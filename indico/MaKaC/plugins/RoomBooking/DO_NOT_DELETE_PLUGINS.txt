@@ -1,0 +1,2 @@
+
+Do not delete built-in plugin ZODB plugin.

@@ -1,0 +1,414 @@
+# -*- coding: utf-8 -*-
+##
+## $Id: collaboration.py,v 1.21 2009/04/25 13:56:05 dmartinc Exp $
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+from datetime import timedelta
+from MaKaC.common.PickleJar import Retrieves
+from MaKaC.common.utils import formatDateTime
+from MaKaC.common.timezoneUtils import nowutc, unixTimeToDatetime
+from MaKaC.plugins.Collaboration.base import CSBookingBase
+from MaKaC.plugins.Collaboration.EVO.common import EVOControlledException, getEVOAnswer, parseEVOAnswer, EVOException,\
+    getMinStartDate, getMaxEndDate, OverlappedError, ChangesFromEVOError,\
+    EVOError
+from MaKaC.plugins.Collaboration.EVO.mail import NewEVOMeetingNotificationAdmin,\
+    needToSendEmails, EVOMeetingModifiedNotificationAdmin, EVOMeetingRemovalNotificationAdmin,\
+    NewEVOMeetingNotificationManager, EVOMeetingModifiedNotificationManager,\
+    EVOMeetingRemovalNotificationManager
+from MaKaC.common.mail import GenericMailer
+from MaKaC.common.logger import Logger
+
+class CSBooking(CSBookingBase):
+    
+    _hasStart = True
+    _hasStop = False
+    _hasCheckStatus = True
+    
+    _requiresServerCallForStart = True
+    _requiresClientCallForStart = True
+    
+    _needsBookingParamsCheck = True
+    _needsToBeNotifiedOnView = True
+    
+    _hasEventDisplay = True
+    
+    _commonIndexes = ["All Videoconference"]
+    
+    _complexParameters = ["communityName", "accessPassword", "hasAccessPassword"]
+        
+    def __init__(self, type, conf):
+        CSBookingBase.__init__(self, type, conf)
+        self._bookingParams = {
+            "communityId": None,
+            "meetingTitle": None,
+            "meetingDescription": None,
+            "sendMailToManagers": False,
+            "type": 0
+        }
+        self._accessPassword = None
+        self._EVOID = None
+        self._url = None
+        
+        self._created = False
+        self._error = False
+        self._errorMessage = None
+        self._errorDetails = None
+        self._changesFromEVO = []
+        
+        self._lastCheck = nowutc()
+        self._checksDone = []
+        
+    def getCommunityName(self):
+        try:
+            return self.getPluginOptionByName("communityList").getValue()[self._bookingParams["communityId"]]
+        except KeyError:
+            return "Non-existant community"
+    
+    def getAccessPassword(self):
+        """ This method returns the access password that will be displayed in the indico page
+        """
+        if self._accessPassword is None:
+            return ""
+        else:
+            return self._accessPassword
+    
+    def setAccessPassword(self, accessPassword):
+        if accessPassword.strip() == "":
+            self._accessPassword = None
+        else:
+            self._accessPassword = accessPassword
+            
+    def getHasAccessPassword(self):
+        return self._accessPassword is not None
+    
+    @Retrieves(['MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking'], 'url')
+    def getURL(self):
+        return self._url
+    
+    @Retrieves(['MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking'], 'errorMessage')
+    def getErrorMessage(self):
+        return self._errorMessage
+    
+    @Retrieves(['MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking'], 'errorDetails')
+    def getErrorDetails(self):
+        return self._errorDetails
+    
+    @Retrieves(['MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking'], 'changesFromEVO')
+    def getChangesFromEVO(self):
+        return self._changesFromEVO
+    
+    def getLastCheck(self):
+        if not hasattr(self, "_lastCheck"): #TODO: remove when safe
+            self._lastCheck = nowutc()
+            self._checksDone = []
+        return self._lastCheck
+    
+    ## overriding methods
+    def _checkBookingParams(self):
+        if self._bookingParams["communityId"] not in self._EVOOptions["communityList"].getValue(): #change when list of community names is ok
+            raise EVOException("communityId parameter (" + str(self._bookingParams["communityId"]) +" ) does not correspond to one of the available communities for booking with id: " + str(self._id))
+
+        if len(self._bookingParams["meetingTitle"].strip()) == 0:
+            raise EVOException("meetingTitle parameter (" + str(self._bookingParams["meetingTitle"]) +" ) is empty for booking with id: " + str(self._id))
+
+        if len(self._bookingParams["meetingDescription"].strip()) == 0:
+            raise EVOException("meetingDescription parameter (" + str(self._bookingParams["meetingDescription"]) +" ) is empty for booking with id: " + str(self._id))
+        
+        if self._startDate > self._endDate:
+            raise EVOException("Start date of booking cannot be after end date. Booking id: " + str(self._id))
+        
+        allowedStartMinutes = self._EVOOptions["allowedPastMinutes"].getValue()
+        if self.getAdjustedStartDate('UTC')  < (nowutc() - timedelta(minutes = allowedStartMinutes )):
+            raise EVOException("Cannot create booking before the past %s minutes. Booking id: %s"% (allowedStartMinutes, str(self._id)))
+        
+        minStartDate = getMinStartDate(self.getConference())
+        if self.getAdjustedStartDate() < minStartDate:
+            raise EVOException("Cannot create a booking %s minutes before the Indico event's start date. Please create it after %s"%(self._EVOOptions["allowedMinutes"].getValue(), formatDateTime(minStartDate)))
+
+        maxEndDate = getMaxEndDate(self.getConference())
+        if self.getAdjustedEndDate() > maxEndDate:
+            raise EVOException("Cannot create a booking %s minutes after before the Indico event's end date. Please create it before %s"%(self._EVOOptions["allowedMinutes"].getValue(), formatDateTime(maxEndDate)))
+        
+        if False: #for now, we don't detect overlapping
+            for booking in self.getBookingsOfSameType():
+                if self._id != booking.getId():
+                    if not ((self._startDate < booking.getStartDate() and self._endDate <= booking.getStartDate()) or
+                            (self._startDate >= booking.getEndDate() and self._endDate > booking.getEndDate())):
+                        return OverlappedError(booking)
+        
+        return False
+    
+    
+    def _create(self):
+        """ Creates a booking in the EVO server if all conditions are met.
+        """
+        arguments = self.getCreateModifyArguments()
+        
+        try:
+            answer = getEVOAnswer("create", arguments, self.getConference().getId(), self._id)
+            
+            returnedAttributes = parseEVOAnswer(answer)
+            
+            self._EVOID = returnedAttributes["meet"]
+            self._url = returnedAttributes["url"]
+            
+            self.bookingOK()
+            self.checkCanStart()
+            
+            if needToSendEmails():
+                try:
+                    notification = NewEVOMeetingNotificationAdmin(self)
+                    GenericMailer.sendAndLog(notification, self.getConference(),
+                                         "MaKaC/plugins/Collaboration/EVO/collaboration.py",
+                                         self.getConference().getCreator())
+                except Exception,e:
+                    Logger.get('EVO').error(
+                        """Could not send NewEVOMeetingNotificationAdmin for booking with id %s , exception: %s""" % (self._id, str(e)))
+                    self._warning = True;
+                    self._warningDetails = "The booking was recorded, but a notification email could not be sent. Reason: " + str(e);
+                    
+            if self._bookingParams["sendMailToManagers"]:
+                try:
+                    notification = NewEVOMeetingNotificationManager(self)
+                    GenericMailer.sendAndLog(notification, self.getConference(),
+                                             "MaKaC/plugins/Collaboration/EVO/collaboration.py",
+                                             self.getConference().getCreator())
+                except Exception,e:
+                    Logger.get('EVO').error(
+                        """Could not send NewEVOMeetingNotificationManager for booking with id %s , exception: %s""" % (self._id, str(e)))
+                    self._warning = True;
+                    self._warningDetails = "The booking was recorded, but a notification email could not be sent. Reason: " + str(e);
+                
+            
+        except EVOControlledException, e:
+            if e.message == "ALREADY_EXIST":
+                return EVOError('duplicated')
+            else:
+                raise EVOException("The booking could not be created\n.The EVO Server sent the following error message: " + e.message)
+                
+
+    def _modify(self):
+        """ Modifies a booking in the EVO server if all conditions are met.
+        """
+        if self._created:
+            arguments = self.getCreateModifyArguments()
+            arguments["meet"] = self._EVOID
+            
+            try:
+                answer = getEVOAnswer("modify", arguments, self.getConference().getId(), self._id)
+                returnedAttributes = parseEVOAnswer(answer)
+                
+                self._EVOID = returnedAttributes["meet"]
+                self._url = returnedAttributes["url"]
+                
+                self.bookingOK()
+                self.checkCanStart()
+                
+                if needToSendEmails():
+                    try:
+                        notification = EVOMeetingModifiedNotificationAdmin(self)
+                        GenericMailer.sendAndLog(notification, self.getConference(),
+                                             "MaKaC/plugins/Collaboration/EVO/collaboration.py",
+                                             self.getConference().getCreator())
+                    except Exception,e:
+                        Logger.get('EVO').error(
+                            """Could not send EVOMeetingModifiedNotificationAdmin for booking with id %s , exception: %s""" % (self._id, str(e)))
+                        self._warning = True;
+                        self._warningDetails = "The modification was recorded, but a notification email could not be sent. Reason: " + str(e);
+                        
+                if self._bookingParams["sendMailToManagers"]:
+                    try:
+                        notification = EVOMeetingModifiedNotificationManager(self)
+                        GenericMailer.sendAndLog(notification, self.getConference(),
+                                             "MaKaC/plugins/Collaboration/EVO/collaboration.py",
+                                             self.getConference().getCreator())
+                    except Exception,e:
+                        Logger.get('EVO').error(
+                            """Could not send EVOMeetingModifiedNotificationManager for booking with id %s , exception: %s""" % (self._id, str(e)))
+                        self._warning = True;
+                        self._warningDetails = "The modification was recorded, but a notification email could not be sent. Reason: " + str(e);
+
+                
+            except EVOControlledException, e:
+                if e.message == "ALREADY_EXIST":
+                    return EVOError('duplicated')
+                else:
+                    raise EVOException("The booking could not be modified\n.The EVO Server sent the following error message: " + e.message)
+            
+        else:
+            self._create()
+            
+    def _start(self):
+        """ Starts an EVO meeting.
+            A last check on the EVO server is performed.
+        """
+        self._checkStatus()
+        if self._canBeStarted:
+            self._permissionToStart = True
+        
+    def _notifyOnView(self):
+        """ This method is called every time that the user sees a booking.
+            It will check the booking status according to the times defined in the 'verifyMinutes' option.
+            If a check must be done, the EVO Server will be contacted.
+        """
+        checksToDo = [timedelta(minutes = int(minutes)) for minutes in self._EVOOptions["verifyMinutes"].getValue()]
+        checksToDo.sort()
+        
+        remainingTime = self.getAdjustedStartDate('UTC') - nowutc()
+        
+        checkDone = False
+        
+        for index, check in enumerate(checksToDo):
+            if remainingTime < check and not check in self._checksDone:
+                self._checkStatus()
+                self._checksDone.extend(checksToDo[index:])
+                checkDone = True
+                break
+        
+        if not checkDone:
+            self.checkCanStart()
+            
+    def _checkStatus(self):
+        if self._created:
+            try:
+                answer = getEVOAnswer("getInfo", {"meet": self._EVOID}, self.getConference().getId(), self._id)                
+                returnedAttributes = parseEVOAnswer(answer)
+                
+                error = self.assignAttributes(returnedAttributes)
+                self.checkCanStart()
+                if error:
+                    return error
+                
+            except EVOControlledException, e:                
+                if e.message == "UNKNOWN_MEETING":
+                    return EVOError('deletedByEVO')
+                else:
+                    raise EVOException("Information could not be retrieved\n.The EVO Server sent the following error message: " + e.message)
+                                        
+    def _delete(self):
+        if self._created:
+            arguments = {
+                "meet": self._EVOID
+            }
+            try:
+                getEVOAnswer("delete", arguments, self.getConference().getId(), self._id)
+                
+                if needToSendEmails():
+                    try:
+                        notification = EVOMeetingRemovalNotificationAdmin(self)
+                        GenericMailer.sendAndLog(notification, self.getConference(),
+                                             "MaKaC/plugins/Collaboration/EVO/collaboration.py",
+                                             self.getConference().getCreator())
+                    except Exception,e:
+                        Logger.get('EVO').error(
+                            """Could not send EVOMeetingNotificationAdmin for booking with id %s , exception: %s""" % (self._id, str(e)))
+                
+                if self._bookingParams["sendMailToManagers"]:
+                    try:
+                        notification = EVOMeetingRemovalNotificationManager(self)
+                        GenericMailer.sendAndLog(notification, self.getConference(),
+                                             "MaKaC/plugins/Collaboration/EVO/collaboration.py",
+                                             self.getConference().getCreator())
+                    except Exception,e:
+                        Logger.get('EVO').error(
+                            """Could not send EVOMeetingRemovalNotificationManager for booking with id %s , exception: %s""" % (self._id, str(e)))
+                
+            except EVOControlledException, e:                
+                if e.message == "DELETE_MEETING_OVER":
+                    return EVOError('cannotDeleteOld')
+                if e.message == "DELETE_MEETING_ONGOING":
+                    return EVOError('cannotDeleteOngoing')
+                else:
+                    raise EVOException("The booking could not be deleted\n.The EVO Server sent the following error message: " + e.message)
+                
+        self._error = False
+    
+    ## end of overrigind methods
+            
+    def getCreateModifyArguments(self):
+        arguments = {
+            "title" : self._bookingParams["meetingTitle"],
+            "desc" : self._bookingParams["meetingDescription"],
+            "start": int(self.getStartDateTimestamp() * 1000), #milliseconds
+            "end": int(self.getEndDateTimestamp() * 1000), #milliseconds
+            "type": 0,
+            "com": self._bookingParams["communityId"]
+        }
+        if self.getHasAccessPassword():
+            arguments["pwd"] = self._accessPassword
+        else:
+            arguments["pwd"] = ''
+            
+        return arguments
+        
+    def assignAttributes(self, attributes):
+        self._changesFromEVO = []
+        
+        verboseKeyNames = {
+            "meet": "EVO Meeting ID",
+            "url": "Koala URL",
+            "title": "Title",
+            "desc": "Description",
+            "start": "Start time",
+            "end": "End time",
+            "type": "Meeting type",
+            "com": "Community"
+        }
+        
+        oldArguments = self.getCreateModifyArguments()
+        changesFromEVO = []
+        for key in oldArguments:
+            if (not key in attributes or attributes[key] != str(oldArguments[key])) and key in verboseKeyNames:
+                changesFromEVO.append(verboseKeyNames[key])
+        
+        self._EVOID = attributes["meet"]
+        self._url = attributes["url"]
+
+        self._bookingParams["meetingTitle"] = attributes["title"]
+        self._bookingParams["meetingDescription"] = attributes["desc"]
+        self.setStartDate(unixTimeToDatetime(int(attributes["start"]) / 1000.0, "UTC"))
+        self.setEndDate(unixTimeToDatetime(int(attributes["end"]) / 1000.0, "UTC"))
+        self._bookingParams["type"] = attributes["type"]
+        self._bookingParams["communityId"] = attributes["com"]
+        
+        self.checkCanStart()
+        
+        if changesFromEVO:
+            return ChangesFromEVOError(changesFromEVO)
+        
+    def bookingOK(self):
+        self._statusMessage = "Booking created"
+        self._statusClass = "statusMessageOK"
+        self._created = True
+        
+    def checkCanStart(self, changeMessage = True):
+        now = nowutc()
+        if self.getStartDate() < now and self.getEndDate() > now:
+            self._canBeStarted = True
+            if changeMessage:
+                self._statusMessage = "Ready to start!"
+                self._statusClass = "statusMessageOK"
+        else:
+            self._canBeStarted = False
+            if now > self.getEndDate() and changeMessage:
+                self._statusMessage = "Already took place"
+                self._statusClass = "statusMessageOther"
+                self._needsToBeNotifiedOfDateChanges = False
+                self._canBeNotifiedOfEventDateChanges = False
+                

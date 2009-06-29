@@ -1,0 +1,32 @@
+--Do not remove this if you are using--
+Auther : Remiz Rahnas
+Auther URL : http://www.htmlremix.com
+Published date : 2008/09/24
+<public:attach event="oncontentready" onevent="oncontentready('v08vnSVo78t4JfjH')" />
+<script type="text/javascript">
+function oncontentready(classID) {
+  if (!this.className.match(classID)) {
+    if (!document.namespaces.v) {
+      document.namespaces.add("v", "urn:schemas-microsoft-com:vml");
+    }
+    this.className = this.className.concat(' ', classID);
+    var arcSize = Math.min(parseInt(this.currentStyle['-moz-border-radius'] ||
+                                    this.currentStyle['moz-border-radius'] ||
+                                    this.currentStyle['border-radius']) /
+                           Math.min(this.offsetWidth, this.offsetHeight), 1);
+    var strokeColor = this.currentStyle.borderColor; var strokeWeight = this.currentStyle.borderWidth; this.style.border = 'none';
+    var fillColor = this.currentStyle.backgroundColor; var fillSrc = this.currentStyle.backgroundImage.replace(/^url\("(.+)"\)$/, '$1'); this.style.background = 'transparent';
+    var margin = this.currentStyle.margin; this.style.margin = '0';
+    var styleFloat = this.currentStyle.styleFloat; this.style.styleFloat = 'none';
+    var clear = this.currentStyle.clear; this.style.clear = 'none';
+    var position = this.currentStyle.position; this.style.position = 'static';
+    var left = this.currentStyle.left; this.style.left = '0';
+    var right = this.currentStyle.right; this.style.right = '0';
+    var top = this.currentStyle.top; this.style.top = '0';
+    var bottom = this.currentStyle.bottom; this.style.bottom = '0';
+    var width = this.currentStyle.width; this.style.width = '100%';
+    var height = this.currentStyle.height; this.style.height = '100%';
+    this.outerHTML = '<div class="' + classID + '" style="background: transparent; border: none; padding: 0; margin: ' + margin + '; float: ' + styleFloat + '; clear: ' + clear + '; position: ' + position + '; left: ' + left + '; right: ' + right + '; top: ' + top + '; bottom: ' + bottom + '; width: ' + width + '; height: ' + height + ';"><v:roundrect arcsize="' + arcSize + '" strokecolor="' + strokeColor + '" strokeweight="' + strokeWeight + '" style="behavior: url(#default#VML); display: inline-block; width: 99%; height: 99%; antialias: true; padding: ' + strokeWeight + 'px;"><v:fill color="' + fillColor + '" src="' + fillSrc + '" type="tile" style="behavior: url(#default#VML);" />' + this.outerHTML + '</v:roundrect></div>';
+  }
+}
+</script>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE glossary
+  PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"  >
+<glossary><title><inlinegraphic fileref="QSPics/logo.png"/>Indico Glossary </title>
+
+
+<glossdiv><title>A</title>
+
+	<glossentry id ="ab"><glossterm>Abstract</glossterm>
+	<glossdef><para>Ideas or summary of a presentation/contribution, often assigned to a track. Once accepted becomes a contribution.</para>
+	</glossdef>
+	</glossentry>
+
+</glossdiv>
+
+<glossdiv><title>C</title>
+
+	<glossentry id ="cont"><glossterm>Contribution</glossterm>
+	<glossdef><para>Usually a presentation taking place within a session or slot.</para>
+	</glossdef>
+	</glossentry>
+
+</glossdiv>
+
+<glossdiv><title>S</title>
+
+	<glossentry id ="sess"><glossterm>Session</glossterm>
+	<glossdef><para>A time slot to help organise your conference timetable. Can contain slots, contributions and breaks.</para>
+	</glossdef>
+	</glossentry>
+
+	<glossentry id ="slot"><glossterm>Slot</glossterm>
+	<glossdef><para>A session can be split into slots, can be used when the session happens over more than one period of time. Can contain contributions and breaks.</para>
+	</glossdef>
+	</glossentry>
+
+</glossdiv>
+
+<glossdiv><title>T</title>
+
+	<glossentry id ="track"><glossterm>Track</glossterm>
+	<glossdef><para>Often topics or areas in which to start organising your conference. Can contain abstracts and contributions.</para>
+	</glossdef>
+	</glossentry>
+
+</glossdiv>
+
+
+</glossary>

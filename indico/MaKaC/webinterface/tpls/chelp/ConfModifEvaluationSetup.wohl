@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+
+<wohl xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="wohl.xsd" version="0.1">
+
+	<page name="ConfModifEvaluationSetup">
+		<tooltip name="currentStatus" target="//*[@id='statusHelp']">
+			<translation language="en">
+				<text>
+					    If set to <strong>HIDDEN</strong>, this survey is
+						not shown in the Display Area and guests cannot answer it
+					    (even if today is within the evaluation period).
+
+					    If set to <strong>VISIBLE</strong>...
+					    <ul>
+					      <li><strong>(not ready)</strong> :
+					      the survey has no question, go to Edit section.</li>
+					      <li><strong>(not open yet)</strong> :
+					      the survey is not yet shown, see evaluation start date.</li>
+					      <li><strong>(closed)</strong> :
+					      the survey is terminated, see evaluation end date.</li>
+					      <li><strong>(running)</strong> :
+					      the form is currently accessible through the Display Area and guests can answer it.</li>
+					    </ul>
+				</text>
+			</translation>
+		</tooltip>
+	
+		<tooltip name="hiddenNoDate" target="//*[@id='hiddenNoDate']">
+			<translation language="en">
+				<text>
+					As your evaluation is <strong>HIDDEN</strong>, 
+					dates are useless.
+				</text>
+			</translation>
+		</tooltip>
+		
+		<tooltip name="startEvaluation" target="//*[@id='startEvaluation']">
+			<translation language="en">
+				<text>
+					When the evaluation starts, following emails are notified.
+    				<title>Note:</title>
+    				No notification is sent if your evaluation is not ready (i.e. contains no question)!
+				</text>
+			</translation>
+		</tooltip>
+
+		<tooltip name="newSubmission" target="//*[@id='newSubmission']">
+			<translation language="en">
+				<text>
+					When a new submission arrives, the following emails are notified.
+				</text>
+			</translation>
+
+		</tooltip>
+
+		<tooltip name="mustHaveAccount" target="//*[@id='mustHaveAccountField']">
+			<translation language="en">
+				<text>
+					Is an account needed?
+  					<title>Hint:</title>
+   	 					If so, visitors must first login before accessing the form.
+				</text>
+			</translation>
+
+		</tooltip>
+
+		<tooltip name="anonymousSubmission" target="//*[@id='anonymousField']">
+			<translation language="en">
+				<text>
+					Can logged submitters send their form anonymously?
+    				<title>Hint:</title>
+    				When anonymous you should get more answers.
+    
+					<title>Note:</title>
+    				Users not logged in can always send their form anonymously.
+    				If you really need to know the identity of all your submitters,
+    				you have to check the option <strong>Must have an account</strong>.
+					
+				</text>
+			</translation>
+
+		</tooltip>
+	</page>
+	
+</wohl>

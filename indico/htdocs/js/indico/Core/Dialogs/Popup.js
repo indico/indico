@@ -1,0 +1,345 @@
+type("PopupDialog", ["PopupWidget"], {
+    draw: function(content, x, y) {
+        return this.PopupWidget.prototype.draw.call(this, content, x, y);
+    },
+
+    clickTriggersClosing: function(target) {
+        // Check if one of the elements that should not trigger
+        // close is clicked
+        var nonCloseTriggeringClick = false;
+        each(this.nonCloseTriggeringElements, function(e) {
+            if (e.ancestorOf(target))
+                nonCloseTriggeringClick = true;
+        });
+        return (!this.canvas.ancestorOf(target) &&
+                !this.triggerElement.ancestorOf(target) &&
+                !nonCloseTriggeringClick);
+    },
+
+    open: function(x, y) {
+        var self = this;
+        this.PopupWidget.prototype.open.call(this, x, y);
+
+        self.clickHandler = function(event) {
+            if (self.clickTriggersClosing($E(eventTarget(event))))
+                self.close();
+        }
+        IndicoUtil.onclickHandlerAdd(self.clickHandler);
+    },
+
+    close: function() {
+        if (this.closeHandler() && this.isopen) {
+            IndicoUtil.onclickHandlerRemove(this.clickHandler);
+            this.PopupWidget.prototype.close.call(this);
+        }
+    },
+    /**
+     * Adds an element to the list of elements that when clicked
+     * on do not trigger close of the popup dialog.
+     */
+    addNonCloseTriggeringElement: function(element) {
+        this.nonCloseTriggeringElements.push(element);
+    }
+},
+     function(content, triggerElement, closeHandler, nonCloseTriggeringElemets) {
+         this.content = content;
+         this.PopupWidget();
+         this.triggerElement = triggerElement;
+         this.closeHandler = closeHandler;
+         this.nonCloseTriggeringElements = any(nonCloseTriggeringElemets, []);
+     }
+    );
+
+type("ExclusivePopup", ["PopupWidget", "Printable"], {
+    open : function() {
+        this.PopupWidget.prototype.open.call(this);
+    },
+
+    draw : function(content, customStyle) {
+        var self = this;
+        var customStyle = any(customStyle, {});
+
+
+        this.greyBg = Html.div({ className: this.printable ? 'noprint' : '', 
+            style: {
+                'opacity': 0.5, /* Standard */
+                'filter': 'alpha(opacity=50)', /* IE */
+                '-khtml-opacity': 0.5, /* Older versions of Safari */
+                '-moz-opacity': 0.5, /* Older versions of Mozilla */
+                'background': '#444444',
+                'position': 'fixed',
+                'width': '100%',
+                'height': '100%',
+                'left': pixels(0),
+                'top': pixels(0)
+            }
+        });
+        IndicoUI.assignLayerLevel(this.greyBg);
+        $E(document.body).append(this.greyBg);
+
+        // This is the div that is being printed when user clicks print
+        this.content = Html.div({}, content);
+        
+        this.contentWrapper = Html.div({style: {padding: pixels(10)}}, this.content);
+        this.container = Html.div({className: 'exclusivePopup' + (this.printable ? ' noprint' : ''), style: customStyle}, this.contentWrapper);
+
+        this.titleDiv = Html.div('title', this.title);
+        this.titleWrapper = Html.div('titleWrapper', this.titleDiv);
+        
+        if (this.title && this.title != '') {
+            // A 20*20px div is added into the existing div to set the size, work-around for an IE bug
+            this.container.append(Html.div('exclusivePopupTopBg', Html.div({style: {width: '20px', height: '20px'}})));
+            this.container.append(this.titleWrapper);
+            this.contentWrapper.setStyle('paddingTop', '0px');
+        }
+        this.container.append(this.contentWrapper);
+
+        this.closeButton = null;
+        if (this.closeHandler != null) {
+            this.closeButton = Html.div('exclusivePopupCloseButton');
+            this.closeButton.observeClick(function(e) {
+                if (self.closeHandler()) {
+                    self.close();
+                }
+            });
+            this.titleWrapper.append(this.closeButton);
+        }
+        
+        this.printLink = null;
+        if (this.showPrintButton) {
+            this.printLink = Html.div('printLink', Html.div('printButton fakeLink', 'Print'));
+            this.titleWrapper.append(this.printLink);
+            this.printLink.observeClick(function() {
+               self.print(); 
+            });
+        }
+            
+
+        return this.PopupWidget.prototype.draw.call(this, this.container, 0, 0);
+    },
+    close: function() {
+        IndicoUI.unAssignLayerLevel(this.greyBg);;
+        $E(document.body).remove(this.greyBg);
+
+        this.PopupWidget.prototype.close.call(this);
+    },
+    postDraw: function() {
+        var winDim = getWindowDimensions();
+
+        // If content is to big for the window add a scrollbar
+        var winHeight = winDim.height - 100;
+        var contentHeight = this.contentWrapper.dom.offsetHeight
+        if (winHeight > this.maxHeight && contentHeight > winHeight) {
+            contentHeight = this.maxHeight;
+        }
+
+        // This is done in order to make sure that the scrollbar is shown
+        // if the content is too big or if new content is added after the popup
+        // dialog is displayed.
+        this.contentWrapper.setStyle('height', pixels(contentHeight));
+        //this.contentWrapper.setStyle('marginTop', pixels((this.closeHandler && !this.title) ? 30 : 10));
+        this.contentWrapper.setStyle('marginBottom', '10px');
+        this.contentWrapper.setStyle('overflowY', 'auto');
+        this.contentWrapper.setStyle('overflowX', 'hidden');
+        this.contentWrapper.setStyle('paddingRight', '10px');
+
+        var left = Math.floor((winDim.width-this.container.dom.offsetWidth)/2)
+        var top = Math.floor((winDim.height-this.container.dom.offsetHeight)/2)
+
+        this.canvas.dom.style.left = pixels(left);
+        this.canvas.dom.style.top = pixels(top);
+        
+        // Make sure the title has correct right padding depending on close button and 
+        // print button;
+        var titlePaddingRight = 20;
+        if (this.closeButton)
+            titlePaddingRight += 30;
+        if (this.printLink)
+            titlePaddingRight += this.printLink.dom.offsetWidth;
+        this.titleDiv.dom.style.paddingRight = pixels(titlePaddingRight);
+
+    },
+    print: function() {
+        if (!exists(this.printDiv)) {
+            this.printDiv = Html.div({className: 'onlyPrint', style: {position: 'absolute', top: '10px', left: '10px'}});
+            $E(document.body).append(this.printDiv);
+        }
+
+        this.printDiv.dom.innerHTML = this.content.dom.innerHTML;
+        
+        this.Printable.prototype.print.call(this, this.printDiv);
+    }
+    },
+     function (title, closeButtonHandler, printable, showPrintButton) {
+         this.title = any(title, null);
+         
+         // Called when user clicks the close button, if the function
+         // returns true the dialog will be closed.
+         this.closeHandler = any(closeButtonHandler, null);
+         
+         // The maximum allowed height, used since it doesn't look
+         // very nice it the dialog gets too big.
+         this.maxHeight = 600;
+         
+         // Decides whether the popup should be printable. That is, when the user
+         // clicks print only the content of the dialog will be printed not the
+         // whole page. Should be true in general unless the dialog is containing
+         // something users normally don't want to print, i.e. the loading dialog.
+         this.printable = any(printable, true);
+         
+         // Whether to show the print button or not in the title
+         // Note: the button will only be shown if the popup dialog has a title.
+         // and is printable.
+         this.showPrintButton = any(showPrintButton && title && printable, false);
+    }
+);
+
+type("BalloonPopup", ["PopupDialog"], {
+    draw: function(x, y) {
+        var self = this;
+
+        this.closeButton = Html.div({className: 'balloonPopupCloseButton'});
+        this.balloonContent = Html.div({className: 'balloonPopup'}, this.closeButton, this.content);
+        this.arrowDiv = Html.div({className: 'balloonPopupArrow', style: {width: this.arrowWidth, height: this.arrowHeight}});
+        this.mainDiv = Html.div({}, this.balloonContent, this.arrowDiv);
+
+        // Hide it until everything is prepared
+        this.mainDiv.dom.style.visibility = 'hidden';
+
+        // Sets the orientation to up
+        this.switchOrientation();
+
+        var toReturn = this.PopupDialog.prototype.draw.call(this, this.mainDiv, x, y);
+
+        this.arrowDiv.dom.style.left = pixels(0);
+        this.closeButton.observeClick(function() {self.close()});
+
+        return toReturn;
+    },
+    open: function(x, y) {
+        var self = this;
+
+        this.x = x;
+        this.y = y;
+
+        this.PopupDialog.prototype.open.call(this, x, y);
+        this.verifyXPos();
+        this.verifyYPos();
+
+        // Everything is done, can now be shown to user
+        this.mainDiv.dom.style.visibility = 'visible';
+    },
+    switchOrientation: function() {
+        if (this.balloonContent.dom.style.bottom == '') {
+            // current orientation is down, set it to up
+            this.balloonContent.dom.style.bottom = pixels(this.arrowHeight - 1);
+            this.balloonContent.dom.style.top = '';
+            this.arrowDiv.dom.style.backgroundPosition = '0 -6px';
+            this.arrowDiv.dom.style.top = '';
+            this.arrowDiv.dom.style.bottom = pixels(0);
+        } else {
+            // current orientation is up, set it to down
+            this.balloonContent.dom.style.top = pixels(this.arrowHeight - 1);
+            this.balloonContent.dom.style.bottom = '';
+            this.arrowDiv.dom.style.backgroundPosition = '0px -25px';
+            this.arrowDiv.dom.style.bottom = '';
+            this.arrowDiv.dom.style.top = pixels(0);
+        }
+    },
+    verifyYPos: function() {
+        var height = this.getBalloonHeight();
+
+        if ((this.y - height) < 5) {
+            this.switchOrientation();
+            return;
+        }
+
+        if ((this.y - height) < getScrollOffset().y )  {
+            if ((getWindowDimensions().height + getScrollOffset().y) > (this.y + height)) {
+                this.switchOrientation();
+                return;
+            }
+        }
+    },
+    verifyXPos: function() {
+        var balloonWidth = this.balloonContent.dom.offsetWidth;
+
+        // Try place the middle of the balloon on mouse pointer position
+        var leftPos = this.x - Math.floor(balloonWidth/2);
+
+        // Check if the balloon is outside left side of browser window
+        if (leftPos - getScrollOffset().x < 0) {
+            leftPos = getScrollOffset().x + 5; // 5 pixel margin
+
+            // Check if the arrow is outside the balloon, then move the balloon to
+            // a correct position based on the arrow
+            var arrowLeftMargin = this.x - Math.floor(this.arrowWidth/2) - this.cornerRadius;
+            if (arrowLeftMargin < leftPos)
+                leftPos = arrowLeftMargin;
+        }
+        // Check if the balloon is outside the right side of browser windows
+        // Counts width 25px margin because of the scrollbar.
+        else if (leftPos + balloonWidth > getScrollOffset().x + getWindowDimensions().width - 25) {
+
+            leftPos = getScrollOffset().x + getWindowDimensions().width - balloonWidth - 25;
+
+            // Check if the arrow is outside the balloon, then move the balloon to
+            // a correct position based on the arrow
+            var arrowRightMargin = this.x + Math.floor(this.arrowWidth/2) + this.cornerRadius;
+            if (arrowRightMargin > leftPos + balloonWidth) {
+                leftPos = arrowRightMargin - balloonWidth;
+            }
+        }
+
+        this.canvas.dom.style.left   = pixels(leftPos);
+        this.arrowDiv.dom.style.left = pixels(this.x - leftPos - Math.floor(this.arrowWidth/2));
+    },
+    close: function() {
+        this.PopupDialog.prototype.close.call(this);
+    },
+    getBalloonHeight: function() {
+        return this.balloonContent.dom.offsetHeight +
+            this.arrowDiv.dom.offsetHeight;
+    }
+},
+     function(content, triggerElement, closeHandler) {
+         this.PopupDialog(content, triggerElement, closeHandler);
+
+         // Constants
+         this.arrowHeight = 19;
+         this.arrowWidth = 35;
+         this.cornerRadius = 6;
+     }
+    );
+
+/**
+ * Utility function to display a popup with errors.
+ * Useful for notifying the user of input mistakes or other errors.
+ * @param {Html or String} title The title of the error popup.
+ * @param {Array of String} errors An Array of strings with the errors to display.
+ * @param {Html or String} afterMessage A message to display after the list of errors.
+ */
+type("ErrorPopup", ["ExclusivePopup"],
+     {
+         draw: function() {
+             var errorList = null;
+             if (this.errors.length == 1) {
+                 errorList = Html.span({className:"errorList"}, this.errors[0]);
+             }else{
+                 errorList = Html.ul("errorList");
+                 each(this.errors, function(e) {
+                     errorList.append(Html.li('', e));
+                 });
+             }
+
+             return this.ExclusivePopup.prototype.draw.call(this,
+                                                            Widget.block([errorList, this.afterMessage]));
+         }
+     },
+
+     function(title, errors, afterMessage) {
+         this.afterMessage = afterMessage;
+         this.errors = errors;
+         this.ExclusivePopup(title, function(){return true;});
+     }
+    );

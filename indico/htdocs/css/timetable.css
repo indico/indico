@@ -1,0 +1,55 @@
+.day{
+	color:gray; 
+	font-weight:bold; 
+    left:0px;
+    position:absolute; 
+}
+
+.time{
+	color:gray; 
+	background-color:white; 
+	font-size:-1; 
+	padding-right:5px; 
+	font-weight:normal;
+    left:65px;
+    height:12px;
+    margin-left:35px;
+    position:absolute;
+}
+
+.blockSession{
+    margin-left:0px; 
+    margin-top:0px;  
+    margin-bottom: 0px; 
+    margin-right:0px;
+    position: absolute;
+    border-top: 2px solid  white;
+    border-left: 1px solid  white;
+    border-right: 1px solid  white;   
+}
+
+.contentTitleBlock{
+    font-size:12;  
+    position:absolute; 
+    color:gray;
+    text-align: left; 
+
+} 
+
+.filterBlock{
+    position:absolute; 
+    font-weight:900;
+    background: #DDDDDD;
+    opacity: 0.8;
+}
+
+.filterType{
+    margin-top: 15px;
+    font-weight:bold;
+    max-height: 200px;
+    overflow: auto;
+}
+
+.filterElement{    
+    font-weight:normal;
+}

@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<xs:schema 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:element name="config">
+    <xs:complexType>
+      <xs:sequence>
+
+	<xs:element name="paths" maxOccurs="unbounded">
+	  <xs:complexType>
+           <xs:sequence>
+              <xs:element name="pathname" type="xs:string" />
+	      <xs:element name="pathdir" type="xs:string"/>
+	   </xs:sequence>
+	 </xs:complexType>
+	</xs:element>
+
+	<xs:element name="db_param">
+           <xs:complexType>
+              <xs:sequence>
+	         <xs:element name="host" type="xs:string" />
+	         <xs:element name="port" type="xs:positiveInteger"/>
+              </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+	<xs:element name="access">
+           <xs:complexType>
+              <xs:sequence>
+	         <xs:element name="user" type="xs:string" />
+	         <xs:element name="group" type="xs:string"/>
+              </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+
+    <xs:element name="url" type="xs:string" />
+       
+    <xs:element name="loginurl" type="xs:string" />
+       
+    <xs:element name="Authlist">
+	<xs:complexType>
+		<xs:sequence>
+    		<xs:element name="authenticator" type="xs:string" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+    </xs:element>
+
+    <xs:element name="email" type="xs:string" />
+
+    <xs:element name="smtp" type="xs:string" />
+
+	<xs:element name="OAI">
+    	   <xs:complexType>
+      	      <xs:all>
+	        <xs:element name="logfile" type="xs:string" />
+	        <xs:element name="nb_record" type="xs:positiveInteger"/>
+		 <xs:element name="nb_ids" type="xs:positiveInteger"/>
+		 <xs:element name="oai_rt_exp" type="xs:positiveInteger"/>
+  		 <xs:element name="namespace" type="xs:string" />
+	 	 <xs:element name="iconfNS" type="xs:string" />
+		 <xs:element name="iconfXSD" type="xs:string" />
+		 <xs:element name="reposName" type="xs:string" />
+  		 <xs:element name="reposId" type="xs:string" />	
+              </xs:all>
+           </xs:complexType>
+        </xs:element>
+
+       <xs:element name="FileType" maxOccurs="unbounded">
+	  <xs:complexType>
+           <xs:sequence>
+              <xs:element name="type" type="xs:string" />
+	      <xs:element name="name" type="xs:string"/>
+	      <xs:element name="loc" type="xs:string"/>
+	      <xs:element name="img" type="xs:string"/>
+	   </xs:sequence>
+	 </xs:complexType>
+	</xs:element>
+
+      <xs:element name="SysIcon" maxOccurs="unbounded">
+	  <xs:complexType>
+           <xs:sequence>
+              <xs:element name="icon" type="xs:string" />
+	      <xs:element name="pic" type="xs:string"/>
+	   </xs:sequence>
+	 </xs:complexType>
+	</xs:element>
+	
+
+
+
+ 	      <xs:element name="event" maxOccurs="unbounded">
+	        <xs:complexType>
+	         <xs:sequence>
+                   <xs:element name="eventname" type="xs:string"/>
+  	           	   <xs:element name="sheets" maxOccurs="unbounded">
+                     <xs:complexType>
+	              <xs:sequence>
+	                <xs:element name="view" type="xs:string" />
+		        <xs:element name="style" type="xs:string"/>
+		     </xs:sequence>
+ 		    </xs:complexType>
+		   </xs:element>
+                 </xs:sequence>
+	        </xs:complexType>
+               </xs:element>
+
+
+
+     	<xs:element name="defaultss" maxOccurs="unbounded">
+	   <xs:complexType>
+	      <xs:sequence>
+	          <xs:element name="eventid" type="xs:string" />
+	          <xs:element name="sheet" type="xs:string"/>
+	      </xs:sequence>
+           </xs:complexType>
+        </xs:element> 
+
+
+	<xs:element name="debug" type="xs:integer" />
+
+
+     </xs:sequence>
+   </xs:complexType>
+</xs:element>
+
+</xs:schema>

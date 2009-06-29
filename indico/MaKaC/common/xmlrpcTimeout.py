@@ -1,0 +1,37 @@
+# -*- coding: utf-8 -*-
+##
+## $Id: xmlrpcTimeout.py,v 1.2 2009/04/25 17:27:35 dmartinc Exp $
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+import xmlrpclib
+from MaKaC.common.httpTimeout import HTTPWithTimeout
+
+class TransportWithTimeout(xmlrpclib.Transport):
+        
+    def setTimeout(self, timeout):
+        self._timeout = timeout
+
+    def make_connection(self, host):
+        return HTTPWithTimeout(host, timeout = self._timeout)
+    
+def getServerWithTimeout(uri, transport=None, encoding=None, verbose=0,
+                         allow_none=0, use_datetime=0, timeout = None):
+    transport = TransportWithTimeout()
+    transport.setTimeout(timeout)
+    return xmlrpclib.ServerProxy(uri, transport, encoding, verbose, allow_none, use_datetime)

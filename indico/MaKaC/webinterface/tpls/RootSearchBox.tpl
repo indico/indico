@@ -1,0 +1,3 @@
+<div>
+%(innerBox)s
+</div>

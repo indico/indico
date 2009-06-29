@@ -1,0 +1,388 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation="schema.xsd">
+
+
+<!--Enter Path names in between the pathdir tags, e.g.<pathdir>c:\tmp</pathdir> or leave blank for default-->
+
+    <paths>
+            <pathname>pkgdirectory</pathname>
+        <pathdir></pathdir>
+    </paths>
+
+    <paths>
+            <pathname>htdocs</pathname>
+    <!--htdocs needs to be the same directory as where you set the modpython handler (or blank)-->
+        <pathdir></pathdir>
+    </paths>
+
+    <paths>
+        <pathname>archive</pathname>
+        <pathdir></pathdir>
+    </paths>
+
+    <paths>
+            <pathname>temp</pathname>
+        <pathdir></pathdir>
+    </paths>
+
+    <paths>
+        <pathname>tpls</pathname>
+            <pathdir></pathdir>
+    </paths>
+
+    <paths>
+        <pathname>ssheets</pathname>
+            <pathdir></pathdir>
+    </paths>
+
+    <paths>
+        <pathname>logDir</pathname>
+            <pathdir>/tmp</pathdir>
+    </paths>
+
+
+    <paths>
+        <pathname>currentdb</pathname>
+            <pathdir></pathdir>
+    </paths>
+
+    <paths>
+        <pathname>dbbackups</pathname>
+            <pathdir></pathdir>
+    </paths>
+
+        <paths>
+        <pathname>XMLCacheDir</pathname>
+            <pathdir></pathdir>
+    </paths>
+
+    <!--Enter database parameters in between tags, e.g. <port>1234</port> or leave as they are for default.
+    
+        'username', 'password' and 'realm' are not mandatory. One must fill them just in the case you want to
+        proctect your database and it must be done according to your ZODB configuration.
+    -->
+
+    <db_param>
+        <host>localhost</host>
+        <port>9675</port>
+        <username></username>
+        <password></password>
+        <realm></realm>
+    </db_param>
+
+
+<!-- Enter user and group name for access rights on the Public Folder (only applicable for linux installations)-->
+    
+    <access>
+        <user></user>
+        <group></group>
+    </access>
+
+
+
+<!--Enter url base in between tags, e.g. <url>http://localhost/MaKaC</url> or leave as it is for default-->
+
+    
+    <url>http://localhost/MaKaC</url>
+
+
+
+<!--Name of the local worker (empty if no load balancing)-->
+	<worker></worker>
+
+<!--Enter your login Url or leave as it is for default-->
+
+    <loginurl></loginurl>
+
+<!--Enter your registration Url or leave as it is for default-->
+
+    <registrationurl></registrationurl>
+
+<!--Enter a short URL to an event (if you configured a redirection in httpd) or leave as it is for default-->
+
+    <shorteventurl></shorteventurl>
+
+<!--Enter a short URL to a category (if you configured a redirection in httpd) or leave as it is for default-->
+
+    <shortcategurl></shortcategurl>
+
+<!--Add any authenticators to the list below the local entry eg. <authenticator>Nice</authenticator> or leave as it is for default-->
+    
+    <Authlist>
+        <authenticator>Local</authenticator>
+    </Authlist>
+
+    <NiceAccount>
+        <NiceLogin></NiceLogin>
+        <NicePassword></NicePassword>
+    </NiceAccount>
+
+
+<!--Support email address. this address will be displayed in the Indico page footers-->
+    <support></support>
+
+
+<!--Enter technical support email in between tags, e.g. <email>indico-project@cern.ch</email>. This address will be used to send error reports-->
+
+    <email></email>
+
+
+<!--Enter SMTP Server to send Email or leave for default-->
+
+    <smtpConfig>
+        <SMTPServer>smtp.cern.ch</SMTPServer>
+        <SMTPLogin></SMTPLogin>
+        <SMTPPassword></SMTPPassword>
+        <SMTPUseTLS>no</SMTPUseTLS>
+    </smtpConfig>
+
+<!--Enter Search Server URL or leave empty by default -->
+
+    <indicoSearch>
+    <searchServer></searchServer> <!-- search server must be just the domain (no http:// needed) -->
+    <searchClass>MaKaC.search.invenioSEA.InvenioSEA</searchClass>
+    </indicoSearch>
+
+<!--Web interface options-->
+    <footer_text>&lt;a href='http://cern.ch'&gt;CERN&lt;/a&gt;</footer_text>
+
+<!--OAI Parameters, leave for default-->
+
+    <OAI>
+        <logfile>/tmp/oailog.log</logfile>
+        <nb_record>100</nb_record>
+        <nb_ids>100</nb_ids>
+        <oai_rt_exp>90000</oai_rt_exp>
+        <namespace>eAgora.cern.ch</namespace>
+        <iconfNS>URL_base</iconfNS>
+        <iconfXSD>URL_base+"/iconf.xsd"</iconfXSD>
+        <reposName>eAgora</reposName>
+        <reposId>eAgora.cern.ch</reposId>
+    </OAI>
+
+<!--Conversion service allow to convert files to PDF
+        - conversion server: URL which we'll to order the conversion
+        - response URL: URL which will received the converted file. It isn't recommendable to modify it.    -->
+
+    <FileConversion>
+        <conversion_server></conversion_server>
+        <response_url>URL_base+"/getConvertedFile.py"</response_url>
+    </FileConversion>
+
+    <!--Report number systems
+        - id: id of the report number system, it is mandatory.
+        - name: name of the report number system, it is mandatory.
+        - url: URL for the report number system.
+    <ReportNumberSystem>
+        <rns_id></rns_id>
+        <rns_name></rns_name>
+        <rns_url></rns_url>
+    </ReportNumberSystem>
+    -->
+    
+
+    
+<!--Known file types-->
+
+	<FileType>
+		<type>RM</type>
+		<name>Real Video</name>
+		<loc>application/vnd.rn-realmedia</loc>
+		<img></img>
+	</FileType>
+
+    <FileType>
+        <type>MOV</type>
+        <name>Quicktime Video</name>
+        <loc>video/quicktime</loc>
+        <img></img>
+    </FileType>
+
+	<FileType>
+		<type>XML</type>
+		<name>XML</name>
+		<loc>text/xml</loc>
+		<img></img>
+	</FileType>
+
+	<FileType>
+		<type>PS</type>
+		<name>PostScript</name>
+		<loc>application/postscript</loc>
+		<img>ps.png</img>
+	</FileType>
+
+	<FileType>
+		<type>SXC</type>
+		<name>Open Office Calc</name>
+		<loc>application/vnd.sun.xml.calc</loc>
+		<img>calc_big.png</img>
+	</FileType>
+
+	<FileType>
+		<type>ODS</type>
+		<name>Open Office Spreadsheet</name>
+		<loc>application/vnd.sun.xml.calc</loc>
+		<img>calc_big.png</img>
+	</FileType>
+
+	<FileType>
+		<type>CSV</type>
+		<name>Ms Excel</name>
+		<loc>application/vnd.ms-excel</loc>
+		<img>excel.png</img>
+	</FileType>
+
+	<FileType>
+		<type>ZIP</type>
+		<name>ZIP</name>
+		<loc>application/zip</loc>
+		<img></img>
+	</FileType>
+
+	<FileType>
+		<type>TAR</type>
+		<name>Tar File</name>
+		<loc>application/tar</loc>
+		<img>zip.png</img>
+	</FileType>
+
+	<FileType>
+		<type>DOC</type>
+		<name>Ms Word</name>
+		<loc>application/msword</loc>
+		<img>word_big.png</img>
+	</FileType>
+
+	<FileType>
+		<type>HTM</type>
+		<name>HTML</name>
+		<loc>text/html</loc>
+		<img></img>
+	</FileType>
+
+	<FileType>
+		<type>SXW</type>
+		<name>Open Office Writer</name>
+		<loc>application/vnd.sun.xml.writer</loc>
+		<img>writer_big.png</img>
+	</FileType>
+
+	<FileType>
+		<type>ODT</type>
+		<name>Open Document Text</name>
+		<loc>application/vnd.sun.xml.writer</loc>
+		<img>writer_big.png</img>
+	</FileType>
+
+	<FileType>
+		<type>OGV</type>
+		<name>Ogg/Theora Video</name>
+		<loc>application/ogg</loc>
+		<img></img>
+	</FileType>
+
+	<FileType>
+		<type>OGG</type>
+		<name>Ogg/Theora Video</name>
+		<loc>application/ogg</loc>
+		<img></img>
+	</FileType>
+
+	<FileType>
+		<type>GZ</type>
+		<name>Zipped File</name>
+		<loc>application/zip</loc>
+		<img>zip.png</img>
+	</FileType>
+
+	<FileType>
+		<type>PDF</type>
+		<name>Portable Document Format</name>
+		<loc>application/pdf</loc>
+		<img>pdf_big.png</img>
+	</FileType>
+
+	<FileType>
+		<type>HTML</type>
+		<name>HTML</name>
+		<loc>text/html</loc>
+		<img></img>
+	</FileType>
+
+	<FileType>
+		<type>SXI</type>
+		<name>Open Office Impress</name>
+		<loc>application/vnd.sun.xml.impress</loc>
+		<img>impress_big.png</img>
+	</FileType>
+
+	<FileType>
+		<type>ODP</type>
+		<name>Open Documents Presentation</name>
+		<loc>application/vnd.sun.xml.impress</loc>
+		<img>impress_big.png</img>
+	</FileType>
+
+	<FileType>
+		<type>PPT</type>
+		<name>Ms Powerpoint</name>
+		<loc>application/vnd.ms-powerpoint</loc>
+		<img>powerpoint_big.png</img>
+	</FileType>
+
+	<FileType>
+		<type>WAV</type>
+		<name>Audio</name>
+		<loc>audio/x-pn-wav</loc>
+		<img></img>
+	</FileType>
+
+	<FileType>
+		<type>TXT</type>
+		<name>Plain Text</name>
+		<loc>text/plain</loc>
+		<img>txt.png</img>
+	</FileType>
+
+	<FileType>
+		<type>XLS</type>
+		<name>MS Excel</name>
+		<loc>application/vnd.ms-excel</loc>
+		<img>xls.png</img>
+	</FileType>
+
+	<FileType>
+		<type>ICAL</type>
+		<name>ICAL</name>
+		<loc>text/calendar</loc>
+		<img></img>
+	</FileType>
+
+	<FileType>
+		<type>RSS</type>
+		<name>RSS</name>
+		<loc>application/xhtml+xml</loc>
+		<img></img>
+    </FileType>
+
+    <FileType>
+		<type>RTF</type>
+		<name>RTF</name>
+		<loc>application/rtf</loc>
+		<img></img>
+	</FileType>
+
+    <!--Enter sanitary level -->
+    <!--0: All html tag are escaped -->
+    <!--1: Raise an error if some javascript or style is submitted  -->
+    <!--2: Raise an error if some javascript is submitted but style is allowed -->
+    <!--3: Accept all -->
+
+    <sanitaryLevel>2</sanitaryLevel>
+
+
+
+</config>

@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+
+<wohl xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="wohl.xsd" version="0.1">
+
+	<page name="ConfModifEvaluationEditQuestion">
+		<tooltip name="requiredField" target="//*[@id='requiredCell']">
+			<translation language="en">
+				<text>
+					If checked, an answer for this question is mandatory.
+				</text>
+			</translation>
+		</tooltip>
+
+		<tooltip name="keyword" target="//*[@id='keywordCell']">
+			<translation language="en">
+				<text>
+					A <strong>keyword</strong> is the summary of the 
+					question in one word.
+					
+					<title>Example:</title>
+					<em>"What is your name?" -> "name"</em>
+				</text>
+			</translation>
+		</tooltip>
+
+		<tooltip name="choiceItems" target="//*[@id='choiceItemsCell']">
+			<translation language="en">
+				<text>
+					<strong>Choice items</strong> are selectable answers. 
+					<title>Example:</title>
+					<em>"What color do you prefer?"</em>
+					<ul>
+						<li><em>red</em></li>
+						<li><em>green</em></li>
+						<li><em>blue</em></li>
+						<li><em>other</em></li>
+					</ul>
+					<title>Note:</title>
+					Check the box next to a choice item, to set it to be a default answer.
+				</text>
+			</translation>
+		</tooltip>
+	</page>
+
+</wohl>

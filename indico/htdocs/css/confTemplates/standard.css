@@ -1,0 +1,232 @@
+/*  
+    Use this stylesheet to modify the layout of your
+    conference.
+*/
+
+
+
+/* ----------- Styles for the conference header ----------- */
+
+/*
+    The wrapper of the whole conference page.
+*/
+.conf {
+    width: 100%;
+    border: none;
+    margin: 0;
+}
+
+/*
+    Wraps around the upper part of the conference header.
+*/
+.confTitleBox {
+    color: white;
+    min-height: 90px;
+    border-top: 3px solid #234173;
+    border-bottom: 1px solid #0f4c80;
+    background: #1a64a0 url("../../images/conf/sprites_blue.png") repeat-x scroll 0 -24px;
+}
+
+/*
+    Sets the width of the upper part of the conference header.
+    Is set to 950px and centered by default.
+*/
+.confTitle {
+    width: 950px;
+    margin: 0 auto;
+}
+
+/*
+    The box containing the logo. By the default the logo is placed 
+    on the left of the conference title.
+*/
+.confLogoBox {
+    float: left;
+    padding-right: 10px;
+}
+
+/*
+    The style for the title text.
+*/
+.conferencetitlelink {
+    font-size:22pt;
+    padding: 25px 0;
+    color: white;
+}
+
+/*
+    Wrapper around the bottom part of the conference header 
+*/
+.confSubTitleBox {
+    min-height: 45px;
+    background: #f5faff url("../../images/conf/sprites_blue.png") repeat-x 0 -213px;
+    border-bottom: 1px solid #d5e4f1;
+    border-top: 1px solid #d5e4f1;
+}
+
+/*
+    The content of the lower part of the header. Is by default
+    centered and has a fixed width.
+*/
+.confSubTitleContent {
+    width: 950px;
+    margin: 0 auto;
+    font-family: Verdana;
+    font-size: 11pt;
+    color: #24425a;
+}
+
+/*
+    Style for links in the lower part of the header
+*/
+.confSubTitle a {
+    font-family: Verdana;
+    font-size: 11pt;
+}
+
+/*
+    Styles for the date and place information.
+*/
+.datePlace {
+    font-family: verdana,arial,sans-serif;
+    font-size: 12pt;
+}
+
+/*
+    Styles for the searchbox
+*/
+.confSearchBox {
+    float: right;
+    background: transparent url("../../images/conf/sprites_blue.png") no-repeat 0 0;
+}
+.confSearchBox .searchButton {
+    color: white;
+}
+.confSearchBox .searchField {
+    color: black;
+}
+
+/*
+    Styles for the nowHappening information
+*/
+.nowHappening .nowHappeningText {
+    margin-right: 5px;
+    float: left;
+}
+
+/*
+    Announcement styles
+*/
+.simpleTextAnnouncement {
+    background: #F5FAFF url(../../images/conf/sprites_blue.png) repeat-x scroll 0 -400px;
+    border-top: 1px solid #c2d6e7;
+    font-family: Verdana;
+    font-weight: bold;
+    font-size: 10pt;
+    text-align: center;
+    color: #0f283d;
+}
+
+
+/* ----------- Styles for the main content ----------- */
+
+/*
+    The wrapper around the menu and the page content.
+    By default centered with a fix width.
+*/
+#confSectionsBox {
+    width: 950px;
+    margin: 0 auto;
+}
+
+
+
+/* ----------- Styles for the menu ----------- */
+
+
+/* Styles for all menu Items */
+
+/*
+    Wrapper around the menu
+*/
+.conf_leftMenu {
+    float:left;
+    width:200px;
+} 
+
+/*
+    Styles for the menu box
+*/
+#outer {
+    background: #f5eedb;
+    border: 1px solid #64615a;
+}
+
+/*
+    The menu item
+*/
+#outer li a {
+    font-family:verdana,arial,sans-serif;
+    font-size: 10pt;
+}
+
+/*
+    The menu item when doing mouseover
+*/
+#outer li a:hover {
+    background: #989486;
+    color: white;
+}  
+
+/*
+    A non selected menu item
+*/    
+.menuConfTitle {
+    text-align:left;
+    color:#0200C6;
+}
+.menuConfTitle a {
+    color: #4e4c46;
+    padding: 7px 12px;
+}
+
+/*
+    A selected menu item
+*/
+.menuConfSelected {
+    font-weight: bold;
+}
+.menuConfSelected a {
+    color: #4e4c46;
+}
+
+/*
+    sub menu item
+*/
+li ul.inner li a { 
+    padding: 3px 12px 3px 30px;
+    background: transparent url(../../images/conf/left_menu_bullet.png) scroll no-repeat 15px center;
+}
+.subMenuConfSelected {
+}
+.subMenuConfSelected a {
+}
+
+/*
+    Support link
+*/
+.confSupportEmailBox{
+    margin: 20px 0;
+}
+
+
+/* ----------- Styles for the page content ----------- */
+
+/*
+    Wrapper around the content
+*/
+.confBodyBox {
+    margin-left:230px;
+}
+
+

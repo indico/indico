@@ -1,0 +1,85 @@
+Indico backup guide at CERN
+===========================
+
+0. Purpose of this document
+
+    This document contains details about the backup policy set up at CERN
+for the Indico system. You'll find detailed instructions about how the backups
+are performed and how the Indico system can be restored in case of trouble or 
+just for "archiving" purposes (looking at older versions of the data). 
+
+
+1. General concerns
+    
+    Before reading this document, please have a look at the Indico document 
+HOWTO_BACKUP in order to have a general knowledge about how to backup an Indico 
+system and the problem it represents.
+    Please, take a look at the document MAINTENANCE_CERN for the details about
+how the Indico software is installed at CERN.
+    
+
+2. Backup
+    
+    At CERN the backup is done using IT service which takes care of it, all we
+have to do it take care of installing the client and schedule the backup. This
+is already done by the group system administrator (Tibor) and the indico 
+directories are already targeted to be backuped so we don't need to worry about
+this. Both the DB and the archive are in the same machine so the 
+synchronisation among them should represent no problem at all as they are 
+backuped at the same time. Both the indico archive and db are on pcdh94:/data04
+and this directory should be backuped by the IT services.
+
+2.1. DB backup
+
+    In order to ensure a good backup of the DB file, a "hot copy" of it is done
+using the script "repozo.py" (see [1] for more info). We use the script 
+pcdh94:/soft/bin/indico_db_backup for launching the backup. This script is
+scheduled as a cronjob by the root user to run dayly just before midnight. It 
+performs a full backup of the db and gzips it under the directory 
+pcdh94:/data04/zodb-backup
+
+2.2. Archive backup
+
+    The archive directory is backuped by the IT service thing as a normal 
+directory structure.
+
+
+4. Restoring
+
+    In order to restore an old copy of Indico at CERN we need to follow the 
+following steps:
+    i) restore from the backuping service the version of pcdh94:/data04 that 
+needs to be recovered on a local directory. Please read carefully Tibor's 
+doc [1] in order to know what needs to be done; for example:
+
+$ sudo /usr/dsm/dsmc restore "/data04/MaKaC/archive/" -subdir=yes /tmp/mydir/archive
+$ sudo /usr/dsm/dsmc restore "/data04/MaKaC/zodb-bakup/" -subdir=yes /tmp/mydir/bk
+    
+    
+    ii) replace the archive directory structure with the restored one by simply
+copying the restored directories to the archive path 
+(pcdh94:/data04/MaKaC/archive); for example:
+
+$ cp -R /tmp/mydir/bk/* /data04/MaKaC/archive/
+
+    iii) restore the db from the backup directory using "repozo"; for example:
+$ /soft/bin/python2.3 /soft/python/bin/repozo.py -R -o data.fs
+
+    iv) copy the db to the destination path.
+    v) start the db server.
+    vi) restart apache
+    vii) everything should work fine.
+
+    Please, keep in mind that the DB needs to run with a compatible version of
+the Indico code (for more info see document HOWTO_BACKUP), so you better restore
+the Indico code which has been backuped at the time the DB was and make it run 
+with it. If you want to restore older copies, you will have to see the version
+correspondence in the file pcdh94:/home/hsanchez/Indico_install.txt and fecth
+the right code version from the CVS repository and do the necessary migrations 
+(this file will be abolished when we set up a way to tag the DB with the last
+sw version used).
+
+
+References
+
+[1] Tibor's notes about "Tivoli Recover Files" <http://simko.home.cern.ch/simko//vademecum/tivoli-recover-files.html>

@@ -1,0 +1,10 @@
+#python -u
+
+_(ur'abc')
+_(Ur'abc')
+_(uR'abc')
+_(UR'abc')
+_(u'abc')
+_(U'abc')
+_(r'abc')
+_(R'abc')

@@ -1,0 +1,99 @@
+Indico at CERN maintenance guide
+================================
+
+0. Purpose of this document
+
+This document aims at describing the details of the Indico installation at CERN.
+You won't find any information about how to install the system or any 
+explanation of the different parts of it, you'll only find the details about the
+concrete configuration at CERN and some instructions for keeping up running.
+
+
+1. Overview of the Indico system at CERN
+
+Nowadays, there is one machine which is dedicated for production at CERN: 
+"pcdh94.cern.ch" which is aliased as "indico.cern.ch". This machine contains
+the whole system including the DB and App servers. Please find in the following
+sections details about each component of the system and its concrete 
+configuration.
+
+
+2. DB server 
+
+As it has been said the DB server is installed and running on the machine 
+"indico.cern.ch". 
+At CERN, ZEO is begin used in order to communicate with ZODB 
+so a ZEO server must be running all the time. The configuration of the ZEO 
+sever is kept in a separated config file which is in /data04/zeo/etc/zeo.cfg.
+Some details about the ZEO configuration:
+    * connection: using TCP socket at address "cdsdoc.cern.ch" port "9675"
+    * db storage: using FileStorage at "/data04/zodb-data/makac/data.fs"
+    * log file: at "/data04/zeo/log/zeo.log"
+
+In order to start/stop the ZEO server and ensure it is always running, Zope 
+zdaemon is used. The configuration of the zdctl is kept in a separted 
+configuration file at "/data04/zeo/etc/zdctl.cfg". This file contains the
+details about how to launch the ZEO server. With the current configuration
+zdctl will launch the ZEO server using zdrun which makes sure that the server is
+always running and if it dies it restarts it automatically. 
+In order to control ZEO server zdctl must always be used; here there are some 
+commands:
+
+    * Start DB server: /soft/bin/python2.3 /soft/python/lib/python2.3/site-packages/zdaemon/zdctl.py -C /data04/zeo/etc/zdctl.cfg start
+    * Stop DB server: /soft/bin/python2.3 /soft/python/lib/python2.3/site-packages/zdaemon/zdctl.py -C /data04/zeo/etc/zdctl.cfg stop
+
+However, a special script exists for making things easier: 
+    
+    * Start DB server: /soft/bin/indico_ctl start
+    * Stop DB server: /soft/bin/indico_ctl stop
+
+Right now the DB server is running under user "hsanchez" so if you are not 
+logged as "hsanchez" you need to execute it with root privileges.
+
+
+3. Archive repository
+
+The archive repository is also on the "indico.cern.ch" machine. The archive 
+repository is under "/data04/MaKaC/archive". This file space must be owned and 
+writable for www-data group.
+
+
+4. Application server
+
+4.1. Indico package
+
+The Indico package is installed in the standard python "site-packages" library:
+"/soft/python/lib/python2.3/site-packages/MaKaC". Which means that the Indico
+configuration file is in "/soft/python/lib/python2.3/site-packages/MaKaC/common/MaKaCConfig.py". Any change in the configuration requires a restarting of the 
+HTTP server (see section 4.2).
+Only root has the right for modifying/updating MaKaC and any update of the 
+Indico package should be done only with FULLY TESTED releases. No modification 
+of the code should be done in the production machine directly; instead, the CVS
+code should be modified and tested in a developement machine; then a new release
+should be done generating a source distribution for it which can be installed
+on the production machine (detailed instructions about how to upgrade the 
+production machine installation can be found at [1]).
+
+4.2. Web interface
+
+The HTTP server...(ask Tibor how to deal with it).
+
+The htdocs layer of the Indico system (mod_python handlers), resources and CSS 
+stylesheets are installed under "/soft/httpd/host/indico/htdocs/". These files 
+should be www-data readable.
+
+
+5. Other
+
+5.1. Submitted abstracts backup
+
+For security reasons, all the submitted abstracts from the Call for Asbtarcts 
+process are backed up in separated XML files. These files are strored under the
+directory "/data04/bk".
+
+6. References
+
+[1] "Upgrade of the Indico sw on the production machine" 
+                                indico/doc/UPGRADE_INDICO_PRODUCTION_CERN
+
+

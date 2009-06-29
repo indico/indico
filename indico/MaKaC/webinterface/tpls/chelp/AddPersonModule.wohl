@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<wohl xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="wohl.xsd" version="0.1">
+
+	<page name="AddPersonModule">
+		<tooltip name="chooseButton" target="//*[@id='chooseButton']" type="hover">
+			<translation language="en">
+				<text>
+					Choose user <strong>from the list</strong>
+				</text>
+			</translation>
+		</tooltip>
+	</page>
+
+</wohl>

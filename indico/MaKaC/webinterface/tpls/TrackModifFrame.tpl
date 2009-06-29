@@ -1,0 +1,2 @@
+<% includeTpl('BannerModif') %>
+%(body)s

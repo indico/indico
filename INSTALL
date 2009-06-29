@@ -1,0 +1,86 @@
+Indico installation manual
+==========================
+
+quick installation guide
+------------------------
+    1) Install Python 2.4.4 (<http://www.python.org/download/releases/2.4.4/>).
+    2) Install Apache HTTP Server 2.0 (<http://httpd.apache.org>). 
+        selecting port 8080 (note that it is possible to install MaKaC in any 
+        other port). Use Apache prefork version only
+    3) Install ZODB 3.4 (<http://www.zope.org/Products/ZODB3.4>).
+    4) Install libxml and libxsl (<http://xmlsoft.org/python.html>)
+    5) Install mod_python 3.3.1 
+        (<http://httpd.apache.org/modules/python-download.cgi>) and follow the 
+        intructions given for modifying apache configuration. 
+    6) Install Python Imaging Library (PIL) v 1.1.6 
+        (<http://www.pythonware.com/products/pil/>).
+    7) Install ReportLab 2.0
+        (<http://www.reportlab.org/downloads.html>).
+    8) Install Pytz (<http://sourceforge.net/projects/pytz>)
+    9) Install Simplejson (<http://pypi.python.org/pypi/simplejson/>)
+    10) Add at the end of the apache configuration file (httpd.conf) the 
+        following:
+<Directory "C:/Program Files/Apache Group/Apache2/htdocs/MaKaC">
+     AddHandler python-program .py
+     PythonHandler mod_python.publisher
+     PythonDebug On
+</Directory>
+
+    Note that the path must be adapted to your filesystem structure
+
+INSTALLATION
+    11) If you wish to run a default installation,proceed to step 13.
+    12) If you wish to run a customised installation :
+	12.1) In the Indico distribution directory, open the Config.xml file into a text editor
+	12.2) Edit the path names and parameters (htdocs path name needs to be the same as the 	directory for the mod python publisher)
+	12.3) Save and close the file		
+    13) In the code directory run the setup script using "setup.py install"
+    14) Start the database daemon.
+    15) Start the apache server.
+    16) Open a web browser and type your base URL plus "/index.py"; example: 	<http://localhost/MaKaC/index.py>
+
+RECONFIGURING AFTER INSTALLATION
+
+    17) If at any point you need to reconfigure any parameters or paths after installation:
+	17.1) In the folder called MaKaC under the python site-packages directory, open the confix.xml file into a text editor, 
+	17.2) Change the paths or parameters that you wish to edit.
+	178.3) Save and close the file
+	17.4) run the script using 'reconfigure.py run'
+	17.5) Restart the apache server
+	
+UPGRADING TO A NEW VERSION
+    18) To upgrade your previous version to a new realease:
+	18.1) from the distribution directory,  'type setup.py upgrade' (this will obtain your current settings)
+	18.2) follow the instructions given
+	18.3) from the code directory type 'setup.py install
+	18.4) Restart the apache server
+
+TO USE AUTHENTICATION MECHANISM WITH ZEO:
+    19) To add an authentication mechanism to the database:
+        19.1) In the configuration file of the database, inside the <zeo> tags, add these three parameters:
+            authentication-protocol digest  # protocol used by zeo, by default, only digest is avaible
+            authentication-database /path/to/the/file/where/the/passwords/will/be/stored/  # must be in a secure place as the empcryption of the password is not strong
+            authentication-realm  # example: indico.cern.ch
+        19.2) use the zeopassword script to add account:
+            python /python/lib/site-package/ZEO/zeopassword.py -C /path/to/the/config/file/of/the/DB username password
+        19.3) add in the Config.xml file the DBUserName, DBPassword and DBRealm values and do a reconfiguration
+
+
+Windows installation : install ZODB as a service
+------------------------------------------------
+    1) download and install ZODB 3.2 for windows (<http://zope.org/Products/ZODB3.2/3.2c1/ZODB3-3.2c1.win32-py2.2.exe>)
+    2) download microsoft srvany tool (<ftp://ftp.pointarrow.com/srvany.zip>) and copy the files instsrv.exe and srvany.exe in your system32 directory
+    3) In the the file WereYouHadInstallMaKaC\MaKaC\indico\src\utils\startDB.py, modify the port(the same that is in "common\MaKaCConfig.py" and the path.
+    4) Open a command line window and type the following:	instsrv ZODB %SystemRoot%\system32\srvany.exe
+    5) Open regedit (type "regedit" in the run dialog window) and go to HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\ZODB
+        Create a key 'Parameters' and navigate to it
+        Now, you have to create three string value:
+                Name                Value
+            AppDirectory            WereYouHadInstallMaKaC\MaKaC\indico\src\utils\
+            Application             c:\python22\python.exe
+            AppParameters           WereYouHadInstallMaKaC\MaKaC\indico\src\utils\startDB.py
+    6) Open the service manager (Right-clic on My Computer->Manage, navigate to services and applications) and find the ZODB service
+        show it properties dialog box, and go to the 'Log On' menu and check 'Local system account'
+        On the general menu, you can set the start option ('automatic' launch the DB when the machine start(recommended) and 'manual' need you start the DB from the service manager or with the command 'net start ZODB').
+    7) you can now start the DB from the service manager
+

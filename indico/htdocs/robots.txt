@@ -1,0 +1,17 @@
+# robots.txt for indico: filter fot robots
+
+User-agent: *
+Allow: /categoryDisplay.py/ical?
+Allow: /conferenceDisplay.py/ical?
+Disallow: /
+
+User-agent: Anarchie
+Disallow: /
+
+User-agent: Ultraseek
+Disallow: /icons/
+
+User-agent: wget
+Allow: /
+
+

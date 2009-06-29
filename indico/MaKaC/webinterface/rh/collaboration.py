@@ -1,0 +1,153 @@
+# -*- coding: utf-8 -*-
+##
+## $Id: collaboration.py,v 1.13 2009/04/28 14:08:41 dmartinc Exp $
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from MaKaC.errors import MaKaCError, PluginError
+from MaKaC.webinterface.pages import conferences
+from MaKaC.webinterface.pages import collaboration
+from MaKaC.webinterface import urlHandlers
+from MaKaC.i18n import _
+from MaKaC.plugins.base import PluginsHolder, Plugin
+from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
+from MaKaC.webinterface.rh.admins import RCAdmin, RHAdminBase
+
+class RCCollaborationAdmin(object):
+    @staticmethod
+    def hasRights(request = None, user = None):
+        """ Returns True if the user is a Server Admin or a Collaboration admin 
+            request: an RH or Service object
+            user: an Avatar object
+            If user is not None, the request object will be used to check the user's privileges.
+            Otherwise the user will be retrieved from the request object 
+        """
+        if user is None:
+            user = request._getUser()
+        
+        # check if user is Server Admin, Collaboration Admin
+        collaborationAdmins = PluginsHolder().getPluginType('Collaboration').getOption('collaborationAdmins').getValue()
+        
+        return RCAdmin.hasRights(None, user) or user in collaborationAdmins
+        
+class RCCollaborationPluginAdmin(object):
+    @staticmethod
+    def hasRights(request = None, user = None, plugins = []):
+        """ Returns True if the user is an admin of one of the plugins corresponding to pluginNames
+            plugins: a list of Plugin objects (e.g. EVO, RecordingRequest) or strings with the plugin name ('EVO', 'RecordingRequest')
+        """
+        if user is None:
+            user = request._getUser()
+        
+        coll = PluginsHolder().getPluginType('Collaboration')
+        
+        if plugins:
+            for plugin in plugins:
+                if not isinstance(plugin, Plugin):
+                    plugin = coll.getPlugin(plugin)
+                
+                if user in plugin.getOption('admins').getValue():
+                    return True
+                
+        return False
+    
+################################################### Server Wide pages #########################################
+class RHAdminCollaboration(RHAdminBase):
+    _uh = urlHandlers.UHAdminCollaboration
+    
+    def _checkParams( self, params ):
+        RHAdminBase._checkParams( self, params )
+        self._queryParams = {}
+        self._queryParams["queryOnLoad"] = (params.get('queryOnLoad', None) == 'true')
+        self._queryParams["page"] = params.get("page", 1)
+        self._queryParams["resultsPerPage"] = params.get("resultsPerPage", 10)
+        self._queryParams["indexName"] = params.get('indexName', 'all')
+        self._queryParams["viewBy"] = params.get('viewBy', 'modificationDate')
+        self._queryParams["orderBy"] = params.get('orderBy', '')
+        self._queryParams["minKey"] = params.get('minKey', '').strip()
+        self._queryParams["maxKey"] = params.get('maxKey', '').strip()
+        self._queryParams["onlyPending"] = (params.get('onlyPending', None) == 'true')
+        self._queryParams["conferenceId"] = params.get('conferenceId', '').strip()
+        self._queryParams["categoryId"] = params.get('categoryId', '').strip()
+    
+    def _checkProtection( self ):
+        if not PluginsHolder().hasPluginType("Collaboration"):
+            raise PluginError("Collaboration plugin system is not active")
+        if not RCCollaborationAdmin.hasRights(self, None): #and not RCCollaborationPluginAdmin.hasRights(self, None, self._tabPlugins)
+            RHAdminBase._checkProtection(self)
+            
+    def _process(self):
+        p = collaboration.WPAdminCollaboration( self , self._queryParams)
+        return p.display()
+        
+    
+################################################### Event Request Handlers ####################################                             
+
+class RHConfModifCSBookings(RHConferenceModifBase):
+    _uh = urlHandlers.UHConfModifCollaboration
+
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        
+        self._activeTab = params.get("tab", None)
+        
+        canSeeAllPluginTabs = self._target.canModify(self.getAW()) or RCCollaborationAdmin.hasRights(self)
+        
+        if canSeeAllPluginTabs:
+            #if the logged in user is event manager, server admin or collaboration admin: we show all plugin tabs
+            self._tabs = CollaborationTools.getTabs(self._conf)
+        else:
+            #else we show only the tabs of plugins of which the user is admin
+            self._tabs = CollaborationTools.getTabs(self._conf, self._getUser())
+        
+        if self._activeTab and not self._activeTab in self._tabs:
+            raise MaKaCError(_("That Video Services tab doesn't exist or you cannot access it"), _("Video Services"))
+        elif not self._activeTab and self._tabs:
+            self._activeTab = self._tabs[0]
+            
+        if canSeeAllPluginTabs:
+            self._tabPlugins = CollaborationTools.getPluginsByTab(self._activeTab, self._conf)
+        else:
+            self._tabPlugins = CollaborationTools.getPluginsByTab(self._activeTab, self._conf, self._getUser())
+            
+    
+    def _checkProtection(self):
+        if not PluginsHolder().hasPluginType("Collaboration"):
+            raise PluginError("Collaboration plugin system is not active")
+        if not RCCollaborationAdmin.hasRights(self, None) and not RCCollaborationPluginAdmin.hasRights(self, None, self._tabPlugins):
+            RHConferenceModifBase._checkProtection(self)
+        
+#        if not self._conf.hasEnabledSection("Video Services"):
+#            return
+#            raise MaKaCError( _("The Video Services section was disabled by the managers."), _("Video Services"))
+        
+    def _process( self ):
+        
+        if self._conf.isClosed():
+            p = conferences.WPConferenceModificationClosed( self, self._target )
+            return p.display()
+        else:
+            ph = PluginsHolder()
+            if ph.getPluginType('Collaboration').getOption("useHTTPS").getValue():
+                self._tohttps = True
+            
+            p = collaboration.WPConfModifCollaboration( self, self._conf)
+            return p.display()
+        
+

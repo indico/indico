@@ -1,0 +1,59 @@
+Tests schedule-related methods
+==============================
+
+>>> from datetime import datetime, date
+>>> import time
+>>> from testenv import endPoint, errorFrom, ordDict, screwDict, testData
+>>> from MaKaC.common.utils import parseDate, parseTime
+>>> endPoint.test.login(username="johndoe", password="johndoe")[:10]
+'johndoe OK'
+
+>>> endPoint.schedule.setSessionSlots(conference=2, value=None)
+False
+>>> errorFrom(endPoint.schedule.setSessionSlots, conference=2, value=True)
+'ERR-S0'
+>>> endPoint.schedule.setScheduleSessions(conference=2, value=True)
+True
+>>> endPoint.schedule.setSessionSlots(conference=2, value=True)
+True
+
+- Try to create session with missing title field
+>>> errorFrom(endPoint.schedule.event.addSession, conference=2, **screwDict(testData.session1,['title']))
+'ERR-P3'
+
+- Try to create session with missing date field
+>>> errorFrom(endPoint.schedule.event.addSession, conference=2, **screwDict(testData.session1,['startDateTime']))
+'ERR-P3'
+
+
+- Create session and slot inside it, and then delete both by deleting
+  the session 
+
+>>> sessId = endPoint.schedule.event.addSession(conference=2, **testData.session1)
+>>> errorFrom(endPoint.schedule.setScheduleSessions, conference=2, value=False)
+'ERR-S2'
+>>> url = endPoint.schedule.session.addSlot(conference=2, session=sessId, **testData.slot1)
+>>> errorFrom(endPoint.schedule.setSessionSlots, conference=2, value=False)
+'ERR-S1'
+>>> errorFrom(endPoint.schedule.event.deleteSession, conference=2, session='does.not.exist')
+'ERR-S4'
+>>> endPoint.schedule.event.deleteSession(conference=2, session=sessId)
+>>> endPoint.schedule.setSessionSlots(conference=2, value=False)
+False
+>>> endPoint.schedule.setScheduleSessions(conference=2, value=False)
+False
+
+- Create session and slot inside it, and then delete both, one by one
+
+>>> sessId = endPoint.schedule.event.addSession(conference=2, **testData.session1)
+>>> url = endPoint.schedule.session.addSlot(conference=2, session=sessId, **testData.slot1)
+>>> errorFrom(endPoint.schedule.session.deleteSlot, conference=2, session=sessId, slot='does.not.exist')
+'ERR-S3'
+>>> endPoint.schedule.session.deleteSlot(conference=2, session=sessId, slot='1')
+>>> endPoint.schedule.event.deleteSession(conference=2, session=sessId)
+>>> endPoint.schedule.setScheduleSessions(conference=2, value=False)
+False
+
+- Create a contribution at the top-level timetable
+
+>>> endPoint.schedule.event.addContribution(conference=2, **testData.contribution1)

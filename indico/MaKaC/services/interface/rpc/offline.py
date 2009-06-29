@@ -1,0 +1,92 @@
+from MaKaC.services.interface.rpc.process import processRequest
+
+from simplejson import dumps
+
+import MaKaC
+
+def offlineRequest(rh, method, params):
+    return dumps(processRequest(method, params, rh._req))
+
+def jsonDescriptor(object):
+
+    # TODO: Merge with locators?
+    
+    if isinstance(object, MaKaC.conference.Conference):
+        return {'conference': object.getId()}
+    elif isinstance(object, MaKaC.conference.Contribution):
+        return {'conference': object.getConference().getId(),
+                'contribution': object.getId()}
+    elif isinstance(object, MaKaC.conference.Session):
+        return {'conference': object.getConference().getId(),
+                'session': object.getId()}
+    elif isinstance(object, MaKaC.conference.SessionSlot):
+        return {'conference': object.getConference().getId(),
+                'session': object.getSession().getId(),
+                'slot': object.getId()}
+    elif isinstance(object, MaKaC.schedule.BreakTimeSchEntry):
+        info = {'conference': object.getOwner().getConference().getId(),
+                     'break': object.getId()}
+        if isinstance(object.getOwner(), MaKaC.conference.SessionSlot):
+            info['slot'] = object.getOwner().getId()
+            info['session'] = object.getOwner().getSession().getId()
+        return info
+
+    return None
+
+def jsonDescriptorType(descriptor):
+    
+    if 'break' in descriptor:
+        return MaKaC.schedule.BreakTimeSchEntry
+    elif 'slot' in descriptor:
+        return MaKaC.conference.SessionSlot
+    elif 'contribution' in descriptor:
+        return MaKaC.conference.Contribution
+    elif 'session' in descriptor:
+        return MaKaC.conference.Session
+    elif 'conference' in descriptor:
+        return MaKaC.conference.Conference
+    else:
+        return None
+
+def decideInheritanceText(event):    
+    if isinstance(event, MaKaC.conference.SessionSlot):
+        text = _("Inherit from parent slot")
+    elif isinstance(event, MaKaC.conference.Session):
+        text = _("Inherit from parent session")
+    elif isinstance(event, MaKaC.conference.Conference):
+        text = _("Inherit from parent event")
+    else:
+        text = str(repr(parent))
+    return text
+
+
+def roomInfo(event, level='real'):
+    # gets inherited/real/own location/room properties
+
+    if level == 'inherited':
+        room = event.getInheritedRoom()
+        location = event.getInheritedLocation()
+        text = decideInheritanceText(event.getLocationParent())
+        
+    elif level == 'real':
+        room = event.getRoom()
+        location = event.getLocation()
+        text = decideInheritanceText(event)
+
+    elif level == 'own':
+        room = event.getOwnRoom()
+        location = event.getOwnLocation()
+        text = ''
+
+    locationName, roomName, address = None, None, None
+    
+    if location:
+        locationName = location.getName()
+        address = location.getAddress()
+    if room:
+        roomName = room.getName()
+
+    return {'location': locationName,
+            'room': roomName,
+            'address': address,
+            'text': text}

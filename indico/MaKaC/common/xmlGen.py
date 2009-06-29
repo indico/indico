@@ -1,0 +1,102 @@
+# -*- coding: utf-8 -*-
+##
+## $Id: xmlGen.py,v 1.12 2008/04/24 16:58:50 jose Exp $
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+from xml.sax import saxutils
+from MaKaC.errors import MaKaCError
+from MaKaC.common.utils import encodeUnicode
+
+class XMLGen:
+    
+    def __init__(self, init=True):
+        self.setSourceEncoding( "utf-8" )
+        if init:
+            self.initXml()
+        else:
+            self.xml=[]
+        self.indent = 0
+
+    def setSourceEncoding( self, newEnc = "utf-8" ):
+        self._sourceEncoding = newEnc
+
+    def initXml(self):
+        #init the OAI response
+        self.xml=["""<?xml version="1.0" encoding="UTF-8"?>\n"""]
+
+    def setSourceEncoding( self, newEnc = "utf-8" ):
+        self._sourceEncoding = newEnc
+
+    def getXml(self):
+        return "".join(self.xml)
+
+    def escapeString(self,text):
+        tmp = encodeUnicode(text, self._sourceEncoding)
+        return saxutils.escape( tmp )
+
+    def openTag(self,name,listAttrib=[],single=False):
+        #open an XML tag
+        #listAttrib is the list of the attribute. each attribute must be set in a 2 elements list like [name,value]
+        #the single parameter, when false, place a '\n\r' after the tag
+        LAtt = ""
+        for att in listAttrib:
+            LAtt= LAtt + ' ' + att[0] + '=' + saxutils.quoteattr(self.escapeString(att[1]))
+        for i in range(0,self.indent):
+            self.xml.append(" ")
+        self.xml.append( "<" + name + LAtt + ">" )
+        if not single:
+            self.xml.append( self.escapeString("\r\n") )
+        self.indent = self.indent+1
+
+    def closeTag(self,name,single=False):
+        #close an XML tag
+        self.indent = self.indent-1
+        if not single:
+            for i in range(0,self.indent):
+                self.xml.append(" ")
+        self.xml.append( "</" + name + ">\r\n")
+
+    def writeText(self,text, single=False):
+        #add text to the response
+        #the single parameter, when false, place a '\n\r' after the text
+        if text!="":
+            text = self.cleanText(text)
+            self.xml.append( self.escapeString(text))
+        if not single:
+            self.xml.append( self.escapeString("\r\n"))
+
+    def writeTag(self,name,value,ListAttrib=[]):
+        #add a full tag
+        self.openTag(name,ListAttrib,True)
+        self.writeText(value,True)
+        self.closeTag(name,True)
+
+    def writeXML(self,text):
+        #add already well-formated text
+        self.xml.append( text )
+
+    def cleanText(self, text):
+        # clean the text from illegal XML characters
+        cm = []
+        for c in range(256):
+            if c < 0x20 and chr(c) not in '\t\r\n':
+                cm.append(" ")
+            else:
+                cm.append(chr(c))
+        return str(text).translate("".join(cm))

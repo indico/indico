@@ -1,0 +1,9 @@
+.conf_leftMenu {
+    float: right;
+    width:200px;
+}
+
+.confBodyBox {
+    margin-left: 0;
+    margin-right: 230px;
+}

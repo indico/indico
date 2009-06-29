@@ -1,0 +1,63 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	
+	<xsd:element name="wohl" type="WOHL"/>
+ 	
+ 	<xsd:complexType name="WOHL">
+ 		<xsd:all>
+		  	<xsd:element name="page" type="Page" minOccurs="1"/>
+	  	</xsd:all>
+  		<xsd:attribute name="version" type="xsd:string" use="required" />
+	</xsd:complexType>
+	
+	<xsd:complexType name="Page">
+		<xsd:sequence>
+			<xsd:element name="tooltip" type="Tooltip" minOccurs="0" maxOccurs="unbounded" />
+			<xsd:element name="information" type="Information" minOccurs="0" maxOccurs="unbounded" />
+		</xsd:sequence>
+  		<xsd:attribute name="name" type="xsd:string" use="required" />
+	</xsd:complexType>
+
+	<xsd:complexType name="Tooltip">
+		<xsd:sequence>
+	  		<xsd:element name="translation" type="Translation" minOccurs="1" maxOccurs="unbounded" />
+	  	</xsd:sequence>
+  		<xsd:attribute name="name" type="xsd:string" use="required" />
+  		<xsd:attribute name="target" type="xsd:string" use="required" />
+  		<xsd:attribute name="type" type="ttType" default="explicit" />
+	</xsd:complexType>
+
+	<xsd:complexType name="Information">
+		<xsd:sequence>
+	  		<xsd:element name="translation" type="Translation" minOccurs="1" maxOccurs="unbounded" />
+	  	</xsd:sequence>
+  		<xsd:attribute name="name" type="xsd:string" use="required" />
+  		<xsd:attribute name="target" type="xsd:string" use="required" />
+	</xsd:complexType>
+
+	<xsd:complexType name="Translation">
+		<xsd:sequence>
+			<xsd:element name="text" type="Text" minOccurs="1" maxOccurs="1" />
+  			<xsd:element name="helpref" type="HelpRef" minOccurs="0" maxOccurs="unbounded" />
+  		</xsd:sequence>
+  		<xsd:attribute name="language" type="xsd:string" use="required" />
+	</xsd:complexType>
+	
+	<xsd:complexType name="HelpRef">
+  		<xsd:attribute name="url" type="xsd:string" use="required" />
+  		<xsd:attribute name="text" type="xsd:string"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="Text" mixed="true">
+		<xsd:choice minOccurs="0"  maxOccurs="unbounded">
+			<xsd:element name="strong" type="Text"/>
+			<xsd:element name="em" type="Text" />
+			<xsd:element name="important" type="Text" />
+		</xsd:choice>
+	</xsd:complexType>
+	
+	<xsd:simpleType name="ttType">
+		<xsd:restriction base="xsd:string">
+        	<xsd:pattern value="explicit|hover"/>
+        </xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

@@ -1,0 +1,268 @@
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+   $Id: it.css,v 1.3 2009/04/28 14:37:04 eragners Exp $
+
+   This file is part of CDS Indico.
+   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+
+   CDS Indico is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 2 of the
+   License, or (at your option) any later version.
+
+   CDS Indico is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+   59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+*/
+
+body {
+    background: white;
+}
+
+h1 {
+	font-size: 35px;
+}
+h2 {
+	font-size: 18px;
+}
+h3 {
+	font-size: 18px;
+}
+h4 {
+	font-size: 15px;
+}
+h5 {
+	font-size: 12px;
+}
+h6 {
+	font-size: 11px;
+}
+pre {
+   font-family: helvetica, verdana, sans-serif;
+   color: #000;
+   white-space: pre-wrap;       /* css-3 */
+   white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+   white-space: -pre-wrap;      /* Opera 4-6 */
+   white-space: -o-pre-wrap;    /* Opera 7 */
+   word-wrap: break-word;       /* Internet Explorer 5.5+ */
+   margin: 0px;
+}
+.tablepre {
+   table-layout: fixed;
+   margin: 0px;
+   padding: 0px;
+   border: 0px;
+}
+p,br,dl,strong,em,h1,h2,h3,h4,h5,h6,td,blockquote,ol,ul,a {
+   color: #000000;
+}
+td{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	/*line-height: 16px;*/
+}
+td a:link,td a:active{
+	text-decoration: none; 
+	color: #006699;
+	font-weight: normal;
+	font-size: 8pt; 
+	font-family: Arial;
+}
+td a:visited {
+	text-decoration: none;  color:#009999 
+}
+td a:hover{
+	color : #666666;
+}
+.SearchButton{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+.menuTextTop a:link,.menuTextTop a:visited,.menuTextTop a:active{
+	font-size: 14px;
+	color: #006699;
+	font-weight: bold;
+}
+.menuTextTop a:hover{
+	color : #666666;
+}
+.menuTextSiteStructure a:link,.menuTextSiteStructure a:visited,.menuTextSiteStructure a:active{
+	color : #000000;
+}
+.menuTextSiteStructure a:hover{
+	color : #666666;
+}
+.menuTextLeft a:link,.menuTextLeft a:visited,.menuTextLeft a:active{
+	font-weight : bold;
+	/*line-height: 16px;*/
+	color : #006699;
+}
+.menuTextLeft a:hover{
+	color : #666666;
+}
+.menuTextLeftActive a:link,.menuTextLeftActive a:visited,.menuTextLeftActive a:active{
+	font-weight : bold;
+	/*line-height: 16px;*/
+	color : #666666;
+}
+.menuTextLeftActive a:hover{
+	color : #666666;
+}
+
+.menuTextSearch{
+	font-size: 11px;
+}
+.introTitleGreen{
+	color: #009999;
+}
+.title1Green{
+	font-size: 25px;
+	color: #009999;
+}
+.title1{
+	font-size: 18px;
+}
+.title2Green{
+	font-size: 15px;
+	color: #009999;
+	font-weight: bold;
+}
+.subtitle {
+	font-size: 15px;
+}
+.title2{
+	font-size: 15px;
+	font-weight: bold;	
+}
+.title3Green{
+	font-size: 12px;
+	color: #009999;
+	font-weight: bold;
+}
+.title3{
+	font-size: 12px;
+	font-weight : bold;
+}
+.linkList{
+	font-size: 11px;
+}
+.introTitleBig1{
+	font-size: 35px;
+}
+.introTitleBig2{
+	font-size: 25px;
+}
+.helpTextBlue a:link,.helpTextBlue a:visited,.helpTextBlue a:active{
+	font-size: 21px;
+	color: #006699;
+}
+.helpTextBlue a:hover{
+	color : #666666;
+}
+.helpTextBlueSmal a:link,.helpTextBlueSmal a:visited,.helpTextBlueSmal a:active{
+	font-weight : bold;
+	color : #006699;
+}
+.helpTextBlueSmal a:hover{
+	color : #666666;
+}
+.iconMedialab{
+	font-size: 10px;
+}
+.helpTextBueNew { 
+	font-size: 21px; 
+	color: #006699; }
+.helpTextBlueSmallNew { 
+	font-weight : bold; 
+	color : #006699; 
+	font-size: 9pt
+}
+table.localmenu {
+	border: 1px solid  #808080
+}
+A:hover {
+	background-color: #dddddd;
+}
+
+.timecolumn { 
+  border-style: none solid solid;
+  border-width: medium 1pt 1pt 1.5pt;
+  border-left: 1.5pt solid #669999;
+  border-right: 1pt solid #669999;
+  border-bottom: 1pt solid #669999;
+  padding: 0cm 5.4pt;
+}
+
+.orgcolumn { 
+  border-style: none solid solid none;
+  border-width: medium 1pt 1pt medium;
+  border-right: 1pt solid #669999;
+  border-bottom: 1pt solid #669999;
+  padding: 0cm 5.4pt;
+}
+
+.themecolumn { 
+  border-style: none solid solid none;
+  border-width: medium 1pt 1pt medium;
+  border-right: 1pt solid #669999;
+  border-bottom: 1pt solid #669999;
+  padding: 0cm 5.4pt;
+}
+
+.topiccolumnnormal {
+  border-style: none solid solid none;
+  border-width: medium 1pt 1pt medium;
+  border-right: 1pt solid #669999;
+  border-bottom: 1pt solid #669999;
+  padding: 0cm 5.4pt;
+}
+
+.topiccolumnwithsc { 
+  border-style: none solid solid none;
+  border-width: medium 1pt 1pt medium;
+  border-right: 1pt solid #669999;
+  border-bottom: 1pt dotted #669999;
+  padding: 0cm 5.4pt;
+}
+
+.spkcolumnnormal { 
+  border-style: none solid solid none;
+  border-width: medium 1pt 1pt medium;
+  border-right: 1pt solid #669999;
+  border-bottom: 1pt solid #669999;
+  padding: 0cm 5.4pt;
+}
+
+.spkcolumnwithsc { 
+  border-style: none solid solid none;
+  border-width: medium 1pt 1pt medium;
+  border-right: 1pt solid #669999;
+  border-bottom: 1pt dotted #669999;
+  padding: 0cm 5.4pt;
+}
+
+.durcolumnnormal { 
+  border-style: none solid solid none;
+  border-width: medium 1pt 1pt medium;
+  border-right: 1pt solid #669999;
+  border-bottom: 1pt solid #669999;
+  padding: 0cm 5.4pt;
+}
+
+.durcolumnwithsc { 
+  border-style: none solid solid none;
+  border-width: medium 1pt 1pt medium;
+  border-right: 1pt solid #669999;
+  border-bottom: 1pt dotted #669999;
+  padding: 0cm 5.4pt;
+}
+.smallfont { 
+  font-size: 8pt;
+  font-family: Arial;
+}

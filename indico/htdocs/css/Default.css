@@ -1,0 +1,4829 @@
+/*
+   A wrapper that wraps around everything except the footer.
+   Used to place the footer correctly at the bottom
+*/ 
+div.wrapper {
+    height: auto !important;
+    min-height: 100%;
+}
+/* 
+    Used to create empty space in end of wrapper
+    which is used but the footer
+*/
+div.wrapper .emptyFooter {
+    height: 50px; /* The height of the footer */
+}
+
+.pageheader{
+    color: gray 
+}
+
+.pagefooter {
+   color: #999;
+   background: #fff;
+   font-size: x-small;
+   margin-top: 20px;
+   padding-bottom: 5px;
+}
+.footerbox {
+   color: #999;
+   background: #fff;
+   margin-left: 0px;
+   padding-left: 5px;
+   padding-right: 5px;
+   border-top: 1px solid #999;
+}
+
+.pagebody {
+    color: #000;
+    background: transparent;
+    margin-left: 10px;
+    margin-top: 10px;
+    margin-right: 10px;
+}
+
+a.note:link {
+   color: #999;
+   background: transparent;
+}
+a.note:visited {
+   color: #999;
+   background: transparent;
+}
+a.note:active {
+   color: #999;
+   background: transparent;
+}
+a.note:hover {
+   color: #999;
+   background: transparent;
+}
+
+/* For the multi-tab control */
+.tabSelected {border-top: gray solid;
+                border-left: gray solid;
+                border-right: gray solid}
+.tab { border: gray solid;
+        background-color: gray }
+.tabSpace { border-bottom: gray solid }
+.tabBody { border-left: gray solid;
+            border-right: gray solid;
+            border-bottom: gray solid }
+.tabLink { color: white }
+
+
+/*For the big-conferences interface pages*/
+.confSupportEmailBox {  text-align: center;
+                        font-size: 12pt }
+
+
+/*
+    Used for meeting and lectures
+*/
+.eventWrapper {
+    background-color: white;
+    width: 1000px;
+    margin: 30px auto;
+    min-height: 500px;
+}
+
+
+/* News styles*/
+
+body {
+    font-family: arial, serif;
+    background: #fff;
+    padding: 0px;
+    margin: 0px;
+    font-size: 10pt;
+}
+
+body, html {
+    height: 100%;
+}
+
+p,br,dl,em,h1,h2,h3,h4,h5,h6,td,blockquote,ol,a {
+   font-size: 10pt;
+   color: #444444;
+}
+
+form {
+    margin: 0;
+}
+
+code {
+   font-family: monospace;
+}
+
+pre {
+   font-family: arial, serif;
+   white-space: pre-wrap;       /* css-3 */
+   white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+   white-space: -pre-wrap;      /* Opera 4-6 */
+   white-space: -o-pre-wrap;    /* Opera 7 */
+   word-wrap: break-word;       /* Internet Explorer 5.5+ */
+   margin: 0px;
+}
+
+.tablepre {
+   table-layout:fixed;
+}
+
+/* 
+    .fakeLink is used on elements that should look
+    like links but are not real links. For example
+    activating javascript code
+*/
+
+a:link, .fakeLink {
+   color: #0b63a5;
+   text-decoration: none;
+}
+a:visited {
+   color: #0b63a5;
+   text-decoration: none;
+}
+a:active {
+   color: #E25300;
+}
+a:hover, .fakeLink:hover {
+   color: #E25300;
+   cursor: pointer;
+}
+a.img:hover {
+   color: #00c;
+}
+a.img:active {
+   color: #00c;
+   font-weight: normal;
+}
+
+/* This will be overidden when a page is printed.
+   It's used for elements that should only be visible
+   when printing */
+.onlyPrint {
+    display: none;
+}
+
+@media print {
+    .noprint {
+        visibility:hidden;
+    }
+    .print {
+        position: fixed;
+        width: 100%;
+        top: 0;
+        left: 0;
+        visibility: visible;
+        overrflow: auto;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .onlyPrint {
+        display: inherit;
+    }
+    
+    .closeButton {
+        display: none;
+    }
+}
+
+
+.dropDownMenu, .dropDownMenuGrey, .dropUpMenu {
+    padding-right: 17px;
+    background: transparent url(../images/menu_arrow_black.png) scroll no-repeat center right;
+    cursor: pointer;
+}
+
+.dropDownMenuGrey {
+    background-image: url(../images/menu_arrow_grey.png);
+}
+
+.dropUpMenu {
+    background: transparent url(../images/menu_arrow_up_black.png) scroll no-repeat center right;
+}
+
+.listtitle {
+   font-weight: bold;
+   font-size: 12pt;
+   color: #234173;
+   background: #D9D9D9;
+   padding: 3px;
+}
+
+.listcell {
+   font-size: 12pt;
+   font-weight: bold;
+   color: #000000;
+   color: #777777;
+   background: #FFFFFF;
+   padding-left: 2px;
+   padding-right: 2px;
+   border-bottom: 1px solid #777777;
+}
+
+
+.separator {
+   font-weight: bold;
+}
+
+.subtitle {
+   font-weight: normal;
+   font-size: 12pt;
+   color: #777777;
+   padding: 3px;
+   margin-top: 2px;
+   margin-bottom: 2px;
+}
+
+.categoryTitle {
+    border-bottom: 2px solid rgb(170, 170, 170);
+    font-size: 26pt;
+    font-family: Times New Roman;
+    color: #B14300;
+    font-weight: normal;
+    margin: 0;
+    margin-bottom: 10px;
+    padding: 0;
+}
+
+.categoryHeader {
+    margin-bottom: 0px;
+}
+
+.categoryHeader a {
+    font-size: 11pt;
+    margin: 0 10px;
+}
+
+.categoryHeader ul {
+    color: #AAA;
+    margin: 15pt 0 0 0;
+    float: right;
+    list-style-type: none;
+}
+
+.categoryHeader li {
+    display: inline;
+    padding: 3px 0;
+}
+
+
+.categoryMap {
+}
+
+.categoryMap a {
+    font-size: 11pt;
+    line-height: 1.6em;
+}
+
+/* styles used for the category overview page */
+
+.categoryOverview {
+    margin-top: 20px;
+}
+
+.categoryOverview table.item {
+    border-bottom: 1px solid #AAAAAA;
+    margin-bottom: 10px;
+    background-color: white;
+    width: 100%;
+}
+
+.categoryOverview table.item td.time {
+    vertical-align: top;
+    text-align: left;
+    padding: 3px;
+    padding-right: 5px;
+    font-style: italic;
+    font-size: 1.0em;
+}
+
+.categoryOverview table.item td.title {
+    vertical-align: top;
+    text-align: left;
+    padding: 3px;
+    width: 100%;
+    font-size: 1.0em;
+}
+
+.categoryOverview table.subItem {
+    border-top: 1px dashed #AAA;
+    padding: 3px 0;
+    width: 100%;
+}
+
+.categoryOverview table.subItem td.time {
+    vertical-align: top;
+    text-align: left;
+    padding: 2px 5px;
+    font-style: italic;
+    font-size: 0.85em;
+}
+
+.categoryOverview table.subItem td.title {
+    vertical-align: top;
+    text-align: left;
+    width: 100%;
+    padding: 2px;
+    font-size: 0.9em;
+    text-align: left;
+}
+
+.categoryOverview table.subItem td.title a {
+    font-size: 1.0em;
+}
+
+.categoryOverview table.subItem td.title span {
+    font-size: 0.9em;
+}
+
+.categoryOverview .dayOverview table.item {
+    font-size: 1.2em;
+}
+
+.categoryOverview .dayOverview table.subItem {
+    font-size: 1.2em;
+}
+
+.menutitle {
+
+   font-weight: bold;
+   font-size: 12pt;
+   color: #000000;
+   background: #DDDDDD;
+   letter-spacing: 6px;
+   padding: 3px;
+}
+
+h2.menutitle {
+   font-weight: bold;
+   font-size: 12pt;
+   color: #000000;
+   background: #DDDDDD;
+   letter-spacing: 6px;
+   padding: 3px;
+}
+
+.menuselectedcell {
+
+   font-weight: bold;
+   font-size: 12pt;
+   color: #E25300;
+   background: #FFFFFF;
+   border-bottom: 2px solid #234173;
+   border-top: 2px solid #234173;
+}
+
+.menumiddlecell {
+
+   font-weight: bold;
+   font-size: 12pt;
+   color: #000000;
+   background: #D9D9D9;
+   border-bottom: 2px solid #FFFFFF;
+}
+
+.menutopcell {
+
+   font-weight: bold;
+   font-size: 12pt;
+   color: #000000;
+   background: #D9D9D9;
+   border-top: 2px solid #234173;
+   border-bottom: 2px solid #FFFFFF;
+}
+
+.menubottomcell {
+
+   font-weight: bold;
+   font-size: 12pt;
+   color: #000000;
+   background: #D9D9D9;
+   border-bottom: 2px solid #234173;
+}
+
+.menuadd {
+   background: #5294CC;
+   color: #FFFFFF;
+   font-weight: bold;
+}
+
+a.menuaddlink:link {
+   background: transparent;
+   color: #FFFFFF;
+   font-weight: bold;
+}
+a.menuaddlink:visited {
+   background: transparent;
+   color: #FFFFFF;
+   font-weight: bold;
+}
+a.menuaddlink:active {
+   background: transparent;
+   font-weight: bold;
+   color: #E25300;
+}
+a.menuaddlink:hover {
+   background: transparent;
+   font-weight: bold;
+   color: #E25300;
+}
+
+.outervtab {
+
+   font-size: 12pt;
+   font-weight: bold;
+   color: #777777;
+   background: #FFFFFF;
+   padding: 0px;
+   border-right: 2px solid #777777;
+}
+
+.vtabmenu {
+
+   font-weight: bold;
+   font-size: 12pt;
+   color: #FFFFFF;
+   background: #777777;
+}
+
+.lastvtabtitle {
+
+   font-size: 12pt;
+   font-weight: bold;
+   color: #E25300;
+   background: #E5E5E5;
+   padding: 0px;
+   padding-left: 3px;
+   border-top: 2px solid #777777;
+}
+
+.lastvtab {
+
+   font-size: 12pt;
+   font-weight: bold;
+   color: #777777;
+   background: #E5E5E5;
+   padding-left: 5px;
+   padding-top: 5px;
+   padding-right: 0px;
+   border-left: 2px solid #777777;
+}
+
+.vtab {
+
+   font-size: 12pt;
+   font-weight: bold;
+   color: #777777;
+   background: #FFFFFF;
+   padding-left: 5px;
+   padding-top: 5px;
+   padding-right: 0px;
+   border-left: 2px solid #777777;
+}
+
+.vtabtitle_old {
+
+   font-size: 12pt;
+   font-weight: bold;
+   color: #FFFFFF;
+   background: #0B63A2;
+   padding: 0px;
+   padding-left: 3px;
+}
+
+.vtabtitle {
+
+   font-size: 12pt;
+   font-weight: bold;
+   background: #E5E5E5;
+   padding: 0px;
+   padding-left: 3px;
+   border-top: 2px solid #777777;
+}
+
+.gestiontable {
+   margin-left: 10px;
+   padding: 0px;
+}
+
+.intermediatevtab {
+   color: #777777;
+   background: #E5E5E5;
+   border-left: 2px solid #777777;
+}
+
+.intermediateleftvtab {
+   display: none;/*
+   color: #777777;
+   background: #E5E5E5;
+   border-top: 2px solid #777777;*/
+}
+.frameBodyMngArea {
+
+   color: #777777;
+   background: #E5E5E5;
+   border-bottom: 2px solid #777777;
+   border-right: 2px solid #777777;
+   border-left: 2px solid #777777;
+}
+
+.bottomvtab {
+
+   color: #777777;/*
+   background: #E5E5E5;
+   padding: 7px;
+   padding-top: 0px;
+   border-left: 2px solid #777777;
+   border-right: 2px solid #777777;
+   border-bottom: 2px solid #777777;*/
+}
+
+.htab {
+   /*border-left: 2px solid #777777;*/
+}
+
+
+
+.tabbarseparator {
+   background: #F2F2F2;
+   border-right: 2px solid #777777;
+   font-size: 3pt;
+}
+
+.display_selectedhtab {
+   color: #E25300;
+   font-weight: bold;
+   background: #FFFFFF;
+   padding: 1px;
+   padding-left:3px;
+   padding-right:3px;
+   padding-top: 3px;
+   border-right: 2px solid #777777;
+   border-top: 2px solid #777777;
+   
+}
+
+.display_unselectedhtab {
+   background: transparent;
+   font-weight: bold;
+   padding: 1px;
+   padding-left:3px;
+   padding-right:3px;
+   padding-top: 3px;
+   border-right: 2px solid #777777;
+   border-bottom: 2px solid #777777;
+}
+
+.display_neutralhtab {
+   background: transparent;
+   font-weight: bold;
+   padding: 1px;
+   border-bottom: 2px solid #777777;
+}
+
+.maincell {
+   background: #FFFFFF;
+   /*border-bottom: 2px solid #777777;
+   border-right: 2px solid #777777;*/
+   padding-top: 10px;
+   padding-bottom: 5px;
+   padding-right: 5px;
+}
+
+.header {
+   background-image: url(../images/bg_header.png);
+   border-bottom: 2px solid #234173;
+}
+
+.mngheader {
+   background-image: url(../images/bg_mng_header.png);
+   border-bottom: 2px solid #E25300;
+}
+
+.managerheadertitle {
+   font-weight: bold;
+   font-size: 12pt;
+   letter-spacing: 4px;
+   color: #FFFFFF;
+   text-align: center;
+   vertical-align: middle;
+   background: #E25300;
+   padding-top:4px;
+   padding-bottom:4px;
+   padding-left:8px;
+   padding-right:8px;
+}
+
+.adminheadertitle {
+   font-weight: bold;
+   font-size: 12pt;
+   letter-spacing: 4px;
+   color: #FFFFFF;
+   text-align: center;
+   vertical-align: middle;
+   background: #234173;
+   padding-top:6px;
+   padding-bottom:4px;
+   padding-left:8px;
+   padding-right:8px;
+}
+
+.blacktext {
+   color: #000000;
+   vertical-align: top;
+}
+
+.bluetext {
+   color: #234173;
+}
+
+.whitelink {
+   color: #FFFFFF;
+   background: transparent;
+   font-weight: bold;
+   text-decoration: none;
+}
+
+.conferencetitlelink {
+   font-size: 25pt;
+   background: transparent;
+}
+
+.greylink {
+   color: #777777;
+   background: transparent;
+   text-decoration: none;
+}
+
+.imglink {
+   border:0;
+}
+
+.bluerowheader {
+   background: #204080;
+   height: 4px;
+}
+
+.protected{
+   font-weight: normal;
+   color: gray;
+   font-size: smaller;
+}
+
+.parenthesisborder{
+   border-right: 2px solid #777777;
+   border-top: 2px solid #777777;
+   border-bottom: 2px solid #777777;
+}
+
+.topborder{
+   border-top: 1px solid #777777;
+}
+
+.bottomborder{
+   border-bottom: 1px solid #777777;
+   padding: 0px;
+   height: 2px;
+}
+
+.leftborder{
+   border-left: 1px solid #777777;
+}
+
+.rightborder{
+   border-right: 1px solid #777777;
+   padding: 0px;
+   width: 1%;
+   text-align: left;
+}
+
+/*All used styles*/
+/* TODO: should probably be removed...
+.confTitle { 
+   font-size: 25pt;
+   vertical-align: bottom;
+   padding-left: 30px;
+   padding-bottom: 10px;
+   padding-top: 10px;
+}
+
+.confTitle h1 {
+    margin: 0;
+    display: inline;    
+    
+}
+
+
+.confDate { 
+   font-size: 14pt;
+   font-weight: bold;
+   background: #777777;
+   color: #FFFFFF;
+   vertical-align: middle;
+   text-align: left;
+   padding: 2px;
+   padding-left: 30px;
+   padding-right: 15px;
+}
+.confPlace { 
+   font-size: 14pt;
+   font-weight: bold;
+   background: #E5E5E5;
+   color: #777777;
+   vertical-align: middle;
+   text-align: left;
+   padding: 2px;
+   padding-left: 15px;
+}
+
+.conf {}
+
+.confTitleBox { text-align: center }
+
+.confBodyBox { background: white;
+                vertical-align: top;
+                padding-left: 3px;
+                padding-top: 8px; 
+                padding-right: 3px }
+
+.confSectionsBox {  width: 180px;
+                    vertical-align: top;
+                    padding-left: 1px;
+                    padding-right: 1px}
+
+.confLogoBox { background: white;
+               vertical-align: middle;
+               text-align: center;
+               border: 0px;}
+
+.menuConf {
+   padding-left: 10px;
+}
+
+.menuConfTitle {
+   font-weight: bold;
+   font-size: 12pt;
+   color: #0200C6;
+   background: #E5E5E5;
+   padding: 3px;
+   border-top: 1px solid #777777;
+}
+
+.menuConfTopCell {
+   border-bottom: 2px solid #1B3162;
+   color: #0200C6;
+   background: transparent;
+   font-weight: bold;
+   text-decoration: none;
+   font-size: 11px;
+}
+
+.menuConfBottomCell {
+   background: #FFFFFF;
+   border-top: 2px solid #1B3162;
+   padding-top: 0px;
+}
+
+.menuConfMiddleCell {
+   font-size: 11px;
+   font-weight: lighter;
+   color: #0200C6;
+   background: #FFFFFF;
+   padding: 3px;
+   padding-left: 10px;
+   border-top: 1px solid #777777;
+}
+
+.menuConfselected {
+   font-weight: bold;
+   font-size: 12pt;
+   color: #FFFFFF;
+   background: #E25300;
+   border-bottom: 1px solid #777777;
+   padding: 3px;
+}
+
+a.confSection:link {
+   background: transparent;
+   font-weight: bold;
+   text-decoration: none;
+   font-size: 12pt;
+}
+a.confSection:visited {
+   background: transparent;
+   font-weight: bold;
+   text-decoration: none;
+   font-size: 12pt;
+}
+a.confSection:active {
+   background: transparent;
+   font-weight: bold;
+   text-decoration: none;
+   font-size: 12pt;
+}
+a.confSection:hover {
+   background: transparent;
+   font-weight: bold;
+   text-decoration: none;
+   font-size: 12pt;
+}
+
+a.confSubSection:link {
+   font-size: 11px;
+   font-weight: lighter;
+   background: transparent;
+}
+a.confSubSection:visited {
+   font-size: 11px;
+   font-weight: lighter;
+   background: transparent;
+}
+a.confSubSection:active {
+   font-size: 11px;
+   font-weight: lighter;
+   background: transparent;
+}
+a.confSubSection:hover {
+   font-size: 11px;
+   font-weight: lighter;
+   background: transparent;
+}
+
+*/
+
+.iconPDF { border-left: 1px solid #777777;
+           border-top: 1px solid #777777;
+           border-bottom: 1px solid #777777;
+           }
+
+.errorDetailsBox { color: gray;
+                    font-size: 12pt;
+                    border: 1px solid
+                }
+
+
+.loginInfoHeader {
+   background: #FFFFFF;
+   vertical-align: top;
+}
+
+.dataCaptionTD {
+   vertical-align: top;
+   text-align: right;
+   padding-right: 15px;
+   width: 15%;
+}
+
+.dataCaptionFormat {
+    font-size: 10pt;
+    font-family: Verdana, Arial;
+    color: #523D04;
+}
+
+.horizontalLine {
+   border-top: 1px solid #AAA;
+   padding-left: 20px;
+}
+
+.buttonsSeparator {
+    margin-top: 5px;
+    /* border-top: 1px solid #777777; */
+}
+
+.groupTitle, .groupTitleNoBorder {
+   font-family: "Times New Roman", Verdana, Arial;
+   font-size: 18pt;
+   color: #4E4C46;
+   letter-spacing: 1px;
+   padding: 3px;
+   border-bottom: 1px solid #777777;
+   margin: 10px 0;
+}
+
+.groupTitleNoBorder {
+   border-bottom: none;
+}
+
+.groupTitleSmall {
+   font-weight: bold;
+   font-size: 11pt;
+   color: #777777;
+   background: #EBEBEB;   
+   padding: 3px;
+}
+
+
+.greyGroupTitle{
+    font-weight: bold;
+    font-size: 12pt;
+    color: #FFFFFF;
+    background: #777777;
+    letter-spacing: 6px;
+    padding: 3px;
+    background: #EBEBEB none repeat scroll 0 0;
+    color: gray;
+    text-align:left;
+}
+
+.groupLink {
+   font-weight: normal;
+   font-size: 10px;
+   color: #FFFFFF;
+   background: #777777;
+   letter-spacing: 1px;
+}
+
+.titleCellTD, .titleCellNoBorderTD {
+   vertical-align: top;
+   text-align: right;
+   padding-right: 15px;
+   width: 15%;
+}
+
+.titleCellFormat {
+    font-size: 10pt;
+    font-family: Verdana, Arial;
+    color: #523D04;
+}
+
+.contentCellTD {
+    color: black;
+}
+
+.subgroupTitle {
+   font-weight: bold;
+   font-size: 18px;
+   color: #888888;
+   padding: 3px;
+   border-bottom: 2px solid #777777;
+   vertical-align: bottom;
+}
+
+.abstractLeftDataCell {
+    padding-right:5px; 
+    border-bottom: 1px solid #888888; 
+    border-left: 5px solid #FFFFFF;
+    vertical-align: top;
+}
+
+.abstractDataCell {
+    padding:5px; 
+    border-bottom: 1px solid #888888; 
+    vertical-align: top;
+}
+
+.displayTitle {
+   font-size: 18px;
+   color: #5294CC;
+   padding: 3px;
+   vertical-align: bottom;
+}
+
+.formTitle {
+   font-weight: bold;
+   font-size: 18px;
+   color: #888888;
+   padding: 3px;
+   border-bottom: 2px solid #777777;
+   vertical-align: bottom;
+}
+
+.buttonBar {
+   background: #F0F0F0;
+   padding: 1px;
+}
+
+.legend {
+   border: 1px solid #5294CC;
+   background:#F6F6F6;
+}
+
+.confDisplayTitle {
+   font-size: 24px;
+   color: #5294CC;
+   padding: 3px;
+   vertical-align: bottom;
+   border-bottom: 2px solid #777777;
+   text-align: center;
+}
+
+.trackDisplayTitle {
+   font-size: 14px;
+   font-weight: bold;
+   color: #5294CC;
+   padding: 3px;
+   vertical-align: bottom;
+}
+
+.displayField {
+    color: #444;
+    font-size:12px;
+    font-weight: bold;
+    padding: 3px 20px 3px 0;
+}
+
+.calendar thead .title {
+   border: none;
+   background: #ECECEC;
+   color:#444;
+   cursor:pointer;
+   font-weight: bold;
+}
+
+.calendar .button {
+   border: none;
+   background: #ECECEC;
+   color:#444;
+   cursor:pointer;
+   font-weight: bold;
+}
+
+/*.marquee {
+   vertical-align: middle;
+   text-align: center;
+   border: 1px solid #5294CC;
+   width:60%;
+   background:#F6F6F6;
+}*/
+
+.categoryInfo {
+    font-size: 10pt;
+    font-style: italic;
+    color: #444;
+    margin-top: 5px;
+}
+
+.categoryManagers {
+    font-size: 10pt;
+    color: #444;
+    margin-top: 5px;
+}
+
+.ACtab { 
+   background-image: url(../images/keys.png);
+   background-repeat: no-repeat;
+}
+
+.toolsTab { 
+   background-image: url(../images/tools.png);
+   background-repeat: no-repeat;
+}
+
+.VCTab { 
+   background-image: url(../images/videoconference.png);
+   background-repeat: no-repeat;
+}
+
+.participantsTab { 
+   background-image: url(../images/participants.png);
+   background-repeat: no-repeat;
+}
+
+.timetableTab { 
+   background-image: url(../images/pocketwatch.png);
+   background-repeat: no-repeat;
+}
+
+.filesTab { 
+   background-image: url(../images/folder.png);
+   background-repeat: no-repeat;
+}
+
+.logsTab { 
+   background-image: url(../images/penpaper.png);
+   background-repeat: no-repeat;
+}
+
+.listingsTab { 
+   background-image: url(../images/listings.png);
+   background-repeat: no-repeat;
+}
+
+.confirmTab {
+   background-image: url(../images/warning.png);
+   background-repeat: no-repeat;
+}
+
+.moveTab {
+   background-image: url(../images/greenarrow.png);
+   background-repeat: no-repeat;
+}
+
+input, textarea, select {
+   font-size: 100%;
+}
+    
+input.smallbtn {
+   color:  #123062;
+   font-size: 80%;
+   text-decoration: none;
+   margin: 0px;
+   margin-top: 1px;
+   margin-right: 1px;
+   padding: 0px;
+   background-color: #D9D9D9;
+   border: 1px solid #fff;
+   border-top-color: #eee;
+   border-left-color: #eee;
+   border-right-color: #669;
+   border-bottom-color: #669;
+}
+
+.yellowButton {
+    background: white url(../images/sprites.png) repeat-x scroll 0 -90px;
+    padding: 2px;
+}
+
+.yellowButton input {
+    background-color: transparent;
+    border: 0;
+    color: black;
+}
+
+.loginButton {
+    border: 1px solid #AAA;
+    float: left;
+    text-align: center;
+}
+
+.loginButton input {
+    cursor: pointer;
+    padding: 0 10px;
+}
+
+.nav_border {
+   color: #eee;
+   background-color: #ddd;
+   border: 1px solid #eee;
+   border-right: 1px solid #aaa;
+   border-bottom: 1px solid #aaa;
+   padding-left: 2px;
+   padding-right: 2px;
+}
+
+a.nav_link:link {
+   color: #5294cc;
+   font-weight: normal;
+}
+a.nav_link:visited {
+   color: #5294cc;
+   font-weight: normal;
+}
+a.nav_link:active {
+   color: #5294cc;
+   font-weight: normal;
+}
+a.nav_link:hover {
+   color: #5294cc;
+   font-weight: normal;
+}
+.nav_alphabet{ height: 25px; }
+
+.nav_alphabet span.nav_border { line-height: 15px; }
+
+.nav_alphabet a{
+   width: 10px;
+   margin-top: 5px;
+}
+
+
+
+/* ===== ROOM BOOKING ================= */
+
+.tip {
+    border:solid 1px #888888; 
+    color:#222222; 
+    background-color:#f0f0f0; 
+    font-size: 11px;
+}
+
+.tip ul {
+    color:#222222;
+    font-size:11px;
+}
+
+.tip a {
+    font-size:11px;
+}
+
+.tip-no-borders {
+    border: none; 
+    color:#222222; 
+    background-color:#f0f0f0; 
+    font-size: 11px;
+}
+
+/* Room booking - calendar bar */
+.barUnaval { /* Bar representing unavailable period */
+    position: absolute; 
+    background-color: #FFE0C5; 
+    border: solid 1px #CCC; 
+    height: 10px; 
+}
+.barCand { /* Bar representing candidate reservation */
+    position: absolute; 
+    background-color: #A7FFD0; 
+    border: solid 1px #CCC; 
+    height: 10px; 
+}
+.barConf { /* Bar representing conflict */
+    position: absolute; 
+    background-color: #D0000A; 
+    border: solid 1px #CCC; 
+    height: 10px; 
+}
+
+.barPreB { /* Bar representing PRE-booking */
+    position: absolute; 
+    background-color: #FFFEB1; 
+    border: solid 1px #CCC; 
+    height: 10px;
+}
+
+.barPreC { /* Bar representing conflict with PRE-booking */
+    position: absolute;
+    background-color: #FFB1F1;
+    border: solid 1px #CCC;
+    height: 10px;
+}
+
+.barPreConc { /* Bar representing concurrent PRE-bookings */
+    position: absolute;
+    background-color: #D1F3FF;
+    border: solid 1px #CCC;
+    height: 10px;
+}
+
+.dayDiv {
+    position: relative; 
+    height: 10px; 
+    font-size:0px; 
+    margin-top: 6px;
+}
+
+.calHour {
+    position: absolute; 
+    font-size: 8px; 
+    height: 10px; 
+    color: Black;
+}
+
+/* Form fields: field description width. */
+.subFieldWidth {
+    width: 84px; 
+}
+.subFieldWidthSmaller
+{
+    width: 60px; 
+}
+
+.actionSucceeded
+{
+    color: Green; margin-left: 6px; font-weight: bold;
+}
+
+.actionFailed
+{
+    color: Red; margin-left: 6px; font-weight: bold;
+}
+
+.publicRoom { color: Green; }
+.moderatedRoom { color: #D37209; }
+.privateRoom { color: Red; }
+
+
+/********************/
+/**** Evaluation ****/
+/********************/
+
+.evaluationForm {
+    width: 940px;
+    margin: 30px auto;
+    background-color: white;
+    padding: 50px 30px;
+}
+
+/* Edit - left menu */
+table.evalEditLeftMenu {
+    vertical-align:middle;
+    text-align:left;
+    margin-left:5px;
+    border:1px solid black; 
+    width:125px;
+}
+table.evalEditLeftMenu td {
+    vertical-align:middle;
+    white-space:nowrap;
+    border:1px solid #cccccc;
+}
+table.evalEditLeftMenu a {
+    color:#000000;
+    background:transparent;
+    text-decoration:none;
+}
+table.evalEditLeftMenu a:hover {
+    color:#E25300;
+    font-weight:bold;
+}
+
+/* Setup */
+table.notificationShow tr{
+    vertical-align:top;
+}
+table.notificationShow td.small{
+    font-size:8pt;
+}
+table.evalSetupSpecialActions td {
+    font-size:8pt;
+}
+table.evalSetupSpecialActions form {
+    margin:0;
+}
+table.evalSetupSpecialActions form input {
+    width:130px;
+}
+table.evalationSetupImportXml {
+    border-top-width:0;
+    border-right-width:0;
+    border-bottom-width:0;
+    border-left:1px solid #777777;
+}
+table.evalationSetupImportXml input {
+    margin-bottom:0;
+}
+/* Setup DataModif */
+table.DataModif {
+    width:80%;
+    border:0;
+    border-left:1px solid #777777;
+}
+table.DataModif td.titleCellTD{
+    white-space:nowrap;
+}
+table.DataModif td.modifRight{
+    width:90%;
+}
+table.notificationEdit {
+    width:100%;
+    border-collapse: collapse
+}
+table.notificationEdit tr{
+    vertical-align:top;
+}
+table.notificationEdit td.notifTitle{
+    font-weight:bold;
+}
+table.notificationEdit td.notifLeft{
+    color:black;
+    width:1%;
+}
+table.notificationEdit td.notifMain {
+    width:90%;
+}
+
+table.groupTable td.notifMain textarea{
+    width:100%;
+}
+
+table.notificationEdit td.notifMain textarea{
+    width:100%;
+    height:60px;
+}
+table.notificationEdit td.notifRight {
+    width:1000px;
+    color:black;
+    white-space:nowrap;
+}
+
+/* Edit one question */
+table.evalEditMain {
+    vertical-align:middle;
+    border-collapse:collapse;
+    margin-left:50px;
+    border:0 solid white;
+    width:575px;
+}
+table.evalEditMain td.titleCellTD {
+    width:125px;
+}
+table.evalEditMain td.inputCelTD select {
+    margin-left:10px;
+}
+table.evalEditMain td.inputCelTD input {
+    margin-left:10px;
+}
+table.evalEditMain td.inputCelTD textarea {
+    width:98%;
+    height:70px;
+    margin-left:10px;
+}
+table.evalEditMain td.inputCelTD input.textType {
+    width:98%;
+}
+table.evalEditMain td.inputCelTD input.choiceItemText {
+    
+}
+table.evalEditMain td.inputCelTD input.btn {
+    margin-left:10px;
+}
+table.evalEditMain td.inputCelTD input.shortInput {
+    width:40%;
+}table.evalEditMain td.errorCelTD {
+    text-align:center;
+    color:red;
+}
+table.evalEditMain td.submitCelTD {
+    text-align:center;
+}
+
+/* Edit form structure */
+table.evalEditViewContainer{
+    margin-left:3px;
+    border-width:0;
+    width:90%;
+}
+table.evalEditViewContainer td{
+    vertical-align:top;
+}
+table.evalEditView {
+    vertical-align:middle;
+    border-collapse:collapse;
+    border:1px solid black;
+    width:100%;
+}
+table.evalEditView td {
+    padding:5px;
+}
+table.evalEditView td.inputCelTD {
+    width:50%;
+    vertical-align:top;
+}
+table.evalEditView td.inputCelTD input.textType {
+    margin-left:0;
+    width:100%;
+}
+table.evalEditView td.inputCelTD input.passwordType {
+    margin-left:0;
+    width:100%;
+}
+table.evalEditView td.inputCelTD input {
+    margin-bottom:0;
+}
+table.evalEditView td.inputCelTD textarea {
+    width:100%;
+    height:70px;
+    margin-left:0;
+}
+table.evalEditView td.commentCelTD {
+    padding-top:5px;
+    padding-right:30px;
+    padding-bottom:15px;
+    padding-left:15px;
+    font-size:x-small;
+    text-align:justify;
+}
+table.evalEditView td.displayField {
+    font-weight:bold;
+}
+table.evalEditViewActions {
+    border:0;
+    border-spacing:0;
+    padding:1px;
+    margin-right:0;
+    padding-right:0;
+}
+table.evalEditViewActions td {
+    padding:0;
+}
+table.evalEditViewActions form {
+    margin:0;
+}
+table.evalEditViewActions select {
+    border:0;
+    font-size:10px;
+}
+
+/* Preview */
+table.evalEditPreview {
+    vertical-align:middle;
+    border-collapse:collapse;
+    border:1px solid #eeeeee;
+    width:90%;
+}
+table.evalEditPreview tr.evalEditPreviewTrGrey {
+    background-color:#eeeeee;
+}
+table.evalEditPreview td {
+    padding:5px;
+    width:50%;
+    vertical-align:top;
+}
+table.evalEditPreview td.inputCelTD{
+    text-align:left;
+}
+table.evalEditPreview td.inputCelTD font {
+    color:black;
+    width:100%;
+    height:100%;
+}
+table.evalEditPreview td.inputCelTD input.textType {
+    margin-left:0;
+    width:90%;
+}
+table.evalEditPreview td.inputCelTD input.passwordType {
+    margin-left:0;
+    width:90%;
+}
+table.evalEditPreview td.inputCelTD input {
+    margin-bottom:0;
+}
+table.evalEditPreview td.inputCelTD textarea {
+    width:90%;
+    height:70px;
+    margin-left:0;
+}
+table.evalEditPreview td.commentCelTD {
+    padding-top:5px;
+    padding-right:30px;
+    padding-bottom:15px;
+    padding-left:15px;
+    font-size:x-small;
+    text-align:justify;
+}
+table.evalEditPreview td.displayField {
+    font-weight:bold;
+}
+table.evalEditPreviewTitle {
+    width:90%;
+}
+table.evalEditPreviewTitle td.title{
+    text-align:center;
+    /*white-space:nowrap;*/
+    border-bottom:2px solid #777777;
+}
+table.noticeMain {
+    width:80%;
+    text-align:center;
+}
+table.noticeMain td.td{
+    text-align:center;
+}
+table.noticeMain td.title{
+    text-align:center;
+}
+table.noticeInside {
+    border:2px solid #777777;
+}
+table.noticeInside td{
+    padding:10px;
+}
+
+/* Results */
+fieldset.evalationResultsFieldset{
+    padding:20px;
+    width:80%;
+    text-align:left;
+}
+fieldset.evalationResultsFieldset legend{
+    color:black;
+}
+fieldset.evalationResultsFieldset ul li{
+    margin: 0.5em 0 0.5em 0;
+}
+fieldset.evalationResultsFieldset p{
+    padding-left: 2.5em;
+}
+fieldset.evalationResultsFieldset td{
+    font-size:8pt;
+}
+fieldset.evalationResultsFieldset table.statsGraphContainer {
+    width:100%;
+}
+fieldset.evalationResultsFieldset table.statsGraphContainer td.statsGraphHead{
+    width:30%;
+    text-align:right;
+}
+fieldset.evalationResultsFieldset table.statsHead{
+    width:100%;
+}
+fieldset.evalationResultsFieldset table.statsGraph{
+    width:100%;
+    border-collapse:collapse;
+}
+fieldset.evalationResultsFieldset td.blue{
+    border:1px solid #888;
+    height:15px;
+    background-color:#d0ecff;
+}
+fieldset.evalationResultsFieldset td.green{
+    border:1px solid #888;
+    height:15px;
+    background-color:#9de47b;
+}
+fieldset.evalationResultsFieldset td.yellow{
+    border:1px solid #888;
+    height:15px;
+    background-color:#fde47b;
+}
+fieldset.evalationResultsFieldset td.pink{
+    border:1px solid #888;
+    height:15px;
+    background-color:#f2e3f4;
+}
+a.greyLink{
+    color:#777777;
+    font-weight:bold;
+}
+a.greyLink:hover{
+    color:#E25300;
+}
+table.evalationResultsSubmitters {
+    border-top-width:0;
+    border-right-width:0;
+    border-bottom-width:0;
+    border-left:1px solid #777777;
+}
+table.evalationResultsSubmitters input {
+    margin-bottom:0;
+}
+
+/* UI Components */
+img {
+    border: 0px;
+}
+
+
+div.UISimpleDialogMainPanel {
+    background: #FFFFFF;
+    border: none;
+    padding-left: 2px;
+    padding-right: 2px;
+    font-size: 10pt;
+}
+
+label {
+    font-weight: bold;
+}
+
+input.UIFieldText
+{
+    border: 1px solid #AAAAAA;
+}
+
+.UILabelSpan
+{
+    float: left;
+    width: 75px;
+    text-align: right;  
+}
+
+.UIFieldSpan {
+  float: right;
+  width: 175px;
+  text-align: left;
+  }
+  
+form.UIPrettyForm
+{
+    padding-top: 10px;
+    margin-left: 50px;
+    
+    font-size: 11px;
+}
+
+label.UIPrettyForm, input.UIPrettyForm  {
+    display: block;
+    width: 150px;
+    float: left;
+    margin-bottom: 5px;
+}
+
+label.UIPrettyForm  {
+    text-align: right;
+    width: 100px;
+    padding-right: 20px;
+}
+
+br.UIPrettyForm  {
+    clear: left;
+}
+
+.UIExpandBottom {
+    font-size: xx-small;
+    width: 100%;
+    margin-bottom: 0px;
+}
+
+.UIExpandContainer {
+    text-align: center; 
+}
+
+div.UIForm
+{
+    padding-top: 5px;
+    width: 100%;
+}
+
+div.UISearchForm
+{
+    background: #EEEEEE;
+}
+
+div.UIFormRow {
+    clear: both;
+    display: block;
+}
+
+.categTitleChosen{
+    font-weight: bold;
+    font-size: 11pt;
+}
+
+div.CategoryListDiv {
+    padding: 10px;
+    height: 300px;
+    width: 100%;
+    max-width: 600px;
+    min-width: 600px;
+    overflow: auto;
+}
+
+ul.CategoryList
+{
+    border: none;
+    display: block;
+    list-style-type: none;
+    padding-left: 0px;
+    margin: 0;
+}
+
+ul.CategoryList li{
+    border-bottom: 1px solid #E2E2E2;
+    margin: 0;
+    display: block;  
+    padding-left: 5px;
+    margin-bottom: 0px;
+    line-height: 25px;
+    vertical-align: middle;
+    cursor: pointer;
+    background-color: white;
+    color: #0B63A5;
+}
+
+ul.CategoryList li:hover{
+    background-color: #FFF6DF;
+}
+
+.CategoryListButtons{
+    float: right;
+    margin: 15pt 0 0;
+}
+
+div.UISearchPeopleListDiv {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    height: 200px;
+    width: 100%;
+    max-width: 450px;
+    min-width: 450px;
+    border: 1px solid #CCCCCC;
+    overflow: auto;
+}
+
+div.UIPeopleListDiv {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    height: 200px;
+    width: 300px;
+    border: 1px solid #CCCCCC;
+    overflow: auto;
+}
+
+ul.UIPeopleList
+{
+    border: none;
+    display: block;
+    list-style-type: none;
+    padding-left: 0px;
+    margin: 0;
+}
+
+ul.UIPeopleList li{
+    border-bottom: 1px solid #DDDDDD;
+    margin: 0;
+    display: block;
+    margin-bottom: 0px;
+    line-height: 25px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+ul.UIPeopleList li .nameLink {
+    padding: 4px 30px;
+}
+
+ul.UIPeopleList li.selectedUser {
+    background-color: #CDEB8B;
+}
+
+ul.UIPeopleList li.unselectedUser {
+    background-color: #FFFFFF;
+}
+
+ul.UIListNestedMenu
+{
+    text-indent: 0;
+    padding-left: 0px;
+    margin-bottom: 0px;
+    margin-left: 0px;
+    list-style-type: none;
+}
+
+ul.UIListNestedMenu li
+{
+    background: #FFFF88;
+}
+
+div#UILoadDiv {
+    background: #FFFFFF;
+    z-index: 3;
+    text-align: center;
+}
+
+div.UITitleBar {
+    background: #4096EE;
+    height: 25px;
+}
+
+div.UITitleBar .UITitleText{
+    float: left;
+    width: 200px;
+    text-align: left;   
+}
+
+div.UITitleBar .UITitleText h1{
+    margin: 0;
+    color: #FFFFFF;
+    font-size: 12pt;
+    clear: both;
+}
+
+
+.UITitleBar .UITitleOptions{
+    float: right;
+    width: 100px;
+    padding-right: 5px;
+    text-align: right;
+}
+
+div#UILoadDiv h1{
+    color: black;
+    margin-top: 30px;
+}
+
+ul.UIPeopleList li.UIPerson
+{
+    background: url("../images/user.png") left top no-repeat;
+}
+
+ul.UIPeopleList li.UIGroup
+{
+    background: url("../images/group.png") left top no-repeat;
+
+}
+
+ul.UIPeopleList li.UIError
+{
+    background: #EEEEEE url("../images/remove.png") left center no-repeat;
+    padding-left: 20px;
+}
+
+.UIInPlaceTextField
+{   
+}
+
+div#UISearchBox
+{
+    position: absolute;
+    right: 30px;
+    top: 36px;
+    border: none;
+    font-size: 10pt;
+    z-index: 1;
+}
+
+div#UISearchBox .searchButton
+{
+    float:right;
+    border-left: 1px solid #888;
+    width: auto;
+}
+
+div#UISearchBox #searchControls
+{
+    width: 250px;
+    border: 1px solid #888;
+    height: 21px; 
+    overflow: hidden;
+    background-color: white;
+}
+
+div#UISearchBox #searchControls input
+{
+    border: 0;
+    color: black;
+    font-weight: normal;
+}
+
+div#UISearchBox #searchText
+{
+    width: 130px;
+}
+
+div#UISearchBox #extraOptions
+{
+    border: 1px solid #888888;
+    border-top: none;
+    width: 250px;
+    display: none;
+    position: absolute;
+    top: 23px;
+    right: 0px;
+    background-color: white;
+}
+
+
+div#UISearchBox #extraOptions table {
+    margin: 10px;
+}
+
+div#UISearchBox #extraOptions input {
+    margin-left: 8px;
+    font-size: 9pt;
+    width: 145px;
+}
+
+div#UISearchBox #extraOptions select {
+    margin-left: 8px;
+    font-size: 9pt;
+    width: 150px;
+}
+
+div#UISearchBox #extraOptions td {
+    font-size: 9pt;
+    color: #444;
+}
+
+div#UISearchBox #extraOptions div {
+    text-align: center;
+    padding: 5px;
+    background-color: #ECECEC;
+    font-style: italic;
+    border-bottom: 1px solid #AAAAAA;
+}
+
+
+.siteSearchBox
+{
+    background: transparent url(../images/menu_arrow_black.png) scroll no-repeat center center;
+    font-weight: normal;
+    vertical-align: middle;
+    display:block;
+    width: 20px;
+    height: 17px;
+    float: right;
+    cursor: pointer;
+}
+
+a.meetingHeaderSearchBox
+{
+    padding-left: 5px;
+    font-size:xx-small;
+    color:#000000;
+    font-weight: normal;
+    vertical-align: middle;
+    float:left; 
+}
+
+
+.bottomLine
+{
+    border-bottom: 1px solid #777777;   
+}
+
+.container
+{
+    overflow: hidden;   
+}
+
+.leftFloat 
+{
+    float: left;
+}
+
+.rightFloat
+{
+    float: right;   
+}
+
+div.UITidyDialog
+{
+    margin-left: 10px;
+    margin-top: 50px;
+}
+
+div.UITidyDialog li
+{
+    font-size: x-small;
+    color: red;
+}
+
+div.UIMicroSearchBox
+{
+    background: #AACCFF;
+    font-size: xx-small;
+    width:250px;
+    position: absolute;
+}
+
+ul.UIUserEvtList
+{
+    list-style-type: none;
+    padding-left: 0px;
+    padding-top: 0px;
+    margin-top: 0px;
+    margin-left: 0px;
+    margin-bottom: 0px;
+}
+
+li.UIUserEvtListPast
+{
+    background: #EFEFEF;
+    border-bottom: 1px solid #CFCFCF;
+}
+li.UIUserEvtListPresent
+{
+    background: #CDEB8B;
+    border-bottom: 1px solid #9AC65C;
+}
+
+li.UIUserEvtListFuture
+{
+    background: #FFFF88;
+    border-bottom: 1px solid #CCCC77;
+}
+li.UIUserEvtListNone
+{
+    border-bottom: 1px solid white;
+}
+
+ul.UIUserEvtList li
+{
+    position: relative;
+    height: 24px;
+    display: block;
+    vertical-align: middle;
+}
+
+.UIRowButton
+{
+    display: block;
+    float: right;
+    margin-right: 5px;
+}
+
+.UIRowButton2
+{
+    margin-left: 10px;
+    padding-top: 4px;
+}
+
+.favoriteItem
+{
+    background: #CDEB8B;
+    color: #36393D;
+}
+
+.UINavBar
+{
+    display: block;
+    height: 25px;
+    width: 100%;
+    background: #DDDDDD;
+    vertical-align: middle; 
+}
+
+.UINavBar *
+{
+    vertical-align: middle;
+}
+
+.UILoading
+{
+    z-index: 2;
+    background: #FFFFFF;
+    text-align: center;
+}
+
+.UILoading *
+{
+    font-size: small;
+    font-weight: bold;
+    vertical-align: middle;
+}
+
+.UILoading img
+{
+    margin-top: 10px;
+}
+
+.UIListTitle {
+   font-weight: bold;
+   font-size: 12pt;
+   color: #000000;
+   background: #DDDDDD;
+   letter-spacing: 6px;
+   padding: 3px;
+   margin-bottom: 0px;
+}
+
+span.evtDate
+{
+    float: left;
+    display: block;
+    width: 90px;
+    padding-right: 5px;
+}
+
+span.evtDateRow
+{
+    float: left;
+    display: block;
+    width: 300px;   
+}
+
+span.evtDateSpan
+{
+    font-weight: bold;
+    font-size: 10pt;
+}
+
+span.evtTimeSpan
+{
+    font-size: 8pt;
+    font-weight: bold;
+}
+
+span.clickableText
+{
+    cursor:pointer;
+}
+span.clickableText:hover
+{
+    color: #E25300;
+    background: transparent;
+}
+
+
+
+a.evtTitle
+{
+    float: left;
+    display: block;
+    width: 350px;
+    padding-right: 5px;     
+}
+
+img.evtIcon
+{
+    float: left;
+    display: block;
+    padding: 1px 5px 1px 0px;
+    vertical-align: middle;
+}
+
+img.clickableImage
+{
+    cursor:pointer;
+}
+
+
+/* New CSS */
+
+
+/* HEADER */
+
+div.pageHeader {
+    position: relative;
+    width: 100%;
+}
+
+div.pageHeaderDark {
+    background-color: #424242;
+}
+
+div.pageHeaderMainPage {
+    background: white url("../images/indico_bg.gif") repeat 0 0;
+}
+
+div.pageOverHeader
+{
+    background: #F6E8BD url(../images/sprites.png) repeat-x scroll 0 -210px;
+    border-bottom: 1px solid #A2905A;
+    padding: 7px 10px;
+    color: #2f2506;
+    font-family: Verdana;
+    font-size: 9pt;
+    font-weight: bold;
+}
+
+/* Styles for the main menu */
+
+div.globalMenu
+{
+    background: #0b63a5 url(../images/sprites.png) repeat-x scroll 0 0;
+    border-top: 1px solid #999999;
+    border-bottom: 1px solid #999999;
+    height: 30px;
+    width: 100%;
+}
+
+div.globalMenu ul {
+    margin: 0;
+    padding: 0;
+    display: inline;
+    list-style-type: none;
+}
+
+div.globalMenu li {
+    display: block;
+    float: left;
+    position: relative;
+    height: 30px;
+    cursor: pointer;
+}
+
+div.globalMenu li.mouseover {
+    background: #439ddc url(../images/sprites.png) repeat-x scroll 0 -30px;
+}
+
+div.globalMenu a
+{   
+    font-weight: bold;
+    font-family: Verdana;
+    font-size: 8pt;
+    color: white;
+    letter-spacing: 0.04em;
+    display: block;
+    padding: 8px 15px;
+}
+
+div.globalMenu span
+{   
+    font-weight: bold;
+    font-family: Verdana;
+    font-size: 8pt;
+    color: white;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 15px;
+    margin-right: 15px;
+    letter-spacing: 0.04em;
+    display: block;
+}
+
+div.globalMenu .dropDownMenu {
+    padding-right: 20px;
+    background: transparent url(../images/menu_arrow_white.png) scroll no-repeat center right;
+}
+
+/* Styles for the session bar at the top right corner */
+
+div.sessionBar {
+    height: 25px;
+    float: right;
+    font-size: 10pt;
+}
+
+div.sessionBar .links
+{
+    background: transparent url(../images/sprites.png) repeat-x scroll 0 -60px;
+    margin-left: 25px;
+    padding-top: 0px;
+    height: 25px;
+}
+
+.loginHighlighted {
+    background: transparent url(../images/sprites.png) repeat-x scroll 0 -150px;
+}
+
+div.sessionBar .corner
+{
+    background: transparent url(../images/session_bar_corner.png) repeat-x scroll 0 0;
+    height: 25px;
+    width: 25px;
+    float: left;
+}
+
+
+div.sessionBar ul
+{
+    margin: 0;
+    padding: 0;
+    display: inline;
+    list-style-type: none;
+}
+
+div.sessionBar li {
+    display: inline;
+    margin: 0;
+    padding: 4px 17px;
+    float: left;
+    border-right: 1px solid #C7C7C7;
+}
+
+div.sessionBar span {
+    color: #444444;
+    font-size: 8pt;
+    margin-right: 5px;
+}
+
+div.sessionBarDark .corner {
+    background-position: -25px 0;
+}
+
+div.sessionBarDark .links {
+    background-position: 0 -180px;
+}
+
+div.sessionBarDark span {
+    color: #BCBCBC
+}
+
+div.sessionBarDark .links a {
+    color: #DFDFDF;
+}
+
+div.sessionBarDark .links a:hover {
+    color: white;
+}
+
+div.sessionBarDark li {
+    border-color: #777;
+}
+
+div.sessionBarDark .dropDownMenu {
+    background: transparent url(../images/menu_arrow_white.png) scroll no-repeat center right;
+}
+
+/* Breadcrumb styles */
+
+.path {
+}
+
+.path img {
+    padding-right: 5px;
+    padding-left: 7px;
+}
+
+.path a {
+   font-size: 9pt;
+}
+
+.pathWithoutLinks {
+    color: #AAAAAA;
+    font-size: 9pt;
+}
+
+.pathWithoutLinks img {
+    padding-right: 5px;
+    padding-left: 7px;
+}
+
+div.mainBreadcrumb {
+    background-color: #ECECEC;
+    padding: 4px 15px;
+    border-bottom: 1px solid #AAAAAA;
+}
+
+div.mainNoBreadcrumb {
+    background: transparent url(../images/sprites.png) scroll repeat-x 0 -120px;
+    height: 10px;
+}
+
+div.noBreadcrumb {
+    padding-top: 5px;
+    padding-bottom: 10px;
+}
+
+ul.horizontalMenu
+{
+    margin: 0;
+    margin-top: 5px;
+    padding: 0;
+    display: inline;
+    list-style-type: none;
+}
+
+ul.horizontalMenu 
+{
+    display: inline;
+    font-size: 10pt;
+}
+ul.horizontalMenu li{
+    display: inline;
+    position: relative;
+    padding: 2px 6px;
+    border-left: 1px solid #DDDDDD;
+    line-height: 1.5;   
+}
+
+img.headerLogo {
+    
+    margin: 7px 10px;
+    border: none;
+    width: 196px;
+    height: 52px;
+}
+
+div.headerAboutIndico
+{
+    position: absolute;
+    top: 25px;
+    left: 230px;
+    width: 300px;
+    color: #444444;
+    font-style: italic;
+    font-size: 9pt;
+}
+
+img.centeredImg {
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+div.eventHeaderButtonBar {
+	padding: 6px 0;
+	min-height: 24px;
+}
+
+div.eventHeaderButtonBar a {
+    position: relative;
+    display: block;
+    float: left;
+    height: 13px;
+    padding: 4px 10px 7px 10px;
+    min-width: 4px;
+	margin-left: 4px;
+	background: transparent url(../images/button_bg.png) repeat-y scroll 0 0;
+    font-size: 13px;
+    font-family: arial, helvetica, sans-serif;
+    color: #cfcfcf;
+}
+
+div.eventHeaderButtonBar a div.leftCorner {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: transparent url(../images/button_bg.png) repeat-y scroll -198px 0;
+    width: 2px;
+    height: 24px;
+}
+
+div.eventHeaderButtonBar a:hover {
+    background-position: 0 -24px;
+    color: white;
+}
+
+div.eventHeaderButtonBar .separator {
+    float: left;
+    margin: 3px 6px 3px 10px;
+    width: 1px;
+    height: 18px;
+    border-right: 1px dotted #999;
+}
+
+div.filterDiv
+{
+    margin-top: 5px;
+    padding: 10px;
+    padding-left: 75px;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    background-color: #777;
+    color: white;
+    display: none;
+}
+
+
+/* Root Page */
+
+.container
+{
+    background: #FFFFFF;
+    margin-bottom: 10px;
+    margin: 30px 80px 30px 60px;
+    overflow: visible;
+}
+
+.body
+{
+}
+
+.bodyWithSideBar {
+    margin-right: 420px;
+}
+
+.bodyWithSideMenu {
+    margin-left: 220px;
+    margin-top: 20px;
+    margin-right: 20px;
+}
+
+/* 
+    Used to create empty space between the main
+    blue bar and the content, when there is
+    a basic side menu like in Room Booking.
+*/
+.emptyVerticalGap {
+    height: 20px; 
+}
+
+.frontPageSideBarContainer {
+    margin: 30px 80px 30px 60px;
+}
+
+.sideBar {
+    float: right;
+    font-size: 11pt;
+    width: 340px;
+    float: right;
+    width: 340px;
+}
+
+.sideMenu {
+    float: left;
+    width: 200px;
+    padding-right: 15px;
+    margin-left:30px;
+}
+
+.managementSideMenu {
+    margin-left:0px;
+}
+
+.sideMenu .separator {
+    font-weight: normal;
+    font-style: italic;
+    font-size: 9pt;
+    color: #777;
+    padding: 7px 0;
+    border-bottom: 1px dotted #999;
+}
+
+.sideMenu .separatorNoText {
+    font-size: 1px;
+    height: 1px;
+    padding: 0;
+    margin-top: 0;
+    border-bottom: 1px dotted #999;
+}
+
+.sideBar .leftCorner {
+    width: 15px;
+    height: 15px;
+    float: left;
+    background: transparent url('../images/grey_corners.png') scroll no-repeat 0 0;
+}
+
+.sideBar .rightCorner {
+    width: 15px;
+    height: 15px;
+    float: right;
+    background: transparent url('../images/grey_corners.png') scroll no-repeat -15px 0;
+}
+
+.sideMenu .corner {
+    width: 15px;
+    height: 15px;
+    float: right;
+    background: transparent url('../images/grey_corners.png') scroll no-repeat -30px 0;
+}
+
+.sideBar .content {
+    background: #ECECEC url('../images/grey_gradient.png') scroll repeat-x bottom left;
+    padding: 20px 20px 50px 20px;
+}
+.sideMenu .content {
+    padding-top: 10px;
+}
+
+.managementSideMenu .content {
+    min-height: 200px;
+}
+
+.managementSideMenu .content {
+    margin-right: 15px;
+}
+
+.topBar {
+    margin-bottom: 30px;
+}
+
+.topBar .content {
+    background: #ECECEC url('../images/grey_gradient2.png') scroll repeat-x bottom left;
+    padding: 20px;
+    font-size: 11pt;
+    color: #444;
+    border: 1px solid #AAA;
+}
+
+.sideBar h1, .topBar h1 {
+    margin: 0;
+    padding: 0;
+    color: #777;
+    font-size: 13pt;
+}
+
+.sideBar ul {
+    margin: 10px 10px 20px 10px;
+    padding: 0;
+    list-style-type: none;
+}
+
+.sideBar li {
+    margin-bottom: 10px;
+    list-style-type: none;
+}
+
+.sideMenu li {
+    margin-bottom: 10px;
+}
+
+.sideBar a {
+    font-size: 12pt;
+}
+
+.sideBar em {
+    color: #777;
+}
+
+.sideMenu a {
+    font-size: 11pt;
+}
+
+.sideMenu .active {
+    font-weight: bold;
+}
+
+.sideMenu a.advanced {
+    font-style: italic;
+}
+
+.sideBar a.subLink {
+    font-style: italic;
+    font-size: 11pt;
+}
+
+.sideBar em {
+    font-size: 10pt;
+    display: block;
+    margin-top: 3px;
+}
+
+.leftMenu
+{
+    float: left;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: 150px;
+    background: #f6f6f6;
+
+}
+
+h1.menuHeader
+{
+    height: 20px;
+    font-size: 10pt;
+    text-align: center;
+    margin-top: 0px;
+    margin-bottom: 4px;
+    padding-top: 2px;
+    display: block;
+    width: 100%;
+    background: #5fa5d4;
+    color: white;
+}
+
+h1.active
+{
+    background: rgb(255,123,45);
+}
+
+li.active a{
+    font-weight: bold;
+}
+
+/* Should no longer be needed... where used
+   for the server admin side menu section.
+h1.active_server_admin
+{
+    background: #4BB453;
+}
+
+li.active_server_admin a{
+    color: #4BB453;
+}
+
+li.active_server_admin a:hover {
+   color: #E25300;
+   background: transparent;
+   font-weight: bold;
+}
+*/
+
+ul.menuList
+{
+    font-size: 10pt;
+    margin:0;
+    margin-bottom: 15px;
+    padding-left: 0px;
+    list-style-type: none;
+}
+
+ul.menuList li
+{
+    height: 20px;
+    display: block;
+    margin-bottom: 4px;
+    background: #ebebeb;
+    padding-left: 20px;
+    font-weight: bold;
+}
+
+li.sideMenu_disabled
+{
+    color: #999;
+}
+
+ul.menuList li.active
+{
+    color: #e25300;
+}
+
+
+.clearfix:after {
+    content: "."; 
+    display: block; 
+    height: 0; 
+    clear: both; 
+    visibility: hidden;
+}
+
+/* Category List */
+
+ul.list
+{
+    position: relative;
+    margin:0px;
+    margin-top: 20px;
+    padding-left: 0px;
+}
+
+.list li
+{
+    border-bottom: 1px solid #E2E2E2;
+    list-style-type: none;
+    padding: 5px 0;
+}
+
+.list a {
+    font-size: 13pt;
+}
+
+ul.listCompact {
+    margin: 0px;
+}
+
+.listCompact li {
+    border-color: white;
+}
+
+.listCompact a {
+    font-size: 10pt;
+}
+
+.farRight
+{
+    position: absolute;
+    top: 5px;
+    right: 50px;
+}
+
+.evtShortDate
+{
+        margin-right: 10px;
+}
+
+.eventList {
+    padding-top: 15px;
+}
+
+.eventList h3 {
+    font-size: 20pt;
+    color: #999999;
+    margin: 20px 10px;
+    padding: 0;
+}
+
+.eventList h4 {
+    color: #555555;
+    font-weight: normal;
+    font-size: 14pt;
+    margin-top: 20px;
+    margin-left: 40px;
+    padding 0;
+    border-bottom: 1px solid #EBEBEB;
+}
+
+.eventList ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    display: block;
+}
+
+.eventList li {
+    margin: 0 0 10px 60px;
+    padding: 0;
+    display: block;
+}
+
+.eventList li .ical {
+    padding: 0 15px;
+}
+
+.eventList li .date {
+    padding: 0 10px 0 0;
+    font-size: 10pt;
+    color: #444;
+}
+
+.eventList li .listName a {
+    font-size: 13pt;
+}
+
+/* Footer */
+
+.footer {
+    text-align: center;
+    color: #444444;
+    height: 40px;
+    margin-top: -50px;
+    padding-top: 10px;
+    bottom: 0;
+    width: 100%;
+}
+
+.footerDark {
+    color: #ECECEC;
+}
+
+.footerDark a {
+    color: #53A0DF;
+}
+
+.footer img
+{
+    vertical-align: middle;
+}
+
+/* TODO: remove permanently? */
+#policyOfUse {
+    display: none;
+    float: right;
+    width: 40%;
+}
+#policyOfUse h1{
+    font-size: 10pt;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* General Titles */
+
+.banner
+{
+    background-color: #ECECEC;
+    color: #444;
+    vertical-align: middle;
+    padding: 20px 30px;
+    line-height: 30px;
+}
+
+/* TODO: Remove these?
+
+.banner_0
+{
+    background: #E0E0E0;
+    font-size: 12pt;                
+}
+
+.banner_1
+{
+    background: #F0F0F0;
+    font-size: 11pt;
+    margin-right: 20px;
+}
+
+.banner_2
+{
+    background: #F8F8F8;
+    font-size: 10pt;
+    margin-right: 40px;
+}
+
+.banner_3
+{
+    background: #FCFCFC;
+    font-size: 10pt;
+    margin-right: 60px;
+}
+
+.banner_4
+{
+    background: #FCFCFC;
+    font-size: 10pt;
+    margin-right: 60px;
+}
+
+.banner_5
+{
+    background: #FCFCFC;
+    font-size: 10pt;
+    margin-right: 60px;
+}
+
+.banner_green
+{
+    background: #d5edd7;
+    font-size: 12pt;                
+}
+
+.banner_orange
+{
+    background: rgb(255,205,174);
+    font-size: 12pt;                
+}
+
+*/
+
+.selectedCategoryName{
+    padding:20px;
+    font-size: 12pt;
+}
+
+.bannerTitle
+{
+    color: #777777;
+}
+
+.bannerTitle:hover
+{
+    color: #E25300
+}
+
+.bannerTitle_0
+{
+    font-size: 16pt;
+}
+
+.bannerTitle_1
+{
+    font-size: 11pt;
+}
+
+.bannerTitle_2
+{
+    font-size: 10pt;
+}
+
+.bannerTitle_3
+{
+    font-size: 10pt;
+}
+
+.bannerTitle_4
+{
+    font-size: 10pt;
+}
+
+.bannerTitle_5
+{
+    font-size: 10pt;
+}
+
+.bannerTitle_noIcon
+{
+    margin-left: 37px;  
+}
+
+.banner_creator
+{
+    font-size: 10pt;
+    font-weight: normal;
+    float: right;
+}
+
+.areaTitle_orange {   
+   font-size: 14px;
+   color: #E25300;
+   padding: 0px;
+   margin-top: 0px;
+}
+
+.titleMiddleImg
+{
+    vertical-align: middle;
+}
+
+/* Context Help */
+
+.ctxtInfo {
+
+}
+
+/* Forms */
+
+.errorMsgBox
+{
+    margin-top: 15px;
+    margin-bottom: 15px;
+    margin-left: auto;
+    margin-right: auto;
+    padding:10px;
+    border:1px solid #5294CC;
+    background:#F6F6F6;
+    text-align: center;
+    width: 33%;
+}
+
+.infoMsgBox
+{
+    margin-top: 15px;
+    margin-bottom: 15px;
+    margin-left: auto;
+    margin-right: auto;
+    padding:10px;
+    border:1px solid #5294CC;
+    background:#F6F6F6;
+    text-align: center;
+    width: 33%;
+}
+
+
+.oneline {
+    display: block;
+    margin-top: 5px;
+    width: 100%;    
+
+}
+
+.blueLineBottom
+{
+    border-bottom: 1px solid #5294CC;
+}
+
+.formLine
+{
+    margin-bottom: 5px;
+}
+
+div.optionGroup
+{
+    margin-top: 20px;
+}
+
+.formLine label
+{
+    font-weight: normal;
+    font-size: 8pt;
+    color: gray;
+}
+
+/* Autocompletion */
+
+.autoCompleteMenu
+{
+    background: #eeeeee;
+}
+
+.autoCompleteMenu ul
+{
+    border: none;
+    display: block;
+    list-style-type: none;
+    padding-left: 0px;
+    margin: 0;
+    
+}
+
+.autoCompleteMenu ul li
+{
+    margin: 0;
+    display: block;  
+    padding-left: 0px;
+    margin-bottom: 0px;
+    height: 20px;
+}
+
+.selected
+{
+    background: #C3D9FF;
+}   
+
+.timeDurationEntry
+{
+    border: none;
+    display: block;
+    list-style-type: none;
+    padding-left: 0px;
+    margin: 0;  
+}
+
+.timeDurationEntry li
+{
+    background: #CDEB8B;
+    border: none;
+    margin: 0;
+    display: block;  
+    padding-left: 0px;
+    margin-bottom: 0px;
+    height: 20px;   
+}
+
+.timeDurationEntry_text
+{
+    font-weight: bold;
+    padding-right: 10px;
+}
+
+/* Tabs */
+
+div.tabListContainer {
+    position: relative;
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+ul.tabList {
+    display: block;
+    list-style-type: none;
+    margin: 0;
+    padding: 0px;
+    padding-bottom: 1px;
+    border-bottom: 1px solid #777777;
+}
+
+ul.tabList li{
+    display: inline;
+    position: relative;
+    padding-bottom: 1px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-weight: bold;
+}
+
+ul.subTabList
+{
+    background: #F2F2F2;
+    display: block;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    padding-top: 10px;
+    padding-bottom: 5px;
+    border-left: 1px solid #777777;
+    border-right: 1px solid #777777;
+}
+
+ul.subTabList li{
+    display: inline;
+    position: relative;
+}
+
+ul.subTabList a
+{
+    font-family: Verdana;
+    font-weight: normal;
+    font-size: 9pt;
+    font-weight: bold;
+    padding-right: 15px;
+    padding-left: 15px;
+    border-right: 1px solid #AAAAAA;
+}
+
+ul.subTabList a:hover
+{
+    color: #dbb03a;
+}
+
+.tabSelected  {
+    color: #E25300;
+    background: #F2F2F2;
+    border: 1px solid #777777;
+    padding-top: 8px;
+    border-bottom: 2px solid #F2F2F2;
+    margin-left: 2px;
+    margin-right: 1px;
+}
+
+.tabSelected  a {
+    padding-top: 3px;
+    color: #555555;
+    font-size: 9pt;
+}
+
+div.tabScrollArrowBg {
+    padding: 0;
+    margin: 0;
+    position: absolute;
+    top: 6px;
+    left: 2px;
+    width: 15px;
+    height: 15px;
+    display: none;
+    background: white url(../images/tab_scroll_arrows.png) no-repeat scroll 0 -60px;
+}
+
+div.tabScrollArrow {
+    border: 1px solid #999999;
+    width: 13px;
+    height: 13px;
+    background: transparent url(../images/tab_scroll_arrows.png) no-repeat scroll 0 0;
+}
+
+div.tabGradient {
+    background: white url(../images/tab_bg.png) repeat-x scroll 0 -60px;
+    /*border-left: 1px solid #777777;
+    border-right: 1px solid #777777;*/
+    height: 20px;
+}
+
+div.tabBorderGradient {
+    background: white url(../images/tab_bg.png) repeat-x scroll 0 -80px;
+    height: 20px;
+    width: 1px;
+    display: inline;
+}
+
+
+.tabUnselected  {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #999999;
+    border-bottom: 0;
+    background: white url(../images/tab_bg.png) repeat-x scroll 0 -30px;
+    padding-top: 3px;
+    margin-left: 1px;
+    cursor: pointer;
+}
+
+.tabUnselected  a {
+    color: #4c6a83;
+    font-weight: normal;
+    font-size: 9pt;
+}
+
+.subTabUnselected  a {
+    color: #4c6a83;
+}
+
+.subTabSelected  a {
+    color: #b38b1f;
+}
+
+.tabExtraButtons {
+    background-color: #888;
+    float: right;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    margin: 10px 10px 0 0;
+}
+
+.tabExtraButtons .buttonContainer {
+    float: left;
+    padding: 0 10px;
+    border-left: 1px solid #aaa;
+    cursor: pointer;
+}
+
+.tabExtraButtons .buttonContainerLeft {
+    border-left: none;
+    -webkit-border-bottom-left-radius: 3px;
+    -moz-border-radius-bottomleft: 3px;
+    -webkit-border-top-left-radius: 3px;
+    -moz-border-radius-topleft: 3px;
+}
+
+.tabExtraButtons .buttonContainerRight {
+    -webkit-border-bottom-right-radius: 3px;
+    -moz-border-radius-bottomright: 3px;
+    -webkit-border-top-right-radius: 3px;
+    -moz-border-radius-topright: 3px;
+}
+
+.tabExtraButtons .buttonContainer:hover {
+    background: #555;
+}
+
+div.tabContents {
+}
+
+div.uniformButtonVBar  input
+{
+    width: 160px;
+}
+
+ul.horizontalSmallMenu
+{
+    padding-left: 0px;
+    margin: 0px;
+    list-style-type: none;
+    display: inline;    
+}
+
+ul.horizontalSmallMenu li
+{
+    padding-left: 10px;
+    margin: 0px;
+    display: inline;
+}
+
+ul.materialList
+{
+    padding: 0px;
+}
+
+ul.materialList li
+{   
+    border-top: 1px solid #AAAAAA;
+    list-style-type: none;
+    padding-bottom: 5px;
+}
+
+ul.materialList li span
+{
+    padding-left: 10px;
+    font-size: 11pt;
+}
+
+
+ul.materialList li ul
+{
+    margin-left: 15px;
+    padding: 5px;
+}
+
+ul.materialList li ul li
+{
+    background: #F2F2F2;
+    list-style-type: none;  
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 5px;
+    border-top: 1px solid #DDDDDD;    
+}
+
+ul.materialList li ul li span
+{
+    padding-left: 0px;
+    font-size: 10pt;
+}
+
+ul.materialList li ul li ul li
+{
+    background: #FFFFFF;
+    padding-left: 10px;
+        
+}
+
+div.resourceContainer
+{
+    background: white;
+    overflow: auto;
+}
+
+div.descriptionBox
+{
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 20px;
+}
+
+div.descriptionLine
+{
+    padding-left : 20px;
+    font-style: italic;
+    font-size: 9pt;
+}
+
+ul.tabList li.hiddenTab
+{
+    display: none;
+}
+
+.spaceLeft {
+    padding-left: 10px;
+}
+
+ul.slotHorizontalMenu
+{
+    margin: 0px;
+    margin-top: 0px;
+    padding: 0px;
+    display: inline;
+    list-style-type: none;
+}
+
+ul.slotHorizontalMenu li {
+    display: inline;
+    position: relative;
+    padding: 0 0 0 0;
+    padding: 5px 5px;
+    line-height: 1.5;   
+}
+
+ul.slotHorizontalMenu li a {
+}
+
+h2.timetableSeparator {
+    margin-left: auto;
+    border-top: 1px solid #DDDDDD;
+}
+
+div.timetableHeader {
+    padding: 20px 5px 10px 5px;
+    margin-top: 20px;
+    border-bottom: 2px solid #777777;
+    font-size: 15pt; color: rgb(68, 68, 68);
+    behavior: url(border-radius.htc);
+}
+
+ul.keywordList
+{
+    margin: 5px;
+    padding: 0px;
+    display: block;
+    list-style-type: none;
+    /*height: 25px;*/
+}
+
+
+ul.keywordList li.oneLineListItem {
+    display: inline;
+    position: relative;
+    padding: 0 0 0 0;
+    color: #5FA5D4;
+}
+
+ul.keywordList li.oneLineListItem:after {
+    color: black;
+    content: ", ";
+}
+
+ul.keywordList li.oneLineListItem_last {
+    display: inline;
+    position: relative;
+    padding: 0 0 0 0;
+    color: #5FA5D4;
+}
+
+ul.keywordList li.oneLineListItem_last:after {
+    content: "";
+}
+
+ul.keywordList li.multipleLinesListItem {
+    position: relative;
+    padding: 0 0 0 0;
+    color: #5FA5D4;        
+}
+
+ul.keywordList li.multipleLinesListItem_last {
+    position: relative;
+    padding: 0 0 0 0;
+    color: #5FA5D4;        
+}
+
+        
+.popupWindowTitle {
+    color: #1A64A0;
+    font-weight: bold;
+    font-style: normal;
+}
+    
+.popUpLabel {
+   vertical-align: top;
+   text-align: right;
+   color: #5294CC;
+   margin-right: 2px;
+ }
+ 
+ .popUpButton {
+   color:  #234173;
+   text-decoration: none;
+   margin: 0px;
+   margin-top: 1px;
+   margin-right: 1px;
+   background-color: #D9D9D9;
+   border: 1px solid #fff;
+   border-top-color: #eee;
+   border-left-color: #eee;
+   border-right-color: #669;
+   border-bottom-color: #669;
+
+ }
+
+.fieldLabel {
+   text-align: right;
+   color: #5294CC;
+   margin-right: 5px;
+}
+
+.headerRoomLink {
+}
+
+.tooltip {
+   background-color: #FFFFFF;
+   border: 1px solid #000000;
+   color: #000000;
+ }
+
+.invalid {
+    -moz-appearance: none;
+    background-color: #FFB9B9;
+}
+
+.invalidLabel {
+    color: #D01F3C;
+}
+
+select.invalidSelect {
+    color: #D01F3C;
+}
+
+.tooltipError {
+   max-width: 300px;
+   padding: 5px;
+   background-color: white;/*#FFB9B9;*/
+   border: 1px solid #D01F3C;
+   color: #D01F3C;
+   font-weight: bold;
+}
+ 
+ul.errorList {
+    padding: 0;
+    margin: 0;
+    margin-left: 20px;  
+}
+
+ul.errorList li {
+    color: #D01F3C; 
+}
+
+.errorList {
+    color: #D01F3C;
+}
+
+
+span.errorTitle {
+    font-size: medium;
+    color: #D01F3C;
+    font-weight: bold;  
+}
+
+span.messageAfterErrors {
+    margin-top: 1em;
+    color: #D01F3C;     
+}
+
+
+/* NEWS MODULE */
+
+.newsItem{
+    display:block;
+    background: #EBF7FF;
+    margin-bottom: 5px;
+    overflow: hidden;
+}
+
+.newsItemDate {
+   font-weight: italic;
+   color: #36393D;
+}
+
+.newsItemTitle {
+    margin-left: 30px;
+    font-weight: bold;
+}
+
+.newsItemContent {
+    margin-left: 30px;
+    float: left;
+
+}
+
+.newsItemOptions{
+    float: right;
+}
+
+
+.newsContainer{
+    margin:10px 80px 10px 80px;
+}
+
+.newsToolBar{
+    text-align:right;
+    margin:10px 80px 10px 80px;
+}
+
+.newsItemEdit{
+    padding: 10px;
+}
+
+.newsEditTitle{
+    width: 500px;
+}
+
+/* news display: */
+
+.newsGroup {
+    margin-left: 30px;
+}
+
+.newsTypeTitle{
+    background: #EBF7FF;
+    margin-bottom: 5px;
+    padding: 3px;
+    font-size: 14px;
+    color: black;
+}
+
+.newsDisplayItem{
+    margin-left: 30px;
+    overflow: hidden;
+}
+
+.newsDisplayItemDate {
+   font-weight: italic;
+   color: #36393D;
+   display: inline;
+   font-weight: bold;
+}
+
+.newsDisplayItemTitle {
+    display: inline;    
+    font-size: 13px;
+}
+
+.newsDisplayItemContent {
+    font-style: italic;
+    margin-left: 100px;
+    color: #777777;
+}
+
+/* PLUGINS ADMIN */
+
+ul.optionList1 {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+ul.optionList2 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+span.optionKey1 {
+    font-weight: bold;  
+}
+
+div.PluginPeopleListDiv {
+    margin-bottom: 10px;
+    height: 100px;
+    width: 300px;
+    border: 1px solid #CCCCCC;
+    overflow: auto;
+}
+
+ul.PluginPeopleList
+{
+    border: none;
+    display: block;
+    list-style-type: none;
+    padding-left: 0px;
+    margin: 0;
+}
+
+ul.PluginPeopleList li{
+    margin: 0;
+    display: block;  
+    margin-bottom: 0px;
+    line-height: 25px;
+    padding-left: 5px;
+    vertical-align: middle;
+}
+
+/* COLLABORATION */
+.collaborationTitleCell {
+    color: #5294CC;
+    text-align: center;
+    padding-left: 15px;
+    border-bottom: 1px solid rgb(82, 148, 204);
+}
+
+.collaborationCell {
+    padding: 0px;
+    padding-left: 15px;
+    padding-top: 5px;
+}
+
+.collaborationCellNarrow {
+    padding: 0px;
+    padding-top: 5px;
+}
+
+.collaborationInfoCell {
+    padding: 0px;
+    padding-left: 50px;
+    padding-bottom: 5px;
+}
+
+span.statusMessage {
+    font-size: medium;
+    font-weight: bold;
+    vertical-align: middle; 
+}
+
+.statusMessageError {
+    color: #D01F3C;
+}
+
+.statusMessageOK {
+    color: #73880A;
+}
+
+.statusMessageOther {
+    color: #7A7A7A;/*#356AA0;*/
+}
+
+ul.collaborationInfo {
+    list-style-type: none;
+    margin:0px;
+    padding:0px;
+    padding-left: 5px;
+    border-left: 1px solid rgb(82, 148, 204);
+}
+
+li.collaborationInfo {
+    padding:0px;
+}
+
+.collaborationWarning {
+    font-weight: bold;
+    color: #D01F3C; 
+}
+
+td.bookingFormFieldName {
+    text-align: right;
+    padding-right: 5px;
+}
+
+span.bookingFormWarning {
+    font-size: x-small;
+    color: #FF7400;
+}
+
+ul.singleBooking {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-align: center; 
+}
+
+div.singleBookingCustomText {
+    margin-bottom: 5px; 
+}
+
+div.actionButton {
+    display: inline;
+    margin-left: 5px;   
+}
+
+/* Collaboration Admin */
+
+ul.CAIndexList {
+    display: block;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    padding-top: 10px;
+    padding-bottom: 5px;
+}
+
+ul.CAIndexList li {
+    display: inline;
+    position: relative;
+    padding-right: 15px;
+    padding-left: 15px;
+    border-right: 1px solid #AAAAAA;
+}
+
+ul.CAIndexList a {
+    font-family: Verdana;
+    font-size: 12pt;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+ul.CAIndexList a:hover
+{
+    color: #dbb03a;
+}
+
+.CAIndexSelected  {
+    color: #B38B1F;
+}
+
+.CAIndexUnselected {
+    color: #4C6A83;
+}
+
+.CALastIndex {
+    border-right: 0px;
+}
+
+div.CADiv {
+    background-color: #F6F6F6;
+    padding: 10px 20px 10px 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    -moz-border-radius-bottomleft:10px;
+    -moz-border-radius-bottomright:10px;
+    -moz-border-radius-topleft:10px;
+    -moz-border-radius-topright:10px;
+    border-bottom:1px solid #AAAAAA;
+    border-right:1px solid #AAAAAA;     
+}
+
+div.CADiv span.pluginNames {
+    font-style: italic;
+}
+
+div.CAShowOnlyPendingDiv {
+    padding-right: 10px;
+    border-right: 1px solid #AAAAAA;
+    margin-right: 10px;
+}
+
+div.CAShowOnlyPendingDiv input {
+    margin: 0;
+    padding: 0;
+}
+
+div.CAShowOnlyPendingDiv label {
+    font-weight: normal;
+}
+
+div.CAFilterByCategoryDiv{
+    padding-right: 10px;
+    border-right: 1px solid #AAAAAA;
+    margin-right: 10px;
+    display: inline;
+}
+
+div.CAResultsPerPageDiv {
+    display: inline;
+}
+
+span.CAMinMaxKeySuggestion {
+    color: orange;
+    font-size: 8pt;
+}
+
+span.CAViewBySpan {
+    font-weight: bold;
+}
+
+div.CADiv a {
+    font-family: Verdana;
+    font-size: 9pt;
+    cursor: pointer;
+}
+
+a.CAViewBySelected  {
+    color: #B38B1F;
+    font-weight: bold;
+}
+
+a.CAViewByUnselected {
+    color: #4C6A83;
+}
+
+div.CAViewByDiv {
+    display: inline;
+}
+
+div.CAViewByDiv a {
+    padding-left: 8px;
+}
+
+div.CAOrderByDiv a {
+    padding-left: 8px;
+}
+
+div.CAOrderByDiv {
+    display: inline;
+    float: right;
+}
+
+div.CAInfoDiv {
+    padding-top: 5px;
+}
+
+div.CAInfoDiv div.CATypesDiv {
+    display: inline;
+    padding-top: 5px;
+}
+
+div.CAInfoDiv div.CAStaticURLDiv {
+    display: block;
+    padding-top: 5px;
+}
+
+a.CAStaticURLSwitch {
+    color: #0B63A5;
+}
+
+div.CAInfoDiv div.CAStaticURLDiv a {
+    margin: 0;
+    padding: 0;
+    font-weight: bold;
+}
+
+div.CAInfoDiv div.CAStaticURLDiv a:hover {
+    color: #DBB03A;
+}
+
+ul.pageNumberList {
+    display: block;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    padding-top: 25px;
+}
+
+ul.pageNumberList li {
+    display: inline;
+    position: relative;
+    padding-right: 15px;
+    padding-left: 15px;
+    border-right: 1px solid #AAAAAA;
+}
+
+ul.pageNumberList li.lastPageNumber {
+    border-right: 0px;
+}
+
+ul.pageNumberList a {
+    font-family: Verdana;
+    font-size: 9pt;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+ul.pageNumberList a:hover
+{
+    color: #dbb03a;
+}
+
+ul.pageNumberList a.pageSelected  {
+    color: #B38B1F;
+}
+
+ul.pageNumberList a.pageUnselected {
+    color: #4C6A83;
+}
+
+table.CAResultsTable {
+    margin: 0;
+    padding: 0;
+}
+
+table.CAResultsTable td.ACBookingGroupTitle {
+    padding-top: 20px;
+}
+
+table.CAResultsTable a.ACConfLink {
+    text-decoration: underline;
+    padding-top: 20px;
+}
+
+table.CAResultsTable a.ACConfLink span.ACConfTitle {
+    font-size: 12pt;
+    font-style: italic;
+    font-weight: bold;
+}
+
+ul.CAResultsTable a.ACConfLink span.ACConfId {
+}
+
+ul.CAResultsTable a.ACConfLink span.ACConfDates {
+    font-size: 11pt;
+}
+
+td.ACBookingFirstCell {
+    padding-left: 30px;
+}
+
+td.ACBookingCell {
+    padding-left: 10px;
+}
+
+td.ACBookingTime {
+    text-align: right;
+}
+
+table.CAResultsTable span.ACGroupDate {
+    font-family: Verdana;
+    font-size: 12pt;
+    font-style: italic;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+td.ACBookingConference {
+    padding-left: 10px;
+}
+
+
+/* ------------------------ */
+
+.timetableBlock {
+    border: 1px solid #aaaaaa;
+    -moz-border-radius: 3px;
+    -webkit-border-radius:3px;
+    behavior: url(border-radius.htc);
+    overflow: hidden;
+}
+
+.timetableBlockPileEffect {
+    border-bottom: none;
+    margin: 1px 0;
+    height: 3px;
+}
+
+div.timetableContribution  {
+    background-color: #f8f2e8;
+}
+
+div.timetableSession div.timetableBlock{
+}
+
+div.timetableBreak div.timetableBlock{
+}
+
+div.timetableBlockTitle {
+    color: #202020;
+    font-weight: bold;
+    font-size: 8pt;
+    padding: 4px;
+}
+
+div.timetableBlockTime {
+    position: absolute;
+    bottom: 4px;
+    right: 6px;
+    color: #202020;
+    font-weight: bold;
+    font-size: 8pt;
+}
+
+div.timetableBlockTimeDiscreet{
+    float: right;
+    margin: 4px;
+    margin-right: 6px;
+    margin-left: 6px;
+    color: #777777;
+    font-style: italic;
+    font-size: 8pt;
+}
+
+div.timetableBlockLocation {
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+    font-style: italic;
+    color: #202020;
+    font-size: 8pt;
+}
+
+div.exclusivePopup {
+    background-color: white;
+    position: fixed;
+    display: inline;
+    border: 1px solid black;
+    -moz-border-radius: 10px;
+    -webkit-border-radius:10px;
+    behavior: url(border-radius.htc);
+}
+
+div.exclusivePopupTopBg {
+    background-color: #F8F8F8;
+    behavior: url(border-radius.htc);
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+}
+
+div.exclusivePopup .title {
+    font-size: 13pt;
+    padding-left: 10px;
+    padding-right: 50px;
+    padding-bottom: 10px;
+    background-color:  #F8F8F8;
+    border-bottom: 1px solid #CCC;
+}
+
+div.exclusivePopup .titleWrapper {
+    position: relative;
+    top: -10px;
+}
+
+div.exclusivePopup .printLink {
+    font-size: 10pt;
+    position: absolute;
+    bottom: 0px;
+    right: 45px;
+    border: 1px solid #aaa;
+    border-bottom-color: white;
+    background: white;
+    
+    -webkit-border-top-right-radius: 3px;
+    -webkit-border-top-left-radius: 3px;
+    -moz-border-radius-topleft: 3px;
+    -moz-border-radius-topright: 3px;
+}
+
+div.exclusivePopupCloseButton {
+    position: absolute;
+    cursor: pointer;
+    top: 5px;
+    right: 10px;
+    background-image: url('../images/popup_close_button.png');
+    width: 15px;
+    height: 15px;
+}
+
+div.balloonPopup {
+    position: absolute;
+    padding-bottom: 15px;
+    color: #202020;
+    border: 1px solid black;
+    background-color: white;
+    -moz-border-radius: 6px;
+    -webkit-border-radius:6px;
+    behavior: url(border-radius.htc);
+}
+
+div.balloonPopupArrow {
+    position: absolute;
+    background: transparent url('../images/balloon_popup_arrows.png') scroll no-repeat 0 -19px;
+    background-repeat: no-repeat;
+    background-position: 0 -19px;
+}
+
+div.balloonPopupCloseButton {
+    position: absolute;
+    cursor: pointer;
+    top: 10px;
+    right: 10px;
+    background-image: url('../images/popup_close_button.png');
+    width: 15px;
+    height: 15px;
+}
+
+.loadingPopup {
+    background: transparent url('../images/load_lightblue.gif') scroll no-repeat center center;
+    min-width: 130px;
+    height: 70px;
+}
+.loadingPopup .text {
+    color: #DDD;
+    text-align: center;
+    font-family: Verdana;
+    padding-top: 80px;
+}
+
+div.timetableLoading {
+    background: transparent url('../images/load_big.gif') scroll no-repeat center center;
+}
+div.timetableLoading .text {
+    color: #777;
+    text-align: center;
+    font-family: Verdana;
+    letter-spacing: 2px;
+}
+
+.timetablePopup {
+} 
+
+.timetablePopup .title {
+    font-family: Verdana;
+    font-size: 12pt;
+    padding: 10px 30px 10px 10px;
+}
+
+div.timetablePopupInfoWrapper {
+    width: 100%;
+    background-color:  #F8F8F8;
+    border-top: 1px solid #DDD;
+    border-bottom: 1px solid #CCC;
+}
+
+.timetablePopup .menuBar {
+    text-align: right;
+    color: #444444;
+    font-weight: normal;
+    padding: 5px 0;
+}
+
+.timetablePopup .managementMenuBar {
+    background-color: #f9f6e4;
+    border-top: 1px solid #e5e0d0;
+}
+
+.timetablePopup .menuBar a {
+    margin: 0 10px;
+}
+
+div.timetablePopupInfoContent {
+    padding: 10px;
+    padding-left: 20px;
+    font-size: 9pt;
+    line-height: 1.5em;
+    font-style: italic;
+}
+
+div.timetablePopupTimeDiv{
+    font-size: 12pt;
+    font-style: normal;
+    margin-bottom: 10px;
+}
+
+div.timetablePopupDescription{
+    font-size: 9pt;
+    font-style: italic;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+div.timetablePopupContributions{
+    font-family: Verdana;
+    padding: 10px 10px 0px 10px;
+    font-size: 9pt;
+    font-weight: bold;
+}
+
+td.timetablePopupContributionTime{
+    vertical-align: top;
+    padding-top: 3px;
+    padding-right: 5px;
+    color: #444444;
+    font-size: 7pt;
+    font-weight: bold;
+}
+
+td.timetablePopupContributionTitle{
+    vertical-align: top;
+    color: #444444;
+    font-size: 9pt;
+    font-weight: normal;
+}
+
+div.timetableColorPicker{
+    padding: 3px;
+    background-color: #EFEFEF;
+    border: 1px solid #aaaaaa;
+}
+
+div.timetableColorPickerBlock {
+    width: 15px;
+    height: 15px;
+    margin: 4px;
+    border: 1px solid #aaaaaa;
+    -moz-border-radius: 3px;
+    -webkit-border-radius:3px;
+    behavior: url(border-radius.htc);
+}
+
+.timetableFilter {
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+}
+
+.timetableFilter .content {
+    width: 900px;
+    margin: 0 auto;
+    background: #ECECEC;
+    border: 1px solid #777;
+    border-bottom: none;
+    position: relative;
+}
+
+.timetableFilter .content table {
+    background: white;
+    width: 100%;
+}
+
+.timetableFilter .content td {
+    padding: 13px 30px;
+    white-space: nowrap;
+    background-color: #ECECEC;
+    vertical-align: middle;
+    width: 1px;
+}
+
+.timetableFilter .closeButton {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    background: transparent url('../images/close_button.png') scroll no-repeat 0 0;
+}
+
+.timetableFilter .closeButton:hover {
+    background-position: 0 -16px;
+}
+
+.timezonePopup {
+    min-width: 300px;
+    padding: 15px 20px 0px 10px;
+}
+
+.timezonePopup .tzHeader {
+    font-size: 15pt;
+    color: #444;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #AAA;
+}
+
+.timezonePopup select {
+    min-width: 310px;
+    margin: 5px 5px 5px 20px;
+    border: 1px solid #AAA;
+}
+.timezonePopup .tzContainer {
+    padding: 0px 5px;
+}
+
+ul.popupList {
+    background: #FFFFFF;
+    padding: 0px;
+    border: 1px solid #99aabb;
+    font-size: 10pt;
+    margin: 0px;
+}
+
+ul.popupList li {
+    list-style-type:none;
+}
+
+ul.popupList input {
+    vertical-align: middle;
+}
+
+ul.popupList li a {
+    vertical-align: bottom;
+    padding: 4px;
+    display: block;
+    list-style-type:none; 
+}
+
+ul.popupList li a.selected {
+    background: #99aabb;
+}
+
+ul.popupList li span {
+    min-width: 200px;
+    display: block;
+}
+
+ul.popupList li a:hover {
+    padding: 4px;
+    display: block;
+    list-style-type:none; 
+    color: white;
+    background: #5FA5D4;
+}
+
+
+ul.globalMenuPopupList {
+    background-color: #4e89b8;
+    border: 0;
+    display: block;
+}
+
+ul.globalMenuPopupList li {
+        display: block;
+}
+
+ul.globalMenuPopupList li a {
+    font-weight: bold;
+    font-family: Verdana;
+    font-size: 8pt;
+    color: white;
+    letter-spacing: 0.04em;
+    padding: 8px;
+    display: block;
+}
+
+ul.globalMenuPopupList li a:hover {
+    padding: 8px;
+    display: block;
+    list-style-type:none; 
+    color: white;
+    background: #5fa5d4;
+}
+
+ul.categoryDisplayPopupList li a {
+    font-size: 11pt;
+}
+
+ul.darkPopupList {
+    background: #444;
+    border: 1px solid #777;
+}
+
+ul.darkPopupList li a.selected {
+    background: #666;
+}
+
+ul.darkPopupList li a:hover {
+    background: #777;
+}
+
+ul.darkPopupList li a {
+    color: #ECECEC;
+    font-weight: normal;
+}
+
+.printButton, .printButtonWhite, .linkButtonWhite, .filterButtonWhite {
+    padding: 4px 6px;
+    margin-left: 6px;
+    cursor: pointer;
+}
+
+.filterButtonWhite {
+    -webkit-border-bottom-right-radius: 3px;
+    -moz-border-radius-bottomright: 3px;
+    color: white;
+}
+
+.printButton {
+    padding-left: 20px;
+    background: transparent url('../images/printer_blue.png') scroll no-repeat center left;
+}
+
+.printButtonWhite {
+    padding-left: 20px;
+    color: white;
+    background: transparent url('../images/printer_white.png') scroll no-repeat center left;
+}
+
+.linkButtonWhite {
+    padding-left: 20px;
+    color: white;
+    background: transparent url('../images/link_white.png') scroll no-repeat center left;
+}
+
+
+/* MODIF DISPLAY*/
+
+.groupItem {
+    /*float:left;*/
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom:12px;
+}
+
+table.groupTable {
+    border: none;
+    width: 100%;
+}
+
+/* This assures the spacing between table rows */
+table.groupTable .blacktext,
+table.groupTable .contentCellTD,
+table.groupTable .dataCaptionTD,
+table.groupTable .titleCellTD  {
+    padding-bottom: 10px;
+}
+
+table.groupTable em.description {
+    display: block;
+    max-width: 500px;
+    margin-bottom: 20px;
+    margin-top: 5px;
+}
+
+.groupItemContent {
+    padding-left:5px;
+}
+
+div.cssTplSelection {
+    padding: 10px;
+    padding-left: 75px;
+    border-top: 1px solid #d9d9d9;
+    background-color: #f2f2f2;
+    color: #444444;
+}
+
+div.cssPreview {
+    float: right;
+}
+
+.disabledRadio {
+    display: none;
+}
+
+.roomWidget {
+    padding: 4px;
+}
+
+.roomWidget th{
+    font-size: 11pt;
+    color: #444444;
+    text-align: left;
+}
+
+ul.nobulletsList
+{
+    position: relative;
+    margin:0px;
+    margin-top: 10px;
+    padding-left: 0px;
+}
+
+ul.nobulletsList li
+{
+    height: 25px;
+    overflow: visible;
+    list-style-type: none;
+}
+
+ul.nobulletsListInline
+{
+    position: relative;
+    margin:0px;
+    margin-top: 10px;
+    padding-left: 0px;
+}
+
+ul.nobulletsListInline li
+{
+    margin-left: 10px;
+    height: 25px;
+    overflow: visible;
+    list-style-type: none;
+    display: inline;
+}
+
+div.FavoritePeopleListDiv {
+    margin-bottom: 10px;
+    height: 300px;
+    width: 400px;
+    border: 1px solid #CCCCCC;
+    overflow: auto;
+}
+
+div.ShortPeopleListDiv {
+    margin-bottom: 10px;
+    height: 150px;
+    width: 300px;
+    border: 1px solid #CCCCCC;
+    overflow: auto;
+}
+
+div.VeryShortPeopleListDiv {
+    margin-bottom: 10px;
+    height:75px;
+    width: 300px;
+    border: 1px solid #CCCCCC;
+    overflow: auto;
+}
+
+div.CategoryEventListDiv {
+    margin-bottom: 10px;
+    height: 150px;
+    width: 400px;
+    border: 1px solid #CCCCCC;
+    overflow: auto;
+}
+
+.searchResultDescription {
+    font-size: 10pt;
+    color: #666666;
+    margin: 5px; 
+    margin-left: 10px; 
+    padding: 5px; 
+}
+
+
+ul.searchResultList {
+    padding: 0px;
+}
+
+li.searchResultEvent {
+    border-bottom: 1px solid #DDDDDD;
+    margin-bottom: 15px;
+    padding: 10px;
+}
+
+li.searchResultContribution {
+    border-bottom: 1px solid #DDDDDD;
+    margin-bottom: 15px;
+    padding: 10px;
+}
+
+ul.authorList {
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.searchPublicWarning {
+    border:1px solid red;
+    color:#FF4444;
+    margin-bottom:20px;
+    margin-top:20px;
+    padding:10px;
+}
+
+.Search {
+    border-bottom: 2px solid rgb(170, 170, 170);
+    font-size: 26pt;
+    font-family: Times New Roman;
+    color: #B14300;
+    font-weight: normal;
+    margin: 0;
+    margin-bottom: 10px;
+    padding: 0;
+}
+
+
+div.UnscheduledContribListDiv {
+    margin-bottom: 10px;
+    height:200px;
+    width: 300px;
+    border: 1px solid #CCCCCC;
+    overflow: auto;
+    margin-top: 10px;
+}
+
+ul.UnscheduledContribList {
+    border: none;
+    display: block;
+    list-style-type: none;
+    padding-left: 0px;
+    margin: 0;
+
+}
+
+ul.UnscheduledContribList li {
+    cursor: pointer;
+    padding: 5px;
+    border-bottom: 1px solid #DDDDDD;
+}
+
+ul.UnscheduledContribList li.selected {
+    background-color: #CDEB8B;
+}
+
+div.dialogButtons {
+    background:#F8F8F8 none repeat scroll 0 0;
+    border-top:1px solid #CCCCCC;
+    margin-top:10px;
+    padding:10px;
+    text-align:center;
+}
+
+.slotTitle {
+    font-size:11pt;
+}
+
+.slotSubTitle {
+    font-size: 10pt;
+    font-weight:normal;
+    padding-bottom: 10px;
+    margin-top: 0px;
+    border-bottom:1px solid #E4E4E4;
+}
+
+.slotSubTitle span{
+    margin-right: 7px;
+}
+
+.calendarColorLegend {
+    padding: 10px 0 10px 20px;
+    font-size: 10pt;
+}
+
+.calendarColorLegend a {
+    font-size: 10pt;
+}
+
+.indicoHelp {
+    width: 500px;
+    margin-left: 20px;
+    margin-bottom: 50px;
+    font-family: Verdana;
+}
+
+.indicoHelp, .indicoHelp em, .indicoHelp p {
+    color: #222;
+    line-height: 160%;
+}
+
+.indicoHelp ul {
+    padding-left: 25px;
+}
+
+.indicoHelp li {
+    margin: 4px 0;
+}
+
+.indicoHelp .title {
+    font-size: 1.4em;
+    color: #777;
+    font-family: 'Times New Roman';
+    padding-bottom: 5px;
+    padding-top: 20px;
+}
+
+
+.indicoHelp .icons {
+    float: right;
+    padding-right: 5px;
+}
+
+.indicoHelp .content {
+    margin-left: 20px;
+}
+
+.indicoHelp .item {
+    padding: 4px 0;
+    border-bottom: 1px dotted #AAA;
+}
+
+.ttModifIcon {
+    float: right;
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+    background: transparent url('../images/popupMenuHover.png') scroll repeat-x 0 0;
+}
+
+.ttModifIcon:hover {
+    background: transparent url('../images/popupMenuHover.png') scroll repeat-x 0 -15px;
+}
+
+.ttManagementBlock {
+    border: 1px solid #aaaaaa;
+    -moz-border-radius: 3px;
+    -webkit-border-radius:3px;
+    behavior: url(border-radius.htc);
+    overflow: hidden;
+}
+
+.ttSessionManagementBlock {
+    border: 1px solid #aaaaaa;
+    -moz-border-radius: 3px;
+    -webkit-border-radius:3px;
+    behavior: url(border-radius.htc);
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.ttMBlockExtraInfo {
+    color: #666666;
+}

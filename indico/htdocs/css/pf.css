@@ -1,0 +1,70 @@
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+   $Id: pf.css,v 1.7 2009/05/07 09:55:56 eragners Exp $
+
+   This file is part of CDS Indico.
+   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+
+   CDS Indico is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 2 of the
+   License, or (at your option) any later version.
+
+   CDS Indico is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+   59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+*/
+
+body {
+    background: #424242;
+}
+
+.pageHeader {
+    border-bottom: none;
+}
+
+div.meetingEventHeader {
+    background: white url('../images/PFlogo.png') left top no-repeat;
+    background-position: 50% 5px;
+    border-top: 1px #AAA solid;
+    border-right: 1px #AAA solid;
+    border-left: 1px #AAA solid;
+    
+    margin: 0;
+    
+    color: #333333;
+    
+    padding-left: 200px;
+    padding-top: 85px;
+}
+
+div.meetingEventSubHeader {
+    border: 1px solid #AAA;
+}
+
+div.meetingEventHeader a:link {
+   color: #0b63a5;
+}
+div.meetingEventHeader a:visited {
+   color: #0b63a5;
+}
+div.meetingEventHeader a:active {
+   color: #E25300;
+}
+div.meetingEventHeader a:hover {
+   color: #E25300;
+}
+
+div.meetingEventHeader h1 {
+    color: #333333;
+}
+
+div.meetingEventHeader h2 {
+    color: #333333;
+}

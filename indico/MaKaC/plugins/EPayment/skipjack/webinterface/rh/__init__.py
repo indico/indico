@@ -1,0 +1,48 @@
+# -*- coding: utf-8 -*-
+##
+## $Id: __init__.py,v 1.2 2009/05/14 18:06:26 jose Exp $
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+from MaKaC.plugins import getModules, initModule
+modules = {}
+topModule = None
+
+
+
+def getRHByTag(self, tag):
+    """Do the link between url handlers and request handlers"""
+    for mod in self.modules.values():
+        for RH in mod.__dict__.keys():
+            try:
+                if mod.__dict__[RH]._requestTag == tag:
+                    return mod.__dict__[RH]
+            except:
+                pass
+
+def preprocessParams(params):
+  try:
+    if not params.has_key('requestTag'):
+        if params['szReturnCode'] == '1':
+           params['requestTag'] = 'confirm'
+        else:
+           params['requestTag'] = 'cancel' 
+    #raise("preprocessParams ... " + str(params))
+    return True
+  except Exception,e:
+     raise "%s"%params

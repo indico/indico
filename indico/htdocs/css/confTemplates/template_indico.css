@@ -1,0 +1,78 @@
+	/* 	
+		Template no. 2
+		Vertical menu in right side
+		Colors and pictures are customizable
+	*/
+	
+	/* 	For user: 
+		
+		There are hints and tips writen inside of these comment lines
+		
+		All colors has to give in hexadecimal form 
+		e.g #11ff22
+		 
+		Between these markings: *** *** is information which is not customizable
+		e.g *** do not make modifications for these values *** 
+	*/
+
+/*
+.conf {
+    width: 100%;
+    border: none;
+    margin: 0;
+}
+
+.confheader {
+}
+
+.confTitleBox {
+    border-top: 3px solid #234173;
+    border-bottom: 1px solid #0f4c80;
+    background: #1a64a0 url("../../images/conf/stripes1.png") repeat-x 0 -24px;
+}
+
+.confSubTitleBox {
+        background: #f5faff url("../../images/conf/stripes1.png") repeat-x 0 -213px;
+        border-bottom: 1px solid #d5e4f1;
+        border-top: 1px solid #d5e4f1;
+}
+
+.conferencetitlelink {
+    color: white;
+}
+
+.confSubTitle, .nowHappening {
+    color: #24425a;
+}
+
+.simpleTextAnnouncement {
+    background: #F5FAFF url(../../images/conf/stripes1.png) repeat-x scroll 0 -300px;
+}
+
+
+.confTitleBox {
+    border-top: 3px solid #103f0a;
+    border-bottom: 1px solid #0f4c80;
+    background: #1a64a0 url("../../images/conf/stripes2.png") repeat-x 0 0;
+}
+
+.confSubTitleBox {
+        background: #f5faff url("../../images/conf/stripes2.png") repeat-x 0 -189px;
+        border-bottom: 1px solid #899d89;
+        border-top: 1px solid #899d89;
+}
+
+.datePlace {
+    color: #073307;
+}
+
+.searchBox {
+    background: transparent url("../../images/conf/stripes2.png") repeat-x 0 -276px;
+}
+
+
+
+.conferencetitlelink {
+    padding: 25px 0;
+}
+*/

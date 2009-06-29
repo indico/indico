@@ -1,0 +1,122 @@
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+   $Id: lecture.css,v 1.7 2009/05/07 09:55:56 eragners Exp $
+
+   This file is part of CDS Indico.
+   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+
+   CDS Indico is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 2 of the
+   License, or (at your option) any later version.
+
+   CDS Indico is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+   59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+*/
+
+/* Definitions for lecture */
+
+body {
+    background: #424242;
+}
+
+.pageHeader {
+    border-bottom: none;
+}
+
+div.lectureEventHeader {
+    background: #1a64a0;
+    color: white;
+    font-size: 12pt;
+    position: relative; 
+    
+    min-height: 130px;
+    margin: 0px;
+    padding: 30px;
+    position: relative;
+}
+
+div.lectureEventHeader a {
+    color: white;
+}
+
+div.lectureEventHeader a:hover {
+    color: #AAAAAA;
+}
+
+div.lectureEventHeader .iCal {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    padding: 10px 10px;
+}
+
+div.eventInfoBox {
+	color: white;	
+	float: right;	
+	padding: 10px;	
+}
+
+h1 {
+	font-size: 18pt;
+	color: white;
+	font-weight: normal;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+h2 {
+	font-size: 11pt;
+	color: white;
+	font-weight: normal;
+	font-style: italic;
+	margin-top: 5px;
+}
+
+div.lectureEventBody {
+	background: white;			
+	font-size: 10pt;
+	color: black;	
+	margin: 0;	
+	padding: 20px;
+}
+
+div.partList {
+	background: #A0A0B0;
+	padding-top: 5px;
+	height: 20px;
+}
+
+div.materialList h3, div.partList h3{	
+	font-size: 11pt;
+	color: black;
+	margin-left: 10px;
+	display: inline;	
+}
+
+div.descriptionBox {
+	margin: 0px;
+	padding: 10px;
+	overflow:auto;
+}
+
+div.lectureEventBody p {
+	font-size: 10pt;
+	color: black;
+}
+
+div.lectureEventBody pre {
+	font-size: 10pt;
+	color: black;
+}
+
+div.lectureExtraInfo {
+	margin: 10px;	
+}

@@ -1,0 +1,228 @@
+# -*- coding: utf-8 -*-
+##
+## $Id: common.py,v 1.12 2009/04/25 13:56:05 dmartinc Exp $
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+
+from MaKaC.plugins.Collaboration.base import CollaborationException, CSErrorBase
+from MaKaC.plugins.base import PluginsHolder
+from urllib2 import HTTPError, URLError
+from datetime import timedelta
+from BaseHTTPServer import BaseHTTPRequestHandler
+from MaKaC.common.httpTimeout import urlOpenWithTimeout
+from MaKaC.common.url import URL
+from array import array
+from MaKaC.common.timezoneUtils import nowutc, datetimeToUnixTime
+from MaKaC.common.logger import Logger
+from MaKaC.common.PickleJar import Retrieves
+
+readLimit = 100000;
+secondsToWait = 10;
+
+def getEVOOptionValueByName(name):
+    ph = PluginsHolder()
+    return ph.getPluginType("Collaboration").getPlugin("EVO").getOption(name).getValue()
+
+def getActionURL(actionString):
+    EVOServerURL = getEVOOptionValueByName("httpServerLocation")
+    actionServlet = getEVOOptionValueByName("APIMap")[actionString]
+    if EVOServerURL.endswith('/'):
+        return EVOServerURL + actionServlet
+    else:
+        return EVOServerURL + '/' + actionServlet
+    
+def getEVOAnswer(action, arguments = {}, eventId = '', bookingId = ''):
+    
+    actionURL = getActionURL(action)
+    
+    indicoID = getEVOOptionValueByName("indicoUserID")
+    indicoPassword = getEVOOptionValueByName("indicoPassword")
+    expirationTime = int(datetimeToUnixTime(nowutc() + timedelta(minutes = getEVOOptionValueByName('expirationTime'))) * 1000)
+    
+    Logger.get('EVO').debug("Expiration time: " + str(expirationTime))
+    
+    arguments["from"] = createLoginKey(indicoID, indicoPassword, expirationTime)
+    
+    url = URL(actionURL)
+    url.setParams(arguments)
+    url.setSeparator('&')
+        
+    Logger.get('EVO').info("""Evt:%s, booking:%s, sending request to EVO: [%s]""" % (eventId, bookingId, str(url)))
+    
+    try:
+        answer = urlOpenWithTimeout(str(url) , secondsToWait).read(readLimit).strip() #we remove any whitespaces, etc. We won't read more than 100k characters
+        
+    except HTTPError, e:
+        Logger.get('EVO').error("""Evt:%s, booking:%s, request: [%s] triggered exception: %s""" % (eventId, bookingId, str(url), str(e)))
+        code = e.code
+        shortMessage = BaseHTTPRequestHandler.responses[code][0]
+        longMessage = BaseHTTPRequestHandler.responses[code][1]
+        errorString = 'HTTPError when contacting EVO for action: ' + action + '. Code=' + str(code) + ', short message ="' + shortMessage + ', long message="' + longMessage + '"'
+        if str(e.code) == '500':
+            raise EVOException("EVO is having problems: [" + errorString + "]", e)
+        raise EVOException(errorString, e)
+    
+    except URLError, e:
+        Logger.get('EVO').error("""Evt:%s, booking:%s, request: [%s] triggered exception: %s""" % (eventId, bookingId, str(url), str(e)))
+        if str(e.reason).strip() == 'timed out':
+            raise EVOException("EVO is not responding.", e)
+        raise EVOException('URLError when contacting EVO for action: ' + action + '. Reason="' + str(e.reason)+'"', e)
+    
+    else:
+        if answer.startswith("OK:"):
+            answer = answer[3:].strip() #we remove the "OK:"
+            Logger.get('EVO').info("""Evt:%s, booking:%s, got answer: [%s]""" % (eventId, bookingId, answer))
+            return answer
+        
+        elif answer.startswith("ERROR:"):
+            error = answer[6:].strip()
+            Logger.get('EVO').warning("""Evt:%s, booking:%s, request: [%s] triggered EVO error: %s""" % (eventId, bookingId, str(url), error))
+            if error == 'YOU_ARE_NOT_OWNER_OF_THE_MEETING' or error == 'NOT_AUTHORIZED_SERVER' or error == 'NOT_AUTHORIZED':
+                raise EVOException("Indico's EVO ID / pwd do not seem to be right. Please report to Indico support.", error)
+            elif error == 'REQUEST_EXPIRED':
+                raise EVOException("Problem contacting EVO: REQUEST_EXPIRED", 'REQUEST_EXPIRED. Something is going wrong with the UNIX timestamp?');
+            elif error == 'WRONG_EXPIRATION_TIME':
+                raise EVOException("Problem contacting EVO; WRONG_EXPIRATION_TIME", 'REQUEST_EXPIRED. Something is going wrong with the UNIX timestamp?');
+            else:
+                raise EVOControlledException(error)
+        else:
+            raise EVOException('Error when contacting EVO for action: ' + action + '. Message from EVO Server did not start by ERROR or OK', answer)
+        
+def parseEVOAnswer(answer):
+    """ Parses an answer such as
+        meet=48760&&start=0&&end=1000&&com=4&&type=0&&title=NewTestTitle&&desc=TestDesc&&url=[meeting=e9eIeivDveaeaBIDaaI9]
+        and returns a tuple of attributes.
+        the url attribute is transformed to the real koala URL
+    """
+    
+    attributesStringList = answer.split('&&')
+    attributes = {}
+    for attributeString in attributesStringList:
+        name, value = attributeString.split('=',1)
+        name = name.strip()
+        value = value.strip()
+        if name == 'url':
+            value = value[1:-1] #we remove the brackets
+            value = getEVOOptionValueByName("koalaLocation") + '?' + value
+        attributes[name] = value
+    return attributes
+
+
+def createLoginKey(EVOID, password, time):
+    """ Obfuscates an EVOID / password couple with a unix timestamp
+        EVOID has to be an 8 digit (max) number / string number, ex: 123 or '123'
+        password has to be a 4 digits password, ex: 1234 or '1234'
+        time is unix time in milliseconds (13 digits max), ex: 12345
+
+        Returns an "obfuscated" EVO login key of 25 characters.
+    """
+    EVOID = str(EVOID)
+    password = str(password)
+    time = str(time)
+    
+    if len(EVOID) > 8:
+        raise EVOException("EVOID has to be 8 digits max")
+    if len(password) != 4:
+        raise EVOException("password has to be 4 digits")
+    if len(time) > 13:
+        raise EVOException("unix time has to be 13 digits max")
+    
+    key = array('c', ' '*25)
+    EVOID = EVOID.zfill(8)
+    time = time.zfill(13)
+    
+    for index, char in enumerate(time):
+        key[index*2] = char
+
+    for index, char in enumerate(EVOID):
+        key[19 - index * 2] = char
+
+    key[1] = password[0]
+    key[21] = password[1]
+    key[3] = password[2]
+    key[23] = password[3]
+
+    return key.tostring()
+
+
+def parseLoginKey(key):
+    """ Parses an "obfuscated" EVO login key of 25 characters.
+        Returns a tuple (EVOID, password, time)
+        EVOID will be an string with a number of maximum 8 digits.
+        time will be an integer, UNIX time in millesconds (13 digits max)
+        password will be a string of 4 characters
+    """
+    if len(key) != 25:
+        raise EVOException("key has to be a string of 25 characters")
+
+    EVOID = str(int("".join([key[i] for i in range (19,3,-2)])))
+    time = int("".join([key[i] for i in range(0,25,2)]))
+    password = "".join([key[1],key[21], key[3], key[23]])
+
+    return (EVOID, password, time)
+
+def getMinStartDate(conference):
+    return conference.getAdjustedStartDate() - timedelta(0,0,0,0, getEVOOptionValueByName("allowedMinutes"))
+
+def getMaxEndDate(conference):
+    return conference.getAdjustedEndDate() + timedelta(0,0,0,0, getEVOOptionValueByName("allowedMinutes"))
+    
+class EVOError(CSErrorBase):
+    
+    def __init__(self, errorType):
+        CSErrorBase.__init__(self)
+        self._errorType = errorType
+        
+    @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.EVOError',
+                'MaKaC.plugins.Collaboration.EVO.common.OverlappedError',
+                'MaKaC.plugins.Collaboration.EVO.common.ChangesFromEVOError'],
+               'errorType')
+    def getErrorType(self):
+        return self._errorType
+    
+    
+class OverlappedError(EVOError):
+    def __init__(self, overlappedBooking):
+        EVOError.__init__(self, 'overlapped')
+        self._overlappedBooking = overlappedBooking
+        
+    @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.OverlappedError'],
+               'overlappedBooking', isPicklableObject = True)
+    def getSuperposedBookingId(self):
+        return self._overlappedBooking
+    
+class ChangesFromEVOError(EVOError):
+
+    def __init__(self, changes):
+        EVOError.__init__(self, 'changesFromEVO')
+        self._changes = changes
+        
+    @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.ChangesFromEVOError'],
+               'changes')
+    def getChanges(self):
+        return self._changes
+    
+    
+class EVOException(CollaborationException):
+    def __init__(self, msg, inner = None):
+        CollaborationException.__init__(self, msg, 'EVO', inner)
+
+class EVOControlledException(Exception):
+    def __init__(self, message):
+        self.message = message

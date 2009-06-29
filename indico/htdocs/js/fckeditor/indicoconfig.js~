@@ -1,0 +1,5 @@
+CKEDITOR.config.toolbar = [
+    ['Bold','Italic','Underline','Strike','-','Subscript','Superscript','-'],
+    ['Indent', 'Outdent', 'NumberedList','BulletedList','Blockquote','-','Link','Unlink','Anchor'],        
+        ['Image','SpecialChar']
+] ;

@@ -1,0 +1,576 @@
+type("IWidget", [],
+     {
+         draw: function(content) {
+             return content;
+         },
+
+         postDraw: function() {
+         },
+
+         _drawHeader: function() {
+             return '';
+         },
+
+         disable: function() {
+         },
+
+         enable: function() {
+         }
+
+     });
+
+type("ListWidget", ["WatchObject", "IWidget"],
+     {
+         getId: function(){
+             return this.id;
+         },
+
+         draw: function() {
+             var self = this;
+
+             self.domList = Html.ul(self.listCssClass);
+
+             return this.IWidget.prototype.draw.call(
+                 this,
+                 $B(self.domList, self,
+                    function(pair) {
+                        return Html.li({id: self.id + '_' + pair.key},
+                                       self._drawItem(pair));
+                    }));
+         },
+
+         _drawItem: function(pair) {
+             // Function to be overloaded by inheriting classes
+             // pair is a key, value pair that can be retrieved with pair.key, pair.get()
+             return '';
+         }
+     },
+
+     function(listCssClass) {
+         this.WatchObject();
+         this.id = Html.generateId();
+         this.listCssClass = listCssClass;
+     }
+    );
+
+type("TabWidget", ["Chooser", "IWidget"],{
+    _titleTemplate: function(text) {
+        return text;
+    },
+
+    draw: function() {
+        var self = this;
+
+        this.tabList = $B(Html.ul("tabList"),
+                          this.options,
+                          function(value) {
+                              var liItem = Html.li(
+                                  value==self.selected.get() ? "tabSelected" : "tabUnselected",
+                                  Widget.link(command(function() {
+                                      self.selected.set(value);
+                                  },
+                                                      self._titleTemplate(value)))
+                              );
+                              liItem.observeEvent('mouseover', function() {
+                                  liItem.setStyle('backgroundPosition', '0 0px');
+                              });
+                              liItem.observeEvent('mouseout', function() {
+                                  liItem.setStyle('backgroundPosition', '0 -30px');
+                              });
+
+                              self.selected.observe(function(selValue) {
+                                  liItem.dom.className = value==selValue ? "tabSelected" : "tabUnselected";
+                              });
+
+                              self.tabs.push(liItem);
+
+                              return liItem;
+                          });
+        var arrow, bg;
+
+        arrow = Html.div({className: 'tabScrollArrow', style: {backgroundPosition: '0 -30px'}});
+        bg = Html.div({className: 'tabScrollArrowBg', style: {left: pixels(self.width - 17)}}, arrow);
+        this.scrollArrows.right = [bg, arrow];
+
+        arrow = Html.div({className: 'tabScrollArrow', style: {backgroundPosition: '0 -15px'}});
+        bg = Html.div({className: 'tabScrollArrowBg'}, arrow);
+        this.scrollArrows.left = [bg, arrow];
+
+        this.scrollArrows.left[0].observeClick(function(event) { self.scrollLeft(); });
+        this.scrollArrows.right[0].observeClick(function(event) { self.scrollRight(); });
+
+        // Mouseover / mouseout event for changing background
+        this.scrollArrows.left[0].observeEvent('mouseover', function() {
+            if (!self.scrollArrowStates.left) {
+                return;
+            }
+            self.scrollArrows.left[0].dom.style.backgroundPosition = '0 -75px';
+        });
+        this.scrollArrows.left[0].observeEvent('mouseout', function() {
+            if (!self.scrollArrowStates.left) {
+                return;
+            }
+            self.scrollArrows.left[0].dom.style.backgroundPosition = '0 -60px';
+        });
+        this.scrollArrows.right[0].observeEvent('mouseover', function() {
+            if (!self.scrollArrowStates.right) {
+                return;
+            }
+            self.scrollArrows.right[0].dom.style.backgroundPosition = '0 -75px';
+        });
+        this.scrollArrows.right[0].observeEvent('mouseout', function() {
+            if (!self.scrollArrowStates.right) {
+                return;
+            }
+            self.scrollArrows.right[0].dom.style.backgroundPosition = '0 -60px';
+        });
+
+        
+        var extraButtons = "";
+        // Add any extra buttons displayed under the tabs
+        if (this.extraButtons.length) {
+            extraButtons = Html.div('tabExtraButtons');
+        }
+        each(this.extraButtons, function(btn, index) {
+            var extraCSSClass = '';
+            if (index == 0)
+                extraCSSClass = "buttonContainerLeft";
+            else if (index == self.extraButtons.length-1)
+                extraCSSClass = "buttonContainerRight";
+            var btnContainer = Html.div('buttonContainer ' + extraCSSClass, btn['btn'])
+            extraButtons.append(btnContainer);
+            btnContainer.observeClick(function() {btn['onclick'](btnContainer);})
+        });
+        
+        var toReturn = this.IWidget.prototype.draw.call(
+            this,
+            Html.div({},
+                     Html.div({className: "tabListContainer", style: {position: 'relative'}}, this.scrollArrows.left[0], this.scrollArrows.right[0], this.tabList,
+                              Html.div('tabGradient', extraButtons/*,
+                                       Html.div({className: 'tabBorderGradient', style: {cssFloat: 'left'}}),
+                                       Html.div({className: 'tabBorderGradient', style: {cssFloat: 'right'}})*/
+                                      )
+                             ),
+                     Html.div({style: {marginTop: pixels(10),
+                                       width: self.width ? pixels(self.width) : 'auto',
+                                       minHeight: self.height ? pixels(self.height) : 'auto' }},
+                              Widget.block(this))
+                    )
+        );
+
+        return toReturn;
+    },
+
+    postDraw: function() {
+        var self = this;
+
+        // If no tabs exist just return
+        if (this.tabs.length === 0 || !this.checkTabOverflow()) {
+            return;
+        }
+
+        this.tabList.dom.style.paddingLeft = "35px";
+        this.tabList.dom.style.paddingRight = "35px";
+
+        // Iterate and hide all tabs that don't fit
+        for(var i = this.tabs.length-1; i > 0; i--) {
+            if (self.checkTabOverflow()) {
+                this.tabs[i].dom.style.display = 'none';
+            } else {
+                self.rightTabIndex = i;
+                break;
+            }
+        }
+
+        // Initially allow scroll right but not left
+        this.setScrollArrowState('right', true);
+        this.setScrollArrowState('left', false);
+    },
+
+    checkTabOverflow: function(tab) {
+        return (this.tabList.dom.offsetHeight > 33);
+    },
+
+    scrollRight: function() {
+        if (!this.scrollArrowStates.right) {
+            return;
+        }
+
+        var rightTab = this.tabs[this.rightTabIndex];
+        var nextRightTab = this.tabs[this.rightTabIndex+1];
+
+        this.rightTabIndex++;
+
+        rightTab.dom.style.marginRight = '';
+        nextRightTab.dom.style.display = 'inline';
+
+        // Hide as many tab as needed to the left to make the new tab to the right fit
+        for (var i = this.leftTabIndex; i < this.tabs.length-1 && this.checkTabOverflow(); i++) {
+            this.tabs[i].dom.style.display = 'none';
+            this.tabs[i].dom.style.marginLeft = '';
+            this.leftTabIndex++;
+        }
+
+        // Add as many tabs as possible to the right
+        for (i = this.rightTabIndex+1; i < this.tabs.length; i++) {
+            this.tabs[i].dom.style.display = 'inline';
+            this.tabs[i-1].dom.style.marginRight = '';
+            // If overflow, revert the changes
+            if (this.checkTabOverflow()) {
+                this.tabs[i].dom.style.display = 'none';
+                this.tabs[i].dom.style.marginRight = '';
+                break;
+            } else {
+                this.rightTabIndex++;
+            }
+        }
+
+
+        // Acvtivate/inactivate the arrows accordingly
+        this.setScrollArrowState('left', true);
+        if (this.rightTabIndex == this.tabs.length-1) {
+            this.setScrollArrowState('right', false);
+        }
+    },
+
+    scrollLeft: function() {
+        if (!this.scrollArrowStates.left) {
+            return;
+        }
+
+        var leftTab = this.tabs[this.leftTabIndex];
+        var prevLeftTab = this.tabs[this.leftTabIndex -1];
+
+        this.leftTabIndex--;
+
+        leftTab.dom.style.marginLeft = '';
+        prevLeftTab.dom.style.display = 'inline';
+
+        // Hide as many tab as needed to the right to make the new tab to the left fit
+        for (var i = this.rightTabIndex; i >= 0  && this.checkTabOverflow(); i--) {
+            this.tabs[i].dom.style.display = 'none';
+            this.tabs[i].dom.style.marginRight = '';
+            this.rightTabIndex--;
+        }
+
+        // Add as many tabs as possible to the left
+        for (i = this.leftTabIndex-1; i >= 0; i--) {
+            this.tabs[i].dom.style.display = 'inline';
+            this.tabs[i+1].dom.style.marginLeft = '';
+            // If overflow, revert the changes
+            if (this.checkTabOverflow()) {
+                this.tabs[i].dom.style.display = 'none';
+                this.tabs[i].dom.style.marginLeft = '';
+                break;
+            }
+            else {
+                this.leftTabIndex--;
+            }
+        }
+
+        // Acvtivate/inactivate the arrows accordingly
+        this.setScrollArrowState('right', true);
+        if (this.leftTabIndex < 1) {
+            this.setScrollArrowState('left', false);
+        }
+    },
+
+    setScrollArrowState: function(direction, active) {
+        var bg = this.scrollArrows[direction][0];
+        var arrow = this.scrollArrows[direction][1];
+        this.scrollArrowStates[direction] = active;
+
+        if (active) {
+            arrow.dom.style.backgroundPosition = '0 -' + pixels(direction == 'right' ? 0 : 15);
+            arrow.dom.style.borderColor = '#999999';
+            bg.dom.style.backgroundPosition = '0 -60px';
+            bg.dom.style.cursor = 'pointer';
+        } else {
+            arrow.dom.style.backgroundPosition = '0 -' + pixels(direction == 'right' ? 30 : 45);
+            arrow.dom.style.borderColor = '#D5D5D5';
+            bg.dom.style.backgroundPosition = '0 -90px';
+            bg.dom.style.cursor = '';
+        }
+        // Make sure arrow is visible
+        bg.dom.style.display = 'block';
+    }
+},
+
+     function(options, width, height, initialSelection, extraButtons) {
+         var self = this;
+         this.width = width;
+         this.height = height;
+         this.tabs = [];
+         this.leftTabIndex = 0;
+         this.rightTabIndex = 0;
+         this.scrollArrows = {};
+         this.scrollArrowStates = {};
+         this.extraButtons = any(extraButtons, []);
+
+         if (!exists(initialSelection)) {
+             initialSelection = 0;
+         }
+
+         this.options = new WatchList();
+
+         //replace with appropriate method, when ready
+         $L(options).each(function(pair) {
+             var value = pair[1];
+             var key = pair[0];
+
+             self.options.append(key);
+             if (value.getParent()) {
+                 value.getParent().dom.removeChild(value.dom);
+                 value.setStyle('display','');
+             }
+         });
+
+         this.selected = new WatchValue(this.options.item(initialSelection));
+
+         this.selected.observe(function(value) {
+             self.set(value);
+         });
+
+         var optionDict = {};
+         each(options, function(item) {
+             optionDict[item[0]] = item[1];
+         });
+
+         this.Chooser(optionDict);
+         this.set(this.selected.get());
+     }
+    );
+
+type("LookupTabWidget", ["TabWidget"],
+     {
+     },
+     function(options, width, height, initialSelection, extraButtons) {
+         var self = this;
+         this.width = width;
+         this.height = height;
+         this.tabs = [];
+         this.leftTabIndex = 0;
+         this.rightTabIndex = 0;
+         this.scrollArrows = {};
+         this.scrollArrowStates = {};
+         this.extraButtons = any(extraButtons, []);
+
+         if (!exists(initialSelection)) {
+             initialSelection = 0;
+         }
+         this.options = $L(translate(options,
+                                     function(value) {
+                                         return value[0];
+                                     }));
+
+         this.selected = new WatchValue(this.options.item(initialSelection));
+
+         this.selected.observe(function(value) {
+             self.set(value);
+         });
+
+         var optionDict = {};
+         each(options, function(item) {
+             optionDict[item[0]] = item[1];
+         });
+
+
+         this.Chooser(new Lookup(optionDict));
+         this.set(this.selected.get());
+     }
+    );
+
+type("RemoteWidget", [],
+     {
+
+         _error: function(error) {
+             var dialog = new ErrorReportDialog(error);
+             dialog.open();
+         },
+
+         run: function(content) {
+             var self = this;
+             var canvas = Html.div({});
+
+             self.source.state.observe(function(value) {
+                 if (value == SourceState.Loaded) {
+                     canvas.set(self.drawContent(content));
+                 }else if(value == SourceState.Loading){
+                    self.runIndicator(canvas);
+                 } else if (value == SourceState.Error) {
+                     self._error(self.source.error.get());
+                 }
+             });
+             return canvas;
+         },
+
+         draw: function(content) {
+             var canvas = this.run(content);
+             this.runIndicator(canvas);
+             return canvas;
+         },
+
+         runIndicator: function(canvas) {
+             if (!this.noIndicator) {
+                 canvas.set(ProgressIndicator());
+             }
+         }
+     },
+     function(method, args, noIndicator) {
+         this.noIndicator = noIndicator;
+         this.source = indicoSource(method, args);
+     });
+
+type("RemoteListWidget", ["ListWidget", "RemoteWidget"], {
+
+    draw: function() {
+        return this.RemoteWidget.prototype.draw.call(this);
+    },
+
+    getList: function() {
+        return this.source;
+    },
+
+    _addElement: function(element) {
+        // overloaded if greater degree of control required
+        this.add(element);
+    },
+
+    /**
+     * drawContent is a method that is called from RemoteWidget when the source changes.
+     *
+     */
+    drawContent: function() {
+        var self = this;
+        this.clear();
+        each($L(this.getList()), function(elem){
+                self._addElement(elem);
+                });
+        return this.ListWidget.prototype.draw.call(this);
+    }
+
+    },
+    function(listCssClass, method, args, noIndicator) {
+        this.ListWidget(listCssClass);
+        this.RemoteWidget(method, args, noIndicator);
+    });
+
+type("PreloadedWidget", ["IWidget"],
+     {
+         draw: function() {
+             var canvas = Html.span({}, 'loading...');
+             var count = 0;
+
+             var self = this;
+
+             var checkNow = function() {
+                 if (count == self.waitingList.length) {
+                     canvas.set(self.drawContent());
+                 }
+             };
+
+             each(this.waitingList,
+                  function(remoteWidget) {
+                      remoteWidget.ready.observe(function(value) {
+                          if (value) {
+                              count++;
+                              checkNow();
+                          }
+                      });
+                  });
+
+             return canvas;
+         }
+     },
+     function(waitingList) {
+         this.waitingList = waitingList;
+     });
+
+ProgressIndicator = function() {
+    return Html.div({style:{textAlign: 'center'}},Html.img({src: imageSrc("ui_loading"), alt: "Loading..."
+}));
+};
+
+type("ServiceWidget", ["IWidget"],
+     {
+         _error: function(error) {
+             var dialog = new ErrorReportDialog(error);
+             dialog.open();
+         },
+
+         request: function(extraArgs) {
+             var self = this;
+             var args = extend(clone(this.args), extraArgs);
+
+             var killProgress = IndicoUI.Dialogs.Util.progress();
+
+             jsonRpc(Indico.Urls.JsonRpcService, this.method, args,
+                     function(response,error) {
+                         if(exists(error)) {
+                             killProgress();
+                             self._error(error);
+                         } else {
+                             self._success(response);
+                             killProgress();
+                         }
+                     }
+                    );
+         }
+     },
+
+     function(endPoint, method, args) {
+         this.endPoint = endPoint;
+         this.method = method;
+         this.args = args;
+         this.IWidget();
+     }
+    );
+
+type("PopupWidget", [], {
+    draw: function(content, x, y, styles) {
+        this.x = x;
+        this.y = y;
+        
+        var styles = any(styles, false);
+
+        this.canvas = Html.div({style: styles ? styles :
+        {
+            position: 'absolute',
+            left: pixels(x),
+            top: pixels(y)
+        }}, content);
+        IndicoUI.assignLayerLevel(this.canvas);
+
+        return this.canvas;
+    },
+
+    open: function(x, y) {
+        $E(document.body).append(this.draw(x,y));
+        this.isopen = true;
+        this.postDraw();
+    },
+
+    isOpen: function() {
+        return this.isopen;
+    },
+
+    postDraw: function() {
+        // to be overloaded
+    },
+
+    openRelative: function(x, y) {
+        var iebody=(document.compatMode && document.compatMode != "BackCompat")? document.documentElement : document.body;
+        var dsocleft=document.all? iebody.scrollLeft : pageXOffset;
+        var dsoctop=document.all? iebody.scrollTop : pageYOffset;
+        this.open(x+dsocleft, y+dsoctop);
+    },
+
+    close: function() {
+        IndicoUI.unAssignLayerLevel(this.canvas);
+        $E(document.body).remove(this.canvas);
+        this.isopen = false;
+    }
+},
+     function() {
+     }
+    );

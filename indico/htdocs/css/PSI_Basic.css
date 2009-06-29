@@ -1,0 +1,267 @@
+	/* 	
+		Default Styles and layout for Conf-pages
+		Do not custom this CSS
+	*/
+	
+/* ------Wrapper------ */
+.conf {
+	align:center;
+}
+
+/* ------Header------ */
+
+.confheader {
+	/*background-image:url('BaseURL/conferenceDisplay.py/getPic?confId=1PicId=1');	*/
+	background: #1a64a0 url('images/lecture3.png') left top no-repeat; /*to be replaced for above */
+	background-position: 15px 5px;
+	height: 95px;
+	margin: 0px 20px 0px 20px;
+	padding-top: 1px;
+}
+
+.confLogoBox {
+	width:150px;
+	height:100%;
+	float:left;
+	background:transparent none repeat scroll 0%;
+
+}
+
+.confLogo {
+	width:100%;
+	height:100%;
+	float:left;
+	
+	}
+
+.confTitleBox {
+	color: white;	
+	float: left;
+	text-align:left;		
+}
+
+.confTitle {
+}
+
+h1 {
+	font-size: 18pt;
+	color: white;
+	font-weight: normal;
+	margin-top: 10px;
+	margin-bottom: 10px;
+
+	}
+
+.rightFloat {
+	padding-right:50px;
+	padding-left:50px;
+}
+
+.conferencetitlelink{
+	font-size:18pt;
+}
+
+.datePlace {
+	color: white;	
+	float: right;	
+	padding: 10px;	
+	font-size:10pt;	
+}
+
+/* ------Main content------ */
+
+.confSectionsBox {
+	width:97%;
+	float:left;
+	padding: 10px 20px 0px 20px;
+	background-color:#FFF;
+}
+
+/* ------Menu------ */
+
+.conf_leftMenu {
+	float:left;
+	width:150px;
+	background:#ffffff none repeat scroll 0%;}
+	
+.menuConfTopCell {
+	background:transparent none repeat scroll 0%;
+	border-bottom:none;
+    width:2%;
+	color:#0200C6;
+	font-family:verdana,arial,sans-serif;
+	font-size:10px;
+	font-weight:bold;
+	text-decoration:none;
+	height:20px;
+	border-top:1px solid #777777;
+}
+
+.conf_leftMenu ul {
+	list-style:none;
+	margin:0px;
+	padding:0px;
+	}
+
+.conf_leftMenu li {
+	margin-bottom:4px;
+	border-top:none;
+}
+	
+.menuConfTitle {
+	text-align:left;
+	background:#E5E5E5 none repeat scroll 0%;
+	border-top:1px solid #777777;	
+	color:#0200C6;
+	font-family:verdana,arial,sans-serif;
+	font-size:10px;
+	font-weight:bold;
+	padding:3px;
+}
+
+.menuConfMiddleCell {
+	padding:0px 0px 0px 0px;
+	border-top:1px solid #CCCCCC;
+	border-bottom:2px solid #1B3162;
+}
+
+.menuConfSelected {
+	background:#5FA5D4 none repeat scroll 0%;
+	color:#FFFFFF;
+	font-family:verdana,arial,sans-serif;
+	font-size:10px;
+	font-weight:bold;
+	padding:2px 2px 3px 0px;
+}
+
+.menuConfSelected2 {
+	background:##5FA5D4 none repeat scroll 0%;
+	color:#FFFFFF;
+	font-family:verdana,arial,sans-serif;
+	font-size:10px;
+	font-weight:bold;
+}
+
+a.confSection:visited {
+	font-size:10px;
+}
+
+a.confSection:link {
+	background:transparent none repeat scroll 0%;
+	font-size:10px;
+	font-weight:bold;
+	text-decoration:none;
+}
+.menuConfBottomCell {
+	border-bottom:0px;
+	border-top:0px;
+}
+
+.confSupportEmailBox{
+    float:left;
+	margin-right:10px;
+}
+
+a.confSupportEmail:link {
+	color:#0B63A5;
+}
+
+/*For dynamic menu*/
+
+    .inner {
+    display:none;
+    top:0px;
+    position:relative;
+    list-style-image:none;
+    list-style-position:outside;
+    list-style-type:none;
+    margin:0pt;
+    padding:0pt;
+    width:100%;
+}
+		
+#outer {
+    list-style-image:none;
+    list-style-position:outside;
+    list-style-type:none;
+    width:100%;
+    position:relative;
+
+	}
+
+/* Styles for Menu Items */
+
+#outer li a {
+	display: block;
+	text-decoration: none;
+	color: #0B63A5;
+	/*background: #fff;  IE6 Bug */
+	height:15px;
+	padding:2px 2px 3px 15px;
+	}
+
+
+/* Fix IE. Hide from IE Mac \*/
+* html ul li { float: left; height: 1%; }
+* html ul li a { height: 1%; }
+/* End */
+
+		
+li ul.inner li a { 
+	padding: 2px 5px; 
+	
+	} /* Sub Menu Styles */
+		
+li:hover ul, li.over ul { display: block; } /* The magic */
+
+
+/* ------Content------ */
+
+.confBodyBox {
+	float:left;
+	padding: 20px 0px 15px 0px;
+	margin-left:20px;
+	background-color:#fff;
+}
+
+.breadcrumps {
+	font-weight: bold;
+}
+
+.mainContent {
+	width:100%;
+}
+
+.col1 {
+	width:0%;
+	float:left;
+	}
+
+.col2 {
+	width:80%;
+	float:left;
+}	
+
+.col3 {
+	width:0px;
+	
+}
+
+/* ------Misc------ */
+
+.tablepre {
+
+}
+
+.displayField {
+	text-align:left; 
+	font-weight: bold;
+}
+
+.italic {
+	font-style:italic;
+}
+
+div.dottedLineBottom {
+	float:left; 
+}

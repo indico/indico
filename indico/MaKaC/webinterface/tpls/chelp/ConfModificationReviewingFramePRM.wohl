@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+
+<wohl xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="wohl.xsd" version="0.1">
+
+    <page name="ConfModificationReviewingFramePRM">
+    
+        <tooltip name="revControlPRM" target="//*[@id='revControlPRMHelp']">
+            <translation language="en">
+                <text>
+                        <p>Here you can add <strong>Paper Review Managers</strong></p>
+                        <p>Use the <strong>Add</strong> button to add a user as a Paper Review Manager</p>
+                        <p>Remove the user from his Paper Review Manager role by clicking on the <strong>red cross</strong> next to each user.</p>
+                        <ul>
+                            <li>
+                                A <strong>Paper Review Manager</strong> can choose <strong>Referees</strong>, <strong>Editors</strong>
+                                and <strong>Reviewers</strong> for the conference.
+                            </li>
+                            <li>
+                                He can also assign <strong>Referees</strong>, <strong>Editors</strong> and <strong>Reviewers</strong>
+                                to contributions.
+                            </li>
+                            <li>
+                                Also, in the Paper Setup tab, he can change options for the reviewing process of this conference, such as:
+                                <ul>
+                                    <li>
+                                        Choosing the reviewing mode of the conference.
+                                    </li>
+                                    <li>
+                                        Choose the types of materials that will be reviewed.
+                                    </li>
+                                    <li>
+                                        Add custom statuses and questions for paper reviewing, and custom criterias for paper editing.
+                                    </li>
+                                    <li>
+                                        Setting default due dates for the Referees, Editors and Reviewers.
+                                    </li>
+                                    <li>
+                                        Upload a layout template that will be available to authors of contributions.
+                                    </li>
+                                </ul> 
+                            </li> 
+                        </ul>
+                </text>
+            </translation>
+        </tooltip>
+    </page>
+    
+</wohl>

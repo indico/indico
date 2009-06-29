@@ -1,0 +1,384 @@
+	/* 	
+		Default Styles and layout for Conf-pages
+		Do not custom this CSS
+	*/
+	
+	/* 	------Wrapper------ */
+	/* 	this is the wrapper of whole conference page */
+
+.conf {
+    width: 100%;
+    border: none;
+    margin: 0;
+}
+
+/* 
+    Header
+*/
+.confheader {
+	background: #1a64a0;
+}
+
+.confLogoBox {
+	height: 100%;
+	float: left;
+	padding-right: 10px;
+	background: transparent none repeat scroll 0 0;
+}
+
+.confLogo {
+}
+
+.confTitleBox {
+	color: white;
+	min-height: 90px;
+	text-align:left;
+	border-top: 3px solid #234173;
+    border-bottom: 1px solid #0f4c80;
+    background: #1a64a0 url("../images/conf/sprites_blue.png") repeat-x scroll 0 -24px;
+}
+
+.confTitle {
+	width: 950px;
+	margin: 0 auto;
+}
+
+.confTitle h1 {
+	font-weight: normal;
+	margin: 0;
+}
+
+.conferencetitlelink {
+	font-size:22pt;
+	display: block;
+    padding: 25px 0;
+    color: white;
+}
+
+.confSubTitleBox {
+    min-height: 45px;
+    background: #f5faff url("../images/conf/sprites_blue.png") repeat-x 0 -213px;
+    border-bottom: 1px solid #d5e4f1;
+    border-top: 1px solid #d5e4f1;
+}
+
+.confSubTitleContent {
+    width: 950px;
+    margin: 0 auto;
+    font-family: Verdana;
+    font-size: 11pt;
+    color: #24425a;
+}
+
+.confSubTitle {
+    padding-top: 10px;
+}
+
+.confSubTitle a {
+    font-family: Verdana;
+    font-size: 11pt;
+}
+
+.datePlace {
+    font-family: verdana,arial,sans-serif;
+    font-size: 12pt;
+    padding-right: 250px;
+    margin-bottom: 10px;
+}
+
+.date {
+    display: inline;
+}
+
+.place {
+    display: inline;
+    font-style: italic;
+    padding-left: 5px;
+}
+
+/* ------Main content------ */
+
+#confSectionsBox {
+	padding-top:30px;
+	width: 950px;
+	margin: 0 auto;
+}
+
+/* ------Menu------ */
+/* here is layout and style for creating default menu for conferences */
+
+
+/* Styles for all menu Items */
+
+#outer {
+    width:100%;
+    position:relative;
+    margin-top: 10px;
+    padding: 10px 0;
+    background: #f5eedb;
+    border: 1px solid #64615a;
+    -moz-border-radius: 5px;
+    -webkit-border-radius:5px;
+    behavior: url(border-radius.htc);
+
+    list-style-image: none;
+    list-style-position: outside;
+    list-style-type: none;
+}
+
+#outer li a {
+    display: block;
+    text-decoration: none;
+
+    font-family:verdana,arial,sans-serif;
+    font-size: 10pt;
+    /*background: #fff;  IE6 Bug */
+}
+
+#outer li a:hover {
+    background: #989486;
+    color: white;
+}
+
+.conf_leftMenu {
+	float:left;
+	width:200px;
+	background:transparent none repeat scroll 0 0;
+}	
+
+	
+.menuConfTitle {
+	text-align:left;
+	color:#0200C6;
+}
+
+.menuConfTitle a {
+    color: #4e4c46;
+    padding: 7px 12px;
+}
+
+a.confSection:visited {
+}
+
+a.confSection:link {
+}
+
+	/* sub menu item */
+	
+li.menuConfMiddleCell {
+    font-weight: normal;
+}
+
+li.menuConfMiddleCell a {
+    padding: 0px 0px 0px 30px;
+}
+
+	/* selected menu item */
+
+.menuConfSelected {
+    font-weight: bold;
+}
+
+.subMenuConfSelected {
+    font-weight: bold;
+}
+
+.menuConfSelected a {
+    padding: 7px 12px;
+    color: #4e4c46;
+}
+
+
+.subMenuConfSelected a {
+    font-weight: bold;
+}
+
+	/* last menu item */
+
+.menuConfBottomCell {
+	border-bottom:0px;
+	border-top:0px;
+	background:transparent none repeat scroll 0 0;
+    display: none;
+}
+
+	/* Support link */
+
+.confSupportEmailBox{
+	margin: 20px 0;
+}
+
+a.confSupportEmail:link {
+}
+
+	/*For dynamic menu*/
+
+.inner {
+    font-family: arial,sans-serif;
+    top:0px;
+    position:relative;
+    list-style-image: none;
+    list-style-position: outside;
+    list-style-type: none;
+    margin: 0 0 5px 0;
+    padding:0pt;
+    width:100%;
+}
+
+
+.conf_leftMenu ul {
+	list-style:none;
+	margin: 0px;
+	margin-bottom: 5px;
+	padding: 0px;
+}
+
+.conf_leftMenu li {
+	border-top:none;
+}	
+
+
+/* Fix IE. Hide from IE Mac \*/
+* html ul li { float: left; height: 1%; }
+* html ul li a { height: 1%; }
+/* End */
+
+		
+li ul.inner li a { 
+    padding: 3px 12px 3px 30px;
+    background: transparent url(../images/conf/left_menu_bullet.png) scroll no-repeat 15px center;
+} /* Sub Menu Styles */
+		
+li:hover ul, li.over ul { display: block; } /* For dynamic */
+
+
+	/* ------Content------ */
+
+	/* wrapper of content and bradcrumps */
+	
+.confBodyBox {
+	margin-left:230px;
+	background:transparent none repeat scroll 0 0;
+
+}
+
+.breadcrumps {
+    display: none;
+	font-weight: bold;
+}
+
+	/* This is for if someday you have more than one column in content */
+	
+.mainContent {
+	width:100%;
+}
+
+
+.col2 {
+	width:100%;
+	float:left;
+	font-family: verdana,arial,sans-serif;;
+}	
+
+
+	/* ------Misc------ */
+
+.tablepre {
+
+}
+
+table.conferenceDetails td {
+    font-family: Verdana, Arial;
+    font-size: 11pt;
+    color: #444;
+}
+
+table.conferenceDetails .displayField {
+	text-align:left; 
+	font-weight: bold;
+	font-size: 10pt;
+	padding-right: 20px;
+	color: #444;
+}
+
+.italic {
+	font-style:italic;
+}
+
+.menuConfTopCell { display: none;}
+
+
+    /* General elements */
+
+pre {
+    margin: 0;
+    color: #444;
+    font-size: 11pt;
+    font-family: verdana,arial,sans-serif;
+}
+
+    /* Styles for the searchbox */
+
+.confSearchBox {
+    width: 250px;
+    float: right;
+    height: 24px;
+    background: transparent url("../images/conf/sprites_blue.png") no-repeat 0 0;
+    margin-top: 10px;
+}
+
+.confSearchBox input {
+    border: none;
+    background: transparent;
+}
+
+.confSearchBox .searchButton {
+    float: right;
+    width: 60px;
+    height: 24px;
+    color: white;
+    font-family: Arial, Verdana;
+    font-size: 9pt;
+    padding-bottom: 2px;
+    font-weight: bold;
+}
+
+.confSearchBox .searchField {
+    color: black;
+    width: 170px;
+    padding: 4px 7px;
+    font-family: Arial, Verdana;
+    font-size: 10pt;
+}
+
+.nowHappening {
+    margin-bottom: 10px;
+}
+
+.nowHappening .nowHappeningText {
+    margin-right: 5px;
+    float: left;
+}
+
+.webcast {
+    margin-bottom: 10px;
+}
+
+.simpleTextAnnouncement {
+    background: #F5FAFF url(../images/conf/sprites_blue.png) repeat-x scroll 0 -400px;
+    border-top: 1px solid #c2d6e7;
+    padding: 8px 0;
+    font-family: Verdana;
+    font-weight: bold;
+    font-size: 10pt;
+    text-align: center;
+    color: #0f283d;
+}
+
+
+/* Elements not part of the conference itself */
+
+.pageHeader {
+    background: #424242;
+}
+

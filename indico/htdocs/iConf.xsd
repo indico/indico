@@ -1,0 +1,167 @@
+<xs:schema 
+xmlns:xs="http://www.w3.org/2001/XMLSchema"
+xmlns:iconf="http://sunuds95.cern.ch:8000/indico"
+targetNamespace="http://sunuds95.cern.ch:8000/indico"
+elementFormDefault="qualified"
+attributeFormDefault="unqualified">
+
+  <xs:annotation>
+    <xs:documentation>
+       XML Schema which can be used to validate IConference data.
+       David Bourillot. august 6th 2003.
+       this schema describe the xml format of the metadata to insert in the oai record
+     </xs:documentation>
+     <xs:documentation>
+       <modifications>
+         <add>datestamp for ressource to avoid reload of file (which can be big as video files)</add>
+         <add>complexType materialType</add>
+         <add>element name in ressourceType</add>
+         <add>element material in sessionType</add>
+         <add>element location in sessionType</add>
+         <add>element material in conferenceType</add> 
+         <add>element contibution in conferenceType</add>
+         <add>element location in contributionType</add>
+         <add>element starDate in contributionType</add>
+         <add>element endDate in contributionType</add>
+         <add>element ID in conferenceType</add>
+         <add>element ID in sessionTypeType</add>
+         <add>element ID in contributionType</add>
+         <add>element ID in materialType</add>
+         <change>rename 'submit' element to 'conference'</change>
+         <change>in contributionType, change resource to material</change>
+         <remove>element authors in contribution</remove>
+         <remove>complexType authorsType</remove>
+       </modifications>
+     </xs:documentation>
+  </xs:annotation>
+
+  <xs:element name="iconf" type="iconf:conferenceType"/>
+
+
+
+
+
+
+  <xs:complexType name="conferenceType">
+    <xs:sequence>
+      <xs:element name="ID" type="xs:string"/>
+      <xs:element name="category" type="xs:string"/>
+      <xs:element name="announcer" type="iconf:announcerType"/>
+      <xs:element name="title" type="xs:string"/>
+      <xs:element name="description" type="xs:string"/>
+      <xs:element name="location" type="iconf:locationType" minOccurs="0"/>
+      <xs:element name="startDate" type="xs:date"/>
+      <xs:element name="endDate" type="xs:date"/>
+      <xs:element name="chair" type="iconf:chairType" minOccurs="0"/>
+      <xs:element name="session" type="iconf:sessionType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="contribution" type="iconf:contributionType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="material" type="iconf:materialType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="locationType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="room" type="xs:string" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+
+
+  <xs:complexType name="announcerType">
+    <xs:sequence>
+      <xs:element name="user" type="iconf:userType"/>
+      <xs:element name="UnformatedUser" type="xs:string" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="chairType">
+    <xs:sequence>
+      <xs:element name="user" type="iconf:userType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="UnformatedUser" type="xs:string" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sessionType">
+    <xs:sequence>
+      <xs:element name="ID" type="xs:string"/>
+      <xs:element name="title" type="xs:string"/>
+      <xs:element name="description" type="xs:string"/>
+      <xs:element name="convener" type="iconf:convenerType" maxOccurs="unbounded"/>
+      <xs:element name="location" type="iconf:locationType"/>
+      <xs:element name="startDate" type="xs:dateTime"/>
+      <xs:element name="endDate" type="xs:dateTime"/>
+      <xs:element name="duration" type="xs:string"/>
+      <xs:element name="contribution" type="iconf:contributionType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="material" type="iconf:materialType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="convenerType">
+    <xs:sequence>
+      <xs:element name="user" type="iconf:userType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="UnformatedUser" type="xs:string" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="contributionType">
+    <xs:sequence>
+      <xs:element name="ID" type="xs:string"/>
+      <xs:element name="title" type="xs:string"/>
+      <xs:element name="speakers" type="iconf:speakerType"/>
+      <xs:element name="location" type="iconf:locationType"/>
+      <xs:element name="startDate" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="endDate" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="duration" type="xs:string" minOccurs="0"/>
+      <xs:element name="abstract" type="xs:string" minOccurs="0"/>
+      <xs:element name="submissionDate" type="xs:dateTime"  minOccurs="0"/>
+      <xs:element name="revisionDate" type="xs:dateTime"  minOccurs="0"/>
+      <xs:element name="material" type="iconf:materialType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="speakerType">
+    <xs:sequence>
+      <xs:element name="user" type="iconf:userType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="UnformatedUser" type="xs:string" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="materialType">
+    <xs:sequence>
+      <xs:element name="ID" type="xs:string"/>
+      <xs:element name="title" type="xs:string"/>
+      <xs:element name="description" type="xs:string"/>
+      <xs:element name="type" type="xs:string"/>
+      <xs:element name="resource" type="iconf:ressourceType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+
+  <xs:complexType name="ressourceType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="description" type="xs:string"/>
+      <xs:element name="type" type="xs:string"/>
+      <xs:element name="url" type="xs:string"/>
+      <xs:element name="datestamp" type="xs:dateTime" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="userType">
+    <xs:sequence>
+      <xs:element name="name" type="iconf:nameType"/>
+      <xs:element name="organization" type="xs:string"/>
+      <xs:element name="email" type="xs:string"/>
+      <xs:element name="userid" type="xs:string" minOccurs="0"/>
+      <xs:element name="pwd" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="nameType"> 
+      <xs:attribute name="first" type="xs:string" use="required"/>
+      <xs:attribute name="middle" type="xs:string" use="optional"/>
+      <xs:attribute name="last" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+</xs:schema>
+
