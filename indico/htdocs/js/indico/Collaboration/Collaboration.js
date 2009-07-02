@@ -1197,13 +1197,13 @@ var refreshPlugin = function(name) {
         refreshBookingS(singleBookings[name]);
         var formNodes = IndicoUtil.findFormFields($E(name + 'Form'));
         IndicoUtil.setFormValues(formNodes, singleBookings[name].bookingParams);
-        each($N('withdrawRecordingRequest'), function(button) {IndicoUI.Effect.appear(button);})
-        each($N('sendRecordingRequest'), function(button) {IndicoUI.Effect.disappear(button);})
-        each($N('modifyRecordingRequest'), function(button) {IndicoUI.Effect.appear(button);})
+        each($N('withdraw'+name), function(button) {IndicoUI.Effect.appear(button);})
+        each($N('send'+name), function(button) {IndicoUI.Effect.disappear(button);})
+        each($N('modify'+name), function(button) {IndicoUI.Effect.appear(button);})
     } else {
-        each($N('withdrawRecordingRequest'), function(button) {IndicoUI.Effect.disappear(button);})
-        each($N('sendRecordingRequest'), function(button) {IndicoUI.Effect.appear(button);})
-        each($N('modifyRecordingRequest'), function(button) {IndicoUI.Effect.disappear(button);})
+        each($N('withdraw'+name), function(button) {IndicoUI.Effect.disappear(button);})
+        each($N('send'+name), function(button) {IndicoUI.Effect.appear(button);})
+        each($N('modify'+name), function(button) {IndicoUI.Effect.disappear(button);})
         $E(name + 'Info').clear();
     }
 };
