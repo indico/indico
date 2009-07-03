@@ -20,16 +20,6 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import sys, getopt, os, time
-from datetime import timedelta, datetime
-from pytz import timezone
-try:
-    from MaKaC.conference import CategoryManager
-    from MaKaC.common import DBMgr
-    from MaKaC.common.timerExec import timer, HelperTaskList, StatisticsUpdater, task
-    from MaKaC.common.timezoneUtils import nowutc
-except ImportError, e:
-    print "ImportError:%s"%e
-    sys.exit(0)
 
 duration = 15*60 # seconds
 linuxPIDFile="/var/run/IndicoTaskDaemon.pid"
@@ -79,6 +69,18 @@ def _killProcess():
     return False
 
 def initDefaultTasks():
+    from datetime import timedelta, datetime
+    from pytz import timezone
+    try:
+        from MaKaC.conference import CategoryManager
+        from MaKaC.common import DBMgr
+        from MaKaC.common.timerExec import HelperTaskList, StatisticsUpdater, task
+        from MaKaC.common.timezoneUtils import nowutc
+    except ImportError, e:
+        print "ImportError:%s"%e
+        sys.exit(0)
+
+    
     print "\nTrying to connect with the database...\nIf you don't see any following message, please make sure that you have already started the database because you might have a connection problem with it.\n"
     DBMgr.getInstance().startRequest()
     print "Database connection established."
@@ -117,6 +119,8 @@ def fileExists(f):
 
 
 def run(log=None):
+    from MaKaC.common.timerExec import timer
+    
     if _isPosix() and (not log or not fileExists(log)):
         print "\nPlease enter an existing log file, and start again\nDaemon stopped!\n"
         os.remove(linuxPIDFile)
