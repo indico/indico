@@ -22,6 +22,7 @@
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.pages.main import WPMainBase
 import MaKaC.webinterface.wcomponents as wcomponents
+from MaKaC.common.info import HelperMaKaCInfo
         
 
 class WPContact(WPMainBase):
@@ -34,4 +35,10 @@ class WPContact(WPMainBase):
 
 
 class WContact(wcomponents.WTemplated):
-    pass
+    
+    def getVars( self ):
+        vars = wcomponents.WTemplated.getVars( self )
+        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+        vars["supportEmail"] = minfo.getPublicSupportEmail()
+        vars["teamEmail"] = minfo.getSupportEmail()
+        return vars
