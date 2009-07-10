@@ -20,7 +20,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import xmlrpclib
-from MaKaC.common.httpTimeout import HTTPWithTimeout
+from MaKaC.common.httpTimeout import HTTPWithTimeout, HTTPSWithTimeout
 
 class TransportWithTimeout(xmlrpclib.Transport):
         
@@ -30,8 +30,20 @@ class TransportWithTimeout(xmlrpclib.Transport):
     def make_connection(self, host):
         return HTTPWithTimeout(host, timeout = self._timeout)
     
+class SafeTransportWithTimeout(xmlrpclib.SafeTransport):
+    
+    def setTimeout(self, timeout):
+        self._timeout = timeout
+
+    def make_connection(self, host):
+        return HTTPSWithTimeout(host, timeout = self._timeout)
+    
 def getServerWithTimeout(uri, transport=None, encoding=None, verbose=0,
                          allow_none=0, use_datetime=0, timeout = None):
-    transport = TransportWithTimeout()
+    
+    if uri.startswith("https://"):
+        transport = SafeTransportWithTimeout()
+    else:
+        transport = TransportWithTimeout()
     transport.setTimeout(timeout)
     return xmlrpclib.ServerProxy(uri, transport, encoding, verbose, allow_none, use_datetime)

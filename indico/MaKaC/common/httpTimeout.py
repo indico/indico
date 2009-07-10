@@ -63,6 +63,33 @@ class HTTPConnectionWithTimeout(httplib.HTTPConnection):
             break
         if not self.sock:
             raise socket.error, msg
+        
+class HTTPSConnectionWithTimeout(httplib.HTTPSConnection):
+    """ A custom HTTPConnection class that allows a timeout to be specified.
+        This is necessary because a timeout cannot be specified in Python 2.5.
+        When we start using Python2.6, this class will be no longer necessary.
+        See example in the "if __name__ == '__main__':" section to understand how to use.
+    """
+
+    def __init__(self, host, port=None, key_file=None, cert_file=None, strict=None, timeout=None):
+        """ Constructor
+            timeout is specified in seconds with a float number.
+        """
+        httplib.HTTPSConnection.__init__(self, host, port, key_file, cert_file, strict)
+        self._timeout = timeout
+
+    def connect(self):
+        """ Overrides HTTPSConnection.connect
+        """        
+
+        "Connect to a host on a given (SSL) port."
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        if self._timeout:
+            sock.settimeout(self._timeout)
+        sock.connect((self.host, self.port))
+        ssl = socket.ssl(sock, self.key_file, self.cert_file)
+        self.sock = httplib.FakeSocket(sock, ssl)
+        
 
 class HTTPHandlerWithTimeout(urllib2.HTTPHandler):
     """ A custom HTTPHandler class that allows a timeout to be specified.
@@ -90,7 +117,7 @@ class HTTPHandlerWithTimeout(urllib2.HTTPHandler):
     
 class HTTPWithTimeout(httplib.HTTP):
     """ A custom HTTP class that allows a timeout to be specified.
-        This is necessary because a timeout cannot be specified in Python 2.5.
+        This is necessary because a timeout cannot be specified in Python 2.4 or 2.5.
         When we start using Python2.6, this class will be no longer necessary.
     """
     _connection_class = HTTPConnectionWithTimeout
@@ -102,6 +129,25 @@ class HTTPWithTimeout(httplib.HTTP):
         if port == 0:
             port = None
         self._setup(self._connection_class(host, port, strict, timeout))
+        
+class HTTPSWithTimeout(httplib.HTTPS):
+    """ A custom HTTPS class that allows a timeout to be specified.
+        This is necessary because a timeout cannot be specified in Python 2.4 or 2.5.
+        When we start using Python2.6, this class will be no longer necessary.
+    """
+    _connection_class = HTTPSConnectionWithTimeout
+
+    def __init__(self, host='', port=None, key_file=None, cert_file=None, strict=None, timeout=None):
+        """ Changed from of httplib.HTTP.__init__, added timeout argument to
+            self._setup(self._connection_class(host, port, strict, timeout))
+        """ 
+        if port == 0:
+            port = None
+        self._setup(self._connection_class(host, port, key_file, cert_file, strict, timeout))
+        # we never actually use these for anything, but we keep them
+        # here for compatibility with post-1.5.2 CVS.
+        self.key_file = key_file
+        self.cert_file = cert_file
     
 def urlOpenWithTimeout(request, timeout):
     opener = urllib2.build_opener(HTTPHandlerWithTimeout(timeout))
