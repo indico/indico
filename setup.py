@@ -1010,7 +1010,7 @@ class tests_indico(Command):
     def finalize_options(self): pass
     
     def run(self):
-        p = Popen("python2.4 tests/__init__.py", shell=True, stdout=PIPE, stderr=PIPE)
+        p = Popen(sys.executable+"tests/__init__.py", shell=True, stdout=PIPE, stderr=PIPE)
         out = string.join(p.stdout.readlines() )
         outerr = string.join(p.stderr.readlines() )
         print out, outerr
