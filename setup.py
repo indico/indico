@@ -19,6 +19,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from subprocess import Popen, PIPE
 import xml.sax, sys, os, shutil, string, fileinput, commands
 from distutils.sysconfig import get_python_lib
 from optparse import OptionParser, OptionGroup
@@ -998,10 +999,27 @@ class sdist(_sdist):
         jsCompress()
         _sdist.run(self)
 
+
+class tests_indico(Command):
+    description = "run the test suite"
+    user_options = []
+    boolean_options = []
+        
+    def initialize_options(self): pass
+
+    def finalize_options(self): pass
+    
+    def run(self):
+        p = Popen("python2.4 tests/__init__.py", shell=True, stdout=PIPE, stderr=PIPE)
+        out = string.join(p.stdout.readlines() )
+        outerr = string.join(p.stderr.readlines() )
+        print out, outerr
+
         
 setup(name = "cds-indico",
       cmdclass={'sdist': sdist,
-                'jsbuild': jsbuild},
+                'jsbuild': jsbuild,
+                'tests': tests_indico},
       version = "%s"%x.versionVal,
       description = "Integrated Digital Conferences",
       author = "AVC Section@CERN-IT",
