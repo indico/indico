@@ -139,11 +139,10 @@ class MultiLevelCache(object):
     
     def __init__(self, cacheName):
         self.cacheName = cacheName
-        self.cacheDir = os.path.join(Config().getInstance().getXMLCacheDir(), cacheName)
+        cacheDir = self.getCacheDir()
 
-        if not os.path.exists(self.cacheDir):
-            os.makedirs(self.cacheDir)
-
+        if not os.path.exists(cacheDir):
+            os.makedirs(cacheDir)
 
     def _saveObject(self, fsPath, path, fileName, data):
         """ Performs the actual save operation """
@@ -160,19 +159,23 @@ class MultiLevelCache(object):
                 os.makedirs(dirPath)
 
             self._saveObject(dirPath, path[1:], fileName, data)
+
+    def getCacheDir(self):
+        return os.path.join(Config().getInstance().getXMLCacheDir(), self.cacheName)
         
     def cacheObject(self, path, fileName, obj):
-        # path - Path where to store
-        # fileName - File name to use
-        # obj - MultiLevelCacheEntry to store
+        """ path - Path where to store
+        fileName - File name to use
+        obj - MultiLevelCacheEntry to store
+        """
         
         obj.setDate(timezoneUtils.nowutc())
-        self._saveObject(self.cacheDir, path, fileName, obj.pickle())
+        self._saveObject(self.getCacheDir(), path, fileName, obj.pickle())
         Logger.get('cache/%s'%self.cacheName).debug("Saved %s/%s" % (path, fileName))
 
     def loadObject(self, fnList):
         
-        filePath = os.path.join(*([self.cacheDir] + fnList))
+        filePath = os.path.join(*([self.getCacheDir()] + fnList))
 
         Logger.get('cache/%s'%self.cacheName).debug("Checking %s...", filePath)
         if os.path.isfile(filePath):
