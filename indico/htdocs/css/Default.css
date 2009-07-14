@@ -2641,6 +2641,11 @@ div.filterDiv
     border: 1px solid #AAA;
 }
 
+.topBar .smaller {
+    padding: 10px;
+    margin-top: 10px;
+}
+
 .sideBar h1, .topBar h1 {
     margin: 0;
     padding: 0;
@@ -2872,6 +2877,31 @@ ul.listCompact {
     padding: 0 10px 0 0;
     font-size: 10pt;
     color: #444;
+}
+
+.eventList li .today {
+    margin: 0 10px 0 0;
+    font-size: 10pt;
+    color: #444;
+    -moz-border-radius-bottomleft:5px;
+    -moz-border-radius-bottomright:5px;
+    -moz-border-radius-topleft:5px;
+    -moz-border-radius-topright:5px;
+    background-color:#F6E8BD;
+    padding: 5px;
+}
+
+.eventList .currentMonth {
+    border-bottom: 1px solid #AAAAAA;
+}
+
+.currentMonth span {
+    padding: 5px 5px 1px 5px;
+    background: #F6E8BD;
+    -moz-border-radius: 5px 5px 0 0;
+    -webkit-border-radius: 5px 5px 0 0;
+    border-radius: 5px 5px 0 0;
+    color: #2F2506;
 }
 
 .eventList li .listName a {
@@ -4826,4 +4856,11 @@ div.dialogButtons {
 
 .ttMBlockExtraInfo {
     color: #666666;
+}
+
+.loadingPast {
+    background: transparent url('../images/loading.gif') no-repeat;
+    padding-left: 25px;
+    margin-left: 10px;
+    display: none;
 }

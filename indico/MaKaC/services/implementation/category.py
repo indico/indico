@@ -2,12 +2,14 @@
 Asynchronous request handlers for category-related services.
 """
 
+import datetime
 from MaKaC.services.implementation.base import ProtectedModificationService, ParameterManager
 from MaKaC.services.implementation.base import ProtectedDisplayService, ServiceBase
 import MaKaC.conference as conference
 from MaKaC.common.logger import Logger
 from MaKaC.services.interface.rpc.common import ServiceError
 import MaKaC.webinterface.locators as locators
+from MaKaC.webinterface.wcomponents import WConferenceList, WConferenceListEvents
 
 class CategoryBase(object):
     """
@@ -103,7 +105,32 @@ class CanCreateEvent(CategoryDisplayBase):
         return False
 
 
+class GetPastEventsList(CategoryDisplayBase):
+    
+    def _checkParams(self):
+        CategoryDisplayBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._fromDate = pm.extract("fromDate", pType=datetime.datetime, allowEmpty=False).date()
+
+    def _getAnswer( self ):
+        
+        
+        allEvents,eventsByMonth = WConferenceList.sortEvents(self._target.getConferenceList())
+        
+        ## CREATE future events dict and future/past counter
+        pastEvents = {}
+        for year in allEvents.keys():
+            if year < self._fromDate.year:
+                pastEvents[year] = allEvents[year]
+            else:
+                for month in allEvents[year].keys():
+                    if month < self._fromDate.month:
+                        pastEvents.setdefault(year,{})[month] = allEvents[year][month]
+        return WConferenceListEvents(pastEvents, self._aw).getHTML()
+
+
 methodMap = {
     "getCategoryList": GetCategoryList,
+    "getPastEventsList": GetPastEventsList,
     "canCreateEvent": CanCreateEvent
     }

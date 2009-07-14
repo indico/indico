@@ -8,7 +8,11 @@ creatDate = creatDate.replace(hour=0,minute=0,second=0)
 tz = DisplayTZ(aw,lItem,useServerTZ=1).getDisplayTZ()
 
 startDate = lItem.getStartDate().astimezone(timezone(tz))
-endDate = lItem.getStartDate().astimezone(timezone(tz))
+endDate = lItem.getEndDate().astimezone(timezone(tz))
+todayDate = nowutc().astimezone(timezone(tz))
+happeningNowClass = ""
+if todayDate  >= startDate and todayDate <= endDate:
+    happeningNowClass = "today"
 
 if startDate.year != endDate.year:
     evtDate = "%s - %s" % (startDate.strftime("%d %b %Y"),endDate.strftime("%d %b %Y"))
@@ -17,13 +21,12 @@ elif (startDate.month != endDate.month) or (startDate.day != endDate.day):
 else:
     evtDate = "%s"%startDate.strftime("%d %b")
 %>
-
 <li>
     <span class="ical">
         <a href="<%= urlHandlers.UHConferenceToiCal.getURL(lItem) %>"><img src="<%= systemIcon("ical_grey") %>" alt="iCal export" /></a>
     </span>
     <span class="listName">
-        <span class="date"><%= evtDate %></span><a href="<%= conferenceDisplayURLGen(lItem) %>"><%= escape(lItem.getTitle().strip()) or "[no title]" %></a>
+        <span class="date <%= happeningNowClass %>"><%= evtDate %></span><a href="<%= conferenceDisplayURLGen(lItem) %>"><%= escape(lItem.getTitle().strip()) or "[no title]" %></a>
 
       	<span class="protected">
       	   

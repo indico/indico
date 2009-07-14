@@ -225,6 +225,67 @@ IndicoUI.Effect = {
             });
 
         return elem;
+    },
+    
+    slide: function(elemId, elemHeight) {
+        
+        /**
+         * 
+         * Before using this Effect your 'elem' should be initialize.
+         * 1) If you want that the element is hidden at the beginning (on load), then:  
+         * 
+         *      a)
+         * 
+         *          <div id="myElem" style="visibility: hidden;">...</div>
+         *      b)
+         *          $E(myElem).dom.style.height = '0';
+         *          $E(myElem).dom.style.visibility = "visible";
+         *          $E(myElem).dom.style.opacity = "0";
+         * 2) If you want that the element is visible at the beginning  (on load):
+         * 
+         *      a)
+         * 
+         *          <div id="myElem">...</div>
+         *      b) 
+         *          Nothing to do.
+         *          
+         *          
+         * @param elemId ID of the element
+         * @param elemHeight $(elemId).dom.offsetHeight; The elem should be visible or 
+         * hidden in order to get the offsetHeight, but not display: none. 
+         * 
+         */
+        var elem = $E(elemId);
+        elem.dom.style.overflow='hidden'
+        var elemDivHeight=elemHeight;
+        if (parseInt(elem.dom.style.height) == '0') {
+            var heightCounter = 1;
+            IndicoUI.Effect.fade(elemId, (Math.floor(Math.log(elemDivHeight)/Math.log(1.3))*20)+200);
+            var incHeight = function() {
+                heightCounter *= 1.3;
+                if (heightCounter < elemDivHeight) {
+                    elem.dom.style.height = Math.floor(heightCounter)+'px';
+                    setTimeout(function(){incHeight();}, 20);
+                }else {
+                    elem.dom.style.height = "auto";
+                }
+            };
+            setTimeout(function(){incHeight();}, 20);
+        }else {
+            var heightCounter = elemDivHeight;
+            IndicoUI.Effect.fade(elemId, (Math.floor(Math.log(elemDivHeight)/Math.log(1.3))*20));
+            var decHeight = function() {
+                heightCounter /= 1.3;
+                if (heightCounter > 5) {
+                    elem.dom.style.height = Math.floor(heightCounter)+'px';
+                    setTimeout(function(){decHeight();}, 20);
+                }else {
+                    elem.dom.style.height = '0px';
+                }
+            };
+            setTimeout(function(){decHeight();}, 20); 
+        }
+        
     }
 
 
