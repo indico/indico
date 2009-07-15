@@ -7,7 +7,7 @@
         <div class="title"><%= _("Helpdesk")%></div>
         
         <div class="content">
-            <p><em><%= _("For support using indico at the CERN please contact the indico helpdesk:")%></em></p>
+            <p><em><%= _("For support using indico at CERN please contact the indico helpdesk:")%></em></p>
             
             <div style="margin: 15px 50px;"><a href="ihelp/cm.html"><%= supportEmail %></a></div>
         </div>
