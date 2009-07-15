@@ -146,6 +146,9 @@ IndicoUI.Effect = {
             if(element.FadeTimeLeft <= elapsedTicks) {
                 element.style.opacity = element.FadeState == 1 ? '1' : '0';
                 element.style.filter = 'alpha(opacity = ' + (element.FadeState == 1 ? '100' : '0') + ')';
+                if (element.FadeState == 1) {
+                    element.style.filter = null;
+                }
                 element.FadeState = element.FadeState == 1 ? 2 : -2;
                 return;
             }
@@ -236,7 +239,7 @@ IndicoUI.Effect = {
          * 
          *      a)
          * 
-         *          <div id="myElem" style="visibility: hidden;">...</div>
+         *          <div id="myElem" style="visibility: hidden; overflow: hidden;">...</div>
          *      b)
          *          $E(myElem).dom.style.height = '0';
          *          $E(myElem).dom.style.visibility = "visible";
@@ -256,7 +259,7 @@ IndicoUI.Effect = {
          * 
          */
         var elem = $E(elemId);
-        elem.dom.style.overflow='hidden'
+        elem.dom.style.overflow='hidden';
         var elemDivHeight=elemHeight;
         if (parseInt(elem.dom.style.height) == '0') {
             var heightCounter = 1;

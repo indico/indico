@@ -26,7 +26,7 @@ todayDate = nowutc().astimezone(timezone(tz))
     <div class="topBar" style="margin-bottom: 10px">
         <div class="content smaller"><span id="futureEventsText">There are <%= numOfEventsInTheFuture %> more events in the <em>future</em>. <span class='fakeLink' onclick='toogleFutureEvents();'>Show them.</span></span></div>
     </div>
-    <div id="futureEvents" style="visibility: hidden;">
+    <div id="futureEvents" style="visibility: hidden; overflow:hidden;">
         <% includeTpl('ConferenceListEvents', items=futureItems, aw=self._aw, conferenceDisplayURLGen=conferenceDisplayURLGen) %>
                 
     </div>
