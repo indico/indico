@@ -1,7 +1,6 @@
 <% declareTemplate(newTemplateStyle=True) %>
 
 <% if not Conference.getLocation(): %>
-<!-- If no room entered, then warn them -->
 <div style="margin-bottom: 1em;">
     <span class="RRWarningMessage">
         <u>Warning:</u> We will need to know the location before we can record the event.<br/>
@@ -12,9 +11,15 @@
 
 <% if IsSingleBooking: %>
 <div style="margin-bottom: 1em;">
-    <button name="sendRecordingRequest" onclick="send('RecordingRequest')" style="display:none;">Send request</button>
-    <button name="modifyRecordingRequest" onclick="send('RecordingRequest')" style="display:none;">Modify request</button>
-    <button name="withdrawRecordingRequest" onclick="withdraw('RecordingRequest')" style="display:none;">Withdraw request</button>
+    <div id="sendRecordingRequestTop" class="sendRecordingRequestDiv" style="display:none;">
+        <button onclick="send('RecordingRequest')">Send request</button>
+    </div>
+    <div id="modifyRecordingRequestTop" class="modifyRecordingRequest" style="display:none;">
+        <button onclick="send('RecordingRequest')">Modify request</button>
+    </div>
+    <div id="withdrawRecordingRequestTop" class="withdrawRecordingRequest" style="display:none;">
+        <button onclick="withdraw('RecordingRequest')">Withdraw request</button>
+    </div>
 </div>
 <% end %>
 
@@ -201,8 +206,14 @@
 
 <% if IsSingleBooking: %>
 <div style="margin-top: 1em;">
-    <button name="sendRecordingRequest" onclick="send('RecordingRequest')" style="display:none;">Send request</button>
-    <button name="modifyRecordingRequest" onclick="send('RecordingRequest')" style="display:none;">Modify request</button>
-    <button name="withdrawRecordingRequest" onclick="withdraw('RecordingRequest')" style="display:none;">Withdraw request</button>
+    <div id="sendRecordingRequestBottom" class="sendRecordingRequestDiv" style="display:none;">
+        <button onclick="send('RecordingRequest')">Send request</button>
+    </div>
+    <div id="modifyRecordingRequestBottom" class="modifyRecordingRequest" style="display:none;">
+        <button onclick="send('RecordingRequest')">Modify request</button>
+    </div>
+    <div id="withdrawRecordingRequestBottom" class="withdrawRecordingRequest" style="display:none;">
+        <button onclick="withdraw('RecordingRequest')">Withdraw request</button>
+    </div>
 </div>
 <% end %>

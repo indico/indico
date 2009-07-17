@@ -880,48 +880,52 @@ var createBooking = function(pluginName, conferenceId) {
             if (checkOK) {
                 var killProgress = IndicoUI.Dialogs.Util.progress("Saving your booking...");
 
+                var saveOk = true;
                 if (pluginHasFunction(pluginName, "onSave")) {
-                    codes[pluginName].onSave(values);
+                    saveOk = codes[pluginName].onSave(values);
                 }
 
-                indicoRequest(
-                    'collaboration.createCSBooking',
-                    {
-                        conference: conferenceId,
-                        type: selectedPlugin,
-                        bookingParams: values
-                    },
-                    function(result,error) {
-                        if (!error) {
-                            // If the server found no problems, a booking object is returned in the result.
-                            // We add it to the watchlist and create an iframe.
-                            if (result.error) {
-                                killProgress();
-                                codes[pluginName].errorHandler('create', result);
-                            } else {
-                                hideAllInfoRows(false);
-                                bookings.append(result);
-                                showAllInfoRows(false);
-                                addIFrame(result);
-                                showInfo[result.id] = false; // we initialize the show info boolean for this booking
-                                refreshStartAllStopAllButtons();
-                                refreshTableHead();
-                                killProgress();
-                                hightlightBookingM(result);
-                                self.close();
-                                
-                                if (pluginHasFunction(pluginName, 'postCreate')) {
-                                    codes[pluginName].postCreate(result);
+                if (saveOk) {
+                    indicoRequest(
+                        'collaboration.createCSBooking',
+                        {
+                            conference: conferenceId,
+                            type: selectedPlugin,
+                            bookingParams: values
+                        },
+                        function(result,error) {
+                            if (!error) {
+                                // If the server found no problems, a booking object is returned in the result.
+                                // We add it to the watchlist and create an iframe.
+                                if (result.error) {
+                                    killProgress();
+                                    codes[pluginName].errorHandler('create', result);
+                                } else {
+                                    hideAllInfoRows(false);
+                                    bookings.append(result);
+                                    showAllInfoRows(false);
+                                    addIFrame(result);
+                                    showInfo[result.id] = false; // we initialize the show info boolean for this booking
+                                    refreshStartAllStopAllButtons();
+                                    refreshTableHead();
+                                    killProgress();
+                                    hightlightBookingM(result);
+                                    self.close();
+
+                                    if (pluginHasFunction(pluginName, 'postCreate')) {
+                                        codes[pluginName].postCreate(result);
+                                    }
                                 }
+                            } else {
+                                killProgress();
+                                self.close();
+                                IndicoUtil.errorReport(error);
                             }
-                        } else {
-                            killProgress();
-                            self.close();
-                            IndicoUtil.errorReport(error);
                         }
-                    }
-                );
-                
+                    );
+                } else { // saveOk = false
+                    killProgress();
+                }
             }
         });
 
@@ -986,9 +990,9 @@ var removeBooking = function(booking, conferenceId) {
                             removeIFrame(booking);
                             refreshStartAllStopAllButtons();
                             refreshTableHead();
-                            
-                            if (pluginHasFunction(pluginName, 'postDelete')) {
-                                codes[pluginName].postDelete(result);
+
+                            if (pluginHasFunction(booking.type, 'postDelete')) {
+                                codes[booking.type].postDelete(result);
                             }
                         }
                         killProgress();
@@ -1053,7 +1057,7 @@ var editBooking = function(booking, conferenceId) {
 
         var formNodes = IndicoUtil.findFormFields(form);
         var values = {}
-        
+
         if (pluginHasFunction(booking.type, "getDateFields")) {
             var fieldList = codes[booking.type].getDateFields();
             var fieldDict = {};
@@ -1092,38 +1096,43 @@ var editBooking = function(booking, conferenceId) {
             if (checkOK) {
                 var killProgress = IndicoUI.Dialogs.Util.progress("Saving your booking...");
 
+                var saveOk = true;
                 if (pluginHasFunction(booking.type, "onSave")) {
-                    codes[booking.type].onSave(values);
+                    saveOk = codes[booking.type].onSave(values);
                 }
 
-                indicoRequest(
-                    'collaboration.editCSBooking',
-                    {
-                        conference: conferenceId,
-                        bookingId: booking.id,
-                        bookingParams: values
-                    },
-                    function(result,error) {
-                        if (!error) {
-                            if (result.error) {
-                                killProgress();
-                                codes[booking.type].errorHandler('edit', result);
+                if (saveOk) {
+                    indicoRequest(
+                        'collaboration.editCSBooking',
+                        {
+                            conference: conferenceId,
+                            bookingId: booking.id,
+                            bookingParams: values
+                        },
+                        function(result,error) {
+                            if (!error) {
+                                if (result.error) {
+                                    killProgress();
+                                    codes[booking.type].errorHandler('edit', result);
+                                } else {
+                                    refreshBooking(result);
+                                    killProgress();
+                                    self.close();
+                                    if (pluginHasFunction(booking.type, 'postEdit')) {
+                                        codes[pluginName].postEdit(result);
+                                    }
+                                }
+
                             } else {
-                                refreshBooking(result);
                                 killProgress();
                                 self.close();
-                                if (pluginHasFunction(booking.type, 'postEdit')) {
-                                    codes[pluginName].postEdit(result);
-                                }
+                                IndicoUtil.errorReport(error);
                             }
-                            
-                        } else {
-                            killProgress();
-                            self.close();
-                            IndicoUtil.errorReport(error);
                         }
-                    }
-                );
+                    );
+                } else { // saveOk = false
+                    killProgress();
+                }
             }
         });
 
@@ -1197,13 +1206,19 @@ var refreshPlugin = function(name) {
         refreshBookingS(singleBookings[name]);
         var formNodes = IndicoUtil.findFormFields($E(name + 'Form'));
         IndicoUtil.setFormValues(formNodes, singleBookings[name].bookingParams);
-        each($N('withdraw'+name), function(button) {IndicoUI.Effect.appear(button);})
-        each($N('send'+name), function(button) {IndicoUI.Effect.disappear(button);})
-        each($N('modify'+name), function(button) {IndicoUI.Effect.appear(button);})
+        IndicoUI.Effect.appear($E('withdraw'+name+'Top'), 'inline');
+        IndicoUI.Effect.appear($E('withdraw'+name+'Bottom'), 'inline');
+        IndicoUI.Effect.appear($E('modify'+name+'Top'), 'inline');
+        IndicoUI.Effect.appear($E('modify'+name+'Bottom'), 'inline');
+        IndicoUI.Effect.disappear($E('send'+name+'Top'));
+        IndicoUI.Effect.disappear($E('send'+name+'Bottom'));
     } else {
-        each($N('withdraw'+name), function(button) {IndicoUI.Effect.disappear(button);})
-        each($N('send'+name), function(button) {IndicoUI.Effect.appear(button);})
-        each($N('modify'+name), function(button) {IndicoUI.Effect.disappear(button);})
+        IndicoUI.Effect.disappear($E('withdraw'+name+'Top'));
+        IndicoUI.Effect.disappear($E('withdraw'+name+'Bottom'));
+        IndicoUI.Effect.disappear($E('modify'+name+'Top'));
+        IndicoUI.Effect.disappear($E('modify'+name+'Bottom'));
+        IndicoUI.Effect.appear($E('send'+name+'Top'), 'inline');
+        IndicoUI.Effect.appear($E('send'+name+'Bottom'), 'inline');
         $E(name + 'Info').clear();
     }
 };
@@ -1244,13 +1259,13 @@ var sendRequest = function(pluginName, conferenceId) {
                     if (exists(singleBookings[pluginName])) {
                         if (pluginHasFunction(pluginName, 'postEdit')) {
                             codes[pluginName].postEdit(result);
-                        }    
+                        }
                     } else {
                         if (pluginHasFunction(pluginName, 'postCreate')) {
                             codes[pluginName].postCreate(result);
-                        } 
+                        }
                     }
-                    
+
                 }
             } else {
                 killProgress();
@@ -1334,7 +1349,7 @@ var withdrawRequest = function(pluginName, conferenceId) {
                                 killProgress();
                                 if (pluginHasFunction(pluginName, 'postDelete')) {
                                     codes[pluginName].postDelete(result);
-                                } 
+                                }
                             }
                         } else {
                             killProgress();

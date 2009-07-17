@@ -59,7 +59,8 @@ class WPAdminsBase( WPMainBase ):
 
     def getJSFiles(self):
         return WPMainBase.getJSFiles(self) + \
-               self._includeJSPackage('Admin')
+               self._includeJSPackage('Admin') + \
+               self._includeJSPackage('Management')
 
     def _getHeader( self ):
         """
@@ -1516,12 +1517,8 @@ class WPUserDetails( WPPersonalArea ):
     def _setActiveTab( self ):
         self._tabDetails.setActive()
 
-        
-class WPUserBaskets( WPPersonalArea ):    
 
-    def getJSFiles(self):
-        return WPPersonalArea.getJSFiles(self) + \
-               self._includeJSPackage('Management')
+class WPUserBaskets( WPPersonalArea ):
 
     def _getTabContent( self, params ):
         c = WUserBaskets( self._avatar )
