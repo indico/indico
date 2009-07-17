@@ -330,7 +330,10 @@ type("RealtimeTextBox", ["IWidget", "WatchAccessor"],
              return this.input.set(value);
          },
          observe: function(observer) {
-             this.input.observe(observer);
+             this.observers.push(observer);
+         },
+         observeOtherKeys: function(observer) {
+             this.otherKeyObservers.push(observer);
          },
 	 unbind: function() {
 	     bind.detach(this.input);
@@ -350,11 +353,25 @@ type("RealtimeTextBox", ["IWidget", "WatchAccessor"],
 
              // fire onChange event each time there's a new char
              this.input.observeEvent('keyup', function(event) {
-                 Dom.Event.dispatch(self.input.dom, 'change');
+		 var keyCode = event.keyCode;
+
+		 if ((keyCode < 32 && keyCode != 8) || (keyCode >= 33 && keyCode < 46) || (keyCode >= 112 && keyCode <= 123)) {
+		     each(self.otherKeyObservers, function(func) {
+			 func(keyCode, event);
+		     });
+		 } else {
+		     each(self.observers, function(func) {
+			 func(keyCode, event);
+		     });
+                     Dom.Event.dispatch(self.input.dom, 'change');
+		     event.preventDefault();
+		 }
              });
          }
      },
      function(args) {
+	 this.observers = [];
+	 this.otherKeyObservers = [];
          this.input = Html.input('text', args);
      });
 

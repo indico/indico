@@ -18,8 +18,8 @@ extend(Html.prototype,
                    return this.ancestorOf(child.getParent());
                }
            },
-	   getElementsByClassName: function(name){	       
-	       if(document.getElementsByClassName) {		   
+	   getElementsByClassName: function(name){
+	       if(document.getElementsByClassName) {
 		   return translate(this.dom.getElementsByClassName(name),
 			     $E);
 	       } else {
@@ -47,6 +47,10 @@ extend(Html.prototype,
 		       return translate(elements, $E);
 		   }
 	       }
+	   },
+
+	   replaceWith: function(element) {
+	       this.getParent().dom.replaceChild(element.dom, this.dom);
 	   }
        });
 
@@ -125,6 +129,20 @@ function eventTarget(event) {
 
 function $N(name) {
     return translate(document.getElementsByName(name), $E);
+}
+
+function flatten(array) {
+    // replace by linearize() when it's working properly?
+
+    if (!isArray(array)) {
+	return [array];
+    } else if (array.length == 0) {
+	return [];
+    }
+
+    var elem = array.splice(0,1);
+    return concat(flatten(elem[0]), flatten(array))
+
 }
 
 // Function that alwats returns true

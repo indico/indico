@@ -4859,9 +4859,64 @@ div.dialogButtons {
     color: #666666;
 }
 
+.suggestionBox {
+    border: 1px solid #888888;
+    width: 250px;
+    overflow: hidden;
+}
+
+.suggestionBoxList {
+    background-color: #FFFFFF;
+    padding: 3px;
+    margin: 0 0 0 0;
+}
+
+.suggestionBoxList li {
+    list-style-type: none;
+    padding: 3px;
+    border-bottom:1px solid #DDDDDD;
+    cursor: pointer;
+}
+
 .loadingPast {
     background: transparent url('../images/loading.gif') no-repeat;
     padding-left: 25px;
     margin-left: 10px;
     display: none;
+}
+
+.searchSuggestionTitle {
+    color: #0B63A5;
+    font-size: 9pt;
+}
+
+.searchSuggestionHighlight {
+    font-weight: bold;
+}
+
+.searchSuggestionPath {
+    color: #444444;
+    font-size: 7pt;
+}
+
+.searchSuggestionSelected {
+    background-color: #ECECEC;
+}
+
+.searchSuggestionOtherResults {
+    background-color: #FFFFFF;
+    color:#777777;
+    font-size:9pt;
+    font-style:italic;
+    text-align:center;
+}
+
+.searchSuggestionHelpBox {
+    background-color: #FFFFFF;
+    color:#555555;
+    font-size:9pt;
+    font-style: italic;
+    margin: 10px 0 0;
+    padding: 5px;
+    border-bottom:1px solid #DDDDDD;
 }

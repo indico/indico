@@ -37,6 +37,8 @@ from pytz import timezone
 from MaKaC.common.logger import Logger
 from MaKaC.plugins.base import PluginsHolder
 
+from zope.index.text import textindex
+
 class Index(Persistent):
     _name = ""
     
@@ -1087,7 +1089,7 @@ class OAIDeletedConferenceCategoryIndex( OAIConferenceIndex ):
         for catId in self._words.keys():
             res.extend(self._words[catId])
         return res
-    
+
     def getAllConferencesIds(self):
         res = []
         for catId in self._ids.keys():
@@ -1102,12 +1104,98 @@ class OAIDeletedPrivateContributionCategoryIndex( OAIDeletedContributionCategory
     _name = "OAIDeletedPrivateContributionCategory"
 
 
+class IndexException(Exception):
+    pass
+
+class IntStringMappedIndex(Persistent):
+    def __init__(self):
+        self._intToStrMap = {}
+        self._strToIntMap = {}
+        self._counter = 0
+
+    def addString(self, stringId):
+        """
+        Adds a string to the index, returning the
+        assigned integer
+        """
+
+        if stringId in self._strToIntMap:
+            raise KeyError("Key '%s' already exists in index!" % stringId)
+
+        intId = self._counter
+        self._intToStrMap[intId] = stringId
+        self._strToIntMap[stringId] = intId
+        self._counter += 1
+
+        self._p_changed = 1
+
+        return intId
+
+    def removeString(self, stringId):
+        """
+        Removes an entry from the Int-String Mapped index,
+        taking the string as input, and returning the integer
+        if it exists, or -1 otherwise.
+        """
+
+        intId = self._strToIntMap[stringId]
+        try:
+            del self._strToIntMap[stringId]
+            del self._intToStrMap[intId]
+        except KeyError:
+            return -1
+
+        self._p_changed = 1
+
+        return intId
+
+    def getString(self, intId):
+        """
+        0 -> 'abcd'
+        """
+
+        if type(intId) != int:
+            raise TypeError
+
+        return self._intToStrMap[intId]
+
+    def getInteger(self, strId):
+        """
+        'abcd' -> 0
+        """
+
+        if type(strId) != str:
+            raise TypeError
+
+        return self._strToIntMap[strId]
+
+
+class TextIndex(IntStringMappedIndex):
+
+    def __init__(self):
+        IntStringMappedIndex.__init__(self)
+        self._textIdx = textindex.TextIndex()
+
+    def index(self, entryId, title):
+        intId = self.addString(entryId)
+        self._textIdx.index_doc(intId, title)
+
+    def unindex(self, entryId):
+        intId = self.getInteger(entryId)
+        self.removeString(entryId)
+        self._textIdx.unindex_doc(intId)
+
+    def search(self, text):
+        records = self._textIdx.apply(text).items()
+        return [(self.getString(record[0]), record[1]) for record in records]
+
 class IndexesHolder( ObjectHolder ):
-    
+
     idxName = "indexes"
     counterName = None
     __allowedIdxs = [ "email", "name", "surName", "organisation", "group",
                     "status", "calendar", "category", "categoryDate",
+                    "categoryName",
                     "pendingSubmitters",
                     "pendingSubmittersTasks", "pendingManagers",
                     "pendingManagersTasks", "pendingCoordinators",
@@ -1124,10 +1212,10 @@ class IndexesHolder( ObjectHolder ):
                     "OAIDeletedPrivateContributionModificationDate",
                     "OAIDeletedPrivateConferenceCategory",
                     "OAIDeletedPrivateContributionCategory"]
-                    
+
     def getIndex( self, name ):
         return self.getById(name)
-    
+
     def getById( self, id ):
         """returns an object from the index which id corresponds to the one
             which is specified.
@@ -1157,6 +1245,8 @@ class IndexesHolder( ObjectHolder ):
                 Idx[str(id)] = CategoryIndex()
             elif id=="categoryDate":
                 Idx[str(id)] = CategoryDateIndex()
+            elif id=="categoryName":
+                Idx[str(id)] = TextIndex()
             elif id=="pendingSubmitters":
                 Idx[str(id)] = PendingSubmittersIndex()
             elif id=="pendingSubmittersTasks":
@@ -1206,7 +1296,7 @@ class IndexesHolder( ObjectHolder ):
                 Idx[str(id)] = OAIDeletedPrivateContributionCategoryIndex()
             else:
                 Idx[str(id)] = Index()
-        
+
             return Idx[str(id)]
 
 
