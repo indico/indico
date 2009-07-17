@@ -2,12 +2,12 @@
 <input type="hidden" name="categId" value="0"/>
 <div id="UISearchBox">
     <div id="searchControls">
-        <div class="yellowButton searchButton">                               
-            <input style="background-color: transparent;" class="button" type="submit" value="<%= _('Search')%>" onclick="javascript: return verifyForm();"/>
+        <div class="yellowButton searchButton">
+            <input style="background-color: transparent;" class="button" type="submit" value="<%= _('Search')%>" onclick="javascript: return verifyForm();" id="searchSubmit"/>
         </div>
-    	<div style="background: white; padding: 2px;">
-                    <div id="yoo" class="<%= moreOptionsClass %>" onclick="javascript:return expandMenu(this);"></div> 
-    				<input style="background-color: transparent;" type="text" id="searchText" name="p" />
+	<div style="background: white; padding: 2px;">
+	  <div id="yoo" class="<%= moreOptionsClass %>" onclick="javascript:return expandMenu(this);"></div>
+	  <input style="background-color: transparent;" type="text" id="searchText" name="p" />
     	</div>
     </div>
 
@@ -33,7 +33,7 @@
                 <td>
                     <select name="collections">
 		      <option value="Events">Events</option>
-		      <option value="Contributions">Contributions</option>					
+		      <option value="Contributions">Contributions</option>
 		      <option value="" selected>Both (Events+Contributions)</option>
                     </select>
                 </td>
@@ -48,7 +48,7 @@
             <tr>
                 <td style="text-align: right;"><%= _("End Date")%></td>
                 <td>
-                    <span id="endDatePlaceBox">    
+                    <span id="endDatePlaceBox">
                     </span>
                 </td>
             </tr>
@@ -62,22 +62,22 @@
 function expandMenu(domElem)
 {
 	var elem = new XElement(domElem);
-	
+
 	if(!exists(elem.dom.extraShown))
 	{
 		var controls = searchControls;
-		
+
 		IndicoUI.Effect.appear(extraOptions, 'block');
 		elem.dom.extraShown=true;
 		resetForm();
-	} 
-	else 
+	}
+	else
 	{
 		IndicoUI.Effect.disappear(extraOptions)
 		elem.dom.extraShown=null;
 		resetForm();
-				
-	} 
+
+	}
 	return false;
 }
 
@@ -107,10 +107,15 @@ var endDateBox = IndicoUI.Widgets.Generic.dateField(null, {name: 'endDate'});
 var searchControls = $E('searchControls');
 var extraOptions = $E('extraOptions');
 
+var intelligentSearchBox = new IntelligentSearchBox({name: 'p', id: 'searchText',
+                                 style: {backgroundColor: 'transparent'}
+				 }, $E('searchSubmit'));
 
 IndicoUI.executeOnLoad(function(){
   $E('startDatePlaceBox').set(startDateBox);
   $E('endDatePlaceBox').set(endDateBox);
-
+  $E('searchText').replaceWith(
+         intelligentSearchBox.draw()
+	 );
 });
 </script>

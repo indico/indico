@@ -79,7 +79,19 @@ from MaKaC.common.logger import Logger
 class CategoryManager( ObjectHolder ):
     idxName = "categories"
     counterName = "CATEGORY"
-    
+
+    def add(self, category):
+        ObjectHolder.add(self, category)
+        # Add category to the name index
+        nameIdx = indexes.IndexesHolder().getIndex('categoryName')
+        nameIdx.index(category.getId(), category.getTitle().decode('utf-8'))
+
+    def remove(self, category):
+        ObjectHolder.add(self, category)
+        # remove category from the name index
+        nameIdx = indexes.IndexesHolder().getIndex('categoryName')
+        nameIdx.unindex(category.getId())
+
     def _newId( self ):
         """
         returns a new id for the category
@@ -98,20 +110,20 @@ class CategoryManager( ObjectHolder ):
             self.add( r )
             root["rootCategory"] = r
         return root["rootCategory"]
-    
-    def getDefaultConference( self ): 
+
+    def getDefaultConference( self ):
         dconf = HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference()
         if dconf == None:
             return HelperMaKaCInfo.getMaKaCInfoInstance().setDefaultConference(DefaultConference())
         else:
             return dconf
-        
+
 
 
 class Category(Persistent):
-    
+
     def __init__( self ):
-        
+
         self.id = ""
         self.name = ""
         self.description = ""
@@ -143,7 +155,7 @@ class Category(Persistent):
         self._timezone = ""
         self.__materialGenerator = Counter()
         self._notifyCreationList = ""
-    
+
     def getAccessController(self):
         return self.__ac
 
@@ -182,8 +194,8 @@ class Category(Persistent):
                 cache.cleanCache()
 
     def clearCache( self ):
-        """ delete cache file of this category. usually used for 
-        admin purposes """ 
+        """ delete cache file of this category. usually used for
+        admin purposes """
         cache = CategoryCache({"categId":self.getId()})
         cache.cleanCache()
 
@@ -192,7 +204,7 @@ class Category(Persistent):
         usually used for admin purposes """
         for conf in self.getConferenceList():
             conf.cleanCache()
-    
+
     def removePaper( self ):
         if self.paper is None:
             return
@@ -212,7 +224,7 @@ class Category(Persistent):
         except AttributeError:
             self.paper = None
         return self.paper
-    
+
     def setSlides( self, newSlides ):
         if self.getSlides() != None:
             raise MaKaCError( _("The slides for this conference have already been set"), _("Conference"))
@@ -300,7 +312,7 @@ class Category(Persistent):
         self.minutes=newMinutes
         self.minutes.setOwner( self )
         self.notifyModification()
-    
+
     def createMinutes( self ):
         if self.getMinutes() != None:
             raise MaKaCError( _("The minutes for this conference have already been created"), _("Conference"))
@@ -333,16 +345,16 @@ class Category(Persistent):
             pass
         except AttributeError, e:
             self.minutes = None
-        return self.minutes        
-            
+        return self.minutes
+
     def addMaterial( self, newMat ):
         try:
             newMat.setId( str(self.__materialGenerator.newCount()) )
         except:
             self.__materialGenerator = Counter()
-            newMat.setId(self.__materialGenerator.newCount() ) 
+            newMat.setId(self.__materialGenerator.newCount() )
         newMat.setOwner( self )
-        self.materials[ newMat.getId() ] =  newMat 
+        self.materials[ newMat.getId() ] =  newMat
         self.notifyModification()
 
     def removeMaterial( self, mat ):
@@ -410,37 +422,39 @@ class Category(Persistent):
         if self.getMinutes():
             l.append( self.getMinutes() )
         return l
-    
+
     def getTaskList(self):
         try :
             return self._tasks.values()
         except :
             self._tasks = {}
             return self._tasks.values()
+
     def getTitle(self):
         return self.name
+
     def getTasks(self):
         try :
             return self._tasks
         except :
             self._tasks = {}
             return self._tasks
-    
+
     def getTask(self, taskId):
         return self.getTasks().get(taskId,None)
 
     def _getTasksAllowed(self):
-        try :            
+        try :
             return self._tasksAllowed
-        except :            
+        except :
             self._tasksAllowed = False
             return self._tasksAllowed
-                    
+
     def tasksAllowed(self):
         if self.hasSubcategories():
             return False
         return self._getTasksAllowed()
-        
+
     def setTasksAllowed(self):
         if self.hasSubcategories() :
             return False
@@ -448,7 +462,7 @@ class Category(Persistent):
         self._tasksAllowed = True
         self.notifyModification()
         return True
-        
+
     def setTasksForbidden(self):
         if len(self.getTaskList()) > 0 :
             return False
@@ -456,7 +470,7 @@ class Category(Persistent):
         self._tasksAllowed = False
         self.notifyModification()
         return False
-    
+
     def _getNewTaskId(self):
         try :
             if self._taskIdGenerator :
@@ -472,7 +486,7 @@ class Category(Persistent):
         newTask = task.Task(self, self._getNewTaskId(), user)
         self.getTasks()["%s"%newTask.getId()] = newTask
         self.notifyModification()
-        return newTask 
+        return newTask
 
     def tasksPublic(self):
         try :
@@ -480,30 +494,30 @@ class Category(Persistent):
         except :
             self._tasksPublic = True
             return self._tasksPublic
-            
+
     def setTasksPublic(self):
         self.tasksPublic()
         self._tasksPublic = True
-        
+
     def setTasksPrivate(self):
         self.tasksPublic()
         self._tasksPublic = False
-    
+
     def tasksCommentPublic(self):
         try :
             return self._tasksCommentPublic
         except :
             self._tasksCommentPublic = True
             return self._tasksCommentPublic
-            
+
     def setTasksCommentPublic(self):
         self.tasksCommentPublic()
         self._tasksCommentPublic = True
-        
+
     def setTasksCommentPrivate(self):
         self.tasksCommentPublic()
         self._tasksCommentPublic = False
-        
+
     def getTasksManagerList(self):
         try :
             return self._tasksManagers
@@ -517,14 +531,14 @@ class Category(Persistent):
         if index < 0 or index >= length :
             return None
         return self._tasksManagers[index]
-        
+
     def addTasksManager(self,user):
         if user is None :
             return False
         self.getTasksManagerList().append(user)
         self._p_changed = 1
         return True
-        
+
     def removeTasksManager(self, index):
         length = len(self.getTasksManagerList())
         if index < 0 or index >= length :
@@ -532,7 +546,7 @@ class Category(Persistent):
         del self.getTasksManagerList()[index]
         self._p_changed = 1
         return True
-    
+
     def getTasksCommentatorList(self):
         try :
             return self._tasksCommentators
@@ -540,20 +554,20 @@ class Category(Persistent):
             self._tasksCommentators = []
             self._p_changed = 1
             return self._tasksCommentators
-        
+
     def getTasksCommentator(self, index):
         length = len(self.getTasksCommentatorList())
         if index < 0 or index >= length :
             return None
         return self._tasksCommentators[index]
-            
+
     def addTasksCommentator(self,user):
         if user is None :
             return False
         self.getTasksCommentatorList().append(user)
         self._p_changed = 1
         return True
-        
+
     def removeTasksCommentator(self, index):
         length = len(self.getTasksCommentatorList())
         if index < 0 or index >= length :
@@ -576,14 +590,14 @@ class Category(Persistent):
         if index < 0 or index >= length :
             return None
         return self._tasksAccessList[index]
-        
+
     def addTasksAccessPerson(self,user):
         if user is None :
             return False
         self.getTasksAccessList().append(user)
         self._p_changed = 1
         return True
-        
+
     def removeTasksAccessPerson(self, index):
         length = len(self.getTasksAccessList())
         if index < 0 or index >= length :
@@ -607,25 +621,25 @@ class Category(Persistent):
     def setVisibility( self, visibility=999 ):
         self._visibility = int(visibility)
         self._reindex()
-        
+
     def _reindex( self ):
         catIdx = indexes.IndexesHolder().getIndex('category')
         catIdx.reindexCateg(self)
-        
+
     def isRoot( self ):
         #to be improved
         return self.owner == None
-    
+
     def notifyOAIModification(self):
         for conf in self.getAllConferenceList():
             conf.notifyOAIModification(updateChildren=True)
-    
+
     def getDefaultStyle( self, type ):
         try:
             return self._defaultStyle[type]
         except:
             return ""
-            
+
     def setDefaultStyle( self, type, style, subcatsStyle=False ):
         try:
             self._defaultStyle[type] = style
@@ -635,14 +649,14 @@ class Category(Persistent):
         self.notifyModification()
         #raise str(subcatsStyle)
         if subcatsStyle:
-            
+
             categ=self.getSubCategoryList()
-            
+
             for cat in categ:
                 cat.setDefaultStyle(type, style, subcatsStyle )
 
     ##################################
-    # Fermi timezone awareness       #    
+    # Fermi timezone awareness       #
     ##################################
     def getTimezone(self):
         try:
@@ -662,7 +676,7 @@ class Category(Persistent):
             conference.moveToTimezone(tz)
 
     ##################################
-    # Fermi timezone awareness(end)  #    
+    # Fermi timezone awareness(end)  #
     ##################################
 
     def getOrder( self ):
@@ -671,7 +685,7 @@ class Category(Persistent):
         except:
             self._order = 0
             return 0
-    
+
     def setOrder( self, order ):
         self._order = order
 
@@ -681,9 +695,9 @@ class Category(Persistent):
 
     def setId( self, newId ):
         self.id = str( newId.strip() )
-    
+
     def getLocator( self ):
-        """Gives back (Locator) a globaly unique identification encapsulated 
+        """Gives back (Locator) a globaly unique identification encapsulated
                 in a Locator object for the category instance """
         d = Locator()
         d["categId"] = self.getId()
@@ -700,7 +714,7 @@ class Category(Persistent):
             self.move( newOwner )
         else:
             self.owner = newOwner
-    
+
     def getCategoryPath(self):
         if self.isRoot():
             return [self.getId()]
@@ -719,7 +733,7 @@ class Category(Persistent):
         return breadcrumbs
 
     def delete( self, deleteConferences=0 ):
-        """removes completely a category (and all its sub-items) from the 
+        """removes completely a category (and all its sub-items) from the
             system"""
         if self.isRoot():
             raise MaKaCError( _("Root category cannot be deleted"), _("Category"))
@@ -737,16 +751,16 @@ class Category(Persistent):
         return
 
     def move( self, newCategory ):
-        ow = self.getOwner()        
+        ow = self.getOwner()
         catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
-        
+
         catDateIdx.unindexCateg(self)
-        
+
         self.getOwner()._removeSubCategory( self )
         newCategory._addSubCategory( self )
         self._reindex()
         catDateIdx.indexCateg(self)
-        
+
         self.notifyOAIModification()
 
     @Retrieves(["MaKaC.conference.Category"], 'name')
@@ -755,6 +769,12 @@ class Category(Persistent):
 
     def setName( self, newName ):
         self.name = newName.strip()
+
+        # Reindex when name changes
+        nameIdx = indexes.IndexesHolder().getIndex('categoryName')
+        nameIdx.unindex(self.getId())
+        nameIdx.index(self.getId(), self.getTitle().decode('utf-8'))
+
         self.cleanCache()
 
     def getDescription( self ):
@@ -766,9 +786,9 @@ class Category(Persistent):
 
     def _addSubCategory( self, newSc ):
         #categories can only contain either conferences either other categories
-        #   but can never contain both. For the moment an exception is raised 
-        #   but this could be replaced by the following policy: if a 
-        #   sub-category is to be added to a category already containing 
+        #   but can never contain both. For the moment an exception is raised
+        #   but this could be replaced by the following policy: if a
+        #   sub-category is to be added to a category already containing
         #   conferences then the conferes are moved into the new sub-category
         #   and it is added to target category.
         #first, check that the category is registered if not raise an exception
@@ -785,8 +805,8 @@ class Category(Persistent):
         newSc.updateFatherProtection()
 
     def _removeSubCategory( self, sc ):
-        """if the given subcategory belongs to the current category it removes 
-            it from the subcategories list (don't use this method, use delete 
+        """if the given subcategory belongs to the current category it removes
+            it from the subcategories list (don't use this method, use delete
             instead)
         """
         if sc in self.getSubCategoryList():
@@ -794,8 +814,8 @@ class Category(Persistent):
             del self.subcategories[ sc.getId() ]
             sc.setOwner( None )
             self.cleanCache()
-    
-    def newSubCategory( self, sc=None ): 
+
+    def newSubCategory( self, sc=None ):
         cm = CategoryManager()
         if sc==None:
             sc = Category()
@@ -819,7 +839,7 @@ class Category(Persistent):
         self._numConferences-=num
         if self.getOwner() is not None:
             self.getOwner()._decNumConfs(num)
-        
+
     def _addConference( self, newConf ):
         if len(self.subcategories)>0:
             raise MaKaCError( _("Cannot add event: the current category already contains some sub-categories"), _("Category"))
@@ -835,7 +855,7 @@ class Category(Persistent):
 
     def getAccessKey(self):
         return ""
-        
+
     def indexConf( self, conf ):
         calIdx = indexes.IndexesHolder().getIndex('calendar')
         calIdx.indexConf(conf)
@@ -843,7 +863,7 @@ class Category(Persistent):
         catIdx.indexConf(conf)
         catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
         catDateIdx.indexConf(conf)
-        
+
     def unindexConf( self, conf ):
         calIdx = indexes.IndexesHolder().getIndex('calendar')
         calIdx.unindexConf(conf)
@@ -851,7 +871,7 @@ class Category(Persistent):
         catIdx.unindexConf(conf)
         catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
         catDateIdx.unindexConf(conf)
-        
+
     def newConference( self, creator, id="", creationDate=None, modificationDate=None ):
         conf = Conference( creator, id, creationDate, modificationDate )
         ConferenceHolder().add( conf )
@@ -872,7 +892,7 @@ class Category(Persistent):
         if notify:
             conf.notifyOAIModification(updateChildren=True)
         self.cleanCache()
-        
+
     def getSubCategoryList( self ):
         subcategs = self.subcategories.values()
         cl = []
@@ -884,12 +904,12 @@ class Category(Persistent):
             id = c.split("-")[1]
             res.append(self.subcategories[id])
         return res
-        
+
     def getConferenceList( self, dateOrdered = False, sortType=1 ):
         """returns the list of conferences included in the current category.
             if dateOrdered (bool) is specified and it is True the returned
             list will be oredered by starting date.
-            
+
             sortType=1--> By date
             sortType=2--> Alphabetically
         """
@@ -900,7 +920,7 @@ class Category(Persistent):
         #for id in resid:
         #    res.append(ch.getById(id))
         res = self.conferences.values()
-        #TODO: this is not very efficient/elegant. to be improved 
+        #TODO: this is not very efficient/elegant. to be improved
         if dateOrdered:
             if sortType==1:
                 di = []
@@ -924,7 +944,7 @@ class Category(Persistent):
                     res.append( self.conferences[id] )
                 res.reverse()
         return res
-    
+
     def getAllConferenceList(self):
         if self.getConferenceList():
             return self.getConferenceList
@@ -985,11 +1005,11 @@ class Category(Persistent):
         for conf in self.conferences.values():
             res.append(conf.getId())
         return res
-        
+
     def getConferenceById(self, conferenceId):
         """ returns tle conference identified with id provided"""
         return self.conferences.get(conferenceId, None)
-        
+
     def _setNumConferences(self):
         self._numConferences=0
         if len(self.getSubCategoryList())>0:
@@ -1002,9 +1022,9 @@ class Category(Persistent):
         """returns the total number of conferences contained in the current
             category and all its sub-categories (if any)"""
         #this new approach will speed up considerably the counting of category
-        #   conferences. However, it will give non accurate results for 
-        #   conferences within many categories (a conference will be counted 
-        #   twice in parent categories). 
+        #   conferences. However, it will give non accurate results for
+        #   conferences within many categories (a conference will be counted
+        #   twice in parent categories).
         #   Besides this approach will generate much more conflict errors. This
         #   can be reduced by simply isolating the counter in a separate object.
         try:
@@ -1035,7 +1055,7 @@ class Category(Persistent):
             self._icon.delete()
         self._icon = iconFile
         self.notifyModification()
-    
+
     def getIcon( self ):
         try:
             if self._icon:
@@ -1068,19 +1088,19 @@ class Category(Persistent):
         return self.__ac.getModifierList()
 
     def grantModification( self, prin ):
-        self.__ac.grantModification( prin )  
+        self.__ac.grantModification( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.linkTo(self, "manager")
         self.resetModifyCache()
         self.cleanCache()
 
     def revokeModification( self, prin ):
-        self.__ac.revokeModification( prin ) 
+        self.__ac.revokeModification( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "manager")
         self.resetModifyCache()
         self.cleanCache()
-    
+
     def canModify( self, aw ):
         try:
             return self._v_canmodify[aw]
@@ -1103,7 +1123,7 @@ class Category(Persistent):
             inherited = self.getOwner().canUserModify( av )
         self._v_canusermodify[av] = inherited or self.__ac.canModify( av )
         return self._v_canusermodify[av]
-            
+
 
     def getAllowedToAccessList( self ):
         return self.__ac.getAccessList()
@@ -1141,7 +1161,7 @@ class Category(Persistent):
         if self.getOwner() is not None:
             return self.getOwner().hasAnyProtection()
         return False
-    
+
     def updateFatherProtection( self ):
         """ Allows to change the parent access protection
         cached in this object
@@ -1149,14 +1169,14 @@ class Category(Persistent):
         self.__ac.setFatherProtection( self.getOwner().isProtected() )
         self.updateSonsProtection()
         self.cleanCache()
-        
+
     def setProtection( self, private ):
         """Allows to change the conference access protection
         """
         self.__ac.setProtection( private )
         self.updateSonsProtection()
         self.cleanCache()
-        
+
     def updateSonsProtection( self ):
         for categ in self.getSubCategoryList():
             categ.updateFatherProtection()
@@ -1208,8 +1228,8 @@ class Category(Persistent):
                 cat.resetAccessCache(False, True)
             for conf in self.getConferenceList():
                 conf.resetAccessCache(False, True)
-        
-    
+
+
     def resetModifyCache(self, UP=True, DOWN=True):
         if hasattr(self,"_v_canmodify"):
             del self._v_canmodify
@@ -1250,7 +1270,7 @@ class Category(Persistent):
         if isinstance(prin, MaKaC.user.Avatar):
             prin.linkTo(self, "access")
         self.resetAccessCache()
-    
+
     def revokeAccess( self, prin ):
         self.__ac.revokeAccess( prin )
         if isinstance(prin, MaKaC.user.Avatar):
@@ -1272,7 +1292,7 @@ class Category(Persistent):
             if isinstance(prin, MaKaC.user.Avatar):
                 prin.linkTo(self, "creator")
             self._p_changed = 1
-            
+
     def revokeConferenceCreation( self, prin ):
         if prin in self.__confCreators:
             self.__confCreators.remove( prin )
@@ -1292,9 +1312,9 @@ class Category(Persistent):
 
     def canCreateConference( self, av ):
         if not self.isConferenceCreationRestricted():
-            return 1 
+            return 1
         return self.isAllowedToCreateConference( av )
-    
+
     def requireDomain( self, dom ):
         self.__ac.requireDomain( dom )
         self.resetAccessCache()
@@ -1308,7 +1328,7 @@ class Category(Persistent):
 
     def getStatistics( self ):
         try:
-            if self._statistics:    
+            if self._statistics:
                 pass
         except AttributeError, e:
             self._statistics = {}
@@ -1318,7 +1338,7 @@ class Category(Persistent):
         self._statistics = self.getStatistics()
         self._statistics["events"] = {}
         self._statistics["contributions"] = {}
-        self._statistics["resources"] = 0 
+        self._statistics["resources"] = 0
         if len(self.getSubCategoryList())>0:
             for cat in self.getSubCategoryList():
                 self._p_changed = 1
@@ -1364,7 +1384,7 @@ class Category(Persistent):
                             self._statistics["resources"] += m.getNbResources()
                 l = conf.getAllMaterialList()
                 for m in l:
-                    self._statistics["resources"] += m.getNbResources()           
+                    self._statistics["resources"] += m.getNbResources()
         else:
             pass
         self._statistics["updated"] = nowutc()
@@ -1423,7 +1443,7 @@ class CustomLocation(Persistent):
 
 
 class CustomRoom(Persistent):
-    
+
     def __init__( self ):
         self.name = ""
 
@@ -1451,7 +1471,7 @@ class CustomRoom(Persistent):
 
 
 class ConferenceParticipation(Persistent):
-    
+
     def __init__(self):
         self._firstName=""
         self._surName=""
@@ -1464,7 +1484,7 @@ class ConferenceParticipation(Persistent):
 
     def _notifyModification( self ):
         pass
-        
+
     def setValues(self, data):
         self.setFirstName(data.get("firstName", ""))
         self.setFamilyName(data.get("familyName",""))
@@ -1503,7 +1523,7 @@ class ConferenceParticipation(Persistent):
             return
         self.setFirstName(av.getName())
         self.setFamilyName(av.getSurName())
-        self.setEmail(av.getEmail()) 
+        self.setEmail(av.getEmail())
         self.setAffiliation(av.getOrganisation())
         self.setAddress(av.getAddress())
         self.setPhone(av.getTelephone())
@@ -1517,7 +1537,7 @@ class ConferenceParticipation(Persistent):
             return
         self.setFirstName(cp.getFirstName())
         self.setFamilyName(cp.getFamilyName())
-        self.setEmail(cp.getEmail()) 
+        self.setEmail(cp.getEmail())
         self.setAffiliation(cp.getAffiliation())
         self.setAddress(cp.getAddress())
         self.setPhone(cp.getPhone())
@@ -1525,7 +1545,7 @@ class ConferenceParticipation(Persistent):
         self.setFax(cp.getFax())
         self._notifyModification()
 
-    def delete( self ):        
+    def delete( self ):
         TrashCanManager().add(self)
 
     def recover(self):
@@ -1639,7 +1659,7 @@ class ConferenceParticipation(Persistent):
             else:
                 res = self.getFirstName()
         return res
-    
+
     def getDirectFullName( self ):
         res = "%s %s"%( self.getFirstName(), self.getFamilyName() )
         res=res.strip()
@@ -1665,7 +1685,7 @@ class ConferenceParticipation(Persistent):
 
 
 class ConferenceChair(ConferenceParticipation):
-    
+
     def __init__(self):
         self._conf=None
         self._id=""
@@ -1706,22 +1726,22 @@ class ConferenceChair(ConferenceParticipation):
 class SubmitterIndex(Persistent):
     """Index for contribution submitters.
 
-        This class allows to index users with submission privileges over the 
-        conference contributions so the owner can answer optimally to the query 
+        This class allows to index users with submission privileges over the
+        conference contributions so the owner can answer optimally to the query
         if a user has any submission privilege over any contribution
         of the conference.
         It is implemented by simply using a BTree where the Avatar id is used
-        as key (because it is unique and non variable) and a list of 
+        as key (because it is unique and non variable) and a list of
         contributions over which he has submission privileges is kept as values.
-        It is the responsability of the index owner (conference contributions) 
-        to keep it up-to-date i.e. notify conference sumitters additions and 
+        It is the responsability of the index owner (conference contributions)
+        to keep it up-to-date i.e. notify conference sumitters additions and
         removals.
     """
 
     def __init__( self ):
         self._idx = OOBTree()
         self._idxEmail = OOBTree()
-    
+
     def _getIdxEmail(self):
         try:
             return self._idxEmail
@@ -1745,7 +1765,7 @@ class SubmitterIndex(Persistent):
         """Registers in the index a submitter of a contribution.
         """
         if av==None or contrib==None:
-            return 
+            return
         if not self._idx.has_key(av.getId()):
             l=[]
             self._idx[av.getId()]=l
@@ -1754,7 +1774,7 @@ class SubmitterIndex(Persistent):
         if contrib not in l:
             l.append(contrib)
             self._idx[av.getId()]=l
-    
+
     def indexEmail(self, email, contrib):
         if not email or not contrib:
             return
@@ -1766,16 +1786,16 @@ class SubmitterIndex(Persistent):
             if not contrib in l:
                 l.append(contrib)
                 self._getIdxEmail()[email] = l
-                
+
 
     def unindex(self,av,contrib):
         if av==None or contrib==None:
-            return 
+            return
         l=self._idx.get(av.getId(),[])
         if contrib in l:
             l.remove(contrib)
             self._idx[av.getId()]=l
-    
+
     def unindexEmail(self, email, contrib):
         if not email or not contrib:
             return
@@ -1787,7 +1807,7 @@ class SubmitterIndex(Persistent):
                 del self._getIdxEmail()[email]
             else:
                 self._getIdxEmail()[email] = l
-    
+
     def _moveEmailtoId(self, av):
         id = av.getId()
         email = av.getEmail()
@@ -1835,7 +1855,7 @@ class ReportNumberHolder(Persistent):
         if self.hasReportNumber(system):
             return self._reports[system]
         return None
-    
+
     def getReportNumberKeys(self):
         return self._reports.keys()
 
@@ -1875,15 +1895,15 @@ class ReportNumberHolder(Persistent):
 
 class Conference(Persistent):
     """This class represents the real world conferences themselves. Objects of
-        this class will contain basic data about the confence and will provide 
-        access to other objects representing certain parts of the conferences 
+        this class will contain basic data about the confence and will provide
+        access to other objects representing certain parts of the conferences
         (ex: contributions, sessions, ...).
     """
-    
+
     @Retrieves ('MaKaC.conference.Conference', 'displayURL', lambda conf: str(urlHandlers.UHConferenceDisplay.getURL(conf)))
     @Retrieves ('MaKaC.conference.Conference', 'modifURL', lambda conf: str(urlHandlers.UHConferenceModification.getURL(conf)))
     def __init__(self, creator, id="", creationDate = None, modificationDate = None):
-        """Class constructor. Initialise the class attributes to the default 
+        """Class constructor. Initialise the class attributes to the default
             values.
            Params:
             confData -- (Dict) Contains the data the conference object has to
@@ -1900,13 +1920,13 @@ class Conference(Persistent):
         self.places = []
         self.rooms = []
         ###################################
-        # Fermi timezone awareness        #  
+        # Fermi timezone awareness        #
         ###################################
         self.startDate = nowutc()
         self.endDate = nowutc()
         self.timezone = ""
         ###################################
-        # Fermi timezone awareness(end)   #  
+        # Fermi timezone awareness(end)   #
         ###################################
         self._screenStartDate = None
         self._screenEndDate = None
@@ -1916,14 +1936,14 @@ class Conference(Persistent):
         self._chairGen=Counter()
         self._chairs=[]
         self.sessions = {}
-        self.__sessionGenerator = Counter() # Provides session unique 
+        self.__sessionGenerator = Counter() # Provides session unique
                                             #   identifiers for this conference
         self.contributions = {}
-        self.__contribGenerator = Counter() # Provides contribution unique 
+        self.__contribGenerator = Counter() # Provides contribution unique
                                             #   identifiers for this conference
         self.programDescription = ""
         self.program = []
-        self.__programGenerator = Counter() # Provides track unique 
+        self.__programGenerator = Counter() # Provides track unique
                                             #   identifiers for this conference
         self.__ac = AccessController()
         self.materials = {}
@@ -1985,17 +2005,17 @@ class Conference(Persistent):
         self._orgText = ""
         self._comments = ""
         self._sortUrlTag = ""
-        
+
         self._dateChangeObservers = []
-        
+
         if PluginsHolder().hasPluginType("Collaboration"):
             from MaKaC.plugins.Collaboration.base import CSBookingManager
             self._CSBookingManager = CSBookingManager(self)
-        
-    
+
+
     def setUrlTag(self, tag):
         self._sortUrlTag = tag
-    
+
     def getUrlTag(self):
         try:
             return self._sortUrlTag
@@ -2038,7 +2058,7 @@ class Conference(Persistent):
             cache.cleanCache()
             cache = EventCache({"id":self.getId(), "type": "static"})
             cache.cleanCache()
-            
+
     def cleanCategoryCache( self ):
         if len(self.getOwnerList()) > 0:
             self.getOwnerList()[0].cleanCache()
@@ -2050,7 +2070,7 @@ class Conference(Persistent):
         else:
             self.setFullyPublic()
             return self._fullyPublic
-            
+
     def setFullyPublic( self ):
         """ This function calculates the self._fullyPublic attribute"""
         if self.isProtected():
@@ -2091,7 +2111,7 @@ class Conference(Persistent):
 
     def setKeywords(self, keywords):
         self._keywords = keywords
-    
+
     def _setCreator(self, av):
         self.__creator = av
 
@@ -2101,11 +2121,11 @@ class Conference(Persistent):
         """
         Returns list of bookings for this conference.
         """
-        
+
         if not "__roomBookingGuids" in ','.join( dir( self ) ):
             self.__roomBookingGuids = []
             #self.__TMP_PopulateRoomBookings()
-        
+
         resvs = []
         for resvGuid in self.__roomBookingGuids:
             r = resvGuid.getReservation()
@@ -2130,7 +2150,7 @@ class Conference(Persistent):
         Returns [] if room booking module is off.
         """
         rooms = []
-        
+
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         if minfo.getRoomBookingModuleActive():
             for r in self.getRoomBookingList():
@@ -2142,21 +2162,21 @@ class Conference(Persistent):
         if not "__roomBookingGuids" in ','.join( dir( self ) ):
             self.__roomBookingGuids = []
         return self.__roomBookingGuids
-    
+
     def setRoomBookingGuids( self, guids ):
         self.__roomBookingGuids = guids
-        
+
     def addRoomBookingGuid( self, guid ):
         if not "__roomBookingGuids" in ','.join( dir( self ) ):
             self.__roomBookingGuids = []
         self.__roomBookingGuids.append( guid )
         self._p_changed = True
-        
+
     def removeRoomBookingGuid( self, guid ):
         if not "__roomBookingGuids" in ','.join( dir( self ) ):
             self.__roomBookingGuids = []
         self.__roomBookingGuids.remove( guid )
-        self._p_changed = True 
+        self._p_changed = True
 
     def __TMP_PopulateRoomBookings( self ):
         # TEMPORARY GENERATION OF RESERVATIONS FOR CONFERENCE
@@ -2167,14 +2187,14 @@ class Conference(Persistent):
         resvs.append( ReservationBase.getReservations( resvID = 381406 ) )
         resvs.append( ReservationBase.getReservations( resvID = 387688 ) )
         resvs.append( ReservationBase.getReservations( resvID = 383459 ) )
-        
+
         resvGuids = []
         for resv in resvs:
             resvGuids.append( ReservationGUID( Location.getDefaultLocation(), resv.id ) )
-        
+
         self.__roomBookingGuids = resvGuids
 
-    
+
     # ========================================================================
 
     def getParticipation(self):
@@ -2194,8 +2214,8 @@ class Conference(Persistent):
         else:
             type = "conference"
         return type
-    
-    def getVerboseType( self ): 
+
+    def getVerboseType( self ):
         # Like getType, but returns "Lecture" instead of "simple_type"
         type = self.getType()
         if type == "simple_event":
@@ -2218,7 +2238,7 @@ class Conference(Persistent):
         except AttributeError:
             self._autoSolveConflict = True
         return self._autoSolveConflict
-    
+
     def setAutoSolveConflict(self, value):
         self._autoSolveConflict = value
 
@@ -2230,8 +2250,8 @@ class Conference(Persistent):
             self._enableSessionSlots = True
         if self.getType() == "conference":
             return True
-        return self._enableSessionSlots 
-    
+        return self._enableSessionSlots
+
     def getEnableSessions(self):
         try :
             if self._enableSessions  :
@@ -2241,16 +2261,16 @@ class Conference(Persistent):
         if self.getType() == "conference":
             return True
         return self._enableSessions
-        
+
     def enableSessionSlots(self):
         self._enableSessionSlots = True
-        
+
     def disableSessionSlots(self):
         self._enableSessionSlots = False
 
     def enableSessions(self):
         self._enableSessions = True
-        
+
     def disableSessions(self):
         self._enableSessions = False
 
@@ -2259,7 +2279,7 @@ class Conference(Persistent):
             Sets SOME values of the current conference object from a dictionary
             containing the following key-value pairs:
                 visibility-(str)
-                title-(str) 
+                title-(str)
                 description-(str)
                 supportEmail-(str)
                 contactInfo-(str)
@@ -2268,7 +2288,7 @@ class Conference(Persistent):
                 locationAddress-(str)
                 roomName-(str) => name of the room, if not specified it will
                     be set to the conference room name.
-            Please, note that this method sets SOME values which means that if 
+            Please, note that this method sets SOME values which means that if
             needed it can be completed to set more values. Also note that if
             the given dictionary doesn't contain all the values, the missing
             ones will be set to the default values.
@@ -2277,7 +2297,7 @@ class Conference(Persistent):
         self.setTitle(confData.get("title", _("NO TITLE ASSIGNED")))
         self.setDescription(confData.get("description", ""))
         self.setSupportEmail(confData.get("supportEmail", ""))
-        self.setContactInfo(confData.get("contactInfo", ""))        
+        self.setContactInfo(confData.get("contactInfo", ""))
         if confData.get("locationName", "").strip() == "":
             self.setLocation(None)
         else:
@@ -2290,14 +2310,14 @@ class Conference(Persistent):
             loc.setName(confData["locationName"])
             loc.setAddress(confData.get("locationAddress", ""))
         #same as for the location
-        if confData.get("roomName", "").strip() == "":            
-                self.setRoom(None)        
+        if confData.get("roomName", "").strip() == "":
+                self.setRoom(None)
         else:
             room = self.getRoom()
             if not room:
                 room = CustomRoom()
             self.setRoom(room)
-            room.setName(confData["roomName"])        
+            room.setName(confData["roomName"])
         self.notifyModification()
 
     def getVisibility ( self ):
@@ -2314,14 +2334,14 @@ class Conference(Persistent):
         self._visibility = int(visibility)
         catIdx = indexes.IndexesHolder().getIndex('category')
         catIdx.reindexConf(self)
-        
+
     def isClosed( self ):
         try:
             return self._closed
         except:
             self._closed = False
             return False
-            
+
     def setClosed( self, closed=True ):
         self._closed = closed
 
@@ -2330,13 +2350,13 @@ class Conference(Persistent):
         calIdx.indexConf(self)
         catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
         catDateIdx.indexConf(self)
-        
+
     def unindexConf( self ):
         calIdx = indexes.IndexesHolder().getIndex('calendar')
         calIdx.unindexConf(self)
         catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
         catDateIdx.unindexConf(self)
-        
+
     def __generateNewContribTypeId( self ):
         """Returns a new unique identifier for the current conference sessions
         """
@@ -2345,7 +2365,7 @@ class Conference(Persistent):
         except:
             self.___contribTypeGenerator = Counter()
             return str(self.___contribTypeGenerator.newCount())
-    
+
     def addContribType(self, ct):
         try:
             if self._contribTypes:
@@ -2360,11 +2380,11 @@ class Conference(Persistent):
             ct.setId(id)
         self._contribTypes[id] = ct
         self.notifyModification()
-    
+
     def newContribType(self, name, description):
         ct = ContributionType(name, description, self)
         self.addContribType(ct)
-    
+
     def getContribTypeList(self):
         try:
             return self._contribTypes.values()
@@ -2372,7 +2392,7 @@ class Conference(Persistent):
             self._contribTypes = {}
             self.notifyModification()
             return self._contribTypes.values()
-    
+
     def getContribTypeById(self, id):
         try:
             if self._contribTypes:
@@ -2383,7 +2403,7 @@ class Conference(Persistent):
         if id in self._contribTypes.keys():
             return self._contribTypes[id]
         return None
-    
+
     def removeContribType(self, ct):
         try:
             if self._contribTypes:
@@ -2398,12 +2418,12 @@ class Conference(Persistent):
                 cont.setType(None)
         ct.delete()
         self.notifyModification()
-    
+
     def recoverContribType(self, ct):
         ct.setConference(self)
         self.addContribType(ct)
         ct.recover()
-    
+
     def _getRepository( self ):
         dbRoot = DBMgr.getInstance().getDBConnection().root()
         try:
@@ -2413,7 +2433,7 @@ class Conference(Persistent):
             dbRoot["local_repositories"] = OOBTree()
             dbRoot["local_repositories"]["main"] = fr
         return fr
-    
+
     def removeResource( self, res ):
         pass
 
@@ -2425,7 +2445,7 @@ class Conference(Persistent):
             self._logo.delete()
         self._logo = logoFile
         self.notifyModification()
-    
+
     def getLogo( self ):
         return self._logo
 
@@ -2452,13 +2472,13 @@ class Conference(Persistent):
         self._logo = logo
         logo.recover()
         self.notifyModification()
-        
+
     def getSession(self):
         return None
 
     def getContribution(self):
         return None
-    
+
     def getSubContribution(self):
         return None
 
@@ -2474,7 +2494,7 @@ class Conference(Persistent):
         self.notifyOAIModification(date=date)
         self.cleanCache()
         self._p_changed=1
-    
+
     def notifyOAIModification(self, date=None, updateChildren=False): #, force=False):
         # ignore call if the id is not set
         # this is to avoid empty id entries in the index
@@ -2525,7 +2545,7 @@ class Conference(Persistent):
                 if not date:
                     date = nowutc()
                 self._OAImodificationDS = date
-                idxPu.indexConference(self)            
+                idxPu.indexConference(self)
             else:
                 #The conference wasn't indexed before and is public
                 if not date:
@@ -2540,11 +2560,11 @@ class Conference(Persistent):
     def getModificationDate( self ):
         """Returns the date in which the conference was last modified"""
         return self._modificationDS
-    
+
     def getAdjustedModificationDate( self, tz ):
         """Returns the date in which the conference was last modified"""
         return self._modificationDS.astimezone(timezone(tz))
-    
+
     def getOAIModificationDate(self):
         try:
             return self._OAImodificationDS
@@ -2559,10 +2579,10 @@ class Conference(Persistent):
     def getAdjustedCreationDate( self, tz ):
         """Returns the date in which the conference was created"""
         return self._creationDS.astimezone(timezone(tz))
-    
+
     def getCreator( self ):
         return self.__creator
-    
+
     def setCreator( self, creator):
         if self.__creator:
             self.__creator.unlinkTo(self, "creator")
@@ -2585,7 +2605,7 @@ class Conference(Persistent):
         self.id = str(newId)
 
     def getLocator( self ):
-        """Gives back (Locator) a globaly unique identification encapsulated in 
+        """Gives back (Locator) a globaly unique identification encapsulated in
             a Locator object for the conference instance """
         d = Locator()
         d["confId"] = self.getId()
@@ -2619,7 +2639,7 @@ class Conference(Persistent):
 
     def addOwner( self, newOwner ):
         if newOwner == None:
-            return 
+            return
         self.__owners.append( newOwner )
         self.notifyModification()
 
@@ -2630,7 +2650,7 @@ class Conference(Persistent):
         owner.removeConference( self )
         if notify:
             self.notifyModification()
-    
+
     def getCategoriesPath(self):
         return [self.getOwnerList()[0].getCategoryPath()]
 
@@ -2647,32 +2667,32 @@ class Conference(Persistent):
                 DeletedObjectHolder().add(DeletedObject(sc))
 
             DeletedObjectHolder().add(DeletedObject(c))
-        
+
 
     def delete( self ):
         """deletes the conference from the system.
         """
-        
+
         self.unindexContributions()
         #index a DeletedObject to keep track of the conference after the deletion
         DeletedObjectHolder().add(DeletedObject(self))
 
         #will have to remove it from all the owners (categories) and the
-        #   conference registry        
+        #   conference registry
         ConferenceHolder().remove( self )
         for owner in self.__owners:
             owner.removeConference( self, notify=False )
-        
+
         for alarm in self.getAlarmList():
             self.removeAlarm(alarm)
-            
+
         self.removeAllEvaluations()
-        
-        TrashCanManager().add(self)        
+
+        TrashCanManager().add(self)
 
         indexes.IndexesHolder().getById("OAIConferenceModificationDate").unindexConference(self)
         indexes.IndexesHolder().getById("OAIPrivateConferenceModificationDate").unindexConference(self)
-        
+
 
     def getConference( self ):
         return self
@@ -2702,13 +2722,13 @@ class Conference(Persistent):
         if sDate == self.getStartDate():
             return
         ###################################
-        # Fermi timezone awareness        # 
+        # Fermi timezone awareness        #
         ###################################
         if sDate.year < 1900:
             sDate = timezone('UTC').localize(1900,sDate.month, \
                     sDate.day,sDate.hour,sDate.minute)
         ###################################
-        # Fermi timezone awareness        # 
+        # Fermi timezone awareness        #
         ###################################
         if check != 0:
             self.verifyStartDate(sDate)
@@ -2736,7 +2756,7 @@ class Conference(Persistent):
         self.notifyModification()
         if index:
             self.indexConf()
-            
+
         #if everything went well, we notify the observers that the start date has changed
         for observer in self.getDateChangeObservers():
             try:
@@ -2755,11 +2775,11 @@ class Conference(Persistent):
 
     def setStartTime(self, hours=0, minutes=0):
         sdate = self.getStartDate()
-        self.startDate = datetime( sdate.year, sdate.month, sdate.day, 
-                                                    int(hours), int(minutes) ) 
+        self.startDate = datetime( sdate.year, sdate.month, sdate.day,
+                                                    int(hours), int(minutes) )
         self.verifyStartDate(self.startDate)
         self.notifyModification()
-        
+
         #if everything went well, we notify the observers that the start date has changed
         for observer in self.getDateChangeObservers():
             try:
@@ -2774,11 +2794,11 @@ class Conference(Persistent):
     def getStartDate(self):
         """returns (datetime) the starting date of the conference"""
         return self.startDate
-  
+
     ###################################
     # Fermi timezone awareness        #
     ###################################
-    
+
     @Retrieves(['MaKaC.conference.Conference'], 'startDate', Conversion.datetime)
     def getAdjustedStartDate(self,tz=None):
         if not tz:
@@ -2796,7 +2816,7 @@ class Conference(Persistent):
             date = None
         self._screenStartDate = date
         self.notifyModification()
-    
+
     def getScreenStartDate(self):
         try:
             date = self._screenStartDate
@@ -2811,7 +2831,7 @@ class Conference(Persistent):
         if not tz:
             tz = self.getTimezone()
         return self.getScreenStartDate().astimezone(timezone(tz))
-            
+
     def calculateDayStartTime(self, day):
         """returns (date) the start date of the conference on a given day
         day is a tz aware datetime"""
@@ -2838,7 +2858,7 @@ class Conference(Persistent):
             self.verifyEndDate(eDate)
         if index:
             self.unindexConf()
-        
+
         oldEdate = self.endDate
         self.endDate  = eDate
         #datetime object is non-mutable so we must "force" the modification
@@ -2846,7 +2866,7 @@ class Conference(Persistent):
         self.notifyModification()
         if index:
             self.indexConf()
-            
+
         #if everything went well, we notify the observers that the start date has changed
         for observer in self.getDateChangeObservers():
             try:
@@ -2857,14 +2877,14 @@ class Conference(Persistent):
                                                    (observer.getName(), formatDateTime(oldEdate), formatDateTime(eDate), self.getId(), str(e)))
                 except Exception, e2:
                     Logger.get('Conference').error("Exception while notifying a end date change: %s (origin: %s)"%(str(e2), str(e)))
-    
+
     def setEndTime(self, hours=0, minutes=0):
         edate = self.getEndDate()
         self.endDate = datetime( edate.year, edate.month, edate.day, \
-                                                    int(hours), int(minutes) ) 
+                                                    int(hours), int(minutes) )
         self.verifyEndDate(self.endDate)
         self.notifyModification()
-        
+
         #if everything went well, we notify the observers that the start date has changed
         for observer in self.getDateChangeObservers():
             try:
@@ -2895,7 +2915,7 @@ class Conference(Persistent):
     ##################################
     # Fermi timezone awareness(end)  #
     ##################################
-    
+
     def getDateChangeObservers(self):
         if not hasattr(self, "_dateChangeObservers"):
             self._dateChangeObservers = []
@@ -2904,7 +2924,7 @@ class Conference(Persistent):
     def addDateChangeObserver(self, observer):
         self.getDateChangeObservers().append(observer)
         self._p_changed=1
-        
+
     def removeDateChangeObserver(self, observer):
         self.getDateChangeObservers().remove(observer)
         self._p_changed=1
@@ -2914,7 +2934,7 @@ class Conference(Persistent):
             date = None
         self._screenEndDate = date
         self.notifyModification()
-        
+
     def getScreenEndDate(self):
         try:
             date = self._screenEndDate
@@ -2929,7 +2949,7 @@ class Conference(Persistent):
         if not tz:
             tz = self.getTimezone()
         return self.getScreenEndDate().astimezone(timezone(tz))
-        
+
     def isEndDateAutoCal( self ):
         """Says whether the end date has been explicitely set for the session
             or it must be calculated automatically
@@ -2978,7 +2998,7 @@ class Conference(Persistent):
     ####################################
     # Fermi timezone awareness(end)    #
     ####################################
-    
+
     @Retrieves("MaKaC.conference.Conference", 'title')
     def getTitle(self):
         """returns (String) the title of the conference"""
@@ -3036,7 +3056,7 @@ class Conference(Persistent):
         self._chairGen=Counter()
         self._chairs=[]
 
-    def _resetChairs(self):   
+    def _resetChairs(self):
         try:
             if self._chairs:
                 return
@@ -3046,11 +3066,11 @@ class Conference(Persistent):
                 newChair=ConferenceChair()
                 newChair.setDataFromAvatar(oc)
                 self._addChair(newChair)
-            
+
     def getChairList(self):
         """Method returning a list of the conference chairmans (Avatars)
         """
-        self._resetChairs()  
+        self._resetChairs()
         return self._chairs
 
     def _addChair(self,newChair):
@@ -3072,13 +3092,13 @@ class Conference(Persistent):
         self.notifyModification()
 
     def addChair(self,newChair):
-        """includes the specified user in the list of conference 
+        """includes the specified user in the list of conference
             chairs"""
         self._resetChairs()
         self._addChair(newChair)
 
     def removeChair(self,chair):
-        """removes the specified user from the list of conference 
+        """removes the specified user from the list of conference
             chairs"""
         self._resetChairs()
         if chair not in self._chairs:
@@ -3099,7 +3119,7 @@ class Conference(Persistent):
             if chair.getId()==id:
                 return chair
         return None
-    
+
     def getAllSessionsConvenerList(self) :
         dictionary = {}
         for session in self.getSessionList() :
@@ -3111,7 +3131,7 @@ class Conference(Persistent):
                     list = []
                     list.append(convener)
                     dictionary[key] = list
-        
+
         return dictionary
 
     def getContactInfo(self):
@@ -3132,7 +3152,7 @@ class Conference(Persistent):
 
     def getOwnLocation( self ):
         return self.getLocation()
-    
+
     def getLocation( self ):
         if len(self.places)>0:
             return self.places[0]
@@ -3150,7 +3170,7 @@ class Conference(Persistent):
 
     def getOwnRoom( self ):
         return self.getRoom()
-    
+
     def getRoom( self ):
         if len(self.rooms)>0:
             return self.rooms[0]
@@ -3167,8 +3187,8 @@ class Conference(Persistent):
         self.notifyModification()
 
     def getLocationList(self):
-        """Method returning a list of "location" objects which contain the 
-            information about the different places the conference is gonna 
+        """Method returning a list of "location" objects which contain the
+            information about the different places the conference is gonna
             happen
         """
         return self.places
@@ -3189,25 +3209,25 @@ class Conference(Persistent):
         except AttributeError:
             self._accessKey = ""
             return self._accessKey
-        
+
     def setModifKey(self, modifKey=""):
         """sets the modification key of the conference"""
         self._modifKey = modifKey
         self.notifyModification()
         self.resetModifyCache()
-        
+
     def getModifKey(self):
         try:
             return self._modifKey
         except AttributeError:
             self._modifKey = ""
             return self._modifKey
-        
+
     def __generateNewSessionId( self ):
         """Returns a new unique identifier for the current conference sessions
         """
         return str(self.__sessionGenerator.newCount())
-        
+
     def addSession(self,newSession, check = 1, id = None):
         """Adds a new session object to the conference taking care of assigning
             a new unique id to it
@@ -3264,7 +3284,7 @@ class Conference(Persistent):
         session.recover(isCancelled)
 
     def getSessionById( self, sessionId ):
-        """Returns the session from the conference list corresponding to the 
+        """Returns the session from the conference list corresponding to the
             unique session id specified
         """
         return self.sessions.get(sessionId,None)
@@ -3279,10 +3299,10 @@ class Conference(Persistent):
         return roomList
 
     def getSessionList( self ):
-        """Retruns a list of the conference session objects 
+        """Retruns a list of the conference session objects
         """
         return self.sessions.values()
-    
+
     def getSessionListSorted( self ):
         """Retruns a sorted list of the conference sessions
         """
@@ -3296,20 +3316,20 @@ class Conference(Persistent):
         return res
 
     def _generateNewContributionId( self ):
-        """Returns a new unique identifier for the current conference 
+        """Returns a new unique identifier for the current conference
             contributions
         """
         return str(self.__contribGenerator.newCount())
-    
+
     def genNewAbstractId(self):
         return str(self.__contribGenerator.newCount())
 
     def syncContribCounter(self):
         self.__contribGenerator.sync(self.getAbstractMgr()._getOldAbstractCounter())
         return self.__contribGenerator._getCount()
-    
+
     def addContribution(self,newContrib,id=""):
-        """Adds a new contribution object to the conference taking care of 
+        """Adds a new contribution object to the conference taking care of
             assigning a new unique id to it
         """
         if self.hasContribution(newContrib):
@@ -3360,7 +3380,7 @@ class Conference(Persistent):
         self.addContribution(contrib, contrib.getId())
         contrib.recover()
 
-    # Note: this kind of factories should never be used as they only allow to 
+    # Note: this kind of factories should never be used as they only allow to
     #   create a single type of contributions
     def newContribution( self, id=None ):
         """Creates and returns a new contribution object already added to the
@@ -3369,13 +3389,13 @@ class Conference(Persistent):
         c = Contribution()
         self.addContribution( c, id )
         return c
-    
+
     def getOwnContributionById( self, id ):
-        """Returns the contribution from the conference list corresponding to 
+        """Returns the contribution from the conference list corresponding to
             the unique contribution id specified
         """
         if self.contributions.has_key( id ):
-            return self.contributions[ id ] 
+            return self.contributions[ id ]
         return None
 
     def getContributionById( self, id ):
@@ -3384,27 +3404,27 @@ class Conference(Persistent):
         return self.contributions.get(str(id).strip(),None)
 
     def getContributionList(self):
-        """Returns a list of the conference contribution objects 
+        """Returns a list of the conference contribution objects
         """
         return self.contributions.values()
-    
+
     def getContributionListSortedById(self):
         """Returns a list of the conference contribution objects, sorted by their id
         """
         contributions = self.contributions.values()
         contributions.sort(key = lambda c: c.getId())
         return contributions
-    
+
     def getNumberOfContributions(self):
         return len(self.contributions)
-    
+
     def getProgramDescription(self):
         try:
             return self.programDescription
         except:
             self.programDescription = ""
         return self.programDescription
-    
+
     def setProgramDescription(self, txt):
         self.programDescription = txt
 
@@ -3419,7 +3439,7 @@ class Conference(Persistent):
         #XXX: The conference program shoul be isolated in a separated object
         if newTrack in self.program:
             return
-        
+
         trackId = newTrack.getId()
         if trackId == "not assigned":
             trackId = self._generateNewTrackId()
@@ -3480,7 +3500,7 @@ class Conference(Persistent):
         self.program.remove(track)
         self.program.insert(newPos,track)
         self.notifyModification()
-        
+
     def moveUpTrack(self,track):
         """
         """
@@ -3545,15 +3565,15 @@ class Conference(Persistent):
 
     def getDomainList( self ):
         return self.__ac.getRequiredDomainList()
-    
+
     def isProtected( self ):
         """Tells whether a conference is protected for accessing or not
         """
         return self.__ac.isProtected()
-        
+
     def getAccessProtectionLevel( self ):
         return self.__ac.getAccessProtectionLevel()
-    
+
     def isItselfProtected( self ):
         return self.__ac.isItselfProtected()
 
@@ -3572,12 +3592,12 @@ class Conference(Persistent):
         for owner in self.getOwnerList():
             if owner.hasAnyProtection():
                 return True
-            
+
         return False
-    
+
     def hasProtectedOwner( self ):
         return self.__ac._getFatherProtection()
-    
+
     def updateFatherProtection( self ):
         protectionBefore = self.__ac.isFatherProtected()
         self.__ac.setFatherProtection(0)
@@ -3587,9 +3607,9 @@ class Conference(Persistent):
 
         protectionAfter = self.__ac.isFatherProtected()
 
-        if protectionBefore != protectionAfter:             
+        if protectionBefore != protectionAfter:
             self.notifyOAIModification(updateChildren=True)
-            
+
     def setProtection( self, private ):
         """Allows to change the conference access protection
         """
@@ -3614,7 +3634,7 @@ class Conference(Persistent):
         """tells whether the specified access wrappers has access to the current
         object or any of its parts"""
         if self.canAccess( aw ):
-            return True        
+            return True
         for session in self.getSessionList():
             if session.canView( aw ):
                 return True
@@ -3624,7 +3644,7 @@ class Conference(Persistent):
         return False
 
     def isAllowedToAccess( self, av):
-        """tells if a user has privileges to access the current conference 
+        """tells if a user has privileges to access the current conference
             (independently that it is protected or not)
         """
         try:
@@ -3652,7 +3672,7 @@ class Conference(Persistent):
             if track.isCoordinator( av ):
                 self._v_isallowedtoaccess[av] = True
                 return True
-            
+
         self._v_isallowedtoaccess[av] = False
         return False
 
@@ -3675,9 +3695,9 @@ class Conference(Persistent):
                 cont.resetAccessCache(False, True)
             for mat in self.getMaterialList():
                 mat.resetAccessCache(False, True)
- 
+
     def canAccess( self, aw ):
-        """Tells whether an access wrapper is allowed to access the current 
+        """Tells whether an access wrapper is allowed to access the current
             conference: when the conference is protected, only if the user is a
             chair or is granted to access the conference, when the client ip is
             not restricted.
@@ -3737,7 +3757,7 @@ class Conference(Persistent):
                         return True
         self._v_cankeymodify[aw] = False
         return False
-        
+
     def grantModification( self, prin, sendEmail=True ):
         email = None
         if isinstance(prin, ConferenceChair):
@@ -3762,7 +3782,7 @@ class Conference(Persistent):
             if isinstance(prin, MaKaC.user.Avatar):
                 prin.linkTo(self, "manager")
         self.resetModifyCache()
-    
+
     def revokeModification( self, prin ):
         self.__ac.revokeModification( prin )
         if isinstance(prin, MaKaC.user.Avatar):
@@ -3787,7 +3807,7 @@ class Conference(Persistent):
                 return True
         self._v_canusermodify[av] = False
         return False
-            
+
     def resetModifyCache(self, UP=True, DOWN=True):
         if hasattr(self,"_v_canmodify"):
             del self._v_canmodify
@@ -3807,10 +3827,10 @@ class Conference(Persistent):
                 cont.resetModifyCache(False, True)
             for mat in self.getMaterialList():
                 mat.resetModifyCache(False, True)
-        
-        
+
+
     def canModify( self, aw ):
-        """Tells whether an access wrapper is allowed to modify the current 
+        """Tells whether an access wrapper is allowed to modify the current
             conference: only if the user is granted to modify the conference and
             he is accessing from an IP address which is not restricted.
         """
@@ -3825,13 +3845,13 @@ class Conference(Persistent):
 
     def getManagerList( self ):
         return self.__ac.getModifierList()
-    
+
     def addToRegistrars(self, av):
         self.getRegistrarList().append(av)
         self.notifyModification()
         if isinstance(av, MaKaC.user.Avatar):
             av.linkTo(self, "registrar")
-    
+
     def removeFromRegistrars(self, av):
         self.getRegistrarList().remove(av)
         self.notifyModification()
@@ -3844,14 +3864,14 @@ class Conference(Persistent):
             return av in self.getRegistrarList()
         except AttributeError:
             return False
-    
+
     def getRegistrarList(self):
         try:
             return self.__registrars
         except AttributeError:
             self.__registrars = []
             return self.__registrars
-        
+
     def canManageRegistration(self, av):
         return self.isRegistrar(av) or self.canUserModify(av)
 
@@ -3861,7 +3881,7 @@ class Conference(Persistent):
     def addMaterial( self, newMat ):
         newMat.setId( str(self.__materialGenerator.newCount()) )
         newMat.setOwner( self )
-        self.materials[ newMat.getId() ] =  newMat 
+        self.materials[ newMat.getId() ] =  newMat
         self.notifyModification()
 
     def removeMaterial( self, mat ):
@@ -3910,7 +3930,7 @@ class Conference(Persistent):
 
     def getMaterialList( self ):
         return self.materials.values()
-    
+
     def getAllMaterialList( self ):
         l = self.getMaterialList()
         if self.getPaper():
@@ -3952,7 +3972,7 @@ class Conference(Persistent):
         except AttributeError:
             self.paper = None
         return self.paper
-    
+
     def setSlides( self, newSlides ):
         if self.getSlides() != None:
             raise MaKaCError( _("The slides for this conference have already been set"), _("Conference"))
@@ -4040,7 +4060,7 @@ class Conference(Persistent):
         self.minutes=newMinutes
         self.minutes.setOwner( self )
         self.notifyModification()
-    
+
     def createMinutes( self ):
         if self.getMinutes() != None:
             raise MaKaCError( _("The minutes for this conference have already been created"), _("Conference"))
@@ -4074,13 +4094,13 @@ class Conference(Persistent):
         except AttributeError, e:
             self.minutes = None
         return self.minutes
-    
+
     def _setSchedule( self, sch=None ):
         self.__schedule=ConferenceSchedule(self)
         for session in self.getSessionList():
             for slot in session.getSlotList():
                 self.__schedule.addEntry(slot.getConfSchEntry())
-        
+
     def getSchedule( self ):
         try:
             if not self.__schedule:
@@ -4092,7 +4112,7 @@ class Conference(Persistent):
     def getDefaultStyle( self ):
         from MaKaC.webinterface import displayMgr
         return displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self).getDefaultStyle()
-    
+
     def clone( self, startDate, options, eventManager=None ):
         # startDate must be in the timezone of the event (to avoid problems with daylight-saving times)
         cat = self.getOwnerList()[0]
@@ -4101,7 +4121,7 @@ class Conference(Persistent):
             creator = managing
         else:
             creator = self.getCreator()
-        conf = cat.newConference(creator) 
+        conf = cat.newConference(creator)
         if managing is not None :
             conf.grantModification(managing)
         conf.setTitle(self.getTitle())
@@ -4128,7 +4148,7 @@ class Conference(Persistent):
         selfDispMgr=displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self)
         selfDispMgr.clone(conf)
         # Contribution Types' List (main detailes of the conference)
-        for t in self.getContribTypeList() :            
+        for t in self.getContribTypeList() :
             conf.addContribType(t.clone(conf))
         for item in self.getSections() :
             conf._sections.append(item)
@@ -4144,17 +4164,17 @@ class Conference(Persistent):
             db_root["webfactoryregistry"] = confRegistry
         meeting=False
         # if the event is a meeting or a lecture
-        if confRegistry.get(str(self.getId()), None) is not None :          
+        if confRegistry.get(str(self.getId()), None) is not None :
             meeting=True
             confRegistry[str(conf.getId())] = confRegistry[str(self.getId())]
-        # if it's a conference, no web factory is needed        
+        # if it's a conference, no web factory is needed
         # Tracks in a conference
         if options.get("tracks",False) :
             for tr in self.getTrackList() :
                 conf.addTrack(tr.clone(conf))
         # Meetings' and conferences' sessions cloning
         if options.get("sessions",False) :
-            for s in self.getSessionList() :                
+            for s in self.getSessionList() :
                 conf.addSession(s.clone(timeDelta, conf, options))
         # Materials' cloning
         if options.get("materials",False) :
@@ -4170,14 +4190,14 @@ class Conference(Persistent):
                 conf.setPoster(self.getPoster().clone(conf))
             if self.getMinutes() is not None:
                 conf.setMinutes(self.getMinutes().clone(conf))
-        # access and modification keys                  
+        # access and modification keys
         if options.get("keys", False) :
             conf.setAccessKey(self.getAccessKey())
             conf.setModifKey(self.getModifKey())
         # Access Control cloning
         if options.get("access",False) :
             conf.setProtection(self.isItselfProtected())
-            for mgr in self.getManagerList() : 
+            for mgr in self.getManagerList() :
                 conf.grantModification(mgr)
             for user in self.getAllowedToAccessList() :
                 conf.grantAccess(user)
@@ -4185,16 +4205,16 @@ class Conference(Persistent):
                 conf.addSessionCoordinatorRight(right)
             for domain in self.getDomainList():
                 conf.requireDomain(domain)
-        # conference's registration form 
+        # conference's registration form
         if options.get("registration",False) :
             conf.setRegistrationForm(self.getRegistrationForm().clone(conf))
-            
+
         # conference's evaluation
         if options.get("evaluation",False) :
             #Modify this, if you have now many evaluations.
             #You will have to clone every evaluations of this conference.
             conf.setEvaluations([self.getEvaluation().clone(conf)])
-        
+
         #conference's abstracts
         if options.get("abstracts",False) :
             conf.abstractMgr = self.abstractMgr.clone(conf)
@@ -4209,7 +4229,7 @@ class Conference(Persistent):
                 if cont.getSession() is None :
                     if not meeting:
                         nc = cont.clone(conf, options, timeDelta)
-                        conf.addContribution(nc)                
+                        conf.addContribution(nc)
                         if cont.isScheduled() :
                             sch.addEntry(nc.getSchEntry())
                     elif cont.isScheduled():
@@ -4217,12 +4237,12 @@ class Conference(Persistent):
                         nc = cont.clone(conf, options, timeDelta)
                         conf.addContribution(nc)
                         sch.addEntry(nc.getSchEntry())
-        # Participants' module settings and list cloning    
+        # Participants' module settings and list cloning
         if options.get("participants",False) :
             self.getParticipation().clone(conf, options, eventManager)
         conf.notifyModification()
         return conf
-    
+
     def newAlarm(self):
         al = Alarm(self)
         tl = HelperTaskList.getTaskListInstance()
@@ -4231,7 +4251,7 @@ class Conference(Persistent):
         self._p_changed = 1
         al.setOwner(self)
         return al
-    
+
     def removeAlarm(self, alarm):
         if alarm in self.alarmList.values():
             del self.alarmList[alarm.getId()]
@@ -4240,22 +4260,22 @@ class Conference(Persistent):
             tl.removeTask(alarm)
             alarm.setOwner(None)
             alarm.delete()
-    
+
     def addAlarm(self, alarm):
         tl = HelperTaskList.getTaskListInstance()
         tl.addTask(alarm)
         self.alarmList[alarm.getId()] = alarm
         self._p_changed = 1
         alarm.setOwner(self)
-    
+
     def recoverAlarm(self, alarm):
         self.addAlarm(alarm)
         alarm.conf = self
         alarm.recover()
-    
+
     def getAlarmList(self):
         return self.alarmList.values()
-    
+
     def getAlarmById(self, id):
         """For given id returns corresponding Alarm or None if not found."""
         return self.alarmList.get(id, None)
@@ -4284,7 +4304,7 @@ class Conference(Persistent):
             track.addCoordinator( av )
             self._trackCoordinators.indexCoordinator( av, track )
             self.notifyModification()
-            
+
     def removeTrackCoordinator( self, track, av ):
         """Removes a user as coordinator for a track.
         """
@@ -4305,7 +4325,7 @@ class Conference(Persistent):
             if not isinstance(contrib.getCurrentStatus(),ContribStatusWithdrawn):
                 for auth in contrib.getAuthorList():
                     self._authorIdx.index(auth)
-        
+
     def getAuthorIndex(self):
         try:
             if self._authorIdx:
@@ -4338,7 +4358,7 @@ class Conference(Persistent):
                 for subcontrib in contrib.getSubContributionList():
                     for auth in subcontrib.getSpeakerList():
                         self._speakerIdx.index(auth)
-        
+
     def getSpeakerIndex(self):
         try:
             if self._speakerIdx:
@@ -4356,7 +4376,7 @@ class Conference(Persistent):
         c=auth.getContribution()
         if c and not isinstance(c.getCurrentStatus(),ContribStatusWithdrawn):
             self.getSpeakerIndex().unindex(auth)
-    
+
     def getRegistrationForm(self):
         try:
             if self._registrationForm is None:
@@ -4364,11 +4384,11 @@ class Conference(Persistent):
         except AttributeError,e:
             self._registrationForm = registration.RegistrationForm(self)
         return self._registrationForm
-        
+
     def setRegistrationForm(self,rf):
         self._registrationForm = rf
         rf.setConference(self)
-        
+
     def removeRegistrationForm(self):
         try:
             self._registrationForm.delete()
@@ -4380,7 +4400,7 @@ class Conference(Persistent):
     def recoverRegistrationForm(self, rf):
         self.setRegistrationForm(rf)
         rf.recover()
-    
+
     def getEvaluation(self, id=0):
         ############################################################################
         #For the moment only one evaluation per conference is used.                #
@@ -4397,12 +4417,12 @@ class Conference(Persistent):
             raise Exception(_("Error with id: expected '%s', found '%s'.")%(id, self.getEvaluations()[0].getId()))
         else:
             return self.getEvaluations()[0]
-    
+
     def getEvaluations(self):
         if not hasattr(self, "_evaluations"):
-            self._evaluations = [Evaluation(self)]                
+            self._evaluations = [Evaluation(self)]
         return self._evaluations
-        
+
     def setEvaluations(self, evaluationsList):
         self._evaluations = evaluationsList
         for evaluation in self._evaluations:
@@ -4426,7 +4446,7 @@ class Conference(Persistent):
         if not hasattr(self, "_evaluationCounter"):
             self._evaluationCounter = Counter()
         return self._evaluationCounter
-        
+
     ## Videoconference bookings related
     def getBookings(self):
         try:
@@ -4436,33 +4456,33 @@ class Conference(Persistent):
             self._bookings = {}
             self.notifyModification()
         return self._bookings
-        
+
     def getBookingsList(self, sort = False):
         bl = self.getBookings().values()
         if sort:
             bl.sort()
         return bl
-     
+
     def _getBookingGenerator(self):
         try:
             return self._bookingGenerator
         except AttributeError, e:
             self._bookingGenerator = Counter()
             return self._bookingGenerator
-        
+
     def getNewBookingId(self):
         return str(self._getBookingGenerator().newCount())
-            
+
     def addBooking(self, bp):
         if (bp.getId() == ""):
             bp.setId(self.getNewBookingId())
         self.getBookings()[bp.getId()] = bp
         self.notifyModification()
-        
+
     def hasBooking(self,booking):
         return booking.getConference()==self and \
         self.getBookings().has_key(booking.getId())
-        
+
     def removeBooking(self, booking):
         if self.hasBooking(booking):
             deletion= booking.deleteBooking()
@@ -4480,17 +4500,17 @@ class Conference(Persistent):
         if self.getBookings().has_key(id):
             return self.getBookings()[id]
         return None
-    
+
     ## End of Videoconference bookings related
-        
+
     def getModPay(self):
         try:
             if self._modPay is None:
                 self._modPay= epayment.EPayment(self)
         except AttributeError,e:
             self._modPay= epayment.EPayment(self)
-        return self._modPay     
-  
+        return self._modPay
+
     def getRegistrants(self):
         try:
             if self._registrants:
@@ -4518,7 +4538,7 @@ class Conference(Persistent):
         rp.setOwner( self )
         self.getRegistrants()[rp.getId()] = rp
         self.notifyModification()
-        
+
     def hasRegistrant(self,rp):
         return rp.getConference()==self and \
                 self.getRegistrants().has_key(rp.getId())
@@ -4578,7 +4598,7 @@ class Conference(Persistent):
                         sessions.append(session)
                         break
         return sessions
-    
+
     def getManagedSession( self, av ):
         ls = []
         for session in self.getSessionList():
@@ -4603,7 +4623,7 @@ class Conference(Persistent):
         if self.sessions.has_key(session.getId()):
             session.addCoordinator(av)
             self._sessionCoordinators.index(av,session)
-            
+
     def removeSessionCoordinator( self, session, av ):
         """Removes a user as coordinator for a session.
         """
@@ -4615,7 +4635,7 @@ class Conference(Persistent):
         if self.sessions.has_key(session.getId()):
             session.removeCoordinator( av )
             self._sessionCoordinators.unindex(av,session)
-    
+
     def _getSubmitterIdx(self):
         try:
             return self._submitterIdx
@@ -4667,7 +4687,7 @@ class Conference(Persistent):
             if self._sections:
                 pass
         except AttributeError, e:
-            self._sections = ConfSectionsMgr().getSectionKeys() 
+            self._sections = ConfSectionsMgr().getSectionKeys()
             self.notifyModification()
         return self._sections
 
@@ -4711,7 +4731,7 @@ class Conference(Persistent):
 
     def setReportNumberHolder(self, rnh):
         self._reportNumberHolder=rnh
-                
+
     def getBadgeTemplateManager(self):
         try:
             if self.__badgeTemplateManager:
@@ -4719,24 +4739,24 @@ class Conference(Persistent):
         except AttributeError:
             self.__badgeTemplateManager = BadgeTemplateManager(self)
         return self.__badgeTemplateManager
-    
+
     def setBadgeTemplateManager(self, badgeTemplateManager):
         self.__badgeTemplateManager = badgeTemplateManager
-        
-    def getPosterTemplateManager(self):      
+
+    def getPosterTemplateManager(self):
         try:
             if self.__posterTemplateManager:
                 pass
         except AttributeError:
             self.__posterTemplateManager = PosterTemplateManager(self)
-        
+
         return self.__posterTemplateManager
-    
+
     def setPosterTemplateManager(self, posterTemplateManager):
         self.__posterTemplateManager = posterTemplateManager
-        
+
     def getCSBookingManager(self):
-        
+
         if PluginsHolder().hasPluginType("Collaboration"):
             if not hasattr(self, "_CSBookingManager"):
                 from MaKaC.plugins.Collaboration.base import CSBookingManager
@@ -4744,10 +4764,10 @@ class Conference(Persistent):
             return self._CSBookingManager
         else:
             return None
-        
-        
+
+
 class DefaultConference(Conference):
-    """ 'default' conference, which stores the 
+    """ 'default' conference, which stores the
      default templates for posters and badges
     """
 
@@ -4756,7 +4776,7 @@ class DefaultConference(Conference):
 
     def indexConf(self):
         pass
-    
+
     def __init__(self):
         """ Default constructor
         """
@@ -4765,10 +4785,10 @@ class DefaultConference(Conference):
         except IndexError:
             raise MaKaCError(_("""There are no admin users. The "default" conference that stores the template cannot be created.
                                 Please add at least 1 user to the admin list."""))
-        
+
 class ConferenceHolder( ObjectHolder ):
-    """Specialised ObjectHolder dealing with conference objects. It gives a 
-            common entry point and provides simple methods to access and 
+    """Specialised ObjectHolder dealing with conference objects. It gives a
+            common entry point and provides simple methods to access and
             maintain the collection of stored conferences (DB).
     """
     idxName = "conferences"
@@ -4792,17 +4812,17 @@ class ConferenceHolder( ObjectHolder ):
         """returns an object from the index which id corresponds to the one
             which is specified.
         """
-        
+
         if (id == "default"):
             return CategoryManager().getDefaultConference()
-        
+
         if type(id) is int:
             id = str(id)
         if self._getIdx().has_key(str(id)):
             return self._getIdx()[str(id)]
         else:
             raise MaKaCError( _("Event id %s does not exist") % str(id) )
-    
+
 class ConfSectionsMgr:
 
     def __init__(self):
@@ -4814,7 +4834,7 @@ class ConfSectionsMgr:
             "videoconference": _("Videoconference"), # only for meetings
             "collaboration": _("Collaboration"), # only for meetings
             "regForm": _("Registration Form") ,
-            "epay": _("e-payment") 
+            "epay": _("e-payment")
         }
 
     def hasSection(self, s):
@@ -4822,7 +4842,7 @@ class ConfSectionsMgr:
 
     def getSections(self):
         return self._sections
-    
+
     def getSectionList(self, sort=False):
         l=self._sections.values()
         if sort:
@@ -4836,14 +4856,14 @@ class ConfSectionsMgr:
         if self._sections.has_key(id):
             return self._sections[id]
         return None
-    
-    
+
+
 class DateChangeObserver(object):
     """ Base class for objects who want to be notified of a change in the start date / end date
         of an object (for example a Conference object).
         Inheriting classes have to implement the notifyStartDateChange and notifyEndDateChange methods,
         and probably the __init__ method too.
-    """ 
+    """
     def getObserverName(self):
         name = "'observer of class" + self.__class__.__name__
         try:
@@ -4852,13 +4872,13 @@ class DateChangeObserver(object):
         except AttributeError:
             pass
         return name
-    
+
     def notifyStartDateChange(self, oldStartDate, newStartDate):
         """ To be implemented by inheriting classes
             Notifies the observer that the start date of the object it is attached to has changed
         """
         raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyStartDateChange")
-    
+
     def notifyEndDateChange(self, oldEndDate, newEndDate):
         """ To be implemented by inheriting classes
             Notifies the observer that the end date of the object it is attached to has changed
@@ -4871,21 +4891,21 @@ class DateChangeObserver(object):
         """
         raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyTimezoneChange")
 
-    
-    
+
+
 class SessionChair(ConferenceParticipation):
-    
+
     def __init__(self):
         self._session=None
         self._id=""
         ConferenceParticipation.__init__(self)
-        
+
     def _notifyModification( self ):
         if self._session != None:
             self._session.notifyModification()
 
     def clone(self):
-        chair = SessionChair()   
+        chair = SessionChair()
         chair.setValues(self.getValues())
         return chair
 
@@ -4917,7 +4937,7 @@ class SessionChair(ConferenceParticipation):
 
 
 class SlotChair(ConferenceParticipation):
-    
+
     def __init__(self):
         self._slot=None
         self._id=""
@@ -4928,10 +4948,10 @@ class SlotChair(ConferenceParticipation):
             self._slot.notifyModification()
 
     def clone(self):
-        chair = SlotChair()        
-        chair.setValues(self.getValues())                        
+        chair = SlotChair()
+        chair.setValues(self.getValues())
         return chair
-        
+
     def getSlot(self):
         return self._slot
 
@@ -4965,7 +4985,7 @@ class SlotChair(ConferenceParticipation):
         return loc
 
 class SessionCoordinatorRights:
-    
+
     def __init__(self):
         self._rights = {"modifContribs": _("Modify the contributions"), \
                 "unrestrictedSessionTT": _("Unrestricted session timetable management")
@@ -4976,7 +4996,7 @@ class SessionCoordinatorRights:
 
     def getRights(self):
         return self._rights
-    
+
     def getRightList(self, sort=False):
         l=self._rights.values()
         if sort:
@@ -4990,16 +5010,16 @@ class SessionCoordinatorRights:
         if self._rights.has_key(id):
             return self._rights[id]
         return None
-            
+
 class SCIndex(Persistent):
     """Index for conference session coordinators.
 
         This class allows to index conference session coordinators so the owner
-        can answer optimally to the query if a user is coordinating 
+        can answer optimally to the query if a user is coordinating
         any conference session.
         It is implemented by simply using a BTree where the Avatar id is used
-        as key (because it is unique and non variable) and a list of 
-        coordinated sessions is kept as keys. It is the responsability of the 
+        as key (because it is unique and non variable) and a list of
+        coordinated sessions is kept as keys. It is the responsability of the
         index owner (conference) to keep it up-to-date i.e. notify session
         coordinator additions and removals.
     """
@@ -5019,7 +5039,7 @@ class SCIndex(Persistent):
         """Registers in the index a coordinator of a session.
         """
         if av == None or session == None:
-            return 
+            return
         if not self._idx.has_key(av.getId()):
             l=[]
             self._idx[av.getId()]=l
@@ -5031,7 +5051,7 @@ class SCIndex(Persistent):
 
     def unindex(self,av,session):
         if av==None or session==None:
-            return 
+            return
         l=self._idx.get(av.getId(),[])
         if session in l:
             l.remove(session)
@@ -5042,16 +5062,16 @@ class SCIndex(Persistent):
 
 
 class Session(Persistent):
-    """This class implements a conference session, being the different parts 
-        in which the conference can be divided and the contributions can be 
+    """This class implements a conference session, being the different parts
+        in which the conference can be divided and the contributions can be
         organised in. The class contains necessary attributes to store session
         basic data and provides the operations related to sessions. In
         principle, a session has no sense to exist without being related to a
         conference but it is allowed for flexibility.
     """
-    
+
     def __init__(self, **sessionData):
-        """Class constructor. Initialise the class attributes to the default 
+        """Class constructor. Initialise the class attributes to the default
             values.
            Params:
             sessionData -- (Dict) Contains the data the session object has to
@@ -5080,7 +5100,7 @@ class Session(Persistent):
         self._contributionDuration=timedelta(minutes=20)
         self.__ac=AccessController()
         self.materials={}
-        self.__materialGenerator=Counter() 
+        self.__materialGenerator=Counter()
         self.minutes=None
         self._comments = ""
         self.slots={}
@@ -5101,7 +5121,7 @@ class Session(Persistent):
 
     def getTimezone( self ):
         return self.getConference().getTimezone()
-    
+
     def isFullyPublic( self ):
         if hasattr(self, "_fullyPublic"):
             return self._fullyPublic
@@ -5140,7 +5160,7 @@ class Session(Persistent):
 
     def setKeywords(self, keywords):
         self._keywords = keywords
-        
+
     def notifyModification( self, date=None ):
         """Method called to notify the current session has been modified.
         """
@@ -5151,7 +5171,7 @@ class Session(Persistent):
         if parent:
             parent.notifyModification()
         self._p_changed=1
-    
+
     def getModificationDate( self ):
         """Returns the date in which the session was last modified"""
         try:
@@ -5159,7 +5179,7 @@ class Session(Persistent):
         except:
             self._modificationDS = nowutc()
             return self._modificationDS
-    
+
     def getCreationDate( self ):
         """Returns the date in which the session was created"""
         try:
@@ -5189,9 +5209,9 @@ class Session(Persistent):
             data["contribution %s"%s.getId()] = s.getTitle()
         for c in self.getContributionList() :
             data["contribution %s"%c.getId()] = c.getTitle()
-        
+
         return data
-        
+
     def getEnableSessionSlots(self):
         try:
             return self.getConference().getEnableSessionSlots()
@@ -5224,14 +5244,14 @@ class Session(Persistent):
         except:
             self._closed = False
             return False
-            
+
     def setClosed( self, closed=True ):
         self._closed = closed
         self.notifyModification()
 
     def includeInConference(self,conf,newId):
         self.conference=conf
-        self.id=newId 
+        self.id=newId
         if self.getAutoSolveConflict():
             check=2
         else:
@@ -5245,12 +5265,12 @@ class Session(Persistent):
         while len(self.getConvenerList()) > 0:
             self.removeConvener(self.getConvenerList()[0])
         while len(self.getMaterialList()) > 0:
-            self.removeMaterial(self.getMaterialList()[0])  
+            self.removeMaterial(self.getMaterialList()[0])
         self.removeMinutes()
         for c in self.getCoordinatorList()[:]:
-            self.removeCoordinator(c)            
+            self.removeCoordinator(c)
         while len(self.contributions.values())>0:
-            self.removeContribution(self.contributions.values()[0])                      
+            self.removeContribution(self.contributions.values()[0])
         while len(self.slots.values())>0:
             self._removeSlot(self.slots.values()[0])
         if self.getConference() is not None:
@@ -5271,7 +5291,7 @@ class Session(Persistent):
         TrashCanManager().remove(self)
 
     def getLocator( self ):
-        """Gives back a globaly unique identification encapsulated in a Locator 
+        """Gives back a globaly unique identification encapsulated in a Locator
             object for the session instance
         """
         if self.conference == None:
@@ -5279,15 +5299,15 @@ class Session(Persistent):
         lconf = self.conference.getLocator()
         lconf["sessionId"] = self.getId()
         return lconf
-    
+
     def getConference( self ):
         return self.conference
-    
+
     def getSession( self ):
         return self
 
     def getOwner( self ):
-        return self.getConference() 
+        return self.getConference()
 
     @Retrieves (['MaKaC.conference.Session'],'id')
     def getId( self ):
@@ -5297,7 +5317,7 @@ class Session(Persistent):
         """returns (string) the unique identiffier of the item"""
         """used mainly in the web session access key table"""
         return "%ss%s" % (self.getConference().getUniqueId(),self.id)
-    
+
     def getModifKey( self ):
         return self.getConference().getModifKey()
 
@@ -5310,19 +5330,19 @@ class Session(Persistent):
         except:
             self._contributionDuration = timedelta(minutes=20)
             return self._contributionDuration
-    
+
     def setContribDuration(self, hour=0, min=20, dur=None):
         if dur is not None:
             self._contributionDuration=dur
         else:
             self._contributionDuration = timedelta(hours=hour,minutes=min)
-    
+
     def fit(self):
         if not self.getConference().getEnableSessionSlots():
             self.getSlotList()[0].fit()
         self.setStartDate(self.getMinSlotStartDate(),0,0)
         self.setEndDate(self.getMaxSlotEndDate(),0)
-    
+
     def addSlot(self,newSlot):
         if self.getAutoSolveConflict():
             check=2
@@ -5332,18 +5352,18 @@ class Session(Persistent):
         if id == "not assigned":
             newSlot.setId(str(self.__slotGenerator.newCount()))
         self.slots[newSlot.getId()]=newSlot
-        self.getSchedule().addEntry(newSlot.getSessionSchEntry(),check)        
+        self.getSchedule().addEntry(newSlot.getSessionSchEntry(),check)
         if self.getConference() is not None:
             self.getConference().getSchedule().addEntry(newSlot.getConfSchEntry(),check)
         self.notifyModification()
-    
+
     def _removeSlot(self,slot):
         del self.slots[slot.getId()]
         self.getSchedule().removeEntry(slot.getSessionSchEntry())
         if self.getConference() is not None:
             self.getConference().getSchedule().removeEntry(slot.getConfSchEntry())
         slot.delete()
-    
+
     def removeSlot(self, slot, force=False):
         if self.slots.has_key(slot.getId()):
             if len(self.slots)==1 and not force:
@@ -5375,10 +5395,10 @@ class Session(Persistent):
             smin = slot.getStartDate().minute
             if (shour, smin) < min:
                 min = (shour, smin)
-        return min    
-        
+        return min
+
     def getMaxSlotEndTime(self):
-        max = (-1,-1) 
+        max = (-1,-1)
         for slot in self.getSlotList():
             if slot.isMoreThanDay():
                 return (23, 59)
@@ -5398,7 +5418,7 @@ class Session(Persistent):
                 if slot.getStartDate() < sDate:
                     sDate = slot.getStartDate()
             return sDate
-            
+
     def getMaxSlotEndDate(self):
         slotList = self.getSlotList()
         if len(slotList)==0:
@@ -5429,20 +5449,20 @@ class Session(Persistent):
         if color is None:
             return self._textColor
         return color
-    
+
     def setValues( self, sessionData,check=1,moveEntries=0 ):
         """Sets all the values of the current session object from a dictionary
             containing the following key-value pairs:
-                title-(str) 
+                title-(str)
                 description-(str)
                 locationName-(str) => name of the location, if not specified
                         it will be set to the conference location name.
                 locationAddress-(str)
                 roomName-(str) => name of the room, if not specified it will
                     be set to the conference room name.
-                sDate - (datetime) => starting date of the session, if not 
+                sDate - (datetime) => starting date of the session, if not
                         specified it will be set to now.
-                eDate - (datetime) => ending date of the session, if not 
+                eDate - (datetime) => ending date of the session, if not
                         specified the end date will be set to the start one
                 durHour - (int) => hours of duration for each entry in the session
                                    by default.
@@ -5453,7 +5473,7 @@ class Session(Persistent):
                     0: no check at all
                     1: check and raise error in case of problem
                     2: check and adapt the owner dates
-           Please, note that this method sets ALL values which means that if 
+           Please, note that this method sets ALL values which means that if
             the given dictionary doesn't contain any of the keys the value
             will set to a default value.
         """
@@ -5480,7 +5500,7 @@ class Session(Persistent):
                 self.setTextColor(self._getCorrectTextColor(textcolor))
         self.setTextColorToLinks(sessionData.has_key("textcolortolinks"))
         #if the location is not defined we set the location of the session
-        #   to None so it will be considered to be the same as for the 
+        #   to None so it will be considered to be the same as for the
         #   conference
         if sessionData.get( "locationName", "" ).strip() == "":
             self.setLocation( None )
@@ -5494,14 +5514,14 @@ class Session(Persistent):
             loc.setName( sessionData["locationName"] )
             loc.setAddress( sessionData.get("locationAddress", "") )
         #same as for the location
-        if sessionData.get( "roomName", "" ).strip() == "":            
-                self.setRoom( None )        
+        if sessionData.get( "roomName", "" ).strip() == "":
+                self.setRoom( None )
         else:
             room = self.getOwnRoom()
             if not room:
                 room = CustomRoom()
             self.setRoom( room )
-            room.setName( sessionData["roomName"] )        
+            room.setName( sessionData["roomName"] )
         if sessionData.get("sDate",None) is not None:
             self.setStartDate(sessionData["sDate"],check,moveEntries=moveEntries)
         if sessionData.get("eDate",None) is not None:
@@ -5536,8 +5556,8 @@ class Session(Persistent):
                     e.move(e.getStartDate() + diff)
             self.getSchedule().reSchedule()
             self.getConference().getSchedule().reSchedule()
-            self.notifyModification()        
-    
+            self.notifyModification()
+
     def clone(self, deltaTime, conf, options):
         ses = Session()
         conf.addSession(ses,check=0)
@@ -5565,7 +5585,7 @@ class Session(Persistent):
         # Access Control cloning
         if options.get("access", False) :
             ses.setProtection(self.isItselfProtected())
-            for mgr in self.getManagerList() : 
+            for mgr in self.getManagerList() :
                 ses.grantModification(mgr)
             for user in self.getAllowedToAccessList() :
                 ses.grantAccess(user)
@@ -5573,16 +5593,16 @@ class Session(Persistent):
                 ses.requireDomain(domain)
             for coord in self.getCoordinatorList():
                 ses.addCoordinator(coord)
-            
-        #slots in timeschedule 
+
+        #slots in timeschedule
         for slot in self.getSlotList() :
-            newslot = slot.clone(ses, options)            
+            newslot = slot.clone(ses, options)
             ses.addSlot(newslot)
-        
+
         ses.notifyModification()
-        
+
         return ses
-    
+
 
     def setTitle( self, newTitle ):
         self.title = newTitle
@@ -5644,13 +5664,13 @@ class Session(Persistent):
 
     def setTextColorToLinks(self, v):
         self._textColorToLink=v
-    
+
     def getStartDate(self):
         return self.startDate
 
     def getAdjustedStartDate(self,tz=None):
         if not tz:
-            tz = self.getConference().getTimezone() 
+            tz = self.getConference().getTimezone()
         if tz not in common_timezones:
             tz = 'UTC'
         return self.startDate.astimezone(timezone(tz))
@@ -5670,7 +5690,7 @@ class Session(Persistent):
                 raise ParentTimingError( _("The session starting date cannot be prior to the event starting date"), _("Session"))
             elif check==2:
                 self.getConference().setStartDate(sdate,check=0,moveEntries=0)
-                            
+
     def setStartDate(self,newDate,check=1,moveEntries=0):
         """
            moveEntries parameter:
@@ -5709,7 +5729,7 @@ class Session(Persistent):
 
     def getEndDate(self):
         return self.startDate+self.duration
- 
+
     ####################################
     # Fermi timezone awareness         #
     ####################################
@@ -5813,11 +5833,11 @@ class Session(Persistent):
         if type(day) is datetime:
             day = day.astimezone(timezone(tz))
         if day.date() < self.getStartDate().astimezone(timezone(tz)).date() or day.date() > self.getEndDate().astimezone(timezone(tz)).date() :
-            return None        
+            return None
         maxTime = self.getStartDate();
         for e in self.getSchedule().getEntriesOnDay(day) :
             if e.getEndDate() > maxTime :
-                maxTime = e.getEndDate()        
+                maxTime = e.getEndDate()
         if maxTime == self.getStartDate() :
             maxTime = day.replace(hour=19, minute=0)#datetime.combine(day,time(19,0))
             if maxTime > self.getEndDate() :
@@ -5830,7 +5850,7 @@ class Session(Persistent):
         information should be inherited
         """
         return self.getConference()
-        
+
     def getLocation( self ):
         if self.getOwnLocation():
             return self.getOwnLocation()
@@ -5878,8 +5898,8 @@ class Session(Persistent):
         self.notifyModification()
 
     def getLocationList(self):
-        """Method returning a list of "location" objects which contain the 
-            information about the different places the conference is gonna 
+        """Method returning a list of "location" objects which contain the
+            information about the different places the conference is gonna
             happen
         """
         return self.places
@@ -5898,7 +5918,7 @@ class Session(Persistent):
                 newConv=SessionChair()
                 newConv.setDataFromAvatar(oc)
                 self._addConvener(newConv)
-            
+
     def getConvenerList(self):
         self._resetConveners()
         return self._conveners
@@ -5912,7 +5932,7 @@ class Session(Persistent):
         except AttributeError:
             self._convenerGen=Counter()
         id = newConv.getId()
-        if id == "":        
+        if id == "":
             id=int(self._convenerGen.newCount())
         newConv.includeInSession(self,id)
         self._conveners.append(newConv)
@@ -5943,7 +5963,7 @@ class Session(Persistent):
     def recoverConvener(self, con):
         self.addConvener(con)
         con.recover()
-    
+
     def getConvenerById(self,id):
         id=int(id)
         for conv in self._conveners:
@@ -5962,7 +5982,7 @@ class Session(Persistent):
 
     def setConvenerText( self, newText ):
         self.convenerText = newText.strip()
-    
+
     def appendConvenerText( self, newText ):
         self.setConvenerText( "%s, %s"%(self.getConvenerText(), newText.strip()) )
 
@@ -5980,7 +6000,7 @@ class Session(Persistent):
     def hasContribution(self,contrib):
         return contrib.getSession()==self and \
                 self.contributions.has_key(contrib.getId())
-    
+
     def removeContribution(self,contrib):
         """Removes the indicated contribution from the session
         """
@@ -5992,7 +6012,7 @@ class Session(Persistent):
             sch.removeEntry(contrib.getSchEntry())
         del self.contributions[contrib.getId()]
         contrib.setSession(None)
-        
+
         self.notifyModification()
 
     def newContribution( self, params = None, id=None ):
@@ -6005,12 +6025,12 @@ class Session(Persistent):
     def getContributionById(self,id):
         id=str(id).strip()
         if self.contributions.has_key( id ):
-            return self.contributions[ id ] 
+            return self.contributions[ id ]
         return None
 
     def getContributionList( self ):
         return self.contributions.values()
-    
+
     def canIPAccess( self, ip ):
         try:
             return self._v_canipaccess[ip]
@@ -6026,17 +6046,17 @@ class Session(Persistent):
             return self._v_canipaccess[ip]
         self._v_canipaccess[ip] = True
         return self._v_canipaccess[ip]
-    
+
     def isProtected( self ):
         # tells if a session is protected or not
         return (self.hasProtectedOwner() + self.getAccessProtectionLevel()) > 0
-        
+
     def getAccessProtectionLevel( self ):
         return self.__ac.getAccessProtectionLevel()
-    
+
     def isItselfProtected( self ):
         return self.__ac.isItselfProtected()
-        
+
     def hasAnyProtection( self ):
         """Tells whether a session has any kind of protection over it:
             access or domain protection.
@@ -6047,14 +6067,14 @@ class Session(Persistent):
             return True
         if self.getAccessProtectionLevel() == -1:
             return False
-        
+
         return self.getOwner().hasAnyProtection()
-    
+
     def hasProtectedOwner( self ):
         if self.getOwner() != None:
             return self.getOwner().isProtected()
         return False
-    
+
     def setProtection( self, private ):
         self.__ac.setProtection( private )
         self.updateFullyPublic()
@@ -6097,7 +6117,7 @@ class Session(Persistent):
             return True
         self._v_isallowedtoaccess[user] = False
         return False
-        
+
     def canAccess( self, aw ):
         try:
             return self._v_canaccess[aw]
@@ -6129,7 +6149,7 @@ class Session(Persistent):
                 cont.resetModifyCache(False, True)
             for mat in self.getMaterialList():
                 mat.resetAccessCache(False, True)
- 
+
     def resetModifyCache(self, UP=True, DOWN=True):
         if hasattr(self,"_v_canmodify"):
             del self._v_canmodify
@@ -6144,12 +6164,12 @@ class Session(Persistent):
                 cont.resetModifyCache(False, True)
             for mat in self.getMaterialList():
                 mat.resetModifyCache(False, True)
-    
+
     def hasProtectedOwner( self ):
         if self.getOwner() != None:
             return self.getOwner().isProtected()
         return False
-    
+
     def grantModification( self, sb, sendEmail=True ):
         if isinstance(sb, SessionChair):
             ah = AvatarHolder()
@@ -6179,7 +6199,7 @@ class Session(Persistent):
             if isinstance(sb, MaKaC.user.Avatar):
                 sb.linkTo(self, "manager")
             self.resetModifyCache()
-    
+
     def revokeModification( self, prin ):
         self.__ac.revokeModification( prin )
         if isinstance(prin, MaKaC.user.Avatar):
@@ -6198,7 +6218,7 @@ class Session(Persistent):
 
 
     def canUserModify( self, av ):
-        """Tells whether a user is allowed to modify the current session: 
+        """Tells whether a user is allowed to modify the current session:
             only if the user is granted to modify the session or the user
             can modify the corresponding conference.
         """
@@ -6213,14 +6233,14 @@ class Session(Persistent):
 
     def getManagerList( self ):
         return self.__ac.getModifierList()
-    
+
     def getAllowedToAccessList( self ):
         return self.__ac.getAccessList()
-    
+
     def addMaterial( self, newMat ):
         newMat.setId( str(self.__materialGenerator.newCount()) )
         newMat.setOwner( self )
-        self.materials[ newMat.getId() ] =  newMat 
+        self.materials[ newMat.getId() ] =  newMat
         self.notifyModification()
 
     def removeMaterial( self, mat ):
@@ -6264,7 +6284,7 @@ class Session(Persistent):
         sl=self.getSlotList()
         for slot in self.getSlotList():
             self.__schedule.addEntry(slot.getSchEntry())
-        
+
     def getSchedule( self ):
         try:
             if self.__schedule is None or not isinstance(self.__schedule,SessionSchedule):
@@ -6272,10 +6292,10 @@ class Session(Persistent):
         except AttributeError, e:
             self._setSchedule()
         return self.__schedule
-    
+
     def getMasterSchedule( self ):
         return self.getOwner().getSchedule()
-    
+
     def requireDomain( self, dom ):
         self.__ac.requireDomain( dom )
         self.resetAccessCache()
@@ -6297,7 +6317,7 @@ class Session(Persistent):
         except AttributeError,e:
             self._comments=""
         return self._comments
-    
+
     def createMinutes( self ):
         if self.getMinutes() != None:
             raise MaKaCError( _("The minutes for this session have already been created"), _("Session"))
@@ -6340,18 +6360,18 @@ class Session(Persistent):
         if self.getConference() is not None:
             self.getConference().addSessionCoordinator(self,av)
         self.resetModifyCache()
-    
+
     def getCoordinatorEmailList(self):
         try:
             return self._coordinatorsEmail
         except:
             self._coordinatorsEmail = []
         return self._coordinatorsEmail
-    
+
     def _addCoordinatorEmail(self, email):
         if not email in self.getCoordinatorEmailList():
             self.getCoordinatorEmailList().append(email)
-    
+
     def removeCoordinatorEmail(self, email):
         if email in self.getCoordinatorEmailList():
             if email in self.getCoordinatorEmailList():
@@ -6360,10 +6380,10 @@ class Session(Persistent):
 
     def addCoordinator( self, sb, sendEmail=True ):
         """Grants coordination privileges to user.
-        
+
             Arguments:
                 sb -- It can be either:
-                        (MaKaC.user.Avatar) the user to which 
+                        (MaKaC.user.Avatar) the user to which
                         coordination privileges must be granted.
                       or:
                         (MaKaC.conference.SessionChair) a non-existing which
@@ -6374,25 +6394,25 @@ class Session(Persistent):
                 pass
         except AttributeError, e:
             self._coordinators=OOBTree()
-        
+
         if isinstance(sb, SessionChair):
             ah = AvatarHolder()
             results=ah.match({"email":sb.getEmail()}, exact=1)
             r=None
-            
+
             for i in results:
                 if sb.getEmail().lower().strip() in [j.lower().strip() for j in i.getEmails()]:
                     r=i
                     break
-            
+
             if r is not None and r.isActivated():
-                
-                self._addCoordinator(r) 
+
+                self._addCoordinator(r)
                 r.linkTo(self, "coordinator")
             else:
-                self.getConference().getPendingQueuesMgr().addPendingCoordinator(sb)                
+                self.getConference().getPendingQueuesMgr().addPendingCoordinator(sb)
         else:
-            self._addCoordinator(sb)  
+            self._addCoordinator(sb)
             if isinstance(sb, MaKaC.user.Avatar):
                 sb.linkTo(self, "coordinator")
 
@@ -6400,7 +6420,7 @@ class Session(Persistent):
         """Revokes coordination privileges to user.
 
            Arguments:
-            av -- (MaKaC.user.Avatar) user for which coordination privileges 
+            av -- (MaKaC.user.Avatar) user for which coordination privileges
                     must be revoked
         """
         try:
@@ -6417,14 +6437,14 @@ class Session(Persistent):
         if self.getConference() is not None:
             self.getConference().removeSessionCoordinator(self,av)
         self.resetModifyCache()
-    
+
     def isCoordinator( self, av ):
         """Tells whether the specified user is a coordinator of the session.
 
            Arguments:
             av -- (MaKaC.user.Avatar) user to be checked
-           
-           Return value: (boolean)  
+
+           Return value: (boolean)
         """
         try:
             if self._coordinators:
@@ -6441,7 +6461,7 @@ class Session(Persistent):
                     self.removeCoordinatorEmail(email)
                     ret = True
         return ret
-        
+
 
     def getCoordinatorList( self ):
         """Return all users which have privileges to coordinate the session.
@@ -6459,20 +6479,20 @@ class Session(Persistent):
     def canCoordinate(self,aw, right=""):
         """Tells if a user has coordination privileges.
 
-            Only session coordinators have coordination privileges over a 
+            Only session coordinators have coordination privileges over a
             session.
-            
+
             Params:
-                aw -- (MaKaC.accessControl.AccessWrapper) User access 
+                aw -- (MaKaC.accessControl.AccessWrapper) User access
                     information for which the coordination privileges must be
                     checked.
-            
+
             Return value: (boolean)
         """
         if right != "":
             return self.isCoordinator(aw.getUser()) and self.getConference().hasSessionCoordinatorRight(right)
         return self.isCoordinator(aw.getUser())
-        
+
 
     def getScheduleType(self):
         try:
@@ -6494,7 +6514,7 @@ class Session(Persistent):
         self._ttType=t
         for slot in self.getSlotList():
             slot.setScheduleType(t)
-            
+
     def getAccessController(self):
         return self.__ac
 
@@ -6529,7 +6549,7 @@ class SessionSlot(Persistent):
 
     def getTimezone( self ):
         return self.getConference().getTimezone()
-    
+
     def getLogInfo(self):
         data = {}
         data["id"] = self.id
@@ -6548,24 +6568,24 @@ class SessionSlot(Persistent):
         for c in self._conveners :
             data["convener %s"%c.getId()] = c.getFullName()
         return data
-        
+
     def clone(self,session, options):
-        
+
         slot = SessionSlot(session)
         slot.session = session
         slot.setTitle(self.getTitle())
-        
+
         timeDifference = session.getStartDate() - self.getSession().getStartDate()
         slot.setStartDate(self.getStartDate() + timeDifference)
         slot.setDuration(dur=self.getDuration())
-        
+
         #places
         if self.getOwnLocation() is not None:
             slot.setLocation(self.getOwnLocation().clone())
         #rooms
         if self.getOwnRoom() is not None:
             slot.setRoom(self.getOwnRoom().clone())
-        
+
         #chairs = conveners
         for ch in self.getOwnConvenerList() :
             slot.addConvener(ch.clone())
@@ -6580,21 +6600,21 @@ class SessionSlot(Persistent):
                     contrib = entry.getOwner()
                     newcontrib = contrib.clone(session, options, timeDifference)
                     slot.getSchedule().addEntry(newcontrib.getSchEntry(),0)
-        
+
         slot.setContribDuration(0, 0, self.getContribDuration())
         slot.notifyModification()
-        
+
         return slot
-       
+
     def fit( self ):
         """
-        sets the start date of the slot to the start date of the first son 
+        sets the start date of the slot to the start date of the first son
         and the end date to the end date of the last son
         """
         sch = self.getSchedule()
         entries = sch.getEntries()
         if len(entries) > 0:
-            self.setStartDate(entries[0].getStartDate(),0,0)            
+            self.setStartDate(entries[0].getStartDate(),0,0)
             self.setEndDate(sch.calculateEndDate(), check=0)
 
     def recalculateTimes( self, type, diff ):
@@ -6631,7 +6651,7 @@ class SessionSlot(Persistent):
                 st=entry.getEndDate()+diff
             if len(entries) != 0 and self.getEndDate() < st:
                 self.setEndDate(st,2)
-            
+
     def setValues(self,data,check=1, moveEntriesBelow=0):
         """check parameter:
             0: no check at all
@@ -6678,7 +6698,7 @@ class SessionSlot(Persistent):
                 data.get("sDay","")!="" and data.get("sHour","")!="" and \
                 data.get("sMinute","")!="":
             sDate = timezone(confTZ).localize(datetime(int(data["sYear"]),int(data["sMonth"]),
-                                        int(data["sDay"]),int(data["sHour"]), 
+                                        int(data["sDay"]),int(data["sHour"]),
                                         int(data["sMinute"])))
         if data.get("eDate",None) is not None:
             ed = data.get("eDate")
@@ -6687,7 +6707,7 @@ class SessionSlot(Persistent):
                 data.get("eDay","")!="" and data.get("eHour","")!="" and \
                 data.get("eMinute","")!="":
             eDate = timezone(confTZ).localize(datetime(int(data["eYear"]),int(data["eMonth"]),
-                                        int(data["eDay"]),int(data["eHour"]), 
+                                        int(data["eDay"]),int(data["eHour"]),
                                         int(data["eMinute"])))
         if sDate != None and eDate != None:
             sDateUTC = sDate.astimezone(timezone('UTC'))
@@ -6747,34 +6767,34 @@ class SessionSlot(Persistent):
         l=self.getSession().getLocator()
         l["slotId"]=self.getId()
         return l
-    
+
     def getConference( self ):
         return self.getSession().getConference()
-    
+
     def getSession(self):
         return self.session
 
     def getOwner( self ):
-        return self.session 
+        return self.session
 
     def _setSchedule(self,klass):
         old_sch=self.getSchedule()
         self._schedule=klass(self)
         #after removing old entries, one could try to fit them into the new
         #   schedule, but there are several things to consider which are left
-        #   for later implementation (breaks, entries not fitting in the 
+        #   for later implementation (breaks, entries not fitting in the
         #   slots,...)
         while len(old_sch.getEntries())>0:
             entry=old_sch.getEntries()[0]
             old_sch.removeEntry(entry)
         self.notifyModification()
-    
+
     def getSchedule(self):
         return self._schedule
-    
+
     def getMasterSchedule( self ):
         return self.getOwner().getSchedule()
-    
+
     def getConfSchEntry( self ):
         try:
             if self._confSchEntry:
@@ -6816,7 +6836,7 @@ class SessionSlot(Persistent):
     @Retrieves(['MaKaC.conference.SessionSlot'], 'description')
     def getDescription(self):
         return self.getSession().getDescription()
-    
+
     def setDates(self,sDate,eDate,check=1,moveEntries=0):
         """check parameter:
             0: no check at all
@@ -6834,7 +6854,7 @@ class SessionSlot(Persistent):
     def getEntries(self):
         entriesList = self.getSchedule().getEntries()
         return entriesList
-        
+
     def move(self, sDate):
         diff=sDate-self.startDate
         self.startDate = sDate
@@ -6909,11 +6929,11 @@ class SessionSlot(Persistent):
     @Retrieves(['MaKaC.conference.SessionSlot'], 'startDate', Conversion.datetime)
     def getAdjustedStartDate(self,tz=None):
         if not tz:
-            tz = self.getConference().getTimezone() 
+            tz = self.getConference().getTimezone()
         if tz not in common_timezones:
             tz = 'UTC'
         return self.startDate.astimezone(timezone(tz))
-    
+
     def getEndDate( self ):
         if self.startDate is None:
             return None
@@ -6922,7 +6942,7 @@ class SessionSlot(Persistent):
     @Retrieves(['MaKaC.conference.SessionSlot'], 'endDate', Conversion.datetime)
     def getAdjustedEndDate( self, tz=None ):
         if not tz:
-            tz = self.getConference().getTimezone() 
+            tz = self.getConference().getTimezone()
         if tz not in common_timezones:
             tz = 'UTC'
         if self.getEndDate():
@@ -6961,7 +6981,7 @@ class SessionSlot(Persistent):
                             sessionEndDate.astimezone(tz).strftime('%Y-%m-%d %H:%M')),\
                             _("Slot"))
                 elif check==2:
-                    self.getSession().setEndDate(eDate,check)            
+                    self.getSession().setEndDate(eDate,check)
             if eDate.astimezone(tz).date() > self.startDate.astimezone(tz).date():
                 raise TimingError( _("The time slot must end on the same day it has started"), _("Slot"))
             # do not modify if slot entries will be affected
@@ -6973,7 +6993,7 @@ class SessionSlot(Persistent):
                         (eDate.astimezone(tz).strftime('%Y-%m-%d %H:%M'),\
                         sch.calculateEndDate().astimezone(tz).strftime('%Y-%m-%d %H:%M')),\
                         _("Slot"))
-    
+
     def setDuration(self,days=0,hours=0,minutes=0,dur=0,check=1):
         """check parameter:
             0: no check at all
@@ -7061,10 +7081,10 @@ class SessionSlot(Persistent):
 
     def canAccess(self,aw):
         return self.getSession().canAccess(aw)
-    
+
     def canView(self,aw):
         return self.getSession().canView(aw)
-    
+
     def setScheduleType(self,id):
         id=str(id).strip().lower()
         currentId=SlotSchTypeFactory.getId(self.getSchedule())
@@ -7091,7 +7111,7 @@ class SessionSlot(Persistent):
         except AttributeError:
             self._convenerGen=Counter()
         id = newConv.getId()
-        if id == "":        
+        if id == "":
             id=int(self._convenerGen.newCount())
         newConv.includeInSlot(self,id)
         self._conveners.append(newConv)
@@ -7140,7 +7160,7 @@ class SessionSlot(Persistent):
         if self.getSession() is not None:
             res=self.getSession().getTextColor()
         return res
-    
+
     def getAutoSolveConflict(self):
         try:
             return self.getConference().getAutoSolveConflict()
@@ -7148,7 +7168,7 @@ class SessionSlot(Persistent):
             return False
 
 class ContributionParticipation(Persistent):
-    
+
     def __init__( self ):
         self._contrib = None
         self._id = ""
@@ -7159,12 +7179,12 @@ class ContributionParticipation(Persistent):
         self._address = ""
         self._phone = ""
         self._title = ""
-        self._fax = ""        
+        self._fax = ""
 
     def _notifyModification( self ):
         if self._contrib != None:
             self._contrib.notifyModification()
-    
+
     def setValues(self, data):
         self.setFirstName(data.get("firstName", ""))
         self.setFamilyName(data.get("familyName",""))
@@ -7185,21 +7205,21 @@ class ContributionParticipation(Persistent):
         data["email"]=self.getEmail()
         data["fax"]=self.getFax()
         data["title"]=self.getTitle()
-        data["phone"]=self.getPhone()        
+        data["phone"]=self.getPhone()
         return data
-    
+
     def clone(self):
         part = ContributionParticipation()
         part.setValues(self.getValues())
         return part
-        
+
     def setDataFromAvatar(self,av):
     # av is an Avatar object.
         if av is None:
             return
         self.setFirstName(av.getName())
         self.setFamilyName(av.getSurName())
-        self.setEmail(av.getEmail()) 
+        self.setEmail(av.getEmail())
         self.setAffiliation(av.getOrganisation())
         self.setAddress(av.getAddress())
         self.setPhone(av.getTelephone())
@@ -7213,7 +7233,7 @@ class ContributionParticipation(Persistent):
             return
         self.setFirstName(cp.getFirstName())
         self.setFamilyName(cp.getFamilyName())
-        self.setEmail(cp.getEmail()) 
+        self.setEmail(cp.getEmail())
         self.setAffiliation(cp.getAffiliation())
         self.setAddress(cp.getAddress())
         self.setPhone(cp.getPhone())
@@ -7240,7 +7260,7 @@ class ContributionParticipation(Persistent):
     @Retrieves ('MaKaC.conference.ContributionParticipation', 'id')
     def getId( self ):
         return self._id
-    
+
     def getContribution( self ):
         return self._contrib
 
@@ -7279,15 +7299,15 @@ class ContributionParticipation(Persistent):
         self._firstName=tmp
         self._index()
         self._notifyModification()
-    
-    @Retrieves ('MaKaC.conference.ContributionParticipation', 'firstName')    
+
+    @Retrieves ('MaKaC.conference.ContributionParticipation', 'firstName')
     def getFirstName( self ):
         return self._firstName
 
     def getName( self ):
         return self._firstName
-    
-        
+
+
     @Updates ('MaKaC.conference.ContributionParticipation', 'familyName')
     def setFamilyName( self, newName ):
         tmp=newName.strip()
@@ -7297,7 +7317,7 @@ class ContributionParticipation(Persistent):
         self._surName=tmp
         self._index()
         self._notifyModification()
-    
+
     @Retrieves ('MaKaC.conference.ContributionParticipation', 'familyName')
     def getFamilyName( self ):
         return self._surName
@@ -7305,7 +7325,7 @@ class ContributionParticipation(Persistent):
     def getSurName( self ):
         return self._surName
 
-    
+
     @Updates ('MaKaC.conference.ContributionParticipation', 'email')
     def setEmail( self, newMail ):
         tmp=newMail.strip()
@@ -7400,7 +7420,7 @@ class ContributionParticipation(Persistent):
             else:
                 res = self.getFirstName()
         return res
-    
+
     def getAbrName(self):
         res = self.getFamilyName()
         if self.getFirstName() != "":
@@ -7427,7 +7447,7 @@ class ContributionParticipation(Persistent):
 
 
 class AuthorIndex(Persistent):
-    
+
     def __init__(self):
         self._idx=OOBTree()
 
@@ -7467,10 +7487,10 @@ class AuthorIndex(Persistent):
     def notifyModification(self):
         self._idx._p_changed = 1
         self._p_changed = 1
-      
+
     def match(self, criteria, exact=0):
         self._options = ['organisation', 'surName', 'name', 'email']
-        l = []        
+        l = []
         for item in self.getParticipations():
             if len(item)>0:
                 ok = []
@@ -7500,7 +7520,7 @@ class AuthorIndex(Persistent):
         return l
 
 class _AuthIdx(Persistent):
-    
+
     def __init__(self,conf):
         self._conf=conf
         self._idx=OOBTree()
@@ -7546,17 +7566,17 @@ class _AuthIdx(Persistent):
 
 
 class _PrimAuthIdx(_AuthIdx):
-    
+
     def __init__(self,conf):
         _AuthIdx.__init__(self,conf)
         for contrib in self._conf.getContributionList():
             for auth in contrib.getPrimaryAuthorList():
-                self.index(auth)        
-    
+                self.index(auth)
+
 class Contribution(Persistent):
-    """This class implements a conference contribution, being the concrete 
-        contributes of the conference participants. The class contains 
-        necessary attributes to store contribution basic meta data and provides 
+    """This class implements a conference contribution, being the concrete
+        contributes of the conference participants. The class contains
+        necessary attributes to store contribution basic meta data and provides
         the useful operations to access and manage them. A contribution can be
         attached either to a session or to a conference.
     """
@@ -7578,7 +7598,7 @@ class Contribution(Persistent):
         self._resetSchEntry()
         self.__ac = AccessController()
         self.materials = {}
-        self.__materialGenerator = Counter() 
+        self.__materialGenerator = Counter()
         self._subConts = []
         self.__subContGenerator = Counter()
         self.paper = None
@@ -7601,17 +7621,17 @@ class Contribution(Persistent):
         self._OAImodificationDS = self._modificationDS
         self._keywords = ""
         self._reviewManager = ReviewManager(self)
-  
+
     def getTimezone( self ):
         return self.getConference().getTimezone()
-    
+
     @Retrieves (['MaKaC.conference.Contribution',
                  'MaKaC.conference.AcceptedContribution'],'reviewManager', isPicklableObject=True)
     def getReviewManager(self):
         if not hasattr(self, "_reviewManager"):
             self._reviewManager = ReviewManager(self)
         return self._reviewManager
-            
+
     def isFullyPublic( self ):
         if hasattr(self, "_fullyPublic"):
             return self._fullyPublic
@@ -7654,7 +7674,7 @@ class Contribution(Persistent):
         else:
             self._keywords = keywords
         self.notifyModification()
-    
+
     def getFields( self ):
         try:
             return self._fields
@@ -7672,14 +7692,14 @@ class Contribution(Persistent):
         if self.getFields().has_key(field):
             del self.getFields()[field]
             self.notifyModification()
-    
+
     def setField( self, field, value ):
         try:
             self.getFields()[field] = value
             self.notifyModification()
         except:
             pass
-        
+
     def getField( self, field ):
         if self.getFields().has_key(field):
             value = self.getFields()[field]
@@ -7691,7 +7711,7 @@ class Contribution(Persistent):
                 return value
         else:
             return ""
-        
+
     def getLogInfo(self):
         data = {}
         data["subject"] = self.getTitle()
@@ -7707,10 +7727,10 @@ class Contribution(Persistent):
                 id = f.getId()
                 data[id] = self.getField(id)
         data["start date"] = "%s"%self.startDate
-        data["duration"] = "%s"%self.duration        
+        data["duration"] = "%s"%self.duration
         if self._track is not None :
             data["track"] = self._track.getTitle()
-        if self._type is not None : 
+        if self._type is not None :
             data["type"] = self._type
         data["speaker text"] = self.speakerText
         if self.place is not None :
@@ -7725,29 +7745,29 @@ class Contribution(Persistent):
         for ca in self._coAuthors :
             data["co-author %s"%ca.getId()] = ca.getFullName()
         for sp in self._speakers :
-            data["speaker %s"%sp.getId()] = sp.getFullName()    
+            data["speaker %s"%sp.getId()] = sp.getFullName()
         for s in self._submitters :
             if isinstance(s, MaKaC.user.Avatar):
                 data["submitter"] = s.getFullName()
             else:
                 data["submitter"] = s.getName()
         return data
-    
-    
+
+
     def setValues( self, data, check=1, moveEntriesBelow=0):
-        """Sets all the values of the current contribution object from a 
+        """Sets all the values of the current contribution object from a
             dictionary containing the following key-value pairs:
-                title-(str) 
+                title-(str)
                 description-(str)
                 locationName-(str) => name of the location, if not specified
                         it will be set to the parent location name.
                 locationAddress-(str)
                 roomName-(str) => name of the room, if not specified it will
                     be set to the parent room name.
-                year, month, day, sHour, sMinute - (str) => components of the 
-                        starting date of the session, if not specified it will 
+                year, month, day, sHour, sMinute - (str) => components of the
+                        starting date of the session, if not specified it will
                         be set to now.
-                durationHours, durationMinutes - (str) 
+                durationHours, durationMinutes - (str)
                 speakers - (str)
                 check parameter:
                     0: no check at all
@@ -7756,11 +7776,11 @@ class Contribution(Persistent):
                 moveEntries:
                     0: no move
                     1: moveEntries below the contribution
-           Please, note that this method sets ALL values which means that if 
+           Please, note that this method sets ALL values which means that if
             the given dictionary doesn't contain any of the keys the value
             will set to a default value.
         """
-        
+
         if self.getAutoSolveConflict() and check == 1:
             check=2
         # In order to move the entries below, it is needed to know the diff (we have to move them)
@@ -7786,7 +7806,7 @@ class Contribution(Persistent):
                 if data.has_key("f_%s"%id):
                     self.setField(id, data["f_%s"%id])
         #if the location is not defined we set the location of the contribution
-        #   to None so it will be considered to be the same as for the 
+        #   to None so it will be considered to be the same as for the
         #   conference
         if data.has_key("locationName"):
             if data["locationName"].strip()=="":
@@ -7815,7 +7835,7 @@ class Contribution(Persistent):
             tz = self.getConference().getTimezone()
         if data.get("targetDay","")!="" and data.get("sHour","")!="" and data.get("sMinute","")!="" and check==2:
             ############################################
-            # Fermi timezone awareness                 # 
+            # Fermi timezone awareness                 #
             ############################################
             me = timezone(tz).localize(datetime(int(data["targetDay"][0:4]), \
                  int(data["targetDay"][5:7]),int(data["targetDay"][8:])))
@@ -7825,19 +7845,19 @@ class Contribution(Persistent):
         if data.get("sYear","")!="" and data.get("sMonth","")!="" and \
                 data.get("sDay","")!="" and data.get("sHour","")!="" and \
                 data.get("sMinute","")!="":
-            self.setStartDate(timezone(tz).localize(datetime(int(data["sYear"]), 
-                              int(data["sMonth"]), int(data["sDay"]), 
-                              int(data["sHour"]),  int(data["sMinute"]))).astimezone(timezone('UTC')), 
+            self.setStartDate(timezone(tz).localize(datetime(int(data["sYear"]),
+                              int(data["sMonth"]), int(data["sDay"]),
+                              int(data["sHour"]),  int(data["sMinute"]))).astimezone(timezone('UTC')),
                               check=1)
             ############################################
-            # Fermi timezone awareness(end)            # 
+            # Fermi timezone awareness(end)            #
             ############################################
         if data.get("durTimedelta", "") != "":
             self.setDuration(check=check, dur=data["durTimedelta"])
         elif data.get("durHours","")!="" and data.get("durMins","")!="":
             self.setDuration(data["durHours"],data["durMins"],check)
         else:
-            h=data.get("durHours","").strip() 
+            h=data.get("durHours","").strip()
             m=data.get("durMins","").strip()
             if h!="" or m!="":
                 h=h or "0"
@@ -7849,8 +7869,8 @@ class Contribution(Persistent):
         if moveEntriesBelow == 1:
             diff = (self.getStartDate() - oldStartDate) + (self.getDuration() - oldDuration)
             self.getConference().getSchedule().moveEntriesBelow(diff, entriesList)
-        self.notifyModification()    
-        
+        self.notifyModification()
+
     def clone(self, parent, options, deltaTime = 0):
         cont = Contribution()
         parent.addContribution(cont)
@@ -7861,12 +7881,12 @@ class Contribution(Persistent):
         cont.setKeywords( self.getKeywords() )
         if deltaTime == 0 :
             deltaTime = parent.getStartDate() - self.getOwner().getStartDate()
-        
+
         startDate = None
         if self.startDate is not None :
             startDate = self.getStartDate() + deltaTime
         cont.setStartDate( startDate )
-        
+
         cont.setDuration( dur=self.getDuration() )
 
         if self.getOwnLocation() is not None:
@@ -7875,15 +7895,15 @@ class Contribution(Persistent):
             cont.setRoom(self.getOwnRoom().clone())
         cont.setBoardNumber(self.getBoardNumber())
         cont.setReportNumberHolder(self.getReportNumberHolder().clone(self))
-                
+
         cont.setStatus(self.getCurrentStatus())
-                
+
         if self.getType() is not None :
             for ct in cont.getConference().getContribTypeList() :
                 if ct.getName() == self.getType().getName() :
                     cont.setType(ct)
                     break
-            
+
         if options.get("tracks", False) :
             if self.getTrack() is not None :
                 for tr in cont.getConference().getTrackList() :
@@ -7892,7 +7912,7 @@ class Contribution(Persistent):
                         break
             else :
                 cont.setTrack(None)
-        
+
         if options.get("access", False) :
             cont.setProtection(self.isItselfProtected())
             for u in self.getAllowedToAccessList() :
@@ -7900,19 +7920,19 @@ class Contribution(Persistent):
             for mgr in self.getManagerList() :
                 cont.grantModification(mgr)
             for sub in self.getSubmitterList() :
-                cont.grantSubmission(sub)                
+                cont.grantSubmission(sub)
             for domain in self.getDomainList():
                 cont.requireDomain(domain)
-        
-        if options.get("authors", False) :            
-            for a in self.getPrimaryAuthorList() :                
+
+        if options.get("authors", False) :
+            for a in self.getPrimaryAuthorList() :
                 cont.addPrimaryAuthor(a.clone())
-            for ca in self.getCoAuthorList() :                
+            for ca in self.getCoAuthorList() :
                 cont.addCoAuthor(ca.clone())
-            for sp in self.getSpeakerList():                
-                cont.newSpeaker(sp.clone())                
-            cont.setSpeakerText(self.getSpeakerText())        
-                
+            for sp in self.getSpeakerList():
+                cont.newSpeaker(sp.clone())
+            cont.setSpeakerText(self.getSpeakerText())
+
         if options.get("materials", False) :
             for m in self.getMaterialList() :
                 cont.addMaterial(m.clone(cont))
@@ -7926,12 +7946,12 @@ class Contribution(Persistent):
                 cont.setPoster(self.getPoster().clone(cont))
             if self.getMinutes() is not None:
                 cont.setMinutes(self.getMinutes().clone(cont))
-        
+
         if options.get("subcontribs", False) :
             for sc in self.getSubContributionList() :
                 cont.addSubContribution(sc.clone(cont, self, options))
         return cont
-    
+
     def notifyModification( self, date=None, oai=True):
         if not date:
             date = nowutc()
@@ -7942,13 +7962,13 @@ class Contribution(Persistent):
         if parent:
             parent.notifyModification()
         self._p_changed = 1
-    
+
     def notifyOAIModification(self, date=None):#, updateChildren=False):#, force=False):
         self.getOAIModificationDate() #init _OAImodificationDS value if it don't exist
         idxPu = indexes.IndexesHolder().getById("OAIContributionModificationDate")
         idxPr = indexes.IndexesHolder().getById("OAIPrivateContributionModificationDate")
 
-                
+
         if self.hasAnyProtection():
             if self in idxPu.getContributions(self._OAImodificationDS.strftime("%Y-%m-%d"), self._OAImodificationDS.strftime("%Y-%m-%d")):
                 #The contribution was public and is now private
@@ -7963,7 +7983,7 @@ class Contribution(Persistent):
 
                 for subContrib in self.getSubContributionList():
                     idxPr.indexContribution(subContrib)
-                        
+
             elif self in idxPr.getContributions(self._OAImodificationDS.strftime("%Y-%m-%d"), self._OAImodificationDS.strftime("%Y-%m-%d")):
                 #The contribution is already indexed in private
                 # if force:
@@ -7984,10 +8004,10 @@ class Contribution(Persistent):
                 self._OAImodificationDS = date
                 self._p_changed=1
                 idxPr.indexContribution(self)
-                
+
                 for subContrib in self.getSubContributionList():
-                    idxPr.indexContribution(subContrib)            
-            
+                    idxPr.indexContribution(subContrib)
+
         else:
             if self in idxPr.getContributions(self.getOAIModificationDate().strftime("%Y-%m-%d"), self.getOAIModificationDate().strftime("%Y-%m-%d")):
                 #The contribution was private and is now public
@@ -7998,10 +8018,10 @@ class Contribution(Persistent):
                     date = nowutc()
                 self._OAImodificationDS = date
                 idxPu.indexContribution(self)
-                
+
                 for subContrib in self.getSubContributionList():
                     idxPu.indexContribution(subContrib)
-            
+
             elif self in idxPu.getContributions(self.getOAIModificationDate().strftime("%Y-%m-%d"), self.getOAIModificationDate().strftime("%Y-%m-%d")):
                 #The contribution is already indexed in public, reIndex it with new date
                 idxPu.unindexContribution(self)
@@ -8022,26 +8042,26 @@ class Contribution(Persistent):
                 self._OAImodificationDS = date
                 idxPu.indexContribution(self)
                 for subContrib in self.getSubContributionList():
-                    idxPu.indexContribution(subContrib)    
-    
+                    idxPu.indexContribution(subContrib)
+
     def getOAIModificationDate(self):
         try:
             return self._OAImodificationDS
         except:
             self._OAImodificationDS = self._modificationDS
         return self._OAImodificationDS
-    
+
     def getCategoriesPath(self):
         return self.getConference().getCategoriesPath()
-    
+
     def getModifKey( self ):
         return self.getConference().getModifKey()
-        
+
     def getAccessKey( self ):
         return self.getConference().getAccessKey()
-        
+
     def getLocator( self ):
-        """Gives back a globaly unique identification encapsulated in a Locator 
+        """Gives back a globaly unique identification encapsulated in a Locator
             object for the contribution instance
         """
         if self.getConference() == None:
@@ -8056,7 +8076,7 @@ class Contribution(Persistent):
         self.parent = conf
 
     def _setId( self, id ):
-        self.id = id 
+        self.id = id
 
     def includeInConference( self, conf, id ):
         """sets the conference of a contribution
@@ -8083,7 +8103,7 @@ class Contribution(Persistent):
             #index a DeletedObject to keep track of the contribution after the deletion
             DeletedObjectHolder().add(DeletedObject(self))
 
-            
+
             self.setTrack(None)
             self.setSession(None)
             for mat in self.getMaterialList():
@@ -8097,7 +8117,7 @@ class Contribution(Persistent):
             while len(self.getSubContributionList()) > 0:
 
                 sc = self.getSubContributionList()[0]
-                
+
                 self.removeSubContribution(sc)
 
 
@@ -8108,12 +8128,12 @@ class Contribution(Persistent):
 
             # (always) delete it from the parent conference
             self.getConference().removeContribution( self, callDelete=False )
-            
+
             self._setConference( None )
 
             self.setStatus(ContribStatusNone(self))
             TrashCanManager().add(self)
-            
+
     def recover(self):
         TrashCanManager().remove(self)
 
@@ -8129,7 +8149,7 @@ class Contribution(Persistent):
         """returns (string) the unique identifier of the item"""
         """used mainly in the web session access key table"""
         return "%st%s" % (self.getConference().getUniqueId(),self.id)
-    
+
     def setTitle( self, newTitle ):
         self.title = newTitle.strip()
         self.notifyModification()
@@ -8144,7 +8164,7 @@ class Contribution(Persistent):
     #def setDescription( self, newDesc ):
     #    self.description = newDesc.strip()
     #    self.notifyModification()
-    # 
+    #
     #def getDescription( self ):
     #    return self.description
     #
@@ -8167,7 +8187,7 @@ class Contribution(Persistent):
 
     def getOwner( self ):
         return self.getParent()
-    
+
     def setOwner(self, owner):
         self.setParent(owner)
 
@@ -8196,10 +8216,10 @@ class Contribution(Persistent):
         self._session=session
         if session is not None:
             session.addContribution(self)
-    
+
     def getContribution(self):
         return self
-    
+
     def _resetSchEntry(self):
         self.__schEntry=ContribSchEntry(self)
 
@@ -8234,7 +8254,7 @@ class Contribution(Persistent):
 
     def getInheritedLocation(self):
         return self.getLocationParent().getLocation()
-    
+
     def getOwnLocation( self ):
         return self.place
 
@@ -8296,7 +8316,7 @@ class Contribution(Persistent):
                     _("Contribution"))
             if check == 2:
                 owner.setEndDate(sDate+self.getDuration(),check)
-                
+
     def setStartDate(self,newDate,check=1, moveEntries=0):
         """check parameter:
             0: no check at all
@@ -8322,11 +8342,11 @@ class Contribution(Persistent):
         if self.getStartDate() is None:
             return None
         if not tz:
-            tz = self.getConference().getTimezone() 
+            tz = self.getConference().getTimezone()
         if tz not in common_timezones:
             tz = 'UTC'
         return self.getStartDate().astimezone(timezone(tz))
-    
+
     def getEndDate( self ):
         if self.getStartDate() is None:
             return None
@@ -8334,13 +8354,13 @@ class Contribution(Persistent):
 
     def getAdjustedEndDate(self,tz=None):
         if not tz:
-            tz = self.getConference().getTimezone() 
+            tz = self.getConference().getTimezone()
         if tz not in common_timezones:
             tz = 'UTC'
         if self.getEndDate():
             return self.getEndDate().astimezone(timezone(tz))
         return None
-    
+
     def getDuration( self ):
         return self.duration
 
@@ -8379,7 +8399,7 @@ class Contribution(Persistent):
             self.verifyDuration(check)
         self.getSchEntry().synchro()
         self.notifyModification()
-    
+
     def _addAuthor( self, part ):
         """
         """
@@ -8408,10 +8428,10 @@ class Contribution(Persistent):
         except AttributeError:
             self._authors = OOBTree()
         if not self._authors.has_key( part.getId() ):
-            return 
+            return
         del self._authors[ part.getId() ]
         part.delete()
-    
+
     def addPrimaryAuthor( self, part ):
         """
         """
@@ -8435,7 +8455,7 @@ class Contribution(Persistent):
         except AttributeError:
             self._primaryAuthors = []
         if part not in self._primaryAuthors:
-            return 
+            return
         if self.getConference() is not None:
             self.getConference().unindexAuthor(part)
         self._primaryAuthors.remove( part )
@@ -8545,9 +8565,9 @@ class Contribution(Persistent):
         except AttributeError:
             self._primaryAuthors = []
         return self._primaryAuthors
-        
+
     getPrimaryAuthorsList = getPrimaryAuthorList
-    
+
     def getAuthorList( self ):
         """
         """
@@ -8581,7 +8601,7 @@ class Contribution(Persistent):
         except AttributeError:
             self._coAuthors = []
         if part not in self._coAuthors:
-            return 
+            return
         if self.getConference() is not None:
             self.getConference().unindexAuthor(part)
         self._coAuthors.remove( part )
@@ -8598,7 +8618,7 @@ class Contribution(Persistent):
         self.addCoAuthor(ca)
         ca.recover()
         if isPendingSubmitter:
-            self.getConference().getPendingQueuesMgr().addPendingSubmitter(ca, False)        
+            self.getConference().getPendingQueuesMgr().addPendingSubmitter(ca, False)
 
     def isCoAuthor( self, part ):
         """
@@ -8674,7 +8694,7 @@ class Contribution(Persistent):
         """
         Adds a new speaker (ContributionParticipation object) to the contribution
         setting the speakers ID and the fact it belongs to that contribution
-        """                
+        """
         try:
             if self._speakers:
                 pass
@@ -8685,7 +8705,7 @@ class Contribution(Persistent):
                 pass
         except AttributeError:
             self._authorGen=Counter()
-        self._speakers.append( part )        
+        self._speakers.append( part )
         newId = part.getId()
         if newId == "":
             newId = str( self._authorGen.newCount() )
@@ -8703,7 +8723,7 @@ class Contribution(Persistent):
         except AttributeError:
             self._speakers = []
         if part not in self._speakers:
-            return 
+            return
         self._speakers.remove( part )
         if self.getConference() is not None:
             self.getConference().unindexSpeaker(part)
@@ -8772,14 +8792,14 @@ class Contribution(Persistent):
             return self._v_canipaccess[ip]
         self._v_canipaccess[ip] = True
         return self._v_canipaccess[ip]
-    
+
     def isProtected( self ):
         # tells if a contribution is protected or not
         return (self.hasProtectedOwner() + self.getAccessProtectionLevel()) > 0
-   
+
     def getAccessProtectionLevel( self ):
         return self.__ac.getAccessProtectionLevel()
-    
+
     def isItselfProtected( self ):
         return self.__ac.isItselfProtected()
 
@@ -8797,17 +8817,17 @@ class Contribution(Persistent):
             return self.getOwner().hasAnyProtection()
         else:
             return False
-    
+
     def hasProtectedOwner( self ):
         if self.getOwner() != None:
             return self.getOwner().isProtected()
         return False
-    
+
     def setProtection( self, private ):
         self.__ac.setProtection( private )
         self.updateFullyPublic()
         self.notifyOAIModification()
-    
+
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
         if isinstance(prin, MaKaC.user.Avatar):
@@ -8819,7 +8839,7 @@ class Contribution(Persistent):
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "access")
         self.resetAccessCache()
-    
+
     def canView( self, aw ):
         """tells whether the specified user has access to the current object
             or any of its sub-objects
@@ -8845,7 +8865,7 @@ class Contribution(Persistent):
                 self.canUserModify( user ) or \
                 self.canUserSubmit(user)
         return self._v_isallowedtoaccess[user]
-        
+
     def canAccess( self, aw ):
         try:
             return self._v_canaccess[aw]
@@ -8880,7 +8900,7 @@ class Contribution(Persistent):
                 subc.resetAccessCache(False, True)
             for mat in self.getMaterialList():
                 mat.resetAccessCache(False, True)
-    
+
     def resetModifyCache(self, UP=True, DOWN=True):
         if hasattr(self,"_v_canmodify"):
             del self._v_canmodify
@@ -8895,13 +8915,13 @@ class Contribution(Persistent):
                 subc.resetAccessCache(False, True)
             for mat in self.getMaterialList():
                 mat.resetModifyCache(False, True)
-        
+
     def grantModification( self, prin ):
         self.__ac.grantModification( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.linkTo(self, "manager")
         self.resetModifyCache()
-    
+
     def revokeModification( self, prin ):
         self.__ac.revokeModification( prin )
         if isinstance(prin, MaKaC.user.Avatar):
@@ -8919,11 +8939,11 @@ class Contribution(Persistent):
         return self._v_canmodify[aw]
 
     def canUserModify( self, av ):
-        """Tells whether a user is allowed to modify the current contribution: 
+        """Tells whether a user is allowed to modify the current contribution:
             only if the user is granted to modify the contribution or the user
             can modify any of its upper objects (i.e. conference or session).
         """
-        try: 
+        try:
             return self._v_canusermodify[av]
         except AttributeError:
             self._v_canusermodify = {}
@@ -8934,14 +8954,14 @@ class Contribution(Persistent):
 
     def getManagerList( self ):
         return self.__ac.getModifierList()
-    
+
     def getAllowedToAccessList( self ):
         return self.__ac.getAccessList()
-    
+
     def addMaterial( self, newMat ):
         newMat.setId( str(self.__materialGenerator.newCount()) )
         newMat.setOwner( self )
-        self.materials[ newMat.getId() ] =  newMat 
+        self.materials[ newMat.getId() ] =  newMat
         self.notifyModification()
 
     def removeMaterial( self, mat ):
@@ -9010,13 +9030,13 @@ class Contribution(Persistent):
         newSub = SubContribution()
         self.addSubContribution(newSub)
         return newSub
-    
+
     def addSubContribution( self, newSubCont ):
         newSubCont.setId(str( self.__subContGenerator.newCount()) )
         newSubCont.setOwner( self )
         self._subConts.append( newSubCont )
         self.notifyModification()
-    
+
     def removeSubContribution( self, subCont ):
         if subCont in self._subConts:
             subCont.delete()
@@ -9029,16 +9049,16 @@ class Contribution(Persistent):
         recSubCont.setOwner( self )
         self._subConts.append( recSubCont )
         recSubCont.recover()
-        self.notifyModification() 
-        
+        self.notifyModification()
+
     def getSubContributionById(self, SCId):
         for sb in self._subConts:
             if sb.getId() == SCId:
                 return sb
-    
+
     def getSubContributionList(self):
         return self._subConts
-    
+
     def upSubContribution(self, subcont):
         if subcont in self._subConts:
             if self._subConts.index(subcont) != 0:
@@ -9046,7 +9066,7 @@ class Contribution(Persistent):
                 sb = self._subConts.pop(index)
                 self._subConts.insert(index-1, sb)
                 self.notifyModification()
-    
+
     def downSubContribution(self, subCont):
         if subCont in self._subConts:
             if self._subConts.index(subCont) < len(self._subConts)-1:
@@ -9054,7 +9074,7 @@ class Contribution(Persistent):
                 sb = self._subConts.pop(index)
                 self._subConts.insert(index+1, sb)
                 self.notifyModification()
-    
+
     def setPaper( self, newPaper ):
         if self.getPaper() != None:
             raise MaKaCError( _("The paper for this contribution has already been set"), _("Contribution"))
@@ -9076,7 +9096,7 @@ class Contribution(Persistent):
 
     def getPaper( self ):
         return self.paper
-    
+
     def setSlides( self, newSlides ):
         if self.getSlides() != None:
             raise MaKaCError( _("The slides for this contribution have already been set"), _("contribution"))
@@ -9159,7 +9179,7 @@ class Contribution(Persistent):
         self.minutes=newMinutes
         self.minutes.setOwner( self )
         self.notifyModification()
-    
+
     def createMinutes( self ):
         if self.getMinutes() != None:
             raise MaKaCError( _("The minutes for this contribution have already been created"), _("Contribution"))
@@ -9196,7 +9216,7 @@ class Contribution(Persistent):
 
     def getMasterSchedule( self ):
         return self.getOwner().getSchedule()
-    
+
     def requireDomain( self, dom ):
         self.__ac.requireDomain( dom )
         self.resetAccessCache()
@@ -9209,7 +9229,7 @@ class Contribution(Persistent):
 
     def getDomainList( self ):
         return self.__ac.getRequiredDomainList()
-    
+
     @Retrieves (['MaKaC.conference.Contribution',
                  'MaKaC.conference.AcceptedContribution'],'track', isPicklableObject=True)
     def getTrack( self ):
@@ -9247,7 +9267,7 @@ class Contribution(Persistent):
         except AttributeError:
             self._type = None
         return self._type
-    
+
     def getModificationDate( self ):
         """Returns the date in which the contribution was last modified"""
         try:
@@ -9276,7 +9296,7 @@ class Contribution(Persistent):
     def withdraw(self,resp,comment):
         """ Remove or put a contribution in a conference
         """
-        
+
         if self.isWithdrawn():
         #put back the authors in the author index
             for auth in self.getAuthorList():
@@ -9285,7 +9305,7 @@ class Contribution(Persistent):
                 self.getConference().getSpeakerIndex().index(spk)
             #change the status of the contribution
             self._status=ContribStatusNotSch(self)
-            
+
         else:
             #remove the authors from the author index
             if self.getConference() is not None:
@@ -9297,7 +9317,7 @@ class Contribution(Persistent):
             if self.isScheduled():
                 self.getSchEntry().getSchedule().removeEntry(self.getSchEntry())
             self.getCurrentStatus().withdraw(resp,comment)
-            
+
 
     def _initSubmissionPrivileges(self):
         """Initialises submission privileges list for a contribution.
@@ -9311,7 +9331,7 @@ class Contribution(Persistent):
         except AttributeError:
             self._submitters=[] #create the attribute
             self.notifyModification(oai=False)
-        
+
     def _grantSubmission(self,av):
         if av not in self._submitters:
             self._submitters.append(av)
@@ -9320,16 +9340,16 @@ class Contribution(Persistent):
         if isinstance(av, MaKaC.user.Avatar):
             av.linkTo(self, "submission")
         self.notifyModification(oai=False)
-    
+
     def _grantSubmissionEmail(self, email):
         if not email in self.getSubmitterEmailList():
             self.getSubmitterEmailList().append(email.lower())
-    
+
     def revokeSubmissionEmail(self, email):
         if email in self.getSubmitterEmailList():
            self.getSubmitterEmailList().remove(email)
            self._p_changed=1
-    
+
     def grantSubmission(self,sb, sendEmail=True):
         """Grants a user with submission privileges for the contribution
            - sb: can be an Avatar or an Author (primary author, co-author, speaker)
@@ -9358,7 +9378,7 @@ class Contribution(Persistent):
                     notif = pendingQueues._PendingSubmitterNotification( [sb] )
                     mail.GenericMailer.sendAndLog( notif, self.getConference() )
                     if self.getConference() is not None:
-                        self.getConference()._getSubmitterIdx().indexEmail(sb.getEmail(),self)    
+                        self.getConference()._getSubmitterIdx().indexEmail(sb.getEmail(),self)
         else:
             self._grantSubmission(sb)
 
@@ -9370,7 +9390,7 @@ class Contribution(Persistent):
         if isinstance(av, MaKaC.user.Avatar):
             av.unlinkTo(self, "submission")
         self.notifyModification(oai=False)
-    
+
     def revokeSubmission(self,av):
         """Removes submission privileges for the specified user
         """
@@ -9412,7 +9432,7 @@ class Contribution(Persistent):
                     self.revokeSubmissionEmail(email)
                     ret = True
         return ret
-    
+
     def getAccessController(self):
         return self.__ac
 
@@ -9423,7 +9443,7 @@ class Contribution(Persistent):
         except AttributeError, e:
             self._reportNumberHolder=ReportNumberHolder(self)
         return self._reportNumberHolder
-    
+
     def setReportNumberHolder(self, rnh):
         self._reportNumberHolder=rnh
 
@@ -9432,12 +9452,12 @@ class Contribution(Persistent):
             return self.getConference().getAutoSolveConflict()
         except:
             return False
-    
+
 class AcceptedContribution( Contribution ):
-    """This class represents a contribution which has been created from an 
+    """This class represents a contribution which has been created from an
         abstract
     """
-    
+
     def __init__(self,abstract):
         Contribution.__init__(self)
         abstract.getConference().addContribution(self,abstract.getId())
@@ -9460,7 +9480,7 @@ class AcceptedContribution( Contribution ):
             if abstract.isSpeaker( auth ):
                 self.addSpeaker( c_auth )
         self._grantSubmission(self.getAbstract().getSubmitter().getUser())
-    
+
     def _setAuthorValuesFromAbstract( self, cAuth, aAuth ):
         cAuth.setTitle( aAuth.getTitle() )
         cAuth.setFirstName( aAuth.getFirstName() )
@@ -9521,7 +9541,7 @@ class ContribStatus(Persistent):
         cs = ContribStatus(contribution, responsible)
         cs.setDate(self.getDate())
         return cs
-        
+
     def _setContrib(self,newContrib):
         self._contrib=newContrib
 
@@ -9545,7 +9565,7 @@ class ContribStatus(Persistent):
 
     def withdraw(self,resp,comments=""):
         self._contrib.setStatus(ContribStatusWithdrawn(self.getContrib(),resp,comments))
-        
+
 class ContribStatusNotSch(ContribStatus):
     """
     """
@@ -9601,7 +9621,7 @@ class ContribStatusNone(ContribStatus):
         return csn
 
 class SubContribParticipation(Persistent):
-    
+
     def __init__( self ):
         self._subContrib = None
         self._id = ""
@@ -9640,7 +9660,7 @@ class SubContribParticipation(Persistent):
         data["title"]=self.getTitle()
         data["phone"]=self.getPhone()
         return data
-    
+
     def clone(self):
         part = SubContribParticipation()
         part.setValues(self.getValues())
@@ -9652,7 +9672,7 @@ class SubContribParticipation(Persistent):
             return
         self.setFirstName(av.getName())
         self.setFamilyName(av.getSurName())
-        self.setEmail(av.getEmail()) 
+        self.setEmail(av.getEmail())
         self.setAffiliation(av.getOrganisation())
         self.setAddress(av.getAddress())
         self.setPhone(av.getTelephone())
@@ -9666,7 +9686,7 @@ class SubContribParticipation(Persistent):
             return
         self.setFirstName(au.getFirstName())
         self.setFamilyName(au.getFamilyName())
-        self.setEmail(au.getEmail()) 
+        self.setEmail(au.getEmail())
         self.setAffiliation(au.getAffiliation())
         self.setAddress(au.getAddress())
         self.setPhone(au.getPhone())
@@ -9680,7 +9700,7 @@ class SubContribParticipation(Persistent):
             return
         self.setFirstName(spk.getFirstName())
         self.setFamilyName(spk.getFamilyName())
-        self.setEmail(spk.getEmail()) 
+        self.setEmail(spk.getEmail())
         self.setAffiliation(spk.getAffiliation())
         self.setAddress(spk.getAddress())
         self.setPhone(spk.getPhone())
@@ -9748,7 +9768,7 @@ class SubContribParticipation(Persistent):
         self._firstName=tmp
         self._index()
         self._notifyModification()
-    
+
     def getFirstName( self ):
         return self._firstName
 
@@ -9807,7 +9827,7 @@ class SubContribParticipation(Persistent):
 
     def getPhone( self ):
         return self._phone
-    
+
     @Updates ('MaKaC.conference.SubContribParticipation', 'title')
     def setTitle( self, newTitle ):
         self._title = newTitle.strip()
@@ -9850,7 +9870,7 @@ class SubContribParticipation(Persistent):
 class SubContribution(Persistent):
     """
     """
-    
+
     def __init__( self, **subContData ):
         self.parent = None
         self.id = ""
@@ -9860,9 +9880,9 @@ class SubContribution(Persistent):
         self.duration = timedelta( minutes=15 )
         self.speakers = []
         self.speakerText = ""
-        
+
         self.materials = {}
-        self.__materialGenerator = Counter() # Provides material unique 
+        self.__materialGenerator = Counter() # Provides material unique
                                              # identifiers whithin the current
         self.poster = None                   # contribution
         self.paper = None
@@ -9888,7 +9908,7 @@ class SubContribution(Persistent):
                 return
         self._fullyPublic = True
         self._p_changed = 1
-        
+
     def updateFullyPublic( self ):
         self.setFullyPublic()
         self.getOwner().updateFullyPublic()
@@ -9902,24 +9922,24 @@ class SubContribution(Persistent):
 
     def setKeywords(self, keywords):
         self._keywords = keywords
-    
+
     def getLogInfo(self):
         data = {}
-        
+
         data["subject"] = self.getTitle()
         data["id"] = self.id
         data["title"] = self.title
         data["parent title"] = self.getParent().getTitle()
         data["description"] = self.description
-        data["duration"] = "%s"%self.duration                
+        data["duration"] = "%s"%self.duration
         data["minutes"] = self.minutes
-        
+
         for sp in self.speakers :
-            data["speaker %s"%sp.getId()] = sp.getFullName()    
-        
+            data["speaker %s"%sp.getId()] = sp.getFullName()
+
         return data
-    
-    
+
+
     def clone(self, deltaTime, parent, options):
         sCont =  SubContribution()
         sCont.setParent(parent)
@@ -9931,15 +9951,15 @@ class SubContribution(Persistent):
         minutes = (dur.seconds % 3600) / 60
         sCont.setDuration(hours, minutes)
         sCont.setReportNumberHolder(self.getReportNumberHolder().clone(self))
-        
+
         # There is no _order attribute in this class
-        
+
         if options.get("authors", False) :
             for s in self.getSpeakerList() :
                 sCont.newSpeaker(s.clone())
             sCont.setSpeakerText(self.getSpeakerText())
-        
-        if options.get("materials", False) : 
+
+        if options.get("materials", False) :
             for m in self.getMaterialList() :
                 sCont.addMaterial(m.clone(sCont))
             if self.getPaper() is not None:
@@ -9952,40 +9972,40 @@ class SubContribution(Persistent):
                 sCont.setPoster(self.getPoster().clone(sCont))
             if self.getMinutes() is not None:
                 sCont.setMinutes(self.getMinutes().clone(sCont))
-      
-    
+
+
         sCont.notifyModification()
         return sCont
-    
+
     def notifyModification( self ):
         parent = self.getParent()
         if parent:
             parent.notifyModification()
         self.notifyOAIModification()
         self._p_changed = 1
-    
+
     def notifyOAIModification(self, date=None): #, force=False):
         return self.getParent().notifyOAIModification()
-    
+
     def getOAIModificationDate( self ):
         parent = self.getParent()
         if parent:
             return parent.getOAIModificationDate()
         return nowutc()
-    
+
     def getCategoriesPath(self):
         return self.getConference().getCategoriesPath()
-    
+
     def getLocator( self ):
-        """Gives back a globaly unique identification encapsulated in a Locator 
+        """Gives back a globaly unique identification encapsulated in a Locator
             object for the contribution instance
         """
-        
+
         lconf = self.getOwner().getLocator()
         lconf["subContId"] = self.getId()
         return lconf
-    
-    
+
+
     def setId( self, newId ):
         self.id = newId
 
@@ -9996,7 +10016,7 @@ class SubContribution(Persistent):
         """returns (string) the unique identifier of the item"""
         """used mainly in the web session access key table"""
         return "%ssc%s" % (self.getParent().getUniqueId(),self.id)
-    
+
     def setTitle( self, newTitle ):
         self.title = newTitle.strip()
         self.notifyModification()
@@ -10020,7 +10040,7 @@ class SubContribution(Persistent):
 
     def getParent( self ):
         return self.parent
-    
+
     def setOwner(self, owner):
         self.setParent(owner)
 
@@ -10029,10 +10049,10 @@ class SubContribution(Persistent):
 
     def getConference( self ):
         return self.parent.getConference()
-    
+
     def getSession( self ):
         return self.parent.getSession()
-    
+
     def getContribution(self):
         return self.parent
 
@@ -10042,15 +10062,15 @@ class SubContribution(Persistent):
     def setDuration( self, hours, minutes=0, dur=0 ):
         if dur!=0:
             self.duration=dur
-        else:          
+        else:
             hours = int( hours )
             minutes = int( minutes )
             self.duration = timedelta(hours=hours,minutes=minutes )
         self.notifyModification()
-    
+
     def getLocation( self ):
         return self.getOwner().getLocation()
-    
+
     def getRoom( self ):
         return self.getOwner().getRoom()
 
@@ -10103,7 +10123,7 @@ class SubContribution(Persistent):
         """
         """
         return self.speakers
-    
+
     def getSpeakerText( self ):
         #to be removed
         try:
@@ -10120,7 +10140,7 @@ class SubContribution(Persistent):
         self.setSpeakerText( "%s, %s"%(self.getSpeakerText(), newText.strip()) )
 
 #    """
-#    There is no _order attribute in this class - 
+#    There is no _order attribute in this class -
 #    the methods below are either obsolate or the feature has not been implemented
 #    """
 #    def setOrder( self, order ):
@@ -10143,19 +10163,19 @@ class SubContribution(Persistent):
         #self._v_canipaccess[ip] = True
         #return self._v_canipaccess[ip]
         return self.getOwner().canIPAccess(ip)
-    
+
     def isProtected( self ):
         return self.hasProtectedOwner()
-    
+
     def getAccessProtectionLevel( self ):
         return self.getOwner().getAccessProtectionLevel()
-    
+
     def hasAnyProtection( self ):
         """Tells whether a subContribution has any kind of protection over it:
             access or domain protection.
         """
         return self.getOwner().hasAnyProtection()
-    
+
     def hasProtectedOwner( self ):
         if self.getOwner() != None:
             return self.getOwner().isProtected()
@@ -10163,10 +10183,10 @@ class SubContribution(Persistent):
 
     def getAccessKey( self ):
         return self.getOwner().getAccessKey()
-    
+
     def getModifKey( self ):
         return self.getConference().getModifKey()
-    
+
     def canView( self, aw ):
         """tells whether the specified user has access to the current object
             or any of its sub-objects
@@ -10177,27 +10197,27 @@ class SubContribution(Persistent):
 
     def isAllowedToAccess( self, user ):
         return self.parent.isAllowedToAccess( user )
-        
+
     def canAccess( self, aw ):
         return self.getOwner().canAccess(aw)
-        
+
     def canModify( self, aw ):
         return self.canUserModify( aw.getUser() ) or self.getConference().canKeyModify( aw )
 
     def canUserModify( self, av ):
-        """Tells whether a user is allowed to modify the current contribution: 
+        """Tells whether a user is allowed to modify the current contribution:
             only if the user is granted to modify the contribution or the user
             can modify any of its upper objects (i.e. conference or session).
         """
         return self.getParent().canUserModify( av )
 
-    def canUserSubmit( self, av ): 
+    def canUserSubmit( self, av ):
         return self.getOwner().canUserSubmit( av )
 
     def addMaterial( self, newMat ):
         newMat.setId( str(self.__materialGenerator.newCount()) )
         newMat.setOwner( self )
-        self.materials[ newMat.getId() ] =  newMat 
+        self.materials[ newMat.getId() ] =  newMat
         self.notifyModification()
 
     def removeMaterial( self, mat):
@@ -10221,7 +10241,7 @@ class SubContribution(Persistent):
         elif mat.getId().lower() == 'poster':
             self.removePoster()
             self.notifyModification()
-        
+
 
     def recoverMaterial(self, recMat):
     # Id must already be set in recMat.
@@ -10248,7 +10268,7 @@ class SubContribution(Persistent):
     def getMaterialList( self ):
         return self.materials.values()
 
-    def getAllMaterialList( self ):  
+    def getAllMaterialList( self ):
         l = self.getMaterialList()
         if self.getPaper():
             l.append( self.getPaper() )
@@ -10262,7 +10282,7 @@ class SubContribution(Persistent):
             l.append( self.getPoster() )
         l.sort(lambda x,y: cmp(x.getTitle(),y.getTitle()))
         return l
-    
+
     def setPaper( self, newPaper ):
         if self.getPaper() != None:
             raise MaKaCError( _("The paper for this subcontribution has already been set"), _("Contribution"))
@@ -10284,7 +10304,7 @@ class SubContribution(Persistent):
 
     def getPaper( self ):
         return self.paper
-    
+
     def setSlides( self, newSlides ):
         if self.getSlides() != None:
             raise MaKaCError( _("The slides for this subcontribution have already been set"), _("Contribution"))
@@ -10333,7 +10353,7 @@ class SubContribution(Persistent):
         except AttributeError:
             self.video = None
         return self.video
-        
+
     def setPoster( self, newPoster ):
         if self.getPoster() != None:
             raise MaKaCError( _("the poster for this subcontribution has already been set"))
@@ -10367,7 +10387,7 @@ class SubContribution(Persistent):
         self.minutes=newMinutes
         self.minutes.setOwner( self )
         self.notifyModification()
-    
+
     def createMinutes( self ):
         if self.getMinutes() != None:
             raise MaKaCError( _("The minutes for this subcontribution have already been created"), _("Sub Contribution"))
@@ -10404,17 +10424,17 @@ class SubContribution(Persistent):
 
     def getMasterSchedule( self ):
         return self.getOwner().getSchedule()
-        
+
     def resetAccessCache(self, UP=True, DOWN=True):
         if UP:
             self.getOwner().resetAccessCache(True, False)
         if DOWN:
             for mat in self.getMaterialList():
                 mat.resetAccessCache(False, True)
-            
+
     def resetModifyCache(self, UP=True, DOWN=True):
         if UP and DOWN:
-            self.resetAccessCache(UP, DOWN) 
+            self.resetAccessCache(UP, DOWN)
         if UP:
             self.getOwner().resetModifyCache(True, False)
         if DOWN:
@@ -10426,14 +10446,14 @@ class SubContribution(Persistent):
         indexes.IndexesHolder().getById("OAIContributionModificationDate").unindexContribution(self)
         indexes.IndexesHolder().getById("OAIPrivateContributionModificationDate").unindexContribution(self)
 
-                
+
     def delete(self):
 
         self.unindex()
-        
+
         #index a DeletedObject to keep track of the sub-contribution after the deletion
         DeletedObjectHolder().add(DeletedObject(self))
-        
+
         while len(self.getSpeakerList()) > 0:
             self.removeSpeaker(self.getSpeakerList()[0])
         for mat in self.getMaterialList():
@@ -10442,7 +10462,7 @@ class SubContribution(Persistent):
         self.removeSlides()
         self.removeVideo()
         self.removePoster()
-        self.removeMinutes()        
+        self.removeMinutes()
         TrashCanManager().add(self)
 
         self.unindex()
@@ -10463,25 +10483,25 @@ class SubContribution(Persistent):
 
 class Material(Persistent):
     """This class represents a set of electronic documents (resources) which can
-        be attached to a conference, a session or a contribution. 
+        be attached to a conference, a session or a contribution.
         A material can be of several types (achieved by specialising this class)
-        and is like a container of files which have some relation among them. 
-        It contains the minimal set of attributes to store basic meta data and 
+        and is like a container of files which have some relation among them.
+        It contains the minimal set of attributes to store basic meta data and
         provides useful operations to access and manage it.
        Attributes:
-        owner -- (Conference, Session or Contribution) Object to which the 
+        owner -- (Conference, Session or Contribution) Object to which the
             material is attached to
         id -- (string) Material unique identifier. Normally used to uniquely
             identify a material within a conference, session or contribution
-        title -- (string) Material denomination 
-        description -- (string) Longer text describing in more detail material 
+        title -- (string) Material denomination
+        description -- (string) Longer text describing in more detail material
             intentions
         type -- (string) String identifying the material classification
-        resources -- (PMapping) Collection of resouces grouped within the 
-            material. Dictionary of references to Resource objects indexed 
+        resources -- (PMapping) Collection of resouces grouped within the
+            material. Dictionary of references to Resource objects indexed
             by their unique relative id.
     """
-    
+
     def __init__( self, materialData=None ):
         self.id = "not assigned"
         self.__resources = {}
@@ -10492,7 +10512,7 @@ class Material(Persistent):
         self.owner = None
         self.__ac = AccessController()
         self._mainResource = None
-    
+
     def isFullyPublic( self ):
         if hasattr(self, "_fullyPublic"):
             return self._fullyPublic
@@ -10501,7 +10521,7 @@ class Material(Persistent):
             return self._fullyPublic
 
     def setFullyPublic( self ):
-        if self.isProtected():   
+        if self.isProtected():
             self._fullyPublic = False
             self._p_changed = 1
             return
@@ -10520,26 +10540,26 @@ class Material(Persistent):
     def setValues( self, params ):
         """Sets all the values of the current material object from a diccionary
             containing the following key-value pairs:
-                title-(str) 
+                title-(str)
                 description-(str)
-           Please, note that this method sets ALL values which means that if 
+           Please, note that this method sets ALL values which means that if
             the given dictionary doesn't contain any of the keys the value
             will set to a default value.
         """
         self.setTitle( params.get( "title", _("NO TITLE ASSIGNED") ) )
         self.setDescription( params.get( "description", "" ) )
         self.notifyModification()
-    
+
     def clone ( self, owner):
         mat = type(self)()
         mat.setTitle(self.getTitle())
         mat.setDescription(self.getDescription())
         mat.notifyModification()
-        
+
         mat.setId(self.getId())
         mat.setOwner(owner)
         mat.setType(self.getType())
-        
+
         mat.setProtection(self.isItselfProtected())
         mat.setAccessKey(self.getAccessKey())
         lrep = self._getRepository()
@@ -10563,17 +10583,17 @@ class Material(Persistent):
                 mat.addResource(newfile)
             else :
                 raise Exception( _("Unexpected object type in Resource List : ")+str(type(r)))
-        
+
         mat.setMainResource(self.getMainResource())
-        
+
         return mat
-    
+
     def notifyModification( self ):
         parent = self.getOwner()
         if parent:
             parent.notifyModification()
         self._p_changed = 1
-    
+
     def getLocator( self ):
         if self.owner == None:
             return Locator()
@@ -10597,7 +10617,7 @@ class Material(Persistent):
         """returns (string) the unique identifier of the item"""
         """used mainly in the web session access key table"""
         return "%sm%s" % (self.getOwner().getUniqueId(),self.id)
-    
+
     def setOwner( self, newOwner ):
         self.owner = newOwner
 
@@ -10615,7 +10635,7 @@ class Material(Persistent):
         if type(self.getOwner()) is Category:
             return None
         return self.getOwner().getConference()
-     
+
     def getSession( self ):
         if self.getContribution():
             return self.getContribution().getSession()
@@ -10631,7 +10651,7 @@ class Material(Persistent):
         if isinstance(self.getOwner(), Contribution):
             return self.getOwner()
         return None
-    
+
     def getSubContribution( self ):
         if isinstance(self.getOwner(), SubContribution):
             return self.getOwner()
@@ -10655,7 +10675,7 @@ class Material(Persistent):
                  'MaKaC.conference.Poster'],'title')
     def getTitle( self ):
         return self.title
-    
+
     @Updates (['MaKaC.conference.Material',
                  'MaKaC.conference.Minutes',
                  'MaKaC.conference.Paper',
@@ -10687,7 +10707,7 @@ class Material(Persistent):
                  'MaKaC.conference.Poster'], 'type')
     def getType( self ):
         return self.type
-    
+
     @Retrieves (['MaKaC.conference.Material',
                  'MaKaC.conference.Minutes',
                  'MaKaC.conference.Paper',
@@ -10707,7 +10727,7 @@ class Material(Persistent):
                 return 'No'
         else:
             return None
-        
+
     @Retrieves (['MaKaC.conference.Material',
                  'MaKaC.conference.Minutes',
                  'MaKaC.conference.Paper',
@@ -10726,7 +10746,7 @@ class Material(Persistent):
             5 : the material is subject to reviewing, has been submitted by the author, and has been judged as Rejected
         """
         if isinstance(self.owner, Contribution):
-            conference = self.owner.getConference() 
+            conference = self.owner.getConference()
             if not conference.hasEnabledSection('paperReviewing') or conference.getConfReview().getChoice() == 0: #conference has no reviewing process
                 return 0
             else: #conference has reviewing
@@ -10734,7 +10754,7 @@ class Material(Persistent):
                 if self.title in reviewableMaterials: #material is reviewable
                     lastReview = self.owner.getReviewManager().getLastReview()
                     if lastReview.isAuthorSubmitted(): #author has submitted
-                        refereeJudgement = lastReview.getRefereeJudgement() 
+                        refereeJudgement = lastReview.getRefereeJudgement()
                         if refereeJudgement.isSubmitted(): #referee has submitted judgement
                             if refereeJudgement.getJudgement() == "Accept":
                                 return 4
@@ -10797,7 +10817,7 @@ class Material(Persistent):
         if res.getId() in self.__resources.keys():
             del self.__resources[ res.getId() ]
             res.delete()
-            self.notifyModification()       
+            self.notifyModification()
         if self.getMainResource() is not None and \
                 self._mainResource.getId() == res.getId():
             self._mainResource = None
@@ -10823,10 +10843,10 @@ class Material(Persistent):
         for res in self.getResourceList():
             self.removeResource( res )
         TrashCanManager().add(self)
-    
+
     def recover(self):
-        TrashCanManager().remove(self)    
-    
+        TrashCanManager().remove(self)
+
     def canIPAccess( self, ip ):
         try:
             return self._v_canipaccess[ip]
@@ -10856,7 +10876,7 @@ class Material(Persistent):
 
     def getAccessProtectionLevel( self ):
         return self.__ac.getAccessProtectionLevel()
-    
+
     def isItselfProtected( self ):
         return self.__ac.isItselfProtected()
 
@@ -10908,36 +10928,36 @@ class Material(Persistent):
                'MaKaC.conference.Paper',
                'MaKaC.conference.Slides',
                'MaKaC.conference.Video',
-               'MaKaC.conference.Poster'], 'accessKey')        
+               'MaKaC.conference.Poster'], 'accessKey')
 
     def setAccessKey( self, pwd="" ):
         self.__ac.setAccessKey(pwd)
         self._p_changed = 1
-        self.resetAccessCache() 
+        self.resetAccessCache()
 
     @Retrieves (['MaKaC.conference.Material',
                  'MaKaC.conference.Minutes',
                  'MaKaC.conference.Paper',
                  'MaKaC.conference.Slides',
                  'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster'], 'accessKey')        
+                 'MaKaC.conference.Poster'], 'accessKey')
     def getAccessKey( self ):
         return self.__ac.getAccessKey()
-        
+
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.linkTo(self, "access")
         self._p_changed = 1
-        self.resetAccessCache() 
+        self.resetAccessCache()
 
     def revokeAccess( self, prin ):
         self.__ac.revokeAccess( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "access")
         self._p_changed = 1
-        self.resetAccessCache() 
-    
+        self.resetAccessCache()
+
     def canView( self, aw ):
         """tells whether the specified user has access to the current object
             or any of its sub-objects
@@ -10956,7 +10976,7 @@ class Material(Persistent):
             pass
         self._v_isallowedtoaccess[user] = (not self.isItselfProtected() and self.getOwner().isAllowedToAccess( user )) or self.__ac.canUserAccess( user ) or self.canUserModify(user)
         return self._v_isallowedtoaccess[user]
-        
+
     def canAccess( self, aw ):
         try:
             return self._v_canaccess[aw]
@@ -10967,11 +10987,11 @@ class Material(Persistent):
         canUserAccess = self.isAllowedToAccess( aw.getUser() )
         canIPAccess = self.canIPAccess( aw.getIP() )
         if not self.isProtected():
-            self._v_canaccess[aw] = canUserAccess or canIPAccess 
+            self._v_canaccess[aw] = canUserAccess or canIPAccess
         else:
             canKeyAccess = self.canKeyAccess(aw)
             self._v_canaccess[aw]  = canUserAccess or canKeyAccess
-        return self._v_canaccess[aw] 
+        return self._v_canaccess[aw]
 
     def resetAccessCache(self, UP=True, DOWN=True):
         if hasattr(self,"_v_canaccess"):
@@ -10987,7 +11007,7 @@ class Material(Persistent):
         if DOWN:
             for res in self.getResourceList():
                 res.resetAccessCache(False, True)
-            
+
     def resetModifyCache(self, UP=True, DOWN=True):
         if hasattr(self,"_v_canmodify"):
             del self._v_canmodify
@@ -10996,7 +11016,7 @@ class Material(Persistent):
         if hasattr(self,"_v_cankeymodify"):
             del self._v_cankeymodify
         if UP and DOWN:
-            self.resetAccessCache(UP, DOWN) 
+            self.resetAccessCache(UP, DOWN)
         if UP:
             self.getOwner().resetModifyCache(True, False)
         if DOWN:
@@ -11021,14 +11041,14 @@ class Material(Persistent):
         if isinstance(prin, MaKaC.user.Avatar):
             prin.linkTo(self, "manager")
         self._p_changed = 1
-        self.resetModifyCache() 
-    
+        self.resetModifyCache()
+
     def revokeModification( self, prin ):
         self.__ac.revokeModification( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "manager")
         self._p_changed = 1
-        self.resetModifyCache() 
+        self.resetModifyCache()
 
     def canModify( self, aw ):
         try:
@@ -11041,7 +11061,7 @@ class Material(Persistent):
         return self._v_canmodify[aw]
 
     def canUserModify( self, user ):
-        """Tells whether a user is allowed to modify the current contribution: 
+        """Tells whether a user is allowed to modify the current contribution:
             only if the user is granted to modify the contribution or the user
             can modify any of its upper objects (i.e. conference or session).
         """
@@ -11059,19 +11079,19 @@ class Material(Persistent):
 
     def getManagerList( self ):
         return self.__ac.getModifierList()
-    
+
     def getAllowedToAccessList( self ):
         return self.__ac.getAccessList()
-    
+
     def requireDomain( self, dom ):
         self.__ac.requireDomain( dom )
         self._p_changed = 1
-        self.resetAccessCache() 
+        self.resetAccessCache()
 
     def freeDomain( self, dom ):
         self.__ac.freeDomain( dom )
         self._p_changed = 1
-        self.resetAccessCache() 
+        self.resetAccessCache()
 
     def getDomainList( self ):
         return self.__ac.getRequiredDomainList()
@@ -11081,47 +11101,47 @@ class Material(Persistent):
 
 
 class Paper(Material):
-    
+
     def __init__( self, materialData = None ):
         Material.__init__( self, materialData )
         self.id = "paper"
-    
+
     def setId( self, newId ):
         return
-    
+
 
 
 class Slides(Material):
-    
+
     def __init__( self, materialData = None ):
         Material.__init__( self, materialData )
         self.id = "slides"
-    
+
     def setId( self, newId ):
         return
-    
-    
+
+
 
 class Video(Material):
-    
+
     def __init__( self, materialData = None ):
         Material.__init__( self, materialData )
         self.id = "video"
-        
+
     def setId( self, newId ):
         return
-    
+
 class Poster(Material):
-    
+
     def __init__( self, materialData = None ):
         Material.__init__( self, materialData )
         self.id = "poster"
-    
+
     def setId( self, newId ):
         return
 
 class Minutes(Material):
-    
+
     def __init__( self, materialData = None ):
         Material.__init__( self, materialData )
         self.id = "minutes"
@@ -11133,11 +11153,11 @@ class Minutes(Material):
         mat.setTitle(self.getTitle())
         mat.setDescription(self.getDescription())
         mat.notifyModification()
-        
+
         mat.setId(self.getId())
         mat.setOwner(owner)
         mat.setType(self.getType())
-        
+
         mat.setProtection(self.isItselfProtected())
         mat.setAccessKey(self.getAccessKey())
         lrep = self._getRepository()
@@ -11163,9 +11183,9 @@ class Minutes(Material):
                 mat.addResource(newfile)
             else :
                 raise Exception( _("Unexpected object type in Resource List : ")+str(type(r)))
-        
+
         mat.setMainResource(self.getMainResource())
-        
+
         return mat
 
     def setId( self, newId ):
@@ -11217,7 +11237,7 @@ class Minutes(Material):
         if self.file is not None and res.getId().strip() == "minutes":
             self.file = None
             res.delete()
-            self.notifyModification()  
+            self.notifyModification()
 
     def recoverResource(self, recRes):
         if recRes.getId() == "minutes":
@@ -11230,11 +11250,11 @@ class Minutes(Material):
 
 
 class Resource(Persistent):
-    """This is the base class for representing individual resources which can 
-        be included in material containers for lately being attached to 
+    """This is the base class for representing individual resources which can
+        be included in material containers for lately being attached to
         conference objects (i.e. conferences, sessions or contributions). This
         class provides basic data and operations to handle this resources.
-       Resources can be of serveral types (files, links, ...) which means 
+       Resources can be of serveral types (files, links, ...) which means
         different specialisations of this class.
        Attributes:
         id -- (string) Allows to assign the resource a unique identifier. It
@@ -11242,14 +11262,14 @@ class Resource(Persistent):
             resources included in a certain material.
         name -- (string) Short description about the purpose or the contents
             of the resource.
-        description - (string) detailed and varied information about the 
+        description - (string) detailed and varied information about the
             resource.
         __owner - (Material) reference to the material object in which the
             current resource is included.
     """
 
     @Retrieves (['MaKaC.conference.Link',
-                 'MaKaC.conference.LocalFile'], 'type', lambda r: if_else(type(r) == Link , 'external', 'stored'))    
+                 'MaKaC.conference.LocalFile'], 'type', lambda r: if_else(type(r) == Link , 'external', 'stored'))
     @Retrieves ('MaKaC.conference.LocalFile', 'url', lambda r: str(urlHandlers.UHFileAccess.getURL(r)))
     def __init__( self, resData = None ):
         self.id = "not assigned"
@@ -11257,26 +11277,26 @@ class Resource(Persistent):
         self.description = ""
         self._owner = None
         self.__ac = AccessController()
-    
+
     def clone( self, conf ):
-        res = Resource()       
+        res = Resource()
         res.setName(self.getName())
         res.setDescription(self.getDescription())
         res.setOwner(conf)
         res.notifyModification()
         res.setId(self.getId())
-        
+
         res.setProtection(self.isItselfProtected())
         #res.__ac = self.getAccessController()
-        
+
         return res
-    
+
     def notifyModification( self ):
         parent = self.getOwner()
         if parent:
             parent.notifyModification()
         self._p_changed = 1
-    
+
     def getLocator( self ):
         if self._owner == None:
             return Locator()
@@ -11291,14 +11311,14 @@ class Resource(Persistent):
                  'MaKaC.conference.LocalFile'],'id')
     def getId( self ):
         return self.id
-    
+
     def getUniqueId( self ):
         """returns (string) the unique identifier of the item
         used mainly in the web session access key table
         for resources, it is the same as the father material since
         only the material can be protected with an access key"""
         return self.getOwner().getUniqueId()
-    
+
     def setOwner( self, newOwner ):
         self._owner = newOwner
 
@@ -11307,7 +11327,7 @@ class Resource(Persistent):
 
     def getCategory( self ):
         #raise "%s:%s:%s"%(self.getOwner(), Material, isinstance(self.getOwner, Material))
-        
+
         if isinstance(self.getOwner(), Category):
             return self.getOwner()
         if isinstance(self.getOwner(), Material):
@@ -11347,13 +11367,13 @@ class Resource(Persistent):
                  'MaKaC.conference.LocalFile'], 'description')
     def getDescription( self ):
         return self.description
-        
+
     def archive( self, repository=None ):
-        """performs necessary operations to ensure the archiving of the 
-            resource. By default is doing nothing as the persistence of the 
+        """performs necessary operations to ensure the archiving of the
+            resource. By default is doing nothing as the persistence of the
             system already ensures the archiving of the basic resource data"""
         return
-    
+
     def delete( self ):
         if self._owner != None:
             self._owner.removeResource( self )
@@ -11378,7 +11398,7 @@ class Resource(Persistent):
             return self._v_canipaccess[ip]
         self._v_canipaccess[ip] = True
         return self._v_canipaccess[ip]
-    
+
     def isProtected( self ):
         # tells if a resource is protected or not
         return (self.hasProtectedOwner() + self.getAccessProtectionLevel()) > 0
@@ -11387,7 +11407,7 @@ class Resource(Persistent):
                  'MaKaC.conference.LocalFile'], 'protection')
     def getAccessProtectionLevel( self ):
         return self.__ac.getAccessProtectionLevel()
-    
+
     def isItselfProtected( self ):
         return self.__ac.isItselfProtected()
 
@@ -11401,7 +11421,7 @@ class Resource(Persistent):
     def setProtection( self, private ):
         self.__ac.setProtection( private )
         self.getOwner().updateFullyPublic()
-    
+
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
         if isinstance(prin, MaKaC.user.Avatar):
@@ -11413,7 +11433,7 @@ class Resource(Persistent):
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "access")
         self.resetAccessCache()
-    
+
     def canView( self, aw ):
         """tells whether the specified user has access to the current object
             or any of its sub-objects
@@ -11429,10 +11449,10 @@ class Resource(Persistent):
             pass
         self._v_isallowedtoaccess[user] = self.__ac.canUserAccess( user ) or self.canUserModify( user ) or (not self.isItselfProtected() and self.getOwner().isAllowedToAccess( user ))
         return self._v_isallowedtoaccess[user]
-        
+
     def canAccess( self, aw ):
         try:
-            return self._v_canaccess[aw] 
+            return self._v_canaccess[aw]
         except AttributeError:
             self._v_canaccess = {}
         except KeyError:
@@ -11447,7 +11467,7 @@ class Resource(Persistent):
         self._v_canaccess[aw] = flag or self.canKeyAccess(aw) or self.getOwner().canKeyAccess(aw) or \
                 (self.getConference() != None and self.getConference().canKeyAccess(aw) and self.getAccessKey() == "") or \
                 (self.getConference() != None and self.getConference().canKeyAccess(aw) and self.getAccessKey() == self.getConference().getAccessKey())
-        return self._v_canaccess[aw] 
+        return self._v_canaccess[aw]
 
     def resetAccessCache(self, UP=True, DOWN=True):
         if hasattr(self,"_v_canaccess"):
@@ -11458,21 +11478,21 @@ class Resource(Persistent):
             del self._v_canipaccess
         if UP:
             self.getOwner().resetAccessCache(True, False)
-            
+
     def resetModifyCache(self, UP=True, DOWN=True):
         if hasattr(self,"_v_canmodify"):
             del self._v_canmodify
         if hasattr(self,"_v_canusermodify"):
             del self._v_canusermodify
         if UP and DOWN:
-            self.resetAccessCache(UP, DOWN) 
+            self.resetAccessCache(UP, DOWN)
         if UP:
             self.getOwner().resetModifyCache(True, False)
 
     def grantModification( self, prin ):
         self.__ac.grantModification( prin )
         self.resetModifyCache()
-    
+
     def revokeModification( self, prin ):
         self.__ac.revokeModification( prin )
         self.resetModifyCache()
@@ -11488,7 +11508,7 @@ class Resource(Persistent):
         return self._v_canmodify[aw]
 
     def canUserModify( self, user ):
-        """Tells whether a user is allowed to modify the current contribution: 
+        """Tells whether a user is allowed to modify the current contribution:
             only if the user is granted to modify the contribution or the user
             can modify any of its upper objects (i.e. conference or session).
         """
@@ -11500,19 +11520,19 @@ class Resource(Persistent):
             pass
         self._v_canusermodify[user] = self.getOwner().canUserModify( user )
         return self._v_canusermodify[user]
-    
+
     def getModifKey( self ):
         return self.getConference().getModifKey()
 
     def getManagerList( self ):
         return self.__ac.getModifierList()
-    
+
     def getAllowedToAccessList( self ):
         return self.__ac.getAccessList()
 
     def getURL( self ):
         return ""
-    
+
     def requireDomain( self, dom ):
         self.__ac.requireDomain( dom )
         self.resetAccessCache()
@@ -11543,8 +11563,8 @@ class Resource(Persistent):
                 if (accessKey != "" and keys[self.getUniqueId()] == accessKey) or (accessKey == "" and self.getConference().getAccessKey() != "" and keys[self.getUniqueId()] == self.getConference().getAccessKey()):
                     return True
         return False
-    
-    
+
+
     @Retrieves (['MaKaC.conference.Resource',
                  'MaKaC.conference.Link',
                  'MaKaC.conference.LocalFile'], 'reviewingState')
@@ -11572,24 +11592,24 @@ class Link(Resource):
        Params:
         url -- (string) Contains the URL to the internet target resource.
     """
-    
+
     def __init__( self, resData = None ):
         Resource.__init__( self, resData )
         self.url = ""
-    
+
     @Updates ('MaKaC.conference.Link', 'url')
     def setURL( self, newURL ):
         self.url = newURL.strip()
         self.notifyModification()
-    
+
     @Retrieves ('MaKaC.conference.Link','url')
     def getURL( self ):
         return self.url
 
 
 class LocalFile(Resource):
-    """Specialises Resource class in order to represent files which can be 
-        stored in the system. The user can choose to use the system as an 
+    """Specialises Resource class in order to represent files which can be
+        stored in the system. The user can choose to use the system as an
         archive of electronic files so he may want to attach a file which is
         in his computer to a conference so it remains there and must be kept
         in the system. This object contains the file basic metadata and provides
@@ -11600,16 +11620,16 @@ class LocalFile(Resource):
         fileName -- (string) Name of the file. Normally the original name of
             the user submitted file is kept.
         filePath -- (string) If it is set, it contains a local path to the
-            file submitted by the user and uploaded in the system. This 
-            attribute is only temporary used so it keeps a pointer to a 
+            file submitted by the user and uploaded in the system. This
+            attribute is only temporary used so it keeps a pointer to a
             temporary uploaded file.
-        __repository -- (FileRep) Once a file is archived, it is kept in a 
-            FileRepository for long term. This attribute contains a pointer 
+        __repository -- (FileRep) Once a file is archived, it is kept in a
+            FileRepository for long term. This attribute contains a pointer
             to the file repository where the file is kept.
         __archivedId -- (string) It contains a unique identifier for the file
             inside the repository where it is archived.
     """
-    
+
     def __init__( self, resData = None ):
         Resource.__init__( self, resData )
         self.fileName= ""
@@ -11617,27 +11637,27 @@ class LocalFile(Resource):
         self.filePath = ""
         self.__repository = None
         self.__archivedId = ""
-    
-    
+
+
     def setFileName( self, newFileName, checkArchive=True ):
         """While the file is not archived sets the file name of the current
-            object to the one specified (if a full path is specified the 
+            object to the one specified (if a full path is specified the
             base name is extracted) replacing on it blanks by underscores.
         """
         if checkArchive and self.isArchived():
             raise MaKaCError( _("The file name of an archived file cannot be changed"), _("File Archiving"))
-        #Using os.path.basename is not enough as it only extract filenames 
-        #   correclty depending on the server platform. So we need to convert 
+        #Using os.path.basename is not enough as it only extract filenames
+        #   correclty depending on the server platform. So we need to convert
         #   to the server platform and apply the basename extraction. As I
         #   couldn't find a python function for this this is done manually
         #   although it can contain errors
-        #On windows basename function seems to work properly with unix file 
+        #On windows basename function seems to work properly with unix file
         #   paths
         if newFileName.count("/"):
             #unix filepath
             newFileName = newFileName.split("/")[-1]
         else:
-            #windows file path: there "/" is not allowed on windows paths 
+            #windows file path: there "/" is not allowed on windows paths
             newFileName = newFileName.split("\\")[-1]
         self.fileName = newFileName.strip().replace(" ", "_")
 
@@ -11656,7 +11676,7 @@ class LocalFile(Resource):
         else:
             return fileExtension
 
-    def setFilePath( self, filePath ): 
+    def setFilePath( self, filePath ):
         if self.isArchived():
             raise MaKaCError( _("The path of an archived file cannot be changed"), _("File Archiving"))
         if not os.access( filePath.strip(), os.F_OK ):
@@ -11710,12 +11730,12 @@ class LocalFile(Resource):
             return _("Nothing to archive")
         repository.storeFile( self )
         self.filePath = ""
-        self.notifyModification() 
+        self.notifyModification()
 
     def unArchive(self):
     # Not used.
         self.__repository = None
-        self.__archivedId = ""      
+        self.__archivedId = ""
 
     def recover(self):
         if not self.isArchived():
@@ -11734,15 +11754,15 @@ class LocalFile(Resource):
         except AttributeError, e:
             pass
         Resource.delete( self )
-    
+
     def getRepository(self):
         return self.__repository
 
     #getURL is removed at the moment from the LocalFile and the file access
-    #   is completely delegated to the web interface; the web interface will 
+    #   is completely delegated to the web interface; the web interface will
     #   have to access the files locally (using the getFilePath) or the readBin
     #   function.
-    #However, for the future it could be required to have several file 
+    #However, for the future it could be required to have several file
     #   repositories so the file access will have to be reviewed.
     #def getURL( self ):
     #    #XXX: Very bad!! We should find a better solution
@@ -11754,12 +11774,12 @@ class TCIndex( Persistent ):
     """Index for conference track coordinators.
 
         This class allows to index conference track coordinators so the owner
-        can answer optimally to the query if a user is coordinating 
+        can answer optimally to the query if a user is coordinating
         any conference track.
         It is implemented by simply using a BTree where the Avatar id is used
-        as key (because it is unique and non variable) and a list of 
-        coordinated tracks is kept as keys. It is the responsability of the 
-        index owner (conference) to keep it up-to-date i.e. notify track 
+        as key (because it is unique and non variable) and a list of
+        coordinated tracks is kept as keys. It is the responsability of the
+        index owner (conference) to keep it up-to-date i.e. notify track
         coordinator additions and removals.
     """
 
@@ -11778,7 +11798,7 @@ class TCIndex( Persistent ):
         """Registers in the index a coordinator of a track.
         """
         if av == None or track == None:
-            return 
+            return
         if not self._idx.has_key( av.getId() ):
             l = []
             self._idx[ av.getId() ] = l
@@ -11790,7 +11810,7 @@ class TCIndex( Persistent ):
 
     def unindexCoordinator( self, av, track ):
         if av == None or track == None:
-            return 
+            return
         l = self._idx.get( av.getId(), [] )
         if track in l:
             l.remove( track )
@@ -11802,7 +11822,7 @@ class TCIndex( Persistent ):
 
 
 class Track(Persistent):
-    
+
     def __init__( self ):
         self.conference = None
         self.id = "not assigned"
@@ -11814,23 +11834,23 @@ class Track(Persistent):
         self._coordinators = []
         self._contributions = OOBTree()
         self._code=""
-    
+
     def clone(self, conference):
         tr = Track()
         tr.setConference(conference)
         tr.setTitle(self.getTitle())
         tr.setCode(self.getCode())
         tr.setDescription(self.getDescription())
-        
+
         for co in self.getCoordinatorList() :
             tr.addCoordinator(co)
-        
+
         for subtr in self.getSubTrackList() :
             tr.addSubTrack(subtr.clone())
-        
+
         return tr
-        
-    
+
+
     def delete( self ):
         """Deletes a track from the system. All the associated abstracts will
             also be notified so the track is no longer associated to them.
@@ -11838,16 +11858,16 @@ class Track(Persistent):
         #XXX: Should we allow to delete a track when there are some abstracts
         #       or contributions submitted for it?!?!?!?!
 
-        # we must notify each abstract in the track about the deletion of the 
-        #   track  
+        # we must notify each abstract in the track about the deletion of the
+        #   track
         while len(self._abstracts)>0:
             k = self._abstracts.keys()[0]
             abstract = self._abstracts[k]
             del self._abstracts[k]
             abstract.removeTrack( self )
 
-        # we must notify each contribution in the track about the deletion of the 
-        #   track  
+        # we must notify each contribution in the track about the deletion of the
+        #   track
         while len(self._contributions)>0:
             k = self._contributions.keys()[0]
             contrib = self._contributions[k]
@@ -11863,7 +11883,7 @@ class Track(Persistent):
             conf = self.conference
             self.conference = None
             conf.removeTrack( self )
-        
+
         TrashCanManager().add(self)
 
     def recover(self):
@@ -11888,7 +11908,7 @@ class Track(Persistent):
             pass
         self._v_canusermodify[av] = self.conference.canUserModify( av )
         return self._v_canusermodify[av]
-    
+
     def canView( self, aw ):
         return self.conference.canView( aw )
 
@@ -11897,9 +11917,9 @@ class Track(Persistent):
         if parent:
             parent.notifyModification()
         self._p_changed = 1
-    
+
     def getLocator( self ):
-        """Gives back a globaly unique identification encapsulated in a Locator 
+        """Gives back a globaly unique identification encapsulated in a Locator
             object for the track instance
         """
         if self.conference == None:
@@ -11907,7 +11927,7 @@ class Track(Persistent):
         lconf = self.conference.getLocator()
         lconf["trackId"] = self.getId()
         return lconf
-    
+
     def setConference(self, conference):
         self.conference = conference
 
@@ -11915,11 +11935,11 @@ class Track(Persistent):
         return self.conference
 
     def getOwner( self ):
-        return self.getConference() 
+        return self.getConference()
 
     def setId( self, newId ):
         self.id = str(newId)
-        
+
     @Retrieves (['MaKaC.conference.Track'],'id')
     def getId( self ):
         return self.id
@@ -11949,7 +11969,7 @@ class Track(Persistent):
 
     def setCode(self,newCode):
         self._code=str(newCode).strip()
-    
+
     def __generateNewSubTrackId( self ):
         return str(self.__SubTrackGenerator.newCount())
 
@@ -11987,7 +12007,7 @@ class Track(Persistent):
 
     def getSubTrackById( self, id ):
         if self.subTracks.has_key( id ):
-            return self.subTracks[ id ] 
+            return self.subTracks[ id ]
         return None
 
     def getSubTrackList( self ):
@@ -12033,7 +12053,7 @@ class Track(Persistent):
 
     def removeAbstract( self, abstract ):
         """Removes an abstract from the track abstract list.
-            
+
             Notice that this method doesn't notify the abstract about the track
             removal.
         """
@@ -12043,9 +12063,9 @@ class Track(Persistent):
 
     def addCoordinator( self, av ):
         """Grants coordination privileges to user.
-        
+
             Arguments:
-                av -- (MaKaC.user.Avatar) the user to which 
+                av -- (MaKaC.user.Avatar) the user to which
                     coordination privileges must be granted.
         """
         try:
@@ -12065,7 +12085,7 @@ class Track(Persistent):
         """Revokes coordination privileges to user.
 
            Arguments:
-            av -- (MaKaC.user.Avatar) user for which coordination privileges 
+            av -- (MaKaC.user.Avatar) user for which coordination privileges
                     must be revoked
         """
         try:
@@ -12080,14 +12100,14 @@ class Track(Persistent):
             self.getConference().removeTrackCoordinator( self, av )
             av.linkTo(self, "coordinator")
             self.notifyModification()
-    
+
     def isCoordinator( self, av ):
         """Tells whether the specified user is a coordinator of the track.
 
            Arguments:
             av -- (MaKaC.user.Avatar) user to be checke
-           
-           Return value: (boolean)  
+
+           Return value: (boolean)
         """
         try:
             if self._coordinators:
@@ -12109,17 +12129,17 @@ class Track(Persistent):
             self._coordinators = []
 
         return self._coordinators
-    
+
     def canCoordinate( self, aw ):
         """Tells if a user has coordination privileges.
 
             Only track coordinators have coordination privileges over a track.
-            
+
             Params:
-                aw -- (MaKaC.accessControl.AccessWrapper) User access 
+                aw -- (MaKaC.accessControl.AccessWrapper) User access
                     information for which the coordination privileges must be
                     checked.
-            
+
             Return value: (boolean)
         """
         return self.isCoordinator( aw.getUser() ) or self.canModify( aw )
@@ -12168,36 +12188,36 @@ class Track(Persistent):
         except AttributeError:
             self._contributions = OOBTree()
         return self._contributions.values()
-    
+
     def canUserCoordinate( self, av ):
         return self.isCoordinator( av ) or self.canUserModify( av )
 
     def getModifKey( self ):
         return self.getConference().getModifKey()
-    
+
 
 class SubTrack(Persistent):
-    
+
     def __init__( self ):
         self.track = None
         self.id = "not assigned"
         self.title = ""
         self.description = ""
-    
+
     def clone(self):
         sub = SubTrack()
         sub.setDescription(self.getDescription())
         sub.setTitle(self.getTitle())
-        
+
         return sub
-    
-    
+
+
     def delete(self):
         TrashCanManager().add(self)
 
     def recover(self):
         TrashCanManager().remove(self)
-    
+
     def canModify( self, aw ):
         try:
             return self._v_canmodify[aw]
@@ -12207,7 +12227,7 @@ class SubTrack(Persistent):
             pass
         self._v_canmodify[aw] = self.track.canModify( aw )
         return self._v_canmodify[aw]
-    
+
     def canView( self, aw ):
         return self.track.canView( aw )
 
@@ -12216,9 +12236,9 @@ class SubTrack(Persistent):
         if parent:
             parent.notifyModification()
         self._p_changed = 1
-    
+
     def getLocator( self ):
-        """Gives back a globaly unique identification encapsulated in a Locator 
+        """Gives back a globaly unique identification encapsulated in a Locator
             object for the session instance
         """
         if self.track == None:
@@ -12226,7 +12246,7 @@ class SubTrack(Persistent):
         lconf = self.track.getLocator()
         lconf["subTrackId"] = self.getId()
         return lconf
-    
+
     def setTrack(self, track):
         self.track = track
         if track == None:
@@ -12236,11 +12256,11 @@ class SubTrack(Persistent):
         return self.track
 
     def getOwner( self ):
-        return self.getTrack() 
+        return self.getTrack()
 
     def setId( self, newId ):
         self.id = str(newId)
-        
+
     def getId( self ):
         return self.id
 
@@ -12260,7 +12280,7 @@ class SubTrack(Persistent):
 
 
 class ContributionType(Persistent):
-    
+
     def __init__(self, name, description, conference):
         self._id = ""
         self._name = name
@@ -12270,36 +12290,36 @@ class ContributionType(Persistent):
     @Retrieves(["MaKaC.conference.ContributionType"], 'id')
     def getId(self):
         return self._id
-    
+
     def setId(self, id):
         self._id = id
 
     @Retrieves(["MaKaC.conference.ContributionType"], 'name')
     def getName(self):
         return self._name
-    
+
     def setName(self, name):
         self._name = name
-    
+
     def getDescription(self):
         return self._description
-    
+
     def setDescription(self, desc):
         self._description = desc
-    
+
     def getConference(self):
         return self._conference
-    
+
     def setConference(self, conf):
         self._conference = conf
-    
+
     def getLocator( self ):
         if self._conference == None:
             return Locator()
         lconf = self._conference.getLocator()
         lconf["contribTypeId"] = self.getId()
         return lconf
-    
+
     def canModify(self, aw):
         try:
             return self._v_canmodify[aw]
@@ -12337,10 +12357,10 @@ class BOAConfig(Persistent):
         self._text=newText.strip()
 
 class DeletedObjectHolder(ObjectHolder):
-    
+
     idxName = "DeletedObject"
     counterName = "DELETEDOBJECT"
-    
+
     def __init__(self):
         ObjectHolder.__init__(self)
         self.archivedConferenceObjs = []
@@ -12357,7 +12377,7 @@ class DeletedObjectHolder(ObjectHolder):
         indexes.IndexesHolder().getIndex("OAIDeletedPrivateContributionModificationDate").initIndex()
         indexes.IndexesHolder().getIndex("OAIDeletedPrivateContributionCategory").initIndex()
 
-    
+
     def add( self, newItem ):
         ObjectHolder.add( self, newItem )
         if newItem.wasArchived:
@@ -12377,14 +12397,14 @@ class DeletedObjectHolder(ObjectHolder):
         else:
             raise Exception("Unknown type for indexing: %s" % newItem._objClass)
 
-    
+
     def get_earliest_datestamp(self):
         date = []
         idxConf = indexes.IndexesHolder().getConferenceDateIndex(private=True)
         d = idxConf.getLowerIndex()
         if d:
             date.append(d)
-            
+
         idxCont = indexes.IndexesHolder().getContributionDateIndex(private=True)
         d = idxCont.getLowerIndex()
         if d:
@@ -12394,17 +12414,17 @@ class DeletedObjectHolder(ObjectHolder):
         d = idxConf.getLowerIndex()
         if d:
             date.append(d)
-            
+
         idxCont = indexes.IndexesHolder().getContributionDateIndex(private=False)
         d = idxCont.getLowerIndex()
         if d:
             date.append(d)
 
-        
+
         if not date:
             return None
         return min(date)
-    
+
     def getAll(self):
         l = []
         l.extend(self.archivedConferenceObjs)
@@ -12443,7 +12463,7 @@ class DeletedObjectHolder(ObjectHolder):
         else:
             return idxHolder.getIndex("OAIDeletedContributionCategory")
 
-    
+
     def getObjs(self, from_date=None, until_date=None, catId=None, type=[], private=False):
         confs = []
         conts = []
@@ -12454,7 +12474,7 @@ class DeletedObjectHolder(ObjectHolder):
         if "cont" in type:
             idxCont = DeletedObjectHolder.getContributionDateIndex(private=private)
             conts.extend(idxCont.getContributions(from_date, until_date))
-        
+
         if catId:
             if "conf" in type:
                 if confs:
@@ -12467,7 +12487,7 @@ class DeletedObjectHolder(ObjectHolder):
                 else:
                     confIdxCat = DeletedObjectHolder.getConferenceCategoryIndex(private=private)
                     confs = confIdxCat.getConferences(catId)
-            
+
             if "cont" in type:
                 if conts:
                     toRemove = []
@@ -12479,12 +12499,12 @@ class DeletedObjectHolder(ObjectHolder):
                 else:
                     contIdxCat = DeletedObjectHolder.getContributionCategoryIndex(private=private)
                     conts = contIdxCat.getContributions(catId)
-        
+
         res = []
         res.extend(confs)
         res.extend(conts)
         return res
-    
+
     def getObjsIds(self, from_date=None, until_date=None, catId=None, type=[], private=False):
 
         objs = self.getObjs(from_date, until_date, catId, type, private)
@@ -12495,7 +12515,7 @@ class DeletedObjectHolder(ObjectHolder):
             ids.append(getHierarchicalId(obj))
 
         return ids
-            
+
 
 class DeletedObject(Persistent):
     #Object created after a deletion of a conference, contribution or subcontribution to keep track
@@ -12526,19 +12546,19 @@ class DeletedObject(Persistent):
             return "%s:%s"%(self.confId, self.contribId)
         else:
             return self.confId
-    
+
     def getOAIModificationDate(self):
         return self._OAImodificationDS
-    
+
     def wasInCategory(self, categId):
         if categId in self.categPath:
             return True
         return False
-    
+
     def getCategoryPath(self):
         return self.categPath
-    
+
     getCategoriesPath = getCategoryPath
-    
+
     def wasArchived(self):
         return self.archived
