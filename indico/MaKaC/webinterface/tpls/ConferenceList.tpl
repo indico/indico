@@ -26,7 +26,7 @@ todayDate = nowutc().astimezone(timezone(tz))
     <div class="topBar" style="margin-bottom: 10px">
         <div class="content smaller"><span id="futureEventsText">There are <%= numOfEventsInTheFuture %> more events in the <em>future</em>. <span class='fakeLink' onclick='toogleFutureEvents();'>Show them.</span></span></div>
     </div>
-    <div id="futureEvents" style="visibility: hidden;">
+    <div id="futureEvents" style="visibility: hidden; overflow:hidden;">
         <% includeTpl('ConferenceListEvents', items=futureItems, aw=self._aw, conferenceDisplayURLGen=conferenceDisplayURLGen) %>
                 
     </div>
@@ -49,7 +49,7 @@ todayDate = nowutc().astimezone(timezone(tz))
     <!-- the following line is left in case we want to go back to the old implementation of the language selector -->
     <!--$E('tzSelector').set(IndicoUI.Widgets.timezoneSelector('<%= urlHandlers.UHResetSession.getURL() %>'));-->
 
-    
+    <% if numOfEventsInTheFuture > 0: %>
     var futureSwitch = false;
     var futureEvents = $E("futureEvents");
     var futureEventsDivHeight=futureEvents.dom.offsetHeight;
@@ -66,7 +66,9 @@ todayDate = nowutc().astimezone(timezone(tz))
         }
         futureSwitch = !futureSwitch;
     } 
+    <%end%>
 
+    <% if numOfEventsInThePast > 0: %>
     var callDone = false;
     var pastSwitch = false;
     function tooglePastEvents() {
@@ -101,5 +103,7 @@ todayDate = nowutc().astimezone(timezone(tz))
                 }
             )
     }
+
+    <% end %>
     
 </script>

@@ -128,7 +128,7 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
 
         // If content is to big for the window add a scrollbar
         var winHeight = winDim.height - 100;
-        var contentHeight = this.contentWrapper.dom.offsetHeight
+        var contentHeight = this.contentWrapper.dom.offsetHeight;
         if (winHeight > this.maxHeight && contentHeight > winHeight) {
             contentHeight = this.maxHeight;
         }

@@ -61,6 +61,8 @@ var Indico = {
         ImagesBase: "<%= Config.getInstance().getImagesBaseURL() %>",
         SecureImagesBase: "<%= Config.getInstance().getImagesBaseSecureURL() %>",
         
+        Login: "<%= urlHandlers.UHSignIn.getURL() %>",
+        
         ConferenceDisplay: "<%= urlHandlers.UHConferenceDisplay.getURL() %>",
         ContributionDisplay: "<%= urlHandlers.UHContributionDisplay.getURL() %>",
         SessionDisplay: "<%= urlHandlers.UHSessionDisplay.getURL() %>",
@@ -86,9 +88,9 @@ var Indico = {
 
     Data: {
         MaterialTypes: { meeting : <%= RHSubmitMaterialBase._allowedMatsForMeetings %>,
-	simple_event: <%= RHSubmitMaterialBase._allowedMatsForSE %>,
-	conference: <%= RHSubmitMaterialBase._allowedMatsConference %>,
-	category: <%= RHSubmitMaterialBase._allowedMatsCategory %>},
+        simple_event: <%= RHSubmitMaterialBase._allowedMatsForSE %>,
+        conference: <%= RHSubmitMaterialBase._allowedMatsConference %>,
+        category: <%= RHSubmitMaterialBase._allowedMatsCategory %>},
         WeekDays: <%= [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ] %> },
 
     Settings: {

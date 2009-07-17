@@ -13,7 +13,7 @@ todayDate = nowutc()
 <% for year in sortAndReturn(items.keys()): %>
 	<% for month in sortAndReturn(items[year].keys()): %>
         <% happeningNowClass = "" %>
-        <% if todayDate.month  == month: %>
+        <% if todayDate.year  == year and todayDate.month  == month: %>
             <% happeningNowClass = "class='currentMonth'" %>
         <% end %>
 		<h4 <%=happeningNowClass%>><span><%= datetime(year, month, 1).strftime("%B %Y") %></span></h4>

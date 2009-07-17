@@ -1819,6 +1819,7 @@ ul.UIPeopleList li{
     line-height: 25px;
     vertical-align: middle;
     cursor: pointer;
+    padding-left: 5px;
 }
 
 ul.UIPeopleList li .nameLink {

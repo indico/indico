@@ -328,6 +328,12 @@ class WPReportError( WPDecorated ):
     
     def __init__( self, rh):
         WPDecorated.__init__(self, rh)#, True)
+        
+    def _getHTMLHeader(self):
+        return ""
+    
+    def _getHeader(self):
+        return ""
     
     def _getBody( self, params ):
         wc = WReportError( params["userEmail"], params["msg"] )
@@ -365,6 +371,12 @@ class WPReportErrorSummary( WPDecorated ):
     
     def __init__( self, rh ):
         WPDecorated. __init__( self, rh)
+    
+    def _getHTMLHeader( self ):
+        return ""
+        
+    def _getHeader( self ):
+        return ""
     
     def _getBody( self, params ):
         wc = WReportErrorSummary()
