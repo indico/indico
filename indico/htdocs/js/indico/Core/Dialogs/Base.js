@@ -101,8 +101,8 @@ type("ErrorReportDialog", ["ServiceDialog"],
                            }
                           );
          },
-
-         draw: function() {
+         
+         _drawError: function() {
              var self = this;
              var email = new WatchObject();
 
@@ -133,6 +133,42 @@ type("ErrorReportDialog", ["ServiceDialog"],
                               ))
                              )
                  ));
+         },
+         
+         _drawWarning: function() {
+             var self = this;
+             
+             var extraInfo;
+             if (this.error.code == 'ERR-P4') {
+                 extraInfo = Html.a({href:Indico.Urls.Login+'?returnURL='+document.URL, style:{marginLeft:pixels(4)}}, 'Go to login page.');
+             }
+             
+             return this.ExclusivePopup.prototype.draw.call(
+                 this,
+                 Html.div(
+                     {},
+                     Html.div({style:{color: '#a33100', borderBottom: '1px #A33100 solid', marginBottom: pixels(15), width:'300px', textAlign: 'center'}},"Warning"),
+                     Html.div({style:{marginBottom: pixels(10), width: '300px', height: '50px', textAlign: 'left', overflow: 'auto'}},
+                             this.error.message, extraInfo),
+                     Html.div({style:{textAlign: 'center'}},
+                              Widget.link(command(
+                                  function() {
+                                      self.close();
+                                  },
+                                  Html.button({style:{marginLeft: pixels(5)}},'Close')
+                              ))
+                             )
+                 ));
+         },
+
+         draw: function() {
+             var self = this;
+             
+             if (this.error.type == "warning") {
+                 return self._drawWarning();
+             }else {
+                 return self._drawError();
+             }
          }
      },
      function(error) {

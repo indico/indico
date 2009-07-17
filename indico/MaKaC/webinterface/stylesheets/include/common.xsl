@@ -88,9 +88,23 @@
             = new PopupMenu({
         ]]>
         </xsl:text>
-        <xsl:if test="$item/modifyLink != ''">
-            'Manage': '<xsl:value-of select="$item/modifyLink"/>',
-        </xsl:if>
+        <xsl:choose>
+            <xsl:when test="$item/modifyLink != '' and $sessId = '' and $contId = '' and $subContId = ''">
+            'Edit event': '<xsl:value-of select="$item/modifyLink"/>',
+            </xsl:when> 
+            <xsl:when test="$item/modifyLink != '' and $subContId != 'null'">
+            'Edit subcontribution': '<xsl:value-of select="$item/modifyLink"/>',
+            </xsl:when>
+            <xsl:when test="$item/modifyLink != '' and $contId != 'null'">
+            'Edit contribution': '<xsl:value-of select="$item/modifyLink"/>',
+            </xsl:when>
+            <xsl:when test="$item/modifyLink != '' and $sessId != 'null'">
+            'Edit session': '<xsl:value-of select="$item/modifyLink"/>',
+            </xsl:when>
+            <xsl:when test="$item/modifyLink != ''">
+            'Edit entry': '<xsl:value-of select="$item/modifyLink"/>',
+            </xsl:when>
+        </xsl:choose>
         <xsl:if test="$item/cloneLink != ''">
             'Clone event': '<xsl:value-of select="$item/cloneLink"/>',
         </xsl:if>

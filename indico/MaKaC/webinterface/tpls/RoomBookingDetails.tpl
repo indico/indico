@@ -1,3 +1,4 @@
+<% declareTemplate(newTemplateStyle=True) %>
     <script type="text/javascript">
         function submit_cancel()
         {
@@ -106,15 +107,15 @@
 
     <!-- END OF CONTEXT HELP DIVS -->
 
-    <table cellpadding="0" cellspacing="0" border="0" width="80%%">
+    <table cellpadding="0" cellspacing="0" border="0" width="80%">
 		<% if standalone: %>
 		    <tr>
-		    <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%%">&nbsp;</td> <!-- lastvtabtitle -->
+		    <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">&nbsp;</td> <!-- lastvtabtitle -->
 		    </tr>
 		<% end %>
         <tr>
-            <td class="bottomvtab" width="100%%">
-                <table width="100%%" cellpadding="0" cellspacing="0" class="htab" border="0">
+            <td class="bottomvtab" width="100%">
+                <table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">
                     <tr>
                         <td class="maincell">
                             <span class="formTitle" style="border-bottom-width: 0px"><%=bookMessage%>ing</span><br /> <!-- PRE-Booking or Booking -->
@@ -125,12 +126,12 @@
                                 <br />
                             <% end %>
                             <br />
-                            <table width="90%%" align="left" border="0">
+                            <table width="90%" align="left" border="0">
                               <!-- ROOM -->
                               <tr>
                                 <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Room")%></span></td>
                                 <td>
-                                    <table width="100%%">
+                                    <table width="100%">
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small> <%= _("Name")%>&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext"><a href="<%= roomDetailsUH.getURL( reservation.room ) %>"><%= reservation.room.name %></a></td>
@@ -153,7 +154,7 @@
                               <tr>
                                 <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("When")%></span></td>
                                 <td>
-                                    <table width="100%%">
+                                    <table width="100%">
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small><%= _("Dates")%>&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext"><%= formatDate(reservation.startDT.date()) %> &mdash; <%= formatDate(reservation.endDT.date()) %></td>
@@ -175,7 +176,7 @@
                             <tr>
                                 <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Booked for")%></span></td>
                                 <td>
-                                    <table width="100%%">
+                                    <table width="100%">
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small> <%= _("Name")%>&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext"><%= verbose( reservation.bookedForName ) %></td>
@@ -196,7 +197,7 @@
                             <tr>
                                 <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Created")%></span></td>
                                 <td>
-                                    <table width="100%%">
+                                    <table width="100%">
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small> <%= _("By")%>&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext"><%= reservation.verboseCreatedBy %></td>
@@ -268,7 +269,7 @@
                             <tr>
                                 <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Excluded days")%></span></td>
                                 <td>
-                                    <table width="100%%">
+                                    <table width="100%">
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top" style="padding-right: 4px;">
                                             <small>
@@ -290,7 +291,7 @@
                             <tr>
                                 <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Occurrences")%></span></td>
                                 <td>
-                                    <table width="100%%">
+                                    <table width="100%">
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top" style="padding-right: 4px;">
                                             <small>

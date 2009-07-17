@@ -30,7 +30,7 @@ from MaKaC import conference
 from MaKaC.common.timezoneUtils import setAdjustedDate
 from MaKaC.common import security
 from MaKaC.errors import MaKaCError, htmlScriptError, htmlForbiddenTag, AdminError
-from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, HTMLSecurityError
+from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessWarning, HTMLSecurityError
 
 from MaKaC.webinterface.rh.base import RequestHandlerBase
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
@@ -247,7 +247,7 @@ class ProtectedService(ServiceBase):
         """
         if self._getUser() == None:
             self._doProcess = False
-            raise ServiceAccessError("ERR-P4", "You are currently not authenticated. Please log in again.")
+            raise ServiceAccessWarning("ERR-P4", "You are currently not authenticated. Please log in again.")
 
     def _checkProtection(self):
         """
@@ -281,11 +281,11 @@ class ProtectedDisplayService(ProtectedService):
                 target = self._target
             if not isinstance(target, Category):
                 if target.getAccessKey() != "" or target.getConference().getAccessKey() != "":
-                    raise ServiceAccessError("ERR-P4", "You are currently not authenticated or cannot access this service. Please log in again if necessary.")
+                    raise ServiceAccessWarning("ERR-P4", "You are currently not authenticated or cannot access this service. Please log in again if necessary.")
             if self._getUser() == None:
                 self._checkSessionUser()
             else:
-                raise ServiceAccessError("ERR-P4", "You cannot access this service. Please log in again if necessary.")
+                raise ServiceAccessWarning("ERR-P4", "You cannot access this service. Please log in again if necessary.")
 
 
 class LoggedOnlyService(ProtectedService):
@@ -316,14 +316,14 @@ class ProtectedModificationService(ProtectedService):
         
         if not target.canModify( self.getAW() ):
             if target.getModifKey() != "":
-                raise ServiceAccessError("ERR-P5", "You don't have the rights to modify this object")
+                raise ServiceAccessWarning("ERR-P5", "You don't have the rights to modify this object")
             if self._getUser() == None:
                 self._checkSessionUser()
             else:
-                raise ServiceAccessError("ERR-P5", "You don't have the rights to modify this object")
+                raise ServiceAccessWarning("ERR-P5", "You don't have the rights to modify this object")
         if hasattr(self._target, "getConference"):
             if target.getConference().isClosed():
-                raise ServiceAccessError("ERR-P6", "Conference %s is closed"%target.getConference().getId())
+                raise ServiceAccessWarning("ERR-P6", "Conference %s is closed"%target.getConference().getId())
 
 class AdminService(ProtectedService):
     """
