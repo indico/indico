@@ -175,7 +175,9 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
          _openSelection: function(event) {
              if (this.selectorPos >= 0) {
                  window.location = this.suggestions[this.selectorPos].url;
+                 return false;
              }
+             return true;
          },
 
          _moveSelector: function(direction) {
@@ -224,6 +226,7 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
 
          this.observe(function(key, event) {
              self._textTyped(key);
+             return true;
          });
 
          this.observeOtherKeys(function(key, event) {
@@ -232,12 +235,12 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
              } else if (key == 27) {
                  self._hideSuggestions();
              } else if (key == 13) {
-                 self._openSelection(event);
+                 return self._openSelection(event);
              }
+             return false;
          });
 
          $E(document.body).observeClick(function(event) {
-
              // Close box if a click is done outside of it
 
              /* for some unknown reason, onclick is called on the submit button,

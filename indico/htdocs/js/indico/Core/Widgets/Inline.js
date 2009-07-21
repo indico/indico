@@ -353,27 +353,31 @@ type("RealtimeTextBox", ["IWidget", "WatchAccessor"],
 
              this.input.observeEvent('keydown', function(event) {
                  var keyCode = event.keyCode;
+                 var value = true;
 
                  if ((keyCode < 32 && keyCode != 8) || (keyCode >= 33 && keyCode < 46) || (keyCode >= 112 && keyCode <= 123)) {
                      each(self.otherKeyObservers, function(func) {
-                         func(keyCode, event);
+                         value = value && func(keyCode, event);
                      });
-                     return false;
+                     return value;
                  }
+                 return true;
              });
 
 
              // fire onChange event each time there's a new char
              this.input.observeEvent('keyup', function(event) {
                  var keyCode = event.keyCode;
+                 var value = true;
 
                  if (!((keyCode < 32 && keyCode != 8) || (keyCode >= 33 && keyCode < 46) || (keyCode >= 112 && keyCode <= 123))) {
                      each(self.observers, function(func) {
-                         func(keyCode, event);
+                         value = value && func(keyCode, event);
                      });
                      Dom.Event.dispatch(self.input.dom, 'change');
-                     return false;
+                     return value;
                  }
+                 return true;
              });
          }
      },
