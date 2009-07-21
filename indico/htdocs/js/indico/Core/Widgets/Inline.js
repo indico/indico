@@ -335,9 +335,9 @@ type("RealtimeTextBox", ["IWidget", "WatchAccessor"],
          observeOtherKeys: function(observer) {
              this.otherKeyObservers.push(observer);
          },
-	 unbind: function() {
-	     bind.detach(this.input);
-	 },
+         unbind: function() {
+             bind.detach(this.input);
+         },
          disable: function() {
              this.input.dom.disabled = true;
          },
@@ -345,33 +345,41 @@ type("RealtimeTextBox", ["IWidget", "WatchAccessor"],
              this.input.dom.disabled = false;
              this.enableEvent();
          },
-	 setStyle: function(prop, value) {
-	     this.input.setStyle(prop, value);
-	 },
+         setStyle: function(prop, value) {
+             this.input.setStyle(prop, value);
+         },
          enableEvent: function() {
              var self = this;
 
+             this.input.observeEvent('keydown', function(event) {
+                 var keyCode = event.keyCode;
+
+                 if ((keyCode < 32 && keyCode != 8) || (keyCode >= 33 && keyCode < 46) || (keyCode >= 112 && keyCode <= 123)) {
+                     each(self.otherKeyObservers, function(func) {
+                         func(keyCode, event);
+                     });
+                     return false;
+                 }
+             });
+
+
              // fire onChange event each time there's a new char
              this.input.observeEvent('keyup', function(event) {
-		 var keyCode = event.keyCode;
+                 var keyCode = event.keyCode;
 
-		 if ((keyCode < 32 && keyCode != 8) || (keyCode >= 33 && keyCode < 46) || (keyCode >= 112 && keyCode <= 123)) {
-		     each(self.otherKeyObservers, function(func) {
-			 func(keyCode, event);
-		     });
-		 } else {
-		     each(self.observers, function(func) {
-			 func(keyCode, event);
-		     });
+                 if (!((keyCode < 32 && keyCode != 8) || (keyCode >= 33 && keyCode < 46) || (keyCode >= 112 && keyCode <= 123))) {
+                     each(self.observers, function(func) {
+                         func(keyCode, event);
+                     });
                      Dom.Event.dispatch(self.input.dom, 'change');
-		     event.preventDefault();
-		 }
+                     return false;
+                 }
              });
          }
      },
      function(args) {
-	 this.observers = [];
-	 this.otherKeyObservers = [];
+         this.observers = [];
+         this.otherKeyObservers = [];
          this.input = Html.input('text', args);
      });
 
@@ -409,7 +417,7 @@ type("EnterObserverTextBox", ["IWidget", "WatchAccessor"],
             // fire event when ENTER key is pressed
             this.input.observeEvent('keypress', function(event) {
                 if (event.keyCode == 13) {
-		    Dom.Event.dispatch(self.input.dom, 'change');
+                    Dom.Event.dispatch(self.input.dom, 'change');
                     keyPressAction();
                 }
                 Dom.Event.dispatch(self.input.dom, 'change');

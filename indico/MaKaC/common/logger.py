@@ -16,7 +16,7 @@ class Logger:
     """
 
     config = Config.getInstance()
-    
+
     __rootLogger = logging.getLogger('')
 
     __indicoFileHandler = logging.FileHandler(os.path.join(config.getLogDir(), 'indico.log'),'a')
@@ -40,6 +40,7 @@ class Logger:
 
     __smtpHandler.addFilter(logging.Filter('indico'))
     __smtpHandler.setLevel(logging.ERROR)
+    __smtpHandler.setFormatter(logging.Formatter("%(asctime)s %(name)s - %(levelname)s %(filename)s:%(lineno)d:%(funcName)s\n\n%(message)s"))
 
     __rootLogger.addHandler(__indicoFileHandler)
     __rootLogger.addHandler(__otherFileHandler)

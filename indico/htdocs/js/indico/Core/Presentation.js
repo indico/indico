@@ -178,3 +178,19 @@ function createObject(clazz, args) {
     return x;
 }
 
+function filter(array, func)
+{
+    var len = array.length;
+
+    var res = new Array();
+    for (var i = 0; i < len; i++)
+    {
+        if (i in array)
+        {
+            var val = array[i];
+            if (func(val))
+                res.push(val);
+        }
+    }
+    return res;
+};
