@@ -650,7 +650,7 @@ class Notification(Persistent):
         # send mail to participant
         if rp.getEmail().strip() != "":
             bodyReg = _("""
-             Congratulations, your registration to %s was successful. See your information below:
+             Congratulations, your registration to %s was successful%s See your information below:
              
                       %s
              %s

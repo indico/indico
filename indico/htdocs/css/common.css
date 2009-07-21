@@ -157,7 +157,7 @@ ul.subEventLevelSCList li {
 
 span.topLevelTitle {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 18px;
+	font-size: 17px;
 	font-weight: normal;
 	color: #333;
 }
@@ -178,7 +178,7 @@ span.subLevelTitle {
 }
 .topLevelTime {
 	font-family: Arial, Helvetica, sans-serif;
-	font-size: 13pt;
+	font-size: 17px;
 	font-weight: normal;
 	color: #444;
     position: absolute;
@@ -188,7 +188,7 @@ span.subLevelTitle {
 
 .subEventLevelTime {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 13pt;
+    font-size: 17px;
     font-weight: normal;
     color: #444;
     position: absolute;
@@ -352,8 +352,8 @@ span.materialGroup {
 }
 
 a.material {
-    padding: 6px 8px 0;
-    height: 22px;
+    padding: 2px 8px 0;
+    height: 18px;
 	color: #333333;
 	float: left;
 	border-left: 1px dotted #AAA;
@@ -378,8 +378,8 @@ span.materialGroup {
 }
 
 .materialList a.material {
-    padding: 6px 12px 0 12px;
-    height: 24px;
+    padding: 2px 12px 0 12px;
+    height: 20px;
 }
 
 .materialList a.materialGroup {
@@ -438,7 +438,7 @@ div.meetingEventHeader {
     
     min-height: 130px;
     margin: 0px;
-    padding: 30px;
+    padding: 20px 30px;
 }
 
 div.meetingEventHeader a {
@@ -466,7 +466,7 @@ div.meetingEventSubHeader {
     font-size: 10pt;
     color: black;   
     margin: 0;
-    padding: 20px;
+    padding: 10px;
     border-bottom: 1px solid #AAA;
 }
 

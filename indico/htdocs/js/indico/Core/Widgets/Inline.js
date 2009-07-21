@@ -391,6 +391,7 @@ type("RealtimeTextArea", ["RealtimeTextBox"],
      {
      },
      function(args) {
+         this.RealtimeTextBox(clone(args));
          this.input = Html.textarea(args);
      });
 
