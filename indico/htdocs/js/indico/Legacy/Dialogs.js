@@ -481,7 +481,7 @@ extend(IndicoUI.Dialogs,
                        IndicoUtil.errorReport(req.error.get());
                    } else if (state == SourceState.Loaded) {
 
-                       rtWidget.set(req.get(), true);
+                       rtWidget.set(req.get(), !req.get());
 
                        rtWidget.observe(function(value){
                            changedText.set(true);
@@ -505,7 +505,7 @@ extend(IndicoUI.Dialogs,
                        });
                    }
 
-                   var killProgress = IndicoUI.Dialogs.Util.progress();
+                   var killProgress = IndicoUI.Dialogs.Util.progress($T('Saving...'));
                    req.set(rtWidget.get());
                };
 

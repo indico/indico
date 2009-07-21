@@ -72,8 +72,8 @@ type("AddMaterialDialog", ["ExclusivePopup"], {
 
         uploadType.set('file');
 
-	// FIX: presentation issue
-	convert.dom.name = 'topdf';
+        // FIX: presentation issue
+        convert.dom.name = 'topdf';
 
         pm.add(selector, 'text', false);
         pm.add(file, 'text', false);
@@ -92,7 +92,7 @@ type("AddMaterialDialog", ["ExclusivePopup"], {
                                  Widget.button(command(
                                      function() {
                                          if (pm.check()) {
-                                             self.killProgress = IndicoUI.Dialogs.Util.progress();
+                                             self.killProgress = IndicoUI.Dialogs.Util.progress($T('Uploading...'));
                                              self.uploading = true;
                                              self.form.dom.submit();
                                          }
@@ -523,7 +523,7 @@ type("ResourceListWidget", ["ListWidget"], {
 
         var deleteResource = function() {
             if (confirm("Are you sure you want to delete "+resource.get('name')+"?")) {
-                var killProgress = IndicoUI.Dialogs.Util.progress();
+                var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
                 jsonRpc(Indico.Urls.JsonRpcService,
                         'material.resources.delete',
                         resParams,
@@ -637,7 +637,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
 
         var deleteMaterial = function() {
             if (confirm("Are you sure you want to delete '"+material.get('title')+"'?")) {
-                var killProgress = IndicoUI.Dialogs.Util.progress();
+                var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
                 jsonRpc(Indico.Urls.JsonRpcService,
                         'material.delete',
                         args,
@@ -844,6 +844,13 @@ type("MaterialEditorDialog", ["ExclusivePopup"], {
             'contribId': intToStr(this.contId),
             'subContId': intToStr(this.subContId)
         };
+
+        // Remove null parameters
+        each(args, function(value, key) {
+            if (value === null) {
+                delete args[key];
+            }
+        });
 
         var mlist = new MaterialListWidget(args, this.types, this.uploadAction, this.width, this.height);
 

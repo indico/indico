@@ -54,8 +54,6 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
              if (!this.suggestionBox) {
                  // Create the suggestion box only once
 
-                 var pos = this.input.getAbsolutePosition();
-
                  // totalNumber will change during time
                  this.totalNumber = new WatchValue(totalNumber);
                  this.suggestionList = Html.ul('suggestionBoxList');
@@ -65,8 +63,8 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
 
                  // Create the suggestion box
                  this.suggestionBox = Html.div({ style: {position: 'absolute',
-                                                         top: pixels(pos.y + 7),
-                                                         left: pixels(pos.x - 3)
+                                                         top: pixels(23),
+                                                         left: 0
                                                         },
                                                  className: 'suggestionBox'},
                                                infoBox,
@@ -74,11 +72,11 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
                                                $B(Html.div("searchSuggestionOtherResults"), this.totalNumber, function(number) {return number===0?'':number + ' ' + $T('other results'); })
                                               );
 
-                 $E(document.body).append(this.suggestionBox);
+                 this.container.append(this.suggestionBox);
              }
 
              // Prepare regular expression for highlighting
-             var tokens = text.split(' ').filter(function(t) { return t !== '';});
+             var tokens = filter(text.split(' '), function(t) { return t !== '';});
              var tokenRE = new RegExp("("+tokens.join('|')+")", 'gi');
 
 
@@ -129,7 +127,7 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
          },
 
          _hideSuggestions: function() {
-             $E(document.body).remove(this.suggestionBox);
+             this.container.remove(this.suggestionBox);
              this.suggestionBox = null;
              this.selectorPos = -1;
              this.suggestions = null;
@@ -176,10 +174,10 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
 
          _openSelection: function(event) {
              if (this.selectorPos >= 0) {
-                 event.preventDefault();
-                 event.stopPropagation();
                  window.location = this.suggestions[this.selectorPos].url;
+                 return false;
              }
+             return true;
          },
 
          _moveSelector: function(direction) {
@@ -217,33 +215,32 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
          }
 
      },
-     function(args, submitBtn){
+     function(args, container, submitBtn){
          args.autocomplete = 'off';
          this.RealtimeTextBox(args);
          this.selectorPos = -1;
          this.querying = false;
+         this.container = container;
 
          var self = this;
 
          this.observe(function(key, event) {
              self._textTyped(key);
+             return true;
          });
 
          this.observeOtherKeys(function(key, event) {
              if (key == 38 || key == 40) {
                  self._moveSelector(key==38?'up':'down');
-                 event.preventDefault();
              } else if (key == 27) {
                  self._hideSuggestions();
-                 event.preventDefault();
              } else if (key == 13) {
-                 // RET
-                 self._openSelection(event);
+                 return self._openSelection(event);
              }
+             return false;
          });
 
          $E(document.body).observeClick(function(event) {
-
              // Close box if a click is done outside of it
 
              /* for some unknown reason, onclick is called on the submit button,

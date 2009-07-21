@@ -1156,6 +1156,8 @@ class IntStringMappedIndex(Persistent):
 
         if type(intId) != int:
             raise TypeError
+        if intId not in self._intToStrMap:
+            return None
 
         return self._intToStrMap[intId]
 
@@ -1166,6 +1168,8 @@ class IntStringMappedIndex(Persistent):
 
         if type(strId) != str:
             raise TypeError
+        if strId not in self._strToIntMap:
+            return None
 
         return self._strToIntMap[strId]
 
@@ -1182,8 +1186,12 @@ class TextIndex(IntStringMappedIndex):
 
     def unindex(self, entryId):
         intId = self.getInteger(entryId)
-        self.removeString(entryId)
-        self._textIdx.unindex_doc(intId)
+
+        if intId:
+            self.removeString(entryId)
+            self._textIdx.unindex_doc(intId)
+        else:
+            Logger.get('indexes.text').error("No such entry '%s'" % entryId)
 
     def search(self, text):
         records = self._textIdx.apply(text).items()

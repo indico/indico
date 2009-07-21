@@ -1,5 +1,8 @@
+<% import MaKaC.common.Configuration as Configuration %>
 <div class="container" style="max-width: 700px;">
-    <div class="groupTitle"><%= _("About Indico") %></div>
+    <div class="groupTitle">
+        <%= _("About Indico") %>
+    </div>
     
     
     <div class="indicoHelp" style="width: 600px;">
@@ -59,7 +62,6 @@
                     (replacing the old CERN Room Booking System).""") %></li>
                     <li><%= _("Integrated support for videoconferencing software (i.e. VRVS11).") %></li>
                     <li><%= _("Exportation of information in different formats: RSS feeds, iCal and MARCXML, for instance.") %></li>
-                    <li><%= _("Creation of DVDs with all the data from a Conference.") %></li>
                     <li><%= _("Multilingual interface (internationalization).") %></li>
                     <li><%= _("Support for different time zones.") %></li>
                     <li><%= _("Accessible and usable interface.") %></li>
@@ -87,6 +89,15 @@
             <p><a href="https://savannah.cern.ch/projects/indico"><%= _("Savannah project page") %></a></p>
 
         </div>
+
+        <% if Configuration.Config.getInstance().getVersion() != "0" and Configuration.Config.getInstance().getVersion() != "":%>
+            <div class="title"><%= _("Version") %></div>
+
+            <div class="content" style="margin-bottom: 10px;">
+                <p>The version of this Indico installation is:  <em><%= Configuration.Config.getInstance().getVersion() %></em> </p>
+            </div>
+        <% end %>
+
     </div>
 
 </div>

@@ -8,13 +8,13 @@
     </tr>
     <tr>
         <td>
-        	<font color="black"><b> <%= _(%>
+		<font color="black"><b>
         	<br/> <%= _("Please log in if you have an account, or create a new one.")%></b></font>
         	<br/><br/><br/>
         </td>
     </tr>
     <tr>
-        <td style="border:1px solid gray">
+        <td>
             %(signIn)s
         </td>
     </tr>

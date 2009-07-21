@@ -1,16 +1,8 @@
 <%! 
-from datetime import datetime, timedelta
-from pytz import timezone
-from MaKaC.common.timezoneUtils import DisplayTZ, nowutc
-
 def sortAndReturn(list):
 	list.sort()
 	list.reverse()
 	return list
-
-tz = DisplayTZ(self._aw,categ,useServerTZ=1).getDisplayTZ()    
-todayDate = nowutc().astimezone(timezone(tz))
-#startDate4Display =  todayDate - timedelta(months=1)
 %>
 
 <% from MaKaC.conference import Conference %>

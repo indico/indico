@@ -30,13 +30,6 @@ function envoi(){
             </a>
             <%= _("Powered by CERN")%>
             
-            <a href="http://cern.ch/indico">
-                Indico
-                <% if Configuration.Config.getInstance().getVersion() != "0":%>
-                    <%= Configuration.Config.getInstance().getVersion() %>
-                <% end %>
-            </a>
-            
             <% if Configuration.Config.getInstance().getWorkerName()!="": %>
                 <span style="display: none;"><%= Configuration.Config.getInstance().getWorkerName() %></span>
             <% end %>

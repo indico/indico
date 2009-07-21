@@ -109,7 +109,7 @@ var extraOptions = $E('extraOptions');
 
 var intelligentSearchBox = new IntelligentSearchBox({name: 'p', id: 'searchText',
                                  style: {backgroundColor: 'transparent'}
-				 }, $E('searchSubmit'));
+				 }, $E('UISearchBox'), $E('searchSubmit'));
 
 IndicoUI.executeOnLoad(function(){
   $E('startDatePlaceBox').set(startDateBox);

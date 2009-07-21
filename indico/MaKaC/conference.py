@@ -87,7 +87,7 @@ class CategoryManager( ObjectHolder ):
         nameIdx.index(category.getId(), category.getTitle().decode('utf-8'))
 
     def remove(self, category):
-        ObjectHolder.add(self, category)
+        ObjectHolder.remove(self, category)
         # remove category from the name index
         nameIdx = indexes.IndexesHolder().getIndex('categoryName')
         nameIdx.unindex(category.getId())
