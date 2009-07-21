@@ -72,8 +72,8 @@ type("AddMaterialDialog", ["ExclusivePopup"], {
 
         uploadType.set('file');
 
-	// FIX: presentation issue
-	convert.dom.name = 'topdf';
+        // FIX: presentation issue
+        convert.dom.name = 'topdf';
 
         pm.add(selector, 'text', false);
         pm.add(file, 'text', false);
@@ -844,6 +844,13 @@ type("MaterialEditorDialog", ["ExclusivePopup"], {
             'contribId': intToStr(this.contId),
             'subContId': intToStr(this.subContId)
         };
+
+        // Remove null parameters
+        each(args, function(value, key) {
+            if (value === null) {
+                delete args[key];
+            }
+        });
 
         var mlist = new MaterialListWidget(args, this.types, this.uploadAction, this.width, this.height);
 
