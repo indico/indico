@@ -292,16 +292,19 @@ class WHeader(WTemplated):
        
         imgLogo=Configuration.Config.getInstance().getSystemIconURL( "logoIndico" )
         imgLogin=Configuration.Config.getInstance().getSystemIconURL( "login" )
-        if Configuration.Config.getInstance().getLoginURL().startswith("https"):
-            
-            # Set proper PROTOCOL for images requested via SSL
-            imgLogo=imgLogo.replace("http://", "https://")
-            imgLogin=imgLogin.replace("http://", "https://")
-            
-            # Set proper PORT for images requested via SSL
-            imgLogo = urlHandlers.setSSLPort( imgLogo )
-            imgLogin = urlHandlers.setSSLPort( imgLogin ) 
-            
+##
+## TOCHECK: We do not need this anymore since we use the flaog _ishttps in the clase RHSignIn
+##
+#        if Configuration.Config.getInstance().getLoginURL().startswith("https"):
+#            
+#            # Set proper PROTOCOL for images requested via SSL
+#            imgLogo=imgLogo.replace("http://", "https://")
+#            imgLogin=imgLogin.replace("http://", "https://")
+#            
+#            # Set proper PORT for images requested via SSL
+#            imgLogo = urlHandlers.setSSLPort( imgLogo )
+#            imgLogin = urlHandlers.setSSLPort( imgLogin ) 
+#            
         vars["imgLogo"] = imgLogo
         vars["imgLogin"] = imgLogin
         vars["isFrontPage"] = self.__isFrontPage

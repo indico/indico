@@ -4923,3 +4923,7 @@ div.dialogButtons {
     margin: 0 0 0;
     padding: 5px;
 }
+
+.fixPreOverflow pre{
+    overflow: hidden;
+}

@@ -90,15 +90,15 @@
   <td valign="top" align="right">
     <xsl:choose>
     <xsl:when test="./description != '' or count(child::convener) != 0 or count(child::material) != 0 or count(child::location) != 0">
-    <table bgcolor="#f0c060" cellpadding="2" cellspacing="0" border="0" class="results">
+    <table bgcolor="#f0c060" cellpadding="0" cellspacing="0" border="0" class="results">
     <xsl:if test="./description != ''">
     <tr>
-      <td valign="top">
-        <b><strong>
+       <td valign="top">
+       <b><strong>
         Description:
         </strong></b>
       </td>
-      <td>
+      <td valign="top" width="400" style="text-align: justify;">
         <xsl:apply-templates select="./description"/>
       </td>
     </tr>
@@ -232,7 +232,7 @@
   <xsl:otherwise>
   <xsl:text disable-output-escaping="yes">
   &#60;td colspan="2" width="75%" valign="top" bgcolor="#F6F6F6"&#62;
-    &#60;table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F6F6F6"&#62;
+    &#60;table class="tablepre" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F6F6F6"&#62;
   </xsl:text>
   </xsl:otherwise>
   </xsl:choose>
@@ -287,7 +287,7 @@
     </tr>	
     <xsl:if test="./abstract != ''">
     <tr>
-      <td>
+      <td colspan="3" style="text-align: justify">
         <xsl:apply-templates select="./abstract"/>
       </td>
     </tr>

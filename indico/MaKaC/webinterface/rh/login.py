@@ -47,6 +47,7 @@ class RHSignIn( base.RH ):
         self._userId = params.get( "userId", "").strip()
     
     def _process( self ):
+        self._tohttps = True
         #Check for automatic login
         auth = AuthenticatorMgr()
         av = auth.autoLogin(self)
