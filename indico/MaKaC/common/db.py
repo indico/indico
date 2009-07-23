@@ -190,15 +190,20 @@ class DBMgr:
     def tpcFinish(self, trans):
         self._storage.tpc_finish(trans)
 
-
     # ZODB version check
-    zodbPkg = pkg_resources.require('ZODB3')[0]
-    zodbVersion = zodbPkg.parsed_version
-    zodbVersion = (int(zodbVersion[0]), int(zodbVersion[1]))
+    try:
+        zodbPkg = pkg_resources.require('ZODB3')[0]
+        zodbVersion = zodbPkg.parsed_version
+        zodbVersion = (int(zodbVersion[0]), int(zodbVersion[1]))
+    except pkg_resources.DistributionNotFound:
+        # Very old versions, in which ZODB didn't register
+        # with pkg_resources
+        import ZODB
+        zodbVersion = ZODB.__version__.split('.')
 
-    if zodbVersion[0] < 3:
+    if int(zodbVersion[0]) < 3:
         raise Exception("ZODB 3 required! %s found" % zodbPkg.version)
-    elif zodbVersion[1] < 7:
+    elif int(zodbVersion[1]) < 7:
         commit = commitZODBOld
 
 
