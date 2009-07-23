@@ -16,7 +16,7 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
              // truncate the category path, if it is too long
 
              var first = list.slice(0,1);
-             var last = list.slice(-1);
+             var last = list.length>1?list.slice(-1):[];
              list = list.slice(1,-1);
 
              var truncated = false;
@@ -32,7 +32,10 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
                  list = concat(['...'], list);
              }
 
-             return concat(first,list,last);
+             return translate(concat(first,list,last),
+                        function(val) {
+                            return escapeHTML(val);
+                        });
          },
 
          _truncateTitle: function(title) {
@@ -59,7 +62,7 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
                  this.suggestionList = Html.ul('suggestionBoxList');
 
                  var infoBox = Html.div('searchSuggestionHelpBox',
-                     $T("Some category names matching your criteria were found"));
+                     $T("Some category suggestions..."));
 
                  // Create the suggestion box
                  this.suggestionBox = Html.div({ style: {position: 'absolute',
@@ -69,14 +72,14 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
                                                  className: 'suggestionBox'},
                                                infoBox,
                                                this.suggestionList,
-                                               $B(Html.div("searchSuggestionOtherResults"), this.totalNumber, function(number) {return number===0?'':number + ' ' + $T('other results'); })
+                                               $B(Html.div("searchSuggestionOtherResults"), this.totalNumber, function(number) {return number===0?'':number + ' ' + $T('other results - please write more...'); })
                                               );
 
                  this.container.append(this.suggestionBox);
              }
 
              // Prepare regular expression for highlighting
-             var tokens = filter(text.split(' '), function(t) { return t !== '';});
+             var tokens = filter(escapeHTML(text).split(' '), function(t) { return t !== '';});
              var tokenRE = new RegExp("("+tokens.join('|')+")", 'gi');
 
 
@@ -86,7 +89,7 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
 
              $B(this.suggestionList, suggList,
                 function(elem) {
-                    var titleHtml = self._truncateTitle(elem.title).replace(tokenRE, '<span class="searchSuggestionHighlight">$1</span>');
+                    var titleHtml = escapeHTML(self._truncateTitle(elem.title)).replace(tokenRE, '<span class="searchSuggestionHighlight">$1</span>');
 
                     var index = counter;
 
