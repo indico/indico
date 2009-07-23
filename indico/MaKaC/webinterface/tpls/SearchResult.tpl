@@ -1,11 +1,5 @@
-<li class="
-  <% if type(result) == ConferenceEntry: %>
-  searchResultEvent
-  <% end %>
-  <% else: %>
-      searchResultContribution
-      <% end %>
-      ">
+<li class="<% if type(result) == ConferenceEntry: %>searchResultEvent<% end %>
+  <% else: %>searchResultContribution<% end %>">
       <% if result.getTitle(): %>
       <a class="searchResultTitle" href="<%= result.getURL().replace('%','%%') %>"><%= result.getTitle() %></a>
       <% end %>
