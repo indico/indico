@@ -118,9 +118,15 @@ function jsonRpcValue(url, method, params, def) {
         }
 
         self.set = function(value) {
-                var old = self.get();
-                jsonRpcCommit(url, method, params, value, process)
-                return old;
+            var old = self.get();
+
+            object.update({
+                state: SourceState.Loading,
+                error: null
+            });
+
+            jsonRpcCommit(url, method, params, value, process);
+            return old;
         };
         self.refresh = function() {
                 object.update({

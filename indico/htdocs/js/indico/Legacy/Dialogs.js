@@ -454,6 +454,7 @@ extend(IndicoUI.Dialogs,
                var changedText = new WatchValue(false);
                var wasChanged = false;
                var compileMinutes = exists(compile)?compile:false;
+               var killProgress = null;
 
                var rtWidget = new RichTextWidget(600,400,{},'','rich','IndicoFull');
 
@@ -478,6 +479,9 @@ extend(IndicoUI.Dialogs,
 
                req.state.observe(function(state){
                    if (state == SourceState.Error) {
+                       if(killProgress) {
+                           killProgress();
+                       }
                        IndicoUtil.errorReport(req.error.get());
                    } else if (state == SourceState.Loaded) {
 
@@ -505,7 +509,7 @@ extend(IndicoUI.Dialogs,
                        });
                    }
 
-                   var killProgress = IndicoUI.Dialogs.Util.progress($T('Saving...'));
+                   killProgress = IndicoUI.Dialogs.Util.progress($T('Saving...'));
                    req.set(rtWidget.get());
                };
 
