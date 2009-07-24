@@ -151,39 +151,32 @@ class RHConferenceCreation( RoomBookingDBMixin, RHConferenceCreationBase ):
         url.addParam("event_type", self._event_type)
         return url
 
-    def _checkProtection( self ): 
+    def _checkProtection( self ):
         try:
             RHConferenceCreationBase._checkProtection( self )
         except Exception:
             self._target = None
-        
+
     def _checkParams( self, params ):
         self._params = params
         self._event_type = params.get("event_type", "").strip()
         RHConferenceCreationBase._checkParams( self, params, mustExist=0 )
-        self._askForType = (params.get("event_type", "").strip() == "")        
+        self._askForType = (params.get("event_type", "").strip() == "")
 
     def _getSelectTypePage( self ):
         p = category.WPConferenceCreationSelectType( self, self._target )
         return p.display( wfs=self._wfReg.getFactoryList() )
-        
-    def _process( self ):
-        
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        rbActive = minfo.getRoomBookingModuleActive()
 
-        if rbActive:
-            self._placeList = [loc.friendlyName for loc in Location.allLocations]
-            self._roomList = CrossLocationQueries.getRooms( location = self._placeList[0] )
-        
+    def _process( self ):
+
         if self._askForType:
             return self._getSelectTypePage()
-        else:            
+        else:
             p = category.WPConferenceCreationMainData( self, self._target )
             if self._wf != None:
                 p = self._wf.getEventCreationPage( self, self._target )
             return p.display(**self._params)
-    
+
 #-------------------------------------------------------------------------------------
 
 class RHConferencePerformCreation( RHConferenceCreationBase ):
