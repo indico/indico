@@ -41,7 +41,6 @@ class MinutesEdit(TextModificationBase, ProtectedModificationService):
         if not minutes:
             minutes = self._target.createMinutes()
         minutes.setText( self._text )
-        return self._text
 
     def _handleGet(self):
         if self._compile:
@@ -81,6 +80,7 @@ class MinutesEdit(TextModificationBase, ProtectedModificationService):
             text += "Chaired by: %s%s%s" % (chairs, lb, lb)
         for min in minutes:
             text += "==================%s%s%s==================%s%s%s%s" % (lb,min[0],lb,lb,min[1],lb,lb)
+
         return text
 
 methodMap = {
