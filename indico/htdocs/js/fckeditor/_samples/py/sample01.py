@@ -68,10 +68,10 @@ print """
 """
 
 # For testing your environments
-print "<hr>"
-for key in os.environ.keys():
-	print "%s: %s<br>" % (key, os.environ.get(key, ""))
-print "<hr>"
+#print "<hr>"
+#for key in os.environ.keys():
+#	print "%s: %s<br>" % (key, os.environ.get(key, ""))
+#print "<hr>"
 
 # Document footer
 print """

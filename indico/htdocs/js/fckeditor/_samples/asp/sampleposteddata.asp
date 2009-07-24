@@ -47,7 +47,7 @@
 			For Each sForm in Request.Form
 			%>
 			<tr>
-				<th><%=sForm%></th>
+				<th><%=Server.HTMLEncode( sForm )%></th>
 				<td><pre><%=Server.HTMLEncode( Request.Form(sForm) )%></pre></td>
 			</tr>
 			<% Next %>

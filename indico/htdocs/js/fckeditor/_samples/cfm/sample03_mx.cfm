@@ -81,7 +81,7 @@ function ChangeToolbar( toolbarName )
 		fckEditor.basePath		= basePath ;
 		if ( isDefined( "URL.Toolbar" ) )
 		{
-			fckEditor.ToolbarSet		= HTMLEditFormat( URL.Toolbar ) ;
+			fckEditor.ToolbarSet		= REReplaceNoCase( URL.Toolbar, "[^a-z]", "", "all" ) ;
 		}
 		fckEditor.create() ; // create the editor.
 	</cfscript>

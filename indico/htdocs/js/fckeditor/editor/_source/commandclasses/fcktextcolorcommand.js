@@ -193,9 +193,9 @@ FCKTextColorCommand.prototype._CreatePanelBody = function( targetDocument, targe
 		oDiv.innerHTML = '<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td nowrap align="center">' + FCKLang.ColorMoreColors + '</td></tr></table>' ;
 
 		FCKTools.AddEventListenerEx( oDiv, 'click', FCKTextColorCommand_MoreOnClick, this ) ;
-	}
 
-	// Dirty hack for Opera, Safari and Firefox 3.
-	if ( !FCKBrowserInfo.IsIE )
-		oDiv.style.width = '96%' ;
+		// Dirty hack for Opera, Safari and Firefox 3.
+		if ( !FCKBrowserInfo.IsIE )
+			oDiv.style.width = '96%' ;
+	}
 }

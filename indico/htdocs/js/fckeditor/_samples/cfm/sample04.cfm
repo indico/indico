@@ -77,7 +77,7 @@ function ChangeSkin( skinName )
 
 <cfset config = structNew()>
 <cfif isDefined( "URL.Skin" )>
-	<cfset config["SkinPath"] = basePath & 'editor/skins/' & HTMLEditFormat( URL.Skin ) & '/'>
+	<cfset config["SkinPath"] = basePath & 'editor/skins/' & REReplaceNoCase( URL.Skin, "[^a-z0-9]", "", "all" ) & '/'>
 </cfif>
 
 <cfmodule

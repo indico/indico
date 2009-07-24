@@ -44,8 +44,8 @@
 			</thead>
 [iterate(client_postparams, local('this'))]
 			<tr>
-				<th>[#this->first]</th>
-				<td><pre>[#this->second]</pre></td>
+				<th>[Encode_HTML: #this->first]</th>
+				<td><pre>[Encode_HTML: #this->second]</pre></td>
 			</tr>
 [/iterate]
 		</table>

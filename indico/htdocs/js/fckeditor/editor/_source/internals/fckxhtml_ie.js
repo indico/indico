@@ -92,6 +92,42 @@ FCKXHtml._AppendAttributes = function( xmlNode, htmlNode, node, nodeName )
 	}
 }
 
+/**
+ * Used to clean up HTML that has been processed FCKXHtml._AppendNode().
+ *
+ * For objects corresponding to HTML elements, Internet Explorer will
+ * treat a property as if it were an attribute set on that element.
+ *
+ * http://msdn.microsoft.com/en-us/library/ms533026(VS.85).aspx#Accessing_Element_Pr
+ *
+ * FCKXHtml._AppendNode() sets the property _fckxhtmljob on node objects
+ * corresponding HTML elements to mark them as having been processed.
+ * Counting these properties as attributes will cripple style removal
+ * because FCK.Styles.RemoveFromSelection() will not remove an element
+ * as long as it still has attributes.
+ *
+ * refs #2156 and #2834
+ */
+
+FCKXHtml._RemoveXHtmlJobProperties = function ( node )
+{
+	// Select only nodes of type ELEMENT_NODE
+	if (!node || !node.nodeType || node.nodeType != 1)
+		return ;
+
+	// Clear the _fckhtmljob attribute.
+	if ( typeof node._fckxhtmljob !== 'undefined' )
+		node.removeAttribute('_fckxhtmljob') ;
+
+	// Recurse upon child nodes.
+	if ( node.hasChildNodes() )
+	{
+		var childNodes = node.childNodes ;
+		for ( var i = childNodes.length - 1 ; i >= 0 ; i-- )
+			FCKXHtml._RemoveXHtmlJobProperties( childNodes.item(i) ) ;
+	}
+}
+
 // On very rare cases, IE is loosing the "align" attribute for DIV. (right align and apply bulleted list)
 FCKXHtml.TagProcessors['div'] = function( node, htmlNode )
 {

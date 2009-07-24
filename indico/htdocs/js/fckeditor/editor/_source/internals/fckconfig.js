@@ -97,7 +97,7 @@ FCKConfig.ProcessHiddenField = function()
 			this.PageConfig[ sKey ] = false ;
 
 		else if ( sVal.length > 0 && !isNaN( sVal ) )	// If it is a number.
-			this.PageConfig[ sKey ] = parseInt( sVal, 10 ) ;
+			this.PageConfig[ sKey ] = parseFloat( sVal ) ;
 
 		else										// In any other case it is a string.
 			this.PageConfig[ sKey ] = sVal ;

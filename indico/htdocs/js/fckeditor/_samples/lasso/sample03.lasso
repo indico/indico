@@ -75,7 +75,7 @@ function ChangeToolbar( toolbarName )
 	);
 
 	if(action_param('Toolbar'));
-		$myeditor->toolbarset = action_param('Toolbar');
+		$myeditor->toolbarset = (String_ReplaceRegExp: action_param('Toolbar'), -find='[^a-zA-Z]', -replace='');
 	/if;
 
 	$myeditor->create;

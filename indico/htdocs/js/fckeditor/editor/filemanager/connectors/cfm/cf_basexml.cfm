@@ -64,5 +64,9 @@
 <cffunction name="SendErrorNode" returntype="void" output="true">
 	<cfargument name="number" required="true" type="Numeric">
 	<cfargument name="text" required="true">
-	<cfoutput><Error number="#ARGUMENTS.number#" text="#htmleditformat(ARGUMENTS.text)#" /></cfoutput>
+	<cfif Len(ARGUMENTS.text)>
+		<cfoutput><Error number="#ARGUMENTS.number#" text="#htmleditformat(ARGUMENTS.text)#" /></cfoutput>
+	<cfelse>
+		<cfoutput><Error number="#ARGUMENTS.number#" /></cfoutput>
+	</cfif>
 </cffunction>

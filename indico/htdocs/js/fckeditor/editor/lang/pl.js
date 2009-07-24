@@ -308,7 +308,7 @@ DlgTableCellSpace	: "Odstęp pomiędzy komórkami",
 DlgTableCellPad		: "Margines wewnętrzny komórek",
 DlgTableCaption		: "Tytuł",
 DlgTableSummary		: "Podsumowanie",
-DlgTableHeaders		: "Headers",	//MISSING
+DlgTableHeaders		: "Nagłówki",
 DlgTableHeadersNone		: "None",	//MISSING
 DlgTableHeadersColumn	: "First column",	//MISSING
 DlgTableHeadersRow		: "First Row",	//MISSING

@@ -84,7 +84,7 @@ function ChangeLanguage( languageCode )
 	if(action_param('Lang'));
 		var('config') = array(
 			'AutoDetectLanguage' = 'false',
-			'DefaultLanguage' = action_param('Lang')
+			'DefaultLanguage' = (String_ReplaceRegExp: action_param('Lang'), -find='[^a-z\-]', -replace='')
 		);
 	else;
 		var('config') = array(

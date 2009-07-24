@@ -58,7 +58,7 @@ foreach ( $postArray as $sForm => $value )
 
 ?>
 			<tr>
-				<th><?php echo $sForm?></th>
+				<th><?php echo htmlspecialchars($sForm) ?></th>
 				<td><pre><?php echo $postedValue?></pre></td>
 			</tr>
 <?php

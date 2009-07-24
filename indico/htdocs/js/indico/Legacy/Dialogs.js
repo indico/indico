@@ -450,10 +450,10 @@ extend(IndicoUI.Dialogs,
            },
 
            writeMinutes: function(confId, sessId, contId, subContId, compile) {
-               
+
                var changedText = new WatchValue(false);
                var wasChanged = false;
-               var compileMinutes = exists(compile)?compile:false 
+               var compileMinutes = exists(compile)?compile:false;
 
                var rtWidget = new RichTextWidget(600,400,{},'','rich','IndicoFull');
 
@@ -466,7 +466,7 @@ extend(IndicoUI.Dialogs,
                        return null;
                    }
                };
-                
+
                var req = indicoSource('minutes.edit',
                    {
                        'confId': intToStr(confId),
@@ -530,7 +530,7 @@ extend(IndicoUI.Dialogs,
 
                    saveButton = Widget.button(command(curry(commitChanges, function(){self.close();}), "Save"));
                    saveButton.dom.disabled = !compileMinutes;
-                   
+
                    var closeMinutes = function(){
                        self.close();
                        rtWidget.destroy();
@@ -540,12 +540,12 @@ extend(IndicoUI.Dialogs,
                        }
 
                    };
-                       
+
                    var commitChangesAndClose = function(suicideHook) {
                        commitChanges(suicideHook, closeMinutes);
                    };
-                       
-                   saveCloseButton = Widget.button(command(curry(commitChangesAndClose, function(){self.close()}), "Save and close"));
+
+                   saveCloseButton = Widget.button(command(curry(commitChangesAndClose, function(){self.close();}), "Save and close"));
                    saveCloseButton.dom.disabled = !compileMinutes;
 
 
@@ -562,5 +562,5 @@ extend(IndicoUI.Dialogs,
                popup.open();
 
            }
-           
+
        });

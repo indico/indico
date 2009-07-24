@@ -80,12 +80,18 @@ Dim sBasePath
 sBasePath = Request.ServerVariables("PATH_INFO")
 sBasePath = Left( sBasePath, InStrRev( sBasePath, "/_samples" ) )
 
+'This RegExp is used to sanitize recived skin parameter
+Dim oRegex
+Set oRegex = New RegExp
+oRegex.Global		= True
+oRegex.Pattern = "[^a-zA-Z0-9]"
+
 Dim oFCKeditor
 Set oFCKeditor = New FCKeditor
 oFCKeditor.BasePath = sBasePath
 
 If Request.QueryString("Skin") <> "" Then
-	oFCKeditor.Config("SkinPath") = sBasePath + "editor/skins/" & Server.HTMLEncode( Request.QueryString("Skin") ) + "/"
+	oFCKeditor.Config("SkinPath") = sBasePath + "editor/skins/" & oRegex.Replace( Request.QueryString("Skin"), "" ) + "/"
 End If
 
 oFCKeditor.Value = "<p>This is some <strong>sample text</strong>. You are using <a href=""http://www.fckeditor.net/"">FCKeditor</a>."
