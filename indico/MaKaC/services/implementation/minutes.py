@@ -23,7 +23,7 @@ class MinutesEdit(TextModificationBase, ProtectedModificationService):
         l.setSubContribution( self._params, 0 )
         # will check if it is compiling minutes
         self._compile = self._params.get("compile", False)
-        
+
         self._target = l.getObject()
 
         # TODO: change str to some kind of html sanitization
@@ -33,7 +33,7 @@ class MinutesEdit(TextModificationBase, ProtectedModificationService):
         if (type(self._target) == conference.Session and \
                not self._target.canCoordinate(self.getAW())) or \
                (type(self._target) == conference.Contribution and \
-                not self._target.canUserSubmit(self._getUser())):        
+                not self._target.canUserSubmit(self._getUser())):
             ProtectedModificationService._checkProtection(self);
 
     def _handleSet(self):
@@ -51,7 +51,7 @@ class MinutesEdit(TextModificationBase, ProtectedModificationService):
             return None
         else:
             return minutes.getText()
-        
+
     def _getCompiledMinutes( self ):
         minutes = []
         isHTML = False
@@ -82,8 +82,6 @@ class MinutesEdit(TextModificationBase, ProtectedModificationService):
         for min in minutes:
             text += "==================%s%s%s==================%s%s%s%s" % (lb,min[0],lb,lb,min[1],lb,lb)
         return text
-
-        
 
 methodMap = {
     "edit": MinutesEdit
