@@ -216,7 +216,7 @@ extend(IndicoUI.Dialogs,
                                    ['End Date/Time', $B(parameterManager.add(IndicoUI.Widgets.Generic.dateField(true), 'datetime', false), info.accessor('endDateTime')) ],
                                    ['Convener(s)', convListWidget.draw()],
                                    ['Session type', sesType.draw()]
-                               ]), Html.div({style:{marginTop: pixels(10), textAlign: 'center', background: '#DDDDDD', padding: pixels(2)}},[addButton, cancelButton])
+                               ]), Html.div('dialogButtons',[addButton, cancelButton])
                                             ]));
                        };
                        popup.open();

@@ -3,7 +3,7 @@
 <script type="text/javascript">
 <!--
 var oFCKeditor = new FCKeditor( 'content' ) ;
-oFCKeditor.Config["CustomConfigurationsPath"] = "%(baseURL)s/js/htmleditor/indicoconfig.js"  ;
+oFCKeditor.Config["CustomConfigurationsPath"] = "%(baseURL)s/js/fckeditor/indicoconfig.js"  ;
 oFCKeditor.Config["ImageUploadURL"] = "%(imageUploadURL)s" ;
 oFCKeditor.Config["ImageBrowserURL"] = "%(imageBrowserURL)s";
 oFCKeditor.Config["ImageBrowserWindowWidth"] = 700 ;
@@ -11,10 +11,10 @@ oFCKeditor.Config["ImageBrowserWindowHeight"] = 200 ;
 oFCKeditor.Config["ImageDlgHideAdvanced"] = true ;
 oFCKeditor.Config["ImageDlgHideLink"] = true ;
 oFCKeditor.Config["LinkBrowser"] = false ;
-oFCKeditor.BasePath       = "%(baseURL)s/js/htmleditor/" ;
+oFCKeditor.BasePath       = "%(baseURL)s/js/fckeditor/" ;
 oFCKeditor.Width          = 700 ;
 oFCKeditor.Height         = 600 ;
-oFCKeditor.ToolbarSet     = "Indico" ;
+oFCKeditor.ToolbarSet     = "IndicoFull" ;
 oFCKeditor.ReplaceTextarea() ;
 //-->
 </script>

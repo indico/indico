@@ -5,7 +5,7 @@
         <td bgcolor="white" width="90%%" valign="top" style="padding-left:20px">
                 <table width="60%%" align="left" valign="middle" style="padding-top:20px" border="0">
 					<tr>
-						<td colspan="2" class="subgroupTitle"> <%= _("Create internal page web")%></td>
+						<td colspan="2" class="subgroupTitle"> <%= _("Create internal web page")%></td>
 					</tr>
                     <tr>
                         <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Name")%></span></td>
