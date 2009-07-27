@@ -103,7 +103,7 @@ class WebFactory(WebFactory):
     
     @staticmethod
     def getConfModifTools(rh, conf):
-        return conferences.WPConfClone(rh, conf)
+        return conferences.WPConfDisplayAlarm(rh, conf)
     
     @staticmethod
     def getConfModifBookings(rh, conf, bs):
