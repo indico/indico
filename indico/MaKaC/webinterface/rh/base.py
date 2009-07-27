@@ -504,7 +504,7 @@ class RH(RequestHandlerBase):
                 pass
             
         #if we have an https request, we replace the links to Indico images by https ones.
-        if self._req.is_https() and self._tohttps:
+        if self._req.is_https() and self._tohttps and res is not None:
             res = res.replace(Config.getInstance().getImagesBaseURL(),
                               urlHandlers.setSSLPort(Config.getInstance().getImagesBaseSecureURL()))
             

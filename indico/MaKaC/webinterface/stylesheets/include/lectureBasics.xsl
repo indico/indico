@@ -25,14 +25,7 @@
 
 
 
-<xsl:template name="eventInfoBox">
-	<div class="iCal">
-		<xsl:if test="./iCalLink != ''">
-			<a href="{./iCalLink}" onmouseover="IndicoUI.Widgets.Generic.tooltip(this, event, '&lt;div style=&quot;padding:3px;&quot;&gt;Export to personal scheduler&lt;/div&gt;');">iCal export</a>
-		</xsl:if>
-	</div>
-	
-	
+<xsl:template name="eventInfoBox">	
 	<h1>
 		<xsl:text disable-output-escaping="yes"></xsl:text><xsl:value-of select="./title" disable-output-escaping="yes"/><xsl:text disable-output-escaping="yes"></xsl:text>
 	</h1>

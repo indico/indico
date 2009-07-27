@@ -132,6 +132,10 @@ class WebFactory(WebFactory):
     @staticmethod
     def getConferenceDisplayWriteMinutes(rh, contrib):
         return WPMConferenceDisplayWriteMinutes(rh,contrib)
+    
+    @staticmethod
+    def getDisplayFullMaterialPackage(rh, conf):
+        return WPMDisplayFullMaterialPackage(rh,conf)
 
 ########### Material Display #################################################   
 
@@ -1782,17 +1786,15 @@ class WPMConfAddAlarm(WPMConfModifTools, conferences.WPConfAddAlarm):
     
 class WPMTimeTableCustomizePDF(WPMeetingDisplay):
     
-    def _getHeader( self ):
-        """
-        """
-        wc = wcomponents.WMenuConferenceHeader( self._getAW(), self._getNavigationDrawer(),self._conf )
-        return wc.getHTML( { "loginURL": self.getLoginURL(),\
-                             "logoutURL": self.getLogoutURL(),\
-                             "confId": self._conf.getId(),\
-                             "currentView": "static",\
-                             "type": WebFactory.getId(), \
-                             "menu": "",\
-                             "loginAsURL": self.getLoginAsURL() } )
+    def __init__(self, rh, conf):
+        WPMeetingDisplay.__init__(self, rh, conf)
+        # An hack to make sure that the background is the same as the header
+        self._extraCSS.append("body { background: #424242; } ")
+
+    def _getFooter( self ):
+        wc = wcomponents.WFooter()
+        p = {"dark":True}
+        return wc.getHTML(p)
     
     def _getBody( self, params ):
         wc = WMTimeTableCustomizePDF( self._conf )
@@ -1809,3 +1811,20 @@ class WMTimeTableCustomizePDF(wcomponents.WTemplated):
         vars["getPDFURL"]=quoteattr(str(url))
         return vars
 
+
+######################## Get file package ######################
+class WPMDisplayFullMaterialPackage(WPMeetingDisplay, conferences.WPDisplayFullMaterialPackage):
+    
+    def __init__(self, rh, conf):
+        WPMeetingDisplay.__init__(self, rh, conf)
+        # An hack to make sure that the background is the same as the header
+        self._extraCSS.append("body { background: #424242; } ")
+
+    def _getFooter( self ):
+        wc = wcomponents.WFooter()
+        p = {"dark":True}
+        return wc.getHTML(p)
+
+    def _getBody(self, params):
+        html = """<div class="evaluationForm">%s</div>"""
+        return html%conferences.WPDisplayFullMaterialPackage._getBody(self, params)

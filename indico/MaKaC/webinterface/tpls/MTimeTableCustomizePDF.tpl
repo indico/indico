@@ -2,7 +2,7 @@
 <form action=%(getPDFURL)s method="post">
     <input type="hidden" name="showDays" value="%(showDays)s">
     <input type="hidden" name="showSessions" value="%(showSessions)s">
-    <table width="40%%" align="center" border="0" style="border-left: 1px solid #777777; border-top: 1px solid #777777;">
+    <table width="40%%" align="center" border="0" style="background-color: white; border-left: 1px solid #777777; border-top: 1px solid #777777;">
         <tr>
             <td class="groupTitle" style="background:#E5E5E5; color:gray"> <%= _("PDF timetable customisation")%></td>
         </tr>
@@ -69,7 +69,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <input type="checkbox" name="showBreaksAtConfLevel" value="showBreaksAtConfLevel" checked="checked"> <%= _("Print "breaks" which are not within any session")%>
+                            <input type="checkbox" name="showBreaksAtConfLevel" value="showBreaksAtConfLevel" checked="checked"> <%= _("Print 'breaks' which are not within any session")%>
                         </td>
                     </tr>
                   </table>
@@ -90,7 +90,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <input type="checkbox" name="showBreaksAtConfLevel" value="showBreaksAtConfLevel" checked="checked"> <%= _("Print "breaks" which are not within any session")%>
+                            <input type="checkbox" name="showBreaksAtConfLevel" value="showBreaksAtConfLevel" checked="checked"> <%= _("Print 'breaks' which are not within any session")%>
                         </td>
                     </tr>
                   </table>

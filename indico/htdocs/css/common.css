@@ -438,7 +438,7 @@ div.meetingEventHeader {
     
     min-height: 130px;
     margin: 0px;
-    padding: 20px 30px;
+    padding: 10px 30px 20px;
 }
 
 div.meetingEventHeader a {

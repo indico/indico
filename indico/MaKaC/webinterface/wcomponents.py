@@ -591,6 +591,8 @@ class WMenuMeetingHeader( WConferenceHeader ):
         vars["viewoptions"] = viewoptions
         vars["SelectedStyle"] = styleMgr.getStylesheetName(vars["currentView"])
         vars["showFilterButton"] = True
+        vars["showExportToPDF"] = True
+        vars["showMore"] = True
 		
         # Dates Menu
         tz = DisplayTZ(self._aw,self._conf,useServerTZ=1).getDisplayTZ()
@@ -658,6 +660,11 @@ class WMenuMeetingHeader( WConferenceHeader ):
         urlCustPrint.addParam("view", vars["currentView"])
         vars["printURL"]=str(urlCustPrint)
         
+        urlCustPDF=urlHandlers.UHConfTimeTableCustomizePDF.getURL(self._conf)
+        urlCustPDF.addParam("showDays", vars.get("selectedDate", "all"))
+        urlCustPDF.addParam("showSessions", vars.get("selectedSession", "all"))
+        vars["pdfURL"]=quoteattr(str(urlCustPDF))
+        
         return vars
 
 class WMenuSimpleEventHeader( WMenuMeetingHeader ):
@@ -681,6 +688,8 @@ class WMenuSimpleEventHeader( WMenuMeetingHeader ):
         vars["SelectedStyle"] = styleMgr.getStylesheetName(vars["currentView"])
         
         vars["showFilterButton"] = False
+        vars["showExportToPDF"] = False
+        vars["showMore"] = True
             
         vars["accessWrapper"] = self._aw
         return vars

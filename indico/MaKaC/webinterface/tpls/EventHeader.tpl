@@ -10,10 +10,10 @@ last = owner.getLastEvent(conf)
 
 # If viewoptions is set then show the style selector
 try:
-	viewoptions
-	styleSelector = True
+	showMore
+	moreButton = True
 except NameError:
-	styleSelector = False
+	moreButton = False
 
 # If printURL is set then show the print button
 try:
@@ -33,6 +33,12 @@ try:
     dark
 except NameError:
     dark = False;
+
+# Export to PDF option    
+try:
+    showExportToPDF
+except:
+    showExportToPDF = False
 
 %>
 
@@ -85,13 +91,13 @@ except NameError:
             <a id="printButton" href="<%= printURL %>"
                style="background-image: url(<%= systemIcon('printer') %>)"></a>
 		<% end %>
-
-		<% if styleSelector: %>
-            <% includeTpl('StyleSelector', viewoptions = viewoptions, SelectedStyle = SelectedStyle) %>
-		<% end %>
-		
-		<% if showFilterButton: %>
+        
+        <% if showFilterButton: %>
             <% includeTpl('MeetingFilter') %>
+        <% end %>
+        
+		<% if moreButton: %>
+            <% includeTpl('HeaderMoreMenu', viewoptions = viewoptions, SelectedStyle = SelectedStyle, pdfURL=pdfURL, showExportToPDF=showExportToPDF) %>
 		<% end %>
         
         <div class="separator"></div>
