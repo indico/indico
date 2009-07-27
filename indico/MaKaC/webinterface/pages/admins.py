@@ -416,7 +416,7 @@ class WPAdminPlugins( WPAdminsBase ):
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
         
-        self._tabs["Main"] = self._tabCtrl.newTab("Main", "Main", urlHandlers.UHAdminPlugins.getURL())
+        self._tabs["Main"] = self._tabCtrl.newTab("Main", _("Main"), urlHandlers.UHAdminPlugins.getURL())
         
         pluginTypes = PluginsHolder().getPluginTypes(sorted = True)
         for pluginType in pluginTypes:
@@ -474,17 +474,17 @@ class WPServicesCommon( WPAdminsBase ):
     def _createTabCtrl( self ):
         self._tabCtrl = wcomponents.TabControl()
         
-        self._subTabWebcast = self._tabCtrl.newTab( "webcast", "Webcast", \
+        self._subTabWebcast = self._tabCtrl.newTab( "webcast", _("Webcast"), \
                 urlHandlers.UHWebcast.getURL() )  
-        self._subTabWebcast_Live = self._subTabWebcast.newSubTab( "live", "Live", \
+        self._subTabWebcast_Live = self._subTabWebcast.newSubTab( "live", _("Live"), \
                 urlHandlers.UHWebcast.getURL() )  
-        self._subTabWebcast_Archive = self._subTabWebcast.newSubTab( "archive", "Archive", \
+        self._subTabWebcast_Archive = self._subTabWebcast.newSubTab( "archive", _("Archive"), \
                 urlHandlers.UHWebcastArchive.getURL() )  
-        self._subTabWebcast_Setup = self._subTabWebcast.newSubTab( "setup", "Setup", \
+        self._subTabWebcast_Setup = self._subTabWebcast.newSubTab( "setup", _("Setup"), \
                 urlHandlers.UHWebcastSetup.getURL() )  
-        self._subTabRecording = self._tabCtrl.newTab( "recording", "Recording", \
+        self._subTabRecording = self._tabCtrl.newTab( "recording", _("Recording"), \
                 urlHandlers.UHRecording.getURL() )       
-        self._subTabOAIPrivateConfig = self._tabCtrl.newTab( "oai-private", "OAI Private Gateway", \
+        self._subTabOAIPrivateConfig = self._tabCtrl.newTab( "oai-private", _("OAI Private Gateway"), \
                 urlHandlers.UHOAIPrivateConfig.getURL() )  
 
     def _getPageContent(self, params):
@@ -1362,7 +1362,7 @@ class WUserIdentitiesTable(wcomponents.WTemplated):
                 continue
             changePassword = ""
             if item.getAuthenticatorTag() != "Local" :
-                changePassword = "External account"
+                changePassword = _("External account")
             else :
                 changeURL = urlHandlers.UHUserIdentityChangePassword.getURL()
                 changeURL.addParam("userId",self._avatar.getId())
@@ -1451,9 +1451,9 @@ class WUserDetails(wcomponents.WTemplated):
             vars["identities"] = WUserIdentitiesTable( self._avatar ).getHTML( { "addIdentityURL": vars["addIdentityURL"], "removeIdentityURL": vars["removeIdentityURL"] })
         vars["activeButton"] = ""
         if self._currentUser in al.getList() and not self._avatar.isActivated():
-            vars["activeButton"] = """<form action="%s" method="POST"><td bgcolor="white" width="100%%"\
+            vars["activeButton"] = _("""<form action="%s" method="POST"><td bgcolor="white" width="100%%"\
                     valign="top" align="left">&nbsp;&nbsp;&nbsp;<input type="submit" class="btn" \
-                    value="activate the account"></td></form>"""%vars["activeURL"]
+                    value=" _("activate the account") "></td></form>""")%vars["activeURL"]
         vars["categoryManager"] = ""
         categs = u.getLinkTo("category","manager")
         for categ in categs:
@@ -1667,7 +1667,7 @@ class WPIdentityChangePassword(WPUserBase):
     
     def _getTabContent(self, params):
         
-        identity = self._avatar.getIdentityById(self._params["identityId"],"Local")
+        identity = self._avatar.getIdentityById(self._params["identityId"],_("Local"))
         c = WIdentityModification( self._avatar, identity )        
         postURL = urlHandlers.UHUserIdentityChangePassword.getURL()
         self._params["postURL"] = postURL
@@ -2525,11 +2525,11 @@ class WPAdminsSystemBase(WPAdminsBase):
     def _createTabCtrl( self ):
         self._tabCtrl = wcomponents.TabControl()
 
-        self._subTabConfiguration = self._tabCtrl.newTab( "configuration", "Configuration", \
+        self._subTabConfiguration = self._tabCtrl.newTab( "configuration", _("Configuration"), \
                 urlHandlers.UHAdminsSystem.getURL() ) 
-        self._subTabTaskManager = self._tabCtrl.newTab( "tasks", "Task Manager", \
+        self._subTabTaskManager = self._tabCtrl.newTab( "tasks", _("Task Manager"), \
                 urlHandlers.UHTaskManager.getURL() ) 
-        self._subTabMaintenance = self._tabCtrl.newTab( "maintenance", "Maintenance", \
+        self._subTabMaintenance = self._tabCtrl.newTab( "maintenance", _("Maintenance"), \
                 urlHandlers.UHMaintenance.getURL() )
         
     def _getPageContent(self, params):
@@ -2718,12 +2718,12 @@ class WTaskManager(wcomponents.WTemplated):
         taskList.sort(lambda x,y: cmp(x.getId(),y.getId()))
         if type == Alarm:
             taskList.sort(lambda x,y: cmp(x.getStartDate(),y.getStartDate()))
-            html.append("""<tr><td valign="top"><b>Alarm</b></td></tr>""")
-            html.append("""<tr><td><table><tr>
+            html.append(_("""<tr><td valign="top"><b>_("Alarm")</b></td></tr>"""))
+            html.append(_("""<tr><td><table><tr>
                     <td></td>
-                    <td><u>Id</u></td>
-                    <td><u>Conference</u></td>
-                    <td><u>Date</u></td></tr>""")
+                    <td><u>_("Id")</u></td>
+                    <td><u>_("Conference")</u></td>
+                    <td><u>_("Date")</u></td></tr>"""))
             for task in taskList:
                 delete = urlHandlers.UHRemoveTask.getURL()
                 delete.addParam("taskId", task.getId())

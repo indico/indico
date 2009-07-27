@@ -20,10 +20,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.plugins import getModules, initModule
+from MaKaC.i18n import _
 
 pluginType = "Collaboration"
-pluginName = "EVO"
-pluginDescription = "EVO, the Collaboration network"
+pluginName = _("EVO")
+pluginDescription = _("EVO, the Collaboration network")
 
 modules = {}
 topModule = None

@@ -11,7 +11,7 @@
       <td bgcolor="white" width="100%%" valign="top" class="blacktext"><%= ("No", "yes")[minfo.useProxy()] %></td>
       <td rowspan="4" valign="top">
         <form action="%(ModifURL)s" method="POST">
-        <input type="submit" class="btn" value="modify">
+        <input type="submit" class="btn" value="<%= _("modify")%>">
         </form>
       </td>
     </tr>

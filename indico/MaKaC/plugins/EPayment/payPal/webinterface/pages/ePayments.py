@@ -26,6 +26,7 @@ from xml.sax.saxutils import quoteattr
 from MaKaC.common import Configuration
 from MaKaC.webinterface import urlHandlers
 import MaKaC
+from MaKaC.i18n import _
 
 from MaKaC.plugins.EPayment.payPal.webinterface.wcomponents import WTemplated
 from MaKaC.plugins.EPayment.payPal.webinterface import urlHandlers as localUrlHandlers
@@ -36,7 +37,7 @@ class WPConfModifEPaymentPayPalBase(registrationForm.WPConfModifRegFormBase):
 
     def _createTabCtrl( self ):
         self._tabCtrl = wcomponents.TabControl()
-        self._tabMain = self._tabCtrl.newTab( "main", "Main", \
+        self._tabMain = self._tabCtrl.newTab( "main", _("Main"), \
                 localUrlHandlers.UHConfModifEPaymentPayPal.getURL( self._conf ) )
         wf = self._rh.getWebFactory()
         if wf:

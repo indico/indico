@@ -26,7 +26,7 @@ import MaKaC.webinterface.wcomponents as wcomponents
 
 class WPHelp(WPMainBase):
     def _getNavigationDrawer(self):
-        return wcomponents.WSimpleNavigationDrawer("Help", urlHandlers.UHConferenceHelp.getURL )
+        return wcomponents.WSimpleNavigationDrawer(_("Help"), urlHandlers.UHConferenceHelp.getURL )
 
     def _getBody(self, params):
         wc = WHelp()

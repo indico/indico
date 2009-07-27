@@ -61,7 +61,7 @@ class RegistrationForm(Persistent):
             self.setModificationEndDate(None)
             self.setCurrency( _("not selected"))
         else:
-            self.activated = groupData.get("activated", False)
+            self.activated = groupData.get(_("activated"), False)
             self.title = groupData.get("name", "")
             self.announcement = groupData.get("announcement", "")
             self.usersLimit = groupData.get("limit", "")

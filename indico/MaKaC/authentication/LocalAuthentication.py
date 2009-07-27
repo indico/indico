@@ -21,12 +21,12 @@
 
 from MaKaC.common.general import *
 from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity
-
+from MaKaC.i18n import _
 
 
 class LocalAuthenticator(Authenthicator):
     idxName = "localIdentities"
-    id = "Local"
+    id = _("Local")
     name = "Indico"
     desciption = "Indico Login"
     UserCreator = None

@@ -9,6 +9,6 @@
 </ul>
 <% end %>
 <% else: %>
-(Empty)
+<%= _("(Empty)")%>
 <% end %>
 </div>

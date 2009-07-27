@@ -18,45 +18,46 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from MaKaC.i18n import _
 
 globalOptions = [
     #Collaboration options necessary in all plugins
-    ("subtab", {"description" : "Subtab where the Recording Request plugin will be placed",
+    ("subtab", {"description" : _("Subtab where the Recording Request plugin will be placed"),
                "type": str,
                "defaultValue": "Recording Request",
                "editable": False,
                "visible": False,
                "mustReload": True}),
-    ("allowedOn", {"description" : "Kind of event types (conference, meeting, simple_event) supported",
+    ("allowedOn", {"description" : _("Kind of event types (conference, meeting, simple_event) supported"),
                "type": list,
                "defaultValue": ["conference","simple_event","meeting"],
                "editable": False,
                "visible": False,
                "mustReload": True} ),
-    ("admins", {"description": "Recording Request admins / responsibles",
+    ("admins", {"description": _("Recording Request admins / responsibles"),
                       "type": 'users',
                       "defaultValue": [],
                       "editable": True,
                       "visible": True} ),
     #RecordingRequest options
-    ("sendMailNotifications", {"description" : "Should mail notifications be sent to responsibles?",
+    ("sendMailNotifications", {"description" : _("Should mail notifications be sent to responsibles?"),
                "type": bool,
                "defaultValue": False,
                "editable": True,
                "visible": True} ),
-    ("additionalEmails", {"description": "Additional email addresses who will receive notifications (always)",
+    ("additionalEmails", {"description": _("Additional email addresses who will receive notifications (always)"),
                           "type": list,
                           "defaultValue": [],
                           "editable": True,
                           "visible": True} ),
     
-    ("contributionWarnLimit", {"description" : "Allowed number of loaded contributions without warning",
+    ("contributionWarnLimit", {"description" : _("Allowed number of loaded contributions without warning"),
                "type": int,
                "defaultValue": 20,
                "editable": True,
                "visible": True} ),
                
-    ("ConsentFormURL", {"description" : "Recording consent form URL",
+    ("ConsentFormURL", {"description" : _("Recording consent form URL"),
                "type": str,
                "defaultValue": "",
                "editable": True,

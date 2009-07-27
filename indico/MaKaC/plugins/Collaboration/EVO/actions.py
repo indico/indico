@@ -21,9 +21,10 @@
 
 from MaKaC.plugins.base import ActionBase
 from MaKaC.plugins.Collaboration.EVO.common import EVOControlledException, getEVOAnswer, EVOException
+from MaKaC.i18n import _
 
 pluginActions = [
-    ("reloadCommunityList", {"buttonText": "Reload Community List",
+    ("reloadCommunityList", {"buttonText": _("Reload Community List"),
                             "associatedOption": "communityList"} )
 ]
 

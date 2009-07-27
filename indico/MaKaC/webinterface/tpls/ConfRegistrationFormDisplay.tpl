@@ -14,7 +14,7 @@
     </tr>
     <tr>
         <td colspan="2" align="left">
-            <br><b><%= _(""" _("Please, note that fields marked with") <font color="red">*</font> _("are mandatory") """)%></b><br>
+            <br><b><%= _("""Please, note that fields marked with <font color="red">*</font> are mandatory""")%></b><br>
         </td>
     </tr>
     <tr>

@@ -37,10 +37,12 @@ type("AddMaterialDialog", ["ExclusivePopup"], {
                                           function(value) {
                                               return Html.option({'value': value}, value);
                                           }),
-                         " or ",
+                         " ",
+                         $T("or"),
+                         " ",
                          Widget.link(command(function() {
                              chooser.set('write');
-                         }, "other")));
+                         }, $T("other"))));
             },
 
             write: function() {
@@ -48,10 +50,12 @@ type("AddMaterialDialog", ["ExclusivePopup"], {
                 pm.remove(select);
                 pm.add(text);
                 return Html.div({}, text,
-                                " or ",
+                                " ",
+                               $T("or"),
+                               " ",
                                 Widget.link(command(function() {
                                     chooser.set('select');
-                                }, "select from list")));
+                                }, $T("select from list"))));
             }
         }));
         chooser.set('select');
@@ -82,10 +86,10 @@ type("AddMaterialDialog", ["ExclusivePopup"], {
         return Html.div({},
                         IndicoUtil.createFormFromMap(
                             [
-                                ['Type', selector],
-                                ['File', file],
-                                ['Description', description],
-                                ['Convert to PDF', convert]
+                                [$T('Type'), selector],
+                                [$T('File'), file],
+                                [$T('Description'), description],
+                                [$T('Convert to PDF'), convert]
                             ]),
                         uploadType,
                         Html.div({style: {'textAlign': 'center'}},
@@ -96,7 +100,7 @@ type("AddMaterialDialog", ["ExclusivePopup"], {
                                              self.uploading = true;
                                              self.form.dom.submit();
                                          }
-                                     }, "Upload"))));
+                                     }, $T("Upload")))));
     },
 
     _drawLinkUpload: function() {
@@ -118,9 +122,9 @@ type("AddMaterialDialog", ["ExclusivePopup"], {
         return Html.div({},
                         IndicoUtil.createFormFromMap(
                             [
-                                ['Type',selector],
-                                ['URL', url],
-                                ['Description', description]
+                                [$T('Type'),selector],
+                                [$T('URL'), url],
+                                [$T('Description'), description]
                             ]),
                         uploadType,
                         Html.div({style: {'textAlign': 'center'}},
@@ -131,7 +135,7 @@ type("AddMaterialDialog", ["ExclusivePopup"], {
                                              self.uploading = true;
                                              self.form.dom.submit();
                                          }
-                                     }, "Upload"))));
+                                     }, $T("Upload")))));
     },
 
     _drawWidget: function() {
@@ -177,8 +181,8 @@ type("AddMaterialDialog", ["ExclusivePopup"], {
     },
 
     draw: function() {
-        this.tabWidget = new TabWidget([['Upload File', this._drawFileUpload()],
-                                        ['Add Link', this._drawLinkUpload()]],
+        this.tabWidget = new TabWidget([[$T('Upload File'), this._drawFileUpload()],
+                                        [$T('Add Link'), this._drawLinkUpload()]],
                                        400, 200);
 
         return this.ExclusivePopup.prototype.draw.call(this,
@@ -196,7 +200,7 @@ type("AddMaterialDialog", ["ExclusivePopup"], {
     this.args = clone(args);
 //    this.args.materialId = material;
 
-    this.ExclusivePopup("Upload Material",
+    this.ExclusivePopup($T("Upload Material"),
                         function() {
                             self.close();
                         });
@@ -237,9 +241,9 @@ type("EditMaterialDialog", ["ServiceDialog", "PreLoadHandler"], {
 
         var statusSelection = Widget.select(
             $L({
-                0:(self.material.get('protectedOwner')?'Private':'Public')+' (from parent)',
-                1:'Private (by itself)',
-                '-1':'Public (by itself)'
+                0:(self.material.get('protectedOwner')?$T('Private'):$T('Public'))+' '+$T('(from parent)'),
+                1:$T('Private (by itself)'),
+                '-1':$T('Public (by itself)')
             })
         );
 
@@ -254,8 +258,8 @@ type("EditMaterialDialog", ["ServiceDialog", "PreLoadHandler"], {
 
         var visibility = Html.select(
             {},
-            Html.option({value: 0},'Visible for unauth. users'),
-            Html.option({value: 1},'Hidden from unauth. users')
+            Html.option({value: 0},$T('Visible for unauth. users')),
+            Html.option({value: 1},$T('Hidden from unauth. users'))
         );
 
         self.userList =  new UserListField('ShortPeopleListDiv',
@@ -270,14 +274,14 @@ type("EditMaterialDialog", ["ServiceDialog", "PreLoadHandler"], {
         var privateInfoDiv = Html.div(
             {style:{padding:pixels(2)}},
             Html.div({},
-                     Html.label({}, 'Allowed users'),
+                     Html.label({}, $T('Allowed users')),
                      self.userList.draw()),
             Html.div({style:{marginTop: pixels(4)}},
-                     Html.label({}, 'Visibility: '),
+                     Html.label({}, $T('Visibility: ')),
                      $B(visibility,
                         self.newMaterial.accessor('hidden'))),
             Html.div({},
-                     Html.label({}, 'Access Key: '),
+                     Html.label({}, $T('Access Key: ')),
                      $B(Html.input('password',{}),
                         self.newMaterial.accessor('accessKey')))
         );
@@ -286,7 +290,7 @@ type("EditMaterialDialog", ["ServiceDialog", "PreLoadHandler"], {
         var protectionDiv = Html.div(
             {style: {marginTop: pixels(5)}},
             Html.div({},
-                     Html.label({},"Status: "),
+                     Html.label({},$T("Status: ")),
                      $B(statusSelection,
                         self.newMaterial.accessor('protection'))
                     ),
@@ -299,18 +303,18 @@ type("EditMaterialDialog", ["ServiceDialog", "PreLoadHandler"], {
         var buttonDiv = Widget.block([
             Widget.button(command(function() {
                 self._saveCategory();
-            },'Save')),
+            },$T('Save'))),
             Widget.button(command(function() {
                 self.close();
-            }, 'Cancel'))
+            }, $T('Cancel')))
         ]);
 
         $B(title, self.newMaterial.accessor('title'));
         $B(description, self.newMaterial.accessor('description'));
 
         var tabControl = new TabWidget([
-            ["Information", Widget.block([titleDiv,descDiv])],
-            ["Access Control" , protectionDiv]], 300,200, 0);
+            [$T("Information"), Widget.block([titleDiv,descDiv])],
+            [$T("Access Control") , protectionDiv]], 300,200, 0);
 
         return this.ExclusivePopup.prototype.draw.call(
             this,
@@ -372,18 +376,18 @@ type("EditResourceDialog", ["ServiceDialog", "PreLoadHandler"], {
 
         self.newResource = clone(this.resource);
         var name = Html.input('text',{});
-        var nameDiv = Widget.block([Html.label({},"Name: "),name]);
+        var nameDiv = Widget.block([Html.label({},$T("Name: ")),name]);
         var description = Html.textarea({name:'description',style: {width: '200px'}});
-        var descDiv = Widget.block([Widget.block(Html.label({},"Description: ")),description]);
+        var descDiv = Widget.block([Widget.block(Html.label({},$T("Description: "))),description]);
         var url = Html.input('text',{name:'url'});
-        var urlDiv = Widget.block([Html.label({},"URL: "),url]);
+        var urlDiv = Widget.block([Html.label({},$T("URL: ")),url]);
         var buttonDiv = Widget.block([
             Widget.button(command(function() {
                 self._saveResource();
-            }, 'Save')),
+            }, $T('Save'))),
             Widget.button(command(function() {
                 self.close();
-            }, 'Cancel'))
+            }, $T('Cancel')))
         ]);
 
         $B(name, self.newResource.accessor('name'));
@@ -400,9 +404,9 @@ type("EditResourceDialog", ["ServiceDialog", "PreLoadHandler"], {
 
         var statusSelection = Widget.select(
             $L({
-                0:(self.resource.get('protectedOwner')?'Private':'Public')+' (from parent)',
-                1:'Private (by itself)',
-                '-1':'Public (by itself)'
+                0:(self.resource.get('protectedOwner')?$T('Private'):$T('Public'))+' '+$T('(from parent)'),
+                1:$T('Private (by itself)'),
+                '-1':$T('Public (by itself)')
             })
         );
 
@@ -418,21 +422,21 @@ type("EditResourceDialog", ["ServiceDialog", "PreLoadHandler"], {
         var privateInfoDiv = Html.div(
             {style:{padding:pixels(2)}},
             Html.div({},
-                     Html.label({}, 'Allowed users'),
+                     Html.label({}, $T('Allowed users')),
                      self.userList.draw()));
 
         var protectionDiv = Html.div(
             {style: {marginTop: pixels(5)}},
             Html.div({},
-                     Html.label({},"Status: "),
+                     Html.label({},$T("Status: ")),
                      $B(statusSelection,
                         self.newResource.accessor('protection'))), privateInfoDiv);
 
         var tabControl = new TabWidget([
-            ["Information", Widget.block([nameDiv,this.resource.type=='stored'?[]:urlDiv,descDiv])],
-            ["Access Control", protectionDiv]], 300,200, 0);
-        tabControl.options = $L(["Information", "Access Control"]);
-        tabControl.selected.set("Information");
+            [$T("Information"), Widget.block([nameDiv,this.resource.type=='stored'?[]:urlDiv,descDiv])],
+            [$T("Access Control")   , protectionDiv]], 300,200, 0);
+        tabControl.options = $L([$T("Information"), $T("Access Control")]);
+        tabControl.selected.set($T("Information"));
 
         return this.ExclusivePopup.prototype.draw.call(
             this,
@@ -506,7 +510,7 @@ var revStateHelpPopup = function(event) {
  */
 var modifyDisabledHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-                                     'Modifying this material is currently not possible because it has been already submitted.');
+                                     $T('Modifying this material is currently not possible because it has been already submitted.'));
 };
 
 type("ResourceListWidget", ["ListWidget"], {
@@ -522,7 +526,7 @@ type("ResourceListWidget", ["ListWidget"], {
         resParams.resourceId = resourceId;
 
         var deleteResource = function() {
-            if (confirm("Are you sure you want to delete "+resource.get('name')+"?")) {
+            if (confirm($T("Are you sure you want to delete")+" "+resource.get('name')+"?")) {
                 var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
                 jsonRpc(Indico.Urls.JsonRpcService,
                         'material.resources.delete',
@@ -807,7 +811,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
                                                   self._loadMaterial(info.material);
                                               }
                                           });
-        }, "Add Material"));
+        }, $T("Add Material")));
 
         return Html.div(
             {},
@@ -862,7 +866,7 @@ type("MaterialEditorDialog", ["ExclusivePopup"], {
                      Widget.button(command(function() {
                          self.close();
                          window.location.reload(true);
-                     }, "Close"))));
+                     }, $T("Close")))));
     }
 },
 
@@ -886,17 +890,17 @@ IndicoUI.Dialogs.Material = {
         dialog.open();
     },
     editMaterial: function(args, material, list) {
-        var dialog = new EditMaterialDialog(args, material, list, "Edit Material");
+        var dialog = new EditMaterialDialog(args, material, list, $T("Edit Material"));
         dialog.execute();
     },
 
     editResource: function(args, material, resource, domItem, appender) {
-        var dialog = new EditResourceDialog(args, material, resource, domItem, appender, "Edit Resource");
+        var dialog = new EditResourceDialog(args, material, resource, domItem, appender, $T("Edit Resource"));
         dialog.execute();
     },
 
     editor: function(confId, sessId, contId, subContId, types, uploadAction, refresh) {
-        var dialog = new MaterialEditorDialog(confId, sessId, contId, subContId, types, uploadAction, "Edit Materials", 400, 300, refresh);
+        var dialog = new MaterialEditorDialog(confId, sessId, contId, subContId, types, uploadAction, $T("Edit Materials"), 400, 300, refresh);
         dialog.open();
     }
 };

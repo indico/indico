@@ -6,6 +6,7 @@ from datetime import datetime
 from pytz import timezone
 from xml.sax.saxutils import quoteattr, escape
 from MaKaC.common.Configuration import Config
+from MaKaC.i18n import _
 
 
 def convertTime(d,tz):
@@ -53,7 +54,7 @@ class TimezoneRegistry:
         
 
 class DisplayTimezoneRegistry:
-    _items = ['MyTimezone','Event Timezone']
+    _items = [_('MyTimezone'),_('Event Timezone')]
 
     def getList( self ):
         return self._items
