@@ -8,7 +8,7 @@
         </tr>
         <tr>
           <td>
-            <table width="100%%">
+            <table width="100%%" style="padding:20px;">
               <tr>
                 <td>
                   <input type="radio" name="typeTT" value="normalTT" checked><b> <%= _("Normal timetable")%>:</b>

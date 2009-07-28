@@ -6774,7 +6774,10 @@ class WTrackCreation( wcomponents.WTemplated ):
 
 class WPConfAddTrack( WPConfModifProgram ):
     
-    def _getTabContent( self, params ):
+    def _setActiveSideMenuItem(self):
+        self._programMenuItem.setActive()
+    
+    def _getPageContent( self, params ):
         p = WTrackCreation( self._conf )
         pars = {"postURL": urlHandlers.UHConfPerformAddTrack.getURL() }
         return p.getHTML( pars )

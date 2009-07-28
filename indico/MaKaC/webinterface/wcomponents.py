@@ -5310,8 +5310,8 @@ class WConfTickerTapeDrawer(WTemplated):
                             ssEntry.getOwnRoom().getName().strip().lower() != self._conf.getRoom().getName().strip().lower():
                                 title="%s (%s)"%(title, ssEntry.getOwnRoom().getName().strip())
                     entryCaptions.append("%s <em>%s-%s</em>" %(title,
-                        entry.getStartDate().strftime("%H:%M"), \
-                        entry.getEndDate().strftime("%H:%M")))
+                        entry.getAdjustedStartDate(self._tz).strftime("%H:%M"), \
+                        entry.getAdjustedEndDate(self._tz).strftime("%H:%M")))
             else:
                 title=entry.getTitle()
                 if isinstance(entry.getOwner(), conference.Contribution):
@@ -5325,8 +5325,8 @@ class WConfTickerTapeDrawer(WTemplated):
                             entry.getOwnRoom().getName().strip().lower() != self._conf.getRoom().getName().strip().lower():
                                 title="%s (%s)"%(title, entry.getOwnRoom().getName().strip())
                 entryCaptions.append("%s <em>%s-%s</em>" %(title,
-                    entry.getStartDate().strftime("%H:%M"), \
-                    entry.getEndDate().strftime("%H:%M")))
+                    entry.getAdjustedStartDate(self._tz).strftime("%H:%M"), \
+                    entry.getAdjustedEndDate(self._tz).strftime("%H:%M")))
         if entryCaptions!=[]:
             nowHappeningArray = """['%s']""" %("', '".join(entryCaptions))
 
