@@ -1935,12 +1935,12 @@ class RHConfModifTools( RHConferenceModifBase ):
         if self._conf.isClosed():
             p = conferences.WPConferenceModificationClosed( self, self._target )
             return p.display()
-        else:            
+        else:
             wf=self.getWebFactory()
             if wf is not None:
                 p = wf.getConfModifTools(self, self._conf)
             else:
-                p = conferences.WPConfDisplayAlarm( self, self._target )
+                p = conferences.WPConfClone( self, self._target )
             return p.display()
 
 class RHConfModifListings( RHConferenceModifBase ):
