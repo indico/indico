@@ -89,7 +89,7 @@ function OpenFolder( folderPath )
 
 function OpenFile( fileUrl )
 {
-	window.top.opener.SetUrl( encodeURI( fileUrl ).replace( '#', '%23' ) ) ;
+	window.top.opener.SetUrl( fileUrl ) ;
 	window.top.close() ;
 	window.top.opener.focus() ;
 }
@@ -145,7 +145,7 @@ function GetFoldersAndFilesCallBack( fckXml )
 
 		// Get the optional "url" attribute. If not available, build the url.
 		var oFileUrlAtt = oNodes[j].attributes.getNamedItem('url') ;
-		var sFileUrl = oFileUrlAtt != null ? oFileUrlAtt.value : sCurrentFolderUrl + sFileName ;
+		var sFileUrl = oFileUrlAtt != null ? oFileUrlAtt.value : encodeURI( sCurrentFolderUrl + sFileName ).replace( /#/g, '%23' ) ;
 
 		oHtml.Append( oListManager.GetFileRowHtml( sFileName, sFileUrl, sFileSize ) ) ;
 	}

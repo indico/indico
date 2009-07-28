@@ -4627,7 +4627,6 @@ ul.nobulletsList li
 
 ul.nobulletsListInline
 {
-    position: relative;
     margin:0px;
     margin-top: 10px;
     padding-left: 0px;
@@ -4865,6 +4864,7 @@ div.dialogButtons {
     border: 1px solid #888888;
     width: 250px;
     overflow: hidden;
+    background-color: white;
 }
 
 .suggestionBoxList {
@@ -4876,7 +4876,7 @@ div.dialogButtons {
 .suggestionBoxList li {
     list-style-type: none;
     padding: 3px;
-    border-bottom:1px solid #DDDDDD;
+    border-top:1px solid #DDDDDD;
     cursor: pointer;
 }
 
@@ -4911,6 +4911,8 @@ div.dialogButtons {
     font-size:9pt;
     font-style:italic;
     text-align:center;
+    margin-top: 5px;
+    margin-bottom: 3px;
 }
 
 .searchSuggestionHelpBox {
@@ -4920,5 +4922,8 @@ div.dialogButtons {
     font-style: italic;
     margin: 0 0 0;
     padding: 5px;
-    border-bottom:1px solid #DDDDDD;
+}
+
+.fixPreOverflow pre{
+    overflow: hidden;
 }

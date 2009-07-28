@@ -67,7 +67,7 @@ function ChangeToolbar( toolbarName )
 </cfoutput>
 
 <cfif isDefined( "URL.Toolbar" )>
-	<cfset toolbarSet = HTMLEditFormat( URL.Toolbar )>
+	<cfset toolbarSet = REReplaceNoCase( URL.Toolbar, "[^a-z]", "", "all" )>
 <cfelse>
 	<cfset toolbarSet = "Default">
 </cfif>

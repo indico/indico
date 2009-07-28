@@ -77,7 +77,7 @@ $oFCKeditor = new FCKeditor('FCKeditor1') ;
 $oFCKeditor->BasePath = $sBasePath ;
 
 if ( isset($_GET['Toolbar']) )
-	$oFCKeditor->ToolbarSet = htmlspecialchars($_GET['Toolbar']);
+	$oFCKeditor->ToolbarSet = preg_replace("/[^a-z]/i", "", $_GET['Toolbar']);
 
 $oFCKeditor->Value = '<p>This is some <strong>sample text</strong>. You are using <a href="http://www.fckeditor.net/">FCKeditor</a>.</p>' ;
 $oFCKeditor->Create() ;

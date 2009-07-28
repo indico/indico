@@ -161,12 +161,12 @@ class sendAccountCreationModeration:
     def send( self ):
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
         name = self._user.getStraightFullName()
-        text = _(""" _("Dear Administrator,
+        text = """ Dear Administrator,
 %s has created a new account in Indico.
 
-In order to activate it, please go to this URL"):
+In order to activate it, please go to this URL:
 <%s>
-""")% (name,urlHandlers.UHUserDetails.getURL( self._user ))
+"""% (name,urlHandlers.UHUserDetails.getURL( self._user ))
         maildata = { "fromAddr": "Indico Mailer<%s>" % minfo.getSupportEmail(), "toList": minfo.getAdminEmails(), "subject": _("[Indico] New account creation request"), "body": text }
         GenericMailer.send(GenericNotification(maildata))
 
@@ -178,10 +178,10 @@ class sendAccountCreationNotification:
     def send( self ):
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
         name = self._user.getStraightFullName()
-        text = _("""Dear Administrator,
+        text = """Dear Administrator,
 %s has created a new account in Indico.
 <%s>
-""") % (name,urlHandlers.UHUserDetails.getURL( self._user ))
+""" % (name,urlHandlers.UHUserDetails.getURL( self._user ))
         maildata = { "fromAddr": "Indico Mailer<%s>" % minfo.getSupportEmail(), "toList": minfo.getAdminEmails(), "subject": _("[Indico] New account creation"), "body": text }
         GenericMailer.send(GenericNotification(maildata))
 

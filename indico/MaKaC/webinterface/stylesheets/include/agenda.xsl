@@ -40,6 +40,7 @@
                 <xsl:call-template name="displayModifIcons">
                     <xsl:with-param name="item" select="."/>
                     <xsl:with-param name="confId" select="./ID"/>
+                    <xsl:with-param name="uploadURL">Indico.Urls.UploadAction.conference</xsl:with-param>
                 </xsl:call-template>
                 </div>
 
@@ -59,14 +60,14 @@
     </tr>
     <tr>
       <td>
-        <table border="0" bgcolor="#f0c060" cellpadding="2" cellspacing="0" width="100%" class="results">
+        <table border="0" bgcolor="#f0c060" cellpadding="2" cellspacing="0" width="100%" class="results tablepre">
         <tr>
           <td valign="top" align="right">
             <b><strong>
               Date/Time: 
             </strong></b>
           </td>
-          <td>
+          <td style="width:90%">
             <small>
             <xsl:choose>
             <xsl:when test="substring(./startDate,0,11) = substring(./endDate,0,11)">
@@ -151,7 +152,7 @@
             Description:
             </strong></b>
           </td>
-          <td>
+          <td class="fixPreOverflow">
             <small>
             <xsl:apply-templates select="./description"/>
             </small>

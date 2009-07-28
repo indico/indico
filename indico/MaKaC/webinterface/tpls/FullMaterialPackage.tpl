@@ -24,7 +24,6 @@ function deselectAll()
 }
 //-->
 </script>
-
 <h3 class="formTitle"><%= _("Get file package")%></h3>
 <p style="font-family: verdana, arial, sans-serif;font-weight: bold;font-size: 10px; color: red;">%(errors)s</p>
 <form action=%(getPkgURL)s method="post" name="getPkgForm">

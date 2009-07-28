@@ -67,7 +67,7 @@ extend(IndicoUI.Dialogs,
                        };
 
                        var popup = new ExclusivePopup(
-                           'Add Break',
+                           $T('Add Break'),
                            function() {
                                popup.close();
                            });
@@ -75,8 +75,8 @@ extend(IndicoUI.Dialogs,
                        popup.draw = function(){
                            var self = this;
 
-                           var addButton = Html.button({}, "Add");
-                           var cancelButton = Html.button({}, "Cancel");
+                           var addButton = Html.button({}, $T("Add"));
+                           var cancelButton = Html.button({}, $T("Cancel"));
                            cancelButton.dom.style.marginLeft = pixels(10);
 
                            info.set('roomInfo', $O(roomInfo));
@@ -98,14 +98,14 @@ extend(IndicoUI.Dialogs,
 
                            return self.ExclusivePopup.prototype.draw.call(
                                this,
-                               Widget.block([IndicoUtil.createFormFromMap([['Title', $B(Html.edit({
+                               Widget.block([IndicoUtil.createFormFromMap([[$T('Title'), $B(Html.edit({
                                    style: {
                                        width: '300px'
                                    }
-                               }), info.accessor('title'))], ['Description', $B(Html.textarea({
+                               }), info.accessor('title'))], [$T('Description'), $B(Html.textarea({
                                    cols: 40,
                                    rows: 2
-                               }), info.accessor('description'))], ['Place', roomEditor.draw()], ['Date/Time', dateTimeField.element]]),
+                               }), info.accessor('description'))], [$T('Place'), roomEditor.draw()], [$T('Date/Time'), dateTimeField.element]]),
                                              Html.div('dialogButtons',
                                                       [addButton, cancelButton])]));
                        };
@@ -170,12 +170,12 @@ extend(IndicoUI.Dialogs,
                            }
                        };
 
-                       var popup = new ExclusivePopup('Add Session');
+                       var popup = new ExclusivePopup($T('Add Session'));
 
                        popup.draw = function(){
                            var self = this;
-                           var addButton = Html.button({},"Add");
-                           var cancelButton = Html.button({},"Cancel");
+                           var addButton = Html.button({},$T("Add"));
+                           var cancelButton = Html.button({},$T("Cancel"));
                            cancelButton.dom.style.marginLeft = pixels(10);
 
                            info.set('roomInfo', $O(roomInfo));
@@ -202,22 +202,22 @@ extend(IndicoUI.Dialogs,
 
                            $B(info.accessor('conveners'), convListWidget.getUsers());
 
-                           var sesType = new RadioFieldWidget({'standard':'Standard','poster':'Poster'},['standard','poster'],'nobulletsListInline');
+                           var sesType = new RadioFieldWidget({'standard':$T('Standard'),'poster':$T('Poster')},['standard','poster'],'nobulletsListInline');
                            sesType.select('standard');
                            $B(info.accessor('sessionType'), sesType.state);
 
                            return this.ExclusivePopup.prototype.draw.call(
                                this,
                                Widget.block([IndicoUtil.createFormFromMap([
-                                   ['Title', $B(parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), info.accessor('title'))],
-                                   ['Description', $B(Html.textarea({cols: 40, rows: 2}), info.accessor('description'))],
-                                   ['Place', Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
-                                   ['Start Date/Time', $B(parameterManager.add(IndicoUI.Widgets.Generic.dateField(true), 'datetime', false), info.accessor('startDateTime')) ],
-                                   ['End Date/Time', $B(parameterManager.add(IndicoUI.Widgets.Generic.dateField(true), 'datetime', false), info.accessor('endDateTime')) ],
-                                   ['Convener(s)', convListWidget.draw()],
-                                   ['Session type', sesType.draw()]
-                               ]), Html.div({style:{marginTop: pixels(10), textAlign: 'center', background: '#DDDDDD', padding: pixels(2)}},[addButton, cancelButton])
-                                            ]));
+                                   [$T('Title'), $B(parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), info.accessor('title'))],
+                                   [$T('Description'), $B(Html.textarea({cols: 40, rows: 2}), info.accessor('description'))],
+                                   [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
+                                   [$T('Start Date/Time'), $B(parameterManager.add(IndicoUI.Widgets.Generic.dateField(true), 'datetime', false), info.accessor('startDateTime')) ],
+                                   [$T('End Date/Time'), $B(parameterManager.add(IndicoUI.Widgets.Generic.dateField(true), 'datetime', false), info.accessor('endDateTime')) ],
+                                   [$T('Convener(s)'), convListWidget.draw()],
+                                   [$T('Session type'), sesType.draw()]
+                               ]), Html.div('dialogButtons',[addButton, cancelButton])
+                               ]));
                        };
                        popup.open();
                    }).run();
@@ -293,15 +293,15 @@ extend(IndicoUI.Dialogs,
                        };
 
                        var popup = new ExclusivePopup(
-                           'Add Session Slot',
+                           $T('Add Session Slot'),
                            function() {
                                popup.close();
                            });
 
                        popup.draw = function() {
                            var self = this;
-                           var addButton = Html.button({}, "Add");
-                           var cancelButton = Html.button({}, "Cancel");
+                           var addButton = Html.button({}, $T("Add"));
+                           var cancelButton = Html.button({}, $T("Cancel"));
                            cancelButton.dom.style.marginLeft = pixels(10);
 
                            info.set('roomInfo', $O(roomInfo));
@@ -331,12 +331,12 @@ extend(IndicoUI.Dialogs,
 
                            return this.ExclusivePopup.prototype.draw.call(
                                this,
-                               Widget.block([IndicoUtil.createFormFromMap([['Title',
+                               Widget.block([IndicoUtil.createFormFromMap([[$T('Title'),
                                                                             $B(Html.edit({
                                                                                 style: { width: '300px'}
                                                                             }), info.accessor('title'))],
-                                                                           ['Place', Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())], ['Date/Time', dateTimeField.element],
-                                                                           ['Convener(s)', convListWidget.draw()]]),
+                                                                           [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())], [$T('Date/Time'), dateTimeField.element],
+                                                                           [$T('Convener(s)'), convListWidget.draw()]]),
                                              Html.div('dialogButtons',
                                                       [addButton, cancelButton])]
                                            ));
@@ -395,7 +395,7 @@ extend(IndicoUI.Dialogs,
                    };
 
                    var popup = new ExclusivePopup(
-                       'Add Subcontribution',
+                       $T('Add Subcontribution'),
                        function() {
                            popup.close();
                        });
@@ -403,8 +403,8 @@ extend(IndicoUI.Dialogs,
 
                        var self = this;
 
-                       var addButton = Html.button({},"Add");
-                       var cancelButton = Html.button({},"Cancel");
+                       var addButton = Html.button({},$T("Add"));
+                       var cancelButton = Html.button({},$T("Cancel"));
                        cancelButton.dom.style.marginLeft = pixels(10);
 
                        cancelButton.observeClick(function(){
@@ -433,11 +433,11 @@ extend(IndicoUI.Dialogs,
                        return self.ExclusivePopup.prototype.draw.call(
                            this,
                            Widget.block([IndicoUtil.createFormFromMap([
-                               ['Title', $B(parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), info.accessor('title'))],
-                               ['Description', $B(Html.textarea({cols: 40, rows: 2}), info.accessor('description'))],
-                               ['Keywords', keywordField.element],
-                               ['Duration (min) ', $B(parameterManager.add(IndicoUI.Widgets.Generic.durationField(), 'int', false), info.accessor('duration')) ],
-                               ['Presenter(s)', presListWidget.draw()]
+                               [$T('Title'), $B(parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), info.accessor('title'))],
+                               [$T('Description'), $B(Html.textarea({cols: 40, rows: 2}), info.accessor('description'))],
+                               [$T('Keywords'), keywordField.element],
+                               [$T('Duration (min) '), $B(parameterManager.add(IndicoUI.Widgets.Generic.durationField(), 'int', false), info.accessor('duration')) ],
+                               [$T('Presenter(s)'), presListWidget.draw()]
                            ]),
                                          Html.div({style:{marginTop: pixels(10), textAlign: 'center', background: '#DDDDDD', padding: pixels(2)}},
                                                   [addButton, cancelButton])
@@ -450,10 +450,11 @@ extend(IndicoUI.Dialogs,
            },
 
            writeMinutes: function(confId, sessId, contId, subContId, compile) {
-               
+
                var changedText = new WatchValue(false);
                var wasChanged = false;
-               var compileMinutes = exists(compile)?compile:false 
+               var compileMinutes = exists(compile)?compile:false;
+               var killProgress = null;
 
                var rtWidget = new RichTextWidget(600,400,{},'','rich','IndicoFull');
 
@@ -466,7 +467,7 @@ extend(IndicoUI.Dialogs,
                        return null;
                    }
                };
-                
+
                var req = indicoSource('minutes.edit',
                    {
                        'confId': intToStr(confId),
@@ -478,6 +479,9 @@ extend(IndicoUI.Dialogs,
 
                req.state.observe(function(state){
                    if (state == SourceState.Error) {
+                       if(killProgress) {
+                           killProgress();
+                       }
                        IndicoUtil.errorReport(req.error.get());
                    } else if (state == SourceState.Loaded) {
 
@@ -505,7 +509,7 @@ extend(IndicoUI.Dialogs,
                        });
                    }
 
-                   var killProgress = IndicoUI.Dialogs.Util.progress($T('Saving...'));
+                   killProgress = IndicoUI.Dialogs.Util.progress($T('Saving...'));
                    req.set(rtWidget.get());
                };
 
@@ -519,7 +523,7 @@ extend(IndicoUI.Dialogs,
 
 
                var popup = new ExclusivePopup(
-                   'My minutes',
+                   $T('My minutes'),
                    function() {
                        popup.close();
                    });
@@ -528,9 +532,9 @@ extend(IndicoUI.Dialogs,
                    var self = this;
                    var content = Html.div({}, rtWidget.draw());
 
-                   saveButton = Widget.button(command(curry(commitChanges, function(){self.close();}), "Save"));
+                   saveButton = Widget.button(command(curry(commitChanges, function(){self.close();}), $T("Save")));
                    saveButton.dom.disabled = !compileMinutes;
-                   
+
                    var closeMinutes = function(){
                        self.close();
                        rtWidget.destroy();
@@ -540,12 +544,11 @@ extend(IndicoUI.Dialogs,
                        }
 
                    };
-                       
+
                    var commitChangesAndClose = function(suicideHook) {
                        commitChanges(suicideHook, closeMinutes);
                    };
-                       
-                   saveCloseButton = Widget.button(command(curry(commitChangesAndClose, function(){self.close()}), "Save and close"));
+                   saveCloseButton = Widget.button(command(curry(commitChangesAndClose, function(){self.close()}), $T("Save and close")));
                    saveCloseButton.dom.disabled = !compileMinutes;
 
 
@@ -556,11 +559,11 @@ extend(IndicoUI.Dialogs,
                                 Html.div({style:{marginTop: pixels(20)}},
                                          saveButton,
                                          saveCloseButton,
-                                         Widget.button(command(closeMinutes, "Close")))));
+                                         Widget.button(command(closeMinutes, $T("Close"))))));
                };
 
                popup.open();
 
            }
-           
+
        });

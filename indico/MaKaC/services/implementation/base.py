@@ -343,26 +343,24 @@ class TextModificationBase( object ):
     """
     Base class for text field modification
     """
-    
+
     def _getAnswer( self ):
         """
         Calls _handle() on the derived classes, in order to make it happen. Provides
         them with self._value.
         """
-        
+
+        # fetch the 'value' parameter (default for text)
         if self._params.has_key('value'):
             self._value = self._params['value']
         else:
+            # None if not passed
             self._value = None
-        
+
         if self._value == None:
             return self._handleGet()
         else:
             self._handleSet()
-        
-        if isinstance(self._value, basestring):
-            return escape(self._value)
-        else:
             return self._value
 
 class HTMLModificationBase( object ):

@@ -111,6 +111,10 @@ class WebFactory(WebFactory):
         return WPSEConferenceDisplayWriteMinutes(rh,contrib)
     getConferenceDisplayWriteMinutes = staticmethod(getConferenceDisplayWriteMinutes)
     
+    @staticmethod
+    def getDisplayFullMaterialPackage(rh, conf):
+        return WPSEDisplayFullMaterialPackage(rh,conf)
+    
 #################### Participants #####################################
 
     def getConfModifParticipantsNewPending(rh, conf):
@@ -656,3 +660,19 @@ class WPSEConferenceDisplayWriteMinutes(WPSimpleEventDisplay):
         return wc.getHTML( pars )
     
 
+######################## Get file package ######################
+class WPSEDisplayFullMaterialPackage(WPSimpleEventDisplay, conferences.WPDisplayFullMaterialPackage):
+    
+    def __init__(self, rh, conf):
+        WPSimpleEventDisplay.__init__(self, rh, conf)
+        # An hack to make sure that the background is the same as the header
+        self._extraCSS.append("body { background: #424242; } ")
+
+    def _getFooter( self ):
+        wc = wcomponents.WFooter()
+        p = {"dark":True}
+        return wc.getHTML(p)
+
+    def _getBody(self, params):
+        html = """<div class="evaluationForm">%s</div>"""
+        return html%conferences.WPDisplayFullMaterialPackage._getBody(self, params)

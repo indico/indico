@@ -107,7 +107,7 @@ type ("UserSearchPopup", ["ExclusivePopup"], {
              * why we use Indico.Settings.ExtAuthenticators[0] because we suppose that there will be
              * just one external authenticator.
              */
-            searchExtForm = IndicoUtil.createFormFromMap([["Search "+Indico.Settings.ExtAuthenticators[0], searchExt]])
+            searchExtForm = IndicoUtil.createFormFromMap([["Search "+Indico.Settings.ExtAuthenticators[0], searchExt]]);
         }
 
         var source = null;
@@ -125,15 +125,9 @@ type ("UserSearchPopup", ["ExclusivePopup"], {
                     if (state == SourceState.Loaded) {
                         userList.set(selectedDiv);
                         self.searchButton.dom.disabled = false;
-                        if ( (!self.searchGroups && empty($L($V(source, "people"))))
-                            ||
-                            (self.searchGroups &&
-                                    self.parametersWidget.selected.get() == 'Users' &&
-                                    empty($L($V(source, "people"))))
-                            ||
-                            (self.searchGroups &&
-                                    self.parametersWidget.selected.get() == 'Groups' &&
-                                    empty($L($V(source, "groups"))))) {
+                        if ( (!self.searchGroups && empty($L($V(source, "people")))) ||
+                             (self.searchGroups && self.parametersWidget.selected.get() == 'Users' && empty($L($V(source, "people")))) ||
+                            (self.searchGroups && self.parametersWidget.selected.get() == 'Groups' && empty($L($V(source, "groups"))))) {
                             userList.append(Html.br());
                             userList.append(Html.em({style:{padding: pixels(10)}}, $T("No results for this search...") ));
                         }
@@ -144,7 +138,7 @@ type ("UserSearchPopup", ["ExclusivePopup"], {
             }
             selectedUserList.clear();
             selectedGroupList.clear();
-            userList.set(Html.div({style: {paddingTop: '20px'}}, ProgressIndicator()));
+            userList.set(Html.div({style: {paddingTop: '20px'}}, new ProgressIndicator()));
             self.searchButton.dom.disabled = true;
         });
 
@@ -247,10 +241,10 @@ type ("UserSearchPopup", ["ExclusivePopup"], {
           this.searchGroups = exists(searchGroups)?searchGroups:false;
 
           this.criteria = new WatchObject();
-	  
-	  if (conferenceId) {
+
+          if (conferenceId) {
               this.criteria.set('conferenceId', conferenceId);
-	  }
+          }
 
           if (this.searchGroups) {
               this.parametersWidget = new TabWidget(
@@ -552,7 +546,7 @@ type("UserListField", ["IWidget"], {
          this.enableGroups = exists(enableGroups)?enableGroups:false;
          this.privileges = exists(privileges)?privileges:{};
          this.selectedPrivileges = new WatchObject();
-	 this.conferenceId = exists(conferenceId)?conferenceId:null;
+         this.conferenceId = exists(conferenceId)?conferenceId:null;
 
 
          var self = this;
@@ -685,7 +679,7 @@ type ("AdditionalUsersPopup", ["ExclusivePopup"], {
       function(title, favouriteUsers, optionalUsers, process) {
           var self = this;
           self.favouriteUsers = favouriteUsers;
-          self.optionalUsers = optionalUsers
+          self.optionalUsers = optionalUsers;
 
           this.processFunction = process;
           this.ExclusivePopup(title, function(){return true;});

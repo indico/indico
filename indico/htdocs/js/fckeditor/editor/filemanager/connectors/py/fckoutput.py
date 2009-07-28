@@ -95,7 +95,10 @@ class BaseXmlMixin(object):
 				"""</Connector>""" )
 
 	def sendErrorNode(self, number, text):
-		return """<Error number="%s" text="%s" />""" % (number, convertToXmlAttribute(text))
+		if number != 1:
+			return """<Error number="%s" />""" % (number)
+		else:
+			return """<Error number="%s" text="%s" />""" % (number, convertToXmlAttribute(text))
 
 class BaseHtmlMixin(object):
 	def sendUploadResults( self, errorNo = 0, fileUrl = '', fileName = '', customMsg = '' ):

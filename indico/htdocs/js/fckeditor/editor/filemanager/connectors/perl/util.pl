@@ -40,9 +40,7 @@ sub RemoveFromEnd
 sub ConvertToXmlAttribute
 {
 	local($value) = @_;
-	return $value;
-#	return utf8_encode(htmlspecialchars($value));
-
+	return(&specialchar_cnv($value));
 }
 
 sub specialchar_cnv

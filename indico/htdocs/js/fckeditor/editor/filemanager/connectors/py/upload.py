@@ -41,7 +41,7 @@ class FCKeditorQuickUpload(	FCKeditorConnectorBase,
 		command = 'QuickUpload'
 		# The file type (from the QueryString, by default 'File').
 		resourceType  = self.request.get('Type','File')
-		currentFolder = getCurrentFolder(self.request.get("CurrentFolder",""))
+		currentFolder = "/"
 		# Check for invalid paths
 		if currentFolder is None:
 			return self.sendUploadResults(102, '', '', "")

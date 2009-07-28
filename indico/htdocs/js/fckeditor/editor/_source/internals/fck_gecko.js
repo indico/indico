@@ -375,6 +375,16 @@ FCK.InsertHtml = function( html )
 
 		range = new FCKDomRange( this.EditorWindow ) ;
 		range.MoveToSelection() ;
+
+		// If the first element (if exists) of the document fragment is a block
+		// element, then split the current block. (#1537)
+		var currentNode = docFrag.RootNode.firstChild ;
+		while ( currentNode && currentNode.nodeType != 1 )
+			currentNode = currentNode.nextSibling ;
+
+		if ( currentNode && FCKListsLib.BlockElements[ currentNode.nodeName.toLowerCase() ] )
+			range.SplitBlock() ;
+
 		range.DeleteContents() ;
 		range.InsertNode( docFrag.RootNode ) ;
 

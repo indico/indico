@@ -87,7 +87,7 @@ function ChangeSkin( skinName )
 		fckEditor.basePath		= basePath ;
 		if ( isDefined( "URL.Skin" ) )
 		{
-			fckEditor.config['SkinPath'] = basePath & 'editor/skins/' & HTMLEditFormat( URL.Skin ) & '/' ;
+			fckEditor.config['SkinPath'] = basePath & 'editor/skins/' & REReplaceNoCase( URL.Skin, "[^a-z0-9]", "", "all" ) & '/' ;
 		}
 		fckEditor.create() ; // create the editor.
 	</cfscript>

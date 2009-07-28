@@ -69,6 +69,7 @@ class RHConfSignIn( conferenceBase.RHConferenceBase ):
         
     
     def _process( self ):
+        self._tohttps = True
         #Check for automatic login
         auth = AuthenticatorMgr()
         av = auth.autoLogin(self)
@@ -1328,8 +1329,15 @@ class RHFullMaterialPackage(RHConferenceBaseDisplay):
         self._errors = params.get("errors","")
 
     def _process( self ):
-        p = conferences.WPDisplayFullMaterialPackage(self,self._target)
+        
+        wf = self.getWebFactory()
+        if wf!=None : #Event == Meeting/Lecture
+            p = wf.getDisplayFullMaterialPackage(self,self._target)
+        else : #Event == Conference
+            p = conferences.WPDisplayFullMaterialPackage(self,self._target)
         return p.display(errors=self._errors)
+        
+        
         
 
 class RHFullMaterialPackagePerform(RHConferenceBaseDisplay):

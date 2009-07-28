@@ -20,10 +20,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.plugins import getModules, initModule
+from MaKaC.i18n import _
 
 pluginType = "Collaboration"
 pluginName = "CERNMCU"
-pluginDescription = "Create conferences in CERN's MCU"
+pluginDescription = _("Create conferences in CERN's MCU")
 
 modules = {}
 topModule = None

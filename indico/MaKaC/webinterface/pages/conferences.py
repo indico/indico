@@ -4560,7 +4560,7 @@ class WPConfModifToolsBase( WPConferenceModifBase ):
         self._tabDelete = self._tabCtrl.newTab( "delete", _("Delete"), \
                 urlHandlers.UHConfDeletion.getURL(self._conf) )
         self._tabMatPackage = self._tabCtrl.newTab( "matPackage", _("Material Package"), \
-                urlHandlers.UHConferenceDisplayMaterialPackage.getURL(self._conf) )
+                urlHandlers.UHConfModFullMaterialPackage.getURL(self._conf) )
         self._tabOfflineSite = self._tabCtrl.newTab( "offlineSite", _("Offline Site"), \
                 urlHandlers.UHConfDVDCreation.getURL(self._conf) )
 
@@ -12398,12 +12398,9 @@ class WPConfModifDisplayImageBrowser (wcomponents.WTemplated):
         return vars
         
 
-class WPDisplayFullMaterialPackage( WPConfModifToolsBase ):
+class WPDisplayFullMaterialPackage( WPConferenceDefaultDisplayBase ):
     
-    def _setActiveTab( self ):
-        self._tabMatPackage.setActive()
-       
-    def _getTabContent(self,params):
+    def _getBody(self,params):
         wc = WFullMaterialPackage( self._conf )
         p = {"errors": params.get("errors",""),\
              "getPkgURL": urlHandlers.UHConferenceDisplayMaterialPackagePerform.getURL(self._conf)}

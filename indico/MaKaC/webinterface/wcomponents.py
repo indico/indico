@@ -292,16 +292,19 @@ class WHeader(WTemplated):
        
         imgLogo=Configuration.Config.getInstance().getSystemIconURL( "logoIndico" )
         imgLogin=Configuration.Config.getInstance().getSystemIconURL( "login" )
-        if Configuration.Config.getInstance().getLoginURL().startswith("https"):
-            
-            # Set proper PROTOCOL for images requested via SSL
-            imgLogo=imgLogo.replace("http://", "https://")
-            imgLogin=imgLogin.replace("http://", "https://")
-            
-            # Set proper PORT for images requested via SSL
-            imgLogo = urlHandlers.setSSLPort( imgLogo )
-            imgLogin = urlHandlers.setSSLPort( imgLogin ) 
-            
+##
+## TOCHECK: We do not need this anymore since we use the flaog _ishttps in the clase RHSignIn
+##
+#        if Configuration.Config.getInstance().getLoginURL().startswith("https"):
+#            
+#            # Set proper PROTOCOL for images requested via SSL
+#            imgLogo=imgLogo.replace("http://", "https://")
+#            imgLogin=imgLogin.replace("http://", "https://")
+#            
+#            # Set proper PORT for images requested via SSL
+#            imgLogo = urlHandlers.setSSLPort( imgLogo )
+#            imgLogin = urlHandlers.setSSLPort( imgLogin ) 
+#            
         vars["imgLogo"] = imgLogo
         vars["imgLogin"] = imgLogin
         vars["isFrontPage"] = self.__isFrontPage
@@ -588,6 +591,8 @@ class WMenuMeetingHeader( WConferenceHeader ):
         vars["viewoptions"] = viewoptions
         vars["SelectedStyle"] = styleMgr.getStylesheetName(vars["currentView"])
         vars["showFilterButton"] = True
+        vars["showExportToPDF"] = True
+        vars["showMore"] = True
 		
         # Dates Menu
         tz = DisplayTZ(self._aw,self._conf,useServerTZ=1).getDisplayTZ()
@@ -655,6 +660,11 @@ class WMenuMeetingHeader( WConferenceHeader ):
         urlCustPrint.addParam("view", vars["currentView"])
         vars["printURL"]=str(urlCustPrint)
         
+        urlCustPDF=urlHandlers.UHConfTimeTableCustomizePDF.getURL(self._conf)
+        urlCustPDF.addParam("showDays", vars.get("selectedDate", "all"))
+        urlCustPDF.addParam("showSessions", vars.get("selectedSession", "all"))
+        vars["pdfURL"]=quoteattr(str(urlCustPDF))
+        
         return vars
 
 class WMenuSimpleEventHeader( WMenuMeetingHeader ):
@@ -678,6 +688,8 @@ class WMenuSimpleEventHeader( WMenuMeetingHeader ):
         vars["SelectedStyle"] = styleMgr.getStylesheetName(vars["currentView"])
         
         vars["showFilterButton"] = False
+        vars["showExportToPDF"] = False
+        vars["showMore"] = True
             
         vars["accessWrapper"] = self._aw
         return vars

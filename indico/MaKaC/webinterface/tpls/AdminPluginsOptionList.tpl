@@ -153,7 +153,7 @@
         <% end %>
         <tr>
             <td colspan="2" style="text-align: right;">
-                <input type="submit" name="Save" value="Save" />
+                <input type="submit" name="Save" value="<%= _("Save") %>" />
             </td>
         </tr>
     </table>

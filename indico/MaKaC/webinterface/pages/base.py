@@ -33,7 +33,7 @@ class WPBase:
     def __init__( self, rh ):
         self._rh = rh
         self._locTZ = ""
-        
+
         #store page specific CSS and JS
         self._extraCSSFiles = []
         self._extraCSS = []
@@ -57,10 +57,10 @@ class WPBase:
 
     def _getBaseURL( self ):
         return Config.getInstance().getBaseURL()
-    
+
     def _getTitle( self ):
         return self._title
-    
+
     def _setTitle( self, newTitle ):
         self._title = newTitle.strip()
 
@@ -77,9 +77,9 @@ class WPBase:
     def _getHeadContent( self ):
         """
         Returns _additional_ content between <head></head> tags.
-        Please note that <title>, <meta> and standard CSS are always included. 
-        
-        Override this method to add your own, page-specific loading of 
+        Please note that <title>, <meta> and standard CSS are always included.
+
+        Override this method to add your own, page-specific loading of
         JavaScript, CSS and other legal content for HTML <head> tag.
         """
         return ""
@@ -93,20 +93,20 @@ class WPBase:
         from MaKaC.webinterface.pages.registrationForm import WPRegistrationFormSignIn
         from MaKaC.webinterface.rh.base import RHModificationBaseProtected
         from MaKaC.webinterface.rh.admins import RHAdminBase
-        
+
         baseurl = self._getBaseURL()
         if ((isinstance(self, WPSignIn) or isinstance(self, WPConfSignIn) or isinstance(self, WPRegistrationFormSignIn)) and \
                 Config.getInstance().getLoginURL().startswith("https")) or \
                 self._rh._req.is_https() and self._rh._tohttps:
             baseurl = baseurl.replace("http://","https://")
             baseurl = urlHandlers.setSSLPort( baseurl )
-            
+
         area=""
         if isinstance(self._rh, RHModificationBaseProtected):
             area=_(""" - _("Management area")""")
         elif isinstance(self._rh, RHAdminBase):
             area=_(""" - _("Administrator area")""")
-        
+
         return wcomponents.WHTMLHeader().getHTML({
                             "area": area,
                             "baseurl": baseurl,
@@ -139,38 +139,38 @@ class WPBase:
         return "%s%s%s"%( self._getHTMLHeader(), \
                             self._display( params ), \
                             self._getHTMLFooter() )
-        
+
     def addExtraCSSFile(self, filename):
         self._extraCSSFiles.append(filename)
-        
+
     def addExtraCSS(self, cssCode):
         self._extraCSS.append(cssCode)
-        
+
     def addExtraJSFile(self, filename):
         self._extraJSFiles.append(filename)
-        
+
     def addExtraJS(self, jsCode):
         self._extraJS.append(jsCode)
-    
-    # auxiliar functions    
-    def _escapeChars(self, text):        
+
+    # auxiliar functions
+    def _escapeChars(self, text):
         return text.replace('%','%%')
 
 
 class WPDecorated( WPBase ):
-    
+
     def _getSiteArea(self):
         return "DisplayArea"
-    
+
     def getLoginURL( self ):
         return urlHandlers.UHSignIn.getURL("%s"%self._rh.getCurrentURL())
-    
+
     def getLogoutURL( self ):
         return urlHandlers.UHSignOut.getURL("%s"%self._rh.getCurrentURL())
-    
+
     def getLoginAsURL( self ):
         return urlHandlers.UHLogMeAs.getURL("%s"%self._rh.getCurrentURL())
-        
+
 
     def _getHeader( self ):
         """
@@ -194,16 +194,16 @@ class WPDecorated( WPBase ):
         """
         """
         return "<div class=\"wrapper\">%s%s<div class=\"emptyFooter\"></div></div>%s"%( self._getHeader(), body, self._getFooter() )
-    
+
     def _display( self, params ):
-        
+
         return self._applyDecoration( self._getBody( params ) )
 
     def _getBody( self, params ):
         """
         """
         pass
-        
+
     def _getNavigationDrawer(self):
         return None
 
@@ -213,7 +213,7 @@ class WPDecorated( WPBase ):
             is shown.
         """
         return False
-    
+
     def _currentCategory(self):
         """
             Whenever in category display mode this is overloaded with the current category
@@ -227,21 +227,21 @@ class WPDecorated( WPBase ):
         return None
 
 class WPNotDecorated( WPBase ):
-    
+
     def getLoginURL( self ):
         return urlHandlers.UHSignIn.getURL("%s"%self._rh.getCurrentURL())
-    
+
     def getLogoutURL( self ):
         return urlHandlers.UHSignOut.getURL("%s"%self._rh.getCurrentURL())
 
     def _display( self, params ):
-        return self._getBody( params ) 
+        return self._getBody( params )
 
     def _getBody( self, params ):
         """
         """
         pass
-        
+
     def _getNavigationDrawer(self):
         return None
 

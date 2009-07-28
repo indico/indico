@@ -108,15 +108,16 @@ FCKSelection.SelectNode = function( node )
 		// Try to select the node as a control.
 		oRange = FCK.EditorDocument.body.createControlRange() ;
 		oRange.addElement( node ) ;
+		oRange.select() ;
 	}
 	catch(e)
 	{
 		// If failed, select it as a text range.
 		oRange = FCK.EditorDocument.body.createTextRange() ;
 		oRange.moveToElementText( node ) ;
+		oRange.select() ;
 	}
 
-	oRange.select() ;
 } ;
 
 FCKSelection.Collapse = function( toStart )

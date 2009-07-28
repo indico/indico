@@ -18,40 +18,40 @@ extend(Html.prototype,
                    return this.ancestorOf(child.getParent());
                }
            },
-	   getElementsByClassName: function(name){
-	       if(document.getElementsByClassName) {
-		   return translate(this.dom.getElementsByClassName(name),
-			     $E);
-	       } else {
-		   // check for XPath
-		   if (!!document.evaluate) {
-		       /* from Prototype */
+           getElementsByClassName: function(name){
+               if(document.getElementsByClassName) {
+                   return translate(this.dom.getElementsByClassName(name),
+                             $E);
+               } else {
+                   // check for XPath
+                   if (!!document.evaluate) {
+                       /* from Prototype */
 
-		       var expression = ".//*[contains(concat(' ', @class, ' '), ' " + name + " ')]";
-		       var results = [];
-		       var query = document.evaluate(expression, this.dom, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-		       for (var i = 0, length = query.snapshotLength; i < length; i++) {
-			   results.push(query.snapshotItem(i));
-		       }
-		       return translate(results,
-					$E);
-		   } else {
-		       var children = this.dom.getElementsByTagName('*');
-		       var elements = [], child;
-		       for (var j = 0, length2 = children.length; j < length2; j++) {
-			   child = children[j];
-			   if (child.className == name) {
-			       elements.push(child);
-			   }
-		       }
-		       return translate(elements, $E);
-		   }
-	       }
-	   },
+                       var expression = ".//*[contains(concat(' ', @class, ' '), ' " + name + " ')]";
+                       var results = [];
+                       var query = document.evaluate(expression, this.dom, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+                       for (var i = 0, length = query.snapshotLength; i < length; i++) {
+                           results.push(query.snapshotItem(i));
+                       }
+                       return translate(results,
+                                        $E);
+                   } else {
+                       var children = this.dom.getElementsByTagName('*');
+                       var elements = [], child;
+                       for (var j = 0, length2 = children.length; j < length2; j++) {
+                           child = children[j];
+                           if (child.className == name) {
+                               elements.push(child);
+                           }
+                       }
+                       return translate(elements, $E);
+                   }
+               }
+           },
 
-	   replaceWith: function(element) {
-	       this.getParent().dom.replaceChild(element.dom, this.dom);
-	   }
+           replaceWith: function(element) {
+               this.getParent().dom.replaceChild(element.dom, this.dom);
+           }
        });
 
 extend(WatchObject.prototype,
@@ -135,13 +135,13 @@ function flatten(array) {
     // replace by linearize() when it's working properly?
 
     if (!isArray(array)) {
-	return [array];
-    } else if (array.length == 0) {
-	return [];
+        return [array];
+    } else if (array.length === 0) {
+        return [];
     }
 
     var elem = array.splice(0,1);
-    return concat(flatten(elem[0]), flatten(array))
+    return concat(flatten(elem[0]), flatten(array));
 
 }
 
@@ -182,15 +182,22 @@ function filter(array, func)
 {
     var len = array.length;
 
-    var res = new Array();
+    var res = [];
     for (var i = 0; i < len; i++)
     {
         if (i in array)
         {
             var val = array[i];
             if (func(val))
+            {
                 res.push(val);
+            }
         }
     }
     return res;
-};
+}
+
+function escapeHTML(html) {
+    // from Prototype
+    return html.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}

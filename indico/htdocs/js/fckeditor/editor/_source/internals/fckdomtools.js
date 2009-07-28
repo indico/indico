@@ -488,18 +488,46 @@ var FCKDomTools =
 
 		for ( var i = 0 ; i < attributes.length ; i++ )
 		{
-			if ( FCKBrowserInfo.IsIE && attributes[i].nodeName == 'class' )
+			if ( FCKBrowserInfo.IsIE )
 			{
-				// IE has a strange bug. If calling removeAttribute('className'),
-				// the attributes collection will still contain the "class"
-				// attribute, which will be marked as "specified", even if the
-				// outerHTML of the element is not displaying the class attribute.
-				// Note : I was not able to reproduce it outside the editor,
-				// but I've faced it while working on the TC of #1391.
-				if ( element.className.length > 0 )
-					return true ;
+				var attributeNodeName = attributes[i].nodeName ;
+
+				if ( attributeNodeName.StartsWith( '_fck' ) )
+				{
+					/**
+					 * There are places in the FCKeditor code where HTML element objects
+					 * get values stored as properties (e.g. _fckxhtmljob).  In Internet
+					 * Explorer, these are interpreted as attempts to set attributes on
+					 * the element.
+					 *
+					 * http://msdn.microsoft.com/en-us/library/ms533026(VS.85).aspx#Accessing_Element_Pr
+					 *
+					 * Counting these as HTML attributes cripples
+					 * FCK.Style.RemoveFromRange() once FCK.GetData() has been called.
+					 *
+					 * The above conditional prevents these internal properties being
+					 * counted as attributes.
+					 *
+					 * refs #2156 and #2834
+					 */
+
+					continue ;
+				}
+
+				if ( attributeNodeName == 'class' )
+				{
+					// IE has a strange bug. If calling removeAttribute('className'),
+					// the attributes collection will still contain the "class"
+					// attribute, which will be marked as "specified", even if the
+					// outerHTML of the element is not displaying the class attribute.
+					// Note : I was not able to reproduce it outside the editor,
+					// but I've faced it while working on the TC of #1391.
+					if ( element.className.length > 0 )
+						return true ;
+					continue ;
+				}
 			}
-			else if ( attributes[i].specified )
+			if ( attributes[i].specified )
 				return true ;
 		}
 

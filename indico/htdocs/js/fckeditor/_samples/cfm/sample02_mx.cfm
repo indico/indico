@@ -95,7 +95,7 @@ This sample shows the editor in all its available languages.
 		if ( isDefined( "URL.Lang" ) )
 		{
 			fckEditor.config["AutoDetectLanguage"]		= false ;
-			fckEditor.config["DefaultLanguage"]			= HTMLEditFormat( URL.Lang ) ;
+			fckEditor.config["DefaultLanguage"]			= REReplaceNoCase( URL.Lang, "[^a-z\-]", "", "all" ) ;
 		}
 		else
 		{

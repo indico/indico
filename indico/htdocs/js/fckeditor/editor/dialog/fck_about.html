@@ -78,8 +78,8 @@ window.onload = function()
 								border-left: #000000 1px solid; border-bottom: #000000 1px solid">
 								<span fcklang="DlgAboutVersion">version</span>
 								<br />
-								<b>2.6.4</b><br />
-								Build 21629</td>
+								<b>2.6 SVN</b><br />
+								Build 23365</td>
 						</tr>
 					</table>
 				</td>
@@ -146,11 +146,11 @@ document.write( '<b>Platform<\/b><br />' + window.navigator.platform + '<br /><b
 var sUserLang = '?' ;
 
 if ( window.navigator.language )
-	sUserLang = window.navigator.language.toLowerCase() ;
+	sUserLang = window.navigator.language ;
 else if ( window.navigator.userLanguage )
-	sUserLang = window.navigator.userLanguage.toLowerCase() ;
+	sUserLang = window.navigator.userLanguage ;
 
-document.write( '<b>User Language<\/b><br />' + sUserLang ) ;
+document.write( '<b>Language<\/b><br />' + sUserLang ) ;
 //-->
 					</script>
 				</td>

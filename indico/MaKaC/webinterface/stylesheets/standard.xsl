@@ -34,12 +34,6 @@
 	<div class="eventWrapper">
 	
 <div class="meetingEventHeader">
-    <div class="iCal">
-        <xsl:if test="./iCalLink != ''">
-            <a href="{./iCalLink}" onmouseover="IndicoUI.Widgets.Generic.tooltip(this, event, '&lt;div style=&quot;padding:3px;&quot;&gt;Export to personal scheduler&lt;/div&gt;');">iCal export</a>
-        </xsl:if>
-    </div>
-
 	<h1>
 		<xsl:text disable-output-escaping="yes"></xsl:text><xsl:value-of select="./title" disable-output-escaping="yes"/><xsl:text disable-output-escaping="yes"></xsl:text>
 	</h1>
@@ -49,15 +43,30 @@
 		</h2>
     </xsl:if>
     <div class="details">
-        <xsl:call-template name="prettydate">
-            <xsl:with-param name="dat" select="substring(./startDate,0,11)"/>
-        </xsl:call-template>
-        <xsl:if test="substring(./startDate,12,5) != '00:00'">
+    
+    
+    
+        <xsl:choose>
+        <xsl:when test="substring(./startDate,0,11) = substring(./endDate,0,11)">
+            <xsl:call-template name="prettydate">
+                <xsl:with-param name="dat" select="substring(./startDate,0,21)"/>
+            </xsl:call-template>
             from <strong><xsl:value-of select="substring(./startDate,12,5)"/></strong>
-        </xsl:if>
-        <xsl:if test="substring(./endDate,12,5) != '00:00'">
             to <strong><xsl:value-of select="substring(./endDate,12,5)"/></strong>
-        </xsl:if>
+        </xsl:when>
+        <xsl:otherwise>
+            from 
+            <xsl:call-template name="prettydate">
+                <xsl:with-param name="dat" select="substring(./startDate,0,11)"/>
+            </xsl:call-template>
+            at <strong><xsl:value-of select="substring(./startDate,12,5)"/></strong>
+            to 
+            <xsl:call-template name="prettydate">
+            <xsl:with-param name="dat" select="substring(./endDate,0,11)"/>
+            </xsl:call-template>
+            at <strong><xsl:value-of select="substring(./endDate,12,5)"/></strong>
+        </xsl:otherwise>
+        </xsl:choose>
         (<xsl:value-of select="substring(./timezone,0,25)"/>)
 
         <xsl:if test="count(child::location) != 0">

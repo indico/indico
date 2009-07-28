@@ -18,22 +18,24 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from MaKaC.i18n import _
+
 
 globalOptions = [
-    ("collaborationAdmins", {"description": "Global collaboration admins",
+    ("collaborationAdmins", {"description": _("Global collaboration admins"),
                             "type": 'users',
                             "defaultValue": []} ),
-    ("useHTTPS", {"description": "Use HTTPS in collaboration pages?",
+    ("useHTTPS", {"description": _("Use HTTPS in collaboration pages?"),
                      "type" : bool,
                      "defaultValue": False} ),
-    ("startMinutes", {"description": "Default start time before Indico event start time (minutes)",
+    ("startMinutes", {"description": _("Default start time before Indico event start time (minutes)"),
                      "type" : int,
                      "defaultValue": 30} ),
-    ("pluginsPerEventType", {"description": "Plugins allowed for each event type",
+    ("pluginsPerEventType", {"description": _("Plugins allowed for each event type"),
                             "type": dict,
                             "editable": False,
                             "visible": True} ),
-    ("pluginsPerIndex", {"description": "Information about each index seen by collaboration admins",
+    ("pluginsPerIndex", {"description": _("Information about each index seen by collaboration admins"),
                          "type": list, #a list of IndexInformation objects
                          "editable": False,
                          "visible": True} )

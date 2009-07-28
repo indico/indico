@@ -598,7 +598,7 @@ class RHUserIdentityChangePassword( RHUserIdentityBase ):
                 del self._params["OK"]               
                 p = adminPages.WPIdentityChangePassword( self, self._avatar, self._params )        
                 return p.display()
-            identity = self._avatar.getIdentityById(self._params["login"],"Local")
+            identity = self._avatar.getIdentityById(self._params["login"], "Local")
             identity.setPassword(self._params["password"])
             p = adminPages.WPUserDetails( self, self._avatar )
             return p.display()

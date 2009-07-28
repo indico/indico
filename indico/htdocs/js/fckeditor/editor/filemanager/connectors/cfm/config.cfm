@@ -28,7 +28,6 @@
 	// SECURITY: You must explicitly enable this "connector". (Set enabled to "true")
 	Config.Enabled = false ;
 
-
 	// Path to uploaded files relative to the document root.
 	Config.UserFilesPath = "/userfiles/" ;
 

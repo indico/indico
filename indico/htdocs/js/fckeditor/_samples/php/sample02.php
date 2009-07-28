@@ -91,7 +91,7 @@ $oFCKeditor->BasePath = $sBasePath ;
 if ( isset($_GET['Lang']) )
 {
 	$oFCKeditor->Config['AutoDetectLanguage']	= false ;
-	$oFCKeditor->Config['DefaultLanguage']		= $_GET['Lang'] ;
+	$oFCKeditor->Config['DefaultLanguage']		= preg_replace("/[^a-z\-]/i", "", $_GET['Lang']) ;
 }
 else
 {

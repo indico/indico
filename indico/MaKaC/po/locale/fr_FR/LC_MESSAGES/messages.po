@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "POT-Creation-Date: 2005-11-22 11:20+0100\n"
-"PO-Revision-Date: 2009-06-22 18:12+0100\n"
+"PO-Revision-Date: 2009-06-26 11:39+0100\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
 "Language-Team: French\n"
 "MIME-Version: 1.0\n"
@@ -307,7 +307,7 @@ msgstr "sélectionné"
 
 #: tpls\ConfModifContribList.tpl:84
 msgid "material package of selected"
-msgstr "paquet des documents de la sélection"
+msgstr "fichier ZIP des documents de la sélection"
 
 #: MaKaC\evaluation.py:1481
 msgid ""
@@ -1302,7 +1302,7 @@ msgstr "Vidéoconférence"
 
 #: tpls\ModifReportNumberEdit.tpl:5
 msgid "Report number - system"
-msgstr "Nombre de rapports - système"
+msgstr "Numéro de rapport - système"
 
 #: tpls\RoomBookingSearch4Rooms.tpl:306
 msgid "Active?"
@@ -3030,7 +3030,7 @@ msgstr "%s char. max."
 #: MaKaC\PDFinterface\conference.py:2137
 #: MaKaC\PDFinterface\conference.py:2296
 msgid "Proceedings"
-msgstr "Démarches"
+msgstr "Actes"
 
 #: MaKaC\webinterface\pages\registrants.py:1902
 #: tpls\CategoryOverview.tpl:16
@@ -3561,7 +3561,7 @@ msgstr "Indico - Integrated Digital Conference"
 
 #: tpls\ConfModifContribList.tpl:31
 msgid "proceedings"
-msgstr "en cours"
+msgstr "actes"
 
 #: tpls\RoomBookingDetails.tpl:71
 msgid "Validity"

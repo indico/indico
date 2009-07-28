@@ -172,7 +172,12 @@ FCK.InsertHtml = function( html )
 	oSel.createRange().pasteHTML( html ) ;
 
 	// Remove the fake node
-	FCK.EditorDocument.getElementById('__fakeFCKRemove__').removeNode( true ) ;
+	var fake = FCK.EditorDocument.getElementById('__fakeFCKRemove__') ;
+	// If the span is the only child of a node (so the inserted HTML is beyond that),
+	// remove also that parent that isn't needed. #1537
+	if (fake.parentNode.childNodes.length == 1)
+		fake = fake.parentNode ;
+	fake.removeNode( true ) ;
 
 	FCKDocumentProcessor.Process( FCK.EditorDocument ) ;
 
@@ -448,7 +453,7 @@ function Doc_OnMouseDown( evt )
 	// Radio buttons and checkboxes should not be allowed to be triggered in IE
 	// in editable mode. Otherwise the whole browser window may be locked by
 	// the buttons. (#1782)
-	if ( e.nodeName.IEquals( 'input' ) && e.type.IEquals( ['radio', 'checkbox'] ) && !e.disabled )
+	if ( e.nodeName && e.nodeName.IEquals( 'input' ) && e.type.IEquals( ['radio', 'checkbox'] ) && !e.disabled )
 	{
 		e.disabled = true ;
 		FCKTools.SetTimeout( _FCK_RemoveDisabledAtt, 1, e ) ;

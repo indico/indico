@@ -401,3 +401,13 @@ a.material:visited {
 	background-color: #FFFDEC;
 	border: 1px solid #204060;
 }
+
+/* Footer */
+
+.footerDark {
+    color: #444444;
+}
+
+.footerDark a {
+    color: #0B63A5;
+}

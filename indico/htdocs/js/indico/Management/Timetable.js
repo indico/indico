@@ -155,11 +155,11 @@ type("AddContributionDialog", ["ExclusivePopup", "PreLoadHandler"],
                                       $T("Choose one (or more) unscheduled"),
                                       Html.div("UnscheduledContribListDiv",
                                                unscheduledList.draw()),
-                                      this.dayList.length==1?'':["Add to ", daySelect],
+                                      this.dayList.length==1?'':[$T("Add to "), daySelect],
                                       Widget.button(command(function() {
                                           self.addExisting(unscheduledList.getList(),
                                                            daySelect.get());
-                                      }, "Add selected"))
+                                      }, $T("Add selected")))
                                      )));
 
              return this.ExclusivePopup.prototype.draw.call(this, Html.span({}, chooseDialog));
@@ -257,7 +257,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
             null,
             self.favorites,
             true, true, true,
-            userListNothing, userListNothing, userListNothing, false, {"presenter-grant-submission": ["submission rights", true]},
+            userListNothing, userListNothing, userListNothing, false, {"presenter-grant-submission": [$T("submission rights"), true]},
 	    self.args.conference
 	);
         $B(info.accessor('presenters'), presListWidget.getUsers());
@@ -266,22 +266,22 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
         if (this.timeStartMethod != null) {
             $B(info.accessor('dateTime'), self.dateTimeField.accessor.accessor('dateTime'));
             $B(info.accessor('duration'), self.dateTimeField.accessor.accessor('duration'));
-            datecomponent = ['Date/Time', self.dateTimeField.element];
+            datecomponent = [$T('Date/Time'), self.dateTimeField.element];
         }else{
             $B(info.accessor('duration'), self.dateTimeField);
-            datecomponent = ['Duration', self.dateTimeField]
+            datecomponent = [$T('Duration'), self.dateTimeField]
         }
 
         return IndicoUtil.createFormFromMap(
             [
                 [
-                    'Title',
+                    $T('Title'),
                     $B(Html.edit({}),
                        info.accessor('title'))
                 ],
-                ['Place', Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
+                [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
                 datecomponent,
-                ['Presenter(s)', presListWidget.draw()]
+                [$T('Presenter(s)'), presListWidget.draw()]
             ]);
 
 
@@ -294,7 +294,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
 
         if (!this.isConference) {
             // if it's a meeting, just add a description
-            fields = [['Description',$B(Html.textarea({cols: 50,rows: 2}),
+            fields = [[$T('Description'),$B(Html.textarea({cols: 50,rows: 2}),
                                        info.accessor('field_content'))]];
         } else {
             // otherwise, add the abstract fields (conferences)
@@ -305,7 +305,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
                 });
         }
 
-        fields.push(['Keywords', keywordField.element]);
+        fields.push([$T('Keywords'), keywordField.element]);
         $B(info.accessor('keywords'), keywordField.accessor);
 
         return IndicoUtil.createFormFromMap(fields);
@@ -320,7 +320,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
             null,
             self.favorites,
             true, true, true,
-            userListNothing, userListNothing, userListNothing, false, {"author-grant-submission": ["submission rights", true]},
+            userListNothing, userListNothing, userListNothing, false, {"author-grant-submission": [$T("submission rights"), true]},
 	    this.args.conference);
 
         var coauthorListWidget = new UserListField(
@@ -329,7 +329,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
             null,
             self.favorites,
             true, true, true,
-            userListNothing, userListNothing, userListNothing, false, {"coauthor-grant-submission": ["submission rights", true]},
+            userListNothing, userListNothing, userListNothing, false, {"coauthor-grant-submission": [$T("submission rights"), true]},
 	    this.args.conference);
 
 
@@ -338,8 +338,8 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
 
         return IndicoUtil.createFormFromMap(
             [
-                ['Author(s)', authorListWidget.draw()],
-                ['Co-author(s)', coauthorListWidget.draw()]
+                [$T('Author(s)'), authorListWidget.draw()],
+                [$T('Co-author(s)'), coauthorListWidget.draw()]
             ]);	
     },
 
@@ -367,8 +367,8 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
             });
         };
 
-        var addButton = Html.button({},"Add");
-        var cancelButton = Html.button({}, "Cancel");
+        var addButton = Html.button({},$T("Add"));
+        var cancelButton = Html.button({}, $T("Cancel"));
 
         cancelButton.observeClick(function(){
             self.close();
@@ -381,13 +381,13 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
 
         cancelButton.dom.style.marginLeft = pixels(10);
 
-	var tabs = [["Basic", self._drawMainTab(info)]];
+	var tabs = [[$T("Basic"), self._drawMainTab(info)]];
 
 	if (this.isConference) {
-	    tabs.push(["Authors", self._drawAuthorsTab(info)]);
+	    tabs.push([$T("Authors"), self._drawAuthorsTab(info)]);
 	}
 
-	tabs.push(["Advanced", self._drawAdvancedTab(info)]);
+	tabs.push([$T("Advanced"), self._drawAdvancedTab(info)]);
         var tabWidget = new TabWidget(tabs, 600, 400);
 
         return Html.div({},
@@ -429,7 +429,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
                  self.open();
              });
 
-         this.ServiceDialog(Indico.Urls.JsonRpcService, method, args, "Add Contribution",
+         this.ServiceDialog(Indico.Urls.JsonRpcService, method, args, $T("Add Contribution"),
                             function() {
                                 self.close();
                             });

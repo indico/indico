@@ -144,7 +144,9 @@ _HTML_TAG_
 
 	if($FORM{'Lang'} ne "") {
 		$Config{'AutoDetectLanguage'}	= "false";
-		$Config{'DefaultLanguage'}		= $FORM{'Lang'};
+		$lang = $FORM{'Lang'};
+		$lang =~ s/[^a-z\-]//ig;
+		$Config{'DefaultLanguage'}		= $lang;
 	} else {
 		$Config{'AutoDetectLanguage'}	= "true";
 		$Config{'DefaultLanguage'}		= 'en' ;

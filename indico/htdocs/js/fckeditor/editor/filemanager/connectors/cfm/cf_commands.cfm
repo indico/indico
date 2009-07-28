@@ -35,7 +35,7 @@
 	<cfset var sTempDir = "">
 	<cfset var sTempFilePath = "">
 	<cfset var errorNumber = 0>
-	<cfset var customMsg = 0>
+	<cfset var customMsg = "">
 	<cfset var counter = 0>
 	<cfset var destination = "">
 
@@ -226,5 +226,5 @@
 		</cftry>
 	</cfif>
 
-	<cfoutput><Error number="#errorNumber#" originalDescription="#HTMLEditFormat(sErrorMsg)#" /></cfoutput>
+	<cfoutput><Error number="#errorNumber#" /></cfoutput>
 </cffunction>

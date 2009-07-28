@@ -89,6 +89,6 @@
     </div>
 
     <br/>
-    <p><em>You can find more user guides, in different languages, provided by external collaborators <a href="https://espace.cern.ch/indico-soft/users/default.aspx">here</a>.</em></p>
+    <p><em><%= _("You can find more user guides, in different languages, provided by external collaborators") %> <a href="https://espace.cern.ch/indico-soft/users/default.aspx">here</a>.</em></p>
 
 </div>

@@ -236,9 +236,6 @@ function removeItem(number, form)
 <% if evtType == 'lecture':%>
     <%= macros.genericField(macros.FIELD_TEXT, 'inPlaceEditOrganiserText', 'event.main.changeOrganiserText', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh) %>
 <% end %>
-<% elif evtType == 'meeting': %>
-    <%= macros.genericField(macros.FIELD_TEXT, 'inPlaceEditSpeakerText', 'event.main.changeSpeakerText', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh) %>
-<% end %>
 
 <%  from MaKaC.common import info %>
 

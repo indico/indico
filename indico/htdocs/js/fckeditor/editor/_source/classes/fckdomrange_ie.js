@@ -77,7 +77,7 @@ FCKDomRange.prototype.Select = function( forceExpand )
 FCKDomRange.prototype.SelectBookmark = function( bookmark, forceExpand )
 {
 	var bIsCollapsed = this.CheckIsCollapsed() ;
-	var bIsStartMakerAlone ;
+	var bIsStartMarkerAlone ;
 	var dummySpan ;
 
 	// Create marker tags for the start and end boundaries.
@@ -111,7 +111,7 @@ FCKDomRange.prototype.SelectBookmark = function( bookmark, forceExpand )
 	}
 	else
 	{
-		bIsStartMakerAlone = ( forceExpand || !eStartMarker.previousSibling || eStartMarker.previousSibling.nodeName.toLowerCase() == 'br' ) && !eStartMarker.nextSibing ;
+		bIsStartMarkerAlone = forceExpand || !eStartMarker.previousSibling || eStartMarker.previousSibling.nodeName.toLowerCase() == 'br';
 
 		// Append a temporary <span>&#65279;</span> before the selection.
 		// This is needed to avoid IE destroying selections inside empty
@@ -122,7 +122,7 @@ FCKDomRange.prototype.SelectBookmark = function( bookmark, forceExpand )
 		dummySpan.innerHTML = '&#65279;' ;	// Zero Width No-Break Space (U+FEFF). See #1359.
 		eStartMarker.parentNode.insertBefore( dummySpan, eStartMarker ) ;
 
-		if ( bIsStartMakerAlone )
+		if ( bIsStartMarkerAlone )
 		{
 			// To expand empty blocks or line spaces after <br>, we need
 			// instead to have any char, which will be later deleted using the
@@ -141,7 +141,7 @@ FCKDomRange.prototype.SelectBookmark = function( bookmark, forceExpand )
 
 	if ( bIsCollapsed )
 	{
-		if ( bIsStartMakerAlone )
+		if ( bIsStartMarkerAlone )
 		{
 			// Move the selection start to include the temporary &#65279;.
 			oIERange.moveStart( 'character', -1 ) ;

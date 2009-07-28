@@ -63,7 +63,7 @@ SpaceNoClose	: /\/>/g ,
 // Empty elements may be <p></p> or even a simple opening <p> (see #211).
 EmptyParagraph	: /^<(p|div|address|h\d|center)(?=[ >])[^>]*>\s*(<\/\1>)?$/ ,
 
-EmptyOutParagraph : /^<(p|div|address|h\d|center)(?=[ >])[^>]*>(?:\s*|&nbsp;)(<\/\1>)?$/ ,
+EmptyOutParagraph : /^<(p|div|address|h\d|center)(?=[ >])[^>]*>(?:\s*|&nbsp;|&#160;)(<\/\1>)?$/ ,
 
 TagBody			: /></ ,
 
