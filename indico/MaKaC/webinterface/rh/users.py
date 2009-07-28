@@ -179,7 +179,7 @@ class RHUserCreation( RH ):
                     #create the identity to the user and send the comfirmatio email
                     _UserUtils.setUserData( a, self._params )
                     li = user.LoginInfo( self._params["login"], self._params["password"] )   
-                    id = ih.createIdentity( li, a, _("Local") )
+                    id = ih.createIdentity( li, a, "Local" )
                     ih.add( id )
                     DBMgr.getInstance().commit()
                     if minfo.getModerateAccountCreation():
@@ -193,7 +193,7 @@ class RHUserCreation( RH ):
                 _UserUtils.setUserData( a, self._params )
                 ah.add(a)
                 li = user.LoginInfo( self._params["login"], self._params["password"] )   
-                id = ih.createIdentity( li, a, _("Local") )
+                id = ih.createIdentity( li, a, "Local" )
                 ih.add( id )
                 DBMgr.getInstance().commit()
                 if minfo.getModerateAccountCreation():
@@ -598,7 +598,7 @@ class RHUserIdentityChangePassword( RHUserIdentityBase ):
                 del self._params["OK"]               
                 p = adminPages.WPIdentityChangePassword( self, self._avatar, self._params )        
                 return p.display()
-            identity = self._avatar.getIdentityById(self._params["login"],_("Local"))
+            identity = self._avatar.getIdentityById(self._params["login"], "Local")
             identity.setPassword(self._params["password"])
             p = adminPages.WPUserDetails( self, self._avatar )
             return p.display()

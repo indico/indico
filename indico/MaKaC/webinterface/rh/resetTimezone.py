@@ -3,7 +3,6 @@ from MaKaC.common import DBMgr
 import MaKaC.webinterface.rh.base as base
 from mod_python import util
 import MaKaC.common.info as info
-from MaKaC.i18n import _
 
 class RHResetTZ(base.RH):
     
@@ -25,10 +24,10 @@ class RHResetTZ(base.RH):
             if parms["saveToProfile"] == "on":
                 user = sess.getUser()
                 if tz == "LOCAL":
-                    user.setDisplayTZMode(_("Event Timezone"))
+                    user.setDisplayTZMode("Event Timezone")
                 else:
                     user.setTimezone(tz)
-                    user.setDisplayTZMode(_("MyTimezone"))
+                    user.setDisplayTZMode("MyTimezone")
         except:
             pass
         

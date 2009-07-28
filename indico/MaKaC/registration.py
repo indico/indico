@@ -47,7 +47,7 @@ def stringToDate( str ):
     return datetime(int(year),months[month],int(day))
 
 class RegistrationForm(Persistent):
-    
+
     def __init__(self, conf, groupData=None):
         self._conf = conf
         if groupData is None:
@@ -61,7 +61,7 @@ class RegistrationForm(Persistent):
             self.setModificationEndDate(None)
             self.setCurrency( _("not selected"))
         else:
-            self.activated = groupData.get(_("activated"), False)
+            self.activated = groupData.get("activated", False)
             self.title = groupData.get("name", "")
             self.announcement = groupData.get("announcement", "")
             self.usersLimit = groupData.get("limit", "")
@@ -98,11 +98,11 @@ class RegistrationForm(Persistent):
         self.addToSortedForms(self.accommodationForm)
         self.addToSortedForms(self.socialEventForm)
         self.addToSortedForms(self.furtherInformation)
-        
+
         self.setAllSessions()
-        
+
     def clone(self, conference):
-        form = RegistrationForm(conference)        
+        form = RegistrationForm(conference)
         form.setConference(conference)
         form.setAnnouncement(self.getAnnouncement())
         form.setContactInfo(self.getContactInfo())
@@ -114,7 +114,7 @@ class RegistrationForm(Persistent):
         if self.getModificationEndDate():
             registrationPeriodModifEndDate = self.getConference().getStartDate() - self.getModificationEndDate()
             form.setModificationEndDate(conference.getStartDate() - registrationPeriodModifEndDate)
-        form.setTitle(self.getTitle())        
+        form.setTitle(self.getTitle())
         form.setUsersLimit(self.getUsersLimit())
         form.setActivated(self.isActivated())
         form.setMandatoryAccount(self.isMandatoryAccount())
@@ -133,7 +133,7 @@ class RegistrationForm(Persistent):
         if ses is not None :
             form.sessionsForm = ses.clone(conference.getSessionList())
         sef = self.getSocialEventForm()
-        if sef is not None : 
+        if sef is not None :
             form.socialEventForm = sef.clone(form)
         for section in self.getGeneralSectionFormsList():
             newSection = section.clone(form)
@@ -146,12 +146,12 @@ class RegistrationForm(Persistent):
         try:
             return self._currency
         except:
-            self.setCurrency( _("Not selected")) 
+            self.setCurrency( _("not selected"))
         return self._currency
 
     def setCurrency(self, currency):
-        self._currency = currency     
-    
+        self._currency = currency
+
     def getConference(self):
         return self._conf
     getOwner = getConference
@@ -190,19 +190,19 @@ class RegistrationForm(Persistent):
 
     def setMandatoryAccount(self, v=True):
         self._mandatoryAccount = v
-    
+
     def setTitle( self, newName ):
         self.title = newName.strip()
 
     def getTitle( self ):
         return self.title
-        
+
     def setAnnouncement( self, newDesc ):
         self.announcement = newDesc.strip()
 
     def getAnnouncement( self ):
         return self.announcement
-    
+
     def setUsersLimit( self, newLimit ):
         if isinstance(newLimit, int):
             self.usersLimit = newLimit
@@ -212,16 +212,16 @@ class RegistrationForm(Persistent):
             else:
                 self.usersLimit = int(newLimit.strip())
         if self.usersLimit<0: self.usersLimit=0
-        
-            
-    def getUsersLimit( self ):        
+
+
+    def getUsersLimit( self ):
         return self.usersLimit
 
     def isFull(self):
         if self.usersLimit != 0:
             return len(self.getConference().getRegistrants()) >= self.usersLimit
         return False
-        
+
     def setStartRegistrationDate( self, sd ):
         self.startRegistrationDate = datetime(sd.year,sd.month,sd.day,0,0,0)
 
@@ -262,7 +262,7 @@ class RegistrationForm(Persistent):
         sd = self.getStartRegistrationDate()
         ed = self.getEndRegistrationDate()
         return date <= ed and date >= sd
-    
+
     def setContactInfo( self, ci ):
         self.contactInfo = ci
 
@@ -294,7 +294,7 @@ class RegistrationForm(Persistent):
     def getStatusById(self, id):
         if self.getStatuses().has_key(id):
             return self.getStatuses()[id]
-        return None 
+        return None
 
     def addStatus(self, st):
         st.setId( str(self._generateStatusId().newCount()) )
@@ -313,10 +313,10 @@ class RegistrationForm(Persistent):
         except:
             self.notification = Notification()
         return self.notification
-        
+
     def getPersonalData(self):
         return self.personalData
-            
+
     def getFurtherInformationForm(self):
         return self.furtherInformation
 
@@ -328,10 +328,10 @@ class RegistrationForm(Persistent):
 
     def getSocialEventForm(self):
         return self.socialEventForm
-    
+
     def getReasonParticipationForm(self):
         return self.reasonParticipationForm
-    
+
     def getSectionById(self, id):
         if id == "reasonParticipation":
             return self.getReasonParticipationForm()
@@ -401,7 +401,7 @@ class RegistrationForm(Persistent):
                 self.addToSortedForms(gs)
         return self._sortedForms
 
-    def addToSortedForms(self, form, i=None):  
+    def addToSortedForms(self, form, i=None):
         if i is None:
             i=len(self.getSortedForms())
         try:
@@ -421,7 +421,7 @@ class RegistrationForm(Persistent):
         return True
 
     def getLocator( self ):
-        """Gives back (Locator) a globaly unique identification encapsulated in 
+        """Gives back (Locator) a globaly unique identification encapsulated in
             a Locator object for the RegistrationForm instance """
         if self.getConference() == None:
             return Locator()
@@ -436,7 +436,7 @@ class RegistrationForm(Persistent):
                 accoType.decreaseNoPlaces()
         for se in reg.getSocialEvents():
             se.delete() # It'll decrease the no of places
-            
+
     def delete(self):
         self.getSessionsForm().clearSessionList()
         TrashCanManager().add(self)
@@ -464,7 +464,7 @@ class Notification(Persistent):
 
     def getToList(self):
         return self._toList
-    
+
     def setToList(self, tl):
         self._toList = tl
 
@@ -507,7 +507,7 @@ class Notification(Persistent):
                 text = """%s: %s
                         """%(sessionForm.getTitle(), "".join(sessionListText))
         return text
-            
+
     def _printAccommodation(self, accommodationForm, accommodation):
         text = ""
         if accommodationForm.isEnabled():
@@ -533,14 +533,14 @@ class Notification(Persistent):
             text = ""
             if se != []:
                 text = """%s:
-                        %s    
+                        %s
                         """%(socialEventForm.getTitle(), "\r\n".join(se) or _("""--_("No social events selected")--"""))
         return text
 
     def _printReasonParticipation(self, reasonParticipationForm, reasonParticipation):
         text = ""
         if reasonParticipationForm.isEnabled():
-            text = """%s: %s    
+            text = """%s: %s
                     """%(reasonParticipationForm.getTitle(), reasonParticipation)
         return text
 
@@ -617,7 +617,7 @@ class Notification(Persistent):
         else:
             epaymentLink = ""
             paymentWarning = "."
-        
+
         if fromAddr.strip()=="":
             info = HelperMaKaCInfo.getMaKaCInfoInstance()
             fromAddr = "%s <%s>"%(info.getTitle(), info.getSupportEmail())
@@ -641,7 +641,7 @@ class Notification(Persistent):
         if self.getToList() != [] or self.getCCList() != []:
             bodyOrg = _("""
              There is a new registrant in '%s'. See information below:
-             
+
                       %s
                       """)%(strip_ml_tags(regForm.getConference().getTitle()), \
                               body)
@@ -651,14 +651,14 @@ class Notification(Persistent):
         if rp.getEmail().strip() != "":
             bodyReg = _("""
              Congratulations, your registration to %s was successful%s See your information below:
-             
+
                       %s
              %s
                       """)% (strip_ml_tags(regForm.getConference().getTitle()),paymentWarning,body,epaymentLink)
             to=rp.getEmail().strip()
             maildata = { "fromAddr": fromAddr, "toList": [to], "subject": subject, "body": bodyReg }
             GenericMailer.send(GenericNotification(maildata))
-        
+
     def sendEmailNewRegistrantDetailsPay(self, regForm,registrant):
         if not registrant.getConference().getModPay().isEnableSendEmailPaymentDetails():
             return
@@ -698,19 +698,19 @@ detail of Booking:
                         if miscItem.isBillable():
                             _billlable=miscItem.isBillable()
                             value=miscItem.getValue()
-                            price=string.atof(miscItem.getPrice())   
+                            price=string.atof(miscItem.getPrice())
                             quantity=miscItem.getQuantity()
-                            total+=price*quantity            
+                            total+=price*quantity
                     if value != "":
-                        value=":%s"%value                                                
-                    if(quantity>0):    
-                         booking.append("""%i\t\t%s : %s%s\t\t%s\t\t%s %s"""%(quantity,miscGroup.getTitle(),caption,value,price,price*quantity,currency) )                             
+                        value=":%s"%value
+                    if(quantity>0):
+                         booking.append("""%i\t\t%s : %s%s\t\t%s\t\t%s %s"""%(quantity,miscGroup.getTitle(),caption,value,price,price*quantity,currency) )
         booking.append("""\nTOTAL\t\t\t\t\t\t\t%s %s"""%(total,regForm.getCurrency()))
         # send email to organisers
         #if self.getToList() != [] or self.getCCList() != []:
         #    bodyOrg = """
         #     There is a new registrant in '%s'. See information below:
-        #     
+        #
         #              %s
         #              """%(strip_ml_tags(registrant.getConference().getTitle()), \
         #                      body)
@@ -724,7 +724,7 @@ detail of Booking:
             to=registrant.getEmail().strip()
             maildata = { "fromAddr": fromAddr, "toList": [to], "subject": subject, "body": bodyReg }
             GenericMailer.send(GenericNotification(maildata))
-        
+
     def sendEmailNewRegistrantConfirmPay(self, regForm,registrant):
         fromAddr=registrant.getConference().getSupportEmail()
         date=registrant.getConference().getStartDate()
@@ -741,7 +741,7 @@ detail of Booking:
 - detail of payment  : \n%s
 - date conference    : %s
 - name conference    : %s
-- registration id    : %s""")%(registrant.getTransactionInfo().getTransactionTxt(),date,getTitle,idRegistrant)        
+- registration id    : %s""")%(registrant.getTransactionInfo().getTransactionTxt(),date,getTitle,idRegistrant)
         booking=[]
         total=0
         booking.append( _(""" Thank you for this payment """))
@@ -761,20 +761,20 @@ detail of Booking:
                         if miscItem.isBillable():
                             _billlable=miscItem.isBillable()
                             v=miscItem.getValue()
-                            price=string.atof(miscItem.getPrice())   
+                            price=string.atof(miscItem.getPrice())
                             quantity=miscItem.getQuantity()
-                            total+=price*quantity            
+                            total+=price*quantity
                     if v != "":
                         v = ":%s"%v
-                    if(quantity>0):    
+                    if(quantity>0):
                          booking.append("""%i\t\t%s : %s%s\t\t%s\t\t%s %s"""%\
-                                        (quantity,gsf.getTitle(),caption,v,price,price*quantity,currency) )                             
+                                        (quantity,gsf.getTitle(),caption,v,price,price*quantity,currency) )
         booking.append("""\nTOTAL\t\t\t\t\t\t\t%s %s"""%(total,regForm.getCurrency()))
         # send email to organisers
         if self.getToList() != [] or self.getCCList() != []:
             bodyOrg =  _("""
              There is a new registrant in '%s'. See information below:
-             
+
                       %s
                       """)%(strip_ml_tags(registrant.getConference().getTitle()), \
                               body)
@@ -788,7 +788,7 @@ detail of Booking:
             to=registrant.getEmail().strip()
             maildata = { "fromAddr": fromAddr, "toList": [to], "subject": subject, "body": bodyReg }
             GenericMailer.send(GenericNotification(maildata))
-        
+
     def sendEmailModificationRegistrant(self, regForm, rp):
         fromAddr=regForm.getConference().getSupportEmail()
         if fromAddr.strip()=="":
@@ -835,13 +835,13 @@ detail of Booking:
         if self.getToList() != [] or self.getCCList() != []:
             bodyOrg = _("""
              A registrant has modified his/her registration for '%s'. See information below:
-             
+
                       %s
                       """)%(strip_ml_tags(regForm.getConference().getTitle()), \
                               body)
             maildata = { "fromAddr": fromAddr, "toList": self.getToList(), "ccList": self.getCCList(), "subject": subject, "body": bodyOrg }
             GenericMailer.send(GenericNotification(maildata))
-            
+
     def exportXml(self, xmlGen):
         """Write xml tags about this object in the given xml generator of type XMLGen."""
         xmlGen.openTag( "notification" )
@@ -867,13 +867,13 @@ class BaseForm(Persistent):
 
 class FieldInputType(Persistent):
     _id=""
-    
+
     def __init__(self, field):
         self._parent = field
-        
+
     def getValues(self):
         return {}
-        
+
     def setValues(self, data):
         pass
 
@@ -919,7 +919,7 @@ class FieldInputType(Persistent):
         This method shouldn't be called from the classes inheriting from this one (FieldInputType).
         This method fills the attribute "item" (MiscellaneousInfoSimpleItem) with the value the user wrote
         in the registration form.
-        """ 
+        """
         if item is None:
             item=MiscellaneousInfoSimpleItem(mg, self.getParent())
             mg.addResponseItem(item)
@@ -931,13 +931,13 @@ class FieldInputType(Persistent):
         """
         pass
 
-    def _getSpecialOptionsHTML(self):        
+    def _getSpecialOptionsHTML(self):
         price= self._parent.getPrice()
-        billable=self._parent.isBillable()    
+        billable=self._parent.isBillable()
         checked=""
         if billable:
             checked="checked=\"checked\""
-        
+
         html= _(""" <tr>
                   <td class="titleCellTD"><span class="titleCellFormat">Is Billable</span></td>
                   <td bgcolor="white" class="blacktext" width="100%%">
@@ -949,10 +949,10 @@ class FieldInputType(Persistent):
                   <td bgcolor="white" class="blacktext" width="100%%">
                     <input type="text" name="price" size="60" value=%s>
                   </td>
-                </tr>       
+                </tr>
                            """)%(checked,price)
         return "".join(html)
-        
+
     def clone(self, gf):
         fi=FieldInputs().getAvailableInputKlassById(self.getId())(gf)
         return fi
@@ -963,32 +963,32 @@ class TextInput(FieldInputType):
     def getName(cls):
         return "Text"
     getName=classmethod(getName)
-    
+
     def _getModifHTML(self,item, registrant):
         caption = self._parent.getCaption()
         price= self._parent.getPrice()
         billable=self._parent.isBillable()
         currency=self._parent.getParent().getRegistrationForm().getCurrency()
-        htmlName=self.getHTMLName()             
+        htmlName=self.getHTMLName()
         v=""
         if item is not None:
             v=item.getValue()
             caption = self._parent.getCaption()
             price= item.getPrice()
             billable=item.isBillable()
-            currency=item.getCurrency()  
-            htmlName=item.getHTMLName()           
+            currency=item.getCurrency()
+            htmlName=item.getHTMLName()
         disable=""
         if ( registrant is not None and billable and registrant.getPayed() ):
-            disable="disabled=\"true\""                
+            disable="disabled=\"true\""
             #pass
         tmp = """&nbsp;%s <input type="text" name="%s" value="%s" size="60" %s >"""%(caption, htmlName, v ,disable)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
-            tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp,price,currency) 
+            tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp,price,currency)
         else:
             tmp= """%s </td> """%tmp
-        return tmp 
+        return tmp
 
     def _setResponseValue(self, item, params, registrant):
         if ( registrant is not None and self._parent.isBillable() and registrant.getPayed() ):
@@ -1005,9 +1005,9 @@ class TextInput(FieldInputType):
         #item.setBillable(self._parent.isBillable())
         #item.setPrice(self._parent.getPrice())
         #item.setCurrency(self._parent.getParent().getRegistrationForm().getCurrency())
-        item.setMandatory(self.getParent().isMandatory()) 
-        item.setHTMLName(self.getHTMLName())                
-    def _getSpecialOptionsHTML(self):    
+        item.setMandatory(self.getParent().isMandatory())
+        item.setHTMLName(self.getHTMLName())
+    def _getSpecialOptionsHTML(self):
         return ""
 
 class TextareaInput(FieldInputType):
@@ -1016,29 +1016,29 @@ class TextareaInput(FieldInputType):
     def getName(cls):
         return "Textarea"
     getName=classmethod(getName)
-    
+
     def _getModifHTML(self,item, registrant):
         caption = self._parent.getCaption()
         price= self._parent.getPrice()
         billable=self._parent.isBillable()
         currency=self._parent.getParent().getRegistrationForm().getCurrency()
-        htmlName=self.getHTMLName()             
+        htmlName=self.getHTMLName()
         v=""
         if item is not None:
             v=item.getValue()
             caption = self._parent.getCaption()
             price= item.getPrice()
             billable=item.isBillable()
-            currency=item.getCurrency()  
-            htmlName=item.getHTMLName()           
+            currency=item.getCurrency()
+            htmlName=item.getHTMLName()
         disable=""
         if ( registrant is not None and billable and registrant.getPayed() ):
-            disable="disabled=\"true\""                
+            disable="disabled=\"true\""
             #pass
         tmp = """&nbsp;%s<br><textarea name="%s" cols="60" rows="4" %s >%s</textarea>"""%(caption, htmlName, disable, v)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         tmp= """%s </td> """%tmp
-        return tmp 
+        return tmp
 
     def _setResponseValue(self, item, params, registrant):
         if ( registrant is not None and self._parent.isBillable() and registrant.getPayed() ):
@@ -1054,10 +1054,10 @@ class TextareaInput(FieldInputType):
         #item.setBillable(self._parent.isBillable())
         #item.setPrice(self._parent.getPrice())
         #item.setCurrency(self._parent.getParent().getRegistrationForm().getCurrency())
-        item.setMandatory(self.getParent().isMandatory()) 
+        item.setMandatory(self.getParent().isMandatory())
         item.setHTMLName(self.getHTMLName())
 
-    def _getSpecialOptionsHTML(self):    
+    def _getSpecialOptionsHTML(self):
         return ""
 
 class NumberInput(FieldInputType):
@@ -1065,33 +1065,33 @@ class NumberInput(FieldInputType):
     def getName(cls):
         return "Number"
     getName=classmethod(getName)
-    
+
     def _getModifHTML(self,item, registrant):
         caption = self._parent.getCaption()
         price= self._parent.getPrice()
         billable=self._parent.isBillable()
         currency=self._parent.getParent().getRegistrationForm().getCurrency()
-        htmlName=self.getHTMLName()    
+        htmlName=self.getHTMLName()
         v="0"
         if item is not None:
             v=item.getValue()
             caption = self._parent.getCaption()
             price= item.getPrice()
             billable=item.isBillable()
-            currency=item.getCurrency()  
-            htmlName=item.getHTMLName()          
-            
+            currency=item.getCurrency()
+            htmlName=item.getHTMLName()
+
         disable=""
         if ( registrant is not None and billable and registrant.getPayed()):
-            disable="disabled=\"true\""                
+            disable="disabled=\"true\""
             #pass
         tmp = """&nbsp;<input type="text" name="%s" value="%s" %s size="6">&nbsp;&nbsp;%s """%(htmlName, v,disable,caption)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
-            tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp,price,currency) 
+            tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp,price,currency)
         else:
             tmp= """%s </td> """%tmp
-        return tmp 
+        return tmp
 
     def _setResponseValue(self, item, params, registrant):
         v=params.get(self.getHTMLName(),"")
@@ -1102,7 +1102,7 @@ class NumberInput(FieldInputType):
             # if the registrant has already payed, Indico blocks all the modifications about new/removed items
             return
         if self.getParent().isMandatory() and v.strip()=="":
-            raise FormValuesError( _("The field \"%s\" is mandatory. Please fill it.")%self.getParent().getCaption())  
+            raise FormValuesError( _("The field \"%s\" is mandatory. Please fill it.")%self.getParent().getCaption())
         if self.getParent().isMandatory() and (not v.isalnum() or int(v)<1):
             raise FormValuesError( _("The field \"%s\" is mandatory. Please fill it with a number.")%self.getParent().getCaption())
         if ( not v.isalnum() or int(v)<1):
@@ -1114,41 +1114,41 @@ class NumberInput(FieldInputType):
         item.setBillable(self._parent.isBillable())
         item.setPrice(self._parent.getPrice())
         item.setCurrency(self._parent.getParent().getRegistrationForm().getCurrency())
-        item.setMandatory(self.getParent().isMandatory()) 
-        item.setHTMLName(self.getHTMLName())                
-        
+        item.setMandatory(self.getParent().isMandatory())
+        item.setHTMLName(self.getHTMLName())
+
 class LabelInput(FieldInputType):
     _id="label"
     def getName(cls):
         return "Label"
     getName=classmethod(getName)
-    
+
     def _getModifHTML(self,item, registrant):
         caption = self._parent.getCaption()
         price= self._parent.getPrice()
         billable=self._parent.isBillable()
         currency=self._parent.getParent().getRegistrationForm().getCurrency()
-        htmlName=self.getHTMLName()    
+        htmlName=self.getHTMLName()
         v=""
         if item is not None:
             v=item.getValue()
             caption = self._parent.getCaption()
             price= item.getPrice()
             billable=item.isBillable()
-            currency=item.getCurrency()  
-            htmlName=item.getHTMLName()     
-            
+            currency=item.getCurrency()
+            htmlName=item.getHTMLName()
+
         disable=""
         if ( registrant is not None and billable and registrant.getPayed()):
-            disable="disabled=\"true\""                
+            disable="disabled=\"true\""
             #pass
         tmp = """&nbsp;%s"""%(caption)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
-            tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp,price,currency) 
+            tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp,price,currency)
         else:
             tmp= """%s </td> """%tmp
-        return tmp 
+        return tmp
 
     def _setResponseValue(self, item, params, registrant):
         if ( registrant is not None and self._parent.isBillable() and registrant.getPayed()):
@@ -1163,20 +1163,20 @@ class LabelInput(FieldInputType):
         item.setBillable(self._parent.isBillable())
         item.setPrice(self._parent.getPrice())
         item.setCurrency(self._parent.getParent().getRegistrationForm().getCurrency())
-        item.setMandatory(self.getParent().isMandatory()) 
-        item.setHTMLName(self.getHTMLName())     
+        item.setMandatory(self.getParent().isMandatory())
+        item.setHTMLName(self.getHTMLName())
         #v=params.get(self.getHTMLName(),"")
         #if self.getParent().isMandatory() and v.strip()=="":
         #    raise FormValuesError("The field \"%s\" is mandatory. Please fill it."%self.getParent().getCaption())
         #item.setValue(v)
-         
+
 
 class CheckboxInput(FieldInputType):
     _id="checkbox"
     def getName(cls):
         return "Multiple choices/checkbox"
     getName=classmethod(getName)
-    
+
     def _getModifHTML(self, item,registrant):
         disable=""
         checked=""
@@ -1201,10 +1201,10 @@ class CheckboxInput(FieldInputType):
         tmp=  """<input type="checkbox" name="%s" %s %s> %s"""%(htmlName, checked,disable, caption)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
-            tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp, price, currency) 
+            tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp, price, currency)
         else:
             tmp= """%s </td> """%tmp
-        return tmp                 
+        return tmp
 
     def _setResponseValue(self, item, params, registrant):
         if (registrant is not None and self._parent.isBillable() and registrant.getPayed()):
@@ -1217,12 +1217,12 @@ class CheckboxInput(FieldInputType):
             item.setQuantity(1)
         else:
             item.setValue("no")
-            item.setQuantity(0)    
+            item.setQuantity(0)
         item.setBillable(self._parent.isBillable())
         item.setPrice(self._parent.getPrice())
         item.setCurrency(self._parent.getParent().getRegistrationForm().getCurrency())
-        item.setMandatory(self.getParent().isMandatory()) 
-        item.setHTMLName(self.getHTMLName())                         
+        item.setMandatory(self.getParent().isMandatory())
+        item.setHTMLName(self.getHTMLName())
 
 class YesNoInput(FieldInputType):
     _id="yes/no"
@@ -1230,28 +1230,28 @@ class YesNoInput(FieldInputType):
     def getName(cls):
         return "Yes/No"
     getName=classmethod(getName)
-    
+
     def _getModifHTML(self,item, registrant):
         caption = self._parent.getCaption()
         price= self._parent.getPrice()
         billable=self._parent.isBillable()
         currency=self._parent.getParent().getRegistrationForm().getCurrency()
         htmlName=self.getHTMLName()
-        caption=self._parent.getCaption()                
+        caption=self._parent.getCaption()
         v="no"
         if item is not None:
             v=item.getValue()
             caption = self._parent.getCaption()
             price= item.getPrice()
             billable=item.isBillable()
-            currency=item.getCurrency()  
+            currency=item.getCurrency()
             htmlName=item.getHTMLName()
             caption=item.getCaption()
         disable=""
         checkedYes=""
         checkedNo=""
         if ( registrant is not None and billable and registrant.getPayed()):
-            disable="disabled=\"true\""                
+            disable="disabled=\"true\""
             #pass
         if v=="yes":
             checkedYes="selected"
@@ -1260,13 +1260,13 @@ class YesNoInput(FieldInputType):
         tmp=  """&nbsp;%s <select name="%s" %s><option value="yes" %s>yes</option><option value="no" %s>no</option></select>"""%(caption, htmlName,disable, checkedYes, checkedNo)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
-            tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp,price,currency) 
+            tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp,price,currency)
         else:
             tmp= """%s </td> """%tmp
-        return tmp           
-        
-        
-        
+        return tmp
+
+
+
     def _setResponseValue(self, item, params, registrant):
         if (registrant is not None and self._parent.isBillable() and registrant.getPayed()):
             #if ( item is not None and item.isBillable()):
@@ -1283,11 +1283,11 @@ class YesNoInput(FieldInputType):
         item.setBillable(self._parent.isBillable())
         item.setPrice(self._parent.getPrice())
         item.setCurrency(self._parent.getParent().getRegistrationForm().getCurrency())
-        item.setMandatory(self.getParent().isMandatory()) 
+        item.setMandatory(self.getParent().isMandatory())
         item.setHTMLName(self.getHTMLName())
 
 class RadioItem(Persistent):
-        
+
     def __init__(self, parent):
         self._parent=parent
         self._id=""
@@ -1299,16 +1299,16 @@ class RadioItem(Persistent):
     #def getQuantity(self):return 1
     def getId(self):
         return self._id
-    
+
     def setId(self, id):
         self._id=id
-    
+
     def getCaption(self):
         return self._caption
 
     def setCaption(self, cap):
         self._caption=cap
-                  
+
     def setEnabled(self, en=True):
         self._enabled = en
 
@@ -1325,20 +1325,20 @@ class RadioItem(Persistent):
         except:
             self._billable = False
         return self._billable
-    
+
     def setBillable(self,v):
         self._billable=v
-        
+
     def getPrice(self):
         try:
             return self._price
         except:
             self.setPrice(False)
         return self._price
-    
+
     def setPrice(self,v):
         self._price=v
-        
+
     def clone(self, parent):
         ri=RadioItem(parent)
         ri.setCaption(self.getCaption())
@@ -1357,7 +1357,7 @@ class RadioGroupInput(FieldInputType):
     def getName(cls):
         return "Multiple options/One choice"
     getName=classmethod(getName)
-    
+
     def __init__(self, field):
         FieldInputType.__init__(self, field)
         self._items={}
@@ -1376,7 +1376,7 @@ class RadioGroupInput(FieldInputType):
             d["radioitems"].append(tmp)
         d["defaultItem"]=self.getDefaultItem()
         return d
-    
+
     def setValues(self, data):
         if data.has_key("radioitems"):
             ris=data.get("radioitems",[])
@@ -1414,7 +1414,7 @@ class RadioGroupInput(FieldInputType):
         vs=self._items.values()
         if sort:
             vs.sort(RadioItem._cmpCaption)
-        return vs 
+        return vs
 
     def addItem(self, v):
         v.setId( str(self._getRadioItemGenerator().newCount()) )
@@ -1450,10 +1450,10 @@ class RadioGroupInput(FieldInputType):
         return rgi
 
     def _getRadioItemGenerator(self):
-        return self._radioItemGenerator            
+        return self._radioItemGenerator
 
     def _getModifHTML(self,item, registrant):
-        
+
         caption = self._parent.getCaption()
         price= self._parent.getCaption()
         billable=self._parent.isBillable()
@@ -1473,22 +1473,22 @@ class RadioGroupInput(FieldInputType):
             if not val.isEnabled():
                 disable="disabled=\"true\""
             if ( registrant is not None and (val.isBillable() or billable) and registrant.getPayed()):
-                disable="disabled=\"true\"" 
+                disable="disabled=\"true\""
                 #pass
             checked=""
             if val.getCaption()==value:
-                checked="checked" 
+                checked="checked"
             elif not value and val.getCaption() == self.getDefaultItem():
                 checked="checked"
             tmp.append("""<tr><td></td><td><input type="radio" name="%s"  value="%s" %s %s> %s</td><td align="right" align="bottom">"""%(self.getHTMLName(), val.getId(), checked,disable, val.getCaption()))
             if val.isBillable():
                 tmp.append("""&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td></tr> """%(val.getPrice(),currency))
             else:
-                 tmp.append(""" </td></tr> """)    
-        
+                 tmp.append(""" </td></tr> """)
+
         return "".join(tmp)
-    
-    
+
+
 
     def _setResponseValue(self, item, params, registrant):
         v=params.get(self.getHTMLName(),"")
@@ -1511,15 +1511,15 @@ class RadioGroupInput(FieldInputType):
             radioitem=self.getItemById(radioitemid)
             caption=radioitem.getCaption()
             billable=radioitem.isBillable()
-            price=radioitem.getPrice() 
+            price=radioitem.getPrice()
             quantity=1
         item.setCurrency(self._parent.getParent().getRegistrationForm().getCurrency())
-        item.setMandatory(self.getParent().isMandatory())                      
+        item.setMandatory(self.getParent().isMandatory())
         item.setValue(caption)
         item.setBillable(billable)
         item.setPrice(price)
-        item.setQuantity(quantity)            
-        
+        item.setQuantity(quantity)
+
 
     def _getSpecialOptionsHTML(self):
         html=["""<tr>
@@ -1545,7 +1545,7 @@ class RadioGroupInput(FieldInputType):
                                 <td class="blacktext"><span class="titleCellFormat"> _("Price")</span></td>
                                 <td bgcolor="white" class="blacktext" width="100%%">
                                     <input type="text" name="newprice">
-                                </td>                                
+                                </td>
                            </tr>
                             </table>
                             </td>
@@ -1572,16 +1572,16 @@ class RadioGroupInput(FieldInputType):
                 html.append("""<span><font color="red">&nbsp;&nbsp;(""" + _("disabled") + """)</font></span>""")
             if v.getCaption()==self.getDefaultItem():
                 html.append("""<span><font color="green">&nbsp;&nbsp;(""" + _("default") + """)</font></span>""")
-            html.append("""                          
-                             </td>                             
-                        </tr>                          
+            html.append("""
+                             </td>
+                        </tr>
                       """)
         html.append("""</table></td></tr>""")
         if billable:
             html.append("""<input type="hidden" name="billable" value="">""")
         html.append("""</table></td></tr>""")
         return "".join(html)
-            
+
 
 class FieldInputs:
 
@@ -1634,7 +1634,7 @@ class GeneralField(Persistent):
         self.setMandatory(data.has_key("mandatory"))
         self.setBillable(data.has_key("billable"))
         self.setPrice(data.get("price",""))
-    
+
     def getValues(self):
         values = {}
         values["caption"] = self.getCaption()
@@ -1643,27 +1643,27 @@ class GeneralField(Persistent):
         values["billable"]=self.isBillable()
         values["price"]=self.getPrice()
         return values
-    
+
     def isBillable(self):
         try:
             return self._billable
         except:
             self._billable = False
         return self._billable
-    
+
     def setBillable(self,v):
         self._billable=v
-        
+
     def getPrice(self):
         try:
             return self._price
         except:
             self._price = 0
         return self._price
-        
+
     def setPrice(self,price):
         self._price=price
-        
+
     def getId(self):
         return self._id
 
@@ -1692,17 +1692,17 @@ class GeneralField(Persistent):
         return self._parent
 
     def getLocator( self ):
-        """Gives back (Locator) a globaly unique identification encapsulated in 
+        """Gives back (Locator) a globaly unique identification encapsulated in
             a Locator object for the GeneralField instance """
         if self.getParent() == None:
             return Locator()
         lconf = self.getParent().getLocator()
         lconf["sectionFieldId"] = self.getId()
         return lconf
-        
+
 class GeneralSectionForm(BaseForm):
-    
-    def __init__(self, regForm, data=None): 
+
+    def __init__(self, regForm, data=None):
         BaseForm.__init__(self)
         self._regForm=regForm
         self._id=""
@@ -1726,7 +1726,7 @@ class GeneralSectionForm(BaseForm):
             title= _("Miscellaneous information %s")%self.getId()
         self.setTitle(title)
         self.setDescription(data.get("description", ""))
-    
+
     def getValues(self):
         values = {}
         values["title"] = self.getTitle()
@@ -1760,7 +1760,7 @@ class GeneralSectionForm(BaseForm):
 
     def setId(self, id):
         self._id = id
-        
+
     def getTitle(self):
         return self._title
 
@@ -1793,7 +1793,7 @@ class GeneralSectionForm(BaseForm):
     #    for f in self.getFields():
     #            if f.getId()==id:
     #                return f
-    #        return None 
+    #        return None
 
     def getSortedFields(self):
         try:
@@ -1802,9 +1802,9 @@ class GeneralSectionForm(BaseForm):
            self._sortedFields = self._fields
            returnFields = self._sortedFields
         return returnFields
-           
 
-    def addToSortedFields(self, f, i=None):  
+
+    def addToSortedFields(self, f, i=None):
         if i is None:
             i=len(self.getSortedFields())
         try:
@@ -1815,23 +1815,23 @@ class GeneralSectionForm(BaseForm):
         self.getSortedFields().insert(i, f)
         self.notifyModification()
         return True
-    
+
     def removeField(self, f):
         if f in self.getSortedFields():
             self.getSortedFields().remove(f)
             self.notifyModification()
-    
+
     def getFieldById(self, id):
         for f in self.getSortedFields():
             if f.getId()==id:
                return f
-        return None 
+        return None
     #
     #end mods
-    ########## 
+    ##########
 
     def getLocator( self ):
-        """Gives back (Locator) a globaly unique identification encapsulated in 
+        """Gives back (Locator) a globaly unique identification encapsulated in
             a Locator object for the GeneralSectionForm instance """
         if self.getRegistrationForm().getConference() == None:
             return Locator()
@@ -1996,11 +1996,11 @@ class PersonalData(Persistent):
 
     def getDataItem(self, key):
         return self._data.get(key, None)
-        
+
 
 class FurtherInformationForm(BaseForm):
 
-    def __init__(self, data=None): 
+    def __init__(self, data=None):
         BaseForm.__init__(self)
         self._title = _("Further information")
         self._content = ""
@@ -2008,7 +2008,7 @@ class FurtherInformationForm(BaseForm):
             self._title = data.get("title", self._title)
             self._content = data.get("content", self._content)
         self._id="furtherInformation"
- 
+
     def getId(self):
         try:
             if self._id:
@@ -2020,7 +2020,7 @@ class FurtherInformationForm(BaseForm):
     def setValues(self, data):
         self.setTitle(data.get("title", _("Further Information")))
         self.setContent(data.get("content", ""))
-    
+
     def getValues(self):
         values = {}
         values["title"] = self.getTitle()
@@ -2033,7 +2033,7 @@ class FurtherInformationForm(BaseForm):
         fif.setValues(self.getValues())
         fif.setEnabled(self.isEnabled())
         return fif
-        
+
     def getTitle(self):
         return self._title
 
@@ -2047,7 +2047,7 @@ class FurtherInformationForm(BaseForm):
         self._content = n
 
 class AccommodationType(Persistent):
-    
+
     def __init__(self, rf, data=None):
         self._id=""
         self._caption=""
@@ -2061,21 +2061,21 @@ class AccommodationType(Persistent):
         self.setCancelled(data.has_key("cancelled"))
         self.setPlacesLimit(data.get("placesLimit", "0"))
         self._regForm.notifyModification()
-        
+
     def getValues(self):
         values = {}
         values["caption"] = self.getCaption()
         if self.isCancelled():
             values["cancelled"] = self.isCancelled()
         values["placesLimit"] = self.getPlacesLimit()
-        
+
         return values
-        
+
     def clone(self, registrationForm):
         act = AccommodationType(registrationForm)
         act.setValues(self.getValues())
         return act
-    
+
     def getId(self):
         return self._id
 
@@ -2170,7 +2170,7 @@ class AccommodationType(Persistent):
         TrashCanManager().remove(self)
 
     def getLocator( self ):
-        """Gives back (Locator) a globaly unique identification encapsulated in 
+        """Gives back (Locator) a globaly unique identification encapsulated in
             a Locator object for the AccommodationType instance """
         if self.getRegistrationForm().getConference() == None:
             return Locator()
@@ -2196,7 +2196,7 @@ class AccommodationForm(BaseForm):
         self._id="accommodation"
         self._arrivalOffsetDates=[-2,0]
         self._departureOffsetDates=[1,3]
- 
+
     def getId(self):
         try:
             if self._id:
@@ -2214,10 +2214,10 @@ class AccommodationForm(BaseForm):
         except:
             self.setDefaultArrivalOffsetDates()
             return self._arrivalOffsetDates
-        
+
     def setDefaultArrivalOffsetDates(self):
         self._arrivalOffsetDates = [-2,0]
-        
+
     def getArrivalDates(self):
         offsets = self.getArrivalOffsetDates()
         conf = self.getConference()
@@ -2240,10 +2240,10 @@ class AccommodationForm(BaseForm):
         except:
             self.setDefaultDepartureOffsetDates()
             return self._departureOffsetDates
-        
+
     def setDefaultDepartureOffsetDates(self):
         self._departureOffsetDates = [1,3]
-        
+
     def getDepartureDates(self):
         offsets = self.getDepartureOffsetDates()
         conf = self.getConference()
@@ -2256,10 +2256,10 @@ class AccommodationForm(BaseForm):
             dates.append(curDate)
             curDate += timedelta(days=1)
         return dates
-        
+
     def setDepartureOffsetDates(self, dates):
         self._departureOffsetDates = dates
-        
+
     def _setDefaultAccommodationTypes(self):
         a = AccommodationType(self._regForm)
         a.setId("cern")
@@ -2280,7 +2280,7 @@ class AccommodationForm(BaseForm):
         self.setCurrency(data.get("currency", ""))
         self.setArrivalOffsetDates([int(data.get("aoffset1",-2)),int(data.get("aoffset2",0))])
         self.setDepartureOffsetDates([int(data.get("doffset1",1)),int(data.get("doffset2",3))])
-        
+
     def getValues(self):
         values = {}
         values["title"] = self.getTitle()
@@ -2295,7 +2295,7 @@ class AccommodationForm(BaseForm):
 
     def clone(self, registrationForm):
         acf = AccommodationForm(registrationForm)
-        acf.setValues(self.getValues())        
+        acf.setValues(self.getValues())
         acf.setEnabled(self.isEnabled())
         acf._accommodationTypes = PersistentMapping()
         for at in self.getAccommodationTypesList() :
@@ -2370,7 +2370,7 @@ class ReasonParticipationForm(BaseForm):
             self._title = data.get("title", self._title)
             self._description = data.get("description",self._description)
         self._id="reasonParticipation"
- 
+
     def getId(self):
         try:
             if self._id:
@@ -2382,13 +2382,13 @@ class ReasonParticipationForm(BaseForm):
     def setValues(self, data):
         self.setTitle(data.get("title", _("Reason for participation")))
         self.setDescription(data.get("description", ""))
-        
+
     def getValues(self):
         values = {}
         values["title"] = self.getTitle()
         values["description"] = self.getDescription()
         return values
-        
+
     def clone(self):
         rpf = ReasonParticipationForm()
         rpf.setValues(self.getValues())
@@ -2408,7 +2408,7 @@ class ReasonParticipationForm(BaseForm):
         self._description = description
 
 class SessionItem(Persistent):
-    
+
     def __init__(self, rf, data=None):
         self._session = None
         self._regForm = rf
@@ -2435,14 +2435,14 @@ class SessionItem(Persistent):
         self.setCancelled(True)
 
     def getLocator( self ):
-        """Gives back (Locator) a globaly unique identification encapsulated in 
+        """Gives back (Locator) a globaly unique identification encapsulated in
             a Locator object for the SocialEventItem instance """
         if self.getRegistrationForm().getConference() == None:
             return Locator()
         lconf = self.getRegistrationForm().getLocator()
         lconf["sessionItemId"] = self.getId()
         return lconf
-    
+
 class RegistrationSession(Persistent):
 
     def __init__(self, ses, regForm=None):
@@ -2518,7 +2518,7 @@ class SessionsForm(BaseForm):
             self._description = data.get("description", self._description)
             self._sessions = data.get("sessions", self._sessions)
         self._id="sessions"
- 
+
     def getId(self):
         try:
             if self._id:
@@ -2535,8 +2535,8 @@ class SessionsForm(BaseForm):
         sesf.setEnabled(self.isEnabled())
         #TODO: Cloning of registrant session
         #for s in newSessions :
-        #    sesf.addSession(s)            
-        
+        #    sesf.addSession(s)
+
         return sesf
 
     def setValues(self, data):
@@ -2613,13 +2613,13 @@ class SessionsForm(BaseForm):
     def getSessionById(self, id):
         return self._sessions.get(id, None)
 
-    
+
 def sortByStartDate( x, y ):
     return cmp(x.getSession().getStartDate(),y.getSession().getStartDate())
 
 
 class SocialEventItem(Persistent):
-    
+
     def __init__(self, rf, data=None):
         self._id=""
         self._caption=""
@@ -2746,14 +2746,14 @@ class SocialEventItem(Persistent):
 
     def setCancelledReason(self, cr):
         self._cancelledReason = cr
-    
+
     def getMaxPlacePerRegistrant(self):
         try:
             return self._maxPlacePerRegistrant
         except AttributeError:
             self._maxPlacePerRegistrant = 9
         return self._maxPlacePerRegistrant
-    
+
     def setMaxPlacePerRegistrant(self, numPlace):
         self._maxPlacePerRegistrant = numPlace
 
@@ -2770,7 +2770,7 @@ class SocialEventItem(Persistent):
         TrashCanManager().remove(self)
 
     def getLocator( self ):
-        """Gives back (Locator) a globaly unique identification encapsulated in 
+        """Gives back (Locator) a globaly unique identification encapsulated in
             a Locator object for the SocialEventItem instance """
         if self.getRegistrationForm().getConference() == None:
             return Locator()
@@ -2796,7 +2796,7 @@ class SocialEventForm(BaseForm):
             self._title = data.get("title", self._title)
             self._description = data.get("description", self._description)
         self._id="socialEvents"
- 
+
     def getId(self):
         try:
             if self._id:
@@ -2818,12 +2818,12 @@ class SocialEventForm(BaseForm):
         values["intro"] = self.getIntroSentence()
         values["selectionType"] = self.getSelectionTypeId()
         return values
-    
+
     def clone(self, registrationForm):
         sef = SocialEventForm(registrationForm)
         sef.setValues(self.getValues())
         sef.setEnabled(self.isEnabled())
-        
+
         for se in self.getSocialEventList() :
             sef.addSocialEvent(se.clone(registrationForm))
         return sef
@@ -2839,7 +2839,7 @@ class SocialEventForm(BaseForm):
 
     def setDescription(self, description):
         self._description = description
-        
+
     def getRegistrationForm(self):
         try:
             if self._regForm:
@@ -2934,7 +2934,7 @@ class SocialEventForm(BaseForm):
             self.removeSocialEvent(se)
 
     def getLocator( self ):
-        """Gives back (Locator) a globaly unique identification encapsulated in 
+        """Gives back (Locator) a globaly unique identification encapsulated in
             a Locator object for the GeneralField instance """
         if self.getConference() == None:
             return Locator()
@@ -2979,7 +2979,7 @@ class StatusValue(Persistent):
     def _cmpCaption(sv1, sv2):
         return cmp(sv1.getCaption().strip().lower(), sv2.getCaption().strip().lower())
     _cmpCaption=staticmethod(_cmpCaption)
-        
+
 
 class Status(Persistent):
 
@@ -3017,7 +3017,7 @@ class Status(Persistent):
         for v in self.getStatusValuesList()[:]:
             if v.getId() not in ids:
                 self.removeStatusValue(v)
-       
+
 
     def getValues(self):
         d={}
@@ -3088,7 +3088,7 @@ class Status(Persistent):
     _cmpCaption=staticmethod(_cmpCaption)
 
     def getLocator( self ):
-        """Gives back (Locator) a globaly unique identification encapsulated in 
+        """Gives back (Locator) a globaly unique identification encapsulated in
             a Locator object for the Status instance """
         if self.getConference() == None:
             return Locator()
@@ -3100,7 +3100,7 @@ class Status(Persistent):
         """Method called to notify that the registration form has been modified.
         """
         self._p_changed=1
-        
+
 
 # Users --------- FINAL INFORMATION STORED FROM THE REGISTRATION FORM
 
@@ -3125,7 +3125,7 @@ class Registrant(Persistent):
         self._fax = ""
         self._email = ""
         self._personalHomepage = ""
-        
+
         self._sessions = []
         self._socialEvents = []
         self._accommodation = Accommodation()
@@ -3138,29 +3138,29 @@ class Registrant(Persistent):
         self._hasPay=False
         self._transactionInfo=None
 
-        
+
         self._randomId = self._generateRandomId()
-        
+
     def isPayedText(self):
         if self.getPayed() :
             return "Yes"
         elif not self.doPay():
             return "-"
         return "No"
-    
+
     def getIdPay(self):
         return "c%sr%s"%(self._conf.getId(),self.getId())
-    
-    def setTotal(self,total):  
+
+    def setTotal(self,total):
         self._total=total
-        
+
     def getTotal(self):
         try:
             return self._total
         except:
             self.setTotal(0)
         return self._total
-    
+
     def updateTotal(self):
         total = 0
         for gs in self.getRegistrationForm().getGeneralSectionFormsList():
@@ -3175,10 +3175,10 @@ class Registrant(Persistent):
                         quantity = miscItem.getQuantity()
                         total += price*quantity
         self.setTotal(total)
-    
+
     def doPay(self):
         return self.getTotal()>0 and not self.getPayed()
-    
+
     def setPersonalData(self, data):
         self.setTitle(data.get("title",""))
         self.setFirstName(data.get("firstName",""))
@@ -3195,18 +3195,18 @@ class Registrant(Persistent):
 
     def setValues(self, data, av):
         self._avatar = av
-        
+
         self.setPersonalData(data)
-        
+
         if self.getRegistrationForm().getReasonParticipationForm().isEnabled():
             self.setReasonParticipation(data.get("reason",""))
-        
+
         if self.getRegistrationForm().getSessionsForm().isEnabled():
             sessions=data.get("sessions",[])
             if not isinstance(sessions, list):
-                sessions = [ sessions ] 
+                sessions = [ sessions ]
             self.setSessions(sessions)
-        
+
         if self.getRegistrationForm().getAccommodationForm().isEnabled():
             ad = data.get("arrivalDate",None)
             dd = data.get("departureDate",None)
@@ -3266,16 +3266,16 @@ class Registrant(Persistent):
         except AttributeError, e:
             self._complete = False
         return self._complete
-        
+
     def getPayed(self):
         try:
             return self._hasPay
         except:
             self.setPayed(False)
         return self._hasPay
-    
+
     def setPayed(self,hasPay):
-        self._hasPay=hasPay    
+        self._hasPay=hasPay
 
     def getTransactionInfo(self):
         try:
@@ -3283,7 +3283,7 @@ class Registrant(Persistent):
         except:
             self.setTransactionInfo(False)
         return self._transactionInfo
-    
+
     def setTransactionInfo(self,transactionInfo):
         self._transactionInfo=transactionInfo
 
@@ -3339,7 +3339,7 @@ class Registrant(Persistent):
 
     def getAdjustedRegistrationDate(self,tz=None):
         if not tz:
-            tz = self.getConference().getTimezone() 
+            tz = self.getConference().getTimezone()
         if tz not in common_timezones:
             tz = 'UTC'
         return self.getRegistrationDate().astimezone(timezone(tz))
@@ -3355,7 +3355,7 @@ class Registrant(Persistent):
 
     def setFirstName(self, v):
         self._firstName = v
-        
+
     def getSurName(self):
         return self._surname
     getFamilyName = getSurName
@@ -3486,7 +3486,7 @@ class Registrant(Persistent):
         self.notifyModification()
 
     def getLocator( self ):
-        """Gives back (Locator) a globaly unique identification encapsulated in 
+        """Gives back (Locator) a globaly unique identification encapsulated in
             a Locator object for the registrant instance """
         if self.getConference() == None:
             return Locator()
@@ -3516,7 +3516,7 @@ class Registrant(Persistent):
         except AttributeError, e:
             self._miscellaneous={}
         return self._miscellaneous
-    
+
     def getMiscellaneousGroupList(self):
         return self.getMiscellaneousGroups().values()
 
@@ -3566,7 +3566,7 @@ class Accommodation(Persistent):
         self._arrivalDate = None
         self._departureDate = None
         self._accommodationType = None
-    
+
     def getArrivalDate(self):
         return self._arrivalDate
 
@@ -3586,7 +3586,7 @@ class Accommodation(Persistent):
         if self.getAccommodationType() != at:
             if self.getAccommodationType() is not None:
                 self.getAccommodationType().decreaseNoPlaces()
-            if at is not None:    
+            if at is not None:
                 at.increaseNoPlaces()
             self._accommodationType = at
 
@@ -3617,7 +3617,7 @@ class SocialEvent(Persistent):
 
     def getCaption(self):
         return self._socialEventItem.getCaption()
-    
+
     def getMaxPlacePerRegistrant(self):
         return self._socialEventItem.getMaxPlacePerRegistrant()
 
@@ -3675,7 +3675,7 @@ class MiscellaneousInfoGroup(Persistent):
                 self.removeResponseItem(f)
 
     def getLocator( self ):
-        """Gives back (Locator) a globaly unique identification encapsulated in 
+        """Gives back (Locator) a globaly unique identification encapsulated in
             a Locator object for the MiscellaneousInfoGroup instance """
         lconf = self.getRegistrant().getLocator()
         lconf["miscInfoId"] = self.getId()
@@ -3698,65 +3698,65 @@ class MiscellaneousInfoSimpleItem(Persistent):
         self._currency=""
         self._mandatory=False
         self._HTMLName=""
-        
+
     def getHTMLName(self):
         try:
             return self._HTMLName
         except:
             self._HTMLName=""
         return self._HTMLName
-    
-    def setHTMLName(self,HTMLName):  
-        self._HTMLName= HTMLName    
-        
-    def isMandatory(self): 
+
+    def setHTMLName(self,HTMLName):
+        self._HTMLName= HTMLName
+
+    def isMandatory(self):
         try:
             return self._mandatory
         except:
             self._mandatory=False
         return self._mandatory
-        
-    def setMandatory(self,mandatory):  
+
+    def setMandatory(self,mandatory):
         self._mandatory= mandatory
-    
+
     def getCurrency(self):
         try:
             return self._currency
         except:
             self.setCurrency("")
         return self._currency
-        
-    def setCurrency(self,currency):  
-        self._currency= currency            
-        
-    def getQuantity(self): 
+
+    def setCurrency(self,currency):
+        self._currency= currency
+
+    def getQuantity(self):
         try:
             return self._quantity
         except:
             self.setQuantity(0)
         return self._quantity
-    def setQuantity(self,quantity):  
-        self._quantity= quantity 
+    def setQuantity(self,quantity):
+        self._quantity= quantity
     def isBillable(self):
         try:
             return self._billable
         except:
             self.setBillable(False)
         return self._billable
-    
+
     def setBillable(self,v):
         self._billable=v
-        
+
     def getPrice(self):
         try:
             return self._price
         except:
             self.setPrice(0)
         return self._price
-    
+
     def setPrice(self,price):
         self._price=price
-        
+
     def getId(self):
         return self._id
 

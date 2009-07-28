@@ -23,7 +23,7 @@ from MaKaC.plugins import getModules, initModule
 from MaKaC.i18n import _
 
 pluginType = "Collaboration"
-pluginName = _("CERNMCU")
+pluginName = "CERNMCU"
 pluginDescription = _("Create conferences in CERN's MCU")
 
 modules = {}

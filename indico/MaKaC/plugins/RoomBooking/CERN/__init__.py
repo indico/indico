@@ -22,8 +22,8 @@
 from MaKaC.plugins import getModules, initModule
 from MaKaC.i18n import _
 
-pluginType = _("RoomBooking")
-pluginName = _("CERN")
+pluginType = "RoomBooking"
+pluginName = "CERN"
 pluginDescription = _("""_("This is the CERN Indico Room Booking plugin. It relies on a ZODB separate backend. It support custom room attributes, and equipment")""")
 
 modules = {}

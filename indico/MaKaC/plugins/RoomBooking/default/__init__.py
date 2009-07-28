@@ -22,7 +22,7 @@
 from MaKaC.plugins import getModules, initModule
 
 pluginType = "RoomBooking"
-pluginName = _("default")
+pluginName = "default"
 pluginDescription = _("""This is the default Indico Room Booking plugin. It relies on a ZODB separate backend. It support custom room attributes, and equipment""")
 
 modules = {}

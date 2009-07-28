@@ -33,7 +33,7 @@ class WPBase:
     def __init__( self, rh ):
         self._rh = rh
         self._locTZ = ""
-        
+
         #store page specific CSS and JS
         self._extraCSSFiles = []
         self._extraCSS = []
@@ -57,10 +57,10 @@ class WPBase:
 
     def _getBaseURL( self ):
         return Config.getInstance().getBaseURL()
-    
+
     def _getTitle( self ):
         return self._title
-    
+
     def _setTitle( self, newTitle ):
         self._title = newTitle.strip()
 
@@ -77,9 +77,9 @@ class WPBase:
     def _getHeadContent( self ):
         """
         Returns _additional_ content between <head></head> tags.
-        Please note that <title>, <meta> and standard CSS are always included. 
-        
-        Override this method to add your own, page-specific loading of 
+        Please note that <title>, <meta> and standard CSS are always included.
+
+        Override this method to add your own, page-specific loading of
         JavaScript, CSS and other legal content for HTML <head> tag.
         """
         return ""
@@ -93,63 +93,20 @@ class WPBase:
         from MaKaC.webinterface.pages.registrationForm import WPRegistrationFormSignIn
         from MaKaC.webinterface.rh.base import RHModificationBaseProtected
         from MaKaC.webinterface.rh.admins import RHAdminBase
-        from MaKaC.webinterface.rh.roomBooking import RHRoomBookingBase
-        from MaKaC.webinterface.rh.roomBooking import RHRoomBookingSearch4Rooms
-        from MaKaC.webinterface.rh.roomBooking import RHRoomBookingSearch4Bookings
-        from MaKaC.webinterface.rh.roomBooking import RHRoomBookingBookingList
-        from MaKaC.webinterface.rh.roomBooking import RHRoomBookingRoomDetails
-        from MaKaC.webinterface.rh.roomBooking import RHRoomBookingAdminBase
-        from MaKaC.webinterface.rh.calendar import RHCalendar
-        from MaKaC.webinterface.rh.categoryDisplay import RHCategoryMap
-        from MaKaC.webinterface.rh.categoryDisplay import RHCategoryStatistics
-        from MaKaC.webinterface.rh.newsDisplay import RHNews
-        from MaKaC.webinterface.rh.categoryDisplay import RHCategOverviewDisplay
-        
+
         baseurl = self._getBaseURL()
         if ((isinstance(self, WPSignIn) or isinstance(self, WPConfSignIn) or isinstance(self, WPRegistrationFormSignIn)) and \
                 Config.getInstance().getLoginURL().startswith("https")) or \
                 self._rh._req.is_https() and self._rh._tohttps:
             baseurl = baseurl.replace("http://","https://")
             baseurl = urlHandlers.setSSLPort( baseurl )
-  
+
         area=""
         if isinstance(self._rh, RHModificationBaseProtected):
             area=_(""" - _("Management area")""")
-        elif isinstance(self._rh, RHAdminBase) or isinstance(self._rh, RHRoomBookingAdminBase):
+        elif isinstance(self._rh, RHAdminBase):
             area=_(""" - _("Administrator area")""")
-            
-        elif isinstance(self._rh, RHRoomBookingBase):            
-                if isinstance(self._rh, RHRoomBookingSearch4Rooms):
-                    area=_(""" - _("Room Booking - Search for Rooms")""")
-                elif isinstance(self._rh, RHRoomBookingSearch4Bookings):
-                    area=_(""" - _("Room Booking - Search Bookings")""")
-                elif isinstance( self._rh, RHRoomBookingRoomDetails ): 
-                    area=_(""" - _("Room Booking - Room Details")""")
-                elif isinstance(self._rh, RHRoomBookingBookingList):
-                    if self._rh._today:
-                        area=_(""" - _("Room Booking - Calendar")""")
-                    elif self._rh._onlyMy and self._rh._onlyPrebookings:
-                        area=_(""" - _("Room Booking - My PRE-bookings")""")
-                    elif self._rh._onlyMy:
-                        area=_(""" - _("Room Booking - My bookings")""")
-                    elif self._rh._ofMyRooms and self._rh._onlyPrebookings:
-                        area=_(""" - _("Room Booking - PRE-bookings in my rooms")""")
-                    elif self._rh._today and self._rh._ofMyRooms:
-                        area=_(""" - _("Room Booking - Bookings in my rooms") """)
-                   
-        elif isinstance(self._rh, RHCalendar):
-                area=_(""" - _("Calendar Overview")""")
-        elif isinstance(self._rh, RHCategoryMap):
-                area=_(""" - _("Category Map")""")
-        elif isinstance(self._rh, RHCategoryStatistics):
-                area=_(""" - _("Category Statistics")""")
-        elif isinstance(self._rh, RHNews):
-                area=_(""" - _("News")""")
-        elif isinstance(self._rh, RHCategOverviewDisplay):
-                area=_(""" - _("Events Display")""")
-                   
-                                                     
-        
+
         return wcomponents.WHTMLHeader().getHTML({
                             "area": area,
                             "baseurl": baseurl,
@@ -182,38 +139,38 @@ class WPBase:
         return "%s%s%s"%( self._getHTMLHeader(), \
                             self._display( params ), \
                             self._getHTMLFooter() )
-        
+
     def addExtraCSSFile(self, filename):
         self._extraCSSFiles.append(filename)
-        
+
     def addExtraCSS(self, cssCode):
         self._extraCSS.append(cssCode)
-        
+
     def addExtraJSFile(self, filename):
         self._extraJSFiles.append(filename)
-        
+
     def addExtraJS(self, jsCode):
         self._extraJS.append(jsCode)
-    
-    # auxiliar functions    
-    def _escapeChars(self, text):        
+
+    # auxiliar functions
+    def _escapeChars(self, text):
         return text.replace('%','%%')
 
 
 class WPDecorated( WPBase ):
-    
+
     def _getSiteArea(self):
         return "DisplayArea"
-    
+
     def getLoginURL( self ):
         return urlHandlers.UHSignIn.getURL("%s"%self._rh.getCurrentURL())
-    
+
     def getLogoutURL( self ):
         return urlHandlers.UHSignOut.getURL("%s"%self._rh.getCurrentURL())
-    
+
     def getLoginAsURL( self ):
         return urlHandlers.UHLogMeAs.getURL("%s"%self._rh.getCurrentURL())
-        
+
 
     def _getHeader( self ):
         """
@@ -237,16 +194,16 @@ class WPDecorated( WPBase ):
         """
         """
         return "<div class=\"wrapper\">%s%s<div class=\"emptyFooter\"></div></div>%s"%( self._getHeader(), body, self._getFooter() )
-    
+
     def _display( self, params ):
-        
+
         return self._applyDecoration( self._getBody( params ) )
 
     def _getBody( self, params ):
         """
         """
         pass
-        
+
     def _getNavigationDrawer(self):
         return None
 
@@ -256,7 +213,7 @@ class WPDecorated( WPBase ):
             is shown.
         """
         return False
-    
+
     def _currentCategory(self):
         """
             Whenever in category display mode this is overloaded with the current category
@@ -270,21 +227,21 @@ class WPDecorated( WPBase ):
         return None
 
 class WPNotDecorated( WPBase ):
-    
+
     def getLoginURL( self ):
         return urlHandlers.UHSignIn.getURL("%s"%self._rh.getCurrentURL())
-    
+
     def getLogoutURL( self ):
         return urlHandlers.UHSignOut.getURL("%s"%self._rh.getCurrentURL())
 
     def _display( self, params ):
-        return self._getBody( params ) 
+        return self._getBody( params )
 
     def _getBody( self, params ):
         """
         """
         pass
-        
+
     def _getNavigationDrawer(self):
         return None
 

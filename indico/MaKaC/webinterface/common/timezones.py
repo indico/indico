@@ -54,7 +54,7 @@ class TimezoneRegistry:
         
 
 class DisplayTimezoneRegistry:
-    _items = [_('MyTimezone'),_('Event Timezone')]
+    _items = ['MyTimezone','Event Timezone']
 
     def getList( self ):
         return self._items

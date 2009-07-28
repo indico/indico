@@ -25,7 +25,6 @@ import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.rb_location import CrossLocationDB
 import MaKaC.common.info as info
-from MaKaC.webinterface.rh.base import RH
 
 #import MaKaC.common.info as info
 #import MaKaC.archives as archives
@@ -193,7 +192,7 @@ class WPRoomBookingSearch4Bookings( WPRoomBookingBase ):
         wc = wcomponents.WRoomBookingSearch4Bookings( self._rh )
         return wc.getHTML( params )
 
-class WPRoomBookingSearch4Users( WPRoomBookingBase, RH ):
+class WPRoomBookingSearch4Users( WPRoomBookingBase ):
     def __init__( self, rh ):
         self._rh = rh
         WPRoomBookingBase.__init__( self, rh )
@@ -203,9 +202,8 @@ class WPRoomBookingSearch4Users( WPRoomBookingBase, RH ):
              urlHandlers.UHRoomBookingSearch4Users.getURL(),
              forceWithoutExtAuth = self._rh._forceWithoutExtAuth,
              multi = False )
-        params["addURL"] = urlHandlers.UHRoomBookingRoomForm.getURL(None)
-        url = urlHandlers.UHRoomBookingRoomForm.getURL( None )        
-        return wc.getHTML( self._redirect( url ), params )
+        params["addURL"] = urlHandlers.UHRoomBookingRoomForm.getURL()
+        return wc.getHTML( params )
 
 # 2. List of ...
 

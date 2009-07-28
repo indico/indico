@@ -23,7 +23,7 @@ from MaKaC.plugins import getModules, initModule
 from MaKaC.i18n import _
 
 pluginType = "Collaboration"
-pluginName = _("EVO")
+pluginName = "EVO"
 pluginDescription = _("EVO, the Collaboration network")
 
 modules = {}

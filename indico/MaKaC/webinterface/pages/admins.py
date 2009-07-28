@@ -55,7 +55,7 @@ from MaKaC.modules.base import ModulesHolder
 class WPAdminsBase( WPMainBase ):
 
     def _getSiteArea(self):
-        return _("AdministrationArea")
+        return "AdministrationArea"
 
     def getJSFiles(self):
         return WPMainBase.getJSFiles(self) + \
@@ -1667,7 +1667,7 @@ class WPIdentityChangePassword(WPUserBase):
     
     def _getTabContent(self, params):
         
-        identity = self._avatar.getIdentityById(self._params["identityId"],_("Local"))
+        identity = self._avatar.getIdentityById(self._params["identityId"],"Local")
         c = WIdentityModification( self._avatar, identity )        
         postURL = urlHandlers.UHUserIdentityChangePassword.getURL()
         self._params["postURL"] = postURL

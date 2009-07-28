@@ -866,7 +866,7 @@ class Avatar(Persistent):
         try:
             return self.status
         except AttributeError:
-            self.status = _("activated")
+            self.status = "activated"
             return self.status
     
     def setStatus( self, status ):
@@ -877,19 +877,19 @@ class Avatar(Persistent):
         statIdx.indexUser( self )
     
     def activateAccount( self ):
-        self.setStatus(_("activated"))
+        self.setStatus("activated")
 
     def disabledAccount( self ):
         self.setStatus("disabled")
     
     def isActivated( self ):
-        return self.status == _("activated")
+        return self.status == "activated"
     
     def isDisabled( self ):
-        return self.status == _("disabled")
+        return self.status == "disabled"
     
     def isNotConfirmed( self ):
-        return self.status == _("Not confirmed")
+        return self.status == "Not confirmed"
 
     def setId(self, id):
         self.id = str(id)
