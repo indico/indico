@@ -35,7 +35,7 @@
     <% eventFavorites = 'false' %>
   <% end %>
   
-  var rbWidget = new RoomBookingWidget(info, parentEvt, <%= jsBoolean(roomBookingActive) %>, <%= jsBoolean(not modifying) %>, <%= eventFavorites %>);
+  var rbWidget = new RoomBookingWidget(info, parentEvt, <%= jsBoolean(not modifying) %>, <%= eventFavorites %>);
 
   var domContent = rbWidget.draw();
 

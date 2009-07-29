@@ -244,7 +244,7 @@ IndicoUI.Widgets = {
             var image = Html.img({
                 src: imageSrc("star"),
                 alt: 'Add to Basket',
-                title: $T('Add to your list of favorite users')  
+                title: $T('Add to your list of favorite users')
             });
             var link = Widget.link(command(function(){
                 jsonRpc(Indico.Urls.JsonRpcService, 'user.favorites.addUsers',
@@ -921,7 +921,7 @@ IndicoUI.Widgets = {
                         $E(hiddenFields[0]).set(!showTime?d[0]:d.getDate());
                         $E(hiddenFields[1]).set(!showTime?d[1]:d.getMonth()+1);
                         $E(hiddenFields[2]).set(!showTime?d[2]:d.getFullYear());
-                        if (showTime) {                        
+                        if (showTime) {
                             $E(hiddenFields[3]).set(d.getHours());
                             $E(hiddenFields[4]).set(d.getMinutes());
                         }
@@ -974,19 +974,24 @@ IndicoUI.Widgets = {
             var elem = Html.input("text",attributes);
             IndicoUI.Widgets.Generic.input2dateField(elem, showTime, hiddenFields)
             return elem;
-      },      
+      },
         dateField_sdate: function(showTime, attributes, hiddenFields){
             attributes = attributes || {};
             var elem = Html.input("text",{'id':'sdate', 'name':'sdate'},attributes);
             IndicoUI.Widgets.Generic.input2dateField(elem, showTime, hiddenFields)
-            return elem;    
+            return elem;
         },
-        
+
         dateField_edate: function(showTime, attributes, hiddenFields){
             attributes = attributes || {};
             var elem = Html.input("text",{'id':'edate', 'name':'edate'},attributes);
             IndicoUI.Widgets.Generic.input2dateField(elem, showTime, hiddenFields)
-            return elem;    
+            return elem;
+        },
+        timeField: function(attributes, hiddenFields){
+            attributes = attributes || {};
+            var elem = Html.input("text",attributes);
+            return elem;
         },
 
         dateEditor: function(elem, method, attributes, cachedValue){
@@ -1038,6 +1043,35 @@ IndicoUI.Widgets = {
 
             return {'element': element,
                     'accessor': obj};
+        },
+
+        dateStartEndTimeField: function(defaultStartTime, defaultEndTime) {
+
+            var obj = new WatchObject();
+            obj.set('startTime', defaultStartTime);
+            obj.set('endTime', defaultEndTime);
+
+            var attributes = {
+                style: {
+                    width: '50px'
+                }
+            };
+
+            var dash = Html.span({style: {padding: '0 10px'}});
+            dash.dom.innerHTML = '&ndash;';
+
+            var startTimeField = IndicoUI.Widgets.Generic.timeField(attributes);
+            var endTimeField =  IndicoUI.Widgets.Generic.timeField(attributes);
+
+            var element = Widget.block([
+                $B(startTimeField, obj.accessor('startTime')), dash,
+                $B(endTimeField, obj.accessor('endTime')),
+            ]);
+
+            return {'element': element,
+                    'accessor': obj,
+                    'startTimeField': startTimeField,
+                    'endTimeField': endTimeField};
         },
 
         durationField: function(defaultVal, attributes) {

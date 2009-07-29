@@ -137,8 +137,8 @@ var IndicoUtil = {
             // if the key is an int, do not print the label
             if (item.length == 2) {
                 list.push(Html.tr({style:{marginTop:'10px'}},
-                                  Html.td({style:{textAlign:'right'}},Html.label("popUpLabel",item[0]+':')),
-                                  Html.td({}, item[1])));
+                                  Html.td({style:{textAlign:'right', verticalAlign: 'top'}},Html.label("popUpLabel",item[0])),
+                                  Html.td({style:{verticalAlign: 'top'}}, Html.div('popUpTdContent', item[1]))));
             } else {
                 list.push(Html.tr({style:{marginTop:'10px'}},
                                   Html.td(),
@@ -205,6 +205,22 @@ var IndicoUtil = {
 
         return sdatetime;
     },
+
+    /**
+    * Parses a json date object into a JS Date
+    * @param {Dictionary} A dictionary with date and time keys set
+    * @return A JS Date with the parsed date/time
+    */
+   parseJsonDate: function(date) {
+       var year = parseInt(date.date.substr(0,4), 10);
+       var month = parseInt(date.date.substr(5,2), 10);
+       var day = parseInt(date.date.substr(8,2), 10);
+
+       var hour = parseInt(date.time.substr(0,2));
+       var min = parseInt(date.time.substr(3,2));
+
+       return new Date(year, month-1, day, hour, min);
+   },
 
     cachedRpcValue: function(endPoint, method, attributes, cachedValue) {
 
@@ -281,7 +297,17 @@ var IndicoUtil = {
         }
         return valid
     },
-    
+
+    /**
+    * Determines if a string is in a valid time format (hh:mm)
+    * @param {String} s The input string
+    * @return {Booleab} true if the string is a valid time string, false otherwise
+    */
+   isTime: function(s) {
+       var regExp = new RegExp("(^([0-9]|[0-1][0-9]|[2][0-3]):([0-5][0-9])$)");
+       return regExp.test(s);
+   },
+
     /**
      * Marks an input field (text, checkbox or select) as invalid.
      * It will change its CSS class so that it appears red, and place an error tooltip over it on mouseover.
@@ -296,30 +322,30 @@ var IndicoUtil = {
         } else {
             component.dom.className+=' invalid';
         }
-        
+
         var tooltip;
         var oList = []; //list of functions that we will call to stop observing events
-        
+
         var stopObserving = function(){
             each(oList, function(value){
                 value();
             });
         };
-        
+
         oList.push(component.observeEvent('mouseover', function(event){
             tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, error, "tooltipError");
         }));
-        
+
         oList.push(component.observeEvent('mouseout', function(event){
             Dom.List.remove(document.body, tooltip);
         }));
-        
+
         oList.push(component.observeEvent('keypress', function(event){
             component.dom.className = component.dom.className.substring(0, component.dom.className.length-8);
             Dom.List.remove(document.body, tooltip);
             stopObserving();
         }));
-        
+
         oList.push(component.observeEvent('change', function(event){
             component.dom.className = component.dom.className.substring(0, component.dom.className.length-8);
             Dom.List.remove(document.body, tooltip);
@@ -333,7 +359,7 @@ var IndicoUtil = {
                 stopObserving();
             }));
         }
-        
+
         return oList;
     },
 
@@ -351,7 +377,7 @@ var IndicoUtil = {
         var entryList = new WatchList(); //elements to check
         var classList = {}; //original class (style) value for each element to check
         var eventList = {}; //all the 'error' events for each element to check
-        
+
         var radioButtonChecks = {}; //
         var radioButtonLabelStopObserving = {};
 
@@ -398,8 +424,9 @@ var IndicoUtil = {
                 }
                 else if (dataType == 'ip' && !(allowEmpty && trim(component.get()) === '') && !IndicoUtil.isIpAddress(component.get())) {
                     error = Html.span({}, "That doesn't seem like a valid IP Address. Example of valid IP Address: 132.156.31.38");
-                }
-                else if (exists(extraCheckFunction)) {
+                } else if (dataType == 'time' && !IndicoUtil.isTime(trim(component.get()))) {
+                    error = Html.span({}, "Time format is not valid. It should be hh:mm");
+                } else if (exists(extraCheckFunction)) {
                     error = extraCheckFunction(component.get());
                 }
                 //--------------------------------
@@ -408,40 +435,40 @@ var IndicoUtil = {
                 //---- Display error -------
                 if (exists(error)) {
                     hasErrors = true;
-                    
+
                     if (component.dom.type != 'radio') {
                         oList = IndicoUtil.markInvalidField(component, error);
-                    
+
                     } else {
                         component.dom.className += ' invalid';
                         $E(component.dom.id + 'Label').dom.className += ' invalidLabel';
-                        
+
                         var tooltip;
                         var oList = []; //list of functions that we will call to stop observing events
-                        
+
                         var stopObserving = component.observeEvent('mouseover', function(event){
                             tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, error, "tooltipError");
                         });
                         oList.push(stopObserving);
-                        
+
                         var stopObservingLabel = $E(component.dom.id + 'Label').observeEvent('mouseover', function(event){
                             tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, error, "tooltipError");
                         });
-                        
+
                         if (!exists(radioButtonLabelStopObserving[component.dom.name])) {
                             radioButtonLabelStopObserving[component.dom.name] = []
                         }
                         radioButtonLabelStopObserving[component.dom.name].push(stopObserving);
                         radioButtonLabelStopObserving[component.dom.name].push(stopObservingLabel);
-                        
+
                         oList.push(component.observeEvent('mouseout', function(event){
                             Dom.List.remove(document.body, tooltip);
                         }));
-                        
+
                         $E(component.dom.id + 'Label').observeEvent('mouseout', function(event){
                             Dom.List.remove(document.body, tooltip);
                         });
-                        
+
                         component.observeEvent('click', function(event) {
                             each($N(component.dom.name), function(component){
                                 component.dom.className = component.dom.className.substring(0, component.dom.className.length-8);

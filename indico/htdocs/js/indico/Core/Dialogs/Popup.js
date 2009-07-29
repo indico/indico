@@ -40,12 +40,12 @@ type("PopupDialog", ["PopupWidget"], {
     addNonCloseTriggeringElement: function(element) {
         this.nonCloseTriggeringElements.push(element);
     }
-},
+    },
      function(content, triggerElement, closeHandler, nonCloseTriggeringElemets) {
          this.content = content;
          this.PopupWidget();
          this.triggerElement = triggerElement;
-         this.closeHandler = closeHandler;
+         this.closeHandler = any(closeHandler, function() {return true});
          this.nonCloseTriggeringElements = any(nonCloseTriggeringElemets, []);
      }
     );
@@ -60,7 +60,7 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
         var customStyle = any(customStyle, {});
 
 
-        this.greyBg = Html.div({ className: this.printable ? 'noprint' : '', 
+        this.greyBg = Html.div({ className: this.printable ? 'noprint' : '',
             style: {
                 'opacity': 0.5, /* Standard */
                 'filter': 'alpha(opacity=50)', /* IE */
@@ -79,13 +79,13 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
 
         // This is the div that is being printed when user clicks print
         this.content = Html.div({}, content);
-        
+
         this.contentWrapper = Html.div({style: {padding: pixels(10)}}, this.content);
         this.container = Html.div({className: 'exclusivePopup' + (this.printable ? ' noprint' : ''), style: customStyle}, this.contentWrapper);
 
         this.titleDiv = Html.div('title', this.title);
         this.titleWrapper = Html.div('titleWrapper', this.titleDiv);
-        
+
         if (this.title && this.title != '') {
             // A 20*20px div is added into the existing div to set the size, work-around for an IE bug
             this.container.append(Html.div('exclusivePopupTopBg', Html.div({style: {width: '20px', height: '20px'}})));
@@ -104,16 +104,16 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
             });
             this.titleWrapper.append(this.closeButton);
         }
-        
+
         this.printLink = null;
         if (this.showPrintButton) {
             this.printLink = Html.div('printLink', Html.div('printButton fakeLink', 'Print'));
             this.titleWrapper.append(this.printLink);
             this.printLink.observeClick(function() {
-               self.print(); 
+               self.print();
             });
         }
-            
+
 
         return this.PopupWidget.prototype.draw.call(this, this.container, 0, 0);
     },
@@ -148,8 +148,8 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
 
         this.canvas.dom.style.left = pixels(left);
         this.canvas.dom.style.top = pixels(top);
-        
-        // Make sure the title has correct right padding depending on close button and 
+
+        // Make sure the title has correct right padding depending on close button and
         // print button;
         var titlePaddingRight = 20;
         if (this.closeButton)
@@ -166,31 +166,33 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
         }
 
         this.printDiv.dom.innerHTML = this.content.dom.innerHTML;
-        
+
         this.Printable.prototype.print.call(this, this.printDiv);
     }
     },
      function (title, closeButtonHandler, printable, showPrintButton) {
          this.title = any(title, null);
-         
+
          // Called when user clicks the close button, if the function
          // returns true the dialog will be closed.
          this.closeHandler = any(closeButtonHandler, null);
-         
+
          // The maximum allowed height, used since it doesn't look
          // very nice it the dialog gets too big.
          this.maxHeight = 600;
-         
+
          // Decides whether the popup should be printable. That is, when the user
          // clicks print only the content of the dialog will be printed not the
          // whole page. Should be true in general unless the dialog is containing
          // something users normally don't want to print, i.e. the loading dialog.
          this.printable = any(printable, true);
-         
+
          // Whether to show the print button or not in the title
          // Note: the button will only be shown if the popup dialog has a title.
          // and is printable.
          this.showPrintButton = any(showPrintButton && title && printable, false);
+
+         this.PopupWidget();
     }
 );
 
@@ -212,7 +214,7 @@ type("BalloonPopup", ["PopupDialog"], {
         var toReturn = this.PopupDialog.prototype.draw.call(this, this.mainDiv, x, y);
 
         this.arrowDiv.dom.style.left = pixels(0);
-        this.closeButton.observeClick(function() {self.close()});
+        this.closeButton.observeClick(function() {self.close();});
 
         return toReturn;
     },
@@ -294,14 +296,11 @@ type("BalloonPopup", ["PopupDialog"], {
         this.canvas.dom.style.left   = pixels(leftPos);
         this.arrowDiv.dom.style.left = pixels(this.x - leftPos - Math.floor(this.arrowWidth/2));
     },
-    close: function() {
-        this.PopupDialog.prototype.close.call(this);
-    },
     getBalloonHeight: function() {
         return this.balloonContent.dom.offsetHeight +
             this.arrowDiv.dom.offsetHeight;
     }
-},
+    },
      function(content, triggerElement, closeHandler) {
          this.PopupDialog(content, triggerElement, closeHandler);
 
@@ -310,7 +309,7 @@ type("BalloonPopup", ["PopupDialog"], {
          this.arrowWidth = 35;
          this.cornerRadius = 6;
      }
-    );
+);
 
 /**
  * Utility function to display a popup with errors.

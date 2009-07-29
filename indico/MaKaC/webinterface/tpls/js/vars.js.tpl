@@ -1,5 +1,6 @@
 <% from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase %>
 <% from MaKaC.common import Config %>
+<% import MaKaC.common.info as info %>
 <% 
 authenticators = Config.getInstance().getAuthenticatorList() 
 extAuths = []
@@ -76,6 +77,8 @@ var Indico = {
         
         SessionModification: "<%= urlHandlers.UHSessionModification.getURL() %>",
         ContributionModification: "<%= urlHandlers.UHContributionModification.getURL() %>",
+        BreakModification: "<%= urlHandlers.UHConfModifyBreak.getURL() %>",
+        Reschedule: "<%= urlHandlers.UHConfModifReschedule.getURL() %>",
 
         UploadAction: {
             subContribution: '<%= str(urlHandlers.UHSubContribModifAddMaterials.getURL()) %>',
@@ -94,6 +97,7 @@ var Indico = {
         WeekDays: <%= [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ] %> },
 
     Settings: {
-        ExtAuthenticators: <%= extAuths %>
+        ExtAuthenticators: <%= extAuths %>,
+        RoomBookingModuleActive: <%= jsBoolean(info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()) %>
     }
 };

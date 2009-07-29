@@ -263,7 +263,7 @@ $E('inPlaceEditLocation').set([
     IndicoUI.Widgets.roomParamsShow,
     function(target, source){
         var info = $O(source.get().getAll());
-        var rbWidget = new RoomBookingWidget(info, null, <%= jsBoolean(rbActive) %>, false);
+        var rbWidget = new RoomBookingWidget(info, null, false);
 	target.set(rbWidget.draw())
         return {
 	  activate: function(){},

@@ -110,12 +110,12 @@ function highlightWithMouse(observable, target) {
         var s = bgColor.match(/rgb\((\d+), (\d+), (\d+)\)/);
         if (!s) {
             s = bgColor.match(/#(..)(..)(..)/);
+            if (!s) {
+                return;
+            }
             s[1] = parseInt('0x'+s[1],16);
             s[2] = parseInt('0x'+s[2],16);
             s[3] = parseInt('0x'+s[3],16);
-            if (!s) {
-                return;
-	    }
         }
 	
         s[1] = Math.floor(s[1]*1.05);

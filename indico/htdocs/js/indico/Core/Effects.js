@@ -109,11 +109,15 @@ IndicoUI.Effect = {
             element.dom.style.backgroundColor = '';
         }
     },
-    
-    fade: function(eid, TimeToFade) {
+
+    fade: function(element, TimeToFade) {
         if (!exists(TimeToFade))
             TimeToFade = 500.0
-        var element = document.getElementById(eid);
+
+        if (typeof element == "string")
+            element = $E(element);
+
+        var element = element.dom;
         if(element == null)
             return;
 
@@ -126,7 +130,7 @@ IndicoUI.Effect = {
                 element.FadeState = -2;
             }
         }
-        
+
         if(element.FadeState == 1 || element.FadeState == -1) {
             element.FadeState = element.FadeState == 1 ? -1 : 1;
             element.FadeTimeLeft = TimeToFade - element.FadeTimeLeft;
@@ -134,15 +138,13 @@ IndicoUI.Effect = {
         else {
             element.FadeState = element.FadeState == 2 ? -1 : 1;
             element.FadeTimeLeft = TimeToFade;
-            setTimeout(function() {animateFade(new Date().getTime(), eid);}, 33);
+            setTimeout(function() {animateFade(new Date().getTime(), element);}, 33);
         }
-      
-        animateFade = function(lastTick, eid) {  
+
+        animateFade = function(lastTick, element) {
             var curTick = new Date().getTime();
             var elapsedTicks = curTick - lastTick;
-        
-            var element = document.getElementById(eid);
-        
+
             if(element.FadeTimeLeft <= elapsedTicks) {
                 element.style.opacity = element.FadeState == 1 ? '1' : '0';
                 element.style.filter = 'alpha(opacity = ' + (element.FadeState == 1 ? '100' : '0') + ')';
@@ -152,16 +154,16 @@ IndicoUI.Effect = {
                 element.FadeState = element.FadeState == 1 ? 2 : -2;
                 return;
             }
-        
+
             element.FadeTimeLeft -= elapsedTicks;
             var newOpVal = element.FadeTimeLeft/TimeToFade;
             if(element.FadeState == 1)
                 newOpVal = 1 - newOpVal;
-        
+
             element.style.opacity = newOpVal;
             element.style.filter = 'alpha(opacity = ' + (newOpVal*100) + ')';
-        
-            setTimeout("animateFade(" + curTick + ",'" + eid + "')", 33);
+
+            setTimeout(function() {animateFade(curTick, element)}, 33);
         };
     },
 
@@ -229,34 +231,34 @@ IndicoUI.Effect = {
 
         return elem;
     },
-    
+
     slide: function(elemId, elemHeight) {
-        
+
         /**
-         * 
+         *
          * Before using this Effect your 'elem' should be initialize.
-         * 1) If you want that the element is hidden at the beginning (on load), then:  
-         * 
+         * 1) If you want that the element is hidden at the beginning (on load), then:
+         *
          *      a)
-         * 
+         *
          *          <div id="myElem" style="visibility: hidden; overflow: hidden;">...</div>
          *      b)
          *          $E(myElem).dom.style.height = '0';
          *          $E(myElem).dom.style.visibility = "visible";
          *          $E(myElem).dom.style.opacity = "0";
          * 2) If you want that the element is visible at the beginning  (on load):
-         * 
+         *
          *      a)
-         * 
+         *
          *          <div id="myElem">...</div>
-         *      b) 
+         *      b)
          *          Nothing to do.
-         *          
-         *          
+         *
+         *
          * @param elemId ID of the element
-         * @param elemHeight $(elemId).dom.offsetHeight; The elem should be visible or 
-         * hidden in order to get the offsetHeight, but not display: none. 
-         * 
+         * @param elemHeight $(elemId).dom.offsetHeight; The elem should be visible or
+         * hidden in order to get the offsetHeight, but not display: none.
+         *
          */
         var elem = $E(elemId);
         elem.dom.style.overflow='hidden';
@@ -286,9 +288,9 @@ IndicoUI.Effect = {
                     elem.dom.style.height = '0px';
                 }
             };
-            setTimeout(function(){decHeight();}, 20); 
+            setTimeout(function(){decHeight();}, 20);
         }
-        
+
     }
 
 

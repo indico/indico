@@ -69,8 +69,9 @@ from MaKaC.common.utils import getHierarchicalId
 from MaKaC.i18n import _
 from MaKaC.common.PickleJar import Retrieves
 from MaKaC.common.PickleJar import Updates
-from MaKaC.common.PickleJar import Conversion
 from MaKaC.common.PickleJar import if_else
+from MaKaC.common.PickleJar import DictPickler
+from MaKaC.common.Conversion import Conversion
 
 from MaKaC.webinterface import urlHandlers
 
@@ -1902,6 +1903,10 @@ class Conference(Persistent):
 
     @Retrieves ('MaKaC.conference.Conference', 'displayURL', lambda conf: str(urlHandlers.UHConferenceDisplay.getURL(conf)))
     @Retrieves ('MaKaC.conference.Conference', 'modifURL', lambda conf: str(urlHandlers.UHConferenceModification.getURL(conf)))
+    @Retrieves(['MaKaC.conference.Conference'], 'sessions', lambda conf: DictPickler.pickle(Conversion.sessionList(conf)))
+    @Retrieves(['MaKaC.conference.Conference'], 'isConference', lambda x : x.getType() == 'conference')
+
+
     def __init__(self, creator, id="", creationDate = None, modificationDate = None):
         """Class constructor. Initialise the class attributes to the default
             values.
@@ -3153,6 +3158,8 @@ class Conference(Persistent):
     def getOwnLocation( self ):
         return self.getLocation()
 
+    @Retrieves(['MaKaC.conference.Conference'], 'location', Conversion.locationName)
+    @Retrieves(['MaKaC.conference.Conference'], 'address', Conversion.locationAddress)
     def getLocation( self ):
         if len(self.places)>0:
             return self.places[0]
@@ -3171,6 +3178,7 @@ class Conference(Persistent):
     def getOwnRoom( self ):
         return self.getRoom()
 
+    @Retrieves(['MaKaC.conference.Conference'], 'room', Conversion.roomName)
     def getRoom( self ):
         if len(self.rooms)>0:
             return self.rooms[0]
@@ -5070,6 +5078,9 @@ class Session(Persistent):
         conference but it is allowed for flexibility.
     """
 
+
+    @Retrieves(['MaKaC.conference.Session'], 'numSlots', lambda x : len(x.getSlotList()))
+
     def __init__(self, **sessionData):
         """Class constructor. Initialise the class attributes to the default
             values.
@@ -5110,7 +5121,7 @@ class Session(Persistent):
         self._coordinatorsEmail = []
         self._code=""
         self._color="#e3f2d3"
-        self._textColor="#777777"
+        self._textColor="#202020"
         self._textColorToLinks=False
         self._ttType=SlotSchTypeFactory.getDefaultId()
         self._closed = False
@@ -5648,7 +5659,7 @@ class Session(Persistent):
             if self._textColor:
                 pass
         except AttributeError:
-            self._textColor="#777777"
+            self._textColor="#202020"
         return self._textColor
 
     def setTextColor(self,newColor):
@@ -5668,6 +5679,7 @@ class Session(Persistent):
     def getStartDate(self):
         return self.startDate
 
+    @Retrieves(['MaKaC.conference.Session'], 'startDate', Conversion.datetime)
     def getAdjustedStartDate(self,tz=None):
         if not tz:
             tz = self.getConference().getTimezone()
@@ -5851,6 +5863,8 @@ class Session(Persistent):
         """
         return self.getConference()
 
+    @Retrieves(['MaKaC.conference.Session'], 'location', Conversion.locationName)
+    @Retrieves(['MaKaC.conference.Session'], 'address', Conversion.locationAddress)
     def getLocation( self ):
         if self.getOwnLocation():
             return self.getOwnLocation()
@@ -5874,6 +5888,7 @@ class Session(Persistent):
             self.places.append( newLocation )
         self.notifyModification()
 
+    @Retrieves(['MaKaC.conference.Session'], 'room', Conversion.roomName)
     def getRoom( self ):
         if self.getOwnRoom():
             return self.getOwnRoom()
@@ -6269,6 +6284,7 @@ class Session(Persistent):
             return self.materials[ matId ]
         return None
 
+    @Retrieves (['MaKaC.conference.Session'],'material', isPicklableObject=True)
     def getMaterialList( self ):
         return self.materials.values()
 
@@ -7021,7 +7037,8 @@ class SessionSlot(Persistent):
         """
         return self.session
 
-    @Retrieves(['MaKaC.conference.SessionSlot'], 'location', Conversion.roomName)
+    @Retrieves(['MaKaC.conference.SessionSlot'], 'location', Conversion.locationName)
+    @Retrieves(['MaKaC.conference.SessionSlot'], 'address', Conversion.locationAddress)
     def getLocation( self ):
         if self.getOwnLocation():
             return self.getOwnLocation()
@@ -7155,6 +7172,7 @@ class SessionSlot(Persistent):
             res=self.getSession().getColor()
         return res
 
+    @Retrieves(['MaKaC.conference.SessionSlot'], 'textColor')
     def getTextColor(self):
         res=""
         if self.getSession() is not None:
@@ -9008,6 +9026,7 @@ class Contribution(Persistent):
             return self.materials[ matId ]
         return None
 
+    @Retrieves (['MaKaC.conference.Contribution'],'material', isPicklableObject=True)
     def getMaterialList( self ):
         return self.materials.values()
 
@@ -10265,6 +10284,7 @@ class SubContribution(Persistent):
             return self.materials[ matId ]
         return None
 
+    @Retrieves (['MaKaC.conference.SubContribution'],'material', isPicklableObject=True)
     def getMaterialList( self ):
         return self.materials.values()
 

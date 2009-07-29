@@ -15,7 +15,8 @@ type("UnscheduledContributionList", ["ListWidget"],
                       }
                   });
 
-             var item = Html.div({}, elem.id + ' - ' + elem.title + ' (' + speakers + ')');
+             var id = Html.em({style: {paddingLeft: "5px", fontSize: '0.9em'}}, elem.id);
+             var item = Html.div({},  elem.title + ( speakers ? (' (' + speakers + ')') : ''), id);
 
              item.observeClick(function() {
                  selected = !selected;
@@ -43,11 +44,18 @@ type("UnscheduledContributionList", ["ListWidget"],
 
          this.ListWidget('UnscheduledContribList');
 
-         each(existing,
-              function(item) {
-                  self.add(item);
-              });
+         // Sort by name and add to the list
+         var items = {};
+         each(existing, function(item) {
+             items[item.title + item.id] = item;
      });
+         var ks = keys(items);
+         ks.sort();
+         for (k in ks) {
+             this.add(items[ks[k]]);
+         }
+     }
+);
 
 type("AddContributionDialog", ["ExclusivePopup", "PreLoadHandler"],
      {
@@ -107,13 +115,13 @@ type("AddContributionDialog", ["ExclusivePopup", "PreLoadHandler"],
 
              indicoRequest(self.args.session?'schedule.slot.scheduleContributions':
                            'schedule.event.scheduleContributions', args, function(result, error){
-                 if (error) {
                      killProgress();
+                 if (error) {
                      IndicoUtil.errorReport(error);
                  }
                  else {
                      self.close();
-                     window.location.reload(true);
+                     self.successFunc(result);
                  }
              });
          },
@@ -122,18 +130,6 @@ type("AddContributionDialog", ["ExclusivePopup", "PreLoadHandler"],
              var self = this;
 
              var unscheduledList = new UnscheduledContributionList(self.existing);
-
-             var daySelect = bind.element(
-                 Html.select({style:{marginLeft: '20px'}}),
-                 this.dayList,
-                 function(elem) {
-                     return Html.option({value: elem}, elem);
-                 }
-             );
-
-             if (this.selectedDays.length == 1) {
-                 daySelect.set(this.selectedDays[0]);
-             }
 
              var chooseDialog = Html.div(
                  {},
@@ -155,24 +151,25 @@ type("AddContributionDialog", ["ExclusivePopup", "PreLoadHandler"],
                                       $T("Choose one (or more) unscheduled"),
                                       Html.div("UnscheduledContribListDiv",
                                                unscheduledList.draw()),
-                                      this.dayList.length==1?'':[$T("Add to "), daySelect],
                                       Widget.button(command(function() {
                                           self.addExisting(unscheduledList.getList(),
-                                                           daySelect.get());
-                                      }, $T("Add selected")))
+                                                           self.selectedDay);
+                                      }, "Add selected"))
                                      )));
 
              return this.ExclusivePopup.prototype.draw.call(this, Html.span({}, chooseDialog));
          }
      },
-     function(dayList, selectedDays, method, timeStartMethod, args, roomInfo, parentRoomData, confStartDate, dayStartDate, crbsActive, isConference) {
+     function(method, timeStartMethod, args, roomInfo, parentRoomData,
+              confStartDate, dayStartDate, isConference, successFunc) {
          var self = this;
 
-         this.newArgs = Array.prototype.slice.call(arguments, 2);
+         this.newArgs = Array.prototype.slice.call(arguments, 0);
 
          this.args = args;
-         this.dayList = dayList;
-         this.selectedDays = selectedDays;
+         this.selectedDay = dayStartDate;
+
+         this.successFunc = successFunc;
 
          this.PreLoadHandler(
              self._preload,
@@ -236,7 +233,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
         }
     ],
     _success: function(response) {
-        window.location.reload(true);
+        //window.location.reload(true);
     },
 
     draw: function() {
@@ -249,7 +246,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
 
         info.set('roomInfo', $O(self.roomInfo));
 
-        var roomEditor = new RoomBookingWidget(info.get('roomInfo'), self.parentRoomData, self.crbsActive, true, self.args.conference);
+        var roomEditor = new RoomBookingWidget(info.get('roomInfo'), self.parentRoomData, true, self.args.conference);
 
         var presListWidget = new UserListField(
             'VeryShortPeopleListDiv', 'PluginPeopleList',
@@ -340,7 +337,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
             [
                 [$T('Author(s)'), authorListWidget.draw()],
                 [$T('Co-author(s)'), coauthorListWidget.draw()]
-            ]);	
+            ]);
     },
 
     _drawNewForm: function() {
@@ -356,13 +353,15 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
             });
 
             indicoRequest(self.method, info, function(result, error){
-                if (error) {
                     killProgress();
+                if (error) {
                     IndicoUtil.errorReport(error);
                 }
                 else {
                     self.close();
-                    window.location.reload(true);
+                    // Only one element is returned but put it in an array
+                    // since the successFunc expects arrays
+                    self.successFunc([result]);
                 }
             });
         };
@@ -400,7 +399,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
      /**
       * @param timeStartMethod rpc_method_name if this parameter is null, the date will not be shown in the form.
       */
-     function(method, timeStartMethod, args, roomInfo, parentRoomData, confStartDate, dayStartDate, crbsActive, isConference) {
+     function(method, timeStartMethod, args, roomInfo, parentRoomData, confStartDate, dayStartDate, isConference, successFunc) {
          this.args = clone(args);
 
          this.dateArgs = clone(args);
@@ -410,10 +409,10 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
          this.roomInfo = roomInfo;
          this.confStartDate = confStartDate;
          this.datStartDate = dayStartDate;
-         this.crbsActive = crbsActive;
          this.parentRoomData = parentRoomData;
          this.existing = existing;
          this.isConference = isConference;
+         this.successFunc = successFunc;
 
          if (this.timeStartMethod == null) {
              this.dateTimeField = IndicoUI.Widgets.Generic.durationField(20);

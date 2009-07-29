@@ -34,8 +34,8 @@ from pytz import timezone
 from MaKaC.common.utils import daysBetween
 from MaKaC.common.PickleJar import Retrieves
 from MaKaC.common.PickleJar import Updates
-from MaKaC.common.PickleJar import Conversion
 from MaKaC.common.PickleJar import DictPickler
+from MaKaC.common.Conversion import Conversion
 
 import MaKaC.conference
 class Schedule:
@@ -920,19 +920,23 @@ class LinkedTimeSchEntry(TimeSchEntry):
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'title', lambda x: x.getOwner().getSession().getTitle())
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'slotTitle', lambda x: x.getOwner().getTitle())
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'id', Conversion.locatorString)
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'sessionId', lambda x: x.getOwner().getSession().getId())
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'sessionSlotId', lambda x: x.getOwner().getId())
     @Retrieves(['MaKaC.schedule.LinkedTimeSchEntry'], 'entryType', lambda x: 'Session')
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'material', lambda x: DictPickler.pickle(x.getOwner().getSession().getMaterialList()))
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'color', lambda x: x.getOwner().getSession().getColor())
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'textColor', lambda x: x.getOwner().getSession().getTextColor())
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'isPoster', lambda x: x.getOwner().getSession().getScheduleType() == 'poster')
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'room', lambda x: Conversion.roomName(x.getOwner().getSession().getRoom()))
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'location', lambda x: Conversion.roomName(x.getOwner().getSession().getLocation()))
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'location', lambda x: Conversion.locationName(x.getOwner().getSession().getLocation()))
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'address', lambda x: Conversion.locationAddress(x.getOwner().getSession().getLocation()))
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'description', lambda x: x.getOwner().getSession().getDescription())
-    @Retrieves(['MaKaC.schedule.ContribSchEntry','MaKaC.schedule.LinkedTimeSchEntry'],
-               'conferenceId',
+    @Retrieves(['MaKaC.schedule.ContribSchEntry','MaKaC.schedule.LinkedTimeSchEntry'], 'conferenceId',
                lambda x: x.getOwner().getConference().getId())
-
-    @Retrieves(['MaKaC.schedule.LinkedTimeSchEntry'],
-               'sessionId',
-               lambda x: x.getOwner().getSession().getId())
-
+    @Retrieves (['MaKaC.schedule.ContribSchEntry','MaKaC.schedule.LinkedTimeSchEntry'], 'scheduleEntryId',
+                lambda x: x.getId())
+    @Retrieves (['MaKaC.schedule.ContribSchEntry','MaKaC.schedule.LinkedTimeSchEntry'], 'scheduleEntryType',
+                lambda x: type(x).__name__)
 
     def __init__(self,owner):
         SchEntry.__init__(self)
@@ -1102,13 +1106,15 @@ class IndTimeSchEntry(TimeSchEntry):
 
 class BreakTimeSchEntry(IndTimeSchEntry):
 
-    @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'],
-               'entryType',               
-               lambda x: 'Break')
+    @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'], 'entryType', lambda x: 'Break')
+    @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'], 'conferenceId', lambda x: x.getOwner().getConference().getId())
+    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'sessionId', Conversion.parentSession)
+    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'sessionSlotId', Conversion.parentSlot)
+    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'scheduleEntryId', lambda x: x.getId())
     def __init__(self):
         IndTimeSchEntry.__init__(self)
         self._color="#90C0F0"
-        self._textColor="#777777"
+        self._textColor="#202020"
         self._textColorToLink=False
     
     def clone(self, owner):
@@ -1220,7 +1226,7 @@ class BreakTimeSchEntry(IndTimeSchEntry):
         if data.has_key("autotextcolor"):
             self._textColor=utils.getTextColorFromBackgroundColor(self.getColor())
         else:
-            self._textColor=data.get("textColor","#777777")
+            self._textColor=data.get("textColor","#202020")
         self.setTextColorToLinks(data.has_key("textcolortolinks"))
         if data.has_key("title"):
             self.setTitle(data["title"])
@@ -1369,12 +1375,13 @@ class BreakTimeSchEntry(IndTimeSchEntry):
     def setTextColor(self,newColor):
         self._textColor=newColor
 
+    @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'], 'textColor')
     def getTextColor(self):
         try:
             if self._textColor:
                 pass
         except AttributeError:
-            self._textColor="#777777"
+            self._textColor="#202020"
         return self._textColor
 
     def setTextColorToLinks(self,v):
@@ -1396,15 +1403,11 @@ class BreakTimeSchEntry(IndTimeSchEntry):
 
 class ContribSchEntry(LinkedTimeSchEntry):
 
-    @Retrieves(['MaKaC.schedule.ContribSchEntry'],
-               'entryType',               
-                lambda x: 'Contribution')
-    @Retrieves(['MaKaC.schedule.ContribSchEntry'],
-               'sessionId',               
-               Conversion.parentSession)
-    @Retrieves(['MaKaC.schedule.ContribSchEntry'],
-               'contributionId',
-               lambda x: x.getOwner().getId())
+    @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'entryType', lambda x: 'Contribution')
+    @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'sessionId', Conversion.parentSession)
+    @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'sessionSlotId', Conversion.parentSlot)
+    #@Retrieves (['MaKaC.schedule.ContribSchEntry'], 'contributionId', lambda x: x.getOwner().getId())
+    @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'material', lambda x: DictPickler.pickle(x.getOwner().getMaterialList()))
     @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'description', lambda x: x.getOwner().getDescription())
     @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'presenters', lambda x: x.getOwner().getSpeakerList(), isPicklableObject=True)
 
@@ -1427,7 +1430,7 @@ class ContribSchEntry(LinkedTimeSchEntry):
     def getRoom(self):
         return self.getOwner().getRoom()
 
-    @Retrieves (['MaKaC.schedule.ContribSchEntry'],'location', Conversion.roomName)
+    @Retrieves (['MaKaC.schedule.ContribSchEntry'],'location', Conversion.locationName)
     def getLocation(self):
         return self.getOwner().getLocation()
         
@@ -1452,10 +1455,12 @@ class ScheduleToJson:
                 if obj.getAdjustedStartDate(tz).date() != day.date():
                     continue
                 
+                #raise "duration: " + (datetime(1900,1,1)+obj.getDuration()).strftime("%Hh%M'") + ''
                 pickledData = DictPickler.pickle(obj, timezone=tz)
                 genId = pickledData['id']
 
                 dayEntry[genId] = pickledData
+                dayEntry[genId]['duration'] = int(obj.getDuration().seconds / 60)
 
                 # sessions that are no poster sessions will be expanded
                 if dayEntry[genId]['entryType'] == 'Session':
@@ -1472,10 +1477,6 @@ class ScheduleToJson:
 
                     dayEntry[genId]['entries'] = entries
 
-                    if (session.getScheduleType() == 'poster'):
-                        dayEntry[genId]['isPoster'] = True
-                        
-                
             scheduleDict[day.strftime("%Y%m%d")] = dayEntry
 
         return json.encode(scheduleDict)

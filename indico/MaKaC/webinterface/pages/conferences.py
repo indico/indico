@@ -20,7 +20,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 
-import urllib 
+import urllib
 import os
 import string
 import random
@@ -70,6 +70,7 @@ from MaKaC.i18n import _
 from MaKaC.plugins import importPlugin
 from MaKaC.modules.base import ModulesHolder
 import MaKaC.webcast as webcast
+from MaKaC.common.PickleJar import DictPickler
 
 def stringToDate( str ):
     #Don't delete this dictionary inside comment. Its purpose is to add the dictionary in the language dictionary during the extraction!
@@ -79,7 +80,7 @@ def stringToDate( str ):
     return datetime(int(year),months[month],int(day))
 
 class WPConferenceBase( base.WPDecorated ):
-    
+
     def __init__( self, rh, conference ):
         WPDecorated.__init__( self, rh )
         self._navigationTarget = self._conf = conference
@@ -97,23 +98,23 @@ class WPConferenceBase( base.WPDecorated ):
         categId = rh._getSession().getVar("currentCategoryId")
         if categId != None:
             self._parentCateg = self._conf.getOwnerById(categId)
-            
+
     def _getFooter( self ):
         """
         """
         wc = wcomponents.WFooter()
-            
+
         p = {"modificationDate":self._conf.getModificationDate().strftime("%d %B %Y %H:%M"),
              "subArea": self._getSiteArea()}
         return wc.getHTML(p)
-        
+
     def getLoginURL( self ):
         wf = self._rh.getWebFactory()
         if wf:
             return WPDecorated.getLoginURL(self)
-        
+
         return urlHandlers.UHConfSignIn.getURL(self._conf,"%s"%self._rh.getCurrentURL())
-    
+
     def getLogoutURL( self ):
         return urlHandlers.UHSignOut.getURL(str(urlHandlers.UHConferenceDisplay.getURL(self._conf)))
 
@@ -138,7 +139,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
                 id = self._conf.getId()
             p["shortURL"] =  Config.getInstance().getShortEventURL() + id
         return wc.getHTML(p)
-    
+
     def _getHeader( self ):
         """
         """
@@ -147,7 +148,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
                              "logoutURL": self.getLogoutURL(),\
                              "loginAsURL": self.getLoginAsURL(), \
                              "dark": True} )
-        
+
     def _defineSectionMenu( self ):
         awUser = self._getAW().getUser()
         self._sectionMenu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
@@ -165,7 +166,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
         else:
             self._abstractsBookOpt.setVisible(True)
         self._trackMgtOpt = self._sectionMenu.getLinkByName("manageTrack")
-        
+
         #registration form
         self._regFormOpt = self._sectionMenu.getLinkByName("registrationForm")
         self._viewRegFormOpt = self._sectionMenu.getLinkByName("ViewMyRegistration")
@@ -183,7 +184,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
             self._registrantsListOpt.setVisible(False)
         else:
             self._registrantsListOpt.setVisible(True)
-            
+
         #evaluation
         evaluation = self._conf.getEvaluation()
         self._evaluationOpt = self._sectionMenu.getLinkByName("evaluation")
@@ -196,9 +197,9 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
         else:
             self._newEvaluationOpt.setVisible(True)
             self._viewEvaluationOpt.setVisible(False)
-        
-            
-        
+
+
+
         self._sectionMenu.setCurrentItem(None)
 
         self._timetableOpt = self._sectionMenu.getLinkByName("timetable")
@@ -238,45 +239,45 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
             self._trackMgtOpt.setVisible(True)
             if not self._conf.hasEnabledSection("cfa"):
                 self._trackMgtOpt.setVisible(False)
-        
-        
+
+
         self._abstractReviewingMgtOpt=self._sectionMenu.getLinkByName("manageabstractreviewing")
         self._abstractReviewingMgtOpt.setVisible(False)
-        
+
         self._paperReviewingMgtOpt=self._sectionMenu.getLinkByName("managepaperreviewing")
         self._paperReviewingMgtOpt.setVisible(False)
-        
+
         self._judgeListOpt=self._sectionMenu.getLinkByName("judgelist")
         self._judgeListOpt.setVisible(False)
         self._assignContribOpt=self._sectionMenu.getLinkByName("assigncontributions")
         self._assignContribOpt.setVisible(False)
-        
+
         if awUser != None and self._conf.hasEnabledSection('paperReviewing'):
-            
+
             conferenceRoles = awUser.getLinkedTo()["conference"]
-                   
+
             if "abstractManager" in conferenceRoles:
                 if self._conf in awUser.getLinkedTo()["conference"]["abstractManager"]:
                     self._abstractReviewingMgtOpt.setVisible(True)
-                    
+
             if "paperReviewManager" in conferenceRoles:
                 if self._conf in awUser.getLinkedTo()["conference"]["paperReviewManager"]:
                     self._paperReviewingMgtOpt.setVisible(True)
-    
+
             if "referee" in conferenceRoles and "editor" in conferenceRoles and "reviewer" in conferenceRoles:
                 show = self._conf in awUser.getLinkedTo()["conference"]["referee"] or \
                        self._conf in awUser.getLinkedTo()["conference"]["editor"] or \
                        self._conf in awUser.getLinkedTo()["conference"]["reviewer"]
                 if show:
                     self._judgeListOpt.setVisible(True)
-                
+
                 if self._conf in awUser.getLinkedTo()["conference"]["referee"]:
                     self._assignContribOpt.setVisible(True)
-            
+
 
     def _defineToolBar(self):
         pass
-    
+
     def _display( self, params ):
         self._defineSectionMenu()
         self._toolBar=wcomponents.WebToolBar()
@@ -309,10 +310,10 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
         urlOpen = urlHandlers.UHConferenceDisplayMenuOpen.getURL(self._conf)
         urlOpen.addParam("currentURL",self._rh.getCurrentURL())
         menuStatus = self._rh._getSession().getVar("menuStatus") or "open"
-        
+
         wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
         webcastURL = wm.isOnAir(self._conf)
-        
+
         frameParams = {\
             "confModifURL": urlHandlers.UHConferenceModification.getURL(self._conf), \
             "logoURL": urlHandlers.UHConferenceLogo.getURL( self._conf), \
@@ -324,7 +325,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
             "webcastURL": webcastURL }
         if self._conf.getLogo():
             frameParams["logoURL"] = urlHandlers.UHConferenceLogo.getURL( self._conf)
-           
+
         colspan=""
         imgOpen=""
         padding=""
@@ -340,7 +341,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
                            </tr>
                       </table>"""%(quoteattr(str(urlOpen)),Config.getInstance().getSystemIconURL("openMenuIcon"))
             padding=""" style="padding:0px" """
- 
+
         body = """
             <div class="confBodyBox clearfix" %s %s>
 
@@ -348,23 +349,23 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
                                         <div>%s</div>
                                         <div class="breadcrumps">%s</div>
                                         <div style="float:right;">%s</div>
-                                    </div> 
+                                    </div>
                 <!--Main body-->
-                                    <div class="mainContent"> 
+                                    <div class="mainContent">
                                         <div class="col2">
                                         %s
                                         </div>
                                   </div>
             </div>"""%(colspan,padding,imgOpen,
-                    self._getNavigationBarHTML(), 
+                    self._getNavigationBarHTML(),
                     self._getToolBarHTML().strip(),
                     body)
-        return frame.getHTML( self._sectionMenu, body, frameParams)        
+        return frame.getHTML( self._sectionMenu, body, frameParams)
 
     def _getHeadContent( self ):
         #This is used for fetching the default css file for the conference pages
-        #And also the modificated uploaded css 
-         
+        #And also the modificated uploaded css
+
         path = baseurl = self._getBaseURL()
         printCSS = """
         <link rel="stylesheet" type="text/css" href="%s/css/Conf_Basic.css" >
@@ -372,8 +373,8 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
         confCSS = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getStyleManager().getCSS()
         if confCSS:
             printCSS = printCSS + """<link rel="stylesheet" type="text/css" href="%s">"""%(confCSS.getURL())
-        return printCSS        
-    
+        return printCSS
+
     def _applyDecoration( self, body ):
         body = self._applyConfDisplayDecoration( body )
         return WPConferenceBase._applyDecoration( self, body )
@@ -383,7 +384,7 @@ class WConfDisplayFrame(wcomponents.WTemplated):
     def __init__(self, aw, conf):
         self._aw = aw
         self._conf = conf
-    
+
     def getHTML( self, menu, body, params ):
         self._body = body
         self._menu = menu
@@ -396,7 +397,7 @@ class WConfDisplayFrame(wcomponents.WTemplated):
             vars["logo"] = "<img src=\"%s\" alt=\"%s\" border=\"0\" class=\"confLogo\" >"%(vars["logoURL"], escape_html(self._conf.getTitle(), escape_quotes = True))
         vars["confTitle"] = self._conf.getTitle()
         vars["displayURL"] = urlHandlers.UHConferenceDisplay.getURL(self._conf)
-        vars["imgConferenceRoom"] = Config.getInstance().getSystemIconURL( "conferenceRoom" ) 
+        vars["imgConferenceRoom"] = Config.getInstance().getSystemIconURL( "conferenceRoom" )
         tz = DisplayTZ(self._aw,self._conf).getDisplayTZ()
         adjusted_sDate = self._conf.getAdjustedStartDate(tz)
         adjusted_eDate = self._conf.getAdjustedEndDate(tz)
@@ -419,23 +420,23 @@ class WConfDisplayFrame(wcomponents.WTemplated):
             "supportEmail": vars["supportEmail"] \
             }
         vars["menu"] = ConfDisplayMenu( self._menu ).getHTML(p)
-        
+
         dm = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf)
         format = dm.getFormat()
         vars["bgColorCode"] = format.getFormatOption("titleBgColor")["code"]
         vars["textColorCode"] = format.getFormatOption("titleTextColor")["code"]
-        
+
         if (Config.getInstance().getIndicoSearchServer() != '') and dm.getSearchEnabled():
             vars["searchBox"] = wcomponents.WMiniSearchBox(self._conf.getId()).getHTML()
         else:
             vars["searchBox"] = ""
-        return vars                      
+        return vars
 
 class ConfDisplayMenu:
-    
+
     def __init__(self, menu):
         self._menu = menu
-    
+
     def getHTML(self, params):
         html = []
         if params["menuStatus"] == "open" and self._menu:
@@ -455,11 +456,11 @@ class ConfDisplayMenu:
                                 <div class="confSupportEmailBox">%s</div>
                         </div>"""%params["supportEmail"])
         return "".join(html)
-    
+
     def _getLinkHTML(self, link, indent=""):
         if not link.isVisible():
             return ""
-        
+
         if link.getType() == "spacer":
             html = """<tr><td><br></td></tr>\n"""
             try:
@@ -469,7 +470,7 @@ class ConfDisplayMenu:
                     html = """<li class="menuConfMiddleCell"><br><li>\n"""
             except Exception:
                 pass
-            
+
         else:
             target = ""
             sublinkList=[]
@@ -489,10 +490,10 @@ class ConfDisplayMenu:
             else:
                 html = ["""<li id="menuLink_%s" class="menuConfTitle" nowrap><a class="confSection" href="%s"%s>%s</a>\n"""%
                             (link.getName(), link.getURL(), target, link.getCaption())]
-                
+
             if len(sublinkList) > 0:
                 html += """<ul class="inner">"""
-                
+
             for sublink in sublinkList:
                 target = ""
                 if isinstance(link, displayMgr.ExternLink):
@@ -505,20 +506,20 @@ class ConfDisplayMenu:
                     html.append( """<li id="menuLink_%s" class="menuConfMiddleCell" nowrap><a class="confSubSection" href="%s"%s>\
                             %s</a></li>"""%(sublink.getName(), sublink.getURL(), target,\
                              sublink.getCaption()) )
-                    
+
             if len(sublinkList) > 0:
                 html += "</ul>"
             html += "</li>"
-            
+
         return "".join(html)
 
 class WPConfSignIn( WPConferenceDefaultDisplayBase ):
-    
+
     def __init__(self, rh, conf, login="", msg = ""):
         self._login = login
         self._msg = msg
         WPConferenceBase.__init__( self, rh, conf)
-    
+
     def _getBody( self, params ):
         wc = wcomponents.WSignIn()
         p = { \
@@ -531,23 +532,23 @@ class WPConfSignIn( WPConferenceDefaultDisplayBase ):
         return wc.getHTML( p )
 
 class WPConfAccountAlreadyActivated( WPConferenceDefaultDisplayBase ):
-    
+
     def __init__(self, rh, conf, av):
         WPConferenceDefaultDisplayBase.__init__( self, rh, conf )
         self._av = av
-    
+
     def _getBody( self, params ):
         wc = wcomponents.WAccountAlreadyActivated( self._av)
         params["mailLoginURL"] = urlHandlers.UHConfSendLogin.getURL( self._conf, self._av)
         return wc.getHTML( params )
 
 class WPConfAccountActivated( WPConferenceDefaultDisplayBase ):
-    
+
     def __init__(self, rh, conf, av, returnURL=""):
         WPConferenceDefaultDisplayBase.__init__( self, rh, conf )
         self._av = av
         self._returnURL=returnURL
-    
+
     def _getBody( self, params ):
         wc = wcomponents.WAccountActivated( self._av)
         params["mailLoginURL"] = urlHandlers.UHConfSendLogin.getURL(self._conf, self._av)
@@ -557,36 +558,36 @@ class WPConfAccountActivated( WPConferenceDefaultDisplayBase ):
         return wc.getHTML( params )
 
 class WPConfAccountDisabled( WPConferenceDefaultDisplayBase ):
-    
+
     def __init__(self, rh, conf, av):
         WPConferenceDefaultDisplayBase.__init__( self, rh, conf )
         self._av = av
-    
+
     def _getBody( self, params ):
         wc = wcomponents.WAccountDisabled( self._av )
         #params["mailLoginURL"] = urlHandlers.UHSendLogin.getURL(self._av)
-        
+
         return wc.getHTML( params )
 
 class WPConfUnactivatedAccount( WPConferenceDefaultDisplayBase ):
-    
+
     def __init__(self, rh, conf, av):
         WPConferenceDefaultDisplayBase.__init__( self, rh, conf )
         self._av = av
-    
+
     def _getBody( self, params ):
         wc = wcomponents.WUnactivatedAccount( self._av )
         params["mailActivationURL"] = urlHandlers.UHConfSendActivation.getURL( self._conf, self._av)
-        
+
         return wc.getHTML( params )
 
 
 class WPConfUserCreation( WPConferenceDefaultDisplayBase ):
-    
+
     def __init__(self, rh, conf, params):
         self._params = params
         WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
-    
+
     def _getBody(self, params ):
         pars = self._params
         p = wcomponents.WUserRegistration()
@@ -599,11 +600,11 @@ class WPConfUserCreation( WPConferenceDefaultDisplayBase ):
 
 
 class WPConfUserCreated( WPConferenceDefaultDisplayBase ):
-    
+
     def __init__(self, rh, conf, av):
         WPConferenceDefaultDisplayBase.__init__( self, rh, conf )
         self._av = av
-    
+
     def _getBody(self, params ):
         p = wcomponents.WUserCreated(self._av)
         pars = {"signInURL" : urlHandlers.UHConfSignIn.getURL( self._conf )}
@@ -611,11 +612,11 @@ class WPConfUserCreated( WPConferenceDefaultDisplayBase ):
 
 
 class WPConfUserExistWithIdentity( WPConferenceDefaultDisplayBase ):
-    
+
     def __init__(self, rh, conf, av):
         WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
         self._av = av
-        
+
     def _getBody(self, params ):
         p = wcomponents.WUserSendIdentity(self._av)
         pars = {"postURL" : urlHandlers.UHConfSendLogin.getURL(self._conf, self._av)}
@@ -623,7 +624,7 @@ class WPConfUserExistWithIdentity( WPConferenceDefaultDisplayBase ):
 
 
 class WConfDetailsBase( wcomponents.WTemplated ):
-    
+
     def __init__(self, aw, conf):
         self._conf = conf
         self._aw = aw
@@ -734,7 +735,7 @@ class WConfDetailsBase( wcomponents.WTemplated ):
         vars["material"] = self._getMaterialHTML()
         vars["moreInfo"] = self._getMoreInfoHTML()
         vars["actions"] = self._getActionsHTML(vars.get("menuStatus", "open") != "open")
-        
+
         return vars
 
 
@@ -748,10 +749,10 @@ class WConfDetailsMin(WConfDetailsBase):
 #---------------------------------------------------------------------------
 
 class WConfDetails:
-    
+
     def __init__(self, aw, conf):
         self._conf = conf
-        self._aw = aw 
+        self._aw = aw
 
     def getHTML( self, params ):
         if self._conf.canAccess( self._aw ):
@@ -762,9 +763,9 @@ class WConfDetails:
 
 
 class WPConferenceDisplay( WPConferenceDefaultDisplayBase ):
-    
+
     def _getBody( self, params ):
-        
+
         wc = WConfDetails( self._getAW(), self._conf )
         pars = { \
     "modifyURL": urlHandlers.UHConferenceModification.getURL( self._conf ), \
@@ -774,9 +775,9 @@ class WPConferenceDisplay( WPConferenceDefaultDisplayBase ):
     "materialURLGen": urlHandlers.UHMaterialDisplay.getURL, \
     "menuStatus": self._rh._getSession().getVar("menuStatus") or "open"}
         return wc.getHTML( pars )
-    
+
     def _getHeadContent( self ):
-        #This is used for fetching the css file for conference page 
+        #This is used for fetching the css file for conference page
         path = baseurl = self._getBaseURL()
         printCSS = """
         <link rel="stylesheet" type="text/css" href="%s/css/Conf_Basic.css" >
@@ -785,22 +786,22 @@ class WPConferenceDisplay( WPConferenceDefaultDisplayBase ):
         if confCSS:
             printCSS = printCSS + """<link rel="stylesheet" type="text/css" href="%s">"""%(confCSS.getURL())
         return printCSS
-        
 
-    def _defineSectionMenu( self ): 
+
+    def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._overviewOpt)
 
 class WSentMail  (wcomponents.WTemplated):
     def __init__(self,conf):
         self._conf = conf
-        
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         vars["BackURL"]=urlHandlers.UHConferenceDisplay.getURL(self._conf)
         return vars
 
-        
+
 class WPSentEmail( WPConferenceDefaultDisplayBase ):
     def _getBody(self,params):
         wc = WSentMail(self._conf)
@@ -815,7 +816,7 @@ class WEmail(wcomponents.WTemplated):
         except:
             self._fromEmail = ""
         self._toEmail = toEmail
-            
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         if vars.get("from", None) is None :
@@ -824,14 +825,14 @@ class WEmail(wcomponents.WTemplated):
             vars["fromField"] = """<input type="text" name="from" size="50" value="%s"></text>"""%vars["from"]
         else :
             vars["fromField"] = """<input type="hidden" name="from" value="%s"></input>%s"""%(vars["from"],vars["from"])
-        
+
         if vars.get("to", None) is None :
             vars["to"] = self._toEmail
         if vars.get("toDisabled",None) is None or not vars.get("toDisabled",None):
             vars["toField"] = """<textarea name="to" cols="50" rows="4">%s</textarea>"""%vars["to"]
         else :
             vars["toField"] = """<input type="hidden" name="to" value="%s"></input>%s"""%(vars["to"],vars["to"])
-            
+
         if vars.get("cc", None) is None :
             vars["cc"]= ""
         if vars.get("postURL",None) is None :
@@ -871,7 +872,7 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
 
 
     def getJSFiles(self):
-        modules = WPConferenceBase.getJSFiles(self)                  
+        modules = WPConferenceBase.getJSFiles(self)
 
         # if the user has management powers, include
         # these modules
@@ -879,7 +880,7 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
 
         # TODO: find way to check if the user is able to manage
         # anything inside the conference (sessions, ...)
-        
+
         modules += self._includeJSPackage('Management')
         modules += self._includeJSPackage('MaterialEditor')
         modules += self._includeJSPackage('Display')
@@ -896,7 +897,7 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
                 id = self._conf.getId()
             p["shortURL"] =  Config.getInstance().getShortEventURL() + id
         return wc.getHTML(p)
-    
+
     def _getHeadContent( self ):
         if self._view in ["xml","text","jacow"] and (self._params.get("frame","")=="no" or self._params.get("fr","")=="no"):
             return ""
@@ -914,11 +915,11 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
         if os.path.exists("%s/css/%s.css" % (htdocs,self._view)):
             styleText += """        <link rel="stylesheet" href="%s/css/%s.css">\n""" % (self._getBaseURL(), self._view)
         return styleText
-            
+
     def _getHTMLHeader( self ):
 
         tpl = wcomponents.WHTMLHeader();
-        
+
         return tpl.getHTML({"area": "",
                             "baseurl": self._getBaseURL(),
                             "conf": Config.getInstance(),
@@ -929,7 +930,7 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
                             "extraJS": self._extraJS,
                             "language": self._getAW().getSession().getLang()
                             })
-    
+
     def _getHeader( self ):
         """
         """
@@ -984,7 +985,7 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
             urladdwebcast.addParam("eventid",self._conf.getId())
             pars['webcastAdminURL'] = urladdwebcast
 
-        frame = self._params.get("frame","") != "no" and self._params.get("fr","") != "no" 
+        frame = self._params.get("frame","") != "no" and self._params.get("fr","") != "no"
         view = self._view
         outGen = outputGenerator(self._getAW())
         path = Config.getInstance().getStylesheetsDir()
@@ -1002,7 +1003,7 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
                 cache = EventCache({"id": self._conf.getId(), "type": "normal"})
                 body = cache.getCachePage()
             if body == "":
-                stylepath = "%s/%s.xsl" % (path,view)            
+                stylepath = "%s/%s.xsl" % (path,view)
                 if self._params.get("detailLevel", "") == "contribution" or self._params.get("detailLevel", "") == "":
                     includeContribution = 1
                 else:
@@ -1013,7 +1014,7 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
             if not frame:
                 html = body
             else:
-                html = """                
+                html = """
                 %s
                 %s
                 %s
@@ -1024,15 +1025,15 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
         else:
             return _("Cannot find the %s stylesheet") % view
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._overviewOpt)
 
 class WPrintPageFrame ( wcomponents.WTemplated ):
     pass
-        
+
 class WConfProgramTrack(wcomponents.WTemplated):
-    
+
     def __init__( self, aw, track ):
         self._aw = aw
         self._track = track
@@ -1058,10 +1059,10 @@ class WConfProgramTrack(wcomponents.WTemplated):
         if subtracks:
             vars["subtracks"] = _("""<i> _("Sub-tracks")</i>: %s""")%", ".join( subtracks )
         return vars
-        
+
 
 class WConfProgram(wcomponents.WTemplated):
-    
+
     def __init__(self, aw, conf):
         self._conf = conf
         self._aw = aw
@@ -1076,19 +1077,19 @@ class WConfProgram(wcomponents.WTemplated):
         return vars
 
 
-    
-    
+
+
 class WPConferenceProgram( WPConferenceDefaultDisplayBase ):
-    
+
     def __init__(*params):
         WPConferenceDefaultDisplayBase.__init__(*params)
         navigationEntry = navigation.NEConferenceProgramme()
-    
+
     def _getBody( self, params ):
         wc = WConfProgram( self._getAW(), self._conf )
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._programOpt)
 
@@ -1101,18 +1102,18 @@ class WPConferenceProgram( WPConferenceDefaultDisplayBase ):
 
 
 class WInternalPageDisplay(wcomponents.WTemplated):
-    
+
     def __init__(self, conf, page):
         self._conf = conf
         self._page=page
-        
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["content"] = self._page.getContent()
         return vars
 
 class WPInternalPageDisplay( WPConferenceDefaultDisplayBase ):
-    
+
     def __init__( self, rh, conference, page ):
         WPConferenceDefaultDisplayBase.__init__( self, rh, conference )
         self._page = page
@@ -1125,9 +1126,9 @@ class WPInternalPageDisplay( WPConferenceDefaultDisplayBase ):
 class WConferenceTimeTable(wcomponents.WTemplated):
 
     def __init__( self, conference, aw ):
-        self._conf = conference       
+        self._conf = conference
         self._aw = aw
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         tz = DisplayTZ(self._aw,self._conf).getDisplayTZ()
@@ -1152,8 +1153,8 @@ class WConferenceRoomTimeTable(WConferenceTimeTable):
         else:
             return self._blankEntryHTML()
 
-    
-    
+
+
     def _getHTMLTimeTable( self, highDetailLevel=0 ):
         self._sessionColorMap = {}
         daySch = []
@@ -1181,7 +1182,7 @@ class WConferenceRoomTimeTable(WConferenceTimeTable):
                     for entry in entryList:
                         room = entry.getOwner().getRoom()
                         if room != None:
-                            if room.getName() not in roomList:                            
+                            if room.getName() not in roomList:
                                 roomList.append(room.getName())
                         if room ==None and not isinstance(entry,schedule.BreakTimeSchEntry):
                             unknown=True
@@ -1189,10 +1190,10 @@ class WConferenceRoomTimeTable(WConferenceTimeTable):
                             continue
             if unknown:
                 roomList.append( _("Room Unknown"))
-                        
+
 
             for hour in range(day.getStartHour(),day.getEndHour()+1):
-                hourSlots=[]                              
+                hourSlots=[]
                 emptyHour = True
                 #Order the entries based on the room order
                 for slot in day.getSlotsOnHour(hour):
@@ -1203,15 +1204,15 @@ class WConferenceRoomTimeTable(WConferenceTimeTable):
                     remColSpan=maxOverlap
                     temp=[]
                     for ent in entryList:
-                        roomname =None                        
+                        roomname =None
                         room = ent.getOwner().getRoom()
                         if room !=None:
                             roomname = room.getName()
                         elif not isinstance(ent,schedule.BreakTimeSchEntry):
                             roomname = _("Room Unknown")
 
-                        if entryOrder != []:   
-                            if roomname !=None:                          
+                        if entryOrder != []:
+                            if roomname !=None:
                                 if roomname in roomList:
                                     pos =roomList.index(roomname)
                                     try:
@@ -1222,13 +1223,13 @@ class WConferenceRoomTimeTable(WConferenceTimeTable):
                                         entryOrder
                             if not isinstance(ent,schedule.BreakTimeSchEntry):
                                 entryOrder.append(ent)
-                            elif isinstance(ent,schedule.BreakTimeSchEntry):                            
+                            elif isinstance(ent,schedule.BreakTimeSchEntry):
                                 entryOrder=[]
                                 entryOrder.append(ent)
 
 
 
-                     #Create the timetable        
+                     #Create the timetable
                     for entry in entryOrder:
                         emptyHour = False
                         emptyDay = False
@@ -1280,19 +1281,19 @@ class WConferenceRoomTimeTable(WConferenceTimeTable):
                     <table align="center" width="100%%">
                         <tr>
                             <td width="100%%">
-                                <table align="center" border="0" width="100%%" 
+                                <table align="center" border="0" width="100%%"
                                         celspacing="0" cellpadding="0" bgcolor="#E6E6E6">
                                     <tr>
                                         <td valign="top" bgcolor="white"  width="10" style="padding-right: 5px;"></td>
-                                        <td colspan="%i" align="center" bgcolor="white"><b>%s</b></td>                                      
-                                   </tr> 
+                                        <td colspan="%i" align="center" bgcolor="white"><b>%s</b></td>
+                                   </tr>
                                    <tr>
                                        <td valign="top" bgcolor="white"  width="10" style="padding-right: 5px;"></td>
                                        <td colspan="%i" align="center" bgcolor="white">%s</td>
                                    </tr>
                                    </tr>
-                                  
-                                   
+
+
                                      <tr>
                                         %s
                                     </tr>
@@ -1326,8 +1327,8 @@ class WConferenceSessionTimeTable(WConferenceTimeTable):
         else:
             return self._blankEntryHTML()
 
-    
-    
+
+
     def _getHTMLTimeTable( self, highDetailLevel=0 ):
         self._sessionColorMap = {}
         daySch = []
@@ -1355,7 +1356,7 @@ class WConferenceSessionTimeTable(WConferenceTimeTable):
                     for entry in entryList:
                         session = entry.getOwner().getSession()
                         if session != None:
-                            if session.getTitle() not in sessionList:                            
+                            if session.getTitle() not in sessionList:
                                 sessionList.append(session.getTitle())
                         if session ==None and not isinstance(entry,schedule.BreakTimeSchEntry):
                             unknown=True
@@ -1363,10 +1364,10 @@ class WConferenceSessionTimeTable(WConferenceTimeTable):
                             continue
             if unknown:
                 sessionList.append( _("Session Unknown"))
-                        
+
 
             for hour in range(day.getStartHour(),day.getEndHour()+1):
-                hourSlots=[]                              
+                hourSlots=[]
                 emptyHour = True
                 #Order the entries based on the session order
                 for slot in day.getSlotsOnHour(hour):
@@ -1377,16 +1378,16 @@ class WConferenceSessionTimeTable(WConferenceTimeTable):
                     remColSpan=maxOverlap
                     temp=[]
                     for ent in entryList:
-                        sessionname =None                        
+                        sessionname =None
                         session = ent.getOwner().getSession()
                         if session !=None:
                             sessionname = session.getTitle()
                         elif not isinstance(ent,schedule.BreakTimeSchEntry):
                             sessionname = _("Session Unknown")
-                            
 
-                        if entryOrder != []:   
-                            if sessionname !=None:                          
+
+                        if entryOrder != []:
+                            if sessionname !=None:
                                 if sessionname in sessionList:
                                     pos =sessionList.index(sessionname)
                                     try:
@@ -1397,13 +1398,13 @@ class WConferenceSessionTimeTable(WConferenceTimeTable):
                                         entryOrder
                             if not isinstance(ent,schedule.BreakTimeSchEntry):
                                 entryOrder.append(ent)
-                            elif isinstance(ent,schedule.BreakTimeSchEntry):                            
+                            elif isinstance(ent,schedule.BreakTimeSchEntry):
                                 entryOrder=[]
                                 entryOrder.append(ent)
 
 
 
-                     #Create the timetable        
+                     #Create the timetable
                     for entry in entryOrder:
                         emptyHour = False
                         emptyDay = False
@@ -1455,19 +1456,19 @@ class WConferenceSessionTimeTable(WConferenceTimeTable):
                     <table align="center" width="100%%">
                         <tr>
                             <td width="100%%">
-                                <table align="center" border="0" width="100%%" 
+                                <table align="center" border="0" width="100%%"
                                         celspacing="0" cellpadding="0" bgcolor="#E6E6E6">
                                     <tr>
                                         <td valign="top" bgcolor="white"  width="10" style="padding-right: 5px;"></td>
-                                        <td colspan="%i" align="center" bgcolor="white"><b>%s</b></td>                                      
-                                   </tr> 
+                                        <td colspan="%i" align="center" bgcolor="white"><b>%s</b></td>
+                                   </tr>
                                    <tr>
                                        <td valign="top" bgcolor="white"  width="10" style="padding-right: 5px;"></td>
                                        <td colspan="%i" align="center" bgcolor="white">%s</td>
                                    </tr>
                                    </tr>
-                                  
-                                   
+
+
                                      <tr>
                                         %s
                                     </tr>
@@ -1509,7 +1510,7 @@ class WConferencePlainTimeTable(WConferenceTimeTable):
                            self.htmlText(contribution.getTitle()),
                            "<br>".join(speakerList) )
         return contrStr
-    
+
     def _getSessionSlotHTML(self,event,URL,refDay):
         sesSlot=event.getOwner()
         session=sesSlot.getSession()
@@ -1578,7 +1579,7 @@ class WConferencePlainTimeTable(WConferenceTimeTable):
                         <td width="75%%" style="color:%s">
                             <a href="%s" style="%s">%s</a><small>%s</small>
                         </td>
-                        <td nowrap align="left" valign="bottom" 
+                        <td nowrap align="left" valign="bottom"
                             width="25%%">
                             <table align="left">
                                 %s
@@ -1589,8 +1590,8 @@ class WConferencePlainTimeTable(WConferenceTimeTable):
                     </tr>
                 </table>
                   """%(session.getTextColor(), URL, linkColor, title,timeInterval,conveners,room,materials)
-    
-    def _getBreakHTML( self, breakEntry ):  
+
+    def _getBreakHTML( self, breakEntry ):
         tz = DisplayTZ(self._aw,self._conf).getDisplayTZ()
         sDate = breakEntry.getAdjustedStartDate(tz)
         eDate = breakEntry.getAdjustedEndDate(tz)
@@ -1603,7 +1604,7 @@ class WConferencePlainTimeTable(WConferenceTimeTable):
                            eDate.strftime("%H:%M"), \
                            (datetime(1900,1,1)+breakEntry.getDuration()).strftime("%Hh%M'"), \
                            breakEntry.getTitle())
-    
+
 
     def _getEntryHTML(self,entry,refDay):
         if isinstance(entry,timetable.SessionSlot):
@@ -1645,8 +1646,8 @@ class WConferencePlainTimeTable(WConferenceTimeTable):
                     sesStr = """
                         <tr>
                             <td colspan="3" width="100%%">
-                                <table align="center" border="0" 
-                                        width="100%%" celspacing="0" 
+                                <table align="center" border="0"
+                                        width="100%%" celspacing="0"
                                         cellpadding="0" style="border-left:2px solid #777777;border-top:2px solid #777777;">
                                     <tr>
                                         <td align="center" colspan="3"  bgcolor="%s" style="padding:10px">%s</td>
@@ -1694,7 +1695,7 @@ class ContainerIndexItem:
         self._entryList = []
         for i in range(0,self._overlap):
             self._entryList.append(None)
-    
+
     def setStartPosition(self, counter):
         self._startPosition = counter
 
@@ -1766,7 +1767,7 @@ class ContainerIndex:
             contItem = self._containerIndex[container]
             return contItem.getEntryIndex(i)
         return 0
-    
+
     def getEntryByPosition(self, container, i):
         if self._containerIndex.has_key(container):
             contItem = self._containerIndex[container]
@@ -1792,16 +1793,16 @@ class ContainerIndex:
             if startPos >= lastPos:
                 lastPos = startPos + cont.getOverlap()
         return lastPos
-                
+
 
 class WConferenceHighDetailTimeTable(WConferenceTimeTable):
-    
+
     def _initTempList(self, max, defaultValue=None):
         t = []
         for i in range(0, max):
             t.append(defaultValue)
         return t
-    
+
     def _getHTMLTimeTable( self, highDetailLevel=0 ):
         containerIndex = ContainerIndex()
         daySch = []
@@ -1908,7 +1909,7 @@ class WConferenceHighDetailTimeTable(WConferenceTimeTable):
                     <table align="center" width="100%%">
                         <tr>
                             <td width="100%%">
-                                <table align="center" border="0" width="100%%" 
+                                <table align="center" border="0" width="100%%"
                                         celspacing="0" cellpadding="0" bgcolor="#E6E6E6">
                                     <tr>
                                         <td colspan="%i" align="center" bgcolor="white"><b>%s</b></td>
@@ -1928,10 +1929,10 @@ class WConferenceHighDetailTimeTable(WConferenceTimeTable):
                 daySch.append(str)
         str = "<br>".join( daySch )
         return str
-    
-    
+
+
 #class WMeetingHighDetailTimeTable(WConferenceTimeTable):
-#    
+#
 #    def getVars( self ):
 #        vars = wcomponents.WTemplated.getVars( self )
 #        self._contribURLGen = vars["contribURLGen"]
@@ -1947,25 +1948,25 @@ class WPConferenceTimeTable( WPConferenceDefaultDisplayBase ):
     def getJSFiles(self):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
                self._includeJSPackage('Timetable')
-    
+
     def _getBody( self, params ):
         wc = WConferenceTimeTable( self._conf, self._getAW()  )
         return wc.getHTML(params)
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._timetableOpt)
-    
+
     def _getHeadContent( self ):
         headContent=WPConferenceDefaultDisplayBase._getHeadContent(self)
-        baseurl = Config.getInstance().getBaseURL() 
-        return """ 
+        baseurl = Config.getInstance().getBaseURL()
+        return """
                  %s
-                 <link rel="stylesheet" type="text/css" href="%s/css/timetable.css"> 
+                 <link rel="stylesheet" type="text/css" href="%s/css/timetable.css">
                 """ % ( headContent, baseurl)
 
 #class WMeetingTimeTable(WConferenceTimeTable):
-#    
+#
 #    def getVars( self ):
 #        vars = wcomponents.WTemplated.getVars( self )
 #        self._contribURLGen = vars["contribURLGen"]
@@ -1979,13 +1980,13 @@ class WPMeetingTimeTable( WPXSLConferenceDisplay ):
     def getJSFiles(self):
         return WPXSLConferenceDisplay.getJSFiles(self) + \
                self._includeJSPackage('Timetable')
-    
+
     def _getBody( self, params ):
         wc = WConferenceTimeTable( self._conf, self._getAW()  )
         return wc.getHTML(params)
 
 class WPConferenceModifBase( main.WPMainBase ):
-    
+
     def __init__( self, rh, conference ):
         main.WPMainBase.__init__( self, rh )
         self._navigationTarget = self._conf = conference
@@ -1998,11 +1999,11 @@ class WPConferenceModifBase( main.WPMainBase ):
         return main.WPMainBase.getJSFiles(self) + \
                self._includeJSPackage('Management') + \
                self._includeJSPackage('MaterialEditor')
-    
+
 
     def _getSiteArea(self):
         return "ModificationArea"
-    
+
     def _getHeader( self ):
         """
         """
@@ -2015,7 +2016,7 @@ class WPConferenceModifBase( main.WPMainBase ):
     def _getNavigationDrawer(self):
         pars = {"target": self._conf, "isModif": True }
         return wcomponents.WNavigationDrawer( pars, bgColor="white" )
-    
+
     def _createSideMenu(self):
         self._sideMenu = wcomponents.ManagementSideMenu()
 
@@ -2025,30 +2026,30 @@ class WPConferenceModifBase( main.WPMainBase ):
             urlHandlers.UHConferenceDisplay.getURL( self._conf ))
         self._viewSection.addItem( self._viewEventPageMenuItem)
         self._sideMenu.addSection(self._viewSection)
-        
+
         # The main section containing most menu items
         self._generalSection = wcomponents.SideMenuSection()
 
         self._generalSettingsMenuItem = wcomponents.SideMenuItem(_("General settings"),
             urlHandlers.UHConferenceModification.getURL( self._conf ))
         self._generalSection.addItem( self._generalSettingsMenuItem)
-        
+
         self._timetableMenuItem = wcomponents.SideMenuItem(_("Timetable"),
             urlHandlers.UHConfModifSchedule.getURL( self._conf ))
         self._generalSection.addItem( self._timetableMenuItem)
-        
+
         self._materialMenuItem = wcomponents.SideMenuItem(_("Material"),
             urlHandlers.UHConfModifShowMaterials.getURL( self._conf ))
         self._generalSection.addItem( self._materialMenuItem)
-        
+
         self._roomBookingMenuItem = wcomponents.SideMenuItem(_("Room booking"),
             urlHandlers.UHConfModifRoomBookingList.getURL( self._conf ))
         self._generalSection.addItem( self._roomBookingMenuItem)
-        
+
         self._programMenuItem = wcomponents.SideMenuItem(_("Programme"),
             urlHandlers.UHConfModifProgram.getURL( self._conf ))
         self._generalSection.addItem( self._programMenuItem)
-        
+
         self._abstractMenuItem = wcomponents.SideMenuItem(_("Abstracts"),
             urlHandlers.UHConfAbstractManagment.getURL( self._conf ))
         self._generalSection.addItem( self._abstractMenuItem)
@@ -2056,11 +2057,11 @@ class WPConferenceModifBase( main.WPMainBase ):
         self._contribListMenuItem = wcomponents.SideMenuItem(_("Contributions"),
             urlHandlers.UHConfModifContribList.getURL( self._conf ))
         self._generalSection.addItem( self._contribListMenuItem)
-        
+
         self._regFormMenuItem = wcomponents.SideMenuItem(_("Registration"),
             urlHandlers.UHConfModifRegForm.getURL( self._conf ))
         self._generalSection.addItem( self._regFormMenuItem)
-        
+
         if self._conf.getCSBookingManager() is not None and self._conf.getCSBookingManager().isCSAllowed():
             self._videoServicesMenuItem = wcomponents.SideMenuItem(_("Video Services"),
                 urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = CollaborationTools.isUsingHTTPS()))
@@ -2069,28 +2070,28 @@ class WPConferenceModifBase( main.WPMainBase ):
             self._videoServicesMenuItem = wcomponents.SideMenuItem(_("Video Services"), None)
             self._generalSection.addItem( self._videoServicesMenuItem)
             self._videoServicesMenuItem.setVisible(False)
-            
+
         self._layoutMenuItem = wcomponents.SideMenuItem(_("Layout"),
             urlHandlers.UHConfModifDisplay.getURL(self._conf))
         self._generalSection.addItem( self._layoutMenuItem)
-        
+
         self._participantsMenuItem = wcomponents.SideMenuItem(_("Participants"),
             urlHandlers.UHConfModifParticipants.getURL( self._conf ) )
         self._generalSection.addItem( self._participantsMenuItem)
-        
+
         self._evaluationMenuItem = wcomponents.SideMenuItem(_("Evaluation"),
             urlHandlers.UHConfModifEvaluation.getURL( self._conf ) )
         self._generalSection.addItem( self._evaluationMenuItem)
 
         self._sideMenu.addSection(self._generalSection)
-        
+
         # The section containing all advanced options
         self._advancedOptionsSection = wcomponents.SideMenuSection(_("Advanced options"))
-        
+
         self._listingsMenuItem = wcomponents.SideMenuItem(_("Lists"),
             urlHandlers.UHConfModifListings.getURL( self._conf ) )
         self._advancedOptionsSection.addItem( self._listingsMenuItem)
-        
+
         self._ACMenuItem = wcomponents.SideMenuItem(_("Protection"),
             urlHandlers.UHConfModifAC.getURL( self._conf ) )
         self._advancedOptionsSection.addItem( self._ACMenuItem)
@@ -2098,7 +2099,7 @@ class WPConferenceModifBase( main.WPMainBase ):
         self._reviewingMenuItem = wcomponents.SideMenuItem(_("Reviewing"),
             urlHandlers.UHConfModifReviewingAccess.getURL( target = self._conf ) )
         self._advancedOptionsSection.addItem( self._reviewingMenuItem)
-        
+
         self._toolsMenuItem = wcomponents.SideMenuItem(_("Tools"),
             urlHandlers.UHConfModifTools.getURL( self._conf ) )
         self._advancedOptionsSection.addItem( self._toolsMenuItem)
@@ -2106,20 +2107,20 @@ class WPConferenceModifBase( main.WPMainBase ):
         self._logMenuItem = wcomponents.SideMenuItem(_("Logs"),
             urlHandlers.UHConfModifLog.getURL( self._conf ) )
         self._advancedOptionsSection.addItem( self._logMenuItem)
-        
+
         self._sideMenu.addSection(self._advancedOptionsSection)
-        
-        
+
+
 
         #we decide which side menu item appear and which don't
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCAbstractManager, RCReviewingStaff
-        
+
         canModify = self._conf.canModify(self._rh.getAW())
         isReviewingStaff = RCReviewingStaff.hasRights(self._rh)
         isPRM = RCPaperReviewManager.hasRights(self._rh)
         isAM = RCAbstractManager.hasRights(self._rh)
         isRegistrar = self._conf.canManageRegistration(self._rh.getAW().getUser())
-        
+
         if not canModify:
             self._generalSettingsMenuItem.setVisible(False)
             self._timetableMenuItem.setVisible(False)
@@ -2133,33 +2134,33 @@ class WPConferenceModifBase( main.WPMainBase ):
             self._toolsMenuItem.setVisible(False)
             self._logMenuItem.setVisible(False)
             self._evaluationMenuItem.setVisible(False)
-            
+
         if not (info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive() and canModify):
             self._roomBookingMenuItem.setVisible(False)
-            
+
         if not (self._conf.hasEnabledSection("cfa") and (canModify or isAM)):
             self._abstractMenuItem.setVisible(False)
-            
+
         if not (canModify or isPRM):
             self._contribListMenuItem.setVisible(False)
-            
+
         if not (self._conf.hasEnabledSection("regForm") and (canModify or isRegistrar)):
             self._regFormMenuItem.setVisible(False)
-            
+
         if not (self._conf.getType() == "conference" and self._conf.hasEnabledSection('paperReviewing') and (canModify or isReviewingStaff)):
             self._reviewingMenuItem.setVisible(False)
         else: #reviewing tab is enabled
             if isReviewingStaff and not canModify:
                 self._reviewingMenuItem.setVisible(True)
-        
-            
+
+
         #tabs forced to be disabled for now
         self._participantsMenuItem.setVisible(False)
-        
+
         # make sure that the section evaluation is always activated
         # for all conferences
         self._conf.enableSection("evaluation")
-        
+
         wf = self._rh.getWebFactory()
         if wf:
             wf.customiseSideMenu( self )
@@ -2171,7 +2172,7 @@ class WPConferenceModifBase( main.WPMainBase ):
         frame = wcomponents.WConferenceModifFrame( self._conf, self._getAW())
 
         sideMenu = self._sideMenu.getHTML()
-        
+
         p = { "categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL, \
               "confDisplayURLGen": urlHandlers.UHConferenceDisplay.getURL, \
               "event": "Conference",
@@ -2189,18 +2190,18 @@ class WPConferenceModifBase( main.WPMainBase ):
 
     def _getTabContent( self, params ):
         return "nothing"
-        
+
     def _getPageContent( self, params ):
         return "nothing"
 
 class WPConferenceModifAbstractBase( WPConferenceModifBase ):
-    
+
     def __init__(self, rh, conf):
         WPConferenceModifBase.__init__(self, rh, conf)
 
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
-        
+
         self._tabCFA = self._tabCtrl.newTab( "cfasetup", _("Setup"), urlHandlers.UHConfModifCFA.getURL( self._conf ) )
         self._tabCFAPreview = self._tabCtrl.newTab("cfapreview", _("Preview"), urlHandlers.UHConfModifCFAPreview.getURL(self._conf))
         self._tabAbstractList = self._tabCtrl.newTab( "abstractList", _("List of Abstracts"), urlHandlers.UHConfAbstractManagment.getURL( self._conf ) )
@@ -2211,25 +2212,25 @@ class WPConferenceModifAbstractBase( WPConferenceModifBase ):
             self._tabCFA.disable()
             self._tabAbstractList.disable()
             self._tabCFAPreview.disable()
-            
+
         self._setActiveTab()
 
     def _getPageContent(self, params):
         self._createTabCtrl()
-        
+
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
 
     def _setActiveSideMenuItem(self):
         self._abstractMenuItem.setActive()
-    
+
     def _getTabContent(self, params):
         return "nothing"
-    
+
     def _setActiveTab(self):
         pass
 
 class WConfModifClosed(wcomponents.WTemplated):
-    
+
     def __init__(self):
         pass
 
@@ -2238,21 +2239,21 @@ class WConfModifClosed(wcomponents.WTemplated):
         vars["closedIconURL"] = Config.getInstance().getSystemIconURL("closed")
         return vars
 
-############# Start of old collaboration related ############################## 
+############# Start of old collaboration related ##############################
 class WBookingSystems( wcomponents.WTemplated ):
-        
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["vrvs"] = "VRVS"
-        vars["mcu"] = "MCU" 
+        vars["mcu"] = "MCU"
         return vars
 
 class WBookingsList( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference ):
         self._conf= conference
-    
-        
+
+
     def _getBookingsHTML( self, booking ):
         url = urlHandlers. UHBookingDetail.getURL(booking)
         Title = booking.getTitle()
@@ -2261,7 +2262,7 @@ class WBookingsList( wcomponents.WTemplated ):
         Ends = str(booking.getEndingDate().strftime("%Y-%m-%d") + ' at ' + booking.getEndingDate().strftime("%H:%M"))
         System = booking.getSystem()
         html ="""
-        
+
             <tr>
                 <td valign="top" nowrap><input type="radio" name="bookings" value="%s"></td>
                 <td valign="top" nowrap class="abstractLeftDataCell"><a href=%s>%s</a></td>
@@ -2270,14 +2271,14 @@ class WBookingsList( wcomponents.WTemplated ):
                 <td valign="top" class="abstractDataCell">%s</td>
                 <td valign="top" class="abstractDataCell">%s</td>
             </tr>
-     
-               """  %(self.htmlText(booking.getId()), 
+
+               """  %(self.htmlText(booking.getId()),
                     quoteattr(str(url)), self.htmlText(Title),
                     self.htmlText(Description),
                     self.htmlText(Starts), self.htmlText(Ends),
                     self.htmlText(System) or "&nbsp;")
         return html
-        
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         l=[]
@@ -2287,9 +2288,9 @@ class WBookingsList( wcomponents.WTemplated ):
         vars["numBookings"]= str(len(l))
         vars["actionPostURL"]=quoteattr(str(urlHandlers.UHConfModifBookingAction.getURL(self._conf)))
         return vars
-    
+
 class WPConfModifBookings( WPConferenceModifBase ):
-    
+
     def __init__(self, rh, conf, bs):
         WPConferenceModifBase.__init__(self, rh, conf)
         self._bs = bs
@@ -2312,7 +2313,7 @@ class WPConfModifBookings( WPConferenceModifBase ):
             return wc.getHTML(p)
 
 class WConfModifBookings( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference ):
         self._conf= conference
 
@@ -2324,9 +2325,9 @@ class WConfModifBookings( wcomponents.WTemplated ):
         vars["listOfBookings"] = wc2.getHTML()
         vars["bookSystemURL"] =quoteattr(str(urlHandlers.UHConfModifBookings.getURL(self._conf)))
         return vars
-    
+
 class WBookings (wcomponents.WTemplated):
-    
+
     def __init__(self, conf):
         self._conf= conf
 
@@ -2355,16 +2356,16 @@ class WBookings (wcomponents.WTemplated):
         return vars
 
 class WHERMESParticipantList (wcomponents.WTemplated):
-    
+
       pass
 
 class WHERMESParticipantCreation (wcomponents.WTemplated):
 
     def __init__( self, conference ):
         self._conf = conference
-        
+
     def getVars (self):
-        vars = wcomponents.WTemplated.getVars( self ) 
+        vars = wcomponents.WTemplated.getVars( self )
         vars["participantName"] = ""
         vars["participantIpAddress"] = ""
         return vars
@@ -2376,20 +2377,20 @@ class WPBookingsHERMES (WPConfModifBookings):
 
     def _setActiveTab( self ):
         self._tabVideoServices.setActive()
-        
+
     def _getTabContent( self, params ):
         p={"UserEmail": self._getAW().getUser().getEmail()}
         wc = WBookingsHERMES (self._conf)
         return wc.getHTML(p)
 
 class WPBookingsVRVS(WPConfModifBookings):
-    
+
     def __init__( self, rh, conf ):
         WPConferenceModifBase.__init__(self, rh, conf)
 
     def _setActiveTab( self ):
         self._tabVideoServices.setActive()
-        
+
     def _getTabContent( self, params ):
         if self._getAW().getUser():
             p={"supportEmail": self._getAW().getUser().getEmail()}
@@ -2399,10 +2400,10 @@ class WPBookingsVRVS(WPConfModifBookings):
         return wc.getHTML(p)
 
 class WBookingsVRVS(WBookings):
-    
+
     def __init__( self, conference ):
         self._conf= conference
-        
+
     def getVars( self ):
         vars = WBookings.getVars( self )
         vars["vrvsLogin"] = ""
@@ -2470,17 +2471,17 @@ class WBookingsVRVS(WBookings):
                 sel = ""
             vars["eminuteoptions"] += """<option value="%s"%s>%s\n""" % (i,sel,i)
         return vars
-     
+
 class WPBookingsVRVSPerformed(WPConferenceModifBase):
-    
+
     def __init__( self, rh, conf, booking ):
         WPConferenceModifBase.__init__(self, rh, conf)
         self._conf = conf
         self._booking = booking
-    
+
     def _setActiveTab( self ):
         self._tabVideoServices.setActive()
-        
+
     def _getTabContent( self, params ):
         p={ \
 "virtualRoom": self._booking.getVirtualRoom(), \
@@ -2494,7 +2495,7 @@ class WPBookingsDetail(WPConferenceModifBase):
         WPConferenceModifBase.__init__(self, rh, conf)
         self._conf = conf
         self._booking=booking
-        
+
     def _setActiveTab( self ):
         self._tabVideoServices.setActive()
 
@@ -2510,14 +2511,14 @@ class WPBookingsDetail(WPConferenceModifBase):
             if (wc == None):
                 wc= WBookingsNotYetAvailable(self._conf)
             return wc.getHTML()
-    
+
 class WBookingsVRVSPerformed(WBookingsVRVS):
 
     def __init__(self, booking):
         self._b = booking
-        
+
     def getVars(self):
-        
+
         vars = wcomponents.WTemplated.getVars(self)
         vars["vrvsLogin"] = self._b.getVRVSuser()
         vars["vrvsCommunity"] = self._b.getCommunity()
@@ -2539,22 +2540,22 @@ class WBookingsVRVSPerformed(WBookingsVRVS):
         return vars
 
 class WBookingsVRVSDetail(WBookingsVRVSPerformed):
-        
+
     def getVars(self):
         vars = WBookingsVRVSPerformed.getVars(self)
         vars ["starting"] = self._b.getStartingDate().strftime("%d-%b-%Y at %H:%M")
         vars ["ending"] =  self._b.getEndingDate().strftime("%d-%b-%Y at %H:%M")
-        return vars 
+        return vars
 
 class WPBookingsVRVSserverError(WPConferenceModifBase):
-    
+
     def __init__( self, rh, conf, response):
         WPConferenceModifBase.__init__(self, rh, conf)
         self.response= response
-    
+
     def _setActiveTab( self ):
         self._tabVideoServices.setActive()
-        
+
     def _getTabContent( self, params ):
         p={}
         wc = WBookingsVRVSserverError(self._conf)
@@ -2562,21 +2563,21 @@ class WPBookingsVRVSserverError(WPConferenceModifBase):
         return wc.getHTML(p)
 
 class WBookingsVRVSserverError(WBookings):
-      
+
     def getVars(self):
         vars = WBookings.getVars(self)
         vars["gobackURL"] = quoteattr(str(urlHandlers.UHBookingsVRVS.getURL(self._conf)))
         return vars
 
 class WPBookingsModifDeleteSuccess(WPConferenceModifBase):
-    
+
     def __init__( self, rh, conf, msg):
         WPConferenceModifBase.__init__(self, rh, conf)
         self.msg = msg[0] + ": " + msg[1]
-    
+
     def _setActiveTab( self ):
         self._tabVideoServices.setActive()
-        
+
     def _getTabContent( self, params ):
         p={}
         wc = WBookingsModifDeleteSuccess(self._conf)
@@ -2587,14 +2588,14 @@ class WBookingsModifDeleteSuccess(WBookings):
 
     def __init__(self, conf):
         self._conf = conf
-        
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["gobackURL"] = quoteattr(str(urlHandlers.UHConfModifBookings.getURL(self._conf)))
         return vars
 
 class WBookingsNotYetAvailable(WBookings):
-     
+
     def getVars( self ):
         vars = WBookings.getVars( self )
         vars["gobackURL"] = quoteattr(str(urlHandlers.UHConfModifBookings.getURL(self._conf)))
@@ -2603,9 +2604,9 @@ class WBookingsNotYetAvailable(WBookings):
 # can be generalize for other systems
 
 class WBookingsWarning (wcomponents.WTemplated):
-    
+
     def __init__(self, conf):
-        self._conf = conf 
+        self._conf = conf
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
@@ -2613,16 +2614,16 @@ class WBookingsWarning (wcomponents.WTemplated):
         return vars
 
 class WPConfModifBookingListBase( WPConferenceModifBase ):
-    
+
     def _setActiveTab( self ):
         self._tabVideoServices.setActive()
 
 class WPBookingsModifDeleteConfirmation(WPConfModifBookingListBase):
-    
+
     def __init__(self,rh, conf, bookingList):
         WPConfModifBookingListBase.__init__(self,rh,conf)
         self._bookingList = bookingList
-    
+
     def _getTabContent(self,params):
         wc=wcomponents.WConfirmation()
         bks=[]
@@ -2640,20 +2641,20 @@ class WPBookingsModifDeleteError(WPConfModifBookingListBase):
         self._deldata = deldata
 
     def _getTabContent(self,params):
-        wc = WBookingsModifDeleteError(self._conf) 
+        wc = WBookingsModifDeleteError(self._conf)
         return wc.getHTML({"ErrorReason":self._deldata[1]})
-              
+
 class WBookingsModifDeleteError(WBookingsVRVSPerformed):
-    
+
     def __init__(self, conf):
         self._conf = conf
-         
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["gobackURL"] = quoteattr(str(urlHandlers.UHConfModifBookings.getURL(self._conf)))
         return vars
 
-        
+
 class WConfModifMainData(wcomponents.WTemplated):
 
     def __init__(self,conference,mfRegistry,ct,rh):
@@ -2691,7 +2692,7 @@ class WConfModifMainData(wcomponents.WTemplated):
             vars["description"] = self._conf.getDescription()
         else:
             vars["description"] = ""
-        
+
         ###################################
         # Fermi timezone awareness        #
         ###################################
@@ -2704,7 +2705,7 @@ class WConfModifMainData(wcomponents.WTemplated):
         ###################################
         vars["chairText"] = self.htmlText(self._conf.getChairmanText())
         place=self._conf.getLocation()
-        
+
         vars["locationName"]=vars["locationAddress"]=""
         if place:
             vars["locationName"]=self.htmlText(place.getName())
@@ -2746,11 +2747,11 @@ class WConfModifMainData(wcomponents.WTemplated):
         disabledText = _("Click to enable")
         lsect=[]
         for sect in conference.ConfSectionsMgr().getSectionKeys():
-            
+
             # Videoconference section should not appear in conferences
             if sect in ['collaboration', 'paperReviewing','videoconference']:
                 continue
-            
+
             url=urlHandlers.UHConfSectionsSettings.getURL(self._conf)
             url.addParam("sectionId", sect)
             url=quoteattr("%s#sections"%str(url))
@@ -2759,7 +2760,7 @@ class WConfModifMainData(wcomponents.WTemplated):
                 textIcon=enabledText
             else:
                 icon=vars["disablePic"]
-                textIcon=disabledText     
+                textIcon=disabledText
             lsect.append("""
                             <tr>
                                 <td>
@@ -2799,10 +2800,10 @@ class WConfModifMainData(wcomponents.WTemplated):
 ############# End of old collaboration related ##############################
 
 class WPConferenceModificationClosed( WPConferenceModifBase ):
-    
+
     def __init__(self, rh, target):
         WPConferenceModifBase.__init__(self, rh, target)
-    
+
     def _getPageContent( self, params ):
         wc = WConfModifClosed()
         pars = { "type": params.get("type","") }
@@ -2810,21 +2811,21 @@ class WPConferenceModificationClosed( WPConferenceModifBase ):
 
 
 class WPConferenceModification( WPConferenceModifBase ):
-    
+
     def __init__(self, rh, target, ct=None):
         WPConferenceModifBase.__init__(self, rh, target)
         self._ct = ct
 
     def _setActiveSideMenuItem( self ):
         self._generalSettingsMenuItem.setActive()
-    
+
     def _getPageContent( self, params ):
         wc = WConfModifMainData( self._conf, ConfMFRegistry(), self._ct, self._rh )
         pars = { "type": params.get("type","") , "conferenceId": self._conf.getId()}
         return wc.getHTML( pars )
-    
+
 class WConfModScreenDatesEdit(wcomponents.WTemplated):
-    
+
     def __init__(self,conf):
         self._conf=conf
 
@@ -2868,9 +2869,9 @@ class WConfModScreenDatesEdit(wcomponents.WTemplated):
             vars["eHour"]=quoteattr(str(ed.hour))
             vars["eMin"]=quoteattr(str(ed.minute))
         return vars
-    
+
 class WPScreenDatesEdit(WPConferenceModification):
-    
+
     def _getPageContent( self, params ):
         wc = WConfModScreenDatesEdit(self._conf)
         return wc.getHTML()
@@ -2879,19 +2880,19 @@ class WConferenceDataModificationAdditionalInfo(wcomponents.WTemplated):
 
     def __init__( self, conference ):
         self._conf = conference
-        
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         vars["contactInfo"] = self._conf.getContactInfo()
         return vars
-        
+
 
 class WConferenceDataModification(wcomponents.WTemplated):
-    
+
     def __init__( self, conference, rh ):
         self._conf = conference
         self._rh = rh
-    
+
     def _getVisibilityHTML(self):
         visibility = self._conf.getVisibility()
         topcat = self._conf.getOwnerList()[0]
@@ -2906,7 +2907,7 @@ class WConferenceDataModification(wcomponents.WTemplated):
             if level == visibility:
                 selected = "selected"
             if topcat.getId() != "0":
-                from MaKaC.common.TemplateExec import truncateTitle 
+                from MaKaC.common.TemplateExec import truncateTitle
                 vis.append("""<option value="%s" %s>%s</option>""" % (level, selected, truncateTitle(topcat.getName(), 120)))
             topcat = topcat.getOwner()
         selected = ""
@@ -2919,7 +2920,7 @@ class WConferenceDataModification(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        
+
         navigator = ""
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         type = self._conf.getType()
@@ -2956,16 +2957,16 @@ class WConferenceDataModification(wcomponents.WTemplated):
         vars["description"] = self._conf.getDescription()
         vars["keywords"] = self._conf.getKeywords()
         tz = self._conf.getTimezone()
-        vars["sDay"] = str( self._conf.getAdjustedStartDate(tz).day ) 
-        vars["sMonth"] = str( self._conf.getAdjustedStartDate(tz).month ) 
-        vars["sYear"] = str( self._conf.getAdjustedStartDate(tz).year ) 
-        vars["sHour"] = str( self._conf.getAdjustedStartDate(tz).hour ) 
-        vars["sMinute"] = str( self._conf.getAdjustedStartDate(tz).minute ) 
-        vars["eDay"] = str( self._conf.getAdjustedEndDate(tz).day ) 
-        vars["eMonth"] = str( self._conf.getAdjustedEndDate(tz).month ) 
-        vars["eYear"] = str( self._conf.getAdjustedEndDate(tz).year ) 
-        vars["eHour"] = str( self._conf.getAdjustedEndDate(tz).hour ) 
-        vars["eMinute"] = str( self._conf.getAdjustedEndDate(tz).minute ) 
+        vars["sDay"] = str( self._conf.getAdjustedStartDate(tz).day )
+        vars["sMonth"] = str( self._conf.getAdjustedStartDate(tz).month )
+        vars["sYear"] = str( self._conf.getAdjustedStartDate(tz).year )
+        vars["sHour"] = str( self._conf.getAdjustedStartDate(tz).hour )
+        vars["sMinute"] = str( self._conf.getAdjustedStartDate(tz).minute )
+        vars["eDay"] = str( self._conf.getAdjustedEndDate(tz).day )
+        vars["eMonth"] = str( self._conf.getAdjustedEndDate(tz).month )
+        vars["eYear"] = str( self._conf.getAdjustedEndDate(tz).year )
+        vars["eHour"] = str( self._conf.getAdjustedEndDate(tz).hour )
+        vars["eMinute"] = str( self._conf.getAdjustedEndDate(tz).minute )
         vars["chairText"] = quoteattr( self._conf.getChairmanText() )
         vars["orgText"] = quoteattr( self._conf.getOrgText() )
         vars["visibility"] = self._getVisibilityHTML()
@@ -2981,7 +2982,7 @@ class WConferenceDataModification(wcomponents.WTemplated):
         vars["locator"] = self._conf.getLocator().getWebForm()
 
         vars["locationAddress"] = locAddress
-        
+
         vars["supportEmail"] = quoteattr( self._conf.getSupportEmail() )
         vars["locator"] = self._conf.getLocator().getWebForm()
         vars["event_type"] = ""
@@ -2992,13 +2993,13 @@ class WConferenceDataModification(wcomponents.WTemplated):
         else:
             vars["additionalInfo"] = ""
         return vars
-    
+
 
 class WPConfDataModif( WPConferenceModification ):
-    
+
     def _getPageContent( self, params ):
         p = WConferenceDataModification( self._conf, self._rh )
-        pars = { 
+        pars = {
         "postURL": urlHandlers.UHConfPerformDataModif.getURL(),
         "calendarIconURL": Config.getInstance().getSystemIconURL("calendar"),
         "calendarSelectURL":  urlHandlers.UHSimpleCalendar.getURL(),
@@ -3007,7 +3008,7 @@ class WPConfDataModif( WPConferenceModification ):
 
 
 class WPModChairNew( WPConferenceModification ):
-    
+
     def _getPageContent(self,params):
         caption= _("Adding a new chair")
         wc=wcomponents.WConfModParticipEdit(title=caption)
@@ -3029,7 +3030,7 @@ class WPModChairNew( WPConferenceModification ):
 
 
 class WPModChairEdit( WPConferenceModification ):
-    
+
     def _getPageContent(self,params):
         caption= _("Edit chairperson data")
         chair=part=params["chair"]
@@ -3054,11 +3055,11 @@ class WPModChairEdit( WPConferenceModification ):
 
 
 class WPConfAddMaterial( WPConferenceModification ):
-    
+
     def __init__( self, rh, conf, mf ):
         WPConferenceModification.__init__( self, rh, conf )
         self._mf = mf
-    
+
     def _getTabContent( self, params ):
         if self._mf:
             comp = self._mf.getCreationWC( self._conf )
@@ -3069,14 +3070,14 @@ class WPConfAddMaterial( WPConferenceModification ):
 
 
 class WScheduleContribution(wcomponents.WTemplated):
-    
+
     def __init__(self, contrib, insideSession = False):
         self._contrib = contrib
         self._insideSession = insideSession
-    
-    def getVars(self):        
+
+    def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
-        
+
         vars['addSubURL'] = urlHandlers.UHContribAddSubCont.getURL(self._contrib)
         if self._insideSession:
             vars['delURL'] = urlHandlers.UHSessionDelSchItems.getURL(self._contrib.getSchEntry())
@@ -3090,16 +3091,16 @@ class WScheduleContribution(wcomponents.WTemplated):
         vars['moveDownURL'] = urlHandlers.UHConfModScheduleMoveEntryDown.getURL(self._contrib.getSchEntry())
         vars['downArrowURL'] = Config.getInstance().getSystemIconURL("downArrow")
         vars['subCont'] = self._contrib.getSubContributionList()
-        
+
         place=""
         if self._contrib.getRoom() is not None and \
                 self._contrib.getRoom().getName().strip()!="":
             place="%s: "%self._contrib.getRoom().getName()
         vars['place'] = place
-        
+
         return vars
-    
-    def getHTML(self, params=None):         
+
+    def getHTML(self, params=None):
         return wcomponents.WTemplated.getHTML( self, params )
 
 class WScheduleSlot(wcomponents.WTemplated):
@@ -3108,9 +3109,9 @@ class WScheduleSlot(wcomponents.WTemplated):
 
         self._slot = slot
         self._session = slot.getSession()
-        self._conf = slot.getConference()          
-        
-    def getHTML(self, params=None):         
+        self._conf = slot.getConference()
+
+    def getHTML(self, params=None):
         return wcomponents.WTemplated.getHTML( self, params )
 
 class WScheduleBreak(wcomponents.WTemplated):
@@ -3124,22 +3125,22 @@ class WScheduleBreak(wcomponents.WTemplated):
         params['relocateAction'] = urlHandlers.UHConfModifScheduleRelocate.getURL
         params['moveUpAction'] = urlHandlers.UHConfModScheduleMoveEntryUp.getURL
         params['moveDownAction'] = urlHandlers.UHConfModScheduleMoveEntryDown.getURL
-        
+
         return wcomponents.WTemplated.getHTML( self, params )
 
 class WConfModifScheduleGraphicOverview(wcomponents.WTemplated):
-    
+
     def __init__(self, conf, timetable, days):
         self._conf = conf
         self._timetable = timetable
         self._days = days
-    
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
 
         vars['schedule'] = self._getScheduleHTML(**vars)
         return vars
-    
+
     def _getColor(self,entry):
         bgcolor = "white"
         if isinstance(entry,schedule.LinkedTimeSchEntry):
@@ -3154,7 +3155,7 @@ class WConfModifScheduleGraphicOverview(wcomponents.WTemplated):
                 bgcolor=entry.getColor()
         return bgcolor
 
-    
+
     def _getContributionHTML(self,contrib,days,params):
         if days:
             params['days'] = days
@@ -3164,7 +3165,7 @@ class WConfModifScheduleGraphicOverview(wcomponents.WTemplated):
         if days:
             params['days'] = days
         return WScheduleSlot(slot).getHTML(params)
-    
+
     def _getBreakHTML(self,breakEntry, days, params):
         if days:
             params['days'] = days
@@ -3180,17 +3181,17 @@ class WConfModifScheduleGraphicOverview(wcomponents.WTemplated):
             return self._getBreakHTML(entry,None,params)
 
     def _getScheduleHTML(self, **params):
-        self._dayParam = params.get("days","all")    
+        self._dayParam = params.get("days","all")
         days = self._days
         timetable = self._timetable
         num_slots_in_hour=int(timedelta(hours=1).seconds/timetable.getSlotLength().seconds)
         slotList=[]
         lastEntries=[]
-        
+
         for day in days:
-        
+
             slotList.append('<a name="%s"></a><div class="timetableHeader" style="margin-top: 15px; margin-bottom: 15px;">%s</div><table style="width:95%%;  margin-left: auto; margin-right: auto;">' % (day.getDate().strftime("%Y-%m-%d"), day.getDate().strftime("%a %b %d")))
-        
+
             maxOverlap=day.getNumMaxOverlaping()
             width="100"
             if maxOverlap!=0:
@@ -3221,10 +3222,10 @@ class WConfModifScheduleGraphicOverview(wcomponents.WTemplated):
                         entryParams['rowspan'] = day.getNumSlots(entry);
                         entryParams['colspan'] = colspan;
                         entryParams['width'] = width;
-                                                
+
                         temp.append(self._getEntryHTML(entry, entryParams))
                         lastEntries.append(entry)
-                        
+
                     if remColSpan>0:
                         temp.append("""<td width="100%%" colspan="%i"></td>"""%(remColSpan))
                     if slot.getAdjustedStartDate().minute==0:
@@ -3246,14 +3247,14 @@ class WConfModifScheduleGraphicOverview(wcomponents.WTemplated):
                 </tr>""" % hour)
                 else:
                     slotList.append("".join(hourSlots))
-                                    
+
             slotList.append('</table>')
-            
+
         return "".join(slotList)
-        
+
 
 class WConfModifScheduleGraphic(wcomponents.WTemplated):
-    
+
     def __init__(self, conference, aw, timetable, dayList, enableControls=False, **params):
         wcomponents.WTemplated.__init__(self, **params)
         self._conf = conference
@@ -3288,34 +3289,41 @@ class WConfModifScheduleGraphic(wcomponents.WTemplated):
 
         vars["addSessionURL"]=urlHandlers.UHConfAddSession.getURL(self._conf)
         vars["addBreakURL"]=urlHandlers.UHConfAddBreak.getURL(self._conf)
-        
+
         originURL = urlHandlers.UHConfModifSchedule.getURL(self._conf)
         newContribURL = urlHandlers.UHConfModScheduleNewContrib.getURL(self._conf)
-        newContribURL.addParam("originURL",originURL)         
+        newContribURL.addParam("originURL",originURL)
         newContribURL.addParam("eventType","meeting")
-        vars["newContribURL"] = newContribURL        
+        vars["newContribURL"] = newContribURL
         vars['rbActive'] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
-        
+
+        vars['ttdata'] = schedule.ScheduleToJson.process(self._conf.getSchedule(), tz)
+        vars['eventInfo'] = simplejson.dumps(DictPickler.pickle(self._conf, timezone=tz))
+
         return vars
 
 class WPConfModifScheduleGraphic( WPConferenceModifBase ):
-    
+
     def __init__(self, rh, conf):
         WPConferenceModifBase.__init__(self, rh, conf)
         self._session = None
         self._contrib = None
-    
+
     def _setActiveSideMenuItem( self ):
         self._timetableMenuItem.setActive()
-    
+
     def _getScheduleContent(self, params):
-        
+
         if self._session != None:
             from MaKaC.webinterface.pages import sessions
             return sessions.WSessionModifSchedule(self._conf, self._timetable, self._days, self._aw, self._session).getHTML(params)
         else:
             return WConfModifScheduleGraphicOverview(self._conf, self._timetable, self._days).getHTML(params)
-    
+
+    def getJSFiles(self):
+        return WPConferenceModifBase.getJSFiles(self) + \
+               self._includeJSPackage('Timetable')
+
     def _generateTimetable(self):
         tz = self._conf.getTimezone()
         timeTable = timetable.TimeTable(self._conf.getSchedule(), tz)
@@ -3340,35 +3348,35 @@ class WPConfModifScheduleGraphic( WPConferenceModifBase ):
             return False
         else:
             return True
-    
-    def _getPageContent( self, params ):        
 
-        params["session"] = self._session                
-        
+    def _getPageContent( self, params ):
+
+        params["session"] = self._session
+
         days = params.get("days", None)
-        
-        timeTable= self._generateTimetable()   
+
+        timeTable= self._generateTimetable()
 
         if days == None or days == 'all':
             dayList = timeTable.getDayList()
         else:
             dayList = [timeTable.getDayList()[int(days)]]
-        
+
         self._days = dayList
         self._timetable = timeTable
-        
+
         params["content"] = self._getScheduleContent(params)
-        
+
         wc = WConfModifScheduleGraphic( self._conf, self._getAW(), timeTable, dayList, enableControls=self._getEnabledControls())
         return wc.getHTML(params)
 
 #------------------------------------------------------------------------------
 
 class WConfModifSchedule(wcomponents.WTemplated):
-    
+
     def __init__(self, conference):
         self._conf = conference
-            
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["confTitle"] = self._conf.getTitle()
@@ -3377,15 +3385,15 @@ class WConfModifSchedule(wcomponents.WTemplated):
         vars["selectAll"] = Config.getInstance().getSystemIconURL("checkAll")
         vars["deselectAll"] = Config.getInstance().getSystemIconURL("uncheckAll")
         vars["standardAction"] = quoteattr(str(urlHandlers.UHConfModifSchedule.getURL(self._conf)))
-      
-        tz = self._conf.getTimezone() 
+
+        tz = self._conf.getTimezone()
         sDate = self._conf.getAdjustedStartDate()
         eDate = self._conf.getAdjustedEndDate()
         vars["start_date"]=sDate.strftime("%A %d %B %Y %H:%M")
         vars["timezone"] = tz
         vars["end_date"]=eDate.strftime("%A %d %B %Y %H:%M")
         vars["editURL"]=quoteattr(str(urlHandlers.UHConfModScheduleDataEdit.getURL(self._conf)))
-        
+
         fullAction = urlHandlers.UHConfModifSchedule.getURL(self._conf)
         fullAction.addParam("view","full")
         vars["fullAction"] = quoteattr(str(fullAction))
@@ -3399,19 +3407,19 @@ class WConfModifSchedule(wcomponents.WTemplated):
                 l.append("""<option value="%s">%s</option>"""%(opt, opt))
         vars["views"] = "\n".join(l)
         vars["entries"] = self.getEntryList(vars,view)
-        vars["removeButton"] = _("""<input type="submit" class="btn" name="fired" value="_("Remove entries")">""")        
+        vars["removeButton"] = _("""<input type="submit" class="btn" name="fired" value="_("Remove entries")">""")
         vars["entriesAction"] = urlHandlers.UHConfModifScheduleEntries.getURL(self._conf)
         #pdf
         url=urlHandlers.UHConfModifScheduleCustomizePDF.getURL(self._conf, showDays="all", showSessions="all")
         vars["pdfButton"] = wcomponents.WUtils.createImgButton(url, "pdf", _("get PDF of the programme"))
-        return vars    
-    
+        return vars
+
     def getEntryList(self, vars, view="standard"):
         html = []
-            
+
         entries = {}
         url = ""
-        tz = self._conf.getTimezone()        
+        tz = self._conf.getTimezone()
         for e in self._conf.getSchedule().getEntries() :
             entryType = ""
             entryId = ""
@@ -3443,11 +3451,11 @@ class WConfModifSchedule(wcomponents.WTemplated):
                 entries["%s-%s"%(startDate,e.getId())] = [e,"session","s%s-%s"%(e.getId(),day),url,startDate,e.getTitle()+" (day %s)"%(day+1), day]
                 day = day + 1
                 startDate = e.getAdjustedStartDate() + timedelta(days=day)
-        
+
         entriesKeys = entries.keys()
         entriesKeys.sort()
-        
-        for k in entriesKeys : 
+
+        for k in entriesKeys :
             e = entries[k][0]
 
             html.append(self._getDayRow(vars, entries[k][4].date()))
@@ -3458,7 +3466,7 @@ class WConfModifSchedule(wcomponents.WTemplated):
             contributions = []
             if entries[k][1] == "session" or entries[k][1] == "contribution" :
                 image = self._getArrowImage(entries[k][1],vars[entries[k][1]+"s"],entries[k][2],vars)
-    
+
             start = end = style = ""
             if entries[k][1] == "session" :
                 style = """style="background:#CCCCCC" """
@@ -3479,44 +3487,44 @@ class WConfModifSchedule(wcomponents.WTemplated):
             </tr>
             """%(style, entries[k][2],start, end,entries[k][1],image,entries[k][3],entries[k][5], self._getEntryIcons(entries[k][2]))
             html.append(text)
-            
+
             if entries[k][1] == "session" and (entries[k][2] in vars["sessions"] or view == "full") :
                 html.append(self._getSessionEntries(e, entries[k][6], vars))
-            
+
             if entries[k][1] == "contribution" and (entries[k][2] in vars["contributions"] or view == "full") :
                 html.append(self._getSubContributions(vars, e))
         return """
                 """.join(html)
 
-    def _getSessionEntries(self, session, day, vars): 
+    def _getSessionEntries(self, session, day, vars):
         html = []
-        tz = self._conf.getTimezone()   
+        tz = self._conf.getTimezone()
         dayDate = session.getAdjustedStartDate() + timedelta(days=day)
         dayDate = dayDate.date()
-                
+
         slots = {}
         for slot in session.getSlotList() :
-            if slot.getAdjustedStartDate().date() == dayDate :        
-                slots["%s%s"%(slot.getAdjustedStartDate(),slot.getId())] = slot             
+            if slot.getAdjustedStartDate().date() == dayDate :
+                slots["%s%s"%(slot.getAdjustedStartDate(),slot.getId())] = slot
         slotKeys = slots.keys()
         slotKeys.sort()
-        
+
         for k in slotKeys :
-            slot = slots[k]                
-            entryId = "l%s-%s"%(session.getId(),slot.getId())            
+            slot = slots[k]
+            entryId = "l%s-%s"%(session.getId(),slot.getId())
             image = self._getArrowImage("slot",vars["slots"],entryId, vars)
-            
+
             url = urlHandlers.UHSessionModSlotEdit.getURL(self._conf)
             url.addParam("sessionId",session.getId())
             url.addParam("slotId",slot.getId())
-            
+
             start = slot.getAdjustedStartDate().strftime("%H:%M")
             end = slot.getAdjustedEndDate().strftime("%H:%M")
-            
+
             title = slot.getTitle()
             if len(title) == 0 :
                 title = "(default slot)"
-            
+
             text = """
             <tr style="background:#D9D9D9" >
                 <td><input type="checkbox" name="entries" value="%s"/></td>
@@ -3525,20 +3533,20 @@ class WConfModifSchedule(wcomponents.WTemplated):
                 <td>&nbsp;slot</td>
                 <td>&nbsp;&nbsp;&nbsp;&nbsp;%s<a href="%s">%s</a></td>
                 <td align="right">&nbsp; %s</td>
-            </tr>        
+            </tr>
             """%(entryId,start,end,image,url,title,self._getEntryIcons(entryId))
             html.append(text)
-            
+
             if  entryId in vars["slots"] or vars["view"] == "full" :
                 html.append(self._getSlotEntries(session, slot, vars))
-                
-            
+
+
         return """
                 """.join(html)
-                
+
     def _getSlotEntries(self, session, slot, vars):
         html = []
-        tz = self._conf.getTimezone() 
+        tz = self._conf.getTimezone()
         for e in slot.getSchedule().getEntries() :
             entryType = ""
             entryId = ""
@@ -3551,7 +3559,7 @@ class WConfModifSchedule(wcomponents.WTemplated):
                 url.addParam("sessionId",session.getId())
                 url.addParam("slotId",slot.getId())
                 url.addParam("schEntryId",e.getId())
-        
+
             elif isinstance(e.getOwner(),conference.Contribution):
                 entryType = "contribution"
                 e = e.getOwner()
@@ -3559,12 +3567,12 @@ class WConfModifSchedule(wcomponents.WTemplated):
                 url = urlHandlers.UHContributionModification.getURL(self._conf)
                 url.addParam("sessionId",session.getId())
                 url.addParam("contribId",e.getId())
-                
-                image = self._getArrowImage(entryType,vars["contributions"],entryId,vars)    
-                
+
+                image = self._getArrowImage(entryType,vars["contributions"],entryId,vars)
+
             start = e.getAdjustedStartDate().strftime("%H:%M")
             end = e.getAdjustedEndDate().strftime("%H:%M")
-            
+
             text = """
             <tr style="background:#E6E6E6" >
                 <td><input type="checkbox" name="entries" value="%s"/></td>
@@ -3573,37 +3581,37 @@ class WConfModifSchedule(wcomponents.WTemplated):
                 <td>&nbsp;%s</td>
                 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s<a href="%s">%s</a></td>
                 <td align="right">&nbsp; %s</td>
-            </tr>        
+            </tr>
             """%(entryId,start,end,entryType,image,url,e.getTitle(), self._getEntryIcons(entryId))
             html.append(text)
-            
+
             if entryType == "contribution" and ("%s"%e.getId() in vars["contributions"] or vars.get("view","standard") == "full") :
                 html.append(self._getSubContributions(vars, e,session, slot))
-            
+
         return """
                 """.join(html)
 
-    def _getSubContributions(self, vars, contrib, session=None, slot=None):        
-        tz = self._conf.getTimezone() 
-        html = []        
+    def _getSubContributions(self, vars, contrib, session=None, slot=None):
+        tz = self._conf.getTimezone()
+        html = []
         entries = {}
         for e in contrib.getSubContributionList() :
             entries["%s"%e.getId()] = e
-            
+
         entryKeys = entries.keys()
         entryKeys.sort()
-        
+
         for k in entryKeys :
-            e = entries[k]            
+            e = entries[k]
             entryId = "u%s-%s"%(contrib.getId(), e.getId())
             url = urlHandlers.UHSubContribModification.getURL(self._conf)
             url.addParam("contribId",contrib.getId())
             url.addParam("subContId",e.getId())
-            
+
             space = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
             if slot is not None :
                 space = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-            
+
             text = """
             <tr>
                 <td><input type="checkbox" name="entries" value="%s"/></td>
@@ -3612,27 +3620,27 @@ class WConfModifSchedule(wcomponents.WTemplated):
                 <td>&nbsp;%s</td>
                 <td>%s<a href="%s">%s</a></td>
                 <td align="right">&nbsp;%s</td>
-            </tr>        
+            </tr>
             """%(entryId,"", "","sub-contrib",space,url,e.getTitle(), self._getEntryIcons(entryId))
             html.append(text)
-            
+
         return """
                 """.join(html)
 
     def _getDayRow(self, vars, date):
         if vars.get("lastDate",None) is  not None and vars["lastDate"] >= date:
             return ""
-        
+
         html = ""
         vars["lastDate"] = date
-        
+
         if "%s"%date in vars["days"] :
             arrowImg = Config.getInstance().getSystemIconURL("arrowRightMenuConf")
             arrowAlt = ">> "
             arrowURL = arrowURL = urlHandlers.UHConfModifSchedule.getURL(self._conf)
             if vars.get("view","standard") == "full" :
                 arrowURL.addParam("view","standard")
-            else : 
+            else :
                 arrowURL.addParam("view",vars.get("view","standard"))
             arrowURL.addParam("session",vars["sessions"])
             arrowURL.addParam("slots",vars["slots"])
@@ -3645,13 +3653,13 @@ class WConfModifSchedule(wcomponents.WTemplated):
             arrowURL = urlHandlers.UHConfModifSchedule.getURL(self._conf)
             if vars.get("view","standard") == "full" :
                 arrowURL.addParam("view","standard")
-            else : 
+            else :
                 arrowURL.addParam("view",vars.get("view","standard"))
             arrowURL.addParam("session",vars["sessions"])
             arrowURL.addParam("slots",vars["slots"])
             days = vars["days"][:]
             days.append("%s"%date)
-            arrowURL.addParam("day",days)                
+            arrowURL.addParam("day",days)
         image = """<a href="%s">&nbsp;<img src="%s" border="0" alt="%s" >&nbsp;</a>"""%(arrowURL, arrowImg, arrowAlt)
         html = """
         <tr>
@@ -3659,7 +3667,7 @@ class WConfModifSchedule(wcomponents.WTemplated):
             <td colspan="3" align="right"><small>%s</small></td>
         </tr>
         """%(image, vars["lastDate"], self._getDayIcons(vars["lastDate"]))
-        
+
         return html
 
     def _getEntryIcons(self, entryId):
@@ -3673,22 +3681,22 @@ class WConfModifSchedule(wcomponents.WTemplated):
             return self._getBreakIcons(entryId)
         if entryId[0:1] == "u" :
             return self._getSubContributionIcons(entryId)
-            
+
     def _getDayIcons(self, day):
         icons = []
         icons.append(self._getNewSessionIcon())
         icons.append(self._getAddContributionIcon())
         icons.append(self._getNewContributionIcon())
-        icons.append(self._getNewBreakIcon())        
+        icons.append(self._getNewBreakIcon())
         icons.append(self._getRescheduleIcon(targetDay=day))
         return "&nbsp;".join(icons)
-        
+
     def _getSessionIcons(self, entryId):
         icons = []
         icons.append(self._getNewSlotIcon(entryId))
         icons.append(self._getRemoveIcon(entryId))
         return "&nbsp;".join(icons)
-        
+
     def _getSlotIcons(self, entryId):
         icons = []
         icons.append(self._getNewContributionIcon(entryId))
@@ -3696,23 +3704,23 @@ class WConfModifSchedule(wcomponents.WTemplated):
         icons.append(self._getRescheduleIcon(entryId))
         icons.append(self._getRemoveIcon(entryId))
         return "&nbsp;".join(icons)
-        
+
     def _getContributionIcons(self, entryId):
-        icons = []        
+        icons = []
         icons.append(self._getNewSubContributionIcon(entryId))
         icons.append(self._getRemoveIcon(entryId))
         return "&nbsp;".join(icons)
-        
+
     def _getBreakIcons(self, entryId):
-        icons = []        
+        icons = []
         icons.append(self._getRemoveIcon(entryId))
         return "&nbsp;".join(icons)
-        
+
     def _getSubContributionIcons(self, entryId):
-        icons = []        
+        icons = []
         icons.append(self._getRemoveIcon(entryId))
         return "&nbsp;".join(icons)
-        
+
     def _getRemoveIcon(self, entryId):
         url = urlHandlers.UHConfModifScheduleEntries.getURL(self._conf)
         url.addParam("fired", _("Remove entries"))
@@ -3720,7 +3728,7 @@ class WConfModifSchedule(wcomponents.WTemplated):
         image = Config.getInstance().getSystemIconURL("cross")
         icon = _("""<a href="%s"><img title="_("Remove entry")" src="%s" border="0" alt="remove" ></a>""")%(url, image)
         return icon
-        
+
     def _getNewBreakIcon(self, entryId = None):
         url = urlHandlers.UHConfModifScheduleEntries.getURL(self._conf)
         url.addParam("fired", _("New break"))
@@ -3737,7 +3745,7 @@ class WConfModifSchedule(wcomponents.WTemplated):
             url.addParam("entries",entryId)
         image = Config.getInstance().getSystemIconURL("existingfile")
         icon = _("""<a href="%s"><img title="_("Add existing contribution")" src="%s" border="0" alt="add contribution" ></a>""")%(url, image)
-        return icon    
+        return icon
 
     def _getNewContributionIcon(self, entryId = None):
         url = urlHandlers.UHConfModifScheduleEntries.getURL(self._conf)
@@ -3746,15 +3754,15 @@ class WConfModifSchedule(wcomponents.WTemplated):
             url.addParam("entries",entryId)
         image = Config.getInstance().getSystemIconURL("file")
         icon = _("""<a href="%s"><img title="_("New contribution")" src="%s" border="0" alt="new contribution" ></a>""")%(url, image)
-        return icon    
-        
+        return icon
+
     def _getNewSessionIcon(self):
         url = urlHandlers.UHConfModifScheduleEntries.getURL(self._conf)
         url.addParam("fired", _("New session"))
         image = Config.getInstance().getSystemIconURL("disabledSection")
         icon = _("""<a href="%s"><img title="_("New session")" src="%s" border="0" alt="session" ></a>""")%(url, image)
-        return icon        
-        
+        return icon
+
     def _getNewSubContributionIcon(self, entryId = None):
         url = urlHandlers.UHConfModifScheduleEntries.getURL(self._conf)
         url.addParam("fired", _("New sub-contribution"))
@@ -3762,16 +3770,16 @@ class WConfModifSchedule(wcomponents.WTemplated):
             url.addParam("entries",entryId)
         image = Config.getInstance().getSystemIconURL("subfile")
         icon = _("""<a href="%s"><img title="_("New sub-contribution")" src="%s" border="0" alt="sub-contribution" ></a>""")%(url, image)
-        return icon        
-            
+        return icon
+
     def _getNewSlotIcon(self, entryId):
         url = urlHandlers.UHConfModifScheduleEntries.getURL(self._conf)
         url.addParam("fired", _("New slot"))
         url.addParam("entries",entryId)
         image = Config.getInstance().getSystemIconURL("subsection")
         icon = _("""<a href="%s"><img title="_("New slot")" src="%s" border="0" alt="slot" ></a>""")%(url, image)
-        return icon        
-        
+        return icon
+
     def _getRescheduleIcon(self, entryId = None, targetDay = None):
         url = urlHandlers.UHConfModifScheduleEntries.getURL(self._conf)
         url.addParam("fired", _("Reschedule"))
@@ -3782,9 +3790,9 @@ class WConfModifSchedule(wcomponents.WTemplated):
         url.addParam("targetDay",targetDay)
         image = Config.getInstance().getSystemIconURL("clock")
         icon = _("""<a href="%s"><img title="_("Reschedule")" src="%s" border="0" alt="Reschedule" ></a>""")%(url, image)
-        return icon        
-    
-    def  _getArrowImage(self, type, entries, entryId, vars):    
+        return icon
+
+    def  _getArrowImage(self, type, entries, entryId, vars):
 
         typeList = ["session","slot","contribution"]
         entryList = []
@@ -3794,7 +3802,7 @@ class WConfModifSchedule(wcomponents.WTemplated):
             entryList = vars["slots"][:]
         elif type == "contribution" :
             entryList = vars["contributions"][:]
-        
+
         if len(entries) == 0 or "%s"%entryId not in entries:
             arrowImg = Config.getInstance().getSystemIconURL("arrowRightMenuConf")
             arrowAlt = ">> "
@@ -3805,7 +3813,7 @@ class WConfModifSchedule(wcomponents.WTemplated):
                 if not t == type :
                     arrowURL.addParam(t,vars[t+"s"])
             arrowURL.addParam("view",vars.get("view","standard"))
-        else : 
+        else :
             arrowImg = Config.getInstance().getSystemIconURL("arrowBottomMenuConf")
             arrowAlt = "VV "
             arrowURL = urlHandlers.UHConfModifSchedule.getURL(self._conf)
@@ -3816,30 +3824,30 @@ class WConfModifSchedule(wcomponents.WTemplated):
                     arrowURL.addParam(t,vars[t+"s"])
             if vars.get("view","standard") == "full" :
                 arrowURL.addParam("view","standard")
-            else : 
+            else :
                 arrowURL.addParam("view",vars.get("view","standard"))
-        
+
         image = """<a href="%s"><img src="%s" border="0" alt="%s" ></a>"""%(arrowURL, arrowImg, arrowAlt)
-    
+
         return image
-        
+
 #------------------------------------------------------------------------------
 class WPConfModifSchedule( WPConferenceModifBase ):
-    
+
     def _setActiveTab( self ):
         self._tabSchedule.setActive()
-    
+
     #def _getTabContent( self, params ):
     #    wc = WConfModifSchedule( self._conf )
     #    return wc.getHTML(params)
-                
+
 #------------------------------------------------------------------------------
 
 class WPPConfModifScheduleRemoveEtries(WPConfModifSchedule):
-    
+
     def __init__(self,rh,conference):
         WPConfModifSchedule.__init__(self,rh,conference)
-    
+
     def _getTabContent(self,params):
         wc = wcomponents.WConfirmation()
         msg = _(""" _("Are you sure you want to remove these entries from the time schedule")?<br/>
@@ -3859,7 +3867,7 @@ class WPPConfModifScheduleRemoveEtries(WPConfModifSchedule):
 
     def _getEntryInfo(self, entries):
         html = []
-        
+
         for eId in entries :
             type = ""
             description = ""
@@ -3908,7 +3916,7 @@ class WPPConfModifScheduleRemoveEtries(WPConfModifSchedule):
 ##############################################################################
 #------------------------------------------------------------------------------
 class WConfModScheduleDataEdit(wcomponents.WTemplated):
-    
+
     def __init__(self,conf):
         self._conf=conf
 
@@ -3930,18 +3938,18 @@ class WConfModScheduleDataEdit(wcomponents.WTemplated):
         return vars
 
 class WPModScheduleDataEdit(WPConfModifSchedule):
-    
+
     def _getPageContent( self, params ):
         wc = WConfModScheduleDataEdit(self._conf)
         return wc.getHTML()
 
 
 class WPModScheduleAddContrib(WPConfModifSchedule):
-    
+
     def __init__(self,rh,conf,targetDay=None):
         WPConfModifSchedule.__init__(self,rh,conf)
         self._targetDay=targetDay
-    
+
     def _getTabContent( self, params ):
         l=[]
         for contrib in self._conf.getContributionList():
@@ -3957,11 +3965,11 @@ class WPModScheduleAddContrib(WPConfModifSchedule):
 #---------------------------------------------------------------------------
 
 class WPConfAddSession(WPConfModifSchedule):
-    
+
     def __init__(self,rh,session,day=None):
         WPConfModifSchedule.__init__(self,rh,session)
         self._targetDay=day
-    
+
     def _getTabContent( self, params ):
         title="Create a new session"
         p=wcomponents.WSessionModEditData(self._conf,self._getAW(),title,self._targetDay)
@@ -3978,12 +3986,12 @@ class WPConfAddSession(WPConfModifSchedule):
         params["textcolorChartURL"]=urltext
         params["textcolor"] = "#777777"
         params["textColorToLinks"]=""
-                
+
         wconvener = wcomponents.WAddPersonModule("convener")
         params["convenerOptions"] = params.get("convenerOptions",self._getPersonOptions())
         params["convener"] = wconvener.getHTML(params)
         return p.getHTML(params)
-    
+
     def _getPersonOptions(self):
         html = []
         names = []
@@ -4015,16 +4023,16 @@ class WPConfAddSession(WPConfModifSchedule):
         for name in names:
             html.append(text[name])
         return "".join(html)
-    
+
 #---------------------------------------------------------------------------
 
 class WPNewSessionConvenerSelect( WPConferenceModifBase ):
-    
+
     def _setActiveTab( self ):
         self._tabContribList.setActive()
-        
+
     def _getTabContent( self, params ):
-        searchAction = str(self._rh.getCurrentURL())               
+        searchAction = str(self._rh.getCurrentURL())
         searchExt = params.get("searchExt","")
         if searchExt != "":
             searchLocal = False
@@ -4036,15 +4044,15 @@ class WPNewSessionConvenerSelect( WPConferenceModifBase ):
 #---------------------------------------------------------------------------
 
 class WPNewSessionConvenerNew( WPConferenceModifBase ):
-    
+
     def __init__(self, rh, conf, params):
         WPConferenceModifBase.__init__(self, rh, conf)
         self._params = params
-    
-    
+
+
     def _setActiveTab( self ):
         self._tabContribList.setActive()
-        
+
     def _getTabContent( self, params ):
         p = wcomponents.WNewPerson()
         if self._params.get("formTitle",None) is None :
@@ -4065,31 +4073,31 @@ class WPNewSessionConvenerNew( WPConferenceModifBase ):
             self._params["phoneValue"] = ""
         if self._params.get("faxValue",None) is None :
             self._params["faxValue"] = ""
-        
+
         self._params["disabledRole"] = False
         self._params["roleDescription"] = _(""" _("Coordinator")<br> _("Manager")""")
         self._params["roleValue"] = _(""" <input type="checkbox" name="coordinatorControl"> _("Give coordinator rights to the convener").<br>
                                         <input type="checkbox" name="managerControl"> _("Give management rights to the convener").""")
         self._params["disabledNotice"] = True
         self._params["noticeValue"] = _("""<i><font color="black"><b>_("Note"): </b></font>_("If this person does not already have
-         an Indico account, he or she will be sent an email asking to create an account. After the account creation the 
+         an Indico account, he or she will be sent an email asking to create an account. After the account creation the
          user will automatically be given coordinator/management rights.")</i>""")
-        
+
         formAction = urlHandlers.UHConfNewSessionPersonAdd.getURL(self._conf)
         formAction.addParam("orgin","new")
         formAction.addParam("typeName","convener")
         self._params["formAction"] = formAction
-        
+
         return p.getHTML(self._params)
 
 #---------------------------------------------------------------------------
 
 class WPConfAddBreak( WPConfModifSchedule ):
-    
+
     def __init__(self,rh,session,day=None):
         WPConfModifSchedule.__init__(self,rh,session)
         self._targetDay=day
-    
+
     def _getTabContent( self, params ):
         p=wcomponents.WBreakDataModification(self._conf.getSchedule(),targetDay=self._targetDay,conf=self._conf)
         pars={"postURL": urlHandlers.UHConfPerformAddBreak.getURL(self._conf)}
@@ -4097,11 +4105,11 @@ class WPConfAddBreak( WPConfModifSchedule ):
 
 
 class WPConfModifyBreak( WPConfModifScheduleGraphic ):
-    
+
     def __init__( self, rh, conf, schBreak ):
         WPConfModifScheduleGraphic.__init__( self, rh, conf )
         self._break = schBreak
-    
+
     def _getScheduleContent( self, params ):
         sch=self._conf.getSchedule()
         wc=wcomponents.WBreakDataModification(sch,self._break,conf=self._conf)
@@ -4111,11 +4119,11 @@ class WPConfModifyBreak( WPConfModifScheduleGraphic ):
 
 
 class WPModSchEditContrib(WPConfModifSchedule):
-    
+
     def __init__(self,rh,contrib):
         WPConfModifSchedule.__init__(self,rh,contrib.getConference())
         self._contrib=contrib
-    
+
     def _getTabContent(self,params):
         wc=wcomponents.WSchEditContrib(self._contrib)
         pars={"postURL":urlHandlers.UHConfModSchEditContrib.getURL(self._contrib)}
@@ -4123,7 +4131,7 @@ class WPModSchEditContrib(WPConfModifSchedule):
 
 
 class WSchEditSlot(wcomponents.WTemplated):
-    
+
     def __init__(self,slotData, errors=[]):
         self._slotData=slotData
         self._errors = errors
@@ -4147,7 +4155,7 @@ class WSchEditSlot(wcomponents.WTemplated):
                             <input type="checkbox" name="sel_conv" value=%s>
                             <input type="hidden" name="conv_id" value=%s>
                         </td>
-                        <td style="border-top:1px solid #777777;padding-top:2px" width="100%%"> 
+                        <td style="border-top:1px solid #777777;padding-top:2px" width="100%%">
                             <table border="0" width="95%%" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td>&nbsp;</td>
@@ -4224,7 +4232,7 @@ class WSchEditSlot(wcomponents.WTemplated):
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> _("Slot Title")</span></td>
             <td bgcolor="white" width="100%%">&nbsp;%s</td>
         </tr>""")%vars["title"]
-            
+
         vars["orginURL"] = vars.get("orginURL","")
         vars["postURL"]=quoteattr(str(urlHandlers.UHConfModSchEditSlot.getURL(slot)))
         vars["sessionTitle"]=self.htmlText(self._slotData.getSession().getTitle())
@@ -4277,23 +4285,23 @@ class WSchEditSlot(wcomponents.WTemplated):
         return vars
 
 class WPModSchEditSlot(WPConfModifSchedule):
-    
+
     def __init__(self,rh,slotData, errors=[]):
         WPConfModifSchedule.__init__(self,rh,slotData.getSession().getConference())
         self._slotData=slotData
         self._errors = errors
-    
+
     def _getTabContent(self,params):
         wc=WSchEditSlot(self._slotData, self._errors)
         return wc.getHTML(params)
 
 class WPModSessionMoveConfirmation(WPConfModifSchedule):
-    
+
     def __init__(self,rh,session):
         WPConfModifSchedule.__init__(self,rh,session.getConference())
         self._session=session
         self._aw = rh._aw
-    
+
     def _getTabContent(self,params):
         wc=WSessionMoveConfirmation(self._session, self._aw)
         url=urlHandlers.UHConfModSessionMoveConfirmation.getURL(self._session)
@@ -4302,9 +4310,9 @@ class WPModSessionMoveConfirmation(WPConfModifSchedule):
 class WSessionMoveConfirmation(wcomponents.WTemplated):
 
     def __init__(self,session, aw):
-        self._session = session 
+        self._session = session
         self._aw = aw
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
         vars["calendarIconURL"] = Config.getInstance().getSystemIconURL("calendar")
@@ -4327,13 +4335,13 @@ class WSessionMoveConfirmation(wcomponents.WTemplated):
             vars["sHour"] = "hh"
             vars["sMinute"] = "mm"
         return vars
-    
+
 class WPModSlotRemConfirmation(WPConfModifSchedule):
-    
+
     def __init__(self,rh,slot):
         WPConfModifSchedule.__init__(self,rh,slot.getConference())
         self._slot=slot
-    
+
     def _getTabContent(self,params):
         wc=wcomponents.WConfirmation()
         slotCaption="on %s %s-%s"%(
@@ -4342,9 +4350,9 @@ class WPModSlotRemConfirmation(WPConfModifSchedule):
             self._slot.getAdjustedEndDate().strftime("%H:%M"))
         if self._slot.getTitle()!="":
             slotCaption=""" "%s" (%s) """%(self._slot.getTitle(),slotCaption)
-        
-        msg= _("""Are you sure you want to delete the slot %s 
-        of the session "%s" (note that any contribution scheduled 
+
+        msg= _("""Are you sure you want to delete the slot %s
+        of the session "%s" (note that any contribution scheduled
         inside will be unscheduled)?""")%(slotCaption,
             self._slot.getSession().getTitle())
         url=urlHandlers.UHConfModSlotRem.getURL(self._slot)
@@ -4352,15 +4360,15 @@ class WPModSlotRemConfirmation(WPConfModifSchedule):
 
 
 class WPModSessionRemConfirmation(WPConfModifSchedule):
-    
+
     def __init__(self,rh,session):
         WPConfModifSchedule.__init__(self,rh,session.getConference())
         self._session=session
-    
+
     def _getTabContent(self,params):
         wc=wcomponents.WConfirmation()
-        msg= _("""Are you sure you want to delete the session "%s" 
-        (note that any contribution scheduled 
+        msg= _("""Are you sure you want to delete the session "%s"
+        (note that any contribution scheduled
         inside will be unscheduled)?""")%(self._session.getTitle())
         url=urlHandlers.UHConfModSessionRem.getURL(self._session)
         return wc.getHTML(msg,url,{})
@@ -4369,7 +4377,7 @@ class WConfModifACSessionCoordinatorRights(wcomponents.WTemplated):
 
     def __init__(self,conf):
         self._conf = conf
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
         url = urlHandlers.UHConfModifCoordinatorRights.getURL(self._conf)
@@ -4390,7 +4398,7 @@ class WConfModifACSessionCoordinatorRights(wcomponents.WTemplated):
 
 
 class WConfModifAC:
-    
+
     def __init__( self, conference, eventType, user ):
         self.__conf = conference
         self._eventType = eventType
@@ -4407,27 +4415,27 @@ class WConfModifAC:
             dc = "<br>%s"%wcomponents.WDomainControlFrame( self.__conf ).getHTML( \
                                                     params["addDomainURL"], \
                                                     params["removeDomainURL"] )
-        
-        
+
+
         mc = wcomponents.WConfModificationControlFrame().getHTML( self.__conf,
                                                   params["addManagersURL"],
                                                   params["removeManagersURL"],
                                                   params["setModifKeyURL"] ) + "<br>"
-        
+
         if self._eventType == "conference":
             rc = wcomponents.WConfRegistrarsControlFrame().getHTML( self.__conf,
                                                   params["addRegistrarsURL"],
                                                   params["removeRegistrarsURL"]) + "<br>"
         else:
             rc = ""
-        
+
         tf=""
         if self._eventType in ["conference","meeting"]:
             tf = "<br>%s" % wcomponents.WConfProtectionToolsFrame(self.__conf).getHTML()
         cr=""
         if self._eventType == "conference":
             cr = "<br>%s"%WConfModifACSessionCoordinatorRights(self.__conf).getHTML()
-        
+
         return """<br><table width="100%%" class="ACtab"><tr><td>%s%s%s%s%s%s<br></td></tr></table>"""%( mc, rc, ac, dc, tf, cr )
 
 
@@ -4439,14 +4447,14 @@ class WPConfModifAC( WPConferenceModifBase ):
         if self._rh.getWebFactory() is not None:
             self._eventType=self._rh.getWebFactory().getId()
         self._user = self._rh._getUser()
-    
+
     def _setActiveSideMenuItem( self ):
         self._ACMenuItem.setActive()
-    
+
     def _getPageContent( self, params ):
         wc = WConfModifAC( self._conf, self._eventType, self._user )
         import MaKaC.webinterface.rh.conferenceModif as conferenceModif
-        p = { 
+        p = {
             "setVisibilityURL": urlHandlers.UHConfSetVisibility.getURL(),
             "setAccessKeyURL": urlHandlers.UHConfSetAccessKey.getURL(),
             "setModifKeyURL": urlHandlers.UHConfSetModifKey.getURL(),
@@ -4463,12 +4471,12 @@ class WPConfModifAC( WPConferenceModifBase ):
 
 
 
- 
+
 
 #============================================================
 
 class WPConfSelectAllowed( WPConfModifAC ):
-    
+
     def _getPageContent( self, params ):
         searchExt = params.get("searchExt","")
         if searchExt != "":
@@ -4481,7 +4489,7 @@ class WPConfSelectAllowed( WPConfModifAC ):
 
 
 class WPConfSelectManagers( WPConfModifAC ):
-    
+
     def _getPageContent( self, params ):
         searchExt = params.get("searchExt","")
         if searchExt != "":
@@ -4493,7 +4501,7 @@ class WPConfSelectManagers( WPConfModifAC ):
         return wc.getHTML( params )
 
 class WPConfSelectRegistrars( WPConfModifAC ):
-    
+
     def _getPageContent( self, params ):
         searchExt = params.get("searchExt","")
         if searchExt != "":
@@ -4505,7 +4513,7 @@ class WPConfSelectRegistrars( WPConfModifAC ):
         from MaKaC.webinterface.rh.conferenceModif import RHConfSelectRegistrars
 
         wc = wcomponents.WPrincipalSelection(RHConfSelectRegistrars._uh.getURL(), forceWithoutExtAuth=searchLocal)
-        
+
         params["addURL"] = RHConfAddRegistrars._uh.getURL()
         return wc.getHTML( params )
 
@@ -4513,7 +4521,7 @@ class WPConfSelectRegistrars( WPConfModifAC ):
 #---------------------------------------------------------------------------
 
 class WConfModifTools( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference, user=None ):
         self.__conf = conference
         self._user=user
@@ -4540,13 +4548,13 @@ class WConfModifTools( wcomponents.WTemplated ):
 
 
 class WPConfModifToolsBase( WPConferenceModifBase ):
-    
+
     def _setActiveSideMenuItem(self):
         self._toolsMenuItem.setActive()
-    
+
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
-        
+
         self._tabAlarms = self._tabCtrl.newTab( "alarms", _("Alarms"), \
                 urlHandlers.UHConfDisplayAlarm.getURL(self._conf) )
         self._tabCloneEvent = self._tabCtrl.newTab( "clone", _("Clone Event"), \
@@ -4566,19 +4574,19 @@ class WPConfModifToolsBase( WPConferenceModifBase ):
 
         self._tabAlarms.setEnabled(False)
         self._tabOfflineSite.setHidden(True)
-        
+
         self._setActiveTab()
-        
+
         wf = self._rh.getWebFactory()
         if wf:
             wf.customiseToolsTabCtrl( self._tabCtrl )
-            
+
     def _getPageContent( self, params ):
         self._createTabCtrl()
-        
+
         html = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
         return html
-    
+
     def _setActiveTab( self ):
         pass
 
@@ -4586,16 +4594,16 @@ class WPConfModifToolsBase( WPConferenceModifBase ):
         return "nothing"
 
 class WPConfClosing(WPConfModifToolsBase):
-    
+
     def __init__(self, rh, conf):
         WPConferenceModifBase.__init__(self, rh, conf)
         self._eventType="conference"
         if self._rh.getWebFactory() is not None:
             self._eventType=self._rh.getWebFactory().getId()
-    
+
     def _setActiveTab( self ):
         self._tabClose.setActive()
-    
+
     def _getTabContent( self, params ):
         msg = _("""
         <font size="+2"> _("Are you sure that you want to CLOSE the event") <i>"%s"</i>?</font><br>
@@ -4608,10 +4616,10 @@ class WPConfClosing(WPConfModifToolsBase):
                         confirmButtonCaption= _("Yes"), cancelButtonCaption= _("No") )
 
 class WPConfDeletion( WPConfModifToolsBase ):
-    
+
     def _setActiveTab( self ):
         self._tabDelete.setActive()
-    
+
     def _getTabContent( self, params ):
         msg = _("""
         <font size="+2"> _("Are you sure that you want to DELETE the conference") <i>"%s"</i>?</font><br>( _("Note that if you delete the conference, all the items below it will also be deleted"))
@@ -4622,7 +4630,7 @@ class WPConfDeletion( WPConfModifToolsBase ):
                         confirmButtonCaption= _("Yes"), cancelButtonCaption=_("No") )
 
 class WPConfCloneConfirm( WPConfModifToolsBase ):
-    
+
     def __init__(self, rh, conf, nbClones):
         WPConfModifToolsBase.__init__(self, rh, conf)
         self._nbClones = nbClones
@@ -4646,19 +4654,19 @@ class WPConfCloneConfirm( WPConfModifToolsBase ):
 #---------------------------------------------------------------------------
 
 class WConferenceParticipants(wcomponents.WTemplated):
-    
+
     def __init__(self, conference):
         self._conf = conference
-            
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["confTitle"] = self._conf.getTitle()
         vars["confId"] = self._conf.getId()
-        vars["contribSetIndex"]='index'        
-        
+        vars["contribSetIndex"]='index'
+
         vars["selectAll"] = Config.getInstance().getSystemIconURL("checkAll")
         vars["deselectAll"] = Config.getInstance().getSystemIconURL("uncheckAll")
-                
+
         vars["participants"] = self.getParticipantsList()
         vars["statisticButton"] = _("""<input type="submit" class="btn" value="_("Attendance statistics")" />""")
         vars["statisticAction"] = str(urlHandlers.UHConfModifParticipantsStatistics.getURL(self._conf))
@@ -4671,27 +4679,27 @@ class WConferenceParticipants(wcomponents.WTemplated):
             vars["addButton"] = _("""<input type="submit" class="btn" value="_("Add existing particitant")" />""")
             vars["addAction"] = str(urlHandlers.UHConfModifParticipantsSelectToAdd.getURL(self._conf))
             vars["sendAddedInfoButton"] = _("""<input type="submit" class="btn" value="_("Inform about adding")" name="participantsAction" />""")
-            
+
             vars["presenceButton"] = vars["absenceButton"] = vars["askButton"] = vars["excuseButton"] = ""
-        
+
         else :
             vars["absenceButton"] = _("""<input type="submit" class="btn" value="_("Mark absence")" name="participantsAction" />""")
             vars["presenceButton"] = _("""<input type="submit" class="btn" value="_("Mark present")" name="participantsAction" />""")
             vars["askButton"] = _("""<input type="submit" class="btn" value="_("Ask for excuse")" name="participantsAction" />""")
             vars["excuseButton"] = _("""<input type="submit" class="btn" value="_("Excuse absence")" name="participantsAction" />""")
-        
+
             vars["inviteButton"] = vars["inviteAction"] = ""
             vars["addButton"] = vars["addAction"] = ""
             vars["removeButton"] = vars["sendAddedInfoButton"] = ""
-        
+
         vars["addButton"] = _("""<input type="submit" class="btn" value="_("Search participant")" />""")
         vars["addAction"] = str(urlHandlers.UHConfModifParticipantsSelectToAdd.getURL(self._conf))
         vars["removeButton"] = _("""<input type="submit" class="btn" value="_("Remove participant")" name="participantsAction" />""")
-        
+
         vars["newParticipantURL"] = urlHandlers.UHConfModifParticipantsNewToAdd.getURL(self._conf)
-        
+
         return vars
-        
+
     def getParticipantsList(self):
         html = []
         for p in self._conf.getParticipation().getParticipantList():#.values().list().sort(sortByName):
@@ -4716,10 +4724,10 @@ class WConferenceParticipants(wcomponents.WTemplated):
         return "".join(html)
 
 class WPConfModifParticipants( WPConferenceModifBase ):
-    
+
     def _setActiveSideMenuItem( self ):
         self._participantsMenuItem.setActive()
-    
+
     def _getPageContent( self, params ):
         p = WConferenceParticipants( self._conf )
         return p.getHTML(params)
@@ -4727,24 +4735,24 @@ class WPConfModifParticipants( WPConferenceModifBase ):
 #---------------------------------------------------------------------------
 
 class WConferenceParticipantsPending(wcomponents.WTemplated):
-    
+
     def __init__(self, conference):
         self.__conf = conference
-            
+
     def getVars(self):
-        
+
         vars = wcomponents.WTemplated.getVars(self)
         vars["confTitle"] = self.__conf.getTitle()
         vars["confId"] = self.__conf.getId()
-        
+
         vars["selectAll"] = Config.getInstance().getSystemIconURL("checkAll")
         vars["deselectAll"] = Config.getInstance().getSystemIconURL("uncheckAll")
-        
+
         if len(vars.get("errorMsg", [])) > 0 :
             vars["errorMsg"] = wcomponents.WErrorMessage().getHTML(vars)
         else :
             vars["errorMsg"] = ""
-                
+
         text = button = action = ""
         action = str(urlHandlers.UHConfModifParticipantsPendingAction.getURL(self.__conf))
 
@@ -4752,19 +4760,19 @@ class WConferenceParticipantsPending(wcomponents.WTemplated):
         vars["pendingAction"] = action
         vars["conf"] = self.__conf
         vars["conferenceStarted"] = nowutc() > self.__conf.getStartDate()
-       
+
         return vars
-    
+
     def _getPendingParticipantsList(self):
         l = []
-        
+
         for k in self.__conf.getParticipation().getPendingParticipantList().keys() :
             p = self.__conf.getParticipation().getPendingParticipantByKey(k)
             l.append((k, p))
         return l
 
 class WPConfModifParticipantsPending( WPConfModifParticipants ):
-    
+
     def _getPageContent( self, params ):
         banner = wcomponents.WParticipantsBannerModif(self._conf).getHTML()
         p = WConferenceParticipantsPending( self._conf )
@@ -4773,24 +4781,24 @@ class WPConfModifParticipantsPending( WPConfModifParticipants ):
 #---------------------------------------------------------------------------
 
 class WConferenceParticipantsStatistics(wcomponents.WTemplated):
-    
+
     def __init__(self, conference):
         self.__conf = conference
-            
+
     def getVars(self):
-        
+
         vars = wcomponents.WTemplated.getVars(self)
         vars["confTitle"] = self.__conf.getTitle()
         vars["confId"] = self.__conf.getId()
-        
+
         vars["invited"] = self.__conf.getParticipation().getInvitedNumber()
         vars["rejected"] = self.__conf.getParticipation().getRejectedNumber()
         vars["added"] = self.__conf.getParticipation().getAddedNumber()
         vars["refused"] = self.__conf.getParticipation().getRefusedNumber()
         vars["pending"] = self.__conf.getParticipation().getPendingNumber()
-        
+
         if nowutc() < self.__conf.getStartDate() :
-            vars["present"] = vars["absent"] = vars["excused"] = ""            
+            vars["present"] = vars["absent"] = vars["excused"] = ""
         else :
             vars["present"] = _("""
             <tr>
@@ -4798,26 +4806,26 @@ class WConferenceParticipantsStatistics(wcomponents.WTemplated):
                 <td><b>%s</b></td>
             </tr>
             """)%self.__conf.getParticipation().getPresentNumber()
-            
+
             vars["absent"] = _("""
             <tr>
                 <td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"> _("Absent participants") </td>
                 <td><b>%s</b></td>
             </tr>
             """)%self.__conf.getParticipation().getAbsentNumber()
-            
+
             vars["excused"] = _("""
             <tr>
                 <td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">&nbsp;&nbsp;&nbsp;&nbsp; _("Excused participants") </td>
                 <td><b>%s</b></td>
             </tr>
             """)%self.__conf.getParticipation().getExcusedNumber()
-        
+
         return vars
-    
+
 
 class WPConfModifParticipantsStatistics( WPConfModifParticipants ):
-    
+
     def _getPageContent( self, params ):
         params["action"] = "search"
         banner = wcomponents.WParticipantsBannerModif(self._conf).getHTML()
@@ -4827,7 +4835,7 @@ class WPConfModifParticipantsStatistics( WPConfModifParticipants ):
 #---------------------------------------------------------------------------
 
 class WPConfModifParticipantsSelect( WPConfModifParticipants ):
-    
+
     def _getPageContent( self, params ):
         searchAction = str(self._rh.getCurrentURL())
         searchExt = params.get("searchExt","")
@@ -4841,7 +4849,7 @@ class WPConfModifParticipantsSelect( WPConfModifParticipants ):
 #---------------------------------------------------------------------------
 
 class WPConfModifParticipantsNew( WPConfModifParticipants ):
-    
+
     def _getPageContent( self, params ):
         p = wcomponents.WNewPerson()
         if params.get("formTitle",None) is None :
@@ -4865,10 +4873,10 @@ class WPConfModifParticipantsNew( WPConfModifParticipants ):
         return p.getHTML(params)
 
 class WPConfModifParticipantsNewPending( WPConferenceDefaultDisplayBase ):
-    
+
     def __init__(self, rh, conf):
         WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
-    
+
     def _getBody( self, params ):
         p = wcomponents.WNewPerson()
         params["formTitle"] = _("Apply for participation")
@@ -4888,7 +4896,7 @@ class WPConfModifParticipantsNewPending( WPConferenceDefaultDisplayBase ):
             params["phoneValue"] = ""
         if params.get("faxValue",None) is None :
             params["faxValue"] = ""
-        
+
         params["disabledTitle"] = params.get("disabledTitle",False)
         params["disabledSurName"] = params.get("disabledSurName",False)
         params["disabledName"] = params.get("disabledName",False)
@@ -4897,20 +4905,20 @@ class WPConfModifParticipantsNewPending( WPConferenceDefaultDisplayBase ):
         params["disabledPhone"] = params.get("disabledPhone",False)
         params["disabledFax"] = params.get("disabledFax",False)
         params["disabledAffiliation"] = params.get("disabledAffiliation",False)
-        
+
         return p.getHTML(params)
 
 
 #---------------------------------------------------------------------------
 
 class WPConfModifParticipantsInvite(WPConferenceDefaultDisplayBase):
-    
+
     def __init__(self, rh, conf):
         WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
-        
+
     def _defineSectionMenu(self):
         self._sectionMenu = None
-    
+
     def _getBody( self, params ):
         msg = _("""
         _("Please indicate whether you want to accept or reject the invitation to the") <i>"%s"</i>?<br>
@@ -4924,10 +4932,10 @@ class WPConfModifParticipantsInvite(WPConferenceDefaultDisplayBase):
 #---------------------------------------------------------------------------
 
 class WPConfModifParticipantsRefuse(WPConferenceDefaultDisplayBase):
-    
+
     def __init__(self, rh, conf):
         WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
-    
+
     def _getBody( self, params ):
         msg = _("""
         <font size="+2"> _("Are you sure you want to refuse to attend the "%s"")?</font>
@@ -4943,10 +4951,10 @@ class WPConfModifParticipantsRefuse(WPConferenceDefaultDisplayBase):
 class WPConfModifParticipantsEMail(WPConferenceModifBase):
     def __init__(self, rh, conf):
         WPConferenceModifBase.__init__(self, rh, conf)
-    
+
     def _setActiveTab( self ):
         self._tabParticipants.setActive()
-    
+
     def _getTabContent( self, params ):
         toemail = params["emailto"]
         params["postURL"] = urlHandlers.UHConfModifParticipantsSendEmail.getURL( self._conf )
@@ -4956,21 +4964,21 @@ class WPConfModifParticipantsEMail(WPConferenceModifBase):
 #---------------------------------------------------------------------------
 
 class WConferenceLog(wcomponents.WTemplated):
-    
+
     def __init__(self, conference):
         self.__conf = conference
         self._tz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
         if not self._tz:
             self._tz = 'UTC'
-            
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["confTitle"] = self.__conf.getTitle()
         vars["confId"] = self.__conf.getId()
-        
+
         vars["selectAll"] = Config.getInstance().getSystemIconURL("checkAll")
         vars["deselectAll"] = Config.getInstance().getSystemIconURL("uncheckAll")
-        
+
         if len(vars.get("errorMsg", [])) > 0 :
             vars["errorMsg"] = wcomponents.WErrorMessage().getHTML(vars)
         else :
@@ -4982,7 +4990,7 @@ class WConferenceLog(wcomponents.WTemplated):
         filter = vars.get("filter","general")
         key = vars.get("filterKey","")
         vars["log"] = self._getLogList(order, filter, key)
-        
+
         orderByDate = urlHandlers.UHConfModifLog.getURL(self.__conf)
         orderByDate.addParam("order","date")
         #orderByType = urlHandlers.UHConfModifLog.getURL(self.__conf)
@@ -4993,24 +5001,24 @@ class WConferenceLog(wcomponents.WTemplated):
         orderByResponsible.addParam("order","responsible")
         orderBySubject= urlHandlers.UHConfModifLog.getURL(self.__conf)
         orderBySubject.addParam("order","subject")
-        
+
         vars["orderByDate"] = orderByDate
         #vars["orderByType"] = orderByType
         vars["orderByModule"] = orderByModule
         vars["orderByResponsible"] = orderByResponsible
         vars["orderBySubject"] = orderBySubject
-        
+
         logFilterAction = urlHandlers.UHConfModifLog.getURL(self.__conf)
         logFilterAction.addParam("order",order)
         vars["logFilterAction"] = logFilterAction
         vars["logListAction"] = ""
         vars["timezone"] = self._tz
-            
+
         return vars
-    
+
     def _getLogList(self, order="date", filter="general", key=""):
         html = []
-        
+
         logList = self.__conf.getLogHandler().getGeneralLogList(order)
         if filter == "email" :
             logList = self.__conf.getLogHandler().getEmailLogList(order)
@@ -5018,7 +5026,7 @@ class WConferenceLog(wcomponents.WTemplated):
             logList = self.__conf.getLogHandler().getActionLogList(order)
         elif filter == "custom" :
             logList = self.__conf.getLogHandler().getCustomLogList(key, order)
-        
+
         for li in logList :
             url = urlHandlers.UHConfModifLogItem.getURL(self.__conf)
             url.addParam("logId",li.getLogId())
@@ -5045,39 +5053,39 @@ class WPConfModifLog( WPConferenceModifBase ):
 
     def _setActiveSideMenuItem( self ):
         self._logMenuItem.setActive()
-    
+
     def _getPageContent( self, params ):
         p = WConferenceLog( self._conf )
         return p.getHTML(params)
 
 #---------------------------------------------------------------------------
 class WConferenceLogItem(wcomponents.WTemplated):
-    
+
     def __init__(self, conference):
         self.__conf = conference
-            
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["confTitle"] = self.__conf.getTitle()
         vars["confId"] = self.__conf.getId()
-        
+
         if len(vars.get("errorMsg", [])) > 0 :
             vars["errorMsg"] = wcomponents.WErrorMessage().getHTML(vars)
         else :
             vars["errorMsg"] = ""
-        
+
         logId = vars.get("logId","")
         logItem = self.__conf.getLogHandler().getLogItemById(logId)
         vars["logItem"] = self._getLogItemElements(logItem)
-        
+
         url = urlHandlers.UHConfModifLog.getURL(self.__conf)
         vars["logListAction"] = url
-        
+
         return vars
-    
+
     def _getLogItemElements(self, logItem):
         html = []
-        
+
         text = """
         <tr>
                 <td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
@@ -5086,7 +5094,7 @@ class WConferenceLogItem(wcomponents.WTemplated):
         </tr>"""%("Subject", logItem.getLogSubject())
         html.append(text)
         logInfo = logItem.getLogInfo()
-        
+
         for key in logInfo.keys():
             if key != "subject":
                 text = """
@@ -5099,10 +5107,10 @@ class WConferenceLogItem(wcomponents.WTemplated):
         return "".join(html)
 
 class WPConfModifLogItem( WPConfModifLog ):
-    
+
     def _setActiveTab( self ):
         self._tabLog.setActive()
-    
+
     def _getPageContent( self, params ):
         banner = wcomponents.WConfLogsBannerModif(self._conf).getHTML()
         p = WConferenceLogItem( self._conf )
@@ -5112,7 +5120,7 @@ class WPConfModifLogItem( WPConfModifLog ):
 #---------------------------------------------------------------------------
 
 class WConfModifListings( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference ):
         self.__conf = conference
 
@@ -5133,7 +5141,7 @@ class WConfModifListings( wcomponents.WTemplated ):
 class WPConfModifListings( WPConferenceModifBase ):
     def _setActiveSideMenuItem(self):
         self._listingsMenuItem.setActive()
-    
+
     def _getPageContent( self, params ):
         wc = WConfModifListings( self._conf )
         return wc.getHTML()
@@ -5142,22 +5150,22 @@ class WPConfModifListings( WPConferenceModifBase ):
 #---------------------------------------------------------------------------
 
 class WConferenceClone(wcomponents.WTemplated):
-    
+
     def __init__(self, conference):
         self.__conf = conference
-    
+
     def _getSelectDay(self):
-        sd = ""        
+        sd = ""
         for i in range(31) :
             selected = ""
             if datetime.today().day == (i+1) :
                 selected = "selected=\"selected\""
             sd += "<OPTION VALUE=\"%d\" %s>%d\n"%(i+1, selected, i+1)
         return sd
-        
+
     def _getSelectMonth(self):
         sm = ""
-        month = [ "January", "February", "March", "April", "May", "June", 
+        month = [ "January", "February", "March", "April", "May", "June",
                 "July", "August", "September", "October", "November", "December"]
         for i in range(12) :
             selected = ""
@@ -5176,7 +5184,7 @@ class WConferenceClone(wcomponents.WTemplated):
             sy += "\t<OPTION VALUE=\"%d\" %s>%d\n"%(i, selected, i)
             i += 1
         return sy
-        
+
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
@@ -5191,17 +5199,17 @@ class WConferenceClone(wcomponents.WTemplated):
 
 
 class WPConfClone( WPConfModifToolsBase ):
-    
+
     def _setActiveTab( self ):
         self._tabCloneEvent.setActive()
-    
+
     def _getTabContent( self, params ):
         p = WConferenceClone( self._conf )
         pars = {"cancelURL": urlHandlers.UHConfModifTools.getURL( self._conf ), \
                 "cloneOnce": urlHandlers.UHConfPerformCloneOnce.getURL( self._conf ), \
                 "cloneInterval": urlHandlers.UHConfPerformCloneInterval.getURL( self._conf ), \
                 "cloneday": urlHandlers.UHConfPerformCloneDays.getURL( self._conf ), \
-                "cloning" : urlHandlers.UHConfPerformCloning.getURL( self._conf ), 
+                "cloning" : urlHandlers.UHConfPerformCloning.getURL( self._conf ),
                 "cloneOptions": _("""<table>
                                 <tr><td width="10%%"></td>
                                     <td width="10%%"><input type="checkbox" name="cloneTracks" id="cloneTracks" value="1" ></td>
@@ -5209,10 +5217,10 @@ class WPConfClone( WPConfModifToolsBase ):
                                                 <tr><td width="10%%"></td>
                                 <tr><td width="10%%"></td>
                                     <td width="10%%"><input type="checkbox" name="cloneTimetable" id="cloneTimetable" value="1" ></td>
-                                    <td width="80%%">_("Full timetable")</td></tr>                                
+                                    <td width="80%%">_("Full timetable")</td></tr>
                                 <!--<tr><td width="10%%"></td>
                                     <td width="10%%"></td>
-                                    <td width="80%%"><input type="checkbox" name="cloneAbstracts" id="cloneAbstracts" value="1" > _("with abstracts")</td></tr>-->                
+                                    <td width="80%%"><input type="checkbox" name="cloneAbstracts" id="cloneAbstracts" value="1" > _("with abstracts")</td></tr>-->
                                 <tr><td width="10%%"></td>
                                     <td width="10%%"><input type="checkbox" name="cloneSessions" id="cloneSessions" value="1" ></td>
                                     <td width="80%%">_("Sessions")</td></tr>
@@ -5227,37 +5235,37 @@ class WPConfClone( WPConfModifToolsBase ):
 #---------------------------------------------------------------------------------------
 
 class WConferenceAllSessionsConveners(wcomponents.WTemplated):
-    
+
     def __init__(self, conference):
         self.__conf = conference
         self._display = []
         self._dispopts = [ "Email", "Session" ]
         self._order = ""
-    
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["confTitle"] = self.__conf.getTitle()
         vars["confId"] = self.__conf.getId()
-        vars["convenerSelectionAction"]=quoteattr(str(urlHandlers.UHConfAllSessionsConvenersAction.getURL(self.__conf)))        
+        vars["convenerSelectionAction"]=quoteattr(str(urlHandlers.UHConfAllSessionsConvenersAction.getURL(self.__conf)))
         vars["contribSetIndex"]='index'
         vars["convenerNumber"]=str(len(self.__conf.getAllSessionsConvenerList()))
         vars["conveners"]=self._getAllConvenersHTML()
         vars["columns"] = self._getColumnsHTML(None)
         vars["backURL"]=quoteattr(str(urlHandlers.UHConfModifListings.getURL(self.__conf)))
         return vars
-    
+
     def _getAllConvenersHTML(self):
         html = ''
 
-        url = urlHandlers.UHSessionModification.getURL(self.__conf)        
+        url = urlHandlers.UHSessionModification.getURL(self.__conf)
         convenersDictionary = self.__conf.getAllSessionsConvenerList()
-    
+
         for key in convenersDictionary.keys() :
             counter = 0
             sessions = []
-            
-            for convener in  convenersDictionary[key] :                
-                if counter == 0 :                    
+
+            for convener in  convenersDictionary[key] :
+                if counter == 0 :
                     html = html + """
                     <tr>
                         <td valign="top" nowrap class="abstractDataCell"><input type="checkbox" name="conveners" value="%s">&nbsp;&nbsp;%s</td>
@@ -5271,17 +5279,17 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
                 sesurl = quoteattr(str(url))
                 sestitle = self.htmlText(convener.getSession().getTitle()) or "&nbsp;"
                 sessions.append("<a href=%s>%s</a>"%(sesurl,sestitle))
-                
+
                 counter = counter + 1
-                        
+
             sessionlist = "<br/>".join(sessions)
             html = html + """<td valign="top"  class="abstractDataCell">%s"""%sessionlist
             html = html + """</td></tr>"""
-        html += _("""    
+        html += _("""
                     <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
                     <tr><td colspan="3" align="left">&nbsp;<input type="submit" class="btn" value="_("Send an E-mail")" name="sendEmails"></td></tr>
                     </form>
-                          """)            
+                          """)
         return html
 
     def _getColumnsHTML(self, sortingField):
@@ -5291,7 +5299,7 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
         if sortingField is not None:
             currentSorting=sortingField.getId()
         currentSortingHTML = ""
-        
+
         url=self._getURL()
         url.addParam("sortBy","Name")
         nameImg=""
@@ -5348,7 +5356,7 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
         html= """
             <t>
             <!--<td width="1px">%s</td>-->
-            %s            
+            %s
             </tr>
              """%(currentSortingHTML, "".join(res))
         return html
@@ -5360,11 +5368,11 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
             url.addParam("disp", ["Email","Session"])
         else:
             url.addParam("disp", self._display)
-        
+
         return url
-            
+
 class WPConfAllSessionsConveners( WPConfModifListings ):
-    
+
     def _getPageContent( self, params ):
         banner = wcomponents.WListingsBannerModif(self._conf).getHTML()
         p = WConferenceAllSessionsConveners( self._conf )
@@ -5374,14 +5382,14 @@ class WPConfAllSessionsConveners( WPConfModifListings ):
 
 
 class WConfModifAllContribParticipants(wcomponents.WTemplated):
-    
+
     def __init__(self, conference, partIndex):
         self._title= _("All participants list")
         self._conf = conference
         self._order = ""
         self._dispopts = ["Email", "Contributions" ]
         self._partIndex=partIndex
-    
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         self._url=vars["participantMainPageURL"]
@@ -5392,7 +5400,7 @@ class WConfModifAllContribParticipants(wcomponents.WTemplated):
         if not vars.has_key("title"):
             vars["title"]=self._title
         return vars
-    
+
     def _getAllParticipantsHTML(self):
         html = []
         for key in self._partIndex.getParticipationKeys():
@@ -5412,11 +5420,11 @@ class WConfModifAllContribParticipants(wcomponents.WTemplated):
                         contribtitle = self.htmlText(contribPart.getContribution().getTitle()) or "&nbsp;"
                         contribs.append("<b>- </b><a href=%s>%s</a>"%(url,contribtitle))
                 html.append("""<td valign="top"  class="abstractDataCell">%s</td></tr>"""%("<br>".join(contribs)))
-        html.append( _("""    
+        html.append( _("""
                     <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
                     <tr><td colspan="3" align="left">&nbsp;<input type="submit" class="btn" value="_("Send an E-mail")" name="sendEmails"></td></tr>
                     </form>
-                          """))           
+                          """))
         return "".join(html)
 
     def _getColumnsHTML(self, sortingField):
@@ -5424,7 +5432,7 @@ class WConfModifAllContribParticipants(wcomponents.WTemplated):
         currentSorting=""
         if sortingField is not None:
             currentSorting=sortingField.getId()
-        
+
         # Name
         url=self._getURL()
         url.addParam("sortBy","Name")
@@ -5442,7 +5450,7 @@ class WConfModifAllContribParticipants(wcomponents.WTemplated):
         checkboxes="%s%s"%(checkAll,uncheckAll)
         res.append("""
                         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%s%s<a href=%s>Name</a></td>"""%(img, checkboxes, sortingURL))
-        
+
         # Others
         for i in self._dispopts:
             url=self._getURL()
@@ -5457,20 +5465,20 @@ class WConfModifAllContribParticipants(wcomponents.WTemplated):
                     url.addParam("order","down")
             sortingURL=quoteattr("%s#results"%str(url))
             res.append("""<td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%s<a href=%s>%s</a></td>"""%(img, sortingURL, i))
-        
+
 
         html= """
             <t>
-            %s            
+            %s
             </tr>
              """%("".join(res))
         return html
 
     def _getURL( self ):
         return self._url
-            
+
 class WPConfAllSpeakers( WPConfModifListings ):
-    
+
     def _getPageContent( self, params ):
         banner = wcomponents.WListingsBannerModif(self._conf).getHTML()
         p = WConfModifAllContribParticipants( self._conf, self._conf.getSpeakerIndex() )
@@ -5479,7 +5487,7 @@ class WPConfAllSpeakers( WPConfModifListings ):
                           "participantSelectionAction":quoteattr(str(urlHandlers.UHConfAllSpeakersAction.getURL(self._conf)))})
 
 class WPConfAllPrimaryAuthors( WPConfModifListings ):
-    
+
     def _getTabContent( self, params ):
         p = WConfModifAllContribParticipants( self._conf, self._conf.getPrimaryAuthorIndex() )
         return p.getHTML({"title": _("All primary authors list"), \
@@ -5487,7 +5495,7 @@ class WPConfAllPrimaryAuthors( WPConfModifListings ):
                           "participantSelectionAction":quoteattr(str(urlHandlers.UHConfAllPrimaryAuthorsAction.getURL(self._conf)))})
 
 class WPConfAllCoAuthors( WPConfModifListings ):
-    
+
     def _getTabContent( self, params ):
         p = WConfModifAllContribParticipants( self._conf, self._conf.getCoAuthorIndex() )
         return p.getHTML({"title": _("All co-authors list"), \
@@ -5498,7 +5506,7 @@ class WPEMailContribParticipants ( WPConfModifListings):
     def __init__(self, rh, conf, participantList):
         WPConfModifListings.__init__(self, rh, conf)
         self._participantList = participantList
-        
+
     def _getTabContent(self,params):
         wc = WEmailToContribParticipants(self._conf, self._getAW().getUser(), self._participantList)
         return wc.getHTML()
@@ -5511,7 +5519,7 @@ class WEmailToContribParticipants(wcomponents.WTemplated):
         except:
             self._fromemail = ""
         self._contribParticipantList = contribParticipantList
- 
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         toEmails=[]
@@ -5532,7 +5540,7 @@ class WPEMailConveners ( WPConfModifListings):
     def __init__(self, rh, conf, convenerList):
         WPConfModifListings.__init__(self, rh, conf)
         self._convenerList = convenerList
-        
+
     def _getTabContent(self,params):
         wc = WEmailToConveners(self._conf, self._getAW().getUser(), self._convenerList)
         return wc.getHTML()
@@ -5545,7 +5553,7 @@ class WEmailToConveners(wcomponents.WTemplated):
         except:
             self._fromemail = ""
         self._convenerList = convenerList
- 
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         toEmails=[]
@@ -5562,7 +5570,7 @@ class WEmailToConveners(wcomponents.WTemplated):
         return vars
 
 class WPConfAllParticipants( WPConfModifListings ):
-    
+
     def _getTabContent( self, params ):
         p = wcomponents.WConferenceAllParticipants( self._conf )
         return p.getHTML()
@@ -5573,12 +5581,12 @@ class WPConfAllParticipants( WPConfModifListings ):
 class WConvenerSentMail  (wcomponents.WTemplated):
     def __init__(self,conf):
         self._conf = conf
-        
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         vars["BackURL"]=quoteattr(str(urlHandlers.UHConfAllSessionsConveners.getURL(self._conf)))
         return vars
-        
+
 class WPSentEmail( WPConfModifListings ):
     def _getTabContent(self,params):
         wc = WConvenerSentMail(self._conf)
@@ -5588,13 +5596,13 @@ class WPSentEmail( WPConfModifListings ):
 class WContribParticipationSentMail(wcomponents.WTemplated):
     def __init__(self,conf):
         self._conf = conf
-        
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         vars["BackURL"]=quoteattr(str(urlHandlers.UHConfAllSpeakers.getURL(self._conf)))
         return vars
 
-        
+
 class WPContribParticipationSentEmail( WPConfModifListings ):
     def _getTabContent(self,params):
         wc = WContribParticipationSentMail(self._conf)
@@ -5665,7 +5673,7 @@ class WSetAlarm(wcomponents.WTemplated):
         if vars["toEmails"] != "" :
             vars["definedRecipients"] = "checked"
             vars["recipientsDisabled"] = ""
-        else : 
+        else :
             vars["definedRecipients"] = ""
             vars["recipientsDisabled"] = """disabled="disabled" """
         vars["includeConf"] = vars.get("includeConf","")
@@ -5691,22 +5699,22 @@ class WConfDisplayAlarm( wcomponents.WTemplated ):
         return vars
 
 class WPConfDisplayAlarm( WPConfModifToolsBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfDisplayAlarm( self._conf, self._rh._getUser() )
-        p = { 
+        p = {
 "addAlarmURL": urlHandlers.UHConfAddAlarm.getURL( self._conf ), \
 "deleteAlarmURL": urlHandlers.UHConfDeleteAlarm.getURL(), \
 "modifyAlarmURL": urlHandlers.UHConfModifyAlarm.getURL(), \
     }
         return wc.getHTML( p )
-    
+
 class WPConfAddAlarm( WPConfModifToolsBase ):
-    
+
     def _setActiveTab( self ):
         self._tabAlarms.setActive()
 
-    
+
     def _getTabContent( self, params ):
         p = WSetAlarm( self._conf, self._getAW() )
         testSendAlarm = _("""<input type="submit" class="btn" value="_("send this alarm email now")" onClick="this.form.action='%s';">""") % urlHandlers.UHSendAlarmNow.getURL( self._conf  )
@@ -5755,18 +5763,18 @@ class WPConfAddAlarm( WPConfModifToolsBase ):
         return p.getHTML( pars )
 
 #--------------------------------------------------------------------
-    
+
 class WPConfModifyAlarm( WPConfModifToolsBase ):
-    
+
     def __init__(self, caller, conf, alarm):
         WPConfModifToolsBase.__init__(self, caller, conf)
         self._alarm = alarm
-    
-    
+
+
     def _getTabContent( self, params ):
-        
+
         p = WSetAlarm(self._conf, self._getAW())
-        
+
         vars = { \
             "cancelURL": urlHandlers.UHConfDisplayAlarm.getURL( self._conf ), \
             "saveAlarm": urlHandlers.UHConfSaveAlarm.getURL(), \
@@ -5799,49 +5807,49 @@ class WPConfModifyAlarm( WPConfModifToolsBase ):
             if i == day:
                 sel = "selected"
             vars["dayOptions"] += "<OPTION VALUE=\"%s\"%s>%s\n"%(string.zfill(i,2),sel,string.zfill(i,2))
-        
+
         vars["monthOptions"] = ""
         for i in range(1,13):
             sel = ""
             if i == month:
                 sel = "selected"
             vars["monthOptions"] += "<OPTION VALUE=\"%s\"%s>%s\n"%(string.zfill(i,2),sel,datetime(1900,i,1).strftime("%B"))
-        
+
         vars["yearOptions"] = ""
         for i in range(startyear,startyear+10):
             sel = ""
             if i == year:
                 sel = "selected"
             vars["yearOptions"] += "<OPTION VALUE=\"%s\"%s>%s\n"%(string.zfill(i,4),sel,string.zfill(i,4))
-        
+
         vars["hour"] = ""
         for i in range(0,24):
             sel = ""
             if i == hour:
                 sel = "selected"
             vars["hour"] += "<OPTION VALUE=\"%s\"%s>%sH\n"%(string.zfill(i,2),sel,string.zfill(i,2))
-        
+
         vars["hourBefore"] = ""
         for i in range(1,24):
             sel = ""
             if i == hourBefore:
                 sel = "selected"
             vars["hourBefore"] += "<OPTION VALUE=\"%s\"%s>H-%s\n"%(string.zfill(i,2),sel,i)
-        
+
         vars["dayBefore"] = ""
         for i in range(1,8):
             sel = ""
             if i == dayBefore:
                 sel = "selected"
             vars["dayBefore"] += "<OPTION VALUE=\"%s\"%s>D-%s\n"%(string.zfill(i,2),sel,i)
-        
+
         vars["subject"] = self._alarm.getSubject()
         vars["toEmails"] = ", ".join(self._alarm.getToAddrList())
         vars["fromEmail"] = self._alarm.getFromAddr()
         vars["text"] = self._alarm.getText()
         vars["note"] = self._alarm.getNote()
         vars["formTitle"] = _("Modify alarm data")
-        
+
         if self._alarm.getToAllParticipants() :
             vars["toAllParticipants"] = _("""
         <tr>
@@ -5856,11 +5864,11 @@ class WPConfModifyAlarm( WPConfModifToolsBase ):
             <td> _("Send alarm to all participants of the event.")</td>
         </tr>
         """)
-            
+
         testSendAlarm = _("""<input type="submit" class="btn" value="_("send this alarm now")" onClick="this.form.action='%s';">""") % urlHandlers.UHSendAlarmNow.getURL( self._conf  )
         if self._rh._getUser():
             testSendAlarm += _(""" <input type="submit" class="btn" value="_("send me this alarm as a test")" onClick="this.form.action='%s';">""") % urlHandlers.UHTestSendAlarm.getURL( self._conf  )
-        
+
         vars["testSendAlarm"] = testSendAlarm
         if self._alarm.getConfSumary():
             vars["includeConf"] = "checked"
@@ -5870,7 +5878,7 @@ class WPConfModifyAlarm( WPConfModifToolsBase ):
 #----------------------------------------------------------------------------------
 
 class WConfModifCFAAddField( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference, fieldId ):
         self._conf = conference
         self._fieldId = fieldId
@@ -5910,9 +5918,9 @@ class WConfModifCFAAddField( wcomponents.WTemplated ):
         vars["errors"] = ""
         return vars
 
-        
+
 class WConfModifCFA( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
@@ -6038,7 +6046,7 @@ class WConfModifCFA( wcomponents.WTemplated ):
             vars["changeStatus"] = _("DISABLE")
             vars["startDate"]=abMgr.getStartSubmissionDate().strftime("%A %d %B %Y")
             vars["endDate"]=abMgr.getEndSubmissionDate().strftime("%A %d %B %Y")
-            vars["announcement"] = abMgr.getAnnouncement()            
+            vars["announcement"] = abMgr.getAnnouncement()
             vars["disabled"] = ""
             modifDL = abMgr.getModificationDeadline()
             vars["modifDL"] = _("""--_("not specified")--""")
@@ -6084,10 +6092,10 @@ class WConfModifCFA( wcomponents.WTemplated ):
 
 
 class WPConfModifCFASelectSubmitters(WPConferenceModifAbstractBase):
-    
+
     def _setActiveTab( self ):
         self._tabCFA.setActive()
-    
+
     def _getTabContent( self, params ):
         searchExt = params.get("searchExt","")
         if searchExt != "":
@@ -6099,10 +6107,10 @@ class WPConfModifCFASelectSubmitters(WPConferenceModifAbstractBase):
         return wc.getHTML( params )
 
 class WPConfModifSelectChairs(WPConferenceModifBase):
-    
+
     def _setActiveSideMenuItem(self):
         self._generalSettingsMenuItem.setActive(True)
-    
+
     def _getPageContent( self, params ):
         searchExt = params.get("searchExt","")
         if searchExt != "":
@@ -6117,7 +6125,7 @@ class WPConfModifCFAPreview( WPConferenceModifAbstractBase ):
 
     def _setActiveTab( self ):
         self._tabCFAPreview.setActive()
-    
+
     def _getTabContent( self, params ):
         import MaKaC.webinterface.pages.abstracts as abstracts
         wc = abstracts.WAbstractDataModification( self._conf )
@@ -6127,12 +6135,12 @@ class WPConfModifCFAPreview( WPConferenceModifAbstractBase ):
         params = ad.toDict()
         params["postURL"] = ""
         return wc.getHTML(params)
-    
+
 class WPConfModifCFA( WPConferenceModifAbstractBase ):
 
     def _setActiveTab( self ):
         self._tabCFA.setActive()
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifCFA( self._conf )
         return wc.getHTML()
@@ -6143,10 +6151,10 @@ class WPConfModifCFAAddField( WPConferenceModifAbstractBase ):
         WPConferenceModifAbstractBase.__init__(self, rh, conf)
         self._conf = conf
         self._fieldId = fieldId
-        
+
     def _setActiveTab( self ):
         self._tabCFA.setActive()
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifCFAAddField( self._conf, self._fieldId )
         return wc.getHTML()
@@ -6155,7 +6163,7 @@ class NotifTplToAddrWrapper:
     _id=""
     _label=""
     _klass=None
-    
+
     def getId(cls):
         return cls._id
     getId=classmethod(getId)
@@ -6163,7 +6171,7 @@ class NotifTplToAddrWrapper:
     def getLabel(cls):
         return _(cls._label)
     getLabel=classmethod(getLabel)
-    
+
     def getToAddrKlass(cls):
         return cls._klass
     getToAddrKlass=classmethod(getToAddrKlass)
@@ -6178,7 +6186,7 @@ class NotifTplToAddrWrapper:
 
 
 class NotifTplToAddrSubmitterWrapper(NotifTplToAddrWrapper):
-    
+
     _id="submitter"
     _klass=review.NotifTplToAddrSubmitter
     _label="Submitters"
@@ -6188,14 +6196,14 @@ class NotifTplToAddrSubmitterWrapper(NotifTplToAddrWrapper):
     isSelectedByDefault = classmethod(isSelectedByDefault)
 
 class NotifTplToAddrPrimaryAuthorsWrapper(NotifTplToAddrWrapper):
-    
+
     _id="primaryAuthors"
     _label= "Primary authors"
     _klass=review.NotifTplToAddrPrimaryAuthors
 
 
 class NotifTplToAddrsFactory:
-    
+
     _avail_toAddrs={
         NotifTplToAddrSubmitterWrapper.getId():NotifTplToAddrSubmitterWrapper,\
         NotifTplToAddrPrimaryAuthorsWrapper.getId():NotifTplToAddrPrimaryAuthorsWrapper}
@@ -6203,14 +6211,14 @@ class NotifTplToAddrsFactory:
     def getToAddrList(cls):
         return cls._avail_toAddrs.values()
     getToAddrList=classmethod(getToAddrList)
-    
+
     def getToAddrById(cls,id):
         return cls._avail_toAddrs.get(id,None)
     getToAddrById=classmethod(getToAddrById)
 
 
 class WConfModCFANotifTplNew(wcomponents.WTemplated):
-    
+
     def __init__(self,conf):
         self._conf=conf
 
@@ -6262,7 +6270,7 @@ class WConfModCFANotifTplNew(wcomponents.WTemplated):
 
 
 class WConfModCFANotifTplEditData(wcomponents.WTemplated):
-    
+
     def __init__(self,notifTpl):
         self._notifTpl=notifTpl
 
@@ -6338,7 +6346,7 @@ class WConfModCFANotifTplEditData(wcomponents.WTemplated):
         return vars
 
 class WPModCFANotifTplNew(WPConfModifCFA):
-    
+
     def _getTabContent(self,params):
         wc = WConfModCFANotifTplNew(self._conf)
         params["errorList"]=params.get("errorList",[])
@@ -6346,7 +6354,7 @@ class WPModCFANotifTplNew(WPConfModifCFA):
 
 
 class WPModCFANotifTplBase(WPConferenceModifBase):
-    
+
     def __init__(self, rh, notifTpl):
         WPConferenceModifBase.__init__(self, rh, notifTpl.getConference())
         self._notifTpl = notifTpl
@@ -6364,7 +6372,7 @@ class WPModCFANotifTplBase(WPConferenceModifBase):
 
     def _setActiveTab( self ):
         pass
-    
+
     def _setActiveSideMenuItem(self):
         self._abstractMenuItem.setActive(True)
 
@@ -6386,26 +6394,26 @@ class WPModCFANotifTplBase(WPConferenceModifBase):
 
 
 class WPModCFANotifTplDisplay(WPModCFANotifTplBase):
-    
+
     def __init__(self, rh, notifTpl):
         WPModCFANotifTplBase.__init__(self, rh, notifTpl)
         self._conf = self._notifTpl.getConference()
-    
+
     def _setActiveTab( self ):
         self._tabMain.setActive()
-    
+
     def _getTabContent(self, params):
         wc = WConfModCFANotifTplDisplay(self._conf, self._notifTpl)
         return wc.getHTML()
 
 
 class WPModCFANotifTplEdit(WPModCFANotifTplBase):
-    
+
     def __init__(self, rh, notifTpl):
         WPConferenceModifBase.__init__(self, rh, notifTpl.getConference())
         self._notifTpl=notifTpl
-        
-    
+
+
     def _getTabContent(self, params):
         wc=WConfModCFANotifTplEditData(self._notifTpl)
         params["errorList"]=params.get("errorList",[])
@@ -6414,20 +6422,20 @@ class WPModCFANotifTplEdit(WPModCFANotifTplBase):
 
 
 class WPModCFANotifTplPreview(WPModCFANotifTplBase):
-    
+
     def _setActiveTab(self):
         self._tabPreview.setActive()
-    
+
     def _getTabContent(self, params):
         wc = WConfModCFANotifTplPreview(self._notifTpl)
         return wc.getHTML()
 
 
 class WConfModCFANotifTplPreview(wcomponents.WTemplated):
-    
+
     def __init__(self,notifTpl):
         self._notifTpl=notifTpl
-    
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         conf=self._notifTpl.getConference()
@@ -6447,12 +6455,12 @@ class WConfModCFANotifTplPreview(wcomponents.WTemplated):
             vars["body"] = _("""<center> _("An abstract must be submitted to display the preview")</center>""")
         vars["cfaURL"]=quoteattr(str(urlHandlers.UHConfModifCFA.getURL(conf)))
         return vars
-    
+
 class NotifTplConditionWrapper:
     _id=""
     _label=""
     _klass=None
-    
+
     def getId(cls):
         return cls._id
     getId=classmethod(getId)
@@ -6460,7 +6468,7 @@ class NotifTplConditionWrapper:
     def getLabel(cls):
         return _(cls._label)
     getLabel=classmethod(getLabel)
-    
+
     def getConditionKlass(cls):
         return cls._klass
     getConditionKlass=classmethod(getConditionKlass)
@@ -6468,7 +6476,7 @@ class NotifTplConditionWrapper:
     def addCondition(cls,tpl,**data):
         pass
     addCondition=classmethod(addCondition)
-    
+
     def needsDialog(cls,**data):
         return False
     needsDialog=classmethod(needsDialog)
@@ -6483,13 +6491,13 @@ class NotifTplCondAcceptedWrapper(NotifTplConditionWrapper):
     _id="accepted"
     _label= "in status ACCEPTED"
     _klass=review.NotifTplCondAccepted
-    
+
     @classmethod
     def addCondition(cls,tpl,**data):
         cType=data.get("contribType","--any--")
         t=data.get("track","--any--")
         tpl.addCondition(cls._klass(track=t,contribType=cType))
-    
+
     @classmethod
     def needsDialog(cls,**data):
         if data.has_key("contribType") and data["contribType"]!="":
@@ -6512,7 +6520,7 @@ class NotifTplCondRejectedWrapper(NotifTplConditionWrapper):
         tpl.addCondition(cls._klass())
 
 class NotifTplCondMergedWrapper(NotifTplConditionWrapper):
-    
+
     _id="merged"
     _label= "in status MERGED"
     _klass=review.NotifTplCondMerged
@@ -6523,7 +6531,7 @@ class NotifTplCondMergedWrapper(NotifTplConditionWrapper):
 
 
 class NotifTplConditionsFactory:
-    
+
     _avail_conds={
         NotifTplCondAcceptedWrapper.getId():NotifTplCondAcceptedWrapper,\
         NotifTplCondRejectedWrapper.getId():NotifTplCondRejectedWrapper,\
@@ -6532,14 +6540,14 @@ class NotifTplConditionsFactory:
     def getConditionList(cls):
         return cls._avail_conds.values()
     getConditionList=classmethod(getConditionList)
-    
+
     def getConditionById(cls,id):
         return cls._avail_conds.get(id,None)
     getConditionById=classmethod(getConditionById)
 
 
 class WConfModNotifTplCondAcc(wcomponents.WTemplated):
-    
+
     def __init__(self,tpl):
         self._notifTpl=tpl
 
@@ -6555,7 +6563,7 @@ class WConfModNotifTplCondAcc(wcomponents.WTemplated):
                 """<option value="--none--">--none--</option>"""]
         for t in self._notifTpl.getConference().getTrackList():
             res.append("""<option value=%s>%s</option>"""%(quoteattr(t.getId()),self.htmlText(t.getTitle())))
-        
+
         return "".join(res)
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
@@ -6567,14 +6575,14 @@ class WConfModNotifTplCondAcc(wcomponents.WTemplated):
 
 
 class WPModNotifTplCondAcc(WPModCFANotifTplBase):
-    
+
     def _getTabContent( self, params ):
         wc=WConfModNotifTplCondAcc(self._notifTpl)
         return wc.getHTML()
-    
-    
+
+
 class WConfModCFANotifTplDisplay(wcomponents.WTemplated):
-    
+
     def __init__(self, conf, notifTpl):
         self._conf = conf
         self._notifTpl = notifTpl
@@ -6614,7 +6622,7 @@ class WConfModCFANotifTplDisplay(wcomponents.WTemplated):
             if self._notifTpl.hasToAddr(toAddr.getToAddrKlass()):
                 res.append("%s"%self.htmlText(toAddr.getLabel()))
         return ", ".join(res)
-    
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["name"] = self._notifTpl.getName()
@@ -6633,29 +6641,29 @@ class WConfModCFANotifTplDisplay(wcomponents.WTemplated):
 
 
 class WCFADataModification(wcomponents.WTemplated):
-    
+
     def __init__( self, conf ):
         self._conf = conf
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
         abMgr = self._conf.getAbstractMgr()
         vars["sDay"] = abMgr.getStartSubmissionDate().day
         vars["sMonth"] = abMgr.getStartSubmissionDate().month
         vars["sYear"] = abMgr.getStartSubmissionDate().year
-        
+
         vars["eDay"] = abMgr.getEndSubmissionDate().day
         vars["eMonth"] = abMgr.getEndSubmissionDate().month
         vars["eYear"] = abMgr.getEndSubmissionDate().year
-        
+
         vars["mDay"] = ""
-        vars["mMonth"] = "" 
+        vars["mMonth"] = ""
         vars["mYear"] = ""
         if abMgr.getModificationDeadline():
             vars["mDay"] = str(abMgr.getModificationDeadline().day)
             vars["mMonth"] = str(abMgr.getModificationDeadline().month)
             vars["mYear"] = str(abMgr.getModificationDeadline().year)
-        
+
         vars["announcement"] = abMgr.getAnnouncement()
         vars["toList"] = ", ".join(abMgr.getSubmissionNotification().getToList())
         vars["ccList"] = ", ".join(abMgr.getSubmissionNotification().getCCList())
@@ -6663,17 +6671,17 @@ class WCFADataModification(wcomponents.WTemplated):
         return vars
 
 class WPCFADataModification( WPConferenceModifAbstractBase ):
-    
+
     def _setActiveTab( self ):
         self._tabCFA.setActive()
-    
+
     def _getTabContent( self, params ):
         p = WCFADataModification( self._conf )
         return p.getHTML()
 
 
 class WConfModifProgram(wcomponents.WTemplated):
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
@@ -6729,17 +6737,17 @@ class WConfModifProgram(wcomponents.WTemplated):
 
 
 class WPConfModifProgram( WPConferenceModifBase ):
-    
+
     def _setActiveSideMenuItem( self ):
         self._programMenuItem.setActive()
-    
+
     def _getPageContent( self, params ):
         wc = WConfModifProgram( self._conf )
         return wc.getHTML()
 
 
 class WConfModifProgramDescription(wcomponents.WTemplated):
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
@@ -6750,20 +6758,20 @@ class WConfModifProgramDescription(wcomponents.WTemplated):
         return vars
 
 class WPConfModifProgramDescription( WPConferenceModifBase ):
-    
+
     def _setActiveSideMenuItem(self):
         self._programMenuItem.setActive()
-    
+
     def _getPageContent( self, params ):
         wc = WConfModifProgramDescription( self._conf )
         return wc.getHTML()
 
 
 class WTrackCreation( wcomponents.WTemplated ):
-    
+
     def __init__( self, targetConf ):
         self.__conf = targetConf
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
         vars["title"], vars["description"] = "", ""
@@ -6773,10 +6781,10 @@ class WTrackCreation( wcomponents.WTemplated ):
 
 
 class WPConfAddTrack( WPConfModifProgram ):
-    
+
     def _setActiveSideMenuItem(self):
         self._programMenuItem.setActive()
-    
+
     def _getPageContent( self, params ):
         p = WTrackCreation( self._conf )
         pars = {"postURL": urlHandlers.UHConfPerformAddTrack.getURL() }
@@ -6793,14 +6801,14 @@ class WAbstracts( wcomponents.WTemplated ):
         self._fields = fields
         self._menuStatus = menuStatus
         self.websession = websession
-        
-        
+
+
 
     def _getURL( self ):
         #builds the URL to the conference management abstract list page
         #   preserving the current filter and sorting status
         url = urlHandlers.UHConfAbstractManagment.getURL(self._conf)
-        
+
         #save params in websession
         dict = self.websession.getVar("abstractFilterAndSortingConf%s"%self._conf.getId())
         if not dict:
@@ -6818,9 +6826,9 @@ class WAbstracts( wcomponents.WTemplated ):
             for t in self._filterCrit.getField( "type" ).getValues():
                 if t:
                     l.append(t.getId())
-            dict["selTypes"] = l 
+            dict["selTypes"] = l
             if self._filterCrit.getField( "type" ).getShowNoValue():
-                dict["typeShowNoValue"] = "1" 
+                dict["typeShowNoValue"] = "1"
         if self._filterCrit.getField("acc_track"):
             dict["selAccTracks"] = self._filterCrit.getField("acc_track").getValues()
             if self._filterCrit.getField("acc_track").getShowNoValue():
@@ -6928,7 +6936,7 @@ class WAbstracts( wcomponents.WTemplated ):
         l = [ _("""<input type="checkbox" name="trackShowMultiple"%s> _("only multiple tracks")""")%checkedShowMultiple,
                 _("""<input type="checkbox" name="selOnlyComments"%s> _("only with comments")""")%checkedShowComments]
         return l
-    
+
     def _getFieldToShow(self):
         if not self._fields:
             self._fields = {"ID": [ _("ID"), "checked"],
@@ -6943,7 +6951,7 @@ class WAbstracts( wcomponents.WTemplated ):
         for key in ["ID", "PrimaryAuthor", "Tracks", "Type", "Status", "AccTrack", "AccType", "SubmissionDate"]:
             l.append("""<input type="checkbox" name="show%s" %s value="checked">%s"""%(key, self._fields[key][1], self._fields[key][0]))
         return l
-    
+
     def _getAbstractTitleBar(self):
         l = []
         if self._fields["ID"][1] == "checked":
@@ -6963,22 +6971,22 @@ class WAbstracts( wcomponents.WTemplated ):
         if self._fields["AccType"][1] == "checked":
             l.append( _("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #5294CC;border-right:5px solid #FFFFFF"> _("Acc. Type")</td>"""))
         if self._fields["SubmissionDate"][1] == "checked":
-            l.append( _("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #5294CC;border-right:5px solid #FFFFFF"><a href=%(dateSortingURL)s> _("Submission date")</a> %(dateImg)s</td>"""))        
-        
+            l.append( _("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #5294CC;border-right:5px solid #FFFFFF"><a href=%(dateSortingURL)s> _("Submission date")</a> %(dateImg)s</td>"""))
+
         return "\n".join(l)
-    
+
     def _getOpenMenuURL(self):
         url = urlHandlers.UHConfAbstractManagmentOpenMenu.getURL(self._conf)
         url.addParam("currentURL", self._getURL())
         return url
-    
+
     def _getCloseMenuURL(self):
         url = urlHandlers.UHConfAbstractManagmentCloseMenu.getURL(self._conf)
         url.addParam("currentURL", self._getURL())
         return url
-    
+
     def _getMenu(self):
-        if self._menuStatus == "open": 
+        if self._menuStatus == "open":
             menu = _("""<table width="100%%" align="center" border="0" style="border-left: 1px solid #777777">
                     <tr>
                         <td class="groupTitle"><a href="%(closeMenuURL)s"><img src=%(openMenuImg)s alt="_("hide menu")" border="0"></a> _("Filtering criteria")</td>
@@ -7031,7 +7039,7 @@ class WAbstracts( wcomponents.WTemplated ):
                     </tr>
                     <tr><td align="left"><small> _("Note that you can open the filtering criteria by clicking in the icon") <img src=%(closeMenuImg)s alt="Show menu" border="0"> _("which is above this line").</small></td></tr>
                 </table>""")
-        
+
         return menu
 
     def getVars( self ):
@@ -7049,16 +7057,16 @@ class WAbstracts( wcomponents.WTemplated ):
         vars["confId"] = self._conf.getId()
         self._authSearch=vars.get("authSearch","")
         vars["authSearch"]=quoteattr(str(self._authSearch))
-        
+
         vars["showFields"] = " ".join(self._getFieldToShow())
-        
-        vars["currentSorting"] = ""       
+
+        vars["currentSorting"] = ""
         sortingField=None
         if self._sortingCrit is not None:
             sortingField=self._sortingCrit.getField()
 
         url = self._getURL()
-        url.addParam("sortBy", "type")        
+        url.addParam("sortBy", "type")
         vars["typeImg"] = ""
         if sortingField and sortingField.getId() == "type":
             vars["currentSorting"] = """<input type="hidden" name="sortBy" value="type">"""
@@ -7069,9 +7077,9 @@ class WAbstracts( wcomponents.WTemplated ):
                 vars["typeImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
         vars["typeSortingURL"] = quoteattr( str( url ) )
-        
+
         url = self._getURL()
-        url.addParam("sortBy", "status")        
+        url.addParam("sortBy", "status")
         vars["statusImg"] = ""
         if sortingField and sortingField.getId() == "status":
             vars["currentSorting"] = """<input type="hidden" name="sortBy" value="status">"""
@@ -7084,7 +7092,7 @@ class WAbstracts( wcomponents.WTemplated ):
         vars["statusSortingURL"] = quoteattr( str( url ) )
 
         url=self._getURL()
-        url.addParam("sortBy","number")        
+        url.addParam("sortBy","number")
         vars["numberImg"]=""
         if sortingField and sortingField.getId() == "number":
                 vars["currentSorting"] = """<input type="hidden" name="sortBy" value="number">"""
@@ -7095,10 +7103,10 @@ class WAbstracts( wcomponents.WTemplated ):
                     vars["numberImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                     url.addParam("order","down")
         vars["numberSortingURL"]=quoteattr(str(url))
-         
+
         url = self._getURL()
         url.addParam("sortBy", "date")
-        
+
         vars["dateImg"] = ""
         if sortingField and sortingField.getId() == "date":
             vars["currentSorting"] = """<input type="hidden" name="sortBy" value="date">"""
@@ -7109,10 +7117,10 @@ class WAbstracts( wcomponents.WTemplated ):
                 vars["dateImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
         vars["dateSortingURL"] = quoteattr( str( url ) )
-        
-        
-        
-            
+
+
+
+
         l = []
         abstractsToPrint = []
         f = filters.SimpleFilter( self._filterCrit, self._sortingCrit )
@@ -7152,7 +7160,7 @@ class WAbstracts( wcomponents.WTemplated ):
                 if auth.getFullName():
                     authList.append(auth.getFullName())
             PAuthors = "<br>".join(authList)
-            
+
             m = []
             if self._fields["ID"][1] == "checked":
                 m.append("""<td class="abstractLeftDataCell" nowrap>%s%s</td>"""%(abstract.getId(), comments))
@@ -7180,7 +7188,7 @@ class WAbstracts( wcomponents.WTemplated ):
         if self._order =="up":
             l.reverse()
         vars["abstracts"] = "".join( l )
-        
+
         l = []
         for key in self._fields.keys():
             if self._fields[key]:
@@ -7189,7 +7197,7 @@ class WAbstracts( wcomponents.WTemplated ):
         vars["number"] = str(len(abstractList))
         vars["accessAbstract"] = quoteattr(str(urlHandlers.UHAbstractDirectAccess.getURL(self._conf)))
         vars["abstractsToPrint"] = "\n".join(abstractsToPrint)
-        
+
         url = urlHandlers.UHConfAbstractManagment.getURL(self._conf)
         url.setSegment( "abstracts" )
         vars["filterPostURL"] = quoteattr(str(url))
@@ -7197,30 +7205,30 @@ class WAbstracts( wcomponents.WTemplated ):
         l = []
         for tpl in self._conf.getAbstractMgr().getNotificationTplList():
             l.append("""<option value="%s">%s</option>"""%(tpl.getId(), tpl.getName()))
-        
+
         vars["closeMenuURL"] = self._getCloseMenuURL()
         vars["closeMenuImg"] = quoteattr(Config.getInstance().getSystemIconURL("openMenu"))
         vars["openMenuURL"] = self._getOpenMenuURL()
         vars["openMenuImg"] = quoteattr(Config.getInstance().getSystemIconURL("closeMenu"))
-        
+
         vars["checkAllTracks"] = """<img src=%s border="0" alt="Select all" onclick="selecAllTracks()">"""%quoteattr(Config.getInstance().getSystemIconURL("checkAll"))
         vars["uncheckAllTracks"] = """<img src=%s border="0" alt="Unselect all" onclick="unselecAllTracks()">"""%quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))
-        
+
         vars["checkAllTypes"] = """<img src=%s border="0" alt="Select all" onclick="selecAllTypes()">"""%quoteattr(Config.getInstance().getSystemIconURL("checkAll"))
         vars["uncheckAllTypes"] = """<img src=%s border="0" alt="Unselect all" onclick="unselecAllTypes()">"""%quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))
-        
+
         vars["checkAllStatus"] = """<img src=%s border="0" alt="Select all" onclick="selecAllStatus()">"""%quoteattr(Config.getInstance().getSystemIconURL("checkAll"))
         vars["uncheckAllStatus"] = """<img src=%s border="0" alt="Unselect all" onclick="unselecAllStatus()">"""%quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))
-        
+
         vars["checkAllAccTracks"] = """<img src=%s border="0" alt="Select all" onclick="selecAllAccTracks()">"""%quoteattr(Config.getInstance().getSystemIconURL("checkAll"))
         vars["uncheckAllAccTracks"] = """<img src=%s border="0" alt="Unselect all" onclick="unselecAllAccTracks()">"""%quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))
-        
+
         vars["checkAllAccTypes"] = """<img src=%s border="0" alt="Select all" onclick="selecAllAccTypes()">"""%quoteattr(Config.getInstance().getSystemIconURL("checkAll"))
         vars["uncheckAllAccTypes"] = """<img src=%s border="0" alt="Unselect all" onclick="unselecAllAccTypes()">"""%quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))
-        
+
         vars["checkAllFields"] = """<img src=%s border="0" alt="Select all" onclick="selecAllFields()">"""%quoteattr(Config.getInstance().getSystemIconURL("checkAll"))
         vars["uncheckAllFields"] = """<img src=%s border="0" alt="Unselect all" onclick="unselecAllFields()">"""%quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))
-        
+
         vars["menu"] = self._getMenu()%vars
         vars["abstractTitleBar"] = self._getAbstractTitleBar()%vars
 
@@ -7236,14 +7244,14 @@ class WAbstracts( wcomponents.WTemplated ):
             vars["generateExcel"] = """<form action=%s method="POST" style="margin-bottom:0px;">%s<input type="submit" class="btn" value="" style="cursor:pointer;text-decoration: none; background-color:transparent;color: #000000;background-image:url(%s); background-repeat:no-repeat;border:0px; width:100px;"></form>"""%(quoteattr(str(generateExcelURL)),"".join(hiddenAbstracts), generateExcelIcon)
         else :
             vars["generateExcel"] = ""
-        
-        
-        
-        
+
+
+
+
         return vars
-                
+
 class WPConfAbstractList( WPConferenceModifAbstractBase ):
-    
+
     def __init__(self, rh, conf, msg):
         self._msg = msg
         WPConferenceModifAbstractBase.__init__(self, rh, conf)
@@ -7255,7 +7263,7 @@ class WPConfAbstractList( WPConferenceModifAbstractBase ):
                             params.get("sortingCrit", None),order, params.get("fields", None), params.get("menuStatus", None), websession )
         p = {"authSearch":params.get("authSearch","")}
         return wc.getHTML( p )
-    
+
     def _setActiveTab(self):
         self._tabAbstractList.setActive()
 
@@ -7283,7 +7291,7 @@ class WPModNewAbstract(WPConfAbstractList):
 
 
 class WConfModAbstractsMerge(wcomponents.WTemplated):
-    
+
     def __init__(self,conf):
         self._conf=conf
 
@@ -7317,20 +7325,20 @@ class WConfModAbstractsMerge(wcomponents.WTemplated):
         vars["selAbstracts"]=",".join(vars.get("absIdList",[]))
         vars["targetAbs"]=quoteattr(str(vars.get("targetAbsId","")))
         vars["inclAuthChecked"]=""
-        if vars.get("inclAuth",False): 
+        if vars.get("inclAuth",False):
             vars["inclAuthChecked"]=" checked"
         vars["comments"]=self.htmlText(vars.get("comments",""))
         vars["notifyChecked"]=""
-        if vars.get("notify",False): 
+        if vars.get("notify",False):
             vars["notifyChecked"]=" checked"
         return vars
 
 
 class WPModMergeAbstracts(WPConfAbstractList):
-    
+
     def __init__(self,rh,conf):
         WPConfAbstractList.__init__(self, rh, conf,"")
-    
+
     def _getTabContent(self,params):
         wc=WConfModAbstractsMerge(self._conf)
         p={"absIdList":params.get("absIdList",[]),
@@ -7346,29 +7354,29 @@ class WPModMergeAbstracts(WPConfAbstractList):
 class WPConfModifDisplayBase( WPConferenceModifBase ):
 
     def _createTabCtrl( self ):
-        
+
         self._tabCtrl = wcomponents.TabControl()
-        
+
         self._tabDisplayCustomization = self._tabCtrl.newTab( "dispCustomization", _("Layout customization"), \
                 urlHandlers.UHConfModifDisplayCustomization.getURL( self._conf ) )
         self._tabDisplayConfHeader = self._tabCtrl.newTab( "displConfHeader", _("Conference header"), \
-                urlHandlers.UHConfModifDisplayConfHeader.getURL( self._conf ) ) 
+                urlHandlers.UHConfModifDisplayConfHeader.getURL( self._conf ) )
         self._tabDisplayMenu = self._tabCtrl.newTab( "dispMenu", _("Menu"), \
                 urlHandlers.UHConfModifDisplayMenu.getURL( self._conf ) )
         self._tabDisplayResources = self._tabCtrl.newTab( "dispResources", _("Images"), \
                 urlHandlers.UHConfModifDisplayResources.getURL( self._conf ) )
-        
+
         self._setActiveTab()
-    
+
     def _getPageContent( self, params ):
         self._createTabCtrl()
-        
+
         html = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
         return html
-        
+
     def _getTabContent( self ):
         return "nothing"
-    
+
     def _setActiveSideMenuItem( self ):
         self._layoutMenuItem.setActive()
 
@@ -7388,15 +7396,15 @@ class WPConfModifDisplay( WPConfModifDisplayBase ):
     def _getTabContent( self, params ):
         wc = WConfModifDisplay( self._conf, self._linkId, self._formatOption )
         return wc.getHTML(self._optionalParams)
-    
+
     def _getHeadContent( self ):
-        #This is used for fetching the css file for management - display  
+        #This is used for fetching the css file for management - display
         path = baseurl = self._getBaseURL()
         saveurl = urlHandlers.UHSavePic.getURL(self._conf)
         printCSS = """
         <link rel="stylesheet" type="text/css" href="%s/css/ModifDisplay.css" >
-            """ %(path) 
-        return printCSS    
+            """ %(path)
+        return printCSS
 
 class WPConfModifDisplayCustomization( WPConfModifDisplayBase ):
 
@@ -7411,12 +7419,12 @@ class WPConfModifDisplayCustomization( WPConfModifDisplayBase ):
         self._tabDisplayCustomization.setActive()
 
 class WConfModifDisplayCustom(wcomponents.WTemplated):
-    
+
     def __init__(self, conf):
         self._conf = conf
         dm = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf)
         self._format = dm.getFormat()
-    
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["saveLogo"]=urlHandlers.UHSaveLogo.getURL(self._conf)
@@ -7441,22 +7449,22 @@ class WConfModifDisplayCustom(wcomponents.WTemplated):
         else:
             vars["logo"] = "<em>No logo has been saved for this conference</em>"
             vars["removeLogo"] = ""
-            
-             
+
+
         #creating css part
         vars["saveCSS"]=urlHandlers.UHSaveCSS.getURL(self._conf)
         sm = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getStyleManager()
-        if sm.getLocalCSS():            
+        if sm.getLocalCSS():
             vars["cssDownload"] = sm.getCSS().getURL()
         else:
             vars["css"] = ""
-            vars["cssDownload"] = ""  
+            vars["cssDownload"] = ""
         vars["removeCSS"] = str(urlHandlers.UHRemoveCSS.getURL(self._conf))
         vars["previewURL"]= urlHandlers.UHConfModifPreviewCSS.getURL(self._conf)
 
 
         if sm.getCSS():
-            vars["currentCSSFileName"] = sm.getCSS().getFileName() 
+            vars["currentCSSFileName"] = sm.getCSS().getFileName()
         else:
             vars["currentCSSFileName"] = ""
         return vars
@@ -7475,13 +7483,13 @@ class WPConfModifDisplayMenu( WPConfModifDisplayBase ):
         self._tabDisplayMenu.setActive()
 
 class WConfModifDisplayMenu(wcomponents.WTemplated):
-    
+
     def __init__(self, conf, linkId):
         self._conf = conf
         dm = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf)
         self._menu = dm.getMenu()
         self._link = self._menu.getLinkById(linkId)
-    
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["addLinkURL"]=quoteattr(str(urlHandlers.UHConfModifDisplayAddLink.getURL(self._conf)))
@@ -7491,26 +7499,26 @@ class WConfModifDisplayMenu(wcomponents.WTemplated):
         vars["confId"] = self._conf.getId()
         if self._link:
             if isinstance(self._link, displayMgr.SystemLink):
-                p = { 
+                p = {
                         "dataModificationURL": quoteattr(str(urlHandlers.UHConfModifDisplayModifySystemData.getURL(self._link))), \
                         "moveUpURL": quoteattr(str(urlHandlers.UHConfModifDisplayUpLink.getURL(self._link))), \
                         "imageUpURL": quoteattr(str(Config.getInstance().getSystemIconURL("upArrow"))), \
                         "moveDownURL": quoteattr(str(urlHandlers.UHConfModifDisplayDownLink.getURL(self._link))), \
-                        "imageDownURL": quoteattr(str(Config.getInstance().getSystemIconURL("downArrow"))) 
+                        "imageDownURL": quoteattr(str(Config.getInstance().getSystemIconURL("downArrow")))
                     }
                 vars["linkEdition"] = WSystemLinkModif(self._link).getHTML(p)
             elif isinstance(self._link, displayMgr.Spacer):
-                p = {   
+                p = {
                         "removeLinkURL": quoteattr(str(urlHandlers.UHConfModifDisplayRemoveLink.getURL(self._link))), \
                         "toggleLinkStatusURL":  quoteattr(str(urlHandlers.UHConfModifDisplayToggleLinkStatus.getURL(self._link))), \
                         "moveUpURL": quoteattr(str(urlHandlers.UHConfModifDisplayUpLink.getURL(self._link))), \
                         "imageUpURL": quoteattr(str(Config.getInstance().getSystemIconURL("upArrow"))), \
                         "moveDownURL": quoteattr(str(urlHandlers.UHConfModifDisplayDownLink.getURL(self._link))), \
-                        "imageDownURL": quoteattr(str(Config.getInstance().getSystemIconURL("downArrow"))) 
+                        "imageDownURL": quoteattr(str(Config.getInstance().getSystemIconURL("downArrow")))
                     }
                 vars["linkEdition"] = WSpacerModif(self._link).getHTML(p)
             elif isinstance(self._link, displayMgr.ExternLink):
-                p = {   
+                p = {
                         "dataModificationURL": quoteattr(str(urlHandlers.UHConfModifDisplayModifyData.getURL(self._link))), \
                         "removeLinkURL": quoteattr(str(urlHandlers.UHConfModifDisplayRemoveLink.getURL(self._link))), \
                         "addSubLinkURL": quoteattr(str(urlHandlers.UHConfModifDisplayAddLink.getURL(self._link))), \
@@ -7521,7 +7529,7 @@ class WConfModifDisplayMenu(wcomponents.WTemplated):
                         "imageDownURL": quoteattr(str(Config.getInstance().getSystemIconURL("downArrow"))) }
                 vars["linkEdition"] = WLinkModif(self._link).getHTML(p)
             else:
-                p = {   
+                p = {
                         "dataModificationURL": quoteattr(str(urlHandlers.UHConfModifDisplayModifyData.getURL(self._link))), \
                         "removeLinkURL": quoteattr(str(urlHandlers.UHConfModifDisplayRemoveLink.getURL(self._link))), \
                         "toggleLinkStatusURL":  quoteattr(str(urlHandlers.UHConfModifDisplayToggleLinkStatus.getURL(self._link))), \
@@ -7533,7 +7541,7 @@ class WConfModifDisplayMenu(wcomponents.WTemplated):
                 vars["linkEdition"] = WPageLinkModif(self._link).getHTML(p)
         else:
             vars["linkEdition"] = _("""<center><b> _("Click on an item of the menu to edit it")</b></center>""")
-        
+
         return vars
 
 class WPConfModifDisplayResources( WPConfModifDisplayBase ):
@@ -7549,10 +7557,10 @@ class WPConfModifDisplayResources( WPConfModifDisplayBase ):
         self._tabDisplayResources.setActive()
 
 class WConfModifDisplayResources(wcomponents.WTemplated):
-    
+
     def __init__(self, conf):
         self._conf = conf
-    
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["savePic"]=urlHandlers.UHSavePic.getURL(self._conf)
@@ -7560,7 +7568,7 @@ class WConfModifDisplayResources(wcomponents.WTemplated):
         vars["picsList"] = []
         im = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getImagesManager()
         for pic in im.getPicList().values():
-            vars["picsList"].append({"id":pic.getId(), 
+            vars["picsList"].append({"id":pic.getId(),
                                     "picURL": str(urlHandlers.UHConferencePic.getURL(pic))})
         return vars
 
@@ -7578,13 +7586,13 @@ class WPConfModifDisplayConfHeader( WPConfModifDisplayBase ):
         self._tabDisplayConfHeader.setActive()
 
 class WConfModifDisplayConfHeader(wcomponents.WTemplated):
-    
+
     def __init__(self, conf):
         self._conf = conf
         dm = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf)
         self._tickerTape=dm.getTickerTape()
         self._searchEnabled = dm.getSearchEnabled()
-    
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
 
@@ -7614,21 +7622,21 @@ class WConfModifDisplayConfHeader(wcomponents.WTemplated):
             vars["nowHappeningTextIcon"]=enabledText
         else:
             vars["nowHappeningIcon"]=vars["disablePic"]
-            vars["nowHappeningTextIcon"]=disabledText     
+            vars["nowHappeningTextIcon"]=disabledText
         vars["nowHappeningURL"]=quoteattr("%s#tickerTape"%str(urlNP))
-        
+
         urlST=urlHandlers.UHTickerTapeAction.getURL(self._conf)
         urlST.addParam("simpleText", "action")
         vars["simpleTextURL"]=quoteattr("%s#tickerTape"%urlST)
-        # simple ext                
+        # simple ext
         vars["text"]=quoteattr(self._tickerTape.getText())
-        if not vars.has_key("modifiedText"): 
+        if not vars.has_key("modifiedText"):
             vars["modifiedText"]=""
         else:
             vars["modifiedText"]= _("""<font color="green"> _("(text saved)")</font>""")
-        
+
         #enable or disable the contribution search feature
-        urlSB=urlHandlers.UHConfModifToggleSearch.getURL(self._conf)        
+        urlSB=urlHandlers.UHConfModifToggleSearch.getURL(self._conf)
         if self._searchEnabled:
             vars["searchBoxIcon"]=vars["enablePic"]
             vars["searchBoxTextIcon"]=enabledText
@@ -7636,17 +7644,17 @@ class WConfModifDisplayConfHeader(wcomponents.WTemplated):
             vars["searchBoxIcon"]=vars["disablePic"]
             vars["searchBoxTextIcon"]=disabledText
         vars["searchBoxURL"]=quoteattr(str(urlSB))
-        
-        
+
+
         return vars
 
 class WFormatColorOptionModif(wcomponents.WTemplated):
-    
+
     def __init__(self, formatOption, format, conf, formId=4):
         self._formatOption = formatOption
         self._format = format
         self._conf = conf
-        
+
         # The form number on the page... used for the color picker
         self._formId = formId
 
@@ -7671,18 +7679,18 @@ class WFormatColorOptionModif(wcomponents.WTemplated):
         return vars
 
 class ConfEditMenu:
-    
+
     def __init__(self, menu, modifURLGen=None):
         self._menu = menu
         self._linkModifHandler = modifURLGen
-    
+
     def getHTML(self):
         html = ["<table>"]
         for link in self._menu.getLinkList():
             html.append(self._getLinkHTML(link))
         html.append("</table>")
         return "".join(html)
-    
+
     def _getLinkHTML(self, link, indent=""):
         if self._menu.linkHasToBeDisplayed(link):
             disabled = _("""<font size="-1" color="red"> _("(disabled)")</font>""")
@@ -7709,10 +7717,10 @@ class ConfEditMenu:
 class WLinkModif(wcomponents.WTemplated):
     def __init__(self, link):
         self._link = link
-    
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
-        
+
         vars["linkName"] = self._link.getCaption()
         vars["linkURL"] = self._link.getURL()
         vars["displayTarget"] = _("Display in the SAME window")
@@ -7724,17 +7732,17 @@ class WLinkModif(wcomponents.WTemplated):
         else:
             vars["linkStatus"] = _("Disabled")
             vars["changeStatusTo"] = _("Activate")
-        
+
         return vars
 
 class WPageLinkModif(wcomponents.WTemplated):
-    
+
     def __init__(self, link):
         self._link = link
-        
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
-        
+
         vars["linkName"] = self._link.getCaption()
         vars["linkContent"] = self.htmlText("%s..."%self._link.getPage().getContent()[0:50])
         vars["displayTarget"] = _("Display in the SAME window")
@@ -7758,7 +7766,7 @@ class WSystemLinkModif(wcomponents.WTemplated):
 
     def __init__(self, link):
         self._link = link
-    
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["linkName"] = self._link.getCaption()
@@ -7776,7 +7784,7 @@ class WSystemLinkModif(wcomponents.WTemplated):
 class WSpacerModif(wcomponents.WTemplated):
     def __init__(self, link):
         self._link = link
-    
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["linkName"] = self._link.getName()
@@ -7808,7 +7816,7 @@ class WPConfModifDisplayAddPage( WPConfModifDisplayBase ):
 
 
 class WConfModifDisplayAddPage(wcomponents.WTemplated):
-    
+
     def __init__(self, conf, linkId):
         self._conf = conf
         self._menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
@@ -7816,13 +7824,13 @@ class WConfModifDisplayAddPage(wcomponents.WTemplated):
             self._link = self._menu.getLinkById(linkId)
         else:
             self._link = self._menu
-    
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["saveLinkURL"] = quoteattr(str(urlHandlers.UHConfModifDisplayAddPage.getURL(self._link)))
         vars["content"]=""
         return vars
-            
+
 class WPConfModifDisplayAddLink( WPConfModifDisplayBase ):
     def __init__(self, rh, conf, linkId):
         WPConfModifDisplayBase.__init__(self, rh, conf)
@@ -7845,7 +7853,7 @@ class WPConfModifDisplayAddLink( WPConfModifDisplayBase ):
 
 
 class WConfModifDisplayAddLink(wcomponents.WTemplated):
-    
+
     def __init__(self, conf, linkId):
         self._conf = conf
         self._menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
@@ -7853,7 +7861,7 @@ class WConfModifDisplayAddLink(wcomponents.WTemplated):
             self._link = self._menu.getLinkById(linkId)
         else:
             self._link = self._menu
-    
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["menuDisplay"] = ConfEditMenu(self._menu, urlHandlers.UHConfModifDisplay.getURL).getHTML()
@@ -7870,7 +7878,7 @@ class WPConfModifDisplayModifyData( WPConfModifDisplayBase ):
     def _setActiveTab( self ):
         self._tabDisplayMenu.setActive()
 
-    def _getTabContent( self, params ):        
+    def _getTabContent( self, params ):
         wc = WConfModifDisplayModifyData( self._conf, self._link )
         p = {
                 "modifyDataURL": quoteattr(str(urlHandlers.UHConfModifDisplayModifyData.getURL(self._link))), \
@@ -7880,13 +7888,13 @@ class WPConfModifDisplayModifyData( WPConfModifDisplayBase ):
         return wc.getHTML( p )
 
 class WConfModifDisplayModifyData(wcomponents.WTemplated):
-    
+
     def __init__(self, conf, link):
         self._conf = conf
         self._menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
         self._link = link
-        
-    
+
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["menuDisplay"] = ConfEditMenu(self._menu, urlHandlers.UHConfModifDisplay.getURL).getHTML()
@@ -7900,7 +7908,7 @@ class WConfModifDisplayModifyData(wcomponents.WTemplated):
         else:
             vars["newChecked"] = ""
             vars["sameChecked"] = _("""CHECKED""")
-        
+
         return vars
 
 
@@ -7910,24 +7918,24 @@ class WPConfModifDisplayModifyPage( WPConfModifDisplayBase ):
         WPConfModifDisplayBase.__init__(self, rh, conf)
         self._link = link
         self._menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-    
+
     def _setActiveTab( self ):
         self._tabDisplayMenu.setActive()
 
-    def _getTabContent( self, params ):        
+    def _getTabContent( self, params ):
         wc = WConfModifDisplayModifyPage( self._conf, self._link )
         p = {
                 "modifyDataURL": quoteattr(str(urlHandlers.UHConfModifDisplayModifyData.getURL(self._link))) }
         return wcomponents.WHTMLEditorWrapper(wc.getHTML( p ),self._conf).getHTML()
 
 class WConfModifDisplayModifyPage(wcomponents.WTemplated):
-    
+
     def __init__(self, conf, link):
         self._conf = conf
         self._menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
         self._link = link
-        
-    
+
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["saveLinkURL"] = quoteattr(str(urlHandlers.UHConfModifDisplayAddLink.getURL(self._link)))
@@ -7947,11 +7955,11 @@ class WPConfModifDisplayModifySystemData( WPConfModifDisplayBase ):
         WPConfModifDisplayBase.__init__(self, rh, conf)
         self._link = link
         self._menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-        
+
     def _setActiveTab( self ):
         self._tabDisplayMenu.setActive()
 
-    def _getTabContent( self, params ):        
+    def _getTabContent( self, params ):
         wc = WConfModifDisplayModifySystemData( self._conf, self._link )
         p = {
                 "modifyDataURL": quoteattr(str(urlHandlers.UHConfModifDisplayModifySystemData.getURL(self._link))), \
@@ -7961,13 +7969,13 @@ class WPConfModifDisplayModifySystemData( WPConfModifDisplayBase ):
         return wc.getHTML( p )
 
 class WConfModifDisplayModifySystemData(wcomponents.WTemplated):
-    
+
     def __init__(self, conf, link):
         self._conf = conf
         self._menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
         self._link = link
-        
-    
+
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["menuDisplay"] = ConfEditMenu(self._menu, urlHandlers.UHConfModifDisplay.getURL).getHTML()
@@ -7980,10 +7988,10 @@ class WPConfModifDisplayRemoveLink( WPConfModifDisplayBase ):
     def __init__(self, rh, conf, link):
         WPConfModifDisplayBase.__init__(self, rh, conf)
         self._link = link
-        
+
     def _setActiveTab( self ):
         self._tabDisplayMenu.setActive()
-        
+
     def _getTabContent( self, params ):
         msg = _("""<font size=\"+2\"> _("Are you sure that you want to DELETE the link") \"%s\"</font><br>( _("Note that if you delete the link, all the links below it will also be deleted"))""")%self._link.getName()
         postURL = quoteattr(str(urlHandlers.UHConfModifDisplayRemoveLink.getURL(self._link)))
@@ -7991,35 +7999,35 @@ class WPConfModifDisplayRemoveLink( WPConfModifDisplayBase ):
         #wc = WConfModifDisplayRemoveLink( self._conf, link )
         #p = {"removeLinkURL": quoteattr(str(urlHandlers.UHConfModifDisplayRemoveLink.getURL(self._link)))}
         #return wc.getHTML( p )
-    
+
 
 class WPConfParticipantList( WPConferenceBase ):
-    
+
     def __init__(self, rh, conf, emailList, displayedGroups, abstracts):
         WPConferenceBase.__init__(self, rh, conf)
         self._emailList = emailList
         self._displayedGroups = displayedGroups
         self._abstracts = abstracts
-    
+
     def _getBody( self, params ):
         WPConferenceBase._getBody(self, params)
         wc = WAbstractsParticipantList(self._conf, self._emailList, self._displayedGroups, self._abstracts)
         return wc.getHTML()
 
 class WPConfModifParticipantList( WPConferenceBase ):
-    
+
     def __init__(self, rh, conf, emailList, displayedGroups, contribs):
         WPConferenceBase.__init__(self, rh, conf)
         self._emailList = emailList
         self._displayedGroups = displayedGroups
         self._contribs = contribs
-    
+
     def _getBody( self, params ):
         WPConferenceBase._getBody(self, params)
         wc = WContribParticipantList(self._conf, self._emailList, self._displayedGroups, self._contribs)
         params = {"urlDisplayGroup":urlHandlers.UHContribsConfManagerDisplayParticipantList.getURL(self._conf)}
         return wc.getHTML(params)
-    
+
 
 class WConfModifContribList(wcomponents.WTemplated):
 
@@ -8031,13 +8039,13 @@ class WConfModifContribList(wcomponents.WTemplated):
         self._totaldur =timedelta(0)
         self._menuStatus = websession.getVar("ContribListMenuStatusConf%s"%conf.getId())
         self.websession = websession
-        
+
 
     def _getURL( self ):
         #builds the URL to the contribution list page
         #   preserving the current filter and sorting status
         url = urlHandlers.UHConfModifContribList.getURL(self._conf)
-        
+
         #save params in websession
         dict = self.websession.getVar("ContributionFilterConf%s"%self._conf.getId())
         if not dict:
@@ -8071,7 +8079,7 @@ class WConfModifContribList(wcomponents.WTemplated):
             dict["order"] = "down"
         dict["OK"] = "1"
         self.websession.setVar("ContributionFilterConf%s"%self._conf.getId(), dict)
-        
+
         return url
 
     def _getMaterialsHTML(self, contrib):
@@ -8129,12 +8137,12 @@ class WConfModifContribList(wcomponents.WTemplated):
         sdate = ""
         if contrib.isScheduled():
             sdate=contrib.getAdjustedStartDate().strftime("%d-%b-%Y %H:%M" )
-        title = """<a href=%s>%s</a>"""%( quoteattr( str( urlHandlers.UHContributionModification.getURL( contrib ) ) ), self.htmlText( contrib.getTitle() ))      
+        title = """<a href=%s>%s</a>"""%( quoteattr( str( urlHandlers.UHContributionModification.getURL( contrib ) ) ), self.htmlText( contrib.getTitle() ))
         strdur = ""
         if contrib.getDuration() is not None and contrib.getDuration().seconds != 0:
             strdur = (datetime(1900,1,1)+ contrib.getDuration()).strftime("%Hh%M'")
             dur = contrib.getDuration()
-            self._totaldur = self._totaldur + dur       
+            self._totaldur = self._totaldur + dur
         l = []
         for spk in contrib.getSpeakerList():
             l.append( self.htmlText( spk.getFullName() ) )
@@ -8227,7 +8235,7 @@ class WConfModifContribList(wcomponents.WTemplated):
             caption=ContribStatusList().getCaption(st)
             res.append("""<input type="checkbox" name="status" value=%s%s> (%s) %s"""%(quoteattr(str(id)),checked,self.htmlText(code),self.htmlText(caption)))
         return "<br>".join(res)
-            
+
     def _getMaterialItemsHTML(self):
         res=[]
         for (id,caption) in [(PaperFactory().getId(),PaperFactory().getTitle()),\
@@ -8243,14 +8251,14 @@ class WConfModifContribList(wcomponents.WTemplated):
         url = urlHandlers.UHConfModifContribListOpenMenu.getURL(self._conf)
         url.addParam("currentURL", self._getURL())
         return url
-    
+
     def _getCloseMenuURL(self):
         url = urlHandlers.UHConfModifContribListCloseMenu.getURL(self._conf)
         url.addParam("currentURL", self._getURL())
         return url
-    
+
     def _getMenu(self):
-        if self._menuStatus == "open": 
+        if self._menuStatus == "open":
             menu = _("""<form action=%(filterPostURL)s method="post">
     <table width="100%%" align="center" border="0" style="border-left: 1px solid #777777">
         <tr>
@@ -8306,7 +8314,7 @@ class WConfModifContribList(wcomponents.WTemplated):
     </table>
 </form>
 """)
-        
+
         return menu
 
     def getVars( self ):
@@ -8321,16 +8329,16 @@ class WConfModifContribList(wcomponents.WTemplated):
         vars["status"]=self._getStatusItemsHTML()
         vars["materials"]=self._getMaterialItemsHTML()
         cl=self._conf.getContribsMatchingAuth(authSearch)
-        
+
         sortingField = self._sortingCrit.getField()
         self._currentSorting=""
-        
+
         if sortingField is not None:
             self._currentSorting=sortingField.getId()
         vars["currentSorting"]=""
-        
+
         url=self._getURL()
-        url.addParam("sortBy","number")        
+        url.addParam("sortBy","number")
         vars["numberImg"]=""
         if self._currentSorting == "number":
                 vars["currentSorting"] = _("""<input type="hidden" name="sortBy" value="_("number")">""")
@@ -8341,7 +8349,7 @@ class WConfModifContribList(wcomponents.WTemplated):
                     vars["numberImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                     url.addParam("order","down")
         vars["numberSortingURL"]=quoteattr(str(url))
-            
+
         url = self._getURL()
         url.addParam("sortBy", "date")
         vars["dateImg"] = ""
@@ -8369,7 +8377,7 @@ class WConfModifContribList(wcomponents.WTemplated):
                 url.addParam("order","down")
         vars["titleSortingURL"]=quoteattr(str(url))
 
-         
+
         url = self._getURL()
         url.addParam("sortBy", "type")
         vars["typeImg"] = ""
@@ -8379,7 +8387,7 @@ class WConfModifContribList(wcomponents.WTemplated):
                 vars["typeImg"]="""<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                 url.addParam("order","up")
             elif self._order == "up":
-                vars["typeImg"]="""<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow"))) 
+                vars["typeImg"]="""<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
         vars["typeSortingURL"] = quoteattr( str( url ) )
         url = self._getURL()
@@ -8395,7 +8403,7 @@ class WConfModifContribList(wcomponents.WTemplated):
                 url.addParam("order","down")
         vars["sessionSortingURL"] = quoteattr( str( url ) )
         url = self._getURL()
-        url.addParam("sortBy", "speaker")        
+        url.addParam("sortBy", "speaker")
         vars["speakerImg"]=""
         if self._currentSorting=="speaker":
             vars["currentSorting"] = _("""<input type="hidden" name="sortBy" value="_("speaker")">""")
@@ -8406,9 +8414,9 @@ class WConfModifContribList(wcomponents.WTemplated):
                 vars["speakerImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
         vars["speakerSortingURL"]=quoteattr( str( url ) )
-            
+
         url = self._getURL()
-        url.addParam("sortBy","track")        
+        url.addParam("sortBy","track")
         vars["trackImg"] = ""
         if self._currentSorting == "track":
             vars["currentSorting"] = _("""<input type="hidden" name="sortBy" value="_("track")">""")
@@ -8445,28 +8453,28 @@ class WConfModifContribList(wcomponents.WTemplated):
         vars["moveURL"]=quoteattr(str(urlHandlers.UHConfModMoveContribsToSession.getURL(self._conf)))
         vars["materialPkgURL"]=quoteattr(str(urlHandlers.UHConfModMaterialPackage.getURL(self._conf)))
         vars["proceedingsURL"]=quoteattr(str(urlHandlers.UHConfModProceedings.getURL(self._conf)))
-        
+
         vars["closeMenuURL"] = self._getCloseMenuURL()
         vars["closeMenuImg"] = quoteattr(Config.getInstance().getSystemIconURL("openMenu"))
         vars["openMenuURL"] = self._getOpenMenuURL()
         vars["openMenuImg"] = quoteattr(Config.getInstance().getSystemIconURL("closeMenu"))
-        
+
         vars["menu"] = self._getMenu()%vars
 
         totaldur = self._totaldur
-        days = totaldur.days        
+        days = totaldur.days
         hours = (totaldur.seconds)/3600
         dayhours = (days * 24)+hours
         mins = ((totaldur.seconds)/60)-(hours*60)
-        vars["totaldur" ]="""%sh%sm"""%(dayhours,mins) 
+        vars["totaldur" ]="""%sh%sm"""%(dayhours,mins)
         vars['rbActive'] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
         return vars
-    
+
 class WPModifContribList( WPConferenceModifBase ):
-        
+
     def _setActiveSideMenuItem(self):
         self._contribListMenuItem.setActive(True)
-    
+
     def _getPageContent( self, params ):
         filterCrit=params.get("filterCrit",None)
         sortingCrit=params.get("sortingCrit",None)
@@ -8474,17 +8482,17 @@ class WPModifContribList( WPConferenceModifBase ):
         websession = self._rh._getSession()
         wc = WConfModifContribList(self._conf,filterCrit, sortingCrit ,order, websession)
         p={"authSearch":params.get("authSearch","")}
-        
+
         return wc.getHTML(p)
 
 class WPConfModifContribToPDFMenu( WPModifContribList ):
-    
+
     def __init__(self, rh, conf, contribIds):
         WPModifContribList.__init__(self, rh, conf)
         self._contribIds = contribIds
-        
+
     def _getPageContent(self, params):
-        
+
         wc = WConfModifContribToPDFMenu(self._conf, self._contribIds)
         return wc.getHTML(params)
 
@@ -8492,7 +8500,7 @@ class WConfModifContribToPDFMenu(wcomponents.WTemplated):
     def __init__(self, conf, contribIds):
         self._conf = conf
         self.contribIds = contribIds
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["createPDFURL"] = urlHandlers.UHContribsConfManagerDisplayMenuPDF.getURL(self._conf)
@@ -8503,7 +8511,7 @@ class WConfModifContribToPDFMenu(wcomponents.WTemplated):
         return vars
 
 class WContributionCreation(wcomponents.WTemplated):
-    
+
     def __init__( self, target):
         self.__owner = target
 
@@ -8531,7 +8539,7 @@ class WContributionCreation(wcomponents.WTemplated):
                     </tr>
                     """ % (caption,"f_%s"%id)
         return html
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         defaultDefinePlace = defaultDefineRoom = ""
@@ -8580,9 +8588,9 @@ class WContributionCreation(wcomponents.WTemplated):
         vars["boardNumber"]=""
         vars["type"]=self._getTypeItemsHTML()
         return vars
-    
+
 class WPConfAddContribution(WPModifContribList):
-    
+
     def _getTabContent( self, params ):
         p = WContributionCreation( self._conf )
         pars = {"postURL": urlHandlers.UHConfPerformAddContribution.getURL(), \
@@ -8619,13 +8627,13 @@ class WContributionSchCreation(WContributionCreation):
                         </td>
                     </tr>"""%(caption, "f_%s"%id)
         return html
-    
+
     def getVars(self):
         params = wcomponents.WTemplated.getVars( self )
         vars=WContributionCreation.getVars(self)
         vars.update(params)
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        
+
         session = None
         slot = None
         if params.get("sessionId", None):
@@ -8640,17 +8648,17 @@ class WContributionSchCreation(WContributionCreation):
         vars["title"] = quoteattr(vars.get("title",""))
         vars["conference"] = self._conf
         vars["useRoomBookingModule"] = minfo.getRoomBookingModuleActive()
-        
-        ####################################### 
+
+        #######################################
         # Fermi timezone awareness            #
         #  targetDay is UTC.  Should we set   #
         #  earlier to conf tz?                #
-        ####################################### 
+        #######################################
         if self._targetDay is not None:
             sd = convertTime.convertTime(self._targetDay,self._conf.getTimezone())
-            ####################################### 
+            #######################################
             # Fermi timezone awareness            #
-            ####################################### 
+            #######################################
             vars["day"]=sd.day
             vars["month"]=sd.month
             vars["year"]=sd.year
@@ -8726,7 +8734,7 @@ class WContributionSchCreation(WContributionCreation):
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> _("Board #")</span></td>
             <td bgcolor="white" width="100%%">&nbsp;
             <input type="text" name="boardNumber" size="10" value=%s></td>
-        </tr>            
+        </tr>
             """)%vars["boardNumber"]
         if not self._conf.getAutoSolveConflict():
             vars["autoUpdate"]= _("""<input type="checkbox" name="check" value="2"> _("Update parents dates")""")
@@ -8735,7 +8743,7 @@ class WContributionSchCreation(WContributionCreation):
         return vars
 
 #---------------------------------------------------------------------------
-                
+
 class WPModScheduleNewContribBase(WPConfModifSchedule):
 
     def __init__(self, rh, conf, targetDay, contributionCreatedFrom = "other"):
@@ -8746,13 +8754,13 @@ class WPModScheduleNewContribBase(WPConfModifSchedule):
         ##################################
         self._confTimezone = conf.getTimezone()
         self._contributionCreatedFrom = contributionCreatedFrom
-        
+
     def _setActiveSideMenuItem(self):
         if self._contributionCreatedFrom == "contributionList":
             self._contribListMenuItem.setActive(True)
         else:
             self._timetableMenuItem.setActive(True)
-    
+
     def _getPageContent( self, params ):
         p = WContributionSchCreation( self._conf, self._targetDay )
         td=""
@@ -8764,24 +8772,24 @@ class WPModScheduleNewContribBase(WPConfModifSchedule):
         params["calendarSelectURL"] =  urlHandlers.UHSimpleCalendar.getURL()
         params["targetDay"] = td
         params["eventType"] = params.get("eventType","conference")
-        
+
         wpresenter = wcomponents.WAddPersonModule("presenter")
         wauthor = wcomponents.WAddPersonModule("author")
-        wcoauthor = wcomponents.WAddPersonModule("coauthor")        
-        
+        wcoauthor = wcomponents.WAddPersonModule("coauthor")
+
         params["presenterOptions"] = params.get("presenterOptions",self._getPersonOptions())
         params["coauthorOptions"] =  params.get("coauthorOptions",self._getPersonOptions())
-        params["authorOptions"] =  params.get("authorOptions",self._getPersonOptions())     
-        
+        params["authorOptions"] =  params.get("authorOptions",self._getPersonOptions())
+
         if params.get("eventType","conference") == "conference" :
             params["author"] = wauthor.getHTML(params)
             params["coauthor"] = wcoauthor.getHTML(params)
-        
+
         params["submission"] = "true"
         params["presenter"] = wpresenter.getHTML(params)
-        
+
         params["contributionCreatedFrom"] = self._contributionCreatedFrom
-        
+
         return p.getHTML( params )
 
     def _getPersonOptions(self):
@@ -8815,20 +8823,20 @@ class WPModScheduleNewContrib(WPModScheduleNewContribBase, WPConfModifSchedule):
     def __init__(self, rh, conf, targetDay, contributionCreatedFrom = "other"):
         WPConfModifSchedule.__init__(self, rh, conf)
         WPModScheduleNewContribBase.__init__(self, rh, conf, targetDay, contributionCreatedFrom)
-        
+
 #---------------------------------------------------------------------------
 
 class WPNewContributionAuthorSelect( WPConferenceModifBase ):
-    
+
     def __init__(self, rh, target):
         WPConferenceModifBase.__init__(self, rh, target.getConference())
         self._target = target
-    
+
     def _setActiveTab( self ):
         self._tabContribList.setActive()
-        
+
     def _getTabContent( self, params ):
-        searchAction = str(self._rh.getCurrentURL())               
+        searchAction = str(self._rh.getCurrentURL())
         searchExt = params.get("searchExt","")
         if searchExt != "":
             searchLocal = False
@@ -8840,18 +8848,18 @@ class WPNewContributionAuthorSelect( WPConferenceModifBase ):
 #---------------------------------------------------------------------------
 
 class WPNewContributionAuthorNew( WPConferenceModifBase ):
-    
+
     def __init__(self, rh, target, params):
         WPConferenceModifBase.__init__(self, rh, target.getConference())
         self._params = params
         self._target = target
-    
+
     def _setActiveTab( self ):
         self._tabContribList.setActive()
-        
+
     def _getTabContent( self, params):
         p = wcomponents.WNewPerson()
-        
+
         if self._params.get("formTitle",None) is None :
                 self._params["formTitle"] = _("Define new author")
         if self._params.get("titleValue",None) is None :
@@ -8870,39 +8878,39 @@ class WPNewContributionAuthorNew( WPConferenceModifBase ):
                 self._params["phoneValue"] = ""
         if self._params.get("faxValue",None) is None :
                 self._params["faxValue"] = ""
-        
-        
+
+
         #self._params["disabledSubmission"] = False
         self._params["disabledRole"] = False
         self._params["roleDescription"] = _("""Submitter""")
         #if self._params.has_key("submissionControlValue"):
-        #    self._params["submissionValue"] = _(""" <input type="checkbox" name="submissionControl" CHECKED> _("Give submission rights to the presenter").""") 
+        #    self._params["submissionValue"] = _(""" <input type="checkbox" name="submissionControl" CHECKED> _("Give submission rights to the presenter").""")
         #else:
         #    self._params["submissionValue"] = """ <input type="checkbox" name="submissionControl"> Give submission rights to the presenter."""
         self._params["roleValue"] = _(""" <input type="checkbox" name="submissionControl" CHECKED onchange="if (!this.checked){this.form.warning_email.type='hidden';}  else {if(this.form.email.value.length==0){this.form.warning_email.type='text'}else{this.form.warning_email.type='hidden';}}"> _("Give submission rights to the presenter").""")
         self._params["disabledNotice"] = False
         self._params["noticeValue"] = _("""<i><font color="black"><b>_("Note"): </b></font>_("If this person does not already have
-         an Indico account, he or she will be sent an email asking to create an account. After the account creation the 
+         an Indico account, he or she will be sent an email asking to create an account. After the account creation the
          user will automatically be given submission rights.")</i>""")
-        
+
         formAction = urlHandlers.UHConfModSchedulePersonAdd.getURL(self._target)
         formAction.addParam("orgin","new")
         formAction.addParam("typeName","author")
         self._params["formAction"] = formAction
-        
+
         return p.getHTML(self._params)
 
 #---------------------------------------------------------------------------
 
 class WPNewContributionCoauthorSelect( WPConferenceModifBase ):
-    
+
     def __init__(self, rh, target):
         WPConferenceModifBase.__init__(self, rh, target.getConference())
         self._target = target
-    
+
     def _setActiveTab( self ):
         self._tabContribList.setActive()
-        
+
     def _getTabContent( self, params ):
         searchAction = str(self._rh.getCurrentURL())
         searchExt = params.get("searchExt","")
@@ -8916,18 +8924,18 @@ class WPNewContributionCoauthorSelect( WPConferenceModifBase ):
 #---------------------------------------------------------------------------
 
 class WPNewContributionCoauthorNew( WPConferenceModifBase ):
-    
+
     def __init__(self, rh, target, params):
         WPConferenceModifBase.__init__(self, rh, target.getConference())
         self._target = target
         self._params = params
-    
+
     def _setActiveTab( self ):
         self._tabContribList.setActive()
-        
+
     def _getTabContent( self, params):
         p = wcomponents.WNewPerson()
-        
+
         if self._params.get("formTitle",None) is None :
                 self._params["formTitle"] = _("Define new co-author")
         if self._params.get("titleValue",None) is None :
@@ -8946,39 +8954,39 @@ class WPNewContributionCoauthorNew( WPConferenceModifBase ):
                 self._params["phoneValue"] = ""
         if self._params.get("faxValue",None) is None :
                 self._params["faxValue"] = ""
-        
+
         #self._params["disabledSubmission"] = False
         self._params["disabledRole"] = False
         self._params["roleDescription"] = _("""Submitter""")
         #if self._params.has_key("submissionControlValue"):
-        #    self._params["submissionValue"] = """ <input type="checkbox" name="submissionControl" CHECKED> Give submission rights to the presenter.""" 
+        #    self._params["submissionValue"] = """ <input type="checkbox" name="submissionControl" CHECKED> Give submission rights to the presenter."""
         #else:
         #    self._params["submissionValue"] = """ <input type="checkbox" name="submissionControl"> Give submission rights to the presenter."""
         self._params["roleValue"] = _(""" <input type="checkbox" name="submissionControl" CHECKED onchange="if (!this.checked){this.form.warning_email.type='hidden';}  else {if(this.form.email.value.length==0){this.form.warning_email.type='text'}else{this.form.warning_email.type='hidden';}}"> _("Give submission rights to the presenter").""")
         self._params["disabledNotice"] = False
         self._params["noticeValue"] = """<i><font color="black"><b>Note: </b></font>If this person does not already have
-         an Indico account, he or she will be sent an email asking to create an account. After the account creation the 
+         an Indico account, he or she will be sent an email asking to create an account. After the account creation the
          user will automatically be given submission rights.</i>"""
-        
+
         formAction = urlHandlers.UHConfModSchedulePersonAdd.getURL(self._target)
         formAction.addParam("orgin","new")
         formAction.addParam("typeName","coauthor")
         self._params["formAction"] = formAction
-        
+
         return p.getHTML(self._params)
 
 
 #---------------------------------------------------------------------------
 
 class WPNewContributionPresenterSelect( WPConferenceModifBase ):
-    
+
     def __init__(self, rh, target):
         WPConferenceModifBase.__init__(self, rh, target.getConference())
         self._target = target
-    
+
     def _setActiveTab( self ):
         self._tabContribList.setActive()
-        
+
     def _getTabContent( self, params ):
         searchAction = str(self._rh.getCurrentURL())
         searchExt = params.get("searchExt","")
@@ -8992,18 +9000,18 @@ class WPNewContributionPresenterSelect( WPConferenceModifBase ):
 #---------------------------------------------------------------------------
 
 class WPNewContributionPresenterNew( WPConferenceModifBase ):
-    
+
     def __init__(self, rh, target, params):
         WPConferenceModifBase.__init__(self, rh, target.getConference())
         self._target = target
         self._params = params
-    
+
     def _setActiveTab( self ):
         self._tabContribList.setActive()
-        
+
     def _getTabContent( self, params):
         p = wcomponents.WNewPerson()
-        
+
         if self._params.get("formTitle",None) is None :
                 self._params["formTitle"] = _("Define new presenter")
         if self._params.get("titleValue",None) is None :
@@ -9022,8 +9030,8 @@ class WPNewContributionPresenterNew( WPConferenceModifBase ):
                 self._params["phoneValue"] = ""
         if self._params.get("faxValue",None) is None :
                 self._params["faxValue"] = ""
-        
-        
+
+
         self._params["disabledRole"] = False
         self._params["roleDescription"] = """Submitter"""
         #if self._params.has_key("submissionControlValue"):
@@ -9032,21 +9040,21 @@ class WPNewContributionPresenterNew( WPConferenceModifBase ):
         #    self._params["roleValue"] = """ <input type="checkbox" name="submissionControl"> Give submission rights to the presenter."""
         self._params["disabledNotice"] = False
         self._params["noticeValue"] = _("""<i><font color="black"><b>_("Note"): </b></font>_("If this person does not already have
-         an Indico account, he or she will be sent an email asking to create an account. After the account creation the 
+         an Indico account, he or she will be sent an email asking to create an account. After the account creation the
          user will automatically be given submission rights.")</i>""")
-        
+
         formAction = urlHandlers.UHConfModSchedulePersonAdd.getURL(self._target)
         formAction.addParam("orgin","new")
         formAction.addParam("typeName","presenter")
         self._params["formAction"] = formAction
-        
+
         return p.getHTML(self._params)
 
 
 #---------------------------------------------------------------------------
 
 class WConfModMoveContribsToSession(wcomponents.WTemplated):
-    
+
     def __init__(self,conf,contribIdList=[]):
         self._conf=conf
         self._contribIdList=contribIdList
@@ -9065,30 +9073,30 @@ class WConfModMoveContribsToSession(wcomponents.WTemplated):
 
 
 class WPModMoveContribsToSession(WPModifContribList):
-    
+
     def _getPageContent(self,params):
         wc=WConfModMoveContribsToSession(self._conf,params.get("contribIds",[]))
         return wc.getHTML()
 
 
 class WPModMoveContribsToSessionConfirmation(WPModifContribList):
-    
+
     def _getPageContent(self,params):
         wc=wcomponents.WConfModMoveContribsToSessionConfirmation(self._conf,params.get("contribIds",[]),params.get("targetSession",None))
         p={"postURL":urlHandlers.UHConfModMoveContribsToSession.getURL(self._conf),}
         return wc.getHTML(p)
 
-    
+
 class WPConfEditContribType(WPConferenceModifBase):
-    
+
     def __init__(self, rh, ct):
         self._conf = ct.getConference()
         self._contribType = ct
         WPConferenceModifBase.__init__(self, rh, self._conf)
-        
+
     def _setActiveSideMenuItem(self):
         self._generalSettingsMenuItem.setActive(True)
-    
+
     def _getPageContent( self, params ):
         wc = WConfEditContribType(self._contribType)
         params["saveURL"] = quoteattr(str(urlHandlers.UHConfEditContribType.getURL(self._contribType)))
@@ -9096,22 +9104,22 @@ class WPConfEditContribType(WPConferenceModifBase):
 
 
 class WConfEditContribType(wcomponents.WTemplated):
-    
+
     def __init__(self, contribType):
         self._contribType = contribType
-        
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["ctName"] = self._contribType.getName()
         vars["ctDescription"] = self._contribType.getDescription()
-        
+
         return vars
 
 class WPConfAddContribType(WPConferenceModifBase):
-    
+
     def _setActiveSideMenuItem(self):
         self._generalSettingsMenuItem.setActive(True)
-    
+
     def _getPageContent( self, params ):
         wc = WConfAddContribType()
         params["saveURL"] = quoteattr(str(urlHandlers.UHConfAddContribType.getURL(self._conf)))
@@ -9119,7 +9127,7 @@ class WPConfAddContribType(WPConferenceModifBase):
 
 
 class WConfAddContribType(wcomponents.WTemplated):
-    
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         return vars
@@ -9131,10 +9139,10 @@ class WAbstractsParticipantList(wcomponents.WTemplated):
         self._displayedGroups = displayedGroups
         self._conf = conf
         self._abstracts = abstracts
-    
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
-        
+
         vars["submitterEmails"] = ",".join(self._emailList["submitters"]["emails"])
         vars["primaryAuthorEmails"] = ",".join(self._emailList["primaryAuthors"]["emails"])
         vars["coAuthorEmails"] = ",".join(self._emailList["coAuthors"]["emails"])
@@ -9148,12 +9156,12 @@ class WAbstractsParticipantList(wcomponents.WTemplated):
         for dg in self._displayedGroups:
             displayedGroups.append("""<input type="hidden" name="displayedGroups" value="%s">"""%dg)
         groupsList = "".join(displayedGroups)
-        
+
         # Submitters
         text = _("show list")
         vars["submitters"] = "<tr colspan=\"2\"><td>&nbsp;</td></tr>"
         if "submitters" in self._displayedGroups:
-            l = []            
+            l = []
             color = "white"
             text = _("close list")
             for subm in self._emailList["submitters"]["tree"].values():
@@ -9172,7 +9180,7 @@ class WAbstractsParticipantList(wcomponents.WTemplated):
                                      %s
                                     <input type="submit" class="btn" value="%s">
                                     </form>"""%(str(urlDisplayGroup), abstractsList,groupsList, text)
-        
+
         # Primary authors
         text = _("show list")
         vars["primaryAuthors"] = "<tr colspan=\"2\"><td>&nbsp;</td></tr>"
@@ -9208,7 +9216,7 @@ class WAbstractsParticipantList(wcomponents.WTemplated):
                     color="#F6F6F6"
                 else:
                     color="white"
-                cAuthEmail = cAuth.getEmail()    
+                cAuthEmail = cAuth.getEmail()
                 if cAuthEmail.strip() == "":
                     participant = "%s"%cAuth.getFullName()
                 else:
@@ -9231,10 +9239,10 @@ class WContribParticipantList(wcomponents.WTemplated):
         self._displayedGroups = displayedGroups
         self._conf = conf
         self._contribs = contribs
-    
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
-        
+
         vars["speakerEmails"] = ", ".join(self._emailList["speakers"]["emails"])
         vars["primaryAuthorEmails"] = ", ".join(self._emailList["primaryAuthors"]["emails"])
         vars["coAuthorEmails"] = ", ".join(self._emailList["coAuthors"]["emails"])
@@ -9248,12 +9256,12 @@ class WContribParticipantList(wcomponents.WTemplated):
         for dg in self._displayedGroups:
             displayedGroups.append("""<input type="hidden" name="displayedGroups" value="%s">"""%dg)
         groupsList = "".join(displayedGroups)
-        
+
         # Speakers
         text = _("show list")
         vars["speakers"] = "<tr colspan=\"2\"><td>&nbsp;</td></tr>"
         if "speakers" in self._displayedGroups:
-            l = []            
+            l = []
             color = "white"
             text = _("close list")
             for speaker in self._emailList["speakers"]["tree"].values():
@@ -9272,7 +9280,7 @@ class WContribParticipantList(wcomponents.WTemplated):
                                      %s
                                     <input type="submit" class="btn" value="%s">
                                     </form>"""%(str(urlDisplayGroup), contribsList,groupsList, text)
-        
+
         # Primary authors
         text = _("show list")
         vars["primaryAuthors"] = "<tr colspan=\"2\"><td>&nbsp;</td></tr>"
@@ -9308,7 +9316,7 @@ class WContribParticipantList(wcomponents.WTemplated):
                     color="#F6F6F6"
                 else:
                     color="white"
-                cAuthEmail = cAuth.getEmail()    
+                cAuthEmail = cAuth.getEmail()
                 if cAuthEmail.strip() == "":
                     participant = "%s"%cAuth.getFullName()
                 else:
@@ -9326,11 +9334,11 @@ class WContribParticipantList(wcomponents.WTemplated):
 
 
 class WPAbstractSendNotificationMail(WPConferenceBase):
-    
+
     def __init__(self, rh, conf, count):
         WPConferenceBase.__init__(self, rh, conf)
         self._count = count
-    
+
     def _getBody( self, params ):
         return _("""
 <table align="center"><tr><td align="center">
@@ -9340,22 +9348,22 @@ _("You can now close this window.")</b>
 </td></tr></table>
 
 """)
-    
-    
+
+
 class WPContributionList( WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NEContributionList
-    
+
     def _getBody( self, params ):
         wc = WConfContributionList( self._getAW(), self._conf, params["sortingCrit"], params["filterCrit"],  params.get("order","down"),params.get("sc",1), params.get("nc",20) )
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._contribListOpt)
 
 
 class WConfContributionList ( wcomponents.WTemplated ):
-    
+
     def __init__(self,aw,conf,sortingCrit,filterCrit,order,sContrib=1,displayContribs=20):
         self._aw = aw
         self._conf = conf
@@ -9457,9 +9465,9 @@ class WConfContributionList ( wcomponents.WTemplated ):
                 %s
                 <td class="abstractDataCell">%s</td>
             </tr>
-                """%(contrib.getId(), self.htmlText( contrib.getId() ), 
-                    sdate or "&nbsp;", typeHTML, 
-                    title or "&nbsp;", speaker or "&nbsp;", 
+                """%(contrib.getId(), self.htmlText( contrib.getId() ),
+                    sdate or "&nbsp;", typeHTML,
+                    title or "&nbsp;", speaker or "&nbsp;",
                     session or "&nbsp;", trackHTML, material or "&nbsp;" )
         return html
 
@@ -9586,22 +9594,22 @@ class WConfContributionList ( wcomponents.WTemplated ):
             url.setSegment("contribs")
             url.addParam("sc",num)
             vars["contribSetIndex"]="""%s<a href=%s><img src=%s border="0" style="vertical-align:middle" alt=""></a>"""%(vars["contribSetIndex"],quoteattr(str(url)),quoteattr(str(iconURL)))
-    
+
         vars["contributions"] = "".join(l)
         vars["contribsToPrint"] = "\n".join(contribsToPrint)
-        
+
         vars["newContribURL"] = urlHandlers.UHConfAddContribution.getURL( self._conf )
-        
+
         sortingField = self._sortingCrit.getField()
         vars["currentSorting"]=""
-        
+
         url=self._getURL()
-         
+
         url.addParam("sortBy","number")
         vars["numberImg"]=""
-        url.addParam("sc",(num-self._displayContribs)) 
+        url.addParam("sc",(num-self._displayContribs))
         if sortingField and sortingField.getId() == "number":
-            
+
             vars["currentSorting"] = _("""<input type="hidden" name="sortBy" value="_("number")">""")
             if self._order == "down":
                 vars["numberImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
@@ -9609,14 +9617,14 @@ class WConfContributionList ( wcomponents.WTemplated ):
             elif self._order == "up":
                 vars["numberImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
-              
-        vars["numberSortingURL"]=quoteattr(str(url))            
+
+        vars["numberSortingURL"]=quoteattr(str(url))
         url = self._getURL()
         url.addParam("sortBy", "date")
         vars["dateImg"] = ""
         url.addParam("sc",(num-self._displayContribs))
         if sortingField and sortingField.getId() == "date":
-            
+
             vars["currentSorting"]= _("""<input type="hidden" name="sortBy" value="_("date")">""")
             if self._order == "down":
                 vars["dateImg"]="""<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
@@ -9637,7 +9645,7 @@ class WConfContributionList ( wcomponents.WTemplated ):
                     typeImg="""<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                     url.addParam("order","up")
                 elif self._order == "up":
-                    typeImg="""<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow"))) 
+                    typeImg="""<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                     url.addParam("order","down")
             typeSortingURL = quoteattr( str( url ) )
             vars["typeHeader"] = """<td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"> %s<a href=%s>Type</a></td>""" % (typeImg,typeSortingURL)
@@ -9671,9 +9679,9 @@ class WConfContributionList ( wcomponents.WTemplated ):
                 vars["speakerImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
         vars["speakerSortingURL"]=quoteattr( str( url ) )
-            
+
         url = self._getURL()
-        url.addParam("sortBy", "session")  
+        url.addParam("sortBy", "session")
         vars["sessionImg"] = ""
         url.addParam("sc",(num-self._displayContribs))
         if sortingField and sortingField.getId() == "session":
@@ -9684,8 +9692,8 @@ class WConfContributionList ( wcomponents.WTemplated ):
             elif self._order == "up":
                 vars["sessionImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
-        vars["sessionSortingURL"]=quoteattr( str( url ) ) 
-            
+        vars["sessionSortingURL"]=quoteattr( str( url ) )
+
         if self._displayTrackFilter:
             url = self._getURL()
             url.addParam("sortBy", "track")
@@ -9697,7 +9705,7 @@ class WConfContributionList ( wcomponents.WTemplated ):
                     trackImg="""<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                     url.addParam("order","up")
                 elif self._order == "up":
-                    trackImg="""<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow"))) 
+                    trackImg="""<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                     url.addParam("order","down")
             trackSortingURL = quoteattr( str( url ) )
             vars["trackHeader"] = _("""<td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"> %s<a href=%s> _("Track")</a></td>""") % (trackImg,trackSortingURL)
@@ -9710,22 +9718,22 @@ class WConfContributionList ( wcomponents.WTemplated ):
 
         vars["contribSelectionAction"]=quoteattr(str(urlHandlers.UHContributionListAction.getURL(self._conf)))
         vars["contributionsPDFURL"]=quoteattr(str(urlHandlers.UHContributionListToPDF.getURL(self._conf)))
-        
+
         return vars
 
 
 class WConfAuthorIndex(wcomponents.WTemplated):
-    
+
     def __init__(self,aw,conf,view,selLetter="[all]"):
         self._aw=aw
         self._conf=conf
         self._view=view
-        self._selLetter=selLetter        
-        
+        self._selLetter=selLetter
+
 
     def _getContribMinView(self,contrib):
-        return """<a href=%s>#%s</a>"""%(quoteattr(str(self._urlGen(contrib))),self.htmlText(contrib.getId()))    
-    
+        return """<a href=%s>#%s</a>"""%(quoteattr(str(self._urlGen(contrib))),self.htmlText(contrib.getId()))
+
     def _getContribFullView(self,contrib):
         return """<p style="text-indent: -3em;margin-left:3em"><a href=%s">%s-%s</a></p>"""%(quoteattr(str(self._urlGen(contrib))),self.htmlText(contrib.getId()),self.htmlText(contrib.getTitle()))
 
@@ -9773,7 +9781,7 @@ class WConfAuthorIndex(wcomponents.WTemplated):
         itemFormatFunc=self._getContribMinView
         if self._view=="full":
             itemFormatFunc=self._getContribFullView
-            
+
         self._urlGen=urlHandlers.UHContributionDisplay.getURL
         contribList=[itemFormatFunc(auth.getContribution()) for auth in pl]
         if authCaption.strip()=="":
@@ -9824,12 +9832,12 @@ class WConfAuthorIndex(wcomponents.WTemplated):
         availViewModes=[["full", _("use contribution ids and titles")],
                         ["onlyIds", _("use contribution ids")]]
         res=[]
-        
+
         for vm in availViewModes:
             sel=""
             if self._view==vm[0]:
                 sel=" selected"
-                
+
             res.append("""<option value=%s%s>%s</option>"""%(
                     quoteattr(str(vm[0])),sel,self.htmlText(vm[1])))
         vars["viewModes"]="".join(res)
@@ -9865,22 +9873,22 @@ class WPAuthorIndex(WPConferenceDefaultDisplayBase):
         wc=WConfAuthorIndex(self._getAW(),self._conf,view,params.get("selLetter","a"))
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._authorIndexOpt)
 
 class WConfSpeakerIndex(wcomponents.WTemplated):
-    
+
     def __init__(self,aw,conf,view,selLetter="[all]"):
         self._aw=aw
         self._conf=conf
         self._view=view
-        self._selLetter=selLetter        
-        
+        self._selLetter=selLetter
+
 
     def _getContribMinView(self,contrib):
-        return """<a href=%s>#%s</a>"""%(quoteattr(str(self._urlGen(contrib))),self.htmlText(contrib.getId()))    
-    
+        return """<a href=%s>#%s</a>"""%(quoteattr(str(self._urlGen(contrib))),self.htmlText(contrib.getId()))
+
     def _getContribFullView(self,contrib):
         if contrib is not None:
             return """<p style="text-indent: -3em;margin-left:3em"><a href=%s">%s-%s</a></p>"""%(quoteattr(str(self._urlGen(contrib))),self.htmlText(contrib.getId()),self.htmlText(contrib.getTitle()))
@@ -9929,7 +9937,7 @@ class WConfSpeakerIndex(wcomponents.WTemplated):
         itemFormatFunc=self._getContribMinView
         if self._view=="full":
             itemFormatFunc=self._getContribFullView
-                
+
         self._urlGen=urlHandlers.UHContributionDisplay.getURL
         participationList=[itemFormatFunc(auth.getContribution()) for auth in pl]
         if authCaption.strip()=="":
@@ -9991,12 +9999,12 @@ class WConfSpeakerIndex(wcomponents.WTemplated):
         availViewModes=[["full", _("use contribution ids and titles")],
                         ["onlyIds", _("use contribution ids")]]
         res=[]
-        
+
         for vm in availViewModes:
             sel=""
             if self._view==vm[0]:
                 sel=" selected"
-                
+
             res.append("""<option value=%s%s>%s</option>"""%(
                     quoteattr(str(vm[0])),sel,self.htmlText(vm[1])))
         vars["viewModes"]="".join(res)
@@ -10031,28 +10039,28 @@ class WPSpeakerIndex(WPConferenceDefaultDisplayBase):
         wc=WConfSpeakerIndex(self._getAW(),self._conf,view,params.get("selLetter","a"))
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._speakerIndexOpt)
 
 class WConfMyContributions(wcomponents.WTemplated):
-    
+
     def __init__(self, aw, conf):
         self._aw=aw
         self._conf=conf
-        
+
     def getHTML(self, params):
         return wcomponents.WTemplated.getHTML(self, params)
-    
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         vars["User"] = self._aw.getUser()
         vars["Conference"] = self._conf
         return vars
-    
+
 
 class WConfMyStuff(wcomponents.WTemplated):
-    
+
     def __init__(self,aw,conf):
         self._aw=aw
         self._conf=conf
@@ -10133,7 +10141,7 @@ class WConfMyStuff(wcomponents.WTemplated):
         vars=wcomponents.WTemplated.getVars(self)
         vars["items"]="%s%s%s"%(self._getSessionsHTML(),
             self._getTracksHTML(),self._getContribsHTML())
-        
+
         import reviewing
         vars["hasPaperReviewing"] = self._conf.hasEnabledSection('paperReviewing')
         vars["ContributionReviewingTemplatesList"] = reviewing.WContributionReviewingTemplatesList(self._conf).getHTML({"CanDelete" : False})
@@ -10142,18 +10150,18 @@ class WConfMyStuff(wcomponents.WTemplated):
 
 class WPMyStuff(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NEMyStuff
-    
+
     def _getBody(self,params):
         wc=WConfMyStuff(self._getAW(),self._conf)
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._myStuffOpt)
 
 
 class WConfModAbstractBook(wcomponents.WTemplated):
-    
+
     def __init__(self,conf):
         self._conf=conf
 
@@ -10163,20 +10171,20 @@ class WConfModAbstractBook(wcomponents.WTemplated):
         vars["modURL"]=quoteattr(str(urlHandlers.UHConfModAbstractBookEdit.getURL(self._conf)))
         vars["text"]=boaConfig.getText()
         return vars
-        
+
 
 class WPModAbstractBook(WPConferenceModifAbstractBase):
-    
+
     def _setActiveTab( self ):
         self._tabBOA.setActive()
-    
+
     def _getTabContent( self, params ):
         wc=WConfModAbstractBook(self._conf)
         return wc.getHTML()
 
 
 class WConfModAbstractBookEdit(wcomponents.WTemplated):
-    
+
     def __init__(self,conf):
         self._conf=conf
 
@@ -10189,26 +10197,26 @@ class WConfModAbstractBookEdit(wcomponents.WTemplated):
 
 
 class WPModAbstractBookEdit(WPConferenceModifAbstractBase):
-    
+
     def _setActiveTab( self ):
         self._tabBOA.setActive()
-    
+
     def _getTabContent( self, params ):
         wc=WConfModAbstractBookEdit(self._conf)
         return wc.getHTML()
 
 class WPFullMaterialPackage( WPConfModifToolsBase ):
-    
+
     def _setActiveTab( self ):
         self._tabMatPackage.setActive()
-    
+
     def _getTabContent( self, params ):
         wc = WFullMaterialPackage( self._conf )
         p = {"errors": params.get("errors","")}
         return wc.getHTML(p)
 
 class WFullMaterialPackage(wcomponents.WTemplated):
-    
+
     def __init__(self,conf):
         self._conf=conf
 
@@ -10216,7 +10224,7 @@ class WFullMaterialPackage(wcomponents.WTemplated):
         vars=wcomponents.WTemplated.getVars(self)
         if not vars.has_key("getPkgURL"):
             vars["getPkgURL"] = quoteattr(str(urlHandlers.UHConfModFullMaterialPackagePerform.getURL(self._conf)))
-         
+
         #######################################
         # Fermi timezone awareness            #
         #######################################
@@ -10268,7 +10276,7 @@ class WPConferenceStaticDefaultDisplayBase( WPConferenceDefaultDisplayBase ):
     def _getHTMLHeader( self ):
         cssDir="./css"
         if len(self._staticPars) > 0 and self._staticPars.values()[0].startswith(".."):
-            cssDir="../css"    
+            cssDir="../css"
         return """
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -10283,7 +10291,7 @@ class WPConferenceStaticDefaultDisplayBase( WPConferenceDefaultDisplayBase ):
                 """%(self._getTitle(), quoteattr(self._staticPars["addressBarIcon"]),
                         cssDir, Config.getInstance().getCssStylesheetName(),
                         self._getWarningMessage())
-    
+
     def _getHeader( self ):
         """
         """
@@ -10305,7 +10313,7 @@ class WPConferenceStaticDefaultDisplayBase( WPConferenceDefaultDisplayBase ):
         return frame.getHTML( self._sectionMenu, body, frameParams)
 
 class WConfStaticDetails( wcomponents.WTemplated ):
-    
+
     def __init__(self, aw, conf, staticPars):
         self._conf = conf
         self._aw = aw
@@ -10327,11 +10335,11 @@ class WConfStaticDetails( wcomponents.WTemplated ):
                 """)%"<br>".join(l)
         return res
 
-    def _getMaterialHTML( self ):   
+    def _getMaterialHTML( self ):
         l = []
         for mat in self._conf.getAllMaterialList():
             temp = wcomponents.WMaterialDisplayItem()
-            url = urlHandlers.UHStaticMaterialDisplay.getRelativeURL(mat)   
+            url = urlHandlers.UHStaticMaterialDisplay.getRelativeURL(mat)
             l.append( temp.getHTML( self._aw, mat, url, self._staticPars["material"] ) )
         res = ""
         if l:
@@ -10401,15 +10409,15 @@ class WConfStaticDetails( wcomponents.WTemplated ):
         vars["material"] = self._getMaterialHTML()
         vars["moreInfo"] = self._getMoreInfoHTML()
         vars["actions"] = self._getActionsHTML(vars.get("menuStatus", "open") != "open")
-        
+
         return vars
 
 class ConfStaticDisplayMenu:
-    
+
     def __init__(self, menu, linkList):
         self._menu = menu
         self._linkList = linkList
-    
+
     def getHTML(self, params):
         html = []
         html = ["""<!--Left menu-->
@@ -10423,11 +10431,11 @@ class ConfStaticDisplayMenu:
             if link.isVisible():
                 html.append(self._getLinkHTML(link, params))
         html.append("""<li class="menuConfBottomCell">&nbsp;</li>""")
-        html.append("""             </ul>      
+        html.append("""             </ul>
                                 <div align="left" class="confSupportEmailBox">%s</div>
                     </div>"""%params["supportEmail"])
         return "".join(html)
-    
+
     def _getLinkHTML(self, link, params, indent=""):
         if not link.isVisible():
             return ""
@@ -10439,11 +10447,11 @@ class ConfStaticDisplayMenu:
                 parentDir = "."
             target = ""
             sublinkList=[]
-            
+
             for sublink in link.getEnabledLinkList():
                 if sublink.isVisible():
                     sublinkList.append(sublink)
-                    
+
             if isinstance(link,displayMgr.ExternLink):
                 target=""" target="_blank" """
             #Commented because menuicon variable is not used anymore
@@ -10451,7 +10459,7 @@ class ConfStaticDisplayMenu:
             #    menuicon=params["arrowBottomMenuConf"]
             #else:
             #    menuicon=params["arrowRightMenuConf"]
-            
+
             #TODO: eventually change this so that it's the same as the non-static menu
             if self._menu.isCurrentItem(link):
                 url="%s%s"%(parentDir, link.getStaticURL())
@@ -10460,7 +10468,7 @@ class ConfStaticDisplayMenu:
             else:
                 url="%s%s"%(parentDir, link.getStaticURL())
                 html = ["""<li id="menuLink_%s" class="menuConfTitle" nowrap><a class="confSection" href="%s"%s>%s</a></li>\n"""%(sublink.getName(), url, target, link.getCaption())]
-                
+
             for sublink in sublinkList:
                 target = ""
                 if isinstance(link, displayMgr.ExternLink):
@@ -10483,7 +10491,7 @@ class WConfStaticDisplayFrame(wcomponents.WTemplated):
         self._aw = aw
         self._conf = conf
         self._staticPars = staticPars
-    
+
     def getHTML( self, menu, body, params ):
         self._body = body
         self._menu = menu
@@ -10528,23 +10536,23 @@ class WConfStaticDisplayFrame(wcomponents.WTemplated):
         vars["bgColorCode"] = format.getFormatOption("titleBgColor")["code"]
         vars["textColorCode"] = format.getFormatOption("titleTextColor")["code"]
         return vars
-    
+
 class WPConferenceStaticDisplay( WPConferenceStaticDefaultDisplayBase ):
 
     def __init__(self, rh, target, staticPars):
         WPConferenceStaticDefaultDisplayBase.__init__(self, rh, target)
         self._staticPars = staticPars
-    
+
     def _getBody( self, params ):
         wc = WConfStaticDetails( self._getAW(), self._conf, self._staticPars )
         return wc.getHTML({})
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceStaticDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._overviewOpt)
 
 class WConfStaticProgramTrack(wcomponents.WTemplated):
-    
+
     def __init__( self, aw, track, staticPars ):
         self._aw = aw
         self._track = track
@@ -10564,7 +10572,7 @@ class WConfStaticProgramTrack(wcomponents.WTemplated):
         return vars
 
 class WConfStaticProgram(wcomponents.WTemplated):
-    
+
     def __init__(self, aw, conf, staticPars):
         self._conf = conf
         self._aw = aw
@@ -10583,17 +10591,17 @@ class WPConferenceStaticProgram( WPConferenceStaticDefaultDisplayBase ):
     def __init__(self, rh, target, staticPars):
         WPConferenceStaticDefaultDisplayBase.__init__(self, rh, target)
         self._staticPars = staticPars
-    
+
     def _getBody( self, params ):
         wc = WConfStaticProgram( self._getAW(), self._conf, self._staticPars )
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceStaticDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._programOpt)
 
 class WConfStaticAuthorIndex(wcomponents.WTemplated):
-    
+
     def __init__(self,aw,conf, staticPars):
         self._aw=aw
         self._conf=conf
@@ -10674,12 +10682,12 @@ class WPStaticAuthorIndex(WPConferenceStaticDefaultDisplayBase):
         wc=WConfStaticAuthorIndex(self._getAW(),self._conf,self._staticPars)
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceStaticDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._authorIndexOpt)
 
 class WConfStaticContributionList ( wcomponents.WTemplated ):
-    
+
     def __init__( self, conf, trackDict ):
         self._conf = conf
         self._trackDict = trackDict
@@ -10737,7 +10745,7 @@ class WConfStaticContributionList ( wcomponents.WTemplated ):
                 <td class="abstractDataCell">%s</td>
             </tr>
                 """%(title or "&nbsp;", speaker or "&nbsp;",
-                    self._getMaterialHTML(contrib) or "&nbsp;", 
+                    self._getMaterialHTML(contrib) or "&nbsp;",
                     contribType or "&nbsp;",
                     self.htmlText( contrib.getId() )
                     )
@@ -10751,7 +10759,7 @@ class WConfStaticContributionList ( wcomponents.WTemplated ):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        
+
         l = []
         #for track in self._conf.getTrackList():
         #    l.append(self._getTrackHTML(track))
@@ -10762,7 +10770,7 @@ class WConfStaticContributionList ( wcomponents.WTemplated ):
         for contrib in contList:
             l.append( self._getContribHTML( contrib ) )
         vars["contributions"] = "".join(l)
-        
+
         return vars
 
 class WPStaticContributionList( WPConferenceStaticDefaultDisplayBase ):
@@ -10771,12 +10779,12 @@ class WPStaticContributionList( WPConferenceStaticDefaultDisplayBase ):
         WPConferenceStaticDefaultDisplayBase.__init__(self, rh, target)
         self._staticPars = staticPars
         self._trackDict = trackDict
-    
+
     def _getBody( self, params ):
         wc = WConfStaticContributionList( self._conf, self._trackDict)
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceStaticDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._contribListOpt)
 
@@ -10786,17 +10794,17 @@ class WPContributionStaticDisplay( WPConferenceStaticDefaultDisplayBase ):
         WPConferenceStaticDefaultDisplayBase.__init__(self, rh, target.getConference())
         self._staticPars = staticPars
         self._contrib = target
-    
+
     def _getBody( self, params ):
         wc=WContributionStaticDisplay( self._getAW(), self._contrib, self._staticPars )
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceStaticDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._contribListOpt)
 
 class WContributionStaticDisplay(wcomponents.WTemplated):
-    
+
     def __init__(self, aw, contrib, staticPars):
         self._aw = aw
         self._contrib = contrib
@@ -10854,7 +10862,7 @@ class WContributionStaticDisplay(wcomponents.WTemplated):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        
+
         vars["title"] = self.htmlText(self._contrib.getTitle())
         vars["description"] = self._contrib.getDescription()
         vars["id"]=self.htmlText(self._contrib.getId())
@@ -10911,10 +10919,10 @@ class WContributionStaticDisplay(wcomponents.WTemplated):
         return vars
 
 class WMaterialStaticDisplay(wcomponents.WTemplated):
-    
+
     def __init__(self, aw, material, staticPars):
         self._material=material
-        self._aw=aw 
+        self._aw=aw
         self._staticPars = staticPars
 
     def getVars( self ):
@@ -10953,14 +10961,14 @@ class WPMaterialStaticDisplay( WPConferenceStaticDefaultDisplayBase ):
         WPConferenceStaticDefaultDisplayBase.__init__(self, rh, material.getConference())
         self._material=material
         self._staticPars = staticPars
-    
+
     def _getBody( self, params ):
         wc = WMaterialStaticDisplay( self._getAW(), self._material, self._staticPars )
         pars = {"rootDir":".", "fileAccessURLGen": urlHandlers.UHStaticResourceDisplay.getRelativeURL }
         return wc.getHTML( pars )
 
 class WTrackStaticContribList ( wcomponents.WTemplated ):
-    
+
     def __init__( self, track, trackDict ):
         self._track = track
         self._conf = track.getConference()
@@ -11027,13 +11035,13 @@ class WTrackStaticContribList ( wcomponents.WTemplated ):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        
+
         l = []
         l.append(self._getTrackHTML(self._track))
         for contrib in self._trackDict[self._track.getId()]:
             l.append( self._getContribHTML( contrib ) )
         vars["contributions"] = "".join(l)
-        
+
         return vars
 
 class WPTrackStaticContribList( WPConferenceStaticDefaultDisplayBase ):
@@ -11043,12 +11051,12 @@ class WPTrackStaticContribList( WPConferenceStaticDefaultDisplayBase ):
         self._staticPars = staticPars
         self._track = target
         self._trackDict = trackDict
-    
+
     def _getBody( self, params ):
         wc = WTrackStaticContribList( self._track, self._trackDict)
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceStaticDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._programOpt)
 
@@ -11063,7 +11071,7 @@ class WPStaticMeetingBase(WPConferenceStaticDefaultDisplayBase):
                 rootDir="%s/.."%rootDir
                 owner=owner.getOwner()
         return rootDir
-    
+
     def _getHTMLHeader( self ):
         path = Config.getInstance().getStylesheetsDir()
         # if a css file is associated with the XSL stylesheet, then we include it in the header
@@ -11087,7 +11095,7 @@ class WPStaticMeetingBase(WPConferenceStaticDefaultDisplayBase):
             <link rel="shortcut icon" href=%s>
             %s
         </head>
-        <body>"""%(self._getTitle(), 
+        <body>"""%(self._getTitle(),
                     quoteattr(self._staticPars["addressBarIcon"]),
                     styleText)
 
@@ -11120,8 +11128,8 @@ class WPXSLMeetingStaticDisplay( WPStaticMeetingBase ):
         categId = rh._getSession().getVar("currentCategoryId")
         if categId != None:
             self._parentCateg = self._conf.getOwnerById(categId)
-        self._staticPars = staticPars    
-                                
+        self._staticPars = staticPars
+
     def _getBody( self, params ):
         pars = { \
     "modifyURL": "", \
@@ -11167,18 +11175,18 @@ class WPMMaterialStaticDisplay( WPStaticMeetingBase ):
               "logoURL": urlHandlers.UHConferenceLogo.getURL( self._conf) }
         if self._conf.getLogo():
             frameParams["logoURL"] = urlHandlers.UHConferenceLogo.getURL( self._conf)
-           
+
         confTitle = self._conf.getTitle()
         colspan=""
         imgOpen=""
         padding=""
         padding=""" style="padding:0px" """
         urlIndex=str(urlHandlers.UHStaticConferenceDisplay.getRelativeURL())
-        urlIndex="%s/%s"%(self.getRootDir(self._material), urlIndex)          
+        urlIndex="%s/%s"%(self.getRootDir(self._material), urlIndex)
         body = _("""
                 <div class="confBodyBox clearfix" %s %s>
                     %s
-                    <table border="0" cellpadding="0" cellspacing="0" 
+                    <table border="0" cellpadding="0" cellspacing="0"
                                 align="center" valign="top" width="95%%">
                         <tr>
                             <td class="formTitle" width="100%%"> _("Added Material") - %s</td>
@@ -11195,7 +11203,7 @@ class WPMMaterialStaticDisplay( WPStaticMeetingBase ):
                         quoteattr(urlIndex),
                         body)
         return frame.getHTML( body, frameParams)
-    
+
     def _getBody( self, params ):
             wc = WMaterialStaticDisplay( self._getAW(), self._material, self._staticPars )
             pars = { "rootDir":self.getRootDir(self._material), "fileAccessURLGen": urlHandlers.UHMStaticResourceDisplay.getRelativeURL }
@@ -11203,13 +11211,13 @@ class WPMMaterialStaticDisplay( WPStaticMeetingBase ):
 
 
 class WConferenceStaticTimeTable(wcomponents.WTemplated):
-    
+
     def __init__( self, timeTable, conference, aw ):
         self._aw = aw
         self._timeTable = timeTable
         self._conf = conference
         self._sessionColorMap = {}
-    
+
     def _getRandomColor( self, color=1 ):
         if color==0:
             r=g=b = random.randint(130,255)
@@ -11218,7 +11226,7 @@ class WConferenceStaticTimeTable(wcomponents.WTemplated):
             g = random.randint(130,255)
             b = random.randint(130,255)
         return "#%X%X%X"%(r,g,b)
-        
+
     def _generateColor( self, color=1, colorMap={} ):
         """
         This function generates a color which does not already exist in the passed colormap
@@ -11230,7 +11238,7 @@ class WConferenceStaticTimeTable(wcomponents.WTemplated):
         while(color in colorMap.values()):
             color = self._getRandomColor(color)
         return color
-                
+
     def _getSessionColor( self, session ):
         if session.getId() not in self._sessionColorMap.keys():
             color = session.getColor()
@@ -11238,7 +11246,7 @@ class WConferenceStaticTimeTable(wcomponents.WTemplated):
                # color = self._generateColor(1,self._sessionColorMap)
             self._sessionColorMap[session.getId()] = color
         return self._sessionColorMap[session.getId()]
-    
+
     def _getColor( self, entry ):
         bgcolor = "#E6E6E6"
         if isinstance(entry, schedule.LinkedTimeSchEntry) and \
@@ -11308,7 +11316,7 @@ class WConferenceStaticTimeTable(wcomponents.WTemplated):
                                 speakers, room,
                                 contribution.getAdjustedStartDate().strftime("%H:%M"),
                                 contribution.getAdjustedEndDate().strftime("%H:%M") )
-    
+
     def _getSessionHTML( self, session, URL, refDay ):
         room = ""
         if session.getRoom() != None:
@@ -11350,7 +11358,7 @@ class WConferenceStaticTimeTable(wcomponents.WTemplated):
             linkColor="color:%s"%session.getSession().getTextColor()
         return """<a href="%s" style="%s">%s</a>%s<small>%s</small>"""%(URL, linkColor,\
                                 title, conveners, timeInterval )
-    
+
     def _getBreakHTML( self, breakEntry ):
         room = ""
         if breakEntry.getRoom() != None:
@@ -11404,7 +11412,7 @@ class WConferenceStaticTimeTable(wcomponents.WTemplated):
                                     self._sessionColorMap[ sessionId ],\
                                     _(""" _("Session"): <i>%s </i>""")%session.getTitle())
             l.append( str )
-        return html%" - ".join( l ) 
+        return html%" - ".join( l )
 
     def _getHTMLTimeTable( self, highDetailLevel=0 ):
         self._sessionColorMap = {}
@@ -11476,7 +11484,7 @@ class WConferenceStaticTimeTable(wcomponents.WTemplated):
                     <table align="center" width="100%%">
                         <tr>
                             <td width="100%%">
-                                <table align="center" border="0" width="100%%" 
+                                <table align="center" border="0" width="100%%"
                                         celspacing="0" cellpadding="0" bgcolor="#E6E6E6">
                                     <tr>
                                         <td colspan="%i" align="center" bgcolor="white"><b>%s</b></td>
@@ -11496,14 +11504,14 @@ class WConferenceStaticTimeTable(wcomponents.WTemplated):
                 daySch.append(str)
         str = "<br>".join( daySch )
         return str
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         self._contribURLGen = vars["contribURLGen"]
         self._sessionURLGen = vars["sessionURLGen"]
         vars["timetable"] = self._getHTMLTimeTable(vars.get("detailLevel", "") == "contribution")
         return vars
- 
+
 
 
 class WPConferenceStaticTimeTable( WPConferenceStaticDefaultDisplayBase ):
@@ -11534,10 +11542,10 @@ class WPConferenceStaticTimeTable( WPConferenceStaticDefaultDisplayBase ):
             else:
                 res.append( entry )
         return res
-    
+
     def _getParallelTimeTable( self, params ):
         tz = DisplayTZ(self._getAW(),self._conf).getDisplayTZ()
-        tt = timetable.TimeTable( self._conf.getSchedule(), tz ) 
+        tt = timetable.TimeTable( self._conf.getSchedule(), tz )
         #####################################
         # Fermi timezone awareness            #
         #####################################
@@ -11550,26 +11558,26 @@ class WPConferenceStaticTimeTable( WPConferenceStaticDefaultDisplayBase ):
         tt.setEndDate( eDate )
         tt.mapEntryList(self._getEntryList())
         return tt
-    
+
     def _getBody( self, params ):
         tt = self._getParallelTimeTable( params )
         wc = WConferenceStaticTimeTable( tt, self._conf, self._getAW()  )
         pars = {"contribURLGen": urlHandlers.UHStaticContributionDisplay.getRelativeURL, \
                 "sessionURLGen": urlHandlers.UHStaticSessionDisplay.getRelativeURL }
         return wc.getHTML( pars )
-    
-    def _defineSectionMenu( self ): 
+
+    def _defineSectionMenu( self ):
         WPConferenceStaticDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._timetableOpt)
 
 class WSessionStaticDisplay(wcomponents.WTemplated):
-    
+
     def __init__(self,aw,session):
         self._aw=aw
         self._session=session
-    
+
     def _getHTMLRow(self,title,body):
-        str = """ 
+        str = """
                 <tr>
                     <td nowrap class="displayField" valign="top"><b>%s:</b></td>
                     <td>%s</td>
@@ -11586,7 +11594,7 @@ class WSessionStaticDisplay(wcomponents.WTemplated):
         elif isinstance(entry,schedule.BreakTimeSchEntry):
             bgcolor = entry.getColor()
         return bgcolor
-    
+
     def _getContributionHTML(self,contrib):
         URL=urlHandlers.UHStaticContributionDisplay.getRelativeURL(contrib, "..")
         room = ""
@@ -11638,8 +11646,8 @@ class WSessionStaticDisplay(wcomponents.WTemplated):
 
     def _getTimeTableHTML(self):
         tz = DisplayTZ(self._aw,self._session.getConference()).getDisplayTZ()
-        timeTable=timetable.TimeTable(self._session.getSchedule(), tz) 
-        sDate,eDate=self._session.getAdjustedStartDate(tz),self._session.getAdjustedEndDate(tz) 
+        timeTable=timetable.TimeTable(self._session.getSchedule(), tz)
+        sDate,eDate=self._session.getAdjustedStartDate(tz),self._session.getAdjustedEndDate(tz)
         timeTable.setStartDate(sDate)
         timeTable.setEndDate(eDate)
         timeTable.mapEntryList(self._getSchEntries())
@@ -11697,7 +11705,7 @@ class WSessionStaticDisplay(wcomponents.WTemplated):
                 <table align="center" width="100%%">
                     <tr>
                         <td width="100%%">
-                            <table align="center" border="0" width="100%%" 
+                            <table align="center" border="0" width="100%%"
                                     celspacing="0" cellpadding="0" bgcolor="#E6E6E6">
                                 <tr>
                                     <td colspan="%i" align="center" bgcolor="white"><b>%s</b></td>
@@ -11716,14 +11724,14 @@ class WSessionStaticDisplay(wcomponents.WTemplated):
 
     def getVars(self):
         vars=wcomponents.WTemplated.getVars( self )
-        
+
         vars["title"]=self.htmlText(self._session.getTitle())
-        
+
         if self._session.getDescription():
             desc = self._session.getDescription().strip()
         else:
             desc = ""
-        
+
         if desc!="":
             vars["description"]="""
                 <tr>
@@ -11732,7 +11740,7 @@ class WSessionStaticDisplay(wcomponents.WTemplated):
                                 """%desc
         else:
             vars["description"] = ""
-                                
+
         #################################
         # Fermi timezone awareness      #
         #################################
@@ -11747,7 +11755,7 @@ class WSessionStaticDisplay(wcomponents.WTemplated):
         #################################
         # Fermi timezone awareness(end) #
         #################################
-        
+
         vars["location"]=""
         loc=self._session.getLocation()
         if loc is not None and loc.getName().strip()!="":
@@ -11761,7 +11769,7 @@ class WSessionStaticDisplay(wcomponents.WTemplated):
             vars["location"]= _("""%s<br><small> _("Room"):</small> %s""")%(vars["location"],
                                                             roomLink)
         vars["location"]=self._getHTMLRow("Place", vars["location"])
-        
+
         sessionConvs=[]
         for convener in self._session.getConvenerList():
             sessionConvs.append("""<a href="mailto:%s">%s</a>"""%(convener.getEmail(),
@@ -11810,10 +11818,10 @@ class WPSessionStaticDisplay( WPConferenceStaticDefaultDisplayBase ):
         self._session=target
         self._staticPars = staticPars
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceStaticDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._timetableOpt)
-    
+
     def _getBody(self,params):
         wc=WSessionStaticDisplay(self._getAW(),self._session)
         return wc.getHTML()
@@ -11821,17 +11829,17 @@ class WPSessionStaticDisplay( WPConferenceStaticDefaultDisplayBase ):
 #------------------------ End Static ---------------------------------------------------------------
 
 class WDVDDone( wcomponents.WTemplated ):
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["supportAddr"]=info.HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
         return vars
 
 class WPDVDDone( WPConfModifToolsBase ):
-    
+
     def _setActiveTab( self ):
         self._tabOfflineSite.setActive()
-    
+
     def _getTabContent( self, params ):
         w = WDVDDone()
         p={}
@@ -11839,10 +11847,10 @@ class WPDVDDone( WPConfModifToolsBase ):
         return w.getHTML(p)
 
 class WPConfModifDVDCreationConfirm( WPConfModifToolsBase ):
-        
+
     def _setActiveTab( self ):
         self._tabOfflineSite.setActive()
-        
+
     def _getTabContent(self,params):
         wc=wcomponents.WConfirmation()
         msg="""<br>Please confirm that you want to create an "Offline Website" for your event<br>
@@ -11851,7 +11859,7 @@ class WPConfModifDVDCreationConfirm( WPConfModifToolsBase ):
         return wc.getHTML(msg,url,{})
 
 class WTimeTableCustomizePDF(wcomponents.WTemplated):
-    
+
     def __init__(self, conf):
         self._conf = conf
 
@@ -11859,27 +11867,27 @@ class WTimeTableCustomizePDF(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
         url=urlHandlers.UHConfTimeTablePDF.getURL(self._conf)
         vars["getPDFURL"]=quoteattr(str(url))
-        
+
         wc = WConfCommonPDFOptions(self._conf)
         vars["commonPDFOptions"] = wc.getHTML()
-        
+
         return vars
 
 
 class WPTimeTableCustomizePDF( WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NETimeTableCustomizePDF
-    
+
     def _getBody( self, params ):
         wc = WTimeTableCustomizePDF( self._conf )
         return wc.getHTML(params)
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._timetableOpt)
 
 
 class WConfModifPendingQueuesList ( wcomponents.WTemplated ):
-    
+
     def __init__(self, url, title, target, list, pType) :
         self._postURL = url;
         self._title = title;
@@ -11904,16 +11912,16 @@ class WConfModifPendingQueuesList ( wcomponents.WTemplated ):
         elif cp1 is None and cp2 is None:
             return 0
         return cmp(cp1.getSession().getTitle(), cp2.getSession().getTitle())
-        
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        
+
         vars["postURL"] = self._postURL
         vars["title"] = self._title
         vars["target"] = self._target
         vars["list"] = self._list
         vars["pType"] = self._pType
-        
+
         return vars
 
 class WConfModifPendingQueues( wcomponents.WTemplated ):
@@ -11944,14 +11952,14 @@ class WConfModifPendingQueues( wcomponents.WTemplated ):
             tab=self._tabCtrl.getTabById("submitters")
         tab.setActive()
 
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         self._createTabCtrl()
         list=[]
         url=""
         title=""
-        
+
         if self._tabSubmitters.isActive():
             # Pending submitters
             keys = self._conf.getPendingQueuesMgr().getPendingSubmittersKeys(True)
@@ -11965,7 +11973,7 @@ class WConfModifPendingQueues( wcomponents.WTemplated ):
             for key in keys:
                 list.append((key, self._pendingSubmitters[key][:]))
                 list.sort(conference.ContributionParticipation._cmpFamilyName)
-        
+
         elif self._tabManagers.isActive():
             # Pending managers
             keys = self._conf.getPendingQueuesMgr().getPendingManagersKeys(True)
@@ -12005,31 +12013,31 @@ class WPConfModifPendingQueuesBase( WPConferenceModifBase ):
     def __init__(self, rh, conf, activeTab=""):
         WPConferenceModifBase.__init__(self, rh, conf)
         self._activeTab=activeTab
-        
+
     def _getPageContent(self, params):
         banner = wcomponents.WListingsBannerModif(self._conf).getHTML()
         return banner+self._getTabContent( params )
-    
+
     def _setActiveSideMenuItem(self):
         self._listingsMenuItem.setActive(True)
 
 class WPConfModifPendingQueues( WPConfModifPendingQueuesBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifPendingQueues( self._conf, self._getAW(), self._activeTab )
         return wc.getHTML()
 
 class WPConfModifPendingQueuesRemoveSubmConfirm( WPConfModifPendingQueuesBase ):
-    
+
     def __init__(self,rh, conf, pendingSubms):
         WPConfModifPendingQueuesBase.__init__(self,rh,conf)
         self._pendingSubms = pendingSubms
-    
+
     def _getTabContent(self,params):
         wc=wcomponents.WConfirmation()
         pss=[]
         for i in self._pendingSubms:
-           pss.append("""<li>%s</li>"""%i) 
+           pss.append("""<li>%s</li>"""%i)
         msg= _(""" _("Are you sure you want to delete the following participants pending to become submitters")?<br>
         <ul>
         %s
@@ -12039,16 +12047,16 @@ class WPConfModifPendingQueuesRemoveSubmConfirm( WPConfModifPendingQueuesBase ):
         return wc.getHTML(msg,url,{"pendingSubmitters":self._pendingSubms, "remove": _("remove")})
 
 class WPConfModifPendingQueuesReminderSubmConfirm( WPConfModifPendingQueuesBase ):
-    
+
     def __init__(self,rh, conf, pendingSubms):
         WPConfModifPendingQueuesBase.__init__(self,rh,conf)
         self._pendingSubms = pendingSubms
-    
+
     def _getTabContent(self,params):
         wc=wcomponents.WConfirmation()
         pss=[]
         for i in self._pendingSubms:
-           pss.append("""<li>%s</li>"""%i) 
+           pss.append("""<li>%s</li>"""%i)
         msg= _(""" _("Please confirm that you want to send an email with the reminder to create an account in Indico")?<br><br> _("The email will be sent to"):<br>
         <ul>
         %s
@@ -12058,11 +12066,11 @@ class WPConfModifPendingQueuesReminderSubmConfirm( WPConfModifPendingQueuesBase 
         return wc.getHTML(msg,url,{"pendingSubmitters":self._pendingSubms, "reminder": _("reminder")})
 
 class WPConfModifPendingQueuesRemoveMgrConfirm( WPConfModifPendingQueuesBase ):
-    
+
     def __init__(self,rh, conf, pendingMgrs):
         WPConfModifPendingQueuesBase.__init__(self,rh,conf)
         self._pendingMgrs = pendingMgrs
-    
+
     def _getTabContent(self,params):
         wc=wcomponents.WConfirmation()
         pss=[]
@@ -12077,16 +12085,16 @@ class WPConfModifPendingQueuesRemoveMgrConfirm( WPConfModifPendingQueuesBase ):
         return wc.getHTML(msg,url,{"pendingManagers":self._pendingMgrs, "remove": _("remove")})
 
 class WPConfModifPendingQueuesReminderMgrConfirm( WPConfModifPendingQueuesBase ):
-    
+
     def __init__(self,rh, conf, pendingMgrs):
         WPConfModifPendingQueuesBase.__init__(self,rh,conf)
         self._pendingMgrs = pendingMgrs
-    
+
     def _getTabContent(self,params):
         wc=wcomponents.WConfirmation()
         pss=[]
         for i in self._pendingMgrs:
-           pss.append("""<li>%s</li>"""%i) 
+           pss.append("""<li>%s</li>"""%i)
         msg= _(""" _("Please confirm that you want to send an email with the reminder to create an account in Indico")?<br><br> _("The email will be sent to"):<br>
         <ul>
         %s
@@ -12096,11 +12104,11 @@ class WPConfModifPendingQueuesReminderMgrConfirm( WPConfModifPendingQueuesBase )
         return wc.getHTML(msg,url,{"pendingManagers":self._pendingMgrs, "reminder": _("reminder")})
 
 class WPConfModifPendingQueuesRemoveCoordConfirm( WPConfModifPendingQueuesBase ):
-    
+
     def __init__(self,rh, conf, pendingCoords):
         WPConfModifPendingQueuesBase.__init__(self,rh,conf)
         self._pendingCoords = pendingCoords
-    
+
     def _getTabContent(self,params):
         wc=wcomponents.WConfirmation()
         pss=[]
@@ -12115,16 +12123,16 @@ class WPConfModifPendingQueuesRemoveCoordConfirm( WPConfModifPendingQueuesBase )
         return wc.getHTML(msg,url,{"pendingCoordinators":self._pendingCoords, "remove": _("remove")})
 
 class WPConfModifPendingQueuesReminderCoordConfirm( WPConfModifPendingQueuesBase ):
-    
+
     def __init__(self,rh, conf, pendingCoords):
         WPConfModifPendingQueuesBase.__init__(self,rh,conf)
         self._pendingCoords = pendingCoords
-    
+
     def _getTabContent(self,params):
         wc=wcomponents.WConfirmation()
         pss=[]
         for i in self._pendingCoords:
-           pss.append("""<li>%s</li>"""%i) 
+           pss.append("""<li>%s</li>"""%i)
         msg= _(""" _("Please confirm that you want to send an email with the reminder to create an account in Indico")?<br><br> _("The email will be sent to"):<br>
         <ul>
         %s
@@ -12132,9 +12140,9 @@ class WPConfModifPendingQueuesReminderCoordConfirm( WPConfModifPendingQueuesBase
         <br>""")%"".join(pss)
         url=urlHandlers.UHConfModifPendingQueuesActionCoord.getURL(self._conf)
         return wc.getHTML(msg,url,{"pendingCoordinators":self._pendingCoords, "reminder": _("reminder")})
-   
+
 class WAbstractBookCustomise(wcomponents.WTemplated):
-    
+
     def __init__(self, conf):
         self._conf = conf
 
@@ -12146,12 +12154,12 @@ class WAbstractBookCustomise(wcomponents.WTemplated):
 
 class WPAbstractBookCustomise( WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NEAbstractBookCustomise
-    
+
     def _getBody( self, params ):
         wc = WAbstractBookCustomise( self._conf )
         return wc.getHTML(params)
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._abstractsBookOpt)
 
@@ -12162,12 +12170,12 @@ class WPMeetingStaticDisplay( WPConferenceStaticDefaultDisplayBase ):
     def __init__(self, rh, target, staticPars):
         WPConferenceStaticDefaultDisplayBase.__init__(self, rh, target)
         self._staticPars = staticPars
-    
+
     def _getBody( self, params ):
         wc = WMeetingStaticDetails( self._getAW(), self._conf, self._staticPars )
         return wc.getHTML({})
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceStaticDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._overviewOpt)
 
@@ -12177,18 +12185,18 @@ class WPMeetiStaticProgram( WPConferenceStaticDefaultDisplayBase ):
     def __init__(self, rh, target, staticPars):
         WPConferenceStaticDefaultDisplayBase.__init__(self, rh, target)
         self._staticPars = staticPars
-    
+
     def _getBody( self, params ):
         wc = WConfStaticProgram( self._getAW(), self._conf, self._staticPars )
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceStaticDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._programOpt)
 
 
 class WMConfStaticDetails( wcomponents.WTemplated ):
-    
+
     def __init__(self, aw, conf, staticPars):
         self._conf = conf
         self._aw = aw
@@ -12210,11 +12218,11 @@ class WMConfStaticDetails( wcomponents.WTemplated ):
                 """)%"<br>".join(l)
         return res
 
-    def _getMaterialHTML( self ):   
+    def _getMaterialHTML( self ):
         l = []
         for mat in self._conf.getAllMaterialList():
             temp = wcomponents.WMaterialDisplayItem()
-            url = urlHandlers.UHStaticMaterialDisplay.getRelativeURL(mat)   
+            url = urlHandlers.UHStaticMaterialDisplay.getRelativeURL(mat)
             l.append( temp.getHTML( self._aw, mat, url, self._staticPars["material"] ) )
         res = ""
         if l:
@@ -12284,11 +12292,11 @@ class WMConfStaticDetails( wcomponents.WTemplated ):
         vars["material"] = self._getMaterialHTML()
         vars["moreInfo"] = self._getMoreInfoHTML()
         vars["actions"] = self._getActionsHTML(vars.get("menuStatus", "open") != "open")
-        
+
         return vars
-        
+
 class WConfStaticProgram(wcomponents.WTemplated):
-    
+
     def __init__(self, aw, conf, staticPars):
         self._conf = conf
         self._aw = aw
@@ -12303,7 +12311,7 @@ class WConfStaticProgram(wcomponents.WTemplated):
         return vars
 
 class WConfModifReschedule(wcomponents.WTemplated):
-    
+
     def __init__(self, targetDay):
         self._targetDay = targetDay
 
@@ -12321,10 +12329,10 @@ class WPConfModifReschedule(WPConferenceModifBase):
     def _getPageContent( self, params):
         wc=WConfModifReschedule(self._targetDay)
         p={"postURL":quoteattr(str(urlHandlers.UHConfModifReschedule.getURL(self._conf)))}
-        return wc.getHTML(p) 
+        return wc.getHTML(p)
 
 class WPConfDisplayWriteMinutes( WPConferenceDefaultDisplayBase ):
-    
+
     def _getBody( self, params ):
         wc = wcomponents.WWriteMinutes( self._conf )
         pars = {"postURL": urlHandlers.UHConferenceDisplayWriteMinutes.getURL(self._conf) }
@@ -12358,19 +12366,19 @@ class WPConfModifReportNumberEdit(WPConferenceModifBase):
 class WPConfModifExistingMaterials( WPConferenceModifBase ):
     def __init__(self, rh, conf):
         WPConferenceModifBase.__init__(self, rh, conf)
-        
+
     def _getPageContent( self, pars ):
         wc=wcomponents.WShowExistingMaterial(self._conf)
         return wc.getHTML( pars )
-    
+
     def _setActiveTab( self ):
         self._tabMaterials.setActive()
-    
+
     def _setActiveSideMenuItem( self ):
         self._materialMenuItem.setActive()
 
 class WPConfModifDisplayImageBrowser (wcomponents.WTemplated):
-    
+
     def __init__(self, conf, req):
         self._conf = conf
         self._req = req
@@ -12399,28 +12407,28 @@ class WPConfModifDisplayImageBrowser (wcomponents.WTemplated):
                 vars["body"] += self._getFileHTML(file)
             vars["body"] += "</tr></table>"
         return vars
-        
+
 
 class WPDisplayFullMaterialPackage( WPConferenceDefaultDisplayBase ):
-    
+
     def _getBody(self,params):
         wc = WFullMaterialPackage( self._conf )
         p = {"errors": params.get("errors",""),\
              "getPkgURL": urlHandlers.UHConferenceDisplayMaterialPackagePerform.getURL(self._conf)}
         return wc.getHTML(p)
-    
+
 # ============================================================================
 # === Room booking related ===================================================
 # ============================================================================
 
 #from MaKaC.webinterface.pages.roomBooking import WPRoomBookingBase0
 class WPConfModifRoomBookingBase( WPConferenceModifBase ):
-    
+
     def getJSFiles(self):
         return [ 'js/prototype/prototype.js',
                  'js/scriptaculous/scriptaculous.js' ] + \
                 WPConferenceModifBase.getJSFiles(self)
-    
+
     def _getHeadContent( self ):
         """
         !!!! WARNING
@@ -12428,11 +12436,11 @@ class WPConfModifRoomBookingBase( WPConferenceModifBase ):
         the same update in:
         roomBooking.py / WPRoomBookingBase0  AND
         conferences.py / WPConfModifRoomBookingBase
-        
-        For complex reasons, these two inheritance chains 
+
+        For complex reasons, these two inheritance chains
         should not have common root, so this duplication is
         necessary evil. (In general, one chain is for standalone
-        room booking and second is for conference-context room 
+        room booking and second is for conference-context room
         booking.)
         """
         baseurl = self._getBaseURL()
@@ -12440,30 +12448,30 @@ class WPConfModifRoomBookingBase( WPConferenceModifBase ):
         <!-- Lightbox -->
         <link rel="stylesheet" href="%s/js/lightbox/lightbox.css"> <!--lightbox.css-->
         <script type="text/javascript" src="%s/js/lightbox/lightbox.js"></script>
-        
+
         <!-- Our libs -->
         <script type="text/javascript" src="%s/js/indico/Legacy/validation.js"></script>
-        
-        <!-- Calendar -->        
+
+        <!-- Calendar -->
         <link rel="stylesheet" type="text/css" href="%s/css/calendar-blue.css" />
         <script type="text/javascript" src="%s"></script>
-        <script type="text/javascript" src="%s"></script>        
+        <script type="text/javascript" src="%s"></script>
         """ % ( baseurl, baseurl, baseurl, baseurl, urlHandlers.UHJavascriptCalendar.getURL(),
                 urlHandlers.UHJavascriptCalendarSetup.getURL() )
-    
+
     def _setActiveSideMenuItem(self):
         self._roomBookingMenuItem.setActive()
-    
+
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
-             
+
         self._tabExistBookings = self._tabCtrl.newTab( "existing", "Existing Bookings", \
                 urlHandlers.UHConfModifRoomBookingList.getURL( self._conf ) )
         self._tabNewBooking = self._tabCtrl.newTab( "new", "New Booking", \
                 urlHandlers.UHConfModifRoomBookingChooseEvent.getURL( self._conf ) )
-        
+
         self._setActiveTab()
-        
+
     def _getPageContent(self, params):
         self._createTabCtrl()
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
@@ -12471,35 +12479,35 @@ class WPConfModifRoomBookingBase( WPConferenceModifBase ):
     def _getTabContent(self, params):
         return "nothing"
 
-        
+
 # 0. Choosing an "event" (conference / session / contribution)...
 
 class WPConfModifRoomBookingChooseEvent( WPConfModifRoomBookingBase ):
-    
+
     def __init__( self, rh ):
         self._rh = rh
         WPConfModifRoomBookingBase.__init__( self, rh, rh._conf )
-    
+
     def _getTabContent( self, params ):
         wc = wcomponents.WRoomBookingChooseEvent( self._rh )
         return wc.getHTML( params )
-    
+
     def _setActiveTab( self ):
         self._tabNewBooking.setActive()
 
 # 1. Searching...
 
 class WPConfModifRoomBookingSearch4Rooms( WPConfModifRoomBookingBase ):
-    
+
     def __init__( self, rh ):
         self._rh = rh
         WPConfModifRoomBookingBase.__init__( self, rh, rh._conf )
-    
-    
+
+
     def _getTabContent( self, params ):
         wc = wcomponents.WRoomBookingSearch4Rooms( self._rh )
         return wc.getHTML( params )
-    
+
     def _setActiveTab( self ):
         self._tabNewBooking.setActive()
 
@@ -12510,21 +12518,21 @@ class WPConfModifRoomBookingRoomList( WPConfModifRoomBookingBase ):
     def __init__( self, rh ):
         self._rh = rh
         WPConfModifRoomBookingBase.__init__( self, rh, self._rh._conf )
-           
+
     def _setActiveTab( self ):
         self._tabNewBooking.setActive()
-        
+
     def _getTabContent( self, params ):
         wc = wcomponents.WRoomBookingRoomList( self._rh )
         return wc.getHTML( params )
-    
-    
+
+
 
 class WPConfModifRoomBookingList( WPConfModifRoomBookingBase ):
 
     def __init__( self, rh ):
         WPConfModifRoomBookingBase.__init__( self, rh, rh._conf )
-    
+
     def _setActiveTab( self ):
         self._tabExistBookings.setActive()
 
@@ -12543,7 +12551,7 @@ class WPConfModifRoomBookingRoomDetails( WPConfModifRoomBookingBase ):
 
     def _setActiveTab( self ):
         self._tabNewBooking.setActive()
-        
+
     def _getTabContent( self, params ):
         wc = wcomponents.WRoomBookingRoomDetails( self._rh )
         return wc.getHTML( params )
@@ -12556,7 +12564,7 @@ class WPConfModifRoomBookingDetails( WPConfModifRoomBookingBase ):
 
     def _setActiveTab( self ):
         self._tabExistBookings.setActive()
-        
+
     def _getTabContent( self, params ):
         wc = wcomponents.WRoomBookingDetails( self._rh )
         return wc.getHTML( params )
@@ -12571,7 +12579,7 @@ class WPConfModifRoomBookingBookingForm( WPConfModifRoomBookingBase ):
 
     def _setActiveTab( self ):
         self._tabNewBooking.setActive()
-        
+
     def _getTabContent( self, params ):
         wc = wcomponents.WRoomBookingBookingForm( self._rh )
         return wc.getHTML( params )
@@ -12589,7 +12597,7 @@ class WConfModifBadgePrinting( wcomponents.WTemplated ):
     """ This class corresponds to the screen where badge templates are
         listed and can be created, edited, deleted, and tried.
     """
-    
+
     def __init__( self, conference, user=None ):
         self.__conf = conference
         self._user=user
@@ -12597,23 +12605,23 @@ class WConfModifBadgePrinting( wcomponents.WTemplated ):
     def _getBaseTemplatesHTML( self ):
         dconf = conference.CategoryManager().getDefaultConference()
         templates = dconf.getBadgeTemplateManager().getTemplates()
-        
+
         html = _("""<option value="blank">&lt; _("Blank Page")&gt;</option>""")
-        
+
         for id,template in templates.iteritems():
             html += '<option value="'+id+'">'+template.getName()+'</option>'
-            
+
         return html
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["NewTemplateURL"]=str(urlHandlers.UHConfModifBadgeDesign.getURL(self.__conf,self.__conf.getBadgeTemplateManager().getNewTemplateId(),new = True))
         vars["CreatePDFURL"]=str(urlHandlers.UHConfModifBadgePrintingPDF.getURL(self.__conf))
-        
+
         vars["TryTemplateDisabled"] = ""
         if len(self.__conf.getBadgeTemplateManager().getTemplates()) == 0:
-            vars["TryTemplateDisabled"] = "disabled"            
-                    
+            vars["TryTemplateDisabled"] = "disabled"
+
         templateListHTML = []
         first = True
         sortedTemplates = self.__conf.getBadgeTemplateManager().getTemplates().items()
@@ -12660,49 +12668,49 @@ class WConfModifBadgePrinting( wcomponents.WTemplated ):
             copy.append(str(Config.getInstance().getSystemIconURL("smallCopy")))
             copy.append("""' border='0'></a>&nbsp;""")
             templateListHTML.append("".join(copy))
-            
+
             templateListHTML.append("""                </td>""")
             templateListHTML.append("""              </tr>""")
-            
+
         vars["templateList"] = "\n".join(templateListHTML)
-        
+
         wcPDFOptions = WConfModifBadgePDFOptions(self.__conf)
         vars['PDFOptions'] = wcPDFOptions.getHTML()
         vars['baseTemplates'] = self._getBaseTemplatesHTML()
-        
+
 
         return vars
 
 class WConfModifBadgePDFOptions( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference, showKeepValues = True, showTip = True ):
         self.__conf = conference
         self.__showKeepValues = showKeepValues
         self.__showTip = showTip
-        
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
-        
+
         pagesizeNames = PDFSizes().PDFpagesizes.keys()
         pagesizeNames.sort()
         vars['PagesizeNames'] = pagesizeNames
-        
+
         vars['PDFOptions'] = self.__conf.getBadgeTemplateManager().getPDFOptions()
         vars['ShowKeepValues'] = self.__showKeepValues
         vars['ShowTip'] = self.__showTip
-        
+
         return vars
-        
+
 
 class WPConfModifBadgePrinting( WPConfModifToolsBase ):
-    
+
     def _setActiveTab( self ):
         self._tabBadges.setActive()
-        
+
     def _getTabContent( self, params ):
         wc = WConfModifBadgePrinting( self._conf )
         return wc.getHTML()
-    
+
 
 
 ##------------------------------------------------------------------------------------------------------------
@@ -12713,7 +12721,7 @@ class WConfModifBadgeDesign( wcomponents.WTemplated ):
     """ This class corresponds to the screen where a template
         is designed inserting, dragging and editing items.
     """
-    
+
     def __init__( self, conference, templateId, new = False, user = None ):
         self.__conf = conference
         self.__templateId = templateId
@@ -12727,7 +12735,7 @@ class WConfModifBadgeDesign( wcomponents.WTemplated ):
         vars["saveBackgroundURL"]=urlHandlers.UHConfModifBadgeSaveBackground.getURL(self.__conf, self.__templateId)
         vars["loadingIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("loading")))
         vars["templateId"]=self.__templateId
-        
+
         cases = []
         for itemName in BadgeDesignConfiguration().items_actions.keys():
             case = []
@@ -12743,7 +12751,7 @@ class WConfModifBadgeDesign( wcomponents.WTemplated ):
             case.append('\n')
             case.append('break;')
             cases.append("".join(case))
-            
+
         vars['switchCases'] = "\n".join(cases)
 
         optgroups = []
@@ -12760,10 +12768,10 @@ class WConfModifBadgeDesign( wcomponents.WTemplated ):
                 optgroup.append('\n')
             optgroup.append('</optgroup>')
             optgroups.append("".join(optgroup))
-        
+
         vars['selectOptions'] = "\n".join(optgroups)
 
-        
+
         if self.__new:
             vars["saveTemplateURL"]=urlHandlers.UHConfModifBadgePrinting.getURL(self.__conf, new=True)
             vars["titleMessage"]= _("Creating new badge template")
@@ -12772,7 +12780,7 @@ class WConfModifBadgeDesign( wcomponents.WTemplated ):
             vars["hasBackground"]="false"
             vars["backgroundURL"]="false"
             vars["backgroundId"]=-1
-            
+
         elif self.__templateId is None:
             vars["saveTemplateURL"]=urlHandlers.UHConfModifBadgePrinting.getURL(self.__conf)
             vars["titleMessage"]= _("No template id given")
@@ -12781,7 +12789,7 @@ class WConfModifBadgeDesign( wcomponents.WTemplated ):
             vars["hasBackground"]="false"
             vars["backgroundURL"]="false"
             vars["backgroundId"]=-1
-            
+
         else:
             vars["saveTemplateURL"]=urlHandlers.UHConfModifBadgePrinting.getURL(self.__conf)
             vars["titleMessage"]= _("Editing badge template")
@@ -12796,8 +12804,8 @@ class WConfModifBadgeDesign( wcomponents.WTemplated ):
             else:
                 vars["hasBackground"]="false"
                 vars["backgroundURL"]="false"
-                
-            
+
+
         return vars
 
 
@@ -12805,9 +12813,9 @@ class WPConfModifBadgeDesign( WPConfModifToolsBase ):
 
     def __init__(self, rh, conf, templateId = None, new = False, baseTemplateId = "blank"):
         WPConferenceModifBase.__init__(self, rh, conf)
-        
+
         self.__templateId = templateId
-        
+
         self.__new = new
         self.__baseTemplate = baseTemplateId
 
@@ -12819,19 +12827,19 @@ class WPConfModifBadgeDesign( WPConfModifToolsBase ):
             # now, let's pretend nothing happened, and let the code
             # handle the template as if it existed before
             self.__new = False
-    
+
     def getJSFiles(self):
         return [ 'js/prototype/prototype.js',
                  'js/scriptaculous/scriptaculous.js' ] + \
                 WPConfModifToolsBase.getJSFiles(self)
-                
+
     def _setActiveTab( self ):
         self._tabBadges.setActive()
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifBadgeDesign( self._conf, self.__templateId, self.__new )
         return wc.getHTML()
-    
+
 ##------------------------------------------------------------------------------------------------------------
 """
 Common PDF Options classes
@@ -12840,14 +12848,14 @@ class WConfCommonPDFOptions( wcomponents.WTemplated ):
     """ This class corresponds to a section of options
         that are common to each PDF in Indico.
     """
-    
+
     def __init__( self, conference, user=None ):
         self.__conf = conference
         self._user=user
-        
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
-        
+
         pagesizeNames = PDFSizes().PDFpagesizes.keys()
         pagesizeNames.sort()
         pagesizeOptions = []
@@ -12858,9 +12866,9 @@ class WConfCommonPDFOptions( wcomponents.WTemplated ):
             pagesizeOptions.append('>')
             pagesizeOptions.append(pagesizeName)
             pagesizeOptions.append('</option>')
-        
+
         vars['pagesizes'] = "".join(pagesizeOptions)
-        
+
         fontsizeOptions = []
         for fontsizeName in PDFSizes().PDFfontsizes:
             fontsizeOptions.append('<option')
@@ -12869,11 +12877,11 @@ class WConfCommonPDFOptions( wcomponents.WTemplated ):
             fontsizeOptions.append('>')
             fontsizeOptions.append(fontsizeName)
             fontsizeOptions.append('</option>')
-        
+
         vars['fontsizes'] = "".join(fontsizeOptions)
-        
+
         return vars
-    
+
 
 # ============================================================================
 # === Posters related ========================================================
@@ -12887,11 +12895,11 @@ class WConfModifPosterPrinting( wcomponents.WTemplated ):
     """ This class corresponds to the screen where poster templates are
         listed and can be created, edited, deleted, and tried.
     """
-    
+
     def __init__( self, conference, user=None ):
         self.__conf = conference
         self._user=user
-        
+
     def _getFullTemplateListHTML( self ):
         globaltemplates = conference.CategoryManager().getDefaultConference().getPosterTemplateManager().getTemplates()
         localtemplates = self.__conf.getPosterTemplateManager().getTemplates()
@@ -12908,9 +12916,9 @@ class WConfModifPosterPrinting( wcomponents.WTemplated ):
         for id,template in globaltemplates.iteritems():
             html += '<option value="'+id+'">'+template.getName()+'</option>'
         return html
-    
+
     def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )        
+        vars = wcomponents.WTemplated.getVars( self )
         vars["NewTemplateURL"]=str(urlHandlers.UHConfModifPosterDesign.getURL(self.__conf, self.__conf.getPosterTemplateManager().getNewTemplateId(),new = True))
         vars["CreatePDFURL"]=str(urlHandlers.UHConfModifPosterPrintingPDF.getURL(self.__conf))
         templateListHTML = []
@@ -12927,7 +12935,7 @@ class WConfModifPosterPrinting( wcomponents.WTemplated ):
                                               template.getName(),
                                               """</label>""",
                                               """&nbsp;&nbsp;&nbsp;"""]))
-            
+
             edit = []
             edit.append("""                  <a href='""")
             edit.append(str(urlHandlers.UHConfModifPosterDesign.getURL(self.__conf, templateId)))
@@ -12951,26 +12959,26 @@ class WConfModifPosterPrinting( wcomponents.WTemplated ):
             templateListHTML.append("".join(copy))
             templateListHTML.append("""                </td>""")
             templateListHTML.append("""              </tr>""")
-            
+
         vars["templateList"] = "\n".join(templateListHTML)
-        
+
         wcPDFOptions = WConfModifPosterPDFOptions(self.__conf)
         vars['PDFOptions'] = wcPDFOptions.getHTML()
-        
+
         vars['baseTemplateList'] = self._getBaseTemplateListHTML()
         vars['fullTemplateList'] = self._getFullTemplateListHTML()
 
         return vars
-    
+
 class WConfModifPosterPDFOptions( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference, user=None ):
         self.__conf = conference
         self._user=user
-    
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
-        
+
         pagesizeNames = PDFSizes().PDFpagesizes.keys()
         pagesizeNames.sort()
         pagesizeOptions = []
@@ -12981,22 +12989,22 @@ class WConfModifPosterPDFOptions( wcomponents.WTemplated ):
             pagesizeOptions.append('>')
             pagesizeOptions.append(pagesizeName)
             pagesizeOptions.append('</option>')
-        
+
         vars['pagesizes'] = "".join(pagesizeOptions)
-        
+
         return vars
 
 class WPConfModifPosterPrinting( WPConfModifToolsBase ):
 
     def _setActiveTab( self ):
         self._tabPosters.setActive()
-    
+
     def _getTabContent( self, params ):
 
         wc = WConfModifPosterPrinting( self._conf )
-        
+
         return wc.getHTML()
-    
+
 ##------------------------------------------------------------------------------------------------------------
 """
 Poster Design classes
@@ -13005,7 +13013,7 @@ class WConfModifPosterDesign( wcomponents.WTemplated ):
     """ This class corresponds to the screen where a template
         is designed inserting, dragging and editing items.
     """
-    
+
     def __init__( self, conference, templateId, new = False, user = None):
         self.__conf = conference
         self.__templateId = templateId
@@ -13020,7 +13028,7 @@ class WConfModifPosterDesign( wcomponents.WTemplated ):
         vars["saveBackgroundURL"]=urlHandlers.UHConfModifPosterSaveBackground.getURL(self.__conf, self.__templateId)
         vars["loadingIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("loading")))
         vars["templateId"]=self.__templateId
-        
+
         cases = []
         for itemName in PosterDesignConfiguration().items_actions.keys():
             case = []
@@ -13036,7 +13044,7 @@ class WConfModifPosterDesign( wcomponents.WTemplated ):
             case.append('\n')
             case.append('break;')
             cases.append("".join(case))
-            
+
         vars['switchCases'] = "\n".join(cases)
 
         optgroups = []
@@ -13053,9 +13061,9 @@ class WConfModifPosterDesign( wcomponents.WTemplated ):
                 optgroup.append('\n')
             optgroup.append('</optgroup>')
             optgroups.append("".join(optgroup))
-        
+
         vars['selectOptions'] = "\n".join(optgroups)
-        
+
         if self.__new:
             vars["saveTemplateURL"]=urlHandlers.UHConfModifPosterPrinting.getURL(self.__conf, new=True)
             vars["titleMessage"]= _("Creating new poster template")
@@ -13064,8 +13072,8 @@ class WConfModifPosterDesign( wcomponents.WTemplated ):
             vars["backgroundId"]=-1
             vars["backgroundPos"]="Stretch"
             vars["templateData"]="''"
-            vars["editingTemplate"]="false"                
- 
+            vars["editingTemplate"]="false"
+
 
         elif self.__templateId is None:
             vars["saveTemplateURL"]=urlHandlers.UHConfModifPosterPrinting.getURL(self.__conf)
@@ -13073,21 +13081,21 @@ class WConfModifPosterDesign( wcomponents.WTemplated ):
             vars["hasBackground"]="false"
             vars["backgroundURL"]="false"
             vars["backgroundId"]=-1
-            vars["backgroundPos"]="Stretch"            
+            vars["backgroundPos"]="Stretch"
             vars["templateData"] == "''"
-            vars["editingTemplate"]="false"                
-  
-            
+            vars["editingTemplate"]="false"
+
+
         else:
             vars["saveTemplateURL"]=urlHandlers.UHConfModifPosterPrinting.getURL(self.__conf)
             vars["titleMessage"]= _("Editing poster template")
             vars["editingTemplate"]="true"
             templateDataString = simplejson.dumps(self.__conf.getPosterTemplateManager().getTemplateData(self.__templateId))
             vars["templateData"]=quoteattr(templateDataString)
-            
-            usedBackgroundId = self.__conf.getPosterTemplateManager().getTemplateById(self.__templateId).getUsedBackgroundId()    
+
+            usedBackgroundId = self.__conf.getPosterTemplateManager().getTemplateById(self.__templateId).getUsedBackgroundId()
             vars["backgroundId"] = usedBackgroundId
-            
+
             if usedBackgroundId != -1:
                 vars["hasBackground"]="true"
                 vars["backgroundURL"]=str(urlHandlers.UHConfModifPosterGetBackground.getURL(self.__conf, self.__templateId, usedBackgroundId))
@@ -13096,18 +13104,18 @@ class WConfModifPosterDesign( wcomponents.WTemplated ):
                 vars["hasBackground"]="false"
                 vars["backgroundURL"]="false"
                 vars["backgroundPos"]="Stretch"
-            
+
         return vars
 
 
 class WPConfModifPosterDesign( WPConfModifToolsBase ):
-    
+
     def __init__(self, rh, conf, templateId = None, new = False, baseTemplateId = "blank"):
-        WPConferenceModifBase.__init__(self, rh, conf) 
+        WPConferenceModifBase.__init__(self, rh, conf)
         self.__templateId = templateId
         self.__new = new
         self.__baseTemplate = baseTemplateId
-        
+
     def getJSFiles(self):
         return [ 'js/prototype/prototype.js',
                  'js/scriptaculous/scriptaculous.js' ] + \
@@ -13115,21 +13123,21 @@ class WPConfModifPosterDesign( WPConfModifToolsBase ):
 
     def _setActiveTab( self ):
         self._tabPosters.setActive()
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifPosterDesign( self._conf, self.__templateId, self.__new)
         return wc.getHTML()
 
     def sortByName(x,y):
         return cmp(x.getFamilyName(),y.getFamilyName())
-    
+
 class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
     #from MaKaC.webinterface.pages import base
-   # from MaKaC.webinterface import wcomponents 
-    
+   # from MaKaC.webinterface import wcomponents
+
     def __init__( self, rh, conf, selectedCSSId):
         WPConferenceDefaultDisplayBase.__init__( self, rh, conf )
-        
+
         self._conf = conf
         self._cssTplsModule = ModulesHolder().getById("cssTpls")
         self._styleMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getStyleManager()
@@ -13139,7 +13147,7 @@ class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
             self._selectedCSS = self._styleMgr.getLocalCSS()
         elif selectedCSSId:
             self._selectedCSS = self._cssTplsModule.getCssTplById(selectedCSSId)
-    
+
     def _applyDecoration( self, body ):
         """
         """
@@ -13148,7 +13156,7 @@ class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
     def _getBody( self, params ):
         path = self._getBaseURL()
         htdocs = Config.getInstance().getHtdocsDir()
-        params["URL2Back"] = urlHandlers.UHConfModifDisplay.getURL(self._conf) 
+        params["URL2Back"] = urlHandlers.UHConfModifDisplay.getURL(self._conf)
         params["cssurl"] = ""
         params['selectedCSSId'] = ""
         if self._selectedCSS:
@@ -13189,9 +13197,9 @@ class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
             printCSS = printCSS + """<link rel="stylesheet" type="text/css" href="%s" >"""%self._selectedCSS.getURL()
         elif self._styleMgr.getCSS():
             printCSS = printCSS + """<link rel="stylesheet" type="text/css" href="%s" >"""%self._styleMgr.getCSS().getURL()
-        return printCSS        
-        
+        return printCSS
+
 
 class WPreviewPage( wcomponents.WTemplated ):
-    pass 
+    pass
 

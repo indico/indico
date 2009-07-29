@@ -109,7 +109,7 @@ def getTextColorFromBackgroundColor(bgcolor):
                 return "#FFFFFF"
         except ValueError:
             pass 
-    return "#777777"
+    return "#202020"
 
 charRplace = [
 [u'\u2019', u"'"],

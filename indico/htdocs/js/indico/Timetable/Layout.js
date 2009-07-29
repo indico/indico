@@ -4,18 +4,25 @@ type("TimetableLayoutManager", [],
          _buildCheckpointTable: function(data) {
              /* Checkpoints are time points where events either start or end */
              checkpoints = {};
+             var addCheckpoint = function(key, time, type, sessionId) {
 
-             var addCheckpoint = function(key, time, type) {
                  if (!checkpoints[time]) {
                      checkpoints[time] = [];
                  }
-                 checkpoints[time].push([key, type]);
+                 checkpoints[time].push([key, type, sessionId]);
              };
 
              each(data, function(value, key){
                  sTime =value.startDate.time.replace(/:/g,'');
-                 addCheckpoint(key, sTime, 'start');
                  eTime = value.endDate.time.replace(/:/g,'');
+
+                 // If a poster session with a duration of > 7h then don't place
+                 // it in the grid but rather on the top as a whole day event
+                 if (value.isPoster && value.duration > (TimetableDefaults.wholeDay*60)) {
+                     addCheckpoint(key, sTime, 'wholeday', value.sessionId);
+                 }
+                 else {
+                     addCheckpoint(key, sTime, 'start', value.sessionId);
 
                  if (eTime > sTime) {
                      addCheckpoint(key, eTime, 'end');
@@ -24,6 +31,7 @@ type("TimetableLayoutManager", [],
                  }
                  else {
                      addCheckpoint(key, 'nextday', 'end');
+                 }
                  }
              });
 
@@ -63,6 +71,102 @@ type("TimetableLayoutManager", [],
              assigned[newElem] = block;
          },
 
+         reorderAssigned: function(assigned, lastAssigned, currentGroup) {
+
+             var correctlyAssigned = function(block) {
+                 return exists(lastAssigned[block.sessionId]) && lastAssigned[block.sessionId]['col'] == block.assigned;
+             }
+
+             // Returns number of previously processed session slots
+             var numAssignedBlocks = function(sessionId) {
+                 var blocks = lastAssigned[sessionId]['blocks'];
+                 var keyss = keys(blocks);
+                 var length = keyss.length;
+                 return length;
+             }
+
+             // Adds/updates a block in the lastAssigned dictionary
+             var lastAssign = function(block, col) {
+                 var col = any(col, null);
+                 if (!exists(lastAssigned[block.sessionId]))
+                     lastAssigned[block.sessionId] = {'blocks': {}};
+                 if (col != null)
+                     lastAssigned[block.sessionId]['col'] = col;
+                 lastAssigned[block.sessionId]['blocks'][block.id] = true;
+             }
+
+             // Changes the column of a block
+             var reassign = function(block, col) {
+                 block.assigned = col;
+                 assigned[col] = block;
+                 if (!exists(block.sessionId)) {
+                     lastAssign(block, col)
+                 }
+             }
+
+             for (key in currentGroup) {
+                 var block = currentGroup[key];
+
+                 // If this is not a session slot (that is a block
+                 // that has sessionId set) then we don't care about in
+                 // which column it is placed
+                 if (!exists(block.sessionId))
+                     continue;
+
+                 if (!exists(lastAssigned[block.sessionId])) {
+                     // This block has never been assigned before. Just update the lastAssigned.
+                     lastAssign(block, block.assigned);
+                     continue;
+                 }
+
+                 lastAssign(block);
+
+                 if (correctlyAssigned(block)) {
+                     // The block has already got its prefered position
+                     continue;
+                 }
+
+                 var preferedCol = lastAssigned[block.sessionId]['col'];
+                 var existingBlock = assigned[preferedCol];
+
+                 // If there's no block on the prefered column it means
+                 // that there are fewer columns this time.
+                 if (!existingBlock) {
+                     // Forcing to use prefered column is not very nice
+                     // for now do nothing
+                     /*
+                     for (var i = preferedCol-1; i >= 0; i--) {
+                         if (!assigned[preferedCol]) {
+                             existingBlock = assigned[i];
+                             preferedCol = i;
+                             break;
+                         }
+                     }
+                     reassign(block, preferedCol);
+                     */
+                     continue;
+                 }
+
+                 // Try to place the block in the prefered column
+                 if (!exists(existingBlock.sessionId) || !exists(lastAssigned[existingBlock.sessionId]) ||
+                     numAssignedBlocks(block.sessionId) > numAssignedBlocks(existingBlock.sessionId)) {
+
+                     // The block currently placed in the prefered column has either no prefered column
+                     // or has a preferred column but has fewer previous placed session slots (this
+                     // gives lower priority).
+
+                     // Only do the swap if the existing block starts at the same time
+                     // otherwise there might be overlapping blocks. Is there a better way
+                     // to handle this so that this check is not needed?
+                     if (existingBlock.start == block.start) {
+                         reassign(existingBlock, block.assigned);
+                         reassign(block, preferedCol);
+                     }
+                 }
+             }
+
+         },
+
          getBlock: function(blocks, key) {
              var block;
              if (blocks[key]) {
@@ -72,6 +176,10 @@ type("TimetableLayoutManager", [],
              }
 
              return block;
+         },
+
+         addWholeDayBlock: function(blocks, key) {
+             block = blocks[key] = {id: key};
          }
      }
     );
@@ -79,9 +187,11 @@ type("TimetableLayoutManager", [],
 
 type("IncrementalLayoutManager", ["TimetableLayoutManager"],
      {
-         drawDay: function(data) {
+         drawDay: function(data, detailLevel) {
 
              var self = this;
+
+             this.detailLevel = any(detailLevel, 'session');
 
              var checkpoints = this._buildCheckpointTable(data);
 
@@ -95,7 +205,7 @@ type("IncrementalLayoutManager", ["TimetableLayoutManager"],
                  var last = ks.length - 1;
 
                  // account for 'nextday' entries
-                 while(!endingHour){
+                 while(!endingHour && last >= 0){
                      endingHour = parseInt(ks[last].substring(0,2), 10);
                      last--;
                  }
@@ -108,13 +218,19 @@ type("IncrementalLayoutManager", ["TimetableLayoutManager"],
              var endMin;
 
              var algData = {
-                 grid : [],
-                 assigned : {},
-                 blocks : {},
-                 active : 0,
-                 currentGroup : [],
-                 topPx : 0,
-                 groups : []
+                 grid : [],             // Positions of all the time lines
+                 assigned : {},         // colums bound to blocks
+                 blocks : {},           // Dict of blocks
+                 active : 0,            // number of of active time blocks
+                 currentGroup : [],     // current processed group
+                 topPx : 0,             // counter when iterating from top to bottom of timetable
+                 groups : [],           // Isolated group of timetable blocks (all blocks in parallel)
+                 extraPx : {},          // Used for increasing the pixels for time blocks. Used when a time
+                                        // time table block needs extra space.
+                 lastAssigned : {},      // Remembers to what column a session has been assigned before
+                                        // makes it possible align sessions under each other
+                 wholeDayBlocks : {}    // All the block that should be shown as spanning the whole day,
+                                        // i.e. a poster session.
              };
 
              var hEnd;
@@ -146,7 +262,7 @@ type("IncrementalLayoutManager", ["TimetableLayoutManager"],
                  counter++;
              });
 
-             return [algData.topPx, algData.grid, algData.blocks, algData.groups];
+             return [algData.topPx, algData.grid, algData.blocks, algData.groups, algData.wholeDayBlocks];
 
          }
 
@@ -188,6 +304,7 @@ type("CompactLayoutManager", ["IncrementalLayoutManager"],
                              incrementPx = diff>incrementPx?diff:incrementPx;
                              algData.topPx += incrementPx;
                          }
+
                          // check if block goes beyond the timetable limits
                          // (ends after midnight)
                          if (hStart == 'nextday') {
@@ -217,19 +334,31 @@ type("CompactLayoutManager", ["IncrementalLayoutManager"],
                  }
              }
 
+             var blockAdded = false;
+
              each(points, function(point) {
                  if (point[1] == 'start') {
+                     blockAdded = true;
+
                      block = self.getBlock(algData.blocks, point[0]);
+                     block.sessionId = point[2];
 
                      block.start = algData.topPx;
                      algData.active++;
                      self.assign(algData.assigned, block);
                      algData.currentGroup.push(block);
+                 } else if (point[1] == 'wholeday') {
+                     self.addWholeDayBlock(algData.wholeDayBlocks, point[0])
                  }
              });
+             // Try to reaorder the assigned blocks based on their previous position
+             if (blockAdded)
+                 self.reorderAssigned(algData.assigned, algData.lastAssigned, algData.currentGroup);
 
              if (algData.active > 0) {
-                 algData.topPx += pxStep;
+                 var extraPx = 0;
+                 each(algData.extraPx, function(value, key) { if (value > extraPx) extraPx = value; } );
+                 algData.topPx += pxStep + extraPx;
              } else {
                  algData.topPx += TimetableDefaults.layouts.compact.values.pxPerSpace;
              }

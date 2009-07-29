@@ -79,35 +79,33 @@ var IndicoUI = {
     }
 };
 
-
-$E(document).observeClick(function(e) {
-
-    each(IndicoUtil.onclickFunctions, function(func) {
-        if (exists(func)) {
-            func(e);
-        }
-    });
-
-    //two-phase delete, due to loop/delete interactions
-    var idxs = [];
-    var count = 0;
-
-    each(IndicoUtil.onclickFunctions, function(func) {
-        if (func === null) {
-            idxs.push(count);
-        }
-        count++;
-    });
-
-    idxs.reverse();
-
-    each(idxs, function(idx) {
-        IndicoUtil.onclickFunctions.removeAt(idx);
-    });
-});
-
 window.onload = function() {
     for (var f in IndicoUI.loadTimeFuncs) {
         IndicoUI.loadTimeFuncs[f]();
     }
+
+    $E(document.body).observeClick(function(e) {
+        each(IndicoUtil.onclickFunctions, function(func) {
+            if (exists(func)) {
+                func(e);
+            }
+        });
+
+        //two-phase delete, due to loop/delete interactions
+        var idxs = [];
+        var count = 0;
+
+        each(IndicoUtil.onclickFunctions, function(func) {
+            if (func === null) {
+                idxs.push(count);
+            }
+            count++;
+        });
+
+        idxs.reverse();
+
+        each(idxs, function(idx) {
+            IndicoUtil.onclickFunctions.removeAt(idx);
+        });
+    });
 };

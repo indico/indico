@@ -58,6 +58,14 @@ type("TabWidget", ["Chooser", "IWidget"],{
         return text;
     },
 
+    enable: function() {
+        this.disableOverlay.dom.style.display = 'none';
+    },
+
+    disable: function() {
+        this.disableOverlay.dom.style.display = 'block';
+    },
+
     draw: function() {
         var self = this;
 
@@ -66,11 +74,11 @@ type("TabWidget", ["Chooser", "IWidget"],{
                           function(value) {
                               var liItem = Html.li(
                                   value==self.selected.get() ? "tabSelected" : "tabUnselected",
-                                  Widget.link(command(function() {
-                                      self.selected.set(value);
-                                  },
-                                                      self._titleTemplate(value)))
+                                  Html.span({}, self._titleTemplate(value))
                               );
+                              liItem.observeClick(function() {
+                                  self.selected.set(value);
+                              });
                               liItem.observeEvent('mouseover', function() {
                                   liItem.setStyle('backgroundPosition', '0 0px');
                               });
@@ -125,7 +133,7 @@ type("TabWidget", ["Chooser", "IWidget"],{
             self.scrollArrows.right[0].dom.style.backgroundPosition = '0 -60px';
         });
 
-        
+
         var extraButtons = "";
         // Add any extra buttons displayed under the tabs
         if (this.extraButtons.length) {
@@ -141,10 +149,23 @@ type("TabWidget", ["Chooser", "IWidget"],{
             extraButtons.append(btnContainer);
             btnContainer.observeClick(function() {btn['onclick'](btnContainer);})
         });
-        
-        var toReturn = this.IWidget.prototype.draw.call(
+
+        // This div is plced on top of the tabs and is shown when the tabs should be disabled (unclickable)
+        this.disableOverlay = Html.div({
+            style: {
+                display: 'none',
+                background: 'white',
+                opacity: '0.7',
+                width: this.width,
+                height: '50px',
+                position: 'absolute',
+                top: '0', left: '0',
+                filter: 'alpha(opacity=70)'
+        }});
+
+        this.container = this.IWidget.prototype.draw.call(
             this,
-            Html.div({},
+            Html.div({style: {width: pixels(self.width)}},
                      Html.div({className: "tabListContainer", style: {position: 'relative'}}, this.scrollArrows.left[0], this.scrollArrows.right[0], this.tabList,
                               Html.div('tabGradient', extraButtons/*,
                                        Html.div({className: 'tabBorderGradient', style: {cssFloat: 'left'}}),
@@ -154,11 +175,12 @@ type("TabWidget", ["Chooser", "IWidget"],{
                      Html.div({style: {marginTop: pixels(10),
                                        width: self.width ? pixels(self.width) : 'auto',
                                        minHeight: self.height ? pixels(self.height) : 'auto' }},
-                              Widget.block(this))
+                              Widget.block(this)),
+                     this.disableOverlay
                     )
         );
 
-        return toReturn;
+        return this.container;
     },
 
     postDraw: function() {
@@ -528,17 +550,31 @@ type("ServiceWidget", ["IWidget"],
 
 type("PopupWidget", [], {
     draw: function(content, x, y, styles) {
+        var self = this;
+
         this.x = x;
         this.y = y;
-        
-        var styles = any(styles, false);
 
-        this.canvas = Html.div({style: styles ? styles :
-        {
-            position: 'absolute',
+        /*
+         * Create canvas if not already created.
+         * Used to avoid errors for classes that don't
+         * call the constructor.
+         */
+        if(!exists(this.canvas))
+            this.canvas = Html.div();
+
+        var styles = any(styles, {
+            // If the canvas has been set to fixed position don't change it
+            position: this.canvas.dom.style.position == 'fixed' ? 'fixed' : 'absolute',
             left: pixels(x),
             top: pixels(y)
-        }}, content);
+        });
+
+        each(styles, function(value, key) {
+                self.canvas.setStyle(key, value);
+        });
+        this.canvas.setContent(content);
+
         IndicoUI.assignLayerLevel(this.canvas);
 
         return this.canvas;
@@ -565,12 +601,37 @@ type("PopupWidget", [], {
         this.open(x+dsocleft, y+dsoctop);
     },
 
-    close: function() {
+    getCanvas: function() {
+        return this.canvas;
+    },
+
+    setFixedPosition: function(fixed) {
+        var fixed = any(fixed, true);
+        this.canvas.dom.style.position = fixed ? 'fixed' : absolute;
+    },
+
+    close: function(e) {
+        var self = this;
+
         IndicoUI.unAssignLayerLevel(this.canvas);
-        $E(document.body).remove(this.canvas);
+
+        /*
+         * IE problem. If the close is triggered by en event and this.canvas
+         * is remvoved from the dom tree then the event wont propagate.
+         * This is fixed by hiding the element and removing it with a timeout so that
+         * there is time enough for the event to be handled.
+         */
+        if (Browser.IE) {
+            this.canvas.dom.style.display = 'none';
+            setTimeout(function() {$E(document.body).remove(self.canvas)}, 500);
+        } else {
+            $E(document.body).remove(self.canvas)
+        }
+
         this.isopen = false;
     }
-},
-     function() {
-     }
-    );
+    },
+    function() {
+        this.canvas = Html.div();
+    }
+);

@@ -304,31 +304,30 @@ type("RoomBookingWidget", ["IWidget"],
 
              return Html.table('roomWidget',
                                Html.tbody({},
-                                          Html.tr({}, Html.th({}, $T("Location")),
-                                                  Html.td({}),
-                                                  Html.th({}, $T("Room"))),
-                                          Html.tr({}, Html.td({style:{'verticalAlign': 'top'}}, this.locationChooser.draw()),
-                                                  Html.td({style:{paddingLeft: '10px', paddingRight: '10px'}}, Html.img({src: imageSrc('roomwidgetArrow')})),
-                                                  roomTd),
+                                          Html.tr({}, Html.th({}, Html.div('roomWidgetTitle', $T("Location"))),
+                                                  Html.th({}, Html.div('roomWidgetTitle', $T("Room")))),
+                                          Html.tr({}, Html.td({style:{'verticalAlign': 'top'}},
+                                                  Html.div({style: {paddingRight: '20px'}}, this.locationChooser.draw())),
+                                                  Html.div({style: {paddingRight: '20px'}}, roomTd)),
                                           Html.tr({},
-                                                  Html.th({colspan: 3}, $T('Address'))),
+                                                  Html.th({colspan: 3}, Html.div({className: 'roomWidgetTitle', style: {width: '210px'}}, $T('Address')))),
                                           Html.tr({},
-                                                  Html.td({}, this.addressArea.draw())
+                                                  Html.td({colspan: '2'}, this.addressArea.draw())
                                                  )));
          }
      },
-     function(info, parent, selectOn, noData, eventFavorites) {
+     function(info, parent, noData, eventFavorites) {
          this.locationValue = new WatchValue();
          this.info = info;
          this.parent = parent;
-         this.selectOn = selectOn;
+         this.selectOn = Indico.Settings.RoomBookingModuleActive;
          this.noData = noData;
 
-         this.addressArea = new RealtimeTextArea({style:{height:'35px'}});
+         this.addressArea = new RealtimeTextArea({style:{height:'35px', width: '200px'}});
 
          $B(this.addressArea, this.info.accessor('address'));
 
-         this.locationChooser = new InlineLocationSelectWidget('roomBooking.locations.list', {}, info.accessor('location'), parent?parent.accessor('location'):null, parent?parent.get('text'):'', this.locationValue, selectOn, !!parent, noData);
+         this.locationChooser = new InlineLocationSelectWidget('roomBooking.locations.list', {}, info.accessor('location'), parent?parent.accessor('location'):null, parent?parent.get('text'):'', this.locationValue, this.selectOn, !!parent, noData);
 
          this.eventFavorites = eventFavorites;
 

@@ -1,4 +1,4 @@
-<%! 
+<%!
 declareTemplate(newTemplateStyle=True)
 location = self._conf.getLocation()
 room = self._conf.getRoom()
@@ -17,7 +17,10 @@ else:
 
 %>
 
-<table style="width: 80%; margin: auto; margin-bottom: 20px;">
+
+<div class="groupTitleNoBorder"><%= _("Timetable")%></div>
+
+<table style="width: 900px; margin-bottom: 20px;">
     <tr>
         <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Start date")%></span></td>
         <td class="blacktext"><%= start_date %></td>
@@ -29,18 +32,18 @@ else:
         <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("End date")%></span></td>
         <td bgcolor="white" class="blacktext"><%= end_date %></td>
     </tr>
-    <tr>
+    <tr style="display: none;">
         <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Options")%></span></td>
         <td><div id="autoSolveConflictPlace">
-                <span id="autoSolveConflictButton">                    
+                <span id="autoSolveConflictButton">
                 </span>
             </div>
             <div id="sessionsPlace">
-                <span id="sessionsButton">                    
+                <span id="sessionsButton">
                 </span>
             </div>
             <div id="sessionSlotsPlace">
-                <span id="sessionSlotsButton">                    
+                <span id="sessionSlotsButton">
                 </span>
             </div>
         </td>
@@ -50,70 +53,84 @@ else:
         <td bgcolor="white" class="blacktext"><%= timezone %></td>
     </tr>
 </table>
+<div class="shit" style="display: none;">
+      <%= content %>
+</div>
 
-    <div style="overflow: auto; padding: 10px; auto; margin-right: auto; margin-left: auto; margin-bottom: 10px; margin-top: 15px;">
 
-        <span style="margin-right: 5px;" class="dataCaptionFormat"><%= _("Show") %>:</span>
-        <form action="<%= urlHandlers.UHConfModifSchedule.getURL(self._conf) %>" method="GET" style="display: inline">
-          <select name="day" onchange="javascript: this.form.submit();">
-            <% for n in range(len(dayList)): %>
-            <option value="<%= n %>"                        
-                    <% if len(self._dayList) == 1 and dayList[n] in self._dayList: %>
-                    selected
-                    <% end %>>
-              <%= dayList[n].getDate().strftime("%A, %d %B %Y") %>                             
-            </option>
-            <% end %>
-            <option value="all" 
-              <% if len(self._dayList) > 1: %>           
-              selected
-              <% end %>>All days</option>
-          </select>
-          <input type="hidden" name="confId" value="<%= self._conf.id %>" />
-        </form>          
+    <div style="overflow: auto; display: none; padding: 10px; auto; margin-right: auto; margin-left: auto; margin-bottom: 10px; margin-top: 15px;">
 
       <% if self.addControlsEnabled(): %>
-	<a href="#" style="margin-left: 15px; margin-right: 8px;" id="addLink" class="dropDownMenu highlight">add</a> <span style="color: #AAAAAA;">|</span> 
-        <a href="<%= urlHandlers.UHConfModifReschedule.getURL(self._conf, targetDay=dayDate.strftime("%Y-%m-%d")) %>" style="margin-left: 8px;">reschedule</a> 
-      
+	<a href="#" style="margin-left: 15px; margin-right: 8px;" id="addLink" class="dropDownMenu highlight">add</a> <span style="color: #AAAAAA;">|</span>
+        <a href="<%= urlHandlers.UHConfModifReschedule.getURL(self._conf, targetDay=dayDate.strftime("%Y-%m-%d")) %>" style="margin-left: 8px;">reschedule</a>
+
       <% end %>
       <% else: %>
 
       <a href="<%= urlHandlers.UHConfModifSchedule.getURL(self._conf, day = days) %>" style="margin-left: 20px;"><%= _("go to timetable")%></a>
       <% end %>
 
-    </div>      
+    </div>
 
-    <%= content %>
+
+
+<div id="timetableDiv" style="position: relative;">
+
+<div class="timetablePreLoading" style="width: 700px; height: 300px;">
+    <div class="text" style="padding-top: 200px;">&nbsp;&nbsp;&nbsp;<%= _("Building timetable...") %></div>
+</div>
+
+<div class="clearfix"></div>
 
 <script type="text/javascript">
-$E('autoSolveConflictButton').set(IndicoUI.Widgets.Generic.switchOptionButton('schedule.setTimeConflictSolving', 
-                                            {conference: '<%= self._conf.id %>'}, 
+var ttdata = <%= str(ttdata).replace('%','%%') %>;
+var eventInfo = <%= eventInfo %>;
+var timetable = new TimeTableManagement(ttdata, eventInfo, 900,$E('timetableDiv'), false);
+
+IndicoUI.executeOnLoad(function(){
+
+
+  $E('timetableDiv').set(timetable.draw());
+  timetable.postDraw();
+
+});
+</script>
+
+
+
+
+
+<script type="text/javascript">
+$E('autoSolveConflictButton').set(IndicoUI.Widgets.Generic.switchOptionButton('schedule.setTimeConflictSolving',
+                                            {conference: '<%= self._conf.id %>'},
                                             'Automatically solve timing conflicts'
 ));
-$E('sessionsButton').set(IndicoUI.Widgets.Generic.switchOptionButton('schedule.setScheduleSessions', 
-                                            {conference: '<%= self._conf.id %>'}, 
+$E('sessionsButton').set(IndicoUI.Widgets.Generic.switchOptionButton('schedule.setScheduleSessions',
+                                            {conference: '<%= self._conf.id %>'},
                                             'Sessions',
                                             true
 ));
-$E('sessionSlotsButton').set(IndicoUI.Widgets.Generic.switchOptionButton('schedule.setSessionSlots', 
-                                            {conference: '<%= self._conf.id %>'}, 
+$E('sessionSlotsButton').set(IndicoUI.Widgets.Generic.switchOptionButton('schedule.setSessionSlots',
+                                            {conference: '<%= self._conf.id %>'},
                                             'Session Slots',
                                             true
 ));
 
 var parentEventRoomData = $O(<%= jsonEncode(roomInfo(self._rh._target)) %>);
 
-var addSession = curry(IndicoUI.Dialogs.addSession, 
+
+
+var addSession = curry(IndicoUI.Dialogs.addSession,
     'schedule.event.addSession',
     'schedule.event.getDayEndDate',
-    <%= jsonEncode({'conference': self._conf.id }) %>, 
+    <%= jsonEncode({'conference': self._conf.id }) %>,
     <%= jsonEncode({'location': locationName,
     'room': roomName,
     'address': address }) %>,
     parentEventRoomData,
     '<%= dayDate.strftime("%d/%m/%Y") %>',
-    <%= jsBoolean(rbActive) %>
+    <%= jsBoolean(rbActive) %>,
+    timetable
     );
 
 var addContribution = function() {
@@ -121,7 +138,7 @@ var addContribution = function() {
 					   <%= map(lambda x: x.getDate().strftime("%d/%m/%Y"), self._dayList) %>,
 					   'schedule.event.addContribution',
                                            'schedule.event.getDayEndDate',
-					   <%= jsonEncode({'conference': self._conf.id }) %>, 
+					   <%= jsonEncode({'conference': self._conf.id }) %>,
 					   <%= jsonEncode({'location': locationName,
 					   'room': roomName,
 					   'address': address }) %>,
@@ -129,24 +146,24 @@ var addContribution = function() {
 					   '<%= self._conf.getStartDate().strftime("%d/%m/%Y %H:%M") %>',
 					   '<%= dayDate.strftime("%d/%m/%Y") %>',
 					   <%= jsBoolean(rbActive) %>,
-					   <%= jsBoolean(self._conf.getType() != 'meeting') %>
-					   );
+					   <%= jsBoolean(self._conf.getType() != 'meeting') %>,
+					   timetable);
 
     dialog.execute();
 };
 
-var addBreak = curry(IndicoUI.Dialogs.addBreak, 
+var addBreak = curry(IndicoUI.Dialogs.addBreak,
     'schedule.event.addBreak',
     'schedule.event.getDayEndDate',
-    <%= jsonEncode({'conference': self._conf.id }) %>, 
+    <%= jsonEncode({'conference': self._conf.id }) %>,
     <%= jsonEncode({'location': locationName,
     'room': roomName,
     'address': address }) %>,
     parentEventRoomData,
     '<%= self._conf.getStartDate().strftime("%d/%m/%Y %H:%M") %>',
     '<%= dayDate.strftime("%d/%m/%Y") %>',
-    <%= jsBoolean(rbActive) %>
-    );
+    <%= jsBoolean(rbActive) %>,
+    timetable);
 
 <% if self.addControlsEnabled(): %>
 var addLink = $E('addLink');
@@ -173,7 +190,7 @@ addLink.observeClick(function(e) {
 <% end %>
 
 var breakMenu = function(link, editURL, deleteURL, relocateURL) {
- 
+
     var manageBreakMenu = null;
     // Close the menu if clicking the link when menu is open
     if (manageBreakMenu && manageBreakMenu.isOpen()) {
@@ -183,7 +200,7 @@ var breakMenu = function(link, editURL, deleteURL, relocateURL) {
     }
     var menuItems = {};
     menuItems['<%= _("Edit") %>'] = editURL;
-    menuItems['<%= _("Delete") %>'] = function() { 
+    menuItems['<%= _("Delete") %>'] = function() {
                                           if (confirm("<%= _("Are you sure you want to delete this break?") %>")) {
        					    window.location = deleteURL;
 					  }
@@ -199,7 +216,7 @@ var breakMenu = function(link, editURL, deleteURL, relocateURL) {
     }
 
 var contributionMenu = function(link, editURL, contributionId, conferenceId, deleteURL, relocateURL) {
- 
+
     var manageContribMenu = null;
     // Close the menu if clicking the link when menu is open
     if (manageContribMenu && manageContribMenu.isOpen()) {
@@ -228,7 +245,7 @@ var contributionMenu = function(link, editURL, contributionId, conferenceId, del
     }
 
 var sessionMenu = function(link, editURL, confId, sessionId, timetableURL) {
- 
+
     var manageSessionMenu = null;
     // Close the menu if clicking the link when menu is open
     if (manageSessionMenu && manageSessionMenu.isOpen()) {
@@ -266,4 +283,8 @@ each($E(document).getElementsByClassName('ttSessionManagementBlock'),
      });
 
 </script>
+
+
+
+
 
