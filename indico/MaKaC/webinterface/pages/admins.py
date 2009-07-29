@@ -2429,6 +2429,10 @@ class WPRoomBookingPluginAdminBase( WPRoomsBase ):
     def __init__( self, rh ):
         WPRoomsBase.__init__( self, rh )
 
+    def getJSFiles(self):
+        return WPRoomsBase.getJSFiles(self) + \
+               self._includeJSPackage('Management')
+
     def _setActiveTab( self ):
         self._subTabRoomBooking.setActive()
 
@@ -2503,9 +2507,10 @@ class WPRoomBookingAdmin( WPRoomBookingPluginAdminBase ):
     
 class WPRoomBookingAdminLocation( WPRoomBookingPluginAdminBase ):
 
-    def __init__( self, rh, location ):
+    def __init__( self, rh, location, actionSucceeded = False ):
         self._rh = rh
         self._location = location
+        self._actionSucceeded = actionSucceeded
         WPRoomBookingPluginAdminBase.__init__( self, rh )
 
     def _setActiveTab( self ):
@@ -2513,6 +2518,7 @@ class WPRoomBookingAdminLocation( WPRoomBookingPluginAdminBase ):
         
     def _getTabContent( self, params ):
         wc = wcomponents.WRoomBookingAdminLocation( self._rh, self._location )
+        params['actionSucceeded'] = self._actionSucceeded
         return wc.getHTML( params )
     
 class WPAdminsSystemBase(WPAdminsBase):

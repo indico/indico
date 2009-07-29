@@ -4,7 +4,7 @@
 </tr>
 <tr>
   <td style="padding-left: 20px; padding-top: 20px;">
-    <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
+    <table>
     <tr>
       <td colspan="3" class="groupTitle"><%= _("Room Booking Module")%></td>
     </tr>
@@ -29,7 +29,7 @@
     </tr>
     </table>
     <br /><br />
-    <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
+    <table>
     <tr>
       <td colspan="3" class="groupTitle"><%= _("Available Room Booking Plugins")%></td>
     </tr>
@@ -52,7 +52,7 @@
     </tr>
     </table>
     <br /><br />
-    <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
+    <table>
     <tr>
       <td colspan="3" class="groupTitle"><%= _("Built-in ZODB Plugin")%> </td>
     </tr>
