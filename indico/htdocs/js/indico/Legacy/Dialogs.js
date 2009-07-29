@@ -252,16 +252,18 @@ extend(IndicoUI.Dialogs,
 
                            return this.ExclusivePopup.prototype.draw.call(
                                this,
-                                   [$T('Title'), $B(parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), info.accessor('title'))],
-                                   [$T('Description'), $B(Html.textarea({cols: 40, rows: 2}), info.accessor('description'))],
-                                   [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
-                                   [$T('Date'), dayStartDate],
-                                   startEndTimeComponent,
-                                   colorPickerComponent,
-                                   [$T('Convener(s)'), convListWidget.draw()],
-                                   [$T('Session type'), sesType.draw()]
-                               ]), Html.div({style:{marginTop: pixels(10), textAlign: 'center', background: '#DDDDDD', padding: pixels(2)}},[addButton, cancelButton])
-                                            ]));
+                               Html.div({},
+                                        IndicoUtil.createFormFromMap([
+
+                                            [$T('Title'), $B(parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), info.accessor('title'))],
+                                            [$T('Description'), $B(Html.textarea({cols: 40, rows: 2}), info.accessor('description'))],
+                                            [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
+                                            [$T('Date'), dayStartDate],
+                                            startEndTimeComponent,
+                                            colorPickerComponent,
+                                            [$T('Convener(s)'), convListWidget.draw()],
+                                            [$T('Session type'), sesType.draw()]]),
+                                        Html.div({style:{marginTop: pixels(10), textAlign: 'center', background: '#DDDDDD', padding: pixels(2)}},[addButton, cancelButton])));
                        };
                        popup.open();
                    }).run();
@@ -590,7 +592,7 @@ extend(IndicoUI.Dialogs,
                    var commitChangesAndClose = function(suicideHook) {
                        commitChanges(suicideHook, closeMinutes);
                    };
-                   saveCloseButton = Widget.button(command(curry(commitChangesAndClose, function(){self.close()}), $T("Save and close")));
+                   saveCloseButton = Widget.button(command(curry(commitChangesAndClose, function(){self.close();}), $T("Save and close")));
                    saveCloseButton.dom.disabled = !compileMinutes;
 
 
