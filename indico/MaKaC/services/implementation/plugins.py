@@ -72,8 +72,39 @@ class PluginOptionsRemoveUser ( PluginOptionsBase, UserModificationBase ):
         
         return True
 
+class PluginOptionsAddRooms ( PluginOptionsBase ):
+    
+    def _checkParams(self):
+        PluginOptionsBase._checkParams(self)
+        
+    def _getAnswer(self):
+        if self._targetOption.getType() == 'rooms':
+            roomToAdd=self._params.get("room")
+            self._targetOption.getValue().append(roomToAdd)
+            self._targetOption._notifyModification()
+        else:
+            raise ServiceError('ERR-PLUG2', "option %s.%s.%s is not of type 'rooms'" % (self._pluginType, self._plugin, self._targetOption))
+        
+        return True
+
+class PluginOptionsRemoveRooms ( PluginOptionsBase ):
+
+    def _checkParams(self):
+        PluginOptionsBase._checkParams(self)
+        
+    def _getAnswer(self):
+        if self._targetOption.getType() == 'rooms':
+            roomToRemove=self._params.get("room")
+            self._targetOption.getValue().remove(roomToRemove)
+            self._targetOption._notifyModification()
+        else:
+            raise ServiceError('ERR-PLUG2', "option %s.%s.%s is not of type 'rooms'" % (self._pluginType, self._plugin, self._targetOption))
+        
+        return True
 
 methodMap = {
     "addUsers": PluginOptionsAddUsers,
-    "removeUser": PluginOptionsRemoveUser
+    "removeUser": PluginOptionsRemoveUser,
+    "addRooms": PluginOptionsAddRooms,
+    "removeRooms": PluginOptionsRemoveRooms
 }

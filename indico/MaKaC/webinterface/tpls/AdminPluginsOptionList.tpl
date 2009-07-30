@@ -35,11 +35,11 @@
                                 },
                                 function(result,error) {
                                     if (!error) {
-				        setResult(true);
+                        setResult(true);
                                     } else {
                                         IndicoUtil.errorReport(error);
-					setResult(false);
-				    }
+                    setResult(false);
+                    }
                                 }
                             );
                         }
@@ -52,10 +52,10 @@
                                 },
                                 function(result,error) {
                                     if (!error) {
-				        setResult(true);
+                        setResult(true);
                                     } else {
                                         IndicoUtil.errorReport(error);
-					setResult(false);
+                    setResult(false);
                                     }
                                 }
                             );
@@ -70,6 +70,58 @@
                         $E('userList<%=name%>').set(uf.draw())
                     </script>
                 <% end %>
+                <% elif option.getType() =="rooms": %>
+                    <div id="roomList" class="PluginPeopleListDiv"></div>
+                    <div id="roomChooser"></div>
+                    <div id="roomAddButton"></div>
+                    <script type="text/javascript">
+                        var removeRoomHandler = function (roomToRemove,setResult){
+                            indicoRequest(
+                                    'plugins.removeRooms',
+                                    {
+                                     optionName: "<%= name %>",
+                                     room: roomToRemove
+                                     },function(result,error) {
+                                         if (!error) {
+                                             setResult(true);
+                                             roomList.set(roomToRemove,null);
+                                         } else {
+                                                IndicoUtil.errorReport(error);
+                                                setResult(false);
+                                         }
+                                    }
+                                );
+                            }
+                        var roomChooser = new SelectRemoteWidget('roomBokking.locationsAndRooms.list', {})
+                        var addRoomButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add Room') );
+                        addRoomButton.observeClick(
+                            function(setResult){
+                                var selectedValue = roomChooser.select.get();
+                                indicoRequest(
+                                    'plugins.addRooms',
+                                    {
+                                     optionName: "<%= name %>",
+                                     room: selectedValue
+                                     },function(result,error) {
+                                         if (!error) {
+                                             roomList.set(selectedValue,$O(selectedValue));
+                                         } else {
+                                                IndicoUtil.errorReport(error);
+                                         }
+                                    }
+                                );
+                        });
+                        var roomList = new RoomListWidget('PluginPeopleList',removeRoomHandler);
+                        //var temp = roomChooser.source.get()["CERN:1"];
+                        var roomSelectedBefore=<%= option.getValue() %>
+                        each (roomSelectedBefore,function(room){
+                            roomList.set(room, room);
+                        });
+                        $E('roomList').set(roomList.draw());
+                        $E('roomChooser').set(roomChooser.draw(),addRoomButton);
+                        $E('roomAddButton').set();
+                    </script>
+               <% end %>
                 <% else: %>
                     <% if option.getType() == list: %>
                         <% value=  ", ".join([str(v) for v in option.getValue()]) %>

@@ -9,7 +9,6 @@ from MaKaC.rb_location import CrossLocationQueries
 
 class RoomBookingListLocations( ProtectedService ):
     
-
     def _getAnswer( self ):
         """
         Calls _handle() on the derived classes, in order to make it happen. Provides
@@ -27,7 +26,7 @@ class RoomBookingListLocations( ProtectedService ):
 
  
 class RoomBookingListRooms( ProtectedService ):
-
+    
     def _checkParams( self ):
         
         try:
@@ -52,9 +51,19 @@ class RoomBookingListRooms( ProtectedService ):
         
         return sorted(res)
 
+class RoomBookingListLocationsAndRooms( ProtectedService ):
+    
+    def _getAnswer( self ):
+        result = {}
+        locationNames = map(lambda l: l.friendlyName, Location.allLocations);
+        for loc in locationNames:
+            for room in CrossLocationQueries.getRooms( location = loc ):
+                #result[loc +":" +str(room.id)] = loc +":" +room.name;
+                result[loc +":" +room.name] = loc +":" +room.name;
+        return result
 
 class GetBookingBase(ProtectedService):
-
+    
     def _getRoomInfo(self, target):
         location = target.getOwnLocation()
 

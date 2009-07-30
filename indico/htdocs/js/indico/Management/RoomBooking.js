@@ -333,3 +333,33 @@ type("RoomBookingWidget", ["IWidget"],
          this.eventFavorites = eventFavorites;
 
      });
+
+type("RoomListWidget", ["ListWidget"],
+        {
+            _drawItem: function(room) {
+                var self = this;
+                var roomData = room.get();
+
+                var removeButton = Widget.link(command(function() {
+                    self.removeProcess(room.key, function(result) {
+                        if (result) {
+                            self.set(room, null);
+                        }
+                    });
+                }, IndicoUI.Buttons.removeButton()));
+                return Html.div({style:{display: 'inline'}},
+                                Html.span({},
+                                        Html.div({style: {cssFloat: "right"}},removeButton),
+                                        $B(Html.span(), room.key)
+                                        ));
+            }
+        },
+
+        function(style, removeProcess) {
+            this.removeProcess = removeProcess;
+            if (!exists(style)) {
+                style = "UIPeopleList";
+            }
+            this.ListWidget(style);
+        }
+       );

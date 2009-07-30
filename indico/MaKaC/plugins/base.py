@@ -624,7 +624,8 @@ class PluginOption(Persistent):
         order: an integer so that the options can be displayed in a given order (ascending order)
     """
     _extraTypes = {
-        'users': list
+        'users': list,
+        'rooms': list
     }
     
     def __init__(self, name, description, type, value = None, editable = True, visible = True, mustReload = False, present = True, order = 0):

@@ -20,6 +20,7 @@ methodMap = {
      
     "roomBooking.locations.list": roomBooking.RoomBookingListLocations,
     "roomBooking.rooms.list": roomBooking.RoomBookingListRooms,
+    "roomBokking.locationsAndRooms.list" :roomBooking.RoomBookingListLocationsAndRooms,
     
     "resources.filetype.icon": resources.GetFileTypeIcon,
     "resources.timezones.getAll": resources.GetTimezones,
