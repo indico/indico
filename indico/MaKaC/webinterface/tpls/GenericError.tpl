@@ -1,3 +1,5 @@
+<% declareTemplate(newTemplateStyle=True) %>
+
 <div class="container">
 
 <table align="center" width="100%%">
@@ -26,10 +28,9 @@
                             <li> <%= _("""You can go back to the precedent page by using the "Back" button of your browser.""")%>
                             <li> <%= _("""You can try to refresh this page by using the "Refresh" button of your browser.""")%>
                             <li>
-                                <form target="_blank" action=%(reportURL)s 
-                                    method="post">
-                                    <input type="hidden" name="reportMsg" value=%(reportMsg)s>
-                                    <input type="hidden" name="userEmail" value=%(userEmail)s>
+                                <form target="_blank" action=<%=reportURL%> method="post">
+                                    <input type="hidden" name="reportMsg" value=<%=reportMsg%>>
+                                    <input type="hidden" name="userEmail" value=<%=userEmail%>>
                  <%= _("If the problem is not meaningful for you and persists, please notify the Indico support team by sending an error report.")%><br><br> 		<center><input type="submit" class="btn" color="blue" value="<%= _("Send Error Report")%>"> </center>
                                 </form>
                         </font></ul>
@@ -41,6 +42,6 @@
 </table>
 <br>
 
-%(errorDetails)s
+<%=errorDetails%>
 
 </div>

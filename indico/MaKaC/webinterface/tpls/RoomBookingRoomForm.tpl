@@ -1,3 +1,4 @@
+<% declareTemplate(newTemplateStyle=True) %>
     <!-- CONTEXT HELP DIVS -->
     <div id="tooltipPool" style="display: none">
         <div id="nameCH" class="tip">
