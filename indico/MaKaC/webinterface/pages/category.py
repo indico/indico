@@ -171,7 +171,7 @@ class WPCategoryDisplay(WPCategoryDisplayBase):
         self._wfReg = wfReg
         if len(self._target.getSubCategoryList())==0:
             tzUtil = DisplayTZ(self._getAW(),target)#None,useServerTZ=1) 
-            self._locTZ = tzUtil.getDisplayTZ() 
+            self._locTZ = tzUtil.getDisplayTZ()      
 
     def _getHeadContent( self ):
         # add RSS feed
@@ -967,6 +967,9 @@ class WPCategOverview( WPCategoryDisplayBase ):
         self._ow = ow
         self._categ = categ
         self._locTZ = DisplayTZ(self._getAW(),None,useServerTZ=1).getDisplayTZ()  
+        
+    def _getTitle(self):
+        return WPCategoryDisplayBase._getTitle(self) + " - " + _("Events Display")    
     
     def _getHeadContent( self ):
         # add RSS feed
@@ -1036,6 +1039,9 @@ class WPCategoryMap( WPCategoryDisplayBase ):
     
     def __init__( self, rh, categ ):
         WPCategoryDisplayBase.__init__( self, rh, categ )
+        
+    def _getTitle(self):
+        return WPCategoryDisplayBase._getTitle(self) + " - " + _("Category Map")    
 
     def _getBody( self, params ):
         wc = WCategoryMap( self._target )
@@ -1094,6 +1100,9 @@ class WPCategoryStatistics( WPCategoryDisplayBase ):
         WPCategoryDisplayBase.__init__( self, rh, target )
         self._wfReg = wfReg
         self._stats = stats
+        
+    def _getTitle(self):
+        return WPCategoryDisplayBase._getTitle(self) + " - " + _("Category Statistics")    
     
     def _getBody( self, params ):
         wcs = WCategoryStatistics( self._target, self._wfReg, self._stats )

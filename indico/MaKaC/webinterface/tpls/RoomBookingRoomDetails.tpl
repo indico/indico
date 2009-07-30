@@ -132,7 +132,7 @@
                                     <table width="100%%">
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small> <%= _("Capacity")%>&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><%= room.capacity %>  <%= _("people")%></td>
+                                            <td align="left" class="blacktext"><%= room.capacity %><%=" "%><%=_("people")%></td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> <%= _("Department")%>&nbsp;&nbsp;</small></td>

@@ -29,6 +29,9 @@ class WPNews(WPMainBase):
     def _getBody(self, params):
         wc = WNews()
         return wc.getHTML()
+    
+    def _getTitle(self):
+        return WPMainBase._getTitle(self) + " - " + _("News")
 
 
 class WNews(wcomponents.WTemplated):
