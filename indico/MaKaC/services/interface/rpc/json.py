@@ -19,7 +19,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import simplejson
+import simplejson, traceback
 from mod_python import apache
 
 from MaKaC.common.PickleJar import DictPickler
@@ -73,7 +73,7 @@ def unicodeToUtf8(obj):
     return obj
 
 def process(req):
-    
+
     responseBody = {
         "version": "1.1",
         "error": None,
@@ -84,24 +84,24 @@ def process(req):
         # check content type (if the users know what they are using)
         #if req.content_type != "application/json":
         #    raise RequestError("Invalid content type. It must be 'application/json'.")
-        
+
         # read request
         requestText = req.read()
-        
+
         Logger.get('rpc').debug('json rpc request. request text= ' + str(requestText))
-        
+
         if requestText == "":
             raise RequestError("ERR-R2", "Empty request.")
-        
+
         # decode json
         try:
             requestBody = decode(requestText)
         except Exception, e:
             raise RequestError("ERR-R3", "Error parsing json request.", e)
-        
+
         if "id" in requestBody:
             responseBody["id"] = requestBody["id"]
-        
+
         result = invokeMethod(str(requestBody["method"]), requestBody.get("params", []), req)
 
         # serialize result
@@ -109,24 +109,24 @@ def process(req):
             responseBody["result"] = result
         except Exception, e:
             raise ProcessError("ERR-P1", "Error during serialization.", e)
-        
+
     except CausedError, e:        
         errorInfo = DictPickler.pickle(e);
 
         Logger.get('rpc').info('Error in request: %s %s' % (errorInfo['code'],
                                                             errorInfo['message']))
-        
+
         if requestBody:
             errorInfo["requestInfo"] = {"method": str(requestBody["method"]),
                                         "params": requestBody.get("params", [])}
             Logger.get('rpc').debug('Arguments: %s' % errorInfo['requestInfo'])
 
-        
-        
+        Logger.get('rpc').debug(traceback.format_exc())
+
         responseBody["error"] = errorInfo
-        
+
     jsonResponse = encode(responseBody)
-    
+
     req.content_type = "application/json"
     req.write(jsonResponse)
     return apache.OK
