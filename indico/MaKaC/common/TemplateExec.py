@@ -426,14 +426,20 @@ class TemplateExec:
             except: pass
             TemplateExec.__saveDebugInfo(e, tplFilename)
 
-            if e.__class__ == ValueError and e.message.startswith("unsupported format character"):
-                #we add some context information to the error message so that it's easier to see where the unsupported character is
-                problematicIndex = int(e.message[e.message.rfind('index')+6:])
-                e.message = e.message + ". Context: [[ " + str(newTpl[problematicIndex-20:problematicIndex+20]) + " ]]"
-                e.args = [e.message]
+            if e.__class__ == ValueError:
+                try:
+                    message = str(e)
+                    if message.startswith("unsupported format character"):
+                        #we add some context information to the error message so that it's easier to see where the unsupported character is
+                        problematicIndex = int(message[message.rfind('index')+6:])
+                        newMessage = message + ". Context: [[ " + str(newTpl[problematicIndex-20:problematicIndex+20]) + " ]]"
+                        e.message = newMessage
+                        e.args = (newMessage)
+                except Exception:
+                    pass
             raise e
-            
-            
+
+
         #recurrenceLevel -= 1
 
         #if recurrenceLevel == 0 and globals().has_key( '_dictCopy' ): 

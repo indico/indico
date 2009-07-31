@@ -65,6 +65,9 @@ import MaKaC.common.info as info
 
 
 class WPRoomBookingBase( WPMainBase ):
+    
+    def _getTitle(self):
+        return WPMainBase._getTitle(self) + " - " + _("Room Booking")
 
     def getJSFiles(self):
         return [ 'js/prototype/prototype.js',
@@ -169,6 +172,9 @@ class WPRoomBookingSearch4Rooms( WPRoomBookingBase ):
         self._forNewBooking = forNewBooking
         WPRoomBookingBase.__init__( self, rh )
         
+    def _getTitle(self):
+        return WPRoomBookingBase._getTitle(self) + " - " + _("Search for rooms")
+        
     def _setCurrentMenuItem( self ):
         if self._forNewBooking:
             self._bookARoomOpt.setActive(True)
@@ -184,6 +190,9 @@ class WPRoomBookingSearch4Bookings( WPRoomBookingBase ):
     def __init__( self, rh ):
         self._rh = rh
         WPRoomBookingBase.__init__( self, rh )
+        
+    def _getTitle(self):
+        return WPRoomBookingBase._getTitle(self) + " - " + _("Search for bookings")
         
     def _setCurrentMenuItem( self ):
         self._bookingListSearchOpt.setActive(True)
@@ -214,6 +223,12 @@ class WPRoomBookingRoomList( WPRoomBookingBase ):
         self._onlyMy = onlyMy
         WPRoomBookingBase.__init__( self, rh )
         
+    def _getTitle(self):
+        if self._onlyMy:
+            return WPRoomBookingBase._getTitle(self) + " - " + _("My Rooms")
+        else:   
+            return WPRoomBookingBase._getTitle(self) + " - " + _("Found rooms")    
+        
     def _setCurrentMenuItem( self ):
         if self._onlyMy:
             self._myRoomListOpt.setActive(True)
@@ -230,6 +245,20 @@ class WPRoomBookingBookingList( WPRoomBookingBase ):
     def __init__( self, rh, today=False, onlyMy=False, onlyPrebookings=False, onlyMyRooms=False ):
         self._rh = rh
         WPRoomBookingBase.__init__( self, rh )
+        
+    def _getTitle(self):
+        if self._rh._today:
+            return WPRoomBookingBase._getTitle(self) + " - " + _("Calendar")
+        elif self._rh._onlyMy and self._rh._onlyPrebookings:   
+            return WPRoomBookingBase._getTitle(self) + " - " + _("My PRE-bookings")
+        elif self._rh._onlyMy:
+            return WPRoomBookingBase._getTitle(self) + " - " + _("My bookings")
+        elif self._rh._ofMyRooms and self._rh._onlyPrebookings:
+            return WPRoomBookingBase._getTitle(self) + " - " + _("PRE-bookings in my rooms")
+        elif self._rh._ofMyRooms:
+            return WPRoomBookingBase._getTitle(self) + " - " + _("Bookings in my rooms")
+        else:
+            return WPRoomBookingBase._getTitle(self) + " - " + _("Found bookings")
         
     def _setCurrentMenuItem( self ):
         if self._rh._today:
@@ -257,6 +286,9 @@ class WPRoomBookingRoomDetails( WPRoomBookingBase ):
     def __init__( self, rh ):
         self._rh = rh
         WPRoomBookingBase.__init__( self, rh )
+        
+    def _getTitle(self):
+        return WPRoomBookingBase._getTitle(self) + " - " + _("Room Details")    
         
     def _setCurrentMenuItem( self ):
         self._roomSearchOpt.setActive(True)

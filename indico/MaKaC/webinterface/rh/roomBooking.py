@@ -44,7 +44,7 @@ import MaKaC.webinterface.pages.roomBooking as roomBooking_wp
 import MaKaC.webinterface.pages.admins as admins
 from MaKaC.rb_room import RoomBase
 from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum
-from MaKaC.rb_factory import Factory            
+from MaKaC.rb_factory import Factory
 from MaKaC.rb_location import CrossLocationQueries, ReservationGUID, RoomGUID, Location, CrossLocationDB
 from MaKaC.rb_tools import intd, FormMode
 from MaKaC import accessControl
@@ -1319,16 +1319,16 @@ class RHRoomBookingSaveRoom( RHRoomBookingAdminBase ):
     Performs physical INSERT or UPDATE.
     When succeeded redirects to room details, otherwise returns to room form.
     """
-    
+
     def _uploadPhotos( self, candRoom, params ):
         if params.get( "largePhotoPath" ) and params.get( "smallPhotoPath" ):
             candRoom.savePhoto( params["largePhotoPath"] )
             candRoom.saveSmallPhoto( params["smallPhotoPath"] )
-    
+
     def _checkParams( self, params ):
         roomID = params.get( "roomID" )
         roomLocation = params.get( "roomLocation" )
-        
+
         candRoom = None
         if roomID:
             self._formMode = FormMode.MODIF
@@ -1351,7 +1351,7 @@ class RHRoomBookingSaveRoom( RHRoomBookingAdminBase ):
     def _process( self ):
         candRoom = self._candRoom
         params = self._params
-        
+
         errors = self._getErrorsOfRoomCandidate( candRoom )
         if not errors:
             # Succeeded
@@ -1359,13 +1359,16 @@ class RHRoomBookingSaveRoom( RHRoomBookingAdminBase ):
                 candRoom.update()
                 # if responsibleId changed
                 candRoom.notifyAboutResponsibility()
+                url = urlHandlers.UHRoomBookingRoomDetails.getURL(candRoom)
+
             elif self._formMode == FormMode.NEW:
                 candRoom.insert()
                 candRoom.notifyAboutResponsibility()
+                url = urlHandlers.UHRoomBookingAdminLocation.getURL(Location.parse(candRoom.locationName), actionSucceeded = True)
+
             self._uploadPhotos( candRoom, params )
             self._websession.setVar( "actionSucceeded", True )
             self._websession.setVar( "formMode", self._formMode )
-            url = urlHandlers.UHRoomBookingRoomDetails.getURL( candRoom )
             self._redirect( url ) # Redirect to room DETAILS
         else:
             # Failed
@@ -1373,14 +1376,14 @@ class RHRoomBookingSaveRoom( RHRoomBookingAdminBase ):
             self._websession.setVar( "candDataInSession", True )
             self._websession.setVar( "errors", errors )
             self._websession.setVar( "showErrors", True )
-            
+
             self._saveRoomCandidateToSession( candRoom )
             url = urlHandlers.UHRoomBookingRoomForm.getURL( None )
             self._redirect( url ) # Redirect again to FORM
 
 
 class RHRoomBookingDeleteRoom( RHRoomBookingAdminBase ):
-    
+
     def _checkParams( self , params ):
         roomID = params.get( "roomID" )
         roomID = int( roomID )
@@ -1636,6 +1639,11 @@ class RHRoomBookingAdminLocation( RHRoomBookingAdminBase ):
         self._location = Location.parse(name)
         if str(self._location) == "None":
             raise MaKaCError( "%s: Unknown Location" % name )
+
+        if params.get("actionSucceeded", None):
+            self._actionSucceeded = True
+        else:
+            self._actionSucceeded = False
     
     def _process( self ):
         
@@ -1652,7 +1660,7 @@ class RHRoomBookingAdminLocation( RHRoomBookingAdminBase ):
             self._booking_stats = st
             self._totalBookings = st['liveValid'] + st['liveCancelled'] + st['liveRejected'] + st['archivalValid'] + st['archivalCancelled'] + st['archivalRejected']
         
-        return admins.WPRoomBookingAdminLocation( self, self._location ).display()
+        return admins.WPRoomBookingAdminLocation( self, self._location, actionSucceeded = self._actionSucceeded ).display()
 
 
 class RHRoomBookingSetDefaultLocation( RHRoomBookingAdminBase ):

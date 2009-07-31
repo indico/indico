@@ -3,12 +3,20 @@
 <tr>
   <td class="formTitle"><a href="<%=urlHandlers.UHRoomBookingAdmin.getURL()%>">&lt;&lt;Back</a></td>
 </tr>
-
+<% if actionSucceeded: %>
+<tr>
+  <td>
+    <div class="successfulAction">
+    <span class="actionSucceeded"> <%= _("Action succeeded.")%></span>  <%= _("A new room has been added.")%>
+    </div>
+  </td>
+</tr>
+<% end %>
 <tr>
   <td>
 <!-- ==================== General Options ====================== -->
 <!-- =========================================================== -->
-    <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777;">
+    <table style="margin-top: 20px;">
     <tr>
       <td colspan="2" class="groupTitle">Location data</td>
     </tr>
@@ -47,7 +55,7 @@
 
     <br/>
 
-    <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777;">
+    <table>
     <tr>
       <td colspan="2" class="groupTitle">General options</td>
     </tr>
@@ -138,7 +146,7 @@
 <!-- ============== Key Performance Indicators ================= -->
 <!-- =========================================================== -->
     <a name="kpi"></a>
-    <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
+    <table>
     <tr>
       <td colspan="5" class="groupTitle">Key Performance Indicators</td>
     </tr>

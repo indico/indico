@@ -20,7 +20,7 @@
 <tr>
   <td>
     <br />
-    <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
+    <table>
     <tr>
       <td colspan="2" class="groupTitle"><%= _("Manage Locations")%></td>
     </tr>

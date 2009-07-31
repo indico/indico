@@ -59,6 +59,13 @@ type ("UserSearchPopup", ["ExclusivePopup"], {
              }).draw(), criteria.accessor('group'))]]);
     },
 
+    _clearSelections: function(selectedList, selectedDiv) {
+        selectedList.clear();
+        each(selectedDiv, function(elem) {
+            elem.dom.className = 'unselectedUser';
+        });
+    },
+
     draw: function () {
 
         var selectedUserList = new WatchList();
@@ -158,7 +165,11 @@ type ("UserSearchPopup", ["ExclusivePopup"], {
         var toggle = function(userOrGroup, object, element){
             var selectedList = userOrGroup=='user'?
                 selectedUserList:selectedGroupList;
+
             if (!search(selectedList, match(object))) {
+                if (self.onlyOne) {
+                    self._clearSelections(selectedList, selectedDiv);
+                }
                 selectedList.insert(object);
                 element.dom.className = 'selectedUser';
             }
@@ -235,10 +246,11 @@ type ("UserSearchPopup", ["ExclusivePopup"], {
     }
 
 },
-      function(title, process, searchGroups, conferenceId) {
+      function(title, process, searchGroups, conferenceId, onlyOne) {
           var self = this;
 
           this.searchGroups = exists(searchGroups)?searchGroups:false;
+          this.onlyOne = any(onlyOne, false);
 
           this.criteria = new WatchObject();
 

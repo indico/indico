@@ -44,6 +44,9 @@ class WPCalendarBase( WPMainBase ):
         self._cal  = calendar
         self._categ = categ
         self._locTZ = timezoneUtils.DisplayTZ(self._getAW(),None,useServerTZ=1).getDisplayTZ() 
+        
+    def _getTitle(self):
+        return WPMainBase._getTitle(self) + " - " + _("Calendar Overview")    
 
 class WPSimpleCalendarBase( WPNotDecorated ):
     

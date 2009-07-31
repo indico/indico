@@ -1,11 +1,4 @@
-<script type="text/javascript">
-    function submit_room_search4user()
-    {
-        document.forms[0].action = '<%= urlHandlers.UHRoomBookingSearch4Users.getURL() %>'
-        document.forms[0].submit()
-    }
-</script>
-
+<% declareTemplate(newTemplateStyle=True) %>
     <!-- CONTEXT HELP DIVS -->
     <div id="tooltipPool" style="display: none">
         <div id="nameCH" class="tip">
@@ -159,7 +152,7 @@
                                             <td align="left" class="blacktext">
                                                 <input type="hidden" id="responsibleId" name="responsibleId" value="<%= room.responsibleId %>" />
                                                 <input type="text" readonly="readonly" id="responsibleName" name="responsibleName" value="<%= responsibleName %>" />
-                                                <input type="button" value="<%= _('Search') %>" onclick="submit_room_search4user();" />
+                                                <input type="button" value="<%= _('Search') %>" onclick="searchForUsers();" />
                                                 <% contextHelp( 'responsibleCH' ) %>
                                             </td>
                                         </tr>
@@ -269,3 +262,15 @@
                     </tr>
                 </table>
     </form>
+
+<script type="text/javascript">
+  function searchForUsers() {
+    var popup = new UserSearchPopup('Select a responsible',
+                                    function(users) {
+                                    $E('responsibleName').set(users[0].name);
+                                    $E('responsibleId').set(users[0].id);
+                                    }, null, null, true);
+
+    popup.open();
+  }
+</script>
