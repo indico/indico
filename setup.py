@@ -476,7 +476,7 @@ class jsbuild(Command):
         jsCompress()
 
 
-class develop_indico(develop.develop):
+class develop_indico(Command):
     description = "prepares the current directory for Indico development"
     user_options = []
     boolean_options = []
@@ -486,7 +486,7 @@ class develop_indico(develop.develop):
     def finalize_options(self): pass
 
     def run(self):
-        self._updateIndicoConfPathInsideMaKaCConfig(os.path.join(os.path.dirname(__file__), 'indico.conf'), 'indico/MaKaC/common/MaKaCConfig.py')
+        updateIndicoConfPathInsideMaKaCConfig(os.path.join(os.path.dirname(__file__), 'indico.conf'), 'indico/MaKaC/common/MaKaCConfig.py')
         compileAllLanguages()
 
 
@@ -548,5 +548,4 @@ if __name__ == '__main__':
           data_files = getDataFiles(x),
           package_data = {'indico': ['*.*'] },
           include_package_data = True,
-          zip_safe = False,
           )

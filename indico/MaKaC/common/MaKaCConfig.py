@@ -26,7 +26,7 @@ indico_conf = "" # path to indico.conf
 import os
 
 if indico_conf == '': # assume that we are in development mode
-    indico_conf = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'etc', 'indico.conf')
+    indico_conf = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'etc', 'indico.conf.local')
 
 execfile(indico_conf)
 
