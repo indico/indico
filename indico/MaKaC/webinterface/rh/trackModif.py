@@ -215,12 +215,12 @@ class _AccContribTypeFilterField(_TrackAbstractFilterField,abstractFilters.AccCo
         _TrackAbstractFilterField.__init__(self,track,values,showNoValue)
     
     def satisfies(self,abstract):
-        as = tracks.AbstractStatusTrackViewFactory().getStatus( self._track, abstract )
-        if as.__class__ in [tracks._ASTrackViewAccepted,\
+        astv = tracks.AbstractStatusTrackViewFactory().getStatus( self._track, abstract )
+        if astv.__class__ in [tracks._ASTrackViewAccepted,\
                             tracks._ASTrackViewPA]:
-            if as.getContribType() is None or as.getContribType()=="":
+            if astv.getContribType() is None or astv.getContribType()=="":
                 return self._showNoValue
-            return as.getContribType() in self._values
+            return astv.getContribType() in self._values
         else:
             return self._showNoValue
 

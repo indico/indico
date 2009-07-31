@@ -1,29 +1,32 @@
 import os, sys
 
-compiler="msgfmt"
+# Accepts --quiet and --basedir somedir
 
-# If --quiet is set we should not produce any output. This is used in code/setup.py
-output = True
-if '--quiet' in sys.argv or '-q' in sys.argv:
-    output = False
+debug = ('--quiet' in sys.argv or '-q' in sys.argv)
+
+if '--basedir' in sys.argv:
+    basedir = sys.argv['--basedir']
+else:
+    basedir = os.getcwd()
     
-if output:
+if debug:
     print "Compiling .po files:"
 
-pwd = os.getcwd()
+prevdir = os.getcwd()
     
-for root, dir, files in os.walk(pwd):
+for root, dir, files in os.walk(basedir):
     if root.endswith("LC_MESSAGES"):
         try:
             os.chdir(root)
-            os.system("%s messages.po -o messages.mo" % (compiler))
-            if output:
+            os.system("msgfmt messages.po -o messages.mo")
+            if debug:
                 print "Compiled " + os.path.join(root,"messages.po")
             
         except Exception, e:
-            if output:
+            if debug:
                 print "[lang=%s] %s" % (root, e)
-        os.chdir(pwd)
 
-if output:
+os.chdir(prevdir)
+
+if debug:
     print "Finished compiling .po files"

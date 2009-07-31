@@ -768,7 +768,7 @@ class ConferenceReview(Persistent):
         """
         
         cfg = Config.getInstance()
-        tempPath = cfg.getUploadedFilesPath()
+        tempPath = cfg.getUploadedFilesTempDir()
         tempFileName = tempfile.mkstemp( suffix="MaKaC.tmp", dir = tempPath )[1]
         f = open( tempFileName, "wb" )
         f.write( fd.read() )

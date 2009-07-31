@@ -32,16 +32,20 @@ from ZODB.DB import DB
 import transaction
 import ZODB
 
-from MaKaC.i18n import _
+try:
+    import setup
+    skip_imports = setup.INDICO_INSTALL
+except Exception:
+    skip_imports = False
 
-from MaKaC.common.logger import Logger
-
-import Configuration
+if not skip_imports:
+    from MaKaC.common.logger import Logger
+    from MaKaC.i18n import _
 
 class MaKaCDB(DB):
     """Subclass of ZODB.DB necessary to remove possible existing dependencies
         from IC"""
-    
+
     def classFactory(self, connection, modulename, globalname):
         if globalname=="PersistentMapping":
             modulename="persistent.mapping"
@@ -50,29 +54,30 @@ class MaKaCDB(DB):
         elif modulename.startswith("IndexedCatalog.BTrees."):
             modulename="BTrees.%s"%modulename[22:]
         return DB.classFactory(self, connection, modulename, globalname)
-    
+
 
 
 class DBMgr:
     """This class provides the access point to the Shelf (every client will
-        use this class in order to obtain a shelf) and some mechanism to 
+        use this class in order to obtain a shelf) and some mechanism to
         ensure there is only one connection opened to the DB during a single
-        request. 
-        This class must not be instantiated, an instance can be obtained 
+        request.
+        This class must not be instantiated, an instance can be obtained
         though the "getInstance" method (implements the singleton pattern
         to ensure unicity)
-        Needs to be checked if the class (static) attribute _instance is 
+        Needs to be checked if the class (static) attribute _instance is
         thread-safe: as it is shared by all the objects of this class,
         it could provoke concurrency troubles having 2 threads using the db
-        connection at the same time. However, the model under which we are 
-        programming is not multi-threaded (mod_python seems to run different 
-        interpreters for each apache subprocess, see mod_python doc section 
-        4.1) so this thechnique can be used. This has to be taken into account 
+        connection at the same time. However, the model under which we are
+        programming is not multi-threaded (mod_python seems to run different
+        interpreters for each apache subprocess, see mod_python doc section
+        4.1) so this thechnique can be used. This has to be taken into account
         when migrating the system to a multi-threading environment.
     """
     _instance = None
 
     def __init__( self ):
+        import Configuration # Please leave this import here, db.py is imported during installation process
         cfg = Configuration.Config.getInstance()
         self._storage=ClientStorage(cfg.getDBConnectionParams(), username=cfg.getDBUserName(), password=cfg.getDBPassword(), realm=cfg.getDBRealm())
         self._db=MaKaCDB(self._storage)
@@ -94,18 +99,18 @@ class DBMgr:
     def _delConnObject(self):
         tid=threading._get_ident()
         del self._conn[tid]
-    
+
     def startRequest( self ):
         """Initialise the DB and starts a new transaction.
         """
-        
+
         conn = self._getConnObject()
         if conn is None:
             self._conn[threading._get_ident()]=self._db.open()
             Logger.get('dbmgr').debug('Allocated connection for thread %s - table size is %s' % (threading._get_ident(), len(self._conn)))
         else:
             Logger.get('dbmgr').debug('Reused connection for thread %s - table size is %s' % (threading._get_ident(), len(self._conn)))
-        
+
     def endRequest( self, commit=True ):
         """Closes the DB and commits changes.
         """
@@ -113,7 +118,7 @@ class DBMgr:
             self.commit()
         else:
             self.abort()
-            
+
         #modification vendredi 010907
 #        try:
 #            self._conn.close()
@@ -129,7 +134,7 @@ class DBMgr:
         if conn == None:
             raise Exception( _("request not started"))
         return conn
-    
+
     def isConnected( self ):
         if self._getConnObject() == None:
             return False
@@ -150,7 +155,7 @@ class DBMgr:
             transaction.savepoint()
         else:
             transaction.commit()
-            
+
     def commitZODBOld(self, sub=False):
             transaction.commit(sub)
 
@@ -177,7 +182,7 @@ class DBMgr:
 
     def loadObject(self, oid, version):
         return self._storage.load(oid, version)
-   
+
     def storeObject(self, oid, serial, data, version, trans):
         return self._storage.store(oid, serial, data, version, trans)
 

@@ -98,7 +98,7 @@ class RHCategoryPerformModification( RHCategModifBase ):
 
     def _getNewTempFile( self ):
         cfg = Config.getInstance()
-        tempPath = cfg.getUploadedFilesPath()
+        tempPath = cfg.getUploadedFilesTempDir()
         tempFileName = tempfile.mkstemp( suffix="Indico.tmp", dir = tempPath )[1]
         return tempFileName
     

@@ -85,7 +85,7 @@ class MaterialLocalRepository(Persistent):
     def __getRepositoryPath( self ):
         from MaKaC.common.Configuration import Config
         cfg = Config.getInstance()
-        return cfg.getArchivePath()
+        return cfg.getArchiveDir()
     
     def getRepositoryPath( self ):
         return self.__getRepositoryPath()
@@ -257,7 +257,7 @@ class LocalRepository(Persistent):
     def __getRepositoryPath( self ):
         from MaKaC.common.Configuration import Config
         cfg = Config.getInstance()
-        return cfg.getArchivePath()
+        return cfg.getArchiveDir()
 
     def getFilePath( self, id ):
         # this os.path.split is to be removed, just to keep compatibility with
@@ -328,7 +328,7 @@ class SimpleRepository:
     def getRepositoryPath( self ):
         from MaKaC.common.Configuration import Config
         cfg = Config.getInstance()
-        return cfg.getArchivePath()
+        return cfg.getArchiveDir()
         
     def getFullPath( self, relativePath ):
         return os.path.join( self.getRepositoryPath(), relativePath )

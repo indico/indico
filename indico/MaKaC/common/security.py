@@ -29,7 +29,7 @@ from MaKaC.webinterface.common.tools import scriptDetection, escape_html, restri
 base module for HTML security
 """
 
-def sanitaryCheck(target, params, accessWrapper):
+def sanitizationCheck(target, params, accessWrapper):
     # first make sure all params are utf-8
     for param in params.keys():
         if isinstance(params[param], str) and params[param] != "":
@@ -49,15 +49,17 @@ def sanitaryCheck(target, params, accessWrapper):
     # then check the security level of data sent to the server
     # if no user logged in, then no html allowed
     if accessWrapper.getUser():
-        level = Config.getInstance().getSanitaryLevel()
+        level = Config.getInstance().getSanitizationLevel()
     elif target and hasattr(target, "canModify") and target.canModify(accessWrapper):
-        #not logged user, but use a modification key
-        level = Config.getInstance().getSanitaryLevel()
+        # not logged user, but use a modification key
+        level = Config.getInstance().getSanitizationLevel()
     else:
-        level = "0"
+        level = 0
 
-    if level == "0":
-        #level 0
+    if level not in range(4):
+        level = 1
+
+    if level == 0:
         #Escape all HTML tags
         for param in params.keys():
             if isinstance(params[param], str):
@@ -69,12 +71,29 @@ def sanitaryCheck(target, params, accessWrapper):
                     item = params[param][i]
                     if isinstance(item, str):
                         params[param][i] = escape_html(item)
-    elif level == "3":
-        #level 3
-        #No check
-        return
-    elif level == "2":
-        #level 2
+
+    # raise error if form or iframe tags are used
+    elif level == 1:
+        #level 1 or default
+        #raise error if script or style detected
+        ret = None
+        for param in params.keys():
+            if isinstance(params[param], str):
+                ret = scriptDetection(params[param])
+                if not restrictedHTML(params[param]):
+                    raise htmlForbiddenTag(params[param])
+            elif isinstance(params[param], list):
+                for item in params[param]:
+                    if isinstance(item, str):
+                        ret = scriptDetection(item)
+                        if ret:
+                            raise htmlScriptError(item)
+                        if not restrictedHTML(item):
+                            raise htmlForbiddenTag(item)
+            if ret:
+                raise htmlScriptError(params[param])
+
+    elif level == 2:
         #raise error if script but style accepted
         ret = None
         for param in params.keys():
@@ -94,24 +113,8 @@ def sanitaryCheck(target, params, accessWrapper):
                         ret = restrictedHTML(item)
                         if not ret:
                             raise htmlForbiddenTag(item)
-        #raise error if form or iframe tags are used
 
-    else:
-        #level 1 or default
-        #raise error if script or style detected
-        ret = None
-        for param in params.keys():
-            if isinstance(params[param], str):
-                ret = scriptDetection(params[param])
-                if not restrictedHTML(params[param]):
-                    raise htmlForbiddenTag(params[param])
-            elif isinstance(params[param], list):
-                for item in params[param]:
-                    if isinstance(item, str):
-                        ret = scriptDetection(item)
-                        if ret:
-                            raise htmlScriptError(item)
-                        if not restrictedHTML(item):
-                            raise htmlForbiddenTag(item)
-            if ret:
-                raise htmlScriptError(params[param])
+
+    elif level == 3:
+        # Absolutely no checks
+        return

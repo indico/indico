@@ -686,9 +686,9 @@ class OAIResponse:
         
         ## OAI config variables    
         
-        self.nb_records_in_resume     = self._config.getNb_records_in_resume()
-        self.nb_identifiers_in_resume = self._config.getNb_identifiers_in_resume()
-        self.oai_rt_expire            = self._config.getOai_rt_expire()
+        self.nb_records_in_resume     = self._config.getNbRecordsInResume()
+        self.nb_identifiers_in_resume = self._config.getNbIdentifiersInResume()
+        self.oai_rt_expire            = self._config.getOAIRtExpire()
         self.runtimelogdir            = self._config.getTempDir() #Directory where the data for resuptio token are stocked
 
     def print_oai_header(self,verb,params={}):

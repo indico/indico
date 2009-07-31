@@ -715,8 +715,6 @@ class WFooter(WTemplated):
         
         if not vars.has_key("shortURL"):
             vars["shortURL"] = ""
-            
-        #vars["footer"] = Configuration.Config.getInstance().getIndicoFooter()
         
         return vars
     

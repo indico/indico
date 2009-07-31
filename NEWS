@@ -2,7 +2,7 @@
 ---------------------------------
 
 [NEWS]
-- (Jose-17.03.2009) allow de use of html entities in reportlab PDFs
+- (Jose-17.03.2009) allow the use of html entities in reportlab PDFs
 - (Jose-27.02.2009) Added the choice to make mandatory or not track selection in abstract submission.
 - (Jose-26.02.2009) Allowing the usage of HTML in abstracts.
 - (Jose-11.02.2009) RoomBooking: if we search for one room booking, we use the simple calendar instead of multi rooms calendar.
@@ -556,4 +556,3 @@ pferreir@pcituds01 /tmp/indico-git $ less CHANGES_PROD
    o Possibility to use '*' to list all the groups/users from the administration area.
    o Improved display for minutes.
    o Added name of the event creator in the management area interface. 
-

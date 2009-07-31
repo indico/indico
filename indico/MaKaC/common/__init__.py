@@ -19,7 +19,17 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from db import DBMgr
-from info import HelperMaKaCInfo
-from url import URL,MailtoURL
-from Configuration import Config
+# We load Configuration from setup.py which in turns loads this (although it
+# is not needed). If we still don't have the dependencies installed this will
+# crash and that's why we selectively install them or not.
+try:
+    import setup
+    skip_imports = setup.INDICO_INSTALL
+except Exception:
+    skip_imports = False
+
+if not skip_imports:
+    from db import DBMgr
+    from info import HelperMaKaCInfo
+    from url import URL,MailtoURL
+    from Configuration import Config

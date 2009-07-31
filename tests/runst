@@ -1,0 +1,27 @@
+#!/usr/bin/env python
+import os
+import sys
+import unittest
+import tempfile
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print '''
+    Usage: %s <testFile.py>
+''' % sys.argv[0]
+        sys.exit()
+
+    contents = '''
+import sys
+sys.path = ['.', 'indico'] + sys.path
+%s
+if __name__ == '__main__':
+    unittest.main()
+''' % file(sys.argv[1]).read()
+
+    fname = tempfile.mktemp()
+    open(fname, 'w').write(contents)
+    try:
+        os.system('%s %s' % (sys.executable, fname))
+    finally:
+        os.unlink(fname)

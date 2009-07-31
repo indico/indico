@@ -29,6 +29,14 @@ is properly set.
 import os.path
 import unittest
 import sys
+import glob
+import re
+import sys
+
+try:
+    import xmlrunner
+except:
+    pass
 
 # The following tests are outdated and need to be fixed before they can be run  
 INVALID_TESTS = ('__init__', 'test', 'testCategories', 'testCFA', 'testConferences', 'testContributions', 'testFileSubmission', 'testSchedule', 'testSciProgramme', 'testSessions', 'testWebInterface', 'rpc', 'jslint')
@@ -48,5 +56,9 @@ def suite():
 
 
 if __name__ == '__main__':
-    sys.path = ['.'] + sys.path
-    unittest.TextTestRunner(verbosity=2).run(suite())
+    sys.path = ['.', os.path.join('indico'), os.path.join('..', 'indico')] + sys.path
+    try:
+        xmlrunner.XMLTestRunner(output='test-reports').run(suite())
+    except:
+        print 'No unittest-xml-reporting package detected, using TextTestRunner..'
+        unittest.TextTestRunner(verbosity=2).run(suite())

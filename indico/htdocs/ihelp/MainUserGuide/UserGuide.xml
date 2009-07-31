@@ -1,0 +1,2588 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<book lang="en">
+  <bookinfo>
+	<title>
+      <inlinegraphic fileref="UserGuidePics/logo.png"/>Indico User Guide
+    </title>
+    <corpauthor>CERN</corpauthor>
+  </bookinfo>
+
+<chapter id='Categs'>
+  	<title>Categories</title>
+	<sect1 id='categ'>
+      		<title>Category</title>
+	      	<para>
+			A category is a means to group your events or other categories together. In Indico 'Home' is the top level category in which you start from. 			Inside a category you can add events or other subcategories, set access rights to say who can access or modify, re-allocate the sub-				categories, remove the sub-categories and also delete the current category and everything it has inside it.
+			These features are accessible through 'modify' (if you have modification rights) on the Tools menu inside the category. You will then be in 			the Management Area for Category.
+		</para>
+	</sect1>
+
+	<sect1 id='createcateg'>
+		<title>Creating a Category</title>
+		<para>
+			From the Management Area you can create a new category you will need to have an administrators account or be listed in the modification list 			<link linkend="categac">(See Access Control)</link> for the category. Inside the main tab <link linkend="categmain">(See Main)</link> in the 			management area you have the option to 'add sub-category' from there you will need to fill in details for the new category. Your new 				category will then be created.
+		</para>
+		<graphic fileref="UserGuidePics/categ1.png"/>
+	</sect1>
+
+	<sect1 id='categmanagement'>
+		<title>Category Management Area</title>
+		<sect2 id='categmain'>
+			<title>Main</title>
+			<para>
+				From the main tab in the Category Management Area:
+			</para>
+		      	<graphic fileref="UserGuidePics/categ2.png"/>
+			<para>
+				You can modify the details of the category; including the default styles for meetings and lectures within the category <link 					linkend="meeting">(See Meetings </link>or <link linkend="lecture">Lectures)</link>. You can also add, remove and re-allocate events 				or sub categories.
+			</para>
+		</sect2>
+
+		<sect2 id='categac'>
+			<title>Access Control</title>
+			<para>
+				From the management area you can protect your category using the 3 controls for access levels:
+				Modification Control, Access Control and Domain Control. You can add Users or Groups to the Modification and Access Control lists.
+			</para>
+			<graphic fileref="UserGuidePics/categ3.png"/>
+			<para>
+				<emphasis>Modification Control</emphasis>Category Managers can be added to a category to allow access to the management area for 				modification. Category managers are either those listed in the modification control list, or administrators. The creator of a 					category will be able to modify it without be listed.
+			</para>
+			<para>
+				<emphasis>Access Control</emphasis> A category can be public or private;
+				Public: Any body can view a public category and any user can add events to it. However users will only be able to see the events 					inside the category to which they have access to.
+				Private: Only those users in the access list or administrators can access the category and add events. When a Category is made 					private, the option for domain control is omitted and any event or category made inside will also be private. The category will be 				displayed with "(protected)" after its name to show it is private.
+			</para>
+			<para>
+				<emphasis>Domain Control</emphasis> - Access to a category can be defined by IP addresses in a domain. A domain needs to be created 				from the Admin tab of the Tools menu before you can add them to the access list.
+			</para>
+		</sect2>
+
+		<sect2 id='categconfcreat'>
+			<title>Conference Creation Tool</title>
+			<para>
+				In categories other than 'Home' you have a tab called 'Conference Creation Tool', from here you can restrict who is able to add 					events to the category. If you restrict it then you need to add users to the list to allow them to add events.
+			</para>
+			<graphic fileref="UserGuidePics/categ4.png"/>
+		</sect2>
+
+		<sect2 id='categmodif'>
+			<title>Detail Modification &amp; Sub-Category/Event Organisation</title>
+			<para>
+				The details of a Category can be modified and sub categories can be organised from the main tab in the management area.
+				Details can be modified by clicking on modify inside the main tab.
+				Sub-categories and events can be organised in the particular order you wish to view them by using the order drop down box next to 					each sub-category.
+			</para>
+			<graphic fileref="UserGuidePics/categ5.png"/>
+			<para>
+				You can re-allocate a sub-category or event by selecting the one you wish to move using the tick box and clicking on re-allocate, you 				will then be asked where you would like to reallocate this sub-category/event to. To remove a sub-category or an  and anything it 					contains or an event select it and click remove, if it contains anything you will be asked if you are sure you want to delete.
+			</para>
+		</sect2>
+
+		<sect2 id='categdel'>
+			<title>Deleting a Category</title>
+			<para>
+				To delete the current category you are in you can go to the Tools tab in the management area and select 'Delete this category' you 				will be asked to confirm the deletion first.
+			</para>
+		</sect2>
+	</sect1>
+</chapter>
+
+<chapter id='Conferences'>
+	<title>Conferences</title>
+	<sect1 id='conf'>
+		<title>Conference</title>
+		<para> <inlinegraphic fileref="UserGuidePics/conf1.png"/>
+			A conference is the most comprehensive event in Indico. You can create tracks in which you can call for abstracts to be submitted; these 				abstracts can then be accepted and become contributions in your conference. A timetable can be created which can include many sessions; 				these sessions can be split into slots if you need to further divide the session. The sessions and slots can contain contributions or you 			can directly have a contribution in the timetable. Contributions can have sub contributions. Material for example papers can be added to 				these contributions, sub contributions, sessions and directly to the conference.
+		</para>
+	</sect1>
+
+	<sect1 id='creatconf'>
+		<title>Creating a Conference</title>
+		<para>
+			If a category is public or you have access rights to it you can create a conference in this category. To do this click on 'Conference' under 			Add Event you will be presented with a form in which you need to fill with the details of the conference you wish to create. Once this 				is done your conference will be created. The creator of this conference will by default have modification rights to it and is referred to as 			a Conference Manager as is anyone else listed in the modification access control list.
+		</para>
+		<blockquote>
+			<para>
+			<inlinegraphic fileref="UserGuidePics/conf2.png"/>To access the Management Area of a conference you need to click on the modification icon 			next to the Conference Name.
+			</para>
+		</blockquote>
+	</sect1>
+
+	<sect1 id='setupconf'>
+		<title>Setting up a Conference</title>
+		<para>
+			Once your conference is created the Conference Manager can start setting up the conference from the Management Area -
+		</para>
+		<itemizedlist>
+			<listitem>
+			<para>
+				Set up your Access Control to restrict or allow users the rights to access or modify the conference.<link linkend="confac">(See 					Access Control Management)</link>.
+			</para>
+			</listitem>
+
+			<listitem>
+			<para>
+				Start adding Tracks to your conference to define areas to help with organisation, a Track Manager can be assigned to each track to 				co-ordinate which abstracts to accept into these tracks <link linkend="progmange">(See Program Management)</link>.
+			</para>
+			</listitem>
+
+			<listitem>
+			<para>
+				Start calling for abstracts. Abstracts are proposed contributions to your conference. By default when you first create a conference 				calling for Abstracts is disabled. You can enable this in 'Abstracts' <link linkend="abstractmngt">(See Abstracts Management)</link>
+			</para>
+			</listitem>
+
+			<listitem>
+			<para>
+				Start looking at which submitted Abstracts you wish to accept into your conference, they will then become contributions <link 					linkend="contribmngt">(see Contributions Management)</link>.
+			</para>
+			</listitem>
+
+			<listitem>
+			<para>
+				Start setting up a Timetable to organise what will be happening where and what contributions, materials etc will be included
+				<link linkend="timetable">(See Timetable Management)</link>.
+			</para>
+			</listitem>
+
+			<listitem>
+			<para>
+				Look at customising the look of your conference when users come to view it 	<link linkend="dispmngt">(See Display Management)</link>
+			</para>
+			</listitem>
+
+			<listitem>
+			<para>
+				If those that will attend your conference need to register and give details concerning their needs while at the conference, you can 				set up a registration Form 	<link linkend="regist">(See Registration Management)</link>
+			</para>
+			</listitem>
+
+			<listitem>
+			<para>
+				There are options to make offline versions of your conference, to clone your conference and to perform other tasks on the whole of 				your conference once you have one set up. <link linkend="conftools">(See Conference Tools)</link>.
+			</para>
+			</listitem>
+		</itemizedlist>
+	</sect1>
+
+	<sect1 id='confmanage'>
+		<title>Conference Management Area</title>
+		<para>
+			The Management Area allows you to control the different parts of your conference the following sections will show each area of the 				Conference Management.
+		</para>
+		<para>
+			The frames surrounding each management area, give you access to either the modification area above or to a display of that area.
+		</para>
+			<graphic fileref="UserGuidePics/confma.png"/>
+		<para>
+			Clicking on the left hand icon <inlinegraphic fileref="UserGuidePics/meetma2.png"/> will take you to the Display area for the 					area you are on, e.g. contribution <link linkend="contdisp">(See Contribution Diplay)</link>.
+		</para>
+		<para>
+			Clicking on the name of the event or contribution etc will take you directly to the management area for the event / contribution.
+		</para>
+
+		<sect2 id='confmain'>
+			<title>Main Management</title>
+			<para>
+				From within the Main Tab you can (Some parts of the screen may not be visible in the pictures):
+			</para>
+			<graphic fileref="UserGuidePics/confm3.png"/>
+			<itemizedlist>
+				<listitem>
+				<para>
+ 					Modify the general information of the conference, e.g. name, Description, dates etc. The Support email if you supply one  will 					be the support email linked from the bottom of the Display Menu , in the Conference Display Area <link linkend="confdisp">(See					Conference Display)</link>.
+				</para>
+				</listitem>
+			</itemizedlist>
+			<graphic fileref="UserGuidePics/confm4.png"/>
+
+			<itemizedlist>
+				<listitem>
+				<para>
+					Add or remove chairpersons to/from the conference
+				</para>
+				</listitem>
+
+				<listitem>
+				<para>
+					Add or remove Material <link linkend="material">(See Material)</link>
+				</para>
+				</listitem>
+
+				<listitem>
+				<para>
+					Create a type of contribution for your conference, for example, oral presentation. This contribution type can be chosen for any 					abstracts or contributions added to the conference.
+				</para>
+				</listitem>
+
+				<listitem>
+				<para>
+					Close the conference from the status area which means it is over, it cannot be accessed by anyone once it has been closed.
+				</para>
+				</listitem>
+			</itemizedlist>
+		</sect2>
+
+		<sect2 id='progmange'>
+			<title>Program Management</title>
+			<para>
+				From the program tab you can add / remove tracks and access each of the tracks <link linkend="tracks">(See Tracks below)</link>
+			</para>
+			<graphic fileref="UserGuidePics/confm5.png"/>
+
+			<sect3 id='tracks'>
+				<title>Tracks</title>
+				<para>
+					Tracks are parts of the conference in which abstracts and contributions can belong to.
+					Inside those tracks you can do the following things:
+				</para>
+				<itemizedlist>
+					<listitem>
+					<para>
+						Main - Modify the Code; a code can be used if you prefer to use codes as apposed to using long titles. The Title and the 						description can also be modified.
+					</para>
+					</listitem>
+				</itemizedlist>
+				<graphic fileref="UserGuidePics/confm6.png"/>
+
+				<itemizedlist>
+					<listitem>
+					<para>
+						Coordination Control - Assign 'Track Manager(s)' to the track who can decide what is accepted into their track.
+						A Track Manager does not have modification access to the rest of the conference, they have access only to the 							modification of their Track.
+					</para>
+					</listitem>
+				</itemizedlist>
+				<graphic fileref="UserGuidePics/confm7.png"/>
+
+				<itemizedlist>
+					<listitem>
+					<para>
+						Abstracts - Show any abstracts which have been submitted into the track, the Track manager can then propose to accept or 						reject it. Only the Conference Manager can have the final say in whether an abstract is accepted / rejected. <link 							linkend="abstractmngt">(See Abstracts Management)</link>
+					</para>
+					</listitem>
+
+					<listitem>
+					<para>
+						Contributions - Show any contributions that belong to that track <link linkend="contribs">(See Contributions)</link>
+					</para>
+					</listitem>
+				</itemizedlist>
+			</sect3>
+		</sect2>
+
+		<sect2 id='contribmngt'>
+			<title>Contribution Management</title>
+			<para>
+				The Contributions Tab shows all the contributions in the conference these may have come from either accepted abstracts or added by 				the conference mangers.
+			</para>
+			<graphic fileref="UserGuidePics/confm8.png"/>
+			<para>
+				From the contributions tab you can:
+			</para>
+			<itemizedlist>
+				<listitem>
+				<para>
+					Create new contributions
+				</para>
+				</listitem>
+
+				<listitem>
+				<para>
+					Access Contributions <link linkend="contribs">(See Contributions)</link>.
+				</para>
+				</listitem>
+
+				<listitem>
+				<para>
+					Search for certain contributions
+				</para>
+				</listitem>
+
+				<listitem>
+				<para>
+					Move contributions
+				</para>
+				</listitem>
+
+				<listitem>
+				<para>
+					Create a PDF of contributions
+				</para>
+				</listitem>
+
+				<listitem>
+				<para>
+					Show the authors of contributions
+				</para>
+				</listitem>
+
+				<listitem>
+				<para>
+					Create a zip file of material from contributions
+				</para>
+				</listitem>
+
+				<listitem>
+				<para>
+					Create a zip file of all the proceedings.
+				</para>
+				</listitem>
+			</itemizedlist>
+
+			<sect3 id='contribs'>
+				<title>Contributions</title>
+				<para>
+					Each contribution has its own management area, (Some parts of the screen may not be visible in the pictures).
+				</para>
+				<para>
+					From inside the Main tab you can:
+				</para>
+				<graphic fileref="UserGuidePics/confm9.png"/>
+				<itemizedlist>
+					<listitem>
+					<para>
+						Modify the main details of the contribution for example, name, duration etc.
+					</para>
+					</listitem>
+
+					<listitem>
+					<para>
+						Change which track this contribution is assigned to.
+					</para>
+					</listitem>
+
+					<listitem>
+					<para>
+						Change which session this contributions is included in <link linkend="timetable">(See Timetable Management)</link>.
+					</para>
+					</listitem>
+
+					<listitem>
+					<para>
+						Add / change authors and co-authors.
+					</para>
+					</listitem>
+
+					<listitem>
+					<para>
+						Add / change the presenters of the contribution.
+					</para>
+					</listitem>
+
+					<listitem>
+					<para>
+						Add Material to the contribution and access the material <link linkend="material">(see material)</link>.
+					</para>
+					</listitem>
+
+					<listitem>
+					<para>
+						Withdraw the contribution from the Conference.
+					</para>
+					</listitem>
+				</itemizedlist>
+				<para>
+					From the subcontributions Tab you can:
+				</para>
+				<graphic fileref="UserGuidePics/confm10.png"/>
+				<itemizedlist>
+					<listitem>
+					<para>
+						Add / Remove a sub contribution.
+					</para>
+					</listitem>
+
+					<listitem>
+					<para>
+						Change the order of sub contributions by using the drop down priorities.
+					</para>
+					</listitem>
+
+					<listitem>
+					<para>
+						Access each sub contribution <link linkend="subcontribs">(See sub-contributions)</link>.
+					</para>
+					</listitem>
+				</itemizedlist>
+
+				<para>
+					From the Access Control Tab you can:
+				</para>
+				<graphic fileref="UserGuidePics/confm11.png"/>
+				<itemizedlist>
+					<listitem>
+					<para>
+						List the users that can submit material into the contributions <link linkend="material">(See Material)</link>.
+					</para>
+					</listitem>
+
+					<listitem>
+					<para>
+						List the users that can Modify the contributions
+					</para>
+					</listitem>
+
+					<listitem>
+					<para>
+						Make the contribution Public or Private: <emphasis>Public:</emphasis> Any user can view the contributions. <emphasis>						Private:</emphasis> Only users listed in the access / modification / submission control can access the contribution.
+					</para>
+					</listitem>
+
+					<listitem>
+					<para>
+						List the domains that can access the contribution (only available if contribution is public)
+					</para>
+					</listitem>
+				</itemizedlist>
+				<para>
+					From the Tools tab you can:
+				</para>
+				<graphic fileref="UserGuidePics/confm12.png"/>
+					<itemizedlist>
+					<listitem>
+					<para>
+						Delete the Contribution
+					</para>
+					</listitem>
+
+					<listitem>
+					<para>
+						Move the Contribution
+					</para>
+					</listitem>
+
+					<listitem>
+					<para>
+						Write the minutes for the contribution, these will be attached to the material for the contribution <link 								linkend="material">(see Material)</link>.
+					</para>
+					</listitem>
+				</itemizedlist>
+			</sect3>
+			<sect3 id='subcontribs'>
+				<title>Sub Contributions</title>
+				<para>
+					Sub Contributions can be added to contributions to organise the contribution further.
+				</para>
+				<graphic fileref="UserGuidePics/confm13.png"/>
+				<para>
+					From inside each sub contribution you can modify the general details, add or remove presenters and attach material the same as 					you can for contributions. From the Tools tab in a sub contribution you can delete that sub contribution or write the minutes 					for it, these will be attached to the material for the sub contribution.
+				</para>
+			</sect3>
+			<sect3 id='material'>
+				<title>Material</title>
+				<para>
+					Material can be submitted by a user once their abstract has been accepted and made into a contribution. Material can also be 					added by the Conference Manager into the conference directly, or into a contribution or sub contribution. From inside a 						contribution, you can add - General Material, Slides, Videos, Minutes or Papers.
+				</para>
+				<graphic fileref="UserGuidePics/meet19.png"/>
+				<para>
+					Within each of those types you can add files or URL links as the resources for these materials, you can also modify the 		               		general details for the material.
+				</para>
+				<graphic fileref="UserGuidePics/confm14.png"/>
+				<para>
+					When you add a paper, the main resource for that paper will show in the proceedings document you can create from the 						contributions tab in the conference. For each material access rights can be set, from inside access control you can list those 					users that can view the material.
+				</para>
+			</sect3>
+		</sect2>
+
+
+		<sect2 id='abstractmngt'>
+			<title>Abstracts Management</title>
+			<para>
+				The abstracts Management in Indico is in three parts - Calling for Abstracts, the Abstracts themselves and the Book of Abstracts.
+			</para>
+
+			<sect3 id='callabs'>
+				<title>Calling for Abstracts</title>
+				<para>
+					The call for abstracts needs to be enabled first from the 'Call for Abstracts' tab. From here you can set the submission dates 					and the deadline for any abstract submissions. You can also add any announcements. If you want to allow any users to make 						submissions after the deadline you can give those users access to do so.
+				</para>
+				<graphic fileref="UserGuidePics/confm15.png"/>
+
+				<sect4 id='notiftemplate'>
+					<title>Notification Template</title>
+					<para>
+						When a user submits an abstract they will receive an email letting them know the abstract has been submitted 								successfully. You can customise this email by adding your own Notification Template. If you do not create a notification 						template a default email will be sent. You can include in this template information about the conference or the abstract 						for example the conference title, to do this insert <screen>%(conference_title)s</screen> in place of where you would 						like the conference title to be. The tags available to put in your template are listed in the 'Available Tags' box.
+					</para>
+					<graphic fileref="UserGuidePics/confm16.png"/>
+				</sect4>
+			</sect3>
+
+			<sect3 id='abstab'>
+				<title>Abstracts Tab</title>
+				<para>
+					The Abstracts tab shows all the Abstracts that have been submitted to the conference:
+				</para>
+				<graphic fileref="UserGuidePics/confm17.png"/>
+				<para>
+					From the abstracts tab you can add new abstracts, create PDFs of the abstracts, create an XML file of abstracts and get the 					authors list. You can also access each abstract; an abstract can be in one of 10 states:
+				</para>
+
+				<informaltable frame='none'>
+					<tgroup cols='3'>
+					<tbody>
+					<row>
+						<entry><inlinegraphic fileref="UserGuidePics/ab1.png"/>Accepted</entry>
+						<entry><inlinegraphic fileref="UserGuidePics/ab2.png"/>Rejected</entry>
+						<entry><inlinegraphic fileref="UserGuidePics/ab3.png"/>Proposed Rejection</entry>
+					</row>
+					<row>
+						<entry><inlinegraphic fileref="UserGuidePics/ab4.png"/>Withdrawn</entry>
+						<entry><inlinegraphic fileref="UserGuidePics/ab5.png"/>Merged</entry>
+						<entry><inlinegraphic fileref="UserGuidePics/ab6.png"/>Submitted</entry>
+					</row>
+					<row>
+						<entry><inlinegraphic fileref="UserGuidePics/ab7.png"/>Under Review</entry>
+						<entry><inlinegraphic fileref="UserGuidePics/ab8.png"/>Duplicated</entry>													<entry><inlinegraphic fileref="UserGuidePics/ab9.png"/>Proposed Acception</entry>
+					</row>
+					<row>
+						<entry><inlinegraphic fileref="UserGuidePics/ab10.png"/>Conflict</entry>
+					</row>
+					</tbody>
+					</tgroup>
+				</informaltable>
+			</sect3>
+
+			<sect3 id='abs'>
+				<title>Abstracts</title>
+				<para>
+					An abstract is can be either submitted by a user or manually added by a track manager. Once a abstract is accepted it is 						automatically changed into a contribution and added to the contributions list in the conference<link linkend="contribmngt">						(See Contribution Management)</link>.
+				</para>
+				<graphic fileref="UserGuidePics/confm18.png"/>
+				<para>
+					The Conference manager from inside Abstract Management can change the status for example by accepting it or marking it as a 					duplicate.
+				</para>
+				<para>
+					The main details of the abstract can be modified and the track to which it is associated with can be changed as well as the 					user that submitted it. Any comments made by the Track Manager or Conference Manager while changing the status of the abstract 					can be viewed from 'Track judgement'
+				</para>
+				<graphic fileref="UserGuidePics/confm19.png"/>
+				<para>
+					Internal comments can be made, and a notification log can also be viewed from inside the abstract management.
+				</para>
+			</sect3>
+
+			<sect3 id='bookabs'>
+				<title>Book of Abstracts</title>
+				<para>
+					The 'Book of Abstracts' tab lets you add any additional comments that you would like to appear in the book of Abstracts, this 					is a PDF file which can be generated from the conference display <link linkend="confdisp">(See Conference Display)</link>						containing all the abstracts.
+				</para>
+			</sect3>
+		</sect2>
+
+		<sect2 id='timetable'>
+			<title>Timetable Management</title>
+			<para>
+				From the timetable tab in a conference you can organise your conference. When you start with a timetable it will look like this:
+			</para>
+			<graphic fileref="UserGuidePics/confm20.png"/>
+			<para>
+				You can modify the start and end dates of the timetable, and you can start adding sessions, breaks and contributions to your 					timetable.
+			</para>
+			<graphic fileref="UserGuidePics/confm21.png"/>
+
+			<sect3 id='sess'>
+				<title>Sessions</title>
+				<para>
+					A session is essentially a time slot to organise your conference with, one way can be to use a session for each track. There 					can be more than one session happening at once for example different parts of the conference can be happening at the same time 					but in different rooms. A session can also be split into slots however these are optional, they can be used when the session 					takes place over more than one period of time, for example you may have a morning slot then a break and then an afternoon slot 					within a session or one day you have a session on a particular subject for a couple of hours and then two days later you have 					another session on that subject, this can be done using slots.
+				</para>
+			</sect3>
+			<sect3 id='addsess'>
+				<title>Adding Sessions and Breaks to Timetable</title>
+				<para>
+					To add a session to your timetable, use the 'new session' button at the top of the timetable, this will present you with a form 					to fill in with the details of your session.
+				</para>
+				<graphic fileref="UserGuidePics/sessform.png"/>
+				<para>
+					You can use the 'update parent's dates' option if you need to change the times of the timetable to accommodate your session 					times.
+				</para>
+				<para>
+					Once the session is created it will appear in your timetable. The same procedure is followed to add a break by using the 'new 					break' option. You can then modify the session by clicking on the session name this will take you to the timetable tab within 					the session <link linkend="sessmgnt">(see Session Management)</link>. If you just want to quickly change the location or time 					of an entry in the timetable you can use the modification icon next to the name.
+				</para>
+			</sect3>
+			<sect3 id='addcontribs'>
+				<title>Adding Contributions to Timetable</title>
+				<para>
+					To add a contribution to your timetable use the 'add contribution' option this will take you to a screen where you can select 					the contribution(s) you want to add.
+				</para>
+				<graphic fileref="UserGuidePics/confm22.png"/>
+				<para>
+					Once the contribution is added to your timetable you can click on the contribution name to edit the time and duration of it 					within the timetable.
+				</para>
+				<graphic fileref="UserGuidePics/confm23.png"/>
+				<para>
+					You can remove sessions, breaks and contributions by clicking on remove / delete in the top right corner of each block. You can 					also move sessions to another starting date / time if needed.
+				</para>
+			</sect3>
+			<sect3 id='sessmgnt'>
+				<title>Session Management</title>
+				<para>
+					From the timetable tab in Session you can: Add slots to the session, Edit slots inside the session, Delete slots inside the 					session, Add breaks and Add contributions.
+				</para>
+				<sect4 id='slot'>
+					<title>Slots</title>
+					<para>
+						A session can be split into slots <link linkend="addslot">(See Adding Slots to Session)</link> however these are 							optional, they can be used when the session takes place over more than one period of time. A session is defaulted to 						having one slot already when it is created.
+					</para>
+				</sect4>
+				<sect4 id='sessmain'>
+					<title>Main Tab</title>
+					<para>
+						From the main tab in session you can, modify the general session information, add conveners and add material.
+					</para>
+				</sect4>
+				<sect4 id='sessconts'>
+					<title>Contributions Tab</title>
+					<para>
+						From the contributions tab you can see all the contributions that are part of your session. These contributions will 						only be shown once they have been added <link linkend="addcontsess">(See Adding Contributions to Sessions)</link>.
+					</para>
+				</sect4>
+				<sect4 id='sessac'>
+					<title>Access Control</title>
+					<para>
+						From the Access control tab in session you can set the access rights for modification, access and domain control the 						same as you can for most of the conference; the only difference is the Co-ordination control in which you can assign 						someone to be the co-ordinator which means they can add and remove contributions and breaks to that particular session.
+					</para>
+				</sect4>
+				<sect4 id='sesstools'>
+					<title>Tools Tab</title>
+					<para>
+						From the Tools tab in session you can delete that session or write minutes for the session.
+					</para>
+				</sect4>
+				<sect4 id='addslot'>
+					<title>Adding Slots to Session</title>
+					<para>
+						To add a slot use the 'new slot' option this will take you to a form to fill in which will create your slot.
+						When you need to edit a slot use the 'edit slot' this will take you to a screen with the options to change times, titles 						etc.
+					</para>
+					<graphic fileref="UserGuidePics/slotedit.png"/>
+					<para>
+ 						You also have the option to update the parent dates or to move the entries inside the slot. Update Parent Dates allows 						you to update the session times if the slot will be outside the sessions original times. The Move entries option means 						if for example you choose to make the slot an hour earlier, you can either leave the contributions / breaks as they are 						or you can tick the box and move all the entries an hour earlier too.
+					</para>
+					<graphic fileref="UserGuidePics/confm24.png"/>
+					<para>
+						These slots will appear in the main conference timetable like this:
+					</para>
+					<graphic fileref="UserGuidePics/confm25.png"/>
+				</sect4>
+
+				<sect4 id='addcontsess'>
+					<title>Adding Contributions to Sessions</title>
+					<para>
+						To add contributions to a session you first need to import them from the main conference, to do this use the 								'contribution tab' inside the session:
+					</para>
+					<graphic fileref="UserGuidePics/confm26.png"/>
+					<para>
+						Click on 'import contributions', this will take you to a screen where you can select the contributions you want to 							include in your session.
+					</para>
+					<graphic fileref="UserGuidePics/confm27.png"/>
+					<para>
+						Once you have selected the contributions they will appear inside the contributions tab in the session. You can then use 						the 'add contribution' option from the session and select from the contributions you imported.
+						When you have added a contribution to your session/slot you can edit the times and duration by clicking on the 							contribution name.
+					</para>
+					<graphic fileref="UserGuidePics/confm28.png"/>
+				</sect4>
+			</sect3>
+		</sect2>
+
+		<sect2 id='confac'>
+			<title>Access Control Management</title>
+			<para>
+				Access Control in a conference is similar to that in a Category. There is Modification control, Domain Control and Access Control.
+				When adding to the Access and Modification lists, you can also add Groups of users if any have been defined by Administration.
+			</para>
+			<para>
+				<emphasis>Modification Control</emphasis> Only the managers listed in the modification control, the creator of the conference and any 				administrators can access the Management 	Area of the conference.However you can add a Modification Key which means anyone with this 				key can modify the conference without logging in.
+			</para>
+			<graphic fileref="UserGuidePics/confm29.png"/>
+			<para>
+				<emphasis>Access Control</emphasis> When the conference is public - Anyone can view the conference including the programme, 					timetable, abstracts etc. When the conference is private - Only those in the access list, conference managers and administrators can 				view the conference.
+			</para>
+			<graphic fileref="UserGuidePics/confm30.png"/>
+			<para>
+				When private you can also add an Access Key which means anyone with this key can access the conference without logging in.
+			</para>
+			<para>
+				<emphasis>Domain Control</emphasis> This is not available when the conference is private, but when it is available it allows you to 				specify which IP addresses can access the conference.
+			</para>
+		</sect2>
+
+		<sect2 id='regist'>
+			<title>Registration Management</title>
+			<para>
+				You may wish to have some kind of registration process for those attending your conference in which you can give the registrants 					options of accommodation or any specific needs. The Registration Management comes in two parts - the Registration Form and the 					Registrants.
+			</para>
+			<sect3 id='regisform'>
+				<title>Registration Form</title>
+				<para>
+					From the Registration Form tab you are able to firstly, enable or disable the Registration. You can also modify the start/end 					dates of registration, the maximum number of registrants you will take, any announcments and if you want to send email 						notifications to people when a new registrant applies.
+				</para>
+				<graphic fileref="UserGuidePics/confreg1.png"/>
+				<para>
+					You can choose which forms you wish to use for your registrants see the forms listed below, to enable or disable one of 					these forms, click on the <inlinegraphic fileref="UserGuidePics/confreg2.png"/>image next to that form, when it is red it is 					disabled and green for enabled. Clicking on the form name will let you modify the form to allow the registrants to enter the 					information you need <link linkend="registarea">(See Registration Area)</link>.
+				</para>
+
+				<sect4 id='regpartic'>
+					<title>Reason for Participation</title>
+					<para>
+						The Reason for participation form allows you to ask the registrant why they want to particpate, from this form you can 						modify the question and title of the form.
+					</para>
+					<graphic fileref="UserGuidePics/confreg3.png"/>
+				</sect4>
+
+				<sect4 id='regsess'>
+					<title>Sessions</title>
+					<para>
+						The Sessions form allows you to add which sessions from your conference you would like people to register for, from the 						form you can also change the title and description.
+					</para>
+					<graphic fileref="UserGuidePics/confreg4.png"/>
+				</sect4>
+
+				<sect4 id='regaccom'>
+					<title>Accommodation </title>
+					<para>
+						The Accomodation form lets you add or remove the different types of accomodation you can book your registrants into or 						give them the choice to book their own.
+					</para>
+					<graphic fileref="UserGuidePics/confreg5.png"/>
+				</sect4>
+
+				<sect4 id='regsocial'>
+					<title>Social Events</title>
+					<para>
+						The Social Events form allows you to add / remove any social events that registrants can register on, when you add an 						event you add the title you wish this event to have.
+					</para>
+					<graphic fileref="UserGuidePics/confreg6.png"/>
+				</sect4>
+
+				<sect4 id='regfurther'>
+					<title>Further Information</title>
+					<para>
+						The Further Information form gives you the opportunity to add any additional information for the registrants.
+					</para>
+					<graphic fileref="UserGuidePics/confreg7.png"/>
+				</sect4>
+			</sect3>
+
+
+			<sect3 id='registrant'>
+				<title>Registrants</title>
+				<para>
+					The Registrants Tab will show a list of all the registrants that have registered for your conference.
+				</para>
+					<graphic fileref="UserGuidePics/confreg12.png"/>
+				<para>
+					Clicking on the registrants name will show you all their details and the information they provided in response to the form's 					questions.
+				</para>
+				<graphic fileref="UserGuidePics/confreg13.png"/>
+			</sect3>
+		</sect2>
+
+		<sect2 id='dispmngt'>
+			<title>Display Management</title>
+			<para>
+				The display area allows you to customise your conference, you can customise the menu that the will be shown in the conference display 				<link linkend="confdisp">(See Conference Display)</link>, change the colours of the conference background / text and you can add a 					logo to your conference.
+			</para>
+			<graphic fileref="UserGuidePics/confm31.png"/>
+
+			<sect3 id='menucust'>
+				<title> Display Menu Customisation</title>
+				<para>
+					The menu customisation allows you to activate or disable menu items and move them up or down the list. You may add your own 					external links or just customise the already existing system links.
+				</para>
+				<graphic fileref="UserGuidePics/confm32.png"/>
+				<para>
+					You can also add external links to your menu by using the 'add link' option.
+				</para>
+				<graphic fileref="UserGuidePics/confm33.png"/>
+				<para>
+					If you want to add spaces between items in your menu you can use the 'add space' option.
+				</para>
+				<graphic fileref="UserGuidePics/confm34.png"/>
+			</sect3>
+
+			<sect3 id='custcol'>
+				<title>Colour Customisation</title>
+				<para>
+					You can change the background colour of the conference by using the 'title background colour' option.
+				</para>
+				<graphic fileref="UserGuidePics/confm35.png"/>
+				<para>
+					The same can be done for the text colour by using the 'title text colour' option.
+				</para>
+			</sect3>
+
+			<sect3 id='logo'>
+				<title>Logo Customisation</title>
+				<para>
+					If you want to add your own logo to the conference display you can add it from the logo area in display. You can browse for you 					logo, save it, and see it in the preview box.
+				</para>
+				<graphic fileref="UserGuidePics/confm36.png"/>
+			</sect3>
+		</sect2>
+
+		<sect2 id='conftools'>
+			<title>Conference Tools</title>
+			<para>
+				The conference Tools allow you to make certain actions on the whole of the conference.
+			</para>
+			<graphic fileref="UserGuidePics/confm37.png"/>
+
+			<sect3 id='confdel'>
+				<title>Deleting a Conference</title>
+				<para>
+					The delete conference option will delete the whole conference. You will be asked to confirm deletion first.
+				</para>
+				<graphic fileref="UserGuidePics/confm37del.png"/>
+			</sect3>
+
+			<sect3 id='clonconf'>
+				<title>Cloning a Conference</title>
+				<para>
+					Clone the conference if you would like to make another conference the same, you have the option to clone it just once, at fixed 					intervals or on certain dates.
+				</para>
+				<graphic fileref="UserGuidePics/confm38.png"/>
+			</sect3>
+
+			<sect3 id='matpack'>
+				<title> Packaging Material</title>
+				<para>
+					Using the 'Get material package' option you can create a package of all the materials that have been used in the conference.
+				</para>
+				<graphic fileref="UserGuidePics/confm39.png"/>
+			</sect3>
+
+			<sect3 id='offline'>
+				<title>Create an Offline version of a Conference</title>
+				<para>
+					Using the 'Offline web for your conference' option you can create a copy of your conference that can be used offline for 						example if you wish to store your conference to a dvd.
+				</para>
+				<graphic fileref="UserGuidePics/confm40.png"/>
+			</sect3>
+
+			<sect3 id='alarm'>
+				<title>Alarm Control</title>
+				<para>
+					You can set an  an alarm / reminder to alert people about the conference, the alert will be in the form of an email.
+				</para>
+				<graphic fileref="UserGuidePics/confm41.png"/>
+
+				<para>
+					<command>
+						This Conference Management Area explained can only be accessed by Administrators or Conference Managers.
+					</command>
+				</para>
+			</sect3>
+		</sect2>
+	</sect1>
+
+	<sect1 id='confdisp'>
+		<title>Conference Display Area</title>
+		<para>
+			The conference Display is the view that users of the conference will see. If the conference is public they will not need to login to 				view the conference. It is also the area in which you can access the modification areas if you have access rights. The different 					areas of the conference can be seen using the left hand Display Menu. This menu may be different if the Conference Manager has 					customised the menu. When a conference is accessed the 'Overview' area is shown first;
+		</para>
+
+		<sect2 id='navigconfdisp'>
+			<title>Navigating the Conference Display Area</title>
+			<para>
+				Various parts of the conference display are always present in order for you to navigate or view the display area:
+			</para>
+			<para>
+				<inlinegraphic fileref="UserGuidePics/confd1.png"/> This is placed at the top left of the display view and will take you back to the 				top level home category
+			</para>
+			<para>
+				<inlinegraphic fileref="UserGuidePics/confd2.png"/> This will be underneath the display menu and enables you to email the event 					support if conference management have entered one
+			</para>
+			<para>
+				<inlinegraphic fileref="UserGuidePics/confd3.png"/> This is placed at the bottom of all indico screens and enables you to email the 				administrator if the administrator has entered the address.
+			</para>
+			<para>
+				<inlinegraphic fileref="UserGuidePics/confd4.png"/> This is on the top of the display menu and enables you close the view of the 					menu.
+			</para>
+			<para>
+				<inlinegraphic fileref="UserGuidePics/confd5.png"/> This is placed at the top right of the screen and is the access for logging in or 				out
+			</para>
+			<para>
+				<inlinegraphic fileref="UserGuidePics/confd6.png"/> The navigation bar, shows you were you are in the conference and allows to back 				step through.
+			</para>
+		</sect2>
+
+		<sect2 id='overview'>
+			<title>Overview Area</title>
+			<para>
+				The Overview area shows the main details of the conference including any material that is included and the date and location of the 				conference.
+			</para>
+			<graphic fileref="UserGuidePics/confd7.png"/>
+			<para>
+				When an administrator or Conference Manager is logged in there will be a modification icon next to the conference title for access to 				the modification area.
+			</para>
+		</sect2>
+
+		<sect2 id='callabsarea'>
+			<title>Calling for Abstracts Area</title>
+			<para>
+				The call for abstracts view will show the range of dates in which an abstract can be submitted
+			</para>
+			<graphic fileref="UserGuidePics/confd8.png"/>
+			<para>
+				From within the Call for abstracts a user can submit an abstract and view the abstracts they have submitted.
+			</para>
+
+			<sect3 id='subab'>
+				<title>Submitting an Abstract</title>
+				<para>
+					You need to be logged in as a user and the dates of submission must be in range to allow you to submit an abstract. Once logged 					in you can fill in the form to submit your abstract. (Some parts of the screen may not be visible in the pictures).
+				</para>
+				<graphic fileref="UserGuidePics/confd9.png"/>
+				<para>
+					You need to fill in the title, content and author details. If you need to you can add any co-authors. You can also choose which 					track 	you would like your abstract to be included in as well as any comments you would like to add. A notification will be 					shown to you if your submission was 	received.
+				</para>
+			</sect3>
+
+			<sect3 id='viewabs'>
+				<title>Viewing your abstracts</title>
+				<para>
+					Any abstracts you have submitted you can view and see their status. You can also create a PDF of your abstracts. By clicking on 					the abstract name you will see the details of the abstract.
+				</para>
+				<graphic fileref="UserGuidePics/confd10.png"/>
+			</sect3>
+
+			<sect3 id='absdisp'>
+				<title>Abstract Display</title>
+				<para>
+					When you click on an abstracts title you will be taken to the abstracts view, this shows all the details of the abstract.
+				</para>
+				<graphic fileref="UserGuidePics/confd11.png"/>
+				<para>
+					You can print the details of this abstract into a PDF using the icon in the top right corner.
+				</para>
+			</sect3>
+		</sect2>
+
+
+		<sect2 id='autidx'>
+			<title>Author Index</title>
+			<para>
+				The Author Index shows all the authors for contributions in the conference, the authors can be searched for by name.
+			</para>
+			<graphic fileref="UserGuidePics/confd12.png"/>
+			<para>
+				The contribution(s) <link linkend="contdisp">(See Contribution Display)</link> they have written and the details of the author can be 				accessed by clicking on the name.
+			</para>
+
+			<sect3 id='authdisp'>
+				<title>Author Display</title>
+				<para>
+					The Author Display shows the details for the author e.g. contact details and the contributions they have authored.
+				</para>
+				<graphic fileref="UserGuidePics/confd13.png"/>
+			</sect3>
+		</sect2>
+
+		<sect2 id='contarea'>
+			<title>Contribution Area</title>
+			<para>
+				Contribution List in the menu takes you to all the contributions in the Conference. From here you can see a list of all or just 					certain types of contributions that you want to see for example only those contributions in a specific session.
+			</para>
+			<graphic fileref="UserGuidePics/confd14.png"/>
+			<para>
+				You can access the display of each contribution by clicking on its name. You can also create a PDF of either selected contributions 				or all of them.
+			</para>
+
+			<sect3 id='contdisp'>
+				<title>Contribution Display</title>
+				<para>
+					In the contribution display you can see all the details of the contribution, including the description, the author, the 						session (if any) that it is included in, any material<link linkend="contmatdisp">(See contribution material display)</link> it 					has and any sub contributions that belong to it. You can also access those details by clicking on their names. You can also 					print the contribution in PDF, XML or ICal format by using the icons in the top right hand corner.
+				</para>
+				<graphic fileref="UserGuidePics/confd15.png"/>
+				<para>
+					If you have modification rights you will have the modification icon next to the print formats and you can access the 						contribution modification area.
+				</para>
+
+
+
+				<sect4 id='contmatdisp'>
+					<title>Contribution Material Display</title>
+					<para>
+						The material that belongs to a contribution can be viewed by accessing the material in the contribution display. From 						the material display you can see the resources attached, and which contribution this material belongs to.
+					</para>
+					<graphic fileref="UserGuidePics/confd151.png"/>
+					<para>
+						When you first open the material display, if there is only one resource attached, that resource will be opened e.g. If 						you have just the one link attached as a resource, when you access the material display the url for that link will be 						opened.
+					</para>
+				</sect4>
+			</sect3>
+		</sect2>
+
+		<sect2 id='myconf'>
+			<title>My Conference Area</title>
+			<para>
+				The 'My Conference' area gives you access to those areas you have Co-ordinator modification rights to. For example if you are a Track 				co-ordinator or a Session co-coordinator those tracks or sessions will appear under my conference.
+			</para>
+			<graphic fileref="UserGuidePics/confd16.png"/>
+			<para>
+				From here you can access your Tracks Modification <link linkend="tracks">(See Tracks)</link> or Session Modification <link 						linkend="sesscoord">(See My Conference - Session Co-ordination)</link> by using the modification icon on the left of the title.
+			</para>
+
+			<sect3 id='sesscoord'>
+				<title>My Conference - Session Co-ordination</title>
+				<para>
+					The session Modification accessible from 'My Conference' is slightly different from the Main Session Modification as you are 					restricted to the Main tab and adding /removing contributions and breaks:
+				</para>
+				<graphic fileref="UserGuidePics/confd17.png"/>
+			</sect3>
+		</sect2>
+
+		<sect2 id='registarea'>
+			<title>Registration Area</title>
+			<para>
+				The Registration Area shows you the dates in which you are able to register, the max number of registrants allowed and any contact 				information.
+			</para>
+			<graphic fileref="UserGuidePics/confreg8.png"/>
+
+			<sect3 id='newregist'>
+				<title>New Registrant</title>
+				<para>
+					From the new registrant area people can fill in the forms that were chosen and customised from the Registration Management 						<link linkend="regist">(See Registration Management)</link>.The registrant will need to fill in their personal information 					and anything else in the form that has been asked for.
+				</para>
+				<graphic fileref="UserGuidePics/confreg9.png"/>
+				<graphic fileref="UserGuidePics/confreg10.png"/>
+				<para>
+					Once submitted you will be shown a screen to confirm your registration.
+				</para>
+				<graphic fileref="UserGuidePics/confreg11.png"/>
+				<para>
+					The menu option which was 'new registrant' will also change to 'Modify my registration'. This will present you with the form 					you filled in originally and will allow you to change the information you originally provided.
+				</para>
+			</sect3>
+		</sect2>
+
+
+
+		<sect2 id='bkabs'>
+			<title>Book of Abstracts</title>
+			<para>
+				The Book of Abstracts selection in the menu will produce a PDF document of all the accepted abstracts (abstracts that have become 					contributions) that are scheduled in the conference. It also shows any contributions that are scheduled.
+			</para>
+		</sect2>
+
+		<sect2 id='progarea'>
+			<title>Scientific Programme Area</title>
+			<para>
+				The Scientific Programme shows all the tracks with their descriptions:
+			</para>
+			<graphic fileref="UserGuidePics/confd18.png"/>
+			<para>
+				You can create a PDF document of all the tracks using the PDF icon in the top right hand corner
+				If you are a Co-ordinator of any tracks, you will have the modification logo next to that track and a 'Manage my Track' option in the 				menu as in the picture above.
+			</para>
+		</sect2>
+
+		<sect2 id='ttarea'>
+			<title>Timetable Area</title>
+			<para>
+				The Timetable area shows all the session/slots, contributions and breaks for the conference. You can access each session by clicking 				on the session name this will show you any contributions/breaks inside this session.
+			</para>
+			<graphic fileref="UserGuidePics/confd19.png"/>
+			<para>
+				Clicking on a contribution name will take you to the display view of that contribution <link linkend="contdisp">(See Contribution 					Display)</link>
+				You can display the timetable for certain days or sessions and choose the detail level using the display options you can also create 				a PDF of the timetable by using the icon in the top right hand corner
+			</para>
+
+			<sect3 id='sessview'>
+				<title>Session View</title>
+				<para>
+					Session View allows you to see any contributions or breaks within each session:
+				</para>
+				<graphic fileref="UserGuidePics/confd20.png"/>
+				<para>
+					If you are a Session Co-ordinator or a Session Manager you will have the modification icon in the top right hand corner as 						above, this will take you to the appropriate Modification area for that session. You may also make a PDF of the session.
+				</para>
+			</sect3>
+		</sect2>
+	</sect1>
+</chapter>
+
+<chapter id='meeting'>
+	<title>Meetings</title>
+	<sect1 id='meet'>
+		<title>Meeting</title>
+		<para><inlinegraphic fileref="UserGuidePics/meet1.png"/>
+			A Meeting is not as in depth as a Conference and is made for smaller events. Within a meeting you can create a Timetable in which you can 			directly add Sessions, Slots, Contributions and Breaks. With a meeting you create the contributions as you add them to the timetable. You 			can set the access Control for the meeting and you have Tools in which you can remove, clone, create offline versions of the meeting and set 			alarms.
+		</para>
+	</sect1>
+
+	<sect1 id='creatmeet'>
+		<title>Creating a Meeting</title>
+		<para>
+			If you have the correct access rights within a Category you can create a new meeting using the 'Meeting' option in the Tools menu, you will 			be presented with a form similar to the one you would for a Conference, however you are able to choose the default style in which the 				Meeting will be displayed <link linkend="meetdisp">(See Meeting Display)</link> when you submit this form the Meeting will be created.
+		</para>
+	</sect1>
+
+	<sect1 id='meetmngt'>
+		<title>Meeting Management Area</title>
+		<para>
+			The Management Area allows you to control the different parts of your meeting the following sections will show each area of the 					Meeting Management.
+		</para>
+		<para>
+			The frames surrounding each management area, give you access to either the modification area above or to a display of that area.
+		</para>
+			<graphic fileref="UserGuidePics/meetma.png"/>
+		<para>
+			Clicking on the left hand icon <inlinegraphic fileref="UserGuidePics/meetma2.png"/> will take you to the management display area for the 				area you are on, e.g. contribution or material etc <link linkend="meetmngtdisp">(See Management Diplays)</link>.
+		</para>
+		<para>
+			Clicking on the name of the event or contribution etc will take you directly to the management area for the event / contribution.
+		</para>
+
+		<sect2 id='meetmain'>
+			<title>Main Management</title>
+			<para>
+				From the Main tab, you are able to modify the details of the meeting including title, description, location, default style of the 					display.
+			</para>
+			<graphic fileref="UserGuidePics/meet2.png"/>
+			<para>
+				You can also add / remove any chairpersons, add / remove material and close the Meeting, if you close the meeting it can no longer be 				accessed.
+			</para>
+
+			<sect3 id='meetvisibility'>
+				<title>Meeting Visibility</title>
+				<para>
+                    This option allows you to choose up to which level your meeting will be visible in the overview pages.
+                </para>
+            </sect3>
+
+		</sect2>
+
+		<sect2 id='meettt'>
+			<title>Timetable Management</title>
+			<para>
+				The timetable management allows you to organise your meeting by using sessions, slots, adding contributions and including breaks.
+				When you first start to organise your meeting the timetable will look like this:
+			</para>
+			<graphic fileref="UserGuidePics/meet3.png"/>
+			<para>
+				You can modify the times in which the timetable will run between, this can either be the same as the meeting or your own custom 					times:
+			</para>
+			<graphic fileref="UserGuidePics/meet4.png"/>
+			<para>
+				You can add a break to your timetable using the 'new break' option you will be presented with a form to fill in with the details of 				the break you want to add.
+			</para>
+
+			<sect3 id='meetaddcont'>
+				<title>Adding Contributions</title>
+				<para>
+					You can directly add Contributions into your timetable using the 'new contribution' option at the top of each day; this will 					take you to a form to create a new contribution.
+				</para>
+				<graphic fileref="UserGuidePics/meet5.png"/>
+				<para>
+					Within this form, you can define the name, description, location, a board number and the starting time with the duration in 					which you want this contribution to take place. If the contribution you want to add is going to be outside the timetable times, 					you can tick the 'update parents dates' and this will change the timetable times accordingly.
+				</para>
+				<graphic fileref="UserGuidePics/meet6.png"/>
+				<para>
+					If you want to change the location or time of the contribution you can use the modification icon on the left of the 							contribution, or you can click on the contribution name to go to the full modification area of Contributions <link 							linkend="meetcontmngt">(See Contribution	Management)</link>. You can also remove the contribution from the timetable using the 					'remove' option on the right of the contribution name.
+				</para>
+			</sect3>
+
+			<sect3 id='meetaddsess'>
+				<title>Adding a Session</title>
+				<para>
+					To add a session to your timetable you can use the 'new session' option, this will present you with a form to fill in the 						details of your session:
+				</para>
+				<graphic fileref="UserGuidePics/meet7.png"/>
+				<para>
+					As with the contributions you can choose to update the timetable dates if your session needs to be earlier /later than the 						timetable is currently, using 'update parents dates'.
+				</para>
+				<graphic fileref="UserGuidePics/meet8.png"/>
+				<para>
+					Once your session is added to the timetable you can use the modification icon to the left to quickly edit the basic details 					within the timetable or you can click on the session name and enter the main Session modification area <link 								linkend="meetsessmngt">(See Session Management)</link>. You can also move or delete the session using the links on the top 					right of the session block.
+				</para>
+			</sect3>
+
+			<sect3 id='meetsessmngt'>
+				<title>Session Management</title>
+				<para>
+					From within session management you can organise each session. You can enter the session modification from the session name 						inside the Timetable tab within the meeting management area. You are able to add/edit/remove slots, add/remove contributions 					and add/remove breaks into the session from here. Slots inside a session are optional, they can be used when the session takes 					place over more than one period of time. When you create a session it is already made with one slot.
+				</para>
+				<graphic fileref="UserGuidePics/meet9.png"/>
+				<para>
+					The Session management shows the times of the whole session at the top. If you have slot(s) which take up less time as in the 					picture above, (the session time runs until 12:00 but the slot finishes at 10:00) you can use the 'fit to inner slots' to make 					the session time start and finish at the same time as the first and last slot.
+				</para>
+
+				<sect4 id='meetaddslot'>
+					<title>Adding Slots to Sessions</title>
+					<para>
+						To add a slot to a session use the 'add slot' option, this will take you to a form to fill in with the slots details:
+					</para>
+					<graphic fileref="UserGuidePics/meet10.png"/>
+					<para>
+						You can choose to update the sessions using 'update parent's dates' if the slot you are adding is going to be outside 						the session times.
+					</para>
+					<graphic fileref="UserGuidePics/meet11.png"/>
+				</sect4>
+
+				<sect4 id='addcontslot'>
+					<title>Adding Contributions to Sessions/Slots</title>
+					<para>
+						To add a contribution to the session use the 'new contribution' option, this will take you to a form to create the 							contribution, The form shows the name and time of the session or slot you are adding the contribution to, and you can 						use the 'update parent's dates' if you need to change the times of the session / slot to accommodate your contribution.
+					</para>
+					<graphic fileref="UserGuidePics/meet12.png"/>
+					<para>
+						When the contribution is added to the session or slot you can change the simple details i.e. time, location by using the 						modification icon to the left, or you can click on the contribution name to go into the main contribution management 						<link linkend="meetcontmngt">(See Contribution Managment)</link>.
+					</para>
+				</sect4>
+
+				<sect4 id='editslot'>
+					<title>Editing Slots</title>
+					<para>
+						If you want to edit the slot details, i.e. change the time of the slot you can use the 'edit slot' option this will take 						you the slot modification screen:
+					</para>
+					<graphic fileref="UserGuidePics/meet13.png"/>
+					<para>
+						As before you can update the session times if the slot will be outside the sessions original times, you also have the 						option to 'move entries inside slot' this means if for example you choose to make the slot an hour earlier, you can 							either leave the contributions / breaks as they are or you can tick the box and move all the entries an hour earlier 						too.
+					</para>
+				</sect4>
+			</sect3>
+
+
+			<sect3 id='meetcontmngt'>
+				<title>Contribution Management</title>
+				<para>
+					You can access the contribution management area by clicking on a contribution name from the timetable, the following sections 					explain the management area of each contribution.
+				</para>
+
+				<sect4 id='meetcontmain'>
+					<title>Main Tab</title>
+					<graphic fileref="UserGuidePics/meet14.png"/>
+					<para>
+						From the main tab you can modify the main details of the contribution - title, description, location etc. You can also 						change the session it is included in, add / remove presenters or add / remove material <link linkend="meetcontmaterial">						(See Material in Contributions)</link>.
+					</para>
+				</sect4>
+
+				<sect4 id='meetcontsub'>
+					<title>Sub Contribution Tab</title>
+					<para>
+						From the sub Contribution Tab you can add/remove sub contributions:
+					</para>
+					<graphic fileref="UserGuidePics/meet15.png"/>
+					<para>
+						Clicking on a sub contribution name will take you to the modification area for the sub contribution <link 								linkend="meetsubcontrib">(See Sub 	Contributions)</link>. You can also change the order of the sub contributions using 						the drop down priority list.
+					</para>
+				</sect4>
+
+
+				<sect4 id='meetcontac'>
+					<title>Access Control Tab</title>
+					<para>
+						From access control you can add/remove users that are allowed to access, modify or submit into your contributions you 						can also choose to make your contribution private.
+					</para>
+					<graphic fileref="UserGuidePics/meet16.png"/>
+					<para>
+						<emphasis>Submission Control</emphasis> List the users or groups that can submit material into the contributions <link 						linkend="meetcontmaterial">(See Material)</link>.
+					</para>
+					<para>
+						<emphasis>Modification Control</emphasis> List the users or groups that can Modify the contributions
+					</para>
+					<para>
+						<emphasis>Access Control</emphasis> Make the contribution Public or Private, If Public: Any user can view the 							contributions. If Private: Only users listed in the access / modification / submission control can access the 							contribution.
+					</para>
+					<para>
+						<emphasis>Domain Control</emphasis> List the domains that can access the contribution (only available if contribution is 						public)
+					</para>
+				</sect4>
+
+				<sect4 id='meetconttools'>
+					<title>Tools Tab</title>
+					<para>
+						From the tools tab you have the option to delete, move or write minutes for the contribution.
+					</para>
+					<graphic fileref="UserGuidePics/meet17.png"/>
+				</sect4>
+
+				<sect4 id='meetsubcontrib'>
+					<title>Sub Contributions</title>
+					<para>
+						Sub Contributions can be added to contributions to organise the contribution further, they can be access from the 'sub 						contributions tab in each contribution <link linkend="meetcontsub">(See sub contribution Tab)</link>.
+					</para>
+					<graphic fileref="UserGuidePics/meet18.png"/>
+					<para>
+						From inside each sub contribution you can modify the general details, add or remove presenters and
+						attach material the same as you can for contributions. From the Tools tab in a sub contribution you can
+						delete that sub contribution or write the minutes for it, these will be attached to the material for the sub
+						contribution.
+					</para>
+				</sect4>
+
+				<sect4 id='meetcontmaterial'>
+					<title>Material in Contributions</title>
+					<para>
+						You can add a variety of different materials to contributions, by choosing the type you want and clicking on add, 							however you can only add one of each type of material but within these types you can add files or links.
+					</para>
+					<graphic fileref="UserGuidePics/meet19.png"/>
+					<para>
+						You can then enter the name and Description of the material. Once added you have the options to add links or files							to your material, one of these files/links can be classed as the main resource. You also have an access control tab 							within the material for you to control who has access to view the material.
+					</para>
+					<graphic fileref="UserGuidePics/meet20.png"/>
+
+				</sect4>
+			</sect3>
+		</sect2>
+
+		<sect2 id='meetac'>
+			<title>Access Control Management</title>
+			<para>
+				Access Control in a meeting is the same as that in a Conference. There is Modification control, Domain Control and Access Control.
+				When adding to the Access and Modification lists, you can also add Groups of users if any have been defined by Administration.
+			</para>
+			<para>
+				<emphasis>Modification Control</emphasis> Only the managers listed in the modification control, the creator of the meeting and any 				administrators can access the Management 	Area of the meeting. However you can add a Modification Key which means anyone with this 					key can modify the meeting without logging in.
+			</para>
+			<graphic fileref="UserGuidePics/meet21.png"/>
+			<para>
+				<emphasis>Access Control</emphasis> When the meeting is public - Anyone can view the meeting including the programme, 						timetable, abstracts etc. When the meeting is private - Only those in the access list, meeting managers and administrators can 					view the meeting.
+			</para>
+			<graphic fileref="UserGuidePics/confm30.png"/>
+			<para>
+				When private you can also add an Access Key which means anyone with this key can access the meeting without logging in.
+			</para>
+			<para>
+				<emphasis>Domain Control</emphasis> This is not available when the meeting is private, but when it is available it allows you to 				specify which IP addresses can access the meeting.
+			</para>
+			<para>
+				<emphasis>Material Visibility</emphasis> By default a material will always be visible in the timetable, even if it is private (the user will then be redirected to a login screen or access key prompt when clicking on it). You can force the material to be hidden for non-authorized people by using the "Visibility to unauthorized users" section in the material access control page.
+			</para>
+		</sect2>
+
+		<sect2 id='meettools'>
+			<title>Tools Management</title>
+			<para>
+				The meeting Tools allow you to make certain actions on the whole of the meeting.
+			</para>
+			<graphic fileref="UserGuidePics/meet22.png"/>
+
+			<sect3 id='meetdel'>
+				<title>Deleting a Meeting</title>
+				<para>
+					The delete meeting option will delete the whole meeting. You will be asked to confirm deletion first.
+				</para>
+				<graphic fileref="UserGuidePics/meet23.png"/>
+			</sect3>
+
+			<sect3 id='meetconf'>
+				<title>Cloning a Meeting</title>
+				<para>
+					Clone the meeting if you would like to make another meeting the same, you have the option to clone it just once, at fixed 					intervals or on certain dates.
+				</para>
+				<graphic fileref="UserGuidePics/meet24.png"/>
+			</sect3>
+
+			<sect3 id='meetmatpack'>
+				<title> Packaging Material</title>
+				<para>
+					Using the 'Get material package' option you can create a package of all the materials that have been used in the meeting.
+				</para>
+				<graphic fileref="UserGuidePics/meet25.png"/>
+			</sect3>
+
+			<sect3 id='meetoffline'>
+				<title>Create an Offline version of a Meeting</title>
+				<para>
+					Using the 'Offline web for your meeting' option you can create a copy of your meeting that can be used offline for 						example if you wish to store your meeting to a dvd.
+				</para>
+				<graphic fileref="UserGuidePics/meet26.png"/>
+			</sect3>
+
+			<sect3 id='meetalarm'>
+				<title>Alarm Control</title>
+				<para>
+					You can set an  an alarm / reminder to alert people about the meeting, the alert will be in the form of an email.
+				</para>
+				<graphic fileref="UserGuidePics/meet27.png"/>
+
+				<para>
+					<command>
+						This Meeting Management Area explained can only be accessed by Administrators or Meeting Managers.
+					</command>
+				</para>
+			</sect3>
+		</sect2>
+	</sect1>
+
+	<sect1 id='meetmngtdisp'>
+		<title>Meeting Management Displays</title>
+		<para>
+			Using the icon <inlinegraphic fileref="UserGuidePics/meetma2.png"/> as mentioned in the Management Area, you can display the item you are 			currently modifying, this applies to material, sessions, contributions, sub contributions and the actual meeting. The actual meeting display 			is what the user will be able to see when they access the meeting <link linkend="meetdisp">(See Meeting Display Area)</link>.
+		</para>
+
+		<sect2 id='meetmatdisp'>
+			<title>Material Display</title>
+			<para>
+				When going into the material display from the management area you will be shown all the links and files that have been added to the 				material along with any details of the material.
+			</para>
+			<graphic fileref="UserGuidePics/meet28.png"/>
+			<para>
+				If you have only one resource added it will open that resource, i.e if you have added just one url link when you try to access the 				material display it will take you to that url. This Material Display can also be veiwed from the Meeting Display Area that the user 				will see when viewing your meeting.
+			</para>
+		</sect2>
+
+		<sect2 id='meetsessdisp'>
+			<title>Session Display</title>
+			<para>
+				When going into the session display from the management area you will be shown all the contributions and breaks that have been added 				to the session.
+			</para>
+			<graphic fileref="UserGuidePics/meet29.png"/>
+			<para>
+				You can click on items within the session display to proceed to the management displays for those items, i.e. each contribution. If a 				person is diplayed for example a	convener clicking on their name will allow you to email them.
+			</para>
+		</sect2>
+
+		<sect2 id='meetcontdisp'>
+			<title>Contribution Display</title>
+			<para>
+				When going into the contribution display from the management area you will be shown all the details of the contribution and also 					which session this contribution belongs to.
+			</para>
+			<graphic fileref="UserGuidePics/meet30.png"/>
+			<para>
+				You can click on items within the contribution display to proceed to the management displays for those items, i.e. the session it 					belongs to or any subcontributions that are under it.
+			</para>
+		</sect2>
+
+		<sect2 id='meetsubcontdisp'>
+			<title>SubContribution Display</title>
+			<para>
+				When going into the sub contribution display from the management area you will be shown all the details of the  sub contribution and 				also which contribution this sub contribution belongs to.
+			</para>
+			<graphic fileref="UserGuidePics/meet31.png"/>
+			<para>
+				Any items in the Meeting Management Displays which have the modification icon <inlinegraphic fileref="UserGuidePics/conf2.png"/> 					diplayed next to them allows you to go into the management area for that item.
+			</para>
+		</sect2>
+
+	</sect1>
+
+
+	<sect1 id='meetdisp'>
+		<title>Meeting Display Area</title>
+		<para>
+			The Meeting Display is the view that users of the meeting will see. If the meeting is public they will not need to login to view 					the meeting. It is also the area in which you can access the modification areas if you have access rights. There are various views in 				which the meeting can be displayed, the following sections show the different views and displays of the different parts of a meeting. If you 			have access rights to view any parts of the meeting you can do so by clicking on their name, for example material <link 						linkend="meetmatdisp">(See material Display)</link>.
+		</para>
+
+		<sect2 id='inidview'>
+			<title>Indico Style </title>
+			<para>
+				This is the default view for meetings in Indico. If you have modification rights to any parts in the meeting you will see the 					modification icon <inlinegraphic fileref="UserGuidePics/conf2.png"/>which will take you to the managment area for that item.
+			</para>
+			<graphic fileref="UserGuidePics/meetd1.png"/>
+		</sect2>
+
+		<sect2 id='itview'>
+			<title>IT Style</title>
+			<para>
+				The IT style:
+			</para>
+			<graphic fileref="UserGuidePics/meetd2.png"/>
+		</sect2>
+
+		<sect2 id='simptexview'>
+			<title>Simple Text Style</title>
+			<para>
+				The simple text style:
+			</para>
+			<graphic fileref="UserGuidePics/meetd3.png"/>
+		</sect2>
+
+		<sect2 id='adminview'>
+			<title>Administrative Style</title>
+			<para>
+				The Administration style:
+			</para>
+			<graphic fileref="UserGuidePics/meetd4.png"/>
+		</sect2>
+
+		<sect2 id='compview'>
+			<title>Compact Style</title>
+			<para>
+				The Compact style:
+			</para>
+			<graphic fileref="UserGuidePics/meetd5.png"/>
+		</sect2>
+
+		<sect2 id='parview'>
+			<title>Parellel Style</title>
+			<para>
+				The Parellel style:
+			</para>
+			<graphic fileref="UserGuidePics/meetd6.png"/>
+		</sect2>
+	</sect1>
+</chapter>
+
+<chapter id='lecture'>
+	<title>Lectures</title>
+	<sect1 id='lect'>
+		<title>Lecture</title>
+		<para><inlinegraphic fileref="UserGuidePics/lect1.png"/>
+			A Lecture is the simplest of events within Indico. A Lecture allows you to add material, give details about the lecture and set the access 			control. You also have Tools in which you can remove, clone, create offline versions of the lecture and set alarms.
+		</para>
+	</sect1>
+
+	<sect1 id='creatlect'>
+		<title>Creating a Lecture</title>
+		<para>
+			If you have the correct access rights within a Category you can create a new lecture using the 'Lecture' option in the Tools menu, you will 			be presented with a form similar to the one you would for a Meeting, you are able to choose the default style in which the 						Lecture will be displayed <link linkend="lectdisp">(See Lecture Display)</link> when you submit this form the Lecture will be created.
+		</para>
+	</sect1>
+
+	<sect1 id='lectmngt'>
+		<title>Lecture Management Area</title>
+		<para>
+			The Management Area allows you to control the different parts of your lecture the following sections will show each area of the 					Lecture Management.
+		</para>
+
+		<sect2 id='lectmain'>
+			<title>Main Management</title>
+			<para>
+				From the Main tab, you are able to modify the details of the lecture including title, description, location, dates, chairpersons text 				and default style of the display.
+			</para>
+			<graphic fileref="UserGuidePics/lect2.png"/>
+			<para>
+				From here you can also add any chairpersons, add or modify material <link linkend="lectmaterial">(see Material)</link> or close the 				lecture - closing the lecture will mean that it can no longer be accessed.
+			</para>
+
+			<para>
+				The frames surrounding each management area, give you access to either the modification area above or to a display of that area.
+			</para>
+			<graphic fileref="UserGuidePics/lectma.png"/>
+			<para>
+				Clicking on the left hand icon <inlinegraphic fileref="UserGuidePics/meetma2.png"/> will take you to the management display area for 				the area you are on, e.g.material<link linkend="lectmatdisp">(See Material Diplay)</link>.
+			</para>
+
+
+			<sect3 id='lectmaterial'>
+				<title>Material</title>
+				<para>
+					You can add material to the lecture, by using the 'add' option in the material section, you can then enter the name and 						description of the material.
+				</para>
+				<graphic fileref="UserGuidePics/lect10.png"/>
+				<para>
+					Once added you have the options to add links or files to your material, one of these files/links can be classed as the main 					resource. You also have an access control tab within the material for you to control who has access to view the material.
+				</para>
+			</sect3>
+
+		</sect2>
+
+		<sect2 id='lectac'>
+			<title>Access Control Management</title>
+			<para>
+				Access Control in a lecture is the same as that in a Meeting. There is Modification control, Domain Control and Access Control.
+				When adding to the Access and Modification lists, you can also add Groups of users if any have been defined by Administration.
+			</para>
+			<para>
+				<emphasis>Modification Control</emphasis> Only the managers listed in the modification control, the creator of the lecture and any 				administrators can access the Management 	Area of the lecture. However you can add a Modification Key which means anyone with this 					key can modify the lecture without logging in.
+			</para>
+			<graphic fileref="UserGuidePics/lect3.png"/>
+			<para>
+				<emphasis>Access Control</emphasis> When the lecture is public - Anyone can view the lecture . When the lecture is private - Only 					those in the access list, lecture managers and administrators can view the lecture.
+			</para>
+			<graphic fileref="UserGuidePics/confm30.png"/>
+			<para>
+				When private you can also add an Access Key which means anyone with this key can access the lecture without logging in.
+			</para>
+			<para>
+				<emphasis>Domain Control</emphasis> This is not available when the lecture is private, but when it is available it allows you to 				specify which IP addresses can access the lecture.
+			</para>
+		</sect2>
+
+		<sect2 id='lecttools'>
+			<title>Tools Management</title>
+			<para>
+				The lecture Tools allow you to make certain actions on the whole of the lecture.
+			</para>
+			<graphic fileref="UserGuidePics/lect4.png"/>
+
+			<sect3 id='lectdel'>
+				<title>Deleting a Lecture</title>
+				<para>
+					The delete lecture option will delete the whole lecture. You will be asked to confirm deletion first.
+				</para>
+				<graphic fileref="UserGuidePics/lect5.png"/>
+			</sect3>
+
+			<sect3 id='lectconf'>
+				<title>Cloning a Lecture</title>
+				<para>
+					Clone the lecture if you would like to make another lecture the same, you have the option to clone it just once, at fixed 						intervals or on certain dates.
+				</para>
+				<graphic fileref="UserGuidePics/lect6.png"/>
+			</sect3>
+
+			<sect3 id='lectmatpack'>
+				<title> Packaging Material</title>
+				<para>
+					Using the 'Get material package' option you can create a package of all the materials that have been used in the lecture.
+				</para>
+				<graphic fileref="UserGuidePics/lect7.png"/>
+			</sect3>
+
+			<sect3 id='lectoffline'>
+				<title>Create an Offline version of a Lecture</title>
+				<para>
+					Using the 'Offline web for your lecture' option you can create a copy of your lecture that can be used offline for 						example if you wish to store your lecture to a dvd.
+				</para>
+				<graphic fileref="UserGuidePics/lect8.png"/>
+			</sect3>
+
+			<sect3 id='lectalarm'>
+				<title>Alarm Control</title>
+				<para>
+					You can set an  an alarm / reminder to alert people about the lecture, the alert will be in the form of an email.
+				</para>
+				<graphic fileref="UserGuidePics/lect9.png"/>
+
+				<para>
+					<command>
+						This Lecture Management Area explained can only be accessed by Administrators or Lecture Managers.
+					</command>
+				</para>
+			</sect3>
+		</sect2>
+	</sect1>
+
+	<sect1 id='lectmngtdisp'>
+		<title>Lecture Management Displays</title>
+		<para>
+			Using the icon <inlinegraphic fileref="UserGuidePics/meetma2.png"/> as mentioned in the Management Area, you can display the item you are 			currently modifying, this applies to material and the actual lecture. The actual lecture display is what the user will be able to see when 			they access the lecture <link linkend="lectdisp">(See Lecture Display Area)</link>.
+		</para>
+
+		<sect2 id='lectmatdisp'>
+			<title>Material Display</title>
+			<para>
+				When going into the material display from the management area you will be shown all the links and files that have been added to the 				material along with any details of the material.
+			</para>
+			<graphic fileref="UserGuidePics/lect17.png"/>
+			<para>
+				If you have only one resource added it will open that resource, i.e if you have added just one url link when you try to access the 				material display it will take you to that url. This Material Display can also be veiwed from the Lecture Display Area that the user 				will see when viewing your lecture.
+			</para>
+		</sect2>
+	</sect1>
+
+
+	<sect1 id='lectdisp'>
+		<title>Lecture Display Area</title>
+		<para>
+			The Lecture Display is the view that users of the lecture will see. If the lecture is public they will not need to login to view 			the lecture. It is also the area in which you can access the modification areas if you have access rights. There are various views in 				which the lecture can be displayed, the following sections show the different views and displays of the different parts of a lecture. If you 			have access rights to view any parts of the lecture you can do so by clicking on their name, for example material <link linkend="lectmatdisp">(See material 	Display)</link>.
+		</para>
+
+		<sect2 id='lectview'>
+			<title>Lecture Style </title>
+			<para>
+				This is the default view for lectures in Indico. If you have modification rights to any parts in the lecture you will see the 					modification icon <inlinegraphic fileref="UserGuidePics/conf2.png"/>which will take you to the managment area for that item.
+			</para>
+			<graphic fileref="UserGuidePics/lect11.png"/>
+		</sect2>
+
+		<sect2 id='lectitview'>
+			<title>IT Style</title>
+			<para>
+				The IT style:
+			</para>
+			<graphic fileref="UserGuidePics/lect12.png"/>
+		</sect2>
+
+		<sect2 id='lectcdsagen'>
+			<title>CDS Agenda Style</title>
+			<para>
+				The CDS Agenda style:
+			</para>
+			<graphic fileref="UserGuidePics/lect13.png"/>
+		</sect2>
+
+		<sect2 id='lectstaticview'>
+			<title>Static Style</title>
+			<para>
+				The Static style:
+			</para>
+			<graphic fileref="UserGuidePics/lect14.png"/>
+		</sect2>
+
+		<sect2 id='lectxmlview'>
+			<title>Simple XML Style</title>
+			<para>
+				The Simple XML style:
+			</para>
+			<graphic fileref="UserGuidePics/lect15.png"/>
+		</sect2>
+
+		<sect2 id='lecteventview'>
+			<title>Event Style</title>
+			<para>
+				The Event style:
+			</para>
+			<graphic fileref="UserGuidePics/lect16.png"/>
+		</sect2>
+	</sect1>
+</chapter>
+
+<chapter id='userandgroups'>
+	<title>Users and Groups</title>
+	<sect1 id='users'>
+		<title>Users</title>
+		<para>
+        Recognized users are either Indico locally registered users, NICE users or users with CERN light weight accounts.
+        </para>
+    </sect1>
+	<sect1 id='groups'>
+		<title>Groups</title>
+		<para>
+        Recognized groups are either Indico locally created groups (only administrators can create such groups), NICE groups, or SIMBA lists. We strongly recommend the use of SIMBA lists as groups of users in Indico.
+        </para>
+    </sect1>
+</chapter>
+
+<chapter id='export'>
+	<title>Exporting Indico Data</title>
+	<sect1 id='expoutlook'>
+		<title>To Personal Scheduler Tools (Outlook, iCal, korganizer...)</title>
+		<para>
+			You can export an event or a set of events to your personal scheduler tool by using the Indico iCal export. Everywhere you see this icon <inlinegraphic fileref="UserGuidePics/ical_small.png"/>, click on it to export the content of the page you are on to your scheduler tool.
+        </para>
+        <para>On an event page, the event will be exported, on a category page, all events in the category will be exported. Some scheduler tools recognise well multiple events (iCal, korganizer, Outlook 2007), others don't (Outlook 2003), in this case only the first event in the list is recognised.
+		</para>
+        <para>You can also ask your personal scheduler tool to subscribe to one of these export URLs (this is particularly interesting for the category export). For iCal: "Calendar" menu -> menu item "Suscribe", then enter the URL of the ical export. Finally, set the "Refresh" to "Every day". Everyday, your iCal software will update its content with any new event in the category.
+		</para>
+	</sect1>
+	<sect1 id='exprss'>
+		<title>RSS feeds</title>
+		<para>
+			Indico provides RSS feeds on each category page. If your browser is RSS-aware, you will see an icon like this on the browser menu bar: <inlinegraphic fileref="UserGuidePics/rss.png"/>. Click on it to access the RSS feed, then possibly subscribe to it using an RSS aggregator.
+        </para>
+	</sect1>
+	<sect1 id='expsharepoint'>
+		<title>Sharepoint</title>
+		<para>
+			If you maintain a sharepoint web site, it is very easy to create inside it a web part exposing the forthcoming events from an Indico category. First add an XML web part, then in the <quote>XML link</quote> part, add the <link linkend="exportpy">XML export</link> URL from indico (eg. http://indico.cern.ch/tools/export.py?fid=2l12&amp;date=today&amp;days=1000&amp;of=xml) and in the <quote>XSL link</quote> part, add this URL: http://indico.cern.ch/export.xsl.
+        </para>
+        <para>
+            The result should look like this:
+            <inlinegraphic fileref="UserGuidePics/sharepoint.png"/>
+        </para>
+	</sect1>
+	<sect1 id='exportpy'>
+		<title>Using the export.py script</title>
+		<para>
+			Indico allow you to programmatically access the content of its database by exposing its events through a web service, the export.py script.
+        </para>
+        <para>
+            A typical example of how to use this script is:
+        <literallayout>
+            http://my.indico.server/tools/export.py?fid=2l12&amp;date=today&amp;days=1000&amp;of=xml
+            where:
+            <emphasis>fid</emphasis> is the category from which you want to extract the events (can be a <emphasis>+</emphasis> separated list)
+            <emphasis>date</emphasis> is the starting date of the event (format: <emphasis>yyyy-mm-dd</emphasis> or <emphasis>today</emphasis>)
+            <emphasis>days</emphasis> is the number of days to export the events (starting on <emphasis>date</emphasis>)
+            <emphasis>of</emphasis> is the output format (one of <emphasis>xml</emphasis>, <emphasis>html</emphasis>, <emphasis>ical</emphasis>, <emphasis>rss</emphasis>)
+        </literallayout>
+        </para>
+	</sect1>
+</chapter>
+
+
+
+
+<chapter id='roomBooking'>
+  <title>Conference Room Booking</title>
+  <sect1 id='rb_introduction'>
+    <title>Introduction</title>
+    <para>
+      This chapter describes Indico module for booking conference rooms.
+    </para>
+    <para>
+      Indico users can book conference rooms for their conference and meeting purposes. Bookings can be also created standalone - they don't have to be bound to any event. Room managers can monitor and moderate all bookings. Indico administrators can create rooms and manage their data.
+    </para>
+    <para>
+      Instead of being a boring manual no one ever reads, this file is an introduction. This assumes you have an intuition how the web works. The suggested way of learning is to start with a tutorial. Then play with the module on your own. Simply use the software as any other web page. Read context help along the way. Finally come back for some tips.
+    </para>
+  </sect1>
+
+  <sect1 id='rb_tutorial'>
+    <title>The Tutorial</title>
+    <para>
+      You may want to read Core Features listing to grasp an idea of room booking module capabilities. To summarize, it is for booking conference rooms.
+    </para>
+
+    <graphic fileref="UserGuidePics/rb_main.png"/>
+
+    <sect2 id='rb_getting_into'>
+      <title>Getting into Room Booking Module</title>
+      <para>
+        To use Indico::CRBS directly, just click 'Room Booking' on Indico home page.
+        To book rooms for your event, go to the event management page and click 'Room Booking' tab. In both cases you will be asked to sign in. Use your Indico credentials.
+      </para>
+    </sect2>
+
+    <sect2 id='rb_first_page'>
+      <title>The First Page</title>
+      <para>
+        Room Booking Module first page depends on who is logged in. For most people, it will show list of their bookings. 'Your bookings' menu option will give you the same list. Room managers will see bookings of rooms they manage, so they can quickly see what's going on. If you are room manager, use 'Users bookings' menu option to show this page again. (This menu option is not visible for ordinary users).
+      </para>
+    </sect2>
+
+    <sect2 id='rb_the_tip'>
+      <title>The Most Important Tip</title>
+      <para>
+        Feeling lost? Point at question mark icon <inlinegraphic fileref="UserGuidePics/help.png"/> with your mouse to see context help. Context help is meant to answer most of your questions along the way. It is always there waiting for you.
+      </para>
+    </sect2>
+
+    <sect2 id='rb_default_room_name'>
+      <title>Room Names</title>
+      <para>
+        If room does not have a name, the default one is built according to the following pattern:
+      </para>
+      <para>
+        "location:  building-floor-room"
+      </para>
+      <para>
+        Examples: "CERN:  304-1-001", "Sheraton:  0-34-013".
+      </para>
+      <graphic fileref="UserGuidePics/rb_room_name.png" />
+    </sect2>
+
+    <sect2 id='rb_room_types'>
+      <title>Three Kinds of Rooms</title>
+      <para>
+        There are three kinds of rooms. They determine how much freedom users have.
+        <itemizedlist>
+          <listitem>
+            <para>Public rooms, which do not require confirmation (black/green color). This means all bookings are considered accepted.</para>
+          </listitem>
+          <listitem>
+            <para>Public rooms, which do require confirmation (orange color). You can PRE-book them and wait for acceptance or rejection.</para>
+          </listitem>
+          <listitem>
+            <para>Private rooms: cannot be booked at all (red color). Only room manager can book his/her private room. If you need such room, you should ask this person to insert a booking for you.</para>
+          </listitem>
+        </itemizedlist>
+      </para>
+      <graphic fileref="UserGuidePics/rb_room_types.png" />
+    </sect2>
+
+    <sect2 id='rb_booking_types'>
+      <title>Six Types of Bookings</title>
+      <para>
+        There are six types of bookings. They allow you to define different types of recurring reservations. Common example is weekly meeting (which takes place the same time every week). You can choose from:
+        <itemizedlist>
+          <listitem>
+            <para>'Single day' : not recurring, one time event</para>
+          </listitem>
+          <listitem>
+            <para>'Repeat daily' : use if you want to book many subsequent days, like the whole week</para>
+          </listitem>
+          <listitem>
+            <para>'Repeat once a week' : the booking will take place every week, always the same day</para>
+          </listitem>
+          <listitem>
+            <para>'Repeat once every two weeks' : like above, but repeats every two weeks</para>
+          </listitem>
+          <listitem>
+            <para>'Repeat once every three weeks' : like above, but repeats every three weeks</para>
+          </listitem>
+          <listitem>
+            <para>'Repeat every month' : allows you to do bookings like 'first Friday of each month', 'second Wednesday of each month', 'fourth Saturday of each month', etc.</para>
+          </listitem>
+        </itemizedlist>
+      </para>
+    </sect2>
+
+    <sect2 id='rb_booking_a_room'>
+      <title>Booking a Room</title>
+      <para>Basically there are two steps: selecting a room and filling a booking form. More detailed steps are:</para>
+      <graphic fileref="UserGuidePics/rb_booking_a_room.png" />
+
+      <itemizedlist>
+        <listitem>
+          <para>On main Indico page, click 'Room Booking' main menu option. This is your entrance to Room Booking Module.</para>
+        </listitem>
+        <listitem>
+          <para>Click 'Book a Room' menu option.</para>
+        </listitem>
+        <listitem>
+          <para>If you know which room you want, simply select it and click [Choose]. You will be taken directly to the booking form.</para>
+        </listitem>
+        <listitem>
+          <para>
+            If you don't know, take advantage of room searching. Specify dates (click orange calendar icon to choose day with a mouse). Specify hours and booking type (single day or repeating). Specify also other criteria the room must meet, like capacity and necessary equipment. Then click [Search] button (there are two for convenience, both will do the same).
+            <itemizedlist>
+              <listitem>
+                <para>You will be presented a list of available rooms meeting your criteria.</para>
+              </listitem>
+              <listitem>
+                <para>Click 'book' link on for the room of your choice.</para>
+              </listitem>
+            </itemizedlist>
+            <graphic fileref="UserGuidePics/rb_booking_form.png" />
+          </para>
+        </listitem>
+        <listitem>
+          <para>Fill a booking form. If you have searched for rooms, most fields are already filled for your convenience. These data come from searching form. After filling the form, click [Re-check for conflicts] button.</para>
+        </listitem>
+        <listitem>
+          <para>Scroll page down to have a look on conflicts. Scroll more to see room availability calendar. Your booking is represented by green bar... or dark red bar if it overlaps on existing bookings, which are pink, by the way. This graphical room preview is useful mainly when you do a recurring booking. Give it a try: set when/type attribute to 'Repeat once a week', set end date to be at least 2 months after start date, and click [Re-check for conflicts] again. See room calendar in it's full glory.</para>
+        </listitem>
+        <listitem>
+          <para>
+            If your booking conflicts with others, you have two options:
+            <itemizedlist>
+              <listitem>
+                <para>In general, you will prefer to resolve conflicts manually - by changing dates, hours or maybe trying another room.</para>
+              </listitem>
+              <listitem>
+                <para>The alternative is to automatically book everything except conflicting days. This may be useful if you do long-term, repeating booking, for example 'whole year, every week'. Imagine everything looks perfect, except for several weeks when room is not available. In this case check the 'skip conflicting dates' option to book everything except problematic dates.</para>
+              </listitem>
+            </itemizedlist>
+          </para>
+        </listitem>
+        <listitem>
+          <para>Click [Book] button.</para>
+        </listitem>
+        <listitem>
+          <para>If your form is OK, system will ensure your new booking does not conflict with others. When no conflicts are found, you will be shown confirmation page which enlists details of your booking.</para>
+        </listitem>
+        <listitem>
+          <para>Click 'Your bookings' from menu. Your new booking now appears on the list.</para>
+        </listitem>
+      </itemizedlist>
+      <graphic fileref="UserGuidePics/rb_conflicts.png" />
+
+      <para>
+        Note: some rooms require confirmation. These rooms often appear in orange color. In this case, you cannot directly book them. You can only 'PRE-book' such room. PRE-booking works exactly the same way as booking. The only difference is that you must wait for acceptance from room manager.
+      </para>
+      <para>
+        Note: you can always modify your booking (or PRE-booking). It will be again checked for conflicts.
+      </para>
+      <para>
+        Note: you can always browse your own bookings and PRE-bookings using menu options 'Your bookings' and 'Your PRE-bookings'.
+      </para>
+
+    </sect2>
+  </sect1>
+
+  <sect1 id='rb_core_features_and_constraints'>
+    <title>Core Features and Constraints</title>
+
+    <sect2 id='rb_core_features_intro'>
+      <title>Introduction</title>
+      <para>
+        This section describes core capabilities and constraints of Room Booking Module.
+        It may be useful to assess whether it meets your needs.
+      </para>
+
+      <para>
+        Note that Room Booking Module is NOT supposed to be a general
+        purpose "room management" or "room booking" software.
+      </para>
+      <para>
+        It was built with _conference_ rooms in mind.
+        Its main purpose is to make conference organization easier.
+        We see room booking as a part of conference organization.
+        (But you _can_ book rooms without defining an event).
+      </para>
+    </sect2>
+
+    <sect2 id='rb_core_features'>
+      <title>Core Features</title>
+      <sect3 id='rb_cf_general'>
+        <title>General</title>
+        <itemizedlist>
+          <listitem>
+            <para>Standalone and "in-conference" mode.</para>
+            <itemizedlist>
+              <listitem>
+                <para>Standalone mode allows you to book, manage bookings and do administration stuff. You don't have to create Indico event. (Bookings will not be assigned to any Indico event).</para>
+              </listitem>
+              <listitem>
+                <para>"In-conference" mode allows you to book rooms for your event. You can assign booked room to conference, lecture, meeting, session, contribution or break.</para>
+              </listitem>
+            </itemizedlist>
+          </listitem>
+          <listitem>
+            <para>Repeating bookings ('every day', 'every week', 'every 3rd Wednesday of a month', etc).</para>
+          </listitem>
+          <listitem>
+            <para>E-mail notifications (to users and room managers, about every important action).</para>
+          </listitem>
+          <listitem>
+            <para>Three user roles: (1) Indico administrator, (2) room manager and (3) ordinary user.</para>
+          </listitem>
+          <listitem>
+            <para>Optional booking moderation. Each room may work in one of the following modes:</para>
+            <itemizedlist>
+              <listitem>
+                <para>Bookings require explicit confirmation of room manager, <emphasis>or</emphasis></para>
+              </listitem>
+              <listitem>
+                <para>Bookings are automatically accepted</para>
+              </listitem>
+            </itemizedlist>
+          </listitem>
+        </itemizedlist>
+      </sect3>
+      <sect3 id='rb_cf_user'>
+        <title>User</title>
+        <itemizedlist>
+          <listitem>
+            <para>Book a room</para>
+          </listitem>
+          <listitem>
+            <para>Manage own bookings (track, modify, cancel)</para>
+          </listitem>
+          <listitem>
+            <para>Search for rooms</para>
+          </listitem>
+          <listitem>
+            <para>Search for bookings (including archival)</para>
+          </listitem>
+        </itemizedlist>
+      </sect3>
+
+      <sect3 id='rb_cf_manager'>
+        <title>Room Manager</title>
+        <itemizedlist>
+          <listitem>
+            <para>Accept and reject PRE-bookings (for his room)</para>
+          </listitem>
+          <listitem>
+            <para>Reject bookings (for his room)</para>
+          </listitem>
+        </itemizedlist>
+      </sect3>
+      <sect3 id='rb_cf_admin'>
+        <title>Indico Administrator</title>
+        <itemizedlist>
+          <listitem>
+            <para>
+              Switch on/off Room Booking Module
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              Configure room booking plugins in admin section
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              Add/remove location
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              Define room attributes specific to the location
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              Define possible room equipment specific to the location
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              Manage meeting rooms (add/modify/remove)
+            </para>
+          </listitem>
+        </itemizedlist>
+      </sect3>
+    </sect2>
+
+    <sect2 id='rb_constraints'>
+      <title>Constraints</title>
+      <para>
+        The room must have its manager. It is not possible to define multiple managers for a single room. (You can workaround this by creating Indico account shared by several people).
+      </para>
+      <para>
+        The room must have defined its building, which must be a number.
+        This is mandatory. If you don't need building, put any number there (like '0').
+        If your buiding naming scheme have letters, we are sorry - the software is not
+        flexible enough for you.
+      </para>
+      <para>
+        The room must have defined floor (alphanumerical) and room 'number' (alphanumerical in fact).
+      </para>
+    </sect2>
+
+  </sect1>
+
+  <sect1 id='rb_dictionary'>
+    <title>Dictionary</title>
+    <para>
+      <emphasis>Room</emphasis> : meeting or conference room. Please note that software is not suitable to manage other rooms, like offices, corridors, etc.</para>
+    <para>
+      <emphasis>Location</emphasis> : physicall location of rooms. Room custom attributes and possible equipment are defined on location basis. Example: rooms at CERN may have different attributes and different equipment than rooms in Fermilab.</para>
+    <para>
+      <emphasis>Booking</emphasis> : final reservation of a room. While considered final, it still may be rejected in case of emergency.</para>
+    <para>
+      <emphasis>PRE-booking</emphasis> : not confirmed reservation of a room. PRE-booking is subject to acceptation or rejection.
+    </para>
+    <para>
+      <emphasis>Room responsible</emphasis> : the person who accepts / rejects bookings. Each room has exactly one person responsible. A person may be responsible for any number of rooms.</para>
+    <para>
+      <emphasis>Room manager</emphasis> : room responsible</para>
+  </sect1>
+
+</chapter>
+
+
+<chapter id='evaluation'>
+  <title>Event evaluation</title>
+  <sect1 id='eval_intro'>
+    <title>Introduction</title>
+    <para>
+      With this evaluation module for Indico you can create your own online web survey
+      in order to know participants' opinion about conferences/seminars/lectures.
+    </para>
+  </sect1>
+  <sect1 id='eval_funcGoals'>
+    <title>Functional goals</title>
+    <sect2 id='eval_security'>
+      <title>Security</title>
+      <para>
+        Survey questions and statistical results are neither vital nor confidential for CERN members.
+        We believe standard precautions are enough within this application.
+        A survey will inherit access and modification rights from the event it belongs to.
+        In other words only users who are allowed to see an event will be able to have access and fill in the evaluation form.
+        The survey can only be altered in the management area.
+        This means that only users who are already allowed to edit an event can modify the corresponding survey
+        and view the statistical results.
+      </para>
+    </sect2>
+    <sect2 id='eval_usability'>
+      <title>Usability</title>
+      <para>
+        Main possible actions for the <emphasis role="bold">surveyor</emphasis>
+        <emphasis role="italic">(management area)</emphasis> are the following:
+      </para>
+      <itemizedlist>
+        <listitem><para>Create/edit an evaluation form concerning an event.</para></listitem>
+        <listitem><para>Edit its options and status (visible/hidden).</para></listitem>
+        <listitem><para>Possibility of setting that only logged users have access to the form.</para></listitem>
+        <listitem><para>Create/edit questions contained in this form.</para></listitem>
+        <listitem><para>Ability to preview a form while editing it.</para></listitem>
+        <listitem><para>Import/export an evaluation in order to back it up or facilitate further creations.</para></listitem>
+        <listitem><para>See the statistics of the results.</para></listitem>
+        <listitem><para>Export statistics to a CSV file.</para></listitem>
+        <listitem><para>Possibility of seeing/deleting individual answers in the results.</para></listitem>
+        <listitem><para>Ability to send automatically the evaluation link by email to the participants when it starts.</para></listitem>
+        <listitem><para>Possibility of editing a processing survey even if some people have already answered it.</para></listitem>
+      </itemizedlist>
+      <para>For a <emphasis role="bold">submitter</emphasis> <emphasis role="italic">(display area)</emphasis>:</para>
+      <itemizedlist>
+        <listitem><para>Access to the survey via the menu of an event.</para></listitem>
+        <listitem><para>Logged users can always modify their already submitted forms.</para></listitem>
+      </itemizedlist>
+    </sect2>
+  </sect1>
+    <sect1 id='eval_interface'>
+      <title>Interface</title>
+      <sect2 id='eval_managementArea'>
+        <title>Management area</title>
+        <para>
+          The evaluation module is a special feature and is by default deactivated at the beginning.
+          So first of all if you plan to use it, activate this feature
+          by clicking on <inlinegraphic fileref="UserGuidePics/enabledSection.png"/>.
+          Now you can see a new tab called <emphasis role="bold">Evaluation</emphasis> on the top of the frame.
+          <graphic fileref="UserGuidePics/eval_ManagementFeature.png"/>
+          Then in Evaluation tab we have four sections:<emphasis role="italic"> Setup | Edit | Preview | Results</emphasis>.
+        </para>
+        <sect3 id='eval_setup'>
+          <title>Setup</title>
+          <para>
+            In this section you can set main information and configuration about the survey.
+            Click on <inlinegraphic fileref="UserGuidePics/eval_modify.png"/> to set your options.
+          </para>
+          <graphic fileref="UserGuidePics/eval_Setup.jpg"/>
+          <itemizedlist>
+            <listitem>
+              <para><emphasis role="bold">Curent status:</emphasis>
+                When an evaluation is HIDDEN (default), it is not shown in the Display Area and guests cannot answer it.
+                On the other hand, it is shown if set to VISIBLE.
+                But be aware if you want your survey to be well running that it must be open and contain some questions.
+                To show / hide it, simply click on
+                <inlinegraphic fileref="UserGuidePics/eval_show.png"/> / <inlinegraphic fileref="UserGuidePics/eval_hide.png"/>.
+              </para>
+            </listitem>
+            <listitem>
+              <para><emphasis role="bold">Notifications:</emphasis>
+                You can set email addresses of people you want to be notified
+                when the evaluation starts and/or when someone answers the form.
+                <emphasis role="underline">Advice:</emphasis> In the modification panel,
+                check <emphasis role="italic">Add&nbsp;current&nbsp;registrants</emphasis>
+                if you want your event participants to be notified of the starting evaluation.
+              </para>
+            </listitem>
+            <listitem>
+              <para><emphasis role="bold">Must have an account:</emphasis>
+                If an account is needed, visitors must first login before accessing the form.
+              </para>
+            </listitem>
+            <listitem>
+              <para><emphasis role="bold">Anonymous:</emphasis>
+                When anonymous, logged submitters send their form anonymously.
+                Otherwise their identity is known by the surveyor.
+                <emphasis role="underline">Note:</emphasis> Users not logged in can always send their form anonymously.
+                If you really need to know the identity of all your submitters,
+                you have to check <emphasis role="italic">Must&nbsp;have&nbsp;an&nbsp;account</emphasis>.
+              </para>
+            </listitem>
+            <listitem>
+              <para><emphasis role="bold">Special Actions:</emphasis>
+                <itemizedlist>
+                  <listitem>
+                    <para>
+                      <inlinegraphic fileref="UserGuidePics/eval_exportEval.png"/>
+                      Export the evaluation with its questions to an XML file.
+                      Useful for backing up or transporting.
+                      <emphasis role="underline">Note:</emphasis>
+                      If the file is directly shown in Firefox/InternetExplorer6, save it with:
+                      <emphasis role="italic">File &gt; Save as...</emphasis>
+                      To solve the same problem in InternetExplorer7:
+                      <emphasis role="italic">Page &gt; Save as...</emphasis>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <inlinegraphic fileref="UserGuidePics/eval_importEval.png"/>
+                      Import an evaluation from an XML file.
+                      <inlinegraphic fileref="UserGuidePics/eval_ImportXml.png"/>
+                      Concerning main setup configuration (all main information, e.g. title, announcement, ...)
+                      you can choose to keep your current one or to overwrite it with imported one.
+                      For the questions, you can keep only your current ones or only imported ones
+                      or have both (imported ones just after current ones).
+                      <emphasis role="underline">Advice:</emphasis>
+                      We suggest you to back up your current evaluation (with export feature)
+                      before importing in order to prevent losses of data.
+                      <emphasis role="underline">Notes:</emphasis>
+                      In order to prevent some misunderstanding the status and the dates are not imported.
+                      Be aware that as questions and submissions are bound,
+                      you will also lose your current submissions if you get rid of your questions.
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <inlinegraphic fileref="UserGuidePics/eval_removeSubmissions.png"/>
+                      All collected answers will be erased.
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <inlinegraphic fileref="UserGuidePics/eval_removeQuestions.png"/>
+                      All questions will be erased.
+                      As the submissions are connected to them, they will also be removed!
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <inlinegraphic fileref="UserGuidePics/eval_reinit.png"/>
+                      Delete all evaluation informations, its questions and its submissions.
+                      You will have a brand new evaluation.
+                    </para>
+                  </listitem>
+                </itemizedlist>
+              </para>
+            </listitem>
+          </itemizedlist>
+        </sect3>
+        <sect3 id='eval_edit'>
+          <title>Edit</title>
+          <para>
+            In this section you can add/edit/remove the questions of your form.
+            On the left panel you have 6 different types of question you can add.
+          </para>
+          <itemizedlist>
+            <listitem>
+              <para>
+                <inlinegraphic fileref="UserGuidePics/eval_textbox.png"/>
+                <emphasis role="bold">Textbox:</emphasis>
+                A standard field where your submitter can enter some text as answer is provided with the question.
+                Here is a little example of a question of type Textbox.
+                <graphic fileref="UserGuidePics/eval_textboxEx.png"/>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <inlinegraphic fileref="UserGuidePics/eval_textarea.png"/>
+                <emphasis role="bold">Textarea:</emphasis>
+                Like Textbox but with more capacity for text.
+                Suited for long answers like comments, feedbacks, etc.
+                <graphic fileref="UserGuidePics/eval_textareaEx.png"/>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <inlinegraphic fileref="UserGuidePics/eval_password.png"/>
+                <emphasis role="bold">Password:</emphasis>
+                Like Textbox but the answer is hidden.
+                For example on the picture below, it is recommanded that
+                the answer is hidden if the submitter is in a public area.
+                Otherwise anybody next to him would be able to read the password on the screen.
+                Note that the evaluation module doesn't use https,
+                as all this information is not supposed to be confidential.
+                <graphic fileref="UserGuidePics/eval_passwordEx.png"/>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <inlinegraphic fileref="UserGuidePics/eval_select.png"/>
+                <emphasis role="bold">Select:</emphasis>
+                A drop down list which lets the submitter to select one answer.
+                <graphic fileref="UserGuidePics/eval_selectEx.png"/>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <inlinegraphic fileref="UserGuidePics/eval_radio.png"/>
+                <emphasis role="bold">Radio:</emphasis>
+                A group of radio buttons which lets the submitter to select one answer.
+                <graphic fileref="UserGuidePics/eval_radioEx.png"/>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <inlinegraphic fileref="UserGuidePics/eval_checkbox.png"/>
+                <emphasis role="bold">Checkbox:</emphasis>
+                This type is suited for multiple choices questions.
+                You can check many answers.
+                <graphic fileref="UserGuidePics/eval_checkboxEx.png"/>
+              </para>
+            </listitem>
+          </itemizedlist>
+          <para>
+            <graphic fileref="UserGuidePics/eval_addBox.png"/>
+            When adding a Textbox/Textarea/Password you have the above screen.
+            <itemizedlist>
+              <listitem>
+                <para>
+                  <emphasis role="bold">Required:</emphasis>
+                  If checked, an answer for this question is mandatory.
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <emphasis role="bold">Question:</emphasis>
+                  Enter your question.
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <emphasis role="bold">Keyword:</emphasis>
+                  A keyword is the summary of the question in one word. (e.g. "What is your name?" -&gt; "name")
+                  It's useful when exporting the statistics into a CSV file.
+                  Instead of writing the full question, we just write the keyword so that it takes less place.
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <emphasis role="bold">Description:</emphasis>
+                  Enter a description (facultative).
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <emphasis role="bold">Help:</emphasis>
+                  Enter a help message (facultative).
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <emphasis role="bold">Default answer:</emphasis>
+                  The answer of the question will already be filled with this given default answer (facultative).
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <emphasis role="bold">Position in form:</emphasis>
+                  The position of the question within the form.
+                </para>
+              </listitem>
+            </itemizedlist>
+          </para>
+          <para>
+            On the following picture you can see the result of the manipulation.
+            <graphic fileref="UserGuidePics/eval_addedBox.jpg"/>
+          </para>
+          <para>
+            <graphic fileref="UserGuidePics/eval_addChoice.png"/>
+            When adding a Select/Radio/Checkbox you have the above screen.
+            Note that some fields have already been described above, that's why they are not explained here.
+          </para>
+          <para>
+            <emphasis role="bold">&bull; Choice Items:</emphasis>
+            Choice items are selectionable answers.
+            <emphasis role="underline">Note:</emphasis>
+            Check the box next to an choice item, to set it to be a default answer.
+          </para>
+          <para>
+            On the following picture you can see the result of the manipulation.
+            <graphic fileref="UserGuidePics/eval_addedChoice.jpg"/>
+          </para>
+          <para>
+            <graphic fileref="UserGuidePics/eval_questionsView.jpg"/>
+            After having first added some questions,
+            here is an example of the questions overview (see above picture).
+            You can change the position of a question within the form by clicking on
+            <inlinegraphic fileref="UserGuidePics/eval_position.jpg"/>.
+            Press <inlinegraphic fileref="UserGuidePics/edit.png"/> to edit a question
+            and <inlinegraphic fileref="UserGuidePics/remove.png"/> to remove it.
+          </para>
+        </sect3>
+        <sect3 id='eval_preview'>
+          <title>Preview</title>
+          <para>
+            In Preview you can see how your evaluation really looks like in the display area.
+            Feel free to play with this form, submitted information won't be recorded.
+          </para>
+        </sect3>
+        <sect3 id='eval_results'>
+          <title>Results</title>
+          <para>
+            In this section we have the statistics.
+            There are two panels called <emphasis role="italic">Options</emphasis> and
+            <emphasis role="italic">Statistics</emphasis>.
+          </para>
+          <para>
+            In the first one you can select which submissions you want to see,
+            remove some of them and export all the results into a CSV file.
+          </para>
+          <para>
+            To import a CSV file into Microsoft Office Excel:
+            <emphasis role="italic">Data</emphasis> &gt;
+            <emphasis role="italic">Import External Data</emphasis> &gt;
+            <emphasis role="italic">Import Data...</emphasis> &gt;
+            select your CSV file &gt;
+            <emphasis role="italic">Next</emphasis> &gt;
+            Uncheck <emphasis role="italic">Tab</emphasis> and check <emphasis role="italic">Comma</emphasis> &gt;
+             <emphasis role="italic">Next</emphasis> &gt;
+             <emphasis role="italic">Finish</emphasis> &gt;
+             <emphasis role="italic">OK</emphasis>.
+          </para>
+          <para>
+            In the second, you see the recolted results of your evaluation shown
+            as graphs or as answers lists depending on the question type.
+          </para>
+          <para>
+            Answers lists shown for Textbox/Textarea/Password. (See <xref linkend="eval_edit"/>)
+            <inlinegraphic fileref="UserGuidePics/eval_result1.png"/>
+          </para>
+          <para>
+            Graphs shown for Select/Radio/Checkbox. (See <xref linkend="eval_edit"/>)
+            <inlinegraphic fileref="UserGuidePics/eval_result6.png"/>
+          </para>
+        </sect3>
+      </sect2>
+      <sect2 id='eval_displayArea'>
+        <title>Display area</title>
+        <para>
+          For a conference, you can access an evaluation via the left menu.
+          <graphic fileref="UserGuidePics/eval_DisplayConf.jpg"/>
+          For a meeting/lecture, you can access it via the top menu.
+          <graphic fileref="UserGuidePics/eval_DisplayMeetingLecture.png"/>
+        </para>
+      </sect2>
+    </sect1>
+</chapter>
+
+<chapter id='protection'>
+  <title>Protection System</title>
+   <sect1 id='prot_intro'>
+    <title>Introduction</title>
+    <para>
+        This section aims to describe the protection system used by Indico to grant or restrict access to users.
+    </para>
+  </sect1>
+  <sect1 id='prot_basic_concepts'>
+    <title>Basic concepts</title>
+    <sect2 id='prot_inhe'>
+      <title>Inheritance schema</title>
+      <para>
+        You can setup a protection policy for almost all the objects that you can create within Indico.
+        This protection policy is based in an inheritance system, meaning that an object is going to inherit the
+        protection from its father, e.g. a contribution can be public but becomes private if we setup its container (a meeting) as private.
+      </para>
+      <para>
+        The protection objects tree is as shown in the following picture:
+        <graphic fileref="UserGuidePics/tree.png" scale="40" scalefit="1"/>
+        As we can see, a <emphasis role="bold">File</emphasis> inherits the protection policy from <emphasis role="italic">Material</emphasis>, <emphasis role="italic">Material</emphasis> from <emphasis role="italic">Contribution</emphasis>, <emphasis role="italic">Contribution</emphasis> from <emphasis role="italic">Session</emphasis>, <emphasis role="italic">Session</emphasis> from <emphasis role="italic">Event</emphasis>, <emphasis role="italic">Event</emphasis> from <emphasis role="italic">Subcategory</emphasis> and <emphasis role="italic">Subcategory</emphasis> from <emphasis role="italic">Category.</emphasis>
+      </para>
+      <para>
+          The next picture shows an example of this inheritance system. "Category A" is PRIVATE and because of this, "Conference 1" becomes PRIVATE too. As User 1 and User 2 are in the access list for "Category A" they can also access "Conferece 1". The rest of Indico users cannot access "Category A" and "Conference 1".
+        <graphic fileref="UserGuidePics/privByInh.png" scale="40" scalefit="1"/>
+      </para>
+
+    </sect2>
+    <sect2 id='prot_types'>
+      <title>Protection types</title>
+      <para>
+        For each object  (category, conference, contribution, session, etc) in Indico, one can setup three kinds of protection: modification control list, access control setup and domain control.
+        <itemizedlist>
+          <listitem>
+            <para>Modification control list contains all the users or groups that can edit and modify an object. Therefore, people in this list will be the managers for the object and they can access all the pages related to it and the objects under it.</para>
+          </listitem>
+          <listitem>
+            <para>Access control setup: by default, an object is public but we can make it private and add restrictions as shown in the section <link linkend="prot_accesscontrol">"Access control policy"</link></para>
+          </listitem>
+          <listitem>
+            <para>Domain control: one can protect an Indico object to be accessed just from users who are connected from some given IPs (see <link linkend="prot_domain">"Domain control policy"</link>)</para>
+          </listitem>
+        </itemizedlist>
+      </para>
+    </sect2>
+  </sect1>
+  <sect1 id='prot_accesscontrol'>
+    <title>Access control policy</title>
+    <para>
+        By default, all the objects (category, event, session, contribution, material, file and link) in Indico are <emphasis role="bold">PUBLIC</emphasis>.
+    </para>
+    <para>
+        We can set an object as PRIVATE and this means that all the objects under it will be PRIVATE as well.
+    </para>
+    <para>
+        If an object is <emphasis role="bold">PRIVATE</emphasis>, nobody can access it but the managers, the users/groups in the access list named "Users allowed to access" and those who know the "access key" if set.
+    </para>
+    <para>
+        If an object is <emphasis role="bold">PRIVATE by inheritance</emphasis>:
+        <itemizedlist>
+          <listitem>
+              <para>Nobody can access it but the managers and the users/groups in the access list "Users allowed to access" <emphasis role="bold">of its father</emphasis> (as example, see section <link linkend="prot_inhe">"Inheritance Schema"</link>).</para>
+          </listitem>
+          <listitem>
+            <para>We can set the PRIVATE object as <emphasis role="bold">PRIVATE by itself</emphasis>, which means that Indico checks only its protection policy and not the father's protection policy.
+                <graphic fileref="UserGuidePics/privByItself.png" scale="40" scalefit="1"/>
+                In the graphic, "User 1" and "User 2" can access "Category A" but they cannot access "Conference 1". Just "User 3" can access "Conference 1".
+            </para>
+          </listitem>
+          <listitem>
+            <para>We can set the PRIVATE object as <emphasis role="bold">ABSOLUTELY PUBLIC</emphasis>, which means that Indico skips the protection that was establish by inheritance.
+              <graphic fileref="UserGuidePics/absoPub.png" scale="40" scalefit="1"/>
+              In the graphic, just "User 1" and "User 2" can access "Category A" but everybodoy can access "Conference 1".
+            </para>
+          </listitem>
+        </itemizedlist>
+    </para>
+  </sect1>
+  <sect1 id='prot_domain'>
+    <title>Domain control policy</title>
+    <para>
+        If an Indico object (category, event, session, contribution, material, file and link) is PUBLIC, we can restrict the access to users accessing Indico from some given IPs (these IPs could be like 127.1 which means that every IP starting like this will be valid).
+
+    </para>
+    <para>
+        If the Indico object is PRIVATE, this checking will not be applied.
+    </para>
+    <para>
+        If you wish to add special access to some users, meaning that the domain control will not be applied for those users, you can add them in the "Users allowed to access" list.
+    </para>
+  </sect1>
+</chapter>
+
+
+
+
+</book>

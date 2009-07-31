@@ -231,7 +231,7 @@ class CDSConvFileConverter(FileConverter):
 
     def _getNewTempFile():
         cfg = Config.getInstance()
-        tempPath = cfg.getUploadedFilesPath()
+        tempPath = cfg.getUploadedFilesTempDir()
         tempFileName = tempfile.mkstemp( suffix="Indico.tmp", dir = tempPath )[1]
         return tempFileName
     _getNewTempFile=staticmethod(_getNewTempFile)

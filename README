@@ -3,21 +3,21 @@ CDS Indico README
 
 $Id: README,v 1.6 2008/04/24 17:00:17 jose Exp $
 
-Following the tradition of CDS Agenda, the CERN Document Server 
-Software Consortium has now developed a new web application to 
-schedule and organise events, from simple lectures to complex 
-meetings, workshops and conferences with sessions and contributions. 
-The tool also includes an advanced user delegation mechanism, 
-allow paper reviewing, archival of conference information and 
+Following the tradition of CDS Agenda, the CERN Document Server
+Software Consortium has now developed a new web application to
+schedule and organise events, from simple lectures to complex
+meetings, workshops and conferences with sessions and contributions.
+The tool also includes an advanced user delegation mechanism,
+allow paper reviewing, archival of conference information and
 electronic proceedings.
 
-The CDS Indico software was originally developed in the framework of 
+The CDS Indico software was originally developed in the framework of
 the EU InDiCo project.
 
-CDS Indico is currently in production at CERN at <http://indico.cern.ch>. 
-You are welcome to have a look at the set of features, and subscribe to 
-the mailing lists <http://cdsware/indico/lists.html> in order to be kept 
-informed about future releases. 
+CDS Indico is currently in production at CERN at <http://indico.cern.ch>.
+You are welcome to have a look at the set of features, and subscribe to
+the mailing lists <http://cdsware/indico/lists.html> in order to be kept
+informed about future releases.
 
 Among the features are:
 
@@ -54,7 +54,7 @@ Among the features are:
     . OAI
     . iCal
     . PDF
-	
+
 The CDS Indico is free software licenced under terms of GNU General
 Public Licence (GPL).  It is provided on an "as is" basis.  However,
 please note that a support contract can be arranged with the CDS
@@ -62,7 +62,14 @@ Development Group in which we, the developers, can help you to
 install, configure, and maintain the system (featuring email and
 telnet support throughout the year), including an eventuality of possible
 local development should a need arise.  If you are interested in
-concluding a support contract with us, please contact us at <indico-support@cern.ch>.
+arranging a support contract with us, please contact us at
+<indico-support@cern.ch>.
+
+
+As of 2006 the TODO list is now handled by CERN Savannah:
+
+   https://savannah.cern.ch/projects/indico/
+
 
 Please consult the INSTALL file for more information.
 
@@ -71,4 +78,3 @@ Good luck, and thanks for choosing CDS Indico.
        - CDS Development Group
          <indico-support@cern.ch>
          <http://cdsware.cern.ch/indico>
-

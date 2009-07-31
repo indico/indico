@@ -210,7 +210,7 @@ class ServiceBase(RequestHandlerBase):
         self._checkProtection()
 
         try:
-            security.sanitaryCheck(self._target,
+            security.sanitizationCheck(self._target,
                                    self._params,
                                    self._aw)
         except (htmlScriptError, htmlForbiddenTag), e:

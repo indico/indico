@@ -131,7 +131,7 @@ class PosterTemplateManager(Persistent):
 
 def getNewTempFile( ):
     cfg = Config.getInstance()
-    tempPath = cfg.getUploadedFilesPath()
+    tempPath = cfg.getUploadedFilesTempDir()
     tempFileName = tempfile.mkstemp( suffix="IndicoPoster.tmp", dir = tempPath )[1]
     return tempFileName
 

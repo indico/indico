@@ -4577,7 +4577,7 @@ window.parent.OnUploadCompleted(%s,"%s","%s", "%s") ;
     
     def _getNewTempFile( self ):
         cfg = Config.getInstance()
-        tempPath = cfg.getUploadedFilesPath()
+        tempPath = cfg.getUploadedFilesTempDir()
         tempFileName = tempfile.mkstemp( suffix="Indico.tmp", dir = tempPath )[1]
         return tempFileName
     
@@ -4897,7 +4897,7 @@ class RHConfSaveLogo( RHConferenceModifBase ):
     
     def _getNewTempFile( self ):
         cfg = Config.getInstance()
-        tempPath = cfg.getUploadedFilesPath()
+        tempPath = cfg.getUploadedFilesTempDir()
         tempFileName = tempfile.mkstemp( suffix="IndicoLogo.tmp", dir = tempPath )[1]
         return tempFileName
     
@@ -4939,7 +4939,7 @@ class RHConfSaveCSS( RHConferenceModifBase ):
     
     def _getNewTempFile( self ):
         cfg = Config.getInstance()
-        tempPath = cfg.getUploadedFilesPath()
+        tempPath = cfg.getUploadedFilesTempDir()
         tempFileName = tempfile.mkstemp( suffix="IndicoCSS.tmp", dir = tempPath )[1]
         return tempFileName
     
@@ -5018,7 +5018,7 @@ class RHConfSavePic( RHConferenceModifBase ):
     
     def _getNewTempFile( self ):
         cfg = Config.getInstance()
-        tempPath = cfg.getUploadedFilesPath()
+        tempPath = cfg.getUploadedFilesTempDir()
         tempFileName = tempfile.mkstemp( suffix="IndicoPic.tmp", dir = tempPath )[1]
         return tempFileName
     
@@ -7735,7 +7735,7 @@ class RHConfBadgeSaveTempBackground(RHConferenceModifBase):
 
     def _getNewTempFile( self ):
         cfg = Config.getInstance()
-        tempPath = cfg.getUploadedFilesPath()
+        tempPath = cfg.getUploadedFilesTempDir()
         tempFileName = tempfile.mkstemp( suffix="IndicoBadgeBG.tmp", dir = tempPath )[1]
         return tempFileName
     
@@ -7824,7 +7824,7 @@ class RHConfBadgeGetBackground(RHConferenceModifBase):
             return p
         else:
             cfg = Config.getInstance()
-            tempPath = cfg.getUploadedFilesPath()
+            tempPath = cfg.getUploadedFilesTempDir()
             if self._conf.getBadgeTemplateManager().hasTemplate(self.__templateId):
                 isArchived, image = self._conf.getBadgeTemplateManager().getTemplateById(self.__templateId).getBackground(self.__backgroundId)                
                 if image is not None:
@@ -8000,7 +8000,7 @@ class RHConfPosterSaveTempBackground(RHConferenceModifBase):
 
     def _getNewTempFile( self ):
         cfg = Config.getInstance()
-        tempPath = cfg.getUploadedFilesPath()
+        tempPath = cfg.getUploadedFilesTempDir()
         tempFileName = tempfile.mkstemp( suffix="IndicoPosterBG.tmp", dir = tempPath )[1]
         return tempFileName
     

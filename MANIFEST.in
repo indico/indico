@@ -1,70 +1,19 @@
-recursive-include indico/MaKaC/webinterface/tpls *.tpl
-recursive-include indico/MaKaC/webinterface/tpls/chelp *.wohl
-recursive-include indico/MaKaC/webinterface/tpls/chelp *.xsd
-recursive-include indico/MaKaC/webinterface/stylesheets *.xsl
-recursive-include indico/MaKaC/webinterface/stylesheets *.css
-recursive-include indico/htdocs *.py
-recursive-include indico/htdocs *.xsl
-recursive-include indico/htdocs/services *.py
-recursive-include indico/htdocs *.css
-include indico/htdocs/makac.css
-recursive-include indico/htdocs/tools *.py
-recursive-include indico/htdocs/js *.js
-include indico/htdocs/js/indico/pack/.keep
-recursive-include indico/htdocs/help *html
-recursive-include indico/htdocs/help *pdf
-recursive-include indico/htdocs/help *xml
-recursive-include indico/htdocs/help *png
-recursive-include indico/htdocs/help *gif
-recursive-include indico/htdocs/htmlarea *html
-recursive-include indico/htdocs/htmlarea *css
-recursive-include indico/htdocs/htmlarea *txt
-recursive-include indico/htdocs/htmlarea *js
-recursive-include indico/htdocs/htmlarea *gif
-
-recursive-include indico/htdocs/js/fckeditor *.html
-recursive-include indico/htdocs/js/fckeditor *.htc
-recursive-include indico/htdocs/js/fckeditor *.xml
-recursive-include indico/htdocs/js/fckeditor *.pl
-recursive-include indico/htdocs/js/fckeditor *.php
-recursive-include indico/htdocs/js/fckeditor *.cfm
-recursive-include indico/htdocs/js/fckeditor *.css
-recursive-include indico/htdocs/js/fckeditor *.txt
-recursive-include indico/htdocs/js/fckeditor *.js
-recursive-include indico/htdocs/js/fckeditor *.gif
-
-recursive-include indico/htdocs/images *.gif
-recursive-include indico/htdocs/images *.png
-recursive-include indico/htdocs/images *.jpg
-recursive-include indico/htdocs/images *.bmp
-recursive-include indico/htdocs/images *.ico
-recursive-include indico/htdocs/images/rooms/large_photos *.jpg
-recursive-include indico/htdocs/images/rooms/small_photos *.jpg
-include etc/confmerge.py
-include etc/__init__.py
-include etc/config.xml
-include etc/config.xsd
+include AUTHORS
+include ChangeLog
+include COPYING
 include INSTALL
 include INSTALL.pdf
-include COPYING
-include AUTHORS
-include THANKS
+include NEWS
 include README
-include .cerndist
-include doc/UserGuide.pdf
-include doc/AdminUserGuide.pdf
-include scripts/taskDaemon.py
-include scripts/TZMigration.py
-recursive-include scripts/recovery *.py
-recursive-include scripts/recovery *.txt
-recursive-include scripts/indexes *.py
-include indico/MaKaC/PDFinterface/ttfonts/.keep
-recursive-include indico/MaKaC/PDFinterface/ttfonts *.ttf
-recursive-include indico/MaKaC/PDFinterface/ttfonts *.ttc
-recursive-include indico/MaKaC/plugins *.tpl
-recursive-include indico/MaKaC/plugins *.css
-recursive-include indico/MaKaC/plugins *.js
-recursive-include indico/MaKaC/po *.po
-recursive-include indico/MaKaC/po *.py
-recursive-include indico/MaKaC/modules *.py
+include THANKS
 
+include doc/*.pdf
+
+recursive-include bin *
+recursive-include etc *
+recursive-include indico/htdocs *
+recursive-include indico/MaKaC *
+recursive-include tests *
+
+prune *.pyc
+prune *.mo

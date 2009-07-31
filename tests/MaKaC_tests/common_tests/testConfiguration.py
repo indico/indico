@@ -19,8 +19,42 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 import unittest
-from MaKaC.common.Configuration import Config 
+import shutil
+import sys
+from MaKaC.common.Configuration import Config
 
 class TestConfiguration(unittest.TestCase):
     def testGetInstanceShouldWork(self):
         self.config = Config.getInstance()
+
+    def testDynamicFindersShouldWork(self):
+        self.testGetInstanceShouldWork()
+        self.assertEqual('/opt/indico/htdocs', self.config.getHtdocsDir())
+
+
+    def testReloadShoulShowNewIndicoConfValuesIfConfMoved(self):
+        self.testGetInstanceShouldWork()
+        orig = file('indico/MaKaC/common/MaKaCConfig.py').read()
+        new = orig.replace('indico_conf = "indico.conf"', 'indico_conf = "indico2.conf"')
+        file('indico/MaKaC/common/MaKaCConfig.py', 'w').write(new)
+        try:
+            shutil.move('indico.conf', 'indico2.conf')
+            self.config.forceReload()
+            self.assertEqual('/opt/indico/htdocs', self.config.getHtdocsDir())
+        finally:
+            file('indico/MaKaC/common/MaKaCConfig.py', 'w').write(orig)
+            shutil.move('indico2.conf', 'indico.conf')
+
+
+    def testReloadShoulShowNewIndicoConfValuesIfConfChanged(self):
+        self.testGetInstanceShouldWork()
+        orig = file('indico.conf').read()
+        file('indico.conf', 'w').write(orig.replace('BaseURL              = "http://localhost/"',
+                                                    'BaseURL              = "http://localhost2/"'))
+
+        try:
+            self.config.forceReload()
+            self.assertEqual('http://localhost2/', self.config.getBaseURL())
+        finally:
+            file('indico.conf', 'w').write(orig.replace('BaseURL              = "http://localhost2/"',
+                                                        'BaseURL              = "http://localhost/"'))

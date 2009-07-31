@@ -20,4 +20,4 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 DEVELOPEMENT = 0
-__version__="0.96.1.20080530" 
+__version__="dev"
