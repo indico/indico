@@ -40,9 +40,11 @@ type("TimetableManagementActions", [], {
         var self = this;
 
         if (!confirm("Are you sure you want to delete this timetable entry?"))
+        {
             return;
+        }
 
-        var info = new WatchObject;
+        var info = new WatchObject();
         var type = eventData.entryType;
 
         if (exists(eventData.sessionId)) {
@@ -54,7 +56,7 @@ type("TimetableManagementActions", [], {
             } else if (this.eventInfo.sessions[eventData.sessionId].numSlots > 1) {
                 // There are more than this slot so just delete the slot not
                 // the whole session
-                type = 'SessionSlot'
+                type = 'SessionSlot';
             }
         }
 
@@ -77,7 +79,7 @@ type("TimetableManagementActions", [], {
 
         if (type == 'Session') {
             // Delete the session from the eventInfo session list
-            delete this.eventInfo.sessions[eventData.sessionId]
+            delete this.eventInfo.sessions[eventData.sessionId];
         }
         else if (type == 'SessionSlot') {
             this.eventInfo.sessions[eventData.sessionId].numSlots--;
@@ -88,7 +90,7 @@ type("TimetableManagementActions", [], {
 
         if (eventData.entryType == 'Contribution') {
             // Get the id by taking the id string after the c character
-            var contribId = eventData.id.substring(eventData.id.indexOf('c')+1)
+            var contribId = eventData.id.substring(eventData.id.indexOf('c')+1);
 
             url = Indico.Urls.ContributionModification + '?confId=' + eventData.conferenceId + '&contribId=' + contribId;
             if (exists(eventData.sessionId)) {
@@ -107,7 +109,7 @@ type("TimetableManagementActions", [], {
      */
     editEntryStartEndDate: function(startDate, endDate, eventData) {
         var self = this;
-        var info = new WatchObject;
+        var info = new WatchObject();
 
         info.set('scheduleEntry', eventData.scheduleEntryId);
         info.set('conference', eventData.conferenceId);
@@ -124,12 +126,12 @@ type("TimetableManagementActions", [], {
             if (type != 'Session') {
                 type = 'Session' + eventData.entryType;
             } else {
-                type = 'SessionSlot'
+                type = 'SessionSlot';
             }
         }
 
         var killProgress = IndicoUI.Dialogs.Util.progress();
-        indicoRequest(this.methods[type]['modifyStartEndDate'], info, function(result, error){
+        indicoRequest(this.methods[type].modifyStartEndDate, info, function(result, error){
             killProgress();
             if (error) {
                 IndicoUtil.errorReport(error);
@@ -140,8 +142,9 @@ type("TimetableManagementActions", [], {
         });
     },
     changeSessionColors: function(eventData, bgColor, textColor) {
-        if (eventData.entryType != 'Session')
+        if (eventData.entryType != 'Session') {
             return;
+        }
 
         var info = new WatchObject();
 
@@ -150,7 +153,7 @@ type("TimetableManagementActions", [], {
         info.set('bgColor', bgColor);
         info.set('textColor', textColor);
 
-        var method = this.methods['Session']['changeColors'];
+        var method = this.methods.Session.changeColors;
 
         indicoRequest(method, info, function(result, error){
             if (error) {
@@ -237,9 +240,9 @@ type("TimetableManagementActions", [], {
 
         var menuItems = {};
         this.addMenu = new PopupMenu(menuItems, [triggerElement], null, true, true);
-        if (this.session == null) {
-            if (keys(this.eventInfo.sessions).length == 0) {
-                menuItems['Session'] = function() { self.addSession(); };
+        if (this.session === null) {
+            if (keys(this.eventInfo.sessions).length === 0) {
+                menuItems.Session = function() { self.addSession(); };
             } else {
                 var sessions = {};
                 each(this.eventInfo.sessions, function(session, key) {
@@ -253,12 +256,12 @@ type("TimetableManagementActions", [], {
                     'New block for session': sessions
 
                 };
-                menuItems['Session'] = new SectionPopupMenu(menuu, [triggerElement, this.addMenu], 'timetableSectionPopupList popupListChained', true, true);
+                menuItems.Session = new SectionPopupMenu(menuu, [triggerElement, this.addMenu], 'timetableSectionPopupList popupListChained', true, true);
             }
 
         }
-        menuItems['Contribution'] = function() { self.addContribution(); };
-        menuItems['Break'] = function () { self.addBreak(); };
+        menuItems.Contribution = function() { self.addContribution(); };
+        menuItems.Break = function () { self.addBreak(); };
 
         var pos = triggerElement.getAbsolutePosition();
         this.addMenu.open(pos.x + triggerElement.dom.offsetWidth + 10, pos.y + triggerElement.dom.offsetHeight + 2);
@@ -277,7 +280,7 @@ type("TimetableManagementActions", [], {
             },
             type: type,
             parentType: 'Event'
-        }
+        };
     },
     _addToSessionParams: function(session, type) {
         var params = this._addParams(type);
@@ -287,7 +290,7 @@ type("TimetableManagementActions", [], {
             location: session.location,
             room: session.room,
             address: session.address
-        }
+        };
 
         // If sessionId exists then use that value, otherwise just use the id
         // This is needed since the session can either be an entry in the timetable
@@ -305,42 +308,47 @@ type("TimetableManagementActions", [], {
     addContribution: function() {
         var self = this;
 
-        if (this.session != null)
-            params = this._addToSessionParams(this.session, 'Contribution');
-        else
-            var params = this._addParams('Contribution');
+        var params;
 
+        if (this.session !== null) {
+            params = this._addToSessionParams(this.session, 'Contribution');
+        } else {
+            params = this._addParams('Contribution');
+        }
 
         var dialog = new AddContributionDialog(
-                           this.methods[params.type].add,
-                           this.methods[params.parentType].dayEndDate,
-                           params.args,
-                           params.roomInfo,
-                           $O(params.roomInfo),
-                           params.startDate,
-                           params.selectedDay,
-                           this.eventInfo.isConference,
-                           function(result) { self._addEntries(result) });
+            this.methods[params.type].add,
+            this.methods[params.parentType].dayEndDate,
+            params.args,
+            params.roomInfo,
+            $O(params.roomInfo),
+            params.startDate,
+            params.selectedDay,
+            this.eventInfo.isConference,
+            function(result) { self._addEntries(result); });
 
         dialog.execute();
     },
     addBreak: function() {
         var self = this;
 
-        if (this.session != null)
+        var params;
+
+        if (this.session !== null) {
             params = this._addToSessionParams(this.session, 'Break');
-        else
-            var params = this._addParams('Break');
+        } else {
+            params = this._addParams('Break');
+        }
 
         IndicoUI.Dialogs.addBreak(
-                this.methods[params.type].add,
-                this.methods[params.parentType].dayEndDate,
-                params.args,
-                params.roomInfo,
-                $O(params.roomInfo),
-                params.startDate,
-                params.selectedDay,
-                function(result) { self._updateEntry(result) });
+            this.methods[params.type].add,
+            this.methods[params.parentType].dayEndDate,
+            params.args,
+            params.roomInfo,
+            $O(params.roomInfo),
+            params.startDate,
+            params.selectedDay,
+            function(result) { self._updateEntry(result); });
     },
     addSession: function() {
         var self = this;
@@ -354,7 +362,7 @@ type("TimetableManagementActions", [], {
             params.roomInfo,
             $O(params.roomInfo),
             params.selectedDay,
-            function(result) { self._updateEntry(result) });
+            function(result) { self._updateEntry(result); });
     },
     addSessionSlot: function(session) {
         var self = this;
@@ -379,10 +387,10 @@ type("TimetableManagementActions", [], {
      */
     _updateEntry: function(result, data) {
         var setData = data ? false : true;
-        var data = any(data, this.timetable.getData());
+        data = any(data, this.timetable.getData());
 
-        if (this.session != null) {
-            this.savedData[result.day][this.session.id]['entries'][result.entry.id] = result.entry;
+        if (this.session !== null) {
+            this.savedData[result.day][this.session.id].entries[result.entry.id] = result.entry;
         }
         data[result.day][result.id] = result.entry;
 
