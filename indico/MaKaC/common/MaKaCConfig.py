@@ -25,8 +25,17 @@ indico_conf = "" # path to indico.conf
 
 import os
 
-if indico_conf == '': # assume that we are in development mode
-    indico_conf = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'etc', 'indico.conf.local')
+if indico_conf == '': # we may be in development mode or in installation mode
+    local = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'etc', 'indico.conf.local')
+    default = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'etc', 'indico.conf')
+
+    if os.path.exists(local):
+        indico_conf = local
+        if os.path.getmtime(local) < os.path.getmtime(default):
+            print "\nWARNING: indico.conf.local is older than indico.conf. Please run \"python setup.py upgrade\".\n"
+    else:
+        indico_conf = default
+
 
 execfile(indico_conf)
 

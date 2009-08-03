@@ -362,8 +362,16 @@ Add the following lines to your Apache2 httpd.conf:
     PythonPath "sys.path + ['%s']"
 </Directory>
 
+<Directory "%s/services">
+    SetHandler python-program
+    PythonHandler MaKaC.services.handler
+    PythonInterpreter main_interpreter
+    Allow from All
+</Directory>
+
+
 Configuration file: %s
-""" % (cfg.getHtdocsDir(), x.packageDir, os.path.join(cfg.getConfigurationDir(), 'indico.conf'))
+""" % (cfg.getHtdocsDir(), x.packageDir, cfg.getHtdocsDir(), os.path.join(cfg.getConfigurationDir(), 'indico.conf'))
 
 
     def _existingDb(self):
@@ -486,8 +494,19 @@ class develop_indico(Command):
     def finalize_options(self): pass
 
     def run(self):
-        updateIndicoConfPathInsideMaKaCConfig(os.path.join(os.path.dirname(__file__), 'indico.conf'), 'indico/MaKaC/common/MaKaCConfig.py')
+        local = 'etc/indico.conf.local'
+        if os.path.exists(local):
+            print 'Upgrading existing etc/indico.conf.local..'
+            upgrade_indico_conf(local, 'etc/indico.conf')
+        else:
+            print 'Creating new etc/indico.conf.local..'
+            shutil.copy('etc/indico.conf', local)
+
+        updateIndicoConfPathInsideMaKaCConfig(os.path.join(os.path.dirname(__file__), 'indico.conf.local'), 'indico/MaKaC/common/MaKaCConfig.py')
         compileAllLanguages()
+        print '''
+Please review etc/indico.conf.local to verify that everything is ok.
+'''
 
 
 class tests_indico(Command):
@@ -522,7 +541,7 @@ if __name__ == '__main__':
     x = Vars()
     x.packageDir = os.path.join(get_python_lib(), 'MaKaC')
 
-    if 'sdist' in sys.argv or 'bdist_egg': # we need to calculate version at this point, before sdist_indico runs
+    if 'sdist' in sys.argv or 'bdist_egg' in sys.argv: # we need to calculate version at this point, before sdist_indico runs
         x.versionVal = versionInit()
 
     setup(name = "cds-indico",
