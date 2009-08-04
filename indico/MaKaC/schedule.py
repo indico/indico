@@ -521,6 +521,8 @@ class SchEntry(Persistent):
     def setTitle( self, newTitle ):
         self.title = newTitle.strip()
 
+    @Retrieves(['MaKaC.schedule.SchEntry',
+                'MaKaC.schedule.BreakTimeSchEntry'], 'description')
     def getDescription( self ):
         return self.description
 

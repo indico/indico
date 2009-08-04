@@ -81,13 +81,13 @@ type("AddContributionDialog", ["ExclusivePopup", "PreLoadHandler"],
          _processDialogState: function() {
              var self = this;
 
-             if (this.existing.length.get() == 0) {
+             if (this.existing.length.get() === 0) {
 
                  // draw instead the creation dialog
                  var dialog = createObject(
                      AddNewContributionDialog,
-                     self.newArgs
-                 );
+                     self.newArgs);
+
                  dialog.execute();
 
                  this.open = function() {};
@@ -142,8 +142,7 @@ type("AddContributionDialog", ["ExclusivePopup", "PreLoadHandler"],
                              function() {
                                  var dialog = createObject(
                                      AddNewContributionDialog,
-                                     self.newArgs
-                                 );
+                                     self.newArgs);
                                  self.close();
                                  dialog.execute();
                              }, $T("Create a new one")
@@ -255,8 +254,8 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
             self.favorites,
             true, true, true,
             userListNothing, userListNothing, userListNothing, false, {"presenter-grant-submission": [$T("submission rights"), true]},
-	    self.args.conference
-	);
+            self.args.conference
+        );
         $B(info.accessor('presenters'), presListWidget.getUsers());
 
         var datecomponent;
@@ -318,7 +317,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
             self.favorites,
             true, true, true,
             userListNothing, userListNothing, userListNothing, false, {"author-grant-submission": [$T("submission rights"), true]},
-	    this.args.conference);
+            this.args.conference);
 
         var coauthorListWidget = new UserListField(
             'VeryShortPeopleListDiv', 'PluginPeopleList',
@@ -327,11 +326,11 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
             self.favorites,
             true, true, true,
             userListNothing, userListNothing, userListNothing, false, {"coauthor-grant-submission": [$T("submission rights"), true]},
-	    this.args.conference);
+            this.args.conference);
 
 
-	$B(info.accessor('authors'), authorListWidget.getUsers());
-	$B(info.accessor('coauthors'), coauthorListWidget.getUsers());
+        $B(info.accessor('authors'), authorListWidget.getUsers());
+        $B(info.accessor('coauthors'), coauthorListWidget.getUsers());
 
         return IndicoUtil.createFormFromMap(
             [
@@ -380,13 +379,13 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
 
         cancelButton.dom.style.marginLeft = pixels(10);
 
-	var tabs = [[$T("Basic"), self._drawMainTab(info)]];
+        var tabs = [[$T("Basic"), self._drawMainTab(info)]];
 
-	if (this.isConference) {
-	    tabs.push([$T("Authors"), self._drawAuthorsTab(info)]);
-	}
+        if (this.isConference) {
+            tabs.push([$T("Authors"), self._drawAuthorsTab(info)]);
+        }
 
-	tabs.push([$T("Advanced"), self._drawAdvancedTab(info)]);
+        tabs.push([$T("Advanced"), self._drawAdvancedTab(info)]);
         var tabWidget = new TabWidget(tabs, 600, 400);
 
         return Html.div({},
@@ -435,4 +434,168 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
      }
 
     );
+
+
+/**
+ * Creates a dialog that allows a break to be added
+ * to the schedule
+ * @param {String} method The name of the JSON-RPC method
+ *        that will be called for the break to be added
+ * @param {String} timeStartMethod The JSON-RPC method that
+ *        will be called in order to know what the default date/time for
+ *        the start of the break will be
+ * @param {Object} args the arguments that will be passed to the
+ *        JSON-RPC methods, in order to identify the event the break
+ *        will be added to
+ * @param {Object} roomInfo The object that contains the default room information
+ *        for the dialog (inherited from the parent, normally)
+ * @param {String} confStartDate A string representing the start date/time of the
+ *        parent event (DD/MM/YYY HH:MM)
+ * @param {String} dayStartDate A string representing the date of the day the
+ *        calendar is currently pointing to (DD/MM/YYYY)
+ */
+
+type("ChangeEditDialog", // silly name!
+     ["ServiceDialog", "PreLoadHandler"],
+     {
+         _preload: [
+             function(hook) {
+
+                 var self = this;
+
+                 // Get "end date" for container, so that the break be added after the rest
+                 indicoRequest(this.timeStartMethod, this.dateArgs , function(result, error){
+                     if (error) {
+                         IndicoUtil.errorReport(error);
+                     }
+                     else {
+                         self.dateTimeField.accessor.set('dateTime', result);
+                         hook.set(true);
+                     }
+                 });
+             }
+         ],
+
+         _submitInfo: function(){
+             var self = this;
+             var killProgress = IndicoUI.Dialogs.Util.progress();
+
+             each(self.args, function(value, key) {
+                 self.info.set(key, value);
+             });
+
+             indicoRequest(self.method, self.info, function(result, error){
+                 killProgress();
+                 if (error) {
+                     IndicoUtil.errorReport(error);
+                 }
+                 else {
+                     self.close();
+                     self.successFunc(result);
+                 }
+             });
+         }
+
+     },
+     function(method, args, title) {
+         var self = this;
+
+         this.PreLoadHandler(
+             this._preload,
+             function() {
+                 self.open();
+             });
+
+         this.ServiceDialog(Indico.Urls.JsonRpcService, method, args,
+                            title,
+                            function() {
+                                this.close();
+                            });
+     });
+
+
+
+type("AddBreakDialog", ["ChangeEditDialog"],
+     {
+         draw: function(){
+             var self = this;
+
+             var addButton = Html.button({}, $T("Add"));
+             var cancelButton = Html.button({}, $T("Cancel"));
+             cancelButton.dom.style.marginLeft = pixels(10);
+
+             this.info.set('roomInfo', $O(this.roomInfo));
+
+             var roomEditor = new RoomBookingWidget(this.info.get('roomInfo'), this.parentRoomInfo, true, this.args.conference);
+
+             cancelButton.observeClick(function(){
+                 self.close();
+             });
+
+
+             addButton.observeClick(function(){
+                 self._submitInfo();
+             });
+
+             invertableBind(this.info.accessor('startDate'),
+                            this.dateTimeField.accessor.accessor('dateTime'),
+                            this.isEdit,
+                            {
+                                toSource: function(obj) {
+                                    return obj?(obj.date+' '+obj.time):null;
+                                },
+                                toTarget: function(str) {
+                                    return str;
+                                }
+                            },
+                            null);
+
+             invertableBind(this.info.accessor('duration'),
+                            this.dateTimeField.accessor.accessor('duration'),
+                            this.isEdit);
+
+             return this.ServiceDialog.prototype.draw.call(
+                 this,
+                 Widget.block([IndicoUtil.createFormFromMap([[$T('Title'), $B(Html.edit({
+                     style: {
+                         width: '300px'
+                     }
+                 }), this.info.accessor('title'))], [$T('Description'), $B(Html.textarea({
+                     cols: 40,
+                     rows: 2
+                 }), this.info.accessor('description'))], [$T('Place'), roomEditor.draw()], [$T('Date/Time'), this.dateTimeField.element]]),
+                               Html.div('dialogButtons',
+                                        [addButton, cancelButton])]));
+         },
+
+         _setup: function(method, timeStartMethod, roomInfo, parentRoomInfo, confStartDate, dayStartDate, successFunc) {
+
+             this.timeStartMethod = timeStartMethod;
+             this.dateArgs = clone(this.args);
+
+             this.roomInfo = roomInfo;
+             this.parentRoomInfo = parentRoomInfo;
+             this.successFunc = successFunc;
+             this.dateTimeField.accessor.set(confStartDate);
+             this.dateArgs.date = dayStartDate;
+
+             this.ChangeEditDialog(method, this.args, $T("Add Break"));
+         }
+
+     },
+
+     function(requestArgs, args, isEdit){
+         var self = this;
+
+         this.isEdit = isEdit;
+         this.args = requestArgs;
+         this.dateTimeField = IndicoUI.Widgets.Generic.dateDurationField('', 20, ' ');
+         if (!isEdit) {
+             this.info = new WatchObject();
+             this._setup.apply(this, args);
+         } else {
+             this.info = $O(args);
+         }
+
+    });
 

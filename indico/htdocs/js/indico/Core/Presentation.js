@@ -201,3 +201,12 @@ function escapeHTML(html) {
     // from Prototype
     return html.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+
+function invertableBind(target, source, invert, template) {
+    var invTemplate = template?{
+        toSource: template.toTarget,
+        toTarget: template.toSource
+    }:null;
+    return invert?$B(source, target, invTemplate):
+        $B(target, source, template);
+}

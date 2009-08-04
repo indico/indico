@@ -340,15 +340,18 @@ type("TimetableManagementActions", [], {
             params = this._addParams('Break');
         }
 
-        IndicoUI.Dialogs.addBreak(
-            this.methods[params.type].add,
-            this.methods[params.parentType].dayEndDate,
-            params.args,
-            params.roomInfo,
-            $O(params.roomInfo),
-            params.startDate,
-            params.selectedDay,
-            function(result) { self._updateEntry(result); });
+        var dialog = new AddBreakDialog(params.args,
+            [
+                this.methods[params.type].add,
+                this.methods[params.parentType].dayEndDate,
+                params.roomInfo,
+                $O(params.roomInfo),
+                params.startDate,
+                params.selectedDay,
+                function(result) { self._updateEntry(result); }
+            ], false);
+
+        dialog.execute();
     },
     addSession: function() {
         var self = this;
