@@ -49,11 +49,13 @@ class ModulesHolder( ObjectHolder ):
         import MaKaC.modules.news as news
         import MaKaC.modules.cssTpls as cssTpls
         import MaKaC.modules.upcoming as upcoming
-
+        import MaKaC.modules.tasks as tasks
+        
         ModulesHolder._availableModules = {
-            news.NewsModule.id:news.NewsModule,
-            cssTpls.CssTplsModule.id:cssTpls.CssTplsModule,
-            upcoming.UpcomingEventsModule.id:upcoming.UpcomingEventsModule
+            news.NewsModule.id               : news.NewsModule,
+            cssTpls.CssTplsModule.id         : cssTpls.CssTplsModule,
+            upcoming.UpcomingEventsModule.id : upcoming.UpcomingEventsModule,
+            tasks.TasksModule.id             : tasks.TasksModule
         }
 
     def _newId( self ):

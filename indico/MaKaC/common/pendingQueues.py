@@ -23,7 +23,9 @@ import MaKaC.common.indexes as indexes
 from MaKaC.common import DBMgr
 from MaKaC.webinterface import mail, urlHandlers
 from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.common.timerExec import HelperTaskList, task, obj
+from MaKaC.common.timerExec import task, obj
+from MaKaC.tasks.controllers import Supervisor
+from MaKaC.tasks.base import OneShotTask 
 from persistent import Persistent
 from MaKaC.user import AvatarHolder
 from MaKaC.common.timezoneUtils import nowutc
@@ -32,8 +34,7 @@ from MaKaC.i18n import _
 
 #---GENERAL----
 
-class PendingHolder:
-
+class PendingHolder(object):
     """ This is an index that holds all the requests to add pending people to become
         Indico users.
         Those participants are not Avatars yet (do not have Indico account) and that's why
@@ -74,6 +75,7 @@ class PendingHolder:
     def _sendReminderEmail(self, sb):
         """We must implement this method in order to sent an email with the reminder for the specific pending users"""
         pass
+    
 
     def _getTasksIdx(self):
         return self._tasksIdx
@@ -84,8 +86,8 @@ class PendingHolder:
         # ------ Creating a task in order to send reminder emails periodically ------
         if not self._hasTask(email):
             # Create the object which send the email
-            pedingReminder=self._reminder(email)
-            pedingReminder.setId("ReminderPending%s-%s"%(self._id,email))
+            pedingReminder = self._reminder(email)
+            pedingReminder.setId("ReminderPending%s-%s" % (self._id,email))
             # Create the task
             t=task()
             t.addObj(pedingReminder) 
@@ -94,21 +96,21 @@ class PendingHolder:
             t.setLastDate(nw) # start in 7 days cos the first email was already sent
             t.setEndDate(nw+timedelta(15)) # keep trying during 15 days
             self._tasksIdx.indexTask(email, t)
-            # Add the track to the track list
-            htl = HelperTaskList.getTaskListInstance()
-            htl.addTask(t)
+            
+            Supervisor.addTask(t)
+            
         
     def _removeTask(self, email):
         if self._hasTask(email):
             t=self._getTasksIdx().matchTask(email)[0]
-            htl = HelperTaskList.getTaskListInstance()
-            htl.removeTask(t)
+            Supervisor.removeTask(t)
             self._tasksIdx.unindexTask(email, t)
 
     def _hasTask(self, email):
         return self._getTasksIdx().matchTask(email) != []
 
-class _PendingNotification:
+
+class _PendingNotification(object):
 
     def __init__( self, psList ):
         self._psList = psList
@@ -147,11 +149,11 @@ class _PendingNotification:
                 d[conf]=[ps]
         return d
 
-class PendingReminder(obj):
 
-    def __init__(self, email):
-        obj.__init__(self)
-        self._email=email
+class PendingReminder(OneShotTask):
+    def __init__(self, email, **kwargs):
+        super(PendingReminder, self).__init__(**kwargs)
+        self._email = email
 
     def run(self):
         """Mandatory to implement for the specific queues.
@@ -173,11 +175,11 @@ class PendingReminder(obj):
             ph.grantRights(av)
             return True
         return False
-
-    def endTask(self):
-        """Mandatory to implement for the specific queues.
-           It removes the task from the task list and from the index of the pending queue"""
-        pass
+    
+    def tearDown(self):
+        '''Inheriting classes must implement this method'''
+        raise Exception('Unimplemented tearDown')
+    
     
     def getEmail(self):
         return self._email
@@ -277,7 +279,7 @@ class PendingSubmitterReminder(PendingReminder):
                 notif = _PendingSubmitterNotification( psl )
                 mail.GenericMailer.send( notif )
 
-    def endTask(self):
+    def tearDown(self):
         psh=PendingSubmittersHolder()
         psl=psh.getPendingByEmail(self._email)
         for e in psl:
@@ -367,6 +369,7 @@ class _PendingManagerNotification(_PendingNotification):
                 participations+="\t\t\t\t - Access: %s\n" % accessURL
         return participations
 
+
 class PendingManagerReminder(PendingReminder):
 
     def run(self):
@@ -378,9 +381,9 @@ class PendingManagerReminder(PendingReminder):
                 notif = _PendingManagerNotification( psl )
                 mail.GenericMailer.send( notif )
 
-    def endTask(self):
-        psh=PendingManagersHolder()
-        psl=psh.getPendingByEmail(self._email)
+    def tearDown(self):
+        psh = PendingManagersHolder()
+        psl = psh.getPendingByEmail(self._email)
         for e in psl:
             e.getConference().getPendingQueuesMgr().removePendingManager(e)
     
@@ -435,7 +438,6 @@ class PendingConfManagersHolder(PendingHolder):
                 mail.GenericMailer.send( notif )
 
 class _PendingConfManagerNotification(_PendingNotification):
-
     def getBody( self ):
         url = urlHandlers.UHUserCreation.getURL()
         url.addParam("cpEmail",self._psList[0].getEmail())
@@ -462,8 +464,8 @@ class _PendingConfManagerNotification(_PendingNotification):
             participations+="\t\t\t- Access: %s\n" % accessURL
         return participations
 
-class PendingConfManagerReminder(PendingReminder):
 
+class PendingConfManagerReminder(PendingReminder):
     def run(self):
         hasAccount=PendingReminder.run(self)
         if not hasAccount:
@@ -473,14 +475,14 @@ class PendingConfManagerReminder(PendingReminder):
                 notif = _PendingManagerNotification( psl )
                 mail.GenericMailer.send( notif )
 
-    def endTask(self):
-        psh=PendingManagersHolder()
-        psl=psh.getPendingByEmail(self._email)
+    def tearDown(self):
+        psh = PendingManagersHolder()
+        psl = psh.getPendingByEmail(self._email)
         for e in psl:
             e.getConference().getPendingQueuesMgr().removePendingManager(e)
     
     def getPendings(self):
-        psh=PendingManagersHolder()
+        psh = PendingManagersHolder()
         return psh.getPendingByEmail(self._email)
 #---END MANAGERS 
 
@@ -559,31 +561,31 @@ class _PendingCoordinatorNotification(_PendingNotification):
                 participations+="\t\t\t\t - Access: %s\n" % accessURL
         return participations
 
-class PendingCoordinatorReminder(PendingReminder):
 
+class PendingCoordinatorReminder(PendingReminder):
     def run(self):
         hasAccount=PendingReminder.run(self)
         if not hasAccount:
-            psh=PendingCoordinatorsHolder()
-            psl=psh.getPendingByEmail(self._email)
+            psh = PendingCoordinatorsHolder()
+            psl = psh.getPendingByEmail(self._email)
             if psl != [] and psl is not None:
-                notif = _PendingCoordinatorNotification( psl )
-                mail.GenericMailer.send( notif )
+                notif = _PendingCoordinatorNotification(psl)
+                mail.GenericMailer.send(notif)
 
-    def endTask(self):
-        psh=PendingCoordinatorsHolder()
-        psl=psh.getPendingByEmail(self._email)
+    def tearDown(self):
+        psh = PendingCoordinatorsHolder()
+        psl = psh.getPendingByEmail(self._email)
         for e in psl:
             e.getConference().getPendingQueuesMgr().removePendingCoordinator(e)
     
     def getPendings(self):
-        psh=PendingCoordinatorsHolder()
+        psh = PendingCoordinatorsHolder()
         return psh.getPendingByEmail(self._email)
 
 #---END COORDINATORS 
 
 #--GENERAL---
-class PendingQueuesHolder:
+class PendingQueuesHolder(object):
 
     _pendingQueues=[PendingSubmittersHolder, \
                     PendingManagersHolder, \

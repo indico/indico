@@ -37,7 +37,9 @@ def main():
       for conf in cat.getConferenceList():
         chconf(conf)
       get_transaction().commit()
+    
     # Tasks
+    # tl = Supervisor.
     htl = timerExec.HelperTaskList.getTaskListInstance()
     for task in htl.getTasks():
         chtask(task)
