@@ -52,8 +52,10 @@ else:
             <div class="simpleTextAnnouncement"><%= simpleTextAnnouncement %></div>
         <% end %>
     </div>
-    <div id="confSectionsBox" class="clearfix">
+    <div id="confSectionsBox">
     %(menu)s
     %(body)s
     </div>
-</div>
+    <% if userId: %>
+        <% includeTpl('JabberChat',userAbrName=userAbrName,userId=userId) %>
+    <% end %>

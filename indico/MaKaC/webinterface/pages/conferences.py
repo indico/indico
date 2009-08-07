@@ -125,7 +125,12 @@ class WPConferenceDisplayBase( WPConferenceBase ):
 
 class WPConferenceDefaultDisplayBase( WPConferenceBase ):
     navigationEntry = None
-
+    
+    def getJSFiles(self):
+        modules = WPConferenceBase.getJSFiles(self)                  
+        modules += self._includeJSPackage('Jabber')
+        return modules
+    
     def _getFooter( self ):
         """
         """
@@ -424,7 +429,9 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         format = dm.getFormat()
         vars["bgColorCode"] = format.getFormatOption("titleBgColor")["code"]
         vars["textColorCode"] = format.getFormatOption("titleTextColor")["code"]
-        
+        if self._aw.getUser():
+            vars["userAbrName"] = self._aw.getUser().getAbrName() 
+            vars["userId"]=self._aw.getUser().getId()
         if (Config.getInstance().getIndicoSearchServer() != '') and dm.getSearchEnabled():
             vars["searchBox"] = wcomponents.WMiniSearchBox(self._conf.getId()).getHTML()
         else:
@@ -780,6 +787,9 @@ class WPConferenceDisplay( WPConferenceDefaultDisplayBase ):
         path = baseurl = self._getBaseURL()
         printCSS = """
         <link rel="stylesheet" type="text/css" href="%s/css/Conf_Basic.css" >
+            """ % path
+        printCSS = printCSS + """
+        <link rel="stylesheet" type="text/css" href="%s/css/jabber.css" >
             """ % path
         confCSS = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getStyleManager().getCSS()
         if confCSS:

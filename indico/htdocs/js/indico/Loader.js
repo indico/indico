@@ -10,6 +10,7 @@ include(ScriptRoot + "indico/Timetable/Loader.js");
 include(ScriptRoot + "indico/Common/Loader.js");
 include(ScriptRoot + "indico/Collaboration/Loader.js");
 include(ScriptRoot + "indico/Display/Loader.js");
+include(ScriptRoot + "indico/Jabber/Loader.js");
 
 // DEBUG only
 //include(ScriptRoot + "indico/Core/Debug.js");
