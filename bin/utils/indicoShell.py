@@ -7,7 +7,7 @@ import MaKaC
 from MaKaC.common.db import DBMgr
 from MaKaC.conference import Conference, Category, ConferenceHolder, CategoryManager, DeletedObjectHolder
 from MaKaC.user import AvatarHolder, GroupHolder
-from MaKaC.common.timerExec import HelperTaskList
+from MaKaC.common.timerExec import HelperTaskList # DEPRECATED
 from MaKaC.common.info import HelperMaKaCInfo
 
 
@@ -45,8 +45,7 @@ def setupNamespace(productionDatabase):
     add(namespace, CategoryManager)
     add(namespace, AvatarHolder)
     add(namespace, GroupHolder)
-    add(namespace, HelperTaskList)
-    add(namespace, HelperMaKaCInfo)
+    add(namespace, HelperTaskList) # DEPRECATED
     add(namespace, HelperMaKaCInfo)
 
     add(namespace, HelperMaKaCInfo.getMaKaCInfoInstance(), 'minfo', 'MaKaCInfo instance')

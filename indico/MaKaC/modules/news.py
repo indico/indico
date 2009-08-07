@@ -24,6 +24,7 @@ from datetime import datetime
 from MaKaC.common.Counter import Counter
 import MaKaC.modules.base as modules
 from MaKaC.common.info import HelperMaKaCInfo
+from MaKaC.i18n import _
 
 class NewsModule(modules.Module):
     """

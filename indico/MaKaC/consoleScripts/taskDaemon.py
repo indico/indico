@@ -22,51 +22,46 @@
 
 import sys, getopt, os, time
 
-duration = 15*60 # seconds
-linuxPIDFile="/var/run/IndicoTaskDaemon.pid"
-logFile="/opt/indico/log/taskDaemon.log"
-
 def _isPosix():
     return os.name == "posix"
 
 def _isWindows():
     return os.name == "nt"
 
-def _savePID(pid):
+def _savePID(pid, pid_file):
     try:
-        f=open(linuxPIDFile, "w")
-        f.write(str(pid))
-        f.close()
+        open(pid_file, "w").write(str(pid))
     except IOError, e:
-        print "Exception while trying to store the daemon PID in the file '%s':\n%s"%(linuxPIDFile, e)
+        print "Exception while trying to store the daemon PID in the file '%s':\n%s" % (linuxPIDFile, e)
+
 
 def _getPID(printExceptions=True):
     try:
-        f=open(linuxPIDFile, "r")
-        pid=f.read()
-        pid=pid.strip()
-        pid=int(pid)
-        f.close()
+        pid = int(open(linuxPIDFile, "r").read().strip())
         return pid
     except IOError, e:
         if printExceptions:
-            print "Exception while opening the file '%s' with the daemon PID:\n%s"%(linuxPIDFile, e)
+            print "Exception while opening the file '%s' with the daemon PID:\n%s" % (linuxPIDFile, e)
     except ValueError, e:
         if printExceptions:
-            print "Exception while reading the file '%s' with the daemon PID:\nThere is not a PID in the file"%(linuxPIDFile)
+            print "Exception while reading the file '%s' with the daemon PID:\nThere is not a PID in the file" % (linuxPIDFile)
     return -1
 
+
 def _killProcess():
-    if _isPosix():
-        pid=_getPID()
-        if pid != -1:
-            try:
-                os.kill(pid, 9)
-            except OSError, e:
-                print e
-                return False
+    if not _isPosix():
+        return False
+    
+    pid = _getPID()
+    if pid != -1:
+        try:
+            os.kill(pid, 9)
+        except OSError, e:
+            print e
+        else:
             os.remove(linuxPIDFile)
             return True
+        
     return False
 
 def initDefaultTasks():
@@ -108,27 +103,12 @@ def initDefaultTasks():
     DBMgr.getInstance().endRequest()
     print ""
 
-def fileExists(f):
-     try:
-        fi = open(f,'a')
-        fi.close()
-     except IOError:
-         exists = False
-     else:
-         exists = True
-     return exists
-
 
 def run(log=None):
-    from MaKaC.common.timerExec import timer
-
-    if _isPosix() and (not log or not fileExists(log)):
-        print "\nPlease enter an existing log file, and start again\nDaemon stopped!\n"
-        os.remove(linuxPIDFile)
-        sys.exit(2)
-    t = timer(duration, log)
-    initDefaultTasks()
-    t.start()
+    from MaKaC.tasks.controllers import Supervisor
+    Supervisor.getInstance().run()
+    # initDefaultTasks()
+    
 
 def startTaskDaemon():
     """
@@ -138,14 +118,15 @@ def startTaskDaemon():
     if oldPID!=-1:
         print "Task daemon is already running"
         sys.exit(0)
+        
     if _isPosix():
         pid=os.fork()
         if pid==0:
             #Child
-            run(log=logFile)
+            run()
         else:
             #Parent
-            _savePID(pid)
+            _savePID(pid, linuxPIDFile)
             print "Daemon started! (pid=%s)\n"%pid
             time.sleep(3)
     elif _isWindows():
@@ -154,64 +135,63 @@ def startTaskDaemon():
     else:
         print "Impossible to start the daemon"
 
+
 def stopTaskDaemon():
     if _killProcess():
         print "Daemon stopped!"
     else:
         print "Impossible to stop the process 'taskDaemon', please do it manually"
 
+
 def restartTaskDaemon():
-    _killProcess()
-    print "Daemon stopped!"
+    stopTaskDaemon()
     startTaskDaemon()
+
 
 def main():
     "Main"
     try:
-        opts, args = getopt.getopt(sys.argv[1:],"hstr", \
-                 [ \
-                   "help", \
-                   "start", \
-		   "stop", \
-		   "restart" \
-                 ]
-        )
+        opts, args = getopt.getopt(sys.argv[1:],"hstr", [ "help", "start", "stop", "restart" ])
     except getopt.GetoptError, e:
-        help()
+        usage()
         sys.exit(2)
 
-    arg=None
+    arg = None
     if len(args) == 1:
         arg=args[0]
     elif len(opts)==1:
         arg=opts[0][0]
-    if arg is not None:
-        if   arg in ("start", "s", "-s"):
+        
+    if arg:
+        if arg in ("start", "s", "-s"):
             startTaskDaemon()
         elif arg in ("stop", "t", "-t"):
             stopTaskDaemon()
         elif arg in ("restart", "r", "-r"):
             restartTaskDaemon()
         elif arg in ("help", "h", "-h", "--help"):
-            help()
+            usage()
             sys.exit()
         else:
-            help()
+            usage()
             sys.exit(2)
         return
     else:
-        help()
+        usage()
         sys.exit(2)
 
 
-def help():
-        "Print out info"
+def usage():
+    print "\nUsage: python taskDaemon.py  start|stop|restart [-h]\n"
+    print "  -h                    Help"
+    print "  -s                    Start the task daemon"
+    print "  -t                    Stop the task daemon"
+    print "  -r                    Restart the task daemon"
 
-        print "\nUsage: python taskDaemon.py  start|stop|restart [-h]\n"
-        print "  -h                    Help"
-        print "  -s                    Start the task daemon"
-        print "  -t                    Stop the task daemon"
-        print "  -r                    Restart the task daemon"
 
 if __name__ == "__main__":
+    from MaKaC.common.Configuration import Config
+    cfg = Config.getInstance()
+    linuxPIDFile = "%s/IndicoTaskDaemon.pid" % cfg.getLogDir()
+    logFile = "%s/taskDaemon.log" % cfg.getLogDir()
     main()

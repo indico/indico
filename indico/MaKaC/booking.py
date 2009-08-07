@@ -41,7 +41,6 @@ from MaKaC.common.Counter import Counter
 from MaKaC.common.ObjectHolders import ObjectHolder, IndexHolder
 from MaKaC.common.Locators import Locator
 from MaKaC.accessControl import AccessController
-from MaKaC.common.timerExec import HelperTaskList, Alarm
 from MaKaC.errors import MaKaCError, TimingError, ParentTimingError
 from MaKaC import registration
 from MaKaC.i18n import _

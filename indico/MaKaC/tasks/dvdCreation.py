@@ -19,8 +19,6 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-'''TODO TASKDAEMON: remove this file once the migration to the new taskDaemon is complete'''
-
 import traceback, string
 import sys
 import shutil, os
@@ -30,22 +28,24 @@ from MaKaC.webinterface import urlHandlers
 from MaKaC.common.Configuration import Config
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC import conference, schedule
-from MaKaC.common.timerExec import HelperTaskList, task, obj
+from MaKaC.tasks.controllers import Supervisor
+from MaKaC.tasks.base import OneShotTask 
 from MaKaC.common.contribPacker import ZIPFileHandler
 from MaKaC.errors import MaKaCError
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 import MaKaC.common.info as info
 from MaKaC.i18n import _
 
-class OfflineWebsiteCreator(obj):
+class OfflineWebsiteCreator(OneShotTask):
+    def __init__(self, rh, conf, **kwargs):
+        super(OfflineWebsiteCreator, self).__init__(**kwargs)
 
-    def __init__(self, rh, conf):
-        obj.__init__(self)
-        self._rh=rh
-        self._conf=conf
-        self._outputFileName=""
-        self._toUser=rh._getUser()
-        self._fileHandler=None
+        self._rh = rh
+        self._conf = conf
+        self._outputFileName = ""
+        self._toUser = rh._getUser()
+        self._fileHandler = None
+
 
     def _getFileExtension(self, name):
         fileExtension = os.path.splitext( name )[1]
@@ -138,7 +138,6 @@ class OfflineWebsiteCreator(obj):
     
     
 class ConferenceOfflineCreator(OfflineWebsiteCreator):
-
     def _getSubdir(self, pars):
         aux = {}
         for par in pars.keys():
@@ -146,7 +145,7 @@ class ConferenceOfflineCreator(OfflineWebsiteCreator):
         return aux
         
 
-    def run( self, fileHandler=None ):
+    def run(self, fileHandler=None):
         publicFileURL = ""
         try:
             #print "[DVD] Creating offline site . . .",
@@ -347,8 +346,8 @@ class ConferenceOfflineCreator(OfflineWebsiteCreator):
         #print "---task finished---"
         return publicFileURL
 
-class MeetingOfflineCreator(OfflineWebsiteCreator):
-    
+
+class MeetingOfflineCreator(OfflineWebsiteCreator):    
     def getRootDirPars(self, target, pars):
         rootDir="."
         if not isinstance(target, conference.Conference):
@@ -361,6 +360,7 @@ class MeetingOfflineCreator(OfflineWebsiteCreator):
         for par in pars.keys():
             aux[par] = "%s/%s"%(rootDir,pars[par])
         return aux
+    
     
     def run( self, fileHandler=None ):
         publicFileURL = ""
@@ -488,25 +488,21 @@ class RHWrapper(Persistent):
     
 class DVDCreation:
     def __init__(self, rh, conf, wf):
-        self._rh=rh
-        self._conf=conf
-        self._wf=wf
+        self._rh = rh
+        self._conf = conf
+        self._wf = wf
 
     def create(self):
         # Create a wrapper for the RH
         rhw = RHWrapper(self._rh)
+        
         # Instantiate a dvd creator
         if self._wf is None:
             dvdCreator = ConferenceOfflineCreator(rhw, self._conf)
         else:
             dvdCreator = MeetingOfflineCreator(rhw, self._conf)
+            
         dvdCreator.setId("OffLineWebsiteCreator")
         
-        # Create a task for the DVD Creator
-        dvdTask = task()
-        dvdTask.addObj(dvdCreator)
-
-        # Add the task to the task list
-        htl = HelperTaskList.getTaskListInstance()
-        htl.addTask(dvdTask)
-
+        # Submit the task
+        Supervisor.addTask(dvdCreator)
