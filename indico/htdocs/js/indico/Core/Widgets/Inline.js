@@ -227,7 +227,7 @@ type("RadioFieldWidget", ["InlineWidget"],
 
      });
 
-type("SelectRemoteWidget", ["InlineRemoteWidget"],
+type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor"],
      {
          _drawItem: function(item) {
              var option = Widget.option(item);// Html.option({value: item.key}, item.get());
@@ -259,6 +259,7 @@ type("SelectRemoteWidget", ["InlineRemoteWidget"],
                                      return self._drawItem(item);
                                  });
          },
+
          observe: function(func) {
              this.select.observe(func);
          },
@@ -271,9 +272,16 @@ type("SelectRemoteWidget", ["InlineRemoteWidget"],
          enable: function() {
              this.select.dom.disabled = false;
          },
+         get: function() {
+             return this.select.get();
+         },
          set: function(option) {
              this.selected.set(option);
-         }
+         },
+         unbind: function() {
+             bind.detach(this.select);
+         },
+
      },
      function(method, args) {
          this.options = new WatchObject();
@@ -357,7 +365,7 @@ type("RealtimeTextBox", ["IWidget", "WatchAccessor"],
 
                  if ((keyCode < 32 && keyCode != 8) || (keyCode >= 33 && keyCode < 46) || (keyCode >= 112 && keyCode <= 123)) {
                      each(self.otherKeyObservers, function(func) {
-                         value = value && func(keyCode, event);
+                         value = value && func(self.input.get(), keyCode, event);
                      });
                      return value;
                  }
@@ -372,7 +380,7 @@ type("RealtimeTextBox", ["IWidget", "WatchAccessor"],
 
                  if (!((keyCode < 32 && keyCode != 8) || (keyCode >= 33 && keyCode < 46) || (keyCode >= 112 && keyCode <= 123))) {
                      each(self.observers, function(func) {
-                         value = value && func(keyCode, event);
+                         value = value && func(self.input.get(), keyCode, event);
                      });
                      Dom.Event.dispatch(self.input.dom, 'change');
                      return value;

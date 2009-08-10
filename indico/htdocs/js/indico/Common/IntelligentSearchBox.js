@@ -232,7 +232,7 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
              return true;
          });
 
-         this.observeOtherKeys(function(key, event) {
+         this.observeOtherKeys(function(text, key, event) {
              if (key == 38 || key == 40) {
                  self._moveSelector(key==38?'up':'down');
              } else if (key == 27) {
