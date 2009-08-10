@@ -23,7 +23,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import materialDisplay
 
-if DEVELOPEMENT:
+if DEVELOPMENT:
     materialDisplay = reload( materialDisplay )
 
 

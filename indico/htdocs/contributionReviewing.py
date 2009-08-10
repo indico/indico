@@ -2,7 +2,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import contribReviewingModif
 
-if DEVELOPEMENT:
+if DEVELOPMENT:
     contribReviewingModif = reload( contribReviewingModif )
 
 

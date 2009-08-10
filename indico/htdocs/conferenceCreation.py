@@ -23,7 +23,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import categoryDisplay
 
-if DEVELOPEMENT:
+if DEVELOPMENT:
     categoryDisplay = reload( categoryDisplay )
 
 

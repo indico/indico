@@ -24,7 +24,7 @@ from MaKaC.common.general import *
 from MaKaC.webinterface.rh import domains
 
 
-if DEVELOPEMENT:
+if DEVELOPMENT:
     domains = reload( domains )
 
 

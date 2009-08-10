@@ -1,7 +1,7 @@
-from MaKaC.common.general import DEVELOPEMENT
+from MaKaC.common.general import DEVELOPMENT
 from MaKaC.webinterface.rh import reviewingModif
 
-if DEVELOPEMENT:
+if DEVELOPMENT:
     reviewingModif = reload( reviewingModif )
 
 def access( req, **params ):

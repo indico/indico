@@ -24,5 +24,5 @@
 
 # indicates whether we are or not in developement; being in developement implies
 #   that some of the modules will be reloaded
-DEVELOPEMENT = 0 
+DEVELOPMENT = 0 
 

@@ -23,19 +23,25 @@ import unittest
 import shutil
 import sys
 from subprocess import call, PIPE
-from setup import confmerge
+from setup import confmerge, modifyOnDiskIndicoConfOption
 
 # CONFIG
 DEBUG_INSTALL = True # set to True to see all stdout
 # END CONFIG
 
 TESTSITEPACKAGES = '_test_site_packages'
+TESTCONFIGURATIONDIR = "_testinstall/etc"
+TESTBINDIR = "_testinstall/bin"
+TESTDOCUMENTATIONDIR = "_testinstall/doc"
+TESTHTDOCSDIR = "_testinstall/htdocs"
+SAMPLE_JSCOMPRESSED_FILE = 'indico/htdocs/js/presentation/pack/Presentation.pack.js'
+
 SAMPLE_MO_FILE = 'indico/MaKaC/po/locale/en_US/LC_MESSAGES/messages.mo'
-MAKACCONFIGPY = "indico/MaKaC/common/MaKaCConfig.py"
-MAKACCONFIGPYBAK = "%s.bak" % MAKACCONFIGPY
-TESTCONFIGDIR = "_testconfigdir"
+MAKACCONFIGPY = "%s/../indico/MaKaC/common/MaKaCConfig.py" % os.path.dirname(__file__)
+MAKACCONFIGPYBAK = "%s/../%s.bak" % (os.path.dirname(__file__), MAKACCONFIGPY)
 INDICOCONFCERNMARKER_START = '# DO NOT EDIT THIS LINE (CERN) ------------------------------------------------'
 INDICOCONFCERNMARKER_END = '# DO NOT EDIT THIS LINE (CERN) - End of CERN specific'
+INDICOCONF = "%s/../etc/indico.conf.local" % os.path.dirname(__file__)
 
 class TestSetupPy(unittest.TestCase):
     def setUp(self):
@@ -43,9 +49,10 @@ class TestSetupPy(unittest.TestCase):
         self._prevcwd = os.getcwd()
         os.chdir(self._rootDir)
         self._testFile = '%s/dist/cds-indico-None.tar.gz' % self._rootDir
+        self._testFileVersion = '%s/dist/cds-indico-0.96.tar.gz' % self._rootDir
         shutil.copyfile(MAKACCONFIGPY, MAKACCONFIGPYBAK)
-        if os.path.exists(TESTCONFIGDIR):
-            shutil.rmtree(TESTCONFIGDIR)
+        if os.path.exists(TESTCONFIGURATIONDIR):
+            shutil.rmtree(TESTCONFIGURATIONDIR)
 
         if DEBUG_INSTALL:
             self._stdout = None
@@ -53,26 +60,32 @@ class TestSetupPy(unittest.TestCase):
             self._stdout = PIPE
 
         self._stdin = PIPE
-
-        if os.path.exists('indico/MaKaC/po/locale/en_US/LC_MESSAGES/messages.mo'):
-            os.unlink('indico/MaKaC/po/locale/en_US/LC_MESSAGES/messages.mo')
+        
+        for f in (SAMPLE_MO_FILE,
+                  SAMPLE_JSCOMPRESSED_FILE):
+            if os.path.exists(f):
+                os.unlink(f)
 
         # Directory to uncompress packages to
         self.dist_test = '%s/dist_test' % self._rootDir
+        
+        # We make a backup of indico.conf
+        shutil.copyfile(INDICOCONF, "%s.running_tests" % INDICOCONF)
 
 
     def tearDown(self):
         shutil.copyfile(MAKACCONFIGPYBAK, MAKACCONFIGPY)
 
-        for f in (self._testFile, 'indico/MaKaC/po/locale/en_US/LC_MESSAGES/messages.mo', MAKACCONFIGPYBAK):
+        for f in (self._testFile, SAMPLE_MO_FILE, MAKACCONFIGPYBAK):
             if os.path.exists(f):
                 os.unlink(f)
 
-        for dir in (self.dist_test, 'build', 'dist', os.path.join(self._rootDir, TESTSITEPACKAGES)):
+        for dir in (self.dist_test, 'build', 'dist', os.path.join(self._rootDir, TESTSITEPACKAGES), os.path.join(self._rootDir, '_testinstall')):
             if os.path.exists(dir):
                 shutil.rmtree(dir)
 
         os.chdir(self._prevcwd)
+        shutil.copyfile("%s.running_tests" % INDICOCONF, INDICOCONF)
 
 
     def uncompressGeneratedDistFile(self):
@@ -80,70 +93,60 @@ class TestSetupPy(unittest.TestCase):
             shutil.rmtree(self.dist_test)
 
         os.makedirs(self.dist_test)
-        self.assertEqual(0, call(['tar', 'xfz', 'dist/cds-indico-None.tar.gz', '-C', self.dist_test]))
+        self.assertEqual(0, call(['tar', 'xfz', 'dist/cds-indico-0.96.tar.gz', '-C', self.dist_test]))
 
 
     def testBuildShouldWork(self):
         self.assertEqual(0, call([sys.executable, 'setup.py', 'build'], stdout=self._stdout))
 
-
     def testInstallShouldWork(self):
-        retcode = call([sys.executable, 'setup.py', 'install', '--force-upgrade', '--root', TESTSITEPACKAGES, '--config-dir', TESTCONFIGDIR, '--uid', str(os.getuid()), '--gid', str(os.getgid())], stdout=self._stdout, stdin=self._stdin)
+        modifyOnDiskIndicoConfOption('etc/indico.conf.local', 'ConfigurationDir', TESTCONFIGURATIONDIR)
+        modifyOnDiskIndicoConfOption('etc/indico.conf.local', 'BinDir', TESTBINDIR)
+        modifyOnDiskIndicoConfOption('etc/indico.conf.local', 'DocumentationDir', TESTDOCUMENTATIONDIR)
+        modifyOnDiskIndicoConfOption('etc/indico.conf.local', 'HtdocsDir', TESTHTDOCSDIR)
+        retcode = call([sys.executable, 'setup.py', 'install', '--root', TESTSITEPACKAGES, '--uid', str(os.getuid()), '--gid', str(os.getgid())], stdout=self._stdout, stdin=self._stdin)
         self.assertEqual(0, retcode)
-        assert(os.path.exists('%s/indico.conf' % TESTCONFIGDIR))
+        assert(os.path.exists('%s/indico.conf' % TESTCONFIGURATIONDIR))
+
 
     def testInstallDeveloperShouldWork(self):
-        self.assertEqual(0, call([sys.executable, 'setup.py', 'install', '--uid', str(os.getuid()), '--gid', str(os.getgid()), '--developer'], stdout=self._stdout, stdin=self._stdin))
+        self.assertEqual(0, call([sys.executable, 'setup.py', 'develop'], stdout=self._stdout, stdin=self._stdin))
 
 
     def testSdistShouldWorkWithVersionSpecified(self):
         self.assertEqual(0, call([sys.executable, 'setup.py', 'sdist', '--version', '0.96'], stdout=self._stdout))
-        self.assertTrue(os.path.exists(self._testFile))
+        self.assertTrue(os.path.exists(self._testFileVersion))
 
-
-    def testSdistCERNShouldPreserveCERNSpecificVariablesInIndicoConf(self):
-        self.assertEqual(0, call([sys.executable, 'setup.py', 'sdist', '--version', '0.96', '--cern-package', '../cerndistdir'], stdout=self._stdout))
-        self.uncompressGeneratedDistFile()
-        self.assertNotEquals(-1, file('%s/dist_test/cds-indico-None/indico.conf' % self._rootDir).read().find(INDICOCONFCERNMARKER_START))
-        self.assertNotEquals(-1, file('%s/dist_test/cds-indico-None/indico.conf' % self._rootDir).read().find(INDICOCONFCERNMARKER_END))
-
-    def testSdistWithoutCERNShouldNotPreserverCERNSpecificVariablesInIndicoConf(self):
-        self.testSdistShouldWorkWithVersionSpecified()
-        self.uncompressGeneratedDistFile()
-        self.assertEquals(-1, file('%s/dist_test/cds-indico-None/indico.conf' % self._rootDir).read().find(INDICOCONFCERNMARKER_START))
-        self.assertEquals(-1, file('%s/dist_test/cds-indico-None/indico.conf' % self._rootDir).read().find(INDICOCONFCERNMARKER_END))
-
-
+    
     def testInstallWithExistingInstallationShouldPreserveOldValuesInIndicoConf(self):
         self.testInstallShouldWork()
         # we modify installed indico.conf
-        orig = file('%s/indico.conf' % TESTCONFIGDIR).read()
-        self.assertNotEqual(-1, orig.find('("localhost", 9675)'))
-        file('%s/indico.conf' % TESTCONFIGDIR, 'w').write(orig.replace('("localhost", 9675)', '("localhost", 9676)'))
-        # print file('%s/indico.conf' % TESTCONFIGDIR).read()
-
-        retcode = call([sys.executable, 'setup.py', 'install', '--force-upgrade', '--root', TESTSITEPACKAGES, '--config-dir', TESTCONFIGDIR, '--uid', str(os.getuid()), '--gid', str(os.getgid())], stdout=self._stdout, stdin=self._stdin)
+        modifyOnDiskIndicoConfOption('%s/indico.conf' % TESTCONFIGURATIONDIR, 'DBConnectionParams', ("localhost", 9676))
+        retcode = call([sys.executable, 'setup.py', 'install', '--force-upgrade', '--root', TESTSITEPACKAGES, '--uid', str(os.getuid()), '--gid', str(os.getgid())], stdout=self._stdout, stdin=self._stdin)
         self.assertEqual(0, retcode)
-        self.assertNotEqual(-1, file('%s/indico.conf' % TESTCONFIGDIR).read().find('(\'localhost\', 9676)'))
+        self.assertNotEqual(-1, file('%s/indico.conf' % TESTCONFIGURATIONDIR).read().find('(\'localhost\', 9676)'))
+        
 
-    def atestJsbuildShouldWork(self):
+
+    def testJsbuildShouldWork(self):
         self.assertEqual(0, call([sys.executable, 'setup.py', 'jsbuild'], stdout=self._stdout))
-        self.assertTrue(os.path.exists(self._testFile))
+        self.assertTrue(os.path.exists(SAMPLE_JSCOMPRESSED_FILE))
 
 
     def testInstallDeveloperModeShouldCompileLanguages(self):
-        assert(not os.path.exists('./indico/MaKaC/po/locale/en_US/LC_MESSAGES/messages.mo'))
+        assert(not os.path.exists(SAMPLE_MO_FILE))
         self.testInstallDeveloperShouldWork()
         assert(os.path.exists(SAMPLE_MO_FILE))
 
 
-    def testInstallNonDeveloperShouldProperlySetMaKaCConfigReferenceToIndicoConf(self):
+    def testInstallShouldProperlySetMaKaCConfigReferenceToIndicoConf(self):
         self.testInstallShouldWork()
         from distutils.sysconfig import get_python_lib
-        cfg_py = "%s/%s/%s" % (TESTSITEPACKAGES, get_python_lib()[1:], MAKACCONFIGPY.replace('indico/', ''))
-        self.assertNotEquals(-1, (open(cfg_py).read().find("indico_conf = \"%s/indico.conf\"" % TESTCONFIGDIR)))
+        cfg_py = "%s/%s" % (TESTSITEPACKAGES, 'usr/local/lib/python2.6/dist-packages/MaKaC/common/MaKaCConfig.py')
+        print open(cfg_py).read()
+        self.assertNotEquals(-1, (open(cfg_py).read().find("indico_conf = \"%s/indico.conf\"" % TESTCONFIGURATIONDIR)))
 
 
     def testInstallDeveloperShouldProperlySetMaKaCConfigReferenceToIndicoConf(self):
         self.testInstallDeveloperShouldWork()
-        assert(open(MAKACCONFIGPY).read().find('indico_conf = "indico.conf"') != -1)
+        assert(open(MAKACCONFIGPY).read().find('indico_conf = ""') == -1)

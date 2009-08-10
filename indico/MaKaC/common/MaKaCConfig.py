@@ -20,7 +20,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## WARNING: THE FOLLOWING LINE WILL BE OVERWRITTEN AT INSTALLATION TIME
-indico_conf = "" # path to indico.conf
+indico_conf = "etc/indico.conf.local" # path to indico.conf
 ##
 
 import os

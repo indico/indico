@@ -23,7 +23,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import contribMod
 
-if DEVELOPEMENT:
+if DEVELOPMENT:
     contribMod = reload( contribMod )
 
 

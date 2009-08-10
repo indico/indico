@@ -25,7 +25,7 @@ from MaKaC.webinterface import pages
 
 from MaKaC.webinterface import pages
 
-if DEVELOPEMENT:
+if DEVELOPMENT:
     pages = reload(pages)
 
 

@@ -23,7 +23,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import fileModif
 
-if DEVELOPEMENT:
+if DEVELOPMENT:
     pages = reload(pages)
 
 

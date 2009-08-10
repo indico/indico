@@ -23,7 +23,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import groups
 
-if DEVELOPEMENT:
+if DEVELOPMENT:
     groups = reload(groups)
 
 

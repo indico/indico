@@ -41,8 +41,8 @@ class RHSearchBase:
         self._noQuery = False        
         self._page = int(params.get('page', 1))
 
-        isearch=Config.getInstance().getIndicoSearchServer()
-        SEAClassName = MaKaCConfig.indicoSearchClass
+        isearch = Config.getInstance().getIndicoSearchServer()
+        SEAClassName = Config.getInstance().getIndicoSearchClass()
         
         moduleName = '.'.join(SEAClassName.split('.')[:-1])
         self._SEAClassName = SEAClassName.split('.')[-1]

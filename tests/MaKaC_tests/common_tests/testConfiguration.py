@@ -22,6 +22,7 @@ import unittest
 import shutil
 import sys
 from MaKaC.common.Configuration import Config
+from setup import confmerge, modifyOnDiskIndicoConfOption
 
 class TestConfiguration(unittest.TestCase):
     def testGetInstanceShouldWork(self):
@@ -29,32 +30,44 @@ class TestConfiguration(unittest.TestCase):
 
     def testDynamicFindersShouldWork(self):
         self.testGetInstanceShouldWork()
-        self.assertEqual('/opt/indico/htdocs', self.config.getHtdocsDir())
+        self.config.getHtdocsDir()
+        self.config.getVersion()
+
+    def testSmtpUseTLS(self):
+        self.testGetInstanceShouldWork()
+        
+        modifyOnDiskIndicoConfOption('etc/indico.conf.local', 'SmtpUseTLS', 'no')
+        self.config.forceReload()
+        self.assertEquals(False, self.config.getSmtpUseTLS())
+        
+        modifyOnDiskIndicoConfOption('etc/indico.conf.local', 'SmtpUseTLS', 'yes')
+        self.config.forceReload()
+        self.assertEquals(True, self.config.getSmtpUseTLS())
 
 
     def testReloadShoulShowNewIndicoConfValuesIfConfMoved(self):
         self.testGetInstanceShouldWork()
         orig = file('indico/MaKaC/common/MaKaCConfig.py').read()
-        new = orig.replace('indico_conf = "indico.conf"', 'indico_conf = "indico2.conf"')
+        new = orig.replace('indico_conf = ""', 'indico_conf = "etc/indico2.conf"')
         file('indico/MaKaC/common/MaKaCConfig.py', 'w').write(new)
         try:
-            shutil.move('indico.conf', 'indico2.conf')
+            shutil.move('etc/indico.conf.local', 'etc/indico2.conf')
             self.config.forceReload()
-            self.assertEqual('/opt/indico/htdocs', self.config.getHtdocsDir())
+            self.config.getHtdocsDir()
         finally:
             file('indico/MaKaC/common/MaKaCConfig.py', 'w').write(orig)
-            shutil.move('indico2.conf', 'indico.conf')
+            shutil.move('etc/indico2.conf', 'etc/indico.conf.local')
 
 
     def testReloadShoulShowNewIndicoConfValuesIfConfChanged(self):
         self.testGetInstanceShouldWork()
-        orig = file('indico.conf').read()
-        file('indico.conf', 'w').write(orig.replace('BaseURL              = "http://localhost/"',
-                                                    'BaseURL              = "http://localhost2/"'))
+        orig = file('etc/indico.conf.local').read()
+        file('etc/indico.conf.local', 'w').write(orig.replace('BaseURL              = "http://localhost/"',
+                                                              'BaseURL              = "http://localhost2/"'))
 
         try:
             self.config.forceReload()
             self.assertEqual('http://localhost2/', self.config.getBaseURL())
         finally:
-            file('indico.conf', 'w').write(orig.replace('BaseURL              = "http://localhost2/"',
-                                                        'BaseURL              = "http://localhost/"'))
+            file('etc/indico.conf.local', 'w').write(orig.replace('BaseURL              = "http://localhost2/"',
+                                                                  'BaseURL              = "http://localhost/"'))

@@ -23,7 +23,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import login
 
-if DEVELOPEMENT:
+if DEVELOPMENT:
     login = reload(login)
 
 

@@ -24,7 +24,7 @@
 # TODO: this file should be removed. I think it is not used anymore! (Jose B.)
 from MaKaC.common.general import *
 
-if DEVELOPEMENT:
+if DEVELOPMENT:
     from MaKaC import webinterface
     webinterface = reload( webinterface )
 

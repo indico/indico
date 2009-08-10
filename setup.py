@@ -43,6 +43,11 @@ import tests
 
 INDICO_INSTALL = True # Needed by common/__init__.py
 
+if os.path.exists('etc/indico.conf.local'):
+    PWD_INDICO_CONF = 'etc/indico.conf.local'
+else:
+    PWD_INDICO_CONF = 'etc/indico.conf'
+    
 class Vars:
     '''Variable holder.'''
     packageDir = None
@@ -66,6 +71,7 @@ def getDataFiles(x):
     #                                 ('a', 'b/c/d.jpg'))
     #
     # first into a dict and then into a pallatable form for setuptools.
+    
     for (baseDstDir, files, remove_first_x_chars) in ((cfg.getBinDir(),           findall('bin'), 4),
                                                       (cfg.getDocumentationDir(), ['doc/UserGuide.pdf','doc/AdminUserGuide.pdf'], 4),
                                                       (cfg.getConfigurationDir(), findall('etc'), 4),
@@ -85,43 +91,83 @@ def getDataFiles(x):
     return dataFiles
 
 
-def upgrade_indico_conf(existing_conf, new_conf):
-    '''Copies new_conf values to existing_conf preserving existing_conf's values'''
+def upgrade_indico_conf(existing_conf, new_conf, mixinValues={}):
+    '''Copies new_conf values to existing_conf preserving existing_conf's values
+    
+    If mixinValues is given its items will be preserved above existing_conf's values and new_conf's values'''
+    
     # We retrieve values from newest indico.conf
     execfile(new_conf)
     new_values = locals()
-
     # We retrieve values from existing indico.conf
     execfile(existing_conf)
     existing_values = locals()
-
-    # We merge them
-    result_values = confmerge(existing_values, new_values)
+   
+    new_values.update(existing_values)
+    new_values.update(mixinValues)
+    
+    # We have to preserve options not currently present in the bundled indico.conf because they
+    # may belong to a plugin. This functionality can lead to forget adding new options to
+    # Configuration.py so be careful my friend. 
+    
+    # We remove vars defined here that aren't options
+    for k in ('new_values', 'new_conf', 'existing_conf', 'mixinValues'):
+        new_values.pop(k)
+        
+    result_values = new_values
 
     # We update a current copy of indico.conf with the new values
     new_contents = open(new_conf).read()
     for k in new_values:
         if new_values[k].__class__ == str:
-            new_contents = re.sub('(%s[ ]*=[ ]*[\'"]{1})([^\'"]+)([\'"]{1})' % k, "\\g<1>%s\\3" % result_values[k], new_contents)
+            regexp = re.compile('^(%s[ ]*=[ ]*[\'"]{1})([^\'"]*)([\'"]{1})' % k, re.MULTILINE)
+            if regexp.search(new_contents):
+                new_contents = re.sub(regexp, "\\g<1>%s\\3" % result_values[k], new_contents)
+            else:
+                new_contents = "%s\n%s = '%s'" % (new_contents, k, result_values[k])
         elif new_values[k].__class__ == int:
-            new_contents = re.sub('(%s[ ]*=[ ]*)([0-9]+)' % k, "\\1 %s" % result_values[k], new_contents)
+            regexp = re.compile('^(%s[ ]*=[ ]*)([0-9]+)' % k, re.MULTILINE)
+            if regexp.search(new_contents):
+                new_contents = re.sub(regexp, "\\g<1>%s" % result_values[k], new_contents)
+            else:
+                new_contents = "%s\n%s = %s" % (new_contents, k, str(result_values[k]))
+            
         elif new_values[k].__class__ == tuple:
-            new_contents = re.sub('(%s[ ]*=[ ]*)[\(]{1}([^\)]+)[\)]{1}' % k, "\\g<1>%s" % str(result_values[k]), new_contents)
+            regexp = re.compile('^(%s[ ]*=[ ]*)[\(]{1}([^\)]+)[\)]{1}' % k, re.MULTILINE)
+            if regexp.search(new_contents):
+                new_contents = re.sub(regexp, "\\g<1>%s" % str(result_values[k]), new_contents)
+            else:
+                new_contents = "%s\n%s = %s" % (new_contents, k, str(result_values[k]))
+            
         elif new_values[k].__class__ == dict:
-            new_contents = re.sub('(%s[ ]*=[ ]*)[\{]{1}([^\}]+)[\}]{1}' % k, "\\g<1>%s" % str(result_values[k]), new_contents)
+            regexp = re.compile('^(%s[ ]*=[ ]*)[\{]{1}([^\}]+)[\}]{1}' % k, re.MULTILINE)
+            if regexp.search(new_contents):
+                new_contents = re.sub(regexp, "\\g<1>%s" % str(result_values[k]), new_contents)
+            else:
+                new_contents = "%s\n%s = %s" % (new_contents, k, str(result_values[k]))
+            
         elif new_values[k].__class__ == list:
-            new_contents = re.sub('(%s[ ]*=[ ]*)[\[]{1}([^\]]+)[\]]{1}' % k, "\\g<1>%s" % str(result_values[k]), new_contents)
+            regexp = re.compile('^(%s[ ]*=[ ]*)[\[]{1}([^\]]+)[\]]{1}' % k, re.MULTILINE)
+            if regexp.search(new_contents):
+                new_contents = re.sub(regexp, "\\g<1>%s" % str(result_values[k]), new_contents)
+            else:
+                new_contents = "%s\n%s = %s" % (new_contents, k, str(result_values[k]))
         else:
             raise 'Invalid config value "%s = %s"' % (k, new_values[k])
-
+    
+    # We write unknown options to the end of the file, they may not be just outdated options but plugins' 
     open(existing_conf, 'w').write(new_contents)
 
+
+def modifyOnDiskIndicoConfOption(indico_conf, optionName, optionValue):
+    upgrade_indico_conf(indico_conf, indico_conf, {optionName: optionValue})
+        
 
 def updateIndicoConfPathInsideMaKaCConfig(indico_conf_path, makacconfigpy_path):
         '''Modifies the location of indico.conf referenced inside makacconfigpy_path to
         point to indico_conf_path'''
         fdata = open(makacconfigpy_path).read()
-        fdata = re.sub('indico_conf[ ]*=[ ]*[\'"]{1}([^\'"]+)[\'"]{1}', "indico_conf = \"%s\"" % indico_conf_path, fdata)
+        fdata = re.sub('indico_conf[ ]*=[ ]*[\'"]{1}([^\'"]*)[\'"]{1}', "indico_conf = \"%s\"" % indico_conf_path, fdata)
         open(makacconfigpy_path, 'w').write(fdata)
 
 
@@ -162,8 +208,8 @@ def jsCompress():
     '''Packs and minifies javascript files'''
     jsbuildPath = 'jsbuild'
     os.chdir('./etc/js')
-    os.system('%s -o ../../indico/htdocs/js/indico/pack -v indico.cfg' % jsbuildPath)
-    os.system('%s -o ../../indico/htdocs/js/presentation/pack -v presentation.cfg' % jsbuildPath )
+    os.system('%s -o ../../indico/htdocs/js/indico/pack indico.cfg' % jsbuildPath)
+    os.system('%s -o ../../indico/htdocs/js/presentation/pack presentation.cfg' % jsbuildPath )
     os.chdir('../..')
 
 
@@ -261,20 +307,9 @@ class install_indico(install.install):
 
         if self.config_dir == None:
             self.config_dir = cfg.getConfigurationDir()
-
-
-        if self.root == None:
-            self._makaccconfig_base_dir = get_python_lib()
-        else:
-            # os.path.join('a'. '/b') returns /b instead of a/b
-            # TODO this will not work on Windows
-            if get_python_lib()[0] == '/':
-                pylib = get_python_lib()[1:]
-            else:
-                pylib = get_python_lib()
-
-            self._makaccconfig_base_dir = os.path.join(self.root, pylib)
-
+        
+        self._makaccconfig_base_dir = '%s/MaKaC/common' % self.install_lib
+        
         if self._existingInstallation():
             if self.force_upgrade:
                 print 'Upgrading existing Indico installation..'
@@ -302,22 +337,26 @@ What do you want to do [u/E]? ''' % self._existingIndicoConfPath())
 
 
         compileAllLanguages()
-        configpath = os.path.join(self.config_dir, 'indico.conf')
-        updateIndicoConfPathInsideMaKaCConfig(configpath, os.path.join('indico', 'MaKaC', 'common', 'MaKaCConfig.py'))
+        indicoconfpath = os.path.join(self.config_dir, 'indico.conf')
+          
+        updateIndicoConfPathInsideMaKaCConfig(indicoconfpath, os.path.join('indico', 'MaKaC', 'common', 'MaKaCConfig.py'))
         install.install.run(self)
         self._createDirs(x)
-        updateIndicoConfPathInsideMaKaCConfig(configpath, 'etc/indico.conf')
+        
+        updateIndicoConfPathInsideMaKaCConfig(indicoconfpath, os.path.join(self._makaccconfig_base_dir, 'MaKaCConfig.py'))
 
-        # updateIndicoConfPathInsideMaKaCConfig(configpath, os.path.join(self._makaccconfig_base_dir, 'MaKaC', 'common', 'MaKaCConfig.py'))
+        if not os.path.exists(self.config_dir):
+            os.makedirs(self.config_dir)
 
-        if not os.path.exists(os.path.dirname(configpath)):
-            os.makedirs(os.path.dirname(configpath))
+        for f in [xx for xx in ('%s/zdctl.conf' % self.config_dir, '%s/zodb.conf' % self.config_dir) if not os.path.exists(xx)]:
+            shutil.copy('%s.sample' % f, f)
 
-        if os.path.exists(configpath):
-            upgrade_indico_conf(configpath, 'etc/indico.conf')
-        else: # first time installation
-            shutil.copy('etc/indico.conf', configpath)
+        if not os.path.exists(indicoconfpath):
+            shutil.copy(PWD_INDICO_CONF, indicoconfpath)
 
+        upgrade_indico_conf(indicoconfpath, PWD_INDICO_CONF)
+            
+        
         if not self._existingDb():
             opt = None
             while opt not in ('Y', 'y', 'n', ''):
@@ -350,6 +389,15 @@ Do you want to create a new database now [Y/n]? ''' % str(cfg.getDBConnectionPar
 Congratulations!
 Indico has been installed correctly.
 
+    indico.conf:      %s/indico.conf
+
+    BinDir:           %s
+    DocumentationDir: %s
+    ConfigurationDir: %s
+    PackageDir:       %s
+    HtdocsDir:        %s
+
+
 Please do not forget to start the 'taskDaemon' in order to use alarms, creation
 of off-line websites, reminders, etc. You can find it in './bin/taskDaemon.py'
 
@@ -370,8 +418,11 @@ Add the following lines to your Apache2 httpd.conf:
 </Directory>
 
 
-Configuration file: %s
-""" % (cfg.getHtdocsDir(), x.packageDir, cfg.getHtdocsDir(), os.path.join(cfg.getConfigurationDir(), 'indico.conf'))
+
+If you are running ZODB on this host:
+- Review %s/zodb.conf and %s/zdctl.conf to make sure everything is ok.
+- To start the database run: zdctl.py -C %s/zdctl.conf start
+""" % (cfg.getConfigurationDir(), cfg.getBinDir(), cfg.getDocumentationDir(), cfg.getConfigurationDir(), x.packageDir, cfg.getHtdocsDir(), cfg.getHtdocsDir(), x.packageDir, cfg.getHtdocsDir(),  cfg.getConfigurationDir(), cfg.getConfigurationDir(), cfg.getConfigurationDir())
 
 
     def _existingDb(self):
@@ -460,6 +511,9 @@ Configuration file: %s
                         valid_credentials = True
                     except KeyError:
                         print "\nERROR: Invalid user/group pair (%s/%s)" % (x.accessuser, x.accessgroup)
+                    
+                    modifyOnDiskIndicoConfOption(PWD_INDICO_CONF, 'ApacheUser', x.accessuser)
+                    modifyOnDiskIndicoConfOption(PWD_INDICO_CONF, 'ApacheGroup', x.accessgroup)
 
             dirs2check = [cfg.getPublicFolder(), cfg.getLogDir(), cfg.getUploadedFilesTempDir()]
             if x.dbInstalledBySetupPy:
@@ -502,10 +556,20 @@ class develop_indico(Command):
             print 'Creating new etc/indico.conf.local..'
             shutil.copy('etc/indico.conf', local)
 
-        updateIndicoConfPathInsideMaKaCConfig(os.path.join(os.path.dirname(__file__), 'indico.conf.local'), 'indico/MaKaC/common/MaKaCConfig.py')
+        for d in [x for x in ('db', 'log') if not os.path.exists(x)]:
+            os.makedirs(d)
+
+        for f in [x for x in ('etc/zdctl.conf', 'etc/zodb.conf') if not os.path.exists(x)]:
+            shutil.copy('%s.sample' % f, f)
+
+        updateIndicoConfPathInsideMaKaCConfig(os.path.join(os.path.dirname(__file__), ''), 'indico/MaKaC/common/MaKaCConfig.py')
         compileAllLanguages()
         print '''
-Please review etc/indico.conf.local to verify that everything is ok.
+IMPORTANT NOTES
+
+- Review etc/indico.conf.local, etc/zodb.conf and etc/zdctl.conf to make sure everything is ok.
+
+- To start the database run: zdctl.py -C etc/zdctl.conf start
 '''
 
 
@@ -533,7 +597,7 @@ if __name__ == '__main__':
         from MaKaC.common.Configuration import Config
     except IOError:
         # If an installation is halfway aborted we can end up with a broken MaKaCConfig in the installation dir
-        updateIndicoConfPathInsideMaKaCConfig('indico.conf', os.path.join('indico', 'MaKaC', 'common', 'MaKaCConfig.py'))
+        updateIndicoConfPathInsideMaKaCConfig(PWD_INDICO_CONF, os.path.join('indico', 'MaKaC', 'common', 'MaKaCConfig.py'))
         from MaKaC.common.Configuration import Config
 
     from MaKaC.i18n import _

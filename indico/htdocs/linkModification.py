@@ -23,7 +23,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import linkModif
 
-if DEVELOPEMENT:
+if DEVELOPMENT:
     linkModif = reload( linkModif )
 
 

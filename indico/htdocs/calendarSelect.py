@@ -22,7 +22,7 @@
 from MaKaC.common.general import *
 from MaKaC.webinterface.rh import calendar
 
-if DEVELOPEMENT:
+if DEVELOPMENT:
     calendar = reload( calendar )
 
 

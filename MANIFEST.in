@@ -1,4 +1,4 @@
-include AUTHORS
+include AUTHORS 
 include ChangeLog
 include COPYING
 include INSTALL
@@ -8,6 +8,7 @@ include README
 include THANKS
 
 include doc/*.pdf
+include ez_setup.py
 
 recursive-include bin *
 recursive-include etc *
@@ -15,5 +16,4 @@ recursive-include indico/htdocs *
 recursive-include indico/MaKaC *
 recursive-include tests *
 
-prune *.pyc
-prune *.mo
+global-exclude *.pyc *.mo zdctl.conf zodb.conf indico.conf.local

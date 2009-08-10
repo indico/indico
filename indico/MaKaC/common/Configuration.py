@@ -32,6 +32,7 @@ import MaKaCConfig
 
 from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
+import MaKaC
 
 class Config:
     """This class provides a common way to access and modify the configuration
@@ -461,6 +462,7 @@ class Config:
             'FileConverterResponseURL': self.getFileConverter().get("response_url", ""),
             'ImagesBaseURL'           : "%s/images" % self._configVars['BaseURL'],
             'ImagesBaseSecureURL'     : "%s/images" % self._configVars['BaseSecureURL'],
+            'Version'                 : MaKaC.__version__,
                                  })
 
         self.__tplFiles = {}
@@ -493,6 +495,13 @@ class Config:
             raise AttributeError
 
 
+    def getSmtpUseTLS(self):
+        if self._configVars['SmtpUseTLS'] == 'yes':
+            return True
+        else:
+            return False
+        
+    
     def getInstance(cls):
         """returns an instance of the Config class ensuring only a single
            instance is created. All the clients should use this method for
@@ -645,7 +654,7 @@ class Config:
 
     def getArchivedFileURL(self, localFile):
         return "%s/getFile.py?%s" % (self.getBaseURL(), localFile.getLocator().getURLForm() )
-
+    
 
     def hasFileConverter(self):
         return self.getFileConverter().get("conversion_server", "") != ""

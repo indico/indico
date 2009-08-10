@@ -1,0 +1,7 @@
+<runner>
+  program       python /usr/local/bin/runzeo.py -C /opt/indico/etc/zodb.conf
+  user		www-data
+  daemon        true
+  directory     /opt/indico/db
+  socket-name   /opt/indico/db/zdsock
+</runner>

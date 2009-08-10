@@ -23,7 +23,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import materialModif
 
-if DEVELOPEMENT:
+if DEVELOPMENT:
     materialModif = reload( materialModif )
 
 

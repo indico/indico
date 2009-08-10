@@ -23,7 +23,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import conferenceModif
 
-if DEVELOPEMENT:
+if DEVELOPMENT:
     conferenceModif = reload( conferenceModif )
 
 

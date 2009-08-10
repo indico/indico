@@ -23,7 +23,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import sessionDisplay
 
-if DEVELOPEMENT:
+if DEVELOPMENT:
     sessionDisplay = reload( sessionDisplay )
 
 

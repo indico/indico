@@ -23,7 +23,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import admins
 
-if DEVELOPEMENT:
+if DEVELOPMENT:
     admins = reload(admins)
 
 

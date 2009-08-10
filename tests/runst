@@ -1,5 +1,8 @@
 #!/usr/bin/env python
+
+'''This script runs a single test file given as an argument'''
 import os
+import shutil
 import sys
 import unittest
 import tempfile
@@ -11,17 +14,10 @@ if __name__ == '__main__':
 ''' % sys.argv[0]
         sys.exit()
 
-    contents = '''
-import sys
-sys.path = ['.', 'indico'] + sys.path
-%s
-if __name__ == '__main__':
-    unittest.main()
-''' % file(sys.argv[1]).read()
-
-    fname = tempfile.mktemp()
-    open(fname, 'w').write(contents)
-    try:
-        os.system('%s %s' % (sys.executable, fname))
-    finally:
-        os.unlink(fname)
+    if not os.path.exists('etc/indico.conf.local'):
+        shutil.copy('etc/indico.conf', 'etc/indico.conf.local')
+        
+    testName = sys.argv[1].replace(".py", "").replace('/', '.')
+    sys.path = [os.path.join(os.path.dirname(__file__), '..', 'indico'), os.path.join(os.path.dirname(__file__), '..')] + sys.path
+    mod = __import__(testName)
+    unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromModule(sys.modules[testName]))

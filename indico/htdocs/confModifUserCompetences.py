@@ -1,7 +1,7 @@
-from MaKaC.common.general import DEVELOPEMENT
+from MaKaC.common.general import DEVELOPMENT
 from MaKaC.webinterface.rh import reviewingUserCompetencesModif
 
-if DEVELOPEMENT:
+if DEVELOPMENT:
     reviewingUserCompetencesModif = reload( reviewingUserCompetencesModif )
 
 def index( req, **params ):

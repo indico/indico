@@ -33,7 +33,7 @@ import MaKaC.conference as conference
 import MaKaC.schedule as schedule
 import MaKaC.webcast as webcast
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.common.general import DEVELOPEMENT
+from MaKaC.common.general import DEVELOPMENT
 from MaKaC.webinterface.linking import RoomLinker
 from Configuration import Config
 from xmlGen import XMLGen
@@ -134,7 +134,7 @@ class outputGenerator:
         """
         self.getOutput(conf, stylesheet, vars, includeSession,includeContribution,includeMaterial,showSession,showDate,showContribution)
         html = self.text
-        if DEVELOPEMENT:
+        if DEVELOPMENT:
             stat_text = _("""<br><br><font size="-2">_("XML creation"): %s<br>_("HTML creation"): %s</font>""") % (self.time_XML,self.time_HTML)
         else:
             stat_text = ""

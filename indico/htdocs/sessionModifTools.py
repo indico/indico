@@ -23,7 +23,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import sessionModif
 
-if DEVELOPEMENT:
+if DEVELOPMENT:
     sessionModif = reload( sessionModif )
 
 
