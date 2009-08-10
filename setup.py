@@ -119,6 +119,7 @@ def upgrade_indico_conf(existing_conf, new_conf, mixinValues={}):
     # We update a current copy of indico.conf with the new values
     new_contents = open(new_conf).read()
     for k in new_values:
+        print k, result_values[k]
         if new_values[k].__class__ == str:
             regexp = re.compile('^(%s[ ]*=[ ]*[\'"]{1})([^\'"]*)([\'"]{1})' % k, re.MULTILINE)
             if regexp.search(new_contents):
@@ -224,15 +225,10 @@ def versionInit():
         '''Writes the version number inside indico/MaKaC/__init__.py'''
         global x
         v = None
-        try:
-            opts, args = getopt.gnu_getopt(sys.argv[1:], "", ["version="])
-
-            for o, a in opts:
-                if o == '--version':
-                    v = a
-                    break
-        except getopt.GetoptError:
-            v = 'dev'
+        for k in sys.argv:
+            if k == '--version':
+                v = sys.argv[sys.argv.index(k) + 1]
+                break
 
         if not v:
             v = raw_input('Version being packaged [dev]: ').strip()
@@ -298,6 +294,10 @@ class install_indico(install.install):
     force_upgrade = False
 
     def run(self):
+        # CRITICAL: if we don't do that BinDir, ConfigurationDir, etc will have install_data preppended to them
+        # therefore negating the advantage of specifying absolute paths there. This seems to be setuptools' 
+        # specific because our old setup.py wasn't doing that
+        self.install_data = '' 
         cfg = Config.getInstance()
 
         if self.root != None and sys.path[0] != os.path.join(self.root, 'MaKaC'):
@@ -340,13 +340,15 @@ What do you want to do [u/E]? ''' % self._existingIndicoConfPath())
         indicoconfpath = os.path.join(self.config_dir, 'indico.conf')
           
         updateIndicoConfPathInsideMaKaCConfig(indicoconfpath, os.path.join('indico', 'MaKaC', 'common', 'MaKaCConfig.py'))
+
+        if not os.path.exists(self.config_dir):
+            os.makedirs(self.config_dir)
+
         install.install.run(self)
         self._createDirs(x)
         
         updateIndicoConfPathInsideMaKaCConfig(indicoconfpath, os.path.join(self._makaccconfig_base_dir, 'MaKaCConfig.py'))
 
-        if not os.path.exists(self.config_dir):
-            os.makedirs(self.config_dir)
 
         for f in [xx for xx in ('%s/zdctl.conf' % self.config_dir, '%s/zodb.conf' % self.config_dir) if not os.path.exists(xx)]:
             shutil.copy('%s.sample' % f, f)
@@ -512,8 +514,8 @@ If you are running ZODB on this host:
                     except KeyError:
                         print "\nERROR: Invalid user/group pair (%s/%s)" % (x.accessuser, x.accessgroup)
                     
-                    modifyOnDiskIndicoConfOption(PWD_INDICO_CONF, 'ApacheUser', x.accessuser)
-                    modifyOnDiskIndicoConfOption(PWD_INDICO_CONF, 'ApacheGroup', x.accessgroup)
+                    modifyOnDiskIndicoConfOption('%s/indico.conf' % cfg.getConfigurationDir(), 'ApacheUser', x.accessuser)
+                    modifyOnDiskIndicoConfOption('%s/indico.conf' % cfg.getConfigurationDir(), 'ApacheGroup', x.accessgroup)
 
             dirs2check = [cfg.getPublicFolder(), cfg.getLogDir(), cfg.getUploadedFilesTempDir()]
             if x.dbInstalledBySetupPy:
