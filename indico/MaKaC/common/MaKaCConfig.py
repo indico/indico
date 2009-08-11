@@ -20,21 +20,13 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## WARNING: THE FOLLOWING LINE WILL BE OVERWRITTEN AT INSTALLATION TIME
-indico_conf = "etc/indico.conf.local" # path to indico.conf
+indico_conf = "/opt/indico/etc/indico.conf" # path to indico.conf
 ##
 
 import os
 
 if indico_conf == '': # we may be in development mode or in installation mode
-    local = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'etc', 'indico.conf.local')
-    default = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'etc', 'indico.conf')
-
-    if os.path.exists(local):
-        indico_conf = local
-        if os.path.getmtime(local) < os.path.getmtime(default):
-            print "\nWARNING: indico.conf.local is older than indico.conf. Please run \"python setup.py upgrade\".\n"
-    else:
-        indico_conf = default
+    indico_conf = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'etc', 'indico.conf')
 
 
 execfile(indico_conf)

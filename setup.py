@@ -43,10 +43,10 @@ import tests
 
 INDICO_INSTALL = True # Needed by common/__init__.py
 
-if os.path.exists('etc/indico.conf.local'):
-    PWD_INDICO_CONF = 'etc/indico.conf.local'
-else:
-    PWD_INDICO_CONF = 'etc/indico.conf'
+if not os.path.exists('etc/indico.conf'):
+    shutil.copy('etc/indico.conf.sample', 'etc/indico.conf')
+
+PWD_INDICO_CONF = 'etc/indico.conf'
     
 class Vars:
     '''Variable holder.'''
@@ -71,10 +71,13 @@ def getDataFiles(x):
     #                                 ('a', 'b/c/d.jpg'))
     #
     # first into a dict and then into a pallatable form for setuptools.
+
+    # This re will be used to filter out etc/*.conf files and therefore not overwritting them
+    isAConfRe = re.compile('etc\/[^/]+\.conf$')
     
     for (baseDstDir, files, remove_first_x_chars) in ((cfg.getBinDir(),           findall('bin'), 4),
                                                       (cfg.getDocumentationDir(), ['doc/UserGuide.pdf','doc/AdminUserGuide.pdf'], 4),
-                                                      (cfg.getConfigurationDir(), findall('etc'), 4),
+                                                      (cfg.getConfigurationDir(), [xx for xx in findall('etc') if not isAConfRe.search(xx)], 4),
                                                       (x.packageDir,              findall('indico/MaKaC'), 13),
                                                       (cfg.getHtdocsDir(),        findall('indico/htdocs'), 14),
                                                       ):
@@ -98,11 +101,11 @@ def upgrade_indico_conf(existing_conf, new_conf, mixinValues={}):
     
     # We retrieve values from newest indico.conf
     execfile(new_conf)
-    new_values = locals()
+    new_values = locals().copy()
     # We retrieve values from existing indico.conf
     execfile(existing_conf)
-    existing_values = locals()
-   
+    existing_values = locals().copy()
+
     new_values.update(existing_values)
     new_values.update(mixinValues)
     
