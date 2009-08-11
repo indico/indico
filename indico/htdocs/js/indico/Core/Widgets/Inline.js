@@ -280,7 +280,7 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor"],
          },
          unbind: function() {
              bind.detach(this.select);
-         },
+         }
 
      },
      function(method, args) {
