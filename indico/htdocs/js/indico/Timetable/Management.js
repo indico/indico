@@ -375,7 +375,7 @@ type("TimetableManagementActions", [], {
 
         IndicoUI.Dialogs.addSessionSlot(
                 this.methods[params.type].add,
-                this.methods[params.parentType].dayEndDate,
+                this.methods['Event'].dayEndDate,
                 params.args,
                 params.roomInfo,
                 $O(params.roomInfo),

@@ -471,8 +471,10 @@ class SessionScheduleAddSessionSlot(sessionServices.SessionModifBase, LocationSe
         sessionServices.SessionModifBase._checkParams(self)
         pManager = ParameterManager(self._params)
 
-        self._dateTime = pManager.extract("dateTime", pType=datetime.datetime)
-        self._duration = pManager.extract("duration", pType=int)
+        self._startDateTime = pManager.extract("startDateTime",
+                                               pType=datetime.datetime)
+        self._endDateTime = pManager.extract("endDateTime",
+                                             pType=datetime.datetime)
         self._title = pManager.extract("title", pType=str, allowEmpty=True)
         self._conveners = pManager.extract("conveners", pType=list,
                                            allowEmpty=True)
@@ -482,12 +484,9 @@ class SessionScheduleAddSessionSlot(sessionServices.SessionModifBase, LocationSe
         slot = conference.SessionSlot(self._target)
 
         slot.setValues({"title": self._title or "",
-                        "durMins": self._duration,
-                        "durHours": 0,
-                        "sDate": self._dateTime})
+                        "sDate": self._startDateTime,
+                        "eDate": self._endDateTime})
 
-        #slot.setStartDate(self._dateTime)
-        #slot.setDuration(minutes = self._duration)
         self. __addConveners(slot)
         self._setLocationInfo(slot)
 
