@@ -51,7 +51,7 @@ class ExpectedParameterException(ServiceError):
     Represents an exception that occurs when a type of parameter was expected
     but another one was obtained
     """
-    
+
     def __init__(self, paramName, expected, got):
         ServiceError.__init__(self, "ERR-P2","'%s': Expected '%s', got instead '%s'" % (paramName, expected, got))
 
@@ -68,12 +68,12 @@ class ParameterManager(object):
     The ParameterManager makes parameter processing a bit easier, by providing
     some default transformations
     """
-    
+
     def __init__(self, paramList, allowEmpty=False, timezone=None):
         self._paramList = paramList
         self._allowEmpty = allowEmpty
         self._timezone = timezone
-        
+
     def extract(self, paramName, pType=None, allowEmpty=None, defaultValue=None):
         """
         Extracts a parameter, given a parameter name, and optional type
@@ -82,25 +82,30 @@ class ParameterManager(object):
         # "global" policy applies if allowEmpty not set
         if (allowEmpty == None):
             allowEmpty = self._allowEmpty
-        
+
         value = self._paramList.get(paramName)
 
         if (not allowEmpty) and (not value):
             raise EmptyParameterException(paramName)
-        
+
         if pType == str:
             if value != None:
                 value = str(value)
             else:
                 value = defaultValue
-                
+
             if (value == '' or value == None) and not allowEmpty:
                 raise EmptyParameterException(paramName)
         elif pType == datetime:
             # format will possibly be accomodated to different standards,
             # in the future
 
-            naiveDate = parseDateTime(value,'%d/%m/%Y %H:%M')
+            # both strings and objects are accepted
+            if type(value) == str:
+                naiveDate = parseDateTime(value,'%d/%m/%Y %H:%M')
+            else:
+                naiveDate = parseDateTime(value['date']+' '+value['time'][:5], '%d/%m/%Y %H:%M')
+
             if self._timezone:
                 value = timezone(self._timezone).localize(naiveDate).astimezone(timezone('utc'))
             else:

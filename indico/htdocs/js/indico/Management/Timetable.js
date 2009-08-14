@@ -254,18 +254,18 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
             self.favorites,
             true, true, true,
             userListNothing, userListNothing, userListNothing, false, {"presenter-grant-submission": [$T("submission rights"), true]},
-            self.args.conference
-        );
+            self.args.conference);
+
         $B(info.accessor('presenters'), presListWidget.getUsers());
 
         var datecomponent;
-        if (this.timeStartMethod != null) {
+        if (this.timeStartMethod !== null) {
             $B(info.accessor('dateTime'), self.dateTimeField.accessor.accessor('dateTime'));
             $B(info.accessor('duration'), self.dateTimeField.accessor.accessor('duration'));
             datecomponent = [$T('Date/Time'), self.dateTimeField.element];
         }else{
             $B(info.accessor('duration'), self.dateTimeField);
-            datecomponent = [$T('Duration'), self.dateTimeField]
+            datecomponent = [$T('Duration'), self.dateTimeField];
         }
 
         return IndicoUtil.createFormFromMap(
@@ -413,9 +413,9 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
          this.isConference = isConference;
          this.successFunc = successFunc;
 
-         if (this.timeStartMethod == null) {
+         if (this.timeStartMethod === null) {
              this.dateTimeField = IndicoUI.Widgets.Generic.durationField(20);
-             args["schedule"] = false;
+             args.schedule = false;
          }else {
              this.dateTimeField = IndicoUI.Widgets.Generic.dateDurationField(confStartDate, 20, ' ');
          }
@@ -497,8 +497,10 @@ type("ChangeEditDialog", // silly name!
          }
 
      },
-     function(method, args, title) {
+     function(method, args, title, successFunc) {
          var self = this;
+
+         this.successFunc = successFunc;
 
          this.PreLoadHandler(
              this._preload,
@@ -520,13 +522,11 @@ type("AddBreakDialog", ["ChangeEditDialog"],
          draw: function(){
              var self = this;
 
-             var addButton = Html.button({}, $T("Add"));
+             var addButton = Html.button({}, this.isEdit?$T("Save"):$T("Add"));
              var cancelButton = Html.button({}, $T("Cancel"));
              cancelButton.dom.style.marginLeft = pixels(10);
 
-             this.info.set('roomInfo', $O(this.roomInfo));
-
-             var roomEditor = new RoomBookingWidget(this.info.get('roomInfo'), this.parentRoomInfo, true, this.args.conference);
+             var roomEditor = new RoomBookingWidget(this.info.get('roomInfo'), this.parentRoomInfo, !this.isEdit, this.info.get('conference'));
 
              cancelButton.observeClick(function(){
                  self.close();
@@ -534,9 +534,15 @@ type("AddBreakDialog", ["ChangeEditDialog"],
 
 
              addButton.observeClick(function(){
-                 self._submitInfo();
+                 if (self.isEdit) {
+                     self._saveInfo();
+                 } else {
+                     self._submitInfo();
+                 }
              });
 
+             // some properties have default values, and the initialization
+             // of the binding must be set
              invertableBind(this.info.accessor('startDate'),
                             this.dateTimeField.accessor.accessor('dateTime'),
                             this.isEdit,
@@ -545,10 +551,10 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                                     return obj?(obj.date+' '+obj.time):null;
                                 },
                                 toTarget: function(str) {
-                                    return str;
+                                    var atoms = str.split(' ');
+                                    return {date: atoms[0], time: atoms[1]};
                                 }
-                            },
-                            null);
+                            });
 
              invertableBind(this.info.accessor('duration'),
                             this.dateTimeField.accessor.accessor('duration'),
@@ -568,33 +574,67 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                                         [addButton, cancelButton])]));
          },
 
-         _setup: function(method, timeStartMethod, roomInfo, parentRoomInfo, confStartDate, dayStartDate, successFunc) {
+         _saveInfo: function() {
+             var self = this;
+             /* timetable may need a full refresh,
+                if the time changes */
 
-             this.timeStartMethod = timeStartMethod;
-             this.dateArgs = clone(this.args);
+             /** save in server **/
+             var args = clone(self.info);
 
-             this.roomInfo = roomInfo;
-             this.parentRoomInfo = parentRoomInfo;
-             this.successFunc = successFunc;
-             this.dateTimeField.accessor.set(confStartDate);
-             this.dateArgs.date = dayStartDate;
+             var killProgress = IndicoUI.Dialogs.Util.progress();
 
-             this.ChangeEditDialog(method, this.args, $T("Add Break"));
+             indicoRequest('schedule.event.editBreak',
+                           args,
+                           function(result, error){
+                               killProgress();
+                               if (error) {
+                                   IndicoUtil.errorReport(error);
+                               }
+                               else {
+                                   self.managementActions._updateEntry(result);
+                                   self.close();
+                               }
+                           });
+
+
+/*             var fullRefresh = (this.originalArgs.startDate.time != self.info.get('startDate').time) || (this.originalArgs.duration != self.info.get('duration'));
+
+             // after it's saved in the server
+             each(keys(this.originalArgs), function(key) {
+                 self.originalArgs[key] = self.info.get(key);
+             });
+
+             alert(fullRefresh);
+
+             if (fullRefresh) {
+                 this.managementActions.redrawTimetable();
+             } else {
+                 this.timetableBlock.redraw();
+             }*/
          }
-
      },
 
-     function(requestArgs, args, isEdit){
+     function(managementActions, args, parentRoomInfo, isEdit){
          var self = this;
 
+         this.managementActions = managementActions;
          this.isEdit = isEdit;
-         this.args = requestArgs;
+         this.parentRoomInfo = parentRoomInfo;
          this.dateTimeField = IndicoUI.Widgets.Generic.dateDurationField('', 20, ' ');
-         if (!isEdit) {
-             this.info = new WatchObject();
-             this._setup.apply(this, args);
+         if (isEdit) {
+             this.info = args;
+             this.ExclusivePopup($T("Edit Break"));
          } else {
-             this.info = $O(args);
+             this.info = clone(args);
+             // by default, assume parent room info
+             this.info.set('roomInfo', clone(parentRoomInfo));
+             this.timeStartMethod = managementActions.methods[args.get('parentType')].dayEndDate;
+             args.set("conference", args.get('args').conference);
+             args.set("date", args.get('selectedDay'));
+             this.dateArgs = args;
+             this.ChangeEditDialog(managementActions.methods[args.get('type')].add, this.info, $T("Add Break"), function(result) { managementActions._updateEntry(result);});
+
          }
 
     });

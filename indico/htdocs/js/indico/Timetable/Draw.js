@@ -36,7 +36,7 @@ type("TimetableBlockBase", [],
              self.div.dom.style.cursor = 'default';
              var cursor = getMousePointerCoordinates(event);
              if (this.managementMode) {
-                 this.popup = new TimetableBlockPopupManagement(self.eventData, self.div,
+                 this.popup = new TimetableBlockPopupManagement(this, self.eventData, self.div,
                      function() {
                          self.div.dom.style.cursor = 'pointer';
                          self.popupActive = false;
@@ -231,6 +231,11 @@ type("TimetableBlock", ["TimetableBlockBase"],
                 }
 
                 return this.div;
+            },
+
+            redraw: function() {
+                this.block.clear();
+                this.block.set(this._blockDescription());
             },
 
             draw: function(leftPos, width) {
@@ -890,17 +895,19 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"], {
                 className: 'fakeLink',
                 style: {fontWeight: 'bold'},
                 href: self.managementActions.editEntry(self.eventData)
-            }, "Edit");
+            }, $T("Edit"));
         } else {
+            // event is a Break
+
             editLink = Html.a({
-                    className: 'fakeLink',
-                    style: {fontWeight: 'bold'},
-                    href: '#'
-                }, "Edit");
+                className: 'fakeLink',
+                style: {fontWeight: 'bold'},
+                href: '#'
+            }, $T("Edit"));
 
             editLink.observeClick(function() {
-                var editDialog = new AddBreakDialog({}, self.eventData, true);
-                editDialog.open();
+                self.managementActions.editEntry(self.eventData);
+                return false;
             });
         }
         menu.insert(editLink);
@@ -910,7 +917,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"], {
         // TODO: Add the link
         if (self.eventData.entryType != 'Session') {
             menu.insert(" | ");
-            menu.insert(Html.a('fakeLink', Html.span({style: {cursor: 'default', color: '#888'}}, "Relocate")));
+            menu.insert(Html.a('fakeLink', Html.span({style: {cursor: 'default', color: '#888'}}, $T("Relocate"))));
         }
 
         if (self.eventData.entryType == 'Session') {
@@ -955,9 +962,10 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"], {
         return contributionsDiv;
     }
     },
-    function(eventData, blockDiv, closeHandler, managementActions) {
-        this.managementActions = managementActions;
-        this.TimetableBlockPopup(eventData, blockDiv, closeHandler);
+     function(block, eventData, blockDiv, closeHandler, managementActions) {
+         this.block = block;
+         this.managementActions = managementActions;
+         this.TimetableBlockPopup(eventData, blockDiv, closeHandler);
     }
 );
 

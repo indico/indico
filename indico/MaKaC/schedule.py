@@ -1113,6 +1113,10 @@ class BreakTimeSchEntry(IndTimeSchEntry):
     @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'sessionId', Conversion.parentSession)
     @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'sessionSlotId', Conversion.parentSlot)
     @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'scheduleEntryId', lambda x: x.getId())
+    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'room', lambda x: Conversion.roomName(x.getRoom()))
+    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'location', lambda x: Conversion.locationName(x.getLocation()))
+    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'address', lambda x: Conversion.locationAddress(x.getLocation().getAddress()))
+
     def __init__(self):
         IndTimeSchEntry.__init__(self)
         self._color="#90C0F0"

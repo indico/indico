@@ -99,7 +99,7 @@ type("TimetableManagementActions", [], {
         } else if (eventData.entryType == 'Session') {
             url = Indico.Urls.SessionModification + '?confId=' + eventData.conferenceId + '&sessionId=' + eventData.sessionId;
         } else if (eventData.entryType == 'Break') {
-            url = Indico.Urls.BreakModification + '?confId=' + eventData.conferenceId + '&schEntryId=' + eventData.scheduleEntryId;
+            this.editBreak(eventData);
         }
 
         return url;
@@ -340,19 +340,42 @@ type("TimetableManagementActions", [], {
             params = this._addParams('Break');
         }
 
-        var dialog = new AddBreakDialog(params.args,
-            [
-                this.methods[params.type].add,
-                this.methods[params.parentType].dayEndDate,
-                params.roomInfo,
-                $O(params.roomInfo),
-                params.startDate,
-                params.selectedDay,
-                function(result) { self._updateEntry(result); }
-            ], false);
+        var dialog = new AddBreakDialog(
+            this,
+            $O(params),
+            $O(params.roomInfo),
+            false);
 
         dialog.execute();
     },
+
+    editBreak: function(eventData) {
+        /** save in server **/
+        var args = $O();
+
+        var params;
+
+        if (this.session !== null) {
+            params = this._addToSessionParams(this.session, 'Break');
+        } else {
+            params = this._addParams('Break');
+        }
+
+        args.set('conference', eventData.conferenceId);
+        args.set('scheduleEntry', eventData.scheduleEntryId);
+
+        each(eventData, function(value, key) {
+            args.set(key, value);
+        });
+
+        args.set('roomInfo',$O({"location": eventData.location,
+                                "room": eventData.room }));
+
+        var editDialog = new AddBreakDialog(this, args, $O(params.roomInfo), true);
+        editDialog.open();
+
+    },
+
     addSession: function() {
         var self = this;
 

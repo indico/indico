@@ -283,14 +283,14 @@ class SessionScheduleChangeSessionColors(sessionServices.SessionModifBase):
         self._session.setBgColor(self._bgColor)
         self._session.setTextColor(self._textColor)
 
-class ScheduleAddBreakBase(LocationSetter):
+class ScheduleEditBreakBase(LocationSetter):
 
     def _checkParams(self):
 
         pManager = ParameterManager(self._params, timezone = self._conf.getTimezone())
 
         self._roomInfo = pManager.extract("roomInfo", pType=dict)
-        self._dateTime = pManager.extract("dateTime", pType=datetime.datetime)
+        self._dateTime = pManager.extract("startDate", pType=datetime.datetime)
         self._duration = pManager.extract("duration", pType=int)
         self._title = pManager.extract("title", pType=str)
         self._description = pManager.extract("description", pType=str,
@@ -298,43 +298,53 @@ class ScheduleAddBreakBase(LocationSetter):
 
     def _getAnswer(self):
 
-        brk = schedule.BreakTimeSchEntry()
-
-        brk.setValues({"title": self._title or "",
+        self._brk.setValues({"title": self._title or "",
                        "description": self._description or "",
                        "startDate": self._dateTime,
                        "durMins": str(self._duration),
                        "durHours": "0"},
                       tz = self._conf.getTimezone())
 
-        self._setLocationInfo(brk)
+        self._setLocationInfo(self._brk)
 
-        self._addToSchedule(brk)
+        self._addToSchedule(self._brk)
 
-        pickledData = DictPickler.pickle(brk, timezone=self._conf.getTimezone())
-        return {'day': brk.getAdjustedStartDate().strftime("%Y%m%d"),
+        pickledData = DictPickler.pickle(self._brk, timezone=self._conf.getTimezone())
+        return {'day': self._brk.getAdjustedStartDate().strftime("%Y%m%d"),
                 'id': pickledData['id'],
                 'entry': pickledData}
 
-class ConferenceScheduleAddBreak(ScheduleAddBreakBase, conferenceServices.ConferenceModifBase):
+class ConferenceScheduleAddBreak(ScheduleEditBreakBase, conferenceServices.ConferenceModifBase):
 
     def _checkParams(self):
         conferenceServices.ConferenceModifBase._checkParams(self)
-        ScheduleAddBreakBase._checkParams(self)
+        ScheduleEditBreakBase._checkParams(self)
+        self._brk = schedule.BreakTimeSchEntry()
 
     def _addToSchedule(self, b):
         self._target.getSchedule().addEntry(b, 2)
+
+class ConferenceScheduleEditBreak(ScheduleEditBreakBase, conferenceServices.ConferenceScheduleModifBase):
+
+    def _checkParams(self):
+        conferenceServices.ConferenceScheduleModifBase._checkParams(self)
+        ScheduleEditBreakBase._checkParams(self)
+        self._brk = self._schEntry
+
+    def _addToSchedule(self, b):
+        pass
 
 class ConferenceScheduleDeleteBreak(conferenceServices.ConferenceScheduleModifBase):
 
     def _getAnswer(self):
         self._conf.getSchedule().removeEntry(self._schEntry)
 
-class SessionSlotScheduleAddBreak(ScheduleAddBreakBase, sessionServices.SessionSlotModifBase):
+class SessionSlotScheduleAddBreak(ScheduleEditBreakBase, sessionServices.SessionSlotModifBase):
 
     def _checkParams(self):
         sessionServices.SessionSlotModifBase._checkParams(self)
-        ScheduleAddBreakBase._checkParams(self)
+        ScheduleEditBreakBase._checkParams(self)
+        self._brk = schedule.BreakTimeSchEntry()
 
     def _addToSchedule(self, b):
         self._slot.getSchedule().addEntry(b, 2)
@@ -727,6 +737,8 @@ methodMap = {
     "event.addContribution": ConferenceScheduleAddContribution,
     "event.addSession": ConferenceScheduleAddSession,
     "event.addBreak": ConferenceScheduleAddBreak,
+
+    "event.editBreak": ConferenceScheduleEditBreak,
 
     "event.modifyStartEndDate": ConferenceScheduleModifyStartEndDate,
 

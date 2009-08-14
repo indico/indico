@@ -195,8 +195,13 @@ type("TimeTable", ["LookupTabWidget"], {
 
          this.width = width;
          this.loadingIndicator = this._createLoadingIndicator();
-         this.timetableDrawer = new TimetableDrawer(data, width, wrappingElement, detailLevel, this._functionButtons(),
-                                                    this.loadingIndicator, managementMode, this.managementActions);
+         this.timetableDrawer = new TimetableDrawer(data, width,
+                                                    wrappingElement,
+                                                    detailLevel,
+                                                    this._functionButtons(),
+                                                    this.loadingIndicator,
+                                                    managementMode,
+                                                    this.managementActions);
 
          var today = new Date();
          var todayStr = IndicoUtil.formatDate2(today);
