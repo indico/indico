@@ -3273,8 +3273,8 @@ class WConfModifScheduleGraphic(wcomponents.WTemplated):
         ################################
         tz = self._conf.getTimezone()
         vars["timezone"]= tz
-        vars["start_date"]=self._conf.getAdjustedStartDate().strftime("%A %d %B %Y %H:%M")
-        vars["end_date"]=self._conf.getAdjustedEndDate().strftime("%A %d %B %Y %H:%M")
+        vars["start_date"]=self._conf.getAdjustedStartDate().strftime("%a %d/%m")
+        vars["end_date"]=self._conf.getAdjustedEndDate().strftime("%a %d/%m")
         #################################
         # Fermi timezone awareness(end) #
         #################################

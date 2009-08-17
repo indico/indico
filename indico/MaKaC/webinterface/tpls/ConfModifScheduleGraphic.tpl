@@ -18,41 +18,7 @@ else:
 %>
 
 
-<div class="groupTitleNoBorder"><%= _("Timetable")%></div>
-
-<table style="width: 900px; margin-bottom: 20px;">
-    <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Start date")%></span></td>
-        <td class="blacktext"><%= start_date %></td>
-        <form action=<%= editURL %> method="POST">
-        <td rowspan="2" ><input type="submit" class="btn" value="<%= _("modify")%>"></td>
-        </form>
-    </tr>
-    <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("End date")%></span></td>
-        <td bgcolor="white" class="blacktext"><%= end_date %></td>
-    </tr>
-    <tr style="display: none;">
-        <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Options")%></span></td>
-        <td><div id="autoSolveConflictPlace">
-                <span id="autoSolveConflictButton">
-                </span>
-            </div>
-            <div id="sessionsPlace">
-                <span id="sessionsButton">
-                </span>
-            </div>
-            <div id="sessionSlotsPlace">
-                <span id="sessionSlotsButton">
-                </span>
-            </div>
-        </td>
-    </tr>
-    <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Timezone") %></span></td>
-        <td bgcolor="white" class="blacktext"><%= timezone %></td>
-    </tr>
-</table>
+<div class="groupTitleNoBorder"><%= _("Timetable")%> <em>(<%=_("from")+" "%> <%= start_date %> <%=" "+_("to")+" "%> <%= end_date %> <a href=<%= editURL %>>[<%=_("edit")%>]</a> <%=_("Timezone")%>: <%= timezone %>)</em></div>
 <div class="shit" style="display: none;">
       <%= content %>
 </div>
@@ -101,20 +67,6 @@ IndicoUI.executeOnLoad(function(){
 
 
 <script type="text/javascript">
-$E('autoSolveConflictButton').set(IndicoUI.Widgets.Generic.switchOptionButton('schedule.setTimeConflictSolving',
-                                            {conference: '<%= self._conf.id %>'},
-                                            'Automatically solve timing conflicts'
-));
-$E('sessionsButton').set(IndicoUI.Widgets.Generic.switchOptionButton('schedule.setScheduleSessions',
-                                            {conference: '<%= self._conf.id %>'},
-                                            'Sessions',
-                                            true
-));
-$E('sessionSlotsButton').set(IndicoUI.Widgets.Generic.switchOptionButton('schedule.setSessionSlots',
-                                            {conference: '<%= self._conf.id %>'},
-                                            'Session Slots',
-                                            true
-));
 
 var parentEventRoomData = $O(<%= jsonEncode(roomInfo(self._rh._target)) %>);
 
