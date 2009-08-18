@@ -540,21 +540,11 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                      self._submitInfo();
                  }
              });
-
              // some properties have default values, and the initialization
              // of the binding must be set
              invertableBind(this.info.accessor('startDate'),
                             this.dateTimeField.accessor.accessor('dateTime'),
-                            this.isEdit,
-                            {
-                                toSource: function(obj) {
-                                    return obj?(obj.date+' '+obj.time):null;
-                                },
-                                toTarget: function(str) {
-                                    var atoms = str.split(' ');
-                                    return {date: atoms[0], time: atoms[1]};
-                                }
-                            });
+                            this.isEdit);
 
              invertableBind(this.info.accessor('duration'),
                             this.dateTimeField.accessor.accessor('duration'),

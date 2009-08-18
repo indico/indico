@@ -1075,7 +1075,7 @@ class IndTimeSchEntry(TimeSchEntry):
             tz = self.getTimezone()
         return self.getEndDate().astimezone(timezone(tz))
 
-    @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'], 'duration', lambda x: str(x))
+    @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'], 'duration', lambda x: str(int(x.seconds / 60)))
     def getDuration(self):
         return self.duration
 

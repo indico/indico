@@ -340,6 +340,7 @@ type("TimetableManagementActions", [], {
             params = this._addParams('Break');
         }
 
+        
         var dialog = new AddBreakDialog(
             this,
             $O(params),
@@ -367,7 +368,8 @@ type("TimetableManagementActions", [], {
         each(eventData, function(value, key) {
             args.set(key, value);
         });
-
+        
+        args.set('startDate', IndicoUtil.formatDateTime(IndicoUtil.parseJsonDate(eventData.startDate)));
         args.set('roomInfo',$O({"location": eventData.location,
                                 "room": eventData.room }));
 
