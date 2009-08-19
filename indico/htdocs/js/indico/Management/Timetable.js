@@ -582,36 +582,24 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                                    IndicoUtil.errorReport(error);
                                }
                                else {
-                                   self.managementActions._updateEntry(result);
+                                   self.managementActions._updateEntry(result,null, self.originalArgs);
                                    self.close();
                                }
                            });
-
-
-/*             var fullRefresh = (this.originalArgs.startDate.time != self.info.get('startDate').time) || (this.originalArgs.duration != self.info.get('duration'));
-
-             // after it's saved in the server
-             each(keys(this.originalArgs), function(key) {
-                 self.originalArgs[key] = self.info.get(key);
-             });
-
-             alert(fullRefresh);
-
-             if (fullRefresh) {
-                 this.managementActions.redrawTimetable();
-             } else {
-                 this.timetableBlock.redraw();
-             }*/
          }
      },
 
      function(managementActions, args, parentRoomInfo, isEdit){
          var self = this;
-
+         
          this.managementActions = managementActions;
          this.isEdit = isEdit;
          this.parentRoomInfo = parentRoomInfo;
          this.dateTimeField = IndicoUI.Widgets.Generic.dateDurationField('', 20, ' ');
+         this.originalArgs = {};
+         each(keys(args), function(key) {
+             self.originalArgs[key] = args.get(key);
+           });
          if (isEdit) {
              this.info = args;
              this.ExclusivePopup($T("Edit Break"));

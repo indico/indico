@@ -409,16 +409,37 @@ type("TimetableManagementActions", [], {
                 function(result) { self._updateEntry(result); }
         );
     },
+    
     /*
+     * 
      * Is called every time a timetable entry has been successfully
      * added or updated. Updates and redraws the timetable.
+     * @param originalArgs this are the original args. If they are passed, we can remove the entry
+     * from the index before adding it again (just in case the date has changed).
+     *
      */
-    _updateEntry: function(result, data) {
+    _updateEntry: function(result, data, originalArgs) {
         var setData = data ? false : true;
         data = any(data, this.timetable.getData());
 
         if (this.session !== null) {
             this.savedData[result.day][this.session.id].entries[result.entry.id] = result.entry;
+        }
+        
+        /* 
+         * if originalArgs is passed, we can check if there is a need for updating the index of entries.
+         */
+        if (exists(originalArgs)) {
+            
+            if (originalArgs && 
+                (originalArgs.startDate.date != result.entry.startDate.date) ||
+                (originalArgs.startDate.time != result.entry.startDate.time) ||
+                (originalArgs.duration != result.entry.duration)) {
+                
+                /*this.timetable.postDraw();*/
+                var prevDay = IndicoUtil.formatDate2(IndicoUtil.parseDateTime(originalArgs.startDate));
+                delete data[prevDay][result.id];
+            }
         }
         data[result.day][result.id] = result.entry;
 
