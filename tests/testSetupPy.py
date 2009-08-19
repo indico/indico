@@ -23,7 +23,7 @@ import unittest
 import shutil
 import sys
 from subprocess import call, PIPE
-from setup import confmerge, modifyOnDiskIndicoConfOption
+from MaKaC.consoleScripts.installBase import modifyOnDiskIndicoConfOption
 
 # CONFIG
 DEBUG_INSTALL = True # set to True to see all stdout
@@ -37,8 +37,8 @@ TESTHTDOCSDIR = "_testinstall/htdocs"
 SAMPLE_JSCOMPRESSED_FILE = 'indico/htdocs/js/presentation/pack/Presentation.pack.js'
 
 SAMPLE_MO_FILE = 'indico/MaKaC/po/locale/en_US/LC_MESSAGES/messages.mo'
-MAKACCONFIGPY = "%s/../indico/MaKaC/common/MaKaCConfig.py" % os.path.dirname(__file__)
-MAKACCONFIGPYBAK = "%s/../%s.bak" % (os.path.dirname(__file__), MAKACCONFIGPY)
+MAKACCONFIGPY = os.path.normpath("%s/../indico/MaKaC/common/MaKaCConfig.py" % os.path.dirname(__file__))
+MAKACCONFIGPYBAK = os.path.normpath("%s.bak" % MAKACCONFIGPY)
 INDICOCONFCERNMARKER_START = '# DO NOT EDIT THIS LINE (CERN) ------------------------------------------------'
 INDICOCONFCERNMARKER_END = '# DO NOT EDIT THIS LINE (CERN) - End of CERN specific'
 INDICOCONF = "%s/../etc/indico.conf.local" % os.path.dirname(__file__)

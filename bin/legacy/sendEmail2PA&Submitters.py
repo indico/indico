@@ -41,12 +41,12 @@ def getToList():
     toList = []
     for contrib in c.getContributionList():
         if not isinstance(contrib.getCurrentStatus(), conference.ContribStatusWithdrawn):
-        for pa in contrib.getPrimaryAuthorList():
-            if pa.getEmail().strip() != "" and (not pa.getEmail() in toList):
-                    toList.append(pa.getEmail())
-        for spk in contrib.getSpeakerList():
-            if spk.getEmail().strip() != "" and (not spk.getEmail() in toList):
-                    toList.append(spk.getEmail())
+            for pa in contrib.getPrimaryAuthorList():
+                if pa.getEmail().strip() != "" and (not pa.getEmail() in toList):
+                        toList.append(pa.getEmail())
+            for spk in contrib.getSpeakerList():
+                if spk.getEmail().strip() != "" and (not spk.getEmail() in toList):
+                        toList.append(spk.getEmail())
     DBMgr.getInstance().endRequest()
     return toList
 

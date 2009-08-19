@@ -44,7 +44,7 @@ def main(argv):
       sys.exit()
    if(meeting != -1 and category != -1):
       print "Meeting:%s"%meeting
-      print "Category:%s"category
+      print "Category:%s" % category
       for i in t.getList():
          if isinstance(i,Conference):
             if i.getId() == meeting:

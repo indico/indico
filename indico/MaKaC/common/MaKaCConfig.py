@@ -20,14 +20,17 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## WARNING: THE FOLLOWING LINE WILL BE OVERWRITTEN AT INSTALLATION TIME
-indico_conf = "/opt/indico/etc/indico.conf" # path to indico.conf
+indico_conf = "" # path to indico.conf
 ##
 
 import os
 
 if indico_conf == '': # we may be in development mode or in installation mode
     indico_conf = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'etc', 'indico.conf')
-
+    if not os.path.exists(indico_conf):
+        # eggmode
+        indico_conf = os.path.join(os.path.dirname(__file__), '..', '..', 'etc', 'indico.conf.sample')
+    
 
 execfile(indico_conf)
 

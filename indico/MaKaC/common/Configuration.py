@@ -339,7 +339,7 @@ class Config:
         # Python doesn't see the changes and inconsistencies appear.
         #     __import__('MaKaC.common.MaKaCConfig') < DOESNT WORK
         #     reload(MaKaCConfig)                    < DOESNT WORK
-        execfile('indico/MaKaC/common/MaKaCConfig.py')
+        execfile(os.path.abspath(os.path.join(os.path.dirname(__file__), 'MaKaCConfig.py')))
         new_vals = locals()
         for k in self._configVars:
             if k in new_vals:

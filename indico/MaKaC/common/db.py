@@ -32,11 +32,8 @@ from ZODB.DB import DB
 import transaction
 import ZODB
 
-try:
-    import setup
-    skip_imports = setup.INDICO_INSTALL
-except Exception:
-    skip_imports = False
+from MaKaC.consoleScripts.installBase import getIndicoInstallMode
+skip_imports = getIndicoInstallMode()
 
 if not skip_imports:
     from MaKaC.common.logger import Logger

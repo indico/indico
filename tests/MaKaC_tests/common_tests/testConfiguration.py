@@ -22,7 +22,7 @@ import unittest
 import shutil
 import sys
 from MaKaC.common.Configuration import Config
-from setup import confmerge, modifyOnDiskIndicoConfOption
+from MaKaC.consoleScripts.installBase import modifyOnDiskIndicoConfOption
 
 class TestConfiguration(unittest.TestCase):
     def testGetInstanceShouldWork(self):

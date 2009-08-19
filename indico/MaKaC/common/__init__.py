@@ -22,11 +22,8 @@
 # We load Configuration from setup.py which in turns loads this (although it
 # is not needed). If we still don't have the dependencies installed this will
 # crash and that's why we selectively install them or not.
-try:
-    import setup
-    skip_imports = setup.INDICO_INSTALL
-except Exception:
-    skip_imports = False
+from MaKaC.consoleScripts.installBase import getIndicoInstallMode
+skip_imports = getIndicoInstallMode()
 
 if not skip_imports:
     from db import DBMgr
