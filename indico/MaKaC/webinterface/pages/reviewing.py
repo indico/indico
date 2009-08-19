@@ -101,7 +101,7 @@ class WPConfModifReviewingPaperSetup(WPConfModifReviewingBase):
 
     def _getTabContent( self, params ):
         wc = WConfModifReviewingPaperSetup( self._conf)
-        p = { # probably these values are not needed any more since now all these things are done by services
+        p = { # probably these values are not needed (except setTemplateURL) any more since now all these things are done by services
              "choiceURL": urlHandlers.UHChooseReviewing.getURL(self._conf), \
              "addStateURL": urlHandlers.UHAddState.getURL(self._conf), \
              "removeStateURL": urlHandlers.UHRemoveState.getURL(self._conf), \

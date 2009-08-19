@@ -368,12 +368,29 @@ var buildShowHideFiltering = function() {
 var contributionTemplate = function(contribution) {
         
     var row = Html.tr();
-    
     // Cell1: checkbox to select this contribution
     var cell1 = Html.td({style:{"textAlign":"center", "width":"0px"}});
-    var checkbox = Html.checkbox({id: 'cb' + contribution.id, name:"selectedContributions"});
+    var id = ("cb" + contribution.id);
+    var name = ("selectedContributions");
+    
+    /*
+    //creating the checkbox IE way
+    if (document.all) {    
+    var checkbox = document.createElement('<input name='+name+'>');
+    checkbox.type = "checkbox"; 
+    checkbox.id = id ;
+    }
+    //the other browsers
+    else {
+        var checkbox = Html.checkbox({id: id, name:name});
+    }
     cell1.set(checkbox);
-    checkbox.dom.value = contribution.id; // has to be added after constructor because of IE
+    //checkbox.dom.value = contribution.id; // has to be added after constructor because of IE
+    */
+    var checkbox = Html.input('checkbox', {id: id, name:name});
+    checkbox.dom.value = contribution.id;
+    cell1.set(checkbox);
+    
     row.append(cell1);
     
     // Cell2: contribution id
@@ -542,7 +559,6 @@ var getCheckedContributions = function() {
             checkedContributions.push(cb.id.slice(2))
         }
     }
-    
     return checkedContributions;
 }
 
@@ -596,7 +612,7 @@ var checkAllHaveReferee = function(contributions, order, role) {
         }
     }
     if (contributionsWithoutReferee.length == contributions.length) {
-        alert("None of the conferences you checked have a Referee." +
+        alert("None of the contributions you checked have a Referee." +
             "You can only add an editor or a reviewer if the contribution has a referee."
         );
         return false;
@@ -826,38 +842,44 @@ var fetchUsers = function(order, role) {
                     title = 'Click on a user name to ' + order + ' a ' + role + ':';
                 }
                 
-                IndicoUI.Dialogs.exclusivePopUp(title, function(suicideHook){
-                    
-                    var users = $L(); 
-                    var userTemplate = function(user) {
-                        var li = Html.li();
-                        var userName = Widget.link(command(function(){
-                            userSelected(user);
-                            suicideHook();
-                        }, user.name));
-                        
-                        var userCompetences = Html.span({style:{marginLeft:'5px'}},
+                var popup = new ExclusivePopup(title, function(){popup.close();});
+                
+                popup.draw = function(){
+	                    var users = $L(); 
+	                    var userTemplate = function(user) {
+	                        var li = Html.li();
+	                        var userName = Widget.link(command(function(){
+	                            userSelected(user);
+	                            var killProgress = IndicoUI.Dialogs.Util.progress()
+	                            popup.close();
+	                            killProgress();
+	                        }, user.name));
+	                    
+	                    
+	                    var userCompetences = Html.span({style:{marginLeft:'5px'}},
                             user.competences.length == 0 ? '(no competences defined)' : '(competences: ' + user.competences.join(', ') + ')'
                         );
+                        
                         li.set(Widget.inline([userName, userCompetences]));
                         return li;
-                    }
-
-                    var userList = Html.ul();
-                    bind.element(userList, users, userTemplate);
-                    
-                    for (i in result) {
+                    }    
+	                
+                        var userList = Html.ul();
+                        bind.element(userList, users, userTemplate);
+                        
+                        for (i in result) {
                         users.append(result[i]);
-                    }
-                    
-                    var cancelButton = Html.button('popUpButton', "Cancel");
-                    cancelButton.observeClick(function(){
-                        suicideHook();
-                    });
-                    
-                    return Widget.block([userList, cancelButton]);
-                });
-                
+                        }                        
+                         
+                        var cancelButton = Html.button({style:{marginLeft:pixels(5)}}, "Cancel");
+                          cancelButton.observeClick(function(){
+                          popup.close();
+                           });
+                           
+                        return this.ExclusivePopup.prototype.draw.call(this, Widget.block([userList, cancelButton]));  
+                };
+             popup.open();
+              
             } else {
                 IndicoUtil.errorReport(error);
             }

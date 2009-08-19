@@ -22,3 +22,12 @@ import MaKaC.webinterface.rh.conferenceDisplay as conferenceDisplay
 
 def index(req,**params):
     return conferenceDisplay.RHMyStuff(req).process(params)
+
+def mySessions(req,**params):
+    return conferenceDisplay.RHConfMyStuffMySessions(req).process(params)
+
+def myContributions(req,**params):
+    return conferenceDisplay.RHConfMyStuffMyContributions(req).process(params)
+
+def myTracks(req,**params):
+    return conferenceDisplay.RHConfMyStuffMyTracks(req).process(params)

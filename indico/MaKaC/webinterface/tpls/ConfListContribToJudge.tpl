@@ -4,7 +4,7 @@
 
 <% dueDateFormat = "%a %d %b %Y" %>
 
-<% if ConfReview.isReferee(User): %>
+<% if ConfReview.getJudgedContributions(User): %>
 <table class="Revtab" width="90%%" cellspacing="0" align="center" border="0" style="border-left: 1px solid #777777;padding-left:2px">
     <tr>
         <td nowrap class="groupTitle" colspan=4><%= _("Contributions to judge as Referee")%></td>
@@ -53,7 +53,7 @@
 <br>
 <% end %>
 
-<% if ConfReview.isEditor(User): %>
+<% if ConfReview.getEditedContributions(User): %>
 <table class="Revtab" width="90%%" cellspacing="0" align="center" border="0" style="border-left: 1px solid #777777;padding-left:2px">
     <tr>
         <td nowrap class="groupTitle" colspan=4><%= _("Judge editing of the contribution")%></td>
@@ -104,8 +104,8 @@
 </table>
 <br>
 <% end %>
+<% if ConfReview.getReviewedContributions(User): %>
 
-<% if ConfReview.isReviewer(User): %>
 <table class="Revtab" width="90%%" cellspacing="0" align="center" border="0" style="border-left: 1px solid #777777;padding-left:2px">
     <tr>
         <td nowrap class="groupTitle" colspan=4><%= _("Give advice on content of the contribution")%></td>

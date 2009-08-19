@@ -1,22 +1,19 @@
 <% declareTemplate(newTemplateStyle=True) %>
+<div class="groupTitle"><%= _("My Conference Features")%></div>
+<div>
 <table width='100%'>
 	<tr>
-        <td>
-            <table>
-                <%= items %>
-            </table>
-        </td>
+           <td nowrap class="displayField" style="padding-top: 25px; padding-left: 10px;">
+              <b>
+                 <%= _("This section gives you the opportunity to access all your features for this conference.")%>
+              </b>
+           </td>
     </tr>
-    <% if hasPaperReviewing: %>
-    <tr>
-        <td>
-            <table cellspacing="0">
-                <tr>
-                    <td colspan="3"><div class="groupTitle">List of contributions templates</div></td>
-                </tr>
-                <%= ContributionReviewingTemplatesList %>
-            </table>
-        </td>
+    <tr>      
+           <td style="padding-left: 30px; padding-top: 10px">
+              <font color="gray"> <%= _("To navigate, please use the sublink(s) located under 'My Conference'.") %>
+              </font>
+           </td>
     </tr>
-    <% end %>
 </table>
+</div>

@@ -855,17 +855,17 @@ class SystemLinkData:
                 "parent": ""}, \
             "mytracks": { \
                 "caption": _("My tracks"), \
-                "URL": str(str(urlHandlers.UHConfMyStuff.getURL(conf))), \
+                "URL": str(str(urlHandlers.UHConfMyStuffMyTracks.getURL(conf))), \
                 "staticURL": "", \
                 "parent": "mystuff"}, \
             "mysessions": { \
                 "caption": _("My sessions"), \
-                "URL": str(str(urlHandlers.UHConfMyStuff.getURL(conf))), \
+                "URL": str(str(urlHandlers.UHConfMyStuffMySessions.getURL(conf))), \
                 "staticURL": "", \
                 "parent": "mystuff"}, \
             "mycontribs": { \
                 "caption": _("My contributions"), \
-                "URL": str(str(urlHandlers.UHConfMyStuff.getURL(conf))), \
+                "URL": str(str(urlHandlers.UHConfMyStuffMyContributions.getURL(conf))), \
                 "staticURL": "", \
                 "parent": "mystuff"}, \
             "manageabstractreviewing": { \

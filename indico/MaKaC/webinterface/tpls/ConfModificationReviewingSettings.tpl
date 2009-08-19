@@ -34,7 +34,7 @@
     </tr>
     <tr>
         <td>
-            <div id="inPlaceEditReviewableMaterials"><%=", ".join(ConfReview.getReviewableMaterials()) %></div>
+           <div id="inPlaceEditReviewableMaterials"><%=", ".join(ConfReview.getReviewableMaterials()) %></div> 
         </td>
     </tr>
 </table>
@@ -226,13 +226,13 @@
 <% else: %>
     <% display = 'none' %>
 <% end %>
+<form action="<%= setTemplateURL %>" method="post" ENCTYPE="multipart/form-data">
 <table id="templateTable" width="90%%" align="center" border="0" style="border-left: 1px solid #777777; display:<%=display%>">
     <tr>
         <td id="uploadTemplateHelp" colspan="5" class="groupTitle"><%= _("Upload a template")%></td>
     </tr>
     <tr>
         <td>
-<form action="<%= setTemplateURL %>" method="post" ENCTYPE="multipart/form-data">
             <table>
             	<tr>
             		<td align="right">
@@ -279,12 +279,12 @@
         <td>
             <input type="submit" class="btn" value="<%= _("Upload")%>">
         </td>
-</form>
     </tr>
     <tr><td>
         <% includeTpl ('ContributionReviewingTemplatesList', ConfReview = ConfReview, CanDelete = CanDelete)%>
     </tr></td>
 </table>
+</form>
 
 
 <script type="text/javascript">

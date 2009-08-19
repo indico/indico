@@ -864,7 +864,37 @@ class RHMyStuff(RHConferenceBaseDisplay,base.RHProtected):
         p=conferences.WPMyStuff(self,self._target)
         return p.display()
 
+class RHConfMyStuffMySessions(RHConferenceBaseDisplay,base.RHProtected):
+    _uh=urlHandlers.UHConfMyStuffMySessions
+    
+    def _checkProtection(self):
+        base.RHProtected._checkProtection(self)
+    
+    def _process(self):
+        p=conferences.WPConfMyStuffMySessions(self,self._target)
+        return p.display()
+    
+class RHConfMyStuffMyContributions(RHConferenceBaseDisplay,base.RHProtected):
+    _uh=urlHandlers.UHConfMyStuffMyContributions
+    
+    def _checkProtection(self):
+        base.RHProtected._checkProtection(self)
+    
+    def _process(self):
+        p=conferences.WPConfMyStuffMyContributions(self,self._target)
+        return p.display()    
 
+class RHConfMyStuffMyTracks(RHConferenceBaseDisplay,base.RHProtected):
+    _uh=urlHandlers.UHConfMyStuffMyTracks
+    
+    def _checkProtection(self):
+        base.RHProtected._checkProtection(self)
+    
+    def _process(self):
+        p=conferences.WPConfMyStuffMyTracks(self,self._target)
+        return p.display()    
+
+        
 class RHContribsActions:
     """
     class to select the action to do with the selected abstracts

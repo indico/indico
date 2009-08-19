@@ -9318,13 +9318,12 @@ class WConfMyContributions(wcomponents.WTemplated):
         vars["Conference"] = self._conf
         return vars
 
-
-class WConfMyStuff(wcomponents.WTemplated):
+class WConfMyStuffMySessions(wcomponents.WTemplated):
 
     def __init__(self,aw,conf):
         self._aw=aw
         self._conf=conf
-
+        
     def _getSessionsHTML(self):
         if self._aw.getUser() is None:
             return ""
@@ -9360,8 +9359,62 @@ class WConfMyStuff(wcomponents.WTemplated):
                     <td>%s</td>
                 </tr>
             </table>
-            """%"".join(res)
+            """%"".join(res)   
+            
+            
+    def getVars(self):
+        vars=wcomponents.WTemplated.getVars(self)
+        vars["items"]="%s"%(self._getSessionsHTML())        
+        return vars       
+    
+class WPConfMyStuffMySessions(WPConferenceDefaultDisplayBase):
+    navigationEntry = navigation.NEMyStuff
+    
+    def _getBody(self,params):
+        wc=WConfMyStuffMySessions(self._getAW(),self._conf)
+        return wc.getHTML()
 
+    def _defineSectionMenu( self ): 
+        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
+        self._sectionMenu.setCurrentItem(self._myStuffOpt)
+
+
+class WConfMyStuffMyContributions(wcomponents.WTemplated):
+    
+    def __init__(self,aw,conf):
+        self._aw=aw
+        self._conf=conf
+        
+    def _getContribsHTML(self):
+        return WConfMyContributions(self._aw, self._conf).getHTML({})   
+    
+    def getVars(self):
+        vars=wcomponents.WTemplated.getVars(self)
+        vars["items"]="%s"%(self._getContribsHTML())  
+    
+        import reviewing
+        vars["hasPaperReviewing"] = self._conf.hasEnabledSection('paperReviewing')
+        vars["ContributionReviewingTemplatesList"] = reviewing.WContributionReviewingTemplatesList(self._conf).getHTML({"CanDelete" : False})
+        return vars
+        
+class WPConfMyStuffMyContributions(WPConferenceDefaultDisplayBase):
+    navigationEntry = navigation.NEMyStuff
+    
+    def _getBody(self,params):
+        wc=WConfMyStuffMyContributions(self._getAW(),self._conf)
+        return wc.getHTML()
+
+    def _defineSectionMenu( self ): 
+        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
+        self._sectionMenu.setCurrentItem(self._myStuffOpt)  
+        
+        
+class WConfMyStuffMyTracks(wcomponents.WTemplated):
+    
+    def __init__(self,aw,conf):
+        self._aw=aw
+        self._conf=conf
+        
     def _getTracksHTML(self):
         if self._aw.getUser() is None or not self._conf.getAbstractMgr().isActive() or not self._conf.hasEnabledSection("cfa"):
             return ""
@@ -9393,10 +9446,7 @@ class WConfMyStuff(wcomponents.WTemplated):
                 </tr>
             </table>
             """%"".join(res)
-
-    def _getContribsHTML(self):
-        return WConfMyContributions(self._aw, self._conf).getHTML({})
-
+    
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
         vars["items"]="%s%s%s"%(self._getSessionsHTML(),
@@ -9406,7 +9456,24 @@ class WConfMyStuff(wcomponents.WTemplated):
         vars["hasPaperReviewing"] = self._conf.hasEnabledSection('paperReviewing')
         vars["ContributionReviewingTemplatesList"] = reviewing.WContributionReviewingTemplatesList(self._conf).getHTML({"CanDelete" : False})
         return vars
+    
+    navigationEntry = navigation.NEMyStuff
+    
+    def _getBody(self,params):
+        wc=WConfMyStuffMyTracks(self._getAW(),self._conf)
+        return wc.getHTML()
 
+    def _defineSectionMenu( self ): 
+        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
+        self._sectionMenu.setCurrentItem(self._myStuffOpt)
+              
+        
+
+class WConfMyStuff(wcomponents.WTemplated):
+    
+    def __init__(self,aw,conf):
+        self._aw=aw
+        self._conf=conf
 
 class WPMyStuff(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NEMyStuff

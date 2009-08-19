@@ -44,12 +44,12 @@
                 <span class="titleCellFormat">Assigned referee</span>
             </td>
             <% if not ContributionReviewManager.hasReferee(): %>
-            <td width="60%%">
+            <td width="60%%" class='bottom_line'>
                 No referee assigned to this contribution.
             </td>
             <% end %>
             <% else: %>
-            <td width="60%%">
+            <td width="60%%" class='bottom_line'>
                 <%= ContributionReviewManager.getReferee().getFullName() %>
             </td>
             <td align="right">
@@ -65,7 +65,7 @@
             </td>
             <form action="<%=assignRefereeURL%>" method="post">
             <% showAssignButton = False %>
-            <td width="80%%">
+            <td width="80%%" class='bottom_line'>
                 <% if CanAssignReferee: %>
                     <% if len(ConfReview.getRefereesList()) == 0: %>
                         No referees proposed for this conference.
@@ -144,12 +144,12 @@
         <td nowrap class="titleCellTD"><span class="titleCellFormat">Assigned editor</span></td>
         
         <% if not ContributionReviewManager.hasEditor(): %>
-            <td width="60%%">
+            <td width="60%%" class='bottom_line'>
                 No editor assigned to this contribution.
             </td>
             <% end %>
             <% else: %>
-            <td width="60%%">
+            <td width="60%%" class='bottom_line'>
                 <%= ContributionReviewManager.getEditor().getFullName() %>
             </td>
             <td align="right">
@@ -166,7 +166,7 @@
         </td>
         <form action="<%=assignEditingURL%>" method="post">
         <% showAssignButton = False %>
-        <td width="80%%">
+        <td width="80%%" class='bottom_line'>
             <% if CanAssignEditorOrReviewers: %>
                 <% if len(ConfReview.getEditorsList()) == 0: %>
                     No editors proposed for this conference.
@@ -251,13 +251,13 @@
             <td nowrap class="titleCellTD"><span class="titleCellFormat">Assigned reviewers</span></td>
             
             <% if not ContributionReviewManager.hasReviewers(): %>
-                <td width="60%%">
+                <td width="60%%" class='bottom_line'>
                     No content reviewers assigned to this contribution.
                 </td>
             <% end %>
             <% else: %>
     			<form action="<%=removeAssignReviewingURL%>" method="post">
-                <td width="60%%">
+                <td width="60%%"  class='bottom_line'>
                     <table cellspacing="0" cellpadding="5">
                     	<% first = True %>
                     	<% for r in ContributionReviewManager.getReviewersList(): %>
@@ -290,7 +290,7 @@
             </td>
             <form action="<%=assignReviewingURL%>" method="post">
             <% showAssignButton = False %>
-            <td width="80%%">
+            <td width="80%%"  class='bottom_line'>
                 <% if CanAssignEditorOrReviewers: %>
                     <% if len(ConfReview.getReviewersList()) == 0: %>
                         No reviewers proposed for this conference.

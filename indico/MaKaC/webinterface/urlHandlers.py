@@ -3207,8 +3207,20 @@ class UHSessionModCoordinatorsAdd(URLHandler):
 
 class UHConfMyStuff(URLHandler):
     _relativeURL="myconference.py"
-
-
+    
+    
+class UHConfMyStuffMySessions(URLHandler):
+    _relativeURL="myconference.py/mySessions"
+      
+    
+class UHConfMyStuffMyTracks(URLHandler):
+    _relativeURL="myconference.py/myTracks"
+        
+    
+class UHConfMyStuffMyContributions(URLHandler):
+    _relativeURL="myconference.py/myContributions"
+    
+    
 class UHConfModSlotRem(URLHandler):
     _relativeURL="confModifSchedule.py/remSlot"
 
