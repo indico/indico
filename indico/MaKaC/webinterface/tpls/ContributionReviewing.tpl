@@ -33,7 +33,7 @@
 </table>
 <% end %>
 
-<table width="90%%" align="center" border="0" style="border-left: 1px solid #777777; margin-bottom: 1em">
+<table width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <!-- Assign or remove a referee -->
     <tr>
         <td id="assignRefereeHelp" colspan="5" class="groupTitle">Assign a referee</td>
@@ -135,7 +135,7 @@
 </table>
 
 <!-- Assign / remove Editors -->
-<table width="90%%" align="center" border="0" style="border-left: 1px solid #777777; margin-bottom: 1em">
+<table width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
         <td id="assignEditorHelp" colspan="5" class="groupTitle">Assign an Editor</td>
     </tr>
@@ -242,7 +242,7 @@
 
 <!-- Assign / remove content reviewers -->
 
-<table width="90%%" align="center" border="0" style="border-left: 1px solid #777777; margin-bottom: 1em">
+<table width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
         <td id="assignReviewersHelp" colspan="5" class="groupTitle">Assign Reviewers</td>
     </tr>
@@ -365,7 +365,7 @@
 
 
 <!-- Judgement of the editor -->
-<table width="90%%" align="center" border="0" style="border-left: 1px solid #777777; margin-bottom: 1em; margin-top: 1em">
+<table width="90%%" align="center" border="0" style="margin-bottom: 1em; margin-top: 1em">
     <tr>
         <td id="editingJudgementHelp" colspan="5" class="groupTitle">Editing judgement</td>
     </tr>
@@ -387,7 +387,7 @@
 </table>
 
 <!-- List of advices from the reviewers -->
-<table width="90%%" align="center" border="0" style="border-left: 1px solid #777777; margin-bottom: 1em">
+<table width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
         <td id="reviewingJudgementHelp" colspan="5" class="groupTitle">Reviewing judgement</td>
     </tr>
@@ -415,7 +415,7 @@
 
 
 <!-- Final reviewing of the referee -->
-<table width="90%%" align="center" border="0" style="border-left: 1px solid #777777; margin-bottom: 1em">
+<table width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
         <td id="finalJudgementHelp" colspan="5" class="groupTitle"><a name="FinalReviewing"></a>Final Judgement</td>
     </tr>

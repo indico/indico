@@ -1,6 +1,6 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 
-<table class="Revtab" width="90%%" cellspacing="0" align="center" border="0" style="border-left: 1px solid #777777;padding-left:2px">
+<table class="Revtab" width="90%%" cellspacing="0" align="center" border="0" style="padding-left:2px">
     <tr>
         <td nowrap class="groupTitle" colspan=5>
             <%= _("User competences")%>
@@ -8,21 +8,21 @@
         </td>
     </tr>
     <tr>
-        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">Id</td>
-        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">Name</td>
-        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"><%= _("Responsabilities")%></td>
-        <td colspan=2 nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"><%= _("Competences")%></td>
+        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB; padding-top: 10px; padding-bottom: 5px;">Id</td>
+        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB; padding-top: 10px; padding-bottom: 5px;">Name</td>
+        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB; padding-top: 10px; padding-bottom: 5px;"><%= _("Responsabilities")%></td>
+        <td colspan=2 nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB; padding-top: 10px; padding-bottom: 5px;"><%= _("Competences")%></td>
     </tr>
    
     
     <% for user, competences in ConfReview.getAllUserCompetences(): %>
         <tr valign="top">
-            <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;"><%= user.getId() %></td>
-            <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;"><%= user.getFullName()%></td>
-            <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
+            <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF; padding-top: 5px;"><%= user.getId() %></td>
+            <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF; padding-top: 5px;"><%= user.getFullName()%></td>
+            <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF; padding-top: 5px;">
                 <%= ", ".join(ConfReview.getUserReviewingRoles(user)) %>
             </td>
-            <td>
+            <td  style="padding-top: 5px;">
                 <span id="competences_<%= user.getId() %>"></span>
             </td>
         </tr>

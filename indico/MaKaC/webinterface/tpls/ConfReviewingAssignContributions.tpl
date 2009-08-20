@@ -4,21 +4,21 @@
 
 <% dueDateFormat = "%a %d %b %Y" %>
 
-<div id="showHideFilteringHelp"><div id="showHideFiltering" style="display:inline"></div></div>
+<div id="showHideFilteringHelp" style="padding-top: 10px;"><div id="showHideFiltering" style="display:inline"></div></div>
 <br/>
 <table id="filteringTable" class="Revtab" width="90%%" align="center">
     <thead>
         <tr style="text-align:center;">
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom:1px solid #BBBBBB;">
                 types
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom:1px solid #BBBBBB;">
                 sessions
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom:1px solid #BBBBBB;">
                 tracks
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom:1px solid #BBBBBB;">
                 assign status
             </td>
         </tr>
@@ -128,7 +128,7 @@
     </ul>
 </div>
 
-<table class="Revtab" width="90%%" cellspacing="0" align="center" border="0" style="border-left: 1px solid #777777;padding-left:2px; margin-bottom:1em">
+<table class="Revtab" width="90%%" cellspacing="0" align="center" border="0" style="padding-left:2px; margin-bottom:1em">
 <!--
     <tr>
         <td nowrap class="groupTitle" colspan=4>Contributions to judge as Referee</td>
@@ -139,19 +139,19 @@
             <td nowrap width="0%%" align="right" class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF">
                 <img src="<%= Config.getInstance().getSystemIconURL("checkAll") %>" alt="Select all" title="Select all" onclick="selectAll('selectedContributions')" style="border:none;"><img src="<%= Config.getInstance().getSystemIconURL("uncheckAll") %>" alt="Deselect all" title="Deselect all" onclick="deselectAll('selectedContributions')" style="border:none;">
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
                 Id
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
                 Title
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
                 Type
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
                 Track
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
                 Session
             </td>
             <!--
@@ -159,10 +159,10 @@
                 State
             </td>
             -->
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
                 Reviewing team
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
                 Due date
             </td>
         </tr>
@@ -350,13 +350,13 @@ var buildShowHideFiltering = function() {
         showFiltering: command(function(){
             $E('filteringTable').dom.style.display = '';
             option.set('hideFiltering');
-        }, '(Show Filtering Criteria)'),
+        }, 'Show Filtering Criteria'),
         hideFiltering: command(function(){
             $E('filteringTable').dom.style.display = 'none';
             option.set('showFiltering');
-        }, '(Hide Filtering Criteria)')
+        }, 'Hide Filtering Criteria')
     });
-    option.set('hideFiltering');
+    option.set('showFiltering');
     
     $E('showHideFiltering').set(Widget.link(option));
 }
@@ -969,6 +969,7 @@ var removeUser = function(role) {
 // Code to be executed on page load
 
 buildShowHideFiltering();
+$E('filteringTable').dom.style.display = 'none';
 
 bind.element($E("tablebody"), contributions, contributionTemplate);
 

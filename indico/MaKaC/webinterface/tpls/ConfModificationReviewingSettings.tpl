@@ -4,17 +4,17 @@
 <% from MaKaC.reviewing import Template %>
 <% from MaKaC.common.utils import formatDateTime %>
 
-<table width="90%%" align="center" border="0" style="border-left: 1px solid #777777; margin-bottom:1em">
+<table width="90%%" align="center" border="0" style="margin-bottom:1em">
     <tr>
         <td id="reviewingModeHelp" colspan="5" class="groupTitle">
             <span><%= _("Choose type of paper reviewing for the conference")%></span>
         </td>
     </tr>
     <tr>
-        <td nowrap class="titleCellTD">
+        <td nowrap class="titleCellTD"  style="padding-top: 5px;">
             <span class="titleCellFormat"><%= _("Type of reviewing")%></span>
         </td>
-        <td nowrap style="vertical-align:top">
+        <td nowrap style="vertical-align:top; padding-top: 5px;">
             <span id="inPlaceEditReviewingMode" style="display:inline"><%= ConferenceReview.reviewingModes[choice] %></span>
         </td>
     </tr>
@@ -26,7 +26,7 @@
 <% else: %>
     <% display = 'none' %>
 <% end %>
-<table id='materialsTable' width="90%%" align="center" border="0" style="border-left: 1px solid #777777; margin-bottom:1em; display:<%=display%>">
+<table id='materialsTable' width="90%%" align="center" border="0" style="margin-bottom:1em; display:<%=display%>">
     <tr>
         <td id="reviewableMaterialsHelp" colspan="5" class="groupTitle">
             <span><%= _("Choose types of materials to be revised")%></span>
@@ -34,7 +34,7 @@
     </tr>
     <tr>
         <td>
-           <div id="inPlaceEditReviewableMaterials"><%=", ".join(ConfReview.getReviewableMaterials()) %></div> 
+           <div id="inPlaceEditReviewableMaterials"  style="padding-top: 5px;"><%=", ".join(ConfReview.getReviewableMaterials()) %></div> 
         </td>
     </tr>
 </table>
@@ -45,7 +45,7 @@
 <% else: %>
     <% display = 'none' %>
 <% end %>
-<table id='statusTable' width="90%%" align="center" border="0" style="border-left: 1px solid #777777; margin-bottom:1em; display:<%=display%>">
+<table id='statusTable' width="90%%" align="center" border="0" style="margin-bottom:1em; display:<%=display%>">
     <tr>
         <td id="reviewingStatesHelp" colspan="5" class="groupTitle"><%= _("Add a paper status for paper reviewing")%></td>
     </tr>
@@ -66,7 +66,7 @@
     -->
     <tr>
         <td>
-            <div id="inPlaceEditStates"><%= ', '.join(ConfReview.getAllStates())%></div>
+            <div id="inPlaceEditStates"  style="padding-top: 5px;"><%= ', '.join(ConfReview.getAllStates())%></div>
         </td>
     </tr>
 </table>
@@ -77,7 +77,7 @@
 <% else: %>
     <% display = 'none' %>
 <% end %>
-<table id="reviewingQuestionsTable" width="90%%" align="center" border="0" style="border-left: 1px solid #777777; margin-bottom:1em; display:<%=display%>">
+<table id="reviewingQuestionsTable" width="90%%" align="center" border="0" style="margin-bottom:1em; display:<%=display%>">
     <tr>
         <td id="reviewingQuestionsHelp" colspan="5" class="groupTitle"><%= _("Add questions for paper reviewing")%></td>
     </tr>
@@ -97,7 +97,7 @@
     -->
     <tr>
         <td>
-            <div id="inPlaceEditQuestions"><%= ', '.join(ConfReview.getReviewingQuestions())%></div>
+            <div id="inPlaceEditQuestions"  style="padding-top: 5px;"><%= ', '.join(ConfReview.getReviewingQuestions())%></div>
         </td>
     </tr>
 </table>
@@ -109,9 +109,9 @@
 <% else: %>
     <% display = 'none' %>
 <% end %>
-<table id="editingCriteriaTable" width="90%%" align="center" border="0" style="border-left: 1px solid #777777; margin-bottom:1em; display:<%=display%>">
+<table id="editingCriteriaTable" width="90%%" align="center" border="0" style="margin-bottom:1em; display:<%=display%>">
     <tr>
-        <td id="editingCriteriaHelp" colspan="5" class="groupTitle"><%= _("Set criteria for paper editing")%></td>
+        <td id="editingCriteriaHelp" colspan="5" class="groupTitle"  style="padding-top: 5px;"><%= _("Set criteria for paper editing")%></td>
     </tr>
     <!--
     <tr>
@@ -129,7 +129,7 @@
     -->
     <tr>
         <td>
-            <div id="inPlaceEditCriteria"><%= ', '.join(ConfReview.getLayoutCriteria())%></div>
+            <div id="inPlaceEditCriteria"  style="padding-top: 10px;"><%= ', '.join(ConfReview.getLayoutCriteria())%></div>
         </td>
     </tr>
 </table>
@@ -141,7 +141,7 @@
 <% else: %>
     <% display = 'none' %>
 <% end %>
-<table id="defaultDueDatesTable" width="90%%" align="center" border="0" style="border-left: 1px solid #777777; margin-bottom:1em; display:<%=display%>">
+<table id="defaultDueDatesTable" width="90%%" align="center" border="0" style="margin-bottom:1em; display:<%=display%>">
     <tr>
         <td id="defaultDatesHelp" colspan="5" class="groupTitle"><%= _("Default due dates for reviewing team")%></td>
     </tr>
@@ -227,7 +227,7 @@
     <% display = 'none' %>
 <% end %>
 <form action="<%= setTemplateURL %>" method="post" ENCTYPE="multipart/form-data">
-<table id="templateTable" width="90%%" align="center" border="0" style="border-left: 1px solid #777777; display:<%=display%>">
+<table id="templateTable" width="90%%" align="center" border="0" style="display:<%=display%>">
     <tr>
         <td id="uploadTemplateHelp" colspan="5" class="groupTitle"><%= _("Upload a template")%></td>
     </tr>
