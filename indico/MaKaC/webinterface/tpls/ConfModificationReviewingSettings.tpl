@@ -236,7 +236,7 @@
             <table>
             	<tr>
             		<td align="right">
-            			Name
+            			<%= _("Name")%>
             		</td>
 					<td>
 						<input type=text size="70" name="name">
@@ -266,7 +266,7 @@
                 </tr>
 				<tr>
                     <td align="right">
-                        Template
+                        <%= _("Template")%>
                     </td>
                     <td>
                         <input name="file" type="file" value="<%= _("Browse...")%>">

@@ -4439,6 +4439,9 @@ class UHConfModifReviewingAssignContributionsAssign( URLHandler ):
 class UHContributionModifReviewing( URLHandler ):
     _relativeURL = "contributionReviewing.py"
 
+class UHContributionReviewingJudgements ( URLHandler ):
+    _relativeURL = "contributionReviewing.py/contributionReviewingJudgements"    
+    
 class UHContributionSubmitForRewiewing( URLHandler ):
     _relativeURL = "contributionReviewing.py/submitForReviewing"
 

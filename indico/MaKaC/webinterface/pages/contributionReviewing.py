@@ -30,7 +30,7 @@ class WPContributionReviewing( WPContributionModifBase ):
         self._aw = rh.getAW()
     
     def _setActiveTab( self ):
-        self._tabReviewing.setActive()
+        self._subtabReviewing.setActive()
         
     def _getTabContent( self, params ):  
         wc = WContributionReviewing(self._target.getConference(), self._aw)
@@ -40,9 +40,8 @@ class WPContributionReviewing( WPContributionModifBase ):
         removeAssignEditingURL = urlHandlers.UHRemoveAssignEditing.getURL(self._target)
         assignReviewingURL = urlHandlers.UHAssignReviewing.getURL(self._target)
         removeAssignReviewingURL = urlHandlers.UHRemoveAssignReviewing.getURL(self._target)
-        finalJudgeURL = urlHandlers.UHFinalJudge.getURL(self._target)
     
-        return wc.getHTML(self._target, assignRefereeURL, removeAssignRefereeURL, assignEditingURL, removeAssignEditingURL, assignReviewingURL, removeAssignReviewingURL, finalJudgeURL)
+        return wc.getHTML(self._target, assignRefereeURL, removeAssignRefereeURL, assignEditingURL, removeAssignEditingURL, assignReviewingURL, removeAssignReviewingURL)
 
 class WContributionReviewing(wcomponents.WTemplated): 
     
@@ -50,7 +49,7 @@ class WContributionReviewing(wcomponents.WTemplated):
         self._conf = conference
         self._aw = aw
     
-    def getHTML( self, target, assignRefereeURL, removeAssignRefereeURL, assignEditingURL, removeAssignEditingURL, assignReviewingURL, removeAssignReviewingURL, finalJudgeURL ):
+    def getHTML( self, target, assignRefereeURL, removeAssignRefereeURL, assignEditingURL, removeAssignEditingURL, assignReviewingURL, removeAssignReviewingURL ):
 
         self.__target = target
         params = {"assignRefereeURL" : assignRefereeURL, \
@@ -58,8 +57,7 @@ class WContributionReviewing(wcomponents.WTemplated):
                   "assignEditingURL" : assignEditingURL, \
                   "removeAssignEditingURL" : removeAssignEditingURL, \
                   "assignReviewingURL" : assignReviewingURL, \
-                  "removeAssignReviewingURL" : removeAssignReviewingURL, \
-                  "finalJudgeURL": finalJudgeURL}
+                  "removeAssignReviewingURL" : removeAssignReviewingURL}
         return wcomponents.WTemplated.getHTML(self, params)
         
     def getVars( self):
@@ -78,14 +76,61 @@ class WContributionReviewing(wcomponents.WTemplated):
         vars["CanAssignEditorOrReviewers"] = reviewManager.isReferee(self._aw.getUser()) or canAssignReferee
         vars["AvailableReviewers"] =  [r for r in  self._conf.getConference().getConfReview().getReviewersList() \
                                        if r not in reviewManager.getReviewersList()]
-        vars["Editing"] = reviewManager.getLastReview().getEditorJudgement()
-        vars["AdviceList"] = reviewManager.getLastReview().getSubmittedReviewerJudgement()
         vars["CanEditDueDates"] = canAssignReferee
         vars["IsReferee"] = self.__target.getReviewManager().isReferee(self._rh._getUser())
         vars["Review"] = self.__target.getReviewManager().getLastReview()
         vars["TrackList"] = self._conf.getTrackList()
         
         return vars
+
+
+class WPContributionReviewingJudgements( WPContributionModifBase ):
+    
+    def __init__(self, rh, contribution):
+        WPContributionModifBase.__init__(self, rh, contribution)
+        self._aw = rh.getAW()
+    
+    def _setActiveTab( self ):
+        self._subtabReviewing.setActive()
+        self._subTabJudgements.setActive()
+        
+        
+    def _getTabContent( self, params ):  
+        wc = WContributionReviewingJudgements(self._target.getConference(), self._aw)        
+        finalJudgeURL = urlHandlers.UHFinalJudge.getURL(self._target)
+    
+        return wc.getHTML(self._target, finalJudgeURL)
+    
+class WContributionReviewingJudgements(wcomponents.WTemplated): 
+    
+    def __init__(self, conference, aw):
+        self._conf = conference
+        self._aw = aw
+    
+    def getHTML( self, target, finalJudgeURL ):
+
+        self.__target = target
+        params = {"finalJudgeURL": finalJudgeURL}
+        return wcomponents.WTemplated.getHTML(self, params)
+        
+    def getVars( self):
+        vars = wcomponents.WTemplated.getVars( self )
+
+        conferenceChoice = self._conf.getConfReview().getChoice()
+        reviewManager = self.__target.getReviewManager()        
+        vars["Conference"] = self._conf
+        vars["ConfReview"] = self._conf.getConfReview()
+        vars["Contribution"] = self.__target
+        vars["ConferenceChoice"] = conferenceChoice
+        vars["Editing"] = reviewManager.getLastReview().getEditorJudgement()
+        vars["AdviceList"] = reviewManager.getLastReview().getSubmittedReviewerJudgement()
+        vars["IsReferee"] = self.__target.getReviewManager().isReferee(self._rh._getUser())
+        vars["Review"] = self.__target.getReviewManager().getLastReview()
+        vars["TrackList"] = self._conf.getTrackList()
+        
+        return vars
+    
+
 
 class WPJudgeEditing( WPContributionModifBase ):
     

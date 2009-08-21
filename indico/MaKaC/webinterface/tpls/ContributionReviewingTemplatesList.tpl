@@ -4,13 +4,13 @@
     <% if ConfReview.hasTemplates(): %>
     	<tr>
             <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
-            	Name
+            	<%= _("Name")%>
     	    </td>
             <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
-            	Format
+            	<%= _("Format")%>
     		</td>
             <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
-            	Description
+            	<%= _("Description")%>
     		</td>
         </tr>
     	
@@ -42,7 +42,7 @@
 	<% end %>
     <% else: %>
         <tr><td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-            No templates have been uploaded yet.
+            <%= _("No templates have been uploaded yet.")%>
         </td></tr>
     <% end %>
 

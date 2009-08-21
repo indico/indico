@@ -4,9 +4,9 @@
 <!-- Judgement of the editor -->
 
 <% if Editing.isSubmitted(): %>
-<table width="90%%" align="center" border="0" style="border-left: 1px solid #777777">
+<table width="90%%" align="center" border="0">
     <tr>
-        <td colspan="5" class="groupTitle">Editing judgement</td>
+        <td colspan="5" class="groupTitle"><%= _("Editing judgement")%></td>
     </tr>
 
     <tr>
@@ -19,9 +19,9 @@
 
 <!-- List of advices from the reviewers -->
 <% if Review.anyReviewerHasGivenAdvice(): %>
-<table width="90%%" align="center" border="0" style="border-left: 1px solid #777777">
+<table width="90%%" align="center" border="0">
     <tr>
-        <td colspan="5" class="groupTitle">Reviewing judgement</td>
+        <td colspan="5" class="groupTitle"><%= _("Reviewing judgement")%></td>
     </tr>
     <tr>
         <td>
@@ -40,9 +40,9 @@
 <!-- Final reviewing of the referee -->
 <% if ConferenceChoice == 2 or ConferenceChoice == 4: %>
     <% if Review.getRefereeJudgement().getJudgement() != None: %>
-<table width="90%%" align="center" border="0" style="border-left: 1px solid #777777">
+<table width="90%%" align="center" border="0">
     <tr>
-        <td colspan="5" class="groupTitle">Final Reviewing</td>
+        <td colspan="5" class="groupTitle"><%= _("Final Reviewing")%></td>
     </tr>
     <tr>
         <td>

@@ -374,9 +374,14 @@ class WPContributionModifBase( WPConferenceModifBase  ):
 
         if hasReviewingEnabled and confReviewChoice != 1:
 
-            self._tabReviewing = self._tabCtrl.newTab( "reviewing", "Reviewing", \
+            self._subtabReviewing = self._tabCtrl.newTab( "reviewing", "Reviewing", \
                 urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
-
+            self._subTabAssign = self._subtabReviewing.newSubTab( "assign", _("Assign Team"), \
+                urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
+            self._subTabJudgements = self._subtabReviewing.newSubTab( "Judgements", _("Judgements"), \
+                urlHandlers.UHContributionReviewingJudgements.getURL( self._target ) )
+            
+    
             if (confReviewChoice == 3 or confReviewChoice == 4) and \
                 self._contrib.getReviewManager().isEditor(self._rh._getUser()) and \
                 (not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self._conf.getConfReview().getChoice() == 3) and \

@@ -44,6 +44,20 @@ class RHContributionReviewing(RHContribModifBaseReviewingStaffRights):
         p = contributionReviewing.WPContributionReviewing(self, self._target)
         return p.display()
 
+class RHContributionReviewingJudgements(RHContribModifBaseReviewingStaffRights):
+    _uh = urlHandlers.UHContributionReviewingJudgements
+    
+    def _checkProtection(self):
+        if self._target.getConference().hasEnabledSection("paperReviewing"):
+            RHContribModifBaseReviewingStaffRights._checkProtection(self)
+        else:
+            raise MaKaCError(_("Paper Reviewing is not active for this conference"))
+    
+    def _process(self):
+        p = contributionReviewing.WPContributionReviewingJudgements(self, self._target)
+        return p.display()
+
+
 #Assign Referee classes
 class RHAssignRefereeBase(RHContribModifBase):
     

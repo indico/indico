@@ -9,6 +9,9 @@ if DEVELOPMENT:
 def index( req, **params ):
     return contribReviewingModif.RHContributionReviewing( req ).process( params )
 
+def contributionReviewingJudgements( req, **params ):
+    return contribReviewingModif.RHContributionReviewingJudgements ( req ). process ( params )
+
 def assignEditing( req, **params ):
     return contribReviewingModif.RHAssignEditing( req ).process( params )
 

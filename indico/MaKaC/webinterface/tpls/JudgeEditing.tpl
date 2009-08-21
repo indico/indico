@@ -1,12 +1,14 @@
 <% from MaKaC.reviewing import ConferenceReview %>
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 
-<table width="90%%" align="center" border="0" style="border-left: 1px solid #777777">
-    <tr>
-        <td colspan="5" class="groupTitle">Give opinion on layout of a contribution</td>
+<table width="90%%" align="center" border="0" style="padding-top: 15px;">
+    <tr
+        <td colspan="5" class="groupTitle"><%= _("Give opinion on layout of a contribution")%>
+            <% inlineContextHelp(_('Here is displayed the judgement given by the Layout Reviewer.<br/>Only the Layout Reviewer of this contribution can change this.')) %>
+        </td>
     </tr>
     <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat">Approved requirements</span></td>
+        <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Reviewing questions")%></span></td>
         <td width="60%%" id="criteriaListDisplay">
         </td>
     </tr>

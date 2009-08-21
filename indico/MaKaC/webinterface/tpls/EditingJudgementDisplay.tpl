@@ -2,21 +2,21 @@
             <table cellspacing="0" cellpadding="5" width="100%%">
                 <tr>
                     <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                        <span class="titleCellFormat">Judgement</span>
+                        <span class="titleCellFormat"><%= _("Judgement")%></span>
                     </td>
                     <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                        <span class="titleCellFormat">Comments</span>
+                        <span class="titleCellFormat"><%= _("Comments")%></span>
                     </td>
                     <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                        <span class="titleCellFormat">Criteria Evaluation</span>
+                        <span class="titleCellFormat"><%= _("Criteria Evaluation")%></span>
                     </td>
                     <% if ShowEditor: %>
                     <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                        <span class="titleCellFormat">Editor</span>
+                        <span class="titleCellFormat"><%= _("Editor")%></span>
                     </td>
                     <% end %>
                     <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                        <span class="titleCellFormat">Submission date</span>
+                        <span class="titleCellFormat"><%= _("Submission date")%></span>
                     </td>
                 </tr>
                 <tr>                    

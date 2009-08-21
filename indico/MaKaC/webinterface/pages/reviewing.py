@@ -21,6 +21,7 @@
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
+from MaKaC.i18n import _
 
 #============================================================
 #==================== Reviewing =============================
@@ -393,8 +394,8 @@ class WConfModificationReviewingFramePRM(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
 
         prmTable = []
-        prmTable.append("""<td nowrap class="titleCellTD"><span class="titleCellFormat">Paper Review Managers<br><font size="-2">(users responsible for assignation of contributions)</font></span></td>
-        <td width="80%%">""")
+        prmTable.append(_("""<td nowrap class="titleCellTD"><span class="titleCellFormat"> _("Paper Review Managers") <br><font size="-2">_("(users responsible for assignation of contributions)")</font></span></td>
+        <td width="80%%">"""))
         prmTable.append(wcomponents.WPrincipalTable().getHTML( self.__target.getConfReview().getPaperReviewManagersList(),
                                                                self.__target, vars["addPaperReviewManagerURL"], vars["removePaperReviewManagerURL"], selectable=False))
         prmTable.append("""</td>""")
@@ -428,8 +429,8 @@ class WConfModificationReviewingFrame(wcomponents.WTemplated):
         if self.__target.getConfReview().getChoice() == 2 or self.__target.getConfReview().getChoice() == 1:
             pass
         else:
-            editor.append("""<td nowrap class="titleCellTD"><span class="titleCellFormat">Editors<br><font size="-2">(users responsible for form verification)</font></span></td>
-        <td width="80%%">""")
+            editor.append(_("""<td nowrap class="titleCellTD"><span class="titleCellFormat">_("Editors")<br><font size="-2">_("(users responsible for form verification)")</font></span></td>
+        <td width="80%%">"""))
             editor.append(wcomponents.WPrincipalTable().getHTML( self.__target.getConfReview().getEditorsList(),
                                                                  self.__target, vars["addEditorURL"], vars["removeEditorURL"], selectable=False))
             editor.append("""</td>""")
@@ -438,14 +439,14 @@ class WConfModificationReviewingFrame(wcomponents.WTemplated):
         if self.__target.getConfReview().getChoice() == 3 or self.__target.getConfReview().getChoice() == 1:
             pass
         else:
-            reviewer.append("""<td nowrap class="titleCellTD"><span class="titleCellFormat">Reviewers<br><font size="-2">(users responsible for content verification)</font></span></td>
-        <td width="80%%">""")
+            reviewer.append(_("""<td nowrap class="titleCellTD"><span class="titleCellFormat">_("Reviewers")<br><font size="-2">_("(users responsible for content verification)")</font></span></td>
+        <td width="80%%">"""))
             reviewer.append(wcomponents.WPrincipalTable().getHTML( self.__target.getConfReview().getReviewersList(),
                                                                    self.__target, vars["addReviewerURL"], vars["removeReviewerURL"], selectable=False))
             reviewer.append("""</td>""")
-
-            refereeTable.append("""<td nowrap class="titleCellTD"><span class="titleCellFormat">Referees<br><font size="-2">(users responsible for decision about contributions)</font></span></td>
-            <td width="80%%">""")
+        
+            refereeTable.append(_("""<td nowrap class="titleCellTD"><span class="titleCellFormat">_("Referees")<br><font size="-2">_("(users responsible for decision about contributions)")</font></span></td>
+            <td width="80%%">"""))
             refereeTable.append(wcomponents.WPrincipalTable().getHTML( self.__target.getConfReview().getRefereesList(),
                                                                        self.__target, vars["addRefereeURL"], vars["removeRefereeURL"], selectable=False))
             refereeTable.append("""</td>""")

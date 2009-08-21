@@ -10,16 +10,16 @@
     <thead>
         <tr style="text-align:center;">
             <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom:1px solid #BBBBBB;">
-                types
+                <%= _("types")%>
             </td>
             <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom:1px solid #BBBBBB;">
-                sessions
+                <%= _("sessions")%>
             </td>
             <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom:1px solid #BBBBBB;">
-                tracks
+                <%= _("tracks")%>
             </td>
             <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom:1px solid #BBBBBB;">
-                assign status
+                <%= _("assign status")%>
             </td>
         </tr>
     </thead>
@@ -32,7 +32,7 @@
                     </tr>
                     <tr>
                         <td><input type="checkbox" id="typeShowNoValue" name="selTypes" value="not specified" checked/></td>
-                        <td> --not specified--</td>
+                        <td> --<%= _("not specified")%>--</td>
                     </tr>
                     <% for type in self._conf.getContribTypeList(): %>
                         <tr>
@@ -49,7 +49,7 @@
                     </tr>
                     <tr>
                         <td><input type="checkbox" id="sessionShowNoValue" name="selSessions" value="not specified" checked/></td>
-                        <td> --not specified--</td>
+                        <td> --<%= _("not specified")%>--</td>
                     </tr>
                     <% for s in self._conf.getSessionListSorted(): %>
                         <tr>
@@ -66,7 +66,7 @@
                     </tr>
                     <tr>
                         <td><input type="checkbox" id="trackShowNoValue" name="selTracks" value="not specified" checked/></td>
-                        <td> --not specified--</td>
+                        <td> --<%= _("not specified")%>--</td>
                     </tr>
                     <% for t in Conference.getTrackList(): %>
                         <tr>
@@ -79,10 +79,10 @@
             <td>
                 <ul style="list-style-type:none">
                     <% if not IsOnlyReferee: %>
-                        <li><input type="checkbox" id="showWithReferee" checked/> With Referee assigned</li>
+                        <li><input type="checkbox" id="showWithReferee" checked/> <%= _("With Referee assigned")%></li>
                     <% end %>
-                    <li><input type="checkbox" id="showWithEditor" checked/> With Editor assigned</li>
-                    <li><input type="checkbox" id="showWithReviewer" checked/> With at least 1 Reviewer assigned</li>
+                    <li><input type="checkbox" id="showWithEditor" checked/> <%= _("With Editor assigned")%></li>
+                    <li><input type="checkbox" id="showWithReviewer" checked/> <%= _("With at least 1 Reviewer assigned")%></li>
 
                 </ul>
             </td>
@@ -98,7 +98,7 @@
 <table>
     <% if not IsOnlyReferee: %>
     <tr>
-        <td>Referee:</td>
+        <td><%= _("Referee")%>:</td>
         <td id="assignRefereeHelp">
             <input id="assignRefereeButton_top" type="button" class="popUpButton" value="Assign">
             <input id="removeRefereeButton_top" type="button" class="popUpButton" value="Remove">
@@ -106,14 +106,14 @@
     </tr>
     <% end %>
     <tr>
-        <td>Editor:</td>
+        <td><%= _("Editor")%>:</td>
         <td id="assignEditorHelp">
             <input id="assignEditorButton_top" type="button" class="popUpButton" value="Assign">
             <input id="removeEditorButton_top" type="button" class="popUpButton" value="Remove">
         </td>
     </tr>
     <tr>
-        <td>Reviewers:</td>
+        <td><%= _("Reviewers")%>:</td>
         <td id="assignReviewerHelp">
             <input id="addReviewerButton_top" type="button" class="popUpButton" value="Assign">
             <input id="removeReviewerButton_top" type="button" class="popUpButton" value="Remove">
@@ -140,19 +140,19 @@
                 <img src="<%= Config.getInstance().getSystemIconURL("checkAll") %>" alt="Select all" title="Select all" onclick="selectAll('selectedContributions')" style="border:none;"><img src="<%= Config.getInstance().getSystemIconURL("uncheckAll") %>" alt="Deselect all" title="Deselect all" onclick="deselectAll('selectedContributions')" style="border:none;">
             </td>
             <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                Id
+                <%= _("Id")%>
             </td>
             <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                Title
+                <%= _("Title")%>
             </td>
             <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                Type
+                <%= _("Type")%>
             </td>
             <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                Track
+                <%= _("Track")%>
             </td>
             <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                Session
+                <%= _("Session")%>
             </td>
             <!--
             <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
@@ -160,10 +160,10 @@
             </td>
             -->
             <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                Reviewing team
+                <%= _("Reviewing team")%>
             </td>
             <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                Due date
+                <%= _("Due date")%>
             </td>
         </tr>
     </thead>
@@ -220,13 +220,13 @@
             <td>
                 <ul>
                     <li>
-                        <em>Referee:</em> 
+                        <em><%= _("Referee")%>:</em> 
                     </li>
                     <li>
-                        <em>Editor:</em> 
+                        <em><%= _("Editor")%>:</em> 
                     </li>
                     <li>
-                        <em>Reviewers:</em>
+                        <em><%= _("Reviewers")%>:</em>
                         <ul>
                         <% for reviewer in rm.getReviewersList() :%>
                             <li>a</li>
@@ -239,7 +239,7 @@
             <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <% date = rm.getLastReview().getAdjustedRefereeDueDate() %>
                 <% if date is None: %>
-                    Due date not set.
+                    <%= _("Due date not set.")%>
                 <% end %>
                 <% else: %>
                 <% if date < nowutc() and not rm.getLastReview().getRefereeJudgement().isSubmitted(): %>
@@ -262,7 +262,7 @@
 <table>
     <% if not IsOnlyReferee: %>
     <tr>
-        <td>Referee:</td>
+        <td><%= _("Referee")%>:</td>
         <td id="assignRefereeHelp">
             <input id="assignRefereeButton_bottom" type="button" class="popUpButton" value="Assign">
             <input id="removeRefereeButton_bottom" type="button" class="popUpButton" value="Remove">
@@ -270,14 +270,14 @@
     </tr>
     <% end %>
     <tr>
-        <td>Editor:</td>
+        <td><%= _("Editor")%>:</td>
         <td id="assignEditorHelp">
             <input id="assignEditorButton_bottom" type="button" class="popUpButton" value="Assign">
             <input id="removeEditorButton_bottom" type="button" class="popUpButton" value="Remove">
         </td>
     </tr>
     <tr>
-        <td>Reviewers:</td>
+        <td><%= _("Reviewers")%>:</td>
         <td id="assignReviewerHelp">
             <input id="addReviewerButton_bottom" type="button" class="popUpButton" value="Assign">
             <input id="removeReviewerButton_bottom" type="button" class="popUpButton" value="Remove">

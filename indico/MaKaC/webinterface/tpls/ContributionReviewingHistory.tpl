@@ -10,7 +10,7 @@
             <tr>
                 <td align="left" colspan="2">
                     <span style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                        Review <%= review.getVersion() %>
+                        <%= _("Review")%> <%= review.getVersion() %>
                     </span>
                 </td>
             </tr>
