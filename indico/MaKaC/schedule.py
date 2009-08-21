@@ -1116,6 +1116,8 @@ class BreakTimeSchEntry(IndTimeSchEntry):
     @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'room', lambda x: Conversion.roomName(x.getRoom()))
     @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'location', lambda x: Conversion.locationName(x.getLocation()))
     @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'address', lambda x: Conversion.locationAddress(x.getLocation()))
+    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'inheritLoc', lambda x: x.getOwnLocation() is None)
+    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'inheritRoom', lambda x: x.getOwnRoom() is None)
 
     def __init__(self):
         IndTimeSchEntry.__init__(self)

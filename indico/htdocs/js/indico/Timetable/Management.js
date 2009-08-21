@@ -220,6 +220,11 @@ type("TimetableManagementActions", [], {
         // TODO: implement reschedule function
         var href = Indico.Urls.Reschedule;
         var rescheduleLink = Html.a({style: {margin: '0 15px'}}, Html.span({style: {cursor: 'default', color: '#888'}}, 'Reschedule'));
+        
+        var underConstr = function(event) {
+            IndicoUI.Widgets.Generic.tooltip(this, event,"This option will be available soon");
+        };
+        rescheduleLink.dom.onmouseover = underConstr;
 
         this.menu = Html.div({style: {cssFloat: 'right', color: '#777'}}, addMenu, ' | ', rescheduleLink);
         return Html.div('clearfix', this.menu, this.infoBox);
@@ -370,8 +375,9 @@ type("TimetableManagementActions", [], {
         });
         
         args.set('startDate', IndicoUtil.formatDateTime(IndicoUtil.parseJsonDate(eventData.startDate)));
-        args.set('roomInfo',$O({"location": eventData.location,
-                                "room": eventData.room }));
+        args.set('roomInfo',$O({"location": eventData.inheritLoc?null:eventData.location,
+                                "room": eventData.inheritRoom?null:eventData.room,
+                                "address": eventData.inheritLoc?'':eventData.address}));
 
         var editDialog = new AddBreakDialog(this, args, $O(params.roomInfo), true);
         editDialog.open();
