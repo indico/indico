@@ -13,6 +13,7 @@ type("TimetableManagementActions", [], {
         },
         'SessionBreak': {
             add: 'schedule.slot.addBreak',
+            edit: 'schedule.slot.editBreak',
             modifyStartEndDate: 'schedule.slot.modifyStartEndDate',
             'delete': 'schedule.slot.deleteBreak'
         },
@@ -29,6 +30,7 @@ type("TimetableManagementActions", [], {
         },
         'Break': {
             add: 'schedule.event.addBreak',
+            edit: 'schedule.event.editBreak',
             modifyStartEndDate: 'schedule.event.modifyStartEndDate',
             'delete': 'schedule.event.deleteBreak'
         },
@@ -345,7 +347,6 @@ type("TimetableManagementActions", [], {
             params = this._addParams('Break');
         }
 
-        
         var dialog = new AddBreakDialog(
             this,
             $O(params),
@@ -374,6 +375,7 @@ type("TimetableManagementActions", [], {
             args.set(key, value);
         });
         
+        args.set('type', params.type)
         args.set('startDate', IndicoUtil.formatDateTime(IndicoUtil.parseJsonDate(eventData.startDate)));
         args.set('roomInfo',$O({"location": eventData.inheritLoc?null:eventData.location,
                                 "room": eventData.inheritRoom?null:eventData.room,

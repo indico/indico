@@ -216,8 +216,8 @@ var IndicoUtil = {
        var month = parseInt(date.date.substr(5,2), 10);
        var day = parseInt(date.date.substr(8,2), 10);
 
-       var hour = parseInt(date.time.substr(0,2));
-       var min = parseInt(date.time.substr(3,2));
+       var hour = parseInt(date.time.substr(0,2), 10);
+       var min = parseInt(date.time.substr(3,2), 10);
 
        return new Date(year, month-1, day, hour, min);
    },

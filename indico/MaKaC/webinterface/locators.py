@@ -170,8 +170,13 @@ class WebLocator:
         if not ("sessionId" in params.keys()) or \
            params["sessionId"] == None or \
            params["sessionId"].strip()=="":
-            if mustExist:
-                raise errors.MaKaCError( _("session id not set"))        
+            if not ("session" in params.keys()) or \
+                params["session"] == None or \
+                params["session"].strip()=="":
+                if mustExist:
+                    raise errors.MaKaCError( _("session id not set"))        
+            else:
+                self.__sessionId = params["session"]
         else:
             self.__sessionId = params["sessionId"]
     
@@ -179,8 +184,16 @@ class WebLocator:
         self.setSession( params, mustExist )
         if not ("slotId" in params.keys()) or \
            params["slotId"].strip()=="":
-            if mustExist:
-                raise errors.MaKaCError( _("slot id not set"))
+            if not ("sessionSlotId" in params.keys()) or \
+                params["sessionSlotId"].strip()=="":
+                if not ("slot" in params.keys()) or \
+                    params["slot"].strip()=="":
+                    if mustExist:
+                        raise errors.MaKaCError( _("slot id not set"))
+                else:
+                    self.__slotId = params["slot"]
+            else:
+                self.__slotId = params["sessionSlotId"]
         else:
             self.__slotId = params["slotId"]
 

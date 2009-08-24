@@ -574,7 +574,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
 
              var killProgress = IndicoUI.Dialogs.Util.progress();
 
-             indicoRequest('schedule.event.editBreak',
+             indicoRequest(self.managementActions.methods[self.info.get('type')].edit,
                            args,
                            function(result, error){
                                killProgress();
@@ -608,7 +608,11 @@ type("AddBreakDialog", ["ChangeEditDialog"],
              // by default, assume parent room info
              this.info.set('roomInfo', clone(parentRoomInfo));
              this.timeStartMethod = managementActions.methods[args.get('parentType')].dayEndDate;
-             args.set("conference", args.get('args').conference);
+             //args.set("conference", args.get('args').conference);
+             var sargs = args.get('args');
+             each(sargs, function(value, key) {
+                 self.info.set(key,value);
+               });
              args.set("date", args.get('selectedDay'));
              this.dateArgs = args;
              this.ChangeEditDialog(managementActions.methods[args.get('type')].add, this.info, $T("Add Break"), function(result) { managementActions._updateEntry(result);});

@@ -303,7 +303,8 @@ class ScheduleEditBreakBase(LocationSetter):
                        "startDate": self._dateTime,
                        "durMins": str(self._duration),
                        "durHours": "0"},
-                      tz = self._conf.getTimezone())
+                       check = 2,
+                       tz = self._conf.getTimezone())
 
         self._setLocationInfo(self._brk)
 
@@ -348,6 +349,16 @@ class SessionSlotScheduleAddBreak(ScheduleEditBreakBase, sessionServices.Session
 
     def _addToSchedule(self, b):
         self._slot.getSchedule().addEntry(b, 2)
+        
+class SessionSlotScheduleEditBreak(ScheduleEditBreakBase, sessionServices.SessionSlotScheduleModifBase):
+
+    def _checkParams(self):
+        sessionServices.SessionSlotScheduleModifBase._checkParams(self)
+        ScheduleEditBreakBase._checkParams(self)
+        self._brk = self._schEntry
+
+    def _addToSchedule(self, b):
+        pass
 
 class SessionSlotScheduleDeleteBreak(sessionServices.SessionSlotScheduleModifBase):
 
@@ -753,6 +764,7 @@ methodMap = {
 
     "slot.addContribution": SessionSlotScheduleAddContribution,
     "slot.addBreak": SessionSlotScheduleAddBreak,
+    "slot.editBreak": SessionSlotScheduleEditBreak,
     "slot.deleteContribution": SessionSlotScheduleDeleteContribution,
     "slot.deleteBreak": SessionSlotScheduleDeleteBreak,
     "slot.getDayEndDate": SessionSlotScheduleGetDayEndDate,
