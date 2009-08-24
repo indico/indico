@@ -163,10 +163,10 @@ var showWidgets = function(firstLoad) {
                             current: 'refereeJudgement'
                            },400,200);
                            
-    $E('commentsMessage').set('These comments, along with your judgement, will be sent by e-mail to the author(s)')
+    $E('commentsMessage').set($T('These comments, along with your judgement, will be sent by e-mail to the author(s)'))
     
     <% if len (ConfReview.getReviewingQuestions()) == 0 : %>
-        $E('questionListDisplay').set("No reviewing questions proposed for this conference.");
+        $E('questionListDisplay').set($T("No reviewing questions proposed for this conference."));
     <% end %>
     <% else: %>
         $E("questionListDisplay").set('');
@@ -238,7 +238,7 @@ var showValues = function() {
             function(result, error){
                 if (!error) {
                     if (result.length == 0) {
-                        $E('questionListDisplay').set('No reviewing questions proposed for this conference.');
+                        $E('questionListDisplay').set($T('No reviewing questions proposed for this conference.'));
                     } else {
                         $E('questionListDisplay').set('');
                         for (var i = 0; i<result.length; i++) {
@@ -264,14 +264,14 @@ var submitted = false;
 var updatePage = function (){
     if (submitted) {
         <% if IsReferee: %>
-        submitButton.set('Mark as NOT submitted');
-        $E('submittedmessage').set('Judgement submitted');
+        submitButton.set($T('Mark as NOT submitted'));
+        $E('submittedmessage').set($T('Judgement submitted'));
         <% end %>
         showValues();
     } else {
         <% if IsReferee: %>
-        submitButton.set('Mark as submitted');
-        $E('submittedmessage').set('Judgement not submitted yet');
+        submitButton.set($T('Mark as submitted'));
+        $E('submittedmessage').set($T('Judgement not submitted yet'));
         <% end %>
         showWidgets();
     }
@@ -295,7 +295,7 @@ var submitButton = new IndicoUI.Widgets.Generic.simpleButton($E('submitbutton'),
                 IndicoUtil.errorReport(error);
             }
         },
-        'Mark as submitted'
+        $T('Mark as submitted')
 );
 <% end %>
 

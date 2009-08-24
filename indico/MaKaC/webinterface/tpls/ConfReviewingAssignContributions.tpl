@@ -350,11 +350,11 @@ var buildShowHideFiltering = function() {
         showFiltering: command(function(){
             $E('filteringTable').dom.style.display = '';
             option.set('hideFiltering');
-        }, 'Show Filtering Criteria'),
+        }, $T('Show Filtering Criteria')),
         hideFiltering: command(function(){
             $E('filteringTable').dom.style.display = 'none';
             option.set('showFiltering');
-        }, 'Hide Filtering Criteria')
+        }, $T('Hide Filtering Criteria'))
     });
     option.set('showFiltering');
     
@@ -466,23 +466,23 @@ var contributionTemplate = function(contribution) {
     ul.dom.style.marginLeft = '5px';
     
     var li1 = Html.li();
-    var span1 = Html.span({}, 'Referee: ')
+    var span1 = Html.span({}, $T('Referee: '))
     var span2 = contribution.reviewManager.referee ?
                     Html.span({id: ("creferee" + contribution.id), style:{"fontWeight":"bolder"}},  contribution.reviewManager.referee.name) :
-                    Html.span({id: ("creferee" + contribution.id)},'No referee');
+                    Html.span({id: ("creferee" + contribution.id)},$T('No referee'));
     li1.set(Widget.block([span1,span2]));
     ul.append(li1);
     
     var li2 = Html.li();
-    var span1 = Html.span({}, 'Editor: ')
+    var span1 = Html.span({}, $T('Editor: '))
     var span2 = contribution.reviewManager.editor ?
                     Html.span({id: ("ceditor" + contribution.id), style:{"fontWeight":"bolder"}},  contribution.reviewManager.editor.name) :
-                    Html.span({id: ("ceditor" + contribution.id)},'No editor');
+                    Html.span({id: ("ceditor" + contribution.id)},$T('No editor'));
     li2.set(Widget.block([span1,span2]));
     ul.append(li2);
     
     var li3 = Html.li();
-    var span = Html.span({id : ("creviewerstitle" + contribution.id)}, 'Reviewers: ');
+    var span = Html.span({id : ("creviewerstitle" + contribution.id)}, $T('Reviewers: '));
     li3.append(span);
     
     
@@ -495,7 +495,7 @@ var contributionTemplate = function(contribution) {
         }
         li3.append(ulReviewers);
     } else {
-        var span = Html.span({id: ("creviewer" + contribution.id)},'No reviewers' );
+        var span = Html.span({id: ("creviewer" + contribution.id)},$T('No reviewers' ));
         li3.append(span);
     }
     ul.append(li3);
@@ -612,35 +612,39 @@ var checkAllHaveReferee = function(contributions, order, role) {
         }
     }
     if (contributionsWithoutReferee.length == contributions.length) {
-        alert("None of the contributions you checked have a Referee." +
-            "You can only add an editor or a reviewer if the contribution has a referee."
+        alert($T("None of the contributions you checked have a Referee.") +
+            $T("You can only add an editor or a reviewer if the contribution has a referee.")
         );
         return false;
     }
     
     if (contributionsWithoutReferee.length > 0) {
-        IndicoUI.Dialogs.exclusivePopUp("Contributions without referee", function(suicideHook){
+        title =$T('Contributions without referee');    
             
-            var span1 = Html.span({}, "Some of the contributions you checked do not have a Referee.");
-            var span2 = Html.span({}, "You can only add an editor or a reviewer if the contribution has a referee."); 
-            var span3 = Html.span({}, "Do you want to add that " + role + " only to the contributions with a referee?");
-            
-            var yesButton = Html.button('popUpButton', "Yes");
+        var popup = new ExclusivePopup(title, function(){popup.close();});
+        
+        popup.draw = function(){
+        
+            var span1 = Html.span({}, $T("Some of the contributions you checked do not have a Referee."));
+            var span2 = Html.span({}, $T("You can only add an editor or a reviewer if the contribution has a referee.")); 
+            var span3 = Html.span({}, $T("Do you want to add that " + role + " only to the contributions with a referee?"));
+            var yesButton = Html.button('popUpButton', $T("Yes"));
             yesButton.observeClick(function(){
                 deselectWithoutReferee(contributions);
                 fetchUsers(order, role);
-                suicideHook();
+                popup.close();
             });
-            
-            var noButton = Html.button('popUpButton', "No");
+                        
+             var noButton = Html.button('popUpButton', $T("No"));
             noButton.observeClick(function(){
-                suicideHook();
-            });
-            
-            var buttons = Widget.inline([yesButton, noButton])
-            
-            return Widget.lines([span1, span2, span3, buttons]);
-        });
+                popup.close();
+            }); 
+              var buttons = Widget.inline([yesButton, noButton])
+              var all = Widget.lines([span1, span2, span3, buttons])
+         return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {height: '130px', width: '420px'}},[all]));  
+                };
+             popup.open();
+          
         return false;
     }
     return true;
@@ -817,7 +821,7 @@ var fetchUsers = function(order, role) {
     
     var checkedContributions = getCheckedContributions();
     if (checkedContributions.length == 0) {
-        alert("Please select at least 1 contribution");
+        alert($T("Please select at least 1 contribution"));
         return;
     }
     
@@ -857,7 +861,7 @@ var fetchUsers = function(order, role) {
 	                    
 	                    
 	                    var userCompetences = Html.span({style:{marginLeft:'5px'}},
-                            user.competences.length == 0 ? '(no competences defined)' : '(competences: ' + user.competences.join(', ') + ')'
+                            user.competences.length == 0 ? $T('(no competences defined)') : $T('(competences: ') + user.competences.join(', ') + ')'
                         );
                         
                         li.set(Widget.inline([userName, userCompetences]));
@@ -871,7 +875,7 @@ var fetchUsers = function(order, role) {
                         users.append(result[i]);
                         }                        
                          
-                        var cancelButton = Html.button({style:{marginLeft:pixels(5)}}, "Cancel");
+                        var cancelButton = Html.button({style:{marginLeft:pixels(5)}}, $T("Cancel"));
                           cancelButton.observeClick(function(){
                           popup.close();
                            });
@@ -895,7 +899,7 @@ var removeUser = function(role) {
     
     var checkedContributions = getCheckedContributions();
     if (checkedContributions.length == 0) {
-        alert("Please select at least 1 contribution");
+        alert($T("Please select at least 1 contribution"));
         return;
     }
     

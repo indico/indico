@@ -365,7 +365,7 @@ new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditReviewingMode'),
 var showReviewableMaterials = function() {
     new IndicoUI.Widgets.Generic.twoListField($E('inPlaceEditReviewableMaterials'),
                         10,"200px",<%=ConfReview.getNonReviewableMaterials()%>,<%=ConfReview.getReviewableMaterials()%>,
-                        "Non reviewable materials", "Reviewable materials",
+                        $T("Non reviewable materials"), $T("Reviewable materials"),
                         'reviewing.conference.changeReviewableMaterials',
                         {conference: '<%= ConfReview.getConference().getId() %>'},
                         '');

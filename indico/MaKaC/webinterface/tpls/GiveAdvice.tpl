@@ -52,7 +52,7 @@ var showWidgets = function(firstLoad) {
                             current: 'reviewerJudgement'
                            },400,200);
                            
-    $E('commentsMessage').set('These comments, along with your judgement, will be sent by e-mail to the author(s)');
+    $E('commentsMessage').set($T('These comments, along with your judgement, will be sent by e-mail to the author(s)'));
     
     <% if len (ConfReview.getReviewingQuestions()) == 0 : %>
         $E('questionListDisplay').set("No reviewing questions proposed for this conference.");
@@ -151,8 +151,8 @@ var showValues = function() {
 
 var updatePage = function (firstLoad){
     if (submitted) {
-        submitButton.set('Mark as NOT submitted');
-        $E('submittedmessage').set('Judgement submitted');
+        submitButton.set($T('Mark as NOT submitted'));
+        $E('submittedmessage').set($T('Judgement submitted'));
         showValues();
     } else {
         submitButton.set('Mark as submitted');

@@ -27,6 +27,7 @@ from persistent import Persistent
 from MaKaC.errors import MaKaCError
 from MaKaC.reviewing import ConferenceReview
 import datetime
+from MaKaC.i18n import _
 
 ###############################################
 # Contribution reviewing classes
@@ -444,24 +445,24 @@ class Review(Persistent):
         status = []
         if self.isAuthorSubmitted():
             if self._refereeJudgement.isSubmitted():
-                status.append("Judged: " + str(self._refereeJudgement.getJudgement()))
+                status.append(_("Judged: ") + str(self._refereeJudgement.getJudgement()))
             else:
-                status.append("Pending referee decision")
+                status.append(_("Pending referee decision"))
                 if not forAuthor:
                     if self._editorJudgement.isSubmitted():
-                        status.append("Layout judged: " + str(self._editorJudgement.getJudgement()))
+                        status.append(_("Layout judged: ") + str(self._editorJudgement.getJudgement()))
                     else:
-                        status.append("Pending layout editor decision")
-
+                        status.append(_("Pending layout editor decision"))
+                        
                     if self.anyReviewerHasGivenAdvice():
                         for a in self.getReviewerJudgements():
-                            status.append("Content judged: " + str(a.getJudgement()))
+                            status.append(_("Content judged: ") + str(a.getJudgement()))
                         if not self.allReviewersHaveGivenAdvice():
-                            status.append("Some content reviewers have not decided yet")
+                            status.append(_("Some content reviewers have not decided yet"))
                     else:
-                        status.append("No content reviewers have decided yet")
+                        status.append(_("No content reviewers have decided yet"))
         else:
-            status.append("Materials not submitted yet")
+            status.append(_("Materials not submitted yet"))
         return status
 
     def isAuthorSubmitted(self):
