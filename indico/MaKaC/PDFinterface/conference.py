@@ -753,10 +753,10 @@ class ContribToPDF(PDFBase):
         style = ParagraphStyle({})
         style.fontName = "LinuxLibertine"
         style.fontSize = 9
-        p = Paragraph(escape(self._contrib.getDescription()), style, part=escape(self._contrib.getTitle()))
-        story.append(p)
+        #p = Paragraph(escape(self._contrib.getDescription()), style, part=escape(self._contrib.getTitle()))
+        #story.append(p)
         
-        story.append(Spacer(inch, 0.2*cm, part=escape(self._contrib.getTitle())))
+        #story.append(Spacer(inch, 0.2*cm, part=escape(self._contrib.getTitle())))
         
         for field in self._conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
             fid = field.getId()
