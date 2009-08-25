@@ -179,16 +179,19 @@ extend(IndicoUI.Dialogs,
         * @param {String} dayStartDate A string representing the date of the day the
         *        calendar is currently pointing to (DD/MM/YYYY)
         */
-           addSessionSlot: function(method, timeStartMethod, args, roomInfo, parentRoomInfo, confStartDate, dayStartDate, successFunc){
+           addSessionSlot: function(method, timeStartMethod, params, roomInfo, parentRoomInfo, confStartDate, dayStartDate, successFunc, editOn){
                var parameterManager = new IndicoUtil.parameterManager();
+               var isEdit = exists(editOn)?editOn:false;
+               var args = isEdit?params:params.args
                var dateArgs = clone(args);
                dateArgs.date = dayStartDate;
                var info = new WatchObject();
                var favorites;
                var parentRoomData;
                
+               
                IndicoUtil.waitLoad([
-                   function(hook) {
+                   isEdit?function(hook){hook.set(true);}:function(hook) {
                        // Get "end date" for container, so that the break be added after the rest
                        indicoRequest(timeStartMethod, dateArgs , function(result, error){
                            if (error) {
@@ -229,12 +232,12 @@ extend(IndicoUI.Dialogs,
                    }], function(retVal) {
                        var submitInfo = function(){
 
-                           each(args, function(value, key) {
-                               info.set(key, value);
+                           each(info, function(value, key) {
+                               args[key] = value;
                            });
                            if (parameterManager.check()) {
                                var killProgress = IndicoUI.Dialogs.Util.progress();
-                               indicoRequest(method, info, function(result, error){
+                               indicoRequest(method, args, function(result, error){
                                    killProgress();
                                    if (error) {
                                        IndicoUtil.errorReport(error);
@@ -248,7 +251,7 @@ extend(IndicoUI.Dialogs,
                        };
 
                        var popup = new ExclusivePopup(
-                           $T('Add Session Slot'),
+                           isEdit?$T('Edit session block'):$T('Add session block'),
                            function() {
                                popup.close();
                            });
@@ -258,6 +261,21 @@ extend(IndicoUI.Dialogs,
                            var addButton = Html.button({}, $T("Add"));
                            var cancelButton = Html.button({}, $T("Cancel"));
                            cancelButton.dom.style.marginLeft = pixels(10);
+                           
+                           /******************************************************
+                            * This is the setup for the edition of sessions slots
+                            *******************************************************/
+                           if (isEdit){
+                               info.set('startDateTime', IndicoUtil.formatDateTime(IndicoUtil.parseJsonDate(params.startDate)));
+                               info.set('endDateTime', IndicoUtil.formatDateTime(IndicoUtil.parseJsonDate(params.endDate)));
+                               info.set('title', params.slotTitle)
+                               info.set('scheduleEntry', params.scheduleEntryId);
+                               info.set('roomInfo',$O({"location": params.inheritLoc?null:params.location,
+                                       "room": params.inheritRoom?null:params.room,
+                                       "address": params.inheritLoc?'':params.address}));
+                           }
+                           
+                           /******************************************************/
 
                            info.set('roomInfo', $O(roomInfo));
 

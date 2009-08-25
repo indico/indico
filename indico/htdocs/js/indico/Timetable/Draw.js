@@ -878,11 +878,15 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"], {
             editLink = Html.a({className: 'dropDownMenu', style: {fontWeght: 'bold'}}, $T('Edit'));
             var menuItems = {};
 
-            menuItems['Session timetable'] = function() {
+            menuItems[$T('Session timetable')] = function() {
                 self.managementActions.sessionTimetable(self.eventData);
                 self.close();
             };
-            menuItems['General settings'] = self.managementActions.editEntry(self.eventData);
+            menuItems[$T('Basic settings')] = function() {
+                self.managementActions.editSessionSlot(self.eventData);
+                self.close();
+            };
+            menuItems[$T('All settings')] = self.managementActions.editEntry(self.eventData);
 
             editLink.observeClick(function() {
                 var menu = new PopupMenu(menuItems, [editLink], 'timetableManagementPopupList', true, true);

@@ -67,7 +67,7 @@ class SessionSlotBase(SessionBase):
 #        except Exception, e:
 #           raise ServiceError("ERR-S3", "Invalid slot id.",inner=str(e))
         except Exception, e:
-           raise ServiceError("ERR-S3", "Invalid slot id.%s"%self._params,inner=str(e))
+            raise ServiceError("ERR-S3", "Invalid slot id.%s"%self._params,inner=str(e))
 
 class SessionSlotDisplayBase(ProtectedDisplayService, SessionSlotBase):
 

@@ -2,6 +2,7 @@ type("TimetableManagementActions", [], {
     methods: {
         'SessionSlot': {
             add: 'schedule.session.addSlot',
+            edit: 'schedule.session.editSlot',
             dayEndDate: 'schedule.slot.getDayEndDate',
             modifyStartEndDate: 'schedule.event.modifyStartEndDate',
             'delete': 'schedule.session.deleteSlot'
@@ -381,7 +382,11 @@ type("TimetableManagementActions", [], {
                                 "room": eventData.inheritRoom?null:eventData.room,
                                 "address": eventData.inheritLoc?'':eventData.address}));
 
-        var editDialog = new AddBreakDialog(this, args, $O(params.roomInfo), true);
+        var editDialog = new AddBreakDialog(
+                this, 
+                args, 
+                $O(params.roomInfo), 
+                true);
         editDialog.open();
 
     },
@@ -409,12 +414,38 @@ type("TimetableManagementActions", [], {
         IndicoUI.Dialogs.addSessionSlot(
                 this.methods[params.type].add,
                 this.methods['Event'].dayEndDate,
-                params.args,
+                params,
                 params.roomInfo,
                 $O(params.roomInfo),
                 params.startDate,
                 params.selectedDay,
                 function(result) { self._updateEntry(result); }
+        );
+    },
+    
+    editSessionSlot: function(eventData) {
+        var self = this;
+
+        var params = this._addToSessionParams(eventData, 'SessionSlot');
+        params.parentType = 'Session';
+        
+        each(eventData, function(value, key) {
+            params[key] = value;
+        });
+        each(params.args, function(value, key) {
+            params[key] = value;
+        });
+
+        IndicoUI.Dialogs.addSessionSlot(
+                this.methods[params.type].edit,
+                this.methods['Event'].dayEndDate,
+                params,
+                params.roomInfo,
+                $O(params.roomInfo),
+                params.startDate,
+                params.selectedDay,
+                function(result) { self._updateEntry(result); },
+                true
         );
     },
     

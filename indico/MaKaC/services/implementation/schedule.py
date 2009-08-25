@@ -465,7 +465,6 @@ class SessionSlotGetBooking(sessionServices.SessionSlotDisplayBase, roomBooking.
     def _getAnswer(self):
         return self._getRoomInfo(self._target)
 
-
 class SessionScheduleGetDayEndDate(sessionServices.SessionModifBase):
 
     def _checkParams(self):
@@ -479,10 +478,8 @@ class SessionScheduleGetDayEndDate(sessionServices.SessionModifBase):
         eDate = self._target.getSchedule().calculateDayEndDate(self._date)
         return eDate.strftime('%d/%m/%Y %H:%M')
 
-
-
-class SessionScheduleAddSessionSlot(sessionServices.SessionModifBase, LocationSetter):
-
+class ScheduleEditSlotBase(LocationSetter):
+    
     def __addConveners(self, slot):
 
         for convenerValues in self._conveners:
@@ -491,7 +488,6 @@ class SessionScheduleAddSessionSlot(sessionServices.SessionModifBase, LocationSe
             slot.addConvener(convener)
 
     def _checkParams(self):
-        sessionServices.SessionModifBase._checkParams(self)
         pManager = ParameterManager(self._params)
 
         self._startDateTime = pManager.extract("startDateTime",
@@ -504,28 +500,48 @@ class SessionScheduleAddSessionSlot(sessionServices.SessionModifBase, LocationSe
         self._roomInfo = pManager.extract("roomInfo", pType=dict)
 
     def _getAnswer(self):
-        slot = conference.SessionSlot(self._target)
 
-        slot.setValues({"title": self._title or "",
+        self._slot.setValues({"title": self._title or "",
                         "sDate": self._startDateTime,
                         "eDate": self._endDateTime})
 
-        self. __addConveners(slot)
-        self._setLocationInfo(slot)
+        self. __addConveners(self._slot)
+        self._setLocationInfo(self._slot)
 
-        self._target.addSlot(slot)
+        self._addToSchedule()
         #self._target.fit()
 
-        logInfo = slot.getLogInfo()
-        logInfo["subject"] = "Create new slot: %s"%slot.getTitle()
+        logInfo = self._slot.getLogInfo()
+        logInfo["subject"] = "Create new slot: %s"%self._slot.getTitle()
         self._conf.getLogHandler().logAction(logInfo,"Timetable/Contribution",self._getUser())
 
-        schEntry = slot.getConfSchEntry()
+        schEntry = self._slot.getConfSchEntry()
         pickledData = DictPickler.pickle(schEntry, timezone=self._conf.getTimezone())
         return {'day': schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
                 'id': pickledData['id'],
                 'entry': pickledData,
-                'session': DictPickler.pickle(slot.getSession(), timezone=self._conf.getTimezone())}
+                'session': DictPickler.pickle(self._slot.getSession(), timezone=self._conf.getTimezone())}
+    
+class SessionScheduleAddSessionSlot(ScheduleEditSlotBase, sessionServices.SessionModifBase):
+
+    def _checkParams(self):
+        sessionServices.SessionModifBase._checkParams(self)
+        ScheduleEditSlotBase._checkParams(self)
+        self._slot = conference.SessionSlot(self._target)
+
+    def _addToSchedule(self):
+        self._target.addSlot(self._slot)
+
+class SessionScheduleEditSessionSlot(ScheduleEditSlotBase, sessionServices.SessionSlotModifBase):
+
+    def _checkParams(self):
+        sessionServices.SessionSlotModifBase._checkParams(self)
+        ScheduleEditSlotBase._checkParams(self)
+
+    def _addToSchedule(self):
+        pass
+
+
 
 class ConferenceSetTimeConflictSolving( conferenceServices.ConferenceTextModificationBase ):
     """
@@ -775,6 +791,7 @@ methodMap = {
 
     "session.getDayEndDate": SessionScheduleGetDayEndDate,
     "session.addSlot": SessionScheduleAddSessionSlot,
+    "session.editSlot": SessionScheduleEditSessionSlot,
     "session.deleteSlot": SessionScheduleDeleteSessionSlot,
     "session.changeColors": SessionScheduleChangeSessionColors,
 
