@@ -147,6 +147,7 @@ extend(IndicoUI.Dialogs,
                                         IndicoUtil.createFormFromMap([
 
                                             [$T('Title'), $B(parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), info.accessor('title'))],
+                                            [$T('Sub-title'), $B(parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), info.accessor('subtitle'))],
                                             [$T('Description'), $B(Html.textarea({cols: 40, rows: 2}), info.accessor('description'))],
                                             [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
                                             [$T('Date'), dayStartDate],
