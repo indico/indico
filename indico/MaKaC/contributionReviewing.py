@@ -213,9 +213,8 @@ class ReviewManager(Persistent):
             self.notifyModification()
             notification = ContributionReviewingRemoveNotification(reviewer, 'Reviewer', self._contribution)
             GenericMailer.sendAndLog(notification, self._contribution.getConference(), "MaKaC/reviewing.py", reviewer)
-        else:
-            raise MaKaCError("Cannot remove a reviewer who is not yet assigned to this contribution")
-
+        
+        
     def removeAllReviewers(self):
         """ Removes all the reviewers for this contribution
         """

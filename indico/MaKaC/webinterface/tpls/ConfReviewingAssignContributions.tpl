@@ -593,6 +593,22 @@ var deselectWithoutReferee = function(contributions) {
 }
 
 /**
+ * Among a list of contributions (given as contribution ids),
+ * this function unchecks the checboxes of the contributions
+ * who don't have a reviewer.
+ * @param {array} contributions List of contribution ids
+ */
+var deselectWithoutReviewer = function(contributions) {
+    for (i in contributions) {
+        contributionId = contributions[i];
+        contribution = getContribution(contributionId);
+        if (contribution.reviewManager.reviewersList.length == 0) {
+            $E('cb' + contributionId).dom.checked = false;
+        }
+    }
+}
+
+/**
  * Checks that all contributions have a Referee.
  * Returns true if all have a referee, false otherwise.
  * If none have a referee, an alert message appear.
@@ -650,6 +666,96 @@ var checkAllHaveReferee = function(contributions, order, role) {
     return true;
 }
 
+/**
+ * When removing a reviewer from one or more contributions this function takes care for the alert messages.
+ * Returns true if there are no warnings, returns false otherwise.
+ * If are checked contributions with no reviewers assigned, an alert message appears.
+ * If some have a reviewers and others don't, a dialog will appear offering
+ * the choice to only apply the assignment to contributions with reviewer. 
+ * @param {Object} contributions
+ * @param {Object} order
+ * @param {Object} role
+ */
+var removeReviewersAlerts = function(contributions, order, role) {
+    contributionsWithoutReviewers = []
+    for (i in contributions) {
+        contributionId = contributions[i]
+        contribution = getContribution(contributionId)
+        if (contribution.reviewManager.reviewersList.length == 0) {
+            contributionsWithoutReviewers.push(contributionId)
+        }
+    } 
+    if (contributionsWithoutReviewers.length == contributions.length) {
+        alert($T("There is no assigned Reviewer to remove.")
+        );
+        return false;
+    }
+    
+    if (contributionsWithoutReviewers.length > 0) {
+        title =$T('Contributions without reviewer');    
+            
+        var popup = new ExclusivePopup(title, function(){popup.close();});
+        
+        popup.draw = function(){
+        
+            var span1 = Html.span({}, $T("Some of the contributions you checked do not have a Reviewer."));
+            var span2 = Html.span({}, $T("Do you want to remove a reviewer only from the contributions that have one?"));
+            var yesButton = Html.button('popUpButton', $T("Yes"));
+            yesButton.observeClick(function(){
+                deselectWithoutReviewer(contributions);
+                fetchUsers(order, role);
+                popup.close();
+            });
+                        
+             var noButton = Html.button('popUpButton', $T("No"));
+             noButton.observeClick(function(){
+                popup.close();
+            }); 
+              var buttons = Widget.inline([yesButton, noButton])
+              var all = Widget.lines([span1, span2, buttons])
+              return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {height: '130px', width: '420px'}},[all]));  
+                };
+             popup.open();
+          
+        return false;
+    }
+    
+    return true;    
+}
+
+/**
+ * When removing a refereee from one or more contributions this function takes care for the alert messages.
+ * If are checked contributions with alredy assigned reviewers/editor
+ * alert message appears that a referee should be assigned
+ * @param {array} contributions List of contribution ids
+ */
+var removeRefereeAlerts = function(contributions){
+    for (i in contributions) {
+        contributionId = contributions[i]
+        contribution = getContribution(contributionId)
+    }
+    var warning = "You have to assign new referee."
+    if(contribution.reviewManager.reviewersList.length != 0) {
+        if(contribution.reviewManager.editor != null) {
+           alert($T("Please note that there are already assigned reviewers and editor." + " " + warning)
+            ); 
+            return false;
+        } else {
+           alert($T("Please note that there are already assigned reviewers." + " " + warning)
+           ); 
+           return false;
+        }
+    } else {
+        if(contribution.reviewManager.editor != null) {
+           alert($T("Please note that there is already assigned an editor." + " " + warning)
+            ); 
+            return false;
+        }
+    } 
+    return true; 
+}
+
+    
 /**
  * Function that is called when a user (referee, editor, reviewer) is clicked.
  * Depending on what has been sotred in the variable 'action', the user will be
@@ -743,25 +849,46 @@ var userSelected = function(user){
             indicoRequest(
                 'reviewing.conference.removeReviewer',
                 params,
-                function(result,error) {
-                    if (!error) {
+                function(result, error) {
+                    notinlist2 = [];
+                    message = $T("The Reviewer you have chosen is not assigned to this contribution")
+                    if(!error) {
                         for (i in checkedContributions) {
                             contributionId = checkedContributions[i]
                             contribution = getContribution(contributionId)
                             
+                            notinlist = false;
+                            deleted = false;
                             for (j in contribution.reviewManager.reviewersList) {
                                 if (contribution.reviewManager.reviewersList[j].id == user.id) {
                                     contribution.reviewManager.reviewersList.splice(j,1);
+                                    updateContribution(contributionId);
+                                    colorify(contributionId,'reviewerstitle');
+                                    $E('cb' + contributionId).dom.checked = true; //updateContribution will build a row with an unchecked checkbox
+                                    deleted = true;
+                                } else {
+                                    notinlist = true;
+                                    notinlist2.push(contributionId)
+                                    $E('cb' + contributionId).dom.checked = false;
+                                    if (checkedContributions.length == 1 ){
+                                        alert(message+"." //alert if the chosen reviewer is not assigned to the checked contribution
+                                        );
+                                    }
                                 }
-                            }
-
-                            updateContribution(contributionId);
-                            colorify(contributionId,'reviewerstitle');
-                            $E('cb' + contributionId).dom.checked = true; //updateContribution will build a row with an unchecked checkbox
+                            }                   
                         }
-                    } else {
+                        if(notinlist2.length > 0 && checkedContributions.length > 1) {
+                            if(deleted){
+                            alert($T("The Reviewer you have chosen will be removed only from the contributions that are assigned to him/her.")
+                            ); //alert if the chosen reviewer is only assigned to some of the checked contributions and will be deleted for them
+                            } else {
+                              alert(message+"s." //alert if the chosen reviewer is not assigned to non of the checked contributions
+                              );  
+                            }
+                        }
+                   } else {
                         IndicoUtil.errorReport(error);
-                    } 
+                   } 
                 }
             );
             break;
@@ -828,8 +955,14 @@ var fetchUsers = function(order, role) {
     if ((order == 'assign' && role == 'editor') || (order == 'add' && role == 'reviewer')) {
         if (!checkAllHaveReferee(checkedContributions, order, role)) {
             return;
-        }        
-    }
+        } 
+   }
+   
+   if (order == 'remove' && role == 'reviewer')  {
+        if (!removeReviewersAlerts(checkedContributions, order, role)) {
+            return;
+        } 
+   }
     
     indicoRequest(
         'reviewing.conference.userCompetencesList',
@@ -902,7 +1035,7 @@ var removeUser = function(role) {
         alert($T("Please select at least 1 contribution"));
         return;
     }
-    
+   
     var params = {conference: '<%= Conference.getId() %>',contributions: checkedContributions}
     
     switch(role) {
@@ -919,7 +1052,11 @@ var removeUser = function(role) {
                         updateContribution(contributionId);
                         colorify(contributionId, 'referee')
                         $E('cb' + contributionId).dom.checked = true; //updateContribution will build a row with an unchecked checkbox
+                                                
                     }
+                    if(!removeRefereeAlerts(checkedContributions)){
+                      fetchUsers('assign', 'referee')
+                    } 
                 } else {
                     IndicoUtil.errorReport(error);
                 }
