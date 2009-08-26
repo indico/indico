@@ -935,6 +935,7 @@ class LinkedTimeSchEntry(TimeSchEntry):
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'inheritLoc', lambda x: x.getOwner().getOwnLocation() is None)
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'inheritRoom', lambda x: x.getOwner().getOwnRoom() is None)
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'description', lambda x: x.getOwner().getSession().getDescription())
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'conveners', lambda x: x.getOwner().getOwnConvenerList(), isPicklableObject=True)
     @Retrieves(['MaKaC.schedule.ContribSchEntry','MaKaC.schedule.LinkedTimeSchEntry'], 'conferenceId',
                lambda x: x.getOwner().getConference().getId())
     @Retrieves (['MaKaC.schedule.ContribSchEntry','MaKaC.schedule.LinkedTimeSchEntry'], 'scheduleEntryId',

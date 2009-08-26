@@ -165,7 +165,10 @@ type("SectionPopupMenu", ["PopupMenu"], {
             var sectionContent = Html.ul(self.cssClass);
 
             each(this.items, function(item, key) {
-                var section = Html.li('section', Html.div('line', Html.div('name', key)));
+                var section = null;
+                if (key != ""){
+                    section = Html.li('section', Html.div('line', Html.div('name', key)));
+                }
 
                 // add the menu items
                 var tmp = $B(Html.ul('subPopupList'), item, self._processItem);

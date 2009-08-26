@@ -273,9 +273,12 @@ extend(IndicoUI.Dialogs,
                                info.set('roomInfo',$O({"location": params.inheritLoc?null:params.location,
                                        "room": params.inheritRoom?null:params.room,
                                        "address": params.inheritLoc?'':params.address}));
+                               info.set("conveners", params.conveners)
+                               
+                           }/******************************************************/
+                           else {
+                               info.set("conveners", params.sessionConveners)
                            }
-                           
-                           /******************************************************/
 
                            info.set('roomInfo', $O(roomInfo));
 
@@ -292,7 +295,7 @@ extend(IndicoUI.Dialogs,
 
                            var convListWidget = new UserListField(
                                'VeryShortPeopleListDiv', 'PluginPeopleList',
-                               [],
+                               isEdit?params.conveners:params.sessionConveners,
                                null,
                                favorites,
                                true, true, true,

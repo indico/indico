@@ -190,8 +190,8 @@ type("TimetableManagementActions", [], {
        });
 
        var message = Html.div({}, Html.span({style: {fontStyle: 'italic', fontSize: '0.9em'}},
-                                            'Your are viewing the content of the session:'),
-                                  Html.div({style: {fontWeight: 'bold', marginTop: '5px', fontSize: '1.1em'}}, eventData.title +
+                                            'You are viewing the content of the session:'),
+                                  Html.div({style: {fontWeight: 'bold', marginTop: '5px', fontSize: '1.3em'}}, eventData.title +
                                            (eventData.slotTitle ? ": " + eventData.slotTitle : ''), Html.span({style: {fontWeight: 'normal'}},
                                            " (" + eventData.startDate.time.substring(0,5) + " - " + eventData.endDate.time.substring(0,5) +")" )));
 
@@ -258,10 +258,10 @@ type("TimetableManagementActions", [], {
                 });
 
                 var menuu = {
-                    'Create new' : {
+                    '' : {
                         'Create a new session': function() { self.addSession(); }
                     },
-                    'New block for session': sessions
+                    'Add interval to:': sessions
 
                 };
                 menuItems.Session = new SectionPopupMenu(menuu, [triggerElement, this.addMenu], 'timetableSectionPopupList popupListChained', true, true);
@@ -299,6 +299,8 @@ type("TimetableManagementActions", [], {
             room: session.room,
             address: session.address
         };
+        
+        params.sessionConveners = session.sessionConveners;
 
         // If sessionId exists then use that value, otherwise just use the id
         // This is needed since the session can either be an entry in the timetable

@@ -16,6 +16,7 @@ from MaKaC.services.implementation import base
 from MaKaC.services.implementation import roomBooking
 from MaKaC.services.implementation import session as sessionServices
 from MaKaC.common.timezoneUtils import setAdjustedDate
+from MaKaC.common.logger import Logger
 
 import datetime, pytz
 
@@ -480,12 +481,8 @@ class SessionScheduleGetDayEndDate(sessionServices.SessionModifBase):
 
 class ScheduleEditSlotBase(LocationSetter):
     
-    def __addConveners(self, slot):
-
-        for convenerValues in self._conveners:
-            convener = conference.SlotChair()
-            DictPickler.update(convener, convenerValues)
-            slot.addConvener(convener)
+    def _addConveners(self, slot):
+        pass
 
     def _checkParams(self):
         pManager = ParameterManager(self._params)
@@ -505,7 +502,7 @@ class ScheduleEditSlotBase(LocationSetter):
                         "sDate": self._startDateTime,
                         "eDate": self._endDateTime})
 
-        self. __addConveners(self._slot)
+        self. _addConveners(self._slot)
         self._setLocationInfo(self._slot)
 
         self._addToSchedule()
@@ -531,6 +528,12 @@ class SessionScheduleAddSessionSlot(ScheduleEditSlotBase, sessionServices.Sessio
 
     def _addToSchedule(self):
         self._target.addSlot(self._slot)
+        
+    def _addConveners(self, slot):
+        for convenerValues in self._conveners:
+            convener = conference.SlotChair()
+            DictPickler.update(convener, convenerValues)
+            slot.addConvener(convener)
 
 class SessionScheduleEditSessionSlot(ScheduleEditSlotBase, sessionServices.SessionSlotModifBase):
 
@@ -540,8 +543,22 @@ class SessionScheduleEditSessionSlot(ScheduleEditSlotBase, sessionServices.Sessi
 
     def _addToSchedule(self):
         pass
-
-
+    
+    def _addConveners(self, slot):
+        convenersIds = []
+        for convenerValues in self._conveners:
+            if convenerValues.has_key("isConfParticipant"):
+                convener = slot.getConvenerById(str(convenerValues['id']))
+                DictPickler.update(convener, convenerValues)
+            else:
+                convener = conference.SlotChair()
+                DictPickler.update(convener, convenerValues)
+                slot.addConvener(convener)
+            convenersIds.append(convener.getId())
+            
+        for conv in slot.getConvenerList()[:]:
+            if conv.getId() not in convenersIds:
+                slot.removeConvener(conv)
 
 class ConferenceSetTimeConflictSolving( conferenceServices.ConferenceTextModificationBase ):
     """

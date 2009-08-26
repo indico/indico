@@ -30,7 +30,7 @@ class UserEditBase ( object ):
 class UserListModificationBase ( object):
     """ Base class to retrieve a list of users from a 'userList' parameter.
         The userList parameter will contain dictionaries with the following keys:
-        id, title, title, familyName, firstName, affiliation, email, address, telephone, fax, submission
+        id, title, familyName, firstName, affiliation, email, address, telephone, fax, submission
         
         The id can be:
         -a number, in this case it represents an Avatar id (a user in the DB)

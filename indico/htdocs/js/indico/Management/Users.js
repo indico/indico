@@ -445,11 +445,11 @@ type("UserListField", ["IWidget"], {
                     self.newProcess(userList, function(value) {
                         if (value) {
                             each(userList, function(user){
-                                if (self.userList.get(user.id)) {
-                                    self.userList.set(user.id, null);
+                                if (self.userList.get("existingAv"+user.id)) {
+                                    self.userList.set("existingAv"+user.id, null);
                                 }
-                                self.userList.set(user.id, $O(user));
-                                self._highlightNewUser(user.id);
+                                self.userList.set("existingAv"+user.id, $O(user));
+                                self._highlightNewUser("existingAv"+user.id);
                             });
                         }
                     });
@@ -500,13 +500,13 @@ type("UserListField", ["IWidget"], {
                     var newUserIds = getSelectedItems(self.userSelectPopup.selectList);
                     each(newUserIds, function(newUserId) {
                         var newUser = self.allOptions.get(newUserId).clone();
-                        if (self.userList.get(newUserId)) {
-                            self.userList.set(newUserId, null);
+                        if (self.userList.get("existingAv"+newUserId)) {
+                            self.userList.set("existingAv"+newUserId, null);
                         }
                         self.newProcess([newUser], function(result) {
                             if (result) {
-                                self.userList.set(newUserId, newUser);
-                                self._highlightNewUser(newUserId);
+                                self.userList.set("existingAv"+newUserId, newUser);
+                                self._highlightNewUser("existingAv"+newUserId);
                             }
                         });
                     });
@@ -564,7 +564,12 @@ type("UserListField", ["IWidget"], {
          var self = this;
 
          each(initialUsers, function(user){
-             self.userList.set(user.id, $O(user));
+             if (any(user.isAvatar, false)) {
+                 self.userList.set('existingAv' + user.id, $O(user));
+             } else {
+                 self.userList.set(user.id, $O(user));
+             }
+             
          });
 
          if (optionalUsers) {

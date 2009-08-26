@@ -1473,6 +1473,9 @@ class CustomRoom(Persistent):
 
 class ConferenceParticipation(Persistent):
 
+    @Retrieves(['MaKaC.conference.ConferenceParticipation',
+                 'MaKaC.conference.SessionChair',
+                 'MaKaC.conference.SlotChair'], 'isConfParticipation', lambda x: True)
     def __init__(self):
         self._firstName=""
         self._surName=""
@@ -1562,6 +1565,9 @@ class ConferenceParticipation(Persistent):
         self._firstName=tmp
         self._notifyModification()
 
+    @Retrieves (['MaKaC.conference.ConferenceParticipation',
+                 'MaKaC.conference.SessionChair',
+                 'MaKaC.conference.SlotChair'], 'firstName')
     def getFirstName( self ):
         return self._firstName
 
@@ -1574,7 +1580,10 @@ class ConferenceParticipation(Persistent):
             return
         self._surName=tmp
         self._notifyModification()
-
+    
+    @Retrieves (['MaKaC.conference.ConferenceParticipation',
+                 'MaKaC.conference.SessionChair',
+                 'MaKaC.conference.SlotChair'], 'familyName')
     def getFamilyName( self ):
         return self._surName
 
@@ -1588,6 +1597,9 @@ class ConferenceParticipation(Persistent):
         self._email=newMail.strip()
         self._notifyModification()
 
+    @Retrieves (['MaKaC.conference.ConferenceParticipation',
+                 'MaKaC.conference.SessionChair',
+                 'MaKaC.conference.SlotChair'], 'email')
     def getEmail( self ):
         return self._email
 
@@ -1598,6 +1610,9 @@ class ConferenceParticipation(Persistent):
         self._affiliation=newAffil.strip()
         self._notifyModification()
 
+    @Retrieves (['MaKaC.conference.ConferenceParticipation',
+                 'MaKaC.conference.SessionChair',
+                 'MaKaC.conference.SlotChair'], 'affiliation')
     def getAffiliation(self):
         return self._affiliation
 
@@ -1608,6 +1623,9 @@ class ConferenceParticipation(Persistent):
         self._address=newAddr.strip()
         self._notifyModification()
 
+    @Retrieves (['MaKaC.conference.ConferenceParticipation',
+                 'MaKaC.conference.SessionChair',
+                 'MaKaC.conference.SlotChair'], 'address')
     def getAddress(self):
         return self._address
 
@@ -1618,6 +1636,9 @@ class ConferenceParticipation(Persistent):
         self._phone=newPhone.strip()
         self._notifyModification()
 
+    @Retrieves (['MaKaC.conference.ConferenceParticipation',
+                 'MaKaC.conference.SessionChair',
+                 'MaKaC.conference.SlotChair'], 'phone')
     def getPhone(self):
         return self._phone
 
@@ -1628,6 +1649,9 @@ class ConferenceParticipation(Persistent):
         self._title=newTitle.strip()
         self._notifyModification()
 
+    @Retrieves (['MaKaC.conference.ConferenceParticipation',
+                 'MaKaC.conference.SessionChair',
+                 'MaKaC.conference.SlotChair'], 'title')
     def getTitle(self):
         return self._title
 
@@ -1638,9 +1662,15 @@ class ConferenceParticipation(Persistent):
         self._fax=newFax.strip()
         self._notifyModification()
 
+    @Retrieves (['MaKaC.conference.ConferenceParticipation',
+                 'MaKaC.conference.SessionChair',
+                 'MaKaC.conference.SlotChair'], 'fax')
     def getFax(self):
         return self._fax
 
+    @Retrieves (['MaKaC.conference.ConferenceParticipation',
+                 'MaKaC.conference.SessionChair',
+                 'MaKaC.conference.SlotChair'], 'fullName')
     def getFullName( self ):
         res = self.getFamilyName()
         if self.getFirstName() != "":
@@ -1652,6 +1682,9 @@ class ConferenceParticipation(Persistent):
             res = "%s %s"%( self.getTitle(), res )
         return res
 
+    @Retrieves (['MaKaC.conference.ConferenceParticipation',
+                 'MaKaC.conference.SessionChair',
+                 'MaKaC.conference.SlotChair'], 'name')
     def getFullNameNoTitle( self ):
         res = self.getFamilyName()
         if self.getFirstName() != "":
@@ -5934,6 +5967,7 @@ class Session(Persistent):
                 newConv.setDataFromAvatar(oc)
                 self._addConvener(newConv)
 
+    @Retrieves (['MaKaC.conference.Session'], 'sessionConveners', isPicklableObject=True)
     def getConvenerList(self):
         self._resetConveners()
         return self._conveners
@@ -7152,6 +7186,7 @@ class SessionSlot(Persistent):
                 return conv
         return None
 
+    @Retrieves(['MaKaC.conference.SessionSlot'], 'convenerList', isPicklableObject=True)
     def getOwnConvenerList(self):
         try:
             if self._conveners:
