@@ -956,7 +956,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"], {
         }
 
 
-        var ttLink = Html.a({className: 'fakeLink'}, "View and edit session timetable");
+        var ttLink = Html.a({className: 'fakeLink'}, "View and edit current interval timetable");
         ttLink.observeClick(function() {
             self.managementActions.sessionTimetable(self.eventData);
             self.close();
