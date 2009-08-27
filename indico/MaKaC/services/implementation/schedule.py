@@ -182,7 +182,7 @@ class ConferenceScheduleAddSession(conferenceServices.ConferenceModifBase, Locat
         self._endDateTime = pManager.extract("endDateTime",
                                              pType=datetime.datetime)
         self._title = pManager.extract("title", pType=str)
-        self._subtitle = pManager.extract("subtitle", pType=str)
+        self._subtitle = pManager.extract("subtitle", pType=str, allowEmpty=True)
         self._textColor = pManager.extract("textColor", pType=str)
         self._bgColor = pManager.extract("bgColor", pType=str)
         self._description = pManager.extract("description", pType=str,
