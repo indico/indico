@@ -3923,17 +3923,17 @@ ul.keywordList li.multipleLinesListItem_last {
 }
 
  .popUpButton {
-   color:  #234173;
-   text-decoration: none;
    margin: 0px;
    margin-top: 1px;
-   margin-right: 1px;
+   margin-right: 1px; 
+   /*color:  #234173;
+   text-decoration: none;   
    background-color: #D9D9D9;
    border: 1px solid #fff;
    border-top-color: #eee;
    border-left-color: #eee;
    border-right-color: #669;
-   border-bottom-color: #669;
+   border-bottom-color: #669;*/
 
  }
 

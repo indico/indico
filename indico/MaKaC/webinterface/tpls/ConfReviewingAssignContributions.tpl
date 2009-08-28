@@ -724,9 +724,8 @@ var removeReviewersAlerts = function(contributions, order, role) {
 }
 
 /**
- * When removing a refereee from one or more contributions this function takes care for the alert messages.
- * If are checked contributions with alredy assigned reviewers/editor
- * alert message appears that a referee should be assigned
+ * When removing a refereee from one or more contributions this function checks
+ * if there are alredy assigned reviewers or editor, or both 
  * @param {array} contributions List of contribution ids
  */
 var removeRefereeAlerts = function(contributions){
@@ -734,28 +733,48 @@ var removeRefereeAlerts = function(contributions){
         contributionId = contributions[i]
         contribution = getContribution(contributionId)
     }
-    var warning = "You have to assign new referee."
-    if(contribution.reviewManager.reviewersList.length != 0) {
-        if(contribution.reviewManager.editor != null) {
-           alert($T("Please note that there are already assigned reviewers and editor." + " " + warning)
-            ); 
+    if(contribution.reviewManager.reviewersList.length != 0 && contribution.reviewManager.editor != null) { 
             return false;
-        } else {
-           alert($T("Please note that there are already assigned reviewers." + " " + warning)
-           ); 
+        } 
+    if(contribution.reviewManager.reviewersList.length != 0 && contribution.reviewManager.editor == null){
            return false;
         }
-    } else {
-        if(contribution.reviewManager.editor != null) {
-           alert($T("Please note that there is already assigned an editor." + " " + warning)
-            ); 
+    if(contribution.reviewManager.reviewersList.length == 0 && contribution.reviewManager.editor != null) {
             return false;
         }
-    } 
+    
     return true; 
 }
 
+/**
+ * When removing a refereee from one or more contributions this function takes care for the alert messages.
+ * If are checked contributions with alredy assigned reviewers/editor
+ * alert message appears that a referee should be assigned
+ * @param {array} contributions List of contribution ids
+ */    
+var removeRefereeAlertsMessage = function(contributions){
+    for (i in contributions) {
+        contributionId = contributions[i]
+        contribution = getContribution(contributionId)
+    }
+    var warning = $T("You have to assign new referee.")
+    var message = $T("nothing")
+    if(contribution.reviewManager.reviewersList.length != 0 && contribution.reviewManager.editor != null) {        
+            message = $T("Please note that there are already assigned reviewers and editor." + " " + warning)
+            return message;
+        } 
+    if(contribution.reviewManager.reviewersList.length != 0 && contribution.reviewManager.editor == null){
+           message = $T("Please note that there are already assigned reviewers." + " " + warning)
+           return message;
+        }
+    if(contribution.reviewManager.reviewersList.length == 0 && contribution.reviewManager.editor != null) {
+           message = $T("Please note that there is already assigned an editor." + " " + warning)
+            return message;
+        }
     
+    return message; 
+}
+                       
 /**
  * Function that is called when a user (referee, editor, reviewer) is clicked.
  * Depending on what has been sotred in the variable 'action', the user will be
@@ -851,7 +870,6 @@ var userSelected = function(user){
                 params,
                 function(result, error) {
                     notinlist2 = [];
-                    message = $T("The Reviewer you have chosen is not assigned to this contribution")
                     if(!error) {
                         for (i in checkedContributions) {
                             contributionId = checkedContributions[i]
@@ -870,21 +888,9 @@ var userSelected = function(user){
                                     notinlist = true;
                                     notinlist2.push(contributionId)
                                     $E('cb' + contributionId).dom.checked = false;
-                                    if (checkedContributions.length == 1 ){
-                                        alert(message+"." //alert if the chosen reviewer is not assigned to the checked contribution
-                                        );
-                                    }
+                                   
                                 }
                             }                   
-                        }
-                        if(notinlist2.length > 0 && checkedContributions.length > 1) {
-                            if(deleted){
-                            alert($T("The Reviewer you have chosen will be removed only from the contributions that are assigned to him/her.")
-                            ); //alert if the chosen reviewer is only assigned to some of the checked contributions and will be deleted for them
-                            } else {
-                              alert(message+"s." //alert if the chosen reviewer is not assigned to non of the checked contributions
-                              );  
-                            }
                         }
                    } else {
                         IndicoUtil.errorReport(error);
@@ -974,9 +980,9 @@ var fetchUsers = function(order, role) {
                 
                 var title = '';
                 if (role == 'editor') {
-                    title = 'Click on a user name to ' + order + ' an editor:';
+                    title = $T('Click on a user name to ') + order + $T(' an editor:');
                 } else {
-                    title = 'Click on a user name to ' + order + ' a ' + role + ':';
+                    title = $T('Click on a user name to ') + order + ' a ' + role + ':';
                 }
                 
                 var popup = new ExclusivePopup(title, function(){popup.close();});
@@ -1012,8 +1018,21 @@ var fetchUsers = function(order, role) {
                           cancelButton.observeClick(function(){
                           popup.close();
                            });
-                           
-                        return this.ExclusivePopup.prototype.draw.call(this, Widget.block([userList, cancelButton]));  
+                       
+                       var span1 = Html.span({}, "");
+                       var message = '';
+                       if(role == 'referee' && order == 'assign' && !removeRefereeAlerts(checkedContributions)) {
+                            span1 = Html.span({style:{"color":"red"}}, removeRefereeAlertsMessage(checkedContributions));
+                       }   
+                       if(role == 'reviewer' && order == 'remove') {
+                            if (checkedContributions.length == 1){
+                                    message = $T("The Reviewer you choose will be removed only from the contribution that is assigned to him/her.") 
+                                } else {
+                                    message = $T("The Reviewer you choose will be removed only from the contributions that are assigned to him/her.")
+                                }
+                            span1 = Html.span({style:{"color":"red"}}, message);
+                       }    
+                        return this.ExclusivePopup.prototype.draw.call(this, Widget.block([span1, userList, cancelButton]));  
                 };
              popup.open();
               
@@ -1092,6 +1111,9 @@ var removeUser = function(role) {
                     for (i in checkedContributions) {
                         contributionId = checkedContributions[i];
                         contribution = getContribution(contributionId);
+                        if (!removeReviewersAlerts(checkedContributions, role)) {
+                                return;
+                        } 
                         contribution.reviewManager.reviewersList = [];
                         updateContribution(contributionId);
                         colorify(contributionId, 'reviewer')
