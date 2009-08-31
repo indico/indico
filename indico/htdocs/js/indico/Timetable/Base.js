@@ -3,7 +3,7 @@ var TimetableDefaults = {
     bottomMargin: 40,
     leftMargin: 55,
     rightMargin: 5,
-    resolution: 10,
+    resolution: 1,
     menuWidth: 150,
     blockMargin: 4,         // Margin used inside timetable blocks
     wholeDay : 7,              // # of hours of duration for a timetable event to be seen as be during the whole day.
@@ -11,7 +11,7 @@ var TimetableDefaults = {
     layouts: {'compact': {name: "Compact",
                           values : {
                               pxPerHour: 60,
-                              pxPerSpace: 8,
+                              pxPerSpace: 2,
                               minPxPerBlock: 50
                           },
                           manager: new CompactLayoutManager()},
