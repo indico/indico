@@ -6836,7 +6836,7 @@ class WMicroSearchBox(WBaseSearchBox):
 
 class WCategorySearchBox(WBaseSearchBox):
    
-    def __init__(self, categId = 0, optionsClass='siteSearchBox'):
+    def __init__(self, categId = 0, optionsClass='arrowExpandIcon'):
         WBaseSearchBox.__init__(self, targetId = categId)
         self._moreOptionsClass = optionsClass
         

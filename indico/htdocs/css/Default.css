@@ -1982,7 +1982,7 @@ div#UISearchBox #extraOptions div {
 }
 
 
-.siteSearchBox
+.arrowExpandIcon
 {
     background: transparent url(../images/menu_arrow_black.png) scroll no-repeat center center;
     font-weight: normal;
@@ -1993,6 +1993,19 @@ div#UISearchBox #extraOptions div {
     float: right;
     cursor: pointer;
 }
+
+.progressIcon
+{
+    background: transparent url(../images/loading.gif) scroll no-repeat center center;
+    font-weight: normal;
+    vertical-align: middle;
+    display:block;
+    width: 20px;
+    height: 17px;
+    float: right;
+    cursor: pointer;
+}
+
 
 a.meetingHeaderSearchBox
 {
@@ -4866,7 +4879,6 @@ div.cssPreview {
     font-weight: normal;
     margin-right: 10px;
     text-align: left;
-    border-bottom: 1px dotted #777;
 }
 
 ul.nobulletsList
@@ -5192,4 +5204,60 @@ div.dialogButtons {
     padding: 10px;
     margin-top: 5px;
     margin-bottom: 5px;
+}
+
+div.flexibleSelect {
+    border: 1px solid #AAAAAA;
+    position: relative;
+}
+
+div.flexibleSelect input {
+    color: black;
+}
+
+div.flexibleSelect input[disabled]{
+    background: white;
+}
+
+div.disabled {
+    background: #DDDDDD;
+}
+
+div.disabled input {
+    color: #AAAAAA;
+    background: #DDDDDD;
+}
+
+div.disabled input[disabled] {
+    background: #DDDDDD;
+}
+
+.optionBox {
+    border: 1px solid #888888;
+    width: 200px;
+    overflow: hidden;
+    background-color: white;
+}
+
+.optionBoxList {
+    background-color: #FFFFFF;
+    padding: 3px;
+    margin: 0 0 0 0;
+    max-height: 200px;
+    overflow: auto;
+}
+
+.optionBoxList li {
+    list-style-type: none;
+    padding: 3px;
+    border-top:1px solid #DDDDDD;
+    cursor: pointer;
+}
+
+.optionBoxList li:hover {
+    background-color: #ECECEC;
+}
+
+.enhanced {
+    font-weight: bold;
 }

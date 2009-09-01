@@ -159,7 +159,6 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
                                    }
                                } else {
                                    IndicoUtil.errorReport(error);
-                                   killProgress();
                                }
 
                            });
