@@ -642,10 +642,14 @@ class WPSessionModifBase( WPConferenceModifBase ):
         self._tabCtrl = wcomponents.TabControl()
         self._tabMain = self._tabCtrl.newTab( "main", _("Main"), \
                 urlHandlers.UHSessionModification.getURL( self._session ) )
-        self._tabMaterials = self._tabCtrl.newTab( "materials", _("Files"), \
-                urlHandlers.UHSessionModifMaterials.getURL( self._session ) )
         self._tabContribs=self._tabCtrl.newTab( "contribs", _("Contributions"), \
                 urlHandlers.UHSessionModContribList.getURL(self._session) )
+        self._tabTimetable=self._tabCtrl.newTab( "sessionTimetable", _("Session timetable"), \
+                urlHandlers.UHSessionModifSchedule.getURL(self._session) )
+        self._tabComm = self._tabCtrl.newTab( "comment", _("Comment"), \
+                urlHandlers.UHSessionModifComm.getURL( self._session ) )
+        self._tabMaterials = self._tabCtrl.newTab( "materials", _("Files"), \
+                urlHandlers.UHSessionModifMaterials.getURL( self._session ) )
         self._tabAC = self._tabCtrl.newTab( "ac", _("Protection"), \
                 urlHandlers.UHSessionModifAC.getURL( self._session ) )
         canCoord=self._session.canCoordinate(self._getAW())
@@ -654,8 +658,6 @@ class WPSessionModifBase( WPConferenceModifBase ):
         self._tabTools = self._tabCtrl.newTab( "tools", _("Tools"), \
                 urlHandlers.UHSessionModifTools.getURL( self._session ) )
         self._tabTools.setEnabled(canModify)
-        self._tabComm = self._tabCtrl.newTab( "comment", _("Comment"), \
-                urlHandlers.UHSessionModifComm.getURL( self._session ) )
         self._setActiveTab()
         self._setupTabCtrl()
         if type != "conference":
@@ -1446,13 +1448,13 @@ class WPSessionModifSchedule( WPConfModifScheduleGraphic ):
         WPConfModifScheduleGraphic.__init__( self, rh, session.getConference() )        
         self._session = session        
     
-    def _setActiveTab( self ):
-        self._tabSchedule.setActive()
+    def _setActiveTab(self):
+        self._tabTimetable.setActive()
     
     def _generateSessionTimetable(self):
         
         tz = self._conf.getTimezone()
-        timeTable = timetable.TimeTable(self._conf.getSchedule(), tz)
+        timeTable = timetable.TimeTable(self._session.getSchedule(), tz)
         sDate,eDate=self._session.getAdjustedStartDate(tz),self._session.getAdjustedEndDate(tz) 
         timeTable.setStartDate(sDate)
         timeTable.setEndDate(eDate)

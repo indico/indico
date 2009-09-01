@@ -604,7 +604,7 @@ class RHConfModifSchedule( RHConferenceModifBase ):
             return p.display(**params)
         else:
             
-            session = self._target.getSessionById(params['sessions'][0])            
+            session = self._target.getSessionById(params['sessions'][0])
             
             p = sessions.WPSessionModifSchedule( self, session )
 
