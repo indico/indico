@@ -177,11 +177,11 @@
 </xsl:template>
 
 <xsl:template match="name">
-  <xsl:value-of select="./@first" disable-output-escaping="yes"/>
-  <xsl:if test="./@first!='' and ./@last!=''">
-  <xsl:text disable-output-escaping="yes"> </xsl:text>
-  </xsl:if>
   <xsl:value-of select="./@last" disable-output-escaping="yes"/>
+  <xsl:if test="./@first!='' and ./@last!=''">
+  <xsl:text disable-output-escaping="yes">, </xsl:text>
+  </xsl:if>
+  <xsl:value-of select="./@first" disable-output-escaping="yes"/>
 </xsl:template>	
 
 </xsl:stylesheet>
