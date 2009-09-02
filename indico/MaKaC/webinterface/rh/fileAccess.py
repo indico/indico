@@ -19,6 +19,8 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import time
+
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.rh.conferenceBase import RHFileBase, RHLinkBase
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
@@ -26,6 +28,7 @@ from MaKaC.webinterface.pages import files
 from MaKaC.common import Config
 from MaKaC.errors import MaKaCError, NoReportError
 
+from email.Utils import formatdate
 
 class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
     _uh  = urlHandlers.UHFileAccess
@@ -43,6 +46,7 @@ class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
         if self._file.getId() != "minutes":
             #self._req.headers_out["Accept-Ranges"] = "bytes"
             self._req.headers_out["Content-Length"] = "%s"%self._file.getSize()
+            self._req.headers_out["Last-Modified"] = "%s"%formatdate(time.mktime(self._file.getCreationDate().timetuple()))
             cfg = Config.getInstance()
             mimetype = cfg.getFileTypeMimeType( self._file.getFileType() )
             self._req.content_type = """%s"""%(mimetype)
