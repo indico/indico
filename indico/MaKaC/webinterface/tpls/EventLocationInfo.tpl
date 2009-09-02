@@ -35,11 +35,13 @@
     <% eventFavorites = 'false' %>
   <% end %>
   
-  var rbWidget = new RoomBookingWidget(info, parentEvt, <%= jsBoolean(not modifying) %>, <%= eventFavorites %>);
+  var rbWidget = new RoomBookingWidget(Indico.Data.Locations, info, parentEvt, nullRoomInfo(info), <%= eventFavorites %>);
 
   var domContent = rbWidget.draw();
 
   $E('roomChooser').set(domContent);
+
+  rbWidget.postDraw();
 
   });
 

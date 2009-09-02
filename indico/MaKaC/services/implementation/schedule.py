@@ -79,7 +79,7 @@ class ScheduleAddContribution(LocationSetter):
 
         self._pManager = ParameterManager(self._params)
 
-        self._roomInfo = self._pManager.extract("roomInfo", pType=dict)
+        self._roomInfo = self._pManager.extract("roomInfo", pType=dict, allowEmpty=True)
         self._keywords = self._pManager.extract("keywords", pType=list,
                                           allowEmpty=True)
         self._needsToBeScheduled = self._params.get("schedule", True)
@@ -174,7 +174,7 @@ class ConferenceScheduleAddSession(conferenceServices.ConferenceModifBase, Locat
 
         pManager = ParameterManager(self._params, timezone = self._conf.getTimezone())
 
-        self._roomInfo = pManager.extract("roomInfo", pType=dict)
+        self._roomInfo = pManager.extract("roomInfo", pType=dict, allowEmpty=True)
         self._conveners = pManager.extract("conveners", pType=list,
                                            allowEmpty=True)
         self._startDateTime = pManager.extract("startDateTime",
@@ -292,7 +292,7 @@ class ScheduleEditBreakBase(LocationSetter):
 
         pManager = ParameterManager(self._params, timezone = self._conf.getTimezone())
 
-        self._roomInfo = pManager.extract("roomInfo", pType=dict)
+        self._roomInfo = pManager.extract("roomInfo", pType=dict, allowEmpty=True)
         self._dateTime = pManager.extract("startDate", pType=datetime.datetime)
         self._duration = pManager.extract("duration", pType=int)
         self._title = pManager.extract("title", pType=str)
@@ -494,7 +494,7 @@ class ScheduleEditSlotBase(LocationSetter):
         self._title = pManager.extract("title", pType=str, allowEmpty=True)
         self._conveners = pManager.extract("conveners", pType=list,
                                            allowEmpty=True)
-        self._roomInfo = pManager.extract("roomInfo", pType=dict)
+        self._roomInfo = pManager.extract("roomInfo", pType=dict, allowEmpty=True)
 
     def _getAnswer(self):
 

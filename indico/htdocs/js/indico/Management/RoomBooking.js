@@ -1,6 +1,13 @@
 type("RoomBookingWidget", ["IWidget"],
 
      {
+
+         postDraw: function() {
+             if (this.parentInfo) {
+                 this.inheritCheckbox.set(this.inheritDefault);
+             }
+         },
+
          draw: function() {
 
              this.inheritText = this.parentInfo?Html.span({},
@@ -8,6 +15,7 @@ type("RoomBookingWidget", ["IWidget"],
                                                           Html.span({},
                                                                     this.parentInfo.get('room') + " (" +
                                                                     this.parentInfo.get('location') + ")")):'';
+
              return Html.table('roomWidget',
                                Html.tbody({},
                                           Html.tr({}, Html.th({}, Html.div('roomWidgetTitle', $T("Location"))),
@@ -80,7 +88,7 @@ type("RoomBookingWidget", ["IWidget"],
 
          }
      },
-     function(locations, info, parent, eventFavorites) {
+     function(locations, info, parent, inheritDefault, eventFavorites) {
          this.locationChooser = new FlexibleSelect(locations, 75);
          this.roomChooser = new FlexibleSelect({}, 120);
          this.addressArea = new RealtimeTextArea({});
@@ -88,6 +96,7 @@ type("RoomBookingWidget", ["IWidget"],
          this.info = info;
          this.parentInfo = parent;
          this.roomCache = {};
+         this.inheritDefault = inheritDefault;
 
          var self = this;
 

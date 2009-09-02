@@ -1,4 +1,12 @@
 
+function nullRoomInfo(info) {
+
+    return (!info) ||
+        (!info.get('location')) ||
+        (!info.get('room'));
+}
+
+
 type("UnscheduledContributionList", ["ListWidget"],
      {
          _drawItem: function(pair) {
@@ -231,6 +239,12 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
             });
         }
     ],
+
+    postDraw: function() {
+        this.roomEditor.postDraw();
+        this.ExclusivePopup.prototype.postDraw.call(this);
+    },
+
     _success: function(response) {
         //window.location.reload(true);
     },
@@ -245,7 +259,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
 
         info.set('roomInfo', $O(self.roomInfo));
 
-        var roomEditor = new RoomBookingWidget(info.get('roomInfo'), self.parentRoomData, true, self.args.conference);
+        this.roomEditor = new RoomBookingWidget(Indico.Data.Locations, info.get('roomInfo'), self.parentRoomData, true, self.args.conference);
 
         var presListWidget = new UserListField(
             'VeryShortPeopleListDiv', 'PluginPeopleList',
@@ -275,7 +289,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
                     $B(Html.edit({}),
                        info.accessor('title'))
                 ],
-                [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
+                [$T('Place'), Html.div({style: {marginBottom: '15px'}}, this.roomEditor.draw())],
                 datecomponent,
                 [$T('Presenter(s)'), presListWidget.draw()]
             ]);
@@ -519,6 +533,13 @@ type("ChangeEditDialog", // silly name!
 
 type("AddBreakDialog", ["ChangeEditDialog"],
      {
+
+         postDraw: function() {
+             this.roomEditor.postDraw();
+             this.ExclusivePopup.prototype.postDraw.call(this);
+         },
+
+
          draw: function(){
              var self = this;
 
@@ -526,7 +547,11 @@ type("AddBreakDialog", ["ChangeEditDialog"],
              var cancelButton = Html.button({}, $T("Cancel"));
              cancelButton.dom.style.marginLeft = pixels(10);
 
-             var roomEditor = new RoomBookingWidget(this.info.get('roomInfo'), this.parentRoomInfo, !this.isEdit, this.info.get('conference'));
+             this.roomEditor = new RoomBookingWidget(Indico.Data.Locations,
+                                                     this.info.get('roomInfo'),
+                                                     this.parentRoomInfo,
+                                                     nullRoomInfo(this.info.get('roomInfo')),
+                                                     this.info.get('conference'));
 
              cancelButton.observeClick(function(){
                  self.close();
@@ -559,7 +584,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                  }), this.info.accessor('title'))], [$T('Description'), $B(Html.textarea({
                      cols: 40,
                      rows: 2
-                 }), this.info.accessor('description'))], [$T('Place'), roomEditor.draw()], [$T('Date/Time'), this.dateTimeField.element]]),
+                 }), this.info.accessor('description'))], [$T('Place'), this.roomEditor.draw()], [$T('Date/Time'), this.dateTimeField.element]]),
                                Html.div('dialogButtons',
                                         [addButton, cancelButton])]));
          },
@@ -591,7 +616,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
 
      function(managementActions, args, parentRoomInfo, isEdit){
          var self = this;
-         
+
          this.managementActions = managementActions;
          this.isEdit = isEdit;
          this.parentRoomInfo = parentRoomInfo;
@@ -606,7 +631,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
          } else {
              this.info = clone(args);
              // by default, assume parent room info
-             this.info.set('roomInfo', clone(parentRoomInfo));
+             this.info.set('roomInfo', $O({location: null, room: null}));
              this.timeStartMethod = managementActions.methods[args.get('parentType')].dayEndDate;
              //args.set("conference", args.get('args').conference);
              var sargs = args.get('args');

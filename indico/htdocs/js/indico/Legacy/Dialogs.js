@@ -78,6 +78,13 @@ extend(IndicoUI.Dialogs,
 
                        var popup = new ExclusivePopup($T('Add Session'));
 
+                       var roomEditor;
+
+                       popup.postDraw = function() {
+                           roomEditor.postDraw();
+                           this.ExclusivePopup.prototype.postDraw.call(this);
+                       };
+
                        popup.draw = function(){
                            var self = this;
                            var addButton = Html.button({},$T("Add"));
@@ -87,7 +94,7 @@ extend(IndicoUI.Dialogs,
                            info.set('roomInfo', $O(roomInfo));
 
 
-                           var roomEditor = new RoomBookingWidget(info.get('roomInfo'), parentRoomInfo, true, args.conference);
+                           roomEditor = new RoomBookingWidget(Indico.Data.Locations, info.get('roomInfo'), parentRoomInfo, true, args.conference);
 
                            cancelButton.observeClick(function(){
                                self.close();
@@ -188,8 +195,8 @@ extend(IndicoUI.Dialogs,
                var info = new WatchObject();
                var favorites;
                var parentRoomData;
-               
-               
+
+
                IndicoUtil.waitLoad([
                    isEdit?function(hook){hook.set(true);}:function(hook) {
                        // Get "end date" for container, so that the break be added after the rest
@@ -256,12 +263,19 @@ extend(IndicoUI.Dialogs,
                                popup.close();
                            });
 
+                       var roomEditor;
+
+                       popup.postDraw = function() {
+                           roomEditor.postDraw();
+                           this.ExclusivePopup.prototype.postDraw.call(this);
+                       };
+
                        popup.draw = function() {
                            var self = this;
                            var addButton = Html.button({}, $T("Add"));
                            var cancelButton = Html.button({}, $T("Cancel"));
                            cancelButton.dom.style.marginLeft = pixels(10);
-                           
+
                            /******************************************************
                             * This is the setup for the edition of sessions slots
                             *******************************************************/
@@ -274,15 +288,21 @@ extend(IndicoUI.Dialogs,
                                        "room": params.inheritRoom?null:params.room,
                                        "address": params.inheritLoc?'':params.address}));
                                info.set("conveners", params.conveners)
-                               
+
                            }/******************************************************/
                            else {
                                info.set("conveners", params.sessionConveners)
+                               info.set('roomInfo', $O({location: null, room: null}));
                            }
 
-                           info.set('roomInfo', $O(roomInfo));
 
-                           var roomEditor = new RoomBookingWidget(info.get('roomInfo'), parentRoomInfo, true, args.conference);
+                           alert(Json.write(info.get('roomInfo')));
+
+                           roomEditor = new RoomBookingWidget(Indico.Data.Locations,
+                                                              info.get('roomInfo'),
+                                                              parentRoomInfo,
+                                                              nullRoomInfo(info.get('roomInfo')),
+                                                              args.conference);
 
 
                            cancelButton.observeClick(function(){
@@ -318,13 +338,13 @@ extend(IndicoUI.Dialogs,
                            parameterManager.add(startEndTimeField.startTimeField, 'time', false);
                            parameterManager.add(startEndTimeField.endTimeField, 'time', false);
                            startEndTimeComponent = [$T('Time'), startEndTimeField.element];
-                           
+
                            $B(info.accessor('conveners'), convListWidget.getUsers());
 
                            return this.ExclusivePopup.prototype.draw.call(
                                this,
                                Widget.block([IndicoUtil.createFormFromMap([[$T('Sub-Title'), $B(Html.edit({style: { width: '300px'}}), info.accessor('title'))],
-                                                                           [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())], 
+                                                                           [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
                                                                            [$T('Date'), dayStartDate],
                                                                            startEndTimeComponent,
                                                                            [$T('Convener(s)'), convListWidget.draw()]]),
