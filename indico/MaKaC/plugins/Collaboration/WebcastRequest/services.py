@@ -1,0 +1,44 @@
+# -*- coding: utf-8 -*-
+##
+## $Id: options.py,v 1.1 2009/04/09 13:13:18 dmartinc Exp $
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+from MaKaC.services.implementation.collaboration import CollaborationPluginServiceBase
+from MaKaC.webinterface.common.contribFilters import PosterFilterField
+from MaKaC.common.PickleJar import DictPickler
+from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
+
+class WebcastAbleTalksService(CollaborationPluginServiceBase):
+    
+    def _getAnswer(self):
+        #a talk is defined as a non-poster contribution
+        filter = PosterFilterField(self._conf, False, False)
+        talks = [cont for cont in self._conf.getContributionList() if filter.satisfies(cont)]
+        
+        webcastCapableRooms = CollaborationTools.getOptionValue('WebcastRequest', 'webcastCapableRooms')
+        webcastAbleTalks = []
+        for t in talks:
+            location = t.getLocation()
+            room = t.getRoom()
+            if location and room and (location.getName() + ":" + room.getName() in webcastCapableRooms):
+                webcastAbleTalks.append(t)
+                
+        webcastAbleTalks.sort(key = lambda c: c.getId())
+        
+        return DictPickler.pickle(webcastAbleTalks)

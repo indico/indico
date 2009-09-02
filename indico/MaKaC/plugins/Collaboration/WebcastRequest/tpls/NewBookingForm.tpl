@@ -1,52 +1,70 @@
 <% declareTemplate(newTemplateStyle=True) %>
 
-<% if not WebcastCapable=="true": %>
+<% if not WebcastCapable: %>
 <div style="margin-bottom: 1em;">
-        <span class="WRNote"><u><b><%=_("Note:")%></b></u> <%=_("In order to send a webcastrequest you need to select a room capable of webcasting, click")%> 
-            <span class='fakeLink' onclick='toogleWebcastCapableRooms();'><%=_("here")%></span>    
-            <span id="webcastEventText"><%=_("to show more information")%></span><br/> 
+    <% if WebcastCapableRooms: %>
+    <table>
+        <tr>
+            <td>
+                <span class="WRNoteTitle"><%=_("Note:")%></span>
+            </td>
+            <td>
+                <span class="WRNoteText">
+                    <%=_("In order to send a Webcast request, you need to select a room capable of webcasting. ")%> 
+                    <span class='fakeLink' onclick='toogleWebcastCapableRooms();' id="webcastRoomsText"><%=_("See list of webcast-able rooms")%></span>
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <div id="webcastCapableRoomsDiv" style="display:none;">
+                    <div style="padding-top:15px;padding-bottom:15px;">
+                        <span class="WRNoteText"><%=_("These are the rooms capable of webcasting:")%> </span>
+                        <table style="margin-left: 20px;">
+                            <% for roomName in WebcastCapableRooms:%>
+                                <tr>
+                                    <td>
+                                        <%=roomName.split(":")[0] %>
+                                    </td>
+                                    <td>
+                                        <%=roomName.split(":")[1] %>
+                                    </td>
+                                </tr>
+                            <% end %>
+                        </table>
+                        <span style="font-style: italic;">
+                            <%=_("Please go to the")%> <a href="<%= urlHandlers.UHConferenceModification.getURL(Conference)%>"><%=_("General settings")%></a> <%=_("and select one of these room locations for this Indico event. ")%>
+                            <%=_("But please remember, you have to book it as well!")%>
+                        </span>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <% end %>
+    <% else: %>
+    <div>
+        <span class="WRNoteTitle"><%=_("Note:")%></span>
+        <span class="WRNoteText">
+            <%=_("In order to send a webcastrequest you need to select a room capable of webcasting. However there are not currently marked as capable in the database.")%> 
         </span>
-        <div id="webcastCapableRoomsDiv" style="visibility: hidden;">
-        <span class="WRNote"><%=_("These are the rooms capable of webcasting:")%> </span>
-        <table style="margin-left: 20px;margin-top: 5px;margin-bottom:20px">
-        <% for roomName in WebcastCapableRooms:%>
-            <tr><td><%=roomName.split(":")[0] %></td><td><%=roomName.split(":")[1] %></td></tr>
-        <% end %>
-        </table>
-        <span style="font-style: italic;margin-left: 20px">
-            <%=_("Please go to the")%> <a href="<%= urlHandlers.UHConferenceModification.getURL(Conference)%>"><%=_("General settings")%></a> <%=_("and select one of these room locations for this Indico event. ")%>
-            <%=_("But remember, you have to book it as well!")%>
-        </span>
-        </div>
-        <script type="text/javascript">
-            var webcastCapableRoomsDiv = $E("webcastCapableRoomsDiv");
-            var webcastCapableRoomsDivHeight=webcastCapableRoomsDiv.dom.offsetHeight;
-            webcastCapableRoomsDiv.dom.style.height = '0';
-            //webcastCapableRoomsDiv.dom.style.visibility = 'visible';
-            webcastCapableRoomsDiv.dom.style.opacity = '0';
-            var webcastSwitch = false;
-            function toogleWebcastCapableRooms() {
-                if (webcastSwitch) {
-                    IndicoUI.Effect.slide("webcastCapableRoomsDiv", webcastCapableRoomsDivHeight); 
-                    $E("webcastEventText").dom.innerHTML = $T("to show more information.");
-                }else {
-                    IndicoUI.Effect.slide("webcastCapableRoomsDiv", webcastCapableRoomsDivHeight); 
-                    webcastCapableRoomsDiv.dom.style.visibility = 'visible';
-                    $E("webcastEventText").dom.innerHTML = $T("to hide the information.");
-                }
-                webcastSwitch = !webcastSwitch;
-            }
-        </script>
+    </div>
+    <% end %>
 </div>
 <% end %>
 <% else: %>
 <div style="margin-bottom: 1em;">
-    <span class="WRNote">
-        <u><b><%=_("Note:")%></b></u> <%=_("If you have not done so already, please remember to book your room")%>
+    <span class="WRNoteTitle"><%=_("Note:")%></span>
+    <span class="WRNoteText">
+        <%=_("If you have not done so already, please remember to book your room(s).")%>
     </span>
 </div>
 <% end %>
+
+
 <div id="WRForm">
+
     <% if IsSingleBooking: %>
     <div style="margin-bottom: 1em;">
         <div id="sendWebcastRequestTop" class="sendWebcastRequestDiv" style="display:none;">
@@ -60,55 +78,106 @@
         </div>
     </div>
     <% end %>
-    <% if NwebcastCapableContributions > 0: %>
-        <!-- DRAW BOX AROUND SECTION 1: SELECT CONTRIBUTIONS -->
-        <div class="WRFormSection" id="contributionselectionDiv">
-            <!-- WHICH CONTRIBUTIONS SHOULD BE WEBCASTED -->
-            <div class="WRFormSubsection">
-                <span class="WRQuestion">Which talks would you like to have webcasted?</span>
-                <div>
-                    <input type="radio" name="talks" value="all" id="allTalksRB" onclick="WR_hideTalks()"/>
-                    <label for="allTalksRB" id="allTalksRBLabel" >All talks</label><span id="allTalksRBTT"/>
-                    <input type="radio" name="talks" value="choose" id="chooseTalksRB" onclick="WR_loadTalks()" />
-                    <label for="chooseTalksRB" id="chooseTalksRBLabel">Choose</label><span id="chooseTalksTT"/>
-                    <% if NContributions > NwebcastCapableContributions and NContributions > 0 : %>
-                        <% if NwebcastCapableContributions > 0:%>
-                            <span class="WRNote">
-                                <br/><b><u><%=_("Note:")%></b></u> <%=_("Only ")%> <%=NwebcastCapableContributions %> <%=_(" out of ")%> <%=NContributions %> <%=_(" contributions are in a room capable of webcasting.")%>
-                            </span>
+    
+    
+    
+    <!-- DRAW BOX AROUND SECTION 1: SELECT CONTRIBUTIONS -->
+    <div class="WRFormSection" id="contributionselectionDiv">
+        <!-- WHICH CONTRIBUTIONS SHOULD BE WEBCASTED -->
+        <div class="WRFormSubsection">
+            <span class="WRQuestion">Which talks would you like to have webcasted?</span>
+            <table>
+                <tr>
+                    <td>
+                        <input type="radio" name="talks" value="all" id="allTalksRB" onclick="WR_hideTalks()" checked />
+                    </td>
+                    <td>
+                        <% if NTalks == NWebcastCapableContributions: %>
+                        <label for="allTalksRB" id="allTalksRBLabel" >All talks</label>
                         <% end %>
-                    <% end %>
-                </div>
-            </div>
-            <div id="contributionsDiv" class="WRFormSubsection" style="display: none;">
-                <span class="WRQuestion"><%=_("Please choose among the contributions below:")%></span>
-                <div class="WRContributionListDiv">
-                    <table>
-                        <tr id="contributionsRow">
-                            <% if HasContributions: %>
-                                <% for cl in ContributionLists: %>
+                        <% else: %>
+                        <label for="allTalksRB" id="allTalksRBLabel"><%=_("All webcast-able talks.")%></label>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <span class="WRNoteTitle"><%=_("Note:")%></span>
+                        <span class="WRNoteText">
+                            <%=_("Some of your talks")%> (<%= str(NTalks - NWebcastCapableContributions) + _(" out of ") + str(NTalks) %>) <%=_(" are not in a room capable of webcasting and thus cannot be webcasted.")%>
+                        </span>
+                        <span class='fakeLink' onclick='toogleWebcastCapableRooms();' id="webcastRoomsText"><%=_("See list of webcast-able rooms")%></span>
+                        <div id="webcastCapableRoomsDiv" style="display:none;">
+                            <div style="padding-top:15px;padding-bottom:15px;">
+                                <span class="WRNoteText"><%=_("These are the rooms capable of webcasting:")%> </span>
+                                <table style="margin-left: 20px;">
+                                    <% for roomName in WebcastCapableRooms:%>
+                                        <tr>
+                                            <td>
+                                                <%=roomName.split(":")[0] %>
+                                            </td>
+                                            <td>
+                                                <%=roomName.split(":")[1] %>
+                                            </td>
+                                        </tr>
+                                    <% end %>
+                                </table>
+                                <span style="font-style: italic;">
+                                    <%=_("Please go to the")%> <a href="<%= urlHandlers.UHConfModifSchedule.getURL(Conference)%>"><%=_("Timetable")%></a> <%=_("and select one of these room locations for your contributions. ")%>
+                                    <%=_("But please remember, you have to book the rooms as well!")%>
+                                </span>
+                            </div>
+                        </div>
+                        <% end %>
+                    </td>
+                
+                </tr>
+                <tr>
+                    <td>
+                        <input type="radio" name="talks" value="choose" id="chooseTalksRB" onclick="WR_loadTalks()" />
+                    </td>
+                    <td>
+                        <% if NTalks == NWebcastCapableContributions: %>
+                        <label for="chooseTalksRB" id="chooseTalksRBLabel"><%=_("Choose talks.")%></label>
+                        <% end %>
+                        <% else:%>
+                        <label for="chooseTalksRB" id="chooseTalksRBLabel"><%=_("Choose among webcast-able talks.")%></label>
+                        <% end %>    
+                    </td>
+                </tr>                    
+            </table>
+        </div>
+        
+        <% displayText = ('none', 'block')[DisplayTalks] %>
+        <div id="contributionsDiv" class="WRFormSubsection" style="display: <%= displayText %>;">
+            <span class="WRQuestion"><%=_("Please choose among the webcast-able contributions below:")%></span>
+            
+            <% if HasTalks: %>
+            <span class="fakeLink" style="margin-left: 20px;margin-right:5px;" onclick="WRSelectAllContributions()">Select all</span>
+            <span style="color: #AAAAAA">|</span>
+            <span class="fakeLink" style="margin-left: 5px;" onclick="WRUnselectAllContributions()">Select none</span>
+            <% end %>
+            
+            <div class="WRContributionListDiv">
+                <table>
+                    <tr id="contributionsRow">
+                        <% if DisplayTalks: %>
+                            <% if HasTalks: %>
+                                <% for tl in TalkLists: %>
                                 <td class="WRContributionsColumn">
                                     <ul class="WROptionList">
-                                    <% for contribution,checked,webcastcapable in cl: %>
-                                        <% if checked: %>
-                                            <% checkedText = 'checked' %>
-                                        <% end %>
-                                        <% else: %>
-                                            <% checkedText = '' %>
-                                        <% end %>
-                                        <% disapledText = '' %>
-                                        <% if webcastcapable: %>
+                                    <% for talk, checked in tl: %>
                                         <li>
-                                            <input type="checkbox" name="talkSelection" value="<%= contribution.getId() %>" id="contribution<%=contribution.getId()%>CB"/ <%=checkedText%>> 
-                                            <label for="contribution<%=contribution.getId()%>CB">
-                                                <span class="WRContributionId">[<%= contribution.getId() %>]</span>
-                                                <span class="WRContributionName"><%= contribution.getTitle() %></span>
-                                                <% if contribution.getSpeakerList() : %>
-                                                <span class="WRSpeakers">, by <%= " and ".join([person.getFullName() for person in contribution.getSpeakerList()]) %></span>
+                                            <% checkedText = ('', 'checked')[checked] %>
+                                            <input type="checkbox" name="talkSelection" value="<%= talk.getId() %>" id="talk<%=talk.getId()%>CB" <%=checkedText%> /> 
+                                            <label for="talk<%=talk.getId()%>CB">
+                                                <span class="WRContributionId">[<%= talk.getId() %>]</span>
+                                                <span class="WRContributionName"><%= talk.getTitle() %></span>
+                                                <% if talk.getSpeakerList() : %>
+                                                <span class="WRSpeakers">, by <%= " and ".join([person.getFullName() for person in talk.getSpeakerList()]) %></span>
                                                 <% end %>
                                             </label>
                                         </li>
-                                        <% end %>
                                     <% end %>
                                     </ul>
                                 </td>
@@ -119,26 +188,33 @@
                                 <%=_("This event has currently no talks.")%>
                                 </td>
                             <% end %>
-                        </tr>
-                    </table>
-                </div>
+                        <% end %>
+                        
+                    </tr>
+                </table>
             </div>
-            <%if NwebcastCapableContributions== NContributions:%>
-                <script type="text/javascript">
-                    IndicoUI.Effect.disappear($E('contributionsDiv'));
-                </script>
+            <% if HasTalks: %>
+            <script type="text/javascript">
+                var WRSelectAllContributions = function() {
+                    each($N('talkSelection'), function(checkbox) {
+                        checkbox.dom.checked = true;
+                    });
+                }
+                var WRUnselectAllContributions = function() {
+                    each($N('talkSelection'), function(checkbox) {
+                        checkbox.dom.checked = false;
+                    });
+                }
+            </script>
             <% end %>
-            <% else: %>
-                <script type="text/javascript">
-                   IndicoUI.Effect.appear($E('contributionsDiv'));
-                </script>
-            <% end %>
-            <div class="WRFormSubsection">
-                <span class="WRQuestion"><%=_("Please write here additional comments about talk selection:")%></span>
-                <div><input size="60" type="text" name="talkSelectionComments"><span id="talkSelectionCommentsTT"/></div>
-            </div>
         </div>
-    <% end %>
+        <div class="WRFormSubsection">
+            <span class="WRQuestion"><%=_("Please write here additional comments about talk selection:")%></span>
+            <div><input size="60" type="text" name="talkSelectionComments"><span id="talkSelectionCommentsTT"/></div>
+        </div>
+    </div>
+    
+    
     <div class="WRFormSection">
         <div class="WRFormSubsection">
         <span class="WRQuestion"><%=_("Have all the speakers given permission to have their talks webcasted?")%></span>
@@ -150,6 +226,7 @@
         <span style="margin-left: 2em;"><%=_("Here is the ")%><a href="<%= ConsentFormURL %>"><%=_("Webcast Consent Form")%></a> <%=_("to be signed by each speaker.")%></span>
         </div>
     </div>
+    
     <!-- DRAW BOX AROUND SECTION 2: TECHNICAL DETAILS FOR WEBCAST -->
     <div class="WRFormSection">
         <!-- SLIDES? CHALKBOARD? -->
@@ -181,13 +258,8 @@
             <span class="WRQuestion"><%=_("All webcasts are recorded. How soon do you need your recording posted online afterwards?")%></span>
             <br />
             <select name="postingUrgency" id="postingUrgency">
-                <% for value, text in PostingUrgency:%>
-                <% if value == "never" : %>
-                    <% selectedText = "selected" %>
-                <% end %>
-                <% else: %>
-                    <% selectedText = "" %>
-                <% end %>
+                <% for value, text in PostingUrgency: %>
+                <% selectedText = ("", "selected")[value == "never"] %>
                 <option value="<%=value%>" <%=selectedText %>><%=text%></option>
                 <% end %>
             </select>
@@ -255,6 +327,7 @@
             </ul>
         </div>
     </div>
+    
     <!-- SECTION 4: Extra comments -->
     <div class="WRFormSection">
         <div class="WRFormSubsection">
@@ -262,6 +335,7 @@
             <textarea rows="10" cols="60" name="otherComments" style="display:block;"></textarea>
         </div>
     </div>
+    
     
     <% if IsSingleBooking: %>
     <div style="margin-top: 1em;">
@@ -278,8 +352,23 @@
     <% end %>
 </div>
 
-<% if not WebcastCapable=="true": %>
-    <script type="text/javascript">
-        setDisabled(document.getElementById("WRForm"));
-    </script>
+<script type="text/javascript">
+    var WRWebcastCapable = <%= jsBoolean(WebcastCapable) %>;
+    var WR_contributionsLoaded = <%= jsBoolean(DisplayTalks) %>;
+</script>
+
+<% if (not WebcastCapable and WebcastCapableRooms) or (NWebcastCapableContributions > 0 and NTalks > NWebcastCapableContributions): %>
+<script type="text/javascript">
+    var webcastSwitch = false;
+    var toogleWebcastCapableRooms = function () {
+        IndicoUI.Effect.toggleAppearance($E('webcastCapableRoomsDiv'));
+        if (webcastSwitch) { 
+            $E("webcastRoomsText").dom.innerHTML = $T("See list of webcast-able rooms.");
+        } else {
+            $E("webcastRoomsText").dom.innerHTML = $T("Hide list of webcast-able rooms.");
+        }
+        webcastSwitch = !webcastSwitch;
+    }
+</script>
 <% end %>
+

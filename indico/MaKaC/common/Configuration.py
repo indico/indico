@@ -93,6 +93,7 @@ class Config:
                  "ats_withdrawn": "as_withdrawn.png",
                  "ats_prop_other_track": "ats_prop_other_track.png",
                  "mail": "mail.png",
+                 "mail_big": "mail_big.png",
                  "comments": "comments.png",
                  "day": "pict_day_orange.png",
                  "year": "pict_year_orange.png",

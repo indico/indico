@@ -61,7 +61,6 @@
     onLoad : function() {
         if (singleBookings['RecordingRequest'] && singleBookings['RecordingRequest'].bookingParams.talks == 'choose') {
             IndicoUI.Effect.appear($E('contributionsDiv'));
-            window.contributionsLoaded = true;
         } else {
             $E('contributionsRow').append(Html.td("RRContributionsColumn",Html.ul({id:'contributionList1', className:'RROptionList'})));
             $E('contributionsRow').append(Html.td("RRContributionsColumn",Html.ul({id:'contributionList2', className:'RROptionList'})));

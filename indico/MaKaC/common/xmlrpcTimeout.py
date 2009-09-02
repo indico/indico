@@ -18,6 +18,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+import sys
 
 import xmlrpclib
 from MaKaC.common.httpTimeout import HTTPWithTimeout, HTTPSWithTimeout
@@ -46,4 +47,8 @@ def getServerWithTimeout(uri, transport=None, encoding=None, verbose=0,
     else:
         transport = TransportWithTimeout()
     transport.setTimeout(timeout)
-    return xmlrpclib.ServerProxy(uri, transport, encoding, verbose, allow_none, use_datetime)
+    
+    if sys.version_info[1] < 5: #python 2.4. example version_info: version_info = (2,4,4,'final',0)
+        return xmlrpclib.ServerProxy(uri, transport, encoding, verbose, allow_none)
+    else:
+        return xmlrpclib.ServerProxy(uri, transport, encoding, verbose, allow_none, use_datetime)

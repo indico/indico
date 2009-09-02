@@ -29,14 +29,11 @@ Classes for uniform deeling with different locations,
 global ids of objects, and cross-location queries.
 """
 
-from ZODB import FileStorage, DB
-from ZODB.DB import DB, transaction
-from ZODB.PersistentMapping import PersistentMapping
 from persistent import Persistent
 from MaKaC.common.Locators import Locator
 import MaKaC
 from MaKaC import plugins
-from MaKaC.plugins.RoomBooking.CERN.factoryCERN import FactoryCERN
+from MaKaC.i18n import _
 
 
 # ZODB branches name
@@ -289,6 +286,7 @@ class ReservationGUID( Persistent, object ):
         """
         Parses guidString into ReservationGUID object.
         """
+        # TODO: check if this code is used. self is not defined, so it will fail
         try:
             loc, id = guidString.split( "|" )
             loc = loc.strip(); id = int( id.strip() )
@@ -518,7 +516,6 @@ class Test:
     def PopulateRoomBookings():
         # TEMPORARY GENERATION OF RESERVATIONS FOR CONFERENCE
         
-        from MaKaC.rb_reservation import ReservationBase
         from MaKaC.rb_dalManager import DALManagerBase
         DALManagerBase.connect()
         

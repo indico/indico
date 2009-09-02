@@ -21,7 +21,6 @@
 
 
 from MaKaC.plugins.Collaboration.base import CollaborationException, CSErrorBase
-from MaKaC.plugins.base import PluginsHolder
 from urllib2 import HTTPError, URLError
 from datetime import timedelta
 from BaseHTTPServer import BaseHTTPRequestHandler
@@ -31,13 +30,13 @@ from array import array
 from MaKaC.common.timezoneUtils import nowutc, datetimeToUnixTime
 from MaKaC.common.logger import Logger
 from MaKaC.common.PickleJar import Retrieves
+from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 
 readLimit = 100000;
 secondsToWait = 10;
 
-def getEVOOptionValueByName(name):
-    ph = PluginsHolder()
-    return ph.getPluginType("Collaboration").getPlugin("EVO").getOption(name).getValue()
+def getEVOOptionValueByName(optionName):
+    return CollaborationTools.getOptionValue('EVO', optionName)
 
 def getActionURL(actionString):
     EVOServerURL = getEVOOptionValueByName("httpServerLocation")
@@ -47,7 +46,7 @@ def getActionURL(actionString):
     else:
         return EVOServerURL + '/' + actionServlet
     
-def getEVOAnswer(action, arguments = {}, eventId = '', bookingId = ''):
+def getRequestURL(action, arguments = {}):
     
     actionURL = getActionURL(action)
     
@@ -55,13 +54,17 @@ def getEVOAnswer(action, arguments = {}, eventId = '', bookingId = ''):
     indicoPassword = getEVOOptionValueByName("indicoPassword")
     expirationTime = int(datetimeToUnixTime(nowutc() + timedelta(minutes = getEVOOptionValueByName('expirationTime'))) * 1000)
     
-    Logger.get('EVO').debug("Expiration time: " + str(expirationTime))
-    
     arguments["from"] = createLoginKey(indicoID, indicoPassword, expirationTime)
     
     url = URL(actionURL)
     url.setParams(arguments)
     url.setSeparator('&')
+    
+    return url
+    
+def getEVOAnswer(action, arguments = {}, eventId = '', bookingId = ''):
+    
+    url = getRequestURL(action, arguments)
         
     Logger.get('EVO').info("""Evt:%s, booking:%s, sending request to EVO: [%s]""" % (eventId, bookingId, str(url)))
     
@@ -93,7 +96,8 @@ def getEVOAnswer(action, arguments = {}, eventId = '', bookingId = ''):
         elif answer.startswith("ERROR:"):
             error = answer[6:].strip()
             Logger.get('EVO').warning("""Evt:%s, booking:%s, request: [%s] triggered EVO error: %s""" % (eventId, bookingId, str(url), error))
-            if error == 'YOU_ARE_NOT_OWNER_OF_THE_MEETING' or error == 'NOT_AUTHORIZED_SERVER' or error == 'NOT_AUTHORIZED':
+            if error == 'YOU_ARE_NOT_OWNER_OF_THE_MEETING' or error == 'NOT_AUTHORIZED_SERVER' or error == 'NOT_AUTHORIZED' or\
+                error == 'LOGIN_KEY_WRONG_LENGTH':
                 raise EVOException("Indico's EVO ID / pwd do not seem to be right. Please report to Indico support.", error)
             elif error == 'REQUEST_EXPIRED':
                 raise EVOException("Problem contacting EVO: REQUEST_EXPIRED", 'REQUEST_EXPIRED. Something is going wrong with the UNIX timestamp?');
@@ -118,8 +122,7 @@ def parseEVOAnswer(answer):
         name = name.strip()
         value = value.strip()
         if name == 'url':
-            value = value[1:-1] #we remove the brackets
-            value = getEVOOptionValueByName("koalaLocation") + '?' + value
+            value = value[1:-1].strip() #we remove the brackets
         attributes[name] = value
     return attributes
 
@@ -185,9 +188,10 @@ def getMaxEndDate(conference):
     
 class EVOError(CSErrorBase):
     
-    def __init__(self, errorType):
+    def __init__(self, errorType, requestURL = None):
         CSErrorBase.__init__(self)
         self._errorType = errorType
+        self._requestURL = requestURL
         
     @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.EVOError',
                 'MaKaC.plugins.Collaboration.EVO.common.OverlappedError',
@@ -195,6 +199,14 @@ class EVOError(CSErrorBase):
                'errorType')
     def getErrorType(self):
         return self._errorType
+
+    @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.EVOError',
+                'MaKaC.plugins.Collaboration.EVO.common.OverlappedError',
+                'MaKaC.plugins.Collaboration.EVO.common.ChangesFromEVOError'],
+               'requestURL')
+    def getRequestURL(self):
+        return self._requestURL
+
     
     
 class OverlappedError(EVOError):
@@ -226,3 +238,19 @@ class EVOException(CollaborationException):
 class EVOControlledException(Exception):
     def __init__(self, message):
         self.message = message
+        
+class EVOWarning(object):
+    
+    def __init__(self, msg, exception = None):
+        self._msg = msg
+        self._exception = exception
+    
+    @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.EVOWarning'],
+               'message')
+    def getMessage(self):
+        return self._msg
+    
+    @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.EVOWarning'],
+               'exception')
+    def getException(self):
+        return self._exception

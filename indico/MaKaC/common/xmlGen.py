@@ -20,7 +20,6 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from xml.sax import saxutils
-from MaKaC.errors import MaKaCError
 from MaKaC.common.utils import encodeUnicode
 
 class XMLGen:
@@ -39,9 +38,6 @@ class XMLGen:
     def initXml(self):
         #init the OAI response
         self.xml=["""<?xml version="1.0" encoding="UTF-8"?>\n"""]
-
-    def setSourceEncoding( self, newEnc = "utf-8" ):
-        self._sourceEncoding = newEnc
 
     def getXml(self):
         return "".join(self.xml)
@@ -86,6 +82,11 @@ class XMLGen:
         self.openTag(name,ListAttrib,True)
         self.writeText(value,True)
         self.closeTag(name,True)
+        
+    def writeComment(self, commentText):
+        self.xml.append("<!-- ")
+        self.writeText(commentText, True)
+        self.xml.append(" -->\r\n")
 
     def writeXML(self,text):
         #add already well-formated text

@@ -32,20 +32,15 @@ class RoomBookingListRooms( ProtectedService ):
         try:
             self._location = self._params["location"];
         except:
-           from MaKaC.services.interface.rpc.common import ServiceError
-           raise ServiceError("ERR-RB0", "Invalid location.")
+            from MaKaC.services.interface.rpc.common import ServiceError
+            raise ServiceError("ERR-RB0", "Invalid location.")
                    
-    def _getAnswer( self ):
-        """
-        Calls _handle() on the derived classes, in order to make it happen. Provides
-        them with self._value.
-        """                
-
-        res = {}
+    def _getAnswer( self ):          
 
         if not Location.parse( self._location ):
             return {}
         
+        res = {}
         for room in CrossLocationQueries.getRooms( location = self._location ):
             res[room.name] = room.name
         
@@ -58,7 +53,6 @@ class RoomBookingListLocationsAndRooms( ProtectedService ):
         locationNames = map(lambda l: l.friendlyName, Location.allLocations);
         for loc in locationNames:
             for room in CrossLocationQueries.getRooms( location = loc ):
-                #result[loc +":" +str(room.id)] = loc +":" +room.name;
                 result[loc +":" +room.name] = loc +":" +room.name;
         return result
 

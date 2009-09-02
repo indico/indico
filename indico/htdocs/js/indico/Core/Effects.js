@@ -34,11 +34,23 @@ IndicoUI.Effect = {
 
     /**
         * Simple CSS manipualtion that sets the element's
-        * 'display' property to 'hide'
+        * 'display' property to 'none'
         * @param {XElement} element the target element
         */
     disappear: function(element){
         element.dom.style.display = 'none';
+    },
+    
+    /**
+     * Simple CSS manipualtion that shows or hides the element by changing its 'display' property
+     * @param {XElement} element the target element
+     */
+    toggleAppearance: function(element, newStyle){
+        if (element.dom.style.display == 'none') {
+            IndicoUI.Effect.appear(element, newStyle);
+        } else {
+            IndicoUI.Effect.disappear(element, newStyle);
+        }
     },
 
     /**
@@ -230,7 +242,26 @@ IndicoUI.Effect = {
         return elem;
     },
     
-    slide: function(elemId, elemHeight) {
+    /**
+     * Prepares an element to be shown / hidden with the 'slide' function.
+     * If you want the element to be initially hidden, its html should be like this:
+     * <div id="myElem" style="visibility: hidden; overflow: hidden;">...</div>
+     * 
+     * @param {string} elemId ID of the element
+     * @param {boolean} initiallyHidden true if you want to initially hide the element, false otherwise.
+     * @return {number} the measured height of the element that has to be input to the 'slide' function.
+     */
+    prepareForSlide: function(elemId, initiallyHidden) {
+        var elem = $E(elemId);
+        var height = elem.dom.offsetHeight;
+        if (initiallyHidden) {
+            elem.dom.style.height = '0';
+            elem.dom.style.opacity = "0";
+        }
+        return height;
+    },
+    
+    slide: function(elemId, elemHeight, showHook, hideHook) {
         
         /**
          * 
@@ -242,8 +273,9 @@ IndicoUI.Effect = {
          *          <div id="myElem" style="visibility: hidden; overflow: hidden;">...</div>
          *      b)
          *          $E(myElem).dom.style.height = '0';
-         *          $E(myElem).dom.style.visibility = "visible";
          *          $E(myElem).dom.style.opacity = "0";
+         *          
+         *          
          * 2) If you want that the element is visible at the beginning  (on load):
          * 
          *      a)
@@ -255,13 +287,22 @@ IndicoUI.Effect = {
          *          
          * @param elemId ID of the element
          * @param elemHeight $(elemId).dom.offsetHeight; The elem should be visible or 
-         * hidden in order to get the offsetHeight, but not display: none. 
+         * hidden in order to get the offsetHeight, but not display: none.
+         * 
+         * Also, be careful that in the moment that you measure the height, the element that
+         * you are measuring has been completely rendered by a browser. For example,
+         * IE7 does not render a table until the </table> closing tag, but FF3 renders it before.
+         * You can check if the measure was correct by launching an "alert(height)" after the measure
+         * and if the measured height is 0 and the measured element is not rendered yet, you
+         * have to put the Javascript code measuring the height later in the DOM tree. 
          * 
          */
         var elem = $E(elemId);
-        elem.dom.style.overflow='hidden';
-        var elemDivHeight=elemHeight;
+        elem.dom.style.overflow = 'hidden';
+        var elemDivHeight = elemHeight;
+        
         if (parseInt(elem.dom.style.height) == '0') {
+            elem.dom.style.visibility = 'visible';
             var heightCounter = 1;
             IndicoUI.Effect.fade(elemId, (Math.floor(Math.log(elemDivHeight)/Math.log(1.3))*20)+200);
             var incHeight = function() {
@@ -269,12 +310,14 @@ IndicoUI.Effect = {
                 if (heightCounter < elemDivHeight) {
                     elem.dom.style.height = Math.floor(heightCounter)+'px';
                     setTimeout(function(){incHeight();}, 20);
-                }else {
+                } else {
                     elem.dom.style.height = "auto";
+                    if (exists(showHook)) showHook();
                 }
             };
             setTimeout(function(){incHeight();}, 20);
-        }else {
+            
+        } else {
             var heightCounter = elemDivHeight;
             IndicoUI.Effect.fade(elemId, (Math.floor(Math.log(elemDivHeight)/Math.log(1.3))*20));
             var decHeight = function() {
@@ -282,8 +325,10 @@ IndicoUI.Effect = {
                 if (heightCounter > 5) {
                     elem.dom.style.height = Math.floor(heightCounter)+'px';
                     setTimeout(function(){decHeight();}, 20);
-                }else {
+                } else {
                     elem.dom.style.height = '0px';
+                    elem.dom.style.visibility = 'hidden';
+                    if (exists(hideHook)) hideHook();
                 }
             };
             setTimeout(function(){decHeight();}, 20); 

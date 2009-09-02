@@ -55,6 +55,10 @@ class CollaborationTools(object):
 #        return cls._plugins[pluginName]
         return cls.getCollaborationPluginType().getPlugin(pluginName)
         
+    @classmethod
+    def getOptionValue(cls, pluginName, optionName):
+        ph = PluginsHolder()
+        return ph.getPluginType("Collaboration").getPlugin(pluginName).getOption(optionName).getValue()
     
     @classmethod
     def isUsingHTTPS(cls):
@@ -76,6 +80,13 @@ class CollaborationTools(object):
             Example: templateClass = CollaborationTools.getTemplateClass("EVO", "WNewBookingForm") will return the WNewBookingForm class in the EVO plugin.
         """
         return cls.getModule(pluginName).pages.__dict__.get(templateName, None)
+    
+    @classmethod
+    def getServiceClass(cls, pluginName, serviceName):
+        """ Utility function that returns a service class object given a plugin name and the class name.
+            Example: serviceClass = CollaborationTools.getTemplateClass("WebcastRequest", "WebcastAbleTalksService") will return the WebcastAbleTalksService class in the WebcastRequest plugin.
+        """
+        return cls.getModule(pluginName).services.__dict__.get(serviceName + "Service", None)
     
     @classmethod
     def getExtraCSS(cls, pluginName):
@@ -107,14 +118,17 @@ class CollaborationTools(object):
         return cls.getModule(pluginName).collaboration.CSBooking
     
     @classmethod
-    def getTabs(cls, event, user = None):
+    def getTabs(cls, conference, user = None):
         """ Returns a list of tab names corresponding to the active plugins for an event.
-            If a user is specified, only tabs with plugins where the user is an admin are returned.
+            If a user is specified, only tabs with plugins where the user is an plugin admin,
+            or where the user is a plugin manager for this event, are returned.
         """
-        
+        csbm = conference.getCSBookingManager()
         subtabNamesSet = set()
-        for plugin in event.getCSBookingManager().getAllowedPlugins():
-            if not user or user in plugin.getOption('admins').getValue():
+        allowedForThisEvent = csbm.getAllowedPlugins()
+        showableForThisEvent = [plugin for plugin in allowedForThisEvent if plugin.isActive()] 
+        for plugin in showableForThisEvent:
+            if not user or user in plugin.getOption('admins').getValue() or csbm.isPluginManager(plugin.getName(), user):
                 subtabNamesSet.add(cls.getPluginSubTab(plugin))
             
         subtabNames = list(subtabNamesSet)
@@ -133,18 +147,21 @@ class CollaborationTools(object):
         
     @classmethod
     def getPluginsByTab(cls, tabName, conference = None, user = None):
-        """ Utility function that returns a list of all plugin objects..
+        """ Utility function that returns a list of plugin objects.
             These Plugin objects will be of the "Collaboration" type, and only those who have declared a subtab equal
             to the "tabName" argument will be returned.
             If tabName is None, [] is returned.
             The conference object is used to filter plugins that are not allowed in a conference,
             because of the conference type or the equipment of the conference room
-            If a user is specified, only plugins where the user is an admin are returned.
+            If a user is specified, only tabs with plugins where the user is an plugin admin,
+            or where the user is a plugin manager for this event, are returned.
         """
         if tabName:
             
+            csbm = conference.getCSBookingManager()
+            
             if conference:
-                allowedPlugins = conference.getCSBookingManager().getAllowedPlugins()
+                allowedPlugins = csbm.getAllowedPlugins()
             else:
                 allowedPlugins = None
             
@@ -153,7 +170,7 @@ class CollaborationTools(object):
                 sorted = True,
                 filter = lambda plugin: cls.getPluginSubTab(plugin) == tabName and
                                         (allowedPlugins is None or plugin in allowedPlugins) and
-                                        (user is None or user in plugin.getOption('admins').getValue())
+                                        (user is None or user in plugin.getOption('admins').getValue() or csbm.isPluginManager(plugin.getName(), user))
             )
         else:
             return []

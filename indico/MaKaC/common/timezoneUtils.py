@@ -1,5 +1,5 @@
 from pytz import timezone, common_timezones
-from datetime import datetime
+from datetime import datetime, timedelta
 import MaKaC.common.info as info
 import calendar
 import time
@@ -59,6 +59,45 @@ def getAdjustedDate(date, object = None, tz=None):
         tz = 'UTC'
     return date.astimezone(timezone(tz))
 
+def isToday(date, tz):
+    """ Returns if a date is inside the current day (given a timezone)
+        date: a timezone-aware datetime
+    """
+    today = getAdjustedDate(nowutc(), None, tz).date()
+    day = getAdjustedDate(date, None, tz).date()
+    return today == day
+
+def isTomorrow(date, tz):
+    """ Returns if a date is inside the day tomorrow (given a timezone)
+        date: a timezone-aware datetime
+    """
+    tomorrow = getAdjustedDate(nowutc(), None, tz).date() + timedelta(days = 1)
+    day = getAdjustedDate(date, None, tz)
+    return tomorrow == day
+
+def isYesterday(date, tz):
+    """ Returns if a date is inside the day yesterday (given a timezone)
+        date: a timezone-aware datetime
+    """
+    yesterday = getAdjustedDate(nowutc(), None, tz).date() - timedelta(days = 1)
+    day = getAdjustedDate(date, None, tz)
+    return yesterday == day
+
+def isSameDay(date1, date2, tz):
+    """ Returns if 2 datetimes occur the same day (given a timezone)
+    """
+    return getAdjustedDate(date1, None, tz).date() == getAdjustedDate(date2, None, tz).date()
+
+def dayDifference(date1, date2, tz):
+    """ Returns the difference in datetimes between 2 dates: date1 - date2 (given a timezone).
+        For example the following 2 UTC dates: 25/07 21:00 and 26/07 03:00 may be on a different day in Europe,
+        but they wouldn't be in Australia, for example
+        date1, date2: timezone-aware datetimes.
+    """ 
+    day1 = getAdjustedDate(date1, None, tz).date()
+    day2 = getAdjustedDate(date2, None, tz).date()
+    return (day1 - day2).days
+    
 def datetimeToUnixTime(t):
     """ Gets a datetime object
         Returns a float with the number of seconds from the UNIX epoch
@@ -125,4 +164,4 @@ class SessionTZ:
         self._displayTZ = tz
     
     def getSessionTZ(self):
-         return self._displayTZ
+        return self._displayTZ

@@ -908,12 +908,16 @@ a.confSubSection:hover {
    border-bottom: none;
 }
 
-.groupTitleSmall {
+.groupTitleSmall, .groupTitleSmallNoBackground {
    font-weight: bold;
    font-size: 11pt;
    color: #777777;
    background: #EBEBEB;   
    padding: 3px;
+}
+
+.groupTitleSmallNoBackground {
+   background: none;
 }
 
 
@@ -954,13 +958,17 @@ a.confSubSection:hover {
     color: black;
 }
 
-.subgroupTitle {
+.subgroupTitle, .subgroupTitleNoBorder {
    font-weight: bold;
    font-size: 18px;
    color: #888888;
    padding: 3px;
    border-bottom: 2px solid #777777;
    vertical-align: bottom;
+}
+
+.subgroupTitleNoBorder {
+   border-bottom: none;
 }
 
 .abstractLeftDataCell {
@@ -1783,6 +1791,19 @@ ul.CategoryList li:hover{
     margin: 15pt 0 0;
 }
 
+li.selectedListItem {
+    background-color: #CDEB8B;
+}
+
+li.unselectedListItem {
+    background-color: #FFFFFF;
+}
+
+li.unselectable {
+    cursor: default;
+    color: #888888;
+}
+
 div.UISearchPeopleListDiv {
     margin-top: 10px;
     margin-bottom: 10px;
@@ -1833,6 +1854,11 @@ ul.UIPeopleList li.selectedUser {
 
 ul.UIPeopleList li.unselectedUser {
     background-color: #FFFFFF;
+}
+
+ul.UIPeopleList li.unselectable {
+    cursor: default;
+    color: #888888;
 }
 
 ul.UIListNestedMenu
@@ -3774,22 +3800,33 @@ ul.PluginPeopleList li{
 }
 
 /* COLLABORATION */
-.collaborationTitleCell {
-    color: #5294CC;
+
+span.createBookingText {
+    font-size: 12pt;
+}
+
+td.collaborationTitleCell {
+    color: #523D04;
     text-align: center;
-    padding-left: 15px;
-    border-bottom: 1px solid rgb(82, 148, 204);
+    padding-bottom: 3px;
 }
 
-.collaborationCell {
+td.collaborationCell {
     padding: 0px;
     padding-left: 15px;
-    padding-top: 5px;
+    padding-right: 15px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    text-align: center;
+    white-space: nowrap;
 }
 
-.collaborationCellNarrow {
+td.collaborationCellNarrow {
     padding: 0px;
-    padding-top: 5px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    width: 0px;
+    white-space: nowrap;
 }
 
 .collaborationInfoCell {
@@ -3797,6 +3834,7 @@ ul.PluginPeopleList li{
     padding-left: 50px;
     padding-bottom: 5px;
 }
+
 
 span.statusMessage {
     font-size: medium;
@@ -3816,16 +3854,12 @@ span.statusMessage {
     color: #7A7A7A;/*#356AA0;*/
 }
 
-ul.collaborationInfo {
-    list-style-type: none;
-    margin:0px;
-    padding:0px;
-    padding-left: 5px;
-    border-left: 1px solid rgb(82, 148, 204);
-}
-
-li.collaborationInfo {
-    padding:0px;
+td.collaborationInfoLeftCol {
+    vertical-align: top;
+    text-align: right;
+    padding-right: 5px;
+    white-space: nowrap;
+    color: #523D04;
 }
 
 .collaborationWarning {
@@ -3903,16 +3937,12 @@ ul.CAIndexList a:hover
 }
 
 div.CADiv {
-    background-color: #F6F6F6;
+    background: #ECECEC url('../images/grey_gradient2.png') scroll repeat-x bottom left;
     padding: 10px 20px 10px 10px;
     margin-top: 10px;
     margin-bottom: 10px;
-    -moz-border-radius-bottomleft:10px;
-    -moz-border-radius-bottomright:10px;
-    -moz-border-radius-topleft:10px;
-    -moz-border-radius-topright:10px;
-    border-bottom:1px solid #AAAAAA;
-    border-right:1px solid #AAAAAA;     
+    color: #444;
+    border: 1px solid #AAA;   
 }
 
 div.CADiv span.pluginNames {
@@ -3941,6 +3971,10 @@ div.CAFilterByCategoryDiv{
     display: inline;
 }
 
+div.CAResultsDiv {
+    padding-top: 20px;
+}
+
 div.CAResultsPerPageDiv {
     display: inline;
 }
@@ -3958,6 +3992,10 @@ div.CADiv a {
     font-family: Verdana;
     font-size: 9pt;
     cursor: pointer;
+}
+
+div.CADiv input.CARadio {
+    margin-left: 0px;
 }
 
 a.CAViewBySelected  {
@@ -4014,6 +4052,15 @@ div.CAInfoDiv div.CAStaticURLDiv a:hover {
     color: #DBB03A;
 }
 
+div.CATotalInIndexDiv {
+    display:inline;
+    float:right;
+}
+
+div.CANResultsDiv {
+    display:inline;
+}
+
 ul.pageNumberList {
     display: block;
     list-style-type: none;
@@ -4055,55 +4102,153 @@ ul.pageNumberList a.pageUnselected {
 }
 
 table.CAResultsTable {
+    width: 100%;
     margin: 0;
     padding: 0;
 }
 
 table.CAResultsTable td.ACBookingGroupTitle {
     padding-top: 20px;
+    color: #555555;
+    font-weight: normal;
+    font-size: 14pt;
+    border-bottom: 1px solid #EBEBEB;
 }
 
 table.CAResultsTable a.ACConfLink {
-    text-decoration: underline;
     padding-top: 20px;
 }
 
 table.CAResultsTable a.ACConfLink span.ACConfTitle {
-    font-size: 12pt;
-    font-style: italic;
-    font-weight: bold;
+    font-size: 14pt;
+    font-weight: normal;
 }
 
-ul.CAResultsTable a.ACConfLink span.ACConfId {
+table.CAResultsTable a.ACConfLink span.ACConfId {
+    font-size: 10pt;
+    font-weight: normal;
+    color: #555555;
 }
 
-ul.CAResultsTable a.ACConfLink span.ACConfDates {
+table.CAResultsTable a.ACConfLink span.ACConfDates {
     font-size: 11pt;
+    font-weight: normal;
+    color: #555555;
 }
 
 td.ACBookingFirstCell {
+    padding: 2px;
     padding-left: 30px;
 }
 
 td.ACBookingCell {
+    padding: 2px;
     padding-left: 10px;
+    max-width: 300px;
+}
+
+td.ACBookingCellNoWrap {
+    padding: 2px;
+    padding-left: 10px;
+    white-space: nowrap;
+    width: 0;
 }
 
 td.ACBookingTime {
+    padding: 2px;
     text-align: right;
 }
 
-table.CAResultsTable span.ACGroupDate {
-    font-family: Verdana;
-    font-size: 12pt;
-    font-style: italic;
-    font-weight: bold;
-    text-decoration: underline;
+/* Collaboration display pages */
+
+.collaborationDisplayTitle {
+    margin: 0;
+    margin-top: 1em;
 }
 
-td.ACBookingConference {
-    padding-left: 10px;
+div.collaborationDisplayDateGroup {
+    padding-top: 5px;
+    padding-bottom: 15px;
 }
+
+span.collaborationDisplayBookingTitle {
+    color: black;
+}
+
+div.collaborationDisplayBookingLine {
+    padding-bottom: 5px;
+}
+
+div.collaborationLinkTooltipMeetingLecture {
+    padding: 3px;
+    background-color: white;
+}
+
+div.collaborationLinkTooltipConference {
+    padding: 3px;
+}
+
+div.collaborationDisplayInfoLine {
+    padding-top: 5px;
+    padding-bottom: 10px;
+}
+
+span.collShowHideBookingsText {
+    font-style: italic;
+}
+
+span.collShowBookingsText {
+    font-style: italic;
+}
+
+div.collHideBookingsDiv {
+    padding-top: 8px;
+}
+
+span.collHideBookingsText {
+    font-style: italic;
+}
+
+table.eventDetails td.collaborationDisplayInfoLeftCol {
+    padding: 0px;
+    padding-right: 10px;
+    vertical-align: top;
+    text-align: right;
+    white-space: nowrap;
+    width: 0px;
+    color: #222222;
+    font-size: 8pt;
+}
+
+table.eventDetails td.collaborationDisplayInfoRightCol {
+    padding: 0px;
+    vertical-align: top;
+    font-size: 8pt;
+}
+
+td.collaborationConfDisplayInfoLeftCol {
+    padding: 0px;
+    padding-right: 10px;
+    vertical-align: top;
+    text-align: right;
+    white-space: nowrap;
+    width: 0px;
+    color: #222222;
+    font-size: 8pt;
+}
+
+td.collaborationConfDisplayInfoRightCol {
+    padding: 0px;
+    vertical-align: top;
+    font-size: 8pt;
+}
+
+
+td.collaborationDisplayInfoLeftCol span {
+    white-space: nowrap;
+}
+
+
 
 
 /* ------------------------ */

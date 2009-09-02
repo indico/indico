@@ -82,6 +82,27 @@ var IndicoUtil = {
 
         }
     },
+    
+    /**
+     * Utility function that sets "form" nodes inside an element to disabled.
+     * @param {XElement} containerElement An element to scan for form nodes to disable.
+     * @param {Boolean} enableDisable true = enable, false = disable 
+     */
+     enableDisableForm : function (containerElement, enableDisable) {
+        var nodesToDisable = {button :'', input :'', optgroup :'', option :'', select :'', textarea :''};
+
+        var node, nodes;
+        nodes = containerElement.dom.getElementsByTagName('*');
+        if (!nodes) return;
+
+        var i = nodes.length;
+        while (i--){
+            node = nodes[i];
+            if ( node.nodeName && node.nodeName.toLowerCase() in nodesToDisable ) {
+                node.disabled = !enableDisable;
+            }
+        }
+    },
 
     /**
     * Given a function 'f', returns another function 'g' that will accept calls of

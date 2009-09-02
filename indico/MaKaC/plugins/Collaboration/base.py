@@ -55,13 +55,33 @@ class CSBookingManager(Persistent):
         # an index of bookings by type. The key will be a booking type (string), the value a list of booking id
         self._bookingsByType = {}
         
+        # a list of ids with hidden bookings
+        self._hiddenBookings = set()
+        
+        # an index of video services managers for each plugin. key: plugin name, value: list of users
+        self._managers = {}
+        
+        #we register as a date change observer of the conference
+        self._conf.addTitleChangeObserver(self)
+        
         #we register as a date change observer of the conference
         self._conf.addDateChangeObserver(self)
+        
+        #we register as a delete observer of the conference
+        self._conf.addDeleteObserver(self)
 
     def getOwner(self):
         """ Returns the Conference (the meeting) that owns this CSBookingManager object.
         """
         return self._conf
+    
+    def restoreAsObserver(self):
+        if not self in self._conf.getTitleChangeObservers():
+            self._conf.addTitleChangeObserver(self)
+        if not self in self._conf.getDateChangeObservers():
+            self._conf.addDateChangeObserver(self)
+        if not self in self._conf.getDeleteObservers():
+            self._conf.addDeleteObserver(self)
     
     def isCSAllowed(self):
         """ Returns if the associated event should display a Video Services tab
@@ -75,14 +95,14 @@ class CSBookingManager(Persistent):
         return False
     
     def getAllowedPlugins(self):
-        """ Returns a list of allowed plugins for this event.
+        """ Returns a list of allowed plugins (Plugin objects) for this event.
             This can depend on the kind of event (meeting, lecture, conference), on the equipment of the room...
         """
         pluginsPerEventType = CollaborationTools.getCollaborationPluginType().getOption("pluginsPerEventType").getValue()
         if pluginsPerEventType is not None:
             return pluginsPerEventType[self._conf.getType()]
         
-    def getBookingList(self, sorted = False, filterByType = None, notify = False):
+    def getBookingList(self, sorted = False, filterByType = None, notify = False, onlyPublic = False):
         """ Returns a list of all the bookings.
             If sorted = True, the list of bookings will be sorted by id.
             If filterByType = None, all bookings are returned.
@@ -101,6 +121,11 @@ class CSBookingManager(Persistent):
                     keys.extend(self._bookingsByType.get(pluginName, []))
         else:
             keys = self._bookings.keys()
+            
+        if onlyPublic and self.getHiddenBookings():
+            keys = set(keys)
+            keys = keys.difference(self.getHiddenBookings())
+            keys = list(keys)
             
         if sorted:
             keys.sort(key = lambda k: int(k))
@@ -143,6 +168,14 @@ class CSBookingManager(Persistent):
             return booking
         else:
             return None
+        
+    def getHiddenBookings(self):
+        if not hasattr(self, '_hiddenBookings'):
+            self._hiddenBookings = set()
+        return self._hiddenBookings
+    
+    def hasBookings(self):
+        return len(self._bookings) > 0
     
     def canCreateBooking(self, type):
         """ Returns if it's possible to create a booking of this given type
@@ -151,41 +184,40 @@ class CSBookingManager(Persistent):
             return len(self.getBookingList(filterByType = type)) == 0
         return True
     
-    def createBooking(self, type, bookingParams = {}):
+    def createBooking(self, bookingType, bookingParams = {}):
         """ Adds a new booking to the list of bookings.
             The id of the new booking is auto-generated incrementally.
             After generating the booking, its "performBooking" method will be called.
             
-            type: a String with the booking's plugin. Example: "DummyPlugin", "EVO"
+            bookingType: a String with the booking's plugin. Example: "DummyPlugin", "EVO"
             bookingParams: a dictionary with the parameters necessary to create the booking.
                            "create the booking" usually means Indico deciding if the booking can take place.
                            if "startDate" and "endDate" are among the keys, they will be taken out of the dictionary.
         """
-        if self.canCreateBooking(type):
-            newBooking = CollaborationTools.getCSBookingClass(type)(type, self._conf)
-            
-            CSBookingManager._setBookingDates(newBooking, bookingParams)
-            CSBookingManager._setNeedsNotifiedDateChange(newBooking, bookingParams)
+        if self.canCreateBooking(bookingType):
+            newBooking = CollaborationTools.getCSBookingClass(bookingType)(bookingType, self._conf)
             
             error = newBooking.setBookingParams(bookingParams)
             
             if error:
-                return error
+                raise CollaborationServiceException("Problem while creating a booking of type " + bookingType)
             else:
+                newId = self._getNewBookingId()
+                newBooking.setId(newId)
                 createResult = newBooking._create()
                 if isinstance(createResult, CSErrorBase):
                     return createResult
                 else:
-                    newId = self._getNewBookingId()
-                    newBooking.setId(newId)
                     self._bookings[newId] = newBooking
-                    self._bookingsByType.setdefault(type,[]).append(newId)
+                    self._bookingsByType.setdefault(bookingType,[]).append(newId)
+                    if newBooking.isHidden():
+                        self.getHiddenBookings().add(newId)
                     self._indexBooking(newBooking)
                     self._notifyModification()
                     return newBooking
         else:
             #we raise an exception because the web interface should take care of this never actually happening
-            raise CollaborationServiceException(type + " only allows to create 1 booking per event")
+            raise CollaborationServiceException(bookingType + " only allows to create 1 booking per event")
     
     def _indexBooking(self, booking):
         if booking.shouldBeIndexed():
@@ -205,24 +237,25 @@ class CSBookingManager(Persistent):
         
         oldStartDate = booking.getStartDate()
         oldModificationDate = booking.getModificationDate()
-        oldNeedsNotifiedDateChange = booking.needsToBeNotifiedOfDateChanges()
         oldBookingParams = booking.getBookingParams() #this is a copy so it's ok
-        
-        CSBookingManager._setBookingDates(booking, bookingParams)
-        CSBookingManager._setNeedsNotifiedDateChange(booking, bookingParams)
         
         error = booking.setBookingParams(bookingParams)
         if error:
-            CSBookingManager._rollbackChanges(booking, oldBookingParams, oldModificationDate, oldNeedsNotifiedDateChange)
-            return error
+            CSBookingManager._rollbackChanges(booking, oldBookingParams, oldModificationDate)
+            raise CollaborationServiceException("Problem while modifying a booking of type " + booking.getType())
         else:
             modifyResult = booking._modify()
             if isinstance(modifyResult, CSErrorBase):
-                CSBookingManager._rollbackChanges(booking, oldBookingParams, oldModificationDate, oldNeedsNotifiedDateChange)
+                CSBookingManager._rollbackChanges(booking, oldBookingParams, oldModificationDate)
                 return modifyResult
             else:
                 modificationDate = nowutc()
                 booking.setModificationDate(modificationDate)
+                
+                if booking.isHidden():
+                    self.getHiddenBookings().add(booking.getId())
+                elif booking.getId() in self.getHiddenBookings():
+                    self.getHiddenBookings().remove(booking.getId())
             
                 self._changeStartDateInIndex(booking, oldStartDate, booking.getStartDate())
                 self._changeModificationDateInIndex(booking, oldModificationDate, modificationDate)
@@ -231,16 +264,21 @@ class CSBookingManager(Persistent):
                     if booking.getAcceptRejectStatus() is not None:
                         booking.clearAcceptRejectStatus()
                         self._addToPendingIndex(booking)
+                        
+                self._notifyModification()
                     
                 return booking
     
     @classmethod
-    def _rollbackChanges(cls, booking, oldBookingParams, oldModificationDate, oldNeedsNotifiedDateChange):
-        CSBookingManager._setBookingDates(booking, oldBookingParams)
-        CSBookingManager._setNeedsNotifiedDateChange(booking, oldBookingParams)
+    def _rollbackChanges(cls, booking, oldBookingParams, oldModificationDate):
         booking.setBookingParams(oldBookingParams)
         booking.setModificationDate(oldModificationDate)
         
+    def _changeConfTitleInIndex(self, booking, oldTitle, newTitle):
+        if booking.shouldBeIndexed():
+            indexes = self._getIndexList(booking)
+            for index in indexes:
+                index.changeEventTitle(booking, oldTitle, newTitle)
     
     def _changeStartDateInIndex(self, booking, oldStartDate, newStartDate):
         if booking.shouldBeIndexed() and booking.hasStartDate():
@@ -259,48 +297,23 @@ class CSBookingManager(Persistent):
             indexes = self._getIndexList(booking)
             for index in indexes:
                 index.changeConfStartDate(booking, oldConfStartDate, newConfStartDate)
-
-    @classmethod
-    def _setBookingDates(cls, booking, bookingParams):
-        """ Extracts "startDate" and "endDate" from the booking parameters.
-            If "startDate" and/or "endDate" are in the keys of the dictionary, they will be removed.
-            Then the dates will be set in the booking.
-        """
-        startDate = bookingParams.pop("startDate", None)
-        if startDate is not None:
-            booking.setStartDateFromString(startDate)
-        endDate = bookingParams.pop("endDate", None)
-        if endDate is not None:
-            booking.setEndDateFromString(endDate)
-            
-    @classmethod
-    def _setNeedsNotifiedDateChange(cls, booking, bookingParams):
-        """ Extracts "notifyOnDateChanges" and "endDate" from the booking parameters.
-            If "startDate" and/or "endDate" are in the keys of the dictionary, they will be removed.
-            Then the dates will be set in the booking.
-        """
-        notifyOnDateChanges = bookingParams.pop("notifyOnDateChanges", None) #this will be ["yes"] or []
-        if notifyOnDateChanges:
-            booking.setNeedsToBeNotifiedOfDateChanges(True)
-        else:
-            booking.setNeedsToBeNotifiedOfDateChanges(False)
-            
-
         
     def removeBooking(self, id):
         """ Removes a booking given its id.
         """
         booking = self.getBooking(id)
-        type = booking.getType()
+        bookingType = booking.getType()
         
-        removeError = booking._delete()
-        if isinstance(removeError, CSErrorBase):
-            return removeError
+        removeResult = booking._delete()
+        if isinstance(removeResult, CSErrorBase):
+            return removeResult
         else:
             del self._bookings[id]
-            self._bookingsByType[type].remove(id)
-            if not self._bookingsByType[type]:
-                del self._bookingsByType[type]
+            self._bookingsByType[bookingType].remove(id)
+            if not self._bookingsByType[bookingType]:
+                del self._bookingsByType[bookingType]
+            if id in self.getHiddenBookings():
+                self.getHiddenBookings().remove(id)
             
             self._unindexBooking(booking)
             
@@ -407,28 +420,85 @@ class CSBookingManager(Persistent):
             
         return indexes
     
+    def getManagers(self):
+        if not hasattr(self, "_managers"):
+            self._managers = {}
+        return self._managers
+    
+    def addPluginManager(self, plugin, user):
+        #TODO: use .linkTo on the user. To be done when the list of roles of a user is actually needed for smth...
+        self.getManagers().setdefault(plugin, []).append(user)
+        self._notifyModification()
+        
+    def removePluginManager(self, plugin, user):
+        #TODO: use .unlinkTo on the user. To be done when the list of roles of a user is actually needed for smth...
+        if user in self.getManagers().setdefault(plugin,[]):
+            self.getManagers()[plugin].remove(user)
+            self._notifyModification()
+    
+    def getVideoServicesManagers(self):
+        return self.getManagers().setdefault('all', [])
+    
+    def isVideoServicesManager(self, user):
+        return user in self.getManagers().setdefault('all', [])
+        
+    def getPluginManagers(self, plugin):
+        return self.getManagers().setdefault(plugin, [])
+    
+    def isPluginManager(self, plugin, user):
+        return user in self.getManagers().setdefault(plugin, [])
+    
+    def isPluginManagerOfAnyPlugin(self, user):
+        #TODO: this method is not optimal. to be optimal, we should store somewhere an index where the key
+        #is the user, and the value is a list of plugins where they are managers.
+        #this could be done with .getLinkTo, but we would need to change the .linkTo method to add extra information
+        #(since we cannot create a role for each plugin)
+        if self.isVideoServicesManager(user):
+            return True
+        else:
+            for plugin in self.getManagers().iterkeys():
+                if self.isPluginManager(plugin, user):
+                    return True
+            return False
+        
+    def notifyTitleChange(self, oldTitle, newTitle):
+        """ Notifies the CSBookingManager that the title of the event (meeting) it's attached to has changed.
+            The CSBookingManager will reindex all its bookings in the event title index.
+            This method will be called by the event (meeting) object
+        """
+        for booking in self.getBookingList():
+            try:
+                self._changeConfTitleInIndex(booking, oldTitle, newTitle)
+            except Exception, e:
+                Logger.get('VideoServ').error("Exception while reindexing a booking in the event title index because its event's title changed: " + str(e))
+            
+    
     def notifyStartDateChange(self, oldStartDate, newStartDate):
         """ Notifies the CSBookingManager that the start date of the event (meeting) it's attached to has changed.
             The CSBookingManager will change the dates of all the bookings that want to be updated.
             This method will be called by the event (meeting) object
         """
         for booking in self.getBookingList():
+            try:
+                self._changeConfStartDateInIndex(booking, oldStartDate, newStartDate)
+            except Exception, e:
+                Logger.get('VideoServ').error("Exception while reindexing a booking in the event start date index because its event's start date changed: " + str(e))
+            
             if booking.needsToBeNotifiedOfDateChanges():
                 oldBookingStartDate = booking.getStartDate()
                 if oldBookingStartDate:
                     try:
                         booking.setStartDate(oldBookingStartDate + (newStartDate - oldStartDate) )
                         self._changeStartDateInIndex(booking, oldBookingStartDate, booking.getStartDate())
-                        self._changeConfStartDateInIndex(booking, oldStartDate, newStartDate)
                         booking._modify()
                     except Exception, e:
                         Logger.get('VideoServ').error("Exception while changing a booking's start after event start date changed: " + str(e))
                         booking.setStartDate(oldBookingStartDate)     
     
     def notifyEndDateChange(self, oldEndDate, newEndDate):
-        """ Notifies the CSBookingManager that the end date of the event (meeting) it's attached to has changed.
+        """ Notifies the CSBookingManager that the end date of the event (Conference) it's attached to has changed.
             The CSBookingManager will change the dates of all the bookings that want to be updated.
-            This method will be called by the event (meeting) object
+            This method will be called by the event (Conference) object
         """
         for booking in self.getBookingList():
             if booking.needsToBeNotifiedOfDateChanges():
@@ -442,26 +512,60 @@ class CSBookingManager(Persistent):
                         booking.setEndDate(oldBookingEndDate)
         
     def notifyTimezoneChange(self, oldTimezone, newTimezone):
-        """ Notifies the CSBookingManager that the timezone of the event (meeting) it's attached to has changed.
+        """ Notifies the CSBookingManager that the timezone of the event it's attached to has changed.
             The CSBookingManager will change the dates of all the bookings that want to be updated.
-            This method will be called by the event (meeting) object
+            This method will be called by the event (Conference) object
         """
         return
     
-    def getEventDisplayPlugins(self):
+    def notifyDeletion(self):
+        """ Notifies the CSBookingManager that the Conference object it is attached to has been deleted.
+            The CSBookingManager will change the dates of all the bookings that want to be updated.
+            This method will be called by the event (Conference) object
+        """
+        for booking in self.getBookingList():
+            try:
+                removeResult = self.removeBooking(booking.getId())
+                if isinstance(removeResult, CSErrorBase):
+                    Logger.get('VideoServ').error("Error while deleting a booking of type %s after deleting an event: %s"%(booking.getType(), removeResult.getMessage() ))
+            except Exception, e:
+                Logger.get('VideoServ').error("Exception while deleting a booking of type %s after deleting an event: %s"%(booking.getType(), str(e) ))            
+        
+    
+    def getEventDisplayPlugins(self, sorted = False):
         pluginsWithEventDisplay = CollaborationTools.pluginsWithEventDisplay()
         l = []
         for pluginName in self._bookingsByType:
             if pluginName in pluginsWithEventDisplay:
                 l.append(pluginName)
+        if sorted:
+            l.sort()
         return l
     
-    def getXML(self, pluginName, displayTz, out):
-        CollaborationTools.getXMLGenerator(pluginName).getXML(self, displayTz, out)
-        
-    def getEventDisplayText(self, pluginName, displayTz):
-        templateClass = CollaborationTools.getTemplateClass(pluginName, "WDisplay")
-        return templateClass(self.getOwner(), displayTz).getHTML()
+    def createTestBooking(self, bookingParams = {}):
+        """ Function that creates a 'test' booking for performance test.
+            Avoids to use any of the plugins except DummyPlugin
+        """
+        from MaKaC.plugins.Collaboration.DummyPlugin.collaboration import CSBooking as DummyBooking
+        bookingType = 'DummyPlugin'
+        newBooking = DummyBooking(bookingType, self._conf)
+        error = newBooking.setBookingParams(bookingParams)
+        if error:
+            raise CollaborationServiceException("Problem while creating a test booking")
+        else:
+            newId = self._getNewBookingId()
+            newBooking.setId(newId)
+            createResult = newBooking._create()
+            if isinstance(createResult, CSErrorBase):
+                return createResult
+            else:
+                self._bookings[newId] = newBooking
+                self._bookingsByType.setdefault(bookingType,[]).append(newId)
+                if newBooking.isHidden():
+                    self.getHiddenBookings().add(newId)
+                self._indexBooking(newBooking)
+                self._notifyModification()
+                return newBooking
     
     def _notifyModification(self):
         self._p_changed = 1
@@ -497,6 +601,7 @@ class CSBookingBase(Persistent):
     _hasStop = False
     _hasCheckStatus = False
     _hasAcceptReject = False
+    _hasStartStopAll = False
     _requiresServerCallForStart = False
     _requiresServerCallForStop = False
     _requiresClientCallForStart = False
@@ -515,10 +620,10 @@ class CSBookingBase(Persistent):
                lambda booking: str(urlHandlers.UHConfModifCollaboration.getURL(booking.getConference(),
                                                                                secure = CollaborationTools.isUsingHTTPS(),
                                                                                tab = CollaborationTools.getPluginSubTab(booking.getPlugin()))))
-    def __init__(self, type, conf):
+    def __init__(self, bookingType, conf):
         """ Constructor for the CSBookingBase class.
             id: a string with the id of the booking
-            type: a string with the type of the booking. Example: "DummyPlugin", "EVO"
+            bookingType: a string with the type of the booking. Example: "DummyPlugin", "EVO"
             conf: a Conference object to which this booking belongs (through the CSBookingManager object). The meeting of this booking.
             startTime: TODO
             endTime: TODO
@@ -532,6 +637,8 @@ class CSBookingBase(Persistent):
                               Needs to be defined by the implementing class, as keys with empty values.
             -_statusMessage, _statusClass : they represent the status message (and its CSS class) that will be displayed.
                  The status of a booking can be, for example: "Booking Accepted" (in green), "Booking refused" (in red)
+            -_warning: A warning is a plugin-defined object, with information to show to the user when
+                       the operation went well but we still have to show some info to the user.
             -_canBeStarted: If its value is true, the "start" button for the booking will be able to be pushed.
                             It can be false if, for example:
                               + The plugin didn't like the booking parameters and doesn't give permission for the booking to be started,
@@ -544,9 +651,10 @@ class CSBookingBase(Persistent):
             -_permissionToStop: Same as permissionToStart. Sometimes the booking should not be allowed to stop even if the "stop" button is available.
         """
         self._id = None
-        self._type = type
+        self._type = bookingType
         self._plugin = CollaborationTools.getPlugin(self._type)
         self._conf = conf
+        self._warning = None
         self._creationDate = nowutc()
         self._modificationDate = nowutc()
         self._creationDateTimestamp = int(datetimeToUnixTimeInt(self._creationDate))
@@ -561,13 +669,15 @@ class CSBookingBase(Persistent):
         self._acceptRejectStatus = None #None = not yet accepted / rejected; True = accepted; False = rejected
         self._rejectReason = ""
         
+        self._canBeDeleted = True
         self._canBeStarted = self._hasStart
         self._canBeStopped = False
         self._permissionToStart = False
         self._permissionToStop = False
         self._needsToBeNotifiedOfDateChanges = self._canBeNotifiedOfEventDateChanges
+        self._hidden = False
         
-        setattr(self, "_" + type + "Options", CollaborationTools.getPlugin(type).getOptions())
+        setattr(self, "_" + bookingType + "Options", CollaborationTools.getPlugin(bookingType).getOptions())
         
 
     @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'id')
@@ -595,6 +705,18 @@ class CSBookingBase(Persistent):
         """ Returns the owner of this CSBookingBase object, which is a Conference object representing the meeting.
         """
         return self._conf
+    
+    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'],
+               'warning', isPicklableObject = True)
+    def getWarning(self):
+        """ Returns a warning attached to this booking.
+            A warning is a plugin-defined object, with information to show to the user when
+            the operation went well but we still have to show some info to the user.
+            To be overloaded by plugins.
+        """
+        if not hasattr(self, '_warning'):
+            self._warning = None
+        return self._warning
     
     def getCreationDate(self):
         """ Returns the date this booking was created, as a timezone localized datetime object
@@ -850,6 +972,7 @@ class CSBookingBase(Persistent):
         bookingParams["endDate"] = self.getEndDateAsString()
         if self.needsToBeNotifiedOfDateChanges():
             bookingParams["notifyOnDateChanges"] = ["notifyOnDateChanges"]
+        bookingParams["hidden"] = self.isHidden()
             
         return bookingParams
         
@@ -872,6 +995,16 @@ class CSBookingBase(Persistent):
             Note: even if a parameter is in this list, you can decide not to implement its corresponding set
             method if you never expect the parameter name to come up inside 'params'.
         """
+        self.setHidden(params.pop("hidden", False))
+        self.setNeedsToBeNotifiedOfDateChanges(params.pop("notifyOnDateChanges", False))
+        
+        startDate = params.pop("startDate", None)
+        if startDate is not None:
+            self.setStartDateFromString(startDate)
+        endDate = params.pop("endDate", None)
+        if endDate is not None:
+            self.setEndDateFromString(endDate)
+        
         for k,v in params.items():
             if k in self._bookingParams:
                 self._bookingParams[k] = v
@@ -888,7 +1021,27 @@ class CSBookingBase(Persistent):
         if self.needsBookingParamsCheck():
             return self._checkBookingParams()
         
-        return True
+        return False
+        
+    def _getTitle(self):
+        if self.hasEventDisplay():
+            raise CollaborationException("Method _getTitle was not overriden for the plugin type " + str(self._type))
+        
+    def _getPluginDisplayName(self):
+        if self.hasEventDisplay():
+            raise CollaborationException("Method _getPluginDisplayName was not overriden for the plugin type " + str(self._type))
+        
+    def _getInformationDisplay(self, tz):
+        templateClass = CollaborationTools.getTemplateClass(self.getType(), "WInformationDisplay")
+        if templateClass:
+            return templateClass(self, tz).getHTML()
+        else:
+            return None
+        
+    def _getLaunchDisplayInfo(self):
+        """ To be overloaded by plugins
+        """
+        return None
         
     def _checkBookingParams(self):
         """ To be overriden by inheriting classes.
@@ -898,13 +1051,21 @@ class CSBookingBase(Persistent):
         """
         if self.needsBookingParamsCheck():
             raise CollaborationServiceException("Method _checkBookingParams was not overriden for the plugin type " + str(self._type))
-                                
+
     @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'hasStart')
     def hasStart(self):
         """ Returns if this booking belongs to a plugin who has a "start" concept.
             This attribute will be available in Javascript with the "hasStart" attribute
         """
         return self._hasStart
+
+    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'hasStartStopAll')    
+    def hasStartStopAll(self):
+        """ Returns if this booking belongs to a plugin who has a "start" concept, and all of its bookings for a conference
+            can be started simultanously.
+            This attribute will be available in Javascript with the "hasStart" attribute
+        """
+        return self._hasStartStopAll
     
     @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'hasStop')
     def hasStop(self):
@@ -954,6 +1115,16 @@ class CSBookingBase(Persistent):
             This attribute will be available in Javascript with the "requiresClientCallForStop" attribute
         """
         return self._requiresClientCallForStop
+
+    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'canBeDeleted')
+    def canBeDeleted(self):
+        """ Returns if this booking can be deleted, in the sense that the "Remove" button will be active and able to be pressed.
+            This attribute will be available in Javascript with the "canBeDeleted" attribute
+        """
+
+        if not hasattr(self, '_canBeDeleted'):
+            self._canBeDeleted = True
+        return self._canBeDeleted
 
     @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'canBeStarted')    
     def canBeStarted(self):
@@ -1012,6 +1183,21 @@ class CSBookingBase(Persistent):
             of their owner Event changing start date, end date or timezone.
         """
         self._needsToBeNotifiedOfDateChanges = needsToBeNotifiedOfDateChanges
+    
+    def isHidden(self):
+        """ Return if this booking is "hidden"
+            A hidden booking will not appear in display pages
+        """
+        if not hasattr(self, '_hidden'):
+            self._hidden = False
+        return self._hidden
+    
+    def setHidden(self, hidden):
+        """ Sets if this booking is "hidden"
+            A hidden booking will not appear in display pages
+            hidden: a Boolean
+        """
+        self._hidden = hidden
         
     @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'allowMultiple')
     def isAllowMultiple(self):
@@ -1213,6 +1399,11 @@ class CSErrorBase(object):
                 'error')
     def getError(self):
         return True
+    
+    def getMessage(self):
+        """ To be overloaded
+        """
+        return ''
         
         
 class CollaborationException(MaKaCError):
@@ -1224,6 +1415,9 @@ class CollaborationException(MaKaCError):
     
     def getInner(self):
         return self._inner
+    
+    def __str__(self):
+        return MaKaCError.__str__(self) + '. Inner: ' + str(self._inner) 
          
 class CollaborationServiceException(ServiceError):
     """ Error for the Collaboration System "core", for Service calls.

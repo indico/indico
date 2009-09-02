@@ -252,7 +252,8 @@ def escapeHTMLForJS(s):
         explore use of regular expressions, or maybe split the string and then join it manually, or just replace them by
         looping through the string and using an if...elif... etc.
     """
-    return s.replace("\\", "\\\\").replace("\'", "\\\'").replace("\"", "\\\"").replace("&", "\\&").replace("\/", "\\/").replace("\n","\\n").replace("\t","\\t").replace("\r","\\r").replace("\b","\\b").replace("\f","\\f")
+    res = s.replace("\\", "\\\\").replace("\'", "\\\'").replace("\"", "\\\"").replace("&", "\\&").replace("/", "\\/").replace("\n","\\n").replace("\t","\\t").replace("\r","\\r").replace("\b","\\b").replace("\f","\\f")
+    return res
 
 
 class TemplateExec:

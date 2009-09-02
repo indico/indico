@@ -12,7 +12,7 @@ IndicoUI.Buttons = {
         return Html.img({
             alt: caption,
             title: caption,
-            src: faded ? imageSrc("add_faded", true) : imageSrc("add"),
+            src: faded ? imageSrc("add_faded") : imageSrc("add"),
             style: {
                 'marginLeft': '5px',
                 'verticalAlign': 'middle'
@@ -27,7 +27,7 @@ IndicoUI.Buttons = {
         return Html.img({
             alt: caption,
             title: caption,
-            src: faded ? imageSrc("remove_faded", true) : imageSrc("remove"),
+            src: faded ? imageSrc("remove_faded") : imageSrc("remove"),
             style: {
                 'marginLeft': '5px',
                 'verticalAlign': 'middle'
@@ -43,7 +43,7 @@ IndicoUI.Buttons = {
 
             alt: caption,
             title: caption,
-            src: faded ? imageSrc("edit_faded", true) : imageSrc("edit"),
+            src: faded ? imageSrc("edit_faded") : imageSrc("edit"),
             style: {
                 'marginLeft': '5px',
                 'verticalAlign': 'middle'
@@ -58,9 +58,10 @@ IndicoUI.Buttons = {
         return Html.img({
             alt: caption,
             title: caption,
-            src: faded ? imageSrc("play_faded", true) : imageSrc("play"),
+            src: faded ? imageSrc("play_faded") : imageSrc("play"),
             style: {
-                'marginLeft': '5px',
+                'marginLeft': '3px',
+                'marginRight': '3px',
                 'verticalAlign': 'middle'
             }
         });
@@ -73,9 +74,10 @@ IndicoUI.Buttons = {
         return Html.img({
             alt: caption,
             title: caption,
-            src: faded ? imageSrc("stop_faded", true) : imageSrc("stop"),
+            src: faded ? imageSrc("stop_faded") : imageSrc("stop"),
             style: {
-                'marginLeft': '5px',
+                'marginLeft': '3px',
+                'marginRight': '3px',
                 'verticalAlign': 'middle'
             }
         });

@@ -46,7 +46,7 @@ def sortAndReturn(list):
     var futureEvents = $E("futureEvents");
     var futureEventsDivHeight=futureEvents.dom.offsetHeight;
     futureEvents.dom.style.height = '0';
-    futureEvents.dom.style.visibility = "visible";
+    //futureEvents.dom.style.visibility = "visible";
     futureEvents.dom.style.opacity = "0";
     function toogleFutureEvents() {
         if (futureSwitch) {

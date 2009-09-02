@@ -417,6 +417,9 @@ class PluginType (PluginBase):
                 p = Plugin(pluginName, pluginModule.__name__, self, description)
                 self.addPlugin(p)
                 
+            if hasattr(pluginModule, "testPlugin") and pluginModule.testPlugin:
+                p.setTestPlugin(pluginModule.testPlugin)
+                
             if hasattr(pluginModule, "options") and hasattr(pluginModule.options, "globalOptions"):
                 p.updateAllOptions(pluginModule.options.globalOptions)
                 
@@ -466,7 +469,7 @@ class PluginType (PluginBase):
         """
         return len(self.__plugins) > 0
     
-    def getPlugins(self, includeNonPresent = False, includeNonActive = False, filter = lambda plugin: True):
+    def getPlugins(self, includeNonPresent = False, includeTestPlugins = False, includeNonActive = False, filter = lambda plugin: True):
         """ Returns a dictionary with the plugins of this PluginType.
             They keys of the dictionary will be strings, with the name of each plugin (e.g. "EVO"). The values will be Plugin objects.
             -includeNonPresent: if True, non present plugins (i.e., plugins in the DB but no longer in the file system) will be returned
@@ -474,16 +477,16 @@ class PluginType (PluginBase):
             -filter: a function that will be passed a plugin as argument and returns if the plugin should be returned or not.
         """
         return dict([(k,v) for k,v in self.__plugins.items()
-                     if (v.isPresent() or includeNonPresent) and (v.isActive() or includeNonActive) and filter(v)])
+                     if (v.isPresent() or includeNonPresent) and (not v.isTestPlugin() or includeTestPlugins) and (v.isActive() or includeNonActive) and filter(v)])
         
-    def getPluginList(self, sorted = False, includeNonPresent = False, includeNonActive = False, filter = lambda plugin: True):
+    def getPluginList(self, sorted = False, includeNonPresent = False, includeTestPlugins = False, includeNonActive = False, filter = lambda plugin: True):
         """ Returns a list with the plugins of this PluginType, as a list of Plugin objects.
             -sorted: if True, the list will be sorted alphabetically by plugin name.
             -includeNonPresent: if True, non present plugins (i.e., plugins in the DB but no longer in the file system) will be returned
             -includeNonActive: if True, non active plugins will be returned
             -filter: a function that will be passed a plugin as argument and returns if the plugin should be returned or not.
         """
-        plugins = self.getPlugins(includeNonPresent, includeNonActive, filter)
+        plugins = self.getPlugins(includeNonPresent, includeTestPlugins, includeNonActive, filter)
         if sorted:
             keys = plugins.keys()
             keys.sort()
@@ -524,6 +527,7 @@ class Plugin(PluginBase):
         self.__moduleName = moduleName
         self.__description = description
         self.__active = active
+        self._testPlugin = False
         self._globalData = self.initializeGlobalData()
 
     def getId(self):
@@ -567,6 +571,14 @@ class Plugin(PluginBase):
         
     def toggleActive(self):
         self.__active = not self.__active
+        
+    def setTestPlugin(self, testPlugin):
+        self._testPlugin = testPlugin
+        
+    def isTestPlugin(self):
+        if not hasattr(self, "_testPlugin"): #TODO: remove when safe
+            self._testPlugin = False
+        return self._testPlugin
         
     def initializeGlobalData(self):
         module = self.getModule()

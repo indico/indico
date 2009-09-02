@@ -20,21 +20,12 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import os as os
-
-from ZODB import FileStorage, DB
-from ZODB.DB import DB, transaction
-from ZODB.PersistentMapping import PersistentMapping
 from persistent import Persistent
 from persistent.mapping import PersistentMapping
-from BTrees.IOBTree import IOBTree
-
-from MaKaC.rb_dalManager import DALManagerBase
 from MaKaC.rb_room import RoomBase
 from MaKaC.rb_location import CrossLocationQueries, Location
 from MaKaC.plugins.RoomBooking.default.factory import Factory
-
 from MaKaC.rb_tools import qbeMatch
-
 from MaKaC.common.Configuration import Config
 
 # Branch name in ZODB root
@@ -136,6 +127,7 @@ class Room( Persistent, RoomBase ):
         minCapacity = kwargs.get( 'minCapacity' )
         location = kwargs.get( 'location' )
         ownedBy = kwargs.get( 'ownedBy' )
+        customAtts = kwargs.get( 'customAtts' )
 #        responsibleID = kwargs.get( 'responsibleID' )
         
         ret_lst = []
@@ -169,6 +161,25 @@ class Room( Persistent, RoomBase ):
                     continue
             if ownedBy != None:
                 if not room.isOwnedBy( ownedBy ):
+                    continue
+            if customAtts is not None:
+                if not hasattr(room, "customAtts"):
+                    continue
+                discard = False
+                for condition in customAtts:
+                    attName = condition["name"]
+                    allowEmpty = condition.get("allowEmpty", False)
+                    filter = condition.get("filter", None)
+                    if not attName in room.customAtts:
+                        discard = True
+                        break
+                    elif not allowEmpty and str(room.customAtts[attName]).strip() == "":
+                        discard = True
+                        break
+                    elif not filter(room.customAtts[attName]):
+                        discard = True
+                        break
+                if discard:
                     continue
             
             # All conditions are met: add room to the results

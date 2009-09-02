@@ -1,9 +1,5 @@
-td.participantsCell {
-	height: 180px; /* keep a bit more height as CERNMCUParticipantsDiv so that dialog is centered on creation */
-}
-
 .CERNMCUParticipantsDiv {
-    height: 156px;
+    height: 93px;
     width: 500px;
     border: 1px solid #CCCCCC;
     overflow: auto;
@@ -26,4 +22,20 @@ ul.CERNMCUParticipantsList li{
     line-height: 25px;
     padding-left: 5px;
     vertical-align: middle;
+}
+
+div.CERNMCU_H323RoomList_Div {
+    height: 300px;
+}
+
+ul.CERNMCU_H323RoomList li{
+    padding-left: 10px;
+}
+
+ul.CERNMCU_H323RoomList div.selectedRoom {
+    background-color: #CDEB8B;
+}
+
+ul.CERNMCU_H323RoomList div.unselectedRoom {
+    background-color: #FFFFFF;
 }

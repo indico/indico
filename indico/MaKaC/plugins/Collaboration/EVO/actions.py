@@ -20,7 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.plugins.base import ActionBase
-from MaKaC.plugins.Collaboration.EVO.common import EVOControlledException, getEVOAnswer, EVOException
+from MaKaC.plugins.Collaboration.EVO.common import EVOControlledException, getEVOAnswer, EVOException,\
+    getEVOOptionValueByName
 from MaKaC.i18n import _
 
 pluginActions = [
@@ -40,11 +41,15 @@ class ReloadCommunityListAction(ActionBase):
         try:
             communityStringList = answer.split('&&')
             communities = {}
+            
+            ignoredCommunities = getEVOOptionValueByName("ingnoredCommunities")
+            
             for communityString in communityStringList:
                 id, name = communityString.split(',')
                 id = id.strip()
                 name = name.strip()
-                communities[id] = name
+                if id not in ignoredCommunities:
+                    communities[id] = name
             self._plugin.getOption("communityList").setValue(communities)
             
         except Exception, e:

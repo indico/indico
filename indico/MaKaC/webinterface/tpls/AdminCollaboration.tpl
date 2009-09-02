@@ -47,13 +47,38 @@
         </div>
     </div>
     
-    <div style="padding-top: 5px">
-        <%= _("Since")%> <input type="text" size="16" id="minKey" onkeypress="updateFilterButton()" value="<%= InitialMinKey %>"/>
-        <%= _("to")%> <input type="text" size="16" id="maxKey" onkeypress="updateFilterButton()" value="<%= InitialMaxKey %>"/>
-        <span class="CAMinMaxKeySuggestion" id="minMaxKeySuggestion"></span>
+    <div id="dateFilter" style="padding-top: 10px">
+        <div>
+            <% if InitialFromDays: %>
+                <% checked1 = '' %>
+                <% checked2 = 'checked' %>
+            <% end %>
+            <% else: %>
+                <% checked1 = 'checked' %>
+                <% checked2 = '' %>
+            <% end %>
+            <input type="radio" name="dateFilterType" id="sinceToDateRadio" onclick="updateDateFilterType()" class="CARadio" <%= checked1 %> />
+            <%= _("Since")%> <input type="text" size="16" id="sinceDate" onkeypress="updateFilterButton()" value="<%= InitialSinceDate %>"/>
+            <%= _("to")%> <input type="text" size="16" id="toDate" onkeypress="updateFilterButton()" value="<%= InitialToDate %>"/>
+            <span class="CAMinMaxKeySuggestion">Please input dates</span>
+        </div>
+        <div style="padding-top: 5px">
+            <input type="radio" name="dateFilterType" id="fromToDaysRadio" onclick="updateDateFilterType()" class="CARadio" <%= checked2 %> />
+            <%= _("From")%> <input type="text" size="3" id="fromDays" onkeypress="updateFilterButton()" value="<%= InitialFromDays %>"/>
+            <%= _("days ago to")%> <input type="text" size="3" id="toDays" onkeypress="updateFilterButton()" value="<%= InitialToDays %>"/>
+            <%= _("days in the future") %>
+            <span class="CAMinMaxKeySuggestion">Please input integers</span>
+        </div>
+    </div>
+    <div id="titleFilter" style="padding-top: 10px">
+        <div>
+            <%= _("From")%> <input type="text" size="16" id="fromTitle" onkeypress="updateFilterButton()" value="<%= InitialFromTitle %>"/>
+            <%= _("to")%> <input type="text" size="16" id="toTitle" onkeypress="updateFilterButton()" value="<%= InitialToTitle %>"/>
+            <span class="CAMinMaxKeySuggestion">Please input a conference title or the beginning of it</span>
+        </div>
     </div>
     
-    <div style="padding-top: 5px">
+    <div style="padding-top: 10px">
         <input type="button" id="filterButton" value="<%= _("Refresh")%>" onclick="applyFilter(); query();"/>
     </div>
 </div>
@@ -86,20 +111,29 @@
     </div>
 </div>
 
-<div class="CADiv">
+<div>
     <div class = "CAResultsDiv">
         <span id="resultsMessage"><%= _("(Results will appear here)")%></span>
-        <table class="CAResultsTable" id ="results">
+        <div id="resultsInfo" style="display:none;">
+            <div class="CATotalInIndexDiv">
+                <span id="totalInIndex"></span><span> bookings in this index.</span>
+            </div>
+            <div class="CANResultsDiv">
+                <span>Query returned </span><span id="nBookings"></span><span> bookings.</span>
+            </div>
+        </div>
+        <table cellpadding="0" cellspacing="0" class="CAResultsTable" id ="results">
         </table>
     </div>
     <div id="pageNumberList">
     </div>
 </div>
-</div>
 <script type="text/javascript">
 
-var nPages = <%= InitialNumberOfPages %>;
 var bookings = <%= jsonEncode (InitialBookings) %>;
+var nBookings = <%= InitialNumberOfBookings %>
+var totalInIndex = <%= InitialTotalInIndex %>
+var nPages = <%= InitialNumberOfPages %>;
 
 var indexNames = <%=[index.getName() for index in Indexes]%>;
 var indexInformation = <%= jsonEncode(DictPickler.pickle(dict([(i.getName(), i) for i in Indexes])))%>
@@ -111,8 +145,12 @@ var queryParams = {
     filterByOnlyPending: true,
     conferenceId: '<%= InitialConferenceId %>',
     categoryId: '<%= InitialCategoryId %>',
-    minKey: '<%= InitialMinKey %>',
-    maxKey: '<%= InitialMaxKey %>',
+    sinceDate: '<%= InitialSinceDate %>',
+    toDate: '<%= InitialToDate %>',
+    fromDays: '<%= InitialFromDays %>',
+    toDays: '<%= InitialToDays %>',
+    fromTitle: '<%= InitialFromTitle %>',
+    toTitle: '<%= InitialToTitle %>',
     viewBy: '',
     orderBy: '',
     resultsPerPage: '<%= InitialResultsPerPage %>',
@@ -185,36 +223,48 @@ var viewByObs = function(viewBySelected, firstTime) {
         	$E(name + 'ViewBy').dom.className = "CAViewByUnselected";
         }
     }
-
-    var clearKeys = function(){
-    	$E('minKey').set('');
-        $E('maxKey').set('');
-        queryParams.minKey = '';
-        queryParams.maxKey = '';
-    }
-
+    
     if ((endsWith(queryParams.viewBy, 'Date') || firstTime) && viewBySelected == 'conferenceTitle') {
-    	clearKeys();
-    	IndicoUI.Widgets.Generic.removeCalendar($E('minKey'));
-        IndicoUI.Widgets.Generic.removeCalendar($E('maxKey'));
-        $E('minMaxKeySuggestion').set('<%= _("Please input a conference title or the beginning of it")%>');
+        if (!(firstTime && bookings)) {
+            $E('fromTitle').set('');
+            $E('toTitle').set('');
+        }
+        IndicoUI.Effect.disappear($E('dateFilter'));
+        IndicoUI.Effect.appear($E('titleFilter'));
         orderByObs('ascending', true); // we put true because we don't want to trigger another request
     }
     if (endsWith(viewBySelected, 'Date') && (queryParams.viewBy == 'conferenceTitle' || firstTime)) {
-    	clearKeys();
-    	IndicoUI.Widgets.Generic.input2dateField($E('minKey'), true, null);
-        IndicoUI.Widgets.Generic.input2dateField($E('maxKey'), true, null);
-        $E('minMaxKeySuggestion').set('<%= _("Please input dates")%>');
+        if (!(firstTime && bookings)) {
+            $E('sinceDate').set('');
+            $E('toDate').set('');
+            $E('fromDays').set('');
+            $E('toDays').set('');
+        }
+        IndicoUI.Effect.disappear($E('titleFilter'));
+        IndicoUI.Effect.appear($E('dateFilter'));
         orderByObs('descending', true); // we put true because we don't want to trigger another request
     }
     
-
     queryParams.viewBy = viewBySelected;
 
     if (!firstTime) {
         applyFilter();
         query()
     };
+}
+
+var updateDateFilterType = function() {
+    if ($E('sinceToDateRadio').dom.checked) {
+        $E('fromDays').dom.disabled = true;
+        $E('toDays').dom.disabled = true;
+        $E('sinceDate').dom.disabled = false;
+        $E('toDate').dom.disabled = false;
+    } else {
+        $E('sinceDate').dom.disabled = true;
+        $E('toDate').dom.disabled = true;
+        $E('fromDays').dom.disabled = false;
+        $E('toDays').dom.disabled = false;
+    }
 }
 
 var orderByObs = function(orderBySelected, firstTime) {
@@ -248,8 +298,28 @@ var applyFilter = function(){
     queryParams.showOnlyPending = $E('pendingCB').dom.checked;
     queryParams.conferenceId = $E('conferenceId').get();
     queryParams.categoryId = $E('categoryId').get();
-    queryParams.minKey = $E('minKey').get();
-    queryParams.maxKey = $E('maxKey').get();
+    if (endsWith(queryParams.viewBy, 'Date')) {
+        queryParams.fromTitle = '';
+        queryParams.toTitle = '';
+        if ($E('sinceToDateRadio').dom.checked) {
+            queryParams.fromDays = '';
+            queryParams.toDays = '';
+            queryParams.sinceDate = $E('sinceDate').get();
+            queryParams.toDate = $E('toDate').get();
+        } else {
+            queryParams.sinceDate = '';
+            queryParams.toDate = '';
+            queryParams.fromDays = $E('fromDays').get();
+            queryParams.toDays = $E('toDays').get();
+        }
+    } else {
+        queryParams.sinceDate = '';
+        queryParams.toDate = '';
+        queryParams.fromDays = '';
+        queryParams.toDays = '';
+        queryParams.fromTitle = $E('fromTitle').get();
+        queryParams.toTitle = $E('toTitle').get();
+    }
     queryParams.resultsPerPage = $E('resultsPerPage').get();
     queryParams.page = 1;
     $E('filterButton').dom.value = '<%= _("Refresh")%>';
@@ -273,8 +343,12 @@ var query = function() {
             indexName : queryParams.indexName,
             viewBy : queryParams.viewBy,
             orderBy : queryParams.orderBy,
-            minKey : queryParams.minKey,
-            maxKey : queryParams.maxKey,
+            sinceDate : queryParams.sinceDate,
+            toDate : queryParams.toDate,
+            fromDays : queryParams.fromDays,
+            toDays : queryParams.toDays,
+            fromTitle : queryParams.fromTitle,
+            toTitle : queryParams.toTitle,
             onlyPending : queryParams.filterByOnlyPending && queryParams.showOnlyPending,
             conferenceId : queryParams.conferenceId,
             categoryId : queryParams.categoryId,
@@ -283,8 +357,10 @@ var query = function() {
         },
         function(result,error) {
             if (!error) {
-                bookings = result[0];
-                nPages = result[1];
+                bookings = result.results;
+                nBookings = result.nBookings;
+                totalInIndex = result.totalInIndex;
+                nPages = result.nPages;
                 updateList();
                 killProgress();
             } else {
@@ -305,10 +381,15 @@ var updateStaticURL = function() {
               '&onlyPending=' + queryParams.showOnlyPending +
               '&conferenceId=' + queryParams.conferenceId +
               '&categoryId=' + queryParams.categoryId +
-              '&minKey=' + queryParams.minKey +
-              '&maxKey=' + queryParams.maxKey +
               '&viewBy=' + queryParams.viewBy +
               '&orderBy=' + queryParams.orderBy;
+    if (queryParams.sinceDate) {
+        url = url + '&fromDate=' + queryParams.sinceDate + '&toDate=' + queryParams.toDate;
+    } else if (queryParams.fromDays) {
+        url = url + '&fromDays=' + queryParams.fromDays + '&toDays=' + queryParams.toDays;
+    } else if (queryParams.fromTitle) {
+        url = url + '&fromTitle=' + queryParams.fromTitle + '&toTitle=' + queryParams.toTitle;
+    }
 
     $E('staticURL').set(url);
     $E('staticURLLink').dom.href = url;
@@ -331,9 +412,9 @@ var confTitleGroupTemplate = function(group, isFirst){
     var conference = group[0];
     var bookings = group[1];
 
-    var result = Html.tbody('',
-        Html.tr('', Html.td({className : !isFirst? 'ACBookingGroupTitle' : '', colspan: 10, colSpan: 10}, 
-            Html.a({className : 'ACConfLink', href : conference.displayURL},
+    var result = Html.tbody({},
+        Html.tr({}, Html.td({className : 'ACBookingGroupTitle', colspan: 10, colSpan: 10}, 
+            Html.a({className : 'ACConfLink', href : conference.videoServicesDisplayURL},
                     Html.span('ACConfTitle', conference.title),
                     Html.span('ACConfId', ' (ID: ' + conference.id + ') '),
                     Html.span('ACConfDates', conference.startDate.date + (conference.startDate.date != conference.endDate.date? ' - ' + conference.endDate.date : ''))
@@ -348,19 +429,28 @@ var confTitleGroupTemplate = function(group, isFirst){
 var confTitleBookingTemplate = function(booking) {
     var row = Html.tr();
 
-    var cell = Html.td('ACBookingFirstCell', Html.a({href: booking.modificationURL}, booking.type));
+    var cell = Html.td('ACBookingFirstCell', Html.span('', booking.type));
     row.append(cell);
 
-    var cell = Html.td('ACBookingCell', Html.span(booking.statusClass, booking.statusMessage));
+    var cell = Html.td('ACBookingCellNoWrap', Html.span(booking.statusClass, booking.statusMessage));
     row.append(cell);
 
-    var cell = Html.td('ACBookingCell', '<%= _("Last modification:")%> ' + formatDateTimeCS(booking.modificationDate) );
+    var cell = Html.td('ACBookingCellNoWrap', '<%= _("Last modification:")%> ' + formatDateTimeCS(booking.modificationDate) );
     row.append(cell);
 
     if (pluginHasFunction(booking.type, 'customText')) {
         var cell = Html.td('ACBookingCell', codes[booking.type].customText(booking, 'conferenceTitle') );
         row.append(cell);
+    } else {
+        row.append(Html.td());
     }
+
+    var cell = Html.td('ACBookingCellNoWrap', Html.a({href: booking.modificationURL}, 'Change'));
+    row.append(cell);
+    var cell = Html.td('ACBookingCellNoWrap', Html.a({href: booking.conference.videoServicesDisplayURL}, 'Event Display'));
+    row.append(cell);
+
+    IndicoUI.Effect.mouseOver(row.dom);
 
     return row;
 }
@@ -374,20 +464,29 @@ var dateBookingTemplate = function(booking, viewBy) {
     var cell = Html.td('ACBookingFirstCell ACBookingTime', time);
     row.append(cell);
 
-    var cell = Html.td('ACBookingCell', Html.a({href: booking.modificationURL}, booking.type));
+    var cell = Html.td('ACBookingCellNoWrap', Html.span('', booking.type));
     row.append(cell);
 
-    var cell = Html.td('ACBookingCell', Html.span(booking.statusClass, booking.statusMessage));
+    var cell = Html.td('ACBookingCellNoWrap', Html.span(booking.statusClass, booking.statusMessage));
     row.append(cell);
 
-    var cell = Html.td('ACBookingConference', Html.span('', '<%= _("In event:")%> '), Html.a({className : 'ACBookingConferenceLink', href:booking.conference.displayURL}, booking.conference.title));
+    var cell = Html.td('ACBookingCell', Html.span('', '<%= _("In event:")%> '), Html.span('', booking.conference.title));
     row.append(cell);
 
     if (pluginHasFunction(booking.type, 'customText')) {
         var cell = Html.td('ACBookingCell', codes[booking.type].customText(booking, viewBy) );
         row.append(cell);
+    } else {
+        row.append(Html.td());
     }
 
+    var cell = Html.td('ACBookingCellNoWrap', Html.a({href: booking.modificationURL}, 'Change'));
+    row.append(cell);
+    var cell = Html.td('ACBookingCellNoWrap', Html.a({href: booking.conference.videoServicesDisplayURL}, 'Event Display'));
+    row.append(cell);
+
+    IndicoUI.Effect.mouseOver(row.dom);
+    
     return row;
 }
 
@@ -395,9 +494,9 @@ var dateGroupTemplate = function(group, isFirst, viewBy) {
     var date = group[0];
     var bookings = group[1];
 
-    var result = Html.tbody('',
-            Html.tr('', Html.td({className : !isFirst? 'ACBookingGroupTitle' : '', colspan: 10, colSpan: 10}, 
-                Html.span('ACGroupDate', date)
+    var result = Html.tbody({},
+            Html.tr({}, Html.td({className : 'ACBookingGroupTitle', colspan: 10, colSpan: 10}, 
+                Html.span({}, date)
             )));
     each(bookings, function(booking){
         result.append(dateBookingTemplate(booking, viewBy));
@@ -415,11 +514,15 @@ var updateResults = function() {
     
     $E('results').clear();
 
-    if (nPages == 0) {
+    if (nBookings < 1) {
         $E('resultsMessage').set('<%= _("No results found")%>');
         IndicoUI.Effect.appear($E('resultsMessage'));
+        IndicoUI.Effect.disappear($E('resultsInfo'));
     } else {
         IndicoUI.Effect.disappear($E('resultsMessage'));
+        IndicoUI.Effect.appear($E('resultsInfo'));
+        $E('totalInIndex').set(totalInIndex);
+        $E('nBookings').set(nBookings);
         for (var i = 0; i < bookings.length; i++) {
             group = bookings[i];
             if (queryParams.viewBy == 'conferenceTitle' || queryParams.viewBy == 'conferenceStartDate') {
@@ -448,6 +551,7 @@ IndicoUI.executeOnLoad(function(){
     indexSelectedObs('<%=InitialIndex%>', true);
     confIdObs();
     viewByObs('<%=InitialViewBy %>', true);
+    updateDateFilterType();
     <% if InitialOrderBy: %>
         orderByObs('<%= InitialOrderBy %>', true);
     <% end %>
@@ -455,8 +559,10 @@ IndicoUI.executeOnLoad(function(){
     
     $E('pageNumberList').set(pf.draw());
 
-    dateParameterManager.add($E('minKey'), 'datetime', true);
-    dateParameterManager.add($E('maxKey'), 'datetime', true);
+    dateParameterManager.add($E('sinceDate'), 'datetime', true);
+    dateParameterManager.add($E('toDate'), 'datetime', true);
+    IndicoUI.Widgets.Generic.input2dateField($E('sinceDate'), true, null);
+    IndicoUI.Widgets.Generic.input2dateField($E('toDate'), true, null);
 
     resultsPerPageParameterManager.add($E('resultsPerPage'), 'int', false, function(value) {
         if (value < 1) {

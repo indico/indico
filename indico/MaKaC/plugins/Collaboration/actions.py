@@ -32,8 +32,9 @@ pluginTypeActions = [
     ("indexPluginsPerIndex", {"visible": False,
                                "executeOnLoad": True}),
     ("reindexAllBookings", {"buttonText": "Reindex ALL bookings (may take a while)"}),
+    ("restoreCSBookingManagersAsObservers", {"buttonText": "Restore CSBookingManagers as Event Observers", "visible": True}),
     ("deleteAllBookings", {"buttonText": "Delete ALL bookings (only to be used by David) (be careful)",
-                           "visible": True})
+                           "visible": False})
 ]
 
 class IndexPluginsPerEventTypeAction(ActionBase):
@@ -90,6 +91,14 @@ class IndexPluginsPerIndexAction(ActionBase):
         result.extend([commonIndexes[k] for k in commonIndexNames])
                 
         self._pluginType.getOption("pluginsPerIndex").setValue(result)
+        
+class RestoreCSBookingManagersAsObserversAction(ActionBase):
+    
+    def call(self):
+        cf = ConferenceHolder()
+        for conf in cf.getValuesToList():
+            csbm = conf.getCSBookingManager()
+            csbm.restoreAsObserver()
         
 class ReindexAllBookingsAction(ActionBase):
     

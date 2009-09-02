@@ -322,12 +322,22 @@ Request details:<br />
                     speakers = ', by ' + ", ".join([person.getFullName() for person in speakerList])
                 else:
                     speakers = ''
-                
-                contributionLine = """•[%s] <a href="%s">%s</a>%s""" % (
+                    
+                if contribution.getLocation():
+                    locationText = "Location: " + contribution.getLocation().getName()
+                    if contribution.getRoom():
+                        locationText += ', Room: ' + contribution.getRoom().getName()
+                    else:
+                        locationText += ', Room: not defined'
+                else:
+                    locationText = "Location: not defined"
+                    
+                contributionLine = """•[%s] <a href="%s">%s</a>%s (%s)""" % (
                     contributionId,
                     urlHandlers.UHContributionDisplay.getURL(contribution),
                     contribution.getTitle(),
-                    speakers
+                    speakers,
+                    locationText
                 )
                 text.append(contributionLine)
             

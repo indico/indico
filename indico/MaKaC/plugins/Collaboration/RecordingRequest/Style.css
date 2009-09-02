@@ -1,8 +1,12 @@
 <% declareTemplate(newTemplateStyle=True) %>
 
-span.RRWarningMessage {
-    color: #D01F3C;
-    font-weight: bold;	
+span.RRNoteTitle {
+    font-weight: bold;
+    font-style: italic;
+    text-decoration: underline;
+}
+span.RRNoteText {
+    font-style: italic;
 }
 
 div.RRFormSection {
@@ -53,7 +57,7 @@ div.RRContributionListDiv {
 
 td.RRContributionsColumn {
     vertical-align: top;
-    width: 50%;	
+    /*width: 50%;*/	
 }
 
 span.RRContributionId {

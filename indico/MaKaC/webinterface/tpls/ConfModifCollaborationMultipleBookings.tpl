@@ -1,30 +1,38 @@
 <table>
     <tr>
+        <td colspan="2" style="padding-top: 20px"></td>
+    </tr>
+    <tr>
         <td class="titleCellNoBorderTD" style="white-space: nowrap;vertical-align: middle;">
-            <span class="titleCellFormat">
+            <span class="titleCellFormat createBookingText">
                 <%= _("Create booking")%>
             </span>
         </td>
         <td style="padding-left: 15px;">
             <% plugins = MultipleBookingPlugins %>
-            <select id="pluginSelect">
+            <select id="pluginSelect" onchange="pluginSelectChanged()">
+                <option value="noneSelected">-- Choose a system --</option>
                 <% for p in plugins: %>
                     <option value="<%=p.getId()%>"><%= p.getName() %></option>
                 <% end %>
             </select>
-            <input id="createBooking" type="button" value="<%= _("Create")%>">
+            <div id="createBookingDiv" style="display: inline;">
+                <input type="button" value="<%= _("Create")%>" disabled>
+            </div>
+            <div id="createBookingHelp" style="display: inline;">
+            </div>
             <span style="margin-left: 5em;font-size: 9pt;">
-                <%= _("Reminder: times correspond to the")%> <%= Conference.getTimezone() %> <%= _("timezone") %>.
+                <%= _("Timezone: ")%><%= Conference.getTimezone() %>
             </span>
         </td>
     </tr>
     <tr>
-        <td class="titleCellNoBorderTD" style="white-space: nowrap;padding-top: 1em;">
-            <span class="titleCellFormat">
-                <%= _("Current bookings")%>
-            </span>
+        <td class="groupTitle" style="white-space: nowrap;padding-top: 1em;" colspan="2">
+            <%= _("Current bookings")%>
         </td>
-        <td style="padding-left: 15px;padding-top: 1em;">
+    </tr>
+    <tr>
+        <td colspan="2" style="padding-top: 20px;">
             <table style="border-collapse: collapse;">
                 <thead>
                     <tr id="tableHeadRow" style="margin-bottom: 5px;">
@@ -92,7 +100,10 @@ var forms = {
   */
 var bookings = $L(<%= jsonEncode(BookingsM)%>);
 
+var createButton;
+var createButtonTooltip;
 
+  
 /* ------------------------------ UTILITY / HELPER FUNCTIONS -------------------------------*/
 
 /**
@@ -101,7 +112,17 @@ var bookings = $L(<%= jsonEncode(BookingsM)%>);
  * @return {String}
  */
 var getSelectedPlugin = function() {
-    return $E('pluginSelect').dom.value;
+    value = $E('pluginSelect').dom.value; 
+    return value == 'noneSelected' ? null : value;
+}
+
+var pluginSelectChanged = function() {
+    selectedPlugin = getSelectedPlugin();
+    if (exists(selectedPlugin)) {
+        createButton.enable();
+    } else {
+        createButton.disable();
+    }
 }
 
 /* ------------------------------ FUNCTIONS TO BE CALLED WHEN USER EVENTS HAPPEN -------------------------------*/
@@ -111,7 +132,10 @@ var getSelectedPlugin = function() {
  * It will call in turn 'createBooking' in Collaboration.js
  */
 var create = function() {
-    createBooking(getSelectedPlugin(), '<%= Conference.getId() %>');
+    selectedPlugin = getSelectedPlugin();
+    if (exists(selectedPlugin)) { 
+        createBooking(selectedPlugin, '<%= Conference.getId() %>');
+    }
 }
 
 /**
@@ -136,10 +160,28 @@ var edit = function(booking) {
 IndicoUI.executeOnLoad(function(){
     // This is strictly necessary in this page because the progress dialog touches the body element of the page,
     // and IE doesn't like when this is done at page load by a script that is not inside the body element.
+    
+    // We configure the "create" button and the list of plugins.
+    createButton = new DisabledButton(Html.input("button", {disabled:true, style:{marginLeft: '6px'}}, $T("Create") ));
 
-    // We add an action to the "Add" button.
-    $E('createBooking').observeClick(function(){ create() });
+    createButton.observeEvent('mouseover', function(event) {
+        if (!createButton.isEnabled()) {
+            createButtonTooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, 
+                     $T("Please select a booking type from the list."), "tooltipError");
+        }
+    });
 
+    createButton.observeEvent('mouseout', function(event){
+        Dom.List.remove(document.body, createButtonTooltip);
+    });
+
+    createButton.observeClick(function(){ create() });
+
+    $E('createBookingDiv').set(createButton.draw());
+
+    $E('pluginSelect').dom.value = 'noneSelected';
+    pluginSelectChanged();
+    
     // We display the bookings
     displayBookings();
 });

@@ -1461,6 +1461,12 @@ class UHAdminCollaboration(OptionallySecureURLHandler):
 
 class UHConfModifCollaboration(OptionallySecureURLHandler):
     _relativeURL = "confModifCollaboration.py"
+    
+class UHConfModifCollaborationManagers(URLHandler):
+    _relativeURL = "confModifCollaboration.py/managers"
+    
+class UHCollaborationDisplay(URLHandler):
+    _relativeURL = "collaborationDisplay.py"
 
 ## End of new Collaboration related
 

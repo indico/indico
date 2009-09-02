@@ -24,10 +24,13 @@ from MaKaC.plugins.Collaboration.base import CollaborationException, CSErrorBase
 from MaKaC.plugins.base import PluginsHolder
 from random import Random
 from MaKaC.common.PickleJar import Retrieves
+from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
+import errno
+
+secondsToWait = 10
     
-def getCERNMCUOptionValueByName(name):
-    ph = PluginsHolder()
-    return ph.getPluginType("Collaboration").getPlugin("CERNMCU").getOption(name).getValue()
+def getCERNMCUOptionValueByName(optionName):
+    return CollaborationTools.getOptionValue('CERNMCU', optionName)
     
 def getMinMaxId():
     idRangeString = getCERNMCUOptionValueByName("idRange")
@@ -82,9 +85,12 @@ class GlobalData(Persistent):
         self._usedIds.remove(id)
         
 class Participant(Persistent):
-    def __init__(self, type, ip):
+    def __init__(self, type, booking, id, ip, createdByIndico = True):
         self._type = type
+        self._booking = booking
+        self._id = id
         self._ip = ip
+        self._createdByIndico = createdByIndico
         
     @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.ParticipantPerson',
                 'MaKaC.plugins.Collaboration.CERNMCU.common.ParticipantRoom'], 'type')
@@ -92,13 +98,26 @@ class Participant(Persistent):
         return self._type
     
     @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.ParticipantPerson',
+                'MaKaC.plugins.Collaboration.CERNMCU.common.ParticipantRoom'], 'participantId')
+    def getId(self):
+        return self._id
+    
+    def getParticipantName(self):
+        if self._createdByIndico:
+            confId = self._booking.getConference().getId()
+            bookingId = self._booking.getId()
+            return "p%sb%sc%s"%(self._id, bookingId, confId)
+        else:
+            return self._id
+    
+    @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.ParticipantPerson',
                 'MaKaC.plugins.Collaboration.CERNMCU.common.ParticipantRoom'], 'ip')
     def getIp(self):
         return self._ip
         
 class ParticipantPerson(Participant):
-    def __init__(self, data):
-        Participant.__init__(self, 'person', data.get("ip",''))
+    def __init__(self, booking, id, data):
+        Participant.__init__(self, 'person', booking, id, data.get("ip",''))
         self._title = data.get("title", '')
         self._familyName = data.get("familyName", '')
         self._firstName = data.get("firstName", '')
@@ -120,7 +139,7 @@ class ParticipantPerson(Participant):
     def getAffiliation(self):
         return self._affiliation
     
-    def getFullName(self):
+    def getDisplayName(self):
         result = []
         if self._title:
             result.append(self._title)
@@ -132,13 +151,13 @@ class ParticipantPerson(Participant):
             result.append(' (')
             result.append(self._affiliation)
             result.append(')')
-        return "".join(result)
+        return ("".join(result))[:31] #31 is the max length accepted by the MCU
         
     
     
 class ParticipantRoom(Participant):
-    def __init__(self, data):
-        Participant.__init__(self, 'room', data.get("ip",''))
+    def __init__(self, booking, id, data):
+        Participant.__init__(self, 'room', booking, id, data.get("ip",''))
         self._name = data.get("name",'')
         self._institution = data.get("institution", '')
         
@@ -152,23 +171,58 @@ class ParticipantRoom(Participant):
             self._institution = ''
         return self._institution
     
-    def getFullName(self):
+    def getDisplayName(self):
         result = self._name
         if self._institution:
             result = result + ' (' + self._institution + ')'
-        return result
-
+        return result[:31] #31 is the max length accepted by the MCU
+    
+class RoomWithH323(object):
+    def __init__(self, institution, name, ip):
+        self._institution = institution
+        self._name = name
+        self._ip = ip
+        
+    @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.RoomWithH323'], 'institution')
+    def getLocation(self):
+        return self._institution
+        
+    @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.RoomWithH323'], 'name')
+    def getName(self):
+        return self._name
+        
+    @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.RoomWithH323'], 'ip')
+    def getIP(self):
+        return self._ip
+    
+    
 class CERNMCUError(CSErrorBase):
     
-    def __init__(self, faultCode):
+    def __init__(self, faultCode, message = ''):
         CSErrorBase.__init__(self)
         self._faultCode = faultCode
+        self._message = message
         
     @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.CERNMCUError'], 'faultCode')
     def getFaultCode(self):
         return self._faultCode
     
+    @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.CERNMCUError'], 'message')
+    def getMessage(self):
+        return self._message
+    
+    def setMessage(self, message):
+        self._message = message
+    
 class CERNMCUException(CollaborationException):
     def __init__(self, msg, inner = None):
         CollaborationException.__init__(self, msg, 'CERN MCU', inner)
+        
+def handleSocketError(e):
+    if e.args[0] == errno.ETIMEDOUT:
+        raise CERNMCUException("Connection with the MCU timed out after %s seconds"%secondsToWait)
+    elif e.args[0] == errno.ECONNREFUSED:
+        raise CERNMCUException("The connection with the MCU was refused.")
+    else:
+        raise e
 

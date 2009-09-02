@@ -23,12 +23,11 @@ from BTrees.OOBTree import OOBTree
 from BTrees.IOBTree import IOBTree 
 from MaKaC.common.logger import Logger
 from MaKaC.common.timezoneUtils import unixTimeToDatetime,\
-    datetimeToUnixTimeInt, setAdjustedDate
+    datetimeToUnixTimeInt
 from MaKaC.conference import ConferenceHolder, CategoryManager
 from MaKaC.common.PickleJar import Retrieves, DictPickler
 from datetime import datetime
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
-from MaKaC.common.utils import parseDateTime
 
 
 class CollaborationIndex(Persistent):
@@ -56,49 +55,53 @@ class CollaborationIndex(Persistent):
             
         reverse = orderBy == "descending"
 
-        if categoryId and not CategoryManager().hasKey(categoryId) or \
-           conferenceId and not ConferenceHolder().hasKey(conferenceId):
-            return []   
-                 
         try:
             index = self._indexes[indexName]
+            totalInIndex = index.getCount()
+            
+            if categoryId and not CategoryManager().hasKey(categoryId) or conferenceId and not ConferenceHolder().hasKey(conferenceId):
+                finalResult = QueryResult([], 0, 0, totalInIndex, 0)
+            else:
+                if viewBy == "conferenceTitle":
+                    items, nBookings = index.getBookingsByConfTitle(minKey, maxKey, conferenceId, categoryId)
+                elif viewBy == "conferenceStartDate":
+                    items, nBookings = index.getBookingsByConfDate(minKey, maxKey, conferenceId, categoryId)
+                else:
+                    items, nBookings = index.getBookingsByDate(viewBy, minKey, maxKey, tz, conferenceId, categoryId, dateFormat)
+                    
+                if reverse:
+                    items.reverse()
+                    
+                
+                nGroups = len(items)
+                    
+                if page:
+                    page = int(page)
+                    if resultsPerPage:
+                        resultsPerPage = int(resultsPerPage)
+                    else:
+                        resultsPerPage = 10
+        
+                    nPages = nGroups / resultsPerPage
+                    if nGroups % resultsPerPage > 0:
+                        nPages = nPages + 1
+                    
+                    if page > nPages:
+                        finalResult = QueryResult([], 0, 0, totalInIndex, nPages)
+                    else:
+                        finalResult = QueryResult(items[(page - 1) * resultsPerPage : page * resultsPerPage], nBookings, nGroups, totalInIndex, nPages)
+                        
+                else:
+                    finalResult = QueryResult(items, nBookings, nGroups, totalInIndex, 0)
+            
         except KeyError:
             Logger.get("VideoServ").warning("Tried to retrieve index with name " + indexName + " but the index did not exist. Maybe no bookings have been added to it yet")
-            return [], 0
+            finalResult = QueryResult([], 0, 0, 0)
             
-        if viewBy == "conferenceTitle":
-            items = index.getBookingsByConfTitle(minKey, maxKey, conferenceId, categoryId, pickle, tz)
-        elif viewBy == "conferenceStartDate":
-            items = index.getBookingsByConfDate(minKey, maxKey, conferenceId, categoryId, pickle, tz)
+        if pickle:
+            return DictPickler.pickle(finalResult, tz)
         else:
-            if minKey:
-                minKey = setAdjustedDate(parseDateTime(minKey), tz = tz)
-            if maxKey:
-                maxKey = setAdjustedDate(parseDateTime(maxKey), tz = tz)
-            items = index.getBookingsByDate(viewBy, minKey, maxKey, tz, conferenceId, categoryId, pickle, dateFormat)
-            
-        if reverse:
-            items.reverse()
-            
-        if page:
-            page = int(page)
-            if resultsPerPage:
-                resultsPerPage = int(resultsPerPage)
-            else:
-                resultsPerPage = 10
-
-            nResults = len(items)
-            nPages = nResults / resultsPerPage
-            if nResults % resultsPerPage > 0:
-                nPages = nPages + 1
-            
-            if page > nPages:
-                return [], nPages
-            
-            return items[(page - 1) * resultsPerPage : page * resultsPerPage], nPages
-                
-        else:
-            return items, 0
+            return finalResult
         
     def dump(self):
         return [(k, v.dump()) for k,v in self._indexes.iteritems()]
@@ -141,6 +144,9 @@ class BookingsIndex(Persistent):
         
     def getName(self):
         return self._name
+        
+    def getCount(self):
+        return self._creationDateIndex.getNumberOfBookings()
 
     def indexBooking(self, booking):
         self._creationDateIndex.indexBooking(booking, booking.getCreationDateTimestamp())
@@ -162,6 +168,12 @@ class BookingsIndex(Persistent):
             self._confTitleIndex.unindexBooking(booking, BookingsIndex._conferenceToKeyTitle(conference))
             self._conferenceStartDateIndex.unindexBooking(booking, BookingsIndex._conferenceToKeyStartDate(conference))
         
+    def changeEventTitle(self, booking, oldTitle, newTitle):
+        conference = booking.getConference()
+        confId = conference.getId()
+        self._confTitleIndex.unindexBooking(booking, BookingsIndex._conferenceToKeyTitle(title = oldTitle, id = confId))
+        self._confTitleIndex.indexBooking(booking, conference, BookingsIndex._conferenceToKeyTitle(title = newTitle, id = confId))
+        
     def changeModificationDate(self, booking, oldDate, newDate):
         oldTimestamp = datetimeToUnixTimeInt(oldDate)
         newTimestamp = datetimeToUnixTimeInt(newDate)
@@ -180,23 +192,22 @@ class BookingsIndex(Persistent):
         conference = booking.getConference()
         conferenceId = booking.getConference().getId()
         
-        oldKey = oldTimestamp + '_' + conferenceId
-        newKey = newTimestamp + '_' + conferenceId 
+        oldKey = str(oldTimestamp) + '_' + conferenceId
+        newKey = str(newTimestamp) + '_' + conferenceId 
         
-        self._conferenceStartDateIndex.unindexBooking(booking, conference, oldKey)
+        self._conferenceStartDateIndex.unindexBooking(booking, oldKey)
         self._conferenceStartDateIndex.indexBooking(booking, conference, newKey)
         
     def getBookingsByDate(self, viewBy, fromDate = None, toDate = None, tz = 'UTC',
-                                conferenceId = None, categoryId = None, pickle = False, dateFormat = None):
+                                conferenceId = None, categoryId = None, dateFormat = None):
         index = self._getIndexByName(viewBy)
-        return index.getBookingsBetween(fromDate, toDate, tz, conferenceId, categoryId, pickle, dateFormat)
+        return index.getBookingsBetween(fromDate, toDate, tz, conferenceId, categoryId, dateFormat)
     
     def getBookingsByConfTitle(self, fromTitle = None, toTitle = None,
-                                     conferenceId = None, categoryId = None, pickle = False, tz = 'UTC'):
-        return self._confTitleIndex.getBookings(fromTitle, toTitle, conferenceId, categoryId, pickle, tz)
+                                     conferenceId = None, categoryId = None):
+        return self._confTitleIndex.getBookings(fromTitle, toTitle, conferenceId, categoryId)
     
-    def getBookingsByConfDate(self, fromDate = None, toDate = None,
-                                    conferenceId = None, categoryId = None, pickle = False, tz = 'UTC'):
+    def getBookingsByConfDate(self, fromDate = None, toDate = None, conferenceId = None, categoryId = None):
         if fromDate:
             minKey = str(datetimeToUnixTimeInt(fromDate))
         else:
@@ -205,7 +216,7 @@ class BookingsIndex(Persistent):
             maxKey = str(datetimeToUnixTimeInt(toDate)) + 'a' # because '_' < 'a' is True
         else:
             maxKey = None
-        return self._confTitleIndex.getBookings(minKey, maxKey, conferenceId, categoryId, pickle, tz)
+        return self._conferenceStartDateIndex.getBookings(minKey, maxKey, conferenceId, categoryId)
     
     def dump(self):
         return {"creationDate": self._creationDateIndex.dump(),
@@ -220,8 +231,11 @@ class BookingsIndex(Persistent):
         return getattr(self, '_'+indexName+'Index')
     
     @classmethod
-    def _conferenceToKeyTitle(cls, conference):
-        return conference.getTitle().lower() + '_' + conference.getId()
+    def _conferenceToKeyTitle(cls, conference = None, title = None, id = None):
+        if conference:
+            return conference.getTitle().lower() + '_' + conference.getId()
+        else:
+            return title.lower() + '_' + id
     
     @classmethod
     def _conferenceToKeyStartDate(cls, conference):
@@ -278,17 +292,18 @@ class BookingDateIndex(Persistent):
             else:
                 del self._tree[k]
     
-    def getBookingsBetween(self, fromDate, toDate, tz = 'UTC', conferenceId = None, categoryId = None, pickle = False, dateFormat = None):
+    def getBookingsBetween(self, fromDate, toDate, tz = 'UTC', conferenceId = None, categoryId = None, dateFormat = None):
         if fromDate:
             fromDate = datetimeToUnixTimeInt(fromDate)
         if toDate:
             toDate = datetimeToUnixTimeInt(toDate)
-        return self._getBookingsBetweenTimestamps(fromDate, toDate, tz, conferenceId, categoryId, pickle, dateFormat)
+        return self._getBookingsBetweenTimestamps(fromDate, toDate, tz, conferenceId, categoryId, dateFormat)
         
     def _getBookingsBetweenTimestamps(self, fromDate, toDate,
-                                      tz = 'UTC', conferenceId = None, categoryId = None, pickle = False, dateFormat = None):
+                                      tz = 'UTC', conferenceId = None, categoryId = None, dateFormat = None):
         
         bookings = []
+        nBookings = 0
         
         date = None
         bookingsForDate = None
@@ -298,10 +313,8 @@ class BookingDateIndex(Persistent):
             
             if date != currentDate:
                 if date is not None and bookingsForDate:
-                    if pickle:
-                        bookings.append((datetime.strftime(date, dateFormat), DictPickler.pickle(bookingsForDate, tz)))
-                    else:
-                        bookings.append((date, bookingsForDate))
+                    bookings.append((datetime.strftime(date, dateFormat), bookingsForDate))
+                    nBookings += len(bookingsForDate)
                 date = currentDate
                 bookingsForDate = []
             
@@ -318,25 +331,10 @@ class BookingDateIndex(Persistent):
                 bookingsForDate.extend(s)
             
         if date is not None and bookingsForDate:
-            if pickle:
-                bookings.append((datetime.strftime(date, dateFormat), DictPickler.pickle(bookingsForDate, tz)))
-            else:
-                bookings.append((date, bookingsForDate))
+            bookings.append((datetime.strftime(date, dateFormat), bookingsForDate))
+            nBookings += len(bookingsForDate)
                 
-        return bookings
-    
-    def getBookingListBetween(self, fromDate, toDate, categoryId = None):
-        if fromDate:
-            fromDate = datetimeToUnixTimeInt(fromDate)
-        if toDate:
-            fromDate = datetimeToUnixTimeInt(toDate)
-        return BookingsIndex._getBookingListBetweenTimestamps(fromDate, toDate)
-    
-    def _getBookingListBetweenTimestamps(self, fromDate, toDate):
-        bookings = []
-        for s in self._tree.itervalues(fromDate, toDate):
-            bookings.extend(s)
-        return bookings
+        return bookings, nBookings
                 
     def dump(self):
         return [(k, [_bookingToDump(b) for b in s]) for k, s in self._tree.iteritems()]
@@ -390,46 +388,35 @@ class BookingConferenceIndex(Persistent):
             else:
                 del self._tree[k]
      
-    def getBookings(self, fromTitle = None, toTitle = None, conferenceId = None, categoryId = None, pickle = False, tz = 'UTC'):
+    def getBookings(self, fromTitle = None, toTitle = None, conferenceId = None, categoryId = None):
         
         if fromTitle:
             fromTitle = fromTitle.lower()
         if toTitle:
             toTitle = toTitle.lower()
         
+        result = []
+        nBookings = 0
+        
         if conferenceId:
-            result = []
-            if pickle:
-                for k, (conference, s) in self._tree.iteritems(fromTitle, toTitle):
-                    if conference.getId() == conferenceId:
-                        result.append((DictPickler.pickle(conference, tz), DictPickler.pickle(s, tz)))
-            else:
-                for k, (conference, s) in self._tree.iteritems(fromTitle, toTitle):
-                    if conference.getId() == conferenceId:
-                        result.append((k, (conference,s)))
-            return result
+            for conference, s in self._tree.itervalues(fromTitle, toTitle):
+                if conference.getId() == conferenceId:
+                    result.append((conference,s))
+                    nBookings += len(s)
             
         elif categoryId:
             cc = CategoryChecker(categoryId)
-            result = []
-            if pickle:
-                for k, (conference, s) in self._tree.iteritems(fromTitle, toTitle):
-                    if cc.check(conference):
-                        result.append((DictPickler.pickle(conference, tz), DictPickler.pickle(s, tz)))
-            else:
-                for k, (conference, s) in self._tree.iteritems(fromTitle, toTitle):
-                    if cc.check(conference):
-                        result.append((k, (conference,s)))
-            return result
+            for conference, s in self._tree.itervalues(fromTitle, toTitle):
+                if cc.check(conference):
+                    result.append((conference,s))
+                    nBookings += len(s)
                     
         else:
-            if pickle:
-                return [((DictPickler.pickle(conference), DictPickler.pickle(s))) for k, (conference, s) in self._tree.iteritems(fromTitle, toTitle)]
-            else:
-                return list(self._tree.iteritems(fromTitle, toTitle))
-            
-    def getBookingsIterator(self, fromTitle = None, toTitle = None):
-        return self.iteritems(fromTitle, toTitle)
+            for conference, s in self._tree.itervalues(fromTitle, toTitle):
+                result.append((conference,s))
+                nBookings += len(s)
+                    
+        return result, nBookings
                 
     def dump(self):
         return [(k, [_bookingToDump(b) for b in s[1]]) for k, s in self._tree.iteritems()]
@@ -541,6 +528,34 @@ class IndexInformation(Persistent):
                         str(self._hasShowOnlyPending),
                         "</strong>"
                         ])
+        
+class QueryResult(object):
+    def __init__(self, results, nBookings, nGroups, totalInIndex, nPages):
+        self._results = results
+        self._nBookings = nBookings
+        self._nGroups = nGroups
+        self._totalInIndex = totalInIndex
+        self._nPages = nPages
+        
+    @Retrieves(['MaKaC.plugins.Collaboration.indexes.QueryResult'], 'results', isPicklableObject = True)
+    def getResults(self):
+        return self._results
+    
+    @Retrieves(['MaKaC.plugins.Collaboration.indexes.QueryResult'], 'nBookings')
+    def getNumberOfBookings(self):
+        return self._nBookings
+    
+    @Retrieves(['MaKaC.plugins.Collaboration.indexes.QueryResult'], 'nGroups')
+    def getNumberOfGroups(self):
+        return self._nGroups
+    
+    @Retrieves(['MaKaC.plugins.Collaboration.indexes.QueryResult'], 'totalInIndex')
+    def getTotalInIndex(self):
+        return self._totalInIndex
+    
+    @Retrieves(['MaKaC.plugins.Collaboration.indexes.QueryResult'], 'nPages')
+    def getNPages(self):
+        return self._nPages
     
     
 def _bookingToDump(booking):

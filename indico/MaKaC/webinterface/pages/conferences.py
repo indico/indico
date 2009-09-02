@@ -272,6 +272,13 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
                 
                 if self._conf in awUser.getLinkedTo()["conference"]["referee"]:
                     self._assignContribOpt.setVisible(True)
+    
+        #collaboration related
+        self._collaborationOpt = self._sectionMenu.getLinkByName("collaboration")
+        self._collaborationOpt.setVisible(False)
+        csbm = self._conf.getCSBookingManager()
+        if csbm is not None and csbm.hasBookings() and csbm.isCSAllowed():
+            self._collaborationOpt.setVisible(True)         
             
 
     def _defineToolBar(self):
@@ -2110,15 +2117,21 @@ class WPConferenceModifBase( main.WPMainBase ):
         self._sideMenu.addSection(self._advancedOptionsSection)
         
         
+        wf = self._rh.getWebFactory()
+        if wf:
+            wf.customiseSideMenu( self )
 
         #we decide which side menu item appear and which don't
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCAbstractManager, RCReviewingStaff
+        from MaKaC.webinterface.rh.collaboration import RCVideoServicesManager
         
+        user = self._rh.getAW().getUser()
         canModify = self._conf.canModify(self._rh.getAW())
         isReviewingStaff = RCReviewingStaff.hasRights(self._rh)
         isPRM = RCPaperReviewManager.hasRights(self._rh)
         isAM = RCAbstractManager.hasRights(self._rh)
-        isRegistrar = self._conf.canManageRegistration(self._rh.getAW().getUser())
+        isRegistrar = self._conf.canManageRegistration(user)
+        isAnyCollaborationPluginManager = RCVideoServicesManager.hasRights(self._rh, 'any')
         
         if not canModify:
             self._generalSettingsMenuItem.setVisible(False)
@@ -2126,7 +2139,6 @@ class WPConferenceModifBase( main.WPMainBase ):
             self._materialMenuItem.setVisible(False)
             self._programMenuItem.setVisible(False)
             self._participantsMenuItem.setVisible(False)
-            self._videoServicesMenuItem.setVisible(False)
             self._listingsMenuItem.setVisible(False)
             self._layoutMenuItem.setVisible(False)
             self._ACMenuItem.setVisible(False)
@@ -2151,6 +2163,9 @@ class WPConferenceModifBase( main.WPMainBase ):
         else: #reviewing tab is enabled
             if isReviewingStaff and not canModify:
                 self._reviewingMenuItem.setVisible(True)
+                
+        if not (canModify or isAnyCollaborationPluginManager):
+            self._videoServicesMenuItem.setVisible(False)
         
             
         #tabs forced to be disabled for now
@@ -2159,10 +2174,6 @@ class WPConferenceModifBase( main.WPMainBase ):
         # make sure that the section evaluation is always activated
         # for all conferences
         self._conf.enableSection("evaluation")
-        
-        wf = self._rh.getWebFactory()
-        if wf:
-            wf.customiseSideMenu( self )
 
     def _setActiveSideMenuItem( self ):
         pass

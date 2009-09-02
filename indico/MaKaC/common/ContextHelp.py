@@ -220,7 +220,7 @@ class ContextHelp:
             self.__trace = []
             self.__html = ""
         
-            self.__translation = {'text':'span',
+            self.__translation = {'text':('div', 'padding: 3px;'),
                                   'em':'em',
                                   'strong':'strong',
                                   'important':('span','font-weight: bold; color: red;'),

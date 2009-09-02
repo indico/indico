@@ -20,38 +20,94 @@ type("IWidget", [],
      });
 
 type("ListWidget", ["WatchObject", "IWidget"],
-     {
-         getId: function(){
-             return this.id;
-         },
+    {
+        getId: function(){
+            return this.id;
+        },
 
-         draw: function() {
-             var self = this;
+        draw: function() {
+            var self = this;
 
-             self.domList = Html.ul(self.listCssClass);
+            self.domList = Html.ul(self.listCssClass);
 
-             return this.IWidget.prototype.draw.call(
-                 this,
-                 $B(self.domList, self,
+            return this.IWidget.prototype.draw.call(
+                this,
+                $B(self.domList, self,
                     function(pair) {
                         return Html.li({id: self.id + '_' + pair.key},
                                        self._drawItem(pair));
-                    }));
-         },
+                   }));
+        },
 
-         _drawItem: function(pair) {
-             // Function to be overloaded by inheriting classes
-             // pair is a key, value pair that can be retrieved with pair.key, pair.get()
-             return '';
-         }
-     },
+        _drawItem: function(pair) {
+            // Function to be overloaded by inheriting classes
+            // pair is a key, value pair that can be retrieved with pair.key, pair.get()
+            return '';
+        }
+    },
 
-     function(listCssClass) {
-         this.WatchObject();
-         this.id = Html.generateId();
-         this.listCssClass = listCssClass;
-     }
-    );
+    function(listCssClass) {
+        this.WatchObject();
+        this.id = Html.generateId();
+        this.listCssClass = listCssClass;
+    }
+);
+
+type("SelectableListWidget", ["ListWidget"],
+    {
+        _getSelectedList: function() {
+            return this.selectedList;
+        },
+        draw: function() {
+            var self = this;
+
+            self.domList = Html.ul(self.listCssClass);
+
+            return this.IWidget.prototype.draw.call(
+                this,
+                $B(self.domList, self,
+                    function(pair) {
+                        var listItem = Html.li({id: self.id + '_' + pair.key}, self._drawItem(pair));
+                        if (pair.get().get("unselectable") === true) {
+                            listItem.dom.className += ' unselectable';
+                        } else {
+                            listItem.observeClick(function(){
+                                if (exists(self.selectedList.get(pair.key))) {
+                                    self.selectedList.set(pair.key, null);
+                                    listItem.dom.className = self.unselectedCssClass;
+                                } else {
+                                    self.selectedList.set(pair.key, pair.get());
+                                    listItem.dom.className = self.selectedCssClass;
+                                }
+                                self.selectedObserver(self.selectedList);
+                            });
+                        }
+                        return listItem;
+                   }));
+        },
+        _drawItem: function(pair) {
+            // Function to be overloaded by inheriting classes
+            // pair is a key, value pair that can be retrieved with pair.key, pair.get()
+            return '';
+        }
+    },
+    function (selectedObserver, listCssClass, selectedCssClass, unselectedCssClass) {
+        this.selectedList = $O();
+        this.selectedObserver = selectedObserver;
+        if (exists (selectedCssClass)) {
+            alert(selectedCssClass)
+            this.selectedCssClass = selectedCssClass;
+        } else {
+            this.selectedCssClass = "selectedListItem";
+        }
+        if (exists (unselectedCssClass)) {
+            this.unselectedCssClass = unselectedCssClass;
+        } else {
+            this.unselectedCssClass = "unselectedListItem";
+        }
+        this.ListWidget(listCssClass);
+    }
+);
 
 type("TabWidget", ["Chooser", "IWidget"],{
     _titleTemplate: function(text) {
@@ -293,6 +349,21 @@ type("TabWidget", ["Chooser", "IWidget"],{
         }
         // Make sure arrow is visible
         bg.dom.style.display = 'block';
+    },
+    
+    /**
+     * Returns the string with the title of the currently selected tab
+     */
+    getSelectedTab: function() {
+        return this.selected.get();
+    },
+    
+    /**
+     * Changed the currently selected tab
+     * @param {string} newSelectedTab The name of the new tab to be selected
+     */
+    setSelectedTab: function(newSelectedTab){
+        this.selected.set(newSelectedTab);
     }
 },
 

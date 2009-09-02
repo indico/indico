@@ -102,6 +102,14 @@ class RoomBase( object ):
         allFast - Bool, defaults to False. If True, ALL active rooms will be returned 
             in ultra fast way, REGARDLESS of all other options.
         ownedBy - Avatar
+        customAtts - for rooms with custom attributes.
+                     rooms with no .customAtts attributes will be filtered out if this parameter is present
+                     The customAtts attribute should be a list of dictionaries with the attributes "name", "allowEmpty", "filter".
+                     "name" -> the name of the custom attribute
+                     "allowEmpty" -> if we allow the custom attribute to be empty or not (empty = "" or string with only whitespaces)
+                     "filter" -> a function to which we will pass the value of the custom attribute and has to return True or False.
+                     If there is more than 1 dictionary in the list, it will be like doing an AND of the conditions they represent.
+                     (see example 6)
         
         Examples:
 
@@ -134,6 +142,10 @@ class RoomBase( object ):
         # 5. Get room 'AT AMPHITHEATRE'
 
         oneRoom = RoomBase.getRooms( roomName = 'AT AMPHITHEATRE' )
+        
+        #6. Get rooms with a H.323 IP defined
+        rooms = RoomBase.getRooms ( customAtts = [{"name":'H323 IP', "allowEmpty":False,
+                                                   "filter": (lambda ip: validIP(ip))}])
         """
         # Simply redirect to the plugin
         from MaKaC.rb_factory import Factory

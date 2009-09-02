@@ -18,6 +18,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+import sys
 
 """ This purpose of this file is low-level handling of plugins.
     It has functions to find the folder structure of the plugins, load them into memory, etc.
@@ -29,7 +30,7 @@ import MaKaC
 
 from MaKaC.errors import MaKaCError, PluginError
 
-basePath = os.path.split(MaKaC.__path__[0])[0]
+basePath = os.path.normpath(os.path.split(MaKaC.__path__[0])[0])
 
 def importName(modulename, name):
     """ Import a named object from a module in the context of this function,
@@ -91,14 +92,18 @@ class Plugins:
 
     @classmethod
     def changePath(cls):
-        from MaKaC import plugins
-        cls.path = plugins.__path__[0]
+        cls.path = sys.modules[__name__].__path__[0]
         
         if os.path.isabs(cls.path):
             cls.path = absToRelative(cls.path,basePath)
+        else:
+            cls.path = cls.path[len(basePath):]
+            
         cls.oldPath = os.getcwd()
+
+        
         if os.path.split(MaKaC.__path__[0])[0]:
-            os.chdir(os.path.split(MaKaC.__path__[0])[0])
+            os.chdir(os.path.normpath(os.path.split(MaKaC.__path__[0])[0]))
             
     @classmethod
     def restorePath(cls):
