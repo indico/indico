@@ -625,6 +625,7 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
              this.disableInput();
              this.list.clear();
              this.list.update(list);
+             this.list.sort(SortCriteria.Integer);
              this.freeMode.set(false);
 
              var self = this;
@@ -681,7 +682,8 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
 
          this.notificationField = Html.div({style:{color: '#AAAAAA', position:'absolute', top: '0px', left: '5px'}});
 
-         this.list = $O(list);
+         this.list = $D(list);
+         this.list.sort(SortCriteria.Integer);
 
          var self = this;
 
