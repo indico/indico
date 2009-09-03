@@ -208,7 +208,7 @@ class ConferenceScheduleAddSession(conferenceServices.ConferenceModifBase, Locat
 
         slot = conference.SessionSlot(session)
 
-        slot.setTitle(self._subtitle)
+        slot.setTitle(self._subtitle or "")
         slot.setStartDate(session.getStartDate())
 
         tz = pytz.timezone(self._conf.getTimezone())
