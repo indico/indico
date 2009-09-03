@@ -5,7 +5,7 @@
 
 extend(IndicoUI.Dialogs,
        {
-           addSession: function(method, timeStartMethod, args, roomInfo, parentRoomInfo, dayStartDate, successFunc){
+           addSession: function(method, timeStartMethod, args, roomInfo, parentRoomInfo, dayStartDate, favoriteRooms, successFunc){
 
                var parameterManager = new IndicoUtil.parameterManager();
                var favorites;
@@ -94,7 +94,7 @@ extend(IndicoUI.Dialogs,
                            info.set('roomInfo', $O(roomInfo));
 
 
-                           roomEditor = new RoomBookingWidget(Indico.Data.Locations, info.get('roomInfo'), parentRoomInfo, true, args.conference);
+                           roomEditor = new RoomBookingWidget(Indico.Data.Locations, info.get('roomInfo'), parentRoomInfo, true, favoriteRooms);
 
                            cancelButton.observeClick(function(){
                                self.close();
@@ -186,7 +186,7 @@ extend(IndicoUI.Dialogs,
         * @param {String} dayStartDate A string representing the date of the day the
         *        calendar is currently pointing to (DD/MM/YYYY)
         */
-           addSessionSlot: function(method, timeStartMethod, params, roomInfo, parentRoomInfo, confStartDate, dayStartDate, successFunc, editOn){
+           addSessionSlot: function(method, timeStartMethod, params, roomInfo, parentRoomInfo, confStartDate, dayStartDate, favoriteRooms, successFunc, editOn){
                var parameterManager = new IndicoUtil.parameterManager();
                var isEdit = exists(editOn)?editOn:false;
                var args = isEdit?params:params.args
@@ -295,14 +295,11 @@ extend(IndicoUI.Dialogs,
                                info.set('roomInfo', $O({location: null, room: null}));
                            }
 
-
-                           alert(Json.write(info.get('roomInfo')));
-
                            roomEditor = new RoomBookingWidget(Indico.Data.Locations,
                                                               info.get('roomInfo'),
                                                               parentRoomInfo,
                                                               nullRoomInfo(info.get('roomInfo')),
-                                                              args.conference);
+                                                              favoriteRooms);
 
 
                            cancelButton.observeClick(function(){

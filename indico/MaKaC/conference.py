@@ -3234,6 +3234,14 @@ class Conference(Persistent):
         """
         return self.places
 
+    @Retrieves(['MaKaC.conference.Conference'], 'favoriteRooms')
+    def getFavoriteRooms(self):
+        roomList = []
+        roomList.extend(self.getRoomList())
+        roomList.extend(map(lambda x: x._getName(), self.getBookedRooms()))
+
+        return roomList
+
     def addLocation(self, newPlace):
         self.places.append( newPlace )
         self.notifyModification()

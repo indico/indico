@@ -27,6 +27,10 @@ while topcat:
 visibilityList[999] = 'Everywhere'     
 
 numRows = 12
+
+
+favoriteRooms = confObj.getFavoriteRooms();
+
 %>
 <div class="groupTitle"><%= _("General Settings")%></div>
 
@@ -263,7 +267,7 @@ $E('inPlaceEditLocation').set([
     IndicoUI.Widgets.roomParamsShow,
     function(target, source){
         var info = $O(source.get().getAll());
-        var rbWidget = new RoomBookingWidget(Indico.Data.Locations, info, null, nullRoomInfo(info));
+        var rbWidget = new RoomBookingWidget(Indico.Data.Locations, info, null, nullRoomInfo(info), <%= favoriteRooms %>);
 	target.set(rbWidget.draw())
         return {
 	  activate: function(){},

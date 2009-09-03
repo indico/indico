@@ -29,10 +29,10 @@
   IndicoUI.executeOnLoad(function() {
 
   <% if self._rh._target and not isinstance(self._rh._target, MaKaC.conference.Category): %>
-    <% eventFavorites = self._rh._target.getConference().getId() %>
+    <% eventFavorites = self._rh._target.getConference().getFavoriteRooms() %>
   <% end %>
   <% else: %>
-    <% eventFavorites = 'false' %>
+    <% eventFavorites = [] %>
   <% end %>
   
   var rbWidget = new RoomBookingWidget(Indico.Data.Locations, info, parentEvt, nullRoomInfo(info), <%= eventFavorites %>);

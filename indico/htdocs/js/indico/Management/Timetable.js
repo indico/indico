@@ -168,7 +168,7 @@ type("AddContributionDialog", ["ExclusivePopup", "PreLoadHandler"],
          }
      },
      function(method, timeStartMethod, args, roomInfo, parentRoomData,
-              confStartDate, dayStartDate, isConference, successFunc) {
+              confStartDate, dayStartDate, isConference, favoriteRooms, successFunc) {
          var self = this;
 
          this.newArgs = Array.prototype.slice.call(arguments, 0);
@@ -259,7 +259,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
 
         info.set('roomInfo', $O(self.roomInfo));
 
-        this.roomEditor = new RoomBookingWidget(Indico.Data.Locations, info.get('roomInfo'), self.parentRoomData, true, self.args.conference);
+        this.roomEditor = new RoomBookingWidget(Indico.Data.Locations, info.get('roomInfo'), self.parentRoomData, true, self.favoriteRooms);
 
         var presListWidget = new UserListField(
             'VeryShortPeopleListDiv', 'PluginPeopleList',
@@ -412,7 +412,8 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
      /**
       * @param timeStartMethod rpc_method_name if this parameter is null, the date will not be shown in the form.
       */
-     function(method, timeStartMethod, args, roomInfo, parentRoomData, confStartDate, dayStartDate, isConference, successFunc) {
+     function(method, timeStartMethod, args, roomInfo, parentRoomData,
+              confStartDate, dayStartDate, isConference, favoriteRooms, successFunc) {
          this.args = clone(args);
 
          this.dateArgs = clone(args);
@@ -426,6 +427,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
          this.existing = existing;
          this.isConference = isConference;
          this.successFunc = successFunc;
+         this.favoriteRooms = favoriteRooms;
 
          if (this.timeStartMethod === null) {
              this.dateTimeField = IndicoUI.Widgets.Generic.durationField(20);
@@ -551,7 +553,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                                                      this.info.get('roomInfo'),
                                                      this.parentRoomInfo,
                                                      nullRoomInfo(this.info.get('roomInfo')),
-                                                     this.info.get('conference'));
+                                                     this.favoriteRooms);
 
              cancelButton.observeClick(function(){
                  self.close();
@@ -614,12 +616,13 @@ type("AddBreakDialog", ["ChangeEditDialog"],
          }
      },
 
-     function(managementActions, args, parentRoomInfo, isEdit){
+     function(managementActions, args, parentRoomInfo, isEdit, favoriteRooms){
          var self = this;
 
          this.managementActions = managementActions;
          this.isEdit = isEdit;
          this.parentRoomInfo = parentRoomInfo;
+         this.favoriteRooms = favoriteRooms;
          this.dateTimeField = IndicoUI.Widgets.Generic.dateDurationField('', 20, ' ');
          this.originalArgs = {};
          each(keys(args), function(key) {

@@ -223,7 +223,7 @@ type("TimetableManagementActions", [], {
         // TODO: implement reschedule function
         var href = Indico.Urls.Reschedule;
         var rescheduleLink = Html.a({style: {margin: '0 15px'}}, Html.span({style: {cursor: 'default', color: '#888'}}, 'Reschedule'));
-        
+
         var underConstr = function(event) {
             IndicoUI.Widgets.Generic.tooltip(this, event,"This option will be available soon");
         };
@@ -299,7 +299,7 @@ type("TimetableManagementActions", [], {
             room: session.room,
             address: session.address
         };
-        
+
         params.sessionConveners = session.sessionConveners;
 
         // If sessionId exists then use that value, otherwise just use the id
@@ -335,6 +335,7 @@ type("TimetableManagementActions", [], {
             params.startDate,
             params.selectedDay,
             this.eventInfo.isConference,
+            this.eventInfo.favoriteRooms,
             function(result) { self._addEntries(result); });
 
         dialog.execute();
@@ -354,7 +355,8 @@ type("TimetableManagementActions", [], {
             this,
             $O(params),
             $O(params.roomInfo),
-            false);
+            false,
+            this.eventInfo.favoriteRooms);
 
         dialog.execute();
     },
@@ -377,18 +379,19 @@ type("TimetableManagementActions", [], {
         each(eventData, function(value, key) {
             args.set(key, value);
         });
-        
-        args.set('type', params.type)
+
+        args.set('type', params.type);
         args.set('startDate', IndicoUtil.formatDateTime(IndicoUtil.parseJsonDate(eventData.startDate)));
         args.set('roomInfo',$O({"location": eventData.inheritLoc?null:eventData.location,
                                 "room": eventData.inheritRoom?null:eventData.room,
                                 "address": eventData.inheritLoc?'':eventData.address}));
 
         var editDialog = new AddBreakDialog(
-                this, 
-                args, 
-                $O(params.roomInfo), 
-                true);
+            this,
+            args,
+            $O(params.roomInfo),
+            true,
+            this.eventInfo.favoriteRooms);
         editDialog.open();
 
     },
@@ -405,6 +408,7 @@ type("TimetableManagementActions", [], {
             params.roomInfo,
             $O(params.roomInfo),
             params.selectedDay,
+            this.eventInfo.favoriteRooms,
             function(result) { self._updateEntry(result); });
     },
     addSessionSlot: function(session) {
@@ -414,23 +418,24 @@ type("TimetableManagementActions", [], {
         params.parentType = 'Session';
 
         IndicoUI.Dialogs.addSessionSlot(
-                this.methods[params.type].add,
-                this.methods['Event'].dayEndDate,
-                params,
-                params.roomInfo,
-                $O(params.roomInfo),
-                params.startDate,
-                params.selectedDay,
-                function(result) { self._updateEntry(result); }
+            this.methods[params.type].add,
+            this.methods.Event.dayEndDate,
+            params,
+            params.roomInfo,
+            $O(params.roomInfo),
+            params.startDate,
+            params.selectedDay,
+            this.eventInfo.favoriteRooms,
+            function(result) { self._updateEntry(result); }
         );
     },
-    
+
     editSessionSlot: function(eventData) {
         var self = this;
 
         var params = this._addToSessionParams(eventData, 'SessionSlot');
         params.parentType = 'Session';
-        
+
         each(eventData, function(value, key) {
             params[key] = value;
         });
@@ -439,20 +444,21 @@ type("TimetableManagementActions", [], {
         });
 
         IndicoUI.Dialogs.addSessionSlot(
-                this.methods[params.type].edit,
-                this.methods['Event'].dayEndDate,
-                params,
-                params.roomInfo,
-                $O(params.roomInfo),
-                params.startDate,
-                params.selectedDay,
-                function(result) { self._updateEntry(result); },
-                true
+            this.methods[params.type].edit,
+            this.methods.Event.dayEndDate,
+            params,
+            params.roomInfo,
+            $O(params.roomInfo),
+            params.startDate,
+            params.selectedDay,
+            this.eventInfo.favoriteRooms,
+            function(result) { self._updateEntry(result); },
+            true
         );
     },
-    
+
     /*
-     * 
+     *
      * Is called every time a timetable entry has been successfully
      * added or updated. Updates and redraws the timetable.
      * @param originalArgs this are the original args. If they are passed, we can remove the entry
@@ -466,17 +472,17 @@ type("TimetableManagementActions", [], {
         if (this.session !== null) {
             this.savedData[result.day][this.session.id].entries[result.entry.id] = result.entry;
         }
-        
-        /* 
+
+        /*
          * if originalArgs is passed, we can check if there is a need for updating the index of entries.
          */
         if (exists(originalArgs)) {
-            
-            if (originalArgs && 
+
+            if (originalArgs &&
                 (originalArgs.startDate.date != result.entry.startDate.date) ||
                 (originalArgs.startDate.time != result.entry.startDate.time) ||
                 (originalArgs.duration != result.entry.duration)) {
-                
+
                 /*this.timetable.postDraw();*/
                 var prevDay = IndicoUtil.formatDate2(IndicoUtil.parseDateTime(originalArgs.startDate));
                 delete data[prevDay][result.id];
