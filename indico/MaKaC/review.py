@@ -546,9 +546,9 @@ class AbstractFieldsMgr(Persistent):
 
     def _initFields(self):
         d=[]
-        su=AbstractField("content","Content", _("Abstract content"),0,True)
+        su=AbstractField("content",_("Content"), _("Abstract content"),0,True)
         d.append(su)
-        su=AbstractField("summary","Summary", _("Summary"),0)
+        su=AbstractField("summary",_("Summary"), _("Summary"),0)
         d.append(su)
         return d
 

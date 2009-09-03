@@ -1000,7 +1000,7 @@ class WPModEditData(WPAbstractManagment):
         wc=wcomponents.WConfModAbstractEditData(self._target.getConference(),self._abstractData)
         p={"postURL": urlHandlers.UHAbstractModEditData.getURL(self._abstract)}
         return _("""
-            <table width="95%%" cellpadding="0" cellspacing="0" align="center" border="0" style="border-left: 1px solid #777777">
+            <table width="95%%" cellpadding="0" cellspacing="0" align="center" border="0">
             <tr>
             <td class="groupTitle">
                         _("Editing an abstract")

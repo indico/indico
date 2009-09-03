@@ -2075,6 +2075,10 @@ class WPConferenceModifBase( main.WPMainBase ):
             urlHandlers.UHConfModifProgram.getURL( self._conf ))
         self._generalSection.addItem( self._programMenuItem)
 
+        self._reviewingMenuItem = wcomponents.SideMenuItem(_("Reviewing"),
+            urlHandlers.UHConfModifReviewingAccess.getURL( target = self._conf ) )
+        self._generalSection.addItem( self._reviewingMenuItem)        
+        
         self._abstractMenuItem = wcomponents.SideMenuItem(_("Abstracts"),
             urlHandlers.UHConfAbstractManagment.getURL( self._conf ))
         self._generalSection.addItem( self._abstractMenuItem)
@@ -2122,13 +2126,13 @@ class WPConferenceModifBase( main.WPMainBase ):
             urlHandlers.UHConfModifAC.getURL( self._conf ) )
         self._advancedOptionsSection.addItem( self._ACMenuItem)
 
-        self._reviewingMenuItem = wcomponents.SideMenuItem(_("Reviewing"),
-            urlHandlers.UHConfModifReviewingAccess.getURL( target = self._conf ) )
-        self._advancedOptionsSection.addItem( self._reviewingMenuItem)
-
         self._toolsMenuItem = wcomponents.SideMenuItem(_("Tools"),
             urlHandlers.UHConfModifTools.getURL( self._conf ) )
         self._advancedOptionsSection.addItem( self._toolsMenuItem)
+            
+        self._layoutMenuItem = wcomponents.SideMenuItem(_("Layout"),
+            urlHandlers.UHConfModifDisplay.getURL(self._conf))
+        self._advancedOptionsSection.addItem( self._layoutMenuItem)
 
         self._logMenuItem = wcomponents.SideMenuItem(_("Logs"),
             urlHandlers.UHConfModifLog.getURL( self._conf ) )
@@ -5830,7 +5834,7 @@ class NotifTplConditionWrapper:
 class NotifTplCondAcceptedWrapper(NotifTplConditionWrapper):
 
     _id="accepted"
-    _label= "in status ACCEPTED"
+    _label= _("in status ACCEPTED")
     _klass=review.NotifTplCondAccepted
 
     @classmethod
@@ -5853,7 +5857,7 @@ class NotifTplCondAcceptedWrapper(NotifTplConditionWrapper):
 class NotifTplCondRejectedWrapper(NotifTplConditionWrapper):
 
     _id="rejected"
-    _label= "in status REJECTED"
+    _label= _("in status REJECTED")
     _klass=review.NotifTplCondRejected
 
     @classmethod
@@ -5863,7 +5867,7 @@ class NotifTplCondRejectedWrapper(NotifTplConditionWrapper):
 class NotifTplCondMergedWrapper(NotifTplConditionWrapper):
 
     _id="merged"
-    _label= "in status MERGED"
+    _label= _("in status MERGED")
     _klass=review.NotifTplCondMerged
 
     @classmethod

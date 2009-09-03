@@ -40,7 +40,7 @@
         </tr>
         <tr><td colspan="2">&nbsp;</td></tr>
         <tr align="center">
-            <td colspan="2" style="border-top:1px solid #777777;" valign="bottom" align="center">
+            <td colspan="2" style="border-bottom:1px solid #BBBBBB; padding-bottom: 5px;" valign="bottom" align="center">
                 <input type="submit" class="btn" name="OK" value="<%= _("submit")%>">
                 <input type="submit" class="btn" name="CANCEL" value="<%= _("cancel")%>">
             </td>

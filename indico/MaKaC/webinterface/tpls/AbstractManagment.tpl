@@ -1,8 +1,8 @@
 
-<table border="0" width="90%%" cellspacing="0" cellpadding="0">
+<table border="0" width="90%%" cellspacing="0" cellpadding="0" align="center">
     <tr>
         <td>
-            <table width="100%%" align="left" border="0" style="border-right:1px solid #777777">
+            <table width="100%%">
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Abstract ID")%></span></td>
                     <td bgcolor="white">%(abstractId)s</td>

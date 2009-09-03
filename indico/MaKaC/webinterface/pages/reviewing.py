@@ -59,7 +59,7 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
                     urlHandlers.UHConfModifReviewingAbstractSetup.getURL(target = self._conf) )
 
         if self._isPRM or self._isAM or self._canModify:
-            self._tabReviewingControl = self._tabCtrl.newTab( "revcontrol", "Control",\
+            self._tabReviewingControl = self._tabCtrl.newTab( "revcontrol", "Reviewing Team",\
                     urlHandlers.UHConfModifReviewingControl.getURL( self._conf ) )
 
         if self._showAssignContributions:

@@ -1,6 +1,6 @@
 
 <form method="POST" action="%(postURL)s">
-    <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
+    <table width="90%%" align="center"  style="border-bottom: 1px solid #BBBBBB;">
         <tr>
             <td class="groupTitle" colspan="2"> <%= _("Modify call for abstract data")%></td>
         </tr>
