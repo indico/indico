@@ -450,6 +450,14 @@ type("EnterObserverTextBox", ["IWidget", "WatchAccessor"],
 type("FlexibleSelect", ["IWidget", "WatchAccessor"],
      {
 
+         _decorate: function(key, elem) {
+             return this.decorator(key, elem);
+         },
+
+         _defaultDecorator: function(key, elem) {
+             return Html.li('bottomLine', elem);
+         },
+
          _drawOptions: function() {
 
              if (!this.optionBox) {
@@ -458,7 +466,7 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
                  this.optionList = Html.ul('optionBoxList');
 
                  var liAdd = Html.a({href: '#'},
-                     Html.li({style: {fontStyle: 'italic'}}, $T('Add a different one')));
+                     Html.span({style: {fontStyle: 'italic'}}, $T('Add a different one')));
 
                  liAdd.observeClick(function() {
                      self._startNew();
@@ -470,7 +478,7 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
                                                     },
                                              className: 'optionBox'},
                                            this.optionList,
-                                           Html.ul('optionBoxList', liAdd)
+                                           Html.div('optionBoxAdd', liAdd)
                                           );
 
                  var self = this;
@@ -478,8 +486,7 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
                  $B(this.optionList,
                     this.list,
                     function(elem) {
-
-                        var li = Html.li({}, elem.get());
+                        var li = self._decorate(elem.key, elem.get());
 
                         li.observeClick(function() {
                             self.set(elem.key);
@@ -625,7 +632,7 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
              this.disableInput();
              this.list.clear();
              this.list.update(list);
-             this.list.sort(SortCriteria.Integer);
+             this.list.sort(this.sortCriteria);
              this.freeMode.set(false);
 
              var self = this;
@@ -667,9 +674,12 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
          }
 
 
-     }, function(list, width) {
+     }, function(list, width, sortCriteria, decorator) {
 
          width = width || 150;
+
+         this.decorator = decorator || this._defaultDecorator;
+         this.sortCriteria =  sortCriteria || SortCriteria.Integer;
 
          this.value = new WatchValue();
          this.input = new RealtimeTextBox({style:{border: 'none', width: pixels(width)}});
@@ -683,7 +693,7 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
          this.notificationField = Html.div({style:{color: '#AAAAAA', position:'absolute', top: '0px', left: '5px'}});
 
          this.list = $D(list);
-         this.list.sort(SortCriteria.Integer);
+         this.list.sort(this.sortCriteria);
 
          var self = this;
 

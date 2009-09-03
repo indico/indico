@@ -10,6 +10,7 @@
    <% delURL=urlHandlers.UHConfModSessionRem.getURL(self._slot.getSession()) %>
 <% end %>
 
+
 <div style="height: 20px; width: 100%%;">
   <div style="width: 60px; float: right;" class="nonLinked">
     <div class="ttModifIcon" style="margin: 3px;" onclick="return sessionMenu($E(this), '<%= urlHandlers.UHSessionModification.getURL(self._slot.getSession()) %>', '<%= self._conf.id %>', '<%= self._slot.getSession().id %>', '<%= "%s#slot%s" % (str(urlHandlers.UHSessionModifSchedule.getURL(self._slot.getSession())),self._slot.getId()) %>');">
@@ -35,11 +36,10 @@
     <% end %>
   </p>
   <small class="ttMBlockExtraInfo">
-        <% if self._slot.getRoom() is not None and self._slot.getRoom().getName().strip()!="": %>
+        <% if (self._slot.getRoom() is not None) and (self._slot.getRoom().getName() != None) and (self._slot.getRoom().getName().strip()!=""): %>
           <%= self.htmlText("%s: " % self._slot.getRoom().getName()) %>
 	<% end %> 
 	<%= self.htmlText(self._slot.getAdjustedStartDate().strftime("%H:%M")) %>-<%= self.htmlText(self._slot.getAdjustedEndDate().strftime("%H:%M")) %></small>
-
   <% if self._slot.getSession().isClosed(): %>
     <strong>[ <a href="<%= urlHandlers.UHSessionOpen.getURL(self._slot.getSession()) %>"><%= _("reopen session")%></a> ]</strong>
   <% end %>

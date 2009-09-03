@@ -2112,8 +2112,7 @@ ul.UIUserEvtList li
 
 .favoriteItem
 {
-    background: #CDEB8B;
-    color: #36393D;
+    font-style: italic;
 }
 
 .UINavBar
@@ -5247,15 +5246,23 @@ div.disabled input[disabled] {
     overflow: auto;
 }
 
+.bottomLine {
+    border-bottom:1px dotted #DDDDDD;
+}
+
 .optionBoxList li {
     list-style-type: none;
     padding: 3px;
-    border-top:1px solid #DDDDDD;
     cursor: pointer;
 }
 
+.optionBoxAdd {
+    padding: 5px;
+    background: #F3F3F3;
+}
+
 .optionBoxList li:hover {
-    background-color: #ECECEC;
+    background-color: #FFF6DF;
 }
 
 .enhanced {

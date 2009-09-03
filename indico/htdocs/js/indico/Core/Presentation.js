@@ -258,6 +258,11 @@ extend(WatchList.prototype,
                var itemD = this.item(destination);
                this.replaceAt(source, itemD);
                this.replaceAt(destination, itemS);
+           },
+
+           sort: function(compare) {
+               compare = compare || SortCriteria.Default;
+               quicksort(this, 0, this.length.get()-1, compare);
            }
 
        });
@@ -269,8 +274,7 @@ type("WatchOrderedDict", ["WatchObject"],
          // remove() functions missing!
 
          sort: function(compare) {
-             compare = compare || SortCriteria.Default;
-             quicksort(this.order, 0, this.order.length.get()-1, compare);
+             this.order.sort(compare);
          }
      },
      function() {

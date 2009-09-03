@@ -2,6 +2,29 @@ type("RoomBookingWidget", ["IWidget"],
 
      {
 
+         _favoriteDecorator: function(key, elem){
+             var li = Html.li(this.eventFavorites.indexOf(key)===null?'bottomLine':
+                            'bottomLine favoriteItem', elem);
+
+             if (key == this.lastFavorite) {
+                 li.dom.style.borderBottom = '1px solid #909090';
+             }
+
+             return li;
+         },
+
+         _favoriteSort: function(e1, e2){
+             if (this.eventFavorites.indexOf(e1) !== null &&
+                 this.eventFavorites.indexOf(e2) === null) {
+                 return -1;
+             } else if (this.eventFavorites.indexOf(e1) === null &&
+                        this.eventFavorites.indexOf(e2) !== null) {
+                 return 1;
+             } else {
+                 return SortCriteria.Integer(e1, e2);
+             }
+         },
+
          postDraw: function() {
              if (this.parentInfo) {
                  this.inheritCheckbox.set(this.inheritDefault);
@@ -89,16 +112,25 @@ type("RoomBookingWidget", ["IWidget"],
          }
      },
      function(locations, info, parent, inheritDefault, eventFavorites) {
+         var self = this;
+
          this.locationChooser = new FlexibleSelect(locations, 75);
-         this.roomChooser = new FlexibleSelect({}, 120);
+         this.roomChooser = new FlexibleSelect({},
+                                               120,
+                                               function(e1, e2){ return self._favoriteSort(e1, e2); },
+                                               function(key, elem){ return self._favoriteDecorator(key, elem); });
          this.addressArea = new RealtimeTextArea({});
          this.inheritCheckbox = Html.checkbox({});
          this.info = info;
          this.parentInfo = parent;
          this.roomCache = {};
          this.inheritDefault = inheritDefault;
+         this.eventFavorites = $L(eventFavorites || []);
 
-         var self = this;
+         // compute last favorite
+         var fav = $L(this.eventFavorites.allItems());
+         fav.sort(SortCriteria.Integer);
+         this.lastFavorite = fav.item(fav.length.get() - 1);
 
          if (this.parentInfo) {
              this.inheritCheckbox.observe(function(value) {
