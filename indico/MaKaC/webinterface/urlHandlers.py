@@ -290,6 +290,14 @@ class UHConfModifAddMaterials( URLHandler ):
 
 # Free standing ==============================================================
 
+class UHRoomBookingMapOfRooms( URLHandler ):
+
+    def getURL( cls, returnURL="" ):
+        return "http://gs-dep.web.cern.ch/gs-dep/groups/SEM/ce/isp/conf_rooms/conf_rooms.html"
+    getURL = classmethod( getURL )
+    
+    
+
 class UHRoomBookingWelcome( URLHandler ):
     _relativeURL = "roomBooking.py"
 
