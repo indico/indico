@@ -39,7 +39,7 @@
 			</h1>
 			<xsl:if test="count(child::chair) != 0">
 				<h2>
-					by <xsl:apply-templates select="./chair"/>
+					chaired by <xsl:apply-templates select="./chair"/>
 				</h2>
 			</xsl:if>
 			
