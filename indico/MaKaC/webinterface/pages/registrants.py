@@ -1850,11 +1850,18 @@ class WConfRegistrantsList( wcomponents.WTemplated ):
 
     def _getRegistrantsHTML( self, reg ):
         fullName = reg.getFullName()
-        institution = reg.getInstitution()
-        email = reg.getEmail()
-        position = reg.getPosition()
-        city = reg.getCity()
-        country = CountryHolder().getCountryById(reg.getCountry())
+        institution = ""
+        if self._regForm.getPersonalData().getDataItem("institution").isEnabled():
+            institution = """<td valign="top" class="abstractDataCell">%s</td>"""%(self.htmlText(reg.getInstitution()) or "&nbsp;")
+        position = ""
+        if self._regForm.getPersonalData().getDataItem("position").isEnabled():
+            position = """<td valign="top" class="abstractDataCell">%s</td>"""%(self.htmlText(reg.getPosition()) or "&nbsp;")
+        city = ""
+        if self._regForm.getPersonalData().getDataItem("city").isEnabled():
+            city = """<td valign="top" class="abstractDataCell">%s</td>"""%(self.htmlText(reg.getCity()) or "&nbsp;")
+        country = ""
+        if self._regForm.getPersonalData().getDataItem("country").isEnabled():
+            country = """<td valign="top" class="abstractDataCell">%s</td>"""%(self.htmlText(CountryHolder().getCountryById(reg.getCountry())) or "&nbsp;") 
         sessions=""
         if self._regForm.getSessionsForm().isEnabled():
             sessionList = [] 
@@ -1865,16 +1872,16 @@ class WConfRegistrantsList( wcomponents.WTemplated ):
         html = """
             <tr>
                 <td valign="top" nowrap class="abstractLeftDataCell">%s</td>
-                <td valign="top" class="abstractDataCell">%s</td>
-                <td valign="top" class="abstractDataCell">%s</td>
-                <td valign="top" class="abstractDataCell">%s</td>
-                <td valign="top" class="abstractDataCell">%s</td>
+                %s
+                %s
+                %s
+                %s
                 %s
             </tr>
                 """%(self.htmlText(fullName),
-                    self.htmlText(institution) or "&nbsp;",
-                    self.htmlText(position) or "&nbsp;", self.htmlText(city) or "&nbsp;",
-                    self.htmlText(country) or "&nbsp;",
+                    institution,
+                    position, city,
+                    country,
                     sessions)
         return html
 
@@ -1937,6 +1944,7 @@ class WConfRegistrantsList( wcomponents.WTemplated ):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
+        vars["regForm"]= self._regForm
         l=[]
         lr=self._conf.getRegistrantsList(True)
         f = filters.SimpleFilter(self._filterCrit,self._sortingCrit)
