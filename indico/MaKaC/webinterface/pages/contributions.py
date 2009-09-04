@@ -29,7 +29,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.navigation as navigation
 import MaKaC.webinterface.materialFactories as materialFactories
 import MaKaC.webinterface.timetable as timetable
-from MaKaC.webinterface.pages.conferences import WConfModifScheduleGraphicOverview, WPConfModifScheduleGraphic, WPConferenceBase, WPConferenceModifBase, WPConferenceDefaultDisplayBase
+from MaKaC.webinterface.pages.conferences import WPConfModifScheduleGraphic, WPConferenceBase, WPConferenceModifBase, WPConferenceDefaultDisplayBase
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.common import Config
@@ -437,40 +437,6 @@ class WPContributionModifTools( WPContributionModifBase ):
 "MoveContributionURL": urlHandlers.UHContributionMove.getURL( self._target ), \
 "writeMinutes": urlHandlers.UHContributionWriteMinutes.getURL( self._target ) }
         return wc.getHTML( pars )  
-
-class WContribModifSchedule( WConfModifScheduleGraphicOverview ):
-    
-    def __init__(self, conf, contrib, aw, timetable, dayList, **params):
-        WConfModifScheduleGraphicOverview.__init__(self, conf, timetable, dayList)
-        self._timetable = timetable
-        self._days = dayList
-        wcomponents.WTemplated.__init__(self, tpl_name='ConfModifScheduleGraphicOverview', **params)
-  
-
-class WPContribModifSchedule( WPConfModifScheduleGraphic ):
-    
-    def __init__( self, rh, contrib):
-        WPConfModifScheduleGraphic.__init__( self, rh, contrib.getConference() )        
-        self._contrib = contrib             
-
-    def _getEnabledControls(self):
-            return False
-    
-    def _getScheduleContent(self,params):
-        frame = wcomponents.WContributionModifFrame( self._contrib, self._getAW(), self._days, handler=urlHandlers.UHContribModifSchedule )
-        html = WContribModifSchedule(self._conf, self._contrib, self._getAW(), self._timetable, self._days).getHTML(params)
-        return frame.getHTML(html, **params)          
-    
-    def _generateTimetable(self):
-        timeTable = timetable.TimeTable() 
-        sDate=self._conf.getStartDate()
-        eDate=self._conf.getEndDate()
-        timeTable.setStartDate(sDate.year,sDate.month,sDate.day)
-        timeTable.setEndDate(eDate.year,eDate.month,eDate.day)
-        timeTable.setStartDayTime(7,0)
-        timeTable.setEndDayTime(21,59)
-        timeTable.mapEntryList([self._contrib.getSchEntry()])  
-        return timeTable
 
 class WPContributionModifMaterials( WPContributionModifBase ):
     def __init__(self, rh, contribution):

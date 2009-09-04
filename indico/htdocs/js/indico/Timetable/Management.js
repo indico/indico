@@ -169,7 +169,25 @@ type("TimetableManagementActions", [], {
         eventData.color = bgColor;
         eventData.textColor = textColor;
     },
-    sessionTimetable: function(eventData) {
+    /**
+     * This function enables/disables options in the timetable menu depending if 
+     * we are creating a general timetable or the timetable for one session.
+     */
+    updateTTMenu: function() {
+        if (this.isSessionTimetable) {
+            if (this.session === null){
+                this.addMenuLink.dom.style.display = "none";
+                this.rescheduleLink.dom.style.display = "none"; 
+                this.separator.dom.style.display = "none";
+            }else {
+                this.addMenuLink.dom.style.display = "inline";
+                this.rescheduleLink.dom.style.display = "inline"; 
+                this.separator.dom.style.display = "inline";
+            }
+        }
+        
+    },
+    intervalTimetable: function(eventData) {
        var self = this;
 
        var day = IndicoUtil.formatDate2(IndicoUtil.parseJsonDate(eventData.startDate));
@@ -184,13 +202,13 @@ type("TimetableManagementActions", [], {
            self._hideInfoBox(message);
            self.menu.remove(goBackLink);
            self.session = null;
-
+           self.updateTTMenu();
            // Enable the tabs
            timetable.enable();
        });
 
        var message = Html.div({}, Html.span({style: {fontStyle: 'italic', fontSize: '0.9em'}},
-                                            'You are viewing the content of the session:'),
+                                            'You are viewing the content of the interval:'),
                                   Html.div({style: {fontWeight: 'bold', marginTop: '5px', fontSize: '1.3em'}}, eventData.title +
                                            (eventData.slotTitle ? ": " + eventData.slotTitle : ''), Html.span({style: {fontWeight: 'normal'}},
                                            " (" + eventData.startDate.time.substring(0,5) + " - " + eventData.endDate.time.substring(0,5) +")" )));
@@ -201,35 +219,41 @@ type("TimetableManagementActions", [], {
        this._showInfoBox(message);
        this.menu.insert(goBackLink);
 
+       this.updateTTMenu();
        // Disables the tabs
        timetable.disable();
     },
     /*
      * Returns the header where all options are placed for managing the timetable, such as add and reschedule
      */
-    managementHeader: function() {
+    managementHeader: function(isSessionTimetable) {
         var self = this;
+        this.isSessionTimetable = isSessionTimetable;
 
         this.infoBox = Html.div({className: 'timetableInfoBox', style: {display:'none'}});
 
-        var addMenu = Html.a({className: 'dropDownMenu fakeLink', style: {margin: '0 15px'}}, 'Add new');
+    
+        this.addMenuLink = Html.a({className: 'dropDownMenu fakeLink', style: {margin: '0 15px'}}, 'Add new');
 
-        addMenu.observeClick(function() {
+        this.addMenuLink.observeClick(function() {
             if (!exists(self.addMenu) || !self.addMenu.isOpen()) {
-                self._openAddMenu(addMenu);
+                self._openAddMenu(self.addMenuLink);
             }
         });
 
+        
+        this.separator = Html.span({}, " | ");
         // TODO: implement reschedule function
         var href = Indico.Urls.Reschedule;
-        var rescheduleLink = Html.a({style: {margin: '0 15px'}}, Html.span({style: {cursor: 'default', color: '#888'}}, 'Reschedule'));
+        this.rescheduleLink = Html.a({style: {margin: '0 15px'}}, Html.span({style: {cursor: 'default', color: '#888'}}, 'Reschedule'));
 
         var underConstr = function(event) {
             IndicoUI.Widgets.Generic.tooltip(this, event,"This option will be available soon");
         };
-        rescheduleLink.dom.onmouseover = underConstr;
+        this.rescheduleLink.dom.onmouseover = underConstr;
 
-        this.menu = Html.div({style: {cssFloat: 'right', color: '#777'}}, addMenu, ' | ', rescheduleLink);
+        this.menu = Html.div({style: {cssFloat: 'right', color: '#777'}}, this.addMenuLink, this.separator, this.rescheduleLink);
+        this.updateTTMenu();
         return Html.div('clearfix', this.menu, this.infoBox);
     },
     /*
@@ -248,7 +272,7 @@ type("TimetableManagementActions", [], {
 
         var menuItems = {};
         this.addMenu = new PopupMenu(menuItems, [triggerElement], null, true, true);
-        if (this.session === null) {
+        if (!this.session === null) {
             if (keys(this.eventInfo.sessions).length === 0) {
                 menuItems.Session = function() { self.addSession(); };
             } else {

@@ -286,11 +286,12 @@ type("TimeTableDisplay", ["TimeTable"], {
 
 type("TimeTableManagement", ["TimeTable"], {
     _getHeader: function() {
-        var div = this.managementActions.managementHeader();
+        var div = this.managementActions.managementHeader(this.isSessionTimetable);
         return div;
     }
     },
-    function(data, eventInfo, width, wrappingElement, detailLevel) {
+    function(data, eventInfo, width, wrappingElement, detailLevel, isSessionTimetable) {
+        this.isSessionTimetable = any(isSessionTimetable, false);
         this.managementActions = new TimetableManagementActions(this, eventInfo);
         this.TimeTable(data, width, wrappingElement, detailLevel, true);
     }

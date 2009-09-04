@@ -29,7 +29,7 @@ import MaKaC.webinterface.navigation as navigation
 import MaKaC.schedule as schedule
 import MaKaC.conference as conference
 import MaKaC.webinterface.linking as linking
-from MaKaC.webinterface.pages.conferences import WScheduleContribution, WConfModifScheduleGraphicOverview, WPConferenceBase, WPConfModifScheduleGraphic, WPConferenceDefaultDisplayBase, WContribParticipantList, WContributionCreation, WContributionSchCreation, WPModScheduleNewContribBase, WPConferenceModifBase
+from MaKaC.webinterface.pages.conferences import WScheduleContribution, WPConferenceBase, WPConfModifScheduleGraphic, WPConferenceDefaultDisplayBase, WContribParticipantList, WContributionCreation, WContributionSchCreation, WPModScheduleNewContribBase, WPConferenceModifBase
 from MaKaC.common import Config, info
 from MaKaC.errors import MaKaCError
 import MaKaC.webinterface.timetable as timetable
@@ -43,6 +43,8 @@ from MaKaC import user
 from MaKaC.i18n import _
 
 from pytz import timezone
+from MaKaC.common.PickleJar import DictPickler
+import simplejson
 import pytz
 import copy
 import MaKaC.webinterface.common.timezones as convertTime
@@ -655,6 +657,7 @@ class WPSessionModifBase( WPConferenceModifBase ):
         canCoord=self._session.canCoordinate(self._getAW())
         canModify=self._session.canModify(self._getAW())
         self._tabAC.setEnabled(canModify)
+        self._tabMaterials.setEnabled(canModify)
         self._tabTools = self._tabCtrl.newTab( "tools", _("Tools"), \
                 urlHandlers.UHSessionModifTools.getURL( self._session ) )
         self._tabTools.setEnabled(canModify)
@@ -1442,16 +1445,20 @@ class WSessionModPosterTTDay(wcomponents.WTemplated):
         return vars
 
 
-class WPSessionModifSchedule( WPConfModifScheduleGraphic ):
+class WPSessionModifSchedule( WPSessionModifBase, WPConfModifScheduleGraphic  ):
     
     def __init__( self, rh, session):
-        WPConfModifScheduleGraphic.__init__( self, rh, session.getConference() )        
-        self._session = session        
-    
+        WPSessionModifBase.__init__(self, rh, session)
+        WPConfModifScheduleGraphic.__init__( self, rh, session.getConference() )
+        self._session = session
+
     def _setActiveTab(self):
         self._tabTimetable.setActive()
+        
+    def getJSFiles(self):
+        return WPConfModifScheduleGraphic.getJSFiles(self)
     
-    def _generateSessionTimetable(self):
+    def _generateTimetable(self):
         
         tz = self._conf.getTimezone()
         timeTable = timetable.TimeTable(self._session.getSchedule(), tz)
@@ -1464,258 +1471,37 @@ class WPSessionModifSchedule( WPConfModifScheduleGraphic ):
         timeTable.mapEntryList(self._session.getSchedule().getEntries())  
         return timeTable
     
-    def _getScheduleContent(self,params):
-
-        sessionTimetable = self._generateSessionTimetable();
-        sessionDays = sessionTimetable.getDayList()
-        
-        wc = WSessionModifSchedule(self._getAW(), self._session, sessionDays, sessionTimetable)
-        return wc.getHTML(params)
-
-class WScheduleBreak(wcomponents.WTemplated):
-
-    def __init__(self, breakEntry):
-        self._breakEntry = breakEntry
-
-    def getHTML(self, params=None):
-        params['modifyAction'] = urlHandlers.UHSessionModifyBreak.getURL
-        params['deleteAction'] = urlHandlers.UHSessionDelSchItems.getURL
-        params['relocateAction'] = urlHandlers.UHConfModifScheduleRelocate.getURL
-        params['moveUpAction'] = urlHandlers.UHSessionModSlotMoveUpEntry.getURL
-        params['moveDownAction'] = urlHandlers.UHSessionModSlotMoveDownEntry.getURL
-        
-        return wcomponents.WTemplated.getHTML( self, params )
+    def _getSchedule(self):
+        return WSessionModifSchedule(self._session, self._timetable, self._days)
     
-class WSessionModifSchedule(WConfModifScheduleGraphicOverview):
+    def _getTabContent( self, params ):
+        return self._getTTPage(params)
+
+class WSessionModifSchedule(wcomponents.WTemplated):
     
-    def __init__(self,aw,session,days,timetable):
-        self._aw=aw
+    def __init__(self, session, timetable, dayList, **params):
+        wcomponents.WTemplated.__init__(self, **params)
         self._session = session
-        self._days=days
         self._timetable = timetable
-             
-    def _getContributionHTML(self,contrib,days,params):
-        if days:
-            params['days'] = days
-        return WScheduleContribution(contrib, insideSession=True).getHTML(params)  
-    
-    def _getBreakHTML(self,breakEntry, header="", footer="", params={}):        
-        return WScheduleBreak(breakEntry).getHTML(params)
+        self._dayList = dayList
 
-    def _getEntryHTML(self,entry, days, room = "", header = "", footer="", params={}):
-        
-        if isinstance(entry,schedule.LinkedTimeSchEntry):
-            if isinstance(entry.getOwner(),conference.Contribution):
-                params.update({room: room, header: header, footer: footer})
-                return self._getContributionHTML(entry.getOwner(), days, params)
-        elif isinstance(entry,schedule.BreakTimeSchEntry):
-            return self._getBreakHTML(entry, header, footer, params=params)
-
-    def _getFitSlotLink( self, container ):
-        """
-        returns a link to the "fit slot" action if and only if
-        the time slot has a son and its limits are larger than its sons'
-        """
-        fitSlotLink = ""
-        entries = container.getSessionSlot().getSchedule().getEntries()
-        if len(entries) > 0:
-            if container.getAdjustedStartDate()<entries[0].getAdjustedStartDate() or container.getAdjustedEndDate()>entries[-1].getAdjustedEndDate():
-                fitSlotLink = _("""
-                                        <a href=%s><small>[_("fit slot")]</small></a>""")% quoteattr(str(urlHandlers.UHSessionFitSlot.getURL(container.getSessionSlot())))
-        return fitSlotLink
-
-    def _getEntries(self, schedule):
-        l = []
-        for sessionEntry in schedule.getEntries():
-            sesSlot = sessionEntry.getOwner()
-            l.append(sesSlot)
-        return l
-
-    def _initTempList(self, max, defaultValue=None):
-        t = []
-        for i in range(0, max):
-            t.append(defaultValue)
-        return t
-    
-    def _getScheduleHTML(self, days, eventType="conference"):                        
-        confTZ = self._session.getTimezone()
-        if self._slot:
-            target = self._slot
-        else:
-            target = self._session
-        
-        timeTable=timetable.TimeTable(target.getSchedule(), confTZ) 
-        sDate,eDate=target.getAdjustedStartDate(), target.getAdjustedEndDate() 
-        timeTable.setStartDate(sDate)
-        timeTable.setEndDate(eDate)
-        
-        if self._slot:
-            timeTable.mapContainerList([self._slot])
-        else:
-            timeTable.mapContainerList(self._getEntries(self._session.getSchedule()))
-                        
-        timeTable.compactDays()
-        containerIndex = ContainerIndex()
-        daySch = [] 
-        
-        for day in timeTable.getDayList():        
-            slotList=[]
-            lastEntries=[]
-            maxoverlaping= day.getContainerMaxOverlap()
-            if not day.hasContainerOverlaps():
-                maxoverlaping = day.getNumMaxOverlaping() or 1
-            width="100"            
-            if maxoverlaping!=0:
-                width=100/maxoverlaping
-            containerIndex.initialization(day, day.hasContainerOverlaps())
-            lastSlot = self._initTempList(maxoverlaping, None)
-            
-            for slot in day.getSlotList():                
-                tempList = self._initTempList(maxoverlaping, """<td></td>""")
-                containerHeader = self._initTempList(maxoverlaping, """<td></td>""")
-                containerFooter = self._initTempList(maxoverlaping, """<td></td>""")
-                thisSlot = self._initTempList(maxoverlaping, None)
-
-                for container in slot.getContainerList():
-                    containerIndex.addContainer(container)
-                    bgcolorSlot = self._getColor(container)
-                    # --- Getting header and footer for the container
-                    ind = containerIndex.getStartPosition(container)
-                   
-                    # ---.
-                    entryList = slot.getContainerEntries(container)
-                    containerIndex.setContainerEntries(container, entryList)
-                    for i in range(0, containerIndex.getMaxOverlap(container)):
-                        entry = containerIndex.getEntryByPosition(container, i)
-                        entryIndex = containerIndex.getEntryIndex(container, i)
-                        thisSlot[entryIndex] = entry
-                        # --- if an entry has already added, it is not added again because it was done a rowspan
-                        if entry and (entry in lastEntries):
-                            tempList[entryIndex] = ""
-                            continue
-                        # ---.
-                        bgcolorContrib=self._getColor(entry)
-                        # ---.
-                        # --- Getting the HTML for an entry:
-                        rowspan = day.getNumContainerSlots(entry)
-                        if entry:
-                            if slot.hasHeaders() and slot.isFirstSlotEntry(entry):
-                                rowspan -= 1
-                            if container.isFinalEntry(entry, day.getLastContainerSlot(container), confTZ):
-                                rowspan -= 1
-                            room = ""
-                            if container.getRoom() != None and container.getRoom().getName().strip() != "":
-                                room = container.getRoom().getName()
-                                
-                            entryParams = {}
-                            entryParams['bgcolor'] = bgcolorContrib;
-                            entryParams['rowspan'] = rowspan;
-                            entryParams['colspan'] = '';
-                            entryParams['width'] = width;
-                               
-                            temp = self._getEntryHTML(entry, days, room, params=entryParams)
-                        else:
-                            # --- Getting header for the broken slots among days and for starting of slots
-                            temp = """<td valign="top" align="center" width="%s%%">&nbsp;
-                                      </td>"""%width
-                        # ---.
-                        tempList[entryIndex] = temp
-                        lastEntries.append(entry)
-
-                # ---.
-                if slot.getAdjustedStartDate().minute==0:
-                    timecol = """<td style="border-top:2px solid #E6E6E6;border-left:2px solid #E6E6E6" valign="top" bgcolor="white" width="40">
-                                    <font color="gray" size="-1">%s</font>
-                                 </td>"""%slot.getAdjustedStartDate().strftime("%H:%M")
-                else:
-                    timecol = """<td style="border-left:2px solid #E6E6E6" bgcolor="white" width="40">&nbsp;</td>"""
-                stri = """
-                            <tr>
-                                %s
-                                %s
-                            </tr>"""%( timecol, \
-                                    "".join(tempList))
-                slotList.append(stri)
-                lastSlot = thisSlot[:]
-            
-            urlNewSlot = urlHandlers.UHSessionModSlotNew.getURL(self._session)
-            urlNewSlot.addParam("slotDate", day.getDate().strftime("%d-%m-%Y"))
-            newSlotBtn=""
-            if self._session.canModify(self._aw) or self._session.canCoordinate(self._aw, "unrestrictedSessionTT"):
-                if self._session.getConference().getEnableSessionSlots() :
-                    newSlotBtn=_("""<input type="submit" class="btn" value="_("new slot")">""")
-            stri="""
-                <table>
-                    <tr>
-
-                    </tr>
-                    %s
-                </table>"""%("".join(slotList))
-            daySch.append(stri)
-        return "<br>".join(daySch)
-
-           
     def getVars( self ):
         vars=wcomponents.WTemplated.getVars(self)
-        
-        self._conf = self._session.getConference()
-        
-        sessions = {}
-        
-        #self._days = vars["days"] 
-        
-        sList = self._conf.getSessionList()
-    
-        for d in self._days:            
-            for s in sList:                        
-                if  s.getAdjustedStartDate().date() <= d.getDate().date() and \
-                    s.getAdjustedEndDate().date() >= d.getDate().date():
-                    sessions[s.getId()] = s
-                
-        vars["daysParam"] = vars.get('days')
-        vars["sessionList"] = sessions                
-        vars["session"]=self._session.getId()
-        
-        vars["slotList"] = self._session.slots
-        slot = vars.get("slot",None)
-        
-        if slot:            
-            self._slot = self._session.getSlotById(slot)
-        else:
-            # by default, present the user with the first slot
-            self._slot = self._session.getSlotList()[0]
-        
-        vars["slot"] = self._slot        
-        
-        vars["slots"]=self._getScheduleHTML(vars["daysParam"])
-        
-        sDate,eDate=self._session.getAdjustedStartDate(),self._session.getAdjustedEndDate()
-        if sDate.strftime("%Y%b%d")==eDate.strftime("%Y%b%d"):
-            vars["dateInterval"]=self.htmlText("%s-%s"%(sDate.strftime("%Y-%b-%d %H:%M"),eDate.strftime("%H:%M")))
-        else:
-            vars["dateInterval"]=self.htmlText("%s/%s"%(sDate.strftime("%Y-%b-%d %H:%M"),eDate.strftime("%Y-%b-%d %H:%M")))
-        vars["start_date"] = self._session.getAdjustedStartDate().strftime("%a %d %b %Y %H:%M")
-        vars["end_date"] = self._session.getAdjustedEndDate().strftime("%a %d %b %Y %H:%M")
-        vars["place"]=""
-        if self._session.getLocation() is not None:
-            vars["place"]=self.htmlText(self._session.getLocation().getName())
-        vars["start_date"] = self._session.getAdjustedStartDate().strftime("%a %d %b %Y %H:%M")
-        vars["end_date"] = self._session.getAdjustedEndDate().strftime("%a %d %b %Y %H:%M")
-        vars["editURL"] = str(urlHandlers.UHSessionModFit.getURL(self._session))
-        vars["dayDate"]=self._days[0].getDate()
-        
-        if self._session.getConference().getEnableSessionSlots() :
-            vars["fitToInnerSlots"] = """<input type="submit" class="btn" value="fit inner timetable">"""
-        else :
-            editURL = urlHandlers.UHSessionDatesModification.getURL(self._session)
-            vars["fitToInnerSlots"] = """<input type="submit" class="btn" value="fit inner timetable"><input type="submit" class="btn" value="modify dates" onClick="this.form.action='%s';">""" % editURL
+        tz = self._session.getTimezone()
+        vars["timezone"]= tz
+        # the list of days specified by the user through the option box
+        vars["daysParam"] = self._dayList
+        # the list of days from the timetable
+        vars["dayList"]=self._timetable.getDayList()
+        # the first day of the list
+        vars["dayDate"]=self._dayList[0].getDate()
 
         vars['rbActive'] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
 
+        vars['ttdata'] = schedule.ScheduleToJson.process(self._session.getSchedule(), tz)
+        vars['eventInfo'] = simplejson.dumps(DictPickler.pickle(self._session.getConference(), timezone=tz))
+
         return vars
-
-
-        
 
 class ContainerIndexItem:
 

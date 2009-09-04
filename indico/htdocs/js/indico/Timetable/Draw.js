@@ -879,7 +879,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"], {
             var menuItems = {};
 
             menuItems[$T('Interval timetable')] = function() {
-                self.managementActions.sessionTimetable(self.eventData);
+                self.managementActions.intervalTimetable(self.eventData);
                 self.close();
             };
             menuItems[$T('Interval properties')] = function() {
@@ -958,7 +958,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"], {
 
         var ttLink = Html.a({className: 'fakeLink'}, "View and edit current interval timetable");
         ttLink.observeClick(function() {
-            self.managementActions.sessionTimetable(self.eventData);
+            self.managementActions.intervalTimetable(self.eventData);
             self.close();
         });
         contributionsDiv.append(Html.div({style: {marginTop: '10px', fontWeight: 'bold'}}, ttLink));

@@ -465,9 +465,9 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
 
                  this.optionList = Html.ul('optionBoxList');
 
-                 var liAdd = Html.a({href: '#'},
+                 var liAdd = Html.span('fakeLink',
                      Html.span({style: {fontStyle: 'italic'}}, $T('Add a different one')));
-
+                 liAdd.href = null;
                  liAdd.observeClick(function() {
                      self._startNew();
                  });
