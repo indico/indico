@@ -575,7 +575,7 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
                  }
              });
 
-             this.container = Html.div('flexibleSelect', this.input.draw(), this.trigger, this.notificationField);
+             this.container = Html.div('flexibleSelect', this.trigger, this.input.draw(), this.notificationField);
 
              return this.container;
          },
