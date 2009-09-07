@@ -886,7 +886,9 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"], {
                 self.managementActions.editSessionSlot(self.eventData);
                 self.close();
             };
-            menuItems[$T('Session properties')] = self.managementActions.editEntry(self.eventData);
+            if (!self.managementActions.isSessionTimetable) {
+                menuItems[$T('Session properties')] = self.managementActions.editEntry(self.eventData);
+            }
 
             editLink.observeClick(function() {
                 var menu = new PopupMenu(menuItems, [editLink], 'timetableManagementPopupList', true, true);

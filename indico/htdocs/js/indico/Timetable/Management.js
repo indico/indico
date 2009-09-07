@@ -272,7 +272,7 @@ type("TimetableManagementActions", [], {
 
         var menuItems = {};
         this.addMenu = new PopupMenu(menuItems, [triggerElement], null, true, true);
-        if (!this.session === null) {
+        if (this.session === null) {
             if (keys(this.eventInfo.sessions).length === 0) {
                 menuItems.Session = function() { self.addSession(); };
             } else {
