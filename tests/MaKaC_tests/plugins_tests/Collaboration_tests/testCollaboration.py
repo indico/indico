@@ -25,6 +25,10 @@ from MaKaC.services.implementation.collaboration import CollaborationRemoveCSBoo
 from MaKaC.plugins.Collaboration.actions import DeleteAllBookingsAction
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.errors import MaKaCError
+from MaKaC.common import Config
+
+from util import TestZEOServer
+
 import math
 import profile
 import time
@@ -35,7 +39,7 @@ import unittest
 import shutil
 import subprocess
 import sys
-import os
+import os, signal
 
 
 ################################### HOW TO USE THIS TEST ##################################
@@ -65,15 +69,14 @@ import os
 #
 #########################################################################################
 
+config = Config.getInstance()
 
 #system and DB paths / configuration
-dbFileDir = '/opt/indico/db/'
-testingDbfile = 'dbForTesting.fs'
-collaborationDbFile = 'CollaborationTests-Data.fs'
-pythonExecutable = sys.executable
-runzeoLocation = '/usr/lib64/python2.4/site-packages/ZEO/runzeo.py'
-zeoConfigLocation = '%s/collaborationtest.zeo.config' % os.path.dirname(__file__)
+testingDbfile = os.path.join(config.getUploadedFilesTempDir(), 'dbForTesting.fs')
+collaborationDbFile = os.path.join(config.getUploadedFilesTempDir(), 'CollaborationTests-Data.fs')
 zeoPort = 9685
+
+pythonExecutable = sys.executable
 
 #test configuration
 firstConfId = 40000
@@ -95,6 +98,14 @@ doCleanUp = True
 doRemove = True
 
 class TestResponsiveness(unittest.TestCase):
+
+    def createDBserver(self, file, port):
+        pid = os.fork()
+        if pid:
+            return pid
+        else:
+            server = TestZEOServer(port, file)
+            server.start()
     
     def setUp(self):
         self.random = Random()
@@ -110,29 +121,28 @@ class TestResponsiveness(unittest.TestCase):
             if makeCopy:
                 self._log("Copying " + testingDbfile + " to " + collaborationDbFile + " ...")
                 try:
-                    os.remove(dbFileDir + collaborationDbFile)
-                    os.remove(dbFileDir + collaborationDbFile + '.index')
-                    os.remove(dbFileDir + collaborationDbFile + '.tmp')
+                    os.remove(collaborationDbFile)
+                    os.remove(collaborationDbFile + '.index')
+                    os.remove(collaborationDbFile + '.tmp')
                 except:
                     pass
                 
-                shutil.copy(dbFileDir + testingDbfile, dbFileDir + collaborationDbFile)
+                shutil.copy(testingDbfile, collaborationDbFile)
                 try:
-                    shutil.copy(dbFileDir + testingDbfile + '.index', dbFileDir + collaborationDbFile + '.index')
+                    shutil.copy(testingDbfile + '.index', collaborationDbFile + '.index')
                 except:
-                    self._log("problem copying "  + dbFileDir + testingDbfile + '.index')
+                    self._log("problem copying "  + testingDbfile + '.index')
                 try:
-                    shutil.copy(dbFileDir + testingDbfile + '.tmp', dbFileDir + collaborationDbFile + '.tmp')
+                    shutil.copy(testingDbfile + '.tmp', collaborationDbFile + '.tmp')
                 except:
-                    self._log("problem copying "  + dbFileDir + testingDbfile + '.tmp')
+                    self._log("problem copying "  + testingDbfile + '.tmp')
                 
                 self._log("copy finished.")
                 self._log('')
             
-            command = [pythonExecutable, runzeoLocation, '-C', zeoConfigLocation]
-            self._log("Starting the zodb server: " + str(command))
-            self.zodbServer = subprocess.Popen(command)
-            self._log("zodb server started on pid: " + str(self.zodbServer.pid) + " .")
+            self._log("Starting the ZEO server: " + str(command))
+            self.createDBServer(collaborationDBFile, zeoPort)
+            self._log("zodb server started on pid: " + str(self.zeoServer) + " .")
             self._log('')
 
             
@@ -205,18 +215,18 @@ class TestResponsiveness(unittest.TestCase):
         self._log('')
         
         try:
-            self._log("Sending kill signal to zodbServer at pid " + str(self.zodbServer.pid) + " ...")
-            subprocess.Popen(['kill', str(self.zodbServer.pid)])
+            self._log("Sending kill signal to ZEO Server at pid " + str(self.zeoServer) + " ...")
+            os.kill(self.zeoServer, signal.SIGTERM)
             self._log("Signal sent")
         except Exception, e:
             self._log("Problem sending kill signal: " + str(e))
         
         try:
-            self._log("Waiting for zodbServer to finish ...")
-            self.zodbServer.wait()
+            self._log("Waiting for ZEO Server to finish ...")
+            os.wait()
             self._log("Zodb server finished.")
         except Exception, e:
-            self._log("Problem waiting for zodbServer: " + str(e))
+            self._log("Problem waiting for ZEO Server: " + str(e))
         
         if doRemove:
             try:
