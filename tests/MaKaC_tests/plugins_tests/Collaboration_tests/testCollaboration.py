@@ -72,7 +72,7 @@ import os, signal
 config = Config.getInstance()
 
 #system and DB paths / configuration
-testingDbfile = os.path.join(config.getUploadedFilesTempDir(), 'dbForTesting.fs')
+testingDbfile = '/tmp/data.fs'
 collaborationDbFile = os.path.join(config.getUploadedFilesTempDir(), 'CollaborationTests-Data.fs')
 zeoPort = 9685
 
@@ -99,7 +99,7 @@ doRemove = True
 
 class TestResponsiveness(unittest.TestCase):
 
-    def createDBserver(self, file, port):
+    def createDBServer(self, file, port):
         pid = os.fork()
         if pid:
             return pid
@@ -140,14 +140,14 @@ class TestResponsiveness(unittest.TestCase):
                 self._log("copy finished.")
                 self._log('')
             
-            self._log("Starting the ZEO server: " + str(command))
-            self.createDBServer(collaborationDBFile, zeoPort)
+            self._log("Starting the ZEO server...")
+            self.zeoServer = self.createDBServer(collaborationDbFile, zeoPort)
             self._log("zodb server started on pid: " + str(self.zeoServer) + " .")
             self._log('')
 
             
             self._log("Creating a CustomDBMgr on port " + str(zeoPort))
-            self.cdbmgr = DBMgr.initializeAndGetInstance(("localhost", zeoPort))
+            self.cdbmgr = DBMgr.getInstance(hostname="localhost", port=zeoPort)
             self._log("Starting a request ...")
             self.cdbmgr.startRequest()
             self._log("Request started successfully.")
