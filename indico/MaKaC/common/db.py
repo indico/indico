@@ -73,42 +73,25 @@ class DBMgr:
     """
     _instance = None
 
-    def __init__( self ):
+    def __init__( self, hostname=None, port=None ):
         import Configuration # Please leave this import here, db.py is imported during installation process
         cfg = Configuration.Config.getInstance()
-        self._storage=ClientStorage(cfg.getDBConnectionParams(), username=cfg.getDBUserName(), password=cfg.getDBPassword(), realm=cfg.getDBRealm())
+
+        if not hostname:
+            hostname = cfg.getDBConnectionParams()[0]
+        if not port:
+            port = cfg.getDBConnectionParams()[1]
+
+        self._storage=ClientStorage((hostname, port), username=cfg.getDBUserName(), password=cfg.getDBPassword(), realm=cfg.getDBRealm())
         self._db=MaKaCDB(self._storage)
         self._conn={}
 
     @classmethod
-    def getInstance( cls ):
+    def getInstance( cls, *args, **kwargs ):
         if cls._instance == None:
             Logger.get('dbmgr').debug('cls._instance is None')
-            cls._instance=DBMgr()
+            cls._instance=DBMgr(*args, **kwargs)
         return cls._instance
-    
-    @classmethod
-    def initializeAndGetInstance(cls, address, username = '', password = '', realm = ''):
-        """ Use this method when you need to create a DBMgr that will not use the "standard" address and port
-            (who are normally retrieved from Config, i.e. indico.conf).
-            Its implementation is quite hacky so that we don't change at all the getInstance and __init__ methods used in many places in Indico.
-        """
-        if cls._instance == None:
-            Logger.get('dbmgr').debug('cls._instance is None (initializeAndGetInstance)')
-            
-            class CustomDBMgr:  # we need this old-style class because DBMgr is an old-style class and we cannot change the class of an object from new-style to old-style
-                pass            # if DBMgr is ever changed to new-style (inherit from object) then we could initialize 'o' in a simpler way with "o = object()" 
-            o = CustomDBMgr()
-            o.__class__ = cls # cls = DBMgr
-            
-            o._storage = ClientStorage(address, username=username, password=password, realm=realm)
-            o._db = MaKaCDB(o._storage)
-            o._conn = {}
-            
-            cls._instance = o
-            
-        return cls._instance
-    
 
     def _getConnObject(self):
         tid=threading._get_ident()
