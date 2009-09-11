@@ -39,7 +39,7 @@
         <td class="blacktext" style="width: 100%%">
             <em class="description">
                 <%= _("If you want to fully customize your conference page you can create your own stylesheet \
-                and upload it. An example stylesheet can be downloaded") %> <a href="css/confTemplates/standard.css"><%=_("here") %></a>.
+                and upload it. An example stylesheet can be downloaded") %> <a href="<%= Config().getBaseURL() %>/css/confTemplates/standard.css"><%=_("here") %></a>.
             </em>
             <form action="%(saveCSS)s" method="POST" ENCTYPE="multipart/form-data" style="margin:0;">
                 <input name="file" type="file" onchange="$E('uploadCSSButton').dom.disabled = false;">
