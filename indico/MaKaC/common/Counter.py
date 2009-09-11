@@ -21,7 +21,6 @@
 
 """This file contains classes that allow to generate sequencial identifiers.
 """
-import ZODB
 from persistent import Persistent
 
 
@@ -34,9 +33,13 @@ class Counter(Persistent):
         self.__count = initialValue
 
     def _getCount(self):
+        """ Returns the next identifier as an integer, without changing the innter state
+        """
         return self.__count
 
     def clone(self):
+        """ Clones this counter
+        """
         newCounter = Counter(self.__count)
         return newCounter
 
@@ -46,6 +49,11 @@ class Counter(Persistent):
         current = self.__count
         self.__count += 1
         return str(current)
+    
+    def previewNextCount(self):
+        """ Returns the next identifier as a string, without changing the inner state
+        """
+        return str(self.__count)
 
     def sync(self,count):
         if count is None or count=="":
@@ -58,5 +66,4 @@ class Counter(Persistent):
             return
         else:
             self.__count=count+1
-        
 

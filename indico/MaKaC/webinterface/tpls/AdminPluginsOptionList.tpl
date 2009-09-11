@@ -92,7 +92,7 @@
                                     }
                                 );
                             }
-                        var roomChooser = new SelectRemoteWidget('roomBokking.locationsAndRooms.list', {})
+                        var roomChooser = new SelectRemoteWidget('roomBooking.locationsAndRooms.list', {})
                         var addRoomButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add Room') );
                         addRoomButton.observeClick(
                             function(setResult){

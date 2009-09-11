@@ -1,11 +1,9 @@
 <% declareTemplate(newTemplateStyle=True) %>
 
-<span><strong>Please input the necessary parameters to perform an EVO booking</strong></span>
-
 <table style="margin-top: 10px;">
     <tr>
         <td class="bookingFormFieldName">
-            <span>Community name</span>
+            <span>Community</span>
         </td>
         <td>
             <select name="communityId">
@@ -28,7 +26,7 @@
             <span>Description</span>
         </td>
         <td>
-            <textarea rows="10" cols="60" name="meetingDescription"><%=EventDescription%></textarea>
+            <textarea rows="3" cols="60" name="meetingDescription"><%=EventDescription%></textarea>
         </td>
     </tr>
     <tr>
@@ -37,7 +35,7 @@
         </td>
         <td>
             <input id="startDate" type="text" size="16" name="startDate" value="<%= DefaultStartDate %>" />
-            <span class="bookingFormWarning">Please keep the dd/mm/yyyy hh:mm format</span>
+            <span id="startDateHelp"></span>
         </td>
     </tr>
     <tr>
@@ -46,25 +44,22 @@
         </td>
         <td>
             <input id="endDate" type="text" size="16" name="endDate" value="<%= DefaultEndDate %>" />
-            <span class="bookingFormWarning">Please keep the dd/mm/yyyy hh:mm format</span>
+            <span id="endDateHelp"></span>
         </td>
     </tr>
-    <tr>
-        <td>
-        </td>
-        <td>
-            <span>Please create your booking between <%= MinStartDate %> and <%= MaxEndDate %></span>
-        </td>
-    </tr>
+    
     <tr>
         <td class="bookingFormFieldName">
-            <span>Meeting access password</span>
+            <span>Access password</span>
         </td>
         <td>
             <input type="password" size="20" name="accessPassword" value="" />
+            <span id="passwordHelp"></span>
         </td>
     </tr>
 </table>
+<!--
 <div>
 <input type="checkbox" id="sendMailCB" name="sendMailToManagers" value="sendMailToManagers"/><label for="sendMailCB">Send a mail notification to all event managers</label>
 </div>
+ -->

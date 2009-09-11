@@ -204,29 +204,27 @@ def Updates(cls, property, modifier=None):
 class DictPickler:     
 
     @classmethod
-    def pickle(cls, object, timezone=None):
+    def pickle(cls, object, timezone = None):
         
         # path mapping supported
         # i.e. getFileSize() ==> file.size
-
+        
         if object is None:
             return None
         elif type(object) == list or type(object) == tuple or type(object) == set or isinstance(object, PersistentList):
             res = []            
             for obj in object:
-                clazz = classPath(obj.__class__)
-                if not globalPickleMap.has_key(clazz):
-                    raise Exception('Class %s is not supposed to be pickled. obj=%s' % (clazz, str(obj)))
-                res.append(DictPickler._pickle(obj, globalPickleMap[clazz], timezone))
+                res.append(DictPickler.pickle(obj, timezone))
             return res
         elif type(object) == dict or isinstance(object, PersistentMapping):
             res = {}          
-            for key,obj in object.iteritems():
-                clazz = classPath(obj.__class__)
-                if not globalPickleMap.has_key(clazz):
-                    raise Exception('Class %s is not supposed to be pickled. obj=%s' % (clazz, str(obj)))
-                res[key] = DictPickler._pickle(obj, globalPickleMap[clazz], timezone)
+            for key, obj in object.iteritems():
+                if not isinstance(key, basestring):
+                    raise Exception("Key %s cannot be pickled because it's not a string. object=%s" % (str(key), str(object)))
+                res[key] = DictPickler.pickle(obj, timezone)
             return res
+        elif isinstance(object, basestring):
+            return object
         else:
             clazz = classPath(object.__class__)
             if not globalPickleMap.has_key(clazz):

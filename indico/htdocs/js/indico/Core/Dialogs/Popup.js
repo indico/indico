@@ -313,6 +313,32 @@ type("BalloonPopup", ["PopupDialog"], {
     );
 
 /**
+ * Utility function to display a simple alert popup.
+ * You can think of it as an "alert" replacement.
+ * It will have a title, a close button, and an OK button.
+ * @param {Html or String} title The title of the error popup.
+ * @param {Element} content Anything you want to put inside.
+ */
+type("AlertPopup", ["ExclusivePopup"],
+    {
+         draw: function() {
+             var self = this;
+             var okButton = Html.button({style:{marginTop: pixels(20)}}, $T('OK'));
+             okButton.observeClick(function(){
+                 self.close();
+             });
+
+             return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {textAlign: 'center'}}, Html.div({}, this.content), okButton));
+         }
+    },
+
+    function(title, content) {
+        this.content = content;
+        this.ExclusivePopup(title, positive);
+    }
+);
+
+/**
  * Utility function to display a popup with errors.
  * Useful for notifying the user of input mistakes or other errors.
  * @param {Html or String} title The title of the error popup.
@@ -340,6 +366,6 @@ type("ErrorPopup", ["ExclusivePopup"],
      function(title, errors, afterMessage) {
          this.afterMessage = afterMessage;
          this.errors = errors;
-         this.ExclusivePopup(title, function(){return true;});
+         this.ExclusivePopup(title, function() {return true;});
      }
     );

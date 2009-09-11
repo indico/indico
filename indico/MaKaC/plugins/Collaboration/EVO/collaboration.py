@@ -26,16 +26,18 @@ from MaKaC.common.timezoneUtils import nowutc, unixTimeToDatetime
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.EVO.common import EVOControlledException, getEVOAnswer, parseEVOAnswer, EVOException,\
     getMinStartDate, getMaxEndDate, OverlappedError, ChangesFromEVOError,\
-    EVOError
+    EVOError, getRequestURL, EVOWarning
 from MaKaC.plugins.Collaboration.EVO.mail import NewEVOMeetingNotificationAdmin,\
-    needToSendEmails, EVOMeetingModifiedNotificationAdmin, EVOMeetingRemovalNotificationAdmin,\
-    NewEVOMeetingNotificationManager, EVOMeetingModifiedNotificationManager,\
-    EVOMeetingRemovalNotificationManager
+    needToSendEmails, EVOMeetingModifiedNotificationAdmin, EVOMeetingRemovalNotificationAdmin
+#    NewEVOMeetingNotificationManager, EVOMeetingModifiedNotificationManager,\
+#    EVOMeetingRemovalNotificationManager
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.logger import Logger
+from MaKaC.i18n import _
 
 class CSBooking(CSBookingBase):
     
+    _hasTitle = True
     _hasStart = True
     _hasStop = False
     _hasCheckStatus = True
@@ -120,6 +122,12 @@ class CSBooking(CSBookingBase):
         return self._lastCheck
     
     ## overriding methods
+    def _getTitle(self):
+        return self._bookingParams["meetingTitle"]
+    
+    def _getPluginDisplayName(self):
+        return "EVO"
+    
     def _checkBookingParams(self):
         if self._bookingParams["communityId"] not in self._EVOOptions["communityList"].getValue(): #change when list of community names is ok
             raise EVOException("communityId parameter (" + str(self._bookingParams["communityId"]) +" ) does not correspond to one of the available communities for booking with id: " + str(self._id))
@@ -161,6 +169,7 @@ class CSBooking(CSBookingBase):
         arguments = self.getCreateModifyArguments()
         
         try:
+            requestURL = getRequestURL("create", arguments)
             answer = getEVOAnswer("create", arguments, self.getConference().getId(), self._id)
             
             returnedAttributes = parseEVOAnswer(answer)
@@ -179,28 +188,28 @@ class CSBooking(CSBookingBase):
                                          self.getConference().getCreator())
                 except Exception,e:
                     Logger.get('EVO').error(
-                        """Could not send NewEVOMeetingNotificationAdmin for booking with id %s , exception: %s""" % (self._id, str(e)))
-                    self._warning = True;
-                    self._warningDetails = "The booking was recorded, but a notification email could not be sent. Reason: " + str(e);
+                        """Could not send NewEVOMeetingNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
+                        (self.getId(), self.getConference().getId(), str(e)))
                     
-            if self._bookingParams["sendMailToManagers"]:
-                try:
-                    notification = NewEVOMeetingNotificationManager(self)
-                    GenericMailer.sendAndLog(notification, self.getConference(),
-                                             "MaKaC/plugins/Collaboration/EVO/collaboration.py",
-                                             self.getConference().getCreator())
-                except Exception,e:
-                    Logger.get('EVO').error(
-                        """Could not send NewEVOMeetingNotificationManager for booking with id %s , exception: %s""" % (self._id, str(e)))
-                    self._warning = True;
-                    self._warningDetails = "The booking was recorded, but a notification email could not be sent. Reason: " + str(e);
+#            if self._bookingParams["sendMailToManagers"]:
+#                try:
+#                    notification = NewEVOMeetingNotificationManager(self)
+#                    GenericMailer.sendAndLog(notification, self.getConference(),
+#                                             "MaKaC/plugins/Collaboration/EVO/collaboration.py",
+#                                             self.getConference().getCreator())
+#                except Exception,e:
+#                    Logger.get('EVO').error(
+#                        """Could not send NewEVOMeetingNotificationManager for booking with id %s , exception: %s""" % (self._id, str(e)))
                 
             
         except EVOControlledException, e:
             if e.message == "ALREADY_EXIST":
-                return EVOError('duplicated')
+                return EVOError('duplicated', str(requestURL))
+            if e.message == "START_IN_PAST":
+                return EVOError('start_in_past', str(requestURL))
             else:
-                raise EVOException("The booking could not be created\n.The EVO Server sent the following error message: " + e.message)
+                raise EVOException("The booking could not be created\n.The EVO Server sent the following error message: " + e.message + 
+                                   ". The request URL was: " + str(requestURL))
                 
 
     def _modify(self):
@@ -211,6 +220,7 @@ class CSBooking(CSBookingBase):
             arguments["meet"] = self._EVOID
             
             try:
+                requestURL = getRequestURL("modify", arguments)
                 answer = getEVOAnswer("modify", arguments, self.getConference().getId(), self._id)
                 returnedAttributes = parseEVOAnswer(answer)
                 
@@ -228,28 +238,28 @@ class CSBooking(CSBookingBase):
                                              self.getConference().getCreator())
                     except Exception,e:
                         Logger.get('EVO').error(
-                            """Could not send EVOMeetingModifiedNotificationAdmin for booking with id %s , exception: %s""" % (self._id, str(e)))
-                        self._warning = True;
-                        self._warningDetails = "The modification was recorded, but a notification email could not be sent. Reason: " + str(e);
+                            """Could not send EVOMeetingModifiedNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
+                            (self.getId(), self.getConference().getId(), str(e)))
                         
-                if self._bookingParams["sendMailToManagers"]:
-                    try:
-                        notification = EVOMeetingModifiedNotificationManager(self)
-                        GenericMailer.sendAndLog(notification, self.getConference(),
-                                             "MaKaC/plugins/Collaboration/EVO/collaboration.py",
-                                             self.getConference().getCreator())
-                    except Exception,e:
-                        Logger.get('EVO').error(
-                            """Could not send EVOMeetingModifiedNotificationManager for booking with id %s , exception: %s""" % (self._id, str(e)))
-                        self._warning = True;
-                        self._warningDetails = "The modification was recorded, but a notification email could not be sent. Reason: " + str(e);
+#                if self._bookingParams["sendMailToManagers"]:
+#                    try:
+#                        notification = EVOMeetingModifiedNotificationManager(self)
+#                        GenericMailer.sendAndLog(notification, self.getConference(),
+#                                             "MaKaC/plugins/Collaboration/EVO/collaboration.py",
+#                                             self.getConference().getCreator())
+#                    except Exception,e:
+#                        Logger.get('EVO').error(
+#                            """Could not send EVOMeetingModifiedNotificationManager for booking with id %s , exception: %s""" % (self._id, str(e)))
 
                 
             except EVOControlledException, e:
                 if e.message == "ALREADY_EXIST":
-                    return EVOError('duplicated')
+                    return EVOError('duplicated', str(requestURL))
+                if e.message == "START_IN_PAST":
+                    return EVOError('start_in_past', str(requestURL))
                 else:
-                    raise EVOException("The booking could not be modified\n.The EVO Server sent the following error message: " + e.message)
+                    raise EVOException("The booking could not be modified\n.The EVO Server sent the following error message: " + e.message + 
+                                       ". The request URL was: " + str(requestURL))
             
         else:
             self._create()
@@ -286,8 +296,10 @@ class CSBooking(CSBookingBase):
             
     def _checkStatus(self):
         if self._created:
+            arguments = {"meet": self._EVOID}
             try:
-                answer = getEVOAnswer("getInfo", {"meet": self._EVOID}, self.getConference().getId(), self._id)                
+                requestURL = getRequestURL("getInfo", arguments)
+                answer = getEVOAnswer("getInfo", arguments , self.getConference().getId(), self._id)                
                 returnedAttributes = parseEVOAnswer(answer)
                 
                 error = self.assignAttributes(returnedAttributes)
@@ -297,16 +309,16 @@ class CSBooking(CSBookingBase):
                 
             except EVOControlledException, e:                
                 if e.message == "UNKNOWN_MEETING":
-                    return EVOError('deletedByEVO')
+                    return EVOError('deletedByEVO', str(requestURL))
                 else:
-                    raise EVOException("Information could not be retrieved\n.The EVO Server sent the following error message: " + e.message)
+                    raise EVOException("Information could not be retrieved\n.The EVO Server sent the following error message: " + e.message + 
+                                       ". The request URL was: " + str(requestURL))
                                         
     def _delete(self):
         if self._created:
-            arguments = {
-                "meet": self._EVOID
-            }
+            arguments = {"meet": self._EVOID}
             try:
+                requestURL = getRequestURL("delete", arguments)
                 getEVOAnswer("delete", arguments, self.getConference().getId(), self._id)
                 
                 if needToSendEmails():
@@ -317,27 +329,37 @@ class CSBooking(CSBookingBase):
                                              self.getConference().getCreator())
                     except Exception,e:
                         Logger.get('EVO').error(
-                            """Could not send EVOMeetingNotificationAdmin for booking with id %s , exception: %s""" % (self._id, str(e)))
+                            """Could not send EVOMeetingRemovalNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
+                            (self.getId(), self.getConference().getId(), str(e)))
                 
-                if self._bookingParams["sendMailToManagers"]:
-                    try:
-                        notification = EVOMeetingRemovalNotificationManager(self)
-                        GenericMailer.sendAndLog(notification, self.getConference(),
-                                             "MaKaC/plugins/Collaboration/EVO/collaboration.py",
-                                             self.getConference().getCreator())
-                    except Exception,e:
-                        Logger.get('EVO').error(
-                            """Could not send EVOMeetingRemovalNotificationManager for booking with id %s , exception: %s""" % (self._id, str(e)))
+#                if self._bookingParams["sendMailToManagers"]:
+#                    try:
+#                        notification = EVOMeetingRemovalNotificationManager(self)
+#                        GenericMailer.sendAndLog(notification, self.getConference(),
+#                                             "MaKaC/plugins/Collaboration/EVO/collaboration.py",
+#                                             self.getConference().getCreator())
+#                    except Exception,e:
+#                        Logger.get('EVO').error(
+#                            """Could not send EVOMeetingRemovalNotificationManager for booking with id %s , exception: %s""" % (self._id, str(e)))
                 
             except EVOControlledException, e:                
                 if e.message == "DELETE_MEETING_OVER":
-                    return EVOError('cannotDeleteOld')
+                    return EVOError('cannotDeleteOld', str(requestURL))
                 if e.message == "DELETE_MEETING_ONGOING":
-                    return EVOError('cannotDeleteOngoing')
+                    return EVOError('cannotDeleteOngoing', str(requestURL))
+                if e.message == "DELETE_MEETING_NO_ID":
+                    self._warning = EVOWarning('cannotDeleteNonExistant')
                 else:
-                    raise EVOException("The booking could not be deleted\n.The EVO Server sent the following error message: " + e.message)
+                    raise EVOException("The booking could not be deleted\n.The EVO Server sent the following error message: " + e.message + 
+                                       ". The request URL was: " + str(requestURL))
                 
         self._error = False
+        
+        
+    def _getLaunchDisplayInfo(self):
+        return {'launchText' : _("Join Now!"),
+                'launchLink' : str(self.getURL()),
+                'launchTooltip': _("Click here to join the EVO meeting!")}
     
     ## end of overrigind methods
             
@@ -398,17 +420,21 @@ class CSBooking(CSBookingBase):
         self._created = True
         
     def checkCanStart(self, changeMessage = True):
-        now = nowutc()
-        if self.getStartDate() < now and self.getEndDate() > now:
-            self._canBeStarted = True
-            if changeMessage:
-                self._statusMessage = "Ready to start!"
-                self._statusClass = "statusMessageOK"
-        else:
-            self._canBeStarted = False
-            if now > self.getEndDate() and changeMessage:
-                self._statusMessage = "Already took place"
-                self._statusClass = "statusMessageOther"
-                self._needsToBeNotifiedOfDateChanges = False
-                self._canBeNotifiedOfEventDateChanges = False
+        if self._created:
+            now = nowutc()
+            self._canBeDeleted = True
+            if self.getStartDate() < now and self.getEndDate() > now:
+                self._canBeStarted = True
+                self._canBeDeleted = False
+                if changeMessage:
+                    self._statusMessage = "Ready to start!"
+                    self._statusClass = "statusMessageOK"
+            else:
+                self._canBeStarted = False
+                if now > self.getEndDate() and changeMessage:
+                    self._canBeDeleted = False
+                    self._statusMessage = "Already took place"
+                    self._statusClass = "statusMessageOther"
+                    self._needsToBeNotifiedOfDateChanges = False
+                    self._canBeNotifiedOfEventDateChanges = False
                 

@@ -894,8 +894,13 @@ class SystemLinkData:
                 "caption": _("Modify my evaluation"), \
                 "URL": str(urlHandlers.UHConfEvaluationDisplayModif.getURL(conf)), \
                 "staticURL": "", \
-                "parent": "evaluation"} \
-                     }
+                "parent": "evaluation"},
+            "collaboration": { \
+                "caption": _("Video Services"), \
+                "URL": str(urlHandlers.UHCollaborationDisplay.getURL(conf)), \
+                "staticURL": "", \
+                "parent": ""} \
+            }
         #this ordered list allow us to keep the order we want for the menu
         if not hasattr(self, "_linkDataOrderedKeys"):
             self._linkDataOrderedKeys = ["overview",
@@ -923,7 +928,8 @@ class SystemLinkData:
                                         "registrants",
                                         "evaluation",
                                         "newEvaluation",
-                                        "viewMyEvaluation"]
+                                        "viewMyEvaluation",
+                                        "collaboration"]
     
     def getLinkData(self):
         return self._linkData

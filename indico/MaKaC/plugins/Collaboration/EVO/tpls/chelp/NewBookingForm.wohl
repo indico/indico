@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<wohl xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="wohl.xsd" version="0.1">
+
+    <page name="NewBookingForm">
+        
+        <tooltip name="password" target="//*[@id='passwordHelp']">
+            <translation language="en">
+                <text>
+                    <p>If you want to protect access to your EVO meeting with a password, please input it here. Otherwise, leave this field empty.</p>
+                </text>
+            </translation>
+        </tooltip>
+
+    </page>
+
+</wohl>

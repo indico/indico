@@ -20,11 +20,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.plugins.base import PluginsHolder
-from MaKaC.plugins.Collaboration.CERNMCU.common import getCERNMCUOptionValueByName
+from MaKaC.plugins.Collaboration.CERNMCU.common import getCERNMCUOptionValueByName,\
+    secondsToWait
 from MaKaC.common.xmlrpcTimeout import getServerWithTimeout
+import datetime
 import xmlrpclib
-
-secondsToWait = 10
 
 class MCU(object):
     _instance = None    
@@ -42,8 +42,16 @@ def MCUTrue():
 def MCUFalse():
     return xmlrpclib.boolean(False)
 
-def MCUTime(timeStr):
-    return xmlrpclib.DateTime(timeStr)
+iso8601format = "%Y%m%dT%H:%M:%S"
+
+def MCUTime(dt):
+    return xmlrpclib.DateTime(dt.strftime(iso8601format))
+
+def datetimeFromMCUTime(mcutime):
+    """ returns a naive datetime from a xmlrpclib.DateTime object
+    """
+    return datetime.datetime.strptime(mcutime.value, iso8601format)
+
 
 confCommonParams = {
     "registerWithGatekeeper" : MCUTrue(),
@@ -64,7 +72,8 @@ confCommonParams = {
 participantCommonParams = {
     "participantProtocol": 'h323',
     "participantType" : 'by_address',
-    "deferConnection" : MCUTrue()   
+    "deferConnection" : MCUTrue(),
+    "displayNameOverrideStatus": MCUTrue()
 }
     
 def MCUParams(**args):

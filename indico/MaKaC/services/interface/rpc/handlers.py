@@ -1,12 +1,9 @@
-from MaKaC.services.implementation import conference
 from MaKaC.services.implementation import resources
 from MaKaC.services.implementation import roomBooking
-from MaKaC.services.implementation import session
 from MaKaC.services.implementation import error
 
 from MaKaC.services.interface.rpc import description
 
-from MaKaC.plugins import importPlugin
 
 def importModule(name):
     mod = __import__(name)
@@ -20,7 +17,7 @@ methodMap = {
      
     "roomBooking.locations.list": roomBooking.RoomBookingListLocations,
     "roomBooking.rooms.list": roomBooking.RoomBookingListRooms,
-    "roomBokking.locationsAndRooms.list" :roomBooking.RoomBookingListLocationsAndRooms,
+    "roomBooking.locationsAndRooms.list" :roomBooking.RoomBookingListLocationsAndRooms,
     
     "resources.filetype.icon": resources.GetFileTypeIcon,
     "resources.timezones.getAll": resources.GetTimezones,

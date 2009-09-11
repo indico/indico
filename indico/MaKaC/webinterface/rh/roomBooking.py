@@ -23,18 +23,12 @@
 
 import os
 
-import MaKaC.webinterface.rh.base as base
-import MaKaC.webinterface.pages.roomBooking as roomBooking
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.locators as locators
-import MaKaC.accessControl as accessControl
-import MaKaC.user as user
 from MaKaC.common.general import *
-from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.Configuration import Config
 from MaKaC.webinterface.rh.base import RHProtected, RoomBookingDBMixin
 from datetime import datetime, timedelta
-from MaKaC.user import AvatarHolder
 from MaKaC.common.utils import HolidaysHolder
 from MaKaC.common.datetimeParser import parse_date
 
@@ -45,11 +39,10 @@ import MaKaC.webinterface.pages.admins as admins
 from MaKaC.rb_room import RoomBase
 from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum
 from MaKaC.rb_factory import Factory
-from MaKaC.rb_location import CrossLocationQueries, ReservationGUID, RoomGUID, Location, CrossLocationDB
+from MaKaC.rb_location import CrossLocationQueries, RoomGUID, Location
 from MaKaC.rb_tools import intd, FormMode
-from MaKaC import accessControl
 from MaKaC import plugins
-from MaKaC.errors import MaKaCError, ModificationError, AccessError, TimingError, ParentTimingError, EntryTimingError, FormValuesError
+from MaKaC.errors import MaKaCError
 
 class CandidateDataFrom( object ):
     DEFAULTS, PARAMS, SESSION = xrange( 3 )
@@ -1063,7 +1056,6 @@ class RHRoomBookingCloneBooking( RHRoomBookingBase ):
         resvID = int(params.get( "resvID" ))
 
         # CREATE CANDIDATE OBJECT
-        import copy
         candResv = CrossLocationQueries.getReservations( resvID = resvID)
         if type(candResv) == list:
             candResv=candResv[0]
@@ -1761,11 +1753,10 @@ class RHRoomBookingSaveCustomAttribute( RHRoomBookingAdminBase ): # + additional
         
         # Set "required" for _all_ custom attributes
         manager = self._location.factory.getCustomAttributesManager()
-        s = ""
         for ca in manager.getAttributes(location=self._location.friendlyName):
             required = hidden = False
             # Try to find in params (found => required == True)
-            for k, v in params.iteritems():
+            for k in params.iterkeys():
                 if k[0:10] == "cattr_req_":
                     attrName = k[10:100].strip()
                     if attrName == ca['name']:

@@ -22,7 +22,6 @@ from MaKaC.common.PickleJar import DictPickler
 
 import os
 from MaKaC.common.general import *
-import MaKaC.webinterface.pages.main as main
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.pages.conferences as conferences
@@ -48,7 +47,7 @@ from MaKaC.plugins.base import PluginsHolder
 import MaKaC.common.indexes as indexes
 import MaKaC.webinterface.personalization as personalization
 from cgi import escape
-import re, os
+import re
 from MaKaC.i18n import _
 from MaKaC.modules.base import ModulesHolder
 
@@ -173,9 +172,9 @@ class WAdmins(wcomponents.WTemplated):
             else:
                 vars["address"] = "%s"%minfo.getCountry()
         try:
-          vars["timezone"] = minfo.getTimezone() 
+            vars["timezone"] = minfo.getTimezone() 
         except: 
-          vars["timezone"] = 'UTC'
+            vars["timezone"] = 'UTC'
         vars["adminList"] = wcomponents.WPrincipalTable().getHTML( minfo.getAdminList().getList(),  None, vars["addAdminsURL"], vars["removeAdminsURL"], selectable=False )
         vars["systemIconAdmins"] = Config.getInstance().getSystemIconURL( "admin" )
         iconDisabled = str(Config.getInstance().getSystemIconURL( "disabledSection" ))
@@ -263,9 +262,9 @@ class WGeneralInfoModification(wcomponents.WTemplated):
         vars["city"] = genInfo.getCity()
         vars["country"] = genInfo.getCountry() 
         try:
-           selected_tz = genInfo.getTimezone()
+            selected_tz = genInfo.getTimezone()
         except:
-           selected_tz = 'UTC'
+            selected_tz = 'UTC'
         vars["timezone"]=TimezoneRegistry.getShortSelectItemsHTML(selected_tz)
         vars["language"]= genInfo.getLang()
         return vars
@@ -375,8 +374,7 @@ class WPConfigUpcomingEvents( WPHomepageCommon ):
         
     def _getTabContent( self, params ):
         wc = WConfigUpcomingEvents()
-        upcomingModule=ModulesHolder().getById("upcoming_events")
-        pars = { }
+        pars = {}
         return wc.getHTML( pars )
 
 class WConfigUpcomingEvents(wcomponents.WTemplated):
@@ -500,8 +498,8 @@ class WPRecording( WPServicesCommon ):
 
     def _getTabContent( self, params ):
         return "under construction"
-        wp = WRecording()
-        return wp.getHTML(params)
+        #wp = WRecording()
+        #return wp.getHTML(params)
 
     def _setActiveTab( self ):
         self._subTabRecording.setActive()
@@ -778,7 +776,7 @@ class WAdminsConferenceStyles(wcomponents.WTemplated):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["contextHelpText"] = _("This is the list of templates that an organizer can use to customize a conference")
-        from MaKaC.modules.base import ModulesHolder
+        #from MaKaC.modules.base import ModulesHolder
         cssTplsModule=ModulesHolder().getById("cssTpls")
         vars["cssTplsModule"] = cssTplsModule
         return vars
@@ -876,16 +874,13 @@ class WPBadgeTemplateDesign( WPTemplatesCommon ):
         wc = conferences.WConfModifBadgeDesign( self._conf, self.__templateId, self.__new )
         return wc.getHTML()
 
-    def sortByName(x,y):
-        return cmp(x.getFamilyName(),y.getFamilyName())
-
 class WPPosterTemplateDesign( WPTemplatesCommon ):
     
     def __init__(self, rh, conf, templateId = None, new = False):
-       WPTemplatesCommon.__init__(self, rh)
-       self._conf = conf
-       self.__templateId = templateId
-       self.__new = new
+        WPTemplatesCommon.__init__(self, rh)
+        self._conf = conf
+        self.__templateId = templateId
+        self.__new = new
     
     def _setActiveTab( self ):
         self._subTabPosters.setActive()
@@ -893,9 +888,6 @@ class WPPosterTemplateDesign( WPTemplatesCommon ):
     def _getTabContent( self, params ):
         wc = conferences.WConfModifPosterDesign( self._conf, self.__templateId, self.__new )
         return wc.getHTML()
-
-    def sortByName(x,y):
-        return cmp(x.getFamilyName(),y.getFamilyName())
         
 class WBadgeTemplates( wcomponents.WTemplated ):
 
@@ -1179,7 +1171,7 @@ class WHTMLUserList(wcomponents.WTemplated):
                         """)%len(self._userList))
         for u in self._userList:
             if color=="white":
-               color="#ececec"
+                color="#ececec"
             else:
                 color="white"
             organisation = ""
@@ -1429,16 +1421,16 @@ class WUserDetails(wcomponents.WTemplated):
 
 
         try:
-           vars["timezone"] = self.htmlText(u.getTimezone())
+            vars["timezone"] = self.htmlText(u.getTimezone())
         except:
-           u.setTimezone("UTC")
-           vars["timezone"] = self.htmlText(u.getTimezone())
+            u.setTimezone("UTC")
+            vars["timezone"] = self.htmlText(u.getTimezone())
 
         try:
-           vars["displayTZMode"] = self.htmlText(u.getDisplayTZMode())
+            vars["displayTZMode"] = self.htmlText(u.getDisplayTZMode())
         except:
-           u.setDisplayTZMode("MyTimezone")
-           vars["displayTZMode"] = self.htmlText(u.getDisplayTZMode())
+            u.setDisplayTZMode("MyTimezone")
+            vars["displayTZMode"] = self.htmlText(u.getDisplayTZMode())
 
 
         vars["locator"] = self.htmlText(self._avatar.getLocator().getWebForm())
@@ -1701,7 +1693,7 @@ class WHTMLGroupList(wcomponents.WTemplated):
                         """)%len(self._groupList))
         for g in self._groupList:
             if color=="white":
-               color="#ececec"
+                color="#ececec"
             else:
                 color="white"
             url = vars["groupDetailsURLGen"]( g )
@@ -1928,14 +1920,14 @@ class WPGroupSelectMembers( WPGroupModificationBase ):
     
 class WPSelectUserToLogAs(WPUserCommon ):
     
-    def _getTabContent( self, params ):
-        wc = WSelectUserToLogAs()
-        pars = {"submitURL":urlHandlers.UHLogMeAs.getURL()}
-        return wc.getHTML( pars )
+#    def _getTabContent( self, params ):
+#        wc = WSelectUserToLogAs()
+#        pars = {"submitURL":urlHandlers.UHLogMeAs.getURL()}
+#        return wc.getHTML( pars )
     
     def _getTabContent( self, params ):
         searchURL = urlHandlers.UHLogMeAs.getURL()
-        cancelURL = urlHandlers.UHUsers.getURL()
+        #cancelURL = urlHandlers.UHUsers.getURL()
         wc = wcomponents.WUserSelection( searchURL, multi=False, forceWithoutExtAuth=True )
         wc.setTitle(_("Select user to log in as"))
         params["addURL"] =  urlHandlers.UHLogMeAs.getURL()
@@ -2047,7 +2039,7 @@ class WPUserMergeSelectPrin(WPUserMerge):
         #searchURL.addParam("selectPrin", "sp")
         addURL = urlHandlers.UHUserMerge.getURL()
         addURL.addParam("setPrin", "setPrin")
-        cancelURL = urlHandlers.UHUserMerge.getURL()
+        #cancelURL = urlHandlers.UHUserMerge.getURL()
         wc = wcomponents.WUserSelection( searchURL, multi=False, forceWithoutExtAuth=True )
         wc.setTitle("Select user")
         params["addURL"] =  addURL
@@ -2069,7 +2061,7 @@ class WPUserMergeSelectToMerge(WPUserMerge):
         #searchURL.addParam("selectToMerge", "sp")
         addURL = urlHandlers.UHUserMerge.getURL()
         addURL.addParam("setToMerge", "setToMerge")
-        cancelURL = urlHandlers.UHUserMerge.getURL()
+        #cancelURL = urlHandlers.UHUserMerge.getURL()
         wc = wcomponents.WUserSelection( searchURL, multi=False, forceWithoutExtAuth=True )
         wc.setTitle("Select user")
         params["addURL"] =  addURL
@@ -2137,7 +2129,7 @@ class WRoomMapperList(wcomponents.WTemplated):
             ul = []
             for rm in roomMapperList:
                 if color=="white":
-                   color="#F6F6F6"
+                    color="#F6F6F6"
                 else:
                     color="white"
                 url = vars["roomMapperDetailsURLGen"]( rm )
@@ -2317,7 +2309,6 @@ class WHTMLDomainList:
                               <td>
                     <br>
                 <table width="100%%" align="left" style="border-top: 1px solid #777777; padding-top:10px">"""
-        ul = []
         color="white"
         ul = []
         for dom in self._list:

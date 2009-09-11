@@ -13,9 +13,6 @@ if __name__ == '__main__':
     Usage: %s <testFile.py>
 ''' % sys.argv[0]
         sys.exit()
-
-    if not os.path.exists('etc/indico.conf.local'):
-        shutil.copy('etc/indico.conf', 'etc/indico.conf.local')
         
     testName = sys.argv[1].replace(".py", "").replace('/', '.')
     sys.path = [os.path.join(os.path.dirname(__file__), '..', 'indico'), os.path.join(os.path.dirname(__file__), '..')] + sys.path

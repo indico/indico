@@ -25,8 +25,8 @@ from datetime import timedelta
 from MaKaC.webinterface.common.tools import strip_ml_tags, unescape_html
 from MaKaC.plugins.Collaboration.EVO.common import getMinStartDate,\
     getMaxEndDate
-from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
+from MaKaC.i18n import _
 
 class WNewBookingForm(WCSPageTemplateBase):
         
@@ -37,8 +37,6 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["EventDescription"] = unescape_html(strip_ml_tags( self._conf.getDescription())).strip()
         vars["DefaultStartDate"] = formatDateTime(self._conf.getAdjustedStartDate() - timedelta(0,0,0,0,CollaborationTools.getCollaborationPluginType().getOption("startMinutes").getValue()))
         vars["DefaultEndDate"] = formatDateTime(self._conf.getAdjustedEndDate())
-        vars["MinStartDate"] = formatDateTime(getMinStartDate(self._conf))
-        vars["MaxEndDate"] = formatDateTime(getMaxEndDate(self._conf))
         vars["Communities"] = self._EVOOptions["communityList"].getValue()
         
         return vars
@@ -55,78 +53,64 @@ class WMain (WJSBase):
         
         return vars
     
+class WExtra (WJSBase):
+    
+    def getVars(self):
+        vars = WJSBase.getVars( self )
+        
+        vars["AllowedStartMinutes"] = self._EVOOptions["allowedPastMinutes"].getValue()
+        if self._conf:
+            vars["MinStartDate"] = formatDateTime(getMinStartDate(self._conf), format = "%a %d/%m %H:%M")
+            vars["MaxEndDate"] = formatDateTime(getMaxEndDate(self._conf), format = "%a %d/%m %H:%M")
+        else:
+            vars["MinStartDate"] = ''
+            vars["MaxEndDate"] = ''
+        
+        return vars
+    
 class WIndexing(WJSBase):
     pass
     
-class WDisplay(WCSPageTemplateBase):
+class WInformationDisplay(WCSPageTemplateBase):
     
-    def __init__(self, conf, displayTz):
-        WCSPageTemplateBase.__init__(self, conf, 'EVO', None)
+    def __init__(self, booking, displayTz):
+        WCSPageTemplateBase.__init__(self, booking.getConference(), 'EVO', None)
+        self._booking = booking
         self._displayTz = displayTz
     
     def getVars(self):
         vars = WCSPageTemplateBase.getVars( self )
         
-        evoBookings = self._conf.getCSBookingManager().getBookingList(filterByType="EVO", notify = True)
-        currentBookings = []
-        futureBookings = []
-        
-        for b in evoBookings:
-            if b.canBeStarted():
-                currentBookings.append(b)
-            if b.getAdjustedStartDate('UTC') > nowutc():
-                futureBookings.append(b)
-        
-        vars["CurrentBookings"] = currentBookings
-        vars["FutureBookings"] = futureBookings
-        vars["Today"] = getAdjustedDate(nowutc(), tz = self._displayTz).date()
-        vars["DisplayTz"] = self._displayTz
+        vars["Booking"] = self._booking
         
         return vars
-    
-    def shouldShow(self):
-        return self._currentBooking or len(self._futureBookings) > 0
     
 class XMLGenerator(object):
     
     @classmethod
-    def getXML(cls, csbm, displayTz, out):
-        """ csbm: a CSBookingManager object
-            out: an XML outpout stream
-        """
-        evoBookings = csbm.getBookingList(filterByType="EVO", notify = True)
-        currentBookings = []
-        futureBookings = []
-        
-        for b in evoBookings:
-            if b.canBeStarted():
-                currentBookings.append(b)
-            if b.getAdjustedStartDate('UTC') > nowutc():
-                futureBookings.append(b)
-        
-        if currentBookings:
-            out.openTag("ongoing")
-            for booking in currentBookings:
-                cls.getBookingXML(booking, displayTz, out)
-            out.closeTag("ongoing")
-        
-        if futureBookings:
-            out.openTag("scheduled")
-            for booking in futureBookings:
-                cls.getBookingXML(booking, displayTz, out)
-            out.closeTag("scheduled")
+    def getDisplayName(cls):
+        return "EVO"
             
     @classmethod
-    def getBookingXML(cls, booking, displayTz, out):
-        out.openTag("booking")
-        out.writeTag("title", booking._bookingParams["meetingTitle"])
-        out.writeTag("startDate", booking.getAdjustedStartDate(displayTz).strftime("%Y-%m-%dT%H:%M:%S"))
-        out.writeTag("endDate",booking.getAdjustedEndDate(displayTz).strftime("%Y-%m-%dT%H:%M:%S"))
-        out.writeTag("url", booking.getURL())
-        if booking.getHasAccessPassword():
-            out.writeTag("hasPassword", "yes")
-        else:
-            out.writeTag("hasPassword", "no")
-        out.closeTag("booking")
+    def getCustomBookingXML(cls, booking, displayTz, out):
+        booking.checkCanStart()
+        if (booking.canBeStarted()):
+            out.openTag("launchInfo")
+            out.writeTag("launchText", _("Join Now!"))
+            out.writeTag("launchLink", booking.getURL())
+            out.writeTag("launchTooltip", _('Click here to join the EVO meeting!'))
+            out.closeTag("launchInfo")
+
+        out.openTag("information")
         
-            
+        if booking.getHasAccessPassword():
+            out.openTag("section")
+            out.writeTag("title", _('Protection:'))
+            out.writeTag("line", _('This EVO meeting is protected by a password'))
+            out.closeTag("section")
+        out.openTag("section")
+        out.writeTag("title", _('Description:'))
+        out.writeTag("line", booking._bookingParams["meetingDescription"])
+        out.closeTag("section")
+        out.closeTag("information")
+                    

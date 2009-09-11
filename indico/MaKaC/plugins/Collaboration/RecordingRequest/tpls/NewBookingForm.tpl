@@ -2,9 +2,10 @@
 
 <% if not Conference.getLocation(): %>
 <div style="margin-bottom: 1em;">
-    <span class="RRWarningMessage">
-        <u>Warning:</u> We will need to know the location before we can record the event.<br/>
-        Please go to the <a href="<%= urlHandlers.UHConferenceModification.getURL(Conference)%>">main tab</a> and enter the room location(s) for this Indico event
+    <span class="RRNoteTitle"><%=_("Warning:")%></span>
+    <span class="RRNoteText">
+        <%= _("We will need to know the location before we can record the event.") %><br />
+        <%= _("Please go to the") %> <a href="<%= urlHandlers.UHConferenceModification.getURL(Conference)%>"> <%= _("General Settings") %></a> <%= _("and enter the room location(s) for this Indico event.")%>
     </span>
 </div>
 <% end %>
@@ -14,10 +15,10 @@
     <div id="sendRecordingRequestTop" class="sendRecordingRequestDiv" style="display:none;">
         <button onclick="send('RecordingRequest')">Send request</button>
     </div>
-    <div id="modifyRecordingRequestTop" class="modifyRecordingRequest" style="display:none;">
+    <div id="modifyRecordingRequestTop" class="modifyRecordingRequestDiv" style="display:none;">
         <button onclick="send('RecordingRequest')">Modify request</button>
     </div>
-    <div id="withdrawRecordingRequestTop" class="withdrawRecordingRequest" style="display:none;">
+    <div id="withdrawRecordingRequestTop" class="withdrawRecordingRequestDiv" style="display:none;">
         <button onclick="withdraw('RecordingRequest')">Withdraw request</button>
     </div>
 </div>
@@ -38,30 +39,33 @@
             <label for="neitherRB">Neither, see comment</label>
         </div>
     </div>
-    <div id="contributionsDiv" class="RRFormSubsection" style="display: none;">
+    <% displayText = ('none', 'block')[DisplayTalks] %>
+    <div id="contributionsDiv" class="RRFormSubsection" style="display: <%= displayText %>;">
         <span class="RRQuestion">Please choose among the contributions below:</span>
+        
+        <% if HasTalks: %>
+        <span class="fakeLink" style="margin-left: 20px; margin-right: 5px;" onclick="WRSelectAllContributions()">Select all</span>
+        <span style="color: #AAAAAA">|</span>
+        <span class="fakeLink" style="margin-left: 5px;" onclick="WRUnselectAllContributions()">Select none</span>
+        <% end %>
+        
         <div class="RRContributionListDiv">
             <table>
                 <tr id="contributionsRow">
-                    <% if DisplayContributions: %>
-                        <% if HasContributions: %>
-                            <% for cl in ContributionLists: %>
+                    <% if DisplayTalks: %>
+                        <% if HasTalks: %>
+                            <% for cl in TalkLists: %>
                             <td class="RRContributionsColumn">
                                 <ul class="RROptionList">
-                                <% for contribution, checked in cl: %>
-                                    <% if checked: %>
-                                        <% checkedText = 'checked' %>
-                                    <% end %>
-                                    <% else: %>
-                                        <% checkedText = '' %>
-                                    <% end %>
+                                <% for talk, checked in cl: %>
+                                    <% checkedText = ('', 'checked')[checked] %>
                                     <li>
-                                        <input type="checkbox" name="talkSelection" value="<%= contribution.getId() %>" id="contribution<%=contribution.getId()%>CB"/ <%=checkedText%>>
-                                        <label for="contribution<%=contribution.getId()%>CB">
-                                            <span class="RRContributionId">[<%= contribution.getId() %>]</span>
-                                            <span class="RRContributionName"><%= contribution.getTitle() %></span>
-                                            <% if contribution.getSpeakerList() : %>
-                                            <span class="RRSpeakers">, by <%= " and ".join([person.getFullName() for person in contribution.getSpeakerList()]) %></span>
+                                        <input type="checkbox" name="talkSelection" value="<%= talk.getId() %>" id="talk<%=talk.getId()%>CB"/ <%=checkedText%>>
+                                        <label for="contribution<%=talk.getId()%>CB">
+                                            <span class="RRContributionId">[<%= talk.getId() %>]</span>
+                                            <span class="RRContributionName"><%= talk.getTitle() %></span>
+                                            <% if talk.getSpeakerList() : %>
+                                            <span class="RRSpeakers">, by <%= " and ".join([person.getFullName() for person in talk.getSpeakerList()]) %></span>
                                             <% end %>
                                         </label>
                                     </li>
@@ -79,6 +83,20 @@
                 </tr>
             </table>
         </div>
+        <% if HasTalks: %>
+        <script type="text/javascript">
+            var WRSelectAllContributions = function() {
+                each($N('talkSelection'), function(checkbox) {
+                    checkbox.dom.checked = true;
+                });
+            }
+            var WRUnselectAllContributions = function() {
+                each($N('talkSelection'), function(checkbox) {
+                    checkbox.dom.checked = false;
+                });
+            }
+        </script>
+        <% end %>
     </div>
     <div class="RRFormSubsection">
         <span class="RRQuestion">Please write here additional comments about talk selection:</span>
@@ -93,8 +111,6 @@
         <label for="permissionNoRB" id="permissionNoRBLabel">No</label>
         <span style="margin-left: 2em;">Here is the <a href="<%= ConsentFormURL %>">Recording Consent Form</a> to be signed by each speaker.</span>
     </div>
-    
-    
 </div>
 
 <!-- DRAW BOX AROUND SECTION 2: TECHNICAL DETAILS FOR RECORDING -->
@@ -209,11 +225,15 @@
     <div id="sendRecordingRequestBottom" class="sendRecordingRequestDiv" style="display:none;">
         <button onclick="send('RecordingRequest')">Send request</button>
     </div>
-    <div id="modifyRecordingRequestBottom" class="modifyRecordingRequest" style="display:none;">
+    <div id="modifyRecordingRequestBottom" class="modifyRecordingRequestDiv" style="display:none;">
         <button onclick="send('RecordingRequest')">Modify request</button>
     </div>
-    <div id="withdrawRecordingRequestBottom" class="withdrawRecordingRequest" style="display:none;">
+    <div id="withdrawRecordingRequestBottom" class="withdrawRecordingRequestDiv" style="display:none;">
         <button onclick="withdraw('RecordingRequest')">Withdraw request</button>
     </div>
 </div>
 <% end %>
+
+<script type="text/javascript">
+    var RR_contributionsLoaded = <%= jsBoolean(DisplayTalks) %>;
+</script>

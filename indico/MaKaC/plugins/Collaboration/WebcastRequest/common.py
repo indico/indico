@@ -21,9 +21,7 @@
 
 from MaKaC.plugins.Collaboration.base import CollaborationServiceException,\
     CSErrorBase
-from MaKaC.plugins.Collaboration.base import CollaborationTools
 from MaKaC.common.PickleJar import Retrieves
-from MaKaC.webinterface.common.contribFilters import PosterFilterField
 
 lectureOptions = [
     ("none", "None"),
@@ -97,57 +95,3 @@ class WebcastRequestError(CSErrorBase):
     
 class WebcastRequestException(CollaborationServiceException):
     pass
-
-def getFormFields( WebcastRequestOptions,conf):
-    roomObject = conf.getRoom()
-    vars = {}
-    vars["Conference"] = conf
-    selectedTalks=[]
-    booking = conf.getCSBookingManager().getSingleBooking('WebcastRequest')
-    if booking:
-        bookingParams = booking._bookingParams
-        selectedTalks=[]
-        if bookingParams['talks'] == 'choose':
-            selectedTalks = bookingParams["talkSelection"]
-    contributions1 = []
-    contributions2 = []
-    filter = PosterFilterField(conf, False, False) #To filter out the poster sesions
-    noPosterContributions = [cont for cont in conf.getContributionListSortedById() if filter.satisfies(cont)]
-    nContributions = len(noPosterContributions)
-    vars["HasContributions"] = nContributions > 0
-    webcastCapableRooms= WebcastRequestOptions["webcastCapableRooms"].getValue()
-
-    vars["WebcastCapableRooms"]=webcastCapableRooms
-    nwebcastCapableContributions = 0
-    for i, contribution in enumerate(noPosterContributions):
-        if(contribution.getLocation() is not None and contribution.getRoom() is not None ):
-            webcastCapable= contribution.getLocation().getName() + ":" + contribution.getRoom().getName() in webcastCapableRooms
-        else:
-            webcastCapable = False
-        if webcastCapable:
-            nwebcastCapableContributions+=1
-        if i <= nContributions / 2:
-            contributions1.append((contribution, contribution.getId() in selectedTalks,webcastCapable))
-        else:
-            contributions2.append((contribution, contribution.getId() in selectedTalks,webcastCapable))
-    vars["ContributionLists"] = [contributions1, contributions2]
-    vars["NwebcastCapableContributions"]=nwebcastCapableContributions
-    vars["NContributions"]=nContributions
-    if(conf.getLocation() is not None and conf.getRoom() is not None ):
-        topLevelWebcastCapable = conf.getLocation().getName()+":"+conf.getRoom().getName() \
-                    in webcastCapableRooms
-    else:
-        topLevelWebcastCapable = False
-    webcastcapable = nwebcastCapableContributions>0 \
-                    or topLevelWebcastCapable
-    if webcastcapable:
-        vars["WebcastCapable"]= "true"    
-    else:
-        vars["WebcastCapable"]= "false"
-    vars["LectureOptions"] = lectureOptions
-    vars["TypesOfEvents"] = typeOfEvents
-    vars["PostingUrgency"] = postingUrgency
-    vars["WebcastPurpose"] = webcastPurpose
-    vars["IntendedAudience"] = intendedAudience
-    vars["SubjectMatter"] = subjectMatter
-    return vars

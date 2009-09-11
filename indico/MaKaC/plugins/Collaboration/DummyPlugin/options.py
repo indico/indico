@@ -18,20 +18,25 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from MaKaC.i18n import _
 
 globalOptions = [
-    ("defaultUsername" , {"description" : "Default username",
-                        "type": str,
-                        "defaultValue": "David"} ),
-    ("subtab", {"description" : "Subtab where DummyPlugin will be placed",
+    #collaboration options necessary in all plugins
+    ("subtab", {"description" : _("Subtab where DummyPlugin will be placed"),
                "type": str,
-               "defaultValue": "DummyTab",
+               "defaultValue": "DummyPlugin",
+               "editable": False,
+               "visible": False,
+               "mustReload": True} ),
+    ("allowedOn", {"description" : _("Kind of event types (conference, meeting, simple_event) supported"),
+               "type": list,
+               "defaultValue": ["meeting","conference","simple_event"],
                "editable": True,
                "visible": True,
-               "mustReload": True} ),
-    ("allowedOn" , {"description" : "Kind of event types (conference, meeting, simple_event) supported",
-               "type": list,
-               "defaultValue": ["meeting"],
-               "editable": True,
-               "visible": True} )
+               "mustReload": False} ),
+    ("admins", {"description": _("DummyPlugin admins / responsibles"),
+                      "type": 'users',
+                      "defaultValue": [],
+                      "editable": True,
+                      "visible": True} )
 ]

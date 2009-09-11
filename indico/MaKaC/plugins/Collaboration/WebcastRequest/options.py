@@ -30,9 +30,9 @@ globalOptions = [
     ("allowedOn", {"description" : "Kind of event types (conference, meeting, simple_event) supported",
                "type": list,
                "defaultValue": ["conference","simple_event","meeting"],
-               "editable": False,
-               "visible": False,
-               "mustReload": True} ),
+               "editable": True,
+               "visible": True,
+               "mustReload": False} ),
     ("admins", {"description": "Webcast Request admins / responsibles",
                       "type": "users",
                       "defaultValue": [],
@@ -50,9 +50,7 @@ globalOptions = [
                           "editable": True,
                           "visible": True} ),
     
-    #This option is not relevant as for webcast as we have to load all the contributions in orer to find out if the
-    #event is capable of webcasting. 
-    ("contributionWarnLimit", {"description" : "Allowed number of loaded contributions without warning",
+    ("contributionLoadLimit", {"description" : "Allowed number of talks fetched on new request page load",
                "type": int,
                "defaultValue": 20,
                "editable": True,

@@ -23,8 +23,9 @@ from MaKaC.plugins import getModules, initModule
 
 pluginType = "Collaboration"
 pluginName = "DummyPlugin"
-pluginDescription = "Dummy collaboration plugin"
-ignore = True
+pluginDescription = "Dummy collaboration plugin used for tests"
+ignore = False
+testPlugin = True
 
 modules = {}
 topModule = None

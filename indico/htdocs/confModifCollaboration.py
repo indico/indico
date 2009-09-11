@@ -24,3 +24,5 @@ from MaKaC.webinterface.rh import collaboration
 def index(req, **params):
     return collaboration.RHConfModifCSBookings( req ).process( params )
 
+def managers(req, **params):
+    return collaboration.RHConfModifCSProtection( req ).process( params )

@@ -4,10 +4,16 @@ span.WRWarningMessage {
     color: #D01F3C;
     font-weight: bold;	
 }
-span.WRNote {
-     font-style: italic;
-     margin-left: 20px;
+
+span.WRNoteTitle {
+    font-weight: bold;
+    font-style: italic;
+    text-decoration: underline;
 }
+span.WRNoteText {
+    font-style: italic;
+}
+
 div.WRFormSection {
     background-color: #F6F6F6;
     padding: 10px 20px 10px 10px;
@@ -56,7 +62,7 @@ div.WRContributionListDiv {
 
 td.WRContributionsColumn {
     vertical-align: top;
-    width: 50%;	
+    /*width: 50%;*/	
 }
 
 span.WRContributionId {

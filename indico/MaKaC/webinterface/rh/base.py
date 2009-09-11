@@ -19,6 +19,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
+from MaKaC.common.TemplateExec import escapeHTMLForJS
 
 """Base definitions for the request handlers (rh). A rh is a class which 
 complies to a well defined interface and which from a mod_python request knows
@@ -49,6 +50,7 @@ from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from xml.sax.saxutils import escape
 
 from MaKaC.common.logger import Logger
+from MaKaC.i18n import _
 
 
 class RequestHandlerBase(object):
@@ -88,7 +90,6 @@ class RequestHandlerBase(object):
 
     def _setLang(self):
         lang=self._websession.getLang()
-        from MaKaC.common.logger import Logger
         Logger.get('i18n').debug("lang:%s"%lang)
         #if lang is None:
         #    lang = "en_US"
@@ -236,6 +237,14 @@ class RH(RequestHandlerBase):
             self._req.status = apache.HTTP_MOVED_PERMANENTLY
         except NameError:
             pass
+    
+    def _checkHttpsRedirect(self):
+        if self._tohttps and not self._req.is_https():
+            current_url = self._req.construct_url(self._req.unparsed_uri)
+            self._redirect(urlHandlers.setSSLPort(current_url.replace("http://", "https://")))
+            return True
+        else:
+            return False
 
     def _normaliseListParam( self, param ):
         if not isinstance(param, list):
@@ -367,9 +376,7 @@ class RH(RequestHandlerBase):
         self._startTime = datetime.now()
         
         #redirect to https if necessary
-        if self._tohttps and not self._req.is_https():
-            current_url = self._req.construct_url(self._req.unparsed_uri)
-            self._redirect(urlHandlers.setSSLPort(current_url.replace("http://", "https://")))
+        if self._checkHttpsRedirect():
             return res
         
         DBMgr.getInstance().startRequest()
@@ -505,8 +512,10 @@ class RH(RequestHandlerBase):
             
         #if we have an https request, we replace the links to Indico images by https ones.
         if self._req.is_https() and self._tohttps and res is not None:
-            res = res.replace(Config.getInstance().getImagesBaseURL(),
-                              urlHandlers.setSSLPort(Config.getInstance().getImagesBaseSecureURL()))
+            imagesBaseURL = Config.getInstance().getImagesBaseURL()
+            imagesBaseSecureURL = urlHandlers.setSSLPort(Config.getInstance().getImagesBaseSecureURL())
+            res = res.replace(imagesBaseURL, imagesBaseSecureURL)
+            res = res.replace(escapeHTMLForJS(imagesBaseURL), escapeHTMLForJS(imagesBaseSecureURL))
             
         totalTime = (datetime.now() - self._startTime)
         textLog.append("%s : Request ended"%totalTime)

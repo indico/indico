@@ -20,7 +20,6 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from datetime import timedelta, datetime
-from mod_python import apache
 
 #################################
 # Fermi timezone awareness      #
@@ -494,6 +493,7 @@ class RHCategoryOpenService(base.RH):
     def _process(self):
         # throw an error if the category was not found
         if self._target == None:
+            from mod_python import apache
             self._req.status = apache.HTTP_NOT_FOUND
             return "Specified category does not exist!"
 

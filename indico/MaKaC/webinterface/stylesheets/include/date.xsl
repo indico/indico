@@ -34,6 +34,15 @@
 	<xsl:value-of select="substring($dat,1,4)"/>
 </xsl:template>
 
+<xsl:template name="shortDate">
+    <xsl:param name="dat" select="0"/>
+    <xsl:value-of select="substring(date:day-name($dat), 1, 3)"/>
+    <xsl:text disable-output-escaping="yes"> </xsl:text>
+    <xsl:value-of select="substring($dat,9,2)"/>
+    <xsl:text disable-output-escaping="yes">/</xsl:text>
+    <xsl:value-of select="substring($dat,6,2)"/>
+</xsl:template>
+
 
 <xsl:template name="prettyduration">
 	<xsl:param name="duration" select="0"/>

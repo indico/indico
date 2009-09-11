@@ -1,3 +1,5 @@
+<% from MaKaC.common.PickleJar import DictPickler %>
+
 var enableCustomId = function() {
     $E('customId').dom.disabled = false;
 }
@@ -7,6 +9,10 @@ var disableCustomId = function() {
 }
 
 var pf = null; //place where to keep a ParticipantListField object to access later
+
+<% if RoomsWithH323IP: %>
+var existingRoomData = <%= jsonEncode(DictPickler.pickle(RoomsWithH323IP)) %>
+<% end %>
 
 /**
  * Creates a participant (person) data creation / edit pop-up dialog.
@@ -98,7 +104,6 @@ type("RoomDataPopup", ["ExclusivePopup"],
 
             var buttonDiv = Html.div({style:{textAlign:"center", marginTop:pixels(10)}}, saveButton, cancelButton)
             
-            
             return this.ExclusivePopup.prototype.draw.call(this, Widget.block([
                 IndicoUtil.createFormFromMap([
                     ['Room Name', $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), roomData.accessor('name'))],
@@ -114,6 +119,104 @@ type("RoomDataPopup", ["ExclusivePopup"],
         this.roomData = roomData;
         this.action = action;
         this.parameterManager = new IndicoUtil.parameterManager();
+        this.ExclusivePopup(title, positive);
+    }
+);
+
+type("H323RoomList", ["SelectableListWidget"],
+    {
+        _drawItem: function(room) {
+            var self = this;
+            var roomData = room.get();
+            
+            var roomDiv = Html.div({style:{display: 'inline'}});
+            roomDiv.appendMany([
+                $B(Html.span(), roomData.accessor('name')),
+                ' (',
+                $B(Html.span(), roomData.accessor('institution')),
+                ') - ',
+                $B(Html.span(), roomData.accessor('ip'))
+            ]);
+            return roomDiv;
+        }
+    },
+    function (selectedObserver) {
+        this.SelectableListWidget(selectedObserver, "UIPeopleList CERNMCU_H323RoomList");
+    }
+)
+
+type("H323RoomPopup", ["ExclusivePopup"],
+    {
+        draw: function() {
+            var self = this;
+            var roomData = self.roomData;
+            var closePopup = function(){self.close()}
+            
+            var saveButton = new DisabledButton(Html.input("button", {disabled:true}, $T("Save") ));
+            saveButton.observeClick(function(){
+                self.action(roomList._getSelectedList(), closePopup);
+            });
+            saveButton.disable();
+            
+            var tooltip;
+
+            saveButton.observeEvent('mouseover', function(event){
+                if (!saveButton.isEnabled()) {
+                    tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY,
+                            $T("You must select at least one item from the list"), "tooltipError");
+                }
+            });
+
+            saveButton.observeEvent('mouseout', function(event){
+                Dom.List.remove(document.body, tooltip);
+            });
+            
+            var cancelButton = Html.button({style:{marginLeft:pixels(5)}}, $T("Cancel"));
+            cancelButton.observeClick(function(){
+                closePopup();
+            });
+            
+            var selectedObserver = function(selectedList) {
+                if (selectedList.isEmpty()) {
+                    saveButton.disable();
+                } else {
+                    saveButton.enable();
+                }
+            }
+            
+            var roomList = new H323RoomList(selectedObserver);
+            var addedParticipants = self.participantListField.getParticipants();
+            each(self.rooms, function(room){
+                var alreadyAdded = false;
+                for (var i = 0; i < addedParticipants.length.get(); i++) {
+                    var participant = addedParticipants.item(i).get();
+                    if (participant.get('type') === 'room' && room.name === participant.get('name') &&
+                            room.institution === participant.get('institution') && room.ip === participant.get('ip')) {
+                        alreadyAdded = true;
+                        break;
+                    }  
+                }
+                
+                roomWO = $O(room);
+                if (alreadyAdded) {
+                    roomWO.set('unselectable', true);
+                }
+                roomList.set(room.name, roomWO);
+
+            });
+
+            var buttonDiv = Html.div({style:{textAlign:"center", marginTop:pixels(10)}}, saveButton.draw(), cancelButton)
+            
+            return this.ExclusivePopup.prototype.draw.call(this, Widget.block([
+                Html.div("UIPeopleListDiv CERNMCU_H323RoomList_Div", roomList.draw()),
+                buttonDiv
+            ]));
+        } // end of draw
+    },
+    function(title, rooms, participantListField, action) {
+        this.rooms = rooms;
+        this.action = action;
+        this.participantListField = participantListField;
         this.ExclusivePopup(title, positive);
     }
 );
@@ -241,8 +344,7 @@ type("ParticipantListField", ["IWidget"],
             
             var addNewPersonButton = Html.button({style:{marginRight: pixels(5)}}, $T('Add New Participant'));
             var addExistingPersonButton = Html.button({style:{marginRight: pixels(5)}}, $T('Add Existing User') );
-            var addRoomButton = Html.button({}, $T('Add Room'));
-            var buttonDiv = Html.div({style:{marginTop: pixels(10)}}, addNewPersonButton, addExistingPersonButton, addRoomButton);
+            var addNewRoomButton = Html.button({style:{marginRight: pixels(5)}}, $T('Add New Room'));
             
             addNewPersonButton.observeClick(function(){
                 var handler = function(participant, closePopup) {
@@ -259,7 +361,7 @@ type("ParticipantListField", ["IWidget"],
                     
                     var openNewPopup = function() {
                         if (i < participantList.length) {
-                            var title = "Please enter the IP of this person (" + (i+1) + "/" + participantList.length + ")";
+                            var title = $T("Please enter the IP of this person") +" (" + (i+1) + "/" + participantList.length + ")";
                             var popup = new PersonDataPopup(title, $O(participantList[i]), ipSaveHandler, ipCancelHandler);
                             popup.open();
                             i++;
@@ -281,18 +383,44 @@ type("ParticipantListField", ["IWidget"],
                         openNewPopup();
                     }
                 }
-                var popup = new UserSearchPopup("Add existing person", handler);
+                var popup = new UserSearchPopup($T("Add existing person"), handler);
                 popup.open();
             });
             
-            addRoomButton.observeClick(function(){
+            addNewRoomButton.observeClick(function(){
                 var handler = function(participant, closePopup) {
                     self._addNewParticipant(participant, 'room');
                     closePopup();
                 }
-                var popup = new RoomDataPopup("Add new room", $O(), handler);
+                var popup = new RoomDataPopup($T("Add new room"), $O(), handler);
                 popup.open();
             });
+            
+            <% if RoomsWithH323IP: %>
+            
+                var addExistingRoomButton = Html.button({style:{marginRight: pixels(5)}}, $T('Add Existing Rooms'));
+                
+                addExistingRoomButton.observeClick(function(){
+                    var handler = function(selectedRooms, closePopup) {
+                        each(selectedRooms, function(room){
+                            self._addNewParticipant(room, 'room');
+                        });
+                        closePopup();
+                    };
+                    var popup = new H323RoomPopup($T("Add Existing Rooms"), existingRoomData, self, handler);
+                    popup.open();
+                });
+    
+            <% end %>
+            
+            <% if RoomsWithH323IP: %>
+                var buttonDiv1 = Html.div({}, addExistingRoomButton, addNewRoomButton);    
+                var buttonDiv2 = Html.div({}, addExistingPersonButton, addNewPersonButton);
+                var buttonDiv = Html.div({style:{marginTop: pixels(10)}}, buttonDiv1, buttonDiv2);
+            <% end %>
+            <% else: %>
+                var buttonDiv = Html.div({}, Html.div({}, addExistingPersonButton, addNewPersonButton, addNewRoomButton));
+            <% end %>
             
             return this.IWidget.prototype.draw.call(this,
                 Widget.block([Html.div("CERNMCUParticipantsDiv", this.participantList.draw()), buttonDiv])
@@ -301,9 +429,10 @@ type("ParticipantListField", ["IWidget"],
     },
     
     function(initialParticipants) {
+        var self = this;
+        
         this.participantList = new ParticipantListWidget();
         this.newParticipantCounter = 0;
-        var self = this;
          
         each(initialParticipants, function(participant){
             self.participantList.set(self.newParticipantCounter++, $O(participant));

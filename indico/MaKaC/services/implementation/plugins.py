@@ -50,7 +50,11 @@ class PluginOptionsAddUsers ( PluginOptionsBase, UserListModificationBase):
         
     def _getAnswer(self):
         if self._targetOption.getType() == 'users':
-            self._targetOption.getValue().extend(self._avatars)
+            optionValue = self._targetOption.getValue()
+            existingUserIds = set([u.getId() for u in optionValue])
+            for u in self._avatars:
+                if not u.getId() in existingUserIds:
+                    optionValue.append(u)
             self._targetOption._notifyModification()
         else:
             raise ServiceError('ERR-PLUG2', "option %s.%s.%s is not of type 'users'" % (self._pluginType, self._plugin, self._targetOption))
@@ -79,8 +83,10 @@ class PluginOptionsAddRooms ( PluginOptionsBase ):
         
     def _getAnswer(self):
         if self._targetOption.getType() == 'rooms':
-            roomToAdd=self._params.get("room")
-            self._targetOption.getValue().append(roomToAdd)
+            optionValue = self._targetOption.getValue()
+            roomToAdd = self._params.get("room")
+            if roomToAdd not in optionValue:
+                optionValue.append(roomToAdd)
             self._targetOption._notifyModification()
         else:
             raise ServiceError('ERR-PLUG2', "option %s.%s.%s is not of type 'rooms'" % (self._pluginType, self._plugin, self._targetOption))

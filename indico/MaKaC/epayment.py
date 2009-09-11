@@ -19,19 +19,10 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from datetime import datetime
 
 from persistent import Persistent
-from persistent.mapping import PersistentMapping
-from persistent.list import PersistentList
-from MaKaC.common.Counter import Counter
-from MaKaC.errors import FormValuesError
 from MaKaC.common.Locators import Locator
-from MaKaC.common import Config
-from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.trashCan import TrashCanManager
-import md5,string,cgi
-import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC import plugins
 
 class EPayment(Persistent):
@@ -82,7 +73,7 @@ class EPayment(Persistent):
                     changed = True
                 else:
                     if not isinstance(self.payMods[mod.pluginName], mod.epayment.getPayModClass()):
-                        oldMod = self.payMods[mod.pluginName]
+                        #oldMod = self.payMods[mod.pluginName]
                         print "replace by mod %s"%mod
                         newMod = mod.epayment.getPayMod()
                         self.payMods[mod.pluginName] = newMod
@@ -537,7 +528,7 @@ class PayLaterMod(BaseEPayMod):
         self._title = "pay later"   
         self._detailPayment= ""
         if data is not None:
-            setValue(data)
+            setValue(data) #TODO: check this, it will fail
         self._id="paylater"
  
     def getId(self):
