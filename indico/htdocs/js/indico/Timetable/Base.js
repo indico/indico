@@ -157,7 +157,7 @@ type("TimeTable", ["LookupTabWidget"], {
          printLink.observeClick(function(e) {
              window.print();
          });
-         var timetableDiv = Html.div({style: {paddingTop: pixels(20), position: 'relative'}}, timetableElements)
+         var timetableDiv = Html.div({style: {paddingTop: pixels(20), position: 'relative'}}, timetableElements);
          $E(document.body).set(header, timetableDiv);
          $E(document.body).setStyle('padding', pixels(30));
      },
@@ -256,19 +256,19 @@ type("TimeTableDisplay", ["TimeTable"], {
 
         var detailsButton = {'btn': Html.div('buttonWhite', Html.span({}, $T('Detailed view'))),
                              'onclick': function(btnContainer) {
-            var detailLevel = self.timetableDrawer.detail.get()
-            var newDetailLevel = detailLevel == 'contribution' ? 'session' : 'contribution';
-            self.timetableDrawer.detail.set(newDetailLevel);
-            var state = (newDetailLevel == 'contribution');
-            //detailsButton.btn.set(state ? "Hide details" : "Show details");
-            btnContainer.dom.style.background = state ? "#9F883B" : "";
-        }};
+                                 var detailLevel = self.timetableDrawer.detail.get();
+                                 var newDetailLevel = detailLevel == 'contribution' ? 'session' : 'contribution';
+                                 self.timetableDrawer.detail.set(newDetailLevel);
+                                 var state = (newDetailLevel == 'contribution');
+                                 //detailsButton.btn.set(state ? "Hide details" : "Show details");
+                                 btnContainer.dom.style.background = state ? "#9F883B" : "";
+                             }};
 
         var filterButton = {'btn': Html.div('buttonWhite', $T('Filter')),
                             'onclick': function(btnContainer) {
                                 // Save the container so that the filter button background
                                 // color can be restored when filter is closed
-                                self.filterButtonContainer = btnContainer
+                                self.filterButtonContainer = btnContainer;
                                 self.filter.toggle();
                                 var state = self.filter.state.get();
                                 btnContainer.dom.style.background = state ? "#9F883B" : "";
@@ -285,8 +285,9 @@ type("TimeTableDisplay", ["TimeTable"], {
         this._filterSetup();
 
         // Set data[all] so that the All days tab is created
-        if (keys(data).length > 1)
+        if (keys(data).length > 1) {
             this.data.all = data;
+        }
     }
 );
 
