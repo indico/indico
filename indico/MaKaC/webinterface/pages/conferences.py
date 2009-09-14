@@ -3609,10 +3609,7 @@ class WSchEditSlot(wcomponents.WTemplated):
             vars["updateParentDates"] = """<input type="hidden" name="check" value="2">"""
         else :
             vars["formTitle"] = _("Modify session slot schedule data")
-            if slot.getOwner().getAutoSolveConflict():
-                vars["updateParentDates"] = ""
-            else:
-                vars["updateParentDates"] = _("""<input type="checkbox" name="check" value="2"> _("update parents dates")<br>""")
+            vars["updateParentDates"] = ""
             vars["slotTitle"] = _("""
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> _("Slot Title")</span></td>
@@ -8122,10 +8119,8 @@ class WContributionSchCreation(WContributionCreation):
             <input type="text" name="boardNumber" size="10" value=%s></td>
         </tr>
             """)%vars["boardNumber"]
-        if not self._conf.getAutoSolveConflict():
-            vars["autoUpdate"]= _("""<input type="checkbox" name="check" value="2"> _("Update parents dates")""")
-        else:
-            vars["autoUpdate"]=""
+
+        vars["autoUpdate"]=""
         return vars
 
 #---------------------------------------------------------------------------

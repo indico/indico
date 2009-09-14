@@ -584,18 +584,6 @@ class SessionScheduleEditSessionSlot(ScheduleEditSlotBase, sessionServices.Sessi
             if conv.getId() not in convenersIds:
                 slot.removeConvener(conv)
 
-class ConferenceSetTimeConflictSolving( conferenceServices.ConferenceTextModificationBase ):
-    """
-    Set or unset automatic conflict solving for timetable
-    """
-    def _handleSet(self):
-        if type(self._value) != bool:
-            raise ServiceError("ERR-E1", "Invalid value type for property")
-        self._target.setAutoSolveConflict(self._value)
-
-    def _handleGet(self):
-        return self._target.getAutoSolveConflict()
-
 class ConferenceSetSessionSlots( conferenceServices.ConferenceTextModificationBase ):
     """
     Set or unset automatic conflict solving for timetable
@@ -838,7 +826,6 @@ methodMap = {
 
     "break.getBooking": BreakGetBooking,
 
-    "setTimeConflictSolving": ConferenceSetTimeConflictSolving,
     "setSessionSlots": ConferenceSetSessionSlots,
     "setScheduleSessions": ConferenceSetScheduleSessions,
 

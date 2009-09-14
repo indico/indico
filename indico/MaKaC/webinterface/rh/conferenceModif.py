@@ -550,20 +550,6 @@ class RHConfSessionSlots( RHConferenceModifBase ):
 
 #----------------------------------------------------------------
 
-class RHConfAutoSolveConflict( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModAutoSolveConflict
-    
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-    
-    def _process( self ):
-        if self._target.getAutoSolveConflict() :
-            self._target.setAutoSolveConflict(False)
-        else : 
-            self._target.setAutoSolveConflict(True)
-        self._redirect( urlHandlers.UHConferenceModification.getURL( self._target ) )
-
-#----------------------------------------------------------------
 class RHConfModifSchedule( RHConferenceModifBase ):
     _uh = urlHandlers.UHConfModifSchedule
     

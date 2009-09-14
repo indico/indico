@@ -563,9 +563,6 @@ class UHConferenceRemoveMaterials( URLHandler ):
 class UHConfModSessionSlots( URLHandler ):
     _relativeURL = "conferenceModification.py/sessionSlots"
 
-class UHConfModAutoSolveConflict( URLHandler ):
-    _relativeURL = "conferenceModification.py/autoSolveConflict"
-
 class UHConferenceClose( URLHandler ):
     _relativeURL = "conferenceModification.py/close"
 

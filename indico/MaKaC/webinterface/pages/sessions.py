@@ -1772,10 +1772,7 @@ class WSessionAddSlot(wcomponents.WTemplated):
             rx.append("""<option value=%s%s>%s</option>"""%(quoteattr(str(room)),
                         sel,self.htmlText(room)))
         vars ["roomsexist"] = "".join(rx)
-        if not self._conf.getAutoSolveConflict():
-            vars["autoUpdate"]= _("""<input type="checkbox" name="check" value="2"> _("Update parents dates")""")
-        else:
-            vars["autoUpdate"]=""
+        vars["autoUpdate"]=""
         return vars
 
 
@@ -1932,10 +1929,7 @@ class WSlotModifMainData(wcomponents.WTemplated):
         slot = self._slotData.getSession().getSlotById(self._slotData.getId())
         vars["locator"] = slot.getLocator().getWebForm()
         vars["postURL"]=quoteattr(str(urlHandlers.UHSessionModSlotEdit.getURL(slot)))
-        if not self._conf.getAutoSolveConflict():
-            vars["autoUpdate"]= _("""<input type="checkbox" name="check" value="2"> _("Update parents dates")""")
-        else:
-            vars["autoUpdate"]=""
+        vars["autoUpdate"]=""
         return vars
 
 
@@ -2883,10 +2877,7 @@ class WSessionModEditDates(wcomponents.WTemplated):
         vars["eYear"]=quoteattr(str(vars.get("eYear",endDate.year)))
         vars["eHour"]=quoteattr(str(vars.get("eHour",endDate.hour)))
         vars["eMinute"]=quoteattr(str(vars.get("eMinute",endDate.minute)))
-        if not self._conf.getAutoSolveConflict():
-            vars["autoUpdate"]= _("""<input type="checkbox" name="check" value="2"> _("Update parents dates")""")
-        else:
-            vars["autoUpdate"]=""
+        vars["autoUpdate"]=""
         if not self._conf.getEnableSessionSlots():
             vars["disabled"] = "disabled"
         else:

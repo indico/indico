@@ -72,12 +72,6 @@ class Schedule:
     def getEntryInPos( self, pos ):
         return None
 
-    def getAutoSolveConflict( self ):
-        try:
-            return self.getOwner().getAutoSolveConflict()
-        except:
-            return False
-
 
 class TimeSchedule(Schedule, Persistent):
     """
@@ -138,13 +132,12 @@ class TimeSchedule(Schedule, Persistent):
         return entry.isScheduled() and entry.getSchedule()==self and\
             entry in self._entries
 
-    def _addEntry(self,entry,check=1):
+    def _addEntry(self,entry,check=2):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+
         if entry.isScheduled():
             # remove it from the old schedule and add it to this one
             entry.getSchedule().removeEntry(entry)
@@ -546,12 +539,6 @@ class SchEntry(Persistent):
     def recover(self):
         pass
 
-    def getAutoSolveConflict( self ):
-        try:
-            return self.getSchedule().getAutoSolveConflict()
-        except:
-            return False
-
 class ConferenceSchedule(TimeSchedule):
     """
     """
@@ -559,13 +546,12 @@ class ConferenceSchedule(TimeSchedule):
     def __init__(self,conf):
         TimeSchedule.__init__(self,conf)
 
-    def addEntry(self,entry,check=1):
+    def addEntry(self,entry,check=2):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+
         if (entry is None) or self.hasEntry(entry):
             return
         if isinstance(entry,LinkedTimeSchEntry):
@@ -714,14 +700,13 @@ class SlotSchedule(TimeSchedule):
                 sessionDur=self.getOwner().getSession().getContribDuration()
                 entry.setDuration(dur=sessionDur)
 
-    def addEntry(self,entry,check=1):
+    def addEntry(self,entry,check=2):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates
         """
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+
         if (entry is None) or self.hasEntry(entry):
             return
         if isinstance(entry,LinkedTimeSchEntry):
@@ -956,13 +941,11 @@ class LinkedTimeSchEntry(TimeSchEntry):
     def getAdjustedStartDate( self, tz=None ):
         return self.__owner.getAdjustedStartDate(tz)
 
-    def setStartDate(self,newDate,check=1, moveEntries=0):
+    def setStartDate(self,newDate,check=2, moveEntries=0):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
         self.getOwner().setStartDate(newDate,check, moveEntries)
 
     def getEndDate( self ):
@@ -977,9 +960,7 @@ class LinkedTimeSchEntry(TimeSchEntry):
     def getDuration(self):
         return self.__owner.getDuration()
 
-    def setDuration(self,hours=0,minutes=15,dur=0,check=1):
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+    def setDuration(self,hours=0,minutes=15,dur=0,check=2):
         if dur!=0:
             self.getOwner().setDuration(dur=dur,check=check)
         else:
@@ -1159,9 +1140,8 @@ class BreakTimeSchEntry(IndTimeSchEntry):
 
         return values
 
-    def setValues( self, data, check=1, moveEntriesBelow=0, tz='UTC'):
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+    def setValues( self, data, check=2, moveEntriesBelow=0, tz='UTC'):
+
         from MaKaC.conference import CustomLocation, CustomRoom
         # In order to move the entries below, it is needed to know the diff (we have to move them)
         # and the list of entries to move. It's is needed to take those datas in advance because they
@@ -1313,9 +1293,8 @@ class BreakTimeSchEntry(IndTimeSchEntry):
             return self.getSchedule().getOwner()
         return None
 
-    def _verifyDuration(self,check=1):
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+    def _verifyDuration(self,check=2):
+
         if self.getSchedule() is not None:
             owner = self.getSchedule().getOwner()
             if self.getEndDate() > owner.getEndDate():
@@ -1328,9 +1307,8 @@ class BreakTimeSchEntry(IndTimeSchEntry):
                     # update the schedule
                     owner.setEndDate(self.getEndDate(),check)
 
-    def setDuration(self, hours=0, min=15, check=1,dur=0):
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+    def setDuration(self, hours=0, min=15, check=2,dur=0):
+
         if dur==0:
             IndTimeSchEntry.setDuration(self,hours,min)
         else:
@@ -1338,9 +1316,8 @@ class BreakTimeSchEntry(IndTimeSchEntry):
         self._verifyDuration(check)
         self.notifyModification()
 
-    def setStartDate(self, newDate,check=1, moveEntries=0):
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+    def setStartDate(self, newDate,check=2, moveEntries=0):
+
         try:
           tz = str(newDate.tzinfo)
         except:
