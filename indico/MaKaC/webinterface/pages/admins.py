@@ -722,6 +722,10 @@ class WWebcastSetup( wcomponents.WTemplated ):
         list_channels += "</table>"
         vars["channels"] = list_channels
         vars["postURL"] = urlHandlers.UHWebcastAddChannel.getURL()
+        
+        vars["saveWebcastServiceURL"] = urlHandlers.UHWebcastSaveWebcastServiceURL.getURL()
+        vars["webcastServiceURL"] = wm.getWebcastServiceURL()
+        
         return vars
     
 class WPWebcastSelectManager( WPWebcastSetup ):

@@ -302,6 +302,18 @@ class RHWebcastMoveChannelDown( RHWebcastBase ):
             self._wm.moveChannelDown(int(self._chnb))
         self._redirect(urlHandlers.UHWebcastSetup.getURL())
         
+class RHWebcastSaveWebcastServiceURL( RHWebcastBase ):
+    _uh = urlHandlers.UHWebcastMoveChannelDown
+    
+    def _checkParams( self, params ):
+        admins.RHAdminBase._checkParams( self, params )
+        self._webcastServiceURL = params.get('webcastServiceURL', '')
+        self._params = params
+    
+    def _process( self ):
+        self._wm.setWebcastServiceURL(self._webcastServiceURL)
+        self._redirect(urlHandlers.UHWebcastSetup.getURL())
+        
 class RHWebcastAddStream( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastAddStream
     

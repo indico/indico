@@ -1,7 +1,7 @@
 <table align="center" width="95%%">
 <tr>
   <td>
-    <br>
+    <br />
     <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
     <tr>
       <td class="groupTitle">Channels</td>
@@ -28,7 +28,23 @@
       </td>
     </tr>
     </table>
-    <br>
+    <br />
+    
+    <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
+    <tr>
+      <td class="groupTitle">Webcast Service URL</td>
+    </tr>
+    <tr>
+      <td bgcolor="white" width="100%%" valign="top" class="blacktext">
+        <form action="%(saveWebcastServiceURL)s" method="POST">
+          <input name="webcastServiceURL" value="%(webcastServiceURL)s"/>
+          <input type="submit" name="submit" value="Save">
+          <span>Used for forthcoming webcast display in event public pages.</span>
+        </form>
+      </td>
+    </tr>
+    </table>
+    <br />
     <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
     <tr>
       <td class="groupTitle">Webcast Administrators list</td>
@@ -42,4 +58,4 @@
   </td>
 </tr>
 </table>
-<br><br>
+<br /><br />

@@ -40,9 +40,15 @@ else:
                     <% if nowHappening: %>
                         <div class="nowHappening" %(textColorStyle)s><%= nowHappening %></div>
                     <% end %>
-                    <% if webcastURL: %>
+                    <% if onAirURL: %>
                         <div class="webcast" %(textColorStyle)s>
-                            <%= _("Live webcast") %>: <a href="<%= webcastURL  %>"><%= _("view the webcast") %></a>
+                            <%= _("Live webcast") %>: <a href="<%= webcastURL  %>"><%= _("view the live webcast") %></a>
+                        </div>
+                    <% end %>
+                    <% if forthcomingWebcast: %>
+                        <div class="webcast" %(textColorStyle)s>
+                            <%= _("Webcast") %>:<%= _(" Please note that this event will be available live via the") %>
+                            <a href="<%= webcastURL %>"><%= _("Webcast Service") %></a>.
                         </div>
                     <% end %>
                 </div>

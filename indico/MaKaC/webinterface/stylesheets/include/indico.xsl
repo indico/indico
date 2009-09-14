@@ -560,11 +560,19 @@
           -->
           
           <tr id="webCastRow" style="display: none">
-            <td class="leftCol">Live webcast</td>
+            <xsl:for-each select="./material">
+            <td class="leftCol">
+              <xsl:if test="./title='live webcast'">
+              Live Webcast
+              </xsl:if>
+              <xsl:if test="./title='forthcoming webcast'">
+              Webcast
+              </xsl:if>
+            </td>
+            </xsl:for-each>
             <td>
               <xsl:for-each select="./material">
-                <xsl:if test="./title='live webcast'">
-                  
+                <xsl:if test="./title = 'live webcast' or ./title = 'forthcoming webcast'">
                   <!-- Show the table row containing info about the webcast -->
                   <xsl:text disable-output-escaping="yes">
                     <![CDATA[
@@ -573,16 +581,22 @@
                         </script>
                       ]]>
                   </xsl:text>
-                  To view the live webcast please click
+                </xsl:if> 
+              
+              
+                <xsl:if test="./title='live webcast'">
                   <a href="{./displayURL}">
-                    <strong>here</strong>
+                    <strong>View the live webcast</strong>
                   </a>
-                  
-                  <xsl:if test="./locked = 'yes'">
-                    <img src="images/protected.png" border="0" alt="locked" style="margin-left: 3px;"/>
-                  </xsl:if>
-
                 </xsl:if>
+                
+                <xsl:if test="./title='forthcoming webcast'">
+                  Please note that this event will be available <em>live</em> via the
+                  <a href="{./displayURL}">
+                    <strong>Webcast Service</strong>.
+                  </a>
+                </xsl:if>
+                
               </xsl:for-each>
             </td>
           </tr>
@@ -594,7 +608,7 @@
               <div class="materialList clearfix">
                 <xsl:for-each select="./material">
                   <xsl:if
-                    test="./title!='live webcast' and ./title!='part1' and ./title!='part2' and ./title!='part3' and ./title!='part4' and ./title!='part5' and ./title!='part6' and ./title!='part7' and ./title!='part8' and ./title!='part9' and ./title!='part10'">
+                    test="./title!='live webcast' and ./title!='forthcoming webcast' and ./title!='part1' and ./title!='part2' and ./title!='part3' and ./title!='part4' and ./title!='part5' and ./title!='part6' and ./title!='part7' and ./title!='part8' and ./title!='part9' and ./title!='part10'">
                     
                     <!-- Show the material table row -->
                     <xsl:text disable-output-escaping="yes">
