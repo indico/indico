@@ -141,10 +141,10 @@ class ConferenceScheduleAddContribution(ScheduleAddContribution, conferenceServi
         if self._needsToBeScheduled:
             self._target.getSchedule().addEntry(contribution.getSchEntry(),1)
 
-class SessionSlotScheduleAddContribution(ScheduleAddContribution, sessionServices.SessionSlotModifBase):
+class SessionSlotScheduleAddContribution(ScheduleAddContribution, sessionServices.SessionSlotModifCoordinationBase):
 
     def _checkParams(self):
-        sessionServices.SessionSlotModifBase._checkParams(self)
+        sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
         ScheduleAddContribution._checkParams(self)
 
     def _addToParent(self, contribution):
@@ -266,10 +266,10 @@ class ConferenceScheduleDeleteContribution(conferenceServices.ConferenceSchedule
 
         self._conf.getSchedule().removeEntry(self._schEntry)
 
-class SessionScheduleDeleteSessionSlot(sessionServices.SessionSlotModifBase):
+class SessionScheduleDeleteSessionSlot(sessionServices.SessionModifUnrestrictedTTCoordinationBase):
 
     def _getAnswer(self):
-        self._session.removeSlot(self._target)
+        self._session.removeSlot(self._slot)
 
 class SessionScheduleChangeSessionColors(sessionServices.SessionModifBase):
 
@@ -343,38 +343,38 @@ class ConferenceScheduleDeleteBreak(conferenceServices.ConferenceScheduleModifBa
     def _getAnswer(self):
         self._conf.getSchedule().removeEntry(self._schEntry)
 
-class SessionSlotScheduleAddBreak(ScheduleEditBreakBase, sessionServices.SessionSlotModifBase):
+class SessionSlotScheduleAddBreak(ScheduleEditBreakBase, sessionServices.SessionSlotModifCoordinationBase):
 
     def _checkParams(self):
-        sessionServices.SessionSlotModifBase._checkParams(self)
+        sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
         ScheduleEditBreakBase._checkParams(self)
         self._brk = schedule.BreakTimeSchEntry()
 
     def _addToSchedule(self, b):
         self._slot.getSchedule().addEntry(b, 2)
         
-class SessionSlotScheduleEditBreak(ScheduleEditBreakBase, sessionServices.SessionSlotScheduleModifBase):
+class SessionSlotScheduleEditBreak(ScheduleEditBreakBase, sessionServices.SessionSlotModifCoordinationBase):
 
     def _checkParams(self):
-        sessionServices.SessionSlotScheduleModifBase._checkParams(self)
+        sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
         ScheduleEditBreakBase._checkParams(self)
         self._brk = self._schEntry
 
     def _addToSchedule(self, b):
         pass
 
-class SessionSlotScheduleDeleteBreak(sessionServices.SessionSlotScheduleModifBase):
+class SessionSlotScheduleDeleteBreak(sessionServices.SessionSlotModifCoordinationBase):
 
     def _checkParams(self):
-        sessionServices.SessionSlotScheduleModifBase._checkParams(self)
+        sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
 
     def _getAnswer(self):
         self._slot.getSchedule().removeEntry(self._schEntry)
 
-class SessionSlotScheduleDeleteContribution(sessionServices.SessionSlotScheduleModifBase):
+class SessionSlotScheduleDeleteContribution(sessionServices.SessionSlotModifCoordinationBase):
 
     def _checkParams(self):
-        sessionServices.SessionSlotScheduleModifBase._checkParams(self)
+        sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
 
     def _getAnswer(self):
 
@@ -393,10 +393,10 @@ class SessionSlotScheduleDeleteContribution(sessionServices.SessionSlotScheduleM
         self._slot.getSchedule().removeEntry(self._schEntry)
 
 
-class SessionSlotScheduleModifyStartEndDate(sessionServices.SessionSlotScheduleModifBase):
+class SessionSlotScheduleModifyStartEndDate(sessionServices.SessionSlotModifCoordinationBase):
 
     def _checkParams(self):
-        sessionServices.SessionSlotScheduleModifBase._checkParams(self)
+        sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
 
         pManager = ParameterManager(self._params, timezone = self._conf.getTimezone())
 
@@ -438,6 +438,26 @@ class ConferenceScheduleModifyStartEndDate(conferenceServices.ConferenceSchedule
                 'id': pickledData['id'],
                 'entry': pickledData}
 
+class SessionScheduleModifyStartEndDate(sessionServices.SessionModifBase):
+
+    def _checkParams(self):
+        sessionServices.SessionModifBase._checkParams(self)
+
+        pManager = ParameterManager(self._params, timezone = self._conf.getTimezone())
+
+        self._startDate = pManager.extract("startDate", pType=datetime.datetime)
+        self._endDate = pManager.extract("endDate", pType=datetime.datetime)
+
+    def _getAnswer(self):
+        self._schEntry.setStartDate(self._startDate);
+        duration = self._endDate - self._startDate
+        self._schEntry.setDuration(dur=duration)
+
+        pickledData = DictPickler.pickle(self._schEntry, timezone=self._conf.getTimezone())
+        return {'day': self._schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
+                'id': pickledData['id'],
+                'entry': pickledData}
+
 class ConferenceScheduleGetDayEndDate(conferenceServices.ConferenceModifBase):
 
     def _checkParams(self):
@@ -450,10 +470,10 @@ class ConferenceScheduleGetDayEndDate(conferenceServices.ConferenceModifBase):
     def _getAnswer(self):
         return self._target.getSchedule().calculateDayEndDate(self._date).strftime('%d/%m/%Y %H:%M')
 
-class SessionSlotScheduleGetDayEndDate(sessionServices.SessionSlotModifBase):
+class SessionSlotScheduleGetDayEndDate(sessionServices.SessionSlotModifCoordinationBase):
 
     def _checkParams(self):
-        sessionServices.SessionSlotModifBase._checkParams(self)
+        sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
         pManager = ParameterManager(self._params)
         date = pManager.extract("date", pType=datetime.date)
         self._date = datetime.datetime(date.year, date.month, date.day, tzinfo=pytz.timezone(self._conf.getTimezone()))
@@ -519,10 +539,10 @@ class ScheduleEditSlotBase(LocationSetter):
                 'entry': pickledData,
                 'session': DictPickler.pickle(self._slot.getSession(), timezone=self._conf.getTimezone())}
     
-class SessionScheduleAddSessionSlot(ScheduleEditSlotBase, sessionServices.SessionModifBase):
+class SessionScheduleAddSessionSlot(ScheduleEditSlotBase, sessionServices.SessionModifUnrestrictedTTCoordinationBase):
 
     def _checkParams(self):
-        sessionServices.SessionModifBase._checkParams(self)
+        sessionServices.SessionModifUnrestrictedTTCoordinationBase._checkParams(self)
         ScheduleEditSlotBase._checkParams(self)
         self._slot = conference.SessionSlot(self._target)
 
@@ -535,10 +555,10 @@ class SessionScheduleAddSessionSlot(ScheduleEditSlotBase, sessionServices.Sessio
             DictPickler.update(convener, convenerValues)
             slot.addConvener(convener)
 
-class SessionScheduleEditSessionSlot(ScheduleEditSlotBase, sessionServices.SessionSlotModifBase):
+class SessionScheduleEditSessionSlot(ScheduleEditSlotBase, sessionServices.SessionModifUnrestrictedTTCoordinationBase):
 
     def _checkParams(self):
-        sessionServices.SessionSlotModifBase._checkParams(self)
+        sessionServices.SessionModifUnrestrictedTTCoordinationBase._checkParams(self)
         ScheduleEditSlotBase._checkParams(self)
 
     def _addToSchedule(self):
@@ -710,7 +730,7 @@ class ConferenceGetUnscheduledContributions(GetUnscheduledContributions, confere
                contrib.isScheduled() or \
                isinstance(contrib.getCurrentStatus(),conference.ContribStatusWithdrawn)
 
-class SessionGetUnscheduledContributions(GetUnscheduledContributions, sessionServices.SessionModifBase):
+class SessionGetUnscheduledContributions(GetUnscheduledContributions, sessionServices.SessionModifCoordinationBase):
 
     def _isScheduled(self, contrib):
         return contrib.isScheduled() or \
@@ -753,9 +773,9 @@ class ScheduleContributions:
                             'entry': pickledData})
         return entries
 
-class SessionSlotScheduleContributions(ScheduleContributions, sessionServices.SessionSlotModifBase):
+class SessionSlotScheduleContributions(ScheduleContributions, sessionServices.SessionSlotModifCoordinationBase):
     def _checkParams(self):
-        sessionServices.SessionSlotModifBase._checkParams(self)
+        sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
         ScheduleContributions._checkParams(self)
 
     def _getContributionId(self, contribId):
@@ -783,17 +803,12 @@ methodMap = {
     "event.addContribution": ConferenceScheduleAddContribution,
     "event.addSession": ConferenceScheduleAddSession,
     "event.addBreak": ConferenceScheduleAddBreak,
-
     "event.editBreak": ConferenceScheduleEditBreak,
-
     "event.modifyStartEndDate": ConferenceScheduleModifyStartEndDate,
-
     "event.deleteContribution": ConferenceScheduleDeleteContribution,
     "event.deleteSession": ConferenceScheduleDeleteSession,
     "event.deleteBreak": ConferenceScheduleDeleteBreak,
-
     "event.getDayEndDate": ConferenceScheduleGetDayEndDate,
-
     "event.getUnscheduledContributions": ConferenceGetUnscheduledContributions,
     "event.scheduleContributions": ConferenceScheduleContributions,
 
@@ -811,6 +826,8 @@ methodMap = {
     "session.editSlot": SessionScheduleEditSessionSlot,
     "session.deleteSlot": SessionScheduleDeleteSessionSlot,
     "session.changeColors": SessionScheduleChangeSessionColors,
+    "session.modifyStartEndDate": SessionScheduleModifyStartEndDate,
+    
 
     "session.getUnscheduledContributions": SessionGetUnscheduledContributions,
     "slot.scheduleContributions": SessionSlotScheduleContributions,

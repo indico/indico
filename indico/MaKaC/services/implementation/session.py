@@ -11,6 +11,7 @@ from MaKaC.common.PickleJar import DictPickler
 from MaKaC.services.interface.rpc.common import ServiceError
 from MaKaC.services.implementation import conference as conferenceServices
 import MaKaC.webinterface.locators as locators 
+from MaKaC.conference import SessionSlot
 
 class SessionBase(conferenceServices.ConferenceBase):
 
@@ -36,12 +37,43 @@ class SessionBase(conferenceServices.ConferenceBase):
             raise ServiceError("ERR-S4", "Invalid session id.")
 
 class SessionModifBase(SessionBase, ProtectedModificationService):
+    
+    def _checkParams( self ):
+        SessionBase._checkParams(self)
+        if self._params.has_key("scheduleEntry"):
+            if self._params.get("sessionTimetable", False):
+                self._schEntry = self._session.getSchedule().getEntryById(self._params["scheduleEntry"]) 
+            else:
+                self._schEntry = self._conf.getSchedule().getEntryById(self._params["scheduleEntry"])
+            if self._schEntry == None:
+                raise ServiceError("ERR-E4", "Invalid scheduleEntry id.")
+            elif isinstance(self._schEntry.getOwner(), SessionSlot):
+                self._slot = self._schEntry.getOwner()
+
+    def _checkProtection(self):
+        ProtectedModificationService._checkProtection(self)
+
+class SessionModifCoordinationBase(SessionModifBase):
 
     def _checkProtection(self):
         # if the use is authorized to coordinate the session, (s)he won't go through the usual mechanisms
-        if self._target.canCoordinate(self.getAW()):
+        if self._session.canCoordinate(self.getAW()):
             return
-        ProtectedModificationService._checkProtection(self)
+        SessionModifBase._checkProtection( self )
+
+class SessionModifUnrestrictedTTCoordinationBase(SessionModifBase):
+
+    def _checkProtection(self):
+        if self._session.canCoordinate(self.getAW(), "unrestrictedSessionTT"):
+            return
+        SessionModifBase._checkProtection( self )
+
+class SessionModifUnrestrictedContribMngCoordBase(SessionModifBase):
+
+    def _checkProtection(self):
+        if self._session.canCoordinate(self.getAW(), "modifContribs"):
+            return
+        SessionModifBase._checkProtection( self )
 
 class SessionSlotBase(SessionBase):
 
@@ -76,25 +108,33 @@ class SessionSlotDisplayBase(ProtectedDisplayService, SessionSlotBase):
         ProtectedDisplayService._checkParams(self)
 
 
-class SessionSlotModifBase(SessionSlotBase, ProtectedModificationService):
+class SessionSlotModifBase(SessionSlotBase, SessionModifBase):
 
     def _checkParams( self ):
         SessionSlotBase._checkParams(self)
+        if self._params.has_key("scheduleEntry"):
+            self._schEntry = self._slot.getSchedule().getEntryById(self._params["scheduleEntry"])
+            if self._schEntry == None:
+                raise ServiceError("ERR-E4", "Invalid scheduleEntry id.")
 
     def _checkProtection(self):
         # if the use is authorized to coordinate the session, (s)he won't go through the usual mechanisms
-        if self._session.canCoordinate(self.getAW()):
-            return
-        ProtectedModificationService._checkProtection(self)
+        SessionModifBase._checkProtection(self)
 
-class SessionSlotScheduleModifBase(SessionSlotModifBase):
+class SessionSlotModifCoordinationBase(SessionSlotModifBase, SessionModifCoordinationBase):
 
-    def _checkParams( self ):
-        SessionSlotModifBase._checkParams(self)
+    def _checkProtection(self):
+        SessionModifCoordinationBase._checkProtection( self )
 
-        self._schEntry = self._slot.getSchedule().getEntryById(self._params["scheduleEntry"])
-        if self._schEntry == None:
-            raise ServiceError("ERR-E4", "Invalid scheduleEntry id.")
+class SessionSlotModifUnrestrictedTTCoordinationBase(SessionSlotModifBase, SessionModifUnrestrictedTTCoordinationBase):
+
+    def _checkProtection(self):
+        SessionModifUnrestrictedTTCoordinationBase._checkProtection( self )
+
+class SessionSlotModifUnrestrictedContribMngCoordBase(SessionSlotModifBase, SessionModifUnrestrictedContribMngCoordBase):
+
+    def _checkProtection(self):
+        SessionModifUnrestrictedContribMngCoordBase._checkProtection( self )
 
 class SessionGetBooking(SessionBase, GetBookingBase):
     pass

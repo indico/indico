@@ -464,7 +464,7 @@ class ShowConcurrentEvents(ServiceBase):
                 continue
         return evtsByCateg
 
-class ConferenceGetFields(ConferenceModifBase):
+class ConferenceGetFields(ConferenceDisplayBase):
 
     def _getAnswer( self ):
         afm = self._target.getAbstractMgr().getAbstractFieldsMgr()

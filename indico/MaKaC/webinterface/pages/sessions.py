@@ -1499,6 +1499,7 @@ class WSessionModifSchedule(wcomponents.WTemplated):
         vars['rbActive'] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
 
         vars['ttdata'] = schedule.ScheduleToJson.process(self._session.getSchedule(), tz)
+
         vars['eventInfo'] = simplejson.dumps(DictPickler.pickle(self._session.getConference(), timezone=tz))
 
         return vars

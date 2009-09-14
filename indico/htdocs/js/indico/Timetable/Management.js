@@ -22,7 +22,8 @@ type("TimetableManagementActions", [], {
             add: 'schedule.event.addSession',
             dayEndDate: 'schedule.session.getDayEndDate',
             'delete': 'schedule.event.deleteSession',
-            changeColors: 'schedule.session.changeColors'
+            changeColors: 'schedule.session.changeColors',
+            modifyStartEndDate: 'schedule.session.modifyStartEndDate' 
         },
         'Contribution': {
             add: 'schedule.event.addContribution',
@@ -65,6 +66,7 @@ type("TimetableManagementActions", [], {
 
         info.set('scheduleEntry', eventData.scheduleEntryId);
         info.set('conference', eventData.conferenceId);
+        info.set('sessionTimetable', any(this.isSessionTimetable, true));
 
 
         var method = this.methods[type]['delete'];
@@ -72,21 +74,21 @@ type("TimetableManagementActions", [], {
         indicoRequest(method, info, function(result, error){
             if (error) {
                 IndicoUtil.errorReport(error);
+            }else {
+                var data = self.timetable.getData();
+                var day = IndicoUtil.formatDate2(IndicoUtil.parseJsonDate(eventData.startDate));
+                delete data[day][eventData.id];
+                self.timetable.setData(data);
+
+                if (type == 'Session') {
+                    // Delete the session from the eventInfo session list
+                    delete this.eventInfo.sessions[eventData.sessionId];
+                }
+                else if (type == 'SessionSlot') {
+                    this.eventInfo.sessions[eventData.sessionId].numSlots--;
+                }
             }
         });
-
-        var data = self.timetable.getData();
-        var day = IndicoUtil.formatDate2(IndicoUtil.parseJsonDate(eventData.startDate));
-        delete data[day][eventData.id];
-        self.timetable.setData(data);
-
-        if (type == 'Session') {
-            // Delete the session from the eventInfo session list
-            delete this.eventInfo.sessions[eventData.sessionId];
-        }
-        else if (type == 'SessionSlot') {
-            this.eventInfo.sessions[eventData.sessionId].numSlots--;
-        }
     },
     editEntry: function(eventData) {
         var url;
@@ -128,7 +130,7 @@ type("TimetableManagementActions", [], {
 
             if (type != 'Session') {
                 type = 'Session' + eventData.entryType;
-            } else {
+            } else if (!self.isSessionTimetable){
                 type = 'SessionSlot';
             }
         }
@@ -161,13 +163,13 @@ type("TimetableManagementActions", [], {
         indicoRequest(method, info, function(result, error){
             if (error) {
                 IndicoUtil.errorReport(error);
+            }else {
+                this.timetable.getTimetableDrawer().setSessionBlockColors(eventData.sessionId, textColor, bgColor);
+
+                eventData.color = bgColor;
+                eventData.textColor = textColor;
             }
         });
-
-        this.timetable.getTimetableDrawer().setSessionBlockColors(eventData.sessionId, textColor, bgColor);
-
-        eventData.color = bgColor;
-        eventData.textColor = textColor;
     },
     /**
      * This function enables/disables options in the timetable menu depending if 
@@ -177,13 +179,17 @@ type("TimetableManagementActions", [], {
         if (this.isSessionTimetable) {
             if (this.session === null){
                 this.addMenuLink.dom.style.display = "none";
+                //this.addIntervalLink.dom.style.display = "inline";
                 this.rescheduleLink.dom.style.display = "none"; 
                 this.separator.dom.style.display = "none";
             }else {
                 this.addMenuLink.dom.style.display = "inline";
+                //this.addIntervalLink.dom.style.display = "none";
                 this.rescheduleLink.dom.style.display = "inline"; 
                 this.separator.dom.style.display = "inline";
             }
+        }else {
+            //this.addIntervalLink.dom.style.display = "none";
         }
         
     },
@@ -251,8 +257,18 @@ type("TimetableManagementActions", [], {
             IndicoUI.Widgets.Generic.tooltip(this, event,"This option will be available soon");
         };
         this.rescheduleLink.dom.onmouseover = underConstr;
+        
+        // JUST FOR SessionTimetable
+        /*this.addIntervalLink = Html.span('fakeLink', 'Add new interval');
+        if (self.isSessionTimetable) {
+            this.addIntervalLink.observeClick(function() {
+                alert(Json.write(self.timetable));
+                self.addSessionSlot(self.eventInfo[0].sessionId);
+            });
+        }*/
+            
 
-        this.menu = Html.div({style: {cssFloat: 'right', color: '#777'}}, this.addMenuLink, this.separator, this.rescheduleLink);
+        this.menu = Html.div({style: {cssFloat: 'right', color: '#777'}}, this.addMenuLink, this.addIntervalLink, this.separator, this.rescheduleLink);
         this.updateTTMenu();
         return Html.div('clearfix', this.menu, this.infoBox);
     },
@@ -308,7 +324,8 @@ type("TimetableManagementActions", [], {
                 address:this.eventInfo.address
             },
             args: {
-                conference: this.eventInfo.id
+                conference: this.eventInfo.id,
+                sessionTimetable: any(this.isSessionTimetable, false)
             },
             type: type,
             parentType: 'Event'
