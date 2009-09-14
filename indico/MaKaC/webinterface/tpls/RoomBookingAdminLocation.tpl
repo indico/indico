@@ -31,13 +31,12 @@
     <tr>
       <td class="titleUpCellTD" style="width: 160px;"><span class="titleCellFormat">Available Rooms</span></td>
       <td bgcolor="white" valign="top" class="blacktext" style="padding-left: 12px;">
-        <% rooms = location.factory.newRoom().getRooms(location=location.friendlyName) %>
-        <%=len(rooms)%> rooms found in this location.
+        <%=len(Rooms)%> rooms found in this location.
         <% url = urlHandlers.UHRoomBookingRoomDetails.getURL() %>
         <form method="post" action="<%=url%>">
         <input type="hidden" name="roomLocation" value="<%=location.friendlyName%>">
         <select name="roomID">
-          <% for room in rooms: %>
+          <% for room in Rooms: %>
             <option value="<%=room.id%>" class="<%=roomClass( room )%>"><%= room.getFullName() %></option>
           <% end %>
         </select>

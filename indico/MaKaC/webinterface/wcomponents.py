@@ -6773,6 +6773,10 @@ class WRoomBookingAdminLocation( WTemplated ):
         vars["AttsManager"] = self._location.factory.getCustomAttributesManager()
         
         # Rooms
+        rooms = self._location.factory.newRoom().getRooms(location = self._location.friendlyName)
+        rooms.sort(key = lambda r: r.getFullName())
+        
+        vars["Rooms"] = rooms
         
         rh = self._rh
         
