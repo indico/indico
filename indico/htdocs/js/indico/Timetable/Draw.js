@@ -1091,22 +1091,6 @@ type("TimetablePopup", ["ExclusivePopup"], {
 type("TimetableDrawer", ["IWidget"],
      {
 
-         /*_titleTemplate : function(text) {
-             if (text == 'all')
-                 return 'All days';
-
-             var day = text.substring(6,8);
-             var month = text.substring(4,6);
-
-             var strDate =  day + '/' + month + '/' + text.substring(0,4);
-
-             var nDate = new Date();
-             setDate(nDate, parseDate(strDate));
-
-             return Indico.Data.WeekDays[nDate.getDay()].substring(0,3)+' '+day+'/'+month;
-
-         },*/
-
          _minuteDifference: function(time1, time2) {
              var t1 = parseInt(time1.substring(0,2), 10)*60 + parseInt(time1.substring(3,6), 10);
              var t2 = parseInt(time2.substring(0,2), 10)*60 + parseInt(time2.substring(3,6), 10);

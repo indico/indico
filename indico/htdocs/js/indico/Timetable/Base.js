@@ -37,8 +37,9 @@ type("TimeTable", ["LookupTabWidget"], {
      * displayed in the tab control
      */
     _titleTemplate : function(text) {
-        if (text == 'all')
-            return 'All days';
+        if (text == 'all') {
+            return $T('All days');
+        }
 
         var day = text.substring(6,8);
         var month = text.substring(4,6);
@@ -218,6 +219,11 @@ type("TimeTable", ["LookupTabWidget"], {
 
          var sortedKeys = keys(this.data);
          sortedKeys.sort();
+
+         // "All days" active if management mode is off
+         if (!managementMode) {
+             sortedKeys.push('all');
+         }
 
          this.LookupTabWidget( translate(sortedKeys, function(key) {
              return [key, function() {
