@@ -486,10 +486,10 @@ class SessionSlotGetBooking(sessionServices.SessionSlotDisplayBase, roomBooking.
     def _getAnswer(self):
         return self._getRoomInfo(self._target)
 
-class SessionScheduleGetDayEndDate(sessionServices.SessionModifBase):
+class SessionScheduleGetDayEndDate(sessionServices.SessionModifUnrestrictedTTCoordinationBase):
 
     def _checkParams(self):
-        sessionServices.SessionModifBase._checkParams(self)
+        sessionServices.SessionModifUnrestrictedTTCoordinationBase._checkParams(self)
         pManager = ParameterManager(self._params)
 
         date = pManager.extract("date", pType=datetime.date)

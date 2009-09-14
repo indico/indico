@@ -1500,7 +1500,9 @@ class WSessionModifSchedule(wcomponents.WTemplated):
 
         vars['ttdata'] = schedule.ScheduleToJson.process(self._session.getSchedule(), tz)
 
-        vars['eventInfo'] = simplejson.dumps(DictPickler.pickle(self._session.getConference(), timezone=tz))
+        eventInfo = DictPickler.pickle(self._session.getConference(), timezone=tz)
+        eventInfo['timetableSession'] = DictPickler.pickle(self._session, timezone=tz)
+        vars['eventInfo'] = simplejson.dumps(eventInfo)
 
         return vars
 

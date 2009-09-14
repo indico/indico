@@ -66,7 +66,7 @@ type("TimetableManagementActions", [], {
 
         info.set('scheduleEntry', eventData.scheduleEntryId);
         info.set('conference', eventData.conferenceId);
-        info.set('sessionTimetable', any(this.isSessionTimetable, true));
+        info.set('sessionTimetable', this.isSessionTimetable);
 
 
         var method = this.methods[type]['delete'];
@@ -179,12 +179,12 @@ type("TimetableManagementActions", [], {
         if (this.isSessionTimetable) {
             if (this.session === null){
                 this.addMenuLink.dom.style.display = "none";
-                //this.addIntervalLink.dom.style.display = "inline";
+                this.addIntervalLink.dom.style.display = "inline";
                 this.rescheduleLink.dom.style.display = "none"; 
                 this.separator.dom.style.display = "none";
             }else {
                 this.addMenuLink.dom.style.display = "inline";
-                //this.addIntervalLink.dom.style.display = "none";
+                this.addIntervalLink.dom.style.display = "none";
                 this.rescheduleLink.dom.style.display = "inline"; 
                 this.separator.dom.style.display = "inline";
             }
@@ -259,13 +259,12 @@ type("TimetableManagementActions", [], {
         this.rescheduleLink.dom.onmouseover = underConstr;
         
         // JUST FOR SessionTimetable
-        /*this.addIntervalLink = Html.span('fakeLink', 'Add new interval');
+        this.addIntervalLink = Html.span('fakeLink', 'Add new interval');
         if (self.isSessionTimetable) {
             this.addIntervalLink.observeClick(function() {
-                alert(Json.write(self.timetable));
-                self.addSessionSlot(self.eventInfo[0].sessionId);
+                self.addSessionSlot(self.eventInfo.timetableSession);
             });
-        }*/
+        }
             
 
         this.menu = Html.div({style: {cssFloat: 'right', color: '#777'}}, this.addMenuLink, this.addIntervalLink, this.separator, this.rescheduleLink);
@@ -460,7 +459,7 @@ type("TimetableManagementActions", [], {
 
         IndicoUI.Dialogs.addSessionSlot(
             this.methods[params.type].add,
-            this.methods.Event.dayEndDate,
+            this.isSessionTimetable?this.methods.Session.dayEndDate:this.methods.Event.dayEndDate,
             params,
             params.roomInfo,
             $O(params.roomInfo),
