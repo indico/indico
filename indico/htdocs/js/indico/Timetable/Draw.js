@@ -776,7 +776,14 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"], {
         var parameterManager = new IndicoUtil.parameterManager();
 
         parameterManager.add(startEndTimeField.startTimeField, 'time', false);
-        parameterManager.add(startEndTimeField.endTimeField, 'time', false);
+        parameterManager.add(startEndTimeField.endTimeField, 'time', false,
+                             function(value) {
+                                 var sTime = parseTime(startEndTimeField.startTimeField.get()).join('');
+                                 var eTime = parseTime(value).join('');
+                                 if (eTime <= sTime) {
+                                     return "End time should be after start time!";
+                                 }
+                             });
 
         var saveButton = Html.button({}, 'Save');
         saveButton.observeClick(function() {
