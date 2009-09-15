@@ -65,7 +65,8 @@ var Indico = {
         popupMenu: "<%= iconFileName("popupMenu")%>",
         roomwidgetArrow: "<%= iconFileName("roomwidgetArrow")%>",
         breadcrumbArrow: "<%= iconFileName("breadcrumbArrow")%>",
-        star: "<%= iconFileName("star")%>"
+        star: "<%= iconFileName("star")%>",
+        warning_yellow: "<%= iconFileName("warning_yellow")%>"
     },
     Urls: {
         JsonRpcService: "<%= urlHandlers.UHJsonRpcService.getURL() %>",

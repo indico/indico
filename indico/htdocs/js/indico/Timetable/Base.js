@@ -168,9 +168,9 @@ type("TimeTable", ["LookupTabWidget"], {
          return this.timetableDrawer;
      },
 
-     setData: function(data) {
+    setData: function(data, startTime, endTime) {
          this.data = data;
-         this.timetableDrawer.setData(data);
+        this.timetableDrawer.setData(data, startTime, endTime);
      },
      _createLoadingIndicator: function() {
          return Html.div('timetableLoading', $T('Updating the timetable...'));

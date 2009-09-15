@@ -437,7 +437,7 @@ class WConferenceHeader( WHeader ):
         return vars
 
 class WMenuConferenceHeader( WConferenceHeader ):
-    """Templating web component for generating the HTML header for 
+    """Templating web component for generating the HTML header for
         the conferences' web interface with a menu
     """
     def __init__(self, aw, navDrawer, conf, modifKey=False):

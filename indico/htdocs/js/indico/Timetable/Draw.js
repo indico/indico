@@ -778,8 +778,8 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"], {
         parameterManager.add(startEndTimeField.startTimeField, 'time', false);
         parameterManager.add(startEndTimeField.endTimeField, 'time', false,
                              function(value) {
-                                 var sTime = parseTime(startEndTimeField.startTimeField.get()).join('');
-                                 var eTime = parseTime(value).join('');
+                                 var sTime = translate(parseTime(startEndTimeField.startTimeField.get()), zeropad).join('');
+                                 var eTime = translate(parseTime(value), zeropad).join('');
                                  if (eTime <= sTime) {
                                      return "End time should be after start time!";
                                  }
@@ -1250,7 +1250,7 @@ type("TimetableDrawer", ["IWidget"],
                  dayFiltered = this.flatten(dayFiltered);
              }
 
-             var dayData = this.layoutChooser.get().drawDay(dayFiltered);
+             var dayData = this.layoutChooser.get().drawDay(dayFiltered, 'session', this.startTime, this.endTime);
              var height = dayData[0]+TimetableDefaults.topMargin+TimetableDefaults.bottomMargin;
              this.wrappingElement.setStyle('height', pixels(height + (this.printableVersion ? 0 : 100))); // +100 to have margin for the tabs
 
@@ -1470,7 +1470,9 @@ type("TimetableDrawer", ["IWidget"],
                  this.loading = 0;
              }
          },
-         setData: function(data) {
+         setData: function(data, startTime, endTime) {
+             this.startTime = startTime;
+             this.endTime = endTime;
              this.data = data;
              this.redraw();
          }

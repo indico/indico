@@ -206,6 +206,7 @@ type("TimetableManagementActions", [], {
        goBackLink.observeClick(function() {
            self.timetable.setData(self.savedData);
            self._hideInfoBox(message);
+           self._hideWarnings();
            self.menu.remove(goBackLink);
            self.session = null;
            self.updateTTMenu();
@@ -213,22 +214,71 @@ type("TimetableManagementActions", [], {
            timetable.enable();
        });
 
-       var message = Html.div({}, Html.span({style: {fontStyle: 'italic', fontSize: '0.9em'}},
-                                            'You are viewing the content of the interval:'),
-                                  Html.div({style: {fontWeight: 'bold', marginTop: '5px', fontSize: '1.3em'}}, eventData.title +
-                                           (eventData.slotTitle ? ": " + eventData.slotTitle : ''), Html.span({style: {fontWeight: 'normal'}},
-                                           " (" + eventData.startDate.time.substring(0,5) + " - " + eventData.endDate.time.substring(0,5) +")" )));
+        // WatchValues, so that interval changes can be handled
+        var startTime = new WatchValue(eventData.startDate.time.substring(0,5));
+        var endTime = new WatchValue(eventData.endDate.time.substring(0,5));
 
-       data[day] = eventData.entries;
+        this.warnings.observe(function(event, elem) {
+            if (event == 'itemAdded') {
+                var msg = elem[1];
+                var finalTime = elem[3];
 
-       self.timetable.setData(data);
-       this._showInfoBox(message);
-       this.menu.insert(goBackLink);
+                if (msg == "OWNER_END_DATE_EXTENDED") {
+                    eventData.endDate.time = finalTime + ":00";
+                    endTime.set(finalTime);
+                } else if (msg == "OWNER_START_DATE_EXTENDED") {
+                    eventData.startDate.time = finalTime + ":00";
+                    startTime.set(finalTime);
+                }
+            }
+        });
 
-       this.updateTTMenu();
-       // Disables the tabs
-       timetable.disable();
+        var message = Html.div({}, Html.span({style: {fontStyle: 'italic', fontSize: '0.9em'}},
+            $T('You are viewing the contents of the session:')),
+            Html.div({style: {fontWeight: 'bold', marginTop: '5px', fontSize: '1.3em'}}, eventData.title +
+                     (eventData.slotTitle ? ": " + eventData.slotTitle : ''), Html.span({style: {fontWeight: 'normal'}},
+                                                                                        " (", $B(Html.span({}), startTime), " - ", $B(Html.span({}), endTime),")" )));
+
+        data[day] = eventData.entries;
+
+        self.timetable.setData(data, startTime.get(), endTime.get());
+        this._showInfoBox(message);
+        this.menu.insert(goBackLink);
+
+        this.updateTTMenu();
+        // Disables the tabs
+        timetable.disable();
     },
+
+    _createInfoArea: function() {
+        return Html.div("timetableManagementInfoArea",
+                        $B(Html.ul({}),
+                           this.warnings,
+                           function(item) {
+
+                               var atoms = Util.parseId(item[2]);
+
+                               var message = {
+                                   OWNER_START_DATE_EXTENDED: {
+                                       SessionSlot : $T('Interval start time changed from '),
+                                       Session: $T('Interval start time changed from '),
+                                       Conference: $T('Conference start time changed from ')
+                                   },
+                                   OWNER_END_DATE_EXTENDED: {
+                                       SessionSlot : $T('Interval end time changed from '),
+                                       Session: $T('Interval end time changed from '),
+                                       Conference: $T('Conference end time changed from ')
+                                   },
+                                   ENTRIES_CHANGED: {
+                                       SessionSlot: $T('Contents of interval changed from ')
+                                   }
+                               }[item[1]][atoms[0]];
+
+                               return Html.li({}, Html.img({style: {padding: '5px', verticalAlign: 'middle'}, src:imageSrc('warning_yellow'), alt: $T('Warning!')}),
+                                              Html.span({style: {verticalAlign: 'middle', marginLeft: '5px'}}, message + ' ' + item[4] + $T(' to ') + item[3]));
+                           }));
+    },
+
     /*
      * Returns the header where all options are placed for managing the timetable, such as add and reschedule
      */
@@ -267,9 +317,12 @@ type("TimetableManagementActions", [], {
         }
             
 
-        this.menu = Html.div({style: {cssFloat: 'right', color: '#777'}}, this.addMenuLink, this.addIntervalLink, this.separator, this.rescheduleLink);
+        this.warningArea = this._createInfoArea();
+        this.warningArea.dom.style.display = 'none';
+
+		this.menu = Html.div({style: {cssFloat: 'right', color: '#777'}}, this.addMenuLink, this.addIntervalLink, this.separator, this.rescheduleLink);
         this.updateTTMenu();
-        return Html.div('clearfix', this.menu, this.infoBox);
+        return Html.div({}, this.warningArea, Html.div('clearfix', this.menu, this.infoBox));
     },
     /*
      * Translate the date string with format yyyymmdd into a javascript
@@ -528,6 +581,7 @@ type("TimetableManagementActions", [], {
                 delete data[prevDay][result.id];
             }
         }
+
         data[result.day][result.id] = result.entry;
 
         if (exists(result.session)) {
@@ -548,7 +602,25 @@ type("TimetableManagementActions", [], {
         if (setData) {
             this.timetable.setData(data);
         }
+
+        var self = this;
+
+        this._hideWarnings();
+
+        if (result.autoOps.length > 0) {
+            this.warningArea.dom.style.display = 'block';
+            each(result.autoOps,
+                 function(op) {
+                     self.warnings.append(op);
+                 });
+        }
     },
+
+    _hideWarnings: function() {
+        this.warningArea.dom.style.display = 'none';
+        this.warnings.clear();
+    },
+
     /*
     * Iterates through entries and adds all of them
     */
@@ -574,6 +646,8 @@ type("TimetableManagementActions", [], {
     function(timetable, eventInfo) {
         this.timetable = timetable;
         this.eventInfo = eventInfo;
+
+        this.warnings = new WatchList();
 
         // Whenever in session content view this is set to the session
         this.session = null;

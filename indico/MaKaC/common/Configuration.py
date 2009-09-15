@@ -50,6 +50,7 @@ class Config:
                  "user": "user.png",
                  "loggedIn": "userloggedin.png",
                  "warning": "warning.png",
+                 "warning_yellow": "warning_yellow.png",
                  "signin": "key.png",
                  "currentMenuItem": "collapsd.png",
                  "paper": "paper.png",

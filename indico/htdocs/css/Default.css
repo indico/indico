@@ -4775,6 +4775,7 @@ ul.darkPopupList li a:hover {
 ul.darkPopupList li a {
     color: #ECECEC;
     font-weight: normal;
+
 }
 
 ul.timetableManagementPopupList li a {
@@ -4784,6 +4785,29 @@ ul.timetableManagementPopupList li a {
 ul.timetableManagementPopupList li a:hover {
     color: #2F2506;
     background: #F9F6E4;
+}
+
+div.timetableManagementInfoArea {
+
+}
+
+div.timetableManagementInfoArea ul {
+    top: 2px;
+    left: 30px;
+    margin-top: 0px;
+    margin-bottom:10px;
+    padding:5px;
+    list-style: none;
+}
+
+div.timetableManagementInfoArea ul li{
+    padding-left: 0px;
+    color: #FF9944;
+    background-color:#FFFFDD;
+    border:1px solid #FFEE33;
+    overflow: auto;
+    font-weight: bold;
+    margin-bottom:5px;
 }
 
 .printButton, .printButtonWhite, .buttonWhite, .buttonWhite, .dropDownMenuButtonWhite {

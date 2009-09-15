@@ -26,6 +26,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.common.timezoneUtils as timezoneUtils
 
 import datetime
+from pytz import timezone
 
 from MaKaC.common.logger import Logger
 
@@ -306,7 +307,7 @@ class ConferenceDateTimeEndModification( ConferenceDateTimeModificationBase ):
             raise ServiceError("ERR-E3",
                                "Date/time of end cannot "+
                                "be lower than data/time of start")
-        self._target.setDates(self._target.getStartDate(), self._pTime)
+        self._target.setDates(self._target.getStartDate(), self._pTime.astimezone(timezone("UTC")))
 
     def _handleGet(self):
         return datetime.datetime.strftime(self._target.getAdjustedEndDate(),

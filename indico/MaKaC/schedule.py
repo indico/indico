@@ -138,6 +138,8 @@ class TimeSchedule(Schedule, Persistent):
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
 
+        autoOps = []
+
         if entry.isScheduled():
             # remove it from the old schedule and add it to this one
             entry.getSchedule().removeEntry(entry)
@@ -149,8 +151,18 @@ class TimeSchedule(Schedule, Persistent):
             sDate=self.findFirstFreeSlot(entry.getDuration())
             if sDate is None:
                 if check==2:
-                    self.getOwner().setEndDate((self.getEndDate()+entry.getDuration()), check)
-                    sDate=self.findFirstFreeSlot(entry.getDuration())
+                    owner = self.getOwner()
+                    newEndDate = self.getEndDate() + entry.getDuration()
+
+                    autoOps.append((owner,
+                                    "OWNER_END_DATE_EXTENDED",
+                                    owner,
+                                    newEndDate.astimezone(timezone(owner.getConference().getTimezone())),
+                                    self.getAdjustedEndDate()
+                                    ))
+
+                    owner.setEndDate(newEndDate, check)
+                    sDate = self.findFirstFreeSlot(entry.getDuration())
                 if sDate is None:
                     raise ParentTimingError( _("There is not enough time found to add this entry in the schedule (duration: %s)")%entry.getDuration(), _("Add Entry"))
             entry.setStartDate(sDate)
@@ -161,12 +173,12 @@ class TimeSchedule(Schedule, Persistent):
                 if check==1:
                     raise TimingError( _("Cannot schedule this entry because its start date (%s) is before its parents (%s)")%(entry.getStartDate(),self.getStartDate('UTC')),_("Add Entry"))
                 elif check == 2:
-                    self.getOwner().setStartDate(entry.getStartDate(),check)
+                    autoOps += self.getOwner().setStartDate(entry.getStartDate(),check)
             elif entry.getEndDate()>self.getEndDate('UTC'):
                 if check==1:
                     raise TimingError( _("Cannot schedule this entry because its end date (%s) is after its parents (%s)")%(entry.getEndDate(),self.getEndDate('UTC')),_("Add Entry"))
                 elif check == 2:
-                    self.getOwner().setEndDate(entry.getEndDate(),check)
+                    autoOps += self.getOwner().setEndDate(entry.getEndDate(),check)
         #we make sure the entry end date does not go outside the schedule
         #   boundaries
         if entry.getEndDate() is not None and \
@@ -177,6 +189,7 @@ class TimeSchedule(Schedule, Persistent):
         entry.setSchedule(self,self._getNewEntryId())
         self.reSchedule()
         self._p_changed = 1
+        return autoOps
 
     def _setEntryDuration(self,entry):
         if entry.getDuration() is None:
@@ -186,8 +199,9 @@ class TimeSchedule(Schedule, Persistent):
         if (entry is None) or self.hasEntry(entry):
             return
         self._setEntryDuration(entry)
-        self._addEntry(entry)
+        result = self._addEntry(entry)
         self._p_changed = 1
+        return result
 
     def _removeEntry(self,entry):
         self._entries.remove(entry)
@@ -432,6 +446,9 @@ class TimeSchedule(Schedule, Persistent):
     def moveEntriesBelow(self, diff, entriesList):
         """diff: the difference we have to increase/decrease each entry of the list.
            entriesList: list of entries for applying the diff"""
+
+        autoOps = []
+
         if diff is not None:
             from MaKaC.conference import SessionSlot
             sessionsAlreadyModif=[]
@@ -442,9 +459,11 @@ class TimeSchedule(Schedule, Persistent):
                         # if the slot is the first in the session schedule
                         # we also change the session start date
                         if session.getSchedule().getEntries()[0].getOwner()==entry.getOwner():
-                            session.setStartDate(session.getStartDate()+diff, check=0, moveEntries=0)
+                            autoOps += session.setStartDate(session.getStartDate()+diff, check=0, moveEntries=0)
                         sessionsAlreadyModif.append(session)
                 entry.setStartDate(entry.getStartDate()+diff, check=0, moveEntries=1)
+
+        return autoOps
 
 class SchEntry(Persistent):
     """base schedule entry class. Do NOT instantiate
@@ -564,7 +583,7 @@ class ConferenceSchedule(TimeSchedule):
                 if not self.getOwner().hasContribution(entry.getOwner()):
                     raise MaKaCError( _("Cannot schedule into the event a contribution that does not belong to it"), _("Event"))
         self._setEntryDuration(entry)
-        self._addEntry(entry,check)
+        return self._addEntry(entry,check)
 
     def moveUpEntry(self,entry,tz=None):
         #not very smart, should be improved: contribs with same start date,
@@ -707,6 +726,8 @@ class SlotSchedule(TimeSchedule):
             2: check and adapt the owner dates
         """
 
+        autoOps = []
+
         if (entry is None) or self.hasEntry(entry):
             return
         if isinstance(entry,LinkedTimeSchEntry):
@@ -722,7 +743,7 @@ class SlotSchedule(TimeSchedule):
                     self.getOwner().getStartDate().strftime('%Y-%m-%d %H:%M')),\
                       _("Slot"))
             elif check == 2:
-                self.getOwner().setStartDate(entry.getStartDate(),check,0)
+                autoOps += self.getOwner().setStartDate(entry.getStartDate(),check,0)
         if entry.getEndDate()!=None and entry.getEndDate() > self.getOwner().getEndDate():
             if check == 1:
                 raise ParentTimingError( _("Cannot add entry which finishes after (%s) the time slot (%s)")%\
@@ -730,9 +751,11 @@ class SlotSchedule(TimeSchedule):
                     self.getOwner().getEndDate().strftime('%Y-%m-%d %H:%M')),\
                      "Slot")
             elif check == 2:
-                self.getOwner().setEndDate(entry.getEndDate(),check)
+                autoOps += self.getOwner().setEndDate(entry.getEndDate(),check)
         self._setEntryDuration(entry)
-        self._addEntry(entry,check)
+        autoOps += self._addEntry(entry,check)
+
+        return autoOps
 
     def moveUpEntry(self,entry):
         #not very smart, should be improved: contribs with same start date,
@@ -946,7 +969,7 @@ class LinkedTimeSchEntry(TimeSchEntry):
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
-        self.getOwner().setStartDate(newDate,check, moveEntries)
+        return self.getOwner().setStartDate(newDate,check, moveEntries)
 
     def getEndDate( self ):
         return self.__owner.getEndDate()
@@ -962,9 +985,9 @@ class LinkedTimeSchEntry(TimeSchEntry):
 
     def setDuration(self,hours=0,minutes=15,dur=0,check=2):
         if dur!=0:
-            self.getOwner().setDuration(dur=dur,check=check)
+            return self.getOwner().setDuration(dur=dur,check=check)
         else:
-            self.getOwner().setDuration(hours,minutes,check=check)
+            return self.getOwner().setDuration(hours,minutes,check=check)
 
     @Retrieves(['MaKaC.schedule.ContribSchEntry'], 'title')
     def getTitle( self ):
@@ -1428,6 +1451,36 @@ class ContribSchEntry(LinkedTimeSchEntry):
 class ScheduleToJson:
 
     @staticmethod
+    def processEntry(obj, tz):
+
+        entry = {}
+
+        #raise "duration: " + (datetime(1900,1,1)+obj.getDuration()).strftime("%Hh%M'") + ''
+        entry = DictPickler.pickle(obj, timezone=tz)
+
+        genId = entry['id']
+
+        entry['duration'] = int(obj.getDuration().seconds / 60)
+
+        # sessions that are no poster sessions will be expanded
+        if entry['entryType'] == 'Session':
+
+            sessionSlot = obj.getOwner()
+            session = sessionSlot.getSession()
+            sessionSlotSchedule = sessionSlot.getSchedule()
+
+            # get session content
+            entries = {}
+            for contrib in sessionSlot.getSchedule().getEntries():
+                contribData = DictPickler.pickle(contrib, timezone=tz)
+                entries[contribData['id']] = contribData
+
+            entry['entries'] = entries
+
+        return genId, entry
+
+
+    @staticmethod
     def process(schedule, tz):
 
         from MaKaC.services.interface.rpc import json
@@ -1439,31 +1492,11 @@ class ScheduleToJson:
 
             for obj in schedule.getEntriesOnDay(day):
 
+                genId, pickledData = ScheduleToJson.processEntry(obj, tz)
+
                 # exclude entries that start in the day before
-                if obj.getAdjustedStartDate(tz).date() != day.date():
-                    continue
-
-                #raise "duration: " + (datetime(1900,1,1)+obj.getDuration()).strftime("%Hh%M'") + ''
-                pickledData = DictPickler.pickle(obj, timezone=tz)
-                genId = pickledData['id']
-
-                dayEntry[genId] = pickledData
-                dayEntry[genId]['duration'] = int(obj.getDuration().seconds / 60)
-
-                # sessions that are no poster sessions will be expanded
-                if dayEntry[genId]['entryType'] == 'Session':
-
-                    sessionSlot = obj.getOwner()
-                    session = sessionSlot.getSession()
-                    sessionSlotSchedule = sessionSlot.getSchedule()
-
-                    # get session content
-                    entries = {}
-                    for contrib in sessionSlot.getSchedule().getEntries():
-                        contribData = DictPickler.pickle(contrib, timezone=tz)
-                        entries[contribData['id']] = contribData
-
-                    dayEntry[genId]['entries'] = entries
+                if obj.getAdjustedStartDate(tz).date() == day.date():
+                    dayEntry[genId] = pickledData
 
             scheduleDict[day.strftime("%Y%m%d")] = dayEntry
 

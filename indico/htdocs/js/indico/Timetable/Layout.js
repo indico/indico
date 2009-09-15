@@ -187,7 +187,7 @@ type("TimetableLayoutManager", [],
 
 type("IncrementalLayoutManager", ["TimetableLayoutManager"],
      {
-         drawDay: function(data, detailLevel) {
+         drawDay: function(data, detailLevel, startTime, endTime) {
 
              var self = this;
 
@@ -211,8 +211,8 @@ type("IncrementalLayoutManager", ["TimetableLayoutManager"],
                  }
 
              } else {
-                 startingHour = 8;
-                 endingHour = 17;
+                 startingHour = parseInt(any(startTime, '8:00').split(':')[0], 10);
+                 endingHour = parseInt(any(endTime, '17:00').split(':')[0],10);
              }
 
              var endMin;

@@ -28,7 +28,7 @@
               <%= "color:%s;" % self._slot.getSession().getTextColor() %>
 	    <% end %>">
 	<%from MaKaC.common.TemplateExec import truncateTitle %>    
-    <% if self._conf.getEnableSessionSlots() and self._slot.getTitle().strip() != "": %>
+    <% if self._conf.getEnableSessionSlots() and self._slot.getTitle() and self._slot.getTitle().strip() != "": %>
       <%= "%s: %s"%(self.htmlText(truncateTitle(self._slot.getSession().getTitle(), 40)), self.htmlText(self._slot.getTitle())) %>
     <% end %>
     <% else: %>
