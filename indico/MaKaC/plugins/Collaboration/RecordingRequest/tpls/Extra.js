@@ -9,7 +9,7 @@ var RR_loadTalks = function () {
         var talkTemplate = function(talk) {
             var checkBox = Html.input('checkbox', {name: "talkSelection", id: "talk" + talk.id + "CB"});
             checkBox.dom.value = talk.id;
-            var talkId = Html.span("RRContributionId", "[" + talk.id + "]")
+            var talkId = Html.span("RRContributionId", "[" + talk.id + "] ")
             var talkName = Html.span("RRContributionName", talk.title)
             var label = Html.label({}, talkId, talkName);
             label.dom.htmlFor = "talk" + talk.id + "CB";
@@ -23,6 +23,15 @@ var RR_loadTalks = function () {
                     speakers += speaker.fullName;
                 });
                 label.append(Html.span("RRSpeakers", speakers))
+            }
+            
+            if (exists(talk.location)) {
+                var locationText = ' (' + talk.location;
+                if (exists(talk.room)) {
+                    locationText += ', ' + talk.room;
+                }
+                locationText += ')';
+                label.append(Html.span("RRSpeakers", locationText))
             }
             
             return Html.li('', checkBox, label);

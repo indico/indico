@@ -39,9 +39,14 @@
             <label for="neitherRB">Neither, see comment</label>
         </div>
     </div>
-    <% displayText = ('none', 'block')[DisplayTalks] %>
+    <% displayText = ('none', 'block')[DisplayTalks and InitialChoose] %>
     <div id="contributionsDiv" class="RRFormSubsection" style="display: <%= displayText %>;">
         <span class="RRQuestion">Please choose among the contributions below:</span>
+        <% if not HasTalks: %>
+        <div>
+            <span style="padding-left: 20px;">This event has no talks</span>
+        </div>
+        <% end %>
         
         <% if HasTalks: %>
         <span class="fakeLink" style="margin-left: 20px; margin-right: 5px;" onclick="WRSelectAllContributions()">Select all</span>
@@ -66,6 +71,13 @@
                                             <span class="RRContributionName"><%= talk.getTitle() %></span>
                                             <% if talk.getSpeakerList() : %>
                                             <span class="RRSpeakers">, by <%= " and ".join([person.getFullName() for person in talk.getSpeakerList()]) %></span>
+                                            <% end %>
+                                            <% if talk.getLocation(): %>
+                                                <% locationText = " (" + talk.getLocation().getName() %>
+                                                <% if talk.getRoom(): %>
+                                                    <% locationText += ", " + talk.getRoom().getName() + ")" %> 
+                                                <% end %>
+                                                <span class="WRSpeakers"><%= locationText %></span>
                                             <% end %>
                                         </label>
                                     </li>
@@ -235,5 +247,5 @@
 <% end %>
 
 <script type="text/javascript">
-    var RR_contributionsLoaded = <%= jsBoolean(DisplayTalks) %>;
+    var RR_contributionsLoaded = <%= jsBoolean(DisplayTalks or not HasTalks) %>;
 </script>

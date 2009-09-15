@@ -22,6 +22,7 @@
 from MaKaC.plugins.Collaboration.base import CollaborationServiceException,\
     CSErrorBase
 from MaKaC.common.PickleJar import Retrieves
+from MaKaC.webinterface.common.contribFilters import PosterFilterField
 
 lectureOptions = [
     ("none", "None"),
@@ -74,6 +75,16 @@ subjectMatter = [
     ("safety" , "Safety"),
     ("techTraining" , "Technical Training")
 ]
+    
+def getTalks(conference, oneIsEnough = False):
+    talks = []
+    filter = PosterFilterField(conference, False, False)
+    for cont in conference.getContributionList():
+        if filter.satisfies(cont):
+            talks.append(cont)
+            if oneIsEnough:
+                break
+    return talks
     
 class RecordingRequestError(CSErrorBase):
     def __init__(self, operation, inner):

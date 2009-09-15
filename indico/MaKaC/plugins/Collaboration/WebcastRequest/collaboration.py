@@ -21,7 +21,8 @@
 
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.WebcastRequest.mail import NewRequestNotification, RequestModifiedNotification, RequestDeletedNotification,\
-    needToSendEmails, RequestRejectedNotification, RequestAcceptedNotification
+    needToSendAdminEmails, RequestRejectedNotification, RequestAcceptedNotification,\
+    RequestAcceptedNotificationAdmin, RequestRejectedNotificationAdmin
 from MaKaC.common.mail import GenericMailer
 from MaKaC.plugins.Collaboration.WebcastRequest.common import WebcastRequestException,\
     WebcastRequestError
@@ -68,14 +69,14 @@ class CSBooking(CSBookingBase):
         if self._bookingParams["lectureStyle"] == 'chooseOne': #change when list of community names is ok
             raise WebcastRequestException("lectureStyle parameter cannot be 'chooseOne'")
     #    if self._bookingParams["talks"] == 'choose':
-     #       raise WebcastRequestException("You cannot choose choose")
+    #       raise WebcastRequestException("You cannot choose choose")
         return False
 
     def _create(self):
         self._statusMessage = "Request successfully sent"
         self._statusClass = "statusMessageOther"
         
-        if needToSendEmails():
+        if needToSendAdminEmails():
             try:
                 notification = NewRequestNotification(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
@@ -91,7 +92,7 @@ class CSBooking(CSBookingBase):
         self._statusMessage = "Request successfully sent"
         self._statusClass = "statusMessageOther"
         
-        if needToSendEmails():
+        if needToSendAdminEmails():
             try:
                 notification = RequestModifiedNotification(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
@@ -111,33 +112,55 @@ class CSBooking(CSBookingBase):
         self._statusClass = "statusMessageOK"
         import MaKaC.webcast as webcast 
         webcast.HelperWebcastManager.getWebcastManagerInstance().addForthcomingWebcast(self._conf)
-        if needToSendEmails():
+        
+        try:
+            notification = RequestAcceptedNotification(self)
+            GenericMailer.sendAndLog(notification, self.getConference(),
+                                 "MaKaC/plugins/Collaboration/WebcastRequest/collaboration.py",
+                                 None)
+        except Exception,e:
+            Logger.get('RecReq').error(
+                """Could not send RequestAcceptedNotification for request with id %s , exception: %s""" % (self._id, str(e)))
+            return WebcastRequestError('accept', e)
+        
+        if needToSendAdminEmails():
             try:
-                notification = RequestAcceptedNotification(self)
+                notification = RequestAcceptedNotificationAdmin(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
                                      "MaKaC/plugins/Collaboration/WebcastRequest/collaboration.py",
-                                     self.getConference().getCreator())
+                                     None)
             except Exception,e:
                 Logger.get('RecReq').error(
-                    """Could not send RequestAcceptedNotification for request with id %s , exception: %s""" % (self._id, str(e)))
-                return WebcastRequestError('remove', e)
+                    """Could not send RequestAcceptedNotificationAdmin for request with id %s , exception: %s""" % (self._id, str(e)))
+                return WebcastRequestError('accept', e)
         
     def _reject(self):
         self._statusMessage = "Request rejected by responsible"
         self._statusClass = "statusMessageError"
-        if needToSendEmails():
+        
+        try:
+            notification = RequestRejectedNotification(self)
+            GenericMailer.sendAndLog(notification, self.getConference(),
+                                 "MaKaC/plugins/Collaboration/WebcastRequest/collaboration.py",
+                                 None)
+        except Exception,e:
+            Logger.get('RecReq').error(
+                """Could not send RequestRejectedNotification for request with id %s , exception: %s""" % (self._id, str(e)))
+            return WebcastRequestError('reject', e)
+        
+        if needToSendAdminEmails():
             try:
-                notification = RequestRejectedNotification(self)
+                notification = RequestRejectedNotificationAdmin(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
                                      "MaKaC/plugins/Collaboration/WebcastRequest/collaboration.py",
-                                     self.getConference().getCreator())
+                                     None)
             except Exception,e:
                 Logger.get('RecReq').error(
-                    """Could not send RequestRejectedNotification for request with id %s , exception: %s""" % (self._id, str(e)))
-                return WebcastRequestError('remove', e)
+                    """Could not send RequestRejectedNotificationAdmin for request with id %s , exception: %s""" % (self._id, str(e)))
+                return WebcastRequestError('reject', e)
                                         
     def _delete(self):
-        if needToSendEmails():
+        if needToSendAdminEmails():
             try:
                 notification = RequestDeletedNotification(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),

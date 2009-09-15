@@ -23,13 +23,14 @@ from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.plugins.Collaboration.WebcastRequest.common import typeOfEvents,\
-    postingUrgency, webcastPurpose, intendedAudience, subjectMatter, lectureOptions
+    postingUrgency, webcastPurpose, intendedAudience, subjectMatter, lectureOptions,\
+    getCommonTalkInformation
 from MaKaC.webinterface import urlHandlers
 from MaKaC.common.utils import formatDateTime
 from MaKaC.common.timezoneUtils import getAdjustedDate
 from MaKaC.plugins.base import PluginsHolder
 
-def needToSendEmails():
+def needToSendAdminEmails():
     webcastRequest = PluginsHolder().getPluginType('Collaboration').getPlugin('WebcastRequest')
     
     admins = webcastRequest.getOption('admins').getValue()
@@ -47,6 +48,9 @@ class WebcastRequestNotificationBase(GenericNotification):
         self._booking = booking
         self._bp = booking._bookingParams
         self._conference = booking.getConference()
+        
+        admins = PluginsHolder().getPluginType('Collaboration').getPlugin('WebcastRequest').getOption("admins").getValue()
+        self.adminEmails = [u.getEmail() for u in admins]
         self.additionalEmails = PluginsHolder().getPluginType('Collaboration').getPlugin('WebcastRequest').getOption("additionalEmails").getValue()
         
         self._displayLink = urlHandlers.UHConferenceDisplay.getURL(self._conference)
@@ -56,6 +60,36 @@ class WebcastRequestNotificationBase(GenericNotification):
         
         self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
         self.setContentType("text/html")
+        
+    def _getEventRoomDetails(self):
+        roomDetails = ""
+        location = self._conference.getLocation()
+        if location:
+            roomDetails += """
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Event location:</strong>
+        </td>
+        <td>
+            %s
+        </td>
+    </tr>
+""" % location.getName()
+
+            room = self._conference.getRoom()
+            if room:
+                roomDetails += """
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Event room:</strong>
+        </td>
+        <td>
+            %s
+        </td>
+    </tr>
+""" % room.getName()
+
+        return roomDetails
         
     def _getEventDetails(self):
         return """
@@ -77,11 +111,12 @@ Event details:
             %s
         </td
     </tr>
-    
+    %s
 </table>
 """%(self._conference.getTitle(),
      self._displayLink,
-     self._conference.getId()
+     self._conference.getId(),
+     self._getEventRoomDetails()
      )
 
     def _getOrganizerDetails(self):
@@ -310,46 +345,57 @@ Request details:<br />
      self._getMatters(),
      self._getComments()
      )
+    
+    def _getTalkListText(self, talkList):
+        text = []
+        for contribution in talkList:
+            
+            speakerList = contribution.getSpeakerList()
+            if speakerList:
+                speakers = ', by ' + ", ".join([person.getFullName() for person in speakerList])
+            else:
+                speakers = ''
+                
+            if contribution.getLocation():
+                locationText = "Location: " + contribution.getLocation().getName()
+                if contribution.getRoom():
+                    locationText += ', Room: ' + contribution.getRoom().getName()
+                else:
+                    locationText += ', Room: not defined'
+            else:
+                locationText = "Location: not defined"
+                
+            contributionLine = """•[%s] <a href="%s">%s</a>%s (%s)""" % (
+                contribution.getId(),
+                urlHandlers.UHContributionDisplay.getURL(contribution),
+                contribution.getTitle(),
+                speakers,
+                locationText
+            )
+            text.append(contributionLine)
+        
+        return text
         
     def _getTalks(self):
         #"all" "choose" "neither"
         if self._bp["talks"] == "all":
-            return """All talks"""
-        elif self._bp["talks"] == "neither":
-            return """Please see the talk selection comments"""
+            talkInfo = getCommonTalkInformation(self._conference)
+            text = ["""The user chose "All webcast-able Talks". List of webcast-able talks:"""]
+            webcastableTalks = talkInfo[2]
+            if webcastableTalks:
+                text.extend(self._getTalkListText(webcastableTalks))
+            else:
+                text.append("(This event has no webcast-able talks talks)")
+            return "<br />".join(text)
         else:
             text = ["""The user chose the following talks:"""]
-            
-            for contributionId in self._bp["talkSelection"]:
-                conf = self._booking.getConference()
-                contribution = conf.getContributionById(contributionId)
-                
-                speakerList = contribution.getSpeakerList()
-                if speakerList:
-                    speakers = ', by ' + ", ".join([person.getFullName() for person in speakerList])
-                else:
-                    speakers = ''
-                    
-                if contribution.getLocation():
-                    locationText = "Location: " + contribution.getLocation().getName()
-                    if contribution.getRoom():
-                        locationText += ', Room: ' + contribution.getRoom().getName()
-                    else:
-                        locationText += ', Room: not defined'
-                else:
-                    locationText = "Location: not defined"
-                
-                contributionLine = """•[%s] <a href="%s">%s</a>%s (%s)""" % (
-                    contributionId,
-                    urlHandlers.UHContributionDisplay.getURL(contribution),
-                    contribution.getTitle(),
-                    speakers,
-                    locationText
-                )
-                text.append(contributionLine)
+            selectedTalks = [self._conference.getContributionById(id) for id in self._bp["talkSelection"]]
+            if selectedTalks:
+                text.extend(self._getTalkListText(selectedTalks))
+            else:
+                text.append("(User did not choose any talks)")
             
             return "<br />".join(text)
-                
                 
         
     def _getTalkSelectionComments(self):
@@ -403,16 +449,12 @@ Request details:<br />
             return "No audiences were selected"
 
 
-class WebcastRequestAdminNotification(WebcastRequestNotificationBase):
+class WebcastRequestAdminNotificationBase(WebcastRequestNotificationBase):
     """ Base class to build an email notification to Admins
     """
     def __init__(self, booking):
         WebcastRequestNotificationBase.__init__(self, booking)
-        self._conference = booking.getConference()
-        admins = PluginsHolder().getPluginType('Collaboration')\
-                       .getPlugin('WebcastRequest').getOption("admins").getValue()
-        adminEmails = [u.getEmail() for u in admins]
-        self.setToList(adminEmails + self.additionalEmails)
+        self.setToList(self.adminEmails + self.additionalEmails)
 
 
 class WebcastRequestManagerNotificationBase(WebcastRequestNotificationBase):
@@ -420,16 +462,16 @@ class WebcastRequestManagerNotificationBase(WebcastRequestNotificationBase):
     """
     def __init__(self, booking):
         WebcastRequestNotificationBase.__init__(self, booking)
-        self._conference = booking.getConference()
         managerEmails = [u.getEmail() for u in self._conference.getManagerList()]
-        self.setToList(managerEmails + self.additionalEmails)
+        managerEmails.append(self._conference.getCreator().getEmail())
+        self.setToList(managerEmails)
 
-class NewRequestNotification(WebcastRequestAdminNotification):
+class NewRequestNotification(WebcastRequestAdminNotificationBase):
     """ Template to build an email notification to the webcast responsible
     """
     
     def __init__(self, booking):
-        WebcastRequestAdminNotification.__init__(self, booking)
+        WebcastRequestAdminNotificationBase.__init__(self, booking)
         
         self.setSubject("""[Indico] [New webcast request] %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
@@ -441,8 +483,6 @@ Click <a href="%s">here</a> to accept or reject the request.<br />
 <br />
 %s
 <br />
-You also can see a list of all the requests here: (not implemented yet).<br />
-<br />
 <br />
 %s
 """ % ( self._adminLink,
@@ -453,25 +493,23 @@ You also can see a list of all the requests here: (not implemented yet).<br />
         
         
         
-class RequestModifiedNotification(WebcastRequestAdminNotification):
+class RequestModifiedNotification(WebcastRequestAdminNotificationBase):
     """ Template to build an email notification to the webcast responsible
     """
     
     def __init__(self, booking):
-        WebcastRequestAdminNotification.__init__(self, booking)
+        WebcastRequestAdminNotificationBase.__init__(self, booking)
         
         self.setSubject("""[Indico] [Webcast request modified] %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear Webcast Responsible,<br />
 <br />
-A webcast request <strong>was modified</strong>.<br />
+A webcast request <strong>has been modified</strong>.<br />
 Click <a href="%s">here</a> to accept or reject the request.<br />
 %s
 <br />
 %s
-<br />
-You also can see a list of all the requests here: (not implemented yet).<br />
 <br />
 <br />
 %s
@@ -483,25 +521,23 @@ You also can see a list of all the requests here: (not implemented yet).<br />
         
         
         
-class RequestDeletedNotification(WebcastRequestAdminNotification):
+class RequestDeletedNotification(WebcastRequestAdminNotificationBase):
     """ Template to build an email notification to the webcast responsible
     """
     
     def __init__(self, booking):
-        WebcastRequestAdminNotification.__init__(self, booking)
+        WebcastRequestAdminNotificationBase.__init__(self, booking)
         
         self.setSubject("""[Indico] [Webcast request deleted] %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear Webcast Responsible,<br />
 <br />
-A webcast request <strong>was withdrawn</strong>.<br />
+A webcast request <strong>has been withdrawn</strong>.<br />
 <br />
 %s
 <br />
 %s
-<br />
-You also can see a list of all the requests here: (not implemented yet).<br />
 <br />
 <br />
 %s
@@ -511,8 +547,10 @@ You also can see a list of all the requests here: (not implemented yet).<br />
         ))
 
 class RequestAcceptedNotification(WebcastRequestManagerNotificationBase):
-    """ Template to build an email notification to the webcast responsible
+    """ Template to build an email notification to the event managers
+        when a request gets accepted.
     """
+
     
     def __init__(self, booking):
         WebcastRequestManagerNotificationBase.__init__(self, booking)
@@ -521,19 +559,42 @@ class RequestAcceptedNotification(WebcastRequestManagerNotificationBase):
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear Event Manager,<br />
-Your webcast request was accepted.<br />
+<br />
+Your webcast request for the event: "%s" has been accepted.<br />
 Click <a href="%s">here</a> to view your request.<br />
 <br />
 Best Regards,<br />
 Webcast Managers
 
-""" % ( self._adminLink
+""" % ( self._conference.getTitle(),
+        self._adminLink
         ))
+        
+class RequestAcceptedNotificationAdmin(WebcastRequestAdminNotificationBase):
+    """ Template to build an email notification to the admins when a request gets accepted
+    """
+    
+    def __init__(self, booking):
+        WebcastRequestAdminNotificationBase.__init__(self, booking)
+        
+        self.setSubject("""[Indico] [Webcast request accepted] %s (event id: %s)"""
+                        % (self._conference.getTitle(), str(self._conference.getId())))
+        
+        self.setBody("""Dear Webcast Responsible,<br />
+<br />
+A webcast request for the event: "%s" has been accepted.<br />
+Click <a href="%s">here</a> to view the request.<br />
+
+""" % ( self._conference.getTitle(),
+        self._adminLink
+      ))
 
 
 class RequestRejectedNotification(WebcastRequestManagerNotificationBase):
-    """ Template to build an email notification to the webcast responsible
+    """ Template to build an email notification to the event managers
+        when a request gets accepted.
     """
+
     
     def __init__(self, booking):
 
@@ -542,14 +603,43 @@ class RequestRejectedNotification(WebcastRequestManagerNotificationBase):
         self.setSubject("""[Indico] [Webcast request rejected] %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         self.setBody("""Dear Event Manager,<br />
-A webcast request for  your event has been rejected.<br />
+<br />
+Your webcast request for the event: "%s" has been rejected.<br />
 Click <a href="%s">here</a> to view your request.<br />
-The reason given by the Webcast responsible was:
+<br />
+The reason given by the Webcast manager was:
 <br />
 %s
 <br />
+<br />
 Best Regards,<br />
 Webcast Managers
-""" % ( self._adminLink,
-        self._booking.getRejectReason()
+""" % ( self._conference.getTitle(),
+        self._adminLink,
+        self._booking.getRejectReason().strip()
         ))
+        
+class RequestRejectedNotificationAdmin(WebcastRequestAdminNotificationBase):
+    """ Template to build an email notification to the admins when a request gets accepted
+    """
+    
+    def __init__(self, booking):
+        WebcastRequestAdminNotificationBase.__init__(self, booking)
+        
+        self.setSubject("""[Indico] [Webcast request rejected] %s (event id: %s)"""
+                        % (self._conference.getTitle(), str(self._conference.getId())))
+        
+        self.setBody("""Dear Webcast Responsible,<br />
+<br />
+A webcast request for the event: "%s" has been rejected.<br />
+Click <a href="%s">here</a> to view the request.<br />
+<br />
+The reason given by the Webcast Responsible who rejected the request was:
+<br />
+%s
+<br />
+
+""" % ( self._conference.getTitle(),
+        self._adminLink,
+        self._booking.getRejectReason().strip()
+      ))

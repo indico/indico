@@ -39,6 +39,9 @@ class RCCollaborationAdmin(object):
             If user is not None, the request object will be used to check the user's privileges.
             Otherwise the user will be retrieved from the request object 
         """
+        if not PluginsHolder().hasPluginType("Collaboration"):
+            return False
+        
         if user is None:
             user = request._getUser()
         
@@ -53,6 +56,9 @@ class RCCollaborationPluginAdmin(object):
         """ Returns True if the user is an admin of one of the plugins corresponding to pluginNames
             plugins: a list of Plugin objects (e.g. EVO, RecordingRequest) or strings with the plugin name ('EVO', 'RecordingRequest')
         """
+        if not PluginsHolder().hasPluginType("Collaboration"):
+            return False
+        
         if user is None:
             user = request._getUser()
         
@@ -83,6 +89,9 @@ class RCVideoServicesManager(object):
                      or the string 'any' (we will then check if the user is manager of any plugin),
                      or nothing (we will then check if the user is a Video Services manager).
         """
+        if not PluginsHolder().hasPluginType("Collaboration"):
+            return False
+        
         user = request.getAW().getUser()
         
         csbm = request._conf.getCSBookingManager()

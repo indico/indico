@@ -72,20 +72,24 @@ def getEVOAnswer(action, arguments = {}, eventId = '', bookingId = ''):
         answer = urlOpenWithTimeout(str(url) , secondsToWait).read(readLimit).strip() #we remove any whitespaces, etc. We won't read more than 100k characters
         
     except HTTPError, e:
-        Logger.get('EVO').error("""Evt:%s, booking:%s, request: [%s] triggered exception: %s""" % (eventId, bookingId, str(url), str(e)))
         code = e.code
         shortMessage = BaseHTTPRequestHandler.responses[code][0]
         longMessage = BaseHTTPRequestHandler.responses[code][1]
-        errorString = 'HTTPError when contacting EVO for action: ' + action + '. Code=' + str(code) + ', short message ="' + shortMessage + ', long message="' + longMessage + '"'
-        if str(e.code) == '500':
-            raise EVOException("EVO is having problems: [" + errorString + "]", e)
-        raise EVOException(errorString, e)
+        
+        Logger.get('EVO').error("""Evt:%s, booking:%s, request: [%s] triggered HTTPError: %s (code = %s, shortMessage = '%s', longMessage = '%s'""" % (eventId, bookingId, str(url), str(e), code, shortMessage, longMessage))
+        
+        if str(code) == '404':
+            raise EVOException('Indico could not find the EVO Server at ' + getEVOOptionValueByName("httpServerLocation") + "(HTTP error 404)")
+        elif str(code) == '500':
+            raise EVOException("The EVO server has an internal problem (HTTP error 500)", e)
+        else:
+            raise EVOException("""Problem when Indico tried to contact the EVO Server.\nReason: HTTPError: %s (code = %s, shortMessage = '%s', longMessage = '%s', url = '%s'""" % (str(e), code, shortMessage, longMessage, str(url)), e)
     
     except URLError, e:
         Logger.get('EVO').error("""Evt:%s, booking:%s, request: [%s] triggered exception: %s""" % (eventId, bookingId, str(url), str(e)))
         if str(e.reason).strip() == 'timed out':
-            raise EVOException("EVO is not responding.", e)
-        raise EVOException('URLError when contacting EVO for action: ' + action + '. Reason="' + str(e.reason)+'"', e)
+            raise EVOException("The EVO server is not responding.", e)
+        raise EVOException('URLError when contacting the EVO server for action: ' + action + '. Reason="' + str(e.reason)+'"', e)
     
     else:
         if answer.startswith("OK:"):
@@ -106,7 +110,7 @@ def getEVOAnswer(action, arguments = {}, eventId = '', bookingId = ''):
             else:
                 raise EVOControlledException(error)
         else:
-            raise EVOException('Error when contacting EVO for action: ' + action + '. Message from EVO Server did not start by ERROR or OK', answer)
+            raise EVOException('Error when contacting the EVO server for action: ' + action + '. Message from the EVO server did not start by ERROR or OK', answer)
         
 def parseEVOAnswer(answer):
     """ Parses an answer such as

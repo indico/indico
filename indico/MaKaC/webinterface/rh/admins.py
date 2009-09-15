@@ -462,8 +462,8 @@ class RHAdminPluginsSaveOptionsBase(RHAdminPluginsBase):
             
             if self._pluginId is not None:
                 plugin = pluginType.getPlugin(self._pluginId)
-                actionList.extend(plugin.getActionList(includeOnlyTriggeredBy = True))
-            actionList.extend(pluginType.getActionList(includeOnlyTriggeredBy = True))
+                actionList.extend(plugin.getActionList(includeOnlyTriggeredBy = True, includeOnlyVisible = False))
+            actionList.extend(pluginType.getActionList(includeOnlyTriggeredBy = True, includeOnlyVisible = False))
             
             for action in actionList:
                 for savedOption in self._optionValues.keys():

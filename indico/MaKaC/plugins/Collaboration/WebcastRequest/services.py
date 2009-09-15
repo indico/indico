@@ -20,24 +20,14 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.services.implementation.collaboration import CollaborationPluginServiceBase
-from MaKaC.webinterface.common.contribFilters import PosterFilterField
 from MaKaC.common.PickleJar import DictPickler
-from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
+from MaKaC.plugins.Collaboration.WebcastRequest.common import getCommonTalkInformation
 
 class WebcastAbleTalksService(CollaborationPluginServiceBase):
     
     def _getAnswer(self):
-        #a talk is defined as a non-poster contribution
-        filter = PosterFilterField(self._conf, False, False)
-        talks = [cont for cont in self._conf.getContributionList() if filter.satisfies(cont)]
-        
-        webcastCapableRooms = CollaborationTools.getOptionValue('WebcastRequest', 'webcastCapableRooms')
-        webcastAbleTalks = []
-        for t in talks:
-            location = t.getLocation()
-            room = t.getRoom()
-            if location and room and (location.getName() + ":" + room.getName() in webcastCapableRooms):
-                webcastAbleTalks.append(t)
+        talkInfo = getCommonTalkInformation(self._conf)
+        webcastAbleTalks = talkInfo[2]
                 
         webcastAbleTalks.sort(key = lambda c: c.getId())
         

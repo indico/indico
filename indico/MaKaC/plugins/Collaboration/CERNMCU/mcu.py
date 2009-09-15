@@ -19,7 +19,6 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.plugins.base import PluginsHolder
 from MaKaC.plugins.Collaboration.CERNMCU.common import getCERNMCUOptionValueByName,\
     secondsToWait
 from MaKaC.common.xmlrpcTimeout import getServerWithTimeout
@@ -77,10 +76,9 @@ participantCommonParams = {
 }
     
 def MCUParams(**args):
-        cernmcu = PluginsHolder().getPluginType('Collaboration').getPlugin('CERNMCU')
-        args["authenticationUser"] = cernmcu.getOption('indicoID').getValue()
-        args["authenticationPassword"] = cernmcu.getOption('indicoPassword').getValue()
-        return args
+    args["authenticationUser"] = getCERNMCUOptionValueByName('indicoID')
+    args["authenticationPassword"] = getCERNMCUOptionValueByName('indicoPassword')
+    return args
 
 def MCUConfCommonParams(**args):
     args.update(confCommonParams)

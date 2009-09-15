@@ -54,7 +54,7 @@ class RoomBookingListLocationsAndRooms( ProtectedService ):
         for loc in locationNames:
             for room in CrossLocationQueries.getRooms( location = loc ):
                 result[loc +":" +room.name] = loc +":" +room.name;
-        return result
+        return sorted(result)
 
 class GetBookingBase(ProtectedService):
     

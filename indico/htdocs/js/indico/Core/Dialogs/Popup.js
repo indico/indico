@@ -328,7 +328,7 @@ type("AlertPopup", ["ExclusivePopup"],
                  self.close();
              });
 
-             return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {textAlign: 'center'}}, Html.div({}, this.content), okButton));
+             return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {textAlign: 'center'}}, Html.div({style: {textAlign: 'left'}}, this.content), okButton));
          }
     },
 

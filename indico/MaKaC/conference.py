@@ -8338,6 +8338,8 @@ class Contribution(Persistent):
             return self.getSchEntry().getSchedule().getOwner()
         return self.getOwner()
 
+    @Retrieves (['MaKaC.conference.Contribution',
+                 'MaKaC.conference.AcceptedContribution'],'location', lambda l: l and l.getName())
     def getLocation( self ):
         if self.getOwnLocation():
             return self.getOwnLocation()
@@ -8353,6 +8355,8 @@ class Contribution(Persistent):
         self.place = newLocation
         self.notifyModification()
 
+    @Retrieves (['MaKaC.conference.Contribution',
+                 'MaKaC.conference.AcceptedContribution'],'room', lambda r: r and r.getName())
     def getRoom( self ):
         if self.getOwnRoom():
             return self.getOwnRoom()

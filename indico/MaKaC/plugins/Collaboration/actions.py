@@ -24,6 +24,7 @@ from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.conference import ConferenceHolder
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.plugins.Collaboration.indexes import IndexInformation
+from MaKaC.plugins.Collaboration.base import CollaborationException
 
 pluginTypeActions = [
     ("indexPluginsPerEventType", {"visible": False,
@@ -44,7 +45,10 @@ class IndexPluginsPerEventTypeAction(ActionBase):
         for plugin in self._pluginType.getPluginList(includeNonActive = True):
             allowedOn = CollaborationTools.getPluginAllowedOn(plugin)
             for eventType in allowedOn:
-                allowedPlugins[eventType].append(plugin)
+                try:
+                    allowedPlugins[eventType].append(plugin)
+                except KeyError,e:
+                    raise CollaborationException("Allowed kinds of events: conference, meeting, simple_event. %s is not allowed" % str(eventType), inner = e)
 
         self._pluginType.getOption("pluginsPerEventType").setValue(allowedPlugins)
         

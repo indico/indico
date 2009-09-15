@@ -21,10 +21,9 @@
 
 from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase, WCSCSSBase,\
     CollaborationTools
-from MaKaC.webinterface.common.contribFilters import PosterFilterField
 from MaKaC.plugins.Collaboration.WebcastRequest.common import lectureOptions,\
     typeOfEvents, postingUrgency, webcastPurpose, intendedAudience,\
-    subjectMatter
+    subjectMatter, getCommonTalkInformation
 
 
 class WNewBookingForm(WCSPageTemplateBase):
@@ -37,23 +36,23 @@ class WNewBookingForm(WCSPageTemplateBase):
         
         underTheLimit = self._conf.getNumberOfContributions() <= self._WebcastRequestOptions["contributionLoadLimit"].getValue()
         booking = self._conf.getCSBookingManager().getSingleBooking('WebcastRequest')
-        initialDisplay = self._conf.getNumberOfContributions() > 0 and (underTheLimit or (booking is not None and booking._bookingParams['talks'] == 'choose'))
+        initialChoose = booking._bookingParams['talks'] == 'choose'
+        initialDisplay = self._conf.getNumberOfContributions() > 0 and (underTheLimit or (booking is not None and initialChoose))
+        
         vars["DisplayTalks"] = initialDisplay
+        vars["InitialChoose"] = initialChoose
         
-        
-        #a talk is defined as a non-poster contribution
-        talks = []
-        filter = PosterFilterField(self._conf, False, False)
-        for cont in self._conf.getContributionList():
-            if filter.satisfies(cont):
-                talks.append(cont)
+        talks, webcastCapableRooms, webcastAbleTalks = getCommonTalkInformation(self._conf)
         nTalks = len(talks)
+        nWebcastCapable = len(webcastAbleTalks)
+        
         vars["HasTalks"] = nTalks > 0
         vars["NTalks"] = nTalks
         
         #list of "locationName:roomName" strings
-        webcastCapableRooms = self._WebcastRequestOptions["webcastCapableRooms"].getValue()
         vars["WebcastCapableRooms"] = webcastCapableRooms
+
+        vars["NWebcastCapableContributions"] = nWebcastCapable
         
         #we see if the event itself is webcast capable (depends on event's room)
         confLocation = self._conf.getLocation()
@@ -62,17 +61,6 @@ class WNewBookingForm(WCSPageTemplateBase):
             topLevelWebcastCapable = True
         else:
             topLevelWebcastCapable = False
-        
-        #a webcast-able talk is defined as a talk talking place in a webcast-able room
-        webcastAbleTalks = []
-        for t in talks:
-            location = t.getLocation()
-            room = t.getRoom()
-            if location and room and (location.getName() + ":" + room.getName() in webcastCapableRooms):
-                webcastAbleTalks.append(t)
-                
-        nWebcastCapable = len(webcastAbleTalks)
-        vars["NWebcastCapableContributions"] = nWebcastCapable
         
         #Finally, this event is webcast capable if the event itself or one of its talks are
         vars["WebcastCapable"] = topLevelWebcastCapable or nWebcastCapable > 0

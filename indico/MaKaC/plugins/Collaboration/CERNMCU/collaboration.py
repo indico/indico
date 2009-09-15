@@ -28,6 +28,7 @@ from MaKaC.plugins.Collaboration.CERNMCU.common import CERNMCUException,\
 from MaKaC.common.utils import formatDateTime, validIP
 from MaKaC.plugins.Collaboration.CERNMCU.mcu import MCU, MCUConfCommonParams, MCUTime,\
     paramsForLog, MCUParams, MCUParticipantCommonParams, datetimeFromMCUTime
+from MaKaC.i18n import _
 
 from xmlrpclib import Fault
 from datetime import timedelta
@@ -675,6 +676,9 @@ class CSBooking(CSBookingBase):
         self._faultCode = e.faultCode
         self._faultString = e.faultString
         
+        if e.faultCode == 14: #authorization error
+            raise CERNMCUException(_("Authorization Error while Indico tried to connect to the MCU.\nPlease report to Indico support."), e)
+        
         if operation == 'create' or operation == 'modify':
             if e.faultCode == 2: #duplicated name
                 fault = CERNMCUError(e.faultCode)
@@ -690,10 +694,10 @@ class CSBooking(CSBookingBase):
                     fault = CERNMCUError(e.faultCode)
                     return fault
             else: #another error
-                raise CERNMCUException("Problem with the MCU while creating or modifying a conference", e)
+                raise CERNMCUException(_("Problem with the MCU while creating or modifying a conference"), e)
         
         elif operation == 'delete':
-            raise CERNMCUException("Problem with the MCU while removing a conference", e)
+            raise CERNMCUException(_("Problem with the MCU while removing a conference"), e)
         
         elif operation == 'add':
             if e.faultCode == 3: #duplicate participant name
@@ -703,16 +707,16 @@ class CSBooking(CSBookingBase):
                 fault = CERNMCUError(e.faultCode)
                 return fault
             else:
-                raise CERNMCUException("Problem with the MCU while adding a participant", e)
+                raise CERNMCUException(_("Problem with the MCU while adding a participant"), e)
             
         elif operation == 'modifyParticipant':
-            raise CERNMCUException("Problem with the MCU while modifying the name of a participant", e)
+            raise CERNMCUException(_("Problem with the MCU while modifying the name of a participant"), e)
         
         elif operation == 'remove':
-            raise CERNMCUException("Problem with the MCU while removing a participant", e)
+            raise CERNMCUException(_("Problem with the MCU while removing a participant"), e)
         
         elif operation == 'start':
-            raise CERNMCUException("Problem with the MCU while starting a conference", e)
+            raise CERNMCUException(_("Problem with the MCU while starting a conference"), e)
         
         elif operation == 'stop':
             if e.faultCode == 201: #we tried to disconnect a participant that was not connected
@@ -720,4 +724,4 @@ class CSBooking(CSBookingBase):
             elif e.faultCode == 5: #we tried to disconnect a participant that didn't exist
                 return None
             else:
-                raise CERNMCUException("Problem with the MCU while stopping a conference", e)
+                raise CERNMCUException(_("Problem with the MCU while stopping a conference"), e)

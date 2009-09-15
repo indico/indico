@@ -252,22 +252,26 @@
 
             switch (ipRetrievalResult) {
             case 1:
-                CSErrorPopup("Room H.323 IP", ["The event's room doesn't have an H.323 IP defined.",
-                                               "Please fill the IP yourself."]);
+                var popup = new AlertPopup("Room H.323 IP", Html.span({},"We have added this event's room as a participant.",
+                                                                          Html.br(),
+                                                                          "But it does not have an H.323 IP defined.",
+                                                                          Html.br(),
+                                                                          "Please remember to fill its IP by editing it."));
+                popup.open();
                 break;
             case 2:
                 CSErrorPopup("Room H.323 IP", ["The event's room doesn't has an H.323 IP defined, but it's not a valid IP.",
                                                "Please fill the IP yourself."]);
                 break;
             case 3:
-                var popup = new AlertPopup("Room H.323 IP", Html.span({},"We have added this event's room as a participant.",
-                                                                         Html.br(),
-                                                                         "Please remember to fill its IP by editing it."));
-                popup.open();
+                CSErrorPopup("Room H.323 IP", ["Indico could not retrieve the H.323 IP for this event's room.",
+                                               "(Indico could not connect to its Room Booking database)",
+                                               "Please remember to fill its IP yourself by editing the room"])
                 break;
             case 4:
-                CSErrorPopup("Room H.323 IP", ["There was a problem retrieveing the H.323 IP of the event's room.",
-                                               "Please fill the IP yourself."]);
+                CSErrorPopup("Room H.323 IP", ["Indico could not retrieve the H.323 IP for this event's room.",
+                                               "(Unknown problem when querying the Room Booking database)",
+                                               "Please remember to fill its IP yourself by editing the room."]);
                 break;
             default:
                 break;

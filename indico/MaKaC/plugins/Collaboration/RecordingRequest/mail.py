@@ -23,7 +23,8 @@ from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.plugins.Collaboration.RecordingRequest.common import typeOfEvents,\
-    postingUrgency, recordingPurpose, intendedAudience, subjectMatter, lectureOptions
+    postingUrgency, recordingPurpose, intendedAudience, subjectMatter, lectureOptions,\
+    getTalks
 from MaKaC.webinterface import urlHandlers
 from MaKaC.common.utils import formatDateTime
 from MaKaC.common.timezoneUtils import getAdjustedDate
@@ -38,6 +39,7 @@ def needToSendEmails():
     
     return (sendMailNotifications and len(admins) > 0) or len(additionalEmails) > 0
 
+
 class RecordingRequestNotificationBase(GenericNotification):
     """ Base class to build an email notification for the Recording request plugin.
     """
@@ -48,8 +50,10 @@ class RecordingRequestNotificationBase(GenericNotification):
         self._bp = booking._bookingParams
         self._conference = booking.getConference()
         
-        adminEmails = [u.getEmail() for u in booking.getPluginOptionByName('admins').getValue()]
-        additionalEmails = booking.getPluginOptionByName("additionalEmails").getValue()
+        admins = PluginsHolder().getPluginType('Collaboration').getPlugin('RecordingRequest').getOption("admins").getValue()
+        
+        self.adminEmails = [u.getEmail() for u in admins]
+        self.additionalEmails = booking.getPluginOptionByName("additionalEmails").getValue()
         
         self._displayLink = urlHandlers.UHConferenceDisplay.getURL(self._conference)
         self._adminLink = urlHandlers.UHConfModifCollaboration.getURL(self._conference,
@@ -57,8 +61,37 @@ class RecordingRequestNotificationBase(GenericNotification):
                                                                       tab = CollaborationTools.getPluginSubTab(booking.getPlugin()))
         
         self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
-        self.setToList(adminEmails + additionalEmails)
         self.setContentType("text/html")
+        
+    def _getEventRoomDetails(self):
+        roomDetails = ""
+        location = self._conference.getLocation()
+        if location:
+            roomDetails += """
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Event location:</strong>
+        </td>
+        <td>
+            %s
+        </td>
+    </tr>
+""" % location.getName()
+
+            room = self._conference.getRoom()
+            if room:
+                roomDetails += """
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Event room:</strong>
+        </td>
+        <td>
+            %s
+        </td>
+    </tr>
+""" % room.getName()
+
+        return roomDetails
         
     def _getEventDetails(self):
         return """
@@ -80,10 +113,12 @@ Event details:
             %s
         </td
     </tr>
+    %s
 </table>
 """%(self._conference.getTitle(),
      self._displayLink,
-     self._conference.getId()
+     self._conference.getId(),
+     self._getEventRoomDetails()
      )
 
     def _getOrganizerDetails(self):
@@ -304,42 +339,56 @@ Request details:<br />
      self._getComments()
      )
         
+    def _getTalkListText(self, talkList):
+        text = []
+        for contribution in talkList:
+            
+            speakerList = contribution.getSpeakerList()
+            if speakerList:
+                speakers = ', by ' + ", ".join([person.getFullName() for person in speakerList])
+            else:
+                speakers = ''
+                
+            if contribution.getLocation():
+                locationText = "Location: " + contribution.getLocation().getName()
+                if contribution.getRoom():
+                    locationText += ', Room: ' + contribution.getRoom().getName()
+                else:
+                    locationText += ', Room: not defined'
+            else:
+                locationText = "Location: not defined"
+                
+            contributionLine = """•[%s] <a href="%s">%s</a>%s (%s)""" % (
+                contribution.getId(),
+                urlHandlers.UHContributionDisplay.getURL(contribution),
+                contribution.getTitle(),
+                speakers,
+                locationText
+            )
+            text.append(contributionLine)
+        
+        return text
+        
     def _getTalks(self):
         #"all" "choose" "neither"
         if self._bp["talks"] == "all":
-            return """All talks"""
+            text = ["""The user chose "All Talks". List of talks:"""]
+            allTalks = getTalks(self._conference)
+            if allTalks:
+                text.extend(self._getTalkListText(allTalks))
+            else:
+                text.append("(This event has no talks)")
+            return "<br />".join(text)
+            
         elif self._bp["talks"] == "neither":
             return """Please see the talk selection comments"""
         else:
             text = ["""The user chose the following talks:"""]
-            
-            for contributionId in self._bp["talkSelection"]:
-                conf = self._booking.getConference()
-                contribution = conf.getContributionById(contributionId)
-                
-                speakerList = contribution.getSpeakerList()
-                if speakerList:
-                    speakers = ', by ' + ", ".join([person.getFullName() for person in speakerList])
-                else:
-                    speakers = ''
-                    
-                if contribution.getLocation():
-                    locationText = "Location: " + contribution.getLocation().getName()
-                    if contribution.getRoom():
-                        locationText += ', Room: ' + contribution.getRoom().getName()
-                    else:
-                        locationText += ', Room: not defined'
-                else:
-                    locationText = "Location: not defined"
-                    
-                contributionLine = """•[%s] <a href="%s">%s</a>%s (%s)""" % (
-                    contributionId,
-                    urlHandlers.UHContributionDisplay.getURL(contribution),
-                    contribution.getTitle(),
-                    speakers,
-                    locationText
-                )
-                text.append(contributionLine)
+            selectedTalks = [self._conference.getContributionById(id) for id in self._bp["talkSelection"]]
+            if selectedTalks:
+                text.extend(self._getTalkListText(selectedTalks))
+            else:
+                text.append("(User did not choose any talks)")
             
             return "<br />".join(text)
                 
@@ -395,13 +444,30 @@ Request details:<br />
 
 
 
+class RecordingRequestAdminNotificationBase(RecordingRequestNotificationBase):
+    """ Base class to build an email notification to Admins
+    """
+    def __init__(self, booking):
+        RecordingRequestNotificationBase.__init__(self, booking)
+        self.setToList(self.adminEmails + self.additionalEmails)
 
-class NewRequestNotification(RecordingRequestNotificationBase):
+
+class RecordingRequestManagerNotificationBase(RecordingRequestNotificationBase):
+    """ Base class to build an email notification to Users
+    """
+    def __init__(self, booking):
+        RecordingRequestNotificationBase.__init__(self, booking)
+        managerEmails = [u.getEmail() for u in self._conference.getManagerList()]
+        managerEmails.append(self._conference.getCreator().getEmail())
+        self.setToList(managerEmails)
+
+
+class NewRequestNotification(RecordingRequestAdminNotificationBase):
     """ Template to build an email notification to the recording responsible
     """
     
     def __init__(self, booking):
-        RecordingRequestNotificationBase.__init__(self, booking)
+        RecordingRequestAdminNotificationBase.__init__(self, booking)
         
         self.setSubject("""[Indico] [New recording request] %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
@@ -415,8 +481,6 @@ Click <a href="%s">here</a> to accept or reject the request.<br />
 <br />
 %s
 <br />
-You also can see a list of all the requests here: (not implemented yet).<br />
-<br />
 <br />
 %s
 """ % ( self._adminLink,
@@ -427,26 +491,24 @@ You also can see a list of all the requests here: (not implemented yet).<br />
         
         
         
-class RequestModifiedNotification(RecordingRequestNotificationBase):
+class RequestModifiedNotification(RecordingRequestAdminNotificationBase):
     """ Template to build an email notification to the recording responsible
     """
     
     def __init__(self, booking):
-        RecordingRequestNotificationBase.__init__(self, booking)
+        RecordingRequestAdminNotificationBase.__init__(self, booking)
         
         self.setSubject("""[Indico] [Recording request modified] %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear Recording Responsible,<br />
 <br />
-A recording request <strong>was modified</strong>.<br />
+A recording request <strong>has been modified</strong>.<br />
 Click <a href="%s">here</a> to accept or reject the request.<br />
 <br />
 %s
 <br />
 %s
-<br />
-You also can see a list of all the requests here: (not implemented yet).<br />
 <br />
 <br />
 %s
@@ -458,25 +520,23 @@ You also can see a list of all the requests here: (not implemented yet).<br />
         
         
         
-class RequestDeletedNotification(RecordingRequestNotificationBase):
+class RequestDeletedNotification(RecordingRequestAdminNotificationBase):
     """ Template to build an email notification to the recording responsible
     """
     
     def __init__(self, booking):
-        RecordingRequestNotificationBase.__init__(self, booking)
+        RecordingRequestAdminNotificationBase.__init__(self, booking)
         
         self.setSubject("""[Indico] [Recording request deleted] %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear Recording Responsible,<br />
 <br />
-A recording request <strong>was withdrawn</strong>.<br />
+A recording request <strong>has been withdrawn</strong>.<br />
 <br />
 %s
 <br />
 %s
-<br />
-You also can see a list of all the requests here: (not implemented yet).<br />
 <br />
 <br />
 %s
@@ -484,3 +544,99 @@ You also can see a list of all the requests here: (not implemented yet).<br />
         self._getOrganizerDetails(),
         self._getRequestDetails('remove')
         ))
+        
+class RequestAcceptedNotification(RecordingRequestManagerNotificationBase):
+    """ Template to build an email notification to the event managers
+        when a request gets accepted.
+    """
+    
+    def __init__(self, booking):
+        RecordingRequestManagerNotificationBase.__init__(self, booking)
+        
+        self.setSubject("""[Indico] [Recording request accepted] %s (event id: %s)"""
+                        % (self._conference.getTitle(), str(self._conference.getId())))
+        
+        self.setBody("""Dear Event Manager,<br />
+<br />
+Your recording request for the event: "%s" has been accepted.<br />
+Click <a href="%s">here</a> to view your request.<br />
+<br />
+Best Regards,<br />
+Recording Responsibles
+
+""" % ( self._conference.getTitle(),
+        self._adminLink
+      ))
+        
+class RequestAcceptedNotificationAdmin(RecordingRequestAdminNotificationBase):
+    """ Template to build an email notification to the admins when a request gets accepted
+    """
+    
+    def __init__(self, booking):
+        RecordingRequestAdminNotificationBase.__init__(self, booking)
+        
+        self.setSubject("""[Indico] [Recording request accepted] %s (event id: %s)"""
+                        % (self._conference.getTitle(), str(self._conference.getId())))
+        
+        self.setBody("""Dear Recording Responsible,<br />
+<br />
+A recording request for the event: "%s" has been accepted.<br />
+Click <a href="%s">here</a> to view the request.<br />
+
+""" % ( self._conference.getTitle(),
+        self._adminLink
+      ))
+
+
+class RequestRejectedNotification(RecordingRequestManagerNotificationBase):
+    """ Template to build an email notification to the event managers
+        when a request gets accepted.
+    """
+
+    
+    def __init__(self, booking):
+
+        RecordingRequestManagerNotificationBase.__init__(self, booking)
+        
+        self.setSubject("""[Indico] [Recording request rejected] %s (event id: %s)"""
+                        % (self._conference.getTitle(), str(self._conference.getId())))
+        self.setBody("""Dear Event Manager,<br /><br />
+The recording request for the event: "%s" has been rejected.<br />
+Click <a href="%s">here</a> to view your request.<br />
+<br />
+The reason given by the Recording responsible was:
+<br />
+%s
+<br />
+<br />
+Best Regards,<br />
+Recording Responsibles
+""" % ( self._conference.getTitle(),
+        self._adminLink,
+        self._booking.getRejectReason().strip()
+        ))
+        
+class RequestRejectedNotificationAdmin(RecordingRequestAdminNotificationBase):
+    """ Template to build an email notification to the admins when a request gets accepted
+    """
+    
+    def __init__(self, booking):
+        RecordingRequestAdminNotificationBase.__init__(self, booking)
+        
+        self.setSubject("""[Indico] [Recording request rejected] %s (event id: %s)"""
+                        % (self._conference.getTitle(), str(self._conference.getId())))
+        
+        self.setBody("""Dear Recording Responsible,<br />
+<br />
+A recording request for the event: "%s" has been rejected.<br />
+Click <a href="%s">here</a> to view the request.<br />
+<br />
+The reason given by the Webcast Responsible who rejected the request was:
+<br />
+%s
+<br />
+
+""" % ( self._conference.getTitle(),
+        self._adminLink,
+        self._booking.getRejectReason().strip()
+      ))

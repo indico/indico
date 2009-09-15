@@ -21,7 +21,8 @@
 
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.RecordingRequest.mail import NewRequestNotification, RequestModifiedNotification, RequestDeletedNotification,\
-    needToSendEmails
+    needToSendEmails, RequestAcceptedNotification, RequestRejectedNotification,\
+    RequestAcceptedNotificationAdmin, RequestRejectedNotificationAdmin
 from MaKaC.common.mail import GenericMailer
 from MaKaC.plugins.Collaboration.RecordingRequest.common import RecordingRequestException,\
     RecordingRequestError
@@ -106,9 +107,53 @@ class CSBooking(CSBookingBase):
         self._statusMessage = "Request accepted"
         self._statusClass = "statusMessageOK"
         
+        try:
+            notification = RequestAcceptedNotification(self)
+            GenericMailer.sendAndLog(notification, self.getConference(),
+                                 "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
+                                 None)
+        except Exception,e:
+            Logger.get('RecReq').error(
+                """Could not send RequestAcceptedNotification for request with id %s , exception: %s""" % (self._id, str(e)))
+            return RecordingRequestError('accept', e)
+            
+        if needToSendEmails():
+            try:
+                notificationAdmin = RequestAcceptedNotificationAdmin(self)
+                GenericMailer.sendAndLog(notificationAdmin, self.getConference(),
+                                     "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
+                                     None)
+            except Exception,e:
+                Logger.get('RecReq').error(
+                    """Could not send RequestAcceptedNotificationAdmin for request with id %s , exception: %s""" % (self._id, str(e)))
+                return RecordingRequestError('accept', e)
+            
+        
+        
     def _reject(self):
         self._statusMessage = "Request rejected by responsible"
         self._statusClass = "statusMessageError"
+        
+        try:
+            notification = RequestRejectedNotification(self)
+            GenericMailer.sendAndLog(notification, self.getConference(),
+                                 "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
+                                 None)
+        except Exception,e:
+            Logger.get('RecReq').error(
+                """Could not send RequestRejectedNotification for request with id %s , exception: %s""" % (self._id, str(e)))
+            return RecordingRequestError('reject', e)
+        
+        if needToSendEmails():
+            try:
+                notificationAdmin = RequestRejectedNotificationAdmin(self)
+                GenericMailer.sendAndLog(notificationAdmin, self.getConference(),
+                                     "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
+                                     None)
+            except Exception,e:
+                Logger.get('RecReq').error(
+                    """Could not send RequestRejectedNotificationAdmin for request with id %s , exception: %s""" % (self._id, str(e)))
+                return RecordingRequestError('reject', e)
                                         
     def _delete(self):
         if needToSendEmails():

@@ -208,8 +208,7 @@ class CSBooking(CSBookingBase):
             if e.message == "START_IN_PAST":
                 return EVOError('start_in_past', str(requestURL))
             else:
-                raise EVOException("The booking could not be created\n.The EVO Server sent the following error message: " + e.message + 
-                                   ". The request URL was: " + str(requestURL))
+                raise EVOException("The booking could not be created due to a problem with the EVO Server\n.The EVO Server sent the following error message: " + e.message, e)
                 
 
     def _modify(self):
@@ -258,8 +257,7 @@ class CSBooking(CSBookingBase):
                 if e.message == "START_IN_PAST":
                     return EVOError('start_in_past', str(requestURL))
                 else:
-                    raise EVOException("The booking could not be modified\n.The EVO Server sent the following error message: " + e.message + 
-                                       ". The request URL was: " + str(requestURL))
+                    raise EVOException("The booking could not be modified due to a problem with the EVO Server\n.The EVO Server sent the following error message: " + e.message, e)
             
         else:
             self._create()
@@ -311,8 +309,7 @@ class CSBooking(CSBookingBase):
                 if e.message == "UNKNOWN_MEETING":
                     return EVOError('deletedByEVO', str(requestURL))
                 else:
-                    raise EVOException("Information could not be retrieved\n.The EVO Server sent the following error message: " + e.message + 
-                                       ". The request URL was: " + str(requestURL))
+                    raise EVOException("Information could not be retrieved due to a problem with the EVO Server\n.The EVO Server sent the following error message: " + e.message, e)
                                         
     def _delete(self):
         if self._created:
@@ -350,8 +347,7 @@ class CSBooking(CSBookingBase):
                 if e.message == "DELETE_MEETING_NO_ID":
                     self._warning = EVOWarning('cannotDeleteNonExistant')
                 else:
-                    raise EVOException("The booking could not be deleted\n.The EVO Server sent the following error message: " + e.message + 
-                                       ". The request URL was: " + str(requestURL))
+                    raise EVOException("The booking could not be deleted due to a problem with the EVO Server\n.The EVO Server sent the following error message: " + e.message, e)
                 
         self._error = False
         

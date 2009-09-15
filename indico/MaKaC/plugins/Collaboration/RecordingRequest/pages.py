@@ -22,8 +22,8 @@
 from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase, WCSCSSBase,\
     CollaborationTools
 from MaKaC.plugins.Collaboration.RecordingRequest.common import typeOfEvents,\
-    postingUrgency, recordingPurpose, intendedAudience, subjectMatter, lectureOptions
-from MaKaC.webinterface.common.contribFilters import PosterFilterField
+    postingUrgency, recordingPurpose, intendedAudience, subjectMatter, lectureOptions,\
+    getTalks
 
 class WNewBookingForm(WCSPageTemplateBase):
         
@@ -34,19 +34,17 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["Conference"] = self._conf
         booking = self._conf.getCSBookingManager().getSingleBooking('RecordingRequest')
         
+        initialChoose = booking._bookingParams['talks'] == 'choose'
+        vars["InitialChoose"] = initialChoose
+        
         if self._conf.getNumberOfContributions() > 0:
             underTheLimit = self._conf.getNumberOfContributions() <= self._RecordingRequestOptions["contributionLoadLimit"].getValue()
-            initialDisplay = underTheLimit or (booking is not None and booking._bookingParams['talks'] == 'choose')
+            
+            initialDisplay = underTheLimit or (booking is not None and initialChoose)
             vars["DisplayTalks"] = initialDisplay
             
             #a talk is defined as a non-poster contribution
-            talks = []
-            filter = PosterFilterField(self._conf, False, False)
-            for cont in self._conf.getContributionList():
-                if filter.satisfies(cont):
-                    talks.append(cont)
-                    if not initialDisplay:
-                        break
+            talks = getTalks(self._conf, not initialDisplay)
             nTalks = len(talks)
             vars["HasTalks"] = nTalks > 0 
             
@@ -69,7 +67,7 @@ class WNewBookingForm(WCSPageTemplateBase):
                     
                 vars["TalkLists"] = [contributions1, contributions2]
         else:
-            vars["DisplayTalks"] = booking is not None and booking._bookingParams['talks'] == 'choose'
+            vars["DisplayTalks"] = booking is not None and initialChoose
             vars["HasTalks"] = False
                 
         vars["ConsentFormURL"] = self._RecordingRequestOptions["ConsentFormURL"].getValue()

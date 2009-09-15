@@ -25,6 +25,7 @@ from MaKaC.plugins.base import PluginsHolder
 from random import Random
 from MaKaC.common.PickleJar import Retrieves
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
+import socket
 import errno
 
 secondsToWait = 10
@@ -34,7 +35,7 @@ def getCERNMCUOptionValueByName(optionName):
     
 def getMinMaxId():
     idRangeString = getCERNMCUOptionValueByName("idRange")
-    return [int(s) for s in idRangeString.split('-')]
+    return tuple([int(s) for s in idRangeString.split('-')])
 
 def getRangeLength():
     idRangeString = getCERNMCUOptionValueByName("idRange")
@@ -220,9 +221,11 @@ class CERNMCUException(CollaborationException):
         
 def handleSocketError(e):
     if e.args[0] == errno.ETIMEDOUT:
-        raise CERNMCUException("Connection with the MCU timed out after %s seconds"%secondsToWait)
+        raise CERNMCUException("CERN's MCU may be offline. Indico encountered a network problem while connecting with the MCU at " + getCERNMCUOptionValueByName('MCUAddress') + ". Connection with the MCU timed out after %s seconds"%secondsToWait)
     elif e.args[0] == errno.ECONNREFUSED:
-        raise CERNMCUException("The connection with the MCU was refused.")
+        raise CERNMCUException("CERN's MCU seems to have problems. Network problem while connecting with the MCU at " + getCERNMCUOptionValueByName('MCUAddress') + ". The connection with the MCU was refused.")
+    elif isinstance(e, socket.gaierror) and e.args[0] == socket.EAI_NODATA:
+        raise CERNMCUException("Network problem while connecting with the MCU at " + getCERNMCUOptionValueByName('MCUAddress') + ". Indico could not resolve the IP address for that host name.")
     else:
-        raise e
+        raise CERNMCUException("Network problem while connecting with the MCU at " + getCERNMCUOptionValueByName('MCUAddress') + ". Problem: " + str(e))
 

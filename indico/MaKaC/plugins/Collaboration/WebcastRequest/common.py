@@ -22,6 +22,8 @@
 from MaKaC.plugins.Collaboration.base import CollaborationServiceException,\
     CSErrorBase
 from MaKaC.common.PickleJar import Retrieves
+from MaKaC.webinterface.common.contribFilters import PosterFilterField
+from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 
 lectureOptions = [
     ("none", "None"),
@@ -75,6 +77,30 @@ subjectMatter = [
     ("safety" , "Safety"),
     ("techTraining" , "Technical Training")
 ]
+
+def getCommonTalkInformation(conference):
+    """ Returns a tuple of 3 lists:
+        -List of talks (Contribution objects which are not in a Poster session)
+        -List of webcast capable rooms, as a list of "locationName:roomName" strings
+        -List of webcast-able talks (list of Contribution objects who take place in a webcast capable room)
+    """
+
+    #a talk is defined as a non-poster contribution
+    filter = PosterFilterField(conference, False, False)
+    talks = [cont for cont in conference.getContributionList() if filter.satisfies(cont)]
+    
+    #list of "locationName:roomName" strings
+    webcastCapableRooms = CollaborationTools.getOptionValue('WebcastRequest', "webcastCapableRooms")
+    
+    #a webcast-able talk is defined as a talk talking place in a webcast-able room
+    webcastAbleTalks = []
+    for t in talks:
+        location = t.getLocation()
+        room = t.getRoom()
+        if location and room and (location.getName() + ":" + room.getName() in webcastCapableRooms):
+            webcastAbleTalks.append(t)
+            
+    return (talks, webcastCapableRooms, webcastAbleTalks)
     
 class WebcastRequestError(CSErrorBase):
     def __init__(self, operation, inner):
