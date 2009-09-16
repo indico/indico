@@ -22,6 +22,7 @@
 from MaKaC.plugins.Collaboration.CERNMCU.common import getCERNMCUOptionValueByName,\
     secondsToWait
 from MaKaC.common.xmlrpcTimeout import getServerWithTimeout
+import time
 import datetime
 import xmlrpclib
 
@@ -49,7 +50,9 @@ def MCUTime(dt):
 def datetimeFromMCUTime(mcutime):
     """ returns a naive datetime from a xmlrpclib.DateTime object
     """
-    return datetime.datetime.strptime(mcutime.value, iso8601format)
+    #We use this expression and not the commented one because the latter is only available in python 2.5
+    return datetime.datetime(*(time.strptime(mcutime.value, iso8601format)[0:6]))
+    #return datetime.datetime.strptime(mcutime.value, iso8601format)
 
 
 confCommonParams = {
