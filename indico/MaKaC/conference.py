@@ -2412,6 +2412,7 @@ class Conference(Persistent):
     def newContribType(self, name, description):
         ct = ContributionType(name, description, self)
         self.addContribType(ct)
+        return ct
 
     def getContribTypeList(self):
         try:

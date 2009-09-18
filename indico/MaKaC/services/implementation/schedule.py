@@ -105,8 +105,8 @@ class ScheduleAddContribution(LocationSetter):
         for field in self._target.getConference().getAbstractMgr().getAbstractFieldsMgr().getFields():
             self._fields[field.getId()] = self._pManager.extract("field_%s"%field.getId(), pType=str,
                                                      allowEmpty=True, defaultValue='')
-        self._privileges = self._pManager.extract("privileges", pType=dict,
-                                                  allowEmpty=True)
+        self._privileges = self._pManager.extract("privileges", pType=dict,                                                  allowEmpty=True)
+        self._contribTypeId = self._pManager.extract("type", pType=str, allowEmpty=True)
 
     def _getAnswer(self):
 
@@ -134,6 +134,10 @@ class ScheduleAddContribution(LocationSetter):
             # for conferences, add authors and coauthors
             self.__addPeople(contribution, self._pManager, "author", conference.Contribution.addPrimaryAuthor)
             self.__addPeople(contribution, self._pManager, "coauthor", conference.Contribution.addCoAuthor)
+            # and also set type if it exists
+            if (self._contribTypeId):
+                contribution.setType(self._target.getConference().getContribTypeById(self._contribTypeId))
+
 
         self.__addPeople(contribution, self._pManager, "presenter", conference.Contribution.newSpeaker)
 
@@ -536,7 +540,7 @@ class SessionScheduleGetDayEndDate(sessionServices.SessionModifUnrestrictedTTCoo
         return eDate.strftime('%d/%m/%Y %H:%M')
 
 class ScheduleEditSlotBase(LocationSetter):
-    
+
     def _addConveners(self, slot):
         pass
 
@@ -578,7 +582,6 @@ class ScheduleEditSlotBase(LocationSetter):
                 'id': pickledData['id'],
                 'entry': pickledData,
                 'session': DictPickler.pickle(self._slot.getSession(), timezone=self._conf.getTimezone())}
-    
 class SessionScheduleAddSessionSlot(ScheduleEditSlotBase, sessionServices.SessionModifUnrestrictedTTCoordinationBase):
 
     def _checkParams(self):
@@ -588,7 +591,7 @@ class SessionScheduleAddSessionSlot(ScheduleEditSlotBase, sessionServices.Sessio
 
     def _addToSchedule(self):
         self._target.addSlot(self._slot)
-        
+
     def _addConveners(self, slot):
         for convenerValues in self._conveners:
             convener = conference.SlotChair()
@@ -603,7 +606,7 @@ class SessionScheduleEditSessionSlot(ScheduleEditSlotBase, sessionServices.Sessi
 
     def _addToSchedule(self):
         pass
-    
+
     def _addConveners(self, slot):
         convenersIds = []
         for convenerValues in self._conveners:
@@ -615,7 +618,7 @@ class SessionScheduleEditSessionSlot(ScheduleEditSlotBase, sessionServices.Sessi
                 DictPickler.update(convener, convenerValues)
                 slot.addConvener(convener)
             convenersIds.append(convener.getId())
-            
+
         for conv in slot.getConvenerList()[:]:
             if conv.getId() not in convenersIds:
                 slot.removeConvener(conv)

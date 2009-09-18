@@ -465,11 +465,14 @@ class ShowConcurrentEvents(ServiceBase):
                 continue
         return evtsByCateg
 
-class ConferenceGetFields(ConferenceDisplayBase):
 
+class ConferenceGetFieldsAndContribTypes(ConferenceModifBase):
     def _getAnswer( self ):
         afm = self._target.getAbstractMgr().getAbstractFieldsMgr()
-        return dict([(f.getId(), f.getName()) for f in afm.getFields()])
+        afmDict =  dict([(f.getId(), f.getName()) for f in afm.getFields()])
+        cTypes = self._target.getContribTypeList()
+        cTypesDict =  dict([(ct.getId(), ct.getName()) for ct in cTypes])
+        return [afmDict, cTypesDict]
 
 
 class ConferenceParticipationForm(ConferenceDisplayBase):
@@ -537,6 +540,7 @@ methodMap = {
     "contributions.list" : ConferenceListContributions,
     "pic.delete": ConferencePicDelete,
     "showConcurrentEvents": ShowConcurrentEvents,
-    "getFields": ConferenceGetFields,
+#    "getFields": ConferenceGetFields,
+    "getFieldsAndContribTypes": ConferenceGetFieldsAndContribTypes,
     "getParticipationForm": ConferenceParticipationForm
     }

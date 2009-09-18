@@ -212,13 +212,14 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
 
             if (this.isConference) {
 
-                indicoRequest('event.getFields', self.args ,
+                indicoRequest('event.getFieldsAndContribTypes', self.args ,
                               function(result, error){
                                   if (error) {
                                       IndicoUtil.errorReport(error);
                                   }
                                   else {
-                                      self.fields = result;
+                                      self.fields = result[0];
+                                      self.contribTypes = result[1];
                                       hook.set(true);
                                   }
                               }
@@ -318,6 +319,21 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
         fields.push([$T('Keywords'), keywordField.element]);
         $B(info.accessor('keywords'), keywordField.accessor);
 
+        if (this.isConference) {
+            //Select List, Optional type for conference
+            self.contribTypes['']  = ''; //add the None type to the select list
+            var typeSelect = bind.element(
+                    Html.select({name: 'type'}),
+                    self.contribTypes,
+                    function(elem) {
+                        return Html.option({value: elem.key}, elem.get());
+                    }
+                );
+            fields.push([$T('Type'), $B(typeSelect,
+                    info.accessor('type'))]);
+        }
+
+
         return IndicoUtil.createFormFromMap(fields);
 
     },
@@ -404,7 +420,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
 
         return Html.div({},
                         tabWidget.draw(),
-                        Html.div('dialogButtons', [addButton, cancelButton])                         );
+                        Html.div('dialogButtons', [addButton, cancelButton]));
 
     }
 },
