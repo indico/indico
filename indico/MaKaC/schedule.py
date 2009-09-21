@@ -1417,7 +1417,7 @@ class ContribSchEntry(LinkedTimeSchEntry):
     @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'entryType', lambda x: 'Contribution')
     @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'sessionId', Conversion.parentSession)
     @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'sessionSlotId', Conversion.parentSlot)
-    #@Retrieves (['MaKaC.schedule.ContribSchEntry'], 'contributionId', lambda x: x.getOwner().getId())
+    @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'contributionId', lambda x: x.getOwner().getId())
     @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'material', lambda x: DictPickler.pickle(x.getOwner().getMaterialList()))
     @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'description', lambda x: x.getOwner().getDescription())
     @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'presenters', lambda x: x.getOwner().getSpeakerList(), isPicklableObject=True)
