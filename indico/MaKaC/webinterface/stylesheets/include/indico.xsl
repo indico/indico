@@ -190,7 +190,7 @@
         </tbody>
       </table>
 
-      <xsl:if test="$minutes != 'off'">
+      <xsl:if test="$minutes = 'on'">
         <xsl:for-each select="./material">
           <xsl:if test="./minutesText != ''">
             <div class="minutesTable">
@@ -337,12 +337,14 @@
       <xsl:if test="count(subcontribution) != 0">
           <ul class="{$scListClass}">
             <xsl:for-each select="subcontribution">
-              <xsl:apply-templates select="."/>
+              <xsl:apply-templates select=".">
+                <xsl:with-param name="minutes" select="$minutes"/>
+              </xsl:apply-templates>
             </xsl:for-each>
           </ul>
       </xsl:if>
 
-          <xsl:if test="$minutes != 'off'">
+          <xsl:if test="$minutes = 'on'">
             <xsl:for-each select="./material">
               <xsl:if test="./minutesText != ''">
                 <div class="minutesTable">
@@ -358,6 +360,7 @@
 
 
   <xsl:template match="subcontribution">
+    <xsl:param name="minutes">off</xsl:param>
     <xsl:variable name="idt" select="./ID"/>
     <li>
       <xsl:if test="name(../..) = 'session'">
@@ -407,7 +410,14 @@
           <xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
         </xsl:for-each> )</xsl:if>
 
-      <xsl:if test="count(child::material) != 0">
+        <xsl:if test="count(child::speakers) != 0">
+          <tr>
+            <td class="leftCol">Speakers:</td>
+            <td><xsl:apply-templates select="./speakers"/></td>
+          </tr>
+        </xsl:if>
+        
+        <xsl:if test="count(child::material) != 0">
         <tr>
           <td class="leftCol">Material:</td>
           <td>
@@ -420,15 +430,19 @@
             </td></tr>
       </xsl:if>
 
-        <xsl:if test="count(child::speakers) != 0">
-          <tr>
-            <td class="leftCol">Speakers:</td>
-            <td><xsl:apply-templates select="./speakers"/></td>
-          </tr>
-        </xsl:if>
-      
         </tbody>
       </table>
+            <xsl:if test="$minutes = 'on'">
+            <xsl:for-each select="./material">
+              <xsl:if test="./minutesText != ''">
+                <div class="minutesTable">
+                    <h2>Minutes</h2>
+                    <span><xsl:apply-templates select="./minutesText"/></span>
+                </div>
+              </xsl:if>
+            </xsl:for-each>
+          </xsl:if>
+      
     </li>
   </xsl:template>
 
@@ -611,7 +625,7 @@
                 </xsl:for-each>
                 </div>
               
-              <xsl:if test="$minutes != 'off'">
+              <xsl:if test="$minutes = 'on'">
                 <xsl:for-each select="./material">
                   <xsl:if test="./minutesText != ''">
                     <center>
