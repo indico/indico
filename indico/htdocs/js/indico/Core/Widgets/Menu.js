@@ -524,7 +524,7 @@ type("ColorPicker", ["WatchValue", "ChainedPopupWidget"], {
             }
         }
 
-        var tmp = this.link.dom.children[0];
+        var tmp = this.link.dom.childNodes[0];
         if (colors.textColor) {
             tmp.style.color = colors.textColor;
         }
