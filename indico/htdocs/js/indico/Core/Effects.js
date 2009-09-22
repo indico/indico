@@ -61,7 +61,7 @@ IndicoUI.Effect = {
         */
     mouseOver: function(element){
         element.onmouseover = function(){
-            this.style.background = "#FFFF88";
+            this.style.background = "#FFF6DF";
         };
         element.onmouseout = function(){
             this.style.background = "transparent";
