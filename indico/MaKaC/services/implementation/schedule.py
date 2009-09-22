@@ -515,6 +515,7 @@ class ScheduleEditSlotBase(LocationSetter):
         self._conveners = pManager.extract("conveners", pType=list,
                                            allowEmpty=True)
         self._roomInfo = pManager.extract("roomInfo", pType=dict, allowEmpty=True)
+        self._isSessionTimetable = pManager.extract("sessionTimetable", pType=bool, allowEmpty=True)
 
     def _getAnswer(self):
 
@@ -532,7 +533,10 @@ class ScheduleEditSlotBase(LocationSetter):
         logInfo["subject"] = "Create new slot: %s"%self._slot.getTitle()
         self._conf.getLogHandler().logAction(logInfo,"Timetable/Contribution",self._getUser())
 
-        schEntry = self._slot.getConfSchEntry()
+        if self._isSessionTimetable:
+            schEntry = self._slot.getSessionSchEntry()
+        else:
+            schEntry = self._slot.getConfSchEntry()
         pickledData = DictPickler.pickle(schEntry, timezone=self._conf.getTimezone())
         return {'day': schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
                 'id': pickledData['id'],
