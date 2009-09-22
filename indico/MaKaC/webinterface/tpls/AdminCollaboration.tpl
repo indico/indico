@@ -15,7 +15,7 @@
             <% additionalStyle = '' %>
         <% end %>
         
-        <a id="index_<%=indexName%>" onclick="indexSelectedObs('<%=indexName%>', false)" <%=additionalStyle%> >
+        <a id="index_<%=indexName%>" onclick="indexSelectedObs('<%=indexName%>', false)" class="CAIndexUnselected" <%=additionalStyle%> >
             <%= indexName[0].upper() + indexName[1:] %>
         </a>
     </li>
@@ -548,7 +548,6 @@ var pf = new PageFooter('<%= InitialNumberOfPages %>', '<%= InitialPage %>', 4, 
 
 IndicoUI.executeOnLoad(function(){
     buildIndexTooltips();
-    indexSelectedObs('<%=InitialIndex%>', true);
     confIdObs();
     viewByObs('<%=InitialViewBy %>', true);
     updateDateFilterType();
