@@ -53,14 +53,19 @@ class WMain (WJSBase):
         vars["MinStartDate"] = formatDateTime(self._conf.getAdjustedStartDate())
         vars["MaxEndDate"] = formatDateTime(self._conf.getAdjustedEndDate())
 
+        # Code to retrieve the event's location and room in order to include the event's room
+        # as an initial participant
         location = self._conf.getLocation()
         room = self._conf.getRoom()
-        if location and room:
+        if location and room and location.getName() and room.getName():
+            locationName = location.getName()
+            roomName = room.getName()
+            
             vars["IncludeInitialRoom"] = True
             vars["IPRetrievalResult"] = -1 # 0 = OK, 1 = room without H323 IP, 2 = room with invalid H323 IP, 3 = connection to RB problem, 4 = another unknown problem 
-            vars["InitialRoomName"] = self._conf.getRoom().getName()
+            vars["InitialRoomName"] = roomName
             if self._conf.getLocation():
-                vars["InitialRoomInstitution"] = self._conf.getLocation().getName()
+                vars["InitialRoomInstitution"] = locationName
             else:
                 vars["InitialRoomInstitution"] = ""
 
@@ -75,7 +80,7 @@ class WMain (WJSBase):
                     attName = getCERNMCUOptionValueByName("H323_IP_att_name")
 
                     try:
-                        returnedRooms = CrossLocationQueries.getRooms( location = location.getName(), roomName = room.getName() )
+                        returnedRooms = CrossLocationQueries.getRooms( location = locationName, roomName = roomName )
     
                         if isinstance(returnedRooms, list):
                             if len(returnedRooms) == 0:
@@ -85,8 +90,7 @@ class WMain (WJSBase):
                         else:
                             returnedRoom = returnedRooms
     
-                        if (returnedRoom != None) and \
-                               (attName in returnedRoom.customAtts):
+                        if (returnedRoom != None) and (attName in returnedRoom.customAtts):
     
                             initialRoomIp = returnedRoom.customAtts[attName]
                             if (initialRoomIp.strip() == ""):
@@ -107,7 +111,7 @@ class WMain (WJSBase):
                     except Exception, e:
                         initialRoomIp = "IP not found."
                         vars["IPRetrievalResult"] = 4
-                        Logger.get("CERNMCU").warning("Location: " + location.getName() + "Problem with CrossLocationQueries when retrieving the list of all rooms with a H323 IP: " + str(e))
+                        Logger.get("CERNMCU").warning("Location: " + locationName + "Problem with CrossLocationQueries when retrieving the list of all rooms with a H323 IP: " + str(e))
                 else:
                     initialRoomIp = "Please enter IP"
                     vars["IPRetrievalResult"] = 3
@@ -116,11 +120,11 @@ class WMain (WJSBase):
             except MaKaCError, e:
                 initialRoomIp = "IP not found."
                 vars["IPRetrievalResult"] = 4
-                Logger.get("CERNMCU").warning("Location: " + location.getName() + "MaKaCError when retrieving a room's H.323 IP: " + e.getMsg())
+                Logger.get("CERNMCU").warning("Location: " + locationName + "MaKaCError when retrieving a room's H.323 IP: " + e.getMsg())
             except Exception, e:
                 initialRoomIp = "IP not found."
                 vars["IPRetrievalResult"] = 4
-                Logger.get("CERNMCU").warning("Location: " + location.getName() + "Exception when retrieving a room's H.323 IP: " + str(e))
+                Logger.get("CERNMCU").warning("Location: " + locationName + "Exception when retrieving a room's H.323 IP: " + str(e))
 
 
             vars["InitialRoomIP"] = initialRoomIp
@@ -149,9 +153,13 @@ class WExtra (WJSBase):
         roomsWithH323IP = []
 
         if self._conf:
+            
+            # Code to get a list of H.323 Videoconference-able rooms
+            # by querying Indico's RB database
             location = self._conf.getLocation()
 
-            if location:
+            if location and location.getName():
+                locationName = location.getName()
 
                 # TODO: get list of room from a plugin option instead of querying the RB DB everytime
                 try:
@@ -163,9 +171,8 @@ class WExtra (WJSBase):
 
                         attName = getCERNMCUOptionValueByName("H323_IP_att_name")
 
-
                         try:
-                            returnedRooms = CrossLocationQueries.getRooms( location = location.getName(),
+                            returnedRooms = CrossLocationQueries.getRooms( location = locationName,
                                                                            customAtts = [{"name":attName, "allowEmpty":False,
                                                                                           "filter": (lambda ip: validIP(ip))}] )
                             if not isinstance(returnedRooms, list):
@@ -175,18 +182,18 @@ class WExtra (WJSBase):
                                     returnedRooms = []
     
                             for room in returnedRooms:
-                                roomsWithH323IP.append(RoomWithH323(location.getName(), room._getName(), room.customAtts[attName]))
+                                roomsWithH323IP.append(RoomWithH323(locationName, room._getName(), room.customAtts[attName]))
                                 
                         except AttributeError:
                             #CrossLocationQueries.getRooms fails because it does not handle location names that are not in the DB
                             pass
                         except Exception, e:
-                            Logger.get("CERNMCU").warning("Location: " + location.getName() + "Problem with CrossLocationQueries when retrieving the list of all rooms with a H323 IP: " + str(e))
+                            Logger.get("CERNMCU").warning("Location: " + locationName + "Problem with CrossLocationQueries when retrieving the list of all rooms with a H323 IP: " + str(e))
 
                 except MaKaCError, e:
-                    Logger.get("CERNMCU").warning("Location: " + location.getName() + "MaKaCError when retrieving the list of all rooms with a H323 IP: " + e.getMsg())
+                    Logger.get("CERNMCU").warning("Location: " + locationName + "MaKaCError when retrieving the list of all rooms with a H323 IP: " + e.getMsg())
                 except Exception, e:
-                    Logger.get("CERNMCU").warning("Location: " + location.getName() + "Exception when retrieving the list of all rooms with a H323 IP: " + str(e))
+                    Logger.get("CERNMCU").warning("Location: " + locationName + "Exception when retrieving the list of all rooms with a H323 IP: " + str(e))
 
         vars["RoomsWithH323IP"] = roomsWithH323IP
         return vars
