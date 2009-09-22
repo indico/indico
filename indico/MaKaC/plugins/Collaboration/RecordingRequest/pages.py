@@ -34,7 +34,7 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["Conference"] = self._conf
         booking = self._conf.getCSBookingManager().getSingleBooking('RecordingRequest')
         
-        initialChoose = booking._bookingParams['talks'] == 'choose'
+        initialChoose = booking is not None and booking._bookingParams['talks'] == 'choose'
         vars["InitialChoose"] = initialChoose
         
         if self._conf.getNumberOfContributions() > 0:
