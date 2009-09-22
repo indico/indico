@@ -31,6 +31,10 @@ globalOptions = [
     ("startMinutes", {"description": _("Default start time before Indico event start time (minutes)"),
                      "type" : int,
                      "defaultValue": 30} ),
+    ("tabOrder", {"description": _("Order in which the tabs will appear"),
+                  "type": list,
+                  "defaultValue": ["Videoconferencing", "Recording Request", "Webcast Request"]
+                  }),
     ("pluginsPerEventType", {"description": _("Plugins allowed for each event type"),
                             "type": dict,
                             "editable": False,
@@ -39,5 +43,4 @@ globalOptions = [
                          "type": list, #a list of IndexInformation objects
                          "editable": False,
                          "visible": True} )
-    
 ]

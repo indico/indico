@@ -58,7 +58,7 @@ class RecordingRequestNotificationBase(GenericNotification):
         self._displayLink = urlHandlers.UHConferenceDisplay.getURL(self._conference)
         self._adminLink = urlHandlers.UHConfModifCollaboration.getURL(self._conference,
                                                                       secure = CollaborationTools.isUsingHTTPS(),
-                                                                      tab = CollaborationTools.getPluginSubTab(booking.getPlugin()))
+                                                                      tab = CollaborationTools.getPluginTab(booking.getPlugin()))
         
         self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
         self.setContentType("text/html")

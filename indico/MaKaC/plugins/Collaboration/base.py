@@ -619,7 +619,7 @@ class CSBookingBase(Persistent):
                'modificationURL',
                lambda booking: str(urlHandlers.UHConfModifCollaboration.getURL(booking.getConference(),
                                                                                secure = CollaborationTools.isUsingHTTPS(),
-                                                                               tab = CollaborationTools.getPluginSubTab(booking.getPlugin()))))
+                                                                               tab = CollaborationTools.getPluginTab(booking.getPlugin()))))
     def __init__(self, bookingType, conf):
         """ Constructor for the CSBookingBase class.
             id: a string with the id of the booking

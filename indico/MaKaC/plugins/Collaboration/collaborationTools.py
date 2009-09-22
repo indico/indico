@@ -57,8 +57,18 @@ class CollaborationTools(object):
         
     @classmethod
     def getOptionValue(cls, pluginName, optionName):
+        """ Returns the value of an option of a plugin (plugins/Collaboration/XXXXX/options.py)
+            pluginName: a string with the name of the plugin
+            optionName: a string with the name of the option
+        """
         ph = PluginsHolder()
         return ph.getPluginType("Collaboration").getPlugin(pluginName).getOption(optionName).getValue()
+    
+    @classmethod
+    def getCollaborationOptionValue(cls, optionName):
+        """ Returns the value of an option of the Collaboration plugin type (plugins/Collaboration/options.py)
+        """
+        return cls.getCollaborationPluginType().getOption(optionName).getValue()
     
     @classmethod
     def isUsingHTTPS(cls):
@@ -124,24 +134,23 @@ class CollaborationTools(object):
             or where the user is a plugin manager for this event, are returned.
         """
         csbm = conference.getCSBookingManager()
-        subtabNamesSet = set()
+        tabNamesSet = set()
         allowedForThisEvent = csbm.getAllowedPlugins()
         showableForThisEvent = [plugin for plugin in allowedForThisEvent if plugin.isActive()] 
         for plugin in showableForThisEvent:
             if not user or user in plugin.getOption('admins').getValue() or csbm.isPluginManager(plugin.getName(), user):
-                subtabNamesSet.add(cls.getPluginSubTab(plugin))
+                tabNamesSet.add(cls.getPluginTab(plugin))
             
-        subtabNames = list(subtabNamesSet)
-        subtabNames.sort()
-        return subtabNames
+        tabNames = list(tabNamesSet)
+        return tabNames
     
     @classmethod
-    def getPluginSubTab(cls, pluginObject):
-        """ Utility function that returns the subtab a Collaboration plugin belongs to.
+    def getPluginTab(cls, pluginObject):
+        """ Utility function that returns the tab a Collaboration plugin belongs to.
             If the option was not defined, "Collaboration" is the default.
         """
-        if pluginObject.hasOption("subtab"):
-            return pluginObject.getOption("subtab").getValue()
+        if pluginObject.hasOption("tab"):
+            return pluginObject.getOption("tab").getValue()
         else:
             return "Collaboration"
         
@@ -168,7 +177,7 @@ class CollaborationTools(object):
             #we get the plugins of this tab
             return cls.getCollaborationPluginType().getPluginList(
                 sorted = True,
-                filter = lambda plugin: cls.getPluginSubTab(plugin) == tabName and
+                filter = lambda plugin: cls.getPluginTab(plugin) == tabName and
                                         (allowedPlugins is None or plugin in allowedPlugins) and
                                         (user is None or user in plugin.getOption('admins').getValue() or csbm.isPluginManager(plugin.getName(), user))
             )

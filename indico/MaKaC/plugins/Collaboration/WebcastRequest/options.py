@@ -21,12 +21,12 @@
 
 globalOptions = [
     #Collaboration options necessary in all plugins
-    ("subtab", {"description" : "Subtab where the Webcast Request plugin will be placed",
+    ("tab", {"description" : "Tab where the Webcast Request plugin will be placed",
                "type": str,
                "defaultValue": "Webcast Request",
-               "editable": False,
-               "visible": False,
-               "mustReload": True}),
+               "editable": True,
+               "visible": True,
+               "mustReload": False}),
     ("allowedOn", {"description" : "Kind of event types (conference, meeting, simple_event) supported",
                "type": list,
                "defaultValue": ["conference","simple_event","meeting"],

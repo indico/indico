@@ -33,6 +33,7 @@ from MaKaC.webinterface.rh.admins import RCAdmin
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.plugins.Collaboration.base import CollaborationException
+from copy import copy
 
 ################################################### Server Wide pages #########################################
 
@@ -194,24 +195,42 @@ class WPConfModifCSBase (WPConferenceModifBase):
                         item.setEnabled(True)
         
         self._subtabs = {}
-        for subtabName in self._tabNames:
-            if subtabName == 'Managers':
-                url = urlHandlers.UHConfModifCollaborationManagers.getURL(self._conf)
-            else:
-                url = urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = CollaborationTools.isUsingHTTPS(), tab=subtabName)
+        tabOrder = CollaborationTools.getCollaborationOptionValue('tabOrder')
+        isUsingHTTPS = CollaborationTools.isUsingHTTPS()
+        allowedTabs = copy(self._tabNames)
+        
+        for tabName in tabOrder:
+            if tabName in allowedTabs:
+                self._addTab(tabName, isUsingHTTPS)
+                allowedTabs.remove(tabName)
                 
-            self._subtabs[subtabName] = self._tabCtrl.newTab(subtabName, subtabName, url)
+        for tabName in allowedTabs:
+            if tabName != 'Managers':
+                self._addTab(tabName, isUsingHTTPS)
+
+        if 'Managers' in allowedTabs:
+            self._addTab('Managers', isUsingHTTPS)
         
         self._setActiveTab()
 
     def _setActiveTab( self ):
         self._subtabs[self._activeTab].setActive()
         
-#    def _getTabContent(self, params):
-#        return "nothing"
-        
     def _setActiveSideMenuItem(self):
         self._videoServicesMenuItem.setActive()
+        
+    def _addTab(self, tabName, isUsingHTTPS):
+        if tabName == 'Managers':
+            url =  urlHandlers.UHConfModifCollaborationManagers.getURL(self._conf)
+        else:
+            url = urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = isUsingHTTPS, tab = tabName)
+        self._subtabs[tabName] = self._tabCtrl.newTab(tabName, tabName, url)
+        
+    def _getTabURL(self, tabName, isUsingHTTPS):
+        if tabName == 'Managers':
+            return urlHandlers.UHConfModifCollaborationManagers.getURL(self._conf)
+        else:
+            return urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = isUsingHTTPS, tab = tabName)
 
 class WPConfModifCollaboration( WPConfModifCSBase ):
     
