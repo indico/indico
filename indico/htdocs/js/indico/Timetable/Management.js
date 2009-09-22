@@ -189,7 +189,7 @@ type("TimetableManagementActions", [], {
                 this.separator.dom.style.display = "inline";
             }
         }else {
-            //this.addIntervalLink.dom.style.display = "none";
+            this.addIntervalLink.dom.style.display = "none";
         }
         
     },
