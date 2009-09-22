@@ -49,9 +49,9 @@
         <% end %>
         
         <% if HasTalks: %>
-        <span class="fakeLink" style="margin-left: 20px; margin-right: 5px;" onclick="WRSelectAllContributions()">Select all</span>
-        <span style="color: #AAAAAA">|</span>
-        <span class="fakeLink" style="margin-left: 5px;" onclick="WRUnselectAllContributions()">Select none</span>
+        <span class="fakeLink" style="margin-left: 20px;" onclick="WRSelectAllContributions()">Select all</span>
+        <span class="horizontalSeparator">|</span>
+        <span class="fakeLink" onclick="WRUnselectAllContributions()">Select none</span>
         <% end %>
         
         <div class="RRContributionListDiv">

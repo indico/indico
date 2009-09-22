@@ -445,9 +445,9 @@ var confTitleBookingTemplate = function(booking) {
         row.append(Html.td());
     }
 
-    var cell = Html.td('ACBookingCellNoWrap', Html.a({href: booking.modificationURL}, 'Change'));
-    row.append(cell);
-    var cell = Html.td('ACBookingCellNoWrap', Html.a({href: booking.conference.videoServicesDisplayURL}, 'Event Display'));
+    var cell = Html.td('ACBookingCellNoWrap', Html.a({href: booking.modificationURL}, 'Change'),
+                                              Html.span('horizontalSeparator', '|'),
+                                              Html.a({href: booking.conference.videoServicesDisplayURL}, 'Event Display'));
     row.append(cell);
 
     IndicoUI.Effect.mouseOver(row.dom);
@@ -480,9 +480,9 @@ var dateBookingTemplate = function(booking, viewBy) {
         row.append(Html.td());
     }
 
-    var cell = Html.td('ACBookingCellNoWrap', Html.a({href: booking.modificationURL}, 'Change'));
-    row.append(cell);
-    var cell = Html.td('ACBookingCellNoWrap', Html.a({href: booking.conference.videoServicesDisplayURL}, 'Event Display'));
+    var cell = Html.td('ACBookingCellNoWrap', Html.a({href: booking.modificationURL}, 'Change'),
+            Html.span('horizontalSeparator', '|'),
+            Html.a({href: booking.conference.videoServicesDisplayURL}, 'Event Display'));
     row.append(cell);
 
     IndicoUI.Effect.mouseOver(row.dom);

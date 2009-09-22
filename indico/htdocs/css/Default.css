@@ -1198,6 +1198,12 @@ a.nav_link:hover {
    margin-top: 5px;
 }
 
+span.horizontalSeparator {
+    color: #AAAAAA;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
 
 
 /* ===== ROOM BOOKING ================= */
