@@ -163,6 +163,7 @@ class ConferenceScheduleAddContribution(ScheduleAddContribution, conferenceServi
 
     def _schedule(self, contribution):
         autoOps = []
+
         # 'check' param = 1 - dates will be checked for errors
         if self._needsToBeScheduled:
             autoOps += self._target.getSchedule().addEntry(contribution.getSchEntry(),1)
@@ -577,7 +578,8 @@ class ScheduleEditSlotBase(LocationSetter):
             schEntry = self._slot.getSessionSchEntry()
         else:
             schEntry = self._slot.getConfSchEntry()
-        pickledData = DictPickler.pickle(schEntry, timezone=self._conf.getTimezone())
+        entryId, pickledData = schedule.ScheduleToJson.processEntry(schEntry, self._conf.getTimezone())
+
         return {'day': schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
                 'id': pickledData['id'],
                 'entry': pickledData,
@@ -789,19 +791,24 @@ class ScheduleContributions:
 
         for contribId in self._ids:
 
+            autoOps = []
+
             contrib = self._getContributionId(contribId)
 
             self._handlePosterContributions()
 
             d = self._target.getSchedule().calculateDayEndDate(self._date)
-            contrib.setStartDate(d)
+
+            autoOps += contrib.setStartDate(d)
             schEntry = contrib.getSchEntry()
-            self._target.getSchedule().addEntry(schEntry)
+            autoOps += self._target.getSchedule().addEntry(schEntry)
 
             pickledData = DictPickler.pickle(schEntry, timezone=self._conf.getTimezone())
             entries.append({'day': schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
                             'id': pickledData['id'],
-                            'entry': pickledData})
+                            'entry': pickledData,
+                            'autoOps': translateAutoOps(autoOps)
+                            })
         return entries
 
 class SessionSlotScheduleContributions(ScheduleContributions, sessionServices.SessionSlotModifCoordinationBase):

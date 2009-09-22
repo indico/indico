@@ -22,22 +22,43 @@
 """Contains tests regarding some scenarios related to schedule management.
 """
 import unittest
-import os
+import os, pdb
 
 
 from datetime import datetime,timedelta
 from pytz import timezone
 
-from MaKaC.schedule import IndTimeSchEntry
 from MaKaC.errors import MaKaCError
-from MaKaC.conference import Conference
+from MaKaC.conference import Conference, Session, SessionSlot, Contribution
 from MaKaC.user import Avatar
 
+from MaKaC.schedule import IndTimeSchEntry
+
+class ConferenceFacade(Conference):
+    def notifyModification(self):
+        pass
+
+    def unindexConf(self):
+        pass
+
+    def indexConf(self):
+        pass
+
+class ContributionFacade(Contribution):
+    def notifyModification(self):
+        pass
+
+    def unindexConf(self):
+        pass
+
+    def indexConf(self):
+        pass
+
 class _ScheduleOwnerWrapper:
-    
+
     def __init__(self,sDate,eDate):
         self._sDate,self._eDate=sDate,eDate
-    
+
     def getStartDate(self):
         return self._sDate
 
@@ -64,7 +85,7 @@ class _ScheduleOwnerWrapper:
         self._sDate=sd
         self._eDate=ed
 
-    
+
 class TestTimeSchedule(unittest.TestCase):
     """Tests the basic schedule management functions
     """
@@ -72,9 +93,11 @@ class TestTimeSchedule(unittest.TestCase):
     def setUp( self ):
         a = Avatar()
         a.setId("creator")
-        self._conf = Conference( a )
+        self._conf = ConferenceFacade( a )
         self._conf.setId('a')
         self._conf.setTimezone('UTC')
+
+        self._conf.setDates(datetime(2009, 9, 21, 16, 0 ,0, tzinfo=timezone("UTC")), datetime(2009, 9, 21, 19, 0 ,0, tzinfo=timezone("UTC")))
 
     def testBasicAddAndRemove( self ):
         from MaKaC.schedule import TimeSchedule
@@ -256,11 +279,177 @@ class TestTimeSchedule(unittest.TestCase):
         sch.moveDownEntry(entry2)
         self.assert_(entry3.getStartDate()==datetime(2004, 01, 01, 10, 25, tzinfo=timezone('UTC')))
         self.assert_(entry2.getStartDate()==datetime(2004, 01, 01, 10, 55, tzinfo=timezone('UTC')))
-        
-        
-        
+
+
+class TestConferenceSchedule(unittest.TestCase):
+    """Tests the basic schedule management functions
+    """
+
+    def setUp( self ):
+        a = Avatar()
+        a.setId("creator")
+        self._conf = ConferenceFacade( a )
+        self._conf.setId('a')
+        self._conf.setTimezone('UTC')
+
+        self._conf.setDates(datetime(2009, 9, 21, 16, 0 ,0, tzinfo=timezone("UTC")),
+                            datetime(2009, 9, 21, 19, 0 ,0, tzinfo=timezone("UTC")))
+
+        self._slot1_sDate = datetime(2009, 9, 21, 17, 0, 0, tzinfo=timezone("UTC"))
+        self._slot1_eDate = datetime(2009, 9, 21, 18, 0, 0, tzinfo=timezone("UTC"))
+        self._slot2_sDate = datetime(2009, 9, 21, 18, 0, 0, tzinfo=timezone("UTC"))
+        self._slot2_eDate = datetime(2009, 9, 21, 19, 0, 0, tzinfo=timezone("UTC"))
+
+        self._session1 = Session()
+        self._session1.setValues({
+            'sDate': self._slot1_sDate,
+            'eDate': self._slot1_eDate
+            })
+
+        self._conf.addSession(self._session1)
+
+        self._slot1 = self._session1.getSlotById(0)
+        self._slot2 = SessionSlot(self._session1)
+
+        self._slot2.setValues({
+            'sDate': self._slot2_sDate,
+            'eDate': self._slot2_eDate
+            });
+
+        self._session1.addSlot(self._slot2)
+
+    def _addContribToSession(self, session, sDate, duration):
+        contrib = ContributionFacade()
+
+        contrib.setParent(self._conf)
+
+        session.addContribution(contrib)
+
+        contrib.setDuration(duration,0)
+        contrib.setStartDate(sDate)
+
+        return contrib
+
+    def _expandNewTest(self, sDate, duration, expSDate, expEDate):
+        from MaKaC.schedule import ConferenceSchedule
+
+        schedule = ConferenceSchedule(self._conf)
+
+        contrib = self._addContribToSession(self._session1, sDate, duration)
+
+        # scheduling
+        autoOps = self._slot2.getSchedule().addEntry(contrib.getSchEntry())
+
+        self.assert_(self._slot2.getAdjustedStartDate() == expSDate)
+        self.assert_(self._slot2.getAdjustedEndDate() == expEDate)
+
+        return autoOps
+
+    def _expandResizeTest(self, sDate, sDuration, newDate, newDuration, expSDate, expEDate):
+        from MaKaC.schedule import ConferenceSchedule
+
+        schedule = ConferenceSchedule(self._conf)
+
+        contrib = self._addContribToSession(self._session1, sDate, sDuration)
+
+        # scheduling
+        self._slot2.getSchedule().addEntry(contrib.getSchEntry())
+
+        # changing time
+        autoOps = contrib.setStartDate(newDate)
+        autoOps += contrib.setDuration(dur=timedelta(hours=newDuration))
+
+        self.assert_(self._slot2.getAdjustedStartDate() == expSDate)
+        self.assert_(self._slot2.getAdjustedEndDate() == expEDate)
+
+        return autoOps
+
+    def testNewContentExpandsSlotDown(self):
+        """ A slot grows down due to new overflowing content """
+        return self._expandNewTest(datetime(2009, 9, 21, 18, 0, 0, tzinfo=timezone("UTC")),
+                                   2,
+                                   self._slot2_sDate,
+                                   datetime(2009, 9, 21, 20, 0, 0, tzinfo=timezone("UTC")))
+
+    def testNotifyNewContentExpandsSlotDown(self):
+        """ When a slot grows down (new content), proper notification is triggered  """
+
+        self.assert_(self.testNewContentExpandsSlotDown() == [])
+
+    def testNewContentExpandsSlotUp(self):
+        """ A slot grows up due to new "underflowing" content """
+        self._expandNewTest(datetime(2009, 9, 21, 17, 0, 0, tzinfo=timezone("UTC")),
+                         2,
+                         datetime(2009, 9, 21, 17, 0, 0, tzinfo=timezone("UTC")),
+                         self._slot2_eDate)
+
+    def testNewContentExpandsSlotBoth(self):
+        """ A slot grows up due to new content that both "underflows" and overflows """
+        self._expandNewTest(datetime(2009, 9, 21, 17, 0, 0, tzinfo=timezone("UTC")),
+                         3,
+                         datetime(2009, 9, 21, 17, 0, 0, tzinfo=timezone("UTC")),
+                         datetime(2009, 9, 21, 20, 0, 0, tzinfo=timezone("UTC")))
+
+    def testNewCrossingDoesNotCorruptSessionTime(self):
+        """ Session start/end time does not get messed up by new overflowing content """
+        from MaKaC.schedule import ConferenceSchedule
+
+        schedule = ConferenceSchedule(self._conf)
+
+        earlyDate = datetime(2009, 9, 21, 16, 0, 0, tzinfo=timezone("UTC"))
+
+        contrib = self._addContribToSession(self._session1, earlyDate, 1)
+
+        # scheduling
+        self._slot2.getSchedule().addEntry(contrib.getSchEntry())
+
+        self.assert_(self._session1.getAdjustedStartDate() == earlyDate)
+        self.assert_(self._session1.getAdjustedEndDate() == self._slot2_eDate)
+
+    def testResizeContentExpandsSlotDown(self):
+        """ A slot grows down by resizing content to overflow"""
+        self._expandResizeTest(self._slot2_sDate,
+                         1,
+                         datetime(2009, 9, 21, 18, 0, 0, tzinfo=timezone("UTC")),
+                         2,
+                         self._slot2_sDate,
+                         datetime(2009, 9, 21, 20, 0, 0, tzinfo=timezone("UTC")))
+
+    def testResizeContentExpandsSlotUp(self):
+        """ A slot grows down by resizing content to "underflow" """
+        self._expandNewTest(datetime(2009, 9, 21, 17, 0, 0, tzinfo=timezone("UTC")),
+                         2,
+                         datetime(2009, 9, 21, 17, 0, 0, tzinfo=timezone("UTC")),
+                         self._slot2_eDate)
+
+    def testResizeContentExpandsSlotBoth(self):
+        """ A slot grows down by resizing content to bot "underflow" and overflow"""
+        self._expandNewTest(datetime(2009, 9, 21, 17, 0, 0, tzinfo=timezone("UTC")),
+                         3,
+                         datetime(2009, 9, 21, 17, 0, 0, tzinfo=timezone("UTC")),
+                         datetime(2009, 9, 21, 20, 0, 0, tzinfo=timezone("UTC")))
+
+    def testResizeCrossingDoesNotCorruptSessionTime(self):
+        """ Session start/end time does not get messed up by resizing content to overflow """
+        from MaKaC.schedule import ConferenceSchedule
+
+        schedule = ConferenceSchedule(self._conf)
+        contrib = self._addContribToSession(self._session1, self._slot2_sDate, 1)
+
+        # scheduling
+        self._slot2.getSchedule().addEntry(contrib.getSchEntry())
+
+        # changing time
+        earlyDate = datetime(2009, 9, 21, 16, 0, 0, tzinfo=timezone("UTC"))
+        contrib.setStartDate(earlyDate)
+
+        self.assert_(self._session1.getAdjustedStartDate() == earlyDate)
+        self.assert_(self._session1.getAdjustedEndDate() == self._slot2_eDate)
+
 
 def testsuite():
     suite = unittest.TestSuite()
     suite.addTest( unittest.makeSuite(TestTimeSchedule) )
+    suite.addTest( unittest.makeSuite(TestConferenceSchedule) )
     return suite
+

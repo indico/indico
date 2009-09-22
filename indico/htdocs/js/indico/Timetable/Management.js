@@ -636,6 +636,7 @@ type("TimetableManagementActions", [], {
         this.timetable.setData(data);
     },
     _showInfoBox: function(content) {
+        this._hideWarnings();
         this.infoBox.dom.style.display = 'block';
         this.infoBox.set(content);
     },

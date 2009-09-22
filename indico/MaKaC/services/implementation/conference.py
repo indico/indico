@@ -273,7 +273,7 @@ class ConferenceDateTimeStartModification( ConferenceDateTimeModificationBase ):
             raise ServiceError("ERR-E3",
                                "Date/time of start cannot "+
                                "be greater than date/time of end")
-        self._target.setDates(self._pTime, self._target.getEndDate())
+        self._target.setDates(self._pTime, self._target.getEndDate(), moveEntries=0)
 
     def _handleGet(self):
         return datetime.datetime.strftime(self._target.getAdjustedStartDate(),
@@ -307,7 +307,9 @@ class ConferenceDateTimeEndModification( ConferenceDateTimeModificationBase ):
             raise ServiceError("ERR-E3",
                                "Date/time of end cannot "+
                                "be lower than data/time of start")
-        self._target.setDates(self._target.getStartDate(), self._pTime.astimezone(timezone("UTC")))
+        self._target.setDates(self._target.getStartDate(),
+                              self._pTime.astimezone(timezone("UTC")),
+                              moveEntries=0)
 
     def _handleGet(self):
         return datetime.datetime.strftime(self._target.getAdjustedEndDate(),

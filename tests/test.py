@@ -29,32 +29,32 @@ DBMgr.getInstance().startRequest()
 
 suite = unittest.TestSuite()
 
-import testCategories
-suite.addTest(testCategories.testsuite())
+#import testCategories
+#suite.addTest(testCategories.testsuite())
 
-import testConferences
-suite.addTest(testConferences.testsuite())
+#import testConferences
+#suite.addTest(testConferences.testsuite())
 
-import testContributions
-suite.addTest( testContributions.testsuite() )
+## import testContributions
+## suite.addTest( testContributions.testsuite() )
 
-import testSessions
-suite.addTest( testSessions.testsuite() )
+## import testSessions
+## suite.addTest( testSessions.testsuite() )
 
-import testCFA 
-suite.addTest( testCFA.testsuite() )
+## import testCFA
+## suite.addTest( testCFA.testsuite() )
 
-import testSciProgramme
-suite.addTest( testSciProgramme.testsuite() )
+## import testSciProgramme
+## suite.addTest( testSciProgramme.testsuite() )
 
 import testSchedule
 suite.addTest( testSchedule.testsuite() )
 
-import testWebInterface
-suite.addTest( testWebInterface.testsuite() )
+#import testWebInterface
+#suite.addTest( testWebInterface.testsuite() )
 
-import testFileSubmission
-suite.addTest( testFileSubmission.testsuite() )
+#import testFileSubmission
+#suite.addTest( testFileSubmission.testsuite() )
 
 unittest.TextTestRunner(verbosity=2).run( suite )
 

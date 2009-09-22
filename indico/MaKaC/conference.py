@@ -5835,15 +5835,17 @@ class Session(Persistent):
         return autoOps
 
     def setEndDate(self,newDate,check=2):
+        autoOps = []
         if not newDate.tzname():
             raise MaKaCError("date should be timezone aware")
         if check != 0:
-            self.verifyEndDate(newDate,check)
+            autoOps += self.verifyEndDate(newDate,check)
         self.duration=newDate-self.getStartDate()
         # A session is not always linked to a conference (for eg. at creation time)
         if self.getConference() and not self.getConference().getEnableSessionSlots() and self.getSlotList()[0].getEndDate() != newDate:
             self.getSlotList()[0].duration = self.duration
         self.notifyModification()
+        return autoOps
 
     def setDates(self,sDate,eDate,check=1,moveEntries=0):
         if eDate<=sDate:
@@ -6900,8 +6902,9 @@ class SessionSlot(Persistent):
         if sDate>eDate:
             raise MaKaCError(_("End date cannot be prior to Start date"),_("Slot"))
 
-        self.setStartDate(sDate,0,moveEntries)
-        self.setDuration(0,0,0,eDate-sDate,check)
+        self.setStartDate(sDate, check, moveEntries, checkDuration=False)
+        self.setDuration(0, 0, 0, eDate-sDate, check)
+
         self.notifyModification()
 
     def getEntries(self):
@@ -6940,7 +6943,7 @@ class SessionSlot(Persistent):
 
         return autoOps
 
-    def setStartDate(self,sDate,check=2,moveEntries=0):
+    def setStartDate(self,sDate,check=2,moveEntries=0,checkDuration=True):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem
@@ -6970,7 +6973,7 @@ class SessionSlot(Persistent):
 
         if self.getConference() and not self.getConference().getEnableSessionSlots() and self.getSession().getStartDate() != sDate:
             self.getSession().setStartDate(sDate, check, 0)
-        if check != 0 and self.getSession():
+        if check != 0 and self.getSession() and checkDuration:
             autoOps += self.verifyDuration(self.getDuration(), check=check)
 
         # synchronize with other timetables
