@@ -149,18 +149,35 @@ class RHConfModifCSBase(RHConferenceModifBase):
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
         
-        self._activeTab = params.get("tab", None)
+        self._activeTabName = params.get("tab", None)
         
         self._canSeeAllPluginTabs = self._target.canModify(self.getAW()) or RCCollaborationAdmin.hasRights(self) or RCVideoServicesManager.hasRights(self)
         
+        # we build the list 'allowedTabs', a list of all tabs that the user can see
         if self._canSeeAllPluginTabs:
             #if the logged in user is event manager, server admin or collaboration admin: we show all plugin tabs
-            self._tabs = CollaborationTools.getTabs(self._conf)
+            allowedTabs = CollaborationTools.getTabs(self._conf)
         else:
             #else we show only the tabs of plugins of which the user is admin
-            self._tabs = CollaborationTools.getTabs(self._conf, self._getUser())
+            allowedTabs = CollaborationTools.getTabs(self._conf, self._getUser())
             
         if self._target.canModify(self.getAW()) or RCVideoServicesManager.hasRights(self):
+            allowedTabs.append('Managers')
+            
+        # we order the list of allowedTabs into the self._tabs list
+        tabOrder = CollaborationTools.getCollaborationOptionValue('tabOrder')
+        self._tabs = []
+        
+        for tabName in tabOrder:
+            if tabName in allowedTabs:
+                self._tabs.append(tabName)
+                allowedTabs.remove(tabName)
+                
+        for tabName in allowedTabs:
+            if tabName != 'Managers':
+                self._tabs.append(tabName)
+
+        if 'Managers' in allowedTabs:
             self._tabs.append('Managers')
         
 
@@ -170,16 +187,15 @@ class RHConfModifCSBookings(RHConfModifCSBase):
     def _checkParams(self, params):
         RHConfModifCSBase._checkParams(self, params)
         
-        if self._activeTab and not self._activeTab in self._tabs:
+        if self._activeTabName and not self._activeTabName in self._tabs:
             raise MaKaCError(_("That Video Services tab doesn't exist or you cannot access it"), _("Video Services"))
-        elif not self._activeTab and self._tabs:
-            self._activeTab = self._tabs[0]
+        elif not self._activeTabName and self._tabs:
+            self._activeTabName = self._tabs[0]
             
         if self._canSeeAllPluginTabs:
-            self._tabPlugins = CollaborationTools.getPluginsByTab(self._activeTab, self._conf)
+            self._tabPlugins = CollaborationTools.getPluginsByTab(self._activeTabName, self._conf)
         else:
-            self._tabPlugins = CollaborationTools.getPluginsByTab(self._activeTab, self._conf, self._getUser())
-            
+            self._tabPlugins = CollaborationTools.getPluginsByTab(self._activeTabName, self._conf, self._getUser())
     
     def _checkProtection(self):
         if not PluginsHolder().hasPluginType("Collaboration"):
@@ -213,7 +229,7 @@ class RHConfModifCSProtection(RHConfModifCSBase):
 
     def _checkParams(self, params):
         RHConfModifCSBase._checkParams(self, params)
-        self._activeTab = 'Managers'
+        self._activeTabName = 'Managers'
     
     def _checkProtection(self):
         if not PluginsHolder().hasPluginType("Collaboration"):
