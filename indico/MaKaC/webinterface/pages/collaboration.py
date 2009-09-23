@@ -33,7 +33,6 @@ from MaKaC.webinterface.rh.admins import RCAdmin
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.plugins.Collaboration.base import CollaborationException
-from copy import copy
 
 ################################################### Server Wide pages #########################################
 
