@@ -23,7 +23,7 @@ type("TimetableManagementActions", [], {
             dayEndDate: 'schedule.session.getDayEndDate',
             'delete': 'schedule.event.deleteSession',
             changeColors: 'schedule.session.changeColors',
-            modifyStartEndDate: 'schedule.session.modifyStartEndDate' 
+            modifyStartEndDate: 'schedule.session.modifyStartEndDate'
         },
         'Contribution': {
             add: 'schedule.event.addContribution',
@@ -172,7 +172,7 @@ type("TimetableManagementActions", [], {
         });
     },
     /**
-     * This function enables/disables options in the timetable menu depending if 
+     * This function enables/disables options in the timetable menu depending if
      * we are creating a general timetable or the timetable for one session.
      */
     updateTTMenu: function() {
@@ -180,55 +180,73 @@ type("TimetableManagementActions", [], {
             if (this.session === null){
                 this.addMenuLink.dom.style.display = "none";
                 this.addIntervalLink.dom.style.display = "inline";
-                this.rescheduleLink.dom.style.display = "none"; 
+                this.rescheduleLink.dom.style.display = "none";
                 this.separator.dom.style.display = "none";
             }else {
                 this.addMenuLink.dom.style.display = "inline";
                 this.addIntervalLink.dom.style.display = "none";
-                this.rescheduleLink.dom.style.display = "inline"; 
+                this.rescheduleLink.dom.style.display = "inline";
                 this.separator.dom.style.display = "inline";
             }
         }else {
             this.addIntervalLink.dom.style.display = "none";
         }
-        
+
     },
     intervalTimetable: function(eventData) {
-       var self = this;
+        var self = this;
 
-       var day = IndicoUtil.formatDate2(IndicoUtil.parseJsonDate(eventData.startDate));
-       var data = {};
+        this.intervalMode = true;
 
-       this.savedData = this.timetable.getData();
-       this.session = eventData;
+        var day = IndicoUtil.formatDate2(IndicoUtil.parseJsonDate(eventData.startDate));
+        var data = {};
 
-       var goBackLink = Html.span({}, Html.a({className: 'fakeLink', style: {fontWeight: 'bold', margin: '0 15px'}}, 'Go back to timetable'), ' | ');
-       goBackLink.observeClick(function() {
-           self.timetable.setData(self.savedData);
-           self._hideInfoBox(message);
-           self._hideWarnings();
-           self.menu.remove(goBackLink);
-           self.session = null;
-           self.updateTTMenu();
-           // Enable the tabs
-           timetable.enable();
-       });
+        this.savedData = this.timetable.getData();
+        this.session = eventData;
+
+        var goBackLink = Html.span({}, Html.a({className: 'fakeLink', style: {fontWeight: 'bold', margin: '0 15px'}}, 'Go back to timetable'), ' | ');
+        goBackLink.observeClick(function() {
+            self.timetable.setData(self.savedData);
+            self._hideInfoBox(message);
+
+            // stop observing the warnings
+            stopObserve();
+            self.intervalMode = false;
+
+            self._hideWarnings();
+            self.menu.remove(goBackLink);
+            self.session = null;
+            self.updateTTMenu();
+            // Enable the tabs
+            timetable.enable();
+        });
 
         // WatchValues, so that interval changes can be handled
         var startTime = new WatchValue(eventData.startDate.time.substring(0,5));
         var endTime = new WatchValue(eventData.endDate.time.substring(0,5));
 
-        this.warnings.observe(function(event, elem) {
+        var stopObserve = this.warnings.observe(function(event, elem) {
             if (event == 'itemAdded') {
                 var msg = elem[1];
                 var finalTime = elem[3];
 
                 if (msg == "OWNER_END_DATE_EXTENDED") {
-                    eventData.endDate.time = finalTime + ":00";
-                    endTime.set(finalTime);
+                    // Make sure that something changed, otherwise the
+                    // warning will be supressed
+
+                    if (endTime.get() != finalTime) {
+                        eventData.endDate.time = finalTime + ":00";
+                        endTime.set(finalTime);
+                        self.processedWarnings.append(elem);
+                    }
                 } else if (msg == "OWNER_START_DATE_EXTENDED") {
-                    eventData.startDate.time = finalTime + ":00";
-                    startTime.set(finalTime);
+                    // Again, make sure that something changed
+
+                    if (startTime.get() != finalTime) {
+                        eventData.startDate.time = finalTime + ":00";
+                        startTime.set(finalTime);
+                        self.processedWarnings.append(elem);
+                    }
                 }
             }
         });
@@ -251,9 +269,13 @@ type("TimetableManagementActions", [], {
     },
 
     _createInfoArea: function() {
+
+        // this is a client-side hack that compensates some algorithm weaknesses
+
         return Html.div("timetableManagementInfoArea",
+                        Html.div({}, $T("Your changes triggered the automatic modification of some settings:")),
                         $B(Html.ul({}),
-                           this.warnings,
+                           this.processedWarnings,
                            function(item) {
 
                                var atoms = Util.parseId(item[2]);
@@ -262,20 +284,22 @@ type("TimetableManagementActions", [], {
                                    OWNER_START_DATE_EXTENDED: {
                                        SessionSlot : $T('Interval start time changed from '),
                                        Session: $T('Interval start time changed from '),
-                                       Conference: $T('Conference start time changed from ')
+                                       Conference: $T('The <strong>starting time</strong> of the <strong>Conference</strong> was moved from ')
                                    },
                                    OWNER_END_DATE_EXTENDED: {
                                        SessionSlot : $T('Interval end time changed from '),
                                        Session: $T('Interval end time changed from '),
-                                       Conference: $T('Conference end time changed from ')
+                                       Conference: $T('The <strong>ending time</strong> of the <strong>Conference</strong> was moved from ')
                                    },
-                                   ENTRIES_CHANGED: {
-                                       SessionSlot: $T('Contents of interval changed from ')
+                                   ENTRIES_MOVED: {
+                                       SessionSlot: $T('The contents of the interval were moved from ')
                                    }
                                }[item[1]][atoms[0]];
 
-                               return Html.li({}, Html.img({style: {padding: '5px', verticalAlign: 'middle'}, src:imageSrc('warning_yellow'), alt: $T('Warning!')}),
-                                              Html.span({style: {verticalAlign: 'middle', marginLeft: '5px'}}, message + ' ' + item[4] + $T(' to ') + item[3]));
+                               var span = Html.span({style: {verticalAlign: 'middle', marginLeft: '5px'}});
+                               span.dom.innerHTML = message + ' <strong>' + item[4] +
+                                   '</strong>' + $T(' to ') + '<strong>' + item[3] + '</strong>' ;
+                               return Html.li({}, span);
                            }));
     },
 
@@ -288,7 +312,7 @@ type("TimetableManagementActions", [], {
 
         this.infoBox = Html.div({className: 'timetableInfoBox', style: {display:'none'}});
 
-    
+
         this.addMenuLink = Html.a({className: 'dropDownMenu fakeLink', style: {margin: '0 15px'}}, 'Add new');
 
         this.addMenuLink.observeClick(function() {
@@ -297,7 +321,7 @@ type("TimetableManagementActions", [], {
             }
         });
 
-        
+
         this.separator = Html.span({}, " | ");
         // TODO: implement reschedule function
         var href = Indico.Urls.Reschedule;
@@ -307,7 +331,7 @@ type("TimetableManagementActions", [], {
             IndicoUI.Widgets.Generic.tooltip(this, event,"This option will be available soon");
         };
         this.rescheduleLink.dom.onmouseover = underConstr;
-        
+
         // JUST FOR SessionTimetable
         this.addIntervalLink = Html.span('fakeLink', 'Add new interval');
         if (self.isSessionTimetable) {
@@ -315,12 +339,12 @@ type("TimetableManagementActions", [], {
                 self.addSessionSlot(self.eventInfo.timetableSession);
             });
         }
-            
+
 
         this.warningArea = this._createInfoArea();
         this.warningArea.dom.style.display = 'none';
 
-		this.menu = Html.div({style: {cssFloat: 'right', color: '#777'}}, this.addMenuLink, this.addIntervalLink, this.separator, this.rescheduleLink);
+                this.menu = Html.div({style: {cssFloat: 'right', color: '#777'}}, this.addMenuLink, this.addIntervalLink, this.separator, this.rescheduleLink);
         this.updateTTMenu();
         return Html.div({}, this.warningArea, Html.div('clearfix', this.menu, this.infoBox));
     },
@@ -611,7 +635,11 @@ type("TimetableManagementActions", [], {
             this.warningArea.dom.style.display = 'block';
             each(result.autoOps,
                  function(op) {
-                     self.warnings.append(op);
+                     if (self.intervalMode) {
+                         self.warnings.append(op);
+                     } else {
+                         self.processedWarnings.append(op);
+                     }
                  });
         }
     },
@@ -619,6 +647,7 @@ type("TimetableManagementActions", [], {
     _hideWarnings: function() {
         this.warningArea.dom.style.display = 'none';
         this.warnings.clear();
+        this.processedWarnings.clear();
     },
 
     /*
@@ -648,7 +677,10 @@ type("TimetableManagementActions", [], {
         this.timetable = timetable;
         this.eventInfo = eventInfo;
 
+        this.intervalMode = false;
+
         this.warnings = new WatchList();
+        this.processedWarnings = new WatchList();
 
         // Whenever in session content view this is set to the session
         this.session = null;
