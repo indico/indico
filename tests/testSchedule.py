@@ -300,6 +300,8 @@ class TestConferenceSchedule(unittest.TestCase):
         self._slot2_sDate = datetime(2009, 9, 21, 18, 0, 0, tzinfo=timezone("UTC"))
         self._slot2_eDate = datetime(2009, 9, 21, 19, 0, 0, tzinfo=timezone("UTC"))
 
+        self._slot2_laterDate = datetime(2009, 9, 21, 20, 0, 0, tzinfo=timezone("UTC"))
+
         self._session1 = Session()
         self._session1.setValues({
             'sDate': self._slot1_sDate,
@@ -325,20 +327,20 @@ class TestConferenceSchedule(unittest.TestCase):
 
         session.addContribution(contrib)
 
-        contrib.setDuration(duration,0)
-        contrib.setStartDate(sDate)
+        autoOps = contrib.setDuration(duration,0)
+        autoOps += contrib.setStartDate(sDate)
 
-        return contrib
+        return contrib, autoOps
 
     def _expandNewTest(self, sDate, duration, expSDate, expEDate):
         from MaKaC.schedule import ConferenceSchedule
 
         schedule = ConferenceSchedule(self._conf)
 
-        contrib = self._addContribToSession(self._session1, sDate, duration)
+        contrib, autoOps = self._addContribToSession(self._session1, sDate, duration)
 
         # scheduling
-        autoOps = self._slot2.getSchedule().addEntry(contrib.getSchEntry())
+        autoOps += self._slot2.getSchedule().addEntry(contrib.getSchEntry())
 
         self.assert_(self._slot2.getAdjustedStartDate() == expSDate)
         self.assert_(self._slot2.getAdjustedEndDate() == expEDate)
@@ -350,7 +352,7 @@ class TestConferenceSchedule(unittest.TestCase):
 
         schedule = ConferenceSchedule(self._conf)
 
-        contrib = self._addContribToSession(self._session1, sDate, sDuration)
+        contrib, autoOps = self._addContribToSession(self._session1, sDate, sDuration)
 
         # scheduling
         self._slot2.getSchedule().addEntry(contrib.getSchEntry())
@@ -366,29 +368,71 @@ class TestConferenceSchedule(unittest.TestCase):
 
     def testNewContentExpandsSlotDown(self):
         """ A slot grows down due to new overflowing content """
-        return self._expandNewTest(datetime(2009, 9, 21, 18, 0, 0, tzinfo=timezone("UTC")),
+        return self._expandNewTest(self._slot2_sDate,
                                    2,
                                    self._slot2_sDate,
-                                   datetime(2009, 9, 21, 20, 0, 0, tzinfo=timezone("UTC")))
+                                   self._slot2_laterDate)
 
     def testNotifyNewContentExpandsSlotDown(self):
         """ When a slot grows down (new content), proper notification is triggered  """
 
-        self.assert_(self.testNewContentExpandsSlotDown() == [])
+        ops = self.testNewContentExpandsSlotDown()
+
+        self.assert_(len(ops) == 2)
+
+        op1 = ops[0]
+        op2 = ops[1]
+
+        self.assert_(type(op1[0]) == SessionSlot)
+        self.assert_(op1[1] == 'OWNER_END_DATE_EXTENDED')
+        self.assert_(type(op1[2]) == SessionSlot)
+        self.assert_(op1[3] == self._slot2_laterDate)
+        self.assert_(op1[4] == self._slot2_eDate)
+
+        self.assert_(type(op2[0]) == SessionSlot)
+        self.assert_(op2[1] == 'OWNER_END_DATE_EXTENDED')
+        self.assert_(type(op2[2]) == Session)
+        self.assert_(op2[3] == self._slot2_laterDate)
+        self.assert_(op2[4] == self._slot2_eDate)
 
     def testNewContentExpandsSlotUp(self):
         """ A slot grows up due to new "underflowing" content """
-        self._expandNewTest(datetime(2009, 9, 21, 17, 0, 0, tzinfo=timezone("UTC")),
-                         2,
-                         datetime(2009, 9, 21, 17, 0, 0, tzinfo=timezone("UTC")),
-                         self._slot2_eDate)
+        return self._expandNewTest(self._slot1_sDate,
+                                   2,
+                                   self._slot1_sDate,
+                                   self._slot2_eDate)
+
+    def testNotifyNewContentExpandsSlotUp(self):
+        """ When a slot grows up (new content), proper notification is triggered  """
+
+#        import rpdb2; rpdb2.start_embedded_debugger_interactive_password()
+
+        ops = self.testNewContentExpandsSlotUp()
+
+        self.assert_(len(ops) == 2)
+
+        op1 = ops[0]
+        op2 = ops[1]
+
+        self.assert_(type(op1[0]) == SessionSlot)
+        self.assert_(op1[1] == 'OWNER_START_DATE_EXTENDED')
+        self.assert_(type(op1[2]) == SessionSlot)
+        self.assert_(op1[3] == self._slot1_sDate)
+        self.assert_(op1[4] == self._slot2_sDate)
+
+        # in an ideal world, this one should not be shown
+        self.assert_(type(op2[0]) == SessionSlot)
+        self.assert_(op2[1] == 'OWNER_END_DATE_EXTENDED')
+        self.assert_(type(op2[2]) == SessionSlot)
+        self.assert_(op2[3] == self._slot2_eDate)
+        self.assert_(op2[4] == self._slot2_sDate)
 
     def testNewContentExpandsSlotBoth(self):
         """ A slot grows up due to new content that both "underflows" and overflows """
         self._expandNewTest(datetime(2009, 9, 21, 17, 0, 0, tzinfo=timezone("UTC")),
-                         3,
-                         datetime(2009, 9, 21, 17, 0, 0, tzinfo=timezone("UTC")),
-                         datetime(2009, 9, 21, 20, 0, 0, tzinfo=timezone("UTC")))
+                            3,
+                            self._slot1_sDate,
+                            self._slot2_laterDate)
 
     def testNewCrossingDoesNotCorruptSessionTime(self):
         """ Session start/end time does not get messed up by new overflowing content """
@@ -398,7 +442,7 @@ class TestConferenceSchedule(unittest.TestCase):
 
         earlyDate = datetime(2009, 9, 21, 16, 0, 0, tzinfo=timezone("UTC"))
 
-        contrib = self._addContribToSession(self._session1, earlyDate, 1)
+        contrib, autoOps = self._addContribToSession(self._session1, earlyDate, 1)
 
         # scheduling
         self._slot2.getSchedule().addEntry(contrib.getSchEntry())
@@ -434,7 +478,7 @@ class TestConferenceSchedule(unittest.TestCase):
         from MaKaC.schedule import ConferenceSchedule
 
         schedule = ConferenceSchedule(self._conf)
-        contrib = self._addContribToSession(self._session1, self._slot2_sDate, 1)
+        contrib, autoOps = self._addContribToSession(self._session1, self._slot2_sDate, 1)
 
         # scheduling
         self._slot2.getSchedule().addEntry(contrib.getSchEntry())

@@ -145,6 +145,8 @@ class TimeSchedule(Schedule, Persistent):
             # remove it from the old schedule and add it to this one
             entry.getSchedule().removeEntry(entry)
 
+        owner = self.getOwner()
+
         # If user has entered start date use these dates
         # if the entry has not a pre-defined start date we try to find a place
         # within the schedule to allocate it
@@ -152,14 +154,13 @@ class TimeSchedule(Schedule, Persistent):
             sDate=self.findFirstFreeSlot(entry.getDuration())
             if sDate is None:
                 if check==2:
-                    owner = self.getOwner()
                     newEndDate = self.getEndDate() + entry.getDuration()
 
                     autoOps.append((owner,
                                     "OWNER_END_DATE_EXTENDED",
                                     owner,
                                     newEndDate.astimezone(timezone(owner.getConference().getTimezone())),
-                                    self.getAdjustedEndDate()
+                                    owner.getAdjustedEndDate()
                                     ))
 
                     owner.setEndDate(newEndDate, check)
@@ -174,12 +175,24 @@ class TimeSchedule(Schedule, Persistent):
                 if check==1:
                     raise TimingError( _("Cannot schedule this entry because its start date (%s) is before its parents (%s)")%(entry.getStartDate(),self.getStartDate('UTC')),_("Add Entry"))
                 elif check == 2:
-                    autoOps += self.getOwner().setStartDate(entry.getStartDate(),check)
+                    autoOps.append((owner,
+                                    "OWNER_START_DATE_EXTENDED",
+                                    owner,
+                                    entry.getAdjustedStartDate(),
+                                    owner.getAdjustedStartDate()
+                                    ))
+                    autoOps += owner.setStartDate(entry.getStartDate(),check)
             elif entry.getEndDate()>self.getEndDate('UTC'):
                 if check==1:
                     raise TimingError( _("Cannot schedule this entry because its end date (%s) is after its parents (%s)")%(entry.getEndDate(),self.getEndDate('UTC')),_("Add Entry"))
                 elif check == 2:
-                    autoOps += self.getOwner().setEndDate(entry.getEndDate(),check)
+                    autoOps.append((owner,
+                                    "OWNER_END_DATE_EXTENDED",
+                                    owner,
+                                    entry.getAdjustedEndDate(),
+                                    owner.getAdjustedEndDate()
+                                    ))
+                    autoOps += owner.setEndDate(entry.getEndDate(),check)
         #we make sure the entry end date does not go outside the schedule
         #   boundaries
         if entry.getEndDate() is not None and \
@@ -728,6 +741,7 @@ class SlotSchedule(TimeSchedule):
         """
 
         autoOps = []
+        owner = self.getOwner()
 
         if (entry is None) or self.hasEntry(entry):
             return
@@ -744,6 +758,12 @@ class SlotSchedule(TimeSchedule):
                     self.getOwner().getStartDate().strftime('%Y-%m-%d %H:%M')),\
                       _("Slot"))
             elif check == 2:
+                autoOps.append((owner,
+                                "OWNER_START_DATE_EXTENDED",
+                                owner,
+                                entry.getAdjustedStartDate(),
+                                owner.getAdjustedStartDate()
+                                ))
                 autoOps += self.getOwner().setStartDate(entry.getStartDate(),check,0)
         if entry.getEndDate()!=None and entry.getEndDate() > self.getOwner().getEndDate():
             if check == 1:
@@ -752,6 +772,12 @@ class SlotSchedule(TimeSchedule):
                     self.getOwner().getEndDate().strftime('%Y-%m-%d %H:%M')),\
                      "Slot")
             elif check == 2:
+                autoOps.append((owner,
+                                "OWNER_END_DATE_EXTENDED",
+                                owner,
+                                entry.getAdjustedEndDate(),
+                                owner.getAdjustedEndDate()
+                                ))
                 autoOps += self.getOwner().setEndDate(entry.getEndDate(),check)
         self._setEntryDuration(entry)
         autoOps += self._addEntry(entry,check)
