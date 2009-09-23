@@ -11,10 +11,10 @@ type("Getter", [], {
 	 * @return {Object} value
 	 */
 	get: function() {}
-	
+
 },
 	/**
-	 * 
+	 *
 	 * @param {Function} get
 	 * @constructor
 	 */
@@ -35,7 +35,7 @@ type("Accessor", ["Getter"], {
 	set: function(value) {}
 },
 	/**
-	 * 
+	 *
 	 * @param {Function} get
 	 * @param {Function} set
 	 * @constructor
@@ -58,7 +58,7 @@ type("Observable", [], {
 	observe: function(observer) {}
 },
 	/**
-	 * 
+	 *
 	 * @param {Function} observer
 	 * @constructor
 	 */
@@ -78,7 +78,7 @@ type("InvokableObservable", ["Observable"], {
 	invokeObserver: function(observer) {}
 },
 	/**
-	 * 
+	 *
 	 * @param {Function} observer
 	 * @param {Function} invokeObserver
 	 * @constructor
@@ -95,7 +95,7 @@ type("InvokableObservable", ["Observable"], {
 type("WatchGetter", ["Getter", "InvokableObservable"], {
 },
 	/**
-	 * 
+	 *
 	 * @param {Function} get
 	 * @param {Function} observe
 	 * @param {Function} invokeObserver
@@ -114,7 +114,7 @@ type("WatchGetter", ["Getter", "InvokableObservable"], {
 type("WatchAccessor", ["WatchGetter", "Accessor"], {
 },
 	/**
-	 * 
+	 *
 	 * @param {Function} get
 	 * @param {Function} set
 	 * @param {Function} observe
@@ -152,7 +152,7 @@ type("Refreshable", [], {
 	refresh: function() {}
 },
 	/**
-	 * 
+	 *
 	 * @param {Function} refresh
 	 * @constructor
 	 */
@@ -164,7 +164,7 @@ type("Refreshable", [], {
 /**
  * Source state enumeration.
  */
-global.SourceState = new Enum("None", "Loading", "Loaded", "Committing", "Error");
+var SourceState = new Enum("None", "Loading", "Loaded", "Committing", "Error");
 
 /**
  * Abstract remote source.
@@ -175,7 +175,7 @@ type("Source", ["Refreshable"], {
 	 * @type {WatchGetter}
 	 */
 	state: null,
-		
+
 	/**
 	 * Error of the source.
 	 * @type {WatchGetter}
@@ -197,7 +197,7 @@ type("Enumerable", [], {
 	isEmpty: function() {}
 },
 	/**
-	 * 
+	 *
 	 * @param {Object} each
 	 * @constructor
 	 */
@@ -209,7 +209,7 @@ type("Enumerable", [], {
 
 type("WatchListable", ["Enumerable"], {
 	/**
-	 * Attaches the list observer and returns a function to detach the observer. 
+	 * Attaches the list observer and returns a function to detach the observer.
 	 * @param {Object} listObserver
 	 * @return {Function}
 	 */
@@ -225,14 +225,14 @@ type("List", ["Enumerable"], {
 	 * @type {Getter}
 	 */
 	length: null,
-	
+
 	/**
 	 * Returns item at index
 	 * @param {Number} index
 	 * @return {Object} item
 	 */
 	item: function(index) {},
-	
+
 	/**
 	 * Returns accessor for item
 	 * @param {Number} index
@@ -246,21 +246,21 @@ type("List", ["Enumerable"], {
 			return self.replaceAt(index, value);
 		});
 	},
-	
-	
+
+
 	/**
 	 * Returns all items in an array
 	 * @return {Array} items
 	 */
 	allItems: function() {},
-	
+
 	/**
 	 * Appends the new item and returns an index of the item.
 	 * @param {Object} item
 	 * @return {Number} index
 	 */
 	append: function(item) {},
-	
+
 	appendExisting: function(item) {
 		if (exists(item)) {
 			return this.append(item);
@@ -268,16 +268,16 @@ type("List", ["Enumerable"], {
 			return this.length;
 		}
 	},
-	
+
 	appendMany: function(items) {
 		var self = this;
 		each(items, function(item) {
 			self.append(item);
 		});
 	},
-	
+
 	/**
-	 * Inserts the new item at the index if available, 
+	 * Inserts the new item at the index if available,
 	 * otherwise inserts the item at the beginning.
 	 * Returns the index of the item.
 	 * @param {Object} item
@@ -285,35 +285,35 @@ type("List", ["Enumerable"], {
 	 * @return {Number} index
 	 */
 	insert: function(item, index) {},
-	
+
 	/**
 	 * Removes the item and returns an index of the item.
 	 * @param {Object} item
 	 * @return {Number} index
 	 */
 	remove: function(item) {},
-	
+
 	removeMany: function(items) {
 		var self = this;
 		each(items, function(item) {
 			self.remove(item);
 		});
 	},
-	
+
 	/**
 	 * Removes an item at the given index and returns the item.
 	 * @param {Object} index
 	 * @return {Object} item
 	 */
 	removeAt: function(index) {},
-	
+
 	removeManyAt: function(indexes) {
 		var self = this;
 		each(indexes, function(index) {
 			self.removeAt(index);
 		});
 	},
-	
+
 	/**
 	 * Replaces item at index and returns previous item
 	 * @param {Number} index
@@ -338,13 +338,13 @@ type("List", ["Enumerable"], {
 		this.insert(item, destination);
 		return item;
 	},
-	
+
 	/**
 	 * Removes all items and return these items.
 	 * @returns {Array} cleared elements
 	 */
 	clear: function() {},
-	
+
 	/**
 	 * Returns index of item or null if not found
 	 * @param {Object} item
@@ -451,7 +451,7 @@ type("Lookup", [], {
  * Map-like collection.
  */
 type("Dictionary", ["Lookup", "Enumerable"], {
-	
+
 	/**
 	 * Sets the value with the key and returns a previous value.
 	 * @param {String} key
@@ -461,7 +461,7 @@ type("Dictionary", ["Lookup", "Enumerable"], {
 	set: function(key, value) {
 		throw new Error("Not implemented");
 	},
-	
+
 	/**
 	 * Get values of the all properties.
 	 * @return {Object} values
@@ -469,7 +469,7 @@ type("Dictionary", ["Lookup", "Enumerable"], {
 	getAll: function() {
 		throw new Error("Not implemented");
 	},
-	
+
 	/**
 	 * Updates multiple properties.
 	 * @param {Object} values

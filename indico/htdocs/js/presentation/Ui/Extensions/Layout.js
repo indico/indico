@@ -31,7 +31,11 @@ internal(function() {
 	}
 	
 	function boolToScrolling(arg) {
-		return exists(arg)?arg?"auto": "hidden":null;
+		return exists(arg)
+			? arg
+				? "auto"
+				: "hidden"
+			: null;
 	}
 
 	extend(Html.prototype, {
@@ -122,7 +126,7 @@ internal(function() {
 			computeY(style);
 			return this.style(style);
 		}
-	});
+	})
 });
 
 extend(Html.prototype, {
@@ -155,7 +159,7 @@ extend(Html.prototype, {
 
 // based on mootools
 delayedBind(Html.prototype, "getAbsolutePosition", function(dom) {
-    return this.dom.getBoundingClientRect && Browser.IE
+	return this.dom.getBoundingClientRect
         ? function() {
             var bound = this.dom.getBoundingClientRect();
             var html = document.documentElement;
@@ -172,9 +176,8 @@ delayedBind(Html.prototype, "getAbsolutePosition", function(dom) {
                 element = element.getOffsetParent();
             }
             return position; 
-        };
+		}
 });
-
 
 var Layout = {
 	row: function() {
@@ -192,7 +195,7 @@ var Layout = {
 				}
 				prev = pos;
 			});
-		};
+		}
 	},
 	rows: function(height, spacing) {
 		return function(element) {

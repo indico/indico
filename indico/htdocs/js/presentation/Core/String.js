@@ -8,7 +8,7 @@
  * @param {String} string
  * @return {Boolean} result
  */
-global.contains = function(text, string) {
+function contains(text, string) {
 	return text.indexOf(string) != -1;
 }
 
@@ -18,7 +18,7 @@ global.contains = function(text, string) {
  * @param {String} string
  * @return {Boolean} result
  */
-global.startsWith = function(text, string) {
+function startsWith(text, string) {
 	return string == text.slice(0, string.length);
 }
 
@@ -28,11 +28,11 @@ global.startsWith = function(text, string) {
  * @param {String} str
  * @return {Boolean} result
  */
-global.endsWith = function(text, str) {
+function endsWith(text, str) {
 	return str == text.slice(-str.length);
 }
 
-global.specialCharMap = {
+var specialCharMap = {
   '\b': '\\b',
   '\t': '\\t',
   '\n': '\\n',
@@ -47,7 +47,7 @@ global.specialCharMap = {
  * @param {String} text
  * @return {String}
  */
-global.escapeString = function(text) {
+function escapeString(text) {
 	return "\"" + text.replace(/[\x00-\x1f\\\"]/g, function(value) {
 		if (value in specialCharMap) {
 			return specialCharMap[value]
@@ -62,7 +62,7 @@ global.escapeString = function(text) {
  * @param {String} text
  * @return {Function} templating function
  */
-global.textTemplate = function(template) {
+function textTemplate(template) {
 	return function(args) {
 		return format(template, args);
 	};
@@ -74,7 +74,7 @@ global.textTemplate = function(template) {
  * @param {Array, Object} args
  * @return {String}
  */
-global.format = function(text, args) {
+function format(text, args) {
   return text.replace(/(\{\{)|(\}\})|(\{[^\}]*\})/g, function(string) {
     switch (string) {
 			case "{{":
@@ -95,36 +95,36 @@ global.format = function(text, args) {
  * @param {String} text
  * @return {String}
  */
-global.trim = function(text) {
+function trim(text) {
 	return trimEnd(trimStart(text));
 }
 
-global.trimStart = function(text) {
+function trimStart(text) {
 	return text.replace(/^\s+/, "");
 }
 
-global.trimEnd = function(text) {
+function trimEnd(text) {
 	return text.replace(/\s+$/, "");
 }
 
-global.padLeft = function(text, size, character) {
+function padLeft(text, size, character) {
 	while (text.length < size) {
 		text = character + text;
 	}
 	return text;
 }
 
-global.zeroPad = function(text, size) {
+function zeroPad(text, size) {
 	return padLeft(text, size, "0");
 }
 
-global.camelToDash = function(text) {
+function camelToDash(text) {
 	return text.replace(/[A-Z]/g, function(item) {
 		return "-" + item.toLowerCase();
 	});
 }
 
-global.decodeHtml = function(html) {
+function decodeHtml(html) {
 	var dom = obtain(decodeHtml, "dom", function() {
 		return document.createElement("div");
 	});

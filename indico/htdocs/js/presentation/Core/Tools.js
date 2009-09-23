@@ -2,13 +2,12 @@
  * @author Tom
  */
 
-
 /**
  * Returns true if the object is an array or is listable.
  * @param {Object} object
  * @return {Boolean}
  */
-global.isArrayOrListable = function(object) {
+function isArrayOrListable(object) {
 	return isArray(object) || (object.Enumerable && !object.Dictionary);
 }
 
@@ -19,26 +18,26 @@ global.isArrayOrListable = function(object) {
  * @param {Function} [template]
  * @return {Array}
  */
-global.$A = function(list, offset, template) {
+function $A(list, offset, template) {
 	return iterate(list, stacker(template), offset);
 }
 
-global.translate = function(source, template) {
+function translate(source, template) {
 	return each(source, stacker(template));
 }
 
-global.map = function(source, template) {
+function map(source, template) {
 	return each(source, mapper(template));
 }
 
-global.dict = function(source, template) {
+function dict(source, template) {
 	return each(source, builder(newObject, function(target, key, value) {
 		var pair = template(value, key);
 		target[pair[0]] = pair[1];
 	}));
 }
 
-global.extractStrings = function(source, template) {
+function extractStrings(source, template) {
 	return translate(dict(source, function(value, key) {
 		return [template(value, key), null];
 	}), function(value, key) {
@@ -53,7 +52,7 @@ global.extractStrings = function(source, template) {
  * @param {Function} [template]
  * @return {Array}
  */
-global.compact = function(list, offset, template) {
+function compact(list, offset, template) {
 	return iterate(list, existing(stacker(template)), offset);
 }
 
@@ -64,8 +63,12 @@ global.compact = function(list, offset, template) {
  * @param {Function} [template]
  * @return {Array}
  */
-global.linearize = function(list, offset, template) {
+function linearize(list, offset, template) {
 	return iterate(list, linearizing(existing(stacker(template))), offset);
+}
+
+function filter(list, match, offset, template) {
+  return iterate(list, where(match, stacker(template)), offset)
 }
 
 /**
@@ -74,7 +77,7 @@ global.linearize = function(list, offset, template) {
  * @param {Function} match
  * @return {Boolean} result
  */
-global.includes = function(collection, match) {
+function includes(collection, match) {
 	return exists(indexOf(collection, match));
 }
 
@@ -83,7 +86,7 @@ global.includes = function(collection, match) {
  * @param {Array, Object} ... lists
  * @return {Array}
  */
-global.concat = function() {
+function concat() {
 	var result = [];
 	iterate(arguments, function(arg) {
 		if (exists(arg)) {
@@ -100,7 +103,7 @@ global.concat = function() {
  * @params {Object} ... objects
  * @return {Object}
  */
-global.merge = function() {
+function merge() {
 	var result = {};
 	iterate(arguments, function(arg) {
 		if (exists(arg)) {
@@ -110,7 +113,7 @@ global.merge = function() {
 	return result;
 }
 
-global.withoutProperties = function(object) {
+function withoutProperties(object) {
 	var result = merge(object);
 	iterate(arguments, function(property) {
 		delete result[property];
@@ -118,10 +121,10 @@ global.withoutProperties = function(object) {
 	return result;
 }
 
-global.keys = function(source) {
+function keys(source) {
 	return translate(source, keyGetter);
 };
-global.values = translate;
+var values = translate;
 
 /**
  * Adds the value as a new property to the object,
@@ -131,7 +134,7 @@ global.values = translate;
  * @param {Function} observer
  * @return {String} key
  */
-global.addProperty = function(object, value, observer) {
+function addProperty(object, value, observer) {
 	var key = 1;
 	while (key in object) {
 		key++;
@@ -151,7 +154,7 @@ global.addProperty = function(object, value, observer) {
  * @param {Function} observer
  * @return {Object} old
  */
-global.changeProperty = function(object, key, value, observer) {
+function changeProperty(object, key, value, observer) {
 	var old = object[key];
 	if (!equals(old, value)) {
 		if (exists(value)) {
@@ -173,7 +176,7 @@ global.changeProperty = function(object, key, value, observer) {
  * @param {Function} observer
  * @return {Object} changes
  */
-global.changeProperties = function(object, values, observer) {
+function changeProperties(object, values, observer) {
 	var changes = {};
 	enumerate(values, function(value, key) {
 		var old = object[key];
@@ -197,7 +200,7 @@ global.changeProperties = function(object, values, observer) {
  * @param {Function} observer
  * @return {Object} changes
  */
-global.replaceProperties = function(object, values, observer) {
+function replaceProperties(object, values, observer) {
 	var changes = clone(values);
 	enumerate(object, function(value, key) {
 		if (!(key in changes)) {
@@ -213,7 +216,7 @@ global.replaceProperties = function(object, values, observer) {
  * @param {String} key
  * @return {Accessor} accessor
  */
-global.objectAccessor = function(object, key) {
+function objectAccessor(object, key) {
 	return new Accessor(function() {
 		return object[key];
 	}, function(value) {
@@ -229,7 +232,7 @@ global.objectAccessor = function(object, key) {
  * @param {WatchAccessor} accessor
  * @return {WatchGetter} getter
  */
-global.getWatchGetter = function(accessor) {
+function getWatchGetter(accessor) {
 	return new WatchGetter(accessor.get, accessor.observe, accessor.invokeObserver);
 }
 
@@ -238,7 +241,7 @@ global.getWatchGetter = function(accessor) {
  * @param {Object} source
  * @return {Boolean} result
  */
-global.cannotGet = function(source) {
+function cannotGet(source) {
 	return source.CanGet ? !source.canGet() : false;
 }
 
@@ -248,7 +251,7 @@ global.cannotGet = function(source) {
  * @param {Object} value
  * @return {Function} setter
  */
-global.setter = function(accessor, value) {
+function setter(accessor, value) {
 	return function() {
 		accessor.set(value);
 	};
@@ -259,7 +262,7 @@ global.setter = function(accessor, value) {
  * @param {Accessor} accessor
  * @return {Accessor} accessor
  */
-global.getAccessorDeep = function(accessor) {
+function getAccessorDeep(accessor) {
 	while (true) {
 		var value = accessor.get();
 		if (!exists(value) || !value.Accessor) {
@@ -278,7 +281,7 @@ global.getAccessorDeep = function(accessor) {
  * @param {Number} min
  * @param {Number} sec
  */
-global.date = function(year, month, day, hour, min, sec) {
+function date(year, month, day, hour, min, sec) {
 	return new Date(year, month - 1, day, hour, min, sec);
 }
 
@@ -287,27 +290,27 @@ global.date = function(year, month, day, hour, min, sec) {
  * @param {Date} date
  * @return {Date} result
  */
-global.copyDate = function(date) {
+function copyDate(date) {
 	return new Date(date.getTime());
 }
 
 
-global.getArgumentsCount = function(func) {
+function getArgumentsCount(func) {
 	// from Prototype
 	var items = func.toString().match(/^[\s\(]*function[^(]*\((.*?)\)/)[1].split(",");
 	return items.length == 1 && !items[0] ? 0 : items.length;
 }
 
 
-global.multiDictSet = function(dict, key, value) {
+function multiDictSet(dict, key, value) {
 	return obtain(dict, key, newWatchList).append(value);
 }
 
-global.tryGet = function(source, key) {
+function tryGet(source, key) {
 	return exists(source) ? source.get(key) : null;
 }
 
-global.path = function(source, path) {
+function path(source, path) {
 	indexOf(path, function(step) {
 		if (!exists(source)) {
 			return true;
@@ -317,7 +320,7 @@ global.path = function(source, path) {
 	return source;
 }
 
-global.pathGet = function(source, path) {
+function pathGet(source, path) {
 	indexOf(path, function(step) {
 		if (!exists(source)) {
 			return true;

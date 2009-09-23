@@ -181,6 +181,15 @@ function linearizing(action) {
         return iterator;
 }
 
+function where(match, action) {
+	function iterator(item, key) {
+		if (match(item, key)) {
+			action(item);
+		}
+	}
+	iterator.result = action.result;
+	return iterator;
+}
 
 /**
  * Returns an iterator
@@ -190,13 +199,7 @@ function linearizing(action) {
  * @return {Function}
  */
 function existing(action) {
-        function iterator(item) {
-                if (exists(item)) {
-                        action(item);
-                }
-        }
-        iterator.result = action.result;
-        return iterator;
+   return where(exists, action);
 }
 
 /**

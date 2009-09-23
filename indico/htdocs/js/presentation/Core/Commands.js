@@ -8,14 +8,14 @@
  * @param {Object} ... args
  * @return {Function}
  */
-global.curry = function(method) {
+function curry(method) {
 	var args = $A(arguments, 1);
 	return function() {
 		return method.apply(this, concat(args, arguments));
 	};
 }
 
-global.wrap = function(method, instance) {
+function wrap(method, instance) {
 	return function() {
 		return method.apply(instance, $A(arguments));
 	}
@@ -28,7 +28,7 @@ global.wrap = function(method, instance) {
  * @param {Object} ... args
  * @return {Function}
  */
-global.apply = function(method, instance) {
+function apply(method, instance) {
 	var args = $A(arguments, 2);
 	return function() {
 		return method.apply(instance, concat(args, arguments));
@@ -42,7 +42,7 @@ global.apply = function(method, instance) {
  * @param {String} key
  * @return {Function} invoker
  */
-global.methodize = function(object, key) {
+function methodize(object, key) {
 	return function() {
 		var method = object[key];
 		if (exists(method)) {
@@ -57,7 +57,7 @@ global.methodize = function(object, key) {
  * @param {Array} [args]
  * @return {Function} template
  */
-global.invoker = function(object, args) {
+function invoker(object, args) {
 	args = any(args, []);
 	return function Invoke(func) {
 		return (arguments.callee.result = func.apply(object, args));
@@ -70,7 +70,7 @@ global.invoker = function(object, args) {
  * @param {Array} [args]
  * @return {Function} template
  */
-global.objectInvoker = function(object, args) {
+function objectInvoker(object, args) {
 	args = any(args, []);
 	return function(key) {
 		var method = object[key];
@@ -86,7 +86,7 @@ global.objectInvoker = function(object, args) {
  * @param {Array} [args]
  * @return {Function} template
  */
-global.methodInvoker = function(method, args) {
+function methodInvoker(method, args) {
 	args = any(args, []);
 	if (isFunction(method)) {
 		return function(object) {
@@ -107,7 +107,7 @@ global.methodInvoker = function(method, args) {
  * @param {Function} ... functions
  * @return {Function} sequence
  */
-global.sequence = function() {
+function sequence() {
 	var functions = compact(arguments);
 	return function Sequence() {
 		iterate(functions, invoker(this, $A(arguments)));
@@ -119,7 +119,7 @@ global.sequence = function() {
  * @param {Function} method
  * @return {Function}
  */
-global.commander = function(method) {
+function commander(method) {
 	var objects = new Bag();
 	return mixinInstance(function() {
 		return objects.each(methodInvoker(method, $A(arguments)));
@@ -130,7 +130,7 @@ global.commander = function(method) {
  * Returns a multi-function with attachable methods.
  * @return {Function} commands
  */
-global.commands = function() {
+function commands() {
 	var methods = new Bag();
 	return mixinInstance(function() {
 		return methods.each(invoker(this, $A(arguments)));
@@ -143,7 +143,7 @@ global.commands = function() {
  * @param {String} caption
  * @return {Function} command
  */
-global.command = function(method, caption) {
+function command(method, caption) {
 	function Command() {
 		return method.apply(this, $A(arguments));
 	}
@@ -152,10 +152,10 @@ global.command = function(method, caption) {
 }
 
 /**
- * Invokes the method with the arguments if it exists. 
+ * Invokes the method with the arguments if it exists.
  * @param {Function} command
  */
-global.invoke = function(method) {
+function invoke(method) {
 	if (exists(method)) {
 		return method.apply(this, $A(arguments, 1));
 	}
@@ -167,7 +167,7 @@ global.invoke = function(method) {
  * @param {Number} timeout
  * @return {Function} cancel
  */
-global.delay = function(method, timeout) {
+function delay(method, timeout) {
 	var id = setTimeout(method, timeout);
 	return function() {
 		clearTimeout(id);
@@ -179,7 +179,7 @@ global.delay = function(method, timeout) {
  * @param {Function} method
  * @return {Function} cancel
  */
-global.defer = function(method) {
+function defer(method) {
 	return delay(method, 1);
 }
 
@@ -188,7 +188,7 @@ global.defer = function(method) {
  * @param {Function} method
  * @return {Function} cancel
  */
-global.schedule = function(method) {
+function schedule(method) {
 	if (exists(method.scheduled)) {
 		return method.scheduled;
 	} else {
@@ -200,7 +200,7 @@ global.schedule = function(method) {
 	}
 }
 
-global.delayedBind = function(target, key, builder) {
+function delayedBind(target, key, builder) {
 	target[key] = function() {
 		var args = $A(arguments);
 		var method = builder.apply(this, args);

@@ -14,7 +14,7 @@ function loadDictionary(language) {
 }
 
 var defaultLanguage = "en_US";
-var languageDictionaryPath = TextRoot;
+var languageDictionaryPath = isDefined("TextRoot") ? TextRoot : "texts";;
 
 loadDictionary(defaultLanguage);
 

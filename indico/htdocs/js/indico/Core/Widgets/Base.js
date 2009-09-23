@@ -141,13 +141,14 @@ type("TabWidget", ["Chooser", "IWidget"],{
         }
         each(this.extraButtons, function(btn, index) {
             var extraCSSClass = '';
-            if (index == 0)
+            if (index === 0) {
                 extraCSSClass = "buttonContainerLeft";
-            else if (index == self.extraButtons.length-1)
+            } else if (index == self.extraButtons.length-1) {
                 extraCSSClass = "buttonContainerRight";
-            var btnContainer = Html.div('buttonContainer ' + extraCSSClass, btn['btn'])
+            }
+            var btnContainer = Html.div('buttonContainer ' + extraCSSClass, btn.btn);
             extraButtons.append(btnContainer);
-            btnContainer.observeClick(function() {btn['onclick'](btnContainer);})
+            btnContainer.observeClick(function() {btn.onclick(btnContainer);});
         });
 
         // This div is plced on top of the tabs and is shown when the tabs should be disabled (unclickable)
@@ -169,16 +170,13 @@ type("TabWidget", ["Chooser", "IWidget"],{
                      Html.div({className: "tabListContainer", style: {position: 'relative'}}, this.scrollArrows.left[0], this.scrollArrows.right[0], this.tabList,
                               Html.div('tabGradient', extraButtons/*,
                                        Html.div({className: 'tabBorderGradient', style: {cssFloat: 'left'}}),
-                                       Html.div({className: 'tabBorderGradient', style: {cssFloat: 'right'}})*/
-                                      )
+                                       Html.div({className: 'tabBorderGradient', style: {cssFloat: 'right'}})*/)
                              ),
                      Html.div({style: {marginTop: pixels(10),
                                        width: self.width ? pixels(self.width) : 'auto',
                                        minHeight: self.height ? pixels(self.height) : 'auto' }},
                               Widget.block(this)),
-                     this.disableOverlay
-                    )
-        );
+                     this.disableOverlay));
 
         return this.container;
     },
@@ -417,7 +415,7 @@ type("RemoteWidget", [],
              self.source.state.observe(function(value) {
                  if (value == SourceState.Loaded) {
                      canvas.set(self.drawContent(content));
-                 }else if(value == SourceState.Loading){
+                 }else if(value == SourceState.Committing){
                     self.runIndicator(canvas);
                  } else if (value == SourceState.Error) {
                      self._error(self.source.error.get());
@@ -434,7 +432,7 @@ type("RemoteWidget", [],
 
          runIndicator: function(canvas) {
              if (!this.noIndicator) {
-                 canvas.set(ProgressIndicator());
+                 canvas.set(new ProgressIndicator());
              }
          }
      },
@@ -560,10 +558,11 @@ type("PopupWidget", [], {
          * Used to avoid errors for classes that don't
          * call the constructor.
          */
-        if(!exists(this.canvas))
+        if(!exists(this.canvas)) {
             this.canvas = Html.div();
+        }
 
-        var styles = any(styles, {
+        styles = any(styles, {
             // If the canvas has been set to fixed position don't change it
             position: this.canvas.dom.style.position == 'fixed' ? 'fixed' : 'absolute',
             left: pixels(x),
@@ -606,7 +605,7 @@ type("PopupWidget", [], {
     },
 
     setFixedPosition: function(fixed) {
-        var fixed = any(fixed, true);
+        fixed = any(fixed, true);
         this.canvas.dom.style.position = fixed ? 'fixed' : absolute;
     },
 
@@ -623,9 +622,9 @@ type("PopupWidget", [], {
          */
         if (Browser.IE) {
             this.canvas.dom.style.display = 'none';
-            setTimeout(function() {$E(document.body).remove(self.canvas)}, 500);
+            setTimeout(function() {$E(document.body).remove(self.canvas);}, 500);
         } else {
-            $E(document.body).remove(self.canvas)
+            $E(document.body).remove(self.canvas);
         }
 
         this.isopen = false;

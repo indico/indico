@@ -8,6 +8,23 @@
  */
 var ReadyState = new Enum("Uninitialized", "Loading", "Loaded", "Interactive", "Complete");
 
+//function jsonRpcStore(url, method, params) {
+//      function commit() {
+//
+//      }
+//
+//      var store = {
+//              list: function(handler) {
+//
+//              },
+//              fetch: function(key, handler) {
+//                      schedule()
+//              }
+//      };
+//
+//      return store;
+//}
+
 /**
  * Returns a JSON-RPC object source. Argument dontWatch specifies if the changes have not to be commited to the server.
  * @param {String} url
@@ -119,13 +136,11 @@ function jsonRpcValue(url, method, params, def) {
 
         self.set = function(value) {
             var old = self.get();
-
             object.update({
-                state: SourceState.Loading,
-                error: null
-            });
-
-            jsonRpcCommit(url, method, params, value, process);
+                        state: SourceState.Committing,
+                        error: null
+                });
+                jsonRpcCommit(url, method, params, value, process)
             return old;
         };
         self.refresh = function() {
@@ -209,7 +224,7 @@ function jsonRequest(url, value, handler) {
  * @return {XMLHttpRequest} request
  */
 function webRequest(url, contentType, body, handler) {
-        var transport = webTransport();
+        var transport = Web.transport();
         try {
                 transport.open("POST", url, true);
                 transport.setRequestHeader("Accept", "text/javascript, text/html, application/xml, text/xml, application/json, */*");
@@ -230,17 +245,55 @@ function webRequest(url, contentType, body, handler) {
         } catch (e) {
                 handler(null, e);
         }
-        return transport;
+        return transport.abort;
 }
+
+/**
+ * Requests static resource via HTTP GET
+ * @param {String} url
+ * @param {Function} handler
+ * @return {XMLHttpRequest} request
+ */
+function webGet(url, handler) {
+        var transport = Web.transport();
+        try {
+                transport.open("GET", url, true);
+                transport.setRequestHeader("Accept", "text/javascript, text/html, application/xml, text/xml, application/json, */*");
+                transport.setRequestHeader("Cache-Control", "max-age=1000000000");
+                transport.onreadystatechange = function() {
+                        if (transport.readyState != ReadyState.Complete) {
+                                return;
+                        }
+                        transport.onreadystatechange = null;
+                        var status = transport.status;
+                        if (status >= 200 && status < 300) {
+                                handler(transport.responseText, null);
+                        } else {
+                                handler(transport.responseText, [status, transport.statusText]);
+                        }
+                };
+                transport.send(null);
+        } catch (e) {
+                handler(null, e);
+        }
+        return transport.abort;
+}
+
+var Web = {};
 
 /**
  * Returns a new XMLHttpRequest.
  * @return {XMLHttpRequest}
  */
-function webTransport() {
+if (isDefined("XMLHttpRequest")) {
+        Web.transport = function(){
+                return new XMLHttpRequest();
+        };
+} else {
+        Web.transport = function(){
         return tryAny(
-                function() { return new XMLHttpRequest(); },
                 function() { return new ActiveXObject('Msxml2.XMLHTTP'); },
                 function() { return new ActiveXObject('Microsoft.XMLHTTP'); }
         );
+        };
 }
