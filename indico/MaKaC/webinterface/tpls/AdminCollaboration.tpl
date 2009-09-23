@@ -116,10 +116,10 @@
         <span id="resultsMessage"><%= _("(Results will appear here)")%></span>
         <div id="resultsInfo" style="display:none;">
             <div class="CATotalInIndexDiv">
-                <span id="totalInIndex"></span><span> bookings in this index.</span>
+                <span id="totalInIndex"></span><span>&nbsp;bookings in this index.</span>
             </div>
             <div class="CANResultsDiv">
-                <span>Query returned </span><span id="nBookings"></span><span> bookings.</span>
+                <span>Query returned&nbsp;</span><span id="nBookings"></span><span>&nbsp;bookings.</span>
             </div>
         </div>
         <table cellpadding="0" cellspacing="0" class="CAResultsTable" id ="results">
