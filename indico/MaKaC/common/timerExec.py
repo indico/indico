@@ -35,6 +35,7 @@ from MaKaC.common.info import HelperMaKaCInfo
 from Counter import Counter
 from MaKaC.user import Avatar
 from MaKaC.common.timezoneUtils import nowutc
+from MaKaC.common.contextManager import ContextManager
 from MaKaC.statistics import CategoryStatistics
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.trashCan import TrashCanManager
@@ -77,7 +78,21 @@ class toExec:
                 self._file.flush()
                 return
         print text
-    
+
+    def _runObj(self):
+        # create the context
+        ContextManager.create()
+
+        try:
+            obj.run()
+        except Exception, e:
+            self._printOutput(e)
+            self._sendErrorEmail(e)
+
+        # destroy the context
+        ContextManager.destroy()
+
+
     def execute(self):
         try:
             self._initLog()
@@ -105,6 +120,7 @@ class toExec:
                 else:
                     try:
                         self._printOutput("\t--->Running task <%s>"%task.getId())
+
                         if task.getStartDate() == None or task.getStartDate() < nowutc():
                             self._printOutput("\t (SINGLE RUN)")
                             # the task is started
@@ -120,12 +136,9 @@ class toExec:
                                 for obj in task.getObjList():
                                     self._printOutput("\t\tRunning object <%s> (start date: %s)"%(obj.getId(),task.getStartDate()))
                                     #task.setLastDate(datetime.now())
-                                    try:
-                                        obj.run()
-                                    except Exception, e:
-                                        self._printOutput(e)
-                                        self._sendErrorEmail(e)
-                                        
+
+                                    self._runObj(obj)
+
                                     self._printOutput("\t\tEnd object")
                                 task.setLastDate(nowutc())
                                 task.setRunning(False)
@@ -150,11 +163,9 @@ class toExec:
                                     for obj in task.getObjList():
                                         self._printOutput("\tRunning object %s (last date: %s)"%(obj.getId(),task.getLastDate()))
                                         #task.setLastDate(datetime.now())
-                                        try:
-                                            obj.run()
-                                        except Exception, e:
-                                            self._printOutput(e)
-                                            self._sendErrorEmail(e)
+
+                                        self._runObj(obj)
+
                                         self._printOutput("\t\tEnd object")
                                     if task.getLastDate() and task.getEndDate():
                                         if task.getLastDate() + task.getInterval() > task.getEndDate():

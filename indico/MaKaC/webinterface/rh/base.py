@@ -50,6 +50,8 @@ from xml.sax.saxutils import escape
 
 from MaKaC.common.logger import Logger
 
+from MaKaC.common.contextManager import ContextManager
+from MaKaC.i18n import _
 
 class RequestHandlerBase(object):
 
@@ -365,7 +367,10 @@ class RH(RequestHandlerBase):
         retry = 10
         textLog = []
         self._startTime = datetime.now()
-        
+
+        # create the context
+        ContextManager.create()
+
         #redirect to https if necessary
         if self._tohttps and not self._req.is_https():
             current_url = self._req.construct_url(self._req.unparsed_uri)
@@ -502,12 +507,20 @@ class RH(RequestHandlerBase):
                 self._req.status=apache.HTTP_INTERNAL_SERVER_ERROR
             except NameError:
                 pass
-            
+
+
+
         #if we have an https request, we replace the links to Indico images by https ones.
         if self._req.is_https() and self._tohttps and res is not None:
-            res = res.replace(Config.getInstance().getImagesBaseURL(),
-                              urlHandlers.setSSLPort(Config.getInstance().getImagesBaseSecureURL()))
-            
+            imagesBaseURL = Config.getInstance().getImagesBaseURL()
+            imagesBaseSecureURL = urlHandlers.setSSLPort(Config.getInstance().getImagesBaseSecureURL())
+            res = res.replace(imagesBaseURL, imagesBaseSecureURL)
+            res = res.replace(escapeHTMLForJS(imagesBaseURL), escapeHTMLForJS(imagesBaseSecureURL))
+
+        # destroy the context
+        ContextManager.destroy()
+
+
         totalTime = (datetime.now() - self._startTime)
         textLog.append("%s : Request ended"%totalTime)
         
