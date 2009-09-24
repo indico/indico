@@ -27,6 +27,7 @@ from MaKaC.plugins.Collaboration.EVO.common import getMinStartDate,\
     getMaxEndDate
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.i18n import _
+from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate
 
 class WNewBookingForm(WCSPageTemplateBase):
         
@@ -35,8 +36,14 @@ class WNewBookingForm(WCSPageTemplateBase):
         
         vars["EventTitle"] = self._conf.getTitle()
         vars["EventDescription"] = unescape_html(strip_ml_tags( self._conf.getDescription())).strip()
-        vars["DefaultStartDate"] = formatDateTime(self._conf.getAdjustedStartDate() - timedelta(0,0,0,0,CollaborationTools.getCollaborationPluginType().getOption("startMinutes").getValue()))
-        vars["DefaultEndDate"] = formatDateTime(self._conf.getAdjustedEndDate())
+        
+        defaultStartDate = self._conf.getAdjustedStartDate() - timedelta(0,0,0,0,CollaborationTools.getCollaborationOptionValue("startMinutes"))
+        nowStartDate = getAdjustedDate(nowutc() - timedelta(0,0,0,0, self._EVOOptions["allowedPastMinutes"].getValue() / 2), self._conf)
+        vars["DefaultStartDate"] = formatDateTime(max(defaultStartDate, nowStartDate))
+        
+        defaultEndDate = self._conf.getAdjustedEndDate()
+        nowEndDate = nowStartDate + timedelta(0,0,0,0, self._EVOOptions["allowedMinutes"].getValue())
+        vars["DefaultEndDate"] = formatDateTime(max(defaultEndDate, nowEndDate))
         vars["Communities"] = self._EVOOptions["communityList"].getValue()
         
         return vars
