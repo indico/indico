@@ -282,13 +282,13 @@ type("TimetableManagementActions", [], {
 
                                var message = {
                                    OWNER_START_DATE_EXTENDED: {
-                                       SessionSlot : $T('Interval start time changed from '),
-                                       Session: $T('Interval start time changed from '),
+                                       SessionSlot : $T('The <strong>starting time</strong> of the session interval moved from  '),
+                                       Session: $T('The <strong>starting time</strong> of the session interval moved from '),
                                        Conference: $T('The <strong>starting time</strong> of the <strong>Conference</strong> was moved from ')
                                    },
                                    OWNER_END_DATE_EXTENDED: {
-                                       SessionSlot : $T('Interval end time changed from '),
-                                       Session: $T('Interval end time changed from '),
+                                       SessionSlot : $T('The <strong>ending time</strong> of the session interval moved from '),
+                                       Session: $T('The <strong>ending time</strong> of the session interval moved from '),
                                        Conference: $T('The <strong>ending time</strong> of the <strong>Conference</strong> was moved from ')
                                    },
                                    ENTRIES_MOVED: {
@@ -632,13 +632,19 @@ type("TimetableManagementActions", [], {
         this._hideWarnings();
 
         if (result.autoOps.length > 0) {
-            this.warningArea.dom.style.display = 'block';
             each(result.autoOps,
                  function(op) {
-                     if (self.intervalMode) {
-                         self.warnings.append(op);
-                     } else {
-                         self.processedWarnings.append(op);
+                     // dirty, dirty HACK
+                     // check that the message is not redundant
+                     // (dates are the same)
+                     if (op[3] != op[4]) {
+                         if (self.intervalMode) {
+                             self.warningArea.dom.style.display = 'block';
+                             self.warnings.append(op);
+                         } else {
+                             self.warningArea.dom.style.display = 'block';
+                             self.processedWarnings.append(op);
+                         }
                      }
                  });
         }
