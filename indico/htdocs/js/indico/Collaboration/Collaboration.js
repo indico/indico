@@ -855,6 +855,21 @@ var dateChangeHelpPopup = function(event) {
 };
 
 /**
+ * Mouseover help popup for the 'Keep booking synchronized with event' advanced option, in case it is disabled.
+ */
+
+var dateChangeDisabledHelpPopup = function(event) {
+    IndicoUI.Widgets.Generic.tooltip(this, event,
+        '<div style="padding:3px">' +
+            $T('By activating this option, you ensure that') + '<br \/>' +
+            $T('if a manager changes the event\'s dates,') + '<br \/>' +
+            $T('this booking\'s dates change accordingly.') + '<br \/>' +
+            $T('The event already took place,') + '<br \/>' +
+            $T('so you cannot activate this option.') + '<br \/>' +
+        '<\/div>');
+};
+
+/**
  * Mouseover help popup for the 'Keep booking hidden' advanced option
  */
 var hiddenHelpPopup = function(event) {
@@ -931,6 +946,8 @@ type ("BookingPopup", ["ExclusivePopup"],
             
             // If this kind of booking can be notified of date changes, we offer a checkbox (checked by default)
             if (canBeNotifiedOnDateChanges[self.bookingType]) {
+                
+                // If this booking in particular cannot be notified of date changes any more, we disable the checkbox
                 var dateCheckBox = Html.checkbox({id : "dateCheckBox"});
                 var dateLabel = Html.label({style: {fontWeight: "normal"}}, $T("Keep booking synchronized with event"));
                 dateLabel.dom.htmlFor = "dateCheckBox";
@@ -938,11 +955,18 @@ type ("BookingPopup", ["ExclusivePopup"],
                 dateChangeHelpImg.dom.onmouseover = dateChangeHelpPopup;
                 var dateChangeDiv = Html.div({style : {display: "block", marginTop:pixels(10), marginLeft: pixels(50)}},
                         dateCheckBox, dateLabel, dateChangeHelpImg);
+                
                 if (self.popupType === 'create') {
                     dateCheckBox.dom.checked = true;
                 } else if (self.popupType === 'edit'){
                     dateCheckBox.dom.checked = self.booking.bookingParams["notifyOnDateChanges"];
+                    if (!self.booking.canBeNotifiedOfEventDateChanges) {
+                        dateCheckBox.dom.disabled = true;
+                        dateLabel.dom.className = 'disabled';
+                        dateChangeHelpImg.dom.onmouseover = dateChangeDisabledHelpPopup;
+                    }
                 }
+                
                 advancedDiv.append(dateChangeDiv);
             }
             

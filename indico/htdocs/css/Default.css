@@ -112,6 +112,10 @@ form {
     margin: 0;
 }
 
+label.disabled{
+    color: gray;
+}
+
 code {
    font-family: monospace;
 }
