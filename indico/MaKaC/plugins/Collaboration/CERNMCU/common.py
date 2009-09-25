@@ -202,7 +202,7 @@ class CERNMCUError(CSErrorBase):
     def __init__(self, faultCode, info = ''):
         CSErrorBase.__init__(self)
         self._faultCode = faultCode
-        self.info = info
+        self._info = info
         
     @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.CERNMCUError'], 'faultCode')
     def getFaultCode(self):
@@ -219,7 +219,10 @@ class CERNMCUError(CSErrorBase):
         return ''
         
     def getLogMessage(self):
-        return "CERNMCU Error. Fault code: " + str(self._faultCode) + ". Info: " + str(self._info)
+        message = "CERNMCU Error. Fault code: " + str(self._faultCode)
+        if self._info:
+            message += ". Info: " + str(self._info)
+        return message
     
 class CERNMCUException(CollaborationException):
     def __init__(self, msg, inner = None):
