@@ -31,5 +31,10 @@ class RoomCERN( Room ):
     For documentation of methods see base class.
     """
 
-    vcList = ["Built-in (MCU) Bridge", "EVO", "Phone Conference", "ESnet collaboration", "HERMES collaboration", "H323 point2point", "ISDN point2point", "I don't know"]
+    vcList = ["Built-in (MCU) Bridge",
+              "EVO",
+              "ESnet MCU",
+              "CERN MCU",
+              "H323 point2point",
+              "I don't know"]
 
