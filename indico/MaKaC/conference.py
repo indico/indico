@@ -5729,8 +5729,7 @@ class Session(Persistent):
                 raise ParentTimingError( _("The session starting date cannot be prior to the event starting date"), _("Session"))
             elif check==2:
                 autoOps.append((self, "OWNER_START_DATE_EXTENDED",
-                                conf, sdate.astimezone(timezone(conf.getTimezone())),
-                                conf.getSchedule().getAdjustedStartDate()))
+                                conf, sdate.astimezone(timezone(conf.getTimezone()))))
                 conf.setStartDate(sdate,check=0,moveEntries=0)
         return autoOps
 
@@ -5819,14 +5818,13 @@ class Session(Persistent):
                 if check==2:
                     if edate>confEndDate:
                         autoOps.append((self, "OWNER_END_DATE_EXTENDED",
-                                        self.getConference(), edate,
-                                        conf.getSchedule().getAdjustedEndDate(),
-                                        conf.getSchedule().getAdjustedStartDate()))
-                        self.getConference().setEndDate(edate.astimezone(tz))
+                                        self.getConference(),
+                                        edate.astimezone(tz)))
+                        self.getConference().setEndDate(edate)
                     if edate<=confStartDate:
                         autoOps.append((self, "OWNER_START_DATE_EXTENDED",
-                                        self.getConference(), edate.astimezone(tz),
-                                        conf.getSchedule().getAdjustedStartDate()))
+                                        self.getConference(),
+                                        edate.astimezone(tz)))
                         self.getConference().setStartDate(edate)
         # check inner schedule
         if len(self.getSlotList()) != 0 and self.getSlotList()[-1].getSchedule().hasEntriesAfter(edate):
@@ -6967,8 +6965,7 @@ class SessionSlot(Persistent):
 
         if difference != None and difference != timedelta(0) and moveEntries:
             autoOps.append((self, "ENTRIES_MOVED",
-                            self, sDate.astimezone(timezone(self.getTimezone())),
-                            self.getAdjustedStartDate()))
+                            self, sDate.astimezone(timezone(self.getTimezone()))))
             self.getSchedule().moveEntriesBelow(difference,self.getSchedule().getEntries()[:])
 
         if self.getConference() and not self.getConference().getEnableSessionSlots() and self.getSession().getStartDate() != sDate:
@@ -7053,8 +7050,7 @@ class SessionSlot(Persistent):
                             _("Slot"))
                 elif check==2:
                     autoOps.append((self, "OWNER_END_DATE_EXTENDED",
-                                    self.getSession(), eDate.astimezone(tz),
-                                    self.getSession().getAdjustedEndDate()))
+                                    self.getSession(), eDate.astimezone(tz)))
                     self.getSession().setEndDate(eDate,check)
             if eDate.astimezone(tz).date() > self.startDate.astimezone(tz).date():
                 raise TimingError( _("The time slot must end on the same day it has started"), _("Slot"))
@@ -7081,8 +7077,7 @@ class SessionSlot(Persistent):
             dur = timedelta(days=int(days),hours=int(hours),minutes=int(minutes))
         if dur==0 and check==2:
             autoOps.append((self, "DURATION_SET",
-                            self, 1,
-                            0))
+                            self, 1))
             dur = timedelta(minutes=1)
         if dur > timedelta(days=1) and check==2:
             pass#dur = timedelta(days=1)
@@ -8384,8 +8379,7 @@ class Contribution(Persistent):
                     _("Contribution"))
             if check == 2:
                 autoOps.append((self, "OWNER_START_DATE_EXTENDED",
-                                owner, sDate.astimezone(tz),
-                                owner.getAdjustedStartDate()))
+                                owner, sDate.astimezone(tz)))
                 owner.setDates(sDate,owner.getEndDate(),check)
         if sDate > owner.getEndDate():
             if check == 1:
@@ -8471,8 +8465,7 @@ class Contribution(Persistent):
                             _("Contribution"))
                 elif check==2:
                     autoOps.append((self, "OWNER_END_DATE_EXTENDED",
-                                    owner, self.getAdjustedEndDate(),
-                                    owner.getAdjustedEndDate()))
+                                    owner, self.getAdjustedEndDate()))
                     owner.setEndDate(endDate, check)
 
         return autoOps

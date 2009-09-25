@@ -29,8 +29,7 @@ def translateAutoOps(autoOps):
          op,
          getHierarchicalId(target),
          formatTime(newValue) if type(newValue) == datetime.datetime else newValue,
-         formatTime(oldValue) if type(oldValue) == datetime.datetime else oldValue),
-        autoOps)
+         autoOps)
 
 
 class ConferenceGetSchedule(conferenceServices.ConferenceDisplayBase):
