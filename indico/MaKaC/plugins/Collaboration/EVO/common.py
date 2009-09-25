@@ -192,10 +192,11 @@ def getMaxEndDate(conference):
     
 class EVOError(CSErrorBase):
     
-    def __init__(self, errorType, requestURL = None):
+    def __init__(self, errorType, requestURL = None, userMessage = None):
         CSErrorBase.__init__(self)
         self._errorType = errorType
         self._requestURL = requestURL
+        self._userMessage = None
         
     @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.EVOError',
                 'MaKaC.plugins.Collaboration.EVO.common.OverlappedError',
@@ -210,6 +211,20 @@ class EVOError(CSErrorBase):
                'requestURL')
     def getRequestURL(self):
         return self._requestURL
+    
+    def getUserMessage(self):
+        if self._userMessage:
+            return self._userMessage
+        else:
+            if self._errorType == 'duplicated':
+                return "This EVO meeting could not be created or changed because EVO considers the resulting meeting as duplicated."
+            elif self._errorType == 'start_in_past':
+                return "This EVO meeting could not be created or changed because EVO does not allow meeting starting in the past."
+            else:
+                return self._errorType
+    
+    def getLogMessage(self):
+        return "EVO Error: " + str(self._errorType) + " for request " + str(self._requestURL)
 
     
     

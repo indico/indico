@@ -256,8 +256,10 @@ class CSBooking(CSBookingBase):
                     return EVOError('duplicated', str(requestURL))
                 if e.message == "START_IN_PAST":
                     return EVOError('start_in_past', str(requestURL))
-                else:
-                    raise EVOException("The booking could not be modified due to a problem with the EVO Server\n.The EVO Server sent the following error message: " + e.message, e)
+                if e.message == "UNKNOWN_MEETING":
+                    return EVOError('deletedByEVO', str(requestURL), 'This EVO meeting could not be modified because it was deleted in the EVO system')
+                
+                raise EVOException("The booking could not be modified due to a problem with the EVO Server\n.The EVO Server sent the following error message: " + e.message, e)
             
         else:
             self._create()

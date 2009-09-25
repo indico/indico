@@ -466,7 +466,7 @@ class CSBooking(CSBookingBase):
         except Fault, e:
             Logger.get('CERNMCU').warning("""Evt:%s, calling participant.add. Got error: %s""" % (self._conf.getId(), str(e)))
             fault = self.handleFault('add', e)
-            fault.setMessage(participant.getIp())
+            fault.setInfo(participant.getIp())
             return fault
         
     def modifyParticipantDisplayName(self, participantName, displayName):
@@ -494,7 +494,7 @@ class CSBooking(CSBookingBase):
         except Fault, e:
             Logger.get('CERNMCU').warning("""Evt:%s, calling participant.modify. Got error: %s""" % (self._conf.getId(), str(e)))
             fault = self.handleFault('modifyParticipant', e)
-            fault.setMessage(participantName)
+            fault.setInfo(participantName)
             return fault
         
     def removeParticipant(self, participantName):

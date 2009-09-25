@@ -118,6 +118,12 @@ class WebcastRequestError(CSErrorBase):
     def getInner(self):
         return str(self._inner)
     
+    def getUserMessage(self):
+        return ''
+    
+    def getLogMessage(self):
+        return "Webcast Request error for operation: " + str(self._operation) + ", inner exception: " + str(self._inner)
+    
     
 class WebcastRequestException(CollaborationServiceException):
     pass

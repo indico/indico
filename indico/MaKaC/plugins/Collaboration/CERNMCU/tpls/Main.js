@@ -106,7 +106,7 @@
                 IndicoUtil.markInvalidField($E('title'), $T("This conference title already exists in the MCU. Please choose a different one."));
                 break;
             case 3:
-                CSErrorPopup("MCU Error", [$T("Participant with IP ") + error.message + $T(" already exists in the MCU.")]);
+                CSErrorPopup("MCU Error", [$T("Participant with IP ") + error.info + $T(" already exists in the MCU.")]);
             case 6:
                 CSErrorPopup("MCU Error", [$T("There are too many conferences in the MCU. No more can be created right now.")]);
             case 7:
