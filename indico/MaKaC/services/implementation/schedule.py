@@ -555,7 +555,7 @@ class SessionScheduleGetDayEndDate(sessionServices.SessionModifUnrestrictedTTCoo
         eDate = self._target.getSchedule().calculateDayEndDate(self._date)
         return eDate.strftime('%d/%m/%Y %H:%M')
 
-class ScheduleEditSlotBase(LocationSetter):
+class ScheduleEditSlotBase(LocationSetter, AutoOpsMixin):
 
     def _addConveners(self, slot):
         pass
@@ -574,6 +574,8 @@ class ScheduleEditSlotBase(LocationSetter):
         self._isSessionTimetable = pManager.extract("sessionTimetable", pType=bool, allowEmpty=True)
 
     def _getAnswer(self):
+
+        self.initializeAutoOps()
 
         self._slot.setValues({"title": self._title or "",
                         "sDate": self._startDateTime,
@@ -598,6 +600,7 @@ class ScheduleEditSlotBase(LocationSetter):
         return {'day': schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
                 'id': pickledData['id'],
                 'entry': pickledData,
+                'autoOps': translateAutoOps(self.getAutoOps()),
                 'session': DictPickler.pickle(self._slot.getSession(), timezone=self._conf.getTimezone())}
 
 class SessionScheduleAddSessionSlot(ScheduleEditSlotBase, sessionServices.SessionModifUnrestrictedTTCoordinationBase):
@@ -891,7 +894,7 @@ methodMap = {
     "session.deleteSlot": SessionScheduleDeleteSessionSlot,
     "session.changeColors": SessionScheduleChangeSessionColors,
     "session.modifyStartEndDate": SessionScheduleModifyStartEndDate,
-    
+
 
     "session.getUnscheduledContributions": SessionGetUnscheduledContributions,
     "slot.scheduleContributions": SessionSlotScheduleContributions,

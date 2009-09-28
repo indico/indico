@@ -607,10 +607,16 @@ type("TimetableManagementActions", [], {
             slot = this.session;
         }
 
+        var oldStartTime, oldEndTime;
+
         // in the affirmative case, fetch the time limits
         if (slot) {
-            var oldStartTime = slot.startDate.time.slice(0,5);
-            var oldEndTime = slot.endDate.time.slice(0,5);
+            oldStartTime = slot.startDate.time.slice(0,5);
+            oldEndTime = slot.endDate.time.slice(0,5);
+        } else {
+            // otherwise, we'll want the conference dates instead
+            oldStartTime = this.eventInfo.startDate.time.slice(0,5);
+            oldEndTime = this.eventInfo.endDate.time.slice(0,5);
         }
 
 
@@ -665,9 +671,9 @@ type("TimetableManagementActions", [], {
         if (result.autoOps && result.autoOps.length > 0) {
             each(result.autoOps,
                  function(op) {
-                     self.warningArea.dom.style.display = 'block';
                      var warning = self._processWarning(op, oldStartTime, oldEndTime);
                      if (warning && self.processedWarnings.indexOf(warning) == null) {
+                         self.warningArea.dom.style.display = 'block';
                          self.processedWarnings.append(warning);
                      }
                  });
