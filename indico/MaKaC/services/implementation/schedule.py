@@ -151,9 +151,12 @@ class ScheduleAddContribution(LocationSetter, AutoOpsMixin):
 
         schEntry = contribution.getSchEntry()
         pickledData = DictPickler.pickle(schEntry, timezone=self._conf.getTimezone())
+        pickledDataSlotSchEntry = self._getSlotEntry()
+
         return {'day': schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
                 'id': pickledData['id'],
                 'entry': pickledData,
+                'slotEntry': pickledDataSlotSchEntry,
                 'autoOps': translateAutoOps(self.getAutoOps())}
 
 
@@ -172,6 +175,10 @@ class ConferenceScheduleAddContribution(ScheduleAddContribution, conferenceServi
         if self._needsToBeScheduled:
             self._target.getSchedule().addEntry(contribution.getSchEntry(),1)
 
+    def _getSlotEntry(self):
+        return None
+
+
 class SessionSlotScheduleAddContribution(ScheduleAddContribution, sessionServices.SessionSlotModifCoordinationBase):
 
     def _checkParams(self):
@@ -184,6 +191,10 @@ class SessionSlotScheduleAddContribution(ScheduleAddContribution, sessionService
 
     def _schedule(self, contribution):
         return  self._slot.getSchedule().addEntry(contribution.getSchEntry())
+
+    def _getSlotEntry(self):
+        return DictPickler.pickle(self._slot.getConfSchEntry(), timezone=self._conf.getTimezone())
+
 
 class ConferenceScheduleAddSession(AutoOpsMixin, conferenceServices.ConferenceModifBase, LocationSetter):
 
@@ -389,7 +400,7 @@ class SessionSlotScheduleAddBreak(ScheduleEditBreakBase, sessionServices.Session
 
     def _addToSchedule(self, b):
         self._slot.getSchedule().addEntry(b, 2)
-        
+
 class SessionSlotScheduleEditBreak(ScheduleEditBreakBase, sessionServices.SessionSlotModifCoordinationBase):
 
     def _checkParams(self):

@@ -593,6 +593,7 @@ type("TimetableManagementActions", [], {
      *
      */
     _updateEntry: function(result, data, originalArgs) {
+
         var setData = data ? false : true;
         data = any(data, this.timetable.getData());
 
