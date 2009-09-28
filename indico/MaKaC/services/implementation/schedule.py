@@ -588,6 +588,7 @@ class ScheduleEditSlotBase(LocationSetter):
                 'id': pickledData['id'],
                 'entry': pickledData,
                 'session': DictPickler.pickle(self._slot.getSession(), timezone=self._conf.getTimezone())}
+
 class SessionScheduleAddSessionSlot(ScheduleEditSlotBase, sessionServices.SessionModifUnrestrictedTTCoordinationBase):
 
     def _checkParams(self):
@@ -809,9 +810,12 @@ class ScheduleContributions(AutoOpsMixin):
             self._target.getSchedule().addEntry(schEntry)
 
             pickledData = DictPickler.pickle(schEntry, timezone=self._conf.getTimezone())
+            pickledDataSlotSchEntry = self._getSlotEntry()
+
             entries.append({'day': schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
                             'id': pickledData['id'],
                             'entry': pickledData,
+                            'slotEntry': pickledDataSlotSchEntry,
                             'autoOps': translateAutoOps(self.getAutoOps())
                             })
         return entries
@@ -828,6 +832,9 @@ class SessionSlotScheduleContributions(ScheduleContributions, sessionServices.Se
         if self._slot.getSession().getScheduleType() == "poster":
             contrib.setStartDate(self._slot.getStartDate())
 
+    def _getSlotEntry(self):
+        return DictPickler.pickle(self._slot.getConfSchEntry(), timezone=self._conf.getTimezone())
+
 class ConferenceScheduleContributions(ScheduleContributions, conferenceServices.ConferenceModifBase):
     def _checkParams(self):
         conferenceServices.ConferenceModifBase._checkParams(self)
@@ -838,6 +845,9 @@ class ConferenceScheduleContributions(ScheduleContributions, conferenceServices.
 
     def _handlePosterContributions(self):
         pass
+
+    def _getSlotEntry(self):
+        return None
 
 
 methodMap = {

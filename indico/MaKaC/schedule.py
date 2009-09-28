@@ -36,6 +36,7 @@ from MaKaC.common.PickleJar import Retrieves
 from MaKaC.common.PickleJar import Updates
 from MaKaC.common.PickleJar import DictPickler
 from MaKaC.common.Conversion import Conversion
+from MaKaC.common.contextManager import ContextManager
 
 import MaKaC.conference
 
