@@ -139,8 +139,6 @@ class TimeSchedule(Schedule, Persistent):
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
 
-        autoOps = []
-
         if entry.isScheduled():
             # remove it from the old schedule and add it to this one
             entry.getSchedule().removeEntry(entry)
@@ -156,10 +154,10 @@ class TimeSchedule(Schedule, Persistent):
                 if check==2:
                     newEndDate = self.getEndDate() + entry.getDuration()
 
-                    autoOps.append((owner,
-                                    "OWNER_END_DATE_EXTENDED",
-                                    owner,
-                                    newEndDate.astimezone(timezone(owner.getConference().getTimezone()))))
+                    ContextManager.get('autoOps').append((owner,
+                                                          "OWNER_END_DATE_EXTENDED",
+                                                          owner,
+                                                          newEndDate.astimezone(timezone(owner.getConference().getTimezone()))))
 
                     owner.setEndDate(newEndDate, check)
                     sDate = self.findFirstFreeSlot(entry.getDuration())
@@ -173,20 +171,20 @@ class TimeSchedule(Schedule, Persistent):
                 if check==1:
                     raise TimingError( _("Cannot schedule this entry because its start date (%s) is before its parents (%s)")%(entry.getStartDate(),self.getStartDate('UTC')),_("Add Entry"))
                 elif check == 2:
-                    autoOps.append((owner,
-                                    "OWNER_START_DATE_EXTENDED",
-                                    owner,
-                                    entry.getAdjustedStartDate()))
-                    autoOps += owner.setStartDate(entry.getStartDate(),check)
+                    ContextManager.get('autoOps').append((owner,
+                                                          "OWNER_START_DATE_EXTENDED",
+                                                          owner,
+                                                          entry.getAdjustedStartDate()))
+                    owner.setStartDate(entry.getStartDate(),check)
             elif entry.getEndDate()>self.getEndDate('UTC'):
                 if check==1:
                     raise TimingError( _("Cannot schedule this entry because its end date (%s) is after its parents (%s)")%(entry.getEndDate(),self.getEndDate('UTC')),_("Add Entry"))
                 elif check == 2:
-                    autoOps.append((owner,
-                                    "OWNER_END_DATE_EXTENDED",
-                                    owner,
-                                    entry.getAdjustedEndDate()))
-                    autoOps += owner.setEndDate(entry.getEndDate(),check)
+                    ContextManager.get('autoOps').append((owner,
+                                                          "OWNER_END_DATE_EXTENDED",
+                                                          owner,
+                                                          entry.getAdjustedEndDate()))
+                    owner.setEndDate(entry.getEndDate(),check)
         #we make sure the entry end date does not go outside the schedule
         #   boundaries
         if entry.getEndDate() is not None and \
@@ -197,7 +195,6 @@ class TimeSchedule(Schedule, Persistent):
         entry.setSchedule(self,self._getNewEntryId())
         self.reSchedule()
         self._p_changed = 1
-        return autoOps
 
     def _setEntryDuration(self,entry):
         if entry.getDuration() is None:
@@ -455,8 +452,6 @@ class TimeSchedule(Schedule, Persistent):
         """diff: the difference we have to increase/decrease each entry of the list.
            entriesList: list of entries for applying the diff"""
 
-        autoOps = []
-
         if diff is not None:
             from MaKaC.conference import SessionSlot
             sessionsAlreadyModif=[]
@@ -467,11 +462,10 @@ class TimeSchedule(Schedule, Persistent):
                         # if the slot is the first in the session schedule
                         # we also change the session start date
                         if session.getSchedule().getEntries()[0].getOwner()==entry.getOwner():
-                            autoOps += session.setStartDate(session.getStartDate()+diff, check=0, moveEntries=0)
+                            session.setStartDate(session.getStartDate()+diff, check=0, moveEntries=0)
                         sessionsAlreadyModif.append(session)
                 entry.setStartDate(entry.getStartDate()+diff, check=0, moveEntries=1)
 
-        return autoOps
 
 class SchEntry(Persistent):
     """base schedule entry class. Do NOT instantiate
@@ -734,7 +728,6 @@ class SlotSchedule(TimeSchedule):
             2: check and adapt the owner dates
         """
 
-        autoOps = []
         owner = self.getOwner()
 
         if (entry is None) or self.hasEntry(entry):
@@ -752,11 +745,11 @@ class SlotSchedule(TimeSchedule):
                     self.getOwner().getStartDate().strftime('%Y-%m-%d %H:%M')),\
                       _("Slot"))
             elif check == 2:
-                autoOps.append((owner,
-                                "OWNER_START_DATE_EXTENDED",
-                                owner,
-                                entry.getAdjustedStartDate()))
-                autoOps += self.getOwner().setStartDate(entry.getStartDate(),check,0)
+                ContextManager.get('autoOps').append((owner,
+                                                      "OWNER_START_DATE_EXTENDED",
+                                                      owner,
+                                                      entry.getAdjustedStartDate()))
+                self.getOwner().setStartDate(entry.getStartDate(),check,0)
         if entry.getEndDate()!=None and entry.getEndDate() > self.getOwner().getEndDate():
             if check == 1:
                 raise ParentTimingError( _("Cannot add entry which finishes after (%s) the time slot (%s)")%\
@@ -764,15 +757,14 @@ class SlotSchedule(TimeSchedule):
                     self.getOwner().getEndDate().strftime('%Y-%m-%d %H:%M')),\
                      "Slot")
             elif check == 2:
-                autoOps.append((owner,
-                                "OWNER_END_DATE_EXTENDED",
-                                owner,
-                                entry.getAdjustedEndDate()))
-                autoOps += self.getOwner().setEndDate(entry.getEndDate(),check)
+                ContextManager.get('autoOps').append((owner,
+                                                      "OWNER_END_DATE_EXTENDED",
+                                                      owner,
+                                                      entry.getAdjustedEndDate()))
+                self.getOwner().setEndDate(entry.getEndDate(),check)
         self._setEntryDuration(entry)
-        autoOps += self._addEntry(entry,check)
+        self._addEntry(entry,check)
 
-        return autoOps
 
     def moveUpEntry(self,entry):
         #not very smart, should be improved: contribs with same start date,

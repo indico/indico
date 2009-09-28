@@ -18,19 +18,26 @@ from MaKaC.services.implementation import session as sessionServices
 from MaKaC.common.timezoneUtils import setAdjustedDate
 from MaKaC.common.logger import Logger
 from MaKaC.common.utils import getHierarchicalId, formatTime
+from MaKaC.common.contextManager import ContextManager
 
 import datetime, pytz
 
 def translateAutoOps(autoOps):
 
     return map(
-        lambda (source, op, target, newValue, oldValue):
+        lambda (source, op, target, newValue):
         (getHierarchicalId(source),
          op,
          getHierarchicalId(target),
-         formatTime(newValue) if type(newValue) == datetime.datetime else newValue,
+         formatTime(newValue) if type(newValue) == datetime.datetime else newValue),
          autoOps)
 
+class AutoOpsMixin:
+    def initializeAutoOps(self):
+        ContextManager.set('autoOps',[])
+
+    def getAutoOps(self):
+        return ContextManager.get('autoOps')
 
 class ConferenceGetSchedule(conferenceServices.ConferenceDisplayBase):
     def _checkParams(self):
@@ -66,7 +73,7 @@ class LocationSetter:
                 target.setRoom(r)
                 r.setName(room)
 
-class ScheduleAddContribution(LocationSetter):
+class ScheduleAddContribution(LocationSetter, AutoOpsMixin):
 
     def __addPeople(self, contribution, pManager, elemType, method):
         """ Generic method for adding presenters, authors and
@@ -109,22 +116,22 @@ class ScheduleAddContribution(LocationSetter):
 
     def _getAnswer(self):
 
-        contribution = conference.Contribution()
+        self.initializeAutoOps()
 
-        autoOps = []
+        contribution = conference.Contribution()
 
         self._addToParent(contribution)
 
         contribution.setTitle(self._title)
         contribution.setKeywords('\n'.join(self._keywords))
 
-        autoOps += contribution.setDuration(self._duration/60, self._duration%60)
+        contribution.setDuration(self._duration/60, self._duration%60)
 
         if self._needsToBeScheduled:
             adjDate = setAdjustedDate(self._dateTime, self._conf)
-            autoOps += contribution.setStartDate(adjDate)
+            contribution.setStartDate(adjDate)
 
-        autoOps += self._schedule(contribution)
+        self._schedule(contribution)
 
         for field, value in self._fields.iteritems():
             contribution.setField(field, value)
@@ -147,7 +154,7 @@ class ScheduleAddContribution(LocationSetter):
         return {'day': schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
                 'id': pickledData['id'],
                 'entry': pickledData,
-                'autoOps': translateAutoOps(autoOps)}
+                'autoOps': translateAutoOps(self.getAutoOps())}
 
 
 class ConferenceScheduleAddContribution(ScheduleAddContribution, conferenceServices.ConferenceModifBase):
@@ -161,12 +168,9 @@ class ConferenceScheduleAddContribution(ScheduleAddContribution, conferenceServi
         contribution.setParent(self._target)
 
     def _schedule(self, contribution):
-        autoOps = []
-
         # 'check' param = 1 - dates will be checked for errors
         if self._needsToBeScheduled:
-            autoOps += self._target.getSchedule().addEntry(contribution.getSchEntry(),1)
-        return autoOps
+            self._target.getSchedule().addEntry(contribution.getSchEntry(),1)
 
 class SessionSlotScheduleAddContribution(ScheduleAddContribution, sessionServices.SessionSlotModifCoordinationBase):
 
@@ -181,7 +185,7 @@ class SessionSlotScheduleAddContribution(ScheduleAddContribution, sessionService
     def _schedule(self, contribution):
         return  self._slot.getSchedule().addEntry(contribution.getSchEntry())
 
-class ConferenceScheduleAddSession(conferenceServices.ConferenceModifBase, LocationSetter):
+class ConferenceScheduleAddSession(AutoOpsMixin, conferenceServices.ConferenceModifBase, LocationSetter):
 
     def __addConveners(self, session):
 
@@ -219,10 +223,11 @@ class ConferenceScheduleAddSession(conferenceServices.ConferenceModifBase, Locat
                                           allowEmpty=False)
 
     def _getAnswer(self):
+
+        self.initializeAutoOps()
+
         conf = self._target
         session = conference.Session()
-
-        autoOps = []
 
         session.setValues({
                      "title": self._title or "",
@@ -239,7 +244,7 @@ class ConferenceScheduleAddSession(conferenceServices.ConferenceModifBase, Locat
         slot = conference.SessionSlot(session)
 
         slot.setTitle(self._subtitle or "")
-        autoOps += slot.setStartDate(session.getStartDate())
+        slot.setStartDate(session.getStartDate())
 
         tz = pytz.timezone(self._conf.getTimezone())
         if session.getEndDate().astimezone(tz).date() > session.getStartDate().astimezone(tz).date():
@@ -250,7 +255,7 @@ class ConferenceScheduleAddSession(conferenceServices.ConferenceModifBase, Locat
         if dur > datetime.timedelta(days=1):
             dur = datetime.timedelta(days=1)
 
-        autoOps += slot.setDuration(dur=dur)
+        slot.setDuration(dur=dur)
         session.addSlot(slot)
 
         self.__addConveners(session)
@@ -268,7 +273,7 @@ class ConferenceScheduleAddSession(conferenceServices.ConferenceModifBase, Locat
                 'id': pickledData['id'],
                 'entry': pickledData,
                 'session': DictPickler.pickle(session, timezone=self._conf.getTimezone()),
-                'autoOps': translateAutoOps(autoOps)}
+                'autoOps': translateAutoOps(self.getAutoOps())}
 
 class ConferenceScheduleDeleteSession(conferenceServices.ConferenceScheduleModifBase):
 
@@ -425,7 +430,7 @@ class SessionSlotScheduleDeleteContribution(sessionServices.SessionSlotModifCoor
         self._slot.getSchedule().removeEntry(self._schEntry)
 
 
-class SessionSlotScheduleModifyStartEndDate(sessionServices.SessionSlotModifCoordinationBase):
+class SessionSlotScheduleModifyStartEndDate(AutoOpsMixin, sessionServices.SessionSlotModifCoordinationBase):
 
     def _checkParams(self):
         sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
@@ -437,11 +442,11 @@ class SessionSlotScheduleModifyStartEndDate(sessionServices.SessionSlotModifCoor
 
     def _getAnswer(self):
 
-        autoOps = []
+        self.initializeAutoOps()
 
-        autoOps += self._schEntry.setStartDate(self._startDate);
+        self._schEntry.setStartDate(self._startDate);
         duration = self._endDate - self._startDate
-        autoOps += self._schEntry.setDuration(dur=duration)
+        self._schEntry.setDuration(dur=duration)
 
         pickledDataEntry = DictPickler.pickle(self._schEntry, timezone=self._conf.getTimezone())
         pickledDataSlotSchEntry = DictPickler.pickle(self._slot.getConfSchEntry(), timezone=self._conf.getTimezone())
@@ -451,10 +456,10 @@ class SessionSlotScheduleModifyStartEndDate(sessionServices.SessionSlotModifCoor
                 'entry': pickledDataEntry,
                 'slotEntry': pickledDataSlotSchEntry,
                 'session': pickledDataSession,
-                'autoOps': translateAutoOps(autoOps)}
+                'autoOps': translateAutoOps(self.getAutoOps())}
 
 
-class ConferenceScheduleModifyStartEndDate(conferenceServices.ConferenceScheduleModifBase):
+class ConferenceScheduleModifyStartEndDate(AutoOpsMixin, conferenceServices.ConferenceScheduleModifBase):
 
     def _checkParams(self):
         conferenceServices.ConferenceScheduleModifBase._checkParams(self)
@@ -466,17 +471,17 @@ class ConferenceScheduleModifyStartEndDate(conferenceServices.ConferenceSchedule
 
     def _getAnswer(self):
 
-        autoOps = []
+        self.initializeAutoOps()
 
-        autoOps += self._schEntry.setStartDate(self._startDate, moveEntries=1);
+        self._schEntry.setStartDate(self._startDate, moveEntries=1);
         duration = self._endDate - self._startDate
-        autoOps += self._schEntry.setDuration(dur=duration)
+        self._schEntry.setDuration(dur=duration)
 
         entryId, pickledData = schedule.ScheduleToJson.processEntry(self._schEntry, self._conf.getTimezone())
         return {'day': self._schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
                 'id': pickledData['id'],
                 'entry': pickledData,
-                'autoOps': translateAutoOps(autoOps)}
+                'autoOps': translateAutoOps(self.getAutoOps())}
 
 class SessionScheduleModifyStartEndDate(sessionServices.SessionModifBase):
 
@@ -770,7 +775,7 @@ class SessionGetUnscheduledContributions(GetUnscheduledContributions, sessionSer
 
 
 
-class ScheduleContributions:
+class ScheduleContributions(AutoOpsMixin):
 
     """ Schedules the contribution in the timetable of the event"""
 
@@ -786,11 +791,12 @@ class ScheduleContributions:
         self._date = datetime.datetime(*(date.timetuple()[:6]+(0, pytz.timezone(self._target.getTimezone()))))
 
     def _getAnswer(self):
+
+        self.initializeAutoOps()
+
         entries = []
 
         for contribId in self._ids:
-
-            autoOps = []
 
             contrib = self._getContributionId(contribId)
 
@@ -798,15 +804,15 @@ class ScheduleContributions:
 
             d = self._target.getSchedule().calculateDayEndDate(self._date)
 
-            autoOps += contrib.setStartDate(d)
+            contrib.setStartDate(d)
             schEntry = contrib.getSchEntry()
-            autoOps += self._target.getSchedule().addEntry(schEntry)
+            self._target.getSchedule().addEntry(schEntry)
 
             pickledData = DictPickler.pickle(schEntry, timezone=self._conf.getTimezone())
             entries.append({'day': schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
                             'id': pickledData['id'],
                             'entry': pickledData,
-                            'autoOps': translateAutoOps(autoOps)
+                            'autoOps': translateAutoOps(self.getAutoOps())
                             })
         return entries
 

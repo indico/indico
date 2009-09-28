@@ -76,6 +76,8 @@ from MaKaC.common.Conversion import Conversion
 from MaKaC.webinterface import urlHandlers
 
 from MaKaC.common.logger import Logger
+from MaKaC.common.contextManager import ContextManager
+
 
 class CategoryManager( ObjectHolder ):
     idxName = "categories"
@@ -1934,6 +1936,7 @@ class Conference(Persistent):
         (ex: contributions, sessions, ...).
     """
 
+
     @Retrieves ('MaKaC.conference.Conference', 'displayURL', lambda conf: str(urlHandlers.UHConferenceDisplay.getURL(conf)))
     @Retrieves ('MaKaC.conference.Conference', 'modifURL', lambda conf: str(urlHandlers.UHConferenceModification.getURL(conf)))
     @Retrieves(['MaKaC.conference.Conference'], 'sessions', lambda conf: DictPickler.pickle(Conversion.sessionList(conf)))
@@ -2878,8 +2881,6 @@ class Conference(Persistent):
         """changes the current conference ending date to the one specified by
             the parameters"""
 
-        autoOps = []
-
         if not eDate.tzname():
             raise MaKaCError("date should be timezone aware")
         if eDate == self.getEndDate():
@@ -2909,8 +2910,6 @@ class Conference(Persistent):
                                                    (observer.getName(), formatDateTime(oldEdate), formatDateTime(eDate), self.getId(), str(e)))
                 except Exception, e2:
                     Logger.get('Conference').error("Exception while notifying a end date change: %s (origin: %s)"%(str(e2), str(e)))
-
-        return autoOps
 
     def setEndTime(self, hours=0, minutes=0):
         edate = self.getEndDate()
@@ -5721,17 +5720,15 @@ class Session(Persistent):
             2: check and adapt the owner dates
         """
 
-        autoOps = []
         conf=self.getConference()
 
         if conf is not None and sdate < conf.getSchedule().getStartDate():
             if check==1:
                 raise ParentTimingError( _("The session starting date cannot be prior to the event starting date"), _("Session"))
             elif check==2:
-                autoOps.append((self, "OWNER_START_DATE_EXTENDED",
+                ContextManager.get('autoOps').append((self, "OWNER_START_DATE_EXTENDED",
                                 conf, sdate.astimezone(timezone(conf.getTimezone()))))
                 conf.setStartDate(sdate,check=0,moveEntries=0)
-        return autoOps
 
     def setStartDate(self,newDate,check=2,moveEntries=0):
         """
@@ -5741,12 +5738,10 @@ class Session(Persistent):
             2: do not move but check that session is not out of the conference dates
         """
 
-        autoOps = []
-
         if not newDate.tzname():
             raise MaKaCError("date should be timezone aware")
         if check != 0:
-            autoOps += self.verifyStartDate(newDate,check)
+            self.verifyStartDate(newDate,check)
         oldSdate = self.getStartDate()
         try:
            tz = str(self.getStartDate().tzinfo)
@@ -5767,8 +5762,6 @@ class Session(Persistent):
         if check == 1:
            self._checkInnerSchedule()
         self.notifyModification()
-
-        return autoOps
 
     def _checkInnerSchedule( self ):
         self.getSchedule().checkSanity()
@@ -5793,7 +5786,6 @@ class Session(Persistent):
             1: check and raise error in case of problem
             2: check and adapt the owner dates
         """
-        autoOps = []
         try:
             tz = timezone(self.getConference().getTimezone())
         except:
@@ -5817,33 +5809,29 @@ class Session(Persistent):
                         _("Session"))
                 if check==2:
                     if edate>confEndDate:
-                        autoOps.append((self, "OWNER_END_DATE_EXTENDED",
-                                        self.getConference(),
-                                        edate.astimezone(tz)))
+                        ContextManager.get('autoOps').append((self, "OWNER_END_DATE_EXTENDED",
+                                                              self.getConference(),
+                                                              edate.astimezone(tz)))
                         self.getConference().setEndDate(edate)
                     if edate<=confStartDate:
-                        autoOps.append((self, "OWNER_START_DATE_EXTENDED",
-                                        self.getConference(),
-                                        edate.astimezone(tz)))
+                        ContextManager.get('autoOps').append((self, "OWNER_START_DATE_EXTENDED",
+                                                              self.getConference(),
+                                                              edate.astimezone(tz)))
                         self.getConference().setStartDate(edate)
         # check inner schedule
         if len(self.getSlotList()) != 0 and self.getSlotList()[-1].getSchedule().hasEntriesAfter(edate):
             raise TimingError( _("Cannot change end date: some entries in the session schedule end after the new date"), _("Session"))
 
-        return autoOps
-
     def setEndDate(self,newDate,check=2):
-        autoOps = []
         if not newDate.tzname():
             raise MaKaCError("date should be timezone aware")
         if check != 0:
-            autoOps += self.verifyEndDate(newDate,check)
+            self.verifyEndDate(newDate,check)
         self.duration=newDate-self.getStartDate()
         # A session is not always linked to a conference (for eg. at creation time)
         if self.getConference() and not self.getConference().getEnableSessionSlots() and self.getSlotList()[0].getEndDate() != newDate:
             self.getSlotList()[0].duration = self.duration
         self.notifyModification()
-        return autoOps
 
     def setDates(self,sDate,eDate,check=1,moveEntries=0):
         if eDate<=sDate:
@@ -6926,8 +6914,6 @@ class SessionSlot(Persistent):
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
 
-        autoOps = []
-
         tz = timezone(self.getConference().getTimezone())
 
         if sDate < self.getSession().getStartDate():
@@ -6937,9 +6923,7 @@ class SessionSlot(Persistent):
                     self.getSession().getStartDate().astimezone(tz).strftime('%Y-%m-%d %H:%M')),\
                     _("Slot"))
             elif check == 2:
-                autoOps += self.getSession().setStartDate(sDate, check, 0)
-
-        return autoOps
+                self.getSession().setStartDate(sDate, check, 0)
 
     def setStartDate(self,sDate,check=2,moveEntries=0,checkDuration=True):
         """check parameter:
@@ -6947,14 +6931,12 @@ class SessionSlot(Persistent):
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
 
-        autoOps = []
-
         if sDate is None:
             return
         if not sDate.tzname():
             raise MaKaCError("date should be timezone aware")
         if check != 0:
-            autoOps += self.verifyStartDate(sDate,check)
+            self.verifyStartDate(sDate,check)
 
         # calculate the difference betwwen old and new date
         difference = None
@@ -6964,33 +6946,29 @@ class SessionSlot(Persistent):
         self.startDate=copy.copy(sDate)
 
         if difference != None and difference != timedelta(0) and moveEntries:
-            autoOps.append((self, "ENTRIES_MOVED",
-                            self, sDate.astimezone(timezone(self.getTimezone()))))
+            ContextManager.get('autoOps').append((self, "ENTRIES_MOVED",
+                                                  self, sDate.astimezone(timezone(self.getTimezone()))))
             self.getSchedule().moveEntriesBelow(difference,self.getSchedule().getEntries()[:])
 
         if self.getConference() and not self.getConference().getEnableSessionSlots() and self.getSession().getStartDate() != sDate:
             self.getSession().setStartDate(sDate, check, 0)
         if check != 0 and self.getSession() and checkDuration:
-            autoOps += self.verifyDuration(self.getDuration(), check=check)
+            self.verifyDuration(self.getDuration(), check=check)
 
         # synchronize with other timetables
         self.getSessionSchEntry().synchro()
         self.getConfSchEntry().synchro()
         self.notifyModification()
 
-        return autoOps
-
     def setEndDate(self,eDate,check=2):
-        autoOps = []
         if not eDate.tzname():
             raise MaKaCError("date should be timezone aware")
         if check != 0:
-            autoOps += self.verifyDuration(eDate-self.startDate, check)
-        autoOps += self.setDuration(dur=eDate-self.startDate,check=check)
+            self.verifyDuration(eDate-self.startDate, check)
+        self.setDuration(dur=eDate-self.startDate,check=check)
         if self.getConference() and not self.getConference().getEnableSessionSlots() and self.getSession().getEndDate() != eDate:
-            autoOps += self.getSession().setEndDate(eDate, check)
+            self.getSession().setEndDate(eDate, check)
         self.notifyModification()
-        return autoOps
 
     def getStartDate( self ):
         return self.startDate
@@ -7031,7 +7009,7 @@ class SessionSlot(Persistent):
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
-        autoOps = []
+
         tz = timezone(self.getConference().getTimezone())
         if dur <= timedelta(0):
             raise MaKaCError( _("The duration cannot be less than zero"), _("Slot"))
@@ -7049,8 +7027,8 @@ class SessionSlot(Persistent):
                             sessionEndDate.astimezone(tz).strftime('%Y-%m-%d %H:%M')),\
                             _("Slot"))
                 elif check==2:
-                    autoOps.append((self, "OWNER_END_DATE_EXTENDED",
-                                    self.getSession(), eDate.astimezone(tz)))
+                    ContextManager.get('autoOps').append((self, "OWNER_END_DATE_EXTENDED",
+                                                          self.getSession(), eDate.astimezone(tz)))
                     self.getSession().setEndDate(eDate,check)
             if eDate.astimezone(tz).date() > self.startDate.astimezone(tz).date():
                 raise TimingError( _("The time slot must end on the same day it has started"), _("Slot"))
@@ -7063,7 +7041,6 @@ class SessionSlot(Persistent):
                         (eDate.astimezone(tz).strftime('%Y-%m-%d %H:%M'),\
                         sch.calculateEndDate().astimezone(tz).strftime('%Y-%m-%d %H:%M')),\
                         _("Slot"))
-        return autoOps
 
     def setDuration(self, days=0,hours=0,minutes=0,dur=0,check=1):
         """check parameter:
@@ -7071,24 +7048,20 @@ class SessionSlot(Persistent):
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
 
-        autoOps = []
-
         if dur==0:
             dur = timedelta(days=int(days),hours=int(hours),minutes=int(minutes))
         if dur==0 and check==2:
-            autoOps.append((self, "DURATION_SET",
-                            self, 1))
+            ContextManager.get('autoOps').append((self, "DURATION_SET",
+                                                  self, 1))
             dur = timedelta(minutes=1)
         if dur > timedelta(days=1) and check==2:
             pass#dur = timedelta(days=1)
         if check != 0:
-            autoOps += self.verifyDuration(dur, check)
+            self.verifyDuration(dur, check)
         self.duration = dur
         self.getSessionSchEntry().synchro()
         self.getConfSchEntry().synchro()
         self.notifyModification()
-
-        return autoOps
 
     def getLocationParent( self ):
         """
@@ -8365,7 +8338,7 @@ class Contribution(Persistent):
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
-        autoOps = []
+
         tz = timezone(self.getConference().getTimezone())
         if self.getSchEntry().getSchedule():
             owner = self.getSchEntry().getSchedule().getOwner()
@@ -8378,8 +8351,8 @@ class Contribution(Persistent):
                     owner.getStartDate().astimezone(tz).strftime('%Y-%m-%d %H:%M')),\
                     _("Contribution"))
             if check == 2:
-                autoOps.append((self, "OWNER_START_DATE_EXTENDED",
-                                owner, sDate.astimezone(tz)))
+                ContextManager.get('autoOps').append((self, "OWNER_START_DATE_EXTENDED",
+                                                      owner, sDate.astimezone(tz)))
                 owner.setDates(sDate,owner.getEndDate(),check)
         if sDate > owner.getEndDate():
             if check == 1:
@@ -8389,15 +8362,12 @@ class Contribution(Persistent):
                     _("Contribution"))
             if check == 2:
                 owner.setEndDate(sDate+self.getDuration(),check)
-        return autoOps
 
     def setStartDate(self, newDate, check=2, moveEntries=0):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
-
-        autoOps = []
 
         if newDate == None:
             self.startDate=None
@@ -8406,12 +8376,10 @@ class Contribution(Persistent):
             raise MaKaCError("date should be timezone aware")
 
         if newDate != None and check != 0:
-            autoOps += self.verifyStartDate(newDate, check)
+            self.verifyStartDate(newDate, check)
         self.startDate=copy.copy(newDate)
         self.getSchEntry().synchro()
         self.notifyModification()
-
-        return autoOps
 
     def getStartDate( self ):
         return self.startDate
@@ -8448,8 +8416,6 @@ class Contribution(Persistent):
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
 
-        autoOps = []
-
         tz = timezone(self.getConference().getTimezone())
 
         endDate = self.getEndDate()
@@ -8464,11 +8430,9 @@ class Contribution(Persistent):
                             owner.getEndDate().astimezone(tz).strftime('%Y-%m-%d %H:%M')),\
                             _("Contribution"))
                 elif check==2:
-                    autoOps.append((self, "OWNER_END_DATE_EXTENDED",
-                                    owner, self.getAdjustedEndDate()))
+                    ContextManager.get('autoOps').append((self, "OWNER_END_DATE_EXTENDED",
+                                                          owner, self.getAdjustedEndDate()))
                     owner.setEndDate(endDate, check)
-
-        return autoOps
 
     def setDuration(self,hours=0,minutes=15,check=2,dur=0):
         """check parameter:
@@ -8476,17 +8440,14 @@ class Contribution(Persistent):
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
 
-        autoOps = []
-
         if dur!=0:
             self.duration=dur
         else:
             self.duration=timedelta(hours=int(hours),minutes=int(minutes))
         if check != 0:
-            autoOps = self.verifyDuration(check)
+            self.verifyDuration(check)
         self.getSchEntry().synchro()
         self.notifyModification()
-        return autoOps
 
     def _addAuthor( self, part ):
         """

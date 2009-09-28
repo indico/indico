@@ -210,7 +210,6 @@ type("TimetableManagementActions", [], {
             self._hideInfoBox(message);
 
             // stop observing the warnings
-            stopObserve();
             self.intervalMode = false;
 
             self._hideWarnings();
@@ -222,50 +221,54 @@ type("TimetableManagementActions", [], {
         });
 
         // WatchValues, so that interval changes can be handled
-        var startTime = new WatchValue(eventData.startDate.time.substring(0,5));
-        var endTime = new WatchValue(eventData.endDate.time.substring(0,5));
-
-        var stopObserve = this.warnings.observe(function(event, elem) {
-            if (event == 'itemAdded') {
-                var msg = elem[1];
-                var finalTime = elem[3];
-
-                if (msg == "OWNER_END_DATE_EXTENDED") {
-                    // Make sure that something changed, otherwise the
-                    // warning will be supressed
-
-                    if (endTime.get() != finalTime) {
-                        eventData.endDate.time = finalTime + ":00";
-                        endTime.set(finalTime);
-                        self.processedWarnings.append(elem);
-                    }
-                } else if (msg == "OWNER_START_DATE_EXTENDED") {
-                    // Again, make sure that something changed
-
-                    if (startTime.get() != finalTime) {
-                        eventData.startDate.time = finalTime + ":00";
-                        startTime.set(finalTime);
-                        self.processedWarnings.append(elem);
-                    }
-                }
-            }
-        });
+        this.slotStartTime = new WatchValue(eventData.startDate.time.substring(0,5));
+        this.slotEndTime = new WatchValue(eventData.endDate.time.substring(0,5));
 
         var message = Html.div({}, Html.span({style: {fontStyle: 'italic', fontSize: '0.9em'}},
             $T('You are viewing the contents of the session:')),
             Html.div({style: {fontWeight: 'bold', marginTop: '5px', fontSize: '1.3em'}}, eventData.title +
-                     (eventData.slotTitle ? ": " + eventData.slotTitle : ''), Html.span({style: {fontWeight: 'normal'}},
-                                                                                        " (", $B(Html.span({}), startTime), " - ", $B(Html.span({}), endTime),")" )));
+                     (eventData.slotTitle ? ": " + eventData.slotTitle : ''),
+                     Html.span({style: {fontWeight: 'normal'}},
+                               " (", $B(Html.span({}), this.slotStartTime), " - ", $B(Html.span({}), this.slotEndTime),")" )));
 
         data[day] = eventData.entries;
 
-        self.timetable.setData(data, startTime.get(), endTime.get());
+        self.timetable.setData(data, this.slotStartTime.get(), this.slotEndTime.get());
         this._showInfoBox(message);
         this.menu.insert(goBackLink);
 
         this.updateTTMenu();
         // Disables the tabs
         timetable.disable();
+    },
+
+    _processWarning: function(entry, startTime, endTime) {
+        var msg = entry[1];
+        var finalTime = entry[3];
+
+        if (Util.parseId(entry[2])[0] == "Session") {
+            return null;
+        }
+
+        if (msg == "OWNER_END_DATE_EXTENDED") {
+            // Make sure that something changed, otherwise the
+            // warning will be supressed
+            if (endTime != finalTime) {
+                // slice(1) to ignore first value
+                return concat(entry.slice(1),  [endTime]);
+            }
+        } else if (msg == "OWNER_START_DATE_EXTENDED") {
+            // Again, make sure that something changed
+
+            if (startTime != finalTime) {
+                // slice(1) to ignore first value
+                return concat(entry.slice(1), [startTime]);
+            }
+        } else {
+            return concat(entry.slice(1), [startTime]);
+        }
+
+        return null;
     },
 
     _createInfoArea: function() {
@@ -278,7 +281,7 @@ type("TimetableManagementActions", [], {
                            this.processedWarnings,
                            function(item) {
 
-                               var atoms = Util.parseId(item[2]);
+                               var atoms = Util.parseId(item[1]);
 
                                var message = {
                                    OWNER_START_DATE_EXTENDED: {
@@ -294,11 +297,11 @@ type("TimetableManagementActions", [], {
                                    ENTRIES_MOVED: {
                                        SessionSlot: $T('The contents of the interval were moved from ')
                                    }
-                               }[item[1]][atoms[0]];
+                               }[item[0]][atoms[0]];
 
                                var span = Html.span({style: {verticalAlign: 'middle', marginLeft: '5px'}});
-                               span.dom.innerHTML = message + ' <strong>' + item[4] +
-                                   '</strong>' + $T(' to ') + '<strong>' + item[3] + '</strong>' ;
+                               span.dom.innerHTML = message + ' <strong>' + item[3] +
+                                   '</strong>' + $T(' to ') + '<strong>' + item[2] + '</strong>' ;
                                return Html.li({}, span);
                            }));
     },
@@ -574,6 +577,13 @@ type("TimetableManagementActions", [], {
         );
     },
 
+    _updateTimes: function(newStartTime, newEndTime) {
+        if (this.session) {
+            this.slotStartTime.set(newStartTime.slice(0,5));
+            this.slotEndTime.set(newEndTime.slice(0,5));
+        }
+    },
+
     /*
      *
      * Is called every time a timetable entry has been successfully
@@ -586,8 +596,27 @@ type("TimetableManagementActions", [], {
         var setData = data ? false : true;
         data = any(data, this.timetable.getData());
 
+        var slot = null;
+
+        // Check whether we're operating *inside or over* a slot or not
+        // (and fetch the slot info)
+        if (result.entry.entryType=="Session") {
+            slot = data[result.day][result.entry.id];
+        } else if (this.session) {
+            slot = this.session;
+        }
+
+        // in the affirmative case, fetch the time limits
+        if (slot) {
+            var oldStartTime = slot.startDate.time.slice(0,5);
+            var oldEndTime = slot.endDate.time.slice(0,5);
+        }
+
+
         if (this.session !== null) {
             this.savedData[result.day][this.session.id].entries[result.entry.id] = result.entry;
+            this._updateTimes(result.slotEntry.startDate.time,
+                             result.slotEntry.endDate.time);
         }
 
         /*
@@ -615,6 +644,7 @@ type("TimetableManagementActions", [], {
         // If this.session is not null then we are editing session content
         // so the savedData needs to be updated as well
         if (this.session && exists(result.slotEntry) && this.savedData) {
+
             // Save the entries, otherwise they are lost
             result.slotEntry.entries = this.session.entries;
             this.savedData[result.day][result.slotEntry.id] = result.slotEntry;
@@ -631,20 +661,13 @@ type("TimetableManagementActions", [], {
 
         this._hideWarnings();
 
-        if (result.autoOps.length > 0) {
+        if (result.autoOps && result.autoOps.length > 0) {
             each(result.autoOps,
                  function(op) {
-                     // dirty, dirty HACK
-                     // check that the message is not redundant
-                     // (dates are the same)
-                     if (op[3] != op[4]) {
-                         if (self.intervalMode) {
-                             self.warningArea.dom.style.display = 'block';
-                             self.warnings.append(op);
-                         } else {
-                             self.warningArea.dom.style.display = 'block';
-                             self.processedWarnings.append(op);
-                         }
+                     self.warningArea.dom.style.display = 'block';
+                     var warning = self._processWarning(op, oldStartTime, oldEndTime);
+                     if (warning && self.processedWarnings.indexOf(warning) == null) {
+                         self.processedWarnings.append(warning);
                      }
                  });
         }
