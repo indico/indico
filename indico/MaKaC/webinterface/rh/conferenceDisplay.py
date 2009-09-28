@@ -560,8 +560,11 @@ class RHConferenceEmail(RHConferenceBaseDisplay, base.RHProtected):
         p=conferences.WPEMail(self, self._target)
         return p.display(emailto=self._emailto)
 
-class RHConferenceSendEmail (RHConferenceBaseDisplay):
+class RHConferenceSendEmail (RHConferenceBaseDisplay, base.RHProtected):
     _uh = urlHandlers.UHConferenceSendEmail
+    
+    def _checkProtection(self):
+        base.RHProtected._checkProtection(self)
 
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams( self, params )
