@@ -385,43 +385,6 @@ def parseTime(timeStr):
 def parseDateTime(dateTimeStr):
     t=time.strptime(dateTimeStr, '%d/%m/%Y %H:%M')
     return datetime(t.tm_year,t.tm_mon, t.tm_mday, t.tm_hour, t.tm_min)
-
-def cleanUnicodeObjects(obj):
-    """ obj must be a list or a dictionary
-        This method will loop through the object and change unicode objects into str objects encoded in utf-8.
-        If a list or a dictionary is found during the loop, a recursive call is made.
-        However this method does not support objects that are not lists or dictionaries.
-        This method is useful to turn unicode objects from the output object given by simplejson.loads(),
-        into str objects encoded in utf-8.
-        In case of a persistent object or an object inside a persistent object,
-        you will need to notify the database of changes in the object after calling this method.
-    """
-    
-    # replace unicode objects inside a list
-    if isinstance(obj,list):
-        for i in range(0, len(obj)):
-            if type(obj[i]) == unicode:
-                obj[i] = obj[i].encode('utf-8','replace')
-            else:
-                cleanUnicodeObjects(obj[i])
-    
-    #replace unicode objects inside a dictionary
-    if isinstance(obj,dict):
-        #replace values
-        for k,v in obj.items():
-            if type(v) == unicode:
-                obj[k] = v.encode('utf-8','replace')
-            else:
-                cleanUnicodeObjects(obj[k])
-                
-        #replace keys
-        dict2 = obj.copy()
-        for k in dict2.keys():
-            if type(k) == unicode:
-                del obj[k]
-                obj[k.encode('utf-8','replace')] = dict2[k]
-            else:
-                cleanUnicodeObjects(k)
                 
 def normalizeToList(l):
     if type(l) != list:

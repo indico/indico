@@ -24,9 +24,7 @@ from persistent import Persistent
 import tempfile
 
 from MaKaC.common.Counter import Counter
-from MaKaC.errors import MaKaCError
 from MaKaC.common import Config
-from MaKaC.common.utils import cleanUnicodeObjects
 
 
 class BadgeTemplateManager(Persistent):
@@ -159,7 +157,7 @@ class BadgeTemplate (Persistent):
             IMPORTANT NOTE: simplejson.loads() builds an objet with unicode objects inside.
                             if these objects are then concatenated to str objects (for example in an Indico HTML template),
                             this can give problems. In those cases transform the unicode object to str with .encode('utf-8').
-                            In this class, __cleanData() already does this by calling MaKaC.common.utils.cleanUnicodeObjects
+                            In this class, __cleanData() already does this by calling MaKaC.services.interface.rpc.json.unicodeToUtf8
             Thus, its structure is a list composed of:
                 -The name of the template
                 -A dictionary with 2 keys: width and height of the template, in pixels.
@@ -353,7 +351,8 @@ class BadgeTemplate (Persistent):
            We have to remove that 'px' at the end.
         """
         self.__templateData[4] = filter ( lambda item: item != False, self.__templateData[4]) # to remove items that have been deleted
-        cleanUnicodeObjects(self.__templateData)
+        from MaKaC.services.interface.rpc.json import unicodeToUtf8
+        unicodeToUtf8(self.__templateData)
         for item in self.__templateData[4]:
             if isinstance(item['x'],basestring) and item['x'][-2:] == 'px':
                 item['x'] = item['x'][0:-2]
