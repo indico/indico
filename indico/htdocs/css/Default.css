@@ -4799,6 +4799,7 @@ div.timetableManagementInfoArea {
     behavior: url(border-radius.htc);
     padding: 5px;
     font-size: 8pt;
+    position: relative;
 }
 
 div.timetableManagementInfoArea div {

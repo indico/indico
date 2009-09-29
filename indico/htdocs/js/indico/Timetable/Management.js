@@ -275,6 +275,20 @@ type("TimetableManagementActions", [], {
 
         // this is a client-side hack that compensates some algorithm weaknesses
 
+        var closeButton = Html.div({
+            className: 'balloonPopupCloseButton',
+            style: {position: 'absolute',
+            top: '10px',
+            right: '10px',
+            padding: '0px'}
+        });
+
+        var self = this;
+
+        closeButton.observeClick(function() {
+            self._hideWarnings();
+        });
+
         return Html.div("timetableManagementInfoArea",
                         Html.div({}, $T("Your changes triggered the automatic modification of some settings:")),
                         $B(Html.ul({}),
@@ -303,7 +317,8 @@ type("TimetableManagementActions", [], {
                                span.dom.innerHTML = message + ' <strong>' + item[3] +
                                    '</strong>' + $T(' to ') + '<strong>' + item[2] + '</strong>' ;
                                return Html.li({}, span);
-                           }));
+                           }),
+                       closeButton);
     },
 
     /*
@@ -672,7 +687,7 @@ type("TimetableManagementActions", [], {
             each(result.autoOps,
                  function(op) {
                      var warning = self._processWarning(op, oldStartTime, oldEndTime);
-                     if (warning && self.processedWarnings.indexOf(warning) == null) {
+                     if (warning && self.processedWarnings.indexOf(warning) === null) {
                          self.warningArea.dom.style.display = 'block';
                          self.processedWarnings.append(warning);
                      }
