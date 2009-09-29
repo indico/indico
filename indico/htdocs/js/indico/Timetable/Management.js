@@ -185,7 +185,7 @@ type("TimetableManagementActions", [], {
             }else {
                 this.addMenuLink.dom.style.display = "inline";
                 this.addIntervalLink.dom.style.display = "none";
-                this.rescheduleLink.dom.style.display = "inline";
+                this.rescheduleLink.dom.style.display = "none";
                 this.separator.dom.style.display = "inline";
             }
         }else {
@@ -208,10 +208,7 @@ type("TimetableManagementActions", [], {
         goBackLink.observeClick(function() {
             self.timetable.setData(self.savedData);
             self._hideInfoBox(message);
-
-            // stop observing the warnings
             self.intervalMode = false;
-
             self._hideWarnings();
             self.menu.remove(goBackLink);
             self.session = null;
@@ -225,7 +222,7 @@ type("TimetableManagementActions", [], {
         this.slotEndTime = new WatchValue(eventData.endDate.time.substring(0,5));
 
         var message = Html.div({}, Html.span({style: {fontStyle: 'italic', fontSize: '0.9em'}},
-            $T('You are viewing the contents of the session:')),
+            $T('You are viewing the contents of the interval:')),
             Html.div({style: {fontWeight: 'bold', marginTop: '5px', fontSize: '1.3em'}},
                      this._generateSlotTitle(eventData),
                      Html.span({style: {fontWeight: 'normal'}},
@@ -233,7 +230,7 @@ type("TimetableManagementActions", [], {
 
         data[day] = eventData.entries;
 
-        self.timetable.setData(data, this.slotStartTime.get(), this.slotEndTime.get());
+        self.timetable.setData(data, eventData, this.slotStartTime.get(), this.slotEndTime.get());
         this._showInfoBox(message);
         this.menu.insert(goBackLink);
 

@@ -5301,3 +5301,7 @@ div.disabled input[disabled] {
 .enhanced {
     font-weight: bold;
 }
+
+div.greyHighlight:hover {
+    background-color: #ECECEC;
+}

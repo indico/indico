@@ -1210,18 +1210,13 @@ type("TimetableDrawer", ["IWidget"],
                      empty = false;
                      break;
                  }
-                 if (self.detail.get() == 'contribution' && eventData.entryType == 'Session' &&
-                     !eventData.isPoster && !empty) {
-                     block = new TimetableBlockContribDetails(eventData, blockData, true, self.printableVersion, self.detail.get());
-                 } else {
-                     compactMode = false;
-                     // For now don't use the compact mode. Activating it makes short entries displaying less
-                     // information in the block (only time and title).
-                     //if (blockData.collapsed || (blockData.end - blockData.start < TimetableDefaults.layouts.proportional.values.pxPerHour))
-                     //    compactMode = true;
+                 compactMode = false;
+                 // For now don't use the compact mode. Activating it makes short entries displaying less
+                 // information in the block (only time and title).
+                 //if (blockData.collapsed || (blockData.end - blockData.start < TimetableDefaults.layouts.proportional.values.pxPerHour))
+                 //    compactMode = true;
 
-                     block = new TimetableBlock(eventData, blockData, compactMode, self.printableVersion, self.detail.get(), self.managementMode, self.managementActions);
-                 }
+                 block = new TimetableBlock(eventData, blockData, compactMode, self.printableVersion, self.detail.get(), self.managementMode, self.managementActions);
                  blockDiv.append(block.draw(leftPos, width));
                  self.blocks.push(block);
              });
@@ -1477,13 +1472,13 @@ type("TimetableDrawer", ["IWidget"],
              this.redraw();
          }
      },
-     function(data, width, wrappingElement, detailLevel, extraButtons, loadingIndicator, managementMode, managementActions) {
+     function(data, canvas, width, wrappingElement, detailLevel, extraButtons, loadingIndicator, managementMode, managementActions, defaultLayout) {
 
 
          var self = this;
 
          this.wrappingElement = wrappingElement;
-         this.canvas = Html.div('canvas'); // TODO: remove canvas
+         this.canvas = canvas; // TODO: remove canvas
          this.filterList = new WatchList();
          this.data = data;
          this.blocks = [];
@@ -1509,8 +1504,8 @@ type("TimetableDrawer", ["IWidget"],
          this.managementActions = managementActions;
 
          // default layout is 'compact'
-         this.layout.set('compact');
-         this.layoutChooser.set('compact');
+         this.layout.set(any(defaultLayout, 'compact'));
+         this.layoutChooser.set(any(defaultLayout, 'compact'));
          // default detail level is 'session'
          this.detail.set(any(detailLevel, 'session'));
 
@@ -1539,3 +1534,76 @@ type("TimetableDrawer", ["IWidget"],
          });
      });
 
+
+
+type("IntervalTimetableDrawer", ["TimetableDrawer"],
+    {
+        posterRedraw: function() {
+            // TO USE: in a future interval timetable for display mode.
+            //var dayFiltered = this.applyFilters(this.data[this.day]);
+            //var dayData = this.layoutChooser.get().drawDay(dayFiltered);
+            var dayData = this.layoutChooser.get().drawDay(this.data[this.day]);
+            var height = 100+TimetableDefaults.topMargin+TimetableDefaults.bottomMargin;
+            this.wrappingElement.setStyle('height', pixels(height + (this.printableVersion ? 0 : 100))); // +100 to have margin for the tabs
+        
+            var blocks = this._posterBlocks(dayData);
+
+            this.canvas.set(Html.div({style: {position: 'relative'}}, blocks));
+        
+            this.postDraw();
+        
+            return height;
+        },
+
+        redraw:function() {
+            if (this.isPoster) {
+                return this.posterRedraw();
+            }else {
+                return this.TimetableDrawer.prototype.redraw.call(this);
+            }
+        },
+        
+        _posterBlocks: function(data) {
+            var self = this;
+
+            var blockDiv = Html.div({style:
+                                     {
+                                         position:'relative',
+                                         top: pixels(TimetableDefaults.topMargin)
+                                     }
+                                    });
+
+            self.blocks = [];
+            var topPx = 0;
+            each(data, function(blockData, id) {
+                /*var colWidth = Math.floor(self.width-TimetableDefaults.leftMargin);
+                var leftPos = TimetableDefaults.leftMargin;
+                var width = self.width - leftPos - TimetableDefaults.rightMargin;
+                var block = new TimetableBlock(blockData, {'start':topPx,'end':topPx+50}, false, self.printableVersion, self.detail.get(), self.managementMode, self.managementActions);
+                topPx += 50;*/
+                
+                var entryTools = Html.div({style:{"float": "right"}},"edit | delete");
+                var entryInfo = Html.div({},blockData.title );
+                var block = Html.div({className:'greyHighlight'}, entryTools, entryInfo);
+                blockDiv.append(block);
+                self.blocks.push(block);
+            });
+
+            return blockDiv;
+        },
+
+        postDraw: function() {
+            
+        },
+
+        setData: function(data, day, isPoster) {
+            this.isPoster = isPoster;
+            this.day = day;
+            if (this.isPoster) this.setLayout('poster');
+            this.TimetableDrawer.prototype.setData.call(this, data);
+        }
+    }, 
+    function(data, canvas, width, wrappingElement, extraButtons, loadingIndicator, managementMode, managementActions) {
+        this.TimetableDrawer(data, canvas, width, wrappingElement, 'session', extraButtons, loadingIndicator, managementMode, managementActions, data.isPoster?'poster':null);
+    }
+);

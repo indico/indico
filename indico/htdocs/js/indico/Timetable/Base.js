@@ -22,7 +22,11 @@ var TimetableDefaults = {
                                    minPxPerBlock: 25
                                },
                                manager: new ProportionalLayoutManager()
-                              }
+                              },
+                              
+              'poster': {name: 'Poster',
+                         manager: new PosterLayoutManager()
+                        }
              },
     filters: {'session': {name: $T('Session'),
                           filter: new SessionFilter()},
@@ -168,9 +172,13 @@ type("TimeTable", ["LookupTabWidget"], {
          return this.timetableDrawer;
      },
 
-    setData: function(data, startTime, endTime) {
+     setData: function(data, intervalData, startTime, endTime) {
          this.data = data;
-        this.timetableDrawer.setData(data, startTime, endTime);
+         if (any(intervalData, false)) {
+             this.intervalTimetableDrawer.setData(data, this.currentDay, intervalData.isPoster);
+         }else {
+             this.timetableDrawer.setData(data, startTime, endTime);
+         }
      },
      _createLoadingIndicator: function() {
          return Html.div('timetableLoading', $T('Updating the timetable...'));
@@ -196,13 +204,20 @@ type("TimeTable", ["LookupTabWidget"], {
 
          this.width = width;
          this.loadingIndicator = this._createLoadingIndicator();
-         this.timetableDrawer = new TimetableDrawer(data, width,
+         var canvas = Html.div('canvas');
+         this.timetableDrawer = new TimetableDrawer(data, canvas, width,
                                                     wrappingElement,
                                                     detailLevel,
                                                     this._functionButtons(),
                                                     this.loadingIndicator,
                                                     managementMode,
                                                     this.managementActions);
+         this.intervalTimetableDrawer = new IntervalTimetableDrawer(data, canvas, width,
+                 wrappingElement,
+                 this._functionButtons(),
+                 this.loadingIndicator,
+                 managementMode,
+                 this.managementActions);
 
          var today = new Date();
          var todayStr = IndicoUtil.formatDate2(today);

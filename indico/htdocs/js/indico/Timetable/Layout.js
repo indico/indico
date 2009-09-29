@@ -459,6 +459,14 @@ type("ProportionalLayoutManager", ["IncrementalLayoutManager"],
          }
      });
 
+
+type("PosterLayoutManager", ["TimetableLayoutManager"],
+    {
+        drawDay: function(data, detailLevel) {
+            return data;
+        }
+    });
+
 type("TimetableLayoutMenu", ["PopupMenu"],
      {
      },
