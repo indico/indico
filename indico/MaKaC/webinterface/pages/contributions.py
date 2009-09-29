@@ -374,7 +374,7 @@ class WPContributionModifBase( WPConferenceModifBase  ):
 
         if hasReviewingEnabled and confReviewChoice != 1:
 
-            self._subtabReviewing = self._tabCtrl.newTab( "reviewing", "Reviewing", \
+            self._subtabReviewing = self._tabCtrl.newTab( "reviewing", "Paper Reviewing", \
                 urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
             self._subTabAssign = self._subtabReviewing.newSubTab( "assign", _("Assign Team"), \
                 urlHandlers.UHContributionModifReviewing.getURL( self._target ) )

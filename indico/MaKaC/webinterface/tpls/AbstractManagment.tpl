@@ -96,7 +96,7 @@
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Submitted by")%></span></td>
                     <form action=%(changeSubmitterURL)s method="POST">
                     <td>%(submitter)s</td>
-                    <td bgcolor="white" valign="bottom" align="right" colspan="2"><input type="submit" class="btn" value="<%= _("change")%>"></td>
+                    <td bgcolor="white" valign="bottom" align="right" colspan="2"><input type="submit" class="btn" value="<%= _("change submitter")%>"></td>
                     </form>
                 </tr>
                 <tr>
@@ -107,7 +107,7 @@
                     <td bgcolor="white" valign="top" colspan="3">%(submitDate)s</td>
                 </tr>
                 <tr>
-                    <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Last modified on")%></span></td>
+                    <td class="dataCaptionTD" style="text-align:left; padding-right: 13px;"><span class="dataCaptionFormat"><%= _("Last modified on")%></span></td>
                     <td bgcolor="white" valign="top" colspan="3">%(modificationDate)s</td>
                 </tr>
                 <tr>

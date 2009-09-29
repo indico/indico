@@ -1,9 +1,14 @@
-<table width="90%%" align="center" border="0">
+<table width="90%%" border="0">
     <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat">
+        <td id="reviewingModeHelp" colspan="5" class="groupTitle" style="padding-bottom: 10px; padding-left: 20px;">
+            <%= _("Default date for abstract reviewing")%>
+        </td>
+    </tr>
+    <tr>
+        <td nowrap class="titleCellTD" style="padding-left: 30px; padding-top: 15px;"><span class="titleCellFormat">
             <%= _("Abstract Reviewer default due date")%>
         </span></td>
-        <td class="blacktext">
+        <td class="blacktext" style="padding-top: 15px;">
             <span id="inPlaceEditDefaultAbstractReviewerDueDate">
                 <% date = ConfReview.getAdjustedDefaultAbstractReviewerDueDate() %>
                 <% if date is None: %>

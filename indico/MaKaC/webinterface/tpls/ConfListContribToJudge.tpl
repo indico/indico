@@ -155,3 +155,5 @@
     
 </table>
 <% end %>
+<% if not ConfReview.getReviewedContributions(User) and not ConfReview.getEditedContributions(User) and not ConfReview.getJudgedContributions(User):%>
+<p style="padding-left: 25px;"><font color="gray"><%= _("There are no contributions aasigned to you to judge yet.")%></font></p>

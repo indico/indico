@@ -53,6 +53,9 @@ def selectSubmitter( req, **params ):
 def removeSubmitter( req, **params ):
     return conferenceModif.RHConfModifCFARemoveSubmitter( req ).process( params )
 
+def notifTpl( req, **params ):
+    return conferenceModif.RHNotifTpl( req ).process( params )
+
 def notifTplNew(req,**params):
     return conferenceModif.RHCFANotifTplNew(req).process(params)
 

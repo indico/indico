@@ -3534,6 +3534,12 @@ class RHConfModifCFA(RHConfModifCFABase):
     def _process( self ):
         p = conferences.WPConfModifCFA( self, self._target )
         return p.display()
+    
+class RHNotifTpl(RHConfModifCFABase):
+    
+    def _process(self):
+        p = reviewing.WPConfModifAbstractsReviewingNotifTpl(self, self._target)
+        return p.display()
 
 
 class RHConfModifCFAPreview(RHConfModifCFABase):
@@ -3560,7 +3566,7 @@ class RHCFANotifTplNew(RHConfModifCFABase):
     def _process(self):
         error = []
         if self._cancel:
-            self._redirect(urlHandlers.UHConfModifCFA.getURL( self._conf ) )
+            self._redirect(urlHandlers.UHAbstractReviewingNotifTpl.getURL( self._conf ) )
             return
         elif self._save:
             if len(self._toList)<=0:
@@ -3581,11 +3587,12 @@ class RHCFANotifTplNew(RHConfModifCFABase):
                     if toAddrWrapper:
                         toAddrWrapper.addToAddr(tpl)
                 self._conf.getAbstractMgr().addNotificationTpl(tpl)
+                #TODO: Write the right URL, UHAbstractReviewingNotifTpl?
                 url = urlHandlers.UHConfModNotifTplConditionNew.getURL(tpl)
                 url.addParams({"condType":self._tplCondition})
                 self._redirect(url)
                 return
-        p=conferences.WPModCFANotifTplNew(self,self._target)
+        p=reviewing.WPModCFANotifTplNew(self,self._target)
         return p.display(title=self._title,\
                         description=self._description,\
                         subject=self._subject,\
@@ -3607,7 +3614,7 @@ class RHCFANotifTplRem(RHConfModifCFABase):
         for id in self._tplIds:
             tpl = absMgr.getNotificationTplById(id)
             absMgr.removeNotificationTpl(tpl)
-        self._redirect(urlHandlers.UHConfModifCFA.getURL( self._conf ) )
+        self._redirect(urlHandlers.UHAbstractReviewingNotifTpl.getURL( self._conf ) )
 
 
 class RHNotificationTemplateModifBase(RHConfModifCFABase):
@@ -3623,14 +3630,14 @@ class RHCFANotifTplUp(RHNotificationTemplateModifBase):
 
     def _process(self):
         self._conf.getAbstractMgr().moveUpNotifTpl(self._target)
-        self._redirect(urlHandlers.UHConfModifCFA.getURL(self._conf))
+        self._redirect(urlHandlers.UHAbstractReviewingNotifTpl.getURL(self._conf))
 
 
 class RHCFANotifTplDown(RHNotificationTemplateModifBase):
 
     def _process(self):
         self._conf.getAbstractMgr().moveDownNotifTpl(self._target)
-        self._redirect(urlHandlers.UHConfModifCFA.getURL(self._conf))
+        self._redirect(urlHandlers.UHAbstractReviewingNotifTpl.getURL(self._conf))
 
 
 class RHCFANotifTplDisplay(RHNotificationTemplateModifBase):

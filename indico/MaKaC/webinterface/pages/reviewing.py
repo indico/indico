@@ -21,8 +21,9 @@
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
+from MaKaC.webinterface.pages.conferences import WPConferenceModifAbstractBase
 from MaKaC.i18n import _
-
+import MaKaC.webinterface.pages.conferences as conferences
 #============================================================
 #==================== Reviewing =============================
 #============================================================
@@ -49,31 +50,43 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
 
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
-
+        
+        self._subtabPaperReviewing = self._tabCtrl.newTab( "paperrev", "Paper Reviewing", \
+                urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
+        
+        self._subtabAbstractsReviewing = self._tabCtrl.newTab( "abstractsrev", "Abstracts Reviewing", \
+                urlHandlers.UHConfModifReviewingAbstractSetup.getURL( target = self._conf ) )
+        
         if self._isPRM or self._canModify:
-            self._tabPaperReviewingSetup = self._tabCtrl.newTab( "revsetup", "Paper setup",\
-                    urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
-
+            self._subTabPaperReviewingSetup = self._subtabPaperReviewing.newSubTab( "revsetup", "Setup",\
+                urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
+            
         if self._isAM or self._canModify:
-            self._tabAbstractReviewingSetup = self._tabCtrl.newTab( "revsetup", "Abstract setup",\
+            self._tabAbstractReviewingSetup = self._subtabAbstractsReviewing.newSubTab( "revsetup", "Abstract setup",\
                     urlHandlers.UHConfModifReviewingAbstractSetup.getURL(target = self._conf) )
-
+            self._tabAbstractNotifTpl = self._subtabAbstractsReviewing.newSubTab( "notiftpl", "Notification templates",\
+                    urlHandlers.UHAbstractReviewingNotifTpl.getURL(target = self._conf) )
+            
         if self._isPRM or self._isAM or self._canModify:
-            self._tabReviewingControl = self._tabCtrl.newTab( "revcontrol", "Reviewing Team",\
+            self._tabPaperReviewingControl = self._subtabPaperReviewing.newSubTab( "revcontrol", "Reviewing Team",\
                     urlHandlers.UHConfModifReviewingControl.getURL( self._conf ) )
-
+            self._tabAbstractsReviewingControl = self._subtabAbstractsReviewing.newSubTab( "revcontrol", "Abstracts Reviewing Team",\
+                    urlHandlers.UHConfModifReviewingAbstractsControl.getURL( self._conf ) ) 
+            self._tabAbstractList = self._subtabAbstractsReviewing.newSubTab( "abstractList", "List of Abstracts",\
+                    urlHandlers.UHConfAbstractList.getURL( self._conf ) )           
+            
         if self._showAssignContributions:
-            self._tabAssignContributions = self._tabCtrl.newTab( "assignContributions", "Assign Contributions",\
-                    urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf ) )
-
-        if self._isPRM or self._isAM or self._canModify:
+            self._tabAssignContributions = self._subtabPaperReviewing.newSubTab( "assignContributions", "Assign Contributions",\
+                    urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf ) )   
+        
+        if self._isPRM or self._isAM or self._canModify:    
             self._tabUserCompetences = self._tabCtrl.newTab( "revcompetences", "User competences",\
                     urlHandlers.UHConfModifUserCompetences.getURL( self._conf ) )
 
         if self._showListContribToJudge:
-            self._tabListContribToJudge = self._tabCtrl.newTab( "contributionsToJudge", "Contributions to judge",\
-                    urlHandlers.UHConfModifListContribToJudge.getURL( self._conf ) )
-
+            self._tabListContribToJudge = self._subtabPaperReviewing.newSubTab( "contributionsToJudge", "Contributions to judge",\
+                    urlHandlers.UHConfModifListContribToJudge.getURL( self._conf ) ) 
+        
         self._setActiveTab()
 
     def _getPageContent(self, params):
@@ -98,8 +111,8 @@ class WPConfModifReviewingPaperSetup(WPConfModifReviewingBase):
         WPConfModifReviewingBase.__init__(self, rh, target)
 
     def _setActiveTab( self ):
-        self._tabPaperReviewingSetup.setActive()
-
+        self._subTabPaperReviewingSetup.setActive()
+   
     def _getTabContent( self, params ):
         wc = WConfModifReviewingPaperSetup( self._conf)
         p = { # probably these values are not needed (except setTemplateURL) any more since now all these things are done by services
@@ -296,12 +309,31 @@ class WPConfModifAbstractReviewing(WPConfModifReviewingBase):
         WPConfModifReviewingBase.__init__(self, rh, target)
 
     def _setActiveTab( self ):
+        self._subtabAbstractsReviewing.setActive()
         self._tabAbstractReviewingSetup.setActive()
 
     def _getTabContent( self, params ):
         wc = WConfModifAbstractReviewingSettings(self._conf)
         params = {}
-        return wc.getHTML( params )
+        return wc.getHTML( params )    
+
+class WPConfAbstractList( WPConfModifReviewingBase ):
+    
+    def __init__(self, rh, conf, msg):
+        self._msg = msg
+        WPConfModifReviewingBase.__init__(self, rh, conf)
+
+    def _getTabContent( self, params ):
+        order = params.get("order","down")
+        websession = self._rh._getSession()
+        wc = conferences.WAbstracts( self._conf, params.get("filterCrit", None ), \
+                            params.get("sortingCrit", None),order, params.get("fields", None), params.get("menuStatus", None), websession )
+        p = {"authSearch":params.get("authSearch","")}
+        return wc.getHTML( p )
+    
+    def _setActiveTab(self):
+        self._subtabAbstractsReviewing.setActive()
+        self._tabAbstractReviewingSetup.setActive()
 
 class WConfModifAbstractReviewingSettings(wcomponents.WTemplated):
 
@@ -311,7 +343,7 @@ class WConfModifAbstractReviewingSettings(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         vars["ConfReview"] = self._conf.getConfReview()
-        return vars
+        return vars   
 
 #classes for control tab
 class WPConfModifReviewingControl(WPConfModifReviewingBase):
@@ -322,8 +354,8 @@ class WPConfModifReviewingControl(WPConfModifReviewingBase):
         WPConfModifReviewingBase.__init__(self, rh, target)
 
     def _setActiveTab( self ):
-        self._tabReviewingControl.setActive()
-
+        self._tabPaperReviewingControl.setActive()
+   
     def _getTabContent( self, params ):
         wc = WConfModifReviewingControl( self._conf )
         p = {
@@ -335,16 +367,52 @@ class WPConfModifReviewingControl(WPConfModifReviewingBase):
             "removeReviewerURL": urlHandlers.UHConfRemoveReviewer.getURL(), \
             "addRefereeURL": urlHandlers.UHConfSelectReferee.getURL(), \
             "removeRefereeURL": urlHandlers.UHConfRemoveReferee.getURL(), \
-            "addAbstractManagerURL": urlHandlers.UHConfSelectAbstractManager.getURL(), \
-            "removeAbstractManagerURL": urlHandlers.UHConfRemoveAbstractManager.getURL(), \
-            "addAbstractReviewerURL": urlHandlers.UHConfSelectAbstractReviewer.getURL(), \
-            "removeAbstractReviewerURL": urlHandlers.UHConfRemoveAbstractReviewer.getURL(), \
             }
         return wc.getHTML( p )
+ 
+#class for setting up abstract notification templates
+class WPConfModifAbstractsReviewingNotifTpl( WPConfModifReviewingBase ):
+    
+    def _setActiveTab( self ):
+        self._tabAbstractNotifTpl.setActive() 
+        self._subtabAbstractsReviewing.setActive()
+    
+    def _getTabContent( self, params ):
+        wc = conferences.WAbstractsReviewingNotifTpl( self._conf )
+        return wc.getHTML()
+ 
+class WPModCFANotifTplNew(WPConfModifReviewingBase):
+    
+    def _setActiveTab( self ):
+        self._tabAbstractNotifTpl.setActive() 
+        self._subtabAbstractsReviewing.setActive()
+    
+    def _getTabContent(self,params):
+        wc = conferences.WConfModCFANotifTplNew(self._conf)
+        params["errorList"]=params.get("errorList",[])
+        return wc.getHTML(params)      
 
+class WPConfReviewingAbstractList( WPConfModifReviewingBase):
+    
+    def __init__(self, rh, conf, msg):
+        self._msg = msg
+        WPConfModifReviewingBase.__init__(self, rh, conf)
 
+    def _getTabContent( self, params ):
+        order = params.get("order","down")
+        websession = self._rh._getSession()
+        wc = conferences.WAbstracts( self._conf, params.get("filterCrit", None ), \
+                            params.get("sortingCrit", None),order, params.get("fields", None), params.get("menuStatus", None), websession )
+        p = {"authSearch":params.get("authSearch","")}
+        return wc.getHTML( p )
+    
+    def _setActiveTab(self):
+        self._subtabAbstractsReviewing.setActive()
+        self._tabAbstractList.setActive()                       
+        
+            
 class WConfModifReviewingControl(wcomponents.WTemplated):
-    """ Template for the previous class. Uses the 3 next classes as templates
+    """ Template for the previous class. Uses the 2 next classes as templates
     """
 
     def __init__( self, conference):
@@ -354,7 +422,6 @@ class WConfModifReviewingControl(wcomponents.WTemplated):
 
         rc=""
         rcPRM=""
-        rcAbstract=""
 
         if self._conf.getConfReview().getChoice() != 1 and self._conf.getConfReview().getChoice() == 0:
             return """<table align="center"><tr><td>Type of reviewing has not been chosen yet</td></tr></table>"""
@@ -370,14 +437,8 @@ class WConfModifReviewingControl(wcomponents.WTemplated):
                                                 params["removeEditorURL"], \
                                                 params["addReviewerURL"], \
                                                 params["removeReviewerURL"])
-
-            rcAbstract = WConfModificationAbstractReviewingFrame().getHTML( self._conf,\
-                                                params["addAbstractManagerURL"], \
-                                                params["removeAbstractManagerURL"], \
-                                                params["addAbstractReviewerURL"], \
-                                                params["removeAbstractReviewerURL"])
-
-            return """<table width="100%%" class="Revtab"><tr><td>%s%s%s</td></tr></table>"""%(rcPRM, rc, rcAbstract)
+            
+            return """<table width="100%%" class="Revtab"><tr><td>%s%s</td></tr></table>"""%(rcPRM, rc)
 
 
 class WConfModificationReviewingFramePRM(wcomponents.WTemplated):
@@ -458,7 +519,24 @@ class WConfModificationReviewingFrame(wcomponents.WTemplated):
         vars["reviewerTable"] = reviewer
         vars["refereeTable"] = refereeTable
 
-        return vars
+class WConfModifAbstractsReviewingControl(wcomponents.WTemplated):
+    """ Template for the previous class. Uses the next class as templates
+    """
+    
+    def __init__( self, conference):
+        self._conf = conference
+
+    def getHTML( self, params ):
+        
+        rcAbstract=""
+        rcAbstract = WConfModificationAbstractReviewingFrame().getHTML( self._conf,\
+                                                params["addAbstractManagerURL"], \
+                                                params["removeAbstractManagerURL"], \
+                                                params["addAbstractReviewerURL"], \
+                                                params["removeAbstractReviewerURL"])
+        
+        return """<table width="100%%" class="Revtab"><tr><td>%s</td></tr></table>"""%(rcAbstract)
+
 
 class WConfModificationAbstractReviewingFrame(wcomponents.WTemplated):
     """ Template used by WConfModifReviewingControl,
@@ -490,8 +568,8 @@ class WPConfSelectPaperReviewManager( WPConfModifReviewingBase ):
 
     def _createTabCtrl(self):
         WPConfModifReviewingBase._createTabCtrl(self)
-        self._tabReviewingControl.setActive()
-
+        self._tabPaperReviewingControl.setActive()
+    
     def _getTabContent( self, params ):
         searchExt = params.get("searchExt","")
         if searchExt != "":
@@ -508,8 +586,9 @@ class WPConfSelectAbstractManager( WPConfModifReviewingBase ):
 
     def _createTabCtrl(self):
         WPConfModifReviewingBase._createTabCtrl(self)
-        self._tabReviewingControl.setActive()
-
+        self._subtabAbstractsReviewing.setActive()
+        self._tabAbstractsReviewingControl.setActive()
+    
     def _getTabContent( self, params ):
         searchExt = params.get("searchExt","")
         if searchExt != "":
@@ -526,8 +605,8 @@ class WPConfSelectEditor( WPConfModifReviewingBase ):
 
     def _createTabCtrl(self):
         WPConfModifReviewingBase._createTabCtrl(self)
-        self._tabReviewingControl.setActive()
-
+        self._tabPaperReviewingControl.setActive()
+    
     def _getTabContent( self, params ):
         searchExt = params.get("searchExt","")
         if searchExt != "":
@@ -544,8 +623,8 @@ class WPConfSelectReviewer( WPConfModifReviewingBase ):
 
     def _createTabCtrl(self):
         WPConfModifReviewingBase._createTabCtrl(self)
-        self._tabReviewingControl.setActive()
-
+        self._tabPaperReviewingControl.setActive()
+    
     def _getTabContent( self, params ):
         searchExt = params.get("searchExt","")
         if searchExt != "":
@@ -562,8 +641,8 @@ class WPConfSelectReferee( WPConfModifReviewingBase ):
 
     def _createTabCtrl(self):
         WPConfModifReviewingBase._createTabCtrl(self)
-        self._tabReviewingControl.setActive()
-
+        self._tabPaperReviewingControl.setActive()
+    
     def _getTabContent( self, params ):
         searchExt = params.get("searchExt","")
         if searchExt != "":
@@ -580,8 +659,9 @@ class WPConfSelectAbstractReviewer( WPConfModifReviewingBase ):
 
     def _createTabCtrl(self):
         WPConfModifReviewingBase._createTabCtrl(self)
-        self._tabReviewingControl.setActive()
-
+        self._subtabAbstractsReviewing.setActive()
+        self._tabAbstractsReviewingControl.setActive()
+    
     def _getTabContent( self, params ):
         searchExt = params.get("searchExt","")
         if searchExt != "":

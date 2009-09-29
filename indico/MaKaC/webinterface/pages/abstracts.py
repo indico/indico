@@ -736,7 +736,7 @@ class WPAbstractManagementBase( WPConferenceModifBase ):
         return banner + html
 
     def _setActiveSideMenuItem(self):
-        self._abstractMenuItem.setActive(True)
+        self._reviewingMenuItem.setActive(True)
 
     def _getTabContent( self, params ):
         return "nothing"

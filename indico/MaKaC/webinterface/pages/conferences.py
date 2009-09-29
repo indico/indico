@@ -2079,8 +2079,8 @@ class WPConferenceModifBase( main.WPMainBase ):
             urlHandlers.UHConfModifReviewingAccess.getURL( target = self._conf ) )
         self._generalSection.addItem( self._reviewingMenuItem)        
         
-        self._abstractMenuItem = wcomponents.SideMenuItem(_("Abstracts"),
-            urlHandlers.UHConfAbstractManagment.getURL( self._conf ))
+        self._abstractMenuItem = wcomponents.SideMenuItem(_("Call for Abstracts"),
+            urlHandlers.UHConfModifCFA.getURL( self._conf ))
         self._generalSection.addItem( self._abstractMenuItem)
 
         self._contribListMenuItem = wcomponents.SideMenuItem(_("Contributions"),
@@ -2243,7 +2243,7 @@ class WPConferenceModifAbstractBase( WPConferenceModifBase ):
 
         self._tabCFA = self._tabCtrl.newTab( "cfasetup", _("Setup"), urlHandlers.UHConfModifCFA.getURL( self._conf ) )
         self._tabCFAPreview = self._tabCtrl.newTab("cfapreview", _("Preview"), urlHandlers.UHConfModifCFAPreview.getURL(self._conf))
-        self._tabAbstractList = self._tabCtrl.newTab( "abstractList", _("List of Abstracts"), urlHandlers.UHConfAbstractManagment.getURL( self._conf ) )
+        self._tabAbstractList = self._tabCtrl.newTab( "abstractList", _("List of Abstracts"), urlHandlers.UHConfAbstractList.getURL( self._conf ) )
         self._tabBOA = self._tabCtrl.newTab("boa", _("Book of Abstracts Setup"), urlHandlers.UHConfModAbstractBook.getURL(self._conf))
 
         if not self._conf.hasEnabledSection("cfa"):
@@ -5434,6 +5434,46 @@ class WConfModifCFA( wcomponents.WTemplated ):
         vars["remNotifTplURL"]=urlHandlers.UHAbstractModNotifTplRem.getURL(self._conf)
         return vars
 
+class WAbstractsReviewingNotifTpl( wcomponents.WTemplated ):
+    def __init__( self, conference ):
+        self._conf = conference
+        
+    def _getNotifTplsHTML(self):
+        res=[]
+        for tpl in self._conf.getAbstractMgr().getNotificationTplList():
+            res.append("""
+                <tr>
+                    <td bgcolor="white" nowrap>
+                        <a href=%s><img src=%s border="0" alt=""></a>
+                        <a href=%s><img src=%s border="0" alt=""></a>
+                        <input type="checkbox" name="selTpls" value=%s>
+                    </td>
+                    <td bgcolor="white" align="left" nowrap><a href=%s>%s</a></td>
+                    <td>&nbsp;<td>
+                    <td bgcolor="white" align="left" width="90%%"><font size="-1">%s</font></td>
+                </tr>"""%(quoteattr(str(urlHandlers.UHConfModCFANotifTplUp.getURL(tpl))),\
+                            quoteattr(str(Config.getInstance().getSystemIconURL("upArrow"))),\
+                            quoteattr(str(urlHandlers.UHConfModCFANotifTplDown.getURL(tpl))),\
+                            quoteattr(str(Config.getInstance().getSystemIconURL("downArrow"))),\
+                            quoteattr(str(tpl.getId())), \
+                            quoteattr(str(urlHandlers.UHAbstractModNotifTplDisplay.getURL(tpl))), \
+                            self.htmlText(tpl.getName()), \
+                            self.htmlText(tpl.getDescription())))
+        return "".join(res)
+    
+    def getVars( self ):
+        vars = wcomponents.WTemplated.getVars(self)
+        abMgr = self._conf.getAbstractMgr()
+        if abMgr.getCFAStatus():
+            modifDL = abMgr.getModificationDeadline()
+            if not modifDL:
+                vars["notifTpls"]=self._getNotifTplsHTML()
+                vars["addNotifTplURL"]=urlHandlers.UHAbstractModNotifTplNew.getURL(self._conf)
+                vars["remNotifTplURL"]=urlHandlers.UHAbstractModNotifTplRem.getURL(self._conf)
+        return vars
+
+
+
 
 class WPConfModifCFASelectSubmitters(WPConferenceModifAbstractBase):
 
@@ -5719,7 +5759,7 @@ class WPModCFANotifTplBase(WPConferenceModifBase):
         pass
 
     def _setActiveSideMenuItem(self):
-        self._abstractMenuItem.setActive(True)
+        self._reviewingMenuItem.setActive()
 
 #    def _applyFrame( self, body ):
 #        frame = wcomponents.WNotifTPLModifFrame( self._notifTpl, self._getAW() )
@@ -6183,6 +6223,7 @@ class WAbstracts( wcomponents.WTemplated ):
         url = urlHandlers.UHConfAbstractManagment.getURL(self._conf)
         return url
 
+    
     def _getTrackFilterItemList( self ):
         checked = ""
         field=self._filterCrit.getField("track")

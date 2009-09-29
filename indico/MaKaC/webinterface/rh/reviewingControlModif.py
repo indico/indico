@@ -40,7 +40,20 @@ class RHConfModifReviewingControl( RHConfModifReviewingPRMAMBase ):
         else:
             p = reviewing.WPConfModifReviewingControl( self, self._target)
         return p.display()
+
+class RHConfModifReviewingAbstractsControl( RHConfModifReviewingPRMAMBase ):
+    _uh = urlHandlers.UHConfModifReviewingAbstractsControl
     
+    def _checkParams( self, params ):
+        RHConfModifReviewingPRMAMBase._checkParams( self, params )
+
+    def _process( self ):
+        if self._conf.isClosed():
+            p = WPConferenceModificationClosed( self, self._target )
+        else:
+            p = reviewing.WPConfModifReviewingAbstractsControl( self, self._target)
+        return p.display()
+   
 class RHConfModifReviewingBase(RHConferenceModifBase):
     """ Base class that checks if reviewing module is active
     """
@@ -259,7 +272,7 @@ class RHConfAddAbstractManager( RHConfModifReviewingBase ):
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 if id is not None and id != '':
                     self._target.getConfReview().addAbstractManager( ph.getById( id ) )
-        self._redirect( urlHandlers.UHConfModifReviewingControl.getURL( self._target ) )
+        self._redirect( urlHandlers.UHConfModifReviewingAbstractsControl.getURL( self._target ) )
 
 
 class RHConfRemoveAbstractManager( RHConfModifReviewingBase ):
@@ -281,7 +294,7 @@ class RHConfRemoveAbstractManager( RHConfModifReviewingBase ):
                         self._target.revokeModification(av)
                     else:
                         self._target.getAccessController().revokeModificationEmail(id)
-        self._redirect( urlHandlers.UHConfModifReviewingControl.getURL( self._target ) )
+        self._redirect( urlHandlers.UHConfModifReviewingAbstractsControl.getURL( self._target ) )
 
 #Abstract Reviewer classes
 class RHConfSelectAbstractReviewer( RHConfModifReviewingAMBase ):
@@ -301,7 +314,7 @@ class RHConfAddAbstractReviewer( RHConfModifReviewingAMBase ):
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 if id is not None and id != '':
                     self._target.getConfReview().addAbstractReviewer( ph.getById( id ) )
-        self._redirect( urlHandlers.UHConfModifReviewingControl.getURL( self._target ) )
+        self._redirect( urlHandlers.UHConfModifReviewingAbstractsControl.getURL( self._target ) )
 
 
 class RHConfRemoveAbstractReviewer( RHConfModifReviewingAMBase ):
@@ -319,5 +332,5 @@ class RHConfRemoveAbstractReviewer( RHConfModifReviewingAMBase ):
                         self._target.revokeModification(av)
                     else:
                         self._target.getAccessController().revokeModificationEmail(id)
-        self._redirect( urlHandlers.UHConfModifReviewingControl.getURL( self._target ) )
+        self._redirect( urlHandlers.UHConfModifReviewingAbstractsControl.getURL( self._target ) )
 

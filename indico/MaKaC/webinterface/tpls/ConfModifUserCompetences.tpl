@@ -1,6 +1,6 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 
-<table class="Revtab" width="90%%" cellspacing="0" align="center" border="0" style="padding-left:2px">
+<table class="Revtab" width="90%%" cellspacing="0" align="center" border="0" style="padding-left:2px; padding-top: 20px;">
     <tr>
         <td nowrap class="groupTitle" colspan=5>
             <%= _("User competences")%>

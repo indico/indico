@@ -160,7 +160,7 @@ def setTTFonts():
     pdfmetrics.registerFont(TTFont('LinuxLibertine-Bold-Italic', os.path.join(dir, 'LinLibertine_BI-4.0.5.ttf')))
     pdfmetrics.registerFont(TTFont('Kochi-Mincho', os.path.join(dir, 'kochi-mincho-subst.ttf')))
     pdfmetrics.registerFont(TTFont('Kochi-Gothic', os.path.join(dir, 'kochi-gothic-subst.ttf')))
-    pdfmetrics.registerFont(TTFont('Uming-CN', os.path.join(dir, 'uming.ttc')))
+    #pdfmetrics.registerFont(TTFont('Uming-CN', os.path.join(dir, 'uming.ttc')))
 
 class Paragraph(platypus.Paragraph):
     """
