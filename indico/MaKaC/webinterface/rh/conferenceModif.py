@@ -4115,7 +4115,7 @@ class RHAbstractList(RHConfModifCFABase):
             for id in dict.get("selAccTypes", []):
                 ltypes.append(self._conf.getContribTypeById(id))
         filter["acc_type"]=ltypes
-        if dict.has_key("selOnlyComments"):
+        if dict.has_key("selOnlyComments") and params.get("selOnlyComments", None):
             filter["comment"] = ""
         self._criteria=AbstractFilterCriteria(self._conf,filter)
         trackShowNoValue,typeShowNoValue,accTypeShowNoValue=True,True,True
