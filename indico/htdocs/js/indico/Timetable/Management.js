@@ -78,7 +78,7 @@ type("TimetableManagementActions", [], {
                 var data = self.timetable.getData();
                 var day = IndicoUtil.formatDate2(IndicoUtil.parseJsonDate(eventData.startDate));
                 delete data[day][eventData.id];
-                self.timetable.setData(data);
+                self.timetable.setData(data, self.session);
 
                 if (type == 'Session') {
                     // Delete the session from the eventInfo session list
@@ -370,7 +370,7 @@ type("TimetableManagementActions", [], {
         this.warningArea = this._createInfoArea();
         this.warningArea.dom.style.display = 'none';
 
-                this.menu = Html.div({style: {cssFloat: 'right', color: '#777'}}, this.addMenuLink, this.addIntervalLink, this.separator, this.rescheduleLink);
+        this.menu = Html.div({style: {cssFloat: 'right', color: '#777'}}, this.addMenuLink, this.addIntervalLink, this.separator, this.rescheduleLink);
         this.updateTTMenu();
         return Html.div({}, this.warningArea, Html.div('clearfix', this.menu, this.infoBox));
     },
@@ -385,14 +385,28 @@ type("TimetableManagementActions", [], {
 
         return new Date(year, month-1, day);
     },
+
+    _allowCreateHere: function(elementType) {
+        switch(elementType) {
+        case 'Session':
+            return (this.session === null);
+        case 'Break':
+            return (this.session?this.session.isPoster === false:true);
+        case 'Contribution':
+            return true;
+        }
+
+    },
+
     _openAddMenu: function(triggerElement) {
         var self = this;
 
         var menuItems = {};
         this.addMenu = new PopupMenu(menuItems, [triggerElement], null, true, true);
-        if (this.session === null) {
+
+        if (this._allowCreateHere('Session')) {
             if (keys(this.eventInfo.sessions).length === 0) {
-                menuItems.Session = function() { self.addSession(); };
+                menuItems[$T('Session')] = function() { self.addSession(); };
             } else {
                 var sessions = {};
                 each(this.eventInfo.sessions, function(session, key) {
@@ -406,12 +420,18 @@ type("TimetableManagementActions", [], {
                     'Add interval to:': sessions
 
                 };
-                menuItems.Session = new SectionPopupMenu(menuu, [triggerElement, this.addMenu], 'timetableSectionPopupList popupListChained', true, true);
+                menuItems[$T('Session')] = new SectionPopupMenu(menuu, [triggerElement, this.addMenu], 'timetableSectionPopupList popupListChained', true, true);
             }
 
         }
-        menuItems.Contribution = function() { self.addContribution(); };
-        menuItems.Break = function () { self.addBreak(); };
+
+        if (this._allowCreateHere('Contribution')){
+            menuItems[$T('Contribution')] = function() { self.addContribution(); };
+        }
+
+        if (this._allowCreateHere('Break')){
+            menuItems[$T('Break')] = function () { self.addBreak(); };
+        }
 
         var pos = triggerElement.getAbsolutePosition();
         this.addMenu.open(pos.x + triggerElement.dom.offsetWidth + 10, pos.y + triggerElement.dom.offsetHeight + 2);
@@ -683,8 +703,10 @@ type("TimetableManagementActions", [], {
 
         // Only set data if the data was not provided as a parameter
         // If provided as parameter this is handled by the caller
+
+
         if (setData) {
-            this.timetable.setData(data);
+            this.timetable.setData(data, this.session);
         }
 
         var self = this;
@@ -724,7 +746,7 @@ type("TimetableManagementActions", [], {
             self._updateEntry(entry, data);
         });
 
-        this.timetable.setData(data);
+        this.timetable.setData(data, this.session);
     },
     _showInfoBox: function(content) {
         this._hideWarnings();

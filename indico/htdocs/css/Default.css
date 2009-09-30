@@ -5302,6 +5302,22 @@ div.disabled input[disabled] {
     font-weight: bold;
 }
 
-div.greyHighlight:hover {
+div.posterEntry {
+    border: 1px solid #aaaaaa;
+    -moz-border-radius: 3px;
+    -webkit-border-radius:3px;
+    behavior: url(border-radius.htc);
+    padding: 5px;
+    margin-bottom: 5px;
+    overflow: auto;
+}
+
+div.posterEntry:hover {
     background-color: #ECECEC;
+}
+
+.posterBlockTime {
+    font-size: 8pt;
+    float: right;
+    margin-top: 5px;
 }

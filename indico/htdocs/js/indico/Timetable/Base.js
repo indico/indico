@@ -23,7 +23,7 @@ var TimetableDefaults = {
                                },
                                manager: new ProportionalLayoutManager()
                               },
-                              
+
               'poster': {name: 'Poster',
                          manager: new PosterLayoutManager()
                         }

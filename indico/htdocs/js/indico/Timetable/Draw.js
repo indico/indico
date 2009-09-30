@@ -1545,13 +1545,13 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
             var dayData = this.layoutChooser.get().drawDay(this.data[this.day]);
             var height = 100+TimetableDefaults.topMargin+TimetableDefaults.bottomMargin;
             this.wrappingElement.setStyle('height', pixels(height + (this.printableVersion ? 0 : 100))); // +100 to have margin for the tabs
-        
+
             var blocks = this._posterBlocks(dayData);
 
             this.canvas.set(Html.div({style: {position: 'relative'}}, blocks));
-        
+
             this.postDraw();
-        
+
             return height;
         },
 
@@ -1562,7 +1562,7 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
                 return this.TimetableDrawer.prototype.redraw.call(this);
             }
         },
-        
+
         _posterBlocks: function(data) {
             var self = this;
 
@@ -1576,15 +1576,25 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
             self.blocks = [];
             var topPx = 0;
             each(data, function(blockData, id) {
-                /*var colWidth = Math.floor(self.width-TimetableDefaults.leftMargin);
-                var leftPos = TimetableDefaults.leftMargin;
-                var width = self.width - leftPos - TimetableDefaults.rightMargin;
-                var block = new TimetableBlock(blockData, {'start':topPx,'end':topPx+50}, false, self.printableVersion, self.detail.get(), self.managementMode, self.managementActions);
-                topPx += 50;*/
-                
-                var entryTools = Html.div({style:{"float": "right"}},"edit | delete");
+
+                var editLink = Html.a('fakeLink', "Edit");
+                editLink.observeClick(function() {
+                    window.location = self.managementActions.editEntry(blockData);
+                });
+
+                var deleteLink = Html.a('fakeLink', "Delete");
+                deleteLink.observeClick(function() {
+                    self.managementActions.deleteEntry(blockData);
+                });
+
+
+                var entryTools = Html.div({style:{cssFloat: "right"}},editLink," | ",deleteLink);
                 var entryInfo = Html.div({},blockData.title );
-                var block = Html.div({className:'greyHighlight'}, entryTools, entryInfo);
+                var timeDiv = Html.div("posterBlockTime", blockData.startDate.time.substring(0,5) +' - '+ blockData.endDate.time.substring(0,5));
+                var block = Html.div({className:'posterEntry'},
+                    entryTools,
+                    entryInfo,
+                    Html.div({},timeDiv));
                 blockDiv.append(block);
                 self.blocks.push(block);
             });
@@ -1593,16 +1603,20 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
         },
 
         postDraw: function() {
-            
+
         },
 
         setData: function(data, day, isPoster) {
             this.isPoster = isPoster;
             this.day = day;
-            if (this.isPoster) this.setLayout('poster');
+            if (this.isPoster) {
+                this.setLayout('poster');
+            } else {
+                this.setLayout('compact');
+            }
             this.TimetableDrawer.prototype.setData.call(this, data);
         }
-    }, 
+    },
     function(data, canvas, width, wrappingElement, extraButtons, loadingIndicator, managementMode, managementActions) {
         this.TimetableDrawer(data, canvas, width, wrappingElement, 'session', extraButtons, loadingIndicator, managementMode, managementActions, data.isPoster?'poster':null);
     }

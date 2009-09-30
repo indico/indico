@@ -815,7 +815,7 @@ class ScheduleContributions(AutoOpsMixin):
 
             contrib = self._getContributionId(contribId)
 
-            self._handlePosterContributions()
+            self._handlePosterContributions(contrib)
 
             d = self._target.getSchedule().calculateDayEndDate(self._date)
 
@@ -842,7 +842,7 @@ class SessionSlotScheduleContributions(ScheduleContributions, sessionServices.Se
     def _getContributionId(self, contribId):
         return self._target.getSession().getContributionById(contribId)
 
-    def _handlePosterContributions(self):
+    def _handlePosterContributions(self, contrib):
         if self._slot.getSession().getScheduleType() == "poster":
             contrib.setStartDate(self._slot.getStartDate())
 
@@ -857,7 +857,7 @@ class ConferenceScheduleContributions(ScheduleContributions, conferenceServices.
     def _getContributionId(self, contribId):
         return self._target.getContributionById(contribId)
 
-    def _handlePosterContributions(self):
+    def _handlePosterContributions(self, contrib):
         pass
 
     def _getSlotEntry(self):

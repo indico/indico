@@ -74,35 +74,37 @@ type("TimetableLayoutManager", [],
          reorderAssigned: function(assigned, lastAssigned, currentGroup) {
 
              var correctlyAssigned = function(block) {
-                 return exists(lastAssigned[block.sessionId]) && lastAssigned[block.sessionId]['col'] == block.assigned;
-             }
+                 return exists(lastAssigned[block.sessionId]) && lastAssigned[block.sessionId].col == block.assigned;
+             };
 
              // Returns number of previously processed session slots
              var numAssignedBlocks = function(sessionId) {
-                 var blocks = lastAssigned[sessionId]['blocks'];
+                 var blocks = lastAssigned.sessionId.blocks;
                  var keyss = keys(blocks);
                  var length = keyss.length;
                  return length;
-             }
+             };
 
              // Adds/updates a block in the lastAssigned dictionary
              var lastAssign = function(block, col) {
-                 var col = any(col, null);
-                 if (!exists(lastAssigned[block.sessionId]))
+                 col = any(col, null);
+                 if (!exists(lastAssigned[block.sessionId])) {
                      lastAssigned[block.sessionId] = {'blocks': {}};
-                 if (col != null)
-                     lastAssigned[block.sessionId]['col'] = col;
-                 lastAssigned[block.sessionId]['blocks'][block.id] = true;
-             }
+                 }
+                 if (col !== null) {
+                     lastAssigned[block.sessionId].col = col;
+                 }
+                 lastAssigned[block.sessionId].blocks[block.id] = true;
+             };
 
              // Changes the column of a block
              var reassign = function(block, col) {
                  block.assigned = col;
                  assigned[col] = block;
                  if (!exists(block.sessionId)) {
-                     lastAssign(block, col)
+                     lastAssign(block, col);
                  }
-             }
+             };
 
              for (key in currentGroup) {
                  var block = currentGroup[key];
@@ -110,8 +112,9 @@ type("TimetableLayoutManager", [],
                  // If this is not a session slot (that is a block
                  // that has sessionId set) then we don't care about in
                  // which column it is placed
-                 if (!exists(block.sessionId))
+                 if (!exists(block.sessionId)) {
                      continue;
+                 }
 
                  if (!exists(lastAssigned[block.sessionId])) {
                      // This block has never been assigned before. Just update the lastAssigned.
@@ -126,7 +129,7 @@ type("TimetableLayoutManager", [],
                      continue;
                  }
 
-                 var preferedCol = lastAssigned[block.sessionId]['col'];
+                 var preferedCol = lastAssigned[block.sessionId].col;
                  var existingBlock = assigned[preferedCol];
 
                  // If there's no block on the prefered column it means
@@ -247,7 +250,7 @@ type("IncrementalLayoutManager", ["TimetableLayoutManager"],
 
              }
 
-             if ($L(ks).indexOf('nextday') != null) {
+             if ($L(ks).indexOf('nextday') !== null) {
                  self.processTimeBlock('nextday', 'nextday', (startingHour * 60 + minutes), minutes, algData);
              } else {
                  // add last hour + 1 to the grid
@@ -348,16 +351,21 @@ type("CompactLayoutManager", ["IncrementalLayoutManager"],
                      self.assign(algData.assigned, block);
                      algData.currentGroup.push(block);
                  } else if (point[1] == 'wholeday') {
-                     self.addWholeDayBlock(algData.wholeDayBlocks, point[0])
+                     self.addWholeDayBlock(algData.wholeDayBlocks, point[0]);
                  }
              });
              // Try to reaorder the assigned blocks based on their previous position
-             if (blockAdded)
+             if (blockAdded) {
                  self.reorderAssigned(algData.assigned, algData.lastAssigned, algData.currentGroup);
+             }
 
              if (algData.active > 0) {
                  var extraPx = 0;
-                 each(algData.extraPx, function(value, key) { if (value > extraPx) extraPx = value; } );
+                 each(algData.extraPx, function(value, key) {
+                     if (value > extraPx) {
+                         extraPx = value;
+                     }
+                 });
                  algData.topPx += pxStep + extraPx;
              } else {
                  algData.topPx += TimetableDefaults.layouts.compact.values.pxPerSpace;
