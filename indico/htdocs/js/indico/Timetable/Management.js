@@ -226,8 +226,8 @@ type("TimetableManagementActions", [], {
 
         var message = Html.div({}, Html.span({style: {fontStyle: 'italic', fontSize: '0.9em'}},
             $T('You are viewing the contents of the session:')),
-            Html.div({style: {fontWeight: 'bold', marginTop: '5px', fontSize: '1.3em'}}, eventData.title +
-                     (eventData.slotTitle ? ": " + eventData.slotTitle : ''),
+            Html.div({style: {fontWeight: 'bold', marginTop: '5px', fontSize: '1.3em'}},
+                     this._generateSlotTitle(eventData),
                      Html.span({style: {fontWeight: 'normal'}},
                                " (", $B(Html.span({}), this.slotStartTime), " - ", $B(Html.span({}), this.slotEndTime),")" )));
 
@@ -242,7 +242,18 @@ type("TimetableManagementActions", [], {
         timetable.disable();
     },
 
-    _processWarning: function(entry, startTime, endTime) {
+    _generateSlotTitle: function(slotData) {
+        return slotData.title + (slotData.slotTitle ? ": " + slotData.slotTitle : '');
+    },
+
+    _processWarning: function(entry, startTime, endTime, slotTitle) {
+        /*
+         * entry - the warning 'entry', a list
+         * startTime - the original starting time for the timeblock
+         * endTime - the original ending time for the timeblock
+         * [slotTitle] - title, if the entry is a slot
+         */
+
         var msg = entry[1];
         var finalTime = entry[3];
 
@@ -255,17 +266,17 @@ type("TimetableManagementActions", [], {
             // warning will be supressed
             if (endTime != finalTime) {
                 // slice(1) to ignore first value
-                return concat(entry.slice(1),  [endTime]);
+                return concat(entry.slice(1),  [endTime, slotTitle]);
             }
         } else if (msg == "OWNER_START_DATE_EXTENDED") {
             // Again, make sure that something changed
 
             if (startTime != finalTime) {
                 // slice(1) to ignore first value
-                return concat(entry.slice(1), [startTime]);
+                return concat(entry.slice(1), [startTime, slotTitle]);
             }
         } else {
-            return concat(entry.slice(1), [startTime]);
+            return concat(entry.slice(1), [startTime, slotTitle]);
         }
 
         return null;
@@ -299,17 +310,17 @@ type("TimetableManagementActions", [], {
 
                                var message = {
                                    OWNER_START_DATE_EXTENDED: {
-                                       SessionSlot : $T('The <strong>starting time</strong> of the session interval moved from  '),
-                                       Session: $T('The <strong>starting time</strong> of the session interval moved from '),
+                                       SessionSlot : $T('The <strong>starting time</strong> of the session interval <strong>')  + item[4] + $T('</strong> was moved from '),
+                                       Session: $T('The <strong>starting time</strong> of the session interval <strong>')  + item[4]  + $T('</strong> was moved from '),
                                        Conference: $T('The <strong>starting time</strong> of the <strong>Conference</strong> was moved from ')
                                    },
                                    OWNER_END_DATE_EXTENDED: {
-                                       SessionSlot : $T('The <strong>ending time</strong> of the session interval moved from '),
-                                       Session: $T('The <strong>ending time</strong> of the session interval moved from '),
+                                       SessionSlot : $T('The <strong>ending time</strong> of the session interval <strong>') + item[4] + $T('</strong> was moved from '),
+                                       Session: $T('The <strong>ending time</strong> of the session interval <strong>') + item[4] + $T('</strong> was moved from '),
                                        Conference: $T('The <strong>ending time</strong> of the <strong>Conference</strong> was moved from ')
                                    },
                                    ENTRIES_MOVED: {
-                                       SessionSlot: $T('The contents of the interval were moved from ')
+                                       SessionSlot: $T('The contents of the interval <strong>') + item[4] + $T('</strong> were moved from ')
                                    }
                                }[item[0]][atoms[0]];
 
@@ -649,7 +660,7 @@ type("TimetableManagementActions", [], {
             if (originalArgs &&
                 (originalArgs.startDate.date != result.entry.startDate.date) ||
                 (originalArgs.startDate.time != result.entry.startDate.time) ||
-                (originalArgs.duration != result.entry.duration)) {
+               (originalArgs.duration != result.entry.duration)) {
 
                 /*this.timetable.postDraw();*/
                 var prevDay = IndicoUtil.formatDate2(IndicoUtil.parseDateTime(originalArgs.startDate));
@@ -683,10 +694,13 @@ type("TimetableManagementActions", [], {
 
         this._hideWarnings();
 
+        // if we are in "slot mode", get the title
+        var slotTitle = slot?self._generateSlotTitle(slot):null;
+
         if (result.autoOps && result.autoOps.length > 0) {
             each(result.autoOps,
                  function(op) {
-                     var warning = self._processWarning(op, oldStartTime, oldEndTime);
+                     var warning = self._processWarning(op, oldStartTime, oldEndTime, slotTitle);
                      if (warning && self.processedWarnings.indexOf(warning) === null) {
                          self.warningArea.dom.style.display = 'block';
                          self.processedWarnings.append(warning);
