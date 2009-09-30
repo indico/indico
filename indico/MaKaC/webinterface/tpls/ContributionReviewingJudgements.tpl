@@ -264,14 +264,14 @@ var submitted = false;
 var updatePage = function (){
     if (submitted) {
         <% if IsReferee: %>
-        submitButton.set($T('Mark as NOT submitted'));
-        $E('submittedmessage').set($T('Judgement submitted'));
+        submitButton.set($T('Undo submittion'));
+        $E('submittedmessage').set($T('Judgement has been send'));
         <% end %>
         showValues();
     } else {
         <% if IsReferee: %>
-        submitButton.set($T('Mark as submitted'));
-        $E('submittedmessage').set($T('Judgement not submitted yet'));
+        submitButton.set($T('Send for reviewing'));
+        $E('submittedmessage').set($T('Judgement not send yet'));
         <% end %>
         showWidgets();
     }

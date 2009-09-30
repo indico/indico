@@ -151,8 +151,8 @@ var showValues = function() {
 
 var updatePage = function (firstLoad){
     if (submitted) {
-        submitButton.set($T('Mark as NOT submitted'));
-        $E('submittedmessage').set($T('Judgement submitted'));
+        submitButton.set($T('Send submittion'));
+        $E('submittedmessage').set($T('Judgement has been send'));
         showValues();
     } else {
         submitButton.set('Mark as submitted');
