@@ -439,3 +439,28 @@ type("ParticipantListField", ["IWidget"],
         });
     }
 );
+
+
+/**
+ * Mouseover help popup for the 'PIN' field
+ */
+
+var CERNMCUPINHelpPopup = function(event) {
+    IndicoUI.Widgets.Generic.tooltip(this, event,
+        '<div style="padding:3px">' +
+            $T('If you want to <strong>protect<\/strong> your MCU conference with a PIN, write it here.') + '<br \/>' +
+            $T('Users will have to input the PIN in order to access the conference.') + '<br \/>' +
+            $T('Otherwise, leave empty.') +
+        '<\/div>');
+};
+
+/**
+ * Mouseover help popup for the 'Custom ID' field
+ */
+var CERNMCUCustomIDHelpPopup = function(event) {
+    IndicoUI.Widgets.Generic.tooltip(this, event,
+        '<div style="padding:3px">' + 
+            $T('If for some reason you want to choose youself the MCU ID of this conference, type it here.') + '<br \/>' +
+            $T('The MCU ID has to be a 5-digit number.') +
+        '<\/div>');
+};

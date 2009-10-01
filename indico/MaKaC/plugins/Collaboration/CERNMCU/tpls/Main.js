@@ -283,6 +283,16 @@
         <% end %>
         
         $E('participantsCell').set(pf.draw());
+        
+        
+        var PINHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
+        PINHelpImg.dom.onmouseover = CERNMCUPINHelpPopup;
+        
+        var customIDHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
+        customIDHelpImg.dom.onmouseover = CERNMCUCustomIDHelpPopup;
+        
+        $E('PINHelp').set(PINHelpImg);
+        $E('customIdHelp').set(customIDHelpImg);
     },
     
     onEdit: function(booking) {
