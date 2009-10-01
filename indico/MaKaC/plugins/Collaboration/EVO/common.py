@@ -200,6 +200,12 @@ class EVOError(CSErrorBase):
         
     @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.EVOError',
                 'MaKaC.plugins.Collaboration.EVO.common.OverlappedError',
+                'MaKaC.plugins.Collaboration.EVO.common.ChangesFromEVOError'], 'origin')
+    def getOrigin(self):
+        return 'EVO'
+        
+    @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.EVOError',
+                'MaKaC.plugins.Collaboration.EVO.common.OverlappedError',
                 'MaKaC.plugins.Collaboration.EVO.common.ChangesFromEVOError'],
                'errorType')
     def getErrorType(self):

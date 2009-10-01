@@ -881,6 +881,15 @@ var hiddenHelpPopup = function(event) {
         '<\/div>');
 };
 
+var sanitizationError = function(invalidFields) {
+    each(invalidFields, function(fieldName) {
+        var fields = $N(fieldName);
+        each(fields, function(field){
+            IndicoUtil.markInvalidField(field, $T("Tags in the <tag> form are not allowed. Please remove any '<' and '>' characters.")); 
+        });
+    });
+}
+
 /**
  * -A modal dialog will emerge to request the booking parameters to the user.
  * -The dialog will change depending on the plugin that has been selected / type of the booking being edited.
@@ -1025,7 +1034,11 @@ type ("BookingPopup", ["ExclusivePopup"],
                                         if (result.error) {
                                             killProgress();
                                             self.switchToBasicTab();
-                                            codes[self.bookingType].errorHandler('create', result);
+                                            if (result.origin === 'sanitization') {
+                                                sanitizationError(result.invalidFields);
+                                            } else {
+                                                codes[self.bookingType].errorHandler('create', result);
+                                            }
                                         } else {
                                             hideAllInfoRows(false);
                                             bookings.append(result);
@@ -1062,7 +1075,11 @@ type ("BookingPopup", ["ExclusivePopup"],
                                         if (result.error) {
                                             killProgress();
                                             self.switchToBasicTab();
-                                            codes[self.bookingType].errorHandler('edit', result);
+                                            if (result.origin === 'sanitization') {
+                                                sanitizationError(result.invalidFields);
+                                            } else {
+                                                codes[self.bookingType].errorHandler('edit', result);
+                                            }
                                         } else {
                                             refreshBooking(result);
                                             killProgress();
@@ -1342,7 +1359,11 @@ var sendRequest = function(pluginName, conferenceId) {
             if (!error) {
                 if (result.error) {
                     killProgress();
-                    codes[pluginName].errorHandler(exists(singleBookings[pluginName]) ? 'edit' : 'create', result)
+                    if (result.origin === 'sanitization') {
+                        sanitizationError(result.invalidFields);
+                    } else {
+                        codes[pluginName].errorHandler(exists(singleBookings[pluginName]) ? 'edit' : 'create', result)
+                    }
                 } else {
                  // If the server found no problems, a booking object is returned in the result.
                     // We add it to the watchlist and create an iframe.
@@ -1431,7 +1452,11 @@ var withdrawRequest = function(pluginName, conferenceId) {
                         if (!error) {
                             if (result.error) {
                                 killProgress();
-                                codes[pluginName].errorHandler('remove', result)
+                                if (result.origin === 'sanitization') {
+                                    sanitizationError(result.invalidFields);
+                                } else {
+                                    codes[pluginName].errorHandler('remove', result);
+                                }
                             } else {
                                 // If the server found no problems, we remove the booking from the watchlist and remove the corresponding iframe.
                                 removeIFrame(singleBookings[pluginName]);

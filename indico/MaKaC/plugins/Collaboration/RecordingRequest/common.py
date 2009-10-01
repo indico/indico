@@ -92,6 +92,10 @@ class RecordingRequestError(CSErrorBase):
         self._operation = operation
         self._inner = inner
         
+    @Retrieves(['MaKaC.plugins.Collaboration.RecordingRequest.common.RecordingRequestError'], 'origin')
+    def getOrigin(self):
+        return 'RecordingRequest'
+        
     @Retrieves(['MaKaC.plugins.Collaboration.RecordingRequest.common.RecordingRequestError'],
                'operation')
     def getOperation(self):

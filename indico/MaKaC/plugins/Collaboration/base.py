@@ -35,6 +35,7 @@ from MaKaC.common.indexes import IndexesHolder
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.conference import Observer
 from MaKaC.common.contextManager import ContextManager
+from MaKaC.webinterface.common.tools import hasTags
 import os, inspect
 import MaKaC.plugins.Collaboration as Collaboration
 from MaKaC.i18n import _
@@ -201,7 +202,9 @@ class CSBookingManager(Persistent, Observer):
             
             error = newBooking.setBookingParams(bookingParams)
             
-            if error:
+            if isinstance(error, CSSanitizationError):
+                return error
+            elif error:
                 raise CollaborationServiceException("Problem while creating a booking of type " + bookingType)
             else:
                 newId = self._getNewBookingId()
@@ -242,7 +245,9 @@ class CSBookingManager(Persistent, Observer):
         oldBookingParams = booking.getBookingParams() #this is a copy so it's ok
         
         error = booking.setBookingParams(bookingParams)
-        if error:
+        if isinstance(error, CSSanitizationError):
+            return error
+        elif error:
             CSBookingManager._rollbackChanges(booking, oldBookingParams, oldModificationDate)
             raise CollaborationServiceException("Problem while modifying a booking of type " + booking.getType())
         else:
@@ -1040,6 +1045,10 @@ class CSBookingBase(Persistent):
             Note: even if a parameter is in this list, you can decide not to implement its corresponding set
             method if you never expect the parameter name to come up inside 'params'.
         """
+        sanitizeResult = self.sanitizeParams(params)
+        if sanitizeResult:
+            return sanitizeResult
+        
         self.setHidden(params.pop("hidden", False))
         self.setNeedsToBeNotifiedOfDateChanges(params.pop("notifyOnDateChanges", False))
         
@@ -1050,7 +1059,7 @@ class CSBookingBase(Persistent):
         if endDate is not None:
             self.setEndDateFromString(endDate)
         
-        for k,v in params.items():
+        for k,v in params.iteritems():
             if k in self._bookingParams:
                 self._bookingParams[k] = v
             elif hasattr(self, "_complexParameters") and k in self._complexParameters:
@@ -1067,6 +1076,23 @@ class CSBookingBase(Persistent):
             return self._checkBookingParams()
         
         return False
+    
+    def sanitizeParams(self, params):
+        """ Checks if the fields introduced into the booking / request form
+            have any kind of HTML or script tag. 
+        """
+        if not isinstance(params, dict):
+            raise CollaborationServiceException("Booking parameters are not a dictionary")
+        
+        invalidFields = []
+        for k, v in params.iteritems():
+            if type(v) == str and hasTags(v):
+                invalidFields.append(k)
+                
+        if invalidFields:
+            return CSSanitizationError(invalidFields)
+        else:
+            return None
         
     def _getTitle(self):
         if self.hasEventDisplay():
@@ -1440,7 +1466,8 @@ class CSErrorBase(object):
         they should return an error that inherits from this class
     """
     
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSReturnedErrorBase',
+    @Retrieves(['MaKaC.plugins.Collaboration.base.CSErrorBase',
+                'MaKaC.plugins.Collaboration.base.CSSanitizationError',
                 'MaKaC.plugins.Collaboration.EVO.common.EVOError',
                 'MaKaC.plugins.Collaboration.EVO.common.OverlappedError',
                 'MaKaC.plugins.Collaboration.EVO.common.ChangesFromEVOError',
@@ -1462,6 +1489,22 @@ class CSErrorBase(object):
             Returns the string that will be printed in Indico's log when this error will happen.
         """
         raise CollaborationException("Method getLogMessage was not overriden for the a CSErrorBase object of class " + self.__class__.__name__)
+    
+class CSSanitizationError(CSErrorBase):
+    """ Class used to return which fields have a sanitization error (invalid html / script tags)
+    """
+    
+    def __init__(self, invalidFields):
+        self._invalidFields = invalidFields
+    
+    @Retrieves(['MaKaC.plugins.Collaboration.base.CSSanitizationError'], 'origin')
+    def getOrigin(self):
+        return 'sanitization'
+    
+    @Retrieves(['MaKaC.plugins.Collaboration.base.CSSanitizationError'], 'invalidFields')
+    def invalidFields(self):
+        return self._invalidFields
+    
         
         
 class CollaborationException(MaKaCError):

@@ -108,6 +108,10 @@ class WebcastRequestError(CSErrorBase):
         self._operation = operation
         self._inner = inner
         
+    @Retrieves(['MaKaC.plugins.Collaboration.WebcastRequest.common.WebcastRequestError'], 'origin')
+    def getOrigin(self):
+        return 'WebcastRequest'
+        
     @Retrieves(['MaKaC.plugins.Collaboration.WebcastRequest.common.WebcastRequestError'],
                'operation')
     def getOperation(self):

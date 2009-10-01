@@ -204,6 +204,10 @@ class CERNMCUError(CSErrorBase):
         self._faultCode = faultCode
         self._info = info
         
+    @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.CERNMCUError'], 'origin')
+    def getOrigin(self):
+        return 'CERNMCU'
+        
     @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.CERNMCUError'], 'faultCode')
     def getFaultCode(self):
         return self._faultCode
