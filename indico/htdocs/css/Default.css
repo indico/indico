@@ -4808,9 +4808,11 @@ div.timetableManagementInfoArea div {
 
 div.timetableManagementInfoArea ul {
     top: 2px;
-    padding-left: 20px;
+    padding-left: 10px;
     margin-top: 5px;
     margin-bottom:10px;
+    list-style: none;
+    margin-left: 5px;
 }
 
 div.timetableManagementInfoArea ul li{
