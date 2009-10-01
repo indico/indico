@@ -465,3 +465,17 @@ var CERNMCUCustomIDHelpPopup = function(event) {
             $T('The MCU ID has to be a 5-digit number.') +
         '<\/div>');
 };
+
+/**
+ * Draws the context help icons and assigns the appropiate popups to each one.
+ */
+var CERNMCUDrawContextHelpIcons = function() {
+    var PINHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
+    PINHelpImg.dom.onmouseover = CERNMCUPINHelpPopup;
+    
+    var customIDHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
+    customIDHelpImg.dom.onmouseover = CERNMCUCustomIDHelpPopup;
+    
+    $E('PINHelp').set(PINHelpImg);
+    $E('customIdHelp').set(customIDHelpImg);
+}

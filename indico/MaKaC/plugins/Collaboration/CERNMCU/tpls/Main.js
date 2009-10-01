@@ -289,15 +289,7 @@
         
         $E('participantsCell').set(pf.draw());
         
-        
-        var PINHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
-        PINHelpImg.dom.onmouseover = CERNMCUPINHelpPopup;
-        
-        var customIDHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
-        customIDHelpImg.dom.onmouseover = CERNMCUCustomIDHelpPopup;
-        
-        $E('PINHelp').set(PINHelpImg);
-        $E('customIdHelp').set(customIDHelpImg);
+        CERNMCUDrawContextHelpIcons();
     },
     
     onEdit: function(booking) {
@@ -307,6 +299,8 @@
         
         pf = new ParticipantListField(booking.bookingParams.participants)
         $E('participantsCell').set(pf.draw());
+        
+        CERNMCUDrawContextHelpIcons();
     },
     
     onSave: function(values) {

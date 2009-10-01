@@ -228,22 +228,11 @@
     },
     
     onCreate: function() {
-        var startDateHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
-        startDateHelpImg.dom.onmouseover = EVOStartDateHelpPopup;
-        
-        var endDateHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
-        endDateHelpImg.dom.onmouseover = EVOEndDateHelpPopup;
-        
-        var passwordHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
-        passwordHelpImg.dom.onmouseover = EVOPasswordHelpPopup;
-        
-        $E('startDateHelp').set(startDateHelpImg);
-        $E('endDateHelp').set(endDateHelpImg);
-        $E('passwordHelp').set(passwordHelpImg);
+        EVODrawContextHelpIcons();
     },
     
     onEdit: function() {
-        callFunction('EVO','onCreate');
+        EVODrawContextHelpIcons();
     },
     
     postCreate: function(booking) {
