@@ -43,17 +43,18 @@ type("RoomBookingWidget", ["IWidget"],
                                Html.tbody({},
                                           Html.tr({}, Html.th({}, Html.div('roomWidgetTitle', $T("Location"))),
                                                   Html.th({}, Html.div('roomWidgetTitle', $T("Room")))),
-                                          Html.tr({}, Html.td({style:{'verticalAlign': 'top'}},
-                                                              Html.div({style: {paddingRight: '20px'}}, this.locationChooser.draw())),
-                                                  Html.div({style: {paddingRight: '20px'}}, Html.td({style:{'verticalAlign': 'top'}},
-                                                              Html.div({style: {paddingRight: '20px'}}, this.roomChooser.draw())))),
                                           Html.tr({},
-                                                  Html.td({colspan: 3}, this.parentInfo?this.inheritCheckbox:'', this.inheritText)),
+                                                  Html.td({style:{'verticalAlign': 'top'}},
+                                                              Html.div({style: {paddingRight: '20px'}}, this.locationChooser.draw())),
+                                                  Html.td({style:{'verticalAlign': 'top'}},
+                                                          Html.div({style: {paddingRight: '20px'}}, this.roomChooser.draw()))),
+                                          Html.tr({},
+                                                  Html.td({colspan: 2}, this.parentInfo?this.inheritCheckbox:'', this.inheritText)),
                                           Html.tr({style:{height: '6px'}}),
                                           Html.tr({},
-                                                  Html.th({colspan: 3}, Html.div({className: 'roomWidgetTitle', style: {width: '210px'}}, $T('Address')))),
+                                                  Html.th({colspan: 2}, Html.div({className: 'roomWidgetTitle', style: {width: '210px'}}, $T('Address')))),
                                           Html.tr({},
-                                                  Html.td({colspan: '2'}, this.addressArea.draw())
+                                                  Html.td({colspan: 2}, this.addressArea.draw())
                                                  )));
 
 

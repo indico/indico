@@ -5241,6 +5241,7 @@ div.dialogButtons {
 div.flexibleSelect {
     border: 1px solid #AAAAAA;
     position: relative;
+    width: 200px;
 }
 
 div.flexibleSelect input {
