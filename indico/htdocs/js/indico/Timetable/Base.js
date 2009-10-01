@@ -174,7 +174,10 @@ type("TimeTable", ["LookupTabWidget"], {
         var type = info[0];
         info = info.slice(2);
 
-        if (type == 'Contribution') {
+        if (type == 'Conference') {
+            return this.eventInfo;
+        }
+        else if (type == 'Contribution') {
             throw 'not implemented!';
         } else if (type=='Session'){
             throw 'not implemented!';
@@ -330,6 +333,7 @@ type("TimeTableManagement", ["TimeTable"], {
     }
 },
      function(data, eventInfo, width, wrappingElement, detailLevel, isSessionTimetable) {
+         this.eventInfo = eventInfo;
          this.isSessionTimetable = any(isSessionTimetable, false);
          this.managementActions = new TimetableManagementActions(this, eventInfo);
          this.TimeTable(data, width, wrappingElement, detailLevel, true);

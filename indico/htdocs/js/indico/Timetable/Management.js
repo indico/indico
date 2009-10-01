@@ -264,6 +264,11 @@ type("TimetableManagementActions", [], {
 
         if (type == "Session") {
             return null;
+        } else if (type == 'Conference') {
+            conference = self.timetable.getById(entry[2]);
+            title = conference.title;
+            startTime = conference.startDate.time.slice(0,5);
+            endTime = conference.endDate.time.slice(0,5);
         } else if (type == 'SessionSlot') {
 
             // this 'if' clearly calls for inheritance

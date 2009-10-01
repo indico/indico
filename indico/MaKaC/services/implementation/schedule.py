@@ -19,6 +19,7 @@ from MaKaC.common.timezoneUtils import setAdjustedDate
 from MaKaC.common.logger import Logger
 from MaKaC.common.utils import getHierarchicalId, formatTime
 from MaKaC.common.contextManager import ContextManager
+from MaKaC.errors import TimingError
 
 import datetime, pytz
 
@@ -32,12 +33,6 @@ def translateAutoOps(autoOps):
          formatTime(newValue) if type(newValue) == datetime.datetime else newValue),
          autoOps)
 
-class AutoOpsMixin:
-    def initializeAutoOps(self):
-        ContextManager.set('autoOps',[])
-
-    def getAutoOps(self):
-        return ContextManager.get('autoOps')
 
 class ConferenceGetSchedule(conferenceServices.ConferenceDisplayBase):
     def _checkParams(self):
@@ -73,7 +68,24 @@ class LocationSetter:
                 target.setRoom(r)
                 r.setName(room)
 
-class ScheduleAddContribution(LocationSetter, AutoOpsMixin):
+class ScheduleOperation:
+    def _getAnswer(self):
+
+        self.initializeAutoOps()
+
+        try:
+            return self._performOperation()
+        except TimingError, e:
+            raise ServiceError("ERR-E2", e.getMsg())
+
+    def initializeAutoOps(self):
+        ContextManager.set('autoOps',[])
+
+    def getAutoOps(self):
+        return ContextManager.get('autoOps')
+
+
+class ScheduleAddContribution(ScheduleOperation, LocationSetter):
 
     def __addPeople(self, contribution, pManager, elemType, method):
         """ Generic method for adding presenters, authors and
@@ -114,9 +126,7 @@ class ScheduleAddContribution(LocationSetter, AutoOpsMixin):
         self._privileges = self._pManager.extract("privileges", pType=dict,                                                  allowEmpty=True)
         self._contribTypeId = self._pManager.extract("type", pType=str, allowEmpty=True)
 
-    def _getAnswer(self):
-
-        self.initializeAutoOps()
+    def _performOperation(self):
 
         contribution = conference.Contribution()
 
@@ -196,7 +206,7 @@ class SessionSlotScheduleAddContribution(ScheduleAddContribution, sessionService
         return DictPickler.pickle(self._slot.getConfSchEntry(), timezone=self._conf.getTimezone())
 
 
-class ConferenceScheduleAddSession(AutoOpsMixin, conferenceServices.ConferenceModifBase, LocationSetter):
+class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.ConferenceModifBase, LocationSetter):
 
     def __addConveners(self, session):
 
@@ -233,9 +243,7 @@ class ConferenceScheduleAddSession(AutoOpsMixin, conferenceServices.ConferenceMo
         self._scheduleType = pManager.extract("sessionType", pType=str,
                                           allowEmpty=False)
 
-    def _getAnswer(self):
-
-        self.initializeAutoOps()
+    def _performOperation(self):
 
         conf = self._target
         session = conference.Session()
@@ -286,9 +294,9 @@ class ConferenceScheduleAddSession(AutoOpsMixin, conferenceServices.ConferenceMo
                 'session': DictPickler.pickle(session, timezone=self._conf.getTimezone()),
                 'autoOps': translateAutoOps(self.getAutoOps())}
 
-class ConferenceScheduleDeleteSession(conferenceServices.ConferenceScheduleModifBase):
+class ConferenceScheduleDeleteSession(ScheduleOperation, conferenceServices.ConferenceScheduleModifBase):
 
-    def _getAnswer(self):
+    def _performOperation(self):
         sessionSlot = self._schEntry.getOwner()
         session = sessionSlot.getSession()
 
@@ -298,9 +306,9 @@ class ConferenceScheduleDeleteSession(conferenceServices.ConferenceScheduleModif
 
         self._conf.removeSession(session)
 
-class ConferenceScheduleDeleteContribution(conferenceServices.ConferenceScheduleModifBase):
+class ConferenceScheduleDeleteContribution(ScheduleOperation, conferenceServices.ConferenceScheduleModifBase):
 
-    def _getAnswer(self):
+    def _performOperation(self):
 
         contrib = self._schEntry.getOwner()
         logInfo = contrib.getLogInfo()
@@ -314,12 +322,12 @@ class ConferenceScheduleDeleteContribution(conferenceServices.ConferenceSchedule
 
         self._conf.getSchedule().removeEntry(self._schEntry)
 
-class SessionScheduleDeleteSessionSlot(sessionServices.SessionModifUnrestrictedTTCoordinationBase):
+class SessionScheduleDeleteSessionSlot(ScheduleOperation, sessionServices.SessionModifUnrestrictedTTCoordinationBase):
 
-    def _getAnswer(self):
+    def _performOperation(self):
         self._session.removeSlot(self._slot)
 
-class SessionScheduleChangeSessionColors(sessionServices.SessionModifBase):
+class SessionScheduleChangeSessionColors(ScheduleOperation, sessionServices.SessionModifBase):
 
     def _checkParams(self):
         sessionServices.SessionModifBase._checkParams(self)
@@ -330,11 +338,11 @@ class SessionScheduleChangeSessionColors(sessionServices.SessionModifBase):
         except:
             raise ServiceError("ERR-S4", "Color parameters not provided.")
 
-    def _getAnswer(self):
+    def _performOperation(self):
         self._session.setBgColor(self._bgColor)
         self._session.setTextColor(self._textColor)
 
-class ScheduleEditBreakBase(LocationSetter):
+class ScheduleEditBreakBase(ScheduleOperation, LocationSetter):
 
     def _checkParams(self):
 
@@ -347,7 +355,7 @@ class ScheduleEditBreakBase(LocationSetter):
         self._description = pManager.extract("description", pType=str,
                                           allowEmpty=True)
 
-    def _getAnswer(self):
+    def _performOperation(self):
 
         self._brk.setValues({"title": self._title or "",
                        "description": self._description or "",
@@ -386,9 +394,9 @@ class ConferenceScheduleEditBreak(ScheduleEditBreakBase, conferenceServices.Conf
     def _addToSchedule(self, b):
         pass
 
-class ConferenceScheduleDeleteBreak(conferenceServices.ConferenceScheduleModifBase):
+class ConferenceScheduleDeleteBreak(ScheduleOperation, conferenceServices.ConferenceScheduleModifBase):
 
-    def _getAnswer(self):
+    def _performOperation(self):
         self._conf.getSchedule().removeEntry(self._schEntry)
 
 class SessionSlotScheduleAddBreak(ScheduleEditBreakBase, sessionServices.SessionSlotModifCoordinationBase):
@@ -411,20 +419,20 @@ class SessionSlotScheduleEditBreak(ScheduleEditBreakBase, sessionServices.Sessio
     def _addToSchedule(self, b):
         pass
 
-class SessionSlotScheduleDeleteBreak(sessionServices.SessionSlotModifCoordinationBase):
+class SessionSlotScheduleDeleteBreak(ScheduleOperation, sessionServices.SessionSlotModifCoordinationBase):
 
     def _checkParams(self):
         sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
 
-    def _getAnswer(self):
+    def _performOperation(self):
         self._slot.getSchedule().removeEntry(self._schEntry)
 
-class SessionSlotScheduleDeleteContribution(sessionServices.SessionSlotModifCoordinationBase):
+class SessionSlotScheduleDeleteContribution(ScheduleOperation, sessionServices.SessionSlotModifCoordinationBase):
 
     def _checkParams(self):
         sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
 
-    def _getAnswer(self):
+    def _performOperation(self):
 
         contrib = self._schEntry.getOwner()
 
@@ -441,7 +449,7 @@ class SessionSlotScheduleDeleteContribution(sessionServices.SessionSlotModifCoor
         self._slot.getSchedule().removeEntry(self._schEntry)
 
 
-class SessionSlotScheduleModifyStartEndDate(AutoOpsMixin, sessionServices.SessionSlotModifCoordinationBase):
+class SessionSlotScheduleModifyStartEndDate(ScheduleOperation, sessionServices.SessionSlotModifCoordinationBase):
 
     def _checkParams(self):
         sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
@@ -451,9 +459,7 @@ class SessionSlotScheduleModifyStartEndDate(AutoOpsMixin, sessionServices.Sessio
         self._startDate = pManager.extract("startDate", pType=datetime.datetime)
         self._endDate = pManager.extract("endDate", pType=datetime.datetime)
 
-    def _getAnswer(self):
-
-        self.initializeAutoOps()
+    def _performOperation(self):
 
         self._schEntry.setStartDate(self._startDate);
         duration = self._endDate - self._startDate
@@ -470,7 +476,7 @@ class SessionSlotScheduleModifyStartEndDate(AutoOpsMixin, sessionServices.Sessio
                 'autoOps': translateAutoOps(self.getAutoOps())}
 
 
-class ConferenceScheduleModifyStartEndDate(AutoOpsMixin, conferenceServices.ConferenceScheduleModifBase):
+class ConferenceScheduleModifyStartEndDate(ScheduleOperation, conferenceServices.ConferenceScheduleModifBase):
 
     def _checkParams(self):
         conferenceServices.ConferenceScheduleModifBase._checkParams(self)
@@ -480,9 +486,7 @@ class ConferenceScheduleModifyStartEndDate(AutoOpsMixin, conferenceServices.Conf
         self._startDate = pManager.extract("startDate", pType=datetime.datetime)
         self._endDate = pManager.extract("endDate", pType=datetime.datetime)
 
-    def _getAnswer(self):
-
-        self.initializeAutoOps()
+    def _performOperation(self):
 
         self._schEntry.setStartDate(self._startDate, moveEntries=1);
         duration = self._endDate - self._startDate
@@ -494,7 +498,7 @@ class ConferenceScheduleModifyStartEndDate(AutoOpsMixin, conferenceServices.Conf
                 'entry': pickledData,
                 'autoOps': translateAutoOps(self.getAutoOps())}
 
-class SessionScheduleModifyStartEndDate(sessionServices.SessionModifBase):
+class SessionScheduleModifyStartEndDate(ScheduleOperation, sessionServices.SessionModifBase):
 
     def _checkParams(self):
         sessionServices.SessionModifBase._checkParams(self)
@@ -504,7 +508,7 @@ class SessionScheduleModifyStartEndDate(sessionServices.SessionModifBase):
         self._startDate = pManager.extract("startDate", pType=datetime.datetime)
         self._endDate = pManager.extract("endDate", pType=datetime.datetime)
 
-    def _getAnswer(self):
+    def _performOperation(self):
         self._schEntry.setStartDate(self._startDate);
         duration = self._endDate - self._startDate
         self._schEntry.setDuration(dur=duration)
@@ -514,7 +518,7 @@ class SessionScheduleModifyStartEndDate(sessionServices.SessionModifBase):
                 'id': pickledData['id'],
                 'entry': pickledData}
 
-class ConferenceScheduleGetDayEndDate(conferenceServices.ConferenceModifBase):
+class ConferenceScheduleGetDayEndDate(ScheduleOperation, conferenceServices.ConferenceModifBase):
 
     def _checkParams(self):
         conferenceServices.ConferenceModifBase._checkParams(self)
@@ -523,10 +527,10 @@ class ConferenceScheduleGetDayEndDate(conferenceServices.ConferenceModifBase):
         date = pManager.extract("date", pType=datetime.date)
         self._date = datetime.datetime(date.year, date.month, date.day, tzinfo=pytz.timezone(self._conf.getTimezone()))
 
-    def _getAnswer(self):
+    def _performOperation(self):
         return self._target.getSchedule().calculateDayEndDate(self._date).strftime('%d/%m/%Y %H:%M')
 
-class SessionSlotScheduleGetDayEndDate(sessionServices.SessionSlotModifCoordinationBase):
+class SessionSlotScheduleGetDayEndDate(ScheduleOperation, sessionServices.SessionSlotModifCoordinationBase):
 
     def _checkParams(self):
         sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
@@ -534,15 +538,15 @@ class SessionSlotScheduleGetDayEndDate(sessionServices.SessionSlotModifCoordinat
         date = pManager.extract("date", pType=datetime.date)
         self._date = datetime.datetime(date.year, date.month, date.day, tzinfo=pytz.timezone(self._conf.getTimezone()))
 
-    def _getAnswer(self):
+    def _performOperation(self):
         eDate = self._slot.getSchedule().calculateDayEndDate(self._date)
         return eDate.strftime('%d/%m/%Y %H:%M')
 
-class SessionSlotGetBooking(sessionServices.SessionSlotDisplayBase, roomBooking.GetBookingBase):
-    def _getAnswer(self):
+class SessionSlotGetBooking(ScheduleOperation, sessionServices.SessionSlotDisplayBase, roomBooking.GetBookingBase):
+    def _performOperation(self):
         return self._getRoomInfo(self._target)
 
-class SessionScheduleGetDayEndDate(sessionServices.SessionModifUnrestrictedTTCoordinationBase):
+class SessionScheduleGetDayEndDate(ScheduleOperation, sessionServices.SessionModifUnrestrictedTTCoordinationBase):
 
     def _checkParams(self):
         sessionServices.SessionModifUnrestrictedTTCoordinationBase._checkParams(self)
@@ -551,11 +555,11 @@ class SessionScheduleGetDayEndDate(sessionServices.SessionModifUnrestrictedTTCoo
         date = pManager.extract("date", pType=datetime.date)
         self._date = datetime.datetime(date.year, date.month, date.day)
 
-    def _getAnswer(self):
+    def _performOperation(self):
         eDate = self._target.getSchedule().calculateDayEndDate(self._date)
         return eDate.strftime('%d/%m/%Y %H:%M')
 
-class ScheduleEditSlotBase(LocationSetter, AutoOpsMixin):
+class ScheduleEditSlotBase(ScheduleOperation, LocationSetter):
 
     def _addConveners(self, slot):
         pass
@@ -573,9 +577,7 @@ class ScheduleEditSlotBase(LocationSetter, AutoOpsMixin):
         self._roomInfo = pManager.extract("roomInfo", pType=dict, allowEmpty=True)
         self._isSessionTimetable = pManager.extract("sessionTimetable", pType=bool, allowEmpty=True)
 
-    def _getAnswer(self):
-
-        self.initializeAutoOps()
+    def _performOperation(self):
 
         self._slot.setValues({"title": self._title or "",
                         "sDate": self._startDateTime,
@@ -761,11 +763,11 @@ class BreakGetBooking(BreakDisplayBase, roomBooking.GetBookingBase):
         return self._getRoomInfo(self._break)
 
 
-class GetUnscheduledContributions:
+class GetUnscheduledContributions(ScheduleOperation):
 
     """ Returns the list of unscheduled contributions for the target """
 
-    def _getAnswer(self):
+    def _performOperation(self):
         unscheduledList = []
 
         for contrib in self._target.getContributionList():
@@ -790,7 +792,7 @@ class SessionGetUnscheduledContributions(GetUnscheduledContributions, sessionSer
 
 
 
-class ScheduleContributions(AutoOpsMixin):
+class ScheduleContributions(ScheduleOperation):
 
     """ Schedules the contribution in the timetable of the event"""
 
@@ -805,9 +807,7 @@ class ScheduleContributions(AutoOpsMixin):
         # convert date to datetime
         self._date = datetime.datetime(*(date.timetuple()[:6]+(0, pytz.timezone(self._target.getTimezone()))))
 
-    def _getAnswer(self):
-
-        self.initializeAutoOps()
+    def _performOperation(self):
 
         entries = []
 
