@@ -33,7 +33,7 @@
             }],
             'pin': ['text', true, function(pin, values){
                 errors = [];
-                if (exists(pin)) {
+                if (exists(pin) && pin !== '') {
                     if (!IndicoUtil.isInteger(pin)) {
                         errors.push($T('The pin has to be a number.'));
                     }
