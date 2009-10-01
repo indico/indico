@@ -62,141 +62,158 @@ type("TimeTable", ["LookupTabWidget"], {
                         this._getHeader(),
                         timetableDiv,
                         this.loadingIndicator);
-         },
+    },
 
     _filterSetup: function() {
-         var self = this;
-         this.filter = new TimeTableFilter(this.timetableDrawer, function () {
-             // When closed restore the filter button color
-             self.filterButtonContainer.dom.style.background = "";
-             return true;
-         });
-         this.filter.draw();
-     },
+        var self = this;
+        this.filter = new TimeTableFilter(this.timetableDrawer, function () {
+            // When closed restore the filter button color
+            self.filterButtonContainer.dom.style.background = "";
+            return true;
+        });
+        this.filter.draw();
+    },
 
     _getMenu: function() {
         return Html.div();
-     },
+    },
 
-     postDraw: function() {
-         this.timetableDrawer.postDraw();
-         this.LookupTabWidget.prototype.postDraw.call(this);
-     },
+    postDraw: function() {
+        this.timetableDrawer.postDraw();
+        this.LookupTabWidget.prototype.postDraw.call(this);
+    },
 
-     filterMenu: function() {
-         var self = this;
+    filterMenu: function() {
+        var self = this;
 
-         var filterLink = Html.a({href: '#'}, $T("Filter"));
-         this.filterMenu = new TimetableFilterMenu(filterLink, self.timetableDrawer);
+        var filterLink = Html.a({href: '#'}, $T("Filter"));
+        this.filterMenu = new TimetableFilterMenu(filterLink, self.timetableDrawer);
 
-         filterLink.observeClick(function(e) {
-             var pos = filterLink.getAbsolutePosition();
-             self.filterMenu.open(pos.x + filterLink.dom.offsetWidth, pos.y);
-             return false;
-         });
+        filterLink.observeClick(function(e) {
+            var pos = filterLink.getAbsolutePosition();
+            self.filterMenu.open(pos.x + filterLink.dom.offsetWidth, pos.y);
+            return false;
+        });
 
-         return Html.ul({className: "inner", style: {display: 'none'}},
-                        Html.li("menuConfMiddleCell",
-                                filterLink));
-     },
+        return Html.ul({className: "inner", style: {display: 'none'}},
+                       Html.li("menuConfMiddleCell",
+                               filterLink));
+    },
 
-     layoutMenu: function() {
-         var self = this;
+    layoutMenu: function() {
+        var self = this;
 
-         var layoutLink = Html.a({href: '#'}, $T("Layout"));
-         this.layoutMenu = new TimetableLayoutMenu(layoutLink, self.timetableDrawer);
+        var layoutLink = Html.a({href: '#'}, $T("Layout"));
+        this.layoutMenu = new TimetableLayoutMenu(layoutLink, self.timetableDrawer);
 
-         layoutLink.observeClick(function(e) {
-             var pos = layoutLink.getAbsolutePosition();
-             //              e.preventDefault();
-             self.layoutMenu.open(pos.x + layoutLink.dom.offsetWidth, pos.y);
-             return false;
-         });
+        layoutLink.observeClick(function(e) {
+            var pos = layoutLink.getAbsolutePosition();
+            //              e.preventDefault();
+            self.layoutMenu.open(pos.x + layoutLink.dom.offsetWidth, pos.y);
+            return false;
+        });
 
-         return Html.ul({className: "inner", style: {display: 'block'}},
-                        Html.li("menuConfMiddleCell",
-                                layoutLink));
-     },
-     printMenu: function() {
-         var self = this;
+        return Html.ul({className: "inner", style: {display: 'block'}},
+                       Html.li("menuConfMiddleCell",
+                               layoutLink));
+    },
+    printMenu: function() {
+        var self = this;
 
-         var printLink = Html.a({href: '#'}, $T("Printable version"));
-         printLink.observeClick(function(e) {
+        var printLink = Html.a({href: '#'}, $T("Printable version"));
+        printLink.observeClick(function(e) {
 
-             self.print();
+            self.print();
 
-         });
+        });
 
-         return Html.ul({className: "inner", style: {display: 'none'}},
-                        Html.li("menuConfMiddleCell",
-                                printLink));
-     },
-     print: function() {
-         var self = this;
+        return Html.ul({className: "inner", style: {display: 'none'}},
+                       Html.li("menuConfMiddleCell",
+                               printLink));
+    },
+    print: function() {
+        var self = this;
 
-         //self.timetableDrawer.setPrintableVersion(true);
+        //self.timetableDrawer.setPrintableVersion(true);
 
-         var bodyPadding = $E(document.body).dom.style.padding;
-         var timetableElements = translate(self.timetableDrawer.canvas.dom.childNodes, function(value) {return $E(value);});
-         var elements = translate($E(document.body).dom.childNodes, function(value) {return $E(value);});
+        var bodyPadding = $E(document.body).dom.style.padding;
+        var timetableElements = translate(self.timetableDrawer.canvas.dom.childNodes, function(value) {return $E(value);});
+        var elements = translate($E(document.body).dom.childNodes, function(value) {return $E(value);});
 
-         var goBackLink = Html.a({href: '#', style: {fontSize: '13pt'}}, 'Go back');
-         var printLink = Html.a({href: '#', style: {fontSize: '13pt'}}, 'Print');
+        var goBackLink = Html.a({href: '#', style: {fontSize: '13pt'}}, 'Go back');
+        var printLink = Html.a({href: '#', style: {fontSize: '13pt'}}, 'Print');
 
-         var links = Html.span({style: {cssFloat: 'right'}}, printLink, ' | ', goBackLink);
+        var links = Html.span({style: {cssFloat: 'right'}}, printLink, ' | ', goBackLink);
 
-         var headerStyle = {padding: '0px 5px 5px 5px',
-             borderBottom: '1px solid black',
-             textAlign: 'center',
-             width: pixels(self.timetableDrawer.width)};
-         var header = Html.div({className: 'timetableHeader clearfix', style: headerStyle}, links,
-             Html.span({style: {cssFloat: 'left'}}, self._titleTemplate(self.timetableDrawer.day)));
+        var headerStyle = {padding: '0px 5px 5px 5px',
+            borderBottom: '1px solid black',
+            textAlign: 'center',
+            width: pixels(self.timetableDrawer.width)};
+        var header = Html.div({className: 'timetableHeader clearfix', style: headerStyle}, links,
+            Html.span({style: {cssFloat: 'left'}}, self._titleTemplate(self.timetableDrawer.day)));
 
-         goBackLink.observeClick(function(e) {
-             self.timetableDrawer.setPrintableVersion(false);
-             $E(document.body).setStyle('padding', bodyPadding);
-             $E(document.body).set(elements);
+        goBackLink.observeClick(function(e) {
+            self.timetableDrawer.setPrintableVersion(false);
+            $E(document.body).setStyle('padding', bodyPadding);
+            $E(document.body).set(elements);
 
-         });
-         printLink.observeClick(function(e) {
-             window.print();
-         });
-         var timetableDiv = Html.div({style: {paddingTop: pixels(20), position: 'relative'}}, timetableElements);
-         $E(document.body).set(header, timetableDiv);
-         $E(document.body).setStyle('padding', pixels(30));
-     },
-     getData: function() {
-         return this.data;
-     },
-     getTimetableDrawer: function() {
-         return this.timetableDrawer;
-     },
+        });
+        printLink.observeClick(function(e) {
+            window.print();
+        });
+        var timetableDiv = Html.div({style: {paddingTop: pixels(20), position: 'relative'}}, timetableElements);
+        $E(document.body).set(header, timetableDiv);
+        $E(document.body).setStyle('padding', pixels(30));
+    },
+    getData: function() {
+        return this.data;
+    },
 
-     setData: function(data, intervalData, startTime, endTime) {
-         this.data = data;
-         if (any(intervalData, false)) {
-             this.intervalTimetableDrawer.setData(data, this.currentDay, intervalData.isPoster);
-         }else {
-             this.timetableDrawer.setData(data, startTime, endTime);
-         }
-     },
-     _createLoadingIndicator: function() {
-         return Html.div('timetableLoading', $T('Updating the timetable...'));
-     },
-     /*
+    getById: function(id) {
+        var info = Util.parseId(id);
+        var type = info[0];
+        info = info.slice(2);
+
+        if (type == 'Contribution') {
+            throw 'not implemented!';
+        } else if (type=='Session'){
+            throw 'not implemented!';
+        } else if (type=='SessionSlot'){
+            return this.data[this.currentDay]['s'+info[0]+'l'+info[1]];
+        } else {
+            throw 'unrecognized id!';
+        }
+    },
+
+    getTimetableDrawer: function() {
+        return this.timetableDrawer;
+    },
+
+    setData: function(data, intervalData, startTime, endTime) {
+        this.data = data;
+        if (any(intervalData, false)) {
+            this.intervalTimetableDrawer.setData(data, this.currentDay, intervalData.isPoster);
+        }else {
+            this.timetableDrawer.setData(data, startTime, endTime);
+        }
+    },
+    _createLoadingIndicator: function() {
+        return Html.div('timetableLoading', $T('Updating the timetable...'));
+    },
+    /*
       * To be overloaded. Header content displayed above the timetable.
       */
-     _getHeader: function() {
-         return Html.div({});
-     },
-     /*
+    _getHeader: function() {
+        return Html.div({});
+    },
+    /*
       * To be overloaded. Returns buttons to be displayed below the tabs in
       * the tab widget.
       */
-     _functionButtons: function() {
-         return [];
-         }
-     },
+    _functionButtons: function() {
+        return [];
+    }
+},
      function(data, width, wrappingElement, detailLevel, managementMode) {
          var self = this;
 
@@ -213,11 +230,11 @@ type("TimeTable", ["LookupTabWidget"], {
                                                     managementMode,
                                                     this.managementActions);
          this.intervalTimetableDrawer = new IntervalTimetableDrawer(data, canvas, width,
-                 wrappingElement,
-                 this._functionButtons(),
-                 this.loadingIndicator,
-                 managementMode,
-                 this.managementActions);
+                                                                    wrappingElement,
+                                                                    this._functionButtons(),
+                                                                    this.loadingIndicator,
+                                                                    managementMode,
+                                                                    this.managementActions);
 
          var today = new Date();
          var todayStr = IndicoUtil.formatDate2(today);
@@ -251,70 +268,70 @@ type("TimeTable", ["LookupTabWidget"], {
                      return self._draw(self.timetableDrawer.drawDay(key));
                  }
              }];
-     }), this.width, 100, initialTab, this._functionButtons());
+         }), this.width, 100, initialTab, this._functionButtons());
 
      }
-);
+    );
 
 type("TimeTableDisplay", ["TimeTable"], {
     _functionButtons: function() {
         var self = this;
 
         var printButton = {'btn': Html.div('printButtonWhite', $T('Print')),
-                'onclick': function(btnContainer) {
-                    self.print();
-                }
-        };
+            'onclick': function(btnContainer) {
+                self.print();
+            }
+                          };
 
         // TODO: Needs to be implemented
         var linkButton = Html.div('linkButtonWhite', $T('Link'));
 
         var detailsButton = {'btn': Html.div('buttonWhite', Html.span({}, $T('Detailed view'))),
-                             'onclick': function(btnContainer) {
-                                 var detailLevel = self.timetableDrawer.detail.get();
-                                 var newDetailLevel = detailLevel == 'contribution' ? 'session' : 'contribution';
-                                 self.timetableDrawer.detail.set(newDetailLevel);
-                                 var state = (newDetailLevel == 'contribution');
-                                 //detailsButton.btn.set(state ? "Hide details" : "Show details");
-                                 btnContainer.dom.style.background = state ? "#9F883B" : "";
-                             }};
+            'onclick': function(btnContainer) {
+                var detailLevel = self.timetableDrawer.detail.get();
+                var newDetailLevel = detailLevel == 'contribution' ? 'session' : 'contribution';
+                self.timetableDrawer.detail.set(newDetailLevel);
+                var state = (newDetailLevel == 'contribution');
+                //detailsButton.btn.set(state ? "Hide details" : "Show details");
+                btnContainer.dom.style.background = state ? "#9F883B" : "";
+            }};
 
         var filterButton = {'btn': Html.div('buttonWhite', $T('Filter')),
-                            'onclick': function(btnContainer) {
-                                // Save the container so that the filter button background
-                                // color can be restored when filter is closed
-                                self.filterButtonContainer = btnContainer;
-                                self.filter.toggle();
-                                var state = self.filter.state.get();
-                                btnContainer.dom.style.background = state ? "#9F883B" : "";
-                            }
-        };
+            'onclick': function(btnContainer) {
+                // Save the container so that the filter button background
+                // color can be restored when filter is closed
+                self.filterButtonContainer = btnContainer;
+                self.filter.toggle();
+                var state = self.filter.state.get();
+                btnContainer.dom.style.background = state ? "#9F883B" : "";
+            }
+                           };
 
         return [printButton,
                 detailsButton,
                 filterButton];
     }
-    },
-    function(data, width, wrappingElement, detailLevel) {
-        this.TimeTable(data, width, wrappingElement, detailLevel, false);
-        this._filterSetup();
+},
+     function(data, width, wrappingElement, detailLevel) {
+         this.TimeTable(data, width, wrappingElement, detailLevel, false);
+         this._filterSetup();
 
-        // Set data[all] so that the All days tab is created
-        if (keys(data).length > 1) {
-            this.data.all = data;
-        }
-    }
-);
+         // Set data[all] so that the All days tab is created
+         if (keys(data).length > 1) {
+             this.data.all = data;
+         }
+     }
+    );
 
 type("TimeTableManagement", ["TimeTable"], {
     _getHeader: function() {
         var div = this.managementActions.managementHeader(this.isSessionTimetable);
         return div;
     }
-    },
-    function(data, eventInfo, width, wrappingElement, detailLevel, isSessionTimetable) {
-        this.isSessionTimetable = any(isSessionTimetable, false);
-        this.managementActions = new TimetableManagementActions(this, eventInfo);
-        this.TimeTable(data, width, wrappingElement, detailLevel, true);
-    }
-);
+},
+     function(data, eventInfo, width, wrappingElement, detailLevel, isSessionTimetable) {
+         this.isSessionTimetable = any(isSessionTimetable, false);
+         this.managementActions = new TimetableManagementActions(this, eventInfo);
+         this.TimeTable(data, width, wrappingElement, detailLevel, true);
+     }
+    );

@@ -243,9 +243,9 @@ type("TimetableManagementActions", [], {
         return slotData.title + (slotData.slotTitle ? ": " + slotData.slotTitle : '');
     },
 
-    _processWarning: function(entry, startTime, endTime, slotTitle) {
+    _processWarning: function(entry) {
         /*
-         * entry - the warning 'entry', a list
+         * entry - the warning 'entry', a list [src, msg, target, newValue]
          * startTime - the original starting time for the timeblock
          * endTime - the original ending time for the timeblock
          * [slotTitle] - title, if the entry is a slot
@@ -254,8 +254,28 @@ type("TimetableManagementActions", [], {
         var msg = entry[1];
         var finalTime = entry[3];
 
-        if (Util.parseId(entry[2])[0] == "Session") {
+        var type = Util.parseId(entry[2])[0];
+
+        var slot = null;
+        var title = "";
+
+        var startTime = "";
+        var endTime = "";
+
+        if (type == "Session") {
             return null;
+        } else if (type == 'SessionSlot') {
+
+            // this 'if' clearly calls for inheritance
+            if (this.session) {
+                slot = this.session;
+            } else {
+                slot = self.timetable.getById(entry[2]);
+            }
+
+            startTime = slot.startDate.time.slice(0,5);
+            endTime = slot.endDate.time.slice(0,5);
+            title = this._generateSlotTitle(slot);
         }
 
         if (msg == "OWNER_END_DATE_EXTENDED") {
@@ -263,17 +283,17 @@ type("TimetableManagementActions", [], {
             // warning will be supressed
             if (endTime != finalTime) {
                 // slice(1) to ignore first value
-                return concat(entry.slice(1),  [endTime, slotTitle]);
+                return concat(entry.slice(1),  [endTime, title]);
             }
         } else if (msg == "OWNER_START_DATE_EXTENDED") {
             // Again, make sure that something changed
 
             if (startTime != finalTime) {
                 // slice(1) to ignore first value
-                return concat(entry.slice(1), [startTime, slotTitle]);
+                return concat(entry.slice(1), [startTime, title]);
             }
         } else {
-            return concat(entry.slice(1), [startTime, slotTitle]);
+            return concat(entry.slice(1), [startTime, title]);
         }
 
         return null;
@@ -303,21 +323,22 @@ type("TimetableManagementActions", [], {
                            this.processedWarnings,
                            function(item) {
 
+                               var title = item[4];
                                var atoms = Util.parseId(item[1]);
 
                                var message = {
                                    OWNER_START_DATE_EXTENDED: {
-                                       SessionSlot : $T('The <strong>starting time</strong> of the session interval <strong>')  + item[4] + $T('</strong> was moved from '),
-                                       Session: $T('The <strong>starting time</strong> of the session interval <strong>')  + item[4]  + $T('</strong> was moved from '),
+                                       SessionSlot : $T('The <strong>starting time</strong> of the session interval <strong>')  + title + $T('</strong> was moved from '),
+                                       Session: $T('The <strong>starting time</strong> of the session interval <strong>')  + title  + $T('</strong> was moved from '),
                                        Conference: $T('The <strong>starting time</strong> of the <strong>Conference</strong> was moved from ')
                                    },
                                    OWNER_END_DATE_EXTENDED: {
-                                       SessionSlot : $T('The <strong>ending time</strong> of the session interval <strong>') + item[4] + $T('</strong> was moved from '),
-                                       Session: $T('The <strong>ending time</strong> of the session interval <strong>') + item[4] + $T('</strong> was moved from '),
+                                       SessionSlot : $T('The <strong>ending time</strong> of the session interval <strong>') + title + $T('</strong> was moved from '),
+                                       Session: $T('The <strong>ending time</strong> of the session interval <strong>') + title + $T('</strong> was moved from '),
                                        Conference: $T('The <strong>ending time</strong> of the <strong>Conference</strong> was moved from ')
                                    },
                                    ENTRIES_MOVED: {
-                                       SessionSlot: $T('The contents of the interval <strong>') + item[4] + $T('</strong> were moved from ')
+                                       SessionSlot: $T('The contents of the interval <strong>') + title + $T('</strong> were moved from ')
                                    }
                                }[item[0]][atoms[0]];
 
@@ -621,6 +642,7 @@ type("TimetableManagementActions", [], {
     },
 
     _updateTimes: function(newStartTime, newEndTime) {
+        // clearly screams for inheritance
         if (this.session) {
             this.slotStartTime.set(newStartTime.slice(0,5));
             this.slotEndTime.set(newEndTime.slice(0,5));
@@ -637,6 +659,7 @@ type("TimetableManagementActions", [], {
      */
     _updateEntry: function(result, data, originalArgs) {
 
+        var self = this;
         var setData = data ? false : true;
         data = any(data, this.timetable.getData());
 
@@ -685,6 +708,21 @@ type("TimetableManagementActions", [], {
             }
         }
 
+        // AutoOp Warnings (before updates are done)
+        this._hideWarnings();
+        if (result.autoOps && result.autoOps.length > 0) {
+            each(result.autoOps,
+                 function(op) {
+                     var warning = self._processWarning(op);
+                     if (warning && self.processedWarnings.indexOf(warning) === null) {
+                         self.warningArea.dom.style.display = 'block';
+                         self.processedWarnings.append(warning);
+                     }
+                 });
+        }
+
+        // Here starts the update cycle
+
         data[result.day][result.id] = result.entry;
 
         if (exists(result.session)) {
@@ -704,27 +742,8 @@ type("TimetableManagementActions", [], {
         // Only set data if the data was not provided as a parameter
         // If provided as parameter this is handled by the caller
 
-
         if (setData) {
             this.timetable.setData(data, this.session);
-        }
-
-        var self = this;
-
-        this._hideWarnings();
-
-        // if we are in "slot mode", get the title
-        var slotTitle = slot?self._generateSlotTitle(slot):null;
-
-        if (result.autoOps && result.autoOps.length > 0) {
-            each(result.autoOps,
-                 function(op) {
-                     var warning = self._processWarning(op, oldStartTime, oldEndTime, slotTitle);
-                     if (warning && self.processedWarnings.indexOf(warning) === null) {
-                         self.warningArea.dom.style.display = 'block';
-                         self.processedWarnings.append(warning);
-                     }
-                 });
         }
     },
 
