@@ -34,6 +34,7 @@ from xmlrpclib import Fault
 from datetime import timedelta
 from MaKaC.common.logger import Logger
 from MaKaC.common.Counter import Counter
+from MaKaC.services.interface.rpc.json import unicodeToUtf8
 import socket
 
 class CSBooking(CSBookingBase):
@@ -247,7 +248,7 @@ class CSBooking(CSBookingBase):
                                          description = self._bookingParams["description"][:31],
                                         )
             Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling conference.create with params: %s""" % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
-            answer = mcu.conference.create(params)
+            answer = unicodeToUtf8(mcu.conference.create(params))
             Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling conference.create. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
             
             for p in self._participants.itervalues():
@@ -295,7 +296,7 @@ class CSBooking(CSBookingBase):
                                          description = self._bookingParams["description"],
                                          )
                 Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling conference.modify with params: %s""" % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
-                answer = mcu.conference.modify(params)
+                answer = unicodeToUtf8(mcu.conference.modify(params))
                 Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling conference.modify. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
                 self._bookingParams["id"] = id
                 self._oldName = self._bookingParams["name"]
@@ -351,7 +352,7 @@ class CSBooking(CSBookingBase):
                     params = MCUParams(conferenceName = self._bookingParams["name"],
                                        participantName = p.getParticipantName())
                     Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.connect with params: %s""" % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
-                    answer = mcu.participant.connect(params)
+                    answer = unicodeToUtf8(mcu.participant.connect(params))
                     Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.connect. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
                 
                 self._statusMessage = "Conference started!"
@@ -377,7 +378,7 @@ class CSBooking(CSBookingBase):
                         params = MCUParams(conferenceName = self._bookingParams["name"],
                                            participantName = p.getParticipantName())
                         Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.disconnect with params: %s""" % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
-                        answer = mcu.participant.disconnect(params)
+                        answer = unicodeToUtf8(mcu.participant.disconnect(params))
                         Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.disconnect. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
                     except Fault, e:
                         Logger.get('CERNMCU').warning("""Evt:%s, booking:%s, calling participant.disconnect. Got error: %s""" % (self._conf.getId(), self.getId(), str(e)))
@@ -419,7 +420,7 @@ class CSBooking(CSBookingBase):
                 mcu = MCU.getInstance()
                 params = MCUParams(conferenceName = name)
                 Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling conference.destroy with params: %s""" % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
-                answer = mcu.conference.destroy(params)
+                answer = unicodeToUtf8(mcu.conference.destroy(params))
                 Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling conference.destroy. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
                 
                 if not oldName:
@@ -451,7 +452,7 @@ class CSBooking(CSBookingBase):
                                                 address = participant.getIp()
                                                 )
             Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.add with params: %s""" % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
-            answer = mcu.participant.add(params)
+            answer = unicodeToUtf8(mcu.participant.add(params))
             Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.add. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
             
             if self._hasBeenStarted:
@@ -459,7 +460,7 @@ class CSBooking(CSBookingBase):
                 params = MCUParams(conferenceName = self._bookingParams["name"],
                                    participantName = participant.getParticipantName())
                 Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.connect with params: %s""" % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
-                answer = mcu.participant.connect(params)
+                answer = unicodeToUtf8(mcu.participant.connect(params))
                 Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.connect. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
             
             return True
@@ -487,7 +488,7 @@ class CSBooking(CSBookingBase):
                                                 operationScope = state
                                                 )
             Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.modify with params: %s""" % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
-            answer = mcu.participant.modify(params)
+            answer = unicodeToUtf8(mcu.participant.modify(params))
             Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.modify. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
             
             return True
@@ -508,7 +509,7 @@ class CSBooking(CSBookingBase):
             params = MCUParams(conferenceName = self._bookingParams["name"],
                                participantName = participantName)
             Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.remove with params: %s""" % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
-            answer = mcu.participant.remove(params)
+            answer = unicodeToUtf8(mcu.participant.remove(params))
             Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.remove. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
             return True
         except Fault, e:
@@ -552,7 +553,7 @@ class CSBooking(CSBookingBase):
                     params = MCUParams()
                 
                 Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling conference.enumerate with params: %s""" % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
-                answer = mcu.conference.enumerate(params)
+                answer = unicodeToUtf8(mcu.conference.enumerate(params))
                 Logger.get('CERNMCU').debug("""Evt:%s, booking:%s, calling conference.enumerate. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
                 
                 for conference in answer.get("conferences", []):
@@ -649,7 +650,7 @@ class CSBooking(CSBookingBase):
                     params = MCUParams()
             
                 Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participants.enumerate with params: %s""" % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
-                answer = mcu.participant.enumerate(params)
+                answer = unicodeToUtf8(mcu.participant.enumerate(params))
                 Logger.get('CERNMCU').debug("""Evt:%s, booking:%s, calling participants.enumerate. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
 
                 for participant in answer.get("participants", []):

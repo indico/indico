@@ -32,7 +32,7 @@ class MCU(object):
     @classmethod
     def getInstance(cls):
         if cls._instance is None:
-            cls._instance = getServerWithTimeout(getCERNMCUOptionValueByName('MCUAddress'), timeout = secondsToWait)
+            cls._instance = getServerWithTimeout(getCERNMCUOptionValueByName('MCUAddress'), encoding='UTF-8', timeout = secondsToWait)
             
         return cls._instance
     
