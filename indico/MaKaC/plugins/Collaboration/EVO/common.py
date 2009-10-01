@@ -225,7 +225,7 @@ class EVOError(CSErrorBase):
             if self._errorType == 'duplicated':
                 return "This EVO meeting could not be created or changed because EVO considers the resulting meeting as duplicated."
             elif self._errorType == 'start_in_past':
-                return "This EVO meeting could not be created or changed because EVO does not allow meeting starting in the past."
+                return "This EVO meeting could not be created or changed because EVO does not allow meetings starting in the past."
             else:
                 return self._errorType
     
