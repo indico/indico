@@ -338,6 +338,19 @@ def encodeUnicode(text, sourceEncoding = "utf-8"):
             return ""
     return tmp.encode('utf-8')
 
+def unicodeLength(s, encoding = 'utf-8'):
+    """ Returns the length of the string s as an unicode object.
+        The conversion is done in the encoding supplied.
+        Example: the word 'niño' has a length of 4 as a unicode object, but 5 as a strig in utf-8
+        because the 'ñ' character uses 2 bytes.
+    """
+    return len(s.decode(encoding, 'replace'))
+
+def unicodeSlice(s, start, end, encoding = 'utf-8'):
+    """ Returns a slice of the string s, based on its encoding.
+        Example: trimAsUnicode('ññññ', 'utf-8', 0, 2) will return 'ññ' instead of 'ñ' even if each 'ñ' occupies 2 bytes.
+    """
+    return s.decode(encoding, 'replace')[start:end]
 
 def daysBetween(dtStart, dtEnd):
     d = dtEnd - dtStart    
