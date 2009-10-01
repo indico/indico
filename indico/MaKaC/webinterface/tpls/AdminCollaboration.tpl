@@ -79,7 +79,7 @@
     </div>
     
     <div style="padding-top: 10px">
-        <input type="button" id="filterButton" value="<%= _("Refresh")%>" onclick="applyFilter(); query();"/>
+        <input type="button" id="filterButton" value="<%= _("Refresh")%>" onclick="refresh()"/>
     </div>
 </div>
 
@@ -174,6 +174,12 @@ var buildIndexTooltips = function() {
     }    
 }
 
+var alertNoIndexSelected = function() {
+    var popup = new AlertPopup("No index selected", Html.span('',"Please select an index name"), Html.br(),
+            Html.span(indexNames.join(', ')));
+    popup.open();
+}
+
 var indexSelectedObs = function(selectedIndexName, firstTime) {
     
     for (var i=0; i<indexNames.length; i++) {
@@ -209,8 +215,7 @@ var indexSelectedObs = function(selectedIndexName, firstTime) {
     }
 
     if (!firstTime) {
-        applyFilter();
-        query()
+        refresh();
     };
 }
 
@@ -248,8 +253,7 @@ var viewByObs = function(viewBySelected, firstTime) {
     queryParams.viewBy = viewBySelected;
 
     if (!firstTime) {
-        applyFilter();
-        query()
+        refresh();
     };
 }
 
@@ -280,8 +284,7 @@ var orderByObs = function(orderBySelected, firstTime) {
     queryParams.orderBy = orderBySelected;
 
     if (!firstTime) {
-        applyFilter();
-        query();
+        refresh();
     };
 
 }
@@ -294,7 +297,17 @@ var updateFilterButton = function() {
     $E('filterButton').dom.value = '<%= _("Apply Filter")%>';   
 }
 
+var refresh = function() {
+    if (!queryParams.indexName) {
+        alertNoIndexSelected();
+    } else {
+        applyFilter();
+        query();
+    }
+}
+
 var applyFilter = function(){
+    
     queryParams.showOnlyPending = $E('pendingCB').dom.checked;
     queryParams.conferenceId = $E('conferenceId').get();
     queryParams.categoryId = $E('categoryId').get();
@@ -323,6 +336,7 @@ var applyFilter = function(){
     queryParams.resultsPerPage = $E('resultsPerPage').get();
     queryParams.page = 1;
     $E('filterButton').dom.value = '<%= _("Refresh")%>';
+    
 }
 
 var query = function() {
