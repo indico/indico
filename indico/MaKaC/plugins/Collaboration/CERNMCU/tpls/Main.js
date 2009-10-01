@@ -22,19 +22,24 @@
                 errors = [];
                 if (values["autoGenerateId"] == 'no') {
                     if (!trim(customId)) {
-                        errors.push($T('Please introduce a numeric ID'));
+                        errors.push($T('Please introduce a numeric ID.'));
                     } else if (!IndicoUtil.isInteger(customId)) {
-                        errors.push($T('Field must be a number'));
+                        errors.push($T('Field must be a number.'));
                     } else if (trim(customId).length != 5) {
-                        errors.push($T('The id must have 5 digits'));
+                        errors.push($T('The id must have 5 digits.'));
                     }
                 }
                 return errors;
             }],
             'pin': ['text', true, function(pin, values){
                 errors = [];
-                if (pin.length >= 32) {
-                    errors.push($T("The pin cannot have more than 31 characters."));
+                if (exists(pin)) {
+                    if (!IndicoUtil.isInteger(pin)) {
+                        errors.push($T('The pin has to be a number.'));
+                    }
+                    if (pin.length >= 32) {
+                        errors.push($T("The pin cannot have more than 31 characters."));
+                    }
                 }
                 return errors;
             }],
