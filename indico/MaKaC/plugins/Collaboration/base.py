@@ -523,7 +523,7 @@ class CSBookingManager(Persistent, Observer):
                             
                         if rollback:
                             booking.setStartDate(oldBookingStartDate)
-                            booking.setEndDate(oldBookingStartDate)
+                            booking.setEndDate(oldBookingEndDate)
                             problems.append(CSBookingManager._booking2NotifyProblem(booking, modifyResult))
                         elif startDateChanged:
                             self._changeStartDateInIndex(booking, oldBookingStartDate, booking.getStartDate())

@@ -435,4 +435,6 @@ class CSBooking(CSBookingBase):
                     self._statusClass = "statusMessageOther"
                     self._needsToBeNotifiedOfDateChanges = False
                     self._canBeNotifiedOfEventDateChanges = False
+                elif changeMessage:
+                    self.bookingOK()
                 
