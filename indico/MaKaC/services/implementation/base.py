@@ -29,7 +29,7 @@ from cgi import escape
 from MaKaC import conference
 from MaKaC.common.timezoneUtils import setAdjustedDate
 from MaKaC.common import security
-from MaKaC.errors import MaKaCError, htmlScriptError, htmlForbiddenTag, AdminError
+from MaKaC.errors import MaKaCError, htmlScriptError, htmlForbiddenTag, AdminError, TimingError
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessWarning, HTMLSecurityError
 
 from MaKaC.webinterface.rh.base import RequestHandlerBase
@@ -401,9 +401,12 @@ class DateTimeModificationBase( TextModificationBase ):
         except ValueError:
             raise ServiceError("ERR-E2",
                                "Date/time is not in the correct format")
-        self._pTime = setAdjustedDate(naiveDate, self._conf) 
-        self._setParam()
-        
+        try:
+            self._pTime = setAdjustedDate(naiveDate, self._conf)
+            self._setParam()
+        except TimingError,e:
+            raise ServiceError("ERR-E2", e.getMsg())
+
 class ListModificationBase ( object ):
     """ Base class for a list modification.
         The class that inherits from this must have:

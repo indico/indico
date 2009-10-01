@@ -2729,7 +2729,7 @@ class Conference(Persistent):
     def getConference( self ):
         return self
 
-    def setDates( self, sDate, eDate=None, check=1, moveEntries=1 ):
+    def setDates( self, sDate, eDate=None, check=1, moveEntries=0 ):
         if sDate>eDate:
             raise MaKaCError( _("Start date cannot be after the end date"), _("Event"))
         oldStartDate=copy.copy(self.getStartDate())
@@ -3024,7 +3024,8 @@ class Conference(Persistent):
         except ValueError,e:
             raise MaKaCError("Error moving the timezone: %s"%e)
         self.setDates( sDate.astimezone(timezone('UTC')), \
-                    eDate.astimezone(timezone('UTC')) )
+                       eDate.astimezone(timezone('UTC')),
+                       moveEntries=1)
 
 
 
@@ -4178,7 +4179,7 @@ class Conference(Persistent):
         startDate = timezone(self.getTimezone()).localize(startDate).astimezone(timezone('UTC'))
         timeDelta = startDate - self.getStartDate()
         endDate = self.getEndDate() + timeDelta
-        conf.setDates( startDate, endDate )
+        conf.setDates( startDate, endDate, moveEntries=1 )
         conf.setContactInfo(self.getContactInfo())
         conf.setChairmanText(self.getChairmanText())
         conf.setVisibility(self.getVisibility())
@@ -8353,7 +8354,7 @@ class Contribution(Persistent):
             if check == 2:
                 ContextManager.get('autoOps').append((self, "OWNER_START_DATE_EXTENDED",
                                                       owner, sDate.astimezone(tz)))
-                owner.setDates(sDate,owner.getEndDate(),check)
+                owner.setDates(sDate,owner.getEndDate(), check)
         if sDate > owner.getEndDate():
             if check == 1:
                 raise ParentTimingError(_("The contribution <i>\"%s\"</i> cannot start after (%s) its parent end date(%s)") %\
