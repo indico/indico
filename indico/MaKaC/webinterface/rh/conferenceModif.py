@@ -114,7 +114,7 @@ class RHConferenceModificationClosed( RHConferenceModifBase ):
             p = conferences.WPConferenceModificationClosed( self, self._target )
             return p.display()
 
-class RHConferenceModification( RHConferenceModifBase, RoomBookingDBMixin ):
+class RHConferenceModification( RoomBookingDBMixin, RHConferenceModifBase ):
     _uh = urlHandlers.UHConferenceModification
 
     def _process( self ):
