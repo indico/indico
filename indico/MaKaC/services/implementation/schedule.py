@@ -25,13 +25,20 @@ import datetime, pytz
 
 def translateAutoOps(autoOps):
 
-    return map(
-        lambda (source, op, target, newValue):
-        (getHierarchicalId(source),
-         op,
-         getHierarchicalId(target),
-         formatTime(newValue) if type(newValue) == datetime.datetime else newValue),
-         autoOps)
+    result = []
+
+    for source,op,target, newValue in autoOps:
+
+        if type(newValue) == datetime.datetime:
+            finalTime = formatTime(newValue)
+        else:
+            finalTime = newValue
+
+        result.append((getHierarchicalId(source),
+                       op,
+                       getHierarchicalId(target),
+                       finalTime))
+    return result
 
 
 class ConferenceGetSchedule(conferenceServices.ConferenceDisplayBase):
