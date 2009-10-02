@@ -53,6 +53,8 @@ from MaKaC.common.logger import Logger
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.i18n import _
 
+from MaKaC.common.TemplateExec import escapeHTMLForJS
+
 class RequestHandlerBase(object):
 
     _uh = None
