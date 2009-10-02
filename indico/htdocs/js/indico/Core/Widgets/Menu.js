@@ -83,7 +83,7 @@ type("PopupMenu", ["ChainedPopupWidget"],
             var self = this;
             var value = pair.get();
             var link = Html.a('fakeLink', pair.key);
-
+            
             if(typeof value == "string" ) {
                 link.setAttribute('href', value);
                 if (self.closeOnClick) {
@@ -163,18 +163,18 @@ type("SectionPopupMenu", ["PopupMenu"], {
             var self = this;
 
             var sectionContent = Html.ul(self.cssClass);
-
+            
             each(this.items, function(item, key) {
                 var section = null;
                 if (key != ""){
                     section = Html.li('section', Html.div('line', Html.div('name', key)));
                 }
-
+                
                 // add the menu items
                 var tmp = $B(Html.ul('subPopupList'), item, self._processItem);
                 sectionContent.append(Html.li({}, section, tmp));
             });
-
+            
             return this.PopupWidget.prototype.draw.call(this, sectionContent, x, y);
         }
         },
@@ -186,6 +186,92 @@ type("SectionPopupMenu", ["PopupMenu"], {
             this.closeOnClick = any(closeOnClick, false);
             this.closeHandler = any(closeHandler, function() {return true;});
         }
+);
+
+/* For add Session menu popup, we add some colored squares for each session */
+type("SessionSectionPopupMenu", ["SectionPopupMenu"], {
+    _processItem: function(pair) {
+    
+    var self = this;
+    var value = pair.get();
+    var color = null;
+    if(value.color != null){
+        color = value.color;
+        value = value.func;
+    }
+    
+    var colorSquare = null;
+    if(color != null){
+        var colorSquare = Html.div({style:{backgroundColor: color, color: color, cssFloat: 'right', width: '15px', height:'15px'}});
+    }
+    
+    //truncate titles which are too long
+    function truncate(title){
+        if(title.length > 25){
+            return title.substring(0,20) + "...";
+        }else{
+        return title;
+        }
+    }
+    
+    var link = Html.a({className:'fakeLink', style:{display: 'inline', padding: 0, paddingLeft: '4px', paddingRight: '4px'}}, truncate(pair.key));
+    var divInput = Html.div({style:{height:'20px', overflow:'auto'}}, colorSquare, link);
+    
+    if(typeof value == "string" ) {
+        link.setAttribute('href', value);
+        if (self.closeOnClick) {
+            link.observeClick(function() {
+                self.close();
+            });
+        }
+    }
+    else {
+        link.observeClick(value.PopupWidget?
+                          function(e) {
+
+                              if (self.selected) {
+                                  self.selected.dom.className = null;
+                                  self.selected = null;
+                              }
+
+                              link.dom.className = 'selected';
+                              self.selected = link;
+
+                              var pos = listItem.getAbsolutePosition();
+
+                              each(self.items, function(item, key) {
+                                  if (item.PopupWidget && item.isOpen()) {
+                                      item.close();
+                                  }
+                              });
+
+                              IndicoUtil.onclickHandlerRemove(self.handler);
+                              var target = value;
+                              target.open(pos.x + (target.alignRight ? 0 : link.dom.offsetWidth), pos.y - 1);
+
+                              return false;
+                          }:
+                          function() {
+                              // assume it's a callback function
+                              value(self);
+                              if (self.closeOnClick) {
+                                  self.close();
+                              }
+                          });
+    }
+
+    var listItem = Html.li({},
+            divInput);
+    return listItem;
+}
+//    draw: function(){
+//    var sectionPopupMenu = new SectionPopupMenu(this.items, this.chainElements, this.cssClass, this.closeOnClick, this.alignRight, this.closeHandler)
+//}
+},
+
+    function(items, chainElements, cssClass, closeOnClick, alignRight, closeHandler) {
+        this.SectionPopupMenu(items, chainElements, cssClass, closeOnClick, alignRight, closeHandler);
+    }
 );
 
 type("RadioPopupWidget", ["ChainedPopupWidget"],

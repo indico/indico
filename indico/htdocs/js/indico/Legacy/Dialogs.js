@@ -355,6 +355,7 @@ extend(IndicoUI.Dialogs,
                    }).run();
            },
 
+           
            /**
         * Creates a dialog that allows a subcontribution to be added
         * to the schedule (inside a contribution)

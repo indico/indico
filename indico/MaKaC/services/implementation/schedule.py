@@ -119,6 +119,7 @@ class ScheduleAddContribution(ScheduleOperation, LocationSetter):
         self._roomInfo = self._pManager.extract("roomInfo", pType=dict, allowEmpty=True)
         self._keywords = self._pManager.extract("keywords", pType=list,
                                           allowEmpty=True)
+        self._boardNumber = self._pManager.extract("boardNumber", pType=str, allowEmpty=True)
         self._needsToBeScheduled = self._params.get("schedule", True)
         if self._needsToBeScheduled:
             self._dateTime = self._pManager.extract("dateTime", pType=datetime.datetime)
@@ -142,6 +143,7 @@ class ScheduleAddContribution(ScheduleOperation, LocationSetter):
         contribution.setTitle(self._title)
         contribution.setKeywords('\n'.join(self._keywords))
 
+        contribution.setBoardNumber(self._boardNumber)
         contribution.setDuration(self._duration/60, self._duration%60)
 
         if self._needsToBeScheduled:
@@ -883,11 +885,84 @@ class ConferenceScheduleContributions(ScheduleContributions, conferenceServices.
 
     def _handlePosterContributions(self, contrib):
         pass
-
+    
     def _getSlotEntry(self):
         return None
 
-
+class Relocate(conferenceServices.ConferenceModifBase):
+    
+    def _checkParams(self):
+        conferenceServices.ConferenceModifBase._checkParams(self)
+        
+        pManager = ParameterManager(self._params, timezone = self._conf.getTimezone())
+        self._contribPlace = pManager.extract("value", pType=str, allowEmpty=False)
+        self._schEntryId = pManager.extract("scheduleEntryId", pType=int, allowEmpty=False)
+        self._sessionId = pManager.extract("sessionId", pType=str, allowEmpty=True, defaultValue=None)
+        self._sessionSlotId = pManager.extract("sessionSlotId", pType=str, allowEmpty=True, defaultValue=None)
+    
+    def _getAnswer(self):
+#        from MaKaC.conference import ConferenceHolder
+#        self._conf = ConferenceHolder().getById(self._params["conference"]);
+        #self._entry = self._conf.getSchedule().getEntryById(self._params["scheduleEntry"])
+        if (self._sessionId != None and self._sessionSlotId != None):
+            self._schEntry = self._conf.getSessionById(self._sessionId).getSlotById(self._sessionSlotId).getSchedule().getEntryById(self._schEntryId)
+        else:
+            self._schEntry = self._conf.getSchedule().getEntryById(self._schEntryId)
+        entry = self._schEntry.getOwner()
+        if self._contribPlace.strip() != "":
+            oldSch = DictPickler.pickle(self._schEntry)
+            oldDate = self._schEntry.getStartDate()
+            month = str(oldDate.month)
+            if len(month) != 2:
+                month = "0"+month
+            day = str(oldDate.day)
+            if len(day) != 2:
+                day = "0"+day
+            hour = str(oldDate.hour)
+            if len(hour) != 2:
+                hour = "0"+hour
+            minute = str(oldDate.minute)
+            if len(minute) != 2:
+                minute = "0"+minute
+            oldSch['startDate'] = day+"/"+month+"/"+str(oldDate.year)+" "+hour+":"+minute#DD/MM/YY HH:MM
+            #we need something like 20090405
+            oldDateConc = str(oldDate.year)+month+day
+            s,ss=self._contribPlace.split(":")
+            if s!="conf":
+                session=self._conf.getSessionById(s)
+                if session is not None:
+                    slot=session.getSlotById(ss)
+                    if slot is not None:
+                        pickledDataSlotSchEntry = DictPickler.pickle(slot.getConfSchEntry(), timezone=self._conf.getTimezone())
+                        pickledDataSession = DictPickler.pickle(session, timezone=self._conf.getTimezone())
+                        self._schEntry.getSchedule().removeEntry(self._schEntry)
+                        if isinstance(entry, conference.Contribution):
+                            entry.setSession(session)
+                        slot.getSchedule().addEntry(self._schEntry, check=2)
+            else:
+                pickledDataSlotSchEntry = None #DictPickler.pickle(self._schEntry.getSchedule().getOwner().getConfSchEntry(), timezone=self._conf.getTimezone())
+                if isinstance(entry, conference.Contribution):
+                    pickledDataSession = DictPickler.pickle(entry.getOwner(), timezone=self._conf.getTimezone())
+                else:
+                    pickledDataSession = None
+                #save the previous date hours and minutes to reschedule the new one on the different day but at the same times
+                hour = oldDate.hour
+                minute = oldDate.minute
+                self._schEntry.getSchedule().removeEntry(self._schEntry)
+                nsd = pytz.timezone(self._conf.getTimezone()).localize(datetime.datetime(int(ss[0:4]),
+                                            int(ss[4:6]),
+                                            int(ss[6:8]),
+                                            hour,
+                                            minute))#this is ugly...
+                nsd = nsd.astimezone(pytz.timezone('UTC'))
+                self._schEntry.setStartDate(nsd)
+                if isinstance(entry, conference.Contribution):
+                    entry.setSession(None)
+                self._conf.getSchedule().addEntry(self._schEntry, check=2)
+        newPickled = DictPickler.pickle(self._schEntry)
+        return {'entry': newPickled, 'old': oldSch, 'id': newPickled['id'], 'day': self._schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
+                'session': pickledDataSession, 'slotEntry': pickledDataSlotSchEntry}
+    
 methodMap = {
     "get": ConferenceGetSchedule,
 
@@ -929,5 +1004,7 @@ methodMap = {
     "setScheduleSessions": ConferenceSetScheduleSessions,
 
     "getAllSessionConveners": ConferenceGetAllConveners,
-    "getAllSpeakers": ConferenceGetAllSpeakers
+    "getAllSpeakers": ConferenceGetAllSpeakers,
+    
+    "relocate": Relocate
 }

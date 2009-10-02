@@ -436,7 +436,10 @@ type("TimetableManagementActions", [], {
             } else {
                 var sessions = {};
                 each(this.eventInfo.sessions, function(session, key) {
-                    sessions[session.title] = function() { self.addSessionSlot(session); };
+                    sessions[session.title] = {};
+                    sessions[session.title]['func'] = function() { self.addSessionSlot(session); };
+                    sessions[session.title]['color'] = self._retrieveSessionColor(session);
+//                    sessions[session.title] = function() { self.addSessionSlot(session); };
                 });
 
                 var menuu = {
@@ -446,7 +449,7 @@ type("TimetableManagementActions", [], {
                     'Add interval to:': sessions
 
                 };
-                menuItems[$T('Session')] = new SectionPopupMenu(menuu, [triggerElement, this.addMenu], 'timetableSectionPopupList popupListChained', true, true);
+                menuItems[$T('Session')] = new SessionSectionPopupMenu(menuu, [triggerElement, this.addMenu], 'timetableSectionPopupList popupListChained', true, true);
             }
 
         }
@@ -461,6 +464,11 @@ type("TimetableManagementActions", [], {
 
         var pos = triggerElement.getAbsolutePosition();
         this.addMenu.open(pos.x + triggerElement.dom.offsetWidth + 10, pos.y + triggerElement.dom.offsetHeight + 2);
+    },
+    _retrieveSessionColor: function(session){
+        // building "strip" function to format the startDate from xxx-xx-xx to xxxxxxx
+        var reg = new RegExp("-", "g");
+        return ttdata[session.startDate.date.replace(reg, "")]["s"+session.id+"l0"].color
     },
     _addParams: function(type) {
         return {
@@ -654,6 +662,23 @@ type("TimetableManagementActions", [], {
         }
     },
 
+    relocateContrib: function(eventData){
+        var relocateDiag = new RelocateDialog(
+                this,
+                timetable.data,
+                eventData.entryType,
+                eventData.sessionId,
+                eventData.sessionSlotId,
+                timetable.currentDay,
+                this.savedData,
+                eventData['scheduleEntryId'],
+                eventData['conferenceId'],
+                eventData['startDate']['date']
+        );
+        relocateDiag.open();
+    },
+    
+    
     /*
      *
      * Is called every time a timetable entry has been successfully
@@ -758,6 +783,32 @@ type("TimetableManagementActions", [], {
         this.processedWarnings.clear();
     },
 
+    /*Like _updateEntry but for relocation function*/
+    //keep the same args as updateEntry in case we merge them, for instance "data" is not used at all
+    _updateEntryRelocate: function(result, data, originalArgs){
+        data = this.timetable.getData();
+        var oldDay = IndicoUtil.formatDate2(IndicoUtil.parseDateTime(originalArgs.startDate));
+        //delete previous entry
+        delete data[oldDay][originalArgs.id];
+        if (this.session && this.savedData) {
+            //if we're in a session, we have to update savedData as well
+            delete this.savedData[oldDay][this.session.id].entries[originalArgs.id];
+        }
+        
+        //Save the new location
+        if(this.savedData && exists(result.slotEntry)){
+            //we're in a session
+            this.savedData[result.day][result.slotEntry.id]['entries'][result.id]=result.entry;
+        }else if(exists(result.slotEntry)){
+            //move into a session
+            data[result.day][result.slotEntry.id]['entries'][result.id]=result.entry;
+        }else if (this.savedData){
+            //move to top level
+            this.savedData[result.day][result.id]=result.entry;
+        }
+        this.timetable.setData(data);
+    },
+    
     /*
     * Iterates through entries and adds all of them
     */

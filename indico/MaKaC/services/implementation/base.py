@@ -319,7 +319,6 @@ class ProtectedModificationService(ProtectedService):
         """
 
         target = self._target
-
         if (type(target) == conference.SessionSlot):
             target = target.getSession()
         

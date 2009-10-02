@@ -927,10 +927,17 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"], {
 
 
         // Relocate link, only available for contribs and breaks
-        // TODO: Add the link
         if (self.eventData.entryType != 'Session') {
             menu.insert(" | ");
-            menu.insert(Html.a('fakeLink', Html.span({style: {cursor: 'default', color: '#888'}}, $T("Relocate"))));
+            
+            relocateLink = Html.a('fakeLink', Html.span({}, $T("Move")));
+            relocateLink.observeClick(function(){
+                self.close();
+                self.managementActions.relocateContrib(self.eventData);
+            })
+            
+            menu.insert(relocateLink);
+            
         }
 
         if (self.eventData.entryType == 'Session') {

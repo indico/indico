@@ -415,7 +415,7 @@ type("TabWidget", ["Chooser", "IWidget"],{
                  value.setStyle('display','');
              }
          });
-
+         
          this.selected = new WatchValue(this.options.item(initialSelection));
 
          this.selected.observe(function(value) {
