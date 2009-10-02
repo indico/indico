@@ -114,35 +114,7 @@ class RHConferenceModificationClosed( RHConferenceModifBase ):
             p = conferences.WPConferenceModificationClosed( self, self._target )
             return p.display()
 
-#class RHConferenceModifBase_UsesRoomBookingDB( RHConferenceModifBase ):
-#    """
-#    Base class for pages that are somehow related to room booking
-#    (they need to connect to room booking database).
-#
-#    For example contribution modification includes choosing a booked
-#    room, so it is inherited from this class.
-#    """
-#
-#    def _startRequestSpecific2RH( self ):
-#        if Config.getInstance().useRoomBookingModule():
-#            CrossLocationDB.connect()
-#
-#    def _endRequestSpecific2RH( self, commit = True ):
-#        if Config.getInstance().useRoomBookingModule():
-#            if commit: CrossLocationDB.commit()
-#            else: CrossLocationDB.rollback()
-#            CrossLocationDB.disconnect()
-#
-#    def _syncSpecific2RH( self ):
-#        if Config.getInstance().useRoomBookingModule():
-#            CrossLocationDB.sync()
-#
-#    def _abortSpecific2RH( self ):
-#        if Config.getInstance().useRoomBookingModule():
-#            CrossLocationDB.rollback()
-
-
-class RHConferenceModification( RHConferenceModifBase ):
+class RHConferenceModification( RHConferenceModifBase, RoomBookingDBMixin ):
     _uh = urlHandlers.UHConferenceModification
 
     def _process( self ):
