@@ -37,7 +37,6 @@ from MaKaC.common.PickleJar import Updates
 from MaKaC.common.PickleJar import Conversion
 from MaKaC.common.PickleJar import DictPickler
 
-import MaKaC.conference
 class Schedule:
     """base schedule class. Do NOT instantiate
     """
