@@ -12,7 +12,7 @@
                         <p>Below the list of this conference\'s Referees is shown.</p>
                         <p>Only Managers and Paper Review Managers can assign Referees.</p>
                         <p>There can only be 1 Referee per contributon.</p>
-                        <p>You can also set the due date for the judgement of the Referee. The Referee will see this date.</p>
+                        <p>You can also set the deadline for the judgement of the Referee. The Referee will see this date.</p>
                 </text>
             </translation>
         </tooltip>
@@ -24,7 +24,7 @@
                         <p>Below the list of this conference\'s Editors is shown.</p>
                         <p>Managers, Paper Review Managers and Referees can assign Editors.</p>
                         <p>There can only be 1 Editor per contributon.</p>
-                        <p>You can also set the due date for the judgement of the Editor. The Editor will see this date.</p>
+                        <p>You can also set the deadline for the judgement of the Editor. The Editor will see this date.</p>
                 </text>
             </translation>
         </tooltip>
@@ -36,7 +36,7 @@
                         <p>Below the list of this conference\'s Reviewers is shown.</p>
                         <p>Managers, Paper Review Managers and Referees can assign Reviewers.</p>
                         <p>There can be one or more Reviewers per contributon.</p>
-                        <p>You can also set the due date for the judgement of the Reviewers. The Reviewers will see this date.</p>
+                        <p>You can also set the deadline for the judgement of the Reviewers. The Reviewers will see this date.</p>
                 </text>
             </translation>
         </tooltip>

@@ -20,14 +20,14 @@
     	    <% t = ConfReview.getTemplates()[k] %>
     	<tr>
     		<td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-    		    <a href="<%= urlHandlers.UHDownloadContributionTemplate.getURL(t) %>">
+    		    <a style="color:#5FA5D4" href="<%= urlHandlers.UHDownloadContributionTemplate.getURL(t) %>">
     			    <%= t.getName() %>
     			</a>
                 
                 <% if CanDelete: %>
                 &nbsp;&nbsp;&nbsp;
                 <a href="<%= urlHandlers.UHDeleteContributionTemplate.getURL(t) %>">
-                    <img class="imglink" src="<%= Configuration.Config.getInstance().getSystemIconURL("smallDelete") %>" alt="delete template">
+                    <img class="imglink" style="vertical-align: bottom; width: 15px; height: 15px;" src="<%= Configuration.Config.getInstance().getSystemIconURL("remove") %>" alt="delete template">
                 </a>
                 <% end %>
     		</td>

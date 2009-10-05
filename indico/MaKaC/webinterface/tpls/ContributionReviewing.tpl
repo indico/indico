@@ -109,7 +109,7 @@
         <% if ContributionReviewManager.hasReferee(): %>
         <tr>
             <td class="dataCaptionTD">
-                <span class="dataCaptionFormat"><%= _("Due date")%></span>
+                <span class="dataCaptionFormat"><%= _("Deadline")%></span>
             </td>
             <td class="blacktext">
                 <span id="inPlaceEditRefereeDueDate">
@@ -213,7 +213,7 @@
     <% if ContributionReviewManager.hasEditor(): %>
         <tr>
             <td class="dataCaptionTD">
-                <span class="dataCaptionFormat"><%= _("Due date")%></span>
+                <span class="dataCaptionFormat"><%= _("Deadline")%></span>
             </td>
             <td class="blacktext">
                 <span id="inPlaceEditEditorDueDate">
@@ -337,7 +337,7 @@
         <% if ContributionReviewManager.hasReviewers(): %>
             <tr>
                 <td class="dataCaptionTD">
-                    <span class="dataCaptionFormat"><%= _("Due date")%></span>
+                    <span class="dataCaptionFormat"><%= _("Deadline")%></span>
                 </td>
                 <td class="blacktext">
                     <span id="inPlaceEditReviewerDueDate">

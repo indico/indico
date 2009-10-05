@@ -163,7 +163,7 @@
                 <%= _("Reviewing team")%>
             </td>
             <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                <%= _("Due date")%>
+                <%= _("Deadline")%>
             </td>
         </tr>
     </thead>
@@ -239,7 +239,7 @@
             <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <% date = rm.getLastReview().getAdjustedRefereeDueDate() %>
                 <% if date is None: %>
-                    <%= _("Due date not set.")%>
+                    <%= _("Deadline not set.")%>
                 <% end %>
                 <% else: %>
                 <% if date < nowutc() and not rm.getLastReview().getRefereeJudgement().isSubmitted(): %>

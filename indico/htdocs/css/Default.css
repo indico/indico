@@ -923,6 +923,16 @@ a.confSubSection:hover {
    margin: 10px 0;
 }
 
+.reviewingsubtitle {
+   font-family: "Times New Roman", Verdana, Arial;
+   font-size: 15pt;
+   color: #4E4C46;
+   letter-spacing: 1px;
+   padding: 3px;
+   border-bottom: 1px solid #DDDDDD;
+   margin: 10px 0;
+}
+
 .groupTitleNoBorder {
    border-bottom: none;
 }
@@ -3890,7 +3900,8 @@ ul.keywordList li.oneLineListItem_last:after {
 ul.keywordList li.multipleLinesListItem {
     position: relative;
     padding: 0 0 0 0;
-    color: #5FA5D4;
+    padding-bottom: 5px;
+    color: #5FA5D4;        
 }
 
 ul.keywordList li.multipleLinesListItem_last {

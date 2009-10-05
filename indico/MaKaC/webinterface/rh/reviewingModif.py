@@ -261,7 +261,7 @@ class RHSetTemplate(RHConfModifReviewingPRMBase):
         RHConfModifReviewingPRMBase._checkParams( self, params )
         self._name = params.get("name")
         self._description = params.get("description")
-        if params.get("formatOther").strip() == "":
+        if ("format" in params):
             self._format = params.get("format")
         else:
             self._format = params.get("formatOther")

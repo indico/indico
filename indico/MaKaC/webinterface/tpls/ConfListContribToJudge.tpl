@@ -13,7 +13,7 @@
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"><%= _("Id")%></td>
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"><%= _("Title")%></td>
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"><%= _("State")%></td>
-        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"><%= _("Due date")%></td>
+        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"><%= _("Deadline")%></td>
     </tr>
    
     <% for c in ConfReview.getJudgedContributions(User): %>
@@ -33,7 +33,7 @@
             <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <% date = c.getReviewManager().getLastReview().getAdjustedRefereeDueDate() %>
                 <% if date is None: %>
-                    <%= _("Due date not set.")%>
+                    <%= _("Deadline not set.")%>
                 <% end %>
                 <% else: %>
                 <% if date < nowutc() and not c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted(): %>
@@ -62,7 +62,7 @@
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"><%= _("Id")%></td>
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"><%= _("Title")%></td>
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"><%= _("State")%></td>
-        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"><%= _("Due date")%></td>
+        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"><%= _("Deadline")%></td>
     </tr>
    
 	<% for c in ConfReview.getEditedContributions(User): %>
@@ -84,7 +84,7 @@
             <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
             <% date = c.getReviewManager().getLastReview().getAdjustedEditorDueDate() %>
             <% if date is None: %>
-                <%= _("Due date not set.")%>
+                <%= _("Deadline not set.")%>
             <% end %>
             <% else: %>
                 <% if date < nowutc() and not c.getReviewManager().getLastReview().getEditorJudgement().isSubmitted(): %>
@@ -114,7 +114,7 @@
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"><%= _("Id")%></td>
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"><%= _("Title")%></td>
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"><%= _("State")%></td>
-        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"><%= _("Due date")%></td>
+        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"><%= _("Deadline")%></td>
     </tr>
    
 	<% for c in ConfReview.getReviewedContributions(User): %>
@@ -136,7 +136,7 @@
             <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
             <% date = c.getReviewManager().getLastReview().getAdjustedReviewerDueDate() %>
             <% if date is None: %>
-                <%= _("Due date not set.")%>
+                <%= _("Deadline not set.")%>
             <% end %>
             <% else: %>
                 <% if date < nowutc() and not c.getReviewManager().getLastReview().hasGivenAdvice(User): %>

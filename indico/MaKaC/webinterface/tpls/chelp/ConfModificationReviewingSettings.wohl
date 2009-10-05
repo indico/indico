@@ -98,7 +98,7 @@
         <tooltip name="defaultDates" target="//*[@id='defaultDatesHelp']">
             <translation language="en">
                 <text>
-                        <p>For each contribution, you can set a due date for the judgement / opinion of
+                        <p>For each contribution, you can set a deadline for the judgement / opinion of
                         Referees, Editors, and Reviewers independently</p>.
                         <p>Here you can set a default date that will be used for new contributions</p>.
                 </text>

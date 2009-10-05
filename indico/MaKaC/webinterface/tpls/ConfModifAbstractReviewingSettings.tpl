@@ -6,7 +6,7 @@
     </tr>
     <tr>
         <td nowrap class="titleCellTD" style="padding-left: 30px; padding-top: 15px;"><span class="titleCellFormat">
-            <%= _("Abstract Reviewer default due date")%>
+            <%= _("Abstract Reviewer Deadline")%>
         </span></td>
         <td class="blacktext" style="padding-top: 15px;">
             <span id="inPlaceEditDefaultAbstractReviewerDueDate">

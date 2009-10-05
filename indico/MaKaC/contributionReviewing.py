@@ -396,11 +396,11 @@ class Review(Persistent):
         self._isAuthorSubmitted = False #boolean that says if the author has submitted his / her materials or not
         self._version = version #the version number for this Review. Different Reviews for the same contribution have increasing version numbers.
         self._materials = [] #'snapshot' of the materials that were analyzed by the reviewing team. Copied from the Contribution materials when judgement is passed.
-        self._authorComments = ""
-        self._refereeDueDate = None #the due date where the referee has to pass his/her judgement
-        self._editorDueDate = None #the due date where the editor has to pass his/her judgement
-        self._reviewerDueDate = None #the due date where all the reviewers have to pass his/her judgement
-
+        self._authorComments = "" 
+        self._refereeDueDate = None #the Deadline where the referee has to pass his/her judgement 
+        self._editorDueDate = None #the Deadline where the editor has to pass his/her judgement
+        self._reviewerDueDate = None #the Deadline where all the reviewers have to pass his/her judgement
+        
     def notifyModification(self):
         """ Notifies the DB that a list or dictionary attribute of this object has changed
         """
@@ -640,17 +640,17 @@ class Review(Persistent):
 
     #dates methods
     def setRefereeDueDate(self, date):
-        """ Sets the due date for the referee.
+        """ Sets the Deadline for the referee.
         """
         self._refereeDueDate = date #datetime(year, month, day, 0, 0, 0, tzinfo=timezone(self.getConference().getTimezone()))
 
     def getRefereeDueDate(self):
-        """ Returns the due date for the referee
+        """ Returns the Deadline for the referee
         """
         return self._refereeDueDate
 
     def getAdjustedRefereeDueDate(self):
-        """ Returns a timezeone-aware due date for the referee given the conference's timezone.
+        """ Returns a timezeone-aware Deadline for the referee given the conference's timezone.
         """
         if self.getRefereeDueDate() is None:
             return None
@@ -658,8 +658,8 @@ class Review(Persistent):
             return getAdjustedDate(self._refereeDueDate, self.getConference())
 
     def getAdjustedRefereeDueDateFormatted(self):
-        """ Returns a timezeone-aware due date for the referee given the conference's timezone,
-            formatted to a string (this method is necessary due to syntax limitations of @Retrieve )
+        """ Returns a timezeone-aware Deadline for the referee given the conference's timezone,
+            formatted to a string (this method is necessary due to syntax limitations of @Retrieve ) 
         """
         date = self.getAdjustedRefereeDueDate()
         if date:
@@ -668,17 +668,17 @@ class Review(Persistent):
             return None
 
     def setEditorDueDate(self, date):
-        """ Sets the due date for the editor.
+        """ Sets the Deadline for the editor.
         """
         self._editorDueDate = date #datetime(year, month, day, 0, 0, 0, tzinfo=timezone(self.getConference().getTimezone()))
 
     def getEditorDueDate(self):
-        """ Returns the due date for the editor
+        """ Returns the Deadline for the editor
         """
         return self._editorDueDate
 
     def getAdjustedEditorDueDate(self):
-        """ Returns a timezeone-aware due date for the editor given the conference's timezone.
+        """ Returns a timezeone-aware Deadline for the editor given the conference's timezone.
         """
         if self.getEditorDueDate() is None:
             return None
@@ -686,17 +686,17 @@ class Review(Persistent):
             return getAdjustedDate(self._editorDueDate, self.getConference())
 
     def setReviewerDueDate(self, date):
-        """ Sets the due date for all the reviewers.
+        """ Sets the Deadline for all the reviewers.
         """
         self._reviewerDueDate = date #datetime(year, month, day, 0, 0, 0, tzinfo=timezone(self.getConference().getTimezone()))
 
     def getReviewerDueDate(self):
-        """ Returns the due date for all the reviewers.
-        """
-        return self._reviewerDueDate
-
+        """ Returns the Deadline for all the reviewers.
+        """        
+        return self._reviewerDueDate   
+    
     def getAdjustedReviewerDueDate(self):
-        """ Returns a timezeone-aware due date for all the reviewers given the conference's timezone.
+        """ Returns a timezeone-aware Deadline for all the reviewers given the conference's timezone.
         """
         if self.getReviewerDueDate() is None:
             return None

@@ -6,9 +6,8 @@
 
 <table width="90%%" align="center" border="0" style="margin-bottom:1em">
     <tr>
-        <td id="reviewingModeHelp" colspan="5" class="groupTitle">
-            <span><%= _("Choose type of paper reviewing for the conference")%></span>
-        </td>
+        <em><%= _("Please, follow the steps to set up the Paper Reviewing Module")%></em> 
+        <div id="reviewingModeHelp" class="groupTitle"><%= _("Step 1: Choose type of paper reviewing for the conference")%></div>
     </tr>
     <tr>
         <td nowrap class="titleCellTD"  style="padding-top: 5px;">
@@ -19,16 +18,32 @@
         </td>
     </tr>
 </table>
-
 <% if ConfReview.hasReviewing(): %>
     <% display = 'table' %>
 <% end %>
 <% else: %>
     <% display = 'none' %>
 <% end %>
-<table id='materialsTable' width="90%%" align="center" border="0" style="margin-bottom:1em; display:<%=display%>">
+<table id='steptitle' width="90%%" border="0" style="margin-bottom:1em; display:<%=display%>">
     <tr>
-        <td id="reviewableMaterialsHelp" colspan="5" class="groupTitle">
+        <td class="groupTitle">
+            <%= _("Step 2: Set up the options for ")%><span id="title">
+            <%if ConferenceReview.reviewingModes[choice]==ConferenceReview.reviewingModes[2]: %><%= _("content reviewing team")%><% end %>
+            <%if ConferenceReview.reviewingModes[choice]==ConferenceReview.reviewingModes[3]: %><%= _("layout reviewing team")%><% end %>
+            <%if ConferenceReview.reviewingModes[choice]==ConferenceReview.reviewingModes[4]: %><%= _("content and layout reviewing team")%><% end %>
+            </span>
+        </td>
+    </tr>
+</table>
+<% if ConfReview.hasReviewing(): %>
+    <% display = 'table' %>
+<% end %>
+<% else: %>
+    <% display = 'none' %>
+<% end %>
+<table id='materialsTable' width="90%%" align="center" border="0" style="margin-bottom:1em; display:<%=display%>">    
+    <tr>
+        <td id="reviewableMaterialsHelp" colspan="5" class="reviewingsubtitle" style="padding-top: 20px;">
             <span><%= _("Choose types of materials to be revised")%></span>
         </td>
     </tr>
@@ -47,7 +62,10 @@
 <% end %>
 <table id='statusTable' width="90%%" align="center" border="0" style="margin-bottom:1em; display:<%=display%>">
     <tr>
-        <td id="reviewingStatesHelp" colspan="5" class="groupTitle"><%= _("Add a paper status for paper reviewing")%></td>
+        <td id="reviewingStatesHelp" colspan="5" class="reviewingsubtitle"><%= _("Add a paper status for paper reviewing")%></td>
+    </tr>
+    <tr>
+        
     </tr>
     <!--
     <tr>
@@ -65,8 +83,24 @@
     </tr>
     -->
     <tr>
-        <td>
+        <td style="width: 400px;">    
             <div id="inPlaceEditStates"  style="padding-top: 5px;"><%= ', '.join(ConfReview.getAllStates())%></div>
+        </td>
+        <td>
+            <div class="titleCellFormat">
+                <%= _("Statuses by default:")%>
+                <ul class="keywordList">
+                <li class="multipleLinesListItem">                    
+                    <%=ConferenceReview.predefinedStates[0] %>
+                </li>  
+                <li class="multipleLinesListItem">                    
+                    <%=ConferenceReview.predefinedStates[1] %>
+                </li>  
+                <li class="multipleLinesListItem">                    
+                    <%=ConferenceReview.predefinedStates[2] %>
+                </li>        
+                </ul>
+            </div>
         </td>
     </tr>
 </table>
@@ -79,7 +113,7 @@
 <% end %>
 <table id="reviewingQuestionsTable" width="90%%" align="center" border="0" style="margin-bottom:1em; display:<%=display%>">
     <tr>
-        <td id="reviewingQuestionsHelp" colspan="5" class="groupTitle"><%= _("Add questions for paper reviewing")%></td>
+        <td id="reviewingQuestionsHelp" colspan="5" class="reviewingsubtitle"><%= _("Add questions for paper reviewing")%></td>
     </tr>
     <!--
     <tr>
@@ -111,7 +145,7 @@
 <% end %>
 <table id="editingCriteriaTable" width="90%%" align="center" border="0" style="margin-bottom:1em; display:<%=display%>">
     <tr>
-        <td id="editingCriteriaHelp" colspan="5" class="groupTitle"  style="padding-top: 5px;"><%= _("Set criteria for paper editing")%></td>
+        <td id="editingCriteriaHelp" colspan="5" class="reviewingsubtitle"  style="padding-top: 5px;"><%= _("Set criteria for paper editing")%></td>
     </tr>
     <!--
     <tr>
@@ -143,7 +177,7 @@
 <% end %>
 <table id="defaultDueDatesTable" width="90%%" align="center" border="0" style="margin-bottom:1em; display:<%=display%>">
     <tr>
-        <td id="defaultDatesHelp" colspan="5" class="groupTitle"><%= _("Default due dates for reviewing team")%></td>
+        <td id="defaultDatesHelp" colspan="5" class="reviewingsubtitle"><%= _("Deadlines for reviewing team")%></td>
     </tr>
     <% if ConfReview.hasPaperReviewing(): %>
         <% display = 'table-row' %>
@@ -153,7 +187,7 @@
     <% end %>    
     <tr id="refereeDefaultDateRow" style="white-space:nowrap; display: <%=display%>">
         <td nowrap class="titleCellTD"><span class="titleCellFormat">
-            <%= _("Referee default due date")%>
+            <%= _("Referee Deadline")%>
         </span></td>
         <td nowrap class="blacktext">
             <span id="inPlaceEditDefaultRefereeDueDate">
@@ -175,7 +209,7 @@
     <% end %>    
     <tr id="editorDefaultDateRow" style="white-space:nowrap; display: <%=display%>">
         <td nowrap class="titleCellTD"><span class="titleCellFormat">
-            <%= _("Editor default due date")%>
+            <%= _("Editor Deadline")%>
         </span></td>
         <td nowrap class="blacktext">
             <span id="inPlaceEditDefaultEditorDueDate">
@@ -203,7 +237,7 @@
     <% end %>    
     <tr id="reviewerDefaultDateRow" style="white-space:nowrap;display: <%=display%>">
         <td nowrap class="titleCellTD"><span class="titleCellFormat">
-            <%= _("Reviewer default due date")%>
+            <%= _("Reviewer Deadline")%>
         </span></td>
         <td nowrap class="blacktext">
             <span id="inPlaceEditDefaultReviewerDueDate">
@@ -229,7 +263,7 @@
 <form action="<%= setTemplateURL %>" method="post" ENCTYPE="multipart/form-data">
 <table id="templateTable" width="90%%" align="center" border="0" style="display:<%=display%>">
     <tr>
-        <td id="uploadTemplateHelp" colspan="5" class="groupTitle"><%= _("Upload a template")%></td>
+        <td id="uploadTemplateHelp" colspan="5" class="reviewingsubtitle"><%= _("Upload a template")%></td>
     </tr>
     <tr>
         <td>
@@ -247,22 +281,16 @@
                         <%= _("Description")%>
                     </td>
                     <td>
-                        <input type=text size="70" name="description">
+                        <textarea rows="2" cols="53" name="description">
                     </td>
                 </tr>
                 <tr>
                     <td align="right">
                         <%= _("Format")%>
                     </td>
-                    <td>
-                        <select name="format">
-                        	<option value="Unknown"><%= _("--Select a format--")%></option>
-                            <% for f in Template.formats: %>
-						    <option value="<%= f %>"><%= f %></option>
-							<% end %>
-                        </select>
-                        or <input name="formatOther" size="25" value="">
+                    <td id='formatchooser'>                        
                     </td>
+                    
                 </tr>
 				<tr>
                     <td align="right">
@@ -286,12 +314,12 @@
 </table>
 </form>
 
-
 <script type="text/javascript">
-                    
+
 var observer = function(value) {
     
     if (value == "No reviewing") {
+        $E('steptitle').dom.style.display = 'none';
         $E('materialsTable').dom.style.display = 'none';
         $E('statusTable').dom.style.display = 'none';
         $E('reviewingQuestionsTable').dom.style.display = 'none';
@@ -303,6 +331,8 @@ var observer = function(value) {
         $E('templateTable').dom.style.display = 'none';
     }
     if (value == "Paper reviewing") {
+        $E('steptitle').dom.style.display = '';
+        $E('title').set('<%= _("content reviewing team")%>');
         $E('materialsTable').dom.style.display = '';
         $E('statusTable').dom.style.display = '';
         $E('reviewingQuestionsTable').dom.style.display = '';
@@ -318,8 +348,11 @@ var observer = function(value) {
         showReviewingQuestions();
         showDefaultReviewerDate();
         showDefaultRefereeDate();
+        showFormatChooser();
     }
     if (value == "Paper editing") {
+        $E('steptitle').dom.style.display = '';
+        $E('title').set('<%= _("layout reviewing team")%>');
         $E('materialsTable').dom.style.display = '';
         $E('statusTable').dom.style.display = 'none';
         $E('reviewingQuestionsTable').dom.style.display = 'none';
@@ -333,8 +366,11 @@ var observer = function(value) {
         showReviewableMaterials();
         showEditingCriteria();
         showDefaultEditorDate();
+        showFormatChooser();
     }
     if (value == "Paper editing and reviewing") {
+        $E('steptitle').dom.style.display = '';
+        $E('title').set('<%= _("content and layout reviewing team")%>');
         $E('materialsTable').dom.style.display = '';
         $E('statusTable').dom.style.display = '';
         $E('reviewingQuestionsTable').dom.style.display = '';
@@ -352,6 +388,7 @@ var observer = function(value) {
         showDefaultRefereeDate();
         showEditingCriteria();
         showDefaultEditorDate();
+        showFormatChooser();
     }
 }
 
@@ -360,8 +397,8 @@ new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditReviewingMode'),
                     {conference: '<%= ConfReview.getConference().getId() %>'},
                     <%= ConferenceReview.reviewingModes[1:] %>,
                     "<%= ConfReview.getReviewingMode() %>",
-                    observer);
-                    
+                    observer);                    
+
 var showReviewableMaterials = function() {
     new IndicoUI.Widgets.Generic.twoListField($E('inPlaceEditReviewableMaterials'),
                         10,"200px",<%=ConfReview.getNonReviewableMaterials()%>,<%=ConfReview.getReviewableMaterials()%>,
@@ -370,13 +407,15 @@ var showReviewableMaterials = function() {
                         {conference: '<%= ConfReview.getConference().getId() %>'},
                         '');
 }
-                    
+
+               
 var showReviewingStates = function() {
     new IndicoUI.Widgets.Generic.keywordField(
         $E('inPlaceEditStates'),
         'multipleLinesListItem',
         'reviewing.conference.changeStates',
-        {conference: '<%= ConfReview.getConference().getId() %>'}
+        {conference: '<%= ConfReview.getConference().getId() %>'},
+        $T('Remove this status from the list')
     );
 }
 
@@ -385,7 +424,8 @@ var showReviewingQuestions = function() {
         $E('inPlaceEditQuestions'),
         'multipleLinesListItem',
         'reviewing.conference.changeQuestions',
-        {conference: '<%= ConfReview.getConference().getId() %>'}
+        {conference: '<%= ConfReview.getConference().getId() %>'},
+        $T('Remove this question from the list')
     );
 }
 
@@ -394,7 +434,8 @@ var showEditingCriteria = function() {
         $E('inPlaceEditCriteria'),
         'multipleLinesListItem',
         'reviewing.conference.changeCriteria',
-        {conference: '<%= ConfReview.getConference().getId() %>'}
+        {conference: '<%= ConfReview.getConference().getId() %>'},
+        $T('Remove this criteria from the list')
     );
 }
 
@@ -421,7 +462,54 @@ var showDefaultReviewerDate = function() {
                         dueDateToChange: 'Reviewer'},
                        null, true);
 }
-                       
+
+IndicoUI.executeOnLoad(function(){
+    var pm = new IndicoUtil.parameterManager();    
+    
+    
+    return $E('formatchooser').set(showFormatChooser(pm));
+});
+
+function showFormatChooser(pm){
+    var select = Html.select({name: 'format'}, Html.option({value: "Unknown"}, "--Select a format--")<% for f in Template.formats: %>,Html.option({value: "<%= f %>"}, "<%= f %>")<%end%>);
+    var text = Html.edit({name: 'formatOther'});
+    var chooser = new Chooser(new Lookup({
+            select: function() {
+                pm.remove(text);
+                pm.add(select);
+               var sel = '<select name="format" id="defaultformat">'+
+                         '<option value="Unknown"><%= _("--Select a format--")%></option>'+  
+                         '<% for f in Template.formats: %>'+ 
+                         '<option value="<%= f %>"><%= f %></option>'+
+                         '<% end %>'+
+                         '</select>';
+                return Html.div({},select,
+                         " ",
+                         $T("or"),
+                         " ",
+                         Widget.link(command(function() {
+                             chooser.set('write');
+                         }, $T("other"))));
+            },
+
+            write: function() {
+                bind.detach(select);
+                pm.remove(select);
+                pm.add(text);
+                return Html.div({}, text,
+                                " ",
+                               $T("or"),
+                               " ",
+                                Widget.link(command(function() {
+                                    chooser.set('select');
+                                }, $T("select from list"))));
+            }
+        }));
+        chooser.set('select');
+
+        return Widget.block(chooser);
+}
+                 
 <% if ConfReview.hasReviewing(): %>
     showReviewableMaterials();
 <% end %>

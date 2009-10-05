@@ -41,8 +41,14 @@ IndicoUI.Widgets = {
         *         The former contains the DOM element (XElement), while the
         *         latter, the accessor to the data.
         */
-    keywordList: function(kindOfList, method, attributes, handler) {
+    keywordList: function(kindOfList, method, attributes, handler, icontitle) {
         var list = new WatchList();
+        
+         var image = Html.img({
+                src: imageSrc("remove"),
+                alt: 'Remove status',
+                title: $T('Remove this status from the list')
+            });
 
         var getElement = function() {
             var text = Html.edit();
@@ -74,9 +80,15 @@ IndicoUI.Widgets = {
             if (method) {
                 var saveButton = Html.input('button','popUpButton',$T('Save'));
                 saveButton.observeClick(function(){
+                    var elem = text.get();
+                if (!search(list,match(elem)) && elem !== '') {
+                    list.append(elem);
+                    text.set('');
+                    message.set('');
+                }
                     indicoRequest(method,extend(clone(attributes), {'value': list}),handler);
                 });
-                buttonBlock = Widget.inline([addButton, saveButton]);
+                buttonBlock = Widget.inline([saveButton]);
             } else {
                 buttonBlock = Widget.inline([addButton]);
             }
@@ -93,9 +105,15 @@ IndicoUI.Widgets = {
                                                                                                      return Html.li(style,[value, Widget.link(command(
                                                                                                          function() {
                                                                                                              list.remove(value);
+                                                                                                             var elem = text.get();
+																							                 if (!search(list,match(elem)) && elem !== '') {
+																							                    list.append(elem);
+																							                    text.set('');
+																							                }
+																							                 indicoRequest(method,extend(clone(attributes), {'value': list}),handler);                                                                                                            
                                                                                                              message.set('');
                                                                                                          },
-                                                                                                         Html.span({style: {color: 'red', marginLeft: '5px'}},'[x]')))]);
+                                                                                                          Html.span({style: {marginLeft: '5px'}}, Html.img({style:{verticalAlign:"bottom", width:'15px', height:'15px'},src: imageSrc("remove"), title: icontitle}))))]);
                                                                                                  });
                 })])
             ]);
@@ -447,9 +465,9 @@ IndicoUI.Widgets = {
              * @param {Object} handler A function that will be called after values are saved.
              * Leave empty to display 'Saved' next to the Save button.
              */
-        keywordField: function(element, kindOfList, method, attributes, handler) {
+        keywordField: function(element, kindOfList, method, attributes, icontitle, handler) {
 
-            var keywordList = IndicoUI.Widgets.keywordList(kindOfList, method, attributes, handler);
+            var keywordList = IndicoUI.Widgets.keywordList(kindOfList, method, attributes, handler, icontitle);
 
             indicoRequest(method,
                           attributes,

@@ -206,8 +206,8 @@ class ConferenceReviewingDefaultDueDateModification(ConferenceReviewingDateTimeM
         elif self._dueDateToChange == "Reviewer":
             self._conf.getConfReview().setDefaultReviewerDueDate(self._pTime)
         else:
-            raise ServiceError("ERR-REV3a",_("Kind of due date to change not set"))
-
+            raise ServiceError("ERR-REV3a",_("Kind of deadline to change not set"))
+        
     def _handleGet(self):
         if self._dueDateToChange == "Referee":
             date = self._conf.getConfReview().getAdjustedDefaultRefereeDueDate()
@@ -216,8 +216,8 @@ class ConferenceReviewingDefaultDueDateModification(ConferenceReviewingDateTimeM
         elif self._dueDateToChange == "Reviewer":
             date = self._conf.getConfReview().getAdjustedDefaultReviewerDueDate()
         else:
-            raise ServiceError("ERR-REV3b",_("Kind of due date to change not set"))
-
+            raise ServiceError("ERR-REV3b",_("Kind of deadline to change not set"))
+        
         if date is None:
             return 'No date set yet'
         else:
@@ -456,8 +456,8 @@ class ContributionReviewingDueDateModification(ContributionReviewingDateTimeModi
         elif self._dueDateToChange == "Reviewer":
             lastReview.setReviewerDueDate(self._pTime)
         else:
-            raise ServiceError("ERR-REV3c",_("Kind of due date to change not set"))
-
+            raise ServiceError("ERR-REV3c",_("Kind of deadline to change not set"))
+        
     def _handleGet(self):
         lastReview = self._target.getReviewManager().getLastReview()
         if self._dueDateToChange == "Referee":
@@ -467,8 +467,8 @@ class ContributionReviewingDueDateModification(ContributionReviewingDateTimeModi
         elif self._dueDateToChange == "Reviewer":
             date = lastReview.getAdjustedReviewerDueDate()
         else:
-            raise ServiceError("ERR-REV3d",_("Kind of due date to change not set"))
-
+            raise ServiceError("ERR-REV3d",_("Kind of deadline to change not set"))
+        
         return datetime.datetime.strftime(date,'%d/%m/%Y %H:%M')
 
 class ContributionReviewingJudgementModification(ContributionReviewingTextModificationBase):
