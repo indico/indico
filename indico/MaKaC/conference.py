@@ -40,8 +40,9 @@ import MaKaC
 import MaKaC.common.indexes as indexes
 from MaKaC.common.timezoneUtils import nowutc
 import MaKaC.fileRepository as fileRepository
-import MaKaC.schedule as schedule
-from MaKaC.schedule import ConferenceSchedule, SessionSchedule, SlotSchedule, PosterSlotSchedule, SlotSchTypeFactory, ContribSchEntry
+from MaKaC.schedule import ConferenceSchedule, SessionSchedule,SlotSchedule,\
+     PosterSlotSchedule, SlotSchTypeFactory, ContribSchEntry, \
+     LinkedTimeSchEntry, BreakTimeSchEntry
 import MaKaC.review as review
 from MaKaC.common import Config, DBMgr, utils
 from MaKaC.common.Counter import Counter
@@ -3352,7 +3353,7 @@ class Conference(Persistent):
         """
         res=[]
         for entry in self.getSchedule().getEntries():
-            if isinstance(entry,schedule.LinkedTimeSchEntry) and \
+            if isinstance(entry,LinkedTimeSchEntry) and \
                                 isinstance(entry.getOwner(),SessionSlot):
                 session=entry.getOwner().getSession()
                 if session not in res:
@@ -4198,7 +4199,7 @@ class Conference(Persistent):
             conf._sections.append(item)
         if options.get("sessions", False):
             for entry in self.getSchedule().getEntries():
-                if isinstance(entry,schedule.BreakTimeSchEntry):
+                if isinstance(entry,BreakTimeSchEntry):
                     conf.getSchedule().addEntry(entry.clone(conf))
         db_root = DBMgr.getInstance().getDBConnection().root()
         if db_root.has_key( "webfactoryregistry" ):
@@ -5588,7 +5589,7 @@ class Session(Persistent):
                     self.getEndDate() > self.getConference().getSchedule().getEndDate():
                 raise MaKaCError( _("Impossible to move the session because it would be out of the conference dates"))
             for entry in self.getSchedule().getEntries():
-                if isinstance(entry,schedule.LinkedTimeSchEntry) and \
+                if isinstance(entry,LinkedTimeSchEntry) and \
                         isinstance(entry.getOwner(), SessionSlot):
                     e = entry.getOwner()
                     e.move(e.getStartDate() + diff)
@@ -6587,8 +6588,8 @@ class SessionSlot(Persistent):
         self._conveners = []
         self._convenerGen=Counter()
         self._schedule=SlotSchTypeFactory.getDefaultKlass()(self)
-        self._sessionSchEntry=schedule.LinkedTimeSchEntry(self)
-        self._confSchEntry=schedule.LinkedTimeSchEntry(self)
+        self._sessionSchEntry=LinkedTimeSchEntry(self)
+        self._confSchEntry=LinkedTimeSchEntry(self)
         self._contributionDuration = None
 
     def getTimezone( self ):
@@ -6637,7 +6638,7 @@ class SessionSlot(Persistent):
         #populate the timetable
         if options.get("contributions", False) :
             for entry in self.getEntries() :
-                if isinstance(entry, schedule.BreakTimeSchEntry) :
+                if isinstance(entry, BreakTimeSchEntry) :
                     newentry = entry.clone(slot)
                     slot.getSchedule().addEntry(newentry,0)
                 elif isinstance(entry, ContribSchEntry) :
@@ -6688,7 +6689,7 @@ class SessionSlot(Persistent):
                 entry.setStartDate(st,1,0)
                 # add diff to last item end date if and only if the item is
                 # not a break
-                #if not isinstance(entry, schedule.BreakTimeSchEntry):
+                #if not isinstance(entry, BreakTimeSchEntry):
                 #    st=entry.getEndDate()+diff
                 #else:
                 #    st=entry.getEndDate()
@@ -6843,7 +6844,7 @@ class SessionSlot(Persistent):
             if self._confSchEntry:
                 pass
         except AttributeError:
-            self._confSchEntry=schedule.LinkedTimeSchEntry(self)
+            self._confSchEntry=LinkedTimeSchEntry(self)
         return self._confSchEntry
 
     def getSessionSchEntry( self ):
@@ -6902,7 +6903,7 @@ class SessionSlot(Persistent):
         diff=sDate-self.startDate
         self.startDate = sDate
         for slotEntry in self.getSchedule().getEntries():
-            if isinstance(slotEntry, schedule.BreakTimeSchEntry):
+            if isinstance(slotEntry, BreakTimeSchEntry):
                 slotEntry.startDate = slotEntry.getStartDate() + diff
             else:
                 se = slotEntry.getOwner()

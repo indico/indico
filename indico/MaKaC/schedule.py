@@ -38,8 +38,6 @@ from MaKaC.common.PickleJar import DictPickler
 from MaKaC.common.Conversion import Conversion
 from MaKaC.common.contextManager import ContextManager
 
-import MaKaC.conference
-
 class Schedule:
     """base schedule class. Do NOT instantiate
     """
