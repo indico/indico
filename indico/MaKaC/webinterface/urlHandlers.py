@@ -4475,13 +4475,18 @@ class UHHelper(object):
     def getDisplayUH(cls, klazz):
         return cls.displayUHs.get(klazz.__name__, None)
 
-# Testing helloworld
-class UHHelloWorld(URLHandler):
-    _relativeURL = "helloWorld.py"
+class UHSwitchInterface( URLHandler ):
+    _relativeURL = "switchInterface.py"
 
-    @classmethod
-    def getURL( cls, name=None ):
+    def getURL( cls, whereTo, returnURL="" ):
+        """
+        whereTo - 'future' or 'past'
+        """
         url = cls._getURL()
-        if name != None:
-            url.addParam("name", name)
+        if str(returnURL).strip() == "":
+            url.addParam( "returnURL", UHWelcome.getURL())
+        else:
+            url.addParam( "returnURL", returnURL )
+        url.addParam("to", whereTo)
         return url
+

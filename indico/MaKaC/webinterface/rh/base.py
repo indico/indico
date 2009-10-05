@@ -370,6 +370,17 @@ class RH(RequestHandlerBase):
         p=errors.WPRestrictedHTML(self, escape(str(e)))
         return p.display()
 
+    ### SWITCHER
+    def _checkInterfaceSwitchNeeded(self):
+
+        from MaKaC.webinterface.session.base import RequestWrapper
+
+        interface = RequestWrapper(self._req).cookies.get("INDICO_INTERFACE")
+        if interface == 'past':
+            current_url = self._req.construct_url(self._req.unparsed_uri)
+            self._redirect(current_url.replace('indicodev','indicodemo'))
+    ### ***
+
     def process( self, params ):
         """
         """
@@ -405,6 +416,10 @@ class RH(RequestHandlerBase):
                         #raise(str(dir(self._websession)))
                         self._setSessionUser()
                         self._setLang()
+
+                        ### SWITCHER
+                        self._checkInterfaceSwitchNeeded();
+                        ### ***
 
                         if self._getUser():
                             Logger.get('requestHandler').debug('Request %s identified with user %s (%s)' % (id(self._req), self._getUser().getFullName(), self._getUser().getId()))

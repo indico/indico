@@ -1,5 +1,6 @@
 <% declareTemplate(newTemplateStyle = True) %>
 
+<% includeTpl('InterfaceSwitcher') %>
 <% includeTpl('Announcement') %>
 
 <div class="pageHeader pageHeaderMainPage clearfix">
