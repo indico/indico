@@ -43,7 +43,10 @@ class RCCollaborationAdmin(object):
             return False
         
         if user is None:
-            user = request._getUser()
+            if request is None:
+                return False
+            else:
+                user = request._getUser()
         
         # check if user is Server Admin, Collaboration Admin
         collaborationAdmins = PluginsHolder().getPluginType('Collaboration').getOption('collaborationAdmins').getValue()
@@ -60,7 +63,10 @@ class RCCollaborationPluginAdmin(object):
             return False
         
         if user is None:
-            user = request._getUser()
+            if request is None:
+                return False
+            else:
+                user = request._getUser()
         
         coll = PluginsHolder().getPluginType('Collaboration')
         

@@ -41,7 +41,10 @@ class RCAdmin(object):
             Otherwise the user will be retrieved from the request object 
         """
         if user is None:
-            user = request._getUser()
+            if request is None:
+                return False
+            else:
+                user = request._getUser()
         
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
         serverAdmins = minfo.getAdminList()
