@@ -376,9 +376,11 @@ class ScheduleEditBreakBase(ScheduleOperation, LocationSetter):
 
         self._addToSchedule(self._brk)
 
+        pickledDataSlotSchEntry = self._getSlotEntry()
         pickledData = DictPickler.pickle(self._brk, timezone=self._conf.getTimezone())
         return {'day': self._brk.getAdjustedStartDate().strftime("%Y%m%d"),
                 'id': pickledData['id'],
+                'slotEntry': pickledDataSlotSchEntry,
                 'entry': pickledData}
 
 class ConferenceScheduleAddBreak(ScheduleEditBreakBase, conferenceServices.ConferenceModifBase):
@@ -391,6 +393,10 @@ class ConferenceScheduleAddBreak(ScheduleEditBreakBase, conferenceServices.Confe
     def _addToSchedule(self, b):
         self._target.getSchedule().addEntry(b, 2)
 
+    def _getSlotEntry(self):
+        return None
+
+
 class ConferenceScheduleEditBreak(ScheduleEditBreakBase, conferenceServices.ConferenceScheduleModifBase):
 
     def _checkParams(self):
@@ -400,6 +406,9 @@ class ConferenceScheduleEditBreak(ScheduleEditBreakBase, conferenceServices.Conf
 
     def _addToSchedule(self, b):
         pass
+
+    def _getSlotEntry(self):
+        return None
 
 class ConferenceScheduleDeleteBreak(ScheduleOperation, conferenceServices.ConferenceScheduleModifBase):
 
@@ -416,6 +425,10 @@ class SessionSlotScheduleAddBreak(ScheduleEditBreakBase, sessionServices.Session
     def _addToSchedule(self, b):
         self._slot.getSchedule().addEntry(b, 2)
 
+    def _getSlotEntry(self):
+        return DictPickler.pickle(self._slot.getConfSchEntry(), timezone=self._conf.getTimezone())
+
+
 class SessionSlotScheduleEditBreak(ScheduleEditBreakBase, sessionServices.SessionSlotModifCoordinationBase):
 
     def _checkParams(self):
@@ -425,6 +438,10 @@ class SessionSlotScheduleEditBreak(ScheduleEditBreakBase, sessionServices.Sessio
 
     def _addToSchedule(self, b):
         pass
+
+    def _getSlotEntry(self):
+        return DictPickler.pickle(self._slot.getConfSchEntry(), timezone=self._conf.getTimezone())
+
 
 class SessionSlotScheduleDeleteBreak(ScheduleOperation, sessionServices.SessionSlotModifCoordinationBase):
 

@@ -387,8 +387,6 @@ class TestConferenceSchedule(unittest.TestCase):
 
         ops = ContextManager.get('autoOps')
 
-        print ops
-
         self.assert_(len(ops) == 4)
 
         op1 = ops[0]

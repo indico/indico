@@ -747,7 +747,7 @@ class SlotSchedule(TimeSchedule):
                 ContextManager.get('autoOps').append((owner,
                                                       "OWNER_START_DATE_EXTENDED",
                                                       owner,
-                                                      entry.getAdjustedStartDate()))
+                                                      entry.getAdjustedStartDate(tz=self.getTimezone())))
                 self.getOwner().setStartDate(entry.getStartDate(),check,0)
         if entry.getEndDate()!=None and entry.getEndDate() > self.getOwner().getEndDate():
             if check == 1:
@@ -759,7 +759,7 @@ class SlotSchedule(TimeSchedule):
                 ContextManager.get('autoOps').append((owner,
                                                       "OWNER_END_DATE_EXTENDED",
                                                       owner,
-                                                      entry.getAdjustedEndDate()))
+                                                      entry.getAdjustedEndDate(tz=self.getTimezone())))
                 self.getOwner().setEndDate(entry.getEndDate(),check)
         self._setEntryDuration(entry)
         self._addEntry(entry,check)
