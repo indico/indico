@@ -22,6 +22,10 @@
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.pages.main import WPMainBase
 import MaKaC.webinterface.wcomponents as wcomponents
+from MaKaC.webinterface.rh.admins import RCAdmin
+from MaKaC.plugins.base import PluginsHolder
+from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin
+from MaKaC.i18n import _
         
 
 class WPHelp(WPMainBase):
@@ -29,9 +33,20 @@ class WPHelp(WPMainBase):
         return wcomponents.WSimpleNavigationDrawer(_("Help"), urlHandlers.UHConferenceHelp.getURL )
 
     def _getBody(self, params):
-        wc = WHelp()
+        wc = WHelp(self._rh)
         return wc.getHTML()
 
 
 class WHelp(wcomponents.WTemplated):
-    pass
+    
+    def __init__(self, rh):
+        self._rh = rh
+    
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        
+        vars["HasCollaboration"] = PluginsHolder().hasPluginType("Collaboration")
+        vars["IsAdmin"] = RCAdmin.hasRights(self._rh)
+        vars["IsCollaborationAdmin"] = RCCollaborationAdmin.hasRights(self._rh)
+        
+        return vars
