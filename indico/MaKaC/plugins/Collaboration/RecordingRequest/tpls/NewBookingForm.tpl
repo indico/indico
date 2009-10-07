@@ -44,7 +44,7 @@
         <span class="RRQuestion">Please choose among the contributions below:</span>
         <% if not HasTalks: %>
         <div>
-            <span style="padding-left: 20px;">This event has no talks</span>
+            <span style="padding-left: 20px;"><%= _("This event has no talks.") %></span>
         </div>
         <% end %>
         
@@ -85,11 +85,6 @@
                                 </ul>
                             </td>
                             <% end %>
-                        <% end %>
-                        <% else: %>
-                            <td class="RRContributionsColumn" style="padding-left: 20px;">
-                                This conference has currently no talks.
-                            </td>
                         <% end %>
                     <% end%>
                 </tr>

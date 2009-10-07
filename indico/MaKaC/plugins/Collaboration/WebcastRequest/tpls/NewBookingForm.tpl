@@ -155,7 +155,7 @@
             
             <% if not HasTalks: %>
             <div>
-                <span style="padding-left: 20px;">This event has no talks</span>
+                <span style="padding-left: 20px;"><%= _("This event has no talks.") %></span>
             </div>
             <% end %>
             
@@ -196,11 +196,6 @@
                                     </ul>
                                 </td>
                                 <% end %>
-                            <% end %>
-                            <% else: %>
-                                <td class="WRContributionsColumn" style="padding-left: 20px;">
-                                <%=_("This event has currently no talks.")%>
-                                </td>
                             <% end %>
                         <% end %>
                         
