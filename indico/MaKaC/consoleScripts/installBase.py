@@ -381,6 +381,12 @@ Do you want to create a new database now [Y/n]? ''' % str(cfg.getDBConnectionPar
             elif opt == 'n':
                 sys.exit()
 
+    #we delete an existing vars.js.tpl.tmp
+    tmp_dir = cfg.getUploadedFilesTempDir()
+    varsJsTplTmpPath = os.path.join(tmp_dir, 'vars.js.tmp.tpl')
+    if os.path.exists(varsJsTplTmpPath):
+        os.remove(varsJsTplTmpPath)
+    
 
     _checkDirPermissions(dbInstalledBySetupPy=dbInstalledBySetupPy, uid=uid, gid=gid)
 
