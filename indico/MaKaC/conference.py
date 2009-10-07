@@ -2007,9 +2007,7 @@ class Conference(Persistent):
         self._comments = ""
         self._sortUrlTag = ""
 
-        self._titleChangeObservers = []
-        self._dateChangeObservers = []
-        self._deleteObservers = []
+        self._observers = []
 
         if PluginsHolder().hasPluginType("Collaboration"):
             from MaKaC.plugins.Collaboration.base import CSBookingManager
@@ -2675,8 +2673,8 @@ class Conference(Persistent):
     def delete( self ):
         """deletes the conference from the system.
         """
-        #we notify the observers that the conference
-        for observer in self.getDeleteObservers():
+        #we notify the observers that the conference has been deleted
+        for observer in self.getObservers():
             try:
                 observer.notifyDeletion()
             except Exception, e:
@@ -2706,23 +2704,21 @@ class Conference(Persistent):
         indexes.IndexesHolder().getById("OAIConferenceModificationDate").unindexConference(self)
         indexes.IndexesHolder().getById("OAIPrivateConferenceModificationDate").unindexConference(self)
 
-    def getDeleteObservers(self):
-        if not hasattr(self, "_deleteObservers"):
-            self._deleteObservers = []
-        return self._deleteObservers
-
-    def addDeleteObserver(self, observer):
-        self.getDeleteObservers().append(observer)
-        self._p_changed=1
-
-    def removeDeleteObserver(self, observer):
-        self.getDeleteObservers().remove(observer)
-        self._p_changed=1
-    
-    
-
     def getConference( self ):
         return self
+    
+    def getObservers(self):
+        if not hasattr(self, "_observers"):
+            self._observers = []
+        return self._observers
+
+    def addObserver(self, observer):
+        self.getObservers().append(observer)
+        self._p_changed=1
+
+    def removeObserver(self, observer):
+        self.getObservers().remove(observer)
+        self._p_changed=1
 
     def setDates( self, sDate, eDate=None, check=1, moveEntries=1 ):
         if sDate>eDate:
@@ -2740,7 +2736,7 @@ class Conference(Persistent):
         self.indexConf()
         self.cleanCategoryCache()
         
-        for observer in self.getDateChangeObservers():
+        for observer in self.getObservers():
             try:
                 observer.notifyEventDateChanges(oldStartDate, self.getStartDate(), oldEndDate, self.getEndDate())
             except Exception, e:
@@ -2796,7 +2792,7 @@ class Conference(Persistent):
 
         #if everything went well, we notify the observers that the start date has changed
         if notifyObservers:
-            for observer in self.getDateChangeObservers():
+            for observer in self.getObservers():
                 try:
                     observer.notifyEventDateChanges(oldSdate, sDate, None, None)
                 except Exception, e:
@@ -2823,7 +2819,7 @@ class Conference(Persistent):
 
         #if everything went well, we notify the observers that the start date has changed
         if notifyObservers:
-            for observer in self.getDateChangeObservers():
+            for observer in self.getObservers():
                 try:
                     observer.notifyEventDateChanges(sdate, self.startDate, None, None)
                 except Exception, e:
@@ -2911,7 +2907,7 @@ class Conference(Persistent):
 
         #if everything went well, we notify the observers that the start date has changed
         if notifyObservers:
-            for observer in self.getDateChangeObservers():
+            for observer in self.getObservers():
                 try:
                     observer.notifyEventDateChanges(None, None, oldEdate, eDate)
                 except Exception, e:
@@ -2931,7 +2927,7 @@ class Conference(Persistent):
 
         #if everything went well, we notify the observers that the start date has changed
         if notifyObservers:
-            for observer in self.getDateChangeObservers():
+            for observer in self.getObservers():
                 try:
                     observer.notifyEventDateChanges(None, None, edate, self.endDate)
                 except Exception, e:
@@ -2960,19 +2956,6 @@ class Conference(Persistent):
     ##################################
     # Fermi timezone awareness(end)  #
     ##################################
-
-    def getDateChangeObservers(self):
-        if not hasattr(self, "_dateChangeObservers"):
-            self._dateChangeObservers = []
-        return self._dateChangeObservers
-
-    def addDateChangeObserver(self, observer):
-        self.getDateChangeObservers().append(observer)
-        self._p_changed=1
-
-    def removeDateChangeObserver(self, observer):
-        self.getDateChangeObservers().remove(observer)
-        self._p_changed=1
 
     def setScreenEndDate(self, date):
         if date == self.getEndDate():
@@ -3007,8 +2990,16 @@ class Conference(Persistent):
     def setTimezone(self, tz):
         oldTimezone = self.timezone
         self.timezone = tz
-        for observer in self.getDateChangeObservers():
-            observer.notifyTimezoneChange(oldTimezone, tz)
+        
+        for observer in self.getObservers():
+            try:
+                observer.notifyTimezoneChange(oldTimezone, tz)
+            except Exception, e:
+                try:
+                    Logger.get('Conference').error("Exception while notifying the observer %s of a timezone change from %s to %s for conference %s: "%
+                                                   (observer.getObserverName(), str(oldTimezone), str(tz), self.getId(), str(e)))
+                except Exception, e2:
+                    Logger.get('Conference').error("Exception while notifying a timezone change: %s (origin: %s)"%(str(e2), str(e)))
 
     def getTimezone(self):
         try:
@@ -3051,35 +3042,22 @@ class Conference(Persistent):
 
     def setTitle(self, title):
         """changes the current title of the conference to the one specified"""
+        oldTitle = self.title
         
+        self.title = title
+        self.cleanCategoryCache()
+        self.notifyModification()
         
         #we notify the observers that the conference's title has changed
-        for observer in self.getTitleChangeObservers():
+        for observer in self.getObservers():
             try:
-                observer.notifyTitleChange(self.title, title)
+                observer.notifyTitleChange(oldTitle, title)
             except Exception, e:
                 try:
                     Logger.get('Conference').error("Exception while notifying the observer %s of of a conference title change for conference %s: %s"%
                                                    (observer.getObserverName(), self.getId(), str(e)))
                 except Exception, e2:
                     Logger.get('Conference').error("Exception while notifying a conference title change: %s (origin: %s)"%(str(e2), str(e)))
-        
-        self.title = title
-        self.cleanCategoryCache()
-        self.notifyModification()
-
-    def getTitleChangeObservers(self):
-        if not hasattr(self, "_titleChangeObservers"):
-            self._titleChangeObservers = []
-        return self._titleChangeObservers
-
-    def addTitleChangeObserver(self, observer):
-        self.getTitleChangeObservers().append(observer)
-        self._p_changed=1
-
-    def removeTitleChangeObserver(self, observer):
-        self.getTitleChangeObservers().remove(observer)
-        self._p_changed=1
 
     def getDescription(self):
         """returns (String) the description of the conference"""
@@ -4930,8 +4908,22 @@ class ConfSectionsMgr:
 
 class Observer(object):
     """ Base class for Observer objects.
-        Provides the getObserverName method (used when writing info to the Indico log)
+        Inheriting classes should overload the following boolean class attributes:
+            _shouldBeTitleNotified
+            _shouldBeDateChangeNotified
+            _shouldBeDeletionNotified
+        And set them to True if they want to be notified of the corresponding event.
+        In that case, they also have to implement the corresponding methods:
+            _notifyTitleChange (for title notification)
+            _notifyEventDateChanges and _notifyTimezoneChange (for date / timezone notification)
+            _notifyDeletion (for deletion notification).
+        The interface for those methods is also specified in this class. If the corresponding
+        class attribute is set to False but the method is not implemented, an exception will be thrown.
     """
+    _shouldBeTitleNotified = False
+    _shouldBeDateChangeNotified = False
+    _shouldBeDeletionNotified = False
+    
     def getObserverName(self):
         name = "'Observer of class" + self.__class__.__name__
         try:
@@ -4940,6 +4932,52 @@ class Observer(object):
         except AttributeError:
             pass
         return name
+    
+    def notifyTitleChange(self, oldTitle, newTitle):
+        if self._shouldBeTitleNotified:
+            self._notifyTitleChange(oldTitle, newTitle)
+            
+    def notifyEventDateChanges(self, oldStartDate = None, newStartDate = None, oldEndDate = None, newEndDate = None):
+        if self._shouldBeDateChangeNotified:
+            self._notifyEventDateChanges(oldStartDate, newStartDate, oldEndDate, newEndDate)
+            
+    def notifyTimezoneChange(self, oldTimezone, newTimezone):
+        if self._shouldBeDateChangeNotified:
+            self._notifyTimezoneChange(oldTimezone, newTimezone)
+            
+    def notifyDeletion(self):
+        if self._shouldBeDeletionNotified:
+            self._notifyDeletion()
+            
+    def _notifyTitleChange(self, oldTitle, newTitle): 
+        """ To be implemented by inheriting classes
+            Notifies the observer that the Conference object's title has changed
+        """
+        raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method _notifyTitleChange")
+    
+    def _notifyEventDateChanges(self, oldStartDate, newStartDate, oldEndDate, newEndDate):
+        """ To be implemented by inheriting classes
+            Notifies the observer that the start and / or end dates of the object it is attached to has changed.
+            If the observer finds any problems during whatever he needs to do as a consequence of
+            the event dates changing, he should write strings describing the problems
+            in the 'dateChangeNotificationProblems' context variable (which is a list of strings).
+        """
+        raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyStartDateChange")
+    
+    def _notifyTimezoneChange(self, oldTimezone, newTimezone):
+        """ To be implemented by inheriting classes.
+            Notifies the observer that the end date of the object it is attached to has changed.
+            This method has to return a list of strings describing problems encountered during
+            whatever the DateChangeObserver object does as a consequence of the notification.
+            If there are no problems, the DateChangeObserver should return an empty list.
+        """
+        raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyTimezoneChange")
+    
+    def _notifyDeletion(self):
+        """ To be implemented by inheriting classes
+            Notifies the observer that the Conference object it is attached to has been deleted
+        """
+        raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyDeletion")
 
 class TitleChangeObserver(Observer):
     """ Base class for objects who want to be notified of a Conference object being deleted.

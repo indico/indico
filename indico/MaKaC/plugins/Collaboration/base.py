@@ -46,6 +46,10 @@ class CSBookingManager(Persistent, Observer):
         It will store the list of bookings. Adding / removing / editing bookings should be through this class.
     """
     
+    _shouldBeTitleNotified = True
+    _shouldBeDateChangeNotified = True
+    _shouldBeDeletionNotified = True
+    
     def __init__(self, conf):
         """ Constructor for the CSBookingManager class.
             conf: a Conference object. The meeting that owns this CSBookingManager.
@@ -64,14 +68,8 @@ class CSBookingManager(Persistent, Observer):
         # an index of video services managers for each plugin. key: plugin name, value: list of users
         self._managers = {}
         
-        #we register as a date change observer of the conference
-        self._conf.addTitleChangeObserver(self)
-        
-        #we register as a date change observer of the conference
-        self._conf.addDateChangeObserver(self)
-        
-        #we register as a delete observer of the conference
-        self._conf.addDeleteObserver(self)
+        #we register as an observer of the conference
+        self._conf.addObserver(self)
 
     def getOwner(self):
         """ Returns the Conference (the meeting) that owns this CSBookingManager object.
@@ -79,12 +77,8 @@ class CSBookingManager(Persistent, Observer):
         return self._conf
     
     def restoreAsObserver(self):
-        if not self in self._conf.getTitleChangeObservers():
-            self._conf.addTitleChangeObserver(self)
-        if not self in self._conf.getDateChangeObservers():
-            self._conf.addDateChangeObserver(self)
-        if not self in self._conf.getDeleteObservers():
-            self._conf.addDeleteObserver(self)
+        if not self in self._conf.getObservers():
+            self._conf.addObserver(self)
     
     def isCSAllowed(self):
         """ Returns if the associated event should display a Video Services tab
