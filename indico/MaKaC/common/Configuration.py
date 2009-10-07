@@ -371,7 +371,7 @@ class Config:
             'ShortCategTag'        : "/categ/",
             'ConfigurationDir'     : "/opt/indico/etc",
             'DocumentationDir'     : "/opt/indico/doc",
-            'HtdocsDir'            : "/opt/indico/www/htdocs",
+            'HtdocsDir'            : "/opt/indico/htdocs",
             'LogDir'               : "/opt/indico/log" ,
             'ArchiveDir'           : "/opt/indico/archive",
             'BinDir'               : "/opt/indico/bin",
