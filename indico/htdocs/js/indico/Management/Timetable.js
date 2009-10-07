@@ -318,7 +318,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
 
         fields.push([$T('Keywords'), keywordField.element]);
         $B(info.accessor('keywords'), keywordField.accessor);
-        
+
         fields.push([$T('Board #'), $B(Html.input({type: 'text', cols: 10, rows: 1}), info.accessor('boardNumber'))]);
 
         if (this.isConference) {
@@ -554,13 +554,13 @@ type("RelocateDialog", ["ExclusivePopup"],
     draw: function() {
         self = this;
         var inSession = true;
-        if (self.sessionId == null && self.slotId == null) {
+        if (self.sessionId === null && self.slotId === null) {
             inSession = false;
         }
 
         // list of all radiobuttons
         var radioButtons = [];
-        
+
         // draw a tab with radiobuttons for each day
         function drawRelocateDay(timetableItems, currentDay) {
             var relocateTable = Html.table( {
@@ -571,8 +571,8 @@ type("RelocateDialog", ["ExclusivePopup"],
             var sortedByTime = [];
             translate(timetableItems, function(value, key) {
                 // consider only sessions
-                    if (key.match("^s") == "s") {
-                        sortedByTime.push( [ value['startDate']['time'], key ]);
+                if (key[0] == "s") {
+                        sortedByTime.push( [ value.startDate.time, key ]);
                     }
                 });
 
@@ -583,19 +583,17 @@ type("RelocateDialog", ["ExclusivePopup"],
             }
             sortedByTime.sort();
 
-            // building "strip" function to format the startDate from xxx-xx-xx to xxxxxxx
-            var reg = new RegExp("-", "g");
-            
+            var rb;
             // add top timetable radio button
-            if (!inSession && self.startDate.replace(reg, "") == currentDay) {
+            if (!inSession && self.startDate.replace('-', '', 'g') == currentDay) {
                 // disable the radio button where the item already belongs to
-                var rb = Html.radio( {
+                rb = Html.radio( {
                     value : "conf:" + currentDay,
                     name : "rbID",
                     disabled : 'disabled'
                 });
             } else {
-                var rb = Html.radio( {
+                rb = Html.radio( {
                     value : "conf:" + currentDay,
                     name : "rbID"
                 });
@@ -605,37 +603,37 @@ type("RelocateDialog", ["ExclusivePopup"],
             radioButtons.push(rb);
 
             // building the radio buttons
-            for ( var i = 0; i < sortedByTime.length; i++) {
+            for ( i = 0; i < sortedByTime.length; i++) {
                 var value = timetableItems[sortedByTime[i][1]];
-                if (inSession && value['sessionId'] == self.sessionId && value['sessionSlotId'] == self.slotId) {
+                if (inSession && value.sessionId == self.sessionId && value.sessionSlotId == self.slotId) {
                     // disable the radio button where the item already belongs to
-                    var rb = Html.radio( {
-                        value : value['sessionId'] + ':' + value['sessionSlotId'],
+                    rb = Html.radio( {
+                        value : value.sessionId + ':' + value.sessionSlotId,
                         name : 'rbID',
                         disabled : 'disabled'
                     });
                 } else {
-                    var rb = Html.radio( {
-                        value : value['sessionId'] + ':' + value['sessionSlotId'],
+                    rb = Html.radio( {
+                        value : value.sessionId + ':' + value.sessionSlotId,
                         name : 'rbID'
                     });
                 }
                 radioButtons.push(rb);
                 relocateTable.append(Html.tr( {
                     style : {
-                        backgroundColor : value['color']
+                        backgroundColor : value.color
                     }
                 }, Html.td( {}, rb, (Html.label( {
                     style : {
-                        'color' : value['textColor']
+                        'color' : value.textColor
                     }
-                }, value['startDate']['time'] + "-" + value['endDate']['time']
-                        + " " + value['title'])))));
+                }, value.startDate.time + "-" + value.endDate.time +
+                                                 " " + value.title)))));
             }
-    
+
             return relocateTable;
         }
-        
+
     // populate the tabslist
     tabsList = [];
     var tabData = null;
@@ -644,38 +642,36 @@ type("RelocateDialog", ["ExclusivePopup"],
     } else {
         tabData = self.timetableData;
     }
-    
+
     // sort tabs according to days
     var dateKeys = keys(tabData);
     dateKeys.sort();
     for ( var i = 0; i < dateKeys.length; i++) {
-        tabsList.push( [ $T(self._titleTemplate(dateKeys[i])), drawRelocateDay(tabData[dateKeys[i]], dateKeys[i]) ])
+        tabsList.push( [ $T(self._titleTemplate(dateKeys[i])), drawRelocateDay(tabData[dateKeys[i]], dateKeys[i]) ]);
     }
-    
+
     this.tabWidget = new TabWidget(tabsList, 400, 200, dateKeys.indexOf(self.currentDay));
     var relocatePopup = new ExclusivePopup("Relocate item", function() {
         return true;
     });
-    
+
     Logic.onlyOne(radioButtons, false); // Ensures that only 1 radio button will be selected at a given time
-    
+
     // define where the contribution is (display purpose)
     var contribLocation = null;
     if (inSession) {
-        contribLocation = self.savedData[self.currentDay]['s' + self.sessionId + 'l' + self.slotId]['title']
-                + " (interval #" + self.slotId + ")";
+        contribLocation = self.savedData[self.currentDay]['s' + self.sessionId + 'l' + self.slotId].title +
+            " (interval #" + self.slotId + ")";
     } else {
         contribLocation = "Top of timetable";
     }
 
     // define if contrib is of type Contribution or Break (display purpose)
-    if (this.entryType == "Contribution") {
-        var span1 = Html.span('', "This contribution is currently in: "
-                + contribLocation);
-    } else {
-        var span1 = Html.span('', "This break is currently in: "
-                + contribLocation);
-    }
+    var span1 = this.entryType == "Contribution"?
+        Html.span('', "This contribution is currently in: " +
+                  contribLocation):
+        Html.span('', "This break is currently in: " +
+                  contribLocation);
 
     // We construct the "ok" button and what happens when it's pressed
     var okButton = Html.button('', "OK");
@@ -703,7 +699,7 @@ type("RelocateDialog", ["ExclusivePopup"],
                     IndicoUtil.errorReport(error);
                 } else {
                     // change json and repaint timetable
-                    self.managementActions._updateEntryRelocate(result, null, result['old']);
+                    self.managementActions._updateEntryRelocate(result, null, result.old);
                     self.close();
                 }
             });
@@ -728,23 +724,24 @@ type("RelocateDialog", ["ExclusivePopup"],
 
         return this.ExclusivePopup.prototype.draw.call(this, Widget.block( [span1, Html.br(), this.tabWidget.draw(), Html.br(), buttonDiv ]));
     },
- 
+
     /*
      * Translates the keys used in the data dictionary into titles
      * displayed in the tab control
      */
     _titleTemplate: function(text) {
-        if (text == 'all')
+        if (text == 'all') {
             return 'All days';
-    
+        }
+
         var day = text.substring(6,8);
         var month = text.substring(4,6);
-    
+
         var strDate =  day + '/' + month + '/' + text.substring(0,4);
-    
+
         var nDate = new Date();
         setDate(nDate, parseDate(strDate));
-    
+
         return Indico.Data.WeekDays[nDate.getDay()].substring(0,3)+' '+day+'/'+month;
 },
     postDraw: function(){

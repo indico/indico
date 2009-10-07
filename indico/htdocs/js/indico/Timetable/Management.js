@@ -437,8 +437,8 @@ type("TimetableManagementActions", [], {
                 var sessions = {};
                 each(this.eventInfo.sessions, function(session, key) {
                     sessions[session.title] = {};
-                    sessions[session.title]['func'] = function() { self.addSessionSlot(session); };
-                    sessions[session.title]['color'] = self._retrieveSessionColor(session);
+                    sessions[session.title].func = function() { self.addSessionSlot(session); };
+                    sessions[session.title].color = self._retrieveSessionColor(session);
 //                    sessions[session.title] = function() { self.addSessionSlot(session); };
                 });
 
@@ -468,7 +468,7 @@ type("TimetableManagementActions", [], {
     _retrieveSessionColor: function(session){
         // building "strip" function to format the startDate from xxx-xx-xx to xxxxxxx
         var reg = new RegExp("-", "g");
-        return ttdata[session.startDate.date.replace(reg, "")]["s"+session.id+"l0"].color
+        return ttdata[session.startDate.date.replace(reg, "")]["s"+session.id+"l0"].color;
     },
     _addParams: function(type) {
         return {
@@ -671,14 +671,13 @@ type("TimetableManagementActions", [], {
                 eventData.sessionSlotId,
                 timetable.currentDay,
                 this.savedData,
-                eventData['scheduleEntryId'],
-                eventData['conferenceId'],
-                eventData['startDate']['date']
-        );
+                eventData.scheduleEntryId,
+                eventData.conferenceId,
+                eventData.startDate.date );
         relocateDiag.open();
     },
-    
-    
+
+
     /*
      *
      * Is called every time a timetable entry has been successfully
@@ -794,21 +793,21 @@ type("TimetableManagementActions", [], {
             //if we're in a session, we have to update savedData as well
             delete this.savedData[oldDay][this.session.id].entries[originalArgs.id];
         }
-        
+
         //Save the new location
         if(this.savedData && exists(result.slotEntry)){
             //we're in a session
-            this.savedData[result.day][result.slotEntry.id]['entries'][result.id]=result.entry;
+            this.savedData[result.day][result.slotEntry.id].entries[result.id]=result.entry;
         }else if(exists(result.slotEntry)){
             //move into a session
-            data[result.day][result.slotEntry.id]['entries'][result.id]=result.entry;
+            data[result.day][result.slotEntry.id].entries[result.id]=result.entry;
         }else if (this.savedData){
             //move to top level
             this.savedData[result.day][result.id]=result.entry;
         }
         this.timetable.setData(data);
     },
-    
+
     /*
     * Iterates through entries and adds all of them
     */

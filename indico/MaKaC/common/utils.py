@@ -387,12 +387,12 @@ def formatDate(date, showWeek=False, format=None):
 def formatTime(time):
     return time.strftime('%H:%M')
 
-def parseDate(dateStr):
-    t=time.strptime(dateStr, '%d/%m/%Y')
+def parseDate(dateStr, format='%d/%m/%Y'):
+    t=time.strptime(dateStr, format)
     return datetime(t.tm_year,t.tm_mon, t.tm_mday).date()
 
-def parseTime(timeStr):
-    t=time.strptime(timeStr, '%H:%M')
+def parseTime(timeStr, format='%H:%M'):
+    t=time.strptime(timeStr, format)
     return datetime(t.tm_year,t.tm_mon, t.tm_mday, t.tm_hour, t.tm_min).time()
 
 def parseDateTime(dateTimeStr):
