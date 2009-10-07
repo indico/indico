@@ -21,12 +21,13 @@
 
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.WebcastRequest.mail import NewRequestNotification, RequestModifiedNotification, RequestDeletedNotification,\
-    needToSendAdminEmails, RequestRejectedNotification, RequestAcceptedNotification,\
+    RequestRejectedNotification, RequestAcceptedNotification,\
     RequestAcceptedNotificationAdmin, RequestRejectedNotificationAdmin
 from MaKaC.common.mail import GenericMailer
 from MaKaC.plugins.Collaboration.WebcastRequest.common import WebcastRequestException,\
     WebcastRequestError
 from MaKaC.common.logger import Logger
+from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 
 class CSBooking(CSBookingBase):
     
@@ -76,7 +77,7 @@ class CSBooking(CSBookingBase):
         self._statusMessage = "Request successfully sent"
         self._statusClass = "statusMessageOther"
         
-        if needToSendAdminEmails():
+        if MailTools.needToSendEmails('WebcastRequest'):
             try:
                 notification = NewRequestNotification(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
@@ -92,7 +93,7 @@ class CSBooking(CSBookingBase):
         self._statusMessage = "Request successfully sent"
         self._statusClass = "statusMessageOther"
         
-        if needToSendAdminEmails():
+        if MailTools.needToSendEmails('WebcastRequest'):
             try:
                 notification = RequestModifiedNotification(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
@@ -123,7 +124,7 @@ class CSBooking(CSBookingBase):
                 """Could not send RequestAcceptedNotification for request with id %s , exception: %s""" % (self._id, str(e)))
             return WebcastRequestError('accept', e)
         
-        if needToSendAdminEmails():
+        if MailTools.needToSendEmails('WebcastRequest'):
             try:
                 notification = RequestAcceptedNotificationAdmin(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
@@ -148,7 +149,7 @@ class CSBooking(CSBookingBase):
                 """Could not send RequestRejectedNotification for request with id %s , exception: %s""" % (self._id, str(e)))
             return WebcastRequestError('reject', e)
         
-        if needToSendAdminEmails():
+        if MailTools.needToSendEmails('WebcastRequest'):
             try:
                 notification = RequestRejectedNotificationAdmin(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
@@ -160,7 +161,7 @@ class CSBooking(CSBookingBase):
                 return WebcastRequestError('reject', e)
                                         
     def _delete(self):
-        if needToSendAdminEmails():
+        if MailTools.needToSendEmails('WebcastRequest'):
             try:
                 notification = RequestDeletedNotification(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),

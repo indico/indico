@@ -20,6 +20,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.plugins.base import PluginsHolder
+from MaKaC.webinterface import urlHandlers
+from MaKaC.common.utils import formatDateTime
+from MaKaC.common.timezoneUtils import getAdjustedDate
 
 class CollaborationTools(object):
     """ Class with utility classmethods for the Collaboration plugins core and plugins
@@ -233,3 +236,190 @@ class CollaborationTools(object):
     @classmethod
     def getXMLGenerator(cls, pluginName):
         return cls.getModule(pluginName).pages.XMLGenerator
+    
+    
+class MailTools(object):
+    
+    @classmethod
+    def needToSendEmails(cls, pluginName = None):
+        if pluginName:
+            admins = CollaborationTools.getOptionValue(pluginName, 'admins')
+            sendMailNotifications = CollaborationTools.getOptionValue(pluginName, 'sendMailNotifications')
+            additionalEmails = CollaborationTools.getOptionValue(pluginName, 'additionalEmails')
+        else:
+            admins = CollaborationTools.getCollaborationOptionValue('admins')
+            sendMailNotifications = CollaborationTools.getCollaborationOptionValue('sendMailNotifications')
+            additionalEmails = CollaborationTools.getCollaborationOptionValue('additionalEmails')
+        
+        return (sendMailNotifications and len(admins) > 0) or len(additionalEmails) > 0
+    
+    @classmethod
+    def getAdminEmailList(cls, pluginName = None):
+        """ Returns a list of admin email addresses that a notification email should be sent to.
+            If pluginName is None, then the global Collaboration admin mails will be returned
+        """
+        if pluginName:
+            adminEmails = CollaborationTools.getOptionValue(pluginName, 'additionalEmails')
+            if CollaborationTools.getOptionValue(pluginName, 'sendMailNotifications'):
+                adminEmails.extend([u.getEmail() for u in CollaborationTools.getOptionValue(pluginName, 'admins')])
+        else:
+            adminEmails = CollaborationTools.getCollaborationOptionValue('additionalEmails')
+            if CollaborationTools.getCollaborationOptionValue('sendMailNotifications'):
+                adminEmails.extend([u.getEmail() for u in CollaborationTools.getCollaborationOptionValue('admins')])
+        return list(set(adminEmails))
+    
+    @classmethod
+    def eventDetails(cls, conf):
+        return """
+Event details:
+<table style="border-spacing: 10px 10px;">
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Event name:</strong>
+        </td>
+        <td>
+            %s <a href="%s">(link)</a>
+        </td
+    </tr>
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Event id</strong>
+        </td>
+        <td>
+            %s
+        </td
+    </tr>
+    %s
+</table>
+"""%(conf.getTitle(),
+     urlHandlers.UHConferenceDisplay.getURL(conf),
+     conf.getId(),
+     MailTools.eventRoomDetails(conf)
+     )
+    
+    
+    @classmethod
+    def eventRoomDetails(cls, conf):
+        roomDetails = ""
+        location = conf.getLocation()
+        if location:
+            roomDetails += """
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Event location:</strong>
+        </td>
+        <td>
+            %s
+        </td>
+    </tr>
+""" % location.getName()
+
+            room = conf.getRoom()
+            if room:
+                roomDetails += """
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Event room:</strong>
+        </td>
+        <td>
+            %s
+        </td>
+    </tr>
+""" % room.getName()
+
+        return roomDetails
+    
+    
+    @classmethod
+    def organizerDetails(cls, conf):
+        creator = conf.getCreator()
+        
+        additionalEmailsText = ""
+        additionalEmails = creator.getSecondaryEmails()
+        if additionalEmails:
+            additionalEmailsText="""
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Additional emails:</strong>
+        </td>
+        <td>
+            %s
+        </td
+    </tr>
+""" % ", ".join(creator.getEmails()[1:])
+
+        additionalTelephonesText = ""
+        additionalTelephones = creator.getSecondaryTelephones()
+        if additionalTelephones:
+            additionalTelephonesText="""
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Additional telephones:</strong>
+        </td>
+        <td>
+            %s
+        </td
+    </tr>
+""" % ", ".join(creator.getTelephone()[1:])
+
+        
+        return """
+Creator of the event details:
+<table style="border-spacing: 10px 10px;">
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Full name:</strong>
+        </td>
+        <td>
+            %s
+        </td
+    </tr>
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Main email address:</strong>
+        </td>
+        <td>
+            %s
+        </td
+    </tr>
+    %s
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Main phone number:</strong>
+        </td>
+        <td>
+            %s
+        </td
+    </tr>
+    %s
+</table>
+""" % (creator.getFullName(),
+       creator.getEmail(),
+       additionalEmailsText,
+       creator.getTelephone(),
+       additionalTelephonesText
+       )
+
+    @classmethod
+    def bookingCreationDate(cls, booking):
+        return formatDateTime(getAdjustedDate(booking.getCreationDate(), booking.getConference()))
+    
+    @classmethod
+    def bookingModificationDate(cls, booking, typeOfMail):
+        if (typeOfMail == 'new'):
+            return ""
+        else:
+            return """
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Modification date:</strong>
+        </td>
+        <td style="vertical-align: top;">
+            %s
+        </td>
+    </tr>
+""" % formatDateTime(getAdjustedDate(booking.getModificationDate(), booking.getConference()))
+
+    @classmethod
+    def listToStr(cls, list):
+        return "<br />".join([("•" + item) for item in list]) 

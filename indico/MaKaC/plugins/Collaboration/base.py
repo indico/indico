@@ -32,10 +32,13 @@ from MaKaC.services.interface.rpc.common import ServiceError
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.common.logger import Logger
 from MaKaC.common.indexes import IndexesHolder
-from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
+from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools,\
+    MailTools
 from MaKaC.conference import Observer
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.webinterface.common.tools import hasTags
+from MaKaC.plugins.Collaboration import mail
+from MaKaC.common.mail import GenericMailer
 import os, inspect
 import MaKaC.plugins.Collaboration as Collaboration
 from MaKaC.i18n import _
@@ -213,6 +216,7 @@ class CSBookingManager(Persistent, Observer):
                         self.getHiddenBookings().add(newId)
                     self._indexBooking(newBooking)
                     self._notifyModification()
+                    self._sendMail(newBooking, 'new')
                     return newBooking
         else:
             #we raise an exception because the web interface should take care of this never actually happening
@@ -267,7 +271,8 @@ class CSBookingManager(Persistent, Observer):
                         self._addToPendingIndex(booking)
                         
                 self._notifyModification()
-                    
+                
+                self._sendMail(booking, 'modify')
                 return booking
     
     @classmethod
@@ -319,6 +324,9 @@ class CSBookingManager(Persistent, Observer):
             self._unindexBooking(booking)
             
             self._notifyModification()
+            
+            self._sendMail(booking, 'remove')
+            
             return booking
     
     def _unindexBooking(self, booking):
@@ -420,6 +428,45 @@ class CSBookingManager(Persistent, Observer):
             indexes.append(collaborationIndex.getIndex(commonIndexName + "_pending"))
             
         return indexes
+    
+    def _sendMail(self, booking, operation):
+        if MailTools.needToSendEmails():
+            
+            if operation == 'new':
+                try:
+                    notification = mail.NewBookingNotification(booking)
+                    GenericMailer.sendAndLog(notification, self._conf,
+                                         "MaKaC/plugins/Collaboration/base.py",
+                                         self._conf.getCreator())
+                except Exception, e:
+                    Logger.get('VideoServ').error(
+                        """Could not send NewBookingNotification for booking with id %s of event with id %s, exception: %s""" %
+                        (booking.getId(), self._conf.getId(), str(e)))
+                    raise e
+                    
+            elif operation == 'modify':
+                try:
+                    notification = mail.BookingModifiedNotification(booking)
+                    GenericMailer.sendAndLog(notification, self._conf,
+                                         "MaKaC/plugins/Collaboration/base.py",
+                                         self._conf.getCreator())
+                except Exception, e:
+                    Logger.get('VideoServ').error(
+                        """Could not send BookingModifiedNotification for booking with id %s of event with id %s, exception: %s""" %
+                        (booking.getId(), self._conf.getId(), str(e)))
+                    raise e
+                    
+            elif operation == 'remove':
+                try:
+                    notification = mail.BookingDeletedNotification(booking)
+                    GenericMailer.sendAndLog(notification, self._conf,
+                                         "MaKaC/plugins/Collaboration/base.py",
+                                         self._conf.getCreator())
+                except Exception, e:
+                    Logger.get('VideoServ').error(
+                        """Could not send BookingDeletedNotification for booking with id %s of event with id %s, exception: %s""" %
+                        (booking.getId(), self._conf.getId(), str(e)))
+                    raise e
     
     def getManagers(self):
         if not hasattr(self, "_managers"):
@@ -659,11 +706,6 @@ class CSBookingBase(Persistent):
     _hasStartDate = True
     _hasEventDisplay = False
     
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'],
-               'modificationURL',
-               lambda booking: str(urlHandlers.UHConfModifCollaboration.getURL(booking.getConference(),
-                                                                               secure = CollaborationTools.isUsingHTTPS(),
-                                                                               tab = CollaborationTools.getPluginTab(booking.getPlugin()))))
     def __init__(self, bookingType, conf):
         """ Constructor for the CSBookingBase class.
             id: a string with the id of the booking
@@ -1282,6 +1324,13 @@ class CSBookingBase(Persistent):
         """
         return self._commonIndexes
     
+    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'],
+                'modificationURL', lambda url: str(url))
+    def getModificationURL(self):
+        return urlHandlers.UHConfModifCollaboration.getURL(self.getConference(),
+                                                           secure = CollaborationTools.isUsingHTTPS(),
+                                                           tab = CollaborationTools.getPluginTab(self.getPlugin()))
+    
     def hasStartDate(self):
         """ Returns if bookings of this type have a start date
             (they may only have creation / modification date)
@@ -1465,8 +1514,8 @@ class CSErrorBase(object):
                 'MaKaC.plugins.Collaboration.EVO.common.EVOError',
                 'MaKaC.plugins.Collaboration.EVO.common.OverlappedError',
                 'MaKaC.plugins.Collaboration.EVO.common.ChangesFromEVOError',
-                'MaKaC.plugins.Collaboration.RecordingRequest.common.RecordingRequestError'
-                'MaKaC.plugins.Collaboration.RecordingRequest.common.WebcastRequestError',
+                'MaKaC.plugins.Collaboration.RecordingRequest.common.RecordingRequestError',
+                'MaKaC.plugins.Collaboration.WebcastRequest.common.WebcastRequestError',
                 'MaKaC.plugins.Collaboration.CERNMCU.common.CERNMCUError'],
                 'error')
     def getError(self):

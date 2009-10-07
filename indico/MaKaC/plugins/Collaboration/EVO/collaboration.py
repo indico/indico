@@ -27,13 +27,13 @@ from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.EVO.common import EVOControlledException, getEVOAnswer, parseEVOAnswer, EVOException,\
     getMinStartDate, getMaxEndDate, OverlappedError, ChangesFromEVOError,\
     EVOError, getRequestURL, EVOWarning
-from MaKaC.plugins.Collaboration.EVO.mail import NewEVOMeetingNotificationAdmin,\
-    needToSendEmails, EVOMeetingModifiedNotificationAdmin, EVOMeetingRemovalNotificationAdmin
+from MaKaC.plugins.Collaboration.EVO.mail import NewEVOMeetingNotificationAdmin, EVOMeetingModifiedNotificationAdmin, EVOMeetingRemovalNotificationAdmin
 #    NewEVOMeetingNotificationManager, EVOMeetingModifiedNotificationManager,\
 #    EVOMeetingRemovalNotificationManager
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
+from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 
 class CSBooking(CSBookingBase):
     
@@ -180,7 +180,7 @@ class CSBooking(CSBookingBase):
             self.bookingOK()
             self.checkCanStart()
             
-            if needToSendEmails():
+            if MailTools.needToSendEmails('EVO'):
                 try:
                     notification = NewEVOMeetingNotificationAdmin(self)
                     GenericMailer.sendAndLog(notification, self.getConference(),
@@ -229,7 +229,7 @@ class CSBooking(CSBookingBase):
                 self.bookingOK()
                 self.checkCanStart()
                 
-                if needToSendEmails():
+                if MailTools.needToSendEmails('EVO'):
                     try:
                         notification = EVOMeetingModifiedNotificationAdmin(self)
                         GenericMailer.sendAndLog(notification, self.getConference(),
@@ -320,7 +320,7 @@ class CSBooking(CSBookingBase):
                 requestURL = getRequestURL("delete", arguments)
                 getEVOAnswer("delete", arguments, self.getConference().getId(), self._id)
                 
-                if needToSendEmails():
+                if MailTools.needToSendEmails('EVO'):
                     try:
                         notification = EVOMeetingRemovalNotificationAdmin(self)
                         GenericMailer.sendAndLog(notification, self.getConference(),

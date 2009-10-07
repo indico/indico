@@ -21,19 +21,8 @@
 from MaKaC.webinterface.mail import GenericNotification
 
 from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
-from MaKaC.webinterface import urlHandlers
+from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from MaKaC.common.utils import formatDateTime
-from MaKaC.plugins.base import PluginsHolder
-
-def needToSendEmails():
-    evo = PluginsHolder().getPluginType('Collaboration').getPlugin('EVO')
-    
-    admins = evo.getOption('admins').getValue()
-    sendMailNotifications = evo.getOption('sendMailNotifications').getValue()
-    additionalEmails = evo.getOption('additionalEmails').getValue()
-    
-    return (sendMailNotifications and len(admins) > 0) or len(additionalEmails) > 0
 
 class EVONotificationBase(GenericNotification):
     """ Base class to build an email notification for the Recording request plugin.
@@ -45,128 +34,11 @@ class EVONotificationBase(GenericNotification):
         self._bp = booking._bookingParams
         self._conference = booking.getConference()
         
-        self._displayLink = urlHandlers.UHConferenceDisplay.getURL(self._conference)
-        self._adminLink = urlHandlers.UHConfModifCollaboration.getURL(self._conference,
-                                                                      secure = CollaborationTools.isUsingHTTPS(),
-                                                                      tab = CollaborationTools.getPluginTab(booking.getPlugin()))
+        self._modifLink = str(booking.getModificationURL())
         
         self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
         self.setContentType("text/html")
-        
-    def _getEventDetails(self):
-        return """
-Event details:
-<table style="border-spacing: 10px 10px;">
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Event name:</strong>
-        </td>
-        <td>
-            %s <a href="%s">(link)</a>
-        </td
-    </tr>
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Event id</strong>
-        </td>
-        <td>
-            %s
-        </td
-    </tr>
-</table>
-"""%(self._conference.getTitle(),
-     self._displayLink,
-     self._conference.getId()
-     )
-
-    def _getOrganizerDetails(self):
-        creator = self._conference.getCreator()
-        
-        additionalEmailsText = ""
-        additionalEmails = creator.getSecondaryEmails()
-        if additionalEmails:
-            additionalEmailsText="""
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Additional emails:</strong>
-        </td>
-        <td>
-            %s
-        </td
-    </tr>
-""" % ", ".join(creator.getEmails()[1:])
-
-        additionalTelephonesText = ""
-        additionalTelephones = creator.getSecondaryTelephones()
-        if additionalTelephones:
-            additionalTelephonesText="""
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Additional telephones:</strong>
-        </td>
-        <td>
-            %s
-        </td
-    </tr>
-""" % ", ".join(creator.getTelephone()[1:])
-
-        
-        return """
-Creator of the event details:
-<table style="border-spacing: 10px 10px;">
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Full name:</strong>
-        </td>
-        <td>
-            %s
-        </td
-    </tr>
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Main email address:</strong>
-        </td>
-        <td>
-            %s
-        </td
-    </tr>
-    %s
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Main phone number:</strong>
-        </td>
-        <td>
-            %s
-        </td
-    </tr>
-    %s
-</table>
-""" % (creator.getFullName(),
-       creator.getEmail(),
-       additionalEmailsText,
-       creator.getTelephone(),
-       additionalTelephonesText
-       )
     
-    def _getCreationDate(self):
-        return formatDateTime(self._booking.getAdjustedCreationDate())
-    
-    def _getModificationDateRow(self, typeOfMail):
-        if (typeOfMail == 'new'):
-            return ""
-        else:
-            return """
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Modification date:</strong>
-        </td>
-        <td style="vertical-align: top;">
-            %s
-        </td>
-    </tr>
-""" % formatDateTime(self._booking.getAdjustedModificationDate())
-
-        
     def _getBookingDetails(self, typeOfMail):
         bp = self._bp
         
@@ -248,8 +120,8 @@ Request details:<br />
     </tr>
 </table>
 """%(self._booking.getId(),
-     self._getCreationDate(),
-     self._getModificationDateRow(typeOfMail),
+     MailTools.bookingCreationDate(self._booking),
+     MailTools.bookingModificationDate(self._booking, typeOfMail),
      bp["meetingTitle"],
      bp["meetingDescription"],
      self._booking.getCommunityName(),
@@ -284,9 +156,7 @@ Request details:<br />
 class EVOAdminNotificationBase(EVONotificationBase):
     def __init__(self, booking):
         EVONotificationBase.__init__(self, booking)
-        adminEmails = [u.getEmail() for u in booking.getPluginOptionByName('admins').getValue()]
-        additionalEmails = booking.getPluginOptionByName("additionalEmails").getValue()
-        self.setToList(adminEmails + additionalEmails)
+        self.setToList(MailTools.getAdminEmailList('EVO'))
         
 class EVOEventManagerNotificationBase(EVONotificationBase):
     def __init__(self, booking):
@@ -301,7 +171,7 @@ class NewEVOMeetingNotificationAdmin(EVOAdminNotificationBase):
     def __init__(self, booking):
         EVOAdminNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico] [New EVO meeting] %s (event id: %s)"""
+        self.setSubject("""[Indico][EVO] New EVO meeting: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear EVO Responsible,<br />
@@ -317,9 +187,9 @@ You also can see a list of all the EVO meetings here: (not implemented yet).<br 
 <br />
 <br />
 %s
-""" % ( self._adminLink,
-        self._getEventDetails(),
-        self._getOrganizerDetails(),
+""" % ( self._modifLink,
+        MailTools.eventDetails(self._conference),
+        MailTools.organizerDetails(self._conference),
         self._getBookingDetails('new')
         ))
         
@@ -330,7 +200,7 @@ class NewEVOMeetingNotificationManager(EVOEventManagerNotificationBase):
     def __init__(self, booking):
         EVOEventManagerNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico] [New EVO meeting] %s (event id: %s)"""
+        self.setSubject("""[Indico] New EVO meeting: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear Conference Manager,<br />
@@ -344,8 +214,8 @@ Click <a href="%s">here</a> to see it in Indico.<br />
 %s
 <br />
 Please note that the auto-join URL will not work until the EVO meeting time arrives.
-""" % ( self._adminLink,
-        self._getEventDetails(),
+""" % ( self._modifLink,
+        MailTools.eventDetails(self._conference),
         self._getBookingDetails('new')
         ))
         
@@ -358,7 +228,7 @@ class EVOMeetingModifiedNotificationAdmin(EVOAdminNotificationBase):
     def __init__(self, booking):
         EVOAdminNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico] [Modified EVO meeting] %s (event id: %s)"""
+        self.setSubject("""[Indico][EVO] EVO meeting modified: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear EVO Responsible,<br />
@@ -374,9 +244,9 @@ You also can see a list of all the EVO meetings here: (not implemented yet).<br 
 <br />
 <br />
 %s
-""" % ( self._adminLink,
-        self._getEventDetails(),
-        self._getOrganizerDetails(),
+""" % ( self._modifLink,
+        MailTools.eventDetails(self._conference),
+        MailTools.organizerDetails(self._conference),
         self._getBookingDetails('modify')
         ))
         
@@ -388,7 +258,7 @@ class EVOMeetingModifiedNotificationManager(EVOEventManagerNotificationBase):
     def __init__(self, booking):
         EVOEventManagerNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico] [Modified EVO meeting] %s (event id: %s)"""
+        self.setSubject("""[Indico] EVO meeting modified: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear Conference Manager,<br />
@@ -402,8 +272,8 @@ Click <a href="%s">here</a> to see it in Indico.<br />
 %s
 <br />
 Please note that the auto-join URL will not work until the EVO meeting time arrives.
-""" % ( self._adminLink,
-        self._getEventDetails(),
+""" % ( self._modifLink,
+        MailTools.eventDetails(self._conference),
         self._getBookingDetails('modify')
         ))
         
@@ -416,7 +286,7 @@ class EVOMeetingRemovalNotificationAdmin(EVOAdminNotificationBase):
     def __init__(self, booking):
         EVOAdminNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico] [Deleted EVO meeting] %s (event id: %s)"""
+        self.setSubject("""[Indico][EVO] EVO meeting deleted: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear EVO Responsible,<br />
@@ -431,8 +301,8 @@ You also can see a list of all the EVO meetings here: (not implemented yet).<br 
 <br />
 <br />
 %s
-""" % ( self._getEventDetails(),
-        self._getOrganizerDetails(),
+""" % ( MailTools.eventDetails(self._conference),
+        MailTools.organizerDetails(self._conference),
         self._getBookingDetails('remove')
         ))
         
@@ -443,7 +313,7 @@ class EVOMeetingRemovalNotificationManager(EVOEventManagerNotificationBase):
     def __init__(self, booking):
         EVOEventManagerNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico] [Deleted EVO meeting] %s (event id: %s)"""
+        self.setSubject("""[Indico] EVO Meeting deleted %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear Conference Manager,<br />
@@ -456,6 +326,6 @@ You also can see a list of all the EVO meetings here: (not implemented yet).<br 
 <br />
 <br />
 %s
-""" % ( self._getEventDetails(),
+""" % ( MailTools.eventDetails(self._conference),
         self._getBookingDetails('remove')
         ))
