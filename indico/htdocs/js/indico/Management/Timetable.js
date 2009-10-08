@@ -549,7 +549,7 @@ type("ChangeEditDialog", // silly name!
                             });
      });
 
-type("RelocateDialog", ["ExclusivePopup"],
+type("MoveEntryDialog", ["ExclusivePopup"],
       {
     draw: function() {
         self = this;
@@ -562,8 +562,8 @@ type("RelocateDialog", ["ExclusivePopup"],
         var radioButtons = [];
 
         // draw a tab with radiobuttons for each day
-        function drawRelocateDay(timetableItems, currentDay) {
-            var relocateTable = Html.table( {
+        function drawMoveEntryDay(timetableItems, currentDay) {
+            var moveEntryTable = Html.table( {
                 width : '100%'
             });
 
@@ -598,7 +598,7 @@ type("RelocateDialog", ["ExclusivePopup"],
                     name : "rbID"
                 });
             }
-            relocateTable.append(Html.tr( {}, Html.td( {}, rb, (Html.label( {},
+            moveEntryTable.append(Html.tr( {}, Html.td( {}, rb, (Html.label( {},
                     "Move it at the top of the timetable")))));
             radioButtons.push(rb);
 
@@ -619,7 +619,7 @@ type("RelocateDialog", ["ExclusivePopup"],
                     });
                 }
                 radioButtons.push(rb);
-                relocateTable.append(Html.tr( {
+                moveEntryTable.append(Html.tr( {
                     style : {
                         backgroundColor : value.color
                     }
@@ -631,7 +631,7 @@ type("RelocateDialog", ["ExclusivePopup"],
                                                  " " + value.title)))));
             }
 
-            return relocateTable;
+            return moveEntryTable;
         }
 
     // populate the tabslist
@@ -647,11 +647,11 @@ type("RelocateDialog", ["ExclusivePopup"],
     var dateKeys = keys(tabData);
     dateKeys.sort();
     for ( var i = 0; i < dateKeys.length; i++) {
-        tabsList.push( [ $T(self._titleTemplate(dateKeys[i])), drawRelocateDay(tabData[dateKeys[i]], dateKeys[i]) ]);
+        tabsList.push( [ $T(self._titleTemplate(dateKeys[i])), drawMoveEntryDay(tabData[dateKeys[i]], dateKeys[i]) ]);
     }
 
     this.tabWidget = new TabWidget(tabsList, 400, 200, dateKeys.indexOf(self.currentDay));
-    var relocatePopup = new ExclusivePopup("Relocate item", function() {
+    var moveEntryPopup = new ExclusivePopup("Move item", function() {
         return true;
     });
 
@@ -676,6 +676,7 @@ type("RelocateDialog", ["ExclusivePopup"],
     // We construct the "ok" button and what happens when it's pressed
     var okButton = Html.button('', "OK");
     okButton.observeClick(function() {
+        var killProgress = IndicoUI.Dialogs.Util.progress("Moving the entry...");
         // retrieving the selected radio button
             var chosenValue = function() {
                 var radios = document.getElementsByName("rbID");
@@ -687,7 +688,7 @@ type("RelocateDialog", ["ExclusivePopup"],
                 return false;
             };
 
-            indicoRequest('schedule.relocate', {
+            indicoRequest('schedule.moveEntry', {
                 value : chosenValue(),
                 OK : 'OK',
                 conference : self.confId,
@@ -696,10 +697,12 @@ type("RelocateDialog", ["ExclusivePopup"],
                 sessionSlotId : self.slotId
             }, function(result, error) {
                 if (error) {
+                    killProgress();
                     IndicoUtil.errorReport(error);
                 } else {
                     // change json and repaint timetable
-                    self.managementActions._updateEntryRelocate(result, null, result.old);
+                    self.managementActions._updateEntryMoveEntry(result, null, result.old);
+                    killProgress();
                     self.close();
                 }
             });

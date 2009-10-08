@@ -34,6 +34,32 @@ var TimetableDefaults = {
                        filter: new RoomFilter()}}
 };
 
+function getTimetableDataById(data, id) {
+    var info = Util.parseId(id);
+    var type = info[0];
+    var compositeId = "";
+    info = info.slice(2);    
+    
+    if (type == 'Conference') {
+        return this.eventInfo;
+    }
+    else if (type == 'Contribution') {
+        throw 'not implemented!';
+    } else if (type=='Session'){
+        throw 'not implemented!';
+    } else if (type=='SessionSlot'){
+        compositeId = ['s'+info[0]+'l'+info[1]];
+    } else {
+        throw 'unrecognized id!';
+    }
+
+    for (day in data) {
+        if (data[day][compositeId]) {
+            return data[day][compositeId];
+        }
+    }
+}
+
 type("TimeTable", ["LookupTabWidget"], {
 
     /*
@@ -170,22 +196,7 @@ type("TimeTable", ["LookupTabWidget"], {
     },
 
     getById: function(id) {
-        var info = Util.parseId(id);
-        var type = info[0];
-        info = info.slice(2);
-
-        if (type == 'Conference') {
-            return this.eventInfo;
-        }
-        else if (type == 'Contribution') {
-            throw 'not implemented!';
-        } else if (type=='Session'){
-            throw 'not implemented!';
-        } else if (type=='SessionSlot'){
-            return this.data[this.currentDay]['s'+info[0]+'l'+info[1]];
-        } else {
-            throw 'unrecognized id!';
-        }
+        return getTimetableDataById(this.data, id);
     },
 
     getTimetableDrawer: function() {

@@ -889,7 +889,7 @@ class ConferenceScheduleContributions(ScheduleContributions, conferenceServices.
     def _getSlotEntry(self):
         return None
 
-class Relocate(conferenceServices.ConferenceModifBase):
+class MoveEntry(ScheduleOperation, conferenceServices.ConferenceModifBase):
 
     def _checkParams(self):
         conferenceServices.ConferenceModifBase._checkParams(self)
@@ -900,7 +900,7 @@ class Relocate(conferenceServices.ConferenceModifBase):
         self._sessionId = pManager.extract("sessionId", pType=str, allowEmpty=True, defaultValue=None)
         self._sessionSlotId = pManager.extract("sessionSlotId", pType=str, allowEmpty=True, defaultValue=None)
 
-    def _getAnswer(self):
+    def _performOperation(self):
 
         if (self._sessionId != None and self._sessionSlotId != None):
             self._schEntry = self._conf.getSessionById(self._sessionId).getSlotById(self._sessionSlotId).getSchedule().getEntryById(self._schEntryId)
@@ -926,7 +926,6 @@ class Relocate(conferenceServices.ConferenceModifBase):
                 if session is not None:
                     slot = session.getSlotById(sessionSlotId)
                     if slot is not None:
-                        pickledDataSlotSchEntry = DictPickler.pickle(slot.getConfSchEntry(), timezone=self._conf.getTimezone())
                         pickledDataSession = DictPickler.pickle(session, timezone=self._conf.getTimezone())
                         # unschedule entry from previous place
                         self._schEntry.getSchedule().removeEntry(self._schEntry)
@@ -934,6 +933,7 @@ class Relocate(conferenceServices.ConferenceModifBase):
                             owner.setSession(session)
                         # add it to new container
                         slot.getSchedule().addEntry(self._schEntry, check=2)
+                        pickledDataSlotSchEntry = DictPickler.pickle(slot.getConfSchEntry(), timezone=self._conf.getTimezone())
                     else:
                         raise ServiceError("ERR-S3","Invalid slot ID")
                 else:
@@ -953,8 +953,6 @@ class Relocate(conferenceServices.ConferenceModifBase):
                 # oldDate is in UTC
                 adjustedOldDate = oldDate.astimezone(pytz.timezone(owner.getTimezone()))
 
-                Logger.get('pedro').debug(adjustedOldDate)
-
                 # newStartDate will result in a naive date (but relative to the evt's timezone)
                 newStartDate = datetime.datetime.combine(parsedDate, adjustedOldDate.time())
                 newStartDate = pytz.timezone(owner.getTimezone()).localize(newStartDate)
@@ -969,8 +967,13 @@ class Relocate(conferenceServices.ConferenceModifBase):
                 self._conf.getSchedule().addEntry(self._schEntry, check=2)
 
         newPickledEntry = DictPickler.pickle(self._schEntry)
-        return {'entry': newPickledEntry, 'old': oldSch, 'id': newPickledEntry['id'], 'day': self._schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
-                'session': pickledDataSession, 'slotEntry': pickledDataSlotSchEntry}
+        return {'entry': newPickledEntry,
+                'old': oldSch,
+                'id': newPickledEntry['id'],
+                'day': self._schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
+                'session': pickledDataSession,
+                'slotEntry': pickledDataSlotSchEntry,
+                'autoOps': translateAutoOps(self.getAutoOps())}
 
 methodMap = {
     "get": ConferenceGetSchedule,
@@ -1015,5 +1018,5 @@ methodMap = {
     "getAllSessionConveners": ConferenceGetAllConveners,
     "getAllSpeakers": ConferenceGetAllSpeakers,
     
-    "relocate": Relocate
+    "moveEntry": MoveEntry
 }

@@ -201,6 +201,7 @@ type("TimetableManagementActions", [], {
         var day = IndicoUtil.formatDate2(IndicoUtil.parseJsonDate(eventData.startDate));
         var data = {};
 
+        // TODO: Get rid of this savedData thing and use topTimetable instead
         this.savedData = this.timetable.getData();
         this.session = eventData;
 
@@ -273,9 +274,9 @@ type("TimetableManagementActions", [], {
 
             // this 'if' clearly calls for inheritance
             if (this.session) {
-                slot = this.session;
+                slot = getTimetableDataById(this.savedData, entry[2]);
             } else {
-                slot = self.timetable.getById(entry[2]);
+                slot = this.timetable.getById(entry[2]);
             }
 
             startTime = slot.startDate.time.slice(0,5);
@@ -439,7 +440,6 @@ type("TimetableManagementActions", [], {
                     sessions[session.title] = {};
                     sessions[session.title].func = function() { self.addSessionSlot(session); };
                     sessions[session.title].color = self._retrieveSessionColor(session);
-//                    sessions[session.title] = function() { self.addSessionSlot(session); };
                 });
 
                 var menuu = {
@@ -662,8 +662,8 @@ type("TimetableManagementActions", [], {
         }
     },
 
-    relocateContrib: function(eventData){
-        var relocateDiag = new RelocateDialog(
+    moveEntryContrib: function(eventData){
+        var moveEntryDiag = new MoveEntryDialog(
                 this,
                 timetable.data,
                 eventData.entryType,
@@ -674,7 +674,7 @@ type("TimetableManagementActions", [], {
                 eventData.scheduleEntryId,
                 eventData.conferenceId,
                 eventData.startDate.date );
-        relocateDiag.open();
+        moveEntryDiag.open();
     },
 
 
@@ -784,7 +784,9 @@ type("TimetableManagementActions", [], {
 
     /*Like _updateEntry but for relocation function*/
     //keep the same args as updateEntry in case we merge them, for instance "data" is not used at all
-    _updateEntryRelocate: function(result, data, originalArgs){
+    _updateEntryMoveEntry: function(result, data, originalArgs){
+        var self = this;
+        
         data = this.timetable.getData();
         var oldDay = IndicoUtil.formatDate2(IndicoUtil.parseDateTime(originalArgs.startDate));
         //delete previous entry
@@ -793,18 +795,38 @@ type("TimetableManagementActions", [], {
             //if we're in a session, we have to update savedData as well
             delete this.savedData[oldDay][this.session.id].entries[originalArgs.id];
         }
+         
+        // AutoOp Warnings (before updates are done)
+        this._hideWarnings();
+        if (result.autoOps && result.autoOps.length > 0) {
+            each(result.autoOps,
+                 function(op) {
+                     var warning = self._processWarning(op);
+                     if (warning && self.processedWarnings.indexOf(warning) === null) {
+                         self.warningArea.dom.style.display = 'block';
+                         self.processedWarnings.append(warning);
+                     }
+                 });
+        }
 
         //Save the new location
         if(this.savedData && exists(result.slotEntry)){
             //we're in a session
-            this.savedData[result.day][result.slotEntry.id].entries[result.id]=result.entry;
+            this.savedData[result.day][result.slotEntry.id].entries[result.id] = result.entry;
+            //Updates the time of the session if it has to be extended
+            this.savedData[result.day][result.slotEntry.id].startDate.time = result.slotEntry.startDate.time;
+            this.savedData[result.day][result.slotEntry.id].endDate.time = result.slotEntry.endDate.time;
         }else if(exists(result.slotEntry)){
             //move into a session
-            data[result.day][result.slotEntry.id].entries[result.id]=result.entry;
+            data[result.day][result.slotEntry.id].entries[result.id] = result.entry;
+            //Updates the time of the session if it has to be extended
+            data[result.day][result.slotEntry.id].startDate.time = result.slotEntry.startDate.time;
+            data[result.day][result.slotEntry.id].endDate.time = result.slotEntry.endDate.time;
         }else if (this.savedData){
             //move to top level
             this.savedData[result.day][result.id]=result.entry;
         }
+
         this.timetable.setData(data);
     },
 
