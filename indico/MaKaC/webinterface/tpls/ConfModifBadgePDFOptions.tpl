@@ -65,6 +65,13 @@
     </tr>
     <tr>
       <td>
+        <% checked = ['', 'checked'][PDFOptions.getDrawDashedRectangles()] %>
+        <input id="drawDashedRectangles" type="checkbox" value="drawDashedRectangles" name="drawDashedRectangles" <%= checked %> />
+        <label for="drawDashedRectangles"><%= _("Draw a dashed rectangle around each badge.")%></label>
+      </td>
+    </tr>
+    <tr>
+      <td>
         <%= _("Page size")%>
         <select name="pagesize">
             <% for pagesizeName in PagesizeNames : %>

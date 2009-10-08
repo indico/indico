@@ -2594,7 +2594,7 @@ class RegistrantsListToBadgesPDF:
                 }
     
     
-    def __init__(self, conf, badgeTemplate, marginTop, marginBottom, marginLeft, marginRight, marginColumns, marginRows, pagesize, registrantList):
+    def __init__(self, conf, badgeTemplate, marginTop, marginBottom, marginLeft, marginRight, marginColumns, marginRows, pagesize, drawDashedRectangles, registrantList):
         """ Constructor
                 conf: the conference for which the badges are printed, as a Conference object.
                 badgeTemplate: the template used, as a BadgeTemplate object.
@@ -2625,6 +2625,8 @@ class RegistrantsListToBadgesPDF:
         
         self.__size = PDFSizes().PDFpagesizes[pagesize]
         self.__width, self.__height = self.__size
+        
+        self.__drawDashedRectangles = drawDashedRectangles
         
         setTTFonts()
         
@@ -2700,11 +2702,12 @@ class RegistrantsListToBadgesPDF:
         """
         
         # We draw a dashed rectangle around the badge
-        self.__canvas.saveState()
-        self.__canvas.setDash(1,5)
-        self.__canvas.rect(posx, self.__height - posy - self.__badgeTemplate.getHeightInCm() * cm,
-                           self.__badgeTemplate.getWidthInCm() * cm, self.__badgeTemplate.getHeightInCm() * cm)
-        self.__canvas.restoreState()
+        if self.__drawDashedRectangles:
+            self.__canvas.saveState()
+            self.__canvas.setDash(1,5)
+            self.__canvas.rect(posx, self.__height - posy - self.__badgeTemplate.getHeightInCm() * cm,
+                               self.__badgeTemplate.getWidthInCm() * cm, self.__badgeTemplate.getHeightInCm() * cm)
+            self.__canvas.restoreState()
         
         # We draw the background if we find it.
         usedBackgroundId = self.__badgeTemplate.getUsedBackgroundId()

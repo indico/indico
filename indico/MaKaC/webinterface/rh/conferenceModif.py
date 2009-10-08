@@ -7649,6 +7649,9 @@ class RHConfBadgePrintingPDF(RHConferenceModifBase):
             self.__keepPDFOptions = False
 
         self.__pagesize = params.get("pagesize",'A4')
+        
+        self.__drawDashedRectangles = params.get("drawDashedRectangles", False) is not False
+        
         self.__registrantList = params.get("registrantList","all")
         if self.__registrantList != "all":
             self.__registrantList = self.__registrantList.split(',')
@@ -7673,6 +7676,7 @@ class RHConfBadgePrintingPDF(RHConferenceModifBase):
                 self.__PDFOptions.setMarginColumns(self.__marginColumns)
                 self.__PDFOptions.setMarginRows(self.__marginRows)
                 self.__PDFOptions.setPagesize(self.__pagesize)
+                self.__PDFOptions.setDrawDashedRectangles(self.__drawDashedRectangles)
 
 
             filename = "Badges.pdf"
@@ -7686,6 +7690,7 @@ class RHConfBadgePrintingPDF(RHConferenceModifBase):
                                              self.__marginColumns,
                                              self.__marginRows,
                                              self.__pagesize,
+                                             self.__drawDashedRectangles,
                                              self.__registrantList)
             data = pdf.getPDFBin()
             #self._req.headers_out["Accept-Ranges"] = "bytes"

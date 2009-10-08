@@ -103,6 +103,8 @@ class RHSetDefaultPDFOptions( RHTemplatesBase ):
             self.__marginRows = self.__defaultConferencePDFOptions.getMarginRows()
         
         self.__pagesize = params.get("pagesize",'A4')
+        
+        self.__drawDashedRectangles = params.get("drawDashedRectangles", False) is not False
     
     def _process( self ):
         self.__defaultConferencePDFOptions.setTopMargin(self.__marginTop)
@@ -112,6 +114,7 @@ class RHSetDefaultPDFOptions( RHTemplatesBase ):
         self.__defaultConferencePDFOptions.setMarginColumns(self.__marginColumns)
         self.__defaultConferencePDFOptions.setMarginRows(self.__marginRows)
         self.__defaultConferencePDFOptions.setPagesize(self.__pagesize)
+        self.__defaultConferencePDFOptions.setDrawDashedRectangles(self.__drawDashedRectangles)
         
         self._redirect(urlHandlers.UHTemplates.getURL())
 

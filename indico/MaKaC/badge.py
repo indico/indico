@@ -476,6 +476,7 @@ class BadgePDFOptions(Persistent):
             self.__marginColumns = 1.0
             self.__marginRows = 0.0
             self._pageSize = "A4"
+            self._drawDashedRectangles = True
         else:
             from MaKaC.conference import CategoryManager
             defaultConferencePDFOptions = CategoryManager().getDefaultConference().getBadgeTemplateManager().getPDFOptions()
@@ -486,6 +487,8 @@ class BadgePDFOptions(Persistent):
             self.__marginColumns = defaultConferencePDFOptions.getMarginColumns()
             self.__marginRows = defaultConferencePDFOptions.getMarginRows()
             self._pageSize = defaultConferencePDFOptions.getPagesize()
+            self._drawDashedRectangles = defaultConferencePDFOptions.getDrawDashedRectangles()
+        
             
 
     def getTopMargin(self):
@@ -510,6 +513,14 @@ class BadgePDFOptions(Persistent):
         if not hasattr(self, "_pageSize"):
             self._pageSize = "A4"
         return self._pageSize
+    
+    def getDrawDashedRectangles(self):
+        """ Returns if we should draw a dashed rectangle around each badge or not.
+            Will return a Boolean
+        """
+        if not hasattr(self, "_drawDashedRectangles"):
+            self._drawDashedRectangles = True
+        return self._drawDashedRectangles
 
     def setTopMargin(self, value):
         self.__topMargin = value
@@ -531,3 +542,9 @@ class BadgePDFOptions(Persistent):
         
     def setPagesize(self, value):
         self._pageSize = value
+        
+    def setDrawDashedRectangles(self, value):
+        """ Sets if we should draw a dashed rectangle around each badge or not.
+            value must be a Boolean
+        """
+        self._drawDashedRectangles = value
