@@ -256,7 +256,8 @@ class MailTools(object):
     @classmethod
     def getAdminEmailList(cls, pluginName = None):
         """ Returns a list of admin email addresses that a notification email should be sent to.
-            If pluginName is None, then the global Collaboration admin mails will be returned
+            If pluginName is None, then the global Collaboration admin mails will be returned.
+            The emails in the list are not in any particular order and should be unique.
         """
         if pluginName:
             adminEmails = CollaborationTools.getOptionValue(pluginName, 'additionalEmails')
@@ -267,6 +268,25 @@ class MailTools(object):
             if CollaborationTools.getCollaborationOptionValue('sendMailNotifications'):
                 adminEmails.extend([u.getEmail() for u in CollaborationTools.getCollaborationOptionValue('admins')])
         return list(set(adminEmails))
+    
+    @classmethod
+    def getManagersEmailList(cls, conf, pluginName = None):
+        """ Returns a list of manager email addresses (for a given event) that a notification email should be sent to.
+            This list includes:
+                -The creator of an event
+                -The managers of an event
+                -Any Video Services Managers
+                -If pluginName is not None, any Video Services Managers for that given system
+            The emails in the list are not in any particular order and should be unique.
+        """
+        csbm = conf.getCSBookingManager()
+        managersEmails = []
+        managersEmails.append(conf.getCreator().getEmail())
+        managersEmails.extend([u.getEmail() for u in conf.getManagerList()])
+        managersEmails.extend(csbm.getVideoServicesManagers())
+        if pluginName:
+            managersEmails.extend(csbm.getPluginManagers(pluginName))
+        return list(set(managersEmails))
     
     @classmethod
     def eventDetails(cls, conf):

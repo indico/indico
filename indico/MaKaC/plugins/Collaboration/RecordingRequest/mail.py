@@ -287,9 +287,7 @@ class RecordingRequestManagerNotificationBase(RecordingRequestNotificationBase):
     """
     def __init__(self, booking):
         RecordingRequestNotificationBase.__init__(self, booking)
-        managerEmails = [u.getEmail() for u in self._conference.getManagerList()]
-        managerEmails.append(self._conference.getCreator().getEmail())
-        self.setToList(managerEmails)
+        self.setToList(MailTools.getManagersEmailList(self._conference, 'RecordingRequest'))
 
 
 class NewRequestNotification(RecordingRequestAdminNotificationBase):

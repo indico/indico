@@ -293,9 +293,7 @@ class WebcastRequestManagerNotificationBase(WebcastRequestNotificationBase):
     """
     def __init__(self, booking):
         WebcastRequestNotificationBase.__init__(self, booking)
-        managerEmails = [u.getEmail() for u in self._conference.getManagerList()]
-        managerEmails.append(self._conference.getCreator().getEmail())
-        self.setToList(managerEmails)
+        self.setToList(MailTools.getManagersEmailList(self._conference, 'WebcastRequest'))
 
 class NewRequestNotification(WebcastRequestAdminNotificationBase):
     """ Template to build an email notification to the webcast responsible

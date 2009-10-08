@@ -161,7 +161,7 @@ class EVOAdminNotificationBase(EVONotificationBase):
 class EVOEventManagerNotificationBase(EVONotificationBase):
     def __init__(self, booking):
         EVONotificationBase.__init__(self, booking)
-        self.setToList([u.getEmail() for u in self._conference.getManagerList()])
+        self.setToList(MailTools.getManagersEmailList(self._conference, 'EVO'))
 
 
 class NewEVOMeetingNotificationAdmin(EVOAdminNotificationBase):
