@@ -1031,15 +1031,18 @@ class RHRoomBookingBookingForm( RHRoomBookingBase ):
 
         RHRoomBookingBase._checkProtection(self)
 
-        if not self._candResv.room.isActive and not self._getUser().isAdmin():
-            raise MaKaCError( "You are not authorized to book this room." )
-        
-        if not self._candResv.room.canBook( self._getUser() ) and not self._candResv.room.canPrebook( self._getUser() ):
-            raise MaKaCError( "You are not authorized to book this room." )
+        # only do the remaining checks the rest if the basic ones were successful
+        # (i.e. user is logged in)
+        if self._doProcess:
+            if not self._candResv.room.isActive and not self._getUser().isAdmin():
+                raise MaKaCError( "You are not authorized to book this room." )
 
-        if self._formMode == FormMode.MODIF:
-            if not self._candResv.canModify( self.getAW() ):
-                raise MaKaCError( "You are not authorized to take this action." )
+            if not self._candResv.room.canBook( self._getUser() ) and not self._candResv.room.canPrebook( self._getUser() ):
+                raise MaKaCError( "You are not authorized to book this room." )
+
+            if self._formMode == FormMode.MODIF:
+                if not self._candResv.canModify( self.getAW() ):
+                    raise MaKaCError( "You are not authorized to take this action." )
 
     def _businessLogic( self ):
         pass
