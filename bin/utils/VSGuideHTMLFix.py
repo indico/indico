@@ -37,9 +37,6 @@ class MyHTMLParser(HTMLParser):
         HTMLParser.__init__(self)
         
     def process(self, target):
-        if os.path.exists(target):
-            print 'good'
-            return
         if not os.path.exists(target):
             print 'Could not find file: ' + target
             return
@@ -62,12 +59,14 @@ class MyHTMLParser(HTMLParser):
             attrs.pop('width','')
             attrs.pop('WIDTH','')
         
-            attrs['style'] = attrs.pop('style','') + ";text-align: center;"
+            if not 'style' in attrs or attrs['style'].find('text-align: center') == -1:
+                attrs['style'] = attrs.pop('style','') + ";text-align: center;"
             
         if tag.lower() == 'p' and ('align' in attrs and attrs['align'].lower() == 'center' or 'ALIGN' in attrs and attrs['ALIGN'].lower() == 'center'):
             attrs.pop('align','')
             attrs.pop('ALIGN','')
-            attrs['style'] = attrs.pop('style','') + ";text-align: center;"
+            if not 'style' in attrs or attrs['style'].find('text-align: center') == -1:
+                attrs['style'] = attrs.pop('style','') + ";text-align: center;"
         
         return tag, attrs
         
