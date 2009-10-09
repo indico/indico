@@ -107,7 +107,7 @@ def _getInstallRequires():
     
     They will only be installed when Indico is installed through easy_install.'''
     
-    base =  ['pytz', 'zodb3', 'jstools', 'zope.index', 'simplejson', 'lxml', 'ReportLab']
+    base =  ['pytz', 'zodb3', 'jstools', 'zope.index', 'simplejson', 'ReportLab']
     if sys.version_info[1] < 5: # hashlib is part of Python 2.5+
         base.append('hashlib')
         
