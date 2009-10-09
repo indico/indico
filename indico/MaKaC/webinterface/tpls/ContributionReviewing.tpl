@@ -36,7 +36,7 @@
 <table width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <!-- Assign or remove a referee -->
     <tr>
-        <td id="assignRefereeHelp" colspan="5" class="groupTitle"><%= _("Assign a referee")%></td>
+        <td id="assignRefereeHelp" colspan="5" class="groupTitle"><%= _("Assign a Referee")%></td>
     </tr>
     <% if ConferenceChoice == 2 or ConferenceChoice == 4: %>
         <tr>

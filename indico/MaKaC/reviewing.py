@@ -40,7 +40,7 @@ class ConferenceReview(Persistent):
     """
     This class manages the parameters of the conference reviewing.
     """
-    reviewingModes = ["", "No reviewing", "Paper reviewing", "Paper editing", "Paper editing and reviewing"]
+    reviewingModes = ["", "No reviewing", "Content reviewing", "Layout reviewing", "Content and layout reviewing"]
     predefinedStates = ["Accept", "To be corrected", "Reject"]
     reviewingQuestionsAnswers = ["Strongly Disagree", "Disagree", "Weakly Disagree", "Borderline", "Weakly Agree", "Agree", "Strongly Agree"]
     reviewingQuestionsLabels = ["-3", "", "", "0", "", "", "+3"]
@@ -168,9 +168,9 @@ class ConferenceReview(Persistent):
     def setChoice(self, choice):
         """ Sets the reviewing mode for the conference, as a number and as a string
             1: "No reviewing"
-            2: "Paper reviewing"
-            3: "Paper editing"
-            4: "Paper editing and reviewing"
+            2: "Content reviewing"
+            3: "Layout reviewing"
+            4: "Content and layout reviewing"
         """
         self._choice = choice
         self._reviewing = ConferenceReview.reviewingModes[choice]
@@ -178,9 +178,9 @@ class ConferenceReview(Persistent):
     def getChoice(self):
         """ Returns the reviewing mode for the conference, as a number
             1: "No reviewing"
-            2: "Paper reviewing"
-            3: "Paper editing"
-            4: "Paper editing and reviewing"
+            2: "Content reviewing"
+            3: "Layout reviewing"
+            4: "Content and layout reviewing"
         """
         return self._choice
 
@@ -824,6 +824,7 @@ class ConferenceReview(Persistent):
         return user in self._paperReviewManagersList or \
                user in self._refereesList or \
                user in self._editorsList or \
+               user in self._reviewersList or \
                user in self._reviewersList or \
                user in self._abstractManagerList or \
                user in self._abstractReviewersList

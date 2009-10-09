@@ -249,6 +249,10 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
 
         self._judgeListOpt=self._sectionMenu.getLinkByName("judgelist")
         self._judgeListOpt.setVisible(False)
+        self._judgereviewerListOpt=self._sectionMenu.getLinkByName("judgelistreviewer")
+        self._judgereviewerListOpt.setVisible(False)
+        self._judgeeditorListOpt=self._sectionMenu.getLinkByName("judgelisteditor")
+        self._judgeeditorListOpt.setVisible(False)
         self._assignContribOpt=self._sectionMenu.getLinkByName("assigncontributions")
         self._assignContribOpt.setVisible(False)
 
@@ -265,11 +269,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
                     self._paperReviewingMgtOpt.setVisible(True)
 
             if "referee" in conferenceRoles and "editor" in conferenceRoles and "reviewer" in conferenceRoles:
-                show = self._conf in awUser.getLinkedTo()["conference"]["referee"] or \
-                       self._conf in awUser.getLinkedTo()["conference"]["editor"] or \
-                       self._conf in awUser.getLinkedTo()["conference"]["reviewer"]
-                if show:
-                    self._judgeListOpt.setVisible(True)
+                showrefereearea = self._conf in awUser.getLinkedTo()["conference"]["referee"] 
 
                 if self._conf in awUser.getLinkedTo()["conference"]["referee"]:
                     self._assignContribOpt.setVisible(True)
@@ -279,6 +279,21 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
         csbm = self._conf.getCSBookingManager()
         if csbm is not None and csbm.hasBookings() and csbm.isCSAllowed():
             self._collaborationOpt.setVisible(True)
+                
+        if showrefereearea:
+			self._judgeListOpt.setVisible(True)
+                
+            showreviewerarea = self._conf in awUser.getLinkedTo()["conference"]["reviewer"]
+                
+        if showreviewerarea:
+        	self._judgereviewerListOpt.setVisible(True)
+                    
+            showeditorarea = self._conf in awUser.getLinkedTo()["conference"]["editor"] 
+                      
+        if showeditorarea:
+            self._judgeeditorListOpt.setVisible(True)                
+                
+            
 
     def _defineToolBar(self):
         pass

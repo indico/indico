@@ -41,11 +41,13 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
         self._isPRM = RCPaperReviewManager.hasRights(rh)
         self._isAM = RCAbstractManager.hasRights(rh)
         self._canModify = self._conf.canModify(rh.getAW())
-
-        self._showListContribToJudge = self._conf.getConfReview().isReviewer(rh._getUser()) or \
-                                       self._conf.getConfReview().isEditor(rh._getUser()) or \
-                                       self._conf.getConfReview().isReferee(rh._getUser())
-
+                                           
+        self._showListContribToJudge = self._conf.getConfReview().isReferee(rh._getUser())
+    
+        self._showListContribToJudgeAsReviewer = self._conf.getConfReview().isReviewer(rh._getUser())
+                                       
+        self._showListContribToJudgeAsEditor = self._conf.getConfReview().isEditor(rh._getUser())
+        
         self._showAssignContributions = self._canModify or self._isPRM or self._conf.getConfReview().isReferee(rh._getUser())
 
     def _createTabCtrl(self):
@@ -54,38 +56,45 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
         self._subtabPaperReviewing = self._tabCtrl.newTab( "paperrev", "Paper Reviewing", \
                 urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
         
-        self._subtabAbstractsReviewing = self._tabCtrl.newTab( "abstractsrev", "Abstracts Reviewing", \
+        if self._isAM or self._canModify:
+            self._subtabAbstractsReviewing = self._tabCtrl.newTab( "abstractsrev", "Abstracts Reviewing", \
                 urlHandlers.UHConfModifReviewingAbstractSetup.getURL( target = self._conf ) )
         
         if self._isPRM or self._canModify:
             self._subTabPaperReviewingSetup = self._subtabPaperReviewing.newSubTab( "revsetup", "Setup",\
                 urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
+            self._tabPaperReviewingControl = self._subtabPaperReviewing.newSubTab( "revcontrol", "Team",\
+                    urlHandlers.UHConfModifReviewingControl.getURL( self._conf ) )
+            self._tabUserCompetencesReviewing = self._subtabPaperReviewing.newSubTab( "revcompetences", "Competences",\
+                    urlHandlers.UHConfModifUserCompetences.getURL( self._conf ) )
             
         if self._isAM or self._canModify:
             self._tabAbstractReviewingSetup = self._subtabAbstractsReviewing.newSubTab( "revsetup", "Abstract setup",\
                     urlHandlers.UHConfModifReviewingAbstractSetup.getURL(target = self._conf) )
             self._tabAbstractNotifTpl = self._subtabAbstractsReviewing.newSubTab( "notiftpl", "Notification templates",\
                     urlHandlers.UHAbstractReviewingNotifTpl.getURL(target = self._conf) )
-            
-        if self._isPRM or self._isAM or self._canModify:
-            self._tabPaperReviewingControl = self._subtabPaperReviewing.newSubTab( "revcontrol", "Reviewing Team",\
-                    urlHandlers.UHConfModifReviewingControl.getURL( self._conf ) )
-            self._tabAbstractsReviewingControl = self._subtabAbstractsReviewing.newSubTab( "revcontrol", "Abstracts Reviewing Team",\
+            self._tabAbstractsReviewingControl = self._subtabAbstractsReviewing.newSubTab( "abscontrol", "Team",\
                     urlHandlers.UHConfModifReviewingAbstractsControl.getURL( self._conf ) ) 
+            self._tabUserCompetencesAbstracts = self._subtabAbstractsReviewing.newSubTab( "abscompetences", "Competences",\
+                    urlHandlers.UHConfModifUserCompetencesAbstracts.getURL( self._conf ) )
             self._tabAbstractList = self._subtabAbstractsReviewing.newSubTab( "abstractList", "List of Abstracts",\
-                    urlHandlers.UHConfAbstractList.getURL( self._conf ) )           
+                    urlHandlers.UHConfAbstractList.getURL( self._conf ) )
             
+        
         if self._showAssignContributions:
             self._tabAssignContributions = self._subtabPaperReviewing.newSubTab( "assignContributions", "Assign Contributions",\
                     urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf ) )   
         
-        if self._isPRM or self._isAM or self._canModify:    
-            self._tabUserCompetences = self._tabCtrl.newTab( "revcompetences", "User competences",\
-                    urlHandlers.UHConfModifUserCompetences.getURL( self._conf ) )
-
         if self._showListContribToJudge:
-            self._tabListContribToJudge = self._subtabPaperReviewing.newSubTab( "contributionsToJudge", "Contributions to judge",\
-                    urlHandlers.UHConfModifListContribToJudge.getURL( self._conf ) ) 
+            self._tabListContribToJudge = self._subtabPaperReviewing.newSubTab( "contributionsToJudge", "Judge as Referee",\
+                    urlHandlers.UHConfModifListContribToJudge.getURL( self._conf ) )
+        if self._showListContribToJudgeAsReviewer:
+            self._tabListContribToJudgeAsReviewer = self._subtabPaperReviewing.newSubTab( "contributionsToJudge", "Judge as Content Reviewer",\
+                    urlHandlers.UHConfModifListContribToJudgeAsReviewer.getURL( self._conf ) )
+        if self._showListContribToJudgeAsEditor:
+            self._tabListContribToJudgeAsEditor = self._subtabPaperReviewing.newSubTab( "contributionsToJudge", "Judge as Layout Reviewer",\
+                    urlHandlers.UHConfModifListContribToJudgeAsEditor.getURL( self._conf ) ) 
+            
         
         self._setActiveTab()
 
@@ -708,6 +717,76 @@ class WConfListContribToJudge(wcomponents.WTemplated):
 
         return vars
 
+class WPConfListContribToJudgeAsReviewer(WPConfModifReviewingBase):
+    """ Tab to see the logged user's list of contributions
+        to judge (as reviewer)
+    """
+    
+    def __init__(self, rh, conference):
+        self._user = rh._getUser()
+        WPConfModifReviewingBase.__init__(self, rh, conference)
+
+    def _setActiveTab( self ):
+        self._tabListContribToJudgeAsReviewer.setActive()
+        
+    def _getTabContent( self, params ):
+        wc = WConfListContribToJudgeAsReviewer(self._conf, self._user)    
+        return wc.getHTML()
+
+class WConfListContribToJudgeAsReviewer(wcomponents.WTemplated):
+    """ Template used to show list of contributions to give advice on
+    """
+    
+    def __init__(self, conf, user):
+        self._conf = conf
+        self._user = user
+
+    def getHTML(self):
+        return wcomponents.WTemplated.getHTML(self)
+
+    def getVars( self ):
+        vars = wcomponents.WTemplated.getVars( self )
+        
+        vars["ConfReview"] = self._conf.getConfReview()
+        vars["User"] = self._user
+        
+        return vars
+
+class WPConfListContribToJudgeAsEditor(WPConfModifReviewingBase):
+    """ Tab to see the logged user's list of contributions
+        to judge (as editor)
+    """
+    
+    def __init__(self, rh, conference):
+        self._user = rh._getUser()
+        WPConfModifReviewingBase.__init__(self, rh, conference)
+
+    def _setActiveTab( self ):
+        self._tabListContribToJudgeAsEditor.setActive()
+        
+    def _getTabContent( self, params ):
+        wc = WConfListContribToJudgeAsEditor(self._conf, self._user)    
+        return wc.getHTML()
+
+class WConfListContribToJudgeAsEditor(wcomponents.WTemplated):
+    """ Template used to show list of contributions to edit
+    """
+    
+    def __init__(self, conf, user):
+        self._conf = conf
+        self._user = user
+
+    def getHTML(self):
+        return wcomponents.WTemplated.getHTML(self)
+
+    def getVars( self ):
+        vars = wcomponents.WTemplated.getVars( self )
+        
+        vars["ConfReview"] = self._conf.getConfReview()
+        vars["User"] = self._user
+        
+        return vars
+
 #classes for assign contributions tab
 class WPConfReviewingAssignContributions(WPConfModifReviewingBase):
     """ Tab to see the logged user's list of contributions
@@ -754,10 +833,10 @@ class WPConfModifUserCompetences(WPConfModifReviewingBase):
         WPConfModifReviewingBase.__init__(self, rh, conference)
 
     def _setActiveTab( self ):
-        self._tabUserCompetences.setActive()
-
+        self._tabUserCompetencesReviewing.setActive()
+        
     def _getTabContent( self, params ):
-        wc = WConfModifUserCompetences(self._conf)
+        wc = WConfModifUserCompetences(self._conf)    
         return wc.getHTML()
 
 class WConfModifUserCompetences(wcomponents.WTemplated):
@@ -775,5 +854,38 @@ class WConfModifUserCompetences(wcomponents.WTemplated):
 
         vars["Conference"] = self._conf
         vars["ConfReview"] = self._conf.getConfReview()
+        
+        return vars
+    
+class WPConfModifUserCompetencesAbstracts(WPConfModifReviewingBase):
+    """ Tab to see the user competences
+    """
+    
+    def __init__(self, rh, conference):
+        WPConfModifReviewingBase.__init__(self, rh, conference)
 
+    def _setActiveTab( self ):
+        self._tabUserCompetencesAbstracts.setActive()
+        self._subtabAbstractsReviewing.setActive()
+        
+    def _getTabContent( self, params ):
+        wc = WConfModifUserCompetencesAbstracts(self._conf)    
+        return wc.getHTML()
+    
+class WConfModifUserCompetencesAbstracts(wcomponents.WTemplated):
+    """ Template used to show list of contributions to judge / edit / give advice on
+    """
+    
+    def __init__(self, conf):
+        self._conf = conf
+
+    def getHTML(self):
+        return wcomponents.WTemplated.getHTML(self)
+
+    def getVars( self ):
+        vars = wcomponents.WTemplated.getVars( self )
+        
+        vars["Conference"] = self._conf
+        vars["ConfReview"] = self._conf.getConfReview()
+        
         return vars

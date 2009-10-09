@@ -39,10 +39,17 @@
             </td>
     	</tr>
     	<% end %>
+    	<tr><td style="padding-bottom:15px;"></td></tr>
+        <tr><td colspan="5" style="padding-top: 15px; border-top: 1px solid #DDDDDD;">
+            <em><%= _("To assign team for Paper Review Module, please click on 'Reviewing Team' and follow the steps")%></em>
+        </td></tr>
 	<% end %>
     <% else: %>
         <tr><td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
             <%= _("No templates have been uploaded yet.")%>
+        </td></tr>
+        <tr><td colspan="5" style="padding-top: 15px; border-top: 1px solid #DDDDDD;">
+            <em><%= _("To assign team for Paper Review Module, please click on 'Reviewing Team' and follow the steps")%></em>
         </td></tr>
     <% end %>
 

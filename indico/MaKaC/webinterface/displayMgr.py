@@ -878,14 +878,24 @@ class SystemLinkData:
                 "URL": str(str(urlHandlers.UHConfModifReviewingPaperSetup.getURL(conf))), \
                 "staticURL": "", \
                 "parent": "mystuff"}, \
-            "judgelist": { \
-                "caption": _("Contributions to judge"), \
-                "URL": str(str(urlHandlers.UHConfModifListContribToJudge.getURL(conf))), \
-                "staticURL": "", \
-                "parent": "mystuff"}, \
             "assigncontributions": { \
                 "caption": _("Assign contributions"), \
                 "URL": str(str(urlHandlers.UHConfModifReviewingAssignContributionsList.getURL(conf))), \
+                "staticURL": "", \
+                "parent": "mystuff"}, \
+            "judgelist": { \
+                "caption": _("Referee Area"), \
+                "URL": str(str(urlHandlers.UHConfModifListContribToJudge.getURL(conf))), \
+                "staticURL": "", \
+                "parent": "mystuff"}, \
+            "judgelistreviewer": { \
+                "caption": _("Content Reviewer Area"), \
+                "URL": str(str(urlHandlers.UHConfModifListContribToJudgeAsReviewer.getURL(conf))), \
+                "staticURL": "", \
+                "parent": "mystuff"}, \
+            "judgelisteditor": { \
+                "caption": _("Layout Reviewer Area"), \
+                "URL": str(str(urlHandlers.UHConfModifListContribToJudgeAsEditor.getURL(conf))), \
                 "staticURL": "", \
                 "parent": "mystuff"}, \
             "abstractsBook": { \
@@ -953,8 +963,10 @@ class SystemLinkData:
                                         "mycontribs",
                                         "manageabstractreviewing",
                                         "managepaperreviewing",
-                                        "judgelist",
                                         "assigncontributions",
+                                        "judgelist",
+                                        "judgelistreviewer",
+                                        "judgelisteditor",
                                         "abstractsBook",
                                         "registrationForm",
                                         "ViewMyRegistration",

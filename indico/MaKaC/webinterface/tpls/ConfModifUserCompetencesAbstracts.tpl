@@ -1,12 +1,9 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 
 <table class="Revtab" width="90%%" cellspacing="0" align="center" border="0" style="padding-left:2px; padding-top: 20px;">
-   <tr><td colspan=5 style="padding-bottom: 15px;">
-            <em><%= _("Please, define competences for every reviewing team member.")%></em>
-   </td></tr> 
     <tr>
         <td nowrap class="groupTitle" colspan=5>
-            <%= _("Paper Reviewing Team competences")%>
+            <%= _("Abstracts Reviewing Team competences")%>
             <span id="competencesHelp"></span> 
         </td>
     </tr>
@@ -19,7 +16,7 @@
    
     
     <% for user, competences in ConfReview.getAllUserCompetences(): %>
-    <% if ConfReview.isPaperReviewManager(user) or ConfReview.isReferee(user) or ConfReview.isEditor(user) or ConfReview.isReviewer(user):%>
+    <% if ConfReview.isAbstractManager(user) or ConfReview.isAbstractReviewer(user):%>
         <tr valign="top">
             <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF; padding-top: 5px;"><%= user.getId() %></td>
             <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF; padding-top: 5px;"><%= user.getFullName()%></td>
@@ -32,16 +29,13 @@
         </tr>
     <% end %>
     <% end %>
-    <tr><td colspan=5 style="padding-top: 15px;">
-            <em><%= _("To assign contributions for reviewing, please click on 'Assign Contributions'")%></em>
-   </td></tr>
 </table>
 
 <script type="text/javascript">
 
 var keyWordfieldList = new Array()
 <% for user, competences in ConfReview.getAllUserCompetences(): %>
- <% if ConfReview.isPaperReviewManager(user) or ConfReview.isReferee(user) or ConfReview.isEditor(user) or ConfReview.isReviewer(user):%>
+  <% if ConfReview.isAbstractManager(user) or ConfReview.isAbstractReviewer(user):%>
     new IndicoUI.Widgets.Generic.keywordField(
         $E('competences_<%= user.getId() %>'),
         'oneLineListItem',

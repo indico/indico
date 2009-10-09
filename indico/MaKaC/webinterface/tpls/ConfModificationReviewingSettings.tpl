@@ -11,7 +11,7 @@
     </tr>
     <tr>
         <td nowrap class="titleCellTD"  style="padding-top: 5px;">
-            <span class="titleCellFormat"><%= _("Type of reviewing")%></span>
+            <span class="titleCellFormat"><%= _("Type of reviewing:")%></span>
         </td>
         <td nowrap style="vertical-align:top; padding-top: 5px;">
             <span id="inPlaceEditReviewingMode" style="display:inline"><%= ConferenceReview.reviewingModes[choice] %></span>
@@ -113,7 +113,7 @@
 <% end %>
 <table id="reviewingQuestionsTable" width="90%%" align="center" border="0" style="margin-bottom:1em; display:<%=display%>">
     <tr>
-        <td id="reviewingQuestionsHelp" colspan="5" class="reviewingsubtitle"><%= _("Add questions for paper reviewing")%></td>
+        <td id="reviewingQuestionsHelp" colspan="5" class="reviewingsubtitle"><%= _("Add questions for content reviewing")%></td>
     </tr>
     <!--
     <tr>
@@ -145,7 +145,7 @@
 <% end %>
 <table id="editingCriteriaTable" width="90%%" align="center" border="0" style="margin-bottom:1em; display:<%=display%>">
     <tr>
-        <td id="editingCriteriaHelp" colspan="5" class="reviewingsubtitle"  style="padding-top: 5px;"><%= _("Set criteria for paper editing")%></td>
+        <td id="editingCriteriaHelp" colspan="5" class="reviewingsubtitle"  style="padding-top: 5px;"><%= _("Set criteria for layout reviewing")%></td>
     </tr>
     <!--
     <tr>
@@ -310,7 +310,7 @@
     </tr>
     <tr><td>
         <% includeTpl ('ContributionReviewingTemplatesList', ConfReview = ConfReview, CanDelete = CanDelete)%>
-    </tr></td>
+    </tr></td>    
 </table>
 </form>
 
@@ -330,7 +330,7 @@ var observer = function(value) {
         $E('reviewerDefaultDateRow').dom.style.display = 'none';
         $E('templateTable').dom.style.display = 'none';
     }
-    if (value == "Paper reviewing") {
+    if (value == "Content reviewing") {
         $E('steptitle').dom.style.display = '';
         $E('title').set('<%= _("content reviewing team")%>');
         $E('materialsTable').dom.style.display = '';
@@ -350,7 +350,7 @@ var observer = function(value) {
         showDefaultRefereeDate();
         showFormatChooser();
     }
-    if (value == "Paper editing") {
+    if (value == "Layout reviewing") {
         $E('steptitle').dom.style.display = '';
         $E('title').set('<%= _("layout reviewing team")%>');
         $E('materialsTable').dom.style.display = '';
@@ -368,7 +368,7 @@ var observer = function(value) {
         showDefaultEditorDate();
         showFormatChooser();
     }
-    if (value == "Paper editing and reviewing") {
+    if (value == "Content and layout reviewing") {
         $E('steptitle').dom.style.display = '';
         $E('title').set('<%= _("content and layout reviewing team")%>');
         $E('materialsTable').dom.style.display = '';

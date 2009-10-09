@@ -345,6 +345,9 @@ class WPContributionModifBase( WPConferenceModifBase  ):
     def __init__( self, rh, contribution ):
         WPConferenceModifBase.__init__( self, rh, contribution.getConference() )
         self._contrib = self._target = contribution
+        from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager
+        self._isPRM = RCPaperReviewManager.hasRights(rh)
+        self._canModify = self._conf.canModify(rh.getAW())
 
     def _getEnabledControls(self):
         return False
@@ -363,39 +366,63 @@ class WPContributionModifBase( WPConferenceModifBase  ):
         #self._tabMaterials = self._tabCtrl.newTab( "materials", _("Files"), \
         #        urlHandlers.UHContribModifMaterials.getURL( self._target ) )
         self._tabSubCont = self._tabCtrl.newTab( "subCont", _("Sub Contribution"), \
-                urlHandlers.UHContribModifSubCont.getURL( self._target ) )
-        self._tabAC = self._tabCtrl.newTab( "ac", _("Protection"), \
+                urlHandlers.UHContribModifSubCont.getURL( self._target ) ) 
+        if self._canModify:
+            self._tabAC = self._tabCtrl.newTab( "ac", _("Protection"), \
                 urlHandlers.UHContribModifAC.getURL( self._target ) )
-        self._tabTools = self._tabCtrl.newTab( "tools", _("Tools"), \
+            self._tabTools = self._tabCtrl.newTab( "tools", _("Tools"), \
                 urlHandlers.UHContribModifTools.getURL( self._target ) )
 
         hasReviewingEnabled = self._contrib.getConference().hasEnabledSection('paperReviewing')
         confReviewChoice = self._contrib.getConference().getConfReview().getChoice()
 
         if hasReviewingEnabled and confReviewChoice != 1:
-
-            self._subtabReviewing = self._tabCtrl.newTab( "reviewing", "Paper Reviewing", \
+            
+            if self._contrib.getReviewManager().isEditor(self._rh._getUser()):
+                self._subtabReviewing = self._tabCtrl.newTab( "reviewing", "Paper Reviewing", \
+                urlHandlers.UHContributionEditingJudgement.getURL( self._target ) )
+            elif self._contrib.getReviewManager().isReviewer(self._rh._getUser()):
+                self._subtabReviewing = self._tabCtrl.newTab( "reviewing", "Paper Reviewing", \
+                urlHandlers.UHContributionGiveAdvice.getURL( self._target ) )             
+            else:
+                self._subtabReviewing = self._tabCtrl.newTab( "reviewing", "Paper Reviewing", \
                 urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
-            self._subTabAssign = self._subtabReviewing.newSubTab( "assign", _("Assign Team"), \
+                
+            if self._canModify or self._isPRM or self._contrib.getReviewManager().isReferee(self._rh._getUser()):
+                self._subTabAssign = self._subtabReviewing.newSubTab( "assign", _("Assign Team"), \
                 urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
-            self._subTabJudgements = self._subtabReviewing.newSubTab( "Judgements", _("Judgements"), \
-                urlHandlers.UHContributionReviewingJudgements.getURL( self._target ) )
+                if self._contrib.getReviewManager().isReferee(self._rh._getUser()):
+                    self._subTabJudgements = self._subtabReviewing.newSubTab( "Judgements", _("Final Judge"), \
+                    urlHandlers.UHContributionReviewingJudgements.getURL( self._target ) )
+                else:
+                    self._subTabJudgements = self._subtabReviewing.newSubTab( "Judgements", _("Judegments"), \
+                    urlHandlers.UHContributionReviewingJudgements.getURL( self._target ) )
             
     
             if (confReviewChoice == 3 or confReviewChoice == 4) and \
                 self._contrib.getReviewManager().isEditor(self._rh._getUser()) and \
                 (not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self._conf.getConfReview().getChoice() == 3) and \
                 self._contrib.getReviewManager().getLastReview().isAuthorSubmitted():
+<<<<<<< HEAD:indico/MaKaC/webinterface/pages/contributions.py
 
                 self._tabJudgeEditing = self._tabCtrl.newTab( "editing", "Editing", \
+=======
+                
+                self._tabJudgeEditing = self._subtabReviewing.newSubTab( "editing", "Judge Layout", \
+>>>>>>> [DEVELOPMENT] - new subtabs + other:indico/MaKaC/webinterface/pages/contributions.py
                                          urlHandlers.UHContributionEditingJudgement.getURL(self._target) )
 
             if (confReviewChoice == 2 or confReviewChoice == 4) and \
                 self._contrib.getReviewManager().isReviewer(self._rh._getUser()) and \
                 not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() and \
                 self._contrib.getReviewManager().getLastReview().isAuthorSubmitted():
+<<<<<<< HEAD:indico/MaKaC/webinterface/pages/contributions.py
 
                 self._tabGiveAdvice = self._tabCtrl.newTab( "advice", "Advice on reviewing", \
+=======
+                
+                self._tabGiveAdvice = self._subtabReviewing.newSubTab( "advice", "Judge Content", \
+>>>>>>> [DEVELOPMENT] - new subtabs + other:indico/MaKaC/webinterface/pages/contributions.py
                                       urlHandlers.UHContributionGiveAdvice.getURL(self._target))
 
             if len(self._contrib.getReviewManager().getVersioning()) > 1 or self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():

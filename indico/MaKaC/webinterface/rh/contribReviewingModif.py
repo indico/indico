@@ -266,6 +266,8 @@ class RHEditorBase(RHContribModifBase):
         RHContribModifBase._checkParams(self, params)
         if not (self._target.getReviewManager().getLastReview().isAuthorSubmitted()):
             raise MaKaCError("You must wait until the author has submitted the materials")
+        if self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
+            raise MaKaCError("The final judgement has been submitted")
 
 class RHContributionEditingJudgement(RHEditorBase):
     _uh = urlHandlers.UHContributionEditingJudgement
@@ -326,6 +328,8 @@ class RHReviewerBase(RHContribModifBase):
         RHContribModifBase._checkParams(self, params)
         if not (self._target.getReviewManager().getLastReview().isAuthorSubmitted()):
             raise MaKaCError("You must wait until the author has submitted the materials")
+        if self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
+            raise MaKaCError("The final judgement has been submitted")
 
 class RHContributionGiveAdvice(RHReviewerBase):
     _uh = urlHandlers.UHContributionGiveAdvice

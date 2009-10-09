@@ -4377,7 +4377,14 @@ class UHConfModifReviewingAbstractsControl ( URLHandler ):
 
 class UHConfModifUserCompetences ( URLHandler ):
     _relativeURL = "confModifUserCompetences.py"
+<<<<<<< HEAD:indico/MaKaC/webinterface/urlHandlers.py
 
+=======
+    
+class UHConfModifUserCompetencesAbstracts ( URLHandler ):
+    _relativeURL = "confModifUserCompetences.py/Abstracts"
+    
+>>>>>>> [DEVELOPMENT] - new subtabs + other:indico/MaKaC/webinterface/urlHandlers.py
 class UHConfModifModifyUserCompetences ( URLHandler ):
     _relativeURL = "confModifUserCompetences.py/modifyCompetences"
 
@@ -4450,7 +4457,17 @@ class UHConfRemoveReferee( URLHandler ):
 
 class UHConfModifListContribToJudge( URLHandler ):
     _relativeURL = "confListContribToJudge.py"
+<<<<<<< HEAD:indico/MaKaC/webinterface/urlHandlers.py
 
+=======
+    
+class UHConfModifListContribToJudgeAsReviewer( URLHandler ):
+    _relativeURL = "confListContribToJudge.py/asReviewer"
+    
+class UHConfModifListContribToJudgeAsEditor( URLHandler ):
+    _relativeURL = "confListContribToJudge.py/asEditor"
+    
+>>>>>>> [DEVELOPMENT] - new subtabs + other:indico/MaKaC/webinterface/urlHandlers.py
 class UHConfModifReviewingAssignContributionsList( URLHandler ):
     _relativeURL = "assignContributions.py"
 

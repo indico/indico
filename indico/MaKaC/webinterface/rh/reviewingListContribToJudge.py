@@ -1,6 +1,8 @@
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.webinterface.pages.reviewing import WPConfListContribToJudge
+from MaKaC.webinterface.pages.reviewing import WPConfListContribToJudgeAsReviewer
+from MaKaC.webinterface.pages.reviewing import WPConfListContribToJudgeAsEditor
 from MaKaC.errors import MaKaCError
 
 class RHContribListToJudge(RHConferenceModifBase):
@@ -21,3 +23,18 @@ class RHContribListToJudge(RHConferenceModifBase):
     def _process( self ):
         p = WPConfListContribToJudge(self, self._target)
         return p.display()
+    
+
+class RHContribListToJudgeAsReviewer(RHContribListToJudge):
+    _uh = urlHandlers.UHConfModifListContribToJudgeAsReviewer
+    
+    def _process( self ):
+        p = WPConfListContribToJudgeAsReviewer(self, self._target)
+        return p.display() 
+    
+class RHContribListToJudgeAsEditor(RHContribListToJudge):
+    _uh = urlHandlers.UHConfModifListContribToJudgeAsEditor
+    
+    def _process( self ):
+        p = WPConfListContribToJudgeAsEditor(self, self._target)
+        return p.display() 

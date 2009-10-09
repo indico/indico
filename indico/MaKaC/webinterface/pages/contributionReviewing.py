@@ -135,6 +135,7 @@ class WContributionReviewingJudgements(wcomponents.WTemplated):
 class WPJudgeEditing( WPContributionModifBase ):
     
     def _setActiveTab( self ):
+        self._subtabReviewing.setActive()
         self._tabJudgeEditing.setActive()
         
     def _getTabContent( self, params ):  
@@ -161,7 +162,9 @@ class WJudgeEditing(wcomponents.WTemplated):
 class WPGiveAdvice( WPContributionModifBase ):
         
     def _setActiveTab( self ):
+        self._subtabReviewing.setActive()
         self._tabGiveAdvice.setActive()
+
         
     def _getTabContent( self, params ):  
         wc = WGiveAdvice(self._target, self._getAW())

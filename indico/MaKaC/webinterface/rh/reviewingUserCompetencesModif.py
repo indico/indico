@@ -35,6 +35,17 @@ class RHConfModifUserCompetences( RHConfModifReviewingPRMAMBase ):
             p = reviewing.WPConfModifUserCompetences( self, self._target)
         return p.display()
     
+
+class RHConfModifUserCompetencesAbstracts( RHConfModifReviewingPRMAMBase ):
+    _uh = urlHandlers.UHConfModifUserCompetences
+
+    def _process( self ):
+        if self._conf.isClosed():
+            p = WPConferenceModificationClosed( self, self._target )
+        else:
+            p = reviewing.WPConfModifUserCompetencesAbstracts( self, self._target)
+        return p.display()
+
 class RHConfModifModifyUserCompetences( RHConfModifReviewingPRMAMBase ):
     
     def _checkParams( self, params ):

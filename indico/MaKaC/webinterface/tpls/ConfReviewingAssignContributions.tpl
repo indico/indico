@@ -3,6 +3,7 @@
 <% from MaKaC.conference import ContribStatusNone %>
 
 <% dueDateFormat = "%a %d %b %Y" %>
+<div style="padding-top:10px; padding-bottom: 10px;"><em><%= _("Please, select one or more contributions to assign Reviewers")%></em></div>
 
 <div id="showHideFilteringHelp" style="padding-top: 10px;"><div id="showHideFiltering" style="display:inline"></div></div>
 <br/>
@@ -236,20 +237,19 @@
                 </ul>
             </td>
             
-            <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
+            <td style="border-right:5px solid #FFFFFF; border-left:5px solid #FFFFFF;">
                 <% date = rm.getLastReview().getAdjustedRefereeDueDate() %>
                 <% if date is None: %>
                     <%= _("Deadline not set.")%>
                 <% end %>
                 <% else: %>
                 <% if date < nowutc() and not rm.getLastReview().getRefereeJudgement().isSubmitted(): %>
-                    <span style="color:red;">
+                    <% color = 'red' %>
                     <% end %>
                     <% else: %>
-                    <span style="color:green;">
+                     <% color = 'green' %>
                     <% end %>
-                    <%= date.strftime(dueDateFormat) %>
-                    </span>
+                    <%= date.strftime(dueDateFormat) %>                   
                 <% end %>
             </td>    
                             
@@ -504,12 +504,13 @@ var contributionTemplate = function(contribution) {
     row.append(cell8);
 
     // Cell9: due date of the contribution
-    var cell9 = Html.td();
+    var cell9 = Html.td({style:{color:<%if color=='red':%>"red"<%end%><%else:%>"green"<%end%>}});
     cell9.set(contribution.reviewManager.lastReview.refereeDueDate)
     row.append(cell9);
     
     return row;
 }
+
 
 /**
  * Updates the display of the contribution row.

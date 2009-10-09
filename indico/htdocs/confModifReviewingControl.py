@@ -16,14 +16,6 @@ def addPaperReviewManager(req, **params):
 def removePaperReviewManager(req, **params):
     return reviewingControlModif.RHConfRemovePaperReviewManager(req).process(params)
 
-def selectAbstractManager(req, **params):
-    return reviewingControlModif.RHConfSelectAbstractManager(req).process(params)
-
-def addAbstractManager(req, **params):
-    return reviewingControlModif.RHConfAddAbstractManager(req).process(params)
-
-def removeAbstractManager(req, **params):
-    return reviewingControlModif.RHConfRemoveAbstractManager(req).process(params)
 
 def selectEditor(req, **params):
     return reviewingControlModif.RHConfSelectEditor(req).process(params)
@@ -42,15 +34,6 @@ def addReviewer(req, **params):
 
 def removeReviewer(req, **params):
     return reviewingControlModif.RHConfRemoveReviewer(req).process(params)
-
-def selectAbstractReviewer(req, **params):
-    return reviewingControlModif.RHConfSelectAbstractReviewer(req).process(params)
-
-def addAbstractReviewer(req, **params):
-    return reviewingControlModif.RHConfAddAbstractReviewer(req).process(params)
-
-def removeAbstractReviewer(req, **params):
-    return reviewingControlModif.RHConfRemoveAbstractReviewer(req).process(params)
 
 def selectReferee(req, **params):
     return reviewingControlModif.RHConfSelectReferee(req).process(params)
