@@ -330,9 +330,36 @@ What do you want to do [u/E]? ''' % _existingIndicoConfPath())
                 sys.exit()
             elif opt == 'u':
                 _activateIndicoConfFromExistingInstallation()
+            else:
+                print "\nInvalid answer. Exiting installation..\n"
+                sys.exit()
 
     compileAllLanguages()
     indicoconfpath = os.path.join(config_dir, 'indico.conf')
+    
+    if not os.path.exists(indicoconfpath):
+        if not os.path.exists(PWD_INDICO_CONF):
+            opt = raw_input('''
+We did not detect an existing Indico installation.
+We also did not detect an etc/indico.conf file in this directory.
+At this point you can:
+
+    [c]opy the default values in etc/indico.conf.sample to a new etc/indico.conf
+    and continue the installation
+
+    [A]bort the installation in order to inspect etc/indico.conf.sample
+    and / or to make your own etc/indico.conf
+
+What do you want to do [c/a]? ''')
+            if opt in ('c', 'C'):
+                shutil.copy(PWD_INDICO_CONF + '.sample', PWD_INDICO_CONF)
+            elif opt in ('', 'a', 'A'):
+                print "\nExiting installation..\n"
+                sys.exit()
+            else:
+                print "\nInvalid anwer. Exiting installation..\n"
+                sys.exit()
+    
     activemakacconfig = os.path.join(os.path.dirname(os.path.abspath(MaKaC.__file__)), 'common', 'MaKaCConfig.py') 
     updateIndicoConfPathInsideMaKaCConfig(indicoconfpath, activemakacconfig)
     
