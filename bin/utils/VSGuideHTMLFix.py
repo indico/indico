@@ -1,3 +1,31 @@
+# -*- coding: utf-8 -*-
+##
+## $Id: VSGuideHTMLFix.py,v 1.2 2008/04/24 17:00:21 dmartinc Exp $
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+""" Simple script to parse and do some corrections HTML exported by the source OpenOffice documents
+    used to produce the Video Services guides.
+    
+    It assumes you are using it from indico's bin directory in development mode.
+    If this isn't right, please change the 'ihelppath' variable and the end of this file.
+"""
+
 from HTMLParser import HTMLParser
 import htmlentitydefs
 import os
@@ -9,6 +37,12 @@ class MyHTMLParser(HTMLParser):
         HTMLParser.__init__(self)
         
     def process(self, target):
+        if os.path.exists(target):
+            print 'good'
+            return
+        if not os.path.exists(target):
+            print 'Could not find file: ' + target
+            return
         self.reset()
         self._inStyleTag = False
         outName = target + '.tmp'
@@ -89,7 +123,8 @@ class MyHTMLParser(HTMLParser):
 
 if __name__ == "__main__":
     p = MyHTMLParser()
-    p.process("/home/dmartinc/Dropbox/PFC/video services user guide/export/Indico VS Guide - Normal User/Indico VS Guide - Normal User.html")
-    p.process("/home/dmartinc/Dropbox/PFC/video services user guide/export/Indico VS Guide - Event Manager/Indico VS Guide - Event Manager.html")
-    p.process("/home/dmartinc/Dropbox/PFC/video services user guide/export/Indico VS Guide - VS Admin/Indico VS Guide - VS Admin.html")
-    p.process("/home/dmartinc/Dropbox/PFC/video services user guide/export/Indico VS Guide - Server Admin/Indico VS Guide - Server Admin.html")
+    ihelpPath = "../../indico/htdocs/ihelp/"
+    p.process(ihelpPath + "VideoServices/IndicoUserGuide_VS/IndicoUserGuide_VS.html")
+    p.process(ihelpPath + "VideoServices/EventManagerUserGuide_VS/EventManagerUserGuide_VS.html")
+    p.process(ihelpPath + "VideoServices/ServerAdminUserGuide_VS/ServerAdminUserGuide_VS.html")
+    p.process(ihelpPath + "VideoServices/VSAdminUserGuide_VS/VSAdminUserGuide_VS.html")
