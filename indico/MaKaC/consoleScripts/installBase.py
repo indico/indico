@@ -451,11 +451,15 @@ Add the following lines to your Apache2 httpd.conf:
     Allow from All
 </Directory>
 
+Alias /indico/images "%s/images"
+Alias /indico "%s"
+
+(change the paths after 'Alias' in order to change the URL bindings)
 
 
 If you are running ZODB on this host:
 - Review %s/zodb.conf and %s/zdctl.conf to make sure everything is ok.
 - To start the database run: zdctl.py -C %s/zdctl.conf start
-""" % (cfg.getConfigurationDir(), cfg.getBinDir(), cfg.getDocumentationDir(), cfg.getConfigurationDir(), cfg.getHtdocsDir(), cfg.getHtdocsDir(), package_dir, cfg.getHtdocsDir(),  cfg.getConfigurationDir(), cfg.getConfigurationDir(), cfg.getConfigurationDir())
+""" % (cfg.getConfigurationDir(), cfg.getBinDir(), cfg.getDocumentationDir(), cfg.getConfigurationDir(), cfg.getHtdocsDir(), cfg.getHtdocsDir(), package_dir, cfg.getHtdocsDir(), cfg.getHtdocsDir(), cfg.getHtdocsDir(), cfg.getConfigurationDir(), cfg.getConfigurationDir(), cfg.getConfigurationDir())
 
 
