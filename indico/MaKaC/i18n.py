@@ -3,6 +3,7 @@
 """Contains internationalization subsystem
 """
 import re,os.path
+from MaKaC.errors import MaKaCError
 import gettext, locale
 import operator
 
@@ -61,7 +62,7 @@ def install(name, lang, unicode, localedir=None):
         Lan = gettext.translation("messages", localedir, languages=[lang])
         LanName = lang
     except Exception, e:
-        raise "Can't find the messages.mo for the language ID %s\n%s"%(lang,e)
+        raise MaKaCError("Can't find the messages.mo for the language ID %s\n%s"%(lang,str(e)))
     Lan.install()
     __ = True
 
