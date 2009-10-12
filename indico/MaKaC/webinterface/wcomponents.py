@@ -20,6 +20,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.plugins.base import PluginsHolder
+from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 
 import os,types,string
 from xml.sax.saxutils import escape, quoteattr
@@ -363,7 +364,7 @@ class WHeader(WTemplated):
                 adminItemList.append({'url': urlHandlers.UHAdminArea.getURL(), 'text': _("Server admin")})
             if PluginsHolder().hasPluginType("Collaboration"):
                 from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin
-                if self._currentuser.isAdmin() or RCCollaborationAdmin.hasRights(user = self._currentuser):
+                if (self._currentuser.isAdmin() or RCCollaborationAdmin.hasRights(user = self._currentuser)) and CollaborationTools.anyPluginsAreActive():
                     adminItemList.append({'url': urlHandlers.UHAdminCollaboration.getURL(), 'text': _("Video Services Overview")})
             
             

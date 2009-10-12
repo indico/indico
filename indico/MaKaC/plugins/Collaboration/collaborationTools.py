@@ -57,6 +57,10 @@ class CollaborationTools(object):
 #            cls._plugins[pluginName] = cls.getCollaborationPluginType().getPlugin(pluginName)
 #        return cls._plugins[pluginName]
         return cls.getCollaborationPluginType().getPlugin(pluginName)
+    
+    @classmethod
+    def anyPluginsAreActive(cls):
+        return len(cls.getCollaborationPluginType().getPlugins(includeNonActive = False)) > 0
         
     @classmethod
     def getOptionValue(cls, pluginName, optionName):
