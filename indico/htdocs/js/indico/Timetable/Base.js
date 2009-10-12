@@ -273,6 +273,8 @@ type("DisplayTimeTable", ["TimeTable"], {
 
 
 type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
+
+
     _titleTemplate : function(text) {
         if (text == 'all') {
             return $T('All days');
@@ -288,20 +290,48 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
 
         return Indico.Data.WeekDays[nDate.getDay()].substring(0,3)+' '+day+'/'+month;
 
+    },
+
+    switchToInterval : function(intervalId) {
+        timetable.disable();
+
+        var intervalInfo = this.data[this.currentDay][intervalId];
+        var data = intervalInfo.entries;
+
+        this.intervalTimeTable = new IntervalManagementTimeTable(this,
+                                                                 data,
+                                                                 intervalInfo,
+                                                                 this.eventInfo,
+                                                                 this.width,
+                                                                 this.canvas,
+                                                                 'contribution',
+                                                                 false);
+        this.menu.dom.style.display = 'none';
+        this.intervalTimeTable.setData(intervalInfo);
+        this.canvas.set(this.intervalTimeTable.draw());
+
+    },
+
+    switchToTopLevel : function() {
+        this.menu.dom.style.display = 'block';
+        timetable.enable();
+        timetable.timetableDrawer.redraw();
     }
 
 },
-     function(data, width, wrappingElement, detailLevel) {
+     function(data, width, wrappingElement, detailLevel, managementActions) {
 
          var self = this;
 
-         var canvas = Html.div('canvas');
+         this.canvas = Html.div('canvas');
 
-         this.timetableDrawer = new TimetableDrawer(data, canvas, width,
+         this.timetableDrawer = new TimetableDrawer(data, this.canvas, width,
                                                     wrappingElement,
                                                     detailLevel,
                                                     this._functionButtons(),
-                                                    this.loadingIndicator);
+                                                    this.loadingIndicator,
+                                                    !!managementActions,
+                                                    managementActions);
 
 
          var sortedKeys = keys(this.data);
@@ -339,38 +369,252 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
 
 
 type("IntervalTimeTableMixin", [], {
+
+    draw: function() {
+        return this._draw(this.timetableDrawer.drawDay(this.currentDay));
+    },
+
+    _getInfoBoxContent: function() {
+
+        return Html.div({}, Html.span({style: {fontStyle: 'italic', fontSize: '0.9em'}},
+            $T('You are viewing the contents of the interval:')),
+            Html.div({style: {fontWeight: 'bold', marginTop: '5px', fontSize: '1.3em'}},
+            this._generateSlotTitle(this.contextInfo),
+            Html.span({style: {fontWeight: 'normal'}},
+            " (", $B(Html.span({}), this.slotStartTime), " - ", $B(Html.span({}), this.slotEndTime),")" )));
+    },
+
+    _generateSlotTitle: function(slotData) {
+        return slotData.title + (slotData.slotTitle ? ": " + slotData.slotTitle : '');
+    },
+
+    setData: function(data) {
+        var day = IndicoUtil.formatDate2(IndicoUtil.parseJsonDate(data.startDate));
+        var ttData = {};
+
+        this.data = data.entries;
+
+        // WatchValues, so that interval changes can be handled
+        this.slotStartTime = new WatchValue(data.startDate.time.substring(0,5));
+        this.slotEndTime = new WatchValue(data.endDate.time.substring(0,5));
+
+        ttData[day] = data.entries;
+
+        this.currentDay = day;
+        this.timetableDrawer.setData(ttData, day, data.isPoster);
+    }
+
 },
-     function(isSessionTimetable) {
+     function(width, wrappingElement, isSessionTimetable, managementActions) {
 
-         var canvas = Html.div('canvas');
+         this.canvas = Html.div('canvas');
 
-         this.timetableDrawer = new IntervalTimetableDrawer(data, canvas, width,
+         this.timetableDrawer = new IntervalTimetableDrawer(this.data, this.canvas, width,
                                                             wrappingElement,
                                                             this._functionButtons(),
                                                             this.loadingIndicator,
-                                                            managementMode,
-                                                            this.managementActions);
+                                                            !!managementActions,
+                                                            managementActions);
 
          this.isSessionTimetable = any(isSessionTimetable, false);
      });
 
 
 type("ManagementTimeTable",["TimeTable"], {
+
+    _createInfoArea: function() {
+
+        // this is a client-side hack that compensates some algorithm weaknesses
+
+        var closeButton = Html.div({
+            className: 'balloonPopupCloseButton',
+            style: {position: 'absolute',
+            top: '10px',
+            right: '10px',
+            padding: '0px'}
+        });
+
+        var self = this;
+
+        closeButton.observeClick(function() {
+            self._hideWarnings();
+        });
+
+        return Html.div("timetableManagementInfoArea",
+                        Html.div({}, $T("Your changes triggered the automatic modification of some settings:")),
+                        $B(Html.ul({}),
+                           this.processedWarnings,
+                           function(item) {
+
+                               var title = item[4];
+                               var atoms = Util.parseId(item[1]);
+
+                               var message = {
+                                   OWNER_START_DATE_EXTENDED: {
+                                       SessionSlot : $T('The <strong>starting time</strong> of the session interval <strong>')  + title + $T('</strong> was moved from '),
+                                       Session: $T('The <strong>starting time</strong> of the session interval <strong>')  + title  + $T('</strong> was moved from '),
+                                       Conference: $T('The <strong>starting time</strong> of the <strong>Conference</strong> was moved from ')
+                                   },
+                                   OWNER_END_DATE_EXTENDED: {
+                                       SessionSlot : $T('The <strong>ending time</strong> of the session interval <strong>') + title + $T('</strong> was moved from '),
+                                       Session: $T('The <strong>ending time</strong> of the session interval <strong>') + title + $T('</strong> was moved from '),
+                                       Conference: $T('The <strong>ending time</strong> of the <strong>Conference</strong> was moved from ')
+                                   },
+                                   ENTRIES_MOVED: {
+                                       SessionSlot: $T('The contents of the interval <strong>') + title + $T('</strong> were moved from ')
+                                   }
+                               }[item[0]][atoms[0]];
+
+                               var span = Html.span({style: {verticalAlign: 'middle', marginLeft: '5px'}});
+                               span.dom.innerHTML = message + ' <strong>' + item[3] +
+                                   '</strong>' + $T(' to ') + '<strong>' + item[2] + '</strong>' ;
+                               return Html.li({}, span);
+                           }),
+                       closeButton);
+    },
+
+    /*
+     *
+     * Is called every time a timetable entry has been successfully
+     * added or updated. Updates and redraws the timetable.
+     * @param originalArgs this are the original args. If they are passed, we can remove the entry
+     * from the index before adding it again (just in case the date has changed).
+     *
+     */
+
+    _processAutoOps: function(result) {
+        this._hideWarnings();
+
+        if (result.autoOps && result.autoOps.length > 0) {
+            each(result.autoOps,
+                 function(op) {
+                     var warning = self._processWarning(op);
+                     if (warning && self.processedWarnings.indexOf(warning) === null) {
+                         self.warningArea.dom.style.display = 'block';
+                         self.processedWarnings.append(warning);
+                     }
+                 });
+        }
+    },
+
+    _hideWarnings: function() {
+        this.warningArea.dom.style.display = 'none';
+        this.warnings.clear();
+        this.processedWarnings.clear();
+    },
+
+    _processWarning: function(entry) {
+        /*
+         * entry - the warning 'entry', a list [src, msg, target, newValue]
+         * startTime - the original starting time for the timeblock
+         * endTime - the original ending time for the timeblock
+         * [slotTitle] - title, if the entry is a slot
+         */
+
+        var msg = entry[1];
+        var finalTime = entry[3];
+
+        var type = Util.parseId(entry[2])[0];
+
+        var slot = null;
+        var title = "";
+
+        var startTime = "";
+        var endTime = "";
+
+        if (type == "Session") {
+            return null;
+        } else if (type == 'Conference') {
+            conference = self.timetable.getById(entry[2]);
+            title = conference.title;
+            startTime = conference.startDate.time.slice(0,5);
+            endTime = conference.endDate.time.slice(0,5);
+        } else if (type == 'SessionSlot') {
+
+            slot = this.getById(entry[2]);
+            startTime = slot.startDate.time.slice(0,5);
+            endTime = slot.endDate.time.slice(0,5);
+            title = this._generateSlotTitle(slot);
+        }
+
+        if (msg == "OWNER_END_DATE_EXTENDED") {
+            // Make sure that something changed, otherwise the
+            // warning will be supressed
+            if (endTime != finalTime) {
+                // slice(1) to ignore first value
+                return concat(entry.slice(1),  [endTime, title]);
+            }
+        } else if (msg == "OWNER_START_DATE_EXTENDED") {
+            // Again, make sure that something changed
+
+            if (startTime != finalTime) {
+                // slice(1) to ignore first value
+                return concat(entry.slice(1), [startTime, title]);
+            }
+        } else {
+            return concat(entry.slice(1), [startTime, title]);
+        }
+
+        return null;
+    },
+
+
     _getHeader: function() {
-        var div = this.managementActions.managementHeader(this.isSessionTimetable);
-        return div;
+
+        var self = this;
+
+        this.infoBox = Html.div({className: 'timetableInfoBox'},
+                                self._getInfoBoxContent());
+
+
+        this.addMenuLink = Html.a({className: 'dropDownMenu fakeLink', style: {margin: '0 15px'}}, 'Add new');
+
+        this.addMenuLink.observeClick(function() {
+            self.managementActions._openAddMenu(self.addMenuLink, self.contextInfo);
+        });
+
+        this.separator = Html.span({}, " | ");
+        // TODO: implement reschedule function
+        var href = Indico.Urls.Reschedule;
+        this.rescheduleLink = Html.a({style: {margin: '0 15px'}}, Html.span({style: {cursor: 'default', color: '#888'}}, 'Reschedule'));
+
+        var underConstr = function(event) {
+            IndicoUI.Widgets.Generic.tooltip(this, event,"This option will be available soon");
+        };
+        this.rescheduleLink.dom.onmouseover = underConstr;
+
+        // JUST FOR IntervalTimetable
+        this.addIntervalLink = Html.span('fakeLink', 'Add new interval');
+
+        if (self.IntervalTimeTableMixin) {
+            this.addIntervalLink.observeClick(function() {
+                self.addSessionSlot(self.eventInfo.timetableSession);
+            });
+        }
+
+        this.warningArea = this._createInfoArea();
+        this.warningArea.dom.style.display = 'none';
+
+        this.menu = Html.div({style: {cssFloat: 'right', color: '#777'}},
+                             this.getTTMenu(),
+                             this.addMenuLink,
+                             this.addIntervalLink,
+                             this.separator,
+                             this.rescheduleLink);
+        return Html.div({}, this.warningArea, Html.div('clearfix', this.menu, this.infoBox));
     }
 },
-     function(data, eventInfo, width, wrappingElement, detailLevel) {
+     function(data, contextInfo, eventInfo, width, wrappingElement, detailLevel, isSessionTimeTable) {
          this.eventInfo = eventInfo;
-         this.managementActions = new TimetableManagementActions(this, eventInfo);
+         this.contextInfo = contextInfo;
          this.TimeTable(data, width, wrappingElement, detailLevel, true);
+         this.warnings = new WatchList();
+         this.processedWarnings = new WatchList();
      }
     );
 
 
 type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"], {
-
 
 },
      function(data, width, wrappingElement, detailLevel) {
@@ -382,15 +626,147 @@ type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"],
 
      });
 
+type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMixin"], {
+
+    _updateEntry: function(result) {
+
+        var self = this;
+        data = this.getData();
+
+        var oldStartTime, oldEndTime, oldStartDate;
+        // Check whether we're operating *over* a slot or not
+        if (result.entry.entryType=="Session") {
+            var slot = data[result.day][result.entry.id];
+
+            // in the affirmative case, fetch the time limits
+            oldStartTime = slot.startDate.time.slice(0,5);
+            oldEndTime = slot.endDate.time.slice(0,5);
+            oldStartDate = slot.startDate.date;
+
+        } else {
+            oldStartTime = this.eventInfo.startDate.time.slice(0,5);
+            oldEndTime = this.eventInfo.endDate.time.slice(0,5);
+            oldStartDate = this.currentDay;
+        }
+
+        if (oldStartDate != result.entry.startDate.date.replace('-','','g')) {
+            delete data[oldStartDate][result.id];
+        }
+
+        // AutoOp Warnings (before updates are done)
+        this._processAutoOps(result);
+
+        // Here starts the update cycle
+        data[result.day][result.id] = result.entry;
+
+        this.timetableDrawer.redraw();
+    },
+
+    _getInfoBoxContent: function() {
+        return '';
+    },
+
+    getTTMenu: function() {
+
+        if (this.isSessionTimetable) {
+            this.addMenuLink.dom.style.display = "none";
+            this.addIntervalLink.dom.style.display = "inline";
+            this.rescheduleLink.dom.style.display = "none";
+            this.separator.dom.style.display = "none";
+        } else {
+            this.addIntervalLink.dom.style.display = "none";
+        }
+
+        return '';
+    }
+
+},
+     function(data, eventInfo, width, wrappingElement, detailLevel) {
+
+         this.ManagementTimeTable(data, eventInfo, eventInfo, width, wrappingElement, detailLevel);
+         var managementActions = new TopLevelTimeTableManagementActions(this, eventInfo, eventInfo, false);
+         this.TopLevelTimeTableMixin(data, width, wrappingElement, detailLevel, managementActions);
+
+
+     });
+
 
 type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMixin"], {
 
+    _updateTimes: function(newStartTime, newEndTime) {
+        this.slotStartTime.set(newStartTime.slice(0,5));
+        this.slotEndTime.set(newEndTime.slice(0,5));
+    },
+
+    _updateEntry: function(result) {
+        var self = this;
+        var slot = this.contextInfo;
+        var data = this.getData();
+
+        var oldStartTime = slot.startDate.time.slice(0,5);
+        var oldEndTime = slot.endDate.time.slice(0,5);
+
+        this.parentTimetable.data[result.day][slot.id].entries[result.entry.id] = result.entry;
+
+        this._updateTimes(result.slotEntry.startDate.time,
+                          result.slotEntry.endDate.time);
+
+        this._processAutoOps(result);
+
+        // Here starts the update cycle
+        data[result.id] = result.entry;
+
+        if (result.session) {
+            // Account for "collateral damage" on sessions slots
+            this.parentTimetable.eventInfo.sessions[result.session.id] = result.session;
+        }
+
+        if (exists(result.slotEntry)) {
+
+            // Save the entries, otherwise they are lost
+            result.slotEntry.entries = slot.entries;
+            this.parentTimetable.data[result.day][result.slotEntry.id] = result.slotEntry;
+            this.contextInfo = result.slotEntry;
+        }
+
+        this.timetableDrawer.redraw();
+
+//        this.timetable.setData(data, this.intervalInfo);
+    },
+
+    getTTMenu: function() {
+        var self = this;
+
+        if (this.isSessionTimetable) {
+            this.addMenuLink.dom.style.display = "inline";
+            this.addIntervalLink.dom.style.display = "none";
+            this.rescheduleLink.dom.style.display = "none";
+            this.separator.dom.style.display = "inline";
+        } else {
+            this.addIntervalLink.dom.style.display = "none";
+        }
+
+        var goBackLink = Html.span({}, Html.a({className: 'fakeLink', style: {fontWeight: 'bold', margin: '0 15px'}}, 'Go back to timetable'), ' | ');
+        goBackLink.observeClick(function() {
+            self.parentTimetable.switchToTopLevel();
+            self._hideWarnings();
+            self.session = null;
+
+        });
+
+        return goBackLink;
+
+    }
 
 },
-     function(data, eventInfo, width, wrappingElement, detailLevel, isSessionTimetable) {
+     function(parent, data, contextInfo, eventInfo, width, wrappingElement, detailLevel, isSessionTimeTable) {
 
-         this.IntervalTimeTableMixin(isSessionTimeTable);
-         this.ManagementTimeTable(data, eventInfo, width, wrappingElement, detailLevel);
+         this.parentTimetable = parent;
+         this.ManagementTimeTable(data, contextInfo, eventInfo, width, wrappingElement, detailLevel);
+         var managementActions = new IntervalTimeTableManagementActions(this, eventInfo, contextInfo, isSessionTimeTable);
+         this.IntervalTimeTableMixin(width, wrappingElement, isSessionTimeTable, managementActions);
+
+         this.setData = IntervalTimeTableMixin.prototype.setData;
 
      });
 

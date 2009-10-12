@@ -142,7 +142,7 @@ type("TimetableManagementActions", [], {
                 IndicoUtil.errorReport(error);
             }
             else {
-                self._updateEntry(result);
+                self.timetable._updateEntry(result);
             }
         });
     },
@@ -171,236 +171,12 @@ type("TimetableManagementActions", [], {
             }
         });
     },
-    /**
-     * This function enables/disables options in the timetable menu depending if
-     * we are creating a general timetable or the timetable for one session.
-     */
-    updateTTMenu: function() {
-        if (this.isSessionTimetable) {
-            if (this.session === null){
-                this.addMenuLink.dom.style.display = "none";
-                this.addIntervalLink.dom.style.display = "inline";
-                this.rescheduleLink.dom.style.display = "none";
-                this.separator.dom.style.display = "none";
-            }else {
-                this.addMenuLink.dom.style.display = "inline";
-                this.addIntervalLink.dom.style.display = "none";
-                this.rescheduleLink.dom.style.display = "none";
-                this.separator.dom.style.display = "inline";
-            }
-        }else {
-            this.addIntervalLink.dom.style.display = "none";
-        }
 
-    },
-    intervalTimetable: function(eventData) {
-        var self = this;
-
-        this.intervalMode = true;
-
-        var day = IndicoUtil.formatDate2(IndicoUtil.parseJsonDate(eventData.startDate));
-        var data = {};
-
-        // TODO: Get rid of this savedData thing and use topTimetable instead
-        this.savedData = this.timetable.getData();
-        this.session = eventData;
-
-        var goBackLink = Html.span({}, Html.a({className: 'fakeLink', style: {fontWeight: 'bold', margin: '0 15px'}}, 'Go back to timetable'), ' | ');
-        goBackLink.observeClick(function() {
-            self.timetable.setData(self.savedData);
-            self._hideInfoBox(message);
-            self.intervalMode = false;
-            self._hideWarnings();
-            self.menu.remove(goBackLink);
-            self.session = null;
-            self.updateTTMenu();
-            // Enable the tabs
-            timetable.enable();
-        });
-
-        // WatchValues, so that interval changes can be handled
-        this.slotStartTime = new WatchValue(eventData.startDate.time.substring(0,5));
-        this.slotEndTime = new WatchValue(eventData.endDate.time.substring(0,5));
-
-        var message = Html.div({}, Html.span({style: {fontStyle: 'italic', fontSize: '0.9em'}},
-            $T('You are viewing the contents of the interval:')),
-            Html.div({style: {fontWeight: 'bold', marginTop: '5px', fontSize: '1.3em'}},
-                     this._generateSlotTitle(eventData),
-                     Html.span({style: {fontWeight: 'normal'}},
-                               " (", $B(Html.span({}), this.slotStartTime), " - ", $B(Html.span({}), this.slotEndTime),")" )));
-
-        data[day] = eventData.entries;
-
-        self.timetable.setData(data, eventData, this.slotStartTime.get(), this.slotEndTime.get());
-        this._showInfoBox(message);
-        this.menu.insert(goBackLink);
-
-        this.updateTTMenu();
-        // Disables the tabs
-        timetable.disable();
+    switchToIntervalTimetable: function(intervalId) {
+        self.timetable.switchToInterval(intervalId);
     },
 
-    _generateSlotTitle: function(slotData) {
-        return slotData.title + (slotData.slotTitle ? ": " + slotData.slotTitle : '');
-    },
 
-    _processWarning: function(entry) {
-        /*
-         * entry - the warning 'entry', a list [src, msg, target, newValue]
-         * startTime - the original starting time for the timeblock
-         * endTime - the original ending time for the timeblock
-         * [slotTitle] - title, if the entry is a slot
-         */
-
-        var msg = entry[1];
-        var finalTime = entry[3];
-
-        var type = Util.parseId(entry[2])[0];
-
-        var slot = null;
-        var title = "";
-
-        var startTime = "";
-        var endTime = "";
-
-        if (type == "Session") {
-            return null;
-        } else if (type == 'Conference') {
-            conference = self.timetable.getById(entry[2]);
-            title = conference.title;
-            startTime = conference.startDate.time.slice(0,5);
-            endTime = conference.endDate.time.slice(0,5);
-        } else if (type == 'SessionSlot') {
-
-            // this 'if' clearly calls for inheritance
-            if (this.session) {
-                slot = getTimetableDataById(this.savedData, entry[2]);
-            } else {
-                slot = this.timetable.getById(entry[2]);
-            }
-
-            startTime = slot.startDate.time.slice(0,5);
-            endTime = slot.endDate.time.slice(0,5);
-            title = this._generateSlotTitle(slot);
-        }
-
-        if (msg == "OWNER_END_DATE_EXTENDED") {
-            // Make sure that something changed, otherwise the
-            // warning will be supressed
-            if (endTime != finalTime) {
-                // slice(1) to ignore first value
-                return concat(entry.slice(1),  [endTime, title]);
-            }
-        } else if (msg == "OWNER_START_DATE_EXTENDED") {
-            // Again, make sure that something changed
-
-            if (startTime != finalTime) {
-                // slice(1) to ignore first value
-                return concat(entry.slice(1), [startTime, title]);
-            }
-        } else {
-            return concat(entry.slice(1), [startTime, title]);
-        }
-
-        return null;
-    },
-
-    _createInfoArea: function() {
-
-        // this is a client-side hack that compensates some algorithm weaknesses
-
-        var closeButton = Html.div({
-            className: 'balloonPopupCloseButton',
-            style: {position: 'absolute',
-            top: '10px',
-            right: '10px',
-            padding: '0px'}
-        });
-
-        var self = this;
-
-        closeButton.observeClick(function() {
-            self._hideWarnings();
-        });
-
-        return Html.div("timetableManagementInfoArea",
-                        Html.div({}, $T("Your changes triggered the automatic modification of some settings:")),
-                        $B(Html.ul({}),
-                           this.processedWarnings,
-                           function(item) {
-
-                               var title = item[4];
-                               var atoms = Util.parseId(item[1]);
-
-                               var message = {
-                                   OWNER_START_DATE_EXTENDED: {
-                                       SessionSlot : $T('The <strong>starting time</strong> of the session interval <strong>')  + title + $T('</strong> was moved from '),
-                                       Session: $T('The <strong>starting time</strong> of the session interval <strong>')  + title  + $T('</strong> was moved from '),
-                                       Conference: $T('The <strong>starting time</strong> of the <strong>Conference</strong> was moved from ')
-                                   },
-                                   OWNER_END_DATE_EXTENDED: {
-                                       SessionSlot : $T('The <strong>ending time</strong> of the session interval <strong>') + title + $T('</strong> was moved from '),
-                                       Session: $T('The <strong>ending time</strong> of the session interval <strong>') + title + $T('</strong> was moved from '),
-                                       Conference: $T('The <strong>ending time</strong> of the <strong>Conference</strong> was moved from ')
-                                   },
-                                   ENTRIES_MOVED: {
-                                       SessionSlot: $T('The contents of the interval <strong>') + title + $T('</strong> were moved from ')
-                                   }
-                               }[item[0]][atoms[0]];
-
-                               var span = Html.span({style: {verticalAlign: 'middle', marginLeft: '5px'}});
-                               span.dom.innerHTML = message + ' <strong>' + item[3] +
-                                   '</strong>' + $T(' to ') + '<strong>' + item[2] + '</strong>' ;
-                               return Html.li({}, span);
-                           }),
-                       closeButton);
-    },
-
-    /*
-     * Returns the header where all options are placed for managing the timetable, such as add and reschedule
-     */
-    managementHeader: function(isSessionTimetable) {
-        var self = this;
-        this.isSessionTimetable = isSessionTimetable;
-
-        this.infoBox = Html.div({className: 'timetableInfoBox', style: {display:'none'}});
-
-
-        this.addMenuLink = Html.a({className: 'dropDownMenu fakeLink', style: {margin: '0 15px'}}, 'Add new');
-
-        this.addMenuLink.observeClick(function() {
-            if (!exists(self.addMenu) || !self.addMenu.isOpen()) {
-                self._openAddMenu(self.addMenuLink);
-            }
-        });
-
-
-        this.separator = Html.span({}, " | ");
-        // TODO: implement reschedule function
-        var href = Indico.Urls.Reschedule;
-        this.rescheduleLink = Html.a({style: {margin: '0 15px'}}, Html.span({style: {cursor: 'default', color: '#888'}}, 'Reschedule'));
-
-        var underConstr = function(event) {
-            IndicoUI.Widgets.Generic.tooltip(this, event,"This option will be available soon");
-        };
-        this.rescheduleLink.dom.onmouseover = underConstr;
-
-        // JUST FOR SessionTimetable
-        this.addIntervalLink = Html.span('fakeLink', 'Add new interval');
-        if (self.isSessionTimetable) {
-            this.addIntervalLink.observeClick(function() {
-                self.addSessionSlot(self.eventInfo.timetableSession);
-            });
-        }
-
-
-        this.warningArea = this._createInfoArea();
-        this.warningArea.dom.style.display = 'none';
-
-        this.menu = Html.div({style: {cssFloat: 'right', color: '#777'}}, this.addMenuLink, this.addIntervalLink, this.separator, this.rescheduleLink);
-        this.updateTTMenu();
-        return Html.div({}, this.warningArea, Html.div('clearfix', this.menu, this.infoBox));
-    },
     /*
      * Translate the date string with format yyyymmdd into a javascript
      * Date object.
@@ -425,7 +201,14 @@ type("TimetableManagementActions", [], {
 
     },
 
-    _openAddMenu: function(triggerElement) {
+    _openAddMenu: function(triggerElement, target) {
+
+        if (exists(this.addMenu) && this.addMenu.isOpen()) {
+            return;
+        }
+
+        this.session = target.entryType=="Session"?target:null;
+
         var self = this;
 
         var menuItems = {};
@@ -465,6 +248,7 @@ type("TimetableManagementActions", [], {
         var pos = triggerElement.getAbsolutePosition();
         this.addMenu.open(pos.x + triggerElement.dom.offsetWidth + 10, pos.y + triggerElement.dom.offsetHeight + 2);
     },
+
     _retrieveSessionColor: function(session){
         // building "strip" function to format the startDate from xxx-xx-xx to xxxxxxx
         var reg = new RegExp("-", "g");
@@ -533,7 +317,9 @@ type("TimetableManagementActions", [], {
             params.selectedDay,
             this.eventInfo.isConference,
             this.eventInfo.favoriteRooms,
-            function(result) { self._addEntries(result); });
+            function(result) {
+                self._addEntries(result);
+            });
 
         dialog.execute();
     },
@@ -654,13 +440,6 @@ type("TimetableManagementActions", [], {
         );
     },
 
-    _updateTimes: function(newStartTime, newEndTime) {
-        // clearly screams for inheritance
-        if (this.session) {
-            this.slotStartTime.set(newStartTime.slice(0,5));
-            this.slotEndTime.set(newEndTime.slice(0,5));
-        }
-    },
 
     moveEntryContrib: function(eventData){
         var moveEntryDiag = new MoveEntryDialog(
@@ -678,115 +457,11 @@ type("TimetableManagementActions", [], {
     },
 
 
-    /*
-     *
-     * Is called every time a timetable entry has been successfully
-     * added or updated. Updates and redraws the timetable.
-     * @param originalArgs this are the original args. If they are passed, we can remove the entry
-     * from the index before adding it again (just in case the date has changed).
-     *
-     */
-    _updateEntry: function(result, data, originalArgs) {
-
-        var self = this;
-        var setData = data ? false : true;
-        data = any(data, this.timetable.getData());
-
-        var slot = null;
-
-        // Check whether we're operating *inside or over* a slot or not
-        // (and fetch the slot info)
-        if (result.entry.entryType=="Session") {
-            slot = data[result.day][result.entry.id];
-        } else if (this.session) {
-            slot = this.session;
-        }
-
-        var oldStartTime, oldEndTime;
-
-        // in the affirmative case, fetch the time limits
-        if (slot) {
-            oldStartTime = slot.startDate.time.slice(0,5);
-            oldEndTime = slot.endDate.time.slice(0,5);
-        } else {
-            // otherwise, we'll want the conference dates instead
-            oldStartTime = this.eventInfo.startDate.time.slice(0,5);
-            oldEndTime = this.eventInfo.endDate.time.slice(0,5);
-        }
-
-
-        if (this.session !== null) {
-            this.savedData[result.day][this.session.id].entries[result.entry.id] = result.entry;
-            this._updateTimes(result.slotEntry.startDate.time,
-                             result.slotEntry.endDate.time);
-        }
-
-        /*
-         * if originalArgs is passed, we can check if there is a need for updating the index of entries.
-         */
-        if (exists(originalArgs)) {
-
-            if (originalArgs &&
-                (originalArgs.startDate.date != result.entry.startDate.date) ||
-                (originalArgs.startDate.time != result.entry.startDate.time) ||
-               (originalArgs.duration != result.entry.duration)) {
-
-                /*this.timetable.postDraw();*/
-                var prevDay = IndicoUtil.formatDate2(IndicoUtil.parseDateTime(originalArgs.startDate));
-                delete data[prevDay][result.id];
-            }
-        }
-
-        // AutoOp Warnings (before updates are done)
-        this._hideWarnings();
-        if (result.autoOps && result.autoOps.length > 0) {
-            each(result.autoOps,
-                 function(op) {
-                     var warning = self._processWarning(op);
-                     if (warning && self.processedWarnings.indexOf(warning) === null) {
-                         self.warningArea.dom.style.display = 'block';
-                         self.processedWarnings.append(warning);
-                     }
-                 });
-        }
-
-        // Here starts the update cycle
-
-        data[result.day][result.id] = result.entry;
-
-        if (exists(result.session)) {
-            this.eventInfo.sessions[result.session.id] = result.session;
-        }
-
-        // If this.session is not null then we are editing session content
-        // so the savedData needs to be updated as well
-        if (this.session && exists(result.slotEntry) && this.savedData) {
-
-            // Save the entries, otherwise they are lost
-            result.slotEntry.entries = this.session.entries;
-            this.savedData[result.day][result.slotEntry.id] = result.slotEntry;
-            this.session = result.slotEntry;
-        }
-
-        // Only set data if the data was not provided as a parameter
-        // If provided as parameter this is handled by the caller
-
-        if (setData) {
-            this.timetable.setData(data, this.session);
-        }
-    },
-
-    _hideWarnings: function() {
-        this.warningArea.dom.style.display = 'none';
-        this.warnings.clear();
-        this.processedWarnings.clear();
-    },
-
     /*Like _updateEntry but for relocation function*/
     //keep the same args as updateEntry in case we merge them, for instance "data" is not used at all
     _updateEntryMoveEntry: function(result, data, originalArgs){
         var self = this;
-        
+
         data = this.timetable.getData();
         var oldDay = IndicoUtil.formatDate2(IndicoUtil.parseDateTime(originalArgs.startDate));
         //delete previous entry
@@ -795,7 +470,7 @@ type("TimetableManagementActions", [], {
             //if we're in a session, we have to update savedData as well
             delete this.savedData[oldDay][this.session.id].entries[originalArgs.id];
         }
-         
+
         // AutoOp Warnings (before updates are done)
         this._hideWarnings();
         if (result.autoOps && result.autoOps.length > 0) {
@@ -834,35 +509,35 @@ type("TimetableManagementActions", [], {
     * Iterates through entries and adds all of them
     */
     _addEntries: function(entries) {
+
         var self = this;
 
-        var data = this.timetable.getData();
-
         each(entries, function(entry) {
-            self._updateEntry(entry, data);
+            self.timetable._updateEntry(entry);
         });
-
-        this.timetable.setData(data, this.session);
-    },
-    _showInfoBox: function(content) {
-        this._hideWarnings();
-        this.infoBox.dom.style.display = 'block';
-        this.infoBox.set(content);
-    },
-    _hideInfoBox: function() {
-        this.infoBox.dom.style.display = 'none';
     }
-    },
-    function(timetable, eventInfo) {
-        this.timetable = timetable;
-        this.eventInfo = eventInfo;
 
-        this.intervalMode = false;
-
-        this.warnings = new WatchList();
-        this.processedWarnings = new WatchList();
-
-        // Whenever in session content view this is set to the session
-        this.session = null;
+},
+     function(timetable, eventInfo, isSessionTimetable) {
+         this.timetable = timetable;
+         this.eventInfo = eventInfo;
+         this.isSessionTimetable = isSessionTimetable;
     }
 );
+
+
+type("TopLevelTimeTableManagementActions", ["TimetableManagementActions"],
+     {
+     },
+     function(timetable, eventInfo, contextInfo, isSessionTimetable) {
+         this.TimetableManagementActions(timetable, eventInfo, contextInfo, isSessionTimetable);
+         this.session = null;
+     });
+
+type("IntervalTimeTableManagementActions", ["TimetableManagementActions"],
+     {
+     },
+     function(timetable, eventInfo, intervalInfo, isSessionTimetable) {
+         this.TimetableManagementActions(timetable, eventInfo, intervalInfo, isSessionTimetable);
+         this.session = intervalInfo;
+     });

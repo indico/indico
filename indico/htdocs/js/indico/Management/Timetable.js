@@ -843,7 +843,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                                    IndicoUtil.errorReport(error);
                                }
                                else {
-                                   self.managementActions._updateEntry(result,null, self.originalArgs);
+                                   self.managementActions.timetable._updateEntry(result);
                                    self.close();
                                }
                            });
@@ -877,7 +877,12 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                });
              args.set("date", args.get('selectedDay'));
              this.dateArgs = args;
-             this.ChangeEditDialog(managementActions.methods[args.get('type')].add, this.info, $T("Add Break"), function(result) { managementActions._updateEntry(result);});
+             this.ChangeEditDialog(managementActions.methods[args.get('type')].add,
+                                   this.info,
+                                   $T("Add Break"),
+                                   function(result) {
+                                       managementActions.timetable._updateEntry(result);
+                                   });
 
          }
 

@@ -13,7 +13,7 @@
 <script type="text/javascript">
 var ttdata = <%= str(ttdata).replace('%','%%') %>;
 var eventInfo = <%= eventInfo %>;
-var timetable = new TimeTableManagement(ttdata, eventInfo, 900,$E('timetableDiv'), false);
+var timetable = new TopLevelManagementTimeTable(ttdata, eventInfo, 900,$E('timetableDiv'), false);
 
 IndicoUI.executeOnLoad(function(){
 

@@ -36,6 +36,7 @@ type("TimetableBlockBase", [],
              self.div.dom.style.cursor = 'default';
              var cursor = getMousePointerCoordinates(event);
              if (this.managementMode) {
+
                  this.popup = new TimetableBlockPopupManagement(this, self.eventData, self.div,
                      function() {
                          self.div.dom.style.cursor = 'pointer';
@@ -59,6 +60,7 @@ type("TimetableBlockBase", [],
             }
              this.popup.open(cursor.x, cursor.y);
          },
+
          closePopup: function() {
              var self = this;
 
@@ -69,6 +71,7 @@ type("TimetableBlockBase", [],
 
              this.popup.close();
          },
+
          createMaterialMenu: function(material, triggerElement, closeHandler) {
 
              var sections = {};
@@ -114,59 +117,7 @@ type("TimetableBlockBase", [],
 
              return button;
          }
-         /* ,
-         createManageMenu: function(triggerElement, closeHandler) {
-             var self = this;
 
-             var info = new WatchObject();
-             var sections = {'Edit': function() {alert('edit');}, 'Delete': function() {
-                 var info = new WatchObject;
-                 info.set('conference', self.eventData.conferenceId);
-                 info.set('break', self.eventData.id);
-                 info.set('target', self.eventData.id);
-                 indicoRequest("schedule.event.deleteBreak", info, function(result, error){
-                     if (error) {
-                         IndicoUtil.errorReport(error);
-                     }
-                     else {
-                         var data = timetable.getData();
-                         data[result.day][result.key] = result.entry;
-                         timetable.updateData(data);
-                     }
-                 });
-             }};
-
-             var menu = new PopupMenu(sections, [triggerElement], null, null, true, closeHandler);
-
-             return menu;
-         },
-         createManageButton: function() {
-             var self = this;
-
-             this.manageMenuOpen = false;
-
-             var button = Html.div('timetableBlockMaterial');
-             button.observeClick(function(e) {
-                 self.materialMenuOpen = true;
-
-                 self.closePopup();
-
-                 // use this style as long as the menu is open
-                 button.dom.className = "timetableBlockMaterial timetableBlockMaterialActive";
-
-                 var menu = self.createManageMenu(button, function () {
-                     // Restores the button style when menu is closed
-                     button.dom.className = "timetableBlockMaterial";
-                     self.manageMenuOpen = false;
-                     return true;
-                 });
-
-                 var pos = button.getAbsolutePosition();
-                 menu.open(pos.x + 20, pos.y + 18);
-             });
-
-             return button;
-         }*/
      },
      function(managementMode, managementActions){
          this.managementMode = managementMode;
@@ -474,50 +425,6 @@ type("TimetableBlockWholeDay", ["TimetableBlockBase"],
             this.margin = TimetableDefaults.blockMargin;
         }
    );
-
-/*
- * Not used any more
- */
-/*
-type("TimetableBlockContribDetails", ["TimetableBlock"],
-        {
-            _blockDescription: function(block, event) {
-                var self = this;
-
-                this.titleDiv = Html.div({className: 'timetableBlockTitle', style: {height: '10px', overflow: 'hidden'}}, this.eventData.title);
-
-                this.div = Html.div({style: { width: '100%', height: '100%'}}, this.titleDiv);
-
-                this.div.append(this._contributions());
-
-                return this.div;
-            },
-
-            _contributions: function(div) {
-                var contribs = Html.div('timetableBlockContribs');
-
-                var first = true;
-                each(this.eventData.entries, function (value, key) {
-                    var div = Html.div('timetableBlockContrib', value.title);
-                    if (first) {
-                        div.dom.style.borderTop = 'none';
-                        first = false;
-                    }
-                    contribs.append(div);
-                });
-
-                return contribs;
-            },
-
-            postDraw: function() {
-
-            }
-        },
-        function(eventData, blockData, compactMode, printableVersion, detailLevel){
-            this.TimetableBlock(eventData, blockData, compactMode, printableVersion, detailLevel);
-        }
-   );
-   */
 
 
 type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
@@ -833,37 +740,6 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"], {
 
         return Html.div('timetablePopupTimeDiv', timeDiv, timeEditDiv);
 
-        //var context = new WidgetEditableContext();
-
-        /*div.set([
-            WidgetEditable(
-                timeDiv,
-                function(target, source) {
-                    var info = $O(source.get().getAll());
-
-                    var startEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(
-                        this.eventData.startDate.time.substring(0,5),
-                        this.eventData.endDate.time.substring(0,5)
-                    );
-                    target.set(startEndTimeField.element);
-
-                    return {
-                        activate: function(){},
-                        save: function () {
-                            // force the observers to be called,
-                            // since objects look immutable to presentation,
-                            // as references are compared
-                            //source.set($O(info.getAll()));
-                        },
-                        stop: function () {
-                            //bind.detach(target);
-                        }
-                    };
-                }
-            )(jsonRpcValue(Indico.Urls.JsonRpcService, 'event.main.changeBooking', {conference: '41726'}), context),
-            IndicoUI.Aux.defaultEditMenu(context)]);
-            return div;
-            */
     },
     _getMenuBar: function() {
         var self = this;
@@ -886,7 +762,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"], {
             var menuItems = {};
 
             menuItems[$T('Interval timetable')] = function() {
-                self.managementActions.intervalTimetable(self.eventData);
+                self.managementActions.switchToIntervalTimetable(self.eventData.id);
                 self.close();
             };
             menuItems[$T('Interval properties')] = function() {
@@ -974,7 +850,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"], {
 
         var ttLink = Html.a({className: 'fakeLink'}, "View and edit current interval timetable");
         ttLink.observeClick(function() {
-            self.managementActions.intervalTimetable(self.eventData);
+            self.managementActions.switchToIntervalTimetable(self.eventData.id);
             self.close();
         });
         contributionsDiv.append(Html.div({style: {marginTop: '10px', fontWeight: 'bold'}}, ttLink));
@@ -1506,6 +1382,7 @@ type("TimetableDrawer", ["IWidget"],
          // if greater > 0 the timetable is loading
          this.loading = 0;
          this.loadingIndicator = loadingIndicator;
+
 
          this.managementMode = managementMode;
          this.managementActions = managementActions;
