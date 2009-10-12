@@ -929,15 +929,15 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"], {
         // Move Entry link, only available for contribs and breaks
         if (self.eventData.entryType != 'Session') {
             menu.insert(" | ");
-            
+
             moveEntryLink = Html.a('fakeLink', Html.span({}, $T("Move")));
             moveEntryLink.observeClick(function(){
                 self.close();
                 self.managementActions.moveEntryContrib(self.eventData);
             })
-            
+
             menu.insert(moveEntryLink);
-            
+
         }
 
         if (self.eventData.entryType == 'Session') {
