@@ -286,9 +286,9 @@ class MailTools(object):
         managersEmails = []
         managersEmails.append(conf.getCreator().getEmail())
         managersEmails.extend([u.getEmail() for u in conf.getManagerList()])
-        managersEmails.extend(csbm.getVideoServicesManagers())
+        managersEmails.extend([u.getEmail() for u in csbm.getVideoServicesManagers()])
         if pluginName:
-            managersEmails.extend(csbm.getPluginManagers(pluginName))
+            managersEmails.extend([u.getEmail() for u in csbm.getPluginManagers(pluginName)])
         return list(set(managersEmails))
     
     @classmethod
