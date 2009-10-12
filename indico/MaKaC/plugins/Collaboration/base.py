@@ -96,11 +96,14 @@ class CSBookingManager(Persistent, Observer):
     
     def getAllowedPlugins(self):
         """ Returns a list of allowed plugins (Plugin objects) for this event.
+            Only active plugins are returned.
             This can depend on the kind of event (meeting, lecture, conference), on the equipment of the room...
         """
         pluginsPerEventType = CollaborationTools.getCollaborationPluginType().getOption("pluginsPerEventType").getValue()
         if pluginsPerEventType is not None:
-            return pluginsPerEventType[self._conf.getType()]
+            allowedForThisEvent = pluginsPerEventType[self._conf.getType()]
+            return [plugin for plugin in allowedForThisEvent if plugin.isActive()]
+        
         
     def getBookingList(self, sorted = False, filterByType = None, notify = False, onlyPublic = False):
         """ Returns a list of all the bookings.

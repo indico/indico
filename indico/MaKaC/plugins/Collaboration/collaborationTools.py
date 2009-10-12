@@ -143,8 +143,7 @@ class CollaborationTools(object):
         csbm = conference.getCSBookingManager()
         tabNamesSet = set()
         allowedForThisEvent = csbm.getAllowedPlugins()
-        showableForThisEvent = [plugin for plugin in allowedForThisEvent if plugin.isActive()] 
-        for plugin in showableForThisEvent:
+        for plugin in allowedForThisEvent:
             if not user or user in plugin.getOption('admins').getValue() or csbm.isPluginManager(plugin.getName(), user):
                 tabNamesSet.add(cls.getPluginTab(plugin))
             

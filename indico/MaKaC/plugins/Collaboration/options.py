@@ -46,7 +46,7 @@ globalOptions = [
                   "defaultValue": ["Videoconferencing", "Recording Request", "Webcast Request"]
                   }),
     ("pluginsPerEventType", {"description": _("Plugins allowed for each event type"),
-                            "type": dict,
+                            "type": dict, #key: a string: conference, simple_event or meeting. Value: list of Plugin objects
                             "editable": False,
                             "visible": True} ),
     ("pluginsPerIndex", {"description": _("Information about each index seen by collaboration admins"),
