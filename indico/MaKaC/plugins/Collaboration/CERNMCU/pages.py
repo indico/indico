@@ -57,7 +57,7 @@ class WMain (WJSBase):
         # as an initial participant
         location = self._conf.getLocation()
         room = self._conf.getRoom()
-        if location and room and location.getName() and room.getName():
+        if location and room and location.getName() and room.getName() and location.getName().strip() and room.getName().strip():
             locationName = location.getName()
             roomName = room.getName()
             
