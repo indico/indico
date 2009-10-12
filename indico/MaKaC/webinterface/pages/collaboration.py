@@ -185,14 +185,6 @@ class WPConfModifCSBase (WPConferenceModifBase):
     
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
-        #if user is not conference manager or server admin, we hide all other main tabs
-        if not (self._conf.canModify(self._rh.getAW()) or RCAdmin.hasRights(self._rh)):
-            for sect in self._sideMenu.getSections():
-                for item in sect.getItems():
-                    if item != self._videoServicesMenuItem:
-                        item.setEnabled(False)
-                    else:
-                        item.setEnabled(True)
         
         isUsingHTTPS = CollaborationTools.isUsingHTTPS()
         for tabName in self._tabNames:

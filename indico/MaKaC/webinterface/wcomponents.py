@@ -2665,6 +2665,12 @@ class SideMenuSection:
     
     def setVisible(self, visible):
         self._visible = visible
+        
+    def hasVisibleItems(self):
+        for item in self._items:
+            if item.isVisible():
+                return True
+        return False
    
 class SideMenuItem:
     
