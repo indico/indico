@@ -56,7 +56,7 @@ class CollaborationIndex(Persistent):
         reverse = orderBy == "descending"
 
         try:
-            index = self._indexes[indexName]
+            index = self.getIndex(indexName)
             totalInIndex = index.getCount()
             
             if categoryId and not CategoryManager().hasKey(categoryId) or conferenceId and not ConferenceHolder().hasKey(conferenceId):
