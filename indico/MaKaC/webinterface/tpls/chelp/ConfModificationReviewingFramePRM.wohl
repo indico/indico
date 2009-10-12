@@ -8,20 +8,20 @@
         <tooltip name="revControlPRM" target="//*[@id='revControlPRMHelp']">
             <translation language="en">
                 <text>
-                        <p>Here you can add <strong>Paper Review Managers</strong></p>
-                        <p>Use the <strong>Add</strong> button to add a user as a Paper Review Manager</p>
-                        <p>Remove the user from his Paper Review Manager role by clicking on the <strong>red cross</strong> next to each user.</p>
+                        <p>Here you can add <strong>Managers of Paper Review Module</strong></p>
+                        <p>Use the <strong>Add</strong> button to add a user as a Manager of Paper Review Module</p>
+                        <p>Remove the user from the list by clicking on the <strong>red cross icon</strong> next to each user.</p>
                         <ul>
                             <li>
-                                A <strong>Paper Review Manager</strong> can choose <strong>Referees</strong>, <strong>Editors</strong>
-                                and <strong>Reviewers</strong> for the conference.
+                                A <strong>Managers of Paper Review Module</strong> can choose <strong>Referees</strong>, <strong>Layout Reviewers</strong>
+                                and <strong>Content Reviewers</strong> for the conference.
                             </li>
                             <li>
-                                He can also assign <strong>Referees</strong>, <strong>Editors</strong> and <strong>Reviewers</strong>
+                                He can also assign <strong>Referees</strong>, <strong>Layout Reviewer</strong> and <strong>Content Reviewers</strong>
                                 to contributions.
                             </li>
                             <li>
-                                Also, in the Paper Setup tab, he can change options for the reviewing process of this conference, such as:
+                                Also, in the Setup tab, he can change options for the reviewing process of this conference, such as:
                                 <ul>
                                     <li>
                                         Choosing the reviewing mode of the conference.
@@ -30,10 +30,10 @@
                                         Choose the types of materials that will be reviewed.
                                     </li>
                                     <li>
-                                        Add custom statuses and questions for paper reviewing, and custom criterias for paper editing.
+                                        Add custom statuses for paper reviewing, and questions for content reviewing, and custom criterias for layout reviewing.
                                     </li>
                                     <li>
-                                        Setting deadline for the Referees, Editors and Reviewers.
+                                        Setting deadline for the Referees, Layout Reviewers and Content Reviewers.
                                     </li>
                                     <li>
                                         Upload a layout template that will be available to authors of contributions.

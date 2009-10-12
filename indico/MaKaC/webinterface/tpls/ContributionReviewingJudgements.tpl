@@ -10,7 +10,7 @@
 <!-- Judgement of the editor -->
 <table width="90%%" align="center" border="0" style="margin-bottom: 1em; margin-top: 1em">
     <tr>
-        <td id="editingJudgementHelp" colspan="5" class="groupTitle"><%= _("Editing judgement")%></td>
+        <td id="editingJudgementHelp" colspan="5" class="groupTitle"><%= _("Layout judgement")%></td>
     </tr>
     <tr>
         <td>
@@ -19,7 +19,7 @@
                     <% includeTpl ('EditingJudgementDisplay', Editing = Editing, ShowEditor = True) %>
                 <% end %>
                 <% else: %>
-                    <font color="red"><%= _("Warning: the editor has not given his judgement yet.")%></span> 
+                    <font color="red"><%= _("Warning: the layout reviewer has not given his judgement yet.")%></span> 
                 <% end %>
             <% end %>
             <% else: %>
@@ -32,7 +32,7 @@
 <!-- List of advices from the reviewers -->
 <table width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
-        <td id="reviewingJudgementHelp" colspan="5" class="groupTitle" style="padding-top: 5px;"><%= _("Reviewing judgement")%></td>
+        <td id="reviewingJudgementHelp" colspan="5" class="groupTitle" style="padding-top: 5px;"><%= _("Content judgement")%></td>
     </tr>
     <tr>
         <td>
@@ -45,11 +45,11 @@
                     </table>
                 <% end %>
                 <% else: %>
-                    <font color="red"><%= _("Warning: all your reviewers have not given their advices yet.")%></span>
+                    <font color="red"><%= _("Warning: all your content reviewers have not given their advices yet.")%></span>
                 <% end %>
             <% end %>
             <% else: %>
-                <%= _("This conference does not enable content reviewing. The editor's judgement is the only judgement.")%>
+                <%= _("This conference does not enable content reviewing. The layout reviewer's judgement is the only judgement.")%>
             <% end %>
         </td>
     </tr>
@@ -65,7 +65,7 @@
     <% if not (ConferenceChoice == 2 or ConferenceChoice == 4): %>
     <tr>
         <td colspan="2" align="center">
-            <span style="color:red;"><%= _("This conference does not enable content reviewing. The editor's judgement is the only judgement.")%></span>
+            <span style="color:red;"><%= _("This conference does not enable content reviewing. The layout reviewer's judgement is the only judgement.")%></span>
         </td>
     </tr>
     <% end %>
@@ -85,14 +85,14 @@
                 <% if ConferenceChoice == 4 and not Editing.isSubmitted(): %>
                    <tr>
                        <td colspan="2" align="center">
-                           <font color="red"><%= _("Warning: the editor has not given his judgement yet.")%></span> 
+                           <font color="red"><%= _("Warning: the layout reviewer has not given his judgement yet.")%></span> 
                        </td>
                    </tr>
                 <% end %>
                 <% if (ConferenceChoice == 2 or ConferenceChoice == 4) and not Review.allReviewersHaveGivenAdvice(): %>
                    <tr>
                        <td colspan="2" align="center">
-                           <font color="red"><%= _("Warning: all your reviewers have not given their advices yet.")%></span>
+                           <font color="red"><%= _("Warning: all your content reviewers have not given their advices yet.")%></span>
                        </td>
                    </tr>
                 <% end %>

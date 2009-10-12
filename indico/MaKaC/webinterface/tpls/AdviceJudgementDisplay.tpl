@@ -11,7 +11,7 @@
                     </td>
                     <% if ShowReviewer: %>
                     <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                        <span class="titleCellFormat"><%= _("Reviewer")%></span>
+                        <span class="titleCellFormat"><%= _("Content Reviewer")%></span>
                     </td>
                     <% end %>
                     <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">

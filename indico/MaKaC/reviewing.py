@@ -918,13 +918,13 @@ class ConferenceReview(Persistent):
         """
         roles=[]
         if self.isPaperReviewManager(user):
-            roles.append('Paper Review Manager')
+            roles.append('Manager of Paper Review Module')
         if self.isReferee(user):
             roles.append('Referee')
         if self.isEditor(user):
-            roles.append('Editor')
+            roles.append('Layout Reviewer')
         if self.isReviewer(user):
-            roles.append('Reviewer')
+            roles.append('Content Reviewer')
         if self.isAbstractManager(user):
             roles.append('Abstracts Manager')
         if self.isAbstractReviewer(user):

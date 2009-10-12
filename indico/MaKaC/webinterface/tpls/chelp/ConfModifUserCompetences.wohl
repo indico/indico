@@ -9,9 +9,8 @@
             <translation language="en">
                 <text>
                         <p>Here you will be able to define competences for the members of the reviewing team.</p>
-                        <p>To add a competence, write it it in the text box of each user and press <strong>Add</strong></p>
-                        <p>If you want to remove a competence, press the red <important>[x]</important> symbol.</p>
-                        <p>When you are finished editing the competences of a given user, press <strong>Save</strong> to save the changes</p>
+                        <p>To add a competence, write it in the text box of each user and press <strong>Save</strong></p>
+                        <p>If you want to remove a competence, press the red <important>x</important> icon.</p>
                 </text>
             </translation>
         </tooltip>

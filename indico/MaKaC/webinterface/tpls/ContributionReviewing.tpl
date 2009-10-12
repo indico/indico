@@ -137,15 +137,15 @@
 <!-- Assign / remove Editors -->
 <table width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
-        <td id="assignEditorHelp" colspan="5" class="groupTitle"><%= _("Assign an Editor")%></td>
+        <td id="assignEditorHelp" colspan="5" class="groupTitle"><%= _("Assign a Layout Reviewer")%></td>
     </tr>
     <% if ConferenceChoice == 3 or ConferenceChoice == 4: %>
     <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Assigned editor")%></span></td>
+        <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Assigned layout reviewer")%></span></td>
         
         <% if not ContributionReviewManager.hasEditor(): %>
             <td width="60%%" class='bottom_line'>
-                <%= _("No editor assigned to this contribution.")%>
+                <%= _("No layout reviewer assigned to this contribution.")%>
             </td>
             <% end %>
             <% else: %>
@@ -162,7 +162,7 @@
     </tr>
     <tr>
         <td nowrap class="titleCellTD">
-            <span class="titleCellFormat"><%= _("Assign an editor to this contribution")%></span>
+            <span class="titleCellFormat"><%= _("Assign a layout reviewer to this contribution")%></span>
         </td>
         <form action="<%=assignEditingURL%>" method="post">
         <% showAssignButton = False %>
@@ -172,7 +172,7 @@
                     <%= _("No editors proposed for this conference.")%>
                 <% end %>
                 <% elif ContributionReviewManager.hasEditor(): %>
-                    <%= _("You can only add one editor for a given contribution.")%>
+                    <%= _("You can only add one layout reviewer for a given contribution.")%>
                 <% end %>
                 <% elif not ContributionReviewManager.hasReferee() and not ConferenceChoice == 3: %>
                     <%= _("Please choose a referee first.")%>
@@ -200,7 +200,7 @@
                 <% end %>
             <% end %>
             <% else: %>
-                <%= _("You are not allowed to assign editors to this contribution.")%>
+                <%= _("You are not allowed to assign layout reviewers to this contribution.")%>
             <% end %>
         </td>
         <% if showAssignButton: %>
@@ -244,11 +244,11 @@
 
 <table width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
-        <td id="assignReviewersHelp" colspan="5" class="groupTitle"><%= _("Assign Reviewers")%></td>
+        <td id="assignReviewersHelp" colspan="5" class="groupTitle"><%= _("Assign Content Reviewers")%></td>
     </tr>
     <% if ConferenceChoice == 2 or ConferenceChoice == 4: %>
         <tr>
-            <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Assigned reviewers")%></span></td>
+            <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Assigned content reviewers")%></span></td>
             
             <% if not ContributionReviewManager.hasReviewers(): %>
                 <td width="60%%" class='bottom_line'>
@@ -286,7 +286,7 @@
         </tr>
         <tr>
             <td nowrap class="titleCellTD">
-                <span class="titleCellFormat"><%= _("Assign reviewers to this contribution")%></span>
+                <span class="titleCellFormat"><%= _("Assign content reviewers to this contribution")%></span>
             </td>
             <form action="<%=assignReviewingURL%>" method="post">
             <% showAssignButton = False %>
@@ -324,7 +324,7 @@
                     <% end %>
                 <% end %>
                 <% else: %>
-                    <%= _("You are not allowed to assign reviewers to this contribution.")%>
+                    <%= _("You are not allowed to assign content reviewers to this contribution.")%>
                 <% end %>
             </td>
             <% if showAssignButton: %>

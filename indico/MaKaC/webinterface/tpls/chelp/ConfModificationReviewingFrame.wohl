@@ -8,7 +8,7 @@
         <tooltip name="revControlRefereeEditorReviewer" target="//*[@id='revControlRefereeEditorReviewerHelp']">
             <translation language="en">
                 <text>
-                        <p>Here you can add <strong>Referees</strong>, <strong>Editors</strong> and <strong>Reviewers</strong> for this conference.</p>
+                        <p>Here you can add <strong>Referees</strong>, <strong>Layout Reviewers</strong> and <strong>Content Reviewers</strong> for this conference.</p>
                         <p>Use the respective <strong>Add</strong> buttons to add a user to a reviewing role.</p>
                         <p>Remove the user from a role by clicking on the <strong>red cross</strong> next to each user.</p>
                         <ul>
@@ -17,23 +17,23 @@
                                 <ul>
                                     <li>There can only be 1 referee per contribution.</li>
                                     <li>A referee has the final word on the judgement of a contribution.</li>
-                                    <li>A referee can choose the editors and reviewers of a contributin he/she is responsible for.</li>
-                                    <li>He can use the advice / opinion of the editor and the reviewers in order to take his / her decision.</li>
+                                    <li>A referee can choose the layout and content reviewers of a contributin he/she is responsible for.</li>
+                                    <li>He can use the advice / opinion of the layout and the content reviewers in order to take his / her decision.</li>
                                 </ul>
                             </li>
                             <li>
-                                <p><strong>Editors</strong> give their opinion on the layout of a contribution.</p>
+                                <p><strong>Layout Reviewers</strong> give their opinion on the layout of a contribution.</p>
                                 <ul>
                                     <li>There can only be 1 referee per contribution.</li>
-                                    <li>The opinion of the editor will be available for the referee in order to help him with his/her decision.</li>
+                                    <li>The opinion of the layout reviewer will be available for the referee in order to help him with his/her decision.</li>
                                 </ul>
                             </li>
                             <li>
-                                <p><strong>Reviewers</strong> give their opinion on the layout of a contribution.</p>
+                                <p><strong>Content Reviewers</strong> give their opinion on the content of a contribution.</p>
                                 <ul>
                                     <li>They should be experts in the topic of the contribution.</li>
-                                    <li>There can be more than one reviewer for each contribution.</li>
-                                    <li>The opinion of the reviewers will be available for the referee in order to help him with his/her decision.</li>
+                                    <li>There can be more than one content reviewer for each contribution.</li>
+                                    <li>The opinion of the content reviewers will be available for the referee in order to help him with his/her decision.</li>
                                 </ul>
                             </li>
                         </ul>

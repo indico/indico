@@ -57,6 +57,20 @@ class RCReferee:
         """ Returns true if the user is a referee of the conference
         """
         return request._conf.getConfReview().isReferee(request.getAW().getUser())
+
+class RCEditor:
+    @staticmethod
+    def hasRights(request):
+        """ Returns true if the user is an editor of the conference
+        """
+        return request._conf.getConfReview().isEditor(request.getAW().getUser())
+    
+class RCReviewer:
+    @staticmethod
+    def hasRights(request):
+        """ Returns true if the user is a reviewer of the conference
+        """
+        return request._conf.getConfReview().isReviewer(request.getAW().getUser())
     
 class RHConfModifReviewingAccess(RHConferenceModifKey):
     """ Class used when the user clicks on the main 'Reviewing' tab
@@ -73,6 +87,8 @@ class RHConfModifReviewingAccess(RHConferenceModifKey):
         self._isAM = RCAbstractManager.hasRights(self)
         self._isReferee = RCReferee.hasRights(self)
         self._isReviewingStaff = RCReviewingStaff.hasRights(self)
+        self._isEditor = RCEditor.hasRights(self)
+        self._isReviewer = RCReviewer.hasRights(self)
 
     def _checkProtection(self):
         
@@ -93,6 +109,10 @@ class RHConfModifReviewingAccess(RHConferenceModifKey):
             url = urlHandlers.UHConfModifReviewingAbstractSetup.getURL( self._conf)
         elif self._isReferee:
             url = urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf )
+        elif self._isReviewer:
+            url = urlHandlers.UHConfModifListContribToJudgeAsReviewer.getURL( self._conf )            
+        elif self._isEditor:
+            url = urlHandlers.UHConfModifListContribToJudgeAsEditor.getURL( self._conf )
         elif self._isReviewingStaff:
             url= urlHandlers.UHConfModifListContribToJudge.getURL( self._conf )
             

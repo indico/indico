@@ -82,8 +82,8 @@
                     <% if not IsOnlyReferee: %>
                         <li><input type="checkbox" id="showWithReferee" checked/> <%= _("With Referee assigned")%></li>
                     <% end %>
-                    <li><input type="checkbox" id="showWithEditor" checked/> <%= _("With Editor assigned")%></li>
-                    <li><input type="checkbox" id="showWithReviewer" checked/> <%= _("With at least 1 Reviewer assigned")%></li>
+                    <li><input type="checkbox" id="showWithEditor" checked/> <%= _("With Layout Reviewer assigned")%></li>
+                    <li><input type="checkbox" id="showWithReviewer" checked/> <%= _("With at least 1 Content Reviewer assigned")%></li>
 
                 </ul>
             </td>
@@ -107,14 +107,14 @@
     </tr>
     <% end %>
     <tr>
-        <td><%= _("Editor")%>:</td>
+        <td><%= _("Layout Reviewer")%>:</td>
         <td id="assignEditorHelp">
             <input id="assignEditorButton_top" type="button" class="popUpButton" value="Assign">
             <input id="removeEditorButton_top" type="button" class="popUpButton" value="Remove">
         </td>
     </tr>
     <tr>
-        <td><%= _("Reviewers")%>:</td>
+        <td><%= _("Content Reviewers")%>:</td>
         <td id="assignReviewerHelp">
             <input id="addReviewerButton_top" type="button" class="popUpButton" value="Assign">
             <input id="removeReviewerButton_top" type="button" class="popUpButton" value="Remove">
@@ -224,10 +224,10 @@
                         <em><%= _("Referee")%>:</em> 
                     </li>
                     <li>
-                        <em><%= _("Editor")%>:</em> 
+                        <em><%= _("Layout Reviewer")%>:</em> 
                     </li>
                     <li>
-                        <em><%= _("Reviewers")%>:</em>
+                        <em><%= _("Content Reviewers")%>:</em>
                         <ul>
                         <% for reviewer in rm.getReviewersList() :%>
                             <li>a</li>
@@ -270,14 +270,14 @@
     </tr>
     <% end %>
     <tr>
-        <td><%= _("Editor")%>:</td>
+        <td><%= _("Layout Reviewer")%>:</td>
         <td id="assignEditorHelp">
             <input id="assignEditorButton_bottom" type="button" class="popUpButton" value="Assign">
             <input id="removeEditorButton_bottom" type="button" class="popUpButton" value="Remove">
         </td>
     </tr>
     <tr>
-        <td><%= _("Reviewers")%>:</td>
+        <td><%= _("Content Reviewers")%>:</td>
         <td id="assignReviewerHelp">
             <input id="addReviewerButton_bottom" type="button" class="popUpButton" value="Assign">
             <input id="removeReviewerButton_bottom" type="button" class="popUpButton" value="Remove">
@@ -474,15 +474,15 @@ var contributionTemplate = function(contribution) {
     ul.append(li1);
     
     var li2 = Html.li();
-    var span1 = Html.span({}, $T('Editor: '))
+    var span1 = Html.span({}, $T('Layout reviewer: '))
     var span2 = contribution.reviewManager.editor ?
                     Html.span({id: ("ceditor" + contribution.id), style:{"fontWeight":"bolder"}},  contribution.reviewManager.editor.name) :
-                    Html.span({id: ("ceditor" + contribution.id)},$T('No editor'));
+                    Html.span({id: ("ceditor" + contribution.id)},$T('No layout reviewer'));
     li2.set(Widget.block([span1,span2]));
     ul.append(li2);
     
     var li3 = Html.li();
-    var span = Html.span({id : ("creviewerstitle" + contribution.id)}, $T('Reviewers: '));
+    var span = Html.span({id : ("creviewerstitle" + contribution.id)}, $T('Content reviewers: '));
     li3.append(span);
     
     
@@ -495,7 +495,7 @@ var contributionTemplate = function(contribution) {
         }
         li3.append(ulReviewers);
     } else {
-        var span = Html.span({id: ("creviewer" + contribution.id)},$T('No reviewers' ));
+        var span = Html.span({id: ("creviewer" + contribution.id)},$T('No content reviewers' ));
         li3.append(span);
     }
     ul.append(li3);
@@ -981,10 +981,13 @@ var fetchUsers = function(order, role) {
                 
                 var title = '';
                 if (role == 'editor') {
-                    title = $T('Click on a user name to ') + order + $T(' an editor:');
+                    title = $T('Click on a user name to ') + order + $T(' an layout reviewer:');
+                } 
+                if (role == 'reviewer') {
+                    title = $T('Click on a user name to ') + order + ' a ' + $T('content reviewer:');
                 } else {
                     title = $T('Click on a user name to ') + order + ' a ' + role + ':';
-                }
+                } 
                 
                 var popup = new ExclusivePopup(title, function(){popup.close();});
                 

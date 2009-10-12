@@ -6,7 +6,7 @@
 <% if Editing.isSubmitted(): %>
 <table width="90%%" align="center" border="0">
     <tr>
-        <td colspan="5" class="groupTitle"><%= _("Editing judgement")%></td>
+        <td colspan="5" class="groupTitle"><%= _("Layout judgement")%></td>
     </tr>
 
     <tr>
@@ -21,7 +21,7 @@
 <% if Review.anyReviewerHasGivenAdvice(): %>
 <table width="90%%" align="center" border="0">
     <tr>
-        <td colspan="5" class="groupTitle"><%= _("Reviewing judgement")%></td>
+        <td colspan="5" class="groupTitle"><%= _("Content judgement")%></td>
     </tr>
     <tr>
         <td>

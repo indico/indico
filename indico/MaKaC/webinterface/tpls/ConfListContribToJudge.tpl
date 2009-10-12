@@ -53,4 +53,4 @@
 <br>
 <% end %>
 <% if not ConfReview.getJudgedContributions(User):%>
-<p style="padding-left: 25px;"><font color="gray"><%= _("There are no contributions aasigned to you to judge yet.")%></font></p>
+<p style="padding-left: 25px;"><font color="gray"><%= _("There are no contributions assigned to you to judge yet.")%></font></p>

@@ -10,7 +10,7 @@
                 <text>
                         <p>Here you can assign a Referee to this contribution</p>
                         <p>Below the list of this conference\'s Referees is shown.</p>
-                        <p>Only Managers and Paper Review Managers can assign Referees.</p>
+                        <p>Only Conference Managers and Managers of Paper Review Module can assign Referees.</p>
                         <p>There can only be 1 Referee per contributon.</p>
                         <p>You can also set the deadline for the judgement of the Referee. The Referee will see this date.</p>
                 </text>
@@ -20,11 +20,11 @@
         <tooltip name="assignEditor" target="//*[@id='assignEditorHelp']">
             <translation language="en">
                 <text>
-                        <p>Here you can assign an Editor to this contribution</p>
-                        <p>Below the list of this conference\'s Editors is shown.</p>
-                        <p>Managers, Paper Review Managers and Referees can assign Editors.</p>
-                        <p>There can only be 1 Editor per contributon.</p>
-                        <p>You can also set the deadline for the judgement of the Editor. The Editor will see this date.</p>
+                        <p>Here you can assign a Layout Reviewer to this contribution</p>
+                        <p>Below the list of this conference\'s Layout Reviewers is shown.</p>
+                        <p>Managers, Managers of Paper Review Module and Referees can assign Layout Reviewer.</p>
+                        <p>There can only be 1 Layout Reviewer per contributon.</p>
+                        <p>You can also set the deadline for the judgement of the Layout Reviewer. The Layout Reviewer will see this date.</p>
                 </text>
             </translation>
         </tooltip>
@@ -32,11 +32,11 @@
         <tooltip name="assignReviewers" target="//*[@id='assignReviewersHelp']">
             <translation language="en">
                 <text>
-                        <p>Here you can assign Reviewers to this contribution</p>
-                        <p>Below the list of this conference\'s Reviewers is shown.</p>
-                        <p>Managers, Paper Review Managers and Referees can assign Reviewers.</p>
-                        <p>There can be one or more Reviewers per contributon.</p>
-                        <p>You can also set the deadline for the judgement of the Reviewers. The Reviewers will see this date.</p>
+                        <p>Here you can assign Content Reviewers to this contribution</p>
+                        <p>Below the list of this conference\'s Content Reviewers is shown.</p>
+                        <p>Managers, Managers of Paper Review Module and Referees can assign Content Reviewers.</p>
+                        <p>There can be one or more Content Reviewers per contributon.</p>
+                        <p>You can also set the deadline for the judgement of the Content Reviewers. The Content Reviewers will see this date.</p>
                 </text>
             </translation>
         </tooltip>
@@ -44,8 +44,8 @@
         <tooltip name="editingJudgement" target="//*[@id='editingJudgementHelp']">
             <translation language="en">
                 <text>
-                        <p>Here is displayed the judgement given by the Editor</p>
-                        <p>Only the Editor of this contribution can change this.</p>
+                        <p>Here is displayed the judgement given by the Layout Reviewer</p>
+                        <p>Only the Layout Reviewer of this contribution can change this.</p>
                 </text>
             </translation>
         </tooltip>
@@ -53,8 +53,8 @@
         <tooltip name="reviewingJudgement" target="//*[@id='reviewingJudgementHelp']">
             <translation language="en">
                 <text>
-                        <p>Here is displayed the judgement given by the Reviewers</p>
-                        <p>Only the Reviewers of this contribution can change their respective judgements.</p>
+                        <p>Here is displayed the judgement given by the Content Reviewers</p>
+                        <p>Only the Content Reviewers of this contribution can change their respective judgements.</p>
                 </text>
             </translation>
         </tooltip>

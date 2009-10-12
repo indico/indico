@@ -2,7 +2,7 @@
 
 <table class="Revtab" width="90%%" cellspacing="0" align="center" border="0" style="padding-left:2px; padding-top: 20px;">
    <tr><td colspan=5 style="padding-bottom: 15px;">
-            <em><%= _("Please, define competences for every reviewing team member.")%></em>
+            <em><%= _("Please, define competences for every team member.")%></em>
    </td></tr> 
     <tr>
         <td nowrap class="groupTitle" colspan=5>
@@ -33,7 +33,7 @@
     <% end %>
     <% end %>
     <tr><td colspan=5 style="padding-top: 15px;">
-            <em><%= _("To assign contributions for reviewing, please click on 'Assign Contributions'")%></em>
+            <em><%= _("To assign contributions for paper reviewing, please click on 'Assign Contributions'")%></em>
    </td></tr>
 </table>
 

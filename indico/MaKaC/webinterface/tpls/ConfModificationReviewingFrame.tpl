@@ -1,7 +1,7 @@
 <table width="90%%" align="center" border="0">
     <tr>
         <td id="revControlRefereeEditorReviewerHelp" colspan="5" class="groupTitle">
-            <%= _("Step 2: Assign Referees, Editors and Reviewers")%>
+            <%= _("Step 2: Assign Reviewers")%>
         </td>
     </tr>
     <tr>
@@ -15,7 +15,7 @@
     </tr>
     <tr><td style="padding-top: 15px;"></td></tr>
     <tr><td colspan="5" style="padding-top: 15px; border-top: 1px solid #DDDDDD;">
-            <em><%= _("To set reviewing team competences, please click on 'Team competences'")%></em>
+            <em><%= _("To define paper reviewers competences, please click on 'Competences'")%></em>
         </td>
     </tr>
 </table>
