@@ -250,7 +250,7 @@ class MailTools(object):
             sendMailNotifications = CollaborationTools.getOptionValue(pluginName, 'sendMailNotifications')
             additionalEmails = CollaborationTools.getOptionValue(pluginName, 'additionalEmails')
         else:
-            admins = CollaborationTools.getCollaborationOptionValue('admins')
+            admins = CollaborationTools.getCollaborationOptionValue('collaborationAdmins')
             sendMailNotifications = CollaborationTools.getCollaborationOptionValue('sendMailNotifications')
             additionalEmails = CollaborationTools.getCollaborationOptionValue('additionalEmails')
         
@@ -269,7 +269,7 @@ class MailTools(object):
         else:
             adminEmails = CollaborationTools.getCollaborationOptionValue('additionalEmails')
             if CollaborationTools.getCollaborationOptionValue('sendMailNotifications'):
-                adminEmails.extend([u.getEmail() for u in CollaborationTools.getCollaborationOptionValue('admins')])
+                adminEmails.extend([u.getEmail() for u in CollaborationTools.getCollaborationOptionValue('collaborationAdmins')])
         return list(set(adminEmails))
     
     @classmethod
