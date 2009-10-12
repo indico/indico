@@ -3721,6 +3721,12 @@ class Conference(Persistent):
             if track.isCoordinator( av ):
                 self._v_isallowedtoaccess[av] = True
                 return True
+            
+        # video services managers are also allowed to access the conference
+        if PluginsHolder().hasPluginType("Collaboration"):
+            if self.getCSBookingManager().isPluginManagerOfAnyPlugin(av):
+                self._v_isallowedtoaccess[av] = True
+                return True
 
         self._v_isallowedtoaccess[av] = False
         return False
