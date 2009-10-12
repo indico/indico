@@ -12,14 +12,17 @@
 
 <% if IsSingleBooking: %>
 <div style="margin-bottom: 1em;">
-    <div id="sendRecordingRequestTop" class="sendRecordingRequestDiv" style="display:none;">
+    <div id="sendRecordingRequestTop" style="display:none;">
         <button onclick="send('RecordingRequest')">Send request</button>
+        <% inlineContextHelp(_('Send the Request to the Recording administrators.')) %>
     </div>
-    <div id="modifyRecordingRequestTop" class="modifyRecordingRequestDiv" style="display:none;">
+    <div id="modifyRecordingRequestTop" style="display:none;">
         <button onclick="send('RecordingRequest')">Modify request</button>
+        <% inlineContextHelp(_('Modify the Recording Request.')) %>
     </div>
-    <div id="withdrawRecordingRequestTop" class="withdrawRecordingRequestDiv" style="display:none;">
+    <div id="withdrawRecordingRequestTop" style="display:none;">
         <button onclick="withdraw('RecordingRequest')">Withdraw request</button>
+        <% inlineContextHelp(_('Withdraw the Recording Request.')) %>
     </div>
 </div>
 <% end %>
@@ -229,14 +232,17 @@
 
 <% if IsSingleBooking: %>
 <div style="margin-top: 1em;">
-    <div id="sendRecordingRequestBottom" class="sendRecordingRequestDiv" style="display:none;">
+    <div id="sendRecordingRequestBottom" style="display:none;">
         <button onclick="send('RecordingRequest')">Send request</button>
+        <% inlineContextHelp(_('Send the Request to the Recording administrators.')) %>
     </div>
-    <div id="modifyRecordingRequestBottom" class="modifyRecordingRequestDiv" style="display:none;">
+    <div id="modifyRecordingRequestBottom" style="display:none;">
         <button onclick="send('RecordingRequest')">Modify request</button>
+        <% inlineContextHelp(_('Modify the Recording Request.')) %>
     </div>
-    <div id="withdrawRecordingRequestBottom" class="withdrawRecordingRequestDiv" style="display:none;">
+    <div id="withdrawRecordingRequestBottom" style="display:none;">
         <button onclick="withdraw('RecordingRequest')">Withdraw request</button>
+        <% inlineContextHelp(_('Withdraw the Recording Request.')) %>
     </div>
 </div>
 <% end %>

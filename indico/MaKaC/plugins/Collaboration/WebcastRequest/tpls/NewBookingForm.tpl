@@ -67,14 +67,17 @@
 
     <% if IsSingleBooking: %>
     <div style="margin-bottom: 1em;">
-        <div id="sendWebcastRequestTop" class="sendWebcastRequestDiv" style="display:none;">
+        <div id="sendWebcastRequestTop" style="display:none;">
             <button onclick="send('WebcastRequest')"><%=_("Send request")%></button>
+            <% inlineContextHelp(_('Send the Request to the Webcast administrators.')) %>
         </div>
-        <div id="modifyWebcastRequestTop" class="modifyWebcastRequestDiv" style="display:none;">
+        <div id="modifyWebcastRequestTop" style="display:none;">
             <button onclick="send('WebcastRequest')"><%=_("Modify request")%></button>
+            <% inlineContextHelp(_('Modify the Webcast Request.')) %>
         </div>
-        <div id="withdrawWebcastRequestTop" class="withdrawWebcastRequestDiv" style="display:none;">
+        <div id="withdrawWebcastRequestTop" style="display:none;">
             <button onclick="withdraw('WebcastRequest')"><%=_("Withdraw request")%></button>
+            <% inlineContextHelp(_('Withdraw the Recording Request.')) %>
         </div>
     </div>
     <% end %>
@@ -219,7 +222,7 @@
         </div>
         <div class="WRFormSubsection">
             <span class="WRQuestion"><%=_("Please write here additional comments about talk selection:")%></span>
-            <div><input size="60" type="text" name="talkSelectionComments"><span id="talkSelectionCommentsTT"/></div>
+            <div><input size="60" type="text" name="talkSelectionComments"></div>
         </div>
     </div>
     
@@ -348,14 +351,17 @@
     
     <% if IsSingleBooking: %>
     <div style="margin-top: 1em;">
-        <div id="sendWebcastRequestBottom" class="sendWebcastRequestDiv" style="display:none;">
+        <div id="sendWebcastRequestBottom" style="display:none;">
             <button onclick="send('WebcastRequest')"><%=_("Send request")%></button>
+            <% inlineContextHelp(_('Send the Request to the Webcast administrators.')) %>
         </div>
-        <div id="modifyWebcastRequestBottom" class="modifyWebcastRequestDiv" style="display:none;">
+        <div id="modifyWebcastRequestBottom" style="display:none;">
             <button onclick="send('WebcastRequest')"><%=_("Modify request")%></button>
+            <% inlineContextHelp(_('Modify the Webcast Request.')) %>
         </div>
-        <div id="withdrawWebcastRequestBottom" class="withdrawWebcastRequestDiv" style="display:none;">
+        <div id="withdrawWebcastRequestBottom" style="display:none;">
             <button onclick="withdraw('WebcastRequest')"><%=_("Withdraw request")%></button>
+            <% inlineContextHelp(_('Withdraw the Webcast Request.')) %>
         </div>
     </div>
     <% end %>
