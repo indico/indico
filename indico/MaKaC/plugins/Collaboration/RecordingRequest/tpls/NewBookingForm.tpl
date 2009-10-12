@@ -1,6 +1,6 @@
 <% declareTemplate(newTemplateStyle=True) %>
 
-<% if not Conference.getLocation(): %>
+<% if not HasLocation: %>
 <div style="margin-bottom: 1em;">
     <span class="RRNoteTitle"><%=_("Warning:")%></span>
     <span class="RRNoteText">

@@ -32,6 +32,13 @@ class WNewBookingForm(WCSPageTemplateBase):
         
         vars["IsSingleBooking"] = not CollaborationTools.getCSBookingClass(self._pluginName)._allowMultiple
         vars["Conference"] = self._conf
+        
+        location = self._conf.getLocation()
+        if location and location.getName() and location.getName().strip():
+            vars["HasLocation"] = True
+        else:
+            vars["HasLocation"] = False
+        
         booking = self._conf.getCSBookingManager().getSingleBooking('RecordingRequest')
         
         initialChoose = booking is not None and booking._bookingParams['talks'] == 'choose'
