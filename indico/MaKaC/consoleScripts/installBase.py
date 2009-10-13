@@ -231,17 +231,18 @@ def _checkDirPermissions(dbInstalledBySetupPy=False, uid=None, gid=None):
                 accessgroup = int(gid)
                 prompt = False
             except KeyError:
-                print 'Invalid pair uid/gid (%s/%s)' % (uid, gid)
+                print 'uid/gid pair (%s/%s) provided through command line is false' % (uid, gid)
 
-        # Try to use indico.conf's
-        try:
-            pwd.getpwnam(cfg.getApacheUser())
-            grp.getgrnam(cfg.getApacheGroup())
-            accessuser = cfg.getApacheUser()
-            accessgroup = cfg.getApacheGroup()
-            prompt = False
-        except KeyError:
-            print "\nERROR: indico.conf's ApacheUser and ApacheGroup options are incorrect (%s/%s)." % (cfg.getApacheUser(), cfg.getApacheGroup())
+        else:
+            # Try to use indico.conf's
+            try:
+                pwd.getpwnam(cfg.getApacheUser())
+                grp.getgrnam(cfg.getApacheGroup())
+                accessuser = cfg.getApacheUser()
+                accessgroup = cfg.getApacheGroup()
+                prompt = False
+            except KeyError:
+                print "\nERROR: indico.conf's ApacheUser and ApacheGroup options are incorrect (%s/%s)." % (cfg.getApacheUser(), cfg.getApacheGroup())
 
         if prompt == True:
             valid_credentials = False
@@ -386,12 +387,14 @@ def indico_post_install(config_dir, makacconfig_base_dir, package_dir, uid=None,
         
     # Shall we create a DB?
     dbInstalledBySetupPy = False
-    if not _existingDb():
+    if _existingDb():
+        print 'Successfully found a database directory at %s' % LOCALDATABASEDIR
+    else:
         opt = None
         while opt not in ('Y', 'y', 'n', ''):
-            opt = raw_input('''\nWe cannot connect to the configured database at %s.
+            opt = raw_input('''\nWe cannot find the configured database at %s.
 
-Do you want to create a new database now [Y/n]? ''' % str(cfg.getDBConnectionParams()))
+Do you want to create a new database now [Y/n]? ''' % LOCALDATABASEDIR)
             if opt in ('Y', 'y', ''):
                 dbInstalledBySetupPy = True
                 dbpath_ok = False
