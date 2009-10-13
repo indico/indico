@@ -28,6 +28,7 @@ from MaKaC.plugins.Collaboration.RecordingRequest.common import RecordingRequest
     RecordingRequestError
 from MaKaC.common.logger import Logger
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
+from MaKaC.i18n import _
 
 class CSBooking(CSBookingBase):
     
@@ -70,7 +71,7 @@ class CSBooking(CSBookingBase):
         return False
 
     def _create(self):
-        self._statusMessage = "Request successfully sent"
+        self._statusMessage = _("Request successfully sent")
         self._statusClass = "statusMessageOther"
         
         if MailTools.needToSendEmails('RecordingRequest'):
@@ -86,7 +87,7 @@ class CSBooking(CSBookingBase):
         
 
     def _modify(self):
-        self._statusMessage = "Request successfully sent"
+        self._statusMessage = _("Request successfully sent")
         self._statusClass = "statusMessageOther"
         
         if MailTools.needToSendEmails('RecordingRequest'):
@@ -105,7 +106,7 @@ class CSBooking(CSBookingBase):
         pass
 
     def _accept(self):
-        self._statusMessage = "Request accepted"
+        self._statusMessage = _("Request accepted")
         self._statusClass = "statusMessageOK"
         
         try:
@@ -132,7 +133,7 @@ class CSBooking(CSBookingBase):
         
         
     def _reject(self):
-        self._statusMessage = "Request rejected by responsible"
+        self._statusMessage = _("Request rejected by responsible")
         self._statusClass = "statusMessageError"
         
         try:

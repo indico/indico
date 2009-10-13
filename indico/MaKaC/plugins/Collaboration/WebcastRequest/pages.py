@@ -46,7 +46,7 @@ class WNewBookingForm(WCSPageTemplateBase):
         nTalks = len(talks)
         nWebcastCapable = len(webcastAbleTalks)
         
-        vars["HasTalks"] = nTalks > 0
+        vars["HasWebcastCapableTalks"] = nWebcastCapable > 0
         vars["NTalks"] = nTalks
         
         #list of "locationName:roomName" strings

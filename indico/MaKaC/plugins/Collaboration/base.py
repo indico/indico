@@ -1004,7 +1004,7 @@ class CSBookingBase(Persistent):
         """
         self._acceptRejectStatus = None
     
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'rejectionReason')
+    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'acceptRejectStatus')
     def getAcceptRejectStatus(self):
         """ Returns the Accept/Reject status of the booking
             This attribute will be available in Javascript with the "acceptRejectStatus"

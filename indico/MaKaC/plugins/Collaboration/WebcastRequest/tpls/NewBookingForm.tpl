@@ -156,13 +156,13 @@
         <div id="contributionsDiv" class="WRFormSubsection" style="display: <%= displayText %>;">
             <span class="WRQuestion"><%=_("Please choose among the webcast-able contributions below:")%></span>
             
-            <% if not HasTalks: %>
+            <% if not HasWebcastCapableTalks: %>
             <div>
-                <span style="padding-left: 20px;"><%= _("This event has no talks.") %></span>
+                <span style="padding-left: 20px;"><%= _("This event has no talks, or none of the talks take place in a room capable of webcasting.") %></span>
             </div>
             <% end %>
             
-            <% if HasTalks: %>
+            <% if HasWebcastCapableTalks: %>
             <span class="fakeLink" style="margin-left: 20px;" onclick="WRSelectAllContributions()">Select all</span>
             <span class="horizontalSeparator">|</span>
             <span class="fakeLink" onclick="WRUnselectAllContributions()">Select none</span>
@@ -172,7 +172,7 @@
                 <table>
                     <tr id="contributionsRow">
                         <% if DisplayTalks: %>
-                            <% if HasTalks: %>
+                            <% if HasWebcastCapableTalks: %>
                                 <% for tl in TalkLists: %>
                                 <td class="WRContributionsColumn">
                                     <ul class="WROptionList">
@@ -207,7 +207,7 @@
                     </tr>
                 </table>
             </div>
-            <% if HasTalks: %>
+            <% if HasWebcastCapableTalks: %>
             <script type="text/javascript">
                 var WRSelectAllContributions = function() {
                     each($N('talkSelection'), function(checkbox) {
@@ -371,7 +371,7 @@
 
 <script type="text/javascript">
     var WRWebcastCapable = <%= jsBoolean(WebcastCapable) %>;
-    var WR_contributionsLoaded = <%= jsBoolean(DisplayTalks or not HasTalks) %>;
+    var WR_contributionsLoaded = <%= jsBoolean(DisplayTalks or not HasWebcastCapableTalks) %>;
 </script>
 
 <% if (not WebcastCapable and WebcastCapableRooms) or (NWebcastCapableContributions > 0 and NTalks > NWebcastCapableContributions): %>
