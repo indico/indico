@@ -26,6 +26,8 @@
             </span>
         </td>
     </tr>
+</table>
+<table>
     <tr>
         <td class="groupTitle" style="white-space: nowrap;padding-top: 1em;" colspan="2">
             <%= _("Current bookings")%>
