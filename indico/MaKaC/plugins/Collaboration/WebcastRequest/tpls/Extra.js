@@ -25,9 +25,9 @@ var WR_loadTalks = function () {
                 label.append(Html.span("WRSpeakers", speakers))
             }
             
-            if (exists(talk.location)) {
+            if (exists(talk.location) && trim(talk.location)) {
                 var locationText = ' (' + talk.location;
-                if (exists(talk.room)) {
+                if (exists(talk.room) && trim(talk.room)) {
                     locationText += ', ' + talk.room;
                 }
                 locationText += ')';

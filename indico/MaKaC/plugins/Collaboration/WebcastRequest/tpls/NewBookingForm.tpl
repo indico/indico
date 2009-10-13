@@ -186,10 +186,12 @@
                                                 <% if talk.getSpeakerList() : %>
                                                 <span class="WRSpeakers">, by <%= " and ".join([person.getFullName() for person in talk.getSpeakerList()]) %></span>
                                                 <% end %>
-                                                <% if talk.getLocation(): %>
-                                                    <% locationText = " (" + talk.getLocation().getName() %>
-                                                    <% if talk.getRoom(): %>
-                                                        <% locationText += ", " + talk.getRoom().getName() + ")" %> 
+                                                <% location = talk.getLocation() %>
+                                                <% room = talk.getRoom() %>
+                                                <% if location and location.getName() and location.getName().strip(): %>
+                                                    <% locationText = " (" + location.getName() %>
+                                                    <% if room and room.getName() and room.getName().strip(): %>
+                                                        <% locationText += ", " + room.getName() + ")" %> 
                                                     <% end %>
                                                     <span class="RRSpeakers"><%= locationText %></span>
                                                 <% end %>

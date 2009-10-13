@@ -191,10 +191,12 @@ Request details:<br />
             else:
                 speakers = ''
                 
-            if contribution.getLocation():
-                locationText = "Location: " + contribution.getLocation().getName()
-                if contribution.getRoom():
-                    locationText += ', Room: ' + contribution.getRoom().getName()
+            location = contribution.getLocation()
+            room = contribution.getRoom()
+            if location and location.getName() and location.getName().strip():
+                locationText = "Location: " + location.getName()
+                if room and room.getName() and room.getName().strip():
+                    locationText += ', Room: ' + room.getName()
                 else:
                     locationText += ', Room: not defined'
             else:
