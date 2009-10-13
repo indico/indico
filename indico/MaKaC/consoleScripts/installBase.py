@@ -378,10 +378,11 @@ def indico_post_install(config_dir, makacconfig_base_dir, package_dir, uid=None,
                             '%s/zodb.conf' % config_dir) if not os.path.exists(xx)]:
         shutil.copy('%s.sample' % f, f)
 
-    if not os.path.exists(indicoconfpath):
+    if not os.path.exists(indicoconfpath) and os.path.exists(PWD_INDICO_CONF):
         shutil.copy(PWD_INDICO_CONF, indicoconfpath)
 
-    upgrade_indico_conf(indicoconfpath, PWD_INDICO_CONF)
+    if os.path.exists(PWD_INDICO_CONF):
+        upgrade_indico_conf(indicoconfpath, PWD_INDICO_CONF)
         
     # Shall we create a DB?
     dbInstalledBySetupPy = False
