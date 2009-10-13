@@ -215,22 +215,22 @@ class CSBooking(CSBookingBase):
             
             if p.getType() == 'person':
                 if not p.getFamilyName():
-                    raise CERNMCUException("Participant (person) does not have family name.")
+                    raise CERNMCUException(_("Participant (person) does not have family name."))
                 if not p.getFirstName():
-                    raise CERNMCUException("Participant (person) does not have first name.")
+                    raise CERNMCUException(_("Participant (person) does not have first name."))
             elif p.getType() == 'room':
                 if not p.getName():
-                    raise CERNMCUException("Participant (room) does not have name.")
+                    raise CERNMCUException(_("Participant (room) does not have name."))
                 
             name = p.getParticipantName()
             if name in pSet:
-                raise CERNMCUException("At least two of the participants will have the same name in the MCU. Please change their name, affiliation, ip, etc.")
+                raise CERNMCUException(_("At least two of the participants will have the same name in the MCU. Please change their name, affiliation, ip, etc."))
             else:
                 pSet.add(name)
                 
             ip = p.getIp()
             if ip in ipSet:
-                raise CERNMCUException("At least two of the participants have the same IP. Please change this")
+                raise CERNMCUException(_("At least two of the participants have the same IP. Please change this"))
             else:
                 ipSet.add(ip)
                 
@@ -263,7 +263,7 @@ class CSBooking(CSBookingBase):
                 if not result is True:
                     return result
             
-            self._statusMessage = "Booking created"
+            self._statusMessage = _("Booking created")
             self._statusClass = "statusMessageOK"
             self._bookingParams["id"] = id
             self._oldName = self._bookingParams["name"]
@@ -362,7 +362,7 @@ class CSBooking(CSBookingBase):
                     answer = unicodeToUtf8(mcu.participant.connect(params))
                     Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.connect. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
                 
-                self._statusMessage = "Conference started!"
+                self._statusMessage = _("Conference started!")
                 self._canBeStarted = False
                 self._canBeStopped = True
                 self._hasBeenStarted = True
@@ -374,7 +374,7 @@ class CSBooking(CSBookingBase):
             except socket.error, e:
                 handleSocketError(e)
         else:
-            raise CERNMCUException("Conference cannot start yet!")
+            raise CERNMCUException(_("Conference cannot start yet!"))
         
     def _stop(self):
         self._checkStatus()
@@ -394,7 +394,7 @@ class CSBooking(CSBookingBase):
                         if fault:
                             return fault
                 
-                self._statusMessage = "Conference stopped"
+                self._statusMessage = _("Conference stopped")
                 self._statusClass = "statusMessageOther"
                 self._canBeStarted = True
                 self._canBeStopped = False
@@ -407,7 +407,7 @@ class CSBooking(CSBookingBase):
             except socket.error, e:
                 handleSocketError(e)
         else:
-            raise CERNMCUException("Conference cannot be stopped")
+            raise CERNMCUException(_("Conference cannot be stopped"))
           
     def _notifyOnView(self):
         self.checkCanStart()
@@ -532,12 +532,12 @@ class CSBooking(CSBookingBase):
                 self._canBeStopped = False
                 
                 if changeMessage:
-                    self._statusMessage = "Ready to start!"
+                    self._statusMessage = _("Ready to start!")
                     self._statusClass = "statusMessageOK"
             else:
                 self._canBeStarted = False
                 if now > self.getEndDate() and changeMessage:
-                    self._statusMessage = "Already took place"
+                    self._statusMessage = _("Already took place")
                     self._statusClass = "statusMessageOther"
                     self._needsToBeNotifiedOfDateChanges = False
                     self._canBeNotifiedOfEventDateChanges = False
