@@ -410,8 +410,9 @@ Do you want to create a new database now [Y/n]? ''' % str(cfg.getDBConnectionPar
 
     #we delete an existing vars.js.tpl.tmp
     tmp_dir = cfg.getUploadedFilesTempDir()
-    varsJsTplTmpPath = os.path.join(tmp_dir, 'vars.js.tmp.tpl')
+    varsJsTplTmpPath = os.path.join(tmp_dir, 'vars.js.tpl.tmp')
     if os.path.exists(varsJsTplTmpPath):
+        print 'Old vars.js.tpl.tmp found at: %s. Removing' % varsJsTplTmpPath
         os.remove(varsJsTplTmpPath)
     
 
