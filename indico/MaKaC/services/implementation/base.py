@@ -29,7 +29,7 @@ from datetime import datetime, date
 from MaKaC import conference
 from MaKaC.common.timezoneUtils import setAdjustedDate
 from MaKaC.common import security
-from MaKaC.errors import MaKaCError, htmlScriptError, htmlForbiddenTag, AdminError
+from MaKaC.errors import MaKaCError, htmlScriptError, htmlForbiddenTag
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, HTMLSecurityError, Warning,\
     ResultWithWarning
 
@@ -37,6 +37,8 @@ from MaKaC.webinterface.rh.base import RequestHandlerBase
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 
 from MaKaC.accessControl import AccessWrapper
+
+from MaKaC.i18n import _
 
 
 """
@@ -338,7 +340,7 @@ class AdminService(ProtectedService):
         ProtectedService._checkProtection(self)
 
         if not self._getUser().isAdmin():
-            raise AdminError()
+            raise ServiceAccessError("ERR-P7", _("Only administrators can perform this operation"))
 
 class TextModificationBase( object ):
     """
