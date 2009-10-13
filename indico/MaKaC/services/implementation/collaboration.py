@@ -21,7 +21,7 @@
 
 from datetime import timedelta
 from MaKaC.services.implementation.base import ParameterManager,\
-    ProtectedService
+    ProtectedService, AdminService
 from MaKaC.services.implementation.conference import ConferenceModifBase
 from MaKaC.common.PickleJar import DictPickler
 from MaKaC.plugins.Collaboration.base import CollaborationException, CollaborationServiceException
@@ -90,13 +90,13 @@ class CollaborationAdminBookingModifBase(CollaborationBookingModifBase):
         if not RCCollaborationAdmin.hasRights(self) and not RCCollaborationPluginAdmin.hasRights(self, None, [self._bookingPlugin]):
             raise CollaborationException(_("You don't have the rights to perform this operation on this booking"))
 
-class AdminCollaborationBase(ProtectedService):
+class AdminCollaborationBase(AdminService):
     
     def _checkProtection(self):
         if not PluginsHolder().hasPluginType("Collaboration"):
             raise PluginError(_("Collaboration plugin system is not active"))
         if not RCCollaborationAdmin.hasRights(self, None):
-            raise CollaborationException(_("You don't have the rights to perform this operation"))
+            AdminService._checkProtection(self)
 
 ##! End of base classes
 
@@ -240,55 +240,57 @@ class CollaborationBookingIndexQuery(AdminCollaborationBase):
     """
     def _checkParams(self):
         AdminCollaborationBase._checkParams(self)
-        self._tz = self.getAW().getUser().getTimezone()
-        
-        try:
-            self._page = self._params.get("page", None)
-            self._resultsPerPage = self._params.get("resultsPerPage", None)
-            self._indexName = self._params['indexName']
-            self._viewBy = self._params['viewBy']
-            self._orderBy = self._params['orderBy']
+        user = self.getAW().getUser()
+        if user: #someone is logged in. if not, AdminCollaborationBase's _checkProtection will take care of it
+            self._tz = user.getTimezone()
             
-            minKey = None
-            maxKey = None
-            if self._params['sinceDate']:
-                minKey = setAdjustedDate(parseDateTime(self._params['sinceDate'].strip()), tz = self._tz)
-            if self._params['toDate']:
-                maxKey = setAdjustedDate(parseDateTime(self._params['toDate'].strip()), tz = self._tz)
-            if self._params['fromTitle']:
-                minKey = self._params['fromTitle'].strip()
-            if self._params['toTitle']:
-                maxKey = self._params['toTitle'].strip()
-            if self._params['fromDays']:
-                try:
-                    fromDays = int(self._params['fromDays'])
-                except ValueError, e:
-                    raise CollaborationException(_("Parameter 'fromDays' is not an integer"), inner = e)
-                minKey = nowutc() - timedelta(days = fromDays)
-            if self._params['toDays']:
-                try:
-                    toDays = int(self._params['toDays'])
-                except ValueError, e:
-                    raise CollaborationException(_("Parameter 'toDays' is not an integer"), inner = e)
-                maxKey = nowutc() + timedelta(days = toDays)
+            try:
+                self._page = self._params.get("page", None)
+                self._resultsPerPage = self._params.get("resultsPerPage", None)
+                self._indexName = self._params['indexName']
+                self._viewBy = self._params['viewBy']
+                self._orderBy = self._params['orderBy']
                 
-            self._minKey = minKey
-            self._maxKey = maxKey
-                
-            self._onlyPending = self._params['onlyPending']
-            categoryId = self._params['categoryId'].strip()
-            if categoryId:
-                self._categoryId = categoryId
-            else:
-                self._categoryId = None
-            conferenceId = self._params['conferenceId'].strip()
-            if conferenceId:
-                self._conferenceId = conferenceId
-            else:
-                self._conferenceId = None
-                
-        except KeyError, e:
-            raise CollaborationException(_("One of the necessary parameters to query the booking index is missing"), inner = e)
+                minKey = None
+                maxKey = None
+                if self._params['sinceDate']:
+                    minKey = setAdjustedDate(parseDateTime(self._params['sinceDate'].strip()), tz = self._tz)
+                if self._params['toDate']:
+                    maxKey = setAdjustedDate(parseDateTime(self._params['toDate'].strip()), tz = self._tz)
+                if self._params['fromTitle']:
+                    minKey = self._params['fromTitle'].strip()
+                if self._params['toTitle']:
+                    maxKey = self._params['toTitle'].strip()
+                if self._params['fromDays']:
+                    try:
+                        fromDays = int(self._params['fromDays'])
+                    except ValueError, e:
+                        raise CollaborationException(_("Parameter 'fromDays' is not an integer"), inner = e)
+                    minKey = nowutc() - timedelta(days = fromDays)
+                if self._params['toDays']:
+                    try:
+                        toDays = int(self._params['toDays'])
+                    except ValueError, e:
+                        raise CollaborationException(_("Parameter 'toDays' is not an integer"), inner = e)
+                    maxKey = nowutc() + timedelta(days = toDays)
+                    
+                self._minKey = minKey
+                self._maxKey = maxKey
+                    
+                self._onlyPending = self._params['onlyPending']
+                categoryId = self._params['categoryId'].strip()
+                if categoryId:
+                    self._categoryId = categoryId
+                else:
+                    self._categoryId = None
+                conferenceId = self._params['conferenceId'].strip()
+                if conferenceId:
+                    self._conferenceId = conferenceId
+                else:
+                    self._conferenceId = None
+                    
+            except KeyError, e:
+                raise CollaborationException(_("One of the necessary parameters to query the booking index is missing"), inner = e)
         
     def _getAnswer(self):
         ci = IndexesHolder().getById('collaboration')
