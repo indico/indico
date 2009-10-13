@@ -75,8 +75,11 @@ class CausedError(Exception):
     def getType(self):
         return self.type
 
-    def __str__(self):       
-        return "%s : %s \r\n %s" % (self.code, self.message, str(self.inner))
+    def __str__(self):
+        if type(self.inner) is list:
+            return "%s : %s \r\n %s" % (self.code, self.message, "\r\n".join(self.inner))
+        else:
+            return "%s : %s \r\n %s" % (self.code, self.message, str(self.inner))
     
 class NoReportError(CausedError):
     
