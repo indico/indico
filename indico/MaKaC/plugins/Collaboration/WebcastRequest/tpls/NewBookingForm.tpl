@@ -102,7 +102,7 @@
                         <label for="allTalksRB" id="allTalksRBLabel"><%=_("All webcast-able talks.")%></label>
                     </td>
                 </tr>
-                <% if WebcastCapable: %>
+                            <% if WebcastCapable: %>
                 <tr>
                     <td></td>
                     <td>
@@ -132,10 +132,10 @@
                                 </span>
                             </div>
                         </div>
-                        <% end %>
+                            <% end %>
                     </td>
                 </tr>
-                <% end %>
+                        <% end %>
                 <tr>
                     <td>
                         <input type="radio" name="talks" value="choose" id="chooseTalksRB" onclick="WR_loadTalks()" />
@@ -374,7 +374,7 @@
     var WR_contributionsLoaded = <%= jsBoolean(DisplayTalks or not HasWebcastCapableTalks) %>;
 </script>
 
-<% if (not WebcastCapable and WebcastCapableRooms) or (NWebcastCapableContributions > 0 and NTalks > NWebcastCapableContributions): %>
+<% if (not WebcastCapable and WebcastCapableRooms) or (NTalks > NWebcastCapableContributions and WebcastCapable): %>
 <script type="text/javascript">
     var webcastSwitch = false;
     var toggleWebcastCapableRooms = function () {
