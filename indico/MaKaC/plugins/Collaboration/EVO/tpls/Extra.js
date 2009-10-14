@@ -1,17 +1,39 @@
+/**
+ * Mouseover help popup for EVOLaunchClientPopup
+ */
+
+var EVOLaunchClientHelpPopup = function(event) {
+    IndicoUI.Widgets.Generic.tooltip(this, event,
+        '<div style="padding:3px">' +
+            $T('If you are using Internet Explorer, Indico cannot load the EVO client directly;') + '<br \/>' +
+            $T('you need to click on the link.') + '<br \/>' +
+            $T('You can avoid this by using another browser. Sorry for the inconvenience.') +
+        '<\/div>');
+};
+
 type("EVOLaunchClientPopup", ["ExclusivePopup"],
     {
         draw: function() {
             var self = this;
     
-            var clientLink = Html.a({href: this.bookingUrl}, $T("Click here to launch the EVO client"))
+            var linkClicked = function(){
+                self.close();return true;
+            }
             
-            var cancelButton = Html.button({}, $T("Cancel"));
+            var clientLink = Html.a({href: this.bookingUrl, onclick : linkClicked, style:{display: 'block'}},
+                    $T("Click here to launch the EVO client"));
+            
+            var infoLink = Html.span({className: 'fakeLink', style: {display: 'block', fontSize: 'smaller', paddingTop: pixels(10)}},
+                $T('(Why am I getting this popup?)'));
+            infoLink.dom.onmouseover = EVOLaunchClientHelpPopup
+            
+            var cancelButton = Html.button({style: {marginTop: pixels(10)}}, $T("Cancel"));
             cancelButton.observeClick(function(){
                 self.close();
             });
             
             return this.ExclusivePopup.prototype.draw.call(this,
-                    Html.div({textAlign: 'center'}, clientLink, cancelButton)
+                    Html.div({style:{textAlign: 'center'}}, clientLink, infoLink, cancelButton)
                     );
         }
     },
@@ -19,7 +41,7 @@ type("EVOLaunchClientPopup", ["ExclusivePopup"],
         this.bookingUrl = bookingUrl;
         this.ExclusivePopup($T('Launch EVO client'), positive);
     }                                                           
-}
+);
 
 /**
  * Mouseover help popup for the 'Start date' field
