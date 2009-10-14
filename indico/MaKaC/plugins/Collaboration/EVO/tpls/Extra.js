@@ -1,3 +1,26 @@
+type("EVOLaunchClientPopup", ["ExclusivePopup"],
+    {
+        draw: function() {
+            var self = this;
+    
+            var clientLink = Html.a({href: this.bookingUrl}, $T("Click here to launch the EVO client"))
+            
+            var cancelButton = Html.button({}, $T("Cancel"));
+            cancelButton.observeClick(function(){
+                self.close();
+            });
+            
+            return this.ExclusivePopup.prototype.draw.call(this,
+                    Html.div({textAlign: 'center'}, clientLink, cancelButton)
+                    );
+        }
+    },
+    function(bookingUrl) {
+        this.bookingUrl = bookingUrl;
+        this.ExclusivePopup($T('Launch EVO client'), positive);
+    }                                                           
+}
+
 /**
  * Mouseover help popup for the 'Start date' field
  */

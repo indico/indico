@@ -1,7 +1,8 @@
 {
     start : function(booking, iframeElement) {
         if (Browser.IE) {
-            window.location.href = booking.url;
+            var popup = EVOLaunchClientPopup(booking.url);
+            popup.open();
         } else {
             iframeElement.location.href = booking.url;
         }
