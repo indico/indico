@@ -421,6 +421,7 @@ class CSBooking(CSBookingBase):
         if self._created:
             now = nowutc()
             self._canBeDeleted = True
+            self._canBeNotifiedOfEventDateChanges = CSBooking._canBeNotifiedOfEventDateChanges
             if self.getStartDate() < now and self.getEndDate() > now:
                 self._canBeStarted = True
                 self._canBeDeleted = False

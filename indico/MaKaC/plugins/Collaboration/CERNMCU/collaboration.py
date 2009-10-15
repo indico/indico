@@ -527,10 +527,10 @@ class CSBooking(CSBookingBase):
     def checkCanStart(self, changeMessage = True):
         if self._created:
             now = nowutc()
+            self._canBeNotifiedOfEventDateChanges = CSBooking._canBeNotifiedOfEventDateChanges
             if self.getStartDate() < now and self.getEndDate() > now and not self._hasBeenStarted:
                 self._canBeStarted = True
                 self._canBeStopped = False
-                
                 if changeMessage:
                     self._statusMessage = _("Ready to start!")
                     self._statusClass = "statusMessageOK"
