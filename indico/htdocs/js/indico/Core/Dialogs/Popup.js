@@ -374,13 +374,12 @@ type("WarningPopup", ["AlertPopup"],
                 return Html.span('', self._formatLine(content));
                 
             } else if (isArray(content)) {
-                var result = Html.ul(level == 0 ? 'warningLevel0' : 'warningLevel1');
-                result.setStyle('paddingLeft', pixels(level * 20));
+                var result = Html.ul(level === 0 ? 'warningLevel0' : 'warningLevel1');
                 each (content, function(line){
                     if (isString(line)) {
                         result.append(Html.li('', self._formatLine(line)));
                     } else if (isArray(content)) {
-                        result.append(self._formatContent(line));
+                        result.append(self._formatContent(line, level + 1));
                     }
                 });
                 return result;
