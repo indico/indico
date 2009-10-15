@@ -70,7 +70,7 @@
     (<%= Booking._getPluginDisplayName() %>)
     
     <% launchInfo = Booking._getLaunchDisplayInfo() %>
-    <% if launchInfo: %>
+    <% if Kind == 'ongoing' and launchInfo: %>
         <a href="<%= launchInfo['launchLink'] %>" id="bookingLink<%=id%>">
             <%= launchInfo['launchText'] %>
         </a>
