@@ -559,7 +559,7 @@ class CSBookingManager(Persistent, Observer):
                         try:
                             modifyResult = booking._modify()
                             if isinstance(modifyResult, CSErrorBase):
-                                Logger.get('VideoServ').error("Error while changing a booking's dates after event dates changed: " + modifyResult.getLogMessage())
+                                Logger.get('VideoServ').warning("Error while changing a booking's dates after event dates changed: " + modifyResult.getLogMessage())
                                 rollback = True
                         except Exception, e:
                             Logger.get('VideoServ').error("Exception while changing a booking's dates after event dates changed: " + str(e))
@@ -613,9 +613,10 @@ class CSBookingManager(Persistent, Observer):
         """
         for booking in self.getBookingList():
             try:
-                removeResult = self.removeBooking(booking.getId())
+                removeResult = booking._delete()
                 if isinstance(removeResult, CSErrorBase):
-                    Logger.get('VideoServ').error("Error while deleting a booking of type %s after deleting an event: %s"%(booking.getType(), removeResult.getMessage() ))
+                    Logger.get('VideoServ').warning("Error while deleting a booking of type %s after deleting an event: %s"%(booking.getType(), removeResult.getLogMessage() ))
+                self._unindexBooking(booking)
             except Exception, e:
                 Logger.get('VideoServ').error("Exception while deleting a booking of type %s after deleting an event: %s"%(booking.getType(), str(e) ))            
         
