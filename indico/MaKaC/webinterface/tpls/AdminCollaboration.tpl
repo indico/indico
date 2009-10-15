@@ -568,6 +568,9 @@ IndicoUI.executeOnLoad(function(){
     <% if InitialOrderBy: %>
         orderByObs('<%= InitialOrderBy %>', true);
     <% end %>
+    <% if InitialIndex: %>
+        indexSelectedObs('<%= InitialIndex %>', true);
+    <% end %>
     updateStaticURL();
     
     $E('pageNumberList').set(pf.draw());
