@@ -314,7 +314,7 @@
             ip = participant.get("ip");
             if (participant.get("ip") in ips) {
                 errors = true;
-                CSErrorPopup("Invalid participants", ["There is more than 1 participant with the ip " + participant.get("ip")]);
+                CSErrorPopup("Invalid participants", ["There is more than one participant with the ip " + participant.get("ip")]);
                 break;
             } else if (!IndicoUtil.isIpAddress(ip)) {
                 CSErrorPopup("Invalid participants", ["The participant " + (i + 1) + " does not have a correct IP"]);
