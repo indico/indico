@@ -25,7 +25,7 @@ IndicoUI.Effect = {
         element.dom.disabled = !enableDisable;
         if (Browser.IE) {
             if (enableDisable) {
-                element.dom.style.backgroundColor = 'white';
+                element.dom.style.backgroundColor = '';
             } else {
                 element.dom.style.backgroundColor = '#ece7e2';
             }
