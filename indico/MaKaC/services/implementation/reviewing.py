@@ -18,6 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 from MaKaC.reviewing import ConferenceReview
+from MaKaC.reviewing import ConferenceReviewingNotification
 from MaKaC.services.implementation.base import ProtectedModificationService,\
     TwoListModificationBase, ParameterManager
 from MaKaC.services.implementation.contribution import ContributionBase
@@ -30,14 +31,14 @@ from MaKaC.services.implementation.base import DateTimeModificationBase
 from MaKaC.webinterface.rh.contribMod import RCContributionReferee
 from MaKaC.webinterface.rh.contribMod import RCContributionEditor
 from MaKaC.webinterface.rh.contribMod import RCContributionReviewer
-from MaKaC.webinterface.user import UserModificationBase
+from MaKaC.webinterface.user import UserModificationBase, UserListModificationBase
 from MaKaC.services.implementation.base import ListModificationBase
 from MaKaC import user
 from MaKaC.services.interface.rpc.common import ServiceError
 from MaKaC.i18n import _
 from MaKaC.errors import MaKaCError
-
 import datetime
+from MaKaC.common.mail import GenericMailer
 
 
 """
@@ -293,14 +294,16 @@ class ConferenceReviewingUserCompetenceList(ListModificationBase, ConferenceRevi
 
     def _handleGet(self):
         return [{"id": user.getId(), "name": user.getStraightFullName(), "competences": c}
-                for user, c in self._confReview.getAllUserCompetences(True, self._role)]
-
-
-
+                for user, c in self._confReview.getAllUserCompetences(False, self._role)]
+        
+        
+        
 class ConferenceReviewingAssignReferee(ConferenceReviewingAssignStaffBasePRM):
     """ Assigns a referee to a list of contributions
     """
     def _getAnswer(self):
+        if self._confReview.getChoice() == 1 or self._confReview.getChoice() == 3:
+            raise ServiceError("ERR-REV6aa",_("can't assign referee"))
         if not self._targetUser:
             raise ServiceError("ERR-REV6a",_("user id not set"))
 
@@ -327,6 +330,8 @@ class ConferenceReviewingAssignEditor(ConferenceReviewingAssignStaffBasePRMRefer
     """ Assigns an editor to a list of contributions
     """
     def _getAnswer(self):
+        if self._confReview.getChoice() == 1 or self._confReview.getChoice() == 2:
+            raise ServiceError("ERR-REV6bb",_("can't assign layout reviewer"))
         if not self._targetUser:
             raise ServiceError("ERR-REV6b",_("user id not set"))
 
@@ -356,6 +361,8 @@ class ConferenceReviewingAddReviewer(ConferenceReviewingAssignStaffBasePRMRefere
     """ Adds a reviewer to a list of contributions
     """
     def _getAnswer(self):
+        if self._confReview.getChoice() == 1 or self._confReview.getChoice() == 3:
+            raise ServiceError("ERR-REV6cc",_("can't assign content reviewer"))
         if not self._targetUser:
             raise ServiceError("ERR-REV6c",_("user id not set"))
 
@@ -390,7 +397,139 @@ class ConferenceReviewingRemoveAllReviewers(ConferenceReviewingAssignStaffBasePR
         return True
 
 
+######################################################
+###  Assign Team to Paper Reviewing module classes ###
+######################################################
 
+class ConferenceReviewingAssignTeamPRM(UserListModificationBase, ConferenceReviewingBase):
+    """ Adds paper review managers to reviewers team for the conference
+    """
+    def _checkParams(self):
+        UserListModificationBase._checkParams(self)
+        ConferenceReviewingBase._checkParams(self)
+
+    def _checkProtection(self):
+        ConferenceReviewingBase._checkProtection(self)
+
+    def _getAnswer(self):
+        for user in self._avatars:
+            if not user in self._confReview._paperReviewManagersList:
+                self._confReview.addPaperReviewManager(user)
+                
+        return True
+    
+class ConferenceReviewingRemoveTeamPRM(UserModificationBase, ConferenceReviewingBase):   
+    """ Removes paper review manager from reviewers team for the conference
+    """
+    def _checkParams(self):
+        UserModificationBase._checkParams(self)
+        ConferenceReviewingBase._checkParams(self)
+        
+    def _checkProtection(self):
+        ConferenceReviewingBase._checkProtection(self)
+        
+    def _getAnswer(self):
+        self._confReview.removePaperReviewManager(self._targetUser)
+        
+        return True
+       
+class ConferenceReviewingAssignTeamReferee(UserListModificationBase, ConferenceReviewingBase):
+    """ Adds referee to reviewers team for the conference
+    """
+    def _checkParams(self):
+        UserListModificationBase._checkParams(self)
+        ConferenceReviewingBase._checkParams(self)
+
+    def _checkProtection(self):
+        ConferenceReviewingBase._checkProtection(self)
+
+    def _getAnswer(self):
+        for user in self._avatars:
+            if not user in self._confReview._refereesList:
+                self._confReview.addReferee(user)
+                
+        return True
+    
+class ConferenceReviewingRemoveTeamReferee(UserModificationBase, ConferenceReviewingBase):   
+    """ Removes referee from reviewers team for the conference
+    """
+    def _checkParams(self):
+        UserModificationBase._checkParams(self)
+        ConferenceReviewingBase._checkParams(self)
+        
+    def _checkProtection(self):
+        ConferenceReviewingBase._checkProtection(self)
+        
+    def _getAnswer(self):
+        self._confReview.removeReferee(self._targetUser)
+        
+        return True
+
+
+class ConferenceReviewingAssignTeamEditor(UserListModificationBase, ConferenceReviewingBase):
+    """ Adds editor to reviewers team for the conference
+    """
+    def _checkParams(self):
+        UserListModificationBase._checkParams(self)
+        ConferenceReviewingBase._checkParams(self)
+
+    def _checkProtection(self):
+        ConferenceReviewingBase._checkProtection(self)
+
+    def _getAnswer(self):
+        for user in self._avatars:
+            if not user in self._confReview._editorsList:
+                self._confReview.addEditor(user)
+                
+        return True
+    
+class ConferenceReviewingRemoveTeamEditor(UserModificationBase, ConferenceReviewingBase):   
+    """ Removes editor from reviewers team for the conference
+    """
+    def _checkParams(self):
+        UserModificationBase._checkParams(self)
+        ConferenceReviewingBase._checkParams(self)
+        
+    def _checkProtection(self):
+        ConferenceReviewingBase._checkProtection(self)
+        
+    def _getAnswer(self):
+        self._confReview.removeEditor(self._targetUser)
+        
+        return True
+ 
+ 
+class ConferenceReviewingAssignTeamReviewer(UserListModificationBase, ConferenceReviewingBase):
+    """ Adds editor to reviewers team for the conference
+    """
+    def _checkParams(self):
+        UserListModificationBase._checkParams(self)
+        ConferenceReviewingBase._checkParams(self)
+
+    def _checkProtection(self):
+        ConferenceReviewingBase._checkProtection(self)
+
+    def _getAnswer(self):
+        for user in self._avatars:
+            if not user in self._confReview._reviewersList:
+                self._confReview.addReviewer(user)
+                
+        return True
+    
+class ConferenceReviewingRemoveTeamReviewer(UserModificationBase, ConferenceReviewingBase):   
+    """ Removes editor from reviewers team for the conference
+    """
+    def _checkParams(self):
+        UserModificationBase._checkParams(self)
+        ConferenceReviewingBase._checkParams(self)
+        
+    def _checkProtection(self):
+        ConferenceReviewingBase._checkProtection(self)
+        
+    def _getAnswer(self):
+        self._confReview.removeReviewer(self._targetUser)
+        
+        return True     
 #####################################
 ###  Contribution reviewing classes
 #####################################
@@ -551,7 +690,16 @@ methodMap = {
     "conference.addReviewer" : ConferenceReviewingAddReviewer,
     "conference.removeReviewer" : ConferenceReviewingRemoveReviewer,
     "conference.removeAllReviewers" : ConferenceReviewingRemoveAllReviewers,
-
+    
+    "conference.assignTeamPRM" : ConferenceReviewingAssignTeamPRM,
+    "conference.removeTeamPRM" : ConferenceReviewingRemoveTeamPRM,
+    "conference.assignTeamReferee" : ConferenceReviewingAssignTeamReferee,
+    "conference.removeTeamReferee" : ConferenceReviewingRemoveTeamReferee,
+    "conference.assignTeamEditor" : ConferenceReviewingAssignTeamEditor,
+    "conference.removeTeamEditor" : ConferenceReviewingRemoveTeamEditor,
+    "conference.assignTeamReviewer" : ConferenceReviewingAssignTeamReviewer,
+    "conference.removeTeamReviewer" : ConferenceReviewingRemoveTeamReviewer,
+    
     "contribution.changeDueDate": ContributionReviewingDueDateModification,
     "contribution.changeComments": ContributionReviewingCommentsModification,
     "contribution.changeJudgement": ContributionReviewingJudgementModification,

@@ -69,7 +69,7 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
                     urlHandlers.UHConfModifUserCompetences.getURL( self._conf ) )
             
         if self._isAM or self._canModify:
-            self._tabAbstractReviewingSetup = self._subtabAbstractsReviewing.newSubTab( "revsetup", "Abstract setup",\
+            self._tabAbstractReviewingSetup = self._subtabAbstractsReviewing.newSubTab( "revsetup", "Setup",\
                     urlHandlers.UHConfModifReviewingAbstractSetup.getURL(target = self._conf) )
             self._tabAbstractNotifTpl = self._subtabAbstractsReviewing.newSubTab( "notiftpl", "Notification templates",\
                     urlHandlers.UHAbstractReviewingNotifTpl.getURL(target = self._conf) )
@@ -461,15 +461,18 @@ class WConfModificationReviewingFramePRM(wcomponents.WTemplated):
         return  wcomponents.WTemplated.getHTML( self, params )
 
     def getVars( self ):
+        
         vars = wcomponents.WTemplated.getVars( self )
 
         prmTable = []
         prmTable.append(_("""<td nowrap class="titleCellTD"><span class="titleCellFormat"> _("Managers of Paper Reviewing Module") <br><font size="-2">_("(users responsible for assignation of contributions)")</font></span></td>
-        <td width="80%%">"""))
-        prmTable.append(wcomponents.WPrincipalTable().getHTML( self.__target.getConfReview().getPaperReviewManagersList(),
-                                                               self.__target, vars["addPaperReviewManagerURL"], vars["removePaperReviewManagerURL"], selectable=False))
-        prmTable.append("""</td>""")
+        """))
+        #prmTable.append(wcomponents.WPrincipalTable().getHTML( self.__target.getConfReview().getPaperReviewManagersList(),
+        #                                                      self.__target, vars["addPaperReviewManagerURL"], vars["removePaperReviewManagerURL"], selectable=False))
+        #prmTable.append("""</td>""")
         prmTable="""%s"""%"".join(prmTable)
+        vars["Conference"] = self.__target.getId()
+        vars["ConfReview"] = self.__target.getConfReview()
         vars["paperReviewManagerTable"] = prmTable
         return vars
 
@@ -500,30 +503,32 @@ class WConfModificationReviewingFrame(wcomponents.WTemplated):
             pass
         else:
             editor.append(_("""<td nowrap class="titleCellTD"><span class="titleCellFormat">_("Layout Reviewers")<br><font size="-2">_("(users responsible for form verification)")</font></span></td>
-        <td width="80%%">"""))
-            editor.append(wcomponents.WPrincipalTable().getHTML( self.__target.getConfReview().getEditorsList(),
-                                                                 self.__target, vars["addEditorURL"], vars["removeEditorURL"], selectable=False))
-            editor.append("""</td>""")
+            """))
+            #editor.append(wcomponents.WPrincipalTable().getHTML( self.__target.getConfReview().getEditorsList(),
+            #                                                     self.__target, vars["addEditorURL"], vars["removeEditorURL"], selectable=False))
+            #editor.append("""</td>""")
         editor="""%s"""%"".join(editor)
 
         if self.__target.getConfReview().getChoice() == 3 or self.__target.getConfReview().getChoice() == 1:
             pass
         else:
             reviewer.append(_("""<td nowrap class="titleCellTD"><span class="titleCellFormat">_("Content Reviewers")<br><font size="-2">_("(users responsible for content verification)")</font></span></td>
-        <td width="80%%">"""))
-            reviewer.append(wcomponents.WPrincipalTable().getHTML( self.__target.getConfReview().getReviewersList(),
-                                                                   self.__target, vars["addReviewerURL"], vars["removeReviewerURL"], selectable=False))
-            reviewer.append("""</td>""")
+            """))
+            #reviewer.append(wcomponents.WPrincipalTable().getHTML( self.__target.getConfReview().getReviewersList(),
+            #                                                       self.__target, vars["addReviewerURL"], vars["removeReviewerURL"], selectable=False))
+            #reviewer.append("""</td>""")
         
             refereeTable.append(_("""<td nowrap class="titleCellTD"><span class="titleCellFormat">_("Referees")<br><font size="-2">_("(users responsible for final decision)")</font></span></td>
-            <td width="80%%">"""))
-            refereeTable.append(wcomponents.WPrincipalTable().getHTML( self.__target.getConfReview().getRefereesList(),
-                                                                       self.__target, vars["addRefereeURL"], vars["removeRefereeURL"], selectable=False))
-            refereeTable.append("""</td>""")
-
+            """))
+            #refereeTable.append(wcomponents.WPrincipalTable().getHTML( self.__target.getConfReview().getRefereesList(),
+            #                                                          self.__target, vars["addRefereeURL"], vars["removeRefereeURL"], selectable=False))
+            #refereeTable.append("""</td>""")
+            
         reviewer="""%s"""%"".join(reviewer)
         refereeTable="""%s"""%"".join(refereeTable)
 
+        vars["Conference"] = self.__target.getId()
+        vars["ConfReview"] = self.__target.getConfReview()
         vars["editorTable"] = editor
         vars["reviewerTable"] = reviewer
         vars["refereeTable"] = refereeTable

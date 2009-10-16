@@ -10,7 +10,9 @@
 <!-- Judgement of the editor -->
 <table width="90%%" align="center" border="0" style="margin-bottom: 1em; margin-top: 1em">
     <tr>
-        <td id="editingJudgementHelp" colspan="5" class="groupTitle"><%= _("Layout judgement")%></td>
+        <td id="editingJudgementHelp" colspan="5" class="groupTitle"><%= _("Layout judgement")%>
+            <% inlineContextHelp(_('Here is displayed the judgement given by the Layout Reviewer.<br/>Only the Layout Reviewer of this contribution can change this.')) %>
+        </td>
     </tr>
     <tr>
         <td>
@@ -32,7 +34,9 @@
 <!-- List of advices from the reviewers -->
 <table width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
-        <td id="reviewingJudgementHelp" colspan="5" class="groupTitle" style="padding-top: 5px;"><%= _("Content judgement")%></td>
+        <td id="reviewingJudgementHelp" colspan="5" class="groupTitle" style="padding-top: 5px;"><%= _("Content judgement")%>
+            <% inlineContextHelp(_('Here is displayed the judgement given by the Content Reviewers<br/>Only the Content Reviewers of this contribution can change their respective judgements.')) %>
+        </td>
     </tr>
     <tr>
         <td>
@@ -60,7 +64,9 @@
 <!-- Final reviewing of the referee -->
 <table width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
-        <td id="finalJudgementHelp" colspan="5" class="groupTitle" style="padding-top: 5px;"><a name="FinalReviewing"></a><%= _("Final Judgement")%></td>
+        <td id="finalJudgementHelp" colspan="5" class="groupTitle" style="padding-top: 5px;"><a name="FinalReviewing"></a><%= _("Final Judgement")%>
+            <% inlineContextHelp(_('Here is displayed the judgement given by the Referee.<br/>If you are the Referee of this contribution, you can change this.')) %>    
+        </td>
     </tr>
     <% if not (ConferenceChoice == 2 or ConferenceChoice == 4): %>
     <tr>

@@ -1,5 +1,9 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 
+<% if not ConfReview.hasReviewing(): %>
+<table align="center"><tr><td><%= _("Type of reviewing has not been chosen yet")%></td></tr></table>
+<% end %>
+<%else:%>
 <table class="Revtab" width="90%%" cellspacing="0" align="center" border="0" style="padding-left:2px; padding-top: 20px;">
    <tr><td colspan=5 style="padding-bottom: 15px;">
             <em><%= _("Please, define competences for every team member.")%></em>
@@ -54,3 +58,4 @@ var keyWordfieldList = new Array()
  <% end %>    
 <% end %>
 </script>
+<% end %>

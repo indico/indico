@@ -3,6 +3,10 @@
 <% from MaKaC.conference import ContribStatusNone %>
 
 <% dueDateFormat = "%a %d %b %Y" %>
+<% if not ConfReview.hasReviewing(): %>
+<table align="center"><tr><td><%= _("Type of reviewing has not been chosen yet")%></td></tr></table>
+<% end %>
+<%else:%>
 <div style="padding-top:10px; padding-bottom: 10px;"><em><%= _("Please, select one or more contributions to assign Reviewers")%></em></div>
 
 <div id="showHideFilteringHelp" style="padding-top: 10px;"><div id="showHideFiltering" style="display:inline"></div></div>
@@ -97,7 +101,7 @@
 </table>
 
 <table>
-    <% if not IsOnlyReferee: %>
+    <% if not IsOnlyReferee and not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
     <tr>
         <td><%= _("Referee")%>:</td>
         <td id="assignRefereeHelp">
@@ -106,6 +110,7 @@
         </td>
     </tr>
     <% end %>
+    <%if not (ConfReview.getChoice() == 2 or ConfReview.getChoice() == 1):%>
     <tr>
         <td><%= _("Layout Reviewer")%>:</td>
         <td id="assignEditorHelp">
@@ -113,6 +118,8 @@
             <input id="removeEditorButton_top" type="button" class="popUpButton" value="Remove">
         </td>
     </tr>
+    <% end %>
+    <% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
     <tr>
         <td><%= _("Content Reviewers")%>:</td>
         <td id="assignReviewerHelp">
@@ -121,8 +128,9 @@
             <input id="removeAllReviewersButton_top" type="button" class="popUpButton" value="Remove All">
         </td>
     </tr>
+    <% end %>
 </table>
-
+<!--  and not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1) -->
 <div id="userSelection_top" style="margin-top: 1em">
     <span id="userSelectionMessage_top"></span>
     <ul id="userList_top">
@@ -220,9 +228,11 @@
             
             <td>
                 <ul>
+                    <% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
                     <li>
                         <em><%= _("Referee")%>:</em> 
                     </li>
+                    <% end %>
                     <li>
                         <em><%= _("Layout Reviewer")%>:</em> 
                     </li>
@@ -240,6 +250,7 @@
             <td style="border-right:5px solid #FFFFFF; border-left:5px solid #FFFFFF;">
                 <% date = rm.getLastReview().getAdjustedRefereeDueDate() %>
                 <% if date is None: %>
+                    <% color = '' %>
                     <%= _("Deadline not set.")%>
                 <% end %>
                 <% else: %>
@@ -260,7 +271,7 @@
 </table>
 
 <table>
-    <% if not IsOnlyReferee: %>
+    <% if not IsOnlyReferee and not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
     <tr>
         <td><%= _("Referee")%>:</td>
         <td id="assignRefereeHelp">
@@ -269,6 +280,7 @@
         </td>
     </tr>
     <% end %>
+    <% if not (ConfReview.getChoice() == 2 or ConfReview.getChoice() == 1): %>
     <tr>
         <td><%= _("Layout Reviewer")%>:</td>
         <td id="assignEditorHelp">
@@ -276,6 +288,8 @@
             <input id="removeEditorButton_bottom" type="button" class="popUpButton" value="Remove">
         </td>
     </tr>
+    <% end %>
+    <% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
     <tr>
         <td><%= _("Content Reviewers")%>:</td>
         <td id="assignReviewerHelp">
@@ -284,6 +298,7 @@
             <input id="removeAllReviewersButton_bottom" type="button" class="popUpButton" value="Remove All">
         </td>
     </tr>
+    <% end %>
 </table>
 
 <div id="userSelection_bottom" style="margin-top: 1em">
@@ -465,6 +480,7 @@ var contributionTemplate = function(contribution) {
     ul.dom.style.padding = 0;
     ul.dom.style.marginLeft = '5px';
     
+    <% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %> 
     var li1 = Html.li();
     var span1 = Html.span({}, $T('Referee: '))
     var span2 = contribution.reviewManager.referee ?
@@ -472,7 +488,9 @@ var contributionTemplate = function(contribution) {
                     Html.span({id: ("creferee" + contribution.id)},$T('No referee'));
     li1.set(Widget.block([span1,span2]));
     ul.append(li1);
+    <% end %>
     
+    <% if not (ConfReview.getChoice() == 2 or ConfReview.getChoice() == 1): %>
     var li2 = Html.li();
     var span1 = Html.span({}, $T('Layout reviewer: '))
     var span2 = contribution.reviewManager.editor ?
@@ -480,7 +498,9 @@ var contributionTemplate = function(contribution) {
                     Html.span({id: ("ceditor" + contribution.id)},$T('No layout reviewer'));
     li2.set(Widget.block([span1,span2]));
     ul.append(li2);
+    <% end %>
     
+    <% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
     var li3 = Html.li();
     var span = Html.span({id : ("creviewerstitle" + contribution.id)}, $T('Content reviewers: '));
     li3.append(span);
@@ -499,6 +519,7 @@ var contributionTemplate = function(contribution) {
         li3.append(span);
     }
     ul.append(li3);
+    <% end %>
     
     cell8.set(ul);
     row.append(cell8);
@@ -1142,26 +1163,31 @@ bind.element($E("tablebody"), contributions, contributionTemplate);
 
 $E('applyFilter').observeClick(fetchContributions);
 
-<% if not IsOnlyReferee: %>
+<% if not IsOnlyReferee and not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
 $E('assignRefereeButton_top').observeClick(function(){ fetchUsers('assign', 'referee'); });
 $E('assignRefereeButton_bottom').observeClick(function(){ fetchUsers('assign', 'referee'); });
 $E('removeRefereeButton_top').observeClick(function(){ removeUser('referee') });
 $E('removeRefereeButton_bottom').observeClick(function(){ removeUser('referee') });
 <% end %>
 
+<% if not (ConfReview.getChoice() == 2 or ConfReview.getChoice() == 1): %>
 $E('assignEditorButton_top').observeClick(function(){ fetchUsers('assign', 'editor'); });
 $E('assignEditorButton_bottom').observeClick(function(){ fetchUsers('assign', 'editor'); });
 $E('removeEditorButton_top').observeClick(function(){ removeUser('editor') });
 $E('removeEditorButton_bottom').observeClick(function(){ removeUser('editor') });
+<% end %>
 
+<% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
 $E('addReviewerButton_top').observeClick(function(){ fetchUsers('add', 'reviewer'); });
 $E('addReviewerButton_bottom').observeClick(function(){ fetchUsers('add', 'reviewer'); });
 $E('removeReviewerButton_top').observeClick(function(){ fetchUsers('remove', 'reviewer'); });
 $E('removeReviewerButton_bottom').observeClick(function(){ fetchUsers('remove', 'reviewer'); });
 $E('removeAllReviewersButton_top').observeClick(function(){ removeUser('allReviewers') });
 $E('removeAllReviewersButton_bottom').observeClick(function(){ removeUser('allReviewers') });
+<% end %>
 
 
 fetchContributions();
     
 </script>
+<% end %>
