@@ -1,11 +1,11 @@
 <% from MaKaC.common.PickleJar import DictPickler %>
 
 var enableCustomId = function() {
-    $E('customId').dom.disabled = false;
+    IndicoUI.Effect.enableDisableTextField($E('customId'), true);
 }
     
 var disableCustomId = function() {
-    $E('customId').dom.disabled = true;
+    IndicoUI.Effect.enableDisableTextField($E('customId'), false);
 }
 
 var pf = null; //place where to keep a ParticipantListField object to access later

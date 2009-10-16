@@ -248,6 +248,7 @@
     
     onCreate : function() {
         $E('autoYesRB').dom.checked = true;
+        disableCustomId();
         <% if IncludeInitialRoom: %>
             pf = new ParticipantListField([{type: 'room',
                                            name: "<%= InitialRoomName %>",
@@ -293,8 +294,21 @@
     },
     
     onEdit: function(booking) {
+        // setFormValues has problems with radio buttons constructed with .innerHTML in IE7
+        if (Browser.IE) {
+            if (booking.bookingParams.autoGenerateId == 'no') {
+                $E('autoNoRB').dom.checked = true;
+                $E('autoyesRB').dom.checked = false;
+            } else {
+                $E('autoNoRB').dom.checked = false;
+                $E('autoyesRB').dom.checked = true;
+            }
+        }
+        
         if (booking.bookingParams.autoGenerateId == 'no') {
             enableCustomId();
+        } else {
+            disableCustomId();
         }
         
         pf = new ParticipantListField(booking.bookingParams.participants)
