@@ -236,11 +236,14 @@ var IndicoUtil = {
 
             self.observe(function(value) {
                 jsonRpcCommit(endPoint, method, attributes, value,
-                              function(result, error)
-                              {
+                              function(result, error) {
                                   if(exists(error)) {
                                       IndicoUtil.errorReport(error);
                                   } else {
+                                      if (exists(result.hasWarning) && result.hasWarning === true) {
+                                          var popup = new WarningPopup(result.warning.title, result.warning.content);
+                                          popup.open();
+                                      }
                                       // would loop infinitely
                                       // self.set(result);
                                   }

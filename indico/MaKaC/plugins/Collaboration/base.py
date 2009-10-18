@@ -33,12 +33,14 @@ from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.common.logger import Logger
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
+from MaKaC.conference import Observer
+from MaKaC.common.contextManager import ContextManager
 import os, inspect
 import MaKaC.plugins.Collaboration as Collaboration
 from MaKaC.i18n import _
 
 
-class CSBookingManager(Persistent):
+class CSBookingManager(Persistent, Observer):
     """ Class for managing the bookins of a meeting.
         It will store the list of bookings. Adding / removing / editing bookings should be through this class.
     """
@@ -472,51 +474,88 @@ class CSBookingManager(Persistent):
             except Exception, e:
                 Logger.get('VideoServ').error("Exception while reindexing a booking in the event title index because its event's title changed: " + str(e))
             
-    
-    def notifyStartDateChange(self, oldStartDate, newStartDate):
-        """ Notifies the CSBookingManager that the start date of the event (meeting) it's attached to has changed.
-            The CSBookingManager will change the dates of all the bookings that want to be updated.
-            This method will be called by the event (meeting) object
-        """
-        for booking in self.getBookingList():
-            try:
-                self._changeConfStartDateInIndex(booking, oldStartDate, newStartDate)
-            except Exception, e:
-                Logger.get('VideoServ').error("Exception while reindexing a booking in the event start date index because its event's start date changed: " + str(e))
             
-            if booking.needsToBeNotifiedOfDateChanges():
-                oldBookingStartDate = booking.getStartDate()
-                if oldBookingStartDate:
-                    try:
-                        booking.setStartDate(oldBookingStartDate + (newStartDate - oldStartDate) )
-                        self._changeStartDateInIndex(booking, oldBookingStartDate, booking.getStartDate())
-                        booking._modify()
-                    except Exception, e:
-                        Logger.get('VideoServ').error("Exception while changing a booking's start after event start date changed: " + str(e))
-                        booking.setStartDate(oldBookingStartDate)     
-    
-    def notifyEndDateChange(self, oldEndDate, newEndDate):
-        """ Notifies the CSBookingManager that the end date of the event (Conference) it's attached to has changed.
+    def notifyEventDateChanges(self, oldStartDate = None, newStartDate = None, oldEndDate = None, newEndDate = None):
+        """ Notifies the CSBookingManager that the start and / or end dates of the event it's attached to have changed.
             The CSBookingManager will change the dates of all the bookings that want to be updated.
-            This method will be called by the event (Conference) object
+            If there are problems (such as a booking not being able to be modified)
+            it will write a list of strings describing the problems in the 'dateChangeNotificationProblems' context variable.
+            (each string is produced by the _booking2NotifyProblem method).
+            This method will be called by the event (meeting) object.
         """
-        for booking in self.getBookingList():
-            if booking.needsToBeNotifiedOfDateChanges():
-                oldBookingEndDate = booking.getEndDate()
-                if oldBookingEndDate:
-                    try:
-                        booking.setEndDate(oldBookingEndDate + (newEndDate - oldEndDate) )
-                        booking._modify()
-                    except Exception, e:
-                        Logger.get('VideoServ').error("Exception while changing a booking's end after event end date changed: " + str(e))
-                        booking.setEndDate(oldBookingEndDate)
+        startDateChanged = oldStartDate is not None and newStartDate is not None and not oldStartDate == newStartDate
+        endDateChanged = oldEndDate is not None and newEndDate is not None and not oldEndDate == newEndDate
+        someDateChanged = startDateChanged or endDateChanged
+
+        if someDateChanged:
+            problems = []
+            for booking in self.getBookingList():
+                if booking.hasStartDate():
+                    if startDateChanged:
+                        try:
+                            self._changeConfStartDateInIndex(booking, oldStartDate, newStartDate)
+                        except Exception, e:
+                            Logger.get('VideoServ').error("Exception while reindexing a booking in the event start date index because its event's start date changed: " + str(e))
+                    
+                    if booking.needsToBeNotifiedOfDateChanges():
+                        oldBookingStartDate = booking.getStartDate()
+                        oldBookingEndDate = booking.getEndDate()
+                        if startDateChanged:
+                            booking.setStartDate(oldBookingStartDate + (newStartDate - oldStartDate) )
+                        if endDateChanged:
+                            booking.setEndDate(oldBookingEndDate + (newEndDate - oldEndDate) )
+                        
+                        rollback = False
+                        modifyResult = None
+                        try:
+                            modifyResult = booking._modify()
+                            if isinstance(modifyResult, CSErrorBase):
+                                Logger.get('VideoServ').error("Error while changing a booking's dates after event dates changed: " + modifyResult.getLogMessage())
+                                rollback = True
+                        except Exception, e:
+                            Logger.get('VideoServ').error("Exception while changing a booking's dates after event dates changed: " + str(e))
+                            rollback = True
+                            
+                        if rollback:
+                            booking.setStartDate(oldBookingStartDate)
+                            booking.setEndDate(oldBookingStartDate)
+                            problems.append(CSBookingManager._booking2NotifyProblem(booking, modifyResult))
+                        elif startDateChanged:
+                            self._changeStartDateInIndex(booking, oldBookingStartDate, booking.getStartDate())
+            if problems:
+                ContextManager.get('dateChangeNotificationProblems')['Collaboration'] = [
+                    'Some Video Services bookings could not be moved:',
+                    problems,
+                    'Go to [[' + str(urlHandlers.UHConfModifCollaboration.getURL(self.getOwner())) + ' the Video Services section]] to modify them yourself.'
+                ]
+                            
         
     def notifyTimezoneChange(self, oldTimezone, newTimezone):
         """ Notifies the CSBookingManager that the timezone of the event it's attached to has changed.
             The CSBookingManager will change the dates of all the bookings that want to be updated.
             This method will be called by the event (Conference) object
         """
-        return
+        return []
+    
+    @classmethod
+    def _booking2NotifyProblem(cls, booking, modifyError):
+        """ Turns a booking into a string used to tell the user
+            why a date change of a booking triggered by the event's start or end date change
+            went bad.
+        """
+        
+        message = []
+        message.extend(["The dates of the ", booking.getType(), " booking"])
+        if booking.hasTitle():
+            message.extend([': "', booking._getTitle(), '" (', booking.getStartDateAsString(), ' - ', booking.getEndDateAsString(), ')'])
+        else:
+            message.extend([' ongoing from ', booking.getStartDateAsString(), ' to ', booking.getEndDateAsString(), ''])
+        
+        message.append(' could not be changed.')
+        if modifyError and modifyError.getUserMessage():
+            message.extend([' Reason: ', modifyError.getUserMessage()])
+        return "".join(message)
+        
     
     def notifyDeletion(self):
         """ Notifies the CSBookingManager that the Conference object it is attached to has been deleted.
@@ -533,6 +572,12 @@ class CSBookingManager(Persistent):
         
     
     def getEventDisplayPlugins(self, sorted = False):
+        """ Returns a list of names (strings) of plugins which have been configured
+            as showing bookings in the event display page, and which have bookings
+            already (or previously) created in the event.
+            (does not check if the bookings are hidden or not)
+        """
+        
         pluginsWithEventDisplay = CollaborationTools.pluginsWithEventDisplay()
         l = []
         for pluginName in self._bookingsByType:
@@ -721,7 +766,7 @@ class CSBookingBase(Persistent):
     def getCreationDate(self):
         """ Returns the date this booking was created, as a timezone localized datetime object
         """
-        if not hasattr(self, "_creationDate"): #remove when put in prod
+        if not hasattr(self, "_creationDate"): #TODO: remove when safe
             self._creationDate = nowutc()
         return self._creationDate
     
@@ -741,7 +786,7 @@ class CSBookingBase(Persistent):
     def getModificationDate(self):
         """ Returns the date this booking was modified last
         """
-        if not hasattr(self, "_modificationDate"):  #remove when put in prod
+        if not hasattr(self, "_modificationDate"):  #TODO: remove when safe
             self._modificationDate = nowutc()
         return self._modificationDate
     
@@ -1223,6 +1268,11 @@ class CSBookingBase(Persistent):
         """
         return self._hasStartDate 
     
+    def hasTitle(self):
+        """ Returns if bookings of this type have a title
+        """
+        return self._hasTitle
+    
     def hasEventDisplay(self):
         """ Returns if the type of this booking should display something on
             an event display page
@@ -1394,16 +1444,24 @@ class CSErrorBase(object):
                 'MaKaC.plugins.Collaboration.EVO.common.EVOError',
                 'MaKaC.plugins.Collaboration.EVO.common.OverlappedError',
                 'MaKaC.plugins.Collaboration.EVO.common.ChangesFromEVOError',
-                'MaKaC.plugins.Collaboration.RecordingRequest.common.RecordingRequestError',
+                'MaKaC.plugins.Collaboration.RecordingRequest.common.RecordingRequestError'
+                'MaKaC.plugins.Collaboration.RecordingRequest.common.WebcastRequestError',
                 'MaKaC.plugins.Collaboration.CERNMCU.common.CERNMCUError'],
                 'error')
     def getError(self):
         return True
     
-    def getMessage(self):
-        """ To be overloaded
+    def getUserMessage(self):
+        """ To be overloaded.
+            Returns the string that will be shown to the user when this error will happen.
         """
-        return ''
+        raise CollaborationException("Method getUserMessage was not overriden for the a CSErrorBase object of class " + self.__class__.__name__)
+        
+    def getLogMessage(self):
+        """ To be overloaded.
+            Returns the string that will be printed in Indico's log when this error will happen.
+        """
+        raise CollaborationException("Method getLogMessage was not overriden for the a CSErrorBase object of class " + self.__class__.__name__)
         
         
 class CollaborationException(MaKaCError):
