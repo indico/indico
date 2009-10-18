@@ -119,7 +119,7 @@ class RHAdminCollaboration(RHAdminBase):
         self._queryParams["queryOnLoad"] = (params.get('queryOnLoad', None) == 'true')
         self._queryParams["page"] = params.get("page", 1)
         self._queryParams["resultsPerPage"] = params.get("resultsPerPage", 10)
-        self._queryParams["indexName"] = params.get('indexName', 'all')
+        self._queryParams["indexName"] = params.get('indexName', None)
         self._queryParams["viewBy"] = params.get('viewBy', 'modificationDate')
         self._queryParams["orderBy"] = params.get('orderBy', '')
         self._queryParams["sinceDate"] = params.get('sinceDate', '').strip()
