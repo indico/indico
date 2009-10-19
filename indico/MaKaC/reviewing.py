@@ -380,8 +380,13 @@ class ConferenceReview(Persistent):
         """
         if referee in self._refereesList:
             if self._userCompetences.has_key(referee):
-                self.clearUserCompetences(referee)
-                del(self._userCompetences[referee])
+                if not ((referee in self._editorsList) or \
+                        (referee in self._paperReviewManagersList) or \
+                        (referee in self._reviewersList) or \
+                        (referee in self._abstractManagerList) or \
+                        (referee in self._abstractReviewersList)):
+                    self.clearUserCompetences(referee)
+                    del(self._userCompetences[referee])
             self._refereesList.remove(referee)
             referee.unlinkTo(self._conference, "referee")
             self.notifyModification()
@@ -459,8 +464,13 @@ class ConferenceReview(Persistent):
         """
         if editor in self._editorsList:
             if self._userCompetences.has_key(editor):
-                self.clearUserCompetences(editor)
-                del(self._userCompetences[editor])
+                if not ((editor in self._paperReviewManagersList) or \
+                        (editor in self._reviewersList) or \
+                        (editor in self._refereesList) or \
+                        (editor in self._abstractManagerList) or \
+                        (editor in self._abstractReviewersList)):
+                    self.clearUserCompetences(editor)
+                    del(self._userCompetences[editor])
             self._editorsList.remove(editor)
             editor.unlinkTo(self._conference, "editor")
             self.notifyModification()
@@ -538,8 +548,13 @@ class ConferenceReview(Persistent):
         """
         if reviewer in self._reviewersList:
             if self._userCompetences.has_key(reviewer):
-                self.clearUserCompetences(reviewer)
-                del(self._userCompetences[reviewer])
+                if not ((reviewer in self._editorsList) or \
+                        (reviewer in self._paperReviewManagersList) or \
+                        (reviewer in self._refereesList) or \
+                        (reviewer in self._abstractManagerList) or \
+                        (reviewer in self._abstractReviewersList)):
+                    self.clearUserCompetences(reviewer)
+                    del(self._userCompetences[reviewer])
             self._reviewersList.remove(reviewer)
             reviewer.unlinkTo(self._conference, "reviewer")
             self.notifyModification()
@@ -617,8 +632,13 @@ class ConferenceReview(Persistent):
         """
         if paperReviewManager in self._paperReviewManagersList:
             if self._userCompetences.has_key(paperReviewManager):
-                self.clearUserCompetences(paperReviewManager)
-                del(self._userCompetences[paperReviewManager])
+                if not ((paperReviewManager in self._editorsList) or \
+                        (paperReviewManager in self._reviewersList) or \
+                        (paperReviewManager in self._refereesList) or \
+                        (paperReviewManager in self._abstractManagerList) or \
+                        (paperReviewManager in self._abstractReviewersList)):
+                    self.clearUserCompetences(paperReviewManager)
+                    del(self._userCompetences[paperReviewManager])
             self._paperReviewManagersList.remove(paperReviewManager)
             paperReviewManager.unlinkTo(self._conference, "paperReviewManager")
             self.notifyModification()
@@ -662,8 +682,13 @@ class ConferenceReview(Persistent):
         """
         if abstractManager in self._abstractManagerList:
             if self._userCompetences.has_key(abstractManager):
-                self.clearUserCompetences(abstractManager)
-                del(self._userCompetences[abstractManager])
+                if not ((abstractManager in self._editorsList) or \
+                        (abstractManager in self._paperReviewManagersList) or \
+                        (abstractManager in self._refereesList) or \
+                        (abstractManager in self._reviewersList) or \
+                        (abstractManager in self._abstractReviewersList)):
+                    self.clearUserCompetences(abstractManager)
+                    del(self._userCompetences[abstractManager])
             self._abstractManagerList.remove(abstractManager)
             abstractManager.unlinkTo(self._conference, "abstractManager")
             self.notifyModification()
@@ -707,8 +732,13 @@ class ConferenceReview(Persistent):
         """
         if abstractReviewer in self._abstractReviewersList:
             if self._userCompetences.has_key(abstractReviewer):
-                self.clearUserCompetences(abstractReviewer)
-                del(self._userCompetences[abstractReviewer])
+                if not ((abstractReviewer in self._editorsList) or \
+                        (abstractReviewer in self._paperReviewManagersList) or \
+                        (abstractReviewer in self._refereesList) or \
+                        (abstractReviewer in self._reviewersList) or \
+                        (abstractReviewer in self._abstractManagerList)):
+                    self.clearUserCompetences(abstractReviewer)
+                    del(self._userCompetences[abstractReviewer])
             self._abstractReviewersList.remove(abstractReviewer)
             abstractReviewer.unlinkTo(self._conference, "abstractReviewer")
             self.notifyModification()
