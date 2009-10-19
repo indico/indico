@@ -1,4 +1,4 @@
-/** $Id: domTT_drag.js,v 1.1 2007/01/17 07:45:16 bourillo Exp $ */
+/** $Id: domTT_drag.js 2315 2006-06-12 05:45:36Z dallen $ */
 // {{{ license
 
 /*
