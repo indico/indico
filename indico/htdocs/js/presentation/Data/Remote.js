@@ -245,7 +245,7 @@ function webRequest(url, contentType, body, handler) {
         } catch (e) {
                 handler(null, e);
         }
-        return transport.abort;
+    return function() { return transport.abort(); };
 }
 
 /**
@@ -276,7 +276,7 @@ function webGet(url, handler) {
         } catch (e) {
                 handler(null, e);
         }
-        return transport.abort;
+    return function() { return transport.abort(); };
 }
 
 var Web = {};
@@ -285,7 +285,7 @@ var Web = {};
  * Returns a new XMLHttpRequest.
  * @return {XMLHttpRequest}
  */
-if (isDefined("XMLHttpRequest")) {
+if (exists(global.XMLHttpRequest)) {
         Web.transport = function(){
                 return new XMLHttpRequest();
         };
