@@ -16,4 +16,4 @@ recursive-include indico/htdocs *
 recursive-include indico/MaKaC *
 recursive-include tests *
 
-global-exclude *.pyc *.mo etc/zdctl.conf etc/zodb.conf etc/indico.conf
+global-exclude *.pyc etc/zdctl.conf etc/zodb.conf etc/indico.conf
