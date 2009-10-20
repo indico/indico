@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 ##
 ## $Id: Configuration.py,v 1.81 2009/06/24 12:13:18 eragners Exp $
 ##
