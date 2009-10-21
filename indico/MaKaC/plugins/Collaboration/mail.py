@@ -102,19 +102,21 @@ class NewBookingNotification(CollaborationNotificationBase):
     def __init__(self, booking):
         CollaborationNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico][Video Services] New booking / request: %s (event id: %s)"""
+        self.setSubject("""[Video Services] New booking / request: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody(
 """
-A new booking / request was created.
+A new booking / request was created in <a href="%s">%s</a>
 <br /><br />
 %s
 <br /><br />
 %s
 <br /><br />
 %s
-""" % ( self._getBookingDetails('new'),
+""" % ( MailTools.getServerName(),
+        MailTools.getServerName(),
+        self._getBookingDetails('new'),
         MailTools.eventDetails(self._conference),
         MailTools.organizerDetails(self._conference)
         ))
@@ -128,19 +130,21 @@ class BookingModifiedNotification(CollaborationNotificationBase):
     def __init__(self, booking):
         CollaborationNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico][Video Services] Booking / request modified: %s (event id: %s)"""
+        self.setSubject("""[Video Services] Booking / request modified: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody(
 """
-A booking / request was modified.
+A booking / request was modified in <a href="%s">%s</a>
 <br /><br />
 %s
 <br /><br />
 %s
 <br /><br />
 %s
-""" % ( self._getBookingDetails('modify'),
+""" % ( MailTools.getServerName(),
+        MailTools.getServerName(),
+        self._getBookingDetails('modify'),
         MailTools.eventDetails(self._conference),
         MailTools.organizerDetails(self._conference)
         ))
@@ -154,19 +158,21 @@ class BookingDeletedNotification(CollaborationNotificationBase):
     def __init__(self, booking):
         CollaborationNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico][Video Services] Booking / request deleted: %s (event id: %s)"""
+        self.setSubject("""[Video Services] Booking / request deleted: %s (event id: %s)"""
                 % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody(
 """
-A booking / request was deleted.
+A booking / request was deleted in <a href="%s">%s</a>
 <br /><br />
 %s
 <br /><br />
 %s
 <br /><br />
 %s
-""" % ( self._getBookingDetails('remove'),
+""" % ( MailTools.getServerName(),
+        MailTools.getServerName(),
+        self._getBookingDetails('remove'),
         MailTools.eventDetails(self._conference),
         MailTools.organizerDetails(self._conference)
         ))

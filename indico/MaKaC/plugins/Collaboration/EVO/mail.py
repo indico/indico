@@ -171,23 +171,23 @@ class NewEVOMeetingNotificationAdmin(EVOAdminNotificationBase):
     def __init__(self, booking):
         EVOAdminNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico][EVO] New EVO meeting: %s (event id: %s)"""
+        self.setSubject("""[EVO] New EVO meeting: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear EVO Responsible,<br />
 <br />
-There is a <strong>new EVO meeting</strong>.<br />
+There is a <strong>new EVO meeting</strong> in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to see it in Indico.<br />
 <br />
 %s
 <br />
 %s
 <br />
-You also can see a list of all the EVO meetings here: (not implemented yet).<br />
-<br />
 <br />
 %s
-""" % ( self._modifLink,
+""" % ( MailTools.getServerName(),
+        MailTools.getServerName(),
+        self._modifLink,
         MailTools.eventDetails(self._conference),
         MailTools.organizerDetails(self._conference),
         self._getBookingDetails('new')
@@ -228,23 +228,23 @@ class EVOMeetingModifiedNotificationAdmin(EVOAdminNotificationBase):
     def __init__(self, booking):
         EVOAdminNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico][EVO] EVO meeting modified: %s (event id: %s)"""
+        self.setSubject("""[EVO] EVO meeting modified: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear EVO Responsible,<br />
 <br />
-An EVO meeting <strong>was modified</strong>.<br />
+An EVO meeting <strong>was modified</strong> in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to see it in Indico.<br />
 <br />
 %s
 <br />
 %s
 <br />
-You also can see a list of all the EVO meetings here: (not implemented yet).<br />
-<br />
 <br />
 %s
-""" % ( self._modifLink,
+""" % ( MailTools.getServerName(),
+        MailTools.getServerName(),
+        self._modifLink,
         MailTools.eventDetails(self._conference),
         MailTools.organizerDetails(self._conference),
         self._getBookingDetails('modify')
@@ -286,22 +286,22 @@ class EVOMeetingRemovalNotificationAdmin(EVOAdminNotificationBase):
     def __init__(self, booking):
         EVOAdminNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico][EVO] EVO meeting deleted: %s (event id: %s)"""
+        self.setSubject("""[EVO] EVO meeting deleted: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear EVO Responsible,<br />
 <br />
-An EVO meeting <strong>was deleted</strong>.<br />
+An EVO meeting <strong>was deleted</strong> in <a href="%s">%s</a><br />
 <br />
 %s
 <br />
 %s
 <br />
-You also can see a list of all the EVO meetings here: (not implemented yet).<br />
-<br />
 <br />
 %s
-""" % ( MailTools.eventDetails(self._conference),
+""" % ( MailTools.getServerName(),
+        MailTools.getServerName(),
+        MailTools.eventDetails(self._conference),
         MailTools.organizerDetails(self._conference),
         self._getBookingDetails('remove')
         ))

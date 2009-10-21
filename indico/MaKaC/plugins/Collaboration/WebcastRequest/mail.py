@@ -304,11 +304,11 @@ class NewRequestNotification(WebcastRequestAdminNotificationBase):
     def __init__(self, booking):
         WebcastRequestAdminNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico][WebcastReq] New webcast request: %s (event id: %s)"""
+        self.setSubject("""[WebcastReq] New webcast request: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         self.setBody("""Dear Webcast Responsible,<br />
 <br />
-There is a <strong>new webcast request</strong>.<br />
+There is a <strong>new webcast request</strong> in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to accept or reject the request.<br />
 %s
 <br />
@@ -316,7 +316,9 @@ Click <a href="%s">here</a> to accept or reject the request.<br />
 <br />
 <br />
 %s
-""" % ( self._modifLink,
+""" % ( MailTools.getServerName(),
+        MailTools.getServerName(),
+        self._modifLink,
         MailTools.eventDetails(self._conference),
         MailTools.organizerDetails(self._conference),
         self._getRequestDetails('new')
@@ -331,12 +333,12 @@ class RequestModifiedNotification(WebcastRequestAdminNotificationBase):
     def __init__(self, booking):
         WebcastRequestAdminNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico][WebcastReq] Webcast request modified: %s (event id: %s)"""
+        self.setSubject("""[WebcastReq] Webcast request modified: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear Webcast Responsible,<br />
 <br />
-A webcast request <strong>has been modified</strong>.<br />
+A webcast request <strong>has been modified</strong> in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to accept or reject the request.<br />
 %s
 <br />
@@ -344,7 +346,9 @@ Click <a href="%s">here</a> to accept or reject the request.<br />
 <br />
 <br />
 %s
-""" % ( self._modifLink,
+""" % ( MailTools.getServerName(),
+        MailTools.getServerName(),
+        self._modifLink,
         MailTools.eventDetails(self._conference),
         MailTools.organizerDetails(self._conference),
         self._getRequestDetails('modify')
@@ -359,12 +363,12 @@ class RequestDeletedNotification(WebcastRequestAdminNotificationBase):
     def __init__(self, booking):
         WebcastRequestAdminNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico][WebcastReq] Webcast request deleted: %s (event id: %s)"""
+        self.setSubject("""[WebcastReq] Webcast request deleted: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear Webcast Responsible,<br />
 <br />
-A webcast request <strong>has been withdrawn</strong>.<br />
+A webcast request <strong>has been withdrawn</strong> in <a href="%s">%s</a><br />
 <br />
 %s
 <br />
@@ -372,7 +376,9 @@ A webcast request <strong>has been withdrawn</strong>.<br />
 <br />
 <br />
 %s
-""" % ( MailTools.eventDetails(self._conference),
+""" % ( MailTools.getServerName(),
+        MailTools.getServerName(),
+        MailTools.eventDetails(self._conference),
         MailTools.organizerDetails(self._conference),
         self._getRequestDetails('remove')
         ))
@@ -408,15 +414,17 @@ class RequestAcceptedNotificationAdmin(WebcastRequestAdminNotificationBase):
     def __init__(self, booking):
         WebcastRequestAdminNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico][WebcastReq] Webcast request accepted: %s (event id: %s)"""
+        self.setSubject("""[WebcastReq] Webcast request accepted: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear Webcast Responsible,<br />
 <br />
-A webcast request for the event: "%s" has been accepted.<br />
+A webcast request for the event: "%s" has been accepted in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to view the request.<br />
 
 """ % ( self._conference.getTitle(),
+        MailTools.getServerName(),
+        MailTools.getServerName(),
         self._modifLink
       ))
 
@@ -457,12 +465,12 @@ class RequestRejectedNotificationAdmin(WebcastRequestAdminNotificationBase):
     def __init__(self, booking):
         WebcastRequestAdminNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico][WebcastReq] Webcast request rejected: %s (event id: %s)"""
+        self.setSubject("""[WebcastReq] Webcast request rejected: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear Webcast Responsible,<br />
 <br />
-A webcast request for the event: "%s" has been rejected.<br />
+A webcast request for the event: "%s" has been rejected in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to view the request.<br />
 <br />
 The reason given by the Webcast Responsible who rejected the request was:
@@ -471,6 +479,8 @@ The reason given by the Webcast Responsible who rejected the request was:
 <br />
 
 """ % ( self._conference.getTitle(),
+        MailTools.getServerName(),
+        MailTools.getServerName(),
         self._modifLink,
         self._booking.getRejectReason().strip()
       ))

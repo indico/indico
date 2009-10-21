@@ -299,12 +299,12 @@ class NewRequestNotification(RecordingRequestAdminNotificationBase):
     def __init__(self, booking):
         RecordingRequestAdminNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico][RecReq] New recording request: %s (event id: %s)"""
+        self.setSubject("""[RecReq] New recording request: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear Recording Responsible,<br />
 <br />
-There is a <strong>new recording request</strong>.<br />
+There is a <strong>new recording request</strong> in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to accept or reject the request.<br />
 <br />
 %s
@@ -313,7 +313,9 @@ Click <a href="%s">here</a> to accept or reject the request.<br />
 <br />
 <br />
 %s
-""" % ( self._modifLink,
+""" % ( MailTools.getServerName(),
+        MailTools.getServerName(),
+        self._modifLink,
         MailTools.organizerDetails(self._conference),
         MailTools.eventDetails(self._conference),
         self._getRequestDetails('new')
@@ -328,12 +330,12 @@ class RequestModifiedNotification(RecordingRequestAdminNotificationBase):
     def __init__(self, booking):
         RecordingRequestAdminNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico][RecReq] Recording request modified: %s (event id: %s)"""
+        self.setSubject("""[RecReq] Recording request modified: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear Recording Responsible,<br />
 <br />
-A recording request <strong>has been modified</strong>.<br />
+A recording request <strong>has been modified</strong> in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to accept or reject the request.<br />
 <br />
 %s
@@ -342,7 +344,9 @@ Click <a href="%s">here</a> to accept or reject the request.<br />
 <br />
 <br />
 %s
-""" % ( self._modifLink,
+""" % ( MailTools.getServerName(),
+        MailTools.getServerName(),
+        self._modifLink,
         MailTools.eventDetails(self._conference),
         MailTools.organizerDetails(self._conference),
         self._getRequestDetails('modify')
@@ -357,12 +361,12 @@ class RequestDeletedNotification(RecordingRequestAdminNotificationBase):
     def __init__(self, booking):
         RecordingRequestAdminNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico][RecReq] Recording request withdrawn: %s (event id: %s)"""
+        self.setSubject("""[RecReq] Recording request withdrawn: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear Recording Responsible,<br />
 <br />
-A recording request <strong>has been withdrawn</strong>.<br />
+A recording request <strong>has been withdrawn</strong> in <a href="%s">%s</a><br />
 <br />
 %s
 <br />
@@ -370,7 +374,9 @@ A recording request <strong>has been withdrawn</strong>.<br />
 <br />
 <br />
 %s
-""" % ( MailTools.eventDetails(self._conference),
+""" % ( MailTools.getServerName(),
+        MailTools.getServerName(),
+        MailTools.eventDetails(self._conference),
         MailTools.organizerDetails(self._conference),
         self._getRequestDetails('remove')
         ))
@@ -405,15 +411,17 @@ class RequestAcceptedNotificationAdmin(RecordingRequestAdminNotificationBase):
     def __init__(self, booking):
         RecordingRequestAdminNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico][RecReq] Recording request accepted: %s (event id: %s)"""
+        self.setSubject("""[RecReq] Recording request accepted: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear Recording Responsible,<br />
 <br />
-A recording request for the event: "%s" has been accepted.<br />
+A recording request for the event: "%s" has been accepted in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to view the request.<br />
 
 """ % ( self._conference.getTitle(),
+        MailTools.getServerName(),
+        MailTools.getServerName(),
         self._modifLink
       ))
 
@@ -453,12 +461,12 @@ class RequestRejectedNotificationAdmin(RecordingRequestAdminNotificationBase):
     def __init__(self, booking):
         RecordingRequestAdminNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico][RecReq] Recording request rejected: %s (event id: %s)"""
+        self.setSubject("""[RecReq] Recording request rejected: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear Recording Responsible,<br />
 <br />
-A recording request for the event: "%s" has been rejected.<br />
+A recording request for the event: "%s" has been rejected in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to view the request.<br />
 <br />
 The reason given by the Webcast Responsible who rejected the request was:
@@ -467,6 +475,8 @@ The reason given by the Webcast Responsible who rejected the request was:
 <br />
 
 """ % ( self._conference.getTitle(),
+        MailTools.getServerName(),
+        MailTools.getServerName(),
         self._modifLink,
         self._booking.getRejectReason().strip()
       ))

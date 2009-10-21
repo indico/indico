@@ -23,6 +23,7 @@ from MaKaC.plugins.base import PluginsHolder
 from MaKaC.webinterface import urlHandlers
 from MaKaC.common.utils import formatDateTime
 from MaKaC.common.timezoneUtils import getAdjustedDate
+from MaKaC.common.Configuration import Config
 
 class CollaborationTools(object):
     """ Class with utility classmethods for the Collaboration plugins core and plugins
@@ -242,6 +243,10 @@ class CollaborationTools(object):
     
     
 class MailTools(object):
+    
+    @classmethod
+    def getServerName(cls):
+        return str(Config.getInstance().getBaseURL())
     
     @classmethod
     def needToSendEmails(cls, pluginName = None):
