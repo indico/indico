@@ -213,16 +213,19 @@ type("TabWidget", ["Chooser", "IWidget"],{
                 display: 'none',
                 background: 'white',
                 opacity: '0.7',
-                width: this.width,
                 height: '50px',
                 position: 'absolute',
                 top: '0', left: '0',
                 filter: 'alpha(opacity=70)'
         }});
 
+        if (exists(this.width)) {
+            this.disableOverlay.dom.style.width = this.width;
+        }
+
         this.container = this.IWidget.prototype.draw.call(
             this,
-            Html.div({style: {width: pixels(self.width)}},
+            Html.div({style: exists(self.width) ? {width: pixels(self.width)} : {}},
                      Html.div({className: "tabListContainer", style: {position: 'relative'}}, this.scrollArrows.left[0], this.scrollArrows.right[0], this.tabList,
                               Html.div('tabGradient', extraButtons/*,
                                        Html.div({className: 'tabBorderGradient', style: {cssFloat: 'left'}}),
