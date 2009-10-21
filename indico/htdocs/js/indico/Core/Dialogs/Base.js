@@ -193,6 +193,7 @@ type("ProgressDialog",["ExclusivePopup"],
          } else {
              this.text = text;
          }
+         this.ExclusivePopup();
      }
     );
 

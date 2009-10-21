@@ -4,17 +4,24 @@
 
 this.global = this;
 
-global.isDefined = function(name) {
+function isDefined(name) {
 	return name in global;
 }
 
 if (typeof(global.include) !== "function") {
-	global.include = function(script) {
+	var include = function(script) {
 		document.write("<script type=\"text/javascript\" src=\"" + script + "\"></script>");
 	}
 }
 
-global.extract = function(text, start, stop) {
+function load(code) {
+	if (window.execScript) {
+		return window.execScript(code);
+	}
+	global.eval(code);
+}
+
+function extract(text, start, stop) {
 	var startIndex;
 	if (!empty(start)) {
 		startIndex = text.indexOf(start);
@@ -30,7 +37,7 @@ global.extract = function(text, start, stop) {
 	return text.substring(startIndex, stopIndex);
 }
 
-global.equals = function(a, b) {
+function equals(a, b) {
 	if (!exists(a))
 		return !exists(b);
 	if (!exists(b))
@@ -46,7 +53,7 @@ global.equals = function(a, b) {
  * Makes declarations internal
  * @param {Function} block
  */
-global.internal = function(block) {
+function internal(block) {
 	block();
 }
 
@@ -55,7 +62,7 @@ global.internal = function(block) {
  * @param {Object} value
  * @return {Object}
  */
-global.pass = function(value) {
+function pass(value) {
 	return value;
 }
 pass.toTarget = pass;
@@ -66,7 +73,7 @@ pass.toSource = pass;
  * @param {Object} value
  * @return {Boolean}
  */
-global.invert = function(value) {
+function invert(value) {
 	return !value;
 }
 invert.toTarget = invert;
@@ -77,7 +84,7 @@ invert.toSource = invert;
  * @param {Object} value
  * @return {Boolean}
  */
-global.exists = function(value) {
+function exists(value) {
 	return value !== undefined && value !== null;
 }
 
@@ -86,7 +93,7 @@ global.exists = function(value) {
  * @param {Object} value
  * @return {Boolean}
  */
-global.empty = function(value) {
+function empty(value) {
 	return !exists(value) || value === ""
 		|| (isArray(value) && value.length === 0)
 		|| (isObject(value) && (value.Enumerable ? value.isEmpty() : !hasProperties(value)));
@@ -97,7 +104,7 @@ global.empty = function(value) {
  * @param {Object} object
  * @return {Boolean}
  */
-global.hasProperties = function(object) {
+function hasProperties(object) {
 	for (var key in object) {
 		return true;
 	}
@@ -109,7 +116,7 @@ global.hasProperties = function(object) {
  * @param {Object} ... values
  * @return {Object}
  */
-global.any = function() {
+function any() {
 	for (var i = 0, length = arguments.length; i < length; i++) {
 		var arg = arguments[i];
 		if (exists(arg)) {
@@ -123,22 +130,22 @@ global.any = function() {
  * @param {Function} ... functions
  * @return {Object}
  */
-global.tryAny = function() {
+function tryAny() {
 	for (var i = 0; i < arguments.length; i++) {
 		var method = arguments[i];
 		try {
 			return method();
 		} catch (e) {
-			
+
 		}
 	}
 }
 
-global.get = function(value, builder) {
+function get(value, builder) {
 	return exists(value) ? value : builder();
 }
 
-global.getByKey = function(object, property, value) {
+function getByKey(object, property, value) {
 	return property in object ? object[property] : value;
 }
 
@@ -147,7 +154,7 @@ global.getByKey = function(object, property, value) {
  * @param {Object} value
  * @return {Boolean}
  */
-global.isObject = function(value) {
+function isObject(value) {
 	return typeof(value) == "object" && value !== null;
 }
 
@@ -156,7 +163,7 @@ global.isObject = function(value) {
  * @param {Object} value
  * @return {Boolean}
  */
-global.isNumber = function(value) {
+function isNumber(value) {
 	return typeof(value) == "number";
 }
 
@@ -165,7 +172,7 @@ global.isNumber = function(value) {
  * @param {Object} value
  * @return {Boolean}
  */
-global.isString = function(value) {
+function isString(value) {
 	return typeof(value) == "string";
 }
 
@@ -174,7 +181,7 @@ global.isString = function(value) {
  * @param {Object} value
  * @return {Boolean}
  */
-global.isFunction = function(value) {
+function isFunction(value) {
 	return typeof(value) == "function";
 }
 
@@ -183,7 +190,7 @@ global.isFunction = function(value) {
  * @param {Object} value
  * @return {Boolean}
  */
-global.isArray = function(value) {
+function isArray(value) {
 	return value instanceof Array;
 }
 
@@ -192,7 +199,7 @@ global.isArray = function(value) {
  * @param {Object} value
  * @return {Boolean}
  */
-global.isDom = function(value) {
+function isDom(value) {
 	return exists(value) && isNumber(value.nodeType);
 }
 
@@ -206,7 +213,7 @@ global.isDom = function(value) {
  * @param {Object} value
  * @return {Object} result
  */
-global.init = function(object, property, value) {
+function init(object, property, value) {
 	var result = object[property];
 	return exists(result) ? result : object[property] = value;
 }
@@ -221,12 +228,12 @@ global.init = function(object, property, value) {
  * @param {Function} initializer
  * @return {Object} result
  */
-global.obtain = function(object, property, initializer) {
+function obtain(object, property, initializer) {
 	var result = object[property];
 	return exists(result) ? result : object[property] = initializer();
 }
 
-global.obtainGet = function(object, property, initializer) {
+function obtainGet(object, property, initializer) {
 	var result = object.get(property);
 	if (!exists(result)) {
 		result = initializer();
@@ -235,11 +242,11 @@ global.obtainGet = function(object, property, initializer) {
 	return result;
 }
 
-global.obtainSet = function(object, property, key, value) {
+function obtainSet(object, property, key, value) {
 	obtain(object, property, newObject)[key] = value;
 }
 
-global.obtainAdd = function(object, property, value) {
+function obtainAdd(object, property, value) {
 	obtain(object, property, newArray).push(value);
 }
 
@@ -249,7 +256,7 @@ global.obtainAdd = function(object, property, value) {
  * @param {Object} properties
  * @return {Object} result
  */
-global.clone = function(object) {
+function clone(object) {
 	var result = new object.constructor();
 	for (var key in object) {
 		result[key] = object[key];
@@ -263,7 +270,7 @@ global.clone = function(object) {
  * @param {Object} source
  * @return {Object} target
  */
-global.extend = function(target, source) {
+function extend(target, source) {
 	for (var key in source) {
 		target[key] = source[key];
 	}
@@ -273,7 +280,7 @@ global.extend = function(target, source) {
 /**
  * Function that does nothing.
  */
-global.nothing = function() {
+function nothing() {
 }
 
 /**
@@ -281,7 +288,7 @@ global.nothing = function() {
  * @param {Object} value
  * @return {String}
  */
-global.str = function(value) {
+function str(value) {
 	switch (typeof(value)) {
 		case "boolean":
 			return value ? "true" : "false";
@@ -302,32 +309,32 @@ global.str = function(value) {
  * @param {Function} type
  * @return {Function}
  */
-global.construct = function(type) {
+function construct(type) {
 	return function() {
 		return new type();
 	};
 }
 
-global.provide = function(type) {
+function provide(type) {
 	return function(value) {
 		return exists(value) ? value : new type();
 	};
 }
 
 
-global.newObject = construct(Object);
-global.newArray = construct(Array);
-global.getObject = provide(newObject);
-global.getArray = provide(newArray);
+var newObject = construct(Object);
+var newArray = construct(Array);
+var getObject = provide(newObject);
+var getArray = provide(newArray);
 
 
-global.objectize = function(key, value) {
+function objectize(key, value) {
 	var obj = {};
 	obj[key] = value;
 	return obj;
 }
 
-global.setExisting = function(object, key, value) {
+function setExisting(object, key, value) {
 	if (exists(value)) {
 		object[key] = value;
 	}
@@ -336,7 +343,7 @@ global.setExisting = function(object, key, value) {
 /**
  * Browser detection from Prototype JavaScript Framework.
  */
-global.Browser = {
+var Browser = {
 	IE: (window.attachEvent && !window.opera) ? extract(navigator.appVersion, "MSIE ", ";") : false,
 	Opera: window.opera ? extract(navigator.appVersion, "", " ") : false,
 	WebKit: navigator.appVersion.indexOf('AppleWebKit/') > -1 ? extract(navigator.appVersion, "AppleWebKit/", " ") : false,

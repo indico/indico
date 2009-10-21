@@ -201,3 +201,125 @@ function escapeHTML(html) {
     // from Prototype
     return html.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+
+function invertableBind(target, source, invert, template) {
+    var invTemplate = template?{
+        toSource: template.toTarget,
+        toTarget: template.toSource
+    }:null;
+    return invert?$B(source, target, invTemplate):
+        $B(target, source, template);
+}
+
+var SortCriteria = {
+    Default: function(e1, e2) {
+        return e1 == e2?0:(e1 < e2?-1:1);
+    },
+    Integer: function(e1, e2) {
+
+        if (isNaN(parseInt(e1,10)) ||
+            isNaN(parseInt(e2,10))) {
+            return SortCriteria.Default(e1, e2);
+        } else {
+            return parseInt(e1,10) == parseInt(e2,10)?0:(parseInt(e1,10) < parseInt(e2,10)?-1:1);
+        }
+    }
+};
+
+function partition(list, start, end, index, cmp) {
+    var pval = list.item(index);
+    list.swap(index, end);
+    var store = start;
+
+    for (var i=start;i < end;++i) {
+        if (cmp(list.item(i), pval) < 0) {
+            list.swap(i, store);
+            store++;
+        }
+    }
+
+    list.swap(store, end);
+    return store;
+}
+
+function quicksort(list, start, end, cmp) {
+    if (end > start) {
+        var pnew = partition(list, start, end, start, cmp);
+        quicksort(list, start, pnew - 1, cmp);
+        quicksort(list, pnew + 1, end, cmp);
+    }
+
+}
+
+extend(WatchList.prototype,
+       {
+           swap: function(source, destination) {
+               var itemS = this.item(source);
+               var itemD = this.item(destination);
+               this.replaceAt(source, itemD);
+               this.replaceAt(destination, itemS);
+           },
+
+           sort: function(compare) {
+               compare = compare || SortCriteria.Default;
+               quicksort(this, 0, this.length.get()-1, compare);
+           }
+
+       });
+
+type("WatchOrderedDict", ["WatchObject"],
+     {
+
+         // ATTENTION: Implementation not complete!
+         // remove() functions missing!
+
+         sort: function(compare) {
+             this.order.sort(compare);
+         }
+     },
+     function() {
+         this.order = $L();
+         this.WatchObject();
+
+         var self = this;
+
+         this.each = function(iterator) {
+
+             // follow the order
+
+             var self = this;
+             each(this.order,
+                  function (key) {
+                      iterator(self.get(key), key);
+                  });
+         };
+
+         this.set = function(key, value) {
+             this.order.add(key);
+             this.WatchObject.prototype.set.call(key, value);
+         };
+
+         var oldUpdate = this.update;
+         var oldClear = this.clear;
+
+         this.update = function(values) {
+
+             var self = this;
+
+             each(values, function(value, key) {
+                 self.order.append(key);
+             });
+
+             oldUpdate.call(this, values);
+         };
+
+         this.clear = function() {
+             this.order.clear();
+             return oldClear();
+         };
+
+     });
+
+function $D(source, template) {
+        return bind.toDictionary(new WatchOrderedDict(), source, template);
+}

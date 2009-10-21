@@ -1,7 +1,7 @@
 
 <div id="timetable" style="position: relative;">
 
-<div class="timetableLoading" style="width: 700px; height: 300px;">
+<div class="timetablePreLoading" style="width: 700px; height: 300px;">
     <div class="text" style="padding-top: 200px;">&nbsp;&nbsp;&nbsp;<%= _("Building timetable...") %></div>
 </div>
 
@@ -12,7 +12,7 @@
 IndicoUI.executeOnLoad(function(){
   var ttdata = <%= str(ttdata).replace('%','%%') %>;
 
-  var timetable = new TimeTable(ttdata,710,$E('timetable'), false);
+  var timetable = new TimeTableDisplay(ttdata,710,$E('timetable'), false);
   $E('timetable').set(timetable.draw());
   timetable.postDraw();
 

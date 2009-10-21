@@ -2,7 +2,7 @@
  * @author Tom
  */
 
-global.Point = function(x, y) {
+function Point(x, y) {
 	if (!exists(x)) {
 		this.x = 0;
 		this.y = 0;
@@ -56,7 +56,7 @@ Point.prototype = {
 			this.y += x.y;
 		} else {
 			this.x += x;
-			this.y += y; 
+			this.y += y;
 		}
 		return this;
 	},
@@ -103,13 +103,13 @@ Point.prototype = {
 	}
 };
 
-global.Rad = {};
+var Rad = {};
 
 times(4, function(value) {
 	Rad["q" + (value + 1)] = Math.PI * (value + 1) / 2;
 });
 
-global.MathEx = {
+var MathEx = {
 	sqr: function(value) {
 		return value * value;
 	},
@@ -159,10 +159,10 @@ global.MathEx = {
 	}
 };
 
-global.even = function(number) {
+function even(number) {
 	return number % 2 === 0;
 }
 
-global.odd = function(number) {
+function odd(number) {
 	return number % 2 !== 0;
 }

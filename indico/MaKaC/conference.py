@@ -40,8 +40,9 @@ import MaKaC
 import MaKaC.common.indexes as indexes
 from MaKaC.common.timezoneUtils import nowutc
 import MaKaC.fileRepository as fileRepository
-import MaKaC.schedule as schedule
-from MaKaC.schedule import ConferenceSchedule, SessionSchedule, SlotSchedule, PosterSlotSchedule, SlotSchTypeFactory, ContribSchEntry
+from MaKaC.schedule import ConferenceSchedule, SessionSchedule,SlotSchedule,\
+     PosterSlotSchedule, SlotSchTypeFactory, ContribSchEntry, \
+     LinkedTimeSchEntry, BreakTimeSchEntry
 import MaKaC.review as review
 from MaKaC.common import Config, DBMgr, utils
 from MaKaC.common.Counter import Counter
@@ -69,12 +70,15 @@ from MaKaC.common.utils import getHierarchicalId
 from MaKaC.i18n import _
 from MaKaC.common.PickleJar import Retrieves
 from MaKaC.common.PickleJar import Updates
-from MaKaC.common.PickleJar import Conversion
 from MaKaC.common.PickleJar import if_else
+from MaKaC.common.PickleJar import DictPickler
+from MaKaC.common.Conversion import Conversion
 
 from MaKaC.webinterface import urlHandlers
 
 from MaKaC.common.logger import Logger
+from MaKaC.common.contextManager import ContextManager
+
 
 class CategoryManager( ObjectHolder ):
     idxName = "categories"
@@ -1472,6 +1476,9 @@ class CustomRoom(Persistent):
 
 class ConferenceParticipation(Persistent):
 
+    @Retrieves(['MaKaC.conference.ConferenceParticipation',
+                 'MaKaC.conference.SessionChair',
+                 'MaKaC.conference.SlotChair'], 'isConfParticipation', lambda x: True)
     def __init__(self):
         self._firstName=""
         self._surName=""
@@ -1561,6 +1568,9 @@ class ConferenceParticipation(Persistent):
         self._firstName=tmp
         self._notifyModification()
 
+    @Retrieves (['MaKaC.conference.ConferenceParticipation',
+                 'MaKaC.conference.SessionChair',
+                 'MaKaC.conference.SlotChair'], 'firstName')
     def getFirstName( self ):
         return self._firstName
 
@@ -1574,6 +1584,9 @@ class ConferenceParticipation(Persistent):
         self._surName=tmp
         self._notifyModification()
 
+    @Retrieves (['MaKaC.conference.ConferenceParticipation',
+                 'MaKaC.conference.SessionChair',
+                 'MaKaC.conference.SlotChair'], 'familyName')
     def getFamilyName( self ):
         return self._surName
 
@@ -1587,6 +1600,9 @@ class ConferenceParticipation(Persistent):
         self._email=newMail.strip()
         self._notifyModification()
 
+    @Retrieves (['MaKaC.conference.ConferenceParticipation',
+                 'MaKaC.conference.SessionChair',
+                 'MaKaC.conference.SlotChair'], 'email')
     def getEmail( self ):
         return self._email
 
@@ -1597,6 +1613,9 @@ class ConferenceParticipation(Persistent):
         self._affiliation=newAffil.strip()
         self._notifyModification()
 
+    @Retrieves (['MaKaC.conference.ConferenceParticipation',
+                 'MaKaC.conference.SessionChair',
+                 'MaKaC.conference.SlotChair'], 'affiliation')
     def getAffiliation(self):
         return self._affiliation
 
@@ -1607,6 +1626,9 @@ class ConferenceParticipation(Persistent):
         self._address=newAddr.strip()
         self._notifyModification()
 
+    @Retrieves (['MaKaC.conference.ConferenceParticipation',
+                 'MaKaC.conference.SessionChair',
+                 'MaKaC.conference.SlotChair'], 'address')
     def getAddress(self):
         return self._address
 
@@ -1617,6 +1639,9 @@ class ConferenceParticipation(Persistent):
         self._phone=newPhone.strip()
         self._notifyModification()
 
+    @Retrieves (['MaKaC.conference.ConferenceParticipation',
+                 'MaKaC.conference.SessionChair',
+                 'MaKaC.conference.SlotChair'], 'phone')
     def getPhone(self):
         return self._phone
 
@@ -1627,6 +1652,9 @@ class ConferenceParticipation(Persistent):
         self._title=newTitle.strip()
         self._notifyModification()
 
+    @Retrieves (['MaKaC.conference.ConferenceParticipation',
+                 'MaKaC.conference.SessionChair',
+                 'MaKaC.conference.SlotChair'], 'title')
     def getTitle(self):
         return self._title
 
@@ -1637,9 +1665,15 @@ class ConferenceParticipation(Persistent):
         self._fax=newFax.strip()
         self._notifyModification()
 
+    @Retrieves (['MaKaC.conference.ConferenceParticipation',
+                 'MaKaC.conference.SessionChair',
+                 'MaKaC.conference.SlotChair'], 'fax')
     def getFax(self):
         return self._fax
 
+    @Retrieves (['MaKaC.conference.ConferenceParticipation',
+                 'MaKaC.conference.SessionChair',
+                 'MaKaC.conference.SlotChair'], 'fullName')
     def getFullName( self ):
         res = self.getFamilyName()
         if self.getFirstName() != "":
@@ -1651,6 +1685,9 @@ class ConferenceParticipation(Persistent):
             res = "%s %s"%( self.getTitle(), res )
         return res
 
+    @Retrieves (['MaKaC.conference.ConferenceParticipation',
+                 'MaKaC.conference.SessionChair',
+                 'MaKaC.conference.SlotChair'], 'name')
     def getFullNameNoTitle( self ):
         res = self.getFamilyName()
         if self.getFirstName() != "":
@@ -1902,7 +1939,12 @@ class Conference(Persistent):
 
     @Retrieves ('MaKaC.conference.Conference', 'videoServicesDisplayURL',
                 lambda conf: (str(urlHandlers.UHConferenceDisplay.getURL(conf)), str(urlHandlers.UHCollaborationDisplay.getURL(conf)))[conf.getType() == 'conference'])
+    @Retrieves ('MaKaC.conference.Conference', 'displayURL', lambda conf: str(urlHandlers.UHConferenceDisplay.getURL(conf)))
     @Retrieves ('MaKaC.conference.Conference', 'modifURL', lambda conf: str(urlHandlers.UHConferenceModification.getURL(conf)))
+    @Retrieves(['MaKaC.conference.Conference'], 'sessions', lambda conf: DictPickler.pickle(Conversion.sessionList(conf)))
+    @Retrieves(['MaKaC.conference.Conference'], 'isConference', lambda x : x.getType() == 'conference')
+
+
     def __init__(self, creator, id="", creationDate = None, modificationDate = None):
         """Class constructor. Initialise the class attributes to the default
             values.
@@ -2234,16 +2276,6 @@ class Conference(Persistent):
             self._logHandler = LogHandler()
         return self._logHandler
 
-    def getAutoSolveConflict(self):
-        try:
-            if self._autoSolveConflict:
-                pass
-        except AttributeError:
-            self._autoSolveConflict = True
-        return self._autoSolveConflict
-
-    def setAutoSolveConflict(self, value):
-        self._autoSolveConflict = value
 
     def getEnableSessionSlots(self):
         try :
@@ -2387,6 +2419,7 @@ class Conference(Persistent):
     def newContribType(self, name, description):
         ct = ContributionType(name, description, self)
         self.addContribType(ct)
+        return ct
 
     def getContribTypeList(self):
         try:
@@ -2724,7 +2757,7 @@ class Conference(Persistent):
     def getConference( self ):
         return self
 
-    def setDates( self, sDate, eDate=None, check=1, moveEntries=1 ):
+    def setDates( self, sDate, eDate=None, check=1, moveEntries=0 ):
         if sDate>eDate:
             raise MaKaCError( _("Start date cannot be after the end date"), _("Event"))
         oldStartDate=copy.copy(self.getStartDate())
@@ -2872,9 +2905,10 @@ class Conference(Persistent):
         if self.getSchedule().hasEntriesAfter(edate):
             raise MaKaCError(_("Cannot change end date to %s: some entries in the timetable would be outside this date (%s)") % (edate,self.getSchedule().getEntries()[-1].getStartDate()), _("Event"))
 
-    def setEndDate(self, eDate,check=1, index=True):
+    def setEndDate(self, eDate, check=1, index=True):
         """changes the current conference ending date to the one specified by
             the parameters"""
+
         if not eDate.tzname():
             raise MaKaCError("date should be timezone aware")
         if eDate == self.getEndDate():
@@ -3018,7 +3052,8 @@ class Conference(Persistent):
         except ValueError,e:
             raise MaKaCError("Error moving the timezone: %s"%e)
         self.setDates( sDate.astimezone(timezone('UTC')), \
-                    eDate.astimezone(timezone('UTC')) )
+                       eDate.astimezone(timezone('UTC')),
+                       moveEntries=1)
 
 
 
@@ -3206,6 +3241,8 @@ class Conference(Persistent):
     def getOwnLocation( self ):
         return self.getLocation()
 
+    @Retrieves(['MaKaC.conference.Conference'], 'location', Conversion.locationName)
+    @Retrieves(['MaKaC.conference.Conference'], 'address', Conversion.locationAddress)
     def getLocation( self ):
         if len(self.places)>0:
             return self.places[0]
@@ -3224,6 +3261,7 @@ class Conference(Persistent):
     def getOwnRoom( self ):
         return self.getRoom()
 
+    @Retrieves(['MaKaC.conference.Conference'], 'room', Conversion.roomName)
     def getRoom( self ):
         if len(self.rooms)>0:
             return self.rooms[0]
@@ -3245,6 +3283,14 @@ class Conference(Persistent):
             happen
         """
         return self.places
+
+    @Retrieves(['MaKaC.conference.Conference'], 'favoriteRooms')
+    def getFavoriteRooms(self):
+        roomList = []
+        roomList.extend(self.getRoomList())
+        roomList.extend(map(lambda x: x._getName(), self.getBookedRooms()))
+
+        return roomList
 
     def addLocation(self, newPlace):
         self.places.append( newPlace )
@@ -3281,7 +3327,7 @@ class Conference(Persistent):
         """
         return str(self.__sessionGenerator.newCount())
 
-    def addSession(self,newSession, check = 1, id = None):
+    def addSession(self,newSession, check = 2, id = None):
         """Adds a new session object to the conference taking care of assigning
             a new unique id to it
         """
@@ -3289,8 +3335,7 @@ class Conference(Persistent):
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+
         if self.hasSession(newSession):
             return
         if self.getSchedule().isOutside(newSession):
@@ -3361,7 +3406,7 @@ class Conference(Persistent):
         """
         res=[]
         for entry in self.getSchedule().getEntries():
-            if isinstance(entry,schedule.LinkedTimeSchEntry) and \
+            if isinstance(entry,LinkedTimeSchEntry) and \
                                 isinstance(entry.getOwner(),SessionSlot):
                 session=entry.getOwner().getSession()
                 if session not in res:
@@ -4188,7 +4233,7 @@ class Conference(Persistent):
         startDate = timezone(self.getTimezone()).localize(startDate).astimezone(timezone('UTC'))
         timeDelta = startDate - self.getStartDate()
         endDate = self.getEndDate() + timeDelta
-        conf.setDates( startDate, endDate )
+        conf.setDates( startDate, endDate, moveEntries=1 )
         conf.setContactInfo(self.getContactInfo())
         conf.setChairmanText(self.getChairmanText())
         conf.setVisibility(self.getVisibility())
@@ -4207,7 +4252,7 @@ class Conference(Persistent):
             conf._sections.append(item)
         if options.get("sessions", False):
             for entry in self.getSchedule().getEntries():
-                if isinstance(entry,schedule.BreakTimeSchEntry):
+                if isinstance(entry,BreakTimeSchEntry):
                     conf.getSchedule().addEntry(entry.clone(conf))
         db_root = DBMgr.getInstance().getDBConnection().root()
         if db_root.has_key( "webfactoryregistry" ):
@@ -5161,6 +5206,9 @@ class Session(Persistent):
         conference but it is allowed for flexibility.
     """
 
+
+    @Retrieves(['MaKaC.conference.Session'], 'numSlots', lambda x : len(x.getSlotList()))
+
     def __init__(self, **sessionData):
         """Class constructor. Initialise the class attributes to the default
             values.
@@ -5201,7 +5249,7 @@ class Session(Persistent):
         self._coordinatorsEmail = []
         self._code=""
         self._color="#e3f2d3"
-        self._textColor="#777777"
+        self._textColor="#202020"
         self._textColorToLinks=False
         self._ttType=SlotSchTypeFactory.getDefaultId()
         self._closed = False
@@ -5343,12 +5391,8 @@ class Session(Persistent):
     def includeInConference(self,conf,newId):
         self.conference=conf
         self.id=newId
-        if self.getAutoSolveConflict():
-            check=2
-        else:
-            check=1
         for slot in self.getSlotList():
-            conf.getSchedule().addEntry(slot.getConfSchEntry(),check)
+            conf.getSchedule().addEntry(slot.getConfSchEntry(),2)
         self.getConference().addSession(self)
         self.notifyModification()
 
@@ -5435,17 +5479,13 @@ class Session(Persistent):
         self.setEndDate(self.getMaxSlotEndDate(),0)
 
     def addSlot(self,newSlot):
-        if self.getAutoSolveConflict():
-            check=2
-        else:
-            check=1
         id = newSlot.getId()
         if id == "not assigned":
             newSlot.setId(str(self.__slotGenerator.newCount()))
         self.slots[newSlot.getId()]=newSlot
-        self.getSchedule().addEntry(newSlot.getSessionSchEntry(),check)
+        self.getSchedule().addEntry(newSlot.getSessionSchEntry(),2)
         if self.getConference() is not None:
-            self.getConference().getSchedule().addEntry(newSlot.getConfSchEntry(),check)
+            self.getConference().getSchedule().addEntry(newSlot.getConfSchEntry(),2)
         self.notifyModification()
 
     def _removeSlot(self,slot):
@@ -5541,7 +5581,7 @@ class Session(Persistent):
             return self._textColor
         return color
 
-    def setValues( self, sessionData,check=1,moveEntries=0 ):
+    def setValues( self, sessionData,check=2,moveEntries=0 ):
         """Sets all the values of the current session object from a dictionary
             containing the following key-value pairs:
                 title-(str)
@@ -5568,8 +5608,7 @@ class Session(Persistent):
             the given dictionary doesn't contain any of the keys the value
             will set to a default value.
         """
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+
         self.setTitle( sessionData.get("title", _("NO TITLE ASSIGNED")) )
         self.setDescription( sessionData.get("description", "") )
         code = sessionData.get("code", "")
@@ -5641,7 +5680,7 @@ class Session(Persistent):
                     self.getEndDate() > self.getConference().getSchedule().getEndDate():
                 raise MaKaCError( _("Impossible to move the session because it would be out of the conference dates"))
             for entry in self.getSchedule().getEntries():
-                if isinstance(entry,schedule.LinkedTimeSchEntry) and \
+                if isinstance(entry,LinkedTimeSchEntry) and \
                         isinstance(entry.getOwner(), SessionSlot):
                     e = entry.getOwner()
                     e.move(e.getStartDate() + diff)
@@ -5739,7 +5778,7 @@ class Session(Persistent):
             if self._textColor:
                 pass
         except AttributeError:
-            self._textColor="#777777"
+            self._textColor="#202020"
         return self._textColor
 
     def setTextColor(self,newColor):
@@ -5759,6 +5798,7 @@ class Session(Persistent):
     def getStartDate(self):
         return self.startDate
 
+    @Retrieves(['MaKaC.conference.Session'], 'startDate', Conversion.datetime)
     def getAdjustedStartDate(self,tz=None):
         if not tz:
             tz = self.getConference().getTimezone()
@@ -5766,33 +5806,33 @@ class Session(Persistent):
             tz = 'UTC'
         return self.startDate.astimezone(timezone(tz))
 
-    def verifyStartDate(self, sdate,check=1):
+    def verifyStartDate(self, sdate, check=2):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem (default)
             2: check and adapt the owner dates
         """
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+
         conf=self.getConference()
-        if conf is not None and sdate<conf.getSchedule().getStartDate():
-            conf_sdate = conf.getSchedule().getStartDate()
+
+        if conf is not None and sdate < conf.getSchedule().getStartDate():
             if check==1:
                 raise ParentTimingError( _("The session starting date cannot be prior to the event starting date"), _("Session"))
             elif check==2:
-                self.getConference().setStartDate(sdate,check=0,moveEntries=0)
+                ContextManager.get('autoOps').append((self, "OWNER_START_DATE_EXTENDED",
+                                conf, sdate.astimezone(timezone(conf.getTimezone()))))
+                conf.setStartDate(sdate,check=0,moveEntries=0)
 
-    def setStartDate(self,newDate,check=1,moveEntries=0):
+    def setStartDate(self,newDate,check=2,moveEntries=0):
         """
            moveEntries parameter:
             0: do not move inner slots
             1: move
             2: do not move but check that session is not out of the conference dates
         """
+
         if not newDate.tzname():
             raise MaKaCError("date should be timezone aware")
-        if self.getAutoSolveConflict() and check == 1:
-            check = 2
         if check != 0:
             self.verifyStartDate(newDate,check)
         oldSdate = self.getStartDate()
@@ -5804,10 +5844,11 @@ class Session(Persistent):
         self.startDate=copy.copy(newDate)
         if moveEntries == 1 and diff is not None and diff != timedelta(0):
             # If the start date changed, we move entries inside the timetable
-            if oldSdate.astimezone(timezone(tz)).date() != newDate.astimezone(timezone(tz)).date():
+            newDateTz = newDate.astimezone(timezone(tz))
+            if oldSdate.astimezone(timezone(tz)).date() != newDateTz.date():
                 entries = self.getSchedule().getEntries()[:]
             else:
-                entries = self.getSchedule().getEntriesOnDay(newDate.astimezone(timezone(self.getTimezone())))[:]
+                entries = self.getSchedule().getEntriesOnDay(newDateTz)[:]
             self.getSchedule().moveEntriesBelow(diff, entries)
         if self.getConference() and not self.getConference().getEnableSessionSlots() and self.getSlotList()[0].getStartDate() != newDate and moveEntries != 0:
             self.getSlotList()[0].startDate = newDate
@@ -5861,18 +5902,22 @@ class Session(Persistent):
                         _("Session"))
                 if check==2:
                     if edate>confEndDate:
+                        ContextManager.get('autoOps').append((self, "OWNER_END_DATE_EXTENDED",
+                                                              self.getConference(),
+                                                              edate.astimezone(tz)))
                         self.getConference().setEndDate(edate)
                     if edate<=confStartDate:
+                        ContextManager.get('autoOps').append((self, "OWNER_START_DATE_EXTENDED",
+                                                              self.getConference(),
+                                                              edate.astimezone(tz)))
                         self.getConference().setStartDate(edate)
         # check inner schedule
         if len(self.getSlotList()) != 0 and self.getSlotList()[-1].getSchedule().hasEntriesAfter(edate):
             raise TimingError( _("Cannot change end date: some entries in the session schedule end after the new date"), _("Session"))
 
-    def setEndDate(self,newDate,check=1):
+    def setEndDate(self,newDate,check=2):
         if not newDate.tzname():
             raise MaKaCError("date should be timezone aware")
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
         if check != 0:
             self.verifyEndDate(newDate,check)
         self.duration=newDate-self.getStartDate()
@@ -5942,6 +5987,8 @@ class Session(Persistent):
         """
         return self.getConference()
 
+    @Retrieves(['MaKaC.conference.Session'], 'location', Conversion.locationName)
+    @Retrieves(['MaKaC.conference.Session'], 'address', Conversion.locationAddress)
     def getLocation( self ):
         if self.getOwnLocation():
             return self.getOwnLocation()
@@ -5965,6 +6012,7 @@ class Session(Persistent):
             self.places.append( newLocation )
         self.notifyModification()
 
+    @Retrieves(['MaKaC.conference.Session'], 'room', Conversion.roomName)
     def getRoom( self ):
         if self.getOwnRoom():
             return self.getOwnRoom()
@@ -6010,6 +6058,7 @@ class Session(Persistent):
                 newConv.setDataFromAvatar(oc)
                 self._addConvener(newConv)
 
+    @Retrieves (['MaKaC.conference.Session'], 'sessionConveners', isPicklableObject=True)
     def getConvenerList(self):
         self._resetConveners()
         return self._conveners
@@ -6360,6 +6409,7 @@ class Session(Persistent):
             return self.materials[ matId ]
         return None
 
+    @Retrieves (['MaKaC.conference.Session'],'material', isPicklableObject=True)
     def getMaterialList( self ):
         return self.materials.values()
 
@@ -6609,11 +6659,6 @@ class Session(Persistent):
     def getAccessController(self):
         return self.__ac
 
-    def getAutoSolveConflict(self):
-        try:
-            return self.getConference().getAutoSolveConflict()
-        except:
-            return False
 
     def _cmpTitle( s1, s2 ):
         s1=s1.getTitle().lower().strip()
@@ -6634,8 +6679,8 @@ class SessionSlot(Persistent):
         self._conveners = []
         self._convenerGen=Counter()
         self._schedule=SlotSchTypeFactory.getDefaultKlass()(self)
-        self._sessionSchEntry=schedule.LinkedTimeSchEntry(self)
-        self._confSchEntry=schedule.LinkedTimeSchEntry(self)
+        self._sessionSchEntry=LinkedTimeSchEntry(self)
+        self._confSchEntry=LinkedTimeSchEntry(self)
         self._contributionDuration = None
 
     def getTimezone( self ):
@@ -6684,7 +6729,7 @@ class SessionSlot(Persistent):
         #populate the timetable
         if options.get("contributions", False) :
             for entry in self.getEntries() :
-                if isinstance(entry, schedule.BreakTimeSchEntry) :
+                if isinstance(entry, BreakTimeSchEntry) :
                     newentry = entry.clone(slot)
                     slot.getSchedule().addEntry(newentry,0)
                 elif isinstance(entry, ContribSchEntry) :
@@ -6735,7 +6780,7 @@ class SessionSlot(Persistent):
                 entry.setStartDate(st,1,0)
                 # add diff to last item end date if and only if the item is
                 # not a break
-                #if not isinstance(entry, schedule.BreakTimeSchEntry):
+                #if not isinstance(entry, BreakTimeSchEntry):
                 #    st=entry.getEndDate()+diff
                 #else:
                 #    st=entry.getEndDate()
@@ -6743,14 +6788,13 @@ class SessionSlot(Persistent):
             if len(entries) != 0 and self.getEndDate() < st:
                 self.setEndDate(st,2)
 
-    def setValues(self,data,check=1, moveEntriesBelow=0):
+    def setValues(self,data,check=2, moveEntriesBelow=0):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates
         """
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+
         # In order to move the entries below, it is needed to know the diff (we have to move them)
         # and the list of entries to move. It's is needed to take those datas in advance because they
         # are going to be modified before the moving.
@@ -6891,7 +6935,7 @@ class SessionSlot(Persistent):
             if self._confSchEntry:
                 pass
         except AttributeError:
-            self._confSchEntry=schedule.LinkedTimeSchEntry(self)
+            self._confSchEntry=LinkedTimeSchEntry(self)
         return self._confSchEntry
 
     def getSessionSchEntry( self ):
@@ -6928,18 +6972,18 @@ class SessionSlot(Persistent):
     def getDescription(self):
         return self.getSession().getDescription()
 
-    def setDates(self,sDate,eDate,check=1,moveEntries=0):
+    def setDates(self,sDate,eDate,check=2,moveEntries=0):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+
         if sDate>eDate:
             raise MaKaCError(_("End date cannot be prior to Start date"),_("Slot"))
 
-        self.setStartDate(sDate,0,moveEntries)
-        self.setDuration(0,0,0,eDate-sDate,check)
+        self.setStartDate(sDate, check, moveEntries, checkDuration=False)
+        self.setDuration(0, 0, 0, eDate-sDate, check)
+
         self.notifyModification()
 
     def getEntries(self):
@@ -6950,21 +6994,21 @@ class SessionSlot(Persistent):
         diff=sDate-self.startDate
         self.startDate = sDate
         for slotEntry in self.getSchedule().getEntries():
-            if isinstance(slotEntry, schedule.BreakTimeSchEntry):
+            if isinstance(slotEntry, BreakTimeSchEntry):
                 slotEntry.startDate = slotEntry.getStartDate() + diff
             else:
                 se = slotEntry.getOwner()
                 se.startDate = se.getStartDate() + diff
         self.getSchedule().reSchedule()
 
-    def verifyStartDate(self, sDate,check=1):
+    def verifyStartDate(self, sDate,check=2):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
+
         tz = timezone(self.getConference().getTimezone())
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+
         if sDate < self.getSession().getStartDate():
             if check == 1:
                 raise ParentTimingError(_("The slot \"%s\" cannot start (%s) before its parent session starts (%s)")%\
@@ -6974,39 +7018,44 @@ class SessionSlot(Persistent):
             elif check == 2:
                 self.getSession().setStartDate(sDate, check, 0)
 
-    def setStartDate(self,sDate,check=1,moveEntries=0):
+    def setStartDate(self,sDate,check=2,moveEntries=0,checkDuration=True):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
 
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
         if sDate is None:
             return
         if not sDate.tzname():
             raise MaKaCError("date should be timezone aware")
         if check != 0:
             self.verifyStartDate(sDate,check)
+
+        # calculate the difference betwwen old and new date
         difference = None
         if self.startDate is not None:
             difference = sDate - self.getStartDate()
+
         self.startDate=copy.copy(sDate)
+
         if difference != None and difference != timedelta(0) and moveEntries:
+            ContextManager.get('autoOps').append((self, "ENTRIES_MOVED",
+                                                  self, sDate.astimezone(timezone(self.getTimezone()))))
             self.getSchedule().moveEntriesBelow(difference,self.getSchedule().getEntries()[:])
+
         if self.getConference() and not self.getConference().getEnableSessionSlots() and self.getSession().getStartDate() != sDate:
             self.getSession().setStartDate(sDate, check, 0)
-        if check != 0 and self.getSession():
+        if check != 0 and self.getSession() and checkDuration:
             self.verifyDuration(self.getDuration(), check=check)
+
+        # synchronize with other timetables
         self.getSessionSchEntry().synchro()
         self.getConfSchEntry().synchro()
         self.notifyModification()
 
-    def setEndDate(self,eDate,check=1):
+    def setEndDate(self,eDate,check=2):
         if not eDate.tzname():
             raise MaKaCError("date should be timezone aware")
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
         if check != 0:
             self.verifyDuration(eDate-self.startDate, check)
         self.setDuration(dur=eDate-self.startDate,check=check)
@@ -7048,14 +7097,13 @@ class SessionSlot(Persistent):
             return True
         return False
 
-    def verifyDuration(self, dur,check=1):
+    def verifyDuration(self, dur, check=1):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
+
         tz = timezone(self.getConference().getTimezone())
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
         if dur <= timedelta(0):
             raise MaKaCError( _("The duration cannot be less than zero"), _("Slot"))
         if dur.days > 1:
@@ -7072,6 +7120,8 @@ class SessionSlot(Persistent):
                             sessionEndDate.astimezone(tz).strftime('%Y-%m-%d %H:%M')),\
                             _("Slot"))
                 elif check==2:
+                    ContextManager.get('autoOps').append((self, "OWNER_END_DATE_EXTENDED",
+                                                          self.getSession(), eDate.astimezone(tz)))
                     self.getSession().setEndDate(eDate,check)
             if eDate.astimezone(tz).date() > self.startDate.astimezone(tz).date():
                 raise TimingError( _("The time slot must end on the same day it has started"), _("Slot"))
@@ -7085,21 +7135,22 @@ class SessionSlot(Persistent):
                         sch.calculateEndDate().astimezone(tz).strftime('%Y-%m-%d %H:%M')),\
                         _("Slot"))
 
-    def setDuration(self,days=0,hours=0,minutes=0,dur=0,check=1):
+    def setDuration(self, days=0,hours=0,minutes=0,dur=0,check=1):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+
         if dur==0:
             dur = timedelta(days=int(days),hours=int(hours),minutes=int(minutes))
         if dur==0 and check==2:
+            ContextManager.get('autoOps').append((self, "DURATION_SET",
+                                                  self, 1))
             dur = timedelta(minutes=1)
         if dur > timedelta(days=1) and check==2:
             pass#dur = timedelta(days=1)
         if check != 0:
-            self.verifyDuration(dur,check)
+            self.verifyDuration(dur, check)
         self.duration = dur
         self.getSessionSchEntry().synchro()
         self.getConfSchEntry().synchro()
@@ -7112,7 +7163,8 @@ class SessionSlot(Persistent):
         """
         return self.session
 
-    @Retrieves(['MaKaC.conference.SessionSlot'], 'location', Conversion.roomName)
+    @Retrieves(['MaKaC.conference.SessionSlot'], 'location', Conversion.locationName)
+    @Retrieves(['MaKaC.conference.SessionSlot'], 'address', Conversion.locationAddress)
     def getLocation( self ):
         if self.getOwnLocation():
             return self.getOwnLocation()
@@ -7226,6 +7278,7 @@ class SessionSlot(Persistent):
                 return conv
         return None
 
+    @Retrieves(['MaKaC.conference.SessionSlot'], 'convenerList', isPicklableObject=True)
     def getOwnConvenerList(self):
         try:
             if self._conveners:
@@ -7246,17 +7299,13 @@ class SessionSlot(Persistent):
             res=self.getSession().getColor()
         return res
 
+    @Retrieves(['MaKaC.conference.SessionSlot'], 'textColor')
     def getTextColor(self):
         res=""
         if self.getSession() is not None:
             res=self.getSession().getTextColor()
         return res
 
-    def getAutoSolveConflict(self):
-        try:
-            return self.getConference().getAutoSolveConflict()
-        except:
-            return False
 
 class ContributionParticipation(Persistent):
 
@@ -7845,7 +7894,7 @@ class Contribution(Persistent):
         return data
 
 
-    def setValues( self, data, check=1, moveEntriesBelow=0):
+    def setValues( self, data, check=2, moveEntriesBelow=0):
         """Sets all the values of the current contribution object from a
             dictionary containing the following key-value pairs:
                 title-(str)
@@ -7872,8 +7921,6 @@ class Contribution(Persistent):
             will set to a default value.
         """
 
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
         # In order to move the entries below, it is needed to know the diff (we have to move them)
         # and the list of entries to move. It's is needed to take those datas in advance because they
         # are going to be modified before the moving.
@@ -7932,14 +7979,14 @@ class Contribution(Persistent):
                  int(data["targetDay"][5:7]),int(data["targetDay"][8:])))
             sdate = timezone(tz).localize(datetime(me.year,me.month, \
                     me.day,int(data["sHour"]),int(data["sMinute"])))
-            self.setStartDate(sdate.astimezone(timezone('UTC')),check=1)
+            self.setStartDate(sdate.astimezone(timezone('UTC')),check=2)
         if data.get("sYear","")!="" and data.get("sMonth","")!="" and \
                 data.get("sDay","")!="" and data.get("sHour","")!="" and \
                 data.get("sMinute","")!="":
             self.setStartDate(timezone(tz).localize(datetime(int(data["sYear"]),
                               int(data["sMonth"]), int(data["sDay"]),
                               int(data["sHour"]),  int(data["sMinute"]))).astimezone(timezone('UTC')),
-                              check=1)
+                              check=2)
             ############################################
             # Fermi timezone awareness(end)            #
             ############################################
@@ -8383,14 +8430,13 @@ class Contribution(Persistent):
             self._boardNumber=""
         return self._boardNumber
 
-    def verifyStartDate(self, sDate,check=1):
+    def verifyStartDate(self, sDate, check=2):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
+
         tz = timezone(self.getConference().getTimezone())
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
         if self.getSchEntry().getSchedule():
             owner = self.getSchEntry().getSchedule().getOwner()
         else:
@@ -8402,7 +8448,9 @@ class Contribution(Persistent):
                     owner.getStartDate().astimezone(tz).strftime('%Y-%m-%d %H:%M')),\
                     _("Contribution"))
             if check == 2:
-                owner.setDates(sDate,owner.getEndDate(),check)
+                ContextManager.get('autoOps').append((self, "OWNER_START_DATE_EXTENDED",
+                                                      owner, sDate.astimezone(tz)))
+                owner.setDates(sDate,owner.getEndDate(), check)
         if sDate > owner.getEndDate():
             if check == 1:
                 raise ParentTimingError(_("The contribution <i>\"%s\"</i> cannot start after (%s) its parent end date(%s)") %\
@@ -8412,20 +8460,20 @@ class Contribution(Persistent):
             if check == 2:
                 owner.setEndDate(sDate+self.getDuration(),check)
 
-    def setStartDate(self,newDate,check=1, moveEntries=0):
+    def setStartDate(self, newDate, check=2, moveEntries=0):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
+
         if newDate == None:
             self.startDate=None
             return
         if not newDate.tzname():
             raise MaKaCError("date should be timezone aware")
-        if self.getAutoSolveConflict() and check==1:
-            check=2
+
         if newDate != None and check != 0:
-            self.verifyStartDate(newDate,check)
+            self.verifyStartDate(newDate, check)
         self.startDate=copy.copy(newDate)
         self.getSchEntry().synchro()
         self.notifyModification()
@@ -8459,33 +8507,36 @@ class Contribution(Persistent):
     def getDuration( self ):
         return self.duration
 
-    def verifyDuration(self,check=1):
+    def verifyDuration(self, check=2):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
+
         tz = timezone(self.getConference().getTimezone())
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+
+        endDate = self.getEndDate()
+
         if self.getSchEntry().getSchedule() is not None:
             owner = self.getSchEntry().getSchedule().getOwner()
-            if self.getEndDate() > owner.getEndDate():
+            if endDate > owner.getEndDate():
                 if check==1:
                     raise ParentTimingError(_("The contribution \"%s\" ending date (%s) has to fit between its parent's dates (%s - %s)") %\
-                            (self.getTitle(), self.getEndDate().astimezone(tz).strftime('%Y-%m-%d %H:%M'),\
+                            (self.getTitle(), endDate.astimezone(tz).strftime('%Y-%m-%d %H:%M'),\
                             owner.getStartDate().astimezone(tz).strftime('%Y-%m-%d %H:%M'),\
                             owner.getEndDate().astimezone(tz).strftime('%Y-%m-%d %H:%M')),\
                             _("Contribution"))
                 elif check==2:
-                    owner.setEndDate(self.getEndDate(),check=2)
+                    ContextManager.get('autoOps').append((self, "OWNER_END_DATE_EXTENDED",
+                                                          owner, self.getAdjustedEndDate()))
+                    owner.setEndDate(endDate, check)
 
-    def setDuration(self,hours=0,minutes=15,check=1,dur=0):
+    def setDuration(self,hours=0,minutes=15,check=2,dur=0):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+
         if dur!=0:
             self.duration=dur
         else:
@@ -9103,6 +9154,7 @@ class Contribution(Persistent):
             return self.materials[ matId ]
         return None
 
+    @Retrieves (['MaKaC.conference.Contribution'],'material', isPicklableObject=True)
     def getMaterialList( self ):
         return self.materials.values()
 
@@ -9542,11 +9594,6 @@ class Contribution(Persistent):
     def setReportNumberHolder(self, rnh):
         self._reportNumberHolder=rnh
 
-    def getAutoSolveConflict(self):
-        try:
-            return self.getConference().getAutoSolveConflict()
-        except:
-            return False
 
 class AcceptedContribution( Contribution ):
     """This class represents a contribution which has been created from an
@@ -10360,6 +10407,7 @@ class SubContribution(Persistent):
             return self.materials[ matId ]
         return None
 
+    @Retrieves (['MaKaC.conference.SubContribution'],'material', isPicklableObject=True)
     def getMaterialList( self ):
         return self.materials.values()
 

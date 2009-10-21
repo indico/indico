@@ -3,25 +3,25 @@
  * @author Tom
  */
 
-// Some parts taken from Prototype Javascript Framework
 
-var Presentation = {
-	path: ScriptRoot + "presentation/"
-};
-
-function include(script) {
+if (typeof(this.include) !== "function") {
+	this.include = function(script) {
 	document.write("<script type=\"text/javascript\" src=\"" + script + "\"></script>");
 }
+}
+
+// Some parts taken from Prototype Javascript Framework
 
 var files = [
 	"Core/Primitives.js",
+	"Core/Exception.js",
 	"Core/Iterators.js",
 	"Core/Tools.js",
 	"Core/String.js",
 	"Core/Type.js",
 	"Core/Interfaces.js",
 	"Core/Commands.js",
-        "Core/MathEx.js",
+    "Core/MathEx.js",
 	"Data/Bag.js",
 	"Data/Watch.js",
 	"Data/WatchValue.js",
@@ -31,16 +31,25 @@ var files = [
 	"Data/Logic.js",
 	"Data/Json.js",
 	"Data/Remote.js",
+	"Data/DataStore.js",
 	"Data/DateTime.js",
+	"Data/Files.js",
+	"Data/Cookies.js",
+	"Data/Service.js",
 	"Ui/MimeTypes.js",
+	"Ui/Dom.js",
 	"Ui/XElement.js",
 	"Ui/Html.js",
-	"Ui/Dom.js",
-	"Ui/Style.js",
-        "Ui/Extensions/Lookup.js",
-        "Ui/Extensions/Layout.js",
-        "Ui/Text.js",
-	"Ui/Styles/SimpleStyles.js",
+	"Ui/Color.js",
+	"Ui/Text.js",
+	"Ui/StyleSheet.js",
+	"Ui/Extensions/SimpleStyles.js",
+	"Ui/Extensions/Layout.js",
+    "Ui/Extensions/Lookup.js",
+	"Ui/Draw/Drawing.js",
+	"Ui/Draw/Svg.js",
+	"Ui/Draw/Vml.js",
+	"Ui/Draw/Draw.js",
 	"Ui/Widgets/WidgetBase.js",
 	"Ui/Widgets/WidgetPage.js",
 	"Ui/Widgets/WidgetComponents.js",
@@ -53,6 +62,6 @@ var files = [
 	"Ui/Widgets/WidgetGrid.js"
 ];
 
-for (var i = 0; i < files.length; i++) {
-	include(Presentation.path + files[i]);
+for (var i in files) {
+	include(ScriptRoot + "presentation/" + files[i]);
 }

@@ -117,10 +117,6 @@
                                             <td align="right" valign="top"><small> <%= _("Where is key?")%>&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext"><%= verbose( room.whereIsKey ) %><% contextHelp( 'whereIsKeyHelp' ) %></td>
                                         </tr>
-                                        <tr>
-                                            <td align="right" valign="top"><small> <%= _("Room tel.")%>&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><%= verbose( room.telephone ) %></td>
-                                        </tr>
                                  </table>
                                 </td>
                               </tr>
@@ -144,6 +140,10 @@
                                                 <%= verbose( room.surfaceArea )%>
                                                 <% if room.surfaceArea: %> m&sup2; <% end %>
                                             </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="right" valign="top"><small> <%= _("Room tel.")%>&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext"><%= verbose( room.telephone ) %></td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> <%= _("Comments")%>&nbsp;&nbsp;</small></td>

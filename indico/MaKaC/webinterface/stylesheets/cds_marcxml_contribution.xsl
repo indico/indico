@@ -61,7 +61,7 @@
   <subfield code="a">Streaming video</subfield>
 </datafield>
 <datafield tag="490" ind1=" " ind2=" ">
-  <subfield code="a"><xsl:value-of select="./category" disable-output-escaping="yes"/></subfield>
+  <subfield code="a"><xsl:value-of select="./category"/></subfield>
 </datafield>
 <datafield tag="490" ind1=" " ind2=" ">
   <subfield code="a"><xsl:value-of select="./title" disable-output-escaping="yes"/></subfield>
@@ -75,7 +75,7 @@
 </datafield>
 </xsl:if>
 <datafield tag="650" ind1="1" ind2="7">
-  <subfield code="a"><xsl:value-of select="./category" disable-output-escaping="yes"/></subfield>
+  <subfield code="a"><xsl:value-of select="./category"/></subfield>
 </datafield>
 <datafield tag="650" ind1="2" ind2="7">
   <subfield code="a">Event</subfield>
@@ -140,11 +140,11 @@
 </xsl:template>
 
 <xsl:template match="name">
-  <xsl:value-of select="./@first" disable-output-escaping="yes"/>
-  <xsl:if test="./@first!='' and ./@last!=''">
-  <xsl:text disable-output-escaping="yes"> </xsl:text>
-  </xsl:if>
   <xsl:value-of select="./@last" disable-output-escaping="yes"/>
+  <xsl:if test="./@first!='' and ./@last!=''">
+  <xsl:text disable-output-escaping="yes">, </xsl:text>
+  </xsl:if>
+  <xsl:value-of select="./@first" disable-output-escaping="yes"/>
 </xsl:template>	
 
 </xsl:stylesheet>

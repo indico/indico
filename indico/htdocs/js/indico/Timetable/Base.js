@@ -1,15 +1,18 @@
 var TimetableDefaults = {
     topMargin: 30,
     bottomMargin: 40,
-    leftMargin: 70,
-    resolution: 10,
+    leftMargin: 55,
+    rightMargin: 5,
+    resolution: 1,
     menuWidth: 150,
     blockMargin: 4,         // Margin used inside timetable blocks
+    wholeDay : 7,              // # of hours of duration for a timetable event to be seen as be during the whole day.
+    minContribHeight: 20,      // Minimum height for a contrib displayed inside a session TODO: remove?
     layouts: {'compact': {name: "Compact",
                           values : {
-                              pxPerHour: 50,
+                              pxPerHour: 60,
                               pxPerSpace: 2,
-                              minPxPerBlock: 35
+                              minPxPerBlock: 50
                           },
                           manager: new CompactLayoutManager()},
 
@@ -19,7 +22,11 @@ var TimetableDefaults = {
                                    minPxPerBlock: 25
                                },
                                manager: new ProportionalLayoutManager()
-                              }
+                              },
+
+              'poster': {name: 'Poster',
+                         manager: new PosterLayoutManager()
+                        }
              },
     filters: {'session': {name: $T('Session'),
                           filter: new SessionFilter()},
@@ -27,152 +34,308 @@ var TimetableDefaults = {
                        filter: new RoomFilter()}}
 };
 
-type("TimeTable", ["IWidget"],
-     {
-         draw: function() {
-             return this.IWidget.prototype.draw.call(this,
-                                                     Html.div({style:{width: pixels(this.width)}},
-                                                              this.timetableDrawer.draw(),
-                                                              Widget.block(this.menuChooser)));
-         },
-         
-         filterSetup: function() {
-             var self = this;
-             this.filter = new TimeTableFilter(this.timetableDrawer, function () {
-                 // When closed restore the filter button color
-                 self.filterButtonContainer.dom.style.background = "";
-                 return true;
-             });
-             this.filter.draw();
-         },
-         
-         functionButtons: function() {
-             var self = this;
+type("TimeTable", ["LookupTabWidget"], {
 
-             var printButton = Html.div('printButtonWhite', $T('Print'));
-             var linkButton = Html.div('linkButtonWhite', $T('Link'));
+    /*
+     * Translates the keys used in the data dictionary into titles
+     * displayed in the tab control
+     */
+    _titleTemplate : function(text) {
+        if (text == 'all') {
+            return $T('All days');
+        }
 
-             var filterButton = {'btn': Html.div('filterButtonWhite', $T('Filter')),
-                                 'onclick': function(btnContainer) {
-                                     // Save the container so that the filter button background
-                                     // color can be restored when filter is closed
-                                     self.filterButtonContainer = btnContainer
-                                     self.filter.toggle();
-                                     var state = self.filter.state.get();
-                                     btnContainer.dom.style.background = state ? "#A5A5A5" : "";
-                                 }
-             };
-             
-             return [{'btn': printButton, 'onclick': function(){self.print()}},
-                     filterButton];
-         },
+        var day = text.substring(6,8);
+        var month = text.substring(4,6);
 
-         postDraw: function() {
-             this.timetableDrawer.postDraw();
-         },
+        var strDate =  day + '/' + month + '/' + text.substring(0,4);
 
-         filterMenu: function() {
-             var self = this;
+        var nDate = new Date();
+        setDate(nDate, parseDate(strDate));
 
-             var filterLink = Html.a({href: '#'}, $T("Filter"));
-             this.filterMenu = new TimetableFilterMenu(filterLink, self.timetableDrawer);
+        return Indico.Data.WeekDays[nDate.getDay()].substring(0,3)+' '+day+'/'+month;
 
-             filterLink.observeClick(function(e) {
-                 var pos = filterLink.getAbsolutePosition();
-                 self.filterMenu.open(pos.x + filterLink.dom.offsetWidth, pos.y);
-                 return false;
-             });
+    },
 
-             return Html.ul({className: "inner", style: {display: 'none'}},
-                            Html.li("menuConfMiddleCell",
-                                    filterLink));
-         },
+    _draw: function(timetableDiv) {
+        return Html.div({style:{width: pixels(this.width)}},
+                        this._getHeader(),
+                        timetableDiv,
+                        this.loadingIndicator);
+    },
 
-         layoutMenu: function() {
-             var self = this;
+    _filterSetup: function() {
+        var self = this;
+        this.filter = new TimeTableFilter(this.timetableDrawer, function () {
+            // When closed restore the filter button color
+            self.filterButtonContainer.dom.style.background = "";
+            return true;
+        });
+        this.filter.draw();
+    },
 
-             var layoutLink = Html.a({href: '#'}, $T("Layout"));
-             this.layoutMenu = new TimetableLayoutMenu(layoutLink, self.timetableDrawer);
+    _getMenu: function() {
+        return Html.div();
+    },
 
-             layoutLink.observeClick(function(e) {
-                 var pos = layoutLink.getAbsolutePosition();
-                 //              e.preventDefault();
-                 self.layoutMenu.open(pos.x + layoutLink.dom.offsetWidth, pos.y);
-                 return false;
-             });
+    postDraw: function() {
+        this.timetableDrawer.postDraw();
+        this.LookupTabWidget.prototype.postDraw.call(this);
+    },
 
-             return Html.ul({className: "inner", style: {display: 'none'}},
-                            Html.li("menuConfMiddleCell",
-                                    layoutLink));
-         },
-         printMenu: function() {
-             var self = this;
+    filterMenu: function() {
+        var self = this;
 
-             var printLink = Html.a({href: '#'}, $T("Printable version"));
-             printLink.observeClick(function(e) {
+        var filterLink = Html.a({href: '#'}, $T("Filter"));
+        this.filterMenu = new TimetableFilterMenu(filterLink, self.timetableDrawer);
 
-                 self.print();
+        filterLink.observeClick(function(e) {
+            var pos = filterLink.getAbsolutePosition();
+            self.filterMenu.open(pos.x + filterLink.dom.offsetWidth, pos.y);
+            return false;
+        });
 
-             });
+        return Html.ul({className: "inner", style: {display: 'none'}},
+                       Html.li("menuConfMiddleCell",
+                               filterLink));
+    },
 
-             return Html.ul({className: "inner", style: {display: 'none'}},
-                            Html.li("menuConfMiddleCell",
-                                    printLink));
-         },
-         print: function() {
-             var self = this;
+    layoutMenu: function() {
+        var self = this;
 
-             //self.timetableDrawer.setPrintableVersion(true);
+        var layoutLink = Html.a({href: '#'}, $T("Layout"));
+        this.layoutMenu = new TimetableLayoutMenu(layoutLink, self.timetableDrawer);
 
-             // Close any open menu otherwise they will
-             // stay open when going back from print view
-             self.filterMenu.close();
-             self.layoutMenu.close();
+        layoutLink.observeClick(function(e) {
+            var pos = layoutLink.getAbsolutePosition();
+            //              e.preventDefault();
+            self.layoutMenu.open(pos.x + layoutLink.dom.offsetWidth, pos.y);
+            return false;
+        });
 
-             var bodyPadding = $E(document.body).dom.style.padding;
-             var timetableElements = translate(self.timetableDrawer.canvas.dom.childNodes, function(value) {return $E(value);});
-             var elements = translate($E(document.body).dom.childNodes, function(value) {return $E(value);});
+        return Html.ul({className: "inner", style: {display: 'block'}},
+                       Html.li("menuConfMiddleCell",
+                               layoutLink));
+    },
+    printMenu: function() {
+        var self = this;
 
-             var goBackLink = Html.a({href: '#', style: {fontSize: '13pt'}}, 'Go back');
-             var printLink = Html.a({href: '#', style: {fontSize: '13pt'}}, 'Print');
-             var showColors = Html.checkbox();
-             var showColorsSpan = Html.span({style: {fontSize: '10pt'}}, showColors, 'Show colors');
+        var printLink = Html.a({href: '#'}, $T("Printable version"));
+        printLink.observeClick(function(e) {
 
-             var links = Html.span({style: {cssFloat: 'right'}}, printLink, ' | ', goBackLink);
+            self.print();
 
-             var headerStyle = {padding: '0px 5px 5px 5px',
-                 borderBottom: '1px solid black',
-                 textAlign: 'center',
-                 width: pixels(self.timetableDrawer.width)};
-             var header = Html.div({className: 'timetableHeader', style: headerStyle}, links, 
-                 Html.span({style: {cssFloat: 'left'}}, self.timetableDrawer._titleTemplate(self.timetableDrawer.day)), showColorsSpan);
+        });
 
-             goBackLink.observeClick(function(e) {
-                 self.timetableDrawer.setPrintableVersion(false);
-                 $E(document.body).setStyle('padding', bodyPadding);
-                 $E(document.body).set(elements);
-                 
-             });
-             showColors.observeClick(function(e) {
-                 alert(showColors.get());
-                 self.timetableDrawer.setPrintableVersion(false);
-                 $E(document.body).set(header, timetableDiv);
-             });
-             printLink.observeClick(function(e) {
-                 window.print();
-             });
-             var timetableDiv = Html.div({style: {paddingTop: pixels(20), position: 'relative'}}, timetableElements)
-             $E(document.body).set(header, timetableDiv);
-             $E(document.body).setStyle('padding', pixels(30));
-         }
+        return Html.ul({className: "inner", style: {display: 'none'}},
+                       Html.li("menuConfMiddleCell",
+                               printLink));
+    },
+    print: function() {
+        var self = this;
 
-     },
-     function(data, width, wrappingElement, detailLevel, adminMode)
-     {
+        //self.timetableDrawer.setPrintableVersion(true);
+
+        var bodyPadding = $E(document.body).dom.style.padding;
+        var timetableElements = translate(self.timetableDrawer.canvas.dom.childNodes, function(value) {return $E(value);});
+        var elements = translate($E(document.body).dom.childNodes, function(value) {return $E(value);});
+
+        var goBackLink = Html.a({href: '#', style: {fontSize: '13pt'}}, 'Go back');
+        var printLink = Html.a({href: '#', style: {fontSize: '13pt'}}, 'Print');
+
+        var links = Html.span({style: {cssFloat: 'right'}}, printLink, ' | ', goBackLink);
+
+        var headerStyle = {padding: '0px 5px 5px 5px',
+            borderBottom: '1px solid black',
+            textAlign: 'center',
+            width: pixels(self.timetableDrawer.width)};
+        var header = Html.div({className: 'timetableHeader clearfix', style: headerStyle}, links,
+            Html.span({style: {cssFloat: 'left'}}, self._titleTemplate(self.timetableDrawer.day)));
+
+        goBackLink.observeClick(function(e) {
+            self.timetableDrawer.setPrintableVersion(false);
+            $E(document.body).setStyle('padding', bodyPadding);
+            $E(document.body).set(elements);
+
+        });
+        printLink.observeClick(function(e) {
+            window.print();
+        });
+        var timetableDiv = Html.div({style: {paddingTop: pixels(20), position: 'relative'}}, timetableElements);
+        $E(document.body).set(header, timetableDiv);
+        $E(document.body).setStyle('padding', pixels(30));
+    },
+    getData: function() {
+        return this.data;
+    },
+
+    getById: function(id) {
+        var info = Util.parseId(id);
+        var type = info[0];
+        info = info.slice(2);
+
+        if (type == 'Conference') {
+            return this.eventInfo;
+        }
+        else if (type == 'Contribution') {
+            throw 'not implemented!';
+        } else if (type=='Session'){
+            throw 'not implemented!';
+        } else if (type=='SessionSlot'){
+            return this.data[this.currentDay]['s'+info[0]+'l'+info[1]];
+        } else {
+            throw 'unrecognized id!';
+        }
+    },
+
+    getTimetableDrawer: function() {
+        return this.timetableDrawer;
+    },
+
+    setData: function(data, intervalData, startTime, endTime) {
+        this.data = data;
+        if (any(intervalData, false)) {
+            this.intervalTimetableDrawer.setData(data, this.currentDay, intervalData.isPoster);
+        }else {
+            this.timetableDrawer.setData(data, startTime, endTime);
+        }
+    },
+    _createLoadingIndicator: function() {
+        return Html.div('timetableLoading', $T('Updating the timetable...'));
+    },
+    /*
+      * To be overloaded. Header content displayed above the timetable.
+      */
+    _getHeader: function() {
+        return Html.div({});
+    },
+    /*
+      * To be overloaded. Returns buttons to be displayed below the tabs in
+      * the tab widget.
+      */
+    _functionButtons: function() {
+        return [];
+    }
+},
+     function(data, width, wrappingElement, detailLevel, managementMode) {
          var self = this;
 
+         this.data = data;
+
          this.width = width;
-         this.timetableDrawer = new TimetableDrawer(data, width, wrappingElement, detailLevel, this.functionButtons());
-         this.adminMode = any(adminMode, false);
-         this.filterSetup();
-     });
+         this.loadingIndicator = this._createLoadingIndicator();
+         var canvas = Html.div('canvas');
+         this.timetableDrawer = new TimetableDrawer(data, canvas, width,
+                                                    wrappingElement,
+                                                    detailLevel,
+                                                    this._functionButtons(),
+                                                    this.loadingIndicator,
+                                                    managementMode,
+                                                    this.managementActions);
+         this.intervalTimetableDrawer = new IntervalTimetableDrawer(data, canvas, width,
+                                                                    wrappingElement,
+                                                                    this._functionButtons(),
+                                                                    this.loadingIndicator,
+                                                                    managementMode,
+                                                                    this.managementActions);
+
+         var today = new Date();
+         var todayStr = IndicoUtil.formatDate2(today);
+         var initialTab = -1;
+         while (exists(data[todayStr])) {
+             today.setDate(today.getDate()-1);
+             todayStr = IndicoUtil.formatDate2(today);
+             initialTab++;
+         }
+         // if today not found, set initial tab to the first one
+         if (initialTab == -1) {
+             initialTab = 0;
+         }
+
+         var sortedKeys = keys(this.data);
+         sortedKeys.sort();
+
+         // "All days" active if management mode is off
+         if (!managementMode) {
+             sortedKeys.push('all');
+         }
+
+         this.LookupTabWidget( translate(sortedKeys, function(key) {
+             return [key, function() {
+                 self.currentDay = key;
+                 // each time one tab is clicked,
+                 // drawDay is called over a different day
+                 if (key == 'all') {
+                     return self._draw(self.timetableDrawer.drawAllDays());
+                 } else {
+                     return self._draw(self.timetableDrawer.drawDay(key));
+                 }
+             }];
+         }), this.width, 100, initialTab, this._functionButtons());
+
+     }
+    );
+
+type("TimeTableDisplay", ["TimeTable"], {
+    _functionButtons: function() {
+        var self = this;
+
+        var printButton = {'btn': Html.div('printButtonWhite', $T('Print')),
+            'onclick': function(btnContainer) {
+                self.print();
+            }
+                          };
+
+        // TODO: Needs to be implemented
+        var linkButton = Html.div('linkButtonWhite', $T('Link'));
+
+        var detailsButton = {'btn': Html.div('buttonWhite', Html.span({}, $T('Detailed view'))),
+            'onclick': function(btnContainer) {
+                var detailLevel = self.timetableDrawer.detail.get();
+                var newDetailLevel = detailLevel == 'contribution' ? 'session' : 'contribution';
+                self.timetableDrawer.detail.set(newDetailLevel);
+                var state = (newDetailLevel == 'contribution');
+                //detailsButton.btn.set(state ? "Hide details" : "Show details");
+                btnContainer.dom.style.background = state ? "#9F883B" : "";
+            }};
+
+        var filterButton = {'btn': Html.div('buttonWhite', $T('Filter')),
+            'onclick': function(btnContainer) {
+                // Save the container so that the filter button background
+                // color can be restored when filter is closed
+                self.filterButtonContainer = btnContainer;
+                self.filter.toggle();
+                var state = self.filter.state.get();
+                btnContainer.dom.style.background = state ? "#9F883B" : "";
+            }
+                           };
+
+        return [printButton,
+                detailsButton,
+                filterButton];
+    }
+},
+     function(data, width, wrappingElement, detailLevel) {
+         this.TimeTable(data, width, wrappingElement, detailLevel, false);
+         this._filterSetup();
+
+         // Set data[all] so that the All days tab is created
+         if (keys(data).length > 1) {
+             this.data.all = data;
+         }
+     }
+    );
+
+type("TimeTableManagement", ["TimeTable"], {
+    _getHeader: function() {
+        var div = this.managementActions.managementHeader(this.isSessionTimetable);
+        return div;
+    }
+},
+     function(data, eventInfo, width, wrappingElement, detailLevel, isSessionTimetable) {
+         this.eventInfo = eventInfo;
+         this.isSessionTimetable = any(isSessionTimetable, false);
+         this.managementActions = new TimetableManagementActions(this, eventInfo);
+         this.TimeTable(data, width, wrappingElement, detailLevel, true);
+     }
+    );

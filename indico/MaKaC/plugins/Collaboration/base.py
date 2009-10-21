@@ -20,7 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from persistent import Persistent
-from MaKaC.common.PickleJar import Retrieves, Conversion
+from MaKaC.common.PickleJar import Retrieves
+from MaKaC.common.Conversion import Conversion
 from MaKaC.common.Counter import Counter
 from MaKaC.common.utils import formatDateTime, parseDateTime
 from MaKaC.common.timezoneUtils import getAdjustedDate, setAdjustedDate,\

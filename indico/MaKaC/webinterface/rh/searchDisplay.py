@@ -216,7 +216,8 @@ class RHSearchBase:
                     numContHits, contShortResult, nContRec, contribResults = self._fillResults('Contributions', 25)
                     params['contShortResult'] = contShortResult
 
-            params['p'] = cgi.escape(phrase, 1)
+            params['p'] = cgi.escape(phrase, quote=True)
+            params['f'] = cgi.escape(self._filteredParams.get('f', ''), quote=True)
 
             params['eventResults'] = eventResults
             params['contribResults'] = contribResults

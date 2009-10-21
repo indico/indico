@@ -285,12 +285,16 @@ Html.prototype.setters.enctype = function(value) {
 };
 
 // due to setAttributeNS for Dom.set()
-Html.prototype.getters.className = function() {
-        return this.dom.className;
-};
-Html.prototype.setters.className = function(value) {
-        this.dom.className = value;
-};
+iterate([
+        "className", "htmlFor"
+], function(name) {
+	Html.prototype.getters[name] = function() {
+		return this.dom[name];
+	};
+	Html.prototype.setters[name] = function(value) {
+		this.dom[name] = value;
+	};
+});
 
 delayedBind(Html.prototype.styleGetters, "opacity", function(dom) {
         return Dom.Style.get(dom, "opacity") === undefined

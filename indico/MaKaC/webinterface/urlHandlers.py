@@ -27,10 +27,10 @@ from new import classobj
 from MaKaC.common.utils import utf8rep
 
 """
-This file contains classes representing url handlers which are objects which 
+This file contains classes representing url handlers which are objects which
 contain information about every request handler of the application and which are
-responsible for generating the correct url for a given request handler given 
-certain parameters. This file is a kind URL database so other web interface 
+responsible for generating the correct url for a given request handler given
+certain parameters. This file is a kind URL database so other web interface
 modules will use the classes instead of using harcoded urls; this makes possible
 to eassily change the urls or the parameter names without affecting the rest of
 the system.
@@ -38,30 +38,30 @@ the system.
 
 class URLHandler(object):
     """This is the generic URLHandler class. It contains information about the
-        concrete URL pointing to the request handler and gives basic methods to 
-        generate the URL from some target objects complying to the Locable 
-        interface. 
-       Actually, URLHandlers must never be intanciated as all their methods are 
+        concrete URL pointing to the request handler and gives basic methods to
+        generate the URL from some target objects complying to the Locable
+        interface.
+       Actually, URLHandlers must never be intanciated as all their methods are
         classmethods.
-       
+
        Attributes:
-        _relativeURL - (string) Contains the relative (the part which is 
-            variable from the root) URL pointing to the corresponding request 
+        _relativeURL - (string) Contains the relative (the part which is
+            variable from the root) URL pointing to the corresponding request
             handler.
     """
     _relativeURL = "broken link"
-    
+
     @classmethod
     def getRelativeURL( cls ):
-        """Gives the relative URL (URL part which is carachteristic) for the 
+        """Gives the relative URL (URL part which is carachteristic) for the
             corresponding request handler.
         """
         return cls._relativeURL
-    
+
     @classmethod
     def _getURL( cls, **params ):
         """ Gives the full URL for the corresponding request handler.
-        
+
             Parameters:
                 params - (Dict) parameters to be added to the URL.
         """
@@ -70,28 +70,28 @@ class URLHandler(object):
     @classmethod
     def getURL( cls, target=None, **params ):
         """Gives the full URL for the corresponding request handler. In case
-            the target parameter is specified it will append to the URL the 
+            the target parameter is specified it will append to the URL the
             the necessary parameters to make the target be specified in the url.
-            
+
             Parameters:
-                target - (Locable) Target object which must be uniquely 
+                target - (Locable) Target object which must be uniquely
                     specified in the URL so the destination request handler
-                    is able to retrieve it. 
+                    is able to retrieve it.
                 params - (Dict) parameters to be added to the URL.
         """
         url = cls._getURL(**params)
         if target is not None:
             url.addParams( target.getLocator() )
         return url
-    
+
 class SecureURLHandler(URLHandler):
-    
+
     @classmethod
     def _getURL(cls, **params):
         return URL( "%s/%s"%(Config.getInstance().getBaseSecureURL(), cls.getRelativeURL()) , **params )
-        
+
 class OptionallySecureURLHandler(URLHandler):
-    
+
     @classmethod
     def getURL( cls, target=None, secure = False, **params ):
         if secure:
@@ -131,7 +131,7 @@ def setSSLPort( url ):
         sslPort = loginURL[colonIx+1:slashIx]  # like "8443"
     except ValueError:
         sslPort = "443"
-    
+
     sslPort = ':' + sslPort     # like ":8443/"
 
     # If there is NO port, nothing will happen (production indico)
@@ -157,7 +157,7 @@ class UHSignIn( URLHandler ):
             url.addParam( "returnURL", returnURL )
         return url
     getURL = classmethod( getURL )
-    
+
 
 class UHActiveAccount( URLHandler ):
     _relativeURL = "signIn.py/active"
@@ -165,7 +165,7 @@ class UHActiveAccount( URLHandler ):
 
 class UHSendActivation( URLHandler ):
     _relativeURL = "signIn.py/sendActivation"
-    
+
 
 class UHDisabledAccount( URLHandler ):
     _relativeURL = "signIn.py/disabledAccount"
@@ -187,7 +187,7 @@ class UHSignOut( URLHandler ):
             url.addParam( "returnURL", returnURL )
         return url
     getURL = classmethod( getURL )
-    
+
 class UHIndicoNews( URLHandler ):
     _relativeURL = "news.py"
 
@@ -196,7 +196,7 @@ class UHConferenceHelp(URLHandler):
 
 class UHSearch(URLHandler):
     _relativeURL ="search.py"
-    
+
 class UHCalendar( URLHandler ):
     _relativeURL = "wcalendar.py"
 
@@ -261,34 +261,42 @@ class UHConferenceOtherViews( URLHandler ):
 
 class UHConferenceLogo( URLHandler ):
     _relativeURL = "conferenceDisplay.py/getLogo"
-    
+
 
 class UHConferenceCSS( URLHandler ):
     _relativeURL = "conferenceDisplay.py/getCSS"
-    
+
 class UHConferencePic( URLHandler ):
-    _relativeURL = "conferenceDisplay.py/getPic"    
-    
+    _relativeURL = "conferenceDisplay.py/getPic"
+
 class UHConfModifPreviewCSS(URLHandler):
     _relativeURL = "confModifDisplay.py/previewCSS"
-    
+
 class UHCategoryIcon( URLHandler ):
     _relativeURL = "categoryDisplay.py/getIcon"
 
 class UHConferenceModification( URLHandler ):
     _relativeURL = "conferenceModification.py"
-    
+
 class UHConfModifShowMaterials( URLHandler ):
     _relativeURL = "conferenceModification.py/materialsShow"
 
 class UHConfModifAddMaterials( URLHandler ):
     _relativeURL = "conferenceModification.py/materialsAdd"
-   
+
 # ============================================================================
 # ROOM BOOKING ===============================================================
 # ============================================================================
 
 # Free standing ==============================================================
+
+class UHRoomBookingMapOfRooms( URLHandler ):
+
+    def getURL( cls, returnURL="" ):
+        return "http://gs-dep.web.cern.ch/gs-dep/groups/SEM/ce/isp/conf_rooms/conf_rooms.html"
+    getURL = classmethod( getURL )
+
+
 
 class UHRoomBookingWelcome( URLHandler ):
     _relativeURL = "roomBooking.py"
@@ -345,7 +353,7 @@ class UHRoomBookingBookingList( URLHandler ):
 
 class UHRoomBookingRoomDetails( URLHandler ):
     _relativeURL = "roomBooking.py/roomDetails"
-    
+
     @classmethod
     def getURL( cls, target = None, calendarMonths = None ):
         """
@@ -359,10 +367,10 @@ class UHRoomBookingRoomDetails( URLHandler ):
         if calendarMonths:
             url.addParam( 'calendarMonths', 'True' )
         return url
-    
+
 class UHRoomBookingRoomStats( URLHandler ):
     _relativeURL = "roomBooking.py/roomStats"
-    
+
 class UHRoomBookingBookingDetails( URLHandler ):
     _relativeURL = "roomBooking.py/bookingDetails"
 
@@ -427,13 +435,13 @@ class UHRoomBookingModuleActive( URLHandler ):
 
 class UHRoomBookingPlugAdminZODBSave( URLHandler ):
     _relativeURL = "roomBookingPluginAdmin.py/zodbSave"
-        
+
 class UHRoomBookingAdmin( URLHandler ):
     _relativeURL = "roomBooking.py/admin"
 
 class UHRoomBookingAdminLocation( URLHandler ):
     _relativeURL = "roomBooking.py/adminLocation"
-    
+
 class UHRoomBookingSetDefaultLocation( URLHandler ):
     _relativeURL = "roomBooking.py/setDefaultLocation"
 class UHRoomBookingSaveLocation( URLHandler ):
@@ -455,10 +463,10 @@ class UHRoomBookingGetDateWarning( URLHandler ):
 
 class UHRoomBookingGetRoomSelectList( URLHandler ):
     _relativeURL = "roomBooking.py/getRoomSelectList"
-    
+
 class UHRoomBookingGetRoomSelectList4SubEvents( URLHandler ):
     _relativeURL = "roomBooking.py/getRoomSelectList4SubEvents"
-    
+
 
 # For the event ==============================================================
 
@@ -468,7 +476,7 @@ class UHConfModifRoomBookingChooseEvent( URLHandler ):
 
 class UHConfModifRoomBookingSearch4Rooms( URLHandler ):
     _relativeURL = "conferenceModification.py/roomBookingSearch4Rooms"
-    
+
     @classmethod
     def getURL( cls, target = None, dontAssign = False  ):
         url = cls._getURL()
@@ -504,7 +512,7 @@ class UHRoomPhoto( URLHandler ):
 
 class UHRoomPhotoSmall( URLHandler ):
     _relativeTemplate = "images/rooms/small_photos/%s.jpg"
-    
+
     @classmethod
     def getURL( cls, target = None ):
         cls._relativeURL = cls._relativeTemplate % str( target )
@@ -528,35 +536,32 @@ class UHConfModChairNew( URLHandler ):
 
 class UHConferenceRemoveChairs( URLHandler ):
     _relativeURL = "conferenceModification.py/removeChairs"
-    
+
 
 class UHConfModChairEdit( URLHandler ):
     _relativeURL = "conferenceModification.py/editChair"
-    
+
 class UHConfModifSelectChairs( URLHandler ):
     _relativeURL = "conferenceModification.py/selectChairs"
- 
- 
+
+
 class UHConfModifAddChairs( URLHandler ):
     _relativeURL = "conferenceModification.py/addChairs"
 
 class UHConferenceAddMaterial( URLHandler ):
     _relativeURL = "conferenceModification.py/addMaterial"
-    
+
 
 class UHConferencePerformAddMaterial( URLHandler ):
     _relativeURL = "conferenceModification.py/performAddMaterial"
 
-    
+
 class UHConferenceRemoveMaterials( URLHandler ):
     _relativeURL = "conferenceModification.py/removeMaterials"
-    
+
 
 class UHConfModSessionSlots( URLHandler ):
     _relativeURL = "conferenceModification.py/sessionSlots"
-
-class UHConfModAutoSolveConflict( URLHandler ):
-    _relativeURL = "conferenceModification.py/autoSolveConflict"
 
 class UHConferenceClose( URLHandler ):
     _relativeURL = "conferenceModification.py/close"
@@ -566,10 +571,10 @@ class UHConferenceDeleteSocialEvent( URLHandler ):
 
 class UHConferenceModificationClosed( URLHandler ):
     _relativeURL = "conferenceModification.py/modificationClosed"
-    
+
 class UHConferenceOpen( URLHandler ):
     _relativeURL = "conferenceModification.py/open"
-    
+
 class UHConfDataModif( URLHandler ):
     _relativeURL = "conferenceModification.py/data"
     @classmethod
@@ -578,7 +583,7 @@ class UHConfDataModif( URLHandler ):
         if target is not None:
             url.addParams( target.getLocator() )
         return url
-    
+
 class UHConfScreenDatesEdit( URLHandler ):
     _relativeURL = "conferenceModification.py/screenDates"
 
@@ -588,7 +593,7 @@ class UHConfPerformDataModif( URLHandler ):
 
 class UHConfAddContribType( URLHandler ):
     _relativeURL = "conferenceModification.py/addContribType"
-    
+
 
 class UHConfRemoveContribType( URLHandler ):
     _relativeURL = "conferenceModification.py/removeContribType"
@@ -599,7 +604,7 @@ class UHConfEditContribType( URLHandler ):
 
 class UHConfSectionsSettings( URLHandler ):
     _relativeURL = "conferenceModification.py/sectionsSettings"
-    
+
 class UHConfModifCFAOptFld( URLHandler ):
     _relativeURL = "confModifCFA.py/abstractFields"
 
@@ -608,19 +613,19 @@ class UHConfModifCFAAddOptFld( URLHandler ):
 
 class UHConfModifCFAPerformAddOptFld( URLHandler ):
     _relativeURL = "confModifCFA.py/performAddAbstractField"
-    
+
 class UHConfModifCFAEditOptFld( URLHandler ):
     _relativeURL = "confModifCFA.py/editAbstractField"
-    
+
 class UHConfModifCFARemoveOptFld( URLHandler ):
     _relativeURL = "confModifCFA.py/removeAbstractField"
-    
+
 class UHConfModifCFAAbsFieldUp(URLHandler):
     _relativeURL = "confModifCFA.py/absFieldUp"
 
 class UHConfModifCFAAbsFieldDown(URLHandler):
     _relativeURL = "confModifCFA.py/absFieldDown"
-    
+
 class UHConfModifReportNumberEdit( URLHandler ):
     _relativeURL = "conferenceModification.py/editReportNumber"
 
@@ -785,7 +790,7 @@ class UHUserAbstracts( URLHandler ):
 
 class UHAbstractModify( URLHandler ):
     _relativeURL = "abstractModify.py"
-    
+
     def getURL( cls, target=None ):
         url = cls._getURL()
         if target:
@@ -849,12 +854,12 @@ class UHAbstractAuthenticateUser( URLHandler ):
 
 class UHAbstractSubmissionSendLogin( URLHandler ):
     _relativeURL = "abstractSubmission.py/sendLogin"
-    
+
 
 class UHAbstractSubmissionAbstract( URLHandler ):
     _relativeURL = "abstractSubmission.py/submitAbstract"
-    
-    
+
+
 class UHAbstractSubmitAuthors( URLHandler ):
     _relativeURL = "abstractSubmission.py/submitAuthors"
 
@@ -893,7 +898,7 @@ class UHAbstractSubmissionRemoveSpeakers( URLHandler ):
 
 class UHAbstractSubmissionFinal( URLHandler ):
     _relativeURL = "abstractSubmission.py/final"
-    
+
 
 class UHAbstractCheckAbstract( URLHandler ):
     _relativeURL = "abstractSubmission.py/checkAbstract"
@@ -1032,7 +1037,7 @@ class UHTrackPerformDataModification( URLHandler ):
 class UHTrackDeleteSubTracks( URLHandler ):
     _relativeURL = "trackModification.py/deleteSubTracks"
 
-    
+
 class UHTrackAddSubTracks( URLHandler ):
     _relativeURL = "trackModification.py/addSubTrack"
 
@@ -1047,38 +1052,38 @@ class UHTrackAbstractModIntComments(UHTrackAbstractBase):
 
 class UHConfModifSchedule( URLHandler ):
     _relativeURL = "confModifSchedule.py"
-    
+
 class UHConfModifScheduleCustomizePDF( URLHandler ):
     _relativeURL = "confModifSchedule.py/customizePdf"
 
-    
+
 ##class UHConfModifScheduleGraphic( URLHandler ):
-##    _relativeURL = "confModifSchedule.py/graphic"    
+##    _relativeURL = "confModifSchedule.py/graphic"
 
 
 class UHConfModifScheduleEntries( URLHandler ):
-    _relativeURL = "confModifSchedule.py/entries"    
-    
+    _relativeURL = "confModifSchedule.py/entries"
+
 
 class UHConfModifScheduleEntriesRemove( URLHandler ):
-    _relativeURL = "confModifSchedule.py/removeEntries"    
-    
-    
+    _relativeURL = "confModifSchedule.py/removeEntries"
+
+
 class UHConfModifScheduleRelocate( URLHandler ):
     _relativeURL = "confModifSchedule.py/relocate"
 
 
 class UHConfDelSchItems( URLHandler ):
     _relativeURL = "confModifSchedule.py/deleteItems"
-    
+
 
 #class UHConfModSchEditBreak( URLHandler ):
 #    _relativeURL = "confModifSchedule.py/editBreak"
-    
+
 
 class UHConfModSchEditContrib(URLHandler):
     _relativeURL = "confModifSchedule.py/editContrib"
-    
+
 
 class UHConfModSchEditSlot(URLHandler):
     _relativeURL = "confModifSchedule.py/editSlot"
@@ -1098,7 +1103,7 @@ class UHConfNewSessionConvenerNew(URLHandler):
     _relativeURL = "sessionCreation.py/convenerNew"
 
 class UHConfNewSessionPersonAdd(URLHandler):
-    _relativeURL = "sessionCreation.py/personAdd"    
+    _relativeURL = "sessionCreation.py/personAdd"
 
 class UHSessionDataModificationConvenerSearch(URLHandler):
     _relativeURL = "sessionModification.py/convenerSearch"
@@ -1107,14 +1112,14 @@ class UHSessionDataModificationConvenerNew(URLHandler):
     _relativeURL = "sessionModification.py/convenerNew"
 
 class UHSessionDataModificationPersonAdd(URLHandler):
-    _relativeURL = "sessionModification.py/personAdd"    
+    _relativeURL = "sessionModification.py/personAdd"
 
 class UHSessionDataModificationNewConvenerSearch(URLHandler):
     _relativeURL = "sessionModification.py/newConvenerSearch"
 
 class UHSessionDataModificationNewConvenerCreate(URLHandler):
-    _relativeURL = "sessionModification.py/newConvenerCreate"    
-    
+    _relativeURL = "sessionModification.py/newConvenerCreate"
+
 class UHSessionDataModificationConvenerAdd(URLHandler):
     _relativeURL = "sessionModification.py/convenerAdd"
 
@@ -1147,34 +1152,34 @@ class UHContribsConfManagerDisplayParticipantList( URLHandler ):
 
 class UHConfAddBreak( URLHandler ):
     _relativeURL = "confModifSchedule.py/addBreak"
-    
+
 
 class UHConfPerformAddBreak( URLHandler ):
     _relativeURL = "confModifSchedule.py/performAddBreak"
-    
+
 
 class UHConfModifyBreak( URLHandler ):
     _relativeURL = "confModifSchedule.py/modifyBreak"
 
 class UHSessionModifyBreak( URLHandler ):
     _relativeURL = "sessionModifSchedule.py/modifyBreak"
-    
+
 
 class UHConfPerformModifyBreak( URLHandler ):
     _relativeURL = "confModifSchedule.py/performModifyBreak"
 
 class UHSessionPerformModifyBreak( URLHandler ):
     _relativeURL = "sessionModifSchedule.py/performModifyBreak"
-    
+
 
 class UHSessionClose( URLHandler ):
     _relativeURL = "sessionModification.py/close"
-    
-    
+
+
 class UHSessionOpen( URLHandler ):
     _relativeURL = "sessionModification.py/open"
-    
-    
+
+
 class UHSessionCreation( URLHandler ):
     _relativeURL = "confModifSchedule.py"
 
@@ -1261,18 +1266,18 @@ class UHContributionRemoveMaterials( URLHandler ):
 # <Deprecated>
 class UHContributionAddMaterial( URLHandler ):
     _relativeURL = "contributionModification.py/addMaterial"
-    
+
 class UHContributionPerformAddMaterial( URLHandler ):
     _relativeURL = "contributionModification.py/performAddMaterial"
 # </Deprecated>
-    
+
 class UHContributionSelectSpeakers( URLHandler ):
     _relativeURL = "contributionModification.py/selectSpeakers"
 
 
 class UHContributionRemoveSpeakers( URLHandler ):
     _relativeURL = "contributionModification.py/removeSpeakers"
-    
+
 
 class UHContributionAddDomain( URLHandler ):
     _relativeURL = "contributionAC.py/addDomains"
@@ -1321,7 +1326,7 @@ class UHSubContribActions(URLHandler):
 
 class UHContribModifTools( URLHandler ):
     _relativeURL = "contributionTools.py"
-    
+
 
 class UHContributionDataModif( URLHandler ):
     _relativeURL = "contributionModification.py/modifData"
@@ -1355,26 +1360,26 @@ class UHBreakCreation( URLHandler ):
 
 class UHConfModifAC( URLHandler ):
     _relativeURL = "confModifAC.py"
-    
+
 class UHConfSetVisibility( URLHandler ):
     _relativeURL = "confModifAC.py/setVisibility"
-    
+
 
 class UHConfSetAccessKey( URLHandler ):
     _relativeURL = "confModifAC.py/setAccessKey"
-    
-    
+
+
 class UHConfSetModifKey( URLHandler ):
     _relativeURL = "confModifAC.py/setModifKey"
-    
-    
+
+
 class UHConfSelectAllowed( URLHandler ):
     _relativeURL = "confModifAC.py/selectAllowed"
-    
+
 
 class UHConfAddAllowed( URLHandler ):
     _relativeURL = "confModifAC.py/addAllowed"
-    
+
 
 class UHConfRemoveAllowed( URLHandler ):
     _relativeURL = "confModifAC.py/removeAllowed"
@@ -1461,10 +1466,10 @@ class UHAdminCollaboration(OptionallySecureURLHandler):
 
 class UHConfModifCollaboration(OptionallySecureURLHandler):
     _relativeURL = "confModifCollaboration.py"
-    
+
 class UHConfModifCollaborationManagers(URLHandler):
     _relativeURL = "confModifCollaboration.py/managers"
-    
+
 class UHCollaborationDisplay(URLHandler):
     _relativeURL = "collaborationDisplay.py"
 
@@ -1481,7 +1486,7 @@ class UHConfModifParticipants( URLHandler ):
 
 class UHConfModifLog( URLHandler ):
     _relativeURL = "confModifLog.py"
-    
+
 class UHConfModifLogItem( URLHandler ):
     _relativeURL = "confModifLog.py/logItem"
 
@@ -1515,10 +1520,10 @@ class UHConfModifDisplayAddPage( URLHandler ):
 
 class UHConfModifDisplayAddPageFile( URLHandler ):
     _relativeURL = "confModifDisplay.py/addPageFile"
-    
+
 class UHConfModifDisplayAddPageFileBrowser( URLHandler ):
     _relativeURL = "confModifDisplay.py/addPageFileBrowser"
-    
+
 class UHConfModifDisplayModifyData( URLHandler ):
     _relativeURL = "confModifDisplay.py/modifyData"
 
@@ -1554,52 +1559,52 @@ class UHConfModifFormatTitleTextColor( URLHandler ):
 
 class UHConfDeletion( URLHandler ):
     _relativeURL = "confModifTools.py/delete"
-    
+
 
 class UHConfClone( URLHandler ):
     _relativeURL = "confModifTools.py/clone"
-    
+
 class UHConfPerformCloning( URLHandler ):
     _relativeURL = "confModifTools.py/performCloning"
 
 class UHConfPerformCloneOnce( URLHandler ):
     _relativeURL = "confModifTools.py/performCloneOnce"
-    
+
 
 class UHConfPerformCloneInterval( URLHandler ):
     _relativeURL = "confModifTools.py/performCloneInterval"
-    
+
 
 class UHConfPerformCloneDays( URLHandler ):
     _relativeURL = "confModifTools.py/performCloneDays"
 
 class UHConfAllSessionsConveners( URLHandler ):
-    _relativeURL = "confModifTools.py/allSessionsConveners"    
-    
+    _relativeURL = "confModifTools.py/allSessionsConveners"
+
 class UHConfAllSessionsConvenersAction( URLHandler ):
-    _relativeURL = "confModifTools.py/allSessionsConvenersAction" 
+    _relativeURL = "confModifTools.py/allSessionsConvenersAction"
 
 class UHConfAllSpeakers( URLHandler ):
-    _relativeURL = "confModifListings.py/allSpeakers"    
+    _relativeURL = "confModifListings.py/allSpeakers"
 
 class UHConfAllSpeakersAction( URLHandler ):
-    _relativeURL = "confModifListings.py/allSpeakersAction"    
+    _relativeURL = "confModifListings.py/allSpeakersAction"
 
 class UHConfAllPrimaryAuthors( URLHandler ):
-    _relativeURL = "confModifListings.py/allPrimaryAuthors"    
+    _relativeURL = "confModifListings.py/allPrimaryAuthors"
 
 class UHConfAllPrimaryAuthorsAction( URLHandler ):
-    _relativeURL = "confModifListings.py/allPrimaryAuthorsAction"    
+    _relativeURL = "confModifListings.py/allPrimaryAuthorsAction"
 
 class UHConfAllCoAuthors( URLHandler ):
-    _relativeURL = "confModifListings.py/allCoAuthors"    
+    _relativeURL = "confModifListings.py/allCoAuthors"
 
 class UHConfAllCoAuthorsAction( URLHandler ):
     _relativeURL = "confModifListings.py/allCoAuthorsAction"
 
 class UHConfDisplayAlarm( URLHandler ):
     _relativeURL = "confModifTools.py/displayAlarm"
-    
+
 class UHConfAddAlarm( URLHandler ):
     _relativeURL = "confModifTools.py/addAlarm"
 
@@ -1631,21 +1636,21 @@ class UHConfSaveAlarm( URLHandler ):
 class UHSaveLogo( URLHandler ):
     _relativeURL = "confModifDisplay.py/saveLogo"
 
-    
+
 class UHRemoveLogo( URLHandler ):
     _relativeURL = "confModifDisplay.py/removeLogo"
-    
+
 class UHSaveCSS( URLHandler ):
     _relativeURL = "confModifDisplay.py/saveCSS"
 
 class UHUseCSS( URLHandler ):
     _relativeURL = "confModifDisplay.py/useCSS"
-    
+
 class UHRemoveCSS( URLHandler ):
     _relativeURL = "confModifDisplay.py/removeCSS"
-    
+
 class UHSavePic( URLHandler ):
-    _relativeURL = "confModifDisplay.py/savePic"  
+    _relativeURL = "confModifDisplay.py/savePic"
 
 class UHConfModifParticipantsObligatory( URLHandler ):
     _relativeURL = "confModifParticipants.py/obligatory"
@@ -1655,13 +1660,13 @@ class UHConfModifParticipantsDisplay( URLHandler ):
 
 class UHConfModifParticipantsAddedInfo( URLHandler ):
     _relativeURL = "confModifParticipants.py/addedInfo"
-    
+
 class UHConfModifParticipantsAllowForApplying( URLHandler ):
     _relativeURL = "confModifParticipants.py/allowForApplying"
 
 class UHConfModifParticipantsToggleAutoAccept( URLHandler ):
     _relativeURL = "confModifParticipants.py/toggleAutoAccept"
-    
+
 class UHConfModifParticipantsPending( URLHandler ):
     _relativeURL = "confModifParticipants.py/pendingParticipants"
 
@@ -1676,12 +1681,12 @@ class UHConfModifParticipantsStatistics( URLHandler ):
 
 class UHConfModifParticipantsSelectToAdd( URLHandler ):
     _relativeURL = "confModifParticipants.py/selectToAdd"
-    
+
 
 class UHConfModifParticipantsAddSelected( URLHandler ):
     _relativeURL = "confModifParticipants.py/addSelected"
 
-    
+
 class UHConfModifParticipantsNewToAdd( URLHandler ):
     _relativeURL = "confModifParticipants.py/newToAdd"
 
@@ -1692,54 +1697,54 @@ class UHConfModifParticipantsAddNew( URLHandler ):
 
 class UHConfModifParticipantsSelectToInvite( URLHandler ):
     _relativeURL = "confModifParticipants.py/selectToInvite"
-    
+
 
 class UHConfModifParticipantsInviteSelected( URLHandler ):
     _relativeURL = "confModifParticipants.py/inviteSelected"
-    
-    
+
+
 class UHConfModifParticipantsNewToInvite( URLHandler ):
     _relativeURL = "confModifParticipants.py/newToInvite"
-    
+
 
 class UHConfModifParticipantsInviteNew( URLHandler ):
     _relativeURL = "confModifParticipants.py/inviteNew"
 
 
 class UHConfModifParticipantsDetails( URLHandler ):
-    _relativeURL = "confModifParticipants.py/details"        
+    _relativeURL = "confModifParticipants.py/details"
 
 
 class UHConfModifParticipantsEdit( URLHandler ):
-    _relativeURL = "confModifParticipants.py/edit"        
+    _relativeURL = "confModifParticipants.py/edit"
 
 
 class UHConfModifParticipantsPendingAction( URLHandler ):
     _relativeURL = "confModifParticipants.py/pendingAction"
 
-    
+
 class UHConfModifParticipantsPendingDetails( URLHandler ):
-    _relativeURL = "confModifParticipants.py/pendingDetails"        
+    _relativeURL = "confModifParticipants.py/pendingDetails"
 
 
 class UHConfModifParticipantsPendingEdit( URLHandler ):
-    _relativeURL = "confModifParticipants.py/pendingEdit"        
+    _relativeURL = "confModifParticipants.py/pendingEdit"
 
 
 class UHConfParticipantsNewPending( URLHandler ):
-    _relativeURL = "confModifParticipants.py/newPending"        
+    _relativeURL = "confModifParticipants.py/newPending"
 
 class UHConfParticipantsAddPending( URLHandler ):
-    _relativeURL = "confModifParticipants.py/addPending"        
+    _relativeURL = "confModifParticipants.py/addPending"
 
 
 class UHConfParticipantsInvitation( URLHandler ):
-    _relativeURL = "confModifParticipants.py/invitation"        
+    _relativeURL = "confModifParticipants.py/invitation"
 
 
 class UHConfParticipantsRefusal( URLHandler ):
     _relativeURL = "confModifParticipants.py/refusal"
-    
+
 
 class UHConfModifParticipantsSendEmail( URLHandler ):
     _relativeURL = "confModifParticipants.py/sendEmail"
@@ -1752,19 +1757,19 @@ class UHTickerTapeAction( URLHandler ):
 
 class UHUserManagement( URLHandler ):
     _relativeURL = "userManagement.py"
-    
+
 class UHUserManagementSwitchAuthorisedAccountCreation( URLHandler ):
     _relativeURL = "userManagement.py/switchAuthorisedAccountCreation"
-    
+
 class UHUserManagementSwitchNotifyAccountCreation( URLHandler ):
     _relativeURL = "userManagement.py/switchNotifyAccountCreation"
-    
+
 class UHUserManagementSwitchModerateAccountCreation( URLHandler ):
     _relativeURL = "userManagement.py/switchModerateAccountCreation"
-    
+
 class UHUsers( URLHandler ):
     _relativeURL = "userList.py"
-    
+
 class UHUserCreation( URLHandler ):
     _relativeURL = "userRegistration.py"
 
@@ -1786,7 +1791,7 @@ class UHUserMerge( URLHandler ):
 
 class UHLogMeAs( URLHandler ):
     _relativeURL = "userManagement.py/LogMeAs"
-    
+
     def getURL( cls, returnURL="" ):
         url = cls._getURL()
         if str(returnURL).strip() != "":
@@ -1874,7 +1879,7 @@ class UHConfActiveAccount( UHConfUser ):
 
 class UHConfEnterAccessKey( UHConfUser ):
     _relativeURL = "conferenceDisplay.py/accessKey"
-        
+
 class UHConfForceEnterAccessKey( UHConfUser ):
     _relativeURL = "conferenceDisplay.py/forceAccessKey"
 
@@ -1886,13 +1891,13 @@ class UHConfEnterModifKey( UHConfUser ):
 
 class UHConfCloseModifKey( UHConfUser ):
     _relativeURL = "conferenceModification.py/closeModifKey"
-    
+
 class UHUserCreated( UHConfUser ):
     _relativeURL = "userRegistration.py/created"
 
 class UHUserActive( URLHandler ):
     _relativeURL = "userRegistration.py/active"
-    
+
 
 
 class UHUserDetails( URLHandler ):
@@ -1978,7 +1983,7 @@ class UHGroupRemoveMembers( URLHandler ):
 
 
 class UHPrincipalDetails:
-    
+
     def getURL( cls, member ):
         if isinstance( member, user.Group ):
             return UHGroupDetails.getURL( member )
@@ -2051,7 +2056,7 @@ class UHAdminSwitchDebugActive( URLHandler ):
 
 class UHAdminSwitchNewsActive( URLHandler ):
     _relativeURL = "adminList.py/switchNewsActive"
-    
+
 class UHAdminSwitchHighlightActive( URLHandler ):
     _relativeURL = "adminList.py/switchHighlightActive"
 
@@ -2069,19 +2074,19 @@ class UHAdminsStyles( URLHandler ):
 
 class UHAdminsConferenceStyles( URLHandler ):
     _relativeURL = "adminConferenceStyles.py"
-    
+
 class UHAdminsAddStyle( URLHandler ):
     _relativeURL = "adminStyles.py/add"
-    
+
 class UHAdminsDeleteStyle( URLHandler ):
     _relativeURL = "adminStyles.py/delete"
-    
+
 class UHAdminsSystem( URLHandler ):
     _relativeURL = "adminSystem.py"
 
 class UHAdminsSystemModif( URLHandler ):
     _relativeURL = "adminSystem.py/modify"
-    
+
 class UHMaterialModification( URLHandler ):
     _relativeURL = "materialModification.py"
 
@@ -2248,7 +2253,7 @@ class UHCategorySetConfCreationControl( URLHandler ):
 
 class UHCategorySetNotifyCreation( URLHandler ):
     _relativeURL = "categoryConfCreationControl.py/setNotifyCreation"
-    
+
 class UHCategorySelectConfCreators( URLHandler ):
     _relativeURL = "categoryConfCreationControl.py/selectAllowedToCreateConf"
 
@@ -2354,7 +2359,7 @@ class UHCategoryOverview( URLHandler ):
 
     def getURLFromOverview( cls, ow ):
         url = cls.getURL()
-        url.setParams( ow.getLocator() ) 
+        url.setParams( ow.getLocator() )
         return url
     getURLFromOverview = classmethod( getURLFromOverview )
 
@@ -2433,7 +2438,7 @@ class UHSubContributionReportNumberRemove( URLHandler ):
 
 class UHSubContributionDataModif( URLHandler ):
     _relativeURL = "subContributionModification.py/modifData"
-    
+
 class UHSubContributionDelete( URLHandler ):
     _relativeURL = "subContributionTools.py/delete"
 
@@ -2475,7 +2480,7 @@ class UHSubContribModifTools( URLHandler ):
 
 class UHSubContribModPresenter( URLHandler ):
     _relativeURL = "subContributionModification.py/modPresenter"
-    
+
     def getURL( cls, target=None ):
         url = cls._getURL()
         url.setParams(target.getSubContrib().getLocator())
@@ -2484,7 +2489,7 @@ class UHSubContribModPresenter( URLHandler ):
     getURL = classmethod( getURL )
 
 
-class UHSessionModification( URLHandler ):    
+class UHSessionModification( URLHandler ):
     _relativeURL = "sessionModification.py"
 
 class UHSessionModifMaterials( URLHandler ):
@@ -2502,19 +2507,19 @@ class UHSessionModConvenerNew( URLHandler ):
 
 class UHSessionModConvenersRem( URLHandler ):
     _relativeURL = "sessionModification.py/remConveners"
-    
+
 
 class UHSessionModConvenerEdit( URLHandler ):
     _relativeURL = "sessionModification.py/editConvener"
 
-    
+
 class UHSessionModSlotConvenerNew( URLHandler ):
     _relativeURL = "sessionModification.py/newSlotConvener"
 
 
 class UHSessionModSlotConvenersRem( URLHandler ):
     _relativeURL = "sessionModification.py/remSlotConveners"
-    
+
 
 class UHSessionModSlotConvenerEdit( URLHandler ):
     _relativeURL = "sessionModification.py/editSlotConvener"
@@ -2704,7 +2709,7 @@ class UHContribModRemPrimAuthors( URLHandler ):
 
 class UHContribModPrimAuthor( URLHandler ):
     _relativeURL = "contributionModification.py/modPrimAuthor"
-    
+
     def getURL( cls, target=None ):
         url = cls._getURL()
         url.setParams(target.getContribution().getLocator())
@@ -2718,14 +2723,14 @@ class UHContribModNewCoAuthor( URLHandler ):
 
 class UHContribModCoAuthorAction( URLHandler ):
     _relativeURL = "contributionModification.py/coAuthorAction"
-    
+
 class UHContribModRemCoAuthors( URLHandler ):
     _relativeURL = "contributionModification.py/remCoAuthors"
 
 
 class UHContribModCoAuthor( URLHandler ):
     _relativeURL = "contributionModification.py/modCoAuthor"
-    
+
     def getURL( cls, target=None ):
         url = cls._getURL()
         url.setParams(target.getContribution().getLocator())
@@ -2738,7 +2743,7 @@ class UHContribModNewSpeaker( URLHandler ):
 
 class UHContribModSpeaker( URLHandler ):
     _relativeURL = "contributionModification.py/modSpeaker"
-    
+
     def getURL( cls, target=None ):
         url = cls._getURL()
         url.setParams(target.getContribution().getLocator())
@@ -2753,7 +2758,7 @@ class UHContributionMove( URLHandler ):
 
 class UHContributionPerformMove( URLHandler ):
     _relativeURL = "contributionModification.py/performMove"
-    
+
 
 class UHSubContribModification( URLHandler ):
     _relativeURL = "subContributionModification.py"
@@ -2815,10 +2820,10 @@ class UHFileAccess( URLHandler ):
 
 class UHVideoWmvAccess( URLHandler ):
     _relativeURL = "getFile.py/wmv"
-    
+
 class UHVideoFlashAccess( URLHandler ):
     _relativeURL = "getFile.py/flash"
-    
+
 class UHErrorReporting( URLHandler ):
     _relativeURL = "errors.py"
 
@@ -2976,20 +2981,20 @@ class UHConfModNotifTplConditionRem(URLHandler):
 
 class UHConfModifCFASelectSubmitter( URLHandler ):
     _relativeURL = "confModifCFA.py/selectSubmitter"
- 
- 
+
+
 class UHConfModifCFAAddSubmitter( URLHandler ):
     _relativeURL = "confModifCFA.py/addSubmitter"
- 
- 
+
+
 class UHConfModifCFARemoveSubmitter( URLHandler ):
     _relativeURL = "confModifCFA.py/removeSubmitter"
- 
- 
+
+
 class UHAbstractChangeSubmitter( URLHandler ):
     _relativeURL = "abstractManagment.py/changeSubmitter"
 
- 
+
 class UHAbstractSetSubmitter( URLHandler ):
     _relativeURL = "abstractManagment.py/setSubmitter"
 
@@ -3048,7 +3053,7 @@ class UHConfModScheduleCoauthorNew(URLHandler):
 
 class UHConfModScheduleMoveEntryUp( URLHandler ):
     _relativeURL = "confModifSchedule.py/moveEntryUp"
-    
+
 class UHConfModScheduleMoveEntryDown( URLHandler ):
     _relativeURL = "confModifSchedule.py/moveEntryDown"
 
@@ -3145,7 +3150,7 @@ class UHSessionModContribQuickAccess(URLHandler):
 class UHTrackModContribQuickAccess(URLHandler):
     _relativeURL="trackModContribList.py/contribQuickAccess"
 
-    
+
 class UHSessionModCoordinatorsRem(URLHandler):
     _relativeURL="sessionModifAC.py/remCoordinators"
 
@@ -3156,7 +3161,7 @@ class UHSessionModCoordinatorsSel(URLHandler):
 
 class UHSessionModCoordinatorsAdd(URLHandler):
     _relativeURL="sessionModifAC.py/addCoordinators"
-    
+
 
 class UHConfMyStuff(URLHandler):
     _relativeURL="myconference.py"
@@ -3170,11 +3175,11 @@ class UHConfModSessionMove(URLHandler):
 
 class UHConfModSessionMoveConfirmation(URLHandler):
     _relativeURL="confModifSchedule.py/moveSession"
-    
+
 
 class UHConfModSessionRem(URLHandler):
     _relativeURL="confModifSchedule.py/remSession"
-    
+
 
 class UHConfModMoveContribsToSession( URLHandler ):
     _relativeURL = "confModifContribList.py/moveToSession"
@@ -3184,7 +3189,7 @@ class UHConferenceDisplayMaterialPackage( URLHandler ):
 
 class UHConferenceDisplayMaterialPackagePerform( URLHandler ):
     _relativeURL = "conferenceDisplay.py/performMatPkg"
-    
+
 class UHConferenceDisplayMenuClose( URLHandler ):
     _relativeURL = "conferenceDisplay.py/closeMenu"
 
@@ -3208,7 +3213,7 @@ class UHConfAbstractBookPerform( URLHandler ):
 
 class UHConferenceToiCal( URLHandler ):
     _relativeURL = "conferenceDisplay.py/ical"
-    
+
 class UHConfModAbstractBook( URLHandler ):
     _relativeURL = "confModBOA.py"
 
@@ -3238,34 +3243,34 @@ class UHRemoveTask( URLHandler ):
 
 class UHUpdateNews( URLHandler ):
     _relativeURL = "updateNews.py"
-    
+
 # Server Admin, plugin management related
 class UHAdminPlugins( URLHandler ):
     _relativeURL = "adminPlugins.py"
-    
+
 class UHAdminPluginsSaveOptionReloadAll( URLHandler ):
     _relativeURL = "adminPlugins.py/saveOptionReloadAll"
 
 class UHAdminPluginsReloadAll( URLHandler ):
     _relativeURL = "adminPlugins.py/reloadAll"
-    
+
 class UHAdminPluginsClearAllInfo( URLHandler ):
     _relativeURL = "adminPlugins.py/clearAllInfo"
-    
+
 class UHAdminReloadPlugins( URLHandler ):
     _relativeURL = "adminPlugins.py/reload"
-    
+
 class UHAdminTogglePlugin( URLHandler ):
     _relativeURL = "adminPlugins.py/toggleActive"
-    
+
 class UHAdminPluginsTypeSaveOptions ( URLHandler ):
     _relativeURL = "adminPlugins.py/savePluginTypeOptions"
-    
+
 class UHAdminPluginsSaveOptions ( URLHandler ):
     _relativeURL = "adminPlugins.py/savePluginOptions"
 # End of Server Admin, plugin management related
-    
-    
+
+
 class UHMaintenance( URLHandler ):
     _relativeURL = "adminMaintenance.py"
 
@@ -3289,67 +3294,67 @@ class UHMaintenancePerformWebsessionCleanup( URLHandler ):
 
 class UHTemplates( URLHandler ):
     _relativeURL = "adminTemplates.py"
-    
+
 class UHTemplatesSetDefaultPDFOptions( URLHandler ):
     _relativeURL = "adminTemplates.py/setDefaultPDFOptions"
 
 class UHServices( URLHandler ):
     _relativeURL = "adminServices.py"
-    
+
 class UHRecording( URLHandler ):
     _relativeURL = "adminServices.py/recording"
-    
+
 class UHWebcast( URLHandler ):
     _relativeURL = "adminServices.py/webcast"
-    
+
 class UHWebcastICal( URLHandler ):
     _relativeURL = "adminServices.py/webcastICal"
-    
+
 class UHWebcastArchive( URLHandler ):
     _relativeURL = "adminServices.py/webcastArchive"
-    
+
 class UHWebcastSetup( URLHandler ):
     _relativeURL = "adminServices.py/webcastSetup"
-    
+
 class UHWebcastSelectManager( URLHandler ):
     _relativeURL = "adminServices.py/webcastSelectManager"
-    
+
 class UHWebcastAddManager( URLHandler ):
     _relativeURL = "adminServices.py/webcastAddManager"
-    
+
 class UHWebcastRemoveManager( URLHandler ):
     _relativeURL = "adminServices.py/webcastRemoveManager"
-    
+
 class UHWebcastAddWebcast( URLHandler ):
     _relativeURL = "adminServices.py/webcastAddWebcast"
-    
+
 class UHWebcastRemoveWebcast( URLHandler ):
     _relativeURL = "adminServices.py/webcastRemoveWebcast"
-    
+
 class UHWebcastArchiveWebcast( URLHandler ):
     _relativeURL = "adminServices.py/webcastArchiveWebcast"
-    
+
 class UHWebcastUnArchiveWebcast( URLHandler ):
     _relativeURL = "adminServices.py/webcastUnArchiveWebcast"
-    
+
 class UHWebcastModifyChannel( URLHandler ):
     _relativeURL = "adminServices.py/webcastModifyChannel"
-    
+
 class UHWebcastAddChannel( URLHandler ):
     _relativeURL = "adminServices.py/webcastAddChannel"
 
 class UHWebcastRemoveChannel( URLHandler ):
     _relativeURL = "adminServices.py/webcastRemoveChannel"
-    
+
 class UHWebcastSwitchChannel( URLHandler ):
     _relativeURL = "adminServices.py/webcastSwitchChannel"
-    
+
 class UHWebcastMoveChannelUp( URLHandler ):
     _relativeURL = "adminServices.py/webcastMoveChannelUp"
-    
+
 class UHWebcastMoveChannelDown( URLHandler ):
     _relativeURL = "adminServices.py/webcastMoveChannelDown"
-    
+
 class UHWebcastAddStream( URLHandler ):
     _relativeURL = "adminServices.py/webcastAddStream"
 
@@ -3358,7 +3363,7 @@ class UHWebcastRemoveStream( URLHandler ):
 
 class UHWebcastAddOnAir( URLHandler ):
     _relativeURL = "adminServices.py/webcastAddOnAir"
-    
+
 class UHWebcastRemoveFromAir( URLHandler ):
     _relativeURL = "adminServices.py/webcastRemoveFromAir"
 
@@ -3370,7 +3375,7 @@ class UHOAIPrivateConfigAddIP( URLHandler ):
 
 class UHOAIPrivateConfigRemoveIP( URLHandler ):
     _relativeURL = "adminServices.py/oaiPrivateConfigRemoveIP"
-    
+
 class UHBadgeTemplates( URLHandler ):
     _relativeURL = "badgeTemplates.py"
 
@@ -3416,7 +3421,7 @@ class UHStaticMaterialDisplay( URLHandler ):
                 if isinstance(res, Link):# and not isinstance(target, Video):
                     return res.getURL()
                 else:
-                    return UHStaticResourceDisplay.getRelativeURL(res) 
+                    return UHStaticResourceDisplay.getRelativeURL(res)
             else:
                 contrib = target.getOwner()
                 if isinstance(contrib, Contribution):
@@ -3452,7 +3457,7 @@ class UHStaticContributionList( URLHandler ):
 
 class UHStaticConfAuthorIndex( URLHandler ):
     _relativeURL = "./authorIndex.html"
-    
+
 class UHStaticContributionDisplay( URLHandler ):
     _relativeURL = ""
 
@@ -3464,13 +3469,13 @@ class UHStaticContributionDisplay( URLHandler ):
                 spk=target.getSpeakerList()[0].getFamilyName().lower()
             contribDirName="%s-%s"%(target.getId(),spk)
             track = target.getTrack()
-            if track is not None:    
+            if track is not None:
                 url = "./%s/%s/%s.html"%(prevPath, track.getTitle().replace(" ","_"), contribDirName)
             else:
                 url = "./%s/other_contributions/%s.html"%(prevPath, contribDirName)
 
         if escape:
-            url = utf8rep(url)            
+            url = utf8rep(url)
 
         return url
     getRelativeURL = classmethod( getRelativeURL )
@@ -3523,7 +3528,7 @@ class UHStaticTrackContribList( URLHandler ):
         if escape:
             url = utf8rep(url)
         return url
-            
+
     getRelativeURL = classmethod( getRelativeURL )
 
 class UHDVDDone( URLHandler ):
@@ -3545,7 +3550,7 @@ class UHMStaticMaterialDisplay( URLHandler ):
                 if isinstance(res, Link):
                     return res.getURL()
                 else:
-                    return UHMStaticResourceDisplay.getRelativeURL(res) 
+                    return UHMStaticResourceDisplay.getRelativeURL(res)
             else:
                 owner = target.getOwner()
                 parents="./material"
@@ -3553,7 +3558,7 @@ class UHMStaticMaterialDisplay( URLHandler ):
                     parents="%s/session-%s-%s"%(parents,owner.getId(), cls._normalisePathItem(owner.getTitle()))
                 elif isinstance(owner, Contribution):
                     if isinstance(owner.getOwner(), Session):
-                        parents="%s/session-%s-%s"%(parents, owner.getOwner().getId(), cls._normalisePathItem(owner.getOwner().getTitle()))    
+                        parents="%s/session-%s-%s"%(parents, owner.getOwner().getId(), cls._normalisePathItem(owner.getOwner().getTitle()))
                     spk=""
                     if len(owner.getSpeakerList())>0:
                         spk=owner.getSpeakerList()[0].getFamilyName().lower()
@@ -3562,7 +3567,7 @@ class UHMStaticMaterialDisplay( URLHandler ):
                 elif isinstance(owner, SubContribution):
                     contrib=owner.getContribution()
                     if isinstance(contrib.getOwner(), Session):
-                        parents="%s/session-%s-%s"%(parents, contrib.getOwner().getId(), cls._normalisePathItem(contrib.getOwner().getTitle()))    
+                        parents="%s/session-%s-%s"%(parents, contrib.getOwner().getId(), cls._normalisePathItem(contrib.getOwner().getTitle()))
                     contribspk=""
                     if len(contrib.getSpeakerList())>0:
                         contribspk=contrib.getSpeakerList()[0].getFamilyName().lower()
@@ -3598,7 +3603,7 @@ class UHMStaticResourceDisplay( URLHandler ):
                 parents="%s/session-%s-%s"%(parents,owner.getId(), cls._normalisePathItem(owner.getTitle()))
             elif isinstance(owner, Contribution):
                 if isinstance(owner.getOwner(), Session):
-                    parents="%s/session-%s-%s"%(parents, owner.getOwner().getId(), cls._normalisePathItem(owner.getOwner().getTitle()))    
+                    parents="%s/session-%s-%s"%(parents, owner.getOwner().getId(), cls._normalisePathItem(owner.getOwner().getTitle()))
                 spk=""
                 if len(owner.getSpeakerList())>0:
                     spk=owner.getSpeakerList()[0].getFamilyName().lower()
@@ -3607,7 +3612,7 @@ class UHMStaticResourceDisplay( URLHandler ):
             elif isinstance(owner, SubContribution):
                 contrib=owner.getContribution()
                 if isinstance(contrib.getOwner(), Session):
-                    parents="%s/session-%s-%s"%(parents, contrib.getOwner().getId(), cls._normalisePathItem(contrib.getOwner().getTitle()))    
+                    parents="%s/session-%s-%s"%(parents, contrib.getOwner().getId(), cls._normalisePathItem(contrib.getOwner().getTitle()))
                 contribspk=""
                 if len(contrib.getSpeakerList())>0:
                     contribspk=contrib.getSpeakerList()[0].getFamilyName().lower()
@@ -3617,7 +3622,7 @@ class UHMStaticResourceDisplay( URLHandler ):
                     subcontspk=owner.getSpeakerList()[0].getFamilyName().lower()
                 subcontribDirName="%s-%s"%(owner.getId(),subcontspk)
                 parents="%s/contrib-%s/subcontrib-%s"%(parents, contribDirName, subcontribDirName)
-            
+
             relativeURL = "%s/resource-%s-%s-%s"%(parents, cls._normalisePathItem(target.getOwner().getTitle()), target.getId(), cls._normalisePathItem(target.getFileName()))
             if escape:
                 relativeURL = utf8rep(relativeURL)
@@ -3625,7 +3630,7 @@ class UHMStaticResourceDisplay( URLHandler ):
         return cls._relativeURL
     getRelativeURL = classmethod( getRelativeURL )
 
-    
+
 # ------- END: DVD creation and static webpages ------
 
 class UHContribAuthorDisplay( URLHandler ):
@@ -3668,11 +3673,11 @@ class UHConfRegistrationFormCreationDone( URLHandler ):
     getURL = classmethod( getURL )
 
 class UHConfRegistrationFormconfirmBooking( URLHandler ):
-    _relativeURL = "confRegistrationFormDisplay.py/confirmBooking"    
-    
+    _relativeURL = "confRegistrationFormDisplay.py/confirmBooking"
+
 class UHConfRegistrationFormconfirmBookingDone( URLHandler ):
-    _relativeURL = "confRegistrationFormDisplay.py/confirmBookingDone"        
-    
+    _relativeURL = "confRegistrationFormDisplay.py/confirmBookingDone"
+
 class UHConfRegistrationFormModify( URLHandler ):
     _relativeURL = "confRegistrationFormDisplay.py/modify"
 
@@ -3682,24 +3687,24 @@ class UHConfRegistrationFormPerformModify( URLHandler ):
 ###################################################################################
 ## epayment url
 class UHConfModifEPayment( URLHandler ):
-    _relativeURL = "confModifEpayment.py"    
+    _relativeURL = "confModifEpayment.py"
 
 class UHConfModifEPaymentEnableSection( URLHandler ):
-    _relativeURL = "confModifEpayment.py/enableSection"   
+    _relativeURL = "confModifEpayment.py/enableSection"
 class UHConfModifEPaymentChangeStatus( URLHandler ):
-    _relativeURL = "confModifEpayment.py/changeStatus"    
+    _relativeURL = "confModifEpayment.py/changeStatus"
 #class UHConfModifEPaymentDataModification( URLHandler ):
 class UHConfModifEPaymentdetailPaymentModification( URLHandler ):
-    _relativeURL = "confModifEpayment.py/dataModif"     
+    _relativeURL = "confModifEpayment.py/dataModif"
 class UHConfModifEPaymentPerformdetailPaymentModification( URLHandler ):
     _relativeURL = "confModifEpayment.py/performDataModif"
 
-################################################################################### 
+###################################################################################
 
 
 class UHConfModifRegForm( URLHandler ):
     _relativeURL = "confModifRegistrationForm.py"
-    
+
 class UHConfModifRegFormChangeStatus( URLHandler ):
     _relativeURL = "confModifRegistrationForm.py/changeStatus"
 
@@ -3714,7 +3719,7 @@ class UHConfModifRegFormSessions( URLHandler ):
 
 class UHConfModifRegFormSessionsDataModif( URLHandler ):
     _relativeURL = "confModifRegistrationForm.py/modifSessionsData"
-    
+
 class UHConfModifRegFormSessionsPerformDataModif( URLHandler ):
     _relativeURL = "confModifRegistrationForm.py/performModifSessionsData"
 
@@ -3762,7 +3767,7 @@ class UHConfModifRegFormReasonParticipationPerformDataModif( URLHandler ):
 
 class UHConfModifRegFormFurtherInformation( URLHandler ):
     _relativeURL = "confModifRegistrationForm.py/modifFurtherInformation"
-    
+
 class UHConfModifRegFormFurtherInformationDataModif( URLHandler ):
     _relativeURL = "confModifRegistrationForm.py/modifFurtherInformationData"
 
@@ -3804,7 +3809,7 @@ class UHConfModifRegFormStatusPerformModif( URLHandler ):
 
 class UHConfModifRegFormActionSection( URLHandler ):
     _relativeURL = "confModifRegistrationForm.py/actionSection"
-    
+
 class UHConfModifRegFormGeneralSection( URLHandler ):
     _relativeURL = "confModifRegistrationForm.py/modifGeneralSection"
 
@@ -3858,13 +3863,13 @@ class UHRegistrantPerformDataModification( URLHandler ):
 
 class UHConfModifRegFormEnableSection( URLHandler ):
     _relativeURL = "confModifRegistrationForm.py/enableSection"
-    
+
 class UHConfModifRegFormEnablePersonalField( URLHandler ):
     _relativeURL = "confModifRegistrationForm.py/enablePersonalField"
-    
+
 class UHConfModifRegFormSwitchPersonalField( URLHandler ):
     _relativeURL = "confModifRegistrationForm.py/switchPersonalField"
-    
+
 class UHCategoryStatistics( URLHandler ):
     _relativeURL = "categoryStatistics.py"
 
@@ -3873,7 +3878,7 @@ class UHCategoryToiCal( URLHandler ):
 
 class UHCategoryToRSS( URLHandler ):
     _relativeURL = "categoryDisplay.py/rss"
-    
+
 class UHCategOverviewToRSS( URLHandler ):
     _relativeURL = "categOverview.py/rss"
 
@@ -3882,16 +3887,16 @@ class UHConfRegistrantsList( URLHandler ):
 
 class UHConfModifRegistrantSessionModify( URLHandler ):
     _relativeURL = "confModifRegistrants.py/modifySessions"
-    
+
 class UHConfModifRegistrantSessionPeformModify( URLHandler ):
     _relativeURL = "confModifRegistrants.py/performModifySessions"
 
 class UHConfModifRegistrantTransactionModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/modifyTransaction"        
+    _relativeURL = "confModifRegistrants.py/modifyTransaction"
 
 class UHConfModifRegistrantTransactionPeformModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/peformModifyTransaction"     
-    
+    _relativeURL = "confModifRegistrants.py/peformModifyTransaction"
+
 class UHConfModifRegistrantAccoModify( URLHandler ):
     _relativeURL = "confModifRegistrants.py/modifyAccommodation"
 
@@ -3936,7 +3941,7 @@ class UHConfModifRegistrantStatusesModify( URLHandler ):
 
 class UHConfModifRegistrantStatusesPerformModify( URLHandler ):
     _relativeURL = "confModifRegistrants.py/performModifyStatuses"
-    
+
 class UHGetCalendarOverview( URLHandler ):
     _relativeURL ="categOverview.py"
 
@@ -3946,7 +3951,7 @@ URL Handlers for  Printing and Design
 """
 class UHConfModifBadgePrinting ( URLHandler ):
     _relativeURL = "confModifTools.py/badgePrinting"
-    
+
     def getURL( cls, target=None, templateId=None, deleteTemplateId=None, cancel=False, new=False, copyTemplateId=None ):
         """
           -The deleteTemplateId param should be set if we want to erase a template.
@@ -3972,10 +3977,10 @@ class UHConfModifBadgePrinting ( URLHandler ):
                 url.addParam("new", True)
         return url
     getURL = classmethod( getURL )
-    
+
 class UHConfModifBadgeDesign ( URLHandler ):
     _relativeURL = "confModifTools.py/badgeDesign"
-    
+
     def getURL( cls, target=None, templateId=None, new=False):
         """
           -The templateId param should always be set:
@@ -3995,7 +4000,7 @@ class UHConfModifBadgeDesign ( URLHandler ):
 
 class UHModifDefTemplateBadge ( URLHandler ):
     _relativeURL = "badgeTemplates.py/badgeDesign"
-    
+
     def getURL( cls, target=None, templateId=None, new=False):
         """
           -The templateId param should always be set:
@@ -4011,11 +4016,11 @@ class UHModifDefTemplateBadge ( URLHandler ):
                 url.addParam("templateId", templateId)
             url.addParam("new", new)
         return url
-    getURL = classmethod( getURL )    
+    getURL = classmethod( getURL )
 
 class UHConfModifBadgeSaveBackground ( URLHandler ):
     _relativeURL = "confModifTools.py/badgeSaveBackground"
-    
+
     def getURL( cls, target=None, templateId=None ):
         url = cls._getURL()
         if target is not None and templateId is not None:
@@ -4023,10 +4028,10 @@ class UHConfModifBadgeSaveBackground ( URLHandler ):
             url.addParam("templateId", templateId)
         return url
     getURL = classmethod( getURL )
-    
+
 class UHConfModifBadgeGetBackground ( URLHandler ):
     _relativeURL = "confModifTools.py/badgeGetBackground"
-    
+
     def getURL( cls, target=None, templateId=None, backgroundId=None):
         url = cls._getURL()
         if target is not None and templateId is not None:
@@ -4035,16 +4040,16 @@ class UHConfModifBadgeGetBackground ( URLHandler ):
             url.addParam("backgroundId", backgroundId)
         return url
     getURL = classmethod( getURL )
-    
+
 class UHConfModifBadgePrintingPDF ( URLHandler ):
     _relativeURL = "confModifTools.py/badgePrintingPDF"
-    
+
 """
 URL Handlers for Poster Printing and Design
 """
 class UHConfModifPosterPrinting ( URLHandler ):
     _relativeURL = "confModifTools.py/posterPrinting"
-    
+
     def getURL( cls, target=None, templateId=None, deleteTemplateId=None, cancel=False, new=False, copyTemplateId=None ):
         """
           -The deleteTemplateId param should be set if we want to erase a template.
@@ -4056,7 +4061,7 @@ class UHConfModifPosterPrinting ( URLHandler ):
           after creating a new template.
         """
         url = cls._getURL()
-        
+
         if target is not None:
 
             url.setParams(target.getLocator())
@@ -4071,11 +4076,11 @@ class UHConfModifPosterPrinting ( URLHandler ):
             if new:
                 url.addParam("new", True)
         return url
-    getURL = classmethod( getURL )    
+    getURL = classmethod( getURL )
 
 class UHConfModifPosterDesign ( URLHandler ):
     _relativeURL = "confModifTools.py/posterDesign"
-    
+
     def getURL( cls, target=None, templateId=None, new=False):
         """
           -The templateId param should always be set:
@@ -4095,7 +4100,7 @@ class UHConfModifPosterDesign ( URLHandler ):
 
 class UHModifDefTemplatePoster ( URLHandler ):
     _relativeURL = "posterTemplates.py/posterDesign"
-    
+
     def getURL( cls, target=None, templateId=None, new=False):
         """
           -The templateId param should always be set:
@@ -4111,11 +4116,11 @@ class UHModifDefTemplatePoster ( URLHandler ):
                 url.addParam("templateId", templateId)
             url.addParam("new", new)
         return url
-    getURL = classmethod( getURL )    
-    
+    getURL = classmethod( getURL )
+
 class UHConfModifPosterSaveBackground ( URLHandler ):
     _relativeURL = "confModifTools.py/posterSaveBackground"
-    
+
     def getURL( cls, target=None, templateId=None ):
         url = cls._getURL()
         if target is not None and templateId is not None:
@@ -4123,10 +4128,10 @@ class UHConfModifPosterSaveBackground ( URLHandler ):
             url.addParam("templateId", templateId)
         return url
     getURL = classmethod( getURL )
-    
+
 class UHConfModifPosterGetBackground ( URLHandler ):
     _relativeURL = "confModifTools.py/posterGetBackground"
-    
+
     def getURL( cls, target=None, templateId=None, backgroundId=None):
         url = cls._getURL()
         if target is not None and templateId is not None:
@@ -4135,7 +4140,7 @@ class UHConfModifPosterGetBackground ( URLHandler ):
             url.addParam("backgroundId", backgroundId)
         return url
     getURL = classmethod( getURL )
-    
+
 class UHConfModifPosterPrintingPDF ( URLHandler ):
     _relativeURL = "confModifTools.py/posterPrintingPDF"
 
@@ -4145,16 +4150,16 @@ URL Handlers for Javascript Packages
 """
 class UHJsonRpcService (URLHandler):
     _relativeURL = "services/json-rpc"
-    
+
 class UHSecureJsonRpcService (SecureURLHandler):
     _relativeURL = "services/json-rpc"
-    
+
 class UHJavascriptCalendar (URLHandler):
     _relativeURL = "js/calendar/calendar.js"
 
 class UHJavascriptCalendarSetup (URLHandler):
     _relativeURL = "js/calendar/calendar-setup.js"
-    
+
 ############
 #Evaluation# DISPLAY AREA
 ############
@@ -4190,38 +4195,38 @@ class UHConfEvaluationSubmitted( URLHandler ):
 ############
 class UHConfModifEvaluation( URLHandler ):
     _relativeURL = "confModifEvaluation.py"
-       
+
 class UHConfModifEvaluationSetup( URLHandler ):
     """same result as UHConfModifEvaluation."""
     _relativeURL = "confModifEvaluation.py/setup"
-    
+
 class UHConfModifEvaluationSetupChangeStatus( URLHandler ):
     _relativeURL = "confModifEvaluation.py/changeStatus"
-    
+
 class UHConfModifEvaluationSetupSpecialAction( URLHandler ):
     _relativeURL = "confModifEvaluation.py/specialAction"
-    
+
 class UHConfModifEvaluationDataModif( URLHandler ):
     _relativeURL = "confModifEvaluation.py/dataModif"
-    
+
 class UHConfModifEvaluationPerformDataModif( URLHandler ):
     _relativeURL = "confModifEvaluation.py/performDataModif"
-    
+
 class UHConfModifEvaluationEdit( URLHandler ):
     _relativeURL = "confModifEvaluation.py/edit"
-      
+
 class UHConfModifEvaluationEditPerformChanges( URLHandler ):
     _relativeURL = "confModifEvaluation.py/editPerformChanges"
-      
+
 class UHConfModifEvaluationPreview( URLHandler ):
     _relativeURL = "confModifEvaluation.py/preview"
-      
+
 class UHConfModifEvaluationResults( URLHandler ):
     _relativeURL = "confModifEvaluation.py/results"
-      
+
 class UHConfModifEvaluationResultsOptions( URLHandler ):
     _relativeURL = "confModifEvaluation.py/resultsOptions"
-      
+
 class UHConfModifEvaluationResultsSubmittersActions( URLHandler ):
     _relativeURL = "confModifEvaluation.py/resultsSubmittersActions"
 
@@ -4233,14 +4238,14 @@ class UHConfModifEvaluationResultsSubmittersActions( URLHandler ):
 
 class UHGetUserEventPage( URLHandler ):
     _relativeURL = "userDetails.py/getEvents"
-    
+
     @classmethod
     def getURL( cls, target=None ):
         url = cls._getURL()
-        
+
         if (target != None):
             url.setParams( target.getLocator() )
-            
+
         return url
 
 class UHResetSession (URLHandler):
@@ -4254,46 +4259,46 @@ class UHConfModifReviewingAccess ( URLHandler ):
 
 class UHConfModifReviewingPaperSetup( URLHandler ):
     _relativeURL = "confModifReviewing.py/paperSetup"
-    
+
 class UHChooseReviewing( URLHandler ):
     _relativeURL = "confModifReviewing.py/chooseReviewing"
-    
+
 class UHAddState( URLHandler ):
     _relativeURL = "confModifReviewing.py/addState"
 
 class UHRemoveState( URLHandler ):
     _relativeURL = "confModifReviewing.py/removeState"
-    
+
 class UHAddQuestion( URLHandler ):
     _relativeURL = "confModifReviewing.py/addQuestion"
-    
+
 class UHRemoveQuestion( URLHandler ):
     _relativeURL = "confModifReviewing.py/removeQuestion"
 
 class UHSetTemplate( URLHandler ):
     _relativeURL = "confModifReviewing.py/setTemplate"
-    
+
 class UHAddCriteria( URLHandler ):
     _relativeURL = "confModifReviewing.py/addCriteria"
-    
+
 class UHRemoveCriteria( URLHandler ):
     _relativeURL = "confModifReviewing.py/removeCriteria"
-    
+
 class UHDownloadContributionTemplate( URLHandler ):
     _relativeURL = "confModifReviewing.py/downloadTemplate"
-    
+
 class UHDeleteContributionTemplate( URLHandler ):
     _relativeURL = "confModifReviewing.py/deleteTemplate"
-    
+
 class UHConfModifReviewingAbstractSetup ( URLHandler ):
     _relativeURL = "confModifReviewing.py/abstractSetup"
 
 class UHConfModifReviewingControl ( URLHandler ):
     _relativeURL = "confModifReviewingControl.py"
-    
+
 class UHConfModifUserCompetences ( URLHandler ):
     _relativeURL = "confModifUserCompetences.py"
-    
+
 class UHConfModifModifyUserCompetences ( URLHandler ):
     _relativeURL = "confModifUserCompetences.py/modifyCompetences"
 
@@ -4302,16 +4307,16 @@ class UHConfSelectPaperReviewManager( URLHandler ):
 
 class UHConfAddPaperReviewManager( URLHandler ):
     _relativeURL = "confModifReviewingControl.py/addPaperReviewManager"
-    
+
 class UHConfRemovePaperReviewManager( URLHandler ):
     _relativeURL = "confModifReviewingControl.py/removePaperReviewManager"
-    
+
 class UHConfSelectAbstractManager( URLHandler ):
     _relativeURL = "confModifReviewingControl.py/selectAbstractManager"
 
 class UHConfAddAbstractManager( URLHandler ):
     _relativeURL = "confModifReviewingControl.py/addAbstractManager"
-    
+
 class UHConfRemoveAbstractManager( URLHandler ):
     _relativeURL = "confModifReviewingControl.py/removeAbstractManager"
 
@@ -4320,25 +4325,25 @@ class UHConfSelectEditor( URLHandler ):
 
 class UHConfAddEditor( URLHandler ):
     _relativeURL = "confModifReviewingControl.py/addEditor"
-    
+
 class UHConfRemoveEditor( URLHandler ):
     _relativeURL = "confModifReviewingControl.py/removeEditor"
 
 class UHConfSelectReviewer( URLHandler ):
     _relativeURL = "confModifReviewingControl.py/selectReviewer"
-    
+
 class UHConfAddReviewer( URLHandler ):
     _relativeURL = "confModifReviewingControl.py/addReviewer"
-    
+
 class UHConfRemoveReviewer( URLHandler ):
     _relativeURL = "confModifReviewingControl.py/removeReviewer"
-    
+
 class UHConfSelectAbstractReviewer( URLHandler ):
     _relativeURL = "confModifReviewingControl.py/selectAbstractReviewer"
-    
+
 class UHConfAddAbstractReviewer( URLHandler ):
     _relativeURL = "confModifReviewingControl.py/addAbstractReviewer"
-    
+
 class UHConfRemoveAbstractReviewer( URLHandler ):
     _relativeURL = "confModifReviewingControl.py/removeAbstractReviewer"
 
@@ -4350,10 +4355,10 @@ class UHConfAddReferee( URLHandler ):
 
 class UHConfRemoveReferee( URLHandler ):
     _relativeURL = "confModifReviewingControl.py/removeReferee"
-    
+
 class UHConfModifListContribToJudge( URLHandler ):
     _relativeURL = "confListContribToJudge.py"
-    
+
 class UHConfModifReviewingAssignContributionsList( URLHandler ):
     _relativeURL = "assignContributions.py"
 
@@ -4364,16 +4369,16 @@ class UHConfModifReviewingAssignContributionsAssign( URLHandler ):
 #Contribution reviewing
 class UHContributionModifReviewing( URLHandler ):
     _relativeURL = "contributionReviewing.py"
-    
+
 class UHContributionSubmitForRewiewing( URLHandler ):
     _relativeURL = "contributionReviewing.py/submitForReviewing"
-    
+
 class UHContributionRemoveSubmittedMarkForReviewing( URLHandler ):
     _relativeURL = "contributionReviewing.py/removeSubmittedMarkForReviewing"
 
 class UHAssignReferee(URLHandler):
     _relativeURL = "contributionReviewing.py/assignReferee"
-    
+
 class UHRemoveAssignReferee(URLHandler):
     _relativeURL = "contributionReviewing.py/removeAssignReferee"
 
@@ -4382,16 +4387,16 @@ class UHAssignEditing( URLHandler ):
 
 class UHRemoveAssignEditing( URLHandler ):
     _relativeURL = "contributionReviewing.py/removeAssignEditing"
-    
+
 class UHAssignReviewing( URLHandler ):
     _relativeURL = "contributionReviewing.py/assignReviewing"
-    
+
 class UHRemoveAssignReviewing( URLHandler ):
     _relativeURL = "contributionReviewing.py/removeAssignReviewing"
-    
+
 class UHFinalJudge( URLHandler ):
     _relativeURL = "contributionReviewing.py/finalJudge"
-    
+
 class UHContributionModifReviewingHistory( URLHandler ):
     _relativeURL = "contributionReviewing.py/reviewingHistory"
 
@@ -4409,13 +4414,13 @@ class UHGiveAdvice( URLHandler ):
 
 class UHRefereeDueDate (URLHandler):
     _relativeURL = "contributionReviewing.py/refereeDueDate"
-    
+
 class UHEditorDueDate (URLHandler):
     _relativeURL = "contributionReviewing.py/editorDueDate"
-    
+
 class UHReviewerDueDate (URLHandler):
     _relativeURL = "contributionReviewing.py/reviewerDueDate"
-    
+
 #### End of reviewing
 
 class UHChangeLang( URLHandler ):
@@ -4430,7 +4435,7 @@ class UHContact( URLHandler ):
 class UHHelper(object):
     """ Returns the display or modif UH for an object of a given class
     """
-    
+
     modifUHs = {
         "Category" : UHCategoryModification,
         "Conference" : UHConferenceModification,
@@ -4443,7 +4448,7 @@ class UHHelper(object):
         "Track" : UHTrackModification,
         "SubTrack" : UHTrackModifSubTrack
     }
-    
+
     displayUHs = {
         "Category" : UHCategoryDisplay,
         "Conference" : UHConferenceDisplay,
@@ -4452,11 +4457,11 @@ class UHHelper(object):
         "Session" : UHSessionDisplay,
         "Abstract": UHAbstractDisplay
     }
-    
+
     @classmethod
     def getModifUH(cls, klazz):
         return cls.modifUHs.get(klazz.__name__, None)
-    
+
     @classmethod
     def getDisplayUH(cls, klazz):
         return cls.displayUHs.get(klazz.__name__, None)
@@ -4464,7 +4469,7 @@ class UHHelper(object):
 # Testing helloworld
 class UHHelloWorld(URLHandler):
     _relativeURL = "helloWorld.py"
-    
+
     @classmethod
     def getURL( cls, name=None ):
         url = cls._getURL()

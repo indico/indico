@@ -16,12 +16,12 @@
     var switchNowHappeningText = function() {
         nowHappeningDiv.dom.innerHTML = nowHappeningSpan + nowHappeningArray[nowHappeningIndex];
         // Fade in
-        IndicoUI.Effect.fade('nowHappeningDiv', nowHappeningFadeTime);
+        IndicoUI.Effect.fade($E('nowHappeningDiv'), nowHappeningFadeTime);
     }
 
     var rotateNowHappening = function() {
         // Fade out
-        IndicoUI.Effect.fade('nowHappeningDiv', nowHappeningFadeTime);
+        IndicoUI.Effect.fade($E('nowHappeningDiv'), nowHappeningFadeTime);
 
         setTimeout(switchNowHappeningText, nowHappeningFadeTime + 50);
 

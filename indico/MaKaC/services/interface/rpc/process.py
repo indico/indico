@@ -9,6 +9,7 @@ from MaKaC.services.interface import rpc
 from MaKaC.services.interface.rpc import handlers
 
 from MaKaC.common import DBMgr, Config
+from MaKaC.common.contextManager import ContextManager
 
 from MaKaC.services.interface.rpc.common import CausedError
 from MaKaC.services.interface.rpc.common import RequestError
@@ -47,40 +48,47 @@ def processRequest(method, params, req):
 
     return result
 
-def invokeMethod(method, params, req):    
-    
-    DBMgr.getInstance().startRequest()        
-    
+def invokeMethod(method, params, req):
+
+    # create the context
+    ContextManager.create()
+
+    DBMgr.getInstance().startRequest()
+
     # room booking database
     _startRequestSpecific2RH()
-
     try:
-        retry = 10
-        while retry > 0:
-            try:
-                DBMgr.getInstance().sync()
+        try:
+            retry = 10
+            while retry > 0:
+                try:
+                    DBMgr.getInstance().sync()
 
-                result = processRequest(method, params, req)
-                
-                _endRequestSpecific2RH( True )
-                DBMgr.getInstance().endRequest(True)                                             
-                break
-            except ConflictError:
-                _abortSpecific2RH()
-                DBMgr.getInstance().abort()                
-                retry -= 1
-                continue
-            except ClientDisconnected:
-                _abortSpecific2RH()
-                DBMgr.getInstance().abort()                
-                retry -= 1
-                time.sleep(10 - retry)
-                continue
-    except CausedError, e:
-        raise e
-    except Exception, e:        
-        raise ProcessError("ERR-P0", "Error processing method.", inner = traceback.format_exception(*sys.exc_info()))
-#    _endRequestSpecific2RH( False ) 
+                    result = processRequest(method, params, req)
+
+                    _endRequestSpecific2RH( True )
+                    DBMgr.getInstance().endRequest(True)
+                    break
+                except ConflictError:
+                    _abortSpecific2RH()
+                    DBMgr.getInstance().abort()
+                    retry -= 1
+                    continue
+                except ClientDisconnected:
+                    _abortSpecific2RH()
+                    DBMgr.getInstance().abort()
+                    retry -= 1
+                    time.sleep(10 - retry)
+                    continue
+        except CausedError, e:
+            raise e
+        except Exception, e:
+            raise ProcessError("ERR-P0", "Error processing method.", inner = traceback.format_exception(*sys.exc_info()))
+    finally:
+        # destroy the context
+        ContextManager.destroy()
+
+#    _endRequestSpecific2RH( False )
 
     return result
 

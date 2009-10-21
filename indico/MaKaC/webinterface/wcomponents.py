@@ -437,7 +437,7 @@ class WConferenceHeader( WHeader ):
         return vars
 
 class WMenuConferenceHeader( WConferenceHeader ):
-    """Templating web component for generating the HTML header for 
+    """Templating web component for generating the HTML header for
         the conferences' web interface with a menu
     """
     def __init__(self, aw, navDrawer, conf, modifKey=False):
@@ -1681,10 +1681,7 @@ class WBreakDataModification(WTemplated):
         vars["calendarIconURL"]=Config.getInstance().getSystemIconURL( "calendar" )
         vars["calendarSelectURL"]=urlHandlers.UHSimpleCalendar.getURL()
         vars["schOptions"]=schOptions
-        if not self._conf.getAutoSolveConflict():
-            vars["autoUpdate"]= _("""<input type="checkbox" name="check" value="2">  _("Update parents dates")""")
-        else:
-            vars["autoUpdate"]=""
+        vars["autoUpdate"]=""
         import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
         wr = webFactoryRegistry.WebFactoryRegistry()
         wf = wr.getFactory(self._conf)
@@ -4886,10 +4883,7 @@ class WSchEditContrib(WTemplated):
             if self._contrib.isScheduled():
                 vars["parentType"]="session slot"
         vars["boardNumber"]=quoteattr(str(self._contrib.getBoardNumber()))
-        if not self._contrib.getConference().getAutoSolveConflict():
-            vars["autoUpdate"] = _("""<input type="checkbox" name="check" value="2"> _("update parents dates")<br>""")
-        else:
-            vars["autoUpdate"] = ""
+        vars["autoUpdate"] = ""
         return vars
 
 
@@ -5082,10 +5076,8 @@ class WSessionModEditData(WTemplated):
         if confRoom:
             vars["confRoom"]=self.htmlText(confRoom.getName())
         vars["roomName"]=quoteattr(str(roomName))
-        if not self._conf.getAutoSolveConflict():
-            vars["autoUpdate"]= _("""<input type="checkbox" name="check" value="2">  _("Update parents dates")""")
-        else:
-            vars["autoUpdate"]=""
+
+        vars["autoUpdate"]=""
         if not self._conf.getEnableSessionSlots():
             vars["disabled"] = "disabled"
         else:
@@ -5741,10 +5733,7 @@ class WSchRelocate(WTemplated):
             vars["entryType"]=""
         vars["entryTitle"]=self._entry.getTitle()
         vars["targetPlace"]=self._getTargetPlaceHTML()
-        if not self._conf.getAutoSolveConflict():
-            vars["autoUpdate"]=WSchRelocateTime().getHTML(vars)
-        else:
-            vars["autoUpdate"]=""
+        vars["autoUpdate"]=""
         return vars
 
 class WReportNumbersTable(WTemplated):
@@ -6838,7 +6827,7 @@ class WMicroSearchBox(WBaseSearchBox):
 
 class WCategorySearchBox(WBaseSearchBox):
    
-    def __init__(self, categId = 0, optionsClass='siteSearchBox'):
+    def __init__(self, categId = 0, optionsClass='arrowExpandIcon'):
         WBaseSearchBox.__init__(self, targetId = categId)
         self._moreOptionsClass = optionsClass
         

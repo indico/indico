@@ -1,232 +1,529 @@
-type("TimetableBlock", [],
+type("TimetableBlockBase", [],
      {
-         _blockDescription: function(block, event) {
+        truncateTitle: function(numChars, title) {
+            if (numChars >= title.length) {
+                return title;
+            }
+
+            if (numChars < 0) {
+                // Never truncate more than the length of  the string
+                if (-numChars >= title.length) {
+                    return title;
+                }
+
+                // Since we add 3 periods in the end truncating 3 or less chars
+                // doen't result in shortening the string. Force it to be <= -4
+                if (numChars >= -3) {
+                    numChars = -4;
+                }
+
+                numChars = title.length + numChars;
+            }
+
+            title = title.substring(0, numChars) + "...";
+            return title;
+        },
+
+         openPopup: function(event) {
              var self = this;
 
-             this.titleDiv = Html.div({className: 'timetableBlockTitle'}, this.eventData.title);
-
-             this.div = Html.div({style: { width: '100%', height: '100%'}}, this.titleDiv);
-
-             if (!self.printableVersion) {
-                 this.div.dom.style.cursor = 'pointer';
+              // If popup alredy shown do nothing
+             if (self.popupActive || self.materialMenuOpen) {
+                 return;
              }
 
+             self.popupActive = true;
+             self.div.dom.style.cursor = 'default';
+             var cursor = getMousePointerCoordinates(event);
+             if (this.managementMode) {
+                 this.popup = new TimetableBlockPopupManagement(this, self.eventData, self.div,
+                     function() {
+                         self.div.dom.style.cursor = 'pointer';
+                         self.popupActive = false;
+                         return self.popupAllowClose;
+                      },
+                      self.managementActions);
 
-             if (!this.compactMode) {
-                 this.timeDiv = Html.div({className: 'timetableBlockTime'}, this.eventData.startDate.time.substring(0,5) +' - '+ this.eventData.endDate.time.substring(0,5));
-                 this.locationDiv = Html.div({className: 'timetableBlockLocation'}, this.eventData.room, Html.br(), this.eventData.location);
-                 this.div.append(this.timeDiv);
-                 this.div.append(this.locationDiv);
-             } else {
-                 this.timeDiv = Html.div({className: 'timetableBlockTimeDiscreet', style: {color: self.printableVersion ? 'black' : ''}}, this.eventData.startDate.time.substring(0,5) +' - '+ this.eventData.endDate.time.substring(0,5));
-                 this.div.insert(this.timeDiv);
+            } else {
+                this.popup = new TimetableBlockPopup(self.eventData, self.div,
+                    function() {
+                        self.div.dom.style.cursor = 'pointer';
+                        self.popupActive = false;
+                        return self.popupAllowClose;
+                    },
+                    function(color) {
+                        var parent = self.div.getParent();
+                        parent.setStyle('backgroundColor', color);
+                    }
+                );
+            }
+             this.popup.open(cursor.x, cursor.y);
+         },
+         closePopup: function() {
+             var self = this;
+
+              // If popup not open shown do nothing
+             if (!self.popupActive) {
+                 return;
              }
 
-             this.div.observeClick(function(e) {
-                 // No popups in printable version
-                 if (self.printableVersion) {
-                     return;
-                 }
+             this.popup.close();
+         },
+         createMaterialMenu: function(material, triggerElement, closeHandler) {
 
-                 // If popup alredy shown do nothing
-                 if (self.popupActive) {
-                     return;
-                 }
+             var sections = {};
 
-                 self.popupActive = true;
-                 self.div.dom.style.cursor = 'default';
-
-                 var cursor = getMousePointerCoordinates(e);
-
-                 var popup = new TimetableBlockPopup(self.eventData, self.div, function() {
-                     self.div.dom.style.cursor = 'pointer';
-                     self.popupActive = false;
-                     return self.popupAllowClose;
-                 },function(color) {
-                     var parent = self.div.getParent();
-                     parent.setStyle('backgroundColor', color);
+             each(material, function(value) {
+                 var section = value.title;
+                 var menuItems = {};
+                 sections[section] = menuItems;
+                 each(value.resources, function(item) {
+                     var name = item.name;
+                     menuItems[name] = item.url;
                  });
-                 popup.open(cursor.x, cursor.y);
              });
 
-             return this.div;
+             var menu = new SectionPopupMenu(sections, [triggerElement], null, null, true, closeHandler);
+
+             return menu;
          },
-
-         draw: function(leftPos, width) {
-
-             var classTable = {
-                 'Session': 'timetableSession',
-                 'Contribution': 'timetableContribution',
-                 'Break': 'timetableBreak'
-             };
-
-             return Html.div({style:
-                              {
-                                  position: 'absolute',
-                                  top: pixels(this.blockData.start),
-                                  height: pixels(this.blockData.end-this.blockData.start-3),
-                                  backgroundColor: this.printableVersion ? 'white' : this.eventData.color,
-                                  borderColor: this.printableVersion ? 'black' : '',
-                                  left: pixels(leftPos),
-                                  width: pixels(width-3),
-                                  borderBottomStyle: this.blockData.unfinished?'dashed':''
-                              },
-                              className: 'timetableBlock ' + classTable[this.eventData.entryType]
-                             }, this._blockDescription());
-         },
-         postDraw: function() {
+         createMaterialButton: function(material) {
              var self = this;
-             var title = this.eventData.title;
 
-	     // sets the highlighting effect
-	     highlightWithMouse(this.div, this.div.getParent());
+             this.materialMenuOpen = false;
 
-             // Returns the total height of the divs in the block
-             var contentHeight = function() {
-                 var h = 0;
-                 if (!self.compactMode) {
-                     h = self.locationDiv.dom.offsetHeight + self.margin;
-                 }
+             var button = Html.div('timetableBlockMaterial');
+             button.observeClick(function(e) {
+                 self.materialMenuOpen = true;
 
-                 return self.titleDiv.dom.offsetHeight + h;
-             };
-             var contentWidth = function() {
-                 return self.timeDiv.dom.offsetWidth + self.locationDiv.dom.offsetWidth + 2*self.margin;
-             };
+                 self.closePopup();
 
-             // Truncates the title to the size numChars
-             // If truncate is < 0 remove numChar characters
-             var truncateTitle = function(numChars) {
-                 if (numChars >= title.length) {
-                     return title;
-                 }
+                 // use this style as long as the menu is open
+                 button.dom.className = "timetableBlockMaterial timetableBlockMaterialActive";
 
-                 if (numChars < 0) {
-                     // Never truncate more than the length of  the string
-                     if (-numChars >= title.length) {
-                         return title;
-                     } else {
-                         numChars = title.length + numChars;
-                     }
-                 }
+                 var menu = self.createMaterialMenu(material, button, function () {
+                     // Restores the button style when menu is closed
+                     button.dom.className = "timetableBlockMaterial";
+                     self.materialMenuOpen = false;
+                     return true;
+                 });
 
-                 title = title.substring(0, numChars) + "...";
-                 self.titleDiv.set(title);
-                 return title;
-             };
-             var parentDivHeight = this.div.dom.parentNode.offsetHeight;
-             var parentDivWidth = this.div.dom.parentNode.offsetWidth;
+                 var pos = button.getAbsolutePosition();
+                 menu.open(pos.x + 20, pos.y + 18);
+             });
 
-             // If nothin has been drawn do nothing
-             if (!parentDivHeight) {
-                 return;
-             }
-
-             // If no space for location and time info then hide the divs
-             if (this.compactMode && parentDivWidth < 200) {
-                 this.timeDiv.dom.style.display = 'none';
-             }
-             if (!this.compactMode) {
-                 if (this.timeDiv.dom.offsetWidth + 8 >= parentDivWidth) {
-                     this.timeDiv.dom.style.display = 'none';
-                     this.locationDiv.dom.style.display = 'none';
-                 }
-                 else if (contentWidth() >= parentDivWidth) {
-                     this.timeDiv.dom.style.display = 'none';
-                 }
-             }
-
-             // If content height <= div height then nothing needs to be done
-             if (contentHeight() <= parentDivHeight) {
-                 return;
-             }
-
-             // Truncate title based on a ratio: div height / content height
-             truncateTitle(Math.ceil(this.eventData.title.length * ((parentDivHeight) / contentHeight())));
-
-             var step = Math.ceil(parentDivWidth / 20);
-             while (contentHeight() > parentDivHeight && title.length > step) {
-                 truncateTitle(-step);
-             }
-
+             return button;
          }
+         /* ,
+         createManageMenu: function(triggerElement, closeHandler) {
+             var self = this;
+
+             var info = new WatchObject();
+             var sections = {'Edit': function() {alert('edit');}, 'Delete': function() {
+                 var info = new WatchObject;
+                 info.set('conference', self.eventData.conferenceId);
+                 info.set('break', self.eventData.id);
+                 info.set('target', self.eventData.id);
+                 indicoRequest("schedule.event.deleteBreak", info, function(result, error){
+                     if (error) {
+                         IndicoUtil.errorReport(error);
+                     }
+                     else {
+                         var data = timetable.getData();
+                         data[result.day][result.key] = result.entry;
+                         timetable.updateData(data);
+                     }
+                 });
+             }};
+
+             var menu = new PopupMenu(sections, [triggerElement], null, null, true, closeHandler);
+
+             return menu;
+         },
+         createManageButton: function() {
+             var self = this;
+
+             this.manageMenuOpen = false;
+
+             var button = Html.div('timetableBlockMaterial');
+             button.observeClick(function(e) {
+                 self.materialMenuOpen = true;
+
+                 self.closePopup();
+
+                 // use this style as long as the menu is open
+                 button.dom.className = "timetableBlockMaterial timetableBlockMaterialActive";
+
+                 var menu = self.createManageMenu(button, function () {
+                     // Restores the button style when menu is closed
+                     button.dom.className = "timetableBlockMaterial";
+                     self.manageMenuOpen = false;
+                     return true;
+                 });
+
+                 var pos = button.getAbsolutePosition();
+                 menu.open(pos.x + 20, pos.y + 18);
+             });
+
+             return button;
+         }*/
      },
-     function(eventData, blockData, compactMode, printableVersion){
-         this.compactMode = compactMode;
-         this.eventData = eventData;
-         this.blockData = blockData;
-         this.margin = TimetableDefaults.blockMargin;
+     function(managementMode, managementActions){
+         this.managementMode = managementMode;
+         this.managementActions = managementActions;
          this.popupActive = false;
          this.popupAllowClose = true;
-         this.printableVersion = any(printableVersion, false);
      }
-    );
+);
 
-type("TimetableColorPicker", ["PopupDialog"], {
-    draw: function(x, y) {
-        var self = this;
+type("TimetableBlock", ["TimetableBlockBase"],
+        {
+            _blockDescription: function(block, event) {
+                var self = this;
 
-        var colors = ['#c6e1c1', '#f4ca88', '#f9ad90', '#e8f4cb', '#cbdef4', '#d5d5d5', 'brown', 'black', 'violet'];
-        var tbody = Html.tbody({});
-        var tr;
-        var i = 0;
-        each(colors, function(c) {
-            if (i++ % 3 == 0) {
-                tr = Html.tr();
-                tbody.append(tr);
-            }
-            var colorBlock = Html.div({className: 'timetableColorPickerBlock', style: {backgroundColor: c, cursor: 'pointer'}});
-            colorBlock.observeEvent('mouseover', function() {
-                self.tmpColor = colorBlock.dom.style.backgroundColor;
-                if (self.tmpColor === ''){
+                this.titleDiv = Html.div({className: 'timetableBlockTitle', style: {fontWeight: this.eventData.fontWeight}}, this.eventData.title);
+                // If it's a session slot it might have a slot title that should be
+                // added to the title
+                if (this.eventData.slotTitle && this.eventData.slotTitle !== "") {
+                    this.titleDiv.append(": " + this.eventData.slotTitle);
+                }
+
+                this.titleWrapper = Html.div({}, this.titleDiv);
+
+                this.div = Html.div({style: { width: '100%', height: '100%'}}, this.titleWrapper);
+
+                if (!this.compactMode) {
+                    this.timeDiv = Html.div({className: 'timetableBlockTime'}, this.eventData.startDate.time.substring(0,5) +' - '+ this.eventData.endDate.time.substring(0,5));
+
+                    this.locationDiv  = Html.div('timetableBlockLocation');
+                    var addComma = false;
+                    if (this.eventData.room) {
+                        this.locationDiv.append(this.eventData.room);
+                        addComma = true;
+                    }
+                    if (this.eventData.location) {
+                        this.locationDiv.append(addComma ? ', ' : '');
+                        this.locationDiv.append(this.eventData.location);
+                    }
+
+                    // If it's a contribtion the add speakers information
+                    if (self.eventData.presenters && self.eventData.presenters.length > 0) {
+                        this.presentersDiv = Html.div({className: 'timetableBlockPresenters'});
+                        this.presentersDiv.append(self.eventData.presenters[0].name);
+                        if (self.eventData.presenters.length > 1) {
+                            this.presentersDiv.append($T(' et al.'));
+                        }
+                        this.titleWrapper.insert(this.presentersDiv);
+                    }
+
+                    // Add material menu
+                    if (!self.managementMode && self.eventData.material && self.eventData.material.length > 0) {
+                        this.titleWrapper.insert(this.createMaterialButton(this.eventData.material));
+                    }
+
+                    //this.titleWrapper.insert(this.createManageButton());
+
+                    this.div.append(this.timeDiv);
+                    this.div.append(this.locationDiv);
+                } else {
+                    this.timeDiv = Html.div('timetableBlockTimeDiscreet', this.eventData.startDate.time.substring(0,5) +' - '+ this.eventData.endDate.time.substring(0,5));
+                    this.div.insert(this.timeDiv);
+                }
+
+                return this.div;
+            },
+
+            redraw: function() {
+                this.block.clear();
+                this.block.set(this._blockDescription());
+            },
+
+            draw: function(leftPos, width) {
+                var self = this;
+
+                this.leftPos = leftPos;
+                this.width = width;
+                this.height = this.blockData.end-this.blockData.start-3;
+                this.topPos = this.blockData.start;
+
+                var classTable = {
+                    'Session': 'timetableSession',
+                    'Contribution': 'timetableContribution',
+                    'Break': 'timetableBreak'
+                };
+
+                this.block = Html.div({style:
+                        {
+                            position: 'absolute',
+                            top: pixels(this.topPos),
+                            height: pixels(this.height),
+                            backgroundColor: this.printableVersion ? 'white' : this.eventData.color,
+                            color: this.printableVersion ? 'black' : this.eventData.textColor,
+                            borderColor: this.printableVersion ? 'black' : '',
+                            left: pixels(this.leftPos),
+                            width: pixels(this.width-3),
+                            borderBottomStyle: this.blockData.unfinished?'dashed':''
+                        },
+                        className: 'timetableBlock ' + classTable[this.eventData.entryType]
+                   }, this._blockDescription()
+               );
+
+
+               // This is a special case, when users shows contribution details it doesn't
+               // apply to poster sessions. Instead add some grpahical elements to indicate
+               // that this sessions contains several contributions.
+               if (this.detailLevel == 'contribution' && this.eventData.isPoster && this.height > 30) {
+                   var pileDiv = this.createPileEffect();
+                   pileDiv.dom.onmouseover = function(){ };
+                   var numContribs = 0;
+                   each(this.eventData.entries, function(value, key) {
+                       if (value.entryType == 'Contribution') {
+                           numContribs++;
+                       }
+                   });
+                   pileDiv.dom.onmouseover = function(event) {
+                       if (self.popupActive) {
+                           return;
+                       }
+
+                       IndicoUI.Widgets.Generic.tooltip(pileDiv.dom, event, "<div style='padding:3px'>" +
+                           $T('This poster session has ') + numContribs + $T(' contribution(s).') + "<br / >" +
+                           $T('Please click for more information.') + "</div>");
+                   };
+               }
+
+               if (!self.printableVersion) {
+                   this.block.dom.style.cursor = 'pointer';
+                   this.block.observeClick(function(e) { self.openPopup(e); });
+                   highlightWithMouse(this.div, this.block);
+               }
+
+               return this.block;
+           },
+            postDraw: function() {
+                var self = this;
+                var title = this.eventData.title;
+
+                // Returns the total height of the divs in the block
+                var contentHeight = function() {
+                    var h = 0;
+                    if (!self.compactMode) {
+                        locationHeight = self.locationDiv.dom.style.display != 'none' ? self.locationDiv.dom.offsetHeight : 0;
+                        timeHeight = self.timeDiv.dom.style.display != 'none' ? self.timeDiv.dom.offsetHeight : 0;
+
+                        h = Math.max(locationHeight, timeHeight);
+                    }
+
+                    return self.titleDiv.dom.offsetHeight + h;
+                };
+                var contentWidth = function() {
+                    return self.timeDiv.dom.offsetWidth + self.locationDiv.dom.offsetWidth + 2*self.margin;
+                };
+
+                var parentDivHeight = this.div.dom.parentNode.offsetHeight;
+                var parentDivWidth = this.div.dom.parentNode.offsetWidth;
+
+                // If nothin has been drawn do nothing
+                if (!parentDivHeight) {
                     return;
                 }
 
-                var bgColor = colorBlock.dom.style.backgroundColor;
-                var s = bgColor.match(/rgb\((\d+), (\d+), (\d+)\)/);
-                if (!s) {
-                    s = bgColor.match(/#(..)(..)(..)/);
-                    if (!s)
-                        return;
-
-                    s[1] = parseInt('0x'+s[1],16);
-                    s[2] = parseInt('0x'+s[2],16);
-                    s[3] = parseInt('0x'+s[3],16);
+                // If no space for location and time info then hide the divs
+                if (this.compactMode && parentDivWidth < 200) {
+                    this.timeDiv.dom.style.display = 'none';
                 }
-                s[1] = Math.floor(s[1]*1.05);
-                s[2] = Math.floor(s[2]*1.05);
-                s[3] = Math.floor(s[3]*1.05);
-                colorBlock.setStyle('backgroundColor', 'rgb(' + s[1] + ',' + s[2] + ',' + s[3] + ')');
-            });
-            colorBlock.observeEvent('mouseout', function(event) {
-                colorBlock.setStyle('backgroundColor', self.tmpColor);
-            });
-            colorBlock.observeClick(function (e) {
-                self.colorClickHandler(c);
-                self.close();
-            });
-            tr.append(Html.td({}, colorBlock));
-        });
+                if (!this.compactMode) {
+                    var locationMaxWidth = parentDivWidth  - 20;
 
-        this.div.append(Html.table({}, tbody));
-        return this.PopupDialog.prototype.draw.call(this, this.div, x, y);
-    },
-    open: function() {
-        var pos = this.colorPickerElement.getAbsolutePosition();
-        return this.PopupDialog.prototype.open.call(this, pos.x-20, pos.y+20);
-    }
-},
-     function(colorPickerElement, colorClickHandler, closeHandler) {
-         this.colorPickerElement = colorPickerElement;
-         this.colorClickHandler = colorClickHandler;
-         this.div = Html.div('timetableColorPicker');
-         this.PopupDialog(this.div, colorPickerElement, closeHandler);
-     });
+                    // Hide the time if there are not enough space
+                    if (this.timeDiv.dom.offsetWidth + 8 >= parentDivWidth) {
+                        this.timeDiv.dom.style.display = 'none';
+                    }
+                    else if (contentWidth() >= parentDivWidth) {
+                        this.timeDiv.dom.style.display = 'none';
+                    } else {
+                        locationMaxWidth -= this.timeDiv.dom.offsetWidth;
+                    }
 
-type("TimetableBlockPopup", ["BalloonPopup"], {
+                    this.locationDiv.dom.style.maxWidth = pixels(locationMaxWidth);
+
+                    // Presenters information should not take more than half of the space of the block
+                    if (this.presentersDiv && this.presentersDiv.dom.offsetWidth > parentDivWidth / 2) {
+                        this.presentersDiv.dom.style.display = 'none';
+                    }
+                }
+
+                // If content height <= div height then nothing needs to be done
+                if (contentHeight() <= parentDivHeight) {
+                    return;
+                }
+
+                // Try to remove the location info, and set title font weight to non bold,
+                // if this works then we're done otherwisestart to truncate the title as well.
+                if (this.timeDiv.dom.style.display == 'none') {
+                    this.locationDiv.dom.style.display = 'none';
+                }
+
+                if (contentHeight() <= parentDivHeight) {
+                    return;
+                }
+
+                // Truncate title based on a ratio: div height / content height
+                this.titleDiv.set(this.truncateTitle(Math.ceil(this.eventData.title.length * ((parentDivHeight) / contentHeight())), title));
+
+                var step = Math.ceil(parentDivWidth / 40);
+                while (contentHeight() > parentDivHeight && title.length > step) {
+                    title = this.truncateTitle(-step, title);
+                    this.titleDiv.set(title);
+                }
+            },
+            createPileEffect: function() {
+                var self = this;
+                var pileEffect = Html.div({style: { position: 'absolute', top: '3px', left: '0', width: pixels(this.width-3)}}, Html.div({},
+                        Html.div('timetableBlock timetableBlockPileEffect'),
+                        Html.div('timetableBlock timetableBlockPileEffect'),
+                        Html.div('timetableBlock timetableBlockPileEffect')
+                    ));
+
+                this.div.insert(pileEffect);
+                this.titleWrapper.dom.style.paddingTop = '20px';
+                if (this.compactMode) {
+                    this.timeDiv.dom.style.paddingTop = '20px';
+                }
+
+                return pileEffect;
+            },
+            setColors: function(textColor, bgColor) {
+                this.block.dom.style.backgroundColor = bgColor;
+                this.block.dom.style.color = textColor;
+            }
+        },
+        function(eventData, blockData, compactMode, printableVersion, detailLevel, managementMode, managementActions){
+            this.TimetableBlockBase(managementMode, managementActions);
+
+            this.compactMode = compactMode;
+            this.eventData = eventData;
+            this.blockData = blockData;
+            this.margin = TimetableDefaults.blockMargin;
+            this.printableVersion = printableVersion;
+            this.detailLevel = detailLevel;
+        }
+   );
+
+
+type("TimetableBlockWholeDay", ["TimetableBlockBase"],
+        {
+            _blockDescription: function(block, event) {
+                var self = this;
+
+                this.titleDiv = Html.div({className: 'timetableBlockTitle', style: {fontWeight: this.eventData.fontWeight}}, this.eventData.title);
+                this.titleWrapper = Html.div({}, this.titleDiv);
+
+                this.div = Html.div({style: { width: '100%', height: '100%'}}, this.titleWrapper);
+
+                this.timeDiv = Html.div('timetableBlockTimeDiscreet', this.eventData.startDate.time.substring(0,5) +' - '+ this.eventData.endDate.time.substring(0,5));
+                this.div.insert(this.timeDiv);
+
+                // Add material menu
+                if (self.eventData.material && self.eventData.material.length > 0) {
+                    this.titleWrapper.insert(this.createMaterialButton(this.eventData.material));
+                }
+
+                return this.div;
+            },
+
+            draw: function() {
+                var self = this;
+
+
+                var classTable = {
+                    'Session': 'timetableSession',
+                    'Contribution': 'timetableContribution',
+                    'Break': 'timetableBreak'
+                };
+
+                block = Html.div({style: {
+                            backgroundColor: this.printableVersion ? 'white' : this.eventData.color,
+                            color: this.printableVersion ? 'black' : this.eventData.textColor,
+                            borderColor: this.printableVersion ? 'black' : '',
+                            maxHeight : '30px',
+                            margin : '2px 0',
+                            overflow : 'hidden'
+                        },
+                        className: 'timetableBlock ' + classTable[this.eventData.entryType]
+                    }, this._blockDescription()
+                );
+
+                if (!self.printableVersion) {
+                    block.dom.style.cursor = 'pointer';
+                    block.observeClick(function(e) { self.openPopup(e); });
+                    highlightWithMouse(this.div, block);
+                }
+
+                return block;
+            },
+            postDraw: function() {
+
+            }
+        },
+        function(eventData, blockData, managementMode, managementActions){
+            this.TimetableBlockBase(managementMode, managementActions);
+
+            this.eventData = eventData;
+            this.blockData = blockData;
+            this.margin = TimetableDefaults.blockMargin;
+        }
+   );
+
+/*
+ * Not used any more
+ */
+/*
+type("TimetableBlockContribDetails", ["TimetableBlock"],
+        {
+            _blockDescription: function(block, event) {
+                var self = this;
+
+                this.titleDiv = Html.div({className: 'timetableBlockTitle', style: {height: '10px', overflow: 'hidden'}}, this.eventData.title);
+
+                this.div = Html.div({style: { width: '100%', height: '100%'}}, this.titleDiv);
+
+                this.div.append(this._contributions());
+
+                return this.div;
+            },
+
+            _contributions: function(div) {
+                var contribs = Html.div('timetableBlockContribs');
+
+                var first = true;
+                each(this.eventData.entries, function (value, key) {
+                    var div = Html.div('timetableBlockContrib', value.title);
+                    if (first) {
+                        div.dom.style.borderTop = 'none';
+                        first = false;
+                    }
+                    contribs.append(div);
+                });
+
+                return contribs;
+            },
+
+            postDraw: function() {
+
+            }
+        },
+        function(eventData, blockData, compactMode, printableVersion, detailLevel){
+            this.TimetableBlock(eventData, blockData, compactMode, printableVersion, detailLevel);
+        }
+   );
+   */
+
+
+type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
     createContent: function() {
         var self = this;
-        
+
         var div = Html.div({className: 'timetablePopup', style: {width: pixels(this.popupWidth)}});
 
         // Truncate title if longer than 90 chars
@@ -237,20 +534,14 @@ type("TimetableBlockPopup", ["BalloonPopup"], {
 
         var titleDiv = Html.div({className: 'title'}, title);
         div.append(titleDiv);
-        
-        if (self.managmenetMode) {
-            var menuBar = this.createManagementMenuBar();
-        } else {
-            var menuBar = this.createDisplayMenuBar()
-        }
-        if (menuBar) {
-            div.append(menuBar);
-        }
-        
-        var infoDiv = this.createInfoDiv();
+
+        var menuBar = this._getMenuBar();
+        div.append(menuBar);
+
+        var infoDiv = this._getGeneralInfo();
         div.append(infoDiv);
-        
-        var contributions = this.createContributionList()
+
+        var contributions = this._getContributionInfo();
         if (contributions) {
             div.append(contributions);
             div.dom.style.width = pixels(this.popupWidth + 50);
@@ -259,21 +550,19 @@ type("TimetableBlockPopup", ["BalloonPopup"], {
         return div;
     },
 
-    createInfoDiv: function() {
+    _getGeneralInfo: function() {
         var self = this;
-        
+
         var infoContentDiv = Html.div({className: 'timetablePopupInfoContent'});
-        
-        infoContentDiv.append(Html.div({className: 'timetablePopupTimeDiv'},
-                              self.eventData.startDate.time.substring(0,5) + ' - ' + 
-                              self.eventData.endDate.time.substring(0,5)));
-        
+
+        infoContentDiv.append(this._getTime());
+
         if (self.eventData.room) {
             infoContentDiv.append(Html.strong({style:{fontStyle: 'normal'}}, 'Room: '));
             infoContentDiv.append(self.eventData.room);
             infoContentDiv.append(Html.br());
         }
-        
+
         if (self.eventData.location) {
             infoContentDiv.append(Html.strong({style:{fontStyle: 'normal'}}, 'Location: '));
             infoContentDiv.append(self.eventData.location);
@@ -286,7 +575,7 @@ type("TimetableBlockPopup", ["BalloonPopup"], {
             var i = 0;
             each(self.eventData.presenters, function(p) {
                 speakers.append(i++ > 0 ? ', ' : '' + p.name);
-                if (p.affiliation && p.affiliation != '') {
+                if (p.affiliation && p.affiliation !== '') {
                     speakers.append(Html.em({style: {fontSize: '9pt'}}, ' (' + p.affiliation + ')'));
                 }
             });
@@ -298,84 +587,30 @@ type("TimetableBlockPopup", ["BalloonPopup"], {
 
         // Add the description and if it's too long cut it down
         var desc = self.eventData.description;
-        if (desc && desc != '') {
+        if (desc && desc !== '') {
             infoContentDiv.append(Html.span({style: {display: 'block', marginTop: pixels(5)}},
                                   desc.length > 200 ? desc.substr(0, 200) + '...' : desc));
         }
 
         return Html.div({className: 'timetablePopupInfoWrapper'}, infoContentDiv);
     },
-    
-    createManagementMenuBar: function() {
-        var self = this;
-        
-        // The admin menu
-        var colorSelector = Html.div({style: {display: 'inline', cursor: 'pointer'}}, 'Color: ',
-                            Html.div({className: 'timetableColorPickerBlock',
-                                style: {display: 'inline', backgroundColor: self.eventData.color}},
-                            Html.img({src: 'images/0.png', width: '15', height: '5'})));
 
-        // Handles the color selector
-        colorSelector.observeClick(function(e) {
-            // If open just close it
-            if (self.colorPickerOpen) {
-                self.colorPicker.close();
-                self.colorPickerOpen = false;
-                return;
-            }
-
-            self.colorPicker = new TimetableColorPicker(colorSelector, function(color) {
-                self.colorPickerOpen = false;
-                self.colorClickHandler(color);
-            }, function() { self.colorPickerOpen = false; return true; });
-            // Make sure that clicking in the color picker div doesn't close
-            // balloon popup
-            self.addNonCloseTriggeringElement(self.colorPicker.div);
-            self.colorPicker.open();
-            self.colorPickerOpen = true;
-        });
-
-        var href = '';
-        if (self.eventData.entryType == 'Contribution') {
-            href = Indico.Urls.ContributionModification + '?confId=' + self.eventData.conferenceId + '&contribId=' + self.eventData.contributionId;
-        } else {
-            href = Indico.Urls.SessionModification + '?confId=' + self.eventData.conferenceId + '&sessionId=' + self.eventData.sessionId;
-        }
-        var modifyLink = Html.a({'href': href, className: 'timetablePopupAdminLink'}, "Modify");
-
-        return Html.div({className: 'managementMenuBar'}, Html.div({}, modifyLink, " | ", colorSelector));
+    _getTime: function() {
+        return Html.div({className: 'timetablePopupTimeDiv'},
+                        this.eventData.startDate.time.substring(0,5) + ' - ' +
+                        this.eventData.endDate.time.substring(0,5));
     },
 
-    createDisplayMenuBar: function() {
+    _getMenuBar: function() {
         var self = this;
-        
+
         // There is only a need for a menu bar when we show contribution or session
         if (self.eventData.entryType != 'Contribution' && self.eventData.entryType != 'Session') {
             return null;
         }
 
-        var exportLink = Html.a('dropDownMenu fakeLink', "Export");
+        var bar = Html.div({});
 
-        exportLink.observeClick(function () {
-            var menuItems = {};
-            if (self.eventData.entryType == 'Contribution') {
-                var urlParams = '?contribId=' + self.eventData.contributionId + '&confId=' + self.eventData.conferenceId
-                menuItems["PDF file"] = Indico.Urls.ContribToPDF + urlParams;
-                menuItems["Calendar"] = Indico.Urls.ContribToiCal + urlParams;
-                menuItems["XML"] = Indico.Urls.ContribToXML + urlParams;
-            } else if (self.eventData.entryType == 'Session') {
-                var urlParams = '?showSessions=' + self.eventData.sessionId + '&confId=' + self.eventData.conferenceId
-                menuItems["PDF timetable"] = Indico.Urls.ConfTimeTablePDF + urlParams;
-
-                urlParams = '?sessionId=' + self.eventData.sessionId + '&confId=' + self.eventData.conferenceId
-                menuItems["Calendar"] = Indico.Urls.SessionToiCal + urlParams;
-            }
-
-            var exportMenu = new PopupMenu(menuItems, [exportLink], null, true, true);
-            var pos = exportLink.getAbsolutePosition();
-            exportMenu.open(pos.x + exportLink.dom.offsetWidth, pos.y + exportLink.dom.offsetHeight);
-        });
-        
         var url = "#";
         if (self.eventData.entryType == 'Contribution') {
             url = Indico.Urls.ContributionDisplay + '?contribId=' + self.eventData.contributionId + '&confId=' + self.eventData.conferenceId;
@@ -383,26 +618,111 @@ type("TimetableBlockPopup", ["BalloonPopup"], {
             url = Indico.Urls.SessionDisplay + '?sessionId=' + self.eventData.sessionId + '&confId=' + self.eventData.conferenceId;
         }
         var viewLink = Html.a({'href': url}, "View details");
+        bar.append(viewLink);
 
-        return Html.div({className: 'menuBar'}, Html.div({}, viewLink, "|", exportLink));
+
+        if (self.eventData.material && self.eventData.material.length > 0) {
+            var materialLink = Html.a('dropDownMenu fakeLink', "Material");
+            materialLink.observeClick(function(e) {
+                var menu = self.createMaterialMenu(self.eventData.material, materialLink);
+
+                var pos = materialLink.getAbsolutePosition();
+                menu.open(pos.x + materialLink.dom.offsetWidth + 2, pos.y + materialLink.dom.offsetHeight + 2);
+            });
+            bar.append("|");
+            bar.append(materialLink);
+        }
+
+
+        var exportLink = Html.a('dropDownMenu fakeLink', "Export");
+        exportLink.observeClick(function () {
+            var menuItems = {};
+            var urlParams;
+            if (self.eventData.entryType == 'Contribution') {
+                urlParams = '?contribId=' + self.eventData.contributionId + '&confId=' + self.eventData.conferenceId;
+                menuItems.PDF = Indico.Urls.ContribToPDF + urlParams;
+                menuItems.Calendar = Indico.Urls.ContribToiCal + urlParams;
+                menuItems.XML = Indico.Urls.ContribToXML + urlParams;
+            } else if (self.eventData.entryType == 'Session') {
+                urlParams = '?showSessions=' + self.eventData.sessionId + '&confId=' + self.eventData.conferenceId;
+                menuItems["PDF timetable"] = Indico.Urls.ConfTimeTablePDF + urlParams;
+
+                urlParams = '?sessionId=' + self.eventData.sessionId + '&confId=' + self.eventData.conferenceId;
+                menuItems.Calendar = Indico.Urls.SessionToiCal + urlParams;
+            }
+
+            var exportMenu = new PopupMenu(menuItems, [exportLink], null, true, true);
+            var pos = exportLink.getAbsolutePosition();
+            exportMenu.open(pos.x + exportLink.dom.offsetWidth + 2, pos.y + exportLink.dom.offsetHeight + 2);
+        });
+        bar.append("|");
+        bar.append(exportLink);
+
+        return Html.div('menuBar', bar);
     },
-    
-    createContributionList: function() {
+
+    _getContributionInfo: function() {
         var self = this;
-        
-        var contributions = Html.tbody({});
+
+        var contributionsDiv = this._getContributionList(6, true);
+
+        if (!contributionsDiv) {
+            return null;
+        }
+
+        var detailsLink = Html.div({style: {marginTop: pixels(5), marginLeft: pixels(5)}}, Html.span({className: "fakeLink", style: {fontStyle: 'italic', fontWeight: 'normal'}}, "View contribution list"));
+        contributionsDiv.append(detailsLink);
+
+        detailsLink.observeClick(function (e) {
+            self.close();
+            var contribs = [];
+            each(self.eventData.entries, function(value, key) {
+                if (value.entryType == 'Contribution') {
+                    contribs.push(value);
+                }
+            });
+            var popup = new ContributionsPopup(self.eventData, contribs, function() {self.popupAllowClose = true; return true;});
+            popup.open();
+        });
+
+
+        /*
+         * A timetable link for viewing the content of a session.
+         * Needs some work on the TimetablePopup dialog
+         */
+
+        /*timetableLink = Html.div({style: {marginTop: pixels(5), marginLeft: pixels(5)}}, Html.span({className: "fakeLink", style: {fontStyle: 'italic', fontWeight: 'normal'}}, "View timetable"));
+        contributionsDiv.append(timetableLink);
+
+        timetableLink.observeClick(function (e) {
+            self.close();
+            var popup = new TimetablePopup(self.eventData, contribs, function() {self.popupAllowClose = true; return true;});
+            popup.open();
+        });
+        */
+
+        return contributionsDiv;
+    },
+    /*
+     * Builds a list of contributions.
+     */
+    _getContributionList: function(maxNumContribs, links) {
+        var self = this;
+
         var contributionsDiv = Html.div({className: 'timetablePopupContributions'}, "Contributions");
 
+        var contributions = Html.tbody({});
         var contribs = [];
         each(this.eventData.entries, function(value, key) {
             if (value.entryType == 'Contribution') {
                 contribs.push(value);
             }
         });
-        
-        if (contribs.length == 0)
+
+        if (contribs.length === 0) {
             return null;
-        
+        }
+
         contribs.sort(function(a,b) {
             if (a.startDate.time > b.startDate.time) {
                 return 1;
@@ -411,50 +731,256 @@ type("TimetableBlockPopup", ["BalloonPopup"], {
         });
         var i = 0;
         each(contribs, function(value) {
-            if (++i < 6) {
-                var link = Html.a({href: Indico.Urls.ContributionDisplay + '?sessionId=' + value.sessionId + '&contribId=' + value.contributionId + '&confId=' + value.conferenceId, style: {fontWeight: 'normal'}}, value.title);
-                contributions.append(Html.tr({}, Html.td('timetablePopupContributionTime', self.eventData.isPoster ? '-' : value.startDate.time.substr(0,5)),
-                                             Html.td('timetablePopupContributionTitle', link)));
+            if (++i <= maxNumContribs) {
+                var element = links ? Html.a({
+                    href: Indico.Urls.ContributionDisplay + '?sessionId=' + value.sessionId + '&contribId=' + value.contributionId + '&confId=' + value.conferenceId,
+                    style: {fontWeight: 'normal'}},
+                    value.title) :
+                    Html.span({}, value.title);
+                contributions.append(Html.tr({}, Html.td('timetablePopupContributionTime', self.eventData.r ? '-' : value.startDate.time.substr(0,5)),
+                                             Html.td('timetablePopupContributionTitle', element)));
             }
         });
-        if (i >= 6) {
-            contributions.append(Html.tr({}, Html.td({}), Html.td({}, Html.span({style: {fontSize: '9pt', fontWeight: 'normal', fontStyle: 'italic', color: '#444444'}}, '' + (i - 5) + ' more contribution(s)...'))));
+        if (i > maxNumContribs) {
+            contributions.append(Html.tr({}, Html.td({}), Html.td({}, Html.span({style: {fontSize: '9pt', fontWeight: 'normal', fontStyle: 'italic', color: '#444444'}}, '' + (i - maxNumContribs) + ' more contribution(s)...'))));
         }
         contributionsDiv.append(Html.table({style: {marginTop: pixels(5)}}, contributions));
 
-        detailsLink = Html.div({style: {marginTop: pixels(5), marginLeft: pixels(5)}}, Html.span({className: "fakeLink", style: {fontStyle: 'italic', fontWeight: 'normal'}}, contribs.length >= 6 ? "View all contributions" : "View contribution list"));
-        contributionsDiv.append(detailsLink);
-
-        detailsLink.observeClick(function (e) {
-            self.close();
-            var popup = new ContributionsPopup(self.eventData, contribs, function() {self.popupAllowClose = true; return true;});
-            popup.open();
-        });
-        
-        //timetableLink = Html.div({style: {marginTop: pixels(5), marginLeft: pixels(5)}}, Html.span({className: "fakeLink", style: {fontStyle: 'italic', fontWeight: 'normal'}}, "View timetable"));
-        //contributionsDiv.append(timetableLink);
-
-        //timetableLink.observeClick(function (e) {
-        //    self.close();
-        //    var popup = new TimetablePopup(self.eventData, contribs, function() {self.popupAllowClose = true; return true;});
-        //    popup.open();
-        //});
-        
         return contributionsDiv;
     }
     },
-     function(eventData, blockDiv, closeHandler, colorClickHandler, managementMode) {
+     function(eventData, blockDiv, closeHandler) {
          this.eventData = eventData;
          this.triggerElement = blockDiv;
          this.popupWidth = 300;
-         this.colorClickHandler = colorClickHandler;
-         this.colorPickerOpen = false;
-
-         this.managementMode = any(managementMode, false);
 
          this.BalloonPopup(this.createContent(), blockDiv, closeHandler);
      }
-    );
+);
+
+
+type("TimetableBlockPopupManagement", ["TimetableBlockPopup"], {
+
+    _getTime: function() {
+        var self = this;
+
+        var editLink = Html.a({className: 'fakeLink', style: {marginLeft: '10px'}}, '[edit]');
+        var timeDiv = Html.div({},
+                               this.eventData.startDate.time.substring(0,5) + ' - ' +
+                               this.eventData.endDate.time.substring(0,5), editLink);
+
+        var startEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(
+                this.eventData.startDate.time.substring(0,5),
+                this.eventData.endDate.time.substring(0,5));
+
+        var parameterManager = new IndicoUtil.parameterManager();
+
+        parameterManager.add(startEndTimeField.startTimeField, 'time', false);
+        parameterManager.add(startEndTimeField.endTimeField, 'time', false,
+                             function(value) {
+                                 var sTime = translate(parseTime(startEndTimeField.startTimeField.get()), zeropad).join('');
+                                 var eTime = translate(parseTime(value), zeropad).join('');
+                                 if (eTime <= sTime) {
+                                     return "End time should be after start time!";
+                                 }
+                             });
+
+        var saveButton = Html.button({}, 'Save');
+        saveButton.observeClick(function() {
+
+            if (!parameterManager.check()) {
+                return;
+            }
+
+            var sTime = startEndTimeField.accessor.get('startTime');
+            var eTime = startEndTimeField.accessor.get('endTime');
+
+            var startDate = IndicoUtil.parseJsonDate(self.eventData.startDate);
+            var endDate = IndicoUtil.parseJsonDate(self.eventData.startDate);
+            startDate.setHours(sTime.substring(0,2));
+            startDate.setMinutes(sTime.substr(3,2));
+
+            endDate.setHours(eTime.substr(0,2));
+            endDate.setMinutes(eTime.substr(3,2));
+
+            self.managementActions.editEntryStartEndDate(IndicoUtil.formatDateTime(startDate),
+                                                         IndicoUtil.formatDateTime(endDate),
+                                                         self.eventData);
+            self.close();
+        });
+        var cancelButton = Html.button({}, 'Cancel');
+        cancelButton.observeClick(function() {
+            timeEditDiv.dom.style.display = 'none';
+            timeDiv.dom.style.display = 'block';
+        });
+
+        var timeEditDiv = Html.div({style: {display: 'none'}},
+                Html.div({style: {cssFloat: 'right'}}, saveButton, " ", cancelButton),
+                startEndTimeField.element);
+
+
+        editLink.observeClick(function() {
+            // make sure the edit div is at least as high as the timeDiv
+            // to avoid a small 'jump' in the balloon popup
+            timeEditDiv.dom.style.height = pixels(timeDiv.dom.offsetHeight);
+            timeEditDiv.dom.style.display = 'block';
+            timeDiv.dom.style.display = 'none';
+        });
+
+
+
+
+
+        return Html.div('timetablePopupTimeDiv', timeDiv, timeEditDiv);
+
+        //var context = new WidgetEditableContext();
+
+        /*div.set([
+            WidgetEditable(
+                timeDiv,
+                function(target, source) {
+                    var info = $O(source.get().getAll());
+
+                    var startEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(
+                        this.eventData.startDate.time.substring(0,5),
+                        this.eventData.endDate.time.substring(0,5)
+                    );
+                    target.set(startEndTimeField.element);
+
+                    return {
+                        activate: function(){},
+                        save: function () {
+                            // force the observers to be called,
+                            // since objects look immutable to presentation,
+                            // as references are compared
+                            //source.set($O(info.getAll()));
+                        },
+                        stop: function () {
+                            //bind.detach(target);
+                        }
+                    };
+                }
+            )(jsonRpcValue(Indico.Urls.JsonRpcService, 'event.main.changeBooking', {conference: '41726'}), context),
+            IndicoUI.Aux.defaultEditMenu(context)]);
+            return div;
+            */
+    },
+    _getMenuBar: function() {
+        var self = this;
+
+        var menu = Html.div({className: 'menuBar managementMenuBar'});
+
+        var deleteLink = Html.a('fakeLink', "Delete");
+        deleteLink.observeClick(function() {
+            self.managementActions.deleteEntry(self.eventData);
+            self.close();
+        });
+        menu.insert(deleteLink);
+        menu.insert(" | ");
+
+        var editLink;
+
+        if (self.eventData.entryType == 'Session') {
+            // If it's a session the show the edit menu
+            editLink = Html.a({className: 'dropDownMenu', style: {fontWeght: 'bold'}}, $T('Edit'));
+            var menuItems = {};
+
+            menuItems[$T('Interval timetable')] = function() {
+                self.managementActions.intervalTimetable(self.eventData);
+                self.close();
+            };
+            menuItems[$T('Interval properties')] = function() {
+                self.managementActions.editSessionSlot(self.eventData);
+                self.close();
+            };
+            if (!self.managementActions.isSessionTimetable) {
+                menuItems[$T('Session properties')] = self.managementActions.editEntry(self.eventData);
+            }
+
+            editLink.observeClick(function() {
+                var menu = new PopupMenu(menuItems, [editLink], 'timetableManagementPopupList', true, true);
+                var pos = editLink.getAbsolutePosition();
+                menu.open(pos.x + editLink.dom.offsetWidth + 2, pos.y + editLink.dom.offsetHeight + 2);
+            });
+
+        } else if (self.eventData.entryType == 'Contribution') {
+            editLink = Html.a({
+                className: 'fakeLink',
+                style: {fontWeight: 'bold'},
+                href: self.managementActions.editEntry(self.eventData)
+            }, $T("Edit"));
+        } else {
+            // event is a Break
+
+            editLink = Html.a({
+                className: 'fakeLink',
+                style: {fontWeight: 'bold'},
+                href: '#'
+            }, $T("Edit"));
+
+            editLink.observeClick(function() {
+                self.managementActions.editEntry(self.eventData);
+                return false;
+            });
+        }
+        menu.insert(editLink);
+
+
+        // Relocate link, only available for contribs and breaks
+        // TODO: Add the link
+        if (self.eventData.entryType != 'Session') {
+            menu.insert(" | ");
+            menu.insert(Html.a('fakeLink', Html.span({style: {cursor: 'default', color: '#888'}}, $T("Relocate"))));
+        }
+
+        if (self.eventData.entryType == 'Session') {
+            // Handles the color picker
+            var colorPicker = new ColorPicker([], true, this.eventData.color, this.eventData.textColor);
+            var colorPickerLink = colorPicker.getLink(function () {
+                self.addNonCloseTriggeringElement(colorPicker.getCanvas());
+                return true;
+            });
+
+            colorPicker.observe(function(colors) {
+                self.managementActions.changeSessionColors(self.eventData, colors.bgColor, colors.textColor);
+            });
+            menu.append(Html.a({}, colorPickerLink));
+        }
+
+
+        return menu;
+    },
+
+    _getContributionInfo: function() {
+        var self = this;
+
+        if (this.eventData.entryType !== 'Session') {
+            return null;
+        }
+
+        var contributionsDiv = this._getContributionList(4, false);
+
+        if (!contributionsDiv) {
+            contributionsDiv = Html.div({className: 'timetablePopupContributions'}, Html.em({style: {fontWeight: 'normal'}}, $T('This session is empty...')));
+        }
+
+
+        var ttLink = Html.a({className: 'fakeLink'}, "View and edit current interval timetable");
+        ttLink.observeClick(function() {
+            self.managementActions.intervalTimetable(self.eventData);
+            self.close();
+        });
+        contributionsDiv.append(Html.div({style: {marginTop: '10px', fontWeight: 'bold'}}, ttLink));
+
+        return contributionsDiv;
+    }
+    },
+     function(block, eventData, blockDiv, closeHandler, managementActions) {
+         this.block = block;
+         this.managementActions = managementActions;
+         this.TimetableBlockPopup(eventData, blockDiv, closeHandler);
+    }
+);
 
 type("ContributionsPopup", ["ExclusivePopup"], {
 
@@ -473,7 +999,7 @@ type("ContributionsPopup", ["ExclusivePopup"], {
             var shortDesc = Html.span({style: {display: 'block'}}, contrib.description.substr(0, 250) + '... ', showFullDescLink);
             var longDesc = Html.span({style: {display: 'none'}}, contrib.description, hideFullDescLink);
 
-            if (contrib.description && contrib.description != '') {
+            if (contrib.description && contrib.description !== '') {
                 if (contrib.description.length <= 250) {
                     longDesc.setStyle('display', 'block');
                     hideFullDescLink.setStyle('display', 'none');
@@ -490,7 +1016,7 @@ type("ContributionsPopup", ["ExclusivePopup"], {
                 var i = 0;
                 each(contrib.presenters, function(p) {
                     speakers.append(i++ > 0 ? ', ' : '' + p.name);
-                    if (p.affiliation && p.affiliation != '') {
+                    if (p.affiliation && p.affiliation !== '') {
                         speakers.append(Html.em({style: {fontSize: '9pt'}}, ' (' + p.affiliation + ')'));
                     }
                 });
@@ -498,12 +1024,12 @@ type("ContributionsPopup", ["ExclusivePopup"], {
                 infoDiv.append(speakers);
             }
 
-            if (contrib.room && contrib.room != '') {
+            if (contrib.room && contrib.room !== '') {
                 var room = Html.span({style: {marginTop: pixels(3), display: 'block'}}, Html.strong({}, 'Room: '), contrib.room);
                 infoDiv.append(room);
             }
 
-            if (contrib.location && contrib.location != '') {
+            if (contrib.location && contrib.location !== '') {
                 var location = Html.span({style: {marginTop: pixels(3), display: 'block'}}, Html.strong({}, 'Location: '), contrib.location);
                 infoDiv.append(location);
             }
@@ -516,6 +1042,11 @@ type("ContributionsPopup", ["ExclusivePopup"], {
                 shortDesc.setStyle('display', 'block');
                 longDesc.setStyle('display', 'none');
             });
+
+            // Hide the infoDiv if it's empty
+            if (infoDiv.dom.innerHTML === "") {
+                infoDiv.dom.style.display = 'none';
+            }
 
             table.append(Html.tr({}, Html.td({style:{verticalAlign: 'top'}}, time), Html.td({}, title, infoDiv)));
         });
@@ -535,11 +1066,15 @@ type("ContributionsPopup", ["ExclusivePopup"], {
      }
     );
 
+/*
+ * An exclusive popup for showing the timetable of a session.
+ * Is functional but needs more work in order to be useful.
+ */
 type("TimetablePopup", ["ExclusivePopup"], {
 
     draw: function() {
         var self = this;
-        
+
         var div = Html.div({style: {padding: pixels(30)}});
 
         var timetable = new TimeTable({"20090617": {"s420": this.eventData}} ,710, div, 'contribution', false);
@@ -554,30 +1089,14 @@ type("TimetablePopup", ["ExclusivePopup"], {
          this.eventData = eventData;
          this.width = 500;
 
-         this.ExclusivePopup('This is going to show the timatable for a session', closeHandler);
+         this.ExclusivePopup('Session timetable', closeHandler);
      }
     );
 
 
 
-type("TimetableDrawer", ["LookupTabWidget"],
+type("TimetableDrawer", ["IWidget"],
      {
-
-         _titleTemplate : function(text) {
-             if (text == 'all')
-                 return 'All days';
-
-             var day = text.substring(6,8);
-             var month = text.substring(4,6);
-
-             var strDate =  day + '/' + month + '/' + text.substring(0,4);
-
-             var nDate = new Date();
-             setDate(nDate, parseDate(strDate));
-
-             return Indico.Data.WeekDays[nDate.getDay()].substring(0,3)+' '+day+'/'+month;
-
-         },
 
          _minuteDifference: function(time1, time2) {
              var t1 = parseInt(time1.substring(0,2), 10)*60 + parseInt(time1.substring(3,6), 10);
@@ -600,6 +1119,18 @@ type("TimetableDrawer", ["LookupTabWidget"],
                  hour = scale[n][0];
                  px = scale[n][1];
 
+                 if (scale[n].length > 2) {
+                     scaleDiv.append(Html.div({style:
+                     {
+                         position: 'absolute',
+                         top: pixels(px),
+                         width: pixels(this.width),
+                         height: hour==last?'20px':scale[n+1][1]-px,
+                         borderTop: '1px dotted red',
+                         fontSize: '8pt'                                                 }}));
+                     continue;
+                 }
+
                  scaleDiv.append(Html.div({style:
                                            {
                                                position: 'absolute',
@@ -611,6 +1142,32 @@ type("TimetableDrawer", ["LookupTabWidget"],
              }
 
              return scaleDiv;
+         },
+
+         _drawWholeDayBlocks: function(data, blocks) {
+             var self = this;
+
+             var wholeDayBlockDiv = Html.div({style:
+                                             {
+                                                 position:'relative',
+                                                 marginTop: pixels(TimetableDefaults.topMargin),
+                                                 top: pixels(10),
+                                                 marginLeft: pixels(TimetableDefaults.leftMargin),
+                                                 marginRight: pixels(TimetableDefaults.rightMargin)
+                                             }
+                                            });
+
+             self.wholeDayBlocks = [];
+
+             var blockAdded = false;
+             each(blocks, function(blockData) {
+                 var eventData = data[blockData.id];
+                 var block = new TimetableBlockWholeDay(eventData, blockData, self.managementMode, self.managementActions);
+                 wholeDayBlockDiv.append(block.draw(0, 100));
+                 blockAdded = true;
+             });
+
+             return blockAdded ? wholeDayBlockDiv : Html.div({});
          },
 
          _drawBlocks: function(data, blocks, groups) {
@@ -631,20 +1188,37 @@ type("TimetableDrawer", ["LookupTabWidget"],
                  var nCol = groups[blockData.group][1];
 
                  var colWidth = Math.floor((self.width-TimetableDefaults.leftMargin) / nCol);
+
                  var leftPos = TimetableDefaults.leftMargin + colWidth*blockData.assigned;
+
+                 var width;
+                 if (parseInt(blockData.assigned, 10) == (nCol-1)) {
+                     // If last colument make sure the blocks spans all the way to the end
+                     // of the timetable. Makes sure that the right margin is always aligned.
+                     width = self.width - leftPos - TimetableDefaults.rightMargin;
+                 } else {
+                     width = colWidth;
+                 }
 
                  var eventData = data[blockData.id];
 
                  var block;
 
-                 if (blockData.collapsed || (blockData.end - blockData.start < TimetableDefaults.layouts.proportional.values.pxPerHour)) {
-                     block = new TimetableBlock(eventData, blockData, true, self.printableVersion);
-                 } else {
-                     block = new TimetableBlock(eventData, blockData, false, self.printableVersion);
-                 }
-                 self.blocks.push(block);
-                 blockDiv.append(block.draw(leftPos, colWidth));
+                 var empty = true;
 
+                 for (b in eventData.entries) {
+                     empty = false;
+                     break;
+                 }
+                 compactMode = false;
+                 // For now don't use the compact mode. Activating it makes short entries displaying less
+                 // information in the block (only time and title).
+                 //if (blockData.collapsed || (blockData.end - blockData.start < TimetableDefaults.layouts.proportional.values.pxPerHour))
+                 //    compactMode = true;
+
+                 block = new TimetableBlock(eventData, blockData, compactMode, self.printableVersion, self.detail.get(), self.managementMode, self.managementActions);
+                 blockDiv.append(block.draw(leftPos, width));
+                 self.blocks.push(block);
              });
 
              return blockDiv;
@@ -655,11 +1229,11 @@ type("TimetableDrawer", ["LookupTabWidget"],
          },
 
          redraw: function(day) {
-             if (this.blockRedraw) {
+             if (this.preventRedraw) {
                  return;
              }
 
-             var day = any(day, this.day);
+             day = any(day, this.day);
              if (day == 'all') {
                  this.redrawAllDays();
                  return;
@@ -671,17 +1245,20 @@ type("TimetableDrawer", ["LookupTabWidget"],
                  dayFiltered = this.flatten(dayFiltered);
              }
 
-             var dayData = this.layoutChooser.get().drawDay(dayFiltered);
+             var dayData = this.layoutChooser.get().drawDay(dayFiltered, 'session', this.startTime, this.endTime);
              var height = dayData[0]+TimetableDefaults.topMargin+TimetableDefaults.bottomMargin;
              this.wrappingElement.setStyle('height', pixels(height + (this.printableVersion ? 0 : 100))); // +100 to have margin for the tabs
 
+             var grid = this._drawGrid(dayData[1]);
+             var blocks = this._drawBlocks(dayFiltered, dayData[2], dayData[3]);
+             var wholeDayBlocks = this._drawWholeDayBlocks(dayFiltered, dayData[4]);
+
              // Only do if not all days are drawn
-             this.canvas.set([this._drawGrid(dayData[1]),
-                              this._drawBlocks(dayFiltered, dayData[2], dayData[3])]);
+             this.canvas.set([wholeDayBlocks, Html.div({style: {position: 'relative'}}, grid, blocks)]);
 
              this.postDraw();
 
-             return height;
+             return height + wholeDayBlocks.dom.offsetHeight;
          },
 
          setPrintableVersion: function(printableVersion) {
@@ -691,7 +1268,20 @@ type("TimetableDrawer", ["LookupTabWidget"],
 
          postDraw: function() {
              each(this.blocks, function(block) { block.postDraw(); });
-             this.LookupTabWidget.prototype.postDraw.call(this);
+         },
+
+         /*
+          * Sets the color for all session blocks belonging to the
+          * session with sessionId
+          */
+         setSessionBlockColors: function (sessionId, textColor, bgColor) {
+             var self = this;
+
+             each(this.blocks, function(block) {
+                 if (block.eventData.entryType == 'Session' && block.eventData.sessionId == sessionId) {
+                     block.setColors(textColor, bgColor);
+                 }
+             });
          },
 
          flatten: function(data) {
@@ -703,6 +1293,8 @@ type("TimetableDrawer", ["LookupTabWidget"],
                      each(entry.entries, function(subentry, subkey) {
                          result[subkey] = clone(subentry);
                          result[subkey].color = entry.color;
+                         result[subkey].textColor = entry.textColor;
+                         result[subkey].fontWeight = 'normal';
                      });
                  } else {
                      result[key] = entry;
@@ -712,14 +1304,19 @@ type("TimetableDrawer", ["LookupTabWidget"],
              return result;
          },
 
+         flatten2: function(data) {
+
+             return data;
+         },
+
          drawDay: function(day) {
              this.day = day;
 
-             this.blockRedraw = true;
+             this.preventRedraw = true;
              this.updateFilters(day);
-             this.blockRedraw = false;
+             this.preventRedraw = false;
 
-             this.redraw(day);
+             this.setLoading(true, this.redraw, day);
 
              return this.canvas;
          },
@@ -727,22 +1324,23 @@ type("TimetableDrawer", ["LookupTabWidget"],
          drawAllDays: function() {
              this.day = 'all';
 
-             this.blockRedraw = true;
+             this.preventRedraw = true;
              this.updateFilters('all');
-             this.blockRedraw = false;
+             this.preventRedraw = false;
 
-             this.redrawAllDays();
+             this.setLoading(true, this.redrawAllDays);
 
              return this.canvas;
          },
 
          redrawAllDays: function() {
              var self = this;
+
              var days = [];
              // Add the elements to an array and sort it based on date
-             each(this.data['all'], function(value, key) {
+             each(this.data.all, function(value, key) {
                  if (key != 'all') {
-                     value['date'] = key;
+                     value.date = key;
                      days.push(value);
                  }
              });
@@ -767,7 +1365,7 @@ type("TimetableDrawer", ["LookupTabWidget"],
              var firstDay = true;
              each(days, function(value) {
                  var day = value.date;
-                 delete value['date'];
+                 delete value.date;
                  var h = self.redraw(day);
 
                  // Copy all the elements in canvas
@@ -777,13 +1375,21 @@ type("TimetableDrawer", ["LookupTabWidget"],
                  // Add a div containing the date
                  var headerStyle = {width: pixels(self.width-10)}; // substract the padding
                  if (self.printableVersion) {
-                     headerStyle['textAlign'] = 'center';
-                     headerStyle['borderBottom'] = '0';
+                     headerStyle.textAlign = 'center';
+                     headerStyle.borderBottom = '0';
                  } else if (firstDay) {
-                     headerStyle['marginTop'] = '0';
-                     headerStyle['paddingTop'] = '0';
+                     headerStyle.marginTop = '0';
                  }
-                 header = Html.div({className: 'timetableHeader', style: headerStyle}, self._titleTemplate(day));
+
+                 // Format the day string
+                 var d = day.substring(6,8);
+                 var m = day.substring(4,6);
+                 var strDate =  d + '/' + m + '/' + day.substring(0,4);
+                 var nDate = new Date();
+                 setDate(nDate, parseDate(strDate));
+                 var dayStr = Indico.Data.WeekDays[nDate.getDay()].substring(0,3)+' '+d+'/'+m;
+
+                 header = Html.div({className: 'timetableHeader', style: headerStyle}, dayStr);
                  div.append(header);
                  // Add the timetable canvas
                  div.append(dayCanvas);
@@ -838,23 +1444,47 @@ type("TimetableDrawer", ["LookupTabWidget"],
                      TimetableDefaults.filters[filterName].filter.setData(self.data, self.day);
                  }
              });
+         },
+         /*
+          * Since the loading indicator needs to be shown before the rest of the code
+          * is executed a small timeout is added before calling the funcToCall.
+          */
+         setLoading: function(loading, funcToCall, arg) {
+             var self = this;
+             funcToCall = any(funcToCall, function () {} );
+             this.loading += loading ? 1 : -1;
+
+             if (this.loading > 0) {
+                 this.loadingIndicator.dom.style.visibility = 'visible';
+                 setTimeout(function() {
+                     funcToCall.call(self, arg);
+                     self.setLoading(false);
+                 }, 100);
+             } else {
+                 this.loadingIndicator.dom.style.visibility = 'hidden';
+                 this.loading = 0;
+             }
+         },
+         setData: function(data, startTime, endTime) {
+             this.startTime = startTime;
+             this.endTime = endTime;
+             this.data = data;
+             this.redraw();
          }
      },
-     function(data, width, wrappingElement, detailLevel, extraButtons) {
+     function(data, canvas, width, wrappingElement, detailLevel, extraButtons, loadingIndicator, managementMode, managementActions, defaultLayout) {
 
 
          var self = this;
 
          this.wrappingElement = wrappingElement;
-         this.canvas = Html.div('canvas'); // TODO: remove canvas
+         this.canvas = canvas; // TODO: remove canvas
          this.filterList = new WatchList();
          this.data = data;
-         // This is used to draw all days
-         this.data.all = this.data;
          this.blocks = [];
          this.width = width;
          // Prevents redraw when set to true
-         this.blockRedraw = false;
+         this.preventRedraw = false;
          // Used to switch between normal and printable version
          this.printableVersion = false;
 
@@ -866,10 +1496,16 @@ type("TimetableDrawer", ["LookupTabWidget"],
 
          this.detail = new WatchValue();
          this.layout = new WatchValue();
+         // if greater > 0 the timetable is loading
+         this.loading = 0;
+         this.loadingIndicator = loadingIndicator;
 
-         // default layout is 'proportional'
-         this.layout.set('proportional');
-         this.layoutChooser.set('proportional');
+         this.managementMode = managementMode;
+         this.managementActions = managementActions;
+
+         // default layout is 'compact'
+         this.layout.set(any(defaultLayout, 'compact'));
+         this.layoutChooser.set(any(defaultLayout, 'compact'));
          // default detail level is 'session'
          this.detail.set(any(detailLevel, 'session'));
 
@@ -884,47 +1520,104 @@ type("TimetableDrawer", ["LookupTabWidget"],
          // create a filterName -> filterObject list
          this.filterState = $O(filterState);
 
-         // Set the initial tab to today's date if exists
-         var today = new Date();
-         var todayStr = IndicoUtil.formatDate2(today);
-         var initialTab = -1;
-         while (exists(data[todayStr])) {
-             today.setDate(today.getDate()-1);
-             todayStr = IndicoUtil.formatDate2(today);
-             initialTab++;
-         }
-         // if today not found, set initial tab to the first one
-         if (initialTab == -1) {
-             initialTab = 0;
-         }
-
-         var sortedKeys = keys(this.data);
-         sortedKeys.sort();
-         
-         // Extra buttons such as print and filter, displayed in tab widget
-         var extraButtons = any(extraButtons, []);
-         
-         // the widget consists in a "rich" tab widget, where
-         // each tab is a day
-         this.LookupTabWidget( translate(sortedKeys, function(key) {
-             return [key, function() {
-                 // each time one tab is clicked,
-                 // drawDay is called over a different day
-                 if (key == 'all') {
-                     return self.drawAllDays();
-                 } else {
-                     return self.drawDay(key);
-                 }
-             }];
-         }), this.width, 100, initialTab, extraButtons);
-
          this.detail.observe(function(value) {
-             self.redraw();
+             if (!self.preventRedraw) {
+                 self.setLoading(true, self.redraw);
+             }
          });
 
          this.layout.observe(function(value) {
              self.layoutChooser.set(value);
-             self.redraw();
+             if (!self.preventRedraw) {
+                 self.setLoading(true, self.redraw);
+             }
          });
      });
 
+
+
+type("IntervalTimetableDrawer", ["TimetableDrawer"],
+    {
+        posterRedraw: function() {
+            // TO USE: in a future interval timetable for display mode.
+            //var dayFiltered = this.applyFilters(this.data[this.day]);
+            //var dayData = this.layoutChooser.get().drawDay(dayFiltered);
+            var dayData = this.layoutChooser.get().drawDay(this.data[this.day]);
+            var height = 100+TimetableDefaults.topMargin+TimetableDefaults.bottomMargin;
+            this.wrappingElement.setStyle('height', pixels(height + (this.printableVersion ? 0 : 100))); // +100 to have margin for the tabs
+
+            var blocks = this._posterBlocks(dayData);
+
+            this.canvas.set(Html.div({style: {position: 'relative'}}, blocks));
+
+            this.postDraw();
+
+            return height;
+        },
+
+        redraw:function() {
+            if (this.isPoster) {
+                return this.posterRedraw();
+            }else {
+                return this.TimetableDrawer.prototype.redraw.call(this);
+            }
+        },
+
+        _posterBlocks: function(data) {
+            var self = this;
+
+            var blockDiv = Html.div({style:
+                                     {
+                                         position:'relative',
+                                         top: pixels(TimetableDefaults.topMargin)
+                                     }
+                                    });
+
+            self.blocks = [];
+            var topPx = 0;
+            each(data, function(blockData, id) {
+
+                var editLink = Html.a('fakeLink', "Edit");
+                editLink.observeClick(function() {
+                    window.location = self.managementActions.editEntry(blockData);
+                });
+
+                var deleteLink = Html.a('fakeLink', "Delete");
+                deleteLink.observeClick(function() {
+                    self.managementActions.deleteEntry(blockData);
+                });
+
+
+                var entryTools = Html.div({style:{cssFloat: "right"}},editLink," | ",deleteLink);
+                var entryInfo = Html.div({},blockData.title );
+                var timeDiv = Html.div("posterBlockTime", blockData.startDate.time.substring(0,5) +' - '+ blockData.endDate.time.substring(0,5));
+                var block = Html.div({className:'posterEntry'},
+                    entryTools,
+                    entryInfo,
+                    Html.div({},timeDiv));
+                blockDiv.append(block);
+                self.blocks.push(block);
+            });
+
+            return blockDiv;
+        },
+
+        postDraw: function() {
+
+        },
+
+        setData: function(data, day, isPoster) {
+            this.isPoster = isPoster;
+            this.day = day;
+            if (this.isPoster) {
+                this.setLayout('poster');
+            } else {
+                this.setLayout('compact');
+            }
+            this.TimetableDrawer.prototype.setData.call(this, data);
+        }
+    },
+    function(data, canvas, width, wrappingElement, extraButtons, loadingIndicator, managementMode, managementActions) {
+        this.TimetableDrawer(data, canvas, width, wrappingElement, 'session', extraButtons, loadingIndicator, managementMode, managementActions, data.isPoster?'poster':null);
+    }
+);

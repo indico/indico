@@ -54,9 +54,9 @@ def isWeekend( d ):
     return d.weekday() in [5, 6]
 
 
-HOLIDAYS_KEY = 'Holidays'    
+HOLIDAYS_KEY = 'Holidays'
 class HolidaysHolder:
-    
+
     @classmethod
     def isWorkingDay( cls, d ):
         if isinstance( d, datetime ):
@@ -64,23 +64,23 @@ class HolidaysHolder:
         if isWeekend( d ):
             return False
         return not cls.__getBranch().has_key( d )
-    
+
     @classmethod
     def getHolidays( cls ):
         """
         Returns list of holidays
         """
         return cls.__getBranch().keys()
-    
+
     @classmethod
     def insertHoliday( cls, d ):
         cls.__getBranch()[d] = None
-    
+
     @classmethod
     def clearHolidays( cls ):
         root = DBMgr.getInstance().getDBConnection().root()
         root[HOLIDAYS_KEY] = OOBTree()
-    
+
     @staticmethod
     def __getBranch():
         root = DBMgr.getInstance().getDBConnection().root()
@@ -96,7 +96,7 @@ def stringToDate( str ):
     return datetime(int(year),months[month],int(day))
 
 def getTextColorFromBackgroundColor(bgcolor):
-    #Returns black if the average of the RGV values 
+    #Returns black if the average of the RGV values
     #is less than 128, and white if bigger.
     if len(bgcolor.strip())==7:# remove "#" before the color code
         bgcolor=bgcolor[1:]
@@ -108,8 +108,8 @@ def getTextColorFromBackgroundColor(bgcolor):
             else:
                 return "#FFFFFF"
         except ValueError:
-            pass 
-    return "#777777"
+            pass
+    return "#202020"
 
 charRplace = [
 [u'\u2019', u"'"],
@@ -140,7 +140,7 @@ def sortUsersByAffiliation(x,y):
 
 def sortUsersByEmail(x,y):
     return cmp(x.getEmail().lower(),y.getEmail().lower())
-    
+
 def sortGroupsByName(x,y):
     return cmp(x.getName().lower(),y.getName().lower())
 
@@ -168,7 +168,7 @@ def sortPrincipalsByName(x,y):
     else:
         namex = x.getFamilyName()
         firstNamex = x.getFirstName()
-        
+
     if y is None:
         namey = ""
     elif isinstance(y, user.CERNGroup) or isinstance(y, user.Group):
@@ -176,7 +176,7 @@ def sortPrincipalsByName(x,y):
     else:
         namey = y.getFamilyName()
         firstNamey = y.getFirstName()
-        
+
     cmpRes = cmp(namex.lower(),namey.lower())
     if cmpRes == 0:
         cmpRes = cmp(firstNamex.lower(),firstNamey.lower())
@@ -194,7 +194,7 @@ def validIP(ip):
     """
     expr = r'(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)'
     return re.match(expr, ip) != None
-    
+
 
 def isStringHTML(s):
     if type(s) == str:
@@ -211,8 +211,8 @@ def getEmailList(stri):
         if email!="" and email.rfind(".", email.find("@") )>0 and email not in emailList :
             emailList.append(email)
     return emailList
-            
-    
+
+
 def dictionaryToString(dico):
     """ Convert the given dictionary to a string, which is returned.
         Useful for HTML attributes (e.g. name="a" value="x" ...).
@@ -273,8 +273,8 @@ def newFakeName(minSize=_FAKENAME_SIZEMIN, maxSize=_FAKENAME_SIZEMAX):
             fakename += vowels[ randint(0,vowelIndexMax) ]
             isVowel = True
     return fakename
-    
-    
+
+
 def newKey(length=_KEY_DEFAULT_LENGTH):
     """returns a new crypted key of given length."""
     #check
@@ -289,7 +289,7 @@ def newKey(length=_KEY_DEFAULT_LENGTH):
     for i in range(length):
         key += table[ randint(0,indexMax) ]
     return key
-        
+
 def nodeValue(node):
     """given a leaf node, returns its value."""
     from xml.dom.minidom import Element,Text
@@ -340,13 +340,13 @@ def encodeUnicode(text, sourceEncoding = "utf-8"):
 
 
 def daysBetween(dtStart, dtEnd):
-    d = dtEnd - dtStart    
+    d = dtEnd - dtStart
     days = [ dtStart + timedelta(n) for n in range(0, d.days + 1)]
     if days[-1] != dtEnd:
         # handles special case, when d.days is the
         # actual span minus 2
         # |----|----|----|----|
-        # (4 days)  
+        # (4 days)
         #    |----|----|---
         # (2 days and some hours)
         days.append(dtEnd)
@@ -396,7 +396,7 @@ def cleanUnicodeObjects(obj):
         In case of a persistent object or an object inside a persistent object,
         you will need to notify the database of changes in the object after calling this method.
     """
-    
+
     # replace unicode objects inside a list
     if isinstance(obj,list):
         for i in range(0, len(obj)):
@@ -404,7 +404,7 @@ def cleanUnicodeObjects(obj):
                 obj[i] = obj[i].encode('utf-8','replace')
             else:
                 cleanUnicodeObjects(obj[i])
-    
+
     #replace unicode objects inside a dictionary
     if isinstance(obj,dict):
         #replace values
@@ -413,7 +413,7 @@ def cleanUnicodeObjects(obj):
                 obj[k] = v.encode('utf-8','replace')
             else:
                 cleanUnicodeObjects(obj[k])
-                
+
         #replace keys
         dict2 = obj.copy()
         for k in dict2.keys():
@@ -422,7 +422,7 @@ def cleanUnicodeObjects(obj):
                 obj[k.encode('utf-8','replace')] = dict2[k]
             else:
                 cleanUnicodeObjects(k)
-                
+
 def normalizeToList(l):
     if type(l) != list:
         l=[l]
@@ -433,7 +433,7 @@ def getHierarchicalId(obj):
     """ Gets the ID of a Conference, Contribution or Subcontribution, in an hierarchical manner"""
 
     from MaKaC import conference
-    
+
     ret = obj.getId()
     if isinstance(obj,conference.Contribution):
         ret="%s.%s"%(obj.getConference().getId(),ret)
@@ -441,6 +441,10 @@ def getHierarchicalId(obj):
         ret="%s.%s.%s"%(obj.getConference().getId(), obj.getContribution().getId(), ret)
     elif isinstance(obj, conference.DeletedObject):
         ret=obj.getId().replace(':','.')
+    elif isinstance(obj, conference.Session):
+        ret="%s.s%s"%(obj.getConference().getId(), ret)
+    elif isinstance(obj, conference.SessionSlot):
+        ret="%s.s%s.%s"%(obj.getConference().getId(), obj.getSession().getId(), ret)
     return ret
 
 def main():
@@ -449,12 +453,12 @@ def main():
     print str( HolidaysHolder.isWorkingDay( date( 2007, 5, 1 ) ) )
     print str( HolidaysHolder.isWorkingDay( date( 2007, 5, 2 ) ) )
     print str( HolidaysHolder.isWorkingDay( date( 2007, 9, 5 ) ) )
-    
+
     h = HolidaysHolder.getHolidays()
     for day in h:
         if day.year == 2007:
             print day
-    
+
     DBMgr.getInstance().endRequest()
 
 if __name__ == '__main__':

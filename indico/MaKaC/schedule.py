@@ -34,27 +34,28 @@ from pytz import timezone
 from MaKaC.common.utils import daysBetween
 from MaKaC.common.PickleJar import Retrieves
 from MaKaC.common.PickleJar import Updates
-from MaKaC.common.PickleJar import Conversion
 from MaKaC.common.PickleJar import DictPickler
+from MaKaC.common.Conversion import Conversion
+from MaKaC.common.contextManager import ContextManager
 
 class Schedule:
     """base schedule class. Do NOT instantiate
     """
-    
+
     def __init__( self, owner ):
-        pass 
+        pass
 
     def getEntries( self ):
         return []
 
-    def addEntry( self, entry, position=None ):    
+    def addEntry( self, entry, position=None ):
         return
 
     def removeEntry( self, entry ):
         return
 
     def getEntryPosition( self, entry ):
-        return 
+        return
 
     def moveEntry( self, entry, newPosition, after=1 ):
         return
@@ -70,12 +71,6 @@ class Schedule:
 
     def getEntryInPos( self, pos ):
         return None
-
-    def getAutoSolveConflict( self ):
-        try:
-            return self.getOwner().getAutoSolveConflict()
-        except:
-            return False
 
 
 class TimeSchedule(Schedule, Persistent):
@@ -137,17 +132,18 @@ class TimeSchedule(Schedule, Persistent):
         return entry.isScheduled() and entry.getSchedule()==self and\
             entry in self._entries
 
-    def _addEntry(self,entry,check=1):
+    def _addEntry(self,entry,check=2):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+
         if entry.isScheduled():
             # remove it from the old schedule and add it to this one
             entry.getSchedule().removeEntry(entry)
-            
+
+        owner = self.getOwner()
+
         # If user has entered start date use these dates
         # if the entry has not a pre-defined start date we try to find a place
         # within the schedule to allocate it
@@ -155,8 +151,15 @@ class TimeSchedule(Schedule, Persistent):
             sDate=self.findFirstFreeSlot(entry.getDuration())
             if sDate is None:
                 if check==2:
-                    self.getOwner().setEndDate((self.getEndDate()+entry.getDuration()), check)
-                    sDate=self.findFirstFreeSlot(entry.getDuration())
+                    newEndDate = self.getEndDate() + entry.getDuration()
+
+                    ContextManager.get('autoOps').append((owner,
+                                                          "OWNER_END_DATE_EXTENDED",
+                                                          owner,
+                                                          newEndDate.astimezone(timezone(owner.getConference().getTimezone()))))
+
+                    owner.setEndDate(newEndDate, check)
+                    sDate = self.findFirstFreeSlot(entry.getDuration())
                 if sDate is None:
                     raise ParentTimingError( _("There is not enough time found to add this entry in the schedule (duration: %s)")%entry.getDuration(), _("Add Entry"))
             entry.setStartDate(sDate)
@@ -167,12 +170,20 @@ class TimeSchedule(Schedule, Persistent):
                 if check==1:
                     raise TimingError( _("Cannot schedule this entry because its start date (%s) is before its parents (%s)")%(entry.getStartDate(),self.getStartDate('UTC')),_("Add Entry"))
                 elif check == 2:
-                    self.getOwner().setStartDate(entry.getStartDate(),check)                
+                    ContextManager.get('autoOps').append((owner,
+                                                          "OWNER_START_DATE_EXTENDED",
+                                                          owner,
+                                                          entry.getAdjustedStartDate()))
+                    owner.setStartDate(entry.getStartDate(),check)
             elif entry.getEndDate()>self.getEndDate('UTC'):
                 if check==1:
                     raise TimingError( _("Cannot schedule this entry because its end date (%s) is after its parents (%s)")%(entry.getEndDate(),self.getEndDate('UTC')),_("Add Entry"))
                 elif check == 2:
-                    self.getOwner().setEndDate(entry.getEndDate(),check)
+                    ContextManager.get('autoOps').append((owner,
+                                                          "OWNER_END_DATE_EXTENDED",
+                                                          owner,
+                                                          entry.getAdjustedEndDate()))
+                    owner.setEndDate(entry.getEndDate(),check)
         #we make sure the entry end date does not go outside the schedule
         #   boundaries
         if entry.getEndDate() is not None and \
@@ -192,8 +203,9 @@ class TimeSchedule(Schedule, Persistent):
         if (entry is None) or self.hasEntry(entry):
             return
         self._setEntryDuration(entry)
-        self._addEntry(entry)
+        result = self._addEntry(entry)
         self._p_changed = 1
+        return result
 
     def _removeEntry(self,entry):
         self._entries.remove(entry)
@@ -212,7 +224,7 @@ class TimeSchedule(Schedule, Persistent):
 
     def getOwner( self ):
         return self._owner
- 
+
     ####################################
     # Fermi timezone awareness         #
     ####################################
@@ -224,7 +236,7 @@ class TimeSchedule(Schedule, Persistent):
                 'MaKaC.schedule.ConferenceSchedule'], 'startDate', Conversion.datetime)
     def getAdjustedStartDate( self, tz=None ):
         return self.getOwner().getAdjustedStartDate(tz)
-        
+
     def getEndDate( self, tz='UTC'):
         return self.getOwner().getAdjustedEndDate(tz)
 
@@ -232,11 +244,11 @@ class TimeSchedule(Schedule, Persistent):
                 'MaKaC.schedule.ConferenceSchedule'], 'endDate', Conversion.datetime)
     def getAdjustedEndDate( self, tz=None):
         return self.getOwner().getAdjustedEndDate(tz)
-    
+
     ####################################
     # Fermi timezone awareness(end)    #
     ####################################
-    
+
     def cmpEntries(self,e1,e2):
         return cmp(e1.getStartDate(),e2.getStartDate())
 
@@ -294,7 +306,7 @@ class TimeSchedule(Schedule, Persistent):
             return day.astimezone(timezone(self.getTimezone())).replace(hour=8,minute=0).astimezone(tz)
         else:
             return self.calculateDayEndDate(day)
-        
+
     def calculateDayEndDate(self,day,hour=0,min=0):
         if day is None:
             return self.calculateEndDate()
@@ -315,7 +327,7 @@ class TimeSchedule(Schedule, Persistent):
             if maxDate.date() != day.date():
                 maxDate = day.replace(hour=23,minute=59)
             return maxDate
-       
+
     def calculateDayStartDate( self, day ):
         #
         # This determines where the times start on the time table.
@@ -332,7 +344,7 @@ class TimeSchedule(Schedule, Persistent):
                     return entry.getStartDate().astimezone(tz)
                 else:
                     return day.replace(hour=0,minute=0)
-            
+
     def getEntryInPos( self, pos ):
         try:
             return self.getEntries()[int(pos)]
@@ -362,7 +374,7 @@ class TimeSchedule(Schedule, Persistent):
         return res
 
     def _getNewEntryId(self):
-        try:    
+        try:
             if self._entryGen:
                 pass
         except AttributeError:
@@ -385,7 +397,7 @@ class TimeSchedule(Schedule, Persistent):
                     return True
                 sDate = entry.getEndDate()
         return False
-        
+
     def compact(self):
         """removes any overlaping among schedule entries and make them go one
             after the other without any gap
@@ -402,7 +414,7 @@ class TimeSchedule(Schedule, Persistent):
 
     def moveDownEntry(self,entry,tz=None):
         pass
-    
+
     def rescheduleTimes(self, type, diff, tz, day=None):
         pass
 
@@ -413,7 +425,7 @@ class TimeSchedule(Schedule, Persistent):
 
 
     def findFirstFreeSlot(self,reqDur=None):
-        """Tries to find the first free time slot available where an entry with 
+        """Tries to find the first free time slot available where an entry with
             the specified duration could be placed
         """
         d=self.getStartDate('UTC')
@@ -434,10 +446,11 @@ class TimeSchedule(Schedule, Persistent):
             else:
                 return d
         return None
-    
+
     def moveEntriesBelow(self, diff, entriesList):
         """diff: the difference we have to increase/decrease each entry of the list.
            entriesList: list of entries for applying the diff"""
+
         if diff is not None:
             from MaKaC.conference import SessionSlot
             sessionsAlreadyModif=[]
@@ -451,6 +464,7 @@ class TimeSchedule(Schedule, Persistent):
                             session.setStartDate(session.getStartDate()+diff, check=0, moveEntries=0)
                         sessionsAlreadyModif.append(session)
                 entry.setStartDate(entry.getStartDate()+diff, check=0, moveEntries=1)
+
 
 class SchEntry(Persistent):
     """base schedule entry class. Do NOT instantiate
@@ -499,11 +513,11 @@ class SchEntry(Persistent):
         return self.getSchedule() is not None
 
     def setValues( self, data ):
-        """Sets all the values of the current schedule entry object from a 
+        """Sets all the values of the current schedule entry object from a
             dictionary containing the following key-value pairs:
-                title-(str) 
+                title-(str)
                 description-(str)
-           Please, note that this method sets ALL values which means that if 
+           Please, note that this method sets ALL values which means that if
             the given dictionary doesn't contain any of the keys the value
             will set to a default value.
         """
@@ -511,7 +525,7 @@ class SchEntry(Persistent):
             self.setTitle(data["title"])
         if data.has_key("description"):
             self.setDescription(data["description"])
-            
+
     @Retrieves(['MaKaC.schedule.SchEntry',
                 'MaKaC.schedule.BreakTimeSchEntry'], 'title')
     def getTitle( self ):
@@ -520,6 +534,8 @@ class SchEntry(Persistent):
     def setTitle( self, newTitle ):
         self.title = newTitle.strip()
 
+    @Retrieves(['MaKaC.schedule.SchEntry',
+                'MaKaC.schedule.BreakTimeSchEntry'], 'description')
     def getDescription( self ):
         return self.description
 
@@ -543,12 +559,6 @@ class SchEntry(Persistent):
     def recover(self):
         pass
 
-    def getAutoSolveConflict( self ):
-        try:
-            return self.getSchedule().getAutoSolveConflict()
-        except:
-            return False
-        
 class ConferenceSchedule(TimeSchedule):
     """
     """
@@ -556,13 +566,12 @@ class ConferenceSchedule(TimeSchedule):
     def __init__(self,conf):
         TimeSchedule.__init__(self,conf)
 
-    def addEntry(self,entry,check=1):
+    def addEntry(self,entry,check=2):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+
         if (entry is None) or self.hasEntry(entry):
             return
         if isinstance(entry,LinkedTimeSchEntry):
@@ -575,7 +584,7 @@ class ConferenceSchedule(TimeSchedule):
                 if not self.getOwner().hasContribution(entry.getOwner()):
                     raise MaKaCError( _("Cannot schedule into the event a contribution that does not belong to it"), _("Event"))
         self._setEntryDuration(entry)
-        self._addEntry(entry,check)
+        return self._addEntry(entry,check)
 
     def moveUpEntry(self,entry,tz=None):
         #not very smart, should be improved: contribs with same start date,
@@ -665,10 +674,10 @@ class SessionSchedule(TimeSchedule):
     def __init__(self,session):
         TimeSchedule.__init__(self,session)
 
-    def checkSanity( self ):  
+    def checkSanity( self ):
         if self.hasEntriesBefore(self.getStartDate()) or self.hasEntriesAfter(self.getEndDate()):
             raise TimingError( _("Sorry, cannot perform this date change: Some entries in the schedule would be outside the new dates"))
-        
+
     def addEntry(self,entry,check=1):
         if (entry is None) or self.hasEntry(entry):
             return
@@ -693,7 +702,7 @@ class SessionSchedule(TimeSchedule):
         if diff is not None:
             for entry in entriesList:
                 entry.setStartDate(entry.getStartDate()+diff, check=0, moveEntries=1)
-    
+
 class SlotSchedule(TimeSchedule):
     """
     """
@@ -711,14 +720,15 @@ class SlotSchedule(TimeSchedule):
                 sessionDur=self.getOwner().getSession().getContribDuration()
                 entry.setDuration(dur=sessionDur)
 
-    def addEntry(self,entry,check=1):
+    def addEntry(self,entry,check=2):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates
         """
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+
+        owner = self.getOwner()
+
         if (entry is None) or self.hasEntry(entry):
             return
         if isinstance(entry,LinkedTimeSchEntry):
@@ -734,6 +744,10 @@ class SlotSchedule(TimeSchedule):
                     self.getOwner().getStartDate().strftime('%Y-%m-%d %H:%M')),\
                       _("Slot"))
             elif check == 2:
+                ContextManager.get('autoOps').append((owner,
+                                                      "OWNER_START_DATE_EXTENDED",
+                                                      owner,
+                                                      entry.getAdjustedStartDate(tz=self.getTimezone())))
                 self.getOwner().setStartDate(entry.getStartDate(),check,0)
         if entry.getEndDate()!=None and entry.getEndDate() > self.getOwner().getEndDate():
             if check == 1:
@@ -742,9 +756,14 @@ class SlotSchedule(TimeSchedule):
                     self.getOwner().getEndDate().strftime('%Y-%m-%d %H:%M')),\
                      "Slot")
             elif check == 2:
+                ContextManager.get('autoOps').append((owner,
+                                                      "OWNER_END_DATE_EXTENDED",
+                                                      owner,
+                                                      entry.getAdjustedEndDate(tz=self.getTimezone())))
                 self.getOwner().setEndDate(entry.getEndDate(),check)
         self._setEntryDuration(entry)
         self._addEntry(entry,check)
+
 
     def moveUpEntry(self,entry):
         #not very smart, should be improved: contribs with same start date,
@@ -809,7 +828,7 @@ class SlotSchedule(TimeSchedule):
 class PosterSlotSchedule(SlotSchedule):
 
     def _setEntryDuration(self,entry):
-        #In the posters schedulers the duration will (by default) always be the 
+        #In the posters schedulers the duration will (by default) always be the
         #   same for every entry within the slot
         if entry.getOwner().getDuration() != None and entry.getOwner().getDuration() != 0 \
                 and entry.getOwner().getDuration().seconds!=0:
@@ -850,7 +869,7 @@ class PosterSlotSchedule(SlotSchedule):
             self._v_allowReSchedule=True
         if self._v_allowReSchedule:
             self._v_allowReSchedule=False
-            for e in self._entries: 
+            for e in self._entries:
                 sd = self.getStartDate()
                 e.setStartDate(self.getStartDate())
             self._v_allowReSchedule=True
@@ -858,7 +877,7 @@ class PosterSlotSchedule(SlotSchedule):
 class SlotSchTypeFactory:
     _sch={"standard":SlotSchedule,"poster":PosterSlotSchedule}
     _default="standard"
-    
+
     def getScheduleKlass(cls,id):
         id=id.strip().lower()
         if not cls._sch.has_key(id):
@@ -886,7 +905,7 @@ class SlotSchTypeFactory:
     getId=classmethod(getId)
 
 class TimeSchEntry(SchEntry):
-    
+
     def __init__(self):
         SchEntry.__init__(self)
         self.startDate=None
@@ -919,19 +938,26 @@ class LinkedTimeSchEntry(TimeSchEntry):
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'title', lambda x: x.getOwner().getSession().getTitle())
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'slotTitle', lambda x: x.getOwner().getTitle())
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'id', Conversion.locatorString)
-    @Retrieves(['MaKaC.schedule.LinkedTimeSchEntry'], 'entryType', lambda x: 'Session')
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'sessionId', lambda x: x.getOwner().getSession().getId())
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'sessionSlotId', lambda x: x.getOwner().getId())
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'entryType', lambda x: 'Session')
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'material', lambda x: DictPickler.pickle(x.getOwner().getSession().getMaterialList()))
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'color', lambda x: x.getOwner().getSession().getColor())
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'room', lambda x: Conversion.roomName(x.getOwner().getSession().getRoom()))
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'location', lambda x: Conversion.roomName(x.getOwner().getSession().getLocation()))
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'textColor', lambda x: x.getOwner().getSession().getTextColor())
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'isPoster', lambda x: x.getOwner().getSession().getScheduleType() == 'poster')
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'room', lambda x: Conversion.roomName(x.getOwner().getRoom()))
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'location', lambda x: Conversion.locationName(x.getOwner().getLocation()))
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'address', lambda x: Conversion.locationAddress(x.getOwner().getLocation()))
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'inheritLoc', lambda x: x.getOwner().getOwnLocation() is None)
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'inheritRoom', lambda x: x.getOwner().getOwnRoom() is None)
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'description', lambda x: x.getOwner().getSession().getDescription())
-    @Retrieves(['MaKaC.schedule.ContribSchEntry','MaKaC.schedule.LinkedTimeSchEntry'],
-               'conferenceId',
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'conveners', lambda x: x.getOwner().getOwnConvenerList(), isPicklableObject=True)
+    @Retrieves(['MaKaC.schedule.ContribSchEntry','MaKaC.schedule.LinkedTimeSchEntry'], 'conferenceId',
                lambda x: x.getOwner().getConference().getId())
-
-    @Retrieves(['MaKaC.schedule.LinkedTimeSchEntry'],
-               'sessionId',
-               lambda x: x.getOwner().getSession().getId())
-
+    @Retrieves (['MaKaC.schedule.ContribSchEntry','MaKaC.schedule.LinkedTimeSchEntry'], 'scheduleEntryId',
+                lambda x: x.getId())
+    @Retrieves (['MaKaC.schedule.ContribSchEntry','MaKaC.schedule.LinkedTimeSchEntry'], 'scheduleEntryType',
+                lambda x: type(x).__name__)
 
     def __init__(self,owner):
         SchEntry.__init__(self)
@@ -945,16 +971,14 @@ class LinkedTimeSchEntry(TimeSchEntry):
                 'MaKaC.schedule.ContribSchEntry'], 'startDate', Conversion.datetime)
     def getAdjustedStartDate( self, tz=None ):
         return self.__owner.getAdjustedStartDate(tz)
-    
-    def setStartDate(self,newDate,check=1, moveEntries=0):
+
+    def setStartDate(self,newDate,check=2, moveEntries=0):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
-        self.getOwner().setStartDate(newDate,check, moveEntries)
-    
+        return self.getOwner().setStartDate(newDate,check, moveEntries)
+
     def getEndDate( self ):
         return self.__owner.getEndDate()
 
@@ -962,18 +986,16 @@ class LinkedTimeSchEntry(TimeSchEntry):
                 'MaKaC.schedule.ContribSchEntry'], 'endDate', Conversion.datetime)
     def getAdjustedEndDate( self, tz=None ):
         return self.__owner.getAdjustedEndDate(tz)
-    
+
     @Retrieves('MaKaC.schedule.LinkedTimeSchEntry', 'duration', lambda x: str(x))
     def getDuration(self):
         return self.__owner.getDuration()
 
-    def setDuration(self,hours=0,minutes=15,dur=0,check=1):
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+    def setDuration(self,hours=0,minutes=15,dur=0,check=2):
         if dur!=0:
-            self.getOwner().setDuration(dur=dur,check=check)
+            return self.getOwner().setDuration(dur=dur,check=check)
         else:
-            self.getOwner().setDuration(hours,minutes,check=check)
+            return self.getOwner().setDuration(hours,minutes,check=check)
 
     @Retrieves(['MaKaC.schedule.ContribSchEntry'], 'title')
     def getTitle( self ):
@@ -984,7 +1006,7 @@ class LinkedTimeSchEntry(TimeSchEntry):
 
     def getOwner( self ):
         return self.__owner
-        
+
     def inDay( self, day ):
         """Tells whether or not the current entry occurs whithin the specified
             day (day is tz-aware)
@@ -992,7 +1014,7 @@ class LinkedTimeSchEntry(TimeSchEntry):
         if not self.isScheduled():
             return False
         return self.getStartDate().astimezone(day.tzinfo).date()<=day.date() and self.getEndDate().astimezone(day.tzinfo).date()>=day.date()
-    
+
     def onDate( self, date ):
         """Tells whether or not the current entry occurs during the specified
             date.
@@ -1001,7 +1023,7 @@ class LinkedTimeSchEntry(TimeSchEntry):
             return False
         return self.getStartDate()<=date and \
                 self.getEndDate()>=date
-            
+
     def collides(self,entry):
         return (entry.getStartDate()>=self.getStartDate() and \
                 entry.getStartDate()<self.getEndDate()) or \
@@ -1010,17 +1032,17 @@ class LinkedTimeSchEntry(TimeSchEntry):
 
 
 class IndTimeSchEntry(TimeSchEntry):
-    
+
     def setValues( self, data ):
-        """Sets all the values of the current schedule entry object from a 
+        """Sets all the values of the current schedule entry object from a
             dictionary containing the following key-value pairs:
-                title-(str) 
+                title-(str)
                 description-(str)
-                year, month, day, sHour, sMinute - (str) => components of the 
-                        starting date of the entry, if not specified it will 
+                year, month, day, sHour, sMinute - (str) => components of the
+                        starting date of the entry, if not specified it will
                         be set to now.
-                durationHours, durationMinutes - (str) 
-           Please, note that this method sets ALL values which means that if 
+                durationHours, durationMinutes - (str)
+           Please, note that this method sets ALL values which means that if
             the given dictionary doesn't contain any of the keys the value
             will set to a default value.
         """
@@ -1029,7 +1051,7 @@ class IndTimeSchEntry(TimeSchEntry):
                 data.get("sMonth", None) != None and \
                 data.get("sDay", None) != None and \
                 data.get("sHour", None) != None and \
-                data.get("sMinute", None) != None: 
+                data.get("sMinute", None) != None:
             self.setStartDate(datetime(int(data["sYear"]),\
                                         int(data["sMonth"]),\
                                         int(data["sDay"]), \
@@ -1052,7 +1074,7 @@ class IndTimeSchEntry(TimeSchEntry):
         return self.getStartDate().astimezone(timezone(tz))
 
     def setStartDate(self,sDate,check=1, moveEntries=0):
-        self.startDate=sDate 
+        self.startDate=sDate
         self._p_changed=1
         if self.isScheduled():
             self.getSchedule().reSchedule()
@@ -1068,7 +1090,7 @@ class IndTimeSchEntry(TimeSchEntry):
             tz = self.getTimezone()
         return self.getEndDate().astimezone(timezone(tz))
 
-    @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'], 'duration', lambda x: str(x))
+    @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'], 'duration', lambda x: str(int(x.seconds / 60)))
     def getDuration(self):
         return self.duration
 
@@ -1088,7 +1110,7 @@ class IndTimeSchEntry(TimeSchEntry):
         if not self.isScheduled():
             return False
         return self.getStartDate().astimezone(day.tzinfo).date()<=day.date() and self.getEndDate().astimezone(day.tzinfo).date()>=day.date()
-    
+
     def onDate( self, date ):
         """Tells whether or not the current entry occurs during the specified
             date.
@@ -1101,33 +1123,41 @@ class IndTimeSchEntry(TimeSchEntry):
 
 class BreakTimeSchEntry(IndTimeSchEntry):
 
-    @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'],
-               'entryType',               
-               lambda x: 'Break')
+    @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'], 'entryType', lambda x: 'Break')
+    @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'], 'conferenceId', lambda x: x.getOwner().getConference().getId())
+    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'sessionId', Conversion.parentSession)
+    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'sessionSlotId', Conversion.parentSlot)
+    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'scheduleEntryId', lambda x: x.getId())
+    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'room', lambda x: Conversion.roomName(x.getRoom()))
+    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'location', lambda x: Conversion.locationName(x.getLocation()))
+    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'address', lambda x: Conversion.locationAddress(x.getLocation()))
+    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'inheritLoc', lambda x: x.getOwnLocation() is None)
+    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'inheritRoom', lambda x: x.getOwnRoom() is None)
+
     def __init__(self):
         IndTimeSchEntry.__init__(self)
         self._color="#90C0F0"
-        self._textColor="#777777"
+        self._textColor="#202020"
         self._textColorToLink=False
-    
+
     def clone(self, owner):
         btse = BreakTimeSchEntry()
         btse.setValues(self.getValues())
         olddate =  self.getOwner().getStartDate()
         newdate = owner.getSchedule().getStartDate()
         timeDifference = newdate - olddate
-        btse.setStartDate(btse.getStartDate()+timeDifference)        
+        btse.setStartDate(btse.getStartDate()+timeDifference)
         return btse
-    
+
     def getValues(self):
         values = {}
         values["startDate"] = self.getStartDate()
         values["endDate"] = self.getEndDate()
         values["durTimedelta"] = self.getDuration()
         values["description"] = self.getDescription()
-        values["title"] = self.getTitle()        
+        values["title"] = self.getTitle()
         if self.getOwnLocation() is not None :
-            values["locationName"] = self.getLocation().getName()        
+            values["locationName"] = self.getLocation().getName()
         else :
             values["locationName"] = ""
         if self.getOwnRoom() is not None :
@@ -1138,12 +1168,11 @@ class BreakTimeSchEntry(IndTimeSchEntry):
         values["textColor"] = self.getTextColor()
         if self.isTextColorToLinks():
             values["textcolortolinks"]="True"
-        
+
         return values
-    
-    def setValues( self, data, check=1, moveEntriesBelow=0, tz='UTC'):
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+
+    def setValues( self, data, check=2, moveEntriesBelow=0, tz='UTC'):
+
         from MaKaC.conference import CustomLocation, CustomRoom
         # In order to move the entries below, it is needed to know the diff (we have to move them)
         # and the list of entries to move. It's is needed to take those datas in advance because they
@@ -1159,7 +1188,7 @@ class BreakTimeSchEntry(IndTimeSchEntry):
                 data.get("sMonth", None) != None and \
                 data.get("sDay", None) != None and \
                 data.get("sHour", None) != None and \
-                data.get("sMinute", None) != None:  
+                data.get("sMinute", None) != None:
             #########################################
             # Fermi timezone awareness              #
             #  We have to store as UTC, relative    #
@@ -1167,7 +1196,7 @@ class BreakTimeSchEntry(IndTimeSchEntry):
             #########################################
             d = timezone(tz).localize(datetime(int(data["sYear"]),
                     int(data["sMonth"]),
-                    int(data["sDay"]), 
+                    int(data["sDay"]),
                     int(data["sHour"]),
                     int(data["sMinute"])))
             sDate = d.astimezone(timezone('UTC'))
@@ -1219,7 +1248,7 @@ class BreakTimeSchEntry(IndTimeSchEntry):
         if data.has_key("autotextcolor"):
             self._textColor=utils.getTextColorFromBackgroundColor(self.getColor())
         else:
-            self._textColor=data.get("textColor","#777777")
+            self._textColor=data.get("textColor","#202020")
         self.setTextColorToLinks(data.has_key("textcolortolinks"))
         if data.has_key("title"):
             self.setTitle(data["title"])
@@ -1243,22 +1272,22 @@ class BreakTimeSchEntry(IndTimeSchEntry):
         if self.getSchedule() is not None:
             return self.getSchedule().getOwner()
         return None
-    
+
     def setLocation(self, loc):
         self.place = loc
 
     def getLocation(self):
         if self.getOwnLocation() is None:
-            return self.getInheritedLocation()        
+            return self.getInheritedLocation()
         return self.getOwnLocation()
 
-    def getInheritedLocation(self):        
+    def getInheritedLocation(self):
         locParent = self.getLocationParent()
         if locParent:
             return locParent.getLocation();
         else:
             return None
-        
+
     def getOwnLocation(self):
         try:
             if self.place:
@@ -1281,7 +1310,7 @@ class BreakTimeSchEntry(IndTimeSchEntry):
             return locParent.getRoom();
         else:
             return None
-    
+
     def getOwnRoom(self):
         try:
             if self.room:
@@ -1295,9 +1324,8 @@ class BreakTimeSchEntry(IndTimeSchEntry):
             return self.getSchedule().getOwner()
         return None
 
-    def _verifyDuration(self,check=1):
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+    def _verifyDuration(self,check=2):
+
         if self.getSchedule() is not None:
             owner = self.getSchedule().getOwner()
             if self.getEndDate() > owner.getEndDate():
@@ -1310,9 +1338,8 @@ class BreakTimeSchEntry(IndTimeSchEntry):
                     # update the schedule
                     owner.setEndDate(self.getEndDate(),check)
 
-    def setDuration(self, hours=0, min=15, check=1,dur=0):
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+    def setDuration(self, hours=0, min=15, check=2,dur=0):
+
         if dur==0:
             IndTimeSchEntry.setDuration(self,hours,min)
         else:
@@ -1320,9 +1347,8 @@ class BreakTimeSchEntry(IndTimeSchEntry):
         self._verifyDuration(check)
         self.notifyModification()
 
-    def setStartDate(self, newDate,check=1, moveEntries=0):
-        if self.getAutoSolveConflict() and check == 1:
-            check=2
+    def setStartDate(self, newDate,check=2, moveEntries=0):
+
         try:
           tz = str(newDate.tzinfo)
         except:
@@ -1368,12 +1394,13 @@ class BreakTimeSchEntry(IndTimeSchEntry):
     def setTextColor(self,newColor):
         self._textColor=newColor
 
+    @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'], 'textColor')
     def getTextColor(self):
         try:
             if self._textColor:
                 pass
         except AttributeError:
-            self._textColor="#777777"
+            self._textColor="#202020"
         return self._textColor
 
     def setTextColorToLinks(self,v):
@@ -1395,21 +1422,17 @@ class BreakTimeSchEntry(IndTimeSchEntry):
 
 class ContribSchEntry(LinkedTimeSchEntry):
 
-    @Retrieves(['MaKaC.schedule.ContribSchEntry'],
-               'entryType',               
-                lambda x: 'Contribution')
-    @Retrieves(['MaKaC.schedule.ContribSchEntry'],
-               'sessionId',               
-               Conversion.parentSession)
-    @Retrieves(['MaKaC.schedule.ContribSchEntry'],
-               'contributionId',
-               lambda x: x.getOwner().getId())
+    @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'entryType', lambda x: 'Contribution')
+    @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'sessionId', Conversion.parentSession)
+    @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'sessionSlotId', Conversion.parentSlot)
+    @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'contributionId', lambda x: x.getOwner().getId())
+    @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'material', lambda x: DictPickler.pickle(x.getOwner().getMaterialList()))
     @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'description', lambda x: x.getOwner().getDescription())
     @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'presenters', lambda x: x.getOwner().getSpeakerList(), isPicklableObject=True)
 
     def __init__(self, owner):
         LinkedTimeSchEntry.__init__(self, owner)
-    
+
     def setSchedule(self,sch,id):
         status=self.getOwner().getCurrentStatus()
         from MaKaC.conference import ContribStatusWithdrawn,ContribStatusNotSch,ContribStatusSch
@@ -1426,14 +1449,44 @@ class ContribSchEntry(LinkedTimeSchEntry):
     def getRoom(self):
         return self.getOwner().getRoom()
 
-    @Retrieves (['MaKaC.schedule.ContribSchEntry'],'location', Conversion.roomName)
+    @Retrieves (['MaKaC.schedule.ContribSchEntry'],'location', Conversion.locationName)
     def getLocation(self):
         return self.getOwner().getLocation()
-        
+
     def getOwnRoom(self):
         return self.getOwner().getOwnRoom()
 
 class ScheduleToJson:
+
+    @staticmethod
+    def processEntry(obj, tz):
+
+        entry = {}
+
+        #raise "duration: " + (datetime(1900,1,1)+obj.getDuration()).strftime("%Hh%M'") + ''
+        entry = DictPickler.pickle(obj, timezone=tz)
+
+        genId = entry['id']
+
+        entry['duration'] = int(obj.getDuration().seconds / 60)
+
+        # sessions that are no poster sessions will be expanded
+        if entry['entryType'] == 'Session':
+
+            sessionSlot = obj.getOwner()
+            session = sessionSlot.getSession()
+            sessionSlotSchedule = sessionSlot.getSchedule()
+
+            # get session content
+            entries = {}
+            for contrib in sessionSlot.getSchedule().getEntries():
+                contribData = DictPickler.pickle(contrib, timezone=tz)
+                entries[contribData['id']] = contribData
+
+            entry['entries'] = entries
+
+        return genId, entry
+
 
     @staticmethod
     def process(schedule, tz):
@@ -1444,48 +1497,26 @@ class ScheduleToJson:
 
         for day in daysBetween(schedule.getAdjustedStartDate(tz), schedule.getAdjustedEndDate(tz)):
             dayEntry = {}
-            
+
             for obj in schedule.getEntriesOnDay(day):
 
+                genId, pickledData = ScheduleToJson.processEntry(obj, tz)
+
                 # exclude entries that start in the day before
-                if obj.getAdjustedStartDate(tz).date() != day.date():
-                    continue
-                
-                pickledData = DictPickler.pickle(obj, timezone=tz)
-                genId = pickledData['id']
+                if obj.getAdjustedStartDate(tz).date() == day.date():
+                    dayEntry[genId] = pickledData
 
-                dayEntry[genId] = pickledData
-
-                # sessions that are no poster sessions will be expanded
-                if dayEntry[genId]['entryType'] == 'Session':
-
-                    sessionSlot = obj.getOwner()
-                    session = sessionSlot.getSession()
-                    sessionSlotSchedule = sessionSlot.getSchedule()
-                    
-                    # get session content
-                    entries = {}
-                    for contrib in sessionSlot.getSchedule().getEntries():
-                        contribData = DictPickler.pickle(contrib, timezone=tz)
-                        entries[contribData['id']] = contribData
-
-                    dayEntry[genId]['entries'] = entries
-
-                    if (session.getScheduleType() == 'poster'):
-                        dayEntry[genId]['isPoster'] = True
-                        
-                
             scheduleDict[day.strftime("%Y%m%d")] = dayEntry
 
         return json.encode(scheduleDict)
 
     @staticmethod
     def sort_dict(dict):
-    	new_dict = {}
-    	sorted_keys = dict.keys()
-    	sorted_keys.sort()
+        new_dict = {}
+        sorted_keys = dict.keys()
+        sorted_keys.sort()
 
-    	for key in sorted_keys:
+        for key in sorted_keys:
             new_dict[key] = dict[key]
 
-    	return new_dict    
+        return new_dict

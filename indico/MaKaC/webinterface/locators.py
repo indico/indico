@@ -29,7 +29,7 @@ import MaKaC.webinterface.materialFactories as materialFactories
 from MaKaC.i18n import _
 
 class CategoryWebLocator:
-    
+
     def __init__( self, params, mustExist=1 ):
         self._categList = []
         categIds = params.get("categId", [])
@@ -46,10 +46,10 @@ class CategoryWebLocator:
                 continue
 
 
-    def getObjectList( self ): 
+    def getObjectList( self ):
         return self._categList
-    
-    def getObject( self ): 
+
+    def getObject( self ):
         if len(self.getObjectList()) == 0:
             return None
         if len(self.getObjectList()) == 1:
@@ -58,7 +58,7 @@ class CategoryWebLocator:
 
 
 class DomainWebLocator:
-    
+
     def __init__( self, params ):
         domId = params.get("domainId", "")
         if domId == "":
@@ -70,7 +70,7 @@ class DomainWebLocator:
         return self._dom
 
 class RoomMapperWebLocator:
-    
+
     def __init__( self, params ):
         rmId = params.get("roomMapperId", "")
         if rmId == "":
@@ -82,7 +82,7 @@ class RoomMapperWebLocator:
         return self._rm
 
 class WebLocator:
-    
+
     def __init__(self):
         self.__categId = None
         self.__confId = None
@@ -119,10 +119,10 @@ class WebLocator:
                params["confId"].strip()=="":
             raise errors.MaKaCError( _("conference id not set"))
         self.__confId = params["confId"]
-    
+
     def getConference( self ):
         return conference.ConferenceHolder().getById( self.__confId )
-    
+
     def setNotificationTemplate( self, params, mustExist=1 ):
         self.setConference(params)
         if not ("notifTplId" in params.keys()) or params["notifTplId"].strip == "":
@@ -130,20 +130,20 @@ class WebLocator:
                 raise errors.MaKaCError( _("notificationTemplate id not set"))
         else:
             self.__notifTplId = params["notifTplId"]
-    
+
     def setMenuLink( self, params, mustExist=1 ):
         self.setConference(params)
         if not ("linkId" in params.keys()) or params["linkId"].strip=="":
             if mustExist:
-                raise errors.MaKaCError( _("link id not set"))        
+                raise errors.MaKaCError( _("link id not set"))
         else:
             self.__menuLinkId = params["linkId"]
-    
+
     def setContribType( self, params ):
         self.setConference(params)
         if not ("contribTypeId" in params.keys()) or params["contribTypeId"].strip=="":
             if mustExist:
-                raise errors.MaKaCError( _("contribType id not set"))        
+                raise errors.MaKaCError( _("contribType id not set"))
         else:
             self.__contribTypeId = params["contribTypeId"]
 
@@ -152,16 +152,16 @@ class WebLocator:
         if not ("abstractId" in params.keys()) or \
            params["abstractId"].strip()=="":
             if mustExist:
-                raise errors.MaKaCError( _("abstract id not set"))        
+                raise errors.MaKaCError( _("abstract id not set"))
         else:
             self.__abstractId = params["abstractId"]
-    
+
     def setTrack( self, params, mustExist=1 ):
         self.setConference( params )
         if not ("trackId" in params.keys()) or \
            params["trackId"].strip()=="":
             if mustExist:
-                raise errors.MaKaCError( _("track id not set"))        
+                raise errors.MaKaCError( _("track id not set"))
         else:
             self.__trackId = params["trackId"]
 
@@ -170,17 +170,30 @@ class WebLocator:
         if not ("sessionId" in params.keys()) or \
            params["sessionId"] == None or \
            params["sessionId"].strip()=="":
-            if mustExist:
-                raise errors.MaKaCError( _("session id not set"))        
+            if not ("session" in params.keys()) or \
+                params["session"] == None or \
+                params["session"].strip()=="":
+                if mustExist:
+                    raise errors.MaKaCError( _("session id not set"))
+            else:
+                self.__sessionId = params["session"]
         else:
             self.__sessionId = params["sessionId"]
-    
+
     def setSlot( self, params, mustExist=1 ):
         self.setSession( params, mustExist )
         if not ("slotId" in params.keys()) or \
            params["slotId"].strip()=="":
-            if mustExist:
-                raise errors.MaKaCError( _("slot id not set"))
+            if not ("sessionSlotId" in params.keys()) or \
+                params["sessionSlotId"].strip()=="":
+                if not ("slot" in params.keys()) or \
+                    params["slot"].strip()=="":
+                    if mustExist:
+                        raise errors.MaKaCError( _("slot id not set"))
+                else:
+                    self.__slotId = params["slot"]
+            else:
+                self.__slotId = params["sessionSlotId"]
         else:
             self.__slotId = params["slotId"]
 
@@ -188,7 +201,7 @@ class WebLocator:
         #self.setSession( params, 0 )
         #self.setConference( params )
         self.setSlot( params, 0)
-        
+
         if not ("contribId" in params.keys()) or \
            params["contribId"] == None or \
            params["contribId"].strip()=="":
@@ -196,10 +209,10 @@ class WebLocator:
                 raise errors.MaKaCError( _("contribution id not set"))
         else:
             self.__contribId = params["contribId"]
-    
-        
+
+
     def setSubContribution( self, params, mustExist=1 ):
-        
+
         self.setContribution( params, 0 )
 
         #self.setConference( params )
@@ -210,9 +223,9 @@ class WebLocator:
                 raise errors.MaKaCError( _("sub contribution id not set"))
         else:
             self.__subContribId = params["subContId"]
-            
+
     def setReview(self, params, mustExist=1):
-        
+
         self.setContribution( params, 0 )
 
         if not ("reviewId" in params.keys()) or \
@@ -221,7 +234,7 @@ class WebLocator:
                 raise errors.MaKaCError( _("review id not set"))
         else:
             self.__reviewId = params["reviewId"]
-    
+
     def setAlarm(self, params, mustExist=1 ):
         self.setConference( params )
         #self.setConference( params )
@@ -238,7 +251,7 @@ class WebLocator:
                 self.setReview(params, 0)
             else:
                 self.setSubContribution( params, 0 )
-            
+
         else:
             self.setCategory( params )
         if not ("materialId" in params.keys()) or \
@@ -247,7 +260,7 @@ class WebLocator:
                 raise errors.MaKaCError( _("material id not set"))
         else:
             self.__materialId = params["materialId"]
-            
+
     def setResource( self, params, mustExist=1 ):
         if not ("resId" in params.keys()) and "resourceId" in params.keys():
             params["resId"] = params["resourceId"]
@@ -258,8 +271,8 @@ class WebLocator:
                 raise errors.MaKaCError( _("material id not set"))
         else:
             self.setMaterial( params, 1 )
-            self.__resId = params["resId"]    
-    
+            self.__resId = params["resId"]
+
     def setRoomBooking( self, params ):
         if not params.has_key( 'resvID' ):
             raise errors.MaKaCError( _("resvID not set"))
@@ -295,7 +308,7 @@ class WebLocator:
                 obj=obj.getResourceById( self.__resId )
             return obj
         if not self.__confId:
-            return None      
+            return None
         obj = conference.ConferenceHolder().getById( self.__confId )
         if obj == None:
             raise errors.NoReportError("The event you are trying to access does not exist or has been deleted")

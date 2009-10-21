@@ -2,6 +2,8 @@ import copy, pytz
 from persistent.list import PersistentList
 from persistent.mapping import PersistentMapping
 
+from MaKaC.common.Conversion import Conversion
+
 globals()['_PickleJar__mappings_pickle'] = {}
 globals()['_PickleJar__mappings_unpickle'] = {}
 
@@ -13,46 +15,6 @@ def if_else(cond, resT, resF):
         return resT
     else:
         return resF
-
-
-## Predefined conversion classes
-
-class Conversion:
-    @classmethod
-    def datetime(cls, dt, timezone = None):
-        if dt:
-            if timezone:
-                date = dt.astimezone(pytz.timezone(timezone))
-            else:
-                date = dt
-            return {'date': str(date.date()),'time': str(date.time())}
-        else:
-            return None
-
-    @classmethod
-    def roomName(cls, room):
-        if room:
-            return room.getName()
-        else:
-            return ''
-
-    @classmethod
-    def parentSession(cls, contribEntry):
-        session = contribEntry.getOwner().getSession()
-        if session:
-            return session.getId()
-        else:
-            return None
-
-    @classmethod
-    def locatorString(cls, obj):
-        locator = obj.getOwner().getLocator()
-        if not locator.has_key('sessionId'):
-            return "c%(contribId)s" % locator
-        elif not locator.has_key('contribId'):
-            return "s%(sessionId)sl%(slotId)s" % locator
-        else:
-            return "s%(sessionId)sc%(contribId)s" % locator
 
 class PicklerException(Exception):
     def __init__(self, message, inner=None):

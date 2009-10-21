@@ -39,12 +39,12 @@ import string
 
 # ----------------- MANAGEMENT AREA ---------------------------
 class WPConfModifRegistrantListBase( registrationForm.WPConfModifRegFormBase ):
-    
+
     def _setActiveTab( self ):
         self._tabRegistrants.setActive()
-        
+
 class WPConfModifRegistrantList( WPConfModifRegistrantListBase ):
-    
+
     def _getTabContent( self, params ):
         filterCrit=params.get("filterCrit",None)
         sortingCrit=params.get("sortingCrit",None)
@@ -57,7 +57,7 @@ class WPConfModifRegistrantList( WPConfModifRegistrantListBase ):
         return wc.getHTML()
 
 class WConfModifRegistrants( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference,filterCrit, sortingCrit, display, websession, order="down", sessionFilterName="session", menustatus=None ):
         self._conf = conference
         self._filterCrit=filterCrit
@@ -130,7 +130,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
             ################
     def _getKeyDispOpts(self, value):
         """
-        Returns the key which contains the done value. 
+        Returns the key which contains the done value.
         """
         for key in self._dispopts.keys():
             if value in self._dispopts[key]:
@@ -149,7 +149,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
             columns ={"PersonalData":"Personal Data","Id":"Id", "Email": "Email", "Position":"Position", "Institution":"Institution","Phone":"Phone","City":"City",\
                       "Country":"Country", "Address":"Address", "ArrivalDate": "Arrival Date", "DepartureDate": "Departure Date", \
                       "RegistrationDate": "Registration date (%s)"%self._conf.getTimezone()}
-            
+
             tit=self._conf.getRegistrationForm().getSessionsForm().getTitle()
             if not self._conf.getRegistrationForm().getSessionsForm().isEnabled():
                 tit='%s <span style="color:red;font-size: 75%%">(disabled)</span>'%tit
@@ -160,11 +160,11 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
             columns["Accommodation"]=tit
             tit=self._conf.getRegistrationForm().getSocialEventForm().getTitle()
             if not self._conf.getRegistrationForm().getSocialEventForm().isEnabled():
-                tit='%s <span style="color:red;font-size: 75%%">(disabled)</span>'%tit        
+                tit='%s <span style="color:red;font-size: 75%%">(disabled)</span>'%tit
             columns["SocialEvents"]=tit
             tit=self._conf.getRegistrationForm().getReasonParticipationForm().getTitle()
             if not self._conf.getRegistrationForm().getReasonParticipationForm().isEnabled():
-                tit='%s <span style="color:red;font-size: 75%%">(disabled)</span>'%tit        
+                tit='%s <span style="color:red;font-size: 75%%">(disabled)</span>'%tit
             columns["ReasonParticipation"]=tit
             columns["more"]="General info"
             columns["statuses"]="Statuses"
@@ -173,13 +173,13 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
             columns["amountToPay"]="Amount"
             columns["LastName"]="Last name"
             columns["FirstName"]="First name"
-            
+
             for st in self._conf.getRegistrationForm().getStatusesList():
                 columns["s-%s"%st.getId()]=st.getCaption()
             for sect in self._conf.getRegistrationForm().getGeneralSectionFormsList():
                 tit=sect.getTitle()
                 if not sect.isEnabled():
-                    tit='%s <span style="color:red;font-size: 75%%">(disabled)</span>'%tit        
+                    tit='%s <span style="color:red;font-size: 75%%">(disabled)</span>'%tit
                 columns[sect.getId()]=tit
                 ############
                 # jmf-start
@@ -198,7 +198,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         """
         display=self._display[:]
         if display == []:
-            display=["Email", "Institution","Phone","City","Country"] 
+            display=["Email", "Institution","Phone","City","Country"]
             if self._conf.hasEnabledSection("epay"):
                 display.extend(["isPayed","idpayment","amountToPay"])
         return display
@@ -207,7 +207,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         #builds the URL to the contribution list page
         #   preserving the current filter and sorting status in the websesion
         url = urlHandlers.UHConfModifRegistrantList.getURL(self._conf)
-        
+
         return url
 
     def _getSessHTML(self):
@@ -259,17 +259,17 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
                 checked=" checked"
             res.append("""<input type="checkbox" name="event" value=%s%s>%s"""%(quoteattr(str(event.getId())),checked,self.htmlText(event.getCaption())))
         return "<br>".join(res)
-       
+
     def _getDispHTML(self):
         """
         Filtering criteria: table with all the options for the columns we need to display.
         """
         res=["""<table width="100%%" cellpadding="0" cellspacing="0" valign="top">"""]
         columns=self._getColumnTitlesDict()
-        checked = " checked"   
+        checked = " checked"
         display=self._getDisplay()
         counter=0
-        # sorting dispopts by 
+        # sorting dispopts by
         auxdict={}
         for key in self._dispopts.keys():
             if not auxdict.has_key(len(self._dispopts[key])):
@@ -306,7 +306,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
             res.append("""<td colspan="2" style="border-bottom:1px solid lightgrey; width:100%%">&nbsp;</td>""")
         res.append("""</table>""")
         return "".join(res)
-                       
+
 
     def _getRegColumnHTML(self, sortingField):
         """
@@ -334,7 +334,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
                     url.addParam("order","down")
             idSortingURL=quoteattr("%s#results"%str(url))
             resgroups["PersonalData"]=[ _("""<td nowrap class="titleCellFormat" style="border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%s<a href=%s> _("Id")</a></td>""")%(idImg, idSortingURL)]
-        
+
         url=self._getURL()
         url.addParam("sortBy","Name")
         nameImg=""
@@ -347,7 +347,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
                 nameImg = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
         nameSortingURL=quoteattr("%s#results"%str(url))
-        
+
         resgroups["PersonalData"].append( _("""<td nowrap class="titleCellFormat" style="border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%s<a href=%s> _("Name")</a></td>""")%(nameImg, nameSortingURL))
         if "Id" in display:
             pdil=["Id", "Name"]
@@ -406,10 +406,10 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         fields.append("""
                         </tr>
                         """)
-        
+
         return "%s%s"%("\r\n".join(groups), "\r\n".join(fields))
 
-        
+
     def _getRegistrantsHTML( self, reg ):
         url = urlHandlers.UHRegistrantModification.getURL(reg)
         fullName = reg.getFullName()
@@ -436,10 +436,10 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
                 regdict["DepartureDate"]=reg.getAccommodation().getDepartureDate().strftime("%d-%B-%Y")
             if reg.getAccommodation().getArrivalDate() is not None:
                 regdict["ArrivalDate"]=reg.getAccommodation().getArrivalDate().strftime("%d-%B-%Y")
-                
+
         events = reg.getSocialEvents()
         items =[]
-        for item in events:       
+        for item in events:
             items.append("%s (%s)"%(item.getCaption(), item.getNoPlaces()))
         regdict["SocialEvents"] = "<br>".join(items)
 
@@ -467,7 +467,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
                 for fld in group.getResponseItemList():
                     regdict["%s-%s"%(group.getId(),fld.getId())]=fld.getValue()
 
-        res =[]        
+        res =[]
         res.append("""<td valign="top" align="right"  width="1px"><input type="checkbox" name="registrants" value="%s"></td>
                     """%(self.htmlText(reg.getId())))
         if "Id" in self._groupsorder["PersonalData"]:
@@ -485,7 +485,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
             if regdict.has_key(key) and regdict[key].strip() != "":
                 v = regdict[key]
             res.append( """<td valign="top"  class="abstractDataCell">%s</td>"""%v)
-        for groupkey in self._groupsorder.keys(): 
+        for groupkey in self._groupsorder.keys():
             if groupkey == "PersonalData":
                 continue
             for key in  self._groupsorder[groupkey]:
@@ -516,17 +516,17 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
                 html.append("""<input type="hidden" name="disp" value="%s">"""%(d))
         html.append("""<input type="hidden" name="sortBy" value="%s">"""%(self._sortingCrit.getField().getId()))
         return "".join(html)
-    
+
     def _getOpenMenuURL(self):
         url = urlHandlers.UHConfModifRegistrantsOpenMenu.getURL(self._conf)
         url.addParam("currentURL", self._getURL())
         return url
-    
+
     def _getCloseMenuURL(self):
         url = urlHandlers.UHConfModifRegistrantsCloseMenu.getURL(self._conf)
         url.addParam("currentURL", self._getURL())
         return url
-    
+
     def _getMenu(self):
         if self._menustatus == "open":
             menu =  _("""<table width="95%%" align="center" border="0" style="border-left: 1px solid #777777">
@@ -538,10 +538,10 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
                 <table width="100%%">
                     <tr>
                         <td>
-                            
+
                         </td>
                     </tr>
-                    <tr>                
+                    <tr>
                         <td>
                             <table align="center" cellspacing="10" width="100%%">
                                 <tr>
@@ -583,15 +583,15 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         </tr>
         <tr><td align="left"><small>  _("Note that you can open the filtering criteria by clicking in the icon") <img src=%(closeMenuImg)s alt="Show menu" border="0">  _("which is above this line").</small></td></tr>
     </table>""")
-        
+
         return menu
-            
+
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        
+
         sortingField = self._sortingCrit.getField()
-        
+
         vars["filterPostURL"]=quoteattr("%s#results"%str(urlHandlers.UHConfModifRegistrantList.getURL(self._conf)))
         l=[]
         cl = self._conf.getRegistrantsList(True)
@@ -602,14 +602,14 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         vars["columns"]=self._getRegColumnHTML(sortingField)
         for reg in f.apply(cl):
             l.append(self._getRegistrantsHTML(reg))
-            regl.append(reg.getId()) 
+            regl.append(reg.getId())
         if self._order =="up":
             l.reverse()
             regl.reverse()
         vars["registrants"] = "".join(l)
         vars["numRegistrants"]=str(len(l))
         vars["actionPostURL"]=quoteattr(str(urlHandlers.UHConfModifRegistrantListAction.getURL(self._conf)))
-        
+
         if l == []:
             vars["emailIconURL"]=""
             vars["printIconURL"]=""
@@ -628,15 +628,15 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         vars ["disp"]= self._getDispHTML()
         tit=self._conf.getRegistrationForm().getAccommodationForm().getTitle()
         if not self._conf.getRegistrationForm().getAccommodationForm().isEnabled():
-            tit='%s <span style="color:red;font-size: 75%%">(disabled)</span>'%tit        
+            tit='%s <span style="color:red;font-size: 75%%">(disabled)</span>'%tit
         vars ["accomtitle"]=tit
         tit=self._conf.getRegistrationForm().getSessionsForm().getTitle()
         if not self._conf.getRegistrationForm().getSessionsForm().isEnabled():
-            tit='%s <span style="color:red;font-size: 75%%">(disabled)</span>'%tit        
+            tit='%s <span style="color:red;font-size: 75%%">(disabled)</span>'%tit
         vars["sesstitle"]=tit
         tit=self._conf.getRegistrationForm().getSocialEventForm().getTitle()
         if not self._conf.getRegistrationForm().getSocialEventForm().isEnabled():
-            tit='%s <span style="color:red;font-size: 75%%">(disabled)</span>'%tit        
+            tit='%s <span style="color:red;font-size: 75%%">(disabled)</span>'%tit
         vars["eventtitle"]=tit
         vars["displayOptions"]=self._getDisplayOptionsHTML()
         vars["sortingOptions"]="""<input type="hidden" name="sortBy" value="%s">
@@ -645,7 +645,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         vars["closeMenuImg"] = quoteattr(Config.getInstance().getSystemIconURL("openMenu"))
         vars["openMenuURL"] = self._getOpenMenuURL()
         vars["openMenuImg"] = quoteattr(Config.getInstance().getSystemIconURL("closeMenu"))
-        
+
         vars["checkAcco"] = """<img src=%s border="0" alt="Select all" onclick="javascript:selectAcco()">"""%quoteattr(Config.getInstance().getSystemIconURL("checkAll"))
         vars["uncheckAcco"] = """<img src=%s border="0" alt="Unselect all" onclick="javascript:unselectAcco()">"""%quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))
         vars["checkEvent"] = """<img src=%s border="0" alt="Select all" onclick="javascript:selectEvent()">"""%quoteattr(Config.getInstance().getSystemIconURL("checkAll"))
@@ -654,7 +654,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         vars["uncheckSession"] = """<img src=%s border="0" alt="Unselect all" onclick="javascript:unselectSession()">"""%quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))
         vars["checkDisplay"] = """<img src=%s border="0" alt="Select all" onclick="javascript:selectDisplay()">"""%quoteattr(Config.getInstance().getSystemIconURL("checkAll"))
         vars["uncheckDisplay"] = """<img src=%s border="0" alt="Unselect all" onclick="javascript:unselectDisplay()">"""%quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))
-        
+
         vars["menu"] = self._getMenu()%vars
         return vars
 
@@ -662,13 +662,13 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
 class WRegSentMail  (wcomponents.WTemplated):
     def __init__(self,conf):
         self._conf = conf
-        
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         vars["BackURL"]=urlHandlers.UHConfModifRegistrantList.getURL(self._conf)
         return vars
 
-        
+
 class WPSentEmail( WPConfModifRegistrantListBase ):
     def _getTabContent(self,params):
         wc = WRegSentMail(self._conf)
@@ -679,7 +679,7 @@ class WRegPreviewMail(wcomponents.WTemplated):
     def __init__(self,conf, params):
         self._conf = conf
         self._params=params
-        
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         fromAddr=self._params.get("from","")
@@ -715,18 +715,18 @@ class WRegPreviewMail(wcomponents.WTemplated):
         vars["postURL"]=urlHandlers.UHRegistrantsSendEmail.getURL(self._conf)
         return vars
 
-        
+
 class WPPreviewEmail( WPConfModifRegistrantListBase ):
 
     def __init__(self, rh, conf, params):
         WPConfModifRegistrantListBase.__init__(self, rh, conf)
         self._params = params
-        
+
     def _getTabContent(self,params):
         wc = WRegPreviewMail(self._conf, self._params)
         return wc.getHTML()
 
-    
+
 class WEmailToRegistrants(wcomponents.WTemplated):
     def __init__(self,conf,user,reglist):
         self._conf = conf
@@ -745,7 +745,7 @@ class WEmailToRegistrants(wcomponents.WTemplated):
                             <td>%s</td>
                     </tr>"""%(self.htmlText(var.getLabel()),self.htmlText(var.getDescription())))
         return "".join(res)
-            
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         toEmails=[]
@@ -766,11 +766,11 @@ class WEmailToRegistrants(wcomponents.WTemplated):
         return vars
 
 class WPRegistrantModifRemoveConfirmation(WPConfModifRegistrantListBase):
-    
+
     def __init__(self,rh, conf, registrantList):
         WPConfModifRegistrantListBase.__init__(self,rh,conf)
         self._regList = registrantList
-    
+
     def _getTabContent(self,params):
         wc=wcomponents.WConfirmation()
         regs=[]
@@ -785,13 +785,13 @@ class WPEMail ( WPConfModifRegistrantListBase ):
     def __init__(self, rh, conf, reglist):
         WPConfModifRegistrantListBase.__init__(self, rh, conf)
         self._regList = reglist
-        
+
     def _getTabContent(self,params):
         wc = WEmailToRegistrants(self._conf, self._getAW().getUser(), self._regList)
         return wc.getHTML()
 
 class WConfModifRegistrantsInfo(wcomponents.WTemplated):
-    
+
     def __init__(self,conf,reglist):
         self._conf = conf
         self._reglist = reglist
@@ -892,26 +892,26 @@ class WConfModifRegistrantsInfo(wcomponents.WTemplated):
         return vars
 
 class WPRegistrantsInfo ( WPConfModifRegistrantListBase ):
-    
+
     def _getTabContent(self,params):
         reglist = params["reglist"]
         wc = WConfModifRegistrantsInfo(self._conf, reglist)
         return wc.getHTML()
-    
+
 
 class WPRegistrantBase( WPConferenceModifBase ):
-    
+
     def __init__( self, rh, registrant ):
         self._registrant = self._target = registrant
         WPConferenceModifBase.__init__( self, rh, self._registrant.getConference() )
 
 
 class WPRegistrantModifBase( WPRegistrantBase ):
-    
+
     def _getNavigationDrawer(self):
         pars = {"target": self._conf, "isModif": True}
         return wcomponents.WNavigationDrawer( pars, bgColor = "white" )
-    
+
     def _createTabCtrl( self ):
         self._tabCtrl = wcomponents.TabControl()
         self._tabMain = self._tabCtrl.newTab( "main", _("Main"), \
@@ -924,7 +924,7 @@ class WPRegistrantModifBase( WPRegistrantBase ):
 
     def _setupTabCtrl(self):
         pass
-    
+
     def _setActiveSideMenuItem(self):
         self._regFormMenuItem.setActive(True)
 
@@ -938,30 +938,30 @@ class WPRegistrantModifBase( WPRegistrantBase ):
         return  _("nothing")
 
 class WPRegistrantModifMain( WPRegistrantModifBase ):
-    
+
     def _setActiveTab( self ):
         self._tabMain.setActive()
 
 
 class WPRegistrantModification( WPRegistrantModifMain ):
-    
+
     def _getTabContent( self, params ):
         wc = WRegistrantModifMain(self._registrant)
         return wc.getHTML()
 
 class WRegistrantModifMain( wcomponents.WTemplated ):
-    
+
     def __init__( self, registrant ):
         self._registrant = registrant
         self._conf = self._registrant.getConference()
-                                 
-      
+
+
     def _getTransactionHTML(self):
         if self._registrant.getPayed():
             total=0
             html=[]
             currency = ""
-            html.append( _(""" 
+            html.append( _("""
                         <tr>
                         <tr><td colspan="4" class="title"><b> _("details") </b></td></tr>
                         <tr>
@@ -970,12 +970,12 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                             <td style="color:black"><b> _("Unit Price") </b></td>
                             <td style="color:black"><b> _("Cost") </b></td>
                             <td></td>
-                        </tr>                        
-                    """))            
+                        </tr>
+                    """))
             for gsf in self._registrant.getMiscellaneousGroupList():
                 regForm = self._conf.getRegistrationForm()
                 miscGroup=self._registrant.getMiscellaneousGroupById(gsf.getId())
-                
+
                 if miscGroup is not None:
                     for miscItem in miscGroup.getResponseItemList():
                         _billlable=False
@@ -989,15 +989,15 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                             if miscItem.isBillable():
                                 _billlable=miscItem.isBillable()
                                 caption=miscItem.getValue()
-                                price=string.atof(miscItem.getPrice())   
+                                price=string.atof(miscItem.getPrice())
                                 quantity=miscItem.getQuantity()
-                                total+=price*quantity            
-                           
+                                total+=price*quantity
+
                         gs = miscGroup.getGeneralSection()
                         disSect = ""
                         if not regForm.hasGeneralSectionForm(gs):
                             disSect = """ <span style="color:red">(disabled or removed)</span>"""
-                        if(quantity>0):    
+                        if(quantity>0):
                             html.append("""
                                     <tr>
                                        <td ><b>%i</b></td>
@@ -1015,7 +1015,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                            <td></td>
                            <td align="right"nowrap>%s&nbsp;&nbsp;%s</td>
                         </tr>
-                        """)%(total,currency))  
+                        """)%(total,currency))
             transHTML = ""
             if self._registrant.getTransactionInfo():
                 transHTML = self._registrant.getTransactionInfo().getTransactionHTML()
@@ -1036,7 +1036,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                             </tr>
                             <tr>
                               <td colspan="3" class="horizontalLine">&nbsp;</td>
-                            </tr>                            
+                            </tr>
                      </form>
                  """)%(quoteattr(str(urlHandlers.UHConfModifRegistrantTransactionModify.getURL(self._registrant))), "%.2f %s"%(self._registrant.getTotal(), self._registrant.getConference().getRegistrationForm().getCurrency()), transHTML,"".join(html))
         elif self._registrant.doPay():
@@ -1071,7 +1071,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                             </form>
                             """)%(" --- ")
 
-                        
+
     def _getSessionsHTML(self):
         regForm = self._conf.getRegistrationForm()
         sessions = self._registrant.getSessionList()
@@ -1305,8 +1305,8 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                     </tr>
                     </form>
                     """)%(quoteattr(str(url)), gsf.getTitle(), self._getMiscInfoItemsHTML(gsf) ) )
-        return "".join(html) 
-           
+        return "".join(html)
+
     def _getStatusesHTML(self):
         regForm = self._conf.getRegistrationForm()
         url=urlHandlers.UHConfModifRegistrantStatusesModify.getURL(self._registrant)
@@ -1353,7 +1353,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
         vars["fax"] = self.htmlText( self._registrant.getFax() )
         vars["email"] = self.htmlText( self._registrant.getEmail() )
         vars["personalHomepage"] = self.htmlText( self._registrant.getPersonalHomepage() )
-        vars["registrationDate"] = _("""--_("date unknown")--""") 
+        vars["registrationDate"] = _("""--_("date unknown")--""")
         if self._registrant.getRegistrationDate() is not None:
             vars["registrationDate"] = "%s (%s)"%(self._registrant.getAdjustedRegistrationDate().strftime("%d-%B-%Y %H:%M"), self._conf.getTimezone())
         vars["reasonParticipation"] = self._getReasonParticipationHTML()
@@ -1363,18 +1363,18 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
         vars["dataModificationURL"] = quoteattr(str(urlHandlers.UHRegistrantDataModification.getURL(self._registrant)))
         vars["otherSections"]=self._getMiscellaneousInfoHTML()
         vars["statuses"]=self._getStatusesHTML()
-                                 
-        vars["transaction"]=self._getTransactionHTML() 
+
+        vars["transaction"]=self._getTransactionHTML()
         return vars
 
 class WPRegistrantDataModification( WPRegistrantModifMain ):
-    
+
     def _getTabContent( self, params ):
         wc = WRegistrantDataModification(self._registrant)
         return wc.getHTML()
 
 class WRegistrantDataModification( wcomponents.WTemplated ):
-    
+
     def __init__( self, registrant ):
         self._registrant = registrant
         self._conf = self._registrant.getConference()
@@ -1470,35 +1470,35 @@ class WConfModifRegistrantSessions2PrioritiesModify(WConfModifRegistrantSessions
 
 
 class WPRegistrantTransactionModify( WPRegistrantModifMain ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegistrantTransactionModify(self._registrant)
         p={"postURL":quoteattr(str(urlHandlers.UHConfModifRegistrantTransactionPeformModify.getURL(self._registrant)))}
         return wc.getHTML(p)
-    
+
 class WConfModifRegistrantTransactionModify(WConfModifRegistrantSessionsBase):
 
     def _getTransactionHTML(self):
         transaction = self._registrant.getTransactionInfo()
-        tmp="" 
+        tmp=""
         checkedYes=""
         checkedNo=""
         if (transaction is None):
             checkedNo="selected"
-        elif (transaction is None or transaction.isChangeable()): 
+        elif (transaction is None or transaction.isChangeable()):
             checkedYes="selected"
-        tmp=  _("""<select name="isPayed"><option value="yes" %s> _("yes")</option><option value="no" %s> _("no")</option></select>""")%(checkedYes, checkedNo)        
+        tmp=  _("""<select name="isPayed"><option value="yes" %s> _("yes")</option><option value="no" %s> _("no")</option></select>""")%(checkedYes, checkedNo)
         return tmp
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         vars ["transation"] = self._getTransactionHTML()
         vars ["price"] = self._registrant.getTotal()
-        vars ["Currency"] = self._registrant.getRegistrationForm().getCurrency()                        
-        return vars 
-    
+        vars ["Currency"] = self._registrant.getRegistrationForm().getCurrency()
+        return vars
+
 class WPRegistrantSessionModify( WPRegistrantModifMain ):
-    
+
     def _getTabContent( self, params ):
         if self._registrant.getRegistrationForm().getSessionsForm().getType()=="all":
             wc = WConfModifRegistrantSessionsAllModify(self._registrant)
@@ -1506,7 +1506,7 @@ class WPRegistrantSessionModify( WPRegistrantModifMain ):
             wc = WConfModifRegistrantSessions2PrioritiesModify(self._registrant)
         p={"postURL":quoteattr(str(urlHandlers.UHConfModifRegistrantSessionPeformModify.getURL(self._registrant)))}
         return wc.getHTML(p)
-    
+
 class WConfModifRegistrantSessionsAllModify(WConfModifRegistrantSessionsBase):
 
     def _getSessionsHTML(self):
@@ -1521,15 +1521,15 @@ class WConfModifRegistrantSessionsAllModify(WConfModifRegistrantSessionsBase):
     def getVars(self):
         vars = WConfModifRegistrantSessionsBase.getVars( self )
         vars ["sessions"] = self._getSessionsHTML()
-        return vars 
-    
+        return vars
+
 class WConfModifRegistrantAccommodationModify(wcomponents.WTemplated):
 
     def __init__(self, registrant):
         self._registrant = registrant
         self._conf = self._registrant.getConference()
         self._accommodation = self._conf.getRegistrationForm().getAccommodationForm()
-        
+
     def _getDatesHTML(self, name, currentDate, startDate=None, endDate=None):
         if name=="arrivalDate":
             dates = self._accommodation.getArrivalDates()
@@ -1581,7 +1581,7 @@ class WConfModifRegistrantAccommodationModify(wcomponents.WTemplated):
                             </tr>
                         """%(currentAccoType.getCaption() ) )
         return "".join(html)
-    
+
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
@@ -1600,7 +1600,7 @@ class WConfModifRegistrantAccommodationModify(wcomponents.WTemplated):
         return vars
 
 class WPRegistrantAccommodationModify( WPRegistrantModifMain ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegistrantAccommodationModify(self._registrant)
         p={"postURL":quoteattr(str(urlHandlers.UHConfModifRegistrantAccoPeformModify.getURL(self._registrant)))}
@@ -1629,9 +1629,9 @@ class WConfModifRegistrantSocialEventsModify(wcomponents.WTemplated):
                     if isinstance(se, registration.SocialEvent) and i == se.getNoPlaces():
                         selected = " selected"
                     optList.append("""<option value="%s"%s>%s"""%(i, selected, i))
-                    
+
                 html.append("""<tr>
-                                    <td align="left" nowrap style="padding-left:10px"><input type="checkbox" name="socialEvents" value="%s" %s>%s&nbsp;&nbsp; 
+                                    <td align="left" nowrap style="padding-left:10px"><input type="checkbox" name="socialEvents" value="%s" %s>%s&nbsp;&nbsp;
                                     </td>
                                     <td width="100%%" align="left">
                                     <select name="places-%s">
@@ -1658,7 +1658,7 @@ class WConfModifRegistrantSocialEventsModify(wcomponents.WTemplated):
                                 </tr>
                             """%(se.getCaption(), cancelledReason ) )
         return "".join(html)
-        
+
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
@@ -1668,7 +1668,7 @@ class WConfModifRegistrantSocialEventsModify(wcomponents.WTemplated):
         return vars
 
 class WPRegistrantSocialEventsModify( WPRegistrantModifMain ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegistrantSocialEventsModify(self._registrant)
         p={"postURL":quoteattr(str(urlHandlers.UHConfModifRegistrantSocialEventsPeformModify.getURL(self._registrant)))}
@@ -1680,7 +1680,7 @@ class WConfModifRegistrantReasonParticipationModify(wcomponents.WTemplated):
         self._registrant = registrant
         self._conf = self._registrant.getConference()
         self._reasonParticipation = self._conf.getRegistrationForm().getReasonParticipationForm()
-        
+
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
@@ -1689,7 +1689,7 @@ class WConfModifRegistrantReasonParticipationModify(wcomponents.WTemplated):
         return vars
 
 class WPRegistrantReasonParticipationModify( WPRegistrantModifMain ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegistrantReasonParticipationModify(self._registrant)
         p={"postURL":quoteattr(str(urlHandlers.UHConfModifRegistrantReasonPartPeformModify.getURL(self._registrant)))}
@@ -1715,7 +1715,7 @@ class WConfModifRegistrantMiscInfoModify(wcomponents.WTemplated):
             if self._miscGroup.getResponseItemById(f.getId()) is not None:
                 miscItem=self._miscGroup.getResponseItemById(f.getId())
                 v=miscItem.getValue()
-                price=v=miscItem.getPrice()                 
+                price=v=miscItem.getPrice()
             html.append("""
                         <tr>
                           <td>
@@ -1724,7 +1724,7 @@ class WConfModifRegistrantMiscInfoModify(wcomponents.WTemplated):
                         </tr>
                         """%(f.getInput().getModifHTML(miscItem, self._registrant)) )
         return "".join(html)
-        
+
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
@@ -1737,7 +1737,7 @@ class WPRegistrantMiscInfoModify( WPRegistrantModifMain ):
     def __init__( self, rh, miscGroup ):
         WPRegistrantModifMain.__init__( self, rh, miscGroup.getRegistrant() )
         self._miscGroup=miscGroup
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegistrantMiscInfoModify(self._miscGroup)
         p={"postURL":quoteattr(str(urlHandlers.UHConfModifRegistrantMiscInfoPerformModify.getURL(self._miscGroup)))}
@@ -1769,7 +1769,7 @@ class WConfModifRegistrantStatusesModify(wcomponents.WTemplated):
                         """)%(st.getId(), checked))
         html.append("""</table>""")
         return "".join(html)
-        
+
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
@@ -1791,7 +1791,7 @@ class WPRegistrantStatusesModify( WPRegistrantModifMain ):
         wc = WConfModifRegistrantStatusesModify(self._registrant)
         p={"postURL":quoteattr(str(urlHandlers.UHConfModifRegistrantStatusesPerformModify.getURL(self._registrant)))}
         return wc.getHTML(p)
-    
+
 # ----------------- DISPLAY AREA ---------------------------
 
 class WPConfRegistrantsList( WPConferenceDefaultDisplayBase ):
@@ -1804,12 +1804,12 @@ class WPConfRegistrantsList( WPConferenceDefaultDisplayBase ):
         wc = WConfRegistrantsList( self._conf, filterCrit, sortingCrit, order, sessionFilterName)
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._registrantsListOpt)
 
 class WConfRegistrantsList( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference, filterCrit, sortingCrit, order, sessionFilterName ):
         self._conf = conference
         self._regForm = self._conf.getRegistrationForm()
@@ -1844,20 +1844,27 @@ class WConfRegistrantsList( wcomponents.WTemplated ):
             url.addParam("sortBy",self._sortingCrit.getField().getId())
             url.addParam("order","down")
 
-#        url.addParam("disp",self._getDisplay()) 
-        
+#        url.addParam("disp",self._getDisplay())
+
         return url
 
     def _getRegistrantsHTML( self, reg ):
         fullName = reg.getFullName()
-        institution = reg.getInstitution()
-        email = reg.getEmail()
-        position = reg.getPosition()
-        city = reg.getCity()
-        country = CountryHolder().getCountryById(reg.getCountry())
+        institution = ""
+        if self._regForm.getPersonalData().getDataItem("institution").isEnabled():
+            institution = """<td valign="top" class="abstractDataCell">%s</td>"""%(self.htmlText(reg.getInstitution()) or "&nbsp;")
+        position = ""
+        if self._regForm.getPersonalData().getDataItem("position").isEnabled():
+            position = """<td valign="top" class="abstractDataCell">%s</td>"""%(self.htmlText(reg.getPosition()) or "&nbsp;")
+        city = ""
+        if self._regForm.getPersonalData().getDataItem("city").isEnabled():
+            city = """<td valign="top" class="abstractDataCell">%s</td>"""%(self.htmlText(reg.getCity()) or "&nbsp;")
+        country = ""
+        if self._regForm.getPersonalData().getDataItem("country").isEnabled():
+            country = """<td valign="top" class="abstractDataCell">%s</td>"""%(self.htmlText(CountryHolder().getCountryById(reg.getCountry())) or "&nbsp;")
         sessions=""
         if self._regForm.getSessionsForm().isEnabled():
-            sessionList = [] 
+            sessionList = []
             for ses in reg.getSessionList():
                 sessionList.append(self.htmlText(ses.getCode()))
             sessions = "<br>".join(sessionList)
@@ -1865,16 +1872,16 @@ class WConfRegistrantsList( wcomponents.WTemplated ):
         html = """
             <tr>
                 <td valign="top" nowrap class="abstractLeftDataCell">%s</td>
-                <td valign="top" class="abstractDataCell">%s</td>
-                <td valign="top" class="abstractDataCell">%s</td>
-                <td valign="top" class="abstractDataCell">%s</td>
-                <td valign="top" class="abstractDataCell">%s</td>
+                %s
+                %s
+                %s
+                %s
                 %s
             </tr>
                 """%(self.htmlText(fullName),
-                    self.htmlText(institution) or "&nbsp;",
-                    self.htmlText(position) or "&nbsp;", self.htmlText(city) or "&nbsp;",
-                    self.htmlText(country) or "&nbsp;",
+                    institution,
+                    position, city,
+                    country,
                     sessions)
         return html
 
@@ -1937,6 +1944,7 @@ class WConfRegistrantsList( wcomponents.WTemplated ):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
+        vars["regForm"]= self._regForm
         l=[]
         lr=self._conf.getRegistrantsList(True)
         f = filters.SimpleFilter(self._filterCrit,self._sortingCrit)
@@ -1946,12 +1954,12 @@ class WConfRegistrantsList( wcomponents.WTemplated ):
             l.reverse()
         vars["registrants"] = "".join(l)
         vars["numRegistrants"]=str(len(l))
-        
+
         # Head Table Titles
         currentSorting=""
         if self._sortingCrit.getField() is not None:
             currentSorting=self._sortingCrit.getField().getSpecialId()
-        
+
         currentSortingHTML = ""
         # --- Name
         url=self._getURL()
@@ -2028,9 +2036,9 @@ class WConfRegistrantsList( wcomponents.WTemplated ):
                 vars["imgCountryTitle"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
         vars["urlCountryTitle"]=quoteattr("%s#results"%str(url))
-        
+
         # --- Sessions
-         
+
         vars["sessionsTitle"] = ""
         if self._regForm.getSessionsForm().isEnabled():
             url=self._getURL()
@@ -2058,7 +2066,7 @@ class WConfRegistrantsList( wcomponents.WTemplated ):
 Badge Printing classes
 """
 class WRegistrantModifPrintBadges( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference, selectedRegistrants, user=None ):
         self.__conf = conference
         self._user=user
@@ -2066,28 +2074,28 @@ class WRegistrantModifPrintBadges( wcomponents.WTemplated ):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        
+
         vars['CreatePDFURL']=str(urlHandlers.UHConfModifBadgePrintingPDF.getURL(self.__conf))
         vars['registrantNamesList'] = "; ".join([self.__conf.getRegistrantById(id).getFullName() for id in self.__selectedRegistrants])
         vars['registrantList'] = ",".join(self.__selectedRegistrants)
         vars['badgeDesignURL'] = str(urlHandlers.UHConfModifBadgePrinting.getURL(self.__conf))
-        
+
         templateListHTML = []
         first = True
-        
+
         nTemplates = len(self.__conf.getBadgeTemplateManager().getTemplates())
         nColumns = 3
         nPerColumn = int(math.ceil(nTemplates / nColumns))
-        
+
         n = 0
         templateListHTML.append("""              <tr>""")
-        
+
         sortedTemplates = self.__conf.getBadgeTemplateManager().getTemplates().items()
         sortedTemplates.sort(lambda item1, item2: cmp(item1[1].getName(), item2[1].getName()))
         for templateId, template in sortedTemplates:
-            
+
             templateListHTML.append("""                <td>""")
-            
+
             radio = []
             radio.append("""                  <input type="radio" name="templateId" value='""")
             radio.append(str(templateId))
@@ -2106,20 +2114,20 @@ class WRegistrantModifPrintBadges( wcomponents.WTemplated ):
                                               template.getName(),
                                               """</label>""",
                                               """&nbsp;&nbsp;&nbsp;"""]))
-            
+
             templateListHTML.append("""                </td>""")
-            
-            n = n + 1            
+
+            n = n + 1
             if n == nPerColumn + 1:
                 n = 0
                 templateListHTML.append("""              </tr>""")
                 templateListHTML.append("""              <tr>""")
-                
 
-            
+
+
         templateListHTML.append("""              </tr>""")
         vars["templateList"] = "\n".join(templateListHTML)
-        
+
         wcPDFOptions = WConfModifBadgePDFOptions(self.__conf)
         vars['PDFOptions'] = wcPDFOptions.getHTML()
 
@@ -2127,11 +2135,11 @@ class WRegistrantModifPrintBadges( wcomponents.WTemplated ):
 
 
 class WPRegistrantModifPrintBadges( WPConfModifRegistrantListBase ):
-    
+
     def __init__(self, rh, conf, selectedRegistrants):
         WPConfModifRegistrantListBase.__init__(self, rh, conf)
         self._selectedRegistrants = selectedRegistrants
-    
+
     def _getTabContent( self, params ):
         wc = WRegistrantModifPrintBadges( self._conf, selectedRegistrants = self._selectedRegistrants )
         return wc.getHTML()

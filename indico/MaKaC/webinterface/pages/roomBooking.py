@@ -114,6 +114,9 @@ class WPRoomBookingBase( WPMainBase ):
         self._roomSearchOpt = wcomponents.SideMenuItem(_("Search rooms"),
                                         urlHandlers.UHRoomBookingSearch4Rooms.getURL(),
                                         enabled=True)
+        self._roomMapOpt = wcomponents.SideMenuItem(_("Map of rooms"),
+                                        urlHandlers.UHRoomBookingMapOfRooms.getURL(),
+                                        enabled=True)
         self._myRoomListOpt = wcomponents.SideMenuItem(_("My rooms"),
                                         urlHandlers.UHRoomBookingRoomList.getURL( onlyMy = True ),
                                         enabled=self._showResponsible)
@@ -144,6 +147,7 @@ class WPRoomBookingBase( WPMainBase ):
         
         self._leftMenu.addSection( self._roomsOpt )
         self._roomsOpt.addItem( self._roomSearchOpt )
+        self._roomsOpt.addItem( self._roomMapOpt )
         self._roomsOpt.addItem( self._myRoomListOpt )
         self._leftMenu.addSection( self._bookingsOpt )
         self._bookingsOpt.addItem( self._bookARoomOpt )

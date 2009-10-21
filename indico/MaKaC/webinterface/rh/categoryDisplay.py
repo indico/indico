@@ -452,7 +452,7 @@ class UtilsConference:
                 r = conference.CustomRoom()
                 c.setRoom( r )
             r.setName( roomName )
-        
+
         c.setSupportEmail( confData.get("supportEmail", "")  )
         displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(c).setDefaultStyle(confData.get("defaultStyle",""))
         if c.getVisibility() != confData.get("visibility",999):

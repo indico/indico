@@ -22,7 +22,7 @@
 from MaKaC.i18n import _
 
 class CountryHolder:
-    
+
     def __init__(self):
         self._countries = {}
         self._countries['AF'] = "AFGHANISTAN"
@@ -202,7 +202,7 @@ class CountryHolder:
         self._countries['SE'] = "SWEDEN"
         self._countries['CH'] = "SWITZERLAND"
         self._countries['SY'] = "SYRIEN ARAB REPUBLIC"
-        self._countries['TW'] = "TAIWAN"
+        self._countries['TW'] = "TAIWAN, PROVINCE OF CHINA"
         self._countries['TJ'] = "TAJIKISTAN"
         self._countries['TH'] = "THAILAND"
         self._countries['TG'] = "TOGO"
@@ -228,17 +228,17 @@ class CountryHolder:
         self._countries['YD'] = "YEMEN DEMOCRATIC"
         self._countries['YE'] = "YEMEN"
         self._countries['ZM'] = "ZAMBIA"
-        self._countries['ZW'] = "ZIMBABWE"    
+        self._countries['ZW'] = "ZIMBABWE"
 
     def getCountries(self):
         return self._countries
 
     def getCountryList( self ):
         return self._countries.values()
-    
+
     def getCountryById( self, id ):
         return self._countries.get(id, "")
-    
+
     def getCountryKeys(self):
         return self._countries.keys()
 

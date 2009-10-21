@@ -16,10 +16,10 @@
             </tr>
             <tr>
                 <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%(imgNameTitle)s<a href=%(urlNameTitle)s><%= _("name")%></a></td>
-                <td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%(imgInstitutionTitle)s<a href=%(urlInstitutionTitle)s><%= _("institution")%></a></td>
-                <td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%(imgPositionTitle)s<a href=%(urlPositionTitle)s><%= _("position")%></a></td>
-                <td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%(imgCityTitle)s<a href=%(urlCityTitle)s><%= _("city")%></a></td>
-                <td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%(imgCountryTitle)s<a href=%(urlCountryTitle)s><%= _("country")%></a></td>
+                <% if regForm.getPersonalData().getDataItem("institution").isEnabled(): %><td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%(imgInstitutionTitle)s<a href=%(urlInstitutionTitle)s><%= _("institution")%></a></td><% end %>
+                <% if regForm.getPersonalData().getDataItem("position").isEnabled(): %><td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%(imgPositionTitle)s<a href=%(urlPositionTitle)s><%= _("position")%></a></td><% end %>
+                <% if regForm.getPersonalData().getDataItem("city").isEnabled(): %><td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%(imgCityTitle)s<a href=%(urlCityTitle)s><%= _("city")%></a></td><% end %>
+                <% if regForm.getPersonalData().getDataItem("country").isEnabled(): %><td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%(imgCountryTitle)s<a href=%(urlCountryTitle)s><%= _("country")%></a></td><% end %>
                 %(sessionsTitle)s
             </tr>
             %(registrants)s

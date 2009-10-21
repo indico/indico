@@ -143,7 +143,7 @@
           <xsl:value-of select="./title" disable-output-escaping="yes"/>
         </span>
       </span>
-      
+
       <xsl:if test="./description != ''">
         <span class="description"><xsl:apply-templates select="./description"/></span>
       </xsl:if>
@@ -190,7 +190,7 @@
         </tbody>
       </table>
 
-      <xsl:if test="$minutes != 'off'">
+      <xsl:if test="$minutes = 'on'">
         <xsl:for-each select="./material">
           <xsl:if test="./minutesText != ''">
             <div class="minutesTable">
@@ -263,7 +263,7 @@
              - <xsl:value-of select="substring(./endDate,12,5)"/>
           </xsl:if>
       </span>
-      
+
       <span class="confModifPadding">
           <span class="{$titleClass}">
             <xsl:value-of select="./title" disable-output-escaping="yes"/>
@@ -277,7 +277,7 @@
             </em>
           </xsl:if>
       </span>
-      
+
       <xsl:if test="string-length(./abstract) > 1">
         <br /><span class="description"><xsl:apply-templates select="./abstract"/></span>
       </xsl:if>
@@ -291,14 +291,14 @@
             </span>
             <br/>
           </xsl:if>-->
-          
+
           <xsl:if test="count(child::speakers) != 0">
             <tr>
               <td class="leftCol">Speakers:</td>
               <td><xsl:apply-templates select="./speakers"/></td>
             </tr>
           </xsl:if>
-          
+
           <xsl:if test="./broadcasturl != ''">
             <tr>
               <td class="leftCol">Video broadcast</td>
@@ -330,19 +330,21 @@
             > (<xsl:apply-templates select="./location">
               <xsl:with-param name="span"/>
             </xsl:apply-templates>) </xsl:if>
-          
+
         </tbody>
       </table>
 
       <xsl:if test="count(subcontribution) != 0">
           <ul class="{$scListClass}">
             <xsl:for-each select="subcontribution">
-              <xsl:apply-templates select="."/>
+              <xsl:apply-templates select=".">
+                <xsl:with-param name="minutes" select="$minutes"/>
+              </xsl:apply-templates>
             </xsl:for-each>
           </ul>
       </xsl:if>
 
-          <xsl:if test="$minutes != 'off'">
+          <xsl:if test="$minutes = 'on'">
             <xsl:for-each select="./material">
               <xsl:if test="./minutesText != ''">
                 <div class="minutesTable">
@@ -358,6 +360,7 @@
 
 
   <xsl:template match="subcontribution">
+    <xsl:param name="minutes">off</xsl:param>
     <xsl:variable name="idt" select="./ID"/>
     <li>
       <xsl:if test="name(../..) = 'session'">
@@ -407,7 +410,14 @@
           <xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
         </xsl:for-each> )</xsl:if>
 
-      <xsl:if test="count(child::material) != 0">
+        <xsl:if test="count(child::speakers) != 0">
+          <tr>
+            <td class="leftCol">Speakers:</td>
+            <td><xsl:apply-templates select="./speakers"/></td>
+          </tr>
+        </xsl:if>
+
+        <xsl:if test="count(child::material) != 0">
         <tr>
           <td class="leftCol">Material:</td>
           <td>
@@ -420,15 +430,19 @@
             </td></tr>
       </xsl:if>
 
-        <xsl:if test="count(child::speakers) != 0">
-          <tr>
-            <td class="leftCol">Speakers:</td>
-            <td><xsl:apply-templates select="./speakers"/></td>
-          </tr>
-        </xsl:if>
-      
         </tbody>
       </table>
+            <xsl:if test="$minutes = 'on'">
+            <xsl:for-each select="./material">
+              <xsl:if test="./minutesText != ''">
+                <div class="minutesTable">
+                    <h2>Minutes</h2>
+                    <span><xsl:apply-templates select="./minutesText"/></span>
+                </div>
+              </xsl:if>
+            </xsl:for-each>
+          </xsl:if>
+
     </li>
   </xsl:template>
 
@@ -462,7 +476,7 @@
           </xsl:if>
         </xsl:if>
       </span>
-      
+
       <xsl:if test="./broadcasturl != ''">
         <br/>
         <a href="{./broadcasturl}">
@@ -553,18 +567,18 @@
 
           <!--
             Handle all related to materials
-          
+
             This uses an ugly hack since the links to same lecture with different dates
-            as well as links to webcasts are treared as materials. The material table row 
+            as well as links to webcasts are treared as materials. The material table row
             is hidden by default and is later displayed using javascript if a material is found
           -->
-          
+
           <tr id="webCastRow" style="display: none">
             <td class="leftCol">Live webcast</td>
             <td>
               <xsl:for-each select="./material">
                 <xsl:if test="./title='live webcast'">
-                  
+
                   <!-- Show the table row containing info about the webcast -->
                   <xsl:text disable-output-escaping="yes">
                     <![CDATA[
@@ -577,7 +591,7 @@
                   <a href="{./displayURL}">
                     <strong>here</strong>
                   </a>
-                  
+
                   <xsl:if test="./locked = 'yes'">
                     <img src="images/protected.png" border="0" alt="locked" style="margin-left: 3px;"/>
                   </xsl:if>
@@ -586,8 +600,8 @@
               </xsl:for-each>
             </td>
           </tr>
-          
-          
+
+
           <tr id="materialList" style="display: none">
             <td class="leftCol">Material</td>
             <td>
@@ -595,7 +609,7 @@
                 <xsl:for-each select="./material">
                   <xsl:if
                     test="./title!='live webcast' and ./title!='part1' and ./title!='part2' and ./title!='part3' and ./title!='part4' and ./title!='part5' and ./title!='part6' and ./title!='part7' and ./title!='part8' and ./title!='part9' and ./title!='part10'">
-                    
+
                     <!-- Show the material table row -->
                     <xsl:text disable-output-escaping="yes">
                       <![CDATA[
@@ -604,14 +618,14 @@
                         </script>
                       ]]>
                     </xsl:text>
-                    
+
                     <xsl:apply-templates select="."/>
-                    
+
                   </xsl:if>
                 </xsl:for-each>
                 </div>
-              
-              <xsl:if test="$minutes != 'off'">
+
+              <xsl:if test="$minutes = 'on'">
                 <xsl:for-each select="./material">
                   <xsl:if test="./minutesText != ''">
                     <center>
@@ -627,7 +641,7 @@
               </xsl:if>
             </td>
           </tr>
-          
+
           <tr id="lectureLinks" style="display: none">
             <td class="leftCol">Other occasions</td>
             <td>
@@ -635,7 +649,7 @@
                 <xsl:sort select="./title"/>
                 <xsl:if
                   test="./title='part1' or ./title='part2' or ./title='part3' or ./title='part4' or ./title='part5' or ./title='part6' or ./title='part7' or ./title='part8' or ./title='part9' or ./title='part10'">
-                  
+
                   <!-- Show the table row containing links to other instances of this lecture -->
                   <xsl:text disable-output-escaping="yes">
                     <![CDATA[
@@ -644,7 +658,7 @@
                         </script>
                       ]]>
                   </xsl:text>
-                  
+
                   <a href="materialDisplay.py?materialId={./ID}&#38;confId={/iconf/ID}">
                     <img src="images/{./title}.png" alt="{./title}"/>
                   </a>
@@ -653,7 +667,7 @@
               </xsl:for-each>
             </td>
           </tr>
-          
+
         <!--
             End of materials
         -->
@@ -693,7 +707,7 @@
             </td>
           </tr>
         </xsl:if>
-        
+
         <xsl:if test="count(./plugins/collaboration/booking) != 0">
           <xsl:variable name="collaborationToday" select="./plugins/collaboration/todayReference"/>
           <xsl:variable name="collaborationTomorrow" select="./plugins/collaboration/tomorrowReference"/>
@@ -702,7 +716,7 @@
             <td>
               <div>
               <xsl:for-each select="./plugins/collaboration/booking">
-              
+
                 <xsl:if test="position() = 3">
                   <div id="collShowBookingsDiv">
                     <span class="collShowHideBookingsText">
@@ -720,7 +734,7 @@
                         <xsl:value-of select="1 + count(following-sibling::booking[kind = 'scheduled'])"/>
                         <xsl:text> more scheduled bookings.</xsl:text>
                       </xsl:if>
-                      
+
                     </span>
                     <span id="collShowBookings" class="fakeLink collShowBookingsText">
                       Show
@@ -731,21 +745,21 @@
               <div id="collHiddenBookings" style="visibility: hidden; overflow: hidden;">
                   ]]></xsl:text>
                 </xsl:if>
-                
+
                 <!-- Start of a booking line -->
                 <div class="collaborationDisplayBookingLine">
                   <xsl:if test="count(child::information) = 0">
                     <span class="collaborationDisplayBookingTitle"><xsl:value-of select="./title"/></span>
                     <xsl:text>:</xsl:text>
                   </xsl:if>
-                  
+
                   <xsl:if test="count(child::information) = 1">
                     <span class="fakeLink" id="collaborationBookingTitle{./id}"><xsl:value-of select="./title"/></span>
                     <xsl:text>:</xsl:text>
-                    
+
                     <xsl:text disable-output-escaping="yes"><![CDATA[
                     <script type="text/javascript">
-                    
+
                       $E('collaborationBookingTitle]]></xsl:text>
                         <xsl:value-of select="./id" disable-output-escaping="yes"/>
                         <xsl:text disable-output-escaping="yes"><![CDATA[').dom.onmouseover = function (event) {
@@ -756,9 +770,9 @@
                               <xsl:text>Click here to show / hide detailed information.</xsl:text>
                               <xsl:text disable-output-escaping="yes">&lt;/div&gt;'</xsl:text>
                               <xsl:text disable-output-escaping="yes"><![CDATA[
-                              );               
+                              );
                         }
-                    
+
                       var bookingInfoState]]></xsl:text>
                         <xsl:value-of select="./id" disable-output-escaping="yes"/>
                       <xsl:text disable-output-escaping="yes"><![CDATA[ = false;
@@ -831,8 +845,8 @@
                       <xsl:if test="./kind = 'ongoing'">
                         <xsl:text> ongoing until </xsl:text>
                       </xsl:if>
-                      
-                    
+
+
                       <xsl:choose>
                         <xsl:when test="$collaborationToday = substring(./endDate,0,11)">
                           <xsl:text> today at </xsl:text>
@@ -850,11 +864,11 @@
                       <xsl:value-of select="substring(./endDate,12,5)"/>
                     </xsl:otherwise>
                   </xsl:choose>
-                  
+
                   <xsl:text> (</xsl:text>
                   <xsl:value-of select="./typeDisplayName"/>
                   <xsl:text>) </xsl:text>
-                  
+
                   <xsl:if test="count(child::launchInfo) = 1">
                     <a href="{./launchInfo/launchLink}" id="bookingLaunchLink{./id}">
                       <xsl:value-of select="./launchInfo/launchText"/>
@@ -871,10 +885,10 @@
                                 <xsl:value-of select="./launchInfo/launchTooltip" disable-output-escaping="yes"/>
                                 <xsl:text disable-output-escaping="yes">&lt;/div&gt;'</xsl:text>
                                 <xsl:text disable-output-escaping="yes"><![CDATA[
-                                );               
+                                );
                           }
                       </script>
-                    ]]></xsl:text>                    
+                    ]]></xsl:text>
                   </xsl:if>
 
                   <xsl:if test="count(child::information) = 1">
@@ -912,19 +926,19 @@
               </div>
             </td>
           </tr>
-          
+
         </xsl:if>
 
       </tbody>
     </table>
-    
+
     <xsl:if test="count(./plugins/collaboration/booking) != 0">
         <xsl:text disable-output-escaping="yes"><![CDATA[
         <script type="text/javascript">
           var hideHook = function() {
               IndicoUI.Effect.appear($E('collShowBookingsDiv'));
           }
-        
+
           if (exists($E('collHiddenBookings'))) {
             var height = IndicoUI.Effect.prepareForSlide('collHiddenBookings', true);
             $E('collShowBookings').observeClick(function() {

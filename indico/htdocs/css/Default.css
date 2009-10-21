@@ -1,12 +1,12 @@
 /*
    A wrapper that wraps around everything except the footer.
    Used to place the footer correctly at the bottom
-*/ 
+*/
 div.wrapper {
     height: auto !important;
     min-height: 100%;
 }
-/* 
+/*
     Used to create empty space in end of wrapper
     which is used but the footer
 */
@@ -15,7 +15,7 @@ div.wrapper .emptyFooter {
 }
 
 .pageheader{
-    color: gray 
+    color: gray
 }
 
 .pagefooter {
@@ -130,7 +130,7 @@ pre {
    table-layout:fixed;
 }
 
-/* 
+/*
     .fakeLink is used on elements that should look
     like links but are not real links. For example
     activating javascript code
@@ -171,27 +171,17 @@ a.img:active {
         visibility:hidden;
     }
     .print {
-        position: fixed;
-        width: 100%;
-        top: 0;
-        left: 0;
         visibility: visible;
-        overrflow: auto;
-        margin: 0;
-        padding: 0;
     }
-    
+
     .onlyPrint {
         display: inherit;
-    }
-    
-    .closeButton {
-        display: none;
+        visibility: visible;
     }
 }
 
 
-.dropDownMenu, .dropDownMenuGrey, .dropUpMenu {
+.dropDownMenu, .dropDownMenuGrey, .dropUpMenu, .dropDownMenuWhite {
     padding-right: 17px;
     background: transparent url(../images/menu_arrow_black.png) scroll no-repeat center right;
     cursor: pointer;
@@ -199,6 +189,10 @@ a.img:active {
 
 .dropDownMenuGrey {
     background-image: url(../images/menu_arrow_grey.png);
+}
+
+.dropDownMenuWhite {
+    background-image: url(../images/menu_arrow_white.png);
 }
 
 .dropUpMenu {
@@ -564,7 +558,7 @@ a.menuaddlink:hover {
    padding-top: 3px;
    border-right: 2px solid #777777;
    border-top: 2px solid #777777;
-   
+
 }
 
 .display_unselectedhtab {
@@ -703,7 +697,7 @@ a.menuaddlink:hover {
 
 /*All used styles*/
 /* TODO: should probably be removed...
-.confTitle { 
+.confTitle {
    font-size: 25pt;
    vertical-align: bottom;
    padding-left: 30px;
@@ -713,12 +707,12 @@ a.menuaddlink:hover {
 
 .confTitle h1 {
     margin: 0;
-    display: inline;    
-    
+    display: inline;
+
 }
 
 
-.confDate { 
+.confDate {
    font-size: 14pt;
    font-weight: bold;
    background: #777777;
@@ -729,7 +723,7 @@ a.menuaddlink:hover {
    padding-left: 30px;
    padding-right: 15px;
 }
-.confPlace { 
+.confPlace {
    font-size: 14pt;
    font-weight: bold;
    background: #E5E5E5;
@@ -747,7 +741,7 @@ a.menuaddlink:hover {
 .confBodyBox { background: white;
                 vertical-align: top;
                 padding-left: 3px;
-                padding-top: 8px; 
+                padding-top: 8px;
                 padding-right: 3px }
 
 .confSectionsBox {  width: 180px;
@@ -912,7 +906,7 @@ a.confSubSection:hover {
    font-weight: bold;
    font-size: 11pt;
    color: #777777;
-   background: #EBEBEB;   
+   background: #EBEBEB;
    padding: 3px;
 }
 
@@ -972,15 +966,15 @@ a.confSubSection:hover {
 }
 
 .abstractLeftDataCell {
-    padding-right:5px; 
-    border-bottom: 1px solid #888888; 
+    padding-right:5px;
+    border-bottom: 1px solid #888888;
     border-left: 5px solid #FFFFFF;
     vertical-align: top;
 }
 
 .abstractDataCell {
-    padding:5px; 
-    border-bottom: 1px solid #888888; 
+    padding:5px;
+    border-bottom: 1px solid #888888;
     vertical-align: top;
 }
 
@@ -1071,42 +1065,42 @@ a.confSubSection:hover {
     margin-top: 5px;
 }
 
-.ACtab { 
+.ACtab {
    background-image: url(../images/keys.png);
    background-repeat: no-repeat;
 }
 
-.toolsTab { 
+.toolsTab {
    background-image: url(../images/tools.png);
    background-repeat: no-repeat;
 }
 
-.VCTab { 
+.VCTab {
    background-image: url(../images/videoconference.png);
    background-repeat: no-repeat;
 }
 
-.participantsTab { 
+.participantsTab {
    background-image: url(../images/participants.png);
    background-repeat: no-repeat;
 }
 
-.timetableTab { 
+.timetableTab {
    background-image: url(../images/pocketwatch.png);
    background-repeat: no-repeat;
 }
 
-.filesTab { 
+.filesTab {
    background-image: url(../images/folder.png);
    background-repeat: no-repeat;
 }
 
-.logsTab { 
+.logsTab {
    background-image: url(../images/penpaper.png);
    background-repeat: no-repeat;
 }
 
-.listingsTab { 
+.listingsTab {
    background-image: url(../images/listings.png);
    background-repeat: no-repeat;
 }
@@ -1124,7 +1118,7 @@ a.confSubSection:hover {
 input, textarea, select {
    font-size: 100%;
 }
-    
+
 input.smallbtn {
    color:  #123062;
    font-size: 80%;
@@ -1203,9 +1197,9 @@ a.nav_link:hover {
 /* ===== ROOM BOOKING ================= */
 
 .tip {
-    border:solid 1px #888888; 
-    color:#222222; 
-    background-color:#f0f0f0; 
+    border:solid 1px #888888;
+    color:#222222;
+    background-color:#f0f0f0;
     font-size: 11px;
 }
 
@@ -1219,36 +1213,36 @@ a.nav_link:hover {
 }
 
 .tip-no-borders {
-    border: none; 
-    color:#222222; 
-    background-color:#f0f0f0; 
+    border: none;
+    color:#222222;
+    background-color:#f0f0f0;
     font-size: 11px;
 }
 
 /* Room booking - calendar bar */
 .barUnaval { /* Bar representing unavailable period */
-    position: absolute; 
-    background-color: #FFE0C5; 
-    border: solid 1px #CCC; 
-    height: 10px; 
+    position: absolute;
+    background-color: #FFE0C5;
+    border: solid 1px #CCC;
+    height: 10px;
 }
 .barCand { /* Bar representing candidate reservation */
-    position: absolute; 
-    background-color: #A7FFD0; 
-    border: solid 1px #CCC; 
-    height: 10px; 
+    position: absolute;
+    background-color: #A7FFD0;
+    border: solid 1px #CCC;
+    height: 10px;
 }
 .barConf { /* Bar representing conflict */
-    position: absolute; 
-    background-color: #D0000A; 
-    border: solid 1px #CCC; 
-    height: 10px; 
+    position: absolute;
+    background-color: #D0000A;
+    border: solid 1px #CCC;
+    height: 10px;
 }
 
 .barPreB { /* Bar representing PRE-booking */
-    position: absolute; 
-    background-color: #FFFEB1; 
-    border: solid 1px #CCC; 
+    position: absolute;
+    background-color: #FFFEB1;
+    border: solid 1px #CCC;
     height: 10px;
 }
 
@@ -1267,26 +1261,26 @@ a.nav_link:hover {
 }
 
 .dayDiv {
-    position: relative; 
-    height: 10px; 
-    font-size:0px; 
+    position: relative;
+    height: 10px;
+    font-size:0px;
     margin-top: 6px;
 }
 
 .calHour {
-    position: absolute; 
-    font-size: 8px; 
-    height: 10px; 
+    position: absolute;
+    font-size: 8px;
+    height: 10px;
     color: Black;
 }
 
 /* Form fields: field description width. */
 .subFieldWidth {
-    width: 84px; 
+    width: 84px;
 }
 .subFieldWidthSmaller
 {
-    width: 60px; 
+    width: 60px;
 }
 
 .actionSucceeded
@@ -1320,7 +1314,7 @@ table.evalEditLeftMenu {
     vertical-align:middle;
     text-align:left;
     margin-left:5px;
-    border:1px solid black; 
+    border:1px solid black;
     width:125px;
 }
 table.evalEditLeftMenu td {
@@ -1433,7 +1427,7 @@ table.evalEditMain td.inputCelTD input.textType {
     width:98%;
 }
 table.evalEditMain td.inputCelTD input.choiceItemText {
-    
+
 }
 table.evalEditMain td.inputCelTD input.btn {
     margin-left:10px;
@@ -1686,7 +1680,7 @@ input.UIFieldText
 {
     float: left;
     width: 75px;
-    text-align: right;  
+    text-align: right;
 }
 
 .UIFieldSpan {
@@ -1694,12 +1688,12 @@ input.UIFieldText
   width: 175px;
   text-align: left;
   }
-  
+
 form.UIPrettyForm
 {
     padding-top: 10px;
     margin-left: 50px;
-    
+
     font-size: 11px;
 }
 
@@ -1727,7 +1721,7 @@ br.UIPrettyForm  {
 }
 
 .UIExpandContainer {
-    text-align: center; 
+    text-align: center;
 }
 
 div.UIForm
@@ -1772,7 +1766,7 @@ ul.CategoryList
 ul.CategoryList li{
     border-bottom: 1px solid #E2E2E2;
     margin: 0;
-    display: block;  
+    display: block;
     padding-left: 5px;
     margin-bottom: 0px;
     line-height: 25px;
@@ -1889,7 +1883,7 @@ div.UITitleBar {
 div.UITitleBar .UITitleText{
     float: left;
     width: 200px;
-    text-align: left;   
+    text-align: left;
 }
 
 div.UITitleBar .UITitleText h1{
@@ -1930,7 +1924,7 @@ ul.UIPeopleList li.UIError
 }
 
 .UIInPlaceTextField
-{   
+{
 }
 
 div#UISearchBox
@@ -1954,7 +1948,7 @@ div#UISearchBox #searchControls
 {
     width: 250px;
     border: 1px solid #888;
-    height: 21px; 
+    height: 21px;
     overflow: hidden;
     background-color: white;
 }
@@ -2014,7 +2008,7 @@ div#UISearchBox #extraOptions div {
 }
 
 
-.siteSearchBox
+.arrowExpandIcon
 {
     background: transparent url(../images/menu_arrow_black.png) scroll no-repeat center center;
     font-weight: normal;
@@ -2026,6 +2020,19 @@ div#UISearchBox #extraOptions div {
     cursor: pointer;
 }
 
+.progressIcon
+{
+    background: transparent url(../images/loading.gif) scroll no-repeat center center;
+    font-weight: normal;
+    vertical-align: middle;
+    display:block;
+    width: 20px;
+    height: 17px;
+    float: right;
+    cursor: pointer;
+}
+
+
 a.meetingHeaderSearchBox
 {
     padding-left: 5px;
@@ -2033,28 +2040,28 @@ a.meetingHeaderSearchBox
     color:#000000;
     font-weight: normal;
     vertical-align: middle;
-    float:left; 
+    float:left;
 }
 
 
 .bottomLine
 {
-    border-bottom: 1px solid #777777;   
+    border-bottom: 1px solid #777777;
 }
 
 .container
 {
-    overflow: hidden;   
+    overflow: hidden;
 }
 
-.leftFloat 
+.leftFloat
 {
     float: left;
 }
 
 .rightFloat
 {
-    float: right;   
+    float: right;
 }
 
 div.UITidyDialog
@@ -2131,8 +2138,7 @@ ul.UIUserEvtList li
 
 .favoriteItem
 {
-    background: #CDEB8B;
-    color: #36393D;
+    font-style: italic;
 }
 
 .UINavBar
@@ -2141,7 +2147,7 @@ ul.UIUserEvtList li
     height: 25px;
     width: 100%;
     background: #DDDDDD;
-    vertical-align: middle; 
+    vertical-align: middle;
 }
 
 .UINavBar *
@@ -2190,7 +2196,7 @@ span.evtDateRow
 {
     float: left;
     display: block;
-    width: 300px;   
+    width: 300px;
 }
 
 span.evtDateSpan
@@ -2222,7 +2228,7 @@ a.evtTitle
     float: left;
     display: block;
     width: 350px;
-    padding-right: 5px;     
+    padding-right: 5px;
 }
 
 img.evtIcon
@@ -2299,7 +2305,7 @@ div.globalMenu li.mouseover {
 }
 
 div.globalMenu a
-{   
+{
     font-weight: bold;
     font-family: Verdana;
     font-size: 8pt;
@@ -2310,7 +2316,7 @@ div.globalMenu a
 }
 
 div.globalMenu span
-{   
+{
     font-weight: bold;
     font-family: Verdana;
     font-size: 8pt;
@@ -2456,7 +2462,7 @@ ul.horizontalMenu
     list-style-type: none;
 }
 
-ul.horizontalMenu 
+ul.horizontalMenu
 {
     display: inline;
     font-size: 10pt;
@@ -2466,11 +2472,11 @@ ul.horizontalMenu li{
     position: relative;
     padding: 2px 6px;
     border-left: 1px solid #DDDDDD;
-    line-height: 1.5;   
+    line-height: 1.5;
 }
 
 img.headerLogo {
-    
+
     margin: 7px 10px;
     border: none;
     width: 196px;
@@ -2572,13 +2578,13 @@ div.filterDiv
     margin-right: 20px;
 }
 
-/* 
+/*
     Used to create empty space between the main
     blue bar and the content, when there is
     a basic side menu like in Room Booking.
 */
 .emptyVerticalGap {
-    height: 20px; 
+    height: 20px;
 }
 
 .frontPageSideBarContainer {
@@ -2812,10 +2818,10 @@ ul.menuList li.active
 
 
 .clearfix:after {
-    content: "."; 
-    display: block; 
-    height: 0; 
-    clear: both; 
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
     visibility: hidden;
 }
 
@@ -2990,7 +2996,7 @@ ul.listCompact {
 .banner_0
 {
     background: #E0E0E0;
-    font-size: 12pt;                
+    font-size: 12pt;
 }
 
 .banner_1
@@ -3031,13 +3037,13 @@ ul.listCompact {
 .banner_green
 {
     background: #d5edd7;
-    font-size: 12pt;                
+    font-size: 12pt;
 }
 
 .banner_orange
 {
     background: rgb(255,205,174);
-    font-size: 12pt;                
+    font-size: 12pt;
 }
 
 */
@@ -3089,7 +3095,7 @@ ul.listCompact {
 
 .bannerTitle_noIcon
 {
-    margin-left: 37px;  
+    margin-left: 37px;
 }
 
 .banner_creator
@@ -3099,7 +3105,7 @@ ul.listCompact {
     float: right;
 }
 
-.areaTitle_orange {   
+.areaTitle_orange {
    font-size: 14px;
    color: #E25300;
    padding: 0px;
@@ -3149,7 +3155,7 @@ ul.listCompact {
 .oneline {
     display: block;
     margin-top: 5px;
-    width: 100%;    
+    width: 100%;
 
 }
 
@@ -3189,13 +3195,13 @@ div.optionGroup
     list-style-type: none;
     padding-left: 0px;
     margin: 0;
-    
+
 }
 
 .autoCompleteMenu ul li
 {
     margin: 0;
-    display: block;  
+    display: block;
     padding-left: 0px;
     margin-bottom: 0px;
     height: 20px;
@@ -3204,7 +3210,7 @@ div.optionGroup
 .selected
 {
     background: #C3D9FF;
-}   
+}
 
 .timeDurationEntry
 {
@@ -3212,7 +3218,7 @@ div.optionGroup
     display: block;
     list-style-type: none;
     padding-left: 0px;
-    margin: 0;  
+    margin: 0;
 }
 
 .timeDurationEntry li
@@ -3220,10 +3226,10 @@ div.optionGroup
     background: #CDEB8B;
     border: none;
     margin: 0;
-    display: block;  
+    display: block;
     padding-left: 0px;
     margin-bottom: 0px;
-    height: 20px;   
+    height: 20px;
 }
 
 .timeDurationEntry_text
@@ -3302,7 +3308,7 @@ ul.subTabList a:hover
     margin-right: 1px;
 }
 
-.tabSelected  a {
+.tabSelected  a, .tabSelected  span {
     padding-top: 3px;
     color: #555555;
     font-size: 9pt;
@@ -3353,7 +3359,7 @@ div.tabBorderGradient {
     cursor: pointer;
 }
 
-.tabUnselected  a {
+.tabUnselected  a, .tabUnselected  span {
     color: #4c6a83;
     font-weight: normal;
     font-size: 9pt;
@@ -3414,7 +3420,7 @@ ul.horizontalSmallMenu
     padding-left: 0px;
     margin: 0px;
     list-style-type: none;
-    display: inline;    
+    display: inline;
 }
 
 ul.horizontalSmallMenu li
@@ -3430,7 +3436,7 @@ ul.materialList
 }
 
 ul.materialList li
-{   
+{
     border-top: 1px solid #AAAAAA;
     list-style-type: none;
     padding-bottom: 5px;
@@ -3452,11 +3458,11 @@ ul.materialList li ul
 ul.materialList li ul li
 {
     background: #F2F2F2;
-    list-style-type: none;  
+    list-style-type: none;
     padding-left: 5px;
     padding-right: 5px;
     padding-top: 5px;
-    border-top: 1px solid #DDDDDD;    
+    border-top: 1px solid #DDDDDD;
 }
 
 ul.materialList li ul li span
@@ -3469,7 +3475,7 @@ ul.materialList li ul li ul li
 {
     background: #FFFFFF;
     padding-left: 10px;
-        
+
 }
 
 div.resourceContainer
@@ -3515,7 +3521,7 @@ ul.slotHorizontalMenu li {
     position: relative;
     padding: 0 0 0 0;
     padding: 5px 5px;
-    line-height: 1.5;   
+    line-height: 1.5;
 }
 
 ul.slotHorizontalMenu li a {
@@ -3570,29 +3576,38 @@ ul.keywordList li.oneLineListItem_last:after {
 ul.keywordList li.multipleLinesListItem {
     position: relative;
     padding: 0 0 0 0;
-    color: #5FA5D4;        
+    color: #5FA5D4;
 }
 
 ul.keywordList li.multipleLinesListItem_last {
     position: relative;
     padding: 0 0 0 0;
-    color: #5FA5D4;        
+    color: #5FA5D4;
 }
 
-        
+
 .popupWindowTitle {
     color: #1A64A0;
     font-weight: bold;
     font-style: normal;
 }
-    
+
 .popUpLabel {
-   vertical-align: top;
    text-align: right;
-   color: #5294CC;
-   margin-right: 2px;
- }
- 
+   font-size: 10pt;
+   font-family: Verdana, Arial;
+   color: #523D04;
+   font-weight: normal;
+   padding-right: 5px;
+   padding-bottom: 3px;
+}
+
+.popUpTdContent {
+   font-weight: normal;
+   padding-bottom: 3px;
+   color: black;
+}
+
  .popUpButton {
    color:  #234173;
    text-decoration: none;
@@ -3610,8 +3625,10 @@ ul.keywordList li.multipleLinesListItem_last {
 
 .fieldLabel {
    text-align: right;
-   color: #5294CC;
+   font-family: Verdana, Arial;
+   color: #523D04;
    margin-right: 5px;
+   font-weight: normal;
 }
 
 .headerRoomLink {
@@ -3639,20 +3656,22 @@ select.invalidSelect {
 .tooltipError {
    max-width: 300px;
    padding: 5px;
-   background-color: white;/*#FFB9B9;*/
-   border: 1px solid #D01F3C;
-   color: #D01F3C;
-   font-weight: bold;
+   border: 1px solid #777;
+   color: #ad1f1f;
+   background: white;
+   -moz-box-shadow: 2px 2px 2px #444;
+   -webkit-box-shadow: 2px 2px 2px #444;
+   box-shadow: 2px 2px 2px #444;
 }
- 
+
 ul.errorList {
     padding: 0;
     margin: 0;
-    margin-left: 20px;  
+    margin-left: 20px;
 }
 
 ul.errorList li {
-    color: #D01F3C; 
+    color: #D01F3C;
 }
 
 .errorList {
@@ -3663,12 +3682,12 @@ ul.errorList li {
 span.errorTitle {
     font-size: medium;
     color: #D01F3C;
-    font-weight: bold;  
+    font-weight: bold;
 }
 
 span.messageAfterErrors {
     margin-top: 1em;
-    color: #D01F3C;     
+    color: #D01F3C;
 }
 
 
@@ -3746,7 +3765,7 @@ span.messageAfterErrors {
 }
 
 .newsDisplayItemTitle {
-    display: inline;    
+    display: inline;
     font-size: 13px;
 }
 
@@ -3770,7 +3789,7 @@ ul.optionList2 {
 }
 
 span.optionKey1 {
-    font-weight: bold;  
+    font-weight: bold;
 }
 
 div.PluginPeopleListDiv {
@@ -3792,7 +3811,7 @@ ul.PluginPeopleList
 
 ul.PluginPeopleList li{
     margin: 0;
-    display: block;  
+    display: block;
     margin-bottom: 0px;
     line-height: 25px;
     padding-left: 5px;
@@ -3839,7 +3858,7 @@ td.collaborationCellNarrow {
 span.statusMessage {
     font-size: medium;
     font-weight: bold;
-    vertical-align: middle; 
+    vertical-align: middle;
 }
 
 .statusMessageError {
@@ -3864,7 +3883,7 @@ td.collaborationInfoLeftCol {
 
 .collaborationWarning {
     font-weight: bold;
-    color: #D01F3C; 
+    color: #D01F3C;
 }
 
 td.bookingFormFieldName {
@@ -3881,16 +3900,16 @@ ul.singleBooking {
     list-style: none;
     margin: 0;
     padding: 0;
-    text-align: center; 
+    text-align: center;
 }
 
 div.singleBookingCustomText {
-    margin-bottom: 5px; 
+    margin-bottom: 5px;
 }
 
 div.actionButton {
     display: inline;
-    margin-left: 5px;   
+    margin-left: 5px;
 }
 
 /* Collaboration Admin */
@@ -3943,6 +3962,12 @@ div.CADiv {
     margin-bottom: 10px;
     color: #444;
     border: 1px solid #AAA;   
+    -moz-border-radius-bottomleft:10px;
+    -moz-border-radius-bottomright:10px;
+    -moz-border-radius-topleft:10px;
+    -moz-border-radius-topright:10px;
+    border-bottom:1px solid #AAAAAA;
+    border-right:1px solid #AAAAAA;
 }
 
 div.CADiv span.pluginNames {
@@ -4253,12 +4278,24 @@ td.collaborationDisplayInfoLeftCol span {
 
 /* ------------------------ */
 
+.timetableInfoBox {
+    margin: 7px 10px;
+    /*background: #F6E8BD url(../images/sprites.png) repeat-x scroll 0 -210px;
+    border: 1px solid #A2905A;*/
+    color: #444444;
+    font-family: Verdana;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+
 .timetableBlock {
     border: 1px solid #aaaaaa;
     -moz-border-radius: 3px;
     -webkit-border-radius:3px;
     behavior: url(border-radius.htc);
     overflow: hidden;
+    color: #202020;
 }
 
 .timetableBlockPileEffect {
@@ -4278,28 +4315,48 @@ div.timetableBreak div.timetableBlock{
 }
 
 div.timetableBlockTitle {
-    color: #202020;
     font-weight: bold;
     font-size: 8pt;
     padding: 4px;
+}
+
+div.timetableBlockPresenters {
+    float: right;
+    margin: 4px;
+    margin-right: 6px;
+    margin-left: 6px;
+    font-size: 8pt;
+    font-style: italic;
+}
+
+div.timetableBlockMaterial {
+    padding: 2px;
+    margin: 2px;
+    float: right;
+    width: 12px;
+    height: 12px;
+    background: transparent url(../images/material_folder.png) scroll no-repeat 3px 3px;
+}
+
+div.timetableBlockMaterial:hover, div.timetableBlockMaterialActive {
+    border: 1px solid #777;
+    margin: 1px;
+    background-color: white;
 }
 
 div.timetableBlockTime {
     position: absolute;
     bottom: 4px;
     right: 6px;
-    color: #202020;
-    font-weight: bold;
+    padding-top: 4px;
     font-size: 8pt;
 }
 
 div.timetableBlockTimeDiscreet{
-    float: right;
+    float: left;
     margin: 4px;
     margin-right: 6px;
     margin-left: 6px;
-    color: #777777;
-    font-style: italic;
     font-size: 8pt;
 }
 
@@ -4308,9 +4365,30 @@ div.timetableBlockLocation {
     bottom: 4px;
     left: 4px;
     font-style: italic;
-    color: #202020;
+    padding-top: 4px;
     font-size: 8pt;
 }
+
+div.timetableBlockContribs {
+    margin: 4px;
+    border: 1px solid #CCC;
+}
+
+/*div.timetableBlockContrib {
+    border-top: 1px dotted #777;
+    background: white;
+    opacity: 0.65;
+    padding: 2px 5px;
+    font-size: 12px;
+    height: 14px;
+    overflow: hidden;
+}
+
+div.timetableBlockContrib:hover {
+    background: black;
+    opacity: 0.45;
+    color: white;
+}*/
 
 div.exclusivePopup {
     background-color: white;
@@ -4351,7 +4429,7 @@ div.exclusivePopup .printLink {
     border: 1px solid #aaa;
     border-bottom-color: white;
     background: white;
-    
+
     -webkit-border-top-right-radius: 3px;
     -webkit-border-top-left-radius: 3px;
     -moz-border-radius-topleft: 3px;
@@ -4408,18 +4486,27 @@ div.balloonPopupCloseButton {
     padding-top: 80px;
 }
 
-div.timetableLoading {
+div.timetablePreLoading {
     background: transparent url('../images/load_big.gif') scroll no-repeat center center;
 }
-div.timetableLoading .text {
+div.timetablePreLoading .text {
     color: #777;
     text-align: center;
     font-family: Verdana;
     letter-spacing: 2px;
 }
 
+div.timetableLoading {
+    position: absolute;
+    top: 40px;
+    left: 0px;
+    padding: 10px 0 6px 35px;
+    background: transparent url('../images/loading.gif') scroll no-repeat 10px center;
+    color: #444;
+}
+
 .timetablePopup {
-} 
+}
 
 .timetablePopup .title {
     font-family: Verdana;
@@ -4444,6 +4531,13 @@ div.timetablePopupInfoWrapper {
 .timetablePopup .managementMenuBar {
     background-color: #f9f6e4;
     border-top: 1px solid #e5e0d0;
+}
+
+.timetablePopup .managementMenuBar a {
+    color: #2F2506;
+}
+.timetablePopup .managementMenuBar a:hover {
+    color: #6F6429;
 }
 
 .timetablePopup .menuBar a {
@@ -4494,20 +4588,104 @@ td.timetablePopupContributionTitle{
     font-weight: normal;
 }
 
-div.timetableColorPicker{
+.colorPicker {
     padding: 3px;
-    background-color: #EFEFEF;
+    background-color: white;
     border: 1px solid #aaaaaa;
+    -moz-box-shadow: 2px 2px 2px #444;
+    box-shadow: 2px 2px 2px #444;
+    -webkit-box-shadow: 2px 2px 2px #444;
 }
 
-div.timetableColorPickerBlock {
-    width: 15px;
-    height: 15px;
-    margin: 4px;
-    border: 1px solid #aaaaaa;
+.colorPicker .custom {
+    margin: 5px;
+    margin-bottom: 10px;
+    padding-top: 8px;
+    border-top: 1px dotted #555;
+}
+
+.colorPicker .inputWrapper {
+    position: relative;
+    padding-right: 20px;
+}
+
+.colorPicker .inputContainer {
+    border: 1px solid #777;
+    margin: 2px 0 2px 7px;
+    position: relativ;
+
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+}
+
+.colorPicker .numberSign {
+    font-size: 12px;
+    max-width: 12px;
+    overflow: hidden;
+    color: #777;
+    position: absolute;
+    left: 10px;
+    top: 1px;
+    cursor: default;
+}
+
+.colorPicker input {
+    width: 55px;
+    margin-left: 15px;
+    border: none;
+    font-size: 8pt;
+    background: transparent;
+}
+
+.colorPicker button {
+    font-size: 8pt;
+    margin-top: 5px;
+}
+
+.colorPicker .custom td {
+    text-align: right;
+    font-size: 8pt;
+    font-family: Verdana;
+}
+
+.colorPicker .block, .colorPicker .previewBlock {
+    border: 1px solid #AAA;
+    text-align: center;
+    overflow: hidden;
+
+    -moz-border-radius: 2px;
+    -webkit-border-radius:2px;
+    border-radius: 2px;
+}
+
+.colorPicker .previewBlock {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 16px;
+    height: 16px;
+}
+
+.colorPicker .block {
+    margin: 2px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.colorPicker .block:hover {
+    opacity: 0.5;
+    border-color: black;
+}
+
+.colorPickerLink {
+    cursor: pointer;
+    padding: 3px 10px;
+    border: 1px solid #AAA;
     -moz-border-radius: 3px;
-    -webkit-border-radius:3px;
-    behavior: url(border-radius.htc);
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
 }
 
 .timetableFilter {
@@ -4581,6 +4759,20 @@ ul.popupList {
     border: 1px solid #99aabb;
     font-size: 10pt;
     margin: 0px;
+    max-width: 500px;
+    min-width: 80px;
+
+    -moz-box-shadow: 2px 2px 2px #444;
+    -webkit-box-shadow: 2px 2px 2px #444;
+    box-shadow: 2px 2px 2px #444;
+}
+
+/* When it's in a popuplist chain then make the box shadow
+ * more descreet. */
+ul.popupListChained {
+    -moz-box-shadow: 0px 0px 1px #444;
+    -webkit-box-shadow: 0px 0px 1px #444;
+    box-shadow: 0px 0px 1px #444;
 }
 
 ul.popupList li {
@@ -4595,7 +4787,7 @@ ul.popupList li a {
     vertical-align: bottom;
     padding: 4px;
     display: block;
-    list-style-type:none; 
+    list-style-type:none;
 }
 
 ul.popupList li a.selected {
@@ -4610,11 +4802,57 @@ ul.popupList li span {
 ul.popupList li a:hover {
     padding: 4px;
     display: block;
-    list-style-type:none; 
+    list-style-type:none;
     color: white;
     background: #5FA5D4;
 }
 
+ul.sectionPopupList {
+    padding: 5px;
+    max-width: 300px;
+    overflow: hidden;
+}
+
+ul.sectionPopupList ul.subPopupList {
+    padding: 0;
+    margin: 0 5px;
+}
+
+ul.sectionPopupList li a {
+    font-size: 10pt;
+}
+
+ul.sectionPopupList li a:hover {
+    background: #ECECEC;
+    color: #0B63A5;
+}
+
+ul.sectionPopupList li.section {
+    height: 25px;
+    display:block;
+}
+
+ul.sectionPopupList li.section .line {
+    height: 12px;
+    border-bottom: 1px dotted #777;
+    position: relative;
+    min-width: 200px;
+}
+
+ul.sectionPopupList li.section .name {
+    position: absolute;
+    top: 0; right: 0;
+    font-family: Verdana;
+    font-size: 9pt;
+    color: #666;
+    padding: 5px 10px;
+    background: white;
+}
+
+ul.timetableSectionPopupList ul.subPopupList {
+   max-height: 250px;
+   overflow-y: auto;
+}
 
 ul.globalMenuPopupList {
     background-color: #4e89b8;
@@ -4639,13 +4877,37 @@ ul.globalMenuPopupList li a {
 ul.globalMenuPopupList li a:hover {
     padding: 8px;
     display: block;
-    list-style-type:none; 
+    list-style-type:none;
     color: white;
     background: #5fa5d4;
 }
 
 ul.categoryDisplayPopupList li a {
     font-size: 11pt;
+}
+
+ul.popupListCheckboxes {
+    min-width: 200px;
+}
+
+ul.popupListCheckboxes li {
+    cursor: pointer;
+}
+
+ul.popupListCheckboxes li:hover {
+    opacity: 0.8;
+}
+
+ul.popupListCheckboxes li span {
+    display: inline;
+    cursor: pointer;
+    margin: 1px 0;
+    padding: 3px;
+}
+
+ul.popupListCheckboxes li input {
+    margin: 2px;
+    padding: 0;
 }
 
 ul.darkPopupList {
@@ -4664,17 +4926,59 @@ ul.darkPopupList li a:hover {
 ul.darkPopupList li a {
     color: #ECECEC;
     font-weight: normal;
+
 }
 
-.printButton, .printButtonWhite, .linkButtonWhite, .filterButtonWhite {
+ul.timetableManagementPopupList li a {
+    color: #2F2506;
+}
+
+ul.timetableManagementPopupList li a:hover {
+    color: #2F2506;
+    background: #F9F6E4;
+}
+
+div.timetableManagementInfoArea {
+    width: 50%;
+    background:#FFFFDD;
+    border: 1px solid #aaaaaa;
+    -moz-border-radius: 3px;
+    -webkit-border-radius:3px;
+    -moz-box-shadow:2px 2px 2px #888888;
+    margin-left: auto;
+    margin-right: auto;
+    behavior: url(border-radius.htc);
+    padding: 5px;
+    font-size: 8pt;
+    position: relative;
+}
+
+div.timetableManagementInfoArea div {
+    padding:5px;
+}
+
+div.timetableManagementInfoArea ul {
+    top: 2px;
+    padding-left: 10px;
+    margin-top: 5px;
+    margin-bottom:10px;
+    list-style: none;
+    margin-left: 5px;
+}
+
+div.timetableManagementInfoArea ul li{
+    padding-left: 0px;
+    overflow: auto;
+    margin-bottom:5px;
+}
+
+.printButton, .printButtonWhite, .buttonWhite, .buttonWhite, .dropDownMenuButtonWhite {
     padding: 4px 6px;
     margin-left: 6px;
     cursor: pointer;
 }
 
-.filterButtonWhite {
-    -webkit-border-bottom-right-radius: 3px;
-    -moz-border-radius-bottomright: 3px;
+.printButtonWhite, .buttonWhite, .buttonWhite, .dropDownMenuButtonWhite {
     color: white;
 }
 
@@ -4685,15 +4989,19 @@ ul.darkPopupList li a {
 
 .printButtonWhite {
     padding-left: 20px;
-    color: white;
     background: transparent url('../images/printer_white.png') scroll no-repeat center left;
 }
 
 .linkButtonWhite {
     padding-left: 20px;
-    color: white;
     background: transparent url('../images/link_white.png') scroll no-repeat center left;
 }
+
+.dropDownMenuButtonWhite {
+    padding-right: 20px;
+    background: transparent url(../images/menu_arrow_white.png) scroll no-repeat center right;
+}
+
 
 
 /* MODIF DISPLAY*/
@@ -4746,12 +5054,15 @@ div.cssPreview {
 }
 
 .roomWidget {
-    padding: 4px;
 }
 
-.roomWidget th{
-    font-size: 11pt;
+.roomWidget th .roomWidgetTitle {
+    font-size: 10pt;
     color: #444444;
+    font-family: Verdana;
+    text-align: left;
+    font-weight: normal;
+    margin-right: 10px;
     text-align: left;
 }
 
@@ -4821,9 +5132,9 @@ div.CategoryEventListDiv {
 .searchResultDescription {
     font-size: 10pt;
     color: #666666;
-    margin: 5px; 
-    margin-left: 10px; 
-    padding: 5px; 
+    margin: 5px;
+    margin-left: 10px;
+    padding: 5px;
 }
 
 
@@ -5078,4 +5389,89 @@ div.dialogButtons {
     padding: 10px;
     margin-top: 5px;
     margin-bottom: 5px;
+}
+
+div.flexibleSelect {
+    border: 1px solid #AAAAAA;
+    position: relative;
+    width: 200px;
+}
+
+div.flexibleSelect input {
+    color: black;
+}
+
+div.flexibleSelect input[disabled]{
+    background: white;
+}
+
+div.disabled {
+    background: #DDDDDD;
+}
+
+div.disabled input {
+    color: #AAAAAA;
+    background: #DDDDDD;
+}
+
+div.disabled input[disabled] {
+    background: #DDDDDD;
+}
+
+.optionBox {
+    border: 1px solid #888888;
+    width: 200px;
+    overflow: hidden;
+    background-color: white;
+}
+
+.optionBoxList {
+    background-color: #FFFFFF;
+    padding: 3px;
+    margin: 0 0 0 0;
+    max-height: 200px;
+    overflow: auto;
+}
+
+.bottomLine {
+    border-bottom:1px dotted #DDDDDD;
+}
+
+.optionBoxList li {
+    list-style-type: none;
+    padding: 3px;
+    cursor: pointer;
+}
+
+.optionBoxAdd {
+    padding: 5px;
+    background: #F3F3F3;
+}
+
+.optionBoxList li:hover {
+    background-color: #FFF6DF;
+}
+
+.enhanced {
+    font-weight: bold;
+}
+
+div.posterEntry {
+    border: 1px solid #aaaaaa;
+    -moz-border-radius: 3px;
+    -webkit-border-radius:3px;
+    behavior: url(border-radius.htc);
+    padding: 5px;
+    margin-bottom: 5px;
+    overflow: auto;
+}
+
+div.posterEntry:hover {
+    background-color: #ECECEC;
+}
+
+.posterBlockTime {
+    font-size: 8pt;
+    float: right;
+    margin-top: 5px;
 }

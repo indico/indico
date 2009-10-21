@@ -36,7 +36,7 @@ def naive2local( naiveDateTime, localTimezone ):
     >>> naive2local(datetime(2008,8,25,0,0,0), 'Europe/Zurich')
     datetime.datetime(2008, 8, 25, 2, 0, tzinfo=<DstTzInfo 'Europe/Zurich' CEST+2:00:00 DST>)
     """
-    
+
     utcDateTime = naiveDateTime.replace(microsecond=0, tzinfo=timezone('UTC'))
     localDateTime = utcDateTime.astimezone(timezone(localTimezone))
     return localDateTime
@@ -48,7 +48,7 @@ def setAdjustedDate(date, object = None, tz=None):
         tz = object.getTimezone()
     if tz not in common_timezones:
         tz = 'UTC'
-    return timezone(tz).localize(date)
+    return timezone(tz).localize(date).astimezone(timezone('UTC'))
 
 def getAdjustedDate(date, object = None, tz=None):
     # Returns a date adjusted to the timezone tz

@@ -45,16 +45,16 @@ type("ChainedPopupWidget", ["PopupWidget"],
 
              IndicoUtil.onclickHandlerAdd(this.handler);
          },
-         
+
          postDraw: function () {
              if (this.alignRight) {
                  // Hide it to avoid flickering
                  this.canvas.dom.style.visibility = 'hidden';
-                 
+
                  // Place it to the left in order to measure the width
                  // if placed to the right it might be to wide for the page
                  this.canvas.dom.style.left = 0;
-                 
+
                  // Align right side of the canvas to the x position given
                  this.canvas.dom.style.left = pixels(this.x - this.canvas.dom.offsetWidth);
 
@@ -79,75 +79,114 @@ type("ChainedPopupWidget", ["PopupWidget"],
 
 type("PopupMenu", ["ChainedPopupWidget"],
      {
-         draw: function(x, y) {
-             var self = this;
+        _processItem: function(pair) {
+            var self = this;
+            var value = pair.get();
+            var link = Html.a('fakeLink', pair.key);
 
-             // create an Html.ul from the items that
-             // were provided through the constructor
-             var content = $B(Html.ul(self.cssClass), this.items,
-                 function(pair) {
-                     var value = pair.get();
-                     var link = Html.a({href: '#'}, pair.key);
-                     
-                     if(typeof value == "string" ) {
-                         link.setAttribute('href', value);
-                         if (self.closeOnClick) {
-                             link.observeClick(function() {
-                                 self.close();
-                             });
-                         }
-                     }
-                     else {
-                         link.observeClick(pair.get().PopupWidget?
-                                           function(e) {
-    
-                                               if (self.selected) {
-                                                   self.selected.dom.className = null;
-                                                   self.selected = null;
-                                               }
-    
-                                               link.dom.className = 'selected';
-                                               self.selected = link;
-    
-                                               var pos = listItem.getAbsolutePosition();
-    
-                                               each(self.items, function(item, key) {
-                                                   if (item.isOpen()) {
-                                                       item.close();
-                                                   }
-                                               });
-    
-                                               IndicoUtil.onclickHandlerRemove(self.handler);
-                                               pair.get().open(pos.x + link.dom.offsetWidth, pos.y - 1);
-                                               
-                                               if (self.closeOnClick) {
-                                                   self.close();
-                                               }
-                                               
-                                               return false;
-                                           }:
-                                           function() {
-                                               // assume it's a callback function
-                                               pair.get()(self);
-                                           });
-                     }
+            if(typeof value == "string" ) {
+                link.setAttribute('href', value);
+                if (self.closeOnClick) {
+                    link.observeClick(function() {
+                        self.close();
+                    });
+                }
+            }
+            else {
+                link.observeClick(pair.get().PopupWidget?
+                                  function(e) {
 
-                     var listItem = Html.li({},
-                         link);
-                     return listItem;
-                 });
+                                      if (self.selected) {
+                                          self.selected.dom.className = null;
+                                          self.selected = null;
+                                      }
 
-             return this.PopupWidget.prototype.draw.call(this, content, x, y);
+                                      link.dom.className = 'selected';
+                                      self.selected = link;
 
-         }
-     },
-     function(items, chainElements, cssClass, closeOnClick, alignRight) {
-         this.ChainedPopupWidget(chainElements, alignRight);
-         this.items = items;
-         this.selected = null;
-         this.cssClass = "popupList " + any(cssClass,"");
-         this.closeOnClick = any(closeOnClick, false);
-     });
+                                      var pos = listItem.getAbsolutePosition();
+
+                                      each(self.items, function(item, key) {
+                                          if (item.PopupWidget && item.isOpen()) {
+                                              item.close();
+                                          }
+                                      });
+
+                                      IndicoUtil.onclickHandlerRemove(self.handler);
+                                      var target = pair.get()
+                                      target.open(pos.x + (target.alignRight ? 0 : link.dom.offsetWidth), pos.y - 1);
+
+                                      return false;
+                                  }:
+                                  function() {
+                                      // assume it's a callback function
+                                      pair.get()(self);
+                                      if (self.closeOnClick) {
+                                          self.close();
+                                      }
+                                  });
+            }
+
+            var listItem = Html.li({},
+                link);
+            return listItem;
+        },
+        close: function() {
+            if(this.closeHandler()) {
+                this.ChainedPopupWidget.prototype.close.call(this);
+            }
+        },
+        draw: function(x, y) {
+            var self = this;
+
+            // create an Html.ul from the items that
+            // were provided through the constructor
+            var content = $B(Html.ul(self.cssClass), this.items, function(pair) {
+                return self._processItem(pair);
+            });
+
+            return this.PopupWidget.prototype.draw.call(this, content, x, y);
+        }
+    },
+    function(items, chainElements, cssClass, closeOnClick, alignRight, closeHandler) {
+        this.ChainedPopupWidget(chainElements, alignRight);
+        this.items = items;
+        this.selected = null;
+        this.cssClass = "popupList " + any(cssClass,"");
+        this.closeOnClick = any(closeOnClick, false);
+        this.closeHandler = any(closeHandler, function() {return true;});
+    }
+);
+
+type("SectionPopupMenu", ["PopupMenu"], {
+        draw: function(x, y) {
+            var self = this;
+
+            var sectionContent = Html.ul(self.cssClass);
+
+            each(this.items, function(item, key) {
+                var section = null;
+                if (key != ""){
+                    section = Html.li('section', Html.div('line', Html.div('name', key)));
+                }
+
+                // add the menu items
+                var tmp = $B(Html.ul('subPopupList'), item, self._processItem);
+                sectionContent.append(Html.li({}, section, tmp));
+            });
+
+            return this.PopupWidget.prototype.draw.call(this, sectionContent, x, y);
+        }
+        },
+        function(items, chainElements, cssClass, closeOnClick, alignRight, closeHandler) {
+            this.ChainedPopupWidget(chainElements, alignRight);
+            this.items = items;
+            this.selected = null;
+            this.cssClass = "popupList sectionPopupList " + any(cssClass,"");
+            this.closeOnClick = any(closeOnClick, false);
+            this.closeHandler = any(closeHandler, function() {return true;});
+        }
+);
 
 type("RadioPopupWidget", ["ChainedPopupWidget"],
      {
@@ -216,7 +255,7 @@ type("CheckPopupWidget", ["ChainedPopupWidget"],
                  return this.PopupWidget.prototype.draw.call(this, content, x, y, styles);
              }
              var content = $B(Html.ul({
-                 className: "popupList",
+                 className: "popupList popupListCheckboxes",
                  style: {maxHeight: pixels(maxHeight), overflowY: 'auto', overflowX: 'hidden', padding: pixels(2)}
              }),
                               this.options,
@@ -224,11 +263,34 @@ type("CheckPopupWidget", ["ChainedPopupWidget"],
                                   var optionCheck = Html.checkbox({});
 				  				  optionCheck.dom.name = optionsId;
 
+				  				  optionCheck.observeClick(function(e) {
+				  				      // Make sure the onclick event is not captured by
+				  				      // parent elements as this would undo the click on the
+				  				      // checkbox.
+				  				      if (!e) var e = window.event;
+				  				      e.cancelBubble = true
+				  				      if (e.stopPropagation) e.stopPropagation();
+			  				      });
+
                                   self.checkboxes[pair.key] = optionCheck;
                                   $B(optionCheck, self.object.accessor(pair.key));
 
-                                  return Html.li({},
-                                                 Html.span({style: {padding: '0px 4px 2px 0px'}}, optionCheck, pair.get()));
+                                  var color = self.colors.get(pair.key);
+                                  if (!color)
+                                      color = 'transparent';
+                                  var textColor = self.textColors.get(pair.key);
+                                  if (!textColor)
+                                      textColor = 'black';
+
+                                  //var span = Html.div({className: 'item', style: {cursor: 'pointer'}}, )
+                                  var span = Html.span('wrapper', pair.get());
+
+                                  var li = Html.li({ style: {backgroundColor: color, color: textColor, marginBottom: '2px'}}, optionCheck, span);
+
+                                  li.observeClick(function() {
+                                      self.object.set(pair.key, !self.object.get(pair.key));
+                                  });
+                                  return li;
                               }
                              );
 
@@ -247,11 +309,263 @@ type("CheckPopupWidget", ["ChainedPopupWidget"],
          }
      },
 
-     function(options, object, chainElements, noOptionsMessage) {
+     function(options, object, colors, textColors, chainElements, noOptionsMessage) {
          this.ChainedPopupWidget(chainElements);
          this.options = options;
          this.object = object;
+         this.colors = colors;
+         this.textColors = textColors;
 
          // A message to be shown if the the dict of options is empty
          this.noOptionsMessage = any(noOptionsMessage, null);
      });
+
+type("ColorPicker", ["WatchValue", "ChainedPopupWidget"], {
+    defaultColors: [
+        {bgColor: '#EEE0EF', textColor: '#1D041F'},
+        {bgColor: '#E3F2D3', textColor: '#253F08'},
+        {bgColor: '#FEFFBF', textColor: '#1F1F02'},
+        {bgColor: '#DFE555', textColor: '#202020'},
+        {bgColor: '#FFEC1F', textColor: '#1F1D04'},
+        {bgColor: '#DFEBFF', textColor: '#0F264F'},
+        {bgColor: '#0D316F', textColor: '#EFF5FF'},
+        {bgColor: '#1A3F14', textColor: '#F1FFEF'},
+        {bgColor: '#5F171A', textColor: '#FFFFFF'},
+        {bgColor: '#D9DFC3', textColor: '#272F09'},
+        {bgColor: '#4F144E', textColor: '#FFEFFF'},
+        {bgColor: '#6F390D', textColor: '#FFEDDF'},
+        {bgColor: '#8ec473', textColor: '#021F03'},
+        {bgColor: '#92b6db', textColor: '#03070F'},
+        {bgColor: '#DFDFDF', textColor: '#151515'},
+        {bgColor: '#ecc495', textColor: '#1F1100'},
+        {bgColor: '#b9cbca', textColor: '#0F0202'},
+        {bgColor: '#C2ECEF', textColor: '#0D1E1F'},
+        {bgColor: '#d0c296', textColor: '#000000'},
+        {bgColor: '#EFEBC2', textColor: '#202020'}
+    ],
+    draw: function(x, y) {
+        var self = this;
+
+        var colorInputChanged = function(colorType, color, previewBlock) {
+            if (!self._validateColor(color)) {
+                previewBlock.set('x');
+                previewBlock.dom.style.backgroundColor = 'transparent';
+            } else {
+                previewBlock.set('');
+                previewBlock.dom.style.backgroundColor = color;
+
+                var colors = clone(self.get());
+                colors[colorType] = color;
+                self.set(colors);
+            }
+        };
+        var updateColorInput = function(color, inputElement, previewBlock) {
+            if (!color)
+                return;
+
+            previewBlock.dom.style.backgroundColor = color;
+            inputElement.set(color.substr(1, color.length-1));
+        };
+        var createColorInput = function(colorType) {
+            var input = Html.edit();
+            var preview = Html.div('previewBlock');
+
+            input.observeEvent('keyup', function() {
+                colorInputChanged(colorType, '#' + input.get(), preview);
+            });
+            self.observe(function(colors) {
+                updateColorInput(colors[colorType], input, preview);
+            });
+
+            updateColorInput(self.get()[colorType], input, preview);
+
+            return Html.div('inputWrapper', preview, Html.div('inputContainer clearfix', Html.div('numberSign', '#'), input));
+        }
+
+        var tbody = Html.tbody({});
+        var tr;
+        var i = 0;
+        each(self.defaultColors, function(c) {
+            if (i++ % 5 == 0) {
+                tr = Html.tr();
+                tbody.append(tr);
+            }
+
+            var colorBlock = Html.div({className: 'block', style: {
+                backgroundColor: c.bgColor,
+                color: c.textColor
+            }}, 'e');
+
+            colorBlock.observeClick(function (e) {
+                self.set(c);
+                self.close();
+            });
+            tr.append(Html.td({}, colorBlock));
+        });
+
+        var div = Html.div('colorPicker');
+
+        // Close the color picker if user presses Esc button
+        div.observeEvent('keyup', function(e) {
+            if (e.keyCode == 27)
+                self.close();
+        });
+
+        div.append(Html.table({}, tbody));
+        var tbody = Html.tbody({});
+        var customTable = Html.table({className: 'custom', cellspacing: '0', cellpadding: '0', border: '0'}, tbody);
+
+        tbody.append(Html.tr({}, Html.td({}, 'Block'), Html.td({}, createColorInput('bgColor'))));
+        tbody.append(Html.tr({}, Html.td({}, 'Text'), Html.td({}, createColorInput('textColor'))));
+
+        div.append(customTable);
+
+        /*
+         * If the current color is a custom color (that is, if it's not among the default ones)
+         * then show the custom color fields by default
+         */
+        var currentColors = this.get();
+        var showCustom = true;
+        for (var i in this.defaultColors) {
+            colors = this.defaultColors[i];
+            if (colors.textColor == currentColors.textColor &&
+                colors.bgColor == currentColors.bgColor) {
+                showCustom = false;
+                break;
+            }
+        }
+        if (!showCustom) {
+            var customLink = Html.a({className: 'fakeLink', style: {fontSize: '0.8em'}}, 'Custom colors');
+            customTable.dom.style.display = 'none';
+            customLink.observeClick(function () {
+                customTable.dom.style.display = 'block';
+                customLink.dom.style.display = 'none';
+            });
+            div.append(Html.div({style: {textAlign: 'right', margin: '3px 5px'}}, customLink));
+        }
+
+        return this.PopupWidget.prototype.draw.call(this, div, x, y);
+    },
+    /*
+     * Returns an clickable link that opens the color selector. If a onclick
+     * function is provided it will be called and the color picker opened if it
+     * returns true
+     */
+    getLink: function(onclick, text) {
+        var self = this;
+
+        var text = any(text, $T('Color'));
+        var onclick = any(onclick, function () { return true; });
+
+        this.link = Html.span('colorPickerLink', Html.span({},text));
+
+        this._updateLink(this.get());
+
+        this.observe(function(colors) { self._updateLink(colors) });
+
+        this.chainElements.push(this.link);
+
+        this.link.observeClick(function() {
+            if (self.active) {
+                self.close();
+            } else if (onclick()) {
+                var pos = self.link.getAbsolutePosition();
+                pos.y += self.link.dom.offsetHeight;
+                if (self.alignRight)
+                    pos.x += self.link.dom.offsetWidth;
+                self.open(pos.x + 3, pos.y + 2);
+            }
+        });
+
+        return this.link;
+    },
+    /*
+     * Sets the text and background colors
+     * @param {string} textColor value (HEX value)
+     * @param {string} bgColor value (HEX value)
+     */
+    setColors: function(textColor, bgColor) {
+        this.set({
+            textColor: textColor,
+            bgColor: bgColor
+        });
+    },
+    getTextColor: function() {
+        return this.get().textColor;
+    },
+    getBgColor: function() {
+        return this.get().bgColor;
+    },
+    _validateColor: function(color) {
+        var regexp = new RegExp("^#?([a-f]|[A-F]|[0-9]){3}(([a-f]|[A-F]|[0-9]){3})?$");
+        return regexp.test(color);
+    },
+    /*
+     * Randomly returns a color among the default colors
+     */
+    _getRandomColors: function() {
+        var rand = Math.floor(Math.random()*this.defaultColors.length)
+        return this.defaultColors[rand];
+    },
+    /*
+     * When clicking on a color update the color picker link (if there is one)
+     */
+    _updateLink: function(colors) {
+        if (!exists(this.link))
+            return;
+
+        var cssClass = 'dropDownMenu';
+
+        if (colors.bgColor) {
+            this.link.dom.style.backgroundColor = colors.bgColor;
+
+            if (this._colorIsDark(colors.bgColor)) {
+                cssClass = 'dropDownMenuGrey';
+            }
+        }
+
+        var tmp = this.link.dom.childNodes[0];
+        if (colors.textColor) {
+            tmp.style.color = colors.textColor;
+        }
+        tmp.className = 'fakeLink ' + cssClass;
+    },
+    /*
+     * Calculates if a color should be considered as dark or light.
+     * Returns true if color is dark.
+     */
+    _colorIsDark: function(color) {
+         // Handle the case with color string having 3 chars length
+         if (color.length == 4) {
+             var tmp = "#";
+             for (var i in color)
+                 if (i != 0)
+                     tmp += color[i] + color[i];
+             color = tmp;
+         }
+         var rgb = [
+                    parseInt(color.substr(1,2), 16),
+                    parseInt(color.substr(3,2), 16),
+                    parseInt(color.substr(5,2), 16)
+         ];
+
+         return Math.floor((rgb[0] + rgb[1] + rgb[2]) / 3) < 128;
+    }
+    },
+    function(chainElements, alignRight, bgColor, textColor) {
+        this.triggerElement = chainElements[0];
+        this.ChainedPopupWidget(chainElements, alignRight);
+
+        // If colors not provided, select random ones
+        if (!exists(textColor) || !exists(bgColor)) {
+            var c = this._getRandomColors();
+            textColor = c.textColor;
+            bgColor = c.bgColor;
+        }
+
+        this.WatchValue({
+            'textColor': textColor,
+            'bgColor': bgColor
+        });
+    }
+);

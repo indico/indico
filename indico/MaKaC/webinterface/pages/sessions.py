@@ -29,7 +29,7 @@ import MaKaC.webinterface.navigation as navigation
 import MaKaC.schedule as schedule
 import MaKaC.conference as conference
 import MaKaC.webinterface.linking as linking
-from MaKaC.webinterface.pages.conferences import WScheduleContribution, WConfModifScheduleGraphicOverview, WPConferenceBase, WPConfModifScheduleGraphic, WPConferenceDefaultDisplayBase, WContribParticipantList, WContributionCreation, WContributionSchCreation, WPModScheduleNewContribBase, WPConferenceModifBase
+from MaKaC.webinterface.pages.conferences import WScheduleContribution, WPConferenceBase, WPConfModifScheduleGraphic, WPConferenceDefaultDisplayBase, WContribParticipantList, WContributionCreation, WContributionSchCreation, WPModScheduleNewContribBase, WPConferenceModifBase
 from MaKaC.common import Config, info
 from MaKaC.errors import MaKaCError
 import MaKaC.webinterface.timetable as timetable
@@ -43,6 +43,8 @@ from MaKaC import user
 from MaKaC.i18n import _
 
 from pytz import timezone
+from MaKaC.common.PickleJar import DictPickler
+import simplejson
 import pytz
 import copy
 import MaKaC.webinterface.common.timezones as convertTime
@@ -50,7 +52,7 @@ import MaKaC.common.timezoneUtils as timezoneUtils
 
 
 class WPSessionBase( WPConferenceBase ):
-    
+
     def __init__( self, rh, session):
         self._session = session
         WPConferenceBase.__init__( self, rh, self._session.getConference() )
@@ -60,12 +62,12 @@ class WPSessionDisplayBase( WPSessionBase ):
     pass
 
 class WPSessionDefaultDisplayBase( WPConferenceDefaultDisplayBase, WPSessionDisplayBase ):
-    
+
     def __init__( self, rh, session ):
         WPSessionDisplayBase.__init__( self, rh, session )
 
 class WContributionDisplayItemBase(wcomponents.WTemplated):
-    
+
     def __init__(self,aw,contrib):
         self._contrib=contrib
         self._aw=aw
@@ -107,7 +109,7 @@ class WContributionDisplayItemMin(WContributionDisplayItemBase):
 
 
 class WContributionDisplayItem:
-    
+
     def __init__( self, aw, contrib ):
         self._contribution = contrib
         self._aw = aw
@@ -131,7 +133,7 @@ class WContributionDisplayPosterItemMin(WContributionDisplayItemBase):
 
 
 class WContributionDisplayPosterItem:
-    
+
     def __init__( self, aw, contrib ):
         self._contribution = contrib
         self._aw = aw
@@ -163,22 +165,22 @@ class _NoWitdhdrawFF(filters.FilterField):
 
 
 class _NoWithdrawnFilterCriteria(filters.FilterCriteria):
-    
+
     def __init__(self,conf):
         self._fields={"no_withdrawn":_NoWitdhdrawFF()}
 
 
 class WSessionDisplayBase(wcomponents.WTemplated):
-    
+
     def __init__(self,aw,session,activeTab="time_table",sortingCrit=None):
         self._aw=aw
         self._session=session
         self._activeTab=activeTab
         self._sortingCrit=sortingCrit
         self._tz = timezoneUtils.DisplayTZ(self._aw,self._session.getConference()).getDisplayTZ()
-    
+
     def _getHTMLRow(self,title,body):
-        str = """ 
+        str = """
                 <tr>
                     <td nowrap class="displayField" valign="top"><b>%s:</b></td>
                     <td>%s</td>
@@ -205,13 +207,13 @@ class WSessionDisplayBase(wcomponents.WTemplated):
             if tab is None:
                 tab=self._tabCtrl.getTabById("time_table")
             tab.setActive()
-            
+
     def _getURL(self,sortByField):
         url=urlHandlers.UHSessionDisplay.getURL(self._session)
         url.addParam("tab",self._activeTab)
         url.addParam("sortBy",sortByField)
         return url
-        
+
     def _getContribListHTML(self):
         cl = []
         if self._sortingCrit is None:
@@ -327,7 +329,7 @@ class WSessionDisplayBase(wcomponents.WTemplated):
                 quoteattr(str(Config.getInstance().getSystemIconURL( "smallVideo" ))),
                 self.htmlText("video")))
         return ", ".join(lm)
-    
+
     def _getContributionHTML(self,contrib):
         URL=urlHandlers.UHContributionDisplay.getURL(contrib)
         room = ""
@@ -387,8 +389,8 @@ class WSessionDisplayBase(wcomponents.WTemplated):
 
     def _getTimeTableHTML(self):
 
-        timeTable=timetable.TimeTable(self._session.getSchedule(),self._tz) 
-        sDate,eDate=self._session.getAdjustedStartDate(self._tz),self._session.getAdjustedEndDate(self._tz) 
+        timeTable=timetable.TimeTable(self._session.getSchedule(),self._tz)
+        sDate,eDate=self._session.getAdjustedStartDate(self._tz),self._session.getAdjustedEndDate(self._tz)
         timeTable.setStartDate(sDate)
         timeTable.setEndDate(eDate)
         tz = self._session.getTimezone()
@@ -412,7 +414,7 @@ class WSessionDisplayBase(wcomponents.WTemplated):
                         slotList.append("".join(hourSlots))
                     hourSlots,hourNeedsDisplay=[],False
                 remColSpan=maxOverlap
-                temp=[]                
+                temp=[]
                 for entry in slot.getEntryList():
                     hourNeedsDisplay=True
                     if len(slot.getEntryList()):
@@ -443,7 +445,7 @@ class WSessionDisplayBase(wcomponents.WTemplated):
                         temp = ["<td></td>"]
                     slotHTML = """<tr>%s</tr>"""%"".join(temp)
                 hourSlots.append(slotHTML)
-                
+
                 if slot == day.getSlotList()[-1]:
                     if hourNeedsDisplay:
                         slotList.append("".join(hourSlots))
@@ -453,7 +455,7 @@ class WSessionDisplayBase(wcomponents.WTemplated):
                 <table align="center" width="100%%">
                     <tr>
                         <td width="100%%">
-                            <table align="center" border="0" width="100%%" 
+                            <table align="center" border="0" width="100%%"
                                     celspacing="0" cellpadding="0" bgcolor="#E6E6E6">
                                 <tr>
                                     <td colspan="%i" align="center" bgcolor="white"><b>%s</b></td>
@@ -483,14 +485,14 @@ class WSessionDisplayBase(wcomponents.WTemplated):
 
     def getVars(self):
         vars=wcomponents.WTemplated.getVars( self )
-        
+
         vars["title"]=self.htmlText(self._session.getTitle())
-        
+
         if self._session.getDescription():
             desc = self._session.getDescription().strip()
         else:
             desc = ""
-        
+
         if desc!="":
             vars["description"]="""
                 <tr>
@@ -499,7 +501,7 @@ class WSessionDisplayBase(wcomponents.WTemplated):
                                 """%desc
         else:
             vars["description"]=""
-                                
+
         tzUtil = timezoneUtils.DisplayTZ(self._aw,self._session.getOwner())
         tz = tzUtil.getDisplayTZ()
         sDate=self._session.getAdjustedStartDate(tz)
@@ -603,7 +605,7 @@ class WSessionDisplay:
 
 class WPSessionDisplay( WPSessionDefaultDisplayBase ):
     navigationEntry = navigation.NESessionDisplay
-    
+
     def _getBody(self,params):
         wc=WSessionDisplay(self._getAW(),self._session)
         return wc.getHTML({"activeTab":params["activeTab"],
@@ -629,43 +631,46 @@ class WPSessionDisplay( WPSessionDefaultDisplayBase ):
 
 
 class WPSessionModifBase( WPConferenceModifBase ):
-    
+
     def __init__(self, rh, session):
         WPConferenceModifBase.__init__(self, rh, session.getConference())
         self._session = session
 
     def _setActiveSideMenuItem( self ):
         self._timetableMenuItem.setActive()
-    
+
     def _createTabCtrl( self ):
         type = self._session.getConference().getType()
         self._tabCtrl = wcomponents.TabControl()
         self._tabMain = self._tabCtrl.newTab( "main", _("Main"), \
                 urlHandlers.UHSessionModification.getURL( self._session ) )
-        self._tabMaterials = self._tabCtrl.newTab( "materials", _("Files"), \
-                urlHandlers.UHSessionModifMaterials.getURL( self._session ) )
         self._tabContribs=self._tabCtrl.newTab( "contribs", _("Contributions"), \
                 urlHandlers.UHSessionModContribList.getURL(self._session) )
+        self._tabTimetable=self._tabCtrl.newTab( "sessionTimetable", _("Session timetable"), \
+                urlHandlers.UHSessionModifSchedule.getURL(self._session) )
+        self._tabComm = self._tabCtrl.newTab( "comment", _("Comment"), \
+                urlHandlers.UHSessionModifComm.getURL( self._session ) )
+        self._tabMaterials = self._tabCtrl.newTab( "materials", _("Files"), \
+                urlHandlers.UHSessionModifMaterials.getURL( self._session ) )
         self._tabAC = self._tabCtrl.newTab( "ac", _("Protection"), \
                 urlHandlers.UHSessionModifAC.getURL( self._session ) )
         canCoord=self._session.canCoordinate(self._getAW())
         canModify=self._session.canModify(self._getAW())
         self._tabAC.setEnabled(canModify)
+        self._tabMaterials.setEnabled(canModify)
         self._tabTools = self._tabCtrl.newTab( "tools", _("Tools"), \
                 urlHandlers.UHSessionModifTools.getURL( self._session ) )
         self._tabTools.setEnabled(canModify)
-        self._tabComm = self._tabCtrl.newTab( "comment", _("Comment"), \
-                urlHandlers.UHSessionModifComm.getURL( self._session ) )
         self._setActiveTab()
         self._setupTabCtrl()
         if type != "conference":
             self._tabContribs.disable()
 
-    def _setActiveTab( self ):        
+    def _setActiveTab( self ):
         pass
 
     def _setupTabCtrl(self):
-        pass     
+        pass
 
     def _getNavigationDrawer(self):
         pars = {"target": self._session, "isModif": True }
@@ -673,14 +678,14 @@ class WPSessionModifBase( WPConferenceModifBase ):
 
     def _getPageContent( self, params ):
         self._createTabCtrl()
-        
+
         banner = wcomponents.WTimetableBannerModif(self._session).getHTML()
         body = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
         return banner + body
 
 
 class WSessionModifClosed(wcomponents.WTemplated):
-    
+
     def __init__(self):
         pass
 
@@ -688,14 +693,14 @@ class WSessionModifClosed(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars(self)
         vars["closedIconURL"] = Config.getInstance().getSystemIconURL("closed")
         return vars
-        
+
 class WSessionModifMainType(wcomponents.WTemplated):
-    
+
     def __init__(self):
         pass
-        
+
     def getVars( self ):
-        vars=wcomponents.WTemplated.getVars(self)  
+        vars=wcomponents.WTemplated.getVars(self)
         l=[]
         currentTTType=vars.get("tt_type",conference.SlotSchTypeFactory.getDefaultId())
         for i in conference.SlotSchTypeFactory.getIdList():
@@ -706,28 +711,28 @@ class WSessionModifMainType(wcomponents.WTemplated):
                         sel,self.htmlText(i)))
         vars["tt_types"]="".join(l)
         return vars
-        
+
 class WSessionModifMainCode(wcomponents.WTemplated):
-    
+
     def __init__(self):
         pass
-        
+
     def getVars( self ):
-        vars=wcomponents.WTemplated.getVars(self) 
+        vars=wcomponents.WTemplated.getVars(self)
         vars["code"]=str(vars.get("code",""))
         return vars
-    
+
 class WSessionModifMainColors(wcomponents.WTemplated):
-    
+
     def __init__(self):
         pass
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         return vars
-    
+
 class WSessionModifMain(wcomponents.WTemplated):
-    
+
     def __init__( self, session, mfRegistry ):
         self._session = session
         self._mfr = mfRegistry
@@ -742,13 +747,13 @@ class WSessionModifMain(wcomponents.WTemplated):
                     quoteattr(str(url)), \
                     self.htmlText(conv.getFullName())))
         return "<br>".join(res)
-        
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["addMaterialURL"]=urlHandlers.UHSessionAddMaterial.getURL(self._session)
         vars["removeMaterialsURL"]=urlHandlers.UHSessionRemoveMaterials.getURL()
         modifyMaterialURLGen=urlHandlers.UHMaterialModification.getURL
-                
+
         newConvenerURL = urlHandlers.UHSessionDataModificationNewConvenerCreate.getURL(self._session)
         vars["newConvenerURL"] = newConvenerURL
         searchConvenerURL = urlHandlers.UHSessionDataModificationNewConvenerSearch.getURL(self._session)
@@ -765,12 +770,12 @@ class WSessionModifMain(wcomponents.WTemplated):
         place=self._session.getLocation()
         if place is not None:
             vars["place"] = "%s<br><pre>%s</pre>"%(\
-                                            self.htmlText(place.getName()), 
+                                            self.htmlText(place.getName()),
                                             self.htmlText(place.getAddress()))
         room=self._session.getRoom()
         if room is not None:
             vars["place"]+="<i>Room:</i> %s"%self.htmlText(room.getName())
-        vars["startDate"],vars["endDate"],vars["duration"]="","","" 
+        vars["startDate"],vars["endDate"],vars["duration"]="","",""
         if self._session.getAdjustedStartDate() is not None:
             tz = self._session.getTimezone()
             vars["startDate"]=self.htmlText(self._session.getAdjustedStartDate().strftime("%A %d %B %Y %H:%M"))
@@ -806,7 +811,7 @@ class WPSessionModificationClosed( WPSessionModifBase ):
         self._tabCtrl = wcomponents.TabControl()
         self._tabMain = self._tabCtrl.newTab( "main",_("Main"), "")
         self._setActiveTab()
-        
+
     def _getTabContent( self, params ):
         comp=WSessionModifClosed()
         return comp.getHTML()
@@ -814,7 +819,7 @@ class WPSessionModificationClosed( WPSessionModifBase ):
 #------------------------------------------------------------------------------------
 
 class WPSessionDataModification(WPSessionModification):
-    
+
     def _getTabContent(self,params):
         title="Edit session data"
         p=wcomponents.WSessionModEditData(self._session.getConference(),self._getAW(),title)
@@ -833,12 +838,12 @@ class WPSessionDataModification(WPSessionModification):
         params["textColorToLinks"]=""
         if self._session.isTextColorToLinks():
             params["textColorToLinks"]="checked=\"checked\""
-        
+
         #wconvener = wcomponents.WAddPersonModule("convener")
         #params["convenerDefined"] = self._getDefinedDisplayList("convener")
         #params["convenerOptions"] = ""
         #params["convener"] = wconvener.getHTML(params)
-        params["convener"] = ""    
+        params["convener"] = ""
         return p.getHTML(params)
 
     def _getDefinedDisplayList(self, typeName):
@@ -857,16 +862,16 @@ class WPSessionDataModification(WPSessionModification):
              counter = counter + 1
          return """
              """.join(html)
-    
+
 #---------------------------------------------------------------------------
 
 class WPSessionDataModificationConvenerSelect( WPSessionModifBase):
-    
+
     #def _setActiveTab( self ):
     #    self._tabContribList.setActive()
-        
+
     def _getTabContent( self, params ):
-        searchAction = str(self._rh.getCurrentURL())        
+        searchAction = str(self._rh.getCurrentURL())
         newButtonAction = params["newButtonAction"]
         searchExt = params.get("searchExt","")
         if searchExt != "":
@@ -879,13 +884,13 @@ class WPSessionDataModificationConvenerSelect( WPSessionModifBase):
 #---------------------------------------------------------------------------
 
 class WPSessionDataModificationConvenerNew(WPSessionModifBase):
-    
+
     #def _setActiveTab( self ):
     #    self._tabContribList.setActive()
-        
+
     def _getTabContent( self, params ):
         p = wcomponents.WNewPerson()
-        
+
         if params.get("formTitle",None) is None :
             params["formTitle"] =_("Define new convener")
         if params.get("titleValue",None) is None :
@@ -904,8 +909,8 @@ class WPSessionDataModificationConvenerNew(WPSessionModifBase):
             params["phoneValue"] = ""
         if params.get("faxValue",None) is None :
             params["faxValue"] = ""
-        
-        
+
+
         params["disabledRole"] = False
         params["roleDescription"] = _(""" _("Coordinator")<br> _("Manager")""")
         if params.has_key("submissionControlValue") :
@@ -916,23 +921,23 @@ class WPSessionDataModificationConvenerNew(WPSessionModifBase):
                                       <input type="checkbox" name="managerControl"> _("Give management rights to the convener").""")
         params["disabledNotice"] = True
         params["noticeValue"] = _("""<i><font color="black"><b> _("Note"): </b></font> _("If this person does not already have
-         an Indico account, he or she will be sent an email asking to create an account. After the account creation the 
+         an Indico account, he or she will be sent an email asking to create an account. After the account creation the
          user will automatically be given coordinator rights").</i>""")
-        
-        
+
+
         if params.get("formAction",None) is None :
             formAction = urlHandlers.UHSessionDataModificationPersonAdd.getURL(self._conf)
             formAction.addParam("sessionId",self._session.getId())
             formAction.addParam("orgin","new")
             formAction.addParam("typeName","convener")
             params["formAction"] = formAction
-        
+
         return p.getHTML(params)
 
 #---------------------------------------------------------------------------
 
 class WPModEditDataConfirmation(WPSessionModification):
-    
+
     def _getTabContent(self,params):
         wc=wcomponents.WConfirmation()
         msg= _("""You have selected to CHANGE THIS SESSION SCHEDULE TYPE from %s to %s, if you continue any contribution scheduled within any slot of the current session will be unscheduled, are you sure you want to continue?""")%(self._session.getScheduleType(),params["tt_type"])
@@ -941,7 +946,7 @@ class WPModEditDataConfirmation(WPSessionModification):
 
 
 class WPModConvenerNew(WPSessionModification):
-    
+
     def _getTabContent(self,params):
         caption= _("Adding a new convener")
         wc=wcomponents.WConfModParticipEdit(title=caption)
@@ -959,11 +964,11 @@ class WPModConvenerNew(WPSessionModification):
                                     </tr>
                                     """)
         return wc.getHTML( params )
-    
+
 
 
 class WPModConvenerEdit(WPSessionModification):
-    
+
 ##    def _getTabContent(self,params):
 ##        caption="Edit convener data"
 ##        conv=params["convener"]
@@ -984,7 +989,7 @@ class WPModConvenerEdit(WPSessionModification):
         params["affiliationValue"] = conv.getAffiliation()
         params["phoneValue"] = conv.getPhone()
         params["faxValue"] = conv.getFax()
-        
+
         params["disabledRole"] = False
         params["roleDescription"] =  _(""" _("Coordinator")<br> _("Manager")""")
         session = conv.getSession()
@@ -995,35 +1000,35 @@ class WPModConvenerEdit(WPSessionModification):
             coordValue = _("""The convener is already a coordinator""")
         else:
             params["disabledNotice"] = False
-        
+
         managerValue =  _("""<input type="checkbox" name="managerControl"> _("Give management rights to the convener").""")
         if (av and av[0] in session.getManagerList() ) or conv.getEmail() in session.getAccessController().getModificationEmail():
             managerValue = _("""The convener is already a manager""")
         else:
             params["disabledNotice"] = False
-        
+
         params["roleValue"] = """ %s<br>
                                   %s"""%(coordValue, managerValue)
-        
+
         params["noticeValue"] =  _("""<i><font color="black"><b> _("Note"): </b></font> _("If this person does not already have
-         an Indico account, he or she will be sent an email asking to create an account. After the account creation the 
+         an Indico account, he or she will be sent an email asking to create an account. After the account creation the
          user will automatically be given coordinator/manager rights").</i>""")
-        
+
         formAction = urlHandlers.UHSessionModConvenerEdit.getURL(conv)
         formAction.addParam("orgin","new")
         formAction.addParam("typeName","convener")
         params["formAction"] = formAction
-        
+
         return p.getHTML(params)
 
 
 
 class WPSessionAddMaterial( WPSessionModification ):
-    
+
     def __init__( self, rh, session, mf ):
         WPSessionModification.__init__( self, rh, session )
         self._mf = mf
-    
+
     def _getTabContent( self, params ):
         if self._mf:
             comp = self._mf.getCreationWC( self._session )
@@ -1034,7 +1039,7 @@ class WPSessionAddMaterial( WPSessionModification ):
 
 
 class WSessionModPlainTTDay(wcomponents.WTemplated):
-    
+
     def __init__(self,aw,day,session):
         self._aw=aw
         self._day=day
@@ -1048,7 +1053,7 @@ class WSessionModPlainTTDay(wcomponents.WTemplated):
         url=urlHandlers.UHContributionModification.getURL(contrib)
         urlEdit=urlHandlers.UHSessionModSchEditContrib.getURL(contrib)
         editIconURL=Config.getInstance().getSystemIconURL("modify")
-        return """ 
+        return """
             <tr>
                 <td valign="top" nowrap><input type="checkbox" name="schEntryId" value=%s></td>
                 <td valign="top" nowrap>%s</td>
@@ -1084,7 +1089,7 @@ class WSessionModPlainTTDay(wcomponents.WTemplated):
         url=urlHandlers.UHSessionModifyBreak.getURL(breakEntry)
         urlEdit=urlHandlers.UHSessionModifyBreak.getURL(breakEntry)
         editIconURL=Config.getInstance().getSystemIconURL("modify")
-        return """ 
+        return """
             <tr>
                 <td valign="top" nowrap><input type="checkbox" name="schEntryId" value=%s></td>
                 <td valign="top" nowrap>%s</td>
@@ -1126,15 +1131,15 @@ class WSessionModPlainTTDay(wcomponents.WTemplated):
             elif isinstance(entry,schedule.BreakTimeSchEntry):
                 entries.append(self._getBreakHTML(entry))
             at+=entry.getDuration()
-        addContribURL=urlHandlers.UHSessionModScheduleAddContrib.getURL(slot)        
-        
+        addContribURL=urlHandlers.UHSessionModScheduleAddContrib.getURL(slot)
+
         orginURL = urlHandlers.UHSessionModifSchedule.getURL(self._session.getOwner())
         orginURL.addParam("sessionId", self._session.getId())
         newContribURL = urlHandlers.UHConfModScheduleNewContrib.getURL(self._session.getOwner())
         newContribURL.addParam("sessionId", self._session.getId())
         newContribURL.addParam("slotId", slot.getId())
-        newContribURL.addParam("orginURL",orginURL)        
-        
+        newContribURL.addParam("orginURL",orginURL)
+
         addBreakURL=urlHandlers.UHSessionAddBreak.getURL(slot)
         delSlotURL=urlHandlers.UHSessionModSlotRem.getURL(slot)
         editSlotURL=urlHandlers.UHSessionModSlotEdit.getURL(slot)
@@ -1169,7 +1174,7 @@ class WSessionModPlainTTDay(wcomponents.WTemplated):
             convs="Conveners: %s"%"; ".join(l)
         return  _("""
             <a name="slot%s"/>
-            <table width="90%%" align="center" border="0" 
+            <table width="90%%" align="center" border="0"
                                         style="border-left: 1px solid #777777">
                 <tr>
                     <td class="groupTitle" style="background: %s">
@@ -1268,7 +1273,7 @@ class WSessionModPlainTTDay(wcomponents.WTemplated):
 
 
 class WSessionModPosterTTDay(wcomponents.WTemplated):
-    
+
     def __init__(self,aw,day,session):
         self._aw=aw
         self._day=day
@@ -1282,7 +1287,7 @@ class WSessionModPosterTTDay(wcomponents.WTemplated):
         url=urlHandlers.UHContributionModification.getURL(contrib)
         urlEdit=urlHandlers.UHSessionModSchEditContrib.getURL(contrib)
         editIconURL=Config.getInstance().getSystemIconURL("modify")
-        return """ 
+        return """
             <tr>
                 <td valign="top" nowrap><input type="checkbox" name="schEntryId" value=%s></td>
                 <td valign="top" nowrap>%s</td>
@@ -1331,14 +1336,14 @@ class WSessionModPosterTTDay(wcomponents.WTemplated):
                     isinstance(entry.getOwner(),conference.Contribution):
                 entries.append(self._getContribHTML(entry.getOwner()))
         addContribURL=urlHandlers.UHSessionModScheduleAddContrib.getURL(slot)
-        
+
         orginURL = urlHandlers.UHSessionModifSchedule.getURL(self._session.getOwner())
         orginURL.addParam("sessionId", self._session.getId())
         newContribURL = urlHandlers.UHConfModScheduleNewContrib.getURL(self._session.getOwner())
         newContribURL.addParam("sessionId", self._session.getId())
         newContribURL.addParam("slotId", slot.getId())
         newContribURL.addParam("orginURL",orginURL)
-        
+
         delSlotURL=urlHandlers.UHSessionModSlotRem.getURL(slot)
         editSlotURL=urlHandlers.UHSessionModSlotEdit.getURL(slot)
         delContribsURL=urlHandlers.UHSessionDelSchItems.getURL(slot)
@@ -1362,7 +1367,7 @@ class WSessionModPosterTTDay(wcomponents.WTemplated):
             convs="""<span style="letter-spacing: 0px">Conveners: %s</span>"""%"; ".join(l)
         return  _("""
             <a name="slot%s"/>
-            <table width="90%%" align="center" border="0" 
+            <table width="90%%" align="center" border="0"
                                         style="border-left: 1px solid #777777">
                 <tr>
                     <td class="groupTitle" style="background-color: %s">
@@ -1414,7 +1419,7 @@ class WSessionModPosterTTDay(wcomponents.WTemplated):
                         str(addContribURL),
                        str(newContribURL),
                         editSlotLink,delSlotLink,slot.getSession().getTextColor(),convs,slot.getSession().getTextColor(),numEntries,
-                        quoteattr(str(delContribsURL)),   
+                        quoteattr(str(delContribsURL)),
                         "".join(entries))
 
     def getVars(self):
@@ -1440,280 +1445,66 @@ class WSessionModPosterTTDay(wcomponents.WTemplated):
         return vars
 
 
-class WPSessionModifSchedule( WPConfModifScheduleGraphic ):
-    
+class WPSessionModifSchedule( WPSessionModifBase, WPConfModifScheduleGraphic  ):
+
     def __init__( self, rh, session):
-        WPConfModifScheduleGraphic.__init__( self, rh, session.getConference() )        
-        self._session = session        
-    
-    def _setActiveTab( self ):
-        self._tabSchedule.setActive()
-    
-    def _generateSessionTimetable(self):
-        
+        WPSessionModifBase.__init__(self, rh, session)
+        WPConfModifScheduleGraphic.__init__( self, rh, session.getConference() )
+        self._session = session
+
+    def _setActiveTab(self):
+        self._tabTimetable.setActive()
+
+    def getJSFiles(self):
+        return WPConfModifScheduleGraphic.getJSFiles(self)
+
+    def _generateTimetable(self):
+
         tz = self._conf.getTimezone()
-        timeTable = timetable.TimeTable(self._conf.getSchedule(), tz)
-        sDate,eDate=self._session.getAdjustedStartDate(tz),self._session.getAdjustedEndDate(tz) 
+        timeTable = timetable.TimeTable(self._session.getSchedule(), tz)
+        sDate,eDate=self._session.getAdjustedStartDate(tz),self._session.getAdjustedEndDate(tz)
         timeTable.setStartDate(sDate)
         timeTable.setEndDate(eDate)
 #        timeTable.setStartDayTime(7,0)
 #        timeTable.setEndDayTime(21,59)
-        
-        timeTable.mapEntryList(self._session.getSchedule().getEntries())  
+
+        timeTable.mapEntryList(self._session.getSchedule().getEntries())
         return timeTable
-    
-    def _getScheduleContent(self,params):
 
-        sessionTimetable = self._generateSessionTimetable();
-        sessionDays = sessionTimetable.getDayList()
-        
-        wc = WSessionModifSchedule(self._getAW(), self._session, sessionDays, sessionTimetable)
-        return wc.getHTML(params)
+    def _getSchedule(self):
+        return WSessionModifSchedule(self._session, self._timetable, self._days)
 
-class WScheduleBreak(wcomponents.WTemplated):
+    def _getTabContent( self, params ):
+        return self._getTTPage(params)
 
-    def __init__(self, breakEntry):
-        self._breakEntry = breakEntry
+class WSessionModifSchedule(wcomponents.WTemplated):
 
-    def getHTML(self, params=None):
-        params['modifyAction'] = urlHandlers.UHSessionModifyBreak.getURL
-        params['deleteAction'] = urlHandlers.UHSessionDelSchItems.getURL
-        params['relocateAction'] = urlHandlers.UHConfModifScheduleRelocate.getURL
-        params['moveUpAction'] = urlHandlers.UHSessionModSlotMoveUpEntry.getURL
-        params['moveDownAction'] = urlHandlers.UHSessionModSlotMoveDownEntry.getURL
-        
-        return wcomponents.WTemplated.getHTML( self, params )
-    
-class WSessionModifSchedule(WConfModifScheduleGraphicOverview):
-    
-    def __init__(self,aw,session,days,timetable):
-        self._aw=aw
+    def __init__(self, session, timetable, dayList, **params):
+        wcomponents.WTemplated.__init__(self, **params)
         self._session = session
-        self._days=days
         self._timetable = timetable
-             
-    def _getContributionHTML(self,contrib,days,params):
-        if days:
-            params['days'] = days
-        return WScheduleContribution(contrib, insideSession=True).getHTML(params)  
-    
-    def _getBreakHTML(self,breakEntry, header="", footer="", params={}):        
-        return WScheduleBreak(breakEntry).getHTML(params)
+        self._dayList = dayList
 
-    def _getEntryHTML(self,entry, days, room = "", header = "", footer="", params={}):
-        
-        if isinstance(entry,schedule.LinkedTimeSchEntry):
-            if isinstance(entry.getOwner(),conference.Contribution):
-                params.update({room: room, header: header, footer: footer})
-                return self._getContributionHTML(entry.getOwner(), days, params)
-        elif isinstance(entry,schedule.BreakTimeSchEntry):
-            return self._getBreakHTML(entry, header, footer, params=params)
-
-    def _getFitSlotLink( self, container ):
-        """
-        returns a link to the "fit slot" action if and only if
-        the time slot has a son and its limits are larger than its sons'
-        """
-        fitSlotLink = ""
-        entries = container.getSessionSlot().getSchedule().getEntries()
-        if len(entries) > 0:
-            if container.getAdjustedStartDate()<entries[0].getAdjustedStartDate() or container.getAdjustedEndDate()>entries[-1].getAdjustedEndDate():
-                fitSlotLink = _("""
-                                        <a href=%s><small>[_("fit slot")]</small></a>""")% quoteattr(str(urlHandlers.UHSessionFitSlot.getURL(container.getSessionSlot())))
-        return fitSlotLink
-
-    def _getEntries(self, schedule):
-        l = []
-        for sessionEntry in schedule.getEntries():
-            sesSlot = sessionEntry.getOwner()
-            l.append(sesSlot)
-        return l
-
-    def _initTempList(self, max, defaultValue=None):
-        t = []
-        for i in range(0, max):
-            t.append(defaultValue)
-        return t
-    
-    def _getScheduleHTML(self, days, eventType="conference"):                        
-        confTZ = self._session.getTimezone()
-        if self._slot:
-            target = self._slot
-        else:
-            target = self._session
-        
-        timeTable=timetable.TimeTable(target.getSchedule(), confTZ) 
-        sDate,eDate=target.getAdjustedStartDate(), target.getAdjustedEndDate() 
-        timeTable.setStartDate(sDate)
-        timeTable.setEndDate(eDate)
-        
-        if self._slot:
-            timeTable.mapContainerList([self._slot])
-        else:
-            timeTable.mapContainerList(self._getEntries(self._session.getSchedule()))
-                        
-        timeTable.compactDays()
-        containerIndex = ContainerIndex()
-        daySch = [] 
-        
-        for day in timeTable.getDayList():        
-            slotList=[]
-            lastEntries=[]
-            maxoverlaping= day.getContainerMaxOverlap()
-            if not day.hasContainerOverlaps():
-                maxoverlaping = day.getNumMaxOverlaping() or 1
-            width="100"            
-            if maxoverlaping!=0:
-                width=100/maxoverlaping
-            containerIndex.initialization(day, day.hasContainerOverlaps())
-            lastSlot = self._initTempList(maxoverlaping, None)
-            
-            for slot in day.getSlotList():                
-                tempList = self._initTempList(maxoverlaping, """<td></td>""")
-                containerHeader = self._initTempList(maxoverlaping, """<td></td>""")
-                containerFooter = self._initTempList(maxoverlaping, """<td></td>""")
-                thisSlot = self._initTempList(maxoverlaping, None)
-
-                for container in slot.getContainerList():
-                    containerIndex.addContainer(container)
-                    bgcolorSlot = self._getColor(container)
-                    # --- Getting header and footer for the container
-                    ind = containerIndex.getStartPosition(container)
-                   
-                    # ---.
-                    entryList = slot.getContainerEntries(container)
-                    containerIndex.setContainerEntries(container, entryList)
-                    for i in range(0, containerIndex.getMaxOverlap(container)):
-                        entry = containerIndex.getEntryByPosition(container, i)
-                        entryIndex = containerIndex.getEntryIndex(container, i)
-                        thisSlot[entryIndex] = entry
-                        # --- if an entry has already added, it is not added again because it was done a rowspan
-                        if entry and (entry in lastEntries):
-                            tempList[entryIndex] = ""
-                            continue
-                        # ---.
-                        bgcolorContrib=self._getColor(entry)
-                        # ---.
-                        # --- Getting the HTML for an entry:
-                        rowspan = day.getNumContainerSlots(entry)
-                        if entry:
-                            if slot.hasHeaders() and slot.isFirstSlotEntry(entry):
-                                rowspan -= 1
-                            if container.isFinalEntry(entry, day.getLastContainerSlot(container), confTZ):
-                                rowspan -= 1
-                            room = ""
-                            if container.getRoom() != None and container.getRoom().getName().strip() != "":
-                                room = container.getRoom().getName()
-                                
-                            entryParams = {}
-                            entryParams['bgcolor'] = bgcolorContrib;
-                            entryParams['rowspan'] = rowspan;
-                            entryParams['colspan'] = '';
-                            entryParams['width'] = width;
-                               
-                            temp = self._getEntryHTML(entry, days, room, params=entryParams)
-                        else:
-                            # --- Getting header for the broken slots among days and for starting of slots
-                            temp = """<td valign="top" align="center" width="%s%%">&nbsp;
-                                      </td>"""%width
-                        # ---.
-                        tempList[entryIndex] = temp
-                        lastEntries.append(entry)
-
-                # ---.
-                if slot.getAdjustedStartDate().minute==0:
-                    timecol = """<td style="border-top:2px solid #E6E6E6;border-left:2px solid #E6E6E6" valign="top" bgcolor="white" width="40">
-                                    <font color="gray" size="-1">%s</font>
-                                 </td>"""%slot.getAdjustedStartDate().strftime("%H:%M")
-                else:
-                    timecol = """<td style="border-left:2px solid #E6E6E6" bgcolor="white" width="40">&nbsp;</td>"""
-                stri = """
-                            <tr>
-                                %s
-                                %s
-                            </tr>"""%( timecol, \
-                                    "".join(tempList))
-                slotList.append(stri)
-                lastSlot = thisSlot[:]
-            
-            urlNewSlot = urlHandlers.UHSessionModSlotNew.getURL(self._session)
-            urlNewSlot.addParam("slotDate", day.getDate().strftime("%d-%m-%Y"))
-            newSlotBtn=""
-            if self._session.canModify(self._aw) or self._session.canCoordinate(self._aw, "unrestrictedSessionTT"):
-                if self._session.getConference().getEnableSessionSlots() :
-                    newSlotBtn=_("""<input type="submit" class="btn" value="_("new slot")">""")
-            stri="""
-                <table>
-                    <tr>
-
-                    </tr>
-                    %s
-                </table>"""%("".join(slotList))
-            daySch.append(stri)
-        return "<br>".join(daySch)
-
-           
     def getVars( self ):
         vars=wcomponents.WTemplated.getVars(self)
-        
-        self._conf = self._session.getConference()
-        
-        sessions = {}
-        
-        #self._days = vars["days"] 
-        
-        sList = self._conf.getSessionList()
-    
-        for d in self._days:            
-            for s in sList:                        
-                if  s.getAdjustedStartDate().date() <= d.getDate().date() and \
-                    s.getAdjustedEndDate().date() >= d.getDate().date():
-                    sessions[s.getId()] = s
-                
-        vars["daysParam"] = vars.get('days')
-        vars["sessionList"] = sessions                
-        vars["session"]=self._session.getId()
-        
-        vars["slotList"] = self._session.slots
-        slot = vars.get("slot",None)
-        
-        if slot:            
-            self._slot = self._session.getSlotById(slot)
-        else:
-            # by default, present the user with the first slot
-            self._slot = self._session.getSlotList()[0]
-        
-        vars["slot"] = self._slot        
-        
-        vars["slots"]=self._getScheduleHTML(vars["daysParam"])
-        
-        sDate,eDate=self._session.getAdjustedStartDate(),self._session.getAdjustedEndDate()
-        if sDate.strftime("%Y%b%d")==eDate.strftime("%Y%b%d"):
-            vars["dateInterval"]=self.htmlText("%s-%s"%(sDate.strftime("%Y-%b-%d %H:%M"),eDate.strftime("%H:%M")))
-        else:
-            vars["dateInterval"]=self.htmlText("%s/%s"%(sDate.strftime("%Y-%b-%d %H:%M"),eDate.strftime("%Y-%b-%d %H:%M")))
-        vars["start_date"] = self._session.getAdjustedStartDate().strftime("%a %d %b %Y %H:%M")
-        vars["end_date"] = self._session.getAdjustedEndDate().strftime("%a %d %b %Y %H:%M")
-        vars["place"]=""
-        if self._session.getLocation() is not None:
-            vars["place"]=self.htmlText(self._session.getLocation().getName())
-        vars["start_date"] = self._session.getAdjustedStartDate().strftime("%a %d %b %Y %H:%M")
-        vars["end_date"] = self._session.getAdjustedEndDate().strftime("%a %d %b %Y %H:%M")
-        vars["editURL"] = str(urlHandlers.UHSessionModFit.getURL(self._session))
-        vars["dayDate"]=self._days[0].getDate()
-        
-        if self._session.getConference().getEnableSessionSlots() :
-            vars["fitToInnerSlots"] = """<input type="submit" class="btn" value="fit inner timetable">"""
-        else :
-            editURL = urlHandlers.UHSessionDatesModification.getURL(self._session)
-            vars["fitToInnerSlots"] = """<input type="submit" class="btn" value="fit inner timetable"><input type="submit" class="btn" value="modify dates" onClick="this.form.action='%s';">""" % editURL
+        tz = self._session.getTimezone()
+        vars["timezone"]= tz
+        # the list of days specified by the user through the option box
+        vars["daysParam"] = self._dayList
+        # the list of days from the timetable
+        vars["dayList"]=self._timetable.getDayList()
+        # the first day of the list
+        vars["dayDate"]=self._dayList[0].getDate()
 
         vars['rbActive'] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
 
+        vars['ttdata'] = schedule.ScheduleToJson.process(self._session.getSchedule(), tz)
+
+        eventInfo = DictPickler.pickle(self._session.getConference(), timezone=tz)
+        eventInfo['timetableSession'] = DictPickler.pickle(self._session, timezone=tz)
+        vars['eventInfo'] = simplejson.dumps(eventInfo)
+
         return vars
-
-
-        
 
 class ContainerIndexItem:
 
@@ -1723,7 +1514,7 @@ class ContainerIndexItem:
         self._entryList = []
         for i in range(0,self._overlap):
             self._entryList.append(None)
-    
+
     def setStartPosition(self, counter):
         self._startPosition = counter
 
@@ -1795,7 +1586,7 @@ class ContainerIndex:
             contItem = self._containerIndex[container]
             return contItem.getEntryIndex(i)
         return 0
-    
+
     def getEntryByPosition(self, container, i):
         if self._containerIndex.has_key(container):
             contItem = self._containerIndex[container]
@@ -1813,14 +1604,14 @@ class ContainerIndex:
             contItem = self._containerIndex[container]
             return contItem.getStartPosition()
         return 0
-            
+
 
 class WPSessionModifyBreak( WPSessionModifSchedule ):
-    
+
     def __init__(self,rh,conf,schBreak):
         WPSessionModifSchedule.__init__(self,rh,conf)
         self._break=schBreak
-    
+
     def _getScheduleContent(self,params):
         sch=self._conf.getSchedule()
         wc=wcomponents.WBreakDataModification(sch,self._break,conf=self._conf)
@@ -1828,14 +1619,14 @@ class WPSessionModifyBreak( WPSessionModifSchedule ):
         params["body"] = wc.getHTML( pars )
         return wcomponents.WBreakModifHeader( self._break, self._getAW() ).getHTML( params )
 
-    
+
 
 class WPModSchEditContrib(WPSessionModifSchedule):
-    
+
     def __init__(self,rh,contrib):
         WPSessionModifSchedule.__init__(self,rh,contrib.getSession())
         self._contrib=contrib
-    
+
     def _getTabContent(self,params):
         if self._contrib.getSession().getScheduleType() == "poster":
             wc=WSessionModContribListEditContrib(self._contrib)
@@ -1845,7 +1636,7 @@ class WPModSchEditContrib(WPSessionModifSchedule):
         return wc.getHTML(pars)
 
 class WSessionAddSlot(wcomponents.WTemplated):
-    
+
     def __init__(self, slotData , conf, errors=[]):
         self._session = slotData.getSession()
         self._slotData = slotData
@@ -1861,7 +1652,7 @@ class WSessionAddSlot(wcomponents.WTemplated):
                             <input type="checkbox" name="sel_conv" value=%s>
                             <input type="hidden" name="conv_id" value=%s>
                         </td>
-                        <td style="border-top:1px solid #777777;padding-top:2px" width="100%%"> 
+                        <td style="border-top:1px solid #777777;padding-top:2px" width="100%%">
                             <table border="0" width="95%%" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td>&nbsp;</td>
@@ -1917,8 +1708,8 @@ class WSessionAddSlot(wcomponents.WTemplated):
                 </tr>
             </table>
                 """%"<br>".join( msgList )
-   
-    
+
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["calendarIconURL"]=Config.getInstance().getSystemIconURL( "calendar" )
@@ -1969,7 +1760,7 @@ class WSessionAddSlot(wcomponents.WTemplated):
         sesRoom = self._slotData.getSession().getRoom()
         if sesRoom:
             vars["sesRoom"] = sesRoom.getName()
-        vars["roomName"] = roomName 
+        vars["roomName"] = roomName
         vars["conveners"]=self._getConvenersHTML()
         vars["postURL"]=quoteattr(str(urlHandlers.UHSessionModSlotNew.getURL(self._session)))
         vars["errors"]=self._getErrorHTML(self._errors)
@@ -1981,10 +1772,7 @@ class WSessionAddSlot(wcomponents.WTemplated):
             rx.append("""<option value=%s%s>%s</option>"""%(quoteattr(str(room)),
                         sel,self.htmlText(room)))
         vars ["roomsexist"] = "".join(rx)
-        if not self._conf.getAutoSolveConflict():
-            vars["autoUpdate"]= _("""<input type="checkbox" name="check" value="2"> _("Update parents dates")""")
-        else:
-            vars["autoUpdate"]=""
+        vars["autoUpdate"]=""
         return vars
 
 
@@ -1994,14 +1782,14 @@ class WPModSlotNew(WPSessionModifSchedule):
         WPSessionModifSchedule.__init__(self, rh, slotData.getSession())
         self._slotData = slotData
         self._errors=errors
-        
-    
+
+
     def _getTabContent( self, params ):
         wc=WSessionAddSlot(self._slotData, self._conf, self._errors)
         return wc.getHTML()
 
 class WSlotModifMainData(wcomponents.WTemplated):
-    
+
     def __init__(self, slot, conf, errors=[]):
         self._slotData = slot
         self._errors=errors
@@ -2016,7 +1804,7 @@ class WSlotModifMainData(wcomponents.WTemplated):
                             <input type="checkbox" name="sel_conv" value=%s>
                             <input type="hidden" name="conv_id" value=%s>
                         </td>
-                        <td style="border-top:1px solid #777777;padding-top:2px" width="100%%"> 
+                        <td style="border-top:1px solid #777777;padding-top:2px" width="100%%">
                             <table border="0" width="95%%" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td>&nbsp;</td>
@@ -2072,7 +1860,7 @@ class WSlotModifMainData(wcomponents.WTemplated):
                 </tr>
             </table>
                 """%"<br>".join( msgList )
-    
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["calendarIconURL"]=Config.getInstance().getSystemIconURL( "calendar" )
@@ -2137,19 +1925,16 @@ class WSlotModifMainData(wcomponents.WTemplated):
         vars ["roomsexist"] = "".join(rx)
         vars["conveners"]=self._getConvenersHTML()
         vars["errors"]=self._getErrorHTML(self._errors)
-        vars["locator"] = ""    
+        vars["locator"] = ""
         slot = self._slotData.getSession().getSlotById(self._slotData.getId())
         vars["locator"] = slot.getLocator().getWebForm()
         vars["postURL"]=quoteattr(str(urlHandlers.UHSessionModSlotEdit.getURL(slot)))
-        if not self._conf.getAutoSolveConflict():
-            vars["autoUpdate"]= _("""<input type="checkbox" name="check" value="2"> _("Update parents dates")""")
-        else:
-            vars["autoUpdate"]=""
+        vars["autoUpdate"]=""
         return vars
 
 
 class WPModSlotEdit(WPConferenceModifBase):
-    
+
     def __init__(self,rh, slot, errors=[]):
         WPConferenceModifBase.__init__(self,rh,slot.getSession().getConference())
         self._slotData=slot
@@ -2160,16 +1945,16 @@ class WPModSlotEdit(WPConferenceModifBase):
 
     def _getPageContent( self, params ):
         wc=WSlotModifMainData(self._slotData,self._conf,self._errors)
-        return wc.getHTML() 
+        return wc.getHTML()
 
 class WSchModifRecalculate(wcomponents.WTemplated):
-    
+
     def __init__(self, entry):
         self._entry = entry
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
-        vars["entryType"]="slot" 
+        vars["entryType"]="slot"
         vars["title"]=""
         if self._entry.getTitle().strip() != "":
             vars["title"]= _("""
@@ -2181,7 +1966,7 @@ class WSchModifRecalculate(wcomponents.WTemplated):
         return vars
 
 class WPModSlotCalc(WPConferenceModifBase):
-    
+
     def __init__(self,rh, slot):
         WPConferenceModifBase.__init__(self,rh,slot.getSession().getConference())
         self._slot=slot
@@ -2192,10 +1977,10 @@ class WPModSlotCalc(WPConferenceModifBase):
     def _getPageContent( self, params ):
         wc=WSchModifRecalculate(self._slot)
         p={"postURL":quoteattr(str(urlHandlers.UHSessionModSlotCalc.getURL(self._slot)))}
-        return wc.getHTML(p) 
+        return wc.getHTML(p)
 
 class WPModSlotRemConfirmation(WPSessionModifSchedule):
-    
+
     def __init__(self,rh,slot):
         WPSessionModifSchedule.__init__(self,rh,slot.getSession())
         self._slot=slot
@@ -2208,16 +1993,16 @@ class WPModSlotRemConfirmation(WPSessionModifSchedule):
             self._slot.getAdjustedEndDate().strftime("%H:%M"))
         if self._slot.getTitle()!="":
             slotCaption=""" "%s" (%s) """%(self._slot.getTitle(),slotCaption)
-        
-        msg= _("""Are you sure you want to delete the slot %s 
-        (note that any contribution scheduled 
+
+        msg= _("""Are you sure you want to delete the slot %s
+        (note that any contribution scheduled
         inside will be unscheduled)?""")%(slotCaption)
         url=urlHandlers.UHSessionModSlotRem.getURL(self._slot)
         return wc.getHTML(msg,url,{})
 
 
 class WPModScheduleAddContrib(WPSessionModifSchedule):
-    
+
     def _getTabContent( self, params ):
         target=self._session
         if params.get("slot",None) is not None:
@@ -2232,11 +2017,11 @@ class WPModScheduleAddContrib(WPSessionModifSchedule):
         return p.getHTML(pars)
 
 class WPModScheduleNewContrib(WPModScheduleNewContribBase, WPSessionModifSchedule):
-    
+
     def __init__(self, rh, ses, targetDay):
         WPSessionModifSchedule.__init__(self, rh, ses)
         WPModScheduleNewContribBase.__init__(self, targetDay)
-    
+
 class WSessionModifSchContribCreation(WContributionCreation):
 
     def __init__(self, slot):
@@ -2260,11 +2045,11 @@ class WSessionModifSchContribCreation(WContributionCreation):
 
 
 class WPSessionAddBreak(WPSessionModifSchedule):
-    
+
     def __init__(self,rh,slot):
         WPSessionModifSchedule.__init__(self,rh,slot.getSession())
         self._slot=slot
-    
+
     def _getTabContent( self, params ):
         s = self._slot.getSchedule()
         day = self._slot.getAdjustedStartDate()
@@ -2275,14 +2060,14 @@ class WPSessionAddBreak(WPSessionModifSchedule):
 
 
 class WSessionModifAC(wcomponents.WTemplated):
-    
+
     def __init__(self,session):
         self._session=session
-    
+
     def _getCoordinatorsHTML(self):
         res = wcomponents.WPrincipalTable().getHTML( list(self._session.getCoordinatorList()), self._session, str(urlHandlers.UHSessionModCoordinatorsSel.getURL()), str(urlHandlers.UHSessionModCoordinatorsRem.getURL()), pendings=self._session.getCoordinatorEmailList(), selectable=False )
         return res
-    
+
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
         wc=wcomponents.WAccessControlFrame()
@@ -2304,17 +2089,17 @@ class WSessionModifAC(wcomponents.WTemplated):
 
 
 class WPSessionModifAC( WPSessionModifBase ):
-    
+
     def _setActiveTab( self ):
         self._tabAC.setActive()
-    
+
     def _getTabContent( self, params ):
         comp=WSessionModifAC(self._session)
         return comp.getHTML()
 
 
 class WPSessionSelectAllowed( WPSessionModifAC ):
-    
+
     def _getTabContent( self, params ):
         searchExt = params.get("searchExt","")
         if searchExt != "":
@@ -2327,7 +2112,7 @@ class WPSessionSelectAllowed( WPSessionModifAC ):
 
 
 class WPSessionSelectManagers( WPSessionModifAC ):
-    
+
     def _getTabContent( self, params ):
         searchExt = params.get("searchExt","")
         if searchExt != "":
@@ -2340,7 +2125,7 @@ class WPSessionSelectManagers( WPSessionModifAC ):
 
 
 class WPModCoordinatorsSel(WPSessionModifAC):
-    
+
     def _getTabContent(self,params):
         searchExt = params.get("searchExt","")
         if searchExt != "":
@@ -2355,10 +2140,10 @@ class WPModCoordinatorsSel(WPSessionModifAC):
 
 
 class WSessionModifTools(wcomponents.WTemplated):
-    
+
     def __init__( self, session ):
         self.__session = session
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["deleteIconURL"] = Config.getInstance().getSystemIconURL("delete")
@@ -2369,21 +2154,21 @@ class WSessionModifTools(wcomponents.WTemplated):
 
 
 class WPSessionModifComm( WPSessionModifBase ):
-    
-    def _setActiveTab( self ):  
+
+    def _setActiveTab( self ):
         self._tabComm.setActive()
-    
+
     def _getTabContent( self, params ):
         wc = wcomponents.WSessionModifComm( self._getAW(),self._session )
-        pars = { 
+        pars = {
                 "editCommentsURLGen":urlHandlers.UHSessionModifCommEdit.getURL
                }
         return wc.getHTML( pars )
 
 
 class WPSessionCommEdit( WPSessionModifBase ):
-        
-    def _setActiveTab( self ):  
+
+    def _setActiveTab( self ):
         self._tabComm.setActive()
 
     def _getTabContent(self,params):
@@ -2395,13 +2180,13 @@ class WPSessionCommEdit( WPSessionModifBase ):
 
 
 class WPSessionModifTools( WPSessionModifBase ):
-    
+
     def _setActiveTab( self ):
         self._tabTools.setActive()
-    
+
     def _getTabContent( self, params ):
         comp = WSessionModifTools( self._session )
-        pars = { 
+        pars = {
 "deleteSessionURL": urlHandlers.UHSessionDeletion.getURL( self._session ), \
 "writeMinutesURL": urlHandlers.UHSessionWriteMinutes.getURL( self._session ) \
                }
@@ -2409,10 +2194,10 @@ class WPSessionModifTools( WPSessionModifBase ):
 
 
 class WPSessionDeletion( WPSessionModifTools ):
-    
+
     def _getTabContent( self, params ):
         msg = _("""
-        <font size="+2">_("Are you sure that you want to DELETE the session '%s'")?</font><br>(_("Note that if you delete the 
+        <font size="+2">_("Are you sure that you want to DELETE the session '%s'")?</font><br>(_("Note that if you delete the
 session, all the items below it will also be deleted"))
               """)%(self._session.getTitle())
         wc = wcomponents.WConfirmation()
@@ -2423,7 +2208,7 @@ session, all the items below it will also be deleted"))
 
 
 class WPSessionWriteMinutes( WPSessionModifTools ):
-    
+
     def _getTabContent( self, params ):
         wc = wcomponents.WWriteMinutes( self._session )
         pars = {"postURL": urlHandlers.UHSessionWriteMinutes.getURL(self._session) }
@@ -2613,7 +2398,7 @@ class WSessionModContribList(wcomponents.WTemplated):
                 checked=" checked"
             res.append("""<input type="checkbox" name="material" value=%s%s> %s"""%(quoteattr(str(id)),checked,self.htmlText(caption)))
         return "<br>".join(res)
-            
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["quickAccessURL"]=quoteattr(str(urlHandlers.UHSessionModContribQuickAccess.getURL(self._session)))
@@ -2643,7 +2428,7 @@ class WSessionModContribList(wcomponents.WTemplated):
                 vars["numberImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
         vars["numberSortingURL"]=quoteattr(str(url))
-            
+
         url = self._getURL()
         url.addParam("sortBy", "date")
         vars["dateImg"] = ""
@@ -2658,7 +2443,7 @@ class WSessionModContribList(wcomponents.WTemplated):
         vars["dateSortingURL"]=quoteattr(str(url))
 
         url = self._getURL()
-        url.addParam("sortBy", "board_number")        
+        url.addParam("sortBy", "board_number")
         vars["boardNumImg"]=""
         if self._currentSorting == "board_number":
             vars["currentSorting"]="""<input type="hidden" name="sortBy" value="board_number">"""
@@ -2669,7 +2454,7 @@ class WSessionModContribList(wcomponents.WTemplated):
                 vars["boardNumImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
         vars["boardNumSortingURL"]=quoteattr(str(url))
-            
+
         url = self._getURL()
         url.addParam("sortBy", "type")
         vars["typeImg"] = ""
@@ -2679,7 +2464,7 @@ class WSessionModContribList(wcomponents.WTemplated):
                 vars["typeImg"]="""<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                 url.addParam("order","up")
             elif self._order == "up":
-                vars["typeImg"]="""<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow"))) 
+                vars["typeImg"]="""<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
         vars["typeSortingURL"] = quoteattr( str( url ) )
 
@@ -2708,7 +2493,7 @@ class WSessionModContribList(wcomponents.WTemplated):
                 vars["speakerImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
         vars["speakerSortingURL"]=quoteattr( str( url ) )
-            
+
         url = self._getURL()
         url.addParam("sortBy","track")
         vars["trackImg"] = ""
@@ -2739,16 +2524,16 @@ class WSessionModContribList(wcomponents.WTemplated):
         vars["addContribURL"]=quoteattr(str(urlHandlers.UHSessionModAddContribs.getURL(self._session)))
         vars["numContribs"]=str(numContribs)
         totaldur = self._totaldur
-        days = totaldur.days        
+        days = totaldur.days
         hours = (totaldur.seconds)/3600
         dayhours = (days * 24)+hours
         mins = ((totaldur.seconds)/60)-(hours*60)
-        vars["totaldur" ]="""%sh%sm"""%(dayhours,mins) 
+        vars["totaldur" ]="""%sh%sm"""%(dayhours,mins)
         return vars
 
 
 class WSessionModPosterContribList(WSessionModContribList):
-    
+
     def _getContribHTML(self,contrib):
         sdate = ""
         if contrib.getAdjustedStartDate() is not None:
@@ -2805,10 +2590,10 @@ class WSessionModPosterContribList(WSessionModContribList):
                     strdur or "&nbsp;",
                     cType or "&nbsp;",
                     quoteattr(str(editURL)),
-                    quoteattr(str(editIconURL)),title or "&nbsp;", 
+                    quoteattr(str(editIconURL)),title or "&nbsp;",
                     speaker or "&nbsp;",
                     track or "&nbsp;",
-                    status or "&nbsp;", 
+                    status or "&nbsp;",
                     materials or "&nbsp;",
                     self.htmlText(contrib.getBoardNumber()) or "&nbsp;")
         return html
@@ -2818,7 +2603,7 @@ class WPModContribList(WPSessionModifBase):
 
     def _setActiveTab(self):
         self._tabContribs.setActive()
-        
+
     def _getTabContent( self, params ):
         filterCrit=params.get("filterCrit",None)
         sortingCrit=params.get("sortingCrit",None)
@@ -2831,7 +2616,7 @@ class WPModContribList(WPSessionModifBase):
 
 
 class WSessionModContribListEditContrib(wcomponents.WTemplated):
-    
+
     def __init__(self,contrib):
         self._contrib=contrib
 
@@ -2909,7 +2694,7 @@ class WPModContribListEditContrib(WPModContribList):
 
 
 class WSessionModAddContribs(wcomponents.WTemplated):
-    
+
     def __init__(self,session):
         self._session=session
 
@@ -2921,7 +2706,7 @@ class WSessionModAddContribs(wcomponents.WTemplated):
 
     def _getContribItems(self):
         res=[]
-        #available contributions to a session are those contributions which: 
+        #available contributions to a session are those contributions which:
         #   1) are not included in any session
         #   2) are not withdrawn
         #   3) are not scheduled
@@ -2955,7 +2740,7 @@ class WSessionModAddContribs(wcomponents.WTemplated):
         vars["tracks"]=self._getTrackItems()
         vars["availContribs"]=self._getContribItems()
         return vars
-        
+
 
 class WPModAddContribs(WPModContribList):
 
@@ -2973,13 +2758,13 @@ class WPModImportContribsConfirmation(WPModContribList):
 
 
 class WPModParticipantList( WPSessionModifBase ):
-    
+
     def __init__(self, rh, conf, emailList, displayedGroups, contribs):
         WPSessionModifBase.__init__(self, rh, conf)
         self._emailList = emailList
         self._displayedGroups = displayedGroups
         self._contribs = contribs
-    
+
     def _getBody( self, params ):
         WPSessionModifBase._getBody(self, params)
         wc = WContribParticipantList(self._conf, self._emailList, self._displayedGroups, self._contribs)
@@ -2987,11 +2772,11 @@ class WPModParticipantList( WPSessionModifBase ):
         return wc.getHTML(params)
 
 class WPSessionDisplayRemoveMaterialsConfirm( WPSessionDefaultDisplayBase ):
-    
+
     def __init__(self,rh, conf, mat):
         WPSessionDefaultDisplayBase.__init__(self,rh,conf)
         self._mat=mat
-    
+
     def _getBody(self,params):
         wc=wcomponents.WDisplayConfirmation()
         msg="""Are you sure you want to delete the following material?<br>
@@ -3001,7 +2786,7 @@ class WPSessionDisplayRemoveMaterialsConfirm( WPSessionDefaultDisplayBase ):
         return wc.getHTML(msg,url,{"deleteMaterial":self._mat.getId()})
 
 class WPSessionDisplayWriteMinutes( WPSessionDefaultDisplayBase ):
-    
+
     def _getBody( self, params ):
         wc = wcomponents.WWriteMinutes( self._session )
         pars = {"postURL": urlHandlers.UHSessionDisplayWriteMinutes.getURL(self._session) }
@@ -3026,7 +2811,7 @@ class WPSessionModifMaterials( WPSessionModifBase ):
     def __init__(self, rh, session):
         self._target = session
         WPSessionModifBase.__init__(self, rh, session)
-    
+
     def _setActiveTab( self ):
         self._tabMaterials.setActive()
 
@@ -3039,14 +2824,14 @@ class WPSessionModifMaterials( WPSessionModifBase ):
         return wc.getHTML( pars )
 
 class WPSessionDatesModification(WPSessionModifSchedule):
-    
+
     def _getTabContent(self,params):
         p=WSessionModEditDates(self._session.getConference())
         params["postURL"]=urlHandlers.UHSessionDatesModification.getURL(self._session)
         return p.getHTML(params)
-       
+
 class WSessionModEditDates(wcomponents.WTemplated):
-    
+
     def __init__(self,targetConf,targetDay=None):
         self._conf=targetConf
         self._targetDay=targetDay
@@ -3068,7 +2853,7 @@ class WSessionModEditDates(wcomponents.WTemplated):
                     """%"<br>".join(l)
         else:
             return ""
-    
+
     def getVars( self ):
         vars=wcomponents.WTemplated.getVars(self)
         vars["errors"]=self._getErrorHTML(vars.get("errors",[]))
@@ -3092,14 +2877,11 @@ class WSessionModEditDates(wcomponents.WTemplated):
         vars["eYear"]=quoteattr(str(vars.get("eYear",endDate.year)))
         vars["eHour"]=quoteattr(str(vars.get("eHour",endDate.hour)))
         vars["eMinute"]=quoteattr(str(vars.get("eMinute",endDate.minute)))
-        if not self._conf.getAutoSolveConflict():
-            vars["autoUpdate"]= _("""<input type="checkbox" name="check" value="2"> _("Update parents dates")""")
-        else:
-            vars["autoUpdate"]=""
+        vars["autoUpdate"]=""
         if not self._conf.getEnableSessionSlots():
             vars["disabled"] = "disabled"
         else:
             vars["disabled"] = ""
         vars["adjustSlots"]=""
         return vars
-    
+

@@ -29,17 +29,19 @@
   IndicoUI.executeOnLoad(function() {
 
   <% if self._rh._target and not isinstance(self._rh._target, MaKaC.conference.Category): %>
-    <% eventFavorites = self._rh._target.getConference().getId() %>
+    <% eventFavorites = self._rh._target.getConference().getFavoriteRooms() %>
   <% end %>
   <% else: %>
-    <% eventFavorites = 'false' %>
+    <% eventFavorites = [] %>
   <% end %>
   
-  var rbWidget = new RoomBookingWidget(info, parentEvt, <%= jsBoolean(roomBookingActive) %>, <%= jsBoolean(not modifying) %>, <%= eventFavorites %>);
+  var rbWidget = new RoomBookingWidget(Indico.Data.Locations, info, parentEvt, nullRoomInfo(info), <%= eventFavorites %>);
 
   var domContent = rbWidget.draw();
 
   $E('roomChooser').set(domContent);
+
+  rbWidget.postDraw();
 
   });
 

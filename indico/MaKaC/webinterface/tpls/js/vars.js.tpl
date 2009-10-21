@@ -1,11 +1,24 @@
 <% from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase %>
 <% from MaKaC.common import Config %>
-<% 
-authenticators = Config.getInstance().getAuthenticatorList() 
+<% import MaKaC.common.info as info %>
+<% from MaKaC.rb_location import Location %>
+<%!
+authenticators = Config.getInstance().getAuthenticatorList()
 extAuths = []
 for auth in authenticators:
     if auth.lower() != "local":
         extAuths.append(auth)
+
+rbActive = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
+if rbActive:
+    locationList = {}
+    locationNames = map(lambda l: l.friendlyName, Location.allLocations)
+
+    for name in locationNames:
+        locationList[name] = name;
+else:
+    locationList = None
+
 %>
 <% end %>
 
@@ -54,30 +67,33 @@ var Indico = {
         popupMenu: "<%= iconFileName("popupMenu")%>",
         roomwidgetArrow: "<%= iconFileName("roomwidgetArrow")%>",
         breadcrumbArrow: "<%= iconFileName("breadcrumbArrow")%>",
-        star: "<%= iconFileName("star")%>"
+        star: "<%= iconFileName("star")%>",
+        warning_yellow: "<%= iconFileName("warning_yellow")%>"
     },
     Urls: {
         JsonRpcService: "<%= urlHandlers.UHJsonRpcService.getURL() %>",
         SecureJsonRpcService: "<%= urlHandlers.UHSecureJsonRpcService.getURL() %>",
-        
+
         ImagesBase: "<%= Config.getInstance().getImagesBaseURL() %>",
         SecureImagesBase: "<%= Config.getInstance().getImagesBaseSecureURL() %>",
-        
+
         Login: "<%= urlHandlers.UHSignIn.getURL() %>",
-        
+
         ConferenceDisplay: "<%= urlHandlers.UHConferenceDisplay.getURL() %>",
         ContributionDisplay: "<%= urlHandlers.UHContributionDisplay.getURL() %>",
         SessionDisplay: "<%= urlHandlers.UHSessionDisplay.getURL() %>",
-        
+
         ContribToXML: "<%= urlHandlers.UHContribToXML.getURL() %>",
         ContribToPDF: "<%= urlHandlers.UHContribToPDF.getURL() %>",
         ContribToiCal: "<%= urlHandlers.UHContribToiCal.getURL() %>",
-        
+
         SessionToPDF: "<%= urlHandlers.UHSessionToiCal.getURL() %>",
         ConfTimeTablePDF: "<%= urlHandlers.UHConfTimeTablePDF.getURL() %>",
-        
+
         SessionModification: "<%= urlHandlers.UHSessionModification.getURL() %>",
         ContributionModification: "<%= urlHandlers.UHContributionModification.getURL() %>",
+        BreakModification: "<%= urlHandlers.UHConfModifyBreak.getURL() %>",
+        Reschedule: "<%= urlHandlers.UHConfModifReschedule.getURL() %>",
 
         UploadAction: {
             subContribution: '<%= str(urlHandlers.UHSubContribModifAddMaterials.getURL()) %>',
@@ -93,9 +109,11 @@ var Indico = {
         simple_event: <%= RHSubmitMaterialBase._allowedMatsForSE %>,
         conference: <%= RHSubmitMaterialBase._allowedMatsConference %>,
         category: <%= RHSubmitMaterialBase._allowedMatsCategory %>},
-        WeekDays: <%= [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ] %> },
-
+        WeekDays: <%= [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ] %>,
+        Locations: <%= jsonEncode(locationList) %>
+    },
     Settings: {
-        ExtAuthenticators: <%= extAuths %>
+        ExtAuthenticators: <%= extAuths %>,
+        RoomBookingModuleActive: <%= jsBoolean(rbActive) %>
     }
 };

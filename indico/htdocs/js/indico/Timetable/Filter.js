@@ -10,12 +10,15 @@ type("TimetableFilterList", ["CheckPopupWidget"],
          var filterObject = TimetableDefaults.filters[filterName].filter;
          var optionStates = filterObject.getOptionStates();
          var optionNames = filterObject.getOptionNames();
+         var optionColors = filterObject.getOptionColors();
+         var optionTextColors = filterObject.getOptionTextColors();
 
          optionStates.observe(function() {
-             timetableDrawer.redraw();
+             if (!timetableDrawer.preventRedraw)
+                 timetableDrawer.setLoading(true, timetableDrawer.redraw);
          });
 
-         this.CheckPopupWidget(optionNames, optionStates, chainElements, noOptionsMessage);
+         this.CheckPopupWidget(optionNames, optionStates, optionColors, optionTextColors, chainElements, noOptionsMessage);
      });
 
 type("TimetableFilterMenu", ["PopupMenu"],
@@ -48,6 +51,14 @@ type("Filter", [],
 
          getOptionStates: function() {
              return this.optionStates;
+         },
+
+         getOptionColors: function() {
+             return this.optionColors;
+         },
+
+         getOptionTextColors: function() {
+             return this.optionTextColors;
          },
 
          setData: function(data, day) {
@@ -85,6 +96,8 @@ type("Filter", [],
      }, function() {
          this.options = new WatchObject();
          this.optionStates = new WatchObject();
+         this.optionColors = new WatchObject();
+         this.optionTextColors = new WatchObject();
      });
 
 type("SessionFilter", ["Filter"],
@@ -92,7 +105,7 @@ type("SessionFilter", ["Filter"],
          apply: function(event) {
              var show = true;
              this.optionStates.each(function(value, key) {
-                 if (event.entryType == 'Session' && key == event.id) {
+                 if (event.entryType == 'Session' && key == event.sessionId) {
                      if (!value) {
                          show = false;
                      }
@@ -104,11 +117,13 @@ type("SessionFilter", ["Filter"],
          processEvent: function(entryData, entry) {
              var self = this;
              if (entryData.entryType == 'Session') {
-                 self.options.set(entry, entryData.title);
-                 self.optionStates.set(entry, true);
+                 self.options.set(entryData.sessionId, entryData.title);
+                 self.optionStates.set(entryData.sessionId, true);
+                 self.optionColors.set(entryData.sessionId, entryData.color);
+                 self.optionTextColors.set(entryData.sessionId, entryData.textColor);
              }
          },
-         
+
          resetEvent: function(entry) {
              this.optionStates.set(entry, true);
          }
@@ -150,7 +165,7 @@ type("RoomFilter", ["Filter"],
 type("TimeTableFilter", ["IWidget"], {
     draw: function() {
         var self = this;
-        
+
         var content = Html.div('content clearfix');
 
         var closeButton = Html.div('closeButton');
@@ -159,36 +174,29 @@ type("TimeTableFilter", ["IWidget"], {
                 self.show(false);
         });
         content.append(closeButton);
-        
+
         this.tableRow = Html.tr();
         content.append(Html.table({cellPadding: 0, cellSpacing: 1, border: 0}, Html.tbody({}, this.tableRow)));
-        
+
         var sessionsLink = Html.span('dropUpMenu fakeLink', $T('Sessions'));
         var sessionsMenu = new TimetableFilterList('session', self.timetableDrawer, [sessionsLink], $T('No sessions in the timetable'));
         this.setUpFilterMenu(sessionsLink, sessionsMenu);
-        
+
         var roomsLink = Html.span('dropUpMenu fakeLink', $T('Rooms'));
         var roomsMenu = new TimetableFilterList('room', self.timetableDrawer, [roomsLink], $T('No rooms found in the timetable'));
         this.setUpFilterMenu(roomsLink, roomsMenu);
-        
-        
+
+
         this.tableRow.insert(Html.td({style: {width: '90px', color: '#777', fontWeight: 'bold'}}, $T('Filter options')));
-        
-        var detailCheckbox = Html.checkbox({style: {cssFloat: 'left', marginRight: '5px'}})
-        $B(detailCheckbox, self.timetableDrawer.detail, {
-            toTarget: function(value) { return value == 'contribution' },
-            toSource: function(value) { return value ? 'contribution' : 'session'; }
-        });
-        
+
         var resetButton = Html.button({style: {cssFloat: 'right', marginRight: '50px'}}, $T('Reset filter'));
         resetButton.observeClick(function() {
             each(TimetableDefaults.filters, function(TTfilter) {
                 TTfilter.filter.reset()
             });
-            self.timetableDrawer.detail.set(false);
         });
-        
-        this.tableRow.append(Html.td({style: {width: 'auto'}}, resetButton, Html.span('', detailCheckbox, $T('Show session content'))));
+
+        this.tableRow.append(Html.td({style: {width: 'auto'}}, resetButton));
 
         this.div.append(content);
 
@@ -198,7 +206,7 @@ type("TimeTableFilter", ["IWidget"], {
         this.setPos(-this.height);
         this.div.dom.style.visibility = 'visible';
     },
-    setUpFilterMenu: function (link, menu) 
+    setUpFilterMenu: function (link, menu)
     {
         var self = this;
 
@@ -215,17 +223,17 @@ type("TimeTableFilter", ["IWidget"], {
     },
     move: function(direction, limit, curState, xPos, i) {
         var self = this;
-    
+
         if (!exists(curState) || !exists(xPos) || !exists(i)) {
             var xPos = self.curXPos;
             var i = 0;
             var curState = self.state;
         }
-        
+
         // If the button state has changed stop the animation
         if (curState != self.state)
             return;
-        
+
         xPos = xPos + (++i * direction);
         if (direction*xPos >= (direction*limit)) {
             self.setPos(limit);
@@ -252,12 +260,12 @@ type("TimeTableFilter", ["IWidget"], {
     },
     function(timetableDrawer, closeHandler) {
         var self = this;
-        
+
         this.timetableDrawer = timetableDrawer;
         this.closeHandler = closeHandler;
-        
+
         this.state = new WatchValue(false);
-        
+
         this.div = Html.div({className: 'timetableFilter', style: {visibility: "hidden"}});
         $E(document.body).append(this.div);
     }

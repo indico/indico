@@ -2,7 +2,7 @@
  * @author Tom
  */
 
-global.Exception = function(message, data, inner) {
+function Exception(message, data, inner) {
 	this.message = message;
 	this.data = data;
 	this.inner = inner;

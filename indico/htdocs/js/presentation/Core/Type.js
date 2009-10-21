@@ -10,7 +10,7 @@
  * @param {Function} [constructor]
  * @return {Function} constructor
  */
-global.type = function(name, mixins, members, constructor) {
+function type(name, mixins, members, constructor) {
 	constructor = any(constructor, function() {});
 	members = getObject(members);
 	members[name] = constructor;
@@ -28,7 +28,7 @@ global.type = function(name, mixins, members, constructor) {
  * @param {Array} mixins
  * @return {Function} target
  */
-global.mixinType = function(target, mixins) {
+function mixinType(target, mixins) {
 	var code = target.prototype;
 	var mixs = target.mixins;
 	iterate(mixins, function(mixinName) {
@@ -62,7 +62,7 @@ global.mixinType = function(target, mixins) {
  * @param {Object} mixin
  * @return {Object} target;
  */
-global.mixinInstance = function(target, source, mixin) {
+function mixinInstance(target, source, mixin) {
 	enumerate(mixin.prototype, function(value, key) {
 		target[key] = source[key];
 	});
@@ -74,14 +74,14 @@ global.mixinInstance = function(target, source, mixin) {
  * @param {String} ... names
  * @constructor
  */
-global.Enum = function() {
+function Enum() {
 	var self = this;
 	iterate(arguments, function(item, index) {
 		self[item] = index;
 	});
 }
 
-global.NamedEnum = function() {
+function NamedEnum() {
 	var self = this;
 	iterate(arguments, function(item) {
 		self[item] = item;

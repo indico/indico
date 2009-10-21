@@ -79,7 +79,7 @@ charRplace = [
 
 
 class ProgrammeToPDF(PDFBase):
-    
+
     def __init__(self, conf, doc=None, story=None, tz=None):
         self._conf = conf
         if not tz:
@@ -88,7 +88,7 @@ class ProgrammeToPDF(PDFBase):
             self._tz = tz
         PDFBase.__init__(self, doc, story)
         self._title = _("Conference Scientific Programme")
-            
+
     def firstPage(self, c, doc):
         c.saveState()
         if HAVE_PIL:
@@ -113,21 +113,21 @@ class ProgrammeToPDF(PDFBase):
         self._drawWrappedString(c, "%s / %s"%(strip_ml_tags(self._conf.getTitle()),self._title), width=inch, height=0.75*inch, font='Times-Roman', size=9, color=(0.5,0.5,0.5), align="left", maximumWidth=self._PAGE_WIDTH-3.5*inch, measurement=inch, lineSpacing=0.15)
         c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, nowutc().strftime("%A %d %B %Y"))
         c.restoreState()
-    
+
     def laterPages(self, c, doc):
         c.saveState()
         self._drawWrappedString(c, "%s / %s"%(escape(strip_ml_tags(self._conf.getTitle())),self._title), width=inch, height=self._PAGE_HEIGHT-0.75*inch, font='Times-Roman', size=9, color=(0.5,0.5,0.5), align="left", maximumWidth=self._PAGE_WIDTH-3.5*inch, measurement=inch, lineSpacing=0.15)
         c.drawCentredString(self._PAGE_WIDTH/2.0, 0.75 * inch, "Page %d "%doc.page)
         c.drawRightString(self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - 0.75 * inch, nowutc().strftime("%A %d %B %Y"))
         c.restoreState()
-    
+
     def getBody(self, story=None):
         if not story:
             story = self._story
         style = styles["Normal"]
         style.alignment = TA_JUSTIFY
         for track in self._conf.getTrackList():
-        
+
             bogustext = track.getTitle()
             p = Paragraph(bogustext, styles["Heading1"])
             self._story.append(p)
@@ -139,7 +139,7 @@ class ProgrammeToPDF(PDFBase):
 
 
 class AbstractToPDF(PDFBase):
-    
+
     def __init__(self, conf, abstract, doc=None, story=None, tz=None):
         self._conf = conf
         if not tz:
@@ -153,7 +153,7 @@ class AbstractToPDF(PDFBase):
         self._title = _("Abstract")
         self._PAGE_HEIGHT = defaultPageSize[1]
         self._PAGE_WIDTH = defaultPageSize[0]
-    
+
     def firstPage(self, c, doc):
         c.saveState()
         showLogo = False
@@ -171,7 +171,7 @@ class AbstractToPDF(PDFBase):
                 c.drawCentredString( self._PAGE_WIDTH*3/4, self._PAGE_HEIGHT - inch - heigth/2, escape(self._conf.getTitle()))
         if not showLogo:
             self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - 2*inch)
-            
+
         c.setFont('Times-Bold', 25)
         #c.drawCentredString(self._PAGE_WIDTH/2, self._PAGE_HEIGHT - inch - 5*cm, self._abstract.getTitle())
         c.setLineWidth(3)
@@ -202,29 +202,29 @@ class AbstractToPDF(PDFBase):
         else:
             text= _("""<b> _("Contribution type")</b> : %s""")%escape(str(self._abstract.getContribType()))
         return text
-    
+
     def getBody(self, story=None, indexedFlowable={}, level=1 ):
         if not story:
             story = self._story
-        
+
         style = ParagraphStyle({})
         style.fontSize = 12
         text = _(""" _("Abstract ID") : %s""")%self._abstract.getId()
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
-        
+
         story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
-        
-        style = ParagraphStyle({})        
+
+        style = ParagraphStyle({})
         style.alignment = TA_CENTER
         style.fontSize = 25
         style.leading = 30
         text = escape(self._abstract.getTitle())
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
-        
+
         indexedFlowable[p] = {"text":escape(self._abstract.getTitle()), "level":1}
-        
+
         style = ParagraphStyle({})
         style.fontName = "LinuxLibertine"
         style.fontSize = 9
@@ -236,20 +236,20 @@ class AbstractToPDF(PDFBase):
         #res="\n".join(res)
         #p = Preformatted(escape(res), style, part=escape(self._abstract.getTitle()))
         #story.append(p)
-        
+
         story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
 
         for field in self._conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
             id = field.getId()
             name = field.getName()
             value = self._abstract.getField(id).strip()
-            if value: #id not in ["content"] and 
+            if value: #id not in ["content"] and
                 styleHead = ParagraphStyle({})
                 styleHead.firstLineIndent = -45
                 styleHead.leftIndent = 45
                 text = "<b>%s</b> :" % name
                 p = Paragraph(text, styleHead, part=escape(self._abstract.getTitle()))
-                story.append(p)    
+                story.append(p)
                 l=value.split("\n")
                 res=[]
                 for line in l:
@@ -258,7 +258,7 @@ class AbstractToPDF(PDFBase):
                 p = Paragraph(escape(res), style, part=escape(self._abstract.getTitle()))
                 story.append(p)
                 story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
-        
+
         style = ParagraphStyle({})
         style.firstLineIndent = -80
         style.leftIndent = 80
@@ -269,9 +269,9 @@ class AbstractToPDF(PDFBase):
         text += " ; ".join(listAuthor)
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
-        
+
         story.append(Spacer(inch, 0.2*cm))
-        
+
         style = ParagraphStyle({})
         style.firstLineIndent = -35
         style.leftIndent = 35
@@ -280,12 +280,12 @@ class AbstractToPDF(PDFBase):
         for author in self._abstract.getCoAuthorList():
             listAuthor.append( "%s (%s)"%(escape(author.getFullName()), escape(author.getAffiliation()) )  )
         text += " ; ".join(listAuthor)
-        
+
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
-        
+
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
-        
+
         style = ParagraphStyle({})
         style.firstLineIndent = -45
         style.leftIndent = 45
@@ -296,14 +296,14 @@ class AbstractToPDF(PDFBase):
         text += " ; ".join(listSpeaker)
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
-        
+
         story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
         style = ParagraphStyle({})
         style.firstLineIndent = -90
         style.leftIndent = 90
         p = Paragraph(self._getTrackText(), style, part=escape(self._abstract.getTitle()))
         story.append(p)
-        
+
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
         tmp= _("""--_("not specified")--""")
         if self._abstract.getContribType() is not None:
@@ -311,42 +311,42 @@ class AbstractToPDF(PDFBase):
         text = _("""<b> _("Contribution type")</b> : %s""")%escape(tmp)
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
-        
+
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
-        
+
         text = _("""<b> _("Submitted by")</b> : %s""")%escape(self._abstract.getSubmitter().getFullName())
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
-        
+
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
-        
+
         text = _("""<b> _("Submitted on")</b> %s""")%self._abstract.getSubmissionDate().strftime("%A %d %B %Y")
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
-        
+
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
-        
+
         text = _("""<b> _("Last modified on")</b> : %s""")%self._abstract.getModificationDate().strftime("%A %d %B %Y")
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
-        
+
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
-        
+
         text = _("""<b> _("Comments")</b> : """)
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
-        
+
         style = ParagraphStyle({})
         style.leftIndent = 40
         text = "%s"%escape(self._abstract.getComments())
         p = Preformatted(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
-        
+
         return story
-        
+
 
 class AbstractsToPDF(PDFWithTOC):
-    
+
     def __init__(self, conf, abstractList, tz=None):
         self._conf = conf
         if not tz:
@@ -356,7 +356,7 @@ class AbstractsToPDF(PDFWithTOC):
         self._abstracts = abstractList
         self._title = _("Abstracts book")
         PDFWithTOC.__init__(self)
-        
+
     def firstPage(self, c, doc):
         c.saveState()
         showLogo = False
@@ -374,7 +374,7 @@ class AbstractsToPDF(PDFWithTOC):
                 c.drawCentredString( self._PAGE_WIDTH*3/4, self._PAGE_HEIGHT - inch - heigth/2, escape(self._conf.getTitle()))
         if not showLogo:
             self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - 2*inch)
-            
+
         c.setFont('Times-Bold', 35)
         c.drawCentredString(self._PAGE_WIDTH/2, self._PAGE_HEIGHT/2, self._title)
         c.setLineWidth(3)
@@ -382,9 +382,9 @@ class AbstractsToPDF(PDFWithTOC):
         c.setFont('Times-Roman', 10)
         c.drawString(0.5*inch, 0.5*inch, str(urlHandlers.UHConferenceDisplay.getURL(self._conf)))
         c.restoreState()
-    
+
     def laterPages(self, c, doc):
-        
+
         c.saveState()
         c.setFont('Times-Roman', 9)
         c.setFillColorRGB(0.5, 0.5, 0.5)
@@ -399,8 +399,8 @@ class AbstractsToPDF(PDFWithTOC):
         c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, _(""" _("Page") %d """)%doc.page)
         c.drawString(inch,  0.75 * inch, nowutc().strftime("%A %d %B %Y"))
         c.restoreState()
-    
-    
+
+
     def getBody(self):
         for abstract in self._abstracts:
             temp = AbstractToPDF(self._conf, abstract, tz=self._tz)
@@ -409,7 +409,7 @@ class AbstractsToPDF(PDFWithTOC):
 
 
 class ConfManagerAbstractToPDF(AbstractToPDF):
-    
+
     def _getTrackText(self):
         text = _("""<b> _("Track classification")</b> : """)
         listTrack= []
@@ -452,7 +452,7 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
         text = _("""<b> _("Track judgments")</b> :""")
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
-        
+
         for track in self._abstract.getTrackListSorted():
             status = self._abstract.getTrackJudgement(track)
             if status.__class__ == review.AbstractAcceptance:
@@ -481,9 +481,9 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
                 modifDate = ""
                 modifier = ""
                 comments = ""
-            
+
             story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
-            
+
             status = self._abstract.getCurrentStatus()
             style = ParagraphStyle({})
             style.firstLineIndent = -90
@@ -491,9 +491,9 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
             text = _(""" _("Track") : %s""")%escape(track.getTitle())
             p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
             story.append(p)
-            
+
             story.append(Spacer(inch, 0.1*cm, part=escape(self._abstract.getTitle())))
-            
+
             status = self._abstract.getCurrentStatus()
             style = ParagraphStyle({})
             style.firstLineIndent = -90
@@ -501,9 +501,9 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
             text = _(""" _("Judgment") : %s""")%st
             p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
             story.append(p)
-            
+
             #story.append(Spacer(inch, 0.1*cm, part=self._abstract.getTitle()))
-            
+
             status = self._abstract.getCurrentStatus()
             style = ParagraphStyle({})
             style.firstLineIndent = -90
@@ -511,9 +511,9 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
             text = _(""" _("Judged by") : %s""")%modifier
             p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
             story.append(p)
-            
+
             #story.append(Spacer(inch, 0.1*cm, part=self._abstract.getTitle()))
-            
+
             status = self._abstract.getCurrentStatus()
             style = ParagraphStyle({})
             style.firstLineIndent = -90
@@ -521,9 +521,9 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
             text = _(""" _("Date") : %s""")%modifDate
             p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
             story.append(p)
-            
+
             #story.append(Spacer(inch, 0.1*cm, part=self._abstract.getTitle()))
-            
+
             status = self._abstract.getCurrentStatus()
             style = ParagraphStyle({})
             style.firstLineIndent = -55
@@ -534,7 +534,7 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
 
 
 class ConfManagerAbstractsToPDF(AbstractsToPDF):
-    
+
     def getBody(self):
         for abstract in self._abstracts:
             temp = ConfManagerAbstractToPDF(self._conf, abstract,tz=self._tz)
@@ -543,7 +543,7 @@ class ConfManagerAbstractsToPDF(AbstractsToPDF):
 
 
 class TrackManagerAbstractToPDF(AbstractToPDF):
-    
+
     def __init__(self, conf, abstract, track, doc=None, story=None, tz=None):
         AbstractToPDF.__init__(self, conf, abstract, doc, story, tz=tz)
         self._track = track
@@ -561,13 +561,13 @@ class TrackManagerAbstractToPDF(AbstractToPDF):
         status=self._abstract.getCurrentStatus()
         text= _("""<b> _("Contribution type")</b> : %s""")%escape(str(self._abstract.getContribType()))
         return text
-    
+
     def getBody(self, story=None, indexedFlowable={}, level=1 ):
         if not story:
             story = self._story
         #get the common abstract content from parent
         AbstractToPDF.getBody(self, story, indexedFlowable, level )
-        
+
         #add info for the track manager
         status=AbstractStatusTrackViewFactory.getStatus(self._track,self._abstract)
         comments = escape(status.getComment())
@@ -620,16 +620,16 @@ class TrackManagerAbstractToPDF(AbstractToPDF):
             text = _("""<b> _("Status")</b> : %s""")%st
             if modifier or modifDate:
                 text += " (%s)"%" - ".join( [modifier, modifDate])
-            
+
         else:
             text = _("""<b> _("Status")</b> : _("SUBMITTED")""")
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
-        
-        
-        
+
+
+
         #story.append(Spacer(inch, 0.1*cm, part=self._abstract.getTitle()))
-        
+
         if res:
             status = self._abstract.getCurrentStatus()
             style = ParagraphStyle({})
@@ -637,8 +637,8 @@ class TrackManagerAbstractToPDF(AbstractToPDF):
             text = "(<i>%s</i>)"%res
             p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
             story.append(p)
-        
-        
+
+
         if comments:
             status = self._abstract.getCurrentStatus()
             style = ParagraphStyle({})
@@ -646,15 +646,15 @@ class TrackManagerAbstractToPDF(AbstractToPDF):
             text = "\"<i>%s</i>\""%comments
             p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
             story.append(p)
-        
+
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
-        
+
         if conflictText:
             style = ParagraphStyle({})
             style.leftIndent = 40
             p = Paragraph( _(""" _("In conflict with"): """), style, part=escape(self._abstract.getTitle()))
             story.append(p)
-            
+
             style = ParagraphStyle({})
             style.leftIndent = 60
             p = Preformatted(conflictText, style, part=escape(self._abstract.getTitle()))
@@ -662,11 +662,11 @@ class TrackManagerAbstractToPDF(AbstractToPDF):
 
 
 class TrackManagerAbstractsToPDF(AbstractsToPDF):
-    
+
     def __init__(self, conf, track, abstractList, tz=None):
         AbstractsToPDF.__init__(self, conf, abstractList, tz)
         self._track = track
-    
+
     def getBody(self):
         for abstract in self._abstracts:
             temp = TrackManagerAbstractToPDF(self._conf, abstract, self._track, tz=self._tz)
@@ -675,7 +675,7 @@ class TrackManagerAbstractsToPDF(AbstractsToPDF):
 
 
 class ContribToPDF(PDFBase):
-    
+
     def __init__(self, conf, contrib, doc=None, story=None, tz=None):
         self._conf = conf
         if not tz:
@@ -689,7 +689,7 @@ class ContribToPDF(PDFBase):
         self._title = _("Contribution")
         self._PAGE_HEIGHT = defaultPageSize[1]
         self._PAGE_WIDTH = defaultPageSize[0]
-    
+
     def firstPage(self, c, doc):
         c.saveState()
         showLogo = False
@@ -716,59 +716,59 @@ class ContribToPDF(PDFBase):
         c.setFont('Times-Roman', 10)
         #c.drawString(0.5*inch, 0.5*inch, Config.getInstance().getBaseURL())
         c.restoreState()
-    
+
     def getBody(self, story=None, indexedFlowable={}, level=1 ):
         if not story:
             story = self._story
-        
+
         style = ParagraphStyle({})
         style.fontSize = 12
         text = _(""" _("Contribution ID") : %s""")%self._contrib.getId()
         p = Paragraph(text, style, part=escape(self._contrib.getTitle()))
         story.append(p)
-        
+
         story.append(Spacer(inch, 0.5*cm, part=escape(self._contrib.getTitle())))
-        
-        style = ParagraphStyle({})        
+
+        style = ParagraphStyle({})
         style.alignment = TA_CENTER
         style.fontSize = 25
         style.leading = 30
         text = escape(self._contrib.getTitle())
         p = Paragraph(text, style, part=escape(self._contrib.getTitle()))
         story.append(p)
-        
+
         if self._contrib.isScheduled():
-            style = ParagraphStyle({})        
+            style = ParagraphStyle({})
             style.alignment = TA_CENTER
             style.fontSize = 12
             style.leading = 30
             text = "%s (%s)" % (escape(self._contrib.getAdjustedStartDate(self._tz).strftime("%A %d %b %Y at %H:%M")),escape((datetime(1900,1,1)+self._contrib.getDuration()).strftime("%Hh%M'")))
             p = Paragraph(text, style, part=escape(self._contrib.getTitle()))
             story.append(p)
-        
+
         indexedFlowable[p] = {"text":escape(self._contrib.getTitle()), "level":1}
-        
+
         story.append(Spacer(inch, 1*cm, part=escape(self._contrib.getTitle())))
-        
+
         style = ParagraphStyle({})
         style.fontName = "LinuxLibertine"
         style.fontSize = 9
-        p = Paragraph(escape(self._contrib.getDescription()), style, part=escape(self._contrib.getTitle()))
-        story.append(p)
-        
-        story.append(Spacer(inch, 0.2*cm, part=escape(self._contrib.getTitle())))
-        
+        #p = Paragraph(escape(self._contrib.getDescription()), style, part=escape(self._contrib.getTitle()))
+        #story.append(p)
+
+        #story.append(Spacer(inch, 0.2*cm, part=escape(self._contrib.getTitle())))
+
         for field in self._conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
             fid = field.getId()
             name = field.getName()
             value = self._contrib.getField(fid).strip()
-            if value: #id not in ["content"] and 
+            if value: #id not in ["content"] and
                 styleHead = ParagraphStyle({})
                 styleHead.firstLineIndent = -55
                 styleHead.leftIndent = 45
-                text = "<b>%s</b> :" % name 
+                text = "<b>%s</b> :" % name
                 p = Paragraph(text, styleHead, part=escape(self._contrib.getTitle()))
-                story.append(p)    
+                story.append(p)
                 l=value.split("\n")
                 res=[]
                 for line in l:
@@ -777,9 +777,9 @@ class ContribToPDF(PDFBase):
                 p = Paragraph(escape(res), style, part=escape(self._contrib.getTitle()))
                 story.append(p)
                 story.append(Spacer(inch, 0.2*cm, part=escape(self._contrib.getTitle())))
-        
+
         story.append(Spacer(inch, 0.5*cm, part=escape(self._contrib.getTitle())))
-        
+
         style = ParagraphStyle({})
         style.firstLineIndent = -80
         style.leftIndent = 80
@@ -790,9 +790,9 @@ class ContribToPDF(PDFBase):
         text += " ; ".join(listAuthor)
         p = Paragraph(text, style, part=escape(self._contrib.getTitle()))
         story.append(p)
-        
+
         story.append(Spacer(inch, 0.2*cm))
-        
+
         style = ParagraphStyle({})
         style.firstLineIndent = -35
         style.leftIndent = 35
@@ -801,12 +801,12 @@ class ContribToPDF(PDFBase):
         for author in self._contrib.getCoAuthorList():
             listAuthor.append( "%s (%s)"%(escape(author.getFullName()), escape(author.getAffiliation()) )  )
         text += " ; ".join(listAuthor)
-        
+
         p = Paragraph(text, style, part=escape(self._contrib.getTitle()))
         story.append(p)
-        
+
         story.append(Spacer(inch, 0.2*cm, part=escape(self._contrib.getTitle())))
-        
+
         style = ParagraphStyle({})
         style.firstLineIndent = -45
         style.leftIndent = 45
@@ -817,7 +817,7 @@ class ContribToPDF(PDFBase):
         text += " ; ".join(listSpeaker)
         p = Paragraph(text, style, part=escape(self._contrib.getTitle()))
         story.append(p)
-        
+
         story.append(Spacer(inch, 0.5*cm, part=escape(self._contrib.getTitle())))
         style = ParagraphStyle({})
         style.firstLineIndent = -90
@@ -830,9 +830,9 @@ class ContribToPDF(PDFBase):
         text = _("""<b> _("Session classification") </b> :  %s""")%escape(sessiontitle)
         p = Paragraph(text, style, part=escape(self._contrib.getTitle()))
         story.append(p)
-        
+
         story.append(Spacer(inch, 0.5*cm, part=escape(self._contrib.getTitle())))
-        
+
         style = ParagraphStyle({})
         style.firstLineIndent = -90
         style.leftIndent = 90
@@ -844,39 +844,39 @@ class ContribToPDF(PDFBase):
         text = _("""<b> _("Track classification")</b> :  %s""")%escape(tracktitle)
         p = Paragraph(text, style, part=escape(self._contrib.getTitle()))
         story.append(p)
-        
+
         story.append(Spacer(inch, 0.2*cm, part=escape(self._contrib.getTitle())))
-        
+
         tmp=_("""--_("not specified")--""")
         if self._contrib.getType():
             tmp=self._contrib.getType().getName()
         text = _("""<b> _("Type")</b> : %s""")%escape(tmp)
         p = Paragraph(text, style, part=escape(self._contrib.getTitle()))
         story.append(p)
-        
+
         # TB: Do we really need to display the submitssion info of a contribution?
         #story.append(Spacer(inch, 0.2*cm, part=escape(self._contrib.getTitle())))
-        
+
         #text = "<b>Submitted by</b> : %s"%escape(self._contrib.getSubmitter().getFullName())
         #p = Paragraph(text, style, part=escape(self._contrib.getTitle()))
         #story.append(p)
-        
+
         return story
-        
+
 class ConfManagerContribToPDF(ContribToPDF):
-    
+
     def getBody(self, story=None, indexedFlowable={}, level=1 ):
         if not story:
             story = self._story
-            
+
         #get the common contribution content from parent
         ContribToPDF.getBody(self, story, indexedFlowable, level )
-        
+
         #add info for the conference manager
 
 
 class ContributionBook(PDFBase):
-    
+
     def __init__(self,conf,contribList,aw,tz=None):
         self._conf=conf
         if not tz:
@@ -891,7 +891,7 @@ class ContributionBook(PDFBase):
         self._doc.rightMargin=1*cm
         self._doc.topMargin=1.5*cm
         self._doc.bottomMargin=1*cm
-            
+
     def firstPage(self,c,doc):
         c.saveState()
         if HAVE_PIL:
@@ -908,7 +908,7 @@ class ContributionBook(PDFBase):
         c.setFont('Times-Bold',15)
         height-=2*cm
         c.drawCentredString(self._PAGE_WIDTH/2.0,height,
-                "%s - %s"%(self._conf.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y"), 
+                "%s - %s"%(self._conf.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y"),
                 self._conf.getAdjustedEndDate(self._tz).strftime("%A %d %B %Y")))
         if self._conf.getLocation():
             height-=1*cm
@@ -918,11 +918,11 @@ class ContributionBook(PDFBase):
         height-=6*cm
         c.drawCentredString(self._PAGE_WIDTH/2.0,height,\
                 self._title)
-        self._drawWrappedString(c, "%s / %s"%(self._conf.getTitle(),self._title), width=inch, height=0.75*inch, font='Times-Roman', size=9, color=(0.5,0.5,0.5), align="left", maximumWidth=self._PAGE_WIDTH-3.5*inch, measurement=inch, lineSpacing=0.15)     
+        self._drawWrappedString(c, "%s / %s"%(self._conf.getTitle(),self._title), width=inch, height=0.75*inch, font='Times-Roman', size=9, color=(0.5,0.5,0.5), align="left", maximumWidth=self._PAGE_WIDTH-3.5*inch, measurement=inch, lineSpacing=0.15)
         c.drawRightString(self._PAGE_WIDTH-inch,0.75*inch,
                 nowutc().strftime("%A %d %B %Y"))
         c.restoreState()
-    
+
     def laterPages(self,c,doc):
         c.saveState()
         c.setFont('Times-Roman',9)
@@ -1007,7 +1007,7 @@ class ContributionBook(PDFBase):
 
 
 class ContribsToPDF(PDFWithTOC):
-    
+
     def __init__(self, conf, contribList, tz=None):
         self._conf = conf
         if not tz:
@@ -1017,7 +1017,7 @@ class ContribsToPDF(PDFWithTOC):
         self._contribs = contribList
         self._title = _("Contributions book")
         PDFWithTOC.__init__(self)
-        
+
     def firstPage(self, c, doc):
         c.saveState()
         showLogo = False
@@ -1044,9 +1044,9 @@ class ContribsToPDF(PDFWithTOC):
         c.setFont('Times-Roman', 10)
         c.drawString(0.5*inch, 0.5*inch, str(urlHandlers.UHConferenceDisplay.getURL(self._conf)))
         c.restoreState()
-    
+
     def laterPages(self, c, doc):
-        
+
         c.saveState()
         c.setFont('Times-Roman', 9)
         c.setFillColorRGB(0.5, 0.5, 0.5)
@@ -1061,21 +1061,21 @@ class ContribsToPDF(PDFWithTOC):
         c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, _(""" _("Page") %d """)%doc.page)
         c.drawString(inch,  0.75 * inch, nowutc().strftime("%A %d %B %Y"))
         c.restoreState()
-    
-    
+
+
     def getBody(self):
         for contrib in self._contribs:
             temp = ContribToPDF(self._conf, contrib, tz=self._tz)
             temp.getBody(self._story, indexedFlowable=self._indexedFlowable, level=1)
             self._story.append(PageBreak())
-        
+
 class ConfManagerContribsToPDF(ContribsToPDF):
-    
+
     def getBody(self):
         for contrib in self._contribs:
             temp = ConfManagerContribToPDF(self._conf, contrib,tz=self._tz)
             temp.getBody(self._story, indexedFlowable=self._indexedFlowable, level=1)
-            self._story.append(PageBreak())        
+            self._story.append(PageBreak())
 
 class TimetablePDFFormat:
 
@@ -1101,19 +1101,19 @@ class TimetablePDFFormat:
         self.contribId = True
         if not params.has_key("showContribId"):
             self.contribId = False
-            
+
         self.speakerTitle = True
         if not params.has_key("showSpeakerTitle"):
             self.speakerTitle = False
-            
+
         self.contribAbstract = False
         if params.has_key("showAbstract"):
             self.contribAbstract = True
-            
+
         self.contribPosterAbstract = True
         if params.has_key("dontShowPosterAbstract"):
             self.contribPosterAbstract = False
-        
+
         self.newPagePerSession = False
         if params.has_key("newPagePerSession"):
             self.newPagePerSession = True
@@ -1145,11 +1145,11 @@ class TimetablePDFFormat:
         self.coverPage=True
         if not params.has_key("showCoverPage"):
             self.coverPage = False
-        
+
         self.tableContents=True
         if not params.has_key("showTableContents"):
             self.tableContents = False
-            
+
         self.logo = False
 
     def showContribId(self):
@@ -1160,7 +1160,7 @@ class TimetablePDFFormat:
 
     def showContribAbstract(self):
         return self.contribAbstract
-    
+
     def showContribPosterAbstract(self):
         return self.contribPosterAbstract
 
@@ -1193,7 +1193,7 @@ class TimetablePDFFormat:
 
     def showTableContents(self):
         return self.tableContents
-       
+
 
 def sortEntries(x,y):
     if cmp(x.getStartDate(),y.getStartDate()):
@@ -1205,7 +1205,7 @@ def sortEntries(x,y):
             return cmp(x.getTitle(),y.getTitle())
 
 class TimeTablePlain(PDFWithTOC):
-    
+
     def __init__(self,conf,aw,showSessions=[],showDays=[],sortingCrit=None, ttPDFFormat=None,
                  pagesize='A4', fontsize = 'normal', firstPageNumber = '1', showSpeakerAffiliation=False, tz=None):
         self._conf=conf
@@ -1257,7 +1257,7 @@ class TimeTablePlain(PDFWithTOC):
             self._story.append(Spacer(inch, 2*cm))
             self._story.append(self._toc)
             self._story.append(PageBreak())
-            
+
     def firstPage(self,c,doc):
         if self._ttPDFFormat.showCoverPage():
             c.saveState()
@@ -1275,7 +1275,7 @@ class TimeTablePlain(PDFWithTOC):
             c.setFont('Times-Bold',modifiedFontSize(15, self._fontsize))
             height-=2*cm
             c.drawCentredString(self._PAGE_WIDTH/2.0,height,
-                    "%s - %s"%(self._conf.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y"), 
+                    "%s - %s"%(self._conf.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y"),
                     self._conf.getAdjustedEndDate(self._tz).strftime("%A %d %B %Y")))
             if self._conf.getLocation():
                 height-=2*cm
@@ -1288,9 +1288,9 @@ class TimeTablePlain(PDFWithTOC):
             c.drawRightString(self._PAGE_WIDTH-inch,0.75*inch,
                     nowutc().strftime("%A %d %B %Y"))
             c.restoreState()
-    
+
     def laterPages(self,c,doc):
-        
+
         c.saveState()
         maxi=self._PAGE_WIDTH-2*cm
         if doc.getCurrentPart().strip() != "":
@@ -1302,26 +1302,26 @@ class TimeTablePlain(PDFWithTOC):
 
     def _defineStyles(self):
         self._styles={}
-        
+
         dayStyle=getSampleStyleSheet()["Heading1"]
         dayStyle.fontSize = modifiedFontSize(dayStyle.fontSize, self._fontsize)
         self._styles["day"]=dayStyle
-        
+
         sessionTitleStyle=getSampleStyleSheet()["Heading2"]
         sessionTitleStyle.fontSize = modifiedFontSize(12.0, self._fontsize)
         self._styles["session_title"]=sessionTitleStyle
-        
+
         sessionDescriptionStyle=getSampleStyleSheet()["Heading2"]
         sessionDescriptionStyle.fontSize = modifiedFontSize(10.0, self._fontsize)
         self._styles["session_description"] = sessionDescriptionStyle
-        
+
         self._styles["table_body"]=getSampleStyleSheet()["Normal"]
-        
+
         convenersStyle=getSampleStyleSheet()["Normal"]
         convenersStyle.fontSize = modifiedFontSize(10.0, self._fontsize)
         convenersStyle.leftIndent=10
         self._styles["conveners"]=convenersStyle
-        
+
         subContStyle=getSampleStyleSheet()["Normal"]
         subContStyle.fontSize=modifiedFontSize(10.0, self._fontsize)
         subContStyle.leftIndent=15
@@ -1404,7 +1404,7 @@ class TimeTablePlain(PDFWithTOC):
                 l.append([date,caption,speakers])
         for subc in contrib.getSubContributionList():
             if not subc.canAccess(self._aw):
-                return            
+                return
             lt=[]
             captionText="- [%s] %s"%(escape(subc.getId()),escape(subc.getTitle()))
             if not self._ttPDFFormat.showContribId():
@@ -1439,7 +1439,7 @@ class TimeTablePlain(PDFWithTOC):
                     l.append([colorCell,"",caption,speakers])
                 else:
                     l.append(["",caption,speakers])
-            
+
 
     def _processPosterContribution(self,contrib,l):
         if not contrib.canAccess(self._aw):
@@ -1555,7 +1555,7 @@ class TimeTablePlain(PDFWithTOC):
                             ('GRID',(0,0),(0,-1),1,colors.lightgrey)])
         entriesOnDay=self._conf.getSchedule().getEntriesOnDay(day)
         entriesOnDay.sort(sortEntries)
-        for entry in entriesOnDay:    
+        for entry in entriesOnDay:
             #Session slot
             if isinstance(entry,schedule.LinkedTimeSchEntry) and \
                     isinstance(entry.getOwner(),conference.SessionSlot):
@@ -1617,7 +1617,7 @@ class TimeTablePlain(PDFWithTOC):
                 res.append(p2)
                 l=[]
                 ts = deepcopy(originalts)
-                if sessionSlot.getSession().getScheduleType()=="poster": 
+                if sessionSlot.getSession().getScheduleType()=="poster":
                     if self._sortingCrit is not None:
                         cl=[]
                         for sEntry in sessionSlot.getSchedule().getEntries():
@@ -1660,7 +1660,7 @@ class TimeTablePlain(PDFWithTOC):
 ##                            date=self._fontify(date,10)
                             date="%s"%escape(sEntry.getAdjustedStartDate(self._tz).strftime("%H:%M"))
                             date=self._fontify(date,10)
-                            
+
                             lt=[]
                             captionText="%s"%escape(sEntry.getTitle())
                             if self._ttPDFFormat.showLengthContribs():
@@ -1770,7 +1770,7 @@ class TimeTablePlain(PDFWithTOC):
                         i-=1
                     if self._ttPDFFormat.showNewPagePerSession():
                         res.append(PageBreak())
-                        
+
         return res
 
 
@@ -1778,7 +1778,7 @@ class TimeTablePlain(PDFWithTOC):
         self._defineStyles()
         if not story:
             story=self._story
-        if not self._ttPDFFormat.showCoverPage(): 
+        if not self._ttPDFFormat.showCoverPage():
             s = ParagraphStyle({})
             s.fontName = "Times-Bold"
             s.fontSize = 18
@@ -1787,7 +1787,7 @@ class TimeTablePlain(PDFWithTOC):
             p=Paragraph(escape(self._conf.getTitle()),s)
             story.append(p)
             story.append(Spacer(1,0.4*inch))
-            
+
         currentDay=self._conf.getSchedule().getAdjustedStartDate(self._tz)
         while currentDay.strftime("%Y-%m-%d")<=self._conf.getSchedule().getAdjustedEndDate(self._tz).strftime("%Y-%m-%d"):
             if len(self._showDays)>0 and \
@@ -1803,13 +1803,13 @@ class TimeTablePlain(PDFWithTOC):
             story.append(p)
             self._indexedFlowable[p]={"text":currentDay.strftime("%A %d %B %Y"), "level":1}
             for entry in dayEntries:
-                story.append(entry) 
+                story.append(entry)
             if not self._ttPDFFormat.showNewPagePerSession():
                 story.append(PageBreak())
             currentDay+=timedelta(days=1)
 
 class SimplifiedTimeTablePlain(PDFBase):
-    
+
     def __init__(self,conf,aw,showSessions=[],showDays=[],sortingCrit=None, ttPDFFormat=None, pagesize = 'A4', fontsize = 'normal', tz=None):
         self._conf=conf
         if not tz:
@@ -1962,11 +1962,11 @@ class SimplifiedTimeTablePlain(PDFBase):
             story.append(p2)
             story.append(Spacer(1,0.4*inch))
             for entry in dayEntries:
-                story.append(entry) 
+                story.append(entry)
             currentDay+=timedelta(days=1)
-    
+
 class AbstractBook(PDFBase):
-    
+
     def __init__(self,conf,aw,sortBy,tz=None):
         self._conf=conf
         if not tz:
@@ -1984,7 +1984,7 @@ class AbstractBook(PDFBase):
         self._doc.rightMargin=1*cm
         self._doc.topMargin=1.5*cm
         self._doc.bottomMargin=1*cm
-            
+
     def firstPage(self,c,doc):
         c.saveState()
         if HAVE_PIL:
@@ -2000,7 +2000,7 @@ class AbstractBook(PDFBase):
         c.setFont('Times-Bold',15)
         height-=2*cm
         c.drawCentredString(self._PAGE_WIDTH/2.0,height,
-                "%s - %s"%(self._conf.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y"), 
+                "%s - %s"%(self._conf.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y"),
                 self._conf.getAdjustedEndDate(self._tz).strftime("%A %d %B %Y")))
         if self._conf.getLocation():
             height-=1*cm
@@ -2010,11 +2010,11 @@ class AbstractBook(PDFBase):
         height-=6*cm
         c.drawCentredString(self._PAGE_WIDTH/2.0,height,\
                 self._title)
-        self._drawWrappedString(c, "%s / %s"%(self._conf.getTitle(),self._title), width=inch, height=0.75*inch, font='Times-Roman', size=9, color=(0.5,0.5,0.5), align="left", maximumWidth=self._PAGE_WIDTH-3.5*inch, measurement=inch, lineSpacing=0.15)     
+        self._drawWrappedString(c, "%s / %s"%(self._conf.getTitle(),self._title), width=inch, height=0.75*inch, font='Times-Roman', size=9, color=(0.5,0.5,0.5), align="left", maximumWidth=self._PAGE_WIDTH-3.5*inch, measurement=inch, lineSpacing=0.15)
         c.drawRightString(self._PAGE_WIDTH-inch,0.75*inch,
                 nowutc().strftime("%A %d %B %Y"))
         c.restoreState()
-    
+
     def laterPages(self,c,doc):
         c.saveState()
         c.setFont('Times-Roman',9)
@@ -2120,7 +2120,7 @@ class FilterCriteria(filters.FilterCriteria):
                 }
 
 class ProceedingsTOC(PDFBase):
-    
+
     def __init__(self, conf, trackDict=None, trackOrder=None, contribList=None, npages=None, doc=None, story=None, tz=None):
         self._conf = conf
         if not tz:
@@ -2136,8 +2136,8 @@ class ProceedingsTOC(PDFBase):
         PDFBase.__init__(self, doc, story)
         self._title = _("Proceedings")
         self._PAGE_HEIGHT = defaultPageSize[1]
-        self._PAGE_WIDTH = defaultPageSize[0] 
-    
+        self._PAGE_WIDTH = defaultPageSize[0]
+
     def firstPage(self,c,doc):
         c.saveState()
         if HAVE_PIL:
@@ -2154,7 +2154,7 @@ class ProceedingsTOC(PDFBase):
         c.setFont('Times-Bold',15)
         height-=2*cm
         c.drawCentredString(self._PAGE_WIDTH/2.0,height,
-                "%s - %s"%(self._conf.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y"), 
+                "%s - %s"%(self._conf.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y"),
                 self._conf.getAdjustedEndDate(self._tz).strftime("%A %d %B %Y")))
         if self._conf.getLocation():
             height-=1*cm
@@ -2165,7 +2165,7 @@ class ProceedingsTOC(PDFBase):
         c.setFont('Times-Roman',9)
         c.setFillColorRGB(0.5,0.5,0.5)
         c.restoreState()
-    
+
     def laterPages(self,c,doc):
         c.saveState()
         location = ""
@@ -2174,7 +2174,7 @@ class ProceedingsTOC(PDFBase):
         self._drawWrappedString(c, "%s%s"%(escape(self._conf.getTitle()), location), width=0.5*inch, height=self._PAGE_HEIGHT-0.75*inch, font='Times-Roman', size=9, color=(0.5,0.5,0.5), align="left", maximumWidth=self._PAGE_WIDTH-inch, measurement=inch, lineSpacing=0.15)
         c.drawCentredString(self._PAGE_WIDTH/2.0,0.5*cm,"%s "%Int2Romans.int_to_roman(doc.page-1))
         c.restoreState()
-    
+
     def getBody(self, story=None, indexedFlowable={}, level=1 ):
         if not story:
             story = self._story
@@ -2189,9 +2189,9 @@ class ProceedingsTOC(PDFBase):
         text = _("Table of Contents")
         p = Paragraph(text, style)
         story.append(p)
-        
+
         story.append(Spacer(inch, 0.5*cm))
-                
+
         styleAuthor = ParagraphStyle({})
         styleAuthor.leading = 10
         styleAuthor.fontName = "Times-Roman"
@@ -2212,7 +2212,7 @@ class ProceedingsTOC(PDFBase):
         styleContrib.leftIndent=0
         styleContrib.firstLineIndent=0
         styleContrib.leftIndent=0
-        
+
         styleTrack = ParagraphStyle({})
         styleTrack.fontName = "Times-Bold"
         styleTrack.fontSize = 12
@@ -2253,7 +2253,7 @@ class ProceedingsTOC(PDFBase):
                 t=Table(l,colWidths=(None,1.2*cm),style=tsContribs)
                 self._story.append(t)
         self._story.append(Spacer(inch, 2*cm))
-        
+
         return story
 
     def _addContrib(self, contrib, l, i, styleContrib, styleAuthor):
@@ -2273,7 +2273,7 @@ class ProceedingsTOC(PDFBase):
         l.append([p2, p3])
         l.append(["", ""])
         return i
-    
+
     def _getAbrName(self, author):
         res = author.getFamilyName()
         if res.strip() != "" and len(res)>1:
@@ -2286,7 +2286,7 @@ class ProceedingsTOC(PDFBase):
         return res
 
 class ProceedingsChapterSeparator(PDFBase):
-    
+
     def __init__(self, track, doc=None, story=None):
         self._track = track
         self._conf = track.getConference()
@@ -2295,8 +2295,8 @@ class ProceedingsChapterSeparator(PDFBase):
         PDFBase.__init__(self, doc, story)
         self._title = _("Proceedings")
         self._PAGE_HEIGHT = defaultPageSize[1]
-        self._PAGE_WIDTH = defaultPageSize[0] 
-    
+        self._PAGE_WIDTH = defaultPageSize[0]
+
     def firstPage(self,c,doc):
         c.saveState()
         c.setFont('Times-Roman',9)
@@ -2308,7 +2308,7 @@ class ProceedingsChapterSeparator(PDFBase):
         c.setFont('Times-Roman',9)
         c.setFillColorRGB(0.5,0.5,0.5)
         c.restoreState()
-    
+
     def laterPages(self,c,doc):
         c.saveState()
         c.setFont('Times-Roman',9)
@@ -2317,7 +2317,7 @@ class ProceedingsChapterSeparator(PDFBase):
         #    "%s / %s"%(escape(self._conf.getTitle()),self._title))
         #c.drawCentredString(self._PAGE_WIDTH/2.0,0.5*cm,"Page %d "%doc.page)
         c.restoreState()
-    
+
     def getBody(self, story=None, indexedFlowable={}, level=1 ):
         if not story:
             story = self._story
@@ -2344,10 +2344,10 @@ class Int2Romans:
             input -= ints[i] * count
         return result
     int_to_roman = staticmethod(int_to_roman)
-    
+
 
 class RegistrantsListToPDF(PDFBase):
-    
+
     def __init__(self, conf,doc=None, story=[],list=None, display=["Institution", "Phone", "City", "Country"]):
         self._conf = conf
         self._regForm = conf.getRegistrationForm()
@@ -2357,7 +2357,7 @@ class RegistrantsListToPDF(PDFBase):
         self._title = _("Registrants List")
         self._PAGE_HEIGHT = landscape(A4)[1]
         self._PAGE_WIDTH = landscape(A4)[0]
-    
+
     def firstPage(self, c, doc):
         c.saveState()
         showLogo = False
@@ -2370,7 +2370,7 @@ class RegistrantsListToPDF(PDFBase):
         c.setFont('Times-Roman', 10)
         c.drawRightString(self._PAGE_WIDTH - inch,self._PAGE_HEIGHT-1*cm, "%s"%(nowutc().strftime("%d %B %Y, %H:%M")))
         c.restoreState()
-    
+
     def getBody(self, story=None, indexedFlowable={}, level=1 ):
         if not story:
             story = self._story
@@ -2382,7 +2382,7 @@ class RegistrantsListToPDF(PDFBase):
         p = Paragraph(text, style, part=escape(self._conf.getTitle()))
         p.spaceAfter = 30
         story.append(p)
-        
+
         styleRegistrant = ParagraphStyle({})
         styleRegistrant.leading = 10
         styleRegistrant.fontName = "Times-Roman"
@@ -2392,7 +2392,7 @@ class RegistrantsListToPDF(PDFBase):
         styleRegistrant.alignment=TA_LEFT
         styleRegistrant.leftIndent=10
         styleRegistrant.firstLineIndent=0
-        
+
         tsRegs=TableStyle([('VALIGN',(0,0),(-1,-1),"MIDDLE"),
                         ('LINEBELOW',(0,0),(-1,0), 1, colors.black),
                         ('ALIGN',(0,0),(-1,0),"CENTER"),
@@ -2400,7 +2400,7 @@ class RegistrantsListToPDF(PDFBase):
         l = []
         lp = []
         lp.append(Paragraph( _("""<b> _("Name")</b>"""), styleRegistrant))
-        
+
         for key in self._display:
             if key in ["Email", "Position", "LastName", "FirstName", "Institution", "Phone", "City", "Country", "Address", "RegistrationDate"]:
                 p=Paragraph("""<b>%s</b>"""%key, styleRegistrant)
@@ -2539,7 +2539,7 @@ class RegistrantsListToBadgesPDF:
     """
     Class used to print the Badges for the registrants
     """
-    
+
     """
     The following dictionary maps the names of the fonts, as returned by the javascript in WConfModifBadgeDesign.tpl,
     to actual TTF font names.
@@ -2555,7 +2555,7 @@ class RegistrantsListToBadgesPDF:
                'Uming-CN':['Uming-CN','Uming-CN','Uming-CN','Uming-CN']
            #,'Bitstream Cyberbit':['Bitstream-Cyberbit', 'Bitstream-Cyberbit', 'Bitstream-Cyberbit', 'Bitstream-Cyberbit']
                }
-    
+
     """ The following dictionary maps the sizes of the items, as returned by the javascript in WConfModifBadgeDesign.tpl,
     to actual font sizes in points, as ReportLab needs.
     """
@@ -2567,7 +2567,7 @@ class RegistrantsListToBadgesPDF:
                    'x-large':16,
                    'xx-large':24
                    }
-    
+
     """ The following dictionary maps the possible text alignments, as returned by the javascript in WConfModifBadgeDesign.tpl,
     to ReportLab constants.
     """
@@ -2576,7 +2576,7 @@ class RegistrantsListToBadgesPDF:
                     'Center':TA_CENTER,
                     'Justified':TA_JUSTIFY
                     }
-    
+
     """ The following dictionary maps the possible text colors, as returned by the javascript in WConfModifBadgeDesign.tpl,
     to ReportLab color constants.
     """
@@ -2592,9 +2592,9 @@ class RegistrantsListToBadgesPDF:
                 'gray': colors.gray,
                 'white': colors.white
                 }
-    
-    
-    def __init__(self, conf, badgeTemplate, marginTop, marginBottom, marginLeft, marginRight, marginColumns, marginRows, pagesize, registrantList):
+
+
+    def __init__(self, conf, badgeTemplate, marginTop, marginBottom, marginLeft, marginRight, marginColumns, marginRows, pagesize, drawDashedRectangles, registrantList):
         """ Constructor
                 conf: the conference for which the badges are printed, as a Conference object.
                 badgeTemplate: the template used, as a BadgeTemplate object.
@@ -2608,7 +2608,7 @@ class RegistrantsListToBadgesPDF:
                 registrantList: either a string whose value should be "all", either a list of registrant id's
             The badges will be drawn aligned to the left.
         """
-        
+
         self.__conf = conf
         self.__badgeTemplate = badgeTemplate
         self.__marginTop = marginTop
@@ -2622,36 +2622,38 @@ class RegistrantsListToBadgesPDF:
             self.__registrantList = self.__conf.getRegistrantsList(sort = True)
         else:
             self.__registrantList = [self.__conf.getRegistrantById(id) for id in registrantList]
-        
+
         self.__size = PDFSizes().PDFpagesizes[pagesize]
         self.__width, self.__height = self.__size
-        
+
+        self.__drawDashedRectangles = drawDashedRectangles
+
         setTTFonts()
-        
-    
+
+
     def getPDFBin(self):
         """ Returns the data of the PDF file to be printed
         """
-        
+
         self.__fileDummy = FileDummy()
         self.__canvas = canvas.Canvas(self.__fileDummy, pagesize = self.__size)
 
         nBadgesHorizontal = int((self.__width - self.__marginLeft * cm - self.__marginRight * cm + self.__marginColumns * cm  + 0.01*cm) /
                                 ((self.__badgeTemplate.getWidthInCm() + self.__marginColumns)  * cm))
-        
-        
+
+
         nBadgesVertical = int((self.__height - self.__marginTop * cm - self.__marginBottom * cm + self.__marginRows * cm + 0.01*cm) /
                               ((self.__badgeTemplate.getHeightInCm() + self.__marginRows) * cm))
-        
+
         # We get an instance of the position generator
         p = RegistrantsListToBadgesPDF.__position_generator(
                                nBadgesHorizontal, nBadgesVertical,
                                self.__badgeTemplate.getWidthInCm() * cm, self.__badgeTemplate.getHeightInCm() * cm,
                                self.__marginLeft * cm, self.__marginTop * cm, self.__marginColumns * cm, self.__marginRows * cm)
-        
+
         if nBadgesHorizontal == 0 or nBadgesVertical == 0:
             raise NoReportError( _("The template dimensions are too large for the page size you selected"))
-        
+
         # We print a badge for each registrant
         for registrant in self.__registrantList:
             try:
@@ -2666,20 +2668,20 @@ class RegistrantsListToBadgesPDF:
                                self.__marginLeft * cm, self.__marginTop * cm, self.__marginColumns * cm, self.__marginRows * cm)
                 posx, posy = p.next()
                 self.__draw_badge(registrant, posx, posy)
-        
+
         self.__canvas.save()
         return self.__fileDummy.getData()
 
-    def __position_generator(cls, 
-                             nBadgesHorizontal, nBadgesVertical, 
-                             badgeWidth, badgeHeight, 
+    def __position_generator(cls,
+                             nBadgesHorizontal, nBadgesVertical,
+                             badgeWidth, badgeHeight,
                              marginLeft, marginTop,
                              interColumnMargin, interRowMargin):
         """ Generates the a new position for drawing a badge each time it is called.
         The position of a badge is the position of the top left corner.
         When there are no more positions available in a page, it throws a StopIteration exception.
         """
-        
+
         nx = 0
         ny = 0
         while ny < nBadgesVertical:
@@ -2698,32 +2700,33 @@ class RegistrantsListToBadgesPDF:
         """ Draws a badge, for a given registrant, at the position (posx, posy).
         (posx, posy) is the position of the top left corner of a badge.
         """
-        
+
         # We draw a dashed rectangle around the badge
-        self.__canvas.saveState()
-        self.__canvas.setDash(1,5)
-        self.__canvas.rect(posx, self.__height - posy - self.__badgeTemplate.getHeightInCm() * cm,
-                           self.__badgeTemplate.getWidthInCm() * cm, self.__badgeTemplate.getHeightInCm() * cm)
-        self.__canvas.restoreState()
-        
+        if self.__drawDashedRectangles:
+            self.__canvas.saveState()
+            self.__canvas.setDash(1,5)
+            self.__canvas.rect(posx, self.__height - posy - self.__badgeTemplate.getHeightInCm() * cm,
+                               self.__badgeTemplate.getWidthInCm() * cm, self.__badgeTemplate.getHeightInCm() * cm)
+            self.__canvas.restoreState()
+
         # We draw the background if we find it.
         usedBackgroundId = self.__badgeTemplate.getUsedBackgroundId()
         if usedBackgroundId != -1 and self.__badgeTemplate.getBackground(usedBackgroundId)[1] is not None:
             self.__canvas.drawImage(self.__badgeTemplate.getBackground(usedBackgroundId)[1].getFilePath(),
                                     posx, self.__height - posy - self.__badgeTemplate.getHeightInCm() * cm,
                                     self.__badgeTemplate.getWidthInCm() * cm, self.__badgeTemplate.getHeightInCm() * cm)
-        
-        
+
+
         # We draw the items of the badge
         for item in self.__badgeTemplate.getItems():
-            
+
             # First we determine the actual text that has to be drawed.
             action = BadgeDesignConfiguration().items_actions[item.getName()]
             if isinstance(action, str):
                 # If for this kind of item we have to draw always the same string, let's draw it.
                 text = action
             elif isinstance(action, types.MethodType):
-                # If the action is a method, depending on which class owns the method, we pass a 
+                # If the action is a method, depending on which class owns the method, we pass a
                 # different object to the method.
                 if action.im_class == Registrant:
                     text = action.__call__(registrant)
@@ -2750,7 +2753,7 @@ class RegistrantsListToBadgesPDF:
                     text = _("Error")
             else:
                 text = _("Error")
-                
+
             if not isinstance(text, basestring):
                 text = str(text)
             text = escape(text)
@@ -2761,7 +2764,7 @@ class RegistrantsListToBadgesPDF:
             style.textColor = RegistrantsListToBadgesPDF.__colors[item.getColor()]
             style.fontSize = RegistrantsListToBadgesPDF.__fontSizes[item.getFontSize()]
             style.leading = style.fontSize
-            
+
             if item.isBold() and item.isItalic():
                 style.fontName = style.fontName = RegistrantsListToBadgesPDF.__fonts[item.getFont()][3]
             elif item.isItalic():
@@ -2770,23 +2773,23 @@ class RegistrantsListToBadgesPDF:
                 style.fontName = style.fontName = RegistrantsListToBadgesPDF.__fonts[item.getFont()][1]
             else:
                 style.fontName = style.fontName = RegistrantsListToBadgesPDF.__fonts[item.getFont()][0]
-            
+
             p = Paragraph(text, style)
-    
+
             itemx = self.__badgeTemplate.pixelsToCm(item.getX()) * cm
             itemy = self.__badgeTemplate.pixelsToCm(item.getY()) * cm
-            
+
             availableWidth = self.__badgeTemplate.pixelsToCm(item.getWidth()) * cm
             availableHeight = (self.__badgeTemplate.getHeightInCm()
                                - self.__badgeTemplate.pixelsToCm(item.getY()) \
                               ) * cm
-    
+
             w,h = p.wrap(availableWidth, availableHeight)
-      
+
             if w > availableWidth or h > availableHeight:
                 ## TODO: give warnings
                 pass
-    
+
             p.drawOn(self.__canvas, posx + itemx, self.__height - posy - itemy - h)
 
 
@@ -2794,7 +2797,7 @@ class LectureToPosterPDF:
     """
     Class used to print a lecture's poster
     """
-    
+
     """ The following dictionary maps the names of the fonts, as returned by the javascript in WConfModifPosterDesign.tpl,
     to actual TTF font names.
     Each font name is mapped to 4 TTF fonts: Normal one, Bold one, Italic one, Bold & Italic one.
@@ -2809,8 +2812,8 @@ class LectureToPosterPDF:
                'Uming-CN':['Uming-CN','Uming-CN','Uming-CN','Uming-CN']
            #,'Bitstream Cyberbit':['Bitstream-Cyberbit', 'Bitstream-Cyberbit', 'Bitstream-Cyberbit', 'Bitstream-Cyberbit']
                }
-    
-    
+
+
     """ The following dictionary maps the possible text alignments, as returned by the javascript in WConfModifPosterDesign.tpl,
     to ReportLab constants.
     """
@@ -2819,7 +2822,7 @@ class LectureToPosterPDF:
                     'Center':TA_CENTER,
                     'Justified':TA_JUSTIFY
                     }
-    
+
     """ The following dictionary maps the possible text colors, as returned by the javascript in WConfModifPosterDesign.tpl,
     to ReportLab color constants.
     """
@@ -2835,8 +2838,8 @@ class LectureToPosterPDF:
                 'gray': colors.gray,
                 'white': colors.white
                 }
-    
-    
+
+
     def __init__(self, conf, posterTemplate, marginH, marginV, pagesize, tz=None):
         """ Constructor
         conf: the conference for which the posters are printed, as a Conference object.
@@ -2847,7 +2850,7 @@ class LectureToPosterPDF:
         registrantList: either a string whose value should be "all",
                         either a list of registrant id's
         """
-        
+
         self.__conf = conf
         if not tz:
             self._tz = self.__conf.getTimezone()
@@ -2856,12 +2859,12 @@ class LectureToPosterPDF:
         self.__posterTemplate = posterTemplate
         self.__marginH = marginH
         self.__marginV = marginV
-        
+
         self.__size = PDFSizes().PDFpagesizes[pagesize]
         self.__width, self.__height = self.__size
-        
+
         setTTFonts()
-      
+
     """ The following function maps the sizes of the items, as returned by the javascript in WConfModifPosterDesign.tpl,
     to actual font sizes in points, as ReportLab needs.
     """
@@ -2873,24 +2876,24 @@ class LectureToPosterPDF:
             return int(m.group(1))
         return None
     __extract_size = classmethod (__extract_size)
-        
-    
+
+
     def getPDFBin(self):
         """ Returns the data of the PDF file to be printed
         """
-        
+
         self.__fileDummy = FileDummy()
         self.__canvas = canvas.Canvas(self.__fileDummy, pagesize = self.__size)
 
         self.__draw_poster(self.__marginH * cm, self.__marginV * cm)
-        
+
         self.__canvas.save()
         return self.__fileDummy.getData()
 
     def __draw_background(self, file, position, posx, posy):
-        
+
         img = Image.open(file)
-        
+
         imgWidth, imgHeight = img.size
 
         posx = self.__posterTemplate.pixelsToCm(posx);
@@ -2905,31 +2908,31 @@ class LectureToPosterPDF:
         elif position == "Center":
             height = self.__posterTemplate.pixelsToCm(imgHeight)
             width = self.__posterTemplate.pixelsToCm(imgWidth)
-            
+
             posterWidth = self.__posterTemplate.getWidthInCm()
             posterHeight = self.__posterTemplate.getHeightInCm()
-            
-            if width > posterWidth or height > posterHeight:     
-                
-                if width > posterWidth:                    
-                    ratio = float(posterWidth)/width;                    
+
+            if width > posterWidth or height > posterHeight:
+
+                if width > posterWidth:
+                    ratio = float(posterWidth)/width;
                     width = posterWidth;
                     height = height*ratio
-                                        
+
                     x_1 = posx;
                     y_1 = posy + (posterHeight - height)/2.0;
 
-                
+
                 if  height > posterHeight:
-                    ratio = float(posterHeight)/height;                    
+                    ratio = float(posterHeight)/height;
                     height = posterHeight;
                     width = width*ratio
-                    x_1 = posx + (posterWidth - width)/2.0;                
+                    x_1 = posx + (posterWidth - width)/2.0;
                     y_1 = posy;
             else:
                 x_1 = posx + (posterWidth - self.__posterTemplate.pixelsToCm(imgWidth))/2.0
                 y_1 = posy + (posterHeight - self.__posterTemplate.pixelsToCm(imgHeight))/2.0
-        
+
         self.__canvas.drawImage(file,
              x_1 * cm, y_1 * cm,
              width * cm, height * cm)
@@ -2938,28 +2941,28 @@ class LectureToPosterPDF:
     def __draw_poster(self, posx, posy):
         """ Draws a poster, for a given registrant, at the position (posx, posy).
         (posx, posy) is the position of the top left corner of a poster.
-        """       
-        
+        """
+
         # We draw the background if we find it.
         usedBackgroundId = self.__posterTemplate.getUsedBackgroundId()
-        
+
         if usedBackgroundId != -1 and self.__posterTemplate.getBackground(usedBackgroundId)[1] is not None:
-            
+
             self.__draw_background(self.__posterTemplate.getBackground(usedBackgroundId)[1].getFilePath(),
-                             self.__posterTemplate.getBackgroundPosition(usedBackgroundId),posx,posy)        
-        
+                             self.__posterTemplate.getBackgroundPosition(usedBackgroundId),posx,posy)
+
         # We draw the items of the poster
         for item in self.__posterTemplate.getItems():
-            
+
             # First we determine the actual text that has to be drawed.
             action = PosterDesignConfiguration().items_actions[item.getName()]
-                        
+
             if isinstance(action, str):
                 # If for this kind of item we have to draw always the same string, let's draw it.
                 # text is passed in lists, because some fields need several lines
                 text = [action]
             elif isinstance(action, types.MethodType):
-                # If the action is a method, depending on which class owns the method, we pass a 
+                # If the action is a method, depending on which class owns the method, we pass a
                 # different object to the method.
                 if action.im_class == conference.Conference:
                     text = action.__call__(self.__conf).replace("\r\n","\n").split("\n")
@@ -2973,11 +2976,11 @@ class LectureToPosterPDF:
                 #  Depending on what is returned, we will pass a different object to the getValue() method.
                 #  -it must have a getValue(object) method, to which a Conference instance or a
                 #  PosterTemplateItem instance must be passed, depending on the result of the getArgumentType() method.
-                argumentType = action.getArgumentType()              
+                argumentType = action.getArgumentType()
                 if action.__name__ == "ConferenceChairperson":
                     #this specific case may need more than one line
                     chairList = action.getValue(self.__conf)
-                    
+
                     # 'text' is a list of lines
                     text = []
                     # let's fill it with the chairpersons' names
@@ -2986,7 +2989,7 @@ class LectureToPosterPDF:
                             text.append("%s (%s)" % (chair.getDirectFullName(),chair.getAffiliation()))
                         else:
                             text.append(chair.getDirectFullName())
-                        
+
                 elif argumentType == conference.Conference:
                     text = [action.getValue(self.__conf)]
                 elif argumentType == PosterTemplateItem:
@@ -2995,16 +2998,16 @@ class LectureToPosterPDF:
                     text = [_("Error")]
             else:
                 text = [_("Error")]
-              
+
             text = map(escape,text)
-            
+
             #style definition for the Paragraph used to draw the text.
             style = ParagraphStyle({})
             style.alignment = LectureToPosterPDF.__alignments[item.getTextAlign()]
             style.textColor = LectureToPosterPDF.__colors[item.getColor()]
             style.fontSize = LectureToPosterPDF.__extract_size(item.getFontSize())
             style.leading = style.fontSize
-            
+
             if item.isBold() and item.isItalic():
                 style.fontName = style.fontName = LectureToPosterPDF.__fonts[item.getFont()][3]
             elif item.isItalic():
@@ -3013,16 +3016,16 @@ class LectureToPosterPDF:
                 style.fontName = style.fontName = LectureToPosterPDF.__fonts[item.getFont()][1]
             else:
                 style.fontName = style.fontName = LectureToPosterPDF.__fonts[item.getFont()][0]
-            
+
             availableWidth = self.__posterTemplate.pixelsToCm(item.getWidth()) * cm
             availableHeight = (self.__posterTemplate.getHeightInCm()
                                - self.__posterTemplate.pixelsToCm(item.getY()) \
                               ) * cm
-                 
+
             w,h = 0,0
             itemx = self.__posterTemplate.pixelsToCm(item.getX()) * cm
             itemy = self.__posterTemplate.pixelsToCm(item.getY()) * cm
-            
+
             # now, we iterate over the line set
             for line in text:
                 if line == "":
@@ -3031,12 +3034,12 @@ class LectureToPosterPDF:
                     p = Paragraph(line, style)
 
                     itemy += h
-             
+
                     w,h = p.wrap(availableWidth, availableHeight)
-      
+
                     if w > availableWidth or h > availableHeight:
                         ## TODO: warnings
-                        pass                
-                            
+                        pass
+
                     # finally, draw
                     p.drawOn(self.__canvas, posx + itemx, self.__height - posy - itemy - h)

@@ -21,7 +21,7 @@ function $B(target, source, template) {
 
 // HIGH LEVEL
 
-/** 
+/**
  * Direct binding.
  * @param {Accessor, List, Dictionary} target
  * @param {Object} source
@@ -101,7 +101,7 @@ bind.accessor = function(target, source, template, listenOnly) {
 	}
 };
 
-/** 
+/**
  * Binds the target to the source accessor.
  * @param {Accessor} target
  * @param {Object} [source]
@@ -122,7 +122,7 @@ bind.toAccessor = function(target, source, template, listenOnly, lock) {
 	}), listenOnly);
 };
 
-/** 
+/**
  * Binds the target list to the source.
  * @param {List} target
  * @param {Object} [source]
@@ -142,7 +142,7 @@ bind.toList = function(target, source, template) {
 	});
 };
 
-/** 
+/**
  * Binds the target dictionary to the source.
  * @param {Dictionary} target
  * @param {Object} [source]
@@ -164,7 +164,7 @@ bind.toDictionary = function(target, source, template) {
 
 // LOW LEVEL
 
-/** 
+/**
  * Binds two lists.
  * @param {List} target
  * @param {WatchList, Enumerable, Array} source
@@ -175,7 +175,7 @@ bind.list = function(target, source, template) {
 	return bind.attach(target, bind.internal.list(target, source, template));
 };
 
-/** 
+/**
  * Binds the target list tp the source object.
  * @param {List} target
  * @param {WatchObject, Object} source
@@ -186,7 +186,7 @@ bind.objectToList = function(target, source, template) {
 	return bind.attach(target, bind.internal.objectToList(target, source, template));
 };
 
-/** 
+/**
  * Binds the target dictionary to the source list.
  * @param {Dictionary} target
  * @param {WatchList, Enumerable, Array} source
@@ -197,7 +197,7 @@ bind.listToDictionary = function(target, source, template) {
 	return bind.attach(target, bind.internal.listToDictionary(target, source, template));
 };
 
-/** 
+/**
  * Binds the target dictionary to the source object.
  * @param {Dictionary} target
  * @param {WatchObject, Object} source
@@ -219,7 +219,7 @@ bind.sequence = function(target, source, template) {
 };
 
 /**
- * 
+ *
  * @param {List} target
  * @param {WatchList, Enumerable, Array} source
  * @param {Function, String} [template]
@@ -292,7 +292,7 @@ bind.internal.element = function(target, source, template) {
 	if (!exists(target)) {
 		return obtainTemplate(template)(source);
 	}
-	
+
 	function gain(value) {
 		if (!exists(value) || value.XElement || !isObject(value)) {
 			target.clear();
@@ -307,7 +307,7 @@ bind.internal.element = function(target, source, template) {
 		}
 		return bind.internal.list(target, $L(value), template);
 	}
-	
+
 	return gain(source);
 };
 
@@ -327,7 +327,7 @@ bind.internal.list = function(target, list, template) {
 		target.insert(template(item, target), index);
 	}
 	target.clear();
-	processListable(list, {
+	return processListable(list, {
 		itemAdded: inserter,
 		itemRemoved: function(item, index) {
 			target.removeAt(index);
@@ -336,7 +336,6 @@ bind.internal.list = function(target, list, template) {
 			target.move(source, destination);
 		}
 	});
-	return null;
 };
 
 bind.internal.objectToList = function(target, object, template) {
@@ -393,7 +392,7 @@ bind.internal.sequence = function(target, list, template) {
 	function update() {
 		target.clear();
 		each(list, function(item, index) {
-			target.insert(template(item, index, target), index);	
+			target.insert(template(item, index, target), index);
 		});
 	}
 	update();

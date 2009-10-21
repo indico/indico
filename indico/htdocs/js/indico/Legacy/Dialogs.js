@@ -5,116 +5,7 @@
 
 extend(IndicoUI.Dialogs,
        {
-           /**
-        * Creates a dialog that allows a break to be added
-        * to the schedule
-        * @param {String} method The name of the JSON-RPC method
-        *        that will be called for the break to be added
-        * @param {String} timeStartMethod The JSON-RPC method that
-        *        will be called in order to know what the default date/time for
-        *        the start of the break will be
-        * @param {Object} args the arguments that will be passed to the
-        *        JSON-RPC methods, in order to identify the event the break
-        *        will be added to
-        * @param {Object} roomInfo The object that contains the default room information
-        *        for the dialog (inherited from the parent, normally)
-        * @param {String} confStartDate A string representing the start date/time of the
-        *        parent event (DD/MM/YYY HH:MM)
-        * @param {String} dayStartDate A string representing the date of the day the
-        *        calendar is currently pointing to (DD/MM/YYYY)
-        */
-           addBreak: function(method, timeStartMethod, args, roomInfo, parentRoomInfo, confStartDate, dayStartDate, crbsActive){
-
-               var parentRoomData;
-               var info = new WatchObject();
-               var dateArgs = clone(args);
-               var dateTimeField = IndicoUI.Widgets.Generic.dateDurationField(confStartDate, 20, ' ');
-
-               dateArgs.date = dayStartDate;
-
-
-               IndicoUtil.waitLoad([
-                   function(hook) {
-                       // Get "end date" for container, so that the break be added after the rest
-                       indicoRequest(timeStartMethod, dateArgs , function(result, error){
-                           if (error) {
-                               IndicoUtil.errorReport(error);
-                           }
-                           else {
-                               dateTimeField.accessor.set('dateTime', result);
-                               hook.set(true);
-                           }
-                       });
-                   }], function(retValue) {
-
-                       var submitInfo = function(){
-                           var killProgress = IndicoUI.Dialogs.Util.progress();
-
-                           each(args, function(value, key) {
-                               info.set(key, value);
-                           });
-
-                           indicoRequest(method, info, function(result, error){
-                               if (error) {
-                                   killProgress();
-                                   IndicoUtil.errorReport(error);
-                               }
-                               else {
-                                   popup.close();
-                                   window.location.reload(true);
-                               }
-                           });
-                       };
-
-                       var popup = new ExclusivePopup(
-                           $T('Add Break'),
-                           function() {
-                               popup.close();
-                           });
-
-                       popup.draw = function(){
-                           var self = this;
-
-                           var addButton = Html.button({}, $T("Add"));
-                           var cancelButton = Html.button({}, $T("Cancel"));
-                           cancelButton.dom.style.marginLeft = pixels(10);
-
-                           info.set('roomInfo', $O(roomInfo));
-
-                           var roomEditor = new RoomBookingWidget(info.get('roomInfo'), parentRoomInfo, crbsActive, true, args.conference);
-
-                           cancelButton.observeClick(function(){
-                               self.close();
-                           });
-
-
-                           addButton.observeClick(function(){
-                               submitInfo();
-                           });
-
-                           // TODO: generalize these rpc method names
-                           $B(info.accessor('dateTime'), dateTimeField.accessor.accessor('dateTime'));
-                           $B(info.accessor('duration'), dateTimeField.accessor.accessor('duration'));
-
-                           return self.ExclusivePopup.prototype.draw.call(
-                               this,
-                               Widget.block([IndicoUtil.createFormFromMap([[$T('Title'), $B(Html.edit({
-                                   style: {
-                                       width: '300px'
-                                   }
-                               }), info.accessor('title'))], [$T('Description'), $B(Html.textarea({
-                                   cols: 40,
-                                   rows: 2
-                               }), info.accessor('description'))], [$T('Place'), roomEditor.draw()], [$T('Date/Time'), dateTimeField.element]]),
-                                             Html.div('dialogButtons',
-                                                      [addButton, cancelButton])]));
-                       };
-
-                       popup.open();
-                   }).run();
-           },
-
-           addSession: function(method, timeStartMethod, args, roomInfo, parentRoomInfo, dayStartDate, crbsActive){
+           addSession: function(method, timeStartMethod, args, roomInfo, parentRoomInfo, dayStartDate, favoriteRooms, successFunc){
 
                var parameterManager = new IndicoUtil.parameterManager();
                var favorites;
@@ -126,6 +17,7 @@ extend(IndicoUI.Dialogs,
 
                IndicoUtil.waitLoad([
                    function(hook) {
+
                        // Get "end date" for container, so that the break be added after the rest
 
                        indicoRequest(timeStartMethod, dateArgs , function(result, error){
@@ -133,11 +25,23 @@ extend(IndicoUI.Dialogs,
                                IndicoUtil.errorReport(error);
                            }
                            else {
-                               info.set('startDateTime', result);
-                               // end date is one hour later, by default
-                               var hourAfter = IndicoUtil.parseDateTime(result);
-                               hourAfter.setHours(hourAfter.getHours()+1);
-                               info.set('endDateTime', IndicoUtil.formatDateTime(hourAfter));
+                               var startDate = IndicoUtil.parseDateTime(result);
+                               var endDate = IndicoUtil.parseDateTime(result);
+                               /*
+                                * If suggested start time is later the 23h then set the suggested
+                                * time to latest possible: 23:00 - 23:59.
+                                */
+                               if (startDate.getHours() >= 23) {
+                                   startDate.setHours(23);
+                                   startDate.setMinutes(0);
+                                   endDate.setHours(23);
+                                   endDate.setMinutes(59);
+                               } else {
+                                   // end date is one hour later, by default
+                                   endDate.setHours(startDate.getHours()+1);
+                               }
+                               info.set('startDateTime', IndicoUtil.formatDateTime(startDate));
+                               info.set('endDateTime', IndicoUtil.formatDateTime(endDate));
                                hook.set(true);
                            }
                        });
@@ -158,19 +62,28 @@ extend(IndicoUI.Dialogs,
                                info.set(key, value);
                            });
                            if (parameterManager.check()) {
+                               var killProgress = IndicoUI.Dialogs.Util.progress();
                                indicoRequest(method, info,
                                              function(result, error){
+                                                 killProgress();
                                                  if (error) {
                                                      IndicoUtil.errorReport(error);
                                                  } else {
-                                                     window.location.reload(true);
+                                                     popup.close();
+                                                     successFunc(result);
                                                  }
                                              });
-                               popup.close();
                            }
                        };
 
                        var popup = new ExclusivePopup($T('Add Session'));
+
+                       var roomEditor;
+
+                       popup.postDraw = function() {
+                           roomEditor.postDraw();
+                           this.ExclusivePopup.prototype.postDraw.call(this);
+                       };
 
                        popup.draw = function(){
                            var self = this;
@@ -181,7 +94,7 @@ extend(IndicoUI.Dialogs,
                            info.set('roomInfo', $O(roomInfo));
 
 
-                           var roomEditor = new RoomBookingWidget(info.get('roomInfo'), parentRoomInfo, crbsActive, true, args.conference);
+                           roomEditor = new RoomBookingWidget(Indico.Data.Locations, info.get('roomInfo'), parentRoomInfo, true, favoriteRooms);
 
                            cancelButton.observeClick(function(){
                                self.close();
@@ -206,18 +119,50 @@ extend(IndicoUI.Dialogs,
                            sesType.select('standard');
                            $B(info.accessor('sessionType'), sesType.state);
 
+                           var startEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(info.get('startDateTime').substr(11,5), info.get('endDateTime').substr(11,5));
+                           var startEndTimeComponent;
+                           var timeTranslation = {
+                                   toTarget: function (value) {
+                                       return dayStartDate + ' ' + value;
+                                   },
+                                   toSource: function(value) {
+                                       return value.substr(11,5);
+                                   }
+                           };
+
+                           $B(info.accessor('startDateTime'), startEndTimeField.accessor.accessor('startTime'), timeTranslation);
+                           $B(info.accessor('endDateTime'), startEndTimeField.accessor.accessor('endTime'), timeTranslation);
+
+                           parameterManager.add(startEndTimeField.startTimeField, 'time', false);
+                           parameterManager.add(startEndTimeField.endTimeField, 'time', false);
+                           startEndTimeComponent = [$T('Time'), startEndTimeField.element];
+
+                           // Create the color picker
+                           var colorPicker = new ColorPicker([], false);
+                           info.set('textColor', colorPicker.getTextColor());
+                           info.set('bgColor', colorPicker.getBgColor());
+                           colorPicker.observe(function(colors) {
+                               info.set('textColor', colors.textColor);
+                               info.set('bgColor', colors.bgColor);
+                           });
+                           colorPicker.setFixedPosition();
+                           var colorPickerComponent = ['Color', Html.div({style: {padding: '5px 0 10px 0'}}, colorPicker.getLink(null, 'Choose a color'))];
+
                            return this.ExclusivePopup.prototype.draw.call(
                                this,
-                               Widget.block([IndicoUtil.createFormFromMap([
-                                   [$T('Title'), $B(parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), info.accessor('title'))],
-                                   [$T('Description'), $B(Html.textarea({cols: 40, rows: 2}), info.accessor('description'))],
-                                   [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
-                                   [$T('Start Date/Time'), $B(parameterManager.add(IndicoUI.Widgets.Generic.dateField(true), 'datetime', false), info.accessor('startDateTime')) ],
-                                   [$T('End Date/Time'), $B(parameterManager.add(IndicoUI.Widgets.Generic.dateField(true), 'datetime', false), info.accessor('endDateTime')) ],
-                                   [$T('Convener(s)'), convListWidget.draw()],
-                                   [$T('Session type'), sesType.draw()]
-                               ]), Html.div('dialogButtons',[addButton, cancelButton])
-                               ]));
+                               Html.div({},
+                                        IndicoUtil.createFormFromMap([
+
+                                            [$T('Title'), $B(parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), info.accessor('title'))],
+                                            [$T('Sub-title'), $B(parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', true), info.accessor('subtitle'))],
+                                            [$T('Description'), $B(Html.textarea({cols: 40, rows: 2}), info.accessor('description'))],
+                                            [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
+                                            [$T('Date'), dayStartDate],
+                                            startEndTimeComponent,
+                                            colorPickerComponent,
+                                            [$T('Convener(s)'), convListWidget.draw()],
+                                            [$T('Session type'), sesType.draw()]]),
+                                        Html.div({style:{marginTop: pixels(10), textAlign: 'center', background: '#DDDDDD', padding: pixels(2)}},[addButton, cancelButton])));
                        };
                        popup.open();
                    }).run();
@@ -241,23 +186,42 @@ extend(IndicoUI.Dialogs,
         * @param {String} dayStartDate A string representing the date of the day the
         *        calendar is currently pointing to (DD/MM/YYYY)
         */
-           addSessionSlot: function(method, timeStartMethod, args, roomInfo, parentRoomInfo, confStartDate, dayStartDate, crbsActive){
-
+           addSessionSlot: function(method, timeStartMethod, params, roomInfo, parentRoomInfo, confStartDate, dayStartDate, favoriteRooms, successFunc, editOn){
+               var parameterManager = new IndicoUtil.parameterManager();
+               var isEdit = exists(editOn)?editOn:false;
+               var args = isEdit?params:params.args
                var dateArgs = clone(args);
                dateArgs.date = dayStartDate;
                var info = new WatchObject();
                var favorites;
                var parentRoomData;
-               var dateTimeField = IndicoUI.Widgets.Generic.dateDurationField(confStartDate, 20, ' ');
+
+
                IndicoUtil.waitLoad([
-                   function(hook) {
+                   isEdit?function(hook){hook.set(true);}:function(hook) {
                        // Get "end date" for container, so that the break be added after the rest
                        indicoRequest(timeStartMethod, dateArgs , function(result, error){
                            if (error) {
                                IndicoUtil.errorReport(error);
                            }
                            else {
-                               dateTimeField.accessor.set('dateTime', result);
+                               var startDate = IndicoUtil.parseDateTime(result);
+                               var endDate = IndicoUtil.parseDateTime(result);
+                               /*
+                                * If suggested start time is later the 23h then set the suggested
+                                * time to latest possible: 23:00 - 23:59.
+                                */
+                               if (startDate.getHours() >= 23) {
+                                   startDate.setHours(23);
+                                   startDate.setMinutes(0);
+                                   endDate.setHours(23);
+                                   endDate.setMinutes(59);
+                               } else {
+                                   // end date is one hour later, by default
+                                   endDate.setHours(startDate.getHours()+1);
+                               }
+                               info.set('startDateTime', IndicoUtil.formatDateTime(startDate));
+                               info.set('endDateTime', IndicoUtil.formatDateTime(endDate));
                                hook.set(true);
                            }
                        });
@@ -275,28 +239,36 @@ extend(IndicoUI.Dialogs,
                    }], function(retVal) {
                        var submitInfo = function(){
 
-                           each(args, function(value, key) {
-                               info.set(key, value);
+                           each(info, function(value, key) {
+                               args[key] = value;
                            });
-
-                           indicoRequest(method, info, function(result, error){
-                               if (error) {
-                                   IndicoUtil.errorReport(error);
-                               }
-                               else {
-                                   // Not very pretty, but can't see any
-                                   // other reasonable option
-                                   window.location = result;
-                               }
-                           });
-                           popup.close();
+                           if (parameterManager.check()) {
+                               var killProgress = IndicoUI.Dialogs.Util.progress();
+                               indicoRequest(method, args, function(result, error){
+                                   killProgress();
+                                   if (error) {
+                                       IndicoUtil.errorReport(error);
+                                   }
+                                   else {
+                                       popup.close();
+                                       successFunc(result);
+                                   }
+                               });
+                           }
                        };
 
                        var popup = new ExclusivePopup(
-                           $T('Add Session Slot'),
+                           isEdit?$T('Edit session block'):$T('Add session block'),
                            function() {
                                popup.close();
                            });
+
+                       var roomEditor;
+
+                       popup.postDraw = function() {
+                           roomEditor.postDraw();
+                           this.ExclusivePopup.prototype.postDraw.call(this);
+                       };
 
                        popup.draw = function() {
                            var self = this;
@@ -304,9 +276,30 @@ extend(IndicoUI.Dialogs,
                            var cancelButton = Html.button({}, $T("Cancel"));
                            cancelButton.dom.style.marginLeft = pixels(10);
 
-                           info.set('roomInfo', $O(roomInfo));
+                           /******************************************************
+                            * This is the setup for the edition of sessions slots
+                            *******************************************************/
+                           if (isEdit){
+                               info.set('startDateTime', IndicoUtil.formatDateTime(IndicoUtil.parseJsonDate(params.startDate)));
+                               info.set('endDateTime', IndicoUtil.formatDateTime(IndicoUtil.parseJsonDate(params.endDate)));
+                               info.set('title', params.slotTitle)
+                               info.set('scheduleEntry', params.scheduleEntryId);
+                               info.set('roomInfo',$O({"location": params.inheritLoc?null:params.location,
+                                       "room": params.inheritRoom?null:params.room,
+                                       "address": params.inheritLoc?'':params.address}));
+                               info.set("conveners", params.conveners)
 
-                           var roomEditor = new RoomBookingWidget(info.get('roomInfo'), parentRoomInfo, crbsActive, true, args.conference);
+                           }/******************************************************/
+                           else {
+                               info.set("conveners", params.sessionConveners)
+                               info.set('roomInfo', $O({location: null, room: null}));
+                           }
+
+                           roomEditor = new RoomBookingWidget(Indico.Data.Locations,
+                                                              info.get('roomInfo'),
+                                                              parentRoomInfo,
+                                                              nullRoomInfo(info.get('roomInfo')),
+                                                              favoriteRooms);
 
 
                            cancelButton.observeClick(function(){
@@ -319,23 +312,38 @@ extend(IndicoUI.Dialogs,
 
                            var convListWidget = new UserListField(
                                'VeryShortPeopleListDiv', 'PluginPeopleList',
-                               [],
+                               isEdit?params.conveners:params.sessionConveners,
                                null,
                                favorites,
                                true, true, true,
                                userListNothing, userListNothing, userListNothing);
 
-                           $B(info.accessor('dateTime'), dateTimeField.accessor.accessor('dateTime'));
-                           $B(info.accessor('duration'), dateTimeField.accessor.accessor('duration'));
+                           var startEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(info.get('startDateTime').substr(11,5), info.get('endDateTime').substr(11,5));
+                           var startEndTimeComponent;
+                           var timeTranslation = {
+                                   toTarget: function (value) {
+                                       return dayStartDate + ' ' + value;
+                                   },
+                                   toSource: function(value) {
+                                       return value.substr(11,5);
+                                   }
+                           };
+
+                           $B(info.accessor('startDateTime'), startEndTimeField.accessor.accessor('startTime'), timeTranslation);
+                           $B(info.accessor('endDateTime'), startEndTimeField.accessor.accessor('endTime'), timeTranslation);
+
+                           parameterManager.add(startEndTimeField.startTimeField, 'time', false);
+                           parameterManager.add(startEndTimeField.endTimeField, 'time', false);
+                           startEndTimeComponent = [$T('Time'), startEndTimeField.element];
+
                            $B(info.accessor('conveners'), convListWidget.getUsers());
 
                            return this.ExclusivePopup.prototype.draw.call(
                                this,
-                               Widget.block([IndicoUtil.createFormFromMap([[$T('Title'),
-                                                                            $B(Html.edit({
-                                                                                style: { width: '300px'}
-                                                                            }), info.accessor('title'))],
-                                                                           [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())], [$T('Date/Time'), dateTimeField.element],
+                               Widget.block([IndicoUtil.createFormFromMap([[$T('Sub-Title'), $B(Html.edit({style: { width: '300px'}}), info.accessor('title'))],
+                                                                           [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
+                                                                           [$T('Date'), dayStartDate],
+                                                                           startEndTimeComponent,
                                                                            [$T('Convener(s)'), convListWidget.draw()]]),
                                              Html.div('dialogButtons',
                                                       [addButton, cancelButton])]
@@ -548,7 +556,7 @@ extend(IndicoUI.Dialogs,
                    var commitChangesAndClose = function(suicideHook) {
                        commitChanges(suicideHook, closeMinutes);
                    };
-                   saveCloseButton = Widget.button(command(curry(commitChangesAndClose, function(){self.close()}), $T("Save and close")));
+                   saveCloseButton = Widget.button(command(curry(commitChangesAndClose, function(){self.close();}), $T("Save and close")));
                    saveCloseButton.dom.disabled = !compileMinutes;
 
 

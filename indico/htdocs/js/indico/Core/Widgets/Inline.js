@@ -227,7 +227,7 @@ type("RadioFieldWidget", ["InlineWidget"],
 
      });
 
-type("SelectRemoteWidget", ["InlineRemoteWidget"],
+type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor"],
      {
          _drawItem: function(item) {
              var option = Widget.option(item);// Html.option({value: item.key}, item.get());
@@ -259,6 +259,7 @@ type("SelectRemoteWidget", ["InlineRemoteWidget"],
                                      return self._drawItem(item);
                                  });
          },
+
          observe: function(func) {
              this.select.observe(func);
          },
@@ -271,9 +272,16 @@ type("SelectRemoteWidget", ["InlineRemoteWidget"],
          enable: function() {
              this.select.dom.disabled = false;
          },
+         get: function() {
+             return this.select.get();
+         },
          set: function(option) {
              this.selected.set(option);
+         },
+         unbind: function() {
+             bind.detach(this.select);
          }
+
      },
      function(method, args) {
          this.options = new WatchObject();
@@ -332,8 +340,15 @@ type("RealtimeTextBox", ["IWidget", "WatchAccessor"],
          observe: function(observer) {
              this.observers.push(observer);
          },
+         observeEvent: function(event, observer) {
+             return this.input.observeEvent(event, observer);
+         },
          observeOtherKeys: function(observer) {
              this.otherKeyObservers.push(observer);
+         },
+         stopObserving: function() {
+             this.observers = [];
+             this.otherKeyObservers = [];
          },
          unbind: function() {
              bind.detach(this.input);
@@ -348,6 +363,9 @@ type("RealtimeTextBox", ["IWidget", "WatchAccessor"],
          setStyle: function(prop, value) {
              this.input.setStyle(prop, value);
          },
+         setFocus: function() {
+             this.input.dom.focus();
+         },
          enableEvent: function() {
              var self = this;
 
@@ -357,7 +375,7 @@ type("RealtimeTextBox", ["IWidget", "WatchAccessor"],
 
                  if ((keyCode < 32 && keyCode != 8) || (keyCode >= 33 && keyCode < 46) || (keyCode >= 112 && keyCode <= 123)) {
                      each(self.otherKeyObservers, function(func) {
-                         value = value && func(keyCode, event);
+                         value = value && func(self.input.get(), keyCode, event);
                      });
                      return value;
                  }
@@ -372,7 +390,7 @@ type("RealtimeTextBox", ["IWidget", "WatchAccessor"],
 
                  if (!((keyCode < 32 && keyCode != 8) || (keyCode >= 33 && keyCode < 46) || (keyCode >= 112 && keyCode <= 123))) {
                      each(self.observers, function(func) {
-                         value = value && func(keyCode, event);
+                         value = value && func(self.input.get(), keyCode, event);
                      });
                      Dom.Event.dispatch(self.input.dom, 'change');
                      return value;
@@ -429,6 +447,287 @@ type("EnterObserverTextBox", ["IWidget", "WatchAccessor"],
             });
         });
 
+type("FlexibleSelect", ["IWidget", "WatchAccessor"],
+     {
+
+         _decorate: function(key, elem) {
+             return this.decorator(key, elem);
+         },
+
+         _defaultDecorator: function(key, elem) {
+             return Html.li('bottomLine', elem);
+         },
+
+         _drawOptions: function() {
+
+             if (!this.optionBox) {
+                 // Create the option box only once
+
+                 this.optionList = Html.ul('optionBoxList');
+
+                 var liAdd = Html.span('fakeLink',
+                     Html.span({style: {fontStyle: 'italic'}}, $T('Add a different one')));
+                 liAdd.href = null;
+                 liAdd.observeClick(function() {
+                     self._startNew();
+                 });
+
+                 this.optionBox = Html.div({ style: {position: 'absolute',
+                                                     top: pixels(20),
+                                                     left: 0
+                                                    },
+                                             className: 'optionBox'},
+                                           this.optionList,
+                                           Html.div('optionBoxAdd', liAdd)
+                                          );
+
+                 var self = this;
+
+                 $B(this.optionList,
+                    this.list,
+                    function(elem) {
+                        var li = self._decorate(elem.key, elem.get());
+
+                        li.observeClick(function() {
+                            self.set(elem.key);
+                            self._hideOptions();
+                            return false;
+                        });
+
+                        return li;
+                    });
+
+
+
+                 this.container.append(this.optionBox);
+             }
+         },
+
+         _observeBlurEvents: function(leaveEditable) {
+             var self = this;
+             this.stopObservingBlur =
+                 this.input.observeEvent('blur',
+                                         function() {
+                                             self._endNew(self.input.get(), leaveEditable);
+                                         });
+
+             this.input.observeOtherKeys(
+                 function(text, key, event) {
+                     if (key == 13) {
+                         self._endNew(text, leaveEditable);
+                     }
+                 });
+         },
+
+         _stopObservingBlurEvents: function()  {
+             this.input.stopObserving();
+             this.stopObservingBlur();
+         },
+
+         _startNew: function() {
+             this._hideOptions();
+             this.input.enable();
+             this.freeMode.set(true);
+             this.input.setFocus();
+
+             this.input.set('');
+             this.value.set('');
+
+             $B(this.value, this.input);
+
+             this._observeBlurEvents();
+
+         },
+
+         _endNew: function(text, leaveEditable) {
+             this.value.set(text);
+
+             if (!leaveEditable) {
+                 this.input.disable();
+                 bind.detach(this.input);
+                 bind.detach(this.value);
+                 this._stopObservingBlurEvents();
+             }
+
+             this.freeMode.set(false);
+             this._notify();
+         },
+
+         _hideOptions: function() {
+             this.container.remove(this.optionBox);
+             this.optionBox = null;
+         },
+
+         _notify: function() {
+             var self = this;
+             each(this.observers,
+                  function(observer) {
+                      observer(self.get());
+                  });
+         },
+
+         draw: function() {
+             var self = this;
+
+             this.trigger.observeClick(function() {
+                 if (!self.disabled) {
+                     self._drawOptions();
+                 }
+             });
+
+             this.container = Html.div('flexibleSelect', this.trigger, this.input.draw(), this.notificationField);
+
+             return this.container;
+         },
+
+         get: function() {
+             return this.value.get();
+         },
+         set: function(value) {
+
+             var oldVal = this.get();
+
+             if (this.list.get(value)) {
+                 this.input.set(this.list.get(value));
+             } else {
+                 this.input.set(value);
+             }
+
+             this.value.set(value);
+
+             if (oldVal != this.get()) {
+                 this._notify();
+             }
+
+             return this.get();
+         },
+         observe: function(observer) {
+             this.observers.push(observer);
+         },
+         invokeObserver: function(observer) {
+             return observer(this.get());
+         },
+         disable: function() {
+             this.container.dom.className = 'flexibleSelect disabled';
+             this.input.disable();
+             this.disabled = true;
+         },
+         enable: function() {
+             this.container.dom.className = 'flexibleSelect';
+             this.disabled = false;
+
+             if (!this.inputDisabled) {
+                 this.enableInput();
+             }
+         },
+         disableInput: function() {
+             this.inputDisabled = true;
+             this.input.disable();
+         },
+         enableInput: function() {
+             this.inputDisabled = false;
+             this.input.enable();
+         },
+         setOptionList: function(list) {
+             this.disableInput();
+             this.list.clear();
+             this.list.update(list);
+             this.list.sort(this.sortCriteria);
+             this.freeMode.set(false);
+
+             var self = this;
+             if (keys(list).length === 0) {
+                 this.trigger.dom.style.display = 'none';
+                 this.enableInput();
+                 this.freeMode.set(true);
+                 $B(this.input, this.value);
+
+                 this._observeBlurEvents(true);
+
+                 // focus() needs some time to get ready (?)
+                 setTimeout(function() {self.input.setFocus();}, 20);
+             }
+         },
+         setLoading: function(state) {
+             if (state) {
+                 this.trigger.dom.style.display = 'inline';
+             }
+
+             this.loading.set(state);
+         },
+
+         detach: function() {
+             bind.detach(this.value);
+             this.input.unbind();
+         },
+
+         _checkEmpty: function(value) {
+             if (!value ) {
+                 if (this.freeMode.get()) {
+                     this.notificationField.set("write...");
+                 } else {
+                     this.notificationField.set("choose...");
+                 }
+             } else {
+                 this.notificationField.set("");
+             }
+         }
+
+
+     }, function(list, width, sortCriteria, decorator) {
+
+         width = width || 150;
+
+         this.decorator = decorator || this._defaultDecorator;
+         this.sortCriteria =  sortCriteria || SortCriteria.Integer;
+
+         this.value = new WatchValue();
+         this.input = new RealtimeTextBox({style:{border: 'none', width: pixels(width)}});
+         this.input.disable();
+         this.disabled = false;
+         this.inputDisabled = true;
+         this.loading = new WatchValue();
+         this.freeMode = new WatchValue(false);
+         this.observers = [];
+
+         this.notificationField = Html.div({style:{color: '#AAAAAA', position:'absolute', top: '0px', left: '5px'}});
+
+         this.list = $D(list);
+         this.list.sort(this.sortCriteria);
+
+         var self = this;
+
+         this.trigger = Html.div('arrowExpandIcon');
+
+         this.loading.observe(function(value) {
+             self.trigger.dom.className = value?'progressIcon':'arrowExpandIcon';
+         });
+
+         this.value.observe(function(value) {
+             self._checkEmpty(value);
+         });
+
+         this.freeMode.observe(function() {
+             self._checkEmpty(self.value.get());
+         });
+
+         $E(document.body).observeClick(function(event) {
+             // Close box if a click is done outside of it
+
+             if (self.optionBox &&
+                 !self.optionList.ancestorOf($E(eventTarget(event))) &&
+                 eventTarget(event) != self.trigger.dom)
+             {
+                 self._hideOptions();
+             }
+         });
+
+         this._checkEmpty();
+
+         this.WatchAccessor(this.get, this.set, this.observe, this.invokeObserver);
+
+     });
+
 /*
  * This type creates a DIV containing a button which is disabled and
  * it places another DIV over it in order to be able to observe events.
@@ -472,7 +771,7 @@ type("DisabledButton", ["IWidget", "WatchAccessor"],
 function(button){
     var self = this;
     this.button = button;
-    this.topTransparentDiv = Html.div({style:{position:"absolute",top:pixels(0), left:pixels(0), width:Browser.IE?"":"100%", height:Browser.IE?"":"100%"}})
+    this.topTransparentDiv = Html.div({style:{position:"absolute",top:pixels(0), left:pixels(0), width:Browser.IE?"":"100%", height:Browser.IE?"":"100%"}});
     this.div = Html.div({style:{display:"inline", position:Browser.IE?"":"relative"}},button, this.topTransparentDiv);
 }
 );

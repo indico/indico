@@ -19,7 +19,7 @@
      59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 -->
 
-<xsl:stylesheet version='1.0' 
+<xsl:stylesheet version='1.0'
    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 <xsl:include href="include/date.xsl"/>
@@ -32,29 +32,41 @@
 <xsl:template match="iconf">
 
     <div class="eventWrapper">
-	
-	
+
+
 	<div class="meetingEventHeader">
 		<h1>
 		<xsl:text disable-output-escaping="yes"></xsl:text><xsl:value-of select="./title" disable-output-escaping="yes"/><xsl:text disable-output-escaping="yes"></xsl:text>
 		</h1>
 		<xsl:if test="count(child::chair) != 0">
 			<h2>
-				by <xsl:apply-templates select="./chair"/>
+				chaired by <xsl:apply-templates select="./chair"/>
 			</h2>
 		</xsl:if>
 		<div class="details">
-			<xsl:call-template name="prettydate">
-				<xsl:with-param name="dat" select="substring(./startDate,0,11)"/>
-			</xsl:call-template>
-			<xsl:if test="substring(./startDate,12,5) != '00:00'">
-				from <strong><xsl:value-of select="substring(./startDate,12,5)"/></strong>
-			</xsl:if>
-			<xsl:if test="substring(./endDate,12,5) != '00:00'">
-				to <strong><xsl:value-of select="substring(./endDate,12,5)"/></strong>
-			</xsl:if>
+			<xsl:choose>
+                <xsl:when test="substring(./startDate,0,11) = substring(./endDate,0,11)">
+                    <xsl:call-template name="prettydate">
+                        <xsl:with-param name="dat" select="substring(./startDate,0,21)"/>
+                    </xsl:call-template>
+                    from <strong><xsl:value-of select="substring(./startDate,12,5)"/></strong>
+                    to <strong><xsl:value-of select="substring(./endDate,12,5)"/></strong>
+                </xsl:when>
+                <xsl:otherwise>
+                    from
+                    <xsl:call-template name="prettydate">
+                        <xsl:with-param name="dat" select="substring(./startDate,0,11)"/>
+                    </xsl:call-template>
+                    at <strong><xsl:value-of select="substring(./startDate,12,5)"/></strong>
+                    to
+                    <xsl:call-template name="prettydate">
+                    <xsl:with-param name="dat" select="substring(./endDate,0,11)"/>
+                    </xsl:call-template>
+                    at <strong><xsl:value-of select="substring(./endDate,12,5)"/></strong>
+                </xsl:otherwise>
+            </xsl:choose>
 			(<xsl:value-of select="substring(./timezone,0,25)"/>)
-			
+
 			<xsl:if test="count(child::location) != 0">
 				<br />at <strong><xsl:apply-templates select="./location"><xsl:with-param name="span">headerRoomLink</xsl:with-param></xsl:apply-templates></strong>
 			</xsl:if>
@@ -69,10 +81,10 @@
           <xsl:with-param name="manageLink">true</xsl:with-param>
           <xsl:with-param name="uploadURL">Indico.Urls.UploadAction.conference</xsl:with-param>
         </xsl:call-template>
-	</div>  
-	
+	</div>
+
 	<xsl:call-template name="meetingEventBody" />
-	
+
 </div>
 </xsl:template>
 
