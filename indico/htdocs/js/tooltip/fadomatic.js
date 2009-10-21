@@ -1,4 +1,4 @@
-/** $Id: fadomatic.js,v 1.1 2007/01/17 07:45:16 bourillo Exp $ */
+/** $Id$ */
 // Title: Fadomatic
 // Version: 1.2
 // Homepage: http://chimpen.com/fadomatic
