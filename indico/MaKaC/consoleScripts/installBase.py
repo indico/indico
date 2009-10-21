@@ -410,7 +410,7 @@ Do you want to create a new database now [Y/n]? ''' % LOCALDATABASEDIR)
                         print 'Unable to create database at %s, please make sure that you have permissions to create that directory' % dbpath
 
             elif opt == 'n':
-                sys.exit()
+                pass
 
     #we delete an existing vars.js.tpl.tmp
     tmp_dir = cfg.getUploadedFilesTempDir()
