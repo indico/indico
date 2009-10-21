@@ -161,8 +161,8 @@ def compileAllLanguages():
         
 def copytreeSilently(source, target):
     '''Copies source tree to target tree overwriting existing files'''
-    source = os.path.normpath(SOURCE)
-    target = os.path.normpath(TARGET)
+    source = os.path.normpath(source)
+    target = os.path.normpath(target)
     for root, dirs, files in os.walk(source, topdown=False):
         for name in files:
             fullpath = os.path.normpath(os.path.join(root, name))
