@@ -29,6 +29,7 @@ from MaKaC.common import indexes
 from MaKaC.common import xmlGen
 from MaKaC.webinterface.urlHandlers import UHMaterialDisplay
 from MaKaC.ICALinterface.conference import ConferenceToiCal
+from MaKaC.ICALinterface.base import ICALBase
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.Configuration import Config
 from MaKaC.webinterface import urlHandlers
@@ -130,12 +131,19 @@ tz: timezone name or absent for default server timezone"""
 
 def displayICalList(res,req):
   filename = "Event.ics"
-  data = ""
+
+  # TODO: proper methods in the iCal interface
+  # for serializing a sequence of events
+
+  icalBase = ICALBase()
+  data = icalBase._printHeader()
+
   ch = ConferenceHolder()
   for confId in res:
     conf = ch.getById(confId)
     ical = ConferenceToiCal(conf.getConference())
-    data += ical.getBody()
+    data += ical.getCore()
+  data += icalBase._printFooter()
   req.headers_out["Content-Length"] = "%s"%len(data)
   cfg = Config.getInstance()
   mimetype = cfg.getFileTypeMimeType( "ICAL" )
