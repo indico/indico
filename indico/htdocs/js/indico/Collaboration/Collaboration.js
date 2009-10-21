@@ -855,6 +855,21 @@ var dateChangeHelpPopup = function(event) {
 };
 
 /**
+ * Mouseover help popup for the 'Keep booking synchronized with event' advanced option, in case it is disabled.
+ */
+
+var dateChangeDisabledHelpPopup = function(event) {
+    IndicoUI.Widgets.Generic.tooltip(this, event,
+        '<div style="padding:3px">' +
+            $T('By activating this option, you ensure that') + '<br \/>' +
+            $T('if a manager changes the event\'s dates,') + '<br \/>' +
+            $T('this booking\'s dates change accordingly.') + '<br \/>' +
+            $T('The event already took place,') + '<br \/>' +
+            $T('so you cannot activate this option.') + '<br \/>' +
+        '<\/div>');
+};
+
+/**
  * Mouseover help popup for the 'Keep booking hidden' advanced option
  */
 var hiddenHelpPopup = function(event) {
@@ -865,6 +880,15 @@ var hiddenHelpPopup = function(event) {
             $T('event\'s display page.') + '<br \/>' +
         '<\/div>');
 };
+
+var sanitizationError = function(invalidFields) {
+    each(invalidFields, function(fieldName) {
+        var fields = $N(fieldName);
+        each(fields, function(field){
+            IndicoUtil.markInvalidField(field, $T("Tags in the <tag> form are not allowed. Please remove any '<' and '>' characters.")); 
+        });
+    });
+}
 
 /**
  * -A modal dialog will emerge to request the booking parameters to the user.
@@ -931,6 +955,8 @@ type ("BookingPopup", ["ExclusivePopup"],
             
             // If this kind of booking can be notified of date changes, we offer a checkbox (checked by default)
             if (canBeNotifiedOnDateChanges[self.bookingType]) {
+                
+                // If this booking in particular cannot be notified of date changes any more, we disable the checkbox
                 var dateCheckBox = Html.checkbox({id : "dateCheckBox"});
                 var dateLabel = Html.label({style: {fontWeight: "normal"}}, $T("Keep booking synchronized with event"));
                 dateLabel.dom.htmlFor = "dateCheckBox";
@@ -938,11 +964,18 @@ type ("BookingPopup", ["ExclusivePopup"],
                 dateChangeHelpImg.dom.onmouseover = dateChangeHelpPopup;
                 var dateChangeDiv = Html.div({style : {display: "block", marginTop:pixels(10), marginLeft: pixels(50)}},
                         dateCheckBox, dateLabel, dateChangeHelpImg);
+                
                 if (self.popupType === 'create') {
                     dateCheckBox.dom.checked = true;
                 } else if (self.popupType === 'edit'){
                     dateCheckBox.dom.checked = self.booking.bookingParams["notifyOnDateChanges"];
+                    if (!self.booking.canBeNotifiedOfEventDateChanges) {
+                        dateCheckBox.dom.disabled = true;
+                        dateLabel.dom.className = 'disabled';
+                        dateChangeHelpImg.dom.onmouseover = dateChangeDisabledHelpPopup;
+                    }
                 }
+                
                 advancedDiv.append(dateChangeDiv);
             }
             
@@ -1001,7 +1034,11 @@ type ("BookingPopup", ["ExclusivePopup"],
                                         if (result.error) {
                                             killProgress();
                                             self.switchToBasicTab();
-                                            codes[self.bookingType].errorHandler('create', result);
+                                            if (result.origin === 'sanitization') {
+                                                sanitizationError(result.invalidFields);
+                                            } else {
+                                                codes[self.bookingType].errorHandler('create', result);
+                                            }
                                         } else {
                                             hideAllInfoRows(false);
                                             bookings.append(result);
@@ -1038,7 +1075,11 @@ type ("BookingPopup", ["ExclusivePopup"],
                                         if (result.error) {
                                             killProgress();
                                             self.switchToBasicTab();
-                                            codes[self.bookingType].errorHandler('edit', result);
+                                            if (result.origin === 'sanitization') {
+                                                sanitizationError(result.invalidFields);
+                                            } else {
+                                                codes[self.bookingType].errorHandler('edit', result);
+                                            }
                                         } else {
                                             refreshBooking(result);
                                             killProgress();
@@ -1318,7 +1359,11 @@ var sendRequest = function(pluginName, conferenceId) {
             if (!error) {
                 if (result.error) {
                     killProgress();
-                    codes[pluginName].errorHandler(exists(singleBookings[pluginName]) ? 'edit' : 'create', result)
+                    if (result.origin === 'sanitization') {
+                        sanitizationError(result.invalidFields);
+                    } else {
+                        codes[pluginName].errorHandler(exists(singleBookings[pluginName]) ? 'edit' : 'create', result)
+                    }
                 } else {
                  // If the server found no problems, a booking object is returned in the result.
                     // We add it to the watchlist and create an iframe.
@@ -1407,7 +1452,11 @@ var withdrawRequest = function(pluginName, conferenceId) {
                         if (!error) {
                             if (result.error) {
                                 killProgress();
-                                codes[pluginName].errorHandler('remove', result)
+                                if (result.origin === 'sanitization') {
+                                    sanitizationError(result.invalidFields);
+                                } else {
+                                    codes[pluginName].errorHandler('remove', result);
+                                }
                             } else {
                                 // If the server found no problems, we remove the booking from the watchlist and remove the corresponding iframe.
                                 removeIFrame(singleBookings[pluginName]);

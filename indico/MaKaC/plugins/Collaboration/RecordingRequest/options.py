@@ -22,12 +22,12 @@ from MaKaC.i18n import _
 
 globalOptions = [
     #Collaboration options necessary in all plugins
-    ("subtab", {"description" : _("Subtab where the Recording Request plugin will be placed"),
+    ("tab", {"description" : _("Name of tab where the Recording Request plugin will be placed"),
                "type": str,
                "defaultValue": "Recording Request",
-               "editable": False,
-               "visible": False,
-               "mustReload": True}),
+               "editable": True,
+               "visible": True,
+               "mustReload": False}),
     ("allowedOn", {"description" : _("Kind of event types (conference, meeting, simple_event) supported"),
                "type": list,
                "defaultValue": ["conference","simple_event","meeting"],

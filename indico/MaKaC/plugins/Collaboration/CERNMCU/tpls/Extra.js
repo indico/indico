@@ -1,11 +1,11 @@
 <% from MaKaC.common.PickleJar import DictPickler %>
 
 var enableCustomId = function() {
-    $E('customId').dom.disabled = false;
+    IndicoUI.Effect.enableDisableTextField($E('customId'), true);
 }
     
 var disableCustomId = function() {
-    $E('customId').dom.disabled = true;
+    IndicoUI.Effect.enableDisableTextField($E('customId'), false);
 }
 
 var pf = null; //place where to keep a ParticipantListField object to access later
@@ -439,3 +439,43 @@ type("ParticipantListField", ["IWidget"],
         });
     }
 );
+
+
+/**
+ * Mouseover help popup for the 'PIN' field
+ */
+
+var CERNMCUPINHelpPopup = function(event) {
+    IndicoUI.Widgets.Generic.tooltip(this, event,
+        '<div style="padding:3px">' +
+            $T('If you want to <strong>protect<\/strong> your MCU conference with a PIN, write it here.') + '<br \/>' +
+            $T('The PIN has to be <strong>numeric<\/strong> (only digits, no letters).') + '<br \/>' +
+            $T('Users will have to input the PIN in order to access the conference.') + '<br \/>' +
+            $T('Otherwise, leave empty.') +
+        '<\/div>');
+};
+
+/**
+ * Mouseover help popup for the 'Custom ID' field
+ */
+var CERNMCUCustomIDHelpPopup = function(event) {
+    IndicoUI.Widgets.Generic.tooltip(this, event,
+        '<div style="padding:3px">' + 
+            $T('If for some reason you want to choose youself the MCU ID of this conference, type it here.') + '<br \/>' +
+            $T('The MCU ID has to be a 5-digit number.') +
+        '<\/div>');
+};
+
+/**
+ * Draws the context help icons and assigns the appropiate popups to each one.
+ */
+var CERNMCUDrawContextHelpIcons = function() {
+    var PINHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
+    PINHelpImg.dom.onmouseover = CERNMCUPINHelpPopup;
+    
+    var customIDHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
+    customIDHelpImg.dom.onmouseover = CERNMCUCustomIDHelpPopup;
+    
+    $E('PINHelp').set(PINHelpImg);
+    $E('customIdHelp').set(customIDHelpImg);
+}

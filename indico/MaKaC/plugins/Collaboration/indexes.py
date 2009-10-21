@@ -56,7 +56,7 @@ class CollaborationIndex(Persistent):
         reverse = orderBy == "descending"
 
         try:
-            index = self._indexes[indexName]
+            index = self.getIndex(indexName)
             totalInIndex = index.getCount()
             
             if categoryId and not CategoryManager().hasKey(categoryId) or conferenceId and not ConferenceHolder().hasKey(conferenceId):
@@ -275,22 +275,32 @@ class BookingDateIndex(Persistent):
                     else:
                         del self._tree[timestamp]
                 except KeyError:
-                    Logger.get('VideoServ').warning("Tried to unindex booking: (confId=%s, id=%s) with key=%s from BookingDateIndex %s, but the booking was not present in the set of bookings with key %s"%(booking.getConference().getId(), booking.getId(), str(timestamp), self.getName(), str(timestamp)))
-                    self._deepUnindexBooking(booking)
+                    Logger.get('VideoServ').warning("Tried to unindex booking: (confId=%s, id=%s) with key=%s from BookingDateIndex %s, but the booking was not present in the set of bookings with key %s"%
+                                                    (booking.getConference().getId(), booking.getId(), str(timestamp), self.getName(), str(timestamp)))
+                    self._deepUnindexBooking(booking, timestamp)
             else:
-                Logger.get('VideoServ').warning("Tried to unindex booking: (confId=%s, id=%s) with key=%s from BookingDateIndex %s, but %s was not present"%(booking.getConference().getId(), booking.getId(), str(timestamp), self.getName(), str(timestamp)))
-                self._deepUnindexBooking(booking)
+                Logger.get('VideoServ').warning("Tried to unindex booking: (confId=%s, id=%s) with key=%s from BookingDateIndex %s, but %s was not present"%
+                                                (booking.getConference().getId(), booking.getId(), str(timestamp), self.getName(), str(timestamp)))
+                self._deepUnindexBooking(booking, timestamp)
                 
-    def _deepUnindexBooking(self, booking):
-        for k, s in self._tree.iteritems():
-            if booking in s:
-                s.remove(booking)
+    def _deepUnindexBooking(self, booking, timestamp):
+        found = False
+        for key in list(self._tree.keys()):
+            bookingSet = self._tree[key]
+            if booking in bookingSet:
+                bookingSet.remove(booking)
                 self._numberOfBookings = self._numberOfBookings - 1
-                Logger.get('VideoServ').warning("Success in deep unindexing booking: (confId=%s, id=%s) with key=%s from BookingDateIndex %s, but %s was not present"%(booking.getConference().getId(), booking.getId(), str(k), self.getName(), str(k)))
-            if s:
+                found = True
+                Logger.get('VideoServ').warning("Success in deep unindexing booking: (confId=%s, id=%s) with key=%s from BookingDateIndex %s, but %s was not present"%
+                                                (booking.getConference().getId(), booking.getId(), str(key), self.getName(), str(timestamp)))
+            if bookingSet:
                 self._tree._p_changed = 1
             else:
-                del self._tree[k]
+                del self._tree[key]
+        if not found:
+            Logger.get('VideoServ').warning("Could not deep unindex booking: (confId=%s, id=%s) from BookingDateIndex %s (should have had key: %s)"%
+                                            (booking.getConference().getId(), booking.getId(), self.getName(), str(timestamp)))
+        
     
     def getBookingsBetween(self, fromDate, toDate, tz = 'UTC', conferenceId = None, categoryId = None, dateFormat = None):
         if fromDate:
@@ -372,21 +382,28 @@ class BookingConferenceIndex(Persistent):
                     del self._tree[key]
             except KeyError, e:
                 Logger.get('VideoServ').warning("Tried to unindex booking: (confId=%s, id=%s) with key=%s from BookingConferenceIndex %s, but the booking was not present in the set of bookings with key %s. Exception: %s"%(booking.getConference().getId(), booking.getId(), str(key), self.getName(), str(key), str(e)))
-                self._deepUnindexBooking(booking)
+                self._deepUnindexBooking(booking, key)
         else:
             Logger.get('VideoServ').warning("Tried to unindex booking: (confId=%s, id=%s) with key=%s from BookingConferenceIndex %s, but %s was not present"%(booking.getConference().getId(), booking.getId(), str(key), self.getName(), str(key)))
-            self._deepUnindexBooking(booking)
+            self._deepUnindexBooking(booking, key)
                 
-    def _deepUnindexBooking(self, booking):
-        for k, v in self._tree.iteritems():
-            if booking in v:
-                v[1].remove(booking)
+    def _deepUnindexBooking(self, booking, bookingKey):
+        found = False
+        for key in list(self._tree.keys()):
+            value = self._tree[key]
+            if booking in value[1]:
+                value[1].remove(booking)
                 self._numberOfBookings = self._numberOfBookings - 1
-                Logger.get('VideoServ').warning("Success in deep unindexing booking: (confId=%s, id=%s) with key=%s from BookingConferenceIndex %s, but %s was not present"%(booking.getConference().getId(), booking.getId(), str(k), self.getName(), str(k)))
-            if v[1]:
+                found = True
+                Logger.get('VideoServ').warning("Success in deep unindexing booking: (confId=%s, id=%s) with key=%s from BookingConferenceIndex %s, but %s was not present"%
+                                (booking.getConference().getId(), booking.getId(), str(key), self.getName(), str(bookingKey)))
+            if value[1]:
                 self._tree._p_changed = 1
             else:
-                del self._tree[k]
+                del self._tree[key]
+        if not found:
+            Logger.get('VideoServ').warning("Could not deep unindex booking: (confId=%s, id=%s) from BookingConferenceIndex %s (should have had key: %s)"%
+                                            (booking.getConference().getId(), booking.getId(), self.getName(), str(bookingKey)))
      
     def getBookings(self, fromTitle = None, toTitle = None, conferenceId = None, categoryId = None):
         

@@ -15,7 +15,7 @@
             <% additionalStyle = '' %>
         <% end %>
         
-        <a id="index_<%=indexName%>" onclick="indexSelectedObs('<%=indexName%>', false)" <%=additionalStyle%> >
+        <a id="index_<%=indexName%>" onclick="indexSelectedObs('<%=indexName%>', false)" class="CAIndexUnselected" <%=additionalStyle%> >
             <%= indexName[0].upper() + indexName[1:] %>
         </a>
     </li>
@@ -79,7 +79,7 @@
     </div>
     
     <div style="padding-top: 10px">
-        <input type="button" id="filterButton" value="<%= _("Refresh")%>" onclick="applyFilter(); query();"/>
+        <input type="button" id="filterButton" value="<%= _("Refresh")%>" onclick="refresh()"/>
     </div>
 </div>
 
@@ -116,10 +116,10 @@
         <span id="resultsMessage"><%= _("(Results will appear here)")%></span>
         <div id="resultsInfo" style="display:none;">
             <div class="CATotalInIndexDiv">
-                <span id="totalInIndex"></span><span> bookings in this index.</span>
+                <span id="totalInIndex"></span><span>&nbsp;bookings in this index.</span>
             </div>
             <div class="CANResultsDiv">
-                <span>Query returned </span><span id="nBookings"></span><span> bookings.</span>
+                <span>Query returned&nbsp;</span><span id="nBookings"></span><span>&nbsp;bookings.</span>
             </div>
         </div>
         <table cellpadding="0" cellspacing="0" class="CAResultsTable" id ="results">
@@ -174,6 +174,12 @@ var buildIndexTooltips = function() {
     }    
 }
 
+var alertNoIndexSelected = function() {
+    var popup = new AlertPopup("No index selected", Html.span('',"Please select an index name"), Html.br(),
+            Html.span(indexNames.join(', ')));
+    popup.open();
+}
+
 var indexSelectedObs = function(selectedIndexName, firstTime) {
     
     for (var i=0; i<indexNames.length; i++) {
@@ -209,8 +215,7 @@ var indexSelectedObs = function(selectedIndexName, firstTime) {
     }
 
     if (!firstTime) {
-        applyFilter();
-        query()
+        refresh();
     };
 }
 
@@ -248,8 +253,7 @@ var viewByObs = function(viewBySelected, firstTime) {
     queryParams.viewBy = viewBySelected;
 
     if (!firstTime) {
-        applyFilter();
-        query()
+        refresh();
     };
 }
 
@@ -280,8 +284,7 @@ var orderByObs = function(orderBySelected, firstTime) {
     queryParams.orderBy = orderBySelected;
 
     if (!firstTime) {
-        applyFilter();
-        query();
+        refresh();
     };
 
 }
@@ -294,7 +297,17 @@ var updateFilterButton = function() {
     $E('filterButton').dom.value = '<%= _("Apply Filter")%>';   
 }
 
+var refresh = function() {
+    if (!queryParams.indexName) {
+        alertNoIndexSelected();
+    } else {
+        applyFilter();
+        query();
+    }
+}
+
 var applyFilter = function(){
+    
     queryParams.showOnlyPending = $E('pendingCB').dom.checked;
     queryParams.conferenceId = $E('conferenceId').get();
     queryParams.categoryId = $E('categoryId').get();
@@ -323,6 +336,7 @@ var applyFilter = function(){
     queryParams.resultsPerPage = $E('resultsPerPage').get();
     queryParams.page = 1;
     $E('filterButton').dom.value = '<%= _("Refresh")%>';
+    
 }
 
 var query = function() {
@@ -445,9 +459,9 @@ var confTitleBookingTemplate = function(booking) {
         row.append(Html.td());
     }
 
-    var cell = Html.td('ACBookingCellNoWrap', Html.a({href: booking.modificationURL}, 'Change'));
-    row.append(cell);
-    var cell = Html.td('ACBookingCellNoWrap', Html.a({href: booking.conference.videoServicesDisplayURL}, 'Event Display'));
+    var cell = Html.td('ACBookingCellNoWrap', Html.a({href: booking.modificationURL}, 'Change'),
+                                              Html.span('horizontalSeparator', '|'),
+                                              Html.a({href: booking.conference.videoServicesDisplayURL}, 'Event Display'));
     row.append(cell);
 
     IndicoUI.Effect.mouseOver(row.dom);
@@ -480,9 +494,9 @@ var dateBookingTemplate = function(booking, viewBy) {
         row.append(Html.td());
     }
 
-    var cell = Html.td('ACBookingCellNoWrap', Html.a({href: booking.modificationURL}, 'Change'));
-    row.append(cell);
-    var cell = Html.td('ACBookingCellNoWrap', Html.a({href: booking.conference.videoServicesDisplayURL}, 'Event Display'));
+    var cell = Html.td('ACBookingCellNoWrap', Html.a({href: booking.modificationURL}, 'Change'),
+            Html.span('horizontalSeparator', '|'),
+            Html.a({href: booking.conference.videoServicesDisplayURL}, 'Event Display'));
     row.append(cell);
 
     IndicoUI.Effect.mouseOver(row.dom);
@@ -548,12 +562,14 @@ var pf = new PageFooter('<%= InitialNumberOfPages %>', '<%= InitialPage %>', 4, 
 
 IndicoUI.executeOnLoad(function(){
     buildIndexTooltips();
-    indexSelectedObs('<%=InitialIndex%>', true);
     confIdObs();
     viewByObs('<%=InitialViewBy %>', true);
     updateDateFilterType();
     <% if InitialOrderBy: %>
         orderByObs('<%= InitialOrderBy %>', true);
+    <% end %>
+    <% if InitialIndex: %>
+        indexSelectedObs('<%= InitialIndex %>', true);
     <% end %>
     updateStaticURL();
     

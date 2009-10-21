@@ -25,9 +25,9 @@ var RR_loadTalks = function () {
                 label.append(Html.span("RRSpeakers", speakers))
             }
             
-            if (exists(talk.location)) {
+            if (exists(talk.location) && trim(talk.location)) {
                 var locationText = ' (' + talk.location;
-                if (exists(talk.room)) {
+                if (exists(talk.room) && trim(talk.room)) {
                     locationText += ', ' + talk.room;
                 }
                 locationText += ')';
@@ -37,7 +37,7 @@ var RR_loadTalks = function () {
             return Html.li('', checkBox, label);
         };
         
-        var killProgress = IndicoUI.Dialogs.Util.progress("Fetching talks, may take a while...");
+        var killProgress = IndicoUI.Dialogs.Util.progress($T("Fetching talks, may take a while..."));
         indicoRequest('event.contributions.list',
             {
                 conference: '<%= ConferenceId %>',
@@ -57,7 +57,7 @@ var RR_loadTalks = function () {
                             }
                         }
                     } else {
-                        $E('contributionList1').set(Html.span({style:{paddingLeft: pixels(20)}},"This event has no talks")); // make this more beautiful
+                        $E('contributionList1').set(Html.span({style:{paddingLeft: pixels(20)}}, $T("This event has no talks"))); // make this more beautiful
                     }
                     RR_contributionsLoaded = true;
                     killProgress();

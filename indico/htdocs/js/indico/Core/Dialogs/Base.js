@@ -136,36 +136,25 @@ type("ErrorReportDialog", ["ServiceDialog"],
          },
          
          _drawWarning: function() {
-             var self = this;
              
-             var extraInfo;
+             var content = [this.error.message];
+             
+             var content = Html.div({style: {textAlign: 'center'}});
+             content.append(Html.span('',this.error.message));
              if (this.error.code == 'ERR-P4') {
-                 extraInfo = Html.a({href:Indico.Urls.Login+'?returnURL='+document.URL, style:{marginLeft:pixels(4)}}, 'Go to login page.');
+                 content.append(Html.br());
+                 content.append(Html.a({href: Indico.Urls.Login+'?returnURL='+document.URL}, "Go to login page"));
              }
              
-             return this.ExclusivePopup.prototype.draw.call(
-                 this,
-                 Html.div(
-                     {},
-                     Html.div({style:{color: '#a33100', borderBottom: '1px #A33100 solid', marginBottom: pixels(15), width:'300px', textAlign: 'center'}},"Warning"),
-                     Html.div({style:{marginBottom: pixels(10), width: '300px', height: '50px', textAlign: 'left', overflow: 'auto'}},
-                             this.error.message, extraInfo),
-                     Html.div({style:{textAlign: 'center'}},
-                              Widget.link(command(
-                                  function() {
-                                      self.close();
-                                  },
-                                  Html.button({style:{marginLeft: pixels(5)}},'Close')
-                              ))
-                             )
-                 ));
+             var popup = new AlertPopup(Html.span('warningTitle', "Warning"), content);
+             popup.open();
          },
 
          draw: function() {
              var self = this;
              
-             if (this.error.type == "warning") {
-                 return self._drawWarning();
+             if (this.error.type == "noReport") {
+                 self._drawWarning();
              }else {
                  return self._drawError();
              }

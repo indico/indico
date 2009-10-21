@@ -22,12 +22,12 @@ from MaKaC.i18n import _
 
 globalOptions = [
     #collaboration options necessary in all plugins
-    ("subtab", {"description" : _("Subtab where DummyPlugin will be placed"),
+    ("tab", {"description" : _("Name of tab where DummyPlugin will be placed"),
                "type": str,
                "defaultValue": "DummyPlugin",
-               "editable": False,
-               "visible": False,
-               "mustReload": True} ),
+               "editable": True,
+               "visible": True,
+               "mustReload": False} ),
     ("allowedOn", {"description" : _("Kind of event types (conference, meeting, simple_event) supported"),
                "type": list,
                "defaultValue": ["meeting","conference","simple_event"],

@@ -113,8 +113,7 @@ def process(req):
     except CausedError, e:        
         errorInfo = DictPickler.pickle(e);
 
-        Logger.get('rpc').exception('Error in request: %s %s' % (errorInfo['code'],
-                                                            errorInfo['message']))
+        Logger.get('rpc').info(str(e))
         
         if requestBody:
             errorInfo["requestInfo"] = {"method": str(requestBody["method"]),

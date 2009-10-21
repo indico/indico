@@ -1,6 +1,6 @@
 <% declareTemplate(newTemplateStyle=True) %>
 
-<% if not Conference.getLocation(): %>
+<% if not HasLocation: %>
 <div style="margin-bottom: 1em;">
     <span class="RRNoteTitle"><%=_("Warning:")%></span>
     <span class="RRNoteText">
@@ -12,14 +12,17 @@
 
 <% if IsSingleBooking: %>
 <div style="margin-bottom: 1em;">
-    <div id="sendRecordingRequestTop" class="sendRecordingRequestDiv" style="display:none;">
+    <div id="sendRecordingRequestTop" style="display:none;">
         <button onclick="send('RecordingRequest')">Send request</button>
+        <% inlineContextHelp(_('Send the Request to the Recording administrators.')) %>
     </div>
-    <div id="modifyRecordingRequestTop" class="modifyRecordingRequestDiv" style="display:none;">
+    <div id="modifyRecordingRequestTop" style="display:none;">
         <button onclick="send('RecordingRequest')">Modify request</button>
+        <% inlineContextHelp(_('Modify the Recording Request.')) %>
     </div>
-    <div id="withdrawRecordingRequestTop" class="withdrawRecordingRequestDiv" style="display:none;">
+    <div id="withdrawRecordingRequestTop" style="display:none;">
         <button onclick="withdraw('RecordingRequest')">Withdraw request</button>
+        <% inlineContextHelp(_('Withdraw the Recording Request.')) %>
     </div>
 </div>
 <% end %>
@@ -44,14 +47,14 @@
         <span class="RRQuestion">Please choose among the contributions below:</span>
         <% if not HasTalks: %>
         <div>
-            <span style="padding-left: 20px;">This event has no talks</span>
+            <span style="padding-left: 20px;"><%= _("This event has no talks.") %></span>
         </div>
         <% end %>
         
         <% if HasTalks: %>
-        <span class="fakeLink" style="margin-left: 20px; margin-right: 5px;" onclick="WRSelectAllContributions()">Select all</span>
-        <span style="color: #AAAAAA">|</span>
-        <span class="fakeLink" style="margin-left: 5px;" onclick="WRUnselectAllContributions()">Select none</span>
+        <span class="fakeLink" style="margin-left: 20px;" onclick="WRSelectAllContributions()">Select all</span>
+        <span class="horizontalSeparator">|</span>
+        <span class="fakeLink" onclick="WRUnselectAllContributions()">Select none</span>
         <% end %>
         
         <div class="RRContributionListDiv">
@@ -72,10 +75,12 @@
                                             <% if talk.getSpeakerList() : %>
                                             <span class="RRSpeakers">, by <%= " and ".join([person.getFullName() for person in talk.getSpeakerList()]) %></span>
                                             <% end %>
-                                            <% if talk.getLocation(): %>
-                                                <% locationText = " (" + talk.getLocation().getName() %>
-                                                <% if talk.getRoom(): %>
-                                                    <% locationText += ", " + talk.getRoom().getName() + ")" %> 
+                                            <% location = talk.getLocation() %>
+                                            <% room = talk.getRoom() %>
+                                            <% if location and location.getName() and location.getName().strip(): %>
+                                                <% locationText = " (" + location.getName() %>
+                                                <% if room and room.getName() and room.getName().strip(): %>
+                                                    <% locationText += ", " + room.getName() + ")" %> 
                                                 <% end %>
                                                 <span class="WRSpeakers"><%= locationText %></span>
                                             <% end %>
@@ -85,11 +90,6 @@
                                 </ul>
                             </td>
                             <% end %>
-                        <% end %>
-                        <% else: %>
-                            <td class="RRContributionsColumn" style="padding-left: 20px;">
-                                This conference has currently no talks.
-                            </td>
                         <% end %>
                     <% end%>
                 </tr>
@@ -234,14 +234,17 @@
 
 <% if IsSingleBooking: %>
 <div style="margin-top: 1em;">
-    <div id="sendRecordingRequestBottom" class="sendRecordingRequestDiv" style="display:none;">
+    <div id="sendRecordingRequestBottom" style="display:none;">
         <button onclick="send('RecordingRequest')">Send request</button>
+        <% inlineContextHelp(_('Send the Request to the Recording administrators.')) %>
     </div>
-    <div id="modifyRecordingRequestBottom" class="modifyRecordingRequestDiv" style="display:none;">
+    <div id="modifyRecordingRequestBottom" style="display:none;">
         <button onclick="send('RecordingRequest')">Modify request</button>
+        <% inlineContextHelp(_('Modify the Recording Request.')) %>
     </div>
-    <div id="withdrawRecordingRequestBottom" class="withdrawRecordingRequestDiv" style="display:none;">
+    <div id="withdrawRecordingRequestBottom" style="display:none;">
         <button onclick="withdraw('RecordingRequest')">Withdraw request</button>
+        <% inlineContextHelp(_('Withdraw the Recording Request.')) %>
     </div>
 </div>
 <% end %>

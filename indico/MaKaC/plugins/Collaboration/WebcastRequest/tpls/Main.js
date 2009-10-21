@@ -4,21 +4,21 @@
             "permission": ["radio", false, function(option, values){
                 var errors = [];
                 if (!exists(values["permission"])) {
-                    errors.push("Please answer if all the speakers given permission to have their talks webcasted.");
+                    errors.push($T("Please answer if all the speakers given permission to have their talks webcasted."));
                 }
                 return errors;
             }],
             "lectureOptions": ["text", true, function(option, values){
                 var errors = [];
                 if (option == 'chooseOne') {
-                    errors.push("Please choose if slides and/or chalkboards will be used.");
+                    errors.push($T("Please choose if slides and/or chalkboards will be used."));
                 }
                 return errors;
             }],
             "lectureStyle": ["text", true, function(option, values){
                 var errors = [];
                 if (option == 'chooseOne') {
-                    errors.push("Please choose a type of event.");
+                    errors.push($T("Please choose a type of event."));
                 }
                 return errors;
             }]
@@ -27,22 +27,22 @@
     
     errorHandler: function(event, error) {
         if (error.operation == "create") {
-            CSErrorPopup("Could not send email to responsible",
-                         [Html.span("", "There was a problem when sending the notification email to the Webcast responsible:", Html.br(), error.inner)])
+            CSErrorPopup($T("Could not send email to responsible"),
+                         [Html.span("", $T("There was a problem when sending the notification email to the Webcast responsible:"), Html.br(), error.inner)])
         }
         if (error.operation == "edit") {
-            CSErrorPopup("Could not send email to responsible",
-                         [Html.span("", "There was a problem when sending the notification email to the Webcast responsible:", Html.br(), error.inner)])
+            CSErrorPopup($T("Could not send email to responsible"),
+                         [Html.span("", $T("There was a problem when sending the notification email to the Webcast responsible:"), Html.br(), error.inner)])
         }
         if (error.operation == "remove") {
-            CSErrorPopup("Could not send email to responsible",
-                        [Html.span("", "There was a problem when sending the notification email to the Webcast responsible:", Html.br(), error.inner)])
+            CSErrorPopup($T("Could not send email to responsible"),
+                        [Html.span("", $T("There was a problem when sending the notification email to the Webcast responsible:"), Html.br(), error.inner)])
         }
     },
     
     customText : function(booking) {
-        if (booking.statusMessage == "Request rejected by responsible" && trim(booking.rejectionReason)) {
-            return "Rejection reason: " + trim(booking.rejectionReason);
+        if (booking.acceptRejectStatus === false && trim(booking.rejectionReason)) {
+            return $T("Rejection reason: ") + trim(booking.rejectionReason);
         }
     },
     

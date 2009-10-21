@@ -36,8 +36,8 @@ class WNewBookingForm(WCSPageTemplateBase):
         
         underTheLimit = self._conf.getNumberOfContributions() <= self._WebcastRequestOptions["contributionLoadLimit"].getValue()
         booking = self._conf.getCSBookingManager().getSingleBooking('WebcastRequest')
-        initialChoose = booking._bookingParams['talks'] == 'choose'
-        initialDisplay = self._conf.getNumberOfContributions() > 0 and (underTheLimit or (booking is not None and initialChoose))
+        initialChoose = booking is not None and booking._bookingParams['talks'] == 'choose'
+        initialDisplay = (self._conf.getNumberOfContributions() > 0 and underTheLimit) or (booking is not None and initialChoose)
         
         vars["DisplayTalks"] = initialDisplay
         vars["InitialChoose"] = initialChoose
@@ -46,7 +46,7 @@ class WNewBookingForm(WCSPageTemplateBase):
         nTalks = len(talks)
         nWebcastCapable = len(webcastAbleTalks)
         
-        vars["HasTalks"] = nTalks > 0
+        vars["HasWebcastCapableTalks"] = nWebcastCapable > 0
         vars["NTalks"] = nTalks
         
         #list of "locationName:roomName" strings
@@ -92,6 +92,7 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["IntendedAudience"] = intendedAudience
         vars["SubjectMatter"] = subjectMatter
         vars["ConsentFormURL"] = self._WebcastRequestOptions["ConsentFormURL"].getValue()
+        
         return vars
     
     

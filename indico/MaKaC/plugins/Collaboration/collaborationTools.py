@@ -20,6 +20,10 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.plugins.base import PluginsHolder
+from MaKaC.webinterface import urlHandlers
+from MaKaC.common.utils import formatDateTime
+from MaKaC.common.timezoneUtils import getAdjustedDate
+from MaKaC.common.Configuration import Config
 
 class CollaborationTools(object):
     """ Class with utility classmethods for the Collaboration plugins core and plugins
@@ -54,11 +58,25 @@ class CollaborationTools(object):
 #            cls._plugins[pluginName] = cls.getCollaborationPluginType().getPlugin(pluginName)
 #        return cls._plugins[pluginName]
         return cls.getCollaborationPluginType().getPlugin(pluginName)
+    
+    @classmethod
+    def anyPluginsAreActive(cls):
+        return len(cls.getCollaborationPluginType().getPlugins(includeNonActive = False)) > 0
         
     @classmethod
     def getOptionValue(cls, pluginName, optionName):
+        """ Returns the value of an option of a plugin (plugins/Collaboration/XXXXX/options.py)
+            pluginName: a string with the name of the plugin
+            optionName: a string with the name of the option
+        """
         ph = PluginsHolder()
         return ph.getPluginType("Collaboration").getPlugin(pluginName).getOption(optionName).getValue()
+    
+    @classmethod
+    def getCollaborationOptionValue(cls, optionName):
+        """ Returns the value of an option of the Collaboration plugin type (plugins/Collaboration/options.py)
+        """
+        return cls.getCollaborationPluginType().getOption(optionName).getValue()
     
     @classmethod
     def isUsingHTTPS(cls):
@@ -124,24 +142,22 @@ class CollaborationTools(object):
             or where the user is a plugin manager for this event, are returned.
         """
         csbm = conference.getCSBookingManager()
-        subtabNamesSet = set()
+        tabNamesSet = set()
         allowedForThisEvent = csbm.getAllowedPlugins()
-        showableForThisEvent = [plugin for plugin in allowedForThisEvent if plugin.isActive()] 
-        for plugin in showableForThisEvent:
+        for plugin in allowedForThisEvent:
             if not user or user in plugin.getOption('admins').getValue() or csbm.isPluginManager(plugin.getName(), user):
-                subtabNamesSet.add(cls.getPluginSubTab(plugin))
+                tabNamesSet.add(cls.getPluginTab(plugin))
             
-        subtabNames = list(subtabNamesSet)
-        subtabNames.sort()
-        return subtabNames
+        tabNames = list(tabNamesSet)
+        return tabNames
     
     @classmethod
-    def getPluginSubTab(cls, pluginObject):
-        """ Utility function that returns the subtab a Collaboration plugin belongs to.
+    def getPluginTab(cls, pluginObject):
+        """ Utility function that returns the tab a Collaboration plugin belongs to.
             If the option was not defined, "Collaboration" is the default.
         """
-        if pluginObject.hasOption("subtab"):
-            return pluginObject.getOption("subtab").getValue()
+        if pluginObject.hasOption("tab"):
+            return pluginObject.getOption("tab").getValue()
         else:
             return "Collaboration"
         
@@ -168,7 +184,7 @@ class CollaborationTools(object):
             #we get the plugins of this tab
             return cls.getCollaborationPluginType().getPluginList(
                 sorted = True,
-                filter = lambda plugin: cls.getPluginSubTab(plugin) == tabName and
+                filter = lambda plugin: cls.getPluginTab(plugin) == tabName and
                                         (allowedPlugins is None or plugin in allowedPlugins) and
                                         (user is None or user in plugin.getOption('admins').getValue() or csbm.isPluginManager(plugin.getName(), user))
             )
@@ -224,3 +240,214 @@ class CollaborationTools(object):
     @classmethod
     def getXMLGenerator(cls, pluginName):
         return cls.getModule(pluginName).pages.XMLGenerator
+    
+    
+class MailTools(object):
+    
+    @classmethod
+    def getServerName(cls):
+        return str(Config.getInstance().getBaseURL())
+    
+    @classmethod
+    def needToSendEmails(cls, pluginName = None):
+        if pluginName:
+            admins = CollaborationTools.getOptionValue(pluginName, 'admins')
+            sendMailNotifications = CollaborationTools.getOptionValue(pluginName, 'sendMailNotifications')
+            additionalEmails = CollaborationTools.getOptionValue(pluginName, 'additionalEmails')
+        else:
+            admins = CollaborationTools.getCollaborationOptionValue('collaborationAdmins')
+            sendMailNotifications = CollaborationTools.getCollaborationOptionValue('sendMailNotifications')
+            additionalEmails = CollaborationTools.getCollaborationOptionValue('additionalEmails')
+        
+        return (sendMailNotifications and len(admins) > 0) or len(additionalEmails) > 0
+    
+    @classmethod
+    def getAdminEmailList(cls, pluginName = None):
+        """ Returns a list of admin email addresses that a notification email should be sent to.
+            If pluginName is None, then the global Collaboration admin mails will be returned.
+            The emails in the list are not in any particular order and should be unique.
+        """
+        if pluginName:
+            adminEmails = CollaborationTools.getOptionValue(pluginName, 'additionalEmails')
+            if CollaborationTools.getOptionValue(pluginName, 'sendMailNotifications'):
+                adminEmails.extend([u.getEmail() for u in CollaborationTools.getOptionValue(pluginName, 'admins')])
+        else:
+            adminEmails = CollaborationTools.getCollaborationOptionValue('additionalEmails')
+            if CollaborationTools.getCollaborationOptionValue('sendMailNotifications'):
+                adminEmails.extend([u.getEmail() for u in CollaborationTools.getCollaborationOptionValue('collaborationAdmins')])
+        return list(set(adminEmails))
+    
+    @classmethod
+    def getManagersEmailList(cls, conf, pluginName = None):
+        """ Returns a list of manager email addresses (for a given event) that a notification email should be sent to.
+            This list includes:
+                -The creator of an event
+                -The managers of an event
+                -Any Video Services Managers
+                -If pluginName is not None, any Video Services Managers for that given system
+            The emails in the list are not in any particular order and should be unique.
+        """
+        csbm = conf.getCSBookingManager()
+        managersEmails = []
+        managersEmails.append(conf.getCreator().getEmail())
+        managersEmails.extend([u.getEmail() for u in conf.getManagerList()])
+        managersEmails.extend([u.getEmail() for u in csbm.getVideoServicesManagers()])
+        if pluginName:
+            managersEmails.extend([u.getEmail() for u in csbm.getPluginManagers(pluginName)])
+        return list(set(managersEmails))
+    
+    @classmethod
+    def eventDetails(cls, conf):
+        return """
+Event details:
+<table style="border-spacing: 10px 10px;">
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Event name:</strong>
+        </td>
+        <td>
+            %s <a href="%s">(link)</a>
+        </td
+    </tr>
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Event id</strong>
+        </td>
+        <td>
+            %s
+        </td
+    </tr>
+    %s
+</table>
+"""%(conf.getTitle(),
+     urlHandlers.UHConferenceDisplay.getURL(conf),
+     conf.getId(),
+     MailTools.eventRoomDetails(conf)
+     )
+    
+    
+    @classmethod
+    def eventRoomDetails(cls, conf):
+        roomDetails = ""
+        location = conf.getLocation()
+        if location:
+            roomDetails += """
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Event location:</strong>
+        </td>
+        <td>
+            %s
+        </td>
+    </tr>
+""" % location.getName()
+
+            room = conf.getRoom()
+            if room:
+                roomDetails += """
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Event room:</strong>
+        </td>
+        <td>
+            %s
+        </td>
+    </tr>
+""" % room.getName()
+
+        return roomDetails
+    
+    
+    @classmethod
+    def organizerDetails(cls, conf):
+        creator = conf.getCreator()
+        
+        additionalEmailsText = ""
+        additionalEmails = creator.getSecondaryEmails()
+        if additionalEmails:
+            additionalEmailsText="""
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Additional emails:</strong>
+        </td>
+        <td>
+            %s
+        </td
+    </tr>
+""" % ", ".join(creator.getEmails()[1:])
+
+        additionalTelephonesText = ""
+        additionalTelephones = creator.getSecondaryTelephones()
+        if additionalTelephones:
+            additionalTelephonesText="""
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Additional telephones:</strong>
+        </td>
+        <td>
+            %s
+        </td
+    </tr>
+""" % ", ".join(creator.getTelephone()[1:])
+
+        
+        return """
+Creator of the event details:
+<table style="border-spacing: 10px 10px;">
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Full name:</strong>
+        </td>
+        <td>
+            %s
+        </td
+    </tr>
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Main email address:</strong>
+        </td>
+        <td>
+            %s
+        </td
+    </tr>
+    %s
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Main phone number:</strong>
+        </td>
+        <td>
+            %s
+        </td
+    </tr>
+    %s
+</table>
+""" % (creator.getFullName(),
+       creator.getEmail(),
+       additionalEmailsText,
+       creator.getTelephone(),
+       additionalTelephonesText
+       )
+
+    @classmethod
+    def bookingCreationDate(cls, booking):
+        return formatDateTime(getAdjustedDate(booking.getCreationDate(), booking.getConference()))
+    
+    @classmethod
+    def bookingModificationDate(cls, booking, typeOfMail):
+        if (typeOfMail == 'new'):
+            return ""
+        else:
+            return """
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Modification date:</strong>
+        </td>
+        <td style="vertical-align: top;">
+            %s
+        </td>
+    </tr>
+""" % formatDateTime(getAdjustedDate(booking.getModificationDate(), booking.getConference()))
+
+    @classmethod
+    def listToStr(cls, list):
+        return "<br />".join([("•" + item) for item in list]) 

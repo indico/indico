@@ -327,14 +327,70 @@ type("AlertPopup", ["ExclusivePopup"],
                  self.close();
              });
 
-             return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {textAlign: 'center'}}, Html.div({style: {textAlign: 'left'}}, this.content), okButton));
+             return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {maxWidth: pixels(400), textAlign: 'center'}}, Html.div({style: {textAlign: 'left'}}, this.content), okButton));
          }
     },
 
     function(title, content) {
         this.content = content;
-        this.ExclusivePopup(title, positive);
+        this.ExclusivePopup(Html.div({style:{textAlign: 'center'}},title), positive);
     }
+);
+
+type("WarningPopup", ["AlertPopup"],
+    {
+        _formatLine: function(line) {
+            var result = Html.div({paddingBottom: pixels(2)});
+            
+            
+            var linkStart = 0;
+            var linkMiddle;
+            var linkEnd = 0;
+            
+            while (linkStart >= 0) {
+                linkStart = line.indexOf('[[', linkEnd);
+                
+                if (linkStart >= 0) {
+                    result.append(Html.span('',line.substring(linkEnd, linkStart)));
+                    
+                    linkMiddle = line.indexOf(' ', linkStart);
+                    linkEnd = line.indexOf(']]', linkStart);
+                    
+                    result.append(Html.a({href: line.substring(linkStart+2, linkMiddle)}, line.substring(linkMiddle + 1, linkEnd) ));
+                    linkEnd+= 2;
+                } else {
+                    result.append(Html.span('',line.substring(linkEnd, line.length)));
+                }
+            }
+            
+            return result;
+        },
+    
+        _formatContent: function(content, level) {
+            var self = this;
+    
+            if (isString(content)) {
+                return Html.span('', self._formatLine(content));
+                
+            } else if (isArray(content)) {
+                var result = Html.ul(level === 0 ? 'warningLevel0' : 'warningLevel1');
+                each (content, function(line){
+                    if (isString(line)) {
+                        result.append(Html.li('', self._formatLine(line)));
+                    } else if (isArray(content)) {
+                        result.append(self._formatContent(line, level + 1));
+                    }
+                });
+                return result;
+            }
+        }
+    },
+    function(title, lines) {
+        var self = this;
+        var content = this._formatContent(lines, 0);
+        
+        this.AlertPopup(Html.span('warningTitle', title), content);
+    } 
 );
 
 /**

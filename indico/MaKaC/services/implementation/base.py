@@ -18,25 +18,29 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 from MaKaC.conference import Category
+from MaKaC.common.PickleJar import DictPickler
 
 import sys, traceback, time, os
 
 from pytz import timezone
 from datetime import datetime, date
-from cgi import escape
 
 from MaKaC import conference
 from MaKaC.common.timezoneUtils import setAdjustedDate
 from MaKaC.common import security
-from MaKaC.errors import MaKaCError, htmlScriptError, htmlForbiddenTag, AdminError, TimingError
-from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessWarning, HTMLSecurityError
+
+from MaKaC.errors import MaKaCError, htmlScriptError, htmlForbiddenTag, TimingError
+from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, HTMLSecurityError, Warning,\
+    ResultWithWarning
 
 from MaKaC.webinterface.rh.base import RequestHandlerBase
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 
 from MaKaC.accessControl import AccessWrapper
 
+from MaKaC.i18n import _
 
 """
 base module for asynchronous server requests
@@ -252,7 +256,7 @@ class ProtectedService(ServiceBase):
         """
         if self._getUser() == None:
             self._doProcess = False
-            raise ServiceAccessWarning("ERR-P4", "You are currently not authenticated. Please log in again.")
+            raise ServiceAccessError("ERR-P4", "You are currently not authenticated. Please log in again.")
 
     def _checkProtection(self):
         """
@@ -286,11 +290,11 @@ class ProtectedDisplayService(ProtectedService):
                 target = self._target
             if not isinstance(target, Category):
                 if target.getAccessKey() != "" or target.getConference().getAccessKey() != "":
-                    raise ServiceAccessWarning("ERR-P4", "You are currently not authenticated or cannot access this service. Please log in again if necessary.")
+                    raise ServiceAccessError("ERR-P4", "You are currently not authenticated or cannot access this service. Please log in again if necessary.")
             if self._getUser() == None:
                 self._checkSessionUser()
             else:
-                raise ServiceAccessWarning("ERR-P4", "You cannot access this service. Please log in again if necessary.")
+                raise ServiceAccessError("ERR-P4", "You cannot access this service. Please log in again if necessary.")
 
 
 class LoggedOnlyService(ProtectedService):
@@ -321,14 +325,14 @@ class ProtectedModificationService(ProtectedService):
         
         if not target.canModify( self.getAW() ):
             if target.getModifKey() != "":
-                raise ServiceAccessWarning("ERR-P5", "You don't have the rights to modify this object")
+                raise ServiceAccessError("ERR-P5", "You don't have the rights to modify this object")
             if self._getUser() == None:
                 self._checkSessionUser()
             else:
-                raise ServiceAccessWarning("ERR-P5", "You don't have the rights to modify this object")
+                raise ServiceAccessError("ERR-P5", "You don't have the rights to modify this object")
         if hasattr(self._target, "getConference"):
             if target.getConference().isClosed():
-                raise ServiceAccessWarning("ERR-P6", "Conference %s is closed"%target.getConference().getId())
+                raise ServiceAccessError("ERR-P6", "Conference %s is closed"%target.getConference().getId())
 
 class AdminService(ProtectedService):
     """
@@ -342,7 +346,7 @@ class AdminService(ProtectedService):
         ProtectedService._checkProtection(self)
 
         if not self._getUser().isAdmin():
-            raise AdminError()
+            raise ServiceAccessError("ERR-P7", _("Only administrators can perform this operation"))
 
 class TextModificationBase( object ):
     """
@@ -350,9 +354,13 @@ class TextModificationBase( object ):
     """
 
     def _getAnswer( self ):
-        """
-        Calls _handle() on the derived classes, in order to make it happen. Provides
-        them with self._value.
+        """ Calls _handleGet() or _handleSet() on the derived classes, in order to make it happen. Provides
+            them with self._value.
+            
+            When calling _handleGet(), it will return the value to return.
+            When calling _handleSet(), it will return:
+            -either self._value if there were no problems
+            -either a FieldModificationWarning object (pickled) if there are warnings to give to the user
         """
 
         # fetch the 'value' parameter (default for text)
@@ -365,8 +373,11 @@ class TextModificationBase( object ):
         if self._value == None:
             return self._handleGet()
         else:
-            self._handleSet()
-            return self._value
+            setResult = self._handleSet()
+            if isinstance(setResult, Warning):
+                return DictPickler.pickle(ResultWithWarning(self._value, setResult))
+            else:
+                return self._value
 
 class HTMLModificationBase( object ):
     """
@@ -392,8 +403,12 @@ class HTMLModificationBase( object ):
 
 
 class DateTimeModificationBase( TextModificationBase ):
-    """
-    Date and time modification base class
+    """ Date and time modification base class
+        Its _handleSet method is called by TextModificationBase's _getAnswer method.
+        DateTimeModificationBase's _handletSet method will call the _setParam method
+        from the classes that inherits from DateTimeModificationBase.
+        _handleSet will return whatever _setParam returns (usually None if there were no problems,
+        or a FieldModificationWarning object with information about a problem / warning to give to the user) 
     """
     def _handleSet(self):
         try:
@@ -401,9 +416,10 @@ class DateTimeModificationBase( TextModificationBase ):
         except ValueError:
             raise ServiceError("ERR-E2",
                                "Date/time is not in the correct format")
+
         try:
             self._pTime = setAdjustedDate(naiveDate, self._conf)
-            self._setParam()
+            return self._setParam()
         except TimingError,e:
             raise ServiceError("ERR-E2", e.getMsg())
 

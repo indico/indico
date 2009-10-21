@@ -2161,7 +2161,11 @@ class WPConferenceModifBase( main.WPMainBase ):
 
         if not (canModify or isAnyCollaborationPluginManager):
             self._videoServicesMenuItem.setVisible(False)
-
+            
+        #we hide the Advanced Options section if it has no items
+        if not self._advancedOptionsSection.hasVisibleItems():
+            self._advancedOptionsSection.setVisible(False)
+        
         #tabs forced to be disabled for now
         self._participantsMenuItem.setVisible(False)
 

@@ -199,21 +199,34 @@ class RoomWithH323(object):
     
 class CERNMCUError(CSErrorBase):
     
-    def __init__(self, faultCode, message = ''):
+    def __init__(self, faultCode, info = ''):
         CSErrorBase.__init__(self)
         self._faultCode = faultCode
-        self._message = message
+        self._info = info
+        
+    @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.CERNMCUError'], 'origin')
+    def getOrigin(self):
+        return 'CERNMCU'
         
     @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.CERNMCUError'], 'faultCode')
     def getFaultCode(self):
         return self._faultCode
     
-    @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.CERNMCUError'], 'message')
-    def getMessage(self):
-        return self._message
+    @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.CERNMCUError'], 'info')
+    def getInfo(self):
+        return self._info
     
-    def setMessage(self, message):
-        self._message = message
+    def setInfo(self, info):
+        self._info = info
+        
+    def getUserMessage(self):
+        return ''
+        
+    def getLogMessage(self):
+        message = "CERNMCU Error. Fault code: " + str(self._faultCode)
+        if self._info:
+            message += ". Info: " + str(self._info)
+        return message
     
 class CERNMCUException(CollaborationException):
     def __init__(self, msg, inner = None):

@@ -6,10 +6,12 @@
         <div class="title"><%= _("User Guides")%></div>
         
         <div class="content">
+            <% if IsAdmin: %>
             <div class="item clearfix">
                 <div class="icons"><a href="ihelp/AdminUserGuide/AdminUserGuide.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
                 <a href="ihelp/AdminUserGuide/index.html"><%= _("Admin User Guide")%></a>
         	</div>
+            <% end %>
         
         	<div class="item clearfix">
                 <div class="icons"><a href="ihelp/MainUserGuide/UserGuide.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
@@ -21,6 +23,36 @@
                 <a href="ihelp/ca.html"><%= _("Quick Start Guide")%></a>
         	</div>
         </div>
+    
+        <% if HasCollaboration: %>
+        <div class="title"><%= _("Video Services Guides")%></div>
+            <div class="content">
+            
+            <% if IsAdmin: %>
+            <div class="item clearfix">
+                <div class="icons"><a href="ihelp/VideoServices/ServerAdminUserGuide_VS/ServerAdminUserGuide_VS.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
+                <a href="ihelp/VideoServices/ServerAdminUserGuide_VS/index.html"><%= _("Admin User Guide")%></a>
+            </div>
+            <% end %>
+            
+            <% if IsCollaborationAdmin: %>
+            <div class="item clearfix">
+                <div class="icons"><a href="ihelp/VideoServices/VSAdminUserGuide_VS/VSAdminUserGuide_VS.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
+                <a href="ihelp/VideoServices/VSAdminUserGuide_VS/index.html"><%= _("Video Services Admin User Guide")%></a>
+            </div>
+            <% end %>
+        
+            <div class="item clearfix">
+                <div class="icons"><a href="ihelp/VideoServices/EventManagerUserGuide_VS/EventManagerUserGuide_VS.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
+                <a href="ihelp/VideoServices/EventManagerUserGuide_VS/index.html"><%= _("Event Manager User Guide")%></a>
+            </div>
+        
+            <div class="item clearfix">
+                <div class="icons"><a href="ihelp/VideoServices/IndicoUserGuide_VS/IndicoUserGuide_VS.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
+                <a href="ihelp/VideoServices/IndicoUserGuide_VS/index.html"><%= _("Indico User Guide")%></a>
+            </div>
+        </div>
+        <% end %>
     
     
     	<div class="title"><%= _("Quick Start Guides")%></div>

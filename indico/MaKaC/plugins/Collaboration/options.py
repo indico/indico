@@ -25,19 +25,32 @@ globalOptions = [
     ("collaborationAdmins", {"description": _("Global collaboration admins"),
                             "type": 'users',
                             "defaultValue": []} ),
+    ("sendMailNotifications", {"description" : _("Should mail notifications be sent to Collaborations admins?"),
+               "type": bool,
+               "defaultValue": False,
+               "editable": True,
+               "visible": True} ),
+    ("additionalEmails", {"description": _("Additional email addresses who will receive notifications (always)"),
+                          "type": list,
+                          "defaultValue": [],
+                          "editable": True,
+                          "visible": True} ),
     ("useHTTPS", {"description": _("Use HTTPS in collaboration pages?"),
                      "type" : bool,
                      "defaultValue": False} ),
     ("startMinutes", {"description": _("Default start time before Indico event start time (minutes)"),
                      "type" : int,
                      "defaultValue": 30} ),
+    ("tabOrder", {"description": _("Order in which the tabs will appear"),
+                  "type": list,
+                  "defaultValue": ["Videoconferencing", "Recording Request", "Webcast Request"]
+                  }),
     ("pluginsPerEventType", {"description": _("Plugins allowed for each event type"),
-                            "type": dict,
+                            "type": dict, #key: a string: conference, simple_event or meeting. Value: list of Plugin objects
                             "editable": False,
                             "visible": True} ),
     ("pluginsPerIndex", {"description": _("Information about each index seen by collaboration admins"),
                          "type": list, #a list of IndexInformation objects
                          "editable": False,
                          "visible": True} )
-    
 ]

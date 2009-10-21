@@ -380,7 +380,7 @@ class ContextHelp:
 
                 if ttType == 'explicit':
                     snippets['snip'+str(count)] ="""<span onmouseover="domTT_activate(this, event, 'content', '%s', 'type', 'greasy', 'caption', false , 'delay', 100, 'maxWidth', 320, 'styleClass', 'tip' );">
-                                                <span style="color: Green; margin-left: 6px; font-size:smaller;"><img style="border: None;display:inline-block;vertical-align: middle" src="%s" alt="Help"/></span>
+                                                <span style="color: Green; margin-left: 6px; font-size:smaller;"><img style="border: None;display:inline-block;vertical-align: middle" src="%s"/></span>
                                                 </span>""" % (filteredText,Config.getInstance().getSystemIconURL( "help" ))
                 
                     elem.newChild(None,'span',content)

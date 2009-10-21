@@ -22,19 +22,24 @@
                 errors = [];
                 if (values["autoGenerateId"] == 'no') {
                     if (!trim(customId)) {
-                        errors.push($T('Please introduce a numeric ID'));
+                        errors.push($T('Please introduce a numeric ID.'));
                     } else if (!IndicoUtil.isInteger(customId)) {
-                        errors.push($T('Field must be a number'));
+                        errors.push($T('Field must be a number.'));
                     } else if (trim(customId).length != 5) {
-                        errors.push($T('The id must have 5 digits'));
+                        errors.push($T('The id must have 5 digits.'));
                     }
                 }
                 return errors;
             }],
             'pin': ['text', true, function(pin, values){
                 errors = [];
-                if (pin.length >= 32) {
-                    errors.push($T("The pin cannot have more than 31 characters."));
+                if (exists(pin) && pin !== '') {
+                    if (!IndicoUtil.isInteger(pin)) {
+                        errors.push($T('The pin has to be a number.'));
+                    }
+                    if (pin.length >= 32) {
+                        errors.push($T("The pin cannot have more than 31 characters."));
+                    }
                 }
                 return errors;
             }],
@@ -106,7 +111,7 @@
                 IndicoUtil.markInvalidField($E('title'), $T("This conference title already exists in the MCU. Please choose a different one."));
                 break;
             case 3:
-                CSErrorPopup("MCU Error", [$T("Participant with IP ") + error.message + $T(" already exists in the MCU.")]);
+                CSErrorPopup("MCU Error", [$T("Participant with IP ") + error.info + $T(" already exists in the MCU.")]);
             case 6:
                 CSErrorPopup("MCU Error", [$T("There are too many conferences in the MCU. No more can be created right now.")]);
             case 7:
@@ -243,6 +248,7 @@
     
     onCreate : function() {
         $E('autoYesRB').dom.checked = true;
+        disableCustomId();
         <% if IncludeInitialRoom: %>
             pf = new ParticipantListField([{type: 'room',
                                            name: "<%= InitialRoomName %>",
@@ -283,15 +289,32 @@
         <% end %>
         
         $E('participantsCell').set(pf.draw());
+        
+        CERNMCUDrawContextHelpIcons();
     },
     
     onEdit: function(booking) {
+        // setFormValues has problems with radio buttons constructed with .innerHTML in IE7
+        if (Browser.IE) {
+            if (booking.bookingParams.autoGenerateId == 'no') {
+                $E('autoNoRB').dom.checked = true;
+                $E('autoyesRB').dom.checked = false;
+            } else {
+                $E('autoNoRB').dom.checked = false;
+                $E('autoyesRB').dom.checked = true;
+            }
+        }
+        
         if (booking.bookingParams.autoGenerateId == 'no') {
             enableCustomId();
+        } else {
+            disableCustomId();
         }
         
         pf = new ParticipantListField(booking.bookingParams.participants)
         $E('participantsCell').set(pf.draw());
+        
+        CERNMCUDrawContextHelpIcons();
     },
     
     onSave: function(values) {
@@ -305,7 +328,7 @@
             ip = participant.get("ip");
             if (participant.get("ip") in ips) {
                 errors = true;
-                CSErrorPopup("Invalid participants", ["There is more than 1 participant with the ip " + participant.get("ip")]);
+                CSErrorPopup("Invalid participants", ["There is more than one participant with the ip " + participant.get("ip")]);
                 break;
             } else if (!IndicoUtil.isIpAddress(ip)) {
                 CSErrorPopup("Invalid participants", ["The participant " + (i + 1) + " does not have a correct IP"]);

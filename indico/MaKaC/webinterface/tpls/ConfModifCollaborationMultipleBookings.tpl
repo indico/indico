@@ -26,6 +26,8 @@
             </span>
         </td>
     </tr>
+</table>
+<table>
     <tr>
         <td class="groupTitle" style="white-space: nowrap;padding-top: 1em;" colspan="2">
             <%= _("Current bookings")%>
@@ -98,7 +100,8 @@ var forms = {
   *                          In that case "permissionToStart" should be set to false so that the booking doesn't start.
   *     -permissionToStop: Same as permissionToStart. Sometimes the booking should not be allowed to stop even if the "stop" button is available.
   */
-var bookings = $L(<%= jsonEncode(BookingsM)%>);
+
+var bookings = $L(<%= jsonEncode(BookingsM) %>);
 
 var createButton;
 var createButtonTooltip;
@@ -155,6 +158,16 @@ var edit = function(booking) {
     editBooking(booking, '<%= Conference.getId() %>');
 };
 
+/**
+ * Mouseover help popup for the 'Create' button
+ */
+var CreateHelpPopup = function(event) {
+    IndicoUI.Widgets.Generic.tooltip(this, event,
+        '<div style="padding:3px">' + 
+            $T('Select a <strong>booking type<\/strong> from the drop-down list and press the "Create" button.') +
+        '<\/div>');
+};
+
 /* ------------------------------ STUFF THAT HAPPENS WHEN PAGE IS LOADED -------------------------------*/
 
 IndicoUI.executeOnLoad(function(){
@@ -178,6 +191,10 @@ IndicoUI.executeOnLoad(function(){
     createButton.observeClick(function(){ create() });
 
     $E('createBookingDiv').set(createButton.draw());
+
+    var createHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
+    createHelpImg.dom.onmouseover = CreateHelpPopup;
+    $E('createBookingHelp').set(createHelpImg);
 
     $E('pluginSelect').dom.value = 'noneSelected';
     pluginSelectChanged();

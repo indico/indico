@@ -112,6 +112,10 @@ form {
     margin: 0;
 }
 
+label.disabled{
+    color: gray;
+}
+
 code {
    font-family: monospace;
 }
@@ -1190,6 +1194,12 @@ a.nav_link:hover {
 .nav_alphabet a{
    width: 10px;
    margin-top: 5px;
+}
+
+span.horizontalSeparator {
+    color: #AAAAAA;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 
@@ -3678,6 +3688,11 @@ ul.errorList li {
     color: #D01F3C;
 }
 
+ul.warningList {
+    padding: 0;
+    margin: 0;
+    margin-left: 20px;  
+}
 
 span.errorTitle {
     font-size: medium;
@@ -3688,6 +3703,23 @@ span.errorTitle {
 span.messageAfterErrors {
     margin-top: 1em;
     color: #D01F3C;
+}
+
+span.warningTitle {
+    font-size: medium;
+    font-weight: bold;  
+}
+
+ul.warningLevel0 {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+ul.warningLevel1 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
 }
 
 

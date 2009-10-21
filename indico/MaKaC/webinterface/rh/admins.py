@@ -40,6 +40,12 @@ class RCAdmin(object):
             If user is not None, the request object will be used to check the user's privileges.
             Otherwise the user will be retrieved from the request object 
         """
+        if user is None:
+            if request is None:
+                return False
+            else:
+                user = request._getUser()
+        
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
         serverAdmins = minfo.getAdminList()
         return serverAdmins.isAdmin(user)

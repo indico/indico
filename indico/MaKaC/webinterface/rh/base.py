@@ -50,6 +50,7 @@ from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from xml.sax.saxutils import escape
 
 from MaKaC.common.logger import Logger
+from MaKaC.common.contextManager import ContextManager
 from MaKaC.i18n import _
 
 from MaKaC.common.contextManager import ContextManager

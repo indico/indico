@@ -33,16 +33,26 @@ from MaKaC.services.interface.rpc.common import ServiceError
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.common.logger import Logger
 from MaKaC.common.indexes import IndexesHolder
-from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
+from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools,\
+    MailTools
+from MaKaC.conference import Observer
+from MaKaC.common.contextManager import ContextManager
+from MaKaC.webinterface.common.tools import hasTags
+from MaKaC.plugins.Collaboration import mail
+from MaKaC.common.mail import GenericMailer
 import os, inspect
 import MaKaC.plugins.Collaboration as Collaboration
 from MaKaC.i18n import _
 
 
-class CSBookingManager(Persistent):
+class CSBookingManager(Persistent, Observer):
     """ Class for managing the bookins of a meeting.
         It will store the list of bookings. Adding / removing / editing bookings should be through this class.
     """
+    
+    _shouldBeTitleNotified = True
+    _shouldBeDateChangeNotified = True
+    _shouldBeDeletionNotified = True
     
     def __init__(self, conf):
         """ Constructor for the CSBookingManager class.
@@ -62,14 +72,8 @@ class CSBookingManager(Persistent):
         # an index of video services managers for each plugin. key: plugin name, value: list of users
         self._managers = {}
         
-        #we register as a date change observer of the conference
-        self._conf.addTitleChangeObserver(self)
-        
-        #we register as a date change observer of the conference
-        self._conf.addDateChangeObserver(self)
-        
-        #we register as a delete observer of the conference
-        self._conf.addDeleteObserver(self)
+        #we register as an observer of the conference
+        self._conf.addObserver(self)
 
     def getOwner(self):
         """ Returns the Conference (the meeting) that owns this CSBookingManager object.
@@ -77,12 +81,8 @@ class CSBookingManager(Persistent):
         return self._conf
     
     def restoreAsObserver(self):
-        if not self in self._conf.getTitleChangeObservers():
-            self._conf.addTitleChangeObserver(self)
-        if not self in self._conf.getDateChangeObservers():
-            self._conf.addDateChangeObserver(self)
-        if not self in self._conf.getDeleteObservers():
-            self._conf.addDeleteObserver(self)
+        if not self in self._conf.getObservers():
+            self._conf.addObserver(self)
     
     def isCSAllowed(self):
         """ Returns if the associated event should display a Video Services tab
@@ -97,11 +97,14 @@ class CSBookingManager(Persistent):
     
     def getAllowedPlugins(self):
         """ Returns a list of allowed plugins (Plugin objects) for this event.
+            Only active plugins are returned.
             This can depend on the kind of event (meeting, lecture, conference), on the equipment of the room...
         """
         pluginsPerEventType = CollaborationTools.getCollaborationPluginType().getOption("pluginsPerEventType").getValue()
         if pluginsPerEventType is not None:
-            return pluginsPerEventType[self._conf.getType()]
+            allowedForThisEvent = pluginsPerEventType[self._conf.getType()]
+            return [plugin for plugin in allowedForThisEvent if plugin.isActive()]
+        
         
     def getBookingList(self, sorted = False, filterByType = None, notify = False, onlyPublic = False):
         """ Returns a list of all the bookings.
@@ -200,7 +203,9 @@ class CSBookingManager(Persistent):
             
             error = newBooking.setBookingParams(bookingParams)
             
-            if error:
+            if isinstance(error, CSSanitizationError):
+                return error
+            elif error:
                 raise CollaborationServiceException("Problem while creating a booking of type " + bookingType)
             else:
                 newId = self._getNewBookingId()
@@ -215,6 +220,7 @@ class CSBookingManager(Persistent):
                         self.getHiddenBookings().add(newId)
                     self._indexBooking(newBooking)
                     self._notifyModification()
+                    self._sendMail(newBooking, 'new')
                     return newBooking
         else:
             #we raise an exception because the web interface should take care of this never actually happening
@@ -241,7 +247,9 @@ class CSBookingManager(Persistent):
         oldBookingParams = booking.getBookingParams() #this is a copy so it's ok
         
         error = booking.setBookingParams(bookingParams)
-        if error:
+        if isinstance(error, CSSanitizationError):
+            return error
+        elif error:
             CSBookingManager._rollbackChanges(booking, oldBookingParams, oldModificationDate)
             raise CollaborationServiceException("Problem while modifying a booking of type " + booking.getType())
         else:
@@ -267,7 +275,8 @@ class CSBookingManager(Persistent):
                         self._addToPendingIndex(booking)
                         
                 self._notifyModification()
-                    
+                
+                self._sendMail(booking, 'modify')
                 return booking
     
     @classmethod
@@ -319,6 +328,9 @@ class CSBookingManager(Persistent):
             self._unindexBooking(booking)
             
             self._notifyModification()
+            
+            self._sendMail(booking, 'remove')
+            
             return booking
     
     def _unindexBooking(self, booking):
@@ -421,6 +433,45 @@ class CSBookingManager(Persistent):
             
         return indexes
     
+    def _sendMail(self, booking, operation):
+        if MailTools.needToSendEmails():
+            
+            if operation == 'new':
+                try:
+                    notification = mail.NewBookingNotification(booking)
+                    GenericMailer.sendAndLog(notification, self._conf,
+                                         "MaKaC/plugins/Collaboration/base.py",
+                                         self._conf.getCreator())
+                except Exception, e:
+                    Logger.get('VideoServ').error(
+                        """Could not send NewBookingNotification for booking with id %s of event with id %s, exception: %s""" %
+                        (booking.getId(), self._conf.getId(), str(e)))
+                    raise e
+                    
+            elif operation == 'modify':
+                try:
+                    notification = mail.BookingModifiedNotification(booking)
+                    GenericMailer.sendAndLog(notification, self._conf,
+                                         "MaKaC/plugins/Collaboration/base.py",
+                                         self._conf.getCreator())
+                except Exception, e:
+                    Logger.get('VideoServ').error(
+                        """Could not send BookingModifiedNotification for booking with id %s of event with id %s, exception: %s""" %
+                        (booking.getId(), self._conf.getId(), str(e)))
+                    raise e
+                    
+            elif operation == 'remove':
+                try:
+                    notification = mail.BookingDeletedNotification(booking)
+                    GenericMailer.sendAndLog(notification, self._conf,
+                                         "MaKaC/plugins/Collaboration/base.py",
+                                         self._conf.getCreator())
+                except Exception, e:
+                    Logger.get('VideoServ').error(
+                        """Could not send BookingDeletedNotification for booking with id %s of event with id %s, exception: %s""" %
+                        (booking.getId(), self._conf.getId(), str(e)))
+                    raise e
+    
     def getManagers(self):
         if not hasattr(self, "_managers"):
             self._managers = {}
@@ -473,51 +524,88 @@ class CSBookingManager(Persistent):
             except Exception, e:
                 Logger.get('VideoServ').error("Exception while reindexing a booking in the event title index because its event's title changed: " + str(e))
             
-    
-    def notifyStartDateChange(self, oldStartDate, newStartDate):
-        """ Notifies the CSBookingManager that the start date of the event (meeting) it's attached to has changed.
-            The CSBookingManager will change the dates of all the bookings that want to be updated.
-            This method will be called by the event (meeting) object
-        """
-        for booking in self.getBookingList():
-            try:
-                self._changeConfStartDateInIndex(booking, oldStartDate, newStartDate)
-            except Exception, e:
-                Logger.get('VideoServ').error("Exception while reindexing a booking in the event start date index because its event's start date changed: " + str(e))
             
-            if booking.needsToBeNotifiedOfDateChanges():
-                oldBookingStartDate = booking.getStartDate()
-                if oldBookingStartDate:
-                    try:
-                        booking.setStartDate(oldBookingStartDate + (newStartDate - oldStartDate) )
-                        self._changeStartDateInIndex(booking, oldBookingStartDate, booking.getStartDate())
-                        booking._modify()
-                    except Exception, e:
-                        Logger.get('VideoServ').error("Exception while changing a booking's start after event start date changed: " + str(e))
-                        booking.setStartDate(oldBookingStartDate)     
-    
-    def notifyEndDateChange(self, oldEndDate, newEndDate):
-        """ Notifies the CSBookingManager that the end date of the event (Conference) it's attached to has changed.
+    def notifyEventDateChanges(self, oldStartDate = None, newStartDate = None, oldEndDate = None, newEndDate = None):
+        """ Notifies the CSBookingManager that the start and / or end dates of the event it's attached to have changed.
             The CSBookingManager will change the dates of all the bookings that want to be updated.
-            This method will be called by the event (Conference) object
+            If there are problems (such as a booking not being able to be modified)
+            it will write a list of strings describing the problems in the 'dateChangeNotificationProblems' context variable.
+            (each string is produced by the _booking2NotifyProblem method).
+            This method will be called by the event (meeting) object.
         """
-        for booking in self.getBookingList():
-            if booking.needsToBeNotifiedOfDateChanges():
-                oldBookingEndDate = booking.getEndDate()
-                if oldBookingEndDate:
-                    try:
-                        booking.setEndDate(oldBookingEndDate + (newEndDate - oldEndDate) )
-                        booking._modify()
-                    except Exception, e:
-                        Logger.get('VideoServ').error("Exception while changing a booking's end after event end date changed: " + str(e))
-                        booking.setEndDate(oldBookingEndDate)
+        startDateChanged = oldStartDate is not None and newStartDate is not None and not oldStartDate == newStartDate
+        endDateChanged = oldEndDate is not None and newEndDate is not None and not oldEndDate == newEndDate
+        someDateChanged = startDateChanged or endDateChanged
+
+        if someDateChanged:
+            problems = []
+            for booking in self.getBookingList():
+                if booking.hasStartDate():
+                    if startDateChanged:
+                        try:
+                            self._changeConfStartDateInIndex(booking, oldStartDate, newStartDate)
+                        except Exception, e:
+                            Logger.get('VideoServ').error("Exception while reindexing a booking in the event start date index because its event's start date changed: " + str(e))
+                    
+                    if booking.needsToBeNotifiedOfDateChanges():
+                        oldBookingStartDate = booking.getStartDate()
+                        oldBookingEndDate = booking.getEndDate()
+                        if startDateChanged:
+                            booking.setStartDate(oldBookingStartDate + (newStartDate - oldStartDate) )
+                        if endDateChanged:
+                            booking.setEndDate(oldBookingEndDate + (newEndDate - oldEndDate) )
+                        
+                        rollback = False
+                        modifyResult = None
+                        try:
+                            modifyResult = booking._modify()
+                            if isinstance(modifyResult, CSErrorBase):
+                                Logger.get('VideoServ').warning("Error while changing a booking's dates after event dates changed: " + modifyResult.getLogMessage())
+                                rollback = True
+                        except Exception, e:
+                            Logger.get('VideoServ').error("Exception while changing a booking's dates after event dates changed: " + str(e))
+                            rollback = True
+                            
+                        if rollback:
+                            booking.setStartDate(oldBookingStartDate)
+                            booking.setEndDate(oldBookingEndDate)
+                            problems.append(CSBookingManager._booking2NotifyProblem(booking, modifyResult))
+                        elif startDateChanged:
+                            self._changeStartDateInIndex(booking, oldBookingStartDate, booking.getStartDate())
+            if problems:
+                ContextManager.get('dateChangeNotificationProblems')['Collaboration'] = [
+                    'Some Video Services bookings could not be moved:',
+                    problems,
+                    'Go to [[' + str(urlHandlers.UHConfModifCollaboration.getURL(self.getOwner())) + ' the Video Services section]] to modify them yourself.'
+                ]
+                            
         
     def notifyTimezoneChange(self, oldTimezone, newTimezone):
         """ Notifies the CSBookingManager that the timezone of the event it's attached to has changed.
             The CSBookingManager will change the dates of all the bookings that want to be updated.
             This method will be called by the event (Conference) object
         """
-        return
+        return []
+    
+    @classmethod
+    def _booking2NotifyProblem(cls, booking, modifyError):
+        """ Turns a booking into a string used to tell the user
+            why a date change of a booking triggered by the event's start or end date change
+            went bad.
+        """
+        
+        message = []
+        message.extend(["The dates of the ", booking.getType(), " booking"])
+        if booking.hasTitle():
+            message.extend([': "', booking._getTitle(), '" (', booking.getStartDateAsString(), ' - ', booking.getEndDateAsString(), ')'])
+        else:
+            message.extend([' ongoing from ', booking.getStartDateAsString(), ' to ', booking.getEndDateAsString(), ''])
+        
+        message.append(' could not be changed.')
+        if modifyError and modifyError.getUserMessage():
+            message.extend([' Reason: ', modifyError.getUserMessage()])
+        return "".join(message)
+        
     
     def notifyDeletion(self):
         """ Notifies the CSBookingManager that the Conference object it is attached to has been deleted.
@@ -526,14 +614,21 @@ class CSBookingManager(Persistent):
         """
         for booking in self.getBookingList():
             try:
-                removeResult = self.removeBooking(booking.getId())
+                removeResult = booking._delete()
                 if isinstance(removeResult, CSErrorBase):
-                    Logger.get('VideoServ').error("Error while deleting a booking of type %s after deleting an event: %s"%(booking.getType(), removeResult.getMessage() ))
+                    Logger.get('VideoServ').warning("Error while deleting a booking of type %s after deleting an event: %s"%(booking.getType(), removeResult.getLogMessage() ))
+                self._unindexBooking(booking)
             except Exception, e:
                 Logger.get('VideoServ').error("Exception while deleting a booking of type %s after deleting an event: %s"%(booking.getType(), str(e) ))            
         
     
     def getEventDisplayPlugins(self, sorted = False):
+        """ Returns a list of names (strings) of plugins which have been configured
+            as showing bookings in the event display page, and which have bookings
+            already (or previously) created in the event.
+            (does not check if the bookings are hidden or not)
+        """
+        
         pluginsWithEventDisplay = CollaborationTools.pluginsWithEventDisplay()
         l = []
         for pluginName in self._bookingsByType:
@@ -616,11 +711,6 @@ class CSBookingBase(Persistent):
     _hasStartDate = True
     _hasEventDisplay = False
     
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'],
-               'modificationURL',
-               lambda booking: str(urlHandlers.UHConfModifCollaboration.getURL(booking.getConference(),
-                                                                               secure = CollaborationTools.isUsingHTTPS(),
-                                                                               tab = CollaborationTools.getPluginSubTab(booking.getPlugin()))))
     def __init__(self, bookingType, conf):
         """ Constructor for the CSBookingBase class.
             id: a string with the id of the booking
@@ -722,7 +812,7 @@ class CSBookingBase(Persistent):
     def getCreationDate(self):
         """ Returns the date this booking was created, as a timezone localized datetime object
         """
-        if not hasattr(self, "_creationDate"): #remove when put in prod
+        if not hasattr(self, "_creationDate"): #TODO: remove when safe
             self._creationDate = nowutc()
         return self._creationDate
     
@@ -742,7 +832,7 @@ class CSBookingBase(Persistent):
     def getModificationDate(self):
         """ Returns the date this booking was modified last
         """
-        if not hasattr(self, "_modificationDate"):  #remove when put in prod
+        if not hasattr(self, "_modificationDate"):  #TODO: remove when safe
             self._modificationDate = nowutc()
         return self._modificationDate
     
@@ -916,7 +1006,7 @@ class CSBookingBase(Persistent):
         """
         self._acceptRejectStatus = None
     
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'rejectionReason')
+    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'acceptRejectStatus')
     def getAcceptRejectStatus(self):
         """ Returns the Accept/Reject status of the booking
             This attribute will be available in Javascript with the "acceptRejectStatus"
@@ -996,6 +1086,10 @@ class CSBookingBase(Persistent):
             Note: even if a parameter is in this list, you can decide not to implement its corresponding set
             method if you never expect the parameter name to come up inside 'params'.
         """
+        sanitizeResult = self.sanitizeParams(params)
+        if sanitizeResult:
+            return sanitizeResult
+        
         self.setHidden(params.pop("hidden", False))
         self.setNeedsToBeNotifiedOfDateChanges(params.pop("notifyOnDateChanges", False))
         
@@ -1006,7 +1100,7 @@ class CSBookingBase(Persistent):
         if endDate is not None:
             self.setEndDateFromString(endDate)
         
-        for k,v in params.items():
+        for k,v in params.iteritems():
             if k in self._bookingParams:
                 self._bookingParams[k] = v
             elif hasattr(self, "_complexParameters") and k in self._complexParameters:
@@ -1023,6 +1117,23 @@ class CSBookingBase(Persistent):
             return self._checkBookingParams()
         
         return False
+    
+    def sanitizeParams(self, params):
+        """ Checks if the fields introduced into the booking / request form
+            have any kind of HTML or script tag. 
+        """
+        if not isinstance(params, dict):
+            raise CollaborationServiceException("Booking parameters are not a dictionary")
+        
+        invalidFields = []
+        for k, v in params.iteritems():
+            if type(v) == str and hasTags(v):
+                invalidFields.append(k)
+                
+        if invalidFields:
+            return CSSanitizationError(invalidFields)
+        else:
+            return None
         
     def _getTitle(self):
         if self.hasEventDisplay():
@@ -1218,11 +1329,23 @@ class CSBookingBase(Persistent):
         """
         return self._commonIndexes
     
+    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'],
+                'modificationURL', lambda url: str(url))
+    def getModificationURL(self):
+        return urlHandlers.UHConfModifCollaboration.getURL(self.getConference(),
+                                                           secure = CollaborationTools.isUsingHTTPS(),
+                                                           tab = CollaborationTools.getPluginTab(self.getPlugin()))
+    
     def hasStartDate(self):
         """ Returns if bookings of this type have a start date
             (they may only have creation / modification date)
         """
         return self._hasStartDate 
+    
+    def hasTitle(self):
+        """ Returns if bookings of this type have a title
+        """
+        return self._hasTitle
     
     def hasEventDisplay(self):
         """ Returns if the type of this booking should display something on
@@ -1391,20 +1514,45 @@ class CSErrorBase(object):
         they should return an error that inherits from this class
     """
     
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSReturnedErrorBase',
+    @Retrieves(['MaKaC.plugins.Collaboration.base.CSErrorBase',
+                'MaKaC.plugins.Collaboration.base.CSSanitizationError',
                 'MaKaC.plugins.Collaboration.EVO.common.EVOError',
                 'MaKaC.plugins.Collaboration.EVO.common.OverlappedError',
                 'MaKaC.plugins.Collaboration.EVO.common.ChangesFromEVOError',
                 'MaKaC.plugins.Collaboration.RecordingRequest.common.RecordingRequestError',
+                'MaKaC.plugins.Collaboration.WebcastRequest.common.WebcastRequestError',
                 'MaKaC.plugins.Collaboration.CERNMCU.common.CERNMCUError'],
                 'error')
     def getError(self):
         return True
     
-    def getMessage(self):
-        """ To be overloaded
+    def getUserMessage(self):
+        """ To be overloaded.
+            Returns the string that will be shown to the user when this error will happen.
         """
-        return ''
+        raise CollaborationException("Method getUserMessage was not overriden for the a CSErrorBase object of class " + self.__class__.__name__)
+        
+    def getLogMessage(self):
+        """ To be overloaded.
+            Returns the string that will be printed in Indico's log when this error will happen.
+        """
+        raise CollaborationException("Method getLogMessage was not overriden for the a CSErrorBase object of class " + self.__class__.__name__)
+    
+class CSSanitizationError(CSErrorBase):
+    """ Class used to return which fields have a sanitization error (invalid html / script tags)
+    """
+    
+    def __init__(self, invalidFields):
+        self._invalidFields = invalidFields
+    
+    @Retrieves(['MaKaC.plugins.Collaboration.base.CSSanitizationError'], 'origin')
+    def getOrigin(self):
+        return 'sanitization'
+    
+    @Retrieves(['MaKaC.plugins.Collaboration.base.CSSanitizationError'], 'invalidFields')
+    def invalidFields(self):
+        return self._invalidFields
+    
         
         
 class CollaborationException(MaKaCError):

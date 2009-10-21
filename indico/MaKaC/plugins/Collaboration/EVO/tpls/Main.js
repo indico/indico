@@ -1,7 +1,8 @@
 {
     start : function(booking, iframeElement) {
         if (Browser.IE) {
-            window.location.href = booking.url;
+            var popup = new EVOLaunchClientPopup(booking.url);
+            popup.open();
         } else {
             iframeElement.location.href = booking.url;
         }
@@ -228,18 +229,11 @@
     },
     
     onCreate: function() {
-        var startDateHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
-        startDateHelpImg.dom.onmouseover = EVOStartDateHelpPopup;
-        
-        var endDateHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
-        endDateHelpImg.dom.onmouseover = EVOEndDateHelpPopup;
-        
-        $E('startDateHelp').set(startDateHelpImg);
-        $E('endDateHelp').set(endDateHelpImg);
+        EVODrawContextHelpIcons();
     },
     
     onEdit: function() {
-        callFunction('EVO','onCreate');
+        EVODrawContextHelpIcons();
     },
     
     postCreate: function(booking) {

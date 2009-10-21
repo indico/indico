@@ -135,6 +135,12 @@ def restrictedHTML(txt):
 ##            return False
 ##    return True
 
+
+def hasTags(s):
+    """ Returns if a given string has any tags
+    """
+    return tagSearch.search(s) is not None
+
 def escape_html(text, escape_quotes=False):
     """ Escape all HTML tags, avoiding XSS attacks.
         < => &lt;

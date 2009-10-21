@@ -78,7 +78,6 @@ class ContextManager:
 
     @classmethod
     def get(cls, name):
-
         """
         If no set has been done over the variable before,
         an exception will be thrown.

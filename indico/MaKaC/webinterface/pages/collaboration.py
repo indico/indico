@@ -179,36 +179,25 @@ class WPConfModifCSBase (WPConferenceModifBase):
         """
         WPConferenceModifBase.__init__(self, rh, conf)
         self._conf = conf
+        self._tabs = {} # list of Indico's Tab objects
         self._tabNames = rh._tabs
-        self._activeTab = rh._activeTab
+        self._activeTabName = rh._activeTabName
     
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
-        #if user is not conference manager or server admin, we hide all other main tabs
-        if not self._conf.canModify(self._rh.getAW()) or RCAdmin.hasRights(self._rh):
-            for sect in self._sideMenu.getSections():
-                for item in sect.getItems():
-                    if item != self._videoServicesMenuItem:
-                        item.setEnabled(False)
-                    else:
-                        item.setEnabled(True)
         
-        self._subtabs = {}
-        for subtabName in self._tabNames:
-            if subtabName == 'Managers':
+        isUsingHTTPS = CollaborationTools.isUsingHTTPS()
+        for tabName in self._tabNames:
+            if tabName == 'Managers':
                 url = urlHandlers.UHConfModifCollaborationManagers.getURL(self._conf)
             else:
-                url = urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = CollaborationTools.isUsingHTTPS(), tab=subtabName)
-                
-            self._subtabs[subtabName] = self._tabCtrl.newTab(subtabName, subtabName, url)
+                url = urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = isUsingHTTPS, tab = tabName)
+            self._tabs[tabName] = self._tabCtrl.newTab(tabName, tabName, url)
         
         self._setActiveTab()
 
     def _setActiveTab( self ):
-        self._subtabs[self._activeTab].setActive()
-        
-#    def _getTabContent(self, params):
-#        return "nothing"
+        self._tabs[self._activeTabName].setActive()
         
     def _setActiveSideMenuItem(self):
         self._videoServicesMenuItem.setActive()
@@ -217,7 +206,7 @@ class WPConfModifCollaboration( WPConfModifCSBase ):
     
     def __init__(self, rh, conf):
         """ Constructor
-            The rh is expected to have the attributes _tabs, _activeTab, _tabPlugins (like RHConfModifCSBookings)
+            The rh is expected to have the attributes _tabs, _activeTabName, _tabPlugins (like RHConfModifCSBookings)
         """
         WPConfModifCSBase.__init__(self, rh, conf)
         self._tabPlugins = rh._tabPlugins
@@ -245,7 +234,7 @@ class WPConfModifCollaboration( WPConfModifCSBase ):
     def _getPageContent( self, params ):
         if len(self._tabNames) > 0:
             self._createTabCtrl()
-            wc = WConfModifCollaboration( self._conf, self._rh.getAW().getUser(), self._activeTab, self._tabPlugins)
+            wc = WConfModifCollaboration( self._conf, self._rh.getAW().getUser(), self._activeTabName, self._tabPlugins)
             return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( wc.getHTML({}) )
         else:
             return _("No available plugins, or no active plugins")

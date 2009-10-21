@@ -13,6 +13,24 @@ IndicoUI.Effect = {
             IndicoUI.Effect.disable(elem);
         });
     },
+    
+    /**
+     * Simple function to enable or disable a text field.
+     * FF changes the background color, but not IE.
+     * This function changes to background color to imitate FF's one.
+     * @params {XElement} element the text field to enable or disable
+     * @params {Boolean} enableDisable true: enable, false: disable
+     */
+    enableDisableTextField: function(element, enableDisable) {
+        element.dom.disabled = !enableDisable;
+        if (Browser.IE) {
+            if (enableDisable) {
+                element.dom.style.backgroundColor = '';
+            } else {
+                element.dom.style.backgroundColor = '#ece7e2';
+            }
+        }
+    },
 
     frame: function(element){
         element.setStyle('overflow', 'auto');
@@ -61,7 +79,7 @@ IndicoUI.Effect = {
         */
     mouseOver: function(element){
         element.onmouseover = function(){
-            this.style.background = "#FFFF88";
+            this.style.background = "#FFF6DF";
         };
         element.onmouseout = function(){
             this.style.background = "transparent";

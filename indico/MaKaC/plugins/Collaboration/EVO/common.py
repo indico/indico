@@ -34,6 +34,8 @@ from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 
 readLimit = 100000;
 secondsToWait = 10;
+encodingTextStart = '<fmt:requestEncoding value='
+encodingTextEnd = '/>'
 
 def getEVOOptionValueByName(optionName):
     return CollaborationTools.getOptionValue('EVO', optionName)
@@ -91,7 +93,22 @@ def getEVOAnswer(action, arguments = {}, eventId = '', bookingId = ''):
             raise EVOException("The EVO server is not responding.", e)
         raise EVOException('URLError when contacting the EVO server for action: ' + action + '. Reason="' + str(e.reason)+'"', e)
     
-    else:
+    else: #we parse the answer
+        encodingTextStart = '<fmt:requestEncoding value='
+        encodingTextEnd = '/>'
+        
+        answer = answer.strip()
+        
+        #we parse an eventual encoding specification, like <fmt:requestEncoding value="UTF-8"/>
+        if answer.startswith(encodingTextStart):
+            endOfEncondingStart = answer.find(encodingTextStart) + len(encodingTextStart)
+            valueStartIndex = max(answer.find('"', endOfEncondingStart), answer.find("'", endOfEncondingStart)) + 1 #find returns -1 if not found
+            valueEndIndex = max(answer.find('"', valueStartIndex), answer.find("'", valueStartIndex))
+            encoding = answer[valueStartIndex:valueEndIndex].strip()
+            endOfEncodignEnd = answer.find(encodingTextEnd) + len(encodingTextEnd)
+            answer = answer[endOfEncodignEnd:].strip()
+            answer = answer.decode(encoding).encode('utf-8')
+        
         if answer.startswith("OK:"):
             answer = answer[3:].strip() #we remove the "OK:"
             Logger.get('EVO').info("""Evt:%s, booking:%s, got answer: [%s]""" % (eventId, bookingId, answer))
@@ -192,10 +209,17 @@ def getMaxEndDate(conference):
     
 class EVOError(CSErrorBase):
     
-    def __init__(self, errorType, requestURL = None):
+    def __init__(self, errorType, requestURL = None, userMessage = None):
         CSErrorBase.__init__(self)
         self._errorType = errorType
         self._requestURL = requestURL
+        self._userMessage = None
+        
+    @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.EVOError',
+                'MaKaC.plugins.Collaboration.EVO.common.OverlappedError',
+                'MaKaC.plugins.Collaboration.EVO.common.ChangesFromEVOError'], 'origin')
+    def getOrigin(self):
+        return 'EVO'
         
     @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.EVOError',
                 'MaKaC.plugins.Collaboration.EVO.common.OverlappedError',
@@ -210,6 +234,20 @@ class EVOError(CSErrorBase):
                'requestURL')
     def getRequestURL(self):
         return self._requestURL
+    
+    def getUserMessage(self):
+        if self._userMessage:
+            return self._userMessage
+        else:
+            if self._errorType == 'duplicated':
+                return "This EVO meeting could not be created or changed because EVO considers the resulting meeting as duplicated."
+            elif self._errorType == 'start_in_past':
+                return "This EVO meeting could not be created or changed because EVO does not allow meetings starting in the past."
+            else:
+                return self._errorType
+    
+    def getLogMessage(self):
+        return "EVO Error: " + str(self._errorType) + " for request " + str(self._requestURL)
 
     
     
@@ -242,6 +280,9 @@ class EVOException(CollaborationException):
 class EVOControlledException(Exception):
     def __init__(self, message):
         self.message = message
+    
+    def __str__(self):
+        return "EVOControlledException. Message = " + self.message
         
 class EVOWarning(object):
     

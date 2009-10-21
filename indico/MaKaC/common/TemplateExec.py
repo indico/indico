@@ -199,7 +199,7 @@ def deepstr(obj):
                 
     return str(obj)
 
-def beautify(obj, classNames, level = 0):
+def beautify(obj, classNames = {"UlClassName": "optionList", "KeyClassName": "optionKey"}, level = 0):
     """ Turns list or dicts into beautiful <ul> HTML lists, recursively.
         -obj: an object that can be a list, a dict, with lists or dicts inside
         -classNames: a dictionary specifying class names. Example:

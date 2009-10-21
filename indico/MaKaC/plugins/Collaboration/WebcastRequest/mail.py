@@ -21,23 +21,11 @@
 from MaKaC.webinterface.mail import GenericNotification
 
 from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
+from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from MaKaC.plugins.Collaboration.WebcastRequest.common import typeOfEvents,\
     postingUrgency, webcastPurpose, intendedAudience, subjectMatter, lectureOptions,\
     getCommonTalkInformation
 from MaKaC.webinterface import urlHandlers
-from MaKaC.common.utils import formatDateTime
-from MaKaC.common.timezoneUtils import getAdjustedDate
-from MaKaC.plugins.base import PluginsHolder
-
-def needToSendAdminEmails():
-    webcastRequest = PluginsHolder().getPluginType('Collaboration').getPlugin('WebcastRequest')
-    
-    admins = webcastRequest.getOption('admins').getValue()
-    sendMailNotifications = webcastRequest.getOption('sendMailNotifications').getValue()
-    additionalEmails = webcastRequest.getOption('additionalEmails').getValue()
-    
-    return (sendMailNotifications and len(admins) > 0) or len(additionalEmails) > 0
 
 
 class WebcastRequestNotificationBase(GenericNotification):
@@ -49,163 +37,10 @@ class WebcastRequestNotificationBase(GenericNotification):
         self._bp = booking._bookingParams
         self._conference = booking.getConference()
         
-        admins = PluginsHolder().getPluginType('Collaboration').getPlugin('WebcastRequest').getOption("admins").getValue()
-        self.adminEmails = [u.getEmail() for u in admins]
-        self.additionalEmails = PluginsHolder().getPluginType('Collaboration').getPlugin('WebcastRequest').getOption("additionalEmails").getValue()
-        
-        self._displayLink = urlHandlers.UHConferenceDisplay.getURL(self._conference)
-        self._adminLink = urlHandlers.UHConfModifCollaboration.getURL(self._conference,
-                                                                      secure = CollaborationTools.isUsingHTTPS(),
-                                                                      tab = CollaborationTools.getPluginSubTab(booking.getPlugin()))
+        self._modifLink = str(booking.getModificationURL())
         
         self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
         self.setContentType("text/html")
-        
-    def _getEventRoomDetails(self):
-        roomDetails = ""
-        location = self._conference.getLocation()
-        if location:
-            roomDetails += """
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Event location:</strong>
-        </td>
-        <td>
-            %s
-        </td>
-    </tr>
-""" % location.getName()
-
-            room = self._conference.getRoom()
-            if room:
-                roomDetails += """
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Event room:</strong>
-        </td>
-        <td>
-            %s
-        </td>
-    </tr>
-""" % room.getName()
-
-        return roomDetails
-        
-    def _getEventDetails(self):
-        return """
-Event details:
-<table style="border-spacing: 10px 10px;">
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Event name:</strong>
-        </td>
-        <td>
-            %s <a href="%s">(link)</a>
-        </td
-    </tr>
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Event id</strong>
-        </td>
-        <td>
-            %s
-        </td
-    </tr>
-    %s
-</table>
-"""%(self._conference.getTitle(),
-     self._displayLink,
-     self._conference.getId(),
-     self._getEventRoomDetails()
-     )
-
-    def _getOrganizerDetails(self):
-        creator = self._conference.getCreator()
-        
-        additionalEmailsText = ""
-        additionalEmails = creator.getSecondaryEmails()
-        if additionalEmails:
-            additionalEmailsText="""
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Additional emails:</strong>
-        </td>
-        <td>
-            %s
-        </td
-    </tr>
-""" % ", ".join(creator.getEmails()[1:])
-
-        additionalTelephonesText = ""
-        additionalTelephones = creator.getSecondaryTelephones()
-        if additionalTelephones:
-            additionalTelephonesText="""
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Additional telephones:</strong>
-        </td>
-        <td>
-            %s
-        </td
-    </tr>
-""" % ", ".join(creator.getTelephone()[1:])
-
-        
-        return """
-Creator of the event details:
-<table style="border-spacing: 10px 10px;">
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Full name:</strong>
-        </td>
-        <td>
-            %s
-        </td
-    </tr>
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Main email address:</strong>
-        </td>
-        <td>
-            %s
-        </td
-    </tr>
-    %s
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Main phone number:</strong>
-        </td>
-        <td>
-            %s
-        </td
-    </tr>
-    %s
-</table>
-""" % (creator.getFullName(),
-       creator.getEmail(),
-       additionalEmailsText,
-       creator.getTelephone(),
-       additionalTelephonesText
-       )
-    
-    def _getCreationDate(self):
-        return formatDateTime(getAdjustedDate(self._booking.getCreationDate(), self._conference))
-    
-    def _getModificationDateRow(self, typeOfMail):
-        if (typeOfMail == 'new'):
-            return ""
-        else:
-            return """
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Modification date:</strong>
-        </td>
-        <td style="vertical-align: top;">
-            %s
-        </td>
-    </tr>
-""" % formatDateTime(getAdjustedDate(self._booking.getModificationDate(), self._conference))
-
         
     def _getRequestDetails(self, typeOfMail):
         bp = self._bp
@@ -329,8 +164,8 @@ Request details:<br />
     </tr>
 </table>
 """%(self._booking.getId(),
-     self._getCreationDate(),
-     self._getModificationDateRow(typeOfMail),
+     MailTools.bookingCreationDate(self._booking),
+     MailTools.bookingModificationDate(self._booking, typeOfMail),
      self._getTalks(),
      self._getTalkSelectionComments(),
      bp["permission"],
@@ -356,10 +191,12 @@ Request details:<br />
             else:
                 speakers = ''
                 
-            if contribution.getLocation():
-                locationText = "Location: " + contribution.getLocation().getName()
-                if contribution.getRoom():
-                    locationText += ', Room: ' + contribution.getRoom().getName()
+            location = contribution.getLocation()
+            room = contribution.getRoom()
+            if location and location.getName() and location.getName().strip():
+                locationText = "Location: " + location.getName()
+                if room and room.getName() and room.getName().strip():
+                    locationText += ', Room: ' + room.getName()
                 else:
                     locationText += ', Room: not defined'
             else:
@@ -412,15 +249,11 @@ Request details:<br />
             return comments
         return "(User didn't write any comments)"
         
-    @classmethod
-    def listToStr(cls, list):
-        return "<br />".join([("•" + item) for item in list]) 
-        
     def _getLectureOptions(self):
         options = self._bp['lectureOptions']
         lodict = dict(lectureOptions)
         if options:
-            return WebcastRequestNotificationBase.listToStr([lodict[k] for k in options])
+            return MailTools.listToStr([lodict[k] for k in options])
         else:
             return "No lecture options were selected"
         
@@ -428,7 +261,7 @@ Request details:<br />
         purposes = self._bp['webcastPurpose']
         rpdict = dict(webcastPurpose)
         if purposes:
-            return WebcastRequestNotificationBase.listToStr([rpdict[k] for k in purposes])
+            return MailTools.listToStr([rpdict[k] for k in purposes])
         else:
             return "No purposes were selected"
         
@@ -436,7 +269,7 @@ Request details:<br />
         audiences = self._bp['intendedAudience']
         iadict = dict(intendedAudience)
         if audiences:
-            return WebcastRequestNotificationBase.listToStr([iadict[k] for k in audiences])
+            return MailTools.listToStr([iadict[k] for k in audiences])
         else:
             return "No audiences were selected"
         
@@ -444,7 +277,7 @@ Request details:<br />
         matters = self._bp['subjectMatter']
         smdict = dict(subjectMatter)
         if matters:
-            return WebcastRequestNotificationBase.listToStr([smdict[k] for k in matters])
+            return MailTools.listToStr([smdict[k] for k in matters])
         else:
             return "No audiences were selected"
 
@@ -454,7 +287,7 @@ class WebcastRequestAdminNotificationBase(WebcastRequestNotificationBase):
     """
     def __init__(self, booking):
         WebcastRequestNotificationBase.__init__(self, booking)
-        self.setToList(self.adminEmails + self.additionalEmails)
+        self.setToList(MailTools.getAdminEmailList('WebcastRequest'))
 
 
 class WebcastRequestManagerNotificationBase(WebcastRequestNotificationBase):
@@ -462,9 +295,7 @@ class WebcastRequestManagerNotificationBase(WebcastRequestNotificationBase):
     """
     def __init__(self, booking):
         WebcastRequestNotificationBase.__init__(self, booking)
-        managerEmails = [u.getEmail() for u in self._conference.getManagerList()]
-        managerEmails.append(self._conference.getCreator().getEmail())
-        self.setToList(managerEmails)
+        self.setToList(MailTools.getManagersEmailList(self._conference, 'WebcastRequest'))
 
 class NewRequestNotification(WebcastRequestAdminNotificationBase):
     """ Template to build an email notification to the webcast responsible
@@ -473,11 +304,11 @@ class NewRequestNotification(WebcastRequestAdminNotificationBase):
     def __init__(self, booking):
         WebcastRequestAdminNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico] [New webcast request] %s (event id: %s)"""
+        self.setSubject("""[WebcastReq] New webcast request: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         self.setBody("""Dear Webcast Responsible,<br />
 <br />
-There is a <strong>new webcast request</strong>.<br />
+There is a <strong>new webcast request</strong> in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to accept or reject the request.<br />
 %s
 <br />
@@ -485,9 +316,11 @@ Click <a href="%s">here</a> to accept or reject the request.<br />
 <br />
 <br />
 %s
-""" % ( self._adminLink,
-        self._getEventDetails(),
-        self._getOrganizerDetails(),
+""" % ( MailTools.getServerName(),
+        MailTools.getServerName(),
+        self._modifLink,
+        MailTools.eventDetails(self._conference),
+        MailTools.organizerDetails(self._conference),
         self._getRequestDetails('new')
         ))
         
@@ -500,12 +333,12 @@ class RequestModifiedNotification(WebcastRequestAdminNotificationBase):
     def __init__(self, booking):
         WebcastRequestAdminNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico] [Webcast request modified] %s (event id: %s)"""
+        self.setSubject("""[WebcastReq] Webcast request modified: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear Webcast Responsible,<br />
 <br />
-A webcast request <strong>has been modified</strong>.<br />
+A webcast request <strong>has been modified</strong> in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to accept or reject the request.<br />
 %s
 <br />
@@ -513,9 +346,11 @@ Click <a href="%s">here</a> to accept or reject the request.<br />
 <br />
 <br />
 %s
-""" % ( self._adminLink,
-        self._getEventDetails(),
-        self._getOrganizerDetails(),
+""" % ( MailTools.getServerName(),
+        MailTools.getServerName(),
+        self._modifLink,
+        MailTools.eventDetails(self._conference),
+        MailTools.organizerDetails(self._conference),
         self._getRequestDetails('modify')
         ))
         
@@ -528,12 +363,12 @@ class RequestDeletedNotification(WebcastRequestAdminNotificationBase):
     def __init__(self, booking):
         WebcastRequestAdminNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico] [Webcast request deleted] %s (event id: %s)"""
+        self.setSubject("""[WebcastReq] Webcast request deleted: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear Webcast Responsible,<br />
 <br />
-A webcast request <strong>has been withdrawn</strong>.<br />
+A webcast request <strong>has been withdrawn</strong> in <a href="%s">%s</a><br />
 <br />
 %s
 <br />
@@ -541,8 +376,10 @@ A webcast request <strong>has been withdrawn</strong>.<br />
 <br />
 <br />
 %s
-""" % ( self._getEventDetails(),
-        self._getOrganizerDetails(),
+""" % ( MailTools.getServerName(),
+        MailTools.getServerName(),
+        MailTools.eventDetails(self._conference),
+        MailTools.organizerDetails(self._conference),
         self._getRequestDetails('remove')
         ))
 
@@ -555,7 +392,7 @@ class RequestAcceptedNotification(WebcastRequestManagerNotificationBase):
     def __init__(self, booking):
         WebcastRequestManagerNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico] [Webcast request accepted] %s (event id: %s)"""
+        self.setSubject("""[Indico] Webcast request accepted: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear Event Manager,<br />
@@ -567,7 +404,7 @@ Best Regards,<br />
 Webcast Managers
 
 """ % ( self._conference.getTitle(),
-        self._adminLink
+        self._modifLink
         ))
         
 class RequestAcceptedNotificationAdmin(WebcastRequestAdminNotificationBase):
@@ -577,16 +414,18 @@ class RequestAcceptedNotificationAdmin(WebcastRequestAdminNotificationBase):
     def __init__(self, booking):
         WebcastRequestAdminNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico] [Webcast request accepted] %s (event id: %s)"""
+        self.setSubject("""[WebcastReq] Webcast request accepted: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear Webcast Responsible,<br />
 <br />
-A webcast request for the event: "%s" has been accepted.<br />
+A webcast request for the event: "%s" has been accepted in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to view the request.<br />
 
 """ % ( self._conference.getTitle(),
-        self._adminLink
+        MailTools.getServerName(),
+        MailTools.getServerName(),
+        self._modifLink
       ))
 
 
@@ -600,7 +439,7 @@ class RequestRejectedNotification(WebcastRequestManagerNotificationBase):
 
         WebcastRequestManagerNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico] [Webcast request rejected] %s (event id: %s)"""
+        self.setSubject("""[Indico] Webcast request rejected: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         self.setBody("""Dear Event Manager,<br />
 <br />
@@ -615,7 +454,7 @@ The reason given by the Webcast manager was:
 Best Regards,<br />
 Webcast Managers
 """ % ( self._conference.getTitle(),
-        self._adminLink,
+        self._modifLink,
         self._booking.getRejectReason().strip()
         ))
         
@@ -626,12 +465,12 @@ class RequestRejectedNotificationAdmin(WebcastRequestAdminNotificationBase):
     def __init__(self, booking):
         WebcastRequestAdminNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico] [Webcast request rejected] %s (event id: %s)"""
+        self.setSubject("""[WebcastReq] Webcast request rejected: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear Webcast Responsible,<br />
 <br />
-A webcast request for the event: "%s" has been rejected.<br />
+A webcast request for the event: "%s" has been rejected in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to view the request.<br />
 <br />
 The reason given by the Webcast Responsible who rejected the request was:
@@ -640,6 +479,8 @@ The reason given by the Webcast Responsible who rejected the request was:
 <br />
 
 """ % ( self._conference.getTitle(),
-        self._adminLink,
+        MailTools.getServerName(),
+        MailTools.getServerName(),
+        self._modifLink,
         self._booking.getRejectReason().strip()
       ))
