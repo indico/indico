@@ -337,6 +337,14 @@ class outputGenerator:
             out.writeTag("type","")
             out.writeTag("displayURL",url)
             out.closeTag("material")
+        elif wm.getForthcomingWebcast(conf):
+            out.openTag("material")
+            out.writeTag("ID","forthcoming webcast")
+            out.writeTag("title","forthcoming webcast")
+            out.writeTag("description","")
+            out.writeTag("type","")
+            out.writeTag("displayURL", wm.getWebcastServiceURL())
+            out.closeTag("material")
         
         #plugins XML
         out.openTag("plugins")

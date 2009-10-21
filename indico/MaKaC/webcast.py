@@ -33,6 +33,7 @@ class WebcastManager(Persistent):
         self._archived_webcasts = []
         self._forthcoming_webcasts = []
         self._managers = []
+        self._webcastServiceURL = '' #used for forthcoming webcast display
         
     def getManagers( self ):
         try:
@@ -256,6 +257,19 @@ class WebcastManager(Persistent):
             self.channels.insert(nb+1, tomove)
         self._p_changed=1
         return True
+    
+    def getWebcastServiceURL(self):
+        """ Returns the Webcast Service URL ( a string ).
+            It will be used to display a link when an event is a forthcoming webcast.
+        """
+        if not hasattr(self, "_webcastServiceURL"):
+            self._webcastServiceURL = ''
+        return self._webcastServiceURL
+    
+    def setWebcastServiceURL(self, url):
+        """ Sets the Webcast Service URL ( a string ).
+        """
+        self._webcastServiceURL = url
     
 class HelperWebcastManager:
     """Helper class used for getting and instance of WebcastManager

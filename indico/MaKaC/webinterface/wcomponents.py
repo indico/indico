@@ -35,6 +35,7 @@ import MaKaC.common.info as info
 import MaKaC.domain as domain
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.common.Configuration as Configuration
+from MaKaC import webcast
 
 from MaKaC.accessControl import AdminList
 from MaKaC.errors import UserError
@@ -366,6 +367,8 @@ class WHeader(WTemplated):
                 from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin
                 if (self._currentuser.isAdmin() or RCCollaborationAdmin.hasRights(user = self._currentuser)) and CollaborationTools.anyPluginsAreActive():
                     adminItemList.append({'url': urlHandlers.UHAdminCollaboration.getURL(), 'text': _("Video Services Overview")})
+            if webcast.HelperWebcastManager.getWebcastManagerInstance().isManager(self._currentuser):
+                adminItemList.append({'url': urlHandlers.UHWebcast.getURL(), 'text': _("Webcast Admin")})
             
             
         vars["adminItemList"] = adminItemList

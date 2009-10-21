@@ -317,8 +317,14 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
         menuStatus = self._rh._getSession().getVar("menuStatus") or "open"
 
         wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
-        webcastURL = wm.isOnAir(self._conf)
 
+        onAirURL = wm.isOnAir(self._conf)
+        if onAirURL:
+            webcastURL = onAirURL
+        else:
+            webcastURL = wm.getWebcastServiceURL() 
+        forthcomingWebcast = not onAirURL and wm.getForthcomingWebcast(self._conf)
+        
         frameParams = {\
             "confModifURL": urlHandlers.UHConferenceModification.getURL(self._conf), \
             "logoURL": urlHandlers.UHConferenceLogo.getURL( self._conf), \
@@ -327,7 +333,9 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
             "menuStatus": menuStatus, \
             "nowHappening": drawer.getNowHappeningHTML(), \
             "simpleTextAnnouncement": drawer.getSimpleText(), \
-            "webcastURL": webcastURL }
+            "onAirURL": onAirURL,
+            "webcastURL": webcastURL,
+            "forthcomingWebcast": forthcomingWebcast }
         if self._conf.getLogo():
             frameParams["logoURL"] = urlHandlers.UHConferenceLogo.getURL( self._conf)
 
