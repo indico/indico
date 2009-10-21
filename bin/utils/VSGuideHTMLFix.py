@@ -75,17 +75,17 @@ class MyHTMLParser(HTMLParser):
             self._inStyleTag = True
         tag, attrs = MyHTMLParser._processAttrs(tag, attrs)
         strattrs = "".join([' %s="%s"' % (key, value) for key, value in attrs.iteritems()])
-        self._out.write("<%s%s>\n" % (tag, strattrs))
+        self._out.write("<%s%s>" % (tag, strattrs))
         
     def handle_startendtag(self, tag, attrs):
         tag, attrs = MyHTMLParser._processAttrs(tag, attrs)
         strattrs = "".join([' %s="%s"' % (key, value) for key, value in attrs])
-        self._out.write("<%s%s />\n" % (tag, strattrs))
+        self._out.write("<%s%s />" % (tag, strattrs))
         
     def handle_endtag(self, tag):
         if tag.lower() == 'style':
             self._inStyleTag = False
-        self._out.write("</%s>\n" % tag)
+        self._out.write("</%s>" % tag)
         
     def handle_data(self, text):
         if self._inStyleTag:
@@ -96,7 +96,8 @@ class MyHTMLParser(HTMLParser):
             iPStyle = max(iPStyle1, iPStyle2, iPStyle3, iPStyle4)
             endIPStyle = text.find('}', iPStyle)
             self._out.write(text[:endIPStyle])
-            self._out.write(';margin: 0; padding: 0;')
+            if not text[:endIPStyle].endswith(';margin: 0; padding: 0;'):
+                self._out.write(';margin: 0; padding: 0;')
             self._out.write(text[endIPStyle:])
         else:
             self._out.write("%s" % text)
@@ -123,7 +124,7 @@ class MyHTMLParser(HTMLParser):
 if __name__ == "__main__":
     p = MyHTMLParser()
     ihelpPath = "../../indico/htdocs/ihelp/"
-    p.process(ihelpPath + "VideoServices/IndicoUserGuide_VS/IndicoUserGuide_VS.html")
-    p.process(ihelpPath + "VideoServices/EventManagerUserGuide_VS/EventManagerUserGuide_VS.html")
-    p.process(ihelpPath + "VideoServices/ServerAdminUserGuide_VS/ServerAdminUserGuide_VS.html")
-    p.process(ihelpPath + "VideoServices/VSAdminUserGuide_VS/VSAdminUserGuide_VS.html")
+    p.process(ihelpPath + "VideoServices/IndicoUserGuide_VS/index.html")
+    p.process(ihelpPath + "VideoServices/EventManagerUserGuide_VS/index.html")
+    p.process(ihelpPath + "VideoServices/ServerAdminUserGuide_VS/index.html")
+    p.process(ihelpPath + "VideoServices/VSAdminUserGuide_VS/index.html")
