@@ -153,7 +153,7 @@ class ReviewManager(Persistent):
             editor.linkTo(self._contribution, "editor")
             self.getConfReview().addEditorContribution(editor, self._contribution)
             self.getLastReview().setEditorDueDate(self.getConfReview().getDefaultEditorDueDate())
-            notification = ContributionReviewingNotification(editor, 'Editor', self._contribution)
+            notification = ContributionReviewingNotification(editor, 'Layout Reviewer', self._contribution)
             GenericMailer.sendAndLog(notification, self._contribution.getConference(), "MaKaC/reviewing.py", editor)
         else:
             raise MaKaCError("Please choose a editor before assigning an editor")
@@ -165,7 +165,7 @@ class ReviewManager(Persistent):
         """
         self._editor.unlinkTo(self._contribution, "editor")
         self.getConfReview().removeEditorContribution(self._editor, self._contribution)
-        notification = ContributionReviewingRemoveNotification(self._editor, 'Editor', self._contribution)
+        notification = ContributionReviewingRemoveNotification(self._editor, 'Layout Reviewer', self._contribution)
         GenericMailer.sendAndLog(notification, self._contribution.getConference(), "MaKaC/reviewing.py", self._editor)
         self._editor = None
 
@@ -196,7 +196,7 @@ class ReviewManager(Persistent):
             self.getLastReview().setReviewerDueDate(self.getConfReview().getDefaultReviewerDueDate())
             if self.getLastReview().getAdviceFrom(reviewer) is None:
                 self.getLastReview().addReviewerJudgement(reviewer)
-            notification = ContributionReviewingNotification(reviewer, 'Reviewer', self._contribution)
+            notification = ContributionReviewingNotification(reviewer, 'Content Reviewer', self._contribution)
             GenericMailer.sendAndLog(notification, self._contribution.getConference(), "MaKaC/reviewing.py", reviewer)
         else:
             raise MaKaCError("Please choose a referee before assigning a reviewer")
@@ -211,7 +211,7 @@ class ReviewManager(Persistent):
             self.getConfReview().removeReviewerContribution(reviewer, self._contribution)
             self._reviewersList.remove(reviewer)
             self.notifyModification()
-            notification = ContributionReviewingRemoveNotification(reviewer, 'Reviewer', self._contribution)
+            notification = ContributionReviewingRemoveNotification(reviewer, 'Content Reviewer', self._contribution)
             GenericMailer.sendAndLog(notification, self._contribution.getConference(), "MaKaC/reviewing.py", reviewer)
         
         
@@ -222,7 +222,7 @@ class ReviewManager(Persistent):
             reviewer.unlinkTo(self._contribution, "reviewer")
             self.getConfReview().removeReviewerContribution(reviewer, self._contribution)
             self.notifyModification()
-            notification = ContributionReviewingRemoveNotification(reviewer, 'Reviewer', self._contribution)
+            notification = ContributionReviewingRemoveNotification(reviewer, 'Content Reviewer', self._contribution)
             GenericMailer.sendAndLog(notification, self._contribution.getConference(), "MaKaC/reviewing.py", reviewer)
         del(self._reviewersList[:])
 
@@ -767,8 +767,8 @@ class ContributionReviewingJudgementNotification(GenericNotification):
 
         The layout of your contribution "%s" (id: %s) has been reviewed.
         The judgement was: %s
-
-        The comments of the editor were:
+        
+        The comments of the layout reviewer were:
         "%s"
 
         Thank you for using our system.
@@ -783,8 +783,8 @@ class ContributionReviewingJudgementNotification(GenericNotification):
 
         The content of your contribution "%s" (id: %s) has been reviewed.
         The judgement was: %s
-
-        The comments of the reviewer were:
+        
+        The comments of the content reviewer were:
         "%s"
 
         Thank you for using our system.

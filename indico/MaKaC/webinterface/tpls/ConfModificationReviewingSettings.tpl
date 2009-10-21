@@ -260,6 +260,18 @@
 <% else: %>
     <% display = 'none' %>
 <% end %>
+<table id="defaultDueDatesTable" width="90%%" align="center" border="0" style="margin-bottom:1em; display:<%=display%>">
+    <tr>
+        <td id="defaultDatesHelp" colspan="5" class="reviewingsubtitle"><%= _("Automatic mails")%></td>
+    </tr>
+    
+
+<% if ConfReview.hasReviewing(): %>
+    <% display = 'table' %>
+<% end %>
+<% else: %>
+    <% display = 'none' %>
+<% end %>
 <form action="<%= setTemplateURL %>" method="post" ENCTYPE="multipart/form-data">
 <table id="templateTable" width="90%%" align="center" border="0" style="display:<%=display%>">
     <tr>

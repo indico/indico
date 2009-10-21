@@ -294,7 +294,7 @@ class ConferenceReviewingUserCompetenceList(ListModificationBase, ConferenceRevi
 
     def _handleGet(self):
         return [{"id": user.getId(), "name": user.getStraightFullName(), "competences": c}
-                for user, c in self._confReview.getAllUserCompetences(False, self._role)]
+                for user, c in self._confReview.getAllUserCompetences(True, self._role)]
         
         
         

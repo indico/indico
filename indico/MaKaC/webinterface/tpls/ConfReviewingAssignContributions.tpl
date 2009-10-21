@@ -3,8 +3,13 @@
 <% from MaKaC.conference import ContribStatusNone %>
 
 <% dueDateFormat = "%a %d %b %Y" %>
+<% color = '' %>
 <% if not ConfReview.hasReviewing(): %>
 <table align="center"><tr><td><%= _("Type of reviewing has not been chosen yet")%></td></tr></table>
+<% end %>
+<% else: %>
+<% if len(Conference.getContributionListSortedById()) == 0: %>
+<table align="center"><tr><td><%= _("There are no contributions to assign")%></td></tr></table>
 <% end %>
 <%else:%>
 <div style="padding-top:10px; padding-bottom: 10px;"><em><%= _("Please, select one or more contributions to assign Reviewers")%></em></div>
@@ -250,7 +255,6 @@
             <td style="border-right:5px solid #FFFFFF; border-left:5px solid #FFFFFF;">
                 <% date = rm.getLastReview().getAdjustedRefereeDueDate() %>
                 <% if date is None: %>
-                    <% color = '' %>
                     <%= _("Deadline not set.")%>
                 <% end %>
                 <% else: %>
@@ -262,8 +266,7 @@
                     <% end %>
                     <%= date.strftime(dueDateFormat) %>                   
                 <% end %>
-            </td>    
-                            
+            </td>           
         </tr>
         <% end %>
     <% end %>
@@ -525,7 +528,7 @@ var contributionTemplate = function(contribution) {
     row.append(cell8);
 
     // Cell9: due date of the contribution
-    var cell9 = Html.td({style:{color:<%if color=='red':%>"red"<%end%><%else:%>"green"<%end%>}});
+    var cell9 = Html.td({style:{"color":<%if color=='red':%>"red"<%end%><%else:%>"green"<%end%>}});
     cell9.set(contribution.reviewManager.lastReview.refereeDueDate)
     row.append(cell9);
     
@@ -1190,4 +1193,5 @@ $E('removeAllReviewersButton_bottom').observeClick(function(){ removeUser('allRe
 fetchContributions();
     
 </script>
+<% end %>
 <% end %>
