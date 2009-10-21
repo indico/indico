@@ -107,7 +107,7 @@ def _getInstallRequires():
     
     They will only be installed when Indico is installed through easy_install.'''
     
-    base =  ['pytz', 'zodb3', 'jstools', 'zope.index', 'simplejson', 'lxml', 'ReportLab']
+    base =  ['pytz', 'zodb3', 'jstools', 'zope.index', 'simplejson']
     if sys.version_info[1] < 5: # hashlib is part of Python 2.5+
         base.append('hashlib')
         
@@ -338,6 +338,7 @@ if __name__ == '__main__':
                                  'indico_ctl           = MaKaC.consoleScripts.indicoCtl:main',
                                  ]
           },
+          zip_safe = False,
           packages = find_packages(where='indico', exclude=('htdocs',)),
           install_requires = _getInstallRequires(),
           data_files = _getDataFiles(x),

@@ -161,8 +161,8 @@ def compileAllLanguages():
         
 def copytreeSilently(source, target):
     '''Copies source tree to target tree overwriting existing files'''
-    source = os.path.normpath(SOURCE)
-    target = os.path.normpath(TARGET)
+    source = os.path.normpath(source)
+    target = os.path.normpath(target)
     for root, dirs, files in os.walk(source, topdown=False):
         for name in files:
             fullpath = os.path.normpath(os.path.join(root, name))
@@ -231,17 +231,18 @@ def _checkDirPermissions(dbInstalledBySetupPy=False, uid=None, gid=None):
                 accessgroup = int(gid)
                 prompt = False
             except KeyError:
-                print 'Invalid pair uid/gid (%s/%s)' % (uid, gid)
+                print 'uid/gid pair (%s/%s) provided through command line is false' % (uid, gid)
 
-        # Try to use indico.conf's
-        try:
-            pwd.getpwnam(cfg.getApacheUser())
-            grp.getgrnam(cfg.getApacheGroup())
-            accessuser = cfg.getApacheUser()
-            accessgroup = cfg.getApacheGroup()
-            prompt = False
-        except KeyError:
-            print "\nERROR: indico.conf's ApacheUser and ApacheGroup options are incorrect (%s/%s)." % (cfg.getApacheUser(), cfg.getApacheGroup())
+        else:
+            # Try to use indico.conf's
+            try:
+                pwd.getpwnam(cfg.getApacheUser())
+                grp.getgrnam(cfg.getApacheGroup())
+                accessuser = cfg.getApacheUser()
+                accessgroup = cfg.getApacheGroup()
+                prompt = False
+            except KeyError:
+                print "\nERROR: indico.conf's ApacheUser and ApacheGroup options are incorrect (%s/%s)." % (cfg.getApacheUser(), cfg.getApacheGroup())
 
         if prompt == True:
             valid_credentials = False
@@ -330,9 +331,36 @@ What do you want to do [u/E]? ''' % _existingIndicoConfPath())
                 sys.exit()
             elif opt == 'u':
                 _activateIndicoConfFromExistingInstallation()
+            else:
+                print "\nInvalid answer. Exiting installation..\n"
+                sys.exit()
 
     compileAllLanguages()
     indicoconfpath = os.path.join(config_dir, 'indico.conf')
+    
+    if not os.path.exists(indicoconfpath):
+        if not os.path.exists(PWD_INDICO_CONF):
+            opt = raw_input('''
+We did not detect an existing Indico installation.
+We also did not detect an etc/indico.conf file in this directory.
+At this point you can:
+
+    [c]opy the default values in etc/indico.conf.sample to a new etc/indico.conf
+    and continue the installation
+
+    [A]bort the installation in order to inspect etc/indico.conf.sample
+    and / or to make your own etc/indico.conf
+
+What do you want to do [c/a]? ''')
+            if opt in ('c', 'C'):
+                shutil.copy(PWD_INDICO_CONF + '.sample', PWD_INDICO_CONF)
+            elif opt in ('', 'a', 'A'):
+                print "\nExiting installation..\n"
+                sys.exit()
+            else:
+                print "\nInvalid anwer. Exiting installation..\n"
+                sys.exit()
+    
     activemakacconfig = os.path.join(os.path.dirname(os.path.abspath(MaKaC.__file__)), 'common', 'MaKaCConfig.py') 
     updateIndicoConfPathInsideMaKaCConfig(indicoconfpath, activemakacconfig)
     
@@ -351,19 +379,22 @@ def indico_post_install(config_dir, makacconfig_base_dir, package_dir, uid=None,
                             '%s/zodb.conf' % config_dir) if not os.path.exists(xx)]:
         shutil.copy('%s.sample' % f, f)
 
-    if not os.path.exists(indicoconfpath):
+    if not os.path.exists(indicoconfpath) and os.path.exists(PWD_INDICO_CONF):
         shutil.copy(PWD_INDICO_CONF, indicoconfpath)
 
-    upgrade_indico_conf(indicoconfpath, PWD_INDICO_CONF)
+    if os.path.exists(PWD_INDICO_CONF):
+        upgrade_indico_conf(indicoconfpath, PWD_INDICO_CONF)
         
     # Shall we create a DB?
     dbInstalledBySetupPy = False
-    if not _existingDb():
+    if _existingDb():
+        print 'Successfully found a database directory at %s' % LOCALDATABASEDIR
+    else:
         opt = None
         while opt not in ('Y', 'y', 'n', ''):
-            opt = raw_input('''\nWe cannot connect to the configured database at %s.
+            opt = raw_input('''\nWe cannot find the configured database at %s.
 
-Do you want to create a new database now [Y/n]? ''' % str(cfg.getDBConnectionParams()))
+Do you want to create a new database now [Y/n]? ''' % LOCALDATABASEDIR)
             if opt in ('Y', 'y', ''):
                 dbInstalledBySetupPy = True
                 dbpath_ok = False
@@ -381,6 +412,13 @@ Do you want to create a new database now [Y/n]? ''' % str(cfg.getDBConnectionPar
             elif opt == 'n':
                 sys.exit()
 
+    #we delete an existing vars.js.tpl.tmp
+    tmp_dir = cfg.getUploadedFilesTempDir()
+    varsJsTplTmpPath = os.path.join(tmp_dir, 'vars.js.tpl.tmp')
+    if os.path.exists(varsJsTplTmpPath):
+        print 'Old vars.js.tpl.tmp found at: %s. Removing' % varsJsTplTmpPath
+        os.remove(varsJsTplTmpPath)
+    
 
     _checkDirPermissions(dbInstalledBySetupPy=dbInstalledBySetupPy, uid=uid, gid=gid)
 
@@ -418,11 +456,15 @@ Add the following lines to your Apache2 httpd.conf:
     Allow from All
 </Directory>
 
+Alias /indico/images "%s/images"
+Alias /indico "%s"
+
+(change the paths after 'Alias' in order to change the URL bindings)
 
 
 If you are running ZODB on this host:
 - Review %s/zodb.conf and %s/zdctl.conf to make sure everything is ok.
 - To start the database run: zdctl.py -C %s/zdctl.conf start
-""" % (cfg.getConfigurationDir(), cfg.getBinDir(), cfg.getDocumentationDir(), cfg.getConfigurationDir(), cfg.getHtdocsDir(), cfg.getHtdocsDir(), package_dir, cfg.getHtdocsDir(),  cfg.getConfigurationDir(), cfg.getConfigurationDir(), cfg.getConfigurationDir())
+""" % (cfg.getConfigurationDir(), cfg.getBinDir(), cfg.getDocumentationDir(), cfg.getConfigurationDir(), cfg.getHtdocsDir(), cfg.getHtdocsDir(), package_dir, cfg.getHtdocsDir(), cfg.getHtdocsDir(), cfg.getHtdocsDir(), cfg.getConfigurationDir(), cfg.getConfigurationDir(), cfg.getConfigurationDir())
 
 
