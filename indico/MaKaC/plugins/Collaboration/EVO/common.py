@@ -34,6 +34,8 @@ from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 
 readLimit = 100000;
 secondsToWait = 10;
+encodingTextStart = '<fmt:requestEncoding value='
+encodingTextEnd = '/>'
 
 def getEVOOptionValueByName(optionName):
     return CollaborationTools.getOptionValue('EVO', optionName)
@@ -91,7 +93,22 @@ def getEVOAnswer(action, arguments = {}, eventId = '', bookingId = ''):
             raise EVOException("The EVO server is not responding.", e)
         raise EVOException('URLError when contacting the EVO server for action: ' + action + '. Reason="' + str(e.reason)+'"', e)
     
-    else:
+    else: #we parse the answer
+        encodingTextStart = '<fmt:requestEncoding value='
+        encodingTextEnd = '/>'
+        
+        answer = answer.strip()
+        
+        #we parse an eventual encoding specification, like <fmt:requestEncoding value="UTF-8"/>
+        if answer.startswith(encodingTextStart):
+            endOfEncondingStart = answer.find(encodingTextStart) + len(encodingTextStart)
+            valueStartIndex = max(answer.find('"', endOfEncondingStart), answer.find("'", endOfEncondingStart)) + 1 #find returns -1 if not found
+            valueEndIndex = max(answer.find('"', valueStartIndex), answer.find("'", valueStartIndex))
+            encoding = answer[valueStartIndex:valueEndIndex].strip()
+            endOfEncodignEnd = answer.find(encodingTextEnd) + len(encodingTextEnd)
+            answer = answer[endOfEncodignEnd:].strip()
+            answer = answer.decode(encoding).encode('utf-8')
+        
         if answer.startswith("OK:"):
             answer = answer[3:].strip() #we remove the "OK:"
             Logger.get('EVO').info("""Evt:%s, booking:%s, got answer: [%s]""" % (eventId, bookingId, answer))
