@@ -383,6 +383,7 @@ class ScheduleEditBreakBase(ScheduleOperation, LocationSetter):
         return {'day': self._brk.getAdjustedStartDate().strftime("%Y%m%d"),
                 'id': pickledData['id'],
                 'slotEntry': pickledDataSlotSchEntry,
+                'autoOps': translateAutoOps(self.getAutoOps()),
                 'entry': pickledData}
 
 class ConferenceScheduleAddBreak(ScheduleEditBreakBase, conferenceServices.ConferenceModifBase):

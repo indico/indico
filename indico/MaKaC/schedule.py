@@ -142,6 +142,7 @@ class TimeSchedule(Schedule, Persistent):
             entry.getSchedule().removeEntry(entry)
 
         owner = self.getOwner()
+        tz = owner.getConference().getTimezone()
 
         # If user has entered start date use these dates
         # if the entry has not a pre-defined start date we try to find a place
@@ -155,7 +156,7 @@ class TimeSchedule(Schedule, Persistent):
                     ContextManager.get('autoOps').append((owner,
                                                           "OWNER_END_DATE_EXTENDED",
                                                           owner,
-                                                          newEndDate.astimezone(timezone(owner.getConference().getTimezone()))))
+                                                          newEndDate.astimezone(timezone(tz))))
 
                     owner.setEndDate(newEndDate, check)
                     sDate = self.findFirstFreeSlot(entry.getDuration())
@@ -172,7 +173,7 @@ class TimeSchedule(Schedule, Persistent):
                     ContextManager.get('autoOps').append((owner,
                                                           "OWNER_START_DATE_EXTENDED",
                                                           owner,
-                                                          entry.getAdjustedStartDate()))
+                                                          entry.getAdjustedStartDate(tz=tz)))
                     owner.setStartDate(entry.getStartDate(),check)
             elif entry.getEndDate()>self.getEndDate('UTC'):
                 if check==1:
@@ -181,7 +182,7 @@ class TimeSchedule(Schedule, Persistent):
                     ContextManager.get('autoOps').append((owner,
                                                           "OWNER_END_DATE_EXTENDED",
                                                           owner,
-                                                          entry.getAdjustedEndDate()))
+                                                          entry.getAdjustedEndDate(tz=tz)))
                     owner.setEndDate(entry.getEndDate(),check)
         #we make sure the entry end date does not go outside the schedule
         #   boundaries
