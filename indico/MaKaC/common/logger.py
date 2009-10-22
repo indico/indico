@@ -40,7 +40,7 @@ class Logger:
 
     __smtpHandler.addFilter(logging.Filter('indico'))
     __smtpHandler.setLevel(logging.ERROR)
-    __smtpHandler.setFormatter(logging.Formatter("%(asctime)s %(name)s - %(levelname)s %(filename)s:%(lineno)d:%(funcName)s\n\n%(message)s"))
+    __smtpHandler.setFormatter(logging.Formatter("%(asctime)s %(name)s - %(levelname)s %(filename)s:%(lineno)d\n\n%(message)s"))
 
     __rootLogger.addHandler(__indicoFileHandler)
     __rootLogger.addHandler(__otherFileHandler)
