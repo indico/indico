@@ -34,31 +34,6 @@ var TimetableDefaults = {
                        filter: new RoomFilter()}}
 };
 
-function getTimetableDataById(data, id) {
-    var info = Util.parseId(id);
-    var type = info[0];
-    var compositeId = "";
-    info = info.slice(2);
-
-    if (type == 'Conference') {
-        return this.eventInfo;
-    }
-    else if (type == 'Contribution') {
-        throw 'not implemented!';
-    } else if (type=='Session'){
-        throw 'not implemented!';
-    } else if (type=='SessionSlot'){
-        compositeId = ['s'+info[0]+'l'+info[1]];
-    } else {
-        throw 'unrecognized id!';
-    }
-
-    for (day in data) {
-        if (data[day][compositeId]) {
-            return data[day][compositeId];
-        }
-    }
-}
 
 type("TimeTable", [], {
 
@@ -88,7 +63,30 @@ type("TimeTable", [], {
     },
 
     getById: function(id) {
-        return getTimetableDataById(this.data, id);
+
+        var info = Util.parseId(id);
+        var type = info[0];
+        var compositeId = "";
+        info = info.slice(2);
+
+        if (type == 'Conference') {
+            return this.eventInfo;
+        }
+        else if (type == 'Contribution') {
+            throw 'not implemented!';
+        } else if (type=='Session'){
+            throw 'not implemented!';
+        } else if (type=='SessionSlot'){
+            compositeId = 's'+info[0]+'l'+info[1];
+        } else {
+            throw 'unrecognized id!';
+        }
+
+        for (day in this.data) {
+            if (this.data[day][compositeId]) {
+                return this.data[day][compositeId];
+            }
+        }
     },
 
     getTimetableDrawer: function() {
@@ -325,6 +323,8 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
 
          this.canvas = Html.div('canvas');
 
+         this.managementActions = managementActions;
+
          this.timetableDrawer = new TimetableDrawer(data, this.canvas, width,
                                                     wrappingElement,
                                                     detailLevel,
@@ -402,12 +402,20 @@ type("IntervalTimeTableMixin", [], {
 
         this.currentDay = day;
         this.timetableDrawer.setData(ttData, day, data.isPoster);
+    },
+
+    getById: function(id) {
+        return this.parentTimetable.getById(id);
     }
 
+
 },
-     function(width, wrappingElement, isSessionTimetable, managementActions) {
+     function(parent, width, wrappingElement, isSessionTimetable, managementActions) {
 
          this.canvas = Html.div('canvas');
+
+         this.managementActions = managementActions;
+         this.parentTimetable = parent;
 
          this.timetableDrawer = new IntervalTimetableDrawer(this.data, this.canvas, width,
                                                             wrappingElement,
@@ -484,6 +492,8 @@ type("ManagementTimeTable",["TimeTable"], {
 
     _processAutoOps: function(result) {
         this._hideWarnings();
+
+        var self = this;
 
         if (result.autoOps && result.autoOps.length > 0) {
             each(result.autoOps,
@@ -628,38 +638,76 @@ type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"],
 
 type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMixin"], {
 
-    _updateEntry: function(result) {
-
-        var self = this;
-        data = this.getData();
+    _deleteOldEntry: function(data, result, oldEntryId) {
+        /*
+         * Deletes the old version of the entry
+         */
 
         var oldStartTime, oldEndTime, oldStartDate;
-        // Check whether we're operating *over* a slot or not
-        if (result.entry.entryType=="Session") {
+        // Check whether we're operating *over* an existing slot or not
+        // it is a slot && slot exists in timetable
+        if (result.entry.entryType=="Session" && data[this.currentDay][result.id]) {
             var slot = data[result.day][result.entry.id];
-
             // in the affirmative case, fetch the time limits
             oldStartTime = slot.startDate.time.slice(0,5);
             oldEndTime = slot.endDate.time.slice(0,5);
             oldStartDate = slot.startDate.date;
 
         } else {
+            // Contribution or break - event timetable limits
+
+            var entry = data[result.day][result.entry.id];
+
             oldStartTime = this.eventInfo.startDate.time.slice(0,5);
             oldEndTime = this.eventInfo.endDate.time.slice(0,5);
             oldStartDate = this.currentDay;
         }
 
-        if (oldStartDate != result.entry.startDate.date.replace('-','','g')) {
-            delete data[oldStartDate][result.id];
-        }
+        delete data[oldStartDate][oldEntryId];
+
+    },
+
+    _updateEntry: function(result, oldEntryId, updateCycle) {
+
+        var data = this.getData();
+
+        // Deletes the old version of the entry
+        this._deleteOldEntry(data, result, oldEntryId);
 
         // AutoOp Warnings (before updates are done)
         this._processAutoOps(result);
 
-        // Here starts the update cycle
-        data[result.day][result.id] = result.entry;
+        // Here's the update cycle
+        if (updateCycle) {
+            updateCycle(data);
+        } else {
+            // If none is defined in the function args,
+            // execute the default action
+            data[result.day][result.id] = result.entry;
+        }
+
+        // Check if the result overflows the conference ending time
+        if ((result.day == this.eventInfo.endDate.date.replace('-','','g')) &&
+            (result.entry.endDate.time.replace(':','','g') >
+             this.eventInfo.endDate.time.replace(':','','g'))) {
+            this.eventInfo.endDate.time = result.endTime;
+        }
 
         this.timetableDrawer.redraw();
+    },
+
+    _updateMovedEntry: function(result, oldEntryId) {
+        this._updateEntry(result, oldEntryId, function(data){
+            if (exists(result.slotEntry)) {
+                // move into a session slot
+                data[result.day][result.slotEntry.id].entries[result.id] = result.entry;
+                // updates the time of the session if it has to be extended
+                data[result.day][result.slotEntry.id].startDate.time = result.slotEntry.startDate.time;
+                data[result.day][result.slotEntry.id].endDate.time = result.slotEntry.endDate.time;
+            } else {
+                data[result.day][result.id] = result.entry;
+            }
+        });
     },
 
     _getInfoBoxContent: function() {
@@ -698,40 +746,65 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
         this.slotEndTime.set(newEndTime.slice(0,5));
     },
 
-    _updateEntry: function(result) {
-        var self = this;
+    _updateEntry: function(result, oldEntryId, updateCycle) {
+
         var slot = this.contextInfo;
         var data = this.getData();
 
-        var oldStartTime = slot.startDate.time.slice(0,5);
-        var oldEndTime = slot.endDate.time.slice(0,5);
-
-        this.parentTimetable.data[result.day][slot.id].entries[result.entry.id] = result.entry;
-
-        this._updateTimes(result.slotEntry.startDate.time,
-                          result.slotEntry.endDate.time);
+        // Delete the old entry
+        delete this.parentTimetable.data[this.currentDay][slot.id].entries[oldEntryId];
 
         this._processAutoOps(result);
 
-        // Here starts the update cycle
-        data[result.id] = result.entry;
+        // Here's the update cycle
+        if (updateCycle) {
+            updateCycle(this.parentTimetable.getData());
+        } else {
 
-        if (result.session) {
-            // Account for "collateral damage" on sessions slots
-            this.parentTimetable.eventInfo.sessions[result.session.id] = result.session;
-        }
+            // If none is defined in the function args,
+            // execute the default action
+            data[result.id] = result.entry;
 
-        if (exists(result.slotEntry)) {
+            this.parentTimetable.data[result.day][slot.id].entries[result.entry.id] = result.entry;
 
-            // Save the entries, otherwise they are lost
-            result.slotEntry.entries = slot.entries;
-            this.parentTimetable.data[result.day][result.slotEntry.id] = result.slotEntry;
-            this.contextInfo = result.slotEntry;
+            if (result.session) {
+                // Account for "collateral damage" on sessions
+                this.parentTimetable.eventInfo.sessions[result.session.id] = result.session;
+            }
+
+            if (exists(result.slotEntry)) {
+
+                // Save the entries, otherwise they are lost
+                result.slotEntry.entries = slot.entries;
+                this.parentTimetable.data[result.day][result.slotEntry.id] = result.slotEntry;
+                this.contextInfo = result.slotEntry;
+            }
+
+
+            // Update the times for the slot
+            this._updateTimes(result.slotEntry.startDate.time,
+                          result.slotEntry.endDate.time);
+
         }
 
         this.timetableDrawer.redraw();
 
-//        this.timetable.setData(data, this.intervalInfo);
+    },
+
+    _updateMovedEntry: function(result, oldEntryId) {
+
+        this._updateEntry(result, oldEntryId, function(data){
+            if(exists(result.slotEntry)){
+                // from slot to slot
+                data[result.day][result.slotEntry.id].entries[result.id] = result.entry;
+                // updates the time of the session if it has to be extended
+                data[result.day][result.slotEntry.id].startDate.time = result.slotEntry.startDate.time;
+                data[result.day][result.slotEntry.id].endDate.time = result.slotEntry.endDate.time;
+            } else {
+                // from slot to top level
+                data[result.day][result.id]=result.entry;
+            }
+        });
     },
 
     getTTMenu: function() {
@@ -761,12 +834,12 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
 },
      function(parent, data, contextInfo, eventInfo, width, wrappingElement, detailLevel, isSessionTimeTable) {
 
-         this.parentTimetable = parent;
          this.ManagementTimeTable(data, contextInfo, eventInfo, width, wrappingElement, detailLevel);
          var managementActions = new IntervalTimeTableManagementActions(this, eventInfo, contextInfo, isSessionTimeTable);
-         this.IntervalTimeTableMixin(width, wrappingElement, isSessionTimeTable, managementActions);
+         this.IntervalTimeTableMixin(parent, width, wrappingElement, isSessionTimeTable, managementActions);
 
          this.setData = IntervalTimeTableMixin.prototype.setData;
+         this.getById = IntervalTimeTableMixin.prototype.getById;
 
      });
 

@@ -142,7 +142,7 @@ type("TimetableManagementActions", [], {
                 IndicoUtil.errorReport(error);
             }
             else {
-                self.timetable._updateEntry(result);
+                self.timetable._updateEntry(result, result.id);
             }
         });
     },
@@ -173,7 +173,7 @@ type("TimetableManagementActions", [], {
     },
 
     switchToIntervalTimetable: function(intervalId) {
-        self.timetable.switchToInterval(intervalId);
+        this.timetable.switchToInterval(intervalId);
     },
 
 
@@ -392,7 +392,7 @@ type("TimetableManagementActions", [], {
             $O(params.roomInfo),
             params.selectedDay,
             this.eventInfo.favoriteRooms,
-            function(result) { self._updateEntry(result); });
+            function(result) { self.timetable._updateEntry(result, result.id); });
     },
     addSessionSlot: function(session) {
         var self = this;
@@ -409,7 +409,7 @@ type("TimetableManagementActions", [], {
             params.startDate,
             params.selectedDay,
             this.eventInfo.favoriteRooms,
-            function(result) { self._updateEntry(result); }
+            function(result) { self.timetable._updateEntry(result, result.id); }
         );
     },
 
@@ -435,7 +435,7 @@ type("TimetableManagementActions", [], {
             params.startDate,
             params.selectedDay,
             this.eventInfo.favoriteRooms,
-            function(result) { self._updateEntry(result); },
+            function(result) { self.timetable._updateEntry(result, result.id); },
             true
         );
     },
@@ -443,16 +443,15 @@ type("TimetableManagementActions", [], {
 
     moveEntryContrib: function(eventData){
         var moveEntryDiag = new MoveEntryDialog(
-                this,
-                timetable.data,
-                eventData.entryType,
-                eventData.sessionId,
-                eventData.sessionSlotId,
-                timetable.currentDay,
-                this.savedData,
-                eventData.scheduleEntryId,
-                eventData.conferenceId,
-                eventData.startDate.date );
+            this,
+            this.timetable,
+            eventData.entryType,
+            eventData.sessionId,
+            eventData.sessionSlotId,
+            timetable.currentDay,
+            eventData.scheduleEntryId,
+            eventData.conferenceId,
+            eventData.startDate.date );
         moveEntryDiag.open();
     },
 
@@ -513,10 +512,9 @@ type("TimetableManagementActions", [], {
         var self = this;
 
         each(entries, function(entry) {
-            self.timetable._updateEntry(entry);
+            self.timetable._updateEntry(entry, entry.id);
         });
     }
-
 },
      function(timetable, eventInfo, isSessionTimetable) {
          this.timetable = timetable;

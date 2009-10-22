@@ -56,14 +56,14 @@ type("UnscheduledContributionList", ["ListWidget"],
          var items = {};
          each(existing, function(item) {
              items[item.title + item.id] = item;
-     });
+         });
          var ks = keys(items);
          ks.sort();
          for (k in ks) {
              this.add(items[ks[k]]);
          }
      }
-);
+    );
 
 type("AddContributionDialog", ["ExclusivePopup", "PreLoadHandler"],
      {
@@ -123,15 +123,15 @@ type("AddContributionDialog", ["ExclusivePopup", "PreLoadHandler"],
 
              indicoRequest(self.args.session?'schedule.slot.scheduleContributions':
                            'schedule.event.scheduleContributions', args, function(result, error){
-                     killProgress();
-                 if (error) {
-                     IndicoUtil.errorReport(error);
-                 }
-                 else {
-                     self.close();
-                     self.successFunc(result);
-                 }
-             });
+                               killProgress();
+                               if (error) {
+                                   IndicoUtil.errorReport(error);
+                               }
+                               else {
+                                   self.close();
+                                   self.successFunc(result);
+                               }
+                           });
          },
 
          draw: function() {
@@ -195,16 +195,16 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
                 hook.set(true);
             }else {
                 indicoRequest(self.timeStartMethod, self.dateArgs ,
-                          function(result, error){
-                              if (error) {
-                                  IndicoUtil.errorReport(error);
+                              function(result, error){
+                                  if (error) {
+                                      IndicoUtil.errorReport(error);
+                                  }
+                                  else {
+                                      self.dateTimeField.accessor.set('dateTime', result);
+                                      hook.set(true);
+                                  }
                               }
-                              else {
-                                  self.dateTimeField.accessor.set('dateTime', result);
-                                  hook.set(true);
-                              }
-                          }
-                         );
+                             );
             }
         },
         function(hook) {
@@ -306,14 +306,14 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
         if (!this.isConference) {
             // if it's a meeting, just add a description
             fields = [[$T('Description'),$B(Html.textarea({cols: 50,rows: 2}),
-                                       info.accessor('field_content'))]];
+                                            info.accessor('field_content'))]];
         } else {
             // otherwise, add the abstract fields (conferences)
             fields = translate(self.fields,
-                function(value, key) {
-                    return [value, $B(Html.textarea({cols: 50,rows: 2}),
-                                           info.accessor('field_'+key))];
-                });
+                               function(value, key) {
+                                   return [value, $B(Html.textarea({cols: 50,rows: 2}),
+                                                     info.accessor('field_'+key))];
+                               });
         }
 
         fields.push([$T('Keywords'), keywordField.element]);
@@ -325,14 +325,14 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
             //Select List, Optional type for conference
             self.contribTypes['']  = ''; //add the None type to the select list
             var typeSelect = bind.element(
-                    Html.select({name: 'type'}),
-                    self.contribTypes,
-                    function(elem) {
-                        return Html.option({value: elem.key}, elem.get());
-                    }
-                );
+                Html.select({name: 'type'}),
+                self.contribTypes,
+                function(elem) {
+                    return Html.option({value: elem.key}, elem.get());
+                }
+            );
             fields.push([$T('Type'), $B(typeSelect,
-                    info.accessor('type'))]);
+                                        info.accessor('type'))]);
         }
 
 
@@ -384,7 +384,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
             });
 
             indicoRequest(self.method, info, function(result, error){
-                    killProgress();
+                killProgress();
                 if (error) {
                     IndicoUtil.errorReport(error);
                 }
@@ -550,221 +550,216 @@ type("ChangeEditDialog", // silly name!
      });
 
 type("MoveEntryDialog", ["ExclusivePopup"],
-      {
-    draw: function() {
-        self = this;
-        var inSession = true;
-        if (self.sessionId === null && self.slotId === null) {
-            inSession = false;
-        }
+     {
+         draw: function() {
+             self = this;
+             var inSession = true;
+             if (self.sessionId === null && self.slotId === null) {
+                 inSession = false;
+             }
 
-        // list of all radiobuttons
-        var radioButtons = [];
+             // list of all radiobuttons
+             var radioButtons = [];
 
-        // draw a tab with radiobuttons for each day
-        function drawMoveEntryDay(timetableItems, currentDay) {
-            var moveEntryTable = Html.table( {
-                width : '100%'
-            });
+             // draw a tab with radiobuttons for each day
+             function drawMoveEntryDay(timetableItems, currentDay) {
+                 var moveEntryTable = Html.table( {
+                     width : '100%'
+                 });
 
-            // Construct a 2d array to sort items by startTime
-            var sortedByTime = [];
-            translate(timetableItems, function(value, key) {
-                // consider only sessions
-                if (key[0] == "s") {
-                        sortedByTime.push( [ value.startDate.time, key ]);
-                    }
-                });
+                 // Construct a 2d array to sort items by startTime
+                 var sortedByTime = [];
+                 translate(timetableItems, function(value, key) {
+                     // consider only sessions
+                     if (key[0] == "s") {
+                         sortedByTime.push( [ value.startDate.time, key ]);
+                     }
+                 });
 
-            // Sorting the 2d array by startTime
-            for ( var i = 0; i < sortedByTime.length; i++) {
-                var temp = sortedByTime[i].splice(0, 1);
-                sortedByTime[i].unshift(temp);
-            }
-            sortedByTime.sort();
+                 // Sorting the 2d array by startTime
+                 for ( var i = 0; i < sortedByTime.length; i++) {
+                     var temp = sortedByTime[i].splice(0, 1);
+                     sortedByTime[i].unshift(temp);
+                 }
+                 sortedByTime.sort();
 
-            var rb;
-            // add top timetable radio button
-            if (!inSession && self.startDate.replace('-', '', 'g') == currentDay) {
-                // disable the radio button where the item already belongs to
-                rb = Html.radio( {
-                    value : "conf:" + currentDay,
-                    name : "rbID",
-                    disabled : 'disabled'
-                });
-            } else {
-                rb = Html.radio( {
-                    value : "conf:" + currentDay,
-                    name : "rbID"
-                });
-            }
-            moveEntryTable.append(Html.tr( {}, Html.td( {}, rb, (Html.label( {},
-                    "Move it at the top of the timetable")))));
-            radioButtons.push(rb);
+                 var rb;
+                 // add top timetable radio button
+                 if (!inSession && self.startDate.replaceAll('-', '', 'g') == currentDay) {
+                     // disable the radio button where the item already belongs to
+                     rb = Html.radio( {
+                         value : "conf:" + currentDay,
+                         name : "rbID",
+                         disabled : 'disabled'
+                     });
+                 } else {
+                     rb = Html.radio( {
+                         value : "conf:" + currentDay,
+                         name : "rbID"
+                     });
+                 }
+                 moveEntryTable.append(Html.tr( {}, Html.td( {}, rb, (Html.label( {},
+                                                                                  "Move it at the top of the timetable")))));
+                 radioButtons.push(rb);
 
-            // building the radio buttons
-            for ( i = 0; i < sortedByTime.length; i++) {
-                var value = timetableItems[sortedByTime[i][1]];
-                if (inSession && value.sessionId == self.sessionId && value.sessionSlotId == self.slotId) {
-                    // disable the radio button where the item already belongs to
-                    rb = Html.radio( {
-                        value : value.sessionId + ':' + value.sessionSlotId,
-                        name : 'rbID',
-                        disabled : 'disabled'
-                    });
-                } else {
-                    rb = Html.radio( {
-                        value : value.sessionId + ':' + value.sessionSlotId,
-                        name : 'rbID'
-                    });
-                }
-                radioButtons.push(rb);
-                moveEntryTable.append(Html.tr( {
-                    style : {
-                        backgroundColor : value.color
-                    }
-                }, Html.td( {}, rb, (Html.label( {
-                    style : {
-                        'color' : value.textColor
-                    }
-                }, value.startDate.time + "-" + value.endDate.time +
-                                                 " " + value.title)))));
-            }
+                 // building the radio buttons
+                 for ( i = 0; i < sortedByTime.length; i++) {
+                     var value = timetableItems[sortedByTime[i][1]];
+                     if (inSession && value.sessionId == self.sessionId && value.sessionSlotId == self.slotId) {
+                         // disable the radio button where the item already belongs to
+                         rb = Html.radio( {
+                             value : value.sessionId + ':' + value.sessionSlotId,
+                             name : 'rbID',
+                             disabled : 'disabled'
+                         });
+                     } else {
+                         rb = Html.radio( {
+                             value : value.sessionId + ':' + value.sessionSlotId,
+                             name : 'rbID'
+                         });
+                     }
+                     radioButtons.push(rb);
+                     moveEntryTable.append(Html.tr( {
+                         style : {
+                             backgroundColor : value.color
+                         }
+                     }, Html.td( {}, rb, (Html.label( {
+                         style : {
+                             'color' : value.textColor
+                         }
+                     }, value.startDate.time + "-" + value.endDate.time +
+                                                      " " + value.title)))));
+                 }
 
-            return moveEntryTable;
-        }
+                 return moveEntryTable;
+             }
 
-    // populate the tabslist
-    tabsList = [];
-    var tabData = null;
-    if (inSession) {
-        tabData = self.savedData;
-    } else {
-        tabData = self.timetableData;
-    }
+             // populate the tabslist
+             tabsList = [];
+             var tabData = self.topLevelTimetableData;
 
-    // sort tabs according to days
-    var dateKeys = keys(tabData);
-    dateKeys.sort();
-    for ( var i = 0; i < dateKeys.length; i++) {
-        tabsList.push( [ $T(self._titleTemplate(dateKeys[i])), drawMoveEntryDay(tabData[dateKeys[i]], dateKeys[i]) ]);
-    }
+             // sort tabs according to days
+             var dateKeys = keys(tabData);
+             dateKeys.sort();
+             for ( var i = 0; i < dateKeys.length; i++) {
+                 tabsList.push( [ $T(self._titleTemplate(dateKeys[i])), drawMoveEntryDay(tabData[dateKeys[i]], dateKeys[i]) ]);
+             }
 
-    this.tabWidget = new TabWidget(tabsList, 400, 200, dateKeys.indexOf(self.currentDay));
-    var moveEntryPopup = new ExclusivePopup("Move item", function() {
-        return true;
-    });
+             this.tabWidget = new TabWidget(tabsList, 400, 200, dateKeys.indexOf(self.currentDay));
+             var moveEntryPopup = new ExclusivePopup("Move item", function() {
+                 return true;
+             });
 
-    Logic.onlyOne(radioButtons, false); // Ensures that only 1 radio button will be selected at a given time
+             Logic.onlyOne(radioButtons, false); // Ensures that only 1 radio button will be selected at a given time
 
-    // define where the contribution is (display purpose)
-    var contribLocation = null;
-    if (inSession) {
-        contribLocation = self.savedData[self.currentDay]['s' + self.sessionId + 'l' + self.slotId].title +
-            " (interval #" + self.slotId + ")";
-    } else {
-        contribLocation = "Top of timetable";
-    }
+             // define where the contribution is (display purpose)
+             var contribLocation = null;
+             if (inSession) {
+                 contribLocation = self.topLevelTimetableData[self.currentDay]['s' + self.sessionId + 'l' + self.slotId].title +
+                     " (interval #" + self.slotId + ")";
+             } else {
+                 contribLocation = "Top of timetable";
+             }
 
-    // define if contrib is of type Contribution or Break (display purpose)
-    var span1 = this.entryType == "Contribution"?
-        Html.span('', "This contribution is currently in: " +
-                  contribLocation):
-        Html.span('', "This break is currently in: " +
-                  contribLocation);
+             // define if contrib is of type Contribution or Break (display purpose)
+             var span1 = this.entryType == "Contribution"?
+                 Html.span('', "This contribution is currently in: " +
+                           contribLocation):
+                 Html.span('', "This break is currently in: " +
+                           contribLocation);
 
-    // We construct the "ok" button and what happens when it's pressed
-    var okButton = Html.button('', "OK");
-    okButton.observeClick(function() {
-        var killProgress = IndicoUI.Dialogs.Util.progress("Moving the entry...");
-        // retrieving the selected radio button
-            var chosenValue = function() {
-                var radios = document.getElementsByName("rbID");
-                for ( var i = 0; i < radios.length; i++) {
-                    if (radios[i].checked) {
-                        return radios[i].value;
-                    }
-                }
-                return false;
-            };
+             // We construct the "ok" button and what happens when it's pressed
+             var okButton = Html.button('', "OK");
+             okButton.observeClick(function() {
+                 var killProgress = IndicoUI.Dialogs.Util.progress("Moving the entry...");
+                 // retrieving the selected radio button
+                 var chosenValue = function() {
+                     var radios = document.getElementsByName("rbID");
+                     for ( var i = 0; i < radios.length; i++) {
+                         if (radios[i].checked) {
+                             return radios[i].value;
+                         }
+                     }
+                     return false;
+                 };
 
-            indicoRequest('schedule.moveEntry', {
-                value : chosenValue(),
-                OK : 'OK',
-                conference : self.confId,
-                scheduleEntryId : self.scheduleEntryId,
-                sessionId : self.sessionId,
-                sessionSlotId : self.slotId
-            }, function(result, error) {
-                if (error) {
-                    killProgress();
-                    IndicoUtil.errorReport(error);
-                } else {
-                    // change json and repaint timetable
-                    self.managementActions._updateEntryMoveEntry(result, null, result.old);
-                    killProgress();
-                    self.close();
-                }
-            });
-        });
+                 indicoRequest('schedule.moveEntry', {
+                     value : chosenValue(),
+                     OK : 'OK',
+                     conference : self.confId,
+                     scheduleEntryId : self.scheduleEntryId,
+                     sessionId : self.sessionId,
+                     sessionSlotId : self.slotId
+                 }, function(result, error) {
+                     if (error) {
+                         killProgress();
+                         IndicoUtil.errorReport(error);
+                     } else {
+                         // change json and repaint timetable
+                         self.managementActions.timetable._updateMovedEntry(result, result.old.id);
+                         killProgress();
+                         self.close();
+                     }
+                 });
+             });
 
-        // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
-        var cancelButton = Html.button( {
-            style : {
-                marginLeft : pixels(5)
-            }
-        }, "Cancel");
-        cancelButton.observeClick(function() {
-            self.close();
-        });
+             // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
+             var cancelButton = Html.button( {
+                 style : {
+                     marginLeft : pixels(5)
+                 }
+             }, "Cancel");
+             cancelButton.observeClick(function() {
+                 self.close();
+             });
 
-        var buttonDiv = Html.div( {
-            style : {
-                textAlign : "center",
-                marginTop : pixels(10)
-            }
-        }, okButton, cancelButton);
+             var buttonDiv = Html.div( {
+                 style : {
+                     textAlign : "center",
+                     marginTop : pixels(10)
+                 }
+             }, okButton, cancelButton);
 
-        return this.ExclusivePopup.prototype.draw.call(this, Widget.block( [span1, Html.br(), this.tabWidget.draw(), Html.br(), buttonDiv ]));
-    },
+             return this.ExclusivePopup.prototype.draw.call(this, Widget.block( [span1, Html.br(), this.tabWidget.draw(), Html.br(), buttonDiv ]));
+         },
 
-    /*
+         /*
      * Translates the keys used in the data dictionary into titles
      * displayed in the tab control
      */
-    _titleTemplate: function(text) {
-        if (text == 'all') {
-            return 'All days';
-        }
+         _titleTemplate: function(text) {
+             if (text == 'all') {
+                 return 'All days';
+             }
 
-        var day = text.substring(6,8);
-        var month = text.substring(4,6);
+             var day = text.substring(6,8);
+             var month = text.substring(4,6);
 
-        var strDate =  day + '/' + month + '/' + text.substring(0,4);
+             var strDate =  day + '/' + month + '/' + text.substring(0,4);
 
-        var nDate = new Date();
-        setDate(nDate, parseDate(strDate));
+             var nDate = new Date();
+             setDate(nDate, parseDate(strDate));
 
-        return Indico.Data.WeekDays[nDate.getDay()].substring(0,3)+' '+day+'/'+month;
-},
-    postDraw: function(){
-        this.tabWidget.postDraw();
-        this.ExclusivePopup.prototype.postDraw.call(this);
-}
-},
+             return Indico.Data.WeekDays[nDate.getDay()].substring(0,3)+' '+day+'/'+month;
+         },
+         postDraw: function(){
+             this.tabWidget.postDraw();
+             this.ExclusivePopup.prototype.postDraw.call(this);
+         }
+     },
 
-function(managementActions, timetableData, entryType, sessionId, slotId, currentDay, savedData, scheduleEntryId, confId, startDate){
-   this.managementActions = managementActions;
-   this.timetableData = timetableData;
-   this.entryType = entryType;
-   this.sessionId = sessionId;
-   this.slotId = slotId;
-   this.currentDay = currentDay;
-   this.savedData = savedData;
-   this.scheduleEntryId = scheduleEntryId;
-   this.confId = confId;
-   this.startDate = startDate;
-});
+     function(managementActions, timetable, entryType, sessionId, slotId, currentDay, scheduleEntryId, confId, startDate){
+         this.managementActions = managementActions;
+         this.timetableData = timetable.getData();
+         this.topLevelTimetableData = timetable.parentTimetable?timetable.parentTimetable.getData():this.timetableData;
+         this.entryType = entryType;
+         this.sessionId = sessionId;
+         this.slotId = slotId;
+         this.currentDay = currentDay;
+         this.scheduleEntryId = scheduleEntryId;
+         this.confId = confId;
+         this.startDate = startDate;
+     });
 
 
 type("AddBreakDialog", ["ChangeEditDialog"],
@@ -843,7 +838,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                                    IndicoUtil.errorReport(error);
                                }
                                else {
-                                   self.managementActions.timetable._updateEntry(result);
+                                   self.managementActions.timetable._updateEntry(result, result.id);
                                    self.close();
                                }
                            });
@@ -861,7 +856,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
          this.originalArgs = {};
          each(keys(args), function(key) {
              self.originalArgs[key] = args.get(key);
-           });
+         });
          if (isEdit) {
              this.info = args;
              this.ExclusivePopup($T("Edit Break"));
@@ -874,17 +869,17 @@ type("AddBreakDialog", ["ChangeEditDialog"],
              var sargs = args.get('args');
              each(sargs, function(value, key) {
                  self.info.set(key,value);
-               });
+             });
              args.set("date", args.get('selectedDay'));
              this.dateArgs = args;
              this.ChangeEditDialog(managementActions.methods[args.get('type')].add,
                                    this.info,
                                    $T("Add Break"),
                                    function(result) {
-                                       managementActions.timetable._updateEntry(result);
+                                       managementActions.timetable._updateEntry(result, result.id);
                                    });
 
          }
 
-    });
+     });
 
