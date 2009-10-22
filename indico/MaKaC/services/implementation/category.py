@@ -114,7 +114,6 @@ class GetPastEventsList(CategoryDisplayBase):
 
     def _getAnswer( self ):
         
-        
         allEvents,eventsByMonth = WConferenceList.sortEvents(self._target.getConferenceList())
         
         ## CREATE future events dict and future/past counter
@@ -122,10 +121,11 @@ class GetPastEventsList(CategoryDisplayBase):
         for year in allEvents.keys():
             if year < self._fromDate.year:
                 pastEvents[year] = allEvents[year]
-            else:
+            elif year == self._fromDate.year:
                 for month in allEvents[year].keys():
                     if month < self._fromDate.month:
                         pastEvents.setdefault(year,{})[month] = allEvents[year][month]
+        
         return WConferenceListEvents(pastEvents, self._aw).getHTML()
 
 
