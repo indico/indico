@@ -687,9 +687,9 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
         }
 
         // Check if the result overflows the conference ending time
-        if ((result.day == this.eventInfo.endDate.date.replace('-','','g')) &&
-            (result.entry.endDate.time.replace(':','','g') >
-             this.eventInfo.endDate.time.replace(':','','g'))) {
+        if ((result.day == this.eventInfo.endDate.date.replaceAll('-','')) &&
+            (result.entry.endDate.time.replaceAll(':','') >
+             this.eventInfo.endDate.time.replaceAll(':',''))) {
             this.eventInfo.endDate.time = result.endTime;
         }
 

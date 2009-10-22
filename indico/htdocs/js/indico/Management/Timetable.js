@@ -585,7 +585,7 @@ type("MoveEntryDialog", ["ExclusivePopup"],
 
                  var rb;
                  // add top timetable radio button
-                 if (!inSession && self.startDate.replaceAll('-', '', 'g') == currentDay) {
+                 if (!inSession && self.startDate.replaceAll('-', '') == currentDay) {
                      // disable the radio button where the item already belongs to
                      rb = Html.radio( {
                          value : "conf:" + currentDay,
