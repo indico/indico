@@ -1,4 +1,4 @@
-import copy, pytz
+import copy
 from persistent.list import PersistentList
 from persistent.mapping import PersistentMapping
 
@@ -166,7 +166,9 @@ def Updates(cls, property, modifier=None):
 class DictPickler:     
 
     @classmethod
-    def pickle(cls, object, timezone = None):
+    def pickle(cls, object, tz = None):
+        """ tz can be a string (preferred) or a pytz.timezone object
+        """
         
         # path mapping supported
         # i.e. getFileSize() ==> file.size
@@ -176,14 +178,14 @@ class DictPickler:
         elif type(object) == list or type(object) == tuple or type(object) == set or isinstance(object, PersistentList):
             res = []            
             for obj in object:
-                res.append(DictPickler.pickle(obj, timezone))
+                res.append(DictPickler.pickle(obj, tz))
             return res
         elif type(object) == dict or isinstance(object, PersistentMapping):
             res = {}          
             for key, obj in object.iteritems():
                 if not isinstance(key, basestring):
                     raise Exception("Key %s cannot be pickled because it's not a string. object=%s" % (str(key), str(object)))
-                res[key] = DictPickler.pickle(obj, timezone)
+                res[key] = DictPickler.pickle(obj, tz)
             return res
         elif isinstance(object, basestring):
             return object
@@ -192,7 +194,7 @@ class DictPickler:
             if not globalPickleMap.has_key(clazz):
                 raise Exception('Class %s is not supposed to be pickled. object=%s' % (clazz, str(object)))
         
-            return DictPickler._pickle(object, globalPickleMap[clazz], timezone)
+            return DictPickler._pickle(object, globalPickleMap[clazz], tz)
     
     @classmethod
     def update(cls, object, dict):
@@ -227,7 +229,7 @@ class DictPickler:
         recursiveUpdate(dict, [])
     
     @classmethod
-    def _pickle(cls,object,pickleTree, timezone):
+    def _pickle(cls,object,pickleTree, tz):
         
         def recursiveAttribution(obj, prop, result):
             if len(prop) == 1:
@@ -249,7 +251,7 @@ class DictPickler:
             if (modifier):
 
                 if modifier == Conversion.datetime:                    
-                    result = modifier(result, timezone=timezone)
+                    result = modifier(result, tz = tz)
                 else:
                     result = modifier(result)
             

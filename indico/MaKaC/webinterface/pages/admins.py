@@ -19,6 +19,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 from MaKaC.common.PickleJar import DictPickler
+from pytz import timezone
 
 import os
 from MaKaC.common.general import *
@@ -31,7 +32,7 @@ import MaKaC.webcast as webcast
 from MaKaC.common.Configuration import Config
 import MaKaC.conference as conference
 import MaKaC.user as user
-from MaKaC.common import utils
+from MaKaC.common import utils, timezoneUtils
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.webinterface.common.timezones import TimezoneRegistry, DisplayTimezoneRegistry
 from MaKaC.common.Announcement import getAnnoucementMgrInstance
@@ -344,19 +345,18 @@ class WPUpdateNews( WPHomepageCommon ):
         self._subTabNews.setActive()
         
     def _getTabContent( self, params ):
+        tz = timezone(timezoneUtils.DisplayTZ(self._getAW()).getDisplayTZ())
         wc = WUpdateNews()
-        newsModule=ModulesHolder().getById("news")
-        newslist=[]
-        for newItem in newsModule.getNewsItemsList():
-            newslist.append({"id":newItem.getId(), 
-                            "creationDate":utils.formatDateTime(newItem.getCreationDate()), 
-                            "title":newItem.getTitle(),
-                            "type":newItem.getType(),
-                            "text":newItem.getContent()})
+        newsModule = ModulesHolder().getById("news")
+
+        newslist = DictPickler.pickle(newsModule.getNewsItemsList(), tz)
         newsTypesList = newsModule.getNewsTypesAsDict()
-        #minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        #news = minfo.getNews()
-        pars = { "newslist": newslist, "newsTypesList": newsTypesList }
+        recentDays = newsModule.getRecentDays()
+
+        pars = {"newslist": newslist,
+                "newsTypesList": newsTypesList,
+                "recentDays": recentDays }
+
         return wc.getHTML( pars )
 
 class WUpdateNews(wcomponents.WTemplated):

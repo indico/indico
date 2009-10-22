@@ -21,13 +21,10 @@
 
 import datetime
 import MaKaC.webinterface.pages.base as base
-import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.accessControl as accessControl
-import MaKaC.common.info as info
 from MaKaC.common import timezoneUtils
 from MaKaC.common.utils import formatTime, formatDateTime
-import MaKaC.webcast as webcast
 from MaKaC.i18n import _
 from pytz import timezone
 from MaKaC.conference import Category, Conference
@@ -211,6 +208,7 @@ class WMainBase(wcomponents.WTemplated):
         
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
+        
         vars['body'] = self._escapeChars(self._page)       
         vars["isFrontPage"] = self._isFrontPage
         
@@ -226,5 +224,8 @@ class WMainBase(wcomponents.WTemplated):
         vars["navigation"] = ""
         if self._navigation:
             vars["navigation"] = self._navigation.getHTML(vars)
+            
+        vars["timezone"] = self._timezone
+            
         return vars
     

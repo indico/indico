@@ -19,11 +19,17 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from datetime import timedelta
 from persistent import Persistent
-from datetime import datetime
 from MaKaC.common.Counter import Counter
 import MaKaC.modules.base as modules
 from MaKaC.common.info import HelperMaKaCInfo
+from MaKaC.i18n import _
+from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc, isTimezoneAware,\
+    setAdjustedDate
+from MaKaC.common.PickleJar import Retrieves
+from MaKaC.common.Conversion import Conversion
+from MaKaC.modules.base import ModulesHolder
 
 class NewsModule(modules.Module):
     """
@@ -39,6 +45,7 @@ class NewsModule(modules.Module):
         self._newsItems = []
         self._p_changed = 1
         self._newsCounter = Counter()
+        self._recentDays = 14 #days to keep a 'New' tag on recent news items
         # fetch all news from the previous location.
         self.addNewsItem(NewsItem( _("Previous news"), HelperMaKaCInfo.getMaKaCInfoInstance().getNews(), "general"))
 
@@ -64,10 +71,17 @@ class NewsModule(modules.Module):
                 return new
         return None
 
+    def getRecentDays(self):
+        if not hasattr(self, '_recentDays'):
+            self._recentDays = 14
+        return self._recentDays
+
+    def setRecentDays(self, recentDays):
+        self._recentDays = recentDays
+
     @classmethod
     def getNewsTypes(self):
         return NewsModule._newsTypes
-
 
     @classmethod
     def getNewsTypesAsDict(self):
@@ -77,11 +91,13 @@ class NewsItem(Persistent):
     
     def __init__(self, title = "", content="", type = ""):
         self._id = None
-        self._creationDate=datetime.utcnow()
+        self._creationDate = nowutc()
         self._content=content
         self._title = title
         self._type = type
+        self._new = True
 
+    @Retrieves(['MaKaC.modules.news.NewsItem'], 'id')
     def getId(self):
         return self._id
 
@@ -89,31 +105,39 @@ class NewsItem(Persistent):
         self._id = id
 
     def getCreationDate(self):
+        if not isTimezoneAware(self._creationDate):
+            self._creationDate = setAdjustedDate(self._creationDate, tz = 'UTC')
         return self._creationDate
 
+    @Retrieves(['MaKaC.modules.news.NewsItem'], 'creationDate', Conversion.datetime)
+    def getAdjustedCreationDate(self, tz = 'UTC'):
+        return getAdjustedDate(self.getCreationDate(), tz = tz)
+
+    @Retrieves(['MaKaC.modules.news.NewsItem'], 'text')
     def getContent(self):
         return self._content
-
 
     def setContent(self, content):
         self._content=content
 
+    @Retrieves(['MaKaC.modules.news.NewsItem'], 'title')
     def getTitle(self):
         return self._title
 
     def setTitle(self, title):
         self._title = title
 
+    @Retrieves(['MaKaC.modules.news.NewsItem'], 'type')
     def getType(self):
         return self._type
 
     def setType(self, type):
         self._type = type
-        
 
+    @Retrieves(['MaKaC.modules.news.NewsItem'], 'humanReadableType')
+    def getHumanReadableType(self):
+        return NewsModule.getNewsTypesAsDict()[self._type]
 
-
-
-
-
-
+    def isNew(self):
+        newsModule = ModulesHolder().getById("news")
+        return self.getCreationDate() + timedelta(days = newsModule.getRecentDays()) > nowutc()

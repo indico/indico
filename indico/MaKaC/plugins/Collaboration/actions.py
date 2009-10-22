@@ -32,8 +32,8 @@ pluginTypeActions = [
                                  "triggeredBy": ["allowedOn"]} ),
     ("indexPluginsPerIndex", {"visible": False,
                                "executeOnLoad": True}),
-    ("reindexAllBookings", {"buttonText": "Reindex ALL bookings (may take a while)"}),
-    ("restoreCSBookingManagersAsObservers", {"buttonText": "Restore CSBookingManagers as Event Observers", "visible": True}),
+    ("reindexAllBookings", {"buttonText": "Reindex ALL bookings (may take a while)", "visible": False}),
+    ("restoreCSBookingManagersAsObservers", {"buttonText": "Restore CSBookingManagers as Event Observers", "visible": False}),
     ("deleteAllBookings", {"buttonText": "Delete ALL bookings (only to be used by David) (be careful)",
                            "visible": False})
 ]

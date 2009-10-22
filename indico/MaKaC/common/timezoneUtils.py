@@ -26,9 +26,16 @@ def utctimestamp2date( ts ):
     """
     return datetime.utcfromtimestamp( ts )
 
+def isTimezoneAware(datetime):
+    """ Takes a datetime object and returns True if it is timezone-aware (has tzinfo)
+        or False if it is naive
+    """
+    return hasattr(datetime, 'tzinfo') and datetime.tzinfo is not None
+    
+
 def naive2local( naiveDateTime, localTimezone ):
     """ Extends naive datetimes with the specified timezone info (string),
-    using DST or STD according to the date in question
+        using DST or STD according to the date in question
 
     >>> from datetime import datetime
     >>> naive2local(datetime(2008,12,25,0,0,0), 'Europe/Zurich')
@@ -43,21 +50,27 @@ def naive2local( naiveDateTime, localTimezone ):
 
 def setAdjustedDate(date, object = None, tz=None):
     # Localizes a date to the timezone tz
+    # tz can be a string (preferred) or a pytz.timezone object 
     # If tz is None, the timezone of the object is used
     if not tz:
         tz = object.getTimezone()
-    if tz not in common_timezones:
-        tz = 'UTC'
-    return timezone(tz).localize(date).astimezone(timezone('UTC'))
+    if isinstance(tz, basestring):
+        tz = timezone(tz)
+    if tz.zone not in common_timezones:
+        tz = timezone('UTC')
+    return tz.localize(date).astimezone(timezone('UTC'))
 
 def getAdjustedDate(date, object = None, tz=None):
     # Returns a date adjusted to the timezone tz
+    # tz can be string (preferred) or a pytz.timezone object
     # If tz is None, the timezone of the object is used
     if not tz:
         tz = object.getTimezone()
-    if tz not in common_timezones:
-        tz = 'UTC'
-    return date.astimezone(timezone(tz))
+    if isinstance(tz, basestring):
+        tz = timezone(tz)
+    if tz.zone not in common_timezones:
+        tz = timezone('UTC')
+    return date.astimezone(tz)
 
 def isToday(date, tz):
     """ Returns if a date is inside the current day (given a timezone)

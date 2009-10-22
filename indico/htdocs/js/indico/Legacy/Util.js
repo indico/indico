@@ -228,6 +228,14 @@ var IndicoUtil = {
     },
 
     /**
+     * Formats a datetime object with 2 attributes, .date and .time
+     * (obtained by pickling with Conversion.datetime)
+     */
+    formatJsonDate: function(jsonDate) {
+        return jsonDate.date + ' at ' + jsonDate.time.substring(0,5);
+    },
+
+    /**
     * Parses a json date object into a JS Date
     * @param {Dictionary} A dictionary with date and time keys set
     * @return A JS Date with the parsed date/time

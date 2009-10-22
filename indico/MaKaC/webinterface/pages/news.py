@@ -19,15 +19,17 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.pages.main import WPMainBase
 import MaKaC.webinterface.wcomponents as wcomponents      
 from MaKaC.modules.base import ModulesHolder
+from MaKaC.i18n import _
+from pytz import timezone
+from MaKaC.common import timezoneUtils
 
 class WPNews(WPMainBase):
 
     def _getBody(self, params):
-        wc = WNews()
+        wc = WNews(tz = timezone(timezoneUtils.DisplayTZ(self._getAW()).getDisplayTZ()))
         return wc.getHTML()
     
     def _getTitle(self):
@@ -35,17 +37,17 @@ class WPNews(WPMainBase):
 
 
 class WNews(wcomponents.WTemplated):
+    
+    def __init__(self, tz):
+        wcomponents.WTemplated.__init__(self)
+        self._tz = tz
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        newsModule=ModulesHolder().getById("news")
-        newslist=[]
-        newsTypes = newsModule.getNewsTypes()
-        for id, label in newsTypes:
-            newslist.append( (label, []) )
-        newstypesIds = map(lambda (x,y): x, newsTypes)
-        for newItem in newsModule.getNewsItemsList():
-            newslist[newstypesIds.index(newItem.getType())][1].append(newItem)
-        vars["news"]=newslist
+        
+        newsModule = ModulesHolder().getById("news")
+        vars["news"] = newsModule.getNewsItemsList()
+        vars["tz"] = self._tz
+        
         return vars
         

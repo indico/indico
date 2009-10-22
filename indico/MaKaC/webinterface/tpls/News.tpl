@@ -2,20 +2,20 @@
     <div class="groupTitle"><%= _("Latest News") %></div>
 
 <div>
-<% for newtype,newslist in news: %>
-    <% if newslist: %>
-        <div class="newsGroup">    
-        <h2 class="newsTypeTitle"><%= newtype %></h2>
-        <% for newitem in newslist: %>
-            <div class="newsDisplayItem">
-                <div class="newsDisplayItemDate"><%= formatDateTime(newitem.getCreationDate())%></div>
-                <div style="display: inline;">
-                    <div class="newsDisplayItemTitle"><%= newitem.getTitle() %></div>
-                    <div class="newsDisplayItemContent"><%= newitem.getContent() %></div>
-                </div>
-            </div>
-        <% end %>
-    <% end %>
+<% for newsItem in news: %>
+    <div class="newsDisplayItem">
+        <div class="newsDisplayItemDateType">
+            <%= formatDate(newsItem.getAdjustedCreationDate(tz))%>
+            -
+            <%= newsItem.getHumanReadableType() %>
+        </div>
+        <div style="display: inline;">
+            <div class="newsDisplayItemTitle"><%= newsItem.getTitle() %></div>
+            <% if newsItem.isNew(): %>
+            <img src="<%= systemIcon('new') %>" style="padding-left: 10px" alt="new" />
+            <% end %>
+            <div class="newsDisplayItemContent"><%= newsItem.getContent() %></div>
+        </div>
     </div>
 <% end %>
 </div>

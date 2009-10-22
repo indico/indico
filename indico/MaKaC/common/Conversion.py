@@ -4,13 +4,15 @@ import pytz
 
 class Conversion:
     @classmethod
-    def datetime(cls, dt, timezone = None):
+    def datetime(cls, dt, tz = None):
         if dt:
-            if timezone:
-                date = dt.astimezone(pytz.timezone(timezone))
+            if tz:
+                if isinstance(tz, basestring):
+                    tz = pytz.timezone(tz)
+                date = dt.astimezone(tz)
             else:
                 date = dt
-            return {'date': str(date.date()),'time': str(date.time())}
+            return {'date': str(date.date()), 'time': str(date.time())}
         else:
             return None
 

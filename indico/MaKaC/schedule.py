@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 ##
 ## $Id: schedule.py,v 1.75 2009/06/19 14:51:33 pferreir Exp $
 ##
@@ -25,15 +25,14 @@ import copy
 from persistent import Persistent
 from datetime import datetime,timedelta
 from MaKaC.common.Counter import Counter
-from MaKaC.errors import MaKaCError, TimingError, ParentTimingError
+from MaKaC.errors import MaKaCError, TimingError, ParentTimingError,\
+    EntryTimingError
 from MaKaC.common import utils
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.i18n import _
-import pytz
 from pytz import timezone
 from MaKaC.common.utils import daysBetween
 from MaKaC.common.PickleJar import Retrieves
-from MaKaC.common.PickleJar import Updates
 from MaKaC.common.PickleJar import DictPickler
 from MaKaC.common.Conversion import Conversion
 from MaKaC.common.contextManager import ContextManager
@@ -266,7 +265,6 @@ class TimeSchedule(Schedule, Persistent):
         if self._v_allowReSchedule:
             self._v_allowReSchedule=False
             self._entries.sort(self.cmpEntries)
-            newEntries=[]
             lastEntry=None
             for entry in self._entries:
                 if lastEntry is not None:
@@ -348,7 +346,7 @@ class TimeSchedule(Schedule, Persistent):
     def getEntryInPos( self, pos ):
         try:
             return self.getEntries()[int(pos)]
-        except IndexError, e:
+        except IndexError:
             return None
 
     def getEntriesOnDay( self, day ):
@@ -841,8 +839,8 @@ class PosterSlotSchedule(SlotSchedule):
             sessionDur=self.getOwner().getSession().getContribDuration()
             entry.setDuration(dur=sessionDur)
 
-    def addEntry(self,entry,check=0): # check=0 is here only because we must
-                                      # have 3 parameters.
+    def addEntry(self,entry,check=0):
+        # check=0 is here only because we must  have 3 parameters.
         if (entry is None) or self.hasEntry(entry):
             return
         from MaKaC.conference import Contribution
@@ -870,7 +868,6 @@ class PosterSlotSchedule(SlotSchedule):
         if self._v_allowReSchedule:
             self._v_allowReSchedule=False
             for e in self._entries:
-                sd = self.getStartDate()
                 e.setStartDate(self.getStartDate())
             self._v_allowReSchedule=True
 
@@ -1292,7 +1289,7 @@ class BreakTimeSchEntry(IndTimeSchEntry):
         try:
             if self.place:
                 pass
-        except AttributeError, e:
+        except AttributeError:
             self.place=None
         return self.place
 
@@ -1315,7 +1312,7 @@ class BreakTimeSchEntry(IndTimeSchEntry):
         try:
             if self.room:
                 pass
-        except AttributeError, e:
+        except AttributeError:
             self.room=None
         return self.room
 
@@ -1349,10 +1346,10 @@ class BreakTimeSchEntry(IndTimeSchEntry):
 
     def setStartDate(self, newDate,check=2, moveEntries=0):
 
-        try:
-          tz = str(newDate.tzinfo)
-        except:
-          tz = 'undef'
+#        try:
+#            tz = str(newDate.tzinfo)
+#        except:
+#            tz = 'undef'
         if self.getSchedule() is not None:
             owner = self.getSchedule().getOwner()
             if newDate < owner.getStartDate():
@@ -1461,8 +1458,6 @@ class ScheduleToJson:
     @staticmethod
     def processEntry(obj, tz):
 
-        entry = {}
-
         #raise "duration: " + (datetime(1900,1,1)+obj.getDuration()).strftime("%Hh%M'") + ''
         entry = DictPickler.pickle(obj, timezone=tz)
 
@@ -1474,8 +1469,6 @@ class ScheduleToJson:
         if entry['entryType'] == 'Session':
 
             sessionSlot = obj.getOwner()
-            session = sessionSlot.getSession()
-            sessionSlotSchedule = sessionSlot.getSchedule()
 
             # get session content
             entries = {}

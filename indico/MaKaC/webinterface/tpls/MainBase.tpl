@@ -18,7 +18,7 @@
                 <div class="rightCorner"></div>
                 <div class="content">
                 <h1><%= _("News") %></h1>
-                    <% includeTpl('WelcomeHeader') %>
+                    <% includeTpl('WelcomeHeader', tz = timezone) %>
                 <h1><%= _("Upcoming events") %></h1>
                     <%= upcomingEvents %>
                 </div>

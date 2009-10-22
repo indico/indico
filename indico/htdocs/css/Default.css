@@ -3720,16 +3720,14 @@ ul.warningLevel1 {
     margin-top: 0px;
     margin-bottom: 0px;
 }
-}
 
 
 /* NEWS MODULE */
 
-.newsItem{
-    display:block;
-    background: #EBF7FF;
-    margin-bottom: 5px;
-    overflow: hidden;
+.newsItem {
+    display: block;
+    background-color: #EBF7FF;
+    margin-bottom: 20px;
 }
 
 .newsItemDate {
@@ -3744,22 +3742,19 @@ ul.warningLevel1 {
 
 .newsItemContent {
     margin-left: 30px;
-    float: left;
-
 }
 
 .newsItemOptions{
     float: right;
 }
 
-
 .newsContainer{
-    margin:10px 80px 10px 80px;
+    margin:10px 50px 10px 50px;
 }
 
 .newsToolBar{
     text-align:right;
-    margin:10px 80px 10px 80px;
+    margin:10px 50px 10px 50px;
 }
 
 .newsItemEdit{
@@ -3787,24 +3782,28 @@ ul.warningLevel1 {
 .newsDisplayItem{
     margin-left: 30px;
     overflow: hidden;
+    border: 1px #E3E3E3 dotted;
+    padding: 10px;
+    margin-bottom: 20px;
+    -moz-border-radius-bottomleft:5px;
+    -moz-border-radius-bottomright:5px;
+    -moz-border-radius-topleft:5px;
+    -moz-border-radius-topright:5px;
 }
 
-.newsDisplayItemDate {
-   font-weight: italic;
-   color: #36393D;
+.newsDisplayItemDateType {
    display: inline;
-   font-weight: bold;
+   float:right;
+   font-size: 8pt;
 }
 
 .newsDisplayItemTitle {
     display: inline;
-    font-size: 13px;
+    font-size: 16pt;
 }
 
 .newsDisplayItemContent {
-    font-style: italic;
-    margin-left: 100px;
-    color: #777777;
+    margin-left: 20px;
 }
 
 /* PLUGINS ADMIN */
