@@ -42,9 +42,11 @@ type("TimeTable", [], {
      * displayed in the tab control
      */
 
+
     _draw: function(timetableDiv) {
+
         return Html.div({style:{width: pixels(this.width)}},
-                        this._getHeader(),
+                        this.header,
                         timetableDiv,
                         this.loadingIndicator);
     },
@@ -119,8 +121,13 @@ type("TimeTable", [], {
 
          this.data = data;
 
+         this.enabled = true;
+
+         this.processedWarnings = new WatchList();
+
          this.width = width;
          this.loadingIndicator = this._createLoadingIndicator();
+         this.header = this._getHeader();
 
      }
     );
@@ -272,6 +279,19 @@ type("DisplayTimeTable", ["TimeTable"], {
 
 type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
 
+    draw: function() {
+        return this.LookupTabWidget.prototype.draw.call(this);
+    },
+
+    disable: function() {
+        this.enabled = false;
+        this.LookupTabWidget.prototype.disable.call(this);
+    },
+
+    enable: function() {
+        this.enabled = true;
+        this.LookupTabWidget.prototype.enable.call(this);
+    },
 
     _titleTemplate : function(text) {
         if (text == 'all') {
@@ -290,6 +310,39 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
 
     },
 
+    _followArgs_interval: function(data) {
+        var m = document.location.hash.match(/#(\d{8})(?:\.(s\d+l\d+))?/);
+
+        if (m) {
+
+            this.currentDay = m[1];
+
+            if (m[2]) {
+                this.switchToInterval(m[2]);
+            }
+        }
+    },
+
+    _followArgs_day: function(data) {
+        var m = document.location.hash.match(/#(\d{8})(?:\.(s\d+l\d+))?/);
+
+        if (m) {
+
+            this.currentDay = m[1];
+
+            var tab = 0;
+            var dayKeys = keys(data);
+
+            for (k in dayKeys) {
+                if (dayKeys[k] == this.currentDay) {
+                    return tab;
+                }
+                tab++;
+            }
+            return -1;
+        }
+    },
+
     switchToInterval : function(intervalId) {
         this.disable();
 
@@ -304,16 +357,24 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
                                                                  this.canvas,
                                                                  'contribution',
                                                                  false);
-        this.menu.dom.style.display = 'none';
         this.intervalTimeTable.setData(intervalInfo);
         this.canvas.set(this.intervalTimeTable.draw());
+        this.menu.dom.style.display = 'none';
+
+    },
+
+    postDraw: function() {
+        this.TimeTable.prototype.postDraw.call(this);
+        var self = this;
 
     },
 
     switchToTopLevel : function() {
+        this.enable();
+        this.set(this.currentDay);
+        this.canvas.set(Widget.block(this));
         this.menu.dom.style.display = 'block';
-        timetable.enable();
-        timetable.timetableDrawer.redraw();
+        this.timetableDrawer.redraw();
     }
 
 },
@@ -321,18 +382,17 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
 
          var self = this;
 
-         this.canvas = Html.div('canvas');
-
          this.managementActions = managementActions;
 
-         this.timetableDrawer = new TimetableDrawer(data, this.canvas, width,
+         this.canvas = Html.div({});
+
+         this.timetableDrawer = new TimetableDrawer(data, width,
                                                     wrappingElement,
                                                     detailLevel,
                                                     this._functionButtons(),
                                                     this.loadingIndicator,
                                                     !!managementActions,
                                                     managementActions);
-
 
          var sortedKeys = keys(this.data);
          sortedKeys.sort();
@@ -341,16 +401,24 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
          var today = new Date();
          var todayStr = IndicoUtil.formatDate2(today);
 
-         var initialTab = -1;
-         while (exists(data[todayStr])) {
-             today.setDate(today.getDate()-1);
-             todayStr = IndicoUtil.formatDate2(today);
-             initialTab++;
+         // parse "command line" arguments
+         var initialTab = this._followArgs_day(data);
+
+         // if nothing is found
+         if (initialTab == -1) {
+             // look for today
+             while (exists(data[todayStr])) {
+                 today.setDate(today.getDate()-1);
+                 todayStr = IndicoUtil.formatDate2(today);
+                 initialTab++;
+             }
          }
+
          // if today not found, set initial tab to the first one
          if (initialTab == -1) {
              initialTab = 0;
          }
+
 
          this.LookupTabWidget( translate(sortedKeys, function(key) {
              return [key, function() {
@@ -360,10 +428,20 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
                  if (key == 'all') {
                      return self._draw(self.timetableDrawer.drawAllDays());
                  } else {
+
+                     // Are we switching to interval mode
+                     if (!self.enabled) {
+                         // stop everything, we don'w want the LookupTabWidget
+                         // to replace the contents
+                         throw "stopDrawing";
+                     }
+
                      return self._draw(self.timetableDrawer.drawDay(key));
                  }
              }];
-         }), this.width, 100, initialTab, this._functionButtons());
+         }), this.width, 100, initialTab, this._functionButtons(), this.canvas);
+
+         this._followArgs_interval();
 
      });
 
@@ -398,6 +476,10 @@ type("IntervalTimeTableMixin", [], {
 
         this.currentDay = day;
         this.timetableDrawer.setData(ttData, day, data.isPoster);
+
+        // The time must be update each time new data is set
+        this.infoBox.set(this._getInfoBoxContent());
+
     },
 
     getById: function(id) {
@@ -408,12 +490,10 @@ type("IntervalTimeTableMixin", [], {
 },
      function(parent, width, wrappingElement, isSessionTimetable, managementActions) {
 
-         this.canvas = Html.div('canvas');
-
          this.managementActions = managementActions;
          this.parentTimetable = parent;
 
-         this.timetableDrawer = new IntervalTimetableDrawer(this.data, this.canvas, width,
+         this.timetableDrawer = new IntervalTimetableDrawer(this.data, width,
                                                             wrappingElement,
                                                             this._functionButtons(),
                                                             this.loadingIndicator,
@@ -574,9 +654,7 @@ type("ManagementTimeTable",["TimeTable"], {
 
         var self = this;
 
-        this.infoBox = Html.div({className: 'timetableInfoBox'},
-                                self._getInfoBoxContent());
-
+        this.infoBox = Html.div({className: 'timetableInfoBox'});
 
         this.addMenuLink = Html.a({className: 'dropDownMenu fakeLink', style: {margin: '0 15px'}}, 'Add new');
 
@@ -618,9 +696,10 @@ type("ManagementTimeTable",["TimeTable"], {
      function(data, contextInfo, eventInfo, width, wrappingElement, detailLevel, isSessionTimeTable) {
          this.eventInfo = eventInfo;
          this.contextInfo = contextInfo;
-         this.TimeTable(data, width, wrappingElement, detailLevel, true);
          this.warnings = new WatchList();
-         this.processedWarnings = new WatchList();
+
+         this.TimeTable(data, width, wrappingElement, detailLevel, true);
+
      }
     );
 
@@ -634,6 +713,8 @@ type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"],
          this.TopLevelTimeTableMixin(data, width, wrappingElement, detailLevel);
 
          this._filterSetup();
+
+         this.postDraw = TopLevelTimeTableMixin.prototype.postDraw;
 
      });
 
@@ -754,6 +835,8 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
          this.TopLevelTimeTableMixin(data, width, wrappingElement, detailLevel, managementActions);
 
 
+         this.postDraw = TopLevelTimeTableMixin.prototype.postDraw;
+
      });
 
 
@@ -854,6 +937,9 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
          this.ManagementTimeTable(data, contextInfo, eventInfo, width, wrappingElement, detailLevel);
          var managementActions = new IntervalTimeTableManagementActions(this, eventInfo, contextInfo, isSessionTimeTable);
          this.IntervalTimeTableMixin(parent, width, wrappingElement, isSessionTimeTable, managementActions);
+
+         this.canvas = Html.div({});
+
 
          this.setData = IntervalTimeTableMixin.prototype.setData;
          this.getById = IntervalTimeTableMixin.prototype.getById;

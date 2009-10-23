@@ -251,7 +251,7 @@ type("TimetableBlock", ["TimetableBlockBase"],
 
                return this.block;
            },
-            postDraw: function() {
+            postDraw: function(hook) {
                 var self = this;
                 var title = this.eventData.title;
 
@@ -327,6 +327,7 @@ type("TimetableBlock", ["TimetableBlockBase"],
                     title = this.truncateTitle(-step, title);
                     this.titleDiv.set(title);
                 }
+
             },
             createPileEffect: function() {
                 var self = this;
@@ -1355,13 +1356,13 @@ type("TimetableDrawer", ["IWidget"],
              this.redraw();
          }
      },
-     function(data, canvas, width, wrappingElement, detailLevel, extraButtons, loadingIndicator, managementMode, managementActions, defaultLayout) {
+     function(data, width, wrappingElement, detailLevel, extraButtons, loadingIndicator, managementMode, managementActions, defaultLayout) {
 
 
          var self = this;
 
          this.wrappingElement = wrappingElement;
-         this.canvas = canvas; // TODO: remove canvas
+         this.canvas = Html.div({});
          this.filterList = new WatchList();
          this.data = data;
          this.blocks = [];
@@ -1416,6 +1417,7 @@ type("TimetableDrawer", ["IWidget"],
                  self.setLoading(true, self.redraw);
              }
          });
+
      });
 
 

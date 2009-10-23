@@ -122,7 +122,7 @@ type("TabWidget", ["Chooser", "IWidget"],{
         this.disableOverlay.dom.style.display = 'block';
     },
 
-    draw: function() {
+    draw: function(dataRetrievalFunc) {
         var self = this;
 
         this.tabList = $B(Html.ul("tabList"),
@@ -208,17 +208,26 @@ type("TabWidget", ["Chooser", "IWidget"],{
         });
 
         // This div is plced on top of the tabs and is shown when the tabs should be disabled (unclickable)
-        this.disableOverlay = Html.div({
-            style: {
-                display: 'none',
-                background: 'white',
-                opacity: '0.7',
-                width: '100%',
-                height: '50px',
-                position: 'absolute',
-                top: '0', left: '0',
-                filter: 'alpha(opacity=70)'
-        }});
+
+        if (exists(this.width)) {
+            this.disableOverlay.dom.style.width = pixels(this.width);
+        }
+
+        // this piece of code is sensitive to exceptions
+        // coming from the drawing functions (for LookupTabWidget)
+        try {
+            if(dataRetrievalFunc) {
+                dataRetrievalFunc.call(this);
+            }
+
+            // if everything goes OK, replace the canvas
+            this.canvas.set(Widget.block(this));
+
+        } catch(e) {
+            if (e == "stopDrawing") {
+                // Otherwise stop drawing
+            }
+        }
 
         this.container = this.IWidget.prototype.draw.call(
             this,
@@ -231,7 +240,7 @@ type("TabWidget", ["Chooser", "IWidget"],{
                      Html.div({style: {marginTop: pixels(10),
                                        width: self.width ? pixels(self.width) : 'auto',
                                        minHeight: self.height ? pixels(self.height) : 'auto' }},
-                              Widget.block(this)),
+                              this.canvas),
                      this.disableOverlay));
 
         return this.container;
@@ -384,10 +393,26 @@ type("TabWidget", ["Chooser", "IWidget"],{
      */
     setSelectedTab: function(newSelectedTab){
         this.selected.set(newSelectedTab);
+    },
+
+    initializeDisableOverlay: function() {
+         this.disableOverlay = Html.div({
+             style: {
+                 display: 'none',
+                 background: 'white',
+                 opacity: '0.7',
+                 height: '50px',
+                 width: '100%',
+                 position: 'absolute',
+                 top: '0', left: '0',
+                 filter: 'alpha(opacity=70)'
+             }});
     }
+
 },
 
-     function(options, width, height, initialSelection, extraButtons) {
+     function(options, width, height, initialSelection, extraButtons, canvas) {
+
          var self = this;
          this.width = width;
          this.height = height;
@@ -397,6 +422,7 @@ type("TabWidget", ["Chooser", "IWidget"],{
          this.scrollArrows = {};
          this.scrollArrowStates = {};
          this.extraButtons = any(extraButtons, []);
+         this.canvas = canvas || Html.div('canvas');
 
          if (!exists(initialSelection)) {
              initialSelection = 0;
@@ -429,13 +455,23 @@ type("TabWidget", ["Chooser", "IWidget"],{
 
          this.Chooser(optionDict);
          this.set(this.selected.get());
+
+         this.initializeDisableOverlay();
      }
     );
 
 type("LookupTabWidget", ["TabWidget"],
      {
+         draw: function() {
+             return this.TabWidget.prototype.draw.call(
+                 this,
+                 function() {
+                     this.set(this.selected.get());
+                 });
+         }
      },
-     function(options, width, height, initialSelection, extraButtons) {
+     function(options, width, height, initialSelection, extraButtons, canvas) {
+
          var self = this;
          this.width = width;
          this.height = height;
@@ -445,6 +481,9 @@ type("LookupTabWidget", ["TabWidget"],
          this.scrollArrows = {};
          this.scrollArrowStates = {};
          this.extraButtons = any(extraButtons, []);
+         this.canvas = canvas || Html.div('canvas');
+
+         this.initializeDisableOverlay();
 
          if (!exists(initialSelection)) {
              initialSelection = 0;
@@ -465,9 +504,8 @@ type("LookupTabWidget", ["TabWidget"],
              optionDict[item[0]] = item[1];
          });
 
-
          this.Chooser(new Lookup(optionDict));
-         this.set(this.selected.get());
+
      }
     );
 

@@ -34,7 +34,7 @@ IndicoUI.Aux = {
 
                 var fieldDiv = field.draw();
 
-		field.set(accessor.get());
+                field.set(accessor.get());
 
                 $B(target, fieldDiv);
 
