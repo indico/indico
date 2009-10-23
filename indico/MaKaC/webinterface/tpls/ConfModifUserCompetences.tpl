@@ -12,7 +12,7 @@
             <em><%= _("Please, define competences for every team member.")%></em>
    </td></tr> 
     <tr>
-        <td nowrap class="groupTitle" colspan=5>
+        <td nowrap class="groupTitle" colspan=5 style="border: none">
             <%= _("Paper Reviewing Team competences")%>
             <span id="competencesHelp"></span> 
         </td>

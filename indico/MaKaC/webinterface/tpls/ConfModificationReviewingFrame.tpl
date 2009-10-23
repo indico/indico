@@ -2,13 +2,16 @@
 <% from MaKaC.common.PickleJar import DictPickler %>
 
 
-<% if ConfReview.hasReviewing(): %>     
+<% if ConfReview.hasReviewing(): %>
 <table width="85%%" align="center" border="0">
     <tr>
-        <td id="revControlRefereeEditorReviewerHelp"  colspan="2" class="groupTitle"  style="padding-top: 15px;">
+        <td id="revControlRefereeEditorReviewerHelp"  colspan="3" class="groupTitle"  style="border: none; padding-top: 15px; padding-bottom: 15px;">
             <%= _("Step 2: Assign Reviewers")%>
         </td>
-    </tr>
+    </tr>   
+</table> 
+<table width="83%%" align="right" border="0">
+    
 <% if ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1:%>
 <% pass %>
 <% end %>
@@ -163,11 +166,10 @@
 <% end %>
 
     <tr><td style="padding-top: 15px;"></td></tr>
-    <tr><td colspan="5" style="padding-top: 15px; border-top: 1px solid #DDDDDD;">
-            <em><%= _("To define paper reviewers competences, please click on 'Competences'")%></em>
+    <tr><td colspan="5" style="padding-top: 15px;">
+     <em><%= _("To define paper reviewers competences, please click on 'Competences'")%></em>       
         </td>
     </tr>
 </table>
 <% end %>
 <br>
-

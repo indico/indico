@@ -9,7 +9,7 @@
 <table width="85%%" align="center" border="0">
     <tr>
         <em><%= _("Please, follow the steps to assign Paper Reviewing Team")%></em> 
-        <td id="revControlPRMHelp"  colspan="3" class="groupTitle" style="padding-top: 15px;"><%= _("Step 1: Assign Managers of Paper Reviewing Module")%></td>
+        <td id="revControlPRMHelp"  colspan="3" class="groupTitle" style="border: none; padding-top: 15px;"><%= _("Step 1: Assign Managers of Paper Reviewing Module")%></td>
     </tr>
     <tr>
          <td style="padding-top: 15px;">%(paperReviewManagerTable)s</td>

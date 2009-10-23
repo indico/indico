@@ -7,21 +7,21 @@
 <% if ConfReview.getJudgedContributions(User): %>
 <table class="Revtab" width="90%%" cellspacing="0" align="center" border="0" style="padding-left:2px; padding-top: 10px">
     <tr>
-        <td nowrap class="groupTitle" colspan=4><%= _("Contributions to judge as Referee")%></td>
+        <td nowrap class="groupTitle" colspan=4 style=""><%= _("Contributions to judge as Referee")%></td>
     </tr>
     <tr>
-        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"><%= _("Id")%></td>
-        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"><%= _("Title")%></td>
-        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"><%= _("State")%></td>
-        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"><%= _("Deadline")%></td>
+        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;padding-top:10px; padding-bottom:10px;"><%= _("Id")%></td>
+        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;padding-top:10px; padding-bottom:10px;"><%= _("Title")%></td>
+        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;padding-top:10px; padding-bottom:10px;"><%= _("State")%></td>
+        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;padding-top:10px; padding-bottom:10px;"><%= _("Deadline")%></td>
     </tr>
    
     <% for c in ConfReview.getJudgedContributions(User): %>
         <% if not isinstance(c.getStatus(), ContribStatusNone): %>
-	    <tr valign="top">
-            <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;"><%= c.getId() %></td>
-            <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;"><a href="<%= urlHandlers.UHContributionModifReviewing.getURL(c) %>"><%= c.getTitle() %></a></td>
-            <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
+	    <tr valign="top" onmouseover="this.style.backgroundColor='#ECECEC'" onmouseout="this.style.backgroundColor='transparent'">
+            <td style="padding-right:5px;padding-left:5px;"><%= c.getId() %></td>
+            <td style="padding-right:5px;padding-left:5px;"><a href="<%= urlHandlers.UHContributionModifReviewing.getURL(c) %>"><%= c.getTitle() %></a></td>
+            <td style="padding-right:5px;padding-left:5px;">
             <% if c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted(): %>
                 <span style="color:green;"><%= _("Judged:")%> <%= c.getReviewManager().getLastReview().getRefereeJudgement().getJudgement() %></span>
             <% end %>
@@ -30,7 +30,7 @@
                 <%= "<br>".join(c.getReviewManager().getLastReview().getReviewingStatus()) %>
             <% end %>
             </td>    
-            <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
+            <td style="padding-right:5px;padding-left:5px;" onmouseover="this.style.borderColor='#ECECEC'" onmouseout="this.style.borderColor='transparent'">
                 <% date = c.getReviewManager().getLastReview().getAdjustedRefereeDueDate() %>
                 <% if date is None: %>
                     <%= _("Deadline not set.")%>

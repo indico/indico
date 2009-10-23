@@ -4,10 +4,10 @@
 <% from MaKaC.reviewing import Template %>
 <% from MaKaC.common.utils import formatDateTime %>
 
-<table width="90%%" align="center" border="0" style="margin-bottom:1em">
+<table width="80%%" align="center" border="0" style="margin-bottom:1em">
     <tr>
         <em><%= _("Please, follow the steps to set up the Paper Reviewing Module")%></em> 
-        <div id="reviewingModeHelp" class="groupTitle"><%= _("Step 1: Choose type of paper reviewing for the conference")%></div>
+        <div id="reviewingModeHelp" class="groupTitle" style="border: none"><%= _("Step 1: Choose type of paper reviewing for the conference")%></div>
     </tr>
     <tr>
         <td nowrap class="titleCellTD"  style="padding-top: 5px;">
@@ -26,7 +26,7 @@
 <% end %>
 <table id='steptitle' width="90%%" border="0" style="margin-bottom:1em; display:<%=display%>">
     <tr>
-        <td class="groupTitle">
+        <td class="groupTitle" style="border: none">
             <%= _("Step 2: Set up the options for ")%><span id="title">
             <%if ConferenceReview.reviewingModes[choice]==ConferenceReview.reviewingModes[2]: %><%= _("content reviewing team")%><% end %>
             <%if ConferenceReview.reviewingModes[choice]==ConferenceReview.reviewingModes[3]: %><%= _("layout reviewing team")%><% end %>
@@ -83,24 +83,11 @@
     </tr>
     -->
     <tr>
-        <td style="width: 400px;">    
-            <div id="inPlaceEditStates"  style="padding-top: 5px;"><%= ', '.join(ConfReview.getAllStates())%></div>
-        </td>
-        <td>
-            <div class="titleCellFormat">
-                <%= _("Statuses by default:")%>
-                <ul class="keywordList">
-                <li class="multipleLinesListItem">                    
-                    <%=ConferenceReview.predefinedStates[0] %>
-                </li>  
-                <li class="multipleLinesListItem">                    
-                    <%=ConferenceReview.predefinedStates[1] %>
-                </li>  
-                <li class="multipleLinesListItem">                    
-                    <%=ConferenceReview.predefinedStates[2] %>
-                </li>        
-                </ul>
+        <td style="width: 400px;">  
+            <div class="titleCellFormat" style="padding-top: 5px;">
+                <%= _("The default statuses are: ")%><em><%= _("Accept, To be corrected")%></em><%=_(" and ")%><em><%=_("Reject")%></em>.<%= _("You can define your own statuses")%>
             </div>
+            <div id="inPlaceEditStates"  style="padding-top: 10px;"><%= ', '.join(ConfReview.getAllStates())%></div>
         </td>
     </tr>
 </table>
@@ -260,18 +247,6 @@
 <% else: %>
     <% display = 'none' %>
 <% end %>
-<table id="defaultDueDatesTable" width="90%%" align="center" border="0" style="margin-bottom:1em; display:<%=display%>">
-    <tr>
-        <td id="defaultDatesHelp" colspan="5" class="reviewingsubtitle"><%= _("Automatic mails")%></td>
-    </tr>
-    
-
-<% if ConfReview.hasReviewing(): %>
-    <% display = 'table' %>
-<% end %>
-<% else: %>
-    <% display = 'none' %>
-<% end %>
 <form action="<%= setTemplateURL %>" method="post" ENCTYPE="multipart/form-data">
 <table id="templateTable" width="90%%" align="center" border="0" style="display:<%=display%>">
     <tr>
@@ -332,6 +307,7 @@ var observer = function(value) {
     
     if (value == "No reviewing") {
         $E('steptitle').dom.style.display = 'none';
+        $E('title').dom.style.display = 'none';
         $E('materialsTable').dom.style.display = 'none';
         $E('statusTable').dom.style.display = 'none';
         $E('reviewingQuestionsTable').dom.style.display = 'none';

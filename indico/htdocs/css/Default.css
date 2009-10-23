@@ -929,7 +929,6 @@ a.confSubSection:hover {
    color: #4E4C46;
    letter-spacing: 1px;
    padding: 3px;
-   border-bottom: 1px solid #DDDDDD;
    margin: 10px 0;
 }
 
@@ -3901,7 +3900,7 @@ ul.keywordList li.multipleLinesListItem {
     position: relative;
     padding: 0 0 0 0;
     padding-bottom: 5px;
-    color: #5FA5D4;        
+    color: #606060;        
 }
 
 ul.keywordList li.multipleLinesListItem_last {

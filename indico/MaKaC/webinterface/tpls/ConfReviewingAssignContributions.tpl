@@ -142,7 +142,7 @@
     </ul>
 </div>
 
-<table class="Revtab" width="90%%" cellspacing="0" align="center" border="0" style="padding-left:2px; margin-bottom:1em">
+<table class="Revtab" width="95%%" cellspacing="0" align="center" border="0" style="padding-left:2px; margin-bottom:1em">
 <!--
     <tr>
         <td nowrap class="groupTitle" colspan=4>Contributions to judge as Referee</td>
@@ -150,22 +150,29 @@
 -->
     <thead>
         <tr>
-            <td nowrap width="0%%" align="right" class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF">
-                <img src="<%= Config.getInstance().getSystemIconURL("checkAll") %>" alt="Select all" title="Select all" onclick="selectAll('selectedContributions')" style="border:none;"><img src="<%= Config.getInstance().getSystemIconURL("uncheckAll") %>" alt="Deselect all" title="Deselect all" onclick="deselectAll('selectedContributions')" style="border:none;">
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF">
+                <ul style="padding-left: 0px; padding-right: 20px;">
+                    <li onclick="selectAll('selectedContributions')" align="left" style="padding-bottom:5px;color:#0B63A5;list-style-type:none;" onmouseover="this.style.color='#E25300'" onmouseout="this.style.color='#0B63A5'">
+                        <span style="cursor:pointer"><%= _("Select All")%></span>
+                    </li>
+                    <li onclick="deselectAll('selectedContributions')" style="color:#0B63A5;list-style-type:none;" onmouseover="this.style.color='#E25300'" onmouseout="this.style.color='#0B63A5'">
+                        <span style="cursor:pointer"><%= _("Deselect All")%></span>
+                    </li>
+                </ul>
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <%= _("Id")%>
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <%= _("Title")%>
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <%= _("Type")%>
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <%= _("Track")%>
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <%= _("Session")%>
             </td>
             <!--
@@ -173,10 +180,10 @@
                 State
             </td>
             -->
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <%= _("Reviewing team")%>
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <%= _("Deadline")%>
             </td>
         </tr>
@@ -186,8 +193,8 @@
     <% for c in Conference.getContributionListSortedById(): %>
         <% rm = c.getReviewManager() %>
         <% if not isinstance(c.getStatus(), ContribStatusNone): %>
-        <tr valign="top">
-            <td></td>
+         <tr valign="top">
+            <td></td>          
             <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <%= c.getId() %>
             </td>
@@ -383,9 +390,19 @@ var buildShowHideFiltering = function() {
  * Builds a table row element from a contribution object, pickled from an Indico's Contribution object
  * @param {Object} contribution
  */
+var backgroundColorOver = function() {
+    IndicoUI.Widgets.Generic.tooltip(this.style.backgroundColor='#ECECEC');
+}
+
+var backgroundColorOut = function() {
+    IndicoUI.Widgets.Generic.tooltip(this.style.backgroundColor='transparent');
+}
+
 var contributionTemplate = function(contribution) {
         
     var row = Html.tr();
+    row.dom.onmouseover = backgroundColorOver;
+    row.dom.onmouseout = backgroundColorOut;
     // Cell1: checkbox to select this contribution
     var cell1 = Html.td({style:{"textAlign":"center", "width":"0px"}});
     var id = ("cb" + contribution.id);

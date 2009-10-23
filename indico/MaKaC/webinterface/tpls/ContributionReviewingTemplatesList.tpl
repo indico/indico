@@ -2,14 +2,15 @@
 <% import MaKaC.common.Configuration as Configuration %>
 
     <% if ConfReview.hasTemplates(): %>
+    <!-- here to put table for the uploaded templates info :) -->
     	<tr>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
+            <td nowrap width="10%%" class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #DDDDDD;">
             	<%= _("Name")%>
     	    </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #DDDDDD;">
             	<%= _("Format")%>
     		</td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #DDDDDD;">
             	<%= _("Description")%>
     		</td>
         </tr>
@@ -40,7 +41,7 @@
     	</tr>
     	<% end %>
     	<tr><td style="padding-bottom:15px;"></td></tr>
-        <tr><td colspan="5" style="padding-top: 15px; border-top: 1px solid #DDDDDD;">
+        <tr><td colspan="5" style="padding-top: 20px;">
             <em><%= _("To assign team for Paper Review Module, please click on 'Team' and follow the steps")%></em>
         </td></tr>
 	<% end %>
@@ -48,7 +49,7 @@
         <tr><td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
             <%= _("No templates have been uploaded yet.")%>
         </td></tr>
-        <tr><td colspan="5" style="padding-top: 15px; border-top: 1px solid #DDDDDD;">
+        <tr><td colspan="5" style="padding-top: 20px;">
             <em><%= _("To assign team for Paper Review Module, please click on 'Team' and follow the steps")%></em>
         </td></tr>
     <% end %>

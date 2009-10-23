@@ -465,7 +465,7 @@ class WConfModificationReviewingFramePRM(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
 
         prmTable = []
-        prmTable.append(_("""<td nowrap class="titleCellTD"><span class="titleCellFormat"> _("Managers of Paper Reviewing Module") <br><font size="-2">_("(users responsible for assignation of contributions)")</font></span></td>
+        prmTable.append(_("""<td nowrap class="titleCellTD"><span class="titleCellFormat"><br> _("Managers of Paper Reviewing Module")<br> <br><font size="-2">_("responsibilities:") _("Setup, Assign")<br> _(" contributions to Referees"),<br>_(" Define team competences")</font></span></td>
         """))
         #prmTable.append(wcomponents.WPrincipalTable().getHTML( self.__target.getConfReview().getPaperReviewManagersList(),
         #                                                      self.__target, vars["addPaperReviewManagerURL"], vars["removePaperReviewManagerURL"], selectable=False))
@@ -502,7 +502,7 @@ class WConfModificationReviewingFrame(wcomponents.WTemplated):
         if self.__target.getConfReview().getChoice() == 2 or self.__target.getConfReview().getChoice() == 1:
             pass
         else:
-            editor.append(_("""<td nowrap class="titleCellTD"><span class="titleCellFormat">_("Layout Reviewers")<br><font size="-2">_("(users responsible for form verification)")</font></span></td>
+            editor.append(_("""<td nowrap class="titleCellTD"><span class="titleCellFormat">_("Layout Reviewers")<br><br><font size="-2">_("responsibility: judge")<br> _("form verification")<br>_("of contributions")</font></span></td>
             """))
             #editor.append(wcomponents.WPrincipalTable().getHTML( self.__target.getConfReview().getEditorsList(),
             #                                                     self.__target, vars["addEditorURL"], vars["removeEditorURL"], selectable=False))
@@ -512,13 +512,13 @@ class WConfModificationReviewingFrame(wcomponents.WTemplated):
         if self.__target.getConfReview().getChoice() == 3 or self.__target.getConfReview().getChoice() == 1:
             pass
         else:
-            reviewer.append(_("""<td nowrap class="titleCellTD"><span class="titleCellFormat">_("Content Reviewers")<br><font size="-2">_("(users responsible for content verification)")</font></span></td>
+            reviewer.append(_("""<td nowrap class="titleCellTD"><span class="titleCellFormat">_("Content Reviewers")<br><br><font size="-2">_("responsibility: judge")<br> _("content verification")<br>_("of contributions")</font></span></td>
             """))
             #reviewer.append(wcomponents.WPrincipalTable().getHTML( self.__target.getConfReview().getReviewersList(),
             #                                                       self.__target, vars["addReviewerURL"], vars["removeReviewerURL"], selectable=False))
             #reviewer.append("""</td>""")
         
-            refereeTable.append(_("""<td nowrap class="titleCellTD"><span class="titleCellFormat">_("Referees")<br><font size="-2">_("(users responsible for final decision)")</font></span></td>
+            refereeTable.append(_("""<td width="80%%" nowrap class="titleCellTD"><span class="titleCellFormat">_("Referees")<br><br><font size="-2">_("responsiblities: Assign,")<br> _("contributions to Reviewers,")<br> _("Give final judgement")</font></span></td>
             """))
             #refereeTable.append(wcomponents.WPrincipalTable().getHTML( self.__target.getConfReview().getRefereesList(),
             #                                                          self.__target, vars["addRefereeURL"], vars["removeRefereeURL"], selectable=False))
