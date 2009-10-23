@@ -107,8 +107,8 @@ class WebcastManager(Persistent):
             if event:
                 wc = Webcast(event)
                 self._forthcoming_webcasts.append(wc)
-                self.remoteSynchronize()
                 self._p_changed=1
+                self.remoteSynchronize()
             
     def getForthcomingWebcast(self, event):
         for wc in self._forthcoming_webcasts:
@@ -134,8 +134,8 @@ class WebcastManager(Persistent):
                 self._forthcoming_webcasts.remove(webcast)
                 if not self.getArchivedWebcast(webcast.getEvent()):
                     self._archived_webcasts.append(webcast)
-                self.remoteSynchronize()
                 self._p_changed=1
+                self.remoteSynchronize()
 
     def archiveForthcomingWebcastById(self, id):
         for wc in self._forthcoming_webcasts:
@@ -143,8 +143,8 @@ class WebcastManager(Persistent):
                 self._forthcoming_webcasts.remove(wc)
                 if not self.getArchivedWebcast(wc.getEvent()):
                     self._archived_webcasts.append(wc)
-                self.remoteSynchronize()
                 self._p_changed=1
+                self.remoteSynchronize()
        
     def unArchiveWebcastById(self, id):
         for wc in self._archived_webcasts:
@@ -152,15 +152,15 @@ class WebcastManager(Persistent):
                 self._archived_webcasts.remove(wc)
                 if not self.getForthcomingWebcast(wc.getEvent()):
                     self._forthcoming_webcasts.append(wc)
-                self.remoteSynchronize()
                 self._p_changed=1
+                self.remoteSynchronize()
                 
     def deleteForthcomingWebcast(self, webcast):
         for wc in self._forthcoming_webcasts:
             if wc == webcast:
                 self._forthcoming_webcasts.remove(webcast)
-                self.remoteSynchronize()
                 self._p_changed=1
+                self.remoteSynchronize()
                 return True
         return False
               
@@ -168,8 +168,8 @@ class WebcastManager(Persistent):
         for wc in self._forthcoming_webcasts:
             if wc.getId() == id:
                 self._forthcoming_webcasts.remove(wc)
-                self.remoteSynchronize()
                 self._p_changed=1
+                self.remoteSynchronize()
                 return True
         return False
                 
@@ -178,8 +178,8 @@ class WebcastManager(Persistent):
             if event:
                 wc = Webcast(event)
                 self._archived_webcasts.append(wc)
-                self.remoteSynchronize()
                 self._p_changed=1
+                self.remoteSynchronize()
             
     def getArchivedWebcast(self, event):
         for wc in self._archived_webcasts:
@@ -236,13 +236,15 @@ class WebcastManager(Persistent):
         if name != "" and not self.getChannel(name):
             ch = Channel(name, url, width, height)
             self.channels.append(ch)
-        self._p_changed=1
+            self._p_changed=1
+            self.remoteSynchronize()
         
     def removeChannel(self, name):
         for ch in self.channels:
             if ch.getName() == name:
                 self.channels.remove(ch)
                 self._p_changed=1
+                self.remoteSynchronize()
         
     def switchChannel(self, name):
         for ch in self.channels:
@@ -260,6 +262,7 @@ class WebcastManager(Persistent):
         else:
             self.channels.insert(nb-1, tomove)
         self._p_changed=1
+        self.remoteSynchronize()
         return True
 
     def moveChannelDown(self, nb):
@@ -271,6 +274,7 @@ class WebcastManager(Persistent):
         else:
             self.channels.insert(nb+1, tomove)
         self._p_changed=1
+        self.remoteSynchronize()
         return True
     
     def getWebcastServiceURL(self):
@@ -302,6 +306,9 @@ class WebcastManager(Persistent):
         
     def remoteSynchronize(self, raiseExceptionOnSyncFail = False):
         """ Calls the webcast synchronization URL
+            Will perform an intermediate commit before calling the URL
+            or the remote server will query a non-updated state of the indico DB.
+            
             raiseExceptionOnSyncFail: if True (default), we will raise a MaKaCError if calling the webcast
             synchronization URL had a problem
         """
@@ -309,6 +316,9 @@ class WebcastManager(Persistent):
         if url:
             
             try:
+                Logger.get('webcast').info("Doing an intermediate commit...")
+                DBMgr.getInstance().commit()
+                Logger.get('webcast').info("Commit done.")
                 Logger.get('webcast').info("Calling the webcast synchronization URL: " + url)
                 answer = urlOpenWithTimeout(url , 10).read(100000).strip()
                 Logger.get('webcast').info("Got answer: " + answer)
