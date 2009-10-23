@@ -163,29 +163,29 @@ def Updates(cls, property, modifier=None):
         
     return factory
         
-class DictPickler:     
+class DictPickler:
 
     @classmethod
-    def pickle(cls, object, tz = None):
-        """ tz can be a string (preferred) or a pytz.timezone object
+    def pickle(cls, object, timezone = None):
+        """ timezone can be a string (preferred) or a pytz.timezone object
         """
-        
+
         # path mapping supported
         # i.e. getFileSize() ==> file.size
         
         if object is None:
             return None
         elif type(object) == list or type(object) == tuple or type(object) == set or isinstance(object, PersistentList):
-            res = []            
+            res = []
             for obj in object:
-                res.append(DictPickler.pickle(obj, tz))
+                res.append(DictPickler.pickle(obj, timezone))
             return res
         elif type(object) == dict or isinstance(object, PersistentMapping):
-            res = {}          
+            res = {}
             for key, obj in object.iteritems():
                 if not isinstance(key, basestring):
                     raise Exception("Key %s cannot be pickled because it's not a string. object=%s" % (str(key), str(object)))
-                res[key] = DictPickler.pickle(obj, tz)
+                res[key] = DictPickler.pickle(obj, timezone)
             return res
         elif isinstance(object, basestring):
             return object
@@ -193,9 +193,9 @@ class DictPickler:
             clazz = classPath(object.__class__)
             if not globalPickleMap.has_key(clazz):
                 raise Exception('Class %s is not supposed to be pickled. object=%s' % (clazz, str(object)))
-        
-            return DictPickler._pickle(object, globalPickleMap[clazz], tz)
-    
+
+            return DictPickler._pickle(object, globalPickleMap[clazz], timezone)
+
     @classmethod
     def update(cls, object, dict):
         
@@ -227,10 +227,10 @@ class DictPickler:
 
     
         recursiveUpdate(dict, [])
-    
+
     @classmethod
-    def _pickle(cls,object,pickleTree, tz):
-        
+    def _pickle(cls,object,pickleTree, timezone):
+
         def recursiveAttribution(obj, prop, result):
             if len(prop) == 1:
                 obj[prop[0]] = result
@@ -250,11 +250,11 @@ class DictPickler:
             # apply the modifier, if there is one
             if (modifier):
 
-                if modifier == Conversion.datetime:                    
-                    result = modifier(result, tz = tz)
+                if modifier == Conversion.datetime:
+                    result = modifier(result, tz = timezone)
                 else:
                     result = modifier(result)
-            
+
             if isObj:
                 result = DictPickler.pickle(result)
         
