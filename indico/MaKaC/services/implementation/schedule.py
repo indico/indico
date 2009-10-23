@@ -543,7 +543,8 @@ class SessionScheduleModifyStartEndDate(ScheduleOperation, sessionServices.Sessi
         pickledData = DictPickler.pickle(self._schEntry, timezone=self._conf.getTimezone())
         return {'day': self._schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
                 'id': pickledData['id'],
-                'entry': pickledData}
+                'entry': pickledData,
+                'autoOps': translateAutoOps(self.getAutoOps())}
 
 class ConferenceScheduleGetDayEndDate(ScheduleOperation, conferenceServices.ConferenceModifBase):
 
@@ -1018,6 +1019,6 @@ methodMap = {
 
     "getAllSessionConveners": ConferenceGetAllConveners,
     "getAllSpeakers": ConferenceGetAllSpeakers,
-    
+
     "moveEntry": MoveEntry
 }

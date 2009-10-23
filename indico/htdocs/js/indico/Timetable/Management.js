@@ -528,7 +528,7 @@ type("TopLevelTimeTableManagementActions", ["TimetableManagementActions"],
      {
      },
      function(timetable, eventInfo, contextInfo, isSessionTimetable) {
-         this.TimetableManagementActions(timetable, eventInfo, contextInfo, isSessionTimetable);
+         this.TimetableManagementActions(timetable, eventInfo, isSessionTimetable);
          this.session = null;
      });
 
@@ -536,6 +536,6 @@ type("IntervalTimeTableManagementActions", ["TimetableManagementActions"],
      {
      },
      function(timetable, eventInfo, intervalInfo, isSessionTimetable) {
-         this.TimetableManagementActions(timetable, eventInfo, intervalInfo, isSessionTimetable);
+         this.TimetableManagementActions(timetable, eventInfo, isSessionTimetable);
          this.session = intervalInfo;
      });

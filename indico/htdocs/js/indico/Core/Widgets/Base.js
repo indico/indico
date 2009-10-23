@@ -219,7 +219,7 @@ type("TabWidget", ["Chooser", "IWidget"],{
                 top: '0', left: '0',
                 filter: 'alpha(opacity=70)'
         }});
-        
+
         this.container = this.IWidget.prototype.draw.call(
             this,
             Html.div({},
@@ -370,14 +370,14 @@ type("TabWidget", ["Chooser", "IWidget"],{
         // Make sure arrow is visible
         bg.dom.style.display = 'block';
     },
-    
+
     /**
      * Returns the string with the title of the currently selected tab
      */
     getSelectedTab: function() {
         return this.selected.get();
     },
-    
+
     /**
      * Changed the currently selected tab
      * @param {string} newSelectedTab The name of the new tab to be selected
@@ -415,7 +415,7 @@ type("TabWidget", ["Chooser", "IWidget"],{
                  value.setStyle('display','');
              }
          });
-         
+
          this.selected = new WatchValue(this.options.item(initialSelection));
 
          this.selected.observe(function(value) {

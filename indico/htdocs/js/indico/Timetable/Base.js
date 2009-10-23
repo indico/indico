@@ -291,7 +291,7 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
     },
 
     switchToInterval : function(intervalId) {
-        timetable.disable();
+        this.disable();
 
         var intervalInfo = this.data[this.currentDay][intervalId];
         var data = intervalInfo.entries;
@@ -384,10 +384,6 @@ type("IntervalTimeTableMixin", [], {
             " (", $B(Html.span({}), this.slotStartTime), " - ", $B(Html.span({}), this.slotEndTime),")" )));
     },
 
-    _generateSlotTitle: function(slotData) {
-        return slotData.title + (slotData.slotTitle ? ": " + slotData.slotTitle : '');
-    },
-
     setData: function(data) {
         var day = IndicoUtil.formatDate2(IndicoUtil.parseJsonDate(data.startDate));
         var ttData = {};
@@ -429,6 +425,11 @@ type("IntervalTimeTableMixin", [], {
 
 
 type("ManagementTimeTable",["TimeTable"], {
+
+    _generateSlotTitle: function(slotData) {
+        return slotData.title + (slotData.slotTitle ? ": " + slotData.slotTitle : '');
+    },
+
 
     _createInfoArea: function() {
 
@@ -651,7 +652,7 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
             // in the affirmative case, fetch the time limits
             oldStartTime = slot.startDate.time.slice(0,5);
             oldEndTime = slot.endDate.time.slice(0,5);
-            oldStartDate = slot.startDate.date;
+            oldStartDate = slot.startDate.date.replaceAll('-','');
 
         } else {
             // Contribution or break - event timetable limits
@@ -663,7 +664,11 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
             oldStartDate = this.currentDay;
         }
 
+        var oldEntries = data[oldStartDate][oldEntryId]?data[oldStartDate][oldEntryId].entries:null;
+
         delete data[oldStartDate][oldEntryId];
+
+        return oldEntries;
 
     },
 
@@ -672,7 +677,7 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
         var data = this.getData();
 
         // Deletes the old version of the entry
-        this._deleteOldEntry(data, result, oldEntryId);
+        var oldEntries = this._deleteOldEntry(data, result, oldEntryId);
 
         // AutoOp Warnings (before updates are done)
         this._processAutoOps(result);
@@ -681,9 +686,22 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
         if (updateCycle) {
             updateCycle(data);
         } else {
+
             // If none is defined in the function args,
             // execute the default action
             data[result.day][result.id] = result.entry;
+
+            // A session interval may contain entries, that
+            // should be preserved
+            if (oldEntries) {
+                data[result.day][result.id].entries = oldEntries;
+            }
+
+            // If a session slot is added, let's update the list of sessions
+            if (result.session) {
+                this.eventInfo.sessions[result.session.id] = result.session;
+            }
+
         }
 
         // Check if the result overflows the conference ending time
@@ -765,8 +783,6 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
             // execute the default action
             data[result.id] = result.entry;
 
-            this.parentTimetable.data[result.day][slot.id].entries[result.entry.id] = result.entry;
-
             if (result.session) {
                 // Account for "collateral damage" on sessions
                 this.parentTimetable.eventInfo.sessions[result.session.id] = result.session;
@@ -780,6 +796,7 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
                 this.contextInfo = result.slotEntry;
             }
 
+            this.parentTimetable.data[result.day][slot.id].entries[result.entry.id] = result.entry;
 
             // Update the times for the slot
             this._updateTimes(result.slotEntry.startDate.time,
