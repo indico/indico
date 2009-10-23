@@ -303,7 +303,7 @@ class RHWebcastMoveChannelDown( RHWebcastBase ):
         self._redirect(urlHandlers.UHWebcastSetup.getURL())
         
 class RHWebcastSaveWebcastServiceURL( RHWebcastBase ):
-    _uh = urlHandlers.UHWebcastMoveChannelDown
+    _uh = urlHandlers.UHWebcastSetup
     
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
@@ -313,6 +313,31 @@ class RHWebcastSaveWebcastServiceURL( RHWebcastBase ):
     def _process( self ):
         self._wm.setWebcastServiceURL(self._webcastServiceURL)
         self._redirect(urlHandlers.UHWebcastSetup.getURL())
+        
+        
+class RHWebcastSaveWebcastSynchronizationURL( RHWebcastBase ):
+    _uh = urlHandlers.UHWebcastSetup
+    
+    def _checkParams( self, params ):
+        admins.RHAdminBase._checkParams( self, params )
+        self._webcastSynchronizationURL = params.get('webcastSynchronizationURL', '')
+        self._params = params
+    
+    def _process( self ):
+        self._wm.setWebcastSynchronizationURL(self._webcastSynchronizationURL)
+        self._redirect(urlHandlers.UHWebcastSetup.getURL())
+        
+        
+class RHWebcastManuelSynchronizationURL( RHWebcastBase ):
+    _uh = urlHandlers.UHWebcastSetup
+        
+    def _process( self ):
+        answer = self._wm.remoteSynchronize(raiseExceptionOnSyncFail = True)
+        if answer:
+            return "Answer obtained by Indico:" + answer
+        else:
+            self._redirect(urlHandlers.UHWebcastSetup.getURL())
+
         
 class RHWebcastAddStream( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastAddStream

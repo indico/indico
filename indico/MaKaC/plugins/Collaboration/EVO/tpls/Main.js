@@ -15,6 +15,13 @@
     
     checkParams: function() {
         return {
+            'communityId': ['text', false, function(option, values){
+                var errors = [];
+                if (option == 'chooseOne') {
+                    errors.push($T("Please choose a community."));
+                }
+                return errors;
+            }],
             'meetingTitle' : ['text', false],
             'meetingDescription' : ['text', false],
             

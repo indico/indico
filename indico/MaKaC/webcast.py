@@ -21,7 +21,11 @@
 
 from persistent import Persistent
 from MaKaC.common.db import DBMgr
-from MaKaC.conference import ConferenceHolder
+from MaKaC.common.logger import Logger
+from MaKaC.common.httpTimeout import urlOpenWithTimeout
+from MaKaC.errors import MaKaCError
+from urllib2 import HTTPError, URLError
+from BaseHTTPServer import BaseHTTPRequestHandler
 
 class WebcastManager(Persistent):
     """Holds and manages general information about webcasts in the system
@@ -29,11 +33,12 @@ class WebcastManager(Persistent):
 
     def __init__(self):
         self.channels = []
-        self._requested_webcasts = []
+#        self._requested_webcasts = []
         self._archived_webcasts = []
         self._forthcoming_webcasts = []
         self._managers = []
         self._webcastServiceURL = '' #used for forthcoming webcast display
+        self._webcastSynchronizationURL = '' #used for automatic synchronization
         
     def getManagers( self ):
         try:
@@ -67,41 +72,42 @@ class WebcastManager(Persistent):
                 return ch
         return None
 
-    def addRequestedWebcast(self, event ):
-        if not self.getRequestedWebcast(event):
-            if event:
-                wc = Webcast(event)
-                self._requested_webcasts.append(wc)
-                self._p_changed=1
-    
-    def getRequestedWebcast(self, event):
-        for wc in self._requested_webcasts:
-            if wc.getEvent() == event:
-                return wc
-        return None
-
-    def getRequestedWebcasts(self):
-        return self._requested_webcasts
-    
-    def acceptRequestedWebcast(self, webcast):
-        for wc in self._requested_webcasts:
-            if wc == webcast:
-                self._requested_webcasts.remove(webcast)
-                if not self.getForthcomingWebcast(webcast.getEvent()):
-                    self._forthcoming_webcasts.append(webcast)
-                self._p_changed=1
-
-    def deleteRequestedWebcast(self, webcast):
-        for wc in self._requested_webcasts:
-            if wc == webcast:
-                self._requested_webcasts.remove(webcast)
-                self._p_changed=1
+#    def addRequestedWebcast(self, event ):
+#        if not self.getRequestedWebcast(event):
+#            if event:
+#                wc = Webcast(event)
+#                self._requested_webcasts.append(wc)
+#                self._p_changed=1
+#    
+#    def getRequestedWebcast(self, event):
+#        for wc in self._requested_webcasts:
+#            if wc.getEvent() == event:
+#                return wc
+#        return None
+#
+#    def getRequestedWebcasts(self):
+#        return self._requested_webcasts
+#    
+#    def acceptRequestedWebcast(self, webcast):
+#        for wc in self._requested_webcasts:
+#            if wc == webcast:
+#                self._requested_webcasts.remove(webcast)
+#                if not self.getForthcomingWebcast(webcast.getEvent()):
+#                    self._forthcoming_webcasts.append(webcast)
+#                self._p_changed=1
+#
+#    def deleteRequestedWebcast(self, webcast):
+#        for wc in self._requested_webcasts:
+#            if wc == webcast:
+#                self._requested_webcasts.remove(webcast)
+#                self._p_changed=1
                     
-    def addForthcomingWebcast( self, event ):
+    def addForthcomingWebcast( self, event):
         if not self.getForthcomingWebcast(event):
             if event:
                 wc = Webcast(event)
                 self._forthcoming_webcasts.append(wc)
+                self.remoteSynchronize()
                 self._p_changed=1
             
     def getForthcomingWebcast(self, event):
@@ -128,6 +134,7 @@ class WebcastManager(Persistent):
                 self._forthcoming_webcasts.remove(webcast)
                 if not self.getArchivedWebcast(webcast.getEvent()):
                     self._archived_webcasts.append(webcast)
+                self.remoteSynchronize()
                 self._p_changed=1
 
     def archiveForthcomingWebcastById(self, id):
@@ -136,6 +143,7 @@ class WebcastManager(Persistent):
                 self._forthcoming_webcasts.remove(wc)
                 if not self.getArchivedWebcast(wc.getEvent()):
                     self._archived_webcasts.append(wc)
+                self.remoteSynchronize()
                 self._p_changed=1
        
     def unArchiveWebcastById(self, id):
@@ -144,12 +152,14 @@ class WebcastManager(Persistent):
                 self._archived_webcasts.remove(wc)
                 if not self.getForthcomingWebcast(wc.getEvent()):
                     self._forthcoming_webcasts.append(wc)
+                self.remoteSynchronize()
                 self._p_changed=1
                 
     def deleteForthcomingWebcast(self, webcast):
         for wc in self._forthcoming_webcasts:
             if wc == webcast:
                 self._forthcoming_webcasts.remove(webcast)
+                self.remoteSynchronize()
                 self._p_changed=1
                 return True
         return False
@@ -158,6 +168,7 @@ class WebcastManager(Persistent):
         for wc in self._forthcoming_webcasts:
             if wc.getId() == id:
                 self._forthcoming_webcasts.remove(wc)
+                self.remoteSynchronize()
                 self._p_changed=1
                 return True
         return False
@@ -167,6 +178,7 @@ class WebcastManager(Persistent):
             if event:
                 wc = Webcast(event)
                 self._archived_webcasts.append(wc)
+                self.remoteSynchronize()
                 self._p_changed=1
             
     def getArchivedWebcast(self, event):
@@ -198,6 +210,7 @@ class WebcastManager(Persistent):
         ch = self.getChannel(chname)
         if ch:
             ch.setOnAir(webcast)
+            self.remoteSynchronize()
 
     def whatsOnAir( self ):
         onair = []
@@ -217,6 +230,7 @@ class WebcastManager(Persistent):
         ch = self.getChannel(chname)
         if ch:
             ch.setOnAir(None)
+            self.remoteSynchronize()
             
     def addChannel(self, name, url, width=480, height=360):
         if name != "" and not self.getChannel(name):
@@ -235,6 +249,7 @@ class WebcastManager(Persistent):
             if ch.getName() == name:
                 ch.switchOnAir()
                 self._p_changed=1
+                self.remoteSynchronize()
 
     def moveChannelUp(self, nb):
         if len(self.channels) <= 1 or len(self.channels) < nb:
@@ -270,6 +285,75 @@ class WebcastManager(Persistent):
         """ Sets the Webcast Service URL ( a string ).
         """
         self._webcastServiceURL = url
+        
+    def getWebcastSynchronizationURL(self):
+        """ Returns the Webcast Synchronization URL ( a string ).
+            It will be used to automatically synchronize every time a 'live channel' is modified
+            or an event is added / removed from forthcoming webcasts
+        """
+        if not hasattr(self, "_webcastSynchronizationURL"):
+            self._webcastSynchronizationURL = ''
+        return self._webcastSynchronizationURL
+    
+    def setWebcastSynchronizationURL(self, url):
+        """ Sets the Webcast Synchronization URL ( a string ).
+        """
+        self._webcastSynchronizationURL = url
+        
+    def remoteSynchronize(self, raiseExceptionOnSyncFail = False):
+        """ Calls the webcast synchronization URL
+            raiseExceptionOnSyncFail: if True (default), we will raise a MaKaCError if calling the webcast
+            synchronization URL had a problem
+        """
+        url = str(self.getWebcastSynchronizationURL()).strip()
+        if url:
+            
+            try:
+                Logger.get('webcast').info("Calling the webcast synchronization URL: " + url)
+                answer = urlOpenWithTimeout(url , 10).read(100000).strip()
+                Logger.get('webcast').info("Got answer: " + answer)
+                return answer
+                
+            except HTTPError, e:
+                code = e.code
+                shortMessage = BaseHTTPRequestHandler.responses[code][0]
+                longMessage = BaseHTTPRequestHandler.responses[code][1]
+                
+                Logger.get('webcast').error("""Calling the webcast synchronization URL: [%s] triggered HTTPError: %s (code = %s, shortMessage = '%s', longMessage = '%s'""" % (str(url), str(e), code, shortMessage, longMessage))
+                
+                if raiseExceptionOnSyncFail:
+                    if str(code) == '404':
+                        raise MaKaCError('Could not find the server at ' + str(url) + "(HTTP error 404)", 'webcast')
+                    elif str(code) == '500':
+                        raise MaKaCError("The server at" + str(url) + " has an internal problem (HTTP error 500)", 'webcast')
+                    else:
+                        raise MaKaCError("Problem contacting the webcast synchronization server. Reason: HTTPError: %s (code = %s, shortMessage = '%s', longMessage = '%s', url = '%s'""" % (str(e), code, shortMessage, longMessage, str(url)), 'webcast')
+                
+            except URLError, e:
+                Logger.get('webcast').error("""Calling the webcast synchronization URL: [%s] triggered exception: %s""" % (str(url), str(e)))
+                if raiseExceptionOnSyncFail:
+                    if str(e.reason).strip() == 'timed out':
+                        raise MaKaCError("The webcast synchronization URL is not responding", 'webcast')
+                    raise MaKaCError("""URLError when contacting the webcast synchronization URL: [%s]. Reason=[%s]"""%(str(url), str(e.reason)), 'webcast')
+                
+            except ValueError, e:
+                Logger.get('webcast').error("""Calling the webcast synchronization URL: [%s] triggered ValueError: %s""" % (str(url), str(e)))
+                if raiseExceptionOnSyncFail:
+                    if str(e.args[0]).strip().startswith("unknown url type"):
+                        raise MaKaCError("The webcast synchronization is not of a correct type. Perhaps you forgot the http:// ?", 'webcast')
+                    raise MaKaCError("""Calling the webcast synchronization URL: [%s] triggered ValueError: %s""" % (str(url), str(e)), 'webcast')
+                
+            except Exception, e:
+                Logger.get('webcast').error("""Calling the webcast synchronization URL: [%s] triggered Exception: %s""" % (str(url), str(e)))
+                if raiseExceptionOnSyncFail:
+                    raise e
+        
+        
+        else:
+            Logger.get('webcast').info("Webcast synchronization URL empty. We do not synchronize")
+            return None
+        
+        
     
 class HelperWebcastManager:
     """Helper class used for getting and instance of WebcastManager
@@ -283,7 +367,7 @@ class HelperWebcastManager:
         root = dbmgr.getDBConnection().root()        
         try:
             wm = root["WebcastManager"]
-        except KeyError, e:
+        except KeyError:
             wm = WebcastManager()
             root["WebcastManager"] = wm
         return wm

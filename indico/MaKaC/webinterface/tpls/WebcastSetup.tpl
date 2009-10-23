@@ -28,14 +28,15 @@
       </td>
     </tr>
     </table>
-    <br />
+    
+    <br /><br />
     
     <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
     <tr>
       <td class="groupTitle">Webcast Service URL</td>
     </tr>
     <tr>
-      <td bgcolor="white" width="100%%" valign="top" class="blacktext">
+      <td bgcolor="white" width="100%%" valign="top" class="blacktext" style="padding-top: 10px;">
         <form action="%(saveWebcastServiceURL)s" method="POST">
           <input name="webcastServiceURL" value="%(webcastServiceURL)s"/>
           <input type="submit" name="submit" value="Save">
@@ -44,7 +45,42 @@
       </td>
     </tr>
     </table>
-    <br />
+    
+    <br /><br />
+    
+    <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
+    <tr>
+      <td class="groupTitle">Webcast Synchronization</td>
+    </tr>
+    <tr>
+      <td bgcolor="white" width="100%%" valign="top" class="blacktext" style="padding-top: 10px;">
+        <form action="%(saveWebcastSynchronizationURL)s" method="POST">
+          <span>Synchronization URL: </span>
+          <input name="webcastSynchronizationURL" size="50" value="%(webcastSynchronizationURL)s"/>
+          <input type="submit" name="submit" value="Save">
+        </form>
+        <div style="padding-top: 10px;padding-bottom: 10px;">
+          Used to automatically synchronize every time:
+          <ul style="padding:0;margin:0;margin-left: 50px;">
+              <li>
+                  Something in the "Live channels" section is changed.
+              </li>
+              <li>
+                  An event is added or removed from "Forthcoming webcasts"
+              </li>
+          </ul>
+          Leave empty for no automatic synchronization.
+        </div>
+        <form action="%(webcastManualSynchronize)s" method="POST">
+            <input type="submit" name="submit" value="Synchronize manually">
+            <span>Remember to save the URL first if you have modified it.</span>
+        </form>
+      </td>
+    </tr>
+    </table>
+    
+    <br /><br />
+    
     <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
     <tr>
       <td class="groupTitle">Webcast Administrators list</td>

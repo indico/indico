@@ -726,6 +726,11 @@ class WWebcastSetup( wcomponents.WTemplated ):
         vars["saveWebcastServiceURL"] = urlHandlers.UHWebcastSaveWebcastServiceURL.getURL()
         vars["webcastServiceURL"] = wm.getWebcastServiceURL()
         
+        vars["saveWebcastSynchronizationURL"] = urlHandlers.UHWebcastSaveWebcastSynchronizationURL.getURL()
+        vars["webcastSynchronizationURL"] = wm.getWebcastSynchronizationURL()
+        
+        vars["webcastManualSynchronize"] = urlHandlers.UHWebcastManualSynchronization.getURL()
+        
         return vars
     
 class WPWebcastSelectManager( WPWebcastSetup ):

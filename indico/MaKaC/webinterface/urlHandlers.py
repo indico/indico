@@ -3358,6 +3358,12 @@ class UHWebcastMoveChannelDown( URLHandler ):
 class UHWebcastSaveWebcastServiceURL( URLHandler ):
     _relativeURL = "adminServices.py/webcastSaveWebcastServiceURL"
     
+class UHWebcastSaveWebcastSynchronizationURL( URLHandler ):
+    _relativeURL = "adminServices.py/webcastSaveWebcastSynchronizationURL"
+    
+class UHWebcastManualSynchronization( URLHandler ):
+    _relativeURL = "adminServices.py/webcastManualSynchronization"
+    
 class UHWebcastAddStream( URLHandler ):
     _relativeURL = "adminServices.py/webcastAddStream"
 
