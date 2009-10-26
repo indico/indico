@@ -11,7 +11,9 @@
 <script type="text/javascript">
 var ttdata = <%= str(ttdata).replace('%','%%') %>;
 var eventInfo = <%= eventInfo %>;
-var timetable = new TimeTableManagement(ttdata, eventInfo, 900,$E('timetableDiv'), false, true);
+
+var historyBroker = new BrowserHistoryBroker();
+var timetable = new SessionManagementTimeTable(ttdata, eventInfo, 900,$E('timetableDiv'),historyBroker);
 
 IndicoUI.executeOnLoad(function(){
 

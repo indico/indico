@@ -359,8 +359,8 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
                                                                  this.eventInfo,
                                                                  this.width,
                                                                  this.canvas,
-                                                                 'contribution',
-                                                                 false);
+                                                                 'contribution');
+
         this.intervalTimeTable.setData(intervalInfo);
         this.canvas.set(this.intervalTimeTable.draw());
         this.menu.dom.style.display = 'none';
@@ -498,7 +498,7 @@ type("IntervalTimeTableMixin", [], {
 
 
 },
-     function(parent, width, wrappingElement, isSessionTimetable, managementActions) {
+     function(parent, width, wrappingElement, managementActions) {
 
          this.managementActions = managementActions;
          this.parentTimetable = parent;
@@ -509,8 +509,6 @@ type("IntervalTimeTableMixin", [], {
                                                             this.loadingIndicator,
                                                             !!managementActions,
                                                             managementActions);
-
-         this.isSessionTimetable = any(isSessionTimetable, false);
      });
 
 
@@ -682,12 +680,13 @@ type("ManagementTimeTable",["TimeTable"], {
         };
         this.rescheduleLink.dom.onmouseover = underConstr;
 
-        // JUST FOR IntervalTimetable
+        // JUST FOR SessionManagementTimetable
         this.addIntervalLink = Html.span('fakeLink', 'Add new interval');
 
-        if (self.IntervalTimeTableMixin) {
+
+        if (self.isSessionTimetable) {
             this.addIntervalLink.observeClick(function() {
-                self.addSessionSlot(self.eventInfo.timetableSession);
+                self.managementActions.addSessionSlot(self.eventInfo.timetableSession);
             });
         }
 
@@ -703,7 +702,7 @@ type("ManagementTimeTable",["TimeTable"], {
         return Html.div({}, this.warningArea, Html.div('clearfix', this.menu, this.infoBox));
     }
 },
-     function(data, contextInfo, eventInfo, width, wrappingElement, detailLevel, isSessionTimeTable) {
+     function(data, contextInfo, eventInfo, width, wrappingElement, detailLevel) {
          this.eventInfo = eventInfo;
          this.contextInfo = contextInfo;
          this.warnings = new WatchList();
@@ -852,12 +851,13 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
     }
 
 },
-     function(data, eventInfo, width, wrappingElement, detailLevel, historyBroker) {
+     function(data, eventInfo, width, wrappingElement, detailLevel, historyBroker, isSessionTimetable) {
+
+         this.isSessionTimetable = isSessionTimetable;
 
          this.ManagementTimeTable(data, eventInfo, eventInfo, width, wrappingElement, detailLevel);
-         var managementActions = new TopLevelTimeTableManagementActions(this, eventInfo, eventInfo, false);
+         var managementActions = new TopLevelTimeTableManagementActions(this, eventInfo, eventInfo, isSessionTimetable);
          this.TopLevelTimeTableMixin(data, width, wrappingElement, detailLevel, managementActions, historyBroker);
-
 
          this.postDraw = TopLevelTimeTableMixin.prototype.postDraw;
 
@@ -956,11 +956,11 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
     }
 
 },
-     function(parent, data, contextInfo, eventInfo, width, wrappingElement, detailLevel, isSessionTimeTable) {
+     function(parent, data, contextInfo, eventInfo, width, wrappingElement, detailLevel) {
 
          this.ManagementTimeTable(data, contextInfo, eventInfo, width, wrappingElement, detailLevel);
-         var managementActions = new IntervalTimeTableManagementActions(this, eventInfo, contextInfo, isSessionTimeTable);
-         this.IntervalTimeTableMixin(parent, width, wrappingElement, isSessionTimeTable, managementActions);
+         var managementActions = new IntervalTimeTableManagementActions(this, eventInfo, contextInfo, false);
+         this.IntervalTimeTableMixin(parent, width, wrappingElement, managementActions);
 
          this.canvas = Html.div({});
 
@@ -970,3 +970,10 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
 
      });
 
+type("SessionManagementTimeTable", ["TopLevelManagementTimeTable"], {
+
+},
+     function(data, eventInfo, width, wrappingElement, historyBroker) {
+
+         this.TopLevelManagementTimeTable(data, eventInfo, width, wrappingElement, 'session', historyBroker, true);
+     });

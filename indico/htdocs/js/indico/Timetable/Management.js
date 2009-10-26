@@ -190,6 +190,7 @@ type("TimetableManagementActions", [], {
     },
 
     _allowCreateHere: function(elementType) {
+
         switch(elementType) {
         case 'Session':
             return (this.session === null);
