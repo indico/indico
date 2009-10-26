@@ -10,7 +10,7 @@ import MaKaC.webinterface.displayMgr as displayMgr
 
 from MaKaC.common.Configuration import Config
 from MaKaC.common import filters
-from MaKaC.common.utils import validMail 
+from MaKaC.common.utils import validMail
 from MaKaC.common.PickleJar import DictPickler
 from MaKaC.common import indexes, info
 
@@ -276,31 +276,31 @@ class ConferenceDateTimeStartModification( ConferenceDateTimeModificationBase ):
         For this, it will check the 'dateChangeNotificationProblems' context variable.
     """
     def _setParam(self):
-        
+
         ContextManager.set('dateChangeNotificationProblems', {})
-        
+
         if (self._pTime > self._target.getEndDate()):
             raise ServiceError("ERR-E3",
                                "Date/time of start cannot "+
                                "be greater than date/time of end")
 
-        self._target.setDates(self._pTime, self._target.getEndDate(), moveEntries=0)
-        
+        self._target.setDates(self._pTime, self._target.getEndDate(), moveEntries=1)
+
         dateChangeNotificationProblems = ContextManager.get('dateChangeNotificationProblems')
-        
+
         if dateChangeNotificationProblems:
-            
+
             warningContent = []
             for problemGroup in dateChangeNotificationProblems.itervalues():
                 warningContent.extend(problemGroup)
-            
+
             return Warning(_('Warning'), [_('The start date of your event was changed correctly.'),
                                           _('However, there were the following problems:'),
                                           warningContent])
-            
+
         else:
             return None
-        
+
     def _handleGet(self):
         return datetime.datetime.strftime(self._target.getAdjustedStartDate(),
                                           '%d/%m/%Y %H:%M')
@@ -333,30 +333,30 @@ class ConferenceDateTimeEndModification( ConferenceDateTimeModificationBase ):
         (Ex: a videoconference booking could not be moved in time according with the conference's time change)
     """
     def _setParam(self):
-        
+
         ContextManager.set('dateChangeNotificationProblems', {})
-        
+
         if (self._pTime < self._target.getStartDate()):
             raise ServiceError("ERR-E3",
                                "Date/time of end cannot "+
-                               "be lower than data/time of start")        
+                               "be lower than data/time of start")
         self._target.setDates(self._target.getStartDate(),
                               self._pTime.astimezone(timezone("UTC")),
                               moveEntries=0)
-                              
+
         dateChangeNotificationProblems = ContextManager.get('dateChangeNotificationProblems')
-    
+
         if dateChangeNotificationProblems:
             warningContent = []
             for problemGroup in dateChangeNotificationProblems.itervalues():
                 warningContent.extend(problemGroup)
-            
+
             return Warning(_('Warning'), [_('The end date of your event was changed correctly.'),
                                           _('However, there were the following problems:'),
                                           warningContent])
         else:
             return None
-        
+
 
     def _handleGet(self):
         return datetime.datetime.strftime(self._target.getAdjustedEndDate(),
