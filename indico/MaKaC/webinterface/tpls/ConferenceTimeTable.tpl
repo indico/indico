@@ -12,7 +12,9 @@
 IndicoUI.executeOnLoad(function(){
   var ttdata = <%= str(ttdata).replace('%','%%') %>;
 
-  var timetable = new TopLevelDisplayTimeTable(ttdata,710,$E('timetable'), 'session');
+  var historyBroker = new BrowserHistoryBroker();
+
+  var timetable = new TopLevelDisplayTimeTable(ttdata,710,$E('timetable'), 'session', historyBroker);
   $E('timetable').set(timetable.draw());
   timetable.postDraw();
 

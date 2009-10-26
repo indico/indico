@@ -9,6 +9,7 @@
         <link rel="stylesheet" type="text/css" href="<%= baseurl %>/css/calendar-blue.css" >
 
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
         <script type="text/javascript">
                 var TextRoot = "<%= baseurl %>/js/indico/i18n/";

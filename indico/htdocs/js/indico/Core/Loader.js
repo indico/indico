@@ -2,6 +2,7 @@ include(ScriptRoot + "indico/Core/Components.js");
 include(ScriptRoot + "indico/Core/Data.js");
 
 include(ScriptRoot + "indico/Core/Presentation.js");
+include(ScriptRoot + "indico/Core/Browser.js");
 include(ScriptRoot + "indico/Core/Services.js");
 include(ScriptRoot + "indico/Core/Auxiliar.js");
 include(ScriptRoot + "indico/Core/Effects.js");

@@ -743,3 +743,24 @@ type("PopupWidget", [], {
         this.canvas = Html.div();
     }
 );
+
+type("HistoryListener", [],
+     {
+         _addToHistory: function(hash) {
+             // Add hash to history
+             if (this.historyBroker) {
+                 this.historyBroker.setUserAction(hash);
+             }
+         },
+
+         registerHistoryBroker: function(broker) {
+             this.historyBroker = broker;
+         },
+
+         notifyHistoryChange: function(hash) {
+             this._retrieveHistoryState(hash);
+         }
+     },
+     function() {
+
+     });

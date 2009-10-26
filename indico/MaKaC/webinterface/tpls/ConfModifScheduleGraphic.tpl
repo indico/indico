@@ -13,10 +13,11 @@
 <script type="text/javascript">
 var ttdata = <%= str(ttdata).replace('%','%%') %>;
 var eventInfo = <%= eventInfo %>;
-var timetable = new TopLevelManagementTimeTable(ttdata, eventInfo, 900,$E('timetableDiv'), false);
+
+var historyBroker = new BrowserHistoryBroker();
+var timetable = new TopLevelManagementTimeTable(ttdata, eventInfo, 900,$E('timetableDiv'), false, historyBroker);
 
 IndicoUI.executeOnLoad(function(){
-
 
   $E('timetableDiv').set(timetable.draw());
   timetable.postDraw();

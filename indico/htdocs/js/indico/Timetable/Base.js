@@ -35,7 +35,7 @@ var TimetableDefaults = {
 };
 
 
-type("TimeTable", [], {
+type("TimeTable", ["HistoryListener"], {
 
     /*
      * Translates the keys used in the data dictionary into titles
@@ -280,6 +280,7 @@ type("DisplayTimeTable", ["TimeTable"], {
 type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
 
     draw: function() {
+
         return this.LookupTabWidget.prototype.draw.call(this);
     },
 
@@ -310,8 +311,8 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
 
     },
 
-    _followArgs_interval: function(data) {
-        var m = document.location.hash.match(/#(\d{8})(?:\.(s\d+l\d+))?/);
+    _followArgs_interval: function(hash, data) {
+        var m = hash.match(/#(\d{8})(?:\.(s\d+l\d+))?/);
 
         if (m) {
 
@@ -319,12 +320,15 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
 
             if (m[2]) {
                 this.switchToInterval(m[2]);
+                return true;
             }
         }
+
+        return false;
     },
 
-    _followArgs_day: function(data) {
-        var m = document.location.hash.match(/#(\d{8})(?:\.(s\d+l\d+))?/);
+    _followArgs_day: function(hash,data) {
+        var m = hash.match(/#(\d{8}|all)(?:\.(s\d+l\d+))?/);
 
         if (m) {
 
@@ -378,13 +382,15 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
     }
 
 },
-     function(data, width, wrappingElement, detailLevel, managementActions) {
+     function(data, width, wrappingElement, detailLevel, managementActions, historyBroker) {
 
          var self = this;
 
          this.managementActions = managementActions;
 
          this.canvas = Html.div({});
+
+         historyBroker.addListener(this);
 
          this.timetableDrawer = new TimetableDrawer(data, width,
                                                     wrappingElement,
@@ -402,7 +408,7 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
          var todayStr = IndicoUtil.formatDate2(today);
 
          // parse "command line" arguments
-         var initialTab = this._followArgs_day(data);
+         var initialTab = this._followArgs_day(window.location.hash, data);
 
          // if nothing is found
          if (initialTab == -1) {
@@ -419,13 +425,13 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
              initialTab = 0;
          }
 
-
          this.LookupTabWidget( translate(sortedKeys, function(key) {
              return [key, function() {
                  self.currentDay = key;
                  // each time one tab is clicked,
                  // drawDay is called over a different day
                  if (key == 'all') {
+                     self._addToHistory('all');
                      return self._draw(self.timetableDrawer.drawAllDays());
                  } else {
 
@@ -436,12 +442,13 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
                          throw "stopDrawing";
                      }
 
+                     self._addToHistory(key);
                      return self._draw(self.timetableDrawer.drawDay(key));
                  }
              }];
          }), this.width, 100, initialTab, this._functionButtons(), this.canvas);
 
-         this._followArgs_interval();
+         this._followArgs_interval(window.location.hash, data);
 
      });
 
@@ -449,6 +456,9 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
 type("IntervalTimeTableMixin", [], {
 
     draw: function() {
+        // Add hash to history
+        this.parentTimetable._addToHistory(this.currentDay + '.' + this.contextInfo.id);
+
         return this._draw(this.timetableDrawer.drawDay(this.currentDay));
     },
 
@@ -706,11 +716,17 @@ type("ManagementTimeTable",["TimeTable"], {
 
 type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"], {
 
+    _retrieveHistoryState: function(hash) {
+        this._followArgs_day(hash, this.data);
+        this.setSelectedTab(this.currentDay);
+    }
+
+
 },
-     function(data, width, wrappingElement, detailLevel) {
+     function(data, width, wrappingElement, detailLevel, historyBroker) {
 
          this.DisplayTimeTable(data, width, wrappingElement, detailLevel);
-         this.TopLevelTimeTableMixin(data, width, wrappingElement, detailLevel);
+         this.TopLevelTimeTableMixin(data, width, wrappingElement, detailLevel, null, historyBroker);
 
          this._filterSetup();
 
@@ -825,14 +841,22 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
         }
 
         return '';
+    },
+
+    _retrieveHistoryState: function(hash) {
+        this._followArgs_day(hash, this.data);
+        if (!this._followArgs_interval(hash, this.data)) {
+            this.switchToTopLevel();
+            this.setSelectedTab(this.currentDay);
+        }
     }
 
 },
-     function(data, eventInfo, width, wrappingElement, detailLevel) {
+     function(data, eventInfo, width, wrappingElement, detailLevel, historyBroker) {
 
          this.ManagementTimeTable(data, eventInfo, eventInfo, width, wrappingElement, detailLevel);
          var managementActions = new TopLevelTimeTableManagementActions(this, eventInfo, eventInfo, false);
-         this.TopLevelTimeTableMixin(data, width, wrappingElement, detailLevel, managementActions);
+         this.TopLevelTimeTableMixin(data, width, wrappingElement, detailLevel, managementActions, historyBroker);
 
 
          this.postDraw = TopLevelTimeTableMixin.prototype.postDraw;
