@@ -43,6 +43,7 @@ type("TimetableManagementActions", [], {
     deleteEntry: function(eventData) {
         var self = this;
 
+
         if (!confirm("Are you sure you want to delete this timetable entry?"))
         {
             return;
@@ -75,10 +76,21 @@ type("TimetableManagementActions", [], {
             if (error) {
                 IndicoUtil.errorReport(error);
             }else {
+
                 var data = self.timetable.getData();
                 var day = IndicoUtil.formatDate2(IndicoUtil.parseJsonDate(eventData.startDate));
-                delete data[day][eventData.id];
-                self.timetable.setData(data, self.session);
+
+                if (self.session) {
+                    delete data[eventData.id];
+                } else {
+                    delete data[day][eventData.id];
+                }
+
+                if (self.session) {
+                    self.timetable.setData(self.session);
+                } else {
+                    self.timetable.setData(data);
+                }
 
                 if (type == 'Session') {
                     // Delete the session from the eventInfo session list
