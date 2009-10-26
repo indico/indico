@@ -41,7 +41,7 @@ type("ChainedPopupWidget", ["PopupWidget"],
                          }
                      });
                  }
-             }
+             };
 
              IndicoUtil.onclickHandlerAdd(this.handler);
          },
@@ -83,7 +83,7 @@ type("PopupMenu", ["ChainedPopupWidget"],
             var self = this;
             var value = pair.get();
             var link = Html.a('fakeLink', pair.key);
-            
+
             if(typeof value == "string" ) {
                 link.setAttribute('href', value);
                 if (self.closeOnClick) {
@@ -113,7 +113,7 @@ type("PopupMenu", ["ChainedPopupWidget"],
                                       });
 
                                       IndicoUtil.onclickHandlerRemove(self.handler);
-                                      var target = pair.get()
+                                      var target = pair.get();
                                       target.open(pos.x + (target.alignRight ? 0 : link.dom.offsetWidth), pos.y - 1);
 
                                       return false;
@@ -163,18 +163,18 @@ type("SectionPopupMenu", ["PopupMenu"], {
             var self = this;
 
             var sectionContent = Html.ul(self.cssClass);
-            
+
             each(this.items, function(item, key) {
                 var section = null;
-                if (key != ""){
+                if (key !== ""){
                     section = Html.li('section', Html.div('line', Html.div('name', key)));
                 }
-                
+
                 // add the menu items
                 var tmp = $B(Html.ul('subPopupList'), item, self._processItem);
                 sectionContent.append(Html.li({}, section, tmp));
             });
-            
+
             return this.PopupWidget.prototype.draw.call(this, sectionContent, x, y);
         }
         },
@@ -191,20 +191,20 @@ type("SectionPopupMenu", ["PopupMenu"], {
 /* For add Session menu popup, we add some colored squares for each session */
 type("SessionSectionPopupMenu", ["SectionPopupMenu"], {
     _processItem: function(pair) {
-    
+
     var self = this;
     var value = pair.get();
     var color = null;
-    if(value.color != null){
+    if(value.color !== null){
         color = value.color;
         value = value.func;
     }
-    
+
     var colorSquare = null;
-    if(color != null){
-        var colorSquare = Html.div({style:{backgroundColor: color, color: color, cssFloat: 'right', width: '15px', height:'15px'}});
+    if(color !== null){
+        colorSquare = Html.div({style:{backgroundColor: color, color: color, cssFloat: 'right', width: '15px', height:'15px'}});
     }
-    
+
     //truncate titles which are too long
     function truncate(title){
         if(title.length > 25){
@@ -213,10 +213,10 @@ type("SessionSectionPopupMenu", ["SectionPopupMenu"], {
         return title;
         }
     }
-    
+
     var link = Html.a({className:'fakeLink', style:{display: 'inline', padding: 0, paddingLeft: '4px', paddingRight: '4px'}}, truncate(pair.key));
     var divInput = Html.div({style:{height:'20px', overflow:'auto'}}, colorSquare, link);
-    
+
     if(typeof value == "string" ) {
         link.setAttribute('href', value);
         if (self.closeOnClick) {
@@ -334,39 +334,47 @@ type("CheckPopupWidget", ["ChainedPopupWidget"],
              // purposes
              this.checkboxes = {};
 
+             var content = null;
+
              if (this.options.isEmpty() && this.noOptionsMessage) {
-                 var content = Html.ul({className: "popupList",
+                 content = Html.ul({className: "popupList",
                      style: {maxHeight: pixels(maxHeight), fontStyle: 'italic', color: '#444444', padding: pixels(5)}},
                      this.noOptionsMessage);
                  return this.PopupWidget.prototype.draw.call(this, content, x, y, styles);
              }
-             var content = $B(Html.ul({
+             content = $B(Html.ul({
                  className: "popupList popupListCheckboxes",
                  style: {maxHeight: pixels(maxHeight), overflowY: 'auto', overflowX: 'hidden', padding: pixels(2)}
              }),
                               this.options,
                               function(pair) {
                                   var optionCheck = Html.checkbox({});
-				  				  optionCheck.dom.name = optionsId;
+                                                                  optionCheck.dom.name = optionsId;
 
-				  				  optionCheck.observeClick(function(e) {
-				  				      // Make sure the onclick event is not captured by
-				  				      // parent elements as this would undo the click on the
-				  				      // checkbox.
-				  				      if (!e) var e = window.event;
-				  				      e.cancelBubble = true
-				  				      if (e.stopPropagation) e.stopPropagation();
-			  				      });
+                                                                  optionCheck.observeClick(function(e) {
+                                                                      // Make sure the onclick event is not captured by
+                                                                      // parent elements as this would undo the click on the
+                                                                      // checkbox.
+                                                                      if (!e) {
+                                                                          e = window.event;
+                                                                      }
+                                                                      e.cancelBubble = true;
+                                                                      if (e.stopPropagation){
+                                                                          e.stopPropagation();
+                                                                      }
+                                                              });
 
                                   self.checkboxes[pair.key] = optionCheck;
                                   $B(optionCheck, self.object.accessor(pair.key));
 
                                   var color = self.colors.get(pair.key);
-                                  if (!color)
+                                  if (!color){
                                       color = 'transparent';
+                                  }
                                   var textColor = self.textColors.get(pair.key);
-                                  if (!textColor)
+                                  if (!textColor){
                                       textColor = 'black';
+                                  }
 
                                   //var span = Html.div({className: 'item', style: {cursor: 'pointer'}}, )
                                   var span = Html.span('wrapper', pair.get());
@@ -446,8 +454,9 @@ type("ColorPicker", ["WatchValue", "ChainedPopupWidget"], {
             }
         };
         var updateColorInput = function(color, inputElement, previewBlock) {
-            if (!color)
+            if (!color){
                 return;
+            }
 
             previewBlock.dom.style.backgroundColor = color;
             inputElement.set(color.substr(1, color.length-1));
@@ -466,13 +475,13 @@ type("ColorPicker", ["WatchValue", "ChainedPopupWidget"], {
             updateColorInput(self.get()[colorType], input, preview);
 
             return Html.div('inputWrapper', preview, Html.div('inputContainer clearfix', Html.div('numberSign', '#'), input));
-        }
+        };
 
         var tbody = Html.tbody({});
         var tr;
         var i = 0;
         each(self.defaultColors, function(c) {
-            if (i++ % 5 == 0) {
+            if (i++ % 5 === 0) {
                 tr = Html.tr();
                 tbody.append(tr);
             }
@@ -493,12 +502,14 @@ type("ColorPicker", ["WatchValue", "ChainedPopupWidget"], {
 
         // Close the color picker if user presses Esc button
         div.observeEvent('keyup', function(e) {
-            if (e.keyCode == 27)
+            if (e.keyCode == 27){
                 self.close();
+            }
         });
 
         div.append(Html.table({}, tbody));
-        var tbody = Html.tbody({});
+
+        tbody = Html.tbody({});
         var customTable = Html.table({className: 'custom', cellspacing: '0', cellpadding: '0', border: '0'}, tbody);
 
         tbody.append(Html.tr({}, Html.td({}, 'Block'), Html.td({}, createColorInput('bgColor'))));
@@ -540,14 +551,14 @@ type("ColorPicker", ["WatchValue", "ChainedPopupWidget"], {
     getLink: function(onclick, text) {
         var self = this;
 
-        var text = any(text, $T('Color'));
-        var onclick = any(onclick, function () { return true; });
+        text = any(text, $T('Color'));
+        onclick = any(onclick, function () { return true; });
 
         this.link = Html.span('colorPickerLink', Html.span({},text));
 
         this._updateLink(this.get());
 
-        this.observe(function(colors) { self._updateLink(colors) });
+        this.observe(function(colors) { self._updateLink(colors); });
 
         this.chainElements.push(this.link);
 
@@ -557,8 +568,9 @@ type("ColorPicker", ["WatchValue", "ChainedPopupWidget"], {
             } else if (onclick()) {
                 var pos = self.link.getAbsolutePosition();
                 pos.y += self.link.dom.offsetHeight;
-                if (self.alignRight)
+                if (self.alignRight){
                     pos.x += self.link.dom.offsetWidth;
+                }
                 self.open(pos.x + 3, pos.y + 2);
             }
         });
@@ -590,15 +602,16 @@ type("ColorPicker", ["WatchValue", "ChainedPopupWidget"], {
      * Randomly returns a color among the default colors
      */
     _getRandomColors: function() {
-        var rand = Math.floor(Math.random()*this.defaultColors.length)
+        var rand = Math.floor(Math.random()*this.defaultColors.length);
         return this.defaultColors[rand];
     },
     /*
      * When clicking on a color update the color picker link (if there is one)
      */
     _updateLink: function(colors) {
-        if (!exists(this.link))
+        if (!exists(this.link)){
             return;
+        }
 
         var cssClass = 'dropDownMenu';
 
@@ -624,9 +637,11 @@ type("ColorPicker", ["WatchValue", "ChainedPopupWidget"], {
          // Handle the case with color string having 3 chars length
          if (color.length == 4) {
              var tmp = "#";
-             for (var i in color)
-                 if (i != 0)
+             for (var i in color){
+                 if (i !== 0) {
                      tmp += color[i] + color[i];
+                 }
+             }
              color = tmp;
          }
          var rgb = [

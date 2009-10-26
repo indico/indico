@@ -159,7 +159,7 @@ extend(Html.prototype, {
 
 // based on mootools
 delayedBind(Html.prototype, "getAbsolutePosition", function(dom) {
-	return this.dom.getBoundingClientRect
+	return (this.dom.getBoundingClientRect && !Browser.WebKit)
         ? function() {
             var bound = this.dom.getBoundingClientRect();
             var html = document.documentElement;

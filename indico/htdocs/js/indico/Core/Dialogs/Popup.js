@@ -8,8 +8,9 @@ type("PopupDialog", ["PopupWidget"], {
         // close is clicked
         var nonCloseTriggeringClick = false;
         each(this.nonCloseTriggeringElements, function(e) {
-            if (e.ancestorOf(target))
+            if (e.ancestorOf(target)) {
                 nonCloseTriggeringClick = true;
+            }
         });
         return (!this.canvas.ancestorOf(target) &&
                 !this.triggerElement.ancestorOf(target) &&
@@ -21,9 +22,10 @@ type("PopupDialog", ["PopupWidget"], {
         this.PopupWidget.prototype.open.call(this, x, y);
 
         self.clickHandler = function(event) {
-            if (self.clickTriggersClosing($E(eventTarget(event))))
+            if (self.clickTriggersClosing($E(eventTarget(event)))) {
                 self.close();
-        }
+            }
+        };
         IndicoUtil.onclickHandlerAdd(self.clickHandler);
     },
 
@@ -45,7 +47,7 @@ type("PopupDialog", ["PopupWidget"], {
          this.content = content;
          this.PopupWidget();
          this.triggerElement = triggerElement;
-         this.closeHandler = any(closeHandler, function() {return true});
+         this.closeHandler = any(closeHandler, function() {return true; });
          this.nonCloseTriggeringElements = any(nonCloseTriggeringElemets, []);
      }
     );
@@ -57,7 +59,7 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
 
     draw : function(content, customStyle) {
         var self = this;
-        var customStyle = any(customStyle, {});
+        customStyle = any(customStyle, {});
 
 
         this.greyBg = Html.div({ className: this.printable ? 'noprint' : '',
@@ -86,7 +88,7 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
         this.titleDiv = Html.div('title', this.title);
         this.titleWrapper = Html.div('titleWrapper', this.titleDiv);
 
-        if (this.title && this.title != '') {
+        if (this.title && this.title !== '') {
             // A 20*20px div is added into the existing div to set the size, work-around for an IE bug
             this.container.append(Html.div('exclusivePopupTopBg', Html.div({style: {width: '20px', height: '20px'}})));
             this.container.append(this.titleWrapper);
@@ -95,7 +97,7 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
         this.container.append(this.contentWrapper);
 
         this.closeButton = null;
-        if (this.closeHandler != null) {
+        if (this.closeHandler !== null) {
             this.closeButton = Html.div('exclusivePopupCloseButton');
             this.closeButton.observeClick(function(e) {
                 if (self.closeHandler()) {
@@ -118,7 +120,7 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
         return this.PopupWidget.prototype.draw.call(this, this.container, 0, 0);
     },
     close: function() {
-        IndicoUI.unAssignLayerLevel(this.greyBg);;
+        IndicoUI.unAssignLayerLevel(this.greyBg);
         $E(document.body).remove(this.greyBg);
 
         this.PopupWidget.prototype.close.call(this);
@@ -143,8 +145,8 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
         this.contentWrapper.setStyle('overflowX', 'hidden');
         this.contentWrapper.setStyle('paddingRight', '10px');
 
-        var left = Math.floor((winDim.width-this.container.dom.offsetWidth)/2)
-        var top = Math.floor((winDim.height-this.container.dom.offsetHeight)/2)
+        var left = Math.floor((winDim.width-this.container.dom.offsetWidth)/2);
+        var top = Math.floor((winDim.height-this.container.dom.offsetHeight)/2);
 
         this.canvas.dom.style.left = pixels(left);
         this.canvas.dom.style.top = pixels(top);
@@ -152,10 +154,12 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
         // Make sure the title has correct right padding depending on close button and
         // print button;
         var titlePaddingRight = 20;
-        if (this.closeButton)
+        if (this.closeButton) {
             titlePaddingRight += 30;
-        if (this.printLink)
+        }
+        if (this.printLink) {
             titlePaddingRight += this.printLink.dom.offsetWidth;
+        }
         this.titleDiv.dom.style.paddingRight = pixels(titlePaddingRight);
 
     },
@@ -232,7 +236,7 @@ type("BalloonPopup", ["PopupDialog"], {
         this.mainDiv.dom.style.visibility = 'visible';
     },
     switchOrientation: function() {
-        if (this.balloonContent.dom.style.bottom == '') {
+        if (this.balloonContent.dom.style.bottom === '') {
             // current orientation is down, set it to up
             this.balloonContent.dom.style.bottom = pixels(this.arrowHeight - 1);
             this.balloonContent.dom.style.top = '';
@@ -276,8 +280,9 @@ type("BalloonPopup", ["PopupDialog"], {
             // Check if the arrow is outside the balloon, then move the balloon to
             // a correct position based on the arrow
             var arrowLeftMargin = this.x - Math.floor(this.arrowWidth/2) - this.cornerRadius;
-            if (arrowLeftMargin < leftPos)
+            if (arrowLeftMargin < leftPos) {
                 leftPos = arrowLeftMargin;
+            }
         }
         // Check if the balloon is outside the right side of browser windows
         // Counts width 25px margin because of the scrollbar.
@@ -341,37 +346,37 @@ type("WarningPopup", ["AlertPopup"],
     {
         _formatLine: function(line) {
             var result = Html.div({paddingBottom: pixels(2)});
-            
-            
+
+
             var linkStart = 0;
             var linkMiddle;
             var linkEnd = 0;
-            
+
             while (linkStart >= 0) {
                 linkStart = line.indexOf('[[', linkEnd);
-                
+
                 if (linkStart >= 0) {
                     result.append(Html.span('',line.substring(linkEnd, linkStart)));
-                    
+
                     linkMiddle = line.indexOf(' ', linkStart);
                     linkEnd = line.indexOf(']]', linkStart);
-                    
+
                     result.append(Html.a({href: line.substring(linkStart+2, linkMiddle)}, line.substring(linkMiddle + 1, linkEnd) ));
                     linkEnd+= 2;
                 } else {
                     result.append(Html.span('',line.substring(linkEnd, line.length)));
                 }
             }
-            
+
             return result;
         },
-    
+
         _formatContent: function(content, level) {
             var self = this;
-    
+
             if (isString(content)) {
                 return Html.span('', self._formatLine(content));
-                
+
             } else if (isArray(content)) {
                 var result = Html.ul(level === 0 ? 'warningLevel0' : 'warningLevel1');
                 each (content, function(line){
@@ -388,9 +393,9 @@ type("WarningPopup", ["AlertPopup"],
     function(title, lines) {
         var self = this;
         var content = this._formatContent(lines, 0);
-        
+
         this.AlertPopup(Html.span('warningTitle', title), content);
-    } 
+    }
 );
 
 /**
