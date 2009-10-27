@@ -192,24 +192,25 @@ type("SectionPopupMenu", ["PopupMenu"], {
 type("SessionSectionPopupMenu", ["SectionPopupMenu"], {
     _processItem: function(pair) {
 
-    var self = this;
-    var value = pair.get();
-    var color = null;
-    if(value.color !== null){
-        color = value.color;
-        value = value.func;
-    }
+        var self = this;
+        var value = pair.get();
+        var color = null;
 
-    var colorSquare = null;
-    if(color !== null){
+        if(exists(value.color)){
+            color = value.color;
+            value = value.func;
+        }
+
+        var colorSquare = null;
+        if(color !== null){
         colorSquare = Html.div({style:{backgroundColor: color, color: color, cssFloat: 'right', width: '15px', height:'15px'}});
-    }
+        }
 
-    //truncate titles which are too long
-    function truncate(title){
-        if(title.length > 25){
-            return title.substring(0,20) + "...";
-        }else{
+        //truncate titles which are too long
+        function truncate(title){
+            if(title.length > 25){
+                return title.substring(0,20) + "...";
+            }else{
         return title;
         }
     }
