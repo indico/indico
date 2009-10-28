@@ -319,7 +319,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
         fields.push([$T('Keywords'), keywordField.element]);
         $B(info.accessor('keywords'), keywordField.accessor);
 
-        fields.push([$T('Board #'), $B(Html.input({type: 'text', cols: 10, rows: 1}), info.accessor('boardNumber'))]);
+        fields.push([$T('Board #'), $B(Html.edit({cols: 10, rows: 1}), info.accessor('boardNumber'))]);
 
         if (this.isConference) {
             //Select List, Optional type for conference
