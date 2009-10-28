@@ -16,7 +16,7 @@ class RHSwitch(base.RH):
         url = self._returnURL
 
         if self._whereTo == 'future':
-            url = url.replace('indicodemo','indicodev')
+            url = url.replace('indico.cern.ch','indicobeta.cern.ch')
         else:
-            url = url.replace('indicodev','indicodemo')
+            url = url.replace('indicobeta.cern.ch','indico.cern.ch')
         self._redirect(url)
