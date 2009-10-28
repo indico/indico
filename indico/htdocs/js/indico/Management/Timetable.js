@@ -552,7 +552,7 @@ type("ChangeEditDialog", // silly name!
 type("MoveEntryDialog", ["ExclusivePopup"],
      {
          draw: function() {
-             self = this;
+             var self = this;
              var inSession = true;
              if (self.sessionId === null && self.slotId === null) {
                  inSession = false;
@@ -639,11 +639,12 @@ type("MoveEntryDialog", ["ExclusivePopup"],
              var tabData = self.topLevelTimetableData;
 
              // sort tabs according to days
-             var dateKeys = keys(tabData);
+             var dateKeys = $L(keys(tabData));
              dateKeys.sort();
-             for ( var i = 0; i < dateKeys.length; i++) {
-                 tabsList.push( [ $T(self._titleTemplate(dateKeys[i])), drawMoveEntryDay(tabData[dateKeys[i]], dateKeys[i]) ]);
-             }
+
+             each(dateKeys, function(key) {
+                 tabsList.push( [ $T(self._titleTemplate(key)), drawMoveEntryDay(tabData[key], key) ]);
+             });
 
              this.tabWidget = new TabWidget(tabsList, 400, 200, dateKeys.indexOf(self.currentDay));
              var moveEntryPopup = new ExclusivePopup("Move item", function() {

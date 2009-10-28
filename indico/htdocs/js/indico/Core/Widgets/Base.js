@@ -207,11 +207,6 @@ type("TabWidget", ["Chooser", "IWidget"],{
             btnContainer.observeClick(function() {btn.onclick(btnContainer);});
         });
 
-        // This div is plced on top of the tabs and is shown when the tabs should be disabled (unclickable)
-
-        if (exists(this.width)) {
-            this.disableOverlay.dom.style.width = pixels(this.width);
-        }
 
         // this piece of code is sensitive to exceptions
         // coming from the drawing functions (for LookupTabWidget)
@@ -229,9 +224,11 @@ type("TabWidget", ["Chooser", "IWidget"],{
             }
         }
 
+        var wrapperStyle = this.width?{width: pixels(this.width)}:{};
+
         this.container = this.IWidget.prototype.draw.call(
             this,
-            Html.div({},
+            Html.div({style: wrapperStyle},
                      Html.div({className: "tabListContainer", style: {position: 'relative'}}, this.scrollArrows.left[0], this.scrollArrows.right[0], this.tabList,
                               Html.div('tabGradient', extraButtons/*,
                                        Html.div({className: 'tabBorderGradient', style: {cssFloat: 'left'}}),
