@@ -1,3 +1,10 @@
 <div class="pageOverHeader clearfix">
-        Welcome to Indico 0.97 Beta. Please, do not hesitate to send your comments and <a href="mailto:indico-team@cern.ch">feedback</a>. If you want to go back to the normal interface, <a href="<%= urlHandlers.UHSwitchInterface().getURL('past', returnURL=self._rh.getCurrentURL()) %>">click here</a>.
+Welcome to the new Indico version!
+<div style="float:right">
+<a href="http://cerncourier.com/cws/article/cnl/40385">what's new?</a>
+<span style="font-weight: normal; padding-left:5px; padding-right:5px;">|</span>
+<a href="mailto:indico-team@cern.ch">send feedback</a>
+<span style="font-weight: normal; padding-left:5px; padding-right:5px;">|</span>
+<a href="<%= urlHandlers.UHSwitchInterface().getURL('past', returnURL=self._rh.getCurrentURL()) %>">back to old interface</a>
+</div>
 </div>
