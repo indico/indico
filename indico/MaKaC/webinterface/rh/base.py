@@ -378,7 +378,7 @@ class RH(RequestHandlerBase):
         interface = RequestWrapper(self._req).cookies.get("INDICO_INTERFACE")
         if interface == 'past':
             current_url = self._req.construct_url(self._req.unparsed_uri)
-            self._redirect(current_url.replace('indicodev','indicodemo'))
+            self._redirect(current_url.replace('indicobeta.cern.ch','indico.cern.ch'))
     ### ***
 
     def process( self, params ):
