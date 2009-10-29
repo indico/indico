@@ -96,7 +96,7 @@ var WRUpdateContributionList = function () {
             $E('contributionList').append(WRTalkTemplate(contribution));
         }
     } else {
-        $E('contributionList').set(Html.span({style:{paddingLeft: pixels(20)}}, $T("This event has no talks"))); // make this more beautiful
+        $E('contributionList').set(Html.span({style:{paddingLeft: pixels(20)}}, $T("This event has no talks, or none of the talks take place in a room capable of webcasting."))); // make this more beautiful
     }
 }
 

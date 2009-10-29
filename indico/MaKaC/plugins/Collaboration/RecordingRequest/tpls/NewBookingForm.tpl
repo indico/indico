@@ -46,11 +46,6 @@
     <% displayText = ('none', 'block')[DisplayTalks and InitialChoose] %>
     <div id="contributionsDiv" class="RRFormSubsection" style="display: <%= displayText %>;">
         <span class="RRQuestion">Please choose among the contributions below:</span>
-        <% if not HasTalks: %>
-        <div>
-            <span style="padding-left: 20px;"><%= _("This event has no talks.") %></span>
-        </div>
-        <% end %>
         
         <% if HasTalks: %>
         <span class="fakeLink" style="margin-left: 20px;" onclick="RRSelectAllContributions()">Select all</span>

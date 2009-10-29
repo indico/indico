@@ -95,7 +95,7 @@ var RRUpdateContributionList = function () {
             $E('contributionList').append(RRTalkTemplate(contribution));
         }
     } else {
-        $E('contributionList').set(Html.span({style:{paddingLeft: pixels(20)}}, $T("This event has no talks"))); // make this more beautiful
+        $E('contributionList').set(Html.span({style:{paddingLeft: pixels(20)}}, $T("This event has no talks."))); // make this more beautiful
     }
 }
 
