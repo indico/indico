@@ -203,5 +203,15 @@ IndicoUI.executeOnLoad(function(){
     displayBookings();
 });
 
+<% if MultipleBookingPlugins: %>
+IndicoUI.executeOnLoad(function(){
+    <% for plugin in MultipleBookingPlugins: %>
+    if (pluginHasFunction("<%=plugin.getName()%>", "onLoad")) {
+        codes["<%=plugin.getName()%>"]["onLoad"]();
+    }
+    <% end %>
+});
+<% end %>
+
 </script>
 

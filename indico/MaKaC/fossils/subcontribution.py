@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: __init__.py,v 1.2 2008/04/24 16:59:02 jose Exp $
+## $Id: subcontribution.py,v 1.39 2009/06/25 15:21:49 dmartinc Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -19,6 +19,39 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.i18n import _
-pluginTypeDescription = _("Room Booking Plugins")
-ignore = True
+
+from MaKaC.common.fossilize import IFossil
+from MaKaC.common.Conversion import Conversion
+
+class ISubContributionFossil(IFossil):
+    
+    def getId(self):
+        pass
+    
+    def getParent(self):
+        pass
+    getParent.convert = lambda p: p.getId()
+    getParent.name = 'parentId'
+    
+    def getTitle(self):
+        pass
+    
+    def getDuration(self):
+        pass
+    getDuration.convert = Conversion.duration
+    
+    
+class ISubContribParticipationFossil(IFossil):
+    
+    def getId(self):
+        pass
+    
+    def getFullName(self):
+        pass
+    
+    
+class ISubContributionWithSpeakersFossil(ISubContributionFossil):
+    
+    def getSpeakerList(self):
+        pass
+    getSpeakerList.result = ISubContribParticipationFossil

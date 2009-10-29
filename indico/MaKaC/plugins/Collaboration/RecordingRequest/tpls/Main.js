@@ -48,9 +48,11 @@
     
     clearForm : function () {
         var formNodes = IndicoUtil.findFormFields($E('RecordingRequestForm'));
-        IndicoUtil.setFormValues(formNodes, {'talkSelectionComments':'', 'numRemoteViewers':'', 'numAttendees':'', 'otherComments':''})
-        $E('allTalksRB').dom.checked = true;
-        IndicoUI.Effect.disappear($E('contributionsDiv'));
+        IndicoUtil.setFormValues(formNodes, {'talkSelectionComments':'', 'numRemoteViewers':'', 'numAttendees':'', 'otherComments':''});
+        if (!isLecture) {
+            $E('allTalksRB').dom.checked = true;
+            IndicoUI.Effect.disappear($E('contributionsDiv'));
+        }
         $E('permissionYesRB').dom.checked = false;
         $E('permissionNoRB').dom.checked = false;
         $E('lectureOptions').dom.value = "chooseOne";
@@ -59,11 +61,11 @@
     },
     
     onLoad : function() {
-        if (singleBookings['RecordingRequest'] && singleBookings['RecordingRequest'].bookingParams.talks == 'choose') {
-            IndicoUI.Effect.appear($E('contributionsDiv'));
-        } else {
-            $E('contributionsRow').append(Html.td("RRContributionsColumn",Html.ul({id:'contributionList1', className:'RROptionList'})));
-            $E('contributionsRow').append(Html.td("RRContributionsColumn",Html.ul({id:'contributionList2', className:'RROptionList'})));
+        RRUpdateContributionList();
+        if (!isLecture) {
+            if (singleBookings['RecordingRequest'] && singleBookings['RecordingRequest'].bookingParams.talks == 'choose') {
+                IndicoUI.Effect.appear($E('contributionsDiv'));
+            }
         }
         
         if(!singleBookings['RecordingRequest']) {

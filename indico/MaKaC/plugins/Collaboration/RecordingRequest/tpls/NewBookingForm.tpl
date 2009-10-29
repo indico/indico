@@ -1,11 +1,11 @@
 <% declareTemplate(newTemplateStyle=True) %>
 
-<% if not HasLocation: %>
+<% if not HasRoom: %>
 <div style="margin-bottom: 1em;">
     <span class="RRNoteTitle"><%=_("Warning:")%></span>
     <span class="RRNoteText">
-        <%= _("We will need to know the location before we can record the event.") %><br />
-        <%= _("Please go to the") %> <a href="<%= urlHandlers.UHConferenceModification.getURL(Conference)%>"> <%= _("General Settings") %></a> <%= _("and enter the room location(s) for this Indico event.")%>
+        <%= _("We will need to know the location and room before we can record the event.") %><br />
+        <%= _("Please go to the") %> <a href="<%= urlHandlers.UHConferenceModification.getURL(Conference)%>"> <%= _("General Settings") %></a> <%= _("and enter the location and room for this Indico event.")%>
     </span>
 </div>
 <% end %>
@@ -31,6 +31,7 @@
 <!-- DRAW BOX AROUND SECTION 1: SELECT CONTRIBUTIONS -->
 <div class="RRFormSection">
     <!-- WHICH CONTRIBUTIONS SHOULD BE RECORDED -->
+<% if not IsLecture: %>
     <div class="RRFormSubsection">
         <span class="RRQuestion">Which talks would you like to have recorded?</span>
         <div>
@@ -52,68 +53,21 @@
         <% end %>
         
         <% if HasTalks: %>
-        <span class="fakeLink" style="margin-left: 20px;" onclick="WRSelectAllContributions()">Select all</span>
+        <span class="fakeLink" style="margin-left: 20px;" onclick="RRSelectAllContributions()">Select all</span>
         <span class="horizontalSeparator">|</span>
-        <span class="fakeLink" onclick="WRUnselectAllContributions()">Select none</span>
+        <span class="fakeLink" onclick="RRUnselectAllContributions()">Select none</span>
         <% end %>
         
         <div class="RRContributionListDiv">
-            <table>
-                <tr id="contributionsRow">
-                    <% if DisplayTalks: %>
-                        <% if HasTalks: %>
-                            <% for cl in TalkLists: %>
-                            <td class="RRContributionsColumn">
-                                <ul class="RROptionList">
-                                <% for talk, checked in cl: %>
-                                    <% checkedText = ('', 'checked')[checked] %>
-                                    <li>
-                                        <input type="checkbox" name="talkSelection" value="<%= talk.getId() %>" id="talk<%=talk.getId()%>CB"/ <%=checkedText%>>
-                                        <label for="contribution<%=talk.getId()%>CB">
-                                            <span class="RRContributionId">[<%= talk.getId() %>]</span>
-                                            <span class="RRContributionName"><%= talk.getTitle() %></span>
-                                            <% if talk.getSpeakerList() : %>
-                                            <span class="RRSpeakers">, by <%= " and ".join([person.getFullName() for person in talk.getSpeakerList()]) %></span>
-                                            <% end %>
-                                            <% location = talk.getLocation() %>
-                                            <% room = talk.getRoom() %>
-                                            <% if location and location.getName() and location.getName().strip(): %>
-                                                <% locationText = " (" + location.getName() %>
-                                                <% if room and room.getName() and room.getName().strip(): %>
-                                                    <% locationText += ", " + room.getName() + ")" %> 
-                                                <% end %>
-                                                <span class="WRSpeakers"><%= locationText %></span>
-                                            <% end %>
-                                        </label>
-                                    </li>
-                                <% end %>
-                                </ul>
-                            </td>
-                            <% end %>
-                        <% end %>
-                    <% end%>
-                </tr>
-            </table>
+            <ul class="RROptionList" id="contributionList">
+            </ul>
         </div>
-        <% if HasTalks: %>
-        <script type="text/javascript">
-            var WRSelectAllContributions = function() {
-                each($N('talkSelection'), function(checkbox) {
-                    checkbox.dom.checked = true;
-                });
-            }
-            var WRUnselectAllContributions = function() {
-                each($N('talkSelection'), function(checkbox) {
-                    checkbox.dom.checked = false;
-                });
-            }
-        </script>
-        <% end %>
     </div>
     <div class="RRFormSubsection">
         <span class="RRQuestion">Please write here additional comments about talk selection:</span>
         <input size="60" type="text" name="talkSelectionComments" style="display:block;">
     </div>
+<% end %>
     <div class="RRFormSubsection">
         <span class="RRQuestion">Have all the speakers given permission to have their talks recorded?</span>
         <br/>
@@ -250,5 +204,7 @@
 <% end %>
 
 <script type="text/javascript">
+    var isLecture = <%= jsBoolean(IsLecture) %>;
+    var RR_contributions = <%= jsonEncode(Contributions) %>;
     var RR_contributionsLoaded = <%= jsBoolean(DisplayTalks or not HasTalks) %>;
 </script>

@@ -1,4 +1,6 @@
 from MaKaC.common.PickleJar import Retrieves
+import sys
+import traceback
 
 class CausedError(Exception):
     def __init__(self, code, message, inner=None, type=None):
@@ -76,10 +78,14 @@ class CausedError(Exception):
         return self.type
 
     def __str__(self):
-        if type(self.inner) is list:
-            return "%s : %s \r\n %s" % (self.code, self.message, "\r\n".join(self.inner))
+        if not self.inner:
+            return "%s : %s (no inner exception)" % (self.code, self.message)
         else:
-            return "%s : %s \r\n %s" % (self.code, self.message, str(self.inner))
+            if type(self.inner) is list:
+                inner = "\r\n".join(self.inner)
+            else:
+                inner = self.inner
+            return "%s : %s\r\n\r\nInner Exception:\r\n%s" % (self.code, self.message, inner)
     
 class NoReportError(CausedError):
     
@@ -90,7 +96,9 @@ class RequestError(CausedError):
     pass
 
 class ProcessError(CausedError):
-    pass
+    
+    def __init__(self, code, message):
+        CausedError.__init__(self, code, message, inner = traceback.format_exception(*sys.exc_info()))
 
 class ServiceError(CausedError):
     pass

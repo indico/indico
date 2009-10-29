@@ -25,7 +25,6 @@ from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from MaKaC.plugins.Collaboration.WebcastRequest.common import typeOfEvents,\
     postingUrgency, webcastPurpose, intendedAudience, subjectMatter, lectureOptions,\
     getCommonTalkInformation
-from MaKaC.webinterface import urlHandlers
 
 
 class WebcastRequestNotificationBase(GenericNotification):
@@ -162,11 +161,19 @@ Request details:<br />
             %s
         </td>
     </tr>
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>List of talks to be webcasted:</strong>
+        </td>
+        <td style="vertical-align: top">
+            %s
+        </td>
+    </tr>
 </table>
 """%(self._booking.getId(),
      MailTools.bookingCreationDate(self._booking),
      MailTools.bookingModificationDate(self._booking, typeOfMail),
-     self._getTalks(),
+     self._getTalksShortMessage(),
      self._getTalkSelectionComments(),
      bp["permission"],
      dict(lectureOptions)[bp["lectureOptions"]],
@@ -178,40 +185,9 @@ Request details:<br />
      self._getPurposes(),
      self._getAudiences(),
      self._getMatters(),
-     self._getComments()
+     self._getComments(),
+     self._getTalks()
      )
-    
-    def _getTalkListText(self, talkList):
-        text = []
-        for contribution in talkList:
-            
-            speakerList = contribution.getSpeakerList()
-            if speakerList:
-                speakers = ', by ' + ", ".join([person.getFullName() for person in speakerList])
-            else:
-                speakers = ''
-                
-            location = contribution.getLocation()
-            room = contribution.getRoom()
-            if location and location.getName() and location.getName().strip():
-                locationText = "Location: " + location.getName()
-                if room and room.getName() and room.getName().strip():
-                    locationText += ', Room: ' + room.getName()
-                else:
-                    locationText += ', Room: not defined'
-            else:
-                locationText = "Location: not defined"
-                
-            contributionLine = """•[%s] <a href="%s">%s</a>%s (%s)""" % (
-                contribution.getId(),
-                urlHandlers.UHContributionDisplay.getURL(contribution),
-                contribution.getTitle(),
-                speakers,
-                locationText
-            )
-            text.append(contributionLine)
-        
-        return text
         
     def _getTalks(self):
         #"all" "choose" "neither"
@@ -220,20 +196,29 @@ Request details:<br />
             text = ["""The user chose "All webcast-able Talks". List of webcast-able talks:"""]
             webcastableTalks = talkInfo[2]
             if webcastableTalks:
-                text.extend(self._getTalkListText(webcastableTalks))
+                text.extend(MailTools.talkListText(self._conference, webcastableTalks))
+                text.append("<strong>Important note:</strong> room is only shown if different from event.")
             else:
-                text.append("(This event has no webcast-able talks talks)")
+                text.append("(This event has no webcast-able talks)")
             return "<br />".join(text)
         else:
             text = ["""The user chose the following talks:"""]
             selectedTalks = [self._conference.getContributionById(id) for id in self._bp["talkSelection"]]
             if selectedTalks:
-                text.extend(self._getTalkListText(selectedTalks))
+                text.extend(MailTools.talkListText(self._conference, selectedTalks))
+                text.append("<strong>Important note:</strong> room is only shown if different from event.")
             else:
                 text.append("(User did not choose any talks)")
             
             return "<br />".join(text)
                 
+    def _getTalksShortMessage(self):
+        if self._bp["talks"] == "all":
+            return """The user chose "All webcast-able Talks". The list of all talks can be found at the end of this e-mail."""
+        elif self._bp["talks"] == "neither":
+            return """Please see the talk selection comments"""
+        else:
+            return """The user chose "Choose talks". The list of chosen talks can be found at the end of this e-mail."""
         
     def _getTalkSelectionComments(self):
         comments = None

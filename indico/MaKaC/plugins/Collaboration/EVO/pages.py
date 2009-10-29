@@ -44,7 +44,11 @@ class WNewBookingForm(WCSPageTemplateBase):
         defaultEndDate = self._conf.getAdjustedEndDate()
         nowEndDate = nowStartDate + timedelta(0,0,0,0, self._EVOOptions["allowedMinutes"].getValue())
         vars["DefaultEndDate"] = formatDateTime(max(defaultEndDate, nowEndDate))
-        vars["Communities"] = self._EVOOptions["communityList"].getValue()
+        
+        communities = self._EVOOptions["communityList"].getValue() #a dict communityId : communityName
+        communityItems = communities.items() # a list of tuples (communityId, communityName)
+        communityItems.sort(key = lambda t: t[1]) # we sort by the second member of the tuple (the name)
+        vars["Communities"] = communityItems
         
         return vars
 

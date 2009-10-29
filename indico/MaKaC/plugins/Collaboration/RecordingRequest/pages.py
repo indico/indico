@@ -24,6 +24,11 @@ from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase, WCSCS
 from MaKaC.plugins.Collaboration.RecordingRequest.common import typeOfEvents,\
     postingUrgency, recordingPurpose, intendedAudience, subjectMatter, lectureOptions,\
     getTalks
+from MaKaC.conference import Contribution
+from MaKaC.common.timezoneUtils import isSameDay
+from MaKaC.common.fossilize import fossilize
+from MaKaC.common.Conversion import Conversion
+from MaKaC.fossils.contribution import IContributionWithSpeakersFossil
 
 class WNewBookingForm(WCSPageTemplateBase):
         
@@ -33,49 +38,48 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["IsSingleBooking"] = not CollaborationTools.getCSBookingClass(self._pluginName)._allowMultiple
         vars["Conference"] = self._conf
         
+        isLecture = self._conf.getType() == 'simple_event'
+        vars["IsLecture"] = isLecture
+        
         location = self._conf.getLocation()
-        if location and location.getName() and location.getName().strip():
-            vars["HasLocation"] = True
+        room = self._conf.getRoom()
+        if location and location.getName() and location.getName().strip() and \
+           room and room.getName() and room.getName().strip():
+            vars["HasRoom"] = True
         else:
-            vars["HasLocation"] = False
+            vars["HasRoom"] = False
         
         booking = self._conf.getCSBookingManager().getSingleBooking('RecordingRequest')
         
         initialChoose = booking is not None and booking._bookingParams['talks'] == 'choose'
         vars["InitialChoose"] = initialChoose
         
-        if self._conf.getNumberOfContributions() > 0:
+        contributions = []
+        
+        if not isLecture and self._conf.getNumberOfContributions() > 0:
             underTheLimit = self._conf.getNumberOfContributions() <= self._RecordingRequestOptions["contributionLoadLimit"].getValue()
             
             initialDisplay = underTheLimit or (booking is not None and initialChoose)
             vars["DisplayTalks"] = initialDisplay
             
             #a talk is defined as a non-poster contribution
-            talks = getTalks(self._conf, not initialDisplay)
+            talks = getTalks(self._conf, oneIsEnough = not initialDisplay)
             nTalks = len(talks)
             vars["HasTalks"] = nTalks > 0 
             
             if initialDisplay:
-                talks.sort(key = lambda c: c.getId())
+                talks.sort(key = Contribution.contributionStartDateForSort)
                     
-                if booking:
-                    selectedTalks = booking._bookingParams["talkSelection"]
-                else:
-                    selectedTalks = []
-    
-                contributions1 = []
-                contributions2 = []
-                
-                for i, contribution in enumerate(talks):
-                    if i < (nTalks + 1) / 2:
-                        contributions1.append((contribution, contribution.getId() in selectedTalks))
-                    else:
-                        contributions2.append((contribution, contribution.getId() in selectedTalks))
+                contributions = fossilize(talks, IContributionWithSpeakersFossil,
+                                          tz = self._conf.getTimezone(),
+                                          units = '(hours)_minutes',
+                                          truncate = True)
                     
-                vars["TalkLists"] = [contributions1, contributions2]
         else:
             vars["DisplayTalks"] = booking is not None and initialChoose
             vars["HasTalks"] = False
+                
+        vars["Contributions"] = contributions
                 
         vars["ConsentFormURL"] = self._RecordingRequestOptions["ConsentFormURL"].getValue()
         vars["LectureOptions"] = lectureOptions
@@ -101,12 +105,30 @@ class WExtra (WJSBase):
             vars["ConferenceId"] = self._conf.getId()
             vars["NumberOfContributions"] = self._conf.getNumberOfContributions()
 
+            # these 2 vars are used to see if contrib dates shown should include day or just time
+            vars["ConfStartDate"] = Conversion.datetime(self._conf.getAdjustedStartDate())
+            vars["IsMultiDayEvent"] = not isSameDay(self._conf.getStartDate(), self._conf.getEndDate(), self._conf.getTimezone())
+            
+            location = ""
+            if self._conf.getLocation() and self._conf.getLocation().getName():
+                location = self._conf.getLocation().getName().strip()
+            vars["ConfLocation"] = location
+            
+            room = ""
+            if self._conf.getRoom() and self._conf.getRoom().getName():
+                room = self._conf.getRoom().getName().strip()
+            vars["ConfRoom"] = room
+
         else:
             # this is so that template can still be rendered in indexes page...
             # if necessary, we should refactor the Extra.js code so that it gets the
             # conference data from the booking, now that the booking has the conference inside
             vars["ConferenceId"] = ""
             vars["NumberOfContributions"] = 0
+            vars["ConfStartDate"] = ""
+            vars["IsMultiDayEvent"] = False
+            vars["ConfLocation"] = ""
+            vars["ConfRoom"] = ""
         
         return vars
 

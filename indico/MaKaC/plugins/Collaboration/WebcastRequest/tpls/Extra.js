@@ -1,5 +1,103 @@
-var WR_hideTalks = function () {
-    IndicoUI.Effect.disappear($E('contributionsDiv'));
+var WR_multiDayEvent = <%= jsBoolean(IsMultiDayEvent) %>;
+<% if ConfStartDate: %>
+var WR_confStartDate = IndicoUtil.parseJsonDate(<%= jsonEncode(ConfStartDate) %>);
+<% end %>
+var WR_confLocation = <%= jsonEncode(ConfLocation) %>
+var WR_confRoom = <%= jsonEncode(ConfRoom) %>
+
+
+var WRSpeakersTemplate = function(speakerList) {
+    var speakers = ", by "
+    enumerate(speakerList, function(speaker, index) {
+        if (index > 0) {
+            speakers += " and ";
+        }
+        speakers += speaker.fullName;
+    });
+    return speakers;
+}
+
+var WRTalkTemplate = function(talk) {
+    
+    // Checkbox
+    var checkBox = Html.input('checkbox', {name: "talkSelection", id: "talk" + talk.id + "CB"});
+    checkBox.dom.value = talk.id;
+    
+    // Start date text
+    var talkStartDateText;
+    if (exists(talk.startDate)) {
+        var startDate = IndicoUtil.parseJsonDate(talk.startDate);
+        if (!WR_multiDayEvent && (startDate.getFullYear() === WR_confStartDate.getFullYear() &&
+                                  startDate.getMonth() === WR_confStartDate.getMonth() &&
+                                  startDate.getDate() === WR_confStartDate.getDate() )) {
+            talkStartDateText = IndicoUtil.formatJustTime(startDate) + " :";
+        } else {
+            talkStartDateText = IndicoUtil.formatDateTime(startDate, 2) + " :";
+        }
+    } else {
+        talkStartDateText = "(Not Scheduled) ";
+    }
+        
+    var talkStartDate = Html.span("WRContributionStartDate", talkStartDateText);
+    
+    // Title
+    var talkName = Html.span("WRContributionName", talk.title);
+    
+    // Duration
+    var duration;
+    if (exists(talk.duration)) {
+        duration = Html.span("WRContributionDuration", " (" + talk.duration + ")");
+    } else {
+        duration = '';
+    }
+    
+    // We build the label
+    var label = Html.label({}, talkStartDate, talkName, duration);
+    label.dom.htmlFor = "talk" + talk.id + "CB";
+    
+    // After the label, the speakers (optionally)
+    if (talk.speakerList.length > 0) {
+        label.append(Html.span("WRSpeakers", WRSpeakersTemplate(talk.speakerList)))
+    }
+
+    // And after the speakers, the location and room (optionally)
+    var contribLocation = "";
+    var contribRoom = ""
+    if (exists(talk.location) && trim(talk.location)) {
+        contribLocation = trim(talk.location);
+    }
+    if (exists(talk.room) && trim(talk.room)) {
+        contribRoom = trim(talk.room);
+    }
+    
+    if (contribLocation != WR_confLocation || contribRoom != WR_confRoom) {
+        if (contribLocation) {
+            var locationText = ' (' + contribLocation;
+            if (contribRoom) {
+                locationText += ', ' + contribRoom;
+            }
+            locationText += ')';
+            label.append(Html.span("WRSpeakers", locationText));
+        }
+    }
+    
+    // Finally, the id
+    label.append(Html.span("WRContributionId", "(id: " + talk.id + ")"));
+    
+    return Html.li('', checkBox, label);    
+    
+};
+
+var WRUpdateContributionList = function () {
+    if (WR_contributions.length > 0) {
+        $E('contributionList').set('');
+        for (i in WR_contributions) {
+            contribution = WR_contributions[i];
+            $E('contributionList').append(WRTalkTemplate(contribution));
+        }
+    } else {
+        $E('contributionList').set(Html.span({style:{paddingLeft: pixels(20)}}, $T("This event has no talks"))); // make this more beautiful
+    }
 }
 
 var WR_loadTalks = function () {
@@ -49,18 +147,8 @@ var WR_loadTalks = function () {
             },
             function(result, error){
                 if (!error) {
-                    if (result.length > 0) {
-                        for (i in result) {
-                            t = result[i];
-                            if (i < result.length / 2) {
-                                $E('contributionList1').append(talkTemplate(t));
-                            } else {
-                                $E('contributionList2').append(talkTemplate(t));
-                            }
-                        }
-                    } else {
-                        $E('contributionList1').set(Html.span({style:{paddingLeft: pixels(20)}}, $T("This event has no talks, or none of the talks take place in a room capable of webcasting.")));
-                    }
+                    WR_contributions = result;
+                    WRUpdateContributionList();
                     IndicoUI.Effect.appear($E('contributionsDiv'));
                     WR_contributionsLoaded = true;
                     killProgress();
@@ -78,4 +166,21 @@ var WR_loadTalks = function () {
         fetchContributions();
     }
     
+}
+
+
+var WR_hideTalks = function () {
+    IndicoUI.Effect.disappear($E('contributionsDiv'));
+}
+
+
+var WRSelectAllContributions = function() {
+    each($N('talkSelection'), function(checkbox) {
+        checkbox.dom.checked = true;
+    });
+}
+var WRUnselectAllContributions = function() {
+    each($N('talkSelection'), function(checkbox) {
+        checkbox.dom.checked = false;
+    });
 }

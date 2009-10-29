@@ -60,14 +60,13 @@ div.WRContributionListDiv {
     overflow: auto;   
 }
 
-td.WRContributionsColumn {
-    vertical-align: top;
-    /*width: 50%;*/	
+span.WRContributionStartDate {
+    margin-left: 5px;
 }
 
 span.WRContributionId {
-	font-weight: bold;
 	margin-left: 5px;
+    font-size: smaller;
 }
 
 span.WRContributionName {

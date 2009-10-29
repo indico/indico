@@ -23,6 +23,7 @@ from MaKaC.plugins.Collaboration.base import CollaborationServiceException,\
     CSErrorBase
 from MaKaC.common.PickleJar import Retrieves
 from MaKaC.webinterface.common.contribFilters import PosterFilterField
+from MaKaC.conference import Contribution
 
 lectureOptions = [
     ("none", "None"),
@@ -76,7 +77,11 @@ subjectMatter = [
     ("techTraining" , "Technical Training")
 ]
     
-def getTalks(conference, oneIsEnough = False):
+def getTalks(conference, oneIsEnough = False, sort = False):
+    """ oneIsEnough: the algorithm will stop at the first contribution found
+                     it will then return a list with a single element
+        sort: if True, contributions are sorted by start date (non scheduled contributions at the end)
+    """
     talks = []
     filter = PosterFilterField(conference, False, False)
     for cont in conference.getContributionList():
@@ -84,6 +89,9 @@ def getTalks(conference, oneIsEnough = False):
             talks.append(cont)
             if oneIsEnough:
                 break
+    if sort and not oneIsEnough:
+        talks.sort(key = Contribution.contributionStartDateForSort)
+        
     return talks
     
 class RecordingRequestError(CSErrorBase):

@@ -12057,7 +12057,7 @@ class WConfModifBadgePrinting( wcomponents.WTemplated ):
             delete = []
             delete.append("""                  <a href='""")
             delete.append(str(urlHandlers.UHConfModifBadgePrinting.getURL(self.__conf, deleteTemplateId=templateId)))
-            delete.append( _("""' onClick="return confirm( _("Are you sure you want to delete this template?'"));"><img src='"""))
+            delete.append( _("""' onClick="return confirm('""" + _("Are you sure you want to delete this template?") + """');"><img src='"""))
             delete.append(str(Config.getInstance().getSystemIconURL("smallDelete")))
             delete.append("""' border='0'></a>&nbsp;""")
             templateListHTML.append("".join(delete))
@@ -12194,8 +12194,11 @@ class WConfModifBadgeDesign( wcomponents.WTemplated ):
             vars["saveTemplateURL"]=urlHandlers.UHConfModifBadgePrinting.getURL(self.__conf)
             vars["titleMessage"]= _("Editing badge template")
             vars["editingTemplate"]="true"
-            templateDataString = simplejson.dumps(self.__conf.getBadgeTemplateManager().getTemplateData(self.__templateId))
-            vars["templateData"]=quoteattr(templateDataString)
+            
+            from MaKaC.services.interface.rpc.json import encode as jsonEncode
+            templateDataString = jsonEncode(self.__conf.getBadgeTemplateManager().getTemplateData(self.__templateId))
+            vars["templateData"]= templateDataString
+            
             usedBackgroundId = self.__conf.getBadgeTemplateManager().getTemplateById(self.__templateId).getUsedBackgroundId()
             vars["backgroundId"] = usedBackgroundId
             if usedBackgroundId != -1:

@@ -828,7 +828,7 @@
   
     // We load the template if we are editing a template
     if (%(editingTemplate)s) {
-       var template = eval(%(templateData)s.unescapeHTML());
+       var template = %(templateData)s
        $E('template name').dom.value = template[0];
        $E('templateDiv').dom.style.width = template[1].width;
        $E('templateDiv').dom.style.height = template[1].height;

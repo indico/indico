@@ -1,7 +1,5 @@
 import pytz
 
-## Predefined conversion classes
-
 class Conversion:
     @classmethod
     def datetime(cls, dt, tz = None):
@@ -13,6 +11,14 @@ class Conversion:
             else:
                 date = dt
             return {'date': str(date.date()), 'time': str(date.time())}
+        else:
+            return None
+        
+    @classmethod
+    def duration(cls, duration, units = 'minutes', truncate = True):
+        if duration:
+            from MaKaC.common.utils import formatDuration
+            return formatDuration(duration, units, truncate)
         else:
             return None
 

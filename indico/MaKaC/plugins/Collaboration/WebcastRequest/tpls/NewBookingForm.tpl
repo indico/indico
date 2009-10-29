@@ -85,6 +85,7 @@
     
     
     <!-- DRAW BOX AROUND SECTION 1: SELECT CONTRIBUTIONS -->
+<% if not IsLecture: %>
     <div class="WRFormSection" id="contributionselectionDiv">
         <!-- WHICH CONTRIBUTIONS SHOULD BE WEBCASTED -->
         <div class="WRFormSubsection">
@@ -169,65 +170,16 @@
             <% end %>
             
             <div class="WRContributionListDiv">
-                <table>
-                    <tr id="contributionsRow">
-                        <% if DisplayTalks: %>
-                            <% if HasWebcastCapableTalks: %>
-                                <% for tl in TalkLists: %>
-                                <td class="WRContributionsColumn">
-                                    <ul class="WROptionList">
-                                    <% for talk, checked in tl: %>
-                                        <li>
-                                            <% checkedText = ('', 'checked')[checked] %>
-                                            <input type="checkbox" name="talkSelection" value="<%= talk.getId() %>" id="talk<%=talk.getId()%>CB" <%=checkedText%> /> 
-                                            <label for="talk<%=talk.getId()%>CB">
-                                                <span class="WRContributionId">[<%= talk.getId() %>]</span>
-                                                <span class="WRContributionName"><%= talk.getTitle() %></span>
-                                                <% if talk.getSpeakerList() : %>
-                                                <span class="WRSpeakers">, by <%= " and ".join([person.getFullName() for person in talk.getSpeakerList()]) %></span>
-                                                <% end %>
-                                                <% location = talk.getLocation() %>
-                                                <% room = talk.getRoom() %>
-                                                <% if location and location.getName() and location.getName().strip(): %>
-                                                    <% locationText = " (" + location.getName() %>
-                                                    <% if room and room.getName() and room.getName().strip(): %>
-                                                        <% locationText += ", " + room.getName() + ")" %> 
-                                                    <% end %>
-                                                    <span class="RRSpeakers"><%= locationText %></span>
-                                                <% end %>
-                                            </label>
-                                        </li>
-                                    <% end %>
-                                    </ul>
-                                </td>
-                                <% end %>
-                            <% end %>
-                        <% end %>
-                        
-                    </tr>
-                </table>
+                <ul class="WROptionList" id="contributionList">
+                </ul>
             </div>
-            <% if HasWebcastCapableTalks: %>
-            <script type="text/javascript">
-                var WRSelectAllContributions = function() {
-                    each($N('talkSelection'), function(checkbox) {
-                        checkbox.dom.checked = true;
-                    });
-                }
-                var WRUnselectAllContributions = function() {
-                    each($N('talkSelection'), function(checkbox) {
-                        checkbox.dom.checked = false;
-                    });
-                }
-            </script>
-            <% end %>
         </div>
         <div class="WRFormSubsection">
             <span class="WRQuestion"><%=_("Please write here additional comments about talk selection:")%></span>
             <div><input size="60" type="text" name="talkSelectionComments"></div>
         </div>
     </div>
-    
+<% end %>
     
     <div class="WRFormSection">
         <div class="WRFormSubsection">
@@ -370,7 +322,11 @@
 </div>
 
 <script type="text/javascript">
+    var isLecture = <%= jsBoolean(IsLecture) %>;
     var WRWebcastCapable = <%= jsBoolean(WebcastCapable) %>;
+
+    var WR_contributions = <%= jsonEncode(Contributions) %>;
+    
     var WR_contributionsLoaded = <%= jsBoolean(DisplayTalks or not HasWebcastCapableTalks) %>;
 </script>
 

@@ -72,6 +72,7 @@ def getEVOAnswer(action, arguments = {}, eventId = '', bookingId = ''):
     
     try:
         answer = urlOpenWithTimeout(str(url) , secondsToWait).read(readLimit).strip() #we remove any whitespaces, etc. We won't read more than 100k characters
+        Logger.get('EVO').info("""Evt:%s, booking:%s, got answer (unprocessed): [%s]""" % (eventId, bookingId, str(answer)))
         
     except HTTPError, e:
         code = e.code
@@ -102,16 +103,17 @@ def getEVOAnswer(action, arguments = {}, eventId = '', bookingId = ''):
         #we parse an eventual encoding specification, like <fmt:requestEncoding value="UTF-8"/>
         if answer.startswith(encodingTextStart):
             endOfEncondingStart = answer.find(encodingTextStart) + len(encodingTextStart)
-            valueStartIndex = max(answer.find('"', endOfEncondingStart), answer.find("'", endOfEncondingStart)) + 1 #find returns -1 if not found
-            valueEndIndex = max(answer.find('"', valueStartIndex), answer.find("'", valueStartIndex))
+            endOfEncodingEnd = answer.find(encodingTextEnd) + len(encodingTextEnd)
+            valueStartIndex = max(answer.find('"', endOfEncondingStart, endOfEncodingEnd), answer.find("'", endOfEncondingStart, endOfEncodingEnd)) + 1 #find returns -1 if not found
+            valueEndIndex = max(answer.find('"', valueStartIndex, endOfEncodingEnd), answer.find("'", valueStartIndex, endOfEncodingEnd))
             encoding = answer[valueStartIndex:valueEndIndex].strip()
-            endOfEncodignEnd = answer.find(encodingTextEnd) + len(encodingTextEnd)
-            answer = answer[endOfEncodignEnd:].strip()
+            
+            answer = answer[endOfEncodingEnd:].strip()
             answer = answer.decode(encoding).encode('utf-8')
         
         if answer.startswith("OK:"):
             answer = answer[3:].strip() #we remove the "OK:"
-            Logger.get('EVO').info("""Evt:%s, booking:%s, got answer: [%s]""" % (eventId, bookingId, answer))
+            Logger.get('EVO').info("""Evt:%s, booking:%s, got answer (processed): [%s]""" % (eventId, bookingId, str(answer)))
             return answer
         
         elif answer.startswith("ERROR:"):
@@ -144,6 +146,8 @@ def parseEVOAnswer(answer):
         value = value.strip()
         if name == 'url':
             value = value[1:-1].strip() #we remove the brackets
+            if value.startswith("meeting"): #the first part of the URL is not there
+                value = getEVOOptionValueByName("koalaLocation") + '?' + value
         attributes[name] = value
     return attributes
 

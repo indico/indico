@@ -366,7 +366,7 @@ What do you want to do [c/a]? ''')
     
 
 
-def indico_post_install(config_dir, makacconfig_base_dir, package_dir, uid=None, gid=None):
+def indico_post_install(config_dir, makacconfig_base_dir, package_dir, force_no_db = False, uid=None, gid=None):
     from MaKaC.common.Configuration import Config
     cfg = Config.getInstance()
     
@@ -387,30 +387,33 @@ def indico_post_install(config_dir, makacconfig_base_dir, package_dir, uid=None,
         
     # Shall we create a DB?
     dbInstalledBySetupPy = False
-    if _existingDb():
-        print 'Successfully found a database directory at %s' % LOCALDATABASEDIR
+    if force_no_db:
+        print 'Skipping database detection'
     else:
-        opt = None
-        while opt not in ('Y', 'y', 'n', ''):
-            opt = raw_input('''\nWe cannot find the configured database at %s.
-
-Do you want to create a new database now [Y/n]? ''' % LOCALDATABASEDIR)
-            if opt in ('Y', 'y', ''):
-                dbInstalledBySetupPy = True
-                dbpath_ok = False
-                while not dbpath_ok:
-                    dbpath = raw_input('''\nWhere do you want to install the database [/opt/indico/db]? ''')
-                    if dbpath.strip() == '':
-                        dbpath = LOCALDATABASEDIR
-
-                    try:
-                        os.makedirs(dbpath)
-                        dbpath_ok = True
-                    except Exception:
-                        print 'Unable to create database at %s, please make sure that you have permissions to create that directory' % dbpath
-
-            elif opt == 'n':
-                pass
+        if _existingDb():
+            print 'Successfully found a database directory at %s' % LOCALDATABASEDIR
+        else:
+            opt = None
+            while opt not in ('Y', 'y', 'n', ''):
+                opt = raw_input('''\nWe cannot find the configured database at %s.
+    
+    Do you want to create a new database now [Y/n]? ''' % LOCALDATABASEDIR)
+                if opt in ('Y', 'y', ''):
+                    dbInstalledBySetupPy = True
+                    dbpath_ok = False
+                    while not dbpath_ok:
+                        dbpath = raw_input('''\nWhere do you want to install the database [/opt/indico/db]? ''')
+                        if dbpath.strip() == '':
+                            dbpath = LOCALDATABASEDIR
+    
+                        try:
+                            os.makedirs(dbpath)
+                            dbpath_ok = True
+                        except Exception:
+                            print 'Unable to create database at %s, please make sure that you have permissions to create that directory' % dbpath
+    
+                elif opt == 'n':
+                    pass
 
     #we delete an existing vars.js.tpl.tmp
     tmp_dir = cfg.getUploadedFilesTempDir()

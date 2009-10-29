@@ -83,7 +83,7 @@ def invokeMethod(method, params, req):
         except CausedError, e:
             raise e
         except Exception, e:
-            raise ProcessError("ERR-P0", "Error processing method.", inner = traceback.format_exception(*sys.exc_info()))
+            raise ProcessError("ERR-P0", "Error processing method.")
     finally:
         # destroy the context
         ContextManager.destroy()

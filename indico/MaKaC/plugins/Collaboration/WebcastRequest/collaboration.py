@@ -85,8 +85,8 @@ class CSBooking(CSBookingBase):
                                      "MaKaC/plugins/Collaboration/WebcastRequest/collaboration.py",
                                      self.getConference().getCreator())
             except Exception,e:
-                Logger.get('RecReq').error(
-                    """Could not send NewRequestNotification for request with id %s , exception: %s""" % (self._id, str(e)))
+                Logger.get('RecReq').exception(
+                    """Could not send NewRequestNotification for request with id %s of event %s, exception: %s""" % (self._id, str(e)))
                 return WebcastRequestError('create', e)
         
 
@@ -101,8 +101,8 @@ class CSBooking(CSBookingBase):
                                      "MaKaC/plugins/Collaboration/WebcastRequest/collaboration.py",
                                      self.getConference().getCreator())
             except Exception,e:
-                Logger.get('RecReq').error(
-                    """Could not send RequestModifiedNotification for request with id %s , exception: %s""" % (self._id, str(e)))
+                Logger.get('RecReq').exception(
+                    """Could not send RequestModifiedNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
                 return WebcastRequestError('edit', e)
 
                                 
@@ -121,8 +121,8 @@ class CSBooking(CSBookingBase):
                                  "MaKaC/plugins/Collaboration/WebcastRequest/collaboration.py",
                                  None)
         except Exception,e:
-            Logger.get('RecReq').error(
-                """Could not send RequestAcceptedNotification for request with id %s , exception: %s""" % (self._id, str(e)))
+            Logger.get('RecReq').exception(
+                """Could not send RequestAcceptedNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
             return WebcastRequestError('accept', e)
         
         if MailTools.needToSendEmails('WebcastRequest'):
@@ -132,8 +132,8 @@ class CSBooking(CSBookingBase):
                                      "MaKaC/plugins/Collaboration/WebcastRequest/collaboration.py",
                                      None)
             except Exception,e:
-                Logger.get('RecReq').error(
-                    """Could not send RequestAcceptedNotificationAdmin for request with id %s , exception: %s""" % (self._id, str(e)))
+                Logger.get('RecReq').exception(
+                    """Could not send RequestAcceptedNotificationAdmin for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
                 return WebcastRequestError('accept', e)
         
     def _reject(self):
@@ -146,8 +146,8 @@ class CSBooking(CSBookingBase):
                                  "MaKaC/plugins/Collaboration/WebcastRequest/collaboration.py",
                                  None)
         except Exception,e:
-            Logger.get('RecReq').error(
-                """Could not send RequestRejectedNotification for request with id %s , exception: %s""" % (self._id, str(e)))
+            Logger.get('RecReq').exception(
+                """Could not send RequestRejectedNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
             return WebcastRequestError('reject', e)
         
         if MailTools.needToSendEmails('WebcastRequest'):
@@ -157,8 +157,8 @@ class CSBooking(CSBookingBase):
                                      "MaKaC/plugins/Collaboration/WebcastRequest/collaboration.py",
                                      None)
             except Exception,e:
-                Logger.get('RecReq').error(
-                    """Could not send RequestRejectedNotificationAdmin for request with id %s , exception: %s""" % (self._id, str(e)))
+                Logger.get('RecReq').exception(
+                    """Could not send RequestRejectedNotificationAdmin for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
                 return WebcastRequestError('reject', e)
                                         
     def _delete(self):
@@ -169,6 +169,6 @@ class CSBooking(CSBookingBase):
                                      "MaKaC/plugins/Collaboration/WebcastRequest/collaboration.py",
                                      self.getConference().getCreator())
             except Exception,e:
-                Logger.get('RecReq').error(
-                    """Could not send RequestDeletedNotification for request with id %s , exception: %s""" % (self._id, str(e)))
+                Logger.get('RecReq').exception(
+                    """Could not send RequestDeletedNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
                 return WebcastRequestError('remove', e)

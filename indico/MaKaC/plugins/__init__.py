@@ -144,7 +144,8 @@ class Plugins:
                                 
                 if modName == "__init__":
                     if importName(modPath, "ignore" ):
-                        del cls.pluginList[type]
+                        if type in cls.pluginList:
+                            del cls.pluginList[type]
                         return
                     
                     optionsModule = importName(modPath, "options")

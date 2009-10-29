@@ -50,6 +50,16 @@ IndicoUI.executeOnLoad(function() {
 });
 <% end %>
 
+<% if SingleBookingPlugins: %>
+IndicoUI.executeOnLoad(function(){
+    <% for plugin in SingleBookingPlugins: %>
+    if (pluginHasFunction("<%=plugin.getName()%>", "onLoad")) {
+        codes["<%=plugin.getName()%>"]["onLoad"]();
+    }
+    <% end %>
+});
+<% end %>
+
 IndicoUI.executeOnLoad(loadBookings);
 
 </script>

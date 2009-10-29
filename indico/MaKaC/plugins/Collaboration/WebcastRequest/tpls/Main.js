@@ -49,9 +49,10 @@
     clearForm : function () {
         var formNodes = IndicoUtil.findFormFields($E('WebcastRequestForm'));
         IndicoUtil.setFormValues(formNodes, {'talkSelectionComments':'', 'numWebcastViewers':'','numRecordingViewers':'', 'numAttendees':'', 'otherComments':''})
-        $E('allTalksRB').dom.checked = true;
-        
-        IndicoUI.Effect.disappear($E('contributionsDiv'));
+        if (!isLecture) {
+            $E('allTalksRB').dom.checked = true;
+            IndicoUI.Effect.disappear($E('contributionsDiv'));
+        }
         
         $E('permissionYesRB').dom.checked = false;
         $E('permissionNoRB').dom.checked = false;
@@ -62,11 +63,14 @@
     
     onLoad : function() {
         
+        WRUpdateContributionList();
+        
         IndicoUtil.enableDisableForm($E("WRForm"), WRWebcastCapable);
         
-        if (!WR_contributionsLoaded) {
-            $E('contributionsRow').append(Html.td("WRContributionsColumn",Html.ul({id:'contributionList1', className:'WROptionList'})));
-            $E('contributionsRow').append(Html.td("WRContributionsColumn",Html.ul({id:'contributionList2', className:'WROptionList'})));
+        if (!isLecture) {
+            if (singleBookings['WebcastRequest'] && singleBookings['WebcastRequest'].bookingParams.talks == 'choose') {
+                IndicoUI.Effect.appear($E('contributionsDiv'));
+            }
         }
         
         if(!singleBookings['WebcastRequest']) {

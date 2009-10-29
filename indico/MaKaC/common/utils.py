@@ -21,12 +21,12 @@
 
 from random import randint
 from datetime import datetime, date, timedelta
+from MaKaC.common.timezoneUtils import isSameDay, isToday, getAdjustedDate,\
+    isTomorrow
 import time
 from MaKaC import user
 import re
 from MaKaC.i18n import _
-import sys
-import os
 
 
 
@@ -383,13 +383,119 @@ def formatDate(date, showWeek=False, format=None):
         return datetime.strftime(date, week+'%d/%m/%Y')
     else:
         return datetime.strftime(date, format)
-
+    
 def formatTime(time):
     return time.strftime('%H:%M')
 
 def parseDate(dateStr, format='%d/%m/%Y'):
     t=time.strptime(dateStr, format)
     return datetime(t.tm_year,t.tm_mon, t.tm_mday).date()
+
+
+def formatDuration(duration, units = 'minutes', truncate = True):
+    """ Formats a duration (a timedelta object)
+    """
+    
+    seconds = duration.days * 86400 + duration.seconds
+    
+        
+    if units == 'seconds':
+        result = seconds
+    elif units == 'minutes':
+        result = seconds / 60
+    elif units == 'hours':
+        result = seconds / 3600
+    elif units == 'days':
+        result = seconds / 86400
+        
+    elif units == 'hours_minutes':
+        #truncate has no effect here
+        minutes = int(seconds / 60) % 60
+        hours = int(seconds / 3600)
+        return str(hours) + 'h' + str(minutes).zfill(2) + 'm'
+    
+    elif units == '(hours)_minutes':
+        #truncate has no effect here
+        minutes = int(seconds / 60) % 60
+        hours = int(seconds / 3600)
+        if hours:
+            return str(hours) + 'h' + str(minutes).zfill(2) + 'm'
+        else:
+            return str(minutes) + 'm'
+    
+    else:
+        raise Exception("Unknown duration unit: " + str(units))
+    
+    if truncate:
+        return int(result)
+    else:
+        return result
+    
+
+    
+    
+            
+    
+def formatTwoDates(date1, date2, tz = None, useToday = False, useTomorrow = False, dayFormat = None, capitalize = True, showWeek = False):
+    """ Formats two dates, such as an event start and end date, taking into account if they happen the same day
+        (given a timezone).
+        -date1 and date2 have to be timezone-aware.
+        -If no tz argument is provided, tz will be the timezone of date1.
+         tz can be a string or a timezone "object"
+        -dayFormat and showWeek are passed to formatDate function, so they behave the same way as in that function
+        -capitalize: capitalize week days AND first letter of sentence if there is one
+        
+        Examples: 17/07/2009 from 08:00 to 18:00 (default args, 2 dates in same day)
+                  from 17/07/2009 at 08:00 to 19/07/2009 at 14:00 (default args, 2 dates in different day)
+                  Fri 17/07/2009 from 08:00 to 18:00 (showWeek = True, default args, 2 dates in same day)
+                  today from 10:00 to 11:00 (useToday = True, default args, 2 dates in same day and it happens to be today)
+    """
+    
+    if not tz:
+        tz = date1.tzinfo
+    
+    date1 = getAdjustedDate(date1, tz = tz)
+    date2 = getAdjustedDate(date2, tz = tz)
+    
+    sameDay = isSameDay(date1, date2, tz)
+    
+    date1text = ''
+    date2text = ''
+    if useToday:
+        if isToday(date1, tz):
+            date1text = "today"
+        if isToday(date2, tz):
+            date2text = "today"
+    if useTomorrow:
+        if isTomorrow(date1, tz):
+            date1text = "isTomorrow"
+        if isTomorrow(date2, tz):
+            date2text = "isTomorrow"
+            
+    
+    if not date1text:
+        date1text = formatDate(date1.date(), showWeek, dayFormat)
+        if capitalize:
+            date1text = date1text.capitalize()
+    if not date2text:
+        date2text = formatDate(date2.date(), showWeek, dayFormat)
+        if capitalize:
+            date2text = date2text.capitalize()
+    
+    time1text = formatTime(date1.time())
+    time2text = formatTime(date2.time())
+        
+    if sameDay:
+        result = date1text + ' from ' + time1text + ' to ' + time2text
+    else:
+        if capitalize:
+            fromText = 'From '
+        else:
+            fromText = 'from '
+        result = fromText + date1text + ' at ' + time1text + ' to ' + date2text + ' at ' + time2text
+    
+    return result
+    
 
 def parseTime(timeStr, format='%H:%M'):
     t=time.strptime(timeStr, format)
