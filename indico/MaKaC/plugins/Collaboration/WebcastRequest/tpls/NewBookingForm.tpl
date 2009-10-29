@@ -157,12 +157,6 @@
         <div id="contributionsDiv" class="WRFormSubsection" style="display: <%= displayText %>;">
             <span class="WRQuestion"><%=_("Please choose among the webcast-able contributions below:")%></span>
             
-            <% if not HasWebcastCapableTalks: %>
-            <div>
-                <span style="padding-left: 20px;"><%= _("This event has no talks, or none of the talks take place in a room capable of webcasting.") %></span>
-            </div>
-            <% end %>
-            
             <% if HasWebcastCapableTalks: %>
             <span class="fakeLink" style="margin-left: 20px;" onclick="WRSelectAllContributions()">Select all</span>
             <span class="horizontalSeparator">|</span>
