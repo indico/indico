@@ -11,10 +11,11 @@
 
 IndicoUI.executeOnLoad(function(){
   var ttdata = <%= str(ttdata).replace('%','%%') %>;
+  var eventInfo = <%= eventInfo %>;
 
   var historyBroker = new BrowserHistoryBroker();
 
-  var timetable = new TopLevelDisplayTimeTable(ttdata,710,$E('timetable'), 'session', historyBroker);
+  var timetable = new TopLevelDisplayTimeTable(ttdata,eventInfo,710,$E('timetable'), 'session', historyBroker);
   $E('timetable').set(timetable.draw());
   timetable.postDraw();
 

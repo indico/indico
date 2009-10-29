@@ -61,7 +61,6 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
         var self = this;
         customStyle = any(customStyle, {});
 
-
         this.greyBg = Html.div({ className: this.printable ? 'noprint' : '',
             style: {
                 'opacity': 0.5, /* Standard */
@@ -128,11 +127,18 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
     postDraw: function() {
         var winDim = getWindowDimensions();
 
-        // If content is to big for the window add a scrollbar
         var winHeight = winDim.height - 100;
         var contentHeight = this.contentWrapper.dom.offsetHeight;
-        if (winHeight > this.maxHeight && contentHeight > winHeight) {
-            contentHeight = this.maxHeight;
+
+        // If content is to big for the window
+        if (contentHeight > winHeight) {
+            // If the window is larger than maxHeight, use the latter
+            if (winHeight > this.maxHeight) {
+                contentHeight = this.maxHeight;
+            } else {
+                // otherwise limit the content to the window height
+                contentHeight = winHeight;
+            }
         }
 
         // This is done in order to make sure that the scrollbar is shown

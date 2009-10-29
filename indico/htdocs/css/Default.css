@@ -3691,7 +3691,7 @@ ul.errorList li {
 ul.warningList {
     padding: 0;
     margin: 0;
-    margin-left: 20px;  
+    margin-left: 20px;
 }
 
 span.errorTitle {
@@ -3707,7 +3707,7 @@ span.messageAfterErrors {
 
 span.warningTitle {
     font-size: medium;
-    font-weight: bold;  
+    font-weight: bold;
 }
 
 ul.warningLevel0 {
@@ -3992,7 +3992,7 @@ div.CADiv {
     margin-top: 10px;
     margin-bottom: 10px;
     color: #444;
-    border: 1px solid #AAA;   
+    border: 1px solid #AAA;
     -moz-border-radius-bottomleft:10px;
     -moz-border-radius-bottomright:10px;
     -moz-border-radius-topleft:10px;
@@ -4543,6 +4543,13 @@ div.timetableLoading {
     font-family: Verdana;
     font-size: 12pt;
     padding: 10px 30px 10px 10px;
+}
+
+.timetablePopup .balloonSubtitle {
+    font-family: Verdana;
+    font-size: 8pt;
+    color: #AAA;
+    padding: 0px 30px 10px 10px;
 }
 
 div.timetablePopupInfoWrapper {
@@ -5506,3 +5513,4 @@ div.posterEntry:hover {
     float: right;
     margin-top: 5px;
 }
+
