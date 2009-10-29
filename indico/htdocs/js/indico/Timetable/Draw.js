@@ -37,7 +37,11 @@ type("TimetableBlockBase", [],
              var cursor = getMousePointerCoordinates(event);
              if (this.managementMode) {
 
-                 this.popup = new TimetableBlockPopupManagement(this, self.eventData, self.div,
+                 this.popup = new TimetableBlockPopupManagement(
+                     self.timetable,
+                     this,
+                     self.eventData,
+                     self.div,
                      function() {
                          self.div.dom.style.cursor = 'pointer';
                          self.popupActive = false;
@@ -46,7 +50,10 @@ type("TimetableBlockBase", [],
                       self.managementActions);
 
             } else {
-                this.popup = new TimetableBlockPopup(self.eventData, self.div,
+                this.popup = new TimetableBlockPopup(
+                    self.timetable,
+                    self.eventData,
+                    self.div,
                     function() {
                         self.div.dom.style.cursor = 'pointer';
                         self.popupActive = false;
@@ -119,7 +126,8 @@ type("TimetableBlockBase", [],
          }
 
      },
-     function(managementMode, managementActions){
+     function(timetable, managementMode, managementActions){
+         this.timetable = timetable;
          this.managementMode = managementMode;
          this.managementActions = managementActions;
          this.popupActive = false;
@@ -350,15 +358,15 @@ type("TimetableBlock", ["TimetableBlockBase"],
                 this.block.dom.style.color = textColor;
             }
         },
-        function(eventData, blockData, compactMode, printableVersion, detailLevel, managementMode, managementActions){
-            this.TimetableBlockBase(managementMode, managementActions);
+     function(timetable, eventData, blockData, compactMode, printableVersion, detailLevel, managementMode, managementActions){
+         this.TimetableBlockBase(timetable, managementMode, managementActions);
 
-            this.compactMode = compactMode;
-            this.eventData = eventData;
-            this.blockData = blockData;
-            this.margin = TimetableDefaults.blockMargin;
-            this.printableVersion = printableVersion;
-            this.detailLevel = detailLevel;
+         this.compactMode = compactMode;
+         this.eventData = eventData;
+         this.blockData = blockData;
+         this.margin = TimetableDefaults.blockMargin;
+         this.printableVersion = printableVersion;
+         this.detailLevel = detailLevel;
         }
    );
 
@@ -418,19 +426,19 @@ type("TimetableBlockWholeDay", ["TimetableBlockBase"],
 
             }
         },
-        function(eventData, blockData, managementMode, managementActions){
-            this.TimetableBlockBase(managementMode, managementActions);
+     function(timetable, eventData, blockData, managementMode, managementActions){
+         this.TimetableBlockBase(timetable, managementMode, managementActions);
 
-            this.eventData = eventData;
-            this.blockData = blockData;
-            this.margin = TimetableDefaults.blockMargin;
-        }
+         this.eventData = eventData;
+         this.blockData = blockData;
+         this.margin = TimetableDefaults.blockMargin;
+     }
    );
 
 
 type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
     createContent: function() {
-        var self = this;
+       var self = this;
 
         var div = Html.div({className: 'timetablePopup', style: {width: pixels(this.popupWidth)}});
 
@@ -442,6 +450,17 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
 
         var titleDiv = Html.div({className: 'title'}, title);
         div.append(titleDiv);
+
+
+        if (self.eventData.entryType != 'Session' &&
+            exists(self.eventData.sessionSlotId)) {
+            var session = self.timetable.eventInfo.sessions[self.eventData.sessionId];
+            var belongsToDiv = Html.div(
+                'balloonSubtitle',
+                $T('inside'),' ',
+                Html.span({style:{fontWeight:'bold'}},session.title));
+            div.append(belongsToDiv);
+        }
 
         var menuBar = this._getMenuBar();
         div.append(menuBar);
@@ -477,7 +496,7 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
             infoContentDiv.append(Html.br());
         }
 
-        // If it's a contribtion the add speakers information
+        // If it's a contribtion add speaker information
         if (self.eventData.entryType == 'Contribution') {
             var speakers = Html.span();
             var i = 0;
@@ -657,7 +676,8 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
         return contributionsDiv;
     }
     },
-     function(eventData, blockDiv, closeHandler) {
+     function(timetable, eventData, blockDiv, closeHandler) {
+         this.timetable = timetable;
          this.eventData = eventData;
          this.triggerElement = blockDiv;
          this.popupWidth = 300;
@@ -811,7 +831,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"], {
             moveEntryLink.observeClick(function(){
                 self.close();
                 self.managementActions.moveEntryContrib(self.eventData);
-            })
+            });
 
             menu.insert(moveEntryLink);
 
@@ -859,10 +879,10 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"], {
         return contributionsDiv;
     }
     },
-     function(block, eventData, blockDiv, closeHandler, managementActions) {
+     function(timetable, block, eventData, blockDiv, closeHandler, managementActions) {
          this.block = block;
          this.managementActions = managementActions;
-         this.TimetableBlockPopup(eventData, blockDiv, closeHandler);
+         this.TimetableBlockPopup(timetable, eventData, blockDiv, closeHandler);
     }
 );
 
@@ -942,7 +962,10 @@ type("ContributionsPopup", ["ExclusivePopup"], {
     }
     },
      function(eventData, contributions, closeHandler) {
-         this.contributions = contributions;
+
+         this.contributions = $L(contributions);
+         this.contributions.sort(IndicoSortCriteria.StartTime);
+
          this.eventData = eventData;
          this.width = 500;
 
@@ -1046,7 +1069,7 @@ type("TimetableDrawer", ["IWidget"],
              var blockAdded = false;
              each(blocks, function(blockData) {
                  var eventData = data[blockData.id];
-                 var block = new TimetableBlockWholeDay(eventData, blockData, self.managementMode, self.managementActions);
+                 var block = new TimetableBlockWholeDay(self.timetable, eventData, blockData, self.managementMode, self.managementActions);
                  wholeDayBlockDiv.append(block.draw(0, 100));
                  blockAdded = true;
              });
@@ -1100,7 +1123,7 @@ type("TimetableDrawer", ["IWidget"],
                  //if (blockData.collapsed || (blockData.end - blockData.start < TimetableDefaults.layouts.proportional.values.pxPerHour))
                  //    compactMode = true;
 
-                 block = new TimetableBlock(eventData, blockData, compactMode, self.printableVersion, self.detail.get(), self.managementMode, self.managementActions);
+                 block = new TimetableBlock(self.timetable, eventData, blockData, compactMode, self.printableVersion, self.detail.get(), self.managementMode, self.managementActions);
                  blockDiv.append(block.draw(leftPos, width));
                  self.blocks.push(block);
              });
@@ -1356,7 +1379,7 @@ type("TimetableDrawer", ["IWidget"],
              this.redraw();
          }
      },
-     function(data, width, wrappingElement, detailLevel, extraButtons, loadingIndicator, managementMode, managementActions, defaultLayout) {
+     function(timetable, width, wrappingElement, detailLevel, extraButtons, loadingIndicator, managementMode, managementActions, defaultLayout) {
 
 
          var self = this;
@@ -1364,7 +1387,8 @@ type("TimetableDrawer", ["IWidget"],
          this.wrappingElement = wrappingElement;
          this.canvas = Html.div({});
          this.filterList = new WatchList();
-         this.data = data;
+         this.data = timetable.data;
+         this.timetable = timetable;
          this.blocks = [];
          this.width = width;
          // Prevents redraw when set to true

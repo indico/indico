@@ -20,15 +20,19 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.services.implementation.collaboration import CollaborationPluginServiceBase
-from MaKaC.common.PickleJar import DictPickler
 from MaKaC.plugins.Collaboration.WebcastRequest.common import getCommonTalkInformation
+from MaKaC.conference import Contribution
+from MaKaC.common.fossilize import fossilize
+from MaKaC.fossils.contribution import IContributionWithSpeakersFossil
 
 class WebcastAbleTalksService(CollaborationPluginServiceBase):
     
     def _getAnswer(self):
         talkInfo = getCommonTalkInformation(self._conf)
         webcastAbleTalks = talkInfo[2]
-                
-        webcastAbleTalks.sort(key = lambda c: c.getId())
+        webcastAbleTalks.sort(key = Contribution.contributionStartDateForSort)
         
-        return DictPickler.pickle(webcastAbleTalks)
+        return fossilize(webcastAbleTalks, IContributionWithSpeakersFossil,
+                         tz = self._conf.getTimezone(),
+                         units = '(hours)_minutes',
+                         truncate = True)

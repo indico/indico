@@ -178,10 +178,28 @@ var IndicoUtil = {
     /**
     * Formats a JS Date, returning a string (DD/MM/YY HH:MM)
     * @param {Date} date A JS Date
+    * @param {Integer} weekDayOption If different from 0, will add the weekday in different ways.
     * @return A string representation of the Date object
     */
-    formatDateTime: function(date) {
-        return zeropad(date.getDate())+'/'+ zeropad(date.getMonth()+1) +'/'+date.getFullYear()+' '+ zeropad(date.getHours())+':'+zeropad(date.getMinutes());
+    formatDateTime: function(date, weekDayOption) {
+        if (!exists(weekDayOption)) {
+            weekDayOption = 0;
+        }
+        
+        var dateText = zeropad(date.getDate())+'/'+ zeropad(date.getMonth()+1) +'/'+date.getFullYear()+' '+ zeropad(date.getHours())+':'+zeropad(date.getMinutes());
+        
+        switch(weekDayOption) {
+        case 1:
+            return Indico.Data.WeekDays[date.getDay()] + " " + dateText;
+        case 2:
+            return Indico.Data.WeekDays[date.getDay()].substring(0,3) + " " + dateText;
+        case 3:
+            return dateText + " (" + Indico.Data.WeekDays[date.getDay()] + ")";
+        case 4:
+            return dateText + " (" + Indico.Data.WeekDays[date.getDay()].substring(0,3) + ")";
+        default:
+            return dateText;
+        }
     },
 
     /**
@@ -200,6 +218,15 @@ var IndicoUtil = {
     */
     formatDate2: function(date) {
         return '' + date.getFullYear() + zeropad(date.getMonth()+1) + zeropad(date.getDate());
+    },
+    
+    /**
+     * Formats a JS Date, returning just the time as a string (HH:MM)
+     * @param {Date} date A JS Date
+     * @return A string representation of the Date object
+     */
+    formatJustTime: function(date) {
+        return zeropad(date.getHours())+ ':' +zeropad(date.getMinutes());
     },
 
     /**

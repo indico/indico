@@ -21,9 +21,11 @@
 
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.webinterface import urlHandlers
-from MaKaC.common.utils import formatDateTime
-from MaKaC.common.timezoneUtils import getAdjustedDate
+from MaKaC.common.utils import formatDateTime, formatTwoDates, formatTime,\
+    formatDuration
+from MaKaC.common.timezoneUtils import getAdjustedDate, isSameDay, maxDatetime
 from MaKaC.common.Configuration import Config
+from MaKaC.conference import Contribution
 
 class CollaborationTools(object):
     """ Class with utility classmethods for the Collaboration plugins core and plugins
@@ -306,7 +308,15 @@ Event details:
             <strong>Event name:</strong>
         </td>
         <td>
-            %s <a href="%s">(link)</a>
+            <a href="%s">%s</a>
+        </td
+    </tr>
+    <tr>
+        <td style="vertical-align: top; white-space : nowrap;">
+            <strong>Event dates:</strong>
+        </td>
+        <td>
+            %s
         </td
     </tr>
     <tr>
@@ -319,8 +329,9 @@ Event details:
     </tr>
     %s
 </table>
-"""%(conf.getTitle(),
-     urlHandlers.UHConferenceDisplay.getURL(conf),
+"""%(urlHandlers.UHConferenceDisplay.getURL(conf),
+     conf.getTitle(),
+     formatTwoDates(conf.getStartDate(), conf.getEndDate(), tz = conf.getTimezone(), showWeek = True),
      conf.getId(),
      MailTools.eventRoomDetails(conf)
      )
@@ -447,6 +458,78 @@ Creator of the event details:
         </td>
     </tr>
 """ % formatDateTime(getAdjustedDate(booking.getModificationDate(), booking.getConference()))
+
+    @classmethod
+    def talkListText(cls, conf, talkList):
+        text = []
+        
+        #we sort by start date
+        talkList.sort(key = Contribution.contributionStartDateForSort)
+        
+        #we check is event is single day
+        singleDayEvent = isSameDay(conf.getStartDate(), conf.getEndDate(), conf.getTimezone())
+        
+        for contribution in talkList:
+            
+            #1. speakers text
+            speakerList = contribution.getSpeakerList()
+            if speakerList:
+                speakers = ', by ' + ", ".join([person.getFullName() for person in speakerList])
+            else:
+                speakers = ''
+            
+            #2. room and location text
+            locationStr = MailTools.locationOrRoomToStr(contribution.getLocation())
+            roomStr = MailTools.locationOrRoomToStr(contribution.getRoom())
+            confLocationStr = MailTools.locationOrRoomToStr(conf.getLocation())
+            confRoomStr = MailTools.locationOrRoomToStr(conf.getRoom())
+            
+            if locationStr == confLocationStr and roomStr == confRoomStr:
+                locationText = ''
+            else:
+                if locationStr:
+                    locationText = "Location: " + locationStr
+                    if roomStr:
+                        locationText += ', Room: ' + roomStr
+                    else:
+                        locationText += ', Room: not defined'
+                else:
+                    locationText = "Location: not defined"
+                
+                locationText = " (%s)" % locationText
+                
+            #3. dates text
+            if not contribution.getStartDate():
+                datesText = '(Not scheduled)'
+            elif singleDayEvent and isSameDay(conf.getStartDate(), contribution.getStartDate(), conf.getTimezone()):
+                datesText = formatTime(contribution.getAdjustedStartDate().time()) + ' (' + formatDuration(contribution.getDuration(), "hours_minutes") + ')'
+            else:
+                datesText = formatDateTime(contribution.getAdjustedStartDate(), showWeek = True) + ' (' + formatDuration(contribution.getDuration(), "hours_minutes") + ')'
+                
+            #4. returned result
+            contributionLine = """•%s : <a href="%s">%s</a>%s (id: %s)%s""" % (
+                datesText,
+                urlHandlers.UHContributionDisplay.getURL(contribution),
+                contribution.getTitle(),
+                speakers,
+                contribution.getId(),
+                locationText
+            )
+            text.append(contributionLine)
+        
+        return text
+
+    @classmethod
+    def locationOrRoomToStr(cls, object):
+        """ Turns a CustomLocation or CustomRoom object into a string,
+            testing if the object is None, object.getName() is None.
+        """
+        if object is None:
+            return ''
+        elif object.getName() is None:
+            return ''
+        else:
+            return object.getName().strip()
 
     @classmethod
     def listToStr(cls, list):

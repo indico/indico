@@ -108,12 +108,12 @@ def process(req):
         try:
             responseBody["result"] = result
         except Exception, e:
-            raise ProcessError("ERR-P1", "Error during serialization.", e)
+            raise ProcessError("ERR-P1", "Error during serialization.")
         
     except CausedError, e:        
         errorInfo = DictPickler.pickle(e);
 
-        Logger.get('rpc').error(str(e))
+        Logger.get('rpc').exception('Service request failed. Request text:\r\n%s\r\n\r\n' % str(requestText))
         
         if requestBody:
             errorInfo["requestInfo"] = {"method": str(requestBody["method"]),

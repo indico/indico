@@ -20,6 +20,12 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.common.utils import formatDateTime
+from MaKaC.fossils.subcontribution import ISubContribParticipationFossil,\
+    ISubContributionFossil, ISubContributionWithSpeakersFossil
+from MaKaC.fossils.contribution import IContributionParticipationFossil,\
+    IContributionFossil, IContributionWithSpeakersFossil,\
+    IContributionWithSubContribsFossil
+from MaKaC.common.fossilize import fossilizes, Fossilizable
 
 import re, os
 import tempfile
@@ -38,7 +44,7 @@ from BTrees.OOBTree import OOBTree
 from BTrees.OIBTree import OIBTree,OISet,union
 import MaKaC
 import MaKaC.common.indexes as indexes
-from MaKaC.common.timezoneUtils import nowutc
+from MaKaC.common.timezoneUtils import nowutc, maxDatetime
 import MaKaC.fileRepository as fileRepository
 from MaKaC.schedule import ConferenceSchedule, SessionSchedule,SlotSchedule,\
      PosterSlotSchedule, SlotSchTypeFactory, ContribSchEntry, \
@@ -7356,7 +7362,9 @@ class SessionSlot(Persistent):
         return res
 
 
-class ContributionParticipation(Persistent):
+class ContributionParticipation(Persistent, Fossilizable):
+    
+    fossilizes(IContributionParticipationFossil)
 
     def __init__( self ):
         self._contrib = None
@@ -7762,13 +7770,15 @@ class _PrimAuthIdx(_AuthIdx):
             for auth in contrib.getPrimaryAuthorList():
                 self.index(auth)
 
-class Contribution(Persistent):
+class Contribution(Persistent, Fossilizable):
     """This class implements a conference contribution, being the concrete
         contributes of the conference participants. The class contains
         necessary attributes to store contribution basic meta data and provides
         the useful operations to access and manage them. A contribution can be
         attached either to a session or to a conference.
     """
+    
+    fossilizes(IContributionFossil, IContributionWithSpeakersFossil, IContributionWithSubContribsFossil)
 
     def __init__(self,**contribData):
         self.parent = None
@@ -9642,6 +9652,16 @@ class Contribution(Persistent):
 
     def setReportNumberHolder(self, rnh):
         self._reportNumberHolder=rnh
+        
+    @classmethod
+    def contributionStartDateForSort(cls, contribution):
+        """ Function that can be used as "key" argument to sort a list of contributions by start date
+            The contributions with no start date will be at the end with this sort
+        """
+        if contribution.getStartDate():
+            return contribution.getStartDate()
+        else:
+            return maxDatetime()
 
 
 class AcceptedContribution( Contribution ):
@@ -9811,7 +9831,9 @@ class ContribStatusNone(ContribStatus):
         csn.setDate(self.getDate())
         return csn
 
-class SubContribParticipation(Persistent):
+class SubContribParticipation(Persistent, Fossilizable):
+    
+    fossilizes(ISubContribParticipationFossil)
 
     def __init__( self ):
         self._subContrib = None
@@ -10058,9 +10080,11 @@ class SubContribParticipation(Persistent):
             res = "%s%s."%(res, self.getFirstName()[0].upper())
         return res
 
-class SubContribution(Persistent):
+class SubContribution(Persistent, Fossilizable):
     """
     """
+    
+    fossilizes(ISubContributionFossil, ISubContributionWithSpeakersFossil)
 
     def __init__( self, **subContData ):
         self.parent = None

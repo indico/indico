@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: __init__.py,v 1.2 2008/04/24 16:59:02 jose Exp $
+## $Id: services.py,v 1.1 2009/04/09 13:13:18 dmartinc Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -19,6 +19,16 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.i18n import _
-pluginTypeDescription = _("Room Booking Plugins")
-ignore = True
+from MaKaC.services.implementation.collaboration import CollaborationPluginServiceBase
+from MaKaC.plugins.Collaboration.RecordingRequest.common import getTalks
+from MaKaC.common.fossilize import fossilize
+from MaKaC.fossils.contribution import IContributionWithSpeakersFossil
+
+class RRTalksService(CollaborationPluginServiceBase):
+    
+    def _getAnswer(self):
+        talks = getTalks(self._conf, sort = True)
+        return fossilize(talks, IContributionWithSpeakersFossil,
+                         tz = self._conf.getTimezone(),
+                         units = '(hours)_minutes',
+                         truncate = True)

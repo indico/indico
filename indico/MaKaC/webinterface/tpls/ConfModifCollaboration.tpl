@@ -111,12 +111,4 @@ var reject = function(booking) {
     rejectBooking(booking, '<%= Conference.getId() %>');
 }
 
-IndicoUI.executeOnLoad(function(){
-    <% for plugin in SingleBookingPlugins + MultipleBookingPlugins: %>
-    if (pluginHasFunction("<%=plugin.getName()%>", "onLoad")) {
-        codes["<%=plugin.getName()%>"]["onLoad"]();
-    }
-    <% end %>
-});
-
 </script>

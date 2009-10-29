@@ -95,7 +95,6 @@ type("SelectableListWidget", ["ListWidget"],
         this.selectedList = $O();
         this.selectedObserver = selectedObserver;
         if (exists (selectedCssClass)) {
-            alert(selectedCssClass)
             this.selectedCssClass = selectedCssClass;
         } else {
             this.selectedCssClass = "selectedListItem";
@@ -712,7 +711,7 @@ type("PopupWidget", [], {
 
     setFixedPosition: function(fixed) {
         fixed = any(fixed, true);
-        this.canvas.dom.style.position = fixed ? 'fixed' : absolute;
+        this.canvas.dom.style.position = fixed ? 'fixed' : 'absolute';
     },
 
     close: function(e) {

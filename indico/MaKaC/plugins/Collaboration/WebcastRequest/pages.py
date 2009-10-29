@@ -24,6 +24,11 @@ from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase, WCSCS
 from MaKaC.plugins.Collaboration.WebcastRequest.common import lectureOptions,\
     typeOfEvents, postingUrgency, webcastPurpose, intendedAudience,\
     subjectMatter, getCommonTalkInformation
+from MaKaC.conference import Contribution
+from MaKaC.common.fossilize import fossilize
+from MaKaC.fossils.contribution import IContributionWithSpeakersFossil
+from MaKaC.common.Conversion import Conversion
+from MaKaC.common.timezoneUtils import isSameDay
 
 
 class WNewBookingForm(WCSPageTemplateBase):
@@ -33,6 +38,9 @@ class WNewBookingForm(WCSPageTemplateBase):
         
         vars["Conference"] = self._conf
         vars["IsSingleBooking"] = not CollaborationTools.getCSBookingClass(self._pluginName)._allowMultiple
+        
+        isLecture = self._conf.getType() == 'simple_event'
+        vars["IsLecture"] = isLecture
         
         underTheLimit = self._conf.getNumberOfContributions() <= self._WebcastRequestOptions["contributionLoadLimit"].getValue()
         booking = self._conf.getCSBookingManager().getSingleBooking('WebcastRequest')
@@ -66,23 +74,14 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["WebcastCapable"] = topLevelWebcastCapable or nWebcastCapable > 0
         
         if initialDisplay:
-            webcastAbleTalks.sort(key = lambda c: c.getId())
+            webcastAbleTalks.sort(key = Contribution.contributionStartDateForSort)
                 
-            if booking:
-                selectedTalks = booking._bookingParams["talkSelection"]
-            else:
-                selectedTalks = []
-
-            contributions1 = []
-            contributions2 = []
-            
-            for i, contribution in enumerate(webcastAbleTalks):
-                if i < (nTalks + 1) / 2:
-                    contributions1.append((contribution, contribution.getId() in selectedTalks))
-                else:
-                    contributions2.append((contribution, contribution.getId() in selectedTalks))
-                
-            vars["TalkLists"] = [contributions1, contributions2]
+            vars["Contributions"] = fossilize(webcastAbleTalks, IContributionWithSpeakersFossil,
+                                                                tz = self._conf.getTimezone(),
+                                                                units = '(hours)_minutes',
+                                                                truncate = True)
+        else:
+            vars["Contributions"] = []
         
         
         vars["LectureOptions"] = lectureOptions
@@ -107,9 +106,24 @@ class WIndexing(WJSBase):
 class WExtra (WJSBase):
     def getVars(self):
         vars = WJSBase.getVars( self )
+        
         if self._conf:
             vars["ConferenceId"] = self._conf.getId()
             vars["NumberOfContributions"] = self._conf.getNumberOfContributions()
+
+            # these 2 vars are used to see if contrib dates shown should include day or just time
+            vars["ConfStartDate"] = Conversion.datetime(self._conf.getAdjustedStartDate())
+            vars["IsMultiDayEvent"] = not isSameDay(self._conf.getStartDate(), self._conf.getEndDate(), self._conf.getTimezone())
+            
+            location = ""
+            if self._conf.getLocation() and self._conf.getLocation().getName():
+                location = self._conf.getLocation().getName().strip()
+            vars["ConfLocation"] = location
+            
+            room = ""
+            if self._conf.getRoom() and self._conf.getRoom().getName():
+                room = self._conf.getRoom().getName().strip()
+            vars["ConfRoom"] = room
 
         else:
             # this is so that template can still be rendered in indexes page...
@@ -117,6 +131,10 @@ class WExtra (WJSBase):
             # conference data from the booking, now that the booking has the conference inside
             vars["ConferenceId"] = ""
             vars["NumberOfContributions"] = 0
+            vars["ConfStartDate"] = ""
+            vars["IsMultiDayEvent"] = False
+            vars["ConfLocation"] = ""
+            vars["ConfRoom"] = ""
         
         return vars
 

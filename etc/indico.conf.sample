@@ -22,11 +22,11 @@ DBRealm              = ""
 #------------------------------------------------------------------------------
 # Possible values of SanitizationLevel:
 #    0: Escape all HTML tags
-#    1: Raise error if FORM or IFRAME tags are used
+#    1: Raise error if styles are used
 #    2: Raise error if SCRIPT tag is used
 #    3: No input filtering is done (DANGEROUS!)
 
-SanitizationLevel    = 1
+SanitizationLevel    = 2
 
 
 #------------------------------------------------------------------------------

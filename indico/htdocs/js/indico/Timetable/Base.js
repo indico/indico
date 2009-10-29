@@ -392,7 +392,7 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
 
          historyBroker.addListener(this);
 
-         this.timetableDrawer = new TimetableDrawer(data, width,
+         this.timetableDrawer = new TimetableDrawer(this, width,
                                                     wrappingElement,
                                                     detailLevel,
                                                     this._functionButtons(),
@@ -503,7 +503,7 @@ type("IntervalTimeTableMixin", [], {
          this.managementActions = managementActions;
          this.parentTimetable = parent;
 
-         this.timetableDrawer = new IntervalTimetableDrawer(this.data, width,
+         this.timetableDrawer = new IntervalTimetableDrawer(this, width,
                                                             wrappingElement,
                                                             this._functionButtons(),
                                                             this.loadingIndicator,
@@ -722,10 +722,12 @@ type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"],
 
 
 },
-     function(data, width, wrappingElement, detailLevel, historyBroker) {
+     function(data, contextInfo, width, wrappingElement, detailLevel, historyBroker) {
 
          this.DisplayTimeTable(data, width, wrappingElement, detailLevel);
          this.TopLevelTimeTableMixin(data, width, wrappingElement, detailLevel, null, historyBroker);
+
+         this.eventInfo = contextInfo;
 
          this._filterSetup();
 

@@ -26,7 +26,7 @@ from MaKaC.common.timezoneUtils import nowutc, unixTimeToDatetime
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.EVO.common import EVOControlledException, getEVOAnswer, parseEVOAnswer, EVOException,\
     getMinStartDate, getMaxEndDate, OverlappedError, ChangesFromEVOError,\
-    EVOError, getRequestURL, EVOWarning
+    EVOError, getRequestURL, EVOWarning, getEVOOptionValueByName
 from MaKaC.plugins.Collaboration.EVO.mail import NewEVOMeetingNotificationAdmin, EVOMeetingModifiedNotificationAdmin, EVOMeetingRemovalNotificationAdmin
 #    NewEVOMeetingNotificationManager, EVOMeetingModifiedNotificationManager,\
 #    EVOMeetingRemovalNotificationManager
@@ -101,6 +101,8 @@ class CSBooking(CSBookingBase):
     
     @Retrieves(['MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking'], 'url')
     def getURL(self):
+        if self._url.startswith("meeting"): #the first part of the URL is not there
+            self._url = getEVOOptionValueByName("koalaLocation") + '?' + self._url
         return self._url
     
     @Retrieves(['MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking'], 'errorMessage')

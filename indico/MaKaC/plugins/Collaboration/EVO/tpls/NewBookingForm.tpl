@@ -8,7 +8,7 @@
         <td>
             <select name="communityId">
                 <option value="chooseOne">-- Choose one --</option>
-                <% for k,v in Communities.items(): %>
+                <% for k,v in Communities: %>
                 <option value="<%=k%>"><%=v%></option>
                 <% end %>
             </select>

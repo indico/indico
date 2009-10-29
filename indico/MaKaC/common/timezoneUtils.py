@@ -130,6 +130,15 @@ def unixTimeToDatetime(seconds, tz = 'UTC'):
     """
     return datetime.fromtimestamp(float(seconds), timezone(tz))
 
+def maxDatetime():
+    """ Returns the maximum possible datetime object as a timezone-aware datetime (in UTC)
+    """
+    return setAdjustedDate(datetime.max, tz = 'UTC')
+
+def minDatetime():
+    """ Returns the maximum possible datetime object as a timezone-aware datetime (in UTC)
+    """
+    return setAdjustedDate(datetime.min, tz = 'UTC')
 
 class DisplayTZ:
     

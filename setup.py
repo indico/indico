@@ -160,11 +160,13 @@ class install_indico(install.install):
     user_options = [('uid=', None, "uid of Apache user\n\n"),
                     ('gid=', None, 'gid of Apache user'),
                     ('config-dir=', None, 'directory to store indico.conf'),
+                    ('force-no-db', None, 'force not to detect if DB installed'),
                     ('force-upgrade', None, 'upgrade without asking for confirmation first')] + install.install.user_options
 
     uid = None
     gid = None
     config_dir = None
+    force_no_db = False
     force_upgrade = False
 
     def run(self):
@@ -190,7 +192,12 @@ class install_indico(install.install):
         install.install.run(self) # this basically copies files to site-packages (or dist-packages)
         
         makacconfig_base_dir = '%s/MaKaC/common' % self.install_lib
-        indico_post_install(self.config_dir, makacconfig_base_dir, self._resolvePackageDir(), self.uid, self.gid)
+        indico_post_install(self.config_dir,
+                            makacconfig_base_dir,
+                            self._resolvePackageDir(),
+                            self.force_no_db,
+                            self.uid,
+                            self.gid)
     
 
     def _resolvePackageDir(self):

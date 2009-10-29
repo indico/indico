@@ -22,3 +22,10 @@ var Util = {
         return concat(["Conference"], [id]);
     }
 };
+
+var IndicoSortCriteria = {
+    StartTime: function(c1, c2) {
+        return SortCriteria.Integer(c1.startDate.time.replaceAll(':',''),
+                                    c2.startDate.time.replaceAll(':',''));
+    }
+};
