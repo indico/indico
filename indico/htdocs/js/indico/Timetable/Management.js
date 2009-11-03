@@ -243,8 +243,8 @@ type("TimetableManagementActions", [], {
                         'Create a new session': function() { self.addSession(); }
                     },
                     'Add interval to:': sessions
-
                 };
+
                 menuItems[$T('Session')] = new SessionSectionPopupMenu(menuu, [triggerElement, this.addMenu], 'timetableSectionPopupList popupListChained', true, true);
             }
 
@@ -263,9 +263,7 @@ type("TimetableManagementActions", [], {
     },
 
     _retrieveSessionColor: function(session){
-        // building "strip" function to format the startDate from xxx-xx-xx to xxxxxxx
-        var reg = new RegExp("-", "g");
-        return ttdata[session.startDate.date.replace(reg, "")]["s"+session.id+"l0"].color;
+        return this.timetable.getById("s"+session.id).color;
     },
     _addParams: function(type) {
         return {

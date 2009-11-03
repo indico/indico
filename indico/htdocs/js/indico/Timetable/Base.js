@@ -77,7 +77,7 @@ type("TimeTable", ["HistoryListener"], {
         else if (type == 'Contribution') {
             throw 'not implemented!';
         } else if (type=='Session'){
-            throw 'not implemented!';
+            return this.eventInfo.sessions[info[0]];
         } else if (type=='SessionSlot'){
             compositeId = 's'+info[0]+'l'+info[1];
         } else {
