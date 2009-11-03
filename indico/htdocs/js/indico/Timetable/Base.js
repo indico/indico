@@ -152,23 +152,6 @@ type("DisplayTimeTable", ["TimeTable"], {
                                filterLink));
     },
 
-    layoutMenu: function() {
-        var self = this;
-
-        var layoutLink = Html.a({href: '#'}, $T("Layout"));
-        this.layoutMenu = new TimetableLayoutMenu(layoutLink, self.timetableDrawer);
-
-        layoutLink.observeClick(function(e) {
-            var pos = layoutLink.getAbsolutePosition();
-            //              e.preventDefault();
-            self.layoutMenu.open(pos.x + layoutLink.dom.offsetWidth, pos.y);
-            return false;
-        });
-
-        return Html.ul({className: "inner", style: {display: 'block'}},
-                       Html.li("menuConfMiddleCell",
-                               layoutLink));
-    },
     printMenu: function() {
         var self = this;
 

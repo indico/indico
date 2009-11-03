@@ -475,19 +475,3 @@ type("PosterLayoutManager", ["TimetableLayoutManager"],
         }
     });
 
-type("TimetableLayoutMenu", ["PopupMenu"],
-     {
-     },
-     function(triggerElement, timetableDrawer) {
-         this.PopupMenu({
-             'White space': new RadioPopupWidget({"compact": $T('Compact'),
-                                                  "proportional": $T('Proportional')},
-                                                 timetableDrawer.layout,
-                                                 [triggerElement, this]),
-             'Detail': new RadioPopupWidget({"session": $T('Session'),
-                                             "contribution": $T('Contribution')},
-                                            timetableDrawer.detail,
-                                            [triggerElement, this])
-         }, [triggerElement]);
-         this.timetableDrawer = timetableDrawer;
-     });
