@@ -72,7 +72,7 @@ class PluginsHolder (ObjectHolder):
         """ Reloads plugins of a given type and updates their information
         """
         Plugins.reloadPluginsByType(type)
-        if self.hasPluginType(type):
+        if self.hasPluginType(type, mustBeActive = False):
             self.getPluginType(type).updateInfo()
         else:
             raise PluginError("Error while trying to reload plugins of the type: " + type + ". Plugins of the type " + type + "do not exist")
@@ -89,7 +89,7 @@ class PluginsHolder (ObjectHolder):
         types = Plugins.getTypeList()
         for type in types:
             
-            if self.hasPluginType(type, False):
+            if self.hasPluginType(type, mustBePresent = False, mustBeActive = False):
                 pluginType = self.getPluginType(type)
                 pluginType.setPresent(True)
             else:
@@ -106,24 +106,27 @@ class PluginsHolder (ObjectHolder):
                 self.remove(item)
         self._getTree("counters")[PluginsHolder.counterName] = Counter()
                     
-    def getPluginTypes(self, sorted = False, includeNonPresent = False):
+    def getPluginTypes(self, sorted = False, includeNonPresent = False, includeNonVisible = True):
         """ Returns a list of different PluginTypes (e.g. epayment, collaboration, roombooking)
             sorted: if True, the list of PluginTypes will be sorted alphabetically
             includeNonPresent: if True, non present PluginTypes will be included. A PluginType is present if it has a physical folder on
             disk, inside MaKaC/plugins
         """
-        pluginTypes = [pt for pt in self.getList() if pt.getId() != "globalPluginOptions" and (pt.isPresent() or includeNonPresent)]
+        pluginTypes = [pt for pt in self.getList() if pt.getId() != "globalPluginOptions" and
+                                                      (pt.isPresent() or includeNonPresent) and
+                                                      (pt.isVisible() or includeNonVisible)]
         if sorted:
             pluginTypes.sort(key = lambda pt: pt.getId())
         return pluginTypes
     
-    def hasPluginType(self, name, mustBePresent = True):
+    def hasPluginType(self, name, mustBePresent = True, mustBeActive = True):
         """ Returns True if there is a PluginType with the given name.
         """
-        if mustBePresent:
-            return self.hasKey(name) and self.getById(name).isPresent()
+        if self.hasKey(name):
+            pluginType = self.getById(name)
+            return (not mustBePresent or pluginType.isPresent()) and (not mustBeActive or pluginType.isActive())
         else:
-            return self.hasKey(name)
+            return False
     
     def getPluginType(self, name):
         """ Returns the PluginType object for the given name 
@@ -379,6 +382,8 @@ class PluginType (PluginBase):
         self.__description = description
         self.__present = True
         self.__plugins = {}
+        self._visible = True
+        self._active = False
         
         
     def updateInfo(self):
@@ -435,6 +440,8 @@ class PluginType (PluginBase):
         
         self.__description = Plugins.getDescriptionByType(self.getName())
         
+        self._visible = Plugins.getIsVisibleType(self.getName())
+
         
     def getId(self):
         return self.__id
@@ -448,6 +455,9 @@ class PluginType (PluginBase):
     def getDescription(self):
         return self.__description
     
+    def hasDescription(self):
+        return (self.__description is not None) and len(self.__description) > 0
+
     def isPresent(self):
         return self.__present
     
@@ -499,7 +509,21 @@ class PluginType (PluginBase):
         l["pluginType"] = self.getName() 
         return l
 
+    def isVisible(self):
+        if not hasattr(self, "_visible"):
+            self._visible = True
+        return self._visible
 
+    def isActive(self):
+        if not hasattr(self, "_active"):
+            self._active = False
+        return self._active
+
+    def setActive(self, value):
+        self._active = value
+
+    def toggleActive(self):
+        self._active = not self.isActive()
 
 class Plugin(PluginBase):
     """ This class represents a plugin ("EVO", "paypal", etc.).

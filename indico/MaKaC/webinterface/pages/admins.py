@@ -419,6 +419,7 @@ class WPAdminPlugins( WPAdminsBase ):
         
         pluginTypes = PluginsHolder().getPluginTypes(sorted = True)
         for pluginType in pluginTypes:
+            if pluginType.isVisible() and pluginType.isActive():
             self._tabs[pluginType.getId()] = self._tabCtrl.newTab(pluginType.getName(), pluginType.getName(),
                                                                        urlHandlers.UHAdminPlugins.getURL( pluginType ))
     

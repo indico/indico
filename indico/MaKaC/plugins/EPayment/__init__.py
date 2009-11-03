@@ -22,3 +22,4 @@
 from MaKaC.i18n import _
 pluginTypeDescription = _("Epayment Plugins")
 ignore = False
+visible = False
