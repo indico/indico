@@ -192,8 +192,8 @@ type("DisplayTimeTable", ["TimeTable"], {
         var timetableElements = translate(self.timetableDrawer.canvas.dom.childNodes, function(value) {return $E(value);});
         var elements = translate($E(document.body).dom.childNodes, function(value) {return $E(value);});
 
-        var goBackLink = Html.a({href: '#', style: {fontSize: '13pt'}}, 'Go back');
-        var printLink = Html.a({href: '#', style: {fontSize: '13pt'}}, 'Print');
+        var goBackLink = Html.a({href: '#', style: {fontSize: '17px'}}, 'Go back');
+        var printLink = Html.a({href: '#', style: {fontSize: '17px'}}, 'Print');
 
         var links = Html.span({style: {cssFloat: 'right'}}, printLink, ' | ', goBackLink);
 

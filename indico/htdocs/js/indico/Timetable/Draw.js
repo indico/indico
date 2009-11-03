@@ -503,7 +503,7 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
             each(self.eventData.presenters, function(p) {
                 speakers.append(i++ > 0 ? ', ' : '' + p.name);
                 if (p.affiliation && p.affiliation !== '') {
-                    speakers.append(Html.em({style: {fontSize: '9pt'}}, ' (' + p.affiliation + ')'));
+                    speakers.append(Html.em({style: {fontSize: '12px'}}, ' (' + p.affiliation + ')'));
                 }
             });
             if (i > 0) {
@@ -669,7 +669,7 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
             }
         });
         if (i > maxNumContribs) {
-            contributions.append(Html.tr({}, Html.td({}), Html.td({}, Html.span({style: {fontSize: '9pt', fontWeight: 'normal', fontStyle: 'italic', color: '#444444'}}, '' + (i - maxNumContribs) + ' more contribution(s)...'))));
+            contributions.append(Html.tr({}, Html.td({}), Html.td({}, Html.span({style: {fontSize: '12px', fontWeight: 'normal', fontStyle: 'italic', color: '#444444'}}, '' + (i - maxNumContribs) + ' more contribution(s)...'))));
         }
         contributionsDiv.append(Html.table({style: {marginTop: pixels(5)}}, contributions));
 
@@ -892,14 +892,14 @@ type("ContributionsPopup", ["ExclusivePopup"], {
         var self = this;
         var table = Html.tbody({});
         each(this.contributions, function(contrib) {
-            var time = Html.div({style: {paddingTop: pixels(7), marginRight: pixels(3), fontSize: '9pt', fontWeight: 'bold'}}, self.eventData.isPoster ? '' : contrib.startDate.time.substr(0,5));
+            var time = Html.div({style: {paddingTop: pixels(7), marginRight: pixels(3), fontSize: '12px', fontWeight: 'bold'}}, self.eventData.isPoster ? '' : contrib.startDate.time.substr(0,5));
             var link = Html.a({href: Indico.Urls.ContributionDisplay + '?sessionId=' + contrib.sessionId + '&contribId=' + contrib.contributionId + '&confId=' + contrib.conferenceId}, contrib.title);
-            var title = Html.div({style: {color: '#444444', width: pixels(self.width), padding: pixels(5), fontSize: '11pt'}}, link);
+            var title = Html.div({style: {color: '#444444', width: pixels(self.width), padding: pixels(5), fontSize: '15px'}}, link);
 
-            var infoDiv = Html.div({style: {width: pixels(self.width), border: '1px solid rgb(234, 234, 234)', marginBottom: pixels(10), marginLeft: pixels(5), padding: pixels(5), backgroundColor: 'rgb(248, 248, 248)',color: '#444444', fontSize: '9pt'}});
+            var infoDiv = Html.div({style: {width: pixels(self.width), border: '1px solid rgb(234, 234, 234)', marginBottom: pixels(10), marginLeft: pixels(5), padding: pixels(5), backgroundColor: 'rgb(248, 248, 248)',color: '#444444', fontSize: '12px'}});
 
-            var showFullDescLink = Html.a({style: {cursor: 'pointer', fontWeight: 'bold', fontSize: '9pt', fontStyle: 'italic'}}, ' Show full description');
-            var hideFullDescLink = Html.a({style: {cursor: 'pointer', fontWeight: 'bold', fontSize: '9pt', fontStyle: 'italic'}}, ' Hide full description');
+            var showFullDescLink = Html.a({style: {cursor: 'pointer', fontWeight: 'bold', fontSize: '12px', fontStyle: 'italic'}}, ' Show full description');
+            var hideFullDescLink = Html.a({style: {cursor: 'pointer', fontWeight: 'bold', fontSize: '12px', fontStyle: 'italic'}}, ' Hide full description');
             var shortDesc = Html.span({style: {display: 'block'}}, contrib.description.substr(0, 250) + '... ', showFullDescLink);
             var longDesc = Html.span({style: {display: 'none'}}, contrib.description, hideFullDescLink);
 
@@ -921,7 +921,7 @@ type("ContributionsPopup", ["ExclusivePopup"], {
                 each(contrib.presenters, function(p) {
                     speakers.append(i++ > 0 ? ', ' : '' + p.name);
                     if (p.affiliation && p.affiliation !== '') {
-                        speakers.append(Html.em({style: {fontSize: '9pt'}}, ' (' + p.affiliation + ')'));
+                        speakers.append(Html.em({style: {fontSize: '12px'}}, ' (' + p.affiliation + ')'));
                     }
                 });
 
@@ -1034,7 +1034,7 @@ type("TimetableDrawer", ["IWidget"],
                          width: pixels(this.width),
                          height: hour==last?'20px':scale[n+1][1]-px,
                          borderTop: '1px dotted red',
-                         fontSize: '8pt'                                                 }}));
+                         fontSize: '11px'}}));
                      continue;
                  }
 
@@ -1045,7 +1045,7 @@ type("TimetableDrawer", ["IWidget"],
                                                width: pixels(this.width),
                                                height: hour==last?'20px':scale[n+1][1]-px,
                                                borderTop: '1px solid #E8E8E8',
-                                               fontSize: '8pt'                                                 }}, zeropad(hour)+':00'));
+                                               fontSize: '11px'}}, zeropad(hour)+':00'));
              }
 
              return scaleDiv;

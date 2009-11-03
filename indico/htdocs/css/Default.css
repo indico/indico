@@ -74,7 +74,7 @@ a.note:hover {
 
 /*For the big-conferences interface pages*/
 .confSupportEmailBox {  text-align: center;
-                        font-size: 12pt }
+                        font-size: 16px }
 
 
 /*
@@ -96,7 +96,7 @@ body {
     background: #fff;
     padding: 0px;
     margin: 0px;
-    font-size: 10pt;
+    font-size: 13px;
 }
 
 body, html {
@@ -104,7 +104,7 @@ body, html {
 }
 
 p,br,dl,em,h1,h2,h3,h4,h5,h6,td,blockquote,ol,a {
-   font-size: 10pt;
+   font-size: 13px;
    color: #444444;
 }
 
@@ -205,14 +205,14 @@ a.img:active {
 
 .listtitle {
    font-weight: bold;
-   font-size: 12pt;
+   font-size: 16px;
    color: #234173;
    background: #D9D9D9;
    padding: 3px;
 }
 
 .listcell {
-   font-size: 12pt;
+   font-size: 16px;
    font-weight: bold;
    color: #000000;
    color: #777777;
@@ -229,7 +229,7 @@ a.img:active {
 
 .subtitle {
    font-weight: normal;
-   font-size: 12pt;
+   font-size: 16px;
    color: #777777;
    padding: 3px;
    margin-top: 2px;
@@ -238,7 +238,7 @@ a.img:active {
 
 .categoryTitle {
     border-bottom: 2px solid rgb(170, 170, 170);
-    font-size: 26pt;
+    font-size: 34px;
     font-family: Times New Roman;
     color: #B14300;
     font-weight: normal;
@@ -252,13 +252,13 @@ a.img:active {
 }
 
 .categoryHeader a {
-    font-size: 11pt;
+    font-size: 14px;
     margin: 0 10px;
 }
 
 .categoryHeader ul {
     color: #AAA;
-    margin: 15pt 0 0 0;
+    margin: 20px 0 0 0;
     float: right;
     list-style-type: none;
 }
@@ -273,7 +273,7 @@ a.img:active {
 }
 
 .categoryMap a {
-    font-size: 11pt;
+    font-size: 14px;
     line-height: 1.6em;
 }
 
@@ -349,7 +349,7 @@ a.img:active {
 .menutitle {
 
    font-weight: bold;
-   font-size: 12pt;
+   font-size: 16px;
    color: #000000;
    background: #DDDDDD;
    letter-spacing: 6px;
@@ -358,7 +358,7 @@ a.img:active {
 
 h2.menutitle {
    font-weight: bold;
-   font-size: 12pt;
+   font-size: 16px;
    color: #000000;
    background: #DDDDDD;
    letter-spacing: 6px;
@@ -368,7 +368,7 @@ h2.menutitle {
 .menuselectedcell {
 
    font-weight: bold;
-   font-size: 12pt;
+   font-size: 16px;
    color: #E25300;
    background: #FFFFFF;
    border-bottom: 2px solid #234173;
@@ -378,7 +378,7 @@ h2.menutitle {
 .menumiddlecell {
 
    font-weight: bold;
-   font-size: 12pt;
+   font-size: 16px;
    color: #000000;
    background: #D9D9D9;
    border-bottom: 2px solid #FFFFFF;
@@ -387,7 +387,7 @@ h2.menutitle {
 .menutopcell {
 
    font-weight: bold;
-   font-size: 12pt;
+   font-size: 16px;
    color: #000000;
    background: #D9D9D9;
    border-top: 2px solid #234173;
@@ -397,7 +397,7 @@ h2.menutitle {
 .menubottomcell {
 
    font-weight: bold;
-   font-size: 12pt;
+   font-size: 16px;
    color: #000000;
    background: #D9D9D9;
    border-bottom: 2px solid #234173;
@@ -432,7 +432,7 @@ a.menuaddlink:hover {
 
 .outervtab {
 
-   font-size: 12pt;
+   font-size: 16px;
    font-weight: bold;
    color: #777777;
    background: #FFFFFF;
@@ -443,14 +443,14 @@ a.menuaddlink:hover {
 .vtabmenu {
 
    font-weight: bold;
-   font-size: 12pt;
+   font-size: 16px;
    color: #FFFFFF;
    background: #777777;
 }
 
 .lastvtabtitle {
 
-   font-size: 12pt;
+   font-size: 16px;
    font-weight: bold;
    color: #E25300;
    background: #E5E5E5;
@@ -461,7 +461,7 @@ a.menuaddlink:hover {
 
 .lastvtab {
 
-   font-size: 12pt;
+   font-size: 16px;
    font-weight: bold;
    color: #777777;
    background: #E5E5E5;
@@ -473,7 +473,7 @@ a.menuaddlink:hover {
 
 .vtab {
 
-   font-size: 12pt;
+   font-size: 16px;
    font-weight: bold;
    color: #777777;
    background: #FFFFFF;
@@ -485,7 +485,7 @@ a.menuaddlink:hover {
 
 .vtabtitle_old {
 
-   font-size: 12pt;
+   font-size: 16px;
    font-weight: bold;
    color: #FFFFFF;
    background: #0B63A2;
@@ -495,7 +495,7 @@ a.menuaddlink:hover {
 
 .vtabtitle {
 
-   font-size: 12pt;
+   font-size: 16px;
    font-weight: bold;
    background: #E5E5E5;
    padding: 0px;
@@ -549,7 +549,7 @@ a.menuaddlink:hover {
 .tabbarseparator {
    background: #F2F2F2;
    border-right: 2px solid #777777;
-   font-size: 3pt;
+   font-size: 4px;
 }
 
 .display_selectedhtab {
@@ -604,7 +604,7 @@ a.menuaddlink:hover {
 
 .managerheadertitle {
    font-weight: bold;
-   font-size: 12pt;
+   font-size: 16px;
    letter-spacing: 4px;
    color: #FFFFFF;
    text-align: center;
@@ -618,7 +618,7 @@ a.menuaddlink:hover {
 
 .adminheadertitle {
    font-weight: bold;
-   font-size: 12pt;
+   font-size: 16px;
    letter-spacing: 4px;
    color: #FFFFFF;
    text-align: center;
@@ -647,7 +647,7 @@ a.menuaddlink:hover {
 }
 
 .conferencetitlelink {
-   font-size: 25pt;
+   font-size: 33px;
    background: transparent;
 }
 
@@ -702,7 +702,7 @@ a.menuaddlink:hover {
 /*All used styles*/
 /* TODO: should probably be removed...
 .confTitle {
-   font-size: 25pt;
+   font-size: 33px;
    vertical-align: bottom;
    padding-left: 30px;
    padding-bottom: 10px;
@@ -717,7 +717,7 @@ a.menuaddlink:hover {
 
 
 .confDate {
-   font-size: 14pt;
+   font-size: 18px;
    font-weight: bold;
    background: #777777;
    color: #FFFFFF;
@@ -728,7 +728,7 @@ a.menuaddlink:hover {
    padding-right: 15px;
 }
 .confPlace {
-   font-size: 14pt;
+   font-size: 18px;
    font-weight: bold;
    background: #E5E5E5;
    color: #777777;
@@ -764,7 +764,7 @@ a.menuaddlink:hover {
 
 .menuConfTitle {
    font-weight: bold;
-   font-size: 12pt;
+   font-size: 16px;
    color: #0200C6;
    background: #E5E5E5;
    padding: 3px;
@@ -798,7 +798,7 @@ a.menuaddlink:hover {
 
 .menuConfselected {
    font-weight: bold;
-   font-size: 12pt;
+   font-size: 16px;
    color: #FFFFFF;
    background: #E25300;
    border-bottom: 1px solid #777777;
@@ -809,25 +809,25 @@ a.confSection:link {
    background: transparent;
    font-weight: bold;
    text-decoration: none;
-   font-size: 12pt;
+   font-size: 16px;
 }
 a.confSection:visited {
    background: transparent;
    font-weight: bold;
    text-decoration: none;
-   font-size: 12pt;
+   font-size: 16px;
 }
 a.confSection:active {
    background: transparent;
    font-weight: bold;
    text-decoration: none;
-   font-size: 12pt;
+   font-size: 16px;
 }
 a.confSection:hover {
    background: transparent;
    font-weight: bold;
    text-decoration: none;
-   font-size: 12pt;
+   font-size: 16px;
 }
 
 a.confSubSection:link {
@@ -859,7 +859,7 @@ a.confSubSection:hover {
            }
 
 .errorDetailsBox { color: gray;
-                    font-size: 12pt;
+                    font-size: 16px;
                     border: 1px solid
                 }
 
@@ -877,7 +877,7 @@ a.confSubSection:hover {
 }
 
 .dataCaptionFormat {
-    font-size: 10pt;
+    font-size: 13px;
     font-family: Verdana, Arial;
     color: #523D04;
 }
@@ -894,7 +894,7 @@ a.confSubSection:hover {
 
 .groupTitle, .groupTitleNoBorder {
    font-family: "Times New Roman", Verdana, Arial;
-   font-size: 18pt;
+   font-size: 24px;
    color: #4E4C46;
    letter-spacing: 1px;
    padding: 3px;
@@ -908,7 +908,7 @@ a.confSubSection:hover {
 
 .groupTitleSmall, .groupTitleSmallNoBackground {
    font-weight: bold;
-   font-size: 11pt;
+   font-size: 14px;
    color: #777777;
    background: #EBEBEB;
    padding: 3px;
@@ -921,7 +921,7 @@ a.confSubSection:hover {
 
 .greyGroupTitle{
     font-weight: bold;
-    font-size: 12pt;
+    font-size: 16px;
     color: #FFFFFF;
     background: #777777;
     letter-spacing: 6px;
@@ -947,7 +947,7 @@ a.confSubSection:hover {
 }
 
 .titleCellFormat {
-    font-size: 10pt;
+    font-size: 13px;
     font-family: Verdana, Arial;
     color: #523D04;
 }
@@ -1057,14 +1057,14 @@ a.confSubSection:hover {
 }*/
 
 .categoryInfo {
-    font-size: 10pt;
+    font-size: 13px;
     font-style: italic;
     color: #444;
     margin-top: 5px;
 }
 
 .categoryManagers {
-    font-size: 10pt;
+    font-size: 13px;
     color: #444;
     margin-top: 5px;
 }
@@ -1347,10 +1347,10 @@ table.notificationShow tr{
     vertical-align:top;
 }
 table.notificationShow td.small{
-    font-size:8pt;
+    font-size:10px;
 }
 table.evalSetupSpecialActions td {
-    font-size:8pt;
+    font-size:10px;
 }
 table.evalSetupSpecialActions form {
     margin:0;
@@ -1610,7 +1610,7 @@ fieldset.evalationResultsFieldset p{
     padding-left: 2.5em;
 }
 fieldset.evalationResultsFieldset td{
-    font-size:8pt;
+    font-size:10px;
 }
 fieldset.evalationResultsFieldset table.statsGraphContainer {
     width:100%;
@@ -1674,7 +1674,7 @@ div.UISimpleDialogMainPanel {
     border: none;
     padding-left: 2px;
     padding-right: 2px;
-    font-size: 10pt;
+    font-size: 13px;
 }
 
 label {
@@ -1752,7 +1752,7 @@ div.UIFormRow {
 
 .categTitleChosen{
     font-weight: bold;
-    font-size: 11pt;
+    font-size: 14px;
 }
 
 div.CategoryListDiv {
@@ -1792,7 +1792,7 @@ ul.CategoryList li:hover{
 
 .CategoryListButtons{
     float: right;
-    margin: 15pt 0 0;
+    margin: 20px 0 0;
 }
 
 li.selectedListItem {
@@ -1899,7 +1899,7 @@ div.UITitleBar .UITitleText{
 div.UITitleBar .UITitleText h1{
     margin: 0;
     color: #FFFFFF;
-    font-size: 12pt;
+    font-size: 16px;
     clear: both;
 }
 
@@ -1943,7 +1943,7 @@ div#UISearchBox
     right: 30px;
     top: 36px;
     border: none;
-    font-size: 10pt;
+    font-size: 13px;
     z-index: 1;
 }
 
@@ -1994,18 +1994,18 @@ div#UISearchBox #extraOptions table {
 
 div#UISearchBox #extraOptions input {
     margin-left: 8px;
-    font-size: 9pt;
+    font-size: 12px;
     width: 145px;
 }
 
 div#UISearchBox #extraOptions select {
     margin-left: 8px;
-    font-size: 9pt;
+    font-size: 12px;
     width: 150px;
 }
 
 div#UISearchBox #extraOptions td {
-    font-size: 9pt;
+    font-size: 12px;
     color: #444;
 }
 
@@ -2186,7 +2186,7 @@ ul.UIUserEvtList li
 
 .UIListTitle {
    font-weight: bold;
-   font-size: 12pt;
+   font-size: 16px;
    color: #000000;
    background: #DDDDDD;
    letter-spacing: 6px;
@@ -2212,12 +2212,12 @@ span.evtDateRow
 span.evtDateSpan
 {
     font-weight: bold;
-    font-size: 10pt;
+    font-size: 13px;
 }
 
 span.evtTimeSpan
 {
-    font-size: 8pt;
+    font-size: 10px;
     font-weight: bold;
 }
 
@@ -2280,7 +2280,7 @@ div.pageOverHeader
     padding: 7px 10px;
     color: #2f2506;
     font-family: Verdana;
-    font-size: 9pt;
+    font-size: 12px;
     font-weight: bold;
 }
 
@@ -2318,7 +2318,7 @@ div.globalMenu a
 {
     font-weight: bold;
     font-family: Verdana;
-    font-size: 8pt;
+    font-size: 11px;
     color: white;
     letter-spacing: 0.04em;
     display: block;
@@ -2329,7 +2329,7 @@ div.globalMenu span
 {
     font-weight: bold;
     font-family: Verdana;
-    font-size: 8pt;
+    font-size: 11px;
     color: white;
     padding-top: 8px;
     padding-bottom: 8px;
@@ -2349,7 +2349,7 @@ div.globalMenu .dropDownMenu {
 div.sessionBar {
     height: 25px;
     float: right;
-    font-size: 10pt;
+    font-size: 13px;
 }
 
 div.sessionBar .links
@@ -2391,7 +2391,7 @@ div.sessionBar li {
 
 div.sessionBar span {
     color: #444444;
-    font-size: 8pt;
+    font-size: 10px;
     margin-right: 5px;
 }
 
@@ -2434,12 +2434,12 @@ div.sessionBarDark .dropDownMenu {
 }
 
 .path a {
-   font-size: 9pt;
+   font-size: 12px;
 }
 
 .pathWithoutLinks {
     color: #AAAAAA;
-    font-size: 9pt;
+    font-size: 12px;
 }
 
 .pathWithoutLinks img {
@@ -2475,7 +2475,7 @@ ul.horizontalMenu
 ul.horizontalMenu
 {
     display: inline;
-    font-size: 10pt;
+    font-size: 13px;
 }
 ul.horizontalMenu li{
     display: inline;
@@ -2501,7 +2501,7 @@ div.headerAboutIndico
     width: 300px;
     color: #444444;
     font-style: italic;
-    font-size: 9pt;
+    font-size: 12px;
 }
 
 img.centeredImg {
@@ -2603,7 +2603,7 @@ div.filterDiv
 
 .sideBar {
     float: right;
-    font-size: 11pt;
+    font-size: 14px;
     width: 340px;
     float: right;
     width: 340px;
@@ -2623,7 +2623,7 @@ div.filterDiv
 .sideMenu .separator {
     font-weight: normal;
     font-style: italic;
-    font-size: 9pt;
+    font-size: 12px;
     color: #777;
     padding: 7px 0;
     border-bottom: 1px dotted #999;
@@ -2681,7 +2681,7 @@ div.filterDiv
 .topBar .content {
     background: #ECECEC url('../images/grey_gradient2.png') scroll repeat-x bottom left;
     padding: 20px;
-    font-size: 11pt;
+    font-size: 14px;
     color: #444;
     border: 1px solid #AAA;
 }
@@ -2695,7 +2695,7 @@ div.filterDiv
     margin: 0;
     padding: 0;
     color: #777;
-    font-size: 13pt;
+    font-size: 17px;
 }
 
 .sideBar ul {
@@ -2714,7 +2714,7 @@ div.filterDiv
 }
 
 .sideBar a {
-    font-size: 12pt;
+    font-size: 16px;
 }
 
 .sideBar em {
@@ -2722,7 +2722,7 @@ div.filterDiv
 }
 
 .sideMenu a {
-    font-size: 11pt;
+    font-size: 14px;
 }
 
 .sideMenu .active {
@@ -2735,11 +2735,11 @@ div.filterDiv
 
 .sideBar a.subLink {
     font-style: italic;
-    font-size: 11pt;
+    font-size: 14px;
 }
 
 .sideBar em {
-    font-size: 10pt;
+    font-size: 13px;
     display: block;
     margin-top: 3px;
 }
@@ -2759,7 +2759,7 @@ div.filterDiv
 h1.menuHeader
 {
     height: 20px;
-    font-size: 10pt;
+    font-size: 13px;
     text-align: center;
     margin-top: 0px;
     margin-bottom: 4px;
@@ -2799,7 +2799,7 @@ li.active_server_admin a:hover {
 
 ul.menuList
 {
-    font-size: 10pt;
+    font-size: 13px;
     margin:0;
     margin-bottom: 15px;
     padding-left: 0px;
@@ -2853,7 +2853,7 @@ ul.list
 }
 
 .list a {
-    font-size: 13pt;
+    font-size: 17px;
 }
 
 ul.listCompact {
@@ -2865,7 +2865,7 @@ ul.listCompact {
 }
 
 .listCompact a {
-    font-size: 10pt;
+    font-size: 13px;
 }
 
 .farRight
@@ -2885,7 +2885,7 @@ ul.listCompact {
 }
 
 .eventList h3 {
-    font-size: 20pt;
+    font-size: 26px;
     color: #999999;
     margin: 20px 10px;
     padding: 0;
@@ -2894,7 +2894,7 @@ ul.listCompact {
 .eventList h4 {
     color: #555555;
     font-weight: normal;
-    font-size: 14pt;
+    font-size: 18px;
     margin-top: 20px;
     margin-left: 40px;
     padding 0;
@@ -2920,13 +2920,13 @@ ul.listCompact {
 
 .eventList li .date {
     padding: 0 10px 0 0;
-    font-size: 10pt;
+    font-size: 13px;
     color: #444;
 }
 
 .eventList li .today {
     margin: 0 10px 0 0;
-    font-size: 10pt;
+    font-size: 13px;
     color: #444;
     -moz-border-radius-bottomleft:5px;
     -moz-border-radius-bottomright:5px;
@@ -2950,7 +2950,7 @@ ul.listCompact {
 }
 
 .eventList li .listName a {
-    font-size: 13pt;
+    font-size: 17px;
 }
 
 /* Footer */
@@ -2985,7 +2985,7 @@ ul.listCompact {
     width: 40%;
 }
 #policyOfUse h1{
-    font-size: 10pt;
+    font-size: 13px;
     font-weight: bold;
     margin-bottom: 5px;
 }
@@ -3006,61 +3006,61 @@ ul.listCompact {
 .banner_0
 {
     background: #E0E0E0;
-    font-size: 12pt;
+    font-size: 16px;
 }
 
 .banner_1
 {
     background: #F0F0F0;
-    font-size: 11pt;
+    font-size: 14px;
     margin-right: 20px;
 }
 
 .banner_2
 {
     background: #F8F8F8;
-    font-size: 10pt;
+    font-size: 13px;
     margin-right: 40px;
 }
 
 .banner_3
 {
     background: #FCFCFC;
-    font-size: 10pt;
+    font-size: 13px;
     margin-right: 60px;
 }
 
 .banner_4
 {
     background: #FCFCFC;
-    font-size: 10pt;
+    font-size: 13px;
     margin-right: 60px;
 }
 
 .banner_5
 {
     background: #FCFCFC;
-    font-size: 10pt;
+    font-size: 13px;
     margin-right: 60px;
 }
 
 .banner_green
 {
     background: #d5edd7;
-    font-size: 12pt;
+    font-size: 16px;
 }
 
 .banner_orange
 {
     background: rgb(255,205,174);
-    font-size: 12pt;
+    font-size: 16px;
 }
 
 */
 
 .selectedCategoryName{
     padding:20px;
-    font-size: 12pt;
+    font-size: 16px;
 }
 
 .bannerTitle
@@ -3075,32 +3075,32 @@ ul.listCompact {
 
 .bannerTitle_0
 {
-    font-size: 16pt;
+    font-size: 21px;
 }
 
 .bannerTitle_1
 {
-    font-size: 11pt;
+    font-size: 14px;
 }
 
 .bannerTitle_2
 {
-    font-size: 10pt;
+    font-size: 13px;
 }
 
 .bannerTitle_3
 {
-    font-size: 10pt;
+    font-size: 13px;
 }
 
 .bannerTitle_4
 {
-    font-size: 10pt;
+    font-size: 13px;
 }
 
 .bannerTitle_5
 {
-    font-size: 10pt;
+    font-size: 13px;
 }
 
 .bannerTitle_noIcon
@@ -3110,7 +3110,7 @@ ul.listCompact {
 
 .banner_creator
 {
-    font-size: 10pt;
+    font-size: 13px;
     font-weight: normal;
     float: right;
 }
@@ -3187,7 +3187,7 @@ div.optionGroup
 .formLine label
 {
     font-weight: normal;
-    font-size: 8pt;
+    font-size: 10px;
     color: gray;
 }
 
@@ -3296,7 +3296,7 @@ ul.subTabList a
 {
     font-family: Verdana;
     font-weight: normal;
-    font-size: 9pt;
+    font-size: 12px;
     font-weight: bold;
     padding-right: 15px;
     padding-left: 15px;
@@ -3321,7 +3321,7 @@ ul.subTabList a:hover
 .tabSelected  a, .tabSelected  span {
     padding-top: 3px;
     color: #555555;
-    font-size: 9pt;
+    font-size: 12px;
 }
 
 div.tabScrollArrowBg {
@@ -3372,7 +3372,7 @@ div.tabBorderGradient {
 .tabUnselected  a, .tabUnselected  span {
     color: #4c6a83;
     font-weight: normal;
-    font-size: 9pt;
+    font-size: 12px;
 }
 
 .subTabUnselected  a {
@@ -3455,7 +3455,7 @@ ul.materialList li
 ul.materialList li span
 {
     padding-left: 10px;
-    font-size: 11pt;
+    font-size: 14px;
 }
 
 
@@ -3478,7 +3478,7 @@ ul.materialList li ul li
 ul.materialList li ul li span
 {
     padding-left: 0px;
-    font-size: 10pt;
+    font-size: 13px;
 }
 
 ul.materialList li ul li ul li
@@ -3505,7 +3505,7 @@ div.descriptionLine
 {
     padding-left : 20px;
     font-style: italic;
-    font-size: 9pt;
+    font-size: 12px;
 }
 
 ul.tabList li.hiddenTab
@@ -3546,7 +3546,7 @@ div.timetableHeader {
     padding: 20px 5px 10px 5px;
     margin-top: 20px;
     border-bottom: 2px solid #777777;
-    font-size: 15pt; color: rgb(68, 68, 68);
+    font-size: 20px; color: rgb(68, 68, 68);
     behavior: url(border-radius.htc);
 }
 
@@ -3604,7 +3604,7 @@ ul.keywordList li.multipleLinesListItem_last {
 
 .popUpLabel {
    text-align: right;
-   font-size: 10pt;
+   font-size: 13px;
    font-family: Verdana, Arial;
    color: #523D04;
    font-weight: normal;
@@ -3794,12 +3794,12 @@ ul.warningLevel1 {
 .newsDisplayItemDateType {
    display: inline;
    float:right;
-   font-size: 8pt;
+   font-size: 10px;
 }
 
 .newsDisplayItemTitle {
     display: inline;
-    font-size: 16pt;
+    font-size: 21px;
 }
 
 .newsDisplayItemContent {
@@ -3852,7 +3852,7 @@ ul.PluginPeopleList li{
 /* COLLABORATION */
 
 span.createBookingText {
-    font-size: 12pt;
+    font-size: 16px;
 }
 
 td.collaborationTitleCell {
@@ -3964,7 +3964,7 @@ ul.CAIndexList li {
 
 ul.CAIndexList a {
     font-family: Verdana;
-    font-size: 12pt;
+    font-size: 16px;
     font-weight: bold;
     cursor: pointer;
 }
@@ -4037,7 +4037,7 @@ div.CAResultsPerPageDiv {
 
 span.CAMinMaxKeySuggestion {
     color: orange;
-    font-size: 8pt;
+    font-size: 10px;
 }
 
 span.CAViewBySpan {
@@ -4046,7 +4046,7 @@ span.CAViewBySpan {
 
 div.CADiv a {
     font-family: Verdana;
-    font-size: 9pt;
+    font-size: 12px;
     cursor: pointer;
 }
 
@@ -4139,7 +4139,7 @@ ul.pageNumberList li.lastPageNumber {
 
 ul.pageNumberList a {
     font-family: Verdana;
-    font-size: 9pt;
+    font-size: 12px;
     font-weight: bold;
     cursor: pointer;
 }
@@ -4167,7 +4167,7 @@ table.CAResultsTable td.ACBookingGroupTitle {
     padding-top: 20px;
     color: #555555;
     font-weight: normal;
-    font-size: 14pt;
+    font-size: 18px;
     border-bottom: 1px solid #EBEBEB;
 }
 
@@ -4176,18 +4176,18 @@ table.CAResultsTable a.ACConfLink {
 }
 
 table.CAResultsTable a.ACConfLink span.ACConfTitle {
-    font-size: 14pt;
+    font-size: 18px;
     font-weight: normal;
 }
 
 table.CAResultsTable a.ACConfLink span.ACConfId {
-    font-size: 10pt;
+    font-size: 13px;
     font-weight: normal;
     color: #555555;
 }
 
 table.CAResultsTable a.ACConfLink span.ACConfDates {
-    font-size: 11pt;
+    font-size: 14px;
     font-weight: normal;
     color: #555555;
 }
@@ -4273,13 +4273,13 @@ table.eventDetails td.collaborationDisplayInfoLeftCol {
     white-space: nowrap;
     width: 0px;
     color: #222222;
-    font-size: 8pt;
+    font-size: 10px;
 }
 
 table.eventDetails td.collaborationDisplayInfoRightCol {
     padding: 0px;
     vertical-align: top;
-    font-size: 8pt;
+    font-size: 10px;
 }
 
 td.collaborationConfDisplayInfoLeftCol {
@@ -4290,13 +4290,13 @@ td.collaborationConfDisplayInfoLeftCol {
     white-space: nowrap;
     width: 0px;
     color: #222222;
-    font-size: 8pt;
+    font-size: 10px;
 }
 
 td.collaborationConfDisplayInfoRightCol {
     padding: 0px;
     vertical-align: top;
-    font-size: 8pt;
+    font-size: 10px;
 }
 
 
@@ -4347,7 +4347,7 @@ div.timetableBreak div.timetableBlock{
 
 div.timetableBlockTitle {
     font-weight: bold;
-    font-size: 8pt;
+    font-size: 11px;
     padding: 4px;
 }
 
@@ -4356,7 +4356,7 @@ div.timetableBlockPresenters {
     margin: 4px;
     margin-right: 6px;
     margin-left: 6px;
-    font-size: 8pt;
+    font-size: 11px;
     font-style: italic;
 }
 
@@ -4380,7 +4380,7 @@ div.timetableBlockTime {
     bottom: 4px;
     right: 6px;
     padding-top: 4px;
-    font-size: 8pt;
+    font-size: 11px;
 }
 
 div.timetableBlockTimeDiscreet{
@@ -4388,7 +4388,7 @@ div.timetableBlockTimeDiscreet{
     margin: 4px;
     margin-right: 6px;
     margin-left: 6px;
-    font-size: 8pt;
+    font-size: 11px;
 }
 
 div.timetableBlockLocation {
@@ -4397,7 +4397,7 @@ div.timetableBlockLocation {
     left: 4px;
     font-style: italic;
     padding-top: 4px;
-    font-size: 8pt;
+    font-size: 11px;
 }
 
 div.timetableBlockContribs {
@@ -4439,7 +4439,7 @@ div.exclusivePopupTopBg {
 }
 
 div.exclusivePopup .title {
-    font-size: 13pt;
+    font-size: 17px;
     padding-left: 10px;
     padding-right: 50px;
     padding-bottom: 10px;
@@ -4453,7 +4453,7 @@ div.exclusivePopup .titleWrapper {
 }
 
 div.exclusivePopup .printLink {
-    font-size: 10pt;
+    font-size: 13px;
     position: absolute;
     bottom: 0px;
     right: 45px;
@@ -4541,13 +4541,13 @@ div.timetableLoading {
 
 .timetablePopup .title {
     font-family: Verdana;
-    font-size: 12pt;
+    font-size: 16px;
     padding: 10px 30px 10px 10px;
 }
 
 .timetablePopup .balloonSubtitle {
     font-family: Verdana;
-    font-size: 8pt;
+    font-size: 11px;
     color: #AAA;
     padding: 0px 30px 10px 10px;
 }
@@ -4585,19 +4585,19 @@ div.timetablePopupInfoWrapper {
 div.timetablePopupInfoContent {
     padding: 10px;
     padding-left: 20px;
-    font-size: 9pt;
+    font-size: 12px;
     line-height: 1.5em;
     font-style: italic;
 }
 
 div.timetablePopupTimeDiv{
-    font-size: 12pt;
+    font-size: 16px;
     font-style: normal;
     margin-bottom: 10px;
 }
 
 div.timetablePopupDescription{
-    font-size: 9pt;
+    font-size: 12px;
     font-style: italic;
     margin-top: 10px;
     margin-bottom: 10px;
@@ -4606,7 +4606,7 @@ div.timetablePopupDescription{
 div.timetablePopupContributions{
     font-family: Verdana;
     padding: 10px 10px 0px 10px;
-    font-size: 9pt;
+    font-size: 12px;
     font-weight: bold;
 }
 
@@ -4615,14 +4615,14 @@ td.timetablePopupContributionTime{
     padding-top: 3px;
     padding-right: 5px;
     color: #444444;
-    font-size: 7pt;
+    font-size: 9px;
     font-weight: bold;
 }
 
 td.timetablePopupContributionTitle{
     vertical-align: top;
     color: #444444;
-    font-size: 9pt;
+    font-size: 12px;
     font-weight: normal;
 }
 
@@ -4672,18 +4672,18 @@ td.timetablePopupContributionTitle{
     width: 55px;
     margin-left: 15px;
     border: none;
-    font-size: 8pt;
+    font-size: 11px;
     background: transparent;
 }
 
 .colorPicker button {
-    font-size: 8pt;
+    font-size: 11px;
     margin-top: 5px;
 }
 
 .colorPicker .custom td {
     text-align: right;
-    font-size: 8pt;
+    font-size: 11px;
     font-family: Verdana;
 }
 
@@ -4775,7 +4775,7 @@ td.timetablePopupContributionTitle{
 }
 
 .timezonePopup .tzHeader {
-    font-size: 15pt;
+    font-size: 20px;
     color: #444;
     margin-bottom: 15px;
     padding-bottom: 5px;
@@ -4795,7 +4795,7 @@ ul.popupList {
     background: #FFFFFF;
     padding: 0px;
     border: 1px solid #99aabb;
-    font-size: 10pt;
+    font-size: 13px;
     margin: 0px;
     max-width: 500px;
     min-width: 80px;
@@ -4857,7 +4857,7 @@ ul.sectionPopupList ul.subPopupList {
 }
 
 ul.sectionPopupList li a {
-    font-size: 10pt;
+    font-size: 13px;
 }
 
 ul.sectionPopupList li a:hover {
@@ -4881,7 +4881,7 @@ ul.sectionPopupList li.section .name {
     position: absolute;
     top: 0; right: 0;
     font-family: Verdana;
-    font-size: 9pt;
+    font-size: 12px;
     color: #666;
     padding: 5px 10px;
     background: white;
@@ -4905,7 +4905,7 @@ ul.globalMenuPopupList li {
 ul.globalMenuPopupList li a {
     font-weight: bold;
     font-family: Verdana;
-    font-size: 8pt;
+    font-size: 11px;
     color: white;
     letter-spacing: 0.04em;
     padding: 8px;
@@ -4921,7 +4921,7 @@ ul.globalMenuPopupList li a:hover {
 }
 
 ul.categoryDisplayPopupList li a {
-    font-size: 11pt;
+    font-size: 14px;
 }
 
 ul.popupListCheckboxes {
@@ -4987,7 +4987,7 @@ div.timetableManagementInfoArea {
     margin-right: auto;
     behavior: url(border-radius.htc);
     padding: 5px;
-    font-size: 8pt;
+    font-size: 11px;
     position: relative;
 }
 
@@ -5095,7 +5095,7 @@ div.cssPreview {
 }
 
 .roomWidget th .roomWidgetTitle {
-    font-size: 10pt;
+    font-size: 13px;
     color: #444444;
     font-family: Verdana;
     text-align: left;
@@ -5168,7 +5168,7 @@ div.CategoryEventListDiv {
 }
 
 .searchResultDescription {
-    font-size: 10pt;
+    font-size: 13px;
     color: #666666;
     margin: 5px;
     margin-left: 10px;
@@ -5207,7 +5207,7 @@ ul.authorList {
 
 .Search {
     border-bottom: 2px solid rgb(170, 170, 170);
-    font-size: 26pt;
+    font-size: 34px;
     font-family: Times New Roman;
     color: #B14300;
     font-weight: normal;
@@ -5254,11 +5254,11 @@ div.dialogButtons {
 }
 
 .slotTitle {
-    font-size:11pt;
+    font-size:14px;
 }
 
 .slotSubTitle {
-    font-size: 10pt;
+    font-size: 13px;
     font-weight:normal;
     padding-bottom: 10px;
     margin-top: 0px;
@@ -5271,11 +5271,11 @@ div.dialogButtons {
 
 .calendarColorLegend {
     padding: 10px 0 10px 20px;
-    font-size: 10pt;
+    font-size: 13px;
 }
 
 .calendarColorLegend a {
-    font-size: 10pt;
+    font-size: 13px;
 }
 
 .indicoHelp {
@@ -5383,7 +5383,7 @@ div.dialogButtons {
 
 .searchSuggestionTitle {
     color: #0B63A5;
-    font-size: 9pt;
+    font-size: 12px;
 }
 
 .searchSuggestionHighlight {
@@ -5392,7 +5392,7 @@ div.dialogButtons {
 
 .searchSuggestionPath {
     color: #444444;
-    font-size: 7pt;
+    font-size: 9px;
 }
 
 .searchSuggestionSelected {
@@ -5402,7 +5402,7 @@ div.dialogButtons {
 .searchSuggestionOtherResults {
     background-color: #FFFFFF;
     color:#777777;
-    font-size:9pt;
+    font-size:12px;
     font-style:italic;
     text-align:center;
     margin-top: 5px;
@@ -5412,7 +5412,7 @@ div.dialogButtons {
 .searchSuggestionHelpBox {
     background-color: #FFFFFF;
     color:#555555;
-    font-size:9pt;
+    font-size:12px;
     font-style: italic;
     margin: 0 0 0;
     padding: 5px;
@@ -5509,7 +5509,7 @@ div.posterEntry:hover {
 }
 
 .posterBlockTime {
-    font-size: 8pt;
+    font-size: 11px;
     float: right;
     margin-top: 5px;
 }

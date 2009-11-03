@@ -269,7 +269,7 @@ type("TabWidget", ["Chooser", "IWidget"],{
     },
 
     checkTabOverflow: function(tab) {
-        return (this.tabList.dom.offsetHeight > 33);
+        return (this.tabList.dom.offsetHeight > 30);
     },
 
     scrollRight: function() {
