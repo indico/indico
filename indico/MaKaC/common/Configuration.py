@@ -237,7 +237,8 @@ class Config:
                  "breadcrumbArrow": "breadcrumb_arrow.png",
                  "invenio": "invenio.png",
                  "heart": "heart.png",
-                 "star": "star.png"
+                 "star": "star.png",
+                 "starGrey": "starGrey.png"
     }
 
 

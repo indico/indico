@@ -67,9 +67,7 @@ class UserAddToBasket(LoggedOnlyService):
 
         self._userList = []
 
-        for userData in self._params['value']:
-            self._userList.append(user.AvatarHolder().getById(userData['id']))
-                
+        self._obj = user.AvatarHolder().getById(self._params['id'])
         self._target = self.getAW().getUser()  
         
     def _getAnswer(self):
@@ -78,12 +76,8 @@ class UserAddToBasket(LoggedOnlyService):
         #if (self._target in self._userList):
         #    raise ServiceError("ERR-U3","Trying to add user to his own favorites!")
         
-        if (self._target == []):
-            raise ServiceError("ERR-U0","No users specified!")
-
-        for user in self._userList:
-            if (not self._target.getPersonalInfo().getBasket().addElement(user)):
-                raise ServiceError("ERR-U1","Element already exists in list!")
+        if (not self._target.getPersonalInfo().getBasket().addElement(self._obj)):
+            raise ServiceError("ERR-U1","Element already exists in list!")
         
 class UserRemoveFromBasket(LoggedOnlyService):
     def _checkParams(self):

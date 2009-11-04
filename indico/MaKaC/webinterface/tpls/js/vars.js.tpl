@@ -35,6 +35,7 @@ var Indico = {
         dot_green: "<%= iconFileName("dot_green") %>",
         dot_red: "<%= iconFileName("dot_red") %>",
         dot_orange: "<%= iconFileName("dot_orange") %>",
+        loading: "<%= iconFileName("loading") %>",
         ui_loading: "<%= iconFileName("ui_loading") %>",
         role_participant: "<%= iconFileName("role_participant") %>",
         role_creator: "<%= iconFileName("role_creator") %>",
@@ -68,6 +69,7 @@ var Indico = {
         roomwidgetArrow: "<%= iconFileName("roomwidgetArrow")%>",
         breadcrumbArrow: "<%= iconFileName("breadcrumbArrow")%>",
         star: "<%= iconFileName("star")%>",
+        starGrey: "<%= iconFileName("starGrey")%>",
         warning_yellow: "<%= iconFileName("warning_yellow")%>"
     },
     Urls: {
