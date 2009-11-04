@@ -311,6 +311,7 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
     },
 
     _followArgs_day: function(hash,data) {
+
         var m = hash.match(/#(\d{8}|all)(?:\.(s\d+l\d+))?/);
 
         if (m) {
@@ -318,10 +319,9 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
             this.currentDay = m[1];
 
             var tab = 0;
-            var dayKeys = keys(data);
 
-            for (k in dayKeys) {
-                if (dayKeys[k] == this.currentDay) {
+            for (k in this.sortedKeys) {
+                if (this.sortedKeys[k] == this.currentDay) {
                     return tab;
                 }
                 tab++;
@@ -383,8 +383,8 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
                                                     !!managementActions,
                                                     managementActions);
 
-         var sortedKeys = keys(this.data);
-         sortedKeys.sort();
+         this.sortedKeys = keys(this.data);
+         this.sortedKeys.sort();
 
 
          var today = new Date();
@@ -408,7 +408,7 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
              initialTab = 0;
          }
 
-         this.LookupTabWidget( translate(sortedKeys, function(key) {
+         this.LookupTabWidget( translate(this.sortedKeys, function(key) {
              return [key, function() {
                  self.currentDay = key;
                  // each time one tab is clicked,

@@ -20,7 +20,18 @@ var Util = {
         }
 
         return concat(["Conference"], [id]);
+    },
+
+    //truncate titles which are too long
+    truncate: function(title, length){
+        length = length || 25;
+        if(title.length > length){
+            return title.substring(0,length-3) + "...";
+        }else{
+            return title;
+        }
     }
+
 };
 
 var IndicoSortCriteria = {

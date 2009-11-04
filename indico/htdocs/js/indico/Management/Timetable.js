@@ -566,8 +566,11 @@ type("MoveEntryDialog", ["ExclusivePopup"],
          // draw a tab with radiobuttons for each day
          _drawMoveEntryDay: function(timetableItems, currentDay) {
              var moveEntryTable = Html.ul( {
-                 width : '100%',
-                 className: 'list'
+                 className: 'list',
+                 style: {
+                     overflow: 'auto',
+                     height: '250px'
+                 }
              });
 
              // list of all radiobuttons
@@ -645,7 +648,7 @@ type("MoveEntryDialog", ["ExclusivePopup"],
                              verticalAlign: 'middle',
                              fontWeight: 'normal'
                          }
-                     }, value.title, Html.span(
+                     }, Util.truncate(value.title, 40), Html.span(
                          {style: {
                              fontSize: '10px',
                              marginLeft: '5px',
