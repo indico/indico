@@ -794,6 +794,13 @@ type("MoveEntryDialog", ["ExclusivePopup"],
          this.scheduleEntryId = scheduleEntryId;
          this.confId = confId;
          this.startDate = startDate;
+
+         var self = this;
+
+         this.ExclusivePopup($T("Move Timetable Entry"),
+                             function() {
+                                 self.close();
+                             });
      });
 
 
