@@ -725,7 +725,7 @@ $E('reviewerNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOpti
 $E('editorNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailNotifForContribution', 
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Editor'}, 
-                                            'Assign/Remove Contribution to Content Reviewer Notification',
+                                            'Assign/Remove Contribution to Layout Reviewer Notification',
                                             true
 ));
 $E('refereeJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailJudgementNotif', 
@@ -820,12 +820,10 @@ function showFormatChooser(pm){
     showReviewingQuestions();
     showDefaultReviewerDate();
     showDefaultRefereeDate();
-    showRefereeNotif();
 <% end %>
 <% if ConfReview.hasPaperEditing(): %>
     showEditingCriteria();
     showDefaultEditorDate();
-    showEditorNotif();
 <% end %>
 
 </script>
