@@ -14,7 +14,7 @@ oFCKeditor.Config["LinkBrowser"] = false ;
 oFCKeditor.BasePath       = "%(baseURL)s/js/fckeditor/" ;
 oFCKeditor.Width          = 700 ;
 oFCKeditor.Height         = 600 ;
-oFCKeditor.ToolbarSet     = "IndicoFull" ;
+oFCKeditor.ToolbarSet     = "IndicoPages" ;
 oFCKeditor.ReplaceTextarea() ;
 //-->
 </script>
