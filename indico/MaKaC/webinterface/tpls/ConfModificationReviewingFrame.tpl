@@ -5,7 +5,7 @@
 <% if ConfReview.hasReviewing(): %>
 <table width="85%%" align="center" border="0">
     <tr>
-        <td id="revControlRefereeEditorReviewerHelp"  colspan="3" class="groupTitle"  style="border: none; padding-top: 15px; padding-bottom: 15px;">
+        <td id="revControlRefereeEditorReviewerHelp"  colspan="3" class="groupTitle"  style="padding-top: 15px; padding-bottom: 15px;">
             <%= _("Step 2: Assign Reviewers")%>
         </td>
     </tr>   

@@ -76,6 +76,20 @@ class ConferenceReview(Persistent):
         self._defaultEditorDueDate = None
         self._defaultReviwerDueDate = None
         self._defaultAbstractReviwerDueDate = None
+        
+        #auto e-mails        
+        self._enableRefereeEmailNotif = False
+        self._enableEditorEmailNotif = False
+        self._enableReviewerEmailNotif = False
+        self._enableRefereeEmailNotifForContribution = False
+        self._enableEditorEmailNotifForContribution = False
+        self._enableReviewerEmailNotifForContribution = False
+        self._enableRefereeJudgementEmailNotif = False
+        self._enableEditorJudgementEmailNotif = False
+        self._enableReviewerJudgementEmailNotif = False
+        self._enableAuthorSubmittedMatRefereeEmailNotif = False
+        self._enableAuthorSubmittedMatEditorEmailNotif = False
+        self._enableAuthorSubmittedMatReviewerEmailNotif = False
 
         self._reviewableMaterials = ["paper"]
         from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry
@@ -163,6 +177,182 @@ class ConferenceReview(Persistent):
             return None
         else:
             return getAdjustedDate(self._defaultAbstractReviwerDueDate, self.getConference())
+    
+    #auto e-mails methods for assign/remove reviewing team to the conference notification
+    def getEnableRefereeEmailNotif(self):
+        try :
+            if self._enableRefereeEmailNotif  :
+                pass
+        except AttributeError :
+            self._enableRefereeEmailNotif = True
+        return self._enableRefereeEmailNotif
+
+    def enableRefereeEmailNotif(self):
+        self._enableRefereeEmailNotif = True
+
+    def disableRefereeEmailNotif(self):
+        self._enableRefereeEmailNotif = False
+        
+        
+    def getEnableEditorEmailNotif(self):
+        try :
+            if self._enableEditorEmailNotif  :
+                pass
+        except AttributeError :
+            self._enableEditorEmailNotif = True
+        return self._enableEditorEmailNotif
+
+    def enableEditorEmailNotif(self):
+        self._enableEditorEmailNotif = True
+
+    def disableEditorEmailNotif(self):
+        self._enableEditorEmailNotif = False
+        
+    
+    def getEnableReviewerEmailNotif(self):
+        try :
+            if self._enableReviewerEmailNotif  :
+                pass
+        except AttributeError :
+            self._enableReviewerEmailNotif = True
+        return self._enableReviewerEmailNotif
+
+    def enableReviewerEmailNotif(self):
+        self._enableReviewerEmailNotif = True
+
+    def disableReviewerEmailNotif(self):
+        self._enableReviewerEmailNotif = False
+       
+      
+    #auto e-mails methods for assign/remove reviewers to/from contributions notification
+    def getEnableRefereeEmailNotifForContribution(self):
+        try :
+            if self._enableRefereeEmailNotifForContribution  :
+                pass
+        except AttributeError :
+            self._enableRefereeEmailNotifForContribution = True
+        return self._enableRefereeEmailNotifForContribution
+
+    def enableRefereeEmailNotifForContribution(self):
+        self._enableRefereeEmailNotifForContribution = True
+
+    def disableRefereeEmailNotifForContribution(self):
+        self._enableRefereeEmailNotifForContribution = False        
+        
+    def getEnableEditorEmailNotifForContribution(self):
+        try :
+            if self._enableEditorEmailNotifForContribution  :
+                pass
+        except AttributeError :
+            self._enableEditorEmailNotifForContribution = True
+        return self._enableEditorEmailNotifForContribution
+
+    def enableEditorEmailNotifForContribution(self):
+        self._enableEditorEmailNotifForContribution = True
+
+    def disableEditorEmailNotifForContribution(self):
+        self._enableEditorEmailNotifForContribution = False        
+    
+    def getEnableReviewerEmailNotifForContribution(self):
+        try :
+            if self._enableReviewerEmailNotifForContribution  :
+                pass
+        except AttributeError :
+            self._enableReviewerEmailNotifForContribution = True
+        return self._enableReviewerEmailNotifForContribution
+
+    def enableReviewerEmailNotifForContribution(self):
+        self._enableReviewerEmailNotifForContribution = True
+
+    def disableReviewerEmailNotifForContribution(self):
+        self._enableReviewerEmailNotifForContribution = False
+
+    #auto e-mails methods for reviewers judgements notification
+    def getEnableRefereeJudgementEmailNotif(self):
+        try :
+            if self._enableRefereeJudgementEmailNotif  :
+                pass
+        except AttributeError :
+            self._enableRefereeJudgementEmailNotif = True
+        return self._enableRefereeJudgementEmailNotif
+
+    def enableRefereeJudgementEmailNotif(self):
+        self._enableRefereeJudgementEmailNotif = True
+
+    def disableRefereeJudgementEmailNotif(self):
+        self._enableRefereeJudgementEmailNotif = False        
+        
+    def getEnableEditorJudgementEmailNotif(self):
+        try :
+            if self._enableEditorJudgementEmailNotif  :
+                pass
+        except AttributeError :
+            self._enableEditorJudgementEmailNotif = True
+        return self._enableEditorJudgementEmailNotif
+
+    def enableEditorJudgementEmailNotif(self):
+        self._enableEditorJudgementEmailNotif = True
+
+    def disableEditorJudgementEmailNotif(self):
+        self._enableEditorJudgementEmailNotif = False        
+    
+    def getEnableReviewerJudgementEmailNotif(self):
+        try :
+            if self._enableReviewerJudgementEmailNotif  :
+                pass
+        except AttributeError :
+            self._enableReviewerJudgementEmailNotif = True
+        return self._enableReviewerJudgementEmailNotif
+
+    def enableReviewerJudgementEmailNotif(self):
+        self._enableReviewerJudgementEmailNotif = True
+
+    def disableReviewerJudgementEmailNotif(self):
+        self._enableReviewerJudgementEmailNotif = False
+
+    #auto e-mails methods for authors' submittion materials notification
+    def getEnableAuthorSubmittedMatRefereeEmailNotif(self):
+        try :
+            if self._enableAuthorSubmittedMatRefereeEmailNotif  :
+                pass
+        except AttributeError :
+            self._enableAuthorSubmittedMatRefereeEmailNotif = True
+        return self._enableAuthorSubmittedMatRefereeEmailNotif
+
+    def enableAuthorSubmittedMatRefereeEmailNotif(self):
+        self._enableAuthorSubmittedMatRefereeEmailNotif = True
+
+    def disableAuthorSubmittedMatRefereeEmailNotif(self):
+        self._enableAuthorSubmittedMatRefereeEmailNotif = False
+        
+    def getEnableAuthorSubmittedMatEditorEmailNotif(self):
+        try :
+            if self._enableAuthorSubmittedMatEditorEmailNotif  :
+                pass
+        except AttributeError :
+            self._enableAuthorSubmittedMatEditorEmailNotif = True
+        return self._enableAuthorSubmittedMatEditorEmailNotif
+
+    def enableAuthorSubmittedMatEditorEmailNotif(self):
+        self._enableAuthorSubmittedMatEditorEmailNotif = True
+
+    def disableAuthorSubmittedMatEditorEmailNotif(self):
+        self._enableAuthorSubmittedMatEditorEmailNotif = False
+        
+    def getEnableAuthorSubmittedMatReviewerEmailNotif(self):
+        try :
+            if self._enableAuthorSubmittedMatReviewerEmailNotif  :
+                pass
+        except AttributeError :
+            self._enableAuthorSubmittedMatReviewerEmailNotif = True
+        return self._enableAuthorSubmittedMatReviewerEmailNotif
+
+    def enableAuthorSubmittedMatReviewerEmailNotif(self):
+        self._enableAuthorSubmittedMatReviewerEmailNotif = True
+
+    def disableAuthorSubmittedMatReviewerEmailNotif(self):
+        self._enableAuthorSubmittedMatReviewerEmailNotif = False
+               
 
     #Reviewing mode methods
     def setChoice(self, choice):
@@ -359,7 +549,7 @@ class ConferenceReview(Persistent):
     def addReferee(self, newReferee):
         """ Adds a new referee to the conference.
             newReferee has to be an Avatar object.
-            The referee is sent a mail notification.
+            The referee is sent a mail notification only if the manager has enabled the option in 'Automatic e-mails' section.
         """
         if newReferee in self.getRefereesList():
             raise MaKaCError("This referee has already been added to this conference")
@@ -369,14 +559,15 @@ class ConferenceReview(Persistent):
             if not self._userCompetences.has_key(newReferee):
                 self._userCompetences[newReferee] = []
             self.notifyModification()
-            notification = ConferenceReviewingNotification(newReferee, 'Referee', self._conference)
-            GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", newReferee)
-
+            if self._enableRefereeEmailNotif == True:
+                notification = ConferenceReviewingNotification(newReferee, 'Referee', self._conference)
+                GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", newReferee)
+            
 
     def removeReferee(self, referee):
         """ Remove a referee from the conference.
             referee has to be an Avatar object.
-            The referee is sent a mail notification.
+            The referee is sent a mail notification only if the manager has enabled the option in 'Automatic e-mails' section.
         """
         if referee in self._refereesList:
             if self._userCompetences.has_key(referee):
@@ -390,8 +581,9 @@ class ConferenceReview(Persistent):
             self._refereesList.remove(referee)
             referee.unlinkTo(self._conference, "referee")
             self.notifyModification()
-            notification = ConferenceReviewingRemoveNotification(referee, 'Referee', self._conference)
-            GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", referee)
+            if self._enableRefereeEmailNotif == True:
+                notification = ConferenceReviewingRemoveNotification(referee, 'Referee', self._conference)
+                GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", referee)
         else:
             raise MaKaCError("Cannot remove a referee who is not yet referee")
 
@@ -444,7 +636,7 @@ class ConferenceReview(Persistent):
     def addEditor(self, newEditor):
         """ Adds a new editor to the conference.
             editor has to be an Avatar object.
-            The editor is sent a mail notification.
+            The editor is sent a mail notification only if the manager has enabled the option in 'Automatic e-mails' section.
         """
         if newEditor in self.getEditorsList():
             raise MaKaCError("This editor has already been added to this conference")
@@ -454,13 +646,14 @@ class ConferenceReview(Persistent):
             if not self._userCompetences.has_key(newEditor):
                 self._userCompetences[newEditor] = []
             self.notifyModification()
-            notification = ConferenceReviewingNotification(newEditor, 'Editor', self._conference)
-            GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", newEditor)
+            if self._enableEditorEmailNotif == True:
+                notification = ConferenceReviewingNotification(newEditor, 'Editor', self._conference)
+                GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", newEditor)
 
     def removeEditor(self, editor):
         """ Remove a editor from the conference.
             editor has to be an Avatar object.
-            The editor is sent a mail notification.
+            The editor is sent a mail notification only if the manager has enabled the option in 'Automatic e-mails' section.
         """
         if editor in self._editorsList:
             if self._userCompetences.has_key(editor):
@@ -474,8 +667,9 @@ class ConferenceReview(Persistent):
             self._editorsList.remove(editor)
             editor.unlinkTo(self._conference, "editor")
             self.notifyModification()
-            notification = ConferenceReviewingRemoveNotification(editor, 'Editor', self._conference)
-            GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", editor)
+            if self._enableEditorEmailNotif == True:
+                notification = ConferenceReviewingRemoveNotification(editor, 'Editor', self._conference)
+                GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", editor)
         else:
             raise MaKaCError("Cannot remove an editor who is not yet editor")
 
@@ -528,7 +722,7 @@ class ConferenceReview(Persistent):
     def addReviewer(self, newReviewer):
         """ Adds a new reviewer to the conference.
             newreviewer has to be an Avatar object.
-            The reviewer is sent a mail notification.
+            The reviewer is sent a mail notification only if the manager has enabled the option in 'Automatic e-mails' section.
         """
         if newReviewer in self.getReviewersList():
             raise MaKaCError("This reviewer has already been added to this conference")
@@ -538,13 +732,14 @@ class ConferenceReview(Persistent):
             if not self._userCompetences.has_key(newReviewer):
                 self._userCompetences[newReviewer] = []
             self.notifyModification()
-            notification = ConferenceReviewingNotification(newReviewer, 'Reviewer', self._conference)
-            GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", newReviewer)
-
+            if self._enableReviewerEmailNotif == True:
+                notification = ConferenceReviewingNotification(newReviewer, 'Reviewer', self._conference)
+                GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", newReviewer)
+        
     def removeReviewer(self, reviewer):
         """ Remove a reviewer from the conference.
             reviewer has to be an Avatar object.
-            The reviewer is sent a mail notification.
+            The reviewer is sent a mail notification only if the manager has enabled the option in 'Automatic e-mails' section.
         """
         if reviewer in self._reviewersList:
             if self._userCompetences.has_key(reviewer):
@@ -558,8 +753,9 @@ class ConferenceReview(Persistent):
             self._reviewersList.remove(reviewer)
             reviewer.unlinkTo(self._conference, "reviewer")
             self.notifyModification()
-            notification = ConferenceReviewingRemoveNotification(reviewer, 'Reviewer', self._conference)
-            GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", reviewer)
+            if self._enableReviewerEmailNotif == True:
+                notification = ConferenceReviewingRemoveNotification(reviewer, 'Reviewer', self._conference)
+                GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", reviewer)
         else:
             raise MaKaCError("Cannot remove a reviewer who is not yet reviewer")
 

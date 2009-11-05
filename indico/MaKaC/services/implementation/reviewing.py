@@ -39,6 +39,7 @@ from MaKaC.i18n import _
 from MaKaC.errors import MaKaCError
 import datetime
 from MaKaC.common.mail import GenericMailer
+from MaKaC.contributionReviewing import ReviewManager
 
 
 """
@@ -236,7 +237,139 @@ class ConferenceAbstractReviewingDefaultDueDateModification(ConferenceAbstractRe
             return 'No date set yet'
         else:
             return datetime.datetime.strftime(date,'%d/%m/%Y %H:%M')
-
+        
+class ConferenceReviewingAutoEmailsModificationReferee(ConferenceReviewingSetupTextModificationBase ):
+    
+    def _handleSet(self):
+        if self._value:
+            self._confReview.enableRefereeEmailNotif()
+        else:
+            self._confReview.disableRefereeEmailNotif()
+        
+    def _handleGet(self):
+        return self._confReview.getEnableRefereeEmailNotif()
+    
+class ConferenceReviewingAutoEmailsModificationEditor(ConferenceReviewingSetupTextModificationBase ):
+    
+    def _handleSet(self):
+        if self._value:
+            self._confReview.enableEditorEmailNotif()
+        else:
+            self._confReview.disableEditorEmailNotif()
+        
+    def _handleGet(self):
+        return self._confReview.getEnableEditorEmailNotif()
+    
+class ConferenceReviewingAutoEmailsModificationReviewer(ConferenceReviewingSetupTextModificationBase ):
+    
+    def _handleSet(self):
+        if self._value:
+            self._confReview.enableReviewerEmailNotif()
+        else:
+            self._confReview.disableReviewerEmailNotif()
+        
+    def _handleGet(self):
+        return self._confReview.getEnableReviewerEmailNotif()
+        
+class ConferenceReviewingAutoEmailsModificationRefereeForContribution(ConferenceReviewingSetupTextModificationBase):
+    
+    def _handleSet(self):
+        if self._value:
+            self._confReview.enableRefereeEmailNotifForContribution()
+        else:
+            self._confReview.disableRefereeEmailNotifForContribution()
+        
+    def _handleGet(self):
+        return self._confReview.getEnableRefereeEmailNotifForContribution()
+    
+class ConferenceReviewingAutoEmailsModificationEditorForContribution(ConferenceReviewingSetupTextModificationBase):
+    
+    def _handleSet(self):
+        if self._value:
+            self._confReview.enableEditorEmailNotifForContribution()
+        else:
+            self._confReview.disableEditorEmailNotifForContribution()
+        
+    def _handleGet(self):
+        return self._confReview.getEnableEditorEmailNotifForContribution()
+    
+class ConferenceReviewingAutoEmailsModificationReviewerForContribution(ConferenceReviewingSetupTextModificationBase):
+    
+    def _handleSet(self):
+        if self._value:
+            self._confReview.enableReviewerEmailNotifForContribution()
+        else:
+            self._confReview.disableReviewerEmailNotifForContribution()
+        
+    def _handleGet(self):
+        return self._confReview.getEnableReviewerEmailNotifForContribution()
+    
+class ConferenceReviewingAutoEmailsModificationRefereeJudgement(ConferenceReviewingSetupTextModificationBase):
+    
+    def _handleSet(self):
+        if self._value:
+            self._confReview.enableRefereeJudgementEmailNotif()
+        else:
+            self._confReview.disableRefereeJudgementEmailNotif()
+        
+    def _handleGet(self):
+        return self._confReview.getEnableRefereeJudgementEmailNotif()
+    
+class ConferenceReviewingAutoEmailsModificationEditorJudgement(ConferenceReviewingSetupTextModificationBase):
+    
+    def _handleSet(self):
+        if self._value:
+            self._confReview.enableEditorJudgementEmailNotif()
+        else:
+            self._confReview.disableEditorJudgementEmailNotif()
+        
+    def _handleGet(self):
+        return self._confReview.getEnableEditorJudgementEmailNotif()
+    
+class ConferenceReviewingAutoEmailsModificationReviewerJudgement(ConferenceReviewingSetupTextModificationBase):
+    
+    def _handleSet(self):
+        if self._value:
+            self._confReview.enableReviewerJudgementEmailNotif()
+        else:
+            self._confReview.disableReviewerJudgementEmailNotif()
+        
+    def _handleGet(self):
+        return self._confReview.getEnableReviewerJudgementEmailNotif()
+    
+class ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatReferee(ConferenceReviewingSetupTextModificationBase):
+    
+    def _handleSet(self):
+        if self._value:
+            self._confReview.enableAuthorSubmittedMatRefereeEmailNotif()
+        else:
+            self._confReview.disableAuthorSubmittedMatRefereeEmailNotif()
+        
+    def _handleGet(self):
+        return self._confReview.getEnableAuthorSubmittedMatRefereeEmailNotif()
+    
+class ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatEditor(ConferenceReviewingSetupTextModificationBase):
+    
+    def _handleSet(self):
+        if self._value:
+            self._confReview.enableAuthorSubmittedMatEditorEmailNotif()
+        else:
+            self._confReview.disableAuthorSubmittedMatEditorEmailNotif()
+        
+    def _handleGet(self):
+        return self._confReview.getEnableAuthorSubmittedMatEditorEmailNotif()
+    
+class ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatReviewer(ConferenceReviewingSetupTextModificationBase):
+    
+    def _handleSet(self):
+        if self._value:
+            self._confReview.enableAuthorSubmittedMatReviewerEmailNotif()
+        else:
+            self._confReview.disableAuthorSubmittedMatReviewerEmailNotif()
+        
+    def _handleGet(self):
+        return self._confReview.getEnableAuthorSubmittedMatReviewerEmailNotif()
+    
 
 class ConferenceReviewingCompetenceModification(ListModificationBase, ConferenceReviewingPRMAMBase):
     #Note: don't change the order of the inheritance here!
@@ -690,6 +823,20 @@ methodMap = {
     "conference.addReviewer" : ConferenceReviewingAddReviewer,
     "conference.removeReviewer" : ConferenceReviewingRemoveReviewer,
     "conference.removeAllReviewers" : ConferenceReviewingRemoveAllReviewers,
+    
+    "conference.RefereeEmailNotif" : ConferenceReviewingAutoEmailsModificationReferee,
+    "conference.EditorEmailNotif" : ConferenceReviewingAutoEmailsModificationEditor,
+    "conference.ReviewerEmailNotif" : ConferenceReviewingAutoEmailsModificationReviewer,
+    "conference.RefereeEmailNotifForContribution" : ConferenceReviewingAutoEmailsModificationRefereeForContribution,
+    "conference.EditorEmailNotifForContribution" : ConferenceReviewingAutoEmailsModificationEditorForContribution,
+    "conference.ReviewerEmailNotifForContribution" : ConferenceReviewingAutoEmailsModificationReviewerForContribution,
+    "conference.RefereeEmailJudgementNotif" : ConferenceReviewingAutoEmailsModificationRefereeJudgement,
+    "conference.EditorEmailJudgementNotif" : ConferenceReviewingAutoEmailsModificationEditorJudgement,
+    "conference.ReviewerEmailJudgementNotif" : ConferenceReviewingAutoEmailsModificationReviewerJudgement,
+    "conference.AuthorSubmittedMatRefereeNotif" : ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatReferee,
+    "conference.AuthorSubmittedMatEditorNotif" : ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatEditor,
+    "conference.AuthorSubmittedMatReviewerNotif" : ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatReviewer,
+    
     
     "conference.assignTeamPRM" : ConferenceReviewingAssignTeamPRM,
     "conference.removeTeamPRM" : ConferenceReviewingRemoveTeamPRM,

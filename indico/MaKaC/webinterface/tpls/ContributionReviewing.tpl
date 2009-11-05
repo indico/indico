@@ -36,7 +36,7 @@
 <table width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <!-- Assign or remove a referee -->
     <tr>
-        <td id="assignRefereeHelp" colspan="5" class="groupTitle"><%= _("Assign a Referee")%></td>
+        <td id="assignRefereeHelp" colspan="5" class="groupTitle" style="border: none; padding-bottom:10px;"><%= _("Assign a Referee")%></td>
     </tr>
     <% if ConferenceChoice == 2 or ConferenceChoice == 4: %>
         <tr>
@@ -137,7 +137,7 @@
 <!-- Assign / remove Editors -->
 <table width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
-        <td id="assignEditorHelp" colspan="5" class="groupTitle"><%= _("Assign a Layout Reviewer")%></td>
+        <td id="assignEditorHelp" colspan="5" class="groupTitle" style="border: none; padding-bottom:10px;"><%= _("Assign a Layout Reviewer")%></td>
     </tr>
     <% if ConferenceChoice == 3 or ConferenceChoice == 4: %>
     <tr>
@@ -244,7 +244,7 @@
 
 <table width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
-        <td id="assignReviewersHelp" colspan="5" class="groupTitle"><%= _("Assign Content Reviewers")%></td>
+        <td id="assignReviewersHelp" colspan="5" class="groupTitle" style="border: none; padding-bottom:10px;"><%= _("Assign Content Reviewers")%></td>
     </tr>
     <% if ConferenceChoice == 2 or ConferenceChoice == 4: %>
         <tr>

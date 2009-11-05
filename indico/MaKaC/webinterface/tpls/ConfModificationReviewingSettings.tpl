@@ -3,11 +3,19 @@
 <% from MaKaC.reviewing import ConferenceReview %>
 <% from MaKaC.reviewing import Template %>
 <% from MaKaC.common.utils import formatDateTime %>
-
-<table width="80%%" align="center" border="0" style="margin-bottom:1em">
+<table width="90%%" border="0" style="margin-bottom:1em">
     <tr>
+        <td nowrap id="reviewingModeHelp" class="groupTitle"><%= _("Step 1: Choose type of paper reviewing for the conference")%>
+        </td>
+    </tr>
         <em><%= _("Please, follow the steps to set up the Paper Reviewing Module")%></em> 
-        <div id="reviewingModeHelp" class="groupTitle" style="border: none"><%= _("Step 1: Choose type of paper reviewing for the conference")%></div>
+</table>
+        
+<table width="90%%" border="0" style="margin-bottom:1em">
+    <tr>
+        <td>
+        
+        </td>
     </tr>
     <tr>
         <td nowrap class="titleCellTD"  style="padding-top: 5px;">
@@ -26,7 +34,7 @@
 <% end %>
 <table id='steptitle' width="90%%" border="0" style="margin-bottom:1em; display:<%=display%>">
     <tr>
-        <td class="groupTitle" style="border: none">
+        <td class="groupTitle">
             <%= _("Step 2: Set up the options for ")%><span id="title">
             <%if ConferenceReview.reviewingModes[choice]==ConferenceReview.reviewingModes[2]: %><%= _("content reviewing team")%><% end %>
             <%if ConferenceReview.reviewingModes[choice]==ConferenceReview.reviewingModes[3]: %><%= _("layout reviewing team")%><% end %>
@@ -173,7 +181,7 @@
         <% display = 'none' %>
     <% end %>    
     <tr id="refereeDefaultDateRow" style="white-space:nowrap; display: <%=display%>">
-        <td nowrap class="titleCellTD"><span class="titleCellFormat">
+        <td nowrap class="titleCellTD" style="text-align:left"><span class="titleCellFormat" align="left">
             <%= _("Referee Deadline")%>
         </span></td>
         <td nowrap class="blacktext">
@@ -195,8 +203,8 @@
         <% display = 'none' %>
     <% end %>    
     <tr id="editorDefaultDateRow" style="white-space:nowrap; display: <%=display%>">
-        <td nowrap class="titleCellTD"><span class="titleCellFormat">
-            <%= _("Editor Deadline")%>
+        <td nowrap class="titleCellTD" style="text-align:left"><span class="titleCellFormat">
+            <%= _("Layout Reviewer Deadline")%>
         </span></td>
         <td nowrap class="blacktext">
             <span id="inPlaceEditDefaultEditorDueDate">
@@ -223,8 +231,8 @@
         <% display = 'none' %>
     <% end %>    
     <tr id="reviewerDefaultDateRow" style="white-space:nowrap;display: <%=display%>">
-        <td nowrap class="titleCellTD"><span class="titleCellFormat">
-            <%= _("Reviewer Deadline")%>
+        <td nowrap class="titleCellTD" style="text-align:left"><span class="titleCellFormat">
+            <%= _("Content Reviewer Deadline")%>
         </span></td>
         <td nowrap class="blacktext">
             <span id="inPlaceEditDefaultReviewerDueDate">
@@ -240,6 +248,187 @@
     </tr>
 </table>
 
+<table id="automaticNotification" width="90%%" align="center" border="0">
+    <% if ConfReview.hasReviewing(): %>
+            <% display = 'table' %>
+        <% end %>
+        <% else: %>
+            <% display = 'none' %>
+        <% end %>
+	    <tr id="autoEmails" style="display:<%=display%>">
+	        <td id="automaticNotificationHelp" colspan="5" class="reviewingsubtitle"><%= _("Automatic e-mails")%>
+	           <% inlineContextHelp(_('Here you can enable/disable automatic e-mails sending.<br/>Notifications can be send to the Reviewing Team in the next several situations<br/><ul><li>when are added/removed Reviewers for the conference</li><li>when are assinged/removed contributions to Reviewers</li><li>when authors of the contributions have been submitted materials</li></ul>Notifications can be send to the authors when their contributions had been judged by the Reviewers.'))%>
+	        </td>
+	    </tr>
+        <% if ConfReview.hasPaperReviewing(): %>
+            <% display = 'table-row' %>
+        <% end %>
+        <% else: %>
+            <% display = 'none' %>
+        <% end %>
+	   <tr id="refereeNotif" style="white-space:nowrap; display: <%=display%>">
+	    <td>
+            <div>
+                <span id="refereeNotifButton">                    
+                </span>
+            </div>
+        </td>
+       </tr>
+        <% if ConfReview.hasPaperEditing(): %>
+            <% display = 'table-row' %>
+        <% end %>
+        <% else: %>
+            <% display = 'none' %>
+        <% end %>
+       <tr id="editorNotif" style="white-space:nowrap; display: <%=display%>">
+          <td>
+            <div>
+                <span id="editorNotifButton">                    
+                </span>
+            </div>
+         </td>
+       </tr>
+        <% if ConfReview.hasPaperReviewing(): %>
+            <% display = 'table-row' %>
+        <% end %>
+        <% else: %>
+            <% display = 'none' %>
+        <% end %>
+       <tr id="reviewerNotif" style="white-space:nowrap; display: <%=display%>">
+        <td>
+            <div>
+                <span id="reviewerNotifButton">                   
+                </span>
+            </div>
+        </td>
+       </tr>
+       <% if ConfReview.hasPaperReviewing(): %>
+            <% display = 'table-row' %>
+        <% end %>
+        <% else: %>
+            <% display = 'none' %>
+        <% end %>
+       <tr id="refereeNotifForContribution" style="white-space:nowrap; display: <%=display%>">
+        <td>
+            <div>
+                <span id="refereeNotifForContributionButton">                    
+                </span>
+            </div>
+        </td>
+       </tr>
+        <% if ConfReview.hasPaperEditing(): %>
+            <% display = 'table-row' %>
+        <% end %>
+        <% else: %>
+            <% display = 'none' %>
+        <% end %>
+       <tr id="editorNotifForContribution" style="white-space:nowrap; display: <%=display%>">
+          <td>
+            <div>
+                <span id="editorNotifForContributionButton">                    
+                </span>
+            </div>
+         </td>
+       </tr>
+        <% if ConfReview.hasPaperReviewing(): %>
+            <% display = 'table-row' %>
+        <% end %>
+        <% else: %>
+            <% display = 'none' %>
+        <% end %>
+       <tr id="reviewerNotifForContribution" style="white-space:nowrap; display: <%=display%>">
+        <td>
+            <div>
+                <span id="reviewerNotifForContributionButton">                   
+                </span>
+            </div>
+        </td>
+       </tr>
+       <% if ConfReview.hasPaperReviewing(): %>
+            <% display = 'table-row' %>
+        <% end %>
+        <% else: %>
+            <% display = 'none' %>
+        <% end %>
+       <tr id="authorSubmittedMatRefereeNotif" style="white-space:nowrap; display: <%=display%>">
+        <td>
+            <div>
+                <span id="authorSubmittedMatRefereeNotifButton">                    
+                </span>
+            </div>
+        </td>
+       </tr>
+        <% if ConfReview.hasPaperEditing(): %>
+            <% display = 'table-row' %>
+        <% end %>
+        <% else: %>
+            <% display = 'none' %>
+        <% end %>
+       <tr id="authorSubmittedMatEditorNotif" style="white-space:nowrap; display: <%=display%>">
+          <td>
+            <div>
+                <span id="authorSubmittedMatEditorNotifButton">                    
+                </span>
+            </div>
+         </td>
+       </tr>
+        <% if ConfReview.hasPaperReviewing(): %>
+            <% display = 'table-row' %>
+        <% end %>
+        <% else: %>
+            <% display = 'none' %>
+        <% end %>
+       <tr id="authorSubmittedMatReviewerNotif" style="white-space:nowrap; display: <%=display%>">
+        <td>
+            <div>
+                <span id="authorSubmittedMatReviewerNotifButton">                   
+                </span>
+            </div>
+        </td>
+       </tr>
+       <% if ConfReview.hasPaperReviewing(): %>
+            <% display = 'table-row' %>
+        <% end %>
+        <% else: %>
+            <% display = 'none' %>
+        <% end %>
+       <tr id="refereeJudgementNotif" style="white-space:nowrap; display: <%=display%>">
+        <td>
+            <div>
+                <span id="refereeJudgementNotifButton">                    
+                </span>
+            </div>
+        </td>
+       </tr>
+        <% if ConfReview.hasPaperEditing(): %>
+            <% display = 'table-row' %>
+        <% end %>
+        <% else: %>
+            <% display = 'none' %>
+        <% end %>
+       <tr id="editorJudgementNotif" style="white-space:nowrap; display: <%=display%>">
+          <td>
+            <div>
+                <span id="editorJudgementNotifButton">                    
+                </span>
+            </div>
+         </td>
+       </tr>
+        <% if ConfReview.hasPaperReviewing(): %>
+            <% display = 'table-row' %>
+        <% end %>
+        <% else: %>
+            <% display = 'none' %>
+        <% end %>
+       <tr id="reviewerJudgementNotif" style="white-space:nowrap; display: <%=display%>">
+        <td>
+            <div>
+                <span id="reviewerJudgementNotifButton">                   
+                </span>
+            </div>
+        </td>
+       </tr>
+</table>
 
 <% if ConfReview.hasReviewing(): %>
     <% display = 'table' %>
@@ -316,6 +505,19 @@ var observer = function(value) {
         $E('refereeDefaultDateRow').dom.style.display = 'none';
         $E('editorDefaultDateRow').dom.style.display = 'none';
         $E('reviewerDefaultDateRow').dom.style.display = 'none';
+        $E('autoEmails').dom.style.display = 'none';
+        $E('refereeNotif').dom.style.display = 'none';
+        $E('editorNotif').dom.style.display = 'none';
+        $E('reviewerNotif').dom.style.display = 'none';
+        $E('refereeNotifForContribution').dom.style.display = 'none';
+        $E('editorNotifForContribution').dom.style.display = 'none';
+        $E('reviewerNotifForContribution').dom.style.display = 'none';
+        $E('refereeJudgementNotif').dom.style.display = 'none';
+        $E('editorJudgementNotif').dom.style.display = 'none';
+        $E('reviewerJudgementNotif').dom.style.display = 'none';
+        $E('authorSubmittedMatRefereeNotif').dom.style.display = 'none';
+        $E('authorSubmittedMatEditorNotif').dom.style.display = 'none';
+        $E('authorSubmittedMatReviewerNotif').dom.style.display = 'none';
         $E('templateTable').dom.style.display = 'none';
     }
     if (value == "Content reviewing") {
@@ -329,6 +531,19 @@ var observer = function(value) {
         $E('refereeDefaultDateRow').dom.style.display = '';
         $E('editorDefaultDateRow').dom.style.display = 'none';
         $E('reviewerDefaultDateRow').dom.style.display = '';
+        $E('autoEmails').dom.style.display = ''
+        $E('refereeNotif').dom.style.display = '';
+        $E('editorNotif').dom.style.display = 'none';
+        $E('reviewerNotif').dom.style.display = '';
+        $E('refereeNotifForContribution').dom.style.display = '';
+        $E('editorNotifForContribution').dom.style.display = 'none';
+        $E('reviewerNotifForContribution').dom.style.display = '';
+        $E('refereeJudgementNotif').dom.style.display = '';
+        $E('editorJudgementNotif').dom.style.display = 'none';
+        $E('reviewerJudgementNotif').dom.style.display = '';
+        $E('authorSubmittedMatRefereeNotif').dom.style.display = '';
+        $E('authorSubmittedMatEditorNotif').dom.style.display = 'none';
+        $E('authorSubmittedMatReviewerNotif').dom.style.display = '';
         $E('templateTable').dom.style.display = '';
         
         showReviewableMaterials();
@@ -349,6 +564,19 @@ var observer = function(value) {
         $E('refereeDefaultDateRow').dom.style.display = 'none';
         $E('editorDefaultDateRow').dom.style.display = '';
         $E('reviewerDefaultDateRow').dom.style.display = 'none';
+        $E('autoEmails').dom.style.display = '';
+        $E('refereeNotif').dom.style.display = 'none';
+        $E('editorNotif').dom.style.display = '';
+        $E('reviewerNotif').dom.style.display = 'none';
+        $E('refereeNotifForContribution').dom.style.display = 'none';
+        $E('editorNotifForContribution').dom.style.display = '';
+        $E('reviewerNotifForContribution').dom.style.display = 'none';
+        $E('refereeJudgementNotif').dom.style.display = 'none';
+        $E('editorJudgementNotif').dom.style.display = '';
+        $E('reviewerJudgementNotif').dom.style.display = 'none';
+        $E('authorSubmittedMatRefereeNotif').dom.style.display = 'none';
+        $E('authorSubmittedMatEditorNotif').dom.style.display = '';
+        $E('authorSubmittedMatReviewerNotif').dom.style.display = 'none';
         $E('templateTable').dom.style.display = '';
         
         showReviewableMaterials();
@@ -367,6 +595,19 @@ var observer = function(value) {
         $E('refereeDefaultDateRow').dom.style.display = '';
         $E('editorDefaultDateRow').dom.style.display = '';
         $E('reviewerDefaultDateRow').dom.style.display = '';
+        $E('autoEmails').dom.style.display = '';
+        $E('refereeNotif').dom.style.display = '';
+        $E('editorNotif').dom.style.display = '';
+        $E('reviewerNotif').dom.style.display = '';
+        $E('refereeNotifForContribution').dom.style.display = '';
+        $E('editorNotifForContribution').dom.style.display = '';
+        $E('reviewerNotifForContribution').dom.style.display = '';
+        $E('refereeJudgementNotif').dom.style.display = '';
+        $E('editorJudgementNotif').dom.style.display = '';
+        $E('reviewerJudgementNotif').dom.style.display = '';
+        $E('authorSubmittedMatRefereeNotif').dom.style.display = '';
+        $E('authorSubmittedMatEditorNotif').dom.style.display = '';
+        $E('authorSubmittedMatReviewerNotif').dom.style.display = '';
         $E('templateTable').dom.style.display = '';
         
         showReviewableMaterials();
@@ -451,6 +692,79 @@ var showDefaultReviewerDate = function() {
                        null, true);
 }
 
+$E('refereeNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailNotif', 
+                                            {conference: '<%= ConfReview.getConference().getId() %>',
+                                            AutoEmailsToChange: 'Referee'}, 
+                                            'Referee Add/Remove Notification',
+                                            true
+)); 
+$E('reviewerNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailNotif', 
+                                            {conference: '<%= ConfReview.getConference().getId() %>',
+                                            AutoEmailsToChange: 'Reviewer'}, 
+                                            'Content Reviewer Add/Remove Notification',
+                                            true
+));
+$E('editorNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailNotif', 
+                                            {conference: '<%= ConfReview.getConference().getId() %>',
+                                            AutoEmailsToChange: 'Editor'}, 
+                                            'Layout Reviewer Add/Remove Notification',
+                                            true
+));
+$E('refereeNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailNotifForContribution', 
+                                            {conference: '<%= ConfReview.getConference().getId() %>',
+                                            AutoEmailsToChange: 'Referee'}, 
+                                            'Assign/Remove Contribution to Referee Notification',
+                                            true
+));
+$E('reviewerNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailNotifForContribution', 
+                                            {conference: '<%= ConfReview.getConference().getId() %>',
+                                            AutoEmailsToChange: 'Reviewer'}, 
+                                            'Assign/Remove Contribution to Content Reviewer Notification',
+                                            true
+));
+$E('editorNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailNotifForContribution', 
+                                            {conference: '<%= ConfReview.getConference().getId() %>',
+                                            AutoEmailsToChange: 'Editor'}, 
+                                            'Assign/Remove Contribution to Content Reviewer Notification',
+                                            true
+));
+$E('refereeJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailJudgementNotif', 
+                                            {conference: '<%= ConfReview.getConference().getId() %>',
+                                            AutoEmailsToChange: 'Referee'}, 
+                                            'Author Notification when the referee submits judgement',
+                                            true
+));
+$E('reviewerJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailJudgementNotif', 
+                                            {conference: '<%= ConfReview.getConference().getId() %>',
+                                            AutoEmailsToChange: 'Reviewer'}, 
+                                            'Author Notification when a content reviewer submits judgement',
+                                            true
+));
+$E('editorJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailJudgementNotif', 
+                                            {conference: '<%= ConfReview.getConference().getId() %>',
+                                            AutoEmailsToChange: 'Editor'}, 
+                                            'Author Notification when the layout reviewer submits judgement',
+                                            true
+));
+$E('authorSubmittedMatRefereeNotif').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatRefereeNotif', 
+                                            {conference: '<%= ConfReview.getConference().getId() %>',
+                                            AutoEmailsToChange: 'Referee'}, 
+                                            'Referee Notification when an author submits materials',
+                                            true
+));
+$E('authorSubmittedMatReviewerNotif').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatEditorNotif', 
+                                            {conference: '<%= ConfReview.getConference().getId() %>',
+                                            AutoEmailsToChange: 'Reviewer'}, 
+                                            'Content Reviewer Notification when an author submits materials',
+                                            true
+));
+$E('authorSubmittedMatEditorNotif').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatReviewerNotif', 
+                                            {conference: '<%= ConfReview.getConference().getId() %>',
+                                            AutoEmailsToChange: 'Editor'}, 
+                                            'Layout Reviewer Notification when an author submits materials',
+                                            true
+));
+
 IndicoUI.executeOnLoad(function(){
     var pm = new IndicoUtil.parameterManager();    
     
@@ -506,10 +820,12 @@ function showFormatChooser(pm){
     showReviewingQuestions();
     showDefaultReviewerDate();
     showDefaultRefereeDate();
+    showRefereeNotif();
 <% end %>
 <% if ConfReview.hasPaperEditing(): %>
     showEditingCriteria();
     showDefaultEditorDate();
+    showEditorNotif();
 <% end %>
 
 </script>

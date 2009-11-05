@@ -119,7 +119,7 @@
         
         <tr>
             <td nowrap class="titleCellTD">
-                <span class="titleCellFormat"><%= _("Reviewing questions")%></span>
+                <span class="titleCellFormat"><%= _("Reviewing questions:")%></span>
             </td>
             <td width="60%%" id="questionListDisplay">
             </td>
@@ -177,7 +177,7 @@ var showWidgets = function(firstLoad) {
     <% else: %>
         $E("questionListDisplay").set('');
         <% for q in ConfReview.getReviewingQuestions(): %>
-            var newDiv = Html.div({style:{borderLeft:'1px solid #777777', paddingLeft:'5px', marginLeft:'10px'}});
+            var newDiv = Html.div({style:{paddingLeft:'5px', marginLeft:'10px'}});
             
             newDiv.append(Html.span(null,"<%=q%>"));
             newDiv.append(Html.br());
