@@ -1108,17 +1108,17 @@ type ("BookingPopup", ["ExclusivePopup"],
                 self.close();
             });
 
-            var buttonDiv = Html.div({style:{textAlign:"center", marginTop:pixels(10)}}, saveButton, cancelButton)
+            var buttonDiv = Html.div('dialogButtons', saveButton, cancelButton)
             
             if (pluginHasFunction(self.bookingType, "getPopupDimensions")) {
                 var dimensions = codes[self.bookingType].getPopupDimensions(); 
                 var width = dimensions['width'];
                 var height = dimensions['height'];
                 width = width > 400 ? width : 400;
-                height = height > 250 ? height : 250;
+                height = height > 200 ? height : 0;
             } else {
                 var width = 600;
-                var height = 500;
+                var height = 0;
             }
             
             var tabControl = new TabWidget([["Basic", form], ["Advanced", advancedDiv]], width, height);

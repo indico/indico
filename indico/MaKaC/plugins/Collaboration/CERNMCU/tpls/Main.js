@@ -239,7 +239,12 @@
     },
     
     getPopupDimensions: function() {
-        return {width : 600, height: 410};
+	if (Browser.IE) {
+		var height = 370;
+	} else {
+		var height = 390;
+	}
+        return {width : 600, height: height};
     },
     
     getDateFields : function() {
@@ -298,10 +303,10 @@
         if (Browser.IE) {
             if (booking.bookingParams.autoGenerateId == 'no') {
                 $E('autoNoRB').dom.checked = true;
-                $E('autoyesRB').dom.checked = false;
+                $E('autoYesRB').dom.checked = false;
             } else {
                 $E('autoNoRB').dom.checked = false;
-                $E('autoyesRB').dom.checked = true;
+                $E('autoYesRB').dom.checked = true;
             }
         }
         

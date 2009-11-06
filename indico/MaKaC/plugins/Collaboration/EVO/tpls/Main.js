@@ -231,10 +231,6 @@
         return ["startDate", "endDate"]
     },
     
-    getPopupDimensions: function() {
-        return {width : 600, height: 260};
-    },
-    
     onCreate: function() {
         EVODrawContextHelpIcons();
     },
