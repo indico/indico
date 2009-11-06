@@ -695,37 +695,37 @@ var showDefaultReviewerDate = function() {
 $E('refereeNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailNotif', 
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Referee'}, 
-                                            'Referee Add/Remove Notification',
+                                            'Add/Remove Referee Notification',
                                             true
 )); 
 $E('reviewerNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailNotif', 
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Reviewer'}, 
-                                            'Content Reviewer Add/Remove Notification',
+                                            'Add/Remove Content Reviewer Notification',
                                             true
 ));
 $E('editorNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailNotif', 
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Editor'}, 
-                                            'Layout Reviewer Add/Remove Notification',
+                                            'Add/Remove Layout Reviewer Notification',
                                             true
 ));
 $E('refereeNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailNotifForContribution', 
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Referee'}, 
-                                            'Assign/Remove Contribution to Referee Notification',
+                                            'Assign/Unassign Contribution to Referee Notification',
                                             true
 ));
 $E('reviewerNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailNotifForContribution', 
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Reviewer'}, 
-                                            'Assign/Remove Contribution to Content Reviewer Notification',
+                                            'Assign/Unassign Contribution to Content Reviewer Notification',
                                             true
 ));
 $E('editorNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailNotifForContribution', 
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Editor'}, 
-                                            'Assign/Remove Contribution to Layout Reviewer Notification',
+                                            'Assign/Unassign Contribution to Layout Reviewer Notification',
                                             true
 ));
 $E('refereeJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailJudgementNotif', 
