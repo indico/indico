@@ -4368,23 +4368,16 @@ class UHConfModifReviewingAbstractSetup ( URLHandler ):
 
 class UHConfModifReviewingControl ( URLHandler ):
     _relativeURL = "confModifReviewingControl.py"
-<<<<<<< HEAD:indico/MaKaC/webinterface/urlHandlers.py
-=======
     
 class UHConfModifReviewingAbstractsControl ( URLHandler ):
     _relativeURL = "confModifAbstractsReviewingControl.py"
->>>>>>> [DEVELOPMENT] - Reviewing Module - 3 parts:indico/MaKaC/webinterface/urlHandlers.py
 
 class UHConfModifUserCompetences ( URLHandler ):
     _relativeURL = "confModifUserCompetences.py"
-<<<<<<< HEAD:indico/MaKaC/webinterface/urlHandlers.py
-
-=======
     
 class UHConfModifUserCompetencesAbstracts ( URLHandler ):
     _relativeURL = "confModifUserCompetences.py/Abstracts"
-    
->>>>>>> [DEVELOPMENT] - new subtabs + other:indico/MaKaC/webinterface/urlHandlers.py
+
 class UHConfModifModifyUserCompetences ( URLHandler ):
     _relativeURL = "confModifUserCompetences.py/modifyCompetences"
 
@@ -4401,13 +4394,8 @@ class UHConfSelectAbstractManager( URLHandler ):
     _relativeURL = "confModifAbstractsReviewingControl.py/selectAbstractManager"
 
 class UHConfAddAbstractManager( URLHandler ):
-<<<<<<< HEAD:indico/MaKaC/webinterface/urlHandlers.py
-    _relativeURL = "confModifReviewingControl.py/addAbstractManager"
-
-=======
     _relativeURL = "confModifAbstractsReviewingControl.py/addAbstractManager"
-    
->>>>>>> [DEVELOPMENT] - Reviewing Module - 3 parts:indico/MaKaC/webinterface/urlHandlers.py
+
 class UHConfRemoveAbstractManager( URLHandler ):
     _relativeURL = "confModifAbstractsReviewingControl.py/removeAbstractManager"
 
@@ -4430,19 +4418,14 @@ class UHConfRemoveReviewer( URLHandler ):
     _relativeURL = "confModifReviewingControl.py/removeReviewer"
 
 class UHConfSelectAbstractReviewer( URLHandler ):
-<<<<<<< HEAD:indico/MaKaC/webinterface/urlHandlers.py
     _relativeURL = "confModifReviewingControl.py/selectAbstractReviewer"
 
 class UHConfAddAbstractReviewer( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/addAbstractReviewer"
-
-=======
     _relativeURL = "confModifAbstractsReviewingControl.py/selectAbstractReviewer"
     
 class UHConfAddAbstractReviewer( URLHandler ):
     _relativeURL = "confModifAbstractsReviewingControl.py/addAbstractReviewer"
-    
->>>>>>> [DEVELOPMENT] - Reviewing Module - 3 parts:indico/MaKaC/webinterface/urlHandlers.py
+
 class UHConfRemoveAbstractReviewer( URLHandler ):
     _relativeURL = "confModifAbstractsReviewingControl.py/removeAbstractReviewer"
 
@@ -4457,17 +4440,13 @@ class UHConfRemoveReferee( URLHandler ):
 
 class UHConfModifListContribToJudge( URLHandler ):
     _relativeURL = "confListContribToJudge.py"
-<<<<<<< HEAD:indico/MaKaC/webinterface/urlHandlers.py
-
-=======
     
 class UHConfModifListContribToJudgeAsReviewer( URLHandler ):
     _relativeURL = "confListContribToJudge.py/asReviewer"
     
 class UHConfModifListContribToJudgeAsEditor( URLHandler ):
     _relativeURL = "confListContribToJudge.py/asEditor"
-    
->>>>>>> [DEVELOPMENT] - new subtabs + other:indico/MaKaC/webinterface/urlHandlers.py
+
 class UHConfModifReviewingAssignContributionsList( URLHandler ):
     _relativeURL = "assignContributions.py"
 
