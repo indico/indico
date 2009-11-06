@@ -2116,10 +2116,6 @@ class WPConferenceModifBase( main.WPMainBase ):
             self._generalSection.addItem( self._videoServicesMenuItem)
             self._videoServicesMenuItem.setVisible(False)
 
-        self._layoutMenuItem = wcomponents.SideMenuItem(_("Layout"),
-            urlHandlers.UHConfModifDisplay.getURL(self._conf))
-        self._generalSection.addItem( self._layoutMenuItem)
-
         self._participantsMenuItem = wcomponents.SideMenuItem(_("Participants"),
             urlHandlers.UHConfModifParticipants.getURL( self._conf ) )
         self._generalSection.addItem( self._participantsMenuItem)
