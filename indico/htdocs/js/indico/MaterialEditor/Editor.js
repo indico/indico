@@ -590,7 +590,7 @@ type("ResourceListWidget", ["ListWidget"], {
 
         var information = [
             Html.a({href: resource.get('url'), style: {paddingLeft: '5px'}}, resource.get('name')),
-            resource.get('type') == 'stored'?"":[" (",Html.span({style:{fontStyle: 'italic', fontSize: '8pt'}}, resource.get('url')),")"],
+            resource.get('type') == 'stored'?"":[" (",Html.span({style:{fontStyle: 'italic', fontSize: '11px'}}, resource.get('url')),")"],
             removeButton,
             editButton,
             Html.div("descriptionLine", resource.get('description'))

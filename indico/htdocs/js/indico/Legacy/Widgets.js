@@ -233,40 +233,6 @@ IndicoUI.Widgets = {
                     handler();
                 }
             });
-        },
-
-        /**
-            * Creates a button that adds a user to the 'favorites' list/basket
-            * @param {String} id The user id of the user to be added
-            * @return The XElement of the button
-            */
-        addToBasketButton: function(id){
-            var image = Html.img({
-                src: imageSrc("star"),
-                alt: 'Add to Basket',
-                title: $T('Add to your list of favorite users')
-            });
-            var link = Widget.link(command(function(){
-                jsonRpc(Indico.Urls.JsonRpcService, 'user.favorites.addUsers',
-                        {'value': [{ 'id': id }]}, function(response, error){
-                    if (exists(error)) {
-                        IndicoUtil.errorReport(error);
-                    }
-                    else {
-
-                        image.dom.src = imageSrc("tick");
-                        image.dom.alt = 'Done';
-                        image.dom.title = $T('Element successfully added to basket!');
-                        image.dom.onclick = function(){
-                            return false;
-                        };
-                    }
-
-                });
-                return false;
-            }, image));
-
-            return link;
         }
     },
 

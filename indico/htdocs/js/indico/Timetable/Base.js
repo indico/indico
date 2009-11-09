@@ -77,7 +77,7 @@ type("TimeTable", ["HistoryListener"], {
         else if (type == 'Contribution') {
             throw 'not implemented!';
         } else if (type=='Session'){
-            throw 'not implemented!';
+            return this.eventInfo.sessions[info[0]];
         } else if (type=='SessionSlot'){
             compositeId = 's'+info[0]+'l'+info[1];
         } else {
@@ -152,23 +152,6 @@ type("DisplayTimeTable", ["TimeTable"], {
                                filterLink));
     },
 
-    layoutMenu: function() {
-        var self = this;
-
-        var layoutLink = Html.a({href: '#'}, $T("Layout"));
-        this.layoutMenu = new TimetableLayoutMenu(layoutLink, self.timetableDrawer);
-
-        layoutLink.observeClick(function(e) {
-            var pos = layoutLink.getAbsolutePosition();
-            //              e.preventDefault();
-            self.layoutMenu.open(pos.x + layoutLink.dom.offsetWidth, pos.y);
-            return false;
-        });
-
-        return Html.ul({className: "inner", style: {display: 'block'}},
-                       Html.li("menuConfMiddleCell",
-                               layoutLink));
-    },
     printMenu: function() {
         var self = this;
 
@@ -192,8 +175,8 @@ type("DisplayTimeTable", ["TimeTable"], {
         var timetableElements = translate(self.timetableDrawer.canvas.dom.childNodes, function(value) {return $E(value);});
         var elements = translate($E(document.body).dom.childNodes, function(value) {return $E(value);});
 
-        var goBackLink = Html.a({href: '#', style: {fontSize: '13pt'}}, 'Go back');
-        var printLink = Html.a({href: '#', style: {fontSize: '13pt'}}, 'Print');
+        var goBackLink = Html.a({href: '#', style: {fontSize: '17px'}}, 'Go back');
+        var printLink = Html.a({href: '#', style: {fontSize: '17px'}}, 'Print');
 
         var links = Html.span({style: {cssFloat: 'right'}}, printLink, ' | ', goBackLink);
 
@@ -328,6 +311,7 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
     },
 
     _followArgs_day: function(hash,data) {
+
         var m = hash.match(/#(\d{8}|all)(?:\.(s\d+l\d+))?/);
 
         if (m) {
@@ -335,10 +319,9 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
             this.currentDay = m[1];
 
             var tab = 0;
-            var dayKeys = keys(data);
 
-            for (k in dayKeys) {
-                if (dayKeys[k] == this.currentDay) {
+            for (k in this.sortedKeys) {
+                if (this.sortedKeys[k] == this.currentDay) {
                     return tab;
                 }
                 tab++;
@@ -400,8 +383,8 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
                                                     !!managementActions,
                                                     managementActions);
 
-         var sortedKeys = keys(this.data);
-         sortedKeys.sort();
+         this.sortedKeys = keys(this.data);
+         this.sortedKeys.sort();
 
 
          var today = new Date();
@@ -425,7 +408,7 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
              initialTab = 0;
          }
 
-         this.LookupTabWidget( translate(sortedKeys, function(key) {
+         this.LookupTabWidget( translate(this.sortedKeys, function(key) {
              return [key, function() {
                  self.currentDay = key;
                  // each time one tab is clicked,

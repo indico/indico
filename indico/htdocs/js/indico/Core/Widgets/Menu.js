@@ -203,77 +203,65 @@ type("SessionSectionPopupMenu", ["SectionPopupMenu"], {
 
         var colorSquare = null;
         if(color !== null){
-        colorSquare = Html.div({style:{backgroundColor: color, color: color, cssFloat: 'right', width: '15px', height:'15px'}});
+            colorSquare = Html.div({style:{backgroundColor: color, color: color, cssFloat: 'right', width: '15px', height:'15px'}});
         }
 
-        //truncate titles which are too long
-        function truncate(title){
-            if(title.length > 25){
-                return title.substring(0,20) + "...";
-            }else{
-        return title;
+        var link = Html.a({className:'fakeLink', style:{display: 'inline', padding: 0, paddingLeft: '4px', paddingRight: '4px'}}, Util.truncate(pair.key));
+        var divInput = Html.div({style:{height:'20px', overflow:'auto'}}, colorSquare, link);
+
+        if(typeof value == "string" ) {
+            link.setAttribute('href', value);
+            if (self.closeOnClick) {
+                link.observeClick(function() {
+                    self.close();
+                });
+            }
         }
-    }
+        else {
+            link.observeClick(value.PopupWidget?
+                              function(e) {
 
-    var link = Html.a({className:'fakeLink', style:{display: 'inline', padding: 0, paddingLeft: '4px', paddingRight: '4px'}}, truncate(pair.key));
-    var divInput = Html.div({style:{height:'20px', overflow:'auto'}}, colorSquare, link);
+                                  if (self.selected) {
+                                      self.selected.dom.className = null;
+                                      self.selected = null;
+                                  }
 
-    if(typeof value == "string" ) {
-        link.setAttribute('href', value);
-        if (self.closeOnClick) {
-            link.observeClick(function() {
-                self.close();
-            });
-        }
-    }
-    else {
-        link.observeClick(value.PopupWidget?
-                          function(e) {
+                                  link.dom.className = 'selected';
+                                  self.selected = link;
 
-                              if (self.selected) {
-                                  self.selected.dom.className = null;
-                                  self.selected = null;
-                              }
+                                  var pos = listItem.getAbsolutePosition();
 
-                              link.dom.className = 'selected';
-                              self.selected = link;
+                                  each(self.items, function(item, key) {
+                                      if (item.PopupWidget && item.isOpen()) {
+                                          item.close();
+                                      }
+                                  });
 
-                              var pos = listItem.getAbsolutePosition();
+                                  IndicoUtil.onclickHandlerRemove(self.handler);
+                                  var target = value;
+                                  target.open(pos.x + (target.alignRight ? 0 : link.dom.offsetWidth), pos.y - 1);
 
-                              each(self.items, function(item, key) {
-                                  if (item.PopupWidget && item.isOpen()) {
-                                      item.close();
+                                  return false;
+                              }:
+                              function() {
+                                  // assume it's a callback function
+                                  value(self);
+                                  if (self.closeOnClick) {
+                                      self.close();
                                   }
                               });
+        }
 
-                              IndicoUtil.onclickHandlerRemove(self.handler);
-                              var target = value;
-                              target.open(pos.x + (target.alignRight ? 0 : link.dom.offsetWidth), pos.y - 1);
-
-                              return false;
-                          }:
-                          function() {
-                              // assume it's a callback function
-                              value(self);
-                              if (self.closeOnClick) {
-                                  self.close();
-                              }
-                          });
-    }
-
-    var listItem = Html.li({},
+        var listItem = Html.li({},
             divInput);
-    return listItem;
-}
-//    draw: function(){
-//    var sectionPopupMenu = new SectionPopupMenu(this.items, this.chainElements, this.cssClass, this.closeOnClick, this.alignRight, this.closeHandler)
-//}
+        return listItem;
+    }
 },
 
-    function(items, chainElements, cssClass, closeOnClick, alignRight, closeHandler) {
-        this.SectionPopupMenu(items, chainElements, cssClass, closeOnClick, alignRight, closeHandler);
-    }
-);
+     function(items, chainElements, cssClass, closeOnClick, alignRight, closeHandler) {
+         this.SectionPopupMenu(items, chainElements, cssClass, closeOnClick, alignRight, closeHandler);
+     }
+    );
 
 type("RadioPopupWidget", ["ChainedPopupWidget"],
      {

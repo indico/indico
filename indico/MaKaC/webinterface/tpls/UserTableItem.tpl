@@ -7,10 +7,10 @@
             src="<%= systemIcon("remove") %>" />    
 <% end %>
 
-<% if not currentUserBasket.hasUserId(id): %>
+<% if currentUserBasket: %>
     <span id="add_<%= id %>_to_basket" class="UIRowButton" style="padding: 3px; height: 16px;"></span>
     <script type="text/javascript">
-        $E('add_<%= id %>_to_basket').set(IndicoUI.Widgets.Options.addToBasketButton('<%= id %>'));
+        $E('add_<%= id %>_to_basket').set(new AddToFavoritesButton(<%= jsBoolean(currentUserBasket.hasUserId(id)) %>, '<%= id %>').draw());
     </script>
 <% end %>
 

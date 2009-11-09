@@ -19,8 +19,5 @@ IndicoUI.executeOnLoad(function(){
   $E('timetable').set(timetable.draw());
   timetable.postDraw();
 
-  $E('menuLink_timetable').append(timetable.filterMenu());
-  $E('menuLink_timetable').append(timetable.layoutMenu());
-  $E('menuLink_timetable').append(timetable.printMenu());
 });
 </script>

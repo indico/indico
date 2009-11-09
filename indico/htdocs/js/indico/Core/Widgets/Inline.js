@@ -1,24 +1,3 @@
-// TODO
-/*
-type("ColoredCheckbox", ["Html"],
-     {
-         _draw: function() {
-             return Html.span({},
-                             );
-         }
-     },
-     function(attributes, checked, label) {
-         this.checkbox = Html.checkbox(attributes, checked);
-         this.label = label;
-     });
-
-IndicoUI.Widgets.Inline = {
-    coloredCheckbox: function(attributes, checked, label) {
-        return new ColoredCheckbox(attributes, checked, label).draw();
-    }
-}
-*/
-// *******************************
 
 type("InlineWidget", ["IWidget"],
      {
@@ -57,6 +36,85 @@ type("InlineRemoteWidget", ["InlineWidget"],
          this.ready.set(false);
          this.source = indicoSource(method, attributes);
      });
+
+/*
+ * This switch button is a 2-state switch that allows different requests to be
+ * performed depending on whether the button should be enabled or disabled
+ */
+type("RemoteSwitchButton", ["InlineWidget"],
+     {
+         draw: function() {
+
+             // icon for "in progress" state
+             var imageLoading = Html.img({
+                 src: imageSrc("loading"),
+                 alt: 'Loading',
+                 title: $T('Communicating with server')
+             });
+
+             var self = this;
+
+             var request = function(currentState, targetState, method) {
+                 indicoRequest(method,
+                               self.args, function(response, error){
+                                   if (exists(error)) {
+                                       self._error(error);
+                                       chooser.set(currentState);
+                                   }
+                                   else {
+                                       chooser.set(targetState);
+                                   }
+
+                               });
+             };
+
+             var chooser = new Chooser(
+                 { 'disable': command(
+                     function(){
+                         chooser.set('progress');
+                         // server request to disable the button
+                         request('disable','enable',self.enableMethod);
+                         return false;
+                     }, this.imgEnabled),
+
+                   'enable': command(
+                       function(){
+                           chooser.set('progress');
+                           // server request to enable the button
+                           request('enable','disable',self.disableMethod);
+                           return false;
+                       }, this.imgDisabled),
+
+                   // "in progress"
+                   'progress': command(function() { return false; },
+                                       imageLoading)
+
+
+                 });
+
+             chooser.set(this.initState?'disable':'enable');
+
+             return Widget.link(chooser);
+         }
+     },
+     /*
+      * initState - initial state (true=enabled, false=disabled)
+      * imgEnabled - image for 'enabled' state
+      * imgDisabled - image for 'disabled' state
+      * imgDisabled - image for 'disabled' state
+      * enableMethod - remote method to be called in order to pass to "enabled state"
+      * disableMethod - remote method to be called in order to pass to "disabled state"
+      * args - extra args to be passed to either method
+      */
+     function(initState, imgEnabled, imgDisabled, enableMethod, disableMethod, args) {
+         this.initState = initState;
+         this.imgEnabled = imgEnabled;
+         this.imgDisabled = imgDisabled;
+         this.enableMethod = enableMethod;
+         this.disableMethod = disableMethod;
+         this.args = args;
+     });
+
 
 type("SwitchOptionButton", ["InlineRemoteWidget"],
      {

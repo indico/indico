@@ -1865,14 +1865,13 @@ class WConfAccessControlFrame(WTemplated):
                                                        selectable=False )
         vars["accessKey"] = self.__target.getAccessKey()
         return vars
-    
-    
+
+
 class WUserTableItem(WTemplated):
-    
+
     def __init__(self, multi=True):
         self._multi = multi
-        
-    
+
     def getHTML( self, user, selected=False, selectable=True ):
         self.__user = user
         self._selected = selected
@@ -1883,7 +1882,7 @@ class WUserTableItem(WTemplated):
         vars = WTemplated.getVars( self )
         vars["id"] = self.__user.getId()
         vars["email"] = self.__user.getEmail()
-        vars["fullName"] = self.__user.getFullName()        
+        vars["fullName"] = self.__user.getFullName()
         vars["type"] = "checkbox"
         selectionText = "checked"
         if not self._multi:
@@ -1892,10 +1891,14 @@ class WUserTableItem(WTemplated):
         vars["selected"] = ""
         if self._selected:
             vars["selected"] = selectionText
-            
-        vars["currentUserBasket"] = self._rh._getUser().getPersonalInfo().getBasket()
+
+        if self._rh._getUser():
+            vars["currentUserBasket"] = self._rh._getUser().getPersonalInfo().getBasket()
+        else:
+            vars["currentUserBasket"] = None
+
         vars["selectable"] = self._selectable
-        
+
         return vars
 
 

@@ -233,7 +233,7 @@ type("CategoryChooserWidget", [], {
 
         this.categTitleDiv = Html.div("categoryTitle", this.currentCateg.title);
 
-        var goBackLink = Html.a({href: '#', style: {fontSize: '13pt'}}, $T('Go to parent category') );
+        var goBackLink = Html.a({href: '#', style: {fontSize: '17px'}}, $T('Go to parent category') );
         goBackLink.observeClick(function(e) {
             self.catListWidget.args.categId = self.parentCateg.id;
             self.catListWidget.source.refresh();

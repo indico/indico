@@ -702,3 +702,38 @@ type ("AdditionalUsersPopup", ["ExclusivePopup"], {
           this.ExclusivePopup(title, function(){return true;});
       }
      );
+
+type("AddToFavoritesButton", ["RemoteSwitchButton"],
+/**
+ * Creates a button that adds a user to the 'favorites' list/basket
+ * takes the initial state of the button and the user id as parameters
+ */
+     {
+     },
+     function(state, id) {
+
+         var imageRemove = Html.img({
+             // make the "star" colorful or grey depending on whether
+             // the user is already in the favorites or not
+             src: imageSrc("star"),
+             alt: 'Remove from Favorites',
+             title: $T('Remove from your list of favorite users')
+             });
+
+         var imageAdd = Html.img({
+             // make the "star" colorful or grey depending on whether
+             // the user is already in the favorites or not
+             src: imageSrc("starGrey"),
+                 alt: 'Add to Favorites',
+             title: $T('Add to your list of favorite users')
+         });
+
+         // call the parent constructor
+         this.RemoteSwitchButton(
+             state,
+             imageRemove,
+             imageAdd,
+             'user.favorites.removeUser',
+             'user.favorites.addUsers',
+             { 'id': id });
+     });

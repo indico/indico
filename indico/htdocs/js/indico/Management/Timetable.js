@@ -551,141 +551,174 @@ type("ChangeEditDialog", // silly name!
 
 type("MoveEntryDialog", ["ExclusivePopup"],
      {
-         draw: function() {
-             var self = this;
-             var inSession = true;
-             if (self.sessionId === null && self.slotId === null) {
-                 inSession = false;
+
+         getChosenValue: function() {
+             var radios = document.getElementsByName("rbID");
+
+             for ( var i = 0; i < radios.length; i++) {
+                 if (radios[i].checked) {
+                     return radios[i].value;
+                 }
              }
+             return false;
+         },
+
+         // draw a tab with radiobuttons for each day
+         _drawMoveEntryDay: function(timetableItems, currentDay) {
+             var moveEntryTable = Html.ul( {
+                 className: 'list',
+                 style: {
+                     overflow: 'auto',
+                     height: '250px'
+                 }
+             });
 
              // list of all radiobuttons
              var radioButtons = [];
 
-             // draw a tab with radiobuttons for each day
-             function drawMoveEntryDay(timetableItems, currentDay) {
-                 var moveEntryTable = Html.table( {
-                     width : '100%'
-                 });
 
-                 // Construct a 2d array to sort items by startTime
-                 var sortedByTime = [];
-                 translate(timetableItems, function(value, key) {
-                     // consider only sessions
-                     if (key[0] == "s") {
-                         sortedByTime.push( [ value.startDate.time, key ]);
-                     }
-                 });
-
-                 // Sorting the 2d array by startTime
-                 for ( var i = 0; i < sortedByTime.length; i++) {
-                     var temp = sortedByTime[i].splice(0, 1);
-                     sortedByTime[i].unshift(temp);
+             // Construct a 2d array to sort items by startTime
+             var sortedByTime = [];
+             translate(timetableItems, function(value, key) {
+                 // consider only sessions
+                 if (key[0] == "s") {
+                     sortedByTime.push( [ value.startDate.time, key ]);
                  }
-                 sortedByTime.sort();
+             });
 
-                 var rb;
-                 // add top timetable radio button
-                 if (!inSession && self.startDate.replaceAll('-', '') == currentDay) {
-                     // disable the radio button where the item already belongs to
-                     rb = Html.radio( {
-                         value : "conf:" + currentDay,
-                         name : "rbID",
-                         disabled : 'disabled'
-                     });
-                 } else {
-                     rb = Html.radio( {
-                         value : "conf:" + currentDay,
-                         name : "rbID"
-                     });
-                 }
-                 moveEntryTable.append(Html.tr( {}, Html.td( {}, rb, (Html.label( {},
-                                                                                  "Move it at the top of the timetable")))));
-                 radioButtons.push(rb);
+             // Sorting the 2d array by startTime
+             for ( var i = 0; i < sortedByTime.length; i++) {
+                 var temp = sortedByTime[i].splice(0, 1);
+                 sortedByTime[i].unshift(temp);
+             }
+             sortedByTime.sort();
 
-                 // building the radio buttons
-                 for ( i = 0; i < sortedByTime.length; i++) {
-                     var value = timetableItems[sortedByTime[i][1]];
-                     if (inSession && value.sessionId == self.sessionId && value.sessionSlotId == self.slotId) {
-                         // disable the radio button where the item already belongs to
-                         rb = Html.radio( {
-                             value : value.sessionId + ':' + value.sessionSlotId,
-                             name : 'rbID',
-                             disabled : 'disabled'
-                         });
-                     } else {
-                         rb = Html.radio( {
-                             value : value.sessionId + ':' + value.sessionSlotId,
-                             name : 'rbID'
-                         });
-                     }
-                     radioButtons.push(rb);
-                     moveEntryTable.append(Html.tr( {
-                         style : {
-                             backgroundColor : value.color
-                         }
-                     }, Html.td( {}, rb, (Html.label( {
-                         style : {
-                             'color' : value.textColor
-                         }
-                     }, value.startDate.time + "-" + value.endDate.time +
-                                                      " " + value.title)))));
-                 }
+             // add top timetable radio button
+             var rb = Html.radio( {
+                 name : "rbID",
+                 style: {verticalAlign: 'middle'}
+             });
+             rb.dom.value = "conf:" + currentDay;
 
-                 return moveEntryTable;
+             // disable the radio button where the item already belongs to
+             if (!this.inSession && this.startDate.replaceAll('-', '') == currentDay) {
+                 rb.dom.disabled = 'disabled';
              }
 
+             moveEntryTable.append(Html.li(
+                 {},rb,
+                 (Html.label( {style: {verticalAlign: 'middle', marginLeft: '5px', fontWeight: 'normal'}},
+                              $T("Top level timetable")))));
+
+             radioButtons.push(rb);
+
+             // building the radio buttons
+             for ( i = 0; i < sortedByTime.length; i++) {
+                 var value = timetableItems[sortedByTime[i][1]];
+                 // disable the radio button where the item already belongs to
+                 rb = Html.radio( {
+                     name : 'rbID',
+                     style: {verticalAlign: 'middle'}
+                 });
+                 rb.dom.value = value.sessionId + ':' + value.sessionSlotId;
+
+                 if (this.inSession && value.sessionId == this.sessionId && value.sessionSlotId == this.slotId) {
+                     rb.dom.disabled = 'disabled';
+                 }
+
+                 radioButtons.push(rb);
+
+                 var colorSquare = Html.div(
+                     {
+                         style : {
+                             width: '15px',
+                             height: '15px',
+                             backgroundColor: this.timetable.getById("s"+value.sessionId).color,
+                             cssFloat: 'right',
+                             marginRight: '10px'
+
+                         }
+                     });
+
+                 moveEntryTable.append(Html.li(
+                     {}, rb,
+                     Html.label( {
+                         style : {
+                             marginLeft: '5px',
+                             verticalAlign: 'middle',
+                             fontWeight: 'normal'
+                         }
+                     }, Util.truncate(value.title, 40), Html.span(
+                         {style: {
+                             fontSize: '10px',
+                             marginLeft: '5px',
+                             color: '#999'
+                         }}, " ", value.startDate.time.slice(0,5) + "-" + value.endDate.time.slice(0,5))),
+                     colorSquare));
+             }
+
+             // Ensure that only 1 radio button will be selected at a given time
+             Logic.onlyOne(radioButtons, false);
+
+             return moveEntryTable;
+         },
+
+
+         draw: function() {
+             var self = this;
+             this.inSession = true;
+
+             if (self.sessionId === null && self.slotId === null) {
+                 this.inSession = false;
+             }
              // populate the tabslist
-             tabsList = [];
              var tabData = self.topLevelTimetableData;
 
              // sort tabs according to days
              var dateKeys = $L(keys(tabData));
              dateKeys.sort();
 
-             each(dateKeys, function(key) {
-                 tabsList.push( [ $T(self._titleTemplate(key)), drawMoveEntryDay(tabData[key], key) ]);
-             });
-
-             this.tabWidget = new TabWidget(tabsList, 400, 200, dateKeys.indexOf(self.currentDay));
-             var moveEntryPopup = new ExclusivePopup("Move item", function() {
-                 return true;
-             });
-
-             Logic.onlyOne(radioButtons, false); // Ensures that only 1 radio button will be selected at a given time
+             this.tabWidget = new TabWidget(
+                 translate(dateKeys,
+                           function(key) {
+                               return [
+                                   $T(self._titleTemplate(key)),
+                                   self._drawMoveEntryDay(tabData[key], key)
+                               ];
+                           }), 400, 200, dateKeys.indexOf(self.currentDay));
 
              // define where the contribution is (display purpose)
              var contribLocation = null;
-             if (inSession) {
+             if (this.inSession) {
                  contribLocation = self.topLevelTimetableData[self.currentDay]['s' + self.sessionId + 'l' + self.slotId].title +
                      " (interval #" + self.slotId + ")";
              } else {
-                 contribLocation = "Top of timetable";
+                 contribLocation = Html.span({style:{fontWeight: 'bold'}},
+                                             $T("Top-level timetable"));
              }
 
              // define if contrib is of type Contribution or Break (display purpose)
-             var span1 = this.entryType == "Contribution"?
-                 Html.span('', "This contribution is currently in: " +
-                           contribLocation):
-                 Html.span('', "This break is currently in: " +
-                           contribLocation);
+             var span1 = Html.span({}, this.entryType == "Contribution"?
+                                   $T("This contribution currently located at: "):
+                                   $T("This break is currently located at: "),
+                                   contribLocation);
+
+             var span2 = Html.div({
+                 style: {
+                     marginTop: '10px',
+                     marginBottom: '15px',
+                     fontStyle: 'italic'
+                 }
+             },
+                 $T("Please select the place where you want to move it to."));
 
              // We construct the "ok" button and what happens when it's pressed
              var okButton = Html.button('', "OK");
              okButton.observeClick(function() {
                  var killProgress = IndicoUI.Dialogs.Util.progress("Moving the entry...");
-                 // retrieving the selected radio button
-                 var chosenValue = function() {
-                     var radios = document.getElementsByName("rbID");
-                     for ( var i = 0; i < radios.length; i++) {
-                         if (radios[i].checked) {
-                             return radios[i].value;
-                         }
-                     }
-                     return false;
-                 };
 
                  indicoRequest('schedule.moveEntry', {
-                     value : chosenValue(),
+                     value : self.getChosenValue(),
                      OK : 'OK',
                      conference : self.confId,
                      scheduleEntryId : self.scheduleEntryId,
@@ -721,7 +754,7 @@ type("MoveEntryDialog", ["ExclusivePopup"],
                  }
              }, okButton, cancelButton);
 
-             return this.ExclusivePopup.prototype.draw.call(this, Widget.block( [span1, Html.br(), this.tabWidget.draw(), Html.br(), buttonDiv ]));
+             return this.ExclusivePopup.prototype.draw.call(this, Widget.block( [Html.div({}, span1, span2), this.tabWidget.draw(), Html.br(), buttonDiv ]));
          },
 
          /*
@@ -753,6 +786,7 @@ type("MoveEntryDialog", ["ExclusivePopup"],
          this.managementActions = managementActions;
          this.timetableData = timetable.getData();
          this.topLevelTimetableData = timetable.parentTimetable?timetable.parentTimetable.getData():this.timetableData;
+         this.timetable = timetable ;
          this.entryType = entryType;
          this.sessionId = sessionId;
          this.slotId = slotId;
@@ -760,6 +794,13 @@ type("MoveEntryDialog", ["ExclusivePopup"],
          this.scheduleEntryId = scheduleEntryId;
          this.confId = confId;
          this.startDate = startDate;
+
+         var self = this;
+
+         this.ExclusivePopup($T("Move Timetable Entry"),
+                             function() {
+                                 self.close();
+                             });
      });
 
 

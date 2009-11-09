@@ -5815,6 +5815,7 @@ class Session(Persistent):
     def setCode(self,newCode):
         self._code=str(newCode).strip()
 
+    @Retrieves (['MaKaC.conference.Session'],'color')
     def getColor(self):
         try:
             if self._color:
