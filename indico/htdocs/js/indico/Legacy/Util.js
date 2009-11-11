@@ -254,6 +254,21 @@ var IndicoUtil = {
         return sdatetime;
     },
 
+    parseDate: function(strDate) {        
+
+        var sdatetime = new Date();
+        var sdate = parseDate(strDate);
+
+        if ( !sdate ) {
+            return null;
+        }
+
+        setTime(sdatetime, [0,0,0,0])
+        setDate(sdatetime, sdate);
+
+        return sdatetime;
+    },
+
     /**
      * Formats a datetime object with 2 attributes, .date and .time
      * (obtained by pickling with Conversion.datetime)

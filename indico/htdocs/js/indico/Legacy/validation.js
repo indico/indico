@@ -140,6 +140,7 @@ Parameters:
 - withRepeatability : whether to check 'repeatibility' field
 - allowPast : whether to allow dates in the past
 - what : what to validate: 0 - both dates and times, 1 - only dates, 2 - only times
+
 Controls must follow naming conventions:
 sDay, sMonth, sYear, sTime
 eDay, eMonth, eYear, eTime
@@ -176,13 +177,12 @@ function validate_period( f1, withRepeatability, allowPast, what )
         {
             todayDate = new Date()
             todayDate.setHours( 0, 0, 0, 0 )
-            if ( sDate.valueOf() > eDate.valueOf() ||
-                            ( !allowPast && ( sDate.valueOf() < (todayDate).valueOf()) ) )
+            if ( !allowPast && ( sDate.valueOf() < (todayDate).valueOf()) )
             {
                 f1.eDay.className = f1.eMonth.className = f1.eYear.className = f1.edate.className = 'invalid'
                 f1.sDay.className = f1.sMonth.className = f1.sYear.className = f1.sdate.className = 'invalid'
                 isValid = false
-            }
+            }                  
         }
     }
     if ( what != ONLY_DATES )
