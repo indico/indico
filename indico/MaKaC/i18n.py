@@ -9,8 +9,8 @@ import operator
 # TODO: Use a standard library for this, possibly pycountry
 # note that pycountry imports lxml, and libxml2 doesn't seem to like that
 languageNames = {
-    'en_US': 'English (USA)',
-    'fr_FR': 'Français (France)'
+    'en_US': 'English',
+    'fr_FR': 'Français'
     }
 
 r = re.compile(r'_\(\"(.*?)\"\)')

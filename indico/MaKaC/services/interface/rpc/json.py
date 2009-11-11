@@ -27,6 +27,7 @@ from MaKaC.common.PickleJar import DictPickler
 from MaKaC.services.interface.rpc.common import RequestError
 from MaKaC.services.interface.rpc.common import ProcessError
 from MaKaC.services.interface.rpc.common import CausedError
+from MaKaC.services.interface.rpc.common import NoReportError
 from MaKaC.services.interface.rpc.process import invokeMethod
 
 from MaKaC.common.logger import Logger
@@ -52,16 +53,16 @@ def unicodeToUtf8(obj):
         you will need to notify the database of changes in the object after calling this method.
         Author: David Martin Clavo
     """
-    
+
     # replace a single unicode object
     if isinstance(obj, unicode):
         return obj.encode("utf-8",'replace')
-    
+
     # replace unicode objects inside a list
     if isinstance(obj,list):
         for i in range(0, len(obj)):
             obj[i] = unicodeToUtf8(obj[i])
-    
+
     #replace unicode objects inside a dictionary
     if isinstance(obj,dict):
         for k,v in obj.items():
@@ -69,11 +70,11 @@ def unicodeToUtf8(obj):
             #keys in JSON objects can only be strings, but we still call unicodeToUtf8
             #for the key in case we have a Python object whose key is a number, etc.
             obj[unicodeToUtf8(k)] = unicodeToUtf8(v)
-                
+
     return obj
 
 def process(req):
-    
+
     responseBody = {
         "version": "1.1",
         "error": None,
@@ -84,24 +85,24 @@ def process(req):
         # check content type (if the users know what they are using)
         #if req.content_type != "application/json":
         #    raise RequestError("Invalid content type. It must be 'application/json'.")
-        
+
         # read request
         requestText = req.read()
-        
+
         Logger.get('rpc').debug('json rpc request. request text= ' + str(requestText))
-        
+
         if requestText == "":
             raise RequestError("ERR-R2", "Empty request.")
-        
+
         # decode json
         try:
             requestBody = decode(requestText)
         except Exception, e:
             raise RequestError("ERR-R3", "Error parsing json request.", e)
-        
+
         if "id" in requestBody:
             responseBody["id"] = requestBody["id"]
-        
+
         result = invokeMethod(str(requestBody["method"]), requestBody.get("params", []), req)
 
         # serialize result
@@ -109,23 +110,27 @@ def process(req):
             responseBody["result"] = result
         except Exception, e:
             raise ProcessError("ERR-P1", "Error during serialization.")
-        
-    except CausedError, e:        
+
+    except CausedError, e:
+
         errorInfo = DictPickler.pickle(e);
 
-        Logger.get('rpc').exception('Service request failed. Request text:\r\n%s\r\n\r\n' % str(requestText))
-        
-        if requestBody:
-            errorInfo["requestInfo"] = {"method": str(requestBody["method"]),
-                                        "params": requestBody.get("params", [])}
-            Logger.get('rpc').debug('Arguments: %s' % errorInfo['requestInfo'])
+        if isinstance(e, NoReportError):
+            # NoReport errors (i.e. not logged in) shouldn't be logged
+            pass
+        else:
+            Logger.get('rpc').exception('Service request failed. Request text:\r\n%s\r\n\r\n' % str(requestText))
 
-        
-        
+            if requestBody:
+                errorInfo["requestInfo"] = {"method": str(requestBody["method"]),
+                                            "params": requestBody.get("params", [])}
+                Logger.get('rpc').debug('Arguments: %s' % errorInfo['requestInfo'])
+
+
         responseBody["error"] = errorInfo
-        
+
     jsonResponse = encode(responseBody)
-    
+
     req.content_type = "application/json"
     req.write(jsonResponse)
     return apache.OK

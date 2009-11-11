@@ -1,15 +1,27 @@
 FCKConfig.ToolbarSets["IndicoMinimal"] = [
     ['Bold','Italic','Underline','StrikeThrough','-','Subscript','Superscript','-'],
-    ['Indent', 'Outdent', 'OrderedList','UnorderedList','Blockquote','-','Link','Unlink','Anchor'],        
+    ['Indent', 'Outdent', 'OrderedList','UnorderedList','Blockquote','-','Link','Unlink','Anchor'],
     ['SpecialChar']
 ] ;
 
 
 FCKConfig.ToolbarSets["IndicoFull"] = [
     ['Bold','Italic','Underline','StrikeThrough','-','Subscript','Superscript','-'],
-    ['Indent', 'Outdent', 'OrderedList','UnorderedList','Blockquote','-','Link','Unlink','Anchor'],        
+    ['Indent', 'Outdent', 'OrderedList','UnorderedList','Blockquote','-','Link','Unlink','Anchor'],
     ['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],
     ['Style','FontFormat','FontName'],
     ['FontSize', 'TextColor','BGColor'],
     ['SpecialChar'], ['FitWindow']
 ] ;
+
+FCKConfig.ToolbarSets["IndicoPages"] = [
+    ['Source'],['Bold','Italic','Underline','StrikeThrough','-','Subscript','Superscript','-'],
+    ['Indent', 'Outdent', 'OrderedList','UnorderedList','Blockquote','-','Link','Unlink','Anchor'],
+    ['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],['Image'],
+    ['Style','FontFormat','FontName'],
+    ['FontSize', 'TextColor','BGColor'],
+    ['SpecialChar'], ['FitWindow']
+] ;
+
+FCKConfig.ImageUpload = false ;
+FCKConfig.ImageBrowser = false ;
