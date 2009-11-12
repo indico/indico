@@ -46,20 +46,20 @@
     {     
         var startDate = IndicoUI.Widgets.Generic.dateField_sdate(false,null,['sDay', 'sMonth', 'sYear']);
         $E('sDatePlace').set(startDate);
- 
+
         var endDate = IndicoUI.Widgets.Generic.dateField_edate(false,null,['eDay', 'eMonth', 'eYear']); 
         $E('eDatePlace').set(endDate);
 
         /* In case the date changes, we need to check whether the start date is greater than the end date,
         and if it's so we need to change it */
-        startDate.observe(function(value) {            
+        startDate.observe(function(value) {
             if ( IndicoUtil.parseDate(startDate.get()) > IndicoUtil.parseDate(endDate.get()) ) {
-                endDate.set(startDate.get());   
+                endDate.set(startDate.get());
                 endDate.dom.onchange();
                 set_repeatition_comment();
             }
         });
-        
+
         endDate.observe(function(value) {
             if ( IndicoUtil.parseDate(startDate.get()) > IndicoUtil.parseDate(endDate.get()) ) {
                 startDate.set(endDate.get());

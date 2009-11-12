@@ -16,9 +16,9 @@ var IndicoUtil = {
         var selectNodes = containerElement.dom.getElementsByTagName("select");
         var textAreaNodes = containerElement.dom.getElementsByTagName("textArea");
         formNodes = [];
-        for (var i=0; i < inputNodes.length; i++) {formNodes.push(inputNodes[i])}
-        for (var i=0; i < selectNodes.length; i++) {formNodes.push(selectNodes[i])}
-        for (var i=0; i < textAreaNodes.length; i++) {formNodes.push(textAreaNodes[i])}
+        for (var i=0; i < inputNodes.length; i++) {formNodes.push(inputNodes[i]);}
+        for (var i=0; i < selectNodes.length; i++) {formNodes.push(selectNodes[i]);}
+        for (var i=0; i < textAreaNodes.length; i++) {formNodes.push(textAreaNodes[i]);}
         return formNodes;
     },
 
@@ -44,7 +44,7 @@ var IndicoUtil = {
                 }
             } else if (node.type == "radio") {
                 if (node.checked) {
-                    values[node.name] = node.value
+                    values[node.name] = node.value;
                 }
             } else {
                 values[node.name] = node.value;
@@ -82,11 +82,11 @@ var IndicoUtil = {
 
         }
     },
-    
+
     /**
      * Utility function that sets "form" nodes inside an element to disabled.
      * @param {XElement} containerElement An element to scan for form nodes to disable.
-     * @param {Boolean} enableDisable true = enable, false = disable 
+     * @param {Boolean} enableDisable true = enable, false = disable
      */
      enableDisableForm : function (containerElement, enableDisable) {
         var nodesToDisable = {button :'', input :'', optgroup :'', option :'', select :'', textarea :''};
@@ -185,9 +185,9 @@ var IndicoUtil = {
         if (!exists(weekDayOption)) {
             weekDayOption = 0;
         }
-        
+
         var dateText = zeropad(date.getDate())+'/'+ zeropad(date.getMonth()+1) +'/'+date.getFullYear()+' '+ zeropad(date.getHours())+':'+zeropad(date.getMinutes());
-        
+
         switch(weekDayOption) {
         case 1:
             return Indico.Data.WeekDays[date.getDay()] + " " + dateText;
@@ -219,7 +219,7 @@ var IndicoUtil = {
     formatDate2: function(date) {
         return '' + date.getFullYear() + zeropad(date.getMonth()+1) + zeropad(date.getDate());
     },
-    
+
     /**
      * Formats a JS Date, returning just the time as a string (HH:MM)
      * @param {Date} date A JS Date
@@ -254,7 +254,7 @@ var IndicoUtil = {
         return sdatetime;
     },
 
-    parseDate: function(strDate) {        
+    parseDate: function(strDate) {
 
         var sdatetime = new Date();
         var sdate = parseDate(strDate);
@@ -263,7 +263,7 @@ var IndicoUtil = {
             return null;
         }
 
-        setTime(sdatetime, [0,0,0,0])
+        setTime(sdatetime, [0,0,0,0]);
         setDate(sdatetime, sdate);
 
         return sdatetime;
@@ -356,8 +356,8 @@ var IndicoUtil = {
      * @return {Booleab} true if the string is a valid IP address, false otherwise
      */
     isIpAddress: function(s) {
-        var valid = true
-        var numbers = s.split('.')
+        var valid = true;
+        var numbers = s.split('.');
         if (numbers.length == 4) {
             for (var i=0; i < 4; i++) {
                 var n = numbers[i];
@@ -369,7 +369,7 @@ var IndicoUtil = {
         } else {
             valid = false;
         }
-        return valid
+        return valid;
     },
 
     /**

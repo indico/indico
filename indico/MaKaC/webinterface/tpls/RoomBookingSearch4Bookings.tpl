@@ -80,13 +80,13 @@
 
         /* In case the date changes, we need to check whether the start date is greater than the end date,
         and if it's so we need to change it */
-        startDate.observe(function(value) {            
+        startDate.observe(function(value) {
             if ( IndicoUtil.parseDate(startDate.get()) > IndicoUtil.parseDate(endDate.get()) ) {
-                endDate.set(startDate.get());   
+                endDate.set(startDate.get());
                 endDate.dom.onchange();
             }
         });
-        
+
         endDate.observe(function(value) {
             if ( IndicoUtil.parseDate(startDate.get()) > IndicoUtil.parseDate(endDate.get()) ) {
                 startDate.set(endDate.get());

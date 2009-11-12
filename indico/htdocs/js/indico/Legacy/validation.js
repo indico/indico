@@ -182,7 +182,7 @@ function validate_period( f1, withRepeatability, allowPast, what )
                 f1.eDay.className = f1.eMonth.className = f1.eYear.className = f1.edate.className = 'invalid'
                 f1.sDay.className = f1.sMonth.className = f1.sYear.className = f1.sdate.className = 'invalid'
                 isValid = false
-            }                  
+            }
         }
     }
     if ( what != ONLY_DATES )
@@ -210,7 +210,7 @@ function validate_period( f1, withRepeatability, allowPast, what )
         {
             f1.repeatability.className = 'invalid'; isValid = false
         }
-        
+
     return isValid
-    
+
 }
