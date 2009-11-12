@@ -664,10 +664,12 @@ class WMenuMeetingHeader( WConferenceHeader ):
         urlCustPrint.addParam("view", vars["currentView"])
         vars["printURL"]=str(urlCustPrint)
         
+
         urlCustPDF=urlHandlers.UHConfTimeTableCustomizePDF.getURL(self._conf)
         urlCustPDF.addParam("showDays", vars.get("selectedDate", "all"))
         urlCustPDF.addParam("showSessions", vars.get("selectedSession", "all"))
-        vars["pdfURL"]=quoteattr(str(urlCustPDF))
+        vars["pdfURL"]=str(urlCustPDF)
+
         
         return vars
 

@@ -172,11 +172,15 @@ class ScheduleAddContribution(ScheduleOperation, LocationSetter):
         pickledData = DictPickler.pickle(schEntry, timezone=self._conf.getTimezone())
         pickledDataSlotSchEntry = self._getSlotEntry()
 
-        return {'day': schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
-                'id': pickledData['id'],
+        result = {'id': pickledData['id'],
                 'entry': pickledData,
                 'slotEntry': pickledDataSlotSchEntry,
                 'autoOps': translateAutoOps(self.getAutoOps())}
+        
+        if self._needsToBeScheduled:
+            result['day'] = schEntry.getAdjustedStartDate().strftime("%Y%m%d")
+        
+        return result
 
 
 class ConferenceScheduleAddContribution(ScheduleAddContribution, conferenceServices.ConferenceModifBase):

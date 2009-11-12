@@ -38,6 +38,7 @@ from MaKaC.common import Config, DBMgr
 from MaKaC.common.utils import isStringHTML,sortContributionByDate
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
+from MaKaC.webinterface.rh.base import RoomBookingDBMixin
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase, RHSubmitMaterialBase
 import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
@@ -615,7 +616,7 @@ class RHConferenceProgramPDF( RHConferenceBaseDisplay ):
         self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
         return data
 
-class RHConferenceTimeTable( RHConferenceBaseDisplay ):
+class RHConferenceTimeTable( RoomBookingDBMixin, RHConferenceBaseDisplay ):
     _uh = urlHandlers.UHConferenceTimeTable
 
     def _process( self ):
