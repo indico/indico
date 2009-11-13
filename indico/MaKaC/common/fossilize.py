@@ -5,7 +5,7 @@ import zope.interface
 
 def fossilizes(*classList):
     zope.interface.declarations._implements("fossilizes", classList, zope.interface.classImplements)
-    
+
 def addFossil(klazz, fossils):
     """ Adds fossils to a class
         klazz: a class object
@@ -13,9 +13,9 @@ def addFossil(klazz, fossils):
     """
     if not type(fossils) is list:
         fossils = [fossils]
-    
+
     for fossil in fossils:
-        zope.interface.classImplements(klazz, fossil) 
+        zope.interface.classImplements(klazz, fossil)
 
 class NonFossilizableException(Exception):
     pass
@@ -35,7 +35,7 @@ class Fossilizable(object):
     @classmethod
     def __extractName(cls, name):
         """ 'De-camelcase' the name """
-        
+
         m = cls.__nameRE.match(name)
 
         if not m:
@@ -54,7 +54,7 @@ class Fossilizable(object):
             return obj.fossilize(interface, **kwargs)
 
     def fossilize(self, interface, **kwargs):
-        
+
         if not interface.providedBy(self):
             raise WrongFossilTypeException("Interface '%s' not provided by '%s'" % (interface.__name__, self.__class__.__name__))
 
@@ -68,7 +68,7 @@ class Fossilizable(object):
             # Result conversion
             if 'result' in tags:
                 targetInterface = interface[method].getTaggedValue('result')
-                #targetInterface = globals()[targetInterfaceName]            
+                #targetInterface = globals()[targetInterfaceName]
                 methodResult = self.__fossilizeIterable(methodResult, targetInterface, **kwargs)
 
             # Conversion function
@@ -77,8 +77,8 @@ class Fossilizable(object):
                 converterArgNames = inspect.getargspec(convertFunction)[0]
                 converterArgs = dict((name, kwargs[name]) for name in converterArgNames if name in kwargs)
                 methodResult = convertFunction(methodResult, **converterArgs)
-            
-            # Re-name the attribute produced by the method    
+
+            # Re-name the attribute produced by the method
             if 'name' in tags:
                 attrName = interface[method].getTaggedValue('name')
             else:
@@ -101,4 +101,4 @@ def fossilize(target, interface, **kwargs):
             return dict((k, fossilize(v, interface, **kwargs)) for k,v in target.iteritems())
         else:
             raise NonFossilizableException()
-    
+
