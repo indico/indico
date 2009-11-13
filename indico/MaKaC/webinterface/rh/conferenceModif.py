@@ -525,7 +525,7 @@ class RHConfSessionSlots( RHConferenceModifBase ):
 
 #----------------------------------------------------------------
 
-class RHConfModifSchedule( RHConferenceModifBase ):
+class RHConfModifSchedule( RoomBookingDBMixin, RHConferenceModifBase ):
     _uh = urlHandlers.UHConfModifSchedule
 
     def _checkParams( self, params ):
