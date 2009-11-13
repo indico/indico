@@ -200,7 +200,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
                                       IndicoUtil.errorReport(error);
                                   }
                                   else {
-                                      self.dateTimeField.accessor.set('dateTime', result);
+                                      self.dateTimeField.set('dateTime', result);
                                       hook.set(true);
                                   }
                               }
@@ -275,9 +275,9 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
 
         var datecomponent;
         if (this.timeStartMethod !== null) {
-            $B(info.accessor('dateTime'), self.dateTimeField.accessor.accessor('dateTime'));
-            $B(info.accessor('duration'), self.dateTimeField.accessor.accessor('duration'));
-            datecomponent = [$T('Date/Time'), self.dateTimeField.element];
+            $B(info.accessor('dateTime'), self.dateTimeField.accessor('dateTime'));
+            $B(info.accessor('duration'), self.dateTimeField.accessor('duration'));
+            datecomponent = [$T('Date/Time'), self.dateTimeField.draw()];
         }else{
             $B(info.accessor('duration'), self.dateTimeField);
             datecomponent = [$T('Duration'), self.dateTimeField];
@@ -451,7 +451,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
              this.dateTimeField = IndicoUI.Widgets.Generic.durationField(20);
              args.schedule = false;
          }else {
-             this.dateTimeField = IndicoUI.Widgets.Generic.dateDurationField(confStartDate, 20, ' ');
+             this.dateTimeField = new DateTimeDurationWidget(confStartDate, 20, ' ');
          }
 
          var self = this;
@@ -503,7 +503,7 @@ type("ChangeEditDialog", // silly name!
                          IndicoUtil.errorReport(error);
                      }
                      else {
-                         self.dateTimeField.accessor.set('dateTime', result);
+                         self.dateTimeField.set('dateTime', result);
                          hook.set(true);
                      }
                  });
@@ -841,11 +841,11 @@ type("AddBreakDialog", ["ChangeEditDialog"],
              // some properties have default values, and the initialization
              // of the binding must be set
              invertableBind(this.info.accessor('startDate'),
-                            this.dateTimeField.accessor.accessor('dateTime'),
+                            this.dateTimeField.accessor('dateTime'),
                             this.isEdit);
 
              invertableBind(this.info.accessor('duration'),
-                            this.dateTimeField.accessor.accessor('duration'),
+                            this.dateTimeField.accessor('duration'),
                             this.isEdit);
 
              return this.ServiceDialog.prototype.draw.call(
@@ -857,7 +857,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                  }), this.info.accessor('title'))], [$T('Description'), $B(Html.textarea({
                      cols: 40,
                      rows: 2
-                 }), this.info.accessor('description'))], [$T('Place'), this.roomEditor.draw()], [$T('Date/Time'), this.dateTimeField.element]]),
+                 }), this.info.accessor('description'))], [$T('Place'), this.roomEditor.draw()], [$T('Date/Time'), this.dateTimeField.draw()]]),
                                Html.div('dialogButtons',
                                         [addButton, cancelButton])]));
          },
@@ -894,7 +894,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
          this.isEdit = isEdit;
          this.parentRoomInfo = parentRoomInfo;
          this.favoriteRooms = favoriteRooms;
-         this.dateTimeField = IndicoUI.Widgets.Generic.dateDurationField('', 20, ' ');
+         this.dateTimeField = new DateTimeDurationWidget(null, 20, ' ');
          this.originalArgs = {};
          each(keys(args), function(key) {
              self.originalArgs[key] = args.get(key);

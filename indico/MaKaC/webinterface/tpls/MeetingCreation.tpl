@@ -140,8 +140,8 @@
 
             var res = {};
 
-            res["sDate"] = dates.item(0).get();
-            res["eDate"] = dates.item(1).get();
+            res["sDate"] = Util.formatDateTime(dates.item(0).get(), IndicoDateTimeFormats.Server, IndicoDateTimeFormats.Default);
+            res["eDate"] = Util.formatDateTime(dates.item(1).get(), IndicoDateTimeFormats.Server, IndicoDateTimeFormats.Default);
             res["timezone"] = $E('Timezone').get();
 
             return res;

@@ -1,5 +1,8 @@
 <%!
 
+# maybe all of this should be moved to the W* class?
+
+from MaKaC.fossils.conference import IConferenceMinimalFossil
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from xml.sax.saxutils import escape
@@ -74,18 +77,10 @@ favoriteRooms = confObj.getFavoriteRooms();
 </tr>
 <tr>
     <td class="dataCaptionTD">
-        <span class="dataCaptionFormat"><%= _("Start date")%></span>
+        <span class="dataCaptionFormat"><%= _("Start/End date")%></span>
     </td>
     <td class="blacktext">
-        <span id="inPlaceEditStartDate"><%=startDate %></span>
-    </td>
-</tr>
-<tr>
-    <td class="dataCaptionTD">
-        <span class="dataCaptionFormat"><%= _("End date")%></span>
-    </td>
-    <td class="blacktext">
-        <span id="inPlaceEditEndDate"><%=endDate %></span>
+        <span id="inPlaceEditStartEndDate"><%=startDate %> <strong>to</strong> <%= endDate %></span>
     </td>
 </tr>
 <!-- Fermi timezone awareness -->
@@ -233,6 +228,8 @@ function removeItem(number, form)
     form.submit();
 }
 
+var confFossile = <%= jsonEncode(confObj.fossilize(IConferenceMinimalFossil, tz=confObj.getTimezone())) %>;
+
 <%= macros.genericField(macros.FIELD_TEXT, 'inPlaceEditTitle', 'event.main.changeTitle', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh) %>
 
 <%= macros.genericField(macros.FIELD_TEXT, 'inPlaceEditSupportEmail', 'event.main.changeSupportEmail', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh) %>
@@ -249,9 +246,7 @@ function removeItem(number, form)
 
 <%= macros.genericField(macros.FIELD_SELECT, 'inPlaceEditType', 'event.main.changeType', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh, options=typeList) %>
 
-<%= macros.genericField(macros.FIELD_DATE, 'inPlaceEditStartDate', 'event.main.changeStartDate', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh) %>
-
-<%= macros.genericField(macros.FIELD_DATE, 'inPlaceEditEndDate', 'event.main.changeEndDate', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh) %>
+$E('inPlaceEditStartEndDate').set(new StartEndDateWidget('event.main.changeDates', <%= jsonEncode({'conference': "%s"%conferenceId}) %>, {'startDate': confFossile.startDate, 'endDate': confFossile.endDate}).draw());
 
 <%= macros.genericField(macros.FIELD_RICHTEXT, 'inPlaceEditDescription', 'event.main.changeDescription', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh, options=(400,200)) %>
 

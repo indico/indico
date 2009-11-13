@@ -5514,3 +5514,9 @@ div.posterEntry:hover {
     margin-top: 5px;
 }
 
+.startEndDate {
+    margin-top: 5px;
+}
+.startEndDate span {
+    color: #666;
+}

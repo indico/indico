@@ -18,6 +18,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+# fossil classes
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.common.utils import formatDateTime
 from MaKaC.fossils.subcontribution import ISubContribParticipationFossil,\
@@ -25,6 +27,7 @@ from MaKaC.fossils.subcontribution import ISubContribParticipationFossil,\
 from MaKaC.fossils.contribution import IContributionParticipationFossil,\
     IContributionFossil, IContributionWithSpeakersFossil,\
     IContributionWithSubContribsFossil
+from MaKaC.fossils.conference import IConferenceMinimalFossil
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 
 import re, os
@@ -1936,12 +1939,16 @@ class ReportNumberHolder(Persistent):
         if self.getOwner() != None:
             self.getOwner().notifyModification()
 
-class Conference(Persistent):
+class Conference(Persistent, Fossilizable):
     """This class represents the real world conferences themselves. Objects of
         this class will contain basic data about the confence and will provide
         access to other objects representing certain parts of the conferences
         (ex: contributions, sessions, ...).
     """
+
+    fossilizes(IConferenceMinimalFossil)
+
+    #TODO: Move to fossilize! (Some conference fossiles already available)
 
     @Retrieves ('MaKaC.conference.Conference', 'videoServicesDisplayURL',
                 lambda conf: (str(urlHandlers.UHConferenceDisplay.getURL(conf)), str(urlHandlers.UHCollaborationDisplay.getURL(conf)))[conf.getType() == 'conference'])

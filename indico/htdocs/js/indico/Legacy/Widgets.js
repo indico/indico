@@ -975,42 +975,6 @@ IndicoUI.Widgets = {
             $B(elem, [editable(IndicoUtil.cachedRpcValue(Indico.Urls.JsonRpcService, method, attributes, cachedValue), context), Widget.text(" "), IndicoUI.Aux.defaultEditMenu(context)]);
         },
 
-        /**
-         * Builds a field made of a date/time field and a duration field.
-         * There are 2 optional labels:
-         * -One before the date/time field.
-         * -One before the duration field.
-         * All 4 element (the 2 fields and the 2 labels) appear in a line.
-         * @param {String} defaultDateTime Date formatted like %d/%m/%Y %H:%M (python format)
-         * @param {String} defaultDur a duration (for ex: 20)
-         * @param {String} dateTimeLabel
-         * @param {String} durationLabel
-         * @return An XElement (div) containing the field
-         */
-        dateDurationField: function(defaultDateTime, defaultDur, dateTimeLabel, durationLabel) {
-
-            if (!dateTimeLabel) {
-                dateTimeLabel = $T("Date/Time:")
-            }
-            if (!durationLabel) {
-                durationLabel = $T("Duration(min):")
-            }
-
-            var obj = new WatchObject();
-            obj.set('dateTime', defaultDateTime);
-            obj.set('duration', defaultDur);
-
-            var element = Widget.block([
-                Html.label("fieldLabel", dateTimeLabel),
-                $B(IndicoUI.Widgets.Generic.dateField(true), obj.accessor('dateTime')),
-                Html.span({style:{marginLeft: pixels(10)}},""),Html.label("fieldLabel", durationLabel),
-                $B(IndicoUI.Widgets.Generic.durationField(), obj.accessor('duration'))
-            ]);
-
-            return {'element': element,
-                    'accessor': obj};
-        },
-
         dateStartEndTimeField: function(defaultStartTime, defaultEndTime) {
 
             var obj = new WatchObject();
@@ -1031,7 +995,7 @@ IndicoUI.Widgets = {
 
             var element = Widget.block([
                 $B(startTimeField, obj.accessor('startTime')), dash,
-                $B(endTimeField, obj.accessor('endTime')),
+                $B(endTimeField, obj.accessor('endTime'))
             ]);
 
             return {'element': element,

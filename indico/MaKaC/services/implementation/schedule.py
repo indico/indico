@@ -176,10 +176,10 @@ class ScheduleAddContribution(ScheduleOperation, LocationSetter):
                 'entry': pickledData,
                 'slotEntry': pickledDataSlotSchEntry,
                 'autoOps': translateAutoOps(self.getAutoOps())}
-        
+
         if self._needsToBeScheduled:
             result['day'] = schEntry.getAdjustedStartDate().strftime("%Y%m%d")
-        
+
         return result
 
 
@@ -560,7 +560,7 @@ class ConferenceScheduleGetDayEndDate(ScheduleOperation, conferenceServices.Conf
         self._date = datetime.datetime(date.year, date.month, date.day, tzinfo=pytz.timezone(self._conf.getTimezone()))
 
     def _performOperation(self):
-        return self._target.getSchedule().calculateDayEndDate(self._date).strftime('%d/%m/%Y %H:%M')
+        return self._target.getSchedule().calculateDayEndDate(self._date).strftime('%Y/%m/%d %H:%M')
 
 class SessionSlotScheduleGetDayEndDate(ScheduleOperation, sessionServices.SessionSlotModifCoordinationBase):
 
@@ -572,7 +572,7 @@ class SessionSlotScheduleGetDayEndDate(ScheduleOperation, sessionServices.Sessio
 
     def _performOperation(self):
         eDate = self._slot.getSchedule().calculateDayEndDate(self._date)
-        return eDate.strftime('%d/%m/%Y %H:%M')
+        return eDate.strftime('%Y/%m/%d %H:%M')
 
 class SessionSlotGetBooking(ScheduleOperation, sessionServices.SessionSlotDisplayBase, roomBooking.GetBookingBase):
     def _performOperation(self):
@@ -589,7 +589,7 @@ class SessionScheduleGetDayEndDate(ScheduleOperation, sessionServices.SessionMod
 
     def _performOperation(self):
         eDate = self._target.getSchedule().calculateDayEndDate(self._date)
-        return eDate.strftime('%d/%m/%Y %H:%M')
+        return eDate.strftime('%Y/%m/%d %H:%M')
 
 class ScheduleEditSlotBase(ScheduleOperation, LocationSetter):
 

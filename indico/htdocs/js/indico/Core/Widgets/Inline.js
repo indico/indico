@@ -8,33 +8,65 @@ type("InlineWidget", ["IWidget"],
      });
 
 
+/*
+ * This class implements a widget that interacts directly with the
+ * remote server. States are handled, through a callback interface.
+ */
 type("InlineRemoteWidget", ["InlineWidget"],
+
      {
+
+         _handleError: function(error) {
+             this._error(error);
+         },
+
+         _handleLoading: function(error) {
+             return Html.span({}, 'loading...');
+         },
+
+         _handleLoaded: function() {
+             // do nothing, overload
+         },
+
          draw: function() {
              var self = this;
-             var canvas = Html.span({}, 'loading...');
 
+             // if the widget is set to load on startup,
+             // the content will be a 'loading' message
+             var wcanvas = Html.div({}, this.loadOnStartup?
+                                   this._handleLoading():
+                                   this._handleContent());
+
+             // observe state changes and call
+             // the handlers accordingly
              this.source.state.observe(function(state) {
                  if (state == SourceState.Error) {
-                     self.ready.set(true);
-                     self._error(self.source.error.get());
+                     self._handleError(self.source.error.get());
+                     wcanvas.set(self._handleContent());
                  } else if (state == SourceState.Loaded) {
-                     self.ready.set(true);
-                     canvas.set(self.drawContent());
+                     self._handleLoaded(self.source.get());
+                     wcanvas.set(self._handleContent());
                  } else {
-                     self.ready.set(false);
-                     canvas.set('loading...');
+                     wcanvas.set(self._handleLoading());
                  }
              });
 
-             return canvas;
+             return wcanvas;
          }
 
      },
-     function(method, attributes) {
+     /*
+      * method - remote method
+      * attributes - attributes that are passed
+      * loadOnStartup - should the widget start loading from the
+      * server automatically?
+      */
+     function(method, attributes, loadOnStartup) {
+         loadOnStartup = exists(loadOnStartup)?loadOnStartup:true;
          this.ready = new WatchValue();
          this.ready.set(false);
-         this.source = indicoSource(method, attributes);
+         this.loadOnStartup = loadOnStartup;
+         this.source = indicoSource(method, attributes, false, !loadOnStartup);
      });
 
 /*
@@ -116,27 +148,6 @@ type("RemoteSwitchButton", ["InlineWidget"],
      });
 
 
-type("SwitchOptionButton", ["InlineRemoteWidget"],
-     {
-         error: function(error) {
-             this.checkbox.set(true);
-             alert(error.message);
-         },
-
-         drawContent: function() {
-             return Html.div({},
-                             this.checkbox,
-                             this.caption);
-
-         }
-     },
-     function(method, attributes, caption) {
-         this.InlineRemoteWidget(method, attributes);
-         this.caption = caption;
-         this.checkbox = Html.checkbox({});
-
-         $B(this.checkbox, this.source);
-     });
 
 type("RadioFieldWidget", ["InlineWidget"],
      {
@@ -348,36 +359,6 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor"],
          this.InlineRemoteWidget(method, args);
      });
 
-type("FavoriteSelectRemoteWidget", ["SelectRemoteWidget"],
-     {
-         _drawItem: function(item) {
-             var option = this.SelectRemoteWidget.prototype._drawItem.call(this, item);
-             // apply on widget generation/reload
-             if (this.favorites && exists(this.favorites.indexOf(item.key))) {
-                 option.dom.className = 'favoriteItem';
-             }
-             return option;
-         },
-
-         setFavorites: function(list) {
-
-             this.favorites = list;
-
-             var self = this;
-
-             // apply immediately
-             each(list, function(favorite) {
-                 var option = self.options.get(favorite);
-                 if (exists(option)){
-                     option.dom.className = 'favoriteItem';
-                 }
-             });
-         }
-     },
-     function(method, args) {
-         this.SelectRemoteWidget(method, args);
-     });
-
 
 type("RealtimeTextBox", ["IWidget", "WatchAccessor"],
      {
@@ -424,6 +405,15 @@ type("RealtimeTextBox", ["IWidget", "WatchAccessor"],
          setFocus: function() {
              this.input.dom.focus();
          },
+         notifyChange: function(keyCode, event) {
+             var value = true;
+             var self = this;
+
+             each(this.observers, function(func) {
+                 value = value && func(self.get(), keyCode, event);
+             });
+             return value;
+         },
          enableEvent: function() {
              var self = this;
 
@@ -433,7 +423,7 @@ type("RealtimeTextBox", ["IWidget", "WatchAccessor"],
 
                  if ((keyCode < 32 && keyCode != 8) || (keyCode >= 33 && keyCode < 46) || (keyCode >= 112 && keyCode <= 123)) {
                      each(self.otherKeyObservers, function(func) {
-                         value = value && func(self.input.get(), keyCode, event);
+                         value = value && func(self.get(), keyCode, event);
                      });
                      return value;
                  }
@@ -444,12 +434,9 @@ type("RealtimeTextBox", ["IWidget", "WatchAccessor"],
              // fire onChange event each time there's a new char
              this.input.observeEvent('keyup', function(event) {
                  var keyCode = event.keyCode;
-                 var value = true;
 
                  if (!((keyCode < 32 && keyCode != 8) || (keyCode >= 33 && keyCode < 46) || (keyCode >= 112 && keyCode <= 123))) {
-                     each(self.observers, function(func) {
-                         value = value && func(self.input.get(), keyCode, event);
-                     });
+                     self.notifyChange(keyCode, event);
                      Dom.Event.dispatch(self.input.dom, 'change');
                      return value;
                  }
@@ -833,3 +820,71 @@ function(button){
     this.div = Html.div({style:{display:"inline", position:Browser.IE?"":"relative"}},button, this.topTransparentDiv);
 }
 );
+
+type("InlineEditWidget", ["InlineRemoteWidget"],
+     {
+
+         _handleError: function(error) {
+             this._error(error);
+         },
+
+         _handleContent: function() {
+
+             var self = this;
+
+             // there are two possible widget modes: edit and display
+             var modeChooser = new Chooser(new Lookup(
+                 {
+                     'edit': function() { return self._handleEditMode(); },
+                     'display': function() { return self._handleDisplayMode(self.value); }
+                 }));
+
+             // edit buttons - save and cancel
+             var editButtons = Html.div({},
+                 Widget.button(command(function() {
+                     if (self._verifyInput()){
+                         self.source.set(self._getNewValue());
+                     }
+                 }, 'Save')),
+                 Widget.button(command(function() {
+                     // back to the start
+                     modeChooser.set('display');
+                     switchChooser.set('switchToEdit');
+                 }, 'Cancel')));
+
+             // there are two possible states for the "switch" area
+             var switchChooser = new Chooser(
+                 {
+                     'switchToEdit': Widget.link(command(function() {
+                         modeChooser.set('edit');
+                         switchChooser.set('switchToDisplay');
+                     }, '(edit)')),
+                     'switchToDisplay': editButtons
+                 });
+
+             // start in display mode, switchToEdit link
+             modeChooser.set('display');
+             switchChooser.set('switchToEdit');
+
+             // call the method that disposes the controllers (subclass)
+             return this._buildFrame(Widget.block(modeChooser),
+                                     Widget.block(switchChooser));
+
+         },
+
+         _handleLoading: function() {
+             // display a progress indicator
+             return progressIndicator(true, false);
+         },
+
+         _handleLoaded: function(value) {
+             // save the final value once and for all
+             this.value = value;
+         }
+
+     },
+     function(method, attributes, initValue) {
+         this.value = initValue;
+         this.InlineRemoteWidget(method, attributes, false);
+     });
+

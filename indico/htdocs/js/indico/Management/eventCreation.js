@@ -18,7 +18,9 @@ type("ShowConcurrentEvents", ["ExclusivePopup", "PreLoadHandler"], {
     draw: function() {
         var self = this;
 
-        if (self.concurrentEvents.isEmpty()) return this.ExclusivePopup.prototype.draw.call(this, "No events in that date");
+        if (self.concurrentEvents.isEmpty()){
+            return this.ExclusivePopup.prototype.draw.call(this, "No events in that date");
+        }
 
         var table = Html.table({style:{borderSpacing: pixels(0)}});
         var tBody = Html.tbody();

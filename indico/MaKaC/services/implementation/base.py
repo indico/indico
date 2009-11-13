@@ -106,9 +106,9 @@ class ParameterManager(object):
 
             # both strings and objects are accepted
             if type(value) == str:
-                naiveDate = parseDateTime(value,'%d/%m/%Y %H:%M')
+                naiveDate = parseDateTime(value,'%Y/%m/%d %H:%M')
             else:
-                naiveDate = parseDateTime(value['date']+' '+value['time'][:5], '%d/%m/%Y %H:%M')
+                naiveDate = parseDateTime(value['date']+' '+value['time'][:5], '%Y/%m/%d %H:%M')
 
             if self._timezone:
                 value = timezone(self._timezone).localize(naiveDate).astimezone(timezone('utc'))
@@ -117,7 +117,7 @@ class ParameterManager(object):
         elif pType == date:
             # format will possibly be accomodated to different standards,
             # in the future
-            value = parseDateTime(value,'%d/%m/%Y').date()
+            value = parseDateTime(value,'%Y/%m/%d').date()
         elif pType == int:
             if value == None and allowEmpty:
                 value = None
@@ -214,7 +214,7 @@ class ServiceBase(RequestHandlerBase):
         _getAnswer() method (implemented by derived classes)
         """
 
-        self._setLang()        
+        self._setLang()
         self._checkParams()
         self._checkProtection()
 

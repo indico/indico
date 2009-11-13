@@ -606,6 +606,10 @@ class TemplateExec:
             objDict['deepstr'] = deepstr
         if not 'beautify' in objDict:
             objDict['beautify'] = beautify
+        # allow fossilization
+        if not 'fossilize' in objDict:
+            from MaKaC.common import fossilize
+            objDict['fossilize'] = fossilize
         #if not 'minfo' in objDict:
         #    objDict['minfo'] = info.HelperMaKaCInfo.getMaKaCInfoInstance()
 

@@ -83,7 +83,7 @@ def sortAndReturn(list):
         indicoRequest('category.getPastEventsList',
                 {
                     categId: '<%= categ.getId() %>',
-                    fromDate: '<%= oldestMonthDate.strftime("%d/%m/%Y %H:%M") %>'
+                    fromDate: '<%= oldestMonthDate.strftime("%Y/%m/%m %H:%M") %>'
                 },
                 function(result, error){
                     if (!error) {

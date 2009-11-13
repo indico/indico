@@ -537,7 +537,7 @@ type("RemoteWidget", [],
 
          runIndicator: function(canvas) {
              if (!this.noIndicator) {
-                 canvas.set(new ProgressIndicator());
+                 canvas.set(progressIndicator(false, true));
              }
          }
      },
@@ -611,8 +611,8 @@ type("PreloadedWidget", ["IWidget"],
          this.waitingList = waitingList;
      });
 
-ProgressIndicator = function() {
-    return Html.div({style:{textAlign: 'center'}},Html.img({src: imageSrc("ui_loading"), alt: "Loading..."
+progressIndicator = function(small, center) {
+    return Html.div(center?{style:{textAlign: 'center'}}:{},Html.img({src: imageSrc(small?"loading":"ui_loading"), alt: "Loading..."
 }));
 };
 
