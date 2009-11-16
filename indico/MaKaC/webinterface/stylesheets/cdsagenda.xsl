@@ -224,7 +224,7 @@
   <xsl:otherwise>
   <xsl:text disable-output-escaping="yes">
   &#60;td colspan="2" width="75%" valign="top" bgcolor="#F6F6F6"&#62;
-    &#60;table class="tablepre" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F6F6F6"&#62;
+    &#60;table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F6F6F6"&#62;
   </xsl:text>
   </xsl:otherwise>
   </xsl:choose>
