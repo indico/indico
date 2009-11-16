@@ -436,7 +436,7 @@ type("RealtimeTextBox", ["IWidget", "WatchAccessor"],
                  var keyCode = event.keyCode;
 
                  if (!((keyCode < 32 && keyCode != 8) || (keyCode >= 33 && keyCode < 46) || (keyCode >= 112 && keyCode <= 123))) {
-                     self.notifyChange(keyCode, event);
+                     var value = self.notifyChange(keyCode, event);
                      Dom.Event.dispatch(self.input.dom, 'change');
                      return value;
                  }
@@ -840,12 +840,15 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
                  }));
 
              // edit buttons - save and cancel
-             var editButtons = Html.div({},
-                 Widget.button(command(function() {
+
+             this.saveButton = Widget.button(command(function() {
                      if (self._verifyInput()){
                          self.source.set(self._getNewValue());
                      }
-                 }, 'Save')),
+             }, 'Save'));
+
+             var editButtons = Html.div({},
+                 this.saveButton,
                  Widget.button(command(function() {
                      // back to the start
                      modeChooser.set('display');
@@ -870,6 +873,12 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
              return this._buildFrame(Widget.block(modeChooser),
                                      Widget.block(switchChooser));
 
+         },
+
+
+         /* Enables/disables saving */
+         _setSave: function(state) {
+             this.saveButton.dom.disabled = !state;
          },
 
          _handleLoading: function() {

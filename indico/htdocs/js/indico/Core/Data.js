@@ -70,6 +70,10 @@ var Util = {
             throw 'unknown source object';
         }
 
+        if (!m1 || !m2) {
+            return null;
+        }
+
         // follow the formatting rules
         return format.replace('%Y', zeropad(m1[1])).
         replace('%m', zeropad(m1[2])).
@@ -86,7 +90,7 @@ var Util = {
      */
     __parseDateTime: function(string, format) {
         // default value
-        format = format || "%d/%m/%Y %H:%M";
+        format = format || "%Y/%m/%d %H:%M";
 
         var tokenOrder = [];
 
@@ -99,7 +103,7 @@ var Util = {
         replace(' ','\\s+');
 
         // apply the regexp
-        var m = string.match(reFormat);
+        var m = string.match('^'+reFormat+'$');
 
         if (!m) {
             // if there are no matches, stop
@@ -123,6 +127,10 @@ var Util = {
 
         var results = Util.__parseDateTime(string, format);
 
+        if(!results) {
+            return null;
+        }
+
         var date = new Date();
 
         setDate(date, [results['%d'],results['%m'],results['%Y']]);
@@ -136,6 +144,10 @@ var Util = {
     parseDateTime: function(string, format){
 
         var results = Util.__parseDateTime(string, format);
+
+        if(!results) {
+            return null;
+        }
 
         // build the actual dates in standard format (zeropad too)
         return {date: zeropad(results['%Y'])+'/'+zeropad(results['%m'])+'/'+zeropad(results['%d']),

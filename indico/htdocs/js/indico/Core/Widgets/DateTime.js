@@ -1,5 +1,5 @@
 
-type("DateTimeSelector", ["RealtimeTextBox"],
+type("DateTimeSelector", ["RealtimeTextBox", "ErrorSensitive"],
      {
          get: function(direct) {
 
@@ -28,6 +28,25 @@ type("DateTimeSelector", ["RealtimeTextBox"],
              } else {
                  RealtimeTextBox.prototype.set.call(this, value);
              }
+         },
+
+         _setErrorState: function(text) {
+             this._setElementErrorState(this.input, text);
+         },
+
+         _checkErrorState: function() {
+
+             var value = this.get();
+
+             if (!this.inError()) {
+                 if (!value) {
+                     this.setError($T('Date is invalid'));
+                 }
+             } else {
+                 if (value) {
+                     this.setError(null);
+                 }
+             }
          }
      },
      function(args, format) {
@@ -37,6 +56,11 @@ type("DateTimeSelector", ["RealtimeTextBox"],
          this.input.dom.style.width = '140px';
 
          var self = this;
+
+         this.observe(function() {
+             self._checkErrorState();
+             return true;
+         });
 
          // set up the calendar widget to appear on click
          var cal = Calendar.setup({
@@ -73,6 +97,36 @@ type("StartEndDateWidget", ["InlineEditWidget"],
 
          },
 
+         __verifyDates: function() {
+
+             var valid = true;
+
+             this.startDate._checkErrorState();
+             this.endDate._checkErrorState();
+
+             if (this.startDate.inError() || this.endDate.inError()) {
+                 valid = false;
+             } else {
+                 this.startDate.setError(null);
+                 this.endDate.setError(null);
+
+                 var sDateTime = Util.parseJSDateTime(this.startDate.get(), IndicoDateTimeFormats.Server);
+                 var eDateTime = Util.parseJSDateTime(this.endDate.get(), IndicoDateTimeFormats.Server);
+
+                 if (sDateTime >= eDateTime) {
+                     valid = false;
+                     this.startDate.setError($T('Start date should be before end date'));
+                     this.endDate.setError($T('End date should be after start date'));
+                 } else {
+                     valid = true;
+                     this.startDate.setError(null);
+                     this.endDate.setError(null);
+                 }
+             }
+
+             this._setSave(valid);
+         },
+
          _handleEditMode: function() {
 
              // create datefields
@@ -80,9 +134,19 @@ type("StartEndDateWidget", ["InlineEditWidget"],
              this.endDate = new DateTimeSelector();
 
              // set them to the values that are passed
-
              this.startDate.set(Util.formatDateTime(this.value.startDate, IndicoDateTimeFormats.Server));
              this.endDate.set(Util.formatDateTime(this.value.endDate, IndicoDateTimeFormats.Server));
+
+             var self = this;
+
+             this.startDate.observe(function() {
+                 self.__verifyDates();
+                 return true;
+             });
+             this.endDate.observe(function() {
+                 self.__verifyDates();
+                 return true;
+             });
 
              // call buildStructure with modification widgets
              return this.__buildStructure(this.startDate.draw(), this.endDate.draw());
@@ -102,10 +166,8 @@ type("StartEndDateWidget", ["InlineEditWidget"],
 
          _verifyInput: function() {
              if (!Util.parseDateTime(this.startDate.get())) {
-                 alert('startDate is wrong');
                  return false;
              } else if (!Util.parseDateTime(this.endDate.get())){
-                 alert('endDate is wrong');
                  return false;
              }
              return true;

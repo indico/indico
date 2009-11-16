@@ -760,3 +760,47 @@ type("HistoryListener", [],
      function() {
 
      });
+
+type("ErrorSensitive", [],
+     {
+         _setElementErrorState: function(element, text) {
+
+             var tooltip;
+
+             this.oldClassName = element.dom.className;
+             element.dom.className += ' invalid';
+
+             this.errorElement = element;
+
+             this._stopObservingError =
+                 element.observeEvent('mouseover', function(event) {
+                     tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, text, "tooltipError");
+                 });
+
+             this._stopObservingErrorOut =
+                 element.observeEvent('mouseout', function(event) {
+                     Dom.List.remove(document.body, tooltip);
+                 });
+         },
+
+         setError: function(text) {
+             if (!text) {
+                 // everything back to normal
+                 if (this._stopObservingError){
+                     this._stopObservingError();
+                     //this._stopObservingErrorOut();
+
+                     this.errorElement.dom.className = this.oldClassName;
+
+                     this._inError = false;
+                 }
+             } else {
+                 this._setErrorState(text);
+                 this._inError = true;
+             }
+         },
+
+         inError: function() {
+             return this._inError;
+         }
+     });
