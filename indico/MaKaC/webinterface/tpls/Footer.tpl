@@ -28,7 +28,7 @@ function envoi(){
             <a href="http://www.cern.ch">
             <img src="<%= systemIcon("cern_small") %>" alt="<%= _("Indico - Integrated Digital Conference")%>" />
             </a>
-            <%= _("Powered by CERN")%>
+            <%= _("Powered by CERN Indico")%>
             
             <% if Configuration.Config.getInstance().getWorkerName()!="": %>
                 <span style="display: none;"><%= Configuration.Config.getInstance().getWorkerName() %></span>
