@@ -1,4 +1,3 @@
-
 var Util = {
     parseId: function(id){
 
@@ -169,7 +168,7 @@ var Util = {
     dateTimeJSToIndico: function(obj){
         return {date:  obj.getFullYear()+ '/'+ zeropad(obj.getMonth()+1) + '/' + zeropad(obj.getDate()),
                 time: zeropad(obj.getHours())+':'+zeropad(obj.getMinutes())+':'+zeropad(obj.getSeconds())};
-    },
+    }
 
 };
 
@@ -184,5 +183,5 @@ var IndicoDateTimeFormats = {
     International: '%d/%m/%Y %H:%M',
     ISO8601: '%Y/%m/%d %H:%M',
     Default: '%d/%m/%Y %H:%M',
-    Server: '%Y/%m/%d %H:%M',
+    Server: '%Y/%m/%d %H:%M'
 };

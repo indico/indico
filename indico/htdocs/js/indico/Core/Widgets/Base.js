@@ -269,7 +269,9 @@ type("TabWidget", ["Chooser", "IWidget"],{
     },
 
     checkTabOverflow: function(tab) {
-        return (this.tabList.dom.offsetHeight > 30);
+        // some magic numbers used... it would be great if a better solution
+        // was possible
+        return (this.tabList.dom.offsetHeight > (Browser.IE?33:30));
     },
 
     scrollRight: function() {

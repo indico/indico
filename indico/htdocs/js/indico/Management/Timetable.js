@@ -581,7 +581,7 @@ type("MoveEntryDialog", ["ExclusivePopup"],
              var sortedByTime = [];
              translate(timetableItems, function(value, key) {
                  // consider only sessions
-                 if (key[0] == "s") {
+                 if (key.slice(0,1) == "s") {
                      sortedByTime.push( [ value.startDate.time, key ]);
                  }
              });
@@ -641,7 +641,7 @@ type("MoveEntryDialog", ["ExclusivePopup"],
                      });
 
                  moveEntryTable.append(Html.li(
-                     {}, rb,
+                     {}, colorSquare, rb,
                      Html.label( {
                          style : {
                              marginLeft: '5px',
@@ -653,8 +653,7 @@ type("MoveEntryDialog", ["ExclusivePopup"],
                              fontSize: '10px',
                              marginLeft: '5px',
                              color: '#999'
-                         }}, " ", value.startDate.time.slice(0,5) + "-" + value.endDate.time.slice(0,5))),
-                     colorSquare));
+                         }}, " ", value.startDate.time.slice(0,5) + "-" + value.endDate.time.slice(0,5)))));
              }
 
              // Ensure that only 1 radio button will be selected at a given time
