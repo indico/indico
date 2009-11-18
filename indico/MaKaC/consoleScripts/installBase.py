@@ -44,12 +44,13 @@ PWD_INDICO_CONF = 'etc/indico.conf'
 
 
 def setIndicoInstallMode(newmode):
-    '''Sets indico install mode. 
-    
-    This function and getIndicoInstallMode are used by some __init__.py inside 
-    MaKaC to load or not some modules. At installation time those modules are not 
+    """
+    Sets indico install mode.
+    This function and getIndicoInstallMode are used by some __init__.py inside
+    MaKaC to load or not some modules. At installation time those modules are not
     available. That's why we need to skip them. They are imported there only as
-    shortcuts.'''  
+    shortcuts.
+    """
     global INDICO_INSTALL
     INDICO_INSTALL = newmode
 
@@ -57,20 +58,14 @@ def setIndicoInstallMode(newmode):
 def getIndicoInstallMode():
     global INDICO_INSTALL
     return INDICO_INSTALL
-    
-    
-def createDirs():
+
+
+def createDirs(directories):
     '''Creates directories that are not automatically created by setup.install or easy_install'''
-    from MaKaC.common.Configuration import Config
-    cfg = Config.getInstance()
-    
-    for dir in (cfg.getLogDir(), 
-                cfg.getUploadedFilesTempDir(), 
-                cfg.getXMLCacheDir()):
-        if not os.path.exists(dir):
-            os.makedirs(dir)
-         
-             
+    for d in ['log', 'tmp', 'cache']:
+        if not os.path.exists(directories[d]):
+            os.makedirs(directories[d])
+
 def upgrade_indico_conf(existing_conf, new_conf, mixinValues={}):
     '''Copies new_conf values to existing_conf file preserving existing_conf's values
     
@@ -205,7 +200,28 @@ You can downlod mod_python from:
 Press any key to continue...''')
 
 
-def _checkDirPermissions(dbInstalledBySetupPy=False, uid=None, gid=None):
+def _guessApacheUidGid():
+
+    finalUser, finalGroup = None, None
+
+    for username in ['apache', 'www-data', 'www']:
+        try:
+            finalUser = pwd.getpwnam(username)
+            break
+        except KeyError:
+            pass
+
+    for groupname in ['apache', 'www-data', 'www']:
+        try:
+            finalGroup = grp.getgrnam(groupname)
+            break
+        except KeyError:
+            pass
+
+    return finalUser, finalGroup
+
+
+def _checkDirPermissions(directories, dbInstalledBySetupPy=False, uid=None, gid=None):
     '''Makes sure that directories which need write access from Apache have
     the correct permissions
     
@@ -215,9 +231,6 @@ def _checkDirPermissions(dbInstalledBySetupPy=False, uid=None, gid=None):
     - uid and gid: if they are valid user_ids and group_ids they will be used to chown
         the directories instead of the indico.conf ones. 
     '''
-    from MaKaC.common.Configuration import Config
-    cfg = Config.getInstance()
-
     # if we are on linux we need to give proper permissions to the results directory
     if sys.platform == "linux2":
         prompt = True
@@ -232,17 +245,15 @@ def _checkDirPermissions(dbInstalledBySetupPy=False, uid=None, gid=None):
                 prompt = False
             except KeyError:
                 print 'uid/gid pair (%s/%s) provided through command line is false' % (uid, gid)
-
         else:
-            # Try to use indico.conf's
-            try:
-                pwd.getpwnam(cfg.getApacheUser())
-                grp.getgrnam(cfg.getApacheGroup())
-                accessuser = cfg.getApacheUser()
-                accessgroup = cfg.getApacheGroup()
+            print "uid/gid not provided. Trying to guess them... ",
+            uid, gid = _guessApacheUidGid()
+            if uid and gid:
+                print "found %s(%s) %s(%s)" % (uid.pw_name, uid.pw_uid,
+                                         gid.gr_name, gid.gr_gid)
+                accessuser = uid.pw_uid
+                accessgroup = gid.gr_gid
                 prompt = False
-            except KeyError:
-                print "\nERROR: indico.conf's ApacheUser and ApacheGroup options are incorrect (%s/%s)." % (cfg.getApacheUser(), cfg.getApacheGroup())
 
         if prompt == True:
             valid_credentials = False
@@ -256,12 +267,12 @@ def _checkDirPermissions(dbInstalledBySetupPy=False, uid=None, gid=None):
                 except KeyError:
                     print "\nERROR: Invalid user/group pair (%s/%s)" % (accessuser, accessgroup)
                 
-                modifyOnDiskIndicoConfOption('%s/indico.conf' % cfg.getConfigurationDir(), 'ApacheUser', accessuser)
-                modifyOnDiskIndicoConfOption('%s/indico.conf' % cfg.getConfigurationDir(), 'ApacheGroup', accessgroup)
+                modifyOnDiskIndicoConfOption('%s/indico.conf' % directories['etc'], 'ApacheUser', accessuser)
+                modifyOnDiskIndicoConfOption('%s/indico.conf' % directories['etc'], 'ApacheGroup', accessgroup)
 
-        dirs2check = [cfg.getPublicFolder(), cfg.getLogDir(), cfg.getUploadedFilesTempDir(), cfg.getXMLCacheDir()]
+        dirs2check = list(directories[x] for x in ['htdocs', 'log', 'tmp', 'cache'])
         if dbInstalledBySetupPy:
-            dirs2check.append(LOCALDATABASEDIR)
+            dirs2check.append(dbInstalledBySetupPy)
 
         for dir in dirs2check:
             print commands.getoutput("chown -R %s:%s %s" % (accessuser, accessgroup, dir))        
@@ -273,7 +284,7 @@ def _existingDb():
 
 def _existingIndicoConfPath():
     from MaKaC.common.Configuration import Config
-    cfg = Config.getInstance() 
+    cfg = Config.getInstance()
     return os.path.join(cfg.getConfigurationDir(), 'indico.conf')
 
 
@@ -296,17 +307,15 @@ def _activateIndicoConfFromExistingInstallation():
 
     Config.getInstance().forceReload()
 
+def _replacePrefixInConf(filePath, prefix):
+    fdata = open(filePath).read()
+    fdata = re.sub('\/opt\/indico', prefix, fdata)
+    open(filePath, 'w').write(fdata)
 
-        
-def indico_pre_install(config_dir, force_upgrade=False):
-    '''config_dir is the final configuration dir which will be different than
-    the currently loaded Config's ''' 
-    from MaKaC.common.Configuration import Config
-    cfg = Config.getInstance()
-        
-    if not os.path.exists(config_dir):
-        os.makedirs(config_dir)
-    
+def indico_pre_install(defaultPrefix, force_upgrade=False, sourceConfig=PWD_INDICO_CONF):
+    '''defaultPrefix is the default prefix dir where Indico will be installed '''
+
+    # if there is an installation, ignore the default prefix
     if _existingInstallation():
         if force_upgrade:
             print 'Upgrading existing Indico installation..'
@@ -330,19 +339,36 @@ What do you want to do [u/E]? ''' % _existingIndicoConfPath())
                 print "\nExiting installation..\n"
                 sys.exit()
             elif opt == 'u':
+                print "Upgrading... ",
                 _activateIndicoConfFromExistingInstallation()
+                print "done!"
+                sys.exit()
             else:
                 print "\nInvalid answer. Exiting installation..\n"
                 sys.exit()
 
+    # then, in case no previous installation exists
+
+    print "No previous installation of Indico was found."
+    print "Please specify a directory prefix:"
+
+    prefixDir = raw_input('[%s]: ' % defaultPrefix).strip()
+
+    if prefixDir == '':
+        prefixDir = defaultPrefix
+
+    configDir = os.path.join(prefixDir, 'etc')
+
+    if not os.path.exists(configDir):
+            os.makedirs(configDir)
+
     compileAllLanguages()
-    indicoconfpath = os.path.join(config_dir, 'indico.conf')
-    
+    indicoconfpath = os.path.join(configDir, 'indico.conf')
+
     if not os.path.exists(indicoconfpath):
-        if not os.path.exists(PWD_INDICO_CONF):
+        if not os.path.exists(sourceConfig):
             opt = raw_input('''
-We did not detect an existing Indico installation.
-We also did not detect an etc/indico.conf file in this directory.
+You now need to configure Indico, by editing indico.conf or letting us do it for you.
 At this point you can:
 
     [c]opy the default values in etc/indico.conf.sample to a new etc/indico.conf
@@ -353,58 +379,66 @@ At this point you can:
 
 What do you want to do [c/a]? ''')
             if opt in ('c', 'C'):
-                shutil.copy(PWD_INDICO_CONF + '.sample', PWD_INDICO_CONF)
+                shutil.copy(sourceConfig + '.sample', indicoconfpath)
+                _replacePrefixInConf(indicoconfpath, prefixDir)
             elif opt in ('', 'a', 'A'):
                 print "\nExiting installation..\n"
                 sys.exit()
             else:
                 print "\nInvalid anwer. Exiting installation..\n"
                 sys.exit()
-    
-    activemakacconfig = os.path.join(os.path.dirname(os.path.abspath(MaKaC.__file__)), 'common', 'MaKaCConfig.py') 
+
+    activemakacconfig = os.path.join(os.path.dirname(os.path.abspath(MaKaC.__file__)), 'common', 'MaKaCConfig.py')
     updateIndicoConfPathInsideMaKaCConfig(indicoconfpath, activemakacconfig)
-    
+
+    return prefixDir
 
 
-def indico_post_install(config_dir, makacconfig_base_dir, package_dir, force_no_db = False, uid=None, gid=None):
+def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_dir, force_no_db = False, uid=None, gid=None, suggestedPrefix=None):
     from MaKaC.common.Configuration import Config
-    cfg = Config.getInstance()
-    
-    createDirs()
-    indicoconfpath = os.path.join(config_dir, 'indico.conf')
-    updateIndicoConfPathInsideMaKaCConfig(indicoconfpath, 
+
+    newConf = os.path.join(targetDirs['etc'],'indico.conf')
+
+    if suggestedPrefix:
+        dbDir = os.path.join(suggestedPrefix,'db')
+    else:
+        dbDir = '/opt/indico/db'
+
+    createDirs(targetDirs)
+    indicoconfpath = os.path.join(sourceDirs['etc'], 'indico.conf')
+    updateIndicoConfPathInsideMaKaCConfig(indicoconfpath,
                                           os.path.join(makacconfig_base_dir, 'MaKaCConfig.py'))
 
-    for f in [xx for xx in ('%s/zdctl.conf' % config_dir, 
-                            '%s/zodb.conf' % config_dir) if not os.path.exists(xx)]:
+    for f in [xx for xx in ('%s/zdctl.conf' % targetDirs['etc'],
+                            '%s/zodb.conf' % targetDirs['etc']) if not os.path.exists(xx)]:
         shutil.copy('%s.sample' % f, f)
 
-    if not os.path.exists(indicoconfpath) and os.path.exists(PWD_INDICO_CONF):
-        shutil.copy(PWD_INDICO_CONF, indicoconfpath)
+    if os.path.exists(newConf):
+        if not os.path.exists(indicoconfpath):
+            shutil.copy(newConf, indicoconfpath)
+        else:
+            upgrade_indico_conf(indicoconfpath, newConf)
 
-    if os.path.exists(PWD_INDICO_CONF):
-        upgrade_indico_conf(indicoconfpath, PWD_INDICO_CONF)
-        
     # Shall we create a DB?
     dbInstalledBySetupPy = False
     if force_no_db:
         print 'Skipping database detection'
     else:
         if _existingDb():
-            print 'Successfully found a database directory at %s' % LOCALDATABASEDIR
+            print 'Successfully found a database directory at %s' % dbDir
         else:
             opt = None
             while opt not in ('Y', 'y', 'n', ''):
                 opt = raw_input('''\nWe cannot find the configured database at %s.
     
-    Do you want to create a new database now [Y/n]? ''' % LOCALDATABASEDIR)
+    Do you want to create a new database now [Y/n]? ''' % dbDir)
                 if opt in ('Y', 'y', ''):
                     dbInstalledBySetupPy = True
                     dbpath_ok = False
                     while not dbpath_ok:
-                        dbpath = raw_input('''\nWhere do you want to install the database [/opt/indico/db]? ''')
+                        dbpath = raw_input('''\nWhere do you want to install the database [%s]? ''' % dbDir)
                         if dbpath.strip() == '':
-                            dbpath = LOCALDATABASEDIR
+                            dbpath = dbDir
     
                         try:
                             os.makedirs(dbpath)
@@ -416,14 +450,19 @@ def indico_post_install(config_dir, makacconfig_base_dir, package_dir, force_no_
                     pass
 
     #we delete an existing vars.js.tpl.tmp
-    tmp_dir = cfg.getUploadedFilesTempDir()
+    tmp_dir = targetDirs['tmp']
+    print tmp_dir
     varsJsTplTmpPath = os.path.join(tmp_dir, 'vars.js.tpl.tmp')
     if os.path.exists(varsJsTplTmpPath):
         print 'Old vars.js.tpl.tmp found at: %s. Removing' % varsJsTplTmpPath
         os.remove(varsJsTplTmpPath)
-    
 
-    _checkDirPermissions(dbInstalledBySetupPy=dbInstalledBySetupPy, uid=uid, gid=gid)
+    if dbInstalledBySetupPy:
+        dbParam = dbpath
+    else:
+        dpParam = None
+
+    _checkDirPermissions(targetDirs, dbInstalledBySetupPy=dbParam, uid=uid, gid=gid)
 
     _checkModPythonIsInstalled()
 
@@ -468,6 +507,6 @@ Alias /indico "%s"
 If you are running ZODB on this host:
 - Review %s/zodb.conf and %s/zdctl.conf to make sure everything is ok.
 - To start the database run: zdctl.py -C %s/zdctl.conf start
-""" % (cfg.getConfigurationDir(), cfg.getBinDir(), cfg.getDocumentationDir(), cfg.getConfigurationDir(), cfg.getHtdocsDir(), cfg.getHtdocsDir(), package_dir, cfg.getHtdocsDir(), cfg.getHtdocsDir(), cfg.getHtdocsDir(), cfg.getConfigurationDir(), cfg.getConfigurationDir(), cfg.getConfigurationDir())
+""" % (targetDirs['etc'], targetDirs['bin'], targetDirs['doc'], targetDirs['etc'], targetDirs['htdocs'], targetDirs['htdocs'], package_dir, targetDirs['htdocs'], targetDirs['htdocs'], targetDirs['htdocs'], targetDirs['etc'],targetDirs['etc'], targetDirs['etc'])
 
 

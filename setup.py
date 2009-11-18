@@ -65,7 +65,6 @@ def _getDataFiles(x):
     values directly because they will not refer to the proper place. We 
     include those files in the egg's root folder. 
     '''
-    cfg = Config.getInstance()
     dataFilesDict = {}
 
     # setup expects a list like this (('foo/bar/baz', 'wiki.py'),
@@ -291,13 +290,14 @@ if __name__ == '__main__':
     from MaKaC.consoleScripts.installBase import *
     setIndicoInstallMode(True)
 
-    try:
-        from MaKaC.common.Configuration import Config
-    except IOError:
-        # If an installation is halfway aborted we can end up with a
-        # broken indico_conf value inside MaKaCConfig from the installation dir.
-        updateIndicoConfPathInsideMaKaCConfig('etc/indico.conf.sample', os.path.join('indico', 'MaKaC', 'common', 'MaKaCConfig.py'))
-        from MaKaC.common.Configuration import Config
+    if 'bdist_egg' not in sys.argv:
+        try:
+            from MaKaC.common.Configuration import Config
+        except IOError:
+            # If an installation is halfway aborted we can end up with a
+            # broken indico_conf value inside MaKaCConfig from the installation dir.
+            updateIndicoConfPathInsideMaKaCConfig('etc/indico.conf.sample', os.path.join('indico', 'MaKaC', 'common', 'MaKaCConfig.py'))
+            from MaKaC.common.Configuration import Config
     
     
     x = vars()

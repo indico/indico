@@ -21,10 +21,11 @@
 '''This script will need to be called after doing easy_install cds-indico to
 complete the installation process.
 
-It only contains functions specific to easy_install. For the rest of the 
-functions refer to installBase.py 
+It only contains functions specific to easy_install. For the rest of the
+functions refer to installBase.py
 
 On RPM or windist based installations it can be made run automatically'''
+
 import os
 import shutil
 
@@ -32,30 +33,56 @@ from distutils.sysconfig import get_python_lib
 
 from installBase import getIndicoInstallMode, setIndicoInstallMode, PWD_INDICO_CONF, indico_pre_install, indico_post_install, copytreeSilently
 
+# The directory where the eff is located
+eggDir = os.path.join(os.path.dirname(__file__), '..', '..')
 
 def copy_egg_datafiles_to_base(dstDir):
-    '''Copies bin, doc, etc & htdocs from egg's installation folder to dstDir
-    
-    NOTE: the egg is always uncompressed because we make references to __file__ all over the place.'''
-    from MaKaC.common.Configuration import Config
-    cfg = Config.getInstance()
-    
-    for (s, dst) in (('bin', cfg.getBinDir()), ('doc', cfg.getDocumentationDir()), ('etc', cfg.getConfigurationDir()), ('htdocs', cfg.getHtdocsDir())):
-        src = os.path.join(os.path.dirname(__file__), '..', '..', s)
+    """Copies bin, doc, etc & htdocs from egg's installation folder to dstDir
+    NOTE: the egg is always uncompressed because we make references to __file__ all over the place.
+    """
+    global eggDir
+
+    binDir = os.path.join(eggDir, 'bin')
+    docDir = os.path.join(eggDir, 'doc')
+    cfgDir = os.path.join(eggDir, 'etc')
+    htdocsDir = os.path.join(eggDir, 'htdocs')
+
+    for (d, src) in (('bin', binDir), ('doc', docDir), ('etc', cfgDir), ('htdocs', htdocsDir)):
+        dst = os.path.join(dstDir, d)
         copytreeSilently(src, dst)
 
 
 def main():
-    setIndicoInstallMode(True)
+
     global PWD_INDICO_CONF
+    global eggDir
+
+    setIndicoInstallMode(True)
     PWD_INDICO_CONF = os.path.join(os.path.dirname(__file__), '..', '..', 'etc', 'indico.conf.sample')
+
+    prefixDir = indico_pre_install('/opt/indico', False, sourceConfig=os.path.join(eggDir,'etc','indico.conf'))
+
     # we need to copy htdocs/ bin/ doc/ etc/ to its proper place
-    # TODO accept commandline switches (for tests)
-    copy_egg_datafiles_to_base('/opt/indico')
-    if not os.path.exists('/opt/indico/etc/indico.conf'):
-        shutil.copy('/opt/indico/etc/indico.conf.sample', '/opt/indico/etc/indico.conf')
-        
-    indico_pre_install('/opt/indico/etc', False)
-    
-    indico_post_install('/opt/indico/etc', os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'common'), get_python_lib(), None, None)
-    
+    print "Copying Indico tree to %s... " % prefixDir,
+    copy_egg_datafiles_to_base(prefixDir)
+    print "done!"
+
+    #    if not os.path.exists('/opt/indico/etc/indico.conf'):
+    #        shutil.copy('/opt/indico/etc/indico.conf.sample', '/opt/indico/etc/indico.conf')
+
+    targetDirs = dict((dirName, os.path.join(prefixDir, dirName))
+                      for dirName in ['bin','doc','etc','htdocs','tmp','log','cache'])
+
+    sourceDirs = dict((dirName, os.path.join(eggDir, dirName))
+                      for dirName in ['bin','doc','etc','htdocs'])
+
+
+    indico_post_install(targetDirs,
+                        sourceDirs,
+                        os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                                     '..',
+                                     'common'),
+                        get_python_lib(),
+                        force_no_db=False,
+                        suggestedPrefix = prefixDir)
+
