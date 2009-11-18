@@ -12,8 +12,9 @@
 <% elif confId: %>
 <% name = "Event" %>
 <% end %>
+
 <div class="container">
-<h1 class="Search">Search <%= name %></h1>
+<div class="Search"><span>Search <%= name %></span></div>
 
 <% if searchingPublicWarning: %>
 <div class="searchPublicWarning">
@@ -92,12 +93,13 @@
 <% includeTpl('SearchNavigationForm', target = "Events", direction="Prev") %>
 <% includeTpl('SearchNavigationForm', target = "Contributions", direction="Prev") %>
 
+
 <% if p != '': %>
 <h3>Hits: <%= numHits %></h3>
 <% end %>
 
 <div id="container">
-
+  
 <ul id="tabList">
 <% if len(eventResults) > 0: %>
 <li><a href="#events">Events</a></li>
@@ -122,7 +124,6 @@
 
 <% if len(contribResults) > 0: %>
 <div id="contribs">
-
   <% includeTpl('SearchNavigationBar', target = "Contributions", shortResult = contShortResult) %>
 
   <ul class="searchResultList" style="list-style-type: none;">
@@ -132,7 +133,7 @@
   </ul>
 <% includeTpl('SearchNavigationBar', target = "Contributions", shortResult = contShortResult) %>
 </div>
-<% end %>
+<% end %> 
 
 </div>
 
@@ -144,10 +145,12 @@
 <div style="float: right; vertical-align: middle;">
 Powered by
 <a href="http://cdsware.cern.ch/invenio/"><img src="<%= systemIcon('invenio') %>" alt="CDS Invenio" title="<%= _("IndicoSearch is powered by CDS Invenio")%>" style="vertical-align: middle; border: 0px;" /></a>
+
 </div>
 
 </div>
 </div>
+
 <script type="text/javascript">
 
 
