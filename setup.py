@@ -33,7 +33,7 @@ import sys
 from distutils.sysconfig import get_python_lib
 from distutils.cmd import Command
 
-from setuptools.command import develop, install, sdist
+from setuptools.command import develop, install, sdist, bdist_egg
 from setuptools import setup, find_packages, findall
 from subprocess import Popen, PIPE
 
@@ -43,7 +43,6 @@ if sys.platform == 'linux2':
 
 import tests
 
-    
 class vars(object):
     '''Variable holder.'''
     packageDir = None
@@ -134,6 +133,15 @@ def _versionInit():
         return v
 
 
+
+def _convertdoc():
+    '''Generates INSTALL from INSTALL.xml'''
+    commands.getoutput('docbook2html --nochunks doc/docbook_src/INSTALL.xml > INSTALL.html')
+    commands.getoutput('docbook2pdf doc/docbook_src/INSTALL.xml')
+    commands.getoutput('w3m INSTALL.html > INSTALL')
+    commands.getoutput('rm INSTALL.html')
+
+
 ###  Commands ###########################################################
 class sdist_indico(sdist.sdist):
     user_options = sdist.sdist.user_options + \
@@ -142,19 +150,15 @@ class sdist_indico(sdist.sdist):
 
     def run(self):
         global x
-
-        self._convertdoc()
+        _convertdoc()
         jsCompress()
         sdist.sdist.run(self)
 
-
-    def _convertdoc(self):
-        '''Generates INSTALL from INSTALL.xml'''
-        commands.getoutput('docbook2html --nochunks doc/docbook_src/INSTALL.xml > INSTALL.html')
-        commands.getoutput('docbook2pdf doc/docbook_src/INSTALL.xml')
-        commands.getoutput('w3m INSTALL.html > INSTALL')
-        commands.getoutput('rm INSTALL.html')
-
+class bdist_egg_indico(bdist_egg.bdist_egg):
+    def run(self):
+        _convertdoc()
+        jsCompress()
+        bdist_egg.bdist_egg.run(self)
 
 class install_indico(install.install):
     user_options = [('uid=', None, "uid of Apache user\n\n"),
@@ -299,16 +303,16 @@ if __name__ == '__main__':
             # broken indico_conf value inside MaKaCConfig from the installation dir.
             updateIndicoConfPathInsideMaKaCConfig('etc/indico.conf.sample', os.path.join('indico', 'MaKaC', 'common', 'MaKaCConfig.py'))
             from MaKaC.common.Configuration import Config
-    
-    
+
+
     x = vars()
     x.packageDir = os.path.join(get_python_lib(), 'MaKaC')
 
     # we need to calculate version at this point, before sdist_indico runs
-    if 'sdist' in sys.argv or 'bdist_egg' in sys.argv: 
+    if 'sdist' in sys.argv or 'bdist_egg' in sys.argv:
         x.versionVal = _versionInit()
-        
-        
+
+
     if 'bdist_egg' in sys.argv:
         x.binDir = 'bin'
         x.documentationDir = 'doc'
@@ -319,11 +323,12 @@ if __name__ == '__main__':
         x.binDir = cfg.getBinDir()
         x.documentationDir = cfg.getDocumentationDir()
         x.configurationDir = cfg.getConfigurationDir()
-        x.htdocsDir = cfg.getHtdocsDir()  
+        x.htdocsDir = cfg.getHtdocsDir()
 
 
     setup(name = "cds-indico",
           cmdclass={'sdist': sdist_indico,
+                    'bdist_egg': bdist_egg_indico,
                     'jsbuild': jsbuild,
                     'install': install_indico,
                     'tests': tests_indico,
@@ -331,13 +336,13 @@ if __name__ == '__main__':
                     },
 
           version = x.versionVal,
-          description = "Integrated Digital Conferences",
+          description = "Integrated Digital Conference",
           author = "AVC Section@CERN-IT",
           author_email = "indico-project@cern.ch",
           url = "http://cern.ch/indico",
           download_url = "http://cern.ch/indico/download-beta.html",
           platforms = ["any"],
-          long_description = "Integrated Digital Conferences",
+          long_description = "Integrated Digital Conference",
           license = "http://www.gnu.org/licenses/gpl-2.0.txt",
           package_dir = { '': 'indico' },
           entry_points = {

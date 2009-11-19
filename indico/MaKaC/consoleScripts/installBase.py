@@ -411,27 +411,36 @@ What do you want to do [c/a]? ''')
 def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_dir, force_no_db = False, uid=None, gid=None, suggestedPrefix=None):
     from MaKaC.common.Configuration import Config
 
-    newConf = os.path.join(targetDirs['etc'],'indico.conf')
-
     if suggestedPrefix:
         dbDir = os.path.join(suggestedPrefix,'db')
     else:
         dbDir = '/opt/indico/db'
 
+    # Create the directories where the resources will be installed
     createDirs(targetDirs)
-    indicoconfpath = os.path.join(sourceDirs['etc'], 'indico.conf')
-    updateIndicoConfPathInsideMaKaCConfig(indicoconfpath,
+
+    # target configuration file (may exist or not)
+    newConf = os.path.join(targetDirs['etc'],'indico.conf')
+    # source configuration file (package)
+    sourceConf = os.path.join(sourceDirs['etc'], 'indico.conf')
+
+    # if there is a source config
+    if os.path.exists(sourceConf):
+        if not os.path.exists(newConf):
+            # just copy if there is no config yet
+            shutil.copy(sourceConf, newConf)
+        else:
+            # upgrade the existing one
+            upgrade_indico_conf(sourceConf, newConf)
+
+    # change MaKaCConfig.py to include the config
+    updateIndicoConfPathInsideMaKaCConfig(newConf,
                                           os.path.join(makacconfig_base_dir, 'MaKaCConfig.py'))
 
+    # copy the db config files
     for f in [xx for xx in ('%s/zdctl.conf' % targetDirs['etc'],
                             '%s/zodb.conf' % targetDirs['etc']) if not os.path.exists(xx)]:
         shutil.copy('%s.sample' % f, f)
-
-    if os.path.exists(newConf):
-        if not os.path.exists(indicoconfpath):
-            shutil.copy(newConf, indicoconfpath)
-        else:
-            upgrade_indico_conf(indicoconfpath, newConf)
 
     # Shall we create a DB?
     dbInstalledBySetupPy = False
@@ -477,13 +486,18 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
     else:
         dpParam = None
 
+    # find the apache user/group
     user, group = _findApacheUserGroup(uid, gid)
 
+    # change indico.conf
     modifyOnDiskIndicoConfOption('%s/indico.conf' % targetDirs['etc'], 'ApacheUser', user)
     modifyOnDiskIndicoConfOption('%s/indico.conf' % targetDirs['etc'], 'ApacheGroup', group)
 
+    # change the db config files (paths + apache user/group)
     _updateDbConfigFiles(dbDir, targetDirs['log'], targetDirs['etc'], user)
+    # check permissions
     _checkDirPermissions(targetDirs, dbInstalledBySetupPy=dbParam, accessuser=user, accessgroup=group)
+    # check that mod_python is installed
     _checkModPythonIsInstalled()
 
     print """
