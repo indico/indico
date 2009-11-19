@@ -58,13 +58,14 @@ class vars(object):
     
 ###  Methods required by setup() ##############################################
 def _getDataFiles(x):
-    '''Returns a fully populated data_files ready to be fed to setup()
+    """
+    Returns a fully populated data_files ready to be fed to setup()
     
     WARNING: when creating a bdist_egg we need to include files inside bin, 
     doc, config & htdocs into the egg therefore we cannot fetch indico.conf 
     values directly because they will not refer to the proper place. We 
     include those files in the egg's root folder. 
-    '''
+    """
     dataFilesDict = {}
 
     # setup expects a list like this (('foo/bar/baz', 'wiki.py'),

@@ -21,7 +21,7 @@
 
 '''This file contains functions used by both 'python setup.py install' and after-easy_install
 based installations.
-''' 
+'''
 
 import commands
 import getopt
@@ -67,10 +67,12 @@ def createDirs(directories):
             os.makedirs(directories[d])
 
 def upgrade_indico_conf(existing_conf, new_conf, mixinValues={}):
-    '''Copies new_conf values to existing_conf file preserving existing_conf's values
-    
-    If mixinValues is given its items will be preserved above existing_conf's values and new_conf's values'''
-    
+    """
+    Copies new_conf values to existing_conf file preserving existing_conf's values
+
+    If mixinValues is given its items will be preserved above existing_conf's values and new_conf's values
+    """
+
     # We retrieve values from newest indico.conf
     execfile(new_conf)
     new_values = locals().copy()
@@ -80,15 +82,15 @@ def upgrade_indico_conf(existing_conf, new_conf, mixinValues={}):
 
     new_values.update(existing_values)
     new_values.update(mixinValues)
-    
+
     # We have to preserve options not currently present in the bundled indico.conf because they
     # may belong to a plugin. This functionality can lead to forget adding new options to
-    # Configuration.py so be careful my friend. 
-    
+    # Configuration.py so be careful my friend.
+
     # We remove vars defined here that aren't options
     for k in ('new_values', 'new_conf', 'existing_conf', 'mixinValues'):
         new_values.pop(k)
-        
+
     result_values = new_values
 
     # We update a current copy of indico.conf with the new values
@@ -106,21 +108,21 @@ def upgrade_indico_conf(existing_conf, new_conf, mixinValues={}):
                 new_contents = re.sub(regexp, "\\g<1>%s" % result_values[k], new_contents)
             else:
                 new_contents = "%s\n%s = %s" % (new_contents, k, str(result_values[k]))
-            
+
         elif new_values[k].__class__ == tuple:
             regexp = re.compile('^(%s[ ]*=[ ]*)[\(]{1}([^\)]+)[\)]{1}' % k, re.MULTILINE)
             if regexp.search(new_contents):
                 new_contents = re.sub(regexp, "\\g<1>%s" % str(result_values[k]), new_contents)
             else:
                 new_contents = "%s\n%s = %s" % (new_contents, k, str(result_values[k]))
-            
+
         elif new_values[k].__class__ == dict:
             regexp = re.compile('^(%s[ ]*=[ ]*)[\{]{1}([^\}]+)[\}]{1}' % k, re.MULTILINE)
             if regexp.search(new_contents):
                 new_contents = re.sub(regexp, "\\g<1>%s" % str(result_values[k]), new_contents)
             else:
                 new_contents = "%s\n%s = %s" % (new_contents, k, str(result_values[k]))
-            
+
         elif new_values[k].__class__ == list:
             regexp = re.compile('^(%s[ ]*=[ ]*)[\[]{1}([^\]]+)[\]]{1}' % k, re.MULTILINE)
             if regexp.search(new_contents):
@@ -129,14 +131,14 @@ def upgrade_indico_conf(existing_conf, new_conf, mixinValues={}):
                 new_contents = "%s\n%s = %s" % (new_contents, k, str(result_values[k]))
         else:
             raise 'Invalid config value "%s = %s"' % (k, new_values[k])
-    
-    # We write unknown options to the end of the file, they may not be just outdated options but plugins' 
+
+    # We write unknown options to the end of the file, they may not be just outdated options but plugins'
     open(existing_conf, 'w').write(new_contents)
 
 
 def modifyOnDiskIndicoConfOption(indico_conf, optionName, optionValue):
     upgrade_indico_conf(indico_conf, indico_conf, {optionName: optionValue})
-        
+
 
 def updateIndicoConfPathInsideMaKaCConfig(indico_conf_path, makacconfigpy_path):
     '''Modifies the location of indico.conf referenced inside makacconfigpy_path to
@@ -153,7 +155,7 @@ def compileAllLanguages():
     os.system('%s compile-all-lang.py --quiet' % sys.executable)
     os.chdir(pwd)
 
-        
+
 def copytreeSilently(source, target):
     '''Copies source tree to target tree overwriting existing files'''
     source = os.path.normpath(source)
@@ -220,28 +222,16 @@ def _guessApacheUidGid():
 
     return finalUser, finalGroup
 
-
-def _checkDirPermissions(directories, dbInstalledBySetupPy=False, uid=None, gid=None):
-    '''Makes sure that directories which need write access from Apache have
-    the correct permissions
-    
-    - dbInstalledBySetupPy if True, means that the dbdir has been created by the setup
-        process and needs to be checked.
-    
-    - uid and gid: if they are valid user_ids and group_ids they will be used to chown
-        the directories instead of the indico.conf ones. 
-    '''
-    # if we are on linux we need to give proper permissions to the results directory
+def _findApacheUserGroup(uid, gid):
+        # if we are on linux we need to give proper permissions to the results directory
     if sys.platform == "linux2":
         prompt = True
 
         # Check to see if uid/gid were provided through commandline
         if uid and gid:
             try:
-                pwd.getpwuid(int(uid))
-                grp.getgrgid(int(gid))
-                accessuser = int(uid)
-                accessgroup = int(gid)
+                accessuser = pwd.getpwuid(int(uid)).pw_name
+                accessgroup = grp.getgrgid(int(gid)).gr_name
                 prompt = False
             except KeyError:
                 print 'uid/gid pair (%s/%s) provided through command line is false' % (uid, gid)
@@ -251,8 +241,8 @@ def _checkDirPermissions(directories, dbInstalledBySetupPy=False, uid=None, gid=
             if uid and gid:
                 print "found %s(%s) %s(%s)" % (uid.pw_name, uid.pw_uid,
                                          gid.gr_name, gid.gr_gid)
-                accessuser = uid.pw_uid
-                accessgroup = gid.gr_gid
+                accessuser = uid.pw_name
+                accessgroup = gid.gr_name
                 prompt = False
 
         if prompt == True:
@@ -266,17 +256,26 @@ def _checkDirPermissions(directories, dbInstalledBySetupPy=False, uid=None, gid=
                     valid_credentials = True
                 except KeyError:
                     print "\nERROR: Invalid user/group pair (%s/%s)" % (accessuser, accessgroup)
-                
-                modifyOnDiskIndicoConfOption('%s/indico.conf' % directories['etc'], 'ApacheUser', accessuser)
-                modifyOnDiskIndicoConfOption('%s/indico.conf' % directories['etc'], 'ApacheGroup', accessgroup)
 
-        dirs2check = list(directories[x] for x in ['htdocs', 'log', 'tmp', 'cache'])
-        if dbInstalledBySetupPy:
-            dirs2check.append(dbInstalledBySetupPy)
+        return accessuser, accessgroup
 
-        for dir in dirs2check:
-            print commands.getoutput("chown -R %s:%s %s" % (accessuser, accessgroup, dir))        
-        
+
+def _checkDirPermissions(directories, dbInstalledBySetupPy=False, accessuser=None, accessgroup=None):
+    '''Makes sure that directories which need write access from Apache have
+    the correct permissions
+
+    - dbInstalledBySetupPy if True, means that the dbdir has been created by the setup
+        process and needs to be checked.
+
+    - uid and gid: if they are valid user_ids and group_ids they will be used to chown
+        the directories instead of the indico.conf ones.
+    '''
+    dirs2check = list(directories[x] for x in ['htdocs', 'log', 'tmp', 'cache'])
+    if dbInstalledBySetupPy:
+        dirs2check.append(dbInstalledBySetupPy)
+
+    for dir in dirs2check:
+        print commands.getoutput("chown -R %s:%s %s" % (accessuser, accessgroup, dir))
 
 def _existingDb():
     return os.path.exists(LOCALDATABASEDIR)
@@ -311,6 +310,21 @@ def _replacePrefixInConf(filePath, prefix):
     fdata = open(filePath).read()
     fdata = re.sub('\/opt\/indico', prefix, fdata)
     open(filePath, 'w').write(fdata)
+
+def _updateDbConfigFiles(dbDir, logDir, cfgDir, uid):
+    filePath = os.path.join(cfgDir, 'zodb.conf')
+    fdata = open(filePath).read()
+    fdata = re.sub('\/opt\/indico\/db', dbDir, fdata)
+    fdata = re.sub('\/opt\/indico\/log', logDir, fdata)
+    open(filePath, 'w').write(fdata)
+
+    filePath = os.path.join(cfgDir, 'zdctl.conf')
+    fdata = open(filePath).read()
+    fdata = re.sub('\/opt\/indico\/db', dbDir, fdata)
+    fdata = re.sub('\/opt\/indico\/etc', cfgDir, fdata)
+    fdata = re.sub('(\s+user\s+)apache', '\g<1>%s' % uid, fdata)
+    open(filePath, 'w').write(fdata)
+
 
 def indico_pre_install(defaultPrefix, force_upgrade=False, sourceConfig=PWD_INDICO_CONF):
     '''defaultPrefix is the default prefix dir where Indico will be installed '''
@@ -430,7 +444,7 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
             opt = None
             while opt not in ('Y', 'y', 'n', ''):
                 opt = raw_input('''\nWe cannot find the configured database at %s.
-    
+
     Do you want to create a new database now [Y/n]? ''' % dbDir)
                 if opt in ('Y', 'y', ''):
                     dbInstalledBySetupPy = True
@@ -439,13 +453,14 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
                         dbpath = raw_input('''\nWhere do you want to install the database [%s]? ''' % dbDir)
                         if dbpath.strip() == '':
                             dbpath = dbDir
-    
+
                         try:
                             os.makedirs(dbpath)
                             dbpath_ok = True
-                        except Exception:
+                        except Exception, e:
+                            print e
                             print 'Unable to create database at %s, please make sure that you have permissions to create that directory' % dbpath
-    
+
                 elif opt == 'n':
                     pass
 
@@ -462,8 +477,13 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
     else:
         dpParam = None
 
-    _checkDirPermissions(targetDirs, dbInstalledBySetupPy=dbParam, uid=uid, gid=gid)
+    user, group = _findApacheUserGroup(uid, gid)
 
+    modifyOnDiskIndicoConfOption('%s/indico.conf' % targetDirs['etc'], 'ApacheUser', user)
+    modifyOnDiskIndicoConfOption('%s/indico.conf' % targetDirs['etc'], 'ApacheGroup', group)
+
+    _updateDbConfigFiles(dbDir, targetDirs['log'], targetDirs['etc'], user)
+    _checkDirPermissions(targetDirs, dbInstalledBySetupPy=dbParam, accessuser=user, accessgroup=group)
     _checkModPythonIsInstalled()
 
     print """
@@ -506,7 +526,7 @@ Alias /indico "%s"
 
 If you are running ZODB on this host:
 - Review %s/zodb.conf and %s/zdctl.conf to make sure everything is ok.
-- To start the database run: zdctl.py -C %s/zdctl.conf start
+- To start the database run: zdaemon -C %s/zdctl.conf start
 """ % (targetDirs['etc'], targetDirs['bin'], targetDirs['doc'], targetDirs['etc'], targetDirs['htdocs'], targetDirs['htdocs'], package_dir, targetDirs['htdocs'], targetDirs['htdocs'], targetDirs['htdocs'], targetDirs['etc'],targetDirs['etc'], targetDirs['etc'])
 
 
