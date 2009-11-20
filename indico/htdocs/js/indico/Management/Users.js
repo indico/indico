@@ -735,5 +735,5 @@ type("AddToFavoritesButton", ["RemoteSwitchButton"],
              imageAdd,
              'user.favorites.removeUser',
              'user.favorites.addUsers',
-             { 'id': id });
+             {value: [{ 'id': id }]});
      });
