@@ -30,6 +30,7 @@ import re
 import shutil
 import string
 import sys
+import pkg_resources
 
 if sys.platform == 'linux2':
     import pwd
@@ -277,34 +278,41 @@ def _checkDirPermissions(directories, dbInstalledBySetupPy=False, accessuser=Non
     for dir in dirs2check:
         print commands.getoutput("chown -R %s:%s %s" % (accessuser, accessgroup, dir))
 
-def _existingDb():
-    return os.path.exists(LOCALDATABASEDIR)
 
+def _existingConfiguredEgg():
+    '''Returns true if an existing EGG has been detected.'''
+    env = pkg_resources.Environment()
+    env.scan()
 
-def _existingIndicoConfPath():
-    from MaKaC.common.Configuration import Config
-    cfg = Config.getInstance()
-    return os.path.join(cfg.getConfigurationDir(), 'indico.conf')
+    # search for all indico dists
+    indico_dists = env['cds-indico']
 
+    for dist in indico_dists:
+        eggPath = dist.location
 
-def _existingInstallation():
-    '''Returns true if an existing installation has been detected.
+        print "* EGG found at %s..." % eggPath,
+        fdata = open(os.path.join(eggPath,'MaKaC','common','MaKaCConfig.py'), 'r').read()
 
-       We consider that an existing installation exists if there is an
-       "indico.conf" file inside the directory pointed by the
-       ConfigurationDir var of the "indico.conf from this directory.'''
-    return os.path.exists(_existingIndicoConfPath())
+        m = re.search('^\s*indico_conf\s*=\s*[\'"]{1}([^\'"]*)[\'"]{1}', fdata, re.MULTILINE)
+        if m and m.group(1) != '':
+            print '%s' % m.group(1)
+            return m.group(1)
+        else:
+            print 'unconfigured'
+    return None
 
+def _extractDirsFromConf(conf):
+    execfile(conf)
+    values = locals().copy()
 
-def _activateIndicoConfFromExistingInstallation():
-    '''Updates the MaKaCConfig file inside the directory from which we
-    are installing and forces Configuration to reload its values
-    '''
-    from MaKaC.common.Configuration import Config
-    updateIndicoConfPathInsideMaKaCConfig(_existingIndicoConfPath(),
-        os.path.join(os.path.dirname(os.path.abspath(MaKaC.__file__)), 'common', 'MaKaCConfig.py'))
-
-    Config.getInstance().forceReload()
+    return {'bin': values['BinDir'],
+            'doc': values['DocumentationDir'],
+            'etc': values['ConfigurationDir'],
+            'htdocs': values['HtdocsDir'],
+            'tmp': values['UploadedFilesTempDir'],
+            'log': values['LogDir'],
+            'cache': values['XMLCacheDir'],
+            'db': LOCALDATABASEDIR}
 
 def _replacePrefixInConf(filePath, prefix):
     fdata = open(filePath).read()
@@ -331,16 +339,19 @@ def indico_pre_install(defaultPrefix, force_upgrade=False, sourceConfig=PWD_INDI
     defaultPrefix is the default prefix dir where Indico will be installed
     """
 
-    # if there is an installation, ignore the default prefix
-    if _existingInstallation():
+    existing = _existingConfiguredEgg()
+
+    upgrade = False
+
+    if existing:
         if force_upgrade:
-            print 'Upgrading existing Indico installation..'
+            upgrade = True
         else:
             opt = None
 
             while opt not in ('', 'e', 'E', 'u'):
                 opt = raw_input('''
-An existing Indico installation has been detected at:
+An existing Indico configuration has been detected at:
 
     %s
 
@@ -350,24 +361,32 @@ At this point you can:
 
     [E]xit this installation process
 
-What do you want to do [u/E]? ''' % _existingIndicoConfPath())
+What do you want to do [u/E]? ''' % existing)
             if opt in ('', 'e', 'E'):
                 print "\nExiting installation..\n"
                 sys.exit()
             elif opt == 'u':
-                print "Upgrading... ",
-                _activateIndicoConfFromExistingInstallation()
-                print "done!"
-                sys.exit()
+                upgrade = True
             else:
                 print "\nInvalid answer. Exiting installation..\n"
                 sys.exit()
 
-    # then, in case no previous installation exists
 
+    if upgrade:
+        print 'Upgrading the existing Indico installation..'
+        return _extractDirsFromConf(existing)
+    else:
+        # then, in case no previous installation exists
+        return fresh_install(defaultPrefix)
+
+
+def fresh_install(defaultPrefix):
+
+    # start from scratch
     print "No previous installation of Indico was found."
     print "Please specify a directory prefix:"
 
+    # ask for a directory prefix
     prefixDir = raw_input('[%s]: ' % defaultPrefix).strip()
 
     if prefixDir == '':
@@ -375,15 +394,19 @@ What do you want to do [u/E]? ''' % _existingIndicoConfPath())
 
     configDir = os.path.join(prefixDir, 'etc')
 
+    # create the directory that will contain the configuration files
     if not os.path.exists(configDir):
             os.makedirs(configDir)
 
+    # compile po -> mo
     compileAllLanguages()
+
     indicoconfpath = os.path.join(configDir, 'indico.conf')
 
-    if not os.path.exists(indicoconfpath):
-        if not os.path.exists(sourceConfig):
-            opt = raw_input('''
+    # this will (hopefully) always be true
+    assert(not os.path.exists(indicoconfpath))
+
+    opt = raw_input('''
 You now need to configure Indico, by editing indico.conf or letting us do it for you.
 At this point you can:
 
@@ -394,29 +417,29 @@ At this point you can:
     and / or to make your own etc/indico.conf
 
 What do you want to do [c/a]? ''')
-            if opt in ('c', 'C'):
-                shutil.copy(sourceConfig + '.sample', indicoconfpath)
-                _replacePrefixInConf(indicoconfpath, prefixDir)
-            elif opt in ('', 'a', 'A'):
-                print "\nExiting installation..\n"
-                sys.exit()
-            else:
-                print "\nInvalid anwer. Exiting installation..\n"
-                sys.exit()
+    if opt in ('c', 'C'):
+        shutil.copy(sourceConfig + '.sample', indicoconfpath)
+        _replacePrefixInConf(indicoconfpath, prefixDir)
+    elif opt in ('', 'a', 'A'):
+        print "\nExiting installation..\n"
+        sys.exit()
+    else:
+        print "\nInvalid anwer. Exiting installation..\n"
+        sys.exit()
 
     activemakacconfig = os.path.join(os.path.dirname(os.path.abspath(MaKaC.__file__)), 'common', 'MaKaCConfig.py')
     updateIndicoConfPathInsideMaKaCConfig(indicoconfpath, activemakacconfig)
 
-    return prefixDir
+    return dict((dirName, os.path.join(prefixDir, dirName))
+                for dirName in ['bin','doc','etc','htdocs','tmp','log','cache'])
 
 
-def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_dir, force_no_db = False, uid=None, gid=None, suggestedPrefix=None):
+def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_dir, force_no_db = False, uid=None, gid=None, dbDir='/opt/indico'):
     from MaKaC.common.Configuration import Config
 
-    if suggestedPrefix:
-        dbDir = os.path.join(suggestedPrefix,'db')
-    else:
-        dbDir = '/opt/indico/db'
+    # we don't want that the db directory be created
+    dbDir = targetDirs['db']
+    del targetDirs['db']
 
     # Create the directories where the resources will be installed
     createDirs(targetDirs)
@@ -449,7 +472,7 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
     if force_no_db:
         print 'Skipping database detection'
     else:
-        if _existingDb():
+        if os.path.exists(dbDir):
             print 'Successfully found a database directory at %s' % dbDir
         else:
             opt = None
@@ -486,7 +509,7 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
     if dbInstalledBySetupPy:
         dbParam = dbpath
     else:
-        dpParam = None
+        dbParam = None
 
     # find the apache user/group
     user, group = _findApacheUserGroup(uid, gid)

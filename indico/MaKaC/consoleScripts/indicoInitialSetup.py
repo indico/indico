@@ -47,8 +47,8 @@ def copy_egg_datafiles_to_base(dstDir):
     cfgDir = os.path.join(eggDir, 'etc')
     htdocsDir = os.path.join(eggDir, 'htdocs')
 
-    for (d, src) in (('bin', binDir), ('doc', docDir), ('etc', cfgDir), ('htdocs', htdocsDir)):
-        dst = os.path.join(dstDir, d)
+    for (dst, src) in ((dstDir['bin'], binDir), (dstDir['doc'], docDir), (dstDir['etc'], cfgDir), (dstDir['htdocs'], htdocsDir)):
+        print "%s -> %s" % (src, dst)
         copytreeSilently(src, dst)
 
 
@@ -60,18 +60,16 @@ def main():
     setIndicoInstallMode(True)
     PWD_INDICO_CONF = os.path.join(os.path.dirname(__file__), '..', '..', 'etc', 'indico.conf.sample')
 
-    prefixDir = indico_pre_install('/opt/indico', False, sourceConfig=os.path.join(eggDir,'etc','indico.conf'))
+    targetDirs = indico_pre_install('/opt/indico', False, sourceConfig=os.path.join(eggDir,'etc','indico.conf'))
 
     # we need to copy htdocs/ bin/ doc/ etc/ to its proper place
-    print "Copying Indico tree to %s... " % prefixDir,
-    copy_egg_datafiles_to_base(prefixDir)
+    print "Copying Indico tree... ",
+    copy_egg_datafiles_to_base(targetDirs)
     print "done!"
 
     #    if not os.path.exists('/opt/indico/etc/indico.conf'):
     #        shutil.copy('/opt/indico/etc/indico.conf.sample', '/opt/indico/etc/indico.conf')
 
-    targetDirs = dict((dirName, os.path.join(prefixDir, dirName))
-                      for dirName in ['bin','doc','etc','htdocs','tmp','log','cache'])
 
     sourceDirs = dict((dirName, os.path.join(eggDir, dirName))
                       for dirName in ['bin','doc','etc','htdocs'])
@@ -83,6 +81,5 @@ def main():
                                      '..',
                                      'common'),
                         get_python_lib(),
-                        force_no_db=False,
-                        suggestedPrefix = prefixDir)
+                        force_no_db=False)
 
