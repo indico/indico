@@ -327,7 +327,9 @@ def _updateDbConfigFiles(dbDir, logDir, cfgDir, uid):
 
 
 def indico_pre_install(defaultPrefix, force_upgrade=False, sourceConfig=PWD_INDICO_CONF):
-    '''defaultPrefix is the default prefix dir where Indico will be installed '''
+    """
+    defaultPrefix is the default prefix dir where Indico will be installed
+    """
 
     # if there is an installation, ignore the default prefix
     if _existingInstallation():
@@ -537,10 +539,11 @@ Alias /indico "%s"
 
 (change the paths after 'Alias' in order to change the URL bindings)
 
+%s
+""" % (targetDirs['etc'], targetDirs['bin'], targetDirs['doc'], targetDirs['etc'], targetDirs['htdocs'], targetDirs['htdocs'], package_dir, targetDirs['htdocs'], targetDirs['htdocs'], targetDirs['htdocs'], _databaseText(cfg.getConfigurationDir()))
 
-If you are running ZODB on this host:
-- Review %s/zodb.conf and %s/zdctl.conf to make sure everything is ok.
-- To start the database run: zdaemon -C %s/zdctl.conf start
-""" % (targetDirs['etc'], targetDirs['bin'], targetDirs['doc'], targetDirs['etc'], targetDirs['htdocs'], targetDirs['htdocs'], package_dir, targetDirs['htdocs'], targetDirs['htdocs'], targetDirs['htdocs'], targetDirs['etc'],targetDirs['etc'], targetDirs['etc'])
-
-
+def _databaseText(cfgPrefix):
+    return """If you are running ZODB on this host:
+ - Review %s/zodb.conf and %s/zdctl.conf to make sure everything is ok.
+ - To start the database run: zdaemon -C %s/zdctl.conf start
+""" % (cfgPrefix, cfgPrefix, cfgPrefix)
