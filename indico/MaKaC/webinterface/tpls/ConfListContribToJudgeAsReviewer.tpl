@@ -24,12 +24,12 @@
             <td style="padding-right:5px;padding-left:5px;"><a href="<%= urlHandlers.UHContributionGiveAdvice.getURL(c) %>"><%= c.getTitle() %></a></td>
             <td style="padding-right:5px;padding-left:5px;">
                 <% if c.getReviewManager().getLastReview().hasGivenAdvice(User): %>
-                    <span style="color:green;"><%= _("Advice given")%></span>
+                    <span><%= _("Advice given")%></span>
                 <% end %>
                 <% else: %>
-                    <span style="color:red;"><%= _("Advice not given yet")%></span>
+                    <span><%= _("Advice not given yet")%></span>
                     <% if c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted(): %>
-                    <span style="color:green;"><br><%= _("but Referee already judged contribution")%></span>
+                    <span><br><%= _("but Referee already judged contribution")%></span>
                     <% end %>
                 <% end %>
             </td>
@@ -39,14 +39,7 @@
                 <%= _("Deadline not set.")%>
             <% end %>
             <% else: %>
-                <% if date < nowutc() and not c.getReviewManager().getLastReview().hasGivenAdvice(User): %>
-                <span style="color:red;">
-                <% end %>
-                <% else: %>
-                <span style="color:green;">
-                <% end %>
-                <%= date.strftime(dueDateFormat) %>
-                </span>
+                <span><%= date.strftime(dueDateFormat) %></span>
             <% end %>
             </td>                    
         </tr>

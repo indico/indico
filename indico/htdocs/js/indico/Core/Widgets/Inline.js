@@ -29,6 +29,26 @@ type("InlineRemoteWidget", ["InlineWidget"],
 
          draw: function() {
              var self = this;
+             var t;
+             t = setTimeout("$E(\""+"message" + "\").set(\'\u00A0\')",2000);
+             var canvas = Html.span({}, 'loading...');
+             canvas.set(self.drawContent());
+             var message = Html.span({style: {marginLeft:'10px'}},'\u00A0');
+             message.dom.id = "message";
+             if (t){ clearTimeout(t);}
+             var table = Html.table();
+             table.dom.style.display = 'inline';
+             var tbody = Html.tbody();
+             table.set(tbody);
+             var row1 = Html.tr();
+             var cell2 = Html.td();
+                    cell2.append(canvas);
+                    row1.append(cell2);
+             cellMessage = Html.td();
+             cellMessage.dom.style.verticalAlign = "middle";
+             cellMessage.dom.rowSpan = 2;
+             cellMessage.append(message);
+             row1.append(cellMessage);
 
              var content = this._handleContent();
 
@@ -53,7 +73,9 @@ type("InlineRemoteWidget", ["InlineWidget"],
                      wcanvas.set(self._handleLoading());
                  }
              });
+            
 
+             
              return wcanvas;
          }
 

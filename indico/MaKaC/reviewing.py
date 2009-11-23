@@ -989,7 +989,7 @@ class ConferenceReview(Persistent):
             return []
 
     # templates methods
-    def setTemplate(self, name, description, format, fd):
+    def setTemplate(self, name, description, format, fd, id):
         """ Stores a template.
             There can be 1 template for any format.
         """
@@ -1005,9 +1005,9 @@ class ConferenceReview(Persistent):
             extension = Template.formats[format]
         else:
             extension = ".template"
-
-        id = self.getNewTemplateId()
-
+        
+        #id = self.getNewTemplateId()
+            
         fileName = "Contribution_template_" + id + "_c" + self._conference.id + extension
 
         file = conference.LocalFile()
@@ -1203,6 +1203,7 @@ class Template(Persistent):
 
     def getFile(self):
         return self.__file
+    
 
     def getLocator( self ):
         """Gives back (Locator) a globaly unique identification encapsulated

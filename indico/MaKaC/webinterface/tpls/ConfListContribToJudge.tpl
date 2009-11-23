@@ -23,10 +23,10 @@
             <td style="padding-right:5px;padding-left:5px;"><a href="<%= urlHandlers.UHContributionModifReviewing.getURL(c) %>"><%= c.getTitle() %></a></td>
             <td style="padding-right:5px;padding-left:5px;">
             <% if c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted(): %>
-                <span style="color:green;"><%= _("Judged:")%> <%= c.getReviewManager().getLastReview().getRefereeJudgement().getJudgement() %></span>
+                <span><%= _("Judged:")%></span> <%= c.getReviewManager().getLastReview().getRefereeJudgement().getJudgement() %>
             <% end %>
             <% else: %>
-                <span style="color:red;"><%= _("Not judged yet")%></span><br>
+                <span><%= _("Not judged yet")%></span><br>
                 <%= "<br>".join(c.getReviewManager().getLastReview().getReviewingStatus()) %>
             <% end %>
             </td>    
@@ -36,14 +36,7 @@
                     <%= _("Deadline not set.")%>
                 <% end %>
                 <% else: %>
-                <% if date < nowutc() and not c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted(): %>
-                    <span style="color:red;">
-                    <% end %>
-                    <% else: %>
-                    <span style="color:green;">
-                    <% end %>
-                    <%= date.strftime(dueDateFormat) %>
-                    </span>
+                    <span><%= date.strftime(dueDateFormat) %></span>
                 <% end %>
             </td>                    
         </tr>

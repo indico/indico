@@ -30,10 +30,10 @@
                                 },
                                 function(result,error) {
                                     if (!error) {
-                        setResult(true);
+                                        setResult(true);
                                     } else {
                                         IndicoUtil.errorReport(error);
-                                setResult(false);
+                                        setResult(false);
                     }
                                 }
                             );
@@ -47,10 +47,10 @@
                                 },
                                 function(result,error) {
                                     if (!error) {
-                        setResult(true);
+                                         setResult(true);
                                     } else {
                                         IndicoUtil.errorReport(error);
-                    setResult(false);
+                                        setResult(false);
                                     }
                                 }
                             );
@@ -77,10 +77,10 @@
                                 },
                                 function(result,error) {
                                     if (!error) {
-                        setResult(true);
+                                        setResult(true);
                                     } else {
                                         IndicoUtil.errorReport(error);
-                                setResult(false);
+                                        setResult(false);
                     }
                                 }
                             );
@@ -94,10 +94,10 @@
                                 },
                                 function(result,error) {
                                     if (!error) {
-                        setResult(true);
+                                        setResult(true);
                                     } else {
                                         IndicoUtil.errorReport(error);
-                    setResult(false);
+                                        setResult(false);
                                     }
                                 }
                             );

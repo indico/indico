@@ -192,8 +192,16 @@ class ConferenceReviewingCriteriaModification(ConferenceReviewingListModificatio
 
     def _handleSet(self):
         self._confReview.setLayoutCriteria(self._value)
-
-
+        
+        
+class ConferenceReviewingDeleteTemplate(ConferenceReviewingBase):  
+    
+    def _getAnswer(self):
+            templateId = self._params.get("templateId")
+            self._confReview.deleteTemplate(templateId)
+            return True    
+       
+        
 class ConferenceReviewingDefaultDueDateModification(ConferenceReviewingDateTimeModificationBase):
 
     def _checkParams(self):
@@ -810,6 +818,7 @@ methodMap = {
     "conference.changeStates": ConferenceReviewingStatesModification,
     "conference.changeQuestions": ConferenceReviewingQuestionsModification,
     "conference.changeCriteria": ConferenceReviewingCriteriaModification,
+    "conference.deleteTemplate" : ConferenceReviewingDeleteTemplate,
     "conference.changeCompetences": ConferenceReviewingCompetenceModification,
     "conference.changeDefaultDueDate" : ConferenceReviewingDefaultDueDateModification,
     "conference.changeAbstractReviewerDefaultDueDate" : ConferenceAbstractReviewingDefaultDueDateModification,

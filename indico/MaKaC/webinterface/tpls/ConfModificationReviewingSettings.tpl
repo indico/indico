@@ -3,6 +3,8 @@
 <% from MaKaC.reviewing import ConferenceReview %>
 <% from MaKaC.reviewing import Template %>
 <% from MaKaC.common.utils import formatDateTime %>
+<% import MaKaC.webinterface.urlHandlers as urlHandlers %>
+<% import MaKaC.common.Configuration as Configuration %>
 <table width="90%%" border="0" style="margin-bottom:1em">
     <tr>
         <td nowrap id="reviewingModeHelp" class="groupTitle"><%= _("Step 1: Choose type of paper reviewing for the conference")%>
@@ -441,7 +443,7 @@
     <tr>
         <td id="uploadTemplateHelp" colspan="5" class="reviewingsubtitle"><%= _("Upload a template")%></td>
     </tr>
-    <tr>
+   <!--  <tr>
         <td>
             <table>
             	<tr>
@@ -483,10 +485,75 @@
         <td>
             <input type="submit" class="btn" value="<%= _("Upload")%>">
         </td>
+    </tr> --> 
+    <tr><a name="UploadTemplate" />
+        <td style="padding-left: 15px;" ><input id='uploadTpl' type="button" value="<%= _('Upload Template')%>"></a>                        
+        </td>
     </tr>
     <tr><td>
-        <% includeTpl ('ContributionReviewingTemplatesList', ConfReview = ConfReview, CanDelete = CanDelete)%>
-    </tr></td>    
+        <% if ConfReview.hasTemplates(): %>
+         <% display = 'table' %>
+       <% end %>
+       <% else: %>
+         <% display = 'none' %>
+       <% end %>
+    <table id="templateListTable" width="90%%" align="center" border="0" style="display:<%=display%>">
+    <!-- here to put table for the uploaded templates info :) -->
+        <tr>
+            <td nowrap width="50%%" class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #DDDDDD;">
+                <%= _("Name")%>
+            </td>
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #DDDDDD;">
+                <%= _("Format")%>
+            </td>
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #DDDDDD;">
+                <%= _("Description")%>
+            </td>
+        </tr>
+        <!-- <% keys = ConfReview.getTemplates().keys() %>
+       <% keys.sort() %> 
+        <% for k in keys: %>
+            <% t = ConfReview.getTemplates()[k] %>
+        <tr id="TemplateRow_<%= k %>">
+            <td id="TemplateName_<%= k %>" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
+                <a style="color:#5FA5D4" href="<%= urlHandlers.UHDownloadContributionTemplate.getURL(t) %>">
+                    <%= t.getName() %>
+                </a>
+                <% if CanDelete: %>
+                &nbsp;&nbsp;&nbsp;
+                <a href="<%= urlHandlers.UHDeleteContributionTemplate.getURL(t) %>"> 
+                <a href="#" onclick="deleteTemplate('<%=t.getId()%>', '<%= t.getName() %>',  '<%= k %>')"> 
+                    <img class="imglink" style="vertical-align: bottom; width: 15px; height: 15px;" src="<%= Configuration.Config.getInstance().getSystemIconURL("remove") %>" alt="delete template">
+                </a>
+                <% end %>
+            </td>
+            <td id="TemplateFormat_<%= k %>" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
+                <%= t.getFormat() %>
+            </td>
+            <td id="TemplateDescription_<%= k %>" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
+                <%= t.getDescription() %>
+            </td>
+        </tr>
+        <% end %> -->
+        </table>
+        
+    
+        <% if ConfReview.hasTemplates(): %>
+         <% display = 'none' %>
+       <% end %>
+       <% else: %>
+         <% display = 'table' %>
+       <% end %>
+        <table id="NoTemplateTable" width="90%%" align="center" border="0" style="display:<%=display%>">
+        <tr><td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
+            <%= _("No templates have been uploaded yet.")%>
+        </td></tr>
+        </table>
+    </tr></td>
+    <tr><td style="padding-bottom:15px;"></td></tr>
+        <tr><td colspan="5" style="padding-top: 20px;">
+            <em><%= _("To assign team for Paper Review Module, please click on 'Team' and follow the steps")%></em>
+        </td></tr>    
 </table>
 </form>
 
@@ -692,85 +759,155 @@ var showDefaultReviewerDate = function() {
                        null, true);
 }
 
+/*var deleteTemplate = function(tempId, tempName, rowId) {
+                    var row = $E('TemplateRow_'+rowId);
+                    var params = {conference: '<%= ConfReview.getConference().getId() %>',templateId: tempId} 
+                    if (confirm("Are you sure you want to delete '"+ tempName+"'?")) {
+                        var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
+                        jsonRpc(Indico.Urls.JsonRpcService,
+                            'reviewing.conference.deleteTemplate',
+                            params,
+                            function(response,error) {
+                                    if (exists(error)) {
+                                        killProgress();
+                                        IndicoUtil.errorReport(error);
+                                    } else {
+                                        $E('templateListTable').remove(row);
+                                        killProgress();
+                                    }
+                                }
+                    );
+                    }
+                };*/
+
+var TemplateList = function(){
+            <% keys = ConfReview.getTemplates().keys() %>
+            <% for k in keys: %>
+                <% t = ConfReview.getTemplates()[k] %>
+                    var row = Html.tr({id:'TemplateRow_'+'<%=t.getId()%>'});
+                var menu;
+                    menu = Html.span(
+                        {},
+                        Widget.link(command( function(){
+                            var params = {conference: <%= ConfReview.getConference().getId() %>,templateId: '<%=t.getId()%>'}
+		                    if (confirm("Are you sure you want to delete '"+ '<%=t.getName()%>'+"'?")) {
+		                        var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
+		                        jsonRpc(Indico.Urls.JsonRpcService,
+		                            'reviewing.conference.deleteTemplate',
+		                            params,
+		                            function(response,error) {
+		                                    if (exists(error)) {
+		                                        killProgress();
+		                                        IndicoUtil.errorReport(error);
+		                                    } else {
+		                                        killProgress();
+		                                        $E('templateListTable').remove($E('TemplateRow_'+'<%=t.getId()%>'));
+		                                        tablerows = document.getElementById('templateListTable').rows.length;
+				                                if(tablerows == '1'){
+				                                    $E('NoTemplateTable').dom.style.display = '';
+				                                    $E('templateListTable').dom.style.display = 'none';}
+		                                    }
+		                                }
+		                    );}
+                           },
+                            IndicoUI.Buttons.removeButton()
+                        )));
+                    var linkName = Html.a({href: "<%= urlHandlers.UHDownloadContributionTemplate.getURL() %>" + "?reviewingTemplateId=" + '<%= t.getId()%>' + "&confId=<%= ConfReview.getConference().getId()%>", style:{color:'#5FA5D4'}}, '<%= t.getName()%>');
+                    var cellName = Html.td({id:'TemplateName_'+'<%= t.getId()%>', style:{borderRight: '5px solid #FFFFFF', borderLeft:'5px solid #FFFFFF'}}, linkName);
+                    cellName.append(linkName);
+                    <% if CanDelete: %>
+                        cellName.append(menu);
+                    <% end %>
+                    var cellFormat = Html.td({id:'TemplateName_'+'<%= t.getId()%>', style:{borderRight: '5px solid #FFFFFF', borderLeft:'5px solid #FFFFFF'}}, '<%= t.getFormat()%>');
+                    var cellDescription = Html.td({id:'TemplateName_'+'<%= t.getId()%>', style:{borderRight: '5px solid #FFFFFF', borderLeft:'5px solid #FFFFFF'}}, '<%= t.getDescription()%>');
+                    row.append(cellName);
+                    row.append(cellFormat);
+                    row.append(cellDescription);        
+                    $E('templateListTable').append(row); 
+             <% end %>
+            
+          }  
+  
+
 $E('refereeNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailNotif', 
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Referee'}, 
-                                            'Add/Remove Referee Notification',
+                                            'When a Referee is added or removed from the team',
                                             true
 )); 
 $E('reviewerNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailNotif', 
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Reviewer'}, 
-                                            'Add/Remove Content Reviewer Notification',
+                                            'When a Content Reviewer is added or removed from the team',
                                             true
 ));
 $E('editorNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailNotif', 
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Editor'}, 
-                                            'Add/Remove Layout Reviewer Notification',
+                                            'When a Layout Reviewer is added or removed from the team',
                                             true
 ));
 $E('refereeNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailNotifForContribution', 
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Referee'}, 
-                                            'Assign/Unassign Contribution to Referee Notification',
+                                            'When a contribution is assigned or unassigned to a Referee',
                                             true
 ));
 $E('reviewerNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailNotifForContribution', 
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Reviewer'}, 
-                                            'Assign/Unassign Contribution to Content Reviewer Notification',
+                                            'When a contribution is assigned or unassigned to a Content Reviewer',
                                             true
 ));
 $E('editorNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailNotifForContribution', 
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Editor'}, 
-                                            'Assign/Unassign Contribution to Layout Reviewer Notification',
+                                            'When a contribution is assigned or unassigned to a Layout Reviewer',
                                             true
 ));
 $E('refereeJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailJudgementNotif', 
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Referee'}, 
-                                            'Author Notification when the referee submits judgement',
+                                            'To the author when the Referee submits judgement',
                                             true
 ));
 $E('reviewerJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailJudgementNotif', 
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Reviewer'}, 
-                                            'Author Notification when a content reviewer submits judgement',
+                                            'To the author when a Content Reviewer submits judgement',
                                             true
 ));
 $E('editorJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailJudgementNotif', 
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Editor'}, 
-                                            'Author Notification when the layout reviewer submits judgement',
+                                            'To the author when the Layout Reviewer submits judgement',
                                             true
 ));
 $E('authorSubmittedMatRefereeNotif').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatRefereeNotif', 
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Referee'}, 
-                                            'Referee Notification when an author submits materials',
+                                            'To the Referee when an author submits paper',
                                             true
 ));
 $E('authorSubmittedMatReviewerNotif').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatEditorNotif', 
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Reviewer'}, 
-                                            'Content Reviewer Notification when an author submits materials',
+                                            'To the Content Reviewer when an author submits paper',
                                             true
 ));
 $E('authorSubmittedMatEditorNotif').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatReviewerNotif', 
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Editor'}, 
-                                            'Layout Reviewer Notification when an author submits materials',
+                                            'To the  Layout Reviewer when an author submits paper',
                                             true
 ));
 
-IndicoUI.executeOnLoad(function(){
-    var pm = new IndicoUtil.parameterManager();    
-    
-    
+
+/* IndicoUI.executeOnLoad(function(){
+    var pm = new IndicoUtil.parameterManager(); 
     return $E('formatchooser').set(showFormatChooser(pm));
 });
+
 
 function showFormatChooser(pm){
     var select = Html.select({name: 'format'}, Html.option({value: "Unknown"}, "--Select a format--")<% for f in Template.formats: %>,Html.option({value: "<%= f %>"}, "<%= f %>")<%end%>);
@@ -781,9 +918,9 @@ function showFormatChooser(pm){
                 pm.add(select);
                var sel = '<select name="format" id="defaultformat">'+
                          '<option value="Unknown"><%= _("--Select a format--")%></option>'+  
-                         '<% for f in Template.formats: %>'+ 
+<% for f in Template.formats: %> 
                          '<option value="<%= f %>"><%= f %></option>'+
-                         '<% end %>'+
+<% end %>
                          '</select>';
                 return Html.div({},select,
                          " ",
@@ -811,9 +948,69 @@ function showFormatChooser(pm){
 
         return Widget.block(chooser);
 }
+ */
                  
 <% if ConfReview.hasReviewing(): %>
     showReviewableMaterials();
+    TemplateList();
+    
+    $E('uploadTpl').observeClick(function(){ var popup = new UploadTemplateDialog(
+        {conference: '<%= ConfReview.getConference().getId() %>'}, '350px', '30px',
+        <%= jsonEncode(Template.formats.keys()) %>, '<%= urlHandlers.UHSetTemplate.getURL() %>',
+        function(value) {
+            $E('NoTemplateTable').dom.style.display = 'none';
+            $E('templateListTable').dom.style.display = '';
+            
+	        /* this is a little hack who is needed to get the URL of the new uploaded template*/
+	        //linkDelete = "<%= urlHandlers.UHDeleteContributionTemplate.getURL() %>" + "?reviewingTemplateId=" + value.id + "&confId=<%= ConfReview.getConference().getId()%>";
+            //var deleteIcon = Html.img({className: 'imglink',style:{paddingLeft: '20px', verticalAlign: 'bottom', width: '15px', height: '15px'}, alt: 'delete template', src: imageSrc("remove")});
+            //var deleteLink = Html.a({href: linkDelete},deleteIcon);
+            
+            var row = Html.tr();
+            var params = {conference: '<%= ConfReview.getConference().getId() %>',templateId: value.id}
+            var deleteTemplate = function() {
+            if (confirm("Are you sure you want to delete '"+ value.name+"'?")) {
+                var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
+	            jsonRpc(Indico.Urls.JsonRpcService,
+		            'reviewing.conference.deleteTemplate',
+		            params,
+		            function(response,error) {
+                            if (exists(error)) {
+                                killProgress();
+                                IndicoUtil.errorReport(error);
+                            } else {
+                                killProgress();
+                                $E('templateListTable').remove(row);
+                                tablerows = document.getElementById('templateListTable').rows.length;
+                                if(tablerows == '1'){
+                                    $E('NoTemplateTable').dom.style.display = '';
+                                    $E('templateListTable').dom.style.display = 'none';}
+                            }
+                        });}};
+        var menu;
+            menu = Html.span(
+                {},
+                Widget.link(command(
+                    deleteTemplate,
+                    IndicoUI.Buttons.removeButton()
+                )));
+            var linkName = Html.a({href: "<%= urlHandlers.UHDownloadContributionTemplate.getURL() %>" + "?reviewingTemplateId=" + value.id + "&confId=<%= ConfReview.getConference().getId()%>", style:{color:'#5FA5D4'}}, value.name);
+            var cellName = Html.td({id:'TemplateName_'+value.id, style:{borderRight: '5px solid #FFFFFF', borderLeft:'5px solid #FFFFFF'}}, linkName);
+            cellName.append(linkName);
+            <% if CanDelete: %>
+                cellName.append(menu);
+            <% end %>
+            var cellFormat = Html.td({id:'TemplateName_'+value.id, style:{borderRight: '5px solid #FFFFFF', borderLeft:'5px solid #FFFFFF'}}, value.format);
+            var cellDescription = Html.td({id:'TemplateName_'+value.id, style:{borderRight: '5px solid #FFFFFF', borderLeft:'5px solid #FFFFFF'}}, value.description);
+            row.append(cellName);
+            row.append(cellFormat);
+            row.append(cellDescription);
+            
+            return $E('templateListTable').append(row);      
+        
+            }); popup.open();
+            }
+            ); 
 <% end %>
 <% if ConfReview.hasPaperReviewing(): %>
     showReviewingStates();

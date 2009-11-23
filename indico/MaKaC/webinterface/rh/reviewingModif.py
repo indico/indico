@@ -18,6 +18,8 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import simplejson
+
 from MaKaC.errors import MaKaCError
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from MaKaC.webinterface.pages.reviewing import WPConfModifReviewingPaperSetup,\
@@ -29,6 +31,7 @@ from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.common import Config
 from MaKaC.i18n import _
+
 
 class RCPaperReviewManager:
     @staticmethod
@@ -132,7 +135,8 @@ class RHConfModifReviewingPRMBase (RHConferenceModifBase):
                 RHConferenceModifBase._checkProtection(self);            
         else:
             raise MaKaCError(_("Paper Reviewing is not active for this conference"))
-
+        
+    
             
 class RHConfModifReviewingAMBase (RHConferenceModifBase):
     """ Base class that allows only abstract managers to do this request.
@@ -281,6 +285,7 @@ class RHSetTemplate(RHConfModifReviewingPRMBase):
         RHConfModifReviewingPRMBase._checkParams( self, params )
         self._name = params.get("name")
         self._description = params.get("description")
+        self._templateId = params.get("temlId")
         if ("format" in params):
             self._format = params.get("format")
         else:
@@ -289,10 +294,17 @@ class RHSetTemplate(RHConfModifReviewingPRMBase):
             self._templatefd = params.get("file").file
         except AttributeError:
             raise MaKaCError("Problem when storing template file")
-
+        
     def _process( self ):
-        self._conf.getConfReview().setTemplate(self._name, self._description, self._format, self._templatefd)
-        self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
+        import random
+        self._id = str(random.random()*random.randint(1,32768))
+        if self._templatefd == None:
+            return {'status': 'ERROR'}
+        else:
+            self._conf.getConfReview().setTemplate(self._name, self._description, self._format, self._templatefd, self._id)
+            #self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
+            return "<html><head></head><body>%s</body></html>"  % simplejson.dumps({'status': 'OK',
+                                     'info': {'name': self._name, 'description': self._description, 'format': self._format, 'id': self._id}})
         
 class RHDownloadTemplate(RHConferenceBaseDisplay):
     

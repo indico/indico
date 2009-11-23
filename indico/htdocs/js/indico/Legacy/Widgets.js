@@ -79,7 +79,7 @@ IndicoUI.Widgets = {
 
             if (method) {
                 var saveButton = Html.input('button','popUpButton',$T('Add')); 
-                /* before the value was 'Save', now it is changed only for Paper Reviewing Module
+                /* before the value was 'Save', now it is changed because of Paper Reviewing Module
                 If in future it is needed to be 'Save' again, we should add one more button and to be choosen between the two */
                 saveButton.observeClick(function(){
                     var elem = text.get();

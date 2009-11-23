@@ -511,6 +511,163 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
                         });
 });
 
+type("UploadTemplateDialog", ["ExclusivePopup"], {
+
+    _iFrameLoaded : function(iframeId) {
+        var doc;
+
+        if (Browser.IE) {
+            // *sigh*
+            doc = document.frames[iframeId].document;
+        } else {
+            doc = $E(iframeId).dom.contentDocument;
+        }
+
+        // textContent would be more appropriate, but IE...
+        var res = Json.read(doc.body.innerHTML);
+
+        if (res.status == "ERROR") {
+            IndicoUtil.errorReport(res.info);
+        } else {            
+            this.close();
+            this.onUpload(res.info);
+        }
+    },
+
+    _setupIframe: function(iframe) {
+        var self = this;
+        
+        var loadFunc = function() {
+            if (self.uploading) {
+                self.killProgress();
+                self.uploading = false;
+                // need to pass the ID, due to IE
+                self._iFrameLoaded(self.frameId);
+            }
+        };
+
+        if (Browser.IE) {
+            // cof! cof!
+            iframe.dom.onreadystatechange = loadFunc;
+        } else {
+            // for normal browsers
+            iframe.observeEvent("load", loadFunc);
+        }
+
+    },
+    
+     _fileUpload: function() {
+        var self = this       
+        var pm = new IndicoUtil.parameterManager();
+        var uploadType = Html.input('hidden', {name: 'uploadType'});
+        var selector = this._showFormatChooser(pm);
+        var file = Html.input('file', {name: 'file'});
+        var description = Html.textarea({name: 'description'});
+        var name = Html.edit({name: 'name'});
+
+        uploadType.set('file');
+
+        pm.add(selector, 'text', false);
+        pm.add(file, 'text', false);
+        pm.add(description, 'text', true);
+        pm.add(name, 'text', true);
+
+        this.frameId = Html.generateId();
+        var iframe = Html.iframe({id: this.frameId, name: this.frameId, style: {display: 'none'}});
+
+        this._setupIframe(iframe);
+
+        this.form = Html.form({
+                            target: this.frameId, method: 'post',
+                            id: Html.generateId(),
+                            action: this.uploadAction,
+                            enctype: 'multipart/form-data',
+                            encoding: 'multipart/form-data'
+                        },
+                        Html.input('hidden', {name: 'conference'}, this.args.conference),
+                        IndicoUtil.createFormFromMap(
+                            [
+                                [$T('Name'), name],
+                                [$T('Type'), selector],
+                                [$T('File'), file],
+                                [$T('Description'), description]
+                            ]),
+                        uploadType);
+
+        return Html.div({},
+                        iframe,
+                        this.form,
+                        Html.div({style: {'textAlign': 'center', width: self.width, height: self.height}},
+                                 Widget.button(command(
+                                     function() {
+                                         if (pm.check()) {
+                                             self.killProgress = IndicoUI.Dialogs.Util.progress($T('Uploading...'));
+                                             self.uploading = true;
+                                             self.form.dom.submit();
+                                         }
+                                     }, $T("Upload")))));
+},
+
+    _showFormatChooser: function(pm) {
+        var self = this;
+        var select = Html.select({name: 'format'});
+        var text = Html.edit({name: 'format'});
+
+        var chooser = new Chooser(new Lookup({
+            select: function() {
+                pm.remove(text);
+                pm.add(select);
+                    
+                return Html.div({}, bind.element(select, $L(self.types),
+                                          function(value) {
+                                              return Html.option({'value': value}, value);
+                                          }),
+                         " ",
+                         $T("or"),
+                         " ",
+                         Widget.link(command(function() {
+                             chooser.set('write');
+                         }, $T("other"))));
+            },
+
+            write: function() {
+                bind.detach(select);
+                pm.remove(select);
+                pm.add(text);
+                return Html.div({}, text,
+                                " ",
+                               $T("or"),
+                               " ",
+                                Widget.link(command(function() {
+                                    chooser.set('select');
+                                }, $T("select from list"))));
+            }
+        }));
+        chooser.set('select');
+
+        return Widget.block(chooser);
+    },
+    
+    draw: function() {
+        return this.ExclusivePopup.prototype.draw.call(this,this._fileUpload());
+    }
+}, function(args, width, height, types, uploadAction, onUpload) {
+    var self = this;
+    this.width = width; 
+    this.height = height;
+    this.types = types;
+    this.uploadAction = uploadAction;
+    this.uploading = false;
+    this.onUpload = onUpload;
+
+    this.args = clone(args);
+
+
+    this.ExclusivePopup($T("Upload Material"),
+                        function() {
+                            self.close();
+                        });
+});
 
 type("EditMaterialResourceBase", ["ServiceDialogWithButtons"], {
 

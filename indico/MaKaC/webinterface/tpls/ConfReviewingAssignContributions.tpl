@@ -265,12 +265,6 @@
                     <%= _("Deadline not set.")%>
                 <% end %>
                 <% else: %>
-                <% if date < nowutc() and not rm.getLastReview().getRefereeJudgement().isSubmitted(): %>
-                    <% color = 'red' %>
-                    <% end %>
-                    <% else: %>
-                     <% color = 'green' %>
-                    <% end %>
                     <%= date.strftime(dueDateFormat) %>                   
                 <% end %>
             </td>           
@@ -545,7 +539,7 @@ var contributionTemplate = function(contribution) {
     row.append(cell8);
 
     // Cell9: due date of the contribution
-    var cell9 = Html.td({style:{"color":<%if color=='red':%>"red"<%end%><%else:%>"green"<%end%>}});
+    var cell9 = Html.td();
     cell9.set(contribution.reviewManager.lastReview.refereeDueDate)
     row.append(cell9);
     
@@ -1067,7 +1061,7 @@ var fetchUsers = function(order, role) {
                        var span1 = Html.span({}, "");
                        var message = '';
                        if(role == 'referee' && order == 'assign' && !removeRefereeAlerts(checkedContributions)) {
-                            span1 = Html.span({style:{"color":"red"}}, removeRefereeAlertsMessage(checkedContributions));
+                            span1 = Html.span({}, removeRefereeAlertsMessage(checkedContributions));
                        }   
                        if(role == 'reviewer' && order == 'remove') {
                             if (checkedContributions.length == 1){
@@ -1075,7 +1069,7 @@ var fetchUsers = function(order, role) {
                                 } else {
                                     message = $T("The Reviewer you choose will be removed only from the contributions that are assigned to him/her.")
                                 }
-                            span1 = Html.span({style:{"color":"red"}}, message);
+                            span1 = Html.span({}, message);
                        }    
                         return this.ExclusivePopup.prototype.draw.call(this, Widget.block([span1, userList, cancelButton]));  
                 };
