@@ -145,6 +145,7 @@ class TimeSchedule(Schedule, Persistent):
             entry.getSchedule().removeEntry(entry)
 
         owner = self.getOwner()
+
         tz = owner.getConference().getTimezone()
 
         # If user has entered start date use these dates

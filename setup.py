@@ -44,7 +44,6 @@ if sys.platform == 'linux2':
     import pwd
     import grp
 
-import tests
 
 class vars(object):
     '''Variable holder.'''
@@ -302,17 +301,18 @@ Please specify the directory where you'd like it to be placed.
 class tests_indico(Command):
     description = "run the test suite"
     user_options = []
-    boolean_options = []
-
+    boolean_options = []    
     def initialize_options(self): pass
 
     def finalize_options(self): pass
 
     def run(self):
-        p = Popen("%s tests/__init__.py" % sys.executable, shell=True, stdout=PIPE, stderr=PIPE)
-        out = string.join(p.stdout.readlines() )
-        outerr = string.join(p.stderr.readlines() )
-        print out, outerr
+        import indicop
+        result = indicop.main()
+        if result:
+            print "All tests succeeded!"
+        else:
+            print "Test Suite FAILED!"
 
 
 if __name__ == '__main__':
@@ -323,7 +323,12 @@ if __name__ == '__main__':
     #    shutil.copy('etc/indico.conf.sample', PWD_INDICO_CONF)
 
     from MaKaC.consoleScripts.installBase import *
-    setIndicoInstallMode(True)
+    
+    #Dirty trick: For running tests, we need to load all the modules
+    if 'tests' in sys.argv:
+        setIndicoInstallMode(False)
+    else:
+        setIndicoInstallMode(True)
 
     x = vars()
     x.packageDir = os.path.join(get_python_lib(), 'MaKaC')

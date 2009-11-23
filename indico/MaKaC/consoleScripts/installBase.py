@@ -40,7 +40,7 @@ if sys.platform == 'linux2':
 
 import MaKaC
 
-INDICO_INSTALL = False
+globals()['INDICO_INSTALL'] = False
 
 LOCALDATABASEDIR = '/opt/indico/db'
 
