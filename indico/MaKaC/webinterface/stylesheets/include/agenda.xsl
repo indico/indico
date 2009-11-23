@@ -229,7 +229,10 @@
           </td>
           <td>
             <xsl:for-each select="./material">
-              <xsl:apply-templates select="."/>
+                <xsl:apply-templates select="."/>                           
+            </xsl:for-each>
+            <xsl:for-each select="./material">
+                <xsl:call-template name="minutes"/>
             </xsl:for-each>
           </td>
         </tr>
@@ -284,7 +287,7 @@
               &#60;td valign="top" bgcolor="#F6F6F6"&#62;
               </xsl:text>
             </xsl:otherwise>
-            </xsl:choose>
+            </xsl:choose>                
               <a href="#{./ID}">
               <font size="-2">
               <xsl:choose>
@@ -355,4 +358,21 @@
 </table>
 </xsl:template>
 
+<xsl:template name="minutes">
+      <xsl:if test="./minutesText != ''">
+      <tr>
+        <td align="center" style="padding-top:10px;padding-bottom:10px" colspan="2">
+          <table border="1" bgcolor="white" cellpadding="2" align="center" width="100%">
+            <tr>
+              <td align="center"><b>Minutes</b></td>
+            </tr>
+            <tr>
+                <td><xsl:apply-templates select="./minutesText"/></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      </xsl:if>
+ </xsl:template>
+ 
 </xsl:stylesheet>
