@@ -271,12 +271,15 @@ def _checkDirPermissions(directories, dbInstalledBySetupPy=False, accessuser=Non
     - uid and gid: if they are valid user_ids and group_ids they will be used to chown
         the directories instead of the indico.conf ones.
     '''
+
+    print "\nWe need to 'sudo' in order to set the permissions of some directories..."
+
     dirs2check = list(directories[x] for x in ['htdocs', 'log', 'tmp', 'cache'])
     if dbInstalledBySetupPy:
         dirs2check.append(dbInstalledBySetupPy)
 
     for dir in dirs2check:
-        print commands.getoutput("chown -R %s:%s %s" % (accessuser, accessgroup, dir))
+        print commands.getoutput("sudo chown -R %s:%s %s" % (accessuser, accessgroup, dir))
 
 
 def _existingConfiguredEgg():
@@ -424,7 +427,7 @@ What do you want to do [c/a]? ''')
         print "\nExiting installation..\n"
         sys.exit()
     else:
-        print "\nInvalid anwer. Exiting installation..\n"
+        print "\nInvalid answer. Exiting installation..\n"
         sys.exit()
 
     activemakacconfig = os.path.join(os.path.dirname(os.path.abspath(MaKaC.__file__)), 'common', 'MaKaCConfig.py')

@@ -255,6 +255,7 @@ class fetchdeps_indico(Command):
 
 
     def _installMissing(self, dist):
+
         env = pkg_resources.Environment()
         easy_install.main(["-U",str(dist)])
         env.scan()
@@ -304,9 +305,11 @@ Please specify the directory where you'd like it to be placed.
         directories['htdocs'] = os.path.join(os.getcwd(), 'indico', 'htdocs')
 
         from MaKaC.consoleScripts.installBase import _databaseText, _findApacheUserGroup, _checkDirPermissions
-        # find the apache user/group
-        user, group = _findApacheUserGroup(None, None)
-        _checkDirPermissions(directories, accessuser=user, accessgroup=group)
+
+        if sys.platform == "linux2":
+            # find the apache user/group
+            user, group = _findApacheUserGroup(None, None)
+            _checkDirPermissions(directories, accessuser=user, accessgroup=group)
 
         updateIndicoConfPathInsideMaKaCConfig(os.path.join(os.path.dirname(__file__), ''), 'indico/MaKaC/common/MaKaCConfig.py')
         compileAllLanguages()
