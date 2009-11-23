@@ -52,7 +52,7 @@ var showWidgets = function(firstLoad) {
                             current: 'reviewerJudgement'
                            },400,200);
                            
-    $E('commentsMessage').set($T('These comments, along with your judgement, will be sent by e-mail to the author(s)'));
+   
     
     <% if len (ConfReview.getReviewingQuestions()) == 0 : %>
         $E('questionListDisplay').set("No reviewing questions proposed for this conference.");

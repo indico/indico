@@ -134,9 +134,6 @@
             <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Comments")%></span></td>
             <td>
                 <div id="inPlaceEditComments"></div>
-                <div id="commentsMessage">
-                    <%= _("These comments, along with your judgement, will be sent by e-mail to the author(s)")%>
-                </div>
             </td>
         </tr>
         <% if IsReferee: %>
@@ -169,7 +166,7 @@ var showWidgets = function(firstLoad) {
                             current: 'refereeJudgement'
                            },400,200);
                            
-    $E('commentsMessage').set($T('These comments, along with your judgement, will be sent by e-mail to the author(s)'))
+    
     
     <% if len (ConfReview.getReviewingQuestions()) == 0 : %>
         $E('questionListDisplay').set($T("No reviewing questions proposed for this conference."));

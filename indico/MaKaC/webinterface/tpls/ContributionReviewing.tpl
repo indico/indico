@@ -13,7 +13,6 @@
         <td>
             <span style="color:red;">
             <%= _("Warning: the author(s) of this contribution have still not marked their initial materials as submitted.")%><br>
-            <%= _("The referee, editor and reviewers will receive an email when they do so.")%><br>
             <%= _("You must wait until then to start the reviewing process.")%>
             </span>
         </td>
@@ -24,7 +23,6 @@
         <td>
             <span style="color:red;">
             <%= _("Warning: since this contribution was marked 'To be corrected', the author(s) has not submitted new materials.")%><br>
-            <%= _("The referee, editor and reviewers will receive an email when they do so.")%>
             <%= _("You must wait until then to restart the reviewing process.")%><br>
             </span>
         </td>
