@@ -281,15 +281,32 @@ class develop_indico(Command):
             print 'Creating new etc/indico.conf..'
             shutil.copy('etc/indico.conf.sample', local)
 
-        for d in [x for x in ('db', 'log') if not os.path.exists(x)]:
-            os.makedirs(d)
-
         for f in [x for x in ('etc/zdctl.conf', 'etc/zodb.conf') if not os.path.exists(x)]:
             shutil.copy('%s.sample' % f, f)
 
-        # TODO: createDirs()
+        print """\nIndico needs to store some information in the filesystem (database, cache, temporary files, logs...)
+Please specify the directory where you'd like it to be placed.
+(Note that putting it outside of your sourcecode tree is recommended)"""
+        prefixDir = raw_input('[%s]: ' % os.getcwd()).strip()
 
-        from MaKaC.consoleScripts.installBase import _databaseText
+        if prefixDir == '':
+            prefixDir = os.getcwd()
+
+        directories = dict((d,os.path.join(prefixDir, d)) for d in
+                           ['db', 'log', 'tmp', 'cache'])
+
+        print 'Creating directories...',
+        for d in directories.values():
+            if not os.path.exists(d):
+                os.makedirs(d)
+        print 'Done!'
+
+        directories['htdocs'] = os.path.join(os.getcwd(), 'indico', 'htdocs')
+
+        from MaKaC.consoleScripts.installBase import _databaseText, _findApacheUserGroup, _checkDirPermissions
+        # find the apache user/group
+        user, group = _findApacheUserGroup(None, None)
+        _checkDirPermissions(directories, accessuser=user, accessgroup=group)
 
         updateIndicoConfPathInsideMaKaCConfig(os.path.join(os.path.dirname(__file__), ''), 'indico/MaKaC/common/MaKaCConfig.py')
         compileAllLanguages()
