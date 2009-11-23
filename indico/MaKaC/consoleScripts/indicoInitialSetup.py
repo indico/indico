@@ -83,3 +83,5 @@ def main():
                         get_python_lib(),
                         force_no_db=False)
 
+if __name__ == '__main__':
+    main()

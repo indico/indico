@@ -159,7 +159,6 @@ class sdist_indico(sdist.sdist):
 class bdist_egg_indico(bdist_egg.bdist_egg):
     def run(self):
         _convertdoc()
-        jsCompress()
         bdist_egg.bdist_egg.run(self)
 
 class install_indico(install.install):
@@ -345,7 +344,9 @@ if __name__ == '__main__':
     from MaKaC.consoleScripts.installBase import *
     setIndicoInstallMode(True)
 
-    if 'bdist_egg' not in sys.argv:
+    if 'bdist_egg' in sys.argv:
+        jsCompress()
+    else:
         try:
             from MaKaC.common.Configuration import Config
         except IOError:
