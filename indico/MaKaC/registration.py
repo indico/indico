@@ -544,30 +544,50 @@ class Notification(Persistent):
                     """%(reasonParticipationForm.getTitle(), reasonParticipation)
         return text
 
-    def _printMiscellaneousInfo(self, regForm, rp):
+    def _printMiscellaneousInfo(self, gs, mig):
         text=[]
-        for gs in regForm.getGeneralSectionFormsList():
-            if gs.isEnabled():
-                mig=rp.getMiscellaneousGroupById(gs.getId())
-                if mig is not None:
-                    noitems=True
-                    text.append("""%s:\r\n\t\t\t"""%(mig.getTitle()))
-                    #Mods to support sorting fields
-                    #for f in gs.getFields():
-                    for f in gs.getSortedFields():
-                        mii=mig.getResponseItemById(f.getId())
-                        if mii is not None:
-                            noitems=False
-                            value=": %s"%mii.getValue()
-                            if isinstance(mii.getGeneralField().getInput(), LabelInput) and mii.isBillable():
-                                value=": %s %s"%(mii.getPrice(), mii.getCurrency())
-                            elif isinstance(mii.getGeneralField().getInput(), LabelInput):
-                                value=""
-                            text.append("""- %s%s\r\n\t\t\t"""%(mii.getCaption(), value))
-                    if noitems:
-                        text.append("""-- no values --\r\n\t\t\t""")
-                    text.append("\r\n             ")
+        if gs.isEnabled():
+            if mig is not None:
+                noitems=True
+                text.append("""%s:\r\n\t\t\t"""%(mig.getTitle()))
+                #Mods to support sorting fields
+                #for f in gs.getFields():
+                for f in gs.getSortedFields():
+                    mii=mig.getResponseItemById(f.getId())
+                    if mii is not None:
+                        noitems=False
+                        value=": %s"%mii.getValue()
+                        if isinstance(mii.getGeneralField().getInput(), LabelInput) and mii.isBillable():
+                            value=": %s %s"%(mii.getPrice(), mii.getCurrency())
+                        elif isinstance(mii.getGeneralField().getInput(), LabelInput):
+                            value=""
+                        text.append("""- %s%s\r\n\t\t\t"""%(mii.getCaption(), value))
+                if noitems:
+                    text.append("""-- no values --\r\n\t\t\t""")
+                text.append("\r\n             ")
         return "".join(text)
+    
+    def _printAllSections(self, regForm, rp):
+        sects = []
+        for formSection in regForm.getSortedForms():
+            if formSection.getId() == "reasonParticipation":
+                sects.append("""
+             %s"""%self._printReasonParticipation(formSection, rp.getReasonParticipation()))
+            elif formSection.getId() == "sessions":
+                sects.append("""
+             %s"""%self._printSessions(formSection, rp.getSessionList()))
+            elif formSection.getId() == "accommodation":
+                sects.append("""
+             %s"""%self._printAccommodation(formSection, rp.getAccommodation()))
+            elif formSection.getId() == "socialEvents":
+                sects.append("""
+             %s"""%self._printSocialEvents(formSection, rp.getSocialEvents()))
+            elif formSection.getId() == "furtherInformation":
+                pass
+            else:
+                sects.append("""
+             %s"""%self._printMiscellaneousInfo(formSection, rp.getMiscellaneousGroupById(formSection.getId())))
+        return "".join(sects)
 
     def _getPDInfoText(self, regForm, rp):
         personalData = regForm.getPersonalData()
@@ -625,18 +645,10 @@ class Notification(Persistent):
         body=_("""
              _("Event"): %s
              _("Registrant Id"): %s%s
-             %s
-             %s
-             %s
-             %s
-             %s
+%s
              """)%(   url,rp.getId(), \
                      self._getPDInfoText(regForm,rp), \
-                     self._printReasonParticipation(regForm.getReasonParticipationForm(), rp.getReasonParticipation()), \
-                     self._printSessions(regForm.getSessionsForm(), rp.getSessionList()), \
-                     self._printAccommodation(regForm.getAccommodationForm(), rp.getAccommodation()), \
-                     self._printSocialEvents(regForm.getSocialEventForm(), rp.getSocialEvents()), \
-                     self._printMiscellaneousInfo(regForm, rp) )
+                     self._printAllSections(regForm, rp) )
         # send mail to organisers
         if self.getToList() != [] or self.getCCList() != []:
             bodyOrg = _("""
@@ -809,11 +821,7 @@ detail of Booking:
               _("Fax"): %s
               _("Email"): %s
               _("Personal Homepage"): %s
-             %s
-             %s
-             %s
-             %s
-             %s
+%s
              """)%(   rp.getId(), \
                      rp.getTitle(), \
                      rp.getFamilyName(), \
@@ -827,11 +835,7 @@ detail of Booking:
                      rp.getFax(), \
                      rp.getEmail(), \
                      rp.getPersonalHomepage(), \
-                     self._printReasonParticipation(regForm.getReasonParticipationForm(), rp.getReasonParticipation()), \
-                     self._printSessions(regForm.getSessionsForm(), rp.getSessionList()), \
-                     self._printAccommodation(regForm.getAccommodationForm(), rp.getAccommodation()), \
-                     self._printSocialEvents(regForm.getSocialEventForm(), rp.getSocialEvents()), \
-                     self._printMiscellaneousInfo(regForm, rp) )
+                     self._printAllSections(regForm, rp) )
         if self.getToList() != [] or self.getCCList() != []:
             bodyOrg = _("""
              A registrant has modified his/her registration for '%s'. See information below:

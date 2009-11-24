@@ -18,11 +18,7 @@ function checkConditions(){
 <center>
   <table width="80%%">
     <tr>
-      <td colspan="2" align="center" nowrap class="title"><%= _("Registered new participant")%></td>
-    </tr>
-    <tr>
       <td colspan="2" align="center">
-        <br><br>
         <table bgcolor="white">
           <tr bgcolor="white">
             <td>
@@ -32,7 +28,7 @@ function checkConditions(){
                 </tr>
                 <tr>
                   <td width="10">&nbsp;</td>
-                  <td align="center"><font color="black"><b><%= _("Congratulations!!!")%></b></font><br><br><%= _("Thank you for completing the registration form which has been sent to the organisers for their attention.")%> %(epaymentAnnounce)s<br><br></td>
+                  <td><%= _("Thank you for completing the registration form which has been sent to the organisers for their attention.")%> %(epaymentAnnounce)s<br><br></td>
                   <td width="10">&nbsp;</td>
                 </tr>
                 <tr><td colspan="3">
@@ -52,11 +48,8 @@ function checkConditions(){
                             <tr>
                               <td colspan="3" style="border-top:2px solid black">&nbsp;</td>
                             </tr>
-                            %(reasonParticipation)s
-                            %(sessions)s
-                            %(accommodation)s
-                            %(socialEvents)s
                             %(otherSections)s
+                            %(paymentInfo)s
                           </table>
                         </td>
                       </tr>

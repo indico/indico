@@ -1286,26 +1286,42 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
         html.append("</table>")
         return "".join(html)
 
-    def _getMiscellaneousInfoHTML(self):
+    def _getMiscellaneousInfoHTML(self, gsf):
         regForm = self._conf.getRegistrationForm()
         html=[]
-        for gsf in regForm.getGeneralSectionFormsList():
-            #if gsf.isEnabled():
-                url=urlHandlers.UHConfModifRegistrantMiscInfoModify.getURL(self._registrant)
-                url.addParam("miscInfoId", gsf.getId())
-                html.append( _("""
-                    <form action=%s method="POST">
-                    <tr>
-                      <td class="dataCaptionTD" valign="top"><span class="dataCaptionFormat">%s</span></td>
-                      <td bgcolor="white" class="blacktext" valign="top">%s</td>
-                      <td valign="bottom"><input type="submit" class="btn" name="" value="_("modify")"></td>
-                    </tr>
-                    <tr>
-                      <td colspan="3" class="horizontalLine">&nbsp;</td>
-                    </tr>
-                    </form>
-                    """)%(quoteattr(str(url)), gsf.getTitle(), self._getMiscInfoItemsHTML(gsf) ) )
+        url=urlHandlers.UHConfModifRegistrantMiscInfoModify.getURL(self._registrant)
+        url.addParam("miscInfoId", gsf.getId())
+        html.append( _("""
+            <form action=%s method="POST">
+            <tr>
+              <td class="dataCaptionTD" valign="top"><span class="dataCaptionFormat">%s</span></td>
+              <td bgcolor="white" class="blacktext" valign="top">%s</td>
+              <td valign="bottom"><input type="submit" class="btn" name="" value="_("modify")"></td>
+            </tr>
+            <tr>
+              <td colspan="3" class="horizontalLine">&nbsp;</td>
+            </tr>
+            </form>
+            """)%(quoteattr(str(url)), gsf.getTitle(), self._getMiscInfoItemsHTML(gsf) ) )
         return "".join(html)
+    
+    def _getFormSections(self):
+        sects = []
+        regForm = self._conf.getRegistrationForm()
+        for formSection in regForm.getSortedForms():
+            if formSection.getId() == "reasonParticipation":
+                sects.append(self._getReasonParticipationHTML())
+            elif formSection.getId() == "sessions":
+                sects.append(self._getSessionsHTML())
+            elif formSection.getId() == "accommodation":
+                sects.append(self._getAccommodationHTML())
+            elif formSection.getId() == "socialEvents":
+                sects.append(self._getSocialEventsHTML())
+            elif formSection.getId() == "furtherInformation":
+                pass
+            else:
+                sects.append(self._getMiscellaneousInfoHTML(formSection))
+        return "".join(sects)
 
     def _getStatusesHTML(self):
         regForm = self._conf.getRegistrationForm()
@@ -1356,12 +1372,8 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
         vars["registrationDate"] = _("""--_("date unknown")--""")
         if self._registrant.getRegistrationDate() is not None:
             vars["registrationDate"] = "%s (%s)"%(self._registrant.getAdjustedRegistrationDate().strftime("%d-%B-%Y %H:%M"), self._conf.getTimezone())
-        vars["reasonParticipation"] = self._getReasonParticipationHTML()
-        vars["sessions"] = self._getSessionsHTML()
-        vars["accommodation"] = self._getAccommodationHTML()
-        vars["socialEvents"] = self._getSocialEventsHTML()
         vars["dataModificationURL"] = quoteattr(str(urlHandlers.UHRegistrantDataModification.getURL(self._registrant)))
-        vars["otherSections"]=self._getMiscellaneousInfoHTML()
+        vars["sections"] = self._getFormSections()
         vars["statuses"]=self._getStatusesHTML()
 
         vars["transaction"]=self._getTransactionHTML()
