@@ -1821,7 +1821,7 @@ class WAccessControlFrame(WTemplated):
             vars["changePrivacy"] = """make it <input type="submit" class="btn" name="visibility" value="PRIVATE"> by itself<br/>"""
             vars["changePrivacy"] += """make it <input type="submit" class="btn" name="visibility" value="ABSOLUTELY PUBLIC">%s""" % WInlineContextHelp('The object will stay public regardless of the protection of its parent').getHTML()
         vars["locator"] = self.__target.getLocator().getWebForm()
-        vars["userTable"] = WPrincipalTable().getHTML( self.__target.getAllowedToAccessList(), self.__target, vars["addAllowedURL"], vars["removeAllowedURL"] )
+        vars["userTable"] = WPrincipalTable().getHTML( self.__target.getAllowedToAccessList(), self.__target, vars["addAllowedURL"], vars["removeAllowedURL"],selectable=False )
 
         return vars
     
