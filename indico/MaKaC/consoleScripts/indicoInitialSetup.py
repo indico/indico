@@ -49,6 +49,10 @@ def copy_egg_datafiles_to_base(dstDir):
 
     for (dst, src) in ((dstDir['bin'], binDir), (dstDir['doc'], docDir), (dstDir['etc'], cfgDir), (dstDir['htdocs'], htdocsDir)):
         print "%s -> %s" % (src, dst)
+        if (os.path.exists(dst) and not os.access(dst, os.W_OK)):
+            print "You don't have write permissions for directory %s!" % dst
+            print "Aborting."
+            sys.exit(-1)
         copytreeSilently(src, dst)
 
 
@@ -70,17 +74,16 @@ def main(rpm=False):
         targetDirs = indico_pre_install('/opt/indico', False, sourceConfig=os.path.join(eggDir,'etc','indico.conf'))
 
         # we need to copy htdocs/ bin/ doc/ etc/ to its proper place
-        print "Copying Indico tree... ",
+        print "Copying Indico tree... "
         copy_egg_datafiles_to_base(targetDirs)
         print "done!"
 
         #    if not os.path.exists('/opt/indico/etc/indico.conf'):
-    #        shutil.copy('/opt/indico/etc/indico.conf.sample', '/opt/indico/etc/indico.conf')
+        #        shutil.copy('/opt/indico/etc/indico.conf.sample', '/opt/indico/etc/indico.conf')
 
 
     sourceDirs = dict((dirName, os.path.join(eggDir, dirName))
                       for dirName in ['bin','doc','etc','htdocs'])
-
 
     indico_post_install(targetDirs,
                         sourceDirs,

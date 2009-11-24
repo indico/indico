@@ -414,9 +414,6 @@ def fresh_install(defaultPrefix):
 
     indicoconfpath = os.path.join(configDir, 'indico.conf')
 
-    # this will (hopefully) always be true
-    assert(not os.path.exists(indicoconfpath))
-
     opt = raw_input('''
 You now need to configure Indico, by editing indico.conf or letting us do it for you.
 At this point you can:
@@ -442,15 +439,16 @@ What do you want to do [c/a]? ''')
     updateIndicoConfPathInsideMaKaCConfig(indicoconfpath, activemakacconfig)
 
     return dict((dirName, os.path.join(prefixDir, dirName))
-                for dirName in ['bin','doc','etc','htdocs','tmp','log','cache'])
+                for dirName in ['bin','doc','etc','htdocs','tmp','log','cache','db'])
 
 
-def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_dir, force_no_db = False, uid=None, gid=None, dbDir='/opt/indico'):
+def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_dir, force_no_db = False, uid=None, gid=None, dbDir=LOCALDATABASEDIR):
     from MaKaC.common.Configuration import Config
 
-    # we don't want that the db directory be created
-    dbDir = targetDirs['db']
-    del targetDirs['db']
+    if 'db' in targetDirs:
+        # we don't want that the db directory be created
+        dbDir = targetDirs['db']
+        del targetDirs['db']
 
     # Create the directories where the resources will be installed
     createDirs(targetDirs)
@@ -488,7 +486,7 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
         else:
             opt = None
             while opt not in ('Y', 'y', 'n', ''):
-                opt = raw_input('''\nWe cannot find the configured database at %s.
+                opt = raw_input('''\nWe cannot find a configured database at %s.
 
     Do you want to create a new database now [Y/n]? ''' % dbDir)
                 if opt in ('Y', 'y', ''):
@@ -530,7 +528,7 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
     modifyOnDiskIndicoConfOption('%s/indico.conf' % targetDirs['etc'], 'ApacheGroup', group)
 
     # change the db config files (paths + apache user/group)
-    _updateDbConfigFiles(dbDir, targetDirs['log'], targetDirs['etc'], user)
+    _updateDbConfigFiles(dbpath, targetDirs['log'], targetDirs['etc'], user)
     # check permissions
     _checkDirPermissions(targetDirs, dbInstalledBySetupPy=dbParam, accessuser=user, accessgroup=group)
     # check that mod_python is installed
@@ -574,7 +572,7 @@ Alias /indico "%s"
 (change the paths after 'Alias' in order to change the URL bindings)
 
 %s
-""" % (targetDirs['etc'], targetDirs['bin'], targetDirs['doc'], targetDirs['etc'], targetDirs['htdocs'], targetDirs['htdocs'], package_dir, targetDirs['htdocs'], targetDirs['htdocs'], targetDirs['htdocs'], _databaseText(cfg.getConfigurationDir()))
+""" % (targetDirs['etc'], targetDirs['bin'], targetDirs['doc'], targetDirs['etc'], targetDirs['htdocs'], targetDirs['htdocs'], package_dir, targetDirs['htdocs'], targetDirs['htdocs'], targetDirs['htdocs'], _databaseText(targetDirs['etc']))
 
 def _databaseText(cfgPrefix):
     return """If you are running ZODB on this host:
