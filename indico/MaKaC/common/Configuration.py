@@ -455,7 +455,7 @@ class Config:
             'RoomSmallPhotosDir'      : os.path.join(self.getHtdocsDir(), 'images', "rooms", "small_photos"),
             'CssDir'                  : "%s/css/" % (self.getHtdocsDir()),
             'CssBaseURL'              : "%s/css" % self.getBaseURL(),
-            'CssConfTemplateBaseURL'  : "%s/css/confTemplates" % self.getHtdocsDir(),
+            'CssConfTemplateBaseURL'  : "%s/css/confTemplates" % self.getBaseURL(),
             'DefaultEventStylesheet'  : self.__defaultEventStylesheet,
             'ShortCategURL'           : '%s%s' % (self.getBaseURL(), self.getShortCategTag()),
             'ShortEventURL'           : '%s%s' % (self.getBaseURL(), self.getShortEventTag()),
