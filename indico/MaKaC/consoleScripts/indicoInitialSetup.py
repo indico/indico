@@ -26,14 +26,14 @@ functions refer to installBase.py
 
 On RPM or windist based installations it can be made run automatically'''
 
-import os
+import os, sys
 import shutil
 
 from distutils.sysconfig import get_python_lib
 
 from installBase import getIndicoInstallMode, setIndicoInstallMode, PWD_INDICO_CONF, indico_pre_install, indico_post_install, copytreeSilently
 
-# The directory where the eff is located
+# The directory where the egg is located
 eggDir = os.path.join(os.path.dirname(__file__), '..', '..')
 
 def copy_egg_datafiles_to_base(dstDir):
@@ -52,22 +52,29 @@ def copy_egg_datafiles_to_base(dstDir):
         copytreeSilently(src, dst)
 
 
-def main():
+def main(rpm=False):
 
     global PWD_INDICO_CONF
     global eggDir
 
     setIndicoInstallMode(True)
-    PWD_INDICO_CONF = os.path.join(os.path.dirname(__file__), '..', '..', 'etc', 'indico.conf.sample')
 
-    targetDirs = indico_pre_install('/opt/indico', False, sourceConfig=os.path.join(eggDir,'etc','indico.conf'))
 
-    # we need to copy htdocs/ bin/ doc/ etc/ to its proper place
-    print "Copying Indico tree... ",
-    copy_egg_datafiles_to_base(targetDirs)
-    print "done!"
+    if rpm:
+        # TODO: post-install for RPMs
+        pass
+    else:
+        targetDirs = { 'etc': '/opt/indico/etc' }
+        PWD_INDICO_CONF = os.path.join(os.path.dirname(__file__), '..', '..', 'etc', 'indico.conf.sample')
 
-    #    if not os.path.exists('/opt/indico/etc/indico.conf'):
+        targetDirs = indico_pre_install('/opt/indico', False, sourceConfig=os.path.join(eggDir,'etc','indico.conf'))
+
+        # we need to copy htdocs/ bin/ doc/ etc/ to its proper place
+        print "Copying Indico tree... ",
+        copy_egg_datafiles_to_base(targetDirs)
+        print "done!"
+
+        #    if not os.path.exists('/opt/indico/etc/indico.conf'):
     #        shutil.copy('/opt/indico/etc/indico.conf.sample', '/opt/indico/etc/indico.conf')
 
 
@@ -84,4 +91,4 @@ def main():
                         force_no_db=False)
 
 if __name__ == '__main__':
-    main()
+    main(rpm=('--rpm' in sys.argv))

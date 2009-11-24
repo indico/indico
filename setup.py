@@ -81,11 +81,11 @@ def _getDataFiles(x):
     # This re will be used to filter out etc/*.conf files and therefore not overwritting them
     isAConfRe = re.compile('etc\/[^/]+\.conf$')
 
-    for (baseDstDir, files, remove_first_x_chars) in ((x.binDir,           findall('bin'), 4),
-                                                      (x.documentationDir, ['doc/UserGuide.pdf','doc/AdminUserGuide.pdf'], 4),
-                                                      (x.configurationDir, [xx for xx in findall('etc') if not isAConfRe.search(xx)], 4),
-                                                      (x.packageDir,              findall('indico/MaKaC'), 13),
-                                                      (x.htdocsDir,        findall('indico/htdocs'), 14),
+    for (baseDstDir, files, remove_first_x_chars) in (('bin',           findall('bin'), 4),
+                                                      ('doc', ['doc/UserGuide.pdf','doc/AdminUserGuide.pdf'], 4),
+                                                      ('etc', [xx for xx in findall('etc') if not isAConfRe.search(xx)], 4),
+#                                                      ('MaKaC',              findall('indico/MaKaC'), 13),
+                                                      ('htdocs',        findall('indico/htdocs'), 14),
                                                       ):
         for f in files:
             dst_dir = os.path.join(baseDstDir, os.path.dirname(f)[remove_first_x_chars:])
@@ -161,62 +161,6 @@ class bdist_egg_indico(bdist_egg.bdist_egg):
         _convertdoc()
         bdist_egg.bdist_egg.run(self)
 
-class install_indico(install.install):
-    user_options = [('uid=', None, "uid of Apache user\n\n"),
-                    ('gid=', None, 'gid of Apache user'),
-                    ('config-dir=', None, 'directory to store indico.conf'),
-                    ('force-no-db', None, 'force not to detect if DB installed'),
-                    ('force-upgrade', None, 'upgrade without asking for confirmation first')] + install.install.user_options
-
-    uid = None
-    gid = None
-    config_dir = None
-    force_no_db = False
-    force_upgrade = False
-
-    def run(self):
-        if self.root != None and sys.path[0] != os.path.join(self.root, 'MaKaC'):
-            sys.path = [os.path.join(self.root, 'MaKaC')] + sys.path
-
-        # If we don't do the following then BinDir, ConfigurationDir, etc will have
-        # self.install_data preppended to them therefore ignoring absolute paths specified in
-        # indico.conf.
-        self.install_data = ''
-
-        self._resolvePackageDir()
-
-        # Indico can be installed both through setup.py and easy_install. To support the latter
-        # we need to split installation steps in external functions that can also be called
-        # by indico_initial_setup.
-        cfg = Config.getInstance()
-        if self.config_dir == None:
-            self.config_dir = cfg.getConfigurationDir()
-
-        indico_pre_install(self.config_dir, force_upgrade=self.force_upgrade)
-
-        install.install.run(self) # this basically copies files to site-packages (or dist-packages)
-
-        makacconfig_base_dir = '%s/MaKaC/common' % self.install_lib
-        indico_post_install(self.config_dir,
-                            makacconfig_base_dir,
-                            self._resolvePackageDir(),
-                            self.force_no_db,
-                            self.uid,
-                            self.gid)
-
-
-    def _resolvePackageDir(self):
-        '''Returns the path where the pure Python package (MaKaC) will be installed to
-
-        We need to touch it primarily because of the tests where we are specifying a root
-        folder.'''
-        x.packageDir = get_python_lib()
-        if self.root:
-            x.packageDir = x.packageDir[1:]
-
-        self.install_purelib = x.packageDir
-
-
 
 class jsbuild(Command):
     description = "minifies and packs javascript files"
@@ -254,7 +198,6 @@ class fetchdeps_indico(Command):
 
 
     def _installMissing(self, dist):
-
         env = pkg_resources.Environment()
         easy_install.main(["-U",str(dist)])
         env.scan()
@@ -316,7 +259,6 @@ Please specify the directory where you'd like it to be placed.
 %s
         ''' % _databaseText('etc')
 
-
 class tests_indico(Command):
     description = "run the test suite"
     user_options = []
@@ -333,7 +275,6 @@ class tests_indico(Command):
         print out, outerr
 
 
-
 if __name__ == '__main__':
     sys.path = ['indico'] + sys.path # Always load source from the current folder
 
@@ -346,42 +287,23 @@ if __name__ == '__main__':
 
     if 'bdist_egg' in sys.argv:
         jsCompress()
-    else:
-        try:
-            from MaKaC.common.Configuration import Config
-        except IOError:
-            # If an installation is halfway aborted we can end up with a
-            # broken indico_conf value inside MaKaCConfig from the installation dir.
-            updateIndicoConfPathInsideMaKaCConfig('etc/indico.conf.sample', os.path.join('indico', 'MaKaC', 'common', 'MaKaCConfig.py'))
-            from MaKaC.common.Configuration import Config
-
 
     x = vars()
     x.packageDir = os.path.join(get_python_lib(), 'MaKaC')
 
-    # we need to calculate version at this point, before sdist_indico runs
-    if 'sdist' in sys.argv or 'bdist_egg' in sys.argv:
+    if ('--single-version-externally-managed' not in sys.argv) and \
+    ('build' not in sys.argv):
         x.versionVal = _versionInit()
 
-
-    if 'bdist_egg' in sys.argv:
-        x.binDir = 'bin'
-        x.documentationDir = 'doc'
-        x.configurationDir = 'etc'
-        x.htdocsDir = 'htdocs'
-    else:
-        cfg = Config.getInstance()
-        x.binDir = cfg.getBinDir()
-        x.documentationDir = cfg.getDocumentationDir()
-        x.configurationDir = cfg.getConfigurationDir()
-        x.htdocsDir = cfg.getHtdocsDir()
-
+    x.binDir = 'bin'
+    x.documentationDir = 'doc'
+    x.configurationDir = 'etc'
+    x.htdocsDir = 'htdocs'
 
     setup(name = "cds-indico",
           cmdclass={'sdist': sdist_indico,
                     'bdist_egg': bdist_egg_indico,
                     'jsbuild': jsbuild,
-                    'install': install_indico,
                     'tests': tests_indico,
                     'fetchdeps': fetchdeps_indico,
                     'develop': develop_indico,
@@ -389,7 +311,7 @@ if __name__ == '__main__':
 
           version = x.versionVal,
           description = "Integrated Digital Conference",
-          author = "AVC Section@CERN-IT",
+          author = "Indico Team",
           author_email = "indico-project@cern.ch",
           url = "http://cern.ch/indico",
           download_url = "http://cern.ch/indico/download-beta.html",

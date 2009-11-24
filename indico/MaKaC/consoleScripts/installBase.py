@@ -31,6 +31,9 @@ import shutil
 import string
 import sys
 import pkg_resources
+import copy
+
+
 
 if sys.platform == 'linux2':
     import pwd
@@ -284,8 +287,13 @@ def _checkDirPermissions(directories, dbInstalledBySetupPy=False, accessuser=Non
 
 def _existingConfiguredEgg():
     '''Returns true if an existing EGG has been detected.'''
-    env = pkg_resources.Environment()
-    env.scan()
+
+    # remove '.' and './indico'
+    path = copy.copy(sys.path)
+    path = path[2:]
+
+    env = pkg_resources.Environment(search_path=path)
+    env.scan(search_path=path)
 
     # search for all indico dists
     indico_dists = env['cds-indico']
@@ -421,7 +429,7 @@ At this point you can:
 
 What do you want to do [c/a]? ''')
     if opt in ('c', 'C'):
-        shutil.copy(sourceConfig + '.sample', indicoconfpath)
+        shutil.copy(PWD_INDICO_CONF + '.sample', indicoconfpath)
         _replacePrefixInConf(indicoconfpath, prefixDir)
     elif opt in ('', 'a', 'A'):
         print "\nExiting installation..\n"
