@@ -330,7 +330,7 @@ def _replacePrefixInConf(filePath, prefix):
     fdata = re.sub('\/opt\/indico', prefix, fdata)
     open(filePath, 'w').write(fdata)
 
-def _updateDbConfigFiles(dbDir, logDir, cfgDir, uid):
+def _updateDbConfigFiles(dbDir, logDir, cfgDir, tmpDir, uid):
     filePath = os.path.join(cfgDir, 'zodb.conf')
     fdata = open(filePath).read()
     fdata = re.sub('\/opt\/indico\/db', dbDir, fdata)
@@ -341,6 +341,7 @@ def _updateDbConfigFiles(dbDir, logDir, cfgDir, uid):
     fdata = open(filePath).read()
     fdata = re.sub('\/opt\/indico\/db', dbDir, fdata)
     fdata = re.sub('\/opt\/indico\/etc', cfgDir, fdata)
+    fdata = re.sub('\/opt\/indico\/tmp', tmpDir, fdata)
     fdata = re.sub('(\s+user\s+)apache', '\g<1>%s' % uid, fdata)
     open(filePath, 'w').write(fdata)
 
@@ -528,7 +529,7 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
     modifyOnDiskIndicoConfOption('%s/indico.conf' % targetDirs['etc'], 'ApacheGroup', group)
 
     # change the db config files (paths + apache user/group)
-    _updateDbConfigFiles(dbpath, targetDirs['log'], targetDirs['etc'], user)
+    _updateDbConfigFiles(dbpath, targetDirs['log'], targetDirs['etc'], targetDirs['tmp'], user)
     # check permissions
     _checkDirPermissions(targetDirs, dbInstalledBySetupPy=dbParam, accessuser=user, accessgroup=group)
     # check that mod_python is installed
