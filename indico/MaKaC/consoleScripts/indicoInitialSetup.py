@@ -90,7 +90,7 @@ def main(rpm=False):
                         os.path.join(os.path.abspath(os.path.dirname(__file__)),
                                      '..',
                                      'common'),
-                        get_python_lib(),
+                        eggDir,
                         force_no_db=False)
 
 if __name__ == '__main__':

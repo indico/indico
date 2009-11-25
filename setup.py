@@ -246,7 +246,7 @@ Please specify the directory where you'd like it to be placed.
 
         directories['htdocs'] = os.path.join(os.getcwd(), 'indico', 'htdocs')
 
-        from MaKaC.consoleScripts.installBase import _databaseText, _findApacheUserGroup, _checkDirPermissions, _updateDbConfigFiles
+        from MaKaC.consoleScripts.installBase import _databaseText, _findApacheUserGroup, _checkDirPermissions, _updateDbConfigFiles, _updateMaKaCEggCache
 
         user = ''
 
@@ -258,6 +258,8 @@ Please specify the directory where you'd like it to be placed.
             _checkDirPermissions(directories, dbInstalledBySetupPy=directories['db'], accessuser=user, accessgroup=group)
 
         _updateDbConfigFiles(directories['db'], directories['log'], os.path.join(sourcePath,'etc'), directories['tmp'], user)
+
+        _updateMaKaCEggCache(os.path.join(os.path.dirname(__file__), 'indico', 'MaKaC', '__init__.py'), directories['tmp'])
 
         updateIndicoConfPathInsideMaKaCConfig(os.path.join(os.path.dirname(__file__), ''), 'indico/MaKaC/common/MaKaCConfig.py')
         compileAllLanguages()

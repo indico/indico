@@ -151,6 +151,11 @@ def updateIndicoConfPathInsideMaKaCConfig(indico_conf_path, makacconfigpy_path):
     fdata = re.sub('indico_conf[ ]*=[ ]*[\'"]{1}([^\'"]*)[\'"]{1}', "indico_conf = \"%s\"" % indico_conf_path, fdata)
     open(makacconfigpy_path, 'w').write(fdata)
 
+def _updateMaKaCEggCache(file, path):
+    fdata = open(file).read()
+    fdata = re.sub('\/opt\/indico\/tmp', path, fdata)
+    open(file, 'w').write(fdata)
+
 
 def compileAllLanguages():
     '''Generates .mo files from .po files'''
@@ -511,7 +516,7 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
 
     #we delete an existing vars.js.tpl.tmp
     tmp_dir = targetDirs['tmp']
-    print tmp_dir
+
     varsJsTplTmpPath = os.path.join(tmp_dir, 'vars.js.tpl.tmp')
     if os.path.exists(varsJsTplTmpPath):
         print 'Old vars.js.tpl.tmp found at: %s. Removing' % varsJsTplTmpPath
@@ -528,6 +533,9 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
     # change indico.conf
     modifyOnDiskIndicoConfOption('%s/indico.conf' % targetDirs['etc'], 'ApacheUser', user)
     modifyOnDiskIndicoConfOption('%s/indico.conf' % targetDirs['etc'], 'ApacheGroup', group)
+
+    # set the directory for the egg cache
+    _updateMaKaCEggCache(os.path.join(package_dir, 'MaKaC', '__init__.py'), targetDirs['tmp'])
 
     if not force_no_db:
         # change the db config files (paths + apache user/group)
