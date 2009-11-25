@@ -5,3 +5,6 @@
   directory     /opt/indico/db
   socket-name   /opt/indico/db/zdsock
 </runner>
+<environment>
+  PYTHON_EGG_CACHE /opt/indico/tmp/egg-cache
+</environment>

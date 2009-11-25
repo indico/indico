@@ -483,6 +483,7 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
         print 'Skipping database detection'
     else:
         if os.path.exists(dbDir):
+            dbpath = dbDir
             print 'Successfully found a database directory at %s' % dbDir
         else:
             opt = None
@@ -528,8 +529,10 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
     modifyOnDiskIndicoConfOption('%s/indico.conf' % targetDirs['etc'], 'ApacheUser', user)
     modifyOnDiskIndicoConfOption('%s/indico.conf' % targetDirs['etc'], 'ApacheGroup', group)
 
-    # change the db config files (paths + apache user/group)
-    _updateDbConfigFiles(dbpath, targetDirs['log'], targetDirs['etc'], targetDirs['tmp'], user)
+    if not force_no_db:
+        # change the db config files (paths + apache user/group)
+        _updateDbConfigFiles(dbpath, targetDirs['log'], targetDirs['etc'], targetDirs['tmp'], user)
+
     # check permissions
     _checkDirPermissions(targetDirs, dbInstalledBySetupPy=dbParam, accessuser=user, accessgroup=group)
     # check that mod_python is installed
@@ -547,33 +550,16 @@ Indico has been installed correctly.
     ConfigurationDir: %s
     HtdocsDir:        %s
 
+For information on how to configure Apache HTTPD, take a look at:
+
+http://cdswaredev.cern.ch/indico/wiki/Admin/Installation#ConfiguringApache
+
 
 Please do not forget to start the 'taskDaemon' in order to use alarms, creation
 of off-line websites, reminders, etc. You can find it in './bin/taskDaemon.py'
 
-Add the following lines to your Apache2 httpd.conf:
-
-<Directory "%s">
-    AddHandler python-program .py
-    PythonHandler mod_python.publisher
-    PythonDebug On
-    PythonPath "sys.path + ['%s']"
-</Directory>
-
-<Directory "%s/services">
-    SetHandler python-program
-    PythonHandler MaKaC.services.handler
-    PythonInterpreter main_interpreter
-    Allow from All
-</Directory>
-
-Alias /indico/images "%s/images"
-Alias /indico "%s"
-
-(change the paths after 'Alias' in order to change the URL bindings)
-
 %s
-""" % (targetDirs['etc'], targetDirs['bin'], targetDirs['doc'], targetDirs['etc'], targetDirs['htdocs'], targetDirs['htdocs'], package_dir, targetDirs['htdocs'], targetDirs['htdocs'], targetDirs['htdocs'], _databaseText(targetDirs['etc']))
+""" % (targetDirs['etc'], targetDirs['bin'], targetDirs['doc'], targetDirs['etc'], targetDirs['htdocs'], _databaseText(targetDirs['etc']))
 
 def _databaseText(cfgPrefix):
     return """If you are running ZODB on this host:

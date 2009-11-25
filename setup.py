@@ -246,12 +246,18 @@ Please specify the directory where you'd like it to be placed.
 
         directories['htdocs'] = os.path.join(os.getcwd(), 'indico', 'htdocs')
 
-        from MaKaC.consoleScripts.installBase import _databaseText, _findApacheUserGroup, _checkDirPermissions
+        from MaKaC.consoleScripts.installBase import _databaseText, _findApacheUserGroup, _checkDirPermissions, _updateDbConfigFiles
+
+        user = ''
+
+        sourcePath = os.getcwd()
 
         if sys.platform == "linux2":
             # find the apache user/group
             user, group = _findApacheUserGroup(None, None)
-            _checkDirPermissions(directories, accessuser=user, accessgroup=group)
+            _checkDirPermissions(directories, dbInstalledBySetupPy=directories['db'], accessuser=user, accessgroup=group)
+
+        _updateDbConfigFiles(directories['db'], directories['log'], os.path.join(sourcePath,'etc'), directories['tmp'], user)
 
         updateIndicoConfPathInsideMaKaCConfig(os.path.join(os.path.dirname(__file__), ''), 'indico/MaKaC/common/MaKaCConfig.py')
         compileAllLanguages()
@@ -292,7 +298,7 @@ if __name__ == '__main__':
     x.packageDir = os.path.join(get_python_lib(), 'MaKaC')
 
     if ('--single-version-externally-managed' not in sys.argv) and \
-    ('build' not in sys.argv):
+    ('build' not in sys.argv) and ('develop' not in sys.argv):
         x.versionVal = _versionInit()
 
     x.binDir = 'bin'

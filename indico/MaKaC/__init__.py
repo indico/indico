@@ -21,3 +21,7 @@
 
 DEVELOPMENT = 0
 __version__="9999"
+
+def setEnvironment():
+    import os
+    os.environ['PYTHON_EGG_CACHE'] = '/opt/indico/tmp/egg-cache'
