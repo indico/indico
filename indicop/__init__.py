@@ -26,22 +26,46 @@ WARNING WARNING WARNING
 If you are launching tests inside Eclipse or any other IDE make sure that sys.path 
 is properly set.
 '''
-import os.path
+import os
 import unittest
 import sys
 import glob
 import re
 import nose
+import figleaf
+import figleaf.annotate_html
 
-def main():
-    sys.path = ['/home/jeremy/cds-indico/indico'] + sys.path
+
+def main(testPath, coverage):
 
     print "Welcome in INDICOP"
     sys.stdout.flush()
-#    result = nose.run(argv=['nose', '--verbose', 'indicop/MaKaC_tests'])
-    result = nose.run(argv=['nose','-v', 'indicop/MaKaC_tests/'])
+    returnString=""
     
-    return result
+    if coverage:
+        figleaf.start()
+    
+    if testPath:
+        result = nose.run(argv=['nose','-v', 'indicop/MaKaC_tests/%s' % testPath])
+    else:
+        result = nose.run(argv=['nose','-v', 'indicop/MaKaC_tests/'])
+
+    if coverage:
+        figleaf.stop()
+        coverageOutput = figleaf.get_data().gather_files()
+        try:
+            figleaf.annotate_html.report_as_html(coverageOutput, 'indicop/coverage/html_report', [], {})
+        except Exception:
+            os.mkdir('indicop/coverage/html_report')
+            figleaf.annotate_html.report_as_html(coverageOutput, 'indicop/coverage/html_report', [], {})
+        returnString += "Report generated in indicop/coverage/html_report\n"
+    
+    if result:
+        returnString += "All tests succeeded!"
+    else:
+        returnString += "TestSuite failed!"
+    
+    return returnString
 
 if __name__ == '__main__':
     main()

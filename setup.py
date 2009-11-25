@@ -300,19 +300,21 @@ Please specify the directory where you'd like it to be placed.
 
 class tests_indico(Command):
     description = "run the test suite"
-    user_options = []
-    boolean_options = []    
+    user_options = [('specify=', None, "Use nosetests style (file.class:testcase)"),
+                    ('coverage', None, "Output coverage report in html")]
+    boolean_options = []
+    
+    specify = None
+    coverage = False
+    
     def initialize_options(self): pass
 
     def finalize_options(self): pass
 
     def run(self):
         import indicop
-        result = indicop.main()
-        if result:
-            print "All tests succeeded!"
-        else:
-            print "Test Suite FAILED!"
+        result = indicop.main(self.specify, self.coverage)
+        print result
 
 
 if __name__ == '__main__':
@@ -346,9 +348,9 @@ if __name__ == '__main__':
                     'bdist': _bdist_indico(dataFiles),
                     'bdist_egg': _bdist_egg_indico(dataFiles),
                     'jsbuild': jsbuild,
-                    'tests': tests_indico,
                     'fetchdeps': fetchdeps_indico,
                     'develop': develop_indico,
+                    'tests': tests_indico,
                     },
 
           version = _versionInit(),
