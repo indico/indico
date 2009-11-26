@@ -3875,20 +3875,22 @@ class Conference(Persistent, Fossilizable):
         if isinstance(prin, ConferenceChair):
             email = prin.getEmail()
         elif isinstance(prin, str):
-            email = prin
+            email = prin 
         if email != None:
             if email == "":
                 return
             ah = AvatarHolder()
             results=ah.match({"email":email}, exact=1)
+            #No registered user in Indico with that email
             if len(results) == 0:
                 self.__ac.grantModificationEmail(email)
                 if sendEmail and isinstance(prin, ConferenceChair):
                     notif = pendingQueues._PendingConfManagerNotification( [prin] )
                     mail.GenericMailer.sendAndLog( notif, self.getConference() )
+            #The user is registered in Indico and is activated as well
             elif len(results) == 1 and results[0] is not None and results[0].isActivated():
                 self.__ac.grantModification(results[0])
-                results[0].linkTo(self, "manager")
+                results[0].linkTo(self, "manager") 
         else:
             self.__ac.grantModification( prin )
             if isinstance(prin, MaKaC.user.Avatar):
