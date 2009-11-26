@@ -25,6 +25,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.materialFactories as materialFactories
 import MaKaC.webinterface.navigation as navigation
 import MaKaC.webinterface.linking as linking
+from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from xml.sax.saxutils import quoteattr
 from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceBase, WPConferenceModifBase
@@ -33,7 +34,7 @@ from datetime import datetime
 from MaKaC.common.utils import isStringHTML
 from MaKaC.i18n import _
 
-class WPSubContributionBase( WPConferenceBase ):
+class WPSubContributionBase( WPMainBase, WPConferenceBase ):
     
     def __init__( self, rh, subContribution ):
         self._subContrib = self._target = subContribution
@@ -54,23 +55,18 @@ class WPSubContributionBase( WPConferenceBase ):
 #        self._overviewSubContOpt.setActionURL( urlHandlers.UHSubContributionOverview.getURL( c ) )
 
 
-class WPSubContributionDisplayBase( WPSubContributionBase ):
-    pass
-
-
-class WPSubContributionDefaultDisplayBase( WPSubContributionDisplayBase, WPConferenceDefaultDisplayBase ):
+class WPSubContributionDefaultDisplayBase( WPConferenceDefaultDisplayBase, WPSubContributionBase ):
     
+    def getJSFiles(self):
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
+            self._includeJSPackage('Management') + \
+               self._includeJSPackage('MaterialEditor')
+
     def __init__( self, rh, contribution ):
-        WPSubContributionDisplayBase.__init__( self, rh, contribution )
-        
-    def _getHeader( self ):
-        return WPConferenceDefaultDisplayBase._getHeader( self )
+        WPSubContributionBase.__init__( self, rh, contribution )
 
-    def _applyDecoration( self, body ):
-        return WPConferenceDefaultDisplayBase._applyDecoration( self, body )
 
-    def _display(self,params):
-        return WPConferenceDefaultDisplayBase._display(self,params)
+
 
 class WSubContributionDisplayBase(wcomponents.WTemplated):
     def __init__(self, aw, subContrib):

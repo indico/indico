@@ -185,7 +185,7 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
 
          // Called when user clicks the close button, if the function
          // returns true the dialog will be closed.
-         this.closeHandler = any(closeButtonHandler, null);
+         this.closeHandler = any(closeButtonHandler, function() {return true; });
 
          // The maximum allowed height, used since it doesn't look
          // very nice it the dialog gets too big.
