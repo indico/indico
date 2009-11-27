@@ -26,11 +26,11 @@
 <table width="100%" border="0" bgcolor="white" cellpadding="1" cellspacing="1">
 <tr>
   <td valign="top" align="left">
-    <table border="0" bgcolor="gray" cellspacing="1" cellpadding="1">
+    <table border="0" bgcolor="gray" cellspacing="1" cellpadding="1" width="100%">
     <tr>
       <td colspan="1">
-	<table border="0" cellpadding="2" cellspacing="0" width="100%" class="headerselected" bgcolor="#000060">
-	<tr>
+    <table border="0" cellpadding="2" cellspacing="0" width="100%" class="headerselected" bgcolor="#000060">
+    <tr>
           <td width="35">
             <img src="images/meeting.png" width="32" height="32" alt="lecture"/>
           </td>
@@ -49,9 +49,9 @@
             </font>
             </strong></b>
             <small>
-		    <xsl:for-each select="./repno">
-			<br/><xsl:apply-templates select="."/>
-		    </xsl:for-each>
+            <xsl:for-each select="./repno">
+            <br/><xsl:apply-templates select="."/>
+            </xsl:for-each>
             </small>
           </td>
         </tr>
@@ -60,7 +60,7 @@
     </tr>
     <tr>
       <td>
-        <table border="0" bgcolor="#f0c060" cellpadding="2" cellspacing="0" width="100%" class="results tablepre">
+        <table border="0" bgcolor="#f0c060" cellpadding="2" cellspacing="0" width="100%" >
         <tr>
           <td valign="top" align="right">
             <b><strong>
@@ -229,10 +229,7 @@
           </td>
           <td>
             <xsl:for-each select="./material">
-                <xsl:apply-templates select="."/>                           
-            </xsl:for-each>
-            <xsl:for-each select="./material">
-                <xsl:call-template name="minutes"/>
+              <xsl:apply-templates select="."/>
             </xsl:for-each>
           </td>
         </tr>
@@ -244,39 +241,41 @@
   </td>
   <td align="right" valign="top">
     <table border="0" bgcolor="gray" cellspacing="1" cellpadding="1">
-    <tr>
-      <td>
-        <table bgcolor="white" cellpadding="2" cellspacing="0" border="0" width="100%">
-          <xsl:for-each select="session">
-          <tr>
-            <td valign="top" class="headerselected" bgcolor="#000060">
-              <font size="-2" color="white">
-              <xsl:choose>
-              <xsl:when test="substring(./startDate,0,11) = substring(./endDate,0,11)">
-                <xsl:call-template name="prettydate">
-                  <xsl:with-param name="dat" select="substring(./startDate,0,11)"/>
-                </xsl:call-template>
-                <xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
-                <xsl:value-of select="substring(./startDate,12,5)"/>
-                <xsl:if test="substring(./endDate,12,5) != '00:00'">-&gt;<xsl:value-of select="substring(./endDate,12,5)"/></xsl:if>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:call-template name="prettydate">
-                  <xsl:with-param name="dat" select="substring(./startDate,0,11)"/>
-                </xsl:call-template>
-                <xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
-                <xsl:value-of select="substring(./startDate,12,5)"/>
-                -&gt;
-                <xsl:call-template name="prettydate">
-                  <xsl:with-param name="dat" select="substring(./endDate,0,11)"/>
-                </xsl:call-template>
-                <xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
-                <xsl:value-of select="substring(./endDate,12,5)"/>
-              </xsl:otherwise>
-              </xsl:choose>
-              </font>
-            </td>
-            <xsl:choose>
+        <xsl:if test="count(child::session) != 0">
+            <tr>
+                <td>
+                    <table bgcolor="white" cellpadding="2" cellspacing="0" border="0" width="100%">
+   
+                        <xsl:for-each select="session">
+                            <tr>
+                                <td valign="top" class="headerselected" bgcolor="#000060">
+                                    <font size="-2" color="white">
+                                        <xsl:choose>
+                                        <xsl:when test="substring(./startDate,0,11) = substring(./endDate,0,11)">
+                                            <xsl:call-template name="prettydate">
+                                                <xsl:with-param name="dat" select="substring(./startDate,0,11)"/>
+                                            </xsl:call-template>
+                                            <xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
+                                            <xsl:value-of select="substring(./startDate,12,5)"/>
+                                            <xsl:if test="substring(./endDate,12,5) != '00:00'">-&gt;<xsl:value-of select="substring(./endDate,12,5)"/></xsl:if>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:call-template name="prettydate">
+                                                <xsl:with-param name="dat" select="substring(./startDate,0,11)"/>
+                                            </xsl:call-template>
+                                            <xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
+                                                <xsl:value-of select="substring(./startDate,12,5)"/>
+                                                -&gt;
+                                            <xsl:call-template name="prettydate">
+                                                <xsl:with-param name="dat" select="substring(./endDate,0,11)"/>
+                                            </xsl:call-template>
+                                            <xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
+                                                <xsl:value-of select="substring(./endDate,12,5)"/>
+                                        </xsl:otherwise>
+                                        </xsl:choose>
+                                    </font>
+                                </td>
+                    <xsl:choose>
             <xsl:when test="count(preceding-sibling::session) mod 2 = 1">
               <xsl:text disable-output-escaping="yes">
               &#60;td valign="top" bgcolor="#E4E4E4"&#62;
@@ -287,7 +286,7 @@
               &#60;td valign="top" bgcolor="#F6F6F6"&#62;
               </xsl:text>
             </xsl:otherwise>
-            </xsl:choose>                
+            </xsl:choose>
               <a href="#{./ID}">
               <font size="-2">
               <xsl:choose>
@@ -306,73 +305,57 @@
               </xsl:if>
               </font>
               <xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
-		<xsl:text disable-output-escaping="yes">&#60;/td&#62;</xsl:text>
+        <xsl:text disable-output-escaping="yes">&#60;/td&#62;</xsl:text>
 
-		<xsl:choose>
-		<xsl:when test="@chairperson != ''">
-			<xsl:choose>
-			<xsl:when test="count(preceding-sibling::session) mod 2 = 1">
-				<xsl:text disable-output-escaping="yes">
-			&#60;td valign="top" align="right" bgcolor="#E4E4E4"&#62;
-			&#60;font size="-2"&#62;
-			</xsl:text>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:text disable-output-escaping="yes">
-			&#60;td valign="top" align="right" bgcolor="#F6F6F6"&#62;
-			&#60;font size="-2"&#62;
-			</xsl:text>
-			</xsl:otherwise>
-			</xsl:choose>
-			<xsl:value-of select="@chairperson"/>
-			<xsl:text disable-output-escaping="yes">
-			&#60;/font&#62;
-			&#60;/td&#62;
-			</xsl:text>	
-		</xsl:when>
-		<xsl:otherwise>
-			<xsl:choose>
-			<xsl:when test="count(preceding-sibling::session) mod 2 = 1">
-				<xsl:text disable-output-escaping="yes">
-				&#60;td valign="top" align="right" bgcolor="#E4E4E4"&#62;
-				</xsl:text>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:text disable-output-escaping="yes">
-				&#60;td valign="top" align="right" bgcolor="#F6F6F6"&#62;
-				</xsl:text>
-			</xsl:otherwise>
-			</xsl:choose>
-			<xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
-			<xsl:text disable-output-escaping="yes">
-			&#60;/td&#62;
-			</xsl:text>
-		</xsl:otherwise>
-		</xsl:choose>
-	</tr>
-	</xsl:for-each>
-	</table>
-	</td></tr></table>
-	</td>
+        <xsl:choose>
+        <xsl:when test="@chairperson != ''">
+            <xsl:choose>
+            <xsl:when test="count(preceding-sibling::session) mod 2 = 1">
+                <xsl:text disable-output-escaping="yes">
+            &#60;td valign="top" align="right" bgcolor="#E4E4E4"&#62;
+            &#60;font size="-2"&#62;
+            </xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:text disable-output-escaping="yes">
+            &#60;td valign="top" align="right" bgcolor="#F6F6F6"&#62;
+            &#60;font size="-2"&#62;
+            </xsl:text>
+            </xsl:otherwise>
+            </xsl:choose>
+            <xsl:value-of select="@chairperson"/>
+            <xsl:text disable-output-escaping="yes">
+            &#60;/font&#62;
+            &#60;/td&#62;
+            </xsl:text> 
+        </xsl:when>
+        <xsl:otherwise>
+            <xsl:choose>
+            <xsl:when test="count(preceding-sibling::session) mod 2 = 1">
+                <xsl:text disable-output-escaping="yes">
+                &#60;td valign="top" align="right" bgcolor="#E4E4E4"&#62;
+                </xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:text disable-output-escaping="yes">
+                &#60;td valign="top" align="right" bgcolor="#F6F6F6"&#62;
+                </xsl:text>
+            </xsl:otherwise>
+            </xsl:choose>
+            <xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
+            <xsl:text disable-output-escaping="yes">
+            &#60;/td&#62;
+            </xsl:text>
+        </xsl:otherwise>
+        </xsl:choose>
+    </tr>
+    </xsl:for-each>
+
+    </table>
+    </td></tr>        </xsl:if></table>
+    </td>
 </tr>
 </table>
 </xsl:template>
 
-<xsl:template name="minutes">
-      <xsl:if test="./minutesText != ''">
-      <tr>
-        <td align="center" style="padding-top:10px;padding-bottom:10px" colspan="2">
-          <table border="1" bgcolor="white" cellpadding="2" align="center" width="100%">
-            <tr>
-              <td align="center"><b>Minutes</b></td>
-            </tr>
-            <tr>
-                <td><xsl:apply-templates select="./minutesText"/></td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-      </xsl:if>
- </xsl:template>
- 
 </xsl:stylesheet>
