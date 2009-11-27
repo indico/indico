@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS Invenio 0.7\n"
 "POT-Creation-Date: 2005-11-22 11:20+0100\n"
-"PO-Revision-Date: 2005-11-22 11:20+0100\n"
+"PO-Revision-Date: 2009-11-27 15:06+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -5699,7 +5699,7 @@ msgstr ""
 
 #: po\language_list.py:9
 msgid "en_US"
-msgstr "English (USA)"
+msgstr "English"
 
 #: webinterface\tpls\RoomBookingRoomList.tpl:47
 msgid "Room name"
