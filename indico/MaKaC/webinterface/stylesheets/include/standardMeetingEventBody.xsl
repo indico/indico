@@ -31,7 +31,7 @@
 
     <div class="meetingEventBody">
         
-        <div style="position: absolute; right: 50px; top: 10px;"><span class="fakeLink dropDownMenu" id="goToDayLink"><strong>Go to day</strong></span></div>
+        <div style="position: absolute; right: 50px; top: 3px;"><span class="fakeLink dropDownMenu" id="goToDayLink"><strong>Go to day</strong></span></div>
 
 <script type="text/javascript">
 
