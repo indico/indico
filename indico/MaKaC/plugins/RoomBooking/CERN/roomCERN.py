@@ -36,5 +36,6 @@ class RoomCERN( Room ):
               "ESnet MCU",
               "CERN MCU",
               "H323 point2point",
+              "Audio Conference",
               "I don't know"]
 

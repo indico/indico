@@ -358,12 +358,14 @@ class RHChairNew(RHConferenceModifBase):
         chair.setPhone(p.get("phone",""))
         chair.setFax(p.get("fax",""))
         self._target.addChair(chair)
+        #If the chairperson needs to be given management rights
         if p.get("manager", None):
             avl = user.AvatarHolder().match({"email":p.get("email","")})
             if avl:
                 av = avl[0]
                 self._target.grantModification(av)
             else:
+                #Apart from granting the chairman, we add it as an Indico user
                 self._target.grantModification(chair)
 
     def _process(self):

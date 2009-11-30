@@ -1,5 +1,5 @@
 <form method="get" action="%(searchAction)s" id="searchBoxForm" style="margin: 0px;">
-<input type="hidden" name="categId" value="0"/>
+<input type="hidden" id="searchCategId" name="categId" value="0"/>
 <div id="UISearchBox">
     <div id="searchControls">
         <div class="yellowButton searchButton">

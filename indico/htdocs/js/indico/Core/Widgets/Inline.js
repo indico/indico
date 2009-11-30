@@ -311,7 +311,7 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor"],
              return option;
          },
 
-         drawContent: function() {
+         _handleContent: function() {
              var self = this;
 
              this.selected.observe(function(value) {
@@ -356,7 +356,8 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor"],
          this.options = new WatchObject();
          this.select = Html.select({});
          this.selected = new WatchValue();
-         this.InlineRemoteWidget(method, args);
+         // Load data source on startup
+         this.InlineRemoteWidget(method, args, true);
      });
 
 

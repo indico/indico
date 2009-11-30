@@ -6,7 +6,7 @@
     <em><%= _("Please, follow the steps to create a lecture")%></em> 
     <div class="groupTitle"><%= _("Step 1: Choose a category")%></div>
     <div style="padding: 10px">
-        <input type="hidden" value="<%= categ['id'] %>" name="categId" id="categId"/>
+        <input type="hidden" value="<%= categ['id'] %>" name="categId" id="createCategId"/>
         <span class="selectedCategoryName"><%= _("The event will be created in:")%> <span id="categTitle" class="categTitleChosen"><%= categ['title'] %></span></span><input <% if nocategs: %>style="display: none;"<% end %> id="buttonCategChooser" type="button" value="<%= _("Browse...")%>" onclick="categoryChooser.open()"/>
     </div>
 
@@ -139,7 +139,7 @@
 
     // ----- Categ Chooser
     var categoryChooserHandler = function(categ){
-        $E("categId").set(categ.id);
+        $E("createCategId").set(categ.id);
         $E("categTitle").set(categ.title);
         $E("buttonCategChooser").set("<%= _("Change...")%>")
         IndicoUI.Effect.highLightBackground("categTitle");
@@ -165,7 +165,7 @@
                     popup.open();
                     return false
                 }
-                if ($E("categId").get() == "") {
+                if ($E("createCategId").get() == "") {
                     var popup = new ErrorPopup("<%= _("Missing mandatory data")%>", ["<%= _("Please, choose a category (step 1)")%>"], "");
                     popup.open();
                     return false;

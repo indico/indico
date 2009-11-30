@@ -30,7 +30,6 @@
 <!-- Global object: Agenda -->
 <xsl:template match="iconf">
 
-<center>
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
 <tr>
   <td>
@@ -64,7 +63,7 @@
   </td>
 </tr>
 </table>
-</center>
+
 </xsl:template>
 
 
@@ -232,7 +231,7 @@
   <xsl:otherwise>
   <xsl:text disable-output-escaping="yes">
   &#60;td colspan="2" width="75%" valign="top" bgcolor="#F6F6F6"&#62;
-    &#60;table class="tablepre" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F6F6F6"&#62;
+    &#60;table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F6F6F6"&#62;
   </xsl:text>
   </xsl:otherwise>
   </xsl:choose>
@@ -293,20 +292,10 @@
     </tr>
     </xsl:if>
     <xsl:for-each select="./material">
-      <xsl:if test="./minutesText != ''">
-      <tr>
-        <td align="center" style="padding-top:10px;padding-bottom:10px" colspan="2">
-          <table border="1" bgcolor="white" cellpadding="2" align="center" width="100%">
-            <tr>
-              <td align="center"><b>Minutes</b></td>
-            </tr>
-            <tr>
-                <td><xsl:apply-templates select="./minutesText"/></td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-      </xsl:if>
+        
+
+                <xsl:call-template name="minutes"/>
+
     </xsl:for-each>
     <xsl:for-each select="subcontribution">
       <xsl:apply-templates select="."/>
