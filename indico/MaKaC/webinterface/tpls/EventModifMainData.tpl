@@ -29,7 +29,7 @@ while topcat:
     topcat = topcat.getOwner()        
 visibilityList[999] = 'Everywhere'     
 
-numRows = 12
+numRows = 11
 
 
 favoriteRooms = confObj.getFavoriteRooms();
