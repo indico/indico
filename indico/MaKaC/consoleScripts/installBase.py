@@ -184,6 +184,15 @@ def copytreeSilently(source, target):
 
 def jsCompress():
     '''Packs and minifies javascript files'''
+
+    try:
+        pkg_resources.require('jstools')
+    except pkg_resources.DistributionNotFound:
+        print """
+JSTools not found! JSTools is needed for JavaScript compression, if you're building Indico from source. Please install it.
+i.e. try 'easy_install jstools'"""
+        sys.exit(-1)
+
     jsbuildPath = 'jsbuild'
     os.chdir('./etc/js')
     os.system('%s -o ../../indico/htdocs/js/indico/pack indico.cfg' % jsbuildPath)
@@ -351,19 +360,27 @@ def _updateDbConfigFiles(dbDir, logDir, cfgDir, tmpDir, uid):
     open(filePath, 'w').write(fdata)
 
 
-def indico_pre_install(defaultPrefix, force_upgrade=False, sourceConfig=PWD_INDICO_CONF):
+def indico_pre_install(defaultPrefix, force_upgrade=False, existingConfig=None):
     """
     defaultPrefix is the default prefix dir where Indico will be installed
     """
 
-    existing = _existingConfiguredEgg()
-
     upgrade = False
 
-    if existing:
-        if force_upgrade:
-            upgrade = True
-        else:
+    # Configuration specified in the command-line
+    if existingConfig:
+        existing = existingConfig
+        # upgrade is mandatory
+        upgrade = True
+    else:
+        # Config not specified
+        # automatically find an EGG in the site-packages path
+        existing = _existingConfiguredEgg()
+
+        # if an EGG was found but upgrade is not forced
+        if existing and not force_upgrade:
+
+            # Ask the user
             opt = None
 
             while opt not in ('', 'e', 'E', 'u'):
@@ -387,7 +404,9 @@ What do you want to do [u/E]? ''' % existing)
             else:
                 print "\nInvalid answer. Exiting installation..\n"
                 sys.exit()
-
+        # if and EGG was found and upgrade is forced
+        elif existing and force_upgrade:
+            upgrade = True
 
     if upgrade:
         print 'Upgrading the existing Indico installation..'

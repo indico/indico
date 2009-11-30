@@ -27,7 +27,7 @@ functions refer to installBase.py
 On RPM or windist based installations it can be made run automatically'''
 
 import os, sys
-import shutil
+import shutil, getopt
 
 from distutils.sysconfig import get_python_lib
 
@@ -56,30 +56,36 @@ def copy_egg_datafiles_to_base(dstDir):
         copytreeSilently(src, dst)
 
 
-def main(rpm=False):
+def main():
 
     global PWD_INDICO_CONF
     global eggDir
 
+    optlist, args = getopt.getopt(sys.argv[1:],'',['rpm','existing-config='])
+
+    forRPM = False
+    existingPath = None
+
+    for o,a in optlist:
+        if o == '--rpm':
+            forRPM = True
+        elif o == '--existing-config':
+            existingPath = a
+
     setIndicoInstallMode(True)
 
-
-    if rpm:
+    if forRPM:
         # TODO: post-install for RPMs
         pass
     else:
         targetDirs = { 'etc': '/opt/indico/etc' }
         PWD_INDICO_CONF = os.path.join(os.path.dirname(__file__), '..', '..', 'etc', 'indico.conf.sample')
 
-        targetDirs = indico_pre_install('/opt/indico', False, sourceConfig=os.path.join(eggDir,'etc','indico.conf'))
-
+        targetDirs = indico_pre_install('/opt/indico', False, existingConfig=existingPath)
         # we need to copy htdocs/ bin/ doc/ etc/ to its proper place
         print "Copying Indico tree... "
         copy_egg_datafiles_to_base(targetDirs)
         print "done!"
-
-        #    if not os.path.exists('/opt/indico/etc/indico.conf'):
-        #        shutil.copy('/opt/indico/etc/indico.conf.sample', '/opt/indico/etc/indico.conf')
 
 
     sourceDirs = dict((dirName, os.path.join(eggDir, dirName))
@@ -91,7 +97,7 @@ def main(rpm=False):
                                      '..',
                                      'common'),
                         eggDir,
-                        force_no_db=False)
+                        force_no_db=(existingPath != None))
 
 if __name__ == '__main__':
-    main(rpm=('--rpm' in sys.argv))
+    main()

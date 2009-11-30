@@ -32,6 +32,7 @@ import string
 import sys
 from distutils.sysconfig import get_python_lib
 from distutils.cmd import Command
+from distutils.command import bdist
 
 import pkg_resources
 from setuptools.command import develop, install, sdist, bdist_egg, easy_install
@@ -58,6 +59,23 @@ class vars(object):
 
 ###  Methods required by setup() ##############################################
 
+def _generateDataPaths(x):
+
+    dataFilesDict = {}
+
+    for (baseDstDir, files, remove_first_x_chars) in x:
+        for f in files:
+            dst_dir = os.path.join(baseDstDir, os.path.dirname(f)[remove_first_x_chars:])
+            if dst_dir not in dataFilesDict:
+                dataFilesDict[dst_dir] = []
+            dataFilesDict[dst_dir].append(f)
+
+    dataFiles = []
+    for k, v in dataFilesDict.items():
+        dataFiles.append((k, v))
+
+    return dataFiles
+
 def _getDataFiles(x):
     """
     Returns a fully populated data_files ready to be fed to setup()
@@ -67,7 +85,6 @@ def _getDataFiles(x):
     values directly because they will not refer to the proper place. We
     include those files in the egg's root folder.
     """
-    dataFilesDict = {}
 
     # setup expects a list like this (('foo/bar/baz', 'wiki.py'),
     #                                 ('a/b/c', 'd.jpg'))
@@ -81,22 +98,11 @@ def _getDataFiles(x):
     # This re will be used to filter out etc/*.conf files and therefore not overwritting them
     isAConfRe = re.compile('etc\/[^/]+\.conf$')
 
-    for (baseDstDir, files, remove_first_x_chars) in (('bin',           findall('bin'), 4),
-                                                      ('doc', ['doc/UserGuide.pdf','doc/AdminUserGuide.pdf'], 4),
-                                                      ('etc', [xx for xx in findall('etc') if not isAConfRe.search(xx)], 4),
-#                                                      ('MaKaC',              findall('indico/MaKaC'), 13),
-                                                      ('htdocs',        findall('indico/htdocs'), 14),
-                                                      ):
-        for f in files:
-            dst_dir = os.path.join(baseDstDir, os.path.dirname(f)[remove_first_x_chars:])
-            if dst_dir not in dataFilesDict:
-                dataFilesDict[dst_dir] = []
-            dataFilesDict[dst_dir].append(f)
-
-    dataFiles = []
-    for k, v in dataFilesDict.items():
-        dataFiles.append((k, v))
-
+    dataFiles = _generateDataPaths((('bin',           findall('bin'), 4),
+                                    ('doc', ['doc/UserGuide.pdf','doc/AdminUserGuide.pdf'], 4),
+                                    ('etc', [xx for xx in findall('etc') if not isAConfRe.search(xx)], 4),
+                                    #('MaKaC',              findall('indico/MaKaC'), 13),
+                                    ('htdocs',        findall('indico/htdocs'), 14)))
     return dataFiles
 
 
@@ -106,9 +112,9 @@ def _getDataFiles(x):
 def _getInstallRequires():
     '''Returns external packages required by Indico
 
-    They will only be installed when Indico is installed through easy_install.'''
+    These are the ones needed for runtime.'''
 
-    base =  ['pytz', 'zodb3', 'jstools', 'zope.index', 'zope.interface', 'simplejson']
+    base =  ['pytz', 'zodb3', 'zope.index', 'zope.interface', 'simplejson']
     if sys.version_info[1] < 5: # hashlib is part of Python 2.5+
         base.append('hashlib')
 
@@ -116,24 +122,15 @@ def _getInstallRequires():
 
 
 def _versionInit():
-        '''Writes a version number inside indico/MaKaC/__init__.py and returns it'''
-        global x
-        v = None
-        for k in sys.argv:
-            if k == '--version':
-                v = sys.argv[sys.argv.index(k) + 1]
-                break
+        '''Retrieves the version number from indico/MaKaC/__init__.py and returns it'''
 
-        if not v:
-            v = raw_input('Version being packaged [dev]: ').strip()
-            if v == '':
-                v = 'dev'
+        import datetime
+        from indico.MaKaC import __version__
+        v = __version__
 
-        old_init = open('indico/MaKaC/__init__.py','r').read()
-        new_init = re.sub('(__version__[ ]*=[ ]*[\'"]{1})([^\'"]+)([\'"]{1})', "\\g<1>%s\\3" % v, old_init)
-        open('indico/MaKaC/__init__.py', 'w').write(new_init)
+        print('Version being packaged: %s' % v)
+
         return v
-
 
 
 def _convertdoc():
@@ -152,15 +149,36 @@ class sdist_indico(sdist.sdist):
 
     def run(self):
         global x
-        _convertdoc()
-        jsCompress()
         sdist.sdist.run(self)
 
-class bdist_egg_indico(bdist_egg.bdist_egg):
-    def run(self):
-        _convertdoc()
-        bdist_egg.bdist_egg.run(self)
 
+class jsdist_indico:
+    def jsCompress(self):
+        from MaKaC.consoleScripts.installBase import jsCompress
+        jsCompress()
+        self.dataFiles += _generateDataPaths([('htdocs/js/presentation/pack', findall('indico/htdocs/js/presentation/pack'), 35),
+                                             ('htdocs/js/indico/pack', findall('indico/htdocs/js/indico/pack'), 29)])
+
+
+def _bdist_indico(dataFiles):
+    class bdist_indico(bdist.bdist, jsdist_indico):
+        def run(self):
+            _convertdoc()
+            self.jsCompress()
+            bdist.bdist.run(self)
+
+    bdist_indico.dataFiles = dataFiles
+    return bdist_indico
+
+def _bdist_egg_indico(dataFiles):
+    class bdist_egg_indico(bdist_egg.bdist_egg, jsdist_indico):
+        def run(self):
+            _convertdoc()
+            self.jsCompress()
+            bdist_egg.bdist_egg.run(self)
+
+    bdist_egg_indico.dataFiles = dataFiles
+    return bdist_egg_indico
 
 class jsbuild(Command):
     description = "minifies and packs javascript files"
@@ -293,31 +311,28 @@ if __name__ == '__main__':
     from MaKaC.consoleScripts.installBase import *
     setIndicoInstallMode(True)
 
-    if 'bdist_egg' in sys.argv:
-        jsCompress()
-
     x = vars()
     x.packageDir = os.path.join(get_python_lib(), 'MaKaC')
 
-    if ('--single-version-externally-managed' not in sys.argv) and \
-    ('build' not in sys.argv) and ('develop' not in sys.argv):
-        x.versionVal = _versionInit()
 
     x.binDir = 'bin'
     x.documentationDir = 'doc'
     x.configurationDir = 'etc'
     x.htdocsDir = 'htdocs'
 
+    dataFiles = _getDataFiles(x)
+
     setup(name = "cds-indico",
           cmdclass={'sdist': sdist_indico,
-                    'bdist_egg': bdist_egg_indico,
+                    'bdist': _bdist_indico(dataFiles),
+                    'bdist_egg': _bdist_egg_indico(dataFiles),
                     'jsbuild': jsbuild,
                     'tests': tests_indico,
                     'fetchdeps': fetchdeps_indico,
                     'develop': develop_indico,
                     },
 
-          version = x.versionVal,
+          version = _versionInit(),
           description = "Integrated Digital Conference",
           author = "Indico Team",
           author_email = "indico-project@cern.ch",
@@ -336,7 +351,7 @@ if __name__ == '__main__':
           zip_safe = False,
           packages = find_packages(where='indico', exclude=('htdocs',)),
           install_requires = _getInstallRequires(),
-          data_files = _getDataFiles(x),
+          data_files = dataFiles,
           package_data = {'indico': ['*.*'] },
           include_package_data = True,
           )

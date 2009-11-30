@@ -20,8 +20,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 DEVELOPMENT = 0
-__version__="9999"
+__version__="v0.97-dev"
 
 def setEnvironment():
     import os
     os.environ['PYTHON_EGG_CACHE'] = '/opt/indico/tmp/egg-cache'
+
