@@ -575,6 +575,7 @@
 
           <tr id="webCastRow" style="display: none">
             <xsl:for-each select="./material">
+            <xsl:if test="./title = 'live webcast' or ./title = 'forthcoming webcast'">
             <td class="leftCol">
               <xsl:if test="./title='live webcast'">
               Live Webcast
@@ -583,6 +584,7 @@
               Webcast
               </xsl:if>
             </td>
+            </xsl:if>
             </xsl:for-each>
             <td>
               <xsl:for-each select="./material">
