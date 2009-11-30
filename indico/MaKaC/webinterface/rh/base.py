@@ -32,6 +32,7 @@ import StringIO
 from datetime import datetime, timedelta
 
 try:
+    from mod_python.util import Field
     from mod_python import apache
 except ImportError:
     pass
@@ -49,6 +50,7 @@ from MaKaC.errors import MaKaCError, ModificationError, AccessError, TimingError
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from xml.sax.saxutils import escape
 
+from MaKaC.common.utils import truncate
 from MaKaC.common.logger import Logger
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.i18n import _
@@ -280,11 +282,27 @@ class RH(RequestHandlerBase):
         p=errors.WPGenericError(self)
         return p.display()
 
+
+    def _getTruncatedParams(self):
+        """ Truncates params, so that file objects do not show up in the logs """
+
+        params = {}
+
+        for key,value in self._reqParams.iteritems():
+            if isinstance(value, Field):
+                params[key] = "<FILE>"
+            elif type(value) == str:
+                params[key] = truncate(value, 1024)
+            else:
+                params[key] = value
+
+        return params
+
     def _processUnexpectedError(self,e):
         """Unexpected errors
         """
 
-        Logger.get('requestHandler').exception('Request %s failed: "%s"\n\nurl: %s\n\nparameters: %s\n\n' % (id(self._req), e,self.getRequestURL() ,self._reqParams))
+        Logger.get('requestHandler').exception('Request %s failed: "%s"\n\nurl: %s\n\nparameters: %s\n\n' % (id(self._req), e,self.getRequestURL(), self._getTruncatedParams()))
         p=errors.WPUnexpectedError(self)
         return p.display()
     

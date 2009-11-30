@@ -551,7 +551,7 @@ class TemplateExec:
             objDict['linkify'] = linkify
         if not 'truncateTitle' in objDict:
             objDict['truncateTitle'] = truncateTitle
-        if not 'urlHandlers' in objDict:            
+        if not 'urlHandlers' in objDict:
             objDict['urlHandlers'] = MaKaC.webinterface.urlHandlers
         if not 'Config' in objDict:
             objDict['Config'] = MaKaC.common.Configuration.Config
