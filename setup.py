@@ -165,6 +165,7 @@ def _bdist_indico(dataFiles):
         def run(self):
             _convertdoc()
             self.jsCompress()
+            compileAllLanguages()
             bdist.bdist.run(self)
 
     bdist_indico.dataFiles = dataFiles
@@ -175,6 +176,7 @@ def _bdist_egg_indico(dataFiles):
         def run(self):
             _convertdoc()
             self.jsCompress()
+            compileAllLanguages()
             bdist_egg.bdist_egg.run(self)
 
     bdist_egg_indico.dataFiles = dataFiles

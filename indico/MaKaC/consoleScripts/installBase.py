@@ -161,7 +161,12 @@ def compileAllLanguages():
     '''Generates .mo files from .po files'''
     pwd = os.getcwd()
     os.chdir(os.path.join(os.path.dirname(os.path.abspath(MaKaC.__file__)), 'po'))
-    os.system('%s compile-all-lang.py --quiet' % sys.executable)
+    retVal = os.system('%s compile-all-lang.py --quiet' % sys.executable)
+
+    if (retVal>>8) != 0:
+        print "Generation of .mo files failed - maybe you don't have gettext installed?"
+        sys.exit(-1)
+
     os.chdir(pwd)
 
 
