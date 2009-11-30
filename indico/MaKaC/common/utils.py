@@ -529,6 +529,12 @@ def getHierarchicalId(obj):
         ret="%s.s%s.%s"%(obj.getConference().getId(), obj.getSession().getId(), ret)
     return ret
 
+def truncate(text, maxSize):
+    if len(text) > maxSize:
+        return text[:maxSize]+'...'
+    else:
+        return text
+
 def main():
     DBMgr.getInstance().startRequest()
     print _("Is working day: ")

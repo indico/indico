@@ -2,7 +2,7 @@
 <form id="conferenceCreationForm" action="%(postURL)s" method="POST">
     <input type="hidden" name="event_type" value="%(event_type)s">
 
-    <em><%= _("Please, follow the steps to create a conference")%></em> 
+    <em><%= _("Please, follow the steps to create a conference")%></em>
 
     <div class="groupTitle"><%= _("Step 1: Choose a category")%></div>
 
@@ -16,7 +16,7 @@
     <table class="groupTable">
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Title")%></span></td>
-            <td nowrap class="contentCellTD">            	
+            <td nowrap class="contentCellTD">
                 <input type="text" name="title" size="80" value="<%= title %>">
             </td>
         </tr>
@@ -58,7 +58,7 @@
         </tr>
 
         <tr id="advancedOptions" style="display:none"><td colspan="2">
-        
+
             <table class="groupTable">
                 <tr>
                     <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Description")%></span></td>
@@ -120,12 +120,12 @@
         }else {
             $E("advancedOptions").dom.style.display = "";
             $E("advancedOptionsText").set('<%= _("Hide advanced options...")%>');
-        }   
+        }
         advOptSwitch = !advOptSwitch;
     }
 
     //---- chairperson management
-    
+
     var userList = [];
     <% from MaKaC.common.PickleJar import DictPickler %>
     var uf = new UserListField('VeryShortPeopleListDiv', 'PluginPeopleList',
@@ -135,7 +135,7 @@
 		    true, true, false,
 		    userListNothing, userListNothing, userListNothing, false,
             {"grant-manager": ['<%= _("event modification")%>', false]});
-    
+
     $E('chairpersonsContainer').set(uf.draw());
 
     // ----- show concurrent events
@@ -144,8 +144,8 @@
 
             var res = {};
 
-            res["sDate"] = dates.item(0).get();
-            res["eDate"] = dates.item(1).get();
+            res["sDate"] = Util.formatDateTime(dates.item(0).get(), IndicoDateTimeFormats.Server, IndicoDateTimeFormats.Default);
+            res["eDate"] = Util.formatDateTime(dates.item(1).get(), IndicoDateTimeFormats.Server, IndicoDateTimeFormats.Default);
             res["timezone"] = $E('Timezone').get();
 
             return res;
@@ -168,30 +168,30 @@
 
     // ---- On Load
     IndicoUI.executeOnLoad(function()
-	{		
+	{
         showAdvancedOptions();
 
         if ("<%=categ["id"]%>" != ""){
             $E("buttonCategChooser").set("<%= _("Change...")%>");
         }
 
-		var startDate = IndicoUI.Widgets.Generic.dateField(true,null,['sDay', 'sMonth', 'sYear','sHour', 'sMinute'])   
+		var startDate = IndicoUI.Widgets.Generic.dateField(true,null,['sDay', 'sMonth', 'sYear','sHour', 'sMinute'])
 		$E('sDatePlace').set(startDate);
-			
-		var endDate = IndicoUI.Widgets.Generic.dateField(true,null,['eDay', 'eMonth', 'eYear', 'eHour', 'eMinute'])   
+
+		var endDate = IndicoUI.Widgets.Generic.dateField(true,null,['eDay', 'eMonth', 'eYear', 'eHour', 'eMinute'])
 		$E('eDatePlace').set(endDate);
-		
+
 		<% if sDay != '': %>
 			startDate.set('<%= sDay %>/<%= sMonth %>/<%= sYear %><%= " " %><%= sHour %>:<%= sMinute %>');
 		<% end %>
-		
+
 		<% if eDay != '': %>
 			endDate.set('<%= eDay %>/<%= eMonth %>/<%= eYear %><%= " " %><%= eHour %>:<%= eMinute %>');
-		<% end %>	
-				
+		<% end %>
+
 		dates.append(startDate);
 		dates.append(endDate);
-		
+
 		injectValuesInForm($E('conferenceCreationForm'), function() {
                 if (!verifyDates()) {
                     var popup = new ErrorPopup("Invalid dates", ["<%= _("Dates have an invalid format: dd/mm/yyyy hh:mm")%>"], "");
@@ -211,21 +211,5 @@
 		$E('descriptionBox').set(editor.draw());
 	});
 
-    function createDatesDict() {
-        if (verifyDates()) {
 
-            var res = {};
-
-            res["sDate"] = dates.item(0).get();
-            res["eDate"] = dates.item(1).get();
-            res["timezone"] = $E('Timezone').get();
-
-            return res;
-        }else{
-            var popup = new ErrorPopup("Invalid dates", ["<%= _("Dates have an invalid format: dd/mm/yyyy hh:mm")%>"], "");
-            popup.open();
-            return null;
-        }
-
-    }
 </script>

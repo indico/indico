@@ -42,5 +42,8 @@ def savePluginOptions( req, **params ):
 def reload( req, **params ):
     return admins.RHAdminPluginsReload( req ).process( params )
 
+def toggleActivePluginType( req, **params ):
+    return admins.RHAdminTogglePluginType( req ).process( params )
+
 def toggleActive( req, **params ):
     return admins.RHAdminTogglePlugin( req ).process( params )

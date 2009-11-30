@@ -269,7 +269,9 @@ type("TabWidget", ["Chooser", "IWidget"],{
     },
 
     checkTabOverflow: function(tab) {
-        return (this.tabList.dom.offsetHeight > 30);
+        // some magic numbers used... it would be great if a better solution
+        // was possible
+        return (this.tabList.dom.offsetHeight > (Browser.IE?33:30));
     },
 
     scrollRight: function() {
@@ -537,7 +539,7 @@ type("RemoteWidget", [],
 
          runIndicator: function(canvas) {
              if (!this.noIndicator) {
-                 canvas.set(new ProgressIndicator());
+                 canvas.set(progressIndicator(false, true));
              }
          }
      },
@@ -611,8 +613,8 @@ type("PreloadedWidget", ["IWidget"],
          this.waitingList = waitingList;
      });
 
-ProgressIndicator = function() {
-    return Html.div({style:{textAlign: 'center'}},Html.img({src: imageSrc("ui_loading"), alt: "Loading..."
+progressIndicator = function(small, center) {
+    return Html.div(center?{style:{textAlign: 'center'}}:{},Html.img({src: imageSrc(small?"loading":"ui_loading"), alt: "Loading..."
 }));
 };
 
@@ -759,4 +761,48 @@ type("HistoryListener", [],
      },
      function() {
 
+     });
+
+type("ErrorSensitive", [],
+     {
+         _setElementErrorState: function(element, text) {
+
+             var tooltip;
+
+             this.oldClassName = element.dom.className;
+             element.dom.className += ' invalid';
+
+             this.errorElement = element;
+
+             this._stopObservingError =
+                 element.observeEvent('mouseover', function(event) {
+                     tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, text, "tooltipError");
+                 });
+
+             this._stopObservingErrorOut =
+                 element.observeEvent('mouseout', function(event) {
+                     Dom.List.remove(document.body, tooltip);
+                 });
+         },
+
+         setError: function(text) {
+             if (!text) {
+                 // everything back to normal
+                 if (this._stopObservingError){
+                     this._stopObservingError();
+                     //this._stopObservingErrorOut();
+
+                     this.errorElement.dom.className = this.oldClassName;
+
+                     this._inError = false;
+                 }
+             } else {
+                 this._setErrorState(text);
+                 this._inError = true;
+             }
+         },
+
+         inError: function() {
+             return this._inError;
+         }
      });

@@ -81,6 +81,7 @@ class Plugins:
     """
     
     pluginList = {}
+    pluginTypeVisible = {}
     pluginTypeOptions = {}
     pluginTypeActions = {}
     pluginTypeActionModules = {}
@@ -148,6 +149,8 @@ class Plugins:
                             del cls.pluginList[type]
                         return
                     
+                    cls.pluginTypeVisible[type] = not (importName(modPath, "visible" ) is False)
+
                     optionsModule = importName(modPath, "options")
                     if optionsModule:
                         cls.pluginTypeOptions[type] = optionsModule.globalOptions
@@ -269,6 +272,12 @@ class Plugins:
         cls.loadPlugins()
         return cls.pluginTypeDescriptions[type]
     
+    @classmethod
+    def getIsVisibleType(cls, type):
+        """ Returns if this plugin type should be shown in the Server Admin interface or not
+        """
+        cls.loadPlugins()
+        return cls.pluginTypeVisible[type]
 
 def reloadPlugins():
     Plugins.reloadPlugins()

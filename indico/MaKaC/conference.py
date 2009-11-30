@@ -18,6 +18,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+# fossil classes
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.common.utils import formatDateTime
 from MaKaC.fossils.subcontribution import ISubContribParticipationFossil,\
@@ -25,6 +27,7 @@ from MaKaC.fossils.subcontribution import ISubContribParticipationFossil,\
 from MaKaC.fossils.contribution import IContributionParticipationFossil,\
     IContributionFossil, IContributionWithSpeakersFossil,\
     IContributionWithSubContribsFossil
+from MaKaC.fossils.conference import IConferenceMinimalFossil
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 
 import re, os
@@ -1936,12 +1939,16 @@ class ReportNumberHolder(Persistent):
         if self.getOwner() != None:
             self.getOwner().notifyModification()
 
-class Conference(Persistent):
+class Conference(Persistent, Fossilizable):
     """This class represents the real world conferences themselves. Objects of
         this class will contain basic data about the confence and will provide
         access to other objects representing certain parts of the conferences
         (ex: contributions, sessions, ...).
     """
+
+    fossilizes(IConferenceMinimalFossil)
+
+    #TODO: Move to fossilize! (Some conference fossiles already available)
 
     @Retrieves ('MaKaC.conference.Conference', 'videoServicesDisplayURL',
                 lambda conf: (str(urlHandlers.UHConferenceDisplay.getURL(conf)), str(urlHandlers.UHCollaborationDisplay.getURL(conf)))[conf.getType() == 'conference'])
@@ -3868,20 +3875,22 @@ class Conference(Persistent):
         if isinstance(prin, ConferenceChair):
             email = prin.getEmail()
         elif isinstance(prin, str):
-            email = prin
+            email = prin 
         if email != None:
             if email == "":
                 return
             ah = AvatarHolder()
             results=ah.match({"email":email}, exact=1)
+            #No registered user in Indico with that email
             if len(results) == 0:
                 self.__ac.grantModificationEmail(email)
                 if sendEmail and isinstance(prin, ConferenceChair):
                     notif = pendingQueues._PendingConfManagerNotification( [prin] )
                     mail.GenericMailer.sendAndLog( notif, self.getConference() )
+            #The user is registered in Indico and is activated as well
             elif len(results) == 1 and results[0] is not None and results[0].isActivated():
                 self.__ac.grantModification(results[0])
-                results[0].linkTo(self, "manager")
+                results[0].linkTo(self, "manager") 
         else:
             self.__ac.grantModification( prin )
             if isinstance(prin, MaKaC.user.Avatar):

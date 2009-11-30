@@ -145,7 +145,7 @@ type ("UserSearchPopup", ["ExclusivePopup"], {
             }
             selectedUserList.clear();
             selectedGroupList.clear();
-            userList.set(Html.div({style: {paddingTop: '20px'}}, new ProgressIndicator()));
+            userList.set(Html.div({style: {paddingTop: '20px'}}, progressIndicator(false, true)));
             self.searchButton.dom.disabled = true;
         });
 
@@ -735,5 +735,5 @@ type("AddToFavoritesButton", ["RemoteSwitchButton"],
              imageAdd,
              'user.favorites.removeUser',
              'user.favorites.addUsers',
-             { 'id': id });
+             {value: [{ 'id': id }]});
      });

@@ -3260,6 +3260,9 @@ class UHAdminPluginsClearAllInfo( URLHandler ):
 class UHAdminReloadPlugins( URLHandler ):
     _relativeURL = "adminPlugins.py/reload"
 
+class UHAdminTogglePluginType( URLHandler ):
+    _relativeURL = "adminPlugins.py/toggleActivePluginType"
+
 class UHAdminTogglePlugin( URLHandler ):
     _relativeURL = "adminPlugins.py/toggleActive"
 

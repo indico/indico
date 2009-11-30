@@ -2230,87 +2230,84 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                             <tr>
                                <td ><b>%i</b></td>
                                <td>%s:%s%s</td>
-                               <td align="right"nowrap >%s</td>
+                               <td align="right" style="padding-right:10px" nowrap >%s</td>
                                <td align="right"nowrap >%s&nbsp;&nbsp;%s</td>
                             </tr>
                             """%(quantity,gsf.getTitle(),caption,value,price,price*quantity,currency) )
         return "".join(html)                
         
 
-    def _getMiscellaneousInfoHTML(self):
+    def _getMiscellaneousInfoHTML(self, gsf):
+        html=[]
+        if gsf.isEnabled():
+            html.append("""
+                <tr>
+                  <td style="color:black"><b>%s</b></td>
+                  <td bgcolor="white" class="blacktext">%s</td>
+                </tr>
+                <tr>
+                  <td colspan="4" style="border-top:2px solid black">&nbsp;</td>
+                </tr>
+                """%(gsf.getTitle(), self._getMiscInfoItemsHTML(gsf) ) )
+        return "".join(html)
+
+    def _getPaymentInfo(self):
         regForm = self._conf.getRegistrationForm()
         modPay=self._conf.getModPay()
         html=[]
-        html2=[]
-        total={}
-        total["value"]=0
-        html2.append( _(""" <tr><td colspan="2"><table width="100%%">
-                        <tr>
-                        <tr><td colspan="4" class="title"><b>_("Payment summary")</b></td></tr>
-                        <tr>
-                            <td style="color:black"><b> _("Quantity")</b></td>
-                            <td style="color:black"><b> _("Item")</b></td>
-                            <td style="color:black"><b> _("Unit Price")</b></td>
-                            <td style="color:black"><b> _("Cost")</b></td>
-                        </tr>                        
-                    """))
-        for gsf in regForm.getGeneralSectionFormsList():
-            if gsf.isEnabled():                
-                html.append("""
-                    <tr>
-                      <td style="color:black"><b>%s</b></td>
-                      <td bgcolor="white" class="blacktext">%s</td>
-                    </tr>
-                    <tr>
-                      <td colspan="4" style="border-top:2px solid black">&nbsp;</td>
-                    </tr>
-                    """%(gsf.getTitle(), self._getMiscInfoItemsHTML(gsf) ) )
-        for gsf in self._registrant.getMiscellaneousGroupList():
-                html2.append("""<tr>%s</tr>"""%(self._getMiscInfoItemsHTMLBilllable(gsf,total))) 
-                
-        url=urlHandlers.UHConfRegistrationFormconfirmBooking.getURL(self._registrant)
-        url.addParam("registrantId", self._registrant.getId())              
-        url.addParam("confId", self._conf.getId())       
-
-        condChecking=""
-        if modPay.hasPaymentConditions():
-            condChecking="""<!--<tr><td>Please ensure that you have read the terms and conditions before continuing.</td></tr>
-                            <tr><td>I have read and agree to the terms and conditions and understand that by confirming this order I will be entering into a binding transaction.</td></tr>-->
-                            <tr>
-                                <td><input type="checkbox" name="conditions"/>I have read and accept the terms and conditions and understand that by confirming this order I will be entering into a binding transaction (<a href="#" onClick="window.open('%s','Conditions','width=400,height=200,resizable=yes,scrollbars=yes'); return false;">Terms and conditions</a>).</td>
-                            </tr>
-                            <tr>
-                                <td><br></td>
-                            </tr>"""%str(urlHandlers.UHConfRegistrationFormConditions.getURL(self._conf))
-
-        html2.append( _("""
-                        <tr>&nbsp;</tr>
-                        <tr>
-                           <td ><b> _("TOTAL")</b></td>
-                           <td></td>
-                           <td></td>
-                           <td align="right"nowrap>%s&nbsp;&nbsp;%s</td>
-                        </tr>
-                        <form name="epay" action="%s" method="POST">
-                        <tr>
-                          <table width="100%%">
-                            
-                            <tr><td>&nbsp;</td></tr>
-                            %s
-                            <tr>
-                              <td align="right" nowrap><input type="submit" value="Next ->" onclick="return checkConditions()" ></td>
-                            </tr>
-                           </table>
-                        </tr>
-                        </form> <td  colspan="4" style="border-top:2px solid black">&nbsp;</td></tr>
-                        </table></td></tr>
-                        """)%(total["value"],regForm.getCurrency(),url,condChecking))
-       
-        
         if self._conf.hasEnabledSection("epay") and modPay.isActivated() and self._registrant.doPay():
-            html=html+html2
-            #self._registrant.setTotal(total["value"])
-        
+            total={}
+            total["value"]=0
+            html.append( _(""" <tr><td colspan="2"><table width="100%%">
+                            <tr>
+                            <tr><td colspan="4" class="title"><b>_("Payment summary")</b></td></tr>
+                            <tr>
+                                <td style="color:black"><b> _("Quantity")</b></td>
+                                <td style="color:black"><b> _("Item")</b></td>
+                                <td style="color:black;padding-right:10px" nowrap ><b>_("Unit Price")</b></td>
+                                <td style="color:black"><b> _("Cost")</b></td>
+                            </tr>                        
+                        """))
+            for gsf in self._registrant.getMiscellaneousGroupList():
+                    html.append("""<tr>%s</tr>"""%(self._getMiscInfoItemsHTMLBilllable(gsf,total))) 
+    
+            url=urlHandlers.UHConfRegistrationFormconfirmBooking.getURL(self._registrant)
+            url.addParam("registrantId", self._registrant.getId())              
+            url.addParam("confId", self._conf.getId())       
+    
+            condChecking=""
+            if modPay.hasPaymentConditions():
+                condChecking="""<!--<tr><td>Please ensure that you have read the terms and conditions before continuing.</td></tr>
+                                <tr><td>I have read and agree to the terms and conditions and understand that by confirming this order I will be entering into a binding transaction.</td></tr>-->
+                                <tr>
+                                    <td><input type="checkbox" name="conditions"/>I have read and accept the terms and conditions and understand that by confirming this order I will be entering into a binding transaction (<a href="#" onClick="window.open('%s','Conditions','width=400,height=200,resizable=yes,scrollbars=yes'); return false;">Terms and conditions</a>).</td>
+                                </tr>
+                                <tr>
+                                    <td><br></td>
+                                </tr>"""%str(urlHandlers.UHConfRegistrationFormConditions.getURL(self._conf))
+    
+            html.append( _("""
+                            <tr>&nbsp;</tr>
+                            <tr>
+                               <td ><b> _("TOTAL")</b></td>
+                               <td></td>
+                               <td></td>
+                               <td align="right"nowrap>%s&nbsp;&nbsp;%s</td>
+                            </tr>
+                            <form name="epay" action="%s" method="POST">
+                            <tr>
+                              <table width="100%%">
+                                
+                                <tr><td>&nbsp;</td></tr>
+                                %s
+                                <tr>
+                                  <td align="right" nowrap><input type="submit" value="Next ->" onclick="return checkConditions()" ></td>
+                                </tr>
+                               </table>
+                            </tr>
+                            </form> <td  colspan="4" style="border-top:2px solid black">&nbsp;</td></tr>
+                            </table></td></tr>
+                            """)%(total["value"],regForm.getCurrency(),url,condChecking))
         return "".join(html)
             
     def _getPDInfoHTML(self):
@@ -2352,6 +2349,24 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                               <td bgcolor="white" class="blacktext">%s</td>
                             </tr>""" % (fieldTitle,fieldValue)
         return html
+    
+    def _getFormSections(self):
+        sects = []
+        regForm = self._conf.getRegistrationForm()
+        for formSection in regForm.getSortedForms():
+            if formSection.getId() == "reasonParticipation":
+                sects.append(self._getReasonParticipationHTML())
+            elif formSection.getId() == "sessions":
+                sects.append(self._getSessionsHTML())
+            elif formSection.getId() == "accommodation":
+                sects.append(self._getAccommodationHTML())
+            elif formSection.getId() == "socialEvents":
+                sects.append(self._getSocialEventsHTML())
+            elif formSection.getId() == "furtherInformation":
+                pass
+            else:
+                sects.append(self._getMiscellaneousInfoHTML(formSection))
+        return "".join(sects)
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
@@ -2359,13 +2374,10 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
         vars["pdfields"] = self._getPDInfoHTML()
         vars["registrationDate"] = _("""--_("date unknown")--""")
         if self._registrant.getRegistrationDate() is not None:
-            vars["registrationDate"] = self._registrant.getAdjustedRegistrationDate().strftime("%d-%B-%Y %H:%M") 
-        vars["reasonParticipation"] = self._getReasonParticipationHTML()
-        vars["sessions"] = self._getSessionsHTML()
-        vars["accommodation"] = self._getAccommodationHTML()
-        vars["socialEvents"] = self._getSocialEventsHTML()
+            vars["registrationDate"] = self._registrant.getAdjustedRegistrationDate().strftime("%d-%B-%Y %H:%M")
         vars["dataModificationURL"] = quoteattr(str(urlHandlers.UHRegistrantDataModification.getURL(self._registrant)))
-        vars["otherSections"]=self._getMiscellaneousInfoHTML()
+        vars["otherSections"] = self._getFormSections()
+        vars["paymentInfo"]  = self._getPaymentInfo()
         vars["epaymentAnnounce"] = ""
         if self._conf.hasEnabledSection("epay") and self._conf.getModPay().isActivated() and self._registrant.doPay():         
             vars["epaymentAnnounce"] = """<br><font color="black">Please proceed to the <b>payment of your order</b> (by using the "Next" button down this page). You will then receive the payment details.</font>"""

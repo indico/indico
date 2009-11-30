@@ -1,3 +1,18 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"PO-Revision-Date: 2009-11-27 15:09+0100\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
 #
 # This file is part of Indico.
 # Copyright (C) 2007 CERN.
@@ -15939,7 +15954,7 @@ msgstr "Changer la thématique"
 #~ "le lieu par défaut dans le module d'administration (Menu principal / "
 #~ "Réservation de salles / Administration)."
 #~ msgid "en_US"
-#~ msgstr "Anglais (États-Unis)"
+#~ msgstr "Anglais"
 #~ msgid "Select 'Other room' to type in arbitrary name"
 #~ msgstr "Sélectionnez 'Autre salle' pour taper un nom arbitraire"
 #~ msgid "delete this conference"

@@ -1821,7 +1821,7 @@ class WAccessControlFrame(WTemplated):
             vars["changePrivacy"] = """make it <input type="submit" class="btn" name="visibility" value="PRIVATE"> by itself<br/>"""
             vars["changePrivacy"] += """make it <input type="submit" class="btn" name="visibility" value="ABSOLUTELY PUBLIC">%s""" % WInlineContextHelp('The object will stay public regardless of the protection of its parent').getHTML()
         vars["locator"] = self.__target.getLocator().getWebForm()
-        vars["userTable"] = WPrincipalTable().getHTML( self.__target.getAllowedToAccessList(), self.__target, vars["addAllowedURL"], vars["removeAllowedURL"] )
+        vars["userTable"] = WPrincipalTable().getHTML( self.__target.getAllowedToAccessList(), self.__target, vars["addAllowedURL"], vars["removeAllowedURL"],selectable=False )
 
         return vars
     
@@ -1903,6 +1903,19 @@ class WUserTableItem(WTemplated):
 
         return vars
 
+class WPendingUserTableItem(WTemplated):
+
+    def getHTML( self, email, selectable=True ):
+        self.email = email
+        self._selectable = selectable
+        return WTemplated.getHTML( self, {} )
+
+    def getVars( self ):
+        vars = WTemplated.getVars( self )
+        vars["email"] = self.email
+        vars["selectable"] = self._selectable
+
+        return vars
 
 class WGroupTableItem(WTemplated):
     
@@ -2010,7 +2023,7 @@ class WPrincipalTable(WTemplated):
             elif isinstance(principal, user.Group):
                 ul.append( WGroupTableItem().getHTML( principal, selected, self.__selectable ) )
         for email in self.__pendings:
-            ul.append( _("""<input type="checkbox" name="selectedPrincipals" value="%s" > <span class="blacktext">%s <small> _("(Pending)")</small></span><br>""")%(email, email))
+            ul.append(WPendingUserTableItem().getHTML(email, self.__selectable))
         vars["userItems"] = "".join( ul )
         return vars
 

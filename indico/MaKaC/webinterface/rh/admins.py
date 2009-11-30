@@ -348,6 +348,10 @@ class RHAdminPluginsBase(RHAdminBase):
         self._pluginType = params.get("pluginType", None)
         self._pluginId = params.get("pluginId", None)
         self._ph = PluginsHolder()
+        if self._pluginType and not self._ph.hasPluginType(self._pluginType, mustBeActive = False):
+            raise PluginError("The plugin type " + self._pluginType + " does not exist or is not visible")
+        elif self._pluginType and self._pluginId and not self._ph.getPluginType(self._pluginType).hasPlugin(self._pluginId):
+            raise PluginError("The plugin " + self._pluginId + " does not exist")
 
 class RHAdminPlugins(RHAdminPluginsBase):
     """ Displays information about a given plugin type.
@@ -357,6 +361,8 @@ class RHAdminPlugins(RHAdminPluginsBase):
     
     def _checkParams(self, params):
         RHAdminPluginsBase._checkParams(self, params)
+        if self._pluginType and not self._ph.hasPluginType(self._pluginType):
+            raise PluginError("The plugin type " + self._pluginType + " does not exist, is not visible or is not active")
         self._initialPlugin = params.get('subtab', 0)
     
     def _process( self ):
@@ -374,13 +380,30 @@ class RHAdminPluginsReload(RHAdminPluginsBase):
     def _checkParams(self, params):
         RHAdminPluginsBase._checkParams(self, params)
         if self._pluginType is None:
-            raise MaKaCError(_("pluginType not set"))
+            raise PluginError(_("pluginType not set"))
+        elif not self._ph.hasPluginType(self._pluginType):
+            raise PluginError("The plugin type " + self._pluginType + " does not exist, is not visible or is not active")
     
     def _process( self ):
         ph = self._ph
         ph.reloadPluginType(self._pluginType)
         self._redirect( urlHandlers.UHAdminPlugins.getURL(self._ph.getPluginType(self._pluginType)))
     
+class RHAdminTogglePluginType(RHAdminPluginsBase):
+    """ Toggles the state of a plugin type between active and non active
+    """
+    _uh = urlHandlers.UHAdminTogglePluginType
+
+    def _checkParams(self, params):
+        RHAdminPluginsBase._checkParams(self, params)
+        if self._pluginType is None:
+            raise MaKaCError(_("pluginType not set"))
+
+    def _process( self ):
+        pluginType = self._ph.getPluginType(self._pluginType)
+        pluginType.toggleActive()
+        self._redirect( urlHandlers.UHAdminPlugins.getURL() )
+
 class RHAdminTogglePlugin(RHAdminPluginsBase):
     """ Toggles the state of a plugin between active and non active
     """
@@ -389,9 +412,9 @@ class RHAdminTogglePlugin(RHAdminPluginsBase):
     def _checkParams(self, params):
         RHAdminPluginsBase._checkParams(self, params)
         if self._pluginType is None:
-            raise MaKaCError(_("pluginType not set"))
+            raise PluginError(_("pluginType not set"))
         if self._pluginId is None:
-            raise MaKaCError(_("pluginId not set")) 
+            raise PluginError(_("pluginId not set"))
     
     def _process( self ):
         pluginType = self._ph.getPluginType(self._pluginType)
@@ -413,6 +436,12 @@ class RHAdminPluginsSaveOptionsBase(RHAdminPluginsBase):
     
     def _checkParams(self, params):
         RHAdminPluginsBase._checkParams(self, params)
+
+        if self._pluginType is None:
+            raise PluginError(_("pluginType not set"))
+        elif not self._ph.hasPluginType(self._pluginType):
+            raise PluginError("The plugin type " + self._pluginType + " does not exist, is not visible or is not active")
+
         self._initialPlugin = params.get('subtab', 0)
     
     def _storeParams(self, params):
@@ -504,8 +533,6 @@ class RHAdminPluginsSaveTypeOptions(RHAdminPluginsSaveOptionsBase):
     
     def _checkParams(self, params):
         RHAdminPluginsSaveOptionsBase._checkParams(self, params)
-        if self._pluginType is None:
-            raise MaKaCError(_("pluginType not set"))
         self._storeParams(params)
         
         self._target = self._ph.getPluginType(self._pluginType)
@@ -518,8 +545,6 @@ class RHAdminPluginsSaveOptions(RHAdminPluginsSaveOptionsBase):
         
     def _checkParams(self, params):
         RHAdminPluginsSaveOptionsBase._checkParams(self, params)
-        if self._pluginType is None:
-            raise PluginError(_("pluginType not set"))
         if self._pluginId is None:
             raise PluginError(_("pluginId not set"))
         self._storeParams(params)

@@ -38,9 +38,9 @@
 		<xsl:text disable-output-escaping="yes"></xsl:text><xsl:value-of select="./title" disable-output-escaping="yes"/><xsl:text disable-output-escaping="yes"></xsl:text>
 	</h1>
 	<xsl:if test="count(child::chair) != 0">
-    	<h2>
+    	<span class="chairedBy">
 			chaired by <xsl:apply-templates select="./chair"/>
-		</h2>
+		</span>
     </xsl:if>
     <div class="details">
     

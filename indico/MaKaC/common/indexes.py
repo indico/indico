@@ -1194,7 +1194,7 @@ class TextIndex(IntStringMappedIndex):
             Logger.get('indexes.text').error("No such entry '%s'" % entryId)
 
     def search(self, text):
-        records = self._textIdx.apply(text).items()
+        records = self._textIdx.apply(text.decode('utf8')).items()
         return [(self.getString(record[0]), record[1]) for record in records]
 
 class IndexesHolder( ObjectHolder ):

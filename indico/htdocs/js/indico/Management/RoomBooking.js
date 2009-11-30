@@ -164,7 +164,7 @@ type("RoomBookingWidget", ["IWidget"],
          }
 
          this.locationChooser.observe(function(value){
-             if (value !== '') {
+             if (value !== '' && locations !== null) {
                  if (locations[value]) {
                      self.roomChooser.setLoading(true);
                      self._loadRooms(value);

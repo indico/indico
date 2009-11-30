@@ -75,7 +75,7 @@ ul.dayList {
 
 ul.meetingTimetable {
     list-style-type: none;
-    padding: 10px;
+    padding: 0 10px;
     margin: 0;
 }
 
@@ -87,7 +87,7 @@ ul.meetingTimetable > li {
 
 
 ul.meetingSubTimetable {
-    margin: 10px 0 0 0;
+    margin: 0 0 0 0;
     list-style-type: none;
     padding: 0px;
 }
@@ -157,7 +157,7 @@ ul.subEventLevelSCList li {
 
 span.topLevelTitle {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 17px;
+	font-size: 16px;
 	font-weight: normal;
 	color: #333;
 }
@@ -178,24 +178,27 @@ span.subLevelTitle {
 }
 .topLevelTime {
 	font-family: Arial, Helvetica, sans-serif;
-	font-size: 17px;
+	font-size: 14px;
 	font-weight: normal;
 	color: #444;
     position: absolute;
     left: 0;
-    top: 12px;
+    top: 6px;
 }
 
 .subEventLevelTime {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 17px;
+    font-size: 14px;
     font-weight: normal;
     color: #444;
     position: absolute;
     left: 0;
-    top: 10px;
+    top: 3px;
 }
 
+.chairedBy {
+     font-size: 12px;
+}
 
 .author {
 	font-style: italic;
@@ -352,8 +355,8 @@ span.materialGroup {
 }
 
 a.material {
-    padding: 2px 8px 0;
-    height: 18px;
+    padding: 2px 8px;
+    height: 15px;
 	color: #333333;
 	float: left;
 	border-left: 1px dotted #AAA;
@@ -378,12 +381,12 @@ span.materialGroup {
 }
 
 .materialList a.material {
-    padding: 2px 12px 0 12px;
-    height: 20px;
+    padding: 2px 8px;
+    height: 15px;
 }
 
 .materialList a.materialGroup {
-    font-size: 15px;
+    font-size: 12px;
 }
 
 a.materialGroup {
@@ -438,7 +441,7 @@ div.meetingEventHeader {
     
     min-height: 130px;
     margin: 0px;
-    padding: 10px 30px 20px;
+    padding: 10px 30px 10px;
 }
 
 div.meetingEventHeader a {
@@ -463,10 +466,10 @@ div.meetingEventHeader .details {
 
 div.meetingEventSubHeader {
     background: #ECECEC;            
-    font-size: 10pt;
+    font-size: 12px;
     color: black;   
     margin: 0;
-    padding: 10px;
+    padding: 3px 10px;
     border-bottom: 1px solid #AAA;
 }
 
@@ -475,7 +478,7 @@ div.meetingEventBody {
     font-size: 10pt;
     color: black;   
     margin: 0px;  
-    padding: 30px 50px;
+    padding: 10px 50px;
     position: relative;
 }
 
@@ -543,8 +546,8 @@ div.minutesTable span {
 }
 
 li.meetingSession, li.meetingContrib, li.breakListItem {
-    padding: 10px 0 10px 10px;
-    margin: 0 0 5px 0;
+    padding: 3px 0 3px 3px;
+    margin: 0 0 0 0;
 }
 
 li.breakListItem pre {
@@ -573,7 +576,7 @@ table.eventDetails {
 table.eventDetails td { 
     color: #222222;
     vertical-align: top;
-    padding: 10px;
+    padding: 3px;
     width: 700px;
 }
 
@@ -587,7 +590,7 @@ table.eventDetails td.leftCol {
 
 table.sessionDetails {
     font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-size: 9pt;
+    font-size: 12px;
 }
 
 table.sessionDetails td { 

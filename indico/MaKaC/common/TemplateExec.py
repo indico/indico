@@ -551,7 +551,7 @@ class TemplateExec:
             objDict['linkify'] = linkify
         if not 'truncateTitle' in objDict:
             objDict['truncateTitle'] = truncateTitle
-        if not 'urlHandlers' in objDict:            
+        if not 'urlHandlers' in objDict:
             objDict['urlHandlers'] = MaKaC.webinterface.urlHandlers
         if not 'Config' in objDict:
             objDict['Config'] = MaKaC.common.Configuration.Config
@@ -606,6 +606,10 @@ class TemplateExec:
             objDict['deepstr'] = deepstr
         if not 'beautify' in objDict:
             objDict['beautify'] = beautify
+        # allow fossilization
+        if not 'fossilize' in objDict:
+            from MaKaC.common import fossilize
+            objDict['fossilize'] = fossilize
         #if not 'minfo' in objDict:
         #    objDict['minfo'] = info.HelperMaKaCInfo.getMaKaCInfoInstance()
 

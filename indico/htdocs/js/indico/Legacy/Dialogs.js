@@ -25,8 +25,9 @@ extend(IndicoUI.Dialogs,
                                IndicoUtil.errorReport(error);
                            }
                            else {
-                               var startDate = IndicoUtil.parseDateTime(result);
-                               var endDate = IndicoUtil.parseDateTime(result);
+                               var startDate = Util.parseJSDateTime(result, IndicoDateTimeFormats.Server);
+                               var endDate = Util.parseJSDateTime(result, IndicoDateTimeFormats.Server);
+
                                /*
                                 * If suggested start time is later the 23h then set the suggested
                                 * time to latest possible: 23:00 - 23:59.
@@ -40,8 +41,8 @@ extend(IndicoUI.Dialogs,
                                    // end date is one hour later, by default
                                    endDate.setHours(startDate.getHours()+1);
                                }
-                               info.set('startDateTime', IndicoUtil.formatDateTime(startDate));
-                               info.set('endDateTime', IndicoUtil.formatDateTime(endDate));
+                               info.set('startDateTime', Util.formatDateTime(startDate, IndicoDateTimeFormats.Server));
+                               info.set('endDateTime', Util.formatDateTime(endDate, IndicoDateTimeFormats.Server));
                                hook.set(true);
                            }
                        });
@@ -118,6 +119,7 @@ extend(IndicoUI.Dialogs,
                            var sesType = new RadioFieldWidget({'standard':$T('Standard'),'poster':$T('Poster')},['standard','poster'],'nobulletsListInline');
                            sesType.select('standard');
                            $B(info.accessor('sessionType'), sesType.state);
+
 
                            var startEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(info.get('startDateTime').substr(11,5), info.get('endDateTime').substr(11,5));
                            var startEndTimeComponent;
@@ -205,8 +207,8 @@ extend(IndicoUI.Dialogs,
                                IndicoUtil.errorReport(error);
                            }
                            else {
-                               var startDate = IndicoUtil.parseDateTime(result);
-                               var endDate = IndicoUtil.parseDateTime(result);
+                               var startDate = Util.parseJSDateTime(result, IndicoDateTimeFormats.Server);
+                               var endDate = Util.parseJSDateTime(result, IndicoDateTimeFormats.Server);
                                /*
                                 * If suggested start time is later the 23h then set the suggested
                                 * time to latest possible: 23:00 - 23:59.
@@ -220,8 +222,8 @@ extend(IndicoUI.Dialogs,
                                    // end date is one hour later, by default
                                    endDate.setHours(startDate.getHours()+1);
                                }
-                               info.set('startDateTime', IndicoUtil.formatDateTime(startDate));
-                               info.set('endDateTime', IndicoUtil.formatDateTime(endDate));
+                               info.set('startDateTime', Util.formatDateTime(startDate, IndicoDateTimeFormats.Server));
+                               info.set('endDateTime', Util.formatDateTime(endDate, IndicoDateTimeFormats.Server));
                                hook.set(true);
                            }
                        });
@@ -355,7 +357,7 @@ extend(IndicoUI.Dialogs,
                    }).run();
            },
 
-           
+
            /**
         * Creates a dialog that allows a subcontribution to be added
         * to the schedule (inside a contribution)

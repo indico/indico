@@ -20,8 +20,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from datetime import timedelta
-from MaKaC.services.implementation.base import ParameterManager,\
-    ProtectedService, AdminService
+from MaKaC.services.implementation.base import ParameterManager, AdminService
 from MaKaC.services.implementation.conference import ConferenceModifBase
 from MaKaC.common.PickleJar import DictPickler
 from MaKaC.plugins.Collaboration.base import CollaborationException, CollaborationServiceException
@@ -30,7 +29,6 @@ from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin,\
 from MaKaC.i18n import _
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.plugins.base import PluginsHolder
-from MaKaC.errors import PluginError
 from MaKaC.common.timezoneUtils import nowutc, setAdjustedDate
 from MaKaC.common.utils import parseDateTime
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
@@ -45,13 +43,14 @@ class CollaborationBase(ConferenceModifBase):
     """
     def _checkParams(self):
         ConferenceModifBase._checkParams(self) #sets self._target = self._conf = the Conference object
+        self._checkCollaborationEnabled()
         self._CSBookingManager = self._conf.getCSBookingManager()
     
     def _checkCollaborationEnabled(self):
         """ Checks if the Collaboration plugin system is active
         """
         if not PluginsHolder().hasPluginType("Collaboration"):
-            raise PluginError("Collaboration plugin system is not active")
+            raise CollaborationServiceException("Collaboration plugin system is not active")
         
     def process(self):
         try:
@@ -75,7 +74,6 @@ class CollaborationBookingModifBase(CollaborationBase):
             raise CollaborationException(_("Booking id not set when trying to modify a booking on meeting ") + str(self._conf.getId()) + _(" with the service ") + str(self.__class__) )
         
     def _checkProtection(self):
-        CollaborationBase._checkCollaborationEnabled(self)
         hasRights = RCCollaborationAdmin.hasRights(self) or \
                     RCCollaborationPluginAdmin.hasRights(self, None, [self._bookingPlugin]) or \
                     RCVideoServicesManager.hasRights(self, [self._bookingPlugin])
@@ -86,15 +84,17 @@ class CollaborationBookingModifBase(CollaborationBase):
 class CollaborationAdminBookingModifBase(CollaborationBookingModifBase):
     
     def _checkProtection(self):
-        CollaborationBase._checkCollaborationEnabled(self)
         if not RCCollaborationAdmin.hasRights(self) and not RCCollaborationPluginAdmin.hasRights(self, None, [self._bookingPlugin]):
             raise CollaborationException(_("You don't have the rights to perform this operation on this booking"))
 
 class AdminCollaborationBase(AdminService):
     
-    def _checkProtection(self):
+    def _checkParams(self):
+        AdminService._checkParams(self)
         if not PluginsHolder().hasPluginType("Collaboration"):
-            raise PluginError(_("Collaboration plugin system is not active"))
+            raise CollaborationServiceException(_("Collaboration plugin system is not active"))
+
+    def _checkProtection(self):
         if not RCCollaborationAdmin.hasRights(self, None):
             AdminService._checkProtection(self)
 
@@ -119,7 +119,6 @@ class CollaborationCreateCSBooking(CollaborationBase):
             raise CollaborationException(_("Custom parameters for plugin ") + str(self._type) + _(" not set when trying to create a booking on meeting ") + str(self._conf.getId() ))
         
     def _checkProtection(self):
-        CollaborationBase._checkCollaborationEnabled(self)
         hasRights = RCCollaborationAdmin.hasRights(self) or \
                     RCCollaborationPluginAdmin.hasRights(self, None, [self._type]) or \
                     RCVideoServicesManager.hasRights(self, [self._type])
@@ -205,7 +204,6 @@ class CollaborationChangePluginManagersBase(CollaborationBase):
             raise CollaborationException(_("Plugin name not set when trying to add a manager on event: ") + str(self._conf.getId()) + _(" with the service ") + str(self.__class__) )
         
     def _checkProtection(self):
-        CollaborationBase._checkCollaborationEnabled(self)
         if not RCVideoServicesManager.hasRights(self):
             CollaborationBase._checkProtection(self)
 
@@ -338,7 +336,6 @@ class CollaborationCustomPluginService(CollaborationBase):
             raise CollaborationException(_("Service " + str(serviceName) + _("Service not found for plugin ") + str(self._pluginName) + _("in CollaborationPluginService")))
     
     def _checkProtection(self):
-        CollaborationBase._checkCollaborationEnabled(self)
         hasRights = RCCollaborationAdmin.hasRights(self) or \
                     RCCollaborationPluginAdmin.hasRights(self, None, [self._pluginName]) or \
                     RCVideoServicesManager.hasRights(self, [self._pluginName])

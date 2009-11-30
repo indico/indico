@@ -25,7 +25,7 @@
     <xsl:param name="minutes"/>
     <div class="meetingEventSubHeader">
 
-      <xsl:call-template name="header2"/>
+      <xsl:call-template name="header2"><xsl:with-param name="minutes">on</xsl:with-param></xsl:call-template>
 
     </div>
 

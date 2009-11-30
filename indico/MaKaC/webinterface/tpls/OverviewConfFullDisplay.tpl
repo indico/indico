@@ -8,7 +8,7 @@
 
 <tr>
     <td>
-        <table class="item" cellspacing="0" cellpadding="0" style="<% if not details: %>padding-bottom: 10px;<% end %>">
+        <table class="item" cellspacing="0" cellpadding="0" style="<% if not details: %>padding-bottom: 0px;<% end %>">
         <tr>
             <td class="time">%(startTime)s</td>
             <td class="title">

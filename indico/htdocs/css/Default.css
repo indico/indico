@@ -284,8 +284,8 @@ a.img:active {
 }
 
 .categoryOverview table.item {
-    border-bottom: 1px solid #AAAAAA;
-    margin-bottom: 10px;
+    border-bottom: 1px dotted #AAAAAA;
+    margin-bottom: 0px;
     background-color: white;
     width: 100%;
 }
@@ -344,6 +344,7 @@ a.img:active {
 
 .categoryOverview .dayOverview table.subItem {
     font-size: 1.2em;
+    margin-left: 20px;
 }
 
 .menutitle {
@@ -2675,13 +2676,13 @@ div.filterDiv
 }
 
 .topBar {
-    margin-bottom: 30px;
+    margin-bottom: 0px;
 }
 
 .topBar .content {
     background: #ECECEC url('../images/grey_gradient2.png') scroll repeat-x bottom left;
-    padding: 20px;
-    font-size: 14px;
+    padding: 10px;
+    font-size: 12px;
     color: #444;
     border: 1px solid #AAA;
 }
@@ -2695,7 +2696,7 @@ div.filterDiv
     margin: 0;
     padding: 0;
     color: #777;
-    font-size: 17px;
+    font-size: 15px;
 }
 
 .sideBar ul {
@@ -5514,3 +5515,9 @@ div.posterEntry:hover {
     margin-top: 5px;
 }
 
+.startEndDate {
+    margin-top: 5px;
+}
+.startEndDate span {
+    color: #666;
+}

@@ -211,6 +211,8 @@ class AccessController( Persistent ):
         return self.managersEmail
     
     def grantModificationEmail(self, email):
+        """looks if the email is in the managersEmail list (list with the users with access to modification)
+        and if it's not it adds the email to the list"""
         if not email in self.getModificationEmail():
             self.getModificationEmail().append(email)
             self._p_changed = 1

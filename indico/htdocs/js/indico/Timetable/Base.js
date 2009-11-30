@@ -570,6 +570,7 @@ type("ManagementTimeTable",["TimeTable"], {
         if (result.autoOps && result.autoOps.length > 0) {
             each(result.autoOps,
                  function(op) {
+
                      var warning = self._processWarning(op);
                      if (warning && self.processedWarnings.indexOf(warning) === null) {
                          self.warningArea.dom.style.display = 'block';
@@ -757,11 +758,11 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
 
         var data = this.getData();
 
-        // Deletes the old version of the entry
-        var oldEntries = this._deleteOldEntry(data, result, oldEntryId);
-
         // AutoOp Warnings (before updates are done)
         this._processAutoOps(result);
+
+        // Deletes the old version of the entry
+        var oldEntries = this._deleteOldEntry(data, result, oldEntryId);
 
         // Here's the update cycle
         if (updateCycle) {

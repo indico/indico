@@ -64,11 +64,7 @@
         <tr>
           <td colspan="3" class="horizontalLine">&nbsp;</td>
         </tr>
-        %(reasonParticipation)s
-        %(sessions)s
-        %(accommodation)s
-        %(socialEvents)s
-        %(otherSections)s
+        %(sections)s
         %(statuses)s
         %(transaction)s         
       </table>

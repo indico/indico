@@ -112,7 +112,7 @@ function jsonRpcObject(url, method, params, dontWatch) {
  * @param {Object} [def]
  * @return {WatchAccessor} value
  */
-function jsonRpcValue(url, method, params, def) {
+function jsonRpcValue(url, method, params, def, dontStart) {
         // not an object for url... curry
         var self = new Source();
         var object = mixWatchGetters(self, ["state", "error"]);
@@ -140,7 +140,7 @@ function jsonRpcValue(url, method, params, def) {
                         state: SourceState.Committing,
                         error: null
                 });
-                jsonRpcCommit(url, method, params, value, process)
+            jsonRpcCommit(url, method, params, value, process);
             return old;
         };
         self.refresh = function() {
@@ -150,7 +150,9 @@ function jsonRpcValue(url, method, params, def) {
                 });
                 return jsonRpc(url, method, params, process);
         };
-        self.refresh();
+        if (!dontStart) {
+            self.refresh();
+        }
         return self;
 }
 

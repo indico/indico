@@ -30,12 +30,22 @@ class PluginOptionsBase (AdminService):
         optionName = self._params.get('optionName', None)
         if optionName:
             options = optionName.split('.')
+            ph = PluginsHolder()
             if len(options) == 3:
                 pluginType, plugin, option = options
-                self._targetOption = PluginsHolder().getPluginType(pluginType).getPlugin(plugin).getOption(option)
+                if ph.hasPluginType(pluginType):
+                    if ph.getPluginType(pluginType).hasPlugin(plugin):
+                        self._targetOption = ph.getPluginType(pluginType).getPlugin(plugin).getOption(option)
+                    else:
+                        raise ServiceError('ERR-PLUG4', 'plugin: ' + str(plugin) + ' does not exist')
+                else:
+                    raise ServiceError('ERR-PLUG3', 'pluginType: ' + str(pluginType) + ' does not exist, is not visible or not active')
             elif len(options) == 2:
                 pluginType, option = options
-                self._targetOption = PluginsHolder().getPluginType(pluginType).getOption(option)
+                if ph.hasPluginType(pluginType):
+                    self._targetOption = ph.getPluginType(pluginType).getOption(option)
+                else:
+                    raise ServiceError('ERR-PLUG3', 'pluginType: ' + str(pluginType) + ' does not exist, is not visible or not active')
             else:
                 raise ServiceError('ERR-PLUG1', 'optionName argument does not have the proper pluginType.plugin.option format')
         else:

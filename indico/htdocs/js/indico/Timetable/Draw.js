@@ -731,8 +731,8 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"], {
             endDate.setHours(eTime.substr(0,2));
             endDate.setMinutes(eTime.substr(3,2));
 
-            self.managementActions.editEntryStartEndDate(IndicoUtil.formatDateTime(startDate),
-                                                         IndicoUtil.formatDateTime(endDate),
+            self.managementActions.editEntryStartEndDate(Util.formatDateTime(startDate, IndicoDateTimeFormats.Server),
+                                                         Util.formatDateTime(endDate, IndicoDateTimeFormats.Server),
                                                          self.eventData);
             self.close();
         });

@@ -29,6 +29,7 @@ from MaKaC.common.contextManager import ContextManager
 import datetime
 from pytz import timezone
 
+from MaKaC.errors import TimingError
 from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
 
@@ -254,6 +255,7 @@ class ConferenceDefaultStyleModification( ConferenceTextModificationBase ):
 
 class ConferenceVisibilityModification( ConferenceTextModificationBase ):
     """
+
     Conference visibility modification
     """
     def _handleSet(self):
@@ -266,7 +268,7 @@ class ConferenceVisibilityModification( ConferenceTextModificationBase ):
     def _handleGet(self):
         return self._target.getVisibility()
 
-class ConferenceDateTimeStartModification( ConferenceDateTimeModificationBase ):
+class ConferenceStartEndDateTimeModification( ConferenceModifBase ):
     """ Conference start date/time modification
         When changing the start date / time, the _setParam method will be called by DateTimeModificationBase's _handleSet method.
         The _setParam method will return None (if there are no problems),
@@ -275,16 +277,28 @@ class ConferenceDateTimeStartModification( ConferenceDateTimeModificationBase ):
         (Ex: a videoconference booking could not be moved in time according with the conference's time change)
         For this, it will check the 'dateChangeNotificationProblems' context variable.
     """
-    def _setParam(self):
+    def _checkParams(self):
+
+        ConferenceModifBase._checkParams(self)
+
+        pm = ParameterManager(self._params.get('value'), timezone=self._conf.getTimezone())
+
+        self._startDate = pm.extract('startDate', pType=datetime.datetime)
+        self._endDate = pm.extract('endDate', pType=datetime.datetime)
+
+    def _getAnswer(self):
 
         ContextManager.set('dateChangeNotificationProblems', {})
 
-        if (self._pTime > self._target.getEndDate()):
+        if (self._startDate > self._endDate):
             raise ServiceError("ERR-E3",
                                "Date/time of start cannot "+
                                "be greater than date/time of end")
 
-        self._target.setDates(self._pTime, self._target.getEndDate(), moveEntries=1)
+        try:
+            self._target.setDates(self._startDate, self._endDate, moveEntries=1)
+        except TimingError,e:
+            raise ServiceError("ERR-E2", e.getMsg())
 
         dateChangeNotificationProblems = ContextManager.get('dateChangeNotificationProblems')
 
@@ -299,11 +313,7 @@ class ConferenceDateTimeStartModification( ConferenceDateTimeModificationBase ):
                                           warningContent])
 
         else:
-            return None
-
-    def _handleGet(self):
-        return datetime.datetime.strftime(self._target.getAdjustedStartDate(),
-                                          '%d/%m/%Y %H:%M')
+            return self._params.get('value')
 
 class ConferenceListUsedRooms( ConferenceDisplayBase ):
     """
@@ -579,8 +589,7 @@ methodMap = {
     "main.changeType": ConferenceTypeModification,
     "main.changeDescription": ConferenceDescriptionModification,
     "main.changeAdditionalInfo": ConferenceAdditionalInfoModification,
-    "main.changeStartDate": ConferenceDateTimeStartModification,
-    "main.changeEndDate": ConferenceDateTimeEndModification,
+    "main.changeDates": ConferenceStartEndDateTimeModification,
     "main.changeBooking": ConferenceBookingModification,
     "main.displayBooking": ConferenceBookingModification,
     "rooms.list" : ConferenceListUsedRooms,
