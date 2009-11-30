@@ -248,7 +248,7 @@ var confFossile = <%= jsonEncode(confObj.fossilize(IConferenceMinimalFossil, tz=
 
 $E('inPlaceEditStartEndDate').set(new StartEndDateWidget('event.main.changeDates', <%= jsonEncode({'conference': "%s"%conferenceId}) %>, {'startDate': confFossile.startDate, 'endDate': confFossile.endDate}).draw());
 
-<%= macros.genericField(macros.FIELD_RICHTEXT, 'inPlaceEditDescription', 'event.main.changeDescription', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh, options=(400,200)) %>
+<%= macros.genericField(macros.FIELD_RICHTEXT, 'inPlaceEditDescription', 'event.main.changeDescription', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh, options=(600,400)) %>
 
 <% if evtType == 'conference':%>
     <%= macros.genericField(macros.FIELD_RICHTEXT, 'inPlaceEditAdditionalInfo', 'event.main.changeAdditionalInfo', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh, options=(400,200)) %>
