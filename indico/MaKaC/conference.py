@@ -4228,6 +4228,7 @@ class Conference(Persistent, Fossilizable):
         return displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self).getDefaultStyle()
 
     def clone( self, startDate, options, eventManager=None ):
+
         # startDate must be in the timezone of the event (to avoid problems with daylight-saving times)
         cat = self.getOwnerList()[0]
         managing = options.get("managing",None)
@@ -5758,7 +5759,7 @@ class Session(Persistent):
         ses.setTitle(self.getTitle())
         ses.setDescription(self.getDescription())
         startDate = self.getStartDate() + deltaTime
-        ses.setStartDate(startDate)
+        ses.setStartDate(startDate, check=1)
         ses.setDuration(dur=self.getDuration())
 
         if self.getOwnLocation() is not None:
@@ -5915,7 +5916,12 @@ class Session(Persistent):
             else:
                 entries = self.getSchedule().getEntriesOnDay(newDateTz)[:]
             self.getSchedule().moveEntriesBelow(diff, entries)
-        if self.getConference() and not self.getConference().getEnableSessionSlots() and self.getSlotList()[0].getStartDate() != newDate and moveEntries != 0:
+
+        if self.getConference() and \
+               not self.getConference().getEnableSessionSlots() and \
+               self.getSlotList() != [] and \
+               self.getSlotList()[0].getStartDate() != newDate and \
+               moveEntries != 0:
             self.getSlotList()[0].startDate = newDate
         if check == 1:
            self._checkInnerSchedule()
