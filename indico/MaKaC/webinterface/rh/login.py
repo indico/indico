@@ -61,7 +61,7 @@ class RHSignIn( base.RH ):
             p = signIn.WPSignIn( self )
             return p.display( returnURL = self._returnURL )
         else:
-            li = LoginInfo( self._login, self._password )   
+            li = LoginInfo( self._login, self._password )
             av = auth.getAvatar(li)
             if not av:
                 p = signIn.WPSignIn( self, login = self._login, msg = _("Wrong login or password") )

@@ -34,6 +34,7 @@ import re
 import nose
 import figleaf
 import figleaf.annotate_html
+import subprocess
 
 
 def main(testPath, coverage):
@@ -44,12 +45,28 @@ def main(testPath, coverage):
     
     if coverage:
         figleaf.start()
+        
+    #Starting Selenium server
+    child = subprocess.Popen(["java", "-jar", "indicop/selenium_tests/selenium-server.jar"], stdout=subprocess.PIPE)
+    
+    #This is a cheap trick to make sure that selenium has fully
+    #started before launching the tests.
+    #Selenium (1.0.1) displays 5 lines in the shell before being ready
+    counter = 0
+    while counter < 5:
+        child_output = child.stdout.readline()
+        #print "Selenium debug %s: %s" % (counter, child_output)
+        counter += 1
     
     if testPath:
         result = nose.run(argv=['nose','-v', 'indicop/MaKaC_tests/%s' % testPath])
     else:
-        result = nose.run(argv=['nose','-v', 'indicop/MaKaC_tests/'])
-
+        #result = nose.run(argv=['nose','-v', 'indicop/MaKaC_tests/'])
+        result = nose.run(argv=['nose','-v', 'indicop/selenium_tests/create_delete_lecture_test.py:Selenium_test.test_create_delete_lecture'])
+    
+    #Stopping Selenium Server
+    child.kill()
+    
     if coverage:
         figleaf.stop()
         coverageOutput = figleaf.get_data().gather_files()

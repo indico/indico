@@ -1395,6 +1395,7 @@ class AvatarHolder( ObjectHolder ):
                         set = set & Set(match)
         for userid in set:
             av=self.getById(userid)
+            print "USERID: %s" % userid
             if not onlyActivated or av.isActivated():
                 result[av.getEmail()]=av
         if not forceWithoutExtAuth:
