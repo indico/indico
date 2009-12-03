@@ -236,6 +236,11 @@ class CollaborationRemovePluginManager(CollaborationChangePluginManagersBase, Us
 class CollaborationBookingIndexQuery(AdminCollaborationBase):
     """
     """
+    
+    def _checkProtection(self):
+        if not RCCollaborationPluginAdmin.hasRights(self, None, "any"):
+            AdminCollaborationBase._checkProtection(self)
+            
     def _checkParams(self):
         AdminCollaborationBase._checkParams(self)
         user = self.getAW().getUser()
