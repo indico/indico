@@ -394,7 +394,7 @@ type("EditResourceDialog", ["ServiceDialog", "PreLoadHandler"], {
         $B(description, self.newResource.accessor('description'));
         $B(url, self.newResource.accessor('url'));
 
-        self.userList = new UserListField('ShortPeopleListDiv',
+        self.userList = new UserListField('VeryShortPeopleListDiv',
                                           'PluginPeopleList',
                                           self.allowedUsers,
                                           null,

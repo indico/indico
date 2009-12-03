@@ -2088,7 +2088,27 @@ class UHAdminsSystemModif( URLHandler ):
     _relativeURL = "adminSystem.py/modify"
 
 class UHMaterialModification( URLHandler ):
-    _relativeURL = "materialModification.py"
+
+    @classmethod
+    def getURL( cls, material, returnURL="" ):
+        from MaKaC import conference
+
+        owner = material.getOwner()
+
+        # return handler depending on parent type
+        if isinstance(owner, conference.Conference):
+            handler = UHConfModifShowMaterials
+        elif isinstance(owner, conference.Session):
+            handler = UHSessionModifMaterials
+        elif isinstance(owner, conference.Contribution):
+            handler = UHContribModifMaterials
+        elif isinstance(owner, conference.SubContribution):
+            handler = UHSubContribModifMaterials
+        else:
+            raise Exception('Unknown material owner type: %s' % owner)
+
+        return handler.getURL(owner, returnURL=returnURL)
+
 
 class UHMaterialModifyData( URLHandler ):
     _relativeURL = "materialModification.py/modify"

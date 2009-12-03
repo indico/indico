@@ -373,7 +373,7 @@ class WCollaborationDisplay( wcomponents.WTemplated ):
         for b in bookings:
             if b.canBeStarted():
                 ongoingBookings.append(b)
-            if b.getAdjustedStartDate('UTC') > nowutc():
+            if b.getStartDate() and b.getAdjustedStartDate('UTC') > nowutc():
                 scheduledBookings.setdefault(b.getAdjustedStartDate(self._tz).date(), []).append(b)
                 
         keys = scheduledBookings.keys()

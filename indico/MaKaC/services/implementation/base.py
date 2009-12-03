@@ -329,7 +329,7 @@ class ProtectedModificationService(ProtectedService):
                 self._checkSessionUser()
             else:
                 raise ServiceAccessError("ERR-P5", "You don't have the rights to modify this object")
-        if hasattr(self._target, "getConference"):
+        if hasattr(self._target, "getConference") and hasattr(self._target, "isClosed"):
             if target.getConference().isClosed():
                 raise ServiceAccessError("ERR-P6", "Conference %s is closed"%target.getConference().getId())
 

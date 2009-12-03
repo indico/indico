@@ -14,7 +14,7 @@
 <% end %>
 
 <div class="container">
-<div class="Search"><span>Search <%= name %></span></div>
+<h1 class="Search">Search <%= name %></h1>
 
 <% if searchingPublicWarning: %>
 <div class="searchPublicWarning">

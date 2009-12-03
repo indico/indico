@@ -133,7 +133,6 @@ class RHWriteMinutes( RHSubContributionDisplayBase ):
             self._redirect( urlHandlers.UHConferenceDisplay.getURL( self._target.getConference() ) )
 
 class RHSubmitMaterial(RHSubContributionDisplayBase):
-    _uh=urlHandlers.UHSubContribSubmitMaterial
 
     def _checkProtection(self):
         if not self._target.canModify( self.getAW() ) and not self._target.canUserSubmit( self.getAW().getUser() ):

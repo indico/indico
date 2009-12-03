@@ -2147,6 +2147,7 @@ class WPCategoryModifExistingMaterials( WPCategoryModifBase ):
     
     def getJSFiles(self):
         return WPCategoryModifBase.getJSFiles(self) + \
+               self._includeJSPackage('Management') + \
                self._includeJSPackage('MaterialEditor')
 
     def _getPageContent( self, pars ):

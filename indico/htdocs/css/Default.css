@@ -2060,10 +2060,10 @@ a.meetingHeaderSearchBox
     border-bottom: 1px solid #777777;
 }
 
-.container
+/*.container
 {
     overflow: hidden;
-}
+}*/
 
 .leftFloat
 {
@@ -2572,7 +2572,8 @@ div.filterDiv
     background: #FFFFFF;
     margin-bottom: 10px;
     margin: 30px 80px 30px 60px;
-    overflow: visible;
+    /*overflow: visible;*/
+    overflow: hidden;
 }
 
 .body

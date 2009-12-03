@@ -53,6 +53,7 @@ class WPContributionDefaultDisplayBase( WPConferenceDefaultDisplayBase, WPContri
 
     def getJSFiles(self):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
+            self._includeJSPackage('Management') + \
                self._includeJSPackage('MaterialEditor')
 
     def __init__( self, rh, contribution ):

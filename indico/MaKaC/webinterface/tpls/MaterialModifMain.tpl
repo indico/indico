@@ -61,7 +61,7 @@
      </tr>
     <tr>
         <td class="dataCaptionTD">
-			<span class="dataCaptionFormat"> <%= _("Main resource")%<</span>
+			<span class="dataCaptionFormat"> <%= _("Main resource")%></span>
         </td>
 		<td bgcolor="white" width="100%%" class="blacktext"><br>&nbsp;&nbsp;&nbsp;%(mainResource)s</td>
 		<form action=%(selectMainResourceURL)s method="POST">

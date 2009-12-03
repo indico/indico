@@ -364,8 +364,8 @@ class WHeader(WTemplated):
             if self._currentuser.isAdmin() or not adminList.getList():
                 adminItemList.append({'url': urlHandlers.UHAdminArea.getURL(), 'text': _("Server admin")})
             if PluginsHolder().hasPluginType("Collaboration"):
-                from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin
-                if (self._currentuser.isAdmin() or RCCollaborationAdmin.hasRights(user = self._currentuser)) and CollaborationTools.anyPluginsAreActive():
+                from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin, RCCollaborationPluginAdmin
+                if (self._currentuser.isAdmin() or RCCollaborationAdmin.hasRights(user = self._currentuser) or RCCollaborationPluginAdmin.hasRights(user = self._currentuser, plugins = "any")) and CollaborationTools.anyPluginsAreActive():
                     adminItemList.append({'url': urlHandlers.UHAdminCollaboration.getURL(), 'text': _("Video Services Overview")})
             if webcast.HelperWebcastManager.getWebcastManagerInstance().isManager(self._currentuser):
                 adminItemList.append({'url': urlHandlers.UHWebcast.getURL(), 'text': _("Webcast Admin")})
