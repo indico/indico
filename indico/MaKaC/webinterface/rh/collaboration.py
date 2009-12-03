@@ -58,6 +58,7 @@ class RCCollaborationPluginAdmin(object):
     def hasRights(request = None, user = None, plugins = []):
         """ Returns True if the user is an admin of one of the plugins corresponding to pluginNames
             plugins: a list of Plugin objects (e.g. EVO, RecordingRequest) or strings with the plugin name ('EVO', 'RecordingRequest')
+                     or the string 'any' (we will then check if the user is manager of any plugin),
         """
         if not PluginsHolder().hasPluginType("Collaboration"):
             return False
@@ -69,6 +70,11 @@ class RCCollaborationPluginAdmin(object):
                 user = request._getUser()
         
         coll = PluginsHolder().getPluginType('Collaboration')
+        
+        if plugins == 'any':
+            plugins = []
+            for p in CollaborationTools.getCollaborationPluginType().getPluginList():
+                plugins.append(p.getName())
         
         if plugins:
             for plugin in plugins:
@@ -141,7 +147,8 @@ class RHAdminCollaboration(RHAdminBase):
     def _checkProtection( self ):
         if not PluginsHolder().hasPluginType("Collaboration"):
             raise PluginError("Collaboration plugin system is not active")
-        if not RCCollaborationAdmin.hasRights(self, None): #and not RCCollaborationPluginAdmin.hasRights(self, None, self._tabPlugins)
+        
+        if not RCCollaborationAdmin.hasRights(self, None) and not RCCollaborationPluginAdmin.hasRights(self, plugins = "any"): #RCCollaborationPluginAdmin.hasRights(self, None, self._tabPlugins):
             RHAdminBase._checkProtection(self)
             
     def _process(self):
