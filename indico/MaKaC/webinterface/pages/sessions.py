@@ -752,7 +752,6 @@ class WSessionModifMain(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
         vars["addMaterialURL"]=urlHandlers.UHSessionAddMaterial.getURL(self._session)
         vars["removeMaterialsURL"]=urlHandlers.UHSessionRemoveMaterials.getURL()
-        modifyMaterialURLGen=urlHandlers.UHMaterialModification.getURL
 
         newConvenerURL = urlHandlers.UHSessionDataModificationNewConvenerCreate.getURL(self._session)
         vars["newConvenerURL"] = newConvenerURL
