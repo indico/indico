@@ -35,54 +35,77 @@ import nose
 import figleaf
 import figleaf.annotate_html
 import subprocess
+import socket
+import time
+from selenium import selenium
 
 
-def main(testPath, coverage):
-
-    print "Welcome in INDICOP"
-    sys.stdout.flush()
-    returnString=""
+    ##TODO check relative PATHs
+class Indicop():
     
-    if coverage:
-        figleaf.start()
+    def unit(self):
+        result = nose.run(argv=['nose','-v', 'indicop/MaKaC_tests/'])
+        return result
+    
+    def functional(self):
+        #Starting Selenium server
+        child = subprocess.Popen(["java", "-jar", "indicop/selenium_tests/selenium-server.jar"], stdout=subprocess.PIPE)
+    
+        sel = selenium("localhost", 4444, "*chrome", "http://www.cern.ch/")
+        for i in range(5):
+            try:
+                #testing if the selenium server has started
+                time.sleep(1)
+                sel.start()
+                sel.stop()
+                
+                result = nose.run(argv=['nose','-v', 'indicop/selenium_tests/'])
+                break
+            except socket.error:
+                print 'Selenium has not started yet. Attempt #%s' % (i+1)
+                time.sleep(5)
+        else:
+            print 'ERROR - Could not start functional tests because of Selenium server.'
+            sys.exit(1)
         
-    #Starting Selenium server
-    child = subprocess.Popen(["java", "-jar", "indicop/selenium_tests/selenium-server.jar"], stdout=subprocess.PIPE)
-    
-    #This is a cheap trick to make sure that selenium has fully
-    #started before launching the tests.
-    #Selenium (1.0.1) displays 5 lines in the shell before being ready
-    counter = 0
-    while counter < 5:
-        child_output = child.stdout.readline()
-        #print "Selenium debug %s: %s" % (counter, child_output)
-        counter += 1
-    
-    if testPath:
-        result = nose.run(argv=['nose','-v', 'indicop/MaKaC_tests/%s' % testPath])
-    else:
-        #result = nose.run(argv=['nose','-v', 'indicop/MaKaC_tests/'])
-        result = nose.run(argv=['nose','-v', 'indicop/selenium_tests/create_delete_lecture_test.py:Selenium_test.test_create_delete_lecture'])
-    
-    #Stopping Selenium Server
-    child.kill()
-    
-    if coverage:
-        figleaf.stop()
-        coverageOutput = figleaf.get_data().gather_files()
-        try:
-            figleaf.annotate_html.report_as_html(coverageOutput, 'indicop/coverage/html_report', [], {})
-        except Exception:
-            os.mkdir('indicop/coverage/html_report')
-            figleaf.annotate_html.report_as_html(coverageOutput, 'indicop/coverage/html_report', [], {})
-        returnString += "Report generated in indicop/coverage/html_report\n"
-    
-    if result:
-        returnString += "All tests succeeded!"
-    else:
-        returnString += "TestSuite failed!"
-    
-    return returnString
+        #Stopping Selenium Server
+        child.kill()
+        
+        return result
 
-if __name__ == '__main__':
-    main()
+    def main(self, testPath, coverage, unitTest, functionalTest):
+    
+        print "Welcome in INDICOP"
+        sys.stdout.flush()
+        returnString=""
+        
+        if coverage:
+            figleaf.start()
+            
+        if testPath:
+            #Security, getting rid of everything after a semicolon
+            escapedPath = testPath.split(';')
+            result = nose.run(argv=['nose','-v', 'indicop/%s' % escapedPath[0]])
+        elif unitTest:
+            result = self.unit()
+        elif functionalTest:
+            result = self.functional()
+        else:
+            result = self.unit() and self.functional()
+        
+        if coverage:
+            figleaf.stop()
+            coverageOutput = figleaf.get_data().gather_files()
+            try:
+                figleaf.annotate_html.report_as_html(coverageOutput, 'indicop/coverage/html_report', [], {})
+            except Exception:
+                os.mkdir('indicop/coverage/html_report')
+                figleaf.annotate_html.report_as_html(coverageOutput, 'indicop/coverage/html_report', [], {})
+            returnString += "Report generated in indicop/coverage/html_report\n"
+        
+        if result:
+            returnString += "All tests succeeded!"
+        else:
+            returnString += "TestSuite failed!"
+        
+        return returnString

@@ -299,21 +299,25 @@ Please specify the directory where you'd like it to be placed.
         open(filePath, 'w').write(fdata)
 
 class tests_indico(Command):
-    description = "run the test suite"
+    description = "Test Suite Framework"
     user_options = [('specify=', None, "Use nosetests style (file.class:testcase)"),
-                    ('coverage', None, "Output coverage report in html")]
+                    ('coverage', None, "Output coverage report in html"),
+                    ('unit', None, "Run only Unit tests"),
+                    ('functional', None, "Run only Functional tests")]
     boolean_options = []
     
     specify = None
     coverage = False
+    unit = False
+    functional = False
     
     def initialize_options(self): pass
 
     def finalize_options(self): pass
 
     def run(self):
-        import indicop
-        result = indicop.main(self.specify, self.coverage)
+        from indicop import Indicop
+        result = Indicop().main(self.specify, self.coverage, self.unit, self.functional)
         print result
 
 
