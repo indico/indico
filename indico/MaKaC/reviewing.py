@@ -91,12 +91,10 @@ class ConferenceReview(Persistent):
         self._enableAuthorSubmittedMatEditorEmailNotif = False
         self._enableAuthorSubmittedMatReviewerEmailNotif = False
 
-        self._reviewableMaterials = ["paper"]
-        from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry
+        self._reviewableMaterials = ["reviewing"]
+        #from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
+        self._nonReviewableMaterials = []#this is not used any more, since we have new material type used only for reviewing
 
-        self._nonReviewableMaterials = MaterialFactoryRegistry._allowedMaterials['conference'] + MaterialFactoryRegistry._allowedMaterials['category']
-
-        self._nonReviewableMaterials.remove("paper")
 
         self._states = [] # list of content reviewing and final judgement non-default states
         self._reviewingQuestions = [] #list of content reviewing and final judgement questions
@@ -105,10 +103,10 @@ class ConferenceReview(Persistent):
         self._templateCounter = Counter(1) #counter to make new id's for the templates
         self._userCompetences = {} #dictionary with the competences of each user. key: user, value: list of competences
         self._userCompetencesByTag = {} #dictionary with the users for each competence. key: competence, value: list of users
-
+        self._reviewingMaterials = {}
         self.notifyModification()
-
-
+    
+    
     def getConference(self):
         """ Returns the parent conference of the ConferenceReview object
         """
@@ -125,9 +123,7 @@ class ConferenceReview(Persistent):
 
     def getEndSubmissionDate(self):
         return self._endSubmissionDate
-
-
-
+    
     def setDefaultRefereeDueDate(self, date):
         self._defaultRefereeDueDate = date
 
@@ -1044,7 +1040,8 @@ class ConferenceReview(Persistent):
         """
         del self._templates[id]
         self.notifyModification()
-
+        
+        
     #competences methods
     def isInReviewingTeam(self, user):
         return user in self._paperReviewManagersList or \
@@ -1212,6 +1209,7 @@ class Template(Persistent):
         loc = self.__conf.getLocator()
         loc["reviewingTemplateId"] = self.getId()
         return loc
+    
 
 class ConferenceReviewingNotification(GenericNotification):
     """ Template to build an email notification to a newly appointed PRM / Referee / Editor / Reviewer / Abstract Manager / Abstract Reviewer

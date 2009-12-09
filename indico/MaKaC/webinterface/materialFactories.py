@@ -326,6 +326,52 @@ class MinutesFactory(MaterialFactory):
         return target.createMinutes()
     create = staticmethod( create )
 
+class WReviewingCreation( WSpecialMaterialCreationBase ):
+    pass
+    
+class ReviewingFactory(MaterialFactory):
+
+    _id = "reviewing"
+    _title = "reviewing"
+    _iconURL = Config.getInstance().getSystemIconURL("material")
+    _creationWC = WReviewingCreation
+    _materialKlasses=[conference.Reviewing]
+    _needsCreationPage = False
+        
+    def get( owner ):
+        """returns the material"""
+        return owner.getReviewing()
+    get = staticmethod(get)
+    
+    def remove( owner ):
+        """performs the deletion of the paper from the owner"""
+        owner.removeReviewing()
+    remove = staticmethod( remove )
+
+    def canAdd( target ):
+        #only one paper can be added to a contribution
+        return target.getReviewing() == None
+    canAdd = staticmethod( canAdd )
+    
+    def canDelete( target ):
+        #only a paper which is already set in a contribution can be deleted
+        return target.getReviewing() != None
+    canDelete = staticmethod( canDelete )
+    
+    def getModificationURL( cls, mat ):
+        """returns the URL for accessing to the modification view of the 
+            material"""
+        return urlHandlers.UHMaterialModification.getURL( mat )
+    getModificationURL = classmethod(getModificationURL)
+
+    def create(cls, target ):
+        m = conference.Reviewing()
+        m.setTitle(cls.getTitle())
+        target.setReviewing( m )
+        return m
+    create = classmethod( create )
+
+
 class DefaultMaterialFactory(MaterialFactory):
 
     """ Default factory, searches for material with same name,

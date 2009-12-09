@@ -27,6 +27,7 @@ from persistent import Persistent
 from MaKaC.errors import MaKaCError
 from MaKaC.reviewing import ConferenceReview
 import datetime
+from MaKaC.common import Config
 from MaKaC.i18n import _
 
 ###############################################
@@ -90,7 +91,16 @@ class ReviewManager(Persistent):
 
     def getReviewById(self, reviewId):
         return self._versioning[int(reviewId)]
-
+    
+    
+    def isInReviewingTeamforContribution(self, user):
+        """ Returns if the user is in the reviewing team for this contribution 
+        """
+        return self.isReferee(user) or \
+               self.isEditor(user) or \
+               self.isReviewer(user)
+              
+    
     #referee methods
     def getReferee(self):
         """ Returns the referee for this contribution
@@ -741,6 +751,7 @@ class Review(Persistent):
         else:
             return getAdjustedDate(self._reviewerDueDate, self.getConference())
 
+ 
 ######################################
 # Email notification classes
 ######################################

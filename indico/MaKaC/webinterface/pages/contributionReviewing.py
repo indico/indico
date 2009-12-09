@@ -101,6 +101,21 @@ class WPContributionReviewingJudgements( WPContributionModifBase ):
     
         return wc.getHTML(self._target, finalJudgeURL)
     
+class WPContributionModifReviewingMaterials( WPContributionModifBase ):
+    
+    def __init__(self, rh, contribution):
+        WPContributionModifBase.__init__(self, rh, contribution)
+        self._aw = rh.getAW()
+    
+    def _setActiveTab( self ):
+        self._subtabReviewing.setActive()
+        self._subTabRevMaterial.setActive()
+        
+        
+    def _getTabContent( self, pars ):
+        wc=wcomponents.WShowExistingReviewingMaterial(self._target)
+        return wc.getHTML( pars )
+    
 class WContributionReviewingJudgements(wcomponents.WTemplated): 
     
     def __init__(self, conference, aw):

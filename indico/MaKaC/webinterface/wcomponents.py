@@ -5594,6 +5594,24 @@ class WShowExistingMaterial(WTemplated):
         vars['mode'] = self._mode
 
         return vars
+    
+class WShowExistingReviewingMaterial(WTemplated):
+    
+    def __init__(self,target):
+        self._target=target
+
+
+    def getVars(self):
+        vars=WTemplated.getVars(self)
+        
+        vars["materialModifHandler"] = vars.get("materialModifHandler", None)
+        vars["materialProtectHandler"] = vars.get("materialProtectHandler", None)
+        vars["resourcesFileModifHandler"] = vars.get("resourcesFileModifHandler", None)
+        vars["resourcesFileProtectHandler"] = vars.get("resourcesFileProtectHandler", None)
+        vars["resourcesLinkModifHandler"] = vars.get("resourcesLinkModifHandler", None)
+        vars["resourcesLinkProtectHandler"] = vars.get("resourcesLinkProtectHandler", None)
+
+        return vars
 
 class WAddNewMaterial(WTemplated):
 

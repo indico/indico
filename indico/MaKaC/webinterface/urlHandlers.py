@@ -4350,7 +4350,7 @@ class UHRemoveQuestion( URLHandler ):
 
 class UHSetTemplate( URLHandler ):
     _relativeURL = "confModifReviewing.py/setTemplate"
-
+    
 class UHAddCriteria( URLHandler ):
     _relativeURL = "confModifReviewing.py/addCriteria"
 
@@ -4457,6 +4457,9 @@ class UHConfModifReviewingAssignContributionsAssign( URLHandler ):
 #Contribution reviewing
 class UHContributionModifReviewing( URLHandler ):
     _relativeURL = "contributionReviewing.py"
+
+class UHContribModifReviewingMaterials ( URLHandler ):
+    _relativeURL = "contributionReviewing.py/contributionReviewingMaterials"
 
 class UHContributionReviewingJudgements ( URLHandler ):
     _relativeURL = "contributionReviewing.py/contributionReviewingJudgements"    

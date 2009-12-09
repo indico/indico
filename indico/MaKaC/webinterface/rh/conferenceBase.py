@@ -200,6 +200,11 @@ class RHAbstractBase( RHConferenceSite ):
 
 class RHSubmitMaterialBase:
 
+    _allowedMatsConference=["paper", "slides", "poster", "minutes"]
+    _allowedMatsforReviewing=["reviewing"]
+    _allowedMatsForMeetings = [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ]
+    _allowedMatsForSE = [ "paper", "slides", "poster", "minutes", "agenda", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast", "video", "streaming video", "downloadable video" ]
+    _allowedMatsCategory = [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ]
 
     def __init__(self, target, rh = None):
         self._target=target

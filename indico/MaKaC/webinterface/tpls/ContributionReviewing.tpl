@@ -11,7 +11,7 @@
     <% if len(Review.getReviewManager().getVersioning()) == 1: %>
     <tr>
         <td>
-            <span style="color:red;">
+            <span>
             <%= _("Warning: the author(s) of this contribution have still not marked their initial materials as submitted.")%><br>
             <%= _("You must wait until then to start the reviewing process.")%>
             </span>
@@ -21,7 +21,7 @@
     <% else: %>
     <tr>
         <td>
-            <span style="color:red;">
+            <span>
             <%= _("Warning: since this contribution was marked 'To be corrected', the author(s) has not submitted new materials.")%><br>
             <%= _("You must wait until then to restart the reviewing process.")%><br>
             </span>

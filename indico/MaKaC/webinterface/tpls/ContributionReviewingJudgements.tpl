@@ -21,7 +21,7 @@
                     <% includeTpl ('EditingJudgementDisplay', Editing = Editing, ShowEditor = True) %>
                 <% end %>
                 <% else: %>
-                    <font color="red"><%= _("Warning: the layout reviewer has not given his judgement yet.")%></span> 
+                    <font><%= _("Warning: the layout reviewer has not given his judgement yet.")%></span> 
                 <% end %>
             <% end %>
             <% else: %>
@@ -49,7 +49,7 @@
                     </table>
                 <% end %>
                 <% else: %>
-                    <font color="red"><%= _("Warning: all your content reviewers have not given their advices yet.")%></span>
+                    <font><%= _("Warning: all your content reviewers have not given their advices yet.")%></span>
                 <% end %>
             <% end %>
             <% else: %>
@@ -91,14 +91,14 @@
                 <% if ConferenceChoice == 4 and not Editing.isSubmitted(): %>
                    <tr>
                        <td colspan="2" align="center">
-                           <font color="red"><%= _("Warning: the layout reviewer has not given his judgement yet.")%></span> 
+                           <font><%= _("Warning: the layout reviewer has not given his judgement yet.")%></span> 
                        </td>
                    </tr>
                 <% end %>
                 <% if (ConferenceChoice == 2 or ConferenceChoice == 4) and not Review.allReviewersHaveGivenAdvice(): %>
                    <tr>
                        <td colspan="2" align="center">
-                           <font color="red"><%= _("Warning: all your content reviewers have not given their advices yet.")%></span>
+                           <font><%= _("Warning: all your content reviewers have not given their advices yet.")%></span>
                        </td>
                    </tr>
                 <% end %>
@@ -108,7 +108,7 @@
             <% if not Review.getRefereeJudgement().isSubmitted(): %>
                 <tr>
                     <td colspan="2" align="center">
-                        <span style="color:red;">
+                        <span>
                         <%= _("This contribution has not been judged yet.")%><br>
                         <%= _("You are not allowed to perform the final judgement on this contribution.")%>
                         </span>

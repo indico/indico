@@ -3760,7 +3760,7 @@ ul.materialList
 
 ul.materialList li
 {
-    border-top: 1px solid #AAAAAA;
+    /*border-top: 1px solid #AAAAAA;*/
     list-style-type: none;
     padding-bottom: 5px;
 }

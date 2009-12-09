@@ -24,11 +24,13 @@ import MaKaC.user as user
 from MaKaC.errors import FormValuesError
 from MaKaC.errors import MaKaCError
 from MaKaC.webinterface.rh.contribMod import RHContribModifBase, RHContribModifBaseReviewingStaffRights
+from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
 from MaKaC.webinterface.rh.contribDisplay import RHContributionMaterialSubmissionRightsBase
 from MaKaC.webinterface.rh.contribMod import RCContributionReferee
 from MaKaC.webinterface.rh.contribMod import RCContributionEditor
 from MaKaC.webinterface.rh.contribMod import RCContributionReviewer
 from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager
+from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from MaKaC.i18n import _
 
 class RHContributionReviewing(RHContribModifBaseReviewingStaffRights):
@@ -57,6 +59,35 @@ class RHContributionReviewingJudgements(RHContribModifBaseReviewingStaffRights):
         p = contributionReviewing.WPContributionReviewingJudgements(self, self._target)
         return p.display()
 
+class RHContribModifReviewingMaterials(RHContribModifBaseReviewingStaffRights):
+    _uh = urlHandlers.UHContribModifReviewingMaterials
+    
+    def _checkProtection(self):
+        """ This disables people that are not conference managers or track coordinators to
+            delete files from a contribution.
+        """
+        RHContribModifBaseReviewingStaffRights._checkProtection(self)
+        for key in self._paramsForCheckProtection.keys():
+            if key.find("delete")!=-1:
+                RHContribModifBaseReviewingStaffRights._checkProtection(self)
+    
+    def _checkParams(self, params):
+        RHContribModifBaseReviewingStaffRights._checkParams(self, params)
+        if not hasattr(self, "_rhSubmitMaterial"):
+            self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
+        self._rhSubmitMaterial._checkParams(params)
+        params["days"] = params.get("day", "all")
+        if params.get("day", None) is not None :
+            del params["day"] 
+        self._paramsForCheckProtection = params
+    
+    def _process(self):
+        if self._target.getOwner().isClosed():
+            p = WPConferenceModificationClosed( self, self._target )
+            return p.display()
+
+        p = contributionReviewing.WPContributionModifReviewingMaterials( self, self._target )
+        return p.display(**self._getRequestParams())
 
 #Assign Referee classes
 class RHAssignRefereeBase(RHContribModifBase):

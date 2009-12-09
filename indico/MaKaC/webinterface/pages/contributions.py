@@ -169,6 +169,16 @@ class WContributionDisplayBase(wcomponents.WTemplated):
                 quoteattr(str(url)),iconURL,self.htmlText(material.getTitle())))
         return self._getHTMLRow("Material","<br>".join(lm))
 
+    def _getReviewingMaterialsHTML(self):
+        rm=[]
+        reviewing=self._contrib.getReviewing()
+        if reviewing is not None:
+            rm.append("""<a href=%s><img src=%s border="0" alt="reviewing"> %s</a>"""%(
+                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(reviewing))),
+                quoteattr(str(materialFactories.ReviewingFactory().getIconURL())),
+                self.htmlText(materialFactories.ReviewingFactory().getTitle())) )
+        return self._getHTMLRow("Reviewing Material","<br>".join(rm))
+            
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["contribXML"]=quoteattr(str(urlHandlers.UHContribToXML.getURL(self._contrib)))
@@ -242,10 +252,12 @@ class WContributionDisplayBase(wcomponents.WTemplated):
         #TODO: fuse this two lines into one, so that they are not both executed...
         #but the 1st line generates a lot of HTML in Python...
         vars["material"]=self._getMaterialHTML()
-
+        vars["revmaterial"]=self._getReviewingMaterialsHTML()
+        
         from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
         vars["MaterialList"] = wcomponents.WShowExistingMaterial(self._contrib).getHTML()
-
+        vars["ReviewingMatList"] = wcomponents.WShowExistingReviewingMaterial(self._contrib).getHTML()
+        
         vars["duration"]=""
         if self._contrib.getDuration() is not None:
             vars["duration"]=(datetime(1900,1,1)+self._contrib.getDuration()).strftime("%M'")
@@ -279,6 +291,7 @@ class WContributionDisplayBase(wcomponents.WTemplated):
         vars["submitIcon"] = self._getSubmitIconHTML()
         vars["Contribution"] = self._contrib
         import contributionReviewing
+        vars["ConfReview"] = self._contrib.getConference().getConfReview()
         vars["reviewingStuffDisplay"]= contributionReviewing.WContributionReviewingDisplay(self._contrib).getHTML({"ShowReviewingTeam" : False})
         vars["reviewingHistoryStuffDisplay"]= contributionReviewing.WContributionReviewingHistory(self._contrib).getHTML({"ShowReviewingTeam" : False})
         if self._contrib.getSession():
@@ -388,6 +401,7 @@ class WPContributionModifBase( WPConferenceModifBase  ):
                 self._subtabReviewing = self._tabCtrl.newTab( "reviewing", "Paper Reviewing", \
                 urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
                 
+            
             if self._canModify or self._isPRM or self._contrib.getReviewManager().isReferee(self._rh._getUser()):
                 self._subTabAssign = self._subtabReviewing.newSubTab( "assign", _("Assign Team"), \
                 urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
@@ -395,9 +409,8 @@ class WPContributionModifBase( WPConferenceModifBase  ):
                     self._subTabJudgements = self._subtabReviewing.newSubTab( "Judgements", _("Final Judge"), \
                     urlHandlers.UHContributionReviewingJudgements.getURL( self._target ) )
                 else:
-                    self._subTabJudgements = self._subtabReviewing.newSubTab( "Judgements", _("Judegments"), \
+                    self._subTabJudgements = self._subtabReviewing.newSubTab( "Judgements", _("Judgements"), \
                     urlHandlers.UHContributionReviewingJudgements.getURL( self._target ) )
-            
     
             if (confReviewChoice == 3 or confReviewChoice == 4) and \
                 self._contrib.getReviewManager().isEditor(self._rh._getUser()) and \
@@ -416,15 +429,14 @@ class WPContributionModifBase( WPConferenceModifBase  ):
                 self._contrib.getReviewManager().isReviewer(self._rh._getUser()) and \
                 not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() and \
                 self._contrib.getReviewManager().getLastReview().isAuthorSubmitted():
-<<<<<<< HEAD:indico/MaKaC/webinterface/pages/contributions.py
-
-                self._tabGiveAdvice = self._tabCtrl.newTab( "advice", "Advice on reviewing", \
-=======
                 
                 self._tabGiveAdvice = self._subtabReviewing.newSubTab( "advice", "Judge Content", \
->>>>>>> [DEVELOPMENT] - new subtabs + other:indico/MaKaC/webinterface/pages/contributions.py
                                       urlHandlers.UHContributionGiveAdvice.getURL(self._target))
-
+             
+            if self._canModify or self._isPRM or self._contrib.getReviewManager().isInReviewingTeamforContribution(self._rh._getUser()):
+                self._subTabRevMaterial = self._subtabReviewing.newSubTab( "revmaterial", _("Reviewing Material"), \
+                urlHandlers.UHContribModifReviewingMaterials.getURL( self._target ) )
+                
             if len(self._contrib.getReviewManager().getVersioning()) > 1 or self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
                 self._tabReviewingHistory = self._tabCtrl.newTab( "reviewing_history", "Reviewing History", \
                                             urlHandlers.UHContributionModifReviewingHistory.getURL( self._target ) )

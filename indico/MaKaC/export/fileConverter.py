@@ -180,6 +180,8 @@ class CDSConvFileConverter(FileConverter):
             return owner.getPoster()
         elif id=="minutes":
             return owner.getMinutes()
+        elif id=="reviewing":
+            return owner.getReviewing()
         else:
             try:
                 return owner.getMaterialById(id)

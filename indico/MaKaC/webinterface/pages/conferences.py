@@ -244,17 +244,20 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
         self._abstractReviewingMgtOpt=self._sectionMenu.getLinkByName("manageabstractreviewing")
         self._abstractReviewingMgtOpt.setVisible(False)
 
+        #paper reviewing related
         self._paperReviewingMgtOpt=self._sectionMenu.getLinkByName("managepaperreviewing")
         self._paperReviewingMgtOpt.setVisible(False)
-
+        
+        self._assignContribOpt=self._sectionMenu.getLinkByName("assigncontributions")
+        self._assignContribOpt.setVisible(False)
+        
         self._judgeListOpt=self._sectionMenu.getLinkByName("judgelist")
         self._judgeListOpt.setVisible(False)
         self._judgereviewerListOpt=self._sectionMenu.getLinkByName("judgelistreviewer")
         self._judgereviewerListOpt.setVisible(False)
         self._judgeeditorListOpt=self._sectionMenu.getLinkByName("judgelisteditor")
         self._judgeeditorListOpt.setVisible(False)
-        self._assignContribOpt=self._sectionMenu.getLinkByName("assigncontributions")
-        self._assignContribOpt.setVisible(False)
+        
 
         if awUser != None and self._conf.hasEnabledSection('paperReviewing'):
 
@@ -267,12 +270,23 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
             if "paperReviewManager" in conferenceRoles:
                 if self._conf in awUser.getLinkedTo()["conference"]["paperReviewManager"]:
                     self._paperReviewingMgtOpt.setVisible(True)
+                    self._assignContribOpt.setVisible(True)
 
             if "referee" in conferenceRoles and "editor" in conferenceRoles and "reviewer" in conferenceRoles:
                 showrefereearea = self._conf in awUser.getLinkedTo()["conference"]["referee"] 
 
-                if self._conf in awUser.getLinkedTo()["conference"]["referee"]:
+               
+                if showrefereearea:
                     self._assignContribOpt.setVisible(True)
+                    self._judgeListOpt.setVisible(True)
+            
+                if showreviewerarea:
+                    self._judgereviewerListOpt.setVisible(True)
+            
+                if showeditorarea:
+                    self._judgeeditorListOpt.setVisible(True)
+
+        
         #collaboration related
         self._collaborationOpt = self._sectionMenu.getLinkByName("collaboration")
         self._collaborationOpt.setVisible(False)

@@ -83,7 +83,14 @@
 					<tr><td>&nbsp;</td></tr>
                     %(subConts)s
                     <% if Contribution.getConference() and Contribution.getConference().hasEnabledSection('paperReviewing') and Contribution.getConference().getConfReview().hasReviewing() : %>
-                        <% if Contribution.canUserSubmit(self._aw.getUser()): %>
+                        <% if Contribution.canUserSubmit(self._aw.getUser()) or Contribution.canModify(self._aw): %>
+                        <tr><td align="right" valign="top" class="displayField" style="border-right:5px solid #FFFFFF;" nowrap>
+                                <b>Reviewing materials:</b>
+                            </td>
+                            <td>
+                                <%=ReviewingMatList%>
+                            </td>
+                        </tr>
                         <tr>
                             <td align="right" valign="top" class="displayField" style="border-right:5px solid #FFFFFF;" nowrap>
                                 <b>Reviewing status:</b>
@@ -118,7 +125,7 @@
                                         </td>
                                     <tr>
                                         <td colspan="2" align="center">
-                                            <font color="red">
+                                            <font>
                                                 Press this button only if you made some mistake when submitting the materials.<br>
                                                 The reviewing team will be notified and the reviewing process will be stopped until you mark the materials as submitted again.
                                             </font>
@@ -153,5 +160,4 @@
         </table>
     </td>
 </tr>
-
 </table>
