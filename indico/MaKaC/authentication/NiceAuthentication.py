@@ -73,8 +73,10 @@ class NiceAuthenticator(Authenthicator):
                         ah.add(av)
                         av.activateAccount()
                         return av
-                else:
+                elif not av.isActivated():
                     av.activateAccount()
+                    return av
+                else:
                     return av
         return None
     
