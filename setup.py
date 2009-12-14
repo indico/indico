@@ -256,7 +256,7 @@ Please specify the directory where you'd like it to be placed.
             prefixDir = os.getcwd()
 
         directories = dict((d,os.path.join(prefixDir, d)) for d in
-                           ['db', 'log', 'tmp', 'cache'])
+                           ['db', 'log', 'tmp', 'cache', 'archive'])
 
         print 'Creating directories...',
         for d in directories.values():
