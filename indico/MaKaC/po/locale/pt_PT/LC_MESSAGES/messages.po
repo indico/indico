@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Indico 0.7\n"
+"Project-Id-Version: Indico v0.97\n"
 "POT-Creation-Date: 2005-11-22 11:20+0100\n"
 "PO-Revision-Date: 2009-05-08 17:43+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"

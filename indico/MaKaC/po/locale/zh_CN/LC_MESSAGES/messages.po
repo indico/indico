@@ -14,7 +14,7 @@
 # General Public License for more details.
 msgid ""
 msgstr ""
-"Project-Id-Version: 0.96\n"
+"Project-Id-Version: Indico v0.97\n"
 "POT-Creation-Date: 2005-11-22 11:20+0100\n"
 "PO-Revision-Date: 2008-06-11 18:37+0800\n"
 "Last-Translator: yihua <vlab@cnic.cn>\n"
