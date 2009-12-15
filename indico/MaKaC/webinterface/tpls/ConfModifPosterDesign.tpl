@@ -815,8 +815,6 @@
             <optgroup label="Normal Fonts">
               <option>Times New Roman</option>
               <option>Courier</option>
-              <option>OhMyGodStars</option>
-              <option>OptimaThin</option>
             </optgroup>  
             <optgroup label="Special Character Fonts">
               <option>LinuxLibertine</option>

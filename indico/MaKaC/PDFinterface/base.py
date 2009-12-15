@@ -132,24 +132,22 @@ def modifiedFontSize(fontsize, lowerNormalHigher):
     
 
 def setTTFonts():
-    dir=os.path.split(os.path.abspath(__file__))[0]
-    dir=os.path.join(dir, "ttfonts")
-    #pdfmetrics.registerFont(TTFont('symbol', os.path.join(dir,'symbol.ttf')))
-    pdfmetrics.registerFont(TTFont('Times-Roman', os.path.join(dir,'times.ttf')))
-    pdfmetrics.registerFont(TTFont('Times-Bold', os.path.join(dir, 'timesbd.ttf')))
-    pdfmetrics.registerFont(TTFont('Times-Italic', os.path.join(dir,'timesi.ttf')))
-    pdfmetrics.registerFont(TTFont('Times-Bold-Italic', os.path.join(dir, 'timesbi.ttf')))
-    pdfmetrics.registerFont(TTFont('Courier', os.path.join(dir, 'cour.ttf')))
-    pdfmetrics.registerFont(TTFont('Courier-Bold', os.path.join(dir, 'courbd.ttf')))
-    pdfmetrics.registerFont(TTFont('Courier-Italic', os.path.join(dir, 'couri.ttf')))
-    pdfmetrics.registerFont(TTFont('Courier-Bold-Italic', os.path.join(dir, 'courbi.ttf')))
-    pdfmetrics.registerFont(TTFont('OhMyGodStars', os.path.join(dir, 'OhMyGodStars.ttf')))
-    pdfmetrics.registerFont(TTFont('Optima-Thin', os.path.join(dir, 'Optima-Thin.ttf')))
-    #pdfmetrics.registerFont(TTFont('Bitstream-Cyberbit', os.path.join(dir, 'Cyberbit.ttf')))
-    pdfmetrics.registerFont(TTFont('LinuxLibertine', os.path.join(dir, 'LinLibertine_Re-2.8.14.ttf')))
-    pdfmetrics.registerFont(TTFont('LinuxLibertine-Bold', os.path.join(dir, 'LinLibertine_Bd-2.8.1.ttf')))
-    pdfmetrics.registerFont(TTFont('LinuxLibertine-Italic', os.path.join(dir, 'LinLibertine_BI-2.8.0.ttf')))
-    pdfmetrics.registerFont(TTFont('LinuxLibertine-Bold-Italic', os.path.join(dir, 'Optima-Thin.ttf')))
+    # Import fonts from indico.extra (separate package)
+    import indico.extra.fonts
+
+    dir=os.path.split(os.path.abspath(indico.extra.fonts.__file__))[0]
+    pdfmetrics.registerFont(TTFont('Times-Roman', os.path.join(dir,'LiberationSerif-Regular.ttf')))
+    pdfmetrics.registerFont(TTFont('Times-Bold', os.path.join(dir, 'LiberationSerif-Bold.ttf')))
+    pdfmetrics.registerFont(TTFont('Times-Italic', os.path.join(dir,'LiberationSerif-Italic.ttf')))
+    pdfmetrics.registerFont(TTFont('Times-Bold-Italic', os.path.join(dir, 'LiberationSerif-BoldItalic.ttf')))
+    pdfmetrics.registerFont(TTFont('Courier', os.path.join(dir, 'LiberationMono-Regular.ttf')))
+    pdfmetrics.registerFont(TTFont('Courier-Bold', os.path.join(dir, 'LiberationMono-Bold.ttf')))
+    pdfmetrics.registerFont(TTFont('Courier-Italic', os.path.join(dir, 'LiberationMono-Italic.ttf')))
+    pdfmetrics.registerFont(TTFont('Courier-Bold-Italic', os.path.join(dir, 'LiberationMono-BoldItalic.ttf')))
+    pdfmetrics.registerFont(TTFont('LinuxLibertine', os.path.join(dir, 'LinLibertine_Re-4.4.1.ttf')))
+    pdfmetrics.registerFont(TTFont('LinuxLibertine-Bold', os.path.join(dir, 'LinLibertine_Bd-4.1.0.ttf')))
+    pdfmetrics.registerFont(TTFont('LinuxLibertine-Italic', os.path.join(dir, 'LinLibertine_It-4.0.6.ttf')))
+    pdfmetrics.registerFont(TTFont('LinuxLibertine-Bold-Italic', os.path.join(dir, 'LinLibertine_BI-4.0.5.ttf')))
     pdfmetrics.registerFont(TTFont('Kochi-Mincho', os.path.join(dir, 'kochi-mincho-subst.ttf')))
     pdfmetrics.registerFont(TTFont('Kochi-Gothic', os.path.join(dir, 'kochi-gothic-subst.ttf')))
     pdfmetrics.registerFont(TTFont('Uming-CN', os.path.join(dir, 'uming.ttc')))
