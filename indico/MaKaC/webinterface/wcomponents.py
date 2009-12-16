@@ -589,7 +589,7 @@ class WMenuMeetingHeader( WConferenceHeader ):
 
         viewoptions = []
         if len(stylesheets) != 0:
-            stylesheets.sort()
+            stylesheets.sort(key=styleMgr.getStylesheetName)
             for stylesheet in stylesheets:
                 viewoptions.append({"id": stylesheet, "name": styleMgr.getStylesheetName(stylesheet) })
         vars["viewoptions"] = viewoptions
@@ -687,7 +687,7 @@ class WMenuSimpleEventHeader( WMenuMeetingHeader ):
         stylesheets = styleMgr.getStylesheetListForEventType(vars["type"])
         viewoptions = []
         if len(stylesheets) != 0:
-            stylesheets.sort()
+            stylesheets.sort(key=styleMgr.getStylesheetName)
             for stylesheet in stylesheets:
                 viewoptions.append({"id": stylesheet, "name": styleMgr.getStylesheetName(stylesheet) })
         vars["viewoptions"] = viewoptions

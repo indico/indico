@@ -82,9 +82,14 @@ STAFF ASSOCIATION
 </xsl:call-template>
 
 <font size="+1" face="Times">
-<xsl:value-of select="./title" disable-output-escaping="yes"/><br/>
+<xsl:value-of select="./title" disable-output-escaping="yes"/>
 </font>
-
+<xsl:if test="count(child::material) != 0">
+    <font face="Times" size="+1"><xsl:for-each select="material">
+        <a href="{./displayURL}">&#160;&#160;<xsl:value-of select="./title" disable-output-escaping="yes"/></a>
+    </xsl:for-each></font>
+</xsl:if>
+<br/>
 <font size="+1" face="Times">
 <xsl:if test="count(child::location) != 0">
   <xsl:value-of select="./location/room"/>
