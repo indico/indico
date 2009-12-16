@@ -357,6 +357,6 @@ if __name__ == '__main__':
           package_data = {'indico': ['*.*'] },
           include_package_data = True,
           dependency_links = [
-                              "http://cdsware/indico/download/cds_indico_extras-0.1-py2.6.egg"
+                              "http://cdswaredev.cern.ch/indico/wiki/Admin/Installation"
                               ],
           )
