@@ -79,7 +79,7 @@ class toExec:
                 return
         print text
 
-    def _runObj(self):
+    def _runObj(self, obj):
         # create the context
         ContextManager.create()
 

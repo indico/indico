@@ -412,8 +412,8 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         vars["displayURL"] = urlHandlers.UHConferenceDisplay.getURL(self._conf)
         vars["imgConferenceRoom"] = Config.getInstance().getSystemIconURL( "conferenceRoom" )
         tz = DisplayTZ(self._aw,self._conf).getDisplayTZ()
-        adjusted_sDate = self._conf.getAdjustedStartDate(tz)
-        adjusted_eDate = self._conf.getAdjustedEndDate(tz)
+        adjusted_sDate = self._conf.getAdjustedScreenStartDate(tz)
+        adjusted_eDate = self._conf.getAdjustedScreenEndDate(tz)
         vars["confDateInterval"] = "from %s to %s (%s)"%(adjusted_sDate.strftime("%d %B %Y"), adjusted_eDate.strftime("%d %B %Y"), tz)
         if adjusted_sDate.strftime("%d%B%Y") == \
                 adjusted_eDate.strftime("%d%B%Y"):

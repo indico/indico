@@ -2547,8 +2547,6 @@ class RegistrantsListToBadgesPDF:
     """
     __fonts = {'Times New Roman':['Times-Roman','Times-Bold','Times-Italic','Times-Bold-Italic'],
                'Courier':['Courier', 'Courier-Bold', 'Courier-Italic', 'Courier-Bold-Italic'],
-               'OhMyGodStars':['OhMyGodStars','OhMyGodStars','OhMyGodStars','OhMyGodStars'],
-               'OptimaThin':['Optima-Thin','Optima-Thin','Optima-Thin','Optima-Thin'],
                'LinuxLibertine':['LinuxLibertine','LinuxLibertine-Bold','LinuxLibertine-Italic','LinuxLibertine-Bold-Italic'],
                'Kochi-Mincho':['Kochi-Mincho','Kochi-Mincho','Kochi-Mincho','Kochi-Mincho'],
                'Kochi-Gothic':['Kochi-Gothic','Kochi-Gothic','Kochi-Gothic','Kochi-Gothic'],
@@ -2804,8 +2802,6 @@ class LectureToPosterPDF:
     """
     __fonts = {'Times New Roman':['Times-Roman','Times-Bold','Times-Italic','Times-Bold-Italic'],
                'Courier':['Courier', 'Courier-Bold', 'Courier-Italic', 'Courier-Bold-Italic'],
-               'OhMyGodStars':['OhMyGodStars','OhMyGodStars','OhMyGodStars','OhMyGodStars'],
-               'OptimaThin':['Optima-Thin','Optima-Thin','Optima-Thin','Optima-Thin'],
                'LinuxLibertine':['LinuxLibertine','LinuxLibertine-Bold','LinuxLibertine-Italic','LinuxLibertine-Bold-Italic'],
                'Kochi-Mincho':['Kochi-Mincho','Kochi-Mincho','Kochi-Mincho','Kochi-Mincho'],
                'Kochi-Gothic':['Kochi-Gothic','Kochi-Gothic','Kochi-Gothic','Kochi-Gothic'],

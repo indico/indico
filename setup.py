@@ -32,8 +32,10 @@ import string
 import sys
 from distutils.sysconfig import get_python_lib
 from distutils.cmd import Command
+from distutils.command import bdist
 
-from setuptools.command import develop, install, sdist
+import pkg_resources
+from setuptools.command import develop, install, sdist, bdist_egg, easy_install
 from setuptools import setup, find_packages, findall
 from subprocess import Popen, PIPE
 
@@ -43,7 +45,6 @@ if sys.platform == 'linux2':
 
 import tests
 
-    
 class vars(object):
     '''Variable holder.'''
     packageDir = None
@@ -55,37 +56,14 @@ class vars(object):
     documentationDir = None
     configurationDir = None
     htdocsDir = None
-    
+
 ###  Methods required by setup() ##############################################
-def _getDataFiles(x):
-    '''Returns a fully populated data_files ready to be fed to setup()
-    
-    WARNING: when creating a bdist_egg we need to include files inside bin, 
-    doc, config & htdocs into the egg therefore we cannot fetch indico.conf 
-    values directly because they will not refer to the proper place. We 
-    include those files in the egg's root folder. 
-    '''
-    cfg = Config.getInstance()
+
+def _generateDataPaths(x):
+
     dataFilesDict = {}
 
-    # setup expects a list like this (('foo/bar/baz', 'wiki.py'),
-    #                                 ('a/b/c', 'd.jpg'))
-    #
-    # What we do below is transform a list like this:
-    #                                (('foo', 'bar/baz/wiki.py'),
-    #                                 ('a', 'b/c/d.jpg'))
-    #
-    # first into a dict and then into a pallatable form for setuptools.
-
-    # This re will be used to filter out etc/*.conf files and therefore not overwritting them
-    isAConfRe = re.compile('etc\/[^/]+\.conf$')
-    
-    for (baseDstDir, files, remove_first_x_chars) in ((x.binDir,           findall('bin'), 4),
-                                                      (x.documentationDir, ['doc/UserGuide.pdf','doc/AdminUserGuide.pdf'], 4),
-                                                      (x.configurationDir, [xx for xx in findall('etc') if not isAConfRe.search(xx)], 4),
-                                                      (x.packageDir,              findall('indico/MaKaC'), 13),
-                                                      (x.htdocsDir,        findall('indico/htdocs'), 14),
-                                                      ):
+    for (baseDstDir, files, remove_first_x_chars) in x:
         for f in files:
             dst_dir = os.path.join(baseDstDir, os.path.dirname(f)[remove_first_x_chars:])
             if dst_dir not in dataFilesDict:
@@ -98,40 +76,69 @@ def _getDataFiles(x):
 
     return dataFiles
 
+def _getDataFiles(x):
+    """
+    Returns a fully populated data_files ready to be fed to setup()
+
+    WARNING: when creating a bdist_egg we need to include files inside bin,
+    doc, config & htdocs into the egg therefore we cannot fetch indico.conf
+    values directly because they will not refer to the proper place. We
+    include those files in the egg's root folder.
+    """
+
+    # setup expects a list like this (('foo/bar/baz', 'wiki.py'),
+    #                                 ('a/b/c', 'd.jpg'))
+    #
+    # What we do below is transform a list like this:
+    #                                (('foo', 'bar/baz/wiki.py'),
+    #                                 ('a', 'b/c/d.jpg'))
+    #
+    # first into a dict and then into a pallatable form for setuptools.
+
+    # This re will be used to filter out etc/*.conf files and therefore not overwritting them
+    isAConfRe = re.compile('etc\/[^/]+\.conf$')
+
+    dataFiles = _generateDataPaths((('bin',           findall('bin'), 4),
+                                    ('doc', ['doc/UserGuide.pdf','doc/AdminUserGuide.pdf'], 4),
+                                    ('etc', [xx for xx in findall('etc') if not isAConfRe.search(xx)], 4),
+                                    #('MaKaC',              findall('indico/MaKaC'), 13),
+                                    ('htdocs',        findall('indico/htdocs'), 14)))
+    return dataFiles
+
 
 
 
 
 def _getInstallRequires():
     '''Returns external packages required by Indico
-    
-    They will only be installed when Indico is installed through easy_install.'''
-    
-    base =  ['pytz', 'zodb3', 'jstools', 'zope.index', 'simplejson']
+
+    These are the ones needed for runtime.'''
+
+    base =  ['pytz', 'zodb3', 'zope.index', 'zope.interface', 'simplejson']
     if sys.version_info[1] < 5: # hashlib is part of Python 2.5+
         base.append('hashlib')
-        
+
     return base
 
 
 def _versionInit():
-        '''Writes a version number inside indico/MaKaC/__init__.py and returns it'''
-        global x
-        v = None
-        for k in sys.argv:
-            if k == '--version':
-                v = sys.argv[sys.argv.index(k) + 1]
-                break
+        '''Retrieves the version number from indico/MaKaC/__init__.py and returns it'''
 
-        if not v:
-            v = raw_input('Version being packaged [dev]: ').strip()
-            if v == '':
-                v = 'dev'
+        import datetime
+        from indico.MaKaC import __version__
+        v = __version__
 
-        old_init = open('indico/MaKaC/__init__.py','r').read()
-        new_init = re.sub('(__version__[ ]*=[ ]*[\'"]{1})([^\'"]+)([\'"]{1})', "\\g<1>%s\\3" % v, old_init)
-        open('indico/MaKaC/__init__.py', 'w').write(new_init)
+        print('Version being packaged: %s' % v)
+
         return v
+
+
+def _convertdoc():
+    '''Generates INSTALL from INSTALL.xml'''
+    commands.getoutput('docbook2html --nochunks doc/docbook_src/INSTALL.xml > INSTALL.html')
+    commands.getoutput('docbook2pdf doc/docbook_src/INSTALL.xml')
+    commands.getoutput('w3m INSTALL.html > INSTALL')
+    commands.getoutput('rm INSTALL.html')
 
 
 ###  Commands ###########################################################
@@ -142,76 +149,38 @@ class sdist_indico(sdist.sdist):
 
     def run(self):
         global x
-
-        self._convertdoc()
-        jsCompress()
         sdist.sdist.run(self)
 
 
-    def _convertdoc(self):
-        '''Generates INSTALL from INSTALL.xml'''
-        commands.getoutput('docbook2html --nochunks doc/docbook_src/INSTALL.xml > INSTALL.html')
-        commands.getoutput('docbook2pdf doc/docbook_src/INSTALL.xml')
-        commands.getoutput('w3m INSTALL.html > INSTALL')
-        commands.getoutput('rm INSTALL.html')
+class jsdist_indico:
+    def jsCompress(self):
+        from MaKaC.consoleScripts.installBase import jsCompress
+        jsCompress()
+        self.dataFiles += _generateDataPaths([('htdocs/js/presentation/pack', findall('indico/htdocs/js/presentation/pack'), 35),
+                                             ('htdocs/js/indico/pack', findall('indico/htdocs/js/indico/pack'), 29)])
 
 
-class install_indico(install.install):
-    user_options = [('uid=', None, "uid of Apache user\n\n"),
-                    ('gid=', None, 'gid of Apache user'),
-                    ('config-dir=', None, 'directory to store indico.conf'),
-                    ('force-no-db', None, 'force not to detect if DB installed'),
-                    ('force-upgrade', None, 'upgrade without asking for confirmation first')] + install.install.user_options
+def _bdist_indico(dataFiles):
+    class bdist_indico(bdist.bdist, jsdist_indico):
+        def run(self):
+            _convertdoc()
+            self.jsCompress()
+            compileAllLanguages()
+            bdist.bdist.run(self)
 
-    uid = None
-    gid = None
-    config_dir = None
-    force_no_db = False
-    force_upgrade = False
+    bdist_indico.dataFiles = dataFiles
+    return bdist_indico
 
-    def run(self):
-        if self.root != None and sys.path[0] != os.path.join(self.root, 'MaKaC'):
-            sys.path = [os.path.join(self.root, 'MaKaC')] + sys.path
-        
-        # If we don't do the following then BinDir, ConfigurationDir, etc will have 
-        # self.install_data preppended to them therefore ignoring absolute paths specified in
-        # indico.conf.
-        self.install_data = ''
-        
-        self._resolvePackageDir()
-        
-        # Indico can be installed both through setup.py and easy_install. To support the latter
-        # we need to split installation steps in external functions that can also be called
-        # by indico_initial_setup.
-        cfg = Config.getInstance()
-        if self.config_dir == None:
-            self.config_dir = cfg.getConfigurationDir()
-            
-        indico_pre_install(self.config_dir, force_upgrade=self.force_upgrade)
-        
-        install.install.run(self) # this basically copies files to site-packages (or dist-packages)
-        
-        makacconfig_base_dir = '%s/MaKaC/common' % self.install_lib
-        indico_post_install(self.config_dir,
-                            makacconfig_base_dir,
-                            self._resolvePackageDir(),
-                            self.force_no_db,
-                            self.uid,
-                            self.gid)
-    
+def _bdist_egg_indico(dataFiles):
+    class bdist_egg_indico(bdist_egg.bdist_egg, jsdist_indico):
+        def run(self):
+            _convertdoc()
+            self.jsCompress()
+            compileAllLanguages()
+            bdist_egg.bdist_egg.run(self)
 
-    def _resolvePackageDir(self):
-        '''Returns the path where the pure Python package (MaKaC) will be installed to
-        
-        We need to touch it primarily because of the tests where we are specifying a root 
-        folder.'''
-        x.packageDir = get_python_lib()
-        if self.root:
-            x.packageDir = x.packageDir[1:]
-
-        self.install_purelib = x.packageDir
-
-
+    bdist_egg_indico.dataFiles = dataFiles
+    return bdist_egg_indico
 
 class jsbuild(Command):
     description = "minifies and packs javascript files"
@@ -228,9 +197,8 @@ class jsbuild(Command):
         from MaKaC.consoleScripts.installBase import jsCompress
         jsCompress()
 
-
-class develop_indico(Command):
-    description = "prepares the current directory for Indico development"
+class fetchdeps_indico(Command):
+    description = "fetch all the dependencies needed to run Indico"
     user_options = []
     boolean_options = []
 
@@ -239,6 +207,35 @@ class develop_indico(Command):
     def finalize_options(self): pass
 
     def run(self):
+        print "Checking if dependencies need to be installed..."
+
+        wset = pkg_resources.working_set
+
+        wset.resolve(map(pkg_resources.Requirement.parse, _getInstallRequires()),
+                           installer = self._installMissing)
+
+        print "Done!"
+
+
+    def _installMissing(self, dist):
+        env = pkg_resources.Environment()
+        easy_install.main(["-U",str(dist)])
+        env.scan()
+        return env[str(dist)][0]
+
+class develop_indico(Command):
+    description = "prepares the current directory for Indico development"
+    user_options = []
+    boolean_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+
         local = 'etc/indico.conf'
         if os.path.exists(local):
             print 'Upgrading existing etc/indico.conf..'
@@ -247,22 +244,48 @@ class develop_indico(Command):
             print 'Creating new etc/indico.conf..'
             shutil.copy('etc/indico.conf.sample', local)
 
-        for d in [x for x in ('db', 'log') if not os.path.exists(x)]:
-            os.makedirs(d)
-
         for f in [x for x in ('etc/zdctl.conf', 'etc/zodb.conf') if not os.path.exists(x)]:
             shutil.copy('%s.sample' % f, f)
-        createDirs()
+
+        print """\nIndico needs to store some information in the filesystem (database, cache, temporary files, logs...)
+Please specify the directory where you'd like it to be placed.
+(Note that putting it outside of your sourcecode tree is recommended)"""
+        prefixDir = raw_input('[%s]: ' % os.getcwd()).strip()
+
+        if prefixDir == '':
+            prefixDir = os.getcwd()
+
+        directories = dict((d,os.path.join(prefixDir, d)) for d in
+                           ['db', 'log', 'tmp', 'cache', 'archive'])
+
+        print 'Creating directories...',
+        for d in directories.values():
+            if not os.path.exists(d):
+                os.makedirs(d)
+        print 'Done!'
+
+        directories['htdocs'] = os.path.join(os.getcwd(), 'indico', 'htdocs')
+
+        from MaKaC.consoleScripts.installBase import _databaseText, _findApacheUserGroup, _checkDirPermissions, _updateDbConfigFiles, _updateMaKaCEggCache
+
+        user = ''
+
+        sourcePath = os.getcwd()
+
+        if sys.platform == "linux2":
+            # find the apache user/group
+            user, group = _findApacheUserGroup(None, None)
+            _checkDirPermissions(directories, dbInstalledBySetupPy=directories['db'], accessuser=user, accessgroup=group)
+
+        _updateDbConfigFiles(directories['db'], directories['log'], os.path.join(sourcePath,'etc'), directories['tmp'], user)
+
+        _updateMaKaCEggCache(os.path.join(os.path.dirname(__file__), 'indico', 'MaKaC', '__init__.py'), directories['tmp'])
+
         updateIndicoConfPathInsideMaKaCConfig(os.path.join(os.path.dirname(__file__), ''), 'indico/MaKaC/common/MaKaCConfig.py')
         compileAllLanguages()
         print '''
-IMPORTANT NOTES
-
-- Review etc/indico.conf.local, etc/zodb.conf and etc/zdctl.conf to make sure everything is ok.
-
-- To start the database run: zdctl.py -C etc/zdctl.conf start
-'''
-
+%s
+        ''' % _databaseText('etc')
 
 class tests_indico(Command):
     description = "run the test suite"
@@ -280,63 +303,45 @@ class tests_indico(Command):
         print out, outerr
 
 
-        
 if __name__ == '__main__':
     sys.path = ['indico'] + sys.path # Always load source from the current folder
-    
+
     #PWD_INDICO_CONF = 'etc/indico.conf'
     #if not os.path.exists(PWD_INDICO_CONF):
     #    shutil.copy('etc/indico.conf.sample', PWD_INDICO_CONF)
-    
+
     from MaKaC.consoleScripts.installBase import *
     setIndicoInstallMode(True)
 
-    try:
-        from MaKaC.common.Configuration import Config
-    except IOError:
-        # If an installation is halfway aborted we can end up with a
-        # broken indico_conf value inside MaKaCConfig from the installation dir.
-        updateIndicoConfPathInsideMaKaCConfig('etc/indico.conf.sample', os.path.join('indico', 'MaKaC', 'common', 'MaKaCConfig.py'))
-        from MaKaC.common.Configuration import Config
-    
-    
     x = vars()
     x.packageDir = os.path.join(get_python_lib(), 'MaKaC')
 
-    # we need to calculate version at this point, before sdist_indico runs
-    if 'sdist' in sys.argv or 'bdist_egg' in sys.argv: 
-        x.versionVal = _versionInit()
-        
-        
-    if 'bdist_egg' in sys.argv:
-        x.binDir = 'bin'
-        x.documentationDir = 'doc'
-        x.configurationDir = 'etc'
-        x.htdocsDir = 'htdocs'
-    else:
-        cfg = Config.getInstance()
-        x.binDir = cfg.getBinDir()
-        x.documentationDir = cfg.getDocumentationDir()
-        x.configurationDir = cfg.getConfigurationDir()
-        x.htdocsDir = cfg.getHtdocsDir()  
 
+    x.binDir = 'bin'
+    x.documentationDir = 'doc'
+    x.configurationDir = 'etc'
+    x.htdocsDir = 'htdocs'
+
+    dataFiles = _getDataFiles(x)
 
     setup(name = "cds-indico",
           cmdclass={'sdist': sdist_indico,
+                    'bdist': _bdist_indico(dataFiles),
+                    'bdist_egg': _bdist_egg_indico(dataFiles),
                     'jsbuild': jsbuild,
-                    'install': install_indico,
                     'tests': tests_indico,
+                    'fetchdeps': fetchdeps_indico,
                     'develop': develop_indico,
                     },
 
-          version = x.versionVal,
-          description = "Integrated Digital Conferences",
-          author = "AVC Section@CERN-IT",
+          version = _versionInit(),
+          description = "Integrated Digital Conference",
+          author = "Indico Team",
           author_email = "indico-project@cern.ch",
           url = "http://cern.ch/indico",
           download_url = "http://cern.ch/indico/download-beta.html",
           platforms = ["any"],
-          long_description = "Integrated Digital Conferences",
+          long_description = "Integrated Digital Conference",
           license = "http://www.gnu.org/licenses/gpl-2.0.txt",
           package_dir = { '': 'indico' },
           entry_points = {
@@ -348,7 +353,7 @@ if __name__ == '__main__':
           zip_safe = False,
           packages = find_packages(where='indico', exclude=('htdocs',)),
           install_requires = _getInstallRequires(),
-          data_files = _getDataFiles(x),
+          data_files = dataFiles,
           package_data = {'indico': ['*.*'] },
           include_package_data = True,
           )

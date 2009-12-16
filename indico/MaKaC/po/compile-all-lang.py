@@ -8,20 +8,24 @@ if '--basedir' in sys.argv:
     basedir = sys.argv['--basedir']
 else:
     basedir = os.getcwd()
-    
+
 if debug:
     print "Compiling .po files:"
 
 prevdir = os.getcwd()
-    
+
 for root, dir, files in os.walk(basedir):
     if root.endswith("LC_MESSAGES"):
         try:
             os.chdir(root)
-            os.system("msgfmt messages.po -o messages.mo")
+            rVal = os.system("msgfmt messages.po -o messages.mo")
+
+            if (rVal >> 8) != 0:
+                sys.exit(-1)
+
             if debug:
                 print "Compiled " + os.path.join(root,"messages.po")
-            
+
         except Exception, e:
             if debug:
                 print "[lang=%s] %s" % (root, e)

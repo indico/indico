@@ -34,11 +34,11 @@ SanitizationLevel    = 2
 #------------------------------------------------------------------------------
 # BaseURL is the url where Indico will be accessed:
 
-BaseURL              = "http://localhost"
+BaseURL              = "http://localhost/indico"
 
 # BaseSecureURL is the HTTPS location of Indico.
 
-BaseSecureURL        = "https://localhost"
+BaseSecureURL        = "https://localhost/indico"
 
 
 # If you are using a custom user authentication system (see below) uncomment

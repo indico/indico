@@ -30,7 +30,6 @@ if indico_conf == '': # we may be in development mode or in installation mode
     if not os.path.exists(indico_conf):
         # eggmode
         indico_conf = os.path.join(os.path.dirname(__file__), '..', '..', 'etc', 'indico.conf.sample')
-    
 
 execfile(indico_conf)
 
@@ -61,3 +60,4 @@ FileTypes = {"DOC":  ["Ms Word","application/msword","word_big.png"],
              "RTF":  ["RTF","application/rtf",""],
              "OGG":  ["Ogg/Theora Video","application/ogg",""],
              "RSS":  ["RSS","application/xhtml+xml",""]}
+
