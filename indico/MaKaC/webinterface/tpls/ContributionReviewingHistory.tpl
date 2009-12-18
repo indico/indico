@@ -8,33 +8,18 @@
     <% if review.getRefereeJudgement().isSubmitted(): %>
         <table width="90%%" align="center" border="0" style="padding-bottom: 10px;">
 		    <tr>
-		        <td colspan="3" class="groupTitle" style="padding-top:20px;"><%= _("Judgement details")%></td>
+		        <td colspan="3" class="groupTitle" style="width: 60%;padding-top:20px; border-bottom: none">
+		          <%= _("Judgement details for ")%><%= _("Review ")%> <%= review.getVersion() %>
+		        </td>
 		    </tr>
 		    <tr>
-		    <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB; padding-top: 5px; padding-bottom: 5px;">
-                    <span class="titleCellFormat"><%= _("Judgement version")%></span>
-            </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB; padding-top: 5px; padding-bottom: 5px;">
-                    <span class="titleCellFormat"><%= _("Type")%></span>
-            </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB; padding-top: 5px; padding-bottom: 5px;">
-                    <span class="titleCellFormat"><%= _("Material")%></span>
-            </td>
-            </tr>
             <tr>
-            <% for m in review.getMaterials(): %>
-                <td>
-                    <span style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                        <%= _("Review")%>: <%= review.getVersion() %>
-                    </span>
-                </td>
-                <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;">
-                    <span style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                        <%= m.getTitle() %>
-                    </span>
-                </td>   
+            <td colspan="2" class="dataCaptionTD" style="padding-right: 1px">
+                    <span class="titleCellFormat"><strong><%= _("Material:")%></strong></span>
+            </td>
+            <td>
+             <% for m in review.getMaterials(): %>
                 <% for res in m.getResourceList(): %>
-                <td>
                     <span style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                     <% if isinstance(res, LocalFile): %>
                         <a href="<%= urlHandlers.UHFileAccess.getURL(res) %>">
@@ -45,14 +30,15 @@
                         <%= res.getName() %>
                     </a>
                     </span>
-                </td>
+                <br/>
                 <% end %>
-            </tr>
             <% end %>
+            </td>
+           </tr>
         </table>
         <% includeTpl ('ContributionReviewingDisplay',
                         Editing = review.getEditorJudgement(), AdviceList = review.getReviewerJudgements(), Review = review,
                         ConferenceChoice = ConferenceChoice) %>
-        <br><br><br>
+        
     <% end %>
 <% end %>

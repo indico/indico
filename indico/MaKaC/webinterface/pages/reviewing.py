@@ -825,10 +825,10 @@ class WConfReviewingAssignContributions(wcomponents.WTemplated):
 
         vars["Conference"] = self._conf
         vars["ConfReview"] = self._conf.getConfReview()
-        vars["IsOnlyReferee"] = self._conf.getConfReview().isReferee(self._aw.getUser()) and not self._conf.canModify(self._aw)
-
+        vars["IsOnlyReferee"] = self._conf.getConfReview().isReferee(self._aw.getUser()) and not self._conf.canModify(self._aw) and not self._conf.getConfReview().isPaperReviewManager(self._aw.getUser())
+        
         return vars
-
+    
 #classes for user competences tab
 class WPConfModifUserCompetences(WPConfModifReviewingBase):
     """ Tab to see the user competences

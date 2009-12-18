@@ -6,10 +6,6 @@
 <% if Editing.isSubmitted(): %>
 <table width="90%%" align="center" border="0">
     <tr>
-        <td colspan="5" class="groupTitle"><%= _("Layout judgement")%></td>
-    </tr>
-
-    <tr>
         <td>
             <% includeTpl ('EditingJudgementDisplay', Editing = Editing, ShowEditor = ShowReviewingTeam) %>
         </td>
@@ -21,11 +17,8 @@
 <% if Review.anyReviewerHasGivenAdvice(): %>
 <table width="90%%" align="center" border="0">
     <tr>
-        <td colspan="5" class="groupTitle"><%= _("Content judgement")%></td>
-    </tr>
-    <tr>
         <td>
-            <table cellspacing="0" cellpadding="5" width="100%%">
+            <table cellspacing="0" cellpadding="2" width="100%%" style="padding-bottom: 10px;">
             <% for advice in AdviceList: %>
                 <% if advice.isSubmitted(): %>
                     <% includeTpl ('AdviceJudgementDisplay', advice = advice, ShowReviewer = ShowReviewingTeam) %>
@@ -41,9 +34,6 @@
 <% if ConferenceChoice == 2 or ConferenceChoice == 4: %>
     <% if Review.getRefereeJudgement().getJudgement() != None: %>
 <table width="90%%" align="center" border="0">
-    <tr>
-        <td colspan="5" class="groupTitle"><%= _("Final Reviewing")%></td>
-    </tr>
     <tr>
         <td>
             <% includeTpl ('FinalJudgementDisplay', Review = Review, ShowReferee = ShowReviewingTeam) %>

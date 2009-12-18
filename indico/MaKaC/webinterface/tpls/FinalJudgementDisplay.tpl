@@ -1,30 +1,24 @@
 <% from MaKaC.reviewing import ConferenceReview %>
-        <table cellspacing="0" cellpadding="5" width="100%%">
+        <table cellspacing="0" cellpadding="2" width="100%%">
             <tr>
-                <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                    <span class="titleCellFormat"><%= _("Judgement")%></span>
+                <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
+                    <span class="titleCellFormat" style="font-size: 12px;"><strong><%= _("Final Judgement:")%></strong></span>
                 </td>
-                <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                    <span class="titleCellFormat"><%= _("Comments")%></span>
-                </td>
-                <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                    <span class="titleCellFormat"><%= _("Approved questions")%></span>
-                </td>
-                <% if ShowReferee: %>
-                <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                    <span class="titleCellFormat"><%= _("Referee")%></span>
-                </td>
-                <% end %>
-                <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                    <span class="titleCellFormat"><%= _("Submission date")%></span>
-                </td>
-            </tr>
-            <tr>                    
                 <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                     <%= Review.getRefereeJudgement().getJudgement() %>
                 </td>
+           </tr>
+           <tr>     
+                <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
+                    <span class="titleCellFormat" style="font-size: 12px;"><%= _("Comments:")%></span>
+                </td>
                 <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                     <%= Review.getRefereeJudgement().getComments() %>
+                </td>
+           </tr>
+           <tr>
+                <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
+                    <span class="titleCellFormat" style="font-size: 12px;"><%= _("Approved questions:")%></span>
                 </td>
                 <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                     <% for q,a in Review.getRefereeJudgement().getAnswers(): %>
@@ -32,11 +26,21 @@
                         <br/>
                     <% end %>                
                 </td>
-                <% if ShowReferee: %>
+          </tr>
+          <% if ShowReferee: %>
+          <tr>
+                <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
+                    <span class="titleCellFormat" style="font-size: 12px;"><%= _("Referee:")%></span>
+                </td>
                 <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                     <%= Review.getRefereeJudgement().getAuthor().getFullName() %>
                 </td>
-                <% end %>
+         </tr>
+         <% end %>
+         <tr>
+                <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
+                    <span class="titleCellFormat" style="font-size: 12px;"><%= _("Submission date:")%></span>
+                </td>
                 <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                     <%= Review.getRefereeJudgement().getAdjustedSubmissionDate().strftime(format) %>
                 </td>

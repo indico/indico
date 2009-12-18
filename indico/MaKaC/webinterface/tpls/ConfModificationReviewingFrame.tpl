@@ -1,7 +1,6 @@
 <% from MaKaC.reviewing import ConferenceReview %>
 <% from MaKaC.common.PickleJar import DictPickler %>
 
-
 <% if ConfReview.hasReviewing(): %>
 <table width="85%%" align="center" border="0">
     <tr>
@@ -39,21 +38,37 @@
                             );
                         }
                         var removeRefereeHandler = function(user, setResult) {
-                            indicoRequest(
-                                'reviewing.conference.removeTeamReferee',
-                                {
-                                    conference: '<%= Conference %>',
-                                    user: user.get('id')
-                                },
-                                function(result,error) {
-                                    if (!error) {
-                                         setResult(true);
-                                    } else {
-                                        IndicoUtil.errorReport(error);
-                                        setResult(false);
+                        userId = user.get('id');
+                        <% for r in ConfReview.getRefereesList():%>
+                            rId = '<%= r.getId()%>';
+                            if(userId == rId){
+                                var del = true;
+                                numberContr = '<%= len(ConfReview.getJudgedContributions(r))%>';
+                                if (numberContr>0){
+                                    if (!(confirm('This referee has assigned '+numberContr+' contributions. Do you want to be removed anyway?'))){
+                                        del = false;
                                     }
                                 }
-                            );
+                                if (del)
+                                    {
+	                                    indicoRequest(
+			                                'reviewing.conference.removeTeamReferee',
+			                                {
+			                                    conference: '<%= Conference %>',
+			                                    user: user.get('id')
+			                                },
+			                                function(result,error) {
+			                                    if (!error) {
+			                                            setResult(true);
+			                                    } else {
+			                                        IndicoUtil.errorReport(error);
+			                                        setResult(false);
+			                                    }
+			                                }
+			                            );
+                                    }
+                             }
+                        <% end%>
                         }
                         
                         var uf = new UserListField('PluginPeopleListDiv', 'PluginPeopleList',
@@ -86,21 +101,37 @@
                             );
                         }
                         var removeReviewerHandler = function(user, setResult) {
-                            indicoRequest(
-                                'reviewing.conference.removeTeamReviewer',
-                                {
-                                    conference: '<%= Conference %>',
-                                    user: user.get('id')
-                                },
-                                function(result,error) {
-                                    if (!error) {
-                                        setResult(true);
-                                    } else {
-                                        IndicoUtil.errorReport(error);
-                                        setResult(false);
+                        userId = user.get('id');
+                        <% for r in ConfReview.getReviewersList():%>
+                            rId = '<%= r.getId()%>';
+                            if(userId == rId){
+                                var del = true;
+                                numberContr = '<%= len(ConfReview.getReviewedContributions(r))%>';
+                                if (numberContr>0){
+                                    if (!(confirm('This content reviewer has assigned '+numberContr+' contributions. Do you want to be removed anyway?'))){
+                                        del = false;
                                     }
                                 }
-                            );
+                                if (del)
+                                    {
+                                        indicoRequest(
+		                                'reviewing.conference.removeTeamReviewer',
+		                                {
+		                                    conference: '<%= Conference %>',
+		                                    user: user.get('id')
+		                                },
+		                                function(result,error) {
+		                                    if (!error) {
+		                                        setResult(true);
+		                                    } else {
+		                                        IndicoUtil.errorReport(error);
+		                                        setResult(false);
+		                                    }
+		                                }
+		                            );
+                                   }
+                             }
+                        <% end%>
                         }
                         
                         var uf = new UserListField('PluginPeopleListDiv', 'PluginPeopleList',
@@ -139,21 +170,37 @@
                             );
                         }
                         var removeEditorHandler = function(user, setResult) {
-                            indicoRequest(
-                                'reviewing.conference.removeTeamEditor',
-                                {
-                                    conference: '<%= Conference %>',
-                                    user: user.get('id')
-                                },
-                                function(result,error) {
-                                    if (!error) {
-                        setResult(true);
-                                    } else {
-                                        IndicoUtil.errorReport(error);
-                    setResult(false);
+                        userId = user.get('id');
+                        <% for r in ConfReview.getEditorsList():%>
+                            rId = '<%= r.getId()%>';
+                            if(userId == rId){
+                                var del = true;
+                                numberContr = '<%= len(ConfReview.getEditedContributions(r))%>';
+                                if (numberContr>0){
+                                    if (!(confirm('This layout reviewer has assigned '+numberContr+' contributions. Do you want to be removed anyway?'))){
+                                        del = false;
                                     }
                                 }
-                            );
+                                if (del)
+                                    {
+                                        indicoRequest(
+		                                'reviewing.conference.removeTeamEditor',
+		                                {
+		                                    conference: '<%= Conference %>',
+		                                    user: user.get('id')
+		                                },
+		                                function(result,error) {
+		                                    if (!error) {
+		                                          setResult(true);
+		                                    } else {
+		                                        IndicoUtil.errorReport(error);
+		                                        setResult(false);
+		                                    }
+		                                }
+		                            );
+                                  }
+                             }
+                        <% end%>
                         }
                         
                         var uf = new UserListField('PluginPeopleListDiv', 'PluginPeopleList',

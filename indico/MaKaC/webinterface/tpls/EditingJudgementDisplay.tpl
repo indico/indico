@@ -1,30 +1,24 @@
 <% from MaKaC.reviewing import ConferenceReview %>
-            <table cellspacing="0" cellpadding="5" width="100%%">
+            <table cellspacing="0" cellpadding="2" width="100%%" style="padding-bottom: 10px;">
                 <tr>
-                    <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                        <span class="titleCellFormat"><%= _("Judgement")%></span>
+                    <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
+                        <span class="titleCellFormat" style="font-size: 12px;"><strong><%= _("Layout judgement:")%></strong></span>
                     </td>
-                    <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                        <span class="titleCellFormat"><%= _("Comments")%></span>
-                    </td>
-                    <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                        <span class="titleCellFormat"><%= _("Criteria Evaluation")%></span>
-                    </td>
-                    <% if ShowEditor: %>
-                    <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                        <span class="titleCellFormat"><%= _("Layout Reviewer")%></span>
-                    </td>
-                    <% end %>
-                    <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;">
-                        <span class="titleCellFormat"><%= _("Submission date")%></span>
-                    </td>
-                </tr>
-                <tr>                    
                     <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                         <%= Editing.getJudgement() %>
                     </td>
+                </tr>
+                <tr>
+                    <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
+                        <span class="titleCellFormat" style="font-size: 12px;"><%= _("Comments:")%></span>
+                    </td>
                     <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                         <%= Editing.getComments() %>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="dataCaptionTD" width="100%" style="width: 25%;padding-right: 1px">
+                        <span class="titleCellFormat" style="font-size: 12px;"><%= _("Criteria Evaluation:")%></span>
                     </td>
                     <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                         <% for q,a in Editing.getAnswers(): %>
@@ -32,11 +26,21 @@
                             <br/>
                         <% end %>
                     </td>
-                    <% if ShowEditor: %>
+                </tr>
+                <% if ShowEditor: %>
+                <tr>
+                    <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
+                        <span class="titleCellFormat" style="font-size: 12px;"><%= _("Layout Reviewer:")%></span>
+                    </td>
                     <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                         <%= Editing.getAuthor().getFullName() %>
                     </td>
-                    <% end %>
+                </tr>
+                <% end %>
+                <tr>
+                    <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
+                        <span class="titleCellFormat" style="font-size: 12px;"><%= _("Submission date:")%></span>
+                    </td>
                     <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                         <%= Editing.getAdjustedSubmissionDate().strftime(format) %>
                     </td>

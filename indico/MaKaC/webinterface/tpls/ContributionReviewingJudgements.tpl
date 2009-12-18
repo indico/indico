@@ -71,7 +71,7 @@
     <% if not (ConferenceChoice == 2 or ConferenceChoice == 4): %>
     <tr>
         <td colspan="2" align="center">
-            <span style="color:red;"><%= _("This conference does not enable content reviewing. The layout reviewer's judgement is the only judgement.")%></span>
+            <span><%= _("This conference does not enable content reviewing. The layout reviewer's judgement is the only judgement.")%></span>
         </td>
     </tr>
     <% end %>
@@ -80,7 +80,7 @@
             <% if not Review.isAuthorSubmitted(): %>
                 <tr>
                     <td colspan="2" align="center">
-                        <span style="color:red;">
+                        <span>
                             <%= _("The author has not submitted the materials yet.")%><br>
                             <%= _("Please wait until he/she does so.")%>
                         </span>
@@ -273,7 +273,7 @@ var updatePage = function (){
         showValues();
     } else {
         <% if IsReferee: %>
-        submitButton.set($T('Send for reviewing'));
+        submitButton.set($T('Send'));
         $E('submittedmessage').set($T('Judgement not send yet'));
         <% end %>
         showWidgets();
