@@ -3,7 +3,6 @@
  * @author Tom
  */
 
-
 if (typeof(this.include) !== "function") {
 	this.include = function(script) {
 	document.write("<script type=\"text/javascript\" src=\"" + script + "\"></script>");
@@ -33,7 +32,7 @@ var files = [
 	"Data/Remote.js",
 	"Data/DataStore.js",
 	"Data/DateTime.js",
-	"Data/Files.js",
+//	"Data/Files.js",
 	"Data/Cookies.js",
 	"Ui/MimeTypes.js",
 	"Ui/Dom.js",

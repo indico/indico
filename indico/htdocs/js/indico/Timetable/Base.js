@@ -807,7 +807,7 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
         /*
          * Deletes the old version of the entry
          */
-
+    
         var oldStartTime, oldEndTime, oldStartDate;
         // Check whether we're operating *over* an existing slot or not
         // it is a slot && slot exists in timetable

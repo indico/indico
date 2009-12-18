@@ -303,13 +303,23 @@ class tests_indico(Command):
     user_options = [('specify=', None, "Use nosetests style (file.class:testcase)"),
                     ('coverage', None, "Output coverage report in html"),
                     ('unit', None, "Run only Unit tests"),
-                    ('functional', None, "Run only Functional tests")]
+                    ('functional', None, "Run only Functional tests"),
+                    ('pylint', None, "Run python source analysis"),
+                    ('jsunit', None, "Run js unit tests"),
+                    ('jslint', None, "Run js source analysis"),
+                    ('jscoverage', None, "Output coverage report in html for js"),
+                    ('jsspecify=', None, "Use js-test-driver style (TestCaseName.testName)")]
     boolean_options = []
     
     specify = None
     coverage = False
     unit = False
     functional = False
+    pylint = False
+    jsunit = False
+    jslint = False
+    jscoverage = False
+    jsspecify = None
     
     def initialize_options(self): pass
 
@@ -317,7 +327,8 @@ class tests_indico(Command):
 
     def run(self):
         from indicop import Indicop
-        result = Indicop().main(self.specify, self.coverage, self.unit, self.functional)
+        result = Indicop().main(self.specify, self.coverage, self.unit, self.functional, self.pylint, 
+                                self.jsunit, self.jslint, self.jscoverage, self.jsspecify)
         print result
 
 
