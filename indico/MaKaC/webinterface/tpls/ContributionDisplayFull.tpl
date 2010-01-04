@@ -98,7 +98,7 @@
                             <% if not Contribution.getReviewManager().getLastReview().isAuthorSubmitted(): %>
                                     <td>
                                         <form action="<%=urlHandlers.UHContributionSubmitForRewiewing.getURL(Contribution)%>" method="POST">
-                                            <input type="submit" class="btn" value="Mark materials as submitted" >
+                                            <input type="submit" class="btn" value="Send materials" >
                                         </form>
                                     </td>
                                 </tr>
@@ -114,6 +114,7 @@
                                         <%= "<br>".join(Contribution.getReviewManager().getLastReview().getReviewingStatus(forAuthor = True)) %>
                                     </td>
                                 </tr>
+                                <tr><td>&nbsp;</td></tr>
                                 <% if not Contribution.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted(): %>
                                     <tr><td>&nbsp;</td></tr>
                                     <tr><td>&nbsp;</td></tr>
