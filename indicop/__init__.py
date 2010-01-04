@@ -162,8 +162,9 @@ class Indicop():
             
             report = ""
             if specify:
+                #ouputing directly in the console
                 print jsTest[1]
-                report = "JS Unit Tests - Ouput in console\n"
+                report = "JS Unit Tests - Output in console\n"
             else:
                 self.writeReport("jsUnit", jsTest[1])
                 report = "JS Unit Tests - report in indicop/report/jsUnit.txt\n"
@@ -214,6 +215,7 @@ class Indicop():
             figleaf.start()
             
         if specify:
+            #running directly the test here and ouputing in the console
             result = nose.run(argv=['nose','-v', 'indicop/%s' % specify])
             if result:
                 returnString += "Specified Test - Succeeded\n"
