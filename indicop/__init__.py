@@ -94,15 +94,16 @@ class Indicop():
         s = outerr.getvalue()
         self.writeReport("functionalTest", s)
         
+        report = ""
         if result:
-            return "All Functional tests succeeded\n"
+            report = "All Functional tests succeeded\n"
         else:
-            return "[FAIL] Functional tests - report in indicop/report/functionalTest.txt\n"
+            report = "[FAIL] Functional tests - report in indicop/report/functionalTest.txt\n"
             
         #Stopping Selenium Server
         child.kill()
         
-        return result
+        return report
 
 
     def pylint(self):
@@ -119,18 +120,30 @@ class Indicop():
         try:
             #Starting js-test-driver server
             server = subprocess.Popen(["java", "-jar", "indicop/javascript_tests/JsTestDriver-1.2.jar", "--port", "9876", "--browser", "firefox"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            #TODO something better to check if the server has started
-            time.sleep(5)
+            time.sleep(2)
             
+            #switching directory to run the tests
+            rootDir = os.getcwd()
+            os.chdir("%s/indicop/javascript_tests/" % rootDir)
             
+            #check if server is ready
+            for i in range(5):
+                jsDryRun = commands.getstatusoutput("java -jar JsTestDriver-1.2.jar --config jsTestDriverNoCoverage.conf --tests Fake.dryRun")
+                if jsDryRun[1].startswith("No browsers were captured, nothing to run..."):
+                    print "Js-test-driver server has not started yet. Attempt #%s" % (i+1)
+                    time.sleep(5)
+                else:
+                    #server is ready
+                    break
+            
+            #setting tests to run
             toTest = ""
             if specify:
                 toTest = specify
             else:
                 toTest = "all"
             
-            rootDir = os.getcwd()
-            os.chdir("%s/indicop/javascript_tests/" % rootDir)
+
             coverageReport = ""
             if coverage:
                 jsTest = commands.getstatusoutput("java -jar JsTestDriver-1.2.jar --tests %s --testOutput coverage" % toTest)
@@ -144,20 +157,31 @@ class Indicop():
             else:
                 jsTest = commands.getstatusoutput("java -jar JsTestDriver-1.2.jar --config jsTestDriverNoCoverage.conf --tests %s --testOutput coverage" % toTest)
             
+            #restoring directory
             os.chdir(rootDir)
             
-            self.writeReport("jsUnit", jsTest[1])
+            report = ""
+            if specify:
+                print jsTest[1]
+                report = "JS Unit Tests - Ouput in console\n"
+            else:
+                self.writeReport("jsUnit", jsTest[1])
+                report = "JS Unit Tests - report in indicop/report/jsUnit.txt\n"
         except OSError:
             print "[ERR] Could not start js-test-driver server - command \"java\" needs to be in your PATH."
             sys.exit(1)
             
+        #stopping the server
         server.kill()
-        return coverageReport + "JS Unit Tests - report in indicop/report/jsUnit.txt\n"
+        return coverageReport + report
 
 
     def jsLint(self):
+        #Folders which are going to be scanned.
+        #Files are going to be find recursively in these folders
         folderNames=['Admin', 'Collaboration', 'Core', 'Display', 'Legacy', 'Management',
                       'MaterialEditor', 'Timetable']
+        
         outputString = ""
         
         #checking if rhino is accessible
@@ -177,20 +201,20 @@ class Indicop():
         self.writeReport("jsLint", outputString)
         return "JS Lint - report in indicop/report/jsLint.txt\n"
 
-
+    
     def writeReport(self, filename, content):
         f = open('indicop/report/%s.txt' % filename, 'w')
         f.write(content)
         f.close()
 
-    def main(self, testPath, coverage, unitTest, functionalTest, pylint, jsunit, jslint, jsCoverage, jsSpecify):
+    def main(self, specify, coverage, unitTest, functionalTest, pylint, jsunit, jslint, jsCoverage, jsSpecify):
         returnString="=============== ~INDICOP SAYS~ ===============\n\n"
         
         if coverage:
             figleaf.start()
             
-        if testPath:
-            result = nose.run(argv=['nose','-v', 'indicop/%s' % testPath])
+        if specify:
+            result = nose.run(argv=['nose','-v', 'indicop/%s' % specify])
             if result:
                 returnString += "Specified Test - Succeeded\n"
             else:
@@ -201,7 +225,7 @@ class Indicop():
             returnString += self.unit()
         elif functionalTest:
             returnString += self.functional()
-        elif jsunit:
+        elif jsunit or jsSpecify:
             returnString += self.jsUnit(jsCoverage, jsSpecify)
         elif jslint:
             returnString += self.jsLint()
