@@ -18,10 +18,10 @@
         </td>
     </tr>
     <tr>
-        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB; padding-top: 10px; padding-bottom: 5px;"><%= _("Id")%></td>
-        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB; padding-top: 10px; padding-bottom: 5px;"><%= _("Name")%></td>
-        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB; padding-top: 10px; padding-bottom: 5px;"><%= _("Responsabilities")%></td>
-        <td colspan=2 nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB; padding-top: 10px; padding-bottom: 5px;"><%= _("Competences")%></td>
+        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF; padding-top: 10px; padding-bottom: 10px;"><%= _("Id")%></td>
+        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF; padding-top: 10px; padding-bottom: 10px;"><%= _("Name")%></td>
+        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF; padding-top: 10px; padding-bottom: 10px;"><%= _("Responsabilities")%></td>
+        <td colspan=2 nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF; padding-top: 10px; padding-bottom: 10px;"><%= _("Competences")%></td>
     </tr>
    
     

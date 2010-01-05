@@ -94,6 +94,79 @@ type("InlineRemoteWidget", ["InlineWidget"],
          this.source = indicoSource(method, attributes, null, !loadOnStartup, callback);
      });
 
+type("InlineRemoteWidgetForOptionButton", ["InlineWidget"],
+     {
+         draw: function() {
+             var self = this;
+             var t;
+             t = setTimeout("$E(\""+"message" + "\").set(\'\u00A0\')",2000);
+             var canvas = Html.span({}, 'loading...');
+             canvas.set(self.drawContent());
+             var message = Html.span({style: {marginLeft:'10px'}},'\u00A0');
+             message.dom.id = "message";
+             if (t){ clearTimeout(t);}
+             var table = Html.table();
+             table.dom.style.display = 'inline';
+             var tbody = Html.tbody();
+             table.set(tbody);
+             var row1 = Html.tr();
+             var cell2 = Html.td();
+                    cell2.append(canvas);
+                    row1.append(cell2);
+             cellMessage = Html.td();
+             cellMessage.dom.style.verticalAlign = "middle";
+             cellMessage.dom.rowSpan = 2;
+             cellMessage.append(message);
+             row1.append(cellMessage);
+
+             tbody.append(row1);
+
+             this.source.state.observe(function(state) {
+                 if (state == SourceState.Error) {
+                     self.ready.set(true);
+                     self._error(self.source.error.get());
+                 } else if (state == SourceState.Committing) {
+                     self.ready.set(true);
+                     message.set('Saving');
+                     message.dom.style.color='orange';
+                  } 
+                    else  {message.set(' ');}
+             });
+            
+
+             return table;
+         }
+
+     },
+     function(method, attributes) {
+         this.ready = new WatchValue();
+         this.ready.set(false);
+         this.source = indicoSource(method, attributes);
+     });
+     
+type("SwitchOptionButton", ["InlineRemoteWidgetForOptionButton"],
+     {
+         error: function(error) {
+             this.checkbox.set(true);
+             alert(error.message);
+         },
+
+         drawContent: function() {
+             return Html.div({},
+                             this.checkbox,
+                             this.caption);
+
+         }
+     },
+     function(method, attributes, caption) {
+         this.InlineRemoteWidgetForOptionButton(method, attributes);
+         this.caption = caption;
+         this.checkbox = Html.checkbox({});
+
+         $B(this.checkbox, this.source);
+     });
+
+
 /*
  * This switch button is a 2-state switch that allows different requests to be
  * performed depending on whether the button should be enabled or disabled

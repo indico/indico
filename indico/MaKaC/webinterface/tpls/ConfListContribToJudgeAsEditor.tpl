@@ -20,7 +20,17 @@
         <% if not isinstance(c.getStatus(), ContribStatusNone): %>
         <tr valign="top" onmouseover="this.style.backgroundColor='#ECECEC'" onmouseout="this.style.backgroundColor='transparent'">
             <td style="padding-right:5px;padding-left:5px;"><%= c.getId() %></td>
-            <td style="padding-right:5px;padding-left:5px;"><a href="<%= urlHandlers.UHContributionEditingJudgement.getURL(c) %>"><%= c.getTitle() %></a></td>
+            
+                <% if not c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted(): %>
+                    <td style="padding-right:5px;padding-left:5px;">
+                        <a href="<%= urlHandlers.UHContributionEditingJudgement.getURL(c) %>"><%= c.getTitle() %></a>
+                    </td>
+                <% end %>
+                <% else: %>
+                    <td style="padding-right:5px;padding-left:5px;" onmouseover="">
+                        <%= c.getTitle() %>
+                    </td>
+                <% end %>
             <td style="padding-right:5px;padding-left:5px;">
                 <% if c.getReviewManager().getLastReview().getEditorJudgement().isSubmitted(): %>
                     <span><%= _("Layout judgement given")%></span>

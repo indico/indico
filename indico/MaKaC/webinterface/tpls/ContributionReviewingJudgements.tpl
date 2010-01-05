@@ -10,7 +10,7 @@
 <!-- Judgement of the editor -->
 <table width="90%%" align="center" border="0" style="margin-bottom: 1em; margin-top: 1em">
     <tr>
-        <td id="editingJudgementHelp" colspan="5" class="groupTitle"><%= _("Layout judgement")%>
+        <td id="editingJudgementHelp" colspan="5" class="groupTitle"><%= _("Layout judgement details")%>
             <% inlineContextHelp(_('Here is displayed the judgement given by the Layout Reviewer.<br/>Only the Layout Reviewer of this contribution can change this.')) %>
         </td>
     </tr>
@@ -34,7 +34,7 @@
 <!-- List of advices from the reviewers -->
 <table width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
-        <td id="reviewingJudgementHelp" colspan="5" class="groupTitle" style="padding-top: 5px;"><%= _("Content judgement")%>
+        <td id="reviewingJudgementHelp" colspan="5" class="groupTitle" style="padding-top: 5px;"><%= _("Content judgement details")%>
             <% inlineContextHelp(_('Here is displayed the judgement given by the Content Reviewers<br/>Only the Content Reviewers of this contribution can change their respective judgements.')) %>
         </td>
     </tr>
@@ -118,16 +118,16 @@
         <% end %>
         
         <tr>
+            <td nowrap class="titleCellTD"><span class="titleCellFormat"><strong><%= _("Judgement")%></strong></span></td>
+            <td>
+                <div id="inPlaceEditJudgement"><strong><%= Review.getRefereeJudgement().getJudgement() %></strong></div>
+            </td>
+        </tr>
+        <tr>
             <td nowrap class="titleCellTD">
                 <span class="titleCellFormat"><%= _("Reviewing questions:")%></span>
             </td>
             <td width="60%%" id="questionListDisplay">
-            </td>
-        </tr>
-        <tr>
-            <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Judgement")%></span></td>
-            <td>
-                <div id="inPlaceEditJudgement"><%= Review.getRefereeJudgement().getJudgement() %></div>
             </td>
         </tr>
         <tr>
@@ -140,6 +140,7 @@
         <tr>
             <td colspan="10">
                 <span id="submitbutton"></span>
+                <span id="submitHelpPopUp"></span>
                 <span id="submittedmessage"></span>
             </td>
         </tr>
@@ -262,23 +263,33 @@ var submitted = true;
 <% else: %>
 var submitted = false;
 <% end %>
-
+       
 
 var updatePage = function (){
     if (submitted) {
         <% if IsReferee: %>
-        submitButton.set($T('Undo submittion'));
+        submitButton.set($T('Undo sending'));
         $E('submittedmessage').set($T('Judgement has been send'));
         <% end %>
         showValues();
     } else {
         <% if IsReferee: %>
         submitButton.set($T('Send'));
+        <% if not Review.isAuthorSubmitted(): %>
+            submitButton.dom.disabled = true;
+            var HelpImg = Html.img({src: '<%= Config.getInstance().getSystemIconURL("help") %>', style: {marginLeft: '5px', verticalAlign: 'middle'}});
+            $E('submitHelpPopUp').append(HelpImg);
+            var submitHelpPopUpText = function(event) {
+              IndicoUI.Widgets.Generic.tooltip(this, event, "<span style='padding:3px'>You are not allowed to give final judgement.<br/>You have to wait for the author to submit the materials.</span>");
+                } 
+            $E('submitHelpPopUp').dom.onmouseover = submitHelpPopUpText;
+        <% end %>
         $E('submittedmessage').set($T('Judgement not send yet'));
         <% end %>
         showWidgets();
     }
 }
+
 
 <% if IsReferee: %>
 var submitButton = new IndicoUI.Widgets.Generic.simpleButton($E('submitbutton'), 'reviewing.contribution.setSubmitted',
@@ -298,7 +309,7 @@ var submitButton = new IndicoUI.Widgets.Generic.simpleButton($E('submitbutton'),
                 IndicoUtil.errorReport(error);
             }
         },
-        $T('Mark as submitted')
+        $T('Send')
 );
 <% end %>
 

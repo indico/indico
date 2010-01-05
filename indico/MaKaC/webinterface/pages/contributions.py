@@ -406,7 +406,7 @@ class WPContributionModifBase( WPConferenceModifBase  ):
                 self._subTabAssign = self._subtabReviewing.newSubTab( "assign", _("Assign Team"), \
                 urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
                 if self._contrib.getReviewManager().isReferee(self._rh._getUser()):
-                    self._subTabJudgements = self._subtabReviewing.newSubTab( "Judgements", _("Final Judge"), \
+                    self._subTabJudgements = self._subtabReviewing.newSubTab( "final", _("Final Judge"), \
                     urlHandlers.UHContributionReviewingJudgements.getURL( self._target ) )
                 else:
                     self._subTabJudgements = self._subtabReviewing.newSubTab( "Judgements", _("Judgements"), \
