@@ -52,7 +52,7 @@ class Indicop():
         self.writeReport("unitTest", s)
         
         if result:
-            return "All Unit tests succeeded\n"
+            return "PY Unit tests succeeded\n"
         else:
             return "[FAIL] Unit tests - report in indicop/report/unitTest.txt\n"
 
@@ -96,7 +96,7 @@ class Indicop():
         
         report = ""
         if result:
-            report = "All Functional tests succeeded\n"
+            report = "PY Functional tests succeeded\n"
         else:
             report = "[FAIL] Functional tests - report in indicop/report/functionalTest.txt\n"
             
@@ -113,7 +113,7 @@ class Indicop():
             sys.exit(1)
         else:
             self.writeReport("pylint", statusOutput[1])
-            return "Pylint - report in indicop/report/pylint.txt\n"
+            return "PY Lint - report in indicop/report/pylint.txt\n"
 
 
     def jsUnit(self, coverage, specify):
@@ -128,14 +128,20 @@ class Indicop():
             
             #check if server is ready
             for i in range(5):
-                jsDryRun = commands.getstatusoutput("java -jar JsTestDriver-1.2.jar --config jsTestDriverNoCoverage.conf --tests Fake.dryRun")
+                if coverage:
+                    jsDryRun = commands.getstatusoutput("java -jar JsTestDriver-1.2.jar --tests Fake.dryRun --testOutput coverage")
+                else:
+                    jsDryRun = commands.getstatusoutput("java -jar JsTestDriver-1.2.jar --config jsTestDriverNoCoverage.conf --tests Fake.dryRun")
                 if jsDryRun[1].startswith("No browsers were captured, nothing to run..."):
                     print "Js-test-driver server has not started yet. Attempt #%s" % (i+1)
                     time.sleep(5)
                 else:
                     #server is ready
                     break
-            
+            else:
+                print '[ERR] Could not start js unit tests because js-test-driver server cannot be started.'
+                sys.exit(1)
+                
             #setting tests to run
             toTest = ""
             if specify:
@@ -151,9 +157,13 @@ class Indicop():
                 os.chdir("%s/coverage" % os.getcwd())
                 
                 #generate html for coverage
-                commands.getstatusoutput("genhtml jsTestDriver.conf-coverage.dat")
+                genOutput = commands.getstatusoutput("genhtml jsTestDriver.conf-coverage.dat")
                 
-                coverageReport = "JS Unit Tests - coverage generated in indicop/javascript_tests/coverage/index.html\n"
+                if genOutput[1].find("genhtml") > -1:
+                    coverageReport = "[ERR] JS Unit Tests - html coverage generation failed, genhtml needs to be in your PATH.\n"
+                else:
+                    coverageReport = "JS Unit Tests - coverage generated in indicop/javascript_tests/coverage/index.html\n"
+                
             else:
                 jsTest = commands.getstatusoutput("java -jar JsTestDriver-1.2.jar --config jsTestDriverNoCoverage.conf --tests %s --testOutput coverage" % toTest)
             
@@ -209,7 +219,7 @@ class Indicop():
         f.close()
 
     def main(self, specify, coverage, unitTest, functionalTest, pylint, jsunit, jslint, jsCoverage, jsSpecify):
-        returnString="=============== ~INDICOP SAYS~ ===============\n\n"
+        returnString="\n\n=============== ~INDICOP SAYS~ ===============\n\n"
         
         if coverage:
             figleaf.start()
@@ -246,7 +256,7 @@ class Indicop():
             except IOError:
                 os.mkdir('indicop/coverage/html_report')
                 figleaf.annotate_html.report_as_html(coverageOutput, 'indicop/coverage/html_report', [], {})
-            returnString += "Unit Test - Report generated in indicop/coverage/html_report/index.html\n"
+            returnString += "PY Unit Test - Report generated in indicop/coverage/html_report/index.html\n"
         
         
         return returnString
