@@ -35,7 +35,6 @@ import commands
 import StringIO
 from selenium import selenium
 
-    ##TODO check relative PATHs
 class Indicop():
     
     def unit(self):
@@ -43,24 +42,25 @@ class Indicop():
         outerr = StringIO.StringIO()
         sys.stderr = outerr
         
-        result = nose.run(argv=['nose','-v', 'indicop/MaKaC_tests/'])
+        result = nose.run(argv=['nose','-v', os.path.join(self.setupDir, 'python', 'unit', 'MaKaC_tests')])
         
         #restoring the stderr
         sys.stderr = sys.__stderr__
         
         s = outerr.getvalue()
-        self.writeReport("unitTest", s)
+        self.writeReport("pyunit", s)
         
         if result:
             return "PY Unit tests succeeded\n"
         else:
-            return "[FAIL] Unit tests - report in indicop/report/unitTest.txt\n"
+            return "[FAIL] Unit tests - report in indicop/report/pyunit.txt\n"
 
 
     def functional(self):
         try:
             #Starting Selenium server
-            child = subprocess.Popen(["java", "-jar", "indicop/selenium_tests/selenium-server.jar"], stdout=subprocess.PIPE)
+            child = subprocess.Popen(["java", "-jar", os.path.join(self.setupDir, 'python', 'functional', 'selenium-server.jar')],
+                                        stdout=subprocess.PIPE)
         except OSError:
             print "[ERR] Could not start selenium server - command \"java\" needs to be in your PATH."
             sys.exit(1)
@@ -86,19 +86,19 @@ class Indicop():
         outerr = StringIO.StringIO()
         sys.stderr = outerr
         
-        result = nose.run(argv=['nose','-v', 'indicop/selenium_tests/'])
+        result = nose.run(argv=['nose','-v', os.path.join(self.setupDir, 'python', 'functional')])
         
         #restoring the stderr
         sys.stderr = sys.__stderr__
         
         s = outerr.getvalue()
-        self.writeReport("functionalTest", s)
+        self.writeReport("pyfunctional", s)
         
         report = ""
         if result:
             report = "PY Functional tests succeeded\n"
         else:
-            report = "[FAIL] Functional tests - report in indicop/report/functionalTest.txt\n"
+            report = "[FAIL] Functional tests - report in indicop/report/pyfunctional.txt\n"
             
         #Stopping Selenium Server
         child.kill()
@@ -107,7 +107,9 @@ class Indicop():
 
 
     def pylint(self):
-        statusOutput = commands.getstatusoutput("pylint --rcfile=indicop/source_analysis/pylint/pylint.conf ../cds-indico/indico/MaKaC/conference.py")
+        statusOutput = commands.getstatusoutput("pylint --rcfile=%s %s" % 
+                                                (os.path.join(self.setupDir, 'python', 'pylint', 'pylint.conf'),
+                                                 os.path.join(self.setupDir, '..', 'indico', 'MaKaC')))
         if statusOutput[1].find("pylint: not found") > -1:
             print "[ERR] Could not start Source Analysis - command \"pylint\" needs to be in your PATH."
             sys.exit(1)
@@ -119,17 +121,17 @@ class Indicop():
     def jsUnit(self, coverage, specify):
         try:
             #Starting js-test-driver server
-            server = subprocess.Popen(["java", "-jar", "indicop/javascript_tests/JsTestDriver-1.2.jar", "--port", "9876", "--browser", "firefox"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            server = subprocess.Popen(["java", "-jar", os.path.join(self.setupDir, 'javascript', 'unit', 'JsTestDriver-1.2.jar'), "--port", "9876", "--browser", "firefox"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             time.sleep(2)
             
             #switching directory to run the tests
             rootDir = os.getcwd()
-            os.chdir("%s/indicop/javascript_tests/" % rootDir)
+            os.chdir(os.path.join(self.setupDir, 'javascript', 'unit'))
             
             #check if server is ready
             for i in range(5):
                 if coverage:
-                    jsDryRun = commands.getstatusoutput("java -jar JsTestDriver-1.2.jar --tests Fake.dryRun --testOutput coverage")
+                    jsDryRun = commands.getstatusoutput("java -jar JsTestDriver-1.2.jar --tests Fake.dryRun --testOutput %s" % os.path.join('..', '..', 'report', 'jscoverage'))
                 else:
                     jsDryRun = commands.getstatusoutput("java -jar JsTestDriver-1.2.jar --config jsTestDriverNoCoverage.conf --tests Fake.dryRun")
                 if jsDryRun[1].startswith("No browsers were captured, nothing to run..."):
@@ -152,17 +154,17 @@ class Indicop():
 
             coverageReport = ""
             if coverage:
-                jsTest = commands.getstatusoutput("java -jar JsTestDriver-1.2.jar --tests %s --testOutput coverage" % toTest)
-                
-                os.chdir("%s/coverage" % os.getcwd())
+                jsTest = commands.getstatusoutput("java -jar JsTestDriver-1.2.jar --tests %s --testOutput %s" % (toTest, os.path.join('..', '..', 'report', 'jscoverage')))
                 
                 #generate html for coverage
-                genOutput = commands.getstatusoutput("genhtml jsTestDriver.conf-coverage.dat")
+                genOutput = commands.getstatusoutput("genhtml -o %s %s" % 
+                                                     (os.path.join('..', '..', 'report', 'jscoverage'), 
+                                                      os.path.join('..', '..', 'report', 'jscoverage', 'jsTestDriver.conf-coverage.dat')))
                 
                 if genOutput[1].find("genhtml") > -1:
                     coverageReport = "[ERR] JS Unit Tests - html coverage generation failed, genhtml needs to be in your PATH.\n"
                 else:
-                    coverageReport = "JS Unit Tests - coverage generated in indicop/javascript_tests/coverage/index.html\n"
+                    coverageReport = "JS Unit Tests - coverage generated in indicop/report/jscoverage/index.html\n"
                 
             else:
                 jsTest = commands.getstatusoutput("java -jar JsTestDriver-1.2.jar --config jsTestDriverNoCoverage.conf --tests %s --testOutput coverage" % toTest)
@@ -176,8 +178,8 @@ class Indicop():
                 print jsTest[1]
                 report = "JS Unit Tests - Output in console\n"
             else:
-                self.writeReport("jsUnit", jsTest[1])
-                report = "JS Unit Tests - report in indicop/report/jsUnit.txt\n"
+                self.writeReport("jsunit", jsTest[1])
+                report = "JS Unit Tests - report in indicop/report/jsunit.txt\n"
         except OSError:
             print "[ERR] Could not start js-test-driver server - command \"java\" needs to be in your PATH."
             sys.exit(1)
@@ -202,23 +204,27 @@ class Indicop():
             sys.exit(1)
         
         for folderName in folderNames:
-            for root, dirs, files in os.walk("%s/indico/htdocs/js/indico/%s" % (os.getcwd(), folderName)):
+            #for root, dirs, files in os.walk("%s/indico/htdocs/js/indico/%s" % (os.getcwd(), folderName)):
+            for root, dirs, files in os.walk(os.path.join(self.setupDir, '..', 'indico', 'htdocs', 'js', 'indico', folderName)):
                 for name in files:
                     filename = os.path.join(root, name)
                     outputString += "\n================== Scanning %s ==================\n" % filename
-                    output = commands.getstatusoutput("rhino indicop/source_analysis/jslint/jslint.js %s" % filename)
+                    output = commands.getstatusoutput("rhino %s %s" % (os.path.join(self.setupDir, 'javascript', 'jslint', 'jslint.js'), filename))
                     outputString += output[1]
 
-        self.writeReport("jsLint", outputString)
-        return "JS Lint - report in indicop/report/jsLint.txt\n"
+        self.writeReport("jslint", outputString)
+        return "JS Lint - report in indicop/report/jslint.txt\n"
 
     
     def writeReport(self, filename, content):
-        f = open('indicop/report/%s.txt' % filename, 'w')
+        f = open(os.path.join(self.setupDir, 'report', filename + ".txt"), 'w')
         f.write(content)
         f.close()
 
     def main(self, specify, coverage, unitTest, functionalTest, pylint, jsunit, jslint, jsCoverage, jsSpecify):
+        #path where this file is
+        self.setupDir = os.path.dirname(__file__)
+        
         returnString="\n\n=============== ~INDICOP SAYS~ ===============\n\n"
         
         if coverage:
@@ -226,7 +232,7 @@ class Indicop():
             
         if specify:
             #running directly the test here and ouputing in the console
-            result = nose.run(argv=['nose','-v', 'indicop/%s' % specify])
+            result = nose.run(argv=['nose','-v', os.path.join(self.setupDir, 'python', specify)])
             if result:
                 returnString += "Specified Test - Succeeded\n"
             else:
@@ -251,12 +257,13 @@ class Indicop():
         if coverage:
             figleaf.stop()
             coverageOutput = figleaf.get_data().gather_files()
+            coverageDir = os.path.join(self.setupDir, 'report', 'pycoverage')
             try:
-                figleaf.annotate_html.report_as_html(coverageOutput, 'indicop/coverage/html_report', [], {})
+                figleaf.annotate_html.report_as_html(coverageOutput, coverageDir, [], {})
             except IOError:
-                os.mkdir('indicop/coverage/html_report')
-                figleaf.annotate_html.report_as_html(coverageOutput, 'indicop/coverage/html_report', [], {})
-            returnString += "PY Unit Test - Report generated in indicop/coverage/html_report/index.html\n"
+                os.mkdir(coverageDir)
+                figleaf.annotate_html.report_as_html(coverageOutput, coverageDir, [], {})
+            returnString += "PY Unit Test - Report generated in report/pycoverage/index.html\n"
         
         
         return returnString
