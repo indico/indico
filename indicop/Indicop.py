@@ -61,8 +61,9 @@ class Indicop(object):
         #It makes more sense to run it here.
         if specify:
             #running directly the test here and ouputing in the console
-            result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir, 
-                                                         'python', specify)])
+            result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir,
+                                                               'python',
+                                                               specify)])
             if result:
                 returnString += "Specified Test - Succeeded\n"
             else:
@@ -150,7 +151,8 @@ class Functional(Indicop):
         sys.stderr = outerr
         
         result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir,
-                                                     'python', 'functional')])
+                                                           'python',
+                                                           'functional')])
         
         #restoring the stderr
         sys.stderr = sys.__stderr__
@@ -173,9 +175,14 @@ class Functional(Indicop):
 class Pylint(Indicop):
     def run(self):
         statusOutput = commands.getstatusoutput("pylint --rcfile=%s %s" % 
-                       (os.path.join(self.setupDir, 'python', 'pylint',
-                                                        'pylint.conf'),
-                       os.path.join(self.setupDir, '..', 'indico', 'MaKaC')))
+                                                (os.path.join(self.setupDir,
+                                                              'python',
+                                                              'pylint',
+                                                              'pylint.conf'),
+                                                os.path.join(self.setupDir,
+                                                             '..',
+                                                             'indico',
+                                                             'MaKaC')))
         if statusOutput[1].find("pylint: not found") > -1:
             return ("[ERR] Could not start Source Analysis - "
                     "command \"pylint\" needs to be in your PATH.")
