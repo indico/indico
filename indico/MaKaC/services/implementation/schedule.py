@@ -122,7 +122,7 @@ class ScheduleAddContribution(ScheduleOperation, LocationSetter):
         self._boardNumber = self._pManager.extract("boardNumber", pType=str, allowEmpty=True)
         self._needsToBeScheduled = self._params.get("schedule", True)
         if self._needsToBeScheduled:
-            self._dateTime = self._pManager.extract("dateTime", pType=datetime.datetime)
+            self._dateTime = self._pManager.extract("startDate", pType=datetime.datetime)
 
         self._duration = self._pManager.extract("duration", pType=int)
         self._title = self._pManager.extract("title", pType=str)
@@ -367,6 +367,7 @@ class ScheduleEditBreakBase(ScheduleOperation, LocationSetter):
         self._title = pManager.extract("title", pType=str)
         self._description = pManager.extract("description", pType=str,
                                           allowEmpty=True)
+        self._dayChanged = pManager.extract("dayChanged", pType=bool, allowEmpty=True) 
 
     def _performOperation(self):
 
@@ -444,7 +445,15 @@ class SessionSlotScheduleEditBreak(ScheduleEditBreakBase, sessionServices.Sessio
         self._brk = self._schEntry
 
     def _addToSchedule(self, b):
-        pass
+        if self._dayChanged:    
+            owner = self._schEntry.getOwner()  
+
+            self._schEntry.getSchedule().removeEntry(self._schEntry)
+
+            self._schEntry.setStartDate(self._dateTime)
+            if isinstance(owner, conference.Contribution):
+                owner.setSession(None)
+            self._conf.getSchedule().addEntry(self._schEntry, check=2)
 
     def _getSlotEntry(self):
         return DictPickler.pickle(self._slot.getConfSchEntry(), timezone=self._conf.getTimezone())
@@ -560,7 +569,7 @@ class ConferenceScheduleGetDayEndDate(ScheduleOperation, conferenceServices.Conf
         conferenceServices.ConferenceModifBase._checkParams(self)
         pManager = ParameterManager(self._params)
 
-        date = pManager.extract("date", pType=datetime.date)
+        date = pManager.extract("selectedDay", pType=datetime.date)
         self._date = datetime.datetime(date.year, date.month, date.day, tzinfo=pytz.timezone(self._conf.getTimezone()))
 
     def _performOperation(self):
@@ -571,7 +580,7 @@ class SessionSlotScheduleGetDayEndDate(ScheduleOperation, sessionServices.Sessio
     def _checkParams(self):
         sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
         pManager = ParameterManager(self._params)
-        date = pManager.extract("date", pType=datetime.date)
+        date = pManager.extract("selectedDay", pType=datetime.date)
         self._date = datetime.datetime(date.year, date.month, date.day, tzinfo=pytz.timezone(self._conf.getTimezone()))
 
     def _performOperation(self):
@@ -588,7 +597,7 @@ class SessionScheduleGetDayEndDate(ScheduleOperation, sessionServices.SessionMod
         sessionServices.SessionModifUnrestrictedTTCoordinationBase._checkParams(self)
         pManager = ParameterManager(self._params)
 
-        date = pManager.extract("date", pType=datetime.date)
+        date = pManager.extract("selectedDay", pType=datetime.date)
         self._date = datetime.datetime(date.year, date.month, date.day)
 
     def _performOperation(self):
@@ -612,18 +621,23 @@ class ScheduleEditSlotBase(ScheduleOperation, LocationSetter):
                                            allowEmpty=True)
         self._roomInfo = pManager.extract("roomInfo", pType=dict, allowEmpty=True)
         self._isSessionTimetable = pManager.extract("sessionTimetable", pType=bool, allowEmpty=True)
+        self._dayChanged = pManager.extract("dayChanged", pType=bool, allowEmpty=True)
 
     def _performOperation(self):
-
-        self._slot.setValues({"title": self._title or "",
+        #if there is something inside the session we have to move it as well
+        if len(self._slot.getEntries()) != 0 :
+            self._slot.setValues({"title": self._title or "",
+                        "sDate": self._startDateTime,
+                        "eDate": self._endDateTime,
+                        "move": 1})
+        else:
+            self._slot.setValues({"title": self._title or "",
                         "sDate": self._startDateTime,
                         "eDate": self._endDateTime})
-
         self. _addConveners(self._slot)
         self._setLocationInfo(self._slot)
 
         self._addToSchedule()
-        #self._target.fit()
 
         logInfo = self._slot.getLogInfo()
         logInfo["subject"] = "Create new slot: %s"%self._slot.getTitle()
@@ -837,7 +851,7 @@ class ScheduleContributions(ScheduleOperation):
                                     timezone = self._target.getTimezone())
 
         self._ids = pManager.extract("ids", pType=list, allowEmpty=False)
-        date = pManager.extract("date", pType=datetime.date,
+        date = pManager.extract("selectedDay", pType=datetime.date,
                                             allowEmpty=False)
 
         # convert date to datetime

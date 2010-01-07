@@ -10,9 +10,9 @@ var Util = {
         }
 
         // [1234.]s0.0
-        m = id.match(/^(?:([^\.]+)\.)s(\d+)\.(\d+)$/);
-        if (m) {
-            return concat(["SessionSlot"], m.slice(1));
+        m = id.match(/^(?:([^\.]+)\.)s(\d+)(\.|l)(\d+)$/);
+        if (m) {            
+            return concat(["SessionSlot"], /*m.slice(1)*/concat(m.slice(1,3), m.slice(4)));
         }
 
         // [1234.]33
@@ -64,7 +64,11 @@ var Util = {
 
             // map the results
             m1 = [null, results['%Y'], results['%m'], results['%d']];
-            m2 = [null, results['%H'], results['%M'], results['%S']];
+            //If we do not want to show the hour
+            if(sourceFormat == IndicoDateTimeFormats.InternationalHourLess || sourceFormat == IndicoDateTimeFormats.ServerHourSlashLess)
+                m2 = [null, '', '', ''];
+            else
+                m2 = [null, results['%H'], results['%M'], results['%S']];
         } else {
             throw 'unknown source object';
         }
@@ -73,14 +77,17 @@ var Util = {
             return null;
         }
 
-        // follow the formatting rules
+        // follow the formatting rules. If no time needed we need to delete the ' :' after the date
+        var s = '';
+        if(sourceFormat != IndicoDateTimeFormats.InternationalHourLess && sourceFormat != IndicoDateTimeFormats.ServerHourSlashLess)
+            s = ':';
         return format.replace('%Y', zeropad(m1[1])).
         replace('%m', zeropad(m1[2])).
         replace('%d', zeropad(m1[3])).
         replace('%H', zeropad(m2[1])).
         replace('%M', zeropad(m2[2])).
-        replace('%S', zeropad(m2[3]));
-
+        replace('%S', zeropad(m2[3])).
+        replace(' :', s);
     },
 
     /*
@@ -184,5 +191,6 @@ var IndicoDateTimeFormats = {
     ISO8601: '%Y/%m/%d %H:%M',
     Default: '%d/%m/%Y %H:%M',
     DefaultHourless: '%d/%m/%Y',
-    Server: '%Y/%m/%d %H:%M'
+    InternationalHourLess: '%d/%m/%Y',
+    ServerHourSlashLess: '%Y%m%d'
 };

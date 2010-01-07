@@ -1010,6 +1010,7 @@ IndicoUI.Widgets = {
             attributes.style = {width: '40px'};
             return Html.edit(attributes, defaultVal);
         },
+      
         applyForParticipationForm: function(conf) {
             alert('hejsan');
         }

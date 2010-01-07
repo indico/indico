@@ -43,12 +43,10 @@ type("TimetableManagementActions", [], {
     deleteEntry: function(eventData) {
         var self = this;
 
-
         if (!confirm("Are you sure you want to delete this timetable entry?"))
-        {
-            return;
-        }
-
+            {
+                return;
+            }
         var info = new WatchObject();
         var type = eventData.entryType;
 
@@ -320,6 +318,13 @@ type("TimetableManagementActions", [], {
         var self = this;
 
         var params;
+        
+        //Get the days in which the conference is being held
+        //if the contribution is inside a session we need to get the days from parentTimetable, not from timetable
+        if(exists(this.timetable.parentTimetable))
+            var days = keys(this.timetable.parentTimetable.getData());
+        else
+            var days = keys(this.timetable.getData());
 
         if (this.session !== null) {
             params = this._addToSessionParams(this.session, 'Contribution');
@@ -337,6 +342,8 @@ type("TimetableManagementActions", [], {
             params.selectedDay,
             this.eventInfo.isConference,
             this.eventInfo.favoriteRooms,
+            days.reverse(),
+            this.timetable,
             function(result) {
                 self._addEntries(result);
             });
@@ -347,6 +354,13 @@ type("TimetableManagementActions", [], {
         var self = this;
 
         var params;
+        
+        //Get the days in which the conference is being held
+        //if the break is inside a session we need to get the days from parentTimetable, not from timetable
+        if(exists(this.timetable.parentTimetable))
+            var days = keys(this.timetable.parentTimetable.getData());
+        else
+            var days = keys(this.timetable.getData());
 
         if (this.session !== null) {
             params = this._addToSessionParams(this.session, 'Break');
@@ -359,6 +373,7 @@ type("TimetableManagementActions", [], {
             $O(params),
             $O(params.roomInfo),
             false,
+            days.reverse(),
             this.eventInfo.favoriteRooms);
 
         dialog.execute();
@@ -369,6 +384,13 @@ type("TimetableManagementActions", [], {
         var args = $O();
 
         var params;
+        
+        //Get the days in which the conference is being held
+        //if the break is inside a session we need to get the days from parentTimetable, not from timetable
+        if(exists(this.timetable.parentTimetable))
+            var days = keys(this.timetable.parentTimetable.getData());
+        else
+            var days = keys(this.timetable.getData());
 
         if (this.session !== null) {
             params = this._addToSessionParams(this.session, 'Break');
@@ -378,6 +400,7 @@ type("TimetableManagementActions", [], {
 
         args.set('conference', eventData.conferenceId);
         args.set('scheduleEntry', eventData.scheduleEntryId);
+        args.set('parentType', params.parentType);
 
         each(eventData, function(value, key) {
             args.set(key, value);
@@ -395,6 +418,7 @@ type("TimetableManagementActions", [], {
             args,
             $O(params.roomInfo),
             true,
+            days.reverse(),
             this.eventInfo.favoriteRooms);
         editDialog.open();
 
@@ -405,6 +429,9 @@ type("TimetableManagementActions", [], {
 
         var params = this._addParams('Session');
 
+        //Get the days in which the conference is being held
+        var days = keys(this.timetable.getData());
+
         IndicoUI.Dialogs.addSession(
             this.methods[params.type].add,
             this.methods[params.parentType].dayEndDate,
@@ -413,6 +440,7 @@ type("TimetableManagementActions", [], {
             $O(params.roomInfo),
             params.selectedDay,
             this.eventInfo.favoriteRooms,
+            days.reverse(),
             function(result) { self.timetable._updateEntry(result, result.id); });
     },
     addSessionSlot: function(session) {
@@ -420,6 +448,9 @@ type("TimetableManagementActions", [], {
 
         var params = this._addToSessionParams(session, 'SessionSlot');
         params.parentType = 'Session';
+        
+        //Get the days in which the conference is being held
+        var days = keys(this.timetable.getData());
 
         IndicoUI.Dialogs.addSessionSlot(
             this.methods[params.type].add,
@@ -430,6 +461,7 @@ type("TimetableManagementActions", [], {
             params.startDate,
             params.selectedDay,
             this.eventInfo.favoriteRooms,
+            days.reverse(),
             function(result) { self.timetable._updateEntry(result, result.id); }
         );
     },
@@ -440,6 +472,9 @@ type("TimetableManagementActions", [], {
         var params = this._addToSessionParams(eventData, 'SessionSlot');
         params.parentType = 'Session';
 
+        //Get the days in which the conference is being held
+        var days = keys(this.timetable.getData());
+        
         each(eventData, function(value, key) {
             params[key] = value;
         });
@@ -456,7 +491,16 @@ type("TimetableManagementActions", [], {
             params.startDate,
             params.selectedDay,
             this.eventInfo.favoriteRooms,
-            function(result) { self.timetable._updateEntry(result, result.id); },
+            days.reverse(),
+            function(result) {
+                var aux = result.entry.entries
+                self.timetable._updateEntry(result, result.id);
+                /* update the inner timetable!
+                 * You need to create the aux before doing the updateEntry because otherwise the subentries
+                 * in the session won't have the correct value
+                 */ 
+                self.timetable.data[result.day][result.id].entries = aux;
+            },
             true
         );
     },
@@ -518,7 +562,12 @@ type("TimetableManagementActions", [], {
         var self = this;
 
         each(entries, function(entry) {
-            self.timetable._updateEntry(entry, entry.id);
+            //check if we created the contribution from inside a session timetable in the top level timetable
+            //if so, that entry needs to be updated in the top level timetable
+            if(self.timetable.currentDay != entry.day && exists(self.timetable.parentTimetable))
+                self.timetable.parentTimetable._updateEntry(entry, entry.id);
+            else
+                self.timetable._updateEntry(entry, entry.id);
         });
     }
 },

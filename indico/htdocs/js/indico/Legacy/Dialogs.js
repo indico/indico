@@ -5,21 +5,19 @@
 
 extend(IndicoUI.Dialogs,
        {
-           addSession: function(method, timeStartMethod, args, roomInfo, parentRoomInfo, dayStartDate, favoriteRooms, successFunc){
+           addSession: function(method, timeStartMethod, args, roomInfo, parentRoomInfo, dayStartDate, favoriteRooms, days, successFunc){
 
                var parameterManager = new IndicoUtil.parameterManager();
                var favorites;
 
                var info = new WatchObject();
                var dateArgs = clone(args);
-               dateArgs.date = dayStartDate;
-
+               //for the first day in the list, select a time just after the last session/contribution/break
+               dateArgs.selectedDay = dayStartDate;
 
                IndicoUtil.waitLoad([
                    function(hook) {
-
                        // Get "end date" for container, so that the break be added after the rest
-
                        indicoRequest(timeStartMethod, dateArgs , function(result, error){
                            if (error) {
                                IndicoUtil.errorReport(error);
@@ -120,12 +118,66 @@ extend(IndicoUI.Dialogs,
                            sesType.select('standard');
                            $B(info.accessor('sessionType'), sesType.state);
 
-
+                           //Create the list of the days in which the conference is being held
+                           var conferenceDays = bind.element(
+                                   Html.select({name: 'type'}),
+                                   days,
+                                   function(elem) {
+                                       var d = Util.formatDateTime(elem, IndicoDateTimeFormats.International, IndicoDateTimeFormats.ServerHourSlashLess); 
+                                       return Html.option({value: elem}, d);
+                                   }
+                               );
+                           //the hour added to dayStartDate is irrelevant and it won't be used, it is only passed to avoid the function crash
+                           conferenceDays.set(Util.formatDateTime(dayStartDate + ' 00:00', IndicoDateTimeFormats.ServerHourSlashLess, IndicoDateTimeFormats.Server));
+                               
+                           //We need to update the value of startDateTime and endDateTime every time that is changed by the user
+                           //value is the new date
+                           conferenceDays.observe(function(value) {
+                               //it is neccesary to update the date in dateArgs with the new date to make the request
+                               dateArgs.selectedDay = Util.formatDateTime(value, IndicoDateTimeFormats.Server, IndicoDateTimeFormats.ServerHourSlashLess);
+                               //we make a timeStartMethod request specifying the date for the request
+                               //and we get the result of the request in result
+                               indicoRequest(timeStartMethod, dateArgs , function(result, error){
+                                   if (error) {
+                                       IndicoUtil.errorReport(error);
+                                   }
+                                   else {
+                                       //update startDate and endDate and assign it to the variables in info
+                                       var startDate = Util.parseJSDateTime(result, IndicoDateTimeFormats.Server);
+                                       var endDate = Util.parseJSDateTime(result, IndicoDateTimeFormats.Server);
+                                       
+                                       var diffHours = dateArgs.endDate.time.substr(0,2) - dateArgs.startDate.time.substr(0,2);
+                                       var diffMinutes = Math.abs(dateArgs.endDate.time.substr(3,2) - dateArgs.startDate.time.substr(3,2));
+                                       if (startDate.getHours() >= 23) {
+                                           startDate.setHours(23);
+                                           startDate.setMinutes(0);
+                                           endDate.setHours(23);
+                                           endDate.setMinutes(59);
+                                       } else {                                           
+                                           endDate.setHours(startDate.getHours()+diffHours);
+                                           endDate.setMinutes(startDate.getMinutes()+diffMinutes);
+                                       }
+                                       info.set('startDateTime', Util.formatDateTime(startDate, IndicoDateTimeFormats.Server));
+                                       info.set('endDateTime', Util.formatDateTime(endDate, IndicoDateTimeFormats.Server));
+                                   }
+                               });
+                               
+                               /*
+                                * parameterManager is not called because if you just change the date and it's not correct you just need
+                                * to have red fields in the date, so what we're doing is just adding a dispatchEvent for both hour fields
+                                * (they are Html.input, so they can be added to the dispatchEvent) to know when they have changed                                 
+                                */
+                               startEndTimeField.startTimeField.dispatchEvent('change');
+                               startEndTimeField.endTimeField.dispatchEvent('change');
+                           });
+                           
                            var startEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(info.get('startDateTime').substr(11,5), info.get('endDateTime').substr(11,5));
                            var startEndTimeComponent;
+                           //template for the binding
                            var timeTranslation = {
                                    toTarget: function (value) {
-                                       return dayStartDate + ' ' + value;
+                                       var aux = conferenceDays.get();
+                                       return Util.formatDateTime(aux, IndicoDateTimeFormats.Server, IndicoDateTimeFormats.ServerHourSlashLess) + ' ' + value;
                                    },
                                    toSource: function(value) {
                                        return value.substr(11,5);
@@ -150,6 +202,7 @@ extend(IndicoUI.Dialogs,
                            colorPicker.setFixedPosition();
                            var colorPickerComponent = ['Color', Html.div({style: {padding: '5px 0 10px 0'}}, colorPicker.getLink(null, 'Choose a color'))];
 
+
                            return this.ExclusivePopup.prototype.draw.call(
                                this,
                                Html.div({},
@@ -159,7 +212,7 @@ extend(IndicoUI.Dialogs,
                                             [$T('Sub-title'), $B(parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', true), info.accessor('subtitle'))],
                                             [$T('Description'), $B(Html.textarea({cols: 40, rows: 2}), info.accessor('description'))],
                                             [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
-                                            [$T('Date'), dayStartDate],
+                                            [$T('Date'), conferenceDays],
                                             startEndTimeComponent,
                                             colorPickerComponent,
                                             [$T('Convener(s)'), convListWidget.draw()],
@@ -188,15 +241,16 @@ extend(IndicoUI.Dialogs,
         * @param {String} dayStartDate A string representing the date of the day the
         *        calendar is currently pointing to (DD/MM/YYYY)
         */
-           addSessionSlot: function(method, timeStartMethod, params, roomInfo, parentRoomInfo, confStartDate, dayStartDate, favoriteRooms, successFunc, editOn){
+           addSessionSlot: function(method, timeStartMethod, params, roomInfo, parentRoomInfo, confStartDate, dayStartDate, favoriteRooms, days, successFunc, editOn){
                var parameterManager = new IndicoUtil.parameterManager();
                var isEdit = exists(editOn)?editOn:false;
                var args = isEdit?params:params.args
                var dateArgs = clone(args);
-               dateArgs.date = dayStartDate;
+               dateArgs.selectedDay = dayStartDate;               
                var info = new WatchObject();
                var favorites;
                var parentRoomData;
+               previousDay = dateArgs.selectedDay;
 
 
                IndicoUtil.waitLoad([
@@ -240,7 +294,11 @@ extend(IndicoUI.Dialogs,
                        });
                    }], function(retVal) {
                        var submitInfo = function(){
-
+                           //if the day changed
+                           if(previousDay != info.get("startDateTime").substr(0,10))
+                               info.set('dayChanged', true);
+                           else
+                               info.set('dayChanged', false);                                                                                                                                                                                                                                                                                                                                                                                       
                            each(info, function(value, key) {
                                args[key] = value;
                            });
@@ -320,11 +378,65 @@ extend(IndicoUI.Dialogs,
                                true, true, true,
                                userListNothing, userListNothing, userListNothing);
 
+                           //Create the list of the days in which the conference is being held
+                           var conferenceDays = bind.element(
+                                   Html.select({name: 'type'}),
+                                   days,
+                                   function(elem) {
+                                       var d = Util.formatDateTime(elem, IndicoDateTimeFormats.International, IndicoDateTimeFormats.ServerHourSlashLess); 
+                                       return Html.option({value: elem}, d);
+                                   }
+                               );
+                           //the hour added to dayStartDate is irrelevant and it won't be used, it is only passed to avoid the function crash
+                           conferenceDays.set(Util.formatDateTime(dayStartDate + ' 00:00', IndicoDateTimeFormats.ServerHourSlashLess, IndicoDateTimeFormats.Server));
+                               
+                           //We need to update the value of startDateTime and endDateTime every time that is changed by the user
+                           //value is the new date
+                           conferenceDays.observe(function(value) {
+                               //it is neccesary to update the date in dateArgs with the new date to make the request
+                               dateArgs.selectedDay = Util.formatDateTime(value, IndicoDateTimeFormats.Server, IndicoDateTimeFormats.ServerHourSlashLess);
+                               //we make a timeStartMethod request specifying the date for the request
+                               //and we get the result of the request in result
+                               indicoRequest(timeStartMethod, dateArgs , function(result, error){
+                                   if (error) {
+                                       IndicoUtil.errorReport(error);
+                                   }
+                                   else {
+                                       //update startDate and endDate and assign it to the variables in info
+                                       var startDate = Util.parseJSDateTime(result, IndicoDateTimeFormats.Server);
+                                       var endDate = Util.parseJSDateTime(result, IndicoDateTimeFormats.Server);
+                                       
+                                       var diffHours = dateArgs.endDate.time.substr(0,2) - dateArgs.startDate.time.substr(0,2);
+                                       var diffMinutes = Math.abs(dateArgs.endDate.time.substr(3,2) - dateArgs.startDate.time.substr(3,2));
+                                       if (startDate.getHours() >= 23) {
+                                           startDate.setHours(23);
+                                           startDate.setMinutes(0);
+                                           endDate.setHours(23);
+                                           endDate.setMinutes(59);
+                                       } else {
+                                           endDate.setHours(startDate.getHours()+diffHours);
+                                           endDate.setMinutes(startDate.getMinutes()+diffMinutes);
+                                       }
+                                       info.set('startDateTime', Util.formatDateTime(startDate, IndicoDateTimeFormats.Server));
+                                       info.set('endDateTime', Util.formatDateTime(endDate, IndicoDateTimeFormats.Server));
+                                   }
+                               });
+                               
+                               /*
+                                * parameterManager is not called because if you just change the date and it's not correct you just need
+                                * to have red fields in the date, so what we're doing is just adding a dispatchEvent for both hour fields
+                                * (they are Html.input, so they can be added to the dispatchEvent) to know when they have changed                                 
+                                */
+                               startEndTimeField.startTimeField.dispatchEvent('change');
+                               startEndTimeField.endTimeField.dispatchEvent('change');
+                           });
+                           
                            var startEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(info.get('startDateTime').substr(11,5), info.get('endDateTime').substr(11,5));
                            var startEndTimeComponent;
                            var timeTranslation = {
                                    toTarget: function (value) {
-                                       return dayStartDate + ' ' + value;
+                                       var aux = conferenceDays.get();
+                                       return Util.formatDateTime(aux, IndicoDateTimeFormats.Server, IndicoDateTimeFormats.ServerHourSlashLess) + ' ' + value;
                                    },
                                    toSource: function(value) {
                                        return value.substr(11,5);
@@ -344,7 +456,7 @@ extend(IndicoUI.Dialogs,
                                this,
                                Widget.block([IndicoUtil.createFormFromMap([[$T('Sub-Title'), $B(Html.edit({style: { width: '300px'}}), info.accessor('title'))],
                                                                            [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
-                                                                           [$T('Date'), dayStartDate],
+                                                                           [$T('Date'), conferenceDays],
                                                                            startEndTimeComponent,
                                                                            [$T('Convener(s)'), convListWidget.draw()]]),
                                              Html.div('dialogButtons',
