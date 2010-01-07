@@ -153,7 +153,6 @@ class MergedAbsIDTplVar(TplVar):
         return ""
     getValue=classmethod(getValue)
 
-
 class MergedAbsTitleTplVar(TplVar):
     _name="merge_target_abstract_title"
     _description=""
@@ -165,6 +164,27 @@ class MergedAbsTitleTplVar(TplVar):
         return ""
     getValue=classmethod(getValue)
 
+class MergedAbsSubFamNameTplVar(TplVar):
+    _name="merge_target_submitter_family_name"
+    _description=""
+
+    def getValue(cls,abstract):
+        status=abstract.getCurrentStatus()
+        if isinstance(status,review.AbstractStatusMerged):
+            return status.getTargetAbstract().getSubmitter().getSurName()
+        return ""
+    getValue=classmethod(getValue)
+
+class MergedAbsSubFirstNameTplVar(TplVar):
+    _name="merge_target_submitter_first_name"
+    _description=""
+
+    def getValue(cls,abstract):
+        status=abstract.getCurrentStatus()
+        if isinstance(status,review.AbstractStatusMerged):
+            return status.getTargetAbstract().getSubmitter().getFirstName()
+        return ""
+    getValue=classmethod(getValue)
 
 class AbsPrimAuthTplVar(TplVar):
     _name="primary_authors"
@@ -184,7 +204,7 @@ class Notificator:
     _vars=[ConfTitleTplVar,ConfURLTplVar,AbsTitleTplVar,AbsTrackTplVar,
             AbsContribTypeTplVar,AbsSubFisrtNameTplVar,
             AbsSubFamNameTplVar,AbsSubTitleTplVar,AbsURLTplVar,AbsIDTplVar,
-            MergedAbsIDTplVar,MergedAbsTitleTplVar,AbsPrimAuthTplVar, AbsReviewCommentsTplVar]
+            MergedAbsIDTplVar,MergedAbsTitleTplVar,MergedAbsSubFamNameTplVar, MergedAbsSubFirstNameTplVar, AbsPrimAuthTplVar, AbsReviewCommentsTplVar]
 
     def getVarList(cls):
         return cls._vars

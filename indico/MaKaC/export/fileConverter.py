@@ -19,8 +19,8 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import tempfile, os, getopt, sys, base64
-import httplib, mimetypes, urlparse
+import tempfile, os, getopt, sys, base64, socket
+import httplib, mimetypes, urlparse, simplejson
 from MaKaC.common.Configuration import Config
 from MaKaC import conference
 
@@ -244,12 +244,25 @@ class CDSConvFileConverter(FileConverter):
         return fileName
     _saveFileToTemp=staticmethod(_saveFileToTemp)
 
-    def storeConvertedFile(params):
-        """ returns the path to the temp file used in the process 
+    def storeConvertedFile(requestIP, params):
+
+        """ returns the path to the temp file used in the process
         so that it can be deleted at a later stage """
+
+        # extract the server name from the url
+        serverURL = Config.getInstance().getFileConverterServerURL()
+        up = urlparse.urlparse(serverURL)
+
+        # check that the request comes from the conversion server
+        if socket.gethostbyname(up[1]) != requestIP:
+            return
+
         if params["status"] == '1':
             locator={}
-            exec "locator = %s"%params["directory"]
+            # python dicts come with ' instead of " by default
+            # using a json encoder on the server side would help...
+            locator = simplejson.loads(params["directory"].replace('\'','"'))
+
             mat=CDSConvFileConverter._getMaterial(locator)
             if mat is not None:
                 filePath = CDSConvFileConverter._saveFileToTemp( params )

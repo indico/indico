@@ -668,7 +668,10 @@ class RHCategoryAddConfCreators( RHCategModifBase ):
         if "selectedPrincipals" in params:
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                self._target.grantConferenceCreation( ph.getById( id ) )
+                entity = ph.getById( id )
+                assert(isinstance(entity, user.Avatar) or
+                       isinstance(entity, user.Group))
+                self._target.grantConferenceCreation( entity )
         self._redirect( urlHandlers.UHCategModifAC.getURL( self._target ) )
 
 

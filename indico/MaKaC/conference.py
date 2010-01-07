@@ -1317,10 +1317,21 @@ class Category(Persistent):
         return self.__confCreators
 
     def isAllowedToCreateConference( self, av ):
+
         if self.canUserModify( av ):
             return 1
+
+        # Avatar is directly in the list
         if av in self.__confCreators:
             return 1
+
+        # Otherwise, if  it is a member of one of the groups in the list...
+        for group in self.__confCreators:
+            if isinstance(group, MaKaC.user.Group):
+                if group.containsUser(av):
+                    return 1
+            else:
+                pass
         return 0
 
     def canCreateConference( self, av ):

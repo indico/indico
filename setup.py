@@ -114,7 +114,7 @@ def _getInstallRequires():
 
     These are the ones needed for runtime.'''
 
-    base =  ['pytz', 'zodb3', 'zope.index', 'zope.interface', 'simplejson']
+    base =  ['pytz', 'zodb3', 'zope.index', 'zope.interface', 'simplejson', 'cds-indico-extras']
     if sys.version_info[1] < 5: # hashlib is part of Python 2.5+
         base.append('hashlib')
 
@@ -356,4 +356,7 @@ if __name__ == '__main__':
           data_files = dataFiles,
           package_data = {'indico': ['*.*'] },
           include_package_data = True,
+          dependency_links = [
+                              "http://cdswaredev.cern.ch/indico/wiki/Admin/Installation/IndicoExtras"
+                              ],
           )

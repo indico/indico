@@ -7,7 +7,7 @@
 
 <% if not selectable: %>
 <input 	type="image" class="UIRowButton"
-			onclick="javascript:removeItem(<%= id %>, this.form);return false;"
+			onclick="javascript:removeItem('<%= id %>', this.form);return false;"
 			title="<%= _("Remove this person from the list")%>"
 			src="<%= systemIcon("remove") %>" />	
 <% end %>

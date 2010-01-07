@@ -192,7 +192,7 @@ class RHMaterialDisplaySubmitResource(RHMaterialDisplayModifBase):
 
 
 class RHMaterialAddConvertedFile(RHMaterialDisplayBase):
-    
+
     def _checkProtection(self):
         pass
 
@@ -201,7 +201,7 @@ class RHMaterialAddConvertedFile(RHMaterialDisplayBase):
 
     def _process( self ):
         params = self._getRequestParams()
-        tempFilePath = fileConverter.CDSConvFileConverter.storeConvertedFile(params)
+        tempFilePath = fileConverter.CDSConvFileConverter.storeConvertedFile(self.getHostIP(), params)
         self._tempFilesToDelete.append(tempFilePath)
         #Normally, you do not have to response anything special.....but we can think about it.
         return params.get("filename","")
