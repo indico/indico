@@ -13,8 +13,8 @@
         </td>
     </tr>
     <tr>
-        <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Users allowed to")%><br> <%= _("create conferences")%></span></td>
-        <td class="blacktext">%(principalTable)s</td>
+        <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Users allowed to create conferences")%></span></td>
+        <td class="blacktext"><div style="width:50%%;">%(principalTable)s</div></td>
     </tr>
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Notify event creation to")%>:</span></td>
