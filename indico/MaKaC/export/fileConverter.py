@@ -254,7 +254,7 @@ class CDSConvFileConverter(FileConverter):
         up = urlparse.urlparse(serverURL)
 
         # check that the request comes from the conversion server
-        if socket.gethostbyname(up.netloc) != requestIP:
+        if socket.gethostbyname(up[1]) != requestIP:
             return
 
         if params["status"] == '1':
