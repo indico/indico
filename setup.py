@@ -326,9 +326,26 @@ class tests_indico(Command):
     def finalize_options(self): pass
 
     def run(self):
-        from indicop import Indicop
-        result = Indicop().main(self.specify, self.coverage, self.unit, self.functional, self.pylint, 
-                                self.jsunit, self.jslint, self.jscoverage, self.jsspecify)
+        from indicop.Indicop import Indicop
+        testsToRun = []
+        if self.pylint:
+            testsToRun.append('pylint')
+        elif self.unit:
+            testsToRun.append('unit')
+        elif self.functional:
+            testsToRun.append('functional')
+        elif self.jsunit or self.jsspecify:
+            testsToRun.append('jsunit')
+        elif self.jslint:
+            testsToRun.append('jslint')
+        else:
+            testsToRun.append('unit')
+            testsToRun.append('functional')
+            testsToRun.append('pylint')
+            testsToRun.append('jsunit')
+            testsToRun.append('jslint')
+        
+        result = Indicop().main(self.specify, self.coverage, self.jsspecify, self.jscoverage, testsToRun)
         print result
 
 
