@@ -103,7 +103,9 @@ class Unit(Indicop):
         sys.stderr = outerr
         
         result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir,
-                                        'python', 'unit', 'MaKaC_tests')])
+                                                           'python',
+                                                           'unit',
+                                                           'MaKaC_tests')])
         
         #restoring the stderr
         sys.stderr = sys.__stderr__
@@ -120,8 +122,9 @@ class Functional(Indicop):
     def run(self):
         try:
             #Starting Selenium server
-            child = subprocess.Popen(["javae", "-jar",
-                                      os.path.join(self.setupDir,'python',
+            child = subprocess.Popen(["java", "-jar",
+                                      os.path.join(self.setupDir,
+                                                   'python',
                                                    'functional',
                                                    'selenium-server.jar')],
                                       stdout=subprocess.PIPE)
