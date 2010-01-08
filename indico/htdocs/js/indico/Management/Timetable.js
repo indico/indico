@@ -272,6 +272,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
             self.args.conference);
 
         $B(info.accessor('presenters'), presListWidget.getUsers());
+        info.set('privileges', presListWidget.getPrivileges());
 
         var datecomponent;
         if (this.timeStartMethod !== null) {
