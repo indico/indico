@@ -288,6 +288,7 @@ type("UserDataPopup", ["ExclusivePopup"],
          draw: function() {
              var userData = this.userData;
              var self = this;
+             self.parameterManager = new IndicoUtil.parameterManager();
 
              grant = [];
              if (this.grantSubmission) {
@@ -297,7 +298,7 @@ type("UserDataPopup", ["ExclusivePopup"],
                  this,
                  Widget.block([IndicoUtil.createFormFromMap([
                      [$T('Title'), $B(Html.select({}, Html.option({}, ""), Html.option({}, $T("Mr.")), Html.option({}, $T("Mrs.")), Html.option({}, $T("Ms.")), Html.option({}, $T("Dr.")), Html.option({}, $T("Prof."))), userData.accessor('title'))],
-                     [$T('Family Name'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('familyName'))],
+                     [$T('Family Name'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), userData.accessor('familyName'))],
                      [$T('First Name'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('firstName'))],
                      [$T('Affiliation'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('affiliation'))],
                      [$T('Email'), $B(Html.edit({style: {width: '200px'}}), userData.accessor('email'))],
@@ -469,14 +470,16 @@ type("UserListField", ["IWidget"], {
                     $T('New user'),
                     newUser,
                     function(newData, suicideHook) {
-                        newUser.update(newData.getAll());
-                        self.newProcess([newUser], function(result) {
-                            if (result) {
-                                self.userList.set(newUserId, newUser);
-                                self._highlightNewUser(newUserId);
-                            }
-                        });
-                        suicideHook();
+                        if (newUserPopup.parameterManager.check()) {
+                            newUser.update(newData.getAll());
+                            self.newProcess([newUser], function(result) {
+                                if (result) {
+                                    self.userList.set(newUserId, newUser);
+                                    self._highlightNewUser(newUserId);
+                                }
+                            });
+                            suicideHook();
+                        }
                     }
                 );
                 newUserPopup.open();
