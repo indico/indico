@@ -33,7 +33,7 @@ import StringIO
 from selenium import selenium
 
 
-class Indicop(object):
+class BaseTest(object):        
     #path to this current file
     setupDir = os.path.dirname(__file__)
     
@@ -42,61 +42,7 @@ class Indicop(object):
         f.write(content)
         f.close()
 
-    def main(self, specify, coverage, jsSpecify, jsCoverage, testsToRun):
-        
-        #define the set of tests
-        testsDict = {'unit': Unit(),
-                     'functional': Functional(),
-                     'pylint': Pylint(),
-                     'jsunit': Jsunit(jsSpecify, jsCoverage),
-                     'jslint': Jslint()}
-        
-        returnString = "\n\n=============== ~INDICOP SAYS~ ===============\n\n"
-        
-        if coverage:
-            figleaf.start()
-            
-        
-        #specified test can either be unit or functional.
-        #It makes more sense to run it here.
-        if specify:
-            #running directly the test here and ouputing in the console
-            result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir,
-                                                               'python',
-                                                               specify)])
-            if result:
-                returnString += "Specified Test - Succeeded\n"
-            else:
-                returnString += "[FAIL] Specified Test - \
-                                    read output from console\n"
-        else:
-            for test in testsToRun:
-                try:
-                    returnString += testsDict[test].run()
-                except KeyError:
-                    returnString += ("[ERR] Test %s does not exist. "
-                      "It has to be added in the testsDict variable\n") % test
-        
-        
-        if coverage:
-            figleaf.stop()
-            coverageOutput = figleaf.get_data().gather_files()
-            coverageDir = os.path.join(self.setupDir, 'report', 'pycoverage')
-            try:
-                figleaf.annotate_html.report_as_html(coverageOutput,
-                                                     coverageDir, [], {})
-            except IOError:
-                os.mkdir(coverageDir)
-                figleaf.annotate_html.report_as_html(coverageOutput,
-                                                     coverageDir, [], {})
-            returnString += ("PY Unit Test - Report generated in "
-                             "report/pycoverage/index.html\n")
-            
-        
-        return returnString
-
-
-class Unit(Indicop):
+class Unit(BaseTest):
     def run(self):
         #capturing the stderr
         outerr = StringIO.StringIO()
@@ -118,7 +64,7 @@ class Unit(Indicop):
         else:
             return "[FAIL] Unit tests - report in indicop/report/pyunit.txt\n"
 
-class Functional(Indicop):
+class Functional(BaseTest):
     def run(self):
         try:
             #Starting Selenium server
@@ -175,7 +121,7 @@ class Functional(Indicop):
         
         return report
     
-class Pylint(Indicop):
+class Pylint(BaseTest):
     def run(self):
         statusOutput = commands.getstatusoutput("pylint --rcfile=%s %s" % 
                                                 (os.path.join(self.setupDir,
@@ -193,7 +139,25 @@ class Pylint(Indicop):
             self.writeReport("pylint", statusOutput[1])
             return "PY Lint - report in indicop/report/pylint.txt\n"
         
-class Jsunit(Indicop):
+class Coverage(BaseTest):
+    def start(self):
+        figleaf.start()
+    
+    def stop(self):
+        figleaf.stop()
+        coverageOutput = figleaf.get_data().gather_files()
+        coverageDir = os.path.join(self.setupDir, 'report', 'pycoverage')
+        try:
+            figleaf.annotate_html.report_as_html(coverageOutput,
+                                                 coverageDir, [], {})
+        except IOError:
+            os.mkdir(coverageDir)
+            figleaf.annotate_html.report_as_html(coverageOutput,
+                                                 coverageDir, [], {})
+        return ("PY Unit Test - Report generated in "
+                             "report/pycoverage/index.html\n")
+        
+class Jsunit(BaseTest):
     def __init__(self, jsSpecify, jsCoverage):
         self.coverage = jsCoverage
         self.specify = jsSpecify
@@ -313,7 +277,7 @@ class Jsunit(Indicop):
         server.kill()
         return coverageReport + report
     
-class Jslint(Indicop):
+class Jslint(BaseTest):
     def run(self):
         #Folders which are going to be scanned.
         #Files are going to be find recursively in these folders
@@ -351,4 +315,55 @@ class Jslint(Indicop):
 
         self.writeReport("jslint", outputString)
         return "JS Lint - report in indicop/report/jslint.txt\n"
+
+
+class Indicop(object):
+    
+    def __init__(self, jsspecify, jscoverage):
+        #variables for jsunit
+        self.jsSpecify = jsspecify
+        self.jsCoverage = jscoverage
+        
+        #define the set of tests
+        self.testsDict = {'unit': Unit(),
+                 'functional': Functional(),
+                 'pylint': Pylint(),
+                 'jsunit': Jsunit(self.jsSpecify, self.jsCoverage),
+                 'jslint': Jslint()}
+
+    
+    def main(self, specify, coverage, testsToRun):
+        
+        returnString = "\n\n=============== ~INDICOP SAYS~ ===============\n\n"
+        
+        coverageTest = Coverage()
+        if coverage:
+            coverageTest.start()
+            
+        
+        #specified test can either be unit or functional.
+        #It makes more sense to run it here.
+        if specify:
+            #running directly the test here and ouputing in the console
+            result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir,
+                                                               'python',
+                                                               specify)])
+            if result:
+                returnString += "Specified Test - Succeeded\n"
+            else:
+                returnString += "[FAIL] Specified Test - \
+                                    read output from console\n"
+        else:
+            for test in testsToRun:
+                try:
+                    returnString += self.testsDict[test].run()
+                except KeyError:
+                    returnString += ("[ERR] Test %s does not exist. "
+                      "It has to be added in the testsDict variable\n") % test
+        
+        
+        if coverage:
+            returnString += coverageTest.stop()
+        
+        return returnString
     

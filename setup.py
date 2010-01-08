@@ -345,7 +345,8 @@ class tests_indico(Command):
             testsToRun.append('jsunit')
             testsToRun.append('jslint')
         
-        result = Indicop().main(self.specify, self.coverage, self.jsspecify, self.jscoverage, testsToRun)
+        indicop = Indicop(self.jsspecify, self.jscoverage)
+        result = indicop.main(self.specify, self.coverage, testsToRun)
         print result
 
 
