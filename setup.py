@@ -39,6 +39,8 @@ from setuptools.command import develop, install, sdist, bdist_egg, easy_install
 from setuptools import setup, find_packages, findall
 from subprocess import Popen, PIPE
 
+EXTRA_RESOURCES_URL = "http://cdswaredev.cern.ch/indico/wiki/Admin/Installation/IndicoExtras"
+
 if sys.platform == 'linux2':
     import pwd
     import grp
@@ -211,7 +213,8 @@ class fetchdeps:
 
     def _installMissing(self, dist):
         env = pkg_resources.Environment()
-        easy_install.main(["-U",str(dist)])
+        print dist, EXTRA_RESOURCES_URL
+        easy_install.main(["-f", EXTRA_RESOURCES_URL, "-U", str(dist)])
         env.scan()
         return env[str(dist)][0]
 
@@ -221,9 +224,11 @@ class fetchdeps_indico(fetchdeps, Command):
     user_options = []
     boolean_options = []
 
-    def initialize_options(self): pass
+    def initialize_options(self):
+        pass
 
-    def finalize_options(self): pass
+    def finalize_options(self):
+        pass
 
 
 class develop_indico(Command):
@@ -362,6 +367,6 @@ if __name__ == '__main__':
           package_data = {'indico': ['*.*'] },
           include_package_data = True,
           dependency_links = [
-                              "http://cdswaredev.cern.ch/indico/wiki/Admin/Installation/IndicoExtras"
+                              EXTRA_RESOURCES_URL
                               ],
           )
