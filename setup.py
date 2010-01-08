@@ -197,15 +197,7 @@ class jsbuild(Command):
         from MaKaC.consoleScripts.installBase import jsCompress
         jsCompress()
 
-class fetchdeps_indico(Command):
-    description = "fetch all the dependencies needed to run Indico"
-    user_options = []
-    boolean_options = []
-
-    def initialize_options(self): pass
-
-    def finalize_options(self): pass
-
+class fetchdeps:
     def run(self):
         print "Checking if dependencies need to be installed..."
 
@@ -223,6 +215,17 @@ class fetchdeps_indico(Command):
         env.scan()
         return env[str(dist)][0]
 
+
+class fetchdeps_indico(fetchdeps, Command):
+    description = "fetch all the dependencies needed to run Indico"
+    user_options = []
+    boolean_options = []
+
+    def initialize_options(self): pass
+
+    def finalize_options(self): pass
+
+
 class develop_indico(Command):
     description = "prepares the current directory for Indico development"
     user_options = []
@@ -235,6 +238,8 @@ class develop_indico(Command):
         pass
 
     def run(self):
+
+        fetchdeps().run()
 
         local = 'etc/indico.conf'
         if os.path.exists(local):
