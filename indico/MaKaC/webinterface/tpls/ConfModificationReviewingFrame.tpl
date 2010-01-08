@@ -214,7 +214,7 @@
 
     <tr><td style="padding-top: 15px;"></td></tr>
     <tr><td colspan="5" style="padding-top: 15px;">
-     <em><%= _("To define paper reviewers competences, please click on 'Competences'")%></em>       
+     <em><%= _("You can define paper reviewers competences by clicking on 'Competences'")%></em>       
         </td>
     </tr>
 </table>

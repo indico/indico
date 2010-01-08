@@ -391,16 +391,17 @@ class WPContributionModifBase( WPConferenceModifBase  ):
 
         if hasReviewingEnabled and confReviewChoice != 1:
             
-            if self._contrib.getReviewManager().isEditor(self._rh._getUser()):
-                self._subtabReviewing = self._tabCtrl.newTab( "reviewing", "Paper Reviewing", \
-                urlHandlers.UHContributionEditingJudgement.getURL( self._target ) )
-            elif self._contrib.getReviewManager().isReviewer(self._rh._getUser()):
-                self._subtabReviewing = self._tabCtrl.newTab( "reviewing", "Paper Reviewing", \
-                urlHandlers.UHContributionGiveAdvice.getURL( self._target ) )             
-            else:
+            if self._canModify or self._isPRM or self._contrib.getReviewManager().isReferee(self._rh._getUser()):
                 self._subtabReviewing = self._tabCtrl.newTab( "reviewing", "Paper Reviewing", \
                 urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
-                
+            else:
+                if self._contrib.getReviewManager().isEditor(self._rh._getUser()):
+                    self._subtabReviewing = self._tabCtrl.newTab( "reviewing", "Paper Reviewing", \
+                    urlHandlers.UHContributionEditingJudgement.getURL( self._target ) )
+                elif self._contrib.getReviewManager().isReviewer(self._rh._getUser()):
+                    self._subtabReviewing = self._tabCtrl.newTab( "reviewing", "Paper Reviewing", \
+                    urlHandlers.UHContributionGiveAdvice.getURL( self._target ) )             
+                           
             
             if self._canModify or self._isPRM or self._contrib.getReviewManager().isReferee(self._rh._getUser()):
                 self._subTabAssign = self._subtabReviewing.newSubTab( "assign", _("Assign Team"), \
@@ -434,11 +435,11 @@ class WPContributionModifBase( WPConferenceModifBase  ):
                                       urlHandlers.UHContributionGiveAdvice.getURL(self._target))
              
             if self._canModify or self._isPRM or self._contrib.getReviewManager().isInReviewingTeamforContribution(self._rh._getUser()):
-                self._subTabRevMaterial = self._subtabReviewing.newSubTab( "revmaterial", _("Reviewing Material"), \
+                self._subTabRevMaterial = self._subtabReviewing.newSubTab( "revmaterial", _("Material to Review"), \
                 urlHandlers.UHContribModifReviewingMaterials.getURL( self._target ) )
                 
             if len(self._contrib.getReviewManager().getVersioning()) > 1 or self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
-                self._tabReviewingHistory = self._tabCtrl.newTab( "reviewing_history", "Reviewing History", \
+                self._subTabReviewingHistory = self._subtabReviewing.newSubTab( "reviewing_history", "History", \
                                             urlHandlers.UHContributionModifReviewingHistory.getURL( self._target ) )
 
         self._setActiveTab()
@@ -465,8 +466,16 @@ class WPContributionModifBase( WPConferenceModifBase  ):
         else:
             banner = wcomponents.WContribListBannerModif(self._target).getHTML()
         body = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
+<<<<<<< HEAD:indico/MaKaC/webinterface/pages/contributions.py
         return banner + body
 
+=======
+        if not self._canModify or self._isPRM:
+            return body
+        else:
+            return banner + body
+    
+>>>>>>> [FIXES] - task #108 + small layout fixes:indico/MaKaC/webinterface/pages/contributions.py
 
 class WPContribModifMain( WPContributionModifBase ):
 

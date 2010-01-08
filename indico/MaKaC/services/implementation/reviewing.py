@@ -539,7 +539,7 @@ class ConferenceReviewingRemoveAllReviewers(ConferenceReviewingAssignStaffBasePR
 
 
 ######################################################
-###  Assign Team to Paper Reviewing module classes ###
+###  Assign/Remove Team classes ###
 ######################################################
 
 class ConferenceReviewingAssignTeamPRM(UserListModificationBase, ConferenceReviewingPRMAMBase):
@@ -602,7 +602,8 @@ class ConferenceReviewingRemoveTeamReferee(UserModificationBase, ConferenceRevie
         ConferenceReviewingPRMAMBase._checkProtection(self)
         
     def _getAnswer(self):
-        for contribution in self._confReview.getJudgedContributions(self._targetUser):
+        judgedContribs = self._confReview.getJudgedContributions(self._targetUser)[:]
+        for contribution in judgedContribs:
             rm = contribution.getReviewManager()
             if rm.hasReferee():
                 rm.removeReferee()
@@ -639,7 +640,8 @@ class ConferenceReviewingRemoveTeamEditor(UserModificationBase, ConferenceReview
         ConferenceReviewingPRMAMBase._checkProtection(self)
         
     def _getAnswer(self):
-        for contribution in self._confReview.getEditedContributions(self._targetUser):
+        editedContribs = self._confReview.getEditedContributions(self._targetUser)[:]
+        for contribution in editedContribs:
             rm = contribution.getReviewManager()
             if rm.hasEditor():
                 rm.removeEditor()
@@ -679,7 +681,8 @@ class ConferenceReviewingRemoveTeamReviewer(UserModificationBase, ConferenceRevi
         if not self._targetUser:
             raise ServiceError("ERR-REV6d",_("user id not set"))
         
-        for contribution in self._confReview.getReviewedContributions(self._targetUser):
+        reviewedContribs = self._confReview.getReviewedContributions(self._targetUser)[:]
+        for contribution in reviewedContribs: 
             rm = contribution.getReviewManager()
             rm.removeReviewer(self._targetUser)
         self._confReview.removeReviewer(self._targetUser)

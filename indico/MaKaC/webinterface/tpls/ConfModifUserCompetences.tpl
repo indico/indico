@@ -7,10 +7,10 @@
 <table align="center"><tr><td><%= _("The Reviewing Team has not been assigned yet.")%></td></tr></table>
 <% end %>
 <%else:%>
+<div style="padding-top:10px; padding-bottom: 10px;padding-left: 10px">
+<em><%= _("Here you can define competences for every team member, if needed.")%></em>
+</div>
 <table class="Revtab" width="90%%" cellspacing="0" align="center" border="0" style="padding-left:2px; padding-top: 20px;">
-   <tr><td colspan=5 style="padding-bottom: 15px;">
-            <em><%= _("Please, define competences for every team member.")%></em>
-   </td></tr> 
     <tr>
         <td nowrap class="groupTitle" colspan=5>
             <%= _("Paper Reviewing Team competences")%>

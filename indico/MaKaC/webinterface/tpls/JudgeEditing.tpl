@@ -2,7 +2,6 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 
 <table width="90%%" align="center" border="0" style="padding-top: 15px;">
-    <tr
         <td colspan="5" class="groupTitle"><%= _("Give opinion on layout of a contribution")%>
             <% inlineContextHelp(_('Here is displayed the judgement given by the Layout Reviewer.<br/>Only the Layout Reviewer of this contribution can change this.')) %>
         </td>

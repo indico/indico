@@ -21,7 +21,16 @@
         <% if not isinstance(c.getStatus(), ContribStatusNone): %>
         <tr valign="top" onmouseover="this.style.backgroundColor='#ECECEC'" onmouseout="this.style.backgroundColor='transparent'">
             <td style="padding-right:5px;padding-left:5px;"><%= c.getId() %></td>
-            <td style="padding-right:5px;padding-left:5px;"><a href="<%= urlHandlers.UHContributionGiveAdvice.getURL(c) %>"><%= c.getTitle() %></a></td>
+            <% if not c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted(): %>
+                    <td style="padding-right:5px;padding-left:5px;">
+                        <a href="<%= urlHandlers.UHContributionGiveAdvice.getURL(c) %>"><%= c.getTitle() %></a>
+                    </td>
+                <% end %>
+                <% else: %>
+                    <td style="padding-right:5px;padding-left:5px;">
+                        <span onmouseover=" IndicoUI.Widgets.Generic.tooltip(this, event, 'Final judgement already given by the referee')"><%= c.getTitle() %></span>
+                    </td>
+                <% end %>
             <td style="padding-right:5px;padding-left:5px;">
                 <% if c.getReviewManager().getLastReview().hasGivenAdvice(User): %>
                     <span><%= _("Advice given")%></span>

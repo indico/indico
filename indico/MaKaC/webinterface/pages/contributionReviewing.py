@@ -225,7 +225,8 @@ class WContributionReviewingDisplay(wcomponents.WTemplated):
 class WPContributionReviewingHistory(WPContributionModifBase):
     
     def _setActiveTab( self ):
-        self._tabReviewingHistory.setActive()
+        self._subtabReviewing.setActive()
+        self._subTabReviewingHistory.setActive()
         
     def _getTabContent( self, params ):
         wc = WContributionReviewingHistory(self._target)
