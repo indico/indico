@@ -345,11 +345,11 @@ if __name__ == '__main__':
                     },
 
           version = _versionInit(),
-          description = "Integrated Digital Conference",
+          description = "Indico allows you to schedule conferences, from single talks to complex meetings with sessions and contributions. It also includes an advanced user delegation mechanism, allows paper reviewing, archival of conference information and electronic proceedings",
           author = "Indico Team",
           author_email = "indico-team@cern.ch",
           url = "http://cdswaredev.cern.ch/indico",
-          download_url = "http://cdswaredev.cern.ch/indico/wiki/Download",
+          download_url = "http://cdswaredev.cern.ch/indico/wiki/Releases/Indico0.97.0",
           platforms = ["any"],
           long_description = "Integrated Digital Conference",
           license = "http://www.gnu.org/licenses/gpl-2.0.txt",
