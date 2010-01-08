@@ -7,17 +7,14 @@
 <% if not ConfReview.hasReviewing(): %>
 <table align="center"><tr><td><%= _("Type of reviewing has not been chosen yet")%></td></tr></table>
 <% end %>
-<% elif not ConfReview.getJudgedContributions(user):%>
-<p style="padding-left: 25px;"><font color="gray"><%= _("There are no contributions to assign as a Referee.")%></font></p>
-<% end %>
 <% else: %>
 <% if len(Conference.getContributionListSortedById()) == 0: %>
 <table align="center"><tr><td><%= _("There are no contributions to assign")%></td></tr></table>
 <% end %>
 <%else:%>
-<div style="padding-top:10px; padding-bottom: 10px;"><em><%= _("Please, select one or more contributions to assign Reviewers")%></em></div>
+<div style="padding-top:10px; padding-bottom: 10px;padding-left: 10px"><em><%= _("Please, select one or more contributions to assign Reviewers")%></em></div>
 
-<div id="showHideFilteringHelp" style="padding-top: 10px;"><div id="showHideFiltering" style="display:inline"></div></div>
+<div id="showHideFilteringHelp" style="padding-top: 10px;padding-left: 40px"><div id="showHideFiltering" style="display:inline"></div></div>
 <br/>
 <table id="filteringTable" class="Revtab" width="90%%" align="center">
     <thead>
@@ -108,7 +105,7 @@
     </tbody>
 </table>
 
-<table>
+<table style="padding-left: 40px">
     <% if not IsOnlyReferee and not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
     <tr>
         <td><%= _("Referee")%>:</td>
@@ -145,7 +142,23 @@
     </ul>
 </div>
 
-<table class="Revtab" width="95%%" cellspacing="0" align="center" border="0" style="padding-left:2px; margin-bottom:1em">
+<table style="padding-left:40px; margin-bottom:1em;">
+        <tr>
+            <td style="padding-bottom: 20px; padding-top: 20px">
+                <%= _("Select:") %>
+            </td>
+            <td nowrap class="titleCellFormat" style="padding-bottom: 20px;  padding-top: 20px; border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF">
+                 <span onclick="selectAll('selectedContributions')" align="left" style="cursor:pointer;padding-bottom:5px;color:#0B63A5;list-style-type:none;" onmouseover="this.style.color='#E25300'" onmouseout="this.style.color='#0B63A5'">
+                        <%= _("All")%>
+                 </span>,
+                 <span onclick="deselectAll('selectedContributions')" align="left" style="cursor:pointer;padding-bottom:5px;color:#0B63A5;list-style-type:none;" onmouseover="this.style.color='#E25300'" onmouseout="this.style.color='#0B63A5'">
+                        <%= _("None")%>
+                 </span>
+            </td>
+        </tr>
+</table>
+
+   <table class="Revtab" width="95%%" cellspacing="0" align="center" border="0" style="padding-left:20px; margin-bottom:1em">
 <!--
     <tr>
         <td nowrap class="groupTitle" colspan=4>Contributions to judge as Referee</td>
@@ -153,16 +166,7 @@
 -->
     <thead>
         <tr>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF">
-                <ul style="padding-left: 0px; padding-right: 20px;">
-                    <li onclick="selectAll('selectedContributions')" align="left" style="padding-bottom:5px;color:#0B63A5;list-style-type:none;" onmouseover="this.style.color='#E25300'" onmouseout="this.style.color='#0B63A5'">
-                        <span style="cursor:pointer"><%= _("Select All")%></span>
-                    </li>
-                    <li onclick="deselectAll('selectedContributions')" style="color:#0B63A5;list-style-type:none;" onmouseover="this.style.color='#E25300'" onmouseout="this.style.color='#0B63A5'">
-                        <span style="cursor:pointer"><%= _("Deselect All")%></span>
-                    </li>
-                </ul>
-            </td>
+            
             <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <%= _("Id")%>
             </td>
@@ -240,7 +244,6 @@
             <% end %>
             </td>
             -->
-            
             <td>
                 <ul>
                     <% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
@@ -277,7 +280,7 @@
     </tbody>
 </table>
 
-<table>
+<table style="padding-left: 40px">
     <% if not IsOnlyReferee and not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
     <tr>
         <td><%= _("Referee")%>:</td>
@@ -715,7 +718,7 @@ var checkAllHaveReferee = function(contributions, order, role) {
  * @param {Object} order
  * @param {Object} role
  */
-var removeReviewersAlerts = function(contributions, order, role) {
+var removeReviewersAlerts = function(contributions, role) {
     contributionsWithoutReviewers = []
     for (i in contributions) {
         contributionId = contributions[i]
@@ -737,21 +740,15 @@ var removeReviewersAlerts = function(contributions, order, role) {
         
         popup.draw = function(){
         
-            var span1 = Html.span({}, $T("Some of the contributions you checked do not have a Reviewer."));
-            var span2 = Html.span({}, $T("Do you want to remove a reviewer only from the contributions that have one?"));
-            var yesButton = Html.button('popUpButton', $T("Yes"));
-            yesButton.observeClick(function(){
+            var span1 = Html.span({}, $T("The Content Reviewers will be removed only from the contributions that have ones."));
+            var okButton = Html.button('popUpButton', $T("OK"));
+            okButton.observeClick(function(){
                 deselectWithoutReviewer(contributions);
-                fetchUsers(order, role);
+                removeUser('allReviewers');
                 popup.close();
             });
-                        
-             var noButton = Html.button('popUpButton', $T("No"));
-             noButton.observeClick(function(){
-                popup.close();
-            }); 
-              var buttons = Widget.inline([yesButton, noButton])
-              var all = Widget.lines([span1, span2, buttons])
+            
+              var all = Widget.lines([span1, okButton])
               return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {height: '130px', width: '420px'}},[all]));  
                 };
              popup.open();
@@ -1004,7 +1001,7 @@ var fetchUsers = function(order, role) {
    }
    
    if (order == 'remove' && role == 'reviewer')  {
-        if (!removeReviewersAlerts(checkedContributions, order, role)) {
+        if (!removeReviewersAlerts(checkedContributions, role)) {
             return;
         } 
    }
@@ -1030,25 +1027,25 @@ var fetchUsers = function(order, role) {
                 var popup = new ExclusivePopup(title, function(){popup.close();});
                 
                 popup.draw = function(){
-	                    var users = $L(); 
-	                    var userTemplate = function(user) {
-	                        var li = Html.li();
-	                        var userName = Widget.link(command(function(){
-	                            userSelected(user);
-	                            var killProgress = IndicoUI.Dialogs.Util.progress()
-	                            popup.close();
-	                            killProgress();
-	                        }, user.name));
-	                    
-	                    
-	                    var userCompetences = Html.span({style:{marginLeft:'5px'}},
+                        var users = $L(); 
+                        var userTemplate = function(user) {
+                            var li = Html.li();
+                            var userName = Widget.link(command(function(){
+                                userSelected(user);
+                                var killProgress = IndicoUI.Dialogs.Util.progress()
+                                popup.close();
+                                killProgress();
+                            }, user.name));
+                        
+                        
+                        var userCompetences = Html.span({style:{marginLeft:'5px'}},
                             user.competences.length == 0 ? $T('(no competences defined)') : $T('(competences: ') + user.competences.join(', ') + ')'
                         );
                         
                         li.set(Widget.inline([userName, userCompetences]));
                         return li;
                     }    
-	                
+                    
                         var userList = Html.ul();
                         bind.element(userList, users, userTemplate);
                         
@@ -1150,12 +1147,12 @@ var removeUser = function(role) {
             params,
             function(result,error) {
                 if (!error) {
+                    if (!removeReviewersAlerts(checkedContributions, role)) {
+                                return;
+                        }
                     for (i in checkedContributions) {
                         contributionId = checkedContributions[i];
                         contribution = getContribution(contributionId);
-                        if (!removeReviewersAlerts(checkedContributions, role)) {
-                                return;
-                        } 
                         contribution.reviewManager.reviewersList = [];
                         updateContribution(contributionId);
                         colorify(contributionId, 'reviewer')
