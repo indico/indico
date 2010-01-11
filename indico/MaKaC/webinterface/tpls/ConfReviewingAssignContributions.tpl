@@ -7,6 +7,9 @@
 <% if not ConfReview.hasReviewing(): %>
 <table align="center"><tr><td><%= _("Type of reviewing has not been chosen yet")%></td></tr></table>
 <% end %>
+<% elif not ConfReview.getJudgedContributions(user):%>
+<p style="padding-left: 25px;"><font color="gray"><%= _("There are no contributions to assign as a Referee.")%></font></p>
+<% end %>
 <% else: %>
 <% if len(Conference.getContributionListSortedById()) == 0: %>
 <table align="center"><tr><td><%= _("There are no contributions to assign")%></td></tr></table>

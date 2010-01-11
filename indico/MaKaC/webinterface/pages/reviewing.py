@@ -53,8 +53,18 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
         
-        self._subtabPaperReviewing = self._tabCtrl.newTab( "paperrev", "Paper Reviewing", \
+        if self._isPRM or self._canModify:
+            self._subtabPaperReviewing = self._tabCtrl.newTab( "paperrev", "Paper Reviewing", \
                 urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
+        elif self._showAssignContributions:
+            self._subtabPaperReviewing = self._tabCtrl.newTab( "paperrev", "Paper Reviewing", \
+                urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf ) )
+        elif self._showListContribToJudgeAsEditor:
+            self._subtabPaperReviewing = self._tabCtrl.newTab( "paperrev", "Paper Reviewing", \
+                urlHandlers.UHConfModifListContribToJudgeAsEditor.getURL( self._conf ) )
+        else:
+            self._subtabPaperReviewing = self._tabCtrl.newTab( "paperrev", "Paper Reviewing", \
+                urlHandlers.UHConfModifListContribToJudgeAsReviewer.getURL( self._conf ) )
         
         if self._isAM or self._canModify:
             self._subtabAbstractsReviewing = self._tabCtrl.newTab( "abstractsrev", "Abstracts Reviewing", \
