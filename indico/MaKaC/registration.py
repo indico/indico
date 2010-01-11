@@ -1542,7 +1542,7 @@ class RadioGroupInput(FieldInputType):
                             <tr>
                                 <td class="blacktext"><span class="titleCellFormat"> _("Billable")</span></td>
                                 <td bgcolor="white" class="blacktext" width="100%%">
-                                    <input type="checkbox" name="newbillable"  checked="checked" >
+                                    <input type="checkbox" name="newbillable" >
                                 </td>
                             </tr>
                             <tr>
