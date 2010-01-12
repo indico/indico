@@ -16,7 +16,11 @@ while target != None:
     if isModif:
         url = UHHelper.getModifUH(type(target)).getURL(target)
     else:
-        url = UHHelper.getDisplayUH(type(target)).getURL(target)
+        if len(appendPath) > 0:
+            catType = appendPath[0]['type']
+        else:
+            catType = ''
+        url = UHHelper.getDisplayUH(type(target), catType).getURL(target)
 
     l.append( (name, url) )
     
