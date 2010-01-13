@@ -2694,33 +2694,6 @@ class RHConfModifListings( RHConferenceModifBase ):
                 p = wf.getConfModifListings(self, self._conf)
             return p.display()
 
-# ALREADY DEFINED IN THIS SAME FILE WITH EXACTLY THE SAME CODE!!
-
-#class RHConfDeletion( RHConferenceModifBase ):
-#    _uh = urlHandlers.UHConfDeletion
-
-    #def _checkParams( self, params ):
-    #    RHConferenceModifBase._checkParams( self, params )
-    #    self._confirm = params.has_key( "confirm" )
-    #    self._cancel = params.has_key( "cancel" )
-
-#    def _process( self ):
-#        if self._cancel:
-#            self._redirect( urlHandlers.UHConfModifTools.getURL( self._conf ) )
-#        elif self._confirm:
-#            parent=None
-#            if self._conf.getOwnerList()!=[]:
-#                parent=self._conf.getOwnerList()[0]
-#            self._conf.delete()
-#            if parent is not None:
-#                self._redirect( urlHandlers.UHCategoryModification.getURL(parent) )
-#            else:
-#                self._redirect( urlHandlers.UHWelcome.getURL() )
-#        else:
-#            return conferences.WPConfDeletion( self, self._conf ).display()
-
-
-
 #######################################################################################
 
 class RHConfClone( RHConferenceModifBase ):
