@@ -109,7 +109,7 @@ class ScheduleAddContribution(ScheduleOperation, LocationSetter):
             method(contribution, element)
 
             if self._privileges is not None:
-                if self._privileges.get('%s-grant-submission' % elemType, True):
+                if self._privileges.get('%s-grant-submission' % elemType, False):
                     contribution.grantSubmission(element)
 
     def _checkParams(self):
