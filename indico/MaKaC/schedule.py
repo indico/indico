@@ -102,12 +102,12 @@ class TimeSchedule(Schedule, Persistent):
     def hasEntriesAfter(self,d):
         """Tells wether there is any entry after the specified date
         """
+        entries=self.getEntries()
         if len(entries)==0:
             return False
         return self.calculateEndDate()>d
 
     def checkSanity( self ):
-        entries=self.getEntries()
         if self.hasEntriesBefore(self.getStartDate()) or self.hasEntriesAfter(self.getEndDate()):
             raise TimingError("Sorry, cannot perform this date change: Some entries in the timetable would be outside the new dates [conference id => %s ]"%(self.getOwner().getConference().getId()))
 
@@ -306,7 +306,7 @@ class TimeSchedule(Schedule, Persistent):
         else:
             return self.calculateDayEndDate(day)
 
-    def calculateDayEndDate(self,day,hour=0,min=0):       
+    def calculateDayEndDate(self,day,hour=0,min=0):
         if day is None:
             return self.calculateEndDate()
         if not day.tzinfo:
@@ -356,7 +356,7 @@ class TimeSchedule(Schedule, Persistent):
         """
         if not day.tzinfo:
             day = timezone(self.getTimezone()).localize(day)
-        res = []     
+        res = []
         for entry in self.getEntries():
             if entry.inDay( day ):
                 res.append( entry )

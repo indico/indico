@@ -6876,13 +6876,13 @@ class SessionSlot(Persistent):
             if len(entries) != 0 and self.getEndDate() < st:
                 self.setEndDate(st,2)
 
-    def setValues(self,data,check=2, moveEntriesBelow=0,):
+    def setValues(self,data,check=2, moveEntriesBelow=0):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates
         """
-        
+
         # In order to move the entries below, it is needed to know the diff (we have to move them)
         # and the list of entries to move. It's is needed to take those datas in advance because they
         # are going to be modified before the moving.
@@ -6938,7 +6938,7 @@ class SessionSlot(Persistent):
             self.setDates(sDateUTC,eDateUTC,check,moveEntries=move)
         elif sDate != None:
             sDateUTC = sDate.astimezone(timezone('UTC'))
-            self.setStartDate(sDateUTC,check,moveEntries=move)       
+            self.setStartDate(sDateUTC,check,moveEntries=move)
         if data.get("durHours","")!="" and data.get("durMins","")!="":
             self.setDuration(hours=data["durHours"],minutes=data["durMins"],check=check)
         if data.get("contribDurHours","")!="" and data.get("contribDurMins","")!="":

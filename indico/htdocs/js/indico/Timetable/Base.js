@@ -267,6 +267,10 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
         return this.LookupTabWidget.prototype.draw.call(this);
     },
 
+    getDays: function() {
+        return keys(this.data);
+    },
+
     disable: function() {
         this.enabled = false;
         this.LookupTabWidget.prototype.disable.call(this);
@@ -473,6 +477,10 @@ type("IntervalTimeTableMixin", [], {
         // The time must be update each time new data is set
         this.infoBox.set(this._getInfoBoxContent());
 
+    },
+
+    getDays: function() {
+        return this.parentTimetable.getDays();
     },
 
     getById: function(id) {

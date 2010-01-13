@@ -200,6 +200,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
                                       IndicoUtil.errorReport(error);
                                   }
                                   else {
+
                                       var startDate = Util.parseJSDateTime(result, IndicoDateTimeFormats.Server);
 
                                       /*
@@ -211,16 +212,16 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
                                           startDate.setMinutes(0);
                                       }
                                       self.startTimeField.set(Util.formatDateTime(startDate, IndicoDateTimeFormats.Server).substr(11,5));
-                                      
-                                      self.info.set('startDate', Util.formatDateTime(startDate, IndicoDateTimeFormats.Server));
+
+                                      self.info.set('startDate', Util.formatDateTime(startDate, IndicoDateTimeFormats.ServerHourless));
                                       hook.set(true);
                                   }
                               }
                              );
             }
         },
-        
-        
+
+
         function(hook) {
             var self = this;
             var parameterManager = new IndicoUtil.parameterManager();
@@ -289,22 +290,23 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
         $B(info.accessor('presenters'), presListWidget.getUsers());
         info.set('privileges', presListWidget.getPrivileges());
 
-        conferenceDays.set(Util.formatDateTime(self.datStartDate + ' ' + self.confStartDate.substr(11,5), IndicoDateTimeFormats.ServerHourSlashLess, IndicoDateTimeFormats.Server));
-    
+        conferenceDays.set(Util.formatDateTime(self.datStartDate + ' ' + self.confStartDate.substr(11,5), IndicoDateTimeFormats.Ordinal, IndicoDateTimeFormats.ServerHourless));
+
         //We need to update the value of Time and endDateTime every time that is changed by the user
         //value is the new date
         conferenceDays.observe(function(value) {
-            //it is neccesary to update the date in dateArgs with the new date                        
-            self.dateArgs.selectedDay = Util.formatDateTime(value, IndicoDateTimeFormats.Server, IndicoDateTimeFormats./*InternationalHourLess*/ServerHourSlashLess);
+            //it is neccesary to update the date in dateArgs with the new date
+            self.dateArgs.selectedDay = Util.formatDateTime(value, IndicoDateTimeFormats.Server, IndicoDateTimeFormats./*DefaultHourless*/Ordinal);
             //but we need to check if the contribution is inside a session and if the day changed, in order
             //to make the request for the session timetable or the top level timetable
-            if(exists(self.timetable.parentTimetable)){
+
+            if(self.timetable.IntervalTimetableMixin){
                 if(self.previousDate.substr(0,10) != self.dateArgsselectedDay)
                     self.timeStartMethod = "schedule.event.getDayEndDate";
                 else
                     self.timeStartMethod = "schedule.slot.getDayEndDate";
             }
-            
+
             //we make a timeStartMethod request specifying the date for the request
             //and we get the result of the request in result
             indicoRequest(self.timeStartMethod, self.dateArgs , function(result, error){
@@ -322,11 +324,11 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
                     info.set('startDate', Util.formatDateTime(startDate, IndicoDateTimeFormats.Server));
                }
             });
-            
+
             /*
              * parameterManager is not called because if you just change the date and it's not correct you just need
              * to have red fields in the date, so what we're doing is just adding a dispatchEvent for both hour fields
-             * (they are Html.input, so they can be added to the dispatchEvent) to know when they have changed                                 
+             * (they are Html.input, so they can be added to the dispatchEvent) to know when they have changed
              */
             self.startTimeField.dispatchEvent('change');
         });
@@ -335,7 +337,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
         var timeTranslation = {
                 toTarget: function (value) {
                     var aux = conferenceDays.get();
-                    return Util.formatDateTime(aux, IndicoDateTimeFormats.Server, IndicoDateTimeFormats.ServerHourSlashLess) + ' ' + value;
+                    return Util.formatDateTime(aux, IndicoDateTimeFormats.Server, IndicoDateTimeFormats.Ordinal) + ' ' + value;
                 },
                 toSource: function(value) {
                     return value.substr(11,5);
@@ -344,7 +346,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
 
         var datecomponent;
         var duration;
-        if (this.timeStartMethod !== null) {         
+        if (this.timeStartMethod !== null) {
             $B(info.accessor('startDate'), self.startTimeField, timeTranslation);
             $B(info.accessor('duration'), self.timeField);
 
@@ -368,10 +370,10 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
                 [$T('Start time'), Html.div({class: 'popUpLabel', style:{textAlign: 'left'}}, this.startTimeField,
                             $T(' Duration '), this.timeField, $T('min'))],
                 [$T('Presenter(s)'), presListWidget.draw()]
-            ]);        
+            ]);
 
-        
-        
+
+
 
     },
 
@@ -484,14 +486,14 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
                 Html.select({name: 'type'}),
                 self.days,
                 function(elem) {
-                    var d = Util.formatDateTime(elem, IndicoDateTimeFormats.International, IndicoDateTimeFormats.ServerHourSlashLess);
+                    var d = Util.formatDateTime(elem, IndicoDateTimeFormats.DefaultHourless, IndicoDateTimeFormats.Ordinal);
                     return Html.option({value: elem}, d);
                 }
             );
-        
+
         addButton.observeClick(function(){
             //check if the day changed
-            if(Util.formatDateTime(conferenceDays.get(), IndicoDateTimeFormats.Server, IndicoDateTimeFormats.ServerHourSlashLess) !=
+            if(Util.formatDateTime(conferenceDays.get(), IndicoDateTimeFormats.Server, IndicoDateTimeFormats.Ordinal) !=
                 self.previousDate.substr(0,10)){
                 self.dayChanged = true;
             }
@@ -542,14 +544,14 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
          this.timetable = timetable;
          this.successFunc = successFunc;
          this.favoriteRooms = favoriteRooms;
-         
+
          this.previousDate = dayStartDate;
          this.info = new WatchObject();
 
          if (this.timeStartMethod === null) {
              args.schedule = false;
          }
-         
+
          var attributes = {
                  style: {
                      width: '50px'
@@ -617,10 +619,10 @@ type("ChangeEditDialog", // silly name!
                              startDate.setHours(23);
                              startDate.setMinutes(0);
                          }
-                         self.startTimeField.set(Util.formatDateTime(startDate, 
+                         self.startTimeField.set(Util.formatDateTime(startDate,
                                                                      IndicoDateTimeFormats.Server).substr(11,5));
-                         
-                         self.info.set('startDate', Util.formatDateTime(startDate, 
+
+                         self.info.set('startDate', Util.formatDateTime(startDate,
                                              IndicoDateTimeFormats.Server));
                          hook.set(true);
                      }
@@ -699,7 +701,9 @@ type("AddBreakDialog", ["ChangeEditDialog"],
 
              addButton.observeClick(function(){
                  //check if the day changed
-                 if(Util.formatDateTime(conferenceDays.get(), IndicoDateTimeFormats.Server, IndicoDateTimeFormats.ServerHourSlashLess) !=
+                 if(Util.formatDateTime(conferenceDays.get(),
+                                        IndicoDateTimeFormats.ServerHourless,
+                                        IndicoDateTimeFormats.Ordinal) !=
                      self.previousDate.substr(0,10)){
                      self.dayChanged = true;
                  }
@@ -714,34 +718,39 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                      self._submitInfo();
                  }
              });
-             
+
              //Create the list of the days in which the conference is being held
              var conferenceDays = bind.element(
                      Html.select({name: 'type'}),
                      self.days,
                      function(elem) {
-                         var d = Util.formatDateTime(elem, IndicoDateTimeFormats.International, IndicoDateTimeFormats.ServerHourSlashLess);
+                         var d = Util.formatDateTime(elem, IndicoDateTimeFormats.International, IndicoDateTimeFormats.Ordinal);
                          return Html.option({value: elem}, d);
                      }
                  );
 
-             conferenceDays.set(Util.formatDateTime(self.info.get('startDate'), IndicoDateTimeFormats.ServerHourSlashLess, IndicoDateTimeFormats.Server));
-             
+             conferenceDays.set(Util.formatDateTime(self.info.get('startDate'), IndicoDateTimeFormats.Ordinal, IndicoDateTimeFormats.ServerHourless));
+
              //We need to update the value of Time and endDateTime every time that is changed by the user
              //value is the new date
              conferenceDays.observe(function(value) {
                  //it is neccesary to update the date in dateArgs with the new date to make the request
-                 self.dateArgs.set("selectedDay", Util.formatDateTime(value, IndicoDateTimeFormats.Server, IndicoDateTimeFormats.ServerHourSlashLess));
+                 self.dateArgs.set("selectedDay", Util.formatDateTime(value, IndicoDateTimeFormats.Server, IndicoDateTimeFormats.Ordinal));
                  //but we need to check if are inside a session and if the day changed, in order
                  //to make the request for the session timetable or the top level timetable
-                 if(exists(self.managementActions.timetable.parentTimetable)){
-                     if(self.previousDate.substr(0,10) != self.dateArgs.get('selectedDay'))
+
+                 if(self.managementActions.timetable.IntervalTimetableMixin &&
+                    /* if we chose a different day, it doesn't matter
+                        if we are inside a session */
+                    self.previousDate.substr(0,10) !=
+                    self.dateArgs.get('selectedDay')){
                          self.timeStartMethod = "schedule.event.getDayEndDate";
-                     else
+                     } else {
                          self.timeStartMethod = "schedule.slot.getDayEndDate";
+                     }
                  }
                  //we make a timeStartMethod request specifying the date for the request
-                 //and we get the result of the request in result
+                 //and we get the result of the request as a result
                  indicoRequest(self.timeStartMethod, self.dateArgs , function(result, error){
                      if (error) {
                          IndicoUtil.errorReport(error);
@@ -759,7 +768,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                  /*
                   * parameterManager is not called because if you just change the date and it's not correct you just need
                   * to have red fields in the date, so what we're doing is just adding a dispatchEvent for both hour fields
-                  * (they are Html.input, so they can be added to the dispatchEvent) to know when they have changed                                 
+                  * (they are Html.input, so they can be added to the dispatchEvent) to know when they have changed
                   */
                  self.startTimeField.dispatchEvent('change');
              });
@@ -768,13 +777,13 @@ type("AddBreakDialog", ["ChangeEditDialog"],
              var timeTranslation = {
                      toTarget: function (value) {
                          var aux = conferenceDays.get();
-                         return Util.formatDateTime(aux, IndicoDateTimeFormats.Server, IndicoDateTimeFormats.ServerHourSlashLess) + ' ' + value;
+                         return Util.formatDateTime(aux, IndicoDateTimeFormats.Server, IndicoDateTimeFormats.Ordinal) + ' ' + value;
                      },
                      toSource: function(value) {
                          return value.substr(11,5);
                      }
              };
-             
+
              // some properties have default values, and the initialization
              // of the binding must be set
              invertableBind(this.info.accessor('startDate'),
@@ -785,10 +794,10 @@ type("AddBreakDialog", ["ChangeEditDialog"],
              invertableBind(this.info.accessor('duration'),
                             this.timeField,
                             this.isEdit);
-             
+
              self.parameterManager.add(self.startTimeField, 'time', false);
              self.parameterManager.add(self.timeField, 'unsigned_int', false);
-             
+
              return this.ServiceDialog.prototype.draw.call(
                  this,
                  Widget.block([IndicoUtil.createFormFromMap([
@@ -797,13 +806,13 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                      style: {
                          width: '300px'
                      }
-                 })), this.info.accessor('title'))], 
-                 
+                 })), this.info.accessor('title'))],
+
                  [$T('Description'), $B(Html.textarea({
                      cols: 40,
                      rows: 2
-                 }), this.info.accessor('description'))], 
-                 [$T('Place'), this.roomEditor.draw()], 
+                 }), this.info.accessor('description'))],
+                 [$T('Place'), this.roomEditor.draw()],
                  [$T('Date'), conferenceDays],
                  [$T('Start time'), Html.div({class: 'popUpLabel', style:{textAlign: 'left'}}, this.startTimeField,
                              $T(' Duration '), this.timeField, $T('min'))]
@@ -883,7 +892,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
 
              /*
               * if we are inside a session and we add a break outside that session, in another day,
-              * we need to update the entry in the parentTimetable. 
+              * we need to update the entry in the parentTimetable.
               */
              this.ChangeEditDialog(managementActions.methods[args.get('type')].add,
                                    this.info,
@@ -891,7 +900,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                                    function(result) {
                                          if(exists(managementActions.timetable.parentTimetable) && this.dayChanged)
                                              managementActions.timetable.parentTimetable._updateEntry(result, result.id);
-                                         else    
+                                         else
                                              managementActions.timetable._updateEntry(result, result.id);
                                    });
 

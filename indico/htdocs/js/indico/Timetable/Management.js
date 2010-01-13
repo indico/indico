@@ -318,13 +318,8 @@ type("TimetableManagementActions", [], {
         var self = this;
 
         var params;
-        
-        //Get the days in which the conference is being held
-        //if the contribution is inside a session we need to get the days from parentTimetable, not from timetable
-        if(exists(this.timetable.parentTimetable))
-            var days = keys(this.timetable.parentTimetable.getData());
-        else
-            var days = keys(this.timetable.getData());
+
+        var days = this.timetable.getDays();
 
         if (this.session !== null) {
             params = this._addToSessionParams(this.session, 'Contribution');
@@ -354,13 +349,8 @@ type("TimetableManagementActions", [], {
         var self = this;
 
         var params;
-        
-        //Get the days in which the conference is being held
-        //if the break is inside a session we need to get the days from parentTimetable, not from timetable
-        if(exists(this.timetable.parentTimetable))
-            var days = keys(this.timetable.parentTimetable.getData());
-        else
-            var days = keys(this.timetable.getData());
+
+        var days = this.timetable.getDays();
 
         if (this.session !== null) {
             params = this._addToSessionParams(this.session, 'Break');
@@ -384,13 +374,8 @@ type("TimetableManagementActions", [], {
         var args = $O();
 
         var params;
-        
-        //Get the days in which the conference is being held
-        //if the break is inside a session we need to get the days from parentTimetable, not from timetable
-        if(exists(this.timetable.parentTimetable))
-            var days = keys(this.timetable.parentTimetable.getData());
-        else
-            var days = keys(this.timetable.getData());
+
+        var days = this.timetable.getDays();
 
         if (this.session !== null) {
             params = this._addToSessionParams(this.session, 'Break');
@@ -448,7 +433,7 @@ type("TimetableManagementActions", [], {
 
         var params = this._addToSessionParams(session, 'SessionSlot');
         params.parentType = 'Session';
-        
+
         //Get the days in which the conference is being held
         var days = keys(this.timetable.getData());
 
@@ -474,7 +459,7 @@ type("TimetableManagementActions", [], {
 
         //Get the days in which the conference is being held
         var days = keys(this.timetable.getData());
-        
+
         each(eventData, function(value, key) {
             params[key] = value;
         });
@@ -498,7 +483,7 @@ type("TimetableManagementActions", [], {
                 /* update the inner timetable!
                  * You need to create the aux before doing the updateEntry because otherwise the subentries
                  * in the session won't have the correct value
-                 */ 
+                 */
                 self.timetable.data[result.day][result.id].entries = aux;
             },
             true

@@ -938,20 +938,20 @@ IndicoUI.Widgets = {
         dateField: function(showTime, attributes, hiddenFields){
             attributes = attributes || {};
             var elem = Html.input("text",attributes);
-            IndicoUI.Widgets.Generic.input2dateField(elem, showTime, hiddenFields)
+            IndicoUI.Widgets.Generic.input2dateField(elem, showTime, hiddenFields);
             return elem;
       },
         dateField_sdate: function(showTime, attributes, hiddenFields){
             attributes = attributes || {};
             var elem = Html.input("text",{'id':'sdate', 'name':'sdate'},attributes);
-            IndicoUI.Widgets.Generic.input2dateField(elem, showTime, hiddenFields)
+            IndicoUI.Widgets.Generic.input2dateField(elem, showTime, hiddenFields);
             return elem;
         },
 
         dateField_edate: function(showTime, attributes, hiddenFields){
             attributes = attributes || {};
             var elem = Html.input("text",{'id':'edate', 'name':'edate'},attributes);
-            IndicoUI.Widgets.Generic.input2dateField(elem, showTime, hiddenFields)
+            IndicoUI.Widgets.Generic.input2dateField(elem, showTime, hiddenFields);
             return elem;
         },
         timeField: function(attributes, hiddenFields){
@@ -1010,7 +1010,7 @@ IndicoUI.Widgets = {
             attributes.style = {width: '40px'};
             return Html.edit(attributes, defaultVal);
         },
-      
+
         applyForParticipationForm: function(conf) {
             alert('hejsan');
         }

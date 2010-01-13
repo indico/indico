@@ -367,7 +367,7 @@ class ScheduleEditBreakBase(ScheduleOperation, LocationSetter):
         self._title = pManager.extract("title", pType=str)
         self._description = pManager.extract("description", pType=str,
                                           allowEmpty=True)
-        self._dayChanged = pManager.extract("dayChanged", pType=bool, allowEmpty=True) 
+        self._dayChanged = pManager.extract("dayChanged", pType=bool, allowEmpty=True)
 
     def _performOperation(self):
 
@@ -445,14 +445,12 @@ class SessionSlotScheduleEditBreak(ScheduleEditBreakBase, sessionServices.Sessio
         self._brk = self._schEntry
 
     def _addToSchedule(self, b):
-        if self._dayChanged:    
-            owner = self._schEntry.getOwner()  
+        if self._dayChanged:
+            owner = self._schEntry.getOwner()
 
             self._schEntry.getSchedule().removeEntry(self._schEntry)
 
             self._schEntry.setStartDate(self._dateTime)
-            if isinstance(owner, conference.Contribution):
-                owner.setSession(None)
             self._conf.getSchedule().addEntry(self._schEntry, check=2)
 
     def _getSlotEntry(self):
@@ -625,15 +623,16 @@ class ScheduleEditSlotBase(ScheduleOperation, LocationSetter):
 
     def _performOperation(self):
         #if there is something inside the session we have to move it as well
+
+        values = {"title": self._title or "",
+                  "sDate": self._startDateTime,
+                  "eDate": self._endDateTime}
+
         if len(self._slot.getEntries()) != 0 :
-            self._slot.setValues({"title": self._title or "",
-                        "sDate": self._startDateTime,
-                        "eDate": self._endDateTime,
-                        "move": 1})
-        else:
-            self._slot.setValues({"title": self._title or "",
-                        "sDate": self._startDateTime,
-                        "eDate": self._endDateTime})
+            values.update({"move": 1})
+
+        self._slot.setValues(values)
+
         self. _addConveners(self._slot)
         self._setLocationInfo(self._slot)
 
