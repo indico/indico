@@ -106,6 +106,8 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
                     urlHandlers.UHConfModifListContribToJudgeAsEditor.getURL( self._conf ) ) 
             
         
+        if not self._conf.hasEnabledSection("cfa"):
+            self._subtabAbstractsReviewing.setHidden(True)
         self._setActiveTab()
 
     def _getPageContent(self, params):
