@@ -4483,6 +4483,10 @@ class UHHelper(object):
 
     displayUHs = {
         "Category" : UHCategoryDisplay,
+        "CategoryMap" : UHCategoryMap,
+        "CategoryOverview" : UHCategoryOverview,
+        "CategoryStatistics" : UHCategoryStatistics,
+        "CategoryCalendar" : UHGetCalendarOverview,
         "Conference" : UHConferenceDisplay,
         "Contribution": UHContributionDisplay,
         "AcceptedContribution": UHContributionDisplay,
@@ -4495,8 +4499,8 @@ class UHHelper(object):
         return cls.modifUHs.get(klazz.__name__, None)
 
     @classmethod
-    def getDisplayUH(cls, klazz):
-        return cls.displayUHs.get(klazz.__name__, None)
+    def getDisplayUH(cls, klazz, type=""):
+        return cls.displayUHs.get("%s%s"%(klazz.__name__, type), None)
 
 # Testing helloworld
 class UHHelloWorld(URLHandler):
