@@ -127,7 +127,7 @@ class RegistrantsListToExcel:
                     status=self._regForm.getStatusById(ids[1])
                     excelGen.addValue(status.getCaption())
                 else:
-                    excelGene.addValue("")
+                    excelGen.addValue("")
             else:
                 ids=key.split("-")
                 if len(ids)==2:
