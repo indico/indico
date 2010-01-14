@@ -117,7 +117,7 @@ var Util = {
             results[tokenOrder[i-1]] = m[i];
         }
 
-        return results
+        return results;
     },
 
     /* parses a string into a JavaScript Date object,
@@ -154,7 +154,7 @@ var Util = {
     },
 
     dateTimeIndicoToJS: function(obj) {
-        m1 = obj.date.match(/(\d+)[-/](\d+)[-/](\d+)/);
+        m1 = obj.date.match(/(\d+)[\-\/](\d+)[\-\/](\d+)/);
         m2 = obj.time.match(/(\d+):(\d+):(\d+)/);
 
         var date = new Date();
@@ -183,5 +183,6 @@ var IndicoDateTimeFormats = {
     International: '%d/%m/%Y %H:%M',
     ISO8601: '%Y/%m/%d %H:%M',
     Default: '%d/%m/%Y %H:%M',
+    DefaultHourless: '%d/%m/%Y',
     Server: '%Y/%m/%d %H:%M'
 };
