@@ -1,8 +1,5 @@
-from MaKaC.common.general import DEVELOPEMENT
-from MaKaC.webinterface.rh import reviewingControlModif
 
-if DEVELOPEMENT:
-    reviewingControlModif = reload( reviewingControlModif )
+from MaKaC.webinterface.rh import reviewingControlModif
 
 def index( req, **params ):
     return reviewingControlModif.RHConfModifReviewingAbstractsControl( req ).process( params )
