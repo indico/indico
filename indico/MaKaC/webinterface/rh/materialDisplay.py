@@ -61,7 +61,7 @@ class RHMaterialDisplay( RHMaterialDisplayBase ):
                 if url.find(".wmv") != -1:
                     urlwmv = urlHandlers.UHVideoWmvAccess().getURL(res)
                     self._redirect( urlwmv )
-                elif url.find(".flv") != -1 or url.find("rtmp://") != -1:
+                elif url.find(".flv") != -1 or url.find(".f4v") != -1 or url.find("rtmp://") != -1:
                     urlflash = urlHandlers.UHVideoFlashAccess().getURL(res)
                     self._redirect( urlflash)
                 else:
