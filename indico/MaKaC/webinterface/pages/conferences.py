@@ -5489,23 +5489,18 @@ class WAbstractsReviewingNotifTpl( wcomponents.WTemplated ):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
         abMgr = self._conf.getAbstractMgr()
+        vars["notifTpls"]=""
+        vars["addNotifTplURL"]=""
+        vars["remNotifTplURL"]=""
+        vars["deadline"]=""
         if abMgr.getCFAStatus():
             modifDL = abMgr.getModificationDeadline()
             if not nowutc() > modifDL:
                 vars["notifTpls"]=self._getNotifTplsHTML()
                 vars["addNotifTplURL"]=urlHandlers.UHAbstractModNotifTplNew.getURL(self._conf)
                 vars["remNotifTplURL"]=urlHandlers.UHAbstractModNotifTplRem.getURL(self._conf)
-                vars["deadline"]=""
             else:
-                vars["notifTpls"]=""
-                vars["addNotifTplURL"]=""
-                vars["remNotifTplURL"]=""
                 vars["deadline"]="expired"
-        else:
-            vars["notifTpls"]=""
-            vars["addNotifTplURL"]=""
-            vars["remNotifTplURL"]=""
-            vars["deadline"]=""
         return vars
 
 
