@@ -615,12 +615,12 @@ var observer = function(value) {
         $E('authorSubmittedMatReviewerNotif').dom.style.display = '';
         $E('templateTable').dom.style.display = '';
         
-        showReviewableMaterials();
+        //showReviewableMaterials();
         showReviewingStates();
         showReviewingQuestions();
         showDefaultReviewerDate();
         showDefaultRefereeDate();
-        showFormatChooser();
+        //showFormatChooser();
     }
     if (value == "Layout reviewing") {
         $E('steptitle').dom.style.display = '';
@@ -648,10 +648,10 @@ var observer = function(value) {
         $E('authorSubmittedMatReviewerNotif').dom.style.display = 'none';
         $E('templateTable').dom.style.display = '';
         
-        showReviewableMaterials();
+        //showReviewableMaterials();
         showEditingCriteria();
         showDefaultEditorDate();
-        showFormatChooser();
+        //showFormatChooser();
     }
     if (value == "Content and layout reviewing") {
         $E('steptitle').dom.style.display = '';
@@ -679,14 +679,14 @@ var observer = function(value) {
         $E('authorSubmittedMatReviewerNotif').dom.style.display = '';
         $E('templateTable').dom.style.display = '';
         
-        showReviewableMaterials();
+        //showReviewableMaterials();
         showReviewingStates();
         showReviewingQuestions();
         showDefaultReviewerDate();
         showDefaultRefereeDate();
         showEditingCriteria();
         showDefaultEditorDate();
-        showFormatChooser();
+        //showFormatChooser();
     }
 }
 
@@ -697,14 +697,14 @@ new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditReviewingMode'),
                     "<%= ConfReview.getReviewingMode() %>",
                     observer);                    
 
-var showReviewableMaterials = function() {
+/*var showReviewableMaterials = function() {
     new IndicoUI.Widgets.Generic.twoListField($E('inPlaceEditReviewableMaterials'),
                         10,"200px",<%=ConfReview.getNonReviewableMaterials()%>,<%=ConfReview.getReviewableMaterials()%>,
                         $T("Non reviewable materials"), $T("Reviewable materials"),
                         'reviewing.conference.changeReviewableMaterials',
                         {conference: '<%= ConfReview.getConference().getId() %>'},
                         '');
-}
+}*/
 
                
 var showReviewingStates = function() {
@@ -953,7 +953,7 @@ function showFormatChooser(pm){
  */
                  
 <% if ConfReview.hasReviewing(): %>
-    showReviewableMaterials();
+    //showReviewableMaterials();
     TemplateList();
     
     $E('uploadTpl').observeClick(function(){ var popup = new UploadTemplateDialog( 'Upload Template',
