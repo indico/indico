@@ -56,6 +56,7 @@
   <td colspan="3" align="center">
     <form action="%(cancelURL)s" method="POST">
     %(params)s
+    <input type="submit" class="btn" value="<%= _("select")%>">
     <input type="submit" class="btn" value="<%= _("cancel")%>">
     </form>
   </td>

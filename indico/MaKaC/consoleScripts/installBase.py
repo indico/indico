@@ -50,9 +50,6 @@ PWD_INDICO_CONF = os.path.abspath(os.path.join(
     os.path.split(os.path.dirname(MaKaC.__file__))[0],'etc', 'indico.conf'
     ))
 
-print os.path.dirname(__file__)
-print PWD_INDICO_CONF
-
 def setIndicoInstallMode(newmode):
     """
     Sets indico install mode.
@@ -307,7 +304,7 @@ def _checkDirPermissions(directories, dbInstalledBySetupPy=False, accessuser=Non
         dirs2check.append(dbInstalledBySetupPy)
 
     for dir in dirs2check:
-        print commands.getoutput("sudo chown -R %s:%s %s" % (accessuser, accessgroup, dir))
+        print commands.getoutput("if test $(which sudo); then CMD=\"sudo\"; fi; $CMD chown -R %s:%s %s" % (accessuser, accessgroup, dir))
 
 
 def _existingConfiguredEgg():
