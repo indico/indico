@@ -367,7 +367,6 @@ class ScheduleEditBreakBase(ScheduleOperation, LocationSetter):
         self._title = pManager.extract("title", pType=str)
         self._description = pManager.extract("description", pType=str,
                                           allowEmpty=True)
-        self._dayChanged = pManager.extract("dayChanged", pType=bool, allowEmpty=True)
 
     def _performOperation(self):
 
@@ -442,6 +441,10 @@ class SessionSlotScheduleEditBreak(ScheduleEditBreakBase, sessionServices.Sessio
     def _checkParams(self):
         sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
         ScheduleEditBreakBase._checkParams(self)
+        if self._schEntry.getStartDate().date() != self._dateTime.date():
+            self._dayChanged = True
+        else:
+            self._dayChanged = False
         self._brk = self._schEntry
 
     def _addToSchedule(self, b):
@@ -619,7 +622,6 @@ class ScheduleEditSlotBase(ScheduleOperation, LocationSetter):
                                            allowEmpty=True)
         self._roomInfo = pManager.extract("roomInfo", pType=dict, allowEmpty=True)
         self._isSessionTimetable = pManager.extract("sessionTimetable", pType=bool, allowEmpty=True)
-        self._dayChanged = pManager.extract("dayChanged", pType=bool, allowEmpty=True)
 
     def _performOperation(self):
         #if there is something inside the session we have to move it as well

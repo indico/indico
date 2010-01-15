@@ -41,6 +41,8 @@ extend(IndicoUI.Dialogs,
                                }
                                info.set('startDateTime', Util.formatDateTime(startDate, IndicoDateTimeFormats.Server));
                                info.set('endDateTime', Util.formatDateTime(endDate, IndicoDateTimeFormats.Server));
+                               dateArgs.startDate = startDate;
+                               dateArgs.endDate = endDate;
                                hook.set(true);
                            }
                        });
@@ -123,7 +125,7 @@ extend(IndicoUI.Dialogs,
                                    Html.select({name: 'type'}),
                                    days,
                                    function(elem) {
-                                       var d = Util.formatDateTime(elem, IndicoDateTimeFormats.International, IndicoDateTimeFormats.Ordinal);
+                                       var d = Util.formatDateTime(elem, IndicoDateTimeFormats.DefaultHourless, IndicoDateTimeFormats.Ordinal);
                                        return Html.option({value: elem}, d);
                                    }
                                );
@@ -133,7 +135,7 @@ extend(IndicoUI.Dialogs,
                            //value is the new date
                            conferenceDays.observe(function(value) {
                                //it is neccesary to update the date in dateArgs with the new date to make the request
-                               dateArgs.selectedDay = Util.formatDateTime(value, IndicoDateTimeFormats.Server, IndicoDateTimeFormats.Ordinal);
+                               dateArgs.selectedDay = Util.formatDateTime(value, IndicoDateTimeFormats.ServerHourless, IndicoDateTimeFormats.Ordinal);
                                //we make a timeStartMethod request specifying the date for the request
                                //and we get the result of the request in result
                                indicoRequest(timeStartMethod, dateArgs , function(result, error){
@@ -145,8 +147,8 @@ extend(IndicoUI.Dialogs,
                                        var startDate = Util.parseJSDateTime(result, IndicoDateTimeFormats.Server);
                                        var endDate = Util.parseJSDateTime(result, IndicoDateTimeFormats.Server);
 
-                                       var diffHours = dateArgs.endDate.time.substr(0,2) - dateArgs.startDate.time.substr(0,2);
-                                       var diffMinutes = Math.abs(dateArgs.endDate.time.substr(3,2) - dateArgs.startDate.time.substr(3,2));
+                                       var diffHours = dateArgs.endDate.getHours() - dateArgs.startDate.getHours();
+                                       var diffMinutes = Math.abs(dateArgs.endDate.getMinutes() - dateArgs.startDate.getMinutes());
                                        if (startDate.getHours() >= 23) {
                                            startDate.setHours(23);
                                            startDate.setMinutes(0);
@@ -176,7 +178,7 @@ extend(IndicoUI.Dialogs,
                            var timeTranslation = {
                                    toTarget: function (value) {
                                        var aux = conferenceDays.get();
-                                       return Util.formatDateTime(aux, IndicoDateTimeFormats.Server, IndicoDateTimeFormats.Ordinal) + ' ' + value;
+                                       return Util.formatDateTime(aux, IndicoDateTimeFormats.ServerHourless, IndicoDateTimeFormats.Ordinal) + ' ' + value;
                                    },
                                    toSource: function(value) {
                                        return value.substr(11,5);
@@ -253,7 +255,20 @@ extend(IndicoUI.Dialogs,
 
 
                IndicoUtil.waitLoad([
-                   isEdit?function(hook){hook.set(true);}:function(hook) {
+                   isEdit?function(hook){
+                       dateArgs.startDate = new Date(dateArgs.startDate.date.substr(0,4),
+                               dateArgs.startDate.date.substr(5,2),
+                               dateArgs.startDate.date.substr(8,2),
+                               dateArgs.startDate.time.substr(0,2),
+                               dateArgs.startDate.time.substr(3,2),
+                               dateArgs.startDate.time.substr(6,2));
+                       dateArgs.endDate = new Date(dateArgs.endDate.date.substr(0,4),
+                               dateArgs.endDate.date.substr(5,2),
+                               dateArgs.endDate.date.substr(8,2),
+                               dateArgs.endDate.time.substr(0,2),
+                               dateArgs.endDate.time.substr(3,2),
+                               dateArgs.endDate.time.substr(6,2));
+                       hook.set(true);}:function(hook) {
                        // Get "end date" for container, so that the break be added after the rest
                        indicoRequest(timeStartMethod, dateArgs , function(result, error){
                            if (error) {
@@ -275,8 +290,11 @@ extend(IndicoUI.Dialogs,
                                    // end date is one hour later, by default
                                    endDate.setHours(startDate.getHours()+1);
                                }
-                               info.set('startDateTime', Util.formatDateTime(startDate, IndicoDateTimeFormats.Server));
-                               info.set('endDateTime', Util.formatDateTime(endDate, IndicoDateTimeFormats.Server));
+                               
+                               dateArgs.startDate = startDate;
+                               dateArgs.endDate = endDate;
+                               info.set('startDateTime', Util.formatDateTime(startDate, IndicoDateTimeFormats.ServerHourless));
+                               info.set('endDateTime', Util.formatDateTime(endDate, IndicoDateTimeFormats.ServerHourless));
                                hook.set(true);
                            }
                        });
@@ -293,11 +311,6 @@ extend(IndicoUI.Dialogs,
                        });
                    }], function(retVal) {
                        var submitInfo = function(){
-                           //if the day changed
-                           if(previousDay != info.get("startDateTime").substr(0,10))
-                               info.set('dayChanged', true);
-                           else
-                               info.set('dayChanged', false);
                            each(info, function(value, key) {
                                args[key] = value;
                            });
@@ -382,18 +395,17 @@ extend(IndicoUI.Dialogs,
                                    Html.select({name: 'type'}),
                                    days,
                                    function(elem) {
-                                       var d = Util.formatDateTime(elem, IndicoDateTimeFormats.International, IndicoDateTimeFormats.Ordinal);
+                                       var d = Util.formatDateTime(elem, IndicoDateTimeFormats.DefaultHourless, IndicoDateTimeFormats.Ordinal);
                                        return Html.option({value: elem}, d);
                                    }
                                );
-                           //the hour added to dayStartDate is irrelevant and it won't be used, it is only passed to avoid the function crash
                            conferenceDays.set(Util.formatDateTime(dayStartDate, IndicoDateTimeFormats.Ordinal, IndicoDateTimeFormats.ServerHourless));
 
                            //We need to update the value of startDateTime and endDateTime every time that is changed by the user
                            //value is the new date
                            conferenceDays.observe(function(value) {
                                //it is neccesary to update the date in dateArgs with the new date to make the request
-                               dateArgs.selectedDay = Util.formatDateTime(value, IndicoDateTimeFormats.Server, IndicoDateTimeFormats.Ordinal);
+                               dateArgs.selectedDay = Util.formatDateTime(value, IndicoDateTimeFormats.ServerHourless, IndicoDateTimeFormats.Ordinal);
                                //we make a timeStartMethod request specifying the date for the request
                                //and we get the result of the request in result
                                indicoRequest(timeStartMethod, dateArgs , function(result, error){
@@ -405,8 +417,8 @@ extend(IndicoUI.Dialogs,
                                        var startDate = Util.parseJSDateTime(result, IndicoDateTimeFormats.Server);
                                        var endDate = Util.parseJSDateTime(result, IndicoDateTimeFormats.Server);
 
-                                       var diffHours = dateArgs.endDate.time.substr(0,2) - dateArgs.startDate.time.substr(0,2);
-                                       var diffMinutes = Math.abs(dateArgs.endDate.time.substr(3,2) - dateArgs.startDate.time.substr(3,2));
+                                       var diffHours = dateArgs.endDate.getHours() - dateArgs.startDate.getHours();
+                                       var diffMinutes = Math.abs(dateArgs.endDate.getMinutes() - dateArgs.startDate.getMinutes());
                                        if (startDate.getHours() >= 23) {
                                            startDate.setHours(23);
                                            startDate.setMinutes(0);
@@ -435,7 +447,7 @@ extend(IndicoUI.Dialogs,
                            var timeTranslation = {
                                    toTarget: function (value) {
                                        var aux = conferenceDays.get();
-                                       return Util.formatDateTime(aux, IndicoDateTimeFormats.Server, IndicoDateTimeFormats.Ordinal) + ' ' + value;
+                                       return Util.formatDateTime(aux, IndicoDateTimeFormats.ServerHourless, IndicoDateTimeFormats.Ordinal) + ' ' + value;
                                    },
                                    toSource: function(value) {
                                        return value.substr(11,5);

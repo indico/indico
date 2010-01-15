@@ -337,7 +337,7 @@ type("TimetableManagementActions", [], {
             params.selectedDay,
             this.eventInfo.isConference,
             this.eventInfo.favoriteRooms,
-            days.reverse(),
+            days,
             this.timetable,
             function(result) {
                 self._addEntries(result);
@@ -363,7 +363,7 @@ type("TimetableManagementActions", [], {
             $O(params),
             $O(params.roomInfo),
             false,
-            days.reverse(),
+            days,
             this.eventInfo.favoriteRooms);
 
         dialog.execute();
@@ -403,7 +403,7 @@ type("TimetableManagementActions", [], {
             args,
             $O(params.roomInfo),
             true,
-            days.reverse(),
+            days,
             this.eventInfo.favoriteRooms);
         editDialog.open();
 
@@ -415,7 +415,7 @@ type("TimetableManagementActions", [], {
         var params = this._addParams('Session');
 
         //Get the days in which the conference is being held
-        var days = keys(this.timetable.getData());
+        var days = this.timetable.getDays();
 
         IndicoUI.Dialogs.addSession(
             this.methods[params.type].add,
@@ -425,7 +425,7 @@ type("TimetableManagementActions", [], {
             $O(params.roomInfo),
             params.selectedDay,
             this.eventInfo.favoriteRooms,
-            days.reverse(),
+            days,
             function(result) { self.timetable._updateEntry(result, result.id); });
     },
     addSessionSlot: function(session) {
@@ -435,7 +435,7 @@ type("TimetableManagementActions", [], {
         params.parentType = 'Session';
 
         //Get the days in which the conference is being held
-        var days = keys(this.timetable.getData());
+        var days = this.timetable.getDays();
 
         IndicoUI.Dialogs.addSessionSlot(
             this.methods[params.type].add,
@@ -446,7 +446,7 @@ type("TimetableManagementActions", [], {
             params.startDate,
             params.selectedDay,
             this.eventInfo.favoriteRooms,
-            days.reverse(),
+            days,
             function(result) { self.timetable._updateEntry(result, result.id); }
         );
     },
@@ -458,7 +458,7 @@ type("TimetableManagementActions", [], {
         params.parentType = 'Session';
 
         //Get the days in which the conference is being held
-        var days = keys(this.timetable.getData());
+        var days = this.timetable.getDays();
 
         each(eventData, function(value, key) {
             params[key] = value;
@@ -476,7 +476,7 @@ type("TimetableManagementActions", [], {
             params.startDate,
             params.selectedDay,
             this.eventInfo.favoriteRooms,
-            days.reverse(),
+            days,
             function(result) {
                 var aux = result.entry.entries
                 self.timetable._updateEntry(result, result.id);
