@@ -1,5 +1,11 @@
-<br>
-<% if remNotifTplURL: %>
+
+            <% if disabled: %>       
+                <%=_("Call for Abstracts is DISABLED for this conference")%>
+            <% end %>
+            <% elif modifDeadline=="expired": %>
+                <%=_("The deadline for modifications on the submitted abstracts is expired.")%>
+            <% end %>
+<% else: %>
 <table class="groupTable">
     <tr>
         <td id="reviewingModeHelp" colspan="5" class="groupTitle" style="padding-bottom: 10px; padding-left: 20px;">
@@ -25,23 +31,5 @@
         <td colspan="3" class="horizontalLine">&nbsp;</td>
     </tr>
 </table>
-<% end %>
-<% else: %>
-    <table align="center">
-        <td>
-            <tr>    
-                <%=_("Call for Abstracts has current status: 'disabled'.")%>
-            </tr>
-        </td>
-    </table>
-<% end %>
-<% if deadline: %>
-    <table align="center">
-        <td>
-            <tr>    
-                <%=_("The deadline for modifications on the submitted abstracts is expired.")%>
-            </tr>
-        </td>
-    </table>
 <% end %>
 <br>
