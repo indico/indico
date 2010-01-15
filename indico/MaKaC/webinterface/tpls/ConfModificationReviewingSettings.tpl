@@ -592,7 +592,7 @@ var observer = function(value) {
     if (value == "Content reviewing") {
         $E('steptitle').dom.style.display = '';
         $E('title').set('<%= _("content reviewing team")%>');
-        $E('materialsTable').dom.style.display = '';
+        $E('materialsTable').dom.style.display = 'none';
         $E('statusTable').dom.style.display = '';
         $E('reviewingQuestionsTable').dom.style.display = '';
         $E('editingCriteriaTable').dom.style.display = 'none';
@@ -625,7 +625,7 @@ var observer = function(value) {
     if (value == "Layout reviewing") {
         $E('steptitle').dom.style.display = '';
         $E('title').set('<%= _("layout reviewing team")%>');
-        $E('materialsTable').dom.style.display = '';
+        $E('materialsTable').dom.style.display = 'none';
         $E('statusTable').dom.style.display = 'none';
         $E('reviewingQuestionsTable').dom.style.display = 'none';
         $E('editingCriteriaTable').dom.style.display = '';
@@ -656,7 +656,7 @@ var observer = function(value) {
     if (value == "Content and layout reviewing") {
         $E('steptitle').dom.style.display = '';
         $E('title').set('<%= _("content and layout reviewing team")%>');
-        $E('materialsTable').dom.style.display = '';
+        $E('materialsTable').dom.style.display = 'none';
         $E('statusTable').dom.style.display = '';
         $E('reviewingQuestionsTable').dom.style.display = '';
         $E('editingCriteriaTable').dom.style.display = '';
