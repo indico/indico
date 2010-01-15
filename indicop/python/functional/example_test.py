@@ -11,7 +11,6 @@ class ExampleTest(SeleniumTestCase):
         sel.click("createEventLink")
         sel.click("link=Lecture")
         sel.wait_for_page_to_load("30000")
-        self.assertEqual("Log in to Indico", sel.get_text("//div[3]/div[1]"))
         sel.type("login", "dummyuser")
         sel.type("password", "dummyuser")
         sel.click("loginButton")
@@ -164,7 +163,7 @@ class ExampleTest(SeleniumTestCase):
         else: self.fail("time out")
         sel.click("link=Tools")
         sel.wait_for_page_to_load("30000")
-        sel.click("//html/body/div[1]/div[4]/div/table/tbody/tr/td[2]/div/div/div/ul[@id='tabList']/li[5]/a")
+        sel.click("//html/body/div[1]/div[3]/div/table/tbody/tr/td[2]/div/div/div/ul[@id='tabList']/li[5]/a")
         sel.wait_for_page_to_load("30000")
         for i in range(60):
             try:

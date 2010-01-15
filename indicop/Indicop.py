@@ -33,7 +33,7 @@ import StringIO
 from selenium import selenium
 
 
-class BaseTest(object):        
+class BaseTest(object):
     #path to this current file
     setupDir = os.path.dirname(__file__)
     
@@ -66,9 +66,38 @@ class Unit(BaseTest):
 
 class Functional(BaseTest):
     def run(self):
+        if not self.startSeleniumServer():
+            return ('[ERR] Could not start functional tests because selenium'
+                    ' server cannot be started.')
+            
+        #capturing the stderr
+        outerr = StringIO.StringIO()
+        sys.stderr = outerr
+        
+        result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir,
+                                                           'python',
+                                                           'functional')])
+        
+        self.stopSeleniumServer()
+        
+        #restoring the stderr
+        sys.stderr = sys.__stderr__
+        
+        s = outerr.getvalue()
+        self.writeReport("pyfunctional", s)
+        
+        report = ""
+        if result:
+            report = "PY Functional tests succeeded\n"
+        else:
+            report = ("[FAIL] Functional tests - report in "
+                    " indicop/report/pyfunctional.txt\n")
+        return report
+    
+    def startSeleniumServer(self):
+        started = True
         try:
-            #Starting Selenium server
-            child = subprocess.Popen(["java", "-jar",
+            self.child = subprocess.Popen(["java", "-jar",
                                       os.path.join(self.setupDir,
                                                    'python',
                                                    'functional',
@@ -92,34 +121,35 @@ class Functional(BaseTest):
                 print 'Selenium has not started yet. Attempt #%s' % (i+1)
                 time.sleep(5)
         else:
+            started = False
+            
+        return started
+            
+    def stopSeleniumServer(self):
+        self.child.kill()
+            
+class Specify(Functional):
+    def __init__(self, specifyArg):
+        self.specify = specifyArg
+        
+    def run(self):
+        
+        #Just in case we're dealing with functional tests
+        if not self.startSeleniumServer():
             return ('[ERR] Could not start functional tests because selenium'
                     ' server cannot be started.')
-            
-        #capturing the stderr
-        outerr = StringIO.StringIO()
-        sys.stderr = outerr
         
+        #running dthe test and ouputing in the console
         result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir,
                                                            'python',
-                                                           'functional')])
+                                                           self.specify)])
         
-        #restoring the stderr
-        sys.stderr = sys.__stderr__
+        self.stopSeleniumServer()
         
-        s = outerr.getvalue()
-        self.writeReport("pyfunctional", s)
-        
-        report = ""
         if result:
-            report = "PY Functional tests succeeded\n"
+            return "Specified Test - Succeeded\n"
         else:
-            report = ("[FAIL] Functional tests - report in "
-                    " indicop/report/pyfunctional.txt\n")
-            
-        #Stopping Selenium Server
-        child.kill()
-        
-        return report
+            return "[FAIL] Specified Test - read output from console\n"
     
 class Pylint(BaseTest):
     def run(self):
@@ -131,7 +161,7 @@ class Pylint(BaseTest):
                                                 os.path.join(self.setupDir,
                                                              '..',
                                                              'indico',
-                                                             'MaKaC')))
+                                                             'MaKaC', 'conference.py')))
         if statusOutput[1].find("pylint: not found") > -1:
             return ("[ERR] Could not start Source Analysis - "
                     "command \"pylint\" needs to be in your PATH.")
@@ -342,17 +372,8 @@ class Indicop(object):
             
         
         #specified test can either be unit or functional.
-        #It makes more sense to run it here.
         if specify:
-            #running directly the test here and ouputing in the console
-            result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir,
-                                                               'python',
-                                                               specify)])
-            if result:
-                returnString += "Specified Test - Succeeded\n"
-            else:
-                returnString += "[FAIL] Specified Test - \
-                                    read output from console\n"
+            returnString += Specify(specify).run()
         else:
             for test in testsToRun:
                 try:
