@@ -54,9 +54,6 @@
                 <td colspan="2">
                     %(searchResultsTable)s
                 </td>
-                <td>
-                    %(selectionBox)s
-                </td>
             </tr>
             <tr>
                 <td colspan="2">
@@ -65,9 +62,11 @@
             </tr>
             <tr>
                 <td colspan="3" align="center">
-                  <input type="submit" class="btn" value="<%= _("cancel")%>" name="cancel">
+                    <input type="submit" class="btn" value="<%= _("select")%>">
+                    <input type="submit" class="btn" value="<%= _("cancel")%>" name="cancel">
                 </td>
             </tr>
         </form>
     <% end %>
 </table>
+

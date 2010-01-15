@@ -165,7 +165,7 @@ class WMaterialDisplay(wcomponents.WTemplated):
                     url = res.getURL()
                     if url.find(".wmv") != -1:
                         url = urlHandlers.UHVideoWmvAccess().getURL(res)
-                    elif url.find(".flv") != -1 or url.find("rtmp://") != -1:
+                    elif url.find(".flv") != -1 or url.find(".f4v") != -1 or url.find("rtmp://") != -1:
                         url = urlHandlers.UHVideoFlashAccess().getURL(res)
                     if res.getName() != "" and res.getName() != res.getURL():
                         title = """<b><a href="%s">%s</a></b>""" % (url, res.getName())

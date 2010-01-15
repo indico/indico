@@ -278,7 +278,7 @@ class WPCalendar( WPCalendarBase ):
         return wc.getHTML( params )
     
     def _getNavigationDrawer(self):
-        link = [{"url": urlHandlers.UHCalendar.getURL([self._categ]), "title": _("Calendar overview")}]
+        link = [{"url": urlHandlers.UHCalendar.getURL([self._categ]), "title": _("Calendar overview"), "type": "Calendar"}]
         pars = {"target": self._categ, "isModif": False}
         return wcomponents.WNavigationDrawer( pars, appendPath = link )
 

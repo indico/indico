@@ -2756,6 +2756,12 @@ class Conference(Persistent, Fossilizable):
 
         self.removeAllEvaluations()
 
+        #For each conference we have a list of managers. If we delete the conference but we don't delete
+        #the link in every manager to the conference then, when the manager goes to his "My profile" he
+        #will see a link to a conference that doesn't exist. Therefore, we need to delete that link as well
+        for manager in self.getManagerList():
+            manager.unlinkTo(self, "manager")
+
         TrashCanManager().add(self)
 
         indexes.IndexesHolder().getById("OAIConferenceModificationDate").unindexConference(self)
@@ -2763,7 +2769,7 @@ class Conference(Persistent, Fossilizable):
 
     def getConference( self ):
         return self
-    
+
     def getObservers(self):
         if not hasattr(self, "_observers"):
             self._observers = []

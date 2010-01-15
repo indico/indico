@@ -39,6 +39,8 @@ from setuptools.command import develop, install, sdist, bdist_egg, easy_install
 from setuptools import setup, find_packages, findall
 from subprocess import Popen, PIPE
 
+EXTRA_RESOURCES_URL = "http://cdswaredev.cern.ch/indico/wiki/Admin/Installation/IndicoExtras"
+
 if sys.platform == 'linux2':
     import pwd
     import grp
@@ -197,15 +199,7 @@ class jsbuild(Command):
         from MaKaC.consoleScripts.installBase import jsCompress
         jsCompress()
 
-class fetchdeps_indico(Command):
-    description = "fetch all the dependencies needed to run Indico"
-    user_options = []
-    boolean_options = []
-
-    def initialize_options(self): pass
-
-    def finalize_options(self): pass
-
+class fetchdeps:
     def run(self):
         print "Checking if dependencies need to be installed..."
 
@@ -219,9 +213,23 @@ class fetchdeps_indico(Command):
 
     def _installMissing(self, dist):
         env = pkg_resources.Environment()
-        easy_install.main(["-U",str(dist)])
+        print dist, EXTRA_RESOURCES_URL
+        easy_install.main(["-f", EXTRA_RESOURCES_URL, "-U", str(dist)])
         env.scan()
         return env[str(dist)][0]
+
+
+class fetchdeps_indico(fetchdeps, Command):
+    description = "fetch all the dependencies needed to run Indico"
+    user_options = []
+    boolean_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
 
 class develop_indico(Command):
     description = "prepares the current directory for Indico development"
@@ -235,6 +243,8 @@ class develop_indico(Command):
         pass
 
     def run(self):
+
+        fetchdeps().run()
 
         local = 'etc/indico.conf'
         if os.path.exists(local):
@@ -335,13 +345,13 @@ if __name__ == '__main__':
                     },
 
           version = _versionInit(),
-          description = "Integrated Digital Conference",
+          description = "Indico is a full-featured conference lifecycle management and meeting/lecture scheduling tool",
           author = "Indico Team",
-          author_email = "indico-project@cern.ch",
-          url = "http://cern.ch/indico",
-          download_url = "http://cern.ch/indico/download-beta.html",
+          author_email = "indico-team@cern.ch",
+          url = "http://cdswaredev.cern.ch/indico",
+          download_url = "http://cdswaredev.cern.ch/indico/wiki/Releases/Indico0.97.0",
           platforms = ["any"],
-          long_description = "Integrated Digital Conference",
+          long_description = "Indico allows you to schedule conferences, from single talks to complex meetings with sessions and contributions. It also includes an advanced user delegation mechanism, allows paper reviewing, archival of conference information and electronic proceedings",
           license = "http://www.gnu.org/licenses/gpl-2.0.txt",
           package_dir = { '': 'indico' },
           entry_points = {
@@ -357,6 +367,6 @@ if __name__ == '__main__':
           package_data = {'indico': ['*.*'] },
           include_package_data = True,
           dependency_links = [
-                              "http://cdswaredev.cern.ch/indico/wiki/Admin/Installation/IndicoExtras"
+                              EXTRA_RESOURCES_URL
                               ],
           )

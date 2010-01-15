@@ -12,6 +12,7 @@ include ez_setup.py
 
 recursive-include bin *
 recursive-include etc *
+include indico/__init__.py
 recursive-include indico/htdocs *
 recursive-include indico/MaKaC *
 recursive-include tests *

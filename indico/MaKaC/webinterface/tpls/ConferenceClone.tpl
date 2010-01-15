@@ -1,6 +1,6 @@
 <script type="text/javascript">	
-	
-	var dateOnce = IndicoUI.Widgets.Generic.dateField(false,null,['stddo', 'stdmo', 'stdyo'])
+        var date = new Date();
+	var dateOnce = IndicoUI.Widgets.Generic.dateField_sdate(false,Util.formatDateTime(date, IndicoDateTimeFormats.DefaultHourless),['stddo', 'stdmo', 'stdyo'])
 	var dateInterval_start = IndicoUI.Widgets.Generic.dateField(false,null,['inddi', 'indmi', 'indyi'])
 	var dateInterval_until = IndicoUI.Widgets.Generic.dateField(false,null,['stddi', 'stdmi', 'stdyi'])
 	var dateDays_start = IndicoUI.Widgets.Generic.dateField(false,null,['inddd', 'indmd', 'indyd'])

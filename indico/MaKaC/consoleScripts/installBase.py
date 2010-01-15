@@ -44,8 +44,14 @@ import MaKaC
 INDICO_INSTALL = False
 
 LOCALDATABASEDIR = '/opt/indico/db'
-PWD_INDICO_CONF = 'etc/indico.conf'
 
+# Egg directory + etc/indico.conf
+PWD_INDICO_CONF = os.path.abspath(os.path.join(
+    os.path.split(os.path.dirname(MaKaC.__file__))[0],'etc', 'indico.conf'
+    ))
+
+print os.path.dirname(__file__)
+print PWD_INDICO_CONF
 
 def setIndicoInstallMode(newmode):
     """
@@ -509,6 +515,8 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
 
     # Shall we create a DB?
     dbInstalledBySetupPy = False
+    dbpath = None
+
     if force_no_db:
         print 'Skipping database detection'
     else:
@@ -562,7 +570,7 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
     # set the directory for the egg cache
     _updateMaKaCEggCache(os.path.join(package_dir, 'MaKaC', '__init__.py'), targetDirs['tmp'])
 
-    if not force_no_db:
+    if not force_no_db and dbpath:
         # change the db config files (paths + apache user/group)
         _updateDbConfigFiles(dbpath, targetDirs['log'], targetDirs['etc'], targetDirs['tmp'], user)
 

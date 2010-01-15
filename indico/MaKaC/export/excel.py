@@ -127,7 +127,7 @@ class RegistrantsListToExcel:
                     status=self._regForm.getStatusById(ids[1])
                     excelGen.addValue(status.getCaption())
                 else:
-                    excelGene.addValue("")
+                    excelGen.addValue("")
             else:
                 ids=key.split("-")
                 if len(ids)==2:
@@ -159,7 +159,7 @@ class RegistrantsListToExcel:
                 elif key == "Address":
                     excelGen.addValue(reg.getAddress())
                 elif key == "Phone":
-                    excelGen.addNumberAsString(reg.getPhone())
+                    excelGen.addValue(reg.getPhone())
                 elif key == "Sessions":
                     p7 = []
                     for ses in reg.getSessionList():

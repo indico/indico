@@ -11,10 +11,5 @@
 
   </ul>
 </td></tr>
-<tr>
-  <td align="center" style="border-bottom:1px solid #777777; padding-bottom:10px">
-    <input type="submit" class="btn" value="<%= _("select")%>">
-  </td>
-</tr>
 </table>
 <br>
