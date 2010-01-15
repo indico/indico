@@ -159,7 +159,7 @@ class RegistrantsListToExcel:
                 elif key == "Address":
                     excelGen.addValue(reg.getAddress())
                 elif key == "Phone":
-                    excelGen.addNumberAsString(reg.getPhone())
+                    excelGen.addValue(reg.getPhone())
                 elif key == "Sessions":
                     p7 = []
                     for ses in reg.getSessionList():
