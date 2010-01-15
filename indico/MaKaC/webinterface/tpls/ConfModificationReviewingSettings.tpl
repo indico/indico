@@ -53,7 +53,7 @@
 <% end %>
 <!-- for now we leave the boxes for chosing reviewing material not to display(they are not used any more)
 ToDo: to remove the code which is not using any more, but to know that we have this wonderful Widget  -->
-<table id='materialsTable' width="90%%" align="center" border="0" style="margin-bottom:1em; display:none">
+<table id='materialsTable' width="90%%" align="center" border="0" style="display:none;">
     <tr>
         <td id="reviewableMaterialsHelp" colspan="5" class="reviewingsubtitle" style="padding-top: 20px;">
             <span><%= _("Choose types of materials to be revised")%></span>

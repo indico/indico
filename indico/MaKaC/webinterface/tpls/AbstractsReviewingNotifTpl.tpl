@@ -1,4 +1,4 @@
-
+<br>
             <% if disabled: %>       
                 <%=_("Call for Abstracts is DISABLED for this conference")%>
             <% end %>
@@ -26,10 +26,7 @@
             <input type="submit" class="btn" value="<%= _("add")%>">
         </td>
         </form>
-    </tr>
-    <tr>
-        <td colspan="3" class="horizontalLine">&nbsp;</td>
-    </tr>
+    </tr>    
 </table>
 <% end %>
 <br>

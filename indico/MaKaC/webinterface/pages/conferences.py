@@ -5503,8 +5503,6 @@ class WAbstractsReviewingNotifTpl( wcomponents.WTemplated ):
                 vars["notifTpls"]=self._getNotifTplsHTML()
                 vars["addNotifTplURL"]=urlHandlers.UHAbstractModNotifTplNew.getURL(self._conf)
                 vars["remNotifTplURL"]=urlHandlers.UHAbstractModNotifTplRem.getURL(self._conf)
-        else:
-            vars["disabled"]=True
         return vars
 
 
