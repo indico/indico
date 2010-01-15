@@ -5493,6 +5493,7 @@ class WAbstractsReviewingNotifTpl( wcomponents.WTemplated ):
         vars["addNotifTplURL"]=""
         vars["remNotifTplURL"]=""
         vars["modifDeadline"]=""
+        vars["disabled"]=True
         if abMgr.getCFAStatus():
             vars["disabled"]=False
             modifDL = abMgr.getModificationDeadline()
