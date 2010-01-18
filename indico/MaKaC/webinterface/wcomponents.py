@@ -859,7 +859,7 @@ class WContribListBannerModif(WTimetableBannerModif):
 class WNotifTplBannerModif(WBannerModif):
 
     def __init__( self, target ):
-        path = [{"url": urlHandlers.UHAbstractReviewingNotifTpl.getURL(target), "title":_("Abstracts Reviewing")}]
+        path = [{"url": urlHandlers.UHConfModifCFA.getURL(target), "title":_("Call for Abstracts")}]
         itemType="Notification Template"
         title=target.getName()
         WBannerModif.__init__(self, path, itemType, title)

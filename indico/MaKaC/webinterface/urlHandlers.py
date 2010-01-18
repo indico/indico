@@ -4418,9 +4418,6 @@ class UHConfRemoveReviewer( URLHandler ):
     _relativeURL = "confModifReviewingControl.py/removeReviewer"
 
 class UHConfSelectAbstractReviewer( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/selectAbstractReviewer"
-
-class UHConfAddAbstractReviewer( URLHandler ):
     _relativeURL = "confModifAbstractsReviewingControl.py/selectAbstractReviewer"
     
 class UHConfAddAbstractReviewer( URLHandler ):

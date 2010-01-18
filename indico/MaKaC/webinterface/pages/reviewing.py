@@ -109,7 +109,11 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
         if not self._conf.hasEnabledSection("cfa"):
             self._subtabAbstractsReviewing.setHidden(True)
         self._setActiveTab()
-
+        
+        """ For now we leave the Abstracts Reviewing tab Hidden as it is still not adapted to be used
+        """
+        self._subtabAbstractsReviewing.setHidden(True) 
+        
     def _getPageContent(self, params):
         self._createTabCtrl()
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )

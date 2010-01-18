@@ -5792,7 +5792,7 @@ class WPModCFANotifTplBase(WPConferenceModifBase):
         pass
 
     def _setActiveSideMenuItem(self):
-        self._reviewingMenuItem.setActive()
+        self._abstractMenuItem.setActive()
 
 #    def _applyFrame( self, body ):
 #        frame = wcomponents.WNotifTPLModifFrame( self._notifTpl, self._getAW() )
