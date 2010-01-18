@@ -7590,6 +7590,7 @@ class WConfModifContribList(wcomponents.WTemplated):
         return html
 
     def _getTypeItemsHTML(self):
+        checked=""
         if self._filterCrit.getField("type").getShowNoValue():
             checked=" checked"
         res=[ _("""<input type="checkbox" name="typeShowNoValue" value="--none--"%s> --_("not specified")--""")%checked]
