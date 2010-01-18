@@ -31,19 +31,93 @@ import time
 import commands
 import StringIO
 from selenium import selenium
-
+from MaKaC.common.db import DBMgr
+from MaKaC import user
+from MaKaC.authentication import AuthenticatorMgr
+from MaKaC.common import HelperMaKaCInfo
+from MaKaC.common import indexes
 
 class BaseTest(object):
     #path to this current file
     setupDir = os.path.dirname(__file__)
     
+    def __init__(self):
+        self.al = None
+        self.ah = None
+        self.avatar = None
+        self.ih = None
+    
     def writeReport(self, filename, content):
         f = open(os.path.join(self.setupDir, 'report', filename + ".txt"), 'w')
         f.write(content)
         f.close()
-
+        
+    def createDummyUser(self):
+        DBMgr.getInstance().startRequest()
+        
+        #filling info to new user
+        self.avatar = user.Avatar()
+        self.avatar.setName( "fake" )
+        self.avatar.setSurName( "fake" )
+        self.avatar.setOrganisation( "fake" )
+        self.avatar.setLang( "en_US" )
+        self.avatar.setEmail( "fake@fake.fake" )
+        
+        #registering user
+        self.ah = user.AvatarHolder()
+        self.ah.add(self.avatar)
+        
+        #setting up the login info
+        li = user.LoginInfo( "dummyuser", "dummyuser" )
+        self.ih = AuthenticatorMgr()
+        userid = self.ih.createIdentity( li, self.avatar, "Local" )
+        self.ih.add( userid )
+        
+        #activate the account
+        self.avatar.activateAccount()
+        
+        #since the DB is empty, we have to add dummy user as admin
+        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+        self.al = minfo.getAdminList()
+        self.al.grant( self.avatar )
+        
+        DBMgr.getInstance().endRequest()
+        
+    def deleteDummyUser(self):
+        DBMgr.getInstance().startRequest()
+        
+        #removing user from admin list
+        self.al.revoke( self.avatar )
+        
+        #remove the login info
+        userid = self.avatar.getIdentityList()[0]
+        self.ih.removeIdentity(userid)
+        
+        #unregistering the user info
+        index = indexes.IndexesHolder().getById("email")
+        index.unindexUser(self.avatar)
+        index = indexes.IndexesHolder().getById("name")
+        index.unindexUser(self.avatar)
+        index = indexes.IndexesHolder().getById("surName")
+        index.unindexUser(self.avatar)
+        index = indexes.IndexesHolder().getById("organisation")
+        index.unindexUser(self.avatar)
+        index = indexes.IndexesHolder().getById("status")
+        index.unindexUser(self.avatar)
+        
+        #removing user from list
+        la = self.ih.getById("Local")
+        la.remove(userid)
+        self.ah.remove(self.avatar)
+        
+        DBMgr.getInstance().endRequest()
+        
+        
 class Unit(BaseTest):
     def run(self):
+        
+        self.createDummyUser()
+        
         #capturing the stderr
         outerr = StringIO.StringIO()
         sys.stderr = outerr
@@ -59,12 +133,17 @@ class Unit(BaseTest):
         s = outerr.getvalue()
         self.writeReport("pyunit", s)
         
+        self.deleteDummyUser()
+        
         if result:
             return "PY Unit tests succeeded\n"
         else:
             return "[FAIL] Unit tests - report in indicop/report/pyunit.txt\n"
 
 class Functional(BaseTest):
+    def __init__(self):
+        self.child = None
+        
     def run(self):
         if not self.startSeleniumServer():
             return ('[ERR] Could not start functional tests because selenium'
@@ -150,6 +229,85 @@ class Specify(Functional):
             return "Specified Test - Succeeded\n"
         else:
             return "[FAIL] Specified Test - read output from console\n"
+        
+class Grid(BaseTest):
+    def __init__(self, hubUrl, hubPort, hubEnv):
+        self.hubEnv = hubEnv
+        self.gridData = GridData.getInstance()
+        self.gridData.setUrl(hubUrl)
+        self.gridData.setPort(hubPort)
+        self.gridData.setActive(False)
+        
+    def run(self):
+        self.gridData.setActive(True)
+        
+        #capturing the stderr
+        outerr = StringIO.StringIO()
+        sys.stderr = outerr
+        
+        returnString = ""
+        for env in self.hubEnv:
+            self.gridData.setEnv(env)
+            sys.stderr.write('~ %s ~\n' % env)
+            result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir,
+                                                               'python',
+                                                               'functional')])
+            if result:
+                returnString += "PY Functional (%s) tests succeeded\n" % env
+            else:
+                returnString += ("[FAIL] Functional (%s) tests - report in "
+                        " indicop/report/pygrid.txt\n") % env
+                        
+        #restoring the stderr
+        sys.stderr = sys.__stderr__
+        
+        s = outerr.getvalue()
+        self.writeReport("pygrid", s)
+        
+        return returnString
+
+    
+class GridData(BaseTest):
+    """Provide informations for selenium grid, data are set from Class Grid
+    and are used by seleniumTestCase.py.
+    Because nosetest cannot forward the arguments to selenium grid."""
+    
+    __instance = None
+    def __init__(self):
+        self.active = None
+        self.url = None
+        self.port = None
+        self.active = None
+        self.currentEnv = None
+    
+    def isActive(self):
+        return self.active
+    def getUrl(self):
+        return self.url
+    def getPort(self):
+        return self.port
+    def getEnv(self):
+        return self.currentEnv
+    
+    def setActive(self, active):
+        self.active = active
+    def setUrl(self, url):
+        self.url = url
+    def setPort(self, port):
+        self.port = port
+    def setEnv(self, env):
+        self.currentEnv = env
+    
+    def getInstance(cls):
+        """returns an instance of the Config class ensuring only a single
+           instance is created. All the clients should use this method for
+           setting a Config object instead of normal instantiation
+        """
+        if cls.__instance == None:
+            cls.__instance = GridData()
+        return cls.__instance
+
+    getInstance = classmethod( getInstance )
     
 class Pylint(BaseTest):
     def run(self):
@@ -161,7 +319,7 @@ class Pylint(BaseTest):
                                                 os.path.join(self.setupDir,
                                                              '..',
                                                              'indico',
-                                                             'MaKaC', 'conference.py')))
+                                                             'MaKaC')))
         if statusOutput[1].find("pylint: not found") > -1:
             return ("[ERR] Could not start Source Analysis - "
                     "command \"pylint\" needs to be in your PATH.")
@@ -350,6 +508,14 @@ class Jslint(BaseTest):
 class Indicop(object):
     
     def __init__(self, jsspecify, jscoverage):
+        
+        #MODIFY ACCORDINGLY TO YOUR SELENIUM GRID INSTALLATION
+        self.gridUrl = "macuds01.cern.ch"
+        self.gridPort = 4444
+        self.gridEnv = ["Firefox on OS X",
+                        "Safari on OS X"]
+        self.grid = Grid(self.gridUrl, self.gridPort, self.gridEnv)
+        
         #variables for jsunit
         self.jsSpecify = jsspecify
         self.jsCoverage = jscoverage
@@ -359,7 +525,8 @@ class Indicop(object):
                  'functional': Functional(),
                  'pylint': Pylint(),
                  'jsunit': Jsunit(self.jsSpecify, self.jsCoverage),
-                 'jslint': Jslint()}
+                 'jslint': Jslint(),
+                 'grid': self.grid}
 
     
     def main(self, specify, coverage, testsToRun):
@@ -388,3 +555,5 @@ class Indicop(object):
         
         return returnString
     
+    def getGrid(self):
+        return self.grid

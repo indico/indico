@@ -308,7 +308,8 @@ class tests_indico(Command):
                     ('jsunit', None, "Run js unit tests"),
                     ('jslint', None, "Run js source analysis"),
                     ('jscoverage', None, "Output coverage report in html for js"),
-                    ('jsspecify=', None, "Use js-test-driver style (TestCaseName.testName)")]
+                    ('jsspecify=', None, "Use js-test-driver style (TestCaseName.testName)"),
+                    ('grid', None, "Use Selenium Grid")]
     boolean_options = []
     
     specify = None
@@ -320,6 +321,7 @@ class tests_indico(Command):
     jslint = False
     jscoverage = False
     jsspecify = None
+    grid = None
     
     def initialize_options(self): pass
 
@@ -338,12 +340,15 @@ class tests_indico(Command):
             testsToRun.append('jsunit')
         elif self.jslint:
             testsToRun.append('jslint')
+        elif self.grid:
+            testsToRun.append('grid')
         else:
             testsToRun.append('unit')
             testsToRun.append('functional')
             testsToRun.append('pylint')
             testsToRun.append('jsunit')
             testsToRun.append('jslint')
+            testsToRun.append('grid')
         
         indicop = Indicop(self.jsspecify, self.jscoverage)
         result = indicop.main(self.specify, self.coverage, testsToRun)

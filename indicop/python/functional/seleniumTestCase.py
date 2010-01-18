@@ -1,26 +1,27 @@
 from MaKaC.common.db import DBMgr
-from MaKaC import user
-from MaKaC.common import indexes
-from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.conference import ConferenceHolder
 from MaKaC.errors import MaKaCError
-from MaKaC.common import HelperMaKaCInfo
-import unittest, time, re
+from indicop.Indicop import BaseTest
+from indicop.Indicop import GridData
+import unittest
 from twill import commands as tc
-import figleaf
 from selenium import selenium
-import unittest, time
-import sys
-import socket
+import unittest
 from twill import commands as tc
+from MaKaC.common.Configuration import Config
 
-class SeleniumTestCase(unittest.TestCase):
+class SeleniumTestCase(unittest.TestCase, BaseTest):
     
     def setUp(self):
         self.verificationErrors = []
         self.confId = None
-        self.selenium = selenium("localhost", 4444, "*chrome", self.getRootUrl())
-#        self.selenium = selenium("localhost", 4444, 'IE on Windows', self.getRootUrl())
+        
+        grid = GridData.getInstance()
+        if grid.isActive():
+            self.selenium = selenium(grid.getUrl(), grid.getPort(), grid.getEnv(), self.getRootUrl())
+        else:
+            self.selenium = selenium("localhost", 4444, "*chrome", self.getRootUrl())
+            
         self.selenium.start()
         
         #Create dummy user and use this user to create conf, session and so on
@@ -44,75 +45,16 @@ class SeleniumTestCase(unittest.TestCase):
         print "Errors array: %s" % self.verificationErrors
         self.assertEqual([], self.verificationErrors)
     
-    
     def getRootUrl(self):
-        #set this accordingly to your indico installation
-        return "http://pcituds01/"
-    
-    def createDummyUser(self):
-        DBMgr.getInstance().startRequest()
-        
-        #filling info to new user
-        self.avatar = user.Avatar()
-        self.avatar.setName( "fake" )
-        self.avatar.setSurName( "fake" )
-        self.avatar.setOrganisation( "fake" )
-        self.avatar.setLang( "en_US" )
-        self.avatar.setEmail( "fake@fake.fake" )
-        
-        #registering user
-        self.ah = user.AvatarHolder()
-        self.ah.add(self.avatar)
-        
-        #setting up the login info
-        li = user.LoginInfo( "dummyuser", "dummyuser" )
-        self.ih = AuthenticatorMgr()
-        id = self.ih.createIdentity( li, self.avatar, "Local" )
-        self.ih.add( id )
-        
-        #activate the account
-        self.avatar.activateAccount()
-        
-        #since the DB is empty, we have to add dummy user as admin
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        self.al = minfo.getAdminList()
-        self.al.grant( self.avatar )
-        
-        DBMgr.getInstance().endRequest()
-        
-    def deleteDummyUser(self):
-        DBMgr.getInstance().startRequest()
-        
-        #removing user from admin list
-        self.al.revoke( self.avatar )
-        
-        #remove the login info
-        id=self.avatar.getIdentityList()[0]
-        self.ih.removeIdentity(id)
-        
-        #unregistering the user info
-        index = indexes.IndexesHolder().getById("email")
-        index.unindexUser(self.avatar)
-        index = indexes.IndexesHolder().getById("name")
-        index.unindexUser(self.avatar)
-        index = indexes.IndexesHolder().getById("surName")
-        index.unindexUser(self.avatar)
-        index = indexes.IndexesHolder().getById("organisation")
-        index.unindexUser(self.avatar)
-        index = indexes.IndexesHolder().getById("status")
-        index.unindexUser(self.avatar)
-        
-        #removing user from list
-        la = self.ih.getById("Local")
-        la.remove(id)
-        self.ah.remove(self.avatar)
-        
-        DBMgr.getInstance().endRequest()
+        return Config.getInstance().getBaseURL()
         
     def setConfID(self, url):
-        #Parsing the url to retrieve the confId
-        #if the confID is set up, we'll try to delete this conference in the teardown
-        #in case the test fails
+        """
+        Parsing the url to retrieve the confId
+        if the confID is set up, we'll try to delete this conference in the teardown
+        in case the test fails
+        """
+        
         splitUrl = url.split('=')
         self.confId = splitUrl[1]
         

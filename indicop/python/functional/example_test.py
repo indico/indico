@@ -15,7 +15,6 @@ class ExampleTest(SeleniumTestCase):
         sel.type("password", "dummyuser")
         sel.click("loginButton")
         sel.wait_for_page_to_load("30000")
-        #self.assertEqual("The lecture will take place in 1 2 3 4 5 6 7 8 9 date(s)", sel.get_text("//form[@id='eventCreationForm']/table[1]/tbody/tr[2]/td[2]")) not working in IE
         sel.type("title", "lecture test")
         sel.click("advancedOptionsText")
         self.assertEqual("Default layout style", sel.get_text("//tr[@id='advancedOptions']/td/table/tbody/tr[2]/td[1]/span"))
