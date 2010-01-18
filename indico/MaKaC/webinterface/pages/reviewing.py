@@ -69,6 +69,11 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
         if self._isAM or self._canModify:
             self._subtabAbstractsReviewing = self._tabCtrl.newTab( "abstractsrev", "Abstracts Reviewing", \
                 urlHandlers.UHConfModifReviewingAbstractSetup.getURL( target = self._conf ) )
+            """ For now we leave the Abstracts Reviewing tab Hidden as it is still not adapted to be used
+            """
+            self._subtabAbstractsReviewing.setHidden(True) 
+            if not self._conf.hasEnabledSection("cfa"):
+                self._subtabAbstractsReviewing.setHidden(True)
         
         if self._isPRM or self._canModify:
             self._subTabPaperReviewingSetup = self._subtabPaperReviewing.newSubTab( "revsetup", "Setup",\
@@ -106,14 +111,9 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
                     urlHandlers.UHConfModifListContribToJudgeAsEditor.getURL( self._conf ) ) 
             
         
-        if not self._conf.hasEnabledSection("cfa"):
-            self._subtabAbstractsReviewing.setHidden(True)
         self._setActiveTab()
         
-        """ For now we leave the Abstracts Reviewing tab Hidden as it is still not adapted to be used
-        """
-        self._subtabAbstractsReviewing.setHidden(True) 
-        
+               
     def _getPageContent(self, params):
         self._createTabCtrl()
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
