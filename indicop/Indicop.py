@@ -147,7 +147,7 @@ class Functional(BaseTest):
     def run(self):
         if not self.startSeleniumServer():
             return ('[ERR] Could not start functional tests because selenium'
-                    ' server cannot be started.')
+                    ' server cannot be started.\n')
             
         #capturing the stderr
         outerr = StringIO.StringIO()
@@ -184,7 +184,7 @@ class Functional(BaseTest):
                                       stdout=subprocess.PIPE)
         except OSError:
             return ("[ERR] Could not start selenium server - command \"java\""
-                    " needs to be in your PATH.")
+                    " needs to be in your PATH.\n")
             
         sel = selenium("localhost", 4444, "*chrome", "http://www.cern.ch/")
         for i in range(5):
@@ -197,7 +197,7 @@ class Functional(BaseTest):
                 #server has started
                 break
             except socket.error:
-                print 'Selenium has not started yet. Attempt #%s' % (i+1)
+                print 'Selenium has not started yet. Attempt #%s\n' % (i+1)
                 time.sleep(5)
         else:
             started = False
@@ -216,7 +216,7 @@ class Specify(Functional):
         #Just in case we're dealing with functional tests
         if not self.startSeleniumServer():
             return ('[ERR] Could not start functional tests because selenium'
-                    ' server cannot be started.')
+                    ' server cannot be started.\n')
         
         #running dthe test and ouputing in the console
         result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir,
@@ -248,7 +248,7 @@ class Grid(BaseTest):
         returnString = ""
         for env in self.hubEnv:
             self.gridData.setEnv(env)
-            sys.stderr.write('~ %s ~\n' % env)
+            sys.stderr.write('\n~ %s ~\n' % env)
             result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir,
                                                                'python',
                                                                'functional')])
@@ -319,10 +319,10 @@ class Pylint(BaseTest):
                                                 os.path.join(self.setupDir,
                                                              '..',
                                                              'indico',
-                                                             'MaKaC')))
+                                                             'MaKaC', 'conference.py')))
         if statusOutput[1].find("pylint: not found") > -1:
             return ("[ERR] Could not start Source Analysis - "
-                    "command \"pylint\" needs to be in your PATH.")
+                    "command \"pylint\" needs to be in your PATH.\n")
         else:
             self.writeReport("pylint", statusOutput[1])
             return "PY Lint - report in indicop/report/pylint.txt\n"
@@ -389,14 +389,14 @@ class Jsunit(BaseTest):
                 if jsDryRun[1].startswith(("No browsers were captured, "
                                            "nothing to run...")):
                     print ("Js-test-driver server has not started yet. "
-                           "Attempt #%s") % (i+1)
+                           "Attempt #%s\n") % (i+1)
                     time.sleep(5)
                 else:
                     #server is ready
                     break
             else:
                 return ('[ERR] Could not start js unit tests because '
-                        'js-test-driver server cannot be started.')
+                        'js-test-driver server cannot be started.\n')
                 
             #setting tests to run
             toTest = ""
@@ -459,7 +459,7 @@ class Jsunit(BaseTest):
                           "indicop/report/jsunit.txt\n")
         except OSError:
             return ("[ERR] Could not start js-test-driver server - command "
-                    "\"java\" needs to be in your PATH.")
+                    "\"java\" needs to be in your PATH.\n")
             
         #stopping the server
         server.kill()
@@ -478,7 +478,7 @@ class Jslint(BaseTest):
         statusOutput = commands.getstatusoutput("rhino -?")
         if statusOutput[1].find("rhino: not found") > -1:
             return ("[ERR] Could not start JS Source Analysis - command "
-                    "\"rhino\" needs to be in your PATH.")
+                    "\"rhino\" needs to be in your PATH.\n")
         
         for folderName in folderNames:
             for root, dirs, files in os.walk(os.path.join(self.setupDir,
