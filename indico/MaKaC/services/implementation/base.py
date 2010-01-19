@@ -89,7 +89,8 @@ class ParameterManager(object):
 
         value = self._paramList.get(paramName)
 
-        if (not allowEmpty) and (not value):
+
+        if (not allowEmpty) and (value == None):
             raise EmptyParameterException(paramName)
 
         if pType == str:
@@ -134,17 +135,20 @@ class ParameterManager(object):
         elif pType == list:
             if not (type(value) == list or (allowEmpty and value == None)):
                 raise ExpectedParameterException(paramName, list, type(value))
+        elif pType == bool:
+            if not (type(value) == bool or (allowEmpty and value == None)):
+                raise ExpectedParameterException(paramName, list, type(value))
 
         return value
 
     def setTimezone(self, tz):
         self._timezone = tz
 
-class ServiceBase(RequestHandlerBase):    
+class ServiceBase(RequestHandlerBase):
     """
     The ServiceBase class is the basic class for services.
-    """    
-    
+    """
+
     def __init__(self, params, remoteHost, session):
         """
         Constructor.  Initializes provate variables
