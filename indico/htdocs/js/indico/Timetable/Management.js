@@ -468,6 +468,37 @@ type("TimetableManagementActions", [], {
         moveEntryDiag.open();
     },
 
+
+    /*
+     * Moves entries up or down, according to the "arrows"
+     */
+    moveEntryUpDown: function(eventData, direction) {
+        /*
+         * true - up
+         * false - down
+         */
+
+        info = this._getLocatorParams(eventData);
+        info.set('direction', direction);
+
+        var self = this;
+
+        var killProgress = IndicoUI.Dialogs.Util.progress();
+
+        indicoRequest('schedule.moveEntryUpDown',
+                      info,
+                      function(result, error){
+                          killProgress();
+                          if (error) {
+                              IndicoUtil.errorReport(error);
+                          } else {
+                              self.timetable._updateDay(result);
+                          }
+                      });
+
+    },
+
+
     /*
     * Iterates through entries and adds all of them
     */
@@ -490,6 +521,14 @@ type("TimetableManagementActions", [], {
 
 type("TopLevelTimeTableManagementActions", ["TimetableManagementActions"],
      {
+         _getLocatorParams: function(eventData) {
+             var info = new WatchObject();
+             info.set('scheduleEntryId', eventData.scheduleEntryId);
+             info.set('conference', eventData.conferenceId);
+
+             return info;
+         }
+
      },
      function(timetable, eventInfo, contextInfo, isSessionTimetable) {
          this.TimetableManagementActions(timetable, eventInfo, isSessionTimetable);
@@ -498,6 +537,16 @@ type("TopLevelTimeTableManagementActions", ["TimetableManagementActions"],
 
 type("IntervalTimeTableManagementActions", ["TimetableManagementActions"],
      {
+         _getLocatorParams: function(eventData) {
+             var info = new WatchObject();
+             info.set('scheduleEntryId', eventData.scheduleEntryId);
+             info.set('conference', eventData.conferenceId);
+             info.set('sessionId', eventData.sessionId);
+             info.set('sessionSlotId', eventData.sessionSlotId);
+
+             return info;
+         }
+
      },
      function(timetable, eventInfo, intervalInfo, isSessionTimetable) {
          this.TimetableManagementActions(timetable, eventInfo, isSessionTimetable);

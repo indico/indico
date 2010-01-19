@@ -981,6 +981,38 @@ class MoveEntry(ScheduleOperation, conferenceServices.ConferenceModifBase):
                 'slotEntry': pickledDataSlotSchEntry,
                 'autoOps': translateAutoOps(self.getAutoOps())}
 
+
+class MoveEntryUpDown(ScheduleOperation, conferenceServices.ConferenceModifBase):
+    def _checkParams(self):
+        conferenceServices.ConferenceModifBase._checkParams(self)
+
+        pManager = ParameterManager(self._params, timezone = self._conf.getTimezone())
+
+        self._schEntryId = pManager.extract("scheduleEntryId", pType=int, allowEmpty=False)
+        self._sessionId = pManager.extract("sessionId", pType=str, allowEmpty=True, defaultValue=None)
+        self._sessionSlotId = pManager.extract("sessionSlotId", pType=str, allowEmpty=True, defaultValue=None)
+        self._direction = pManager.extract("direction", pType=bool, allowEmpty=False)
+
+    def _performOperation(self):
+
+        if (self._sessionId != None and self._sessionSlotId != None):
+
+            slot = self._conf.getSessionById(self._sessionId).getSlotById(self._sessionSlotId)
+            sched = slot.getSchedule()
+        else:
+            sched = self._conf.getSchedule()
+
+        schEntry = sched.getEntryById(self._schEntryId)
+
+        if self._direction:
+            sched.moveUpEntry(schEntry)
+        else:
+            sched.moveDownEntry(schEntry)
+
+        return schedule.ScheduleToJson.process(sched, self._conf.getTimezone(), days = [ schEntry.getAdjustedStartDate() ])
+
+
+
 methodMap = {
     "get": ConferenceGetSchedule,
 
@@ -1024,5 +1056,6 @@ methodMap = {
     "getAllSessionConveners": ConferenceGetAllConveners,
     "getAllSpeakers": ConferenceGetAllSpeakers,
 
-    "moveEntry": MoveEntry
+    "moveEntry": MoveEntry,
+    "moveEntryUpDown": MoveEntryUpDown
 }

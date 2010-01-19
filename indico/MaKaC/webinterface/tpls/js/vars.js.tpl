@@ -70,7 +70,9 @@ var Indico = {
         breadcrumbArrow: "<%= iconFileName("breadcrumbArrow")%>",
         star: "<%= iconFileName("star")%>",
         starGrey: "<%= iconFileName("starGrey")%>",
-        warning_yellow: "<%= iconFileName("warning_yellow")%>"
+        warning_yellow: "<%= iconFileName("warning_yellow")%>",
+        arrow_up: "<%= iconFileName("upArrow")%>",
+        arrow_down: "<%= iconFileName("downArrow")%>"
     },
     Urls: {
         JsonRpcService: "<%= urlHandlers.UHJsonRpcService.getURL() %>",

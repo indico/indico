@@ -985,7 +985,7 @@ class LinkedTimeSchEntry(TimeSchEntry):
     def getAdjustedEndDate( self, tz=None ):
         return self.__owner.getAdjustedEndDate(tz)
 
-    @Retrieves('MaKaC.schedule.LinkedTimeSchEntry', 'duration', lambda x: str(x))
+    @Retrieves('MaKaC.schedule.LinkedTimeSchEntry', 'duration', Conversion.timedelta)
     def getDuration(self):
         return self.__owner.getDuration()
 
@@ -1088,7 +1088,7 @@ class IndTimeSchEntry(TimeSchEntry):
             tz = self.getTimezone()
         return self.getEndDate().astimezone(timezone(tz))
 
-    @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'], 'duration', lambda x: str(int(x.seconds / 60)))
+    @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'], 'duration', Conversion.timedelta)
     def getDuration(self):
         return self.duration
 
@@ -1464,8 +1464,6 @@ class ScheduleToJson:
 
         genId = entry['id']
 
-        entry['duration'] = int(obj.getDuration().seconds / 60)
-
         # sessions that are no poster sessions will be expanded
         if entry['entryType'] == 'Session':
 
@@ -1483,13 +1481,14 @@ class ScheduleToJson:
 
 
     @staticmethod
-    def process(schedule, tz):
-
-        from MaKaC.services.interface.rpc import json
+    def process(schedule, tz, days = None):
 
         scheduleDict={}
 
-        for day in daysBetween(schedule.getAdjustedStartDate(tz), schedule.getAdjustedEndDate(tz)):
+        if not days:
+            days = daysBetween(schedule.getAdjustedStartDate(tz), schedule.getAdjustedEndDate(tz))
+
+        for day in days:
             dayEntry = {}
 
             for obj in schedule.getEntriesOnDay(day):
@@ -1502,7 +1501,7 @@ class ScheduleToJson:
 
             scheduleDict[day.strftime("%Y%m%d")] = dayEntry
 
-        return json.encode(scheduleDict)
+        return scheduleDict
 
     @staticmethod
     def sort_dict(dict):

@@ -35,36 +35,9 @@ type("TimetableBlockBase", [],
              self.popupActive = true;
              self.div.dom.style.cursor = 'default';
              var cursor = getMousePointerCoordinates(event);
-             if (this.managementMode) {
 
-                 this.popup = new TimetableBlockPopupManagement(
-                     self.timetable,
-                     this,
-                     self.eventData,
-                     self.div,
-                     function() {
-                         self.div.dom.style.cursor = 'pointer';
-                         self.popupActive = false;
-                         return self.popupAllowClose;
-                      },
-                      self.managementActions);
+             this.popup = self._drawPopup();
 
-            } else {
-                this.popup = new TimetableBlockPopup(
-                    self.timetable,
-                    self.eventData,
-                    self.div,
-                    function() {
-                        self.div.dom.style.cursor = 'pointer';
-                        self.popupActive = false;
-                        return self.popupAllowClose;
-                    },
-                    function(color) {
-                        var parent = self.div.getParent();
-                        parent.setStyle('backgroundColor', color);
-                    }
-                );
-            }
              this.popup.open(cursor.x, cursor.y);
          },
 
@@ -123,19 +96,22 @@ type("TimetableBlockBase", [],
              });
 
              return button;
+         },
+
+         _getRightSideDecorators: function()
+         {
+             return Html.span({});
          }
 
      },
-     function(timetable, managementMode, managementActions){
+     function(timetable){
          this.timetable = timetable;
-         this.managementMode = managementMode;
-         this.managementActions = managementActions;
          this.popupActive = false;
          this.popupAllowClose = true;
      }
 );
 
-type("TimetableBlock", ["TimetableBlockBase"],
+type("TimetableBlockNormal", ["TimetableBlockBase"],
         {
             _blockDescription: function(block, event) {
                 var self = this;
@@ -147,11 +123,14 @@ type("TimetableBlock", ["TimetableBlockBase"],
                     this.titleDiv.append(": " + this.eventData.slotTitle);
                 }
 
-                this.titleWrapper = Html.div({}, this.titleDiv);
+                this.titleWrapper = Html.div({}, this._getRightSideDecorators(), this.titleDiv);
 
                 this.div = Html.div({style: { width: '100%', height: '100%'}}, this.titleWrapper);
 
-                if (!this.compactMode) {
+                if (this.compactMode) {
+                    this.timeDiv = Html.div('timetableBlockTimeDiscreet', this.eventData.startDate.time.substring(0,5) +' - '+ this.eventData.endDate.time.substring(0,5));
+                    this.div.insert(this.timeDiv);
+                } else {
                     this.timeDiv = Html.div({className: 'timetableBlockTime'}, this.eventData.startDate.time.substring(0,5) +' - '+ this.eventData.endDate.time.substring(0,5));
 
                     this.locationDiv  = Html.div('timetableBlockLocation');
@@ -165,7 +144,7 @@ type("TimetableBlock", ["TimetableBlockBase"],
                         this.locationDiv.append(this.eventData.location);
                     }
 
-                    // If it's a contribtion the add speakers information
+                    // If it's a contribution add the speakers information
                     if (self.eventData.presenters && self.eventData.presenters.length > 0) {
                         this.presentersDiv = Html.div({className: 'timetableBlockPresenters'});
                         this.presentersDiv.append(self.eventData.presenters[0].name);
@@ -176,7 +155,7 @@ type("TimetableBlock", ["TimetableBlockBase"],
                     }
 
                     // Add material menu
-                    if (!self.managementMode && self.eventData.material && self.eventData.material.length > 0) {
+                    if (!self.managementActions && self.eventData.material && self.eventData.material.length > 0) {
                         this.titleWrapper.insert(this.createMaterialButton(this.eventData.material));
                     }
 
@@ -184,9 +163,6 @@ type("TimetableBlock", ["TimetableBlockBase"],
 
                     this.div.append(this.timeDiv);
                     this.div.append(this.locationDiv);
-                } else {
-                    this.timeDiv = Html.div('timetableBlockTimeDiscreet', this.eventData.startDate.time.substring(0,5) +' - '+ this.eventData.endDate.time.substring(0,5));
-                    this.div.insert(this.timeDiv);
                 }
 
                 return this.div;
@@ -255,6 +231,7 @@ type("TimetableBlock", ["TimetableBlockBase"],
                    this.block.dom.style.cursor = 'pointer';
                    this.block.observeClick(function(e) { self.openPopup(e); });
                    highlightWithMouse(this.div, this.block);
+                   showWithMouse(this.div, this.arrows);
                }
 
                return this.block;
@@ -358,8 +335,9 @@ type("TimetableBlock", ["TimetableBlockBase"],
                 this.block.dom.style.color = textColor;
             }
         },
-     function(timetable, eventData, blockData, compactMode, printableVersion, detailLevel, managementMode, managementActions){
-         this.TimetableBlockBase(timetable, managementMode, managementActions);
+     function(timetable, eventData, blockData, compactMode, printableVersion, detailLevel){
+
+         this.TimetableBlockBase(timetable);
 
          this.compactMode = compactMode;
          this.eventData = eventData;
@@ -367,17 +345,18 @@ type("TimetableBlock", ["TimetableBlockBase"],
          this.margin = TimetableDefaults.blockMargin;
          this.printableVersion = printableVersion;
          this.detailLevel = detailLevel;
+         this.arrows = Html.span({});
         }
    );
 
 
-type("TimetableBlockWholeDay", ["TimetableBlockBase"],
+type("TimetableBlockWholeDayBase", ["TimetableBlockBase"],
         {
             _blockDescription: function(block, event) {
                 var self = this;
 
                 this.titleDiv = Html.div({className: 'timetableBlockTitle', style: {fontWeight: this.eventData.fontWeight}}, this.eventData.title);
-                this.titleWrapper = Html.div({}, this.titleDiv);
+                this.titleWrapper = Html.div({}, this._getRightSideDecorators(), this.titleDiv);
 
                 this.div = Html.div({style: { width: '100%', height: '100%'}}, this.titleWrapper);
 
@@ -418,6 +397,7 @@ type("TimetableBlockWholeDay", ["TimetableBlockBase"],
                     block.dom.style.cursor = 'pointer';
                     block.observeClick(function(e) { self.openPopup(e); });
                     highlightWithMouse(this.div, block);
+                    showWithMouse(this.div, this.arrows);
                 }
 
                 return block;
@@ -426,14 +406,130 @@ type("TimetableBlockWholeDay", ["TimetableBlockBase"],
 
             }
         },
-     function(timetable, eventData, blockData, managementMode, managementActions){
-         this.TimetableBlockBase(timetable, managementMode, managementActions);
+     function(timetable, eventData, blockData){
+         this.TimetableBlockBase(timetable);
 
          this.eventData = eventData;
          this.blockData = blockData;
          this.margin = TimetableDefaults.blockMargin;
+         this.arrows = Html.span({});
      }
    );
+
+
+type("TimetableBlockDisplayMixin",[],
+     {
+         _drawPopup: function() {
+
+             var self = this;
+
+             return new TimetableBlockPopup(
+                 this.timetable,
+                 this.eventData,
+                 this.div,
+                 function() {
+                     self.div.dom.style.cursor = 'pointer';
+                     self.popupActive = false;
+                     return self.popupAllowClose;
+                 },
+                 function(color) {
+                     var parent = self.div.getParent();
+                     parent.setStyle('backgroundColor', color);
+                 }
+             );
+         }
+
+     });
+
+type("TimetableBlockManagementMixin",[],
+     {
+         _drawPopup: function() {
+
+             var self = this;
+
+             return new TimetableBlockPopupManagement(
+                 this.timetable,
+                 this,
+                 this.eventData,
+                 this.div,
+                 function() {
+                         self.div.dom.style.cursor = 'pointer';
+                         self.popupActive = false;
+                         return self.popupAllowClose;
+                     },
+                 this.managementActions);
+         },
+
+         _getRightSideDecorators: function()
+         {
+             return this.arrows;
+         }
+
+     },
+     function() {
+         var arrowUp = Html.img({src: imageSrc('arrow_up'), title: $T('Move up')});
+         var arrowDown = Html.img({src: imageSrc('arrow_down'), style:{paddingLeft: '5px'}, title: $T('Move down')});
+
+         var self = this;
+
+         arrowUp.observeClick(
+             function(event) {
+                 self.managementActions.moveEntryUpDown(self.eventData, true);
+                 event.stopPropagation();
+                 return false;
+             });
+
+         arrowDown.observeClick(
+             function(event) {
+                 self.managementActions.moveEntryUpDown(self.eventData, false);
+                 event.stopPropagation();
+                 return false;
+             });
+
+
+         this.arrows = Html.div({style: {cssFloat: 'right', padding: '2px'}}, arrowUp, arrowDown);
+     });
+
+type("TimetableBlockWholeDayDisplay", ["TimetableBlockWholeDayBase", "TimetableBlockDisplayMixin"],
+     {
+     },
+     function(timetable, eventData, blockData) {
+         this.TimetableBlockWholeDayBase(timetable, eventData, blockData);
+     });
+
+type("TimetableBlockWholeDayManagement", ["TimetableBlockWholeDayBase", "TimetableBlockManagementMixin"],
+     {
+     },
+     function(timetable, eventData, blockData, managementActions) {
+         this.TimetableBlockWholeDayBase(timetable, eventData, blockData);
+         this.managementActions = managementActions;
+         this.TimetableBlockManagementMixin();
+
+         this._getRightSideDecorators = TimetableBlockManagementMixin.prototype._getRightSideDecorators;
+
+     });
+
+
+type("TimetableBlockNormalDisplay", ["TimetableBlockNormal", "TimetableBlockDisplayMixin"],
+     {
+     },
+     function(timetable, eventData, blockData, compactMode, printableVersion, detailLevel)
+     {
+         this.TimetableBlockNormal(timetable, eventData, blockData, compactMode, printableVersion, detailLevel);
+     });
+
+type("TimetableBlockNormalManagement", ["TimetableBlockNormal", "TimetableBlockManagementMixin"],
+     {
+     },
+     function(timetable, eventData, blockData, compactMode, printableVersion, detailLevel, managementActions)
+     {
+         this.TimetableBlockNormal(timetable, eventData, blockData, compactMode, printableVersion, detailLevel);
+         this.managementActions = managementActions;
+         this.TimetableBlockManagementMixin();
+
+         this._getRightSideDecorators = TimetableBlockManagementMixin.prototype._getRightSideDecorators;
+
+     });
 
 
 type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
@@ -687,7 +783,8 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
 );
 
 
-type("TimetableBlockPopupManagement", ["TimetableBlockPopup"], {
+type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
+{
 
     _getTime: function() {
         var self = this;
@@ -883,8 +980,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"], {
          this.block = block;
          this.managementActions = managementActions;
          this.TimetableBlockPopup(timetable, eventData, blockDiv, closeHandler);
-    }
-);
+     });
 
 type("ContributionsPopup", ["ExclusivePopup"], {
 
@@ -1069,7 +1165,13 @@ type("TimetableDrawer", ["IWidget"],
              var blockAdded = false;
              each(blocks, function(blockData) {
                  var eventData = data[blockData.id];
-                 var block = new TimetableBlockWholeDay(self.timetable, eventData, blockData, self.managementMode, self.managementActions);
+
+                 var block;
+                 if (self.managementMode) {
+                     block = new TimetableBlockWholeDayManagement(self.timetable, eventData, blockData, self.managementActions);
+                 } else {
+                     block = new TimetableBlockWholeDayDisplay(self.timetable, eventData, blockData);
+                 }
                  wholeDayBlockDiv.append(block.draw(0, 100));
                  blockAdded = true;
              });
@@ -1123,7 +1225,12 @@ type("TimetableDrawer", ["IWidget"],
                  //if (blockData.collapsed || (blockData.end - blockData.start < TimetableDefaults.layouts.proportional.values.pxPerHour))
                  //    compactMode = true;
 
-                 block = new TimetableBlock(self.timetable, eventData, blockData, compactMode, self.printableVersion, self.detail.get(), self.managementMode, self.managementActions);
+                 if (self.managementMode) {
+
+                     block = new TimetableBlockNormalManagement(self.timetable, eventData, blockData, compactMode, self.printableVersion, self.detail.get(), self.managementActions);
+                 } else {
+                     block = new TimetableBlockNormalDisplay(self.timetable, eventData, blockData, compactMode, self.printableVersion, self.detail.get());
+                 }
                  blockDiv.append(block.draw(leftPos, width));
                  self.blocks.push(block);
              });

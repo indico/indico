@@ -796,6 +796,15 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
         this.timetableDrawer.redraw();
     },
 
+    _updateDay: function(dayData) {
+
+        var data = this.getData();
+
+        extend(data, dayData);
+
+        this.timetableDrawer.redraw();
+    },
+
     _updateMovedEntry: function(result, oldEntryId) {
         this._updateEntry(result, oldEntryId, function(data){
             if (exists(result.slotEntry)) {
@@ -915,6 +924,15 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
                 data[result.day][result.id]=result.entry;
             }
         });
+    },
+
+    _updateDay: function(dayData) {
+
+        var data = this.getData();
+
+        extend(data, dayData[keys(dayData)[0]]);
+
+        this.timetableDrawer.redraw();
     },
 
     getTTMenu: function() {
