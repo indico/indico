@@ -499,7 +499,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
        <% else: %>
          <% display = 'none' %>
        <% end %>
-    <table width="90%%" align="center" border="0" style="display:<%=display%>">
+    <table id="templateListTableAll" width="90%%" align="center" border="0" style="display:<%=display%>">
     <!-- here to put table for the uploaded templates info :) -->
      <thead>
         <tr>
@@ -812,7 +812,7 @@ var TemplateList = function(){
 		                                        tablerows = document.getElementById('templateListTable').rows.length;
 				                                if(tablerows == '1'){
 				                                    $E('NoTemplateTable').dom.style.display = '';
-				                                    $E('templateListTable').dom.style.display = 'none';}
+				                                    $E('templateListTableAll').dom.style.display = 'none';}
 		                                    }
 		                                }
 		                    );}
@@ -830,7 +830,7 @@ var TemplateList = function(){
                     row.append(cellName);
                     row.append(cellFormat);
                     row.append(cellDescription);        
-                    $E('templateListTable').insert(row); 
+                    $E('templateListTable').append(row); 
              <% end %>
             
           }  
@@ -966,7 +966,7 @@ function showFormatChooser(pm){
         <%= jsonEncode(Template.formats.keys()) %>, '<%= urlHandlers.UHSetTemplate.getURL() %>',
         function(value) {
             $E('NoTemplateTable').dom.style.display = 'none';
-            $E('templateListTable').dom.style.display = '';
+            $E('templateListTableAll').dom.style.display = '';
             
 	        /* this is a little hack who is needed to get the URL of the new uploaded template*/
 	        //linkDelete = "<%= urlHandlers.UHDeleteContributionTemplate.getURL() %>" + "?reviewingTemplateId=" + value.id + "&confId=<%= ConfReview.getConference().getId()%>";
@@ -988,10 +988,10 @@ function showFormatChooser(pm){
                             } else {
                                 killProgress();
                                 $E('templateListTable').remove(row);
-                                tablerows = document.getElementById('templateListTable').rows.length;
+                                tablerows = document.getElementById('templateListTableAll').rows.length;
                                 if(tablerows == '1'){
                                     $E('NoTemplateTable').dom.style.display = '';
-                                    $E('templateListTable').dom.style.display = 'none';}
+                                    $E('templateListTableAll').dom.style.display = 'none';}
                             }
                         });}};
         var menu;
