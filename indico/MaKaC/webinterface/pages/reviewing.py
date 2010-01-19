@@ -72,8 +72,8 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
             """ For now we leave the Abstracts Reviewing tab Hidden as it is still not adapted to be used
             """
             self._subtabAbstractsReviewing.setHidden(True) 
-            if not self._conf.hasEnabledSection("cfa"):
-                self._subtabAbstractsReviewing.setHidden(True)
+            """if not self._conf.hasEnabledSection("cfa"):
+                self._subtabAbstractsReviewing.setHidden(True)"""
         
         if self._isPRM or self._canModify:
             self._subTabPaperReviewingSetup = self._subtabPaperReviewing.newSubTab( "revsetup", "Setup",\

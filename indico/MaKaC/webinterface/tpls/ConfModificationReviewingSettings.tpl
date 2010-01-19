@@ -499,8 +499,9 @@ ToDo: to remove the code which is not using any more, but to know that we have t
        <% else: %>
          <% display = 'none' %>
        <% end %>
-    <table id="templateListTable" width="90%%" align="center" border="0" style="display:<%=display%>">
+    <table width="90%%" align="center" border="0" style="display:<%=display%>">
     <!-- here to put table for the uploaded templates info :) -->
+     <thead>
         <tr>
             <td nowrap width="50%%" class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #DDDDDD;">
                 <%= _("Name")%>
@@ -512,6 +513,9 @@ ToDo: to remove the code which is not using any more, but to know that we have t
                 <%= _("Description")%>
             </td>
         </tr>
+        </thead>
+        <tbody id="templateListTable">
+        </tbody>
         <!-- <% keys = ConfReview.getTemplates().keys() %>
        <% keys.sort() %> 
         <% for k in keys: %>
@@ -538,8 +542,6 @@ ToDo: to remove the code which is not using any more, but to know that we have t
         </tr>
         <% end %> -->
         </table>
-        
-    
         <% if ConfReview.hasTemplates(): %>
          <% display = 'none' %>
        <% end %>
@@ -592,6 +594,7 @@ var observer = function(value) {
     if (value == "Content reviewing") {
         $E('steptitle').dom.style.display = '';
         $E('title').set('<%= _("content reviewing team")%>');
+        $E('title').dom.style.display = '';
         $E('materialsTable').dom.style.display = 'none';
         $E('statusTable').dom.style.display = '';
         $E('reviewingQuestionsTable').dom.style.display = '';
@@ -624,6 +627,7 @@ var observer = function(value) {
     }
     if (value == "Layout reviewing") {
         $E('steptitle').dom.style.display = '';
+        $E('title').dom.style.display = '';
         $E('title').set('<%= _("layout reviewing team")%>');
         $E('materialsTable').dom.style.display = 'none';
         $E('statusTable').dom.style.display = 'none';
@@ -656,6 +660,7 @@ var observer = function(value) {
     if (value == "Content and layout reviewing") {
         $E('steptitle').dom.style.display = '';
         $E('title').set('<%= _("content and layout reviewing team")%>');
+        $E('title').dom.style.display = '';
         $E('materialsTable').dom.style.display = 'none';
         $E('statusTable').dom.style.display = '';
         $E('reviewingQuestionsTable').dom.style.display = '';
@@ -825,7 +830,7 @@ var TemplateList = function(){
                     row.append(cellName);
                     row.append(cellFormat);
                     row.append(cellDescription);        
-                    $E('templateListTable').append(row); 
+                    $E('templateListTable').insert(row); 
              <% end %>
             
           }  
@@ -900,7 +905,7 @@ $E('authorSubmittedMatReviewerNotif').set(IndicoUI.Widgets.Generic.switchOptionB
 $E('authorSubmittedMatEditorNotif').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatReviewerNotif', 
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Editor'}, 
-                                            'To the  Layout Reviewer when an author submits paper',
+                                            'To the Layout Reviewer when an author submits paper',
                                             true
 ));
 
