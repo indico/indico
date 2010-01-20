@@ -117,23 +117,26 @@ class Unit(BaseTest):
     def run(self):
         
         self.createDummyUser()
+        result = None
         
-        #capturing the stderr
-        outerr = StringIO.StringIO()
-        sys.stderr = outerr
-        
-        result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir,
-                                                           'python',
-                                                           'unit',
-                                                           'MaKaC_tests')])
-        
-        #restoring the stderr
-        sys.stderr = sys.__stderr__
-        
-        s = outerr.getvalue()
-        self.writeReport("pyunit", s)
-        
-        self.deleteDummyUser()
+        try:
+            #capturing the stderr
+            outerr = StringIO.StringIO()
+            sys.stderr = outerr
+            
+            result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir,
+                                                               'python',
+                                                               'unit',
+                                                               'MaKaC_tests')])
+            
+            #restoring the stderr
+            sys.stderr = sys.__stderr__
+            
+            
+            s = outerr.getvalue()
+            self.writeReport("pyunit", s)
+        finally:
+            self.deleteDummyUser()
         
         if result:
             return "PY Unit tests succeeded\n"
@@ -299,10 +302,6 @@ class GridData(BaseTest):
         self.currentEnv = env
     
     def getInstance(cls):
-        """returns an instance of the Config class ensuring only a single
-           instance is created. All the clients should use this method for
-           setting a Config object instead of normal instantiation
-        """
         if cls.__instance == None:
             cls.__instance = GridData()
         return cls.__instance
@@ -386,8 +385,7 @@ class Jsunit(BaseTest):
                                                  " --config "
                                                  "jsTestDriverNoCoverage.conf"
                                                  " --tests Fake.dryRun"))
-                if jsDryRun[1].startswith(("No browsers were captured, "
-                                           "nothing to run...")):
+                if jsDryRun[1].startswith("No browsers were captured"):
                     print ("Js-test-driver server has not started yet. "
                            "Attempt #%s\n") % (i+1)
                     time.sleep(5)
@@ -514,7 +512,6 @@ class Indicop(object):
         self.gridPort = 4444
         self.gridEnv = ["Firefox on OS X",
                         "Safari on OS X"]
-        self.grid = Grid(self.gridUrl, self.gridPort, self.gridEnv)
         
         #variables for jsunit
         self.jsSpecify = jsspecify
@@ -526,7 +523,7 @@ class Indicop(object):
                  'pylint': Pylint(),
                  'jsunit': Jsunit(self.jsSpecify, self.jsCoverage),
                  'jslint': Jslint(),
-                 'grid': self.grid}
+                 'grid': Grid(self.gridUrl, self.gridPort, self.gridEnv)}
 
     
     def main(self, specify, coverage, testsToRun):
@@ -554,6 +551,3 @@ class Indicop(object):
             returnString += coverageTest.stop()
         
         return returnString
-    
-    def getGrid(self):
-        return self.grid
