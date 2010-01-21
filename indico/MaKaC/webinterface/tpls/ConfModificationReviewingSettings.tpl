@@ -809,7 +809,7 @@ var TemplateList = function(){
 		                                    } else {
 		                                        killProgress();
 		                                        $E('templateListTable').remove($E('TemplateRow_'+'<%=t.getId()%>'));
-		                                        tablerows = document.getElementById('templateListTable').rows.length;
+		                                        tablerows = document.getElementById('templateListTableAll').rows.length;
 				                                if(tablerows == '1'){
 				                                    $E('NoTemplateTable').dom.style.display = '';
 				                                    $E('templateListTableAll').dom.style.display = 'none';}

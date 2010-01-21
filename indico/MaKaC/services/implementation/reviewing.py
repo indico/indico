@@ -228,9 +228,7 @@ class ConferenceReviewingDefaultDueDateModification(ConferenceReviewingDateTimeM
         else:
             raise ServiceError("ERR-REV3b",_("Kind of deadline to change not set"))
         
-        if date is None:
-            return 'No date set yet'
-        else:
+        if date:
             return datetime.datetime.strftime(date,'%d/%m/%Y %H:%M')
 
 
@@ -241,9 +239,7 @@ class ConferenceAbstractReviewingDefaultDueDateModification(ConferenceAbstractRe
 
     def _handleGet(self):
         date = self._conf.getConfReview().getAdjustedDefaultAbstractReviewerDueDate()
-        if date is None:
-            return 'No date set yet'
-        else:
+        if date:
             return datetime.datetime.strftime(date,'%d/%m/%Y %H:%M')
         
 class ConferenceReviewingAutoEmailsModificationReferee(ConferenceReviewingSetupTextModificationBase ):
