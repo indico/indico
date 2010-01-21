@@ -332,17 +332,17 @@ class tests_indico(Command):
         testsToRun = []
         if self.pylint:
             testsToRun.append('pylint')
-        elif self.unit:
+        if self.unit:
             testsToRun.append('unit')
-        elif self.functional:
+        if self.functional:
             testsToRun.append('functional')
-        elif self.jsunit or self.jsspecify:
+        if self.jsunit or self.jsspecify:
             testsToRun.append('jsunit')
-        elif self.jslint:
+        if self.jslint:
             testsToRun.append('jslint')
-        elif self.grid:
+        if self.grid:
             testsToRun.append('grid')
-        else:
+        if not (self.pylint or self.unit or self.functional or self.jsunit or self.jslint or self.grid):
             testsToRun.append('unit')
             testsToRun.append('functional')
             testsToRun.append('pylint')
