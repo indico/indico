@@ -152,7 +152,7 @@ var showValues = function() {
 var updatePage = function (firstLoad){
     if (submitted) {
         submitButton.set($T('Undo sending'));
-        $E('submittedmessage').set($T('Judgement has been send'));
+        $E('submittedmessage').set($T('Judgement has been sent'));
         showValues();
     } else {
         submitButton.set('Mark as submitted');

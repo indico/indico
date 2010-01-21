@@ -5,11 +5,11 @@
 <% dueDateFormat = "%a %d %b %Y" %>
 <% color = '' %>
 <% if not ConfReview.hasReviewing(): %>
-<table align="center"><tr><td><%= _("Type of reviewing has not been chosen yet")%></td></tr></table>
+<p style="padding-left: 25px;"><font color="gray"><%= _("Type of reviewing has not been chosen yet")%></font></p>
 <% end %>
 <% else: %>
 <% if len(Conference.getContributionListSortedById()) == 0: %>
-<table align="center"><tr><td><%= _("There are no contributions to assign")%></td></tr></table>
+<p style="padding-left: 25px;"><font color="gray"><%= _("There are no contributions to assign.")%></font></p>
 <% end %>
 <%else:%>
 <div style="padding-top:10px; padding-bottom: 10px;padding-left: 10px"><em><%= _("Please, select one or more contributions to assign Reviewers")%></em></div>
@@ -166,7 +166,7 @@
 -->
     <thead>
         <tr>
-            
+            <td></td>
             <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <%= _("Id")%>
             </td>
@@ -728,7 +728,7 @@ var removeReviewersAlerts = function(contributions, role) {
         }
     } 
     if (contributionsWithoutReviewers.length == contributions.length) {
-        alert($T("There is no assigned Reviewer to remove.")
+        alert($T("There is no assigned Content Reviewer to remove.")
         );
         return false;
     }
@@ -740,7 +740,7 @@ var removeReviewersAlerts = function(contributions, role) {
         
         popup.draw = function(){
         
-            var span1 = Html.span({}, $T("The Content Reviewers will be removed only from the contributions that have ones."));
+            var span1 = Html.span({}, $T("The Content Reviewers will be removed only from the contributions that have one."));
             var okButton = Html.button('popUpButton', $T("OK"));
             okButton.observeClick(function(){
                 deselectWithoutReviewer(contributions);
@@ -794,17 +794,17 @@ var removeRefereeAlertsMessage = function(contributions){
         contribution = getContribution(contributionId)
     }
     var warning = $T("You have to assign new referee.")
-    var message = $T("nothing")
+    var message = $T("")
     if(contribution.reviewManager.reviewersList.length != 0 && contribution.reviewManager.editor != null) {        
-            message = $T("Please note that there are already assigned reviewers and editor." + " " + warning)
+            message = $T("Please note that layout and content have already been assigned for this/these contributions."+ warning)
             return message;
         } 
     if(contribution.reviewManager.reviewersList.length != 0 && contribution.reviewManager.editor == null){
-           message = $T("Please note that there are already assigned reviewers." + " " + warning)
+           message = $T("Please note that a content reviewer has already been assigned for this/these contributions."+ warning)
            return message;
         }
     if(contribution.reviewManager.reviewersList.length == 0 && contribution.reviewManager.editor != null) {
-           message = $T("Please note that there is already assigned an editor." + " " + warning)
+           message = $T("Please note that a layout reviewer has already been assigned for this/these contributions."+ warning)
             return message;
         }
     

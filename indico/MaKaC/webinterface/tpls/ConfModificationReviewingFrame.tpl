@@ -45,7 +45,7 @@
                                 var del = true;
                                 numberContr = '<%= len(ConfReview.getJudgedContributions(r))%>';
                                 if (numberContr>0){
-                                    if (!(confirm('This referee has assigned '+numberContr+' contributions. Do you want to be removed anyway?'))){
+                                    if (!(confirm('This referee has been assigned '+numberContr+' contributions. Do you want to remove the referee anyway?'))){
                                         del = false;
                                     }
                                 }
@@ -108,7 +108,7 @@
                                 var del = true;
                                 numberContr = '<%= len(ConfReview.getReviewedContributions(r))%>';
                                 if (numberContr>0){
-                                    if (!(confirm('This content reviewer has assigned '+numberContr+' contributions. Do you want to be removed anyway?'))){
+                                    if (!(confirm('This content reviewer has been assigned '+numberContr+' contributions. Do you want to remove the content reviewer anyway?'))){
                                         del = false;
                                     }
                                 }
@@ -177,7 +177,7 @@
                                 var del = true;
                                 numberContr = '<%= len(ConfReview.getEditedContributions(r))%>';
                                 if (numberContr>0){
-                                    if (!(confirm('This layout reviewer has assigned '+numberContr+' contributions. Do you want to be removed anyway?'))){
+                                    if (!(confirm('This layout reviewer has been assigned '+numberContr+' contributions. Do you want to remove the layout reviewer anyway?'))){
                                         del = false;
                                     }
                                 }

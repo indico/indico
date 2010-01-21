@@ -97,7 +97,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
     <tr>
         <td style="width: 400px;">  
             <div class="titleCellFormat" style="padding-top: 5px;">
-                <%= _("The default statuses are: ")%><em><%= _("Accept, To be corrected")%></em><%=_(" and ")%><em><%=_("Reject")%></em>.<%= _("You can define your own statuses")%>
+                <%= _("The default statuses are: ")%><em><%= _("Accept, To be corrected")%></em><%=_(" and ")%><em><%=_("Reject")%></em>.<%= _(" You can define your own statuses")%>
             </div>
             <div id="inPlaceEditStates"  style="padding-top: 10px;"><%= ', '.join(ConfReview.getAllStates())%></div>
         </td>

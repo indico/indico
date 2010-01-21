@@ -643,7 +643,7 @@ class ConferenceReview(Persistent):
                 self._userCompetences[newEditor] = []
             self.notifyModification()
             if self._enableEditorEmailNotif == True:
-                notification = ConferenceReviewingNotification(newEditor, 'Editor', self._conference)
+                notification = ConferenceReviewingNotification(newEditor, 'Layout Reviewer', self._conference)
                 GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", newEditor)
 
     def removeEditor(self, editor):
@@ -664,7 +664,7 @@ class ConferenceReview(Persistent):
             editor.unlinkTo(self._conference, "editor")
             self.notifyModification()
             if self._enableEditorEmailNotif == True:
-                notification = ConferenceReviewingRemoveNotification(editor, 'Editor', self._conference)
+                notification = ConferenceReviewingRemoveNotification(editor, 'Layout Reviewer', self._conference)
                 GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", editor)
         else:
             raise MaKaCError("Cannot remove an editor who is not yet editor")
@@ -729,7 +729,7 @@ class ConferenceReview(Persistent):
                 self._userCompetences[newReviewer] = []
             self.notifyModification()
             if self._enableReviewerEmailNotif == True:
-                notification = ConferenceReviewingNotification(newReviewer, 'Reviewer', self._conference)
+                notification = ConferenceReviewingNotification(newReviewer, 'Content Reviewer', self._conference)
                 GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", newReviewer)
         
     def removeReviewer(self, reviewer):
@@ -750,7 +750,7 @@ class ConferenceReview(Persistent):
             reviewer.unlinkTo(self._conference, "reviewer")
             self.notifyModification()
             if self._enableReviewerEmailNotif == True:
-                notification = ConferenceReviewingRemoveNotification(reviewer, 'Reviewer', self._conference)
+                notification = ConferenceReviewingRemoveNotification(reviewer, 'Content Reviewer', self._conference)
                 GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", reviewer)
         else:
             raise MaKaCError("Cannot remove a reviewer who is not yet reviewer")
@@ -1141,7 +1141,7 @@ class ConferenceReview(Persistent):
         """
         roles=[]
         if self.isPaperReviewManager(user):
-            roles.append('Manager of Paper Review Module')
+            roles.append('Manager of Paper Reviewing Module')
         if self.isReferee(user):
             roles.append('Referee')
         if self.isEditor(user):

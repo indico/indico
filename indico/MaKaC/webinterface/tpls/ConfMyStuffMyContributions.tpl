@@ -13,7 +13,7 @@
         <td>
             <table cellspacing="0" align="center" width="70%">
                 <tr>
-                    <td colspan="3"><div class="groupTitle">List of contributions templates</div></td>
+                    <td colspan="3"><div class="groupTitle">List of contribution templates</div></td>
                 </tr>
                 <%= ContributionReviewingTemplatesList %>
             </table>

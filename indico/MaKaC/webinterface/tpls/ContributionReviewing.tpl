@@ -50,11 +50,13 @@
             <td width="60%%" class='bottom_line'>
                 <%= ContributionReviewManager.getReferee().getFullName() %>
             </td>
+            <% if CanAssignReferee: %>
             <td align="right">
                 <form action="<%=removeAssignRefereeURL %>" method="post">
                     <input type="submit" class=btn value="remove">
                 </form>
             </td>
+            <% end %>
             <% end %>
         </tr>
         <tr>
@@ -126,7 +128,7 @@
     <% else: %>
     <tr>
         <td colspan="5">
-            <%= _("This conference does not enable content reviewing. The editor's judgement is the only judgement.")%>
+            <%= _("This conference does not enable content reviewing. The layout reviewer's judgement is the only judgement.")%>
         </td>
     </tr>
     <% end %>
@@ -230,7 +232,7 @@
     <% else: %>
     <tr>
         <td colspan="5">
-            <%= _("The reviewing mode does not allow editing.")%>
+            <%= _("The reviewing mode does not allow layout reviewing.")%>
         </td>
     </tr>
     <% end %>

@@ -64,7 +64,7 @@
 <!-- Final reviewing of the referee -->
 <table width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
-        <td id="finalJudgementHelp" colspan="5" class="groupTitle" style="padding-top: 5px; border-bottom: none"><a name="FinalReviewing"></a><%= _("Final Judgement")%>
+        <td id="finalJudgementHelp" colspan="5" class="groupTitle" style="padding-bottom: 15px; padding-top: 5px; border-bottom: none"><a name="FinalReviewing"></a><%= _("Final Judgement")%>
             <% inlineContextHelp(_('Here is displayed the judgement given by the Referee.<br/>If you are the Referee of this contribution, you can change this.')) %>    
         </td>
     </tr>
@@ -97,7 +97,7 @@
                 <% end %>
                 <% if (ConferenceChoice == 2 or ConferenceChoice == 4) and not Review.allReviewersHaveGivenAdvice(): %>
                    <tr>
-                       <td colspan="2" align="center">
+                       <td colspan="2" align="left">
                            <font><%= _("Warning: all your content reviewers have not given their advices yet.")%></span>
                        </td>
                    </tr>
@@ -269,7 +269,7 @@ var updatePage = function (){
     if (submitted) {
         <% if IsReferee: %>
         submitButton.set($T('Undo sending'));
-        $E('submittedmessage').set($T('Judgement has been send'));
+        $E('submittedmessage').set($T('Judgement has been sent'));
         <% end %>
         showValues();
     } else {
@@ -284,7 +284,7 @@ var updatePage = function (){
                 } 
             $E('submitHelpPopUp').dom.onmouseover = submitHelpPopUpText;
         <% end %>
-        $E('submittedmessage').set($T('Judgement not send yet'));
+        $E('submittedmessage').set($T('Judgement not sent yet'));
         <% end %>
         showWidgets();
     }

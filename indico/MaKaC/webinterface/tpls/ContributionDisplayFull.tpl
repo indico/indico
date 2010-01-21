@@ -13,7 +13,7 @@
         <table align="center" width="95%%" border="0">
         %(withdrawnNotice)s
         <tr>
-          <td align="center">%(modifIcon)s%(submitIcon)s<font size="+1" color="black"><b>%(title)s</b></font></td>
+          <td align="center">%(modifIcon)s<font size="+1" color="black"><b>%(title)s</b></font></td>
 	</tr>
         <tr>
 	  <td width="100%%">&nbsp;<td>
