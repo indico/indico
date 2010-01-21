@@ -386,6 +386,7 @@ class Config:
             'SmtpUseTLS'           : 'no',
             'SupportEmail'         : 'root@localhost',
             'PublicSupportEmail'   : 'root@localhost',
+            'NoReplyEmail'         : 'noreply-root@localhost',
             'IndicoSearchServer'   : '',
             'IndicoSearchClass'    : 'MaKaC.search.invenioSEA.InvenioSEA',
             'FileConverter'        : {"conversion_server": "", "response_url": "http://localhost/getConvertedFile.py"},

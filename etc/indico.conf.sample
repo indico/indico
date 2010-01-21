@@ -103,6 +103,11 @@ SupportEmail         = "root@localhost"
 
 PublicSupportEmail   = "root@localhost"
 
+# NoReplyEmail is the email address showed when we do not want the users to answer
+# an automatically generated email.
+
+NoReplyEmail	     = "noreply-root@localhost"
+
 
 #------------------------------------------------------------------------------
 # APACHE
