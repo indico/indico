@@ -830,7 +830,8 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
 
             self.managementActions.editEntryStartEndDate(Util.formatDateTime(startDate, IndicoDateTimeFormats.Server),
                                                          Util.formatDateTime(endDate, IndicoDateTimeFormats.Server),
-                                                         self.eventData);
+                                                         self.eventData,
+                                                         rescheduleCheckbox.get());
             self.close();
         });
         var cancelButton = Html.button({}, 'Cancel');
@@ -839,21 +840,21 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
             timeDiv.dom.style.display = 'block';
         });
 
-        var timeEditDiv = Html.div({style: {display: 'none'}},
+        var rescheduleCheckbox = Html.checkbox({style:{marginRight: '5px', verticalAlign: 'middle'}});
+
+        var timeEditDiv = Html.div({style: {display: 'none', fontSize: '9pt'}},
                 Html.div({style: {cssFloat: 'right'}}, saveButton, " ", cancelButton),
-                startEndTimeField.element);
+            startEndTimeField.element,
+            Html.div({style: {marginTop: '5px'}}, rescheduleCheckbox, $T('Shift later entries')));
 
 
         editLink.observeClick(function() {
             // make sure the edit div is at least as high as the timeDiv
             // to avoid a small 'jump' in the balloon popup
-            timeEditDiv.dom.style.height = pixels(timeDiv.dom.offsetHeight);
             timeEditDiv.dom.style.display = 'block';
+            //timeEditDiv.dom.style.height = pixels(timeDiv.dom.offsetHeight);
             timeDiv.dom.style.display = 'none';
         });
-
-
-
 
 
         return Html.div('timetablePopupTimeDiv', timeDiv, timeEditDiv);

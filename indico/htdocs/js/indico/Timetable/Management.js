@@ -124,7 +124,7 @@ type("TimetableManagementActions", [], {
     /*
      * Edit start and end date. date format has to be dd/mm/yy mm:hh
      */
-    editEntryStartEndDate: function(startDate, endDate, eventData) {
+    editEntryStartEndDate: function(startDate, endDate, eventData, reschedule) {
         var self = this;
         var info = new WatchObject();
 
@@ -133,6 +133,7 @@ type("TimetableManagementActions", [], {
 
         info.set('startDate', startDate);
         info.set('endDate', endDate);
+        info.set('reschedule', reschedule);
 
         var type = eventData.entryType;
 
@@ -154,7 +155,14 @@ type("TimetableManagementActions", [], {
                 IndicoUtil.errorReport(error);
             }
             else {
-                self.timetable._updateEntry(result, result.id);
+                // Depending on whether 'reschedule' was selected or not,
+                // update the whole day or just one entry
+
+                if (reschedule) {
+                    self.timetable._updateDay(result);
+                } else {
+                    self.timetable._updateEntry(result, result.id);
+                }
             }
         });
     },
@@ -492,7 +500,10 @@ type("TimetableManagementActions", [], {
                           if (error) {
                               IndicoUtil.errorReport(error);
                           } else {
-                              self.timetable._updateDay(result);
+                              var key = keys(result)[0];
+                              var entry = {entry: result[key], id: key};
+
+                              self.timetable._updateDay(entry);
                           }
                       });
 

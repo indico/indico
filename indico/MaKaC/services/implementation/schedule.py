@@ -21,7 +21,7 @@ from MaKaC.common.utils import getHierarchicalId, formatTime, formatDateTime, pa
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.errors import TimingError
 
-import time, datetime, pytz
+import time, datetime, pytz, copy
 
 def translateAutoOps(autoOps):
 
@@ -480,75 +480,79 @@ class SessionSlotScheduleDeleteContribution(ScheduleOperation, sessionServices.S
         self._slot.getSchedule().removeEntry(self._schEntry)
 
 
-class SessionSlotScheduleModifyStartEndDate(ScheduleOperation, sessionServices.SessionSlotModifCoordinationBase):
+class ModifyStartEndDate(ScheduleOperation):
 
     def _checkParams(self):
-        sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
 
         pManager = ParameterManager(self._params, timezone = self._conf.getTimezone())
-
         self._startDate = pManager.extract("startDate", pType=datetime.datetime)
         self._endDate = pManager.extract("endDate", pType=datetime.datetime)
+        self._reschedule = pManager.extract("reschedule", pType=bool)
 
     def _performOperation(self):
 
-        self._schEntry.setStartDate(self._startDate);
-        duration = self._endDate - self._startDate
-        self._schEntry.setDuration(dur=duration)
-
-        pickledDataEntry = DictPickler.pickle(self._schEntry, timezone=self._conf.getTimezone())
-        pickledDataSlotSchEntry = DictPickler.pickle(self._slot.getConfSchEntry(), timezone=self._conf.getTimezone())
-        pickledDataSession = DictPickler.pickle(self._session, timezone=self._conf.getTimezone())
-        return {'day': self._schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
-                'id': pickledDataEntry['id'],
-                'entry': pickledDataEntry,
-                'slotEntry': pickledDataSlotSchEntry,
-                'session': pickledDataSession,
-                'autoOps': translateAutoOps(self.getAutoOps())}
-
-
-class ConferenceScheduleModifyStartEndDate(ScheduleOperation, conferenceServices.ConferenceScheduleModifBase):
-
-    def _checkParams(self):
-        conferenceServices.ConferenceScheduleModifBase._checkParams(self)
-
-        pManager = ParameterManager(self._params, timezone = self._conf.getTimezone())
-
-        self._startDate = pManager.extract("startDate", pType=datetime.datetime)
-        self._endDate = pManager.extract("endDate", pType=datetime.datetime)
-
-    def _performOperation(self):
+        # if we want to reschedule other entries, let's store the old parameters
+        # and the list of entries that will be rescheduled (after this one)
+        if self._reschedule:
+            oldStartDate=copy.copy(self._schEntry.getStartDate())
+            oldDuration=copy.copy(self._schEntry.getDuration())
+            i = self._schEntry.getSchedule().getEntries().index(self._schEntry)+1
+            entriesList = self._schEntry.getSchedule().getEntries()[i:]
 
         self._schEntry.setStartDate(self._startDate, moveEntries=1);
         duration = self._endDate - self._startDate
         self._schEntry.setDuration(dur=duration)
 
-        entryId, pickledData = schedule.ScheduleToJson.processEntry(self._schEntry, self._conf.getTimezone())
+        # In case of 'reschedule', calculate the time difference
+        if self._reschedule:
+            diff = (self._schEntry.getStartDate() - oldStartDate) + (self._schEntry.getDuration() - oldDuration)
+
+            # shift accordingly
+            self._schEntry.getSchedule().moveEntriesBelow(diff, entriesList)
+
+            # retrieve results
+            pickledData = schedule.ScheduleToJson.process(self._schEntry.getSchedule(), self._conf.getTimezone(), days = [self._schEntry.getAdjustedStartDate()])
+            entryId = pickledData.keys()[0]
+            pickledData = pickledData.values()[0]
+        else:
+            entryId, pickledData = schedule.ScheduleToJson.processEntry(self._schEntry, self._conf.getTimezone())
+
         return {'day': self._schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
-                'id': pickledData['id'],
+                'id': entryId,
                 'entry': pickledData,
                 'autoOps': translateAutoOps(self.getAutoOps())}
 
-class SessionScheduleModifyStartEndDate(ScheduleOperation, sessionServices.SessionModifBase):
+
+class SessionSlotScheduleModifyStartEndDate(ModifyStartEndDate, sessionServices.SessionSlotModifCoordinationBase):
 
     def _checkParams(self):
-        sessionServices.SessionModifBase._checkParams(self)
-
-        pManager = ParameterManager(self._params, timezone = self._conf.getTimezone())
-
-        self._startDate = pManager.extract("startDate", pType=datetime.datetime)
-        self._endDate = pManager.extract("endDate", pType=datetime.datetime)
+        sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
+        ModifyStartEndDate._checkParams(self)
 
     def _performOperation(self):
-        self._schEntry.setStartDate(self._startDate);
-        duration = self._endDate - self._startDate
-        self._schEntry.setDuration(dur=duration)
 
-        pickledData = DictPickler.pickle(self._schEntry, timezone=self._conf.getTimezone())
-        return {'day': self._schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
-                'id': pickledData['id'],
-                'entry': pickledData,
-                'autoOps': translateAutoOps(self.getAutoOps())}
+        result = ModifyStartEndDate._performOperation(self)
+
+        pickledDataSlotSchEntry = DictPickler.pickle(self._slot.getConfSchEntry(), timezone=self._conf.getTimezone())
+        pickledDataSession = DictPickler.pickle(self._session, timezone=self._conf.getTimezone())
+        result.update({'slotEntry': pickledDataSlotSchEntry,
+                       'session': pickledDataSession})
+
+        return result
+
+
+class ConferenceScheduleModifyStartEndDate(ModifyStartEndDate, conferenceServices.ConferenceScheduleModifBase):
+
+   def _checkParams(self):
+        conferenceServices.ConferenceScheduleModifBase._checkParams(self)
+        ModifyStartEndDate._checkParams(self)
+
+
+class SessionScheduleModifyStartEndDate(ModifyStartEndDate, sessionServices.SessionModifBase):
+
+   def _checkParams(self):
+        sessionServices.SessionModifBase._checkParams(self)
+        ModifyStartEndDate._checkParams(self)
 
 class ConferenceScheduleGetDayEndDate(ScheduleOperation, conferenceServices.ConferenceModifBase):
 

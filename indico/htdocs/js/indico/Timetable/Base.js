@@ -796,11 +796,16 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
         this.timetableDrawer.redraw();
     },
 
-    _updateDay: function(dayData) {
+    _updateDay: function(result) {
+
+        this._processAutoOps(result);
 
         var data = this.getData();
 
-        extend(data, dayData);
+        var entry = {};
+        entry[result.id] = result.entry;
+
+        extend(data, entry);
 
         this.timetableDrawer.redraw();
     },
@@ -926,11 +931,13 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
         });
     },
 
-    _updateDay: function(dayData) {
+    _updateDay: function(result) {
+
+        this._processAutoOps(result);
 
         var data = this.getData();
 
-        extend(data, dayData[keys(dayData)[0]]);
+        extend(data, result.entry);
 
         this.timetableDrawer.redraw();
     },

@@ -836,7 +836,7 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
              // there are two possible widget modes: edit and display
              var modeChooser = new Chooser(new Lookup(
                  {
-                     'edit': function() { return self._handleEditMode(); },
+                     'edit': function() { return self._handleEditMode(self.value); },
                      'display': function() { return self._handleDisplayMode(self.value); }
                  }));
 
@@ -862,6 +862,7 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
                      'switchToEdit': Widget.link(command(function() {
                          modeChooser.set('edit');
                          switchChooser.set('switchToDisplay');
+                         return false;
                      }, '(edit)')),
                      'switchToDisplay': editButtons
                  });
