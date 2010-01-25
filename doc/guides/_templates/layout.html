@@ -4,7 +4,7 @@
     {{ super() }}
 {% endblock %}
 {% block sidebarlogo %}
-   <img src="_static/indico_logo.png" width="200px"/> 
+   <img src="{{ pathto("_static/indico_logo.png", 1) }}" width="200px"/> 
 {% endblock %}
 {% block extrahead %}
    <link type="text/css" href="{{ pathto("_static/indico.css", 1) }}" rel="stylesheet"/> 
