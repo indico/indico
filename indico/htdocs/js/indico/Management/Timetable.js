@@ -299,10 +299,11 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
             //but we need to check if the contribution is inside a session and if the day changed, in order
             //to make the request for the session timetable or the top level timetable
             if(exists(self.timetable.parentTimetable)){
-                if(self.previousDate.substr(0,10) != self.dateArgs.selectedDay)
-                    self.timeStartMethod = self.timetable.managementActions.methods['Event'].getDayEndDate;
-                else
-                    self.timeStartMethod = self.timetable.managementActions.methods['SessionSlot'].getDayEndDate;
+                if(self.previousDate.substr(0,10) != self.dateArgs.selectedDay) {
+                    self.timeStartMethod = self.timetable.managementActions.methods.Event.getDayEndDate;
+                } else {
+                    self.timeStartMethod = self.timetable.managementActions.methods.SessionSlot.getDayEndDate;
+                }
             }
 
             //we make a timeStartMethod request specifying the date for the request
@@ -365,7 +366,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
                 ],
                 [$T('Place'), Html.div({style: {marginBottom: '15px'}}, this.roomEditor.draw())],
                 [$T('Date'), conferenceDays],
-                [$T('Start time'), Html.div({class: 'popUpLabel', style:{textAlign: 'left'}}, this.startTimeField,
+                [$T('Start time'), Html.div({className: 'popUpLabel', style:{textAlign: 'left'}}, this.startTimeField,
                             $T(' Duration '), this.timeField, $T('min'))],
                 [$T('Presenter(s)'), presListWidget.draw()]
             ]);
@@ -499,7 +500,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
 
             //if we are inside a session and the new contribution is set for a different day, we suppose that the contribution is not part of the session
             if(self.dayChanged){
-                self.method = self.timetable.managementActions.methods['Contribution'].add;
+                self.method = self.timetable.managementActions.methods.Contribution.add;
             }
             submitInfo();
         });
@@ -710,11 +711,12 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                  } else {
                      //in case we're inside a session and the break is added to a different day, we suppose it's not inside the session anymore
                      if(self.dayChanged){
-                         self.method = self.managementActions.methods['Break'].add;
+                         self.method = self.managementActions.methods.Break.add;
                      }
                      else{
-                         if(exists(self.managementActions.timetable.parentTimetable))
-                             self.method = self.managementActions.methods['SessionBreak'].add;
+                         if(exists(self.managementActions.timetable.parentTimetable)) {
+                             self.method = self.managementActions.methods.SessionBreak.add;
+                         }
                      }
                      self._submitInfo();
                  }
@@ -743,12 +745,13 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                  if(self.previousDate.substr(0,10) != self.dateArgs.get('selectedDay')){
                     /* if we chose a different day, it doesn't matter
                         if we are inside a session */
-                         self.timeStartMethod = self.managementActions.methods['Event'].dayEndDate;
+                         self.timeStartMethod = self.managementActions.methods.Event.dayEndDate;
                  } else {
-                         if(exists(self.managementActions.timetable.parentTimetable))
+                     if(exists(self.managementActions.timetable.parentTimetable)) {
                              self.timeStartMethod = self.managementActions.methods[self.originalArgs.parentType].dayEndDate;
+                     }
                  }
-                 
+
                  //we make a timeStartMethod request specifying the date for the request
                  //and we get the result of the request as a result
                  indicoRequest(self.timeStartMethod, self.dateArgs, function(result, error){
@@ -814,7 +817,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                  }), this.info.accessor('description'))],
                  [$T('Place'), this.roomEditor.draw()],
                  [$T('Date'), conferenceDays],
-                 [$T('Start time'), Html.div({class: 'popUpLabel', style:{textAlign: 'left'}}, this.startTimeField,
+                 [$T('Start time'), Html.div({className: 'popUpLabel', style:{textAlign: 'left'}}, this.startTimeField,
                              $T(' Duration '), this.timeField, $T('min'))]
                   ]),
                                Html.div('dialogButtons',
@@ -839,10 +842,11 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                       }
                       else {
                           //if we are moving the result to the top timetable we don't need the session slot
-                          if(self.dayChanged && exists(result.slotEntry))
+                          if(self.dayChanged && exists(result.slotEntry)) {
                               result.slotEntry = null;
-                           self.managementActions.timetable._updateMovedEntry(result, args.get('scheduleEntryId'));
-                           self.close();
+                          }
+                          self.managementActions.timetable._updateMovedEntry(result, args.get('scheduleEntryId'));
+                          self.close();
                       }
              });
          }
@@ -898,10 +902,11 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                                    this.info,
                                    $T("Add Break"),
                                    function(result) {
-                                         if(exists(managementActions.timetable.parentTimetable) && this.dayChanged)
-                                             managementActions.timetable.parentTimetable._updateEntry(result, result.id);
-                                         else
-                                             managementActions.timetable._updateEntry(result, result.id);
+                                       if(exists(managementActions.timetable.parentTimetable) && this.dayChanged) {
+                                           managementActions.timetable.parentTimetable._updateEntry(result, result.id);
+                                       } else {
+                                           managementActions.timetable._updateEntry(result, result.id);
+                                       }
                                    });
 
          }

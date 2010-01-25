@@ -267,7 +267,7 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
         return this.LookupTabWidget.prototype.draw.call(this);
     },
 
-    getDays: function() {        
+    getDays: function() {
         return this.sortedKeys;
     },
 

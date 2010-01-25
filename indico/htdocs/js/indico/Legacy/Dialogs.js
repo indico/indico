@@ -290,7 +290,7 @@ extend(IndicoUI.Dialogs,
                                    // end date is one hour later, by default
                                    endDate.setHours(startDate.getHours()+1);
                                }
-                               
+
                                dateArgs.startDate = startDate;
                                dateArgs.endDate = endDate;
                                info.set('startDateTime', Util.formatDateTime(startDate, IndicoDateTimeFormats.ServerHourless));

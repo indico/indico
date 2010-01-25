@@ -441,19 +441,19 @@ class SessionSlotScheduleEditBreak(ScheduleEditBreakBase, sessionServices.Sessio
     def _checkParams(self):
         sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
         ScheduleEditBreakBase._checkParams(self)
-        if self._schEntry.getStartDate().date() != self._dateTime.date():
-            self._dayChanged = True
-        else:
-            self._dayChanged = False
         self._brk = self._schEntry
 
     def _addToSchedule(self, b):
-        if self._dayChanged:
+        # if the schedule target day is different from the current
+        if self._schEntry.getStartDate().date() != self._dateTime.date():
             owner = self._schEntry.getOwner()
 
+            # remove the entry
             self._schEntry.getSchedule().removeEntry(self._schEntry)
 
+            # set it to the new date
             self._schEntry.setStartDate(self._dateTime)
+            # add it on the new date
             self._conf.getSchedule().addEntry(self._schEntry, check=2)
 
     def _getSlotEntry(self):
