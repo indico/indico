@@ -1,0 +1,11 @@
+div.body img {
+    max-width: 900px;
+}
+
+div.related {
+    background-color: #01243f;
+}
+
+div.document {
+    background-color: #02345A;
+}
