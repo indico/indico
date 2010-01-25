@@ -1,0 +1,227 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Chapter 9. Protection System &mdash; Indico v0.97 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.97',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Indico v0.97 documentation" href="../index.html" />
+    <link rel="up" title="Indico’s User Guide" href="index.html" />
+    <link rel="next" title="Indico’s Admin Guide" href="../AdminGuide/index.html" />
+    <link rel="prev" title="Chapter 8. Event Evaluation" href="Evaluation.html" />
+   <link type="text/css" href="../_static/indico.css" rel="stylesheet"/> 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../AdminGuide/index.html" title="Indico’s Admin Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Evaluation.html" title="Chapter 8. Event Evaluation"
+             accesskey="P">previous</a> |</li>
+    <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
+    
+        <li><a href="../index.html">Indico v0.97 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" accesskey="U">Indico&#8217;s User Guide</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="chapter-9-protection-system">
+<h1>Chapter 9. Protection System<a class="headerlink" href="#chapter-9-protection-system" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>9.1. Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>This section aims to describe the protection system used by
+Indico to grant or restrict access to users.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="basic-concepts">
+<h2>9.2. Basic Concepts<a class="headerlink" href="#basic-concepts" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="inheritance-schema">
+<h3>9.2.1. Inheritance Schema<a class="headerlink" href="#inheritance-schema" title="Permalink to this headline">¶</a></h3>
+<p>You can set up a protection policy for almost all the objects that
+you can create within Indico. This protection policy is based on an
+inheritance system, meaning that an object is going to inherit the
+protection from its father, e.g., a contribution can be public but
+becomes private if we set up its container (a meeting) as private.</p>
+<p>The protection objects tree is as shown in the following picture:</p>
+<p><img alt="image208" src="../_images/tree.png" /></p>
+<p>As we can see, a <strong>File</strong> inherits the protection policy from
+<em>Material</em>, <em>Material</em> from <em>Contribution</em>, <em>Contribution</em> from
+<em>Session</em>, <em>Session</em> from <em>Event</em>, <em>Event</em> from <em>Sub-category</em> and
+<em>Sub-category</em> from <em>Category.</em>
+The next picture shows an example of this inheritance system.
+&#8220;Category A&#8221; is PRIVATE and because of this, &#8220;Conference 1&#8221; becomes
+PRIVATE too. As User 1 and User 2 are in the access list for
+&#8220;Category A&#8221; they can also access &#8220;Conference 1&#8221;. The rest of Indico
+users cannot access &#8220;Category A&#8221; and &#8220;Conference 1&#8221;.</p>
+<p><img alt="image209" src="../_images/privByInh.png" /></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="protection-types">
+<h3>9.2.2. Protection Types<a class="headerlink" href="#protection-types" title="Permalink to this headline">¶</a></h3>
+<p>For each object (category, conference, contribution, session,
+etc) in Indico, one can set up three kinds of protection:
+modification control list, access control setup, and domain control.</p>
+<ul class="simple">
+<li>The modification control list contains all the users or groups that can
+edit and modify an object. Therefore, people in this list will be
+the managers for the object and they can access all the pages
+related to it and the objects under it.</li>
+<li>Access control setup: by default, an object is public but we can
+make it private and add restrictions as shown in the section
+<a class="reference external" href="#id1">Access Control Policy</a>.</li>
+<li>Domain control: one can protect an Indico object to be accessed
+only by users who are connected from some given IPs (see
+<a class="reference external" href="#id3">Domain Control Policy</a>).</li>
+</ul>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="id1">
+<h2>9.3. Access Control Policy<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>By default, all the objects (category, event, session,
+contribution, material, file and link) in Indico are <strong>PUBLIC</strong>.</p>
+<p>We can set an object as PRIVATE and this means that all the
+objects under it will be PRIVATE as well.</p>
+<p>If an object is <strong>PRIVATE</strong>, nobody can access it but the
+managers, the users/groups in the access list named &#8220;Users allowed
+to access&#8221; and those who know the &#8220;access key&#8221; if set.</p>
+<p>If an object is <strong>PRIVATE by inheritance</strong>:</p>
+<ul>
+<li><p class="first">Nobody can access it but the managers and the users/groups in the
+access list &#8220;Users allowed to access&#8221; <strong>of its father</strong> (as
+example, see section <a class="reference external" href="#prot_inhe">&#8220;Inheritance Schema&#8221;</a>).</p>
+</li>
+<li><p class="first">We can set the PRIVATE object as <strong>PRIVATE by itself</strong>, which means
+that Indico checks only its protection policy and not the father&#8217;s
+protection policy.</p>
+<p><img alt="image210" src="../_images/privByItself.png" /></p>
+<p>In the graphic, &#8220;User 1&#8221; and &#8220;User 2&#8221; can access &#8220;Category A&#8221; but
+they cannot access &#8220;Conference 1&#8221;. Only &#8220;User 3&#8221; can access
+&#8220;Conference 1&#8221;.</p>
+</li>
+<li><p class="first">We can set the PRIVATE object as <strong>ABSOLUTELY PUBLIC</strong>, which means
+that Indico skips the protection that was established by inheritance.</p>
+<p><img alt="image211" src="../_images/absoPub.png" /></p>
+<p>In the graphic, only &#8220;User 1&#8221; and &#8220;User 2&#8221; can access &#8220;Category A&#8221;,
+but everybody can access &#8220;Conference 1&#8221;.</p>
+</li>
+</ul>
+</div>
+<hr class="docutils" />
+<div class="section" id="id3">
+<h2>9.4. Domain Control Policy<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>If an Indico object (category, event, session, contribution,
+material, file and link) is PUBLIC, we can restrict the access to
+users accessing Indico from some given IPs (these IPs could be like
+127.1 which means that every IP starting like this will be valid).</p>
+<p>If the Indico object is PRIVATE, this checking will not be
+applied.</p>
+<p>If you wish to add special access to some users, meaning that the
+domain control will not be applied for those users, you can add
+them in the &#8220;Users allowed to access&#8221; list.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+   <img src="../_static/indico_logo.png" width="200px"/> 
+
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Chapter 9. Protection System</a><ul>
+<li><a class="reference external" href="#introduction">9.1. Introduction</a></li>
+<li><a class="reference external" href="#basic-concepts">9.2. Basic Concepts</a><ul>
+<li><a class="reference external" href="#inheritance-schema">9.2.1. Inheritance Schema</a></li>
+<li><a class="reference external" href="#protection-types">9.2.2. Protection Types</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#id1">9.3. Access Control Policy</a></li>
+<li><a class="reference external" href="#id3">9.4. Domain Control Policy</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="Evaluation.html"
+                                  title="previous chapter">Chapter 8. Event Evaluation</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="../AdminGuide/index.html"
+                                  title="next chapter">Indico&#8217;s Admin Guide</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/UserGuide/Protection.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../AdminGuide/index.html" title="Indico’s Admin Guide"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Evaluation.html" title="Chapter 8. Event Evaluation"
+             >previous</a> |</li>
+    <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
+    
+        <li><a href="../index.html">Indico v0.97 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Indico&#8217;s User Guide</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Indico Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>
