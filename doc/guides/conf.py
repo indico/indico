@@ -163,6 +163,8 @@ htmlhelp_basename = 'Indicodoc'
 
 # -- Options for LaTeX output --------------------------------------------------
 
+latex_elements = { 'inputenc': "\\usepackage[utf8x]{inputenc}" }
+
 # The paper size ('letter' or 'a4').
 #latex_paper_size = 'letter'
 
@@ -172,7 +174,15 @@ htmlhelp_basename = 'Indicodoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'Indico.tex', u'Indico Documentation',
+  ('UserGuide/index', 'IndicoUserGuide.tex', u'Indico User Guide',
+   u'Indico Team', 'manual'),
+  ('AdminGuide/index', 'IndicoAdminGuide.tex', u'Indico Documentation',
+   u'Indico Team', 'manual'),
+  ('QuickStartGuides/index', 'IndicoQSG.tex', u'Indico Documentation',
+   u'Indico Team', 'manual'),
+  ('FAQ/index', 'IndicoFAQ.tex', u'Indico Documentation',
+   u'Indico Team', 'manual'),
+  ('Glossary/index', 'IndicoGlossary.tex', u'Indico Documentation',
    u'Indico Team', 'manual'),
 ]
 
