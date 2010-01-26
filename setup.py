@@ -101,9 +101,8 @@ def _getDataFiles(x):
     isAConfRe = re.compile('etc\/[^/]+\.conf$')
 
     dataFiles = _generateDataPaths((('bin',           findall('bin'), 4),
-                                    ('doc', ['doc/UserGuide.pdf','doc/AdminUserGuide.pdf'], 4),
+                                    ('doc', findall('doc'), 4),
                                     ('etc', [xx for xx in findall('etc') if not isAConfRe.search(xx)], 4),
-                                    #('MaKaC',              findall('indico/MaKaC'), 13),
                                     ('htdocs',        findall('indico/htdocs'), 14)))
     return dataFiles
 
@@ -134,15 +133,6 @@ def _versionInit():
 
         return v
 
-
-def _convertdoc():
-    '''Generates INSTALL from INSTALL.xml'''
-    commands.getoutput('docbook2html --nochunks doc/docbook_src/INSTALL.xml > INSTALL.html')
-    commands.getoutput('docbook2pdf doc/docbook_src/INSTALL.xml')
-    commands.getoutput('w3m INSTALL.html > INSTALL')
-    commands.getoutput('rm INSTALL.html')
-
-
 ###  Commands ###########################################################
 class sdist_indico(sdist.sdist):
     user_options = sdist.sdist.user_options + \
@@ -165,7 +155,6 @@ class jsdist_indico:
 def _bdist_indico(dataFiles):
     class bdist_indico(bdist.bdist, jsdist_indico):
         def run(self):
-            _convertdoc()
             self.jsCompress()
             compileAllLanguages()
             bdist.bdist.run(self)
@@ -176,7 +165,6 @@ def _bdist_indico(dataFiles):
 def _bdist_egg_indico(dataFiles):
     class bdist_egg_indico(bdist_egg.bdist_egg, jsdist_indico):
         def run(self):
-            _convertdoc()
             self.jsCompress()
             compileAllLanguages()
             bdist_egg.bdist_egg.run(self)

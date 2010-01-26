@@ -43,12 +43,12 @@ type("PopupDialog", ["PopupWidget"], {
         this.nonCloseTriggeringElements.push(element);
     }
     },
-     function(content, triggerElement, closeHandler, nonCloseTriggeringElemets) {
+     function(content, triggerElement, closeHandler, nonCloseTriggeringElements) {
          this.content = content;
          this.PopupWidget();
          this.triggerElement = triggerElement;
          this.closeHandler = any(closeHandler, function() {return true; });
-         this.nonCloseTriggeringElements = any(nonCloseTriggeringElemets, []);
+         this.nonCloseTriggeringElements = any(nonCloseTriggeringElements, []);
      }
     );
 
@@ -312,8 +312,8 @@ type("BalloonPopup", ["PopupDialog"], {
             this.arrowDiv.dom.offsetHeight;
     }
     },
-     function(content, triggerElement, closeHandler) {
-         this.PopupDialog(content, triggerElement, closeHandler);
+     function(content, triggerElement, closeHandler, nonCloseElements) {
+         this.PopupDialog(content, triggerElement, closeHandler, nonCloseElements);
 
          // Constants
          this.arrowHeight = 19;

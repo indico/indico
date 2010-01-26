@@ -267,6 +267,10 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
         return this.LookupTabWidget.prototype.draw.call(this);
     },
 
+    getDays: function() {
+        return this.sortedKeys;
+    },
+
     disable: function() {
         this.enabled = false;
         this.LookupTabWidget.prototype.disable.call(this);
@@ -475,6 +479,10 @@ type("IntervalTimeTableMixin", [], {
 
     },
 
+    getDays: function() {
+        return this.parentTimetable.getDays();
+    },
+
     getById: function(id) {
         return this.parentTimetable.getById(id);
     }
@@ -613,7 +621,6 @@ type("ManagementTimeTable",["TimeTable"], {
             startTime = conference.startDate.time.slice(0,5);
             endTime = conference.endDate.time.slice(0,5);
         } else if (type == 'SessionSlot') {
-
             slot = this.getById(entry[2]);
             startTime = slot.startDate.time.slice(0,5);
             endTime = slot.endDate.time.slice(0,5);
@@ -730,7 +737,8 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
         // Check whether we're operating *over* an existing slot or not
         // it is a slot && slot exists in timetable
         if (result.entry.entryType=="Session" && data[this.currentDay][result.id]) {
-            var slot = data[result.day][result.entry.id];
+            var slot = data[this.currentDay][result.entry.id];
+            //var slot = data[result.day][result.entry.id];
             // in the affirmative case, fetch the time limits
             oldStartTime = slot.startDate.time.slice(0,5);
             oldEndTime = slot.endDate.time.slice(0,5);
@@ -792,6 +800,20 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
              this.eventInfo.endDate.time.replaceAll(':',''))) {
             this.eventInfo.endDate.time = result.endTime;
         }
+
+        this.timetableDrawer.redraw();
+    },
+
+    _updateDay: function(result) {
+
+        this._processAutoOps(result);
+
+        var data = this.getData();
+
+        var entry = {};
+        entry[result.id] = result.entry;
+
+        extend(data, entry);
 
         this.timetableDrawer.redraw();
     },
@@ -888,12 +910,11 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
                 this.parentTimetable.data[result.day][result.slotEntry.id] = result.slotEntry;
                 this.contextInfo = result.slotEntry;
             }
-
             this.parentTimetable.data[result.day][slot.id].entries[result.entry.id] = result.entry;
 
             // Update the times for the slot
             this._updateTimes(result.slotEntry.startDate.time,
-                          result.slotEntry.endDate.time);
+                              result.slotEntry.endDate.time);
 
         }
 
@@ -902,7 +923,6 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
     },
 
     _updateMovedEntry: function(result, oldEntryId) {
-
         this._updateEntry(result, oldEntryId, function(data){
             if(exists(result.slotEntry)){
                 // from slot to slot
@@ -915,6 +935,17 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
                 data[result.day][result.id]=result.entry;
             }
         });
+    },
+
+    _updateDay: function(result) {
+
+        this._processAutoOps(result);
+
+        var data = this.getData();
+
+        extend(data, result.entry);
+
+        this.timetableDrawer.redraw();
     },
 
     getTTMenu: function() {

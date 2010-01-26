@@ -1145,7 +1145,7 @@ class WConferenceTimeTable(wcomponents.WTemplated):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         tz = DisplayTZ(self._aw,self._conf).getDisplayTZ()
-        vars["ttdata"] = schedule.ScheduleToJson.process(self._conf.getSchedule(), tz)
+        vars["ttdata"] = simplejson.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(), tz))
         vars['eventInfo'] = simplejson.dumps(DictPickler.pickle(self._conf, timezone=tz))
         return vars
 
@@ -3174,7 +3174,7 @@ class WConfModifScheduleGraphic(wcomponents.WTemplated):
         vars["newContribURL"] = newContribURL
         vars['rbActive'] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
 
-        vars['ttdata'] = schedule.ScheduleToJson.process(self._conf.getSchedule(), tz)
+        vars['ttdata'] = simplejson.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(), tz))
         vars['eventInfo'] = simplejson.dumps(DictPickler.pickle(self._conf, timezone=tz))
 
         return vars

@@ -1,0 +1,201 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>1. Session Co-ordinator’s Guide &mdash; Indico v0.97 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.97',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Indico v0.97 documentation" href="../../index.html" />
+    <link rel="up" title="3. Session Coordinator’s Guide" href="index.html" />
+    <link rel="next" title="4. Session Manager’s Guide" href="../QSGSessionManager/index.html" />
+    <link rel="prev" title="3. Session Coordinator’s Guide" href="index.html" />
+   <link type="text/css" href="../../_static/indico.css" rel="stylesheet"/> 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../QSGSessionManager/index.html" title="4. Session Manager’s Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="3. Session Coordinator’s Guide"
+             accesskey="P">previous</a> |</li>
+    <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
+    
+        <li><a href="../../index.html">Indico v0.97 documentation</a> &raquo;</li>
+
+          <li><a href="../index.html" >Indico&#8217;s Quick Start Guides</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">3. Session Coordinator&#8217;s Guide</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="session-co-ordinator-s-guide">
+<h1>1. Session Co-ordinator&#8217;s Guide<a class="headerlink" href="#session-co-ordinator-s-guide" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="session-co-ordinator">
+<h2>1.1. Session Co-ordinator<a class="headerlink" href="#session-co-ordinator" title="Permalink to this headline">¶</a></h2>
+<p>The Session Co-ordinator is responsible for scheduling
+contributions and breaks within his session. These contributions
+need to be imported by the Session Manager or Conference Manager
+before you can add them to your session.</p>
+<p>You are given this co-ordinator access by either the Session
+Manager or the Conference Manager. The Conference Manager sets the
+level of modification rights for all of the Session Co-ordinators.
+You can access your session by selecting <em>My session</em> from the
+conference menu.</p>
+<p><img alt="image1" src="../../_images/mysess.png" /></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="session-co-ordination">
+<h2>1.2. Session Co-ordination<a class="headerlink" href="#session-co-ordination" title="Permalink to this headline">¶</a></h2>
+<p>There are three levels of co-ordination modification that the
+Conference Manager can give to Session Co-ordinators, as we will
+see in the following sections.</p>
+<p>If you do not have access or the rights to any part within your
+session you will be presented with this page:</p>
+<p><img alt="image2" src="../../_images/nomod.png" /></p>
+<hr class="docutils" />
+<div class="section" id="basic-rights">
+<h3>1.2.1. Basic Rights<a class="headerlink" href="#basic-rights" title="Permalink to this headline">¶</a></h3>
+<p>All Session Co-ordinators can:</p>
+<ul class="simple">
+<li>Manage the timetable with restrictions: it is allowed to add contributions,
+create breaks, reschedule contributions and breaks; but, for instance, it
+is not allowed to create new sessions, new intervals, etc.</li>
+<li>View contribution list (cannot modify contributions)</li>
+<li>View the sessions&#8217; main information (cannot modify)</li>
+<li>View comments from the Conference Manager (cannot modify)</li>
+</ul>
+<p>Your co-ordination will mainly take place within the <em>Session timetable</em>
+tab of your session:</p>
+<p><img alt="image3" src="../../_images/basicco.png" /></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="contribution-modification-rights">
+<h3>1.2.2. Contribution Modification Rights<a class="headerlink" href="#contribution-modification-rights" title="Permalink to this headline">¶</a></h3>
+<p>If the Conference Manager has allowed contribution modification
+rights you can:</p>
+<ul class="simple">
+<li>Modify the main data of the contribution.</li>
+<li>Set the access controls for the contribution, i.e., give
+submission rights to presenters or allow others to manage the
+contribution.</li>
+<li>Add/remove sub-contributions.</li>
+</ul>
+<p>To modify the contribution click on its entry item from either the
+timetable or the contribution list.</p>
+<p>The contribution management area (for a more detailed explanation
+please see <a class="reference external" href="../../UserGuide/Conferences.html#contributions-management">Contributions in the Indico User Guide</a>):</p>
+<p><img alt="image4" src="../../_images/contco1.png" /></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="unrestricted-timetable-management">
+<h3>1.2.3. Unrestricted Timetable Management<a class="headerlink" href="#unrestricted-timetable-management" title="Permalink to this headline">¶</a></h3>
+<p>If the Conference Manager has allowed you unrestricted timetable
+management rights you can:</p>
+<ul class="simple">
+<li>Add contributions and breaks, reschedule contributions and breaks
+as before</li>
+<li>Add, Edit and Delete session intervals</li>
+</ul>
+<p>The timetable management area will be the same as with the
+basic rights with the options to manage the intervals:</p>
+<p><img alt="image5" src="../../_images/ttco.png" /></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+   <img src="../../_static/indico_logo.png" width="200px"/> 
+
+            <h3><a href="../../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">1. Session Co-ordinator&#8217;s Guide</a><ul>
+<li><a class="reference external" href="#session-co-ordinator">1.1. Session Co-ordinator</a></li>
+<li><a class="reference external" href="#session-co-ordination">1.2. Session Co-ordination</a><ul>
+<li><a class="reference external" href="#basic-rights">1.2.1. Basic Rights</a></li>
+<li><a class="reference external" href="#contribution-modification-rights">1.2.2. Contribution Modification Rights</a></li>
+<li><a class="reference external" href="#unrestricted-timetable-management">1.2.3. Unrestricted Timetable Management</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="index.html"
+                                  title="previous chapter">3. Session Coordinator&#8217;s Guide</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="../QSGSessionManager/index.html"
+                                  title="next chapter">4. Session Manager&#8217;s Guide</a></p>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../QSGSessionManager/index.html" title="4. Session Manager’s Guide"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="3. Session Coordinator’s Guide"
+             >previous</a> |</li>
+    <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
+    
+        <li><a href="../../index.html">Indico v0.97 documentation</a> &raquo;</li>
+
+          <li><a href="../index.html" >Indico&#8217;s Quick Start Guides</a> &raquo;</li>
+          <li><a href="index.html" >3. Session Coordinator&#8217;s Guide</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Indico Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

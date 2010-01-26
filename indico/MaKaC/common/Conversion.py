@@ -108,3 +108,10 @@ class Conversion:
             return "s%(sessionId)sl%(slotId)s" % locator
         else:
             return "s%(sessionId)sc%(contribId)s" % locator
+
+    @classmethod
+    def timedelta(cls, obj):
+        """
+        Converts a timedelta to integer minutes
+        """
+        return int(obj.seconds / 60)

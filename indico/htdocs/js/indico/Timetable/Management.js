@@ -43,12 +43,10 @@ type("TimetableManagementActions", [], {
     deleteEntry: function(eventData) {
         var self = this;
 
-
         if (!confirm("Are you sure you want to delete this timetable entry?"))
-        {
-            return;
-        }
-
+            {
+                return;
+            }
         var info = new WatchObject();
         var type = eventData.entryType;
 
@@ -124,7 +122,7 @@ type("TimetableManagementActions", [], {
     /*
      * Edit start and end date. date format has to be dd/mm/yy mm:hh
      */
-    editEntryStartEndDate: function(startDate, endDate, eventData) {
+    editEntryStartEndDate: function(startDate, endDate, eventData, reschedule) {
         var self = this;
         var info = new WatchObject();
 
@@ -133,6 +131,8 @@ type("TimetableManagementActions", [], {
 
         info.set('startDate', startDate);
         info.set('endDate', endDate);
+        info.set('reschedule', reschedule);
+        info.set('sessionTimetable', this.isSessionTimetable);
 
         var type = eventData.entryType;
 
@@ -154,7 +154,14 @@ type("TimetableManagementActions", [], {
                 IndicoUtil.errorReport(error);
             }
             else {
-                self.timetable._updateEntry(result, result.id);
+                // Depending on whether 'reschedule' was selected or not,
+                // update the whole day or just one entry
+
+                if (reschedule) {
+                    self.timetable._updateDay(result);
+                } else {
+                    self.timetable._updateEntry(result, result.id);
+                }
             }
         });
     },
@@ -313,6 +320,8 @@ type("TimetableManagementActions", [], {
 
         var params;
 
+        var days = this.timetable.getDays();
+
         if (this.session !== null) {
             params = this._addToSessionParams(this.session, 'Contribution');
         } else {
@@ -329,6 +338,8 @@ type("TimetableManagementActions", [], {
             params.selectedDay,
             this.eventInfo.isConference,
             this.eventInfo.favoriteRooms,
+            days,
+            this.timetable,
             function(result) {
                 self._addEntries(result);
             });
@@ -339,6 +350,8 @@ type("TimetableManagementActions", [], {
         var self = this;
 
         var params;
+
+        var days = this.timetable.getDays();
 
         if (this.session !== null) {
             params = this._addToSessionParams(this.session, 'Break');
@@ -351,6 +364,7 @@ type("TimetableManagementActions", [], {
             $O(params),
             $O(params.roomInfo),
             false,
+            days,
             this.eventInfo.favoriteRooms);
 
         dialog.execute();
@@ -362,6 +376,8 @@ type("TimetableManagementActions", [], {
 
         var params;
 
+        var days = this.timetable.getDays();
+
         if (this.session !== null) {
             params = this._addToSessionParams(this.session, 'Break');
         } else {
@@ -370,6 +386,7 @@ type("TimetableManagementActions", [], {
 
         args.set('conference', eventData.conferenceId);
         args.set('scheduleEntry', eventData.scheduleEntryId);
+        args.set('parentType', params.parentType);
 
         each(eventData, function(value, key) {
             args.set(key, value);
@@ -387,6 +404,7 @@ type("TimetableManagementActions", [], {
             args,
             $O(params.roomInfo),
             true,
+            days,
             this.eventInfo.favoriteRooms);
         editDialog.open();
 
@@ -397,6 +415,9 @@ type("TimetableManagementActions", [], {
 
         var params = this._addParams('Session');
 
+        //Get the days in which the conference is being held
+        var days = this.timetable.getDays();
+
         IndicoUI.Dialogs.addSession(
             this.methods[params.type].add,
             this.methods[params.parentType].dayEndDate,
@@ -405,6 +426,7 @@ type("TimetableManagementActions", [], {
             $O(params.roomInfo),
             params.selectedDay,
             this.eventInfo.favoriteRooms,
+            days,
             function(result) { self.timetable._updateEntry(result, result.id); });
     },
     addSessionSlot: function(session) {
@@ -412,6 +434,9 @@ type("TimetableManagementActions", [], {
 
         var params = this._addToSessionParams(session, 'SessionSlot');
         params.parentType = 'Session';
+
+        //Get the days in which the conference is being held
+        var days = this.timetable.getDays();
 
         IndicoUI.Dialogs.addSessionSlot(
             this.methods[params.type].add,
@@ -422,6 +447,7 @@ type("TimetableManagementActions", [], {
             params.startDate,
             params.selectedDay,
             this.eventInfo.favoriteRooms,
+            days,
             function(result) { self.timetable._updateEntry(result, result.id); }
         );
     },
@@ -431,6 +457,9 @@ type("TimetableManagementActions", [], {
 
         var params = this._addToSessionParams(eventData, 'SessionSlot');
         params.parentType = 'Session';
+
+        //Get the days in which the conference is being held
+        var days = this.timetable.getDays();
 
         each(eventData, function(value, key) {
             params[key] = value;
@@ -448,7 +477,16 @@ type("TimetableManagementActions", [], {
             params.startDate,
             params.selectedDay,
             this.eventInfo.favoriteRooms,
-            function(result) { self.timetable._updateEntry(result, result.id); },
+            days,
+            function(result) {
+                var aux = result.entry.entries;
+                self.timetable._updateEntry(result, result.id);
+                /* update the inner timetable!
+                 * You need to create the aux before doing the updateEntry because otherwise the subentries
+                 * in the session won't have the correct value
+                 */
+                self.timetable.data[result.day][result.id].entries = aux;
+            },
             true
         );
     },
@@ -468,6 +506,40 @@ type("TimetableManagementActions", [], {
         moveEntryDiag.open();
     },
 
+
+    /*
+     * Moves entries up or down, according to the "arrows"
+     */
+    moveEntryUpDown: function(eventData, direction) {
+        /*
+         * true - up
+         * false - down
+         */
+
+        info = this._getLocatorParams(eventData);
+        info.set('direction', direction);
+
+        var self = this;
+
+        var killProgress = IndicoUI.Dialogs.Util.progress();
+
+        indicoRequest('schedule.moveEntryUpDown',
+                      info,
+                      function(result, error){
+                          killProgress();
+                          if (error) {
+                              IndicoUtil.errorReport(error);
+                          } else {
+                              var key = keys(result)[0];
+                              var entry = {entry: result[key], id: key};
+
+                              self.timetable._updateDay(entry);
+                          }
+                      });
+
+    },
+
+
     /*
     * Iterates through entries and adds all of them
     */
@@ -476,7 +548,13 @@ type("TimetableManagementActions", [], {
         var self = this;
 
         each(entries, function(entry) {
-            self.timetable._updateEntry(entry, entry.id);
+            //check if we created the contribution from inside a session timetable in the top level timetable
+            //if so, that entry needs to be updated in the top level timetable
+            if(self.timetable.currentDay != entry.day && exists(self.timetable.parentTimetable)) {
+                self.timetable.parentTimetable._updateEntry(entry, entry.id);
+            } else {
+                self.timetable._updateEntry(entry, entry.id);
+            }
         });
     }
 },
@@ -490,6 +568,19 @@ type("TimetableManagementActions", [], {
 
 type("TopLevelTimeTableManagementActions", ["TimetableManagementActions"],
      {
+         _getLocatorParams: function(eventData) {
+             var info = new WatchObject();
+             info.set('scheduleEntryId', eventData.scheduleEntryId);
+             info.set('conference', eventData.conferenceId);
+
+             if (this.isSessionTimetable) {
+                 info.set('sessionTimetable', this.isSessionTimetable);
+                 info.set('sessionId', eventData.sessionId);
+             }
+
+             return info;
+         }
+
      },
      function(timetable, eventInfo, contextInfo, isSessionTimetable) {
          this.TimetableManagementActions(timetable, eventInfo, isSessionTimetable);
@@ -498,6 +589,16 @@ type("TopLevelTimeTableManagementActions", ["TimetableManagementActions"],
 
 type("IntervalTimeTableManagementActions", ["TimetableManagementActions"],
      {
+         _getLocatorParams: function(eventData) {
+             var info = new WatchObject();
+             info.set('scheduleEntryId', eventData.scheduleEntryId);
+             info.set('conference', eventData.conferenceId);
+             info.set('sessionId', eventData.sessionId);
+             info.set('sessionSlotId', eventData.sessionSlotId);
+
+             return info;
+         }
+
      },
      function(timetable, eventInfo, intervalInfo, isSessionTimetable) {
          this.TimetableManagementActions(timetable, eventInfo, isSessionTimetable);

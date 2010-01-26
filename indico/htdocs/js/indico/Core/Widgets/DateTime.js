@@ -70,7 +70,7 @@ type("DateTimeSelector", ["RealtimeTextBox", "ErrorSensitive"],
              showsTime: true,
              // notify the selector each time a new date/time is set
              // (since onkeydown/onkeyup won't be called)
-             onUpdate: function() { self.notifyChange() }
+             onUpdate: function() { self.notifyChange(); }
          });
      });
 
@@ -127,15 +127,15 @@ type("StartEndDateWidget", ["InlineEditWidget"],
              this._setSave(valid);
          },
 
-         _handleEditMode: function() {
+         _handleEditMode: function(value) {
 
              // create datefields
              this.startDate = new DateTimeSelector();
              this.endDate = new DateTimeSelector();
 
              // set them to the values that are passed
-             this.startDate.set(Util.formatDateTime(this.value.startDate, IndicoDateTimeFormats.Server));
-             this.endDate.set(Util.formatDateTime(this.value.endDate, IndicoDateTimeFormats.Server));
+             this.startDate.set(Util.formatDateTime(value.startDate, IndicoDateTimeFormats.Server));
+             this.endDate.set(Util.formatDateTime(value.endDate, IndicoDateTimeFormats.Server));
 
              var self = this;
 
@@ -186,7 +186,7 @@ type("DateTimeDurationWidget", ["IWidget"],
          draw: function() {
              this.dateTimeField = new DateTimeSelector({});
 
-             $B(this.dateTimeField, this.data.accessor('dateTime'))
+             $B(this.dateTimeField, this.data.accessor('dateTime'));
 
              return Html.div(
                  {},

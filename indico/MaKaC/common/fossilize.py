@@ -1,3 +1,12 @@
+"""
+`fossilize` allows us to "serialize" complex python objects into dictionaries and lists. Such operation is very useful for generating JSON data structures from business objects.
+It works as a wrapper around `zope.interface`.
+
+Some of the features are:
+ * Different "fossil" types for the same source class;
+ * Built-in inheritance support;
+"""
+
 import inspect
 import re
 import zope.interface
@@ -7,9 +16,11 @@ def fossilizes(*classList):
     zope.interface.declarations._implements("fossilizes", classList, zope.interface.classImplements)
 
 def addFossil(klazz, fossils):
-    """ Adds fossils to a class
-        klazz: a class object
-        fossils: a fossil class (or a list of fossil classes)
+    """ Declares fossils for a class
+    
+        :param klazz: a class object
+        :type klass: class object
+        :param fossils: a fossil class (or a list of fossil classes)
     """
     if not type(fossils) is list:
         fossils = [fossils]
@@ -24,11 +35,15 @@ class WrongFossilTypeException(Exception):
     pass
 
 class IFossil(zope.interface.Interface):
+    """
+    Fossil base interface. All fossil classes should derive from this one.
+    """
     pass
 
 class Fossilizable(object):
-
-    """ Base class for all the objects that can be fossilized """
+    """
+    Base class for all the objects that can be fossilized
+    """
 
     __nameRE = re.compile('^get(.*)$')
 
@@ -54,6 +69,12 @@ class Fossilizable(object):
             return obj.fossilize(interface, **kwargs)
 
     def fossilize(self, interface, **kwargs):
+        """
+        Fossilizes the object, using the fossil provided by `interface`.
+
+        :param interface: the target fossile type
+        :type interface: IFossil
+        """
 
         if not interface.providedBy(self):
             raise WrongFossilTypeException("Interface '%s' not provided by '%s'" % (interface.__name__, self.__class__.__name__))
@@ -89,6 +110,14 @@ class Fossilizable(object):
         return result
 
 def fossilize(target, interface, **kwargs):
+    """
+    Method that allows the "fossilization" process to be called on data structures (lists, dictionaries and sets) as well as normal `Fossilizable` objects.
+
+    :param target: target object to be fossilized
+    :type target: Fossilizable
+    :param interface: target fossil type
+    :type interface: IFossil
+    """
     if isinstance(target, Fossilizable):
         return target.fossilize(interface, **kwargs)
     else:

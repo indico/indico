@@ -10,7 +10,7 @@ var Util = {
         }
 
         // [1234.]s0.0
-        m = id.match(/^(?:([^\.]+)\.)s(\d+)\.(\d+)$/);
+        m = id.match(/^(?:([^\.]+)\.)s(\d+)(?:\.|l)(\d+)$/);
         if (m) {
             return concat(["SessionSlot"], m.slice(1));
         }
@@ -44,7 +44,7 @@ var Util = {
 
         var m1 = null, m2 = null;
 
-        if (obj == null) {
+        if (obj === null) {
             return null;
         }
         // handle date object
@@ -53,8 +53,8 @@ var Util = {
             m2 = [null, zeropad(obj.getHours()), obj.getMinutes(), obj.getSeconds()];
         } else if (typeof(obj) == 'object'){
             // handle datetime dictionaries
-            // data comes from the server in %Y-%m-%d %H:%M
-            m1 = obj.date.match(/(\d+)[-/](\d+)[-/](\d+)/);
+            // data comes from the server in %Y-%m-%d %H:%M:%S
+            m1 = obj.date.match(/(\d+)[-\/](\d+)[-\/](\d+)/);
             m2 = obj.time.match(/(\d+):(\d+):(\d+)/);
         } else if (sourceFormat){
             // handle strings
@@ -64,7 +64,8 @@ var Util = {
 
             // map the results
             m1 = [null, results['%Y'], results['%m'], results['%d']];
-            m2 = [null, results['%H'], results['%M'], results['%S']];
+            //If we do not want to show the hour
+            m2 = [null, any(results['%H'],''), any(results['%M'],''), any(results['%S'],'')];
         } else {
             throw 'unknown source object';
         }
@@ -73,14 +74,12 @@ var Util = {
             return null;
         }
 
-        // follow the formatting rules
         return format.replace('%Y', zeropad(m1[1])).
         replace('%m', zeropad(m1[2])).
         replace('%d', zeropad(m1[3])).
         replace('%H', zeropad(m2[1])).
         replace('%M', zeropad(m2[2])).
         replace('%S', zeropad(m2[3]));
-
     },
 
     /*
@@ -182,7 +181,11 @@ var IndicoSortCriteria = {
 var IndicoDateTimeFormats = {
     International: '%d/%m/%Y %H:%M',
     ISO8601: '%Y/%m/%d %H:%M',
-    Default: '%d/%m/%Y %H:%M',
-    DefaultHourless: '%d/%m/%Y',
-    Server: '%Y/%m/%d %H:%M'
+    Ordinal: '%Y%m%d'
 };
+
+IndicoDateTimeFormats.Default = IndicoDateTimeFormats.International;
+IndicoDateTimeFormats.Server = IndicoDateTimeFormats.ISO8601;
+
+IndicoDateTimeFormats.DefaultHourless = IndicoDateTimeFormats.Default.split(' ')[0];
+IndicoDateTimeFormats.ServerHourless = IndicoDateTimeFormats.Server.split(' ')[0];

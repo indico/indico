@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Indico’s Glossary &mdash; Indico v0.97 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.97',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Indico v0.97 documentation" href="../index.html" />
+    <link rel="next" title="Indico’s FAQ" href="../FAQ/FAQ.html" />
+    <link rel="prev" title="1. Track Co-ordinator’s Guide" href="../QuickStartGuides/QSGTrackCoordinator/TrackCoordinator.html" />
+   <link type="text/css" href="../_static/indico.css" rel="stylesheet"/> 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../FAQ/FAQ.html" title="Indico’s FAQ"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../QuickStartGuides/QSGTrackCoordinator/TrackCoordinator.html" title="1. Track Co-ordinator’s Guide"
+             accesskey="P">previous</a> |</li>
+    <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
+    
+        <li><a href="../index.html">Indico v0.97 documentation</a> &raquo;</li>
+ 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="indico-s-glossary">
+<h1>Indico&#8217;s Glossary<a class="headerlink" href="#indico-s-glossary" title="Permalink to this headline">¶</a></h1>
+<dl class="glossary docutils">
+<dt id="term-absolutely-public">Absolutely Public</dt>
+<dd>The state in which a resource is public, regardless of the status
+that is inherited from the parent resource.</dd>
+<dt id="term-abstract">Abstract</dt>
+<dd>Ideas or summary of a presentation/contribution, often assigned to
+a track. Once accepted becomes a contribution.</dd>
+<dt id="term-account">Account</dt>
+<dd>A register, associated with a user, and that enables him/her to
+authenticate his/her identity. Indico supports local accounts (no
+longer used at CERN) and NICE accounts (centrally registered at
+CERN, and authenticated through SSO).</dd>
+<dt id="term-avatar">Avatar</dt>
+<dd>An &#8220;Avatar&#8221; is a representation of a user in the Indico database.
+It usually contains all the user&#8217;s personal info (that is extracted
+from the NICE database the first time the user logs into Indico).
+These data can be explicitly modified by the user. An Avatar is
+normally associated with one or more accounts.</dd>
+<dt id="term-break">Break</dt>
+<dd>A pause in the schedule of a meeting/conference. Breaks can be
+placed inside sessions/slots or at the top level.</dd>
+<dt id="term-category">Category</dt>
+<dd>A container for events. Categories can contain either other
+categories (sub-categories), or events, never both at the same
+time. The category hierarchy of Indico resembles a tree where
+categories that contain events are the &#8220;leaves&#8221;.</dd>
+<dt id="term-clone">Clone</dt>
+<dd>Cloning a meeting means replicating it (with the exact same
+information) on a diferent date. This is normally useful for series
+of meetings whose participans and/or contents don&#8217;t change
+significantly.</dd>
+<dt id="term-conference">Conference</dt>
+<dd>The most complex kind of event, containing the same as a meeting,
+plus support for registration, abstract management, and other
+features that are specific to this kind of event.</dd>
+<dt id="term-contribution">Contribution</dt>
+<dd>Usually a presentation taking place within a session or slot.</dd>
+<dt id="term-evaluation">Evaluation</dt>
+<dd>A poll, that is conducted normally after an event takes place, so
+that the organizer can gather feedback about it. It can be applied
+to any event, and the results can be exported as stylesheets.</dd>
+<dt id="term-event">Event</dt>
+<dd>An event is either a Lecture, Meeting or Conference.</dd>
+<dt id="term-file">File</dt>
+<dd>In the context of Indico, this is a resource that links to a
+physical file, contained in Indico&#8217;s &#8220;archive&#8221;. Files are stored
+inside materials.</dd>
+<dt id="term-lecture">Lecture</dt>
+<dd>A presentation, normally done by one or more speakers. It doesn&#8217;t
+contain any &#8220;substructures&#8221; such as contributions.</dd>
+<dt id="term-link">Link</dt>
+<dd>In the context of Indico, a Link is a resource that links to some
+other resource on the Web, specified by a URL. Links exist inside
+materials.</dd>
+<dt id="term-material">Material</dt>
+<dd>A Material is a container for Files and Links, it groups resources
+of the same nature (i.e. slides, documents, drawings...). Materials
+can be attached to Categories (quite rare), Events, Sessions,
+Contributions and Subcontributions.</dd>
+<dt id="term-meeting">Meeting</dt>
+<dd>A kind of event that implies some degree of participation from
+different participants, over different topics (Contributions).
+Contributions can be placed into Sessions, for better organization.
+Slots can also be used, but they are disabled by default.</dd>
+<dt id="term-minutes">Minutes</dt>
+<dd>Minutes are annotations produced by participans in a meeting. They
+can be associated with Meetings, Sessions, Contributions and
+Subcontributions.</dd>
+<dt id="term-private">Private</dt>
+<dd>A status in which a resource cannot be accessed by users that do
+not accomplish certain criteria (i.e. being in a list, or coming
+from a specific IP domain...).</dd>
+<dt id="term-private-by-inheritance">Private by Inheritance</dt>
+<dd>A status in which an resource is private just because its parent
+resource was set as private (either by inheritance, or
+explicitly).</dd>
+<dt id="term-public">Public</dt>
+<dd>A status in which a resource is publicly accessible, with no
+constraints. This status can be overriden, if the parent resource
+is set as private (see Private by Inheritance).</dd>
+<dt id="term-resource">Resource</dt>
+<dd>In the context of this document, a Resource is a category, event
+(lecture, meeting or conference), session, contribution,
+subcontribution, material, link or file. It is basically any
+information-bearing object in Indico&#8217;s domain.</dd>
+<dt id="term-session">Session</dt>
+<dd>A time slot to help organise your conference timetable. Can contain
+slots, contributions and breaks.</dd>
+<dt id="term-slot">Slot</dt>
+<dd>A session can be split into slots, can be used when the session
+happens over more than one period of time. Can contain
+contributions and breaks.</dd>
+<dt id="term-subcontribution">Subcontribution</dt>
+<dd>A subdivision of a contribution.</dd>
+<dt id="term-track">Track</dt>
+<dd>Often topics or areas in which to start organising your conference.
+Can contain abstracts and contributions.</dd>
+<dt id="term-visibility">Visibility</dt>
+<dd>In the context of Indico, Visibility usually refers to the extent
+to which an event can be seen in the event overview page. This
+attribute sets whether the event can be seen as belonging to the
+top level class (and all those below), to none of them (invisible),
+or to one of the intermediate classes (and all those below).</dd>
+</dl>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+   <img src="../_static/indico_logo.png" width="200px"/> 
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="../QuickStartGuides/QSGTrackCoordinator/TrackCoordinator.html"
+                                  title="previous chapter">1. Track Co-ordinator&#8217;s Guide</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="../FAQ/FAQ.html"
+                                  title="next chapter">Indico&#8217;s FAQ</a></p>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../FAQ/FAQ.html" title="Indico’s FAQ"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../QuickStartGuides/QSGTrackCoordinator/TrackCoordinator.html" title="1. Track Co-ordinator’s Guide"
+             >previous</a> |</li>
+    <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
+    
+        <li><a href="../index.html">Indico v0.97 documentation</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Indico Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

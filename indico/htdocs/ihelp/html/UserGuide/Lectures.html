@@ -1,0 +1,306 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>4. Lectures &mdash; Indico v0.97 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.97',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Indico v0.97 documentation" href="../index.html" />
+    <link rel="up" title="Indico’s User Guide" href="index.html" />
+    <link rel="next" title="5. Users and Groups" href="UsersGroups.html" />
+    <link rel="prev" title="3. Meetings" href="Meetings.html" />
+   <link type="text/css" href="../_static/indico.css" rel="stylesheet"/> 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="UsersGroups.html" title="5. Users and Groups"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Meetings.html" title="3. Meetings"
+             accesskey="P">previous</a> |</li>
+    <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
+    
+        <li><a href="../index.html">Indico v0.97 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" accesskey="U">Indico&#8217;s User Guide</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="lectures">
+<h1>4. Lectures<a class="headerlink" href="#lectures" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="lecture">
+<h2>4.1. Lecture<a class="headerlink" href="#lecture" title="Permalink to this headline">¶</a></h2>
+<p>A Lecture is the simplest form of event within Indico. A
+Lecture allows you to add material, give details about the lecture,
+and set the access control. You also have Tools in which you can
+remove, clone, and set alarms.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="creating-a-lecture">
+<h2>4.2. Creating a Lecture<a class="headerlink" href="#creating-a-lecture" title="Permalink to this headline">¶</a></h2>
+<p>If you have the correct access rights within a Category you can
+create a new lecture using the <em>Create event</em> &gt; <em>Lecture</em> from the
+blue top bar.
+You will be presented with a form similar to that for a Meeting;
+you are able to choose the default style in which the
+Lecture will be displayed <a class="reference external" href="#lecture-display-area">(See Lecture Display Area)</a>.
+After you submit this form the Lecture will be created and you will
+be redirected to its Management Area.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="lecture-management-area">
+<h2>4.3. Lecture Management Area<a class="headerlink" href="#lecture-management-area" title="Permalink to this headline">¶</a></h2>
+<p>The Management Area allows you to control the different parts of
+your lecture. The following sections will show each area of the
+Lecture Management.</p>
+<hr class="docutils" />
+<div class="section" id="general-settings-management">
+<h3>4.3.1. General Settings Management<a class="headerlink" href="#general-settings-management" title="Permalink to this headline">¶</a></h3>
+<p>From the <em>General settings</em> menu, you are able to modify the details of the
+lecture including title, description, location, dates, speakers, and default
+style of the display.</p>
+<p><img alt="image141" src="../_images/lect2.png" /></p>
+<p>Clicking on the link <em>View event page</em> will take you to the
+home page of your event.</p>
+<hr class="docutils" />
+<div class="section" id="material">
+<h4>4.3.1.1. Material<a class="headerlink" href="#material" title="Permalink to this headline">¶</a></h4>
+<p>You can add material to the lecture, by using the <em>Material</em> menu, and
+the link <em>Add Material</em>.
+You can then enter the name and description of the material.</p>
+<p><img alt="image144" src="../_images/lect10.png" /></p>
+<p>The material can be files or links. You also protect the material
+to control who has access to view the material.</p>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="protection-management">
+<h3>4.3.2. Protection Management<a class="headerlink" href="#protection-management" title="Permalink to this headline">¶</a></h3>
+<p>Protection Management in a lecture is the same as that in a Meeting.
+There is Modification Control, Domain Control and Access Control.
+When adding to the Access and Modification lists, you can also add
+Groups of users if any have been defined by Administration.</p>
+<p><em>Modification Control</em> Only the managers listed in the
+modification control, the creator of the lecture, and any
+administrators can access the Management Area of the lecture.
+However, you can add a Modification Key which means anyone with this
+key can modify the lecture without logging in.</p>
+<p><img alt="image145" src="../_images/lect3.png" /></p>
+<p><em>Access Control</em> When the lecture is public, anyone can view the
+lecture . When the lecture is private, only those in the access
+list, lecture managers, and administrators can view the lecture.</p>
+<p><img alt="image146" src="../_images/confm30.png" /></p>
+<p>When private you can also add an Access Key which means anyone
+with this key can access the lecture without logging in.</p>
+<p><em>Domain Control</em> This is available when the lecture is
+public. You can specify which domain can access the lecture. For
+instance, users accessing from a computer in the CERN domain will
+be able to access.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="tools-management">
+<h3>4.3.3. Tools Management<a class="headerlink" href="#tools-management" title="Permalink to this headline">¶</a></h3>
+<p>The lecture Tools allow you to carry out certain actions on the whole
+of the lecture.</p>
+<p><img alt="image147" src="../_images/lect4.png" /></p>
+<hr class="docutils" />
+<div class="section" id="deleting-a-lecture">
+<h4>4.3.3.1. Deleting a Lecture<a class="headerlink" href="#deleting-a-lecture" title="Permalink to this headline">¶</a></h4>
+<p>The Delete this lecture option will delete the whole lecture. You will
+be asked to confirm deletion beforehand.</p>
+<p><img alt="image148" src="../_images/lect5.png" /></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="cloning-a-lecture">
+<h4>4.3.3.2. Cloning a Lecture<a class="headerlink" href="#cloning-a-lecture" title="Permalink to this headline">¶</a></h4>
+<p>Clone the lecture if you would like to make another lecture exactly the
+same. You have the option to clone it once, at fixed intervals,
+or on certain dates.</p>
+<p><img alt="image149" src="../_images/lect6.png" /></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="packaging-material">
+<h4>4.3.3.3. Packaging Material<a class="headerlink" href="#packaging-material" title="Permalink to this headline">¶</a></h4>
+<p>Using the <em>Material Package</em> option you can create a package
+of all the materials that have been used in the lecture.</p>
+<p><img alt="image150" src="../_images/lect7.png" /></p>
+<hr class="docutils" />
+</div>
+<hr class="docutils" />
+<div class="section" id="alarm-control">
+<h4>4.3.3.4. Alarm Control<a class="headerlink" href="#alarm-control" title="Permalink to this headline">¶</a></h4>
+<p>You can set an alarm/reminder to alert people about the
+lecture; the alert will be in the form of an email.</p>
+<p><img alt="image152" src="../_images/lect9.png" /></p>
+</div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="lecture-display-area">
+<h2>4.4. Lecture Display Area<a class="headerlink" href="#lecture-display-area" title="Permalink to this headline">¶</a></h2>
+<p>The Lecture Display is the view that users of the lecture will
+see. If the lecture is public they will not need to log in to view
+the lecture. It is also the area in which you can access the
+modification areas if you have access rights. There are various
+views in which the lecture can be displayed; the following sections
+show the different views and displays of the different parts of a
+lecture.</p>
+<hr class="docutils" />
+<div class="section" id="lecture-style">
+<h3>4.4.1. Lecture Style<a class="headerlink" href="#lecture-style" title="Permalink to this headline">¶</a></h3>
+<p>This is the default view for lectures in Indico. If you have
+modification rights to any parts in the lecture, you will be able
+to access the Management Area by clicking the modification icon <img alt="image155" src="../_images/conf2.png" />.</p>
+<p>You can also do some management actions from the tab <em>Manage</em> on the right
+of the title.</p>
+<p><img alt="image156" src="../_images/lect11.png" /></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="it-style">
+<h3>4.4.2. IT Style<a class="headerlink" href="#it-style" title="Permalink to this headline">¶</a></h3>
+<p>The IT style:</p>
+<p><img alt="image157" src="../_images/lect12.png" /></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="cds-agenda-style">
+<h3>4.4.3. CDS Agenda Style<a class="headerlink" href="#cds-agenda-style" title="Permalink to this headline">¶</a></h3>
+<p>The CDS Agenda style:</p>
+<p><img alt="image158" src="../_images/lect13.png" /></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="static-style">
+<h3>4.4.4. Static Style<a class="headerlink" href="#static-style" title="Permalink to this headline">¶</a></h3>
+<p>The Static style:</p>
+<p><img alt="image159" src="../_images/lect14.png" /></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="simple-xml-style">
+<h3>4.4.5. Simple XML Style<a class="headerlink" href="#simple-xml-style" title="Permalink to this headline">¶</a></h3>
+<p>The Simple XML style:</p>
+<p><img alt="image160" src="../_images/lect15.png" /></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="event-style">
+<h3>4.4.6. Event Style<a class="headerlink" href="#event-style" title="Permalink to this headline">¶</a></h3>
+<p>The Event style:</p>
+<p><img alt="image161" src="../_images/lect16.png" /></p>
+<hr class="docutils" />
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+   <img src="../_static/indico_logo.png" width="200px"/> 
+
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">4. Lectures</a><ul>
+<li><a class="reference external" href="#lecture">4.1. Lecture</a></li>
+<li><a class="reference external" href="#creating-a-lecture">4.2. Creating a Lecture</a></li>
+<li><a class="reference external" href="#lecture-management-area">4.3. Lecture Management Area</a><ul>
+<li><a class="reference external" href="#general-settings-management">4.3.1. General Settings Management</a><ul>
+<li><a class="reference external" href="#material">4.3.1.1. Material</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#protection-management">4.3.2. Protection Management</a></li>
+<li><a class="reference external" href="#tools-management">4.3.3. Tools Management</a><ul>
+<li><a class="reference external" href="#deleting-a-lecture">4.3.3.1. Deleting a Lecture</a></li>
+<li><a class="reference external" href="#cloning-a-lecture">4.3.3.2. Cloning a Lecture</a></li>
+<li><a class="reference external" href="#packaging-material">4.3.3.3. Packaging Material</a></li>
+<li><a class="reference external" href="#alarm-control">4.3.3.4. Alarm Control</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference external" href="#lecture-display-area">4.4. Lecture Display Area</a><ul>
+<li><a class="reference external" href="#lecture-style">4.4.1. Lecture Style</a></li>
+<li><a class="reference external" href="#it-style">4.4.2. IT Style</a></li>
+<li><a class="reference external" href="#cds-agenda-style">4.4.3. CDS Agenda Style</a></li>
+<li><a class="reference external" href="#static-style">4.4.4. Static Style</a></li>
+<li><a class="reference external" href="#simple-xml-style">4.4.5. Simple XML Style</a></li>
+<li><a class="reference external" href="#event-style">4.4.6. Event Style</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="Meetings.html"
+                                  title="previous chapter">3. Meetings</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="UsersGroups.html"
+                                  title="next chapter">5. Users and Groups</a></p>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="UsersGroups.html" title="5. Users and Groups"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Meetings.html" title="3. Meetings"
+             >previous</a> |</li>
+    <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
+    
+        <li><a href="../index.html">Indico v0.97 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Indico&#8217;s User Guide</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Indico Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

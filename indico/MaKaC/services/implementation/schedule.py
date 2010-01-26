@@ -21,7 +21,7 @@ from MaKaC.common.utils import getHierarchicalId, formatTime, formatDateTime, pa
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.errors import TimingError
 
-import time, datetime, pytz
+import time, datetime, pytz, copy
 
 def translateAutoOps(autoOps):
 
@@ -122,7 +122,7 @@ class ScheduleAddContribution(ScheduleOperation, LocationSetter):
         self._boardNumber = self._pManager.extract("boardNumber", pType=str, allowEmpty=True)
         self._needsToBeScheduled = self._params.get("schedule", True)
         if self._needsToBeScheduled:
-            self._dateTime = self._pManager.extract("dateTime", pType=datetime.datetime)
+            self._dateTime = self._pManager.extract("startDate", pType=datetime.datetime)
 
         self._duration = self._pManager.extract("duration", pType=int)
         self._title = self._pManager.extract("title", pType=str)
@@ -444,7 +444,17 @@ class SessionSlotScheduleEditBreak(ScheduleEditBreakBase, sessionServices.Sessio
         self._brk = self._schEntry
 
     def _addToSchedule(self, b):
-        pass
+        # if the schedule target day is different from the current
+        if self._schEntry.getStartDate().date() != self._dateTime.date():
+            owner = self._schEntry.getOwner()
+
+            # remove the entry
+            self._schEntry.getSchedule().removeEntry(self._schEntry)
+
+            # set it to the new date
+            self._schEntry.setStartDate(self._dateTime)
+            # add it on the new date
+            self._conf.getSchedule().addEntry(self._schEntry, check=2)
 
     def _getSlotEntry(self):
         return DictPickler.pickle(self._slot.getConfSchEntry(), timezone=self._conf.getTimezone())
@@ -480,75 +490,79 @@ class SessionSlotScheduleDeleteContribution(ScheduleOperation, sessionServices.S
         self._slot.getSchedule().removeEntry(self._schEntry)
 
 
-class SessionSlotScheduleModifyStartEndDate(ScheduleOperation, sessionServices.SessionSlotModifCoordinationBase):
+class ModifyStartEndDate(ScheduleOperation):
 
     def _checkParams(self):
-        sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
 
         pManager = ParameterManager(self._params, timezone = self._conf.getTimezone())
-
         self._startDate = pManager.extract("startDate", pType=datetime.datetime)
         self._endDate = pManager.extract("endDate", pType=datetime.datetime)
+        self._reschedule = pManager.extract("reschedule", pType=bool)
 
     def _performOperation(self):
 
-        self._schEntry.setStartDate(self._startDate);
-        duration = self._endDate - self._startDate
-        self._schEntry.setDuration(dur=duration)
-
-        pickledDataEntry = DictPickler.pickle(self._schEntry, timezone=self._conf.getTimezone())
-        pickledDataSlotSchEntry = DictPickler.pickle(self._slot.getConfSchEntry(), timezone=self._conf.getTimezone())
-        pickledDataSession = DictPickler.pickle(self._session, timezone=self._conf.getTimezone())
-        return {'day': self._schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
-                'id': pickledDataEntry['id'],
-                'entry': pickledDataEntry,
-                'slotEntry': pickledDataSlotSchEntry,
-                'session': pickledDataSession,
-                'autoOps': translateAutoOps(self.getAutoOps())}
-
-
-class ConferenceScheduleModifyStartEndDate(ScheduleOperation, conferenceServices.ConferenceScheduleModifBase):
-
-    def _checkParams(self):
-        conferenceServices.ConferenceScheduleModifBase._checkParams(self)
-
-        pManager = ParameterManager(self._params, timezone = self._conf.getTimezone())
-
-        self._startDate = pManager.extract("startDate", pType=datetime.datetime)
-        self._endDate = pManager.extract("endDate", pType=datetime.datetime)
-
-    def _performOperation(self):
+        # if we want to reschedule other entries, let's store the old parameters
+        # and the list of entries that will be rescheduled (after this one)
+        if self._reschedule:
+            oldStartDate=copy.copy(self._schEntry.getStartDate())
+            oldDuration=copy.copy(self._schEntry.getDuration())
+            i = self._schEntry.getSchedule().getEntries().index(self._schEntry)+1
+            entriesList = self._schEntry.getSchedule().getEntries()[i:]
 
         self._schEntry.setStartDate(self._startDate, moveEntries=1);
         duration = self._endDate - self._startDate
         self._schEntry.setDuration(dur=duration)
 
-        entryId, pickledData = schedule.ScheduleToJson.processEntry(self._schEntry, self._conf.getTimezone())
+        # In case of 'reschedule', calculate the time difference
+        if self._reschedule:
+            diff = (self._schEntry.getStartDate() - oldStartDate) + (self._schEntry.getDuration() - oldDuration)
+
+            # shift accordingly
+            self._schEntry.getSchedule().moveEntriesBelow(diff, entriesList)
+
+            # retrieve results
+            pickledData = schedule.ScheduleToJson.process(self._schEntry.getSchedule(), self._conf.getTimezone(), days = [self._schEntry.getAdjustedStartDate()])
+            entryId = pickledData.keys()[0]
+            pickledData = pickledData.values()[0]
+        else:
+            entryId, pickledData = schedule.ScheduleToJson.processEntry(self._schEntry, self._conf.getTimezone())
+
         return {'day': self._schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
-                'id': pickledData['id'],
+                'id': entryId,
                 'entry': pickledData,
                 'autoOps': translateAutoOps(self.getAutoOps())}
 
-class SessionScheduleModifyStartEndDate(ScheduleOperation, sessionServices.SessionModifBase):
+
+class SessionSlotScheduleModifyStartEndDate(ModifyStartEndDate, sessionServices.SessionSlotModifCoordinationBase):
 
     def _checkParams(self):
-        sessionServices.SessionModifBase._checkParams(self)
-
-        pManager = ParameterManager(self._params, timezone = self._conf.getTimezone())
-
-        self._startDate = pManager.extract("startDate", pType=datetime.datetime)
-        self._endDate = pManager.extract("endDate", pType=datetime.datetime)
+        sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
+        ModifyStartEndDate._checkParams(self)
 
     def _performOperation(self):
-        self._schEntry.setStartDate(self._startDate);
-        duration = self._endDate - self._startDate
-        self._schEntry.setDuration(dur=duration)
 
-        pickledData = DictPickler.pickle(self._schEntry, timezone=self._conf.getTimezone())
-        return {'day': self._schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
-                'id': pickledData['id'],
-                'entry': pickledData,
-                'autoOps': translateAutoOps(self.getAutoOps())}
+        result = ModifyStartEndDate._performOperation(self)
+
+        pickledDataSlotSchEntry = DictPickler.pickle(self._slot.getConfSchEntry(), timezone=self._conf.getTimezone())
+        pickledDataSession = DictPickler.pickle(self._session, timezone=self._conf.getTimezone())
+        result.update({'slotEntry': pickledDataSlotSchEntry,
+                       'session': pickledDataSession})
+
+        return result
+
+
+class ConferenceScheduleModifyStartEndDate(ModifyStartEndDate, conferenceServices.ConferenceScheduleModifBase):
+
+   def _checkParams(self):
+        conferenceServices.ConferenceScheduleModifBase._checkParams(self)
+        ModifyStartEndDate._checkParams(self)
+
+
+class SessionScheduleModifyStartEndDate(ModifyStartEndDate, sessionServices.SessionModifBase):
+
+   def _checkParams(self):
+        sessionServices.SessionModifBase._checkParams(self)
+        ModifyStartEndDate._checkParams(self)
 
 class ConferenceScheduleGetDayEndDate(ScheduleOperation, conferenceServices.ConferenceModifBase):
 
@@ -556,7 +570,7 @@ class ConferenceScheduleGetDayEndDate(ScheduleOperation, conferenceServices.Conf
         conferenceServices.ConferenceModifBase._checkParams(self)
         pManager = ParameterManager(self._params)
 
-        date = pManager.extract("date", pType=datetime.date)
+        date = pManager.extract("selectedDay", pType=datetime.date)
         self._date = datetime.datetime(date.year, date.month, date.day, tzinfo=pytz.timezone(self._conf.getTimezone()))
 
     def _performOperation(self):
@@ -567,7 +581,7 @@ class SessionSlotScheduleGetDayEndDate(ScheduleOperation, sessionServices.Sessio
     def _checkParams(self):
         sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
         pManager = ParameterManager(self._params)
-        date = pManager.extract("date", pType=datetime.date)
+        date = pManager.extract("selectedDay", pType=datetime.date)
         self._date = datetime.datetime(date.year, date.month, date.day, tzinfo=pytz.timezone(self._conf.getTimezone()))
 
     def _performOperation(self):
@@ -584,7 +598,7 @@ class SessionScheduleGetDayEndDate(ScheduleOperation, sessionServices.SessionMod
         sessionServices.SessionModifUnrestrictedTTCoordinationBase._checkParams(self)
         pManager = ParameterManager(self._params)
 
-        date = pManager.extract("date", pType=datetime.date)
+        date = pManager.extract("selectedDay", pType=datetime.date)
         self._date = datetime.datetime(date.year, date.month, date.day)
 
     def _performOperation(self):
@@ -610,16 +624,21 @@ class ScheduleEditSlotBase(ScheduleOperation, LocationSetter):
         self._isSessionTimetable = pManager.extract("sessionTimetable", pType=bool, allowEmpty=True)
 
     def _performOperation(self):
+        #if there is something inside the session we have to move it as well
 
-        self._slot.setValues({"title": self._title or "",
-                        "sDate": self._startDateTime,
-                        "eDate": self._endDateTime})
+        values = {"title": self._title or "",
+                  "sDate": self._startDateTime,
+                  "eDate": self._endDateTime}
+
+        if len(self._slot.getEntries()) != 0 :
+            values.update({"move": 1})
+
+        self._slot.setValues(values)
 
         self. _addConveners(self._slot)
         self._setLocationInfo(self._slot)
 
         self._addToSchedule()
-        #self._target.fit()
 
         logInfo = self._slot.getLogInfo()
         logInfo["subject"] = "Create new slot: %s"%self._slot.getTitle()
@@ -981,6 +1000,45 @@ class MoveEntry(ScheduleOperation, conferenceServices.ConferenceModifBase):
                 'slotEntry': pickledDataSlotSchEntry,
                 'autoOps': translateAutoOps(self.getAutoOps())}
 
+
+class MoveEntryUpDown(ScheduleOperation, conferenceServices.ConferenceModifBase):
+    def _checkParams(self):
+        conferenceServices.ConferenceModifBase._checkParams(self)
+
+        pManager = ParameterManager(self._params, timezone = self._conf.getTimezone())
+
+        self._schEntryId = pManager.extract("scheduleEntryId", pType=int, allowEmpty=False)
+        self._sessionId = pManager.extract("sessionId", pType=str, allowEmpty=True, defaultValue=None)
+        self._sessionSlotId = pManager.extract("sessionSlotId", pType=str, allowEmpty=True, defaultValue=None)
+        self._direction = pManager.extract("direction", pType=bool, allowEmpty=False)
+        self._isSessionTimetable = pManager.extract("sessionTimetable", pType=bool, allowEmpty=True)
+
+    def _performOperation(self):
+
+
+
+        if self._isSessionTimetable:
+            schedObject = self._conf.getSessionById(self._sessionId)
+        else:
+            if self._sessionId != None and self._sessionSlotId != None:
+                session = self._conf.getSessionById(self._sessionId)
+                slot = session.getSlotById(self._sessionSlotId)
+                schedObject = slot
+            else:
+                schedObject = self._conf
+
+        sched = schedObject.getSchedule()
+        schEntry = sched.getEntryById(self._schEntryId)
+
+        if self._direction:
+            sched.moveUpEntry(schEntry)
+        else:
+            sched.moveDownEntry(schEntry)
+
+        return schedule.ScheduleToJson.process(sched, self._conf.getTimezone(), days = [ schEntry.getAdjustedStartDate() ])
+
+
+
 methodMap = {
     "get": ConferenceGetSchedule,
 
@@ -1024,5 +1082,6 @@ methodMap = {
     "getAllSessionConveners": ConferenceGetAllConveners,
     "getAllSpeakers": ConferenceGetAllSpeakers,
 
-    "moveEntry": MoveEntry
+    "moveEntry": MoveEntry,
+    "moveEntryUpDown": MoveEntryUpDown
 }

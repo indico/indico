@@ -7071,7 +7071,6 @@ class SessionSlot(Persistent):
 
         self.setStartDate(sDate, check, moveEntries, checkDuration=False)
         self.setDuration(0, 0, 0, eDate-sDate, check)
-
         self.notifyModification()
 
     def getEntries(self):

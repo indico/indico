@@ -48,13 +48,11 @@
             %(selectionBox)s
         </td>
     </tr>
-    </form>
     <tr>
         <td colspan="3" align="center">
-            <form action="%(addURL)s" method="POST">
-                %(params)s
+                <input type="submit" class="btn" value="<%= _("select")%>" name="select">
                 <input type="submit" class="btn" value="<%= _("cancel")%>">
-            </form>
         </td>
     </tr>
+    </form>
 </table>

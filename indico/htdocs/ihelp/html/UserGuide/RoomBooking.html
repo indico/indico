@@ -1,0 +1,427 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7. Conference Room Booking &mdash; Indico v0.97 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.97',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Indico v0.97 documentation" href="../index.html" />
+    <link rel="up" title="Indico’s User Guide" href="index.html" />
+    <link rel="next" title="8. Event Evaluation" href="Evaluation.html" />
+    <link rel="prev" title="6. Exporting Indico Data" href="Export.html" />
+   <link type="text/css" href="../_static/indico.css" rel="stylesheet"/> 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Evaluation.html" title="8. Event Evaluation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Export.html" title="6. Exporting Indico Data"
+             accesskey="P">previous</a> |</li>
+    <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
+    
+        <li><a href="../index.html">Indico v0.97 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" accesskey="U">Indico&#8217;s User Guide</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="conference-room-booking">
+<h1>7. Conference Room Booking<a class="headerlink" href="#conference-room-booking" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>7.1. Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>This chapter describes the Indico module for booking conference
+rooms.</p>
+<p>Indico users can book conference rooms for their conference and
+meeting purposes. Bookings can also be standalone - they
+do not have to be bound to any event. Room managers can monitor and
+moderate all bookings. Indico administrators can create rooms and
+manage their data.</p>
+<p>Instead of being a boring manual no one ever reads, this file is
+an introduction. This assumes you have some intuition of how the web
+works. The suggested way of learning is to start with a tutorial,
+then play with the module on your own. Simply use the software as
+any other Web page. Read context help along the way. Finally come
+back for some tips.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="the-tutorial">
+<h2>7.2. The Tutorial<a class="headerlink" href="#the-tutorial" title="Permalink to this headline">¶</a></h2>
+<p>You may want to read the Core Features listing to grasp the capabilities
+of the room booking module capabilities. To summarize, it is for booking
+conference rooms.</p>
+<p><img alt="image165" src="../_images/rb_main.png" /></p>
+<hr class="docutils" />
+<div class="section" id="getting-into-room-booking-module">
+<h3>7.2.1. Getting into Room Booking Module<a class="headerlink" href="#getting-into-room-booking-module" title="Permalink to this headline">¶</a></h3>
+<p>To use Indico::CRBS directly, just click <em>Room Booking</em> on Indico
+home page. To book rooms for your event, go to the event management
+page and click <em>Room Booking</em> option. In both cases you will be asked
+to sign in. Use your Indico credentials.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="the-first-page">
+<h3>7.2.2. The First Page<a class="headerlink" href="#the-first-page" title="Permalink to this headline">¶</a></h3>
+<p>The Room Booking Module first page depends on who is logged in. For
+most people, it will show a list of their bookings. The <em>My bookings</em>
+menu option will give you the same list. Room managers will see
+bookings of rooms they manage, so they can quickly see what&#8217;s going
+on. If you are a room manager, use the <em>Bookings in my rooms</em> menu option to
+show this page again. (This menu option is not visible for ordinary
+users).</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="the-most-important-tip">
+<h3>7.2.3. The Most Important Tip<a class="headerlink" href="#the-most-important-tip" title="Permalink to this headline">¶</a></h3>
+<p>Feeling lost? Point at the question mark icon <img alt="image166" src="../_images/help.png" /> with your
+mouse to see context help. Context help is meant to answer most of
+your questions along the way. It is always there waiting for you.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="room-names">
+<h3>7.2.4. Room Names<a class="headerlink" href="#room-names" title="Permalink to this headline">¶</a></h3>
+<p>If a room does not have a name, the default one is built according
+to the following pattern:</p>
+<p>&#8220;location: building-floor-room&#8221;</p>
+<p>Examples: &#8220;CERN: 304-1-001&#8221;, &#8220;Sheraton: 0-34-013&#8221;.</p>
+<p><img alt="image167" src="../_images/rb_room_name.png" /></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="three-kinds-of-room">
+<h3>7.2.5. Three Kinds of Room<a class="headerlink" href="#three-kinds-of-room" title="Permalink to this headline">¶</a></h3>
+<p>There are three kinds of room. They determine how much freedom
+users have.</p>
+<ul>
+<li><dl class="first docutils">
+<dt><em>Public rooms</em> which do not require confirmation (black/green</dt>
+<dd><p class="first last">colour). This means all bookings are considered accepted.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>Public rooms</em> which do require confirmation (orange colour). You can</dt>
+<dd><p class="first last">PRE-book them and wait for acceptance or rejection.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>Private rooms</em> which cannot be booked at all (red colour). Only the room</dt>
+<dd><p class="first last">manager can book his/her private room. If you need such a room, you
+should ask this person to insert a booking for you.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p><img alt="image168" src="../_images/rb_room_types.png" /></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="six-types-of-booking">
+<h3>7.2.6. Six Types of Booking<a class="headerlink" href="#six-types-of-booking" title="Permalink to this headline">¶</a></h3>
+<p>There are six types of booking. They allow you to define
+different types of recurring reservation. A common example is a weekly
+meeting (which takes place at the same time every week). You can
+choose from:</p>
+<ul class="simple">
+<li><em>Single day</em>: not recurring, one-time event</li>
+<li><em>Repeat daily</em>: use if you want to book many subsequent days, like
+the whole week</li>
+<li><em>Repeat once a week</em>: the booking will take place every week,
+always on the same day</li>
+<li><em>Repeat once every two weeks</em>: as above, but repeats every two
+weeks</li>
+<li><em>Repeat once every three weeks</em>: as above, but repeats every
+three weeks</li>
+<li><em>Repeat every month</em>: allows you to do bookings like &#8216;first Friday
+of each month&#8217;, &#8216;second Wednesday of each month&#8217;, &#8216;fourth Saturday
+of each month&#8217;, etc.</li>
+</ul>
+</div>
+<hr class="docutils" />
+<div class="section" id="booking-a-room">
+<h3>7.2.7. Booking a Room<a class="headerlink" href="#booking-a-room" title="Permalink to this headline">¶</a></h3>
+<p>Basically there are two steps: selecting a room and filling in a
+booking form. More detailed steps are:</p>
+<p><img alt="image169" src="../_images/rb_booking_a_room.png" /></p>
+<ul class="simple">
+<li>On the main Indico page, click the <em>Room Booking</em> menu option. This is
+your entrance to the Room Booking Module.</li>
+<li>Click the <em>Book a Room</em> menu option.</li>
+<li>If you know which room you want, simply select it and click
+[Choose]. You will be taken directly to the booking form.</li>
+<li>If you don&#8217;t know, take advantage of room searching. Specify
+dates (click the orange calendar icon to choose the day with a mouse).
+Specify hours and booking type (single day or repeating). Specify
+also other criteria the room must meet, like capacity and necessary
+equipment. Then click the [Search] button (there are two for
+convenience, both will do the same).</li>
+<li>You will be presented with a list of available rooms meeting your
+criteria.</li>
+<li>Click the <em>Book</em> link on for the room of your choice.</li>
+</ul>
+<p><img alt="image170" src="../_images/rb_booking_form.png" /></p>
+<ul class="simple">
+<li>Fill in a booking form. If you have searched for rooms, most fields
+are already filled in for your convenience. These data come from
+the searching form. After filling in the form, click the [Re-check for
+conflicts] button.</li>
+<li>Scroll the page down to have a look at conflicts. Scroll more to see
+the room availability calendar. Your booking is represented by a green
+bar or dark red bar if it overlaps with existing bookings, which
+are pink, by the way. This graphical room preview is useful mainly
+when you do a recurring booking. Give it a try: set the when/type
+attribute to <em>Repeat once a week</em>, set the end date to be at least 2
+months after the start date, and click the [Re-check for conflicts] again.
+See the room calendar in its full glory.</li>
+<li>If your booking conflicts with others, you have two options:<ul>
+<li>In general, you will prefer to resolve conflicts manually: by
+changing dates, hours or maybe trying another room.</li>
+<li>The alternative is to automatically book everything except
+conflicting days. This may be useful if you do long-term, recurring
+booking, for example, <em>whole year, every week</em>. Imagine everything
+looks perfect, except for several weeks when the room is not available.
+In this case check the &#8216;skip conflicting dates&#8217; option to book
+everything except problematic dates.</li>
+</ul>
+</li>
+<li>Click the [Book] button.</li>
+<li>If your form is OK, the system will ensure your new booking does not
+conflict with others. When no conflicts are found, you will be
+shown the confirmation page which lists details of your booking.</li>
+<li>Click <em>My bookings</em> from the menu. Your new booking now appears on
+the list.</li>
+</ul>
+<p><img alt="image171" src="../_images/rb_conflicts.png" /></p>
+<p>Note: some rooms require confirmation. These rooms are usually coded
+in orange. In this case, you cannot directly book them. You
+can only <em>PRE-book</em> such a room. PRE-booking works exactly the same
+way as booking. The only difference is that you must wait for
+acceptance from the room manager.</p>
+<p>Note: you can always modify your booking (or PRE-booking). It
+will again be checked for conflicts.</p>
+<p>Note: you can always browse your own bookings and PRE-bookings
+using the menu options <em>My bookings</em> and <em>My PRE-bookings</em></p>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="core-features-and-constraints">
+<h2>7.3. Core Features and Constraints<a class="headerlink" href="#core-features-and-constraints" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>7.3.1. Introduction<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>This section describes core capabilities and constraints of the Room
+Booking Module. It may be useful to assess whether it meets your
+needs.</p>
+<p>Note that the Room Booking Module is NOT supposed to be a general-purpose
+&#8220;room management&#8221; or &#8220;room booking&#8221; software.</p>
+<p>It was built with conference rooms in mind. Its main purpose
+is to make conference organization easier. We see room booking as a
+part of conference organization (but you can book rooms
+without defining an event).</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="core-features">
+<h3>7.3.2. Core Features<a class="headerlink" href="#core-features" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="general">
+<h4>7.3.2.1. General<a class="headerlink" href="#general" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>Stand-alone and &#8220;in-conference&#8221; mode.<ul>
+<li>The stand-alone mode allows you to book, manage bookings and do
+administration stuff. You don&#8217;t have to create an Indico event
+(the bookings will not be assigned to any Indico event).</li>
+<li>The &#8220;In-conference&#8221; mode allows you to book rooms for your event. You
+can assign booked rooms to conference, lecture, meeting, session,
+contribution or break.</li>
+</ul>
+</li>
+<li>Recurring bookings (&#8216;every day&#8217;, &#8216;every week&#8217;, &#8216;every 3rd Wednesday
+of a month&#8217;, etc).</li>
+<li>E-mail notifications (to users and room managers, about every
+important action).</li>
+<li>Three user roles: (1) Indico administrator, (2) room manager and
+(3) ordinary user.</li>
+<li>Optional booking moderation. Each room may work in one of the
+following modes:<ul>
+<li>Bookings require explicit confirmation of room manager, <em>or</em></li>
+<li>Bookings are automatically accepted.</li>
+</ul>
+</li>
+</ul>
+</div>
+<hr class="docutils" />
+<div class="section" id="user">
+<h4>7.3.2.2. User<a class="headerlink" href="#user" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>Book a room</li>
+<li>Manage own bookings (track, modify, cancel)</li>
+<li>Search for rooms</li>
+<li>Search for bookings (including archival)</li>
+</ul>
+</div>
+<hr class="docutils" />
+<div class="section" id="room-manager">
+<h4>7.3.2.3. Room Manager<a class="headerlink" href="#room-manager" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>Accept and reject PRE-bookings (for his room)</li>
+<li>Reject bookings (for his room)</li>
+</ul>
+</div>
+<hr class="docutils" />
+<div class="section" id="indico-administrator">
+<h4>7.3.2.4. Indico Administrator<a class="headerlink" href="#indico-administrator" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>Switch on/off Room Booking Module</li>
+<li>Configure room booking plugins in admin section</li>
+<li>Add/remove location</li>
+<li>Define room attributes specific to the location</li>
+<li>Define possible room equipment specific to the location</li>
+<li>Manage meeting rooms (add/modify/remove)</li>
+</ul>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="constraints">
+<h3>7.3.3. Constraints<a class="headerlink" href="#constraints" title="Permalink to this headline">¶</a></h3>
+<p>The room must have its manager. It is not possible to define
+multiple managers for a single room (you can work around this by
+creating an Indico account shared by several people).</p>
+<p>The room must have a defined building, which must be a number.
+This is mandatory. If you do not need building, put any number there
+(like &#8216;0&#8217;). If your building naming scheme has letters, we are
+sorry - the software is not flexible enough for you.</p>
+<p>The room must have defined floor (alphanumerical) and room
+&#8216;number&#8217; (alphanumerical in fact).</p>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="dictionary">
+<h2>7.4. Dictionary<a class="headerlink" href="#dictionary" title="Permalink to this headline">¶</a></h2>
+<p><em>Room</em>: meeting or conference room. Please note that the software is
+not suitable for managing other rooms, like offices, corridors, etc.</p>
+<p><em>Location</em>: physical location of rooms. Room custom attributes
+and possible equipment are defined on a location basis. Example:
+rooms at CERN may have different attributes and different equipment
+than rooms in Fermilab.</p>
+<p><em>Booking</em>: final reservation of a room. While considered final,
+it still may be rejected in case of emergency.</p>
+<p><em>PRE-booking</em>: unconfirmed reservation of a room. PRE-booking
+is subject to acceptance or rejection.</p>
+<p><em>Room responsible</em>: the person who accepts/rejects bookings.
+Each room has exactly one person responsible. A person may be
+responsible for any number of rooms.</p>
+<p><em>Room manager</em>: room responsible</p>
+<hr class="docutils" />
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+   <img src="../_static/indico_logo.png" width="200px"/> 
+
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">7. Conference Room Booking</a><ul>
+<li><a class="reference external" href="#introduction">7.1. Introduction</a></li>
+<li><a class="reference external" href="#the-tutorial">7.2. The Tutorial</a><ul>
+<li><a class="reference external" href="#getting-into-room-booking-module">7.2.1. Getting into Room Booking Module</a></li>
+<li><a class="reference external" href="#the-first-page">7.2.2. The First Page</a></li>
+<li><a class="reference external" href="#the-most-important-tip">7.2.3. The Most Important Tip</a></li>
+<li><a class="reference external" href="#room-names">7.2.4. Room Names</a></li>
+<li><a class="reference external" href="#three-kinds-of-room">7.2.5. Three Kinds of Room</a></li>
+<li><a class="reference external" href="#six-types-of-booking">7.2.6. Six Types of Booking</a></li>
+<li><a class="reference external" href="#booking-a-room">7.2.7. Booking a Room</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#core-features-and-constraints">7.3. Core Features and Constraints</a><ul>
+<li><a class="reference external" href="#id1">7.3.1. Introduction</a></li>
+<li><a class="reference external" href="#core-features">7.3.2. Core Features</a><ul>
+<li><a class="reference external" href="#general">7.3.2.1. General</a></li>
+<li><a class="reference external" href="#user">7.3.2.2. User</a></li>
+<li><a class="reference external" href="#room-manager">7.3.2.3. Room Manager</a></li>
+<li><a class="reference external" href="#indico-administrator">7.3.2.4. Indico Administrator</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#constraints">7.3.3. Constraints</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#dictionary">7.4. Dictionary</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="Export.html"
+                                  title="previous chapter">6. Exporting Indico Data</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="Evaluation.html"
+                                  title="next chapter">8. Event Evaluation</a></p>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Evaluation.html" title="8. Event Evaluation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Export.html" title="6. Exporting Indico Data"
+             >previous</a> |</li>
+    <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
+    
+        <li><a href="../index.html">Indico v0.97 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Indico&#8217;s User Guide</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Indico Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>
