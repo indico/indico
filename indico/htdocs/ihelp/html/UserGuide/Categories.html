@@ -1,0 +1,241 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>1. Categories &mdash; Indico v0.97 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.97',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Indico v0.97 documentation" href="../index.html" />
+    <link rel="up" title="Indico’s User Guide" href="index.html" />
+    <link rel="next" title="2. Conferences" href="Conferences.html" />
+    <link rel="prev" title="Indico’s User Guide" href="index.html" />
+   <link type="text/css" href="../_static/indico.css" rel="stylesheet"/> 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Conferences.html" title="2. Conferences"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Indico’s User Guide"
+             accesskey="P">previous</a> |</li>
+    <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
+    
+        <li><a href="../index.html">Indico v0.97 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" accesskey="U">Indico&#8217;s User Guide</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="categories">
+<h1>1. Categories<a class="headerlink" href="#categories" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="category">
+<h2>1.1. Category<a class="headerlink" href="#category" title="Permalink to this headline">¶</a></h2>
+<p>A Category is a means of grouping your events or other Categories
+together. In Indico <em>Home</em> is the top level category from where you
+start. Inside a category you can:</p>
+<ul class="simple">
+<li>add events or other sub-categories,</li>
+<li>set access rights to say who can access or modify,</li>
+<li>re-allocate the sub-categories,</li>
+<li>remove the sub-categories,</li>
+<li>and also delete the current category and everything inside it.</li>
+</ul>
+<p>These features are accessible through the menu <em>Manage</em> (you must be logged in
+and with modification rights in order to see it), that you can find close to the
+big orange category name. After clicking <em>Manage</em> (more specifically its inner
+option <em>Edit category</em>) you will be accessing the Management area for Category.</p>
+</div>
+<div class="section" id="creating-a-category">
+<h2>1.2. Creating a Category<a class="headerlink" href="#creating-a-category" title="Permalink to this headline">¶</a></h2>
+<p>From the menu <em>Manage</em> (more specifically its inner
+option <em>Add subcategory</em>) you can create a new category.
+You will need to have an Administrator&#8217;s account or be listed
+in the modification list <a class="reference external" href="#protection">(see Protection)</a>
+for the category.</p>
+<p>Also you can create it from the Management area, from the menu
+<em>General settings</em> <a class="reference external" href="#general-settings">(See General Settings)</a>
+and by clicking the button <em>add subcateg</em>.</p>
+<p><img alt="image1" src="../_images/categ1.png" /></p>
+</div>
+<div class="section" id="category-management-area">
+<h2>1.3. Category Management Area<a class="headerlink" href="#category-management-area" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="general-settings">
+<h3>1.3.1. General settings<a class="headerlink" href="#general-settings" title="Permalink to this headline">¶</a></h3>
+<p>In the Category Management Area, the first option in the menu is <em>General settings</em>:</p>
+<p>You can modify the details of the category:</p>
+<ul class="simple">
+<li>Name</li>
+<li>Description</li>
+<li>Timezone</li>
+<li>Icon</li>
+<li>Default style (layout) for meetings created within this category <a class="reference external" href="Meetings.html">(see Meetings)</a></li>
+<li>Default style (layout) for lectures created within this category <a class="reference external" href="Lectures.html">(see Lectures)</a></li>
+</ul>
+<p>and you can modify its content:</p>
+<ul class="simple">
+<li>Add a new sub-category</li>
+<li>Re-allocate (move to another category) some events or categories</li>
+<li>Remove the inner events or categories</li>
+</ul>
+<p><img alt="image2" src="../_images/categ2.png" style="width: 900px;" /></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="protection">
+<h3>1.3.2. Protection<a class="headerlink" href="#protection" title="Permalink to this headline">¶</a></h3>
+<p>From the Management Area you can protect your category using the
+three controls for access levels: Modification control, Access control,
+and Domain control. You can add Users or Groups to the Modification
+and Access control lists.</p>
+<p><img alt="image3" src="../_images/categ3.png" /></p>
+<p><em>Modification Control</em> Category Managers can be added to a
+category to allow access to the Management Area for modification.
+Category managers are either those listed in the modification
+control list, or Indico administrators. The creator of a category
+will be able to modify it without being listed.</p>
+<p><em>Access Control</em> A category can be public or private; Public: Anyone
+can view a public category and any user can add events to it.
+However, users will only be able to see the events inside the
+category to which they have access. Private: Only those users in
+the access list or administrators can access the category and add
+events. When a Category is made private, the option for domain
+control is omitted and any event or category made inside it will also
+be private. The category will be displayed with &#8220;(protected)&#8221; after
+its name to show it is private.</p>
+<p><em>Domain Control</em> The access to the Category can be restricted by domain.
+Therefore, just the users from the chosen domain will be able to access
+(e.g. If we choose the domain CERN, just users from inside CERN will
+be able to access the category and its content).</p>
+<p><em>Conference Creation Tool</em> You can restrict who is able to add
+events to the category. If you restrict it, you need to add
+users or groups to the list in order to allow them to add events.</p>
+<p><img alt="image4" src="../_images/categ4.png" /></p>
+<p><a class="reference external" href="Protection.html">See Protection System</a>
+in order to know more about Protection in Indico.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="detail-modification-sub-category-event-organisation">
+<h3>1.3.3. Detail Modification &amp; Sub-Category/Event Organisation<a class="headerlink" href="#detail-modification-sub-category-event-organisation" title="Permalink to this headline">¶</a></h3>
+<p>The details of a Category can be modified and sub-categories can
+be organised from the <em>General settings</em> tab in the management area.
+Details can be modified by clicking on modify inside the main tab.
+Sub-categories and events can be organised in the particular order
+in which you wish to view them by using the order drop down box next
+to each sub-category.</p>
+<p><img alt="image5" src="../_images/categ5.png" /></p>
+<p>You can re-allocate a sub-category or event by selecting the one
+you wish to move using the tick box and clicking on re-allocate,
+you will then be asked to where you would like to reallocate this
+sub-category/event.</p>
+<p>To remove a sub-category and anything it contains or an event,
+select it and click <em>remove</em>. If it contains anything you will be
+asked if you are sure you want to delete it.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="deleting-a-category">
+<h3>1.3.4. Deleting a Category<a class="headerlink" href="#deleting-a-category" title="Permalink to this headline">¶</a></h3>
+<p>To delete the current category you can go to the Tools menu in the
+Management Area and select &#8216;Delete this category&#8217; you
+will be asked to confirm the deletion first.</p>
+<hr class="docutils" />
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+   <img src="../_static/indico_logo.png" width="200px"/> 
+
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">1. Categories</a><ul>
+<li><a class="reference external" href="#category">1.1. Category</a></li>
+<li><a class="reference external" href="#creating-a-category">1.2. Creating a Category</a></li>
+<li><a class="reference external" href="#category-management-area">1.3. Category Management Area</a><ul>
+<li><a class="reference external" href="#general-settings">1.3.1. General settings</a></li>
+<li><a class="reference external" href="#protection">1.3.2. Protection</a></li>
+<li><a class="reference external" href="#detail-modification-sub-category-event-organisation">1.3.3. Detail Modification &amp; Sub-Category/Event Organisation</a></li>
+<li><a class="reference external" href="#deleting-a-category">1.3.4. Deleting a Category</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="index.html"
+                                  title="previous chapter">Indico&#8217;s User Guide</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="Conferences.html"
+                                  title="next chapter">2. Conferences</a></p>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Conferences.html" title="2. Conferences"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Indico’s User Guide"
+             >previous</a> |</li>
+    <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
+    
+        <li><a href="../index.html">Indico v0.97 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Indico&#8217;s User Guide</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Indico Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>
