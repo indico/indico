@@ -55,25 +55,20 @@ class LocationSetter:
         location = self._roomInfo.get('location', None)
 
         if location != None:
-            #if location.strip()=="":
-            #    target.setLocation(None)
-            #else:
-                loc = target.getOwnLocation()
-                if not loc:
-                    loc = conference.CustomLocation()
-                target.setLocation(loc)
-                loc.setName(location)
-                loc.setAddress(address)
+            loc = target.getOwnLocation()
+            if not loc:
+                loc = conference.CustomLocation()
+            target.setLocation(loc)
+            loc.setName(location)
+            loc.setAddress(address)
+
         #same as for the location
         if room != None:
-            #if room.strip()=="":
-            #    target.setRoom(None)
-            #else:
-                r = target.getOwnRoom()
-                if not r:
-                    r = conference.CustomRoom()
-                target.setRoom(r)
-                r.setName(room)
+            r = target.getOwnRoom()
+            if not r:
+                r = conference.CustomRoom()
+            target.setRoom(r)
+            r.setName(room)
 
 class ScheduleOperation:
     def _getAnswer(self):

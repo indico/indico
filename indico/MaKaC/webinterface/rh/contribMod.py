@@ -747,11 +747,11 @@ class RHContributionModifData(RHContribModifBaseSpecialSesCoordRights):
                 params["sDay"] = ""
                 params["sHour"] = ""
                 params["sMinute"] = ""
-            
+
             if params.has_key("duration"):
                 params["durMins"] = params["duration"];
             else:
-                params["durMins"] = ""        
+                params["durMins"] = ""
             self._target.setValues(params)
             self._target.setType(self._type)
         self._redirect(urlHandlers.UHContributionModification.getURL(self._target))

@@ -2,8 +2,8 @@
 function nullRoomInfo(info) {
 
     return (!info) ||
-        (!info.get('location')) ||
-        (!info.get('room'));
+        (!exists(info.get('location'))) ||
+        (!exists(info.get('room')));
 }
 
 
@@ -797,14 +797,14 @@ type("AddBreakDialog", ["ChangeEditDialog"],
              invertableBind(this.info.accessor('duration'),
                             this.timeField,
                             this.isEdit);
-             
+
              invertableBind(this.info.accessor('inheritLoc'),
                             this.roomEditor.inheritCheckbox.get(),
                             false);
-             
+
              invertableBind(this.info.accessor('inheritRoom'),
                             this.roomEditor.inheritCheckbox.get(),
-                            false);             
+                            false);
 
              self.parameterManager.add(self.startTimeField, 'time', false);
              self.parameterManager.add(self.timeField, 'unsigned_int', false);
