@@ -19,6 +19,9 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import sys
+import httplib, urllib2, socket
+
 """ The HTTPConnectionWithTimeout and HTTPHandlerWithTimeout classes are derived
     from Python 2.5 's httplib.HTTPConnection and urllib2.HTTPHandler respectively.
     They should be used when we want the Indico server to connect to another server
@@ -26,8 +29,6 @@
     Python 2.6 has a "timeout" argument in urllib2.urlopen but not in Python 2.5.
     For use of these classes, see the example in the "if __name__ == '__main__':" section.
 """
-
-import httplib, urllib2, socket
 
 class HTTPConnectionWithTimeout(httplib.HTTPConnection):
     """ A custom HTTPConnection class that allows a timeout to be specified.
@@ -63,7 +64,7 @@ class HTTPConnectionWithTimeout(httplib.HTTPConnection):
             break
         if not self.sock:
             raise socket.error, msg
-        
+
 class HTTPSConnectionWithTimeout(httplib.HTTPSConnection):
     """ A custom HTTPConnection class that allows a timeout to be specified.
         This is necessary because a timeout cannot be specified in Python 2.5.
@@ -80,7 +81,7 @@ class HTTPSConnectionWithTimeout(httplib.HTTPSConnection):
 
     def connect(self):
         """ Overrides HTTPSConnection.connect
-        """        
+        """
 
         "Connect to a host on a given (SSL) port."
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -89,7 +90,7 @@ class HTTPSConnectionWithTimeout(httplib.HTTPSConnection):
         sock.connect((self.host, self.port))
         ssl = socket.ssl(sock, self.key_file, self.cert_file)
         self.sock = httplib.FakeSocket(sock, ssl)
-        
+
 
 class HTTPHandlerWithTimeout(urllib2.HTTPHandler):
     """ A custom HTTPHandler class that allows a timeout to be specified.
@@ -102,7 +103,7 @@ class HTTPHandlerWithTimeout(urllib2.HTTPHandler):
         """ Constructor
             timeout is specified in seconds with a float number.
         """
-        
+
         urllib2.HTTPHandler.__init__(self)
         self._timeout = timeout
 
@@ -111,36 +112,57 @@ class HTTPHandlerWithTimeout(urllib2.HTTPHandler):
         """
 
         def makeConnection(host, port=None, strict=None):
-            return HTTPConnectionWithTimeout(host, port, strict, timeout = self._timeout)
+            if sys.version_info[0] == 2:
+                if sys.version_info[1] >= 6:
+                    return httplib.HTTPConnection(host, port, strict, timeout = self._timeout)
+                else:
+                    return HTTPConnectionWithTimeout(host, port, strict, timeout = self._timeout)
+            else:
+                raise Exception("This code will probably need fixing with Python 3")
 
         return self.do_open(makeConnection, req)
-    
+
 class HTTPWithTimeout(httplib.HTTP):
     """ A custom HTTP class that allows a timeout to be specified.
         This is necessary because a timeout cannot be specified in Python 2.4 or 2.5.
         When we start using Python2.6, this class will be no longer necessary.
     """
-    _connection_class = HTTPConnectionWithTimeout
+
+    #definition of the _connection_class attribute
+    if sys.version_info[0] == 2:
+        if sys.version_info[1] >= 6:
+            _connection_class = httplib.HTTPConnection
+        else:
+            _connection_class = HTTPConnectionWithTimeout
+    else:
+        raise Exception("This code will probably need fixing with Python 3")
 
     def __init__(self, host='', port=None, strict=None, timeout=None):
         """ Changed from of httplib.HTTP.__init__, added timeout argument to
             self._setup(self._connection_class(host, port, strict, timeout))
-        """ 
+        """
         if port == 0:
             port = None
         self._setup(self._connection_class(host, port, strict, timeout))
-        
+
 class HTTPSWithTimeout(httplib.HTTPS):
     """ A custom HTTPS class that allows a timeout to be specified.
         This is necessary because a timeout cannot be specified in Python 2.4 or 2.5.
         When we start using Python2.6, this class will be no longer necessary.
     """
-    _connection_class = HTTPSConnectionWithTimeout
+    #definition of the _connection_class attribute
+    if sys.version_info[0] == 2:
+        if sys.version_info[1] >= 6:
+            _connection_class = httplib.HTTPSConnection
+        else:
+            _connection_class = HTTPSConnectionWithTimeout
+    else:
+        raise Exception("This code will probably need fixing with Python 3")
 
     def __init__(self, host='', port=None, key_file=None, cert_file=None, strict=None, timeout=None):
         """ Changed from of httplib.HTTP.__init__, added timeout argument to
             self._setup(self._connection_class(host, port, strict, timeout))
-        """ 
+        """
         if port == 0:
             port = None
         self._setup(self._connection_class(host, port, key_file, cert_file, strict, timeout))
@@ -148,17 +170,23 @@ class HTTPSWithTimeout(httplib.HTTPS):
         # here for compatibility with post-1.5.2 CVS.
         self.key_file = key_file
         self.cert_file = cert_file
-    
-def urlOpenWithTimeout(request, timeout):
-    opener = urllib2.build_opener(HTTPHandlerWithTimeout(timeout))
-    return opener.open(request)
-        
+
+def urlOpenWithTimeout(url, timeout):
+    if sys.version_info[0] == 2:
+        if sys.version_info[1] >= 6:
+            return urllib2.urlopen(url, timeout = timeout)
+        else:
+            opener = urllib2.build_opener(HTTPHandlerWithTimeout(timeout))
+            return opener.open(url)
+    else:
+        raise Exception("This code will probably need fixing with Python 3")
+
 
 # test request with timeout
 if __name__ == '__main__':
-    request = urllib2.Request("http://www.google.com")
+    url = "http://www.google.com"
     try:
-        file = urlOpenWithTimeout(request,5)
+        file = urlOpenWithTimeout(url,5)
         for l in file.readlines():
             print l
     except Exception, e:
