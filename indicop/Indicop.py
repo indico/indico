@@ -30,6 +30,7 @@ import socket
 import time
 import commands
 import StringIO
+import signal
 from selenium import selenium
 from MaKaC.common.db import DBMgr
 from MaKaC import user
@@ -143,7 +144,6 @@ class Unit(BaseTest):
         
         try:
             coverage = Coverage.getInstance()
-            print coverage
             if coverage != False:
                 coverage.start()
             
@@ -271,7 +271,7 @@ class Functional(BaseTest):
         if result:
             report = returnString + "PY Functional tests succeeded\n"
         else:
-            report = returnString + ("[FAIL] Functional tests - report in "
+            report = returnString + ("[FAIL] Functional tests - report in"
                     " indicop/report/pyfunctional.txt\n")
         return report
     
@@ -348,7 +348,6 @@ class Specify(Functional):
             return "[FAIL] Specified Test - read output from console\n"
         
 class Grid(BaseTest):
-    #TODO infinite loop when hub is down
     def __init__(self, hubUrl, hubPort, hubEnv):
         self.hubEnv = hubEnv
         self.gridData = GridData.getInstance()
@@ -360,6 +359,19 @@ class Grid(BaseTest):
         self.startMessage("Starting grid tests")
         
         self.gridData.setActive(True)
+        
+        #Checking if hub is online
+        sel = selenium(self.gridData.getUrl(), self.gridData.getPort(),
+                       self.hubEnv[0], "http://www.cern.ch/")
+        selTimeout = TimeoutFunction(sel.start, 10) 
+        try: 
+            selTimeout()
+        except TimeoutFunctionException: 
+            return "[FAIL] Selenium Grid - Hub is probably down (%s:%s)" % \
+                    (self.gridData.getUrl(), self.gridData.getPort())
+        else:
+            print "Hub is UP, continue with grid tests"
+        
         
         #capturing the stderr
         outerr = StringIO.StringIO()
@@ -425,6 +437,31 @@ class GridData(BaseTest):
 
     getInstance = classmethod( getInstance )
     
+    
+class TimeoutFunctionException(Exception): 
+    """Exception to raise on a timeout""" 
+    pass 
+
+class TimeoutFunction: 
+
+    def __init__(self, function, timeout): 
+        self.timeout = timeout 
+        self.function = function 
+
+    def handle_timeout(self, signum, frame): 
+        raise TimeoutFunctionException()
+
+    def __call__(self, *args): 
+        old = signal.signal(signal.SIGALRM, self.handle_timeout) 
+        signal.alarm(self.timeout) 
+        try: 
+            result = self.function(*args)
+        finally: 
+            signal.signal(signal.SIGALRM, old)
+        signal.alarm(0)
+        return result
+    
+    
 class Pylint(BaseTest):
     def run(self):
         returnString = ""
@@ -480,8 +517,7 @@ class Jsunit(BaseTest):
             #coverage activation
             success = self.buildConfFile(confFile, self.coverage)
             if not (success == ""):
-                print success
-                return
+                return success
             
             #switching directory to run the tests
             os.chdir(os.path.join(self.setupDir, 'javascript', 'unit'))
@@ -572,8 +608,14 @@ class Jsunit(BaseTest):
                                         'unit',
                                         'confTemplate.conf')
         
+        relativeTestsFolder = os.path.join("tests")
+        absoluteTestsFolder = os.path.join(self.setupDir,
+                                           "javascript",
+                                           "unit",
+                                           "tests")
+        
         relativePluginsFolder = os.path.join("..", "indico", "MaKaC", "plugins")
-        absoutePluginsFolder = os.path.join(self.setupDir,
+        absolutePluginsFolder = os.path.join(self.setupDir,
                                             "..",
                                             "indico",
                                             "MaKaC",
@@ -592,8 +634,19 @@ class Jsunit(BaseTest):
             confTemplate = f.read()
             f.close()
             
+            #adding tests files from Indicop folder
+            for root, dirs, files in os.walk(absoluteTestsFolder):
+                for name in files:
+                    if name.endswith(".js"):
+                        absoluteFilePath = os.path.join(root, name)
+                        splitPath = absoluteFilePath.split(relativeTestsFolder)
+                        relativeFilePath = relativeTestsFolder + splitPath[1]
+                        
+                        confTemplate += "\n  - %s" % os.path.join(relativeFilePath)
+            
+            
             #adding plugins test files
-            for root, dirs, files in os.walk(absoutePluginsFolder):
+            for root, dirs, files in os.walk(absolutePluginsFolder):
                 for name in files:
                     if name.endswith(".js") and \
                                           root.find("/tests/javascript/unit") > 0:
@@ -609,7 +662,6 @@ class Jsunit(BaseTest):
             if coverage:
                 confTemplate += coverageConf
                 
-            
             #writing the compelete configuration in a file
             confFile = open(os.path.join(self.setupDir, 'javascript', 'unit',
                                          confFilePath), 'w')
@@ -618,7 +670,7 @@ class Jsunit(BaseTest):
             
             return ""
         except IOError, e:
-            return "Could not open a file. (%s)" % e
+            return "[ERR] JS Unit Tests - Could not open a file. (%s)" % e
             
 class Jslint(BaseTest):
     def run(self):
@@ -679,7 +731,8 @@ class Jslint(BaseTest):
                                                                 filename))
                     returnString += output[1]
         return returnString
-        
+    
+    
 class Indicop(object):
     
     def __init__(self, jsspecify, jscoverage):
@@ -724,3 +777,4 @@ class Indicop(object):
         
         
         return returnString
+

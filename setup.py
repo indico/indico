@@ -348,7 +348,7 @@ class tests_indico(Command):
             testsToRun.append('pylint')
             testsToRun.append('jsunit')
             testsToRun.append('jslint')
-            #testsToRun.append('grid') TODO still buggy when no hub
+            testsToRun.append('grid')
         
         indicop = Indicop(self.jsspecify, self.jscoverage)
         result = indicop.main(self.specify, self.coverage, testsToRun)
