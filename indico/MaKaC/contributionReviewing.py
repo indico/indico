@@ -373,13 +373,13 @@ class Judgement(Persistent):
                     GenericMailer.sendAndLog(notification, self._review.getConference(), "MaKaC/reviewing.py", author)
             else:
                 if isinstance(self, RefereeJudgement) and self.getConfReview()._enableRefereeJudgementEmailNotif == True:
-                    notification = ContributionReviewingJudgementWithdrawalNotification(author, self, self.getReviewManager().getContribution())
+                    notification = ContributionReviewingJudgementNotification(author, self, self.getReviewManager().getContribution())
                     GenericMailer.sendAndLog(notification, self._review.getConference(), "MaKaC/reviewing.py", author)
                 if isinstance(self, EditorJudgement) and self.getConfReview()._enableEditorJudgementEmailNotif == True:
                     notification = ContributionReviewingJudgementNotification(author, self, self.getReviewManager().getContribution())
                     GenericMailer.sendAndLog(notification, self._review.getConference(), "MaKaC/reviewing.py", author)
                 if isinstance(self, ReviewerJudgement) and self.getConfReview()._enableReviewerJudgementEmailNotif == True:
-                    notification = ContributionReviewingJudgementWithdrawalNotification(author, self, self.getReviewManager().getContribution())
+                    notification = ContributionReviewingJudgementNotification(author, self, self.getReviewManager().getContribution())
                     GenericMailer.sendAndLog(notification, self._review.getConference(), "MaKaC/reviewing.py", author)
         
     def notifyModification(self):
