@@ -101,9 +101,8 @@ def _getDataFiles(x):
     isAConfRe = re.compile('etc\/[^/]+\.conf$')
 
     dataFiles = _generateDataPaths((('bin',           findall('bin'), 4),
-                                    ('doc', ['doc/UserGuide.pdf','doc/AdminUserGuide.pdf'], 4),
+                                    ('doc', findall('doc'), 4),
                                     ('etc', [xx for xx in findall('etc') if not isAConfRe.search(xx)], 4),
-                                    #('MaKaC',              findall('indico/MaKaC'), 13),
                                     ('htdocs',        findall('indico/htdocs'), 14)))
     return dataFiles
 
