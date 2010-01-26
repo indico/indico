@@ -475,14 +475,22 @@ type("TimetableBlockManagementMixin",[],
          arrowUp.observeClick(
              function(event) {
                  self.managementActions.moveEntryUpDown(self.eventData, true);
-                 event.stopPropagation();
+                 if (event.stopPropagation) {
+                     event.stopPropagation();
+                 } else {
+                     event.cancelBubble = true;
+                 }
                  return false;
              });
 
          arrowDown.observeClick(
              function(event) {
                  self.managementActions.moveEntryUpDown(self.eventData, false);
-                 event.stopPropagation();
+                 if (event.stopPropagation) {
+                     event.stopPropagation();
+                 } else {
+                     event.cancelBubble = true;
+                 }
                  return false;
              });
 
