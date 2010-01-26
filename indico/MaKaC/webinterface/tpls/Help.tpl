@@ -109,12 +109,12 @@
         <div class="content">
         	<div class="item clearfix">
                 <div class="icons"><a href="ihelp/pdf/IndicoFAQ.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
-                <a href="ihelp/html/FAQ/index.html"><%= _("FAQ") %></a>
+                <a href="ihelp/html/FAQ/FAQ.html"><%= _("FAQ") %></a>
             </div>
         
             <div class="item clearfix">
                 <div class="icons"><a href="ihelp/pdf/IndicoGlossary.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
-                <a href="ihelp/html/Glossary/index.html"><%= _("Glossary") %></a>
+                <a href="ihelp/html/Glossary/Glossary.html"><%= _("Glossary") %></a>
             </div>
         </div>
 
