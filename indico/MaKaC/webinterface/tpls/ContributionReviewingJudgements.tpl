@@ -15,7 +15,7 @@
         </td>
     </tr>
     <tr>
-        <td>
+        <td align="left">
             <% if ConferenceChoice == 3 or ConferenceChoice == 4: %>
                 <% if Editing.isSubmitted(): %>
                     <% includeTpl ('EditingJudgementDisplay', Editing = Editing, ShowEditor = True) %>
@@ -70,7 +70,7 @@
     </tr>
     <% if not (ConferenceChoice == 2 or ConferenceChoice == 4): %>
     <tr>
-        <td colspan="2" align="center">
+        <td colspan="2" align="left">
             <span><%= _("This conference does not enable content reviewing. The layout reviewer's judgement is the only judgement.")%></span>
         </td>
     </tr>
@@ -79,7 +79,7 @@
         <% if IsReferee: %>
             <% if not Review.isAuthorSubmitted(): %>
                 <tr>
-                    <td colspan="2" align="center">
+                    <td colspan="2" align="left">
                         <span>
                             <%= _("The author has not submitted the materials yet.")%><br>
                             <%= _("Please wait until he/she does so.")%>
@@ -90,7 +90,7 @@
             <% else: %>
                 <% if ConferenceChoice == 4 and not Editing.isSubmitted(): %>
                    <tr>
-                       <td colspan="2" align="center">
+                       <td colspan="2" align="left">
                            <font><%= _("Warning: the layout reviewer has not given his judgement yet.")%></span> 
                        </td>
                    </tr>
@@ -118,8 +118,8 @@
         <% end %>
         
         <tr>
-            <td nowrap class="titleCellTD"><span class="titleCellFormat"><strong><%= _("Judgement")%></strong></span></td>
-            <td>
+            <td nowrap class="titleCellTD" style="padding-top: 10px;"><span class="titleCellFormat"><strong><%= _("Judgement")%>:</strong></span></td>
+            <td style="padding-top: 10px;">
                 <div id="inPlaceEditJudgement"><strong><%= Review.getRefereeJudgement().getJudgement() %></strong></div>
             </td>
         </tr>
@@ -131,16 +131,22 @@
             </td>
         </tr>
         <tr>
-            <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Comments")%></span></td>
+            <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Comments")%>:</span></td>
             <td>
                 <div id="inPlaceEditComments"></div>
             </td>
         </tr>
         <% if IsReferee: %>
+        <% if not FinalJudge: %>
+        <% display = 'span' %>
+		<% end %>
+		<% else: %>
+		    <% display = 'none' %>
+		<% end %>
         <tr>
-            <td colspan="10">
-                <span id="submitbutton"></span>
-                <span id="submitHelpPopUp"></span>
+            <td colspan="3" style="padding-top: 20px">
+                <span id="submitbutton" align="right"></span>
+                <span id="submitHelpPopUp" style="display:<%=display%>" align="right"></span>
                 <span id="submittedmessage"></span>
             </td>
         </tr>
@@ -150,7 +156,16 @@
 </table>
 
 <script type="text/javascript">
-                  
+
+var observer = function(value) {
+                if(value!="None"){
+                        submitButton.dom.disabled = false;
+                        $E('submitHelpPopUp').set("");
+                        $E('submitHelpPopUp').dom.display = 'none';
+                        }
+                     
+}
+               
 var showWidgets = function(firstLoad) {
                            
     new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditJudgement'),
@@ -158,7 +173,7 @@ var showWidgets = function(firstLoad) {
                         {conference: '<%= Contribution.getConference().getId() %>',
                         contribution: '<%= Contribution.getId() %>',
                         current: 'refereeJudgement'
-                        }, <%= ConfReview.getAllStates() %>);
+                        }, <%= ConfReview.getAllStates() %>, "<%=FinalJudge%>", observer);       
     
     new IndicoUI.Widgets.Generic.richTextField($E('inPlaceEditComments'),
                            'reviewing.contribution.changeComments',
@@ -228,7 +243,7 @@ var showValues = function() {
             },
             function(result, error){
                 if (!error) {
-                    $E('inPlaceEditJudgement').set(result)
+                    $E('inPlaceEditJudgement').set(result);
                 }
             }
         )
@@ -275,15 +290,22 @@ var updatePage = function (){
     } else {
         <% if IsReferee: %>
         submitButton.set($T('Send'));
-        <% if not Review.isAuthorSubmitted(): %>
+        <% if not Review.isAuthorSubmitted() or not FinalJudge: %>
             submitButton.dom.disabled = true;
             var HelpImg = Html.img({src: '<%= Config.getInstance().getSystemIconURL("help") %>', style: {marginLeft: '5px', verticalAlign: 'middle'}});
             $E('submitHelpPopUp').append(HelpImg);
-            var submitHelpPopUpText = function(event) {
-              IndicoUI.Widgets.Generic.tooltip(this, event, "<span style='padding:3px'>You are not allowed to give final judgement.<br/>You have to wait for the author to submit the materials.</span>");
-                } 
+            <% if not Review.isAuthorSubmitted(): %>
+		            var submitHelpPopUpText = function(event) {
+		              IndicoUI.Widgets.Generic.tooltip(this, event, "<span style='padding:3px'>You are not allowed to give final judgement.<br/>You have to wait for the author to submit the materials.</span>");
+		                } 
+		    <% end %>
+		    <% if not FinalJudge: %>
+	               var submitHelpPopUpText = function(event) {
+                      IndicoUI.Widgets.Generic.tooltip(this, event, "<span style='padding:3px'>You must give your judgement before sending.</span>");
+                        } 	        
+		    <% end %>
             $E('submitHelpPopUp').dom.onmouseover = submitHelpPopUpText;
-        <% end %>
+        <% end %>        
         $E('submittedmessage').set($T('Judgement not sent yet'));
         <% end %>
         showWidgets();

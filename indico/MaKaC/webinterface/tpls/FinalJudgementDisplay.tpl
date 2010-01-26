@@ -5,7 +5,7 @@
                     <span class="titleCellFormat" style="font-size: 12px;"><strong><%= _("Final Judgement:")%></strong></span>
                 </td>
                 <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                    <%= Review.getRefereeJudgement().getJudgement() %>
+                    <strong><%= Review.getRefereeJudgement().getJudgement() %></strong>
                 </td>
            </tr>
            <tr>     

@@ -488,23 +488,30 @@ class Review(Persistent):
         """
         status = []
         if self.isAuthorSubmitted():
-            if self._refereeJudgement.isSubmitted():
-                status.append(_("Judged: ") + str(self._refereeJudgement.getJudgement()))
-            else:
-                status.append(_("Pending referee decision"))
-                if not forAuthor:
-                    if self._editorJudgement.isSubmitted():
-                        status.append(_("Layout judged: ") + str(self._editorJudgement.getJudgement()))
-                    else:
-                        status.append(_("Pending layout editor decision"))
-                        
-                    if self.anyReviewerHasGivenAdvice():
-                        for a in self.getReviewerJudgements():
-                            status.append(_("Content judged: ") + str(a.getJudgement()))
-                        if not self.allReviewersHaveGivenAdvice():
-                            status.append(_("Some content reviewers have not decided yet"))
-                    else:
-                        status.append(_("No content reviewers have decided yet"))
+            if self.getConfReview().getChoice() == 3:
+                if self._editorJudgement.isSubmitted():
+                    status.append(_("Judged: ") + str(self._editorJudgement.getJudgement()))
+                else:
+                    status.append(_("Pending layout reviewer decision"))
+            elif self.getConfReview().getChoice() == 4 or self.getConfReview().getChoice() == 2:
+                if self._refereeJudgement.isSubmitted():
+                    status.append(_("Judged: ") + str(self._refereeJudgement.getJudgement()))
+                else:
+                    status.append(_("Pending referee decision"))
+                    if not forAuthor:
+                        if self.getConfReview().getChoice() == 4:
+                            if self._editorJudgement.isSubmitted():
+                                status.append(_("Layout judged: ") + str(self._editorJudgement.getJudgement()))
+                            else:
+                                status.append(_("Pending layout reviewer decision"))
+                            
+                        if self.anyReviewerHasGivenAdvice():
+                            for a in self.getReviewerJudgements():
+                                status.append(_("Content judged: ") + str(a.getJudgement()))
+                            if not self.allReviewersHaveGivenAdvice():
+                                status.append(_("Some content reviewers have not decided yet"))
+                        else:
+                            status.append(_("No content reviewers have decided yet"))
         else:
             status.append(_("Materials not submitted yet"))
         return status
@@ -533,12 +540,12 @@ class Review(Persistent):
                 GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "MaKaC/reviewing.py", self._reviewManager.getReferee())
             
             if self._reviewManager.hasEditor() and self.getConfReview()._enableAuthorSubmittedMatEditorEmailNotif == True:
-                notification = MaterialsSubmittedNotification(self._reviewManager.getEditor(), 'Editor', self._reviewManager.getContribution())
+                notification = MaterialsSubmittedNotification(self._reviewManager.getEditor(), 'Layout Reviewer', self._reviewManager.getContribution())
                 GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "MaKaC/reviewing.py", self._reviewManager.getEditor())
 
             for reviewer in self._reviewManager.getReviewersList():
                 if self.getConfReview()._enableAuthorSubmittedMatReviewerEmailNotif == True:
-                    notification = MaterialsSubmittedNotification(reviewer, 'Reviewer', self._reviewManager.getContribution())
+                    notification = MaterialsSubmittedNotification(reviewer, 'Content Reviewer', self._reviewManager.getContribution())
                     GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "MaKaC/reviewing.py", reviewer)
         
         else:

@@ -2,7 +2,7 @@
             <table cellspacing="0" cellpadding="2" width="100%%" style="padding-bottom: 10px;">
                 <tr>
                     <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
-                        <span class="titleCellFormat" style="font-size: 12px;"><strong><%= _("Judgement:")%></strong></span>
+                        <span class="titleCellFormat" style="font-size: 12px;"><strong><%= _("Layout Judgement:")%></strong></span>
                     </td>
                     <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                         <strong><%= Editing.getJudgement() %></strong>

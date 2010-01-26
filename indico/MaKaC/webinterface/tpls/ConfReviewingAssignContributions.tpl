@@ -136,15 +136,10 @@
     <% end %>
 </table>
 <!--  and not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1) -->
-<div id="userSelection_top" style="margin-top: 1em">
-    <span id="userSelectionMessage_top"></span>
-    <ul id="userList_top">
-    </ul>
-</div>
 
-<table style="padding-left:40px; margin-bottom:1em;">
+<table style="padding-left:40px;">
         <tr>
-            <td style="padding-bottom: 20px; padding-top: 20px">
+            <td style="padding-bottom: 5px; padding-top: 5px">
                 <%= _("Select:") %>
             </td>
             <td nowrap class="titleCellFormat" style="padding-bottom: 20px;  padding-top: 20px; border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF">
@@ -193,6 +188,9 @@
             <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <%= _("Deadline")%>
             </td>
+        </tr>
+        <tr>
+            <td colspan="8" style="border-bottom: 1px solid grey"></td>
         </tr>
     </thead>
    
@@ -749,7 +747,8 @@ var removeReviewersAlerts = function(contributions, role) {
             });
             
               var all = Widget.lines([span1, okButton])
-              return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {height: '130px', width: '420px'}},[all]));  
+              okButton.dom.align = 'center';
+              return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {height: '100px', width: '250px'}},[all]));  
                 };
              popup.open();
           
@@ -995,9 +994,11 @@ var fetchUsers = function(order, role) {
     }
     
     if ((order == 'assign' && role == 'editor') || (order == 'add' && role == 'reviewer')) {
-        if (!checkAllHaveReferee(checkedContributions, order, role)) {
-            return;
-        } 
+        <% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
+	        if (!checkAllHaveReferee(checkedContributions, order, role)) {
+	            return;
+	        } 
+	    <% end %>
    }
    
    if (order == 'remove' && role == 'reviewer')  {
@@ -1015,13 +1016,20 @@ var fetchUsers = function(order, role) {
                 action = order + '_' + role;
                 
                 var title = '';
+                var new_assign = '';
                 if (role == 'editor') {
-                    title = $T('Click on a user name to ') + order + $T(' an layout reviewer:');
+                    title = $T('Click on a user name to ') + order + $T(' a layout reviewer:');
                 } 
                 if (role == 'reviewer') {
                     title = $T('Click on a user name to ') + order + ' a ' + $T('content reviewer:');
                 } else {
+                    if (order == 'assign') {
                     title = $T('Click on a user name to ') + order + ' a ' + role + ':';
+                    } if(order == 'new_assign' && !removeRefereeAlerts(checkedContributions)) {
+                        action = 'assign_' + role;
+                        title = $T('Click on a user name to assign new ') + role + ':';
+                        new_assign = 'True';
+                    }
                 } 
                 
                 var popup = new ExclusivePopup(title, function(){popup.close();});
@@ -1060,7 +1068,7 @@ var fetchUsers = function(order, role) {
                        
                        var span1 = Html.span({}, "");
                        var message = '';
-                       if(role == 'referee' && order == 'assign' && !removeRefereeAlerts(checkedContributions)) {
+                       if(new_assign) {
                             span1 = Html.span({}, removeRefereeAlertsMessage(checkedContributions));
                        }   
                        if(role == 'reviewer' && order == 'remove') {
@@ -1113,7 +1121,7 @@ var removeUser = function(role) {
                                                 
                     }
                     if(!removeRefereeAlerts(checkedContributions)){
-                      fetchUsers('assign', 'referee')
+                      fetchUsers('new_assign', 'referee')
                     } 
                 } else {
                     IndicoUtil.errorReport(error);

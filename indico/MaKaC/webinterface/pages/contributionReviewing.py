@@ -137,6 +137,7 @@ class WContributionReviewingJudgements(wcomponents.WTemplated):
         vars["ConfReview"] = self._conf.getConfReview()
         vars["Contribution"] = self.__target
         vars["ConferenceChoice"] = conferenceChoice
+        vars["FinalJudge"] = reviewManager.getLastReview().getRefereeJudgement().getJudgement()
         vars["Editing"] = reviewManager.getLastReview().getEditorJudgement()
         vars["AdviceList"] = reviewManager.getLastReview().getSubmittedReviewerJudgement()
         vars["IsReferee"] = self.__target.getReviewManager().isReferee(self._rh._getUser())
@@ -171,6 +172,7 @@ class WJudgeEditing(wcomponents.WTemplated):
         vars["Contribution"] = self._contrib
         vars["ConfReview"] = self._contrib.getConference().getConfReview()
         vars["Editing"] = self._contrib.getReviewManager().getLastReview().getEditorJudgement()
+        vars["Review"] = self._contrib.getReviewManager().getLastReview()
 
         return vars
 
@@ -201,6 +203,7 @@ class WGiveAdvice(wcomponents.WTemplated):
         vars["Contribution"] = self._contrib
         vars["ConfReview"] = self._contrib.getConference().getConfReview()
         vars["Advice"] = self._contrib.getReviewManager().getLastReview().getAdviceFrom(self.__reviewer)
+        vars["Review"] = self._contrib.getReviewManager().getLastReview()
         
         return vars
     

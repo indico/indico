@@ -68,7 +68,7 @@
                     %(speakers)s
                     <% if Contribution.canUserSubmit(self._aw.getUser()) or Contribution.canModify(self._aw): %>
                         <td class="displayField" nowrap="" align="right" valign="top">
-                            <b>Material:</b>
+                            <b><%=_("Material")%>:</b>
                         </td>
                         <td width="100%%" valign="top">
                             <%=MaterialList%>
@@ -85,7 +85,7 @@
                     <% if Contribution.getConference() and Contribution.getConference().hasEnabledSection('paperReviewing') and Contribution.getConference().getConfReview().hasReviewing() : %>
                         <% if Contribution.canUserSubmit(self._aw.getUser()) or Contribution.canModify(self._aw): %>
                         <tr><td align="right" valign="top" class="displayField" style="border-right:5px solid #FFFFFF;" nowrap>
-                                <b>Reviewing materials:</b>
+                                <b><%=_("Reviewing materials")%>:</b>
                             </td>
                             <td>
                                 <%=ReviewingMatList%>
@@ -93,7 +93,7 @@
                         </tr>
                         <tr>
                             <td align="right" valign="top" class="displayField" style="border-right:5px solid #FFFFFF;" nowrap>
-                                <b>Reviewing status:</b>
+                                <b><%=_("Reviewing status")%>:</b>
                             </td>
                             <% if not Contribution.getReviewManager().getLastReview().isAuthorSubmitted(): %>
                                     <td>
@@ -105,8 +105,8 @@
                                 <tr>
                                     <td></td>
                                     <td>
-                                        Note: Press this button to submit your materials for reviewing.<br>
-                                        By doing this you will lock your materials until they are reviewed.
+                                        <%=_("Note: Press this button to submit your materials for reviewing")%>.<br>
+                                        <%=_("By doing this you will lock your materials until they are reviewed")%>.
                                     </td>
                             <% end %>
                             <% else: %>
@@ -115,23 +115,46 @@
                                     </td>
                                 </tr>
                                 <tr><td>&nbsp;</td></tr>
-                                <% if not Contribution.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted(): %>
-                                    <tr><td>&nbsp;</td></tr>
-                                    <tr><td>&nbsp;</td></tr>
+                                <% if  Contribution.getConference().getConfReview().getChoice() == 3: %> 
+                                    <% if not Contribution.getReviewManager().getLastReview().getEditorJudgement().isSubmitted():%>
+                                        <% display = 'table' %>
+                                    <% end %>
+                                    <% else: %>
+                                        <% display = 'none' %>
+                                    <% end %>
+                                <% end %>
+                                <% if Contribution.getConference().getConfReview().getChoice() == 2: %>
+                                    <% if not (Contribution.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or Contribution.getReviewManager().getLastReview().anyReviewerHasGivenAdvice()): %>
+                                        <% display = 'table' %>
+                                    <% end %>
+                                    <% else: %>
+                                        <% display = 'none' %>
+                                    <% end %>
+                                <% end %>
+                                <% if  Contribution.getConference().getConfReview().getChoice() == 4: %>
+                                    <% if not (Contribution.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or Contribution.getReviewManager().getLastReview().anyReviewerHasGivenAdvice() and Contribution.getReviewManager().getLastReview().getEditorJudgement().isSubmitted()): %>                              
+                                        <% display = 'table' %>
+                                    <% end %>
+                                    <% else: %>
+                                        <% display = 'none' %>
+                                    <% end %>
+                                <% end %>
+                                   <tr><td>&nbsp;</td></tr>
+                                    <table align="center" style="display:<%=display%>">
                                     <tr>
                                         <td colspan="2" align="center">
                                             <form action="<%=urlHandlers.UHContributionRemoveSubmittedMarkForReviewing.getURL(Contribution)%>" method="POST">
-                                                <input type="submit" class="btn" value="UNMARK materials as submitted" >
+                                                <input type="submit" class="btn" value="UNDO sending" >
                                             </form>
                                         </td>
                                     <tr>
-                                        <td colspan="2" align="center">
+                                        <td colspan="2" align="left">
                                             <font>
-                                                Press this button only if you made some mistake when submitting the materials.<br>
-                                                The reviewing team will be notified and the reviewing process will be stopped until you mark the materials as submitted again.
+                                                <%=_("Press this button only if you made some mistake when submitting the materials")%>.<br>
+                                                <%=_("The reviewing team will be notified and the reviewing process will be stopped until you mark the materials as submitted again")%>.
                                             </font>
                                         </td>
-                                <% end %>
+                                     </table>
                             <% end %>
                         </tr>
                         <% end %>
@@ -145,7 +168,7 @@
               <% if Contribution.getConference() and Contribution.getConference().hasEnabledSection('paperReviewing') and Contribution.getConference().getConfReview().hasReviewing() and len(Contribution.getReviewManager().getVersioning()) > 1: %>
                   <tr>
                       <td align="center" class="displayField" nowrap>
-                            <b>Reviewing history</b>
+                            <b><%=_("Reviewing history")%></b>
                       </td>
                   </tr>
                   <tr>

@@ -474,7 +474,7 @@ class ConferenceReviewingAssignEditor(ConferenceReviewingAssignStaffBasePRMRefer
 
         for contribution in self._contributions:
             rm = contribution.getReviewManager()
-            if rm.hasReferee():
+            if rm.hasReferee() or self._confReview.getChoice() == 3:
                 if not rm.isEditor(self._targetUser):
                     if rm.hasEditor():
                         rm.removeEditor()
@@ -762,7 +762,8 @@ class ContributionReviewingDueDateModification(ContributionReviewingDateTimeModi
         else:
             raise ServiceError("ERR-REV3d",_("Kind of deadline to change not set"))
         
-        return datetime.datetime.strftime(date,'%d/%m/%Y %H:%M')
+        if date:
+            return datetime.datetime.strftime(date,'%d/%m/%Y %H:%M')
 
 class ContributionReviewingJudgementModification(ContributionReviewingTextModificationBase):
 
@@ -774,7 +775,7 @@ class ContributionReviewingJudgementModification(ContributionReviewingTextModifi
     def _handleGet(self):
         judgement = self.getJudgementObject().getJudgement()
         if judgement is None:
-            return "No judgement yet"
+            return 'None'
         else:
             return judgement
 

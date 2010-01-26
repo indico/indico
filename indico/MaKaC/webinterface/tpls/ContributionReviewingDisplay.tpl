@@ -3,7 +3,7 @@
 
 <!-- Judgement of the editor -->
 
-<% if Editing.isSubmitted(): %>
+<% if Editing.isSubmitted() and not (ConferenceChoice == 2 or ConferenceChoice == 1): %>
 <table width="90%%" align="center" border="0">
     <tr>
         <td>
@@ -14,7 +14,7 @@
 <% end %>
 
 <!-- List of advices from the reviewers -->
-<% if Review.anyReviewerHasGivenAdvice(): %>
+<% if Review.anyReviewerHasGivenAdvice() and not (ConferenceChoice == 3 or ConferenceChoice == 1): %>
 <table width="90%%" align="center" border="0">
     <tr>
         <td>
@@ -32,7 +32,7 @@
 
 <!-- Final reviewing of the referee -->
 <% if ConferenceChoice == 2 or ConferenceChoice == 4: %>
-    <% if Review.getRefereeJudgement().getJudgement() != None: %>
+    <% if Review.getRefereeJudgement().isSubmitted(): %>
 <table width="90%%" align="center" border="0">
     <tr>
         <td>

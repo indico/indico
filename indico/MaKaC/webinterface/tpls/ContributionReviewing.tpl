@@ -127,7 +127,7 @@
     <% end %>
     <% else: %>
     <tr>
-        <td colspan="5">
+        <td colspan="5" align="left">
             <%= _("This conference does not enable content reviewing. The layout reviewer's judgement is the only judgement.")%>
         </td>
     </tr>

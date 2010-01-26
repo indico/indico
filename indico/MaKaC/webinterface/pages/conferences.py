@@ -70,6 +70,7 @@ from MaKaC.modules.base import ModulesHolder
 import MaKaC.webcast as webcast
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil
+import MaKaC.reviewing as reviewing
 
 def stringToDate( str ):
     #Don't delete this dictionary inside comment. Its purpose is to add the dictionary in the language dictionary during the extraction!
@@ -9394,6 +9395,7 @@ class WConfMyContributions(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
         vars["User"] = self._aw.getUser()
         vars["Conference"] = self._conf
+        vars["ConfReviewingChoice"] = self._conf.getConfReview().getChoice()
         return vars
 
 class WConfMyStuffMySessions(wcomponents.WTemplated):
