@@ -852,7 +852,7 @@ class ScheduleContributions(ScheduleOperation):
                                     timezone = self._target.getTimezone())
 
         self._ids = pManager.extract("ids", pType=list, allowEmpty=False)
-        date = pManager.extract("selectedDay", pType=datetime.date,
+        date = pManager.extract("date", pType=datetime.date,
                                             allowEmpty=False)
 
         # convert date to datetime
@@ -1011,16 +1011,23 @@ class MoveEntryUpDown(ScheduleOperation, conferenceServices.ConferenceModifBase)
         self._sessionId = pManager.extract("sessionId", pType=str, allowEmpty=True, defaultValue=None)
         self._sessionSlotId = pManager.extract("sessionSlotId", pType=str, allowEmpty=True, defaultValue=None)
         self._direction = pManager.extract("direction", pType=bool, allowEmpty=False)
+        self._isSessionTimetable = pManager.extract("sessionTimetable", pType=bool, allowEmpty=True)
 
     def _performOperation(self):
 
-        if (self._sessionId != None and self._sessionSlotId != None):
 
-            slot = self._conf.getSessionById(self._sessionId).getSlotById(self._sessionSlotId)
-            sched = slot.getSchedule()
+
+        if self._isSessionTimetable:
+            schedObject = self._conf.getSessionById(self._sessionId)
         else:
-            sched = self._conf.getSchedule()
+            if self._sessionId != None and self._sessionSlotId != None:
+                session = self._conf.getSessionById(self._sessionId)
+                slot = session.getSlotById(self._sessionSlotId)
+                schedObject = slot
+            else:
+                schedObject = self._conf
 
+        sched = schedObject.getSchedule()
         schEntry = sched.getEntryById(self._schEntryId)
 
         if self._direction:

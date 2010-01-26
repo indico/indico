@@ -168,7 +168,7 @@ type("AddContributionDialog", ["ExclusivePopup", "PreLoadHandler"],
          }
      },
      function(method, timeStartMethod, args, roomInfo, parentRoomData,
-              confStartDate, dayStartDate, isConference, favoriteRooms, days, successFunc) {
+              confStartDate, dayStartDate, isConference, favoriteRooms, days, timetable, successFunc) {
          var self = this;
 
          this.newArgs = Array.prototype.slice.call(arguments, 0);
@@ -177,6 +177,7 @@ type("AddContributionDialog", ["ExclusivePopup", "PreLoadHandler"],
          this.selectedDay = dayStartDate;
          this.days = days;
          this.successFunc = successFunc;
+         this.timetable = timetable;
 
          this.PreLoadHandler(
              self._preload,

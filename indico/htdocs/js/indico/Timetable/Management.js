@@ -132,6 +132,7 @@ type("TimetableManagementActions", [], {
         info.set('startDate', startDate);
         info.set('endDate', endDate);
         info.set('reschedule', reschedule);
+        info.set('sessionTimetable', this.isSessionTimetable);
 
         var type = eventData.entryType;
 
@@ -478,7 +479,7 @@ type("TimetableManagementActions", [], {
             this.eventInfo.favoriteRooms,
             days,
             function(result) {
-                var aux = result.entry.entries
+                var aux = result.entry.entries;
                 self.timetable._updateEntry(result, result.id);
                 /* update the inner timetable!
                  * You need to create the aux before doing the updateEntry because otherwise the subentries
@@ -549,10 +550,11 @@ type("TimetableManagementActions", [], {
         each(entries, function(entry) {
             //check if we created the contribution from inside a session timetable in the top level timetable
             //if so, that entry needs to be updated in the top level timetable
-            if(self.timetable.currentDay != entry.day && exists(self.timetable.parentTimetable))
+            if(self.timetable.currentDay != entry.day && exists(self.timetable.parentTimetable)) {
                 self.timetable.parentTimetable._updateEntry(entry, entry.id);
-            else
+            } else {
                 self.timetable._updateEntry(entry, entry.id);
+            }
         });
     }
 },
@@ -570,6 +572,11 @@ type("TopLevelTimeTableManagementActions", ["TimetableManagementActions"],
              var info = new WatchObject();
              info.set('scheduleEntryId', eventData.scheduleEntryId);
              info.set('conference', eventData.conferenceId);
+
+             if (this.isSessionTimetable) {
+                 info.set('sessionTimetable', this.isSessionTimetable);
+                 info.set('sessionId', eventData.sessionId);
+             }
 
              return info;
          }
