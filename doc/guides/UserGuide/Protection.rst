@@ -1,19 +1,20 @@
-Chapter 9. Protection System
-============================
+=================
+Protection System
+=================
 
-9.1. Introduction
------------------
+Introduction
+------------
 
 This section aims to describe the protection system used by
 Indico to grant or restrict access to users.
 
 --------------
 
-9.2. Basic Concepts
--------------------
+Basic Concepts
+--------------
 
-9.2.1. Inheritance Schema
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Inheritance Schema
+~~~~~~~~~~~~~~~~~~
 
 You can set up a protection policy for almost all the objects that
 you can create within Indico. This protection policy is based on an
@@ -39,8 +40,8 @@ users cannot access "Category A" and "Conference 1".
 
 --------------
 
-9.2.2. Protection Types
-~~~~~~~~~~~~~~~~~~~~~~~
+Protection Types
+~~~~~~~~~~~~~~~~
 
 For each object (category, conference, contribution, session,
 etc) in Indico, one can set up three kinds of protection:
@@ -63,8 +64,8 @@ modification control list, access control setup, and domain control.
 
 --------------
 
-9.3. Access Control Policy
---------------------------
+Access Control Policy
+---------------------
 
 By default, all the objects (category, event, session,
 contribution, material, file and link) in Indico are **PUBLIC**.
@@ -104,8 +105,8 @@ If an object is **PRIVATE by inheritance**:
 
 --------------
 
-9.4. Domain Control Policy
---------------------------
+Domain Control Policy
+---------------------
 
 If an Indico object (category, event, session, contribution,
 material, file and link) is PUBLIC, we can restrict the access to

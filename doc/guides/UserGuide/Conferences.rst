@@ -1,8 +1,9 @@
-Chapter 2. Conferences
-======================
+===========
+Conferences
+===========
 
-2.1. Conference
----------------
+Conference
+----------
 
 A conference is the most comprehensive event in Indico.
 You should be able to manage its complete life-cycle, 
@@ -20,8 +21,8 @@ for instance, among other functionalities you can setup:
 
 --------------
 
-2.2. Creating a Conference
---------------------------
+Creating a Conference
+---------------------
 
 In order to create a conference, you just need to click on
 *Create event* and *Create conference*, in blue bar at the top of 
@@ -49,8 +50,8 @@ home page.
 
 --------------
 
-2.3. Setting up a Conference
-----------------------------
+Setting up a Conference
+-----------------------
 
 Once your conference has been created the Conference Manager can start
 setting up the conference from the Management Area.
@@ -66,8 +67,8 @@ setting up the conference from the Management Area.
 
 --------------
 
-2.4. Conference Management Area
--------------------------------
+Conference Management Area
+--------------------------
 
 The Management Area allows you to control, manage, setup and 
 modify the different parts of your conference. The following 
@@ -80,8 +81,8 @@ home page of the event.
 
 --------------
 
-2.4.1. General Settings
-~~~~~~~~~~~~~~~~~~~~~~~
+General Settings
+~~~~~~~~~~~~~~~~
 
 From the option General Settings in the left menu you can:
 
@@ -99,8 +100,8 @@ From the option General Settings in the left menu you can:
 
 --------------
 
-2.4.2. Programme Management
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Programme Management
+~~~~~~~~~~~~~~~~~~~~
 
 From the Programme menu (on the left menu) you can add/remove tracks and access each
 of the tracks `(see Tracks below) <#tracks>`_
@@ -109,8 +110,8 @@ of the tracks `(see Tracks below) <#tracks>`_
 
 --------------
 
-2.4.2.1. Tracks
-^^^^^^^^^^^^^^^
+Tracks
+^^^^^^
 
 Tracks are parts of the conference to which abstracts and
 contributions can belong. Inside tracks you can do the
@@ -134,8 +135,8 @@ following:
 
 --------------
 
-2.4.3. Contributions Management
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Contributions Management
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 The Contributions menu shows all the contributions to the
 conference. These may be either accepted abstracts or
@@ -162,8 +163,8 @@ the button *apply filter*.
 
 --------------
 
-2.4.3.1. Contributions
-^^^^^^^^^^^^^^^^^^^^^^
+Contributions
+^^^^^^^^^^^^^
 
 Each contribution has its own management area.
 
@@ -220,8 +221,8 @@ From the Tools tab you can:
 
 --------------
 
-2.4.3.2. Sub-contributions
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Sub-contributions
+^^^^^^^^^^^^^^^^^
 
 Sub-contributions can be added to a contribution to organize the
 contribution further.
@@ -236,8 +237,8 @@ these will be attached to the material for the sub-contribution.
 
 --------------
 
-2.4.3.3. Material
-^^^^^^^^^^^^^^^^^
+Material
+^^^^^^^^
 
 Material can be submitted by a user once the abstract has been
 accepted and made into a contribution. Material can also be added
@@ -255,8 +256,8 @@ you can list those users that can view the material.
 
 --------------
 
-2.4.4. Abstracts Management
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Abstracts Management
+~~~~~~~~~~~~~~~~~~~~
 
 The Abstracts Management in Indico has four tabs:
 
@@ -268,8 +269,8 @@ The Abstracts Management in Indico has four tabs:
 
 --------------
 
-2.4.4.1. Call for Abstracts Setup
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Call for Abstracts Setup
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 The call for abstracts needs to be enabled first from the *Setup* 
 tab. From here you can set:
@@ -294,8 +295,8 @@ tab. From here you can set:
 
 --------------
 
-2.4.4.1.1. Notification Template
-''''''''''''''''''''''''''''''''
+Notification Template
+'''''''''''''''''''''
 
 A notification template is an email template that the conference
 organizer can pre-defined and that will be automatically used by
@@ -345,8 +346,8 @@ In order to create a Notification Template you have to:
 
 --------------
 
-2.4.4.2. List of Abstracts Tab
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+List of Abstracts Tab
+^^^^^^^^^^^^^^^^^^^^^
 
 The List of Abstracts tab shows all the abstracts that have been
 submitted to the conference:
@@ -375,8 +376,8 @@ you want to display and apply it to the list.
 
 --------------
 
-2.4.4.3. Abstracts
-^^^^^^^^^^^^^^^^^^
+Abstracts
+^^^^^^^^^
 
 An abstract is either submitted by a user or manually
 added by a Abstract Manager (conference organizers). Once an 
@@ -404,8 +405,8 @@ can also be viewed from inside the tab *Notification log*.
 
 --------------
 
-2.4.4.4. Book of Abstracts
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Book of Abstracts
+^^^^^^^^^^^^^^^^^
 
 The *Book of Abstracts* tab lets you add any additional comments
 that you would like to appear in the first page of the book of Abstracts.
@@ -415,8 +416,8 @@ abstracts.
 
 --------------
 
-2.4.5. Timetable Management
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Timetable Management
+~~~~~~~~~~~~~~~~~~~~
 
 You can organise your conference from the Timetable tab in a conference. 
 When you start with a timetable it will look like this:
@@ -434,8 +435,8 @@ on the entry box and edition balloon will show up.
 
 --------------
 
-2.4.5.1. Sessions
-^^^^^^^^^^^^^^^^^
+Sessions
+^^^^^^^^
 
 A session is essentially a time interval within which you organise many
 presentations of your conference. You can create sessions base on 
@@ -453,8 +454,8 @@ different reasons:
 
 --------------
 
-2.4.5.2. Adding Sessions and Breaks to a Timetable
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Adding Sessions and Breaks to a Timetable
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To add a session to your timetable, use the menu *Add new* and the
 option *Session* > *Create a new session*, at the top of the timetable.
@@ -472,8 +473,8 @@ balloon and the link *View and edit current interval timetable*.
 
 --------------
 
-2.4.5.3. Adding Contributions to a Timetable
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Adding Contributions to a Timetable
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To add a contribution to your timetable use the option *Add new* > *Contribution*.
 Here, there are two possible situations:
@@ -495,8 +496,8 @@ box and using the edition balloon.
 
 --------------
 
-2.4.5.4. Session Management
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Session Management
+^^^^^^^^^^^^^^^^^^
 
 You can access the Management area for a session from the edition
 balloon (this is the balloon that appears when clicking on the entry), 
@@ -519,8 +520,8 @@ You will see different tabs from which you can:
 
 --------------
 
-2.4.5.4.1. Intervals 
-''''''''''''''''''''
+Intervals 
+'''''''''
 
 A session can happen in different intervals of time.
 If you already have a session (which will be like the first interval)
@@ -537,16 +538,16 @@ session on that subject.
 
 --------------
 
-2.4.5.4.2. Main Tab
-'''''''''''''''''''
+Main Tab
+''''''''
 
 From the Main tab in Session you can, modify the general session
 information and add conveners.
 
 --------------
 
-2.4.5.4.3. Contributions Tab
-''''''''''''''''''''''''''''
+Contributions Tab
+'''''''''''''''''
 
 From the Contributions tab you can see all the contributions that
 are part of your session. These contributions will only be shown
@@ -555,8 +556,8 @@ once they have been added
 
 --------------
 
-2.4.5.4.4. Protection Tab 
-'''''''''''''''''''''''''
+Protection Tab 
+''''''''''''''
 
 From the Protection tab in Session you can set the access
 rights for modification, access, and domain control in the same way as you
@@ -567,16 +568,16 @@ and breaks to that particular session.
 
 --------------
 
-2.4.5.4.5. Tools Tab
-''''''''''''''''''''
+Tools Tab
+'''''''''
 
 From the Tools tab in Session you can delete that session or
 write minutes for the session.
 
 --------------
 
-2.4.5.4.7. Adding Contributions to Sessions
-'''''''''''''''''''''''''''''''''''''''''''
+Adding Contributions to Sessions
+''''''''''''''''''''''''''''''''
 
 Inside sessions, you can create new contributions from the timetable
 or add unscheduled contributions (which have already been created
@@ -606,8 +607,8 @@ on the contribution box.
 
 --------------
 
-2.4.6. Protection Management
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Protection Management
+~~~~~~~~~~~~~~~~~~~~~
 
 Protection in a conference is similar to that in a Category `(see
 Protection) <Categories.html#protection>`_.
@@ -640,8 +641,8 @@ Therefore, just people from inside this domain will be able to access.
 
 --------------
 
-2.4.7. Registration Management
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Registration Management
+~~~~~~~~~~~~~~~~~~~~~~~
 
 You may wish to have some kind of registration process for those
 attending your conference. Here you can give the registrants
@@ -651,8 +652,8 @@ Registrants.
 
 --------------
 
-2.4.7.1. Registration Form
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Registration Form
+^^^^^^^^^^^^^^^^^
 
 You can access the registration module from the option *Registration*
 in the menu of the left.
@@ -675,8 +676,8 @@ information you need `(see Registration Area) <#registration-area>`_.
 
 --------------
 
-2.4.7.1.1. Reason for Participation
-'''''''''''''''''''''''''''''''''''
+Reason for Participation
+''''''''''''''''''''''''
 
 The Reason for participation form allows you to ask the
 registrant why hey wants to participate. From this form you can
@@ -686,8 +687,8 @@ modify the question and title of the form.
 
 --------------
 
-2.4.7.1.2. Sessions
-'''''''''''''''''''
+Sessions
+''''''''
 
 The Sessions form allows you to add which sessions from your
 conference you would like people to register for. From the form you
@@ -699,8 +700,8 @@ any session).
 
 --------------
 
-2.4.7.1.3. Accommodation
-''''''''''''''''''''''''
+Accommodation
+'''''''''''''
 
 The Accommodation form lets you add or remove the different types
 of accommodation available to your registrants or give them the
@@ -710,8 +711,8 @@ choice to book their own.
 
 --------------
 
-2.4.7.1.4. Social Events
-''''''''''''''''''''''''
+Social Events
+'''''''''''''
 
 The Social Events form allows you to add/remove any social
 events for which registrants can register. When you add an event you
@@ -721,8 +722,8 @@ add the title of this event.
 
 --------------
 
-2.4.7.1.5. Further Information
-''''''''''''''''''''''''''''''
+Further Information
+'''''''''''''''''''
 
 The Further Information form gives you the opportunity to add any
 additional information for the registrants.
@@ -731,8 +732,8 @@ additional information for the registrants.
 
 --------------
 
-2.4.7.1.6. General Sections 
-''''''''''''''''''''''''''''''
+General Sections 
+''''''''''''''''
 
 From the button *New sect.*, you can create a customizable section
 for your form. Inside the section, you can create any number of fields
@@ -743,8 +744,8 @@ online payment system.
 
 |image99|
 
-2.4.7.2. Registrants
-^^^^^^^^^^^^^^^^^^^^
+Registrants
+^^^^^^^^^^^
 
 The Registrants tab will show a list of all the registrants 
 for your conference.
@@ -759,8 +760,8 @@ questions.
 
 --------------
 
-2.4.8. Layout Management
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Layout Management
+~~~~~~~~~~~~~~~~~~
 
 The display area allows you to customize your conference. You can
 customize the menu that will be shown in the conference display
@@ -771,8 +772,8 @@ conference background/text, add a logo, and much more.
 
 --------------
 
-2.4.8.1. Display Menu Customization
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Display Menu Customization
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 |image61|
 
@@ -791,8 +792,8 @@ the 'add space' option.
 
 --------------
 
-2.4.8.2. Colour Customization
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Colour Customization
+^^^^^^^^^^^^^^^^^^^^
 
 You can change the background colour of the conference header by using
 the *Conference header background color* option.
@@ -804,8 +805,8 @@ text colour* option.
 
 --------------
 
-2.4.8.3. Logo Customization
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Logo Customization
+^^^^^^^^^^^^^^^^^^
 
 If you want to add your own logo to the conference display you
 can add it from the logo area in display. You can browse for you
@@ -815,8 +816,8 @@ logo, save it, and see it in the preview box.
 
 --------------
 
-2.4.9. Conference Tools
-~~~~~~~~~~~~~~~~~~~~~~~
+Conference Tools
+~~~~~~~~~~~~~~~~
 
 The conference Tools allow you to carry out certain actions on the
 whole of the conference.
@@ -825,8 +826,8 @@ whole of the conference.
 
 --------------
 
-2.4.9.1. Deleting a Conference
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Deleting a Conference
+^^^^^^^^^^^^^^^^^^^^^
 
 The Delete option will delete the whole conference and there is not
 an undo tool so far.
@@ -836,8 +837,8 @@ You will be asked to confirm deletion first.
 
 --------------
 
-2.4.9.2. Cloning a Conference
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Cloning a Conference
+^^^^^^^^^^^^^^^^^^^^
 
 Clone the conference if you would like to make another conference
 exactly the same. You have the option to clone it once, at fixed
@@ -847,8 +848,8 @@ intervals, or on certain dates.
 
 --------------
 
-2.4.9.3. Packaging Material
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Packaging Material
+^^^^^^^^^^^^^^^^^^
 
 Using the *Material package* option you can create a package
 of all the materials that have been used in the conference.
@@ -857,8 +858,8 @@ of all the materials that have been used in the conference.
 
 --------------
 
-.. 2.4.9.4. Create an Offline Version of a Conference
-.. ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. Create an Offline Version of a Conference
+.. ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. 
 .. Using the *Offline web for your conference* option you can create
 .. a copy of your conference that can be used offline, for example, if
@@ -868,8 +869,8 @@ of all the materials that have been used in the conference.
 
 .. --------------
 
-2.4.9.4. Alarm Control
-^^^^^^^^^^^^^^^^^^^^^^
+Alarm Control
+^^^^^^^^^^^^^
 
 You can set an alarm/reminder to alert people about the
 conference; the alert will be in the form of an email and
@@ -879,8 +880,8 @@ it will be automatically sent when you wish it to happen.
 
 --------------
 
-2.5. Conference Display Area
-----------------------------
+Conference Display Area
+-----------------------
 
 The Conference Display is the view that users of the conference
 will see. If the conference is public they will not need to log in
@@ -893,8 +894,8 @@ area is shown first.
 
 --------------
 
-2.5.1. Navigating the Conference Display Area
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Navigating the Conference Display Area
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Various parts of the conference display are always present in
 order for you to navigate or view the display area:
@@ -911,8 +912,8 @@ the access for logging in or out.
 
 --------------
 
-2.5.2. Overview Area
-~~~~~~~~~~~~~~~~~~~~
+Overview Area
+~~~~~~~~~~~~~
 
 The Overview Area shows the main details of the conference
 including any material that is included and the date and location
@@ -922,8 +923,8 @@ of the conference.
 
 --------------
 
-2.5.3. Call for Abstracts Area
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Call for Abstracts Area
+~~~~~~~~~~~~~~~~~~~~~~~
 
 The Call for abstracts view will show the range of dates during which
 an abstract can be submitted.
@@ -935,8 +936,8 @@ and view the abstracts they have submitted.
 
 --------------
 
-2.5.3.1. Submitting an Abstract
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Submitting an Abstract
+^^^^^^^^^^^^^^^^^^^^^^
 
 You need to be logged in as a user and the dates of submission
 must be in the time range to allow you to submit an abstract. Once 
@@ -952,8 +953,8 @@ after submitting.
 
 --------------
 
-2.5.3.2. Viewing your abstracts
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Viewing your abstracts
+^^^^^^^^^^^^^^^^^^^^^^
 
 You can view and see the status of any abstracts you have submitted.
 You can also create a PDF of your abstracts. By clicking on
@@ -963,8 +964,8 @@ the abstract name you will see the details of the abstract.
 
 --------------
 
-2.5.3.3. Abstract Display
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Abstract Display
+^^^^^^^^^^^^^^^^
 
 When you click on an abstract's title you will be taken to the
 abstracts view. This shows all the details of the abstract.
@@ -976,8 +977,8 @@ icon in the top right corner.
 
 --------------
 
-2.5.4. Author Index
-~~~~~~~~~~~~~~~~~~~
+Author Index
+~~~~~~~~~~~~
 
 The Author Index shows all the authors with contributions in the
 conference; the authors can be searched for by name.
@@ -990,8 +991,8 @@ clicking on the name.
 
 --------------
 
-2.5.4.1. Author Display
-^^^^^^^^^^^^^^^^^^^^^^^
+Author Display
+^^^^^^^^^^^^^^
 
 The Author Display shows the details of the author, e.g., contact
 details and the contribution(s) he has authored.
@@ -1000,8 +1001,8 @@ details and the contribution(s) he has authored.
 
 --------------
 
-2.5.5. Contribution Area
-~~~~~~~~~~~~~~~~~~~~~~~~
+Contribution Area
+~~~~~~~~~~~~~~~~~
 
 Contribution List in the menu takes you to all the contributions
 in the Conference. From here you can see a list of all or just
@@ -1016,8 +1017,8 @@ contributions or all of them.
 
 --------------
 
-2.5.5.1. Contribution Display
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Contribution Display
+^^^^^^^^^^^^^^^^^^^^
 
 In the Contribution Display you can see all the details of the
 contribution, including the description, the author, the session
@@ -1035,8 +1036,8 @@ Modification Area.
 
 --------------
 
-2.5.5.1.1. Contribution Material Display
-''''''''''''''''''''''''''''''''''''''''
+Contribution Material Display
+'''''''''''''''''''''''''''''
 
 The material that belongs to a contribution can be viewed by
 accessing the Contribution Display `(see Contribution Display) <#contribution-display>`_. 
@@ -1049,8 +1050,8 @@ or in the red cross to remove it.
 
 --------------
 
-2.5.6. My Conference Area
-~~~~~~~~~~~~~~~~~~~~~~~~~
+My Conference Area
+~~~~~~~~~~~~~~~~~~
 
 The *My conference* area gives you access to those areas for which
 you have Co-ordinator modification rights. For example, if you are a Track
@@ -1066,8 +1067,8 @@ using the modification icon on the left of the title.
 
 --------------
 
-2.5.6.1. My Conference: Session Co-ordination
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+My Conference: Session Co-ordination
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The session Modification accessible from *My conference* is
 slightly different from the Main Session Modification as you are
@@ -1078,8 +1079,8 @@ breaks:
 
 --------------
 
-2.5.7. Registration Area
-~~~~~~~~~~~~~~~~~~~~~~~~
+Registration Area
+~~~~~~~~~~~~~~~~~
 
 The Registration Area shows you the dates in which you are able
 to register, the maximum number of registrants allowed and any contact
@@ -1089,8 +1090,8 @@ information.
 
 --------------
 
-2.5.7.1. New Registrant
-^^^^^^^^^^^^^^^^^^^^^^^
+New Registrant
+^^^^^^^^^^^^^^
 
 From the New Registrant Area people can fill in the forms that
 were chosen and customized from the Registration Management
@@ -1115,8 +1116,8 @@ you originally provided.
 
 --------------
 
-2.5.8. Book of Abstracts
-~~~~~~~~~~~~~~~~~~~~~~~~
+Book of Abstracts
+~~~~~~~~~~~~~~~~~
 
 The Book of Abstracts selection in the menu will produce a PDF
 document of all the accepted abstracts (abstracts that have become
@@ -1125,8 +1126,8 @@ any contributions that are scheduled.
 
 --------------
 
-2.5.9. Scientific Programme Area
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Scientific Programme Area
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The Scientific Programme shows all the tracks with their
 descriptions:
@@ -1140,8 +1141,8 @@ a *Manage my track* option in the menu as in the picture above.
 
 --------------
 
-2.5.10. Timetable Area
-~~~~~~~~~~~~~~~~~~~~~~
+Timetable Area
+~~~~~~~~~~~~~~
 
 The Timetable area shows all the session, contributions, and
 breaks for the conference. You can access each session content
@@ -1157,8 +1158,8 @@ the detail level using the *Filter* options.
 
 --------------
 
-2.5.10.1. Session View
-^^^^^^^^^^^^^^^^^^^^^^
+Session View
+^^^^^^^^^^^^
 
 Session View allows you to see any contributions or breaks within
 each session:

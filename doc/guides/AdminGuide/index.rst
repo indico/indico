@@ -9,6 +9,7 @@ Indico's Admin Guide
 Contents:
 
 .. toctree::
+   :numbered:
    :maxdepth: 2
 
    ./AdminGuide.rst

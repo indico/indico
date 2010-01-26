@@ -1,8 +1,10 @@
-Chapter 1. Track Co-ordinator's Guide
-=====================================
+==========================
+Track Co-ordinator's Guide
+==========================
 
-1.1. Track Co-ordinator
------------------------
+------------------
+Track Co-ordinator
+------------------
 
 As a Track Co-ordinator you are able to propose the acceptance or
 rejection of abstracts within your track. Your are given the Track
@@ -20,8 +22,9 @@ track.
 
 --------------
 
-1.2. Track Co-ordinating
-------------------------
+-------------------
+Track Co-ordinating
+-------------------
 
 Once in the My tracks area you can click on the small red pen
 to the left of the track name to access the co-ordination
@@ -29,8 +32,8 @@ area of that track.
 
 --------------
 
-1.2.1. Abstracts Tab
-~~~~~~~~~~~~~~~~~~~~
+Abstracts Tab
+~~~~~~~~~~~~~
 
 The Abstracts tab lists all the abstracts that have been
 submitted for your track and their status.
@@ -46,8 +49,8 @@ duplicated, or suggest the abstract for another track.
 
 --------------
 
-1.2.2. Internal Comments Tab
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Internal Comments Tab
+~~~~~~~~~~~~~~~~~~~~~
 
 The Internal comments tab allows you to view and add any comments
 attached to the abstract.

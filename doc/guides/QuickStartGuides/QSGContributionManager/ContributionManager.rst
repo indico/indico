@@ -1,8 +1,10 @@
-Chapter 1. Contribution Manager's Guide
-=======================================
+============================
+Contribution Manager's Guide
+============================
 
-1.1. Contribution Manager
--------------------------
+--------------------
+Contribution Manager
+--------------------
 
 The Contribution Mananager is responsible for managing
 the information in a contribution. Your are given contribution
@@ -17,8 +19,9 @@ This will take you to your contribution management area.
 
 --------------
 
-1.2. Contribution Management
-----------------------------
+-----------------------
+Contribution Management
+-----------------------
 
 Once in the contribution management area you can start managing
 your contribution using the following tabs.
@@ -29,8 +32,8 @@ User Guide <../../UserGuide/Conferences.html#contributions-management>`_.
 
 --------------
 
-1.2.1. Main Tab
-~~~~~~~~~~~~~~~
+Main Tab
+~~~~~~~~
 
 The Main tab contains all the data about the contribution
 itself.
@@ -39,8 +42,8 @@ itself.
 
 --------------
 
-1.2.2. Sub Contribution Tab
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Sub Contribution Tab
+~~~~~~~~~~~~~~~~~~~~
 
 The sub contribution tab allows you to add and remove sub
 contributions.
@@ -52,8 +55,8 @@ its management area.
 
 --------------
 
-1.2.3. Access Control Tab
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Access Control Tab
+~~~~~~~~~~~~~~~~~~
 
 The access control tab allows you to add other contribution
 managers and to give permission for users to submit material for
@@ -63,8 +66,8 @@ your contribution.
 
 --------------
 
-1.2.4. Tools Tab
-~~~~~~~~~~~~~~~~
+Tools Tab
+~~~~~~~~~
 
 The tools tab allows you to delete the contribution, move the
 contribution, and write minutes for the contribution.

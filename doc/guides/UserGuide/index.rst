@@ -9,6 +9,7 @@ Indico's User Guide
 Contents:
 
 .. toctree::
+   :numbered:
    :maxdepth: 2
 
    ./Categories.rst

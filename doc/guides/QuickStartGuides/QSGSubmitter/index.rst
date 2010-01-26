@@ -9,6 +9,7 @@ Submitter's Guide
 Contents:
 
 .. toctree::
+   :numbered:
    :maxdepth: 2
 
    ./Submitter.rst

@@ -1,8 +1,9 @@
-Chapter 4. Lectures
-===================
+========
+Lectures
+========
 
-4.1. Lecture
-------------
+Lecture
+-------
 
 A Lecture is the simplest form of event within Indico. A
 Lecture allows you to add material, give details about the lecture,
@@ -11,8 +12,8 @@ remove, clone, and set alarms.
 
 --------------
 
-4.2. Creating a Lecture
------------------------
+Creating a Lecture
+------------------
 
 If you have the correct access rights within a Category you can
 create a new lecture using the *Create event* > *Lecture* from the
@@ -25,8 +26,8 @@ be redirected to its Management Area.
 
 --------------
 
-4.3. Lecture Management Area
-----------------------------
+Lecture Management Area
+-----------------------
 
 The Management Area allows you to control the different parts of
 your lecture. The following sections will show each area of the
@@ -34,8 +35,8 @@ Lecture Management.
 
 --------------
 
-4.3.1. General Settings Management
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+General Settings Management
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 From the *General settings* menu, you are able to modify the details of the
 lecture including title, description, location, dates, speakers, and default
@@ -48,8 +49,8 @@ home page of your event.
 
 --------------
 
-4.3.2. Material
-^^^^^^^^^^^^^^^
+Material
+^^^^^^^^
 
 You can add material to the lecture, by using the *Material* menu, and
 the link *Add Material*.
@@ -62,8 +63,8 @@ to control who has access to view the material.
 
 --------------
 
-4.3.3. Protection Management
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Protection Management
+~~~~~~~~~~~~~~~~~~~~~
 
 Protection Management in a lecture is the same as that in a Meeting.
 There is Modification Control, Domain Control and Access Control.
@@ -94,8 +95,8 @@ be able to access.
 
 --------------
 
-4.3.4. Tools Management
-~~~~~~~~~~~~~~~~~~~~~~~
+Tools Management
+~~~~~~~~~~~~~~~~
 
 The lecture Tools allow you to carry out certain actions on the whole
 of the lecture.
@@ -104,8 +105,8 @@ of the lecture.
 
 --------------
 
-4.3.4.1. Deleting a Lecture
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Deleting a Lecture
+^^^^^^^^^^^^^^^^^^
 
 The Delete this lecture option will delete the whole lecture. You will
 be asked to confirm deletion beforehand.
@@ -114,8 +115,8 @@ be asked to confirm deletion beforehand.
 
 --------------
 
-4.3.4.2. Cloning a Lecture
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Cloning a Lecture
+^^^^^^^^^^^^^^^^^
 
 Clone the lecture if you would like to make another lecture exactly the
 same. You have the option to clone it once, at fixed intervals,
@@ -125,8 +126,8 @@ or on certain dates.
 
 --------------
 
-4.3.4.3. Packaging Material
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Packaging Material
+^^^^^^^^^^^^^^^^^^
 
 Using the *Material Package* option you can create a package
 of all the materials that have been used in the lecture.
@@ -135,8 +136,8 @@ of all the materials that have been used in the lecture.
 
 --------------
 
-.. 4.3.4.4. Create an Offline version of a Lecture
-.. ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. Create an Offline version of a Lecture
+.. ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. Using the 'Offline web for your lecture' option you can create a
 .. copy of your lecture that can be used offline for example if you
@@ -146,7 +147,7 @@ of all the materials that have been used in the lecture.
 
 --------------
 
-4.3.4.4. Alarm Control
+Alarm Control
 ^^^^^^^^^^^^^^^^^^^^^^
 
 You can set an alarm/reminder to alert people about the
@@ -156,8 +157,8 @@ lecture; the alert will be in the form of an email.
 
 --------------
 
-4.4. Lecture Display Area
--------------------------
+Lecture Display Area
+--------------------
 
 The Lecture Display is the view that users of the lecture will
 see. If the lecture is public they will not need to log in to view
@@ -169,8 +170,8 @@ lecture.
 
 --------------
 
-4.4.1. Lecture Style
-~~~~~~~~~~~~~~~~~~~~
+Lecture Style
+~~~~~~~~~~~~~
 
 This is the default view for lectures in Indico. If you have
 modification rights to any parts in the lecture, you will be able
@@ -183,8 +184,8 @@ of the title.
 
 --------------
 
-4.4.2. IT Style
-~~~~~~~~~~~~~~~
+IT Style
+~~~~~~~~
 
 The IT style:
 
@@ -192,8 +193,8 @@ The IT style:
 
 --------------
 
-4.4.3. CDS Agenda Style
-~~~~~~~~~~~~~~~~~~~~~~~
+CDS Agenda Style
+~~~~~~~~~~~~~~~~
 
 The CDS Agenda style:
 
@@ -201,8 +202,8 @@ The CDS Agenda style:
 
 --------------
 
-4.4.4. Static Style
-~~~~~~~~~~~~~~~~~~~
+Static Style
+~~~~~~~~~~~~
 
 The Static style:
 
@@ -210,8 +211,8 @@ The Static style:
 
 --------------
 
-4.4.5. Simple XML Style
-~~~~~~~~~~~~~~~~~~~~~~~
+Simple XML Style
+~~~~~~~~~~~~~~~~
 
 The Simple XML style:
 
@@ -219,8 +220,8 @@ The Simple XML style:
 
 --------------
 
-4.4.6. Event Style
-~~~~~~~~~~~~~~~~~~
+Event Style
+~~~~~~~~~~~
 
 The Event style:
 

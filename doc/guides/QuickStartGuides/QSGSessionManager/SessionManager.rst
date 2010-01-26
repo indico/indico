@@ -1,8 +1,10 @@
-Chapter 1. Session Manager's Guide
-==================================
+=======================
+Session Manager's Guide
+=======================
 
-1.1. Session Manager
---------------------
+---------------
+Session Manager
+---------------
 
 The Session Manager has full control of a session.
 However, your Conference Manager may request you not to edit some
@@ -14,8 +16,9 @@ conference menu.
 
 --------------
 
-1.2. Session Management
------------------------
+------------------
+Session Management
+------------------
 
 Once in the session management area you can start managing your
 session using the following tabs.
@@ -25,8 +28,8 @@ in-depth explanation please see `Session Management in the Indico User Guide <..
 
 --------------
 
-1.2.1. Main Tab
-~~~~~~~~~~~~~~~
+Main Tab
+~~~~~~~~
 
 The Main tab contains all the data about the session itself
 
@@ -34,8 +37,8 @@ The Main tab contains all the data about the session itself
 
 --------------
 
-1.2.2. Contributions Tab
-~~~~~~~~~~~~~~~~~~~~~~~~
+Contributions Tab
+~~~~~~~~~~~~~~~~~
 
 The Contributions tab gives a list of all the contributions
 associated with your session.
@@ -48,8 +51,8 @@ then enter the modification area of that contribution.
 
 --------------
 
-1.2.3. Session Timetable Tab
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Session Timetable Tab
+~~~~~~~~~~~~~~~~~~~~~
 
 The Session Timetable tab lets you arrange the scheduling for your
 session, you can add/edit/delete session intervals, organise when your
@@ -64,8 +67,8 @@ link that allows you to modify it.
 
 --------------
 
-1.2.4. Access Control Tab
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Access Control Tab
+~~~~~~~~~~~~~~~~~~
 
 The Access Control tab is the area in which you can set access
 rights for your session. Please check with your Conference Manager
@@ -82,16 +85,16 @@ co-ordinator cannot change details of the session itself.
 
 --------------
 
-1.2.5. Tools Tab
-~~~~~~~~~~~~~~~~
+Tools Tab
+~~~~~~~~~
 
 The Tools tab allows you to delete the session and to write
 minutes for the session.
 
 --------------
 
-1.2.6. Comment Tab
-~~~~~~~~~~~~~~~~~~
+Comment Tab
+~~~~~~~~~~~
 
 The Comment tab stores any comments about your session. You can
 view this comment but only the Conference Manager can modify the

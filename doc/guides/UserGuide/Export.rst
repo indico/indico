@@ -1,8 +1,9 @@
-Chapter 6. Exporting Indico Data
-================================
+=====================
+Exporting Indico Data
+=====================
 
-6.1. To Personal Scheduler Tools (Outlook, iCal, korganizer...)
----------------------------------------------------------------
+To Personal Scheduler Tools (Outlook, iCal, korganizer...)
+----------------------------------------------------------
 
 You can export an event or a set of events to your personal
 scheduler tool by using the Indico iCal export. When you see
@@ -25,8 +26,8 @@ its content with any new event in the Category.
 
 --------------
 
-6.2. RSS feeds
---------------
+RSS feeds
+---------
 
 Indico provides RSS feeds on each Category page. If your browser
 is RSS-aware, you will see an icon like this on the browser menu
@@ -35,8 +36,8 @@ subscribe to it using an RSS aggregator.
 
 --------------
 
-6.3. Sharepoint
----------------
+Sharepoint
+----------
 
 If you maintain a Sharepoint web site, it is very easy to create
 inside it a web part exposing the forthcoming events from an Indico
@@ -46,12 +47,14 @@ http://indico.cern.ch/tools/export.py?fid=2l12&date=today&days=1000&of=xml)
 and in the "XSL link" part, add this URL:
 http://indico.cern.ch/export.xsl.
 
-The result should look like this: |image164|
+The result should look like this:
+
+|image164|
 
 --------------
 
-6.4. Using the export.py script
--------------------------------
+Using the export.py script
+--------------------------
 
 Indico allows you to programmatically access the content of its
 database by exposing its events through a web service, the

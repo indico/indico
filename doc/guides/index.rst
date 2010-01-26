@@ -14,8 +14,8 @@ Contents:
    ./UserGuide/index.rst
    ./AdminGuide/index.rst
    ./QuickStartGuides/index.rst
-   ./Glossary/index.rst
-   ./FAQ/index.rst
+   ./Glossary/Glossary.rst
+   ./FAQ/FAQ.rst
 
 
 .. Indices and tables

@@ -9,6 +9,7 @@ CDS Agenda users
 Contents:
 
 .. toctree::
+   :numbered:
    :maxdepth: 2
 
    ./CDSAgenda.rst

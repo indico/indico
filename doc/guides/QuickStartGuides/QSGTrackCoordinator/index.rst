@@ -9,6 +9,7 @@ Track Co-ordinator's Guide
 Contents:
 
 .. toctree::
+   :numbered:
    :maxdepth: 2
 
    ./TrackCoordinator.rst

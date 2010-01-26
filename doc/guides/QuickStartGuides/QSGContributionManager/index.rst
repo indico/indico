@@ -9,6 +9,7 @@ Contribution Manager's Guide
 Contents:
 
 .. toctree::
+   :numbered:
    :maxdepth: 2
 
    ./ContributionManager.rst

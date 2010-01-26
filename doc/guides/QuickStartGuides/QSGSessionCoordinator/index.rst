@@ -9,6 +9,7 @@ Session Coordinator's Guide
 Contents:
 
 .. toctree::
+   :numbered:
    :maxdepth: 2
 
    ./SessionCoordinator.rst

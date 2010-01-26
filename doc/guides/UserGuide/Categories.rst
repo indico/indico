@@ -1,8 +1,9 @@
-Chapter 1. Categories
-=====================
+==========
+Categories
+==========
 
-1.1. Category
--------------
+Category
+---------
 
 A Category is a means of grouping your events or other Categories 
 together. In Indico *Home* is the top level category from where you
@@ -20,8 +21,8 @@ big orange category name. After clicking *Manage* (more specifically its inner
 option *Edit category*) you will be accessing the Management area for Category.
 
 
-1.2. Creating a Category
-------------------------
+Creating a Category
+-------------------
 
 From the menu *Manage* (more specifically its inner 
 option *Add subcategory*) you can create a new category. 
@@ -36,11 +37,11 @@ and by clicking the button *add subcateg*.
 |image1|
 
 
-1.3. Category Management Area
------------------------------
+Category Management Area
+------------------------
 
-1.3.1. General settings
-~~~~~~~~~~~~~~~~~~~~~~~
+General settings
+~~~~~~~~~~~~~~~~
 
 In the Category Management Area, the first option in the menu is *General settings*:
 
@@ -63,8 +64,8 @@ and you can modify its content:
 
 --------------
 
-1.3.2. Protection 
-~~~~~~~~~~~~~~~~~
+Protection 
+~~~~~~~~~~
 
 From the Management Area you can protect your category using the
 three controls for access levels: Modification control, Access control,
@@ -105,8 +106,8 @@ in order to know more about Protection in Indico.
 
 --------------
 
-1.3.3. Detail Modification & Sub-Category/Event Organisation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Detail Modification & Sub-Category/Event Organisation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The details of a Category can be modified and sub-categories can
 be organised from the *General settings* tab in the management area. 
@@ -128,8 +129,8 @@ asked if you are sure you want to delete it.
 
 --------------
 
-1.3.4. Deleting a Category
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Deleting a Category
+~~~~~~~~~~~~~~~~~~~
 
 To delete the current category you can go to the Tools menu in the
 Management Area and select 'Delete this category' you

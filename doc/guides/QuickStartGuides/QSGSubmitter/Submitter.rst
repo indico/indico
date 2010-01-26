@@ -1,7 +1,9 @@
-Chapter 1. Submitter's Guide
-============================
+=================
+Submitter's Guide
+=================
 
-1.1. Submitter
+--------------
+Submitter
 --------------
 
 The Submitter is able to submit material for a
@@ -20,8 +22,9 @@ contributions for which you can submit material.
 
 --------------
 
-1.2. Submitting
----------------
+----------
+Submitting
+----------
 
 Once in the My contributions area you can click on the
 contribution name to view the contribution details and start
@@ -31,8 +34,8 @@ submitting material.
 
 --------------
 
-1.2.1. Submitting Material
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Submitting Material
+~~~~~~~~~~~~~~~~~~~
 
 Once you have clicked on 'Add Material' you are presented with
 a screen to let you submit.

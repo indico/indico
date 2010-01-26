@@ -1,8 +1,9 @@
-Chapter 7. Conference Room Booking
-==================================
+=======================
+Conference Room Booking
+=======================
 
-7.1. Introduction
------------------
+Introduction
+------------
 
 This chapter describes the Indico module for booking conference
 rooms.
@@ -22,8 +23,8 @@ back for some tips.
 
 --------------
 
-7.2. The Tutorial
------------------
+The Tutorial
+------------
 
 You may want to read the Core Features listing to grasp the capabilities
 of the room booking module capabilities. To summarize, it is for booking
@@ -33,8 +34,8 @@ conference rooms.
 
 --------------
 
-7.2.1. Getting into Room Booking Module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Getting into Room Booking Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To use Indico::CRBS directly, just click *Room Booking* on Indico
 home page. To book rooms for your event, go to the event management
@@ -43,8 +44,8 @@ to sign in. Use your Indico credentials.
 
 --------------
 
-7.2.2. The First Page
-~~~~~~~~~~~~~~~~~~~~~
+The First Page
+~~~~~~~~~~~~~~
 
 The Room Booking Module first page depends on who is logged in. For
 most people, it will show a list of their bookings. The *My bookings*
@@ -56,8 +57,8 @@ users).
 
 --------------
 
-7.2.3. The Most Important Tip
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The Most Important Tip
+~~~~~~~~~~~~~~~~~~~~~~
 
 Feeling lost? Point at the question mark icon |image166| with your
 mouse to see context help. Context help is meant to answer most of
@@ -65,8 +66,8 @@ your questions along the way. It is always there waiting for you.
 
 --------------
 
-7.2.4. Room Names
-~~~~~~~~~~~~~~~~~
+Room Names
+~~~~~~~~~~
 
 If a room does not have a name, the default one is built according
 to the following pattern:
@@ -79,8 +80,8 @@ Examples: "CERN: 304-1-001", "Sheraton: 0-34-013".
 
 --------------
 
-7.2.5. Three Kinds of Room
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Three Kinds of Room
+~~~~~~~~~~~~~~~~~~~
 
 There are three kinds of room. They determine how much freedom
 users have.
@@ -98,8 +99,8 @@ users have.
 
 --------------
 
-7.2.6. Six Types of Booking
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Six Types of Booking
+~~~~~~~~~~~~~~~~~~~~
 
 There are six types of booking. They allow you to define
 different types of recurring reservation. A common example is a weekly
@@ -122,8 +123,8 @@ choose from:
 
 --------------
 
-7.2.7. Booking a Room
-~~~~~~~~~~~~~~~~~~~~~
+Booking a Room
+~~~~~~~~~~~~~~
 
 Basically there are two steps: selecting a room and filling in a
 booking form. More detailed steps are:
@@ -193,11 +194,11 @@ using the menu options *My bookings* and *My PRE-bookings*
 
 --------------
 
-7.3. Core Features and Constraints
-----------------------------------
+Core Features and Constraints
+-----------------------------
 
-7.3.1. Introduction
-~~~~~~~~~~~~~~~~~~~
+Introduction
+~~~~~~~~~~~~
 
 This section describes core capabilities and constraints of the Room
 Booking Module. It may be useful to assess whether it meets your
@@ -213,11 +214,11 @@ without defining an event).
 
 --------------
 
-7.3.2. Core Features
-~~~~~~~~~~~~~~~~~~~~
+Core Features
+~~~~~~~~~~~~~
 
-7.3.2.1. General
-^^^^^^^^^^^^^^^^
+General
+^^^^^^^
    
 * Stand-alone and "in-conference" mode.
 
@@ -242,8 +243,8 @@ without defining an event).
 
 --------------
 
-7.3.2.2. User
-^^^^^^^^^^^^^
+User
+^^^^
 
 * Book a room
 * Manage own bookings (track, modify, cancel)
@@ -252,16 +253,16 @@ without defining an event).
 
 --------------
 
-7.3.2.3. Room Manager
-^^^^^^^^^^^^^^^^^^^^^
+Room Manager
+^^^^^^^^^^^^
 
 * Accept and reject PRE-bookings (for his room)
 * Reject bookings (for his room)
 
 --------------
 
-7.3.2.4. Indico Administrator
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Indico Administrator
+^^^^^^^^^^^^^^^^^^^^
 
 * Switch on/off Room Booking Module
 * Configure room booking plugins in admin section
@@ -272,8 +273,8 @@ without defining an event).
 
 --------------
 
-7.3.3. Constraints
-~~~~~~~~~~~~~~~~~~
+Constraints
+~~~~~~~~~~~
 
 The room must have its manager. It is not possible to define
 multiple managers for a single room (you can work around this by
@@ -289,8 +290,8 @@ The room must have defined floor (alphanumerical) and room
 
 --------------
 
-7.4. Dictionary
----------------
+Dictionary
+----------
 
 *Room*: meeting or conference room. Please note that the software is
 not suitable for managing other rooms, like offices, corridors, etc.

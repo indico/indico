@@ -1,8 +1,10 @@
-Chapter 1. Session Co-ordinator's Guide
-=======================================
+==============================
+Session Co-ordinator's Guide
+==============================
 
-1.1. Session Co-ordinator
--------------------------
+--------------------
+Session Co-ordinator
+--------------------
 
 The Session Co-ordinator is responsible for scheduling
 contributions and breaks within his session. These contributions
@@ -19,8 +21,9 @@ conference menu.
 
 --------------
 
-1.2. Session Co-ordination
---------------------------
+---------------------
+Session Co-ordination
+---------------------
 
 There are three levels of co-ordination modification that the
 Conference Manager can give to Session Co-ordinators, as we will
@@ -33,8 +36,8 @@ session you will be presented with this page:
 
 --------------
 
-1.2.1. Basic Rights
-~~~~~~~~~~~~~~~~~~~
+Basic Rights
+~~~~~~~~~~~~
 
 All Session Co-ordinators can:
 
@@ -53,8 +56,8 @@ tab of your session:
 
 --------------
 
-1.2.2. Contribution Modification Rights
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Contribution Modification Rights
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If the Conference Manager has allowed contribution modification
 rights you can:
@@ -76,8 +79,8 @@ please see `Contributions in the Indico User Guide <../../UserGuide/Conferences.
 
 --------------
 
-1.2.3. Unrestricted Timetable Management
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Unrestricted Timetable Management
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If the Conference Manager has allowed you unrestricted timetable
 management rights you can:

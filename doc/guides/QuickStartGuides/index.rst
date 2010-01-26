@@ -9,7 +9,8 @@ Indico's Quick Start Guides
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :numbered:
+   :maxdepth: 1
 
    ./QSGAgendaUsers/index.rst
    ./QSGContributionManager/index.rst

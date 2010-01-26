@@ -1,8 +1,8 @@
-Chapter 1. Starting with Indico
-===============================
+Starting with Indico
+====================
 
-1.1. Creating an Administration Account
----------------------------------------
+Creating an Administration Account
+----------------------------------
 
 After installation the first screen presented to you will be:
 
@@ -16,7 +16,7 @@ with a link to activate your account, once activated you will
 then be able to login.
 Now, it is the moment to add yourself as an Administrator. 
 In order to do so, click on *Server admin*, in the top blue bar, and you 
-will access the `Administration Area <#chapter-2-administration-area>`_.
+will access the `Administration Area <#administration-area>`_.
 
 |image2|
 
@@ -33,12 +33,12 @@ Administrators will have access and modification rights to all categories and ev
 Users can create their own accounts to use Indico, and they
 can modify, delete and add extra logins manually. Administrators are also able
 to create new accounts and assign users to be Administrators or
-organise users into groups `(see Administration Area) <#chapter-2-administration-area>`_
+organise users into groups `(see Administration Area) <#administration-area>`_
 
 --------------
 
-1.2. Accounts Created by a User
--------------------------------
+Accounts Created by a User
+--------------------------
 
 When a new user wants to create an account, he can do so by
 clicking on *login* in the top right-hand corner of Indico. From
@@ -48,8 +48,8 @@ an email will be sent to the user.
 
 --------------
 
-1.2.1. Activating a User Created Account
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Activating a User Created Account
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A user activates the account by using the link that
 is sent in an email after applying for a new account. If
@@ -57,8 +57,8 @@ the account is not activated the user cannot log in.
 
 --------------
 
-1.2.2. Retrieving a Forgotten Password
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Retrieving a Forgotten Password
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If a user needs to retrieve his password, he can use the
 login screen and his forgotten password option; the user will be
@@ -67,7 +67,7 @@ account.
 
 --------------
 
-Chapter 2. Administration Area
+Administration Area
 ==============================
 
 The Administration Area controls the whole of Indico, anything
@@ -81,8 +81,8 @@ maintenance.
 
 --------------
 
-2.1. General settings 
----------------------
+General settings 
+----------------
 
 From the *General settings* in the Administration Area, you are able to
 modify the system title, the organisation, the support email and
@@ -100,16 +100,16 @@ this support email.
 
 --------------
 
-2.2. Users
-----------
+Users
+-----
 
 From the *Users and Groups* option you can control and modify
 any of the user accounts and groups.
 
 --------------
 
-2.2.1. Manually Creating a User
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Manually Creating a User
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 To manually create a new account use the *New User* button in the
 *Users and Groups* menu, *Manage Users* tab. You will be presented
@@ -119,8 +119,8 @@ need to activate the account.
 
 --------------
 
-2.2.2. Searching for Users
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Searching for Users
+~~~~~~~~~~~~~~~~~~~
 
 You can search for a user by surname, first name, email
 address or organisation. If you are not sure of the full details you
@@ -130,8 +130,8 @@ match your search. The Search filter is found by clicking on
 
 --------------
 
-2.2.3. Manually Activating an Account
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Manually Activating an Account
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To activate an account from within the administration area, go to
 the *Users and Groups* option, *Manage Users* tab, and search for the user's
@@ -147,8 +147,8 @@ the user for that account will now be able to log in.
 
 --------------
 
-2.2.4. Modifying a User's Account
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Modifying a User's Account
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 From the Account Details screen above you have the option to modify
 the user's details. From here you are able to modify the user
@@ -157,8 +157,8 @@ fax number, default timezone, default language, etc.
 
 --------------
 
-2.2.5. Creating Additional Logins for a User
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Creating Additional Logins for a User
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A user may have more than one login (username and password) on
 their account, this can be useful if a user has certain access
@@ -174,8 +174,8 @@ show in the User Details screen as above
 
 --------------
 
-2.2.6. Deleting Additional Logins
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Deleting Additional Logins
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To delete any additional account login select those accounts for
 that user that you wish to delete and use the *delete selected
@@ -184,8 +184,8 @@ have one login account however.
 
 --------------
 
-2.3. Groups
------------
+Groups
+------
 
 You can use the Groups section to categorise users if you wish.
 You may want to use this feature to help with Access Control.
@@ -211,8 +211,8 @@ continue adding and removing users, or to modify the group details.
 
 --------------
 
-2.4. IP Domains
----------------
+IP Domains
+----------
 
 You can add sets of IP addresses called Domains to be used in
 Access Control. To add a new domain use the *New Domain* option in
@@ -233,8 +233,8 @@ From here you can also modify the domain.
 
 --------------
 
-2.5. Maintenance
-----------------
+Maintenance
+-----------
 
 The maintenance area is accessible from the *System* menu, *Maintenance* tab. 
 From here you are able to:

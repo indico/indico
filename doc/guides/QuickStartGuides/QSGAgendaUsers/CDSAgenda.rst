@@ -1,5 +1,6 @@
-0. Preliminary Note on Indico
------------------------------
+--------------------------
+Preliminary Note on Indico
+--------------------------
 
 Indico is currently in the process of replacing CDS Agenda as the
 only CERN event management software. The developement of Indico was
@@ -17,11 +18,12 @@ We hope you will enjoy using Indico, and please do not hesitate to contact
 us (`indico-team@cern.ch <mailto:indico-team@cern.ch>`_) if you wish to
 propose an improvement, report a bug or simply need help...
 
-1. General
-----------
+-------
+General
+-------
 
-1.1. Login
-~~~~~~~~~~
+Login
+~~~~~
 
 Use the "login" link in the top-right corner of the screen.
 
@@ -36,8 +38,8 @@ page.
 The "remind me of my password" feature works only with local Indico
 accounts, not with NICE ones.
 
-1.2. Modify Account Data
-~~~~~~~~~~~~~~~~~~~~~~~~
+Modify Account Data
+~~~~~~~~~~~~~~~~~~~
 
 Once logged in, you may click on your name which appears in the
 top-right corner to modify all the information associated with your
@@ -45,8 +47,9 @@ account (tel. number, affiliation...).
 
 --------------
 
-2. Event Creation
------------------
+--------------
+Event Creation
+--------------
 
 As in CDS Agenda, events can be created in all category which do
 not contain any subcategory. In such categories, a menu such as
@@ -57,21 +60,21 @@ this one will appear in the top bar:
 In order to create an event, click on the proper event type and
 fill the form in.
 
-2.1. Lectures
-~~~~~~~~~~~~~
+Lectures
+~~~~~~~~
 
 A lecture is the simplest event possible. It consists of a title,
 speaker, dates, description, plus attached files. It does not
 contain a timetable.
 
-2.2. Meetings
-~~~~~~~~~~~~~
+Meetings
+~~~~~~~~
 
 Create a meeting if you wish to handle a timetable with several
 items inside, attach files to them...
 
-2.3. Conferences
-~~~~~~~~~~~~~~~~
+Conferences
+~~~~~~~~~~~
 
 You should choose to create a conference only if you need advanced
 features such as call for abstract, registration form, epayment.
@@ -80,11 +83,12 @@ just a timetable.
 
 --------------
 
-3. Event Modification
----------------------
+------------------
+Event Modification
+------------------
 
-3.1. Using a Modification Key
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Using a Modification Key
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 As in CDS Agenda, you may use a modification key in order to modify
 your meeting. To do so, go to the display page of the meeting and
@@ -95,8 +99,8 @@ modification key.
 
 *Note: Unlike in CDS Agenda a modification key will not be automatically given to your meeting. (see section 4 if you want to set one for your meeting)*
 
-3.2. By logging In
-~~~~~~~~~~~~~~~~~~
+By logging In
+~~~~~~~~~~~~~
 
 Being logged in will give you a default access to the modification
 of the meetings for which you have the proper rights. For example,
@@ -106,8 +110,8 @@ resides. The manager of the event may also grant you modification
 rights on the full event or only on parts of it (a session, a
 contribution...).
 
-3.3. Access to the Modification Interface
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Access to the Modification Interface
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once you have entered the modification key, or if you are logged in
 with rights over the event, small blue arrows will appear in the
@@ -115,8 +119,8 @@ timetable next to the items you are allowed to modify. If you click
 on it, you will see a menu with all the options to modify, write minutes,
 manage material, etc.
 
-3.4. Creating a Timetable
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Creating a Timetable
+~~~~~~~~~~~~~~~~~~~~
 
 Once you have created your meeting, access the modification area by
 clicking the pencil button on the top bar. Then click on the
@@ -137,8 +141,8 @@ display page by clicking on the display icon:
 
 |image12|
 
-3.5. Posting Files/Links
-~~~~~~~~~~~~~~~~~~~~~~~~
+Posting Files/Links
+~~~~~~~~~~~~~~~~~~~
 
 You can either post a file or a link from the display of the
 timetable of your event by clicking on the file upload icon:
@@ -150,10 +154,11 @@ or from the modification interface of the event by choosing the
 
 --------------
 
-4. Event Protection
--------------------
+----------------
+Event Protection
+----------------
 
-4.1. Setting up access/modification keys
+Setting up access/modification keys
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You need to enter the modification area in order to change these.
@@ -165,7 +170,7 @@ Then enter a modification password and/or an access password and
 validate your choice by clicking on the "change" button.
 *Note: If you choose to protect the access to your event, setting an access key will not be sufficient: don't forget to set the current status of the event to "PRIVATE"!*
 
-4.2. Delegate Management Rights
+Delegate Management Rights
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Instead of using a modification key, you can also grant

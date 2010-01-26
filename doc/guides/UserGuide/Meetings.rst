@@ -1,8 +1,9 @@
-Chapter 3. Meetings
-===================
+========
+Meetings
+========
 
-3.1. Meeting
-------------
+Meeting
+-------
 
 A Meeting is not as in depth as a Conference and is made
 for smaller events. Within a Meeting you can find two main
@@ -19,8 +20,8 @@ and you have Tools in which you can remove, clone, and set alarms.
 
 --------------
 
-3.2. Creating a Meeting
------------------------
+Creating a Meeting
+------------------
 
 If you have the correct access rights within a Category you can
 create a new meeting using the blue top bar *Create event* option.
@@ -33,8 +34,8 @@ Area.
 
 --------------
 
-3.3. Meeting Management Area
-----------------------------
+Meeting Management Area
+-----------------------
 
 The Management Area allows you to control the different parts of
 your meeting. The following sections will show each area of the
@@ -45,8 +46,8 @@ management display area for the meeting.
 
 --------------
 
-3.3.1. General Settings Management
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+General Settings Management
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 From the Main tab, you are able to modify the details of the
 meeting including title, description, location, default style of
@@ -56,16 +57,16 @@ the display. You can also add/remove any chairpersons.
 
 --------------
 
-3.3.1.1. Meeting Visibility
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Meeting Visibility
+^^^^^^^^^^^^^^^^^^
 
 This option allows you to choose up to which level your meeting
 will be visible in the overview pages.
 
 --------------
 
-3.3.2. Timetable Management
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Timetable Management
+~~~~~~~~~~~~~~~~~~~~
 
 The Timetable Management allows you to organize your meeting by
 using sessions (groups of contributions), contributions (presentations),
@@ -83,8 +84,8 @@ for Conferences) <Conferences.html#timetable-management>`_.
 
 --------------
 
-3.3.2.1. Adding Contributions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Adding Contributions
+^^^^^^^^^^^^^^^^^^^^
 
 You can directly add contributions into your timetable using the
 *Add new* > *Contribution* at the top of the timetable. This will open
@@ -103,20 +104,20 @@ contribution.
 
 --------------
 
-3.3.2.3. Session Management
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Session Management
+^^^^^^^^^^^^^^^^^^
 
 See `Session Management for Conferences <Conferences.html#session-management>`_.
 
-3.3.2.4. Contribution Management
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Contribution Management
+^^^^^^^^^^^^^^^^^^^^^^^
 
 See `Contribution Management for Conferences <Conferences.html#contribution-management>`_.
 
 --------------
 
-3.3.3. Protection Management
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Protection Management
+~~~~~~~~~~~~~~~~~~~~~
 
 Protection in a meeting is the same as that in a Conference.
 There is Modification Control, Domain Control, and Access Control.
@@ -154,8 +155,8 @@ the material access control page.
 
 --------------
 
-3.3.4. Tools Tab 
-~~~~~~~~~~~~~~~~
+Tools Tab 
+~~~~~~~~~
 
 The meeting Tools allow you to make certain actions on the whole
 of the meeting. See following sub-sections.
@@ -164,8 +165,8 @@ of the meeting. See following sub-sections.
 
 --------------
 
-3.3.4.1. Deleting a Meeting
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Deleting a Meeting
+^^^^^^^^^^^^^^^^^^
 
 The Delete meeting option will delete the whole meeting. You will
 be asked to confirm deletion beforehand.
@@ -174,8 +175,8 @@ be asked to confirm deletion beforehand.
 
 --------------
 
-3.3.4.2. Cloning a Meeting
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Cloning a Meeting
+^^^^^^^^^^^^^^^^^
 
 Clone the meeting if you would like to make another meeting exactly the
 same. You have the option to clone it once, at fixed intervals,
@@ -185,8 +186,8 @@ or on certain dates.
 
 --------------
 
-3.3.4.3. Packaging Material
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Packaging Material
+^^^^^^^^^^^^^^^^^^
 
 Using the *Material package* option you can create a package
 of all the materials that have been used in the meeting.
@@ -195,8 +196,8 @@ of all the materials that have been used in the meeting.
 
 --------------
 
-.. 3.3.4.4. Create an Offline version of a Meeting
-.. ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. Create an Offline version of a Meeting
+.. ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. Using the 'Offline web for your meeting' option you can create a
 .. copy of your meeting that can be used offline for example if you
@@ -206,8 +207,8 @@ of all the materials that have been used in the meeting.
 
 --------------
 
-3.3.4.4. Alarm Control
-^^^^^^^^^^^^^^^^^^^^^^
+Alarm Control
+^^^^^^^^^^^^^
 
 You can set an alarm/reminder to alert people about the
 meeting. The alert will be in the form of an email, and in
@@ -217,8 +218,8 @@ the date that you have selected.
 
 --------------
 
-3.4. Meeting Display Area
--------------------------
+Meeting Display Area
+--------------------
 
 The Meeting Display is the view that users of the meeting will
 see. If the meeting is public they will not need to log in to view
@@ -229,8 +230,8 @@ show the different views and displays.
 
 --------------
 
-3.4.1. Indico Style
-~~~~~~~~~~~~~~~~~~~
+Indico Style
+~~~~~~~~~~~~
 
 This is the default view for meetings in Indico. If you have
 modification rights to any parts of the meeting you will be able
@@ -240,8 +241,8 @@ to access the Management Area by clicking the icon |image133|.
 
 --------------
 
-3.4.2. IT Style
-~~~~~~~~~~~~~~~
+IT Style
+~~~~~~~~
 
 The IT style:
 
@@ -249,8 +250,8 @@ The IT style:
 
 --------------
 
-3.4.3. Simple Text Style
-~~~~~~~~~~~~~~~~~~~~~~~~
+Simple Text Style
+~~~~~~~~~~~~~~~~~
 
 The simple text style:
 
@@ -258,8 +259,8 @@ The simple text style:
 
 --------------
 
-3.4.4. Administrative Style
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Administrative Style
+~~~~~~~~~~~~~~~~~~~~
 
 The Administration style:
 
@@ -267,8 +268,8 @@ The Administration style:
 
 --------------
 
-3.4.5. Compact Style
-~~~~~~~~~~~~~~~~~~~~
+Compact Style
+~~~~~~~~~~~~~
 
 The Compact style:
 
@@ -276,8 +277,8 @@ The Compact style:
 
 --------------
 
-3.4.6. Parellel Style
-~~~~~~~~~~~~~~~~~~~~~
+Parellel Style
+~~~~~~~~~~~~~~
 
 The Parellel style:
 

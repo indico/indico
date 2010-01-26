@@ -147,7 +147,7 @@ html_static_path = ['_static']
 #html_split_index = False
 
 # If true, links to the reST sources are added to the pages.
-#html_show_sourcelink = True
+html_show_sourcelink = False
 
 # If true, an OpenSearch description file will be output, and all pages will
 # contain a <link> tag referring to it.  The value of this option must be the
@@ -163,7 +163,9 @@ htmlhelp_basename = 'Indicodoc'
 
 # -- Options for LaTeX output --------------------------------------------------
 
-latex_elements = { 'inputenc': "\\usepackage[utf8x]{inputenc}" }
+latex_elements = { "inputenc": "\\usepackage[utf8x]{inputenc}",
+                   "papersize": "a4paper",                    
+                 }
 
 # The paper size ('letter' or 'a4').
 #latex_paper_size = 'letter'
@@ -190,9 +192,9 @@ latex_documents = [
    u'Indico Team', 'manual'),
   ('QuickStartGuides/QSGTrackCoordinator/index', 'IndicoQSGTrackCoordinator.tex', u'Indico Documentation',
    u'Indico Team', 'manual'),
-  ('FAQ/index', 'IndicoFAQ.tex', u'Indico Documentation',
+  ('FAQ/FAQ', 'IndicoFAQ.tex', u'Indico Documentation',
    u'Indico Team', 'manual'),
-  ('Glossary/index', 'IndicoGlossary.tex', u'Indico Documentation',
+  ('Glossary/Glossary', 'IndicoGlossary.tex', u'Indico Documentation',
    u'Indico Team', 'manual'),
 ]
 

@@ -1,8 +1,9 @@
-Chapter 8. Event Evaluation
-===========================
+================
+Event Evaluation
+================
 
-8.1. Introduction
------------------
+Introduction
+------------
 
 With this evaluation module for Indico you can create your own
 online web survey in order to know participants' opinion about the
@@ -10,11 +11,11 @@ conferences/seminars/lectures.
 
 --------------
 
-8.2. Functional goals
----------------------
+Functional goals
+----------------
 
-8.2.1. Security
-~~~~~~~~~~~~~~~
+Security
+~~~~~~~~
 
 Survey questions and statistical results are neither vital nor
 confidential for CERN members. We believe standard precautions are
@@ -28,8 +29,8 @@ survey and view the statistical results.
 
 --------------
 
-8.2.2. Usability
-~~~~~~~~~~~~~~~~
+Usability
+~~~~~~~~~
 
 The main possible actions for the **surveyor** *(management area)*
 are the following:
@@ -57,19 +58,19 @@ For a **submitter** *(display area)*:
 
 --------------
 
-8.3. Interface
---------------
+Interface
+---------
 
-8.3.1. Management Area
-~~~~~~~~~~~~~~~~~~~~~~
+Management Area
+~~~~~~~~~~~~~~~
 
 In the *Evaluation* option we have four
 tabs: *Setup \| Edit \| Preview \| Results*.
 
 --------------
 
-8.3.1.1. Setup
-^^^^^^^^^^^^^^
+Setup
+^^^^^
 
 In this section you can set the main information and configuration
 about the survey. Click on |image174| to set your options.
@@ -138,8 +139,8 @@ about the survey. Click on |image174| to set your options.
 
 --------------
 
-8.3.1.2. Edit
-^^^^^^^^^^^^^
+Edit
+^^^^
 
 In this section you can add/edit/remove the questions in your
 form. On the left panel you have six different types of question you
@@ -242,8 +243,8 @@ of a question within the form by clicking on |image201|. Press
 
 --------------
 
-8.3.1.3. Preview
-^^^^^^^^^^^^^^^^
+Preview
+^^^^^^^
 
 In Preview you can see what your evaluation really looks like in
 the display area. Feel free to play with this form, submitted
@@ -251,8 +252,8 @@ information won't be recorded.
 
 --------------
 
-8.3.1.4. Results
-^^^^^^^^^^^^^^^^
+Results
+^^^^^^^
 
 In this section we have the statistics. There are two panels
 called *Options* and *Statistics*.
@@ -270,16 +271,18 @@ In the second, you see the collected results of your evaluation
 shown as graphs or as answer lists depending on the question
 type.
 
-Answer lists shown for Textbox/Textarea/Password. (See
-`Section 8.3.1.2 <#eval_edit>`_) |image204|
+Answer lists shown for Textbox/Textarea/Password:
 
-Graphs shown for Select/Radio/Checkbox. (See
-`Section 8.3.1.2 <#eval_edit>`_) |image205|
+|image204|
+
+Graphs shown for Select/Radio/Checkbox:
+
+|image205|
 
 --------------
 
-8.3.2. Display Area
-~~~~~~~~~~~~~~~~~~~
+Display Area
+~~~~~~~~~~~~
 
 For a conference, you can access an evaluation via the left menu.
 
