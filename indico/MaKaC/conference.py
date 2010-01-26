@@ -5663,7 +5663,7 @@ class Session(Persistent):
             return self._textColor
         return color
 
-    def setValues( self, sessionData,check=2,moveEntries=0 ):
+    def setValues( self, sessionData,check=2,moveEntries=0, isEdit = False ):
         """Sets all the values of the current session object from a dictionary
             containing the following key-value pairs:
                 title-(str)
@@ -5714,7 +5714,10 @@ class Session(Persistent):
         #if the location is not defined we set the location of the session
         #   to None so it will be considered to be the same as for the
         #   conference
-        if sessionData.get( "locationName", "" ).strip() == "":
+        #if we are creating the session we need to set the location as none, but if it's an edit
+        #it is neccesary to leave the location as "", because otherwise it will inherit it from the
+        #parent even if the checkbox is not checked
+        if sessionData.get( "locationName", "" ).strip() == "" and not isEdit:
             self.setLocation( None )
         else:
             #if the location name is defined we must set a new location (or
@@ -5726,7 +5729,7 @@ class Session(Persistent):
             loc.setName( sessionData["locationName"] )
             loc.setAddress( sessionData.get("locationAddress", "") )
         #same as for the location
-        if sessionData.get( "roomName", "" ).strip() == "":
+        if sessionData.get( "roomName", "" ).strip() == "" and not isEdit:
                 self.setRoom( None )
         else:
             room = self.getOwnRoom()
@@ -8038,9 +8041,9 @@ class Contribution(Persistent, Fossilizable):
         #   to None so it will be considered to be the same as for the
         #   conference
         if data.has_key("locationName"):
-            if data["locationName"].strip()=="":
-                self.setLocation(None)
-            else:
+           # if data["locationName"].strip()=="":
+            #    self.setLocation(None)
+            #else:
                 #if the location name is defined we must set a new location (or
                 #   modify the existing one) for the contribution
                 loc=self.getOwnLocation()
@@ -8051,9 +8054,9 @@ class Contribution(Persistent, Fossilizable):
                 loc.setAddress(data.get("locationAddress", ""))
         #same as for the location
         if data.has_key("roomName"):
-            if data["roomName"].strip()=="":
-                self.setRoom(None)
-            else:
+           # if data["roomName"].strip()=="":
+            #    self.setRoom(None)
+            #else:
                 room=self.getOwnRoom()
                 if not room:
                     room=CustomRoom()

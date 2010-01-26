@@ -253,7 +253,7 @@ class RHSessionDataModification( RoomBookingDBMixin, RHSessionModifBase ):
                                     int( params["eHour"] ), \
                                     int( params["eMinute"] )))
         params["eDate"] = ed.astimezone(timezone('UTC'))
-        self._target.setValues(params,self._check,self._slmove)
+        self._target.setValues(params,self._check,self._slmove, True)
         self._target.setScheduleType(params.get("tt_type",self._target.getScheduleType()))
     
     def _process( self ):

@@ -395,7 +395,7 @@ type("TimetableManagementActions", [], {
         args.set('type', params.type);
 
         args.set('startDate', Util.formatDateTime(eventData.startDate, IndicoDateTimeFormats.Server));
-        args.set('roomInfo',$O({"location": eventData.inheritLoc?null:eventData.location,
+        args.set('roomInfo',$O({"location": eventData.inheritLoc?'':eventData.location,
                                 "room": eventData.inheritRoom?null:eventData.room,
                                 "address": eventData.inheritLoc?'':eventData.address}));
 

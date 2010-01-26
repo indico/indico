@@ -55,9 +55,9 @@ class LocationSetter:
         location = self._roomInfo.get('location', None)
 
         if location != None:
-            if location.strip()=="":
-                target.setLocation(None)
-            else:
+            #if location.strip()=="":
+            #    target.setLocation(None)
+            #else:
                 loc = target.getOwnLocation()
                 if not loc:
                     loc = conference.CustomLocation()
@@ -66,9 +66,9 @@ class LocationSetter:
                 loc.setAddress(address)
         #same as for the location
         if room != None:
-            if room.strip()=="":
-                target.setRoom(None)
-            else:
+            #if room.strip()=="":
+            #    target.setRoom(None)
+            #else:
                 r = target.getOwnRoom()
                 if not r:
                     r = conference.CustomRoom()
@@ -379,7 +379,6 @@ class ScheduleEditBreakBase(ScheduleOperation, LocationSetter):
                        tz = self._conf.getTimezone())
 
         self._setLocationInfo(self._brk)
-
         self._addToSchedule(self._brk)
 
         pickledDataSlotSchEntry = self._getSlotEntry()

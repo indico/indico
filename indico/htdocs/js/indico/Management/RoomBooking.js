@@ -158,7 +158,11 @@ type("RoomBookingWidget", ["IWidget"],
                      self.locationChooser.enable();
                      self.roomChooser.enable();
                      self.addressArea.enable();
+
                      self._startBind();
+                     self.info.set('location', '');
+                     self.info.set('room', '');
+                     self.info.set('address', '');
                  }
              });
          }
