@@ -2079,7 +2079,7 @@ class WPConferenceModifBase( main.WPMainBase ):
             urlHandlers.UHConfModifRegForm.getURL( self._conf ))
         self._generalSection.addItem( self._regFormMenuItem)
 
-        if self._conf.getCSBookingManager() is not None and self._conf.getCSBookingManager().isCSAllowed():
+        if self._conf.getCSBookingManager() is not None and self._conf.getCSBookingManager().isCSAllowed(self._rh.getAW().getUser()):
             from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
             self._videoServicesMenuItem = wcomponents.SideMenuItem(_("Video Services"),
                 urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = CollaborationTools.isUsingHTTPS()))

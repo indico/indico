@@ -51,6 +51,19 @@ class CollaborationBase(ConferenceModifBase):
         if not PluginsHolder().hasPluginType("Collaboration"):
             raise CollaborationServiceException("Collaboration plugin system is not active")
         
+    def _checkCanManagePlugin(self, plugin):
+        isAdminOnlyPlugin = CollaborationTools.isAdminOnlyPlugin(plugin)
+        
+        hasAdminRights = RCCollaborationAdmin.hasRights(self) or \
+                         RCCollaborationPluginAdmin.hasRights(self, None, [plugin])
+                         
+        if not hasAdminRights and isAdminOnlyPlugin:
+            raise CollaborationException(_("Cannot acces service of admin-only plugin if user is not admin, for event: ") + str(self._conf.getId()) + _(" with the service ") + str(self.__class__) )
+        
+        elif not hasAdminRights and not RCVideoServicesManager.hasRights(self, [plugin]):
+            #we check if it's an event creator / manager (this will call ConferenceModifBase._checkProtection)
+            CollaborationBase._checkProtection(self)
+        
     def process(self):
         try:
             return ConferenceModifBase.process(self)
@@ -73,20 +86,20 @@ class CollaborationBookingModifBase(CollaborationBase):
             raise CollaborationException(_("Booking id not set when trying to modify a booking on meeting ") + str(self._conf.getId()) + _(" with the service ") + str(self.__class__) )
         
     def _checkProtection(self):
-        hasRights = RCCollaborationAdmin.hasRights(self) or \
-                    RCCollaborationPluginAdmin.hasRights(self, None, [self._bookingPlugin]) or \
-                    RCVideoServicesManager.hasRights(self, [self._bookingPlugin])
-        
-        if not hasRights:
-            CollaborationBase._checkProtection(self)
+        CollaborationBase._checkCanManagePlugin(self, self._bookingPlugin)
 
 class CollaborationAdminBookingModifBase(CollaborationBookingModifBase):
+    """ Base class for services on booking objects that can only be requested by Server Admins,
+        Video Services Admins, or Plugin admins, such as accept or reject a request, etc.
+    """
     
     def _checkProtection(self):
         if not RCCollaborationAdmin.hasRights(self) and not RCCollaborationPluginAdmin.hasRights(self, None, [self._bookingPlugin]):
             raise CollaborationException(_("You don't have the rights to perform this operation on this booking"))
 
 class AdminCollaborationBase(AdminService):
+    """ Base class for admin services in the Video Services Overview page, not directed towards a specific booking.
+    """
     
     def _checkParams(self):
         AdminService._checkParams(self)
@@ -118,12 +131,7 @@ class CollaborationCreateCSBooking(CollaborationBase):
             raise CollaborationException(_("Custom parameters for plugin ") + str(self._type) + _(" not set when trying to create a booking on meeting ") + str(self._conf.getId() ))
         
     def _checkProtection(self):
-        hasRights = RCCollaborationAdmin.hasRights(self) or \
-                    RCCollaborationPluginAdmin.hasRights(self, None, [self._type]) or \
-                    RCVideoServicesManager.hasRights(self, [self._type])
-            
-        if not hasRights:
-            CollaborationBase._checkProtection(self)
+        CollaborationBase._checkCanManagePlugin(self, self._type)
     
     def _getAnswer(self):
         return DictPickler.pickle(self._CSBookingManager.createBooking(self._type, bookingParams = self._bookingParams),
@@ -162,28 +170,28 @@ class CollaborationStartCSBooking(CollaborationBookingModifBase):
                                   timezone = self._conf.getTimezone())
 
 class CollaborationStopCSBooking(CollaborationBookingModifBase):
-    """ Performs server-side actions when a booking is started
+    """ Performs server-side actions when a booking is stopped
     """
     def _getAnswer(self):
         return DictPickler.pickle(self._CSBookingManager.stopBooking(self._bookingId),
                                   timezone = self._conf.getTimezone())
 
 class CollaborationCheckCSBookingStatus(CollaborationBookingModifBase):
-    """ Performs server-side actions when a booking is started
+    """ Performs server-side actions when a booking's status is checked
     """
     def _getAnswer(self):
         return DictPickler.pickle(self._CSBookingManager.checkBookingStatus(self._bookingId),
                                   timezone = self._conf.getTimezone())
         
 class CollaborationAcceptCSBooking(CollaborationAdminBookingModifBase):
-    """ Performs server-side actions when a booking is started
+    """ Performs server-side actions when a booking / request is accepted
     """
     def _getAnswer(self):
         return DictPickler.pickle(self._CSBookingManager.acceptBooking(self._bookingId),
                                   timezone = self._conf.getTimezone())
         
 class CollaborationRejectCSBooking(CollaborationAdminBookingModifBase):
-    """ Performs server-side actions when a booking is started
+    """ Performs server-side actions when a booking / request is rejected
     """
     def _checkParams(self):
         CollaborationAdminBookingModifBase._checkParams(self)
@@ -194,19 +202,27 @@ class CollaborationRejectCSBooking(CollaborationAdminBookingModifBase):
                                   timezone = self._conf.getTimezone())
         
 class CollaborationChangePluginManagersBase(CollaborationBase):
+    """ Base class for adding and removing plugin managers in an event
+        self._plugin will be a string with the plugin name.
+    """
     
     def _checkParams(self):
         CollaborationBase._checkParams(self)
         if self._params.has_key('plugin'):
             self._plugin = self._params['plugin']
         else:
-            raise CollaborationException(_("Plugin name not set when trying to add a manager on event: ") + str(self._conf.getId()) + _(" with the service ") + str(self.__class__) )
+            raise CollaborationException(_("Plugin name not set when trying to add or remove a manager on event: ") + str(self._conf.getId()) + _(" with the service ") + str(self.__class__) )
+        
+        if CollaborationTools.isAdminOnlyPlugin(self._plugin):
+            raise CollaborationException(_("Tried to add or remove a manager for an admin-only plugin on event : ") + str(self._conf.getId()) + _(" with the service ") + str(self.__class__) )
         
     def _checkProtection(self):
         if not RCVideoServicesManager.hasRights(self):
             CollaborationBase._checkProtection(self)
 
 class CollaborationAddPluginManager(CollaborationChangePluginManagersBase, UserListModificationBase):
+    """ Adds a user as Plugin Manager for an event and plugin
+    """
     
     def _checkParams(self):
         CollaborationChangePluginManagersBase._checkParams(self)
@@ -222,6 +238,8 @@ class CollaborationAddPluginManager(CollaborationChangePluginManagersBase, UserL
     
 
 class CollaborationRemovePluginManager(CollaborationChangePluginManagersBase, UserModificationBase):
+    """ Removes a user as Plugin Manager for an event and plugin
+    """
     
     def _checkParams(self):
         CollaborationChangePluginManagersBase._checkParams(self)
@@ -233,7 +251,7 @@ class CollaborationRemovePluginManager(CollaborationChangePluginManagersBase, Us
 
     
 class CollaborationBookingIndexQuery(AdminCollaborationBase):
-    """
+    """ Performs a query to the Collaboration index of bookings / request objects.
     """
     
     def _checkProtection(self):
@@ -340,12 +358,7 @@ class CollaborationCustomPluginService(CollaborationBase):
             raise CollaborationException(_("Service " + str(serviceName) + _("Service not found for plugin ") + str(self._pluginName) + _("in CollaborationPluginService")))
     
     def _checkProtection(self):
-        hasRights = RCCollaborationAdmin.hasRights(self) or \
-                    RCCollaborationPluginAdmin.hasRights(self, None, [self._pluginName]) or \
-                    RCVideoServicesManager.hasRights(self, [self._pluginName])
-            
-        if not hasRights:
-            CollaborationBase._checkProtection(self)
+        CollaborationBase._checkCanManagePlugin(self, self._pluginName)
     
     def _getAnswer(self):
         serviceObject = self._serviceClass(self._params, self._aw)
@@ -356,7 +369,7 @@ class CollaborationCustomPluginService(CollaborationBase):
 
 class CollaborationPluginServiceBase(CollaborationBase):
     """ Base class that plugin-defined services need to inherit from.
-        The _params and _aw attributes will be available from them,
+        The _params and _aw attributes will be available for them,
         and also _target and _conf and _CSBookingManager from CollaborationBase.
         If they implement a _checkParams method, they need to call
         their parent's (this class's) method first.

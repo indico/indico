@@ -83,14 +83,16 @@ class CSBookingManager(Persistent, Observer):
         if not self in self._conf.getObservers():
             self._conf.addObserver(self)
 
-    def isCSAllowed(self):
+    def isCSAllowed(self, user = None):
         """ Returns if the associated event should display a Video Services tab
             This can depend on the kind of event (meeting, lecture, conference), on the equipment of the room...
+            If a user is provided, we will take into account if the user can manage the plugin (for example,
+            an event manager cannot manage an admin-only plugin)
         """
         pluginsPerEventType = CollaborationTools.getCollaborationPluginType().getOption("pluginsPerEventType").getValue()
         if pluginsPerEventType:
             for plugin in pluginsPerEventType[self._conf.getType()]:
-                if plugin.isActive():
+                if plugin.isActive() and (user is None or CollaborationTools.canUserManagePlugin(self._conf, plugin, user)):
                     return True
         return False
 
@@ -719,6 +721,7 @@ class CSBookingBase(Persistent):
     _hasStartDate = True
     _hasEventDisplay = False
     _hasTitle = False
+    _adminOnly = False
 
     def __init__(self, bookingType, conf):
         """ Constructor for the CSBookingBase class.
@@ -1395,6 +1398,12 @@ class CSBookingBase(Persistent):
             an event display page
         """
         return self._hasEventDisplay
+
+    def isAdminOnly(self):
+        """ Returns if this booking / this booking's plugin pages should only be displayed
+            to Server Admins, Video Service Admins, or the respective plugin admins.
+        """
+        return self._adminOnly
 
     def _create(self):
         """ To be overriden by inheriting classes.

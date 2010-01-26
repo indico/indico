@@ -1,4 +1,5 @@
 <% from MaKaC.fossils.user import IAvatarFossil %>
+<% from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools %>
 
 <p style="font-style: italic; padding-bottom: 20px;" >
     Event managers have all the necessary rights for all of the <strong>Video Services</strong> section.<br />
@@ -15,7 +16,7 @@
     </div>
 </div>
 
-<% allowedPluginNames = [p.getName() for p in CSBM.getAllowedPlugins()] %>
+<% allowedPluginNames = [p.getName() for p in CSBM.getAllowedPlugins() if not CollaborationTools.isAdminOnlyPlugin(p)] %>
 <% allowedPluginNames.sort() %>
 
 <div class="groupTitle"><%= _("Managers for individual systems") %></div>

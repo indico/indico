@@ -18,11 +18,11 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.plugins.base import PluginsHolder
+from MaKaC.plugins.base import PluginsHolder, Plugin
 from MaKaC.webinterface import urlHandlers
 from MaKaC.common.utils import formatDateTime, formatTwoDates, formatTime,\
     formatDuration
-from MaKaC.common.timezoneUtils import getAdjustedDate, isSameDay, maxDatetime
+from MaKaC.common.timezoneUtils import getAdjustedDate, isSameDay
 from MaKaC.common.Configuration import Config
 from MaKaC.conference import Contribution
 
@@ -137,17 +137,27 @@ class CollaborationTools(object):
         return cls.getModule(pluginName).collaboration.CSBooking
     
     @classmethod
-    def getTabs(cls, conference, user = None):
+    def getTabs(cls, conference, user):
         """ Returns a list of tab names corresponding to the active plugins for an event.
-            If a user is specified, only tabs with plugins where the user is an plugin admin,
-            or where the user is a plugin manager for this event, are returned.
+            If a user is specified, only tabs that a user can see are returned.
+            A user can see a tab if:
+            -The user is a Server Admin or a Video Services Admin
+            -The user is a Plugin Admin of a plugin in that tab.
+            -The user is an Event Manager or Video Services Manager and the plugin is not "admins only"
+            -The user is a Plugin Manager of a plugin in that tab and the plugin is not "admins only"
         """
-        csbm = conference.getCSBookingManager()
         tabNamesSet = set()
+        csbm = conference.getCSBookingManager()
+        
+        # we get the list of Plugin objects allowed for this kind of event 
         allowedForThisEvent = csbm.getAllowedPlugins()
+        
         for plugin in allowedForThisEvent:
-            if not user or user in plugin.getOption('admins').getValue() or csbm.isPluginManager(plugin.getName(), user):
+            
+            if cls.canUserManagePlugin(conference, plugin, user):
+
                 tabNamesSet.add(cls.getPluginTab(plugin))
+            
             
         tabNames = list(tabNamesSet)
         return tabNames
@@ -163,15 +173,15 @@ class CollaborationTools(object):
             return "Collaboration"
         
     @classmethod
-    def getPluginsByTab(cls, tabName, conference = None, user = None):
+    def getPluginsByTab(cls, tabName, conference, user):
         """ Utility function that returns a list of plugin objects.
             These Plugin objects will be of the "Collaboration" type, and only those who have declared a subtab equal
             to the "tabName" argument will be returned.
             If tabName is None, [] is returned.
             The conference object is used to filter plugins that are not allowed in a conference,
             because of the conference type or the equipment of the conference room
-            If a user is specified, only tabs with plugins where the user is an plugin admin,
-            or where the user is a plugin manager for this event, are returned.
+            If a user is specified, only tabs with plugins that the user can see will be returned:
+            -
         """
         if tabName:
             
@@ -187,10 +197,33 @@ class CollaborationTools(object):
                 sorted = True,
                 filter = lambda plugin: cls.getPluginTab(plugin) == tabName and
                                         (allowedPlugins is None or plugin in allowedPlugins) and
-                                        (user is None or user in plugin.getOption('admins').getValue() or csbm.isPluginManager(plugin.getName(), user))
+                                        cls.canUserManagePlugin(conference, plugin, user)
             )
         else:
             return []
+        
+    @classmethod
+    def canUserManagePlugin(cls, conference, plugin, user):
+        """ Utility function that returns if a user can interact with a plugin inside an event,
+            depending on the plugin, the user, and the event where the user tries to see a plugin page
+            or change a plugin object
+        """
+        csbm = conference.getCSBookingManager()
+        
+        from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin
+        isAdminUser = RCCollaborationAdmin.hasRights(user = user)
+        
+        isAdminOnlyPlugin = cls.isAdminOnlyPlugin(plugin)
+        
+        canSee = (
+                isAdminUser or 
+                user in plugin.getOption('admins').getValue() or
+                not isAdminOnlyPlugin and (conference.canUserModify(user) or
+                                           csbm.isVideoServicesManager(user) or
+                                           csbm.isPluginManager(plugin.getName(), user) ) )
+
+        return canSee
+        
     
             
     @classmethod
@@ -215,6 +248,17 @@ class CollaborationTools(object):
             return pluginObject.getOption("allowedOn").getValue()
         else:
             return []
+        
+    @classmethod
+    def isAdminOnlyPlugin(cls, plugin):
+        """ plugin can be a string with the name of the plugin
+            or a Plugin object
+        """
+        if isinstance(plugin, Plugin):
+            pluginName = plugin.getName()
+        else:
+            pluginName = plugin
+        return cls.getCSBookingClass(pluginName)._adminOnly
         
     @classmethod
     def pluginsWithEventDisplay(cls):
