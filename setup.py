@@ -311,7 +311,7 @@ class tests_indico(Command):
                     ('jsspecify=', None, "Use js-test-driver style (TestCaseName.testName)"),
                     ('grid', None, "Use Selenium Grid")]
     boolean_options = []
-    
+
     specify = None
     coverage = False
     unit = False
@@ -322,7 +322,7 @@ class tests_indico(Command):
     jscoverage = False
     jsspecify = None
     grid = None
-    
+
     def initialize_options(self): pass
 
     def finalize_options(self): pass
@@ -349,7 +349,7 @@ class tests_indico(Command):
             testsToRun.append('jsunit')
             testsToRun.append('jslint')
             testsToRun.append('grid')
-        
+
         indicop = Indicop(self.jsspecify, self.jscoverage)
         result = indicop.main(self.specify, self.coverage, testsToRun)
         print result
@@ -363,7 +363,7 @@ if __name__ == '__main__':
     #    shutil.copy('etc/indico.conf.sample', PWD_INDICO_CONF)
 
     from MaKaC.consoleScripts.installBase import *
-    
+
     #Dirty trick: For running tests, we need to load all the modules
     if 'tests' in sys.argv:
         setIndicoInstallMode(False)

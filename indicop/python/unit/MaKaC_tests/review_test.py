@@ -39,7 +39,7 @@ def setup_module():
 def teardown_module():
     DBMgr.getInstance().abort()
     DBMgr.getInstance().endRequest()
-    
+
 class TestCFADirectives( unittest.TestCase ):
     """Tests the setting of the main CFA directives.
     """
@@ -63,7 +63,7 @@ class TestCFADirectives( unittest.TestCase ):
 
     def testSubmissionPeriod( self ):
         cfa = self._conf.getAbstractMgr()
-        #we set up the submission period 
+        #we set up the submission period
         startDate = datetime(2004, 01, 01, tzinfo=self._tz)
         endDate = datetime(2004, 01, 03, tzinfo=self._tz)
         cfa.setStartSubmissionDate( startDate )
@@ -119,7 +119,7 @@ class TestAbstractSubmission( unittest.TestCase ):
         self.assert_( a.isSubmitter( submitter ) )
         #checking access privileges
         #checking modification privileges
-    
+
 
 class TestAbstractModification( unittest.TestCase ):
     """Tests different abstract modification scenarios
@@ -235,7 +235,7 @@ class TestAbstractAcceptation( unittest.TestCase ):
         self.assert_( c_auth.getPhone() == auth2.getTelephone() )
 
     def testIdCollission( self ):
-        #checks that no collission with contributions can happen regarding 
+        #checks that no collission with contributions can happen regarding
         #   the ids
         contrib=conference.Contribution()
         self._conf.addContribution(contrib)
@@ -265,7 +265,7 @@ class TestAbstractAcceptation( unittest.TestCase ):
 class TestAbstractDisplay(unittest.TestCase):
     """tests different abstract displaying scenarios.
     """
-    
+
     def setUp( self ):
         av = user.Avatar()
         self._conf = conference.Conference( av )
@@ -290,7 +290,7 @@ class TestAbstractDisplay(unittest.TestCase):
 class TestAbstractWithdrawal(unittest.TestCase):
     """tests different abstract withdrawal scenarios.
     """
-    
+
     def setUp( self ):
         av = user.Avatar()
         self._conf = conference.Conference( av )
@@ -340,7 +340,7 @@ class TestAbstractWithdrawal(unittest.TestCase):
 class TestAbstractRecovery(unittest.TestCase):
     """tests different abstract recovery scenarios.
     """
-    
+
     def setUp( self ):
         av = user.Avatar()
         self._conf = conference.Conference( av )
@@ -380,7 +380,7 @@ class TestAbstractRecovery(unittest.TestCase):
 class TestAbstractReallocation(unittest.TestCase):
     """tests different abstract reallocation scenarios.
     """
-    
+
     def setUp( self ):
         av = user.Avatar()
         self._conf = conference.Conference( av )
@@ -391,7 +391,7 @@ class TestAbstractReallocation(unittest.TestCase):
         submitter.setId( "submitter" )
         self._abstract = self._conf.getAbstractMgr().newAbstract( submitter )
         self._abstract.addTrack( self._track1 )
-    
+
     def testSimpleReallocation( self ):
         tc1 = user.Avatar()
         tc1.setId( "tc1" )
@@ -415,12 +415,12 @@ class TestAbstractReallocation(unittest.TestCase):
         self.assert_( t1jud in t3_tl )
         t1_tl = self._abstract.getReallocationTargetedList( self._track1 )
         self.assert_( t1jud not in t1_tl )
-        
-   
+
+
 class TestNotification(unittest.TestCase):
     """
     """
-    
+
     def setUp( self ):
         from MaKaC.user import Avatar
         av = Avatar()
@@ -439,7 +439,7 @@ class TestNotification(unittest.TestCase):
         #self._submitter.setId( "submitter" )
         #self._abstract=self._conf.getAbstractMgr().newAbstract(self._submitter)
         #self._abstract.addTrack(self._track1)
-    
+
     def testBasicManagement( self ):
         #test adding and removing notification templates
         from MaKaC.review import NotificationTemplate
@@ -454,7 +454,7 @@ class TestNotification(unittest.TestCase):
         self.assert_(tpl1 not in absMgr.getNotificationTplList())
         self.assert_(tpl1!=absMgr.getNotificationTplById(tpl1.getId()))
         self.assert_(tpl2==absMgr.getNotificationTplById(tpl2.getId()))
-    
+
     def testTplConditions(self):
         #test adding and removing conditions to templates
         from MaKaC.review import NotificationTemplate
@@ -559,7 +559,7 @@ class TestNotification(unittest.TestCase):
 class TestAuthorSearch(unittest.TestCase):
     """
     """
-    
+
     def setUp( self ):
         self._creator=user.Avatar()
         self._conf=conference.Conference(self._creator)

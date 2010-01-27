@@ -21,10 +21,10 @@ class ExampleTest(SeleniumTestCase):
         sel.click("advancedOptionsText")
         sel.click("ok")
         sel.wait_for_page_to_load("30000")
-        
+
         #we set the confId, so in case the test fails, Teardown function is going to delete the conf
         SeleniumTestCase.setConfID(self, sel.get_location())
-        
+
         try: self.failUnless(sel.is_text_present("lecture test"))
         except AssertionError, e: self.verificationErrors.append(str(e))
         sel.click("link=Tools")
@@ -53,10 +53,10 @@ class ExampleTest(SeleniumTestCase):
         except AssertionError, e: self.verificationErrors.append(str(e))
         sel.click("ok")
         sel.wait_for_page_to_load("30000")
-        
+
         #we set the confId, so in case the test fails, Teardown function is going to delete the conf
         SeleniumTestCase.setConfID(self, sel.get_location())
-        
+
         sel.click("link=Timetable")
         sel.wait_for_page_to_load("30000")
         sel.click("link=Add new")
@@ -172,7 +172,7 @@ class ExampleTest(SeleniumTestCase):
         else: self.fail("time out")
         sel.click("confirm")
         sel.wait_for_page_to_load("30000")
-        
+
     def tearDown(self):
         SeleniumTestCase.tearDown(self)
 

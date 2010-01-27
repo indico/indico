@@ -36,7 +36,7 @@ def teardown_module():
     DBMgr.getInstance().endRequest()
 
 class TestMaterialRepository(unittest.TestCase):
-    """Tests the basic functionalities of the MaterialLocalRepository file 
+    """Tests the basic functionalities of the MaterialLocalRepository file
         repository.
     """
 
@@ -78,7 +78,7 @@ class TestMaterialRepository(unittest.TestCase):
 #        self.assertEqual( fr.getRepositoryPath(), self._archivePath )
 
     def testArchiveConferenceFile( self ):
-        """Makes sure a file wich is attached to a conference gets stored in 
+        """Makes sure a file wich is attached to a conference gets stored in
             the right path: basePath/year/C0/0/test.txt
         """
         #first we create a dummy user which will be the conf creator

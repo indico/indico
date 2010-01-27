@@ -42,12 +42,12 @@ def setup_module():
 def teardown_module():
     DBMgr.getInstance().abort()
     DBMgr.getInstance().endRequest()
-    
+
 class _ScheduleOwnerWrapper:
-    
+
     def __init__(self,sDate,eDate):
         self._sDate,self._eDate=sDate,eDate
-    
+
     def getStartDate(self):
         return self._sDate
 
@@ -74,7 +74,7 @@ class _ScheduleOwnerWrapper:
         self._sDate=sd
         self._eDate=ed
 
-    
+
 class TestTimeSchedule(unittest.TestCase):
     """Tests the basic schedule management functions
     """

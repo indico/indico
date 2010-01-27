@@ -42,10 +42,10 @@ def setup_module():
 def teardown_module():
     DBMgr.getInstance().abort()
     DBMgr.getInstance().endRequest()
-        
+
 #From testCategories.py
 class TestCategories():
-    
+
     def testBasicAddAndRemoveConferences(self):
         #creation of basic category structure over which perform the tests
         croot=conference.Category()
@@ -55,7 +55,7 @@ class TestCategories():
         croot._addSubCategory(c2)
         c1_1=conference.Category()
         c1._addSubCategory(c1_1)
-        #checks adding a conference increases the conference number of the 
+        #checks adding a conference increases the conference number of the
         #   involved categories
         creator=user.Avatar()
         conf1=conference.Conference(creator)
@@ -82,7 +82,7 @@ class TestCategories():
         assert (c1.getNumConferences()==0)
         assert (c2.getNumConferences()==0)
         assert (croot.getNumConferences()==0)
-        
+
     def testAddAndRemoveSubCategories(self):
         #checks that the conference counter works fine when adding a new
         #   sub-category
@@ -114,7 +114,7 @@ class TestCategories():
         assert (croot.getNumConferences()==2)
         assert (c1.getNumConferences()==0)
         assert (c1_1.getNumConferences()==2)
-        
+
         assert (c2.getNumConferences()==2)
         croot._removeSubCategory(c1)
         assert (croot.getNumConferences()==2)
@@ -126,7 +126,7 @@ class TestCategories():
         assert (c1.getNumConferences()==0)
         assert (c1_1.getNumConferences()==2)
         assert (c2.getNumConferences()==0)
-        
+
 #from testConferences.py
 class TestBasicManagement(unittest.TestCase):
     """Tests the basic conference management functions
@@ -137,10 +137,10 @@ class TestBasicManagement(unittest.TestCase):
         self._creator.setId("creator")
         self._conf=Conference(self._creator)
         self._conf.setTimezone('UTC')
-        
+
         category=conference.Category()
         self._conf.addOwner(category)
-        
+
         confTZ = self._conf.getTimezone()
         sd = timezone(confTZ).localize(datetime(2000, 1, 1))
         sdUTC = sd.astimezone(timezone('UTC'))
@@ -197,10 +197,10 @@ class TestModifyConferenceDates(unittest.TestCase):
         a.setId("creator")
         self._conf=Conference(a)
         self._conf.setTimezone('UTC')
-        
+
         category=conference.Category()
         self._conf.addOwner(category)
-        
+
         sd=datetime(2004, 01, 01, 10, 00, tzinfo=timezone('UTC'))
         ed=datetime(2004, 01, 05, 10, 00, tzinfo=timezone('UTC'))
         self._conf.setDates(sd,ed)
@@ -212,7 +212,7 @@ class TestModifyConferenceDates(unittest.TestCase):
         s2=Session()
         s2.setDates(datetime(2004, 01, 01, 15, 00, tzinfo=timezone('UTC')),datetime(2004, 01, 01, 18, 00, tzinfo=timezone('UTC')))
         self._conf.addSession(s2)
-        #checks that modifying conference dates which does not affect to 
+        #checks that modifying conference dates which does not affect to
         #   sessions is allowed
         self._conf.setStartDate(datetime(2004, 01, 01, 9, 00, tzinfo=timezone('UTC')))
         self._conf.setEndDate(datetime(2004, 01, 01, 19, 00, tzinfo=timezone('UTC')))
@@ -228,7 +228,7 @@ class TestModifyConferenceDates(unittest.TestCase):
         self._conf.getSchedule().addEntry(c1.getSchEntry())
         self._conf.getSchedule().addEntry(b)
         self._conf.getSchedule().addEntry(c2.getSchEntry())
-        #checks that modifying conference dates which does not affect to 
+        #checks that modifying conference dates which does not affect to
         #   entries is allowed
         self._conf.setStartDate(datetime(2004, 01, 01, 9, 00, tzinfo=timezone('UTC')))
         self._conf.setEndDate(datetime(2004, 01, 01, 19, 00, tzinfo=timezone('UTC')))
@@ -288,7 +288,7 @@ class TestSchedule(unittest.TestCase):
         self._conf.addContribution(c)
         c.setStartDate(datetime(2004, 01, 04, 13, 00, tzinfo=timezone('UTC')))
         self._conf.getSchedule().addEntry(c.getSchEntry())
-        #checks that everything works fine when changing conference schdule 
+        #checks that everything works fine when changing conference schdule
         #   dates to ones different from the conference
         #self._conf.setScreenStartDate(datetime(2004, 01, 04, 10, 00, tzinfo=timezone('UTC')))
         #self._conf.setScreenEndDate(datetime(2004, 01, 05, 12, 00, tzinfo=timezone('UTC')))
@@ -308,7 +308,7 @@ class TestSchedule(unittest.TestCase):
         #c.setStartDate(datetime(2004, 01, 04, 10, 00, tzinfo=timezone('UTC')))
         #self._conf.getSchedule().setDates(None,None)
         pass
-        
+
     def testSessions(self):
         s1=Session()
         self._conf.addSession(s1)
@@ -395,7 +395,7 @@ class TestAuthorIndex(unittest.TestCase):
         auth4.setEmail("jose.benito.gonzalez@cern.ch")
         c2.addPrimaryAuthor(auth3)
         c2.addPrimaryAuthor(auth4)
-        #Tests removing a contribution from a conference updates the author 
+        #Tests removing a contribution from a conference updates the author
         #   index correctly
         #self.assert_(auth3 in idx.getParticipations()[2])
         #self.assert_(len(idx.getParticipations()[2])==2)
@@ -428,7 +428,7 @@ class TestAuthorIndex(unittest.TestCase):
         #self.assert_(len(idx.getParticipations()[0])==1)
 
     def testChangesInAuthorData(self):
-        #Checks that changes in the author data updates the author index 
+        #Checks that changes in the author data updates the author index
         #   correctly
         c1=Contribution()
         self._conf.addContribution(c1)
@@ -441,7 +441,7 @@ class TestAuthorIndex(unittest.TestCase):
         auth2.setEmail("aM")
         c1.addPrimaryAuthor(auth1)
         c1.addPrimaryAuthor(auth2)
-        
+
         idx=self._conf.getAuthorIndex()
         self.assert_(auth1 in idx.getParticipations()[1])
         self.assert_(len(idx.getParticipations()[1])==1)
@@ -604,8 +604,8 @@ class TestContributionSubmitterIndex(unittest.TestCase):
         self.assert_(len(self._conf.getContribsForSubmitter(av2))==0)
         self.assert_(c1 not in self._conf.getContribsForSubmitter(av2))
         self.assert_(c2 not in self._conf.getContribsForSubmitter(av2))
-        
-        
+
+
 
 class TestBasicManagement(unittest.TestCase):
     """Tests the basic contribution management functions
@@ -680,7 +680,7 @@ class TestBasicManagement(unittest.TestCase):
         self.assert_(contrib1 not in session2.getContributionList())
 
     def testCustomIds(self):
-        #tests that adding a contribution with a custom id does not cause any 
+        #tests that adding a contribution with a custom id does not cause any
         #   trouble
         contrib1 = Contribution()
         self._conf.addContribution(contrib1,"test")
@@ -815,8 +815,8 @@ class TestSubmissionPrivileges(unittest.TestCase):
         self.assert_(len(c1.getSubmitterList())==0)
 
     def testAccContrib(self):
-        #tests that when a contribution comes from an accepted abstract the 
-        #   abstract submitters are also granted with submission privileges 
+        #tests that when a contribution comes from an accepted abstract the
+        #   abstract submitters are also granted with submission privileges
         #   for the contribution
         av1=Avatar()
         av1.setId("1")
@@ -859,7 +859,7 @@ class TestTCIndex( unittest.TestCase ):
         self._idx.indexCoordinator( av , t )
         self.assert_( len(self._idx.getTracks( av )) == 1 )
         self.assert_( t in self._idx.getTracks( av ) )
-    
+
     def testIndexingSeveralCoordinators( self ):
         #adding 2 coordinators for the same track
         from MaKaC.user import Avatar
@@ -874,7 +874,7 @@ class TestTCIndex( unittest.TestCase ):
         self._idx.indexCoordinator( av2 , t )
         self.assert_( t in self._idx.getTracks( av1 ) )
         self.assert_( t in self._idx.getTracks( av2 ) )
-    
+
     def testIndexingSeveralTracks( self ):
         #adding 1 coordinator for 2 tracks
         from MaKaC.user import Avatar
@@ -901,7 +901,7 @@ class TestTCIndex( unittest.TestCase ):
         self._idx.indexCoordinator( av , t )
         self._idx.unindexCoordinator( av, t )
         self.assert_( len(self._idx.getTracks( av )) == 0 )
-    
+
     def testUnindexingSeveralCoordinators( self ):
         from MaKaC.user import Avatar
         av1 = Avatar()
@@ -916,7 +916,7 @@ class TestTCIndex( unittest.TestCase ):
         self._idx.unindexCoordinator( av1, t1 )
         self.assert_( t1 not in self._idx.getTracks( av1 ) )
         self.assert_( t1 in self._idx.getTracks( av2 ) )
-    
+
     def testUnindexingSeveralTracks( self ):
         from MaKaC.user import Avatar
         av1 = Avatar()
@@ -936,7 +936,7 @@ class TestTCIndex( unittest.TestCase ):
 class TestAddTrackCoordinator( unittest.TestCase ):
     """Tests different scenarios of the Define Track Coord use case.
     """
-    
+
     def setUp( self ):
         from MaKaC.user import Avatar
         cr = Avatar()
@@ -946,7 +946,7 @@ class TestAddTrackCoordinator( unittest.TestCase ):
         self._track1 = Track()
         self._track1.setId( "1" )
         self._conf.addTrack( self._track1 )
-        
+
 
     def tearDown( self ):
         pass
@@ -964,7 +964,7 @@ class TestAddTrackCoordinator( unittest.TestCase ):
 class TestRemoveTrackCoordinator( unittest.TestCase ):
     """Tests different scenarios of the Remove Track Coord use case.
     """
-    
+
     def setUp( self ):
         from MaKaC.user import Avatar
         cr = Avatar()
@@ -974,7 +974,7 @@ class TestRemoveTrackCoordinator( unittest.TestCase ):
         self._track1 = Track()
         self._track1.setId( "1" )
         self._conf.addTrack( self._track1 )
-        
+
     def tearDown( self ):
         pass
 
@@ -994,7 +994,7 @@ class TestRemoveTrackCoordinator( unittest.TestCase ):
 
 
 class TestContributionInclusion( unittest.TestCase ):
-    
+
     def setUp( self ):
         from MaKaC.user import Avatar
         cr = Avatar()
@@ -1015,7 +1015,7 @@ class TestContributionInclusion( unittest.TestCase ):
         self._track1.removeContribution( contrib1 )
         self.assert_( not self._track1.hasContribution( contrib1 ) )
         self.assert_( contrib1.getTrack() == None )
-        
+
 #from testSessions.py
 class TestBasicManagement(unittest.TestCase):
     """Tests the basic contribution management functions
@@ -1059,7 +1059,7 @@ class TestBasicManagement(unittest.TestCase):
 
     def testDateModification(self):
         self._conf.setDates(datetime(2004,1,1,tzinfo=timezone('UTC')),datetime(2004,1,5,tzinfo=timezone('UTC')))
-        ##checks that a session cannot be added if its dates are outside the 
+        ##checks that a session cannot be added if its dates are outside the
         ##   schedule boundaries
         #s1=Session()
         #s1.setDates(datetime(2003,12,31,tzinfo=timezone('UTC')),datetime(2004,1,31,tzinfo=timezone('UTC')))
@@ -1265,7 +1265,7 @@ class TestSchedule(unittest.TestCase):
         #Move all the entries
         slot3=SessionSlot(session1)
         slot3.setStartDate(datetime(2004,1,1,10,0,tzinfo=timezone('UTC')))
-        slot3.setDuration(hours=3,minutes=0)        
+        slot3.setDuration(hours=3,minutes=0)
         session1.addSlot(slot3)
         c4,c5=Contribution(),Contribution()
         session1.addContribution(c4)
@@ -1274,7 +1274,7 @@ class TestSchedule(unittest.TestCase):
         c5.setTitle("campeonisimo")
         c4.setStartDate(datetime(2004,1,1,11,0,tzinfo=timezone('UTC')))
         c4.setDuration(0,30)
-        c5.setDuration(0,30)        
+        c5.setDuration(0,30)
         b2=BreakTimeSchEntry()
         b2.setDuration(0,30)
         b2.setTitle("breaaaaaaak")
@@ -1284,7 +1284,7 @@ class TestSchedule(unittest.TestCase):
         self.assert_(c4.getStartDate() == datetime(2004,1,1,11,0,tzinfo=timezone('UTC')))
         slot3.setStartDate(datetime(2004,1,1,11,0,tzinfo=timezone('UTC')))
         #self.assert_(c4.getStartDate() == datetime(2004,1,1,12,0,tzinfo=timezone('UTC')))
-        
+
 
         # ------- CONFERENCE -------
         # Conference should not start after a entry
@@ -1305,7 +1305,7 @@ class TestSchedule(unittest.TestCase):
         slot2.setStartDate(datetime(2004,1,1,10,0,tzinfo=timezone('UTC')))
         session2.addSlot(slot2)
         #self.assertRaises(MaKaCError,self._conf.setEndTime,17,59)
-        
+
 
     def testSlots(self):
         self._conf.setDates(datetime(2004,1,1,9,0,tzinfo=timezone('UTC')),datetime(2004,1,5,10,0,tzinfo=timezone('UTC')))
@@ -1388,7 +1388,7 @@ class TestSchedule(unittest.TestCase):
         #self.assert_(b1.getStartDate()==datetime(2004,1,1,10,0,tzinfo=timezone('UTC')))
 
     def testMoveScheduledContribToSession(self):
-        #tests that moving scheduled contributions at conference level into a 
+        #tests that moving scheduled contributions at conference level into a
         #   session works correctly: removes them from the conference schedule
         #   and includes them into the selected session
         self._conf.setDates(datetime(2004,1,1,9,0,tzinfo=timezone('UTC')),datetime(2004,1,5,10,0,tzinfo=timezone('UTC')))
@@ -1516,8 +1516,8 @@ class TestCoordinatorsIndexComponent(unittest.TestCase):
         self.assert_(s1 in idx.getSessions(c2))
         self.assert_(s2 not in idx.getSessions(c2))
         self.assert_(len(idx.getSessions(c2))==1)
-        
-        
+
+
 #from testWebInterface.py should be renamed to testContributions.py anyway
 """Contains tests regarding some scenarios related to contribution list display.
 """
@@ -1606,4 +1606,3 @@ class TestContributionList(unittest.TestCase):
         self.assert_( contribList[0] == contrib2 )
         self.assert_( contribList[1] == contrib1 )
         self.assert_( contribList[2] == contrib3 )
-        
