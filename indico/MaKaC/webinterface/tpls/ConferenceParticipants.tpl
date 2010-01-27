@@ -157,9 +157,10 @@ function deselectAll()
 
 		<table style="margin-top: 20px;">
 				<tr>
-					<td>
+					<td>Add participant: </td>
+                    <td>
 						<form action="<%= newParticipantURL %>" method="post">
-								<div><input type="submit" value="<%= _("Add new participant")%>" class="btn"  /></div>
+								<div><input type="submit" value="<%= _("Define new")%>" class="btn"  /></div>
 						</form>
 					</td>
 					
@@ -178,21 +179,16 @@ function deselectAll()
 						</form>
 					</td>
 
-					<td>
-						<form action="%(statisticAction)s" method="post">\
-							<div>%(statisticButton)s</div>
-						</form>		
-					</td>
 				</tr>
 								
 		</table>
 
 
 		<div style="position: relative; overflow: auto; margin-top: 10px;">			
-		
+		<form action="%(statisticAction)s" method="post" id="statisticsForm"></form> 
 			<form action="%(participantsAction)s" method="post" name="participantsForm">
 		
-				<div style="float: left; padding-right: 30px; min-width: 400px; min-height: 200px;">								
+				<div style="float: left; padding-right: 30px; min-width: 400px; min-height: 270px;">								
 							<table>
 								<tr>
 									<th class="titleCellFormat">
@@ -210,7 +206,9 @@ function deselectAll()
 				</div>
 
 				<div style="padding-top: 30px;" class="uniformButtonVBar">
-			
+			                
+                            <div><input type="button" class="btn" style="margin-bottom: 20px" value="<%= _("View attendance") %>" onclick="javascript:$E('statisticsForm').dom.submit();" /></div>
+                        
 							<% if presenceButton: %>
 								<div>%(presenceButton)s</div>
 							<% end %>
@@ -228,7 +226,7 @@ function deselectAll()
 							<% end %>
 							
 							<% if sendButton: %>
-								<div>%(sendButton)s</div>
+								<div style="margin-bottom: 20px">%(sendButton)s</div>
 							<% end %>
 							
 							<% if sendAddedInfoButton: %>
