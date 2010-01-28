@@ -155,7 +155,7 @@ class Unit(BaseTest):
 
 
             #retrieving tests from Indicop folder
-            args = ['nose', '--nologcapture','--logging-clear-handlers', '-v', os.path.join(self.setupDir, 'python', 'unit')]
+            args = ['nose', '--nologcapture', '--logging-clear-handlers', '-v', os.path.join(self.setupDir, 'python', 'unit')]
             #retrieving tests from plugins folder
             for folder in self.walkThroughFolders(os.path.join(self.setupDir,
                                                                '..',
@@ -248,7 +248,7 @@ class Functional(BaseTest):
         sys.stderr = outerr
 
         #retrieving tests from Indicop folder
-        args = ['nose', '-v', os.path.join(self.setupDir, 'python', 'functional')]
+        args = ['nose', '--nologcapture', '--logging-clear-handlers', '-v', os.path.join(self.setupDir, 'python', 'functional')]
         #retrieving tests from plugins folder
         for folder in self.walkThroughFolders(os.path.join(self.setupDir,
                                                            '..',

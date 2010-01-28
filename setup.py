@@ -384,16 +384,17 @@ i.e. try 'easy_install %s'""" % (package, package)
     def checkJars(self):
         """check if needed jars are here, if not, dowloading them and unzip a file if necessary"""
         jarsList = {}
+        currentFilePath = os.path.dirname(__file__)
 
         jarsList['jsunit'] = {'url': "http://js-test-driver.googlecode.com/files/JsTestDriver-1.2.jar",
-                                      'path': os.path.join(os.path.dirname(__file__),
+                                      'path': os.path.join(currentFilePath,
                                             'indicop',
                                             'javascript',
                                             'unit'),
                                       'filename': "JsTestDriver-1.2.jar"}
 
         jarsList['jscoverage'] = {'url': "http://js-test-driver.googlecode.com/files/coverage-1.2.jar",
-                                  'path': os.path.join(os.path.dirname(__file__),
+                                  'path': os.path.join(currentFilePath,
                                         'indicop',
                                         'javascript',
                                         'unit',
@@ -401,14 +402,13 @@ i.e. try 'easy_install %s'""" % (package, package)
                                   'filename': "coverage-1.2.jar"}
 
         jarsList['selenium'] = {'url': "http://release.seleniumhq.org/selenium-remote-control/1.0.1/selenium-remote-control-1.0.1-dist.zip",
-                                'path': os.path.join(os.path.dirname(__file__),
+                                'path': os.path.join(currentFilePath,
                                         'indicop',
                                         'python',
                                         'functional'),
                                 'filename': "selenium-server.jar",
                                 'zipname': "selenium-remote-control-1.0.1-dist.zip",
                                 'inZipPath': "selenium-remote-control-1.0.1/selenium-server-1.0.1/selenium-server.jar"}
-
 
         validJars = True
 
@@ -450,12 +450,14 @@ i.e. try 'easy_install %s'""" % (package, package)
         try:
             zfobj = zipfile.ZipFile(zipPath)
             outfile = open(targetFile, 'wb')
-            outfile.write(zfobj.read('inZipPath'))
+            outfile.write(zfobj.read(inZipPath))
             outfile.flush()
             outfile.close()
-        finally:
+
             #delete zip file
             os.unlink(zipPath)
+        except NameError, e:
+            print e
 
 if __name__ == '__main__':
     sys.path = [os.path.abspath('indico')] + sys.path # Always load source from the current folder
