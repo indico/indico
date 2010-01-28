@@ -411,6 +411,25 @@ class RefereeJudgement(Judgement):
         return zip(self.getConfReview().getReviewingQuestions(), (self.getAnswer(k) for k in self.getConfReview().getReviewingQuestions()))
 
 class EditorJudgement(Judgement):
+        
+    def setSubmitted(self, submitted):
+        """ Sets the final judgement for a review, if the reviewing mode is only layout reviewing
+            since this is the Layout Reviewer judgement.
+            The judgement is a string among the pre-defined states (Accept, Reject, To be corrected) 
+            If it's the first time that the final judgement is set for this review, the contribution materials
+            are copied into the review.
+            If the judgement is 'To be corrected', versioning takes place.
+            A new Review object is then created as 'last review'.
+        """
+        if self.getReviewManager().getConference().getConfReview().getChoice() == 3:
+            Judgement.setSubmitted(self, submitted)
+        
+            self.getReview().copyMaterials([m for m in self.getReviewManager().getContribution().getAllMaterialList()
+                                        if m.getTitle() in self.getConfReview().getReviewableMaterials()])
+                                                   
+            if self._judgement == "To be corrected":
+                self.getReviewManager().newReview()
+            
     def getAnswers(self):
         return zip(self.getConfReview().getLayoutCriteria(), (self.getAnswer(k) for k in self.getConfReview().getLayoutCriteria()))
 
@@ -818,10 +837,26 @@ class ContributionReviewingJudgementNotification(GenericNotification):
         self.setToList([user.getEmail()])
 
         if isinstance(judgement, EditorJudgement):
-            self.setSubject("""[Indico] The layout of your contribution "%s" (id: %s) has been reviewed"""
+            if contribution.getConference().getConfReview().getChoice() == 3:
+                self.setSubject("""[Indico] Your contribution "%s" (id: %s) has been completely reviewed by the layout reviewer"""    
                             % (contribution.getTitle(), str(contribution.getId())))
-            self.setBody("""Dear Indico user,
-
+                self.setBody("""Dear Indico user,
+            
+            Your contribution "%s" (id: %s) has been completely reviewed by the assigned layout reviewer.
+            The judgement was: %s
+            
+            The comments of the layout reviewer were:
+            "%s"
+            
+            Thank you for using our system.
+            """ % ( contribution.getTitle(), str(contribution.getId()), judgement.getJudgement(),
+                    judgement.getComments())
+            )
+            else:
+                self.setSubject("""[Indico] The layout of your contribution "%s" (id: %s) has been reviewed"""    
+                            % (contribution.getTitle(), str(contribution.getId())))
+                self.setBody("""Dear Indico user,
+        
         The layout of your contribution "%s" (id: %s) has been reviewed.
         The judgement was: %s
         
@@ -864,6 +899,7 @@ class ContributionReviewingJudgementNotification(GenericNotification):
         """ % ( contribution.getTitle(), str(contribution.getId()), judgement.getJudgement(),
                 judgement.getComments())
         )  
+     
                 
 class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
     """ Template to build an email notification for a contribution submitter
@@ -876,10 +912,22 @@ class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
         self.setToList([user.getEmail()])
 
         if isinstance(judgement, EditorJudgement):
-            self.setSubject("""[Indico] The judgement for the layout of your contribution "%s" (id: %s) has been widthdrawn"""
+            if contribution.getConference().getConfReview().getChoice() == 3:
+                self.setSubject("""[Indico] The judgement for your contribution "%s" (id: %s) has been widthdrawn by the layout reviewer"""    
                             % (contribution.getTitle(), str(contribution.getId())))
-            self.setBody("""Dear Indico user,
-
+                self.setBody("""Dear Indico user,
+        
+        The judgement for your contribution "%s" (id: %s) has been widthdrawn by the assigned layout reviewer.
+        The judgement was: %s
+        
+        Thank you for using our system.
+        """ % ( contribution.getTitle(), str(contribution.getId()), judgement.getJudgement())
+        )
+            else:
+                self.setSubject("""[Indico] The judgement for the layout of your contribution "%s" (id: %s) has been widthdrawn"""    
+                            % (contribution.getTitle(), str(contribution.getId())))
+                self.setBody("""Dear Indico user,
+        
         The judgement for the layout of your contribution "%s" (id: %s) has been widthdrawn.
         The judgement was: %s
 

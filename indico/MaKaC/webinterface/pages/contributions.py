@@ -406,7 +406,7 @@ class WPContributionModifBase( WPConferenceModifBase  ):
             if self._canModify or self._isPRM or self._contrib.getReviewManager().isReferee(self._rh._getUser()):
                 self._subTabAssign = self._subtabReviewing.newSubTab( "assign", _("Assign Team"), \
                 urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
-                if self._contrib.getReviewManager().isReferee(self._rh._getUser()):
+                if self._contrib.getReviewManager().isReferee(self._rh._getUser()) and not (confReviewChoice == 3 or confReviewChoice == 1):
                     self._subTabJudgements = self._subtabReviewing.newSubTab( "final", _("Final Judge"), \
                     urlHandlers.UHContributionReviewingJudgements.getURL( self._target ) )
                 else:
@@ -415,7 +415,7 @@ class WPContributionModifBase( WPConferenceModifBase  ):
     
             if (confReviewChoice == 3 or confReviewChoice == 4) and \
                 self._contrib.getReviewManager().isEditor(self._rh._getUser()) and \
-                (not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self._conf.getConfReview().getChoice() == 3) and \
+                (not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or confReviewChoice == 3) and \
                 self._contrib.getReviewManager().getLastReview().isAuthorSubmitted():
 <<<<<<< HEAD:indico/MaKaC/webinterface/pages/contributions.py
 

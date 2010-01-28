@@ -20,34 +20,34 @@
         <% if not isinstance(c.getStatus(), ContribStatusNone): %>
         <tr valign="top" onmouseover="this.style.backgroundColor='#ECECEC'" onmouseout="this.style.backgroundColor='transparent'">
             <td style="padding-right:5px;padding-left:5px;"><%= c.getId() %></td>
-                <% if not c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() and c.getReviewManager().getLastReview().isAuthorSubmitted(): %>
-                    <td style="padding-right:5px;padding-left:5px;">
-                        <a href="<%= urlHandlers.UHContributionEditingJudgement.getURL(c) %>"><%= c.getTitle() %></a>
-                    </td>
-                <% end %>
-	            <% if c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted(): %>
-	                    <td style="padding-right:5px;padding-left:5px;">
-	                        <span onmouseover=" IndicoUI.Widgets.Generic.tooltip(this, event, 'Final judgement already given by the referee')">
-	                           <%= c.getTitle() %>
-	                        </span>
+            <% if c.getReviewManager().getLastReview().isAuthorSubmitted(): %>
+                <% if ConfReview.getChoice() == 3 or not c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted(): %>
+                        <td style="padding-right:5px;padding-left:5px;">
+	                        <a href="<%= urlHandlers.UHContributionEditingJudgement.getURL(c) %>"><%= c.getTitle() %></a>
 	                    </td>
 	            <% end %>
-	               <% if not c.getReviewManager().getLastReview().isAuthorSubmitted(): %> 
+	            <% if ConfReview.getChoice() == 4 and c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() : %>
+		               <td style="padding-right:5px;padding-left:5px;">
+	                            <span onmouseover=" IndicoUI.Widgets.Generic.tooltip(this, event, 'Final judgement already given by the referee')">
+	                               <%= c.getTitle() %>
+	                            </span>
+                        </td>
+                <% end %>	            
+	        <% end %>
+	        <% else: %> 
 		               <td style="padding-right:5px;padding-left:5px;">
 	                            <span onmouseover=" IndicoUI.Widgets.Generic.tooltip(this, event, 'You must wait for the author to submit the materials<br/> before you judge the contribution.')">
 	                               <%= c.getTitle() %>
 	                            </span>
 	                   </td>    
-	               <% end %>
-	               
-                
+	        <% end %>                
             <td style="padding-right:5px;padding-left:5px;">
                 <% if c.getReviewManager().getLastReview().getEditorJudgement().isSubmitted(): %>
                     <span><%= _("Layout judgement given")%></span>
                 <% end %>
                 <% else: %>
                     <span><%= _("Layout judgement not given yet")%></span>
-                    <% if c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted(): %>
+                    <% if c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() and ConfReview.getChoice() == 4: %>
                     <span><br><%= _("but Referee already judged contribution")%></span>
                     <% end %>
                 <% end %>

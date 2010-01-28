@@ -100,13 +100,13 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
             self._tabAssignContributions = self._subtabPaperReviewing.newSubTab( "assignContributions", "Assign Contributions",\
                     urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf ) )   
         
-        if self._showListContribToJudge:
+        if self._showListContribToJudge and (self._conf.getConfReview().getChoice()==2 or self._conf.getConfReview().getChoice()==4):
             self._tabListContribToJudge = self._subtabPaperReviewing.newSubTab( "contributionsToJudge", "Judge as Referee",\
                     urlHandlers.UHConfModifListContribToJudge.getURL( self._conf ) )
-        if self._showListContribToJudgeAsReviewer:
+        if self._showListContribToJudgeAsReviewer and (self._conf.getConfReview().getChoice()==2 or self._conf.getConfReview().getChoice()==4):
             self._tabListContribToJudgeAsReviewer = self._subtabPaperReviewing.newSubTab( "contributionsToJudge", "Judge as Content Reviewer",\
                     urlHandlers.UHConfModifListContribToJudgeAsReviewer.getURL( self._conf ) )
-        if self._showListContribToJudgeAsEditor:
+        if self._showListContribToJudgeAsEditor and (self._conf.getConfReview().getChoice()==3 or self._conf.getConfReview().getChoice()==4):
             self._tabListContribToJudgeAsEditor = self._subtabPaperReviewing.newSubTab( "contributionsToJudge", "Judge as Layout Reviewer",\
                     urlHandlers.UHConfModifListContribToJudgeAsEditor.getURL( self._conf ) ) 
             

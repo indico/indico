@@ -297,7 +297,8 @@ class RHEditorBase(RHContribModifBase):
         RHContribModifBase._checkParams(self, params)
         if not (self._target.getReviewManager().getLastReview().isAuthorSubmitted()):
             raise MaKaCError("You must wait until the author has submitted the materials")
-        if self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
+        if self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() and \
+           not self._target.getConference().getConfReview().getChoice() == 3:
             raise MaKaCError("The final judgement has been submitted")
 
 class RHContributionEditingJudgement(RHEditorBase):
@@ -313,8 +314,8 @@ class RHJudgeEditing(RHEditorBase):
     
     def _checkParams( self, params ):
         RHEditorBase._checkParams( self, params )
-        if self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() \
-            and not self._target.getConference().getConfReview().getChoice() == 3:
+        if self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() and \
+            not self._target.getConference().getConfReview().getChoice() == 3:
             raise MaKaCError("This contribution has already been judged by the referee.")
         self._editingJudgement = params.get("editingJudgement")
         self._comments = params.get("comments")
@@ -423,7 +424,8 @@ class RHRemoveSubmittedMarkForReviewing(RHReviewingAuthorBase):
         
     def _checkParams(self, params):
         RHContributionMaterialSubmissionRightsBase._checkParams(self, params)
-        if self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
+        if self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or \
+        (self._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted() and self._target.getConference().getConfReview().getChoice() == 3):
             raise MaKaCError("This contribution has already been judged. You cannot un-submit the materials")
         
     def _process (self):

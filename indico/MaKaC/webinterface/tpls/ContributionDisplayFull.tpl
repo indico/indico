@@ -132,7 +132,7 @@
                                     <% end %>
                                 <% end %>
                                 <% if  Contribution.getConference().getConfReview().getChoice() == 4: %>
-                                    <% if not (Contribution.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or Contribution.getReviewManager().getLastReview().anyReviewerHasGivenAdvice() and Contribution.getReviewManager().getLastReview().getEditorJudgement().isSubmitted()): %>                              
+                                    <% if not (Contribution.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or Contribution.getReviewManager().getLastReview().anyReviewerHasGivenAdvice() or Contribution.getReviewManager().getLastReview().getEditorJudgement().isSubmitted()): %>                              
                                         <% display = 'table' %>
                                     <% end %>
                                     <% else: %>

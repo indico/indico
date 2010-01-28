@@ -5,7 +5,7 @@
 
 <% for review in Versioning: %>
 
-    <% if review.getRefereeJudgement().isSubmitted(): %>
+    <% if review.getRefereeJudgement().isSubmitted() or (ConferenceChoice==3 and review.getEditorJudgement().isSubmitted()): %>
         <table width="90%%" align="center" border="0" style="padding-bottom: 10px;">
 		    <tr>
                 <td colspan="3" class="groupTitle" style="padding-top:20px; border-bottom: none; font-size: 20px;">
