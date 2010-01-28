@@ -1,11 +1,9 @@
-
 function nullRoomInfo(info) {
 
     return (!info) ||
         (!exists(info.get('location'))) ||
         (!exists(info.get('room')));
 }
-
 
 type("UnscheduledContributionList", ["ListWidget"],
      {
@@ -690,7 +688,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
              this.roomEditor = new RoomBookingWidget(Indico.Data.Locations,
                                                      this.info.get('roomInfo'),
                                                      this.parentRoomInfo,
-                                                     nullRoomInfo(this.info.get('roomInfo')),
+                                                     this.isEdit?nullRoomInfo(this.info.get('roomInfo')):true,
                                                      this.favoriteRooms);
 
              cancelButton.observeClick(function(){
@@ -885,6 +883,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
          each(keys(args), function(key) {
              self.originalArgs[key] = args.get(key);
          });
+
          if (isEdit) {
              this.info = args;
              this.ExclusivePopup($T("Edit Break"));
@@ -893,7 +892,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
          } else {
              this.info = clone(args);
              // by default, assume parent room info
-             this.info.set('roomInfo', $O({location: null, room: null}));
+             this.info.set('roomInfo', $O({location: args.get('roomInfo').location, room: args.get('roomInfo').room}));
              this.timeStartMethod = managementActions.methods[args.get('parentType')].dayEndDate;
              //args.set("conference", args.get('args').conference);
              this.dateArgs = args;
