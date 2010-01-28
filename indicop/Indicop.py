@@ -153,8 +153,9 @@ class Unit(BaseTest):
             outerr = StringIO.StringIO()
             sys.stderr = outerr
 
+
             #retrieving tests from Indicop folder
-            args = ['nose', '-v', os.path.join(self.setupDir, 'python', 'unit')]
+            args = ['nose', '--nologcapture','--logging-clear-handlers', '-v', os.path.join(self.setupDir, 'python', 'unit')]
             #retrieving tests from plugins folder
             for folder in self.walkThroughFolders(os.path.join(self.setupDir,
                                                                '..',
@@ -579,7 +580,7 @@ class Jsunit(BaseTest):
                     coverageReport = ("JS Coverage - generated in "
                                      "indicop/report/jscoverage/index.html\n")
 
-            #deleted built conf file
+            #delete built conf file
             os.unlink(confFile)
 
             #restoring directory

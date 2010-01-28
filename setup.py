@@ -330,6 +330,16 @@ class tests_indico(Command):
     def run(self):
         from indicop.Indicop import Indicop
         testsToRun = []
+
+        if not self.checkPackages():
+            print "Please install those missing packages before launching the tests again"
+            sys.exit(-1)
+
+        #missing jars will be downloaded automatically
+        if not self.checkJars():
+            print "Some jars could not be downloaded. Please download the missing jars manually"
+            sys.exit(-1)
+
         if self.pylint:
             testsToRun.append('pylint')
         if self.unit:
@@ -354,6 +364,98 @@ class tests_indico(Command):
         result = indicop.main(self.specify, self.coverage, testsToRun)
         print result
 
+    def checkPackages(self):
+        packagesList = ['figleaf',
+                        'nose',
+                        'selenium',
+                        'twill']
+        validPackages = True
+
+        for package in packagesList:
+            try:
+                pkg_resources.require(package)
+            except pkg_resources.DistributionNotFound:
+                print """
+%s not found! Please install it.
+i.e. try 'easy_install %s'""" % (package, package)
+                validPackages = False
+        return validPackages
+
+    def checkJars(self):
+        """check if needed jars are here, if not, dowloading them and unzip a file if necessary"""
+        jarsList = {}
+
+        jarsList['jsunit'] = {'url': "http://js-test-driver.googlecode.com/files/JsTestDriver-1.2.jar",
+                                      'path': os.path.join(os.path.dirname(__file__),
+                                            'indicop',
+                                            'javascript',
+                                            'unit'),
+                                      'filename': "JsTestDriver-1.2.jar"}
+
+        jarsList['jscoverage'] = {'url': "http://js-test-driver.googlecode.com/files/coverage-1.2.jar",
+                                  'path': os.path.join(os.path.dirname(__file__),
+                                        'indicop',
+                                        'javascript',
+                                        'unit',
+                                        'plugins'),
+                                  'filename': "coverage-1.2.jar"}
+
+        jarsList['selenium'] = {'url': "http://release.seleniumhq.org/selenium-remote-control/1.0.1/selenium-remote-control-1.0.1-dist.zip",
+                                'path': os.path.join(os.path.dirname(__file__),
+                                        'indicop',
+                                        'python',
+                                        'functional'),
+                                'filename': "selenium-server.jar",
+                                'zipname': "selenium-remote-control-1.0.1-dist.zip",
+                                'inZipPath': "selenium-remote-control-1.0.1/selenium-server-1.0.1/selenium-server.jar"}
+
+
+        validJars = True
+
+        for name in jarsList:
+            jar = jarsList[name]
+            #check if jar is already here
+            if not os.path.exists(os.path.join(jar['path'], jar['filename'])):
+                print "Downloading %s..." % jar['filename']
+                try:
+                    self.download(jar['url'], jar['path'])
+
+                    #if a zipname is specified, we will unzip the target file pointed by inZipPath variable
+                    try:
+                        if jar['zipname'] != None:
+                            self.unzip(os.path.join(jar['path'], jar['zipname']), jar['inZipPath'], os.path.join(jar['path'], jar['filename']))
+                    except KeyError:
+                        pass
+
+                except IOError:
+                    validJars = validJars and False
+                    print 'Could not download %s from %s' % (jar['filename'], jar['url'])
+
+        return validJars
+
+    def download(self, url, path):
+        """Copy the contents of a file from a given URL
+        to a local file.
+        """
+        import urllib
+        webFile = urllib.urlopen(url)
+        localFile = open(os.path.join(path, url.split('/')[-1]), 'w')
+        localFile.write(webFile.read())
+        webFile.close()
+        localFile.close()
+
+    def unzip(self, zipPath, inZipPath, targetFile):
+        """extract the needed file from zip and then delete the zip"""
+        import zipfile
+        try:
+            zfobj = zipfile.ZipFile(zipPath)
+            outfile = open(targetFile, 'wb')
+            outfile.write(zfobj.read('inZipPath'))
+            outfile.flush()
+            outfile.close()
+        finally:
+            #delete zip file
+            os.unlink(zipPath)
 
 if __name__ == '__main__':
     sys.path = [os.path.abspath('indico')] + sys.path # Always load source from the current folder
@@ -417,3 +519,5 @@ if __name__ == '__main__':
                               EXTRA_RESOURCES_URL
                               ],
           )
+
+
