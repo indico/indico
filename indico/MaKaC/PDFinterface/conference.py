@@ -994,17 +994,21 @@ class ContributionBook(PDFBase):
             p2=Paragraph(speakers,self._styles["speakers"])
             abstract=contrib.getDescription()
             p3=Paragraph(escape(abstract),self._styles["abstract"])
+            ses=""
+            if contrib.getSession() is not None:
+                ses=contrib.getSession().getTitle()
+            if contrib.getBoardNumber():
+                if ses != "":
+                    ses = "%s - "%ses
+                ses="%sBoard: %s"%(ses, contrib.getBoardNumber())
             if contrib.isScheduled():
-                ses=""
-                if contrib.getSession() is not None:
-                    ses="%s - "%contrib.getSession().getTitle()
-                if contrib.getBoardNumber():
-                    ses="%sBoard: %s - "%(ses, contrib.getBoardNumber())
+                if ses != "":
+                    ses = "%s - "%ses
                 text="%s%s"%(ses,contrib.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y %H:%M"))
-                p4=Paragraph(escape(text),self._styles["tt_info"])
-                abs=KeepTogether([p1,p4,p2,p3])
             else:
-                abs=KeepTogether([p1,p2,p3])
+                text = ses
+            p4=Paragraph(escape(text),self._styles["tt_info"])
+            abs=KeepTogether([p1,p4,p2,p3])
             story.append(abs)
             story.append(Spacer(1,0.4*inch))
 
@@ -2075,17 +2079,21 @@ class AbstractBook(PDFBase):
         p2=Paragraph(speakers,self._styles["speakers"])
         abstract=contrib.getDescription()
         p3=Paragraph(escape(abstract),self._styles["abstract"])
+        ses=""
+        if contrib.getSession() is not None:
+            ses=contrib.getSession().getTitle()
+        if contrib.getBoardNumber():
+            if ses != "":
+                ses = "%s - "%ses
+            ses="%sBoard: %s"%(ses, contrib.getBoardNumber())
         if contrib.isScheduled():
-            ses=""
-            if contrib.getSession() is not None:
-                ses="%s - "%contrib.getSession().getTitle()
-            if contrib.getBoardNumber():
-                ses="%sBoard: %s - "%(ses, contrib.getBoardNumber())
+            if ses != "":
+                ses = "%s - "%ses
             text="%s%s"%(ses,contrib.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y %H:%M"))
-            p4=Paragraph(escape(text),self._styles["tt_info"])
-            abs=KeepTogether([p1,p4,p2,p3])
         else:
-            abs=KeepTogether([p1,p2,p3])
+            text = ses
+        p4=Paragraph(escape(text),self._styles["tt_info"])
+        abs=KeepTogether([p1,p4,p2,p3])
         story.append(abs)
         story.append(Spacer(1,0.4*inch))
 
