@@ -31,109 +31,18 @@ import time
 import commands
 import StringIO
 import signal
+from BaseTest import BaseTest
 from selenium import selenium
 from MaKaC.common.db import DBMgr
 from MaKaC import user
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common import indexes
+from util import TestZEOServer
+import ZODB
+from ZODB import FileStorage, DB
+import transaction
 
-class BaseTest(object):
-    #path to this current file
-    setupDir = os.path.dirname(__file__)
-
-    def __init__(self):
-        self.al = None
-        self.ah = None
-        self.avatar = None
-        self.ih = None
-
-    def writeReport(self, filename, content):
-        try:
-            f = open(os.path.join(self.setupDir, 'report', filename + ".txt"), 'w')
-            f.write(content)
-            f.close()
-            return ""
-        except IOError:
-            return "Unable to write in %s, check your file permissions." % \
-                    os.path.join(self.setupDir, 'report', filename + ".txt")
-
-    def createDummyUser(self):
-        DBMgr.getInstance().startRequest()
-
-        #filling info to new user
-        self.avatar = user.Avatar()
-        self.avatar.setName( "fake" )
-        self.avatar.setSurName( "fake" )
-        self.avatar.setOrganisation( "fake" )
-        self.avatar.setLang( "en_US" )
-        self.avatar.setEmail( "fake@fake.fake" )
-
-        #registering user
-        self.ah = user.AvatarHolder()
-        self.ah.add(self.avatar)
-
-        #setting up the login info
-        li = user.LoginInfo( "dummyuser", "dummyuser" )
-        self.ih = AuthenticatorMgr()
-        userid = self.ih.createIdentity( li, self.avatar, "Local" )
-        self.ih.add( userid )
-
-        #activate the account
-        self.avatar.activateAccount()
-
-        #since the DB is empty, we have to add dummy user as admin
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        self.al = minfo.getAdminList()
-        self.al.grant( self.avatar )
-
-        DBMgr.getInstance().endRequest()
-
-    def deleteDummyUser(self):
-        DBMgr.getInstance().startRequest()
-
-        #removing user from admin list
-        self.al.revoke( self.avatar )
-
-        #remove the login info
-        userid = self.avatar.getIdentityList()[0]
-        self.ih.removeIdentity(userid)
-
-        #unregistering the user info
-        index = indexes.IndexesHolder().getById("email")
-        index.unindexUser(self.avatar)
-        index = indexes.IndexesHolder().getById("name")
-        index.unindexUser(self.avatar)
-        index = indexes.IndexesHolder().getById("surName")
-        index.unindexUser(self.avatar)
-        index = indexes.IndexesHolder().getById("organisation")
-        index.unindexUser(self.avatar)
-        index = indexes.IndexesHolder().getById("status")
-        index.unindexUser(self.avatar)
-
-        #removing user from list
-        la = self.ih.getById("Local")
-        la.remove(userid)
-        self.ah.remove(self.avatar)
-
-        DBMgr.getInstance().endRequest()
-
-    def walkThroughFolders(self, rootPath, foldersPattern):
-        """scan a directory and return folders which match the pattern"""
-
-        rootPluginsPath = os.path.join(rootPath)
-        foldersArray = []
-
-        for root, dirs, files in os.walk(rootPluginsPath):
-            if root.endswith(foldersPattern) > 0:
-                foldersArray.append(root)
-
-        return foldersArray
-
-    def startMessage(self, message):
-        print "##################################################################"
-        print "#####     %s" % message
-        print "##################################################################\n"
 
 class Unit(BaseTest):
     def run(self):
@@ -761,9 +670,10 @@ class Indicop(object):
 
         returnString = "\n\n=============== ~INDICOP SAYS~ ===============\n\n"
 
+        self.startDB()
+
         if coverage:
             Coverage.instantiate()
-
 
         #specified test can either be unit or functional.
         if specify:
@@ -776,6 +686,83 @@ class Indicop(object):
                     returnString += ("[ERR] Test %s does not exist. "
                       "It has to be added in the testsDict variable\n") % test
 
+        self.stopDB()
 
         return returnString
 
+
+    def startDB(self):
+        zeoPort = 9686
+        self.createNewDBFile()
+        self.zeoServer = self.createDBServer("/tmp/indicop/Data.fs", zeoPort)
+        print ("zodb server started on pid: " + str(self.zeoServer) + " .")
+        print ("Creating a CustomDBMgr on port " + str(zeoPort))
+        self.cdbmgr = DBMgr.getInstance(hostname="localhost", port=zeoPort)
+        print ("Starting a request ...")
+        self.cdbmgr.startRequest()
+        print ("Request started successfully.")
+        self.cdbmgr.endRequest(True)
+        print ("Request ended successfully.")
+
+    def stopDB(self):
+        try:
+            print ("Sending kill signal to ZEO Server at pid " + str(self.zeoServer) + " ...")
+            os.kill(self.zeoServer, signal.SIGTERM)
+            print ("Signal sent")
+        except Exception, e:
+            print ("Problem sending kill signal: " + str(e))
+
+        try:
+            print ("Waiting for ZEO Server to finish ...")
+            os.wait()
+            print ("Zodb server finished.")
+        except Exception, e:
+            print ("Problem waiting for ZEO Server: " + str(e))
+
+        self.removeDBFile()
+
+    def createNewDBFile(self):
+        savedDir = os.getcwd()
+        try:
+            os.mkdir("/tmp/indicop")
+        except OSError:
+            pass
+        os.chdir("/tmp/indicop/")
+        print "DONE"
+        storage = FileStorage.FileStorage("Data.fs")
+        print "DONE"
+        db = DB(storage)
+        print "DONE"
+        connection = db.open()
+        print "DONE"
+        dbroot = connection.root()
+        print "DONE"
+
+        transaction.commit()
+
+        connection.close()
+        print "DONE"
+        db.close()
+        print "DONE"
+        storage.close()
+        print "DONE"
+        os.chdir(savedDir)
+
+    def removeDBFile(self):
+        savedDir = os.getcwd()
+        os.chdir("/tmp/indicop/")
+
+        os.unlink("Data.fs")
+        os.unlink("Data.fs.index")
+        os.unlink("Data.fs.lock")
+        os.unlink("Data.fs.tmp")
+
+        os.chdir(savedDir)
+
+    def createDBServer(self, file, port):
+        pid = os.fork()
+        if pid:
+            return pid
+        else:
+            server = TestZEOServer(port, file)
+            server.start()
