@@ -20,7 +20,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-from MaKaC.common.db import DBMgr
+from indicop.Indicop import Indicop
 from MaKaC import conference
 from MaKaC import user
 from MaKaC.user import Avatar
@@ -30,18 +30,18 @@ from MaKaC.conference import ContributionParticipation
 from MaKaC.conference import SCIndex
 from MaKaC.errors import MaKaCError
 from MaKaC.schedule import BreakTimeSchEntry
-from datetime import datetime,timedelta
+from datetime import datetime
 from pytz import timezone
 
 import unittest
 
 
 def setup_module():
-    DBMgr.getInstance().startRequest()
+    a=Indicop.getInstance(None, None).getDBInstance().startRequest()
 
 def teardown_module():
-    DBMgr.getInstance().abort()
-    DBMgr.getInstance().endRequest()
+    Indicop.getInstance(None, None).getDBInstance().abort()
+    Indicop.getInstance(None, None).getDBInstance().endRequest()
 
 #From testCategories.py
 class TestCategories():

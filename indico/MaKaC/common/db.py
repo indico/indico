@@ -92,6 +92,10 @@ class DBMgr:
             cls._instance=DBMgr(*args, **kwargs)
         return cls._instance
 
+    @classmethod
+    def setInstance( cls, dbInstance ):
+        cls._instance = dbInstance
+
     def _getConnObject(self):
         tid=threading._get_ident()
         if self._conn.has_key(tid):

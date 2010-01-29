@@ -21,24 +21,10 @@
 
 
 import os
-import sys
-import nose
-import figleaf
-import figleaf.annotate_html
-import subprocess
-import socket
-import time
-import commands
-import StringIO
-import signal
-import BaseTest
-from selenium import selenium
-from MaKaC.common.db import DBMgr
 from MaKaC import user
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common import indexes
-from ZEO.runzeo import ZEOOptions, ZEOServer
 
 class BaseTest(object):
     #path to this current file
@@ -66,7 +52,8 @@ class BaseTest(object):
                     os.path.join(self.setupDir, 'report', filename + ".txt")
 
     def createDummyUser(self):
-        DBMgr.getInstance().startRequest()
+        from Indicop import Indicop
+        Indicop.getInstance(None, None).getDBInstance().startRequest()
 
         #filling info to new user
         self.avatar = user.Avatar()
@@ -94,10 +81,11 @@ class BaseTest(object):
         self.al = minfo.getAdminList()
         self.al.grant( self.avatar )
 
-        DBMgr.getInstance().endRequest()
+        Indicop.getInstance(None, None).getDBInstance().endRequest()
 
     def deleteDummyUser(self):
-        DBMgr.getInstance().startRequest()
+        from Indicop import Indicop
+        Indicop.getInstance(None, None).getDBInstance().startRequest()
 
         #removing user from admin list
         self.al.revoke( self.avatar )
@@ -123,7 +111,7 @@ class BaseTest(object):
         la.remove(userid)
         self.ah.remove(self.avatar)
 
-        DBMgr.getInstance().endRequest()
+        Indicop.getInstance(None, None).getDBInstance().endRequest()
 
     def walkThroughFolders(self, rootPath, foldersPattern):
         """scan a directory and return folders which match the pattern"""
@@ -137,3 +125,76 @@ class BaseTest(object):
 
         return foldersArray
 
+
+################################################
+#    To be deleted when we get rid of mod_python
+################################################
+    def createDummyUserDeprecated(self):
+        from MaKaC.common.db import DBMgr
+        self.fakedb = DBMgr().getInstance()
+        self.fakedb._db.close()
+        self.db = DBMgr()
+        DBMgr.setInstance(self.db)
+        self.db.startRequest()
+
+        #filling info to new user
+        self.avatarD = user.Avatar()
+        self.avatarD.setName( "fake" )
+        self.avatarD.setSurName( "fake" )
+        self.avatarD.setOrganisation( "fake" )
+        self.avatarD.setLang( "en_US" )
+        self.avatarD.setEmail( "fake@fake.fake" )
+
+        #registering user
+        self.ahD = user.AvatarHolder()
+        self.ahD.add(self.avatarD)
+
+        #setting up the login info
+        liD = user.LoginInfo( "dummyuser", "dummyuser" )
+        self.ihD = AuthenticatorMgr()
+        useridD = self.ihD.createIdentity( liD, self.avatarD, "Local" )
+        self.ihD.add( useridD )
+
+        #activate the account
+        self.avatarD.activateAccount()
+
+        #since the DB is empty, we have to add dummy user as admin
+        minfoD = HelperMaKaCInfo.getMaKaCInfoInstance()
+        self.alD = minfoD.getAdminList()
+        self.alD.grant( self.avatarD )
+
+        self.db.endRequest(True)
+
+    def deleteDummyUserDeprecated(self):
+        from MaKaC.common.db import DBMgr
+        self.db.startRequest()
+
+        #removing user from admin list
+        self.alD.revoke( self.avatarD )
+
+        #remove the login info
+        useridD = self.avatarD.getIdentityList()[0]
+        self.ihD.removeIdentity(useridD)
+
+        #unregistering the user info
+        index = indexes.IndexesHolder().getById("email")
+        index.unindexUser(self.avatarD)
+        index = indexes.IndexesHolder().getById("name")
+        index.unindexUser(self.avatarD)
+        index = indexes.IndexesHolder().getById("surName")
+        index.unindexUser(self.avatarD)
+        index = indexes.IndexesHolder().getById("organisation")
+        index.unindexUser(self.avatarD)
+        index = indexes.IndexesHolder().getById("status")
+        index.unindexUser(self.avatarD)
+
+        #removing user from list
+        laD = self.ihD.getById("Local")
+        laD.remove(useridD)
+        self.ahD.remove(self.avatarD)
+
+        self.db.endRequest(True)
+
+################################################
+#            end of block
+################################################

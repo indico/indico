@@ -105,17 +105,17 @@ class TestResponsiveness(unittest.TestCase):
         else:
             server = TestZEOServer(port, file)
             server.start()
-    
+
     def setUp(self):
         self.random = Random()
         self._loggingSetup()
         self.falseSession = FalseSession()
-        
-        
+
+
         self._log("Start of test. Current pid is: " + str(os.getpid()))
         self._log("Initiating setUp of test")
         self._log('')
-        
+
         try:
             if makeCopy:
                 self._log("Copying " + testingDbfile + " to " + collaborationDbFile + " ...")
@@ -125,7 +125,7 @@ class TestResponsiveness(unittest.TestCase):
                     os.remove(collaborationDbFile + '.tmp')
                 except:
                     pass
-                
+
                 shutil.copy(testingDbfile, collaborationDbFile)
                 try:
                     shutil.copy(testingDbfile + '.index', collaborationDbFile + '.index')
@@ -135,43 +135,43 @@ class TestResponsiveness(unittest.TestCase):
                     shutil.copy(testingDbfile + '.tmp', collaborationDbFile + '.tmp')
                 except:
                     self._log("problem copying "  + testingDbfile + '.tmp')
-                
+
                 self._log("copy finished.")
                 self._log('')
-            
+
             self._log("Starting the ZEO server...")
             self.zeoServer = self.createDBServer(collaborationDbFile, zeoPort)
             self._log("zodb server started on pid: " + str(self.zeoServer) + " .")
             self._log('')
 
-            
+
             self._log("Creating a CustomDBMgr on port " + str(zeoPort))
             self.cdbmgr = DBMgr.getInstance(hostname="localhost", port=zeoPort)
             self._log("Starting a request ...")
             self.cdbmgr.startRequest()
             self._log("Request started successfully.")
             self._log('')
-            
+
             if doCleanUp:
                 self._log('Cleaning the DB of bookings and recreating the indexes')
                 DeleteAllBookingsAction(FalseAction()).call()
                 self._log('Cleanup succesfull')
-            
+
             self._log("We start populating DB with bookings...")
-            
+
             #ConferenceHolder()._getIdx() is an OOBTree
             size = lastConfId - firstConfId
-            self._log("Populating among aproximately " + str(size) + " events, from " + str(firstConfId) + " to " + str(lastConfId) + ", with aproximately " + str(startingBookings) + " bookings") 
+            self._log("Populating among aproximately " + str(size) + " events, from " + str(firstConfId) + " to " + str(lastConfId) + ", with aproximately " + str(startingBookings) + " bookings")
             self._log("Initial size of 'all' index: " + str(IndexesHolder().getById("collaboration").getAllBookingsIndex().getCount()))
-            
+
             self.validConfIds = []
             self.confsWithBookings = []
-            
+
             populated = 0
             added = 0
             chance = (float(startingBookings) / float(size)) / 2.0
             ch = ConferenceHolder()
-            
+
             for confId in xrange(firstConfId, lastConfId + 1):
                 confId = str(confId)
                 if self.random.random() < chance:
@@ -187,64 +187,64 @@ class TestResponsiveness(unittest.TestCase):
                     while i < bookingsForThisConf:
                         conf.getCSBookingManager().createTestBooking(bookingParams = {'startDate': self._randomDate(startDate, endDate)})
                         i += 1
-                        
+
                     populated += 1
                     self.confsWithBookings.append(confId)
                     if populated % 100 == 0:
                         self._log(str(populated) + ' events populated. Index size: ' + str (IndexesHolder().getById("collaboration").getAllBookingsIndex().getCount()))
-               
+
 
             self._log("Populating finished. " + str(populated) + " events populated with " + str(added) + " bookings")
             self._log("Size of 'all' index is now: " + str(IndexesHolder().getById("collaboration").getAllBookingsIndex().getCount()))
             self._log("Performing commit...")
-                
+
             self.cdbmgr.endRequest(True) #True = commmit
             self._log("End of request")
             self._log('')
-            
+
         except Exception, e:
             tb = str(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error("There was an exception in setUp. Calling tearDown. Exception: " + str(e) + ", Traceback = " + tb)
             self.tearDown()
             self.fail("setUp failed. Cause: " + str(e) + ", Traceback = " + tb)
-        
-    
+
+
     def tearDown(self):
         self._log("Initiating tearDown of test")
         self._log('')
-        
+
         try:
             self._log("Sending kill signal to ZEO Server at pid " + str(self.zeoServer) + " ...")
             os.kill(self.zeoServer, signal.SIGTERM)
             self._log("Signal sent")
         except Exception, e:
             self._log("Problem sending kill signal: " + str(e))
-        
+
         try:
             self._log("Waiting for ZEO Server to finish ...")
             os.wait()
             self._log("Zodb server finished.")
         except Exception, e:
             self._log("Problem waiting for ZEO Server: " + str(e))
-        
+
         if doRemove:
             try:
                 self._log("Removing " + collaborationDbFile + " ...")
                 self._log(collaborationDbFile + " removed.")
             except Exception, e:
                 self._log("Problem removing the test DB file: " + str(e))
-        
+
         self._log("End of test")
-    
-    
+
+
     def testResponsiveness(self):
         self._log("Start of tests")
         self._log('')
-        
+
         self._log("Starting add booking test")
         self._addBookingTest()
         self._log("End of add booking test. Normal time: avg= %.5fs, dev= %.5fs. CPU time: avg= %.5fs, dev= %.5fs." % (self.average, self.deviation, self.caverage, self.cdeviation))
-        
+
         self._log("Starting remove booking test")
         self._removeBookingTest()
         self._log("End of remove booking test. Normal time: avg= %.5fs, dev= %.5fs. CPU time: avg= %.5fs, dev= %.5fs." % (self.average, self.deviation, self.caverage, self.cdeviation))
@@ -252,20 +252,20 @@ class TestResponsiveness(unittest.TestCase):
         self._log("Starting index query test")
         self._indexQueryTest()
         self._log("End of index query test. Normal time: avg= %.5fs, dev= %.5fs. CPU time: avg= %.5fs, dev= %.5fs." % (self.average, self.deviation, self.caverage, self.cdeviation))
-        
+
         self._log("Starting remove conference test")
         self._removeConfTest()
-        self._log("End of remove conference test. Normal time: avg= %.5fs, dev= %.5fs. CPU time: avg= %.5fs, dev= %.5fs." % (self.average, self.deviation, self.caverage, self.cdeviation))        
-        
+        self._log("End of remove conference test. Normal time: avg= %.5fs, dev= %.5fs. CPU time: avg= %.5fs, dev= %.5fs." % (self.average, self.deviation, self.caverage, self.cdeviation))
+
         self._log("Starting random operations test")
         self._randomOpsTest()
         self._log("End of random operations test. Normal time: avg= %.5fs, dev= %.5fs. CPU time: avg= %.5fs, dev= %.5fs." % (self.average, self.deviation, self.caverage, self.cdeviation))
-        
+
         self._log("End of tests")
         self._log('')
         assert True
-    
-    
+
+
 ######## Add booking test ########
 
     def _addBookingTest(self):
@@ -282,21 +282,21 @@ class TestResponsiveness(unittest.TestCase):
                 times.append((end - start, cend - cstart))
                 self._updateValidIdsAfterAddingBooking(confId)
                 i = i + 1
-                
+
             self.average, self.deviation, self.caverage, self.cdeviation = processResults(times)
-        
+
         if doProfile:
             profile.runctx("executeAddBookingTest()", {}, {'executeAddBookingTest' : executeAddBookingTest}, 'addBooking.prof')
         else:
             exec "executeAddBookingTest()" in {}, {'executeAddBookingTest' : executeAddBookingTest}
-        
+
     def _getConfIdForAdding(self):
         return self.random.choice(self.validConfIds)
-    
+
     def _updateValidIdsAfterAddingBooking(self, confId):
         if confId not in self.confsWithBookings:
             self.confsWithBookings.append(confId)
-    
+
     def _addBooking(self, confId):
         self.cdbmgr.startRequest()
         params = {"conference": confId,
@@ -307,7 +307,7 @@ class TestResponsiveness(unittest.TestCase):
         service._checkParams()
         service._getAnswer()
         self.cdbmgr.endRequest()
-         
+
 ######## Remove booking test ########
 
     def _removeBookingTest(self):
@@ -316,25 +316,25 @@ class TestResponsiveness(unittest.TestCase):
             i = 0
             while i < bookingsPerTest:
                 confId, bookingId = self._getIdsForRemoveBooking()
-                
+
                 start = time.time()
                 cstart = time.clock()
                 self._removeBooking(confId, bookingId)
                 cend = time.clock()
                 end = time.time()
                 times.append((end - start, cend - cstart))
-                
+
                 self._updateValidIdsAfterRemoveBooking(confId)
-                
+
                 i = i + 1
-                
+
             self.average, self.deviation, self.caverage, self.cdeviation = processResults(times)
-        
+
         if doProfile:
             profile.runctx("executeRemoveBookingTest()", {}, {'executeRemoveBookingTest' : executeRemoveBookingTest}, 'removeBooking.prof')
         else:
             exec "executeRemoveBookingTest()" in {}, {'executeRemoveBookingTest' : executeRemoveBookingTest}
-    
+
     def _getIdsForRemoveBooking(self):
         n = 0
         self.cdbmgr.startRequest()
@@ -351,13 +351,13 @@ class TestResponsiveness(unittest.TestCase):
                     self.fail("Could not found a good conference for remove booking")
         self.cdbmgr.endRequest()
         return confId, bookingId
-    
+
     def _updateValidIdsAfterRemoveBooking(self, confId):
         self.cdbmgr.startRequest()
         if len(ConferenceHolder().getById(confId).getCSBookingManager()._bookingsByType.get("DummyPlugin", [])) == 0:
             self.confsWithBookings.remove(confId)
         self.cdbmgr.endRequest()
-    
+
     def _removeBooking(self, confId, bookingId):
         self.cdbmgr.startRequest()
 
@@ -368,7 +368,7 @@ class TestResponsiveness(unittest.TestCase):
         service._checkParams()
         service._getAnswer()
         self.cdbmgr.endRequest()
-    
+
 ######## Remove conference test ########
 
     def _removeConfTest(self):
@@ -377,9 +377,9 @@ class TestResponsiveness(unittest.TestCase):
             times = []
             i = 0
             while i < removeConfsPerTest:
-                
+
                 confId = self.random.choice(self.confsWithBookings)
-                
+
                 start = time.time()
                 cstart = time.clock()
                 self._removeConf(confId)
@@ -387,30 +387,30 @@ class TestResponsiveness(unittest.TestCase):
                 end = time.time()
                 times.append((end - start, cend - cstart))
                 i = i + 1
-                
+
                 self.validConfIds.remove(confId)
                 self.confsWithBookings.remove(confId)
-                
+
                 if len(self.confsWithBookings) == 0:
                     self._log("Stopped removeConf test after removing " + str(i) + " conferences")
                     break
-            
+
             self.average, self.deviation, self.caverage, self.cdeviation = processResults(times)
-        
+
         if doProfile:
             profile.runctx("executeRemoveConfTest()", {}, {'executeRemoveConfTest' : executeRemoveConfTest}, 'removeConference.prof')
         else:
             exec "executeRemoveConfTest()" in {}, {'executeRemoveConfTest' : executeRemoveConfTest}
-    
+
     def _removeConf(self, confId):
         self.cdbmgr.startRequest()
         ConferenceHolder().getById(confId).getCSBookingManager().notifyDeletion()
         self.cdbmgr.endRequest()
-    
+
 ######## Index query test ########
 
     def _indexQueryTest(self):
-        def executeIndexQueryTest():          
+        def executeIndexQueryTest():
             times = []
             i = 0
             while i < indexQueriesPerTest:
@@ -421,24 +421,24 @@ class TestResponsiveness(unittest.TestCase):
                 end = time.time()
                 times.append((end - start, cend - cstart))
                 i = i + 1
-            
+
             self.average, self.deviation, self.caverage, self.cdeviation = processResults(times)
-        
+
         if doProfile:
             profile.runctx("executeIndexQueryTest()", {}, {'executeIndexQueryTest' : executeIndexQueryTest}, 'indexQuery.prof')
         else:
             exec "executeIndexQueryTest()" in {}, {'executeIndexQueryTest' : executeIndexQueryTest}
-    
+
     def _indexQuery(self):
         self.cdbmgr.startRequest()
-        
+
         fromConfId = self.random.choice(self.validConfIds)
         toConfId = self.random.choice(self.validConfIds)
         if int(toConfId) < int(fromConfId):
             fromConfId, toConfId = toConfId, fromConfId
         fromTitle = ConferenceHolder().getById(fromConfId).getTitle()
         toTitle = ConferenceHolder().getById(toConfId).getTitle()
-        
+
         params = {"page" : self.random.randint(0, 10),
                   "resultsPerPage" : 50,
                   "indexName": 'all',
@@ -454,11 +454,11 @@ class TestResponsiveness(unittest.TestCase):
                   "categoryId": '',
                   "conferenceId": ''
                   }
-        
+
         service = CollaborationBookingIndexQuery(params, None, self.falseSession)
         service._checkParams()
         service._getAnswer()
-        
+
         self.cdbmgr.endRequest()
 
 ######## Random ops test ########
@@ -469,7 +469,7 @@ class TestResponsiveness(unittest.TestCase):
         timesRemoveBooking = []
         timesIndexQuery = []
         timesAddBooking = []
-        
+
         i = 0
         while i < randomOpsPerTest:
             i = i + 1
@@ -508,46 +508,46 @@ class TestResponsiveness(unittest.TestCase):
                 cend = time.clock()
                 end = time.time()
                 timesAddBooking.append((end - start, cend - cstart))
-            
-        
+
+
         if timesAddBooking:
-            self._log("[Random ops test] Add booking. Normal time: avg= %.5fs, dev= %.5fs. CPU time: avg= %.5fs, dev= %.5fs." % processResults(timesAddBooking)) 
+            self._log("[Random ops test] Add booking. Normal time: avg= %.5fs, dev= %.5fs. CPU time: avg= %.5fs, dev= %.5fs." % processResults(timesAddBooking))
         else:
             self._log("[Random ops test] No add booking operations were executed")
-        
+
         if timesIndexQuery:
-            self._log("[Random ops test] Index Query. Normal time: avg= %.5fs, dev= %.5fs. CPU time: avg= %.5fs, dev= %.5fs." % processResults(timesIndexQuery)) 
+            self._log("[Random ops test] Index Query. Normal time: avg= %.5fs, dev= %.5fs. CPU time: avg= %.5fs, dev= %.5fs." % processResults(timesIndexQuery))
         else:
             self._log("[Random ops test] No index query operations were executed")
-        
+
         if timesRemoveBooking:
             self._log("[Random ops test] Remove booking. Normal time: avg= %.5fs, dev= %.5fs. CPU time: avg= %.5fs, dev= %.5fs." % processResults(timesRemoveBooking))
         else:
             self._log("[Random ops test] No remove booking operations were executed")
-                
+
         if timesRemoveConf:
             self._log("[Random ops test] Remove conference. Normal time: avg= %.5fs, dev= %.5fs. CPU time: avg= %.5fs, dev= %.5fs." % processResults(timesRemoveConf))
         else:
             self._log("[Random ops test] No remove conference operations were executed")
-            
+
         self.average, self.deviation, self.caverage, self.cdeviation = processResults(timesAddBooking + timesAddBooking + timesAddBooking + timesAddBooking)
-            
+
 
 ######## Logging and util stuff ########
-    
+
     def _loggingSetup(self):
         self.logger = logging.getLogger('CollaborationTest')
         handler = logging.StreamHandler(sys.stdout)
         handler.setFormatter(logging.Formatter('%(asctime)s %(message)s'))
         self.logger.addHandler(handler)
-        
+
     def _log(self, message):
         self.logger.debug(str(message))
-        
+
     def _randomDate(self, start, end):
         stime = time.mktime(time.strptime(start, dateFormat))
         etime = time.mktime(time.strptime(end, dateFormat))
-        
+
         ptime = stime + self.random.random() * (etime - stime)
 
         return time.strftime(dateFormat, time.localtime(ptime))
@@ -560,15 +560,15 @@ class FalseAction:
 
 class FalseUser:
     _instance = None
-    
+
     @classmethod
     def getInstance(cls):
         if cls._instance is None:
             cls._instance = FalseUser()
         return cls._instance
-    
+
     def getTimezone(self):
-        return 'UTC'    
+        return 'UTC'
 
 class FalseSession:
     def getUser(self):

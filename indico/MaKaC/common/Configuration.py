@@ -346,6 +346,13 @@ class Config:
         self._shelf = None
 
 
+    def updateValues(self, newValues):
+        """The argument is a dictionary.
+        This function updates only the values provided by the dictionary"""
+        for k in newValues:
+            if k in self._configVars:
+                self._configVars[k] = newValues[k]
+
     def forceReload(self):
         '''Forces Config to reread indico.conf and repopulate all of its variables'''
         # We don't use __import__ or reload because if the file changes are done too fast

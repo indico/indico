@@ -34,13 +34,9 @@ import signal
 from BaseTest import BaseTest
 from selenium import selenium
 from MaKaC.common.db import DBMgr
-from MaKaC import user
-from MaKaC.authentication import AuthenticatorMgr
-from MaKaC.common import HelperMaKaCInfo
-from MaKaC.common import indexes
 from util import TestZEOServer
-import ZODB
 from ZODB import FileStorage, DB
+from MaKaC.common.Configuration import Config
 import transaction
 
 
@@ -51,12 +47,12 @@ class Unit(BaseTest):
 
         result = False
 
+        self.createDummyUser()
+
         try:
             coverage = Coverage.getInstance()
             if coverage != False:
                 coverage.start()
-
-            self.createDummyUser()
 
             #capturing the stderr
             outerr = StringIO.StringIO()
@@ -64,7 +60,8 @@ class Unit(BaseTest):
 
 
             #retrieving tests from Indicop folder
-            args = ['nose', '--nologcapture', '--logging-clear-handlers', '-v', os.path.join(self.setupDir, 'python', 'unit')]
+            args = ['nose', '--nologcapture', '--logging-clear-handlers', '-v',
+                    os.path.join(self.setupDir, 'python', 'unit')]
             #retrieving tests from plugins folder
             for folder in self.walkThroughFolders(os.path.join(self.setupDir,
                                                                '..',
@@ -157,7 +154,8 @@ class Functional(BaseTest):
         sys.stderr = outerr
 
         #retrieving tests from Indicop folder
-        args = ['nose', '--nologcapture', '--logging-clear-handlers', '-v', os.path.join(self.setupDir, 'python', 'functional')]
+        args = ['nose', '--nologcapture', '--logging-clear-handlers', '-v',
+                os.path.join(self.setupDir, 'python', 'functional')]
         #retrieving tests from plugins folder
         for folder in self.walkThroughFolders(os.path.join(self.setupDir,
                                                            '..',
@@ -240,17 +238,25 @@ class Specify(Functional):
     def run(self):
         self.startMessage("Starting Python specified tests")
 
-        #Just in case we're dealing with functional tests
-        if not self.startSeleniumServer():
-            return ('[ERR] Could not start functional tests because selenium'
-                    ' server cannot be started.\n')
+        self.createDummyUser()
 
-        #running dthe test and ouputing in the console
-        result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir,
-                                                           'python',
-                                                           self.specify)])
+        try:
+            #if specified path does not contained unit, we are probably dealing
+            #with functional tests
+            if self.specify.find('unit/') < 0:
+                if not self.startSeleniumServer():
+                    return ('[ERR] Could not start functional tests because selenium'
+                            ' server cannot be started.\n')
 
-        self.stopSeleniumServer()
+            #running the test and ouputing in the console
+            result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir,
+                                                               'python',
+                                                               self.specify)])
+
+            if self.specify.find('unit/') < 0:
+                self.stopSeleniumServer()
+        finally:
+            self.deleteDummyUser()
 
         if result:
             return "Specified Test - Succeeded\n"
@@ -340,12 +346,11 @@ class GridData(BaseTest):
     def setEnv(self, env):
         self.currentEnv = env
 
+    @classmethod
     def getInstance(cls):
         if cls.__instance == None:
             cls.__instance = GridData()
         return cls.__instance
-
-    getInstance = classmethod( getInstance )
 
 
 class TimeoutFunctionException(Exception):
@@ -457,15 +462,15 @@ class Jsunit(BaseTest):
             else:
                 toTest = "all"
 
+            command = ("java -jar JsTestDriver-1.2.jar "
+                                             "--config %s "
+                                             "--tests %s ") % \
+                                             (confFile, toTest)
+            if self.coverage:
+                command += "--testOutput %s" % coveragePath
 
             #running tests
-            jsTest = commands.getstatusoutput(("java -jar "
-                                             "JsTestDriver-1.2.jar "
-                                             "--config "
-                                             "%s "
-                                             "--tests %s "
-                                             "--testOutput %s") %
-                                             (confFile, toTest, coveragePath))
+            jsTest = commands.getoutput(command)
 
             coverageReport = ""
             if self.coverage:
@@ -498,10 +503,10 @@ class Jsunit(BaseTest):
             report = ""
             if self.specify:
                 #ouputing directly in the console
-                print jsTest[1]
+                print jsTest
                 report = "JS Unit Tests - Output in console\n"
             else:
-                report += self.writeReport("jsunit", jsTest[1])
+                report += self.writeReport("jsunit", jsTest)
                 report += ("JS Unit Tests - report in "
                           "indicop/report/jsunit.txt\n")
         except OSError, e:
@@ -644,8 +649,11 @@ class Jslint(BaseTest):
 
 
 class Indicop(object):
+    __instance = None
 
     def __init__(self, jsspecify, jscoverage):
+        self.dbmgr = None
+        self.zeoServer = None
 
         #MODIFY ACCORDINGLY TO YOUR SELENIUM GRID INSTALLATION
         self.gridUrl = "macuds01.cern.ch"
@@ -670,6 +678,10 @@ class Indicop(object):
 
         returnString = "\n\n=============== ~INDICOP SAYS~ ===============\n\n"
 
+        #To not pollute the installation of Indico
+        self.reconfigureFolders()
+
+        #setting and starting fake DB
         self.startDB()
 
         if coverage:
@@ -686,40 +698,49 @@ class Indicop(object):
                     returnString += ("[ERR] Test %s does not exist. "
                       "It has to be added in the testsDict variable\n") % test
 
+        #stoppingfake DB
         self.stopDB()
 
         return returnString
 
+    def reconfigureFolders(self):
+        newValues = {'LogDir': '/tmp/indicop/log',
+         'ArchiveDir': '/tmp/indicop/archive',
+         'UploadedFilesTempDir': '/tmp/indicop/tmp'}
+        for k in newValues:
+            try:
+                os.mkdir(newValues[k])
+            except OSError:
+                pass
+
+        Config.getInstance().updateValues(newValues)
+
 
     def startDB(self):
         zeoPort = 9686
+        self.removeDBFile()
         self.createNewDBFile()
         self.zeoServer = self.createDBServer("/tmp/indicop/Data.fs", zeoPort)
         print ("zodb server started on pid: " + str(self.zeoServer) + " .")
         print ("Creating a CustomDBMgr on port " + str(zeoPort))
-        self.cdbmgr = DBMgr.getInstance(hostname="localhost", port=zeoPort)
+        self.dbmgr = DBMgr(hostname="localhost", port=zeoPort)
+        DBMgr.setInstance(self.dbmgr)
         print ("Starting a request ...")
-        self.cdbmgr.startRequest()
+        self.dbmgr.startRequest()
         print ("Request started successfully.")
-        self.cdbmgr.endRequest(True)
+        self.dbmgr.endRequest(True)
         print ("Request ended successfully.")
 
     def stopDB(self):
         try:
-            print ("Sending kill signal to ZEO Server at pid " + str(self.zeoServer) + " ...")
             os.kill(self.zeoServer, signal.SIGTERM)
-            print ("Signal sent")
-        except Exception, e:
+        except OSError, e:
             print ("Problem sending kill signal: " + str(e))
 
         try:
-            print ("Waiting for ZEO Server to finish ...")
             os.wait()
-            print ("Zodb server finished.")
-        except Exception, e:
+        except OSError, e:
             print ("Problem waiting for ZEO Server: " + str(e))
-
-        self.removeDBFile()
 
     def createNewDBFile(self):
         savedDir = os.getcwd()
@@ -728,34 +749,33 @@ class Indicop(object):
         except OSError:
             pass
         os.chdir("/tmp/indicop/")
-        print "DONE"
         storage = FileStorage.FileStorage("Data.fs")
-        print "DONE"
         db = DB(storage)
-        print "DONE"
         connection = db.open()
-        print "DONE"
         dbroot = connection.root()
-        print "DONE"
 
         transaction.commit()
 
         connection.close()
-        print "DONE"
         db.close()
-        print "DONE"
         storage.close()
-        print "DONE"
         os.chdir(savedDir)
 
     def removeDBFile(self):
         savedDir = os.getcwd()
-        os.chdir("/tmp/indicop/")
+        try:
+            os.chdir("/tmp/indicop/")
 
-        os.unlink("Data.fs")
-        os.unlink("Data.fs.index")
-        os.unlink("Data.fs.lock")
-        os.unlink("Data.fs.tmp")
+            os.unlink("Data.fs")
+            os.unlink("Data.fs.index")
+            os.unlink("Data.fs.lock")
+            os.unlink("Data.fs.tmp")
+        except OSError:
+            #directory does not exist yet
+            pass
+        except IOError:
+            #files do not exist
+            pass
 
         os.chdir(savedDir)
 
@@ -766,3 +786,12 @@ class Indicop(object):
         else:
             server = TestZEOServer(port, file)
             server.start()
+
+    def getDBInstance(self):
+        return self.dbmgr
+
+    @classmethod
+    def getInstance(cls, jsspecify, jscoverage):
+        if cls.__instance == None:
+            cls.__instance = Indicop(jsspecify, jscoverage)
+        return cls.__instance

@@ -34,14 +34,14 @@ from MaKaC.conference import Conference
 from MaKaC.conference import Category
 from MaKaC.user import Avatar
 import MaKaC.common.indexes as indexes
-from MaKaC.common.db import DBMgr
+from indicop.Indicop import Indicop
 
 def setup_module():
-    DBMgr.getInstance().startRequest()
+    Indicop.getInstance(None, None).getDBInstance().startRequest()
 
 def teardown_module():
-    DBMgr.getInstance().abort()
-    DBMgr.getInstance().endRequest()
+    Indicop.getInstance(None, None).getDBInstance().abort()
+    Indicop.getInstance(None, None).getDBInstance().endRequest()
 
 class _ScheduleOwnerWrapper:
 

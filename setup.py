@@ -360,7 +360,7 @@ class tests_indico(Command):
             testsToRun.append('jslint')
             testsToRun.append('grid')
 
-        indicop = Indicop(self.jsspecify, self.jscoverage)
+        indicop = Indicop.getInstance(self.jsspecify, self.jscoverage)
         result = indicop.main(self.specify, self.coverage, testsToRun)
         print result
 
@@ -427,9 +427,9 @@ i.e. try 'easy_install %s'""" % (package, package)
                     except KeyError:
                         pass
 
-                except IOError:
+                except IOError, e:
                     validJars = validJars and False
-                    print 'Could not download %s from %s' % (jar['filename'], jar['url'])
+                    print 'Could not download %s from %s (%s)' % (jar['filename'], jar['url'], e)
 
         return validJars
 
