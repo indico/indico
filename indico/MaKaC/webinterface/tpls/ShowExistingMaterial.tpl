@@ -1,4 +1,4 @@
-<div class="groupTitle"><%= _("Existing material")%></div>
+%(existingMaterialsTitle)s
 
 <div id="materialListPlace"><!-- DOM-filled materials list --></div>
 <span id="container"></span>

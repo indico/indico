@@ -113,7 +113,7 @@ class WPContributionModifReviewingMaterials( WPContributionModifBase ):
         
         
     def _getTabContent( self, pars ):
-        wc=wcomponents.WShowExistingReviewingMaterial(self._target)
+        wc=wcomponents.WShowExistingReviewingMaterial(self._target, True)
         return wc.getHTML( pars )
     
 class WContributionReviewingJudgements(wcomponents.WTemplated): 

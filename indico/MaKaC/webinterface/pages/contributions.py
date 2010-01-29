@@ -255,8 +255,8 @@ class WContributionDisplayBase(wcomponents.WTemplated):
         vars["revmaterial"]=self._getReviewingMaterialsHTML()
         
         from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
-        vars["MaterialList"] = wcomponents.WShowExistingMaterial(self._contrib).getHTML()
-        vars["ReviewingMatList"] = wcomponents.WShowExistingReviewingMaterial(self._contrib).getHTML()
+        vars["MaterialList"] = wcomponents.WShowExistingMaterial(self._contrib, False).getHTML()
+        vars["ReviewingMatList"] = wcomponents.WShowExistingReviewingMaterial(self._contrib, False).getHTML()
         
         vars["duration"]=""
         if self._contrib.getDuration() is not None:
@@ -407,7 +407,7 @@ class WPContributionModifBase( WPConferenceModifBase  ):
                 self._subTabAssign = self._subtabReviewing.newSubTab( "assign", _("Assign Team"), \
                 urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
                 if self._contrib.getReviewManager().isReferee(self._rh._getUser()) and not (confReviewChoice == 3 or confReviewChoice == 1):
-                    self._subTabJudgements = self._subtabReviewing.newSubTab( "final", _("Final Judge"), \
+                    self._subTabJudgements = self._subtabReviewing.newSubTab( "final", _("Final Judgement"), \
                     urlHandlers.UHContributionReviewingJudgements.getURL( self._target ) )
                 else:
                     self._subTabJudgements = self._subtabReviewing.newSubTab( "Judgements", _("Judgements"), \
@@ -506,7 +506,7 @@ class WPContributionModifMaterials( WPContributionModifBase ):
         self._tabMaterials.setActive()
 
     def _getTabContent( self, pars ):
-        wc=wcomponents.WShowExistingMaterial(self._target, mode='management')
+        wc=wcomponents.WShowExistingMaterial(self._target, mode='management', show=True)
         return wc.getHTML( pars )
 
 class WPModSearchPrimAuthor ( WPContribModifMain ):

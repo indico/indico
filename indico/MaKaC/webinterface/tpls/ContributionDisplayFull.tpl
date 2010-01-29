@@ -70,7 +70,7 @@
                         <td class="displayField" nowrap="" align="right" valign="top">
                             <b><%=_("Material")%>:</b>
                         </td>
-                        <td width="100%%" valign="top">
+                        <td width="100%%" valign="top" style="padding-top:5px;">
                             <%=MaterialList%>
                         </td>
                     <% end %>

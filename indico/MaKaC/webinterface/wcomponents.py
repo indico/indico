@@ -5570,21 +5570,27 @@ class WMaterialListItem(WTemplated):
 
 class WShowExistingMaterial(WTemplated):
 
-    def __init__(self,target, mode='display'):
+    def __init__(self,target, mode='display', show=True):
         """
         mode should be 'display' or 'management'
         """
         self._target=target
         self._mode = mode
+        self._show = show
+
 
     def getVars(self):
         vars=WTemplated.getVars(self)
-
         # yes, this may look a bit redundant, but materialRegistry isn't
         # bound to a particular target
         materialRegistry = self._target.getMaterialRegistry()
         vars["materialList"] = materialRegistry.getMaterialList(self._target)
 
+
+        if self._show:
+            vars["existingMaterialsTitle"] = """ <div class="groupTitle" id="title">%s</div>""" % _("Existing material")
+        else:
+            vars["existingMaterialsTitle"] = " "
         vars["materialModifHandler"] = vars.get("materialModifHandler", None)
         vars["materialProtectHandler"] = vars.get("materialProtectHandler", None)
         vars["resourcesFileModifHandler"] = vars.get("resourcesFileModifHandler", None)
@@ -5597,13 +5603,18 @@ class WShowExistingMaterial(WTemplated):
     
 class WShowExistingReviewingMaterial(WTemplated):
     
-    def __init__(self,target):
+    def __init__(self,target,show=True):
         self._target=target
+        self._show=show
 
 
     def getVars(self):
         vars=WTemplated.getVars(self)
         
+        if self._show:
+            vars["existingMaterialsTitle"] = """ <div class="groupTitle" id="title">%s</div>""" % _("Existing Reviewing material")
+        else:
+            vars["existingMaterialsTitle"] = " "
         vars["materialModifHandler"] = vars.get("materialModifHandler", None)
         vars["materialProtectHandler"] = vars.get("materialProtectHandler", None)
         vars["resourcesFileModifHandler"] = vars.get("resourcesFileModifHandler", None)

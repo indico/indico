@@ -5087,7 +5087,7 @@ class ConfSectionsMgr:
     def __init__(self):
         self._sections = {
             "cfa": _("Call for abstracts"),
-            #TODO: comment the following line to make the Paper Reviewing module not appear
+            #comment the following line to make the Paper Reviewing module not appear
             "paperReviewing" : _("Paper Reviewing"),
             "evaluation": _("Evaluation Form"),
             "videoconference": _("Videoconference"), # only for meetings
@@ -5114,8 +5114,11 @@ class ConfSectionsMgr:
             l.sort()
         return l
 
-    def getSectionKeys(self):
-        return self._sections.keys()
+    def getSectionKeys(self, sort=False):
+        l=self._sections.keys()
+        if sort:
+            l.sort()
+        return l
 
     def getSection(self, id):
         if self._sections.has_key(id):

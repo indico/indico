@@ -2103,19 +2103,19 @@ class WPConferenceModifBase( main.WPMainBase ):
 
         self._programMenuItem = wcomponents.SideMenuItem(_("Programme"),
             urlHandlers.UHConfModifProgram.getURL( self._conf ))
-        self._generalSection.addItem( self._programMenuItem)
-
-        self._reviewingMenuItem = wcomponents.SideMenuItem(_("Reviewing"),
-            urlHandlers.UHConfModifReviewingAccess.getURL( target = self._conf ) )
-        self._generalSection.addItem( self._reviewingMenuItem)        
-        
+        self._generalSection.addItem( self._programMenuItem)               
+                       
         self._abstractMenuItem = wcomponents.SideMenuItem(_("Call for Abstracts"),
             urlHandlers.UHConfModifCFA.getURL( self._conf ))
         self._generalSection.addItem( self._abstractMenuItem)
-
+        
         self._contribListMenuItem = wcomponents.SideMenuItem(_("Contributions"),
             urlHandlers.UHConfModifContribList.getURL( self._conf ))
         self._generalSection.addItem( self._contribListMenuItem)
+        
+        self._reviewingMenuItem = wcomponents.SideMenuItem(_("Reviewing"),
+            urlHandlers.UHConfModifReviewingAccess.getURL( target = self._conf ) )
+        self._generalSection.addItem( self._reviewingMenuItem) 
 
         self._regFormMenuItem = wcomponents.SideMenuItem(_("Registration"),
             urlHandlers.UHConfModifRegForm.getURL( self._conf ))

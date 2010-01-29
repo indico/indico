@@ -1,7 +1,6 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 <% from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase %>
-<div class="groupTitle"><%= _("Existing Reviewing material")%></div>
-
+%(existingMaterialsTitle)s
 <div id="reviewingMaterialListPlace"><!-- DOM-filled materials list --></div>
 <span id="container"></span>
 
