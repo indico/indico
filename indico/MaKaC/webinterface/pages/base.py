@@ -107,6 +107,13 @@ class WPBase:
         elif isinstance(self._rh, RHAdminBase):
             area=_(""" - _("Administrator area")""")
 
+        websession = self._getAW().getSession()
+        if websession:
+            language = websession.getLang()
+        else:
+            info = HelperMaKaCInfo().getMaKaCInfoInstance()
+            language = info.getLang()
+
         return wcomponents.WHTMLHeader().getHTML({
                             "area": area,
                             "baseurl": baseurl,
@@ -116,7 +123,7 @@ class WPBase:
                             "extraCSS": self._extraCSS,
                             "extraJSFiles": self.getJSFiles(),
                             "extraJS": self._extraJS,
-                            "language": self._getAW().getSession().getLang()
+                            "language": language
                             })
 
     def _getHTMLFooter( self ):

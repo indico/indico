@@ -46,7 +46,7 @@ from MaKaC.common.general import *
 
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common import DBMgr, Config, security
-from MaKaC.errors import MaKaCError, ModificationError, AccessError, TimingError, ParentTimingError, EntryTimingError, FormValuesError, NoReportError, htmlScriptError, htmlForbiddenTag, ConferenceClosedError
+from MaKaC.errors import MaKaCError, ModificationError, AccessError, TimingError, ParentTimingError, EntryTimingError, FormValuesError, NoReportError, htmlScriptError, htmlForbiddenTag, ConferenceClosedError, HostnameResolveError
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from xml.sax.saxutils import escape
 
@@ -171,17 +171,26 @@ class RH(RequestHandlerBase):
         RH._currentRH = self
     
     # Methods =============================================================
-    
+
     def getHostIP(self):
         import socket
-        hostIP = socket.gethostbyname(str(self._req.get_remote_host(apache.REMOTE_NOLOOKUP)))
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.useProxy():
-            xff = self._req.headers_in.get("X-Forwarded-For",hostIP).split(", ")[-1]
-            return socket.gethostbyname(xff)
-        else:
-            return hostIP
-    
+
+        host = str(self._req.get_remote_host(apache.REMOTE_NOLOOKUP))
+
+        try:
+            hostIP = socket.gethostbyname(host)
+            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+            if minfo.useProxy():
+                # if we're behind a proxy, use X-Forwarded-For
+                xff = self._req.headers_in.get("X-Forwarded-For",hostIP).split(", ")[-1]
+                return socket.gethostbyname(xff)
+            else:
+                return hostIP
+        except socket.gaierror, e:
+            # in case host resolution fails
+            raise HostnameResolveError("Error resolving host '%s' : %s" % (host, e))
+
+
     def getTarget( self ):
         return self._target 
     
@@ -305,6 +314,15 @@ class RH(RequestHandlerBase):
         Logger.get('requestHandler').exception('Request %s failed: "%s"\n\nurl: %s\n\nparameters: %s\n\n' % (id(self._req), e,self.getRequestURL(), self._getTruncatedParams()))
         p=errors.WPUnexpectedError(self)
         return p.display()
+
+    def _processHostnameResolveError(self,e):
+        """Unexpected errors
+        """
+
+        Logger.get('requestHandler').exception('Request %s failed: "%s"\n\nurl: %s\n\nparameters: %s\n\n' % (id(self._req), e,self.getRequestURL(), self._getTruncatedParams()))
+        p=errors.WPHostnameResolveError(self)
+        return p.display()
+
     
     def _processAccessError(self,e):
         """Treats access errors occured during the process of a RH.
@@ -473,6 +491,10 @@ class RH(RequestHandlerBase):
         except AccessError, e:
             #Access error treatment
             res = self._processAccessError( e )
+            self._endRequestSpecific2RH( False )
+            DBMgr.getInstance().endRequest(False)
+        except HostnameResolveError, e:
+            res = self._processHostnameResolveError( e )
             self._endRequestSpecific2RH( False )
             DBMgr.getInstance().endRequest(False)
         except ModificationError, e:
