@@ -1,11 +1,9 @@
-
 function nullRoomInfo(info) {
 
     return (!info) ||
-        (!info.get('location')) ||
-        (!info.get('room'));
+        (!exists(info.get('location'))) ||
+        (!exists(info.get('room')));
 }
-
 
 type("UnscheduledContributionList", ["ListWidget"],
      {
@@ -633,7 +631,6 @@ type("ChangeEditDialog", // silly name!
          _submitInfo: function(){
              var self = this;
 
-
              each(self.args, function(value, key) {
                  self.info.set(key, value);
              });
@@ -691,7 +688,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
              this.roomEditor = new RoomBookingWidget(Indico.Data.Locations,
                                                      this.info.get('roomInfo'),
                                                      this.parentRoomInfo,
-                                                     nullRoomInfo(this.info.get('roomInfo')),
+                                                     this.isEdit?nullRoomInfo(this.info.get('roomInfo')):true,
                                                      this.favoriteRooms);
 
              cancelButton.observeClick(function(){
@@ -799,6 +796,14 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                             this.timeField,
                             this.isEdit);
 
+             invertableBind(this.info.accessor('inheritLoc'),
+                            this.roomEditor.inheritCheckbox.get(),
+                            false);
+
+             invertableBind(this.info.accessor('inheritRoom'),
+                            this.roomEditor.inheritCheckbox.get(),
+                            false);
+
              self.parameterManager.add(self.startTimeField, 'time', false);
              self.parameterManager.add(self.timeField, 'unsigned_int', false);
 
@@ -878,6 +883,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
          each(keys(args), function(key) {
              self.originalArgs[key] = args.get(key);
          });
+
          if (isEdit) {
              this.info = args;
              this.ExclusivePopup($T("Edit Break"));
@@ -886,7 +892,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
          } else {
              this.info = clone(args);
              // by default, assume parent room info
-             this.info.set('roomInfo', $O({location: null, room: null}));
+             this.info.set('roomInfo', $O({location: args.get('roomInfo').location, room: args.get('roomInfo').room}));
              this.timeStartMethod = managementActions.methods[args.get('parentType')].dayEndDate;
              //args.set("conference", args.get('args').conference);
              this.dateArgs = args;

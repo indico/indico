@@ -5711,29 +5711,23 @@ class Session(Persistent):
             else:
                 self.setTextColor(self._getCorrectTextColor(textcolor))
         self.setTextColorToLinks(sessionData.has_key("textcolortolinks"))
-        #if the location is not defined we set the location of the session
-        #   to None so it will be considered to be the same as for the
-        #   conference
-        if sessionData.get( "locationName", "" ).strip() == "":
-            self.setLocation( None )
-        else:
-            #if the location name is defined we must set a new location (or
-            #   modify the existing one) for the session
+
+        if "locationName" in sessionData:
             loc = self.getOwnLocation()
             if not loc:
                 loc = CustomLocation()
             self.setLocation( loc )
             loc.setName( sessionData["locationName"] )
             loc.setAddress( sessionData.get("locationAddress", "") )
+
         #same as for the location
-        if sessionData.get( "roomName", "" ).strip() == "":
-                self.setRoom( None )
-        else:
+        if "roomName" in sessionData:
             room = self.getOwnRoom()
             if not room:
                 room = CustomRoom()
             self.setRoom( room )
             room.setName( sessionData["roomName"] )
+
         if sessionData.get("sDate",None) is not None:
             self.setStartDate(sessionData["sDate"],check,moveEntries=moveEntries)
         if sessionData.get("eDate",None) is not None:
@@ -8034,31 +8028,22 @@ class Contribution(Persistent, Fossilizable):
                 id = f.getId()
                 if data.has_key("f_%s"%id):
                     self.setField(id, data["f_%s"%id])
-        #if the location is not defined we set the location of the contribution
-        #   to None so it will be considered to be the same as for the
-        #   conference
-        if data.has_key("locationName"):
-            if data["locationName"].strip()=="":
-                self.setLocation(None)
-            else:
-                #if the location name is defined we must set a new location (or
-                #   modify the existing one) for the contribution
-                loc=self.getOwnLocation()
-                if not loc:
-                    loc=CustomLocation()
-                self.setLocation(loc)
-                loc.setName(data["locationName"])
-                loc.setAddress(data.get("locationAddress", ""))
+
+        if "locationName" in data:
+            loc=self.getOwnLocation()
+            if not loc:
+                loc=CustomLocation()
+            self.setLocation(loc)
+            loc.setName(data["locationName"])
+            loc.setAddress(data.get("locationAddress", ""))
+
         #same as for the location
-        if data.has_key("roomName"):
-            if data["roomName"].strip()=="":
-                self.setRoom(None)
-            else:
-                room=self.getOwnRoom()
-                if not room:
-                    room=CustomRoom()
-                self.setRoom(room)
-                room.setName(data["roomName"])
+        if "roomName" in data:
+            room=self.getOwnRoom()
+            if not room:
+                room=CustomRoom()
+            self.setRoom(room)
+            room.setName(data["roomName"])
         tz = 'UTC'
         if self.getConference():
             tz = self.getConference().getTimezone()

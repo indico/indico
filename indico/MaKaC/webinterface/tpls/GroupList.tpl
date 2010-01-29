@@ -2,7 +2,7 @@
 <form action="%(createGroupURL)s" method="POST">
 
 <tr>
-  <td colspan="2"><div class="groupTitle"><%= _("Grup tools") %></div></td>
+  <td colspan="2"><div class="groupTitle"><%= _("Group tools") %></div></td>
 </tr>
 <tr>
   <td></td>

@@ -1276,6 +1276,7 @@ class WContributionDataModification(wcomponents.WTemplated):
             defaultInheritPlace = ""
             locationName = self._contrib.getLocation().getName()
             locationAddress = self._contrib.getLocation().getAddress()
+
         if self._contrib.getOwnRoom():
             defaultDefineRoom= "checked"
             defaultInheritRoom = ""
@@ -1337,7 +1338,6 @@ class WContributionDataModification(wcomponents.WTemplated):
         
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars["useRoomBookingModule"] = minfo.getRoomBookingModuleActive()
-
         return vars
 
 

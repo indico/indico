@@ -73,6 +73,10 @@ class AccessError(AccessControlError):
     """
     pass
 
+class HostnameResolveError(MaKaCError):
+    """
+    Hostname resolution failed
+    """
 
 class ModificationError(AccessControlError):
     """

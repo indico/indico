@@ -136,7 +136,6 @@ class TimeSchedule(Schedule, Persistent):
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
-
         if entry.isScheduled():
             # remove it from the old schedule and add it to this one
             entry.getSchedule().removeEntry(entry)
@@ -727,7 +726,6 @@ class SlotSchedule(TimeSchedule):
         """
 
         owner = self.getOwner()
-
         if (entry is None) or self.hasEntry(entry):
             return
         if isinstance(entry,LinkedTimeSchEntry):
@@ -1170,7 +1168,6 @@ class BreakTimeSchEntry(IndTimeSchEntry):
         return values
 
     def setValues( self, data, check=2, moveEntriesBelow=0, tz='UTC'):
-
         from MaKaC.conference import CustomLocation, CustomRoom
         # In order to move the entries below, it is needed to know the diff (we have to move them)
         # and the list of entries to move. It's is needed to take those datas in advance because they

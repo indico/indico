@@ -1,4 +1,4 @@
-<form action=%(postURL)s method="POST">    
+<form action=%(postURL)s method="POST">
     %(toIds)s
     <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
         <tr>
@@ -6,18 +6,18 @@
             </td>
         </tr>
         <tr>
+            <td><%= _("From")%>: </td>
+            <td colspan="2"><input type="text" name="from" size="50" value="%(from)s"></text></td>
+        </tr>
+        <tr>
             <td>
-                <%= _("To")%>: 
+                <%= _("To")%>:
             </td>
 	        <td colspan="2" style="padding-top:5px; padding-bottom:5px">%(toEmails)s</td>
         </tr>
         <tr>
-            <td><%= _("Cc")%>: </td>
+            <td valign="top"><%= _("Cc")%>: </td>
   	        <td colspan="2"><input type="text" name="cc" size="50" value="%(cc)s"></text> <font color="red"><%= _("Beware, addresses in this field will receive one mail per registrant")%></font></td>
-        </tr>
-        <tr>
-            <td><%= _("From")%>: </td>
-  	        <td colspan="2"><input type="text" name="from" size="50" value="%(from)s"></text></td>
         </tr>
         <tr>
             <td><%= _("Subject")%>:</td>
