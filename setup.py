@@ -468,8 +468,11 @@ if __name__ == '__main__':
 
     from MaKaC.consoleScripts.installBase import *
 
-    #Dirty trick: For running tests, we need to load all the modules
+
+    #Dirty trick: For running tests, we need to load all the modules and get rid of unnecessary outputs
     if 'tests' in sys.argv:
+        import logging
+        logging.basicConfig(filename='/tmp/indicop/log/debug',level=logging.DEBUG)
         setIndicoInstallMode(False)
     else:
         setIndicoInstallMode(True)
