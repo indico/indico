@@ -55,12 +55,12 @@ class WebFactory(WebFactory):
     iconURL = Configuration.Config.getInstance().getSystemIconURL( "meeting" )
     name = "Meeting"
     description = """this type is meant for events which contain several contributions or talks and that require schedulling and eventually organising of those contributions in sessions"""
-        
 
-######### Conference Creation/Display/Modifications ##########################    
+
+######### Conference Creation/Display/Modifications ##########################
 
     @staticmethod
-    def getEventCreationPage( rh, targetCateg ): 
+    def getEventCreationPage( rh, targetCateg ):
         return WPMeetingEventCreation( rh, targetCateg )
 
     @staticmethod
@@ -68,11 +68,11 @@ class WebFactory(WebFactory):
         return conferences.WPMeetingTimeTable(rh,conference, "static", "meeting", {})
 
     @staticmethod
-    def getIconURL(): 
+    def getIconURL():
         return WebFactory.iconURL
-    
+
     @staticmethod
-    def customiseSideMenu( webPageWithSideMenu ): 
+    def customiseSideMenu( webPageWithSideMenu ):
         webPageWithSideMenu._programMenuItem.setVisible(False)
         webPageWithSideMenu._abstractMenuItem.setVisible(False)
         webPageWithSideMenu._layoutMenuItem.setVisible(False)
@@ -84,14 +84,14 @@ class WebFactory(WebFactory):
     def customiseToolsTabCtrl( tabCtrl ):
         tabCtrl.getTabById("clone").enable()
         tabCtrl.getTabById("matPackage").enable()
-        tabCtrl.getTabById("offlineSite").enable()        
+        tabCtrl.getTabById("offlineSite").enable()
         tabCtrl.getTabById("close").enable()
         tabCtrl.getTabById("delete").enable()
         tabCtrl.getTabById("badges").disable()
         tabCtrl.getTabById("alarms").enable()
-        tabCtrl.getTabById("posters").disable()
-        tabCtrl.getTabById("badges").disable() 
-        
+        tabCtrl.getTabById("posters").enable()
+        tabCtrl.getTabById("badges").disable()
+
 
     @staticmethod
     def getConfModif(rh, conf):
@@ -100,22 +100,22 @@ class WebFactory(WebFactory):
     @staticmethod
     def getConfModifAC(rh, conf):
         return WPMConfModifAC(rh, conf)
-    
+
     @staticmethod
     def getConfModifTools(rh, conf):
         return conferences.WPConfDisplayAlarm(rh, conf)
-    
+
     @staticmethod
     def getConfModifBookings(rh, conf, bs):
         return WPMConfModifBookings(rh, conf, bs)
-    
+
     @staticmethod
     def getConfModifListings(rh, conf):
         return WPMConfModifListings(rh, conf)
-    
+
     @staticmethod
     def getConfClone(rh, conf):
-        return WPMConfClone(rh, conf)    
+        return WPMConfClone(rh, conf)
 
     @staticmethod
     def getConfModifSchedule (rh, conf):
@@ -132,12 +132,12 @@ class WebFactory(WebFactory):
     @staticmethod
     def getConferenceDisplayWriteMinutes(rh, contrib):
         return WPMConferenceDisplayWriteMinutes(rh,contrib)
-    
+
     @staticmethod
     def getDisplayFullMaterialPackage(rh, conf):
         return WPMDisplayFullMaterialPackage(rh,conf)
 
-########### Material Display #################################################   
+########### Material Display #################################################
 
     def getMaterialDisplay( rh, material):
         return WPMMaterialDisplay(rh, material)
@@ -148,7 +148,7 @@ class WebFactory(WebFactory):
     getMaterialDisplayRemoveResourceConfirm = staticmethod(getMaterialDisplayRemoveResourceConfirm)
 
 ############# Subcontribution Display##########################################
-    
+
     def getSubContributionDisplay(rh, subcontrib):
         return WPMSubContributionDisplay(rh, subcontrib)
     getSubContributionDisplay = staticmethod(getSubContributionDisplay)
@@ -158,11 +158,11 @@ class WebFactory(WebFactory):
     getSubContributionDisplayWriteMinutes = staticmethod(getSubContributionDisplayWriteMinutes)
 
 ############# Contribution Display #############################################
-    
+
     def getContributionDisplay(rh, contrib):
         return WPMContributionDisplay(rh,contrib)
     getContributionDisplay = staticmethod(getContributionDisplay)
-    
+
 ############# Contribution modification #########################################
     def getContributionModification(rh, contrib):
         return WPMContributionModification(rh,contrib)
@@ -179,7 +179,7 @@ class WebFactory(WebFactory):
     def getContributionModifTools(rh, contrib):
         return WPMContributionModifTools (rh,contrib)
     getContributionModifTools = staticmethod(getContributionModifTools)
- 
+
     def getContributionEditData(rh, contrib):
         return WPMContribEditData(rh, contrib)
     getContributionEditData = staticmethod (getContributionEditData)
@@ -203,7 +203,7 @@ class WebFactory(WebFactory):
     def getContributionDisplayWriteMinutes(rh, contrib):
         return WPMContributionDisplayWriteMinutes(rh,contrib)
     getContributionDisplayWriteMinutes = staticmethod(getContributionDisplayWriteMinutes)
-      
+
 ########## Session Display###########################################
 
     def getSessionDisplay(rh,session):
@@ -230,7 +230,7 @@ class WebFactory(WebFactory):
     def getSessionModifMaterials():
         return WPMSessionModifMaterials
     getSessionModifMaterials = staticmethod(getSessionModifMaterials)
-    
+
     def getModSlotRemConfirmation(self, slot):
         return WPMModSlotRemConfirmation(self,slot)
     getModSlotRemConfirmation = staticmethod(getModSlotRemConfirmation)
@@ -262,7 +262,7 @@ class WebFactory(WebFactory):
     def getSessionModifCommEdit(rh, session):
         return WPMSessionModifCommEdit(rh,session)
     getSessionModifCommEdit = staticmethod(getSessionModifCommEdit)
-    
+
     def getSessionModifSchedule(rh,session):
         return WPMSessionModifSchedule(rh,session)
     getSessionModifSchedule = staticmethod(getSessionModifSchedule)
@@ -278,41 +278,41 @@ class WebFactory(WebFactory):
     getConfModifParticipantsNewPending = staticmethod(getConfModifParticipantsNewPending)
 
 #################### Evaluation #####################################
-    
+
     def getEvaluationDisplay(rh, conf):
         return WPMEvaluationDisplay(rh, conf)
     getEvaluationDisplay = staticmethod(getEvaluationDisplay)
-    
+
     def getEvaluationDisplayModif(rh, conf):
         return WPMEvaluationDisplayModif(rh, conf)
     getEvaluationDisplayModif = staticmethod(getEvaluationDisplayModif)
-    
+
     def getEvaluationSubmitted(rh, conf, mode):
         return WPMEvaluationSubmitted(rh, conf, mode)
     getEvaluationSubmitted = staticmethod(getEvaluationSubmitted)
-    
+
     def getEvaluationFull(rh, conf):
         return WPMEvaluationFull(rh, conf)
     getEvaluationFull = staticmethod(getEvaluationFull)
-    
+
     def getEvaluationClosed(rh, conf):
         return WPMEvaluationClosed(rh, conf)
     getEvaluationClosed = staticmethod(getEvaluationClosed)
-    
+
     def getEvaluationSignIn(rh, conf):
         return WPMEvaluationSignIn(rh, conf)
     getEvaluationSignIn = staticmethod(getEvaluationSignIn)
-    
+
     def getEvaluationInactive(rh, conf):
         return WPMEvaluationInactive(rh, conf)
     getEvaluationInactive = staticmethod(getEvaluationInactive)
-    
+
 #################### Alarms #####################################
 
     def getConfAddAlarm(rh, conf):
         return WPMConfAddAlarm(rh, conf)
     getConfAddAlarm = staticmethod(getConfAddAlarm)
-    
+
 MeetingWebFactory = WebFactory
 
 #################### Event Creation #####################################
@@ -326,12 +326,12 @@ class WMeetingCreation(category.WConferenceCreation):
         self._categ = targetCateg
         self._type = type
         self._rh = rh
-    
+
     def getVars( self ):
         vars = category.WConferenceCreation.getVars( self )
-        vars["event_type"] = WebFactory.getId()     
+        vars["event_type"] = WebFactory.getId()
         return vars
-            
+
 
 ################# Minutes #########################################
 
@@ -345,7 +345,7 @@ class WPMConferenceDisplayWriteMinutes(conferences.WPConferenceDefaultDisplayBas
         if self._conf.getLogo():
             frameParams["logoURL"] = urlHandlers.UHConferenceLogo.getURL( self._conf)
 
-        confTitle = self._conf.getTitle()   
+        confTitle = self._conf.getTitle()
         colspan=""
         imgOpen=""
         padding=""
@@ -354,7 +354,7 @@ class WPMConferenceDisplayWriteMinutes(conferences.WPConferenceDefaultDisplayBas
         body = _("""
                 <td class="confBodyBox" %s %s>
                     %s
-                    <table border="0" cellpadding="0" cellspacing="0" 
+                    <table border="0" cellpadding="0" cellspacing="0"
                                 align="center" width="95%%">
                         <tr>
                             <td class="formTitle" width="100%%"> _("Minutes") - %s</td>
@@ -371,12 +371,12 @@ class WPMConferenceDisplayWriteMinutes(conferences.WPConferenceDefaultDisplayBas
                         self._getNavigationBarHTML(),
                         body)
         return frame.getHTML( body, frameParams)
-    
+
     def _getBody( self, params ):
         wc = wcomponents.WWriteMinutes( self._conf )
         pars = {"postURL": urlHandlers.UHConferenceDisplayWriteMinutes.getURL(self._conf) }
         return wc.getHTML( pars )
-    
+
 ################# Subcontribution Display ##############################
 
 class WPMSubContributionDisplay(subContributions.WPSubContributionDisplay):
@@ -388,7 +388,7 @@ class WPMSubContributionDisplay(subContributions.WPSubContributionDisplay):
         if self._conf.getLogo():
             frameParams["logoURL"] = urlHandlers.UHConferenceLogo.getURL( self._conf)
 
-        confTitle = self._conf.getTitle()   
+        confTitle = self._conf.getTitle()
         colspan=""
         imgOpen=""
         padding=""
@@ -397,7 +397,7 @@ class WPMSubContributionDisplay(subContributions.WPSubContributionDisplay):
         body = _("""
                 <td class="confBodyBox" %s %s>
                     %s
-                    <table border="0" cellpadding="0" cellspacing="0" 
+                    <table border="0" cellpadding="0" cellspacing="0"
                                 align="center" width="95%%">
                         <tr>
                             <td class="formTitle" width="100%%"> _("SubContribution View") - %s</td>
@@ -445,13 +445,13 @@ class WMSubContributionDisplayMin (WMSubContributionDisplayBase):
 
 class WPMSubContributionDisplayWriteMinutes(WPMSubContributionDisplay):
     navigationEntry=navigation.NESubContributionDisplay
-    
+
     def _getBody( self, params ):
         wc = wcomponents.WWriteMinutes( self._subContrib )
         pars = {"postURL": urlHandlers.UHSubContributionDisplayWriteMinutes.getURL(self._subContrib) }
         return wc.getHTML( pars )
 
-    
+
 ################# Contribution Display ################################
 
 class WPMContributionDisplay(contributions.WPContributionDisplay):
@@ -463,7 +463,7 @@ class WPMContributionDisplay(contributions.WPContributionDisplay):
         if self._conf.getLogo():
             frameParams["logoURL"] = urlHandlers.UHConferenceLogo.getURL( self._conf)
 
-        confTitle = self._conf.getTitle()   
+        confTitle = self._conf.getTitle()
         colspan=""
         imgOpen=""
         padding=""
@@ -472,7 +472,7 @@ class WPMContributionDisplay(contributions.WPContributionDisplay):
         body =  _("""
                 <td class="confBodyBox" %s %s>
                     %s
-                    <table border="0" cellpadding="0" cellspacing="0" 
+                    <table border="0" cellpadding="0" cellspacing="0"
                                 align="center" valign="top" width="95%%">
                         <tr>
                             <td class="formTitle" width="100%%"> _("Contribution View") - %s</td>
@@ -517,7 +517,7 @@ class WMContributionDisplayMin (WMContributionDisplayBase):
     pass
 
 class WPMContributionDisplayWriteMinutes(WPMContributionDisplay):
-    
+
     def _getBody( self, params ):
         wc = wcomponents.WWriteMinutes( self._contrib )
         pars = {"postURL": urlHandlers.UHContributionDisplayWriteMinutes.getURL(self._contrib) }
@@ -535,7 +535,7 @@ class WPMSessionDisplay(sessions.WPSessionDisplay):
         if self._conf.getLogo():
             frameParams["logoURL"] = urlHandlers.UHConferenceLogo.getURL( self._conf)
 
-        confTitle = self._conf.getTitle()   
+        confTitle = self._conf.getTitle()
         colspan=""
         imgOpen=""
         padding=""
@@ -544,7 +544,7 @@ class WPMSessionDisplay(sessions.WPSessionDisplay):
         body =  _("""
                 <td class="confBodyBox" %s %s>
                     %s
-                    <table border="0" cellpadding="0" cellspacing="0" 
+                    <table border="0" cellpadding="0" cellspacing="0"
                                 align="center" valign="top" width="95%%">
                         <tr>
                             <td class="formTitle" width="100%%"> _("Session View") - %s</td>
@@ -610,7 +610,7 @@ class WMSessionDisplayFull(WMSessionDisplayBase ):
             tab.setActive()
 
 class WPMSessionDisplayWriteMinutes(WPMSessionDisplay):
-    
+
     def _getBody( self, params ):
         wc = wcomponents.WWriteMinutes( self._session )
         pars = {"postURL": urlHandlers.UHSessionDisplayWriteMinutes.getURL(self._session) }
@@ -620,13 +620,13 @@ class WPMSessionDisplayWriteMinutes(WPMSessionDisplay):
 
 ##Taking subContribTabs out and changing link at top##
 #class ContribModifTabsFrame:
-#    
+#
 #    @staticmethod
 #    def _getBody( self, params ):
 #        self._createTabCtrl()
-#        
+#
 #        banner = wcomponents.WBannerModif().getHTML(self._target)
-#        body = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )        
+#        body = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
 #        return banner + body
 
 class WPMContributionModification(contributions.WPContributionModification):
@@ -638,7 +638,7 @@ class WPMModSpeaker(contributions.WPModSpeaker):
     #def _getBody( self, params ):
     #    return ContribModifTabsFrame._getBody(self, params)
 
-class WPMContribAddMaterial(contributions.WPContribAddMaterial):    
+class WPMContribAddMaterial(contributions.WPContribAddMaterial):
     pass
 #    def _getBody( self, params ):
 #        return ContribModifTabsFrame._getBody(self, params)
@@ -656,7 +656,7 @@ class WPMContributionModifSC(contributions.WPContribModifSC):
 
 class WPMContribModifAC(contributions.WPContribModifAC):
     pass
-        
+
 class WPMContributionModifTools(contributions.WPContributionModifTools):
     pass
 #    def _getBody( self, params ):
@@ -673,18 +673,18 @@ class WPMContribAddSC(contributions.WPContribAddSC):
 
 
 class WPMMaterialDisplayBase( material.WPMaterialDisplayBase):
-    
+
     def __init__( self, rh, materialObj ):
         material.WPMaterialDisplayBase.__init__(self, rh, materialObj)
         self._extraCSS.append(" body { background: #424242; } ")
-    
+
     def _applyConfDisplayDecoration( self, body ):
         frame = WMConfDisplayFrame( self._getAW(), self._conf )
         frameParams = {\
               "logoURL": urlHandlers.UHConferenceLogo.getURL( self._conf) }
         if self._conf.getLogo():
             frameParams["logoURL"] = urlHandlers.UHConferenceLogo.getURL( self._conf)
-           
+
         confTitle = self._conf.getTitle()
         colspan=""
         imgOpen=""
@@ -694,7 +694,7 @@ class WPMMaterialDisplayBase( material.WPMaterialDisplayBase):
         body =  _("""
                 <td class="confBodyBox" %s %s>
                     %s
-                    <table border="0" cellpadding="0" cellspacing="0" 
+                    <table border="0" cellpadding="0" cellspacing="0"
                                 align="center" valign="top" width="95%%">
                         <tr>
                             <td><div class="groupTitle">_("Added Material") - %s</div></td>
@@ -711,7 +711,7 @@ class WPMMaterialDisplayBase( material.WPMaterialDisplayBase):
                         self._getNavigationBarHTML(),
                         body)
         return frame.getHTML( body, frameParams)
-    
+
     def _getFooter( self ):
         wc = wcomponents.WFooter()
         p = {"dark":True}
@@ -725,7 +725,7 @@ class WMConfDisplayFrame(conferences.WConfDisplayFrame):
             vars["logo"] = "<img src=\"%s\" alt=\"%s\" border=\"0\">"%(vars["logoURL"], self._conf.getTitle())
         vars["confTitle"] = self._conf.getTitle()
         vars["displayURL"] = urlHandlers.UHConferenceDisplay.getURL(self._conf)
-        vars["imgConferenceRoom"] = Config.getInstance().getSystemIconURL( "conferenceRoom" ) 
+        vars["imgConferenceRoom"] = Config.getInstance().getSystemIconURL( "conferenceRoom" )
         #################################
         # Fermi timezone awareness      #
         #################################
@@ -744,7 +744,7 @@ class WMConfDisplayFrame(conferences.WConfDisplayFrame):
         #################################
         # Fermi timezone awareness(end) #
         #################################
-        vars["body"] = self._body     
+        vars["body"] = self._body
         vars["confLocation"] = ""
         if self._conf.getLocationList():
             vars["confLocation"] =  self._conf.getLocationList()[0].getName()
@@ -755,7 +755,7 @@ class WMConfDisplayFrame(conferences.WConfDisplayFrame):
         format = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getFormat()
         vars["bgColorCode"] = format.getFormatOption("titleBgColor")["code"]
         vars["textColorCode"] = format.getFormatOption("titleTextColor")["code"]
-        return vars                      
+        return vars
 
     def getHTML( self, body, params ):
         self._body = body
@@ -766,26 +766,26 @@ class WMMaterialDisplay(material.WMaterialDisplay):
             self._material=material
             self._aw=aw
             self._modif = modif
-    
+
         def getVars( self ):
             vars=material.WMaterialDisplay.getVars( self )
             vars["modif"]=""
             if self._modif==1:
                 vars["modif"] = """<a href="%s"><img class="imglink" src="%s" alt="Modify"></a>"""%(urlHandlers.UHMaterialModification.getURL(self._material),Config.getInstance().getSystemIconURL( "modify" ))
             return vars
-    
+
 class WPMMaterialDisplay( WPMMaterialDisplayBase):
     navigationEntry = navigation.NEMeetingMaterialDisplay
     def __init__(self, rh, material):
         WPMMaterialDisplayBase.__init__(self, rh, material)
-    
+
     def _getBody( self, params ):
         self._modif=0
         if self._target.canModify(self._getAW()):
             self._modif = 1
         wc = WMMaterialDisplay( self._getAW(), self._material, self._modif )
-        pars = { "fileAccessURLGen": urlHandlers.UHFileAccess.getURL }              
-        return wc.getHTML( pars ) 
+        pars = { "fileAccessURLGen": urlHandlers.UHFileAccess.getURL }
+        return wc.getHTML( pars )
 
 class WPMMaterialDisplayRemoveResourceConfirm(WPMMaterialDisplayBase, material.WPMaterialDisplayRemoveResourceConfirm):
     navigationEntry=navigation.NEMeetingMaterialDisplay
@@ -809,13 +809,13 @@ class WPMConfModif(conferences.WPConferenceModification):
 class WMConfModifMainData(conferences.WConfModifMainData):
     def getVars(self):
         vars = conferences.WConfModifMainData.getVars( self )
-        
-        #enable Evaluation by default        
+
+        #enable Evaluation by default
         self._conf.enableSection('evaluation')
-        
+
         return vars
 
-##Access Control ## 
+##Access Control ##
 class WPMConfModifAC(conferences.WPConfModifAC):
     pass
 
@@ -823,12 +823,12 @@ class WMConfModifAC(conferences.WConfModifAC):
     pass  #Depends which frames we need inside of AC
 
 
-##Tools ## 
+##Tools ##
 class WPMConfModifTools (conferences.WPConfModifToolsBase):
-    
+
     def _getTabContent( self, params ):
         wc = WMConfModifTools( self._conf, self._rh._getUser() )
-        p = { 
+        p = {
             "deleteConferenceURL": urlHandlers.UHConfDeletion.getURL( self._conf ), \
             "cloneConferenceURL": urlHandlers.UHConfClone.getURL( self._conf ), \
             "addAlarmURL": urlHandlers.UHConfAddAlarm.getURL( self._conf ), \
@@ -851,7 +851,7 @@ class WMConfModifBookings (conferences.WConfModifBookings):
 ##
 
 class WPMConfModifListings (conferences.WPConfModifListings):
-    
+
     def _getTabContent( self, params ):
         wc = WMConfModifListings( self._conf )
         return wc.getHTML()
@@ -860,7 +860,7 @@ class WMConfModifListings (conferences.WConfModifListings):
     pass
 
 class WPMConfClone(conferences.WPConfClone):
-   
+
     def _getTabContent( self, params ):
         p = conferences.WConferenceClone( self._conf )
         pars = { \
@@ -909,7 +909,7 @@ class WPMConfAddContribution(conferences.WPModScheduleNewContrib):
         conferences.WPModScheduleNewContrib.__init__(self, rh, conf)
         self._targetDay = targetDay
 
-        
+
     def _getTabContent( self, params ):
         p = WMContributionCreation( self._conf, self._targetDay )
         pars = {"postURL": urlHandlers.UHMConfPerformAddContribution.getURL(), \
@@ -918,14 +918,14 @@ class WPMConfAddContribution(conferences.WPModScheduleNewContrib):
         "targetDay": self._targetDay.strftime("%Y-%m-%d") \
         }
         return p.getHTML(pars)
-        
+
 
 class WMContributionCreation(conferences.WContributionCreation):
 
     def __init__( self, target, targetDay):
         conferences.WContributionCreation.__init__(self, target)
         self._targetDay=targetDay
-                
+
     def getVars( self ):
         vars = conferences.WContributionCreation.getVars( self )
         vars["sHour"]=self._targetDay.hour
@@ -933,7 +933,7 @@ class WMContributionCreation(conferences.WContributionCreation):
         vars["durationHours"],vars["durationMinutes"]="0","20"
         return vars
 
-######################### Session View ####################### 
+######################### Session View #######################
 
 ##TabControl####
 class WPMSessionAddMaterial(sessions.WPSessionAddMaterial):
@@ -944,7 +944,7 @@ class WPMSessionAddMaterial(sessions.WPSessionAddMaterial):
 class WPMModConvenerEdit(sessions.WPModConvenerEdit):
     def _setupTabCtrl(self):
         self._tabContribs.disable()
-    
+
 
 class WPMModConvenerNew(sessions.WPModConvenerNew):
     def _setupTabCtrl(self):
@@ -970,15 +970,15 @@ class WPMModSlotEdit(sessions.WPModSlotEdit):
 class WPMSessionModification( sessions.WPSessionModification ):
     def _setupTabCtrl(self):
         self._tabContribs.disable()
-        
+
 class WPMSessionModifMaterials( sessions.WPSessionModifMaterials ):
     def _setupTabCtrl(self):
         self._tabContribs.disable()
-        
+
 class WPMSessionModifAC(sessions.WPSessionModifAC):
     def _setupTabCtrl(self):
         self._tabContribs.disable()
-        
+
 class WPMSessionModifTools(sessions.WPSessionModifTools):
     def _setupTabCtrl(self):
         self._tabContribs.disable()
@@ -986,19 +986,19 @@ class WPMSessionModifTools(sessions.WPSessionModifTools):
 class WPMSessionModifComm(sessions.WPSessionModifComm):
     def _setupTabCtrl(self):
         self._tabContribs.disable()
-    
+
 class WPMSessionModifCommEdit(sessions.WPSessionCommEdit):
     def _setupTabCtrl(self):
         self._tabContribs.disable()
-        
+
 class WPMSessionModifSchedule(sessions.WPSessionModifSchedule):
     pass
 
 ################# Session Modification ###################################
-    
+
 ##Change slot options##
 class WMSessionModifSchedule(sessions.WSessionModifSchedule):
-    
+
     def _getFitSlotLink( self, container, linkColor ):
         """
         returns a link to the "fit slot" action if and only if
@@ -1010,7 +1010,7 @@ class WMSessionModifSchedule(sessions.WSessionModifSchedule):
             if container.getStartDate()<entries[0].getStartDate() or container.getEndDate()>entries[-1].getEndDate():
                 fitSlotLink =  _("""<input type="submit" value="_("fit slot")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlHandlers.UHSessionFitSlot.getURL(container.getSessionSlot()))
         return fitSlotLink
-    
+
     def _getCompactSlotLink( self, container, linkColor ):
         """
         returns a link to the "compact slot" action if and only if
@@ -1021,7 +1021,7 @@ class WMSessionModifSchedule(sessions.WSessionModifSchedule):
         if sch.hasGap():
             compactSlotLink =  _("""<input type="submit" value="_("compact slot")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlHandlers.UHSessionModSlotCompact.getURL(container.getSessionSlot()))
         return compactSlotLink
-    
+
     def _getAddContribLink( self, container, linkColor ):
         """
         returns a link to the "add contribution" action if and only if
@@ -1038,13 +1038,13 @@ class WMSessionModifSchedule(sessions.WSessionModifSchedule):
         else:
             addContrib = ""
         return addContrib
-    
+
     def _getContainerHeaderHTML(self, container, bgcolorSlot, colspan, width, eventType):
         # header is displayed just in the first slot of a container:
         room=""
         if container.getRoom() is not None and container.getRoom().getName().strip()!="":
             room="at %s"%container.getRoom().getName()
-        
+
         orginURL = urlHandlers.UHSessionModifSchedule.getURL(self._session.getOwner())
         orginURL.addParam("sessionId", self._session.getId())
         urlNewContrib = urlHandlers.UHConfModScheduleNewContrib.getURL(self._session.getOwner())
@@ -1052,7 +1052,7 @@ class WMSessionModifSchedule(sessions.WSessionModifSchedule):
         urlNewContrib.addParam("slotId", container.getSessionSlot().getId())
         urlNewContrib.addParam("orginURL",orginURL)
         urlNewContrib.addParam("eventType",eventType)
-        
+
         urlAddBreak = urlHandlers.UHSessionAddBreak.getURL(container.getSessionSlot())
         urlDelSlot = urlHandlers.UHSessionModSlotRem.getURL(container.getSessionSlot())
         urlEditSlot = urlHandlers.UHSessionModSlotEdit.getURL(container.getSessionSlot())
@@ -1125,7 +1125,7 @@ class WMSessionModifSchedule(sessions.WSessionModifSchedule):
 
     def _getContainerFooterHTML(self, container, bgcolorSlot, colspan, width, eventType):
         # footer is displayed just in the last slot of a container:
-        
+
         orginURL = urlHandlers.UHSessionModifSchedule.getURL(self._session.getOwner())
         orginURL.addParam("sessionId", self._session.getId())
         urlNewContrib = urlHandlers.UHConfModScheduleNewContrib.getURL(self._session.getOwner())
@@ -1133,7 +1133,7 @@ class WMSessionModifSchedule(sessions.WSessionModifSchedule):
         urlNewContrib.addParam("slotId", container.getSessionSlot().getId())
         urlNewContrib.addParam("orginURL",orginURL)
         urlNewContrib.addParam("eventType",eventType)
-        
+
         urlAddBreak = urlHandlers.UHSessionAddBreak.getURL(container.getSessionSlot())
         urlDelSlot = urlHandlers.UHSessionModSlotRem.getURL(container.getSessionSlot())
         urlEditSlot = urlHandlers.UHSessionModSlotEdit.getURL(container.getSessionSlot())
@@ -1150,7 +1150,7 @@ class WMSessionModifSchedule(sessions.WSessionModifSchedule):
                 editSlotLink= _("""<input type="submit" value="_("edit slot")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlEditSlot)
                 if len(self._session.getSlotList()) > 1:
                     delSlotLink= _("""<input type="submit" value="_("delete slot")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlDelSlot)
-        
+
         return  _("""
         <td colspan="%s" bgcolor="%s" align="center" valign="middle" width="%s%%" style="color: black;">
         <table width="100%%">
@@ -1168,11 +1168,11 @@ class WMSessionModifSchedule(sessions.WSessionModifSchedule):
                              addContrib, \
                              str(urlNewContrib), \
                              str(urlAddBreak), \
-                             editSlotLink,delSlotLink,fitSlotLink,compactSlotLink, str(urlCalSlot))   
-            
-    
+                             editSlotLink,delSlotLink,fitSlotLink,compactSlotLink, str(urlCalSlot))
+
+
     def _getSlotsDisabledScheduleHTML(self):
-        tz = self._session.getConference().getTimezone() 
+        tz = self._session.getConference().getTimezone()
         timeTable=timetable.TimeTable(self._session.getSlotList()[0].getSchedule(),tz)
         sDate=self._session.getSlotList()[0].getSchedule().getAdjustedStartDate()
         eDate=self._session.getSlotList()[0].getSchedule().getAdjustedEndDate()
@@ -1222,7 +1222,7 @@ class WMSessionModifSchedule(sessions.WSessionModifSchedule):
                                 "".join(temp))
                 else:
                     temp="""<tr>%s</tr>"""%"".join(temp)
-                slotList.append(temp)            
+                slotList.append(temp)
             orginURL = urlHandlers.UHConfModifSchedule.getURL(self._session)
             reducedScheduleActionURL = urlHandlers.UHReducedSessionScheduleAction.getURL(self._session)
             reducedScheduleActionURL.addParam("slotId",0)
@@ -1232,32 +1232,32 @@ class WMSessionModifSchedule(sessions.WSessionModifSchedule):
         <table align="center" width="100%%">
             <tr>
                 <td width="60%%">
-                    <table align="center" border="0" width="100%%" 
+                    <table align="center" border="0" width="100%%"
                             celspacing="0" cellpadding="0" bgcolor="#E6E6E6">
                         <tr>
-                            <td colspan="%i" align="center" 
+                            <td colspan="%i" align="center"
                                                     bgcolor="white">
                                 <table cellspacing="0" cellpadding="0"
                                         width="100%%">
                                     <tr>
                                         <td align="center" width="100%%">
-                                            <b>%s</b> 
-                                        </td>                                        
+                                            <b>%s</b>
+                                        </td>
                                         <td align="right">
                                             &nbsp;
-                                        </td>                                
+                                        </td>
                                         <td align="right">
                                             &nbsp;
                                         </td>
                                         <form action=%s method="POST">
-                                        <td align="right">                                                                                    
-                                            <input type="submit" class="btn" name="newContrib" value="_("new contribution")">   
+                                        <td align="right">
+                                            <input type="submit" class="btn" name="newContrib" value="_("new contribution")">
                                         </td>
-                                        <td align="right">                                        
-                                            <input type="submit" class="btn" name="newBreak" value="_("new break")">   
-                                        </td>                                        
-                                        <td align="right">                                            
-                                            <input type="submit" class="btn" name="reschedule" value="_("reschedule")">   
+                                        <td align="right">
+                                            <input type="submit" class="btn" name="newBreak" value="_("new break")">
+                                        </td>
+                                        <td align="right">
+                                            <input type="submit" class="btn" name="reschedule" value="_("reschedule")">
                                         </td>
                                         </form>
                                     </tr>
@@ -1270,20 +1270,20 @@ class WMSessionModifSchedule(sessions.WSessionModifSchedule):
             </tr>
         </table>
                 """)%(day.getDate().strftime("%Y-%m-%d"),maxOverlap+2,
-                        day.getDate().strftime("%A, %d %B %Y"),                                                
-                        quoteattr(str(reducedScheduleActionURL)),                                                
+                        day.getDate().strftime("%A, %d %B %Y"),
+                        quoteattr(str(reducedScheduleActionURL)),
                         "".join(slotList))
             daySch.append(res)
         return "<br>".join(daySch)
-    
-    
-    def _getScheduleHTML(self, eventType="conference"): 
+
+
+    def _getScheduleHTML(self, eventType="conference"):
         if self._session.getConference().getEnableSessionSlots() :
             return sessions.WSessionModifSchedule._getScheduleHTML(self,"meeting")
         else :
-            return self._getSlotsDisabledScheduleHTML() 
-            
-    
+            return self._getSlotsDisabledScheduleHTML()
+
+
     def getVars( self ):
         vars = sessions.WSessionModifSchedule.getVars(self)
         if self._session.getConference().getEnableSessionSlots() :
@@ -1292,14 +1292,14 @@ class WMSessionModifSchedule(sessions.WSessionModifSchedule):
             editURL = urlHandlers.UHSessionDatesModification.getURL(self._session)
             vars["fitToInnerSlots"] =  _("""<input type="submit" class="btn" value="_("fit inner timetable")"><input type="submit" class="btn" value="_("modify dates")" onClick="this.form.action='%s';">""") % editURL
         return vars
-        
+
 ######################################################################
 class WPMeetingDisplay( WPConferenceDisplayBase ):
 
     def _getNavigationDrawer(self):
         pars = {"target": self._conf, "isModif": False}
         return wcomponents.WNavigationDrawer( pars )
-    
+
     def _getHeader( self ):
         """
         """
@@ -1312,7 +1312,7 @@ class WPMeetingDisplay( WPConferenceDisplayBase ):
                              "filterActive": False,\
                              "dark": True,\
                              "loginAsURL": self.getLoginAsURL()} )
-    
+
     def _getBody( self, params ):
 
         wc = WMeetingDisplay( self._getAW(), self._conf )
@@ -1326,7 +1326,7 @@ class WPMeetingDisplay( WPConferenceDisplayBase ):
 
 
 class WMeetingContribBaseDisplayItem(wcomponents.WTemplated):
-    
+
     def getHTML( self, contribution, aw, modifyURLGen, materialsURLGen, subContribModifyURLGen ):
         self.__contrib = contribution
         self.__modifyURLGen = modifyURLGen
@@ -1352,7 +1352,7 @@ class WMeetingContribBaseDisplayItem(wcomponents.WTemplated):
             vars["place"] = "%s"%location.getName().upper()
             if location.getAddress().strip() != "":
                 vars["place"] += "(%s)"%location.getAddress()
-            
+
         room = self.__contrib.getOwnRoom()
         if room:
             location = self.__contrib.getLocation()
@@ -1386,7 +1386,7 @@ class WMeetingContribBaseDisplayItem(wcomponents.WTemplated):
             vars["materials"] = ""
         else:
             vars["materials"] = "(%s)"%", ".join( ml )
-        
+
         vars["materialURLGen"] = self.__materialsURLGen
         scl = []
         for sc in self.__contrib.getSubContributionList():
@@ -1401,7 +1401,7 @@ class WMeetingContribBaseDisplayItem(wcomponents.WTemplated):
         vars["modifyItem"] = ""
         if self.__contrib.canModify( self.__aw ):
             vars["modifyItem"] = """<a href="%s"><img src="%s" border="0" alt="Jump to the modification interface"></a> """%(self.__modifyURLGen( self.__contrib ), Configuration.Config.getInstance().getSystemIconURL("modify") )
-        return vars    
+        return vars
 
 
 class WMeetingContribFullDisplayItem(WMeetingContribBaseDisplayItem):
@@ -1413,7 +1413,7 @@ class WMeetingContribMinimalDisplayItem(WMeetingContribBaseDisplayItem):
 
 
 class WMeetingContribDisplayItem:
-    
+
     def getHTML(self, contrib, aw, modifyURLGen, materialsURLGen, subContribModifyURLGen):
         if not contrib.canView( aw ):
             return ""
@@ -1424,7 +1424,7 @@ class WMeetingContribDisplayItem:
                                                 modifyURLGen, materialsURLGen, subContribModifyURLGen )
 
 class WMeetingSessionSlotBaseDisplayItem(wcomponents.WTemplated):
-    
+
     def getHTML( self, slot, aw, modifyURLGen, contribModifyURLGen, materialURLGen, subContribModifyURLGen ):
         self.__session  = slot.getSession()
         self.__slot = slot
@@ -1435,11 +1435,11 @@ class WMeetingSessionSlotBaseDisplayItem(wcomponents.WTemplated):
         self.__subContribModifyURLGen = subContribModifyURLGen
         html = wcomponents.WTemplated.getHTML( self, {} )
         return html
-    
+
     def __getSchedule( self, contribModifURLGen, materialURLGen, subContribModifyURLGen ):
         l = []
         for entry in self.__slot.getSchedule().getEntries():
-            if type( entry ) == schedule.BreakTimeSchEntry: 
+            if type( entry ) == schedule.BreakTimeSchEntry:
                 l.append( WMeetingBreakDisplayItem().getHTML(entry, \
                                                       self.__aw) )
             else:
@@ -1461,7 +1461,7 @@ class WMeetingSessionSlotBaseDisplayItem(wcomponents.WTemplated):
         if str.strip() == "":
             return ""
         return str
-            
+
     def __getConvenersHTML( self, convList ):
         cl = []
         if self.__session.getConvenerText()!="":
@@ -1470,7 +1470,7 @@ class WMeetingSessionSlotBaseDisplayItem(wcomponents.WTemplated):
             cl.append(conv.getFullName())
         html = ""
         if len(cl) > 0:
-            html = self.__getHTMLRow( _("Conveners"), "<br>".join(cl) ) 
+            html = self.__getHTMLRow( _("Conveners"), "<br>".join(cl) )
         return html
 
     def __getMaterialHTML( self, matList ):
@@ -1537,7 +1537,7 @@ class WMeetingSessionSlotFullDisplayItem(WMeetingSessionSlotBaseDisplayItem):
     pass
 
 class WMeetingSessionSlotDisplayItem:
-    
+
     def getHTML(self, slot, aw, modifyURLGen, contribModifyURLGen, materialURLGen, subContribModifyURLGen ):
         session = slot.getSession()
         if not session.canView( aw ):
@@ -1551,7 +1551,7 @@ class WMeetingSessionSlotDisplayItem:
                                             materialURLGen, subContribModifyURLGen )
 
 class WMeetingBaseDisplay(wcomponents.WTemplated):
-    
+
     def getHTML(self, aw, conference, params=None):
         self.__conf = conference
         self.__aw = aw
@@ -1575,7 +1575,7 @@ class WMeetingBaseDisplay(wcomponents.WTemplated):
                                                         contribModifURLGen, \
                                                         materialURLGen,\
                                                         subContribModifyURLGen ) )
-            elif type( entry ) == schedule.BreakTimeSchEntry: 
+            elif type( entry ) == schedule.BreakTimeSchEntry:
                 l.append( WMeetingBreakDisplayItem().getHTML(entry, \
                                                       self.__aw ) )
             elif type(entry) is conference.ContribSchEntry:
@@ -1601,7 +1601,7 @@ class WMeetingBaseDisplay(wcomponents.WTemplated):
             if body.strip() == "":
                 return ""
         return str
-                            
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         vars["title"] = self.__conf.getTitle()
@@ -1659,7 +1659,7 @@ class WMeetingDisplay(object):
     def __init__( self, aw, conference ):
         self._aw = aw
         self._conf = conference
-    
+
     def getHTML(self, params):
         if self._conf.canAccess( self._aw ):
             return WMeetingFullDisplay().getHTML( self._aw, \
@@ -1680,10 +1680,10 @@ class WMeetingMinimalDisplay(WMeetingBaseDisplay):
 #################### Participants #####################################
 
 class WPMConfModifParticipantsNewPending(WPMeetingDisplay,conferences.WPConfModifParticipantsNewPending):
-    
+
     def __init__(self, rh, conf):
         WPMeetingDisplay.__init__(self, rh, conf)
-    
+
     def _getBody(self, params):
         return conferences.WPConfModifParticipantsNewPending._getBody(self, params)
 
@@ -1695,7 +1695,7 @@ class WPMEvaluationBase( WPMeetingDisplay ):
 
 class WPMEvaluationDisplay (WPMEvaluationBase, evaluations.WPEvaluationDisplay):
     """[Meeting] Evaluation default display."""
-    
+
     def __init__(self, rh, conf):
         WPMeetingDisplay.__init__(self, rh, conf)
         # An hack to make sure that the background is the same as the header
@@ -1712,69 +1712,69 @@ class WPMEvaluationDisplay (WPMEvaluationBase, evaluations.WPEvaluationDisplay):
 
 class WPMEvaluationDisplayModif (WPMEvaluationBase, evaluations.WPEvaluationDisplayModif):
     """[Meeting] The user can modify his already submitted evaluation."""
-    
+
     def __init__(self, rh, conf):
         WPMeetingDisplay.__init__(self, rh, conf)
-    
+
     def _getBody(self, params):
         return evaluations.WPEvaluationDisplayModif._getBody(self, params)
 
 class WPMEvaluationSubmitted (WPMEvaluationBase, evaluations.WPEvaluationSubmitted):
     """[Meeting] Submitted evaluation."""
-    
+
     def __init__(self, rh, conf, mode):
         self._mode = mode
         WPMeetingDisplay.__init__(self, rh, conf)
-    
+
     def _getBody(self, params):
         return evaluations.WPEvaluationSubmitted._getBody(self, params)
 
 class WPMEvaluationFull (WPMEvaluationBase, evaluations.WPEvaluationFull):
     """[Meeting] Evaluation is full."""
-    
+
     def __init__(self, rh, conf):
         WPMeetingDisplay.__init__(self, rh, conf)
-    
+
     def _getBody(self, params):
         return evaluations.WPEvaluationFull._getBody(self, params)
 
 class WPMEvaluationClosed (WPMEvaluationBase, evaluations.WPEvaluationClosed):
     """[Meeting] Evaluation is closed."""
-    
+
     def __init__(self, rh, conf):
         WPMeetingDisplay.__init__(self, rh, conf)
-    
+
     def _getBody(self, params):
         return evaluations.WPEvaluationClosed._getBody(self, params)
 
 class WPMEvaluationSignIn (WPMEvaluationBase, evaluations.WPEvaluationSignIn):
     """[Meeting] Invite user to login/signin."""
-    
+
     def __init__(self, rh, conf):
         WPMeetingDisplay.__init__(self, rh, conf)
-    
+
     def _getBody(self, params):
         return evaluations.WPEvaluationSignIn._getBody(self, params)
 
 class WPMEvaluationInactive (WPMEvaluationBase, evaluations.WPEvaluationInactive):
     """[Meeting] Inactive evaluation."""
-    
+
     def __init__(self, rh, conf):
         WPMeetingDisplay.__init__(self, rh, conf)
-    
+
     def _getBody(self, params):
         return evaluations.WPEvaluationInactive._getBody(self, params)
-        
+
 #################### Alarms #####################################
-        
+
 class WPMConfAddAlarm(WPMConfModifTools, conferences.WPConfAddAlarm):
-    
+
     def __init__(self, rh, conf):
         WPMConfModifTools.__init__(self, rh, conf)
-        
+
     def _setActiveTab( self ):
         self._tabAlarms.setActive()
-        
+
     def _getTabContent(self, params):
         params["toAllParticipants"] =  _("""
         <tr>
@@ -1783,9 +1783,9 @@ class WPMConfAddAlarm(WPMConfModifTools, conferences.WPConfAddAlarm):
         </tr>
         """)
         return conferences.WPConfAddAlarm._getTabContent(self, params)
-    
+
 class WPMTimeTableCustomizePDF(WPMeetingDisplay):
-    
+
     def __init__(self, rh, conf):
         WPMeetingDisplay.__init__(self, rh, conf)
         # An hack to make sure that the background is the same as the header
@@ -1795,13 +1795,13 @@ class WPMTimeTableCustomizePDF(WPMeetingDisplay):
         wc = wcomponents.WFooter()
         p = {"dark":True}
         return wc.getHTML(p)
-    
+
     def _getBody( self, params ):
         wc = WMTimeTableCustomizePDF( self._conf )
         return wc.getHTML(params)
 
 class WMTimeTableCustomizePDF(wcomponents.WTemplated):
-    
+
     def __init__(self, conf):
         self._conf = conf
 
@@ -1814,7 +1814,7 @@ class WMTimeTableCustomizePDF(wcomponents.WTemplated):
 
 ######################## Get file package ######################
 class WPMDisplayFullMaterialPackage(WPMeetingDisplay, conferences.WPDisplayFullMaterialPackage):
-    
+
     def __init__(self, rh, conf):
         WPMeetingDisplay.__init__(self, rh, conf)
         # An hack to make sure that the background is the same as the header
