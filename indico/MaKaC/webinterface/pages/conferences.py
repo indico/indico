@@ -322,9 +322,9 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
         if onAirURL:
             webcastURL = onAirURL
         else:
-            webcastURL = wm.getWebcastServiceURL() 
+            webcastURL = wm.getWebcastServiceURL()
         forthcomingWebcast = not onAirURL and wm.getForthcomingWebcast(self._conf)
-        
+
         frameParams = {\
             "confModifURL": urlHandlers.UHConferenceModification.getURL(self._conf), \
             "logoURL": urlHandlers.UHConferenceLogo.getURL( self._conf), \
@@ -2170,11 +2170,11 @@ class WPConferenceModifBase( main.WPMainBase ):
 
         if not (canModify or isAnyCollaborationPluginManager):
             self._videoServicesMenuItem.setVisible(False)
-            
+
         #we hide the Advanced Options section if it has no items
         if not self._advancedOptionsSection.hasVisibleItems():
             self._advancedOptionsSection.setVisible(False)
-        
+
         #tabs forced to be disabled for now
         self._participantsMenuItem.setVisible(False)
 
@@ -12196,11 +12196,11 @@ class WConfModifBadgeDesign( wcomponents.WTemplated ):
             vars["saveTemplateURL"]=urlHandlers.UHConfModifBadgePrinting.getURL(self.__conf)
             vars["titleMessage"]= _("Editing badge template")
             vars["editingTemplate"]="true"
-            
+
             from MaKaC.services.interface.rpc.json import encode as jsonEncode
             templateDataString = jsonEncode(self.__conf.getBadgeTemplateManager().getTemplateData(self.__templateId))
             vars["templateData"]= templateDataString
-            
+
             usedBackgroundId = self.__conf.getBadgeTemplateManager().getTemplateById(self.__templateId).getUsedBackgroundId()
             vars["backgroundId"] = usedBackgroundId
             if usedBackgroundId != -1:
@@ -12390,7 +12390,7 @@ class WConfModifPosterPDFOptions( wcomponents.WTemplated ):
         for pagesizeName in pagesizeNames:
             pagesizeOptions.append('<option')
             if pagesizeName == 'A4':
-                pagesizeOptions.append( _("SELECTED"))
+                pagesizeOptions.append(" SELECTED")
             pagesizeOptions.append('>')
             pagesizeOptions.append(pagesizeName)
             pagesizeOptions.append('</option>')
