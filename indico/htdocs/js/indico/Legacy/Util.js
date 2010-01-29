@@ -35,19 +35,21 @@ var IndicoUtil = {
         }
         for (var i=0; i < formNodes.length; i++) {
             var node = formNodes[i];
-            if (node.type == "checkbox") {
-                if (!exists(values[node.name])) {
-                    values[node.name] = [];
-                }
-                if (node.checked) {
-                    values[node.name].push(node.value);
-                }
-            } else if (node.type == "radio") {
-                if (node.checked) {
+            if (exists(node.name) && node.name) {
+                if (node.type == "checkbox") {
+                    if (!exists(values[node.name])) {
+                        values[node.name] = [];
+                    }
+                    if (node.checked) {
+                        values[node.name].push(node.value);
+                    }
+                } else if (node.type == "radio") {
+                    if (node.checked) {
+                        values[node.name] = node.value;
+                    }
+                } else {
                     values[node.name] = node.value;
                 }
-            } else {
-                values[node.name] = node.value;
             }
         }
         return values;
