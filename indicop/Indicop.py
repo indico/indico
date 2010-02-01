@@ -30,6 +30,7 @@ import socket
 import time
 import commands
 import StringIO
+import shutil
 import signal
 import tempfile
 from BaseTest import BaseTest
@@ -701,7 +702,7 @@ class Indicop(object):
 
         #stoppingfake DB
         self.stopDB()
-        #self.deleteTempFolders()
+        self.deleteTempFolders()
 
         return returnString
 
@@ -760,37 +761,11 @@ class Indicop(object):
         os.chdir(savedDir)
 
     def deleteTempFolders(self):
-        print "DEL %s" % self.newValues
         for k in self.newValues:
-            for root, dirs, files in os.walk(self.newValues[k]):
-                for name in files:
-                    print "FILES %s" % os.path.join(root, name)
-                    os.unlink(os.path.join(root, name))
-#            for root, dirs, files in os.walk(self.newValues[k]):
-#                for dir in dirs:
-#                    print "DIR %s" % os.path.join(root, dir)
-#                    os.rmdir(os.path.join(root, dir))
-            os.removedirs(self.newValues[k])
-        print "DELEND"
+            shutil.rmtree(self.newValues[k])
 
     def removeDBFile(self):
-        savedDir = os.getcwd()
-        try:
-            os.chdir(self.dbFolder)
-
-            os.unlink("Data.fs")
-            os.unlink("Data.fs.index")
-            os.unlink("Data.fs.lock")
-            os.unlink("Data.fs.tmp")
-            os.rmdir(self.dbFolder)
-        except OSError:
-            #directory does not exist yet
-            pass
-        except IOError:
-            #files do not exist
-            pass
-
-        os.chdir(savedDir)
+        shutil.rmtree(self.dbFolder)
 
     def createDBServer(self, file, port):
         pid = os.fork()

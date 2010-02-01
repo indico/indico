@@ -331,12 +331,12 @@ class test_indico(Command):
         from indicop.Indicop import Indicop
         testsToRun = []
 
-        if not self.checkPackages():
+        if not self.checkIndicopPackages():
             print "Please install those missing packages before launching the tests again"
             sys.exit(-1)
 
         #missing jars will be downloaded automatically
-        if not self.checkJars():
+        if not self.checkIndicopJars():
             print "Some jars could not be downloaded. Please download the missing jars manually"
             sys.exit(-1)
 
@@ -362,9 +362,10 @@ class test_indico(Command):
 
         indicop = Indicop.getInstance(self.jsspecify, self.jscoverage)
         result = indicop.main(self.specify, self.coverage, testsToRun)
+
         print result
 
-    def checkPackages(self):
+    def checkIndicopPackages(self):
         packagesList = ['figleaf',
                         'nose',
                         'selenium',
@@ -381,7 +382,7 @@ i.e. try 'easy_install %s'""" % (package, package)
                 validPackages = False
         return validPackages
 
-    def checkJars(self):
+    def checkIndicopJars(self):
         """check if needed jars are here, if not, dowloading them and unzip a file if necessary"""
         jarsList = {}
         currentFilePath = os.path.dirname(__file__)
@@ -470,16 +471,12 @@ if __name__ == '__main__':
 
 
     #Dirty trick: For running tests, we need to load all the modules and get rid of unnecessary outputs
+    tempLoggingDir = None
     if 'test' in sys.argv:
         import logging
         import tempfile
-#        try:
-#            os.mkdir('/tmp/indicop/')
-#            os.mkdir('/tmp/indicop/log')
-#        except OSError:
-#            pass
-#        logging.basicConfig(filename='/tmp/indicop/log/debug',level=logging.DEBUG)
-        logging.basicConfig(filename=os.path.join(tempfile.mkdtemp(), 'logging'), level=logging.DEBUG)
+        tempLoggingDir = tempfile.mkdtemp()
+        logging.basicConfig(filename=os.path.join(tempLoggingDir, 'logging'), level=logging.DEBUG)
         setIndicoInstallMode(False)
     else:
         setIndicoInstallMode(True)
@@ -532,4 +529,6 @@ if __name__ == '__main__':
                               ],
           )
 
-
+    #delete the temp folder used for logging
+    if 'test' in sys.argv:
+        shutil.rmtree(tempLoggingDir)
