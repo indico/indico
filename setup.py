@@ -384,33 +384,35 @@ i.e. try 'easy_install %s'""" % (package, package)
         return validPackages
 
     def checkIndicopJars(self):
+        from indicop.Indicop import TestsConfig
+
         """check if needed jars are here, if not, dowloading them and unzip a file if necessary"""
         jarsList = {}
         currentFilePath = os.path.dirname(__file__)
 
-        jarsList['jsunit'] = {'url': "http://js-test-driver.googlecode.com/files/JsTestDriver-1.2.jar",
-                                      'path': os.path.join(currentFilePath,
-                                            'indicop',
-                                            'javascript',
-                                            'unit'),
-                                      'filename': "JsTestDriver-1.2.jar"}
+        jarsList['jsunit'] = {'path':     os.path.join(currentFilePath,
+                                                       'indicop',
+                                                       'javascript',
+                                                       'unit'),
+                              'url':      TestsConfig.getInstance().getJsunitURL(),
+                              'filename': TestsConfig.getInstance().getJsunitFilename()}
 
-        jarsList['jscoverage'] = {'url': "http://js-test-driver.googlecode.com/files/coverage-1.2.jar",
-                                  'path': os.path.join(currentFilePath,
-                                        'indicop',
-                                        'javascript',
-                                        'unit',
-                                        'plugins'),
-                                  'filename': "coverage-1.2.jar"}
+        jarsList['jscoverage'] = {'path':     os.path.join(currentFilePath,
+                                                           'indicop',
+                                                           'javascript',
+                                                           'unit',
+                                                           'plugins'),
+                                  'url':      TestsConfig.getInstance().getJscoverageURL(),
+                                  'filename': TestsConfig.getInstance().getJscoverageFilename()}
 
-        jarsList['selenium'] = {'url': "http://release.seleniumhq.org/selenium-remote-control/1.0.1/selenium-remote-control-1.0.1-dist.zip",
-                                'path': os.path.join(currentFilePath,
-                                        'indicop',
-                                        'python',
-                                        'functional'),
-                                'filename': "selenium-server.jar",
-                                'zipname': "selenium-remote-control-1.0.1-dist.zip",
-                                'inZipPath': "selenium-remote-control-1.0.1/selenium-server-1.0.1/selenium-server.jar"}
+        jarsList['selenium'] = {'path':      os.path.join(currentFilePath,
+                                                          'indicop',
+                                                          'python',
+                                                          'functional'),
+                                'url':       TestsConfig.getInstance().getSeleniumURL(),
+                                'inZipPath': TestsConfig.getInstance().getSeleniumInZipPath(),
+                                'zipname':   TestsConfig.getInstance().getSeleniumZipname(),
+                                'filename':  TestsConfig.getInstance().getSeleniumFilename()}
 
         validJars = True
 

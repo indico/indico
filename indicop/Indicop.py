@@ -206,7 +206,7 @@ class Functional(BaseTest):
                                       os.path.join(self.setupDir,
                                                    'python',
                                                    'functional',
-                                                   'selenium-server.jar')],
+                                                   TestsConfig.getInstance().getSeleniumFilename())],
                                       stdout=subprocess.PIPE)
         except OSError, e:
             return ("[ERR] Could not start selenium server - command \"java\""
@@ -266,11 +266,11 @@ class Specify(Functional):
             return "[FAIL] Specified Test - read output from console\n"
 
 class Grid(BaseTest):
-    def __init__(self, hubUrl, hubPort, hubEnv):
-        self.hubEnv = hubEnv
+    def __init__(self):
+        self.hubEnv = TestsConfig.getInstance().getHubEnv()
         self.gridData = GridData.getInstance()
-        self.gridData.setUrl(hubUrl)
-        self.gridData.setPort(hubPort)
+        self.gridData.setUrl(TestsConfig.getInstance().getHubURL())
+        self.gridData.setPort(TestsConfig.getInstance().getHubPort())
         self.gridData.setActive(False)
 
     def run(self):
@@ -425,7 +425,7 @@ class Jsunit(BaseTest):
                                        os.path.join(self.setupDir,
                                                     'javascript',
                                                     'unit',
-                                                    'JsTestDriver-1.2.jar'),
+                                                    TestsConfig.getInstance().getJsunitFilename()),
                                         "--port",
                                         "9876",
                                         "--browser",
@@ -446,10 +446,10 @@ class Jsunit(BaseTest):
             #check if server is ready
             for i in range(5):
                 jsDryRun = commands.getstatusoutput(("java -jar "
-                                             "JsTestDriver-1.2.jar"
+                                             "%s"
                                              " --config "
                                              "%s"
-                                             " --tests Fake.dryRun") % confFile)
+                                             " --tests Fake.dryRun") % (TestsConfig.getInstance().getJsunitFilename(), confFile))
                 if jsDryRun[1].startswith("No browsers were captured"):
                     print ("Js-test-driver server has not started yet. "
                            "Attempt #%s\n") % (i+1)
@@ -468,10 +468,10 @@ class Jsunit(BaseTest):
             else:
                 toTest = "all"
 
-            command = ("java -jar JsTestDriver-1.2.jar "
-                                             "--config %s "
-                                             "--tests %s ") % \
-                                             (confFile, toTest)
+            command = ("java -jar %s "
+                            "--config %s "
+                            "--tests %s ") % \
+                            (TestsConfig.getInstance().getJsunitFilename(), confFile, toTest)
             if self.coverage:
                 command += "--testOutput %s" % coveragePath
 
@@ -545,8 +545,8 @@ class Jsunit(BaseTest):
         #lines needed to activate coverage plugin
         coverageConf = """\nplugin:
   - name: \"coverage\"
-    jar: \"plugins/coverage-1.2.jar\"
-    module: \"com.google.jstestdriver.coverage.CoverageModule\""""
+    jar: \"plugins/%s\"
+    module: \"com.google.jstestdriver.coverage.CoverageModule\"""" % TestsConfig.getInstance().getJscoverageFilename()
 
 
         try:
@@ -673,12 +673,6 @@ class Indicop(object):
         self.dbmgr = None
         self.zeoServer = None
 
-        #MODIFY ACCORDINGLY TO YOUR SELENIUM GRID INSTALLATION
-        self.gridUrl = "macuds04.cern.ch"
-        self.gridPort = 4444
-        self.gridEnv = ["Firefox on OS X",
-                        "Safari on OS X"]
-
         #variables for jsunit
         self.jsSpecify = jsspecify
         self.jsCoverage = jscoverage
@@ -689,7 +683,7 @@ class Indicop(object):
                  'pylint': Pylint(),
                  'jsunit': Jsunit(self.jsSpecify, self.jsCoverage),
                  'jslint': Jslint(),
-                 'grid': Grid(self.gridUrl, self.gridPort, self.gridEnv)}
+                 'grid': Grid()}
 
 
     def main(self, specify, coverage, testsToRun):
@@ -699,7 +693,7 @@ class Indicop(object):
         #To not pollute the installation of Indico
         self.reconfigureFolders()
 
-        #setting and starting fake DB
+        #Stopping current DB and setting and starting fake DB
         self.startDB()
 
         if coverage:
@@ -798,4 +792,40 @@ class Indicop(object):
     def getInstance(cls, jsspecify, jscoverage):
         if cls.__instance == None:
             cls.__instance = Indicop(jsspecify, jscoverage)
+        return cls.__instance
+
+class TestsConfig:
+    __instance = None
+
+    def __init__(self):
+        execfile(os.path.join(os.path.dirname(__file__), 'tests.conf'))
+        self.testsConf = locals()
+
+    def __getattr__(self, attr):
+        """Dynamic finder for values defined in indico.conf
+
+            For example, if an indico.conf value is "username" this method will
+            return its value for a getUsername() call.
+
+            If you add a new pair option = value to indico.conf there is no need to
+            create anything here. It will be returned automatically.
+
+            This all means that changing the name of an indico.conf will force you
+            to change all references in code to getOldOptionName to getNewOptionName
+            including the reference in default_values in this file.
+        """
+        # The following code intercepts all method calls that start with get and are
+        # not already defined (so you can still override a get method if you want)
+        # and returns a closure that returns the value of the option being asked for
+        if attr[0:3] == 'get':
+            def configFinder(k):
+                return self.testsConf[k]
+            return lambda: configFinder(attr[3:])
+        else:
+            raise AttributeError
+
+    @classmethod
+    def getInstance(cls):
+        if cls.__instance == None:
+            cls.__instance = TestsConfig()
         return cls.__instance
