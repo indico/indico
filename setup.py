@@ -328,8 +328,6 @@ class test_indico(Command):
     def finalize_options(self): pass
 
     def run(self):
-        from indicop.Indicop import Indicop
-        testsToRun = []
 
         if not self.checkIndicopPackages():
             print "Please install those missing packages before launching the tests again"
@@ -339,6 +337,9 @@ class test_indico(Command):
         if not self.checkIndicopJars():
             print "Some jars could not be downloaded. Please download the missing jars manually"
             sys.exit(-1)
+
+        from indicop.Indicop import Indicop
+        testsToRun = []
 
         if self.pylint:
             testsToRun.append('pylint')

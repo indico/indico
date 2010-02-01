@@ -194,6 +194,7 @@ class BaseTest(object):
         self.ahD.remove(self.avatarD)
 
         self.db.endRequest(True)
+        DBMgr.setInstance(self.fakedb)
 
 ################################################
 #            end of block

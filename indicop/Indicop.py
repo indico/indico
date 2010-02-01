@@ -252,7 +252,7 @@ class Specify(Functional):
 
             #running the test and ouputing in the console
             result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir,
-                                                               'python',
+                                                               '..',
                                                                self.specify)])
 
             if self.specify.find('unit/') < 0:
@@ -285,7 +285,11 @@ class Grid(BaseTest):
         try:
             selTimeout()
         except TimeoutFunctionException:
-            return "[FAIL] Selenium Grid - Hub is probably down (%s:%s)" % \
+            return "[ERR] Selenium Grid - Hub is probably down (%s:%s)" % \
+                    (self.gridData.getUrl(), self.gridData.getPort())
+        except socket.error:
+            return ("[ERR] Selenium Grid - Connection refused, check your "
+                    "hub's settings (%s:%s)") % \
                     (self.gridData.getUrl(), self.gridData.getPort())
         else:
             print "Hub is UP, continue with grid tests"
@@ -305,7 +309,7 @@ class Grid(BaseTest):
             if result:
                 returnString += "PY Functional (%s) tests succeeded\n" % env
             else:
-                returnString += ("[FAIL] Functional (%s) tests - report in "
+                returnString += ("[FAIL] Functional (%s) tests - report in"
                         " indicop/report/pygrid.txt\n") % env
 
         #restoring the stderr
@@ -594,10 +598,10 @@ class Jslint(BaseTest):
         returnString = ""
         self.startMessage("Starting jslint tests")
 
-        #Folders which are going to be scanned.
-        #Files are going to be find recursively in these folders
-        folderNames = ['Admin', 'Collaboration', 'Core', 'Display', 'Legacy',
-                       'Management', 'MaterialEditor', 'Timetable']
+        #Folders which are not going to be scanned.
+        #Files are going to be find recursively in the other folders
+        import sets
+        blackList = sets.Set(['pack', 'Loader.js', 'Common', 'i18n'])
 
         outputString = ""
 
@@ -606,6 +610,18 @@ class Jslint(BaseTest):
         if statusOutput[1].find("rhino: not found") > -1:
             return ("[ERR] Could not start JS Source Analysis - command "
                     "\"rhino\" needs to be in your PATH. (%s)\n" % statusOutput[1])
+
+        #constructing a list of folders to scan
+        folderNames = []
+        list  = os.listdir(os.path.join(self.setupDir,
+                                        '..',
+                                        'indico',
+                                        'htdocs',
+                                        'js',
+                                        'indico'))
+        for name in list:
+            if not (name in blackList):
+                folderNames.append(name)
 
         #Scanning Indico core
         for folderName in folderNames:
@@ -658,7 +674,7 @@ class Indicop(object):
         self.zeoServer = None
 
         #MODIFY ACCORDINGLY TO YOUR SELENIUM GRID INSTALLATION
-        self.gridUrl = "macuds01.cern.ch"
+        self.gridUrl = "macuds04.cern.ch"
         self.gridPort = 4444
         self.gridEnv = ["Firefox on OS X",
                         "Safari on OS X"]
