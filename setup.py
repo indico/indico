@@ -298,7 +298,7 @@ Please specify the directory where you'd like it to be placed.
             fdata = re.sub('\/opt\/indico\/%s'%dir[0], d, fdata)
         open(filePath, 'w').write(fdata)
 
-class tests_indico(Command):
+class test_indico(Command):
     description = "Test Suite Framework"
     user_options = [('specify=', None, "Use nosetests style (file.class:testcase)"),
                     ('coverage', None, "Output coverage report in html"),
@@ -470,9 +470,16 @@ if __name__ == '__main__':
 
 
     #Dirty trick: For running tests, we need to load all the modules and get rid of unnecessary outputs
-    if 'tests' in sys.argv:
+    if 'test' in sys.argv:
         import logging
-        logging.basicConfig(filename='/tmp/indicop/log/debug',level=logging.DEBUG)
+        import tempfile
+#        try:
+#            os.mkdir('/tmp/indicop/')
+#            os.mkdir('/tmp/indicop/log')
+#        except OSError:
+#            pass
+#        logging.basicConfig(filename='/tmp/indicop/log/debug',level=logging.DEBUG)
+        logging.basicConfig(filename=os.path.join(tempfile.mkdtemp(), 'logging'), level=logging.DEBUG)
         setIndicoInstallMode(False)
     else:
         setIndicoInstallMode(True)
@@ -495,7 +502,7 @@ if __name__ == '__main__':
                     'jsbuild': jsbuild,
                     'fetchdeps': fetchdeps_indico,
                     'develop': develop_indico,
-                    'tests': tests_indico,
+                    'test': test_indico,
                     },
 
           version = _versionInit(),

@@ -31,6 +31,7 @@ import time
 import commands
 import StringIO
 import signal
+import tempfile
 from BaseTest import BaseTest
 from selenium import selenium
 from MaKaC.common.db import DBMgr
@@ -700,27 +701,25 @@ class Indicop(object):
 
         #stoppingfake DB
         self.stopDB()
+        #self.deleteTempFolders()
 
         return returnString
 
     def reconfigureFolders(self):
-        newValues = {'LogDir': '/tmp/indicop/log',
-         'ArchiveDir': '/tmp/indicop/archive',
-         'UploadedFilesTempDir': '/tmp/indicop/tmp'}
-        for k in newValues:
-            try:
-                os.mkdir(newValues[k])
-            except OSError:
-                pass
+        keyNames = ['LogDir',
+                    'ArchiveDir',
+                    'UploadedFilesTempDir']
+        self.newValues = {}
 
-        Config.getInstance().updateValues(newValues)
+        for key in keyNames:
+            self.newValues[key] = tempfile.mkdtemp()
 
+        Config.getInstance().updateValues(self.newValues)
 
     def startDB(self):
         zeoPort = 9686
-        self.removeDBFile()
         self.createNewDBFile()
-        self.zeoServer = self.createDBServer("/tmp/indicop/Data.fs", zeoPort)
+        self.zeoServer = self.createDBServer(os.path.join(self.dbFolder, "Data.fs"), zeoPort)
         print ("zodb server started on pid: " + str(self.zeoServer) + " .")
         print ("Creating a CustomDBMgr on port " + str(zeoPort))
         self.dbmgr = DBMgr(hostname="localhost", port=zeoPort)
@@ -741,14 +740,13 @@ class Indicop(object):
             os.wait()
         except OSError, e:
             print ("Problem waiting for ZEO Server: " + str(e))
+        self.removeDBFile()
 
     def createNewDBFile(self):
         savedDir = os.getcwd()
-        try:
-            os.mkdir("/tmp/indicop")
-        except OSError:
-            pass
-        os.chdir("/tmp/indicop/")
+        self.dbFolder = tempfile.mkdtemp()
+        os.chdir(self.dbFolder)
+
         storage = FileStorage.FileStorage("Data.fs")
         db = DB(storage)
         connection = db.open()
@@ -761,15 +759,30 @@ class Indicop(object):
         storage.close()
         os.chdir(savedDir)
 
+    def deleteTempFolders(self):
+        print "DEL %s" % self.newValues
+        for k in self.newValues:
+            for root, dirs, files in os.walk(self.newValues[k]):
+                for name in files:
+                    print "FILES %s" % os.path.join(root, name)
+                    os.unlink(os.path.join(root, name))
+#            for root, dirs, files in os.walk(self.newValues[k]):
+#                for dir in dirs:
+#                    print "DIR %s" % os.path.join(root, dir)
+#                    os.rmdir(os.path.join(root, dir))
+            os.removedirs(self.newValues[k])
+        print "DELEND"
+
     def removeDBFile(self):
         savedDir = os.getcwd()
         try:
-            os.chdir("/tmp/indicop/")
+            os.chdir(self.dbFolder)
 
             os.unlink("Data.fs")
             os.unlink("Data.fs.index")
             os.unlink("Data.fs.lock")
             os.unlink("Data.fs.tmp")
+            os.rmdir(self.dbFolder)
         except OSError:
             #directory does not exist yet
             pass
