@@ -77,7 +77,8 @@ class ConferenceReview(Persistent):
         self._defaultReviwerDueDate = None
         self._defaultAbstractReviwerDueDate = None
         
-        #auto e-mails        
+        #auto e-mails 
+        self._enablePRMEmailNotif = True       
         self._enableRefereeEmailNotif = False
         self._enableEditorEmailNotif = False
         self._enableReviewerEmailNotif = False
@@ -175,6 +176,20 @@ class ConferenceReview(Persistent):
             return getAdjustedDate(self._defaultAbstractReviwerDueDate, self.getConference())
     
     #auto e-mails methods for assign/remove reviewing team to the conference notification
+    def getEnablePRMEmailNotif(self):
+        try :
+            if self._enablePRMEmailNotif  :
+                pass
+        except AttributeError :
+            self._enablePRMEmailNotif = True
+        return self._enablePRMEmailNotif
+
+    def enablePRMEmailNotif(self):
+        self._enablePRMEmailNotif = True
+
+    def disablePRMEmailNotif(self):
+        self._enablePRMEmailNotif = False
+    
     def getEnableRefereeEmailNotif(self):
         try :
             if self._enableRefereeEmailNotif  :
@@ -814,6 +829,7 @@ class ConferenceReview(Persistent):
             if not self._userCompetences.has_key(newPaperReviewManager):
                 self._userCompetences[newPaperReviewManager] = []
             self.notifyModification()
+        if self._enablePRMEmailNotif == True:
             notification = ConferenceReviewingNotification(newPaperReviewManager, 'Paper Review Manager', self._conference)
             GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", newPaperReviewManager)
 
@@ -834,8 +850,9 @@ class ConferenceReview(Persistent):
             self._paperReviewManagersList.remove(paperReviewManager)
             paperReviewManager.unlinkTo(self._conference, "paperReviewManager")
             self.notifyModification()
-            notification = ConferenceReviewingRemoveNotification(paperReviewManager, 'Paper Review Manager', self._conference)
-            GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", paperReviewManager)
+            if self._enablePRMEmailNotif == True:
+                notification = ConferenceReviewingRemoveNotification(paperReviewManager, 'Paper Review Manager', self._conference)
+                GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", paperReviewManager)
         else:
             raise MaKaCError("Cannot remove a paper review manager who is not yet paper review manager")
 
@@ -1140,13 +1157,13 @@ class ConferenceReview(Persistent):
             in this conference, as a list of strings.
         """
         roles=[]
-        if self.isPaperReviewManager(user):
+        if self.isPaperReviewManager(user) and not self._choice == 1:
             roles.append('Manager of Paper Reviewing Module')
-        if self.isReferee(user):
+        if self.isReferee(user) and (self._choice == 2 or self._choice == 4):
             roles.append('Referee')
-        if self.isEditor(user):
+        if self.isEditor(user) and (self._choice == 3 or self._choice == 4):
             roles.append('Layout Reviewer')
-        if self.isReviewer(user):
+        if self.isReviewer(user) and (self._choice == 2 or self._choice == 4):
             roles.append('Content Reviewer')
         if self.isAbstractManager(user):
             roles.append('Abstracts Manager')

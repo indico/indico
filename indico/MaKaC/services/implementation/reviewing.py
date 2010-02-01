@@ -241,7 +241,18 @@ class ConferenceAbstractReviewingDefaultDueDateModification(ConferenceAbstractRe
         date = self._conf.getConfReview().getAdjustedDefaultAbstractReviewerDueDate()
         if date:
             return datetime.datetime.strftime(date,'%d/%m/%Y %H:%M')
+
+class ConferenceReviewingAutoEmailsModificationPRM(ConferenceReviewingSetupTextModificationBase ):
+    
+    def _handleSet(self):
+        if self._value:
+            self._confReview.enablePRMEmailNotif()
+        else:
+            self._confReview.disablePRMEmailNotif()
         
+    def _handleGet(self):
+        return self._confReview.getEnablePRMEmailNotif()
+       
 class ConferenceReviewingAutoEmailsModificationReferee(ConferenceReviewingSetupTextModificationBase ):
     
     def _handleSet(self):
@@ -847,6 +858,7 @@ methodMap = {
     "conference.removeReviewer" : ConferenceReviewingRemoveReviewer,
     "conference.removeAllReviewers" : ConferenceReviewingRemoveAllReviewers,
     
+    "conference.PRMEmailNotif" : ConferenceReviewingAutoEmailsModificationPRM,
     "conference.RefereeEmailNotif" : ConferenceReviewingAutoEmailsModificationReferee,
     "conference.EditorEmailNotif" : ConferenceReviewingAutoEmailsModificationEditor,
     "conference.ReviewerEmailNotif" : ConferenceReviewingAutoEmailsModificationReviewer,

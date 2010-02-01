@@ -1,7 +1,7 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 
 <% if not ConfReview.hasReviewing(): %>
-<table align="center"><tr><td><%= _("Type of reviewing has not been chosen yet")%></td></tr></table>
+<p style="padding-left: 25px;"><font color="gray"><%= _("Type of reviewing has not been chosen yet")%></font></p>
 <% end %>
 <% elif ConfReview.getAllUserCompetences() == []: %>
 <table align="center"><tr><td><%= _("The Reviewing Team has not been assigned yet.")%></td></tr></table>
@@ -26,6 +26,7 @@
    
     
     <% for user, competences in ConfReview.getAllUserCompetences(): %>
+    <% if ConfReview.getUserReviewingRoles(user): %>
     <% if ConfReview.isPaperReviewManager(user) or ConfReview.isReferee(user) or ConfReview.isEditor(user) or ConfReview.isReviewer(user):%>
         <tr valign="top">
             <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF; padding-top: 5px;"><%= user.getId() %></td>
@@ -37,6 +38,7 @@
                 <span id="competences_<%= user.getId() %>"></span>
             </td>
         </tr>
+    <% end %>
     <% end %>
     <% end %>
     <tr><td colspan=5 style="padding-top: 15px;">

@@ -277,14 +277,14 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
                 showrefereearea = self._conf in awUser.getLinkedTo()["conference"]["referee"] 
 
                
-                if showrefereearea:
+                if showrefereearea and (self._conf.getConfReview().getChoice()==2 or self._conf.getConfReview().getChoice()==4):
                     self._assignContribOpt.setVisible(True)
                     self._judgeListOpt.setVisible(True)
             
-                if showreviewerarea:
+                if showreviewerarea and (self._conf.getConfReview().getChoice()==2 or self._conf.getConfReview().getChoice()==4):
                     self._judgereviewerListOpt.setVisible(True)
             
-                if showeditorarea:
+                if showeditorarea and (self._conf.getConfReview().getChoice()==3 or self._conf.getConfReview().getChoice()==4):
                     self._judgeeditorListOpt.setVisible(True)
 
         

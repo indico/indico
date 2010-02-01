@@ -7,31 +7,35 @@
         </td>
     </tr>
     <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Reviewing questions")%></span></td>
+        <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Reviewing questions")%>:</span></td>
         <td width="60%%" id="criteriaListDisplay">
+        </td>
+    </tr>    
+    <tr>
+        <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Comments")%>:</span></td>
+        <td>
+            <div id="inPlaceEditComments"></div>
         </td>
     </tr>
     <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat">Judgement</span></td>
+        <td nowrap class="titleCellTD"><span class="titleCellFormat"><strong><%= _("Judgement")%>:</strong></span></td>
         <td>
             <div id="inPlaceEditJudgement"><%= Editing.getJudgement() %></div>
         </td>
     </tr>
+    <% if not Editing.getJudgement(): %>
+        <% display = 'span' %>
+    <% end %>
+    <% else: %>
+            <% display = 'none' %>
+    <% end %>
     <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat">Comments</span></td>
-        <td>
-            <div id="inPlaceEditComments"></div>
-            These comments, along with your judgement, will be sent by e-mail to the author(s)
-        </td>
-    </tr>
-    <tr>
-        <td colspan="10">
+        <td colspan="10" style="padding-top: 20px;">
             <span id="submitbutton"></span>
             <span id="submittedmessage"></span>
 		</td>
     </tr>
 </table>
-
 
 <script type="text/javascript">
 

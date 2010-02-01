@@ -132,11 +132,13 @@ class WContributionReviewingJudgements(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
 
         conferenceChoice = self._conf.getConfReview().getChoice()
+        conferenceChoiceStr = self._conf.getConfReview().getReviewingMode()
         reviewManager = self.__target.getReviewManager()        
         vars["Conference"] = self._conf
         vars["ConfReview"] = self._conf.getConfReview()
         vars["Contribution"] = self.__target
         vars["ConferenceChoice"] = conferenceChoice
+        vars["ConferenceChoiceStr"] = conferenceChoiceStr
         vars["FinalJudge"] = reviewManager.getLastReview().getRefereeJudgement().getJudgement()
         vars["Editing"] = reviewManager.getLastReview().getEditorJudgement()
         vars["AdviceList"] = reviewManager.getLastReview().getSubmittedReviewerJudgement()

@@ -3,18 +3,28 @@
 
 <% if ConfReview.hasReviewing(): %>
 <table width="85%%" align="center" border="0">
-    <tr>
         <td id="revControlRefereeEditorReviewerHelp"  colspan="3" class="groupTitle"  style="padding-top: 15px; padding-bottom: 15px;">
             <%= _("Step 2: Assign Reviewers")%>
         </td>
-    </tr>   
+    </tr>
+    <tr>
+        <td>
+            <% if ConfReview.getEnableRefereeEmailNotif() or ConfReview.getEnableEditorEmailNotif() or ConfReview.getEnableReviewerEmailNotif(): %>
+                <div style="padding-top: 10px; padding-bottom: 15px;">
+                    <em><%=_("An automatically generated e-mail will be send to the Reviewers you will assign")%></em><br>
+                    <em><%= _("You  can  modify this from the Paper Reviewing Setup")%></em>
+                </div>
+            <% end %>
+        </td>
+    </tr>
+    <tr>
 </table> 
+
 <table width="83%%" align="right" border="0">
-    
 <% if ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1:%>
 <% pass %>
 <% end %>
-<% else: %> 
+<% else: %>
     <tr>
         %(refereeTable)s
         <td width="80%%" style="padding-top: 15px; padding-bottom: 15px;"><div id="RefereeList"></div></td>

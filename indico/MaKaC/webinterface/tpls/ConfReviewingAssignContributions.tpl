@@ -731,6 +731,21 @@ var removeReviewersAlerts = function(contributions, role) {
         return false;
     }
     
+    contributionsWithoutEditor = []
+    for (i in contributions) {
+        contributionId = contributions[i]
+        contribution = getContribution(contributionId)
+        if (contribution.reviewManager.editor = null) {
+            contributionsWithoutEditor.push(contributionId)
+        }
+    }
+    
+    if (contributionsWithoutEditor.length == contributions.length) {
+        alert($T("There is no assigned Layout Reviewer to remove.")
+        );
+        return false;
+    } 
+    
     if (contributionsWithoutReviewers.length > 0) {
         title =$T('Contributions without reviewer');    
             
@@ -756,6 +771,48 @@ var removeReviewersAlerts = function(contributions, role) {
     }
     
     return true;    
+}
+
+var removeEditorAlerts = function(contributions, role) {
+    
+    contributionsWithoutEditor = []
+    for (i in contributions) {
+        contributionId = contributions[i]
+        contribution = getContribution(contributionId)
+        if (contribution.reviewManager.editor == null) {
+            contributionsWithoutEditor.push(contributionId)
+        }
+    }
+    
+    if (contributionsWithoutEditor.length == contributions.length) {
+        alert($T("There is no assigned Layout Reviewer to remove.")
+        );
+        return false;
+    } 
+    
+    return true;
+    
+}
+
+var removeNoRefereeAlerts = function(contributions, role) {
+    
+    contributionsWithoutEditor = []
+    for (i in contributions) {
+        contributionId = contributions[i]
+        contribution = getContribution(contributionId)
+        if (contribution.reviewManager.referee == null) {
+            contributionsWithoutEditor.push(contributionId)
+        }
+    }
+    
+    if (contributionsWithoutEditor.length == contributions.length) {
+        alert($T("There is no assigned Referee to remove.")
+        );
+        return false;
+    } 
+    
+    return true;
+    
 }
 
 /**
@@ -1006,7 +1063,8 @@ var fetchUsers = function(order, role) {
             return;
         } 
    }
-    
+   
+   
     indicoRequest(
         'reviewing.conference.userCompetencesList',
         {conference: '<%= Conference.getId() %>', role: role},
@@ -1111,6 +1169,9 @@ var removeUser = function(role) {
             params,
             function(result,error) {
                 if (!error) {
+                    if (!removeNoRefereeAlerts(checkedContributions, role)) {
+                                return;
+                        }
                     for (i in checkedContributions) {
                         contributionId = checkedContributions[i];
                         contribution = getContribution(contributionId);
@@ -1135,6 +1196,9 @@ var removeUser = function(role) {
             params,
             function(result,error) {
                 if (!error) {
+                    if (!removeEditorAlerts(checkedContributions, role)) {
+                                return;
+                        }
                     for (i in checkedContributions) {
                         contributionId = checkedContributions[i];
                         contribution = getContribution(contributionId);

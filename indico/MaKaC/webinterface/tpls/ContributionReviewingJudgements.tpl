@@ -6,8 +6,11 @@
 <% format = "%a %d %b %Y at %H\x3a%M" %>
 
 
-
+<div style="padding-left: 10px; padding-top: 10px">
+<em><%= _("The reviewing mode choosen for this conference is")%>: <%= ConferenceChoiceStr%></em>
+</div>
 <!-- Judgement of the editor -->
+<% if ConferenceChoice == 3 or ConferenceChoice == 4:%>
 <table width="90%%" align="center" border="0" style="margin-bottom: 1em; margin-top: 1em">
     <tr>
         <td id="editingJudgementHelp" colspan="5" class="groupTitle" style="border-bottom: none"><%= _("Layout judgement details")%>
@@ -30,8 +33,10 @@
         </td>
     </tr>
 </table>
+<% end %>
 
 <!-- List of advices from the reviewers -->
+<% if ConferenceChoice == 2 or ConferenceChoice == 4:%>
 <table width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
         <td id="reviewingJudgementHelp" colspan="5" class="groupTitle" style="padding-top: 5px; border-bottom: none"><%= _("Content judgement details")%>
@@ -58,10 +63,10 @@
         </td>
     </tr>
 </table>
-
-
+<% end %>
 
 <!-- Final reviewing of the referee -->
+<% if ConferenceChoice == 2 or ConferenceChoice == 4:%>
 <table width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
         <td id="finalJudgementHelp" colspan="5" class="groupTitle" style="padding-bottom: 15px; padding-top: 5px; border-bottom: none"><a name="FinalReviewing"></a><%= _("Final Judgement")%>
@@ -107,7 +112,7 @@
         <% else: %>
             <% if not Review.getRefereeJudgement().isSubmitted(): %>
                 <tr>
-                    <td colspan="2" align="center">
+                    <td colspan="2" align="left">
                         <span>
                         <%= _("This contribution has not been judged yet.")%><br>
                         <%= _("You are not allowed to perform the final judgement on this contribution.")%>
@@ -116,13 +121,6 @@
                 </tr>
             <% end %>
         <% end %>
-        
-        <tr>
-            <td nowrap class="titleCellTD" style="padding-top: 10px;"><span class="titleCellFormat"><strong><%= _("Judgement")%>:</strong></span></td>
-            <td style="padding-top: 10px;">
-                <div id="inPlaceEditJudgement"><strong><%= Review.getRefereeJudgement().getJudgement() %></strong></div>
-            </td>
-        </tr>
         <tr>
             <td nowrap class="titleCellTD">
                 <span class="titleCellFormat"><%= _("Reviewing questions:")%></span>
@@ -134,6 +132,12 @@
             <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Comments")%>:</span></td>
             <td>
                 <div id="inPlaceEditComments"></div>
+            </td>
+        </tr>
+        <tr>
+            <td nowrap class="titleCellTD"><span class="titleCellFormat"><strong><%= _("Judgement")%>:</strong></span></td>
+            <td>
+                <div id="inPlaceEditJudgement"><strong><%= Review.getRefereeJudgement().getJudgement() %></strong></div>
             </td>
         </tr>
         <% if IsReferee: %>
@@ -154,6 +158,7 @@
     <% end %>                    
                         
 </table>
+<% end %>
 
 <script type="text/javascript">
 

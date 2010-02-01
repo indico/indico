@@ -105,8 +105,7 @@
                                 <tr>
                                     <td></td>
                                     <td>
-                                        <%=_("Note: Press this button to submit your materials for reviewing")%>.<br>
-                                        <%=_("By doing this you will lock your materials until they are reviewed")%>.
+                                        <%=_("By clicking on this button you will lock your materials until they are reviewed")%>.
                                     </td>
                             <% end %>
                             <% else: %>
