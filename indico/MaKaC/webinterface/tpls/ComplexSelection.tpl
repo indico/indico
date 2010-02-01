@@ -24,7 +24,7 @@
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Organisation")%></span></td>
         <td class="contentCellTD">
-            <input type="text" name="organisation" size="60" 
+            <input type="text" name="organisation" size="60"
                     value="%(organisation)s">
         </td>
     </tr>

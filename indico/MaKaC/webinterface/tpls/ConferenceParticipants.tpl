@@ -185,10 +185,10 @@ function deselectAll()
 
 
 		<div style="position: relative; overflow: auto; margin-top: 10px;">			
-		<form action="%(statisticAction)s" method="post" id="statisticsForm"></form> 
+		<form action="%(statisticAction)s" method="post" id="statisticsForm"></form>
 			<form action="%(participantsAction)s" method="post" name="participantsForm">
 		
-				<div style="float: left; padding-right: 30px; min-width: 400px; min-height: 270px;">								
+				<div style="float: left; padding-right: 30px; min-width: 400px; min-height: 270px;">
 							<table>
 								<tr>
 									<th class="titleCellFormat">

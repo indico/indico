@@ -27,7 +27,7 @@
 				<td><b>%(pending)s</b></td>
 			</tr>
 			<tr><td>&nbsp;</td><td>&nbsp</td></tr>
-		
+
 			%(present)s
 			%(absent)s
 			%(excused)s
