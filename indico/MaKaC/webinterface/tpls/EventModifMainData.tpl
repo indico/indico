@@ -240,7 +240,7 @@ var confFossile = <%= jsonEncode(confObj.fossilize(IConferenceMinimalFossil, tz=
 
 <%  from MaKaC.common import info %>
 
-<%= macros.genericField(macros.FIELD_SELECT, 'inPlaceEditDefaultStyle', 'event.main.changeDefaultStyle', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh, options=info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager().getStylesheetListForEventType(confObj.getType())) %>
+<%= macros.genericField(macros.FIELD_SELECT, 'inPlaceEditDefaultStyle', 'event.main.changeDefaultStyle', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh, options=info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager().getStylesheetDictForEventType(confObj.getType())) %>
 
 <%= macros.genericField(macros.FIELD_SELECT, 'inPlaceEditVisibility', 'event.main.changeVisibility', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh, options=visibilityList) %>
 

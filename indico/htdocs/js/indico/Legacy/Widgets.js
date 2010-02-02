@@ -1012,7 +1012,7 @@ IndicoUI.Widgets = {
         },
 
         applyForParticipationForm: function(conf) {
-            alert('hejsan');
+            // TODO
         }
     }// end of Generic namespace
 };

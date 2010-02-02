@@ -33,7 +33,7 @@ from Configuration import Config
 class MaKaCInfo(Persistent):
     """Holds and manages general information and data concerning each system
     """
-    
+
     def __init__( self ):
         # server description fields
         self._title = ""
@@ -44,16 +44,16 @@ class MaKaCInfo(Persistent):
         self._country = ""
         self._lang = "en_US"
         self._tz = ""
-        
+
         # Account-related features
         self._authorisedAccountCreation = True
         self._notifyAccountCreation = False
         self._moderateAccountCreation = False
         self._moderators = []
-        
+
         # Room booking related
         self._roomBookingModuleActive = False
-        
+
         # Global poster/badge templates
         self._defaultConference = None
 
@@ -64,13 +64,13 @@ class MaKaCInfo(Persistent):
         self._cacheActive = False
         self._newsActive = False
         self._debugActive = False
-        
+
         # template set
         self._defaultTemplateSet = None
 
         # Define if Indico use a proxy (load balancing)
         self. _proxy = False
-        # Define the volume used in archiving: 
+        # Define the volume used in archiving:
         # e.g. /afs/cern.ch/project/indico/XXXX/2008/...
         # XXXX will be replaced by self._archivingVolume
         # if self._archivingVolume is empty the path would be:
@@ -110,7 +110,7 @@ class MaKaCInfo(Persistent):
         except:
             self._news = ""
             return ""
-        
+
     def setNews( self, news ):
         self._news = news
 
@@ -156,7 +156,7 @@ class MaKaCInfo(Persistent):
 
     def setNotifyAccountCreation( self, flag=False ):
         self._notifyAccountCreation = flag
-        
+
     def getModerateAccountCreation( self ):
         try:
             return self._moderateAccountCreation
@@ -166,7 +166,7 @@ class MaKaCInfo(Persistent):
 
     def setModerateAccountCreation( self, flag=False ):
         self._moderateAccountCreation = flag
-        
+
     def getTitle( self ):
         return self._title
 
@@ -179,7 +179,7 @@ class MaKaCInfo(Persistent):
 
     def setCacheActive( self, bool=True ):
         self._cacheActive = bool
-    
+
     def isNewsActive( self ):
         if hasattr( self, "_newsActive" ):
             return self._newsActive
@@ -189,7 +189,7 @@ class MaKaCInfo(Persistent):
 
     def setNewsActive( self, bool=True ):
         self._newsActive = bool
-       
+
     def isHighlightActive ( self ):
         if hasattr( self, "_highlightActive" ):
            return self._highlightActive
@@ -199,10 +199,10 @@ class MaKaCInfo(Persistent):
 
     def setHighlightActive (self, bool=True ):
         self._highlightActive = bool
- 
+
     def setTitle( self, newTitle ):
         self._title = newTitle.strip()
-    
+
     def getOrganisation( self ):
         return self._organisation
 
@@ -227,7 +227,7 @@ class MaKaCInfo(Persistent):
 
     def setPublicSupportEmail( self, newEmail ):
         self._publicSupportEmail = newEmail.strip()
-        
+
     def getCity( self ):
         return self._city
 
@@ -261,7 +261,7 @@ class MaKaCInfo(Persistent):
         for admin in self.getAdminList().getList():
             emails.append(admin.getEmail())
         return emails
-    
+
     # === ROOM BOOKING RELATED ===============================================
 
     def getRoomBookingModuleActive( self ):
@@ -285,7 +285,7 @@ class MaKaCInfo(Persistent):
 
     def setRoomBookingDBConnectionParams( self, hostPortTuple = ('localhost', 9676) ):
         self._roomBookingStorageParams = hostPortTuple
-    
+
     # Only for default Indico/ZODB plugin
     def getRoomBookingDBUserName( self ):
         try:
@@ -293,11 +293,11 @@ class MaKaCInfo(Persistent):
         except:
             self._roomBookingDBUserName = ""
             return self._roomBookingDBUserName
-    
+
     # Only for default Indico/ZODB plugin
     def setRoomBookingDBUserName( self, user = "" ):
         self._roomBookingDBUserName = user
-    
+
     # Only for default Indico/ZODB plugin
     def getRoomBookingDBPassword( self ):
         try:
@@ -305,11 +305,11 @@ class MaKaCInfo(Persistent):
         except:
             self._roomBookingDBPassword = ""
             return self._roomBookingDBPassword
-    
+
     # Only for default Indico/ZODB plugin
     def setRoomBookingDBPassword( self, password = "" ):
         self._roomBookingDBPassword = password
-    
+
     # Only for default Indico/ZODB plugin
     def getRoomBookingDBRealm( self ):
         try:
@@ -321,22 +321,22 @@ class MaKaCInfo(Persistent):
     # Only for default Indico/ZODB plugin
     def setRoomBookingDBRealm( self, realm = "" ):
         self._roomBookingDBRealm = realm
-        
-    def getDefaultConference( self ):        
+
+    def getDefaultConference( self ):
         try:
             self._defaultConference
         except AttributeError:
             self._defaultConference = None
-            
+
         return self._defaultConference
 
     def setDefaultConference( self, dConf ):
         self._defaultConference = dConf
         return self._defaultConference
-    
+
     def setProxy(self, proxy):
         self._proxy = proxy
-    
+
     def useProxy(self):
         try:
             return self._proxy
@@ -349,7 +349,7 @@ class MaKaCInfo(Persistent):
             return self._defaultTemplateSet
         except:
             self._defaultTemplateSet = None
-            return None    
+            return None
 
     def setDefaultTemplateSet( self, defTemp ):
         self._defaultTemplateSet = defTemp
@@ -360,9 +360,9 @@ class MaKaCInfo(Persistent):
             return self._lang
         except:
             self._lang = "en_US"
-            #Logger.get('i18n').warning('No language set in MaKaCInfo... using %s by default' % self._lang) 
+            #Logger.get('i18n').warning('No language set in MaKaCInfo... using %s by default' % self._lang)
             return self._lang
-        
+
     def setLang( self, lang ):
         self._lang = lang
 
@@ -378,7 +378,7 @@ class MaKaCInfo(Persistent):
     def getOAIPrivateHarvesterList(self):
         """ Returns the list of allowed IPs of harvesters
         for the private OAI gateway """
-        
+
         try:
             self._oaiPrivateHarvesterList
         except:
@@ -387,18 +387,18 @@ class MaKaCInfo(Persistent):
 
     def setOAIPrivateHarvesterList(self, harvList):
         self._oaiPrivateHarvesterList = harvList
-        
+
 
 class HelperMaKaCInfo:
-    """Helper class used for getting and instance of MaKaCInfo. 
-        It will be migrated into a static method in MaKaCInfo class once the 
-        ZODB4 is released and the Persistent classes are no longer Extension 
+    """Helper class used for getting and instance of MaKaCInfo.
+        It will be migrated into a static method in MaKaCInfo class once the
+        ZODB4 is released and the Persistent classes are no longer Extension
         ones.
     """
-    
+
     def getMaKaCInfoInstance(cls):
         dbmgr = DBMgr.getInstance()
-        root = dbmgr.getDBConnection().root()        
+        root = dbmgr.getDBConnection().root()
         try:
             minfo = root["MaKaCInfo"]["main"]
         except KeyError, e:
@@ -406,10 +406,10 @@ class HelperMaKaCInfo:
             root["MaKaCInfo"] = OOBTree.OOBTree()
             root["MaKaCInfo"]["main"] = minfo
         return minfo
-    
+
     getMaKaCInfoInstance = classmethod( getMaKaCInfoInstance )
 
-    
+
 class StyleManager(Persistent):
     """This class manages the stylesheets used by the server for the display
        of events timetables
@@ -421,34 +421,34 @@ class StyleManager(Persistent):
         self._defaultEventStylesheet = Config.getInstance().getDefaultEventStylesheet()
 
     def getStylesheets(self):
-        """gives back the entire stylesheet list. 
+        """gives back the entire stylesheet list.
         """
         return self._stylesheets
-    
+
     def setStylesheets(self, sList=[]):
         self._stylesheets = sList
-    
+
     def getEventStylesheets(self):
-        """gives back the entire stylesheet/event association list. 
+        """gives back the entire stylesheet/event association list.
         """
-        return self._eventStylesheets            
-    
+        return self._eventStylesheets
+
     def setEventStylesheets(self, sDict={}):
         self._eventStylesheets = sDict
-        
+
     def getDefaultEventStylesheet(self):
         """gives back the default stylesheet/event association
         """
         return self._defaultEventStylesheet
-    
+
     def setDefaultEventStylesheet(self, sDict={}):
         self._defaultEventStylesheet = sDict
-    
+
     def getDefaultStylesheetForEventType(self, type):
         """gives back the default stylesheet for the given type of event
         """
         return self._defaultEventStylesheet.get(type,"")
-   
+
     def removeStyle( self, style, type="" ):
         if type == "":
             # style globally removed
@@ -494,21 +494,29 @@ class StyleManager(Persistent):
     def removeStyleFromAllTypes( self, style ):
         for type in ["simple_event", "meeting", "conference"]:
             self.removeStyleFromEventType(style, type)
-        
+
     def getStylesheetListForEventType(self, type):
-        """gives back the stylesheet list associated to a given type of event. 
+        """gives back the stylesheet list associated to a given type of event.
         If no event was specified it returns the empty list.
            Params:
                 type -- unique identifier of the event type
         """
         return self._eventStylesheets.get( type, [] )
 
+    def getStylesheetDictForEventType(self, type):
+        """gives back the stylesheet list associated to a given type of event.
+        If no event was specified it returns the empty list.
+           Params:
+                type -- unique identifier of the event type
+        """
+        return dict((ssid, self._stylesheets[ssid]) for ssid in self._eventStylesheets.get( type, [] ))
+
     def getStylesheetName( self, stylesheet ):
         return self._stylesheets.get( stylesheet, "" )
 
     def getBaseXSLPath( self ):
         return Config.getInstance().getStylesheetsDir()
-    
+
     def getXSLPath( self, stylesheet ):
         if stylesheet.strip() != "":
             basepath = Config.getInstance().getStylesheetsDir()
@@ -521,10 +529,10 @@ class StyleManager(Persistent):
         if self.getXSLPath( stylesheet ):
             return "%s.xsl" % stylesheet
         return ""
-    
+
     def getBaseCSSPath( self ):
         return os.path.join(Config.getInstance().getHtdocsDir(),"css")
-    
+
     def getCSSPath( self, stylesheet ):
         if stylesheet.strip() != "":
             basepath = Config.getInstance().getHtdocsDir()
