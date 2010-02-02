@@ -111,6 +111,7 @@ class Config:
                  "arrowRightMenuConfSelected": "arrowRightMenuConfSelected.png",
                  "bulletMenuConf": "bulletMenuConf.png",
                  "logoIndico": "logo_indico.png",
+                 "indico_small": "indico_small.png",
                  "login": "pict_login.png",
                  "table": "img_table.png",
                  "lectureMenu": "pict_event_negb.png",
