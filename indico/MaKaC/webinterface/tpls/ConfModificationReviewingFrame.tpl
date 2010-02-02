@@ -30,6 +30,7 @@
         <td width="80%%" style="padding-top: 15px; padding-bottom: 15px;"><div id="RefereeList"></div></td>
     </tr>
 <script type="text/javascript">
+
                         var newRefereeHandler = function(userList, setResult) {
                             indicoRequest(
                                 'reviewing.conference.assignTeamReferee',
@@ -47,18 +48,21 @@
                                 }
                             );
                         }
+                                                
                         var removeRefereeHandler = function(user, setResult) {
                         userId = user.get('id');
+                        var del = true;
                         <% for r in ConfReview.getRefereesList():%>
                             rId = '<%= r.getId()%>';
                             if(userId == rId){
-                                var del = true;
                                 numberContr = '<%= len(ConfReview.getJudgedContributions(r))%>';
                                 if (numberContr>0){
                                     if (!(confirm('This referee has been assigned '+numberContr+' contributions. Do you want to remove the referee anyway?'))){
                                         del = false;
                                     }
                                 }
+                              } 
+                         <% end%>
                                 if (del)
                                     {
 	                                    indicoRequest(
@@ -77,8 +81,8 @@
 			                                }
 			                            );
                                     }
-                             }
-                        <% end%>
+                             
+                       
                         }
                         
                         var uf = new UserListField('PluginPeopleListDiv', 'PluginPeopleList',
@@ -112,16 +116,18 @@
                         }
                         var removeReviewerHandler = function(user, setResult) {
                         userId = user.get('id');
+                        var del = true;
                         <% for r in ConfReview.getReviewersList():%>
                             rId = '<%= r.getId()%>';
                             if(userId == rId){
-                                var del = true;
                                 numberContr = '<%= len(ConfReview.getReviewedContributions(r))%>';
                                 if (numberContr>0){
                                     if (!(confirm('This content reviewer has been assigned '+numberContr+' contributions. Do you want to remove the content reviewer anyway?'))){
                                         del = false;
                                     }
                                 }
+                              }
+                        <% end%>
                                 if (del)
                                     {
                                         indicoRequest(
@@ -140,8 +146,7 @@
 		                                }
 		                            );
                                    }
-                             }
-                        <% end%>
+                            
                         }
                         
                         var uf = new UserListField('PluginPeopleListDiv', 'PluginPeopleList',
@@ -181,16 +186,18 @@
                         }
                         var removeEditorHandler = function(user, setResult) {
                         userId = user.get('id');
+                        var del = true;
                         <% for r in ConfReview.getEditorsList():%>
                             rId = '<%= r.getId()%>';
                             if(userId == rId){
-                                var del = true;
                                 numberContr = '<%= len(ConfReview.getEditedContributions(r))%>';
                                 if (numberContr>0){
                                     if (!(confirm('This layout reviewer has been assigned '+numberContr+' contributions. Do you want to remove the layout reviewer anyway?'))){
                                         del = false;
                                     }
                                 }
+                              }
+                        <% end%>
                                 if (del)
                                     {
                                         indicoRequest(
@@ -209,8 +216,7 @@
 		                                }
 		                            );
                                   }
-                             }
-                        <% end%>
+                             
                         }
                         
                         var uf = new UserListField('PluginPeopleListDiv', 'PluginPeopleList',
