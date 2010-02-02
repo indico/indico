@@ -12,9 +12,6 @@ from MaKaC.common.Configuration import Config
 
 class SeleniumTestCase(unittest.TestCase, BaseTest):
 
-#NOTE: functional tests are using the current Database, not the temporary one.
-#This have to be changed when we will migrate to wsgi
-
     def setUp(self):
         self.verificationErrors = []
         self.confId = None
@@ -27,8 +24,7 @@ class SeleniumTestCase(unittest.TestCase, BaseTest):
 
         self.selenium.start()
 
-        #Create dummy user and use this user to create conf, session and so on
-        self.createDummyUserDeprecated()
+
 
         #Handy functions from selenium and twill you might need
         #set up the time between each selenium's commands (in milliseconds)
@@ -41,7 +37,6 @@ class SeleniumTestCase(unittest.TestCase, BaseTest):
         if self.confId:
             self.deleteConference(self.confId)
 
-        self.deleteDummyUserDeprecated()
 
         self.selenium.stop()
 

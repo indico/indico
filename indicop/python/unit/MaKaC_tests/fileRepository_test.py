@@ -24,16 +24,16 @@ of files.
 """
 
 import unittest
-from indicop.Indicop import Indicop
+from MaKaC.common import DBMgr
 import os
 
 
 def setup_module():
-    Indicop.getInstance(None, None).getDBInstance().startRequest()
+    DBMgr.getInstance().startRequest()
 
 def teardown_module():
-    Indicop.getInstance(None, None).getDBInstance().abort()
-    Indicop.getInstance(None, None).getDBInstance().endRequest()
+    DBMgr.getInstance().abort()
+    DBMgr.getInstance().endRequest()
 
 class TestMaterialRepository(unittest.TestCase):
     """Tests the basic functionalities of the MaterialLocalRepository file

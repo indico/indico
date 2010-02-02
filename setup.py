@@ -343,10 +343,10 @@ class test_indico(Command):
 
         if self.pylint:
             testsToRun.append('pylint')
-        if self.unit:
-            testsToRun.append('unit')
         if self.functional:
             testsToRun.append('functional')
+        if self.unit:
+            testsToRun.append('unit')
         if self.jsunit or self.jsspecify:
             testsToRun.append('jsunit')
         if self.jslint:

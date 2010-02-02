@@ -21,10 +21,19 @@
 
 
 import os
+import tempfile
+import transaction
+import signal
+import shutil
+import commands
+from util import TestZEOServer
+from ZODB import FileStorage, DB
 from MaKaC import user
+from TestsConfig import TestsConfig
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common import indexes
+from MaKaC.common import DBMgr
 
 class BaseTest(object):
     #path to this current file
@@ -52,8 +61,7 @@ class BaseTest(object):
                     os.path.join(self.setupDir, 'report', filename + ".txt")
 
     def createDummyUser(self):
-        from Indicop import Indicop
-        Indicop.getInstance(None, None).getDBInstance().startRequest()
+        DBMgr.getInstance().startRequest()
 
         #filling info to new user
         self.avatar = user.Avatar()
@@ -81,11 +89,10 @@ class BaseTest(object):
         self.al = minfo.getAdminList()
         self.al.grant( self.avatar )
 
-        Indicop.getInstance(None, None).getDBInstance().endRequest()
+        DBMgr.getInstance().endRequest()
 
     def deleteDummyUser(self):
-        from Indicop import Indicop
-        Indicop.getInstance(None, None).getDBInstance().startRequest()
+        DBMgr.getInstance().startRequest()
 
         #removing user from admin list
         self.al.revoke( self.avatar )
@@ -111,7 +118,7 @@ class BaseTest(object):
         la.remove(userid)
         self.ah.remove(self.avatar)
 
-        Indicop.getInstance(None, None).getDBInstance().endRequest()
+        DBMgr.getInstance().endRequest()
 
     def walkThroughFolders(self, rootPath, foldersPattern):
         """scan a directory and return folders which match the pattern"""
@@ -125,77 +132,63 @@ class BaseTest(object):
 
         return foldersArray
 
+    def startFakeDB(self, zeoPort):
+        self.createNewDBFile()
+        self.zeoServer = self.createDBServer(os.path.join(self.dbFolder, "Data.fs"), zeoPort)
+        DBMgr.setInstance(DBMgr(hostname="localhost", port=zeoPort))
+        DBMgr.getInstance().startRequest()
+        DBMgr.getInstance().endRequest(True)
 
-################################################
-#    To be deleted when we get rid of mod_python
-################################################
-    def createDummyUserDeprecated(self):
-        from MaKaC.common.db import DBMgr
-        self.fakedb = DBMgr().getInstance()
-        self.fakedb._db.close()
-        self.db = DBMgr()
-        DBMgr.setInstance(self.db)
-        self.db.startRequest()
+    def stopFakeDB(self):
+        try:
+            os.kill(self.zeoServer, signal.SIGTERM)
+        except OSError, e:
+            print ("Problem sending kill signal: " + str(e))
 
-        #filling info to new user
-        self.avatarD = user.Avatar()
-        self.avatarD.setName( "fake" )
-        self.avatarD.setSurName( "fake" )
-        self.avatarD.setOrganisation( "fake" )
-        self.avatarD.setLang( "en_US" )
-        self.avatarD.setEmail( "fake@fake.fake" )
+        try:
+            import time
+            #time.sleep(10)
+            #os.wait()
+            os.waitpid(self.zeoServer, 0)
+        except OSError, e:
+            print ("Problem waiting for ZEO Server: " + str(e))
 
-        #registering user
-        self.ahD = user.AvatarHolder()
-        self.ahD.add(self.avatarD)
+        self.removeDBFile()
 
-        #setting up the login info
-        liD = user.LoginInfo( "dummyuser", "dummyuser" )
-        self.ihD = AuthenticatorMgr()
-        useridD = self.ihD.createIdentity( liD, self.avatarD, "Local" )
-        self.ihD.add( useridD )
+    def restoreDBInstance(self):
+        DBMgr.setInstance(DBMgr())
 
-        #activate the account
-        self.avatarD.activateAccount()
+    def startProductionDB(self):
+        commands.getstatusoutput(TestsConfig.getInstance().getStartDBCmd())
 
-        #since the DB is empty, we have to add dummy user as admin
-        minfoD = HelperMaKaCInfo.getMaKaCInfoInstance()
-        self.alD = minfoD.getAdminList()
-        self.alD.grant( self.avatarD )
+    def stopProductionDB(self):
+        commands.getstatusoutput(TestsConfig.getInstance().getStopDBCmd())
 
-        self.db.endRequest(True)
+    def createNewDBFile(self):
+        savedDir = os.getcwd()
+        self.dbFolder = tempfile.mkdtemp()
+        os.chdir(self.dbFolder)
 
-    def deleteDummyUserDeprecated(self):
-        from MaKaC.common.db import DBMgr
-        self.db.startRequest()
+        storage = FileStorage.FileStorage("Data.fs")
+        db = DB(storage)
+        connection = db.open()
+        dbroot = connection.root()
 
-        #removing user from admin list
-        self.alD.revoke( self.avatarD )
+        transaction.commit()
 
-        #remove the login info
-        useridD = self.avatarD.getIdentityList()[0]
-        self.ihD.removeIdentity(useridD)
+        connection.close()
+        db.close()
+        storage.close()
+        os.chdir(savedDir)
 
-        #unregistering the user info
-        index = indexes.IndexesHolder().getById("email")
-        index.unindexUser(self.avatarD)
-        index = indexes.IndexesHolder().getById("name")
-        index.unindexUser(self.avatarD)
-        index = indexes.IndexesHolder().getById("surName")
-        index.unindexUser(self.avatarD)
-        index = indexes.IndexesHolder().getById("organisation")
-        index.unindexUser(self.avatarD)
-        index = indexes.IndexesHolder().getById("status")
-        index.unindexUser(self.avatarD)
+    def removeDBFile(self):
+        shutil.rmtree(self.dbFolder)
 
-        #removing user from list
-        laD = self.ihD.getById("Local")
-        laD.remove(useridD)
-        self.ahD.remove(self.avatarD)
+    def createDBServer(self, file, port):
+        pid = os.fork()
+        if pid:
+            return pid
+        else:
+            server = TestZEOServer(port, file)
+            server.start()
 
-        self.db.endRequest(True)
-        DBMgr.setInstance(self.fakedb)
-
-################################################
-#            end of block
-################################################

@@ -31,14 +31,14 @@ import MaKaC.errors as errors
 
 from datetime import datetime
 from pytz import timezone
-from indicop.Indicop import Indicop
+from MaKaC.common import DBMgr
 
 def setup_module():
-    Indicop.getInstance(None, None).getDBInstance().startRequest()
+    DBMgr.getInstance().startRequest()
 
 def teardown_module():
-    Indicop.getInstance(None, None).getDBInstance().abort()
-    Indicop.getInstance(None, None).getDBInstance().endRequest()
+    DBMgr.getInstance().abort()
+    DBMgr.getInstance().endRequest()
 
 class TestCFADirectives( unittest.TestCase ):
     """Tests the setting of the main CFA directives.

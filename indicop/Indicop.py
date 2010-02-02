@@ -34,6 +34,7 @@ import shutil
 import signal
 import tempfile
 from BaseTest import BaseTest
+from TestsConfig import TestsConfig
 from selenium import selenium
 from MaKaC.common.db import DBMgr
 from util import TestZEOServer
@@ -49,6 +50,8 @@ class Unit(BaseTest):
 
         result = False
 
+        #launch a fresh DB in parallel of the production DB
+        self.startFakeDB(TestsConfig.getInstance().getFakeDBPort())
         self.createDummyUser()
 
         try:
@@ -78,6 +81,8 @@ class Unit(BaseTest):
             #restoring the stderr
             sys.stderr = sys.__stderr__
 
+
+
             if coverage:
                 returnString += coverage.stop()
 
@@ -85,6 +90,9 @@ class Unit(BaseTest):
             returnString += self.writeReport("pyunit", s)
         finally:
             self.deleteDummyUser()
+            #stopping the fake DB
+            self.stopFakeDB()
+            self.restoreDBInstance()
 
         if result:
             return returnString + "PY Unit tests succeeded\n"
@@ -151,6 +159,13 @@ class Functional(BaseTest):
             return ('[ERR] Could not start functional tests because selenium'
                     ' server cannot be started.\n')
 
+
+        #Stop prod DB and launch a fresh DB on this prod db port
+        self.stopProductionDB()
+        self.startFakeDB(Config.getInstance().getDBConnectionParams()[1])
+        #Create dummy user and use this user to create conf, session and so on
+        self.createDummyUser()
+
         #capturing the stderr
         outerr = StringIO.StringIO()
         sys.stderr = outerr
@@ -173,6 +188,12 @@ class Functional(BaseTest):
 
         #restoring the stderr
         sys.stderr = sys.__stderr__
+
+        self.deleteDummyUser()
+        #stopping the fake DB
+        self.stopFakeDB()
+        self.startProductionDB()
+        self.restoreDBInstance()
 
         s = outerr.getvalue()
         returnString += self.writeReport("pyfunctional", s)
@@ -691,10 +712,7 @@ class Indicop(object):
         returnString = "\n\n=============== ~INDICOP SAYS~ ===============\n\n"
 
         #To not pollute the installation of Indico
-        self.reconfigureFolders()
-
-        #Stopping current DB and setting and starting fake DB
-        self.startDB()
+        self.configureTempFolders()
 
         if coverage:
             Coverage.instantiate()
@@ -710,13 +728,11 @@ class Indicop(object):
                     returnString += ("[ERR] Test %s does not exist. "
                       "It has to be added in the testsDict variable\n") % test
 
-        #stoppingfake DB
-        self.stopDB()
         self.deleteTempFolders()
 
         return returnString
 
-    def reconfigureFolders(self):
+    def configureTempFolders(self):
         keyNames = ['LogDir',
                     'ArchiveDir',
                     'UploadedFilesTempDir']
@@ -727,105 +743,12 @@ class Indicop(object):
 
         Config.getInstance().updateValues(self.newValues)
 
-    def startDB(self):
-        zeoPort = 9686
-        self.createNewDBFile()
-        self.zeoServer = self.createDBServer(os.path.join(self.dbFolder, "Data.fs"), zeoPort)
-        print ("zodb server started on pid: " + str(self.zeoServer) + " .")
-        print ("Creating a CustomDBMgr on port " + str(zeoPort))
-        self.dbmgr = DBMgr(hostname="localhost", port=zeoPort)
-        DBMgr.setInstance(self.dbmgr)
-        print ("Starting a request ...")
-        self.dbmgr.startRequest()
-        print ("Request started successfully.")
-        self.dbmgr.endRequest(True)
-        print ("Request ended successfully.")
-
-    def stopDB(self):
-        try:
-            os.kill(self.zeoServer, signal.SIGTERM)
-        except OSError, e:
-            print ("Problem sending kill signal: " + str(e))
-
-        try:
-            os.wait()
-        except OSError, e:
-            print ("Problem waiting for ZEO Server: " + str(e))
-        self.removeDBFile()
-
-    def createNewDBFile(self):
-        savedDir = os.getcwd()
-        self.dbFolder = tempfile.mkdtemp()
-        os.chdir(self.dbFolder)
-
-        storage = FileStorage.FileStorage("Data.fs")
-        db = DB(storage)
-        connection = db.open()
-        dbroot = connection.root()
-
-        transaction.commit()
-
-        connection.close()
-        db.close()
-        storage.close()
-        os.chdir(savedDir)
-
     def deleteTempFolders(self):
         for k in self.newValues:
             shutil.rmtree(self.newValues[k])
-
-    def removeDBFile(self):
-        shutil.rmtree(self.dbFolder)
-
-    def createDBServer(self, file, port):
-        pid = os.fork()
-        if pid:
-            return pid
-        else:
-            server = TestZEOServer(port, file)
-            server.start()
-
-    def getDBInstance(self):
-        return self.dbmgr
 
     @classmethod
     def getInstance(cls, jsspecify, jscoverage):
         if cls.__instance == None:
             cls.__instance = Indicop(jsspecify, jscoverage)
-        return cls.__instance
-
-class TestsConfig:
-    __instance = None
-
-    def __init__(self):
-        execfile(os.path.join(os.path.dirname(__file__), 'tests.conf'))
-        self.testsConf = locals()
-
-    def __getattr__(self, attr):
-        """Dynamic finder for values defined in indico.conf
-
-            For example, if an indico.conf value is "username" this method will
-            return its value for a getUsername() call.
-
-            If you add a new pair option = value to indico.conf there is no need to
-            create anything here. It will be returned automatically.
-
-            This all means that changing the name of an indico.conf will force you
-            to change all references in code to getOldOptionName to getNewOptionName
-            including the reference in default_values in this file.
-        """
-        # The following code intercepts all method calls that start with get and are
-        # not already defined (so you can still override a get method if you want)
-        # and returns a closure that returns the value of the option being asked for
-        if attr[0:3] == 'get':
-            def configFinder(k):
-                return self.testsConf[k]
-            return lambda: configFinder(attr[3:])
-        else:
-            raise AttributeError
-
-    @classmethod
-    def getInstance(cls):
-        if cls.__instance == None:
-            cls.__instance = TestsConfig()
         return cls.__instance
