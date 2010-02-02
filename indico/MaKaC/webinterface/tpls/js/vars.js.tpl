@@ -72,7 +72,8 @@ var Indico = {
         starGrey: "<%= iconFileName("starGrey")%>",
         warning_yellow: "<%= iconFileName("warning_yellow")%>",
         arrow_up: "<%= iconFileName("upArrow")%>",
-        arrow_down: "<%= iconFileName("downArrow")%>"
+        arrow_down: "<%= iconFileName("downArrow")%>",
+        indico_small: "<%= iconFileName("indico_small")%>"
     },
     Urls: {
         JsonRpcService: "<%= urlHandlers.UHJsonRpcService.getURL() %>",

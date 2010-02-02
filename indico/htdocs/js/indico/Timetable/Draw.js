@@ -1317,7 +1317,6 @@ type("TimetableDrawer", ["IWidget"],
                          result[subkey] = clone(subentry);
                          result[subkey].color = entry.color;
                          result[subkey].textColor = entry.textColor;
-                         result[subkey].fontWeight = 'normal';
                      });
                  } else {
                      result[key] = entry;

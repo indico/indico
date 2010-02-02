@@ -14,33 +14,24 @@ function envoi(){
 }
 </script>
 
-<!-- TODO: remove permanently? -->
-<% if isFrontPage: %>
-	<div id="policyOfUse">
-		<h1><%= _("Policy of Use")%></h1>
-		<%= _("If you want to use it for CERN-related projects, please contact")%> <a href="mailto:indico-support@cern.ch"> <%= _("Indico support")%></a><%= _(""".
-        Non-CERN institutes may install the Indico software locally under GNU General Public License
-        (see the""")%> <a href="http://cern.ch/indico"><%= _("project web site")%></a>).
-	</div>
-<% end %>
-
 <div id="poweredBy" class="footer<% if dark == True: %> footerDark<% end %>">
-            <a href="http://www.cern.ch">
-            <img src="<%= systemIcon("cern_small") %>" alt="<%= _("Indico - Integrated Digital Conference")%>" />
-            </a>
-            <%= _("Powered by CERN Indico")%>
-            
+
+<div style="margin-bottom: 15px; font-family: monospace; font-size: 10px;">
+  <% if shortURL != "" and not isFrontPage: %>
+  <div><%= shortURL %></div>
+  <% end %>
+
+  <% if modificationDate != "": %>
+  <div><%= _("Last modified: ") + modificationDate %></div>
+  <% end %>
+</div>
+
+
+            <img src="<%= systemIcon("indico_small") %>" alt="<%= _("Indico - Integrated Digital Conference")%>" style="vertical-align: middle; margin-right: 2px;"/>
+            <span style="vertical-align: middle;"><%= _("Powered by ")%> <a href="http://cdsware.cern.ch/indico/">CDS Indico</a></span>
+
             <% if Configuration.Config.getInstance().getWorkerName()!="": %>
                 <span style="display: none;"><%= Configuration.Config.getInstance().getWorkerName() %></span>
             <% end %>
-            
-            <% if shortURL != "" and not isFrontPage: %>
-                <span class="separator">|</span>
-                <span><%= shortURL %></span>
-            <% end %>
-        
-            <% if modificationDate != "": %>
-                <span class="separator">|</span>
-                <span><%= _("Last modified: ") + modificationDate %></span>
-            <% end %>
+
 </div>

@@ -937,7 +937,7 @@ class LinkedTimeSchEntry(TimeSchEntry):
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'sessionId', lambda x: x.getOwner().getSession().getId())
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'sessionSlotId', lambda x: x.getOwner().getId())
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'entryType', lambda x: 'Session')
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'material', lambda x: DictPickler.pickle(x.getOwner().getSession().getMaterialList()))
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'material', lambda x: DictPickler.pickle(x.getOwner().getSession().getAllMaterialList()))
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'color', lambda x: x.getOwner().getSession().getColor())
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'textColor', lambda x: x.getOwner().getSession().getTextColor())
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'isPoster', lambda x: x.getOwner().getSession().getScheduleType() == 'poster')
@@ -1421,7 +1421,7 @@ class ContribSchEntry(LinkedTimeSchEntry):
     @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'sessionId', Conversion.parentSession)
     @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'sessionSlotId', Conversion.parentSlot)
     @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'contributionId', lambda x: x.getOwner().getId())
-    @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'material', lambda x: DictPickler.pickle(x.getOwner().getMaterialList()))
+    @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'material', lambda x: DictPickler.pickle(x.getOwner().getAllMaterialList()))
     @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'description', lambda x: x.getOwner().getDescription())
     @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'presenters', lambda x: x.getOwner().getSpeakerList(), isPicklableObject=True)
 

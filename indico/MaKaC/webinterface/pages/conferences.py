@@ -4071,7 +4071,6 @@ class WConferenceParticipants(wcomponents.WTemplated):
         vars["deselectAll"] = Config.getInstance().getSystemIconURL("uncheckAll")
 
         vars["participants"] = self.getParticipantsList()
-        vars["statisticButton"] = _("""<input type="submit" class="btn" value="_("Attendance statistics")" />""")
         vars["statisticAction"] = str(urlHandlers.UHConfModifParticipantsStatistics.getURL(self._conf))
         vars["sendButton"] = _("""<input type="submit" class="btn" value="_("Send email to")" name="participantsAction" />""")
         vars["excelButton"] = """<input type="submit" class="btn" value="Export to Excel" name="participantsAction"/>"""
@@ -4095,7 +4094,7 @@ class WConferenceParticipants(wcomponents.WTemplated):
             vars["addButton"] = vars["addAction"] = ""
             vars["removeButton"] = vars["sendAddedInfoButton"] = ""
 
-        vars["addButton"] = _("""<input type="submit" class="btn" value="_("Search participant")" />""")
+        vars["addButton"] = _("""<input type="submit" class="btn" value="_("Search database")" />""")
         vars["addAction"] = str(urlHandlers.UHConfModifParticipantsSelectToAdd.getURL(self._conf))
         vars["removeButton"] = _("""<input type="submit" class="btn" value="_("Remove participant")" name="participantsAction" />""")
 
@@ -4205,21 +4204,21 @@ class WConferenceParticipantsStatistics(wcomponents.WTemplated):
         else :
             vars["present"] = _("""
             <tr>
-                <td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"> _("Present participants") </td>
+                <td class="titleCellFormat"> _("Present participants") </td>
                 <td><b>%s</b></td>
             </tr>
             """)%self.__conf.getParticipation().getPresentNumber()
 
             vars["absent"] = _("""
             <tr>
-                <td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"> _("Absent participants") </td>
+                <td class="titleCellFormat"> _("Absent participants") </td>
                 <td><b>%s</b></td>
             </tr>
             """)%self.__conf.getParticipation().getAbsentNumber()
 
             vars["excused"] = _("""
             <tr>
-                <td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">&nbsp;&nbsp;&nbsp;&nbsp; _("Excused participants") </td>
+                <td class="titleCellFormat"> _("Excused participants") </td>
                 <td><b>%s</b></td>
             </tr>
             """)%self.__conf.getParticipation().getExcusedNumber()

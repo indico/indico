@@ -4,12 +4,15 @@
 
 <div class="pageHeader pageHeaderMainPage clearfix">
         <% includeTpl('SessionBar') %>
-    
+
         <% if searchBox != '': %>
             <%= searchBox %>
         <% end %>
 
-        <a href="<%= urlHandlers.UHWelcome.getURL() %>">
+        <!--
+            set fixed height on anchor to assure that the height is
+            corrected if the image cannot be retrieved (i.e. https problems) -->
+        <a style="display: block; min-height: 66px;" href="<%= urlHandlers.UHWelcome.getURL() %>">
             <img class="headerLogo" src="<%= imgLogo %>" />
         </a>
 
@@ -43,7 +46,7 @@
             <li style="display: none;" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="<%= urlHandlers.UHContact.getURL() %>">Contact</a></li>
             <li style="display: none;" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="<%= urlHandlers.UHCategoryMap.getURL(categId=0) %>">Site Map</a></li>
             <li style="display: none;" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="<%= urlHandlers.UHAbout.getURL() %>">About Indico</a></li>
-            
+
             <li onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''" style="display: none;"><a href="urlHandlers.UHGetUserEventPage.getURL()"><%= _("My Indico") %></a></li>
         </ul>
     </div>
@@ -52,10 +55,10 @@
 <%
 urlConference = urlHandlers.UHConferenceCreation.getURL(currentCategory)
 urlConference.addParam("event_type","default")
-    
+
 urlLecture = urlHandlers.UHConferenceCreation.getURL(currentCategory)
 urlLecture.addParam("event_type","simple_event")
-    
+
 urlMeeting = urlHandlers.UHConferenceCreation.getURL(currentCategory)
 urlMeeting.addParam("event_type","meeting")
 %>
@@ -64,7 +67,7 @@ urlMeeting.addParam("event_type","meeting")
 var createEventMenu = $E('createEventMenu');
 createEventMenu.observeClick(function(e) {
     var menuItems = {};
-    
+
     menuItems['<%= _("Create lecture") %>'] = "<%= urlLecture %>";
     menuItems['<%= _("Create meeting") %>'] = "<%= urlMeeting %>";
     menuItems['<%= _("Create conference") %>'] = "<%= urlConference %>";
@@ -106,6 +109,5 @@ helpMenu.observeClick(function(e) {
     return false;
 });
 </script>
-
 
 

@@ -2961,14 +2961,15 @@ ul.listCompact {
     text-align: center;
     color: #444444;
     height: 40px;
-    margin-top: -50px;
+    margin-top: -85px;
+    margin-bottom: 5px;
     padding-top: 10px;
     bottom: 0;
     width: 100%;
 }
 
 .footerDark {
-    color: #ECECEC;
+    color: #888888;
 }
 
 .footerDark a {
@@ -3112,9 +3113,9 @@ ul.listCompact {
 
 .banner_creator
 {
-    font-size: 13px;
+    font-size: 11px;
     font-weight: normal;
-    float: right;
+    line-height: 10px;
 }
 
 .areaTitle_orange {
@@ -5521,4 +5522,11 @@ div.posterEntry:hover {
 }
 .startEndDate span {
     color: #666;
+}
+
+.siteTitle {
+    font-size: 30px;
+    margin-top:0;
+    padding-left:10px;
+    padding-top:15px;
 }

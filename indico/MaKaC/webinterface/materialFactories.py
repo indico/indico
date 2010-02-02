@@ -402,26 +402,23 @@ class MaterialFactoryRegistry:
 
 
 class ConfMFRegistry( MaterialFactoryRegistry ):
-    
-    def __init__(self):
-        self._registry = { PaperFactory._id: PaperFactory, \
-                        SlidesFactory._id: SlidesFactory, \
-                        MinutesFactory._id: MinutesFactory, \
-                        VideoFactory._id: VideoFactory, \
-                        PosterFactory._id: PosterFactory }
+
+    _registry = { PaperFactory._id: PaperFactory, \
+                  SlidesFactory._id: SlidesFactory, \
+                  MinutesFactory._id: MinutesFactory, \
+                  VideoFactory._id: VideoFactory, \
+                  PosterFactory._id: PosterFactory }
 
 
 class SessionMFRegistry( MaterialFactoryRegistry ):
-    def __init__(self):
-        self._registry = { MinutesFactory._id: MinutesFactory }
+    _registry = { MinutesFactory._id: MinutesFactory }
 
 
 class ContribMFRegistry(MaterialFactoryRegistry):
-    def __init__(self):
-        self._registry = { PaperFactory._id: PaperFactory, \
-                    SlidesFactory._id: SlidesFactory, \
-                    MinutesFactory._id: MinutesFactory, \
-                    VideoFactory._id: VideoFactory, \
-                    PosterFactory._id: PosterFactory }
+    _registry = { PaperFactory._id: PaperFactory, \
+                  SlidesFactory._id: SlidesFactory, \
+                  MinutesFactory._id: MinutesFactory, \
+                  VideoFactory._id: VideoFactory, \
+                  PosterFactory._id: PosterFactory }
 
 
