@@ -1696,7 +1696,7 @@ input.UIFieldText
 
 .UIFieldSpan {
   float: right;
-  width: 175px;
+  width: 185px;
   text-align: left;
   }
 
@@ -2571,7 +2571,7 @@ div.filterDiv
 {
     background: #FFFFFF;
     margin-bottom: 10px;
-    margin: 30px 80px 30px 60px;
+    margin: 15px 80px 30px 60px;
     /*overflow: visible;*/
     overflow: hidden;
 }
@@ -2586,7 +2586,7 @@ div.filterDiv
 
 .bodyWithSideMenu {
     margin-left: 220px;
-    margin-top: 20px;
+    margin-top: 5px;
     margin-right: 20px;
 }
 
@@ -2961,12 +2961,17 @@ ul.listCompact {
     text-align: center;
     color: #444444;
     height: 40px;
-    margin-top: -85px;
+    margin-top: -60px;
     margin-bottom: 5px;
     padding-top: 10px;
     bottom: 0;
     width: 100%;
 }
+
+.longFooter {
+    margin-top: -60px;
+}
+
 
 .footerDark {
     color: #888888;
@@ -2998,7 +3003,7 @@ ul.listCompact {
 .banner
 {
     background-color: #ECECEC;
-    color: #444;
+    color: #888;
     vertical-align: middle;
     padding: 20px 30px;
     line-height: 30px;
@@ -5178,6 +5183,13 @@ div.CategoryEventListDiv {
     padding: 5px;
 }
 
+a.searchResultTitle{
+    font-size: 14px;
+}
+
+a.searchResultLink{
+    color: #76A2C4;
+}
 
 ul.searchResultList {
     padding: 0px;
@@ -5185,14 +5197,12 @@ ul.searchResultList {
 
 li.searchResultEvent {
     border-bottom: 1px solid #DDDDDD;
-    margin-bottom: 15px;
-    padding: 10px;
+    padding: 5px;
 }
 
 li.searchResultContribution {
     border-bottom: 1px solid #DDDDDD;
-    margin-bottom: 15px;
-    padding: 10px;
+    padding: 5px;
 }
 
 ul.authorList {
@@ -5201,21 +5211,16 @@ ul.authorList {
 }
 
 .searchPublicWarning {
-    border:1px solid red;
     color:#FF4444;
-    margin-bottom:20px;
-    margin-top:20px;
     padding:10px;
 }
 
 .Search {
-    border-bottom: 2px solid rgb(170, 170, 170);
     font-size: 34px;
     font-family: Times New Roman;
     color: #B14300;
     font-weight: normal;
     margin: 0;
-    margin-bottom: 10px;
     padding: 0;
 }
 
@@ -5529,4 +5534,46 @@ div.posterEntry:hover {
     margin-top:0;
     padding-left:10px;
     padding-top:15px;
+}
+
+div.eventModifButtonBar {
+	padding: 6px 0;
+	min-height: 24px;
+	min-width: 200px;
+}
+
+div.eventModifButtonBar a {
+    position: relative;
+    display: block;
+    float: left;
+    height: 13px;
+    padding: 4px 10px 7px 10px;
+    min-width: 4px;
+    margin-left: 4px;
+    background: transparent url(../images/button_bg_light.png) repeat-y scroll 0 0;
+    font-size: 13px;
+    font-family: arial, helvetica, sans-serif;
+    color: #000;
+}
+
+div.eventModifButtonBar a div.leftCorner {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: transparent url(../images/button_bg_light.png) repeat-y scroll -198px 0px;
+    width: 2px;
+    height: 24px;
+}
+
+div.eventModifButtonBar a:hover {
+    background-position: 0 -24px;
+    color: #808080;
+}
+
+div.eventModifButtonBar .separator {
+    float: left;
+    margin: 3px 6px 3px 10px;
+    width: 1px;
+    height: 18px;
+    border-right: 1px dotted #999;
 }
