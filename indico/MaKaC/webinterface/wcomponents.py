@@ -93,16 +93,16 @@ class WTemplated:
         """
 
 
-        if DBMgr.getInstance().isConnected():        
-            template = info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultTemplateSet()    
-        
+        if DBMgr.getInstance().isConnected():
+            template = info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultTemplateSet()
+
             if template != None :
                 specTpl = "%s.%s.%s" % (tplId, template, extension)
-            
-                if os.path.exists(os.path.join(dir,specTpl)):          
+
+                if os.path.exists(os.path.join(dir,specTpl)):
                     return specTpl
 
-        
+
         return "%s.%s" % (tplId, extension)
 
     def _setTPLFile(self):
@@ -114,7 +114,7 @@ class WTemplated:
         cfg = Configuration.Config.getInstance()
         dir = cfg.getTPLDir()
         file = cfg.getTPLFile( self.tplId )
-        
+
         if file == "":
             file = self._getSpecificTPL(dir,self.tplId)
         self.tplFile = os.path.join(dir, file)
@@ -122,9 +122,9 @@ class WTemplated:
         hfile = self._getSpecificTPL(os.path.join(dir,'chelp'),
                                               self.tplId,
                                               extension='wohl')
-    
+
         self.helpFile = os.path.join(dir,'chelp',hfile)
-        
+
 
     def getVars( self ):
         """Returns a dictionary containing the TPL variables that will
@@ -138,14 +138,14 @@ class WTemplated:
 
         cfg = Configuration.Config.getInstance()
         vars = cfg.getTPLVars()
-        
+
         for paramName in self.__params:
             vars[ paramName ] = self.__params[ paramName ]
         if len(vars.get("errorMsg", [])) > 0 :
             vars["errorMsg"] = WErrorMessage().getHTML(vars)
         else:
             vars["errorMsg"] = ""
-        
+
         if len(vars.get("infoMsg", [])) > 0 :
             vars["infoMsg"] = WInfoMessage().getHTML(vars)
         else :
@@ -162,7 +162,7 @@ class WTemplated:
         """
         from MaKaC.webinterface.rh.base import RH
         self._rh = RH._currentRH
-        if self.tplId == None:            
+        if self.tplId == None:
             self.tplId = self.__class__.__name__[1:]
         self._setTPLFile()
         self.__params = {}
@@ -184,14 +184,14 @@ class WTemplated:
                 fh.close()
             except exceptions.IOError:
                 pass
-        
+
         vars = self.getVars()
         vars['__rh__'] = self._rh
         vars['self'] = self
-                
+
         tempHTML = TemplateExec.executeTemplate( text, vars, self.tplId )
 
-        if helpText == None:            
+        if helpText == None:
             return tempHTML
         else:
             try:
@@ -201,7 +201,7 @@ class WTemplated:
                     raise MaKaCError(_("Template " + str(self.tplId) + " produced empty output, and it has a .wohl file. Error: " + str(e)))
                 else:
                     raise e
-            
+
 
     def htmlText(param):
         if param:
@@ -219,21 +219,21 @@ class WTemplated:
         return "&nbsp;"
     textToHTML = staticmethod( textToHTML )
 
-    def _escapeChars(self, text):        
+    def _escapeChars(self, text):
         return text.replace('%','%%')
 
 class WHTMLHeader(WTemplated):
-    
-    
-    
+
+
+
     def __init__(self, tpl_name = None):
         WTemplated.__init__(self)
-        
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
-                
+
         if DBMgr.getInstance().isConnected():
-            vars['stylesheet'] = Config.getInstance().getCssStylesheetName() 
+            vars['stylesheet'] = Config.getInstance().getCssStylesheetName()
         else:
             vars['stylesheet'] = 'Default.css'
         return vars
@@ -250,7 +250,7 @@ class WHeader(WTemplated):
         self._aw = aw
         self.__isFrontPage = isFrontPage
         self.__currentCategory = currentCategory
-   
+
     """
         Returns the current active timezone.
     """
@@ -261,7 +261,7 @@ class WHeader(WTemplated):
             tz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
 
         return tz
-    
+
     """
         Returns timezone string that is show to the user.
     """
@@ -275,49 +275,49 @@ class WHeader(WTemplated):
             return timezone
 
     def getVars( self ):
-        vars = WTemplated.getVars( self )        
+        vars = WTemplated.getVars( self )
         #urlHandlers.UHUserDetails.getURL(self._currentuser)
         vars["logMeAs"] = ""
         # TODO: Remove this after CRBS headers are fixed!
         if self._currentuser:
             vars["userInfo"] = """<font size="-1"><a class="topbar" href="%s" target="_blank">%s</a> - <a href="%s">logout</a></font>"""%(urlHandlers.UHUserDetails.getURL(self._currentuser), self._currentuser.getFullName(), vars["logoutURL"])
             vars["userDetails"] = """class="topbar" href="%s" target="_blank\""""%urlHandlers.UHUserDetails.getURL(self._currentuser)
-            
+
             if self._currentuser.isAdmin():
                 vars["logMeAs"] = vars["loginAsURL"]
         else:
             vars["userInfo"] = """<a href="%s">login</a>"""%(vars["loginURL"])
             vars["userDetails"] = ""
         # *****************
-       
+
         vars["currentUser"] = self._currentuser
-       
+
         imgLogo=Configuration.Config.getInstance().getSystemIconURL( "logoIndico" )
         imgLogin=Configuration.Config.getInstance().getSystemIconURL( "login" )
 ##
 ## TOCHECK: We do not need this anymore since we use the flaog _ishttps in the clase RHSignIn
 ##
 #        if Configuration.Config.getInstance().getLoginURL().startswith("https"):
-#            
+#
 #            # Set proper PROTOCOL for images requested via SSL
 #            imgLogo=imgLogo.replace("http://", "https://")
 #            imgLogin=imgLogin.replace("http://", "https://")
-#            
+#
 #            # Set proper PORT for images requested via SSL
 #            imgLogo = urlHandlers.setSSLPort( imgLogo )
-#            imgLogin = urlHandlers.setSSLPort( imgLogin ) 
-#            
+#            imgLogin = urlHandlers.setSSLPort( imgLogin )
+#
         vars["imgLogo"] = imgLogo
         vars["imgLogin"] = imgLogin
         vars["isFrontPage"] = self.__isFrontPage
         vars["currentCategory"] = self.__currentCategory
-        
+
         if self._aw.getSession():
             selLang = self._aw.getSession().getLang()
         else:
             minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
             selLang = minfo.getLang()
-        
+
         #language list related
         languages = {}
         vars["SelectedLanguageName"] = "Unknown Language";
@@ -328,7 +328,7 @@ class WHeader(WTemplated):
         vars["Languages"] = languages
 
         vars["SelectedLanguage"] = selLang;
-        
+
         vars["ActiveTimezone"] = self._getActiveTimezone();
         """
             Get the timezone for displaying on top of the page.
@@ -338,25 +338,28 @@ class WHeader(WTemplated):
             2. If the user has a custom timezone display that one.
         """
         vars["ActiveTimezoneDisplay"] = self._getTimezoneDisplay(vars["ActiveTimezone"])
-        
+
         if DBMgr.getInstance().isConnected():
             vars["title"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTitle()
             vars["organization"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getOrganisation()
         else:
             vars["title"] = "Indico"
             vars["organization"] = ""
-        
-        
+
+
         # Search box, in case search is active
         if Config.getInstance().getIndicoSearchServer() != '' :
-            vars['searchBox'] = WCategorySearchBox().getHTML()
+            categId = 0
+            if self.__currentCategory:
+                categId = self.__currentCategory.getId()
+            vars['searchBox'] = WCategorySearchBox(categId=categId).getHTML()
         else:
             vars['searchBox'] = ""
-        
+
         # Check if room booking module is active
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars['roomBooking'] = minfo.getRoomBookingModuleActive()
-        
+
         #Build a list of items for the administration menu
         adminList = AdminList.getInstance()
         adminItemList = []
@@ -369,41 +372,41 @@ class WHeader(WTemplated):
                     adminItemList.append({'url': urlHandlers.UHAdminCollaboration.getURL(), 'text': _("Video Services Overview")})
             if webcast.HelperWebcastManager.getWebcastManagerInstance().isManager(self._currentuser):
                 adminItemList.append({'url': urlHandlers.UHWebcast.getURL(), 'text': _("Webcast Admin")})
-            
-            
+
+
         vars["adminItemList"] = adminItemList
-        
+
         return vars
 
 
 class WStaticWebHeader( WTemplated ):
-    """Templating web component for generating the HTML header for 
+    """Templating web component for generating the HTML header for
         the static web interface when generating a DVD.
     """
     def getVars( self ):
         vars = WTemplated.getVars( self )
         return vars
-    
+
 class WManagementHeader( WHeader ):
-    """Templating web component for generating the HTML header for 
+    """Templating web component for generating the HTML header for
         the management web interface.
     """
     pass
 
 class WHelpHeader( WHeader ):
-    """Templating web component for generating the HTML header for 
+    """Templating web component for generating the HTML header for
         the help web interface.
     """
     pass
-    
+
 class WRoomBookingHeader( WHeader ):
-    """Templating web component for generating the HTML header for 
+    """Templating web component for generating the HTML header for
         the (standalone) room booking web interface.
     """
     pass
 
 class WConferenceHeader( WHeader ):
-    """Templating web component for generating the HTML header for 
+    """Templating web component for generating the HTML header for
         the conferences' web interface.
     """
 
@@ -413,21 +416,21 @@ class WConferenceHeader( WHeader ):
         WHeader.__init__(self, self._aw, navDrawer, tpl_name='EventHeader')
         tzUtil = DisplayTZ(self._aw,self._conf)
         self._locTZ = tzUtil.getDisplayTZ()
-     
+
     def getVars( self ):
         vars = WHeader.getVars( self )
         vars["categurl"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])
-        
+
         vars["conf"] = self._conf;
-        
+
         vars["imgLogo"] = Configuration.Config.getInstance().getSystemIconURL( "miniLogo" )
         vars["MaKaCHomeURL"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])
-        
+
         #moved here from WHeader in order to be able to use DisplayTZ with self._conf (in some pages WHeader has no self._conf).
         #TODO: Is this needed?
         #vars["Timezones"] = Config.getInstance().getTimezoneList()
- 
- 
+
+
 #        if self._conf.getModifKey() != '':
 #            url = urlHandlers.UHConfEnterModifKey.getURL(self._conf)
 #            url.addParam("redirectURL",urlHandlers.UHConferenceDisplay.getURL(self._conf))
@@ -462,7 +465,7 @@ class WMenuConferenceHeader( WConferenceHeader ):
             vars["confModif"] = _("""<a href=%s>_("exit manage")</a>""")%quoteattr(str(url))
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         stylesheets = styleMgr.getStylesheetListForEventType(vars["type"])
-       
+
         # View Menu
         viewoptions = []
         if len(stylesheets) != 0:
@@ -524,7 +527,7 @@ class WMenuConferenceHeader( WConferenceHeader ):
                     hideContributions = ""
         # Save to session
         vars["hideContributions"] = hideContributions;
-        
+
         if self._conf.getType() == "meeting" and self._conf.getParticipation().isAllowedForApplying() and self._conf.getStartDate() > nowutc():
             vars["applyForParticipation"] = _("""<a href="%s">_("Apply for participation")</a>""")%urlHandlers.UHConfParticipantsNewPending.getURL(self._conf)
         else :
@@ -558,11 +561,11 @@ class WMenuConferenceHeader( WConferenceHeader ):
         else:
             vars["searchBox"] = ""
 
-        
+
         return vars
 
 class WMenuMeetingHeader( WConferenceHeader ):
-    """Templating web component for generating the HTML header for 
+    """Templating web component for generating the HTML header for
         the meetings web interface with a menu
     """
     def __init__(self, aw, navDrawer, conf, modifKey=False):
@@ -572,11 +575,11 @@ class WMenuMeetingHeader( WConferenceHeader ):
         WHeader.__init__(self, self._aw, navDrawer, tpl_name='EventHeader')
         tzUtil = DisplayTZ(self._aw,self._conf)
         self._locTZ = tzUtil.getDisplayTZ()
-       
+
 
     def getVars( self ):
         vars = WConferenceHeader.getVars( self )
-        
+
         vars["categurl"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])
         #vars["confModif"] =  _("""<a href=%s> _("manage")</a>""")%quoteattr(str(urlHandlers.UHConfEnterModifKey.getURL(self._conf)))
         #if self._conf.canKeyModify(self._aw):
@@ -597,7 +600,7 @@ class WMenuMeetingHeader( WConferenceHeader ):
         vars["showFilterButton"] = True
         vars["showExportToPDF"] = True
         vars["showMore"] = True
-		
+
         # Dates Menu
         tz = DisplayTZ(self._aw,self._conf,useServerTZ=1).getDisplayTZ()
         sdate = self._conf.getStartDate().astimezone(timezone(tz))
@@ -619,7 +622,7 @@ class WMenuMeetingHeader( WConferenceHeader ):
             dates.append(""" <option value="%s" %s>%s</option> """%(d, selected, d))
             sdate = sdate + timedelta(days=1)
         vars["datesMenu"] = "".join(dates);
-        
+
         # Sessions Menu
         sessions = []
         selected = ""
@@ -640,7 +643,7 @@ class WMenuMeetingHeader( WConferenceHeader ):
                 title = title[0:40] + "..."
             sessions.append(""" <option value="%s" %s>%s</option> """%(id, selected, title))
         vars["sessionsMenu"] = "".join(sessions);
-        
+
         # Handle hide/show contributions option
         hideContributions = None;
         if len(self._conf.getSessionList()) != 0:
@@ -650,12 +653,12 @@ class WMenuMeetingHeader( WConferenceHeader ):
                 else:
                     hideContributions = ""
         vars["hideContributions"] = hideContributions;
-        
+
         if Config.getInstance().getIndicoSearchServer() != '' :
-            vars["searchBox"] = WCategorySearchBox(optionsClass='meetingHeaderSearchBox').getHTML()            
+            vars["searchBox"] = WCategorySearchBox(optionsClass='meetingHeaderSearchBox').getHTML()
         else:
             vars["searchBox"] = ""
-        
+
         urlCustPrint = urlHandlers.UHConferenceOtherViews.getURL(self._conf)
         urlCustPrint.addParam("showDate", vars.get("selectedDate", "all"))
         urlCustPrint.addParam("showSession", vars.get("selectedSession", "all"))
@@ -663,21 +666,21 @@ class WMenuMeetingHeader( WConferenceHeader ):
         urlCustPrint.addParam("fr", "no")
         urlCustPrint.addParam("view", vars["currentView"])
         vars["printURL"]=str(urlCustPrint)
-        
+
 
         urlCustPDF=urlHandlers.UHConfTimeTableCustomizePDF.getURL(self._conf)
         urlCustPDF.addParam("showDays", vars.get("selectedDate", "all"))
         urlCustPDF.addParam("showSessions", vars.get("selectedSession", "all"))
         vars["pdfURL"]=str(urlCustPDF)
 
-        
+
         return vars
 
 class WMenuSimpleEventHeader( WMenuMeetingHeader ):
-    """Templating web component for generating the HTML header for 
+    """Templating web component for generating the HTML header for
         the simple event' web interface with a menu
     """
-    
+
     def getVars( self ):
         vars = WMenuMeetingHeader.getVars( self )
         vars["confModif"] = """<a href=%s>manage</a>"""%quoteattr(str(urlHandlers.UHConfEnterModifKey.getURL(self._conf)))
@@ -692,38 +695,38 @@ class WMenuSimpleEventHeader( WMenuMeetingHeader ):
                 viewoptions.append({"id": stylesheet, "name": styleMgr.getStylesheetName(stylesheet) })
         vars["viewoptions"] = viewoptions
         vars["SelectedStyle"] = styleMgr.getStylesheetName(vars["currentView"])
-        
+
         vars["showFilterButton"] = False
         vars["showExportToPDF"] = False
         vars["showMore"] = True
-            
+
         vars["accessWrapper"] = self._aw
         return vars
 
 
-    
+
 class WFooter(WTemplated):
-    """Templating web component for generating a common HTML footer for the 
+    """Templating web component for generating a common HTML footer for the
         web interface.
     """
-    
+
     def __init__(self, tpl_name = None, isFrontPage = False):
         WTemplated.__init__(self, tpl_name)
         self.__isFrontPage = isFrontPage
-        
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
-        
+
         vars["isFrontPage"] = self.__isFrontPage;
-        
+
         if not vars.has_key("modificationDate"):
             vars["modificationDate"] = ""
-        
+
         if not vars.has_key("shortURL"):
             vars["shortURL"] = ""
-        
+
         return vars
-    
+
 class WNavigationDrawer(WTemplated):
 
     def __init__( self, pars, bgColor = None, appendPath = [] ):
@@ -731,10 +734,10 @@ class WNavigationDrawer(WTemplated):
         self._isModif = pars.get("isModif", False)
         self._track = pars.get("track", None) #for abstracts viewed inside a track
         self._bgColor = bgColor
-        
+
         """
             The appendPath is an array with dictionaries: {"url": x, "title": x}.
-            Each of these links are added in the end of the breadcrumb 
+            Each of these links are added in the end of the breadcrumb
         """
         self._appendPath = appendPath
 
@@ -746,18 +749,18 @@ class WNavigationDrawer(WTemplated):
         vars["bgColor"] = self._bgColor
         vars["appendPath"] = self._appendPath
         return vars
-    
+
     def getHTML(self, params=None):
         return WTemplated.getHTML(self, params)
 
 class WSimpleNavigationDrawer(WTemplated):
-    
+
     def __init__( self, title, handler = None, bgColor = None, **pars  ):
         self._urlHandler = handler
         self._pars = pars
         self._title = title
         self._bgColor = bgColor
-        
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
         vars["urlHandler"] = self._urlHandler
@@ -765,18 +768,18 @@ class WSimpleNavigationDrawer(WTemplated):
         vars["pars"] = self._pars
         vars["bgColor"] = self._bgColor
         return vars
-    
+
     def getHTML(self, params=None):
         return WTemplated.getHTML(self, params)
-    
+
 class WBannerModif(WTemplated):
-    
+
     def __init__( self, path = [], itemType = "", title = "" ):
         WTemplated.__init__( self, "BannerModif" )
         self._path = path
         self._title = title
         self._type = itemType
-        
+
     def getHTML(self):
         """ Retrieves the HTML of the banner of the modification interface
             of the given target event / category / contribution / abstract / etc.
@@ -784,7 +787,7 @@ class WBannerModif(WTemplated):
             If originUrl and originPageTitle is set then this link his added to the end
             of the breadcrumb showed in the banner.
         """
-        
+
         return WTemplated.getHTML(self, {"type" : self._type, "path": self._path, "title": self._title})
 
 class WTimetableBannerModif(WBannerModif):
@@ -799,7 +802,7 @@ class WTimetableBannerModif(WBannerModif):
         itemType = type(target).__name__
         title = target.getTitle()
         WBannerModif.__init__(self, path, itemType, title)
-        
+
     def _getOwnerBasePath(self, target):
         path = []
         obj = target
@@ -814,7 +817,7 @@ class WTimetableBannerModif(WBannerModif):
         return path
 
 class WContribListBannerModif(WTimetableBannerModif):
-    
+
     def __init__(self, target ):
         ## PATH
         # Iterate till conference is reached
@@ -825,10 +828,10 @@ class WContribListBannerModif(WTimetableBannerModif):
         itemType = type(target).__name__
         title = target.getTitle()
         WBannerModif.__init__(self, path, itemType, title)
-    
+
 
 class WNotifTplBannerModif(WBannerModif):
-    
+
     def __init__( self, target ):
         path = [{"url": urlHandlers.UHConfModifCFA.getURL(target), "title":_("Call for abstracts setup")}]
         itemType="Notification Template"
@@ -836,15 +839,15 @@ class WNotifTplBannerModif(WBannerModif):
         WBannerModif.__init__(self, path, itemType, title)
 
 class WAbstractBannerModif(WBannerModif):
-    
+
     def __init__( self, target ):
         path = [{"url": urlHandlers.UHConfAbstractManagment.getURL(target), "title":_("Abstracts list")}]
         itemType="Abstract"
         title=target.getTitle()
         WBannerModif.__init__(self, path, itemType, title)
-        
+
 class WTrackBannerModif(WBannerModif):
-    
+
     def __init__( self, track, abstract=None ):
         path = []
         target = track
@@ -857,78 +860,78 @@ class WTrackBannerModif(WBannerModif):
         itemType=type(target).__name__
         title=target.getTitle()
         WBannerModif.__init__(self, path, itemType, title)
-        
+
 class WCategoryBannerModif(WBannerModif):
-    
+
     def __init__( self, target ):
         itemType="Category"
         title=target.getTitle()
         WBannerModif.__init__(self, [], itemType, title)
 
 class WRegFormBannerModif(WBannerModif):
-    
+
     def __init__( self, registrant ):
         path=[{"url": urlHandlers.UHConfModifRegistrantList.getURL(registrant.getConference()), "title":_("Registrants list")}]
-        
+
         itemType="Registrant"
         title=registrant.getFullName()
         WBannerModif.__init__(self, path, itemType, title)
 
 class WRegFormSectionBannerModif(WBannerModif):
-    
+
     def __init__( self, target, conf ):
         path=[{"url": urlHandlers.UHConfModifRegForm.getURL(conf), "title":_("Registration form setup")}]
-        
+
         itemType="Registration form Section"
         title=target.getTitle()
         WBannerModif.__init__(self, path, itemType, title)
 
 class WEpaymentBannerModif(WBannerModif):
-    
+
     def __init__( self, target, conf ):
         path=[{"url": urlHandlers.UHConfModifEPayment.getURL(conf), "title":_("Epayment setup")}]
-        
+
         itemType="Epayment plugin"
         title=target.getTitle()
         WBannerModif.__init__(self, path, itemType, title)
 
 class WListingsBannerModif(WBannerModif):
-    
+
     def __init__( self, conf ):
         path=[{"url": urlHandlers.UHConfModifListings.getURL(conf), "title":_("All listings")}]
-        
+
         itemType="Pending queues"
         title=""
         WBannerModif.__init__(self, path, itemType, title)
 
 class WParticipantsBannerModif(WBannerModif):
-    
+
     def __init__( self, conf ):
         path=[{"url": urlHandlers.UHConfModifParticipants.getURL(conf), "title":_("Participants list")}]
-        
+
         itemType="Pending participants"
         title=""
         WBannerModif.__init__(self, path, itemType, title)
 
 
 class WConfLogsBannerModif(WBannerModif):
-    
+
     def __init__( self, conf ):
         path=[{"url": urlHandlers.UHConfModifLog.getURL(conf), "title":_("Logs")}]
-        
+
         itemType="Log item"
         title=""
         WBannerModif.__init__(self, path, itemType, title)
 
 class WCategModifHeader(WTemplated):
-    
+
     def __init__(self, targetConf ):
         self._conf = targetConf
-        
+
     def _getSingleCategHTML( self, categ, URLGen ):
-      
+
         return """<a href="%s">%s</a>"""%(URLGen( categ ), categ.getName())
- 
+
     def _getMultipleCategHTML( self, categList, URLGen ):
         l = []
         for categ in self._conf.getOwnerList():
@@ -938,9 +941,9 @@ class WCategModifHeader(WTemplated):
                         <select name="categId">%s</select>
                         <input type="submit" class="btn" value="_("go")">
                     </form>""")%(URLGen(), "".join(l))
-   
+
     def getVars( self ):
-        
+
         vars = WTemplated.getVars( self )
         #raise "%s"%(type(self._conf))
         try:
@@ -949,7 +952,7 @@ class WCategModifHeader(WTemplated):
             ol=self._conf
         #raise "%s"%ol
         URLGen = vars.get("categDisplayURLGen", urlHandlers.UHCategoryDisplay.getURL )
-        
+
         try:
             if len(ol)>1:
                 vars["categ"] = self._getMultipleCategHTML(ol, URLGen)
@@ -959,19 +962,19 @@ class WCategModifHeader(WTemplated):
         except:
             vars["categ"] = self._getSingleCategHTML( ol, URLGen)
             vars["viewImageURL"] = Configuration.Config.getInstance().getSystemIconURL( "view" )
-        
+
         return vars
 
 
 class WCategoryModificationHeader(WTemplated):
-    
-    
+
+
     def __init__( self, category ):
         self._categ = category
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
-        
+
         vars["confTitle"] = self._categ.getName()
         vars["title"] = self._categ.getName()
         vars["catDisplayURL"] = urlHandlers.UHCategoryDisplay.getURL(self._categ)
@@ -980,15 +983,15 @@ class WCategoryModificationHeader(WTemplated):
         #vars["intermediateVTabPixels"] = self.getIntermediateVTabPixels()
         vars["eventCaption"]= "Category"
         return vars
-        
+
     def getIntermediateVTabPixels( self ):
         return 0
-        
+
     def getTitleTabPixels( self ):
         return 260
 
 class WConfModifHeader(WTemplated):
-    
+
     def __init__( self, conf, aw ):
         self._conf = conf
         self._aw = aw
@@ -1016,13 +1019,13 @@ class WConfModifHeader(WTemplated):
         if type == "simple_event":
             type = "lecture"
         vars["eventCaption"]=type.capitalize()#"Event"
-        
-        
+
+
         return vars
 
 
 class WSessionModifHeader(WTemplated):
-    
+
     def __init__( self, session, aw ):
         self._session = session
         self._aw = aw
@@ -1041,7 +1044,7 @@ class WSessionModifHeader(WTemplated):
         return vars
 
 class WBreakModifHeader(WTemplated):
-    
+
     def __init__( self, breakSlot, aw ):
         self._break = breakSlot
         self._aw = aw
@@ -1057,7 +1060,7 @@ class WBreakModifHeader(WTemplated):
 
 
 class WContribModifHeader(WTemplated):
-    
+
     def __init__( self, contrib, aw):
         self._contrib = contrib
         self._aw = aw
@@ -1074,7 +1077,7 @@ class WContribModifHeader(WTemplated):
     def getVars( self ):
         vars = WTemplated.getVars( self )
         vars["imgGestionGrey"] = Configuration.Config.getInstance().getSystemIconURL( "gestionGrey" )
-        vars["title"] = escape(self._contrib.getTitle())        
+        vars["title"] = escape(self._contrib.getTitle())
         urlGen = vars.get( "contribDisplayURLGen", urlHandlers.UHContributionDisplay.getURL )
         vars["contribDisplayURL"] = urlGen(self._contrib)
         urlGen = vars.get( "contribModifURLGen", urlHandlers.UHContributionModification.getURL )
@@ -1083,21 +1086,21 @@ class WContribModifHeader(WTemplated):
 
 
 class WContribModifTool(WTemplated):
-    
+
     def __init__( self, contrib ):
         self._contrib = contrib
-    
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
         vars["deleteIconURL"] = Configuration.Config.getInstance().getSystemIconURL("delete")
         vars["moveIconURL"] = Configuration.Config.getInstance().getSystemIconURL("move")
         vars["writeIconURL"] = Configuration.Config.getInstance().getSystemIconURL("write_minutes")
         return vars
-        
+
 
 
 class WContributionDeletion(object):
-    
+
     def __init__( self, contribList ):
         self._contribList = contribList
 
@@ -1120,7 +1123,7 @@ class WContributionDeletion(object):
                     <li> _("ALL the existing sub-contributions within the above contribution(s) will also be deleted")</li>
                 </ul>
                 </td></tr>
-            </table> 
+            </table>
               """)%("".join(l))
         wc = WConfirmation()
         contribIdList = []
@@ -1137,11 +1140,11 @@ class WContributionDeletion(object):
 
 
 class WContribModifSC(WTemplated):
-    
+
     def __init__( self, contrib ):
         self._contrib = contrib
         self._conf = self._contrib.getConference()
-        
+
 
     def getSubContItems(self,SCModifURL):
         temp = []
@@ -1169,7 +1172,7 @@ class WContribModifSC(WTemplated):
                 <table align="center">%s
                 </table>"""%"".join( temp )
         return html
-    
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
         cfg = Configuration.Config.getInstance()
@@ -1177,7 +1180,7 @@ class WContribModifSC(WTemplated):
         vars["confId"] = self._contrib.getConference().getId()
         vars["contribId"] = self._contrib.getId()
         vars["deleteItemsURL"] = vars["moveSubContribURL"]
-        
+
         return vars
 ###ness##################################################################################
 #     def __getSubCategoryItems( self, sl, modifURLGen ):
@@ -1208,7 +1211,7 @@ class WContribModifSC(WTemplated):
 ##ness##############################################################################
 
 class WMaterialModifHeader(WTemplated):
-    
+
     def __init__( self, material, aw ):
         self._mat = material
         self._aw = aw
@@ -1236,16 +1239,16 @@ class WMaterialModifHeader(WTemplated):
         vars["titleTabPixels"] = WMaterialModifFrame(self._mat, self._aw).getTitleTabPixels()
         return vars
 
-    
+
 class WConferenceModifFrame(WTemplated):
-    
+
     def __init__( self, conference, aw,):
         self.__conf = conference
         self._aw = aw
 
     def getHTML( self, body, **params ):
         params["body"] = body
-        return WTemplated.getHTML( self, params ) 
+        return WTemplated.getHTML( self, params )
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
@@ -1254,16 +1257,16 @@ class WConferenceModifFrame(WTemplated):
         vars["date"] = utils.formatDateTime(self.__conf.getAdjustedStartDate(), format="%d %B")
 
         return vars
-    
+
 class WCategoryModifFrame(WTemplated):
-    
+
     def __init__( self, conference):
         self.__conf = conference
-        
+
 
     def getHTML( self, body, **params ):
         params["body"] = body
-        return WTemplated.getHTML( self, params ) 
+        return WTemplated.getHTML( self, params )
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
@@ -1278,26 +1281,26 @@ class WCategoryModifFrame(WTemplated):
         vars["intermediateVTabPixels"] = self.getIntermediateVTabPixels()
         return vars
 
-    
+
     def getIntermediateVTabPixels( self ):
         return 0
-        
+
     def getTitleTabPixels( self ):
         return 260
-    
+
     def getCloseHeaderTags( self ):
         return ""
 
 class WNotifTPLModifFrame(WTemplated):
-    
+
     def __init__(self, notifTpl, aw):
         self._notifTpl = notifTpl
         self._aw = aw
-    
+
     def getHTML( self, body, **params ):
         params["body"] = body
         return WTemplated.getHTML( self, params )
-    
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
         conf = self._notifTpl.getConference()
@@ -1312,22 +1315,22 @@ class WNotifTPLModifFrame(WTemplated):
         owner = self._notifTpl.getOwner()
         wc = WConferenceModifFrame(owner, self._aw)
         return wc
-        
+
     def getIntermediateVTabPixels( self ):
         wc = self.getOwnerComponent()
         return 7 + wc.getIntermediateVTabPixels()
-        
+
     def getTitleTabPixels( self ):
         wc = self.getOwnerComponent()
         return wc.getTitleTabPixels() - 7
-    
+
     def getCloseHeaderTags( self ):
         wc = self.getOwnerComponent()
         return "</table></td></tr>" + wc.getCloseHeaderTags()
 
 
 class WScheduleContributionModifFrame(WTemplated):
-    
+
     def __init__( self, contribution, aw, days, handler=urlHandlers.UHContributionModification):
         self._contrib = contribution
         self._conf = self._contrib.getConference()
@@ -1335,12 +1338,12 @@ class WScheduleContributionModifFrame(WTemplated):
         self._days = days
         self._handler = handler
 
-    def getHTML( self, body, **params ):        
-        
+    def getHTML( self, body, **params ):
+
         params["body"] = body
-        
+
         dateList = [d.getDate() for d in self._days]
-        
+
         # Keep contributions that happen in the selected day(s)
 
         # DEBUG
@@ -1349,18 +1352,18 @@ class WScheduleContributionModifFrame(WTemplated):
             assert(type(c.getStartDate()) == datetime),"Not all dates are present for the contributions!"
 
         ###
-            
+
         l = []
         for contrib in self._conf.getContributionList():
             if contrib.getStartDate().date() in dateList:
                 l.append(contrib)
         params["contribList"] = l
         params["handler"] = self._handler
-        
+
         return WTemplated.getHTML( self, params )
 
 class WContributionModifFrame(WTemplated):
-    
+
     def __init__( self, contribution, aw):
         self._contrib = contribution
         self._aw = aw
@@ -1376,7 +1379,7 @@ class WContributionModifFrame(WTemplated):
 
 
 class WMaterialModifFrame(WTemplated):
-    
+
     def __init__( self, material, aw):
         self._material = material
         self._aw = aw
@@ -1394,11 +1397,11 @@ class WMaterialModifFrame(WTemplated):
             wc = WContribModifHeader( owner, self._aw )
         elif isinstance(owner, conference.Session):
             wc = WSessionModifHeader( owner, self._aw )
-        elif isinstance(owner, conference.SubContribution):         
+        elif isinstance(owner, conference.SubContribution):
             wc = WSubContribModifHeader( owner, self._aw )
         elif isinstance(owner, conference.Category) :
-            wc = WCategoryModificationHeader(owner)  
-        else:       
+            wc = WCategoryModificationHeader(owner)
+        else:
             wc = WConfModifHeader( owner, self._aw )
         vars["context"] = wc.getHTML( vars )
         vars["closeHeaderTags"] = self.getCloseHeaderTags()
@@ -1407,7 +1410,7 @@ class WMaterialModifFrame(WTemplated):
         vars["title"] = escape(self._material.getTitle())
         vars["materialDisplayURL"] = vars["materialDisplayURLGen"]( self._material )
         return vars
-        
+
     def getOwnerComponent( self ):
         owner = self._material.getOwner()
         if isinstance(owner, conference.Contribution):
@@ -1416,26 +1419,26 @@ class WMaterialModifFrame(WTemplated):
             wc = WSessionModifFrame(owner, self._aw)
         elif isinstance(owner, conference.SubContribution):
             wc = WSubContributionModifFrame(owner, self._aw)
-        
+
         else:
             wc = WConferenceModifFrame(owner, self._aw)
         return wc
-        
+
     def getIntermediateVTabPixels( self ):
         wc = self.getOwnerComponent()
         return 7 + wc.getIntermediateVTabPixels()
-        
+
     def getTitleTabPixels( self ):
         wc = self.getOwnerComponent()
         return wc.getTitleTabPixels() - 7
-    
+
     def getCloseHeaderTags( self ):
         wc = self.getOwnerComponent()
         return "</table></td></tr>" + wc.getCloseHeaderTags()
 
 
 class WResourceModifFrame(WTemplated):
-    
+
     def __init__( self, resource, aw):
         self._resource = resource
         self._aw = aw
@@ -1453,20 +1456,20 @@ class WResourceModifFrame(WTemplated):
         vars["titleTabPixels"] = self.getTitleTabPixels()
         vars["closeHeaderTags"] = self.getCloseHeaderTags()
         return vars
-        
+
     def getOwnerComponent( self ):
         owner = self._resource.getOwner()
         wc = WMaterialModifFrame(owner, self._aw)
         return wc
-        
+
     def getIntermediateVTabPixels( self ):
         wc = self.getOwnerComponent()
         return 7 + wc.getIntermediateVTabPixels()
-        
+
     def getTitleTabPixels( self ):
         wc = self.getOwnerComponent()
         return wc.getTitleTabPixels() - 7
-    
+
     def getCloseHeaderTags( self ):
         wc = self.getOwnerComponent()
         return "</table></td></tr>" + wc.getCloseHeaderTags()
@@ -1482,7 +1485,7 @@ class WLinkModifFrame( WResourceModifFrame ):
 
 
 class ModifFrameFactory:
-    
+
     def getFrameClass( cls, target ):
         if isinstance(target, conference.Conference):
             return WConferenceModifFrame
@@ -1500,7 +1503,7 @@ class ModifFrameFactory:
             return WLinkModifFrame
         return None
     getFrameClass = classmethod( getFrameClass )
-        
+
     def getModifFrame( target ):
         f = ModifFrameFactory.getFrameClass( target )
         if f:
@@ -1510,7 +1513,7 @@ class ModifFrameFactory:
 
 
 class WSubContributionDisplay:
-    
+
     def __init__(self, aw, subContrib):
         self._aw = aw
         self._subContrib = subContrib
@@ -1525,7 +1528,7 @@ class WSubContributionDisplay:
         return ""
 
 class WSubContributionDisplayBase(WTemplated):
-    
+
     def __init__(self, aw, subContrib):
         self._aw = aw
         self._subContrib = subContrib
@@ -1575,16 +1578,16 @@ class WSubContributionDisplayMin(WSubContributionDisplayBase):
 
 
 class WMaterialDisplayItem(WTemplated):
-    
+
     def getHTML( self, aw, material, URL="", icon=Configuration.Config.getInstance().getSystemIconURL( "material" ) ):
         if material.canView( aw ):
-            
+
             return """<a href=%s>%s</a>"""%(quoteattr( str( URL ) ), WTemplated.htmlText( material.getTitle() ) )
         return ""
 
 
 class WBreakDataModification(WTemplated):
-    
+
     def __init__(self,sch,breakEntry=None,targetDay=None,conf=None):
         self._break=breakEntry
         if self._break!=None:
@@ -1660,7 +1663,7 @@ class WBreakDataModification(WTemplated):
         if ownerRoom:
             vars["ownerRoom"] = ownerRoom.getName()
         vars["roomName"] = quoteattr(str(roomName))
-            
+
         vars["WPtitle"]=wpTitle
         vars["title"]=quoteattr(str(title))
         vars["description"]=self.htmlText(description)
@@ -1705,15 +1708,15 @@ class WBreakDataModification(WTemplated):
 
         vars['rbActive'] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
         return vars
- 
+
 
 class WMaterialTable( WTemplated ):
     # Deprecated - used in old file management scheme
-    
+
     def __init__(self, matOwner, registry = None ):
         self._owner = matOwner
         self._fr = registry
-    
+
     def _getAdditionalMaterialItems( self ):
         l = []
         for mat in self._owner.getMaterialList():
@@ -1739,7 +1742,7 @@ class WMaterialTable( WTemplated ):
                      """%(mat.getId(), Config.getInstance().getSystemIconURL("material"), self._modifyURLGen( mat ), mat.getTitle() ) )
         return "".join(l)
 
-    def _getSpecialMaterialItems( self ): 
+    def _getSpecialMaterialItems( self ):
         if not self._fr:
             return ""
         l = []
@@ -1775,7 +1778,7 @@ class WMaterialTable( WTemplated ):
         params={"addURL": addURL, "deleteURL": removeURL}
 
         hiddenParams = self._owner.getLocator().getWebForm()
-            
+
         return WTemplated.getHTML( self, params )
 
     def getVars( self ):
@@ -1794,7 +1797,7 @@ class WMaterialTable( WTemplated ):
 
 
 class WAccessControlFrame(WTemplated):
-        
+
     def getHTML( self, target, setVisibilityURL, addAllowedURL, removeAllowedURL):
         self.__target = target
         params = { "setVisibilityURL": setVisibilityURL,\
@@ -1824,10 +1827,10 @@ class WAccessControlFrame(WTemplated):
         vars["userTable"] = WPrincipalTable().getHTML( self.__target.getAllowedToAccessList(), self.__target, vars["addAllowedURL"], vars["removeAllowedURL"],selectable=False )
 
         return vars
-    
+
 
 class WConfAccessControlFrame(WTemplated):
-    
+
     def getHTML( self, target, setVisibilityURL, addAllowedURL, removeAllowedURL,  setAccessKeyURL):
         self.__target = target
         params = { "setPrivacyURL": setVisibilityURL,\
@@ -1837,7 +1840,7 @@ class WConfAccessControlFrame(WTemplated):
         return  WTemplated.getHTML( self, params )
 
     def getVars( self ):
-        vars = WTemplated.getVars( self )        
+        vars = WTemplated.getVars( self )
         if self.__target.getAccessProtectionLevel() == -1:
             vars["privacy"] = "ABSOLUTELY PUBLIC%s" % WInlineContextHelp('The object will stay public regardless of the protection of its parent (no more inheritance)').getHTML()
             vars["changePrivacy"] = """make it simply <input type="submit" class="btn" name="visibility" value="PUBLIC">%s<br/>""" % WInlineContextHelp('It will then be public by default but will inherit from the potential protection of its parent').getHTML()
@@ -1858,7 +1861,7 @@ class WConfAccessControlFrame(WTemplated):
             vars["privacy"] = "PUBLIC%s%s" % (WInlineContextHelp('the object is currently public because its parent is public but might inherit from the potential protection of its parent if it changes one day').getHTML(), fullyPublic)
             vars["changePrivacy"] = """make it <input type="submit" class="btn" name="visibility" value="PRIVATE"> by itself<br/>"""
             vars["changePrivacy"] += """make it <input type="submit" class="btn" name="visibility" value="ABSOLUTELY PUBLIC">%s""" % WInlineContextHelp('The object will stay public regardless of the protection of its parent').getHTML()
-            
+
         vars["locator"] = self.__target.getLocator().getWebForm()
         vars["userTable"] = WPrincipalTable().getHTML( self.__target.getAllowedToAccessList(),
                                                        self.__target,
@@ -1918,10 +1921,10 @@ class WPendingUserTableItem(WTemplated):
         return vars
 
 class WGroupTableItem(WTemplated):
-    
+
     def __init__(self, multi=True):
         self._multi = multi
-    
+
     def getHTML( self, group, selected=False, selectable=True ):
         self.__group = group
         self._selected = selected
@@ -1945,10 +1948,10 @@ class WGroupTableItem(WTemplated):
         return vars
 
 class WGroupNICETableItem(WTemplated):
-    
+
     def __init__(self, multi=True):
         self._multi = multi
-    
+
     def getHTML( self, group, selected=False, selectable=True ):
         self.__group = group
         self._selected = selected
@@ -1971,10 +1974,10 @@ class WGroupNICETableItem(WTemplated):
         return vars
 
 class WAuthorTableItem(WTemplated):
-    
+
     def __init__(self, multi=False):
         self._multi = multi
-    
+
     def getHTML( self, author, selected=False ):
         self.__author = author
         self._selected = selected
@@ -1996,7 +1999,7 @@ class WAuthorTableItem(WTemplated):
 
 
 class WPrincipalTable(WTemplated):
-    
+
     def getHTML( self, principalList, target, addPrincipalsURL, removePrincipalsURL, pendings=[], selectable=True ):
         self.__principalList = principalList
         self.__principalList.sort(utils.sortPrincipalsByName)
@@ -2029,7 +2032,7 @@ class WPrincipalTable(WTemplated):
 
 
 class WModificationControlFrame(WTemplated):
-    
+
     def getHTML( self, target, addManagersURL, removeManagersURL ):
         self.__target = target
         params = { "addManagersURL": addManagersURL, \
@@ -2039,17 +2042,17 @@ class WModificationControlFrame(WTemplated):
     def getVars( self ):
         vars = WTemplated.getVars( self )
         vars["locator"] = self.__target.getLocator().getWebForm()
-        vars["principalTable"] = WPrincipalTable().getHTML( self.__target.getManagerList(), 
+        vars["principalTable"] = WPrincipalTable().getHTML( self.__target.getManagerList(),
                                                             self.__target,vars["addManagersURL"],
                                                             vars["removeManagersURL"],
                                                             pendings=self.__target.getAccessController().getModificationEmail(),
                                                             selectable=False)
-        
+
         return vars
 
 
 class WConfModificationControlFrame(WTemplated):
-    
+
     def getHTML( self, target, addManagersURL, removeManagersURL, setModifKeyURL ):
         self.__target = target
         params = { "addManagersURL": addManagersURL, \
@@ -2060,7 +2063,7 @@ class WConfModificationControlFrame(WTemplated):
     def getVars( self ):
         vars = WTemplated.getVars( self )
         vars["locator"] = self.__target.getLocator().getWebForm()
-        vars["principalTable"] = WPrincipalTable().getHTML( self.__target.getManagerList(), 
+        vars["principalTable"] = WPrincipalTable().getHTML( self.__target.getManagerList(),
                                                             self.__target, vars["addManagersURL"],
                                                             vars["removeManagersURL"],
                                                             pendings=self.__target.getAccessController().getModificationEmail(),
@@ -2069,7 +2072,7 @@ class WConfModificationControlFrame(WTemplated):
         return vars
 
 class WConfRegistrarsControlFrame(WTemplated):
-    
+
     def getHTML(self, target, addRegistrarURL, removeRegistrarURL):
         self.__target = target
         params = {
@@ -2085,14 +2088,14 @@ class WConfRegistrarsControlFrame(WTemplated):
 
 
 class WAlarmFrame(WTemplated):
-    
+
     def getHTML( self, target, addAlarmURL, deleteAlarmURL, modifyAlarmURL ):
         self.__target = target
         self._deleteAlarmURL = deleteAlarmURL
         self._modifyAlarmURL = modifyAlarmURL
         params = { "addAlarmURL": addAlarmURL, \
                    "deleteAlarmURL": deleteAlarmURL, \
-                   "modifyAlarmURL": modifyAlarmURL                   
+                   "modifyAlarmURL": modifyAlarmURL
                    }
         return  WTemplated.getHTML( self, params )
 
@@ -2106,7 +2109,7 @@ class WAlarmFrame(WTemplated):
                 addr = " <br> ".join(al.getToAddrList()) + " <br> "
             for user in al.getToUserList():
                 addr = addr + user.getEmail() + " <br> "
-            
+
             if al.getToAllParticipants() :
                 addr = "to all participants"
             if al.getAdjustedLastDate() != None:
@@ -2150,7 +2153,7 @@ class WConfProtectionToolsFrame(WTemplated):
         return vars
 
 class WDomainControlFrame(WTemplated):
-    
+
     def __init__( self, target ):
         self._target = target
 
@@ -2168,26 +2171,26 @@ class WDomainControlFrame(WTemplated):
         l = []
         for dom in domain.DomainHolder().getList():
             if dom not in self._target.getDomainList():
-                l.append("""<option value="%s">%s</option>"""%(dom.getId(), dom.getName())) 
+                l.append("""<option value="%s">%s</option>"""%(dom.getId(), dom.getName()))
         vars["domainsToAdd"] = "".join(l)
         vars["removeURL"] = self._removeURL
         vars["addURL"] = self._addURL
         vars["locator"] = self._target.getLocator().getWebForm()
         return vars
-    
-    
+
+
 class WMaterialDataModificationBase(WTemplated):
-    
+
     def __init__( self, material ):
         self._material = material
         self._owner = material.getOwner()
-    
+
     def _setMaterialValues( self, material, materialData ):
         material.setTitle( materialData["title"] )
         material.setDescription( materialData["description"] )
         if "type" in materialData:
             material.setType( materialData["type"] )
-    
+
     def _getTypesSelectItems( self, default = "misc" ):
         definedTypes = ["misc"]
         l = []
@@ -2201,11 +2204,11 @@ class WMaterialDataModificationBase(WTemplated):
 
 
 class WMaterialCreation(WMaterialDataModificationBase):
-    
+
     def __init__( self, owner):
         self._owner = owner
 
-    
+
     def getVars( self ):
         vars = WMaterialDataModificationBase.getVars( self )
         vars["title"] = ""
@@ -2213,13 +2216,13 @@ class WMaterialCreation(WMaterialDataModificationBase):
         vars["types"] = self._getTypesSelectItems()
         vars["locator"] = self._owner.getLocator().getWebForm()
         return vars
-    
+
     def create( self, materialData ):
         m = conference.Material()
         self._setMaterialValues( m, materialData )
         self._owner.addMaterial( m )
         return m
-    
+
 class WInlineContextHelp(WTemplated):
 
     def __init__(self, content):
@@ -2230,18 +2233,18 @@ class WInlineContextHelp(WTemplated):
         vars["helpContent"] = self._content
         vars["imgSrc"] = Config.getInstance().getSystemIconURL( "help" )
         return vars
-        
+
 #class WPaperDataModification( WMaterialDataModification ):
 #    pass
 
 #class WMaterialModification( WTemplated ):
-#    
+#
 #    def __init__( self, material ):
 #        self._material = material
 #        self.__conf = material.getConference()
 #        self.__session = material.getSession()
 #        self.__contrib = material.getContribution()
-#    
+#
 #    def getVars( self ):
 #        vars = WTemplated.getVars( self )
 #        vars["locator"] = self._material.getLocator().getWebForm()
@@ -2292,7 +2295,7 @@ class WInlineContextHelp(WTemplated):
 #            self._contrib = self._conf.getContributionById( contribId )
 #            self._matParent = self._contrib
 #        if materialId != None and materialId != "":
-#            self._material = self._matParent.getMaterialById( materialId ) 
+#            self._material = self._matParent.getMaterialById( materialId )
 #
 #    def getHTML( self, confId, sessionId, contribId, materialId, params ):
 #        self._setObjects( confId, sessionId, contribId, materialId )
@@ -2310,7 +2313,7 @@ class WInlineContextHelp(WTemplated):
 
 
 #class WFileSubmission(WTemplated):
-#    
+#
 #    def __init__(self, material):
 #        self.__material = material
 #
@@ -2336,7 +2339,7 @@ class WInlineContextHelp(WTemplated):
 
 
 #class WLinkSubmission(WResourceSubmission):
-#    
+#
 #    def __init__(self, material):
 #        self.__material = material
 #
@@ -2361,14 +2364,14 @@ class WInlineContextHelp(WTemplated):
 
 
 class WResourceModification(WTemplated):
-    
+
     def __init__( self, resource ):
         self._resource = resource
         self._conf = resource.getConference()
         self._session = resource.getSession()
         self._contrib = resource.getContribution()
         self._material = resource.getOwner()
-    
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
         vars["confTitle"] = self._conf.getTitle()
@@ -2389,10 +2392,10 @@ class WResourceModification(WTemplated):
                                                     vars["setAccessKeyURL"], \
                                                     vars["setModifKeyURL"] )
         return vars
-    
+
 
 class WResourceDataModification(WResourceModification):
-    
+
     def getHTML(self, params):
         str = """
             <form action="%s" method="POST" enctype="multipart/form-data">
@@ -2402,7 +2405,7 @@ class WResourceDataModification(WResourceModification):
               """%(params["postURL"],\
                    self._resource.getLocator().getWebForm(),\
                    WTemplated.getHTML( self, params ) )
-        return str    
+        return str
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
@@ -2412,7 +2415,7 @@ class WResourceDataModification(WResourceModification):
 
 
 class WUserRegistration(WTemplated):
-    
+
     def __init__( self, av = None ):
         self._avatar = av
 
@@ -2454,7 +2457,7 @@ class WUserRegistration(WTemplated):
         else:
             vars = self.__defineExistingUserVars( vars )
             vars["locator"] = self._avatar.getLocator().getWebForm()
-        
+
         #note: there's a reason this line is TitlesRegistry() and not just TitlesRegistry
         #methods in TitlesRegistry cannot be classmethods because _items cannot be a class
         #attribute because the i18n '_' function doesn't work for class attributes
@@ -2474,10 +2477,10 @@ class WUserRegistration(WTemplated):
 
 
 class WUserCreated(WTemplated):
-    
+
     def __init__( self, av = None ):
         self._avatar = av
-    
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -2490,10 +2493,10 @@ class WUserCreated(WTemplated):
 
 
 class WUserSendIdentity(WTemplated):
-    
+
     def __init__( self, av = None ):
         self._avatar = av
-    
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
         vars["locator"] = self._avatar.getLocator().getWebForm()
@@ -2508,7 +2511,7 @@ class WUserSendIdentity(WTemplated):
 
 
 class WUserSearchResultsTable( WTemplated ):
-    
+
     def __init__(self, multi=True):
         self._multi = multi
 
@@ -2522,7 +2525,7 @@ class WUserSearchResultsTable( WTemplated ):
         elif isinstance(principal,conference.ContributionParticipation):
             return WAuthorTableItem
         return None
-    
+
     def getHTML( self, resultList ):
         self.__resultList = resultList
         self.__resultList.sort(utils.sortPrincipalsByName)
@@ -2543,7 +2546,7 @@ class WUserSearchResultsTable( WTemplated ):
         vars["nbResults"] = len(self.__resultList)
         return vars
 
-    
+
 class WSignIn(WTemplated):
 
     def getVars( self ):
@@ -2569,7 +2572,7 @@ class WSignIn(WTemplated):
         return vars
 
 class WConfirmation(WTemplated):
-    
+
     def getHTML( self, message, postURL, passingArgs, **opts):
         params = {}
         params["message"] = message
@@ -2587,7 +2590,7 @@ class WConfirmation(WTemplated):
         return WTemplated.getHTML( self, params )
 
 class WDisplayConfirmation(WTemplated):
-    
+
     def getHTML( self, message, postURL, passingArgs, **opts):
         params = {}
         params["message"] = message
@@ -2611,30 +2614,30 @@ class SideMenu(object):
         """
         self._sections = []
         self._userStatus = userStatus
-       
-    def addSection(self, section, top=False):    
+
+    def addSection(self, section, top=False):
         if top:
             self._sections.insert(0, section)
         else:
             self._sections.append(section)
-        
+
     def getSections(self):
         return self._sections
-        
+
 class ManagementSideMenu(SideMenu):
-        
+
     def getHTML(self):
         return WSideMenu(self, self._userStatus, type="management").getHTML()
-    
+
 class BasicSideMenu(SideMenu):
-    
+
     def getHTML(self):
         return WSideMenu(self, self._userStatus, type="basic").getHTML()
 
 class SideMenuSection:
-    """ class coment 
+    """ class coment
     """
-    
+
     def __init__(self, title=None, active=False, currentPage = None, visible=True):
         """ -title is the words that will be displayed int he side menu.
             -active is True if ...
@@ -2652,46 +2655,46 @@ class SideMenuSection:
 
     def getItems(self):
         return self._items
-    
+
     def addItem(self, item):
         self._items.append(item)
         item.setSection(self)
-    
+
     def isActive(self):
         return self._active
-        
+
     def setActive(self, val):
         self._active = val
-        
+
     def checkActive(self):
-        
+
         self._active = False
-        
+
         for item in self._items:
             if item.isActive():
                 self._active = True
                 break
-     
+
     def getCurrentPage(self):
         return self._currentPage
-     
+
     def setCurrentPage(self, currentPage):
         self._currentPage = currentPage
-        
+
     def isVisible(self):
         return self._visible
-    
+
     def setVisible(self, visible):
         self._visible = visible
-        
+
     def hasVisibleItems(self):
         for item in self._items:
             if item.isVisible():
                 return True
         return False
-   
+
 class SideMenuItem:
-    
+
     def __init__(self, title, url, active=False, enabled=True, errorMessage = "msgNoPermissions", visible=True):
         """ errorMessage: one of the error messages in SideMenu.wohl
         """
@@ -2701,59 +2704,59 @@ class SideMenuItem:
         self._enabled = enabled
         self._errorMessage = errorMessage
         self._visible = visible
-    
+
     def getTitle(self):
         return self._title;
-    
+
     def setSection(self, section):
         self._section = section
-    
+
     def getURL(self):
         return self._url
-    
+
     def setURL(self, url):
         self._url = url
-    
+
     def isActive(self):
         return self._active
-    
+
     def isEnabled(self):
         return self._enabled
-    
+
     def getErrorMessage(self):
         return self._errorMessage
-    
+
     def setActive(self, val=True):
         self._active = val
         self._section.checkActive()
-        
+
     def setEnabled(self, val):
         self._enabled = val
-        
+
     def setErrorMessage(self, val):
         self._errorMessage = val
-            
+
     def isVisible(self):
         return self._visible
-    
+
     def setVisible(self, visible):
         self._visible = visible
 
 class WSideMenu(WTemplated):
-    
+
     def __init__(self, menu, loggedIn, type="basic"):
         """
             type can be: basic (display interface) or management (management interface).
         """
         self._menu = menu
         self._type = type
-        
+
         # is the user logged in? used for changing some tooltips
         self._loggedIn = loggedIn
-    
+
     def getVars(self):
         vars = WTemplated.getVars(self)
-        
+
         vars['menu'] = self._menu
         vars['loggedIn'] = self._loggedIn
         vars['sideMenuType'] = self._type
@@ -2788,19 +2791,19 @@ class WebToolBar(object):
 
     def setCurrentItem( self, item ):
         self.currentItem = item
-        
+
     def isFirstItem( self, item):
         return self.items[0] == item
-        
+
     def isLastItem( self, item ):
         return self.items[len(self.items)-1] == item
-        
+
     def getHTML( self ):
         return WTBDrawer(self).getHTML()
 
 
 class WTBItem:
-    
+
     def __init__( self, caption, **args):
         self.owner = None
         self.caption = caption
@@ -2836,25 +2839,25 @@ class WTBItem:
 
     def isEnabled( self ):
         return self.enabled
-        
+
     def hasIcon( self ):
-        return self.icon != ""    
+        return self.icon != ""
 
     def addItem( self, newItem ):
         if newItem not in self.subItems:
             self.subItems.append( newItem )
             newItem.setOwner( self.owner )
-    
+
     def removeItem( self, item ):
         if item in self.subItems:
             self.subItems.remove( item )
 
     def getItemList( self ):
         return self.subItems
-        
+
     def isFirstItem( self, item):
         return self.subItems[0] == item
-        
+
     def isLastItem( self, item ):
         i = len(self.subItems)-1
         while not self.subItems[i].isEnabled():
@@ -2862,21 +2865,21 @@ class WTBItem:
         return self.subItems[i] == item
 
     def setOwner( self, owner ):
-        self.owner = owner 
+        self.owner = owner
         for item in self.getItemList():
             item.setOwner( self.owner )
 
 
 class WTBSeparator(WTBItem):
-    
+
     def __init__( self ):
         WTBItem.__init__(self, "")
 
     def setCurrent( self ):
-        return 
+        return
 
 class WTBGroup( WTBItem ):
-    
+
     def __init__( self, caption, **args ):
         WTBItem.__init__( self, caption, **args )
         self.items= []
@@ -2885,30 +2888,30 @@ class WTBGroup( WTBItem ):
         if newItem not in self.items:
             self.items.append( newItem )
             newItem.setOwner( self.owner )
-    
+
     def removeItem( self, item ):
         if item in self.items:
             self.items.remove( item )
 
     def getItemList( self ):
         return self.items
-        
+
     def isFirstItem( self, item):
         return self.items[0] == item
-        
+
     def isLastItem( self, item ):
         i = len(self.items)-1
         while not self.items[i].isEnabled():
             i -= 1
         return self.items[i] == item
-    
+
     def setOwner( self, owner ):
-        self.owner = owner 
+        self.owner = owner
         for item in self.getItemList():
             item.setOwner( self.owner )
 
 class WTBSection( WTBItem ):
-    
+
     def __init__( self, caption, **args ):
         WTBItem.__init__( self, caption, **args )
         self.items= []
@@ -2918,41 +2921,41 @@ class WTBSection( WTBItem ):
         if newItem not in self.items:
             self.items.append( newItem )
             newItem.setOwner( self.owner )
-    
+
     def removeItem( self, item ):
         if item in self.items:
             self.items.remove( item )
 
     def getItemList( self ):
         return self.items
-        
+
     def isFirstItem( self, item):
         return self.items[0] == item
-        
+
     def isLastItem( self, item ):
         i = len(self.items)-1
         while not self.items[i].isEnabled():
             i -= 1
         return self.items[i] == item
-    
+
     def setOwner( self, owner ):
-        self.owner = owner 
+        self.owner = owner
         for item in self.getItemList():
             item.setOwner( self.owner )
-    
+
     def setDrawer( self, d ):
         self.drawer = d(self)
-        
+
     def getDrawer( self ):
         return self.drawer
-        
+
     def hasDrawer( self ):
         return self.drawer != None
 
 class WTBDrawer:
     def __init__( self, toolbar ):
         self.toolbar = toolbar
-    
+
     def getHTML( self ):
         l = []
         for item in self.toolbar.getItemList():
@@ -2966,12 +2969,12 @@ class WTBDrawer:
                 drawer = WStdTBDrawer(item)
             l.append(drawer.getHTML())
         return "".join(l)
-        
+
 class WStdTBDrawer(WTemplated):
 
     def __init__( self, item ):
         self.item = item
-        
+
     def _getTBItemCaption( self, item):
         return """<tr>
       <td colspan="2" class="menutitle">%s</td>
@@ -2988,7 +2991,7 @@ class WStdTBDrawer(WTemplated):
         return """<td class="%s">&nbsp;<img src="%s"\
          style="vertical-align:middle" alt=""></td>"""%(style,\
                          Configuration.Config.getInstance().getSystemIconURL("arrowLeft"))
-    
+
     def _getIconHTML( self, item, style ):
         return """<td class="%s">&nbsp;<img src="%s" alt="" hspace="3" vspace="2">
                 </td>"""%(style, item.getIcon())
@@ -3033,7 +3036,7 @@ class WStdTBDrawer(WTemplated):
     def getVars( self ):
         vars = WTemplated.getVars( self )
         l = []
-        
+
         if self.item != None:
             for tbItem in self.item.getItemList():
                 if not tbItem.isEnabled():
@@ -3057,7 +3060,7 @@ class WStdTBDrawer(WTemplated):
                         style, itemHTML))
         vars["items"] = "".join(l)
         return vars
-    
+
 
 class WStdSectionDrawer(WStdTBDrawer):
 
@@ -3117,12 +3120,12 @@ class WAddEventSectionDrawer(WStdSectionDrawer):
                     </a>"""%(item.getActionURL(), \
                                             item.getCaption())
         return str
-        
+
     def _getCurrentIconForItem( self, item, style ):
         if item.hasIcon():
             return self._getIconHTML(item, style)
         return ""
-        
+
     def _getStyleForItem( self):
         return "menuadd"
 
@@ -3149,21 +3152,21 @@ class WAddEventSectionDrawer(WStdSectionDrawer):
 
 
 class WConferenceListEvents(WTemplated):
-    
+
     def __init__( self, items, aw):
         self._items = items
         self._aw = aw
-        
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
-        vars["items"] = self._items        
+        vars["items"] = self._items
         vars["conferenceDisplayURLGen"] = urlHandlers.UHConferenceDisplay.getURL
         vars["aw"] = self._aw
         return vars
 
 
 class WConferenceList(WTemplated):
-    
+
     def __init__( self, category, wfReg ):
         self._categ = category
         self._list = category.getConferenceList()
@@ -3174,23 +3177,23 @@ class WConferenceList(WTemplated):
 
     @staticmethod
     def sortEvents(list):
-        
+
         # populate a year -> month -> day -> event (4 level) tree in O(N) time
         # each node is a dictionary, so that O(1) is reached for lookup of leaves
-        
+
         def __addLeaf(map, path, leaf):
-            
+
             # stop condition
             if path == []:
                 map[leaf.getId()] = leaf
                 return;
-            
+
             if not map.has_key(path[0]):
                 map[path[0]] = {} # virgin node
-                
+
             # this reminds me of Prolog... beautiful...
             __addLeaf(map[path[0]], path[1:], leaf)
-           
+
         fList = {}
         listByMonth = {}
         for conf in list:
@@ -3199,19 +3202,19 @@ class WConferenceList(WTemplated):
             __addLeaf(fList, path, conf)
             listByMonth.setdefault(startDate.year,{}).setdefault(startDate.month,[]).append(conf)
         return fList, listByMonth
-    
+
     def getPresentPastFutureEvents(self, allEvents, eventsByMonth, numEvents):
         """
         @param allEvents: is a dictionary with the format expected by the template ConferenceListItem
         @param eventsByMonth: is a dictionary with all the events by year and month. E.g. eventsByMonth[2009][1] == [conf1, conf2,...]
-        @return:  
+        @return:
             - a dictionary with the same format as allEvents but just with the events to display
             - a dictionary with the same format as allEvents but just with the future events
             - a counter with the number of future events
             - a counter with the number of past events
             - the oldest date of the events that are shown by default
         """
-        
+
         def getPrevMonth(d):
             year = d.year
             prevMonth = (d.month - 1)%12
@@ -3219,8 +3222,8 @@ class WConferenceList(WTemplated):
                 prevMonth = 12
                 year -= 1
             return date(year, prevMonth, 1)
-                
-        
+
+
         def getNextMonth(d):
             year = d.year
             nextMonth = (d.month + 1)%12
@@ -3229,14 +3232,14 @@ class WConferenceList(WTemplated):
             elif d.month + 1 > 12:
                 year += 1
             return date(year, nextMonth, 1)
-        
+
         MAX_NUMBER_OF_EVENTS_SHOWN = 10
         if numEvents < MAX_NUMBER_OF_EVENTS_SHOWN:
             MAX_NUMBER_OF_EVENTS_SHOWN = numEvents
         todayDate = nowutc().date()
-        previousMonthDate, nextMonthDate, newerDateUsed, olderDateUsed = todayDate, todayDate, todayDate, todayDate 
+        previousMonthDate, nextMonthDate, newerDateUsed, olderDateUsed = todayDate, todayDate, todayDate, todayDate
         nextMonthDate = todayDate
-        
+
         ## CREATE Present Events dict
         presentEvents = {}
         presentCounter = 0
@@ -3245,7 +3248,7 @@ class WConferenceList(WTemplated):
             del allEvents[todayDate.year][todayDate.month]
             presentCounter = len(eventsByMonth[todayDate.year][todayDate.month])
         while presentCounter < MAX_NUMBER_OF_EVENTS_SHOWN:
-            previousMonthDate = getPrevMonth(previousMonthDate) 
+            previousMonthDate = getPrevMonth(previousMonthDate)
             nextMonthDate = getNextMonth(nextMonthDate)
             # add nextMonth
             if allEvents.has_key(nextMonthDate.year) and allEvents[nextMonthDate.year].has_key(nextMonthDate.month):
@@ -3259,7 +3262,7 @@ class WConferenceList(WTemplated):
                 del allEvents[previousMonthDate.year][previousMonthDate.month]
                 presentCounter += len(eventsByMonth[previousMonthDate.year][previousMonthDate.month])
                 olderDateUsed = previousMonthDate
-            
+
         ## CREATE future events dict and future/past counter
         futureEvents = {}
         futureCounter = 0
@@ -3279,13 +3282,13 @@ class WConferenceList(WTemplated):
                         futureCounter += len(eventsByMonth[year][month])
                     elif olderDateUsed.year == year and month < olderDateUsed.month:
                         pastCounter += len(eventsByMonth[year][month])
-        
+
         return presentEvents, futureEvents, futureCounter, pastCounter, olderDateUsed
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
         allEvents, eventsByMonth = WConferenceList.sortEvents(self._list)
-        #vars["items"], vars["futureItems"], vars["numOfEventsInTheFuture"], vars["numOfEventsInThePast"] = allEvents, allEvents, 0, 0 
+        #vars["items"], vars["futureItems"], vars["numOfEventsInTheFuture"], vars["numOfEventsInThePast"] = allEvents, allEvents, 0, 0
         vars["presentItems"], vars["futureItems"], vars["numOfEventsInTheFuture"], vars["numOfEventsInThePast"], vars["oldestMonthDate"] =  self.getPresentPastFutureEvents(allEvents, eventsByMonth, len(self._list))
         vars["categ"] = self._categ
         vars["ActiveTimezone"] = DisplayTZ(self._aw,self._categ,useServerTZ=1).getDisplayTZ()
@@ -3294,7 +3297,7 @@ class WConferenceList(WTemplated):
 
 
 class WCategoryList(WTemplated):
-        
+
     def __init__( self, categ ):
         self._categ = categ
         self._list = categ.getSubCategoryList()
@@ -3304,11 +3307,11 @@ class WCategoryList(WTemplated):
         return WTemplated.getHTML( self, params )
 
     def getVars( self ):
-        
-        vars = WTemplated.getVars( self )           
+
+        vars = WTemplated.getVars( self )
         vars["items"] = self._list
         vars["categ"] = self._categ;
-        
+
         return vars
 
 class WCategoryStatisticsListRow(WTemplated):
@@ -3332,7 +3335,7 @@ class WCategoryStatisticsListRow(WTemplated):
 
 
 class WCategoryStatisticsList(WTemplated):
-    
+
     def __init__( self, statsName, stats ):
         self._stats = stats
         self._statsName = statsName
@@ -3368,7 +3371,7 @@ class WCategoryStatisticsList(WTemplated):
         return vars
 
 class WConfCreationControlFrame(WTemplated):
-    
+
     def __init__( self, categ ):
         self._categ = categ
 
@@ -3387,7 +3390,7 @@ class WConfCreationControlFrame(WTemplated):
 
 
 class WWriteMinutes(WTemplated):
-    
+
     def __init__( self, target ):
         self._target = target
 
@@ -3407,7 +3410,7 @@ class WWriteMinutes(WTemplated):
         return vars
 
 class WMinutesDisplay(WTemplated):
-    
+
     def __init__( self, target ):
         self._target = target
 
@@ -3417,7 +3420,7 @@ class WMinutesDisplay(WTemplated):
         return vars
 
 class TabControl:
-    
+
     def __init__( self, parent=None, child=None ):
         self._tabs = []
         self._active = None
@@ -3451,7 +3454,7 @@ class TabControl:
     def setActiveTab( self, tab ):
         if tab in self._tabs:
             self._active = tab
-    
+
     def getActiveTab( self ):
         return self._active
 
@@ -3474,7 +3477,7 @@ class TabControl:
     def getChild( self ):
         # retrieve child TabControl
         return self._child
-    
+
     def getLevel( self ):
         tmp = self.getParent()
         level = 0
@@ -3482,9 +3485,9 @@ class TabControl:
             level += 1
             tmp = tmp.getParent()
         return level
-   
+
 class Tab:
-    
+
     def __init__( self, owner, id, caption, URL, hidden = False ):
         self._owner = owner
         self._id = id.strip()
@@ -3511,7 +3514,7 @@ class Tab:
 
     def isDefault( self ):
         return self._owner.getDefaultTab() == self
-    
+
     def isActive( self ):
         return self._owner.getActiveTab() == self
 
@@ -3543,12 +3546,12 @@ class Tab:
         # guarantee that a subtabControl exists
         if not self._subtabControl:
             self._subtabControl = TabControl(parent=self._owner)
-            
+
         tab=self._subtabControl.newTab( id, caption, url )
         return tab
 
 class WConfModifAC:
-    
+
     def __init__( self, conference ):
         self.__conf = conference
 
@@ -3568,7 +3571,7 @@ class WConfModifAC:
         return """%s%s<br>%s"""%( ac, dc, mc )
 
 #class WTrackModifSubTrack( WTemplated ):
-#    
+#
 #    def __init__( self, track ):
 #        self.__track = track
 #        self.__conf = track.getConference()
@@ -3587,23 +3590,23 @@ class WConfModifAC:
 
 
 #class WSubTrackDataModification(WTemplated):
-#    
+#
 #    def __init__( self, subTrack ):
 #        self.__subTrack = subTrack
 #        self.__track = subTrack.getTrack()
-#    
+#
 #    def getVars( self ):
 #        vars = WTemplated.getVars(self)
-#        
+#
 #        vars["title"] = self.__subTrack.getTitle()
 #        vars["description"] = self.__subTrack.getDescription()
-#        
+#
 #        vars["locator"] = self.__subTrack.getLocator().getWebForm()
-#        
+#
 #        return vars
 
 #class WCFAModifFrame(WTemplated):
-#    
+#
 #    def __init__( self, conf, aw):
 #        self.__conf = conf
 #        self._aw = aw
@@ -3614,36 +3617,36 @@ class WConfModifAC:
 #
 #    def getVars( self ):
 #        vars = WTemplated.getVars( self )
-#        
+#
 #        vars["context"] = WConfModifHeader( self.__conf, self._aw ).getHTML(vars)
-#       
-#        
+#
+#
 #        return vars
 
 #class WCFAModifMain(WTemplated):
-#    
+#
 #    def __init__( self, conf ):
 #        self.__conf = conf
-#    
+#
 #    def getVars( self ):
 #        vars = WTemplated.getVars( self )
 #        abMgr = self.__conf.getAbstractMgr()
-#        
+#
 #        vars["startDate"] = abMgr.getStartSubmissionDate().strftime("%A %d %B %Y")
 #        vars["endDate"] = abMgr.getEndSubmissionDate().strftime("%A %d %B %Y")
-#        
+#
 #        typeList = ""
 #        for type in self._conf.getContribTypeList():
 #            typeList += "<input type=\"checkbox\" name=\"types\" value=\"%s\">%s<br>\n"%(type.getId(), type.getName())
 #        vars["typeList"] = typeList
-#        
+#
 #        return vars
 
 #class WCFARefereeList(WTemplated):
-#    
+#
 #    def __init__( self, conf ):
 #        self.__conf = conf
-#    
+#
 #    def getVars( self ):
 #        vars = WTemplated.getVars(self)
 #        vars["refereeTable"] = "%s"%WPrincipalTable().getHTML( self.__conf.getAbstractMgr().getRefereeList(), self.__conf, vars["addRefereeURL"], vars["removeRefereeURL"] )
@@ -3652,7 +3655,7 @@ class WConfModifAC:
 class WTabControl( WTemplated ):
     _unSelTabCls="Unselected"
     _selTabCls="Selected"
-    
+
     def __init__( self, ctrl, accessWrapper, **params ):
         self._tabCtrl = ctrl
         self._aw = accessWrapper
@@ -3667,7 +3670,7 @@ class WTabControl( WTemplated ):
             tabCtrl = self._tabCtrl
 
         html = []
-  
+
         # Which css class prefix to use
         tabClassPrefix = ""
         isSubTab = False
@@ -3697,7 +3700,7 @@ class WTabControl( WTemplated ):
             if not tab.isEnabled():
                 continue
             cls=self.__class__._unSelTabCls
-                
+
             # Don't add the right border if in sub level and if last elemnt
             borderRight = ""
             if i == len(tabCtrl.getTabList()) -1 and isSubTab:
@@ -3709,13 +3712,13 @@ class WTabControl( WTemplated ):
             if tab.isActive():
                 self._activeTab = tab
                 cls=self.__class__._selTabCls
-                    
+
                 if tab.getSubTabControl():
                     self._getTabsHTML(tab.getSubTabControl(), maxtabs)
 
             if (tab.isHidden()):
                 hasHiddenOptions = True
-                
+
                 hiddenClass = ' hiddenTab'
             else:
                 hiddenClass = ''
@@ -3725,7 +3728,7 @@ class WTabControl( WTemplated ):
             gradientDiv = ""
             if addGradientDiv:
                 gradientDiv = """<div class="tabGradient"><div class="tabBorderGradient" style="float: left;"></div><div class="tabBorderGradient" style="float: right;"></div></div>"""
- 
+
             cssClass = ""
             if tabCtrl.getLevel() == 0:
                 cssClass = """ class="tabListContainer" """
@@ -3733,7 +3736,7 @@ class WTabControl( WTemplated ):
             html.append("""</ul>%s</div>""" % gradientDiv)
 
             self._tabsBars.append("".join(html))
-            
+
             return True
 
         return False
@@ -3748,7 +3751,7 @@ class WTabControl( WTemplated ):
     def getHTML( self, body ):
         self._body = body
         return WTemplated.getHTML( self )
-    
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
         vars["cs"] = len(self._tabCtrl.getTabList())+1
@@ -3758,16 +3761,16 @@ class WTabControl( WTemplated ):
         return vars
 
 #class WAbstractFilterCtrl( WTemplated ):
-#    
+#
 #    def __init__(self, conf, filter, sorter):
 #        self._filter = filter
 #        self._conf = conf
 #        self._sorter = sorter
-#    
+#
 #    def getVars( self ):
 #        vars = WTemplated.getVars(self)
 #        abMgr = self._conf.getAbstractMgr()
-#        
+#
 #        trackFilter = "<option value=\"\">No filter</option>\n"
 #        for track in self._conf.getTrackList():
 #            selected = ""
@@ -3775,7 +3778,7 @@ class WTabControl( WTemplated ):
 #                selected = "selected"
 #            trackFilter += "<option value=\"%s\" %s>%s</option>\n"%(track.getId(), selected, track.getTitle())
 #        vars["trackFilter"] = trackFilter
-#        
+#
 #        typeFilter = "<option value=\"\">No filter</option>\n"
 #        for type in self._conf.getContribTypeList():
 #            selected = ""
@@ -3783,7 +3786,7 @@ class WTabControl( WTemplated ):
 #                selected = "selected"
 #            typeFilter += "<option value=\"%s\" %s>%s</option>\n"%(type.getId(), selected, type)
 #        vars["typeFilter"] = typeFilter
-#        
+#
 #        statusFilter = "<option value=\"\">No filter</option>\n"
 #        for name in StatusName().getNameList():
 #            selected = ""
@@ -3791,7 +3794,7 @@ class WTabControl( WTemplated ):
 #                selected = "selected"
 #            statusFilter += "<option value=\"%s\" %s>%s</option>\n"%(name, selected, name)
 #        vars["statusFilter"] = statusFilter
-#        
+#
 #        fDay = "<option value=\"\"> </option>\n"
 #        for i in range(1,32):
 #            selected = ""
@@ -3800,7 +3803,7 @@ class WTabControl( WTemplated ):
 #                    selected = "selected"
 #            fDay += "<option value=\"%s\" %s>%s</option>\n"%(i, selected, i)
 #        vars["fDay"] = fDay
-#        
+#
 #        fMonth = "<option value=\"\"> </option>\n"
 #        month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 #        for i in range(1,13):
@@ -3810,7 +3813,7 @@ class WTabControl( WTemplated ):
 #                    selected = "selected"
 #            fMonth += "<option value=\"%s\" %s>%s</option>\n"%(i, selected, month[i-1])
 #        vars["fMonth"] = fMonth
-#        
+#
 #        fYear = "<option value=\"\"> </option>\n"
 #        for i in range(2000,2011):
 #            selected = ""
@@ -3819,9 +3822,9 @@ class WTabControl( WTemplated ):
 #                    selected = "selected"
 #            fYear += "<option value=\"%s\" %s>%s</option>\n"%(i, selected, i)
 #        vars["fYear"] = fYear
-#        
-#        
-#        
+#
+#
+#
 #        tDay = "<option value=\"\"> </option>\n"
 #        for i in range(1,32):
 #            selected = ""
@@ -3830,7 +3833,7 @@ class WTabControl( WTemplated ):
 #                    selected = "selected"
 #            tDay += "<option value=\"%s\" %s>%s</option>\n"%(i, selected, i)
 #        vars["tDay"] = tDay
-#        
+#
 #        tMonth = "<option value=\"\"> </option>\n"
 #        for i in range(1,13):
 #            selected = ""
@@ -3839,7 +3842,7 @@ class WTabControl( WTemplated ):
 #                    selected = "selected"
 #            tMonth += "<option value=\"%s\" %s>%s</option>\n"%(i, selected, month[i-1])
 #        vars["tMonth"] = tMonth
-#        
+#
 #        tYear = "<option value=\"\"> </option>\n"
 #        for i in range(2000,2011):
 #            selected = ""
@@ -3848,9 +3851,9 @@ class WTabControl( WTemplated ):
 #                    selected = "selected"
 #            tYear += "<option value=\"%s\" %s>%s</option>\n"%(i, selected, i)
 #        vars["tYear"] = tYear
-#        
-#        
-#        
+#
+#
+#
 #        #sortList = ["title", "type", "modification date"]
 #        selected = ""
 #        if self._sorter["field"] == "title":
@@ -3869,24 +3872,24 @@ class WTabControl( WTemplated ):
 #            selected = "selected"
 #        sortBy += "<option value=\"status\" %s>Status</option>\n"%selected
 #        selected = ""
-#        
+#
 #        if self._sorter["direction"] == "desc":
 #            vars["ascChecked"] = ""
 #            vars["descChecked"] = "checked"
 #        else:
 #            vars["ascChecked"] = "checked"
 #            vars["descChecked"] = ""
-#        
+#
 #        vars["sortBy"] = sortBy
-#       
-#        
+#
+#
 #        return vars
 #
 #class WSubTrackCreation( WTemplated ):
-#    
+#
 #    def __init__( self, track ):
 #        self.__track = track
-#    
+#
 #    def getVars( self ):
 #        vars = WTemplated.getVars(self)
 #        vars["title"], vars["description"] = "", ""
@@ -3894,18 +3897,18 @@ class WTabControl( WTemplated ):
 #        return vars
 
 #class WSetLogo( WTemplated ):
-#    
+#
 #    def __init__( self, conference ):
 #        self.__conf = conference
-#    
+#
 #    def getVars( self ):
 #        vars = WTemplated.getVars( self )
 #        vars["confTitle"] = self.__conf.getTitle()
-#        
+#
 #        return vars
 
 class WSelectionBox(WTemplated):
-    
+
     def getVars(self):
         vars=WTemplated.getVars(self)
         if not vars.has_key("description"):
@@ -3915,9 +3918,9 @@ class WSelectionBox(WTemplated):
         if not vars.has_key("table_width"):
             vars["table_width"]=""
         return vars
-    
+
 class WSelectionBoxAuthors:
-    
+
     def getHTML(self):
         wc=WSelectionBox()
         p={
@@ -3930,7 +3933,7 @@ class WSelectionBoxAuthors:
         return wc.getHTML(p)
 
 class WMSelectionBoxAuthors:
-    
+
     def getHTML(self):
         wc=WSelectionBox()
         p={
@@ -3942,7 +3945,7 @@ class WMSelectionBoxAuthors:
         return wc.getHTML(p)
 
 class WSelectionBoxSubmitter:
-    
+
     def getHTML(self):
         wc=WSelectionBox()
         p={
@@ -3990,7 +3993,7 @@ class WSelectionBoxCloneLecture :
 
 
 class WUserSelection(WTemplated):
-    
+
 
     def __init__( self, searchURL, multi=True, addTo=0, forceWithoutExtAuth=False):
         self._title =  _("Search for users")
@@ -4003,7 +4006,7 @@ class WUserSelection(WTemplated):
         #addTo=3: show selection box to add session managers as session conveners
         #addTo=4: show selection box to add submitter as speaker. This is just for meetings
         self._addTo=addTo
-    
+
     def _performSearch( self, criteria, exact=0 ):
         ah = user.AvatarHolder()
         res = ah.match(criteria, exact=exact, forceWithoutExtAuth=self._forceWithoutExtAuth)
@@ -4037,11 +4040,11 @@ class WUserSelection(WTemplated):
         #a.setEmail( params["email"] )
         #a.setOrganisation( params["organisation"] )
         #user.AvatarHolder().add( a )
-    
+
     def _normaliseListParam( self, param ):
         if not isinstance(param, list):
                 return [ param ]
-        return param 
+        return param
 
     def getHTML( self, params ):
         self._cancelURL = params.get("addURL","")
@@ -4072,7 +4075,7 @@ class WUserSelection(WTemplated):
         vars["cancelURL"] = self._cancelURL
         vars["searchResultsTable"] = ""
         res=[]
-        
+
         if self._action == _("search").strip():
             criteria = { "name": vars["firstName"], \
                          "surName": vars["surName"], \
@@ -4125,7 +4128,7 @@ class WAuthorSearch(WUserSelection):
         _title =  _("Search Users and Authors")
         WUserSelection.__init__(self, searchURL, multi, addTo, forceWithoutExtAuth=forceWithoutExtAuth)
         self._conf = conf
-        
+
 
     def _performSearch( self, criteria, exact=0  ):
         #this should go in the PrincipalHolder match method
@@ -4146,7 +4149,7 @@ class WAuthorSearch(WUserSelection):
 
 class WPrincipalSelection(WUserSelection):
 
-    
+
     def _performSearch( self, criteria, exact=0 ):
         #this should go in the PrincipalHolder match method
         _title =  _("Search for users and groups")
@@ -4171,8 +4174,8 @@ class WPrincipalSelection(WUserSelection):
 
 
 class WComplexSelection(WUserSelection):
-    
-    
+
+
     def __init__(self, target, searchAction, forceWithoutExtAuth=False):
         _title = _("Search for users")
         WUserSelection.__init__(self, searchAction, forceWithoutExtAuth=forceWithoutExtAuth)
@@ -4181,7 +4184,7 @@ class WComplexSelection(WUserSelection):
         except:
             self._conf = None
         self._target = target
-        
+
     def _performSearch( self, criteria, exact=0 ):
         #this should go in the PrincipalHolder match method
         ah = user.AvatarHolder()
@@ -4200,7 +4203,7 @@ class WComplexSelection(WUserSelection):
             if author.getEmail() not in emails:
                 l.append(author)
         return l
-        
+
     def getVars(self):
         vars = WUserSelection.getVars( self )
         vars["usericon"]=quoteattr(str(Config.getInstance().getSystemIconURL("user" )))
@@ -4208,26 +4211,26 @@ class WComplexSelection(WUserSelection):
 
 class WCategoryComplexSelection(WComplexSelection):
 
-    
+
     def __init__(self, category, searchAction, forceWithoutExtAuth=False):
         WComplexSelection.__init__(self, None, searchAction,forceWithoutExtAuth=forceWithoutExtAuth)
         self._category = category
-        
+
     def _performSearch( self, criteria, exact=0 ):
         #this should go in the PrincipalHolder match method
         ah = user.AvatarHolder()
         resUsers = ah.match(criteria, exact=exact, forceWithoutExtAuth=self._forceWithoutExtAuth)
         return resUsers
-        
+
 
 class WNewPerson(WTemplated):
-      
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
         options = [" ",  _("Mr."),  _("Ms."),  _("Dr."),  _("Prof.")]
         titles = []
         titleValue = vars.get("titleValue", " ")
-        
+
         for o in options :
             selected = ""
             if titleValue == o :
@@ -4236,7 +4239,7 @@ class WNewPerson(WTemplated):
             titles.append(text)
         vars["titles"] = """
                         """.join(titles)
-                        
+
         if vars.get("disabledTitle", False) :
             vars["titles"] = """<input type="hidden" name="title" value="%s"></input>%s"""%(titleValue,titleValue)
         else :
@@ -4245,22 +4248,22 @@ class WNewPerson(WTemplated):
             %s
             </select>
             """%vars["titles"]
-        
+
         if vars.get("disabledSurName", False) :
             vars["surName"] = """<input type="hidden" name="surName" value="%s"></input>%s"""%(vars["surNameValue"],vars["surNameValue"])
         else :
             vars["surName"] = """<input type="text" size="50" name="surName" value="%s" >"""%vars["surNameValue"]
-        
+
         if vars.get("disabledName", False) :
             vars["name"] = """<input type="hidden" name="name" value="%s"></input>%s"""%(vars["nameValue"],vars["nameValue"])
         else :
             vars["name"] = """<input type="text" size="50" name="name" value="%s" >"""%vars["nameValue"]
-        
+
         if vars.get("disabledAffiliation", False) :
             vars["affiliation"] = """<input type="hidden" name="affiliation" value="%s"></input>%s"""%(vars["affiliationValue"],vars["affiliationValue"])
         else :
             vars["affiliation"] = """<input type="text" size="50" name="affiliation" value="%s" >"""%vars["affiliationValue"]
-            
+
         if vars.get("disabledEmail", False) :
             vars["email"] = """<input type="hidden" name="email" value="%s"></input>%s"""%(vars["emailValue"],vars["emailValue"])
         else :
@@ -4273,17 +4276,17 @@ class WNewPerson(WTemplated):
             vars["address"] = """<input type="hidden" name="address" value="%s"></input>%s"""%(vars["addressValue"],vars["addressValue"])
         else :
             vars["address"] = """<textarea name="address" rows="5" cols="38" value="%s"></textarea>"""%vars["emailValue"]
-        
+
         if vars.get("disabledPhone", False) :
             vars["phone"] = """<input type="hidden" name="phone" value="%s"></input>%s"""%(vars["phoneValue"],vars["phoneValue"])
         else :
             vars["phone"] = """<input type="text" size="50" name="phone" value="%s" >"""%vars["phoneValue"]
-        
+
         if vars.get("disabledPhone", False) :
             vars["phone"] = """<input type="hidden" name="phone" value="%s"></input>%s"""%(vars["phoneValue"],vars["phoneValue"])
         else :
             vars["phone"] = """<input type="text" size="50" name="phone" value="%s" >"""%vars["phoneValue"]
-        
+
         if vars.get("disabledFax", False) :
             vars["fax"] = """<input type="hidden" name="fax" value="%s"></input>%s"""%(vars["faxValue"],vars["faxValue"])
         else :
@@ -4291,12 +4294,12 @@ class WNewPerson(WTemplated):
         if vars.get("disabledRole", True) :
             vars["role"] = ""
         else :
-            vars["role"] = """        
+            vars["role"] = """
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat">%s</span></td>
             <td bgcolor="white" width="100%%" valign="top" class="blacktext">%s</td>
         </tr>"""%(vars["roleDescription"], vars["roleValue"])
-                
+
         if vars.get("disabledNotice", True) :
             vars["notice"] = ""
         else :
@@ -4305,7 +4308,7 @@ class WNewPerson(WTemplated):
             <td nowrap class="titleCellTD"></td>
             <td bgcolor="white" width="100%%" valign="top" class="blacktext">%s</td>
         </tr>"""%vars["noticeValue"]
-        
+
         if vars.get("msg","")!="":
             vars["msg"]=  _("""<table bgcolor="gray"><tr><td bgcolor="white">
                       <font size="+1" color="red"><b> _("You must enter a valid email address.")</b></font>
@@ -4317,97 +4320,97 @@ class WNewPerson(WTemplated):
 
 
 class WAddPersonModule(WTemplated):
-    
+
     def __addBasketPeople(self, peopleList):
-        
+
         basket = self._rh._getUser().getPersonalInfo().getBasket().getUsers()
-        
+
         peopleList += """<option value=""></option>"""
-        
+
         for userId in basket:
             peopleList += """<option class="favoriteItem" value="%s">%s</option>"""%(userId,basket[userId].getStraightFullName())
-        
+
         return peopleList
-    
+
     def __init__(self,personType, displayName=""):
         self._personType = personType
         self._displayName = displayName
-        
+
     def getVars( self ):
-        vars = WTemplated.getVars( self )         
+        vars = WTemplated.getVars( self )
         if self._personType is None or self._personType == "" :
             raise MaKaCError( _("'personType' must be set to use the Add Person Module"))
             return
-            
+
         if self._displayName != "":
             vars["personName"] = self._displayName
         else:
             vars["personName"] = string.capwords("%s"%self._personType)
-        
-        # Add people from the users basket        
-        vars["personOptions"] = self.__addBasketPeople("")    
-        
-        vars["personOptions"] += vars["%sOptions"%self._personType]        
-        
+
+        # Add people from the users basket
+        vars["personOptions"] = self.__addBasketPeople("")
+
+        vars["personOptions"] += vars["%sOptions"%self._personType]
+
         vars["personChosen"] = "%sChosen"%self._personType
-        
+
         vars["personDefined"] = vars["%sDefined"%self._personType]
-        
+
         if vars["personOptions"] == """<option value=""> </option>""":
             vars["disabledAdd"] = "disabled"
         else:
             vars["disabledAdd"] = ""
 
         vars["personType"] = self._personType
-        
+
         if vars.get("submission",None) is not None :
             vars["submissionButtons"] =  _("""
             <tr>
                 <td colspan="4"><input type="submit" class="btn" value="_("Grant submission")" onClick="setAction(this.form,'Grant submission');"></td>
             </tr>
             <tr>
-                <td colspan="4"><input type="submit" class="btn" value="_("Withdraw submission")" onClick="setAction(this.form,'Withdraw submission');"></td>                                    
+                <td colspan="4"><input type="submit" class="btn" value="_("Withdraw submission")" onClick="setAction(this.form,'Withdraw submission');"></td>
             </tr>""")
         else :
             vars["submissionButtons"] = ""
         return vars
-    
+
 
 class WAccountAlreadyActivated(WTemplated):
-    
+
     def __init__(self, av):
         self._av = av
-    
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
         return vars
 
 
 class WAccountActivated(WTemplated):
-    
+
     def __init__(self, av):
         self._av = av
-    
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
         return vars
 
 
 class WAccountDisabled(WTemplated):
-    
+
     def __init__(self, av):
         self._av = av
-    
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
         return vars
 
 
 class WUnactivatedAccount(WTemplated):
-    
+
     def __init__(self, av):
         self._av = av
-    
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -4416,7 +4419,7 @@ class WUnactivatedAccount(WTemplated):
 
 
 class WAbstractModIntCommentEdit(WTemplated):
-    
+
     def __init__(self,comment):
         self._comment=comment
 
@@ -4427,7 +4430,7 @@ class WAbstractModIntCommentEdit(WTemplated):
 
 
 class WAbstractModNewIntComment(WTemplated):
-    
+
     def __init__(self,aw,abstract):
         self._aw=aw
         self._abstract=abstract
@@ -4451,10 +4454,10 @@ class WSessionModifComm(WTemplated):
         except:
             comment = _("No Session Comment Entered")
             self._session.setComments("")
-        
+
         modifButton=""
         if self._conf.canModify(self._aw):
-            
+
             modifButton =  _("""<form action=%s method="POST">
                     <td align="center">
                         <input type="submit" class="btn" value="_("modify")">
@@ -4471,7 +4474,7 @@ class WSessionModifComm(WTemplated):
                 %s
             </td>
         </tr>
-        <tr>                      
+        <tr>
             %s
         </tr>
         </table> """)%(comment,modifButton))
@@ -4484,7 +4487,7 @@ class WSessionModifComm(WTemplated):
 
 
 class WSessionModifCommEdit(WTemplated):
-    
+
     def __init__(self,comment):
         self._comment=comment
 
@@ -4492,9 +4495,9 @@ class WSessionModifCommEdit(WTemplated):
         vars=WTemplated.getVars(self)
         vars["comment"]=self.htmlText(self._comment)
         return vars
-    
+
 class WAbstractModIntComments(WTemplated):
-    
+
     def __init__(self,aw,abstract):
         self._aw=aw
         self._abstract=abstract
@@ -4551,7 +4554,7 @@ class WAbstractModIntComments(WTemplated):
 
 
 class WAbstractModMarkAsDup(WTemplated):
-        
+
     def __init__(self,abstract):
         self._abstract=abstract
 
@@ -4583,7 +4586,7 @@ class WAbstractModMarkAsDup(WTemplated):
 
 
 class WAbstractModUnMarkAsDup(WTemplated):
-        
+
     def __init__(self,abstract):
         self._abstract=abstract
 
@@ -4596,7 +4599,7 @@ class WAbstractModUnMarkAsDup(WTemplated):
 
 
 class WConfModAbstractEditData(WTemplated):
-    
+
     def __init__(self,conference,abstractData):
         self._ad=abstractData
         self._conf=conference
@@ -4610,7 +4613,7 @@ class WConfModAbstractEditData(WTemplated):
     #            sel=" selected"
     #        res.append("""<option value=%s%s>%s</option>"""%(quoteattr(t),sel,self.htmlText(t)))
     #    return "".join(res)
-        
+
     def _getContribTypeItemsHTML(self):
         res=[ _("""<option value="">--_("not specified")--</option>""")]
         for cType in self._conf.getContribTypeList():
@@ -4646,7 +4649,7 @@ class WConfModAbstractEditData(WTemplated):
                             <input type="checkbox" name="sel_prim_author" value=%s>
                             <input type="hidden" name="auth_prim_id" value=%s>
                         </td>
-                        <td style="border-top:1px solid #777777;" width="100%%"> 
+                        <td style="border-top:1px solid #777777;" width="100%%">
                             <table width="95%%" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td nowrap>
@@ -4692,7 +4695,7 @@ class WConfModAbstractEditData(WTemplated):
                     quoteattr(str(author.getId())), spk_checked)
             res.append(tmp)
         return "".join(res)
-        
+
     def _getCoAuthorsHTML(self):
         res=[]
         for author in self._ad.getCoAuthorList():
@@ -4719,7 +4722,7 @@ class WConfModAbstractEditData(WTemplated):
                             <input type="checkbox" name="sel_co_author" value=%s>
                             <input type="hidden" name="auth_co_id" value=%s>
                         </td>
-                         <td style="border-top:1px solid #777777;"> 
+                         <td style="border-top:1px solid #777777;">
                             <table color="gray">
                                 <tr>
                                     <td nowrap>
@@ -4815,7 +4818,7 @@ class WConfModAbstractEditData(WTemplated):
 
 
 class WScheduleAddContributions(WTemplated):
-    
+
     def __init__(self,selectList,targetDay=None):
         self._contribList=selectList
         self._targetDay=targetDay
@@ -4847,7 +4850,7 @@ class WScheduleAddContributions(WTemplated):
                             self.htmlText(contrib.getTitle()),
                             spksCaption))
         return "".join(res)
-            
+
 
     def getVars(self):
         vars=WTemplated.getVars(self)
@@ -4856,10 +4859,10 @@ class WScheduleAddContributions(WTemplated):
         if self._targetDay is not None:
             vars["targetDay"]="""<input type="hidden" name="targetDay" value=%s>"""%(quoteattr(str(self._targetDay.strftime("%Y-%m-%d"))))
         return vars
-        
+
 
 class WSchEditContrib(WTemplated):
-    
+
     def __init__(self,contrib):
         self._contrib=contrib
 
@@ -4916,7 +4919,7 @@ class WSchEditContrib(WTemplated):
 
 
 class WConfModParticipEdit(WTemplated):
-    
+
     def __init__(self,title="",part=None):
         self._part=part
         self._ctitle=title
@@ -4949,22 +4952,22 @@ class WConfModParticipEdit(WTemplated):
         return vars
 
 class WSessionModEditDataCode(WTemplated):
-    
+
     def __init__(self):
         pass
-        
+
     def getVars( self ):
-        vars=WTemplated.getVars(self) 
+        vars=WTemplated.getVars(self)
         vars["code"]=quoteattr(str(vars.get("code","")))
         return vars
 
 class WSessionModEditDataType(WTemplated):
-    
+
     def __init__(self):
         pass
-        
+
     def getVars( self ):
-        vars=WTemplated.getVars(self) 
+        vars=WTemplated.getVars(self)
         l=[]
         currentTTType=vars.get("tt_type",conference.SlotSchTypeFactory.getDefaultId())
         for i in conference.SlotSchTypeFactory.getIdList():
@@ -4977,16 +4980,16 @@ class WSessionModEditDataType(WTemplated):
         return vars
 
 class WSessionModEditDataColors(WTemplated):
-    
+
     def __init__(self):
         pass
-        
+
     def getVars( self ):
-        vars=WTemplated.getVars(self) 
+        vars=WTemplated.getVars(self)
         return vars
-        
+
 class WSessionModEditData(WTemplated):
-    
+
     def __init__(self,targetConf,aw,pageTitle="",targetDay=None):
         self._conf=targetConf
         self._title=pageTitle
@@ -5010,7 +5013,7 @@ class WSessionModEditData(WTemplated):
                     """%"<br>".join(l)
         else:
             return ""
-    
+
     def getVars( self ):
         vars=WTemplated.getVars(self)
         vars["conference"] = self._conf
@@ -5049,20 +5052,20 @@ class WSessionModEditData(WTemplated):
         vars["durMin"]=quoteattr(str(vars.get("durMin",20)))
         vars["defaultInheritPlace"]="checked"
         vars["defaultDefinePlace"]=""
-        
+
         if vars.get("convenerDefined",None) is None :
             sessionId = vars["sessionId"]
             session = self._conf.getSessionById(sessionId)
-            html = []            
+            html = []
             for convener in session.getConvenerList() :
                 text = """
                  <tr>
                      <td width="5%%"><input type="checkbox" name="%ss" value="%s"></td>
                      <td>&nbsp;%s</td>
                  </tr>"""%("convener",convener.getId(),convener.getFullName())
-                html.append(text)                
+                html.append(text)
             vars["definedConveners"] = """
-                                         """.join(html)            
+                                         """.join(html)
         if vars.get("locationAction","")=="define":
             vars["defaultInheritPlace"]=""
             vars["defaultDefinePlace"]="checked"
@@ -5088,7 +5091,7 @@ class WSessionModEditData(WTemplated):
             vars["defaultInheritRoom"]="checked"
             roomName = ""
 
-        
+
         vars["confRoom"]=""
         rx=[]
         roomsexist = self._conf.getRoomList()
@@ -5130,11 +5133,11 @@ class WSessionModEditData(WTemplated):
             vars["Colors"]=""
             vars["code"]=""
         return vars
-    
+
 #--------------------------------------------------------------------------------------
 
 class WConfModMoveContribsToSessionConfirmation(WTemplated):
-    
+
     def __init__(self,conf,contribIdList=[],targetSession=None):
         self._conf=conf
         self._contribIdList=contribIdList
@@ -5195,7 +5198,7 @@ class WConfModMoveContribsToSessionConfirmation(WTemplated):
 
 
 class WConfTBDrawer:
-    
+
     def __init__(self,tb):
         self._tb=tb
 
@@ -5220,52 +5223,52 @@ class WConfTBDrawer:
                 </table>
                     """%("".join(res))
         return ""
-        
+
 class WErrorMessage :
-    
+
     def getHTML( self, vars ):
-                
+
         if vars.get("errorMsg", None) is None :
             return ""
         if type(vars["errorMsg"]) != list:
             vars["errorMsg"]=[vars["errorMsg"]]
         for i in range(0,len(vars["errorMsg"])) :
             vars["errorMsg"][i] = """<span style="color: red;">"""+vars["errorMsg"][i]+"""</span>"""
-        
+
         errorMsg = """
         """.join(vars["errorMsg"])
-        
-        html = """                    
+
+        html = """
                 <div class="errorMsgBox">
                     %s
                 </div>
                """%errorMsg
-        
+
         return html
-    
+
 class WInfoMessage :
-    
+
     def getHTML( self, vars ):
         if vars.get("infoMsg", None) is None :
-            return "" 
+            return ""
         if type(vars["infoMsg"]) != list:
             vars["infoMsg"]=[vars["infoMsg"]]
         for i in range(0,len(vars["infoMsg"])) :
             vars["infoMsg"][i] = """<span style="color: green;">"""+vars["infoMsg"][i]+"""</span>"""
-        
+
         infoMsg = """
         """.join(vars["infoMsg"])
-        
-        html = """                    
+
+        html = """
                 <div class="errorMsgBox">
                     %s
                 </div>
         """%infoMsg
-        
+
         return html
 
 class WConfTickerTapeDrawer(WTemplated):
-    
+
     def __init__(self,conf, tz=None):
         self._conf=conf
         self._tz = tz
@@ -5277,12 +5280,12 @@ class WConfTickerTapeDrawer(WTemplated):
             return None
 
         html = WTemplated.getHTML( self, params )
-        
+
         if html == "":
             return None
 
         return html
-    
+
     def getSimpleText( self ):
         if not self._tickerTape.isSimpleTextEnabled() or \
            self._tickerTape.getText().strip() == "":
@@ -5292,13 +5295,13 @@ class WConfTickerTapeDrawer(WTemplated):
 
     def getVars(self):
         vars = WTemplated.getVars( self )
-    
+
         vars["nowHappeningArray"] = None
         if self._tickerTape.isNowHappeningEnabled():
             vars["nowHappeningArray"] = self._getNowHappening()
 
         return vars
-    
+
     def _getNowHappening( self ):
         # This will contain a string formated for use in the template
         # javascripts
@@ -5387,7 +5390,7 @@ class WSubmitMaterialLink(WTemplated):
         else:
             vars["linkValue"] = ""
         return vars
- 
+
 class WSubmitMaterialFile(WTemplated):
 
     def __init__(self, filenb, availMF):
@@ -5426,7 +5429,7 @@ class WSubmitMaterialFile(WTemplated):
             vars["fileName"] = ""
         vars["fileNewName"] = "FileNewName%s" % self._filenb
         return vars
-    
+
 class WMaterialListFile(WTemplated):
 
     def __init__(self, target):
@@ -5465,7 +5468,7 @@ class WMaterialListFile(WTemplated):
         else:
             vars["fileAccessURL"]=quoteattr(str(urlHandlers.UHFileAccess.getURL(self._target)))
         return vars
-    
+
 class WMaterialListItem(WTemplated):
 
     def __init__(self, target, returnURL=""):
@@ -5473,8 +5476,8 @@ class WMaterialListItem(WTemplated):
         self._returnURL = returnURL.strip('"')
 
     def getVars(self):
-        vars=WTemplated.getVars(self)   
-        deleteURL = None  
+        vars=WTemplated.getVars(self)
+        deleteURL = None
         mf = None
         from MaKaC.webinterface.materialFactories import ConfMFRegistry,SessionMFRegistry,ContribMFRegistry
         if isinstance(self._target.getOwner(),conference.Conference):
@@ -5505,7 +5508,7 @@ class WMaterialListItem(WTemplated):
             vars["materialActions"] += """<img src="%s" alt="Protected" style="margin-left: 5px; vertical-align: middle; border: 0;" />""" % Config.getInstance().getSystemIconURL("protected")
         vars["fileList"]=""
         for resource in self._target.getResourceList():
-            vars["fileList"] += WMaterialListFile(resource).getHTML(vars) 
+            vars["fileList"] += WMaterialListFile(resource).getHTML(vars)
         if mf is None:
             vars["materialIcon"]=quoteattr(str(Config.getInstance().getSystemIconURL("material")))
         else:
@@ -5514,14 +5517,14 @@ class WMaterialListItem(WTemplated):
 
 
 class WShowExistingMaterial(WTemplated):
-    
+
     def __init__(self,target):
         self._target=target
 
 
     def getVars(self):
         vars=WTemplated.getVars(self)
-        
+
         vars["materialModifHandler"] = vars.get("materialModifHandler", None)
         vars["materialProtectHandler"] = vars.get("materialProtectHandler", None)
         vars["resourcesFileModifHandler"] = vars.get("resourcesFileModifHandler", None)
@@ -5532,7 +5535,7 @@ class WShowExistingMaterial(WTemplated):
         return vars
 
 class WAddNewMaterial(WTemplated):
-    
+
     def __init__(self,target,availMF):
         self._target=target
         self._availMF=availMF
@@ -5611,7 +5614,7 @@ class WAddNewMaterial(WTemplated):
         return vars
 
 class WSubmitMaterial(WTemplated):
-    
+
     def __init__(self,target,availMF):
         self._target=target
         self._availMF=availMF
@@ -5712,10 +5715,10 @@ class WSchRelocateTime(WTemplated):
     def getVars(self):
         vars = WTemplated.getVars(self)
         return vars
-        
-    
+
+
 class WSchRelocate(WTemplated):
-    
+
     def __init__(self, entry):
         self._entry=entry
         if isinstance(self._entry, conference.Contribution):
@@ -5751,7 +5754,7 @@ class WSchRelocate(WTemplated):
                             slot.getAdjustedStartDate().strftime("%H:%M"), slot.getAdjustedEndDate().strftime("%H:%M")) )
                 html.append("</table></td></tr>")
         return "".join(html)
-                    
+
 
     def getVars(self):
         vars = WTemplated.getVars(self)
@@ -5769,14 +5772,14 @@ class WReportNumbersTable(WTemplated):
     def __init__(self, target, type="event"):
         self._target=target
         self._type=type
-    
+
     def _getCurrentItems(self):
         html=[]
         rns = self._target.getReportNumberHolder().listReportNumbers()
         id = 0
-        
+
         reportCodes = []
-        
+
         for rn in rns:
             key = rn[0]
             number = rn[1]
@@ -5797,7 +5800,7 @@ class WReportNumbersTable(WTemplated):
                         <option value="%s">%s</option>
                         """%(system, rnsystems[system]["name"] ) )
         return "".join(html)
-    
+
     def getVars(self):
         vars = WTemplated.getVars(self)
         if self._type == "event":
@@ -5836,7 +5839,7 @@ class WModifReportNumberEdit(WTemplated):
             vars["postURL"]=quoteattr(str(urlHandlers.UHSubContributionReportNumberPerformEdit.getURL(self._target)))
         return vars
 
-    
+
 class WHTMLEditorWrapper(WTemplated):
 
     def __init__(self, html, conf):
@@ -5900,38 +5903,38 @@ class RoomBars:
 # ============================================================================
 
 class WRoomBookingWelcome( WTemplated ):
-    
+
     def __init__(self):
         self.__adminList = AdminList.getInstance()
-    
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
         return vars
 
 class WRoomBookingRoomSelectList( WTemplated ):
-    
+
     def __init__( self, rh ):
         self._rh = rh
-    
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
-        
+
         vars['roomList'] = self._rh._roomList
         vars['locationRoom'] = self._rh._locationRoom
-        
+
         return vars
-        
+
 class WRoomBookingRoomSelectList4SubEvents( WTemplated ):
-    
+
     def __init__( self, rh ):
         self._rh = rh
-    
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
-        
+
         vars['roomList'] = self._rh._roomList
         vars['locationRoom'] = self._rh._locationRoom
-        
+
         return vars
 
 # ============================================================================
@@ -5942,7 +5945,7 @@ class WRoomBookingRoomSelectList4SubEvents( WTemplated ):
 # 0. Choosing an "event" (conference / session / contribution)...
 
 class WRoomBookingChooseEvent( WTemplated ):
-    
+
     def __init__( self, rh ):
         self._rh = rh
 
@@ -5951,13 +5954,13 @@ class WRoomBookingChooseEvent( WTemplated ):
 
         vars["conference"] = self._rh._conf
         vars["contributions"] = list( [ c for c in self._rh._conf.getContributionList() if c.getStartDate() ] )
-      
+
         return vars
 
 # 1. Searching
 
 class WRoomBookingSearch4Rooms( WTemplated ):
-    
+
     def __init__( self, rh, standalone = False ):
         self._standalone = standalone
         self._rh = rh
@@ -5974,7 +5977,7 @@ class WRoomBookingSearch4Rooms( WTemplated ):
         vars["possibleEquipment"] = self._rh._equipment
         vars["forNewBooking"] = self._rh._forNewBooking
         vars["eventRoomName"] = self._rh._eventRoomName
-        
+
         vars["preview"] = False
 
         vars["startDT"] = websession.getVar( "defaultStartDT" )
@@ -5993,13 +5996,13 @@ class WRoomBookingSearch4Rooms( WTemplated ):
             vars["roomBookingRoomListURL"] = urlHandlers.UHConfModifRoomBookingRoomList.getURL( self._rh._conf )
             vars["detailsUH"] = urlHandlers.UHConfModifRoomBookingRoomDetails
             vars["bookingFormUH"] =  urlHandlers.UHConfModifRoomBookingBookingForm
-        
+
         vars['youCannot'] = "javascript:alert( 'You cannot book this room' );"
-        
+
         return vars
 
 class WRoomBookingSearch4Bookings( WTemplated ):
-    
+
     def __init__( self, rh ):
         self._rh = rh
 
@@ -6013,18 +6016,18 @@ class WRoomBookingSearch4Bookings( WTemplated ):
         vars["repeatability"] = None
 
         vars["roomBookingBookingListURL"] = urlHandlers.UHRoomBookingBookingList.getURL( None )
-        
+
         return vars
 
 # 2. List of...
 
 class WRoomBookingRoomList( WTemplated ):
-    
+
     def __init__( self, rh, standalone = False ):
         self._rh = rh
         self._standalone = standalone
         self._title = None
-        try: self._title = self._rh._title; 
+        try: self._title = self._rh._title;
         except: pass
 
     def getVars( self ):
@@ -6042,17 +6045,17 @@ class WRoomBookingRoomList( WTemplated ):
             vars["conference"] = self._rh._conf
             vars["detailsUH"] = urlHandlers.UHConfModifRoomBookingRoomDetails
             vars["bookingFormUH"] = urlHandlers.UHConfModifRoomBookingBookingForm
-        
+
         return vars
 
 class WRoomBookingList( WTemplated ):
-    
+
     def __init__( self, rh, standalone = False ):
         self._standalone = standalone
         self._rh = rh
         if not standalone:
             self._conf = rh._conf
-        
+
     def getVars( self ):
         vars=WTemplated.getVars( self )
 
@@ -6060,7 +6063,7 @@ class WRoomBookingList( WTemplated ):
         vars["standalone"] = self._standalone
         dm = datetime.now() - timedelta( 1 )
         vars["yesterday"] = dm #datetime( dm.year, dm.month, dm.day, 0, 0, 1 )
-        
+
         if self._standalone:
             vars["bookingDetailsUH"] = urlHandlers.UHRoomBookingBookingDetails
         else:
@@ -6070,31 +6073,31 @@ class WRoomBookingList( WTemplated ):
         return vars
 
 class WRoomBookingBookingList( WTemplated ): # Standalone version
-    
+
     def __init__( self, rh ):
         self._rh = rh
         self._title = None
-        try: self._title = self._rh._title; 
+        try: self._title = self._rh._title;
         except: pass
-        
+
     def _isOn(self, boolVal):
         if boolVal:
             return "on"
         else:
             return ""
-    
-    def getVars( self ):        
+
+    def getVars( self ):
         vars = WTemplated.getVars( self )
-        rh = self._rh        
+        rh = self._rh
 
         vars["reservations"] = rh._resvs
-                
+
         #vars["smallPhotoUH"] = urlHandlers.UHSendRoomPhoto
         vars["bookingDetailsUH"] = urlHandlers.UHRoomBookingBookingDetails
         vars["withPhoto"] = False
         vars["title"] = self._title
         vars["showRejectAllButton"] = rh._showRejectAllButton
-        
+
         vars["prebookingsRejected"] = rh._prebookingsRejected
         vars["subtitle"] = rh._subtitle
         vars["description"] = rh._description
@@ -6104,18 +6107,18 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
         overload = ( len( rh._resvs ) > 300 ) or self._rh._overload
 
         ed = None
-        sd = rh._resvEx.startDT.date()                        
+        sd = rh._resvEx.startDT.date()
         if rh._resvEx.endDT:
-            ed = rh._resvEx.endDT.date()      
-        
+            ed = rh._resvEx.endDT.date()
+
         # autoCriteria - dates are calculated based on the next reservation
         if rh._autoCriteria:
             tmp = ReservationBase.findSoonest( rh._resvs, afterDT = yesterday )
             if tmp:
                 tmp = tmp.getNextRepeating( afterDT = yesterday )
                 if tmp and tmp.startDT.date() > sd:
-                    sd = tmp.startDT                
-            if not ed: 
+                    sd = tmp.startDT
+            if not ed:
                 # one month of time span
                 ed = sd + timedelta( 30 )
 
@@ -6124,7 +6127,7 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
         calendarEndDT = datetime( ed.year, ed.month, ed.day, 23, 59 )
 
         from MaKaC.rb_tools import formatDate
-        
+
         if  calendarStartDT.date() == calendarEndDT.date():
             vars["periodName"] = "day"
             vars["verbosePeriod"] = formatDate(calendarStartDT)
@@ -6132,8 +6135,8 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
             vars["periodName"] = "period"
             vars["verbosePeriod"] = "%s -> %s" % ( formatDate(calendarStartDT), formatDate(calendarEndDT) )
         vars["startD"] = formatDate(calendarStartDT)
-        vars["endD"] = formatDate(calendarEndDT)        
-        
+        vars["endD"] = formatDate(calendarEndDT)
+
         # Data for previous/next URLs (it's about periods, not paging)
         newParams4Previous = rh._reqParams.copy()
         newParams4Next = rh._reqParams.copy()
@@ -6144,37 +6147,37 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
             del newParams4Previous['day']
             del newParams4Next['day']
 
-        
+
         startD = calendarStartDT.date()
         endD = calendarEndDT.date()
-        
+
         if endD != startD:
             period = endD - startD
-            
+
             prevStartD = startD - period
             prevEndD = startD - timedelta(1)
-            
+
             nextStartD = endD + timedelta(1)
             nextEndD = endD + period
         else:
             prevStartD = prevEndD = startD - timedelta(1)
-            nextStartD = nextEndD = endD + timedelta(1) 
-        
+            nextStartD = nextEndD = endD + timedelta(1)
+
         newParams4Previous['sDay'] = prevStartD.day
         newParams4Previous['sMonth'] = prevStartD.month
         newParams4Previous['sYear'] = prevStartD.year
         newParams4Previous['eDay'] = prevEndD.day
         newParams4Previous['eMonth'] = prevEndD.month
         newParams4Previous['eYear'] = prevEndD.year
-        
+
         newParams4Next['sDay'] = nextStartD.day
         newParams4Next['sMonth'] = nextStartD.month
         newParams4Next['sYear'] = nextStartD.year
         newParams4Next['eDay'] = nextEndD.day
         newParams4Next['eMonth'] = nextEndD.month
         newParams4Next['eYear'] = nextEndD.year
-        
-        vars["withPrevNext"] = True               
+
+        vars["withPrevNext"] = True
         vars["prevURL"] = urlHandlers.UHRoomBookingBookingList.getURL( newParams = newParams4Previous )
         vars["nextURL"] = urlHandlers.UHRoomBookingBookingList.getURL( newParams = newParams4Next )
 
@@ -6185,63 +6188,63 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
                           (not self._rh._ofMyRooms and not self._rh._onlyMy) ) and \
                           not self._rh._search
         showEmptyRooms = showEmptyDays
-        
-                
+
+
         # Calendar related stuff ==========
-        
+
         bars = []
         collisionsOfResvs = []
-        
+
         # there's at least one reservation
         if len( rh._resvs ) > 0 and not overload:
-                       
-            
-            # Prepare the list of Collisions 
+
+
+            # Prepare the list of Collisions
             # (collision is just a helper object, it's not the best notion here)
-            
+
             for r in rh._resvs:
                 for p in r.splitToPeriods(endDT=calendarEndDT):
                     if p.startDT >= calendarStartDT and p.endDT <= calendarEndDT:
                         collisionsOfResvs.append( Collision( ( p.startDT, p.endDT ), r ) )
-            
+
             if len( collisionsOfResvs ) > 500:
                 overload = True
             else:
-            
-                # Translate collisions to Bars                
+
+                # Translate collisions to Bars
                 for c in collisionsOfResvs:
                     if c.withReservation.isConfirmed:
                         bars.append( Bar( c, Bar.UNAVAILABLE ) )
                     else:
                         bars.append( Bar( c, Bar.PREBOOKED ) )
-                
+
                 bars = barsList2Dictionary( bars )
                 bars = addOverlappingPrebookings( bars )
                 bars = sortBarsByImportance( bars, calendarStartDT, calendarEndDT )
-                
+
                 rooms = []
                 for r in rh._resvs:
                     rooms.append(r.room)
-                
+
                 #rooms = {}
                 #for r in rh._resvs:
                 #    rooms[r.room] = None
                 #rooms = rooms.keys()
-                
+
                 #CrossLocationQueries.getRooms( location = self.location )
                 if not self._rh._onlyMy:
                     rooms = self._rh._rooms
-                
+
                 bars = introduceRooms( rooms, bars, calendarStartDT, calendarEndDT, showEmptyDays = showEmptyDays, showEmptyRooms = showEmptyRooms )
-                                                
+
                 vars["Bar"] = Bar
-                
-                self.__sortUsingCriterion(rh._order, collisionsOfResvs)                
-        
+
+                self.__sortUsingCriterion(rh._order, collisionsOfResvs)
+
         # we want to display every room, with or without reservation
         elif not overload:
-            # initialize collision bars 
-            bars = {}            
+            # initialize collision bars
+            bars = {}
             bars = sortBarsByImportance( bars, calendarStartDT, calendarEndDT )
 
             # insert rooms
@@ -6249,10 +6252,10 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
                     rooms = self._rh._rooms
             else:
                     rooms = []
-                
-            bars = introduceRooms( rooms, bars, calendarStartDT, calendarEndDT, showEmptyDays = showEmptyDays, showEmptyRooms = showEmptyRooms )                            
-            
-        
+
+            bars = introduceRooms( rooms, bars, calendarStartDT, calendarEndDT, showEmptyDays = showEmptyDays, showEmptyRooms = showEmptyRooms )
+
+
         vars["unrolledReservations"] = collisionsOfResvs
         vars["bars"] = bars
         vars["calendarStartDT"] = calendarStartDT
@@ -6275,16 +6278,16 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
             vars["bars"] = bars
 
         return vars
-            
 
-    def __sortUsingCriterion(self, order, uresvs):            
-        
+
+    def __sortUsingCriterion(self, order, uresvs):
+
         if order == "" or order =="room":
-            # standard sorting order (by room, and then date) 
+            # standard sorting order (by room, and then date)
             uresvs.sort(lambda r1,r2: cmp(r1.withReservation.room.name,r2.withReservation.room.name))
         else:
-            if order == 'date':              
-                uresvs.sort(lambda r1, r2: cmp(r1.startDT, r2.startDT))                
+            if order == 'date':
+                uresvs.sort(lambda r1, r2: cmp(r1.startDT, r2.startDT))
             elif order == 'reason':
                 uresvs.sort(lambda r1, r2: cmp(r1.withReservation.reason.lower(), r2.withReservation.reason.lower()))
             elif order == 'for':
@@ -6296,7 +6299,7 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
 # 3. Details of...
 
 def barsList2Dictionary( bars ):
-    """ 
+    """
     Converts:
     list of bars => dictionary of bars, key = datetime, value = list of bars
     """
@@ -6307,18 +6310,18 @@ def barsList2Dictionary( bars ):
             h[d].append( bar )
         else:
             h[d] = [bar]
-    return h 
+    return h
 
 def addOverlappingPrebookings( bars ):
     """
     Adds bars representing overlapping pre-bookings.
     Returns new bars dictionary.
     """
-    
+
     # For each day
     for dt in bars.keys():
         dayBars = bars[dt]
-        
+
         # For each (prebooked) bar i
         for i in xrange( 0, len( dayBars ) ):
             bar = dayBars[i]
@@ -6328,7 +6331,7 @@ def addOverlappingPrebookings( bars ):
                 for j in xrange( i+1, len( dayBars ) ):
                     collCand = dayBars[j]
                     if collCand.type == Bar.PREBOOKED:
-                        
+
                         # If there is an overlap, add PRECONCURRENT bar
                         over = overlap( bar.startDT, bar.endDT, collCand.startDT, collCand.endDT )
                         if over and bar.forReservation.room == collCand.forReservation.room:
@@ -6336,25 +6339,25 @@ def addOverlappingPrebookings( bars ):
                             dayBars.append( Bar( collision, Bar.PRECONCURRENT ) )
 
         bars[dt] = dayBars # With added concurrent prebooking bars
-    
+
     return bars
 
 def sortBarsByImportance( bars, calendarStartDT, calendarEndDT ):
-    """ 
-    Moves conflict bars to the end of the list, 
+    """
+    Moves conflict bars to the end of the list,
     so they will be drawn last and therefore be visible.
-    
+
     Returns sorted bars.
     """
     for dt in bars.keys():
         dayBars = bars[dt]
         dayBars.sort()
         bars[dt] = dayBars
-        
+
     for day in iterdays( calendarStartDT, calendarEndDT ):
         if not bars.has_key( day.date() ):
             bars[day.date()] = []
-    
+
     return bars
 
 def getRoomBarsList( rooms ):
@@ -6367,7 +6370,7 @@ def getRoomBarsList( rooms ):
     return roomBarsList
 
 def introduceRooms( rooms, dayBarsDic, calendarStartDT, calendarEndDT, showEmptyDays=True, showEmptyRooms=True ):
-    # Input: 
+    # Input:
     # dayBarsDic is a dictionary date => [bar1, bar2, bar3, ...]
     #
     # Output:
@@ -6376,7 +6379,7 @@ def introduceRooms( rooms, dayBarsDic, calendarStartDT, calendarEndDT, showEmpty
     import copy
     cleanRoomBarsList = getRoomBarsList( rooms )
     newDayBarsDic = {}
-    
+
     s = ""
     for day in iterdays( calendarStartDT, calendarEndDT ):
         dayBars = dayBarsDic[day.date()]
@@ -6385,24 +6388,24 @@ def introduceRooms( rooms, dayBarsDic, calendarStartDT, calendarEndDT, showEmpty
             room = bar.forReservation.room
             if not roomBarsDic.has_key( room ):
                 roomBarsDic[room] = []
-            # Bars order should be preserved            
+            # Bars order should be preserved
             roomBarsDic[room].append( bar )
-        
-        if showEmptyRooms: 
+
+        if showEmptyRooms:
             dayRoomBarsList = getRoomBarsList( rooms ) #copy.copy( cleanRoomBarsList )
-        
+
             for roomBar in dayRoomBarsList:
                 roomBar.bars = roomBarsDic.get( roomBar.room, [] )
         else:
             dayRoomBarsList = []
             for room in roomBarsDic.keys():
                 dayRoomBarsList.append(RoomBars(room,roomBarsDic[room]))
-        
+
         if showEmptyDays or len(dayBars) > 0:
             newDayBarsDic[day.date()] = dayRoomBarsList
-    
+
     return newDayBarsDic
-        
+
 
 class WRoomBookingRoomStats( WTemplated ):
 
@@ -6416,16 +6419,16 @@ class WRoomBookingRoomStats( WTemplated ):
         vars["standalone"] = self._standalone
         vars["period"] = self._rh._period
         vars["kpiAverageOccupation"] = str( int( round( self._rh._kpiAverageOccupation * 100 ) ) ) + "%"
-        # Bookings    
+        # Bookings
         vars["kbiTotalBookings"] = self._rh._totalBookings
         # Next 9 KPIs
         vars["stats"] = self._rh._booking_stats
         vars["statsURL"] = urlHandlers.UHRoomBookingRoomStats.getURL()
         return vars
-   
+
 
 class WRoomBookingRoomDetails( WTemplated ):
-    
+
     def __init__( self, rh, standalone = False ):
         self._rh = rh
         self._standalone = standalone
@@ -6444,7 +6447,7 @@ class WRoomBookingRoomDetails( WTemplated ):
         vars["standalone"] = self._standalone
         vars["actionSucceeded"] = self._rh._afterActionSucceeded
         vars["deletionFailed"] = self._rh._afterDeletionFailed
-        
+
         vars["roomStatsUH"] = urlHandlers.UHRoomBookingRoomStats
 
         if self._standalone:
@@ -6476,8 +6479,8 @@ class WRoomBookingRoomDetails( WTemplated ):
         resvEx.endDT = calendarEndDT
         resvEx.repeatability = RepeatabilityEnum.daily
         resvEx.room = self._rh._room
-        resvEx.isConfirmed = None # to include not also confirmed 
-        
+        resvEx.isConfirmed = None # to include not also confirmed
+
         # Bars: Existing reservations
         collisionsOfResvs = resvEx.getCollisions()
 
@@ -6505,11 +6508,11 @@ class WRoomBookingRoomDetails( WTemplated ):
         vars["day_name"] = day_name
         vars["Bar"] = Bar
         vars["withConflicts"] = False
-        
+
         return vars
 
 class WRoomBookingDetails( WTemplated ):
-    
+
     def __init__( self, rh, standalone = False ):
         self._rh = rh
         self._resv = rh._resv
@@ -6526,7 +6529,7 @@ class WRoomBookingDetails( WTemplated ):
         if self._rh._afterActionSucceeded:
             vars["title"] = self._rh._title
             vars["description"] = self._rh._description
-        
+
         if self._standalone:
             vars["roomDetailsUH"] = urlHandlers.UHRoomBookingRoomDetails
         else:
@@ -6541,7 +6544,7 @@ class WRoomBookingDetails( WTemplated ):
 # 4. Booking Form
 
 class WRoomBookingBookingForm( WTemplated ):
-    
+
     def __init__( self, rh, standalone = False ):
         self._rh = rh
         self._candResv = rh._candResv
@@ -6575,13 +6578,13 @@ class WRoomBookingBookingForm( WTemplated ):
         vars["thereAreConflicts"] = self._rh._thereAreConflicts
         vars["skipConflicting"] = self._rh._skipConflicting
 
-        if self._rh._formMode == FormMode.MODIF: 
-            vars["allowPast"] = "true" 
-        else: 
-            vars["allowPast"] = "false" 
-        vars["formMode"] = self._rh._formMode 
+        if self._rh._formMode == FormMode.MODIF:
+            vars["allowPast"] = "true"
+        else:
+            vars["allowPast"] = "false"
+        vars["formMode"] = self._rh._formMode
         vars["FormMode"] = FormMode
-        
+
         # [Book] or [PRE-Book] ?
         bookingMessage = "Book"
         room = self._candResv.room
@@ -6594,30 +6597,30 @@ class WRoomBookingBookingForm( WTemplated ):
             bText = bookingMessage
         else:
             bText = "Save"
-        
+
         vars["roomBookingRoomCalendar"] = WRoomBookingRoomCalendar( self._rh, self._standalone, buttonText=bText).getHTML( {} )
-        
+
         return vars
 
 class WRoomBookingConfirmBooking( WRoomBookingBookingForm ):
-    
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
-        
+
         vars["candResv"] = self._candResv
-        
+
         vars["standalone"] = self._standalone
         vars["formMode"] = self._rh._formMode
         vars["FormMode"] = FormMode
         vars["collisions"] = self._rh._collisions
-        
+
         bookingMessage = "Book"
         room = self._candResv.room
         user = self._rh._getUser()
         if room.canPrebook( user ) and not room.canBook( user ):
             bookingMessage = "PRE-Book"
         vars["bookingMessage"] = bookingMessage
-               
+
         if self._standalone:
              vars["conf"] = None
              vars["saveBookingUH"] = urlHandlers.UHRoomBookingSaveBooking
@@ -6625,27 +6628,27 @@ class WRoomBookingConfirmBooking( WRoomBookingBookingForm ):
         else:
              vars["conf"] = self._rh._conf
              vars["saveBookingUH"] = urlHandlers.UHConfModifRoomBookingSaveBooking
-             vars["roomDetailsUH"] = urlHandlers.UHConfModifRoomBookingRoomDetails             
+             vars["roomDetailsUH"] = urlHandlers.UHConfModifRoomBookingRoomDetails
         return vars
-        
+
 class WRoomBookingRoomForm( WTemplated ):
-    
+
     def __init__( self, rh ):
         self._rh = rh
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
-        
+
         candRoom = self._rh._candRoom
         goodFactory = Location.parse( candRoom.locationName ).factory
-        
+
         vars["Location"] = Location
         vars["room"] = candRoom
         vars["largePhotoPath"] = None
         vars["smallPhotoPath"] = None
         vars["config"] = Config.getInstance()
         vars["possibleEquipment"] = goodFactory.getEquipmentManager().getPossibleEquipment( location = candRoom.locationName )
-        
+
         vars["showErrors"] = self._rh._showErrors
         vars["errors"] = self._rh._errors
 
@@ -6656,7 +6659,7 @@ class WRoomBookingRoomForm( WTemplated ):
             vars["responsibleName"] = resp.getFullName()
         else:
             vars["responsibleName"] = ""
-        
+
         return vars
 
 
@@ -6667,7 +6670,7 @@ class WRoomBookingRoomCalendar( WTemplated ):
         self._candResv = rh._candResv
         self._standalone = standalone
         self._buttonText = buttonText
-        
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
 
@@ -6682,7 +6685,7 @@ class WRoomBookingRoomCalendar( WTemplated ):
         # Calendar range
         now = datetime.now()
         if candResv != None: #.startDT != None and candResv.endDT != None:
-            calendarStartDT = datetime( candResv.startDT.year, candResv.startDT.month, candResv.startDT.day, 0, 0, 1 )  # Potential performance problem 
+            calendarStartDT = datetime( candResv.startDT.year, candResv.startDT.month, candResv.startDT.day, 0, 0, 1 )  # Potential performance problem
             calendarEndDT =  datetime( candResv.endDT.year, candResv.endDT.month, candResv.endDT.day, 23, 59 )     # with very long reservation periods
         else:
             calendarStartDT = datetime( now.year, now.month, now.day, 0, 0, 1 )
@@ -6695,7 +6698,7 @@ class WRoomBookingRoomCalendar( WTemplated ):
         resvEx.repeatability = RepeatabilityEnum.daily
         resvEx.room = room
         resvEx.isConfirmed = None # To include both confirmed and not confirmed
-        
+
         # Bars: Existing reservations
         collisionsOfResvs = resvEx.getCollisions()
         bars = []
@@ -6711,7 +6714,7 @@ class WRoomBookingRoomCalendar( WTemplated ):
             bars.append( Bar( Collision( (p.startDT, p.endDT), candResv ), Bar.CANDIDATE  ) )
 
         # Bars: Conflicts all vs candidate
-        candResvIsConfirmed = candResv.isConfirmed;   
+        candResvIsConfirmed = candResv.isConfirmed;
         candResv.isConfirmed = None
         allCollisions = candResv.getCollisions()
         candResv.isConfirmed = candResvIsConfirmed
@@ -6725,13 +6728,13 @@ class WRoomBookingRoomCalendar( WTemplated ):
                 collisions.append( c )
             else:
                 bars.append( Bar( c, Bar.PRECONFLICT ) )
-        
+
         if not candResv.isRejected and not candResv.isCancelled:
             vars["thereAreConflicts"] = len( collisions ) > 0
         else:
             vars["thereAreConflicts"] = False
         vars["conflictsNumber"] = len( collisions )
-        
+
         bars = barsList2Dictionary( bars )
         bars = addOverlappingPrebookings( bars )
         bars = sortBarsByImportance( bars, calendarStartDT, calendarEndDT )
@@ -6788,96 +6791,99 @@ class WRoomBookingAdminLocation( WTemplated ):
         vars["location"] = self._location
         vars["possibleEquipment"] = self._location.factory.getEquipmentManager().getPossibleEquipment(location = self._location.friendlyName)
         vars["AttsManager"] = self._location.factory.getCustomAttributesManager()
-        
+
         # Rooms
         rooms = self._location.factory.newRoom().getRooms(location = self._location.friendlyName)
         rooms.sort(key = lambda r: r.getFullName())
-        
+
         vars["Rooms"] = rooms
-        
+
         rh = self._rh
-        
+
         vars["withKPI"] = rh._withKPI
-        
+
         if rh._withKPI:
             vars["kpiAverageOccupation"] = str( int( round( rh._kpiAverageOccupation * 100 ) ) ) + "%"
-            
+
             vars["kpiTotalRooms"] = rh._kpiTotalRooms
             vars["kpiActiveRooms"] = rh._kpiActiveRooms
             vars["kpiReservableRooms"] = rh._kpiReservableRooms
-    
+
             vars["kpiReservableCapacity"] = rh._kpiReservableCapacity
             vars["kpiReservableSurface"] = rh._kpiReservableSurface
-            
+
             # Bookings
-            
+
             vars["kbiTotalBookings"] = rh._totalBookings
-    
+
             # Next 9 KPIs
             vars["stats"] = rh._booking_stats
-        
+
         return vars
-    
-class WBaseSearchBox(WTemplated):     
-    
+
+class WBaseSearchBox(WTemplated):
+
     def __init__(self, template='SearchBox', targetId=0):
         # overload the template
         WTemplated.__init__(self,template)
         self._targetId = targetId
-        
+
     def getVars(self):
-        vars = WTemplated.getVars( self )        
+        vars = WTemplated.getVars( self )
         vars["searchAction"] = urlHandlers.UHSearch.getURL();
         vars['targetId'] = self._targetId
         vars['searchImg'] =  imgLogo=Configuration.Config.getInstance().getSystemIconURL( "search" )
+        vars['categId'] = 0
         return vars
 
 class WMiniSearchBox(WBaseSearchBox):
-   
+
     def __init__(self, confId):
         WBaseSearchBox.__init__(self, template='MiniSearchBox',targetId = confId)
-   
+
     def getVars(self):
         vars = WBaseSearchBox.getVars( self )
-        return vars    
+        return vars
 
 class WMicroSearchBox(WBaseSearchBox):
-   
+
     def __init__(self, confId):
         WBaseSearchBox.__init__(self, template='MicroSearchBox',targetId = confId)
         self._confId = confId
-   
-    def getVars(self):
-        vars = WBaseSearchBox.getVars( self )       
-        vars["innerBox"] = WMiniSearchBox(self._confId).getHTML().replace('"', '\\"').replace("'", "\\'").replace("\n"," ")
-        vars["closeIcon"] = quoteattr(str(Configuration.Config.getInstance().getSystemIconURL("remove")));
-        return vars    
 
-class WCategorySearchBox(WBaseSearchBox):
-   
-    def __init__(self, categId = 0, optionsClass='arrowExpandIcon'):
-        WBaseSearchBox.__init__(self, targetId = categId)
-        self._moreOptionsClass = optionsClass
-        
     def getVars(self):
         vars = WBaseSearchBox.getVars( self )
+        vars["innerBox"] = WMiniSearchBox(self._confId).getHTML().replace('"', '\\"').replace("'", "\\'").replace("\n"," ")
+        vars["closeIcon"] = quoteattr(str(Configuration.Config.getInstance().getSystemIconURL("remove")));
+        return vars
+
+class WCategorySearchBox(WBaseSearchBox):
+
+    def __init__(self, categId = 0, optionsClass='arrowExpandIcon'):
+        WBaseSearchBox.__init__(self, targetId = categId)
+        self._categId = categId
+        self._moreOptionsClass = optionsClass
+
+    def getVars(self):
+        vars = WBaseSearchBox.getVars( self )
+        vars["categId"] = self._categId
         vars['moreOptionsClass'] = self._moreOptionsClass
         return vars
-      
+
 class WRootSearchBox(WBaseSearchBox):
-    
+
     def __init__(self):
         # overload the template
         WBaseSearchBox.__init__(self,'RootSearchBox')
-        
+
     def getVars(self):
-        vars = WBaseSearchBox.getVars( self )        
-        vars["innerBox"] = WBaseSearchBox().getHTML()   
+        vars = WBaseSearchBox.getVars( self )
+        vars["innerBox"] = WBaseSearchBox().getHTML()
         return vars
-    
+
 class WUtils:
     """A interface for creating easily some HTML elements..."""
-    
+
     def createImg(cls, imgId, imgInfo="", imgText="", **attributes):
         """ returns an HTML image with optional text on the right.
             Params:
@@ -6889,7 +6895,7 @@ class WUtils:
         attr = utils.dictionaryToString(attributes)
         return """<img src="%s" alt="%s" %s /> %s"""%(Config.getInstance().getSystemIconURL(imgId),imgInfo,attr,imgText)
     createImg = classmethod(createImg)
-    
+
     def createImgButton(cls, url, imgId, imgInfo="", imgText="", **attributes):
         """ returns an HTML image link with optional text on the right.
             Params:
@@ -6904,12 +6910,12 @@ class WUtils:
               <img src="%s" alt="%s" /> %s
           </a>"""%(url, attr, Config.getInstance().getSystemIconURL(imgId), imgInfo, imgText)
     createImgButton = classmethod(createImgButton)
-    
+
     def createChangingImgButton(cls, url, imgID, imgOverId, imgInfo="", imgText="", **attributes):
         """ returns a changing HTML image link
             (i.e. the image changes depending on mouseOver/mouseOut)
             with optional text on the right.
-        
+
             Params:
                 url -- link of target.
                 imgID -- ID of the basic picture (see /code/MaKaC/common/MaCaKConfig.py ->SystemIcons).
@@ -6923,9 +6929,9 @@ class WUtils:
         iconOverUrl = Config.getInstance().getSystemIconURL(imgOverId)
         return """<a href="%s" %s>
               <img src="%s" alt="%s" onmouseover="javascript:this.src='%s'" onMouseOut="javascript:this.src='%s'"/> %s
-          </a>"""%(url, attr, iconUrl, imgInfo, iconOverUrl, iconUrl, imgText)           
+          </a>"""%(url, attr, iconUrl, imgInfo, iconOverUrl, iconUrl, imgText)
     createChangingImgButton = classmethod(createChangingImgButton)
-    
+
     def createTextarea(cls, content="", **attributes):
         """ returns an HTML textarea with optional text.
             Params:
@@ -6939,7 +6945,7 @@ class WUtils:
         #return HTML string
         return """<textarea rows="5" cols="15" %s>%s</textarea>"""%(attr,content)
     createTextarea = classmethod(createTextarea)
-    
+
     def createInput(cls, text="", **attributes):
         """ returns an HTML input with optional text.
             Params:
@@ -6953,7 +6959,7 @@ class WUtils:
         #return HTML string
         return """<input %s/>%s"""%(attr,text)
     createInput = classmethod(createInput)
-    
+
     def createSelect(cls, emptyOption, options, selected="", **attributes):
         """ returns an HTML select field.
             Params:
@@ -6978,7 +6984,7 @@ class WUtils:
                     optionsHTML += "<option>%s</option>"%(option)
         return """<select %s>%s</select>"""%(attr,optionsHTML)
     createSelect = classmethod(createSelect)
-    
+
     def appendNewLine(cls, htmlContent):
         """ appends a new line <br/> to the given html element.
             Params:
@@ -6988,7 +6994,7 @@ class WUtils:
     appendNewLine = classmethod(appendNewLine)
 
 class WBeautifulHTMLList(WTemplated):
-    
+
     def __init__(self, listObject, classNames, level):
         """ classNames: a dictionary such as {'UlClassName' : 'optionList'}. See the getVars for more class names.
         """
@@ -6996,7 +7002,7 @@ class WBeautifulHTMLList(WTemplated):
         self.__listObject = listObject
         self.__classNames = classNames
         self.__level = level
-        
+
     def getVars(self):
         vars = WTemplated.getVars( self )
         vars["ListObject"] = self.__listObject
@@ -7005,9 +7011,9 @@ class WBeautifulHTMLList(WTemplated):
         vars["DivClassName"] = self.__classNames.get("DivClassName", "")
         vars["Level"] = self.__level
         return vars
-    
+
 class WBeautifulHTMLDict(WTemplated):
-    
+
     def __init__(self, dictObject, classNames, level):
         """ classNames: a dictionary such as {'UlClassName' : 'optionList'}. See the getVars for more class names.
         """
@@ -7015,7 +7021,7 @@ class WBeautifulHTMLDict(WTemplated):
         self.__dictObject = dictObject
         self.__classNames = classNames
         self.__level = level
-        
+
     def getVars(self):
         vars = WTemplated.getVars( self )
         vars["DictObject"] = self.__dictObject
