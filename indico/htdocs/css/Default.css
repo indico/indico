@@ -2961,12 +2961,17 @@ ul.listCompact {
     text-align: center;
     color: #444444;
     height: 40px;
-    margin-top: -85px;
+    margin-top: -60px;
     margin-bottom: 5px;
     padding-top: 10px;
     bottom: 0;
     width: 100%;
 }
+
+.longFooter {
+    margin-top: -60px;
+}
+
 
 .footerDark {
     color: #888888;
@@ -2998,7 +3003,7 @@ ul.listCompact {
 .banner
 {
     background-color: #ECECEC;
-    color: #444;
+    color: #888;
     vertical-align: middle;
     padding: 20px 30px;
     line-height: 30px;
@@ -5529,4 +5534,46 @@ div.posterEntry:hover {
     margin-top:0;
     padding-left:10px;
     padding-top:15px;
+}
+
+div.eventModifButtonBar {
+	padding: 6px 0;
+	min-height: 24px;
+	min-width: 200px;
+}
+
+div.eventModifButtonBar a {
+    position: relative;
+    display: block;
+    float: left;
+    height: 13px;
+    padding: 4px 10px 7px 10px;
+    min-width: 4px;
+    margin-left: 4px;
+    background: transparent url(../images/button_bg_light.png) repeat-y scroll 0 0;
+    font-size: 13px;
+    font-family: arial, helvetica, sans-serif;
+    color: #000;
+}
+
+div.eventModifButtonBar a div.leftCorner {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: transparent url(../images/button_bg_light.png) repeat-y scroll -198px 0px;
+    width: 2px;
+    height: 24px;
+}
+
+div.eventModifButtonBar a:hover {
+    background-position: 0 -24px;
+    color: #808080;
+}
+
+div.eventModifButtonBar .separator {
+    float: left;
+    margin: 3px 6px 3px 10px;
+    width: 1px;
+    height: 18px;
+    border-right: 1px dotted #999;
 }

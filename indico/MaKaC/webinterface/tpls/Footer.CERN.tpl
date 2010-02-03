@@ -24,7 +24,7 @@ function envoi(){
 	</div>
 <% end %>
 
-<div id="poweredBy" class="footer<% if dark == True: %> footerDark<% end %>">
+<div id="poweredBy" class="<%if shortURL != "" and not isFrontPage: %>longFooter <% end %>footer<% if dark == True: %> footerDark<% end %>">
 
 <div style="margin-bottom: 15px; font-family: monospace; font-size: 10px;">
   <% if shortURL != "" and not isFrontPage: %>

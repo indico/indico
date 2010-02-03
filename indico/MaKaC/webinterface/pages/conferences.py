@@ -3966,7 +3966,7 @@ class WPConfModifToolsBase( WPConferenceModifBase ):
                 urlHandlers.UHConfModifPosterPrinting.getURL(self._conf) )
         self._tabBadges = self._tabCtrl.newTab( "badges", _("Badges/Tablesigns"), \
                 urlHandlers.UHConfModifBadgePrinting.getURL(self._conf) )
-        self._tabClose = self._tabCtrl.newTab( "close", _("Close"), \
+        self._tabClose = self._tabCtrl.newTab( "close", _("Lock"), \
                 urlHandlers.UHConferenceClose.getURL( self._conf ) )
         self._tabDelete = self._tabCtrl.newTab( "delete", _("Delete"), \
                 urlHandlers.UHConfDeletion.getURL(self._conf) )
@@ -4009,9 +4009,8 @@ class WPConfClosing(WPConfModifToolsBase):
 
     def _getTabContent( self, params ):
         msg = _("""
-        <font size="+2"> _("Are you sure that you want to CLOSE the event") <i>"%s"</i>?</font><br>
-        ( _("Note that if you close the event, you will not be able to change its details any more
-        <br>Only the administrator of the system can re-open an event"))
+        <font size="+2"> _("Are you sure that you want to LOCK the event") <i>"%s"</i>?</font><br>
+        (_("Note that if you lock the event, you will not be able to change its details any more <br>Only the administrator of the system can unlock an event"))
               """)%(self._conf.getTitle())
         wc = wcomponents.WConfirmation()
         return wc.getHTML( msg, \
