@@ -1696,7 +1696,7 @@ input.UIFieldText
 
 .UIFieldSpan {
   float: right;
-  width: 175px;
+  width: 185px;
   text-align: left;
   }
 
@@ -2571,7 +2571,7 @@ div.filterDiv
 {
     background: #FFFFFF;
     margin-bottom: 10px;
-    margin: 30px 80px 30px 60px;
+    margin: 15px 80px 30px 60px;
     /*overflow: visible;*/
     overflow: hidden;
 }
@@ -2586,7 +2586,7 @@ div.filterDiv
 
 .bodyWithSideMenu {
     margin-left: 220px;
-    margin-top: 20px;
+    margin-top: 5px;
     margin-right: 20px;
 }
 
@@ -5183,6 +5183,13 @@ div.CategoryEventListDiv {
     padding: 5px;
 }
 
+a.searchResultTitle{
+    font-size: 14px;
+}
+
+a.searchResultLink{
+    color: #76A2C4;
+}
 
 ul.searchResultList {
     padding: 0px;
@@ -5190,14 +5197,12 @@ ul.searchResultList {
 
 li.searchResultEvent {
     border-bottom: 1px solid #DDDDDD;
-    margin-bottom: 15px;
-    padding: 10px;
+    padding: 5px;
 }
 
 li.searchResultContribution {
     border-bottom: 1px solid #DDDDDD;
-    margin-bottom: 15px;
-    padding: 10px;
+    padding: 5px;
 }
 
 ul.authorList {
@@ -5206,21 +5211,16 @@ ul.authorList {
 }
 
 .searchPublicWarning {
-    border:1px solid red;
     color:#FF4444;
-    margin-bottom:20px;
-    margin-top:20px;
     padding:10px;
 }
 
 .Search {
-    border-bottom: 2px solid rgb(170, 170, 170);
     font-size: 34px;
     font-family: Times New Roman;
     color: #B14300;
     font-weight: normal;
     margin: 0;
-    margin-bottom: 10px;
     padding: 0;
 }
 
