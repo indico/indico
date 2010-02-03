@@ -6,7 +6,7 @@
     <% name = "" %>
   <% end %>
   <% else: %>
-    <% name = "Category" %>
+    <% name = "category" %>
   <% end %>
 <% end %>
 <% elif confId: %>
