@@ -3,7 +3,6 @@
 %(existingMaterialsTitle)s
 <div id="reviewingMaterialListPlace"><!-- DOM-filled materials list --></div>
 <span id="container"></span>
-
                                    
 <script type="text/javascript">
 
@@ -16,6 +15,32 @@ var args = {
         contribId: '<%= self._target.getId() %>'
     };
     var uploadAction = Indico.Urls.UploadAction.contribution;
+    var visibility = '';
+                                 <% if  self._target.getConference().getConfReview().getChoice() == 3: %> 
+                                    <% if not self._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted():%>
+                                        visibility = 'visible';
+                                    <% end %>
+                                    <% else: %>
+                                        visibility = 'hidden';
+                                    <% end %>
+                                <% end %>
+                                <% if self._target.getConference().getConfReview().getChoice() == 2: %>
+                                    <% if not (self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self._target.getReviewManager().getLastReview().anyReviewerHasGivenAdvice()): %>
+                                        visibility = 'visible';
+                                    <% end %>
+                                    <% else: %>
+                                        visibility = 'hidden';
+                                    <% end %>
+                                <% end %>
+                                <% if  self._target.getConference().getConfReview().getChoice() == 4: %>
+                                    <% if not (self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self._target.getReviewManager().getLastReview().anyReviewerHasGivenAdvice() or self._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted()): %>                              
+                                        visibility = 'visible';
+                                    <% end %>
+                                    <% else: %>
+                                        visibility = 'hidden';
+                                    <% end %>
+                                <% end %>
+    
     
 var mlist = new ReviewingMaterialListWidget(args, <%= RHSubmitMaterialBase._allowedMatsforReviewing %>, uploadAction);
 

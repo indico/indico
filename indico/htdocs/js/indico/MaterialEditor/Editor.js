@@ -1574,16 +1574,19 @@ type("ReviewingMaterialListWidget", ["RemoteWidget", "ListWidget"], {
         var matWidgetDiv = matWidget.draw();
         
         var item = [
-            IndicoUI.Buttons.arrowExpandIcon(matWidgetDiv, true),
-            $B(Html.span({}),material.accessor('title')),
-            menu,
-            $B(Html.div("descriptionLine"), material.accessor('description')),
+             // not to be shown the type of material if it is "reviewing"
+            //IndicoUI.Buttons.arrowExpandIcon(matWidgetDiv, true),
+            //$B(Html.span({}),material.accessor('title')),
+            //menu,
+            //$B(Html.div("descriptionLine"), material.accessor('description')),
             matWidgetDiv
         ];}
         
          return item;
         
     },
+    
+   
 
     /* _getReviewingStateImage : function(reviewingState) {
         // stores an image with the reviewing status of the material
@@ -1653,41 +1656,42 @@ type("ReviewingMaterialListWidget", ["RemoteWidget", "ListWidget"], {
     drawContent: function() {
 
         var self = this;
-
-
+        
         $O(self.source).each(function(value, key){
             var obj = watchize(value);
             self.set(key, obj);
         });
-        
-        
+                
         var link = Widget.link(command(function(){
-            IndicoUI.Dialogs.Material.add(self.args,
-                                          self,
-                                          self.types,
-                                          self.uploadAction,
-                                          function(info) {
-                                              if (self.get(info.material)) {
-                                                  self.get(info.material).get('resources').append(watchize(info));
-                                              } else {
-                                                  self._loadMaterial(info.material);
-                                              }
-                                          });
-        }, $T("Add Material")));
+                    IndicoUI.Dialogs.Material.add(self.args,
+                                                  self,
+                                                  self.types,
+                                                  self.uploadAction,
+                                                  function(info) {
+                                                      if (self.get(info.material)) {
+                                                          self.get(info.material).get('resources').append(watchize(info));
+                                                      } else {
+                                                          self._loadMaterial(info.material);
+                                                      }
+                                                  });
+                }, $T("Add Material")));
+        
+        
         
         return Html.div(
             {},
-            Html.div({style:{textAlign: 'left'}}, link),
+            Html.div({style:{textAlign: 'left', visibility: visibility}}, link),
             Html.div({style:{overflow: 'auto', width: self.width, height: self.height}},
                      this.ListWidget.prototype.draw.call(this))
         );
     }
 },
 
-     function(args, types, uploadAction, width, height) {
+     function(args, types, uploadAction, width, height, visibility) {
          var self = this;
          this.width = width;
          this.height = height;
+         this.visibility = visibility;
          this.args = args;
          this.types = types;
          this.uploadAction = uploadAction;
