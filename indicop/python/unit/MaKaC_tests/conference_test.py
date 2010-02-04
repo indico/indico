@@ -22,8 +22,6 @@
 
 
 from MaKaC import conference
-from MaKaC import user
-from MaKaC.user import Avatar
 from MaKaC.conference import Conference, Category
 from MaKaC.conference import Session,Contribution,SessionSlot
 from MaKaC.conference import ContributionParticipation
@@ -37,52 +35,66 @@ from pytz import timezone
 import unittest
 
 
-def setup_module():
-    DBMgr.getInstance().startRequest()
-
-def teardown_module():
-    DBMgr.getInstance().abort()
-    DBMgr.getInstance().endRequest()
+#def setup_module():
+#    DBMgr.getInstance().startRequest()
+#
+#def teardown_module():
+#    DBMgr.getInstance().abort()
+#    DBMgr.getInstance().endRequest()
 
 #From testCategories.py
-class TestCategories():
+class TestCategories(unittest.TestCase):
+
+#    def setUp(self):
+#        DBMgr.getInstance().startRequest()
+#
+#    def tearDown(self):
+#        DBMgr.getInstance().endRequest(True)
 
     def testBasicAddAndRemoveConferences(self):
+        DBMgr.getInstance().startRequest()
+
         #creation of basic category structure over which perform the tests
-        croot=conference.Category()
-        c1=conference.Category()
-        croot._addSubCategory(c1)
-        c2=conference.Category()
-        croot._addSubCategory(c2)
-        c1_1=conference.Category()
-        c1._addSubCategory(c1_1)
+#        croot=conference.Category()
+#        c1=conference.Category()
+#        croot._addSubCategory(c1)
+#        c2=conference.Category()
+#        croot._addSubCategory(c2)
+#        c1_1=conference.Category()
+#        c1._addSubCategory(c1_1)
         #checks adding a conference increases the conference number of the
         #   involved categories
-        creator=user.Avatar()
+        from MaKaC.user import Avatar
+        creator=Avatar()
         conf1=conference.Conference(creator)
-        conf1.setId("0")
-        c1_1._addConference(conf1)
-        assert (c1_1.getNumConferences()==1)
-        assert (c1.getNumConferences()==1)
-        assert (c2.getNumConferences()==0)
-        assert (croot.getNumConferences()==1)
-        conf2=conference.Conference(creator)
-        conf2.setId("1")
-        c2._addConference(conf2)
-        assert (c1_1.getNumConferences()==1)
-        assert (c1.getNumConferences()==1)
-        assert (c2.getNumConferences()==1)
-        assert (croot.getNumConferences()==2)
-        c1_1.removeConference(conf1)
-        assert (c1_1.getNumConferences()==0)
-        assert (c1.getNumConferences()==0)
-        assert (c2.getNumConferences()==1)
-        assert (croot.getNumConferences()==1)
-        c2.removeConference(conf2)
-        assert (c1_1.getNumConferences()==0)
-        assert (c1.getNumConferences()==0)
-        assert (c2.getNumConferences()==0)
-        assert (croot.getNumConferences()==0)
+        print conf1,creator
+        assert False
+#        conf1.setId("0")
+#        c1_1._addConference(conf1)
+#        assert (c1_1.getNumConferences()==1)
+#        assert (c1.getNumConferences()==1)
+#        assert (c2.getNumConferences()==0)
+#        assert (croot.getNumConferences()==1)
+#        conf2=conference.Conference(creator)
+#        conf2.setId("1")
+#        c2._addConference(conf2)
+#        assert (c1_1.getNumConferences()==1)
+#        assert (c1.getNumConferences()==1)
+#        assert (c2.getNumConferences()==1)
+#        assert (croot.getNumConferences()==2)
+#        c1_1.removeConference(conf1)
+#        assert (c1_1.getNumConferences()==0)
+#        assert (c1.getNumConferences()==0)
+#        assert (c2.getNumConferences()==1)
+#        assert (croot.getNumConferences()==1)
+#        c2.removeConference(conf2)
+#        assert (c1_1.getNumConferences()==0)
+#        assert (c1.getNumConferences()==0)
+#        assert (c2.getNumConferences()==0)
+#        assert (croot.getNumConferences()==0)
+#
+#        DBMgr.getInstance().getDBConnCache().close()
+        DBMgr.getInstance().endRequest(True)
 
     def testAddAndRemoveSubCategories(self):
         #checks that the conference counter works fine when adding a new
@@ -91,7 +103,8 @@ class TestCategories():
         c1=conference.Category()
         c2=conference.Category()
         croot._addSubCategory(c2)
-        creator=user.Avatar()
+        from MaKaC.user import Avatar
+        creator=Avatar()
         conf0=conference.Conference(creator)
         conf0.setId("0")
         conf1=conference.Conference(creator)

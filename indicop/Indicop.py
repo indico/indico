@@ -44,6 +44,7 @@ import transaction
 
 
 class Unit(BaseTest):
+
     def run(self):
         returnString = ""
         self.startMessage("Starting Python unit tests")
@@ -66,7 +67,7 @@ class Unit(BaseTest):
 
             #retrieving tests from Indicop folder
             args = ['nose', '--nologcapture', '--logging-clear-handlers', '-v',
-                    os.path.join(self.setupDir, 'python', 'unit')]
+                    os.path.join(self.setupDir, 'python', 'unit', 'MaKaC_tests', 'conference_test.py:TestCategories.testBasicAddAndRemoveConferences')]
             #retrieving tests from plugins folder
             for folder in self.walkThroughFolders(os.path.join(self.setupDir,
                                                                '..',
@@ -89,7 +90,7 @@ class Unit(BaseTest):
             s = outerr.getvalue()
             returnString += self.writeReport("pyunit", s)
         finally:
-            self.deleteDummyUser()
+            #self.deleteDummyUser()
             #stopping the fake DB
             self.stopFakeDB()
             self.restoreDBInstance()
@@ -149,51 +150,55 @@ class Coverage(BaseTest):
 
 class Functional(BaseTest):
     def __init__(self):
+        BaseTest.__init__(self)
         self.child = None
 
     def run(self):
         returnString = ""
         self.startMessage("Starting Python functional tests")
 
-        if not self.startSeleniumServer():
-            return ('[ERR] Could not start functional tests because selenium'
-                    ' server cannot be started.\n')
-
 
         #Stop prod DB and launch a fresh DB on this prod db port
-        self.stopProductionDB()
+        #self.stopProductionDB()
         self.startFakeDB(Config.getInstance().getDBConnectionParams()[1])
-        #Create dummy user and use this user to create conf, session and so on
-        self.createDummyUser()
 
-        #capturing the stderr
-        outerr = StringIO.StringIO()
-        sys.stderr = outerr
+        try:
+            if not self.startSeleniumServer():
+                return ('[ERR] Could not start functional tests because selenium'
+                        ' server cannot be started.\n')
 
-        #retrieving tests from Indicop folder
-        args = ['nose', '--nologcapture', '--logging-clear-handlers', '-v',
-                os.path.join(self.setupDir, 'python', 'functional')]
-        #retrieving tests from plugins folder
-        for folder in self.walkThroughFolders(os.path.join(self.setupDir,
-                                                           '..',
-                                                           'indico',
-                                                           'MaKaC',
-                                                           'plugins'),
-                                              "/tests/python/functional"):
-            args.append(folder)
+            #Create dummy user and use this user to create conf, session and so on
+            self.createDummyUser()
 
-        result = nose.run(argv = args)
+            #capturing the stderr
+            outerr = StringIO.StringIO()
+            sys.stderr = outerr
 
-        self.stopSeleniumServer()
+            #retrieving tests from Indicop folder
+            args = ['nose', '--nologcapture', '--logging-clear-handlers', '-v',
+                    os.path.join(self.setupDir, 'python', 'functional')]
+            #retrieving tests from plugins folder
+            for folder in self.walkThroughFolders(os.path.join(self.setupDir,
+                                                               '..',
+                                                               'indico',
+                                                               'MaKaC',
+                                                               'plugins'),
+                                                  "/tests/python/functional"):
+                args.append(folder)
 
-        #restoring the stderr
-        sys.stderr = sys.__stderr__
+            result = nose.run(argv = args)
 
-        self.deleteDummyUser()
-        #stopping the fake DB
-        self.stopFakeDB()
-        self.startProductionDB()
-        self.restoreDBInstance()
+            #self.deleteDummyUserYEAH()
+        finally:
+            self.stopSeleniumServer()
+
+            #restoring the stderr
+            sys.stderr = sys.__stderr__
+
+            #stopping the fake DB
+            self.stopFakeDB()
+            #self.startProductionDB()
+            self.restoreDBInstance()
 
         s = outerr.getvalue()
         returnString += self.writeReport("pyfunctional", s)
@@ -261,6 +266,8 @@ class Specify(Functional):
     def run(self):
         self.startMessage("Starting Python specified tests")
 
+        #launch a fresh DB in parallel of the production DB
+        self.startFakeDB(TestsConfig.getInstance().getFakeDBPort())
         self.createDummyUser()
 
         try:
@@ -280,7 +287,10 @@ class Specify(Functional):
                 self.stopSeleniumServer()
         finally:
             self.deleteDummyUser()
-
+            #stopping the fake DB
+            self.stopFakeDB()
+            #self.startProductionDB()
+            self.restoreDBInstance()
         if result:
             return "Specified Test - Succeeded\n"
         else:

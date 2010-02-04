@@ -343,10 +343,10 @@ class test_indico(Command):
 
         if self.pylint:
             testsToRun.append('pylint')
-        if self.functional:
-            testsToRun.append('functional')
         if self.unit:
             testsToRun.append('unit')
+        if self.functional:
+            testsToRun.append('functional')
         if self.jsunit or self.jsspecify:
             testsToRun.append('jsunit')
         if self.jslint:
@@ -479,7 +479,7 @@ if __name__ == '__main__':
         import logging
         import tempfile
         tempLoggingDir = tempfile.mkdtemp()
-        logging.basicConfig(filename=os.path.join(tempLoggingDir, 'logging'), level=logging.DEBUG)
+        #logging.basicConfig(filename=os.path.join(tempLoggingDir, 'logging'), level=logging.DEBUG)
         setIndicoInstallMode(False)
     else:
         setIndicoInstallMode(True)

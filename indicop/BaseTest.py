@@ -26,24 +26,12 @@ import transaction
 import signal
 import shutil
 import commands
-from util import TestZEOServer
-from ZODB import FileStorage, DB
-from MaKaC import user
 from TestsConfig import TestsConfig
-from MaKaC.authentication import AuthenticatorMgr
-from MaKaC.common import HelperMaKaCInfo
-from MaKaC.common import indexes
-from MaKaC.common import DBMgr
+from MaKaC.common.db import DBMgr
 
 class BaseTest(object):
     #path to this current file
     setupDir = os.path.dirname(__file__)
-
-    def __init__(self):
-        self.al = None
-        self.ah = None
-        self.avatar = None
-        self.ih = None
 
     def startMessage(self, message):
         print "##################################################################"
@@ -61,62 +49,79 @@ class BaseTest(object):
                     os.path.join(self.setupDir, 'report', filename + ".txt")
 
     def createDummyUser(self):
+        from MaKaC import user
+        from MaKaC.authentication import AuthenticatorMgr
+        from MaKaC.common import HelperMaKaCInfo
+        from MaKaC.common import indexes
         DBMgr.getInstance().startRequest()
 
+        print DBMgr.getInstance()._db
+
         #filling info to new user
-        self.avatar = user.Avatar()
-        self.avatar.setName( "fake" )
-        self.avatar.setSurName( "fake" )
-        self.avatar.setOrganisation( "fake" )
-        self.avatar.setLang( "en_US" )
-        self.avatar.setEmail( "fake@fake.fake" )
+        avatar = user.Avatar()
+        avatar.setName( "fake" )
+        avatar.setSurName( "fake" )
+        avatar.setOrganisation( "fake" )
+        avatar.setLang( "en_US" )
+        avatar.setEmail( "fake@fake.fake" )
 
         #registering user
-        self.ah = user.AvatarHolder()
-        self.ah.add(self.avatar)
+        ah = user.AvatarHolder()
+        ah.add(avatar)
+
+        print "AVATAR %s" % avatar._p_jar
 
         #setting up the login info
         li = user.LoginInfo( "dummyuser", "dummyuser" )
-        self.ih = AuthenticatorMgr()
-        userid = self.ih.createIdentity( li, self.avatar, "Local" )
-        self.ih.add( userid )
+        ih = AuthenticatorMgr()
+        userid = ih.createIdentity( li, avatar, "Local" )
+        ih.add( userid )
 
         #activate the account
-        self.avatar.activateAccount()
+        avatar.activateAccount()
 
         #since the DB is empty, we have to add dummy user as admin
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        self.al = minfo.getAdminList()
-        self.al.grant( self.avatar )
+        al = minfo.getAdminList()
+        al.grant( avatar )
 
         DBMgr.getInstance().endRequest()
 
     def deleteDummyUser(self):
+        from MaKaC import user
+        from MaKaC.authentication import AuthenticatorMgr
+        from MaKaC.common import HelperMaKaCInfo
+        from MaKaC.common import indexes
         DBMgr.getInstance().startRequest()
 
         #removing user from admin list
-        self.al.revoke( self.avatar )
+        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+        al = minfo.getAdminList()
+        ah = user.AvatarHolder()
+        avatar = ah.match({'email':'fake@fake.fake'})[0]
+        al.revoke( avatar )
 
         #remove the login info
-        userid = self.avatar.getIdentityList()[0]
-        self.ih.removeIdentity(userid)
+        userid = avatar.getIdentityList()[0]
+        ih = AuthenticatorMgr()
+        ih.removeIdentity(userid)
 
         #unregistering the user info
         index = indexes.IndexesHolder().getById("email")
-        index.unindexUser(self.avatar)
+        index.unindexUser(avatar)
         index = indexes.IndexesHolder().getById("name")
-        index.unindexUser(self.avatar)
+        index.unindexUser(avatar)
         index = indexes.IndexesHolder().getById("surName")
-        index.unindexUser(self.avatar)
+        index.unindexUser(avatar)
         index = indexes.IndexesHolder().getById("organisation")
-        index.unindexUser(self.avatar)
+        index.unindexUser(avatar)
         index = indexes.IndexesHolder().getById("status")
-        index.unindexUser(self.avatar)
+        index.unindexUser(avatar)
 
         #removing user from list
-        la = self.ih.getById("Local")
+        la = ih.getById("Local")
         la.remove(userid)
-        self.ah.remove(self.avatar)
+        ah.remove(avatar)
 
         DBMgr.getInstance().endRequest()
 
@@ -136,18 +141,22 @@ class BaseTest(object):
         self.createNewDBFile()
         self.zeoServer = self.createDBServer(os.path.join(self.dbFolder, "Data.fs"), zeoPort)
         DBMgr.setInstance(DBMgr(hostname="localhost", port=zeoPort))
+
         DBMgr.getInstance().startRequest()
+        DBMgr.getInstance().sync()
         DBMgr.getInstance().endRequest(True)
 
     def stopFakeDB(self):
+        DBMgr.getInstance().startRequest()
+        DBMgr.getInstance().sync()
+        DBMgr.getInstance().endRequest(True)
+
         try:
             os.kill(self.zeoServer, signal.SIGTERM)
         except OSError, e:
             print ("Problem sending kill signal: " + str(e))
 
         try:
-            import time
-            #time.sleep(10)
             #os.wait()
             os.waitpid(self.zeoServer, 0)
         except OSError, e:
@@ -156,7 +165,7 @@ class BaseTest(object):
         self.removeDBFile()
 
     def restoreDBInstance(self):
-        DBMgr.setInstance(DBMgr())
+        DBMgr.setInstance(None)
 
     def startProductionDB(self):
         commands.getstatusoutput(TestsConfig.getInstance().getStartDBCmd())
@@ -165,6 +174,7 @@ class BaseTest(object):
         commands.getstatusoutput(TestsConfig.getInstance().getStopDBCmd())
 
     def createNewDBFile(self):
+        from ZODB import FileStorage, DB
         savedDir = os.getcwd()
         self.dbFolder = tempfile.mkdtemp()
         os.chdir(self.dbFolder)
@@ -185,6 +195,7 @@ class BaseTest(object):
         shutil.rmtree(self.dbFolder)
 
     def createDBServer(self, file, port):
+        from util import TestZEOServer
         pid = os.fork()
         if pid:
             return pid
