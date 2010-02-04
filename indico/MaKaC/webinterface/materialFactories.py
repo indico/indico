@@ -495,6 +495,9 @@ class SessionMFRegistry(MaterialFactoryRegistry):
 
 
 class ContribMFRegistry(MaterialFactoryRegistry):
+                  PosterFactory._id: PosterFactory }, \
+                  ReviewingFactory._id: ReviewingFactory }
+class CategoryMFRegistry( ContribMFRegistry ):
     pass
 
 
