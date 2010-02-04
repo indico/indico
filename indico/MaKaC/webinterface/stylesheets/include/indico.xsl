@@ -276,6 +276,17 @@
               </xsl:call-template>
             </em>
           </xsl:if>
+
+          <xsl:if
+            test="count(./location) != 0 and normalize-space(string(../location)) != normalize-space(string(./location))"
+            >
+            <span style="margin-left: 15px;">(
+            <xsl:apply-templates select="./location">
+              <xsl:with-param name="span"/>
+            </xsl:apply-templates>)</span>
+          </xsl:if>
+
+
       </span>
 
       <xsl:if test="string-length(./abstract) > 1">
@@ -324,12 +335,6 @@
               </td>
             </tr>
           </xsl:if>
-
-          <xsl:if
-            test="count(./location) != 0 and normalize-space(string(../location)) != normalize-space(string(./location))"
-            > (<xsl:apply-templates select="./location">
-              <xsl:with-param name="span"/>
-            </xsl:apply-templates>) </xsl:if>
 
         </tbody>
       </table>

@@ -19,9 +19,9 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import MaKaC.conference as conference
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
-import MaKaC.conference as conference
 from MaKaC.common.Configuration import Config
 from MaKaC.i18n import _
 
@@ -398,7 +398,7 @@ class MaterialFactoryRegistry:
     def get(cls,mat):
         for factory in cls._registry.values():
             if factory.appliesToMaterial(mat):
-                return factory            
+                return factory
 
 
 class ConfMFRegistry( MaterialFactoryRegistry ):
@@ -408,7 +408,6 @@ class ConfMFRegistry( MaterialFactoryRegistry ):
                   MinutesFactory._id: MinutesFactory, \
                   VideoFactory._id: VideoFactory, \
                   PosterFactory._id: PosterFactory }
-
 
 class SessionMFRegistry( MaterialFactoryRegistry ):
     _registry = { MinutesFactory._id: MinutesFactory }
@@ -421,4 +420,8 @@ class ContribMFRegistry(MaterialFactoryRegistry):
                   VideoFactory._id: VideoFactory, \
                   PosterFactory._id: PosterFactory }
 
+class CategoryMFRegistry( ContribMFRegistry ):
+    pass
 
+class SubContributionMFRegistry( ContribMFRegistry ):
+    pass
