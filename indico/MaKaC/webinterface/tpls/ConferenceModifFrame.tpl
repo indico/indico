@@ -5,8 +5,8 @@ from MaKaC.webinterface.urlHandlers import UHConferenceModification
 
 <div class="banner">
 
-    <% if not conf.isClosed(): %>
         <div style="float: right; height: 20px; line-height: 20px;" class="eventModifButtonBar">
+    <% if not conf.isClosed(): %>
           <a style="vertical-align: middle;" href="<%= urlHandlers.UHConfClone.getURL(conf) %>">
               <%= _("Clone") %><div class="leftCorner"></div>
           </a>
@@ -16,8 +16,14 @@ from MaKaC.webinterface.urlHandlers import UHConferenceModification
           <a style="vertical-align: middle;" href="<%= urlHandlers.UHConfDeletion.getURL(conf) %>">
               <%= _("Delete") %><div class="leftCorner"></div>
           </a>
-        </div>
+          <div class="separator"></div>
     <% end %>
+
+          <a class="eventModifSpecial" style="vertical-align: middle;" href="<%= urlHandlers.UHConferenceDisplay.getURL( conf ) %>">
+              <%= _("View event page") %><div class="leftCorner"></div>
+          </a>
+
+        </div>
 
     <a href="<%= UHConferenceModification.getURL(conf) %>">
         <span class="bannerTitle bannerTitle_0">
