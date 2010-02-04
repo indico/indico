@@ -2036,9 +2036,6 @@ class WPConferenceModifBase( main.WPMainBase ):
 
         # Section containing the view event page link
         self._viewSection = wcomponents.SideMenuSection()
-        self._viewEventPageMenuItem = wcomponents.SideMenuItem(_("View event page"),
-            urlHandlers.UHConferenceDisplay.getURL( self._conf ))
-        self._viewSection.addItem( self._viewEventPageMenuItem)
         self._sideMenu.addSection(self._viewSection)
 
         # The main section containing most menu items

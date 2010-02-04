@@ -5536,6 +5536,19 @@ div.posterEntry:hover {
     padding-top:15px;
 }
 
+a.eventModifSpecial div.leftCorner {
+    background: transparent url(../images/button_bg_special.png) repeat-y scroll -198px 0px !important;
+}
+
+a.eventModifSpecial {
+    background: transparent url(../images/button_bg_special.png) repeat-y scroll 0 0 !important;
+}
+
+a.eventModifSpecial:hover {
+    background-position: 0 24px !important;
+}
+
+
 div.eventModifButtonBar {
 	padding: 6px 0;
 	min-height: 24px;
@@ -5551,9 +5564,9 @@ div.eventModifButtonBar a {
     min-width: 4px;
     margin-left: 4px;
     background: transparent url(../images/button_bg_light.png) repeat-y scroll 0 0;
-    font-size: 13px;
+    font-size: 12px;
     font-family: arial, helvetica, sans-serif;
-    color: #000;
+    color: #555;
 }
 
 div.eventModifButtonBar a div.leftCorner {
@@ -5566,7 +5579,7 @@ div.eventModifButtonBar a div.leftCorner {
 }
 
 div.eventModifButtonBar a:hover {
-    background-position: 0 -24px;
+    background-position: 0 24px;
     color: #808080;
 }
 
