@@ -401,6 +401,13 @@ class Category(Persistent):
         recMat.recover()
         self.notifyModification()
 
+    def getMaterialRegistry(self):
+        """
+        Return the correct material registry for this type
+        """
+        from MaKaC.webinterface.materialFactories import CategoryMFRegistry
+        return CategoryMFRegistry
+
     def getMaterialById( self, matId ):
         if matId.lower() == 'paper':
             return self.getPaper()
@@ -4044,6 +4051,13 @@ class Conference(Persistent, Fossilizable):
         recMat.recover()
         self.notifyModification()
 
+    def getMaterialRegistry(self):
+        """
+        Return the correct material registry for this type
+        """
+        from MaKaC.webinterface.materialFactories import ConfMFRegistry
+        return ConfMFRegistry
+
     def getMaterialById( self, matId ):
         if matId.lower() == 'paper':
             return self.getPaper()
@@ -6483,6 +6497,13 @@ class Session(Persistent):
         self.materials[ recMat.getId() ] = recMat
         recMat.recover()
         self.notifyModification()
+
+    def getMaterialRegistry(self):
+        """
+        Return the correct material registry for this type
+        """
+        from MaKaC.webinterface.materialFactories import SessionMFRegistry
+        return SessionMFRegistry
 
     def getMaterialById( self, matId ):
         if matId.lower() == 'minutes':
@@ -9215,6 +9236,13 @@ class Contribution(Persistent, Fossilizable):
         recMat.recover()
         self.notifyModification()
 
+    def getMaterialRegistry(self):
+        """
+        Return the correct material registry for this type
+        """
+        from MaKaC.webinterface.materialFactories import ContribMFRegistry
+        return ContribMFRegistry
+
     def getMaterialById( self, matId ):
         if matId.lower() == 'paper':
             return self.getPaper()
@@ -10481,6 +10509,13 @@ class SubContribution(Persistent, Fossilizable):
         self.materials[ recMat.getId() ] =  recMat
         recMat.recover()
         self.notifyModification()
+
+    def getMaterialRegistry(self):
+        """
+        Return the correct material registry for this type
+        """
+        from MaKaC.webinterface.materialFactories import SubContributionMFRegistry
+        return SubContributionMFRegistry
 
     def getMaterialById( self, matId ):
         if matId.lower() == 'paper':

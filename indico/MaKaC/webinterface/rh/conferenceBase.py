@@ -281,7 +281,7 @@ class RHSubmitMaterialBase:
         """ Returns the Material object to which the ressource is being submitted
         """
         
-        mf = materialFactories.ContribMFRegistry.getById(self._materialId)
+        mf = self._target.getMaterialRegistry().getById(self._materialId)
 
         material = mf.get(self._target)
         if material is None:
