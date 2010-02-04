@@ -9622,6 +9622,11 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
         p.recover()
 
     def getReviewing( self ):
+        try:
+            if self.reviewing:
+                pass
+        except AttributeError, e:
+            self.reviewing = None
         return self.reviewing
 
     def getMasterSchedule( self ):

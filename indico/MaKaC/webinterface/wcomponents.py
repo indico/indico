@@ -5581,11 +5581,11 @@ class WShowExistingMaterial(WTemplated):
 
     def getVars(self):
         vars=WTemplated.getVars(self)
+        
         # yes, this may look a bit redundant, but materialRegistry isn't
         # bound to a particular target
         materialRegistry = self._target.getMaterialRegistry()
         vars["materialList"] = materialRegistry.getMaterialList(self._target)
-
 
         if self._show:
             vars["existingMaterialsTitle"] = """ <div class="groupTitle" id="title">%s</div>""" % _("Existing material")
