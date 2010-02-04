@@ -401,11 +401,16 @@ class RefereeJudgement(Judgement):
         """
         Judgement.setSubmitted(self, submitted)
         
-        self.getReview().copyMaterials(self.getReviewManager().getContribution().getReviewing())
+        matReviewing = self.getReviewManager().getContribution().getReviewing()
+        
+        self.getReview().copyMaterials(matReviewing) 
                                                    
         if self._judgement == "To be corrected" or self._judgement in self.getReviewManager().getConference().getConfReview().getStates():
             self.getReviewManager().newReview()
-
+            # remove reviewing materials from the contribution
+            self.getReviewManager().getContribution().removeMaterial(matReviewing)
+            
+            
     def getAnswers(self):
         return zip(self.getConfReview().getReviewingQuestions(), (self.getAnswer(k) for k in self.getConfReview().getReviewingQuestions()))
 
@@ -422,11 +427,15 @@ class EditorJudgement(Judgement):
         """
         if self.getReviewManager().getConference().getConfReview().getChoice() == 3:
             Judgement.setSubmitted(self, submitted)
+            
+            matReviewing = self.getReviewManager().getContribution().getReviewing()
         
-            self.getReview().copyMaterials(self.getReviewManager().getContribution().getReviewing())
+            self.getReview().copyMaterials(matReviewing)
                                                    
             if self._judgement == "To be corrected":
                 self.getReviewManager().newReview()
+                # remove reviewing materials from the contribution
+                self.getReviewManager().getContribution().removeMaterial(matReviewing)
             
     def getAnswers(self):
         return zip(self.getConfReview().getLayoutCriteria(), (self.getAnswer(k) for k in self.getConfReview().getLayoutCriteria()))
