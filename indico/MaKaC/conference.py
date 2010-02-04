@@ -11166,7 +11166,8 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
                  'MaKaC.conference.Paper',
                  'MaKaC.conference.Slides',
                  'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster'], 'subjectToReviewing')
+                 'MaKaC.conference.Poster',
+                 'MaKaC.conference.Reviewing'], 'subjectToReviewing')
     def isSubjectToReviewing(self):
         """ Returns if a material is subject to reviewing.
             This only has sense if the material belongs to a contribuion. Otherwise, the returned value is None.
@@ -11174,7 +11175,7 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         """
         if isinstance(self.owner, Contribution):
             reviewableMaterials = self.owner.getConference().getConfReview().getReviewableMaterials()
-            if self.title in reviewableMaterials:
+            if self.id in reviewableMaterials:
                 return 'Yes'
             else:
                 return 'No'
@@ -11186,7 +11187,8 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
                  'MaKaC.conference.Paper',
                  'MaKaC.conference.Slides',
                  'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster'], 'reviewingState')
+                 'MaKaC.conference.Poster',
+                 'MaKaC.conference.Reviewing'], 'reviewingState')
     def getReviewingState(self):
         """ Returns the reviewing state of a material.
             The state is represented by an integer:
@@ -11204,7 +11206,7 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
                 return 0
             else: #conference has reviewing
                 reviewableMaterials = conference.getConfReview().getReviewableMaterials()
-                if self.title in reviewableMaterials: #material is reviewable
+                if self.id in reviewableMaterials: #material is reviewable
                     lastReview = self.owner.getReviewManager().getLastReview()
                     if lastReview.isAuthorSubmitted(): #author has submitted
                         refereeJudgement = lastReview.getRefereeJudgement()

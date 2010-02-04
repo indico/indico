@@ -1283,41 +1283,22 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
         var reviewingState = material.get('reviewingState');
         var menu;
 
-        //if (material.get('reviewingState') < 3) { // if material can be modified
-            menu = Html.span(
-                {},
-                Widget.link(command(
-                    deleteMaterial,
-                    IndicoUI.Buttons.removeButton()
-                )),
-                Widget.link(command(
-                    function(){
-                        IndicoUI.Dialogs.Material.editMaterial(
-                            self.args,
-                            self.types,
-                            material,
-                            self);
-                    },
-                    IndicoUI.Buttons.editButton()
-                ))
-                // revStateImg
-                );
-
-        /* } else { // material cannot be modified: we use grey icons without click popup, just a mouseover help information popup
-            var ab = IndicoUI.Buttons.addButton(true);
-            ab.dom.title = '';
-            ab.dom.onmouseover = modifyDisabledHelpPopup;
-
-            var rb = IndicoUI.Buttons.removeButton(true);
-            rb.dom.title = '';
-            rb.dom.onmouseover = modifyDisabledHelpPopup;
-
-            var eb = IndicoUI.Buttons.editButton(true);
-            eb.dom.title = '';
-            eb.dom.onmouseover = modifyDisabledHelpPopup;
-
-            menu = Html.span({},ab,rb,eb,revStateImg);
-        }*/
+        menu = Html.span(
+            {},
+            Widget.link(command(
+                deleteMaterial,
+                IndicoUI.Buttons.removeButton()
+            )),
+            Widget.link(command(
+                function(){
+                    IndicoUI.Dialogs.Material.editMaterial(
+                        self.args,
+                        material,
+                        self);
+                },
+                IndicoUI.Buttons.editButton()
+            ))
+        );
 
         args.materialProtection = material.get('protection');
         var matWidget = new ResourceListWidget(material.get('resources'), args, material.get('title'), self.types, self.showMainResources);
@@ -1355,44 +1336,6 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
          return item;
         
     },
-
-   /*  _getReviewingStateImage : function(reviewingState) {
-        // stores an image with the reviewing status of the material
-        var imgAttrs = {
-            style: {'marginLeft': '5px', 'verticalAlign': 'middle'},
-            title:''
-        };
-
-        switch (reviewingState) {
-        case 1:
-            imgAttrs.alt = 'Not subject to reviewing';
-            imgAttrs.src = imageSrc("dot_gray");
-            break;
-        case 2:
-            imgAttrs.alt = 'Not yet submitted by author';
-            imgAttrs.src = imageSrc("dot_orange");
-            break;
-        case 3:
-            imgAttrs.alt = 'Submitted by author, pending revision';
-            imgAttrs.src = imageSrc("dot_blue");
-            break;
-        case 4:
-            imgAttrs.alt = 'Submitted by author, judged Accepted';
-            imgAttrs.src = imageSrc("dot_green");
-            break;
-        case 5:
-            imgAttrs.alt = 'Submitted by author, judged Rejected';
-            imgAttrs.src = imageSrc("dot_red");
-            break;
-        default:
-            break;
-        }
-
-        var revState = Html.img(imgAttrs);
-        revState.dom.onmouseover = revStateHelpPopup;
-
-        return revState;
-    },*/
 
     draw: function() {
         return this.RemoteWidget.prototype.draw.call(this);
@@ -1571,60 +1514,14 @@ type("ReviewingMaterialListWidget", ["RemoteWidget", "ListWidget"], {
             });
         var item = [];
         if(material.get('reviewingState') > 1){
-        var matWidgetDiv = matWidget.draw();
+	        var matWidgetDiv = matWidget.draw();
+	        
+	        var item = [matWidgetDiv];
+	    }
         
-        var item = [
-             // not to be shown the type of material if it is "reviewing"
-            //IndicoUI.Buttons.arrowExpandIcon(matWidgetDiv, true),
-            //$B(Html.span({}),material.accessor('title')),
-            //menu,
-            //$B(Html.div("descriptionLine"), material.accessor('description')),
-            matWidgetDiv
-        ];}
-        
-         return item;
+        return item;
         
     },
-    
-   
-
-    /* _getReviewingStateImage : function(reviewingState) {
-        // stores an image with the reviewing status of the material
-        var imgAttrs = {
-            style: {'marginLeft': '5px', 'verticalAlign': 'middle'},
-            title:''
-        };
-
-        switch (reviewingState) {
-        case 1:
-            imgAttrs.alt = 'Not subject to reviewing';
-            imgAttrs.src = imageSrc("dot_gray");
-            break;
-        case 2:
-            imgAttrs.alt = 'Not yet submitted by author';
-            imgAttrs.src = imageSrc("dot_orange");
-            break;
-        case 3:
-            imgAttrs.alt = 'Submitted by author, pending revision';
-            imgAttrs.src = imageSrc("dot_blue");
-            break;
-        case 4:
-            imgAttrs.alt = 'Submitted by author, judged Accepted';
-            imgAttrs.src = imageSrc("dot_green");
-            break;
-        case 5:
-            imgAttrs.alt = 'Submitted by author, judged Rejected';
-            imgAttrs.src = imageSrc("dot_red");
-            break;
-        default:
-            break;
-        }
-
-        var revState = Html.img(imgAttrs);
-        revState.dom.onmouseover = revStateHelpPopup;
-
-        return revState;
-    }, */
 
     draw: function() {
         return this.RemoteWidget.prototype.draw.call(this);

@@ -5587,7 +5587,8 @@ class WShowExistingMaterial(WTemplated):
         materialRegistry = self._target.getMaterialRegistry()
         vars["materialList"] = materialRegistry.getMaterialList(self._target)
 
-        if self._show:
+      
+        if self._showTitle:
             vars["existingMaterialsTitle"] = """ <div class="groupTitle" id="title">%s</div>""" % _("Existing material")
         else:
             vars["existingMaterialsTitle"] = " "
@@ -5603,15 +5604,15 @@ class WShowExistingMaterial(WTemplated):
     
 class WShowExistingReviewingMaterial(WTemplated):
     
-    def __init__(self,target,show=True):
+    def __init__(self,target,showTitle=True):
         self._target=target
-        self._show=show
+        self._showTitle=showTitle
 
 
     def getVars(self):
         vars=WTemplated.getVars(self)
         
-        if self._show:
+        if self._showTitle:
             vars["existingMaterialsTitle"] = """ <div class="groupTitle" id="title">%s</div>""" % _("Existing Reviewing material")
         else:
             vars["existingMaterialsTitle"] = " "
