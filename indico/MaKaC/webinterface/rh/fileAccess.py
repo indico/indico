@@ -35,8 +35,8 @@ class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
     def _checkParams( self, params ):
         try:
             RHFileBase._checkParams( self, params )
-        except:
-            raise NoReportError("The file you try to access does not exist.")
+        except Exception, e:
+            raise NoReportError("The file you try to access does not exist.%s"%e)
 
     def _checkProtection( self ):
         RHDisplayBaseProtected._checkProtection( self )

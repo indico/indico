@@ -342,6 +342,11 @@ class WebLocator:
             fr = materialFactories.ContribMFRegistry
             if obj == None:
                 raise errors.NoReportError("The contribution you are trying to access does not exist or has been deleted")
+        if self.__reviewId:
+            #obj must be a Contribution
+            obj = obj.getReviewManager().getReviewById(self.__reviewId)
+            if obj == None:
+                raise errors.NoReportError("The review you are tring to access does not exist or has been deleted")
         if self.__subContribId:
             obj = obj.getSubContributionById( self.__subContribId )
             fr = materialFactories.ContribMFRegistry

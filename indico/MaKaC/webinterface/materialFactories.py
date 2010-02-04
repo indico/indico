@@ -340,7 +340,11 @@ class ReviewingFactory(MaterialFactory):
         
     def get( owner ):
         """returns the material"""
-        return owner.getReviewing()
+        if isinstance(owner, conference.Contribution):
+            return owner.getReviewing()
+        else:
+            # we supposed that it is a Review object
+            return owner.getMaterialById(0)
     get = staticmethod(get)
     
     def remove( owner ):

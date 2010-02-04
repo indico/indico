@@ -400,10 +400,9 @@ class RefereeJudgement(Judgement):
             A new Review object is then created as 'last review'.
         """
         Judgement.setSubmitted(self, submitted)
-
-        self.getReview().copyMaterials([m for m in self.getReviewManager().getContribution().getAllMaterialList()
-                                        if m.getTitle() in self.getConfReview().getReviewableMaterials()])
-
+        
+        self.getReview().copyMaterials(self.getReviewManager().getContribution().getReviewing())
+                                                   
         if self._judgement == "To be corrected" or self._judgement in self.getReviewManager().getConference().getConfReview().getStates():
             self.getReviewManager().newReview()
 
@@ -424,8 +423,7 @@ class EditorJudgement(Judgement):
         if self.getReviewManager().getConference().getConfReview().getChoice() == 3:
             Judgement.setSubmitted(self, submitted)
         
-            self.getReview().copyMaterials([m for m in self.getReviewManager().getContribution().getAllMaterialList()
-                                        if m.getTitle() in self.getConfReview().getReviewableMaterials()])
+            self.getReview().copyMaterials(self.getReviewManager().getContribution().getReviewing())
                                                    
             if self._judgement == "To be corrected":
                 self.getReviewManager().newReview()
@@ -598,18 +596,19 @@ class Review(Persistent):
         """ Returns the materials stored in this Review.
         """
         return self._materials
-
-    def copyMaterials(self, materials):
+    
+    def copyMaterials(self, material):
         """ Copies the materials from the contribution to this review object.
             This is done by cloning the materials, and putting the contribution as owner.
             This way, even if the author deletes materials during another review, they endure in this review.
         """
-        self._materials = []
-        for m in materials:
-            self._materials.append(m.clone(self))
-
-    def getMaterialById(self, materialId):
+        self._materials = [material.clone(self)]
+    
+    def getMaterialById(self, materialId=0):
         """ Returns one of the materials of the review given its id
+        
+            So far there is just one material (reviewing) with many resources. So, by default we
+            get the first element of the list of materials.
         """
         return self._materials[int(materialId)]
 
