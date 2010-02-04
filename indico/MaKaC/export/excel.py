@@ -25,12 +25,12 @@ from MaKaC.common import utils
 class ExcelGenerator:
     """It helps to create an Excel CSV file. The way to work with this class
     is the following:
-        - Use always "addValue" for adding all the cell values to the current 
+        - Use always "addValue" for adding all the cell values to the current
         line, including empty strings.
         - Once the line was completely filled use "newLine" to follow with the
         filling of the next line of the CSV file.
     For instance:
-        excelGen=ExcelGenerator()        
+        excelGen=ExcelGenerator()
         for n in range(0,5):
             for i in ["a","b","c","d"]:
                 excelGen.addValue("%s-%s"%(n,i))
@@ -54,11 +54,11 @@ class ExcelGenerator:
         self._currentLine.append(ExcelGenerator.excelFormatting(value))
 
     def addNumberAsString(self, value):
-        """Add a new cell value (which it has to be interpreted like 
+        """Add a new cell value (which it has to be interpreted like
         a string not like a number) to the current line"""
         if value.strip()!="":
             self._currentLine.append("=%s"%ExcelGenerator.excelFormatting(value).replace(",",";"))
-            
+
         else:
             self._currentLine.append("")
 
@@ -79,23 +79,23 @@ class ExcelGenerator:
             text="\"%s\""%text
         return text
     excelFormatting=staticmethod(excelFormatting)
-        
+
 
 
 
 class RegistrantsListToExcel:
-    
+
     def __init__(self, conf,list=None, display=["Institution", "Phone", "City", "Country"]):
         self._conf = conf
         self._regForm = conf.getRegistrationForm()
         self._regList = list
         self._display = display
-        
+
     def getExcelFile(self):
         excelGen=ExcelGenerator()
         excelGen.addValue("Name")
         for key in self._display:
-            if key in ["Email", "Position", "Institution", "Phone", "City", "Country", "Address"]:
+            if key in ["Id", "Email", "Position", "Institution", "Phone", "City", "Country", "Address"]:
                 excelGen.addValue(key)
             elif key=="Accommodation":
                 excelGen.addValue(self._regForm.getAccommodationForm().getTitle())
@@ -142,10 +142,12 @@ class RegistrantsListToExcel:
 
         if self._regList == None:
             self._regList = self._conf.getRegistrantsList(True)
-            
+
         for reg in self._regList:
             excelGen.addValue(reg.getFullName())
             for key in self._display:
+                if key == "Id":
+                    excelGen.addValue(reg.getId())
                 if key == "Email":
                     excelGen.addValue(reg.getEmail())
                 elif key == "Institution":
@@ -225,25 +227,25 @@ class RegistrantsListToExcel:
             excelGen.newLine()
         return excelGen.getExcelContent()
 
-        
+
 class AbstractListToExcel:
-    
+
     def __init__(self, conf,list=None, display=["ID","Title","Primary Authors","Track Name","Contribution Type"]):
-        self._conf = conf        
+        self._conf = conf
         self._abstractList = list
         self._displayList = display
-        
+
     def getExcelFile(self):
-        excelGen=ExcelGenerator()        
-        for key in self._displayList:            
+        excelGen=ExcelGenerator()
+        for key in self._displayList:
             excelGen.addValue(key)
-            
+
         excelGen.newLine()
 
         if self._abstractList is None:
             self._abstractList = self._conf.getAbstractMgr().getAbstractList()
-            
-        for abstract in self._abstractList :            
+
+        for abstract in self._abstractList :
             for key in self._displayList :
                 if key == "ID" :
                     excelGen.addValue(abstract.getId())
@@ -264,16 +266,16 @@ class AbstractListToExcel:
                     ctname=""
                     if contribType is not None:
                         ctname=contribType.getName()
-                    excelGen.addNumberAsString(ctname)                
+                    excelGen.addNumberAsString(ctname)
             excelGen.newLine()
         return excelGen.getExcelContent()
 
 class ParticipantsListToExcel:
-    
+
     def __init__(self, conf,list=None):
         self._conf = conf
         self._partList = list
-        
+
     def getExcelFile(self):
         excelGen=ExcelGenerator()
         excelGen.addValue("Name")
@@ -285,7 +287,7 @@ class ParticipantsListToExcel:
 
         if self._partList == None:
             self._partList = self._conf.getParticipation().getParticipantList()
-            
+
         for reg in self._partList:
             excelGen.addValue(reg.getFullName())
             excelGen.addValue(reg.getEmail())

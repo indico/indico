@@ -1,6 +1,6 @@
 from MaKaC.webinterface.pages.category import WPCategoryDisplayBase
 from MaKaC.webinterface.pages.conferences import WPConferenceDisplayBase
-from MaKaC.webinterface.wcomponents import WTemplated
+from MaKaC.webinterface.wcomponents import WTemplated, WNavigationDrawer
 
 class WSearch(WTemplated):
     def __init__(self, target, aw):
@@ -26,6 +26,10 @@ class WPSearchCategory(WPSearch, WPCategoryDisplayBase):
     def _setParams(self, params):
         params['confId'] = None
         params['categId'] = self._target.getId()
+
+    def _getNavigationDrawer(self):
+        pars = {"target": self._target, "isModif": False}
+        return WNavigationDrawer( pars )
 
 
 class WPSearchConference(WPSearch, WPConferenceDisplayBase):

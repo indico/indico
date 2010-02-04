@@ -30,14 +30,14 @@ from MaKaC.common.logger import Logger
 from xml.dom import minidom
 
 class InvenioSEA(base.SearchEngineAdapter):
-    """ 
+    """
         Search engine adapter for CDS Invenio.
         Currently used at CERN.
-    """        
-    
+    """
+
     def getRequestAddress(self):
         return Config.getInstance().getIndicoSearchServer() + "/search"
-    
+
     def _buildCategoryHierarchy(self, target):
         """
             Builds a category path, separated by ':', as indicosearch wishes.
@@ -59,7 +59,7 @@ class InvenioSEA(base.SearchEngineAdapter):
 
         m = regexp.match(text.split('\n')[1])
 
-        if m:        
+        if m:
             return int(m.group(1))
         else:
             return 0
@@ -68,7 +68,7 @@ class InvenioSEA(base.SearchEngineAdapter):
 
         authors = []
         materials = []
-        
+
         id = elem.getElementsByTagName("identifier")[0].firstChild.data.encode("utf-8")
         title = elem.getElementsByTagName("title")
         if len(title) > 0:
@@ -77,7 +77,7 @@ class InvenioSEA(base.SearchEngineAdapter):
                 title = cgi.escape(title.data.encode("utf-8"))
         else:
             title = None
-        
+
         location = elem.getElementsByTagName("location")
         if len(location) > 0:
             location = location[0].firstChild.data.encode("utf-8")
@@ -99,18 +99,18 @@ class InvenioSEA(base.SearchEngineAdapter):
             description = None
 
         for a in elem.getElementsByTagName("author"):
-            
+
             name = a.getElementsByTagName("name")[0].firstChild.data.encode("utf-8")
             role = a.getElementsByTagName("role")[0].firstChild.data.encode("utf-8")
-            
+
             affiliation = a.getElementsByTagName("affiliation")[0].firstChild
             if affiliation:
                 affiliation = affiliation.data.encode("utf-8")
-            
+
             authors.append(base.Author(name, role, affiliation))
 
         for a in elem.getElementsByTagName("material"):
-            
+
             url = a.getElementsByTagName("url")[0].firstChild
             if url:
                 url = url.data.encode("utf-8")
@@ -122,32 +122,32 @@ class InvenioSEA(base.SearchEngineAdapter):
                     matDescription = cgi.escape(matDescription.data.encode("utf-8"))
             else:
                 matDescription = None
-            
+
             materials.append((url, matDescription))
 
-        
+
         return base.SearchResult.create(id, title, location, startDate, materials, authors, description)
 
-    
+
     def __init__(self, target, private=False):
         """
             Constructor
-            
+
             @param target: Target event/category
             @type target: Conference/Category object
         """
 
         self._private = private
-        
+
         if target == None:
             #search root category by default
             self._marcQuery = ''
             self._searchCategories = True
         elif type(target) == conference.Category:
             # we're dealing with a category
-        
+
             hierarchy = self._buildCategoryHierarchy(target)
-            
+
             if hierarchy != '0':
                 # if not on root, search using path
                 self._marcQuery = '650_7:"'+hierarchy+'*" '
@@ -155,20 +155,20 @@ class InvenioSEA(base.SearchEngineAdapter):
                 # perform global search
                 self._marcQuery = ''
             self._searchCategories = True
-            
-        elif type(target) == conference.Conference:        
+
+        elif type(target) == conference.Conference:
             # we're looking inside an event
-             
+
             # search for event identifier
             self._marcQuery = 'AND (970__:"INDICO.p%s*" OR 970__:"INDICO.r%s*")' % (target.getId(), target.getId())
             self._searchCategories = False
-            
+
         else:
             raise Exception("Unknown target type.")
-      
+
     def addParameters(self, params):
         newParams = params.copy()
-        
+
         # sc = "split by collection"
         newParams['of'] = 'xm'
         return newParams
@@ -187,17 +187,17 @@ class InvenioSEA(base.SearchEngineAdapter):
                 result.append(self._processElem(elem))
 
         return result
-        
+
     ## Now, we have the actual translation rules
     ## Notice that the second parameter of SEATranslator is
     ## currently not being used.
     ##
     ## '@SEATranslator(sourceField, type, targetField)'
-    
+
     @SEATranslator ('p', 'text', 'p')
     def translatePhrase(self, phrase):
         return phrase + ' ' + self._marcQuery
-    
+
     @SEATranslator(['startDate', 'endDate'],'date', 'p')
     def translateDates(self, startDate, endDate):
 
@@ -206,7 +206,7 @@ class InvenioSEA(base.SearchEngineAdapter):
         if endDate != '':
             endDate = time.strftime("%Y-%m-%d", time.strptime(endDate, "%d/%m/%Y"))
 
-        
+
         if startDate != '' and endDate != '':
             return '518__d:"%s"->"%s"' % (startDate, endDate)
         elif startDate != '':
@@ -215,7 +215,7 @@ class InvenioSEA(base.SearchEngineAdapter):
             return '518__d:->"%s"' % (endDate)
         else:
             return ""
-    
+
     @SEATranslator ('f',[],'f')
     def translateField(self, field):
         return field
@@ -227,12 +227,12 @@ class InvenioSEA(base.SearchEngineAdapter):
             repository = 'INDICOSEARCH'
         else:
             repository = 'INDICOPUBLIC'
-        
+
         if collection == 'Events':
             return '%s.events' % repository
         elif collection == 'Contributions':
             return '%s.contribs' % repository
-    
+
     @SEATranslator ('startRecord',[],'jrec')
     def translateStartRecord(self, startRecord):
         return startRecord
@@ -242,9 +242,9 @@ class InvenioSEA(base.SearchEngineAdapter):
         return numRecords
 
     @SEATranslator ('sortField',[],'sf')
-    def translateNumRecords(self, sortField):
+    def translateSortField(self, sortField):
         return sortField
 
     @SEATranslator ('sortOrder',[],'so')
-    def translateNumRecords(self, sortOrder):
+    def translateSortOrder(self, sortOrder):
         return sortOrder

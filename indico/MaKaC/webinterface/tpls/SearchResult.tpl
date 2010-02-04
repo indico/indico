@@ -6,7 +6,7 @@
       <% if result.getStartDate(accessWrapper): %>
     <small style="display: block;"><%= result.getStartDate(accessWrapper).strftime("%Y-%m-%d %H:%M:%S (%Z)") %></small>
     <% end %>
-    
+
     <ul class="authorList">
   <% for author in result.getAuthors(): %>
   <li
@@ -20,7 +20,7 @@
     </li>
     <% end %>
   </ul>
-  
+
 <%!
 if result.getDescription() != None:
     fullDesc = result.getDescription()
@@ -33,7 +33,7 @@ else:
     <%= entryDesc %>
 
     <% if len(entryDesc) < len(fullDesc): %>
-      <a href="#" onclick="IndicoUI.Effect.appear($E('desc<%= result.getCompoundId() %>')); $E(this).getParent().getParent().remove($E(this).getParent()); return false;" style="margin-bottom: 10px;">more</a>
+      <a href="#" class="searchResultLink" onclick="IndicoUI.Effect.appear($E('desc<%= result.getCompoundId() %>')); $E(this).getParent().getParent().remove($E(this).getParent()); return false;" style="margin-bottom: 10px;">more</a>
     <% end %>
   </div>
 
