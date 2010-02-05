@@ -139,7 +139,8 @@ class BaseTest(object):
 
     def startFakeDB(self, zeoPort):
         self.createNewDBFile()
-        self.zeoServer = self.createDBServer(os.path.join(self.dbFolder, "Data.fs"), zeoPort)
+        self.zeoServer = self.createDBServer(os.path.join(self.dbFolder, "Data.fs"),
+                                             zeoPort)
         DBMgr.setInstance(DBMgr(hostname="localhost", port=zeoPort))
 
         DBMgr.getInstance().startRequest()

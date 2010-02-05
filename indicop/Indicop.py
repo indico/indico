@@ -36,11 +36,7 @@ import tempfile
 from BaseTest import BaseTest
 from TestsConfig import TestsConfig
 from selenium import selenium
-from MaKaC.common.db import DBMgr
-from util import TestZEOServer
-from ZODB import FileStorage, DB
 from MaKaC.common.Configuration import Config
-import transaction
 
 
 class Unit(BaseTest):
@@ -67,7 +63,7 @@ class Unit(BaseTest):
 
             #retrieving tests from Indicop folder
             args = ['nose', '--nologcapture', '--logging-clear-handlers', '-v',
-                    os.path.join(self.setupDir, 'python', 'unit', 'MaKaC_tests', 'conference_test.py:TestCategories.testBasicAddAndRemoveConferences')]
+                    os.path.join(self.setupDir, 'python', 'unit')]
             #retrieving tests from plugins folder
             for folder in self.walkThroughFolders(os.path.join(self.setupDir,
                                                                '..',
@@ -81,7 +77,6 @@ class Unit(BaseTest):
 
             #restoring the stderr
             sys.stderr = sys.__stderr__
-
 
 
             if coverage:
@@ -157,7 +152,6 @@ class Functional(BaseTest):
         returnString = ""
         self.startMessage("Starting Python functional tests")
 
-
         #Stop prod DB and launch a fresh DB on this prod db port
         #self.stopProductionDB()
         self.startFakeDB(Config.getInstance().getDBConnectionParams()[1])
@@ -188,10 +182,9 @@ class Functional(BaseTest):
 
             result = nose.run(argv = args)
 
-            #self.deleteDummyUserYEAH()
         finally:
             self.stopSeleniumServer()
-
+            self.deleteDummyUser()
             #restoring the stderr
             sys.stderr = sys.__stderr__
 
@@ -232,7 +225,8 @@ class Functional(BaseTest):
                                       os.path.join(self.setupDir,
                                                    'python',
                                                    'functional',
-                                                   TestsConfig.getInstance().getSeleniumFilename())],
+                                                   TestsConfig.getInstance().
+                                                   getSeleniumFilename())],
                                       stdout=subprocess.PIPE)
         except OSError, e:
             return ("[ERR] Could not start selenium server - command \"java\""
@@ -296,6 +290,7 @@ class Specify(Functional):
         else:
             return "[FAIL] Specified Test - read output from console\n"
 
+
 class Grid(BaseTest):
     def __init__(self):
         self.hubEnv = TestsConfig.getInstance().getHubEnv()
@@ -307,50 +302,61 @@ class Grid(BaseTest):
     def run(self):
         self.startMessage("Starting grid tests")
 
-        self.gridData.setActive(True)
-
-        #Checking if hub is online
-        sel = selenium(self.gridData.getUrl(), self.gridData.getPort(),
-                       self.hubEnv[0], "http://www.cern.ch/")
-        selTimeout = TimeoutFunction(sel.start, 10)
         try:
-            selTimeout()
-        except TimeoutFunctionException:
-            return "[ERR] Selenium Grid - Hub is probably down (%s:%s)" % \
-                    (self.gridData.getUrl(), self.gridData.getPort())
-        except socket.error:
-            return ("[ERR] Selenium Grid - Connection refused, check your "
-                    "hub's settings (%s:%s)") % \
-                    (self.gridData.getUrl(), self.gridData.getPort())
-        else:
-            print "Hub is UP, continue with grid tests"
+            self.createDummyUser()
+            self.gridData.setActive(True)
 
-
-        #capturing the stderr
-        outerr = StringIO.StringIO()
-        sys.stderr = outerr
-
-        returnString = ""
-        for env in self.hubEnv:
-            self.gridData.setEnv(env)
-            sys.stderr.write('\n~ %s ~\n' % env)
-            result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir,
-                                                               'python',
-                                                               'functional')])
-            if result:
-                returnString += "PY Functional (%s) tests succeeded\n" % env
+            #Checking if hub is online
+            sel = selenium(self.gridData.getUrl(), self.gridData.getPort(),
+                           self.hubEnv[0], "http://www.cern.ch/")
+            try:
+                signal.signal(signal.SIGALRM, handler)
+                signal.alarm(10)
+                sel.start()
+                sel.open("/")
+                sel.stop()
+                signal.alarm(0)
+            except socket.error:
+                return ("[ERR] Selenium Grid - Connection refused, check your "
+                        "hub's settings (%s:%s)") % \
+                        (self.gridData.getUrl(), self.gridData.getPort())
+            except Exception, e:
+                return "[ERR] Selenium Grid - Hub is probably down (%s:%s) (%s)" % \
+                        (self.gridData.getUrl(), self.gridData.getPort(), e)
             else:
-                returnString += ("[FAIL] Functional (%s) tests - report in"
-                        " indicop/report/pygrid.txt\n") % env
+                print "Hub is UP, continue with grid tests"
 
-        #restoring the stderr
-        sys.stderr = sys.__stderr__
+            #capturing the stderr
+            outerr = StringIO.StringIO()
+            sys.stderr = outerr
 
-        s = outerr.getvalue()
-        returnString += self.writeReport("pygrid", s)
+            returnString = ""
+            for env in self.hubEnv:
+                self.gridData.setEnv(env)
+                sys.stderr.write('\n~ %s ~\n' % env)
+                result = nose.run(argv=['nose', '--nologcapture',
+                                        '--logging-clear-handlers', '-v',
+                                        os.path.join(self.setupDir,
+                                                     'python',
+                                                     'functional')])
+                if result:
+                    returnString += "PY Functional (%s) tests succeeded\n" % env
+                else:
+                    returnString += ("[FAIL] Functional (%s) tests - report in"
+                            " indicop/report/pygrid.txt\n") % env
 
+            #restoring the stderr
+            sys.stderr = sys.__stderr__
+
+            s = outerr.getvalue()
+            returnString += self.writeReport("pygrid", s)
+        finally:
+            self.deleteDummyUser()
         return returnString
 
+
+def handler(signum, frame):
+    raise Exception("10s timeout")
 
 class GridData(BaseTest):
     """Provide informations for selenium grid, data are set from Class Grid
@@ -388,30 +394,6 @@ class GridData(BaseTest):
         if cls.__instance == None:
             cls.__instance = GridData()
         return cls.__instance
-
-
-class TimeoutFunctionException(Exception):
-    """Exception to raise on a timeout"""
-    pass
-
-class TimeoutFunction:
-
-    def __init__(self, function, timeout):
-        self.timeout = timeout
-        self.function = function
-
-    def handle_timeout(self, signum, frame):
-        raise TimeoutFunctionException()
-
-    def __call__(self, *args):
-        old = signal.signal(signal.SIGALRM, self.handle_timeout)
-        signal.alarm(self.timeout)
-        try:
-            result = self.function(*args)
-        finally:
-            signal.signal(signal.SIGALRM, old)
-        signal.alarm(0)
-        return result
 
 
 class Pylint(BaseTest):
@@ -456,7 +438,8 @@ class Jsunit(BaseTest):
                                        os.path.join(self.setupDir,
                                                     'javascript',
                                                     'unit',
-                                                    TestsConfig.getInstance().getJsunitFilename()),
+                                                    TestsConfig.getInstance().
+                                                    getJsunitFilename()),
                                         "--port",
                                         "9876",
                                         "--browser",
@@ -480,7 +463,10 @@ class Jsunit(BaseTest):
                                              "%s"
                                              " --config "
                                              "%s"
-                                             " --tests Fake.dryRun") % (TestsConfig.getInstance().getJsunitFilename(), confFile))
+                                             " --tests Fake.dryRun") %\
+                                             (TestsConfig.getInstance().
+                                              getJsunitFilename(),
+                                              confFile))
                 if jsDryRun[1].startswith("No browsers were captured"):
                     print ("Js-test-driver server has not started yet. "
                            "Attempt #%s\n") % (i+1)
@@ -502,7 +488,9 @@ class Jsunit(BaseTest):
             command = ("java -jar %s "
                             "--config %s "
                             "--tests %s ") % \
-                            (TestsConfig.getInstance().getJsunitFilename(), confFile, toTest)
+                            (TestsConfig.getInstance().getJsunitFilename(),
+                             confFile,
+                             toTest)
             if self.coverage:
                 command += "--testOutput %s" % coveragePath
 
@@ -577,7 +565,8 @@ class Jsunit(BaseTest):
         coverageConf = """\nplugin:
   - name: \"coverage\"
     jar: \"plugins/%s\"
-    module: \"com.google.jstestdriver.coverage.CoverageModule\"""" % TestsConfig.getInstance().getJscoverageFilename()
+    module: \"com.google.jstestdriver.coverage.CoverageModule\"""" % \
+    TestsConfig.getInstance().getJscoverageFilename()
 
 
         try:

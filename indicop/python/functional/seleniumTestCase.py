@@ -15,6 +15,7 @@ class SeleniumTestCase(unittest.TestCase, BaseTest):
     def setUp(self):
         self.verificationErrors = []
         self.confId = None
+        self.selenium = None
 
         grid = GridData.getInstance()
         if grid.isActive():
@@ -23,7 +24,6 @@ class SeleniumTestCase(unittest.TestCase, BaseTest):
             self.selenium = selenium("localhost", 4444, "*chrome", self.getRootUrl())
 
         self.selenium.start()
-
 
 
         #Handy functions from selenium and twill you might need
