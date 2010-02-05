@@ -148,7 +148,7 @@ class RegistrantsListToExcel:
             for key in self._display:
                 if key == "Id":
                     excelGen.addValue(reg.getId())
-                if key == "Email":
+                elif key == "Email":
                     excelGen.addValue(reg.getEmail())
                 elif key == "Institution":
                     excelGen.addValue(reg.getInstitution())
