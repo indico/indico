@@ -39,4 +39,8 @@ SeleniumFilename   = "selenium-server.jar"
 #------------------------------------------------------------------------------
 HubURL         = "macuds04.cern.ch"
 HubPort        = 4444
-HubEnv         = ['Safari on OS X']
+HubEnv         = ['Safari on OS X',
+                  'Firefox on OS X',
+                  'Firefox on Linux',
+                  'Firefox on Windows',
+                  'IE on Windows']

@@ -48,7 +48,10 @@ class Unit(BaseTest):
         result = False
 
         #launch a fresh DB in parallel of the production DB
-        self.startFakeDB(TestsConfig.getInstance().getFakeDBPort())
+        try:
+            self.startFakeDB(TestsConfig.getInstance().getFakeDBPort())
+        except:
+            return "[ERR] Unit tests - Please, specify a FakeDBPort in tests.conf"
         self.createDummyUser()
 
         try:
@@ -231,6 +234,8 @@ class Functional(BaseTest):
         except OSError, e:
             return ("[ERR] Could not start selenium server - command \"java\""
                     " needs to be in your PATH. (%s)\n" % e)
+        except AttributeError:
+            return "[ERR] Please specify a SeleniumFilename in tests.conf"
 
         sel = selenium("localhost", 4444, "*chrome", "http://www.cern.ch/")
         for i in range(5):
@@ -261,7 +266,10 @@ class Specify(Functional):
         self.startMessage("Starting Python specified tests")
 
         #launch a fresh DB in parallel of the production DB
-        self.startFakeDB(TestsConfig.getInstance().getFakeDBPort())
+        try:
+            self.startFakeDB(TestsConfig.getInstance().getFakeDBPort())
+        except AttributeError:
+            return "[ERR] Please, specify a FakeDBPort in tests.conf"
         self.createDummyUser()
 
         try:
@@ -303,6 +311,9 @@ class Grid(BaseTest):
         self.startMessage("Starting grid tests")
 
         try:
+            #Stop prod DB and launch a fresh DB on this prod db port
+            #self.stopProductionDB()
+            self.startFakeDB(Config.getInstance().getDBConnectionParams()[1])
             self.createDummyUser()
             self.gridData.setActive(True)
 
@@ -352,8 +363,11 @@ class Grid(BaseTest):
             returnString += self.writeReport("pygrid", s)
         finally:
             self.deleteDummyUser()
+            #stopping the fake DB
+            self.stopFakeDB()
+            #self.startProductionDB()
+            self.restoreDBInstance()
         return returnString
-
 
 def handler(signum, frame):
     raise Exception("10s timeout")
@@ -537,6 +551,8 @@ class Jsunit(BaseTest):
         except OSError, e:
             return ("[ERR] Could not start js-test-driver server - command "
                     "\"java\" needs to be in your PATH. (%s)\n" % e)
+        except AttributeError:
+            return "[ERR] Please specify a JsunitFilename in tests.conf"
 
         #stopping the server
         server.kill()
@@ -560,13 +576,15 @@ class Jsunit(BaseTest):
                                             "indico",
                                             "MaKaC",
                                             "plugins")
-
-        #lines needed to activate coverage plugin
-        coverageConf = """\nplugin:
+        try:
+            #lines needed to activate coverage plugin
+            coverageConf = """\nplugin:
   - name: \"coverage\"
     jar: \"plugins/%s\"
     module: \"com.google.jstestdriver.coverage.CoverageModule\"""" % \
-    TestsConfig.getInstance().getJscoverageFilename()
+        TestsConfig.getInstance().getJscoverageFilename()
+        except AttributeError:
+            return "[ERR] Please, specify a JscoverageFilename in tests.conf"
 
 
         try:
