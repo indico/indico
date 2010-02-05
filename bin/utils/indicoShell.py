@@ -9,6 +9,7 @@ from MaKaC.conference import Conference, Category, ConferenceHolder, CategoryMan
 from MaKaC.user import AvatarHolder, GroupHolder
 from MaKaC.common.timerExec import HelperTaskList
 from MaKaC.common.info import HelperMaKaCInfo
+from MaKaC.plugins.base import PluginsHolder
 
 
 def add(namespace, element, name=None, doc=None):
@@ -47,7 +48,7 @@ def setupNamespace(productionDatabase):
     add(namespace, GroupHolder)
     add(namespace, HelperTaskList)
     add(namespace, HelperMaKaCInfo)
-    add(namespace, HelperMaKaCInfo)
+    add(namespace, PluginsHolder)
 
     add(namespace, HelperMaKaCInfo.getMaKaCInfoInstance(), 'minfo', 'MaKaCInfo instance')
 
