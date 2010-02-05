@@ -262,7 +262,6 @@ class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.Confere
                      "sDate": self._startDateTime,
                      "eDate": self._endDateTime
                      })
-
         conf.addSession(session)
         session.setScheduleType(self._scheduleType)
         session.setTextColor(self._textColor)
@@ -296,11 +295,28 @@ class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.Confere
         pickledData = DictPickler.pickle(schEntry, timezone=conf.getTimezone())
         pickledData['entries'] = {}
 
+        self.initializeFilteringCriteria(session.getId(), schEntry.getSchedule().getOwner().getId())
+
         return {'day': slot.getAdjustedStartDate().strftime("%Y%m%d"),
                 'id': pickledData['id'],
                 'entry': pickledData,
                 'session': DictPickler.pickle(session, timezone=self._conf.getTimezone()),
                 'autoOps': translateAutoOps(self.getAutoOps())}
+
+    def initializeFilteringCriteria(self, sessionId, conferenceId):
+        # Filtering criteria: by default make new session type checked
+        websession = self._getSession()
+        sessionDict = websession.getVar("ContributionFilterConf%s"%conferenceId)
+        if not sessionDict:
+            #Create a new dictionary
+            sessionDict = {}
+        if sessionDict.has_key('sessions'):
+            #Append the new type to the existing list
+            sessionDict['sessions'].append(sessionId)
+            websession._p_changed = 1
+        else:
+            #Create a new entry for the dictionary containing the new type
+            sessionDict['sessions'] = [sessionId]
 
 class ConferenceScheduleDeleteSession(ScheduleOperation, conferenceServices.ConferenceScheduleModifBase):
 

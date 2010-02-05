@@ -3453,6 +3453,20 @@ class RHConfPerformAddTrack( RHConferenceModifBase ):
             params = self._getRequestParams()
             t.setTitle(params["title"])
             t.setDescription(params["description"])
+            # Filtering criteria: by default make new contribution type checked
+            websession = self._getSession()
+            dict = websession.getVar("ContributionFilterConf%s"%self._conf.getId())
+            if not dict:
+                    #Create a new dictionary
+                    dict = {}
+            if dict.has_key('tracks'):
+                    #Append the new type to the existing list
+                    newDict = dict['tracks'][:]
+                    newDict.append(t.getId())
+                    dict['tracks'] = newDict[:]
+            else:
+                    #Create a new entry for the dictionary containing the new type
+                    dict['tracks'] = [t.getId()]
             self._redirect( urlHandlers.UHConfModifProgram.getURL( self._conf ) )
 
 class RHConfDelTracks( RHConferenceModifBase ):
