@@ -301,7 +301,7 @@ class tests_indico(Command):
 
 
 if __name__ == '__main__':
-    sys.path = ['indico'] + sys.path # Always load source from the current folder
+    sys.path = [os.path.abspath('indico')] + sys.path # Always load source from the current folder
 
     #PWD_INDICO_CONF = 'etc/indico.conf'
     #if not os.path.exists(PWD_INDICO_CONF):
