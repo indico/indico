@@ -299,6 +299,13 @@ class Specify(Functional):
             return "[FAIL] Specified Test - read output from console\n"
 
 
+class TimeoutException(Exception):
+    """SIGALARM was sent to the process"""
+    pass
+
+def raise_timeout(signum, frame):
+    raise TimeoutException("10sec Timeout")
+
 class Grid(BaseTest):
     def __init__(self):
         self.hubEnv = TestsConfig.getInstance().getHubEnv()
@@ -312,7 +319,7 @@ class Grid(BaseTest):
 
         try:
             #Stop prod DB and launch a fresh DB on this prod db port
-            #self.stopProductionDB()
+            self.stopProductionDB()
             self.startFakeDB(Config.getInstance().getDBConnectionParams()[1])
             self.createDummyUser()
             self.gridData.setActive(True)
@@ -320,22 +327,25 @@ class Grid(BaseTest):
             #Checking if hub is online
             sel = selenium(self.gridData.getUrl(), self.gridData.getPort(),
                            self.hubEnv[0], "http://www.cern.ch/")
+
+            signal.signal(signal.SIGALRM, raise_timeout)
             try:
-                signal.signal(signal.SIGALRM, handler)
-                signal.alarm(10)
+                signal.alarm(2)
                 sel.start()
                 sel.open("/")
                 sel.stop()
-                signal.alarm(0)
             except socket.error:
                 return ("[ERR] Selenium Grid - Connection refused, check your "
                         "hub's settings (%s:%s)") % \
                         (self.gridData.getUrl(), self.gridData.getPort())
-            except Exception, e:
+            except TimeoutException, e:
                 return "[ERR] Selenium Grid - Hub is probably down (%s:%s) (%s)" % \
                         (self.gridData.getUrl(), self.gridData.getPort(), e)
             else:
                 print "Hub is UP, continue with grid tests"
+            finally:
+                #disable the alarm signal
+                signal.alarm(0)
 
             #capturing the stderr
             outerr = StringIO.StringIO()
@@ -362,15 +372,11 @@ class Grid(BaseTest):
             s = outerr.getvalue()
             returnString += self.writeReport("pygrid", s)
         finally:
-            self.deleteDummyUser()
             #stopping the fake DB
             self.stopFakeDB()
-            #self.startProductionDB()
+            self.startProductionDB()
             self.restoreDBInstance()
         return returnString
-
-def handler(signum, frame):
-    raise Exception("10s timeout")
 
 class GridData(BaseTest):
     """Provide informations for selenium grid, data are set from Class Grid
@@ -733,7 +739,7 @@ class Indicop(object):
 
         if coverage:
             Coverage.instantiate()
-
+        print testsToRun
         #specified test can either be unit or functional.
         if specify:
             returnString += Specify(specify).run()
