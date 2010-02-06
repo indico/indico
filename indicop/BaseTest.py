@@ -26,6 +26,7 @@ import transaction
 import signal
 import shutil
 import commands
+import sys
 from TestsConfig import TestsConfig
 from MaKaC.common.db import DBMgr
 
@@ -169,10 +170,18 @@ class BaseTest(object):
         DBMgr.setInstance(None)
 
     def startProductionDB(self):
-        commands.getstatusoutput(TestsConfig.getInstance().getStartDBCmd())
+        try:
+            commands.getstatusoutput(TestsConfig.getInstance().getStartDBCmd())
+        except KeyError:
+            print "[ERR] Not found in tests.conf: command to start production DB"
+            sys.exit(1)
 
     def stopProductionDB(self):
-        commands.getstatusoutput(TestsConfig.getInstance().getStopDBCmd())
+        try:
+            commands.getstatusoutput(TestsConfig.getInstance().getStopDBCmd())
+        except KeyError:
+            print "[ERR] Not found in tests.conf: command to stop production DB"
+            sys.exit(1)
 
     def createNewDBFile(self):
         from ZODB import FileStorage, DB

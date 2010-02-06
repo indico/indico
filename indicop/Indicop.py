@@ -50,7 +50,7 @@ class Unit(BaseTest):
         #launch a fresh DB in parallel of the production DB
         try:
             self.startFakeDB(TestsConfig.getInstance().getFakeDBPort())
-        except:
+        except KeyError:
             return "[ERR] Unit tests - Please, specify a FakeDBPort in tests.conf"
         self.createDummyUser()
 
@@ -156,7 +156,7 @@ class Functional(BaseTest):
         self.startMessage("Starting Python functional tests")
 
         #Stop prod DB and launch a fresh DB on this prod db port
-        #self.stopProductionDB()
+        self.stopProductionDB()
         self.startFakeDB(Config.getInstance().getDBConnectionParams()[1])
 
         try:
@@ -193,7 +193,7 @@ class Functional(BaseTest):
 
             #stopping the fake DB
             self.stopFakeDB()
-            #self.startProductionDB()
+            self.startProductionDB()
             self.restoreDBInstance()
 
         s = outerr.getvalue()
@@ -234,7 +234,7 @@ class Functional(BaseTest):
         except OSError, e:
             return ("[ERR] Could not start selenium server - command \"java\""
                     " needs to be in your PATH. (%s)\n" % e)
-        except AttributeError:
+        except KeyError:
             return "[ERR] Please specify a SeleniumFilename in tests.conf"
 
         sel = selenium("localhost", 4444, "*chrome", "http://www.cern.ch/")
@@ -268,7 +268,7 @@ class Specify(Functional):
         #launch a fresh DB in parallel of the production DB
         try:
             self.startFakeDB(TestsConfig.getInstance().getFakeDBPort())
-        except AttributeError:
+        except KeyError:
             return "[ERR] Please, specify a FakeDBPort in tests.conf"
         self.createDummyUser()
 
@@ -308,14 +308,21 @@ def raise_timeout(signum, frame):
 
 class Grid(BaseTest):
     def __init__(self):
-        self.hubEnv = TestsConfig.getInstance().getHubEnv()
-        self.gridData = GridData.getInstance()
-        self.gridData.setUrl(TestsConfig.getInstance().getHubURL())
-        self.gridData.setPort(TestsConfig.getInstance().getHubPort())
-        self.gridData.setActive(False)
+        try:
+            self.hubEnv = TestsConfig.getInstance().getHubEnv()
+            self.gridData = GridData.getInstance()
+            self.gridData.setUrl(TestsConfig.getInstance().getHubURL())
+            self.gridData.setPort(TestsConfig.getInstance().getHubPort())
+            self.gridData.setActive(False)
+            self.configExists = True
+        except KeyError:
+            self.configExists = False
 
     def run(self):
         self.startMessage("Starting grid tests")
+
+        if not self.configExists:
+            return "[ERR] Grid - Please specify hub configuration in tests.conf"
 
         try:
             #Stop prod DB and launch a fresh DB on this prod db port
@@ -557,7 +564,7 @@ class Jsunit(BaseTest):
         except OSError, e:
             return ("[ERR] Could not start js-test-driver server - command "
                     "\"java\" needs to be in your PATH. (%s)\n" % e)
-        except AttributeError:
+        except KeyError:
             return "[ERR] Please specify a JsunitFilename in tests.conf"
 
         #stopping the server
@@ -589,7 +596,7 @@ class Jsunit(BaseTest):
     jar: \"plugins/%s\"
     module: \"com.google.jstestdriver.coverage.CoverageModule\"""" % \
         TestsConfig.getInstance().getJscoverageFilename()
-        except AttributeError:
+        except KeyError:
             return "[ERR] Please, specify a JscoverageFilename in tests.conf"
 
 
@@ -739,7 +746,7 @@ class Indicop(object):
 
         if coverage:
             Coverage.instantiate()
-        print testsToRun
+
         #specified test can either be unit or functional.
         if specify:
             returnString += Specify(specify).run()
