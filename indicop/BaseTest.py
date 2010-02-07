@@ -144,27 +144,24 @@ class BaseTest(object):
                                              zeoPort)
         DBMgr.setInstance(DBMgr(hostname="localhost", port=zeoPort))
 
-        DBMgr.getInstance().startRequest()
-        DBMgr.getInstance().sync()
-        DBMgr.getInstance().endRequest(True)
-
     def stopFakeDB(self):
-        DBMgr.getInstance().startRequest()
-        DBMgr.getInstance().sync()
-        DBMgr.getInstance().endRequest(True)
-
         try:
             os.kill(self.zeoServer, signal.SIGTERM)
         except OSError, e:
             print ("Problem sending kill signal: " + str(e))
+        except AttributeError, e:
+            #DB has been already stopped
+            pass
 
         try:
             #os.wait()
             os.waitpid(self.zeoServer, 0)
+            self.removeDBFile()
         except OSError, e:
             print ("Problem waiting for ZEO Server: " + str(e))
-
-        self.removeDBFile()
+        except AttributeError, e:
+            #DB has been already stopped
+            pass
 
     def restoreDBInstance(self):
         DBMgr.setInstance(None)

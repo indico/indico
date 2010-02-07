@@ -187,7 +187,8 @@ class Functional(BaseTest):
 
         finally:
             self.stopSeleniumServer()
-            self.deleteDummyUser()
+            #self.deleteDummyUser()
+
             #restoring the stderr
             sys.stderr = sys.__stderr__
 
@@ -265,34 +266,51 @@ class Specify(Functional):
     def run(self):
         self.startMessage("Starting Python specified tests")
 
-        #launch a fresh DB in parallel of the production DB
-        try:
-            self.startFakeDB(TestsConfig.getInstance().getFakeDBPort())
-        except KeyError:
-            return "[ERR] Please, specify a FakeDBPort in tests.conf"
-        self.createDummyUser()
 
-        try:
-            #if specified path does not contained unit, we are probably dealing
-            #with functional tests
-            if self.specify.find('unit/') < 0:
-                if not self.startSeleniumServer():
-                    return ('[ERR] Could not start functional tests because selenium'
-                            ' server cannot be started.\n')
 
-            #running the test and ouputing in the console
-            result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir,
+
+        #if specified path does not contained unit, we are probably dealing
+        #with functional tests
+        if self.specify.find('unit/') < 0:
+            if not self.startSeleniumServer():
+                return ('[ERR] Could not start functional tests because selenium'
+                        ' server cannot be started.\n')
+            try:
+                #Stop prod DB and launch a fresh DB on this prod db port
+                self.stopProductionDB()
+                self.startFakeDB(Config.getInstance().getDBConnectionParams()[1])
+                self.createDummyUser()
+
+                #running the test and ouputing in the console
+                result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir,
+                                                                   '..',
+                                                                   self.specify)])
+            finally:
+                self.stopSeleniumServer()
+                #stopping the fake DB
+                self.stopFakeDB()
+                self.startProductionDB()
+                self.restoreDBInstance()
+
+        else:
+            #launch a fresh DB in parallel of the production DB
+            try:
+                self.startFakeDB(TestsConfig.getInstance().getFakeDBPort())
+            except KeyError:
+                return "[ERR] Please, specify a FakeDBPort in tests.conf"
+            try:
+                self.createDummyUser()
+
+                #running the test and ouputing in the console
+                result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir,
                                                                '..',
                                                                self.specify)])
 
-            if self.specify.find('unit/') < 0:
-                self.stopSeleniumServer()
-        finally:
-            self.deleteDummyUser()
-            #stopping the fake DB
-            self.stopFakeDB()
-            #self.startProductionDB()
-            self.restoreDBInstance()
+            finally:
+                self.deleteDummyUser()
+                #stopping the fake DB
+                self.stopFakeDB()
+                self.restoreDBInstance()
         if result:
             return "Specified Test - Succeeded\n"
         else:
@@ -336,23 +354,12 @@ class Grid(BaseTest):
                            self.hubEnv[0], "http://www.cern.ch/")
 
             signal.signal(signal.SIGALRM, raise_timeout)
-            try:
-                signal.alarm(2)
-                sel.start()
-                sel.open("/")
-                sel.stop()
-            except socket.error:
-                return ("[ERR] Selenium Grid - Connection refused, check your "
-                        "hub's settings (%s:%s)") % \
-                        (self.gridData.getUrl(), self.gridData.getPort())
-            except TimeoutException, e:
-                return "[ERR] Selenium Grid - Hub is probably down (%s:%s) (%s)" % \
-                        (self.gridData.getUrl(), self.gridData.getPort(), e)
-            else:
-                print "Hub is UP, continue with grid tests"
-            finally:
-                #disable the alarm signal
-                signal.alarm(0)
+            signal.alarm(10)
+            sel.start()
+            sel.open("/")
+            sel.stop()
+            #disable the alarm signal
+            signal.alarm(0)
 
             #capturing the stderr
             outerr = StringIO.StringIO()
@@ -378,6 +385,13 @@ class Grid(BaseTest):
 
             s = outerr.getvalue()
             returnString += self.writeReport("pygrid", s)
+        except socket.error:
+            return ("[ERR] Selenium Grid - Connection refused, check your "
+                    "hub's settings (%s:%s)") % \
+                    (self.gridData.getUrl(), self.gridData.getPort())
+        except TimeoutException, e:
+            return "[ERR] Selenium Grid - Hub is probably down (%s:%s) (%s)" % \
+                    (self.gridData.getUrl(), self.gridData.getPort(), e)
         finally:
             #stopping the fake DB
             self.stopFakeDB()
