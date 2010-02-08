@@ -322,7 +322,7 @@ class TimeoutException(Exception):
     pass
 
 def raise_timeout(signum, frame):
-    raise TimeoutException("10sec Timeout")
+    raise TimeoutException("15sec Timeout")
 
 class Grid(BaseTest):
     def __init__(self):
@@ -354,7 +354,7 @@ class Grid(BaseTest):
                            self.hubEnv[0], "http://www.cern.ch/")
 
             signal.signal(signal.SIGALRM, raise_timeout)
-            signal.alarm(10)
+            signal.alarm(15)
             sel.start()
             sel.open("/")
             sel.stop()
@@ -393,6 +393,8 @@ class Grid(BaseTest):
             return "[ERR] Selenium Grid - Hub is probably down (%s:%s) (%s)" % \
                     (self.gridData.getUrl(), self.gridData.getPort(), e)
         finally:
+            #disable alarm
+            signal.alarm(0)
             #stopping the fake DB
             self.stopFakeDB()
             self.startProductionDB()

@@ -345,21 +345,21 @@ class test_indico(Command):
             testsToRun.append('pylint')
         if self.functional:
             testsToRun.append('functional')
+        if self.grid:
+            testsToRun.append('grid')
         if self.unit:
             testsToRun.append('unit')
         if self.jsunit or self.jsspecify:
             testsToRun.append('jsunit')
         if self.jslint:
             testsToRun.append('jslint')
-        if self.grid:
-            testsToRun.append('grid')
-        if not (self.pylint or self.unit or self.functional or self.jsunit or self.jslint or self.grid):
+        if testsToRun == []:
             testsToRun.append('functional')
+            testsToRun.append('grid')
             testsToRun.append('unit')
             testsToRun.append('pylint')
             testsToRun.append('jsunit')
             testsToRun.append('jslint')
-            testsToRun.append('grid')
 
         indicop = Indicop.getInstance(self.jsspecify, self.jscoverage)
         result = indicop.main(self.specify, self.coverage, testsToRun)
@@ -389,30 +389,33 @@ i.e. try 'easy_install %s'""" % (package, package)
         """check if needed jars are here, if not, dowloading them and unzip a file if necessary"""
         jarsList = {}
         currentFilePath = os.path.dirname(__file__)
-
-        jarsList['jsunit'] = {'path':     os.path.join(currentFilePath,
-                                                       'indicop',
-                                                       'javascript',
-                                                       'unit'),
-                              'url':      TestsConfig.getInstance().getJsunitURL(),
-                              'filename': TestsConfig.getInstance().getJsunitFilename()}
-
-        jarsList['jscoverage'] = {'path':     os.path.join(currentFilePath,
+        try:
+            jarsList['jsunit'] = {'path':     os.path.join(currentFilePath,
                                                            'indicop',
                                                            'javascript',
-                                                           'unit',
-                                                           'plugins'),
-                                  'url':      TestsConfig.getInstance().getJscoverageURL(),
-                                  'filename': TestsConfig.getInstance().getJscoverageFilename()}
+                                                           'unit'),
+                                  'url':      TestsConfig.getInstance().getJsunitURL(),
+                                  'filename': TestsConfig.getInstance().getJsunitFilename()}
 
-        jarsList['selenium'] = {'path':      os.path.join(currentFilePath,
-                                                          'indicop',
-                                                          'python',
-                                                          'functional'),
-                                'url':       TestsConfig.getInstance().getSeleniumURL(),
-                                'inZipPath': TestsConfig.getInstance().getSeleniumInZipPath(),
-                                'zipname':   TestsConfig.getInstance().getSeleniumZipname(),
-                                'filename':  TestsConfig.getInstance().getSeleniumFilename()}
+            jarsList['jscoverage'] = {'path':     os.path.join(currentFilePath,
+                                                               'indicop',
+                                                               'javascript',
+                                                               'unit',
+                                                               'plugins'),
+                                      'url':      TestsConfig.getInstance().getJscoverageURL(),
+                                      'filename': TestsConfig.getInstance().getJscoverageFilename()}
+
+            jarsList['selenium'] = {'path':      os.path.join(currentFilePath,
+                                                              'indicop',
+                                                              'python',
+                                                              'functional'),
+                                    'url':       TestsConfig.getInstance().getSeleniumURL(),
+                                    'inZipPath': TestsConfig.getInstance().getSeleniumInZipPath(),
+                                    'zipname':   TestsConfig.getInstance().getSeleniumZipname(),
+                                    'filename':  TestsConfig.getInstance().getSeleniumFilename()}
+        except KeyError, key:
+            print "[ERR] Please specify a value for %s in tests.conf" % key
+            sys.exit(1)
 
         validJars = True
 
