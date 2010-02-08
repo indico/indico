@@ -2034,10 +2034,6 @@ class WPConferenceModifBase( main.WPMainBase ):
     def _createSideMenu(self):
         self._sideMenu = wcomponents.ManagementSideMenu()
 
-        # Section containing the view event page link
-        self._viewSection = wcomponents.SideMenuSection()
-        self._sideMenu.addSection(self._viewSection)
-
         # The main section containing most menu items
         self._generalSection = wcomponents.SideMenuSection()
 

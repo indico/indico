@@ -163,6 +163,7 @@ class WAdmins(wcomponents.WTemplated):
         vars["organisation"] = minfo.getOrganisation()
         vars["supportEmail"] = minfo.getSupportEmail()
         vars["publicSupportEmail"] = minfo.getPublicSupportEmail()
+        vars["noReplyEmail"] = minfo.getNoReplyEmail()
         vars["lang"] = minfo.getLang()
         vars["address"] = ""
         if minfo.getCity() != "":
@@ -261,7 +262,8 @@ class WGeneralInfoModification(wcomponents.WTemplated):
         vars["supportEmail"] = genInfo.getSupportEmail()
         vars["publicSupportEmail"] = genInfo.getPublicSupportEmail()
         vars["city"] = genInfo.getCity()
-        vars["country"] = genInfo.getCountry() 
+        vars["country"] = genInfo.getCountry()
+        vars["noReplyEmail"] = genInfo.getNoReplyEmail()
         try:
             selected_tz = genInfo.getTimezone()
         except:

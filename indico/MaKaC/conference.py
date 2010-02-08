@@ -3139,15 +3139,24 @@ class Conference(Persistent, Fossilizable):
         self.description = desc
         self.notifyModification()
 
-    def getSupportEmail( self ):
-        """Returns the support email address associated with the conference
+    def getSupportEmail( self, returnNoReply=False ):
+        """
+        Returns the support email address associated with the conference
+        :param returnNoReply: Return no-reply address in case there's no support e-mail (default True)
+        :type returnNoReply: bool
+
         """
         try:
             if self._supportEmail:
                 pass
         except AttributeError, e:
             self._supportEmail = ""
-        return self._supportEmail
+        if self._supportEmail.strip() == "" and returnNoReply:
+            # In case there's no conference support e-mail, return the no-reply
+            # address, and the 'global' support e-mail if there isn't one
+            return HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
+        else:
+            return self._supportEmail
 
     def setSupportEmail( self, newSupportEmail ):
         self._supportEmail = newSupportEmail.strip()

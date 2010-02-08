@@ -27,6 +27,7 @@ from MaKaC.webinterface.mail import GenericMailer
 from MaKaC.webinterface.common.baseNotificator import TplVar, Notification
 from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
+from MaKaC.common.info import HelperMaKaCInfo
 
 class ConfTitleTplVar(TplVar):
     _name="conference_title"
@@ -235,5 +236,9 @@ class EmailNotificator(Notificator):
         return Notification(subject=subj,body=b,fromAddr=fa,toList=tl,ccList=cc)
     
     def notify(self,abstract,tpl):
+        #if no from address is specified we should put the default one
+        if tpl.getFromAddr().strip() == "":
+            tpl.setFromAddr(tpl.getConference().getSupportEmail(returnNoReply=True))
+
         sm=GenericMailer.send(self.apply(abstract,tpl))
         

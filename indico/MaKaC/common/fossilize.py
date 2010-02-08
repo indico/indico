@@ -17,7 +17,7 @@ def fossilizes(*classList):
 
 def addFossil(klazz, fossils):
     """ Declares fossils for a class
-    
+
         :param klazz: a class object
         :type klass: class object
         :param fossils: a fossil class (or a list of fossil classes)

@@ -305,11 +305,8 @@ class _AbstractSubmissionNotification:
         return self._abstract.getSubmitter()
 
     def getFromAddr(self):
-        if self._conf.getSupportEmail().strip()!="":
-            return self._conf.getSupportEmail()
-        else:
-            return HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
-            
+        return self._conf.getSupportEmail(returnNoReply=True)
+
     def getCCList(self):
         return self._abstract.getOwner().getSubmissionNotification().getCCList()
 
@@ -397,6 +394,7 @@ class RHAbstractSubmission( RHAbstractSubmissionBase ):
         #if the user is not logged in we return inmediately as this form needs
         #   the user to be logged in and therefore all the checking below is not
         #   necessary
+
         if self._getUser() == None:
             return
         self._action = ""
@@ -478,10 +476,12 @@ class RHAbstractSubmission( RHAbstractSubmissionBase ):
             track = self._conf.getTrackById( trackId )
             a.addTrack( track )
         a.setComments(self._abstractData.comments)
+
+
         #The commit must be forced before sending the confirmation
         DBMgr.getInstance().commit()
         #Email confirmation about the submission
-        mail.Mailer.send( _AbstractSubmissionNotification( a ) )
+        mail.Mailer.send( _AbstractSubmissionNotification( a ), self._conf.getSupportEmail(returnNoReply=True) )
         #Email confirmation about the submission to coordinators
         if cfaMgr.getSubmissionNotification().hasDestination():
             asn=_AbstractSubmissionNotification( a )

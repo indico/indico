@@ -36,6 +36,12 @@
       </td>
     </tr>
     <tr>
+      <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("No reply email")%><br><%= _("(for automatic messages that don't need answer)")%></span></td>
+      <td bgcolor="white" width="100%%">&nbsp;
+        <input type="text" size="50" name="noReplyEmail" value="%(noReplyEmail)s">
+      </td>
+    </tr>
+    <tr>
       <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Language")%></span></td>
       <td bgcolor="white" width="100%%">&nbsp;
 	     <select name="lang">
