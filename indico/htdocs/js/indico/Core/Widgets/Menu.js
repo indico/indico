@@ -47,6 +47,9 @@ type("ChainedPopupWidget", ["PopupWidget"],
          },
 
          postDraw: function () {
+
+             this.PopupWidget.prototype.postDraw.call(this);
+
              if (this.alignRight) {
                  // Hide it to avoid flickering
                  this.canvas.dom.style.visibility = 'hidden';

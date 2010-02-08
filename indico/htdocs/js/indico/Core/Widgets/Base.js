@@ -697,7 +697,9 @@ type("PopupWidget", [], {
     },
 
     postDraw: function() {
-        // to be overloaded
+        if (Browser.IE) {
+            this.canvas.dom.style.display = '';
+        }
     },
 
     openRelative: function(x, y) {
@@ -729,7 +731,9 @@ type("PopupWidget", [], {
          */
         if (Browser.IE) {
             this.canvas.dom.style.display = 'none';
-            setTimeout(function() {$E(document.body).remove(self.canvas);}, 500);
+            setTimeout(function() {
+                $E(document.body).remove(self.canvas);
+            }, 500);
         } else {
             $E(document.body).remove(self.canvas);
         }
