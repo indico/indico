@@ -266,9 +266,6 @@ class Specify(Functional):
     def run(self):
         self.startMessage("Starting Python specified tests")
 
-
-
-
         #if specified path does not contained unit, we are probably dealing
         #with functional tests
         if self.specify.find('unit/') < 0:
