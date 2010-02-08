@@ -54,7 +54,7 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
     """
     All room booking related hanlders are derived from this class.
     This gives them:
-    - several general use methods 
+    - several general use methods
     - login-protection
     - auto connecting/disconnecting from room booking db
     """
@@ -68,7 +68,7 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
         session.setVar( "actionSucceeded", None )
         session.setVar( "deletionFailed", None )
         session.setVar( "formMode", None )
-        
+
         session.setVar( "candDataInSession", None )
         session.setVar( "candDataInParams", None )
         session.setVar( "afterCalPreview", None )
@@ -76,18 +76,18 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
         session.setVar( "showErrors", False )
         session.setVar( "errors", None )
         session.setVar( "thereAreConflicts", None )
-        
+
         session.setVar( "roomID", None )
         session.setVar( "roomLocation", None )
         session.setVar( "resvID", None )
- 
+
     def _checkParamsRepeatingPeriod( self, params ):
         """
         Extracts startDT, endDT and repeatability
         from the form, if present.
-        
-        Assigns these values to self, or Nones if values 
-        are not present. 
+
+        Assigns these values to self, or Nones if values
+        are not present.
         """
         sDay = params.get( "sDay" )
         if sDay and len( sDay.strip() ) > 0:
@@ -120,7 +120,7 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
         eTime = params.get( "eTime" )
         if eTime and len( eTime.strip() ) > 0:
             eTime = eTime.strip()
-        
+
         # process sTime and eTime
         if sTime and eTime:
             t = sTime.split( ':' )
@@ -136,7 +136,7 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
                 repeatability = None
             else:
                 repeatability = int( repeatability.strip() )
-        
+
         self._startDT = None
         self._endDT = None
         self._repeatability = repeatability
@@ -157,8 +157,8 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
             self._today=True
             self._startDT = datetime.today().replace(hour=0,minute=0,second=0)
             self._endDT = self._startDT.replace(hour=23,minute=59,second=59)
-    # Room 
-    
+    # Room
+
     def _saveRoomCandidateToSession( self, c ):
         session = self._websession     # Just an alias
         if self._formMode == FormMode.MODIF:
@@ -170,7 +170,7 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
         session.setVar( "building", c.building )
         session.setVar( "floor", c.floor )
         session.setVar( "roomNr", c.roomNr )
-        
+
         session.setVar( "isActive", c.isActive )
         session.setVar( "isReservable", c.isReservable )
         session.setVar( "resvsNeedConfirmation", c.resvsNeedConfirmation )
@@ -219,11 +219,11 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
 
     def _loadRoomCandidateFromDefaults( self, candRoom ):
         candRoom.isActive = True
-        
+
         candRoom.building = None
         candRoom.floor = ''
         candRoom.roomNr = ''
-        
+
         candRoom.capacity = 20
         candRoom.site = ''
         candRoom.division = None
@@ -231,7 +231,7 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
         candRoom.resvsNeedConfirmation = False
         candRoom.photoId = None
         candRoom.externalId = None
-        
+
         candRoom.telephone = ''      # str
         candRoom.surfaceArea = None
         candRoom.whereIsKey = ''
@@ -240,17 +240,17 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
 
     def _loadRoomCandidateFromSession( self, candRoom ):
         session = self._websession # Just an alias
-        
+
         candRoom.name = session.getVar( "name" )
         candRoom.site = session.getVar( "site" )
         candRoom.building = intd( session.getVar( "building" ) )
         candRoom.floor = session.getVar( "floor" )
         candRoom.roomNr = session.getVar( "roomNr" )
-        
+
         candRoom.isActive = bool( session.getVar( "isActive" ) )
         candRoom.isReservable = bool( session.getVar( "isReservable" ) )
         candRoom.resvsNeedConfirmation = bool( session.getVar( "resvsNeedConfirmation" ) )
-        
+
         candRoom.responsibleId = session.getVar( "responsibleId" )
         candRoom.whereIsKey = session.getVar( "whereIsKey" )
         candRoom.telephone = session.getVar( "telephone" )
@@ -275,17 +275,17 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
         candRoom.building = intd( params.get( "building" ) )
         candRoom.floor = params.get( "floor" )
         candRoom.roomNr = params.get( "roomNr" )
-        
+
         candRoom.isActive = bool( params.get( "isActive" ) ) # Safe
         candRoom.isReservable = bool( params.get( "isReservable" ) ) # Safe
         candRoom.resvsNeedConfirmation = bool( params.get( "resvsNeedConfirmation" ) ) # Safe
-        
+
         candRoom.responsibleId = params.get( "responsibleId" )
         if candRoom.responsibleId == "None":
             candRoom.responsibleId = None
         candRoom.whereIsKey = params.get( "whereIsKey" )
         candRoom.telephone = params.get( "telephone" )
-        
+
         candRoom.capacity = intd( params.get( "capacity" ) )
         candRoom.division = params.get( "division" )
         candRoom.surfaceArea = intd( params.get( "surfaceArea" ) )
@@ -300,7 +300,7 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
                 vcList.append(k[3:])
         candRoom.setEquipment( eqList )
         candRoom.setAvailableVC(vcList)
-        
+
         for k, v in params.iteritems():
             if k.startswith( "cattr_" ):
                 attrName = k[6:len(k)]
@@ -323,14 +323,14 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
         session.setVar( "reason", c.reason )
         session.setVar( "usesAVC", c.usesAVC )
         session.setVar( "needsAVCSupport", c.needsAVCSupport )
-        
+
         if hasattr(self, '_skipConflicting'):
             if self._skipConflicting:
                 skip = 'on'
             else:
                 skip = 'off'
             session.setVar( "skipConflicting", skip )
-        
+
         if hasattr(c, "useVC"):
             session.setVar( "useVC",  c.useVC)
 
@@ -351,7 +351,7 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
                 else:
                     self._thereAreConflicts = True
                     errors.append( "There are conflicts with other bookings" )
-        
+
         return errors
 
     def _loadResvCandidateFromSession( self, candResv, params ):
@@ -388,7 +388,7 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
         useVC = session.getVar('useVC')
         if useVC is not None:
             candResv.useVC = useVC
-        
+
         return candResv
 
     def _loadResvCandidateFromParams( self, candResv, params ):
@@ -494,7 +494,7 @@ class RHRoomBookingAdminBase( RHRoomBookingBase ):
 
 class RHRoomBookingWelcome( RHRoomBookingBase ):
     _uh = urlHandlers.UHRoomBookingWelcome
-    
+
     def _process( self ):
         #if self._getUser().isResponsibleForRooms():
         #    self._redirect( urlHandlers.UHRoomBookingBookingList.getURL( ofMyRooms = True, autoCriteria = True ) )
@@ -518,15 +518,15 @@ class RHRoomBookingSearch4Rooms( RHRoomBookingBase ):
 
     def _setGeneralDefaultsInSession( self ):
         now = datetime.now()
-        
+
         # if it's saturday or sunday, postpone for monday as a default
         if now.weekday() in [5,6]:
             now = now + timedelta( 7 - now.weekday() )
-            
+
         websession = self._websession
         websession.setVar( "defaultStartDT", datetime( now.year, now.month, now.day, 8, 30 ) )
         websession.setVar( "defaultEndDT", datetime( now.year, now.month, now.day, 17, 30 ) )
-        
+
     def _checkParams( self, params ):
         self._cleanDefaultsFromSession()
         self._setGeneralDefaultsInSession()
@@ -539,7 +539,7 @@ class RHRoomBookingSearch4Rooms( RHRoomBookingBase ):
         self._rooms = CrossLocationQueries.getRooms( allFast = True )
         self._rooms.sort()
         self._equipment = CrossLocationQueries.getPossibleEquipment()
-    
+
     def _process( self ):
         self._businessLogic()
         p = roomBooking_wp.WPRoomBookingSearch4Rooms( self, self._forNewBooking )
@@ -550,16 +550,16 @@ class RHRoomBookingSearch4Bookings( RHRoomBookingBase ):
     def _businessLogic( self ):
         self._rooms = CrossLocationQueries.getRooms( allFast = True )
         self._rooms.sort()
-    
+
     def _process( self ):
         self._businessLogic()
         p = roomBooking_wp.WPRoomBookingSearch4Bookings( self )
         return p.display()
 
 class RHRoomBookingSearch4Users( RHRoomBookingBase ):
-    
+
     def _checkParams( self, params ):
-        
+
         roomID = params.get( "roomID" )
         roomLocation = params.get( "roomLocation" )
         candRoom = None
@@ -577,7 +577,7 @@ class RHRoomBookingSearch4Users( RHRoomBookingBase ):
         # Set session
         self._websession.setVar( "showErrors", False )
         self._websession.setVar( "candDataInSession", True )
-    
+
         if params.has_key( 'largePhotoPath' ): del params['largePhotoPath']
         if params.has_key( 'smallPhotoPath' ): del params['smallPhotoPath']
 
@@ -592,7 +592,7 @@ class RHRoomBookingSearch4Users( RHRoomBookingBase ):
 # 2. List of ...
 
 class RHRoomBookingRoomList( RHRoomBookingBase ):
-    
+
     def _checkParams( self, params ):
 
         self._roomLocation = None
@@ -606,11 +606,11 @@ class RHRoomBookingRoomList( RHRoomBookingBase ):
             self._freeSearch = ""
             for c in s:
                 if c != ',': self._freeSearch += c
-        
+
         self._capacity = None
         if params.get("capacity") and len( params["capacity"].strip() ) > 0:
             self._capacity = int( params["capacity"].strip() )
-        
+
         self._availability = "Don't care"
         if params.get("availability") and len( params["availability"].strip() ) > 0:
             self._availability = params["availability"].strip()
@@ -620,19 +620,19 @@ class RHRoomBookingRoomList( RHRoomBookingBase ):
 
         self._includePrebookings = False
         if params.get( 'includePrebookings' ) == "on": self._includePrebookings = True
-        
+
         # The end of "avail/don't care"
-        
+
         # Equipment
         self._equipment = []
         for k, v in params.iteritems():
             if k[0:4] == "equ_" and v == "on":
                 self._equipment.append( k[4:100] )
-                
+
         # Special
         self._isReservable = self._ownedBy = self._isAutoConfirmed = None
         self._isActive = True
-        
+
         if params.get( 'isReservable' ) == "on": self._isReservable = True
         if params.get( 'isAutoConfirmed' ) == "on": self._isAutoConfirmed = True
 
@@ -646,7 +646,7 @@ class RHRoomBookingRoomList( RHRoomBookingBase ):
         if self._onlyMy: # Can't be done in checkParams since it must be after checkProtection
             self._title = "My rooms"
             self._ownedBy = self._getUser()
-        
+
         r = RoomBase()
         r.capacity = self._capacity
         r.isActive = self._isActive
@@ -670,7 +670,7 @@ class RHRoomBookingRoomList( RHRoomBookingBase ):
             p.repeatability = self._repeatability
             if self._includePrebookings:
                 p.isConfirmed = None   # because it defaults to True
-            
+
             # Set default values for later booking form
             self._websession.setVar( "defaultStartDT", p.startDT )
             self._websession.setVar( "defaultEndDT", p.endDT )
@@ -680,26 +680,26 @@ class RHRoomBookingRoomList( RHRoomBookingBase ):
 
             rooms = CrossLocationQueries.getRooms( \
                 location = self._roomLocation,
-                freeText = self._freeSearch, 
-                ownedBy = self._ownedBy, 
-                roomExample = r, 
-                resvExample = p, 
+                freeText = self._freeSearch,
+                ownedBy = self._ownedBy,
+                roomExample = r,
+                resvExample = p,
                 available = available )
             # Special care for capacity (20% => greater than)
             if len ( rooms ) == 0:
                 rooms = CrossLocationQueries.getRooms( \
-                    location = self._roomLocation, 
-                    freeText = self._freeSearch, 
-                    ownedBy = self._ownedBy, 
-                    roomExample = r, 
-                    resvExample = p, 
+                    location = self._roomLocation,
+                    freeText = self._freeSearch,
+                    ownedBy = self._ownedBy,
+                    roomExample = r,
+                    resvExample = p,
                     available = available,
                     minCapacity = True )
 
         rooms.sort()
 
         self._rooms = rooms
-    
+
     def _process( self ):
         self._businessLogic()
         p = roomBooking_wp.WPRoomBookingRoomList( self, self._onlyMy )
@@ -711,7 +711,7 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
         self._roomGUIDs = []
         self._allRooms = False
         roomGUIDs = params.get( "roomGUID" )
-        if isinstance( roomGUIDs, str ): 
+        if isinstance( roomGUIDs, str ):
             if roomGUIDs == "allRooms":
                 self._allRooms = True
                 roomGUIDs = [ str(room.guid) for room in CrossLocationQueries.getRooms( allFast = True )]
@@ -719,7 +719,7 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
                 roomGUIDs = [roomGUIDs.strip()]
         if isinstance( roomGUIDs, list )  and  roomGUIDs != ['']:
             self._roomGUIDs = roomGUIDs
-            
+
         resvEx = ReservationBase()
         self._checkParamsRepeatingPeriod( params )
         resvEx.startDT = self._startDT
@@ -731,13 +731,13 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
         if reason and len( reason.strip() ) > 0:
             resvEx.reason = reason.strip()
         self._title = "Bookings"
-        
-        onlyPrebookings = params.get( "onlyPrebookings" )        
+
+        onlyPrebookings = params.get( "onlyPrebookings" )
         self._onlyPrebookings = False
-        
-        onlyBookings = params.get( "onlyBookings" )        
+
+        onlyBookings = params.get( "onlyBookings" )
         self._onlyBookings = False
-        
+
         if onlyPrebookings and len( onlyPrebookings.strip() ) > 0:
             if onlyPrebookings == 'on':
                 resvEx.isConfirmed = False
@@ -745,12 +745,12 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
                 self._onlyPrebookings = True
         elif onlyBookings and len( onlyBookings.strip() ) > 0:
             if onlyBookings == 'on':
-                resvEx.isConfirmed = True            
+                resvEx.isConfirmed = True
                 self._onlyBookings = True
         else:
             # find pre-bookings as well
             resvEx.isConfirmed = None
-            
+
         self._onlyMy = False
         onlyMy = params.get( "onlyMy" )
         if onlyMy and len( onlyMy.strip() ) > 0:
@@ -767,27 +767,27 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
                 self._title = self._title + " for your rooms"
         else:
             self._rooms = None
-        
+
         self._search = False
         search = params.get( "search" )
         if search and len( search.strip() ) > 0:
             if search == 'on':
                 self._search = True
                 self._title = "Search " + self._title
-        
+
         self._order = params.get( "order", "" )
-        
+
         isArchival = params.get( "isArchival" )
         if isArchival and len( isArchival.strip() ) > 0:
             self._isArchival = True
         else:
             self._isArchival = None
-        
+
         self._autoCriteria = False
         if params.get( "autoCriteria" ) == "True" or not resvEx.startDT:
             now = datetime.now()
             after = now + timedelta( 30 ) # 1 month later
-            
+
             resvEx.startDT = datetime( now.year, now.month, now.day, 0, 0, 0 )
             resvEx.endDT = datetime( after.year, after.month, after.day, 23, 59, 00 )
             self._autoCriteria = True
@@ -804,7 +804,7 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
         else:
             resvEx.isCancelled = False
 
-        
+
         needsAVCSupport = params.get( "needsAVCSupport" )
         if needsAVCSupport and len( needsAVCSupport.strip() ) > 0:
             resvEx.needsAVCSupport = needsAVCSupport == 'on'
@@ -836,7 +836,7 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
 
     def _process( self ):
         # The following can't be done in checkParams since it must be after checkProtection
-        if self._onlyMy: 
+        if self._onlyMy:
             self._resvEx.createdBy = str( self._getUser().id )
         if self._ofMyRooms:
             self._rooms = self._getUser().getRooms()
@@ -853,7 +853,7 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
                 self._rooms.extend( rooms )
             else:
                 self._rooms = rooms
-        
+
         # Init
         resvEx = self._resvEx
 
@@ -875,30 +875,30 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
         if not self._overload:
             self._resvs = CrossLocationQueries.getReservations( resvExample = resvEx, rooms = self._rooms, archival = self._isArchival, heavy = self._isHeavy, days = days )
 
-        
+
         p = roomBooking_wp.WPRoomBookingBookingList( self )
         return p.display()
 
 
 # 3. Details of ...
 
-class RHRoomBookingRoomDetails( RHRoomBookingBase ): 
-    
+class RHRoomBookingRoomDetails( RHRoomBookingBase ):
+
     def _checkParams( self, params ):
         locator = locators.WebLocator()
         locator.setRoom( params )
         self._room = self._target = locator.getObject()
-        
+
         session = self._websession
         self._afterActionSucceeded = session.getVar( "actionSucceeded" )
         self._afterDeletionFailed = session.getVar( "deletionFailed" )
         self._formMode = session.getVar( "formMode" )
-        
+
         self._searchingStartDT = self._searchingEndDT = None
         if not params.get( 'calendarMonths' ):
             self._searchingStartDT = session.getVar( "defaultStartDT" )
             self._searchingEndDT = session.getVar( "defaultEndDT" )
-        
+
         self._clearSessionState()
 
     def _businessLogic( self ):
@@ -909,20 +909,20 @@ class RHRoomBookingRoomDetails( RHRoomBookingBase ):
         p = roomBooking_wp.WPRoomBookingRoomDetails( self )
         return p.display()
 
-class RHRoomBookingRoomStats( RHRoomBookingBase ): 
-    
+class RHRoomBookingRoomStats( RHRoomBookingBase ):
+
     def _checkParams( self, params ):
         locator = locators.WebLocator()
         locator.setRoom( params )
         self._period = params.get("period","pastmonth")
-        self._room = self._target = locator.getObject()    
+        self._room = self._target = locator.getObject()
 
     def _businessLogic( self ):
         self._kpiAverageOccupation = self._room.getMyAverageOccupation(self._period)
         self._kpiActiveRooms = RoomBase.getNumberOfActiveRooms()
         self._kpiReservableRooms = RoomBase.getNumberOfReservableRooms()
         self._kpiReservableCapacity, self._kpiReservableSurface = RoomBase.getTotalSurfaceAndCapacity()
-        # Bookings    
+        # Bookings
         st = ReservationBase.getRoomReservationStats(self._room)
         self._booking_stats = st
         self._totalBookings = st['liveValid'] + st['liveCancelled'] + st['liveRejected'] + st['archivalValid'] + st['archivalCancelled'] + st['archivalRejected']
@@ -932,10 +932,10 @@ class RHRoomBookingRoomStats( RHRoomBookingBase ):
         p = roomBooking_wp.WPRoomBookingRoomStats( self )
         return p.display()
 
-class RHRoomBookingBookingDetails( RHRoomBookingBase ): 
+class RHRoomBookingBookingDetails( RHRoomBookingBase ):
 
     def _checkParams( self, params ):
-        
+
         locator = locators.WebLocator()
         locator.setRoomBooking( params )
         self._resv = self._target = locator.getObject()
@@ -958,12 +958,12 @@ class RHRoomBookingBookingDetails( RHRoomBookingBase ):
 # 4. New
 
 class RHRoomBookingBookingForm( RHRoomBookingBase ):
-    
+
     def _checkParams( self, params ):
         session = self._websession  # Just an alias
         self._thereAreConflicts = session.getVar( 'thereAreConflicts' )
         self._skipConflicting = False
-        
+
         # DATA FROM?
         self._dataFrom = CandidateDataFrom.DEFAULTS
         if params.get( "candDataInParams" ) or params.get( "afterCalPreview" ):
@@ -1005,7 +1005,7 @@ class RHRoomBookingBookingForm( RHRoomBookingBase ):
                 candResv = self._loadResvCandidateFromParams( None, params )
             else:
                 candResv = self._loadResvCandidateFromDefaults( params )
-        
+
         if self._formMode == FormMode.MODIF:
             import copy
             candResv = copy.copy(CrossLocationQueries.getReservations( resvID = resvID, location = roomLocation ))
@@ -1013,10 +1013,10 @@ class RHRoomBookingBookingForm( RHRoomBookingBase ):
                 self._loadResvCandidateFromParams( candResv, params )
             if self._dataFrom == CandidateDataFrom.SESSION:
                 self._loadResvCandidateFromSession( candResv, params )
-            
+
         self._errors = session.getVar( "errors" )
         self._candResv = candResv
-        
+
         self._clearSessionState()
 
 
@@ -1049,7 +1049,7 @@ class RHRoomBookingCloneBooking( RHRoomBookingBase ):
     """
     Performs open a new booking form with the data of an already existing booking.
     """
-    
+
     def _checkParams( self, params ):
         session = self._websession  # Just an alias
 
@@ -1057,7 +1057,7 @@ class RHRoomBookingCloneBooking( RHRoomBookingBase ):
         session.setVar( "candDataInSession", True )
 
         self._formMode = FormMode.NEW
-        
+
         # Reservation ID
         resvID = int(params.get( "resvID" ))
 
@@ -1078,9 +1078,9 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
     Performs physical INSERT or UPDATE.
     When succeeded redirects to booking details, otherwise returns to booking form.
     """
-    
+
     def _checkParams( self, params ):
-        
+
         resvID = params.get( "resvID" )
         roomLocation = params.get( "roomLocation" )
         self._answer = params.get( "answer", None )
@@ -1089,7 +1089,7 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
         # forceAddition is set by the confirmation dialog, so that
         # prebookings that conflict with other prebookings are
         # silently added
-        
+
         self._forceAddition = params.get("forceAddition","False")
         if self._forceAddition == 'True':
             self._forceAddition = True
@@ -1102,18 +1102,18 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
             resvID = int( resvID )
             _candResv = CrossLocationQueries.getReservations( resvID = resvID, location = roomLocation )
             self._orig_candResv = _candResv
-            
+
             import copy
             candResv = copy.copy(_candResv)
-            
+
             if self._forceAddition:
                 # booking data comes from session if confirmation was required
                 self._loadResvCandidateFromSession( candResv, params )
             else:
                 self._loadResvCandidateFromParams( candResv, params )
-                
+
             self._resvID = resvID
-            
+
         else:
             self._formMode = FormMode.NEW
             candResv = Location.parse( roomLocation ).factory.newReservation()
@@ -1121,70 +1121,70 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
             candResv.createdBy = str( self._getUser().id )
             candResv.isRejected = False
             candResv.isCancelled = False
-        
+
             if self._forceAddition:
                 # booking data comes from session if confirmation was required
                 self._loadResvCandidateFromSession( candResv, params )
             else:
                 self._loadResvCandidateFromParams( candResv, params )
-                
+
             self._resvID = None
-            
-        
-        self._candResv = candResv                 
-        
+
+
+        self._candResv = candResv
+
         self._params = params
         self._clearSessionState()
-    
-    
+
+
     def _checkProtection( self ):
         RHRoomBookingBase._checkProtection(self)
 
         if not self._candResv.room.isActive and not self._getUser().isAdmin():
             raise MaKaCError( "You are not authorized to book this room." )
-        
+
         if self._formMode == FormMode.MODIF:
             if not self._candResv.canModify( self.getAW() ):
                 raise MaKaCError( "You are not authorized to take this action." )
 
     def _businessLogic( self ):
-        
+
         candResv = self._candResv
         self._emailsToBeSent = []
         self._confirmAdditionFirst = False;
-                
+
         # Set confirmation status
         candResv.isConfirmed = True
         user = self._getUser()
         if not candResv.room.canBook( user ):
             candResv.isConfirmed = False
 
-        
-        errors = self._getErrorsOfResvCandidate( candResv )        
-        session = self._websession        
-        
+
+        errors = self._getErrorsOfResvCandidate( candResv )
+        session = self._websession
+
         if not errors and self._answer != 'No':
-        
-            # If we're dealing with an unapproved pre-booking            
-            if not candResv.isConfirmed and not self._forceAddition:                
-                
+
+            # If we're dealing with an unapproved pre-booking
+            if not candResv.isConfirmed and not self._forceAddition:
+
                 candResv.isConfirmed = None;
                 # find pre-booking collisions
                 self._collisions = candResv.getCollisions(sansID = candResv.id)
-                
+
                 candResv.isConfirmed = False
-                
+
                 # are there any collisions?
                 if len( self._collisions ) > 0:
                     # save the reservation to the session
                     self._saveResvCandidateToSession( candResv )
                     # ask for confirmation about the pre-booking
-                    self._confirmAdditionFirst = True                    
-                        
+                    self._confirmAdditionFirst = True
+
 
             # approved pre-booking or booking
             if not self._confirmAdditionFirst:
-                                            
+
                 # Form is OK and (no conflicts or skip conflicts)
                 if self._formMode == FormMode.NEW:
                     candResv.insert()
@@ -1199,42 +1199,42 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
                     if self._forceAddition:
                         self._loadResvCandidateFromSession( self._orig_candResv, self._params )
                     else:
-                        self._loadResvCandidateFromParams( self._orig_candResv, self._params )                    
+                        self._loadResvCandidateFromParams( self._orig_candResv, self._params )
                     self._orig_candResv.update()
                     self._emailsToBeSent += self._orig_candResv.notifyAboutUpdate()
                     session.setVar( "title", 'Booking updated.' )
                     session.setVar( "description", 'Please review details below.' )
                 session.setVar( "actionSucceeded", True )
-                            
-                                
-        else:            
+
+
+        else:
             session.setVar( "candDataInSession", True )
             session.setVar( "errors", errors )
-            
+
             if self._answer == 'No':
-                session.setVar( "actionSucceeded", True )                
+                session.setVar( "actionSucceeded", True )
             else:
                 session.setVar( "actionSucceeded", False )
                 session.setVar( "showErrors", True )
                 session.setVar( "thereAreConflicts", self._thereAreConflicts )
-            
+
             self._saveResvCandidateToSession( candResv )
 
         # Form is not properly filled OR there are conflicts
-        self._errors = errors        
-    
-    def _process( self ): 
+        self._errors = errors
+
+    def _process( self ):
 
         self._businessLogic()
-            
+
         if self._errors or self._answer == 'No':
-            url = urlHandlers.UHRoomBookingBookingForm.getURL( self._candResv.room, resvID=self._resvID )            
+            url = urlHandlers.UHRoomBookingBookingForm.getURL( self._candResv.room, resvID=self._resvID )
         elif self._confirmAdditionFirst:
             p = roomBooking_wp.WPRoomBookingConfirmBooking( self )
             return p.display()
         else:
             url = urlHandlers.UHRoomBookingBookingDetails.getURL( self._candResv )
-            
+
         self._redirect( url )
 
 
@@ -1242,7 +1242,7 @@ class RHRoomBookingRoomForm( RHRoomBookingAdminBase ):
     """
     Form for creating NEW and MODIFICATION of an existing room.
     """
-    
+
     def _checkParams( self, params ):
         session = self._websession  # Just an alias
 
@@ -1274,7 +1274,7 @@ class RHRoomBookingRoomForm( RHRoomBookingAdminBase ):
         self._showErrors = self._websession.getVar( "showErrors" )
         if self._showErrors:
             self._errors = self._websession.getVar( "errors" )
-        
+
         # CREATE CANDIDATE OBJECT
         candRoom = None
 
@@ -1290,15 +1290,15 @@ class RHRoomBookingRoomForm( RHRoomBookingAdminBase ):
                 self._loadRoomCandidateFromSession( candRoom )
             else:
                 self._loadRoomCandidateFromDefaults( candRoom )
-        
+
         if self._formMode == FormMode.MODIF:
             candRoom = CrossLocationQueries.getRooms( roomID = roomID, location = roomLocation )
-            
+
             if self._dataFrom == CandidateDataFrom.PARAMS:
                 self._loadRoomCandidateFromParams( candRoom, params )
             if self._dataFrom == CandidateDataFrom.SESSION:
                 self._loadRoomCandidateFromSession( candRoom )
-            
+
         self._errors = session.getVar( "errors" )
 
         # After searching for responsible
@@ -1409,13 +1409,13 @@ class RHRoomBookingDeleteRoom( RHRoomBookingAdminBase ):
             self._redirect( url ) # Redirect to room DETAILS
 
 class RHRoomBookingDeleteBooking( RHRoomBookingAdminBase ):
-    
+
     def _checkParams( self , params ):
         resvID = int( params.get( "resvID" ) )
         roomLocation = params.get( "roomLocation" )
         self._resv = CrossLocationQueries.getReservations( resvID = resvID, location = roomLocation )
         self._target = self._resv
-        
+
     def _process( self ):
         # Booking deletion is always possible - just delete
         self._resv.remove()
@@ -1425,13 +1425,13 @@ class RHRoomBookingDeleteBooking( RHRoomBookingAdminBase ):
         self._redirect( url ) # Redirect to deletion confirmation
 
 class RHRoomBookingCancelBooking( RHRoomBookingBase ):
-    
+
     def _checkParams( self , params ):
         resvID = int( params.get( "resvID" ) )
         roomLocation = params.get( "roomLocation" )
         self._resv = CrossLocationQueries.getReservations( resvID = resvID, location = roomLocation )
         self._target = self._resv
-    
+
     def _checkProtection( self ):
         RHRoomBookingBase._checkProtection(self)
         user = self._getUser()
@@ -1440,14 +1440,14 @@ class RHRoomBookingCancelBooking( RHRoomBookingBase ):
         if ( not self._resv.isOwnedBy( user ) ) and \
             ( not self._getUser().isAdmin() ):
                 raise MaKaCError( "You are not authorized to take this action." )
-    
+
     def _process( self ):
         # Booking deletion is always possible - just delete
         self._emailsToBeSent = []
         self._resv.cancel()    # Just sets isCancel = True
-        self._resv.update()
+        self._resv.update(udpateReservationIndex=False)
         self._emailsToBeSent += self._resv.notifyAboutCancellation()
-        
+
         self._websession.setVar( 'actionSucceeded', True )
         self._websession.setVar( 'title', "Booking has been cancelled." )
         self._websession.setVar( 'description', "You have successfully cancelled the booking." )
@@ -1456,12 +1456,12 @@ class RHRoomBookingCancelBooking( RHRoomBookingBase ):
 
 
 class RHRoomBookingCancelBookingOccurrence( RHRoomBookingBase ):
-    
+
     def _checkParams( self , params ):
         resvID = int( params.get( "resvID" ) )
         roomLocation = params.get( "roomLocation" )
         date = params.get( "date" )
-        
+
         self._resv = CrossLocationQueries.getReservations( resvID = resvID, location = roomLocation )
         self._date = parse_date( date )
         self._target = self._resv
@@ -1473,13 +1473,13 @@ class RHRoomBookingCancelBookingOccurrence( RHRoomBookingBase ):
         # (Owner can not reject his own booking, he should cancel instead)
         if self._resv.createdBy != user.getId() and (not user.isAdmin()):
                 raise MaKaCError( "You are not authorized to take this action." )
-    
+
     def _process( self ):
         self._emailsToBeSent = []
-        self._resv.excludeDay( self._date )
-        self._resv.update()
+        self._resv.excludeDay( self._date, unindex=True )
+        self._resv.update(udpateReservationIndex=False)
         self._emailsToBeSent += self._resv.notifyAboutCancellation( date = self._date )
-        
+
         self._websession.setVar( 'actionSucceeded', True )
         self._websession.setVar( 'title', "Selected occurrence has been cancelled." )
         self._websession.setVar( 'description', "YOu have successfully cancelled an occurrence of this booking." )
@@ -1488,12 +1488,12 @@ class RHRoomBookingCancelBookingOccurrence( RHRoomBookingBase ):
 
 
 class RHRoomBookingRejectBooking( RHRoomBookingBase ):
-    
+
     def _checkParams( self , params ):
         resvID = int( params.get( "resvID" ) )
         roomLocation = params.get( "roomLocation" )
         reason = params.get( "reason" )
-        
+
         self._resv = CrossLocationQueries.getReservations( resvID = resvID, location = roomLocation )
         self._resv.rejectionReason = reason
         self._target = self._resv
@@ -1506,13 +1506,13 @@ class RHRoomBookingRejectBooking( RHRoomBookingBase ):
         if ( not self._resv.room.isOwnedBy( user ) ) and \
             ( not self._getUser().isAdmin() ):
                 raise MaKaCError( "You are not authorized to take this action." )
-    
+
     def _process( self ):
         self._emailsToBeSent = []
         self._resv.reject()    # Just sets isRejected = True
-        self._resv.update()
+        self._resv.update(udpateReservationIndex=False)
         self._emailsToBeSent += self._resv.notifyAboutRejection()
-        
+
         self._websession.setVar( 'actionSucceeded', True )
         self._websession.setVar( 'title', "Booking has been rejected." )
         self._websession.setVar( 'description', "NOTE: rejection e-mail has been sent to the user. However, it's advisable to <strong>inform</strong> the user directly. Note that users often don't read e-mails." )
@@ -1521,7 +1521,7 @@ class RHRoomBookingRejectBooking( RHRoomBookingBase ):
 
 
 class RHRoomBookingRejectALlConflicting( RHRoomBookingBase ):
-    
+
 #    def _checkParams( self , params ):
 #        pass
 
@@ -1533,7 +1533,7 @@ class RHRoomBookingRejectALlConflicting( RHRoomBookingBase ):
         if ( not user.getRooms() ) and \
             ( not self._getUser().isAdmin() ):
                 raise MaKaCError( "You are not authorized to take this action." )
-    
+
     def _process( self ):
         userRooms = self._getUser().getRooms()
         self._emailsToBeSent = []
@@ -1542,7 +1542,7 @@ class RHRoomBookingRejectALlConflicting( RHRoomBookingBase ):
         resvEx.isConfirmed = False
         resvEx.isRejected = False
         resvEx.isCancelled = False
-        
+
         resvs = CrossLocationQueries.getReservations( resvExample = resvEx, rooms = userRooms )
 
         counter = 0
@@ -1564,7 +1564,7 @@ class RHRoomBookingRejectALlConflicting( RHRoomBookingBase ):
         self._redirect( url ) # Redirect to booking details
 
 class RHRoomBookingAcceptBooking( RHRoomBookingBase ):
-    
+
     def _checkParams( self , params ):
         resvID = int( params.get( "resvID" ) )
         roomLocation = params.get( "roomLocation" )
@@ -1578,7 +1578,7 @@ class RHRoomBookingAcceptBooking( RHRoomBookingBase ):
         if ( not self._resv.room.isOwnedBy( user ) ) and \
             ( not self._getUser().isAdmin() ):
                 raise MaKaCError( "You are not authorized to take this action." )
-    
+
     def _process( self ):
         self._emailsToBeSent = []
         session = self._websession
@@ -1587,7 +1587,7 @@ class RHRoomBookingAcceptBooking( RHRoomBookingBase ):
             self._resv.isConfirmed = True
             self._resv.update(False)
             self._emailsToBeSent += self._resv.notifyAboutConfirmation()
-            
+
             session.setVar( 'actionSucceeded', True )
             session.setVar( 'title', "Booking has been accepted." )
             session.setVar( 'description', "NOTE: confirmation e-mail has been sent to the user." )
@@ -1603,7 +1603,7 @@ class RHRoomBookingAcceptBooking( RHRoomBookingBase ):
 
             session.setVar( 'title', "PRE-Booking conflicts with other (confirmed) bookings." )
             session.setVar( 'description', "" )
-            
+
             self._formMode = FormMode.MODIF
             self._saveResvCandidateToSession( self._resv )
             url = urlHandlers.UHRoomBookingBookingForm.getURL( self._resv.room )
@@ -1618,17 +1618,17 @@ class RHRoomBookingStatement( RHRoomBookingBase ):
         self._description = session.getVar( 'description' )
         session.setVar( 'title', None )
         session.setVar( 'description', None )
-    
+
     def _process( self ):
         return roomBooking_wp.WPRoomBookingStatement( self ).display()
 
 class RHRoomBookingAdmin( RHRoomBookingAdminBase ):
-    
+
     def _process( self ):
         return admins.WPRoomBookingAdmin( self ).display()
 
 class RHRoomBookingAdminLocation( RHRoomBookingAdminBase ):
-    
+
     def _checkParams( self, params ):
         self._withKPI = False
         if params.get( 'withKPI' ) == 'True':
@@ -1642,22 +1642,22 @@ class RHRoomBookingAdminLocation( RHRoomBookingAdminBase ):
             self._actionSucceeded = True
         else:
             self._actionSucceeded = False
-    
+
     def _process( self ):
-        
+
         if self._withKPI:
             self._kpiAverageOccupation = RoomBase.getAverageOccupation(location=self._location.friendlyName)
             self._kpiTotalRooms = RoomBase.getNumberOfRooms(location=self._location.friendlyName)
             self._kpiActiveRooms = RoomBase.getNumberOfActiveRooms(location=self._location.friendlyName)
             self._kpiReservableRooms = RoomBase.getNumberOfReservableRooms(location=self._location.friendlyName)
             self._kpiReservableCapacity, self._kpiReservableSurface = RoomBase.getTotalSurfaceAndCapacity(location=self._location.friendlyName)
-            
+
             # Bookings
-            
+
             st = ReservationBase.getReservationStats(location=self._location.friendlyName)
             self._booking_stats = st
             self._totalBookings = st['liveValid'] + st['liveCancelled'] + st['liveRejected'] + st['archivalValid'] + st['archivalCancelled'] + st['archivalRejected']
-        
+
         return admins.WPRoomBookingAdminLocation( self, self._location, actionSucceeded = self._actionSucceeded ).display()
 
 
@@ -1665,7 +1665,7 @@ class RHRoomBookingSetDefaultLocation( RHRoomBookingAdminBase ):
 
     def _checkParams( self , params ):
         self._defaultLocation = params["defaultLocation"]
-    
+
     def _process( self ):
         Location.setDefaultLocation( self._defaultLocation )
         url = urlHandlers.UHRoomBookingAdmin.getURL()
@@ -1683,7 +1683,7 @@ class RHRoomBookingSaveLocation( RHRoomBookingAdminBase ):
                 self._pluginClass = plug.roombooking.getRBClass()
         if self._pluginClass == None:
             raise MaKaCError( "%s: Cannot find requested plugin" % name )
-    
+
     def _process( self ):
         if self._locationName:
             location = Location( self._locationName, self._pluginClass )
@@ -1696,9 +1696,9 @@ class RHRoomBookingDeleteLocation( RHRoomBookingAdminBase ):
 
     def _checkParams( self , params ):
         self._locationName = params["removeLocationName"]
-    
+
     def _process( self ):
-        
+
         if self._locationName:
             Location.removeLocation( self._locationName )
         url = urlHandlers.UHRoomBookingAdmin.getURL()
@@ -1712,7 +1712,7 @@ class RHRoomBookingSaveEquipment( RHRoomBookingAdminBase ):
         self._location = Location.parse(name)
         if str(self._location) == "None":
             raise MaKaCError( "%s: Unknown Location" % name )
-        
+
     def _process( self ):
         if self._eq:
             self._location.factory.getEquipmentManager().insertEquipment( self._eq, location=self._location.friendlyName )
@@ -1727,7 +1727,7 @@ class RHRoomBookingDeleteEquipment( RHRoomBookingAdminBase ):
         self._location = Location.parse(name)
         if str(self._location) == "None":
             raise MaKaCError( "%s: Unknown Location" % name )
-    
+
     def _process( self ):
         self._location.factory.getEquipmentManager().removeEquipment( self._eq, location=self._location.friendlyName )
         url = urlHandlers.UHRoomBookingAdminLocation.getURL(self._location)
@@ -1740,11 +1740,11 @@ class RHRoomBookingSaveCustomAttribute( RHRoomBookingAdminBase ): # + additional
         self._location = Location.parse(name)
         if str(self._location) == "None":
             raise MaKaCError( "%s: Unknown Location" % name )
-        
+
         self._newAttr = None
         if params.get( "newCustomAttributeName" ):
             attrName = params["newCustomAttributeName"].strip()
-            if attrName: 
+            if attrName:
                 attrIsReq = False
                 if params.get( "newCustomAttributeIsRequired" ) == "on":
                     attrIsReq = True
@@ -1756,7 +1756,7 @@ class RHRoomBookingSaveCustomAttribute( RHRoomBookingAdminBase ): # + additional
                     'type': 'str',
                     'required': attrIsReq,
                     'hidden': attrIsHidden }
-        
+
         # Set "required" for _all_ custom attributes
         manager = self._location.factory.getCustomAttributesManager()
         for ca in manager.getAttributes(location=self._location.friendlyName):
@@ -1773,7 +1773,7 @@ class RHRoomBookingSaveCustomAttribute( RHRoomBookingAdminBase ): # + additional
                         hidden = True
             manager.setRequired( ca['name'], required, location=self._location.friendlyName )
             manager.setHidden( ca['name'], hidden, location=self._location.friendlyName )
-    
+
     def _process( self ):
         if self._newAttr:
             self._location.factory.getCustomAttributesManager().insertAttribute( self._newAttr, location=self._location.friendlyName )
@@ -1788,7 +1788,7 @@ class RHRoomBookingDeleteCustomAttribute( RHRoomBookingAdminBase ):  # + additio
         self._location = Location.parse(name)
         if str(self._location) == "None":
             raise MaKaCError( "%s: Unknown Location" % name )
-    
+
     def _process( self ):
         self._location.factory.getCustomAttributesManager().removeAttribute( self._attr, location=self._location.friendlyName )
         url = urlHandlers.UHRoomBookingAdminLocation.getURL(self._location)
@@ -1815,63 +1815,63 @@ class RHRoomBookingSendRoomPhoto( RHRoomBookingBase ):
 from MaKaC.common.utils import isWeekend
 
 class RHRoomBookingGetDateWarning( RHRoomBookingBase ):
-    
+
     def _checkParams( self, params ):
         try:
             self._checkParamsRepeatingPeriod( params )
         except:
             pass
-    
+
     def addRandom( self, s ):
         return s
         #import random
         #return str( int( random.random() * 1000 ) ) + " | " + s
-    
+
     def _process( self ):
         if not self._startDT or not self._endDT:
             return self.addRandom( " " )
-        
+
         if  HolidaysHolder.isWorkingDay( self._startDT ) and \
             HolidaysHolder.isWorkingDay( self._endDT ):
             return self.addRandom( " " )
-        
+
         if isWeekend( self._startDT ) or isWeekend( self._endDT ):
             return self.addRandom( "Warning: weekend chosen" )
-            
+
         return self.addRandom( "Warning: holidays chosen" )
 
 
 class RHRoomBookingGetRoomSelectList( RHRoomBookingBase ):
-    
+
     def _checkParams( self, params ):
         self.location = params.get( 'locationName' )
         self.forSubEvents = params.get( 'forSubEvents' ) == 'True'
-    
+
     def _process( self ):
-        
+
         self._roomList = []
         if self.location:
             self._roomList = CrossLocationQueries.getRooms( location = self.location )
         self._locationRoom = ""
-        
+
         from MaKaC.webinterface import wcomponents
         if self.forSubEvents:
             p = wcomponents.WRoomBookingRoomSelectList4SubEvents( self )
         else:
             p = wcomponents.WRoomBookingRoomSelectList( self )
-        
+
         return p.getHTML( self.getRequestParams() )
-        
+
         #return "<div style='background-color: red;'>&nbsp;&nbsp;&nbsp;&nbsp;</div>"
 
 class RHRoomBookingRejectBookingOccurrence( RHRoomBookingBase ):
-    
+
     def _checkParams( self , params ):
         resvID = int( params.get( "resvID" ) )
         roomLocation = params.get( "roomLocation" )
         reason = params.get( "reason" )
         date = params.get( "date" )
-        
+
         self._resv = CrossLocationQueries.getReservations( resvID = resvID, location = roomLocation )
         self._rejectionReason = reason
         self._date = parse_date( date )
@@ -1885,13 +1885,13 @@ class RHRoomBookingRejectBookingOccurrence( RHRoomBookingBase ):
         if ( not self._resv.room.isOwnedBy( user ) ) and \
             ( not self._getUser().isAdmin() ):
                 raise MaKaCError( "You are not authorized to take this action." )
-    
+
     def _process( self ):
         self._emailsToBeSent = []
-        self._resv.excludeDay( self._date )
-        self._resv.update()
+        self._resv.excludeDay( self._date, unindex=True )
+        self._resv.update(udpateReservationIndex=False)
         self._emailsToBeSent += self._resv.notifyAboutRejection( date = self._date, reason = self._rejectionReason )
-        
+
         self._websession.setVar( 'actionSucceeded', True )
         self._websession.setVar( 'title', "Selected occurrence of this booking has been rejected." )
         self._websession.setVar( 'description', "NOTE: rejection e-mail has been sent to the user. " )
