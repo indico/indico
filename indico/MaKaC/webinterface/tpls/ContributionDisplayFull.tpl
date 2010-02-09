@@ -91,11 +91,9 @@
                                 <%=ReviewingMatList%>
                             </td>
                         </tr>
-                        <tr>
-                            <td align="right" valign="top" class="displayField" style="border-right:5px solid #FFFFFF;" nowrap>
-                                <b><%=_("Reviewing status")%>:</b>
-                            </td>
                             <% if not Contribution.getReviewManager().getLastReview().isAuthorSubmitted(): %>
+                                  <tr>
+                                    <td>&nbsp;</td>
                                     <td>
                                         <form action="<%=urlHandlers.UHContributionSubmitForRewiewing.getURL(Contribution)%>" method="POST">
                                             <input type="submit" class="btn" value="Send materials" >
@@ -109,6 +107,10 @@
                                     </td>
                             <% end %>
                             <% else: %>
+                                    <tr>
+		                            <td align="right" valign="top" class="displayField" style="border-right:5px solid #FFFFFF;" nowrap>
+		                                <b><%=_("Reviewing status")%>:</b>
+		                            </td>
                                     <td style="border-left:5px solid #FFFFFF;">
                                         <%= "<br>".join(Contribution.getReviewManager().getLastReview().getReviewingStatus(forAuthor = True)) %>
                                     </td>
@@ -184,3 +186,6 @@
     </td>
 </tr>
 </table>
+<script type="text/javascript">
+
+</script>

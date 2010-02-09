@@ -19,17 +19,12 @@
     </tr>
     <tr>
         <td align="left">
-            <% if ConferenceChoice == 3 or ConferenceChoice == 4: %>
                 <% if Editing.isSubmitted(): %>
                     <% includeTpl ('EditingJudgementDisplay', Editing = Editing, ShowEditor = True) %>
                 <% end %>
                 <% else: %>
                     <font><%= _("Warning: the layout reviewer has not given his judgement yet.")%></span> 
                 <% end %>
-            <% end %>
-            <% else: %>
-                <%= _("The conference review mode does not allow layout editing.")%>
-            <% end %>
         </td>
     </tr>
 </table>
@@ -45,7 +40,6 @@
     </tr>
     <tr>
         <td>
-            <% if ConferenceChoice == 2 or ConferenceChoice == 4: %>
                 <% if len(AdviceList) > 0: %>
                     <table cellspacing="0" cellpadding="5" width="100%%">
                     <% for advice in AdviceList: %>
@@ -56,10 +50,6 @@
                 <% else: %>
                     <font><%= _("Warning: all your content reviewers have not given their advices yet.")%></span>
                 <% end %>
-            <% end %>
-            <% else: %>
-                <%= _("This conference does not enable content reviewing. The layout reviewer's judgement is the only judgement.")%>
-            <% end %>
         </td>
     </tr>
 </table>
@@ -73,16 +63,7 @@
             <% inlineContextHelp(_('Here is displayed the judgement given by the Referee.<br/>If you are the Referee of this contribution, you can change this.')) %>    
         </td>
     </tr>
-    <% if not (ConferenceChoice == 2 or ConferenceChoice == 4): %>
-    <tr>
-        <td colspan="2" align="left">
-            <span><%= _("This conference does not enable content reviewing. The layout reviewer's judgement is the only judgement.")%></span>
-        </td>
-    </tr>
-    <% end %>
-    <% else: %>
-        <% if IsReferee: %>
-            <% if not Review.isAuthorSubmitted(): %>
+    <% if not Review.isAuthorSubmitted(): %>
                 <tr>
                     <td colspan="2" align="left">
                         <span>
@@ -92,7 +73,8 @@
                     </td>
                 </tr>
             <% end %>
-            <% else: %>
+    <% else: %>
+        <% if IsReferee: %>
                 <% if ConferenceChoice == 4 and not Editing.isSubmitted(): %>
                    <tr>
                        <td colspan="2" align="left">
@@ -108,7 +90,6 @@
                    </tr>
                 <% end %>
             <% end %>
-        <% end %>
         <% else: %>
             <% if not Review.getRefereeJudgement().isSubmitted(): %>
                 <tr>
@@ -154,9 +135,8 @@
                 <span id="submittedmessage"></span>
             </td>
         </tr>
-        <% end %>
-    <% end %>                    
-                        
+        <% end %>  
+   <% end %>
 </table>
 <% end %>
 
@@ -299,11 +279,11 @@ var updatePage = function (){
             submitButton.dom.disabled = true;
             var HelpImg = Html.img({src: '<%= Config.getInstance().getSystemIconURL("help") %>', style: {marginLeft: '5px', verticalAlign: 'middle'}});
             $E('submitHelpPopUp').append(HelpImg);
-            <% if not Review.isAuthorSubmitted(): %>
+           /* <% if not Review.isAuthorSubmitted(): %>
 		            var submitHelpPopUpText = function(event) {
 		              IndicoUI.Widgets.Generic.tooltip(this, event, "<span style='padding:3px'>You are not allowed to give final judgement.<br/>You have to wait for the author to submit the materials.</span>");
 		                } 
-		    <% end %>
+		    <% end %>*/
 		    <% if not FinalJudge: %>
 	               var submitHelpPopUpText = function(event) {
                       IndicoUI.Widgets.Generic.tooltip(this, event, "<span style='padding:3px'>You must give your judgement before sending.</span>");

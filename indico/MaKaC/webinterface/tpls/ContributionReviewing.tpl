@@ -5,7 +5,9 @@
 
 <% format = "%a %d %b %Y at %H\x3a%M" %>
 
-
+<div style="padding-left: 10px; padding-top: 10px; padding-bottom: 10px">
+<em><%= _("The reviewing mode choosen for this conference is")%>: <%= ConferenceChoiceStr%></em>
+</div>
 <% if not Review.isAuthorSubmitted(): %>
 <table width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <% if len(Review.getReviewManager().getVersioning()) == 1: %>
@@ -31,19 +33,21 @@
 </table>
 <% end %>
 
-<table width="90%%" align="center" border="0" style="margin-bottom: 1em">
+<% if ConferenceChoice == 2 or ConferenceChoice == 4: %>
+<table class="newsDisplayItem" width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <!-- Assign or remove a referee -->
+     
     <tr>
         <td id="assignRefereeHelp" colspan="5" class="groupTitle" style="border: none; padding-bottom:10px;"><%= _("Assign a Referee")%></td>
     </tr>
-    <% if ConferenceChoice == 2 or ConferenceChoice == 4: %>
+   
         <tr>
             <td nowrap class="titleCellTD">
-                <span class="titleCellFormat"><%= _("Assigned referee")%></span>
+                <span class="titleCellFormat"><%= _("Referee")%>:</span>
             </td>
             <% if not ContributionReviewManager.hasReferee(): %>
-            <td width="60%%" class='bottom_line'>
-                <%= _("No referee assigned to this contribution.")%>
+            <td width="60%%" class='bottom_line' style="padding-bottom: 10px;">
+                <%= _("not assigned yet")%>
             </td>
             <% end %>
             <% else: %>
@@ -51,27 +55,50 @@
                 <%= ContributionReviewManager.getReferee().getFullName() %>
             </td>
             <% if CanAssignReferee: %>
-            <td align="right">
+            <tr>
+            <td>&nbsp;</td>
+            <td align="left" style="padding-top: 5px; padding-bottom: 15px;">
                 <form action="<%=removeAssignRefereeURL %>" method="post">
-                    <input type="submit" class=btn value="remove">
+                    <input type="submit" class=btn value="Remove">
                 </form>
             </td>
+            </tr>
             <% end %>
             <% end %>
         </tr>
+        <% if ContributionReviewManager.hasReferee(): %>
+            <tr>
+	            <td class="dataCaptionTD">
+	                <span class="dataCaptionFormat"><%= _("Deadline")%></span>
+	            </td>
+	            <td class="blacktext">
+	                <span id="inPlaceEditRefereeDueDate">
+	                    <% date = ContributionReviewManager.getLastReview().getAdjustedRefereeDueDate() %>
+	                    <% if date is None: %>
+	                        <%= _("Date not set yet.")%>
+	                    <% end %>
+	                    <% else: %>
+	                        <%= formatDateTime(date) %>
+	                    <% end %>
+	                </span>
+	            </td>
+	        </tr>
+        <% end %>
+        <% else: %>
         <tr>
-            <td nowrap class="titleCellTD">
-                <span class="titleCellFormat"><%= _("Assign a referee to this contribution")%></span>
+            <td>&nbsp;</td>
+            <td  width="60%%" class='bottom_line'>
+                <span class="titleCellFormat"><%= _("Choose a referee to assign from the list")%>:</span>
             </td>
+         </tr>
+         <tr>
+            <td>&nbsp;</td>
             <form action="<%=assignRefereeURL%>" method="post">
             <% showAssignButton = False %>
-            <td width="80%%" class='bottom_line'>
+            <td width="80%%" class='bottom_line' style="padding-top: 10px;">
                 <% if CanAssignReferee: %>
                     <% if len(ConfReview.getRefereesList()) == 0: %>
                         <%= _("No referees proposed for this conference.")%>
-                    <% end %>
-                    <% elif ContributionReviewManager.hasReferee(): %>
-                        <%= _("You can only add one referee for a given contribution.")%>
                     <% end %>
                     <% else: %>
                         <% showAssignButton = True %>
@@ -99,85 +126,91 @@
                     <%= _("You are not allowed to assign referees to this contribution.")%>
                 <% end %>
             </td>
+            <tr>
             <% if showAssignButton: %>
-                <td align="right">
-                    <input type="submit" class=btn value="assign">
+                <td>&nbsp;</td>
+                <td align="left">
+                    <input type="submit" class=btn value="Assign">
                 </td>
             <% end %>
             </form>
-        </tr>
-        <% if ContributionReviewManager.hasReferee(): %>
-        <tr>
-            <td class="dataCaptionTD">
-                <span class="dataCaptionFormat"><%= _("Deadline")%></span>
-            </td>
-            <td class="blacktext">
-                <span id="inPlaceEditRefereeDueDate">
-                    <% date = ContributionReviewManager.getLastReview().getAdjustedRefereeDueDate() %>
-                    <% if date is None: %>
-                        <%= _("Date not set yet.")%>
-                    <% end %>
-                    <% else: %>
-                        <%= formatDateTime(date) %>
-                    <% end %>
-                </span>
-            </td>
+            </tr>
         </tr>
         <% end %>
-    <% end %>
-    <% else: %>
-    <tr>
-        <td colspan="5" align="left">
-            <%= _("This conference does not enable content reviewing. The layout reviewer's judgement is the only judgement.")%>
-        </td>
-    </tr>
-    <% end %>
 </table>
+<% end %>
 
+<% if ConferenceChoice == 3 or ConferenceChoice == 4: %>
 <!-- Assign / remove Editors -->
-<table width="90%%" align="center" border="0" style="margin-bottom: 1em">
+<table class="newsDisplayItem" width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
-        <td id="assignEditorHelp" colspan="5" class="groupTitle" style="border: none; padding-bottom:10px;"><%= _("Assign a Layout Reviewer")%></td>
+            <td id="assignEditorHelp" colspan="5" class="groupTitle" style="border: none; padding-bottom:10px;"><%= _("Assign a Layout Reviewer")%></td>
     </tr>
-    <% if ConferenceChoice == 3 or ConferenceChoice == 4: %>
     <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Assigned layout reviewer")%></span></td>
-        
-        <% if not ContributionReviewManager.hasEditor(): %>
-            <td width="60%%" class='bottom_line'>
-                <%= _("No layout reviewer assigned to this contribution.")%>
-            </td>
-            <% end %>
-            <% else: %>
-            <td width="60%%" class='bottom_line'>
-                <%= ContributionReviewManager.getEditor().getFullName() %>
-            </td>
-            <td align="right">
-                <form action="<%=removeAssignEditingURL%>" method="post">
-                    <input type="submit" class=btn value="remove">
+	        <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Layout reviewer")%>:</span></td>
+	        
+	   <% if ContributionReviewManager.hasEditor(): %>
+	         <td width="60%%" class='bottom_line'>
+	         <%= ContributionReviewManager.getEditor().getFullName() %>
+	         </td>
+	</tr>
+    <tr>
+           <td>&nbsp;</td>
+           <td align="left" style="padding-top: 5px; padding-bottom: 15px;">
+              <form action="<%=removeAssignEditingURL%>" method="post">
+                 <input type="submit" class=btn value="Remove">
                 </form>
-            </td>
-            <% end %>
-        </td>
+           </td>
+      </tr>
+      <tr>
+           <td class="dataCaptionTD">
+	               <span class="dataCaptionFormat"><%= _("Deadline")%></span>
+	       </td>
+	       <td class="blacktext">
+	            <span id="inPlaceEditEditorDueDate">
+	            <% date = ContributionReviewManager.getLastReview().getAdjustedEditorDueDate() %>
+	            <% if date is None: %>
+	                <%= _("Date not set yet.")%>
+	            <% end %>
+	            <% else: %>
+	                 <%= formatDateTime(date) %>
+	            <% end %>
+	            </span>
+	       </td>
+      </tr>
+      <% end %>
+      <% else: %>
+	        <td width="60%%" style="padding-bottom: 10px;">
+	           <%= _("not assigned yet")%>
+	        </td>
     </tr>
+    <form action="<%=assignEditingURL%>" method="post">
     <tr>
-        <td nowrap class="titleCellTD">
-            <span class="titleCellFormat"><%= _("Assign a layout reviewer to this contribution")%></span>
-        </td>
-        <form action="<%=assignEditingURL%>" method="post">
         <% showAssignButton = False %>
-        <td width="80%%" class='bottom_line'>
             <% if CanAssignEditorOrReviewers: %>
-                <% if len(ConfReview.getEditorsList()) == 0: %>
-                    <%= _("No editors proposed for this conference.")%>
-                <% end %>
-                <% elif ContributionReviewManager.hasEditor(): %>
-                    <%= _("You can only add one layout reviewer for a given contribution.")%>
-                <% end %>
-                <% elif not ContributionReviewManager.hasReferee() and not ConferenceChoice == 3: %>
+                <% if not ContributionReviewManager.hasReferee() and not ConferenceChoice == 3: %>
+                <td>&nbsp;</td>
+                <td>
                     <%= _("Please choose a referee first.")%>
+                </td>
+                </tr>
+                <% end %>
+                <% elif len(ConfReview.getEditorsList()) == 0: %>
+                <td>&nbsp;</td>
+                <td>
+                    <%= _("No editors proposed for this conference.")%>
+                </td>
+                </tr>
                 <% end %>
                 <% else: %>
+                <td>&nbsp;</td>
+                <td>
+		            <span class="titleCellFormat"><%= _("Choose a layout reviewer to assign from the list")%>:</span>
+		        </td>
+		        </tr>
+		        <tr>
+		        <td>&nbsp;</td>
+		        <td width="80%%" class='bottom_line'>
                     <% showAssignButton = True %>
                     <table cellspacing="0" cellpadding="5">
                     <% first = True %>
@@ -204,107 +237,119 @@
             <% end %>
         </td>
         <% if showAssignButton: %>
-            <td align="right">
-                <input type="submit" class=btn value="assign">
+        <\tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td align="left">
+                <input type="submit" class=btn value="Assign">
             </td>
+        </tr>
         <% end %>
         </form>
+        </tr>
+    <% end %>
     </tr>
-    <% if ContributionReviewManager.hasEditor(): %>
+</table>
+<% end %>
+
+<% if ConferenceChoice == 2 or ConferenceChoice == 4: %>
+<!-- Assign / remove content reviewers -->
+<table class="newsDisplayItem" width="90%%" align="center" border="0" style="margin-bottom: 1em">
+	    <tr>
+	        <td id="assignReviewersHelp" colspan="5" class="groupTitle" style="border: none; padding-bottom:10px;"><%= _("Assign Content Reviewers")%></td>
+	    </tr>
         <tr>
-            <td class="dataCaptionTD">
-                <span class="dataCaptionFormat"><%= _("Deadline")%></span>
-            </td>
-            <td class="blacktext">
-                <span id="inPlaceEditEditorDueDate">
-                    <% date = ContributionReviewManager.getLastReview().getAdjustedEditorDueDate() %>
+            <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Content reviewers")%>:</span></td>
+            <% if ContributionReviewManager.hasReviewers(): %>
+                <form action="<%=removeAssignReviewingURL%>" method="post">
+                <td width="60%%"  class='bottom_line'>
+                    <table cellspacing="0" cellpadding="5">
+                        <% first = True %>
+                        <% for r in ContributionReviewManager.getReviewersList(): %>
+                            <tr>
+                                <td>
+                                    <input type="radio" name="reviewerRemoveAssignSelection" value="<%= r.getId() %>"
+                                    <% if first: %>
+                                        CHECKED
+                                        <% first = False %>
+                                    <% end %>
+                                    >
+                                </td>
+                                <td align="left">
+                                    <%= r.getFullName() %>
+                                </td>
+                            </tr>
+                        <% end %>
+                    </table>
+                </td>
+                <tr>
+                <td>&nbsp;</td>
+                <td align="left" style="padding-top: 5px; padding-bottom: 15px;">
+                    <input type="submit" class=btn value="Remove">
+                </td>
+                </tr>
+                </form>
+                <tr>
+                <td class="dataCaptionTD" style="padding-top: 5px; padding-bottom: 15px;">
+                    <span class="dataCaptionFormat"><%= _("Deadline")%></span>
+                </td>
+                <td class="blacktext" style="padding-top: 5px; padding-bottom: 15px;">
+                    <span id="inPlaceEditReviewerDueDate">
+                    <% date = ContributionReviewManager.getLastReview().getAdjustedReviewerDueDate() %>
                     <% if date is None: %>
                         <%= _("Date not set yet.")%>
                     <% end %>
                     <% else: %>
                         <%= formatDateTime(date) %>
                     <% end %>
-                </span>
-            </td>
-        </tr>
-    <% end %>
-    <% end %>
-    <% else: %>
-    <tr>
-        <td colspan="5">
-            <%= _("The reviewing mode does not allow layout reviewing.")%>
-        </td>
-    </tr>
-    <% end %>
-</table>
-
-
-
-<!-- Assign / remove content reviewers -->
-
-<table width="90%%" align="center" border="0" style="margin-bottom: 1em">
-    <tr>
-        <td id="assignReviewersHelp" colspan="5" class="groupTitle" style="border: none; padding-bottom:10px;"><%= _("Assign Content Reviewers")%></td>
-    </tr>
-    <% if ConferenceChoice == 2 or ConferenceChoice == 4: %>
-        <tr>
-            <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Assigned content reviewers")%></span></td>
-            
-            <% if not ContributionReviewManager.hasReviewers(): %>
-                <td width="60%%" class='bottom_line'>
-                    <%= _("No content reviewers assigned to this contribution.")%>
+                    </span>
                 </td>
+            </tr>
             <% end %>
             <% else: %>
-    			<form action="<%=removeAssignReviewingURL%>" method="post">
-                <td width="60%%"  class='bottom_line'>
-                    <table cellspacing="0" cellpadding="5">
-                    	<% first = True %>
-                    	<% for r in ContributionReviewManager.getReviewersList(): %>
-    					    <tr>
-                                <td>
-                                	<input type="radio" name="reviewerRemoveAssignSelection" value="<%= r.getId() %>"
-                                    <% if first: %>
-                                        CHECKED
-                                        <% first = False %>
-                                    <% end %>
-    								>
-                                </td>
-                                <td align="left">
-                                    <%= r.getFullName() %>
-                                </td>
-    						</tr>
-    					<% end %>
-                    </table>
+                <td width="60%%" class='bottom_line' style="padding-bottom: 10px;">
+                    <%= _("not assigned yet")%>
                 </td>
-                <td align="right">
-                    <input type="submit" class=btn value="remove">
-                </td>
-    			</form>
             <% end %>
             </td>
-        </tr>
-        <tr>
-            <td nowrap class="titleCellTD">
-                <span class="titleCellFormat"><%= _("Assign content reviewers to this contribution")%></span>
-            </td>
-            <form action="<%=assignReviewingURL%>" method="post">
-            <% showAssignButton = False %>
-            <td width="80%%"  class='bottom_line'>
-                <% if CanAssignEditorOrReviewers: %>
-                    <% if len(ConfReview.getReviewersList()) == 0: %>
-                        <%= _("No reviewers proposed for this conference.")%>
-                    <% end %>
-                    <% elif not ContributionReviewManager.hasReferee(): %>
-                        <%= _("Please choose a referee first.")%>
-                    <% end %>
-    				<% elif len(AvailableReviewers) == 0: %>
-    				    <%= _("No more reviewers available in this conference.")%>
-    				<% end %>
-                    <% else: %>
-                        <% showAssignButton = True %>
-                        <table cellspacing="0" cellpadding="5">
-                        <% first = True %>
+            </tr>
+    <form action="<%=assignReviewingURL%>" method="post">
+    <tr>
+        <% showAssignButton = False %>
+            <% if CanAssignEditorOrReviewers: %>
+                <% if not ContributionReviewManager.hasReferee(): %>
+                <td>&nbsp;</td>
+                <td>
+                    <%= _("Please choose a referee first.")%>
+                </td>
+                </tr>
+                <% end %>
+                <% elif len(ConfReview.getReviewersList()) == 0: %>
+                <td>&nbsp;</td>
+                <td>
+                    <%= _("No editors proposed for this conference.")%>
+                </td>
+                </tr>
+                <% end %>
+                <% elif len(AvailableReviewers) == 0: %>
+                <td>&nbsp;</td>
+                <td>
+                        <%= _("No more content reviewers available in this conference.")%>
+                </td>
+                </tr>
+                <% end %>
+                <% else: %>
+                <td>&nbsp;</td>
+                <td>
+                    <span class="titleCellFormat"><%= _("Choose a content reviewer to assign from the list")%>:</span>
+                </td>
+                </tr>
+                <tr>
+                <td>&nbsp;</td>
+                <td width="80%%" class='bottom_line'>
+                    <% showAssignButton = True %>
+                    <table cellspacing="0" cellpadding="5">
+                    <% first = True %>
                         <% for r in AvailableReviewers: %>
                             <tr>
                                 <td>
@@ -328,39 +373,17 @@
                 <% end %>
             </td>
             <% if showAssignButton: %>
-                <td align="right">
-                    <input type="submit" class=btn value="assign">
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td align="left">
+                    <input type="submit" class=btn value="Assign">
                 </td>
             <% end %>
             </form>
-        </tr>
-        <% if ContributionReviewManager.hasReviewers(): %>
-            <tr>
-                <td class="dataCaptionTD">
-                    <span class="dataCaptionFormat"><%= _("Deadline")%></span>
-                </td>
-                <td class="blacktext">
-                    <span id="inPlaceEditReviewerDueDate">
-                    <% date = ContributionReviewManager.getLastReview().getAdjustedReviewerDueDate() %>
-                    <% if date is None: %>
-                        <%= _("Date not set yet.")%>
-                    <% end %>
-                    <% else: %>
-                        <%= formatDateTime(date) %>
-                    <% end %>
-                    </span>
-                </td>
-            </tr>
-        <% end %>
-    <% end %>
-    <% else: %>
-    <tr>
-        <td colspan="5">
-            <%= _("The reviewing mode does not allow content reviewing.")%>
-        </td>
-    </tr>
-    <% end %>
+        </tr>  
 </table>
+<% end %>
 
 
 

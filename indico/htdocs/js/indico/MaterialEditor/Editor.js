@@ -293,6 +293,7 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
         // make typeSelector available to the object
         this.typeSelector = typeSelector;
 
+<<<<<<< HEAD:indico/htdocs/js/indico/MaterialEditor/Editor.js
         return Html.div({},
                         IndicoUtil.createFormFromMap(
                             [
@@ -511,6 +512,7 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
     this.ExclusivePopupWithButtons($T("Upload Material"),
                         function() {
                             self.close();
+                            
                         });
 });
 
@@ -1558,7 +1560,8 @@ type("ReviewingMaterialListWidget", ["RemoteWidget", "ListWidget"], {
             var obj = watchize(value);
             self.set(key, obj);
         });
-                
+        
+       
         var link = Widget.link(command(function(){
                     IndicoUI.Dialogs.Material.add(self.args,
                                                   self,
@@ -1572,8 +1575,6 @@ type("ReviewingMaterialListWidget", ["RemoteWidget", "ListWidget"], {
                                                       }
                                                   });
                 }, $T("Add Material")));
-        
-        
         
         return Html.div(
             {},

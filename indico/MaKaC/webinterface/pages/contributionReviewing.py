@@ -64,6 +64,7 @@ class WContributionReviewing(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
 
         conferenceChoice = self._conf.getConfReview().getChoice()
+        conferenceChoiceStr = self._conf.getConfReview().getReviewingMode()
         reviewManager = self.__target.getReviewManager()
         canAssignReferee = self._conf.getConfReview().isPaperReviewManager(self._aw.getUser()) or self._conf.canModify(self._aw)
         
@@ -71,6 +72,7 @@ class WContributionReviewing(wcomponents.WTemplated):
         vars["ConfReview"] = self._conf.getConfReview()
         vars["Contribution"] = self.__target
         vars["ConferenceChoice"] = conferenceChoice
+        vars["ConferenceChoiceStr"] = conferenceChoiceStr
         vars["ContributionReviewManager"] = reviewManager
         vars["CanAssignReferee"] = canAssignReferee
         vars["CanAssignEditorOrReviewers"] = reviewManager.isReferee(self._aw.getUser()) or canAssignReferee
