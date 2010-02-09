@@ -301,7 +301,7 @@ type("UserDataPopup", ["ExclusivePopup"],
                      [$T('Family Name'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), userData.accessor('familyName'))],
                      [$T('First Name'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('firstName'))],
                      [$T('Affiliation'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('affiliation'))],
-                     [$T('Email'), $B(Html.edit({style: {width: '200px'}}), userData.accessor('email'))],
+                     [$T('Email'),  $B(self.parameterManager.add(Html.edit({style: {width: '200px'}}), 'email', true), userData.accessor('email'))],
                      [$T('Address'), $B(Html.textarea(), userData.accessor('address'))],
                      [$T('Telephone'), $B(Html.edit({style: {width: '150px'}}), userData.accessor('telephone'))],
                      [$T('Fax'), $B(Html.edit({style: {width: '150px'}}), userData.accessor('fax'))],
@@ -345,15 +345,17 @@ type("UserListWidget", ["ListWidget"],
                      'Change user data',
                      userData.clone(),
                      function(newData, suicideHook) {
-                         self.editProcess(userData, function(result) {
-                             if (result) {
-                                 userData.update(newData.getAll());
-                                 if (!startsWith(userData.get('id'), 'newUser')) {
-                                     userData.set('id', 'edited' + userData.get('id'));
+                         if (editPopup.parameterManager.check()) {
+                             self.editProcess(userData, function(result) {
+                                 if (result) {
+                                     userData.update(newData.getAll());
+                                     if (!startsWith(userData.get('id'), 'newUser')) {
+                                         userData.set('id', 'edited' + userData.get('id'));
+                                     }
                                  }
-                             }
-                         });
-                         suicideHook();
+                             });
+                             suicideHook();
+                         }
                      }
                  );
                  editPopup.open();

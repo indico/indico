@@ -351,28 +351,6 @@ var IndicoUtil = {
     },
 
     /**
-     * Determines if a string is a valid IP address ("A.B.C.D")
-     * @param {String} s The input string
-     * @return {Booleab} true if the string is a valid IP address, false otherwise
-     */
-    isIpAddress: function(s) {
-        var valid = true;
-        var numbers = s.split('.');
-        if (numbers.length == 4) {
-            for (var i=0; i < 4; i++) {
-                var n = numbers[i];
-                if (!(n == trim(n) && n.length >= 1 && n.length <= 3 && IndicoUtil.isInteger(n))) {
-                    valid = false;
-                    break;
-                }
-            }
-        } else {
-            valid = false;
-        }
-        return valid;
-    },
-
-    /**
     * Determines if a string is in a valid time format (hh:mm)
     * @param {String} s The input string
     * @return {Booleab} true if the string is a valid time string, false otherwise
@@ -499,7 +477,10 @@ var IndicoUtil = {
                 else if (dataType == 'datetime' && !(allowEmpty && trim(component.get()) === '') && !IndicoUtil.parseDateTime(component.get())) {
                     error = Html.span({}, "Date format is not valid. It should be dd/mm/yyyy hh:mm");
                 }
-                else if (dataType == 'ip' && !(allowEmpty && trim(component.get()) === '') && !IndicoUtil.isIpAddress(component.get())) {
+                else if (dataType == 'email' && !(allowEmpty && trim(component.get()) === '') && !Util.Validation.isEmailAddress(component.get())) {
+                    error = Html.span({}, "Invalid e-mail address");
+                }
+                else if (dataType == 'ip' && !(allowEmpty && trim(component.get()) === '') &&  !Util.Validation.isIPAddress(component.get())) {
                     error = Html.span({}, "That doesn't seem like a valid IP Address. Example of valid IP Address: 132.156.31.38");
                 } else if (dataType == 'time' && !IndicoUtil.isTime(trim(component.get()))) {
                     error = Html.span({}, "Time format is not valid. It should be hh:mm");

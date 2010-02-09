@@ -171,6 +171,21 @@ var Util = {
 
 };
 
+Util.Validation = {
+    isIPAddress: function(address) {
+        // thanks to Jan Goyvaerts
+        return exists(address.match(/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/));
+    },
+
+    isEmailAddress: function(address) {
+        // Adapted RFC2822 (thanks to Jan Goyvaerts)
+        return exists(address.toLowerCase().match(/^[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+(?:\.[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+)*@(?:[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?$/));
+    }
+
+
+
+};
+
 var IndicoSortCriteria = {
     StartTime: function(c1, c2) {
         return SortCriteria.Integer(c1.startDate.time.replaceAll(':',''),
