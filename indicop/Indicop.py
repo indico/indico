@@ -33,6 +33,8 @@ import StringIO
 import shutil
 import signal
 import tempfile
+import transaction
+from MaKaC.common.db import DBMgr
 from BaseTest import BaseTest
 from TestsConfig import TestsConfig
 from selenium import selenium
@@ -47,51 +49,37 @@ class Unit(BaseTest):
 
         result = False
 
-        #launch a fresh DB in parallel of the production DB
-        try:
-            self.startFakeDB(TestsConfig.getInstance().getFakeDBPort())
-        except KeyError:
-            return "[ERR] Unit tests - Please, specify a FakeDBPort in tests.conf"
-        self.createDummyUser()
+        coverage = Coverage.getInstance()
+        if coverage != False:
+            coverage.start()
 
-        try:
-            coverage = Coverage.getInstance()
-            if coverage != False:
-                coverage.start()
-
-            #capturing the stderr
-            outerr = StringIO.StringIO()
-            sys.stderr = outerr
+        #capturing the stderr
+        outerr = StringIO.StringIO()
+        sys.stderr = outerr
 
 
-            #retrieving tests from Indicop folder
-            args = ['nose', '--nologcapture', '--logging-clear-handlers', '-v',
-                    os.path.join(self.setupDir, 'python', 'unit')]
-            #retrieving tests from plugins folder
-            for folder in self.walkThroughFolders(os.path.join(self.setupDir,
-                                                               '..',
-                                                               'indico',
-                                                               'MaKaC',
-                                                               'plugins'),
-                                                  "/tests/python/unit"):
-                args.append(folder)
+        #retrieving tests from Indicop folder
+        args = ['nose', '--nologcapture', '--logging-clear-handlers', '-v',
+                os.path.join(self.setupDir, 'python', 'unit')]
+        #retrieving tests from plugins folder
+        for folder in self.walkThroughFolders(os.path.join(self.setupDir,
+                                                           '..',
+                                                           'indico',
+                                                           'MaKaC',
+                                                           'plugins'),
+                                              "/tests/python/unit"):
+            args.append(folder)
 
-            result = nose.run(argv = args)
+        result = nose.run(argv = args)
 
-            #restoring the stderr
-            sys.stderr = sys.__stderr__
+        #restoring the stderr
+        sys.stderr = sys.__stderr__
 
+        if coverage:
+            returnString += coverage.stop()
 
-            if coverage:
-                returnString += coverage.stop()
-
-            s = outerr.getvalue()
-            returnString += self.writeReport("pyunit", s)
-        finally:
-            #self.deleteDummyUser()
-            #stopping the fake DB
-            self.stopFakeDB()
-            self.restoreDBInstance()
+        s = outerr.getvalue()
+        returnString += self.writeReport("pyunit", s)
 
         if result:
             return returnString + "PY Unit tests succeeded\n"
@@ -148,24 +136,16 @@ class Coverage(BaseTest):
 
 class Functional(BaseTest):
     def __init__(self):
-        BaseTest.__init__(self)
         self.child = None
 
     def run(self):
         returnString = ""
         self.startMessage("Starting Python functional tests")
 
-        #Stop prod DB and launch a fresh DB on this prod db port
-        self.stopProductionDB()
-        self.startFakeDB(Config.getInstance().getDBConnectionParams()[1])
-
         try:
             if not self.startSeleniumServer():
                 return ('[ERR] Could not start functional tests because selenium'
                         ' server cannot be started.\n')
-
-            #Create dummy user and use this user to create conf, session and so on
-            self.createDummyUser()
 
             #capturing the stderr
             outerr = StringIO.StringIO()
@@ -187,15 +167,9 @@ class Functional(BaseTest):
 
         finally:
             self.stopSeleniumServer()
-            #self.deleteDummyUser()
 
             #restoring the stderr
             sys.stderr = sys.__stderr__
-
-            #stopping the fake DB
-            self.stopFakeDB()
-            self.startProductionDB()
-            self.restoreDBInstance()
 
         s = outerr.getvalue()
         returnString += self.writeReport("pyfunctional", s)
@@ -273,46 +247,22 @@ class Specify(Functional):
                 return ('[ERR] Could not start functional tests because selenium'
                         ' server cannot be started.\n')
             try:
-                #Stop prod DB and launch a fresh DB on this prod db port
-                self.stopProductionDB()
-                self.startFakeDB(Config.getInstance().getDBConnectionParams()[1])
-                self.createDummyUser()
-
                 #running the test and ouputing in the console
                 result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir,
                                                                    '..',
                                                                    self.specify)])
             finally:
                 self.stopSeleniumServer()
-                #stopping the fake DB
-                self.stopFakeDB()
-                self.startProductionDB()
-                self.restoreDBInstance()
-
         else:
-            #launch a fresh DB in parallel of the production DB
-            try:
-                self.startFakeDB(TestsConfig.getInstance().getFakeDBPort())
-            except KeyError:
-                return "[ERR] Please, specify a FakeDBPort in tests.conf"
-            try:
-                self.createDummyUser()
+            #running the test and ouputing in the console
+            result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir,
+                                                           '..',
+                                                           self.specify)])
 
-                #running the test and ouputing in the console
-                result = nose.run(argv=['nose', '-v', os.path.join(self.setupDir,
-                                                               '..',
-                                                               self.specify)])
-
-            finally:
-                self.deleteDummyUser()
-                #stopping the fake DB
-                self.stopFakeDB()
-                self.restoreDBInstance()
         if result:
             return "Specified Test - Succeeded\n"
         else:
             return "[FAIL] Specified Test - read output from console\n"
-
 
 class TimeoutException(Exception):
     """SIGALARM was sent to the process"""
@@ -320,6 +270,7 @@ class TimeoutException(Exception):
 
 def raise_timeout(signum, frame):
     raise TimeoutException("15sec Timeout")
+
 
 class Grid(BaseTest):
     def __init__(self):
@@ -340,10 +291,6 @@ class Grid(BaseTest):
             return "[ERR] Grid - Please specify hub configuration in tests.conf"
 
         try:
-            #Stop prod DB and launch a fresh DB on this prod db port
-            self.stopProductionDB()
-            self.startFakeDB(Config.getInstance().getDBConnectionParams()[1])
-            self.createDummyUser()
             self.gridData.setActive(True)
 
             #Checking if hub is online
@@ -392,10 +339,7 @@ class Grid(BaseTest):
         finally:
             #disable alarm
             signal.alarm(0)
-            #stopping the fake DB
-            self.stopFakeDB()
-            self.startProductionDB()
-            self.restoreDBInstance()
+
         return returnString
 
 class GridData(BaseTest):
@@ -449,7 +393,7 @@ class Pylint(BaseTest):
                                                 os.path.join(self.setupDir,
                                                              '..',
                                                              'indico',
-                                                             'MaKaC', 'conference.py')))
+                                                             'MaKaC')))
         if statusOutput[1].find("pylint: not found") > -1:
             return ("[ERR] Could not start Source Analysis - "
                     "command \"pylint\" needs to be in your PATH. (%s)\n" %
@@ -750,15 +694,27 @@ class Indicop(object):
                  'grid': Grid()}
 
 
-    def main(self, specify, coverage, testsToRun):
+    def main(self, stopAndStartProductionDB, specify, coverage, testsToRun):
 
         returnString = "\n\n=============== ~INDICOP SAYS~ ===============\n\n"
 
         #To not pollute the installation of Indico
         self.configureTempFolders()
 
+        #managing the databases
+        if ('functional' in testsToRun) or ('grid' in testsToRun):
+            if stopAndStartProductionDB:
+                self.stopProductionDB()
+            self.startFakeDB(Config.getInstance().getDBConnectionParams()[1])
+            self.createDummyUser()
+        elif 'unit' in testsToRun or 'specify' in testsToRun:
+            self.startFakeDB(TestsConfig.getInstance().getFakeDBPort())
+            self.createDummyUser()
+
+
         if coverage:
             Coverage.instantiate()
+
 
         #specified test can either be unit or functional.
         if specify:
@@ -771,12 +727,20 @@ class Indicop(object):
                     returnString += ("[ERR] Test %s does not exist. "
                       "It has to be added in the testsDict variable\n") % test
 
-        self.deleteTempFolders()
+        #restoring db environment
+        if ('functional' in testsToRun) or ('grid' in testsToRun):
+            self.stopFakeDB()
+            if stopAndStartProductionDB:
+                self.startProductionDB()
+            self.restoreDBInstance()
+        elif 'unit' in testsToRun or 'specify' in testsToRun:
+            self.stopFakeDB()
+            self.restoreDBInstance()
 
         return returnString
 
     def configureTempFolders(self):
-        keyNames = ['LogDir',
+        keyNames = [#'LogDir',
                     'ArchiveDir',
                     'UploadedFilesTempDir']
         self.newValues = {}
@@ -790,8 +754,134 @@ class Indicop(object):
         for k in self.newValues:
             shutil.rmtree(self.newValues[k])
 
-    @classmethod
-    def getInstance(cls, jsspecify, jscoverage):
-        if cls.__instance == None:
-            cls.__instance = Indicop(jsspecify, jscoverage)
-        return cls.__instance
+    def startFakeDB(self, zeoPort):
+        self.createNewDBFile()
+        self.zeoServer = self.createDBServer(os.path.join(self.dbFolder, "Data.fs"),
+                                             zeoPort)
+        DBMgr.setInstance(DBMgr(hostname="localhost", port=zeoPort))
+
+    def stopFakeDB(self):
+        try:
+            os.kill(self.zeoServer, signal.SIGTERM)
+        except OSError, e:
+            print ("Problem sending kill signal: " + str(e))
+
+        try:
+            #os.wait()
+            os.waitpid(self.zeoServer, 0)
+            self.removeDBFile()
+        except OSError, e:
+            print ("Problem waiting for ZEO Server: " + str(e))
+
+    def restoreDBInstance(self):
+        DBMgr.setInstance(None)
+
+    def startProductionDB(self):
+        try:
+            commands.getstatusoutput(TestsConfig.getInstance().getStartDBCmd())
+        except KeyError:
+            print "[ERR] Not found in tests.conf: command to start production DB"
+            sys.exit(1)
+
+    def stopProductionDB(self):
+        try:
+            commands.getstatusoutput(TestsConfig.getInstance().getStopDBCmd())
+        except KeyError:
+            print "[ERR] Not found in tests.conf: command to stop production DB"
+            sys.exit(1)
+
+    def createNewDBFile(self):
+        from ZODB import FileStorage, DB
+        savedDir = os.getcwd()
+        self.dbFolder = tempfile.mkdtemp()
+        os.chdir(self.dbFolder)
+
+        storage = FileStorage.FileStorage("Data.fs")
+        db = DB(storage)
+        connection = db.open()
+        dbroot = connection.root()
+
+        transaction.commit()
+
+        connection.close()
+        db.close()
+        storage.close()
+        os.chdir(savedDir)
+
+    def removeDBFile(self):
+        shutil.rmtree(self.dbFolder)
+
+    def createDBServer(self, file, port):
+        from util import TestZEOServer
+        pid = os.fork()
+        if pid:
+            return pid
+        else:
+            server = TestZEOServer(port, file)
+            server.start()
+
+    def createDummyUser(self):
+        from MaKaC import user
+        from MaKaC.authentication import AuthenticatorMgr
+        from MaKaC.common import HelperMaKaCInfo
+        from MaKaC.common import indexes
+        DBMgr.getInstance().startRequest()
+
+        #filling info to new user
+        avatar = user.Avatar()
+        avatar.setName( "fake" )
+        avatar.setSurName( "fake" )
+        avatar.setOrganisation( "fake" )
+        avatar.setLang( "en_US" )
+        avatar.setEmail( "fake@fake.fake" )
+
+        #registering user
+        ah = user.AvatarHolder()
+        ah.add(avatar)
+
+        #setting up the login info
+        li = user.LoginInfo( "dummyuser", "dummyuser" )
+        ih = AuthenticatorMgr()
+        userid = ih.createIdentity( li, avatar, "Local" )
+        ih.add( userid )
+
+        #activate the account
+        avatar.activateAccount()
+
+        #since the DB is empty, we have to add dummy user as admin
+        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+        al = minfo.getAdminList()
+        al.grant( avatar )
+
+        DBMgr.getInstance().endRequest()
+
+    def deleteDummyUser(self):
+        from MaKaC import user
+        from MaKaC.authentication import AuthenticatorMgr
+        from MaKaC.common import HelperMaKaCInfo
+        from MaKaC.common import indexes
+        DBMgr.getInstance().startRequest()
+
+        #removing user from admin list
+        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+        al = minfo.getAdminList()
+        ah = user.AvatarHolder()
+        avatar = ah.match({'email':'fake@fake.fake'})[0]
+        al.revoke( avatar )
+
+        #remove the login info
+        userid = avatar.getIdentityList()[0]
+        ih = AuthenticatorMgr()
+        ih.removeIdentity(userid)
+
+        #unregistering the user info
+        index = indexes.IndexesHolder().getById("email")
+        index.unindexUser(avatar)
+        index = indexes.IndexesHolder().getById("name")
+        index.unindexUser(avatar)
+        index = indexes.IndexesHolder().getById("surName")
+        index.unindexUser(avatar)
+        index = indexes.IndexesHolder().getById("organisation")
+        index.unindexUser(avatar)
+        index = indexes.IndexesHolder().getById("status")
+        index.unindexUser(avatar)

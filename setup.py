@@ -36,7 +36,6 @@ from distutils.command import bdist
 import pkg_resources
 from setuptools.command import develop, install, sdist, bdist_egg, easy_install
 from setuptools import setup, find_packages, findall
-from subprocess import Popen, PIPE
 
 EXTRA_RESOURCES_URL = "http://cdswaredev.cern.ch/indico/wiki/Admin/Installation/IndicoExtras"
 
@@ -338,31 +337,53 @@ class test_indico(Command):
             print "Some jars could not be downloaded. Please download the missing jars manually"
             sys.exit(-1)
 
+        from indicop.util import TestZEOServer
         from indicop.Indicop import Indicop
+        from indicop.TestsConfig import TestsConfig
+        from MaKaC.common.Configuration import Config
         testsToRun = []
 
+        if self.unit:
+            testsToRun.append('unit')
         if self.pylint:
             testsToRun.append('pylint')
         if self.functional:
             testsToRun.append('functional')
         if self.grid:
             testsToRun.append('grid')
-        if self.unit:
-            testsToRun.append('unit')
         if self.jsunit or self.jsspecify:
             testsToRun.append('jsunit')
         if self.jslint:
             testsToRun.append('jslint')
+        if self.specify != None:
+            testsToRun.append('specify')
         if testsToRun == []:
+            testsToRun.append('unit')
             testsToRun.append('functional')
             testsToRun.append('grid')
-            testsToRun.append('unit')
             testsToRun.append('pylint')
             testsToRun.append('jsunit')
             testsToRun.append('jslint')
 
-        indicop = Indicop.getInstance(self.jsspecify, self.jscoverage)
-        result = indicop.main(self.specify, self.coverage, testsToRun)
+        #Check if we need to shutdown the production DB to run functional tests
+        stopAndStartProductionDB = False
+        if ('functional' in testsToRun) or ('grid' in testsToRun) or ((self.specify != None) and (self.specify.find('unit/') < 0)):
+            server = TestZEOServer(Config.getInstance().getDBConnectionParams()[1], 'test')
+            if server.server.can_connect(server.options.family, server.options.address):
+                print """Your production database is currently running.
+Do you want to stop it using this command '%s' and run the tests?
+(We will restart your produduction after the tests with this command '%s')""" % \
+(TestsConfig.getInstance().getStartDBCmd(), TestsConfig.getInstance().getStopDBCmd())
+                userInput = raw_input("Press enter or type 'yes' to accept: ")
+                if userInput == 'yes' or userInput == '':
+                    stopAndStartProductionDB = True
+                else:
+                    print "Exiting testing framework..."
+                    sys.exit(1)
+
+
+        indicop = Indicop(self.jsspecify, self.jscoverage)
+        result = indicop.main(stopAndStartProductionDB, self.specify, self.coverage, testsToRun)
 
         print result
 
@@ -384,7 +405,7 @@ i.e. try 'easy_install %s'""" % (package, package)
         return validPackages
 
     def checkIndicopJars(self):
-        from indicop.Indicop import TestsConfig
+        from indicop.TestsConfig import TestsConfig
 
         """check if needed jars are here, if not, dowloading them and unzip a file if necessary"""
         jarsList = {}

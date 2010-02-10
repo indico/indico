@@ -31,16 +31,17 @@ from MaKaC.schedule import BreakTimeSchEntry
 from MaKaC.common import DBMgr
 from datetime import datetime
 from pytz import timezone
+from MaKaC.user import Avatar
 
 import unittest
 
 
-#def setup_module():
-#    DBMgr.getInstance().startRequest()
-#
-#def teardown_module():
-#    DBMgr.getInstance().abort()
-#    DBMgr.getInstance().endRequest()
+def setup_module():
+    DBMgr.getInstance().startRequest()
+
+def teardown_module():
+    DBMgr.getInstance().abort()
+    DBMgr.getInstance().endRequest()
 
 #From testCategories.py
 class TestCategories(unittest.TestCase):
@@ -52,49 +53,48 @@ class TestCategories(unittest.TestCase):
 #        DBMgr.getInstance().endRequest(True)
 
     def testBasicAddAndRemoveConferences(self):
-        DBMgr.getInstance().startRequest()
+#        DBMgr.getInstance().startRequest()
 
         #creation of basic category structure over which perform the tests
-#        croot=conference.Category()
-#        c1=conference.Category()
-#        croot._addSubCategory(c1)
-#        c2=conference.Category()
-#        croot._addSubCategory(c2)
-#        c1_1=conference.Category()
-#        c1._addSubCategory(c1_1)
+        croot=conference.Category()
+        c1=conference.Category()
+        croot._addSubCategory(c1)
+        c2=conference.Category()
+        croot._addSubCategory(c2)
+        c1_1=conference.Category()
+        c1._addSubCategory(c1_1)
         #checks adding a conference increases the conference number of the
         #   involved categories
         from MaKaC.user import Avatar
         creator=Avatar()
         conf1=conference.Conference(creator)
         print conf1,creator
-        assert False
-#        conf1.setId("0")
-#        c1_1._addConference(conf1)
-#        assert (c1_1.getNumConferences()==1)
-#        assert (c1.getNumConferences()==1)
-#        assert (c2.getNumConferences()==0)
-#        assert (croot.getNumConferences()==1)
-#        conf2=conference.Conference(creator)
-#        conf2.setId("1")
-#        c2._addConference(conf2)
-#        assert (c1_1.getNumConferences()==1)
-#        assert (c1.getNumConferences()==1)
-#        assert (c2.getNumConferences()==1)
-#        assert (croot.getNumConferences()==2)
-#        c1_1.removeConference(conf1)
-#        assert (c1_1.getNumConferences()==0)
-#        assert (c1.getNumConferences()==0)
-#        assert (c2.getNumConferences()==1)
-#        assert (croot.getNumConferences()==1)
-#        c2.removeConference(conf2)
-#        assert (c1_1.getNumConferences()==0)
-#        assert (c1.getNumConferences()==0)
-#        assert (c2.getNumConferences()==0)
-#        assert (croot.getNumConferences()==0)
-#
+        conf1.setId("0")
+        c1_1._addConference(conf1)
+        assert (c1_1.getNumConferences()==1)
+        assert (c1.getNumConferences()==1)
+        assert (c2.getNumConferences()==0)
+        assert (croot.getNumConferences()==1)
+        conf2=conference.Conference(creator)
+        conf2.setId("1")
+        c2._addConference(conf2)
+        assert (c1_1.getNumConferences()==1)
+        assert (c1.getNumConferences()==1)
+        assert (c2.getNumConferences()==1)
+        assert (croot.getNumConferences()==2)
+        c1_1.removeConference(conf1)
+        assert (c1_1.getNumConferences()==0)
+        assert (c1.getNumConferences()==0)
+        assert (c2.getNumConferences()==1)
+        assert (croot.getNumConferences()==1)
+        c2.removeConference(conf2)
+        assert (c1_1.getNumConferences()==0)
+        assert (c1.getNumConferences()==0)
+        assert (c2.getNumConferences()==0)
+        assert (croot.getNumConferences()==0)
+
 #        DBMgr.getInstance().getDBConnCache().close()
-        DBMgr.getInstance().endRequest(True)
+#        DBMgr.getInstance().endRequest(True)#
 
     def testAddAndRemoveSubCategories(self):
         #checks that the conference counter works fine when adding a new

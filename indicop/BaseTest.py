@@ -49,75 +49,71 @@ class BaseTest(object):
             return "Unable to write in %s, check your file permissions." % \
                     os.path.join(self.setupDir, 'report', filename + ".txt")
 
-    def createDummyUser(self):
-        from MaKaC import user
-        from MaKaC.authentication import AuthenticatorMgr
-        from MaKaC.common import HelperMaKaCInfo
-        from MaKaC.common import indexes
-        DBMgr.getInstance().startRequest()
-
-        print DBMgr.getInstance()._db
-
-        #filling info to new user
-        avatar = user.Avatar()
-        avatar.setName( "fake" )
-        avatar.setSurName( "fake" )
-        avatar.setOrganisation( "fake" )
-        avatar.setLang( "en_US" )
-        avatar.setEmail( "fake@fake.fake" )
-
-        #registering user
-        ah = user.AvatarHolder()
-        ah.add(avatar)
-
-        print "AVATAR %s" % avatar._p_jar
-
-        #setting up the login info
-        li = user.LoginInfo( "dummyuser", "dummyuser" )
-        ih = AuthenticatorMgr()
-        userid = ih.createIdentity( li, avatar, "Local" )
-        ih.add( userid )
-
-        #activate the account
-        avatar.activateAccount()
-
-        #since the DB is empty, we have to add dummy user as admin
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        al = minfo.getAdminList()
-        al.grant( avatar )
-
-        DBMgr.getInstance().endRequest()
-
-    def deleteDummyUser(self):
-        from MaKaC import user
-        from MaKaC.authentication import AuthenticatorMgr
-        from MaKaC.common import HelperMaKaCInfo
-        from MaKaC.common import indexes
-        DBMgr.getInstance().startRequest()
-
-        #removing user from admin list
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        al = minfo.getAdminList()
-        ah = user.AvatarHolder()
-        avatar = ah.match({'email':'fake@fake.fake'})[0]
-        al.revoke( avatar )
-
-        #remove the login info
-        userid = avatar.getIdentityList()[0]
-        ih = AuthenticatorMgr()
-        ih.removeIdentity(userid)
-
-        #unregistering the user info
-        index = indexes.IndexesHolder().getById("email")
-        index.unindexUser(avatar)
-        index = indexes.IndexesHolder().getById("name")
-        index.unindexUser(avatar)
-        index = indexes.IndexesHolder().getById("surName")
-        index.unindexUser(avatar)
-        index = indexes.IndexesHolder().getById("organisation")
-        index.unindexUser(avatar)
-        index = indexes.IndexesHolder().getById("status")
-        index.unindexUser(avatar)
+#    def createDummyUser(self):
+#        from MaKaC import user
+#        from MaKaC.authentication import AuthenticatorMgr
+#        from MaKaC.common import HelperMaKaCInfo
+#        from MaKaC.common import indexes
+#        DBMgr.getInstance().startRequest()
+#
+#        #filling info to new user
+#        avatar = user.Avatar()
+#        avatar.setName( "fake" )
+#        avatar.setSurName( "fake" )
+#        avatar.setOrganisation( "fake" )
+#        avatar.setLang( "en_US" )
+#        avatar.setEmail( "fake@fake.fake" )
+#
+#        #registering user
+#        ah = user.AvatarHolder()
+#        ah.add(avatar)
+#
+#        #setting up the login info
+#        li = user.LoginInfo( "dummyuser", "dummyuser" )
+#        ih = AuthenticatorMgr()
+#        userid = ih.createIdentity( li, avatar, "Local" )
+#        ih.add( userid )
+#
+#        #activate the account
+#        avatar.activateAccount()
+#
+#        #since the DB is empty, we have to add dummy user as admin
+#        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+#        al = minfo.getAdminList()
+#        al.grant( avatar )
+#
+#        DBMgr.getInstance().endRequest()
+#
+#    def deleteDummyUser(self):
+#        from MaKaC import user
+#        from MaKaC.authentication import AuthenticatorMgr
+#        from MaKaC.common import HelperMaKaCInfo
+#        from MaKaC.common import indexes
+#        DBMgr.getInstance().startRequest()
+#
+#        #removing user from admin list
+#        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+#        al = minfo.getAdminList()
+#        ah = user.AvatarHolder()
+#        avatar = ah.match({'email':'fake@fake.fake'})[0]
+#        al.revoke( avatar )
+#
+#        #remove the login info
+#        userid = avatar.getIdentityList()[0]
+#        ih = AuthenticatorMgr()
+#        ih.removeIdentity(userid)
+#
+#        #unregistering the user info
+#        index = indexes.IndexesHolder().getById("email")
+#        index.unindexUser(avatar)
+#        index = indexes.IndexesHolder().getById("name")
+#        index.unindexUser(avatar)
+#        index = indexes.IndexesHolder().getById("surName")
+#        index.unindexUser(avatar)
+#        index = indexes.IndexesHolder().getById("organisation")
+#        index.unindexUser(avatar)
+#        index = indexes.IndexesHolder().getById("status")
+#        index.unindexUser(avatar)
 
         #removing user from list
         la = ih.getById("Local")
@@ -137,76 +133,3 @@ class BaseTest(object):
                 foldersArray.append(root)
 
         return foldersArray
-
-    def startFakeDB(self, zeoPort):
-        self.createNewDBFile()
-        self.zeoServer = self.createDBServer(os.path.join(self.dbFolder, "Data.fs"),
-                                             zeoPort)
-        DBMgr.setInstance(DBMgr(hostname="localhost", port=zeoPort))
-
-    def stopFakeDB(self):
-        try:
-            os.kill(self.zeoServer, signal.SIGTERM)
-        except OSError, e:
-            print ("Problem sending kill signal: " + str(e))
-        except AttributeError, e:
-            #DB has been already stopped
-            pass
-
-        try:
-            #os.wait()
-            os.waitpid(self.zeoServer, 0)
-            self.removeDBFile()
-        except OSError, e:
-            print ("Problem waiting for ZEO Server: " + str(e))
-        except AttributeError, e:
-            #DB has been already stopped
-            pass
-
-    def restoreDBInstance(self):
-        DBMgr.setInstance(None)
-
-    def startProductionDB(self):
-        try:
-            commands.getstatusoutput(TestsConfig.getInstance().getStartDBCmd())
-        except KeyError:
-            print "[ERR] Not found in tests.conf: command to start production DB"
-            sys.exit(1)
-
-    def stopProductionDB(self):
-        try:
-            commands.getstatusoutput(TestsConfig.getInstance().getStopDBCmd())
-        except KeyError:
-            print "[ERR] Not found in tests.conf: command to stop production DB"
-            sys.exit(1)
-
-    def createNewDBFile(self):
-        from ZODB import FileStorage, DB
-        savedDir = os.getcwd()
-        self.dbFolder = tempfile.mkdtemp()
-        os.chdir(self.dbFolder)
-
-        storage = FileStorage.FileStorage("Data.fs")
-        db = DB(storage)
-        connection = db.open()
-        dbroot = connection.root()
-
-        transaction.commit()
-
-        connection.close()
-        db.close()
-        storage.close()
-        os.chdir(savedDir)
-
-    def removeDBFile(self):
-        shutil.rmtree(self.dbFolder)
-
-    def createDBServer(self, file, port):
-        from util import TestZEOServer
-        pid = os.fork()
-        if pid:
-            return pid
-        else:
-            server = TestZEOServer(port, file)
-            server.start()
-

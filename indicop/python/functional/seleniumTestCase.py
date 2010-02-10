@@ -16,7 +16,6 @@ class SeleniumTestCase(unittest.TestCase, BaseTest):
         self.verificationErrors = []
         self.confId = None
         self.selenium = None
-
         grid = GridData.getInstance()
         if grid.isActive():
             self.selenium = selenium(grid.getUrl(), grid.getPort(), grid.getEnv(), self.getRootUrl())
@@ -25,10 +24,9 @@ class SeleniumTestCase(unittest.TestCase, BaseTest):
 
         self.selenium.start()
 
-
         #Handy functions from selenium and twill you might need
         #set up the time between each selenium's commands (in milliseconds)
-#        self.selenium.set_speed(1000)
+#        self.selenium.set_speed(5000)
         #convenient to set the browser in a known state
 #        tc.clear_cookies()
 
