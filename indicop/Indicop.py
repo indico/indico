@@ -134,6 +134,7 @@ class Coverage(BaseTest):
         cls.__instance = Coverage()
     instantiate = classmethod( instantiate )
 
+
 class Functional(BaseTest):
     def __init__(self):
         self.child = None
@@ -232,6 +233,7 @@ class Functional(BaseTest):
 
     def stopSeleniumServer(self):
         self.child.kill()
+
 
 class Specify(Functional):
     def __init__(self, specifyArg):
