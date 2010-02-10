@@ -10,6 +10,7 @@ from MaKaC.user import AvatarHolder, GroupHolder
 
 from MaKaC.services.interface.rpc.common import ServiceError
 
+from MaKaC.services.implementation.base import ParameterManager
 from MaKaC.services.implementation.base import ProtectedModificationService
 from MaKaC.services.implementation.base import ProtectedDisplayService
 from MaKaC.errors import ModificationError, MaKaCError
@@ -249,13 +250,15 @@ class EditMaterialClassBase(MaterialModifBase, UserListChange):
         matId = self._params.get("materialId",None)
         self._newProperties = self._params.get("materialInfo",None)
         self._newUserList = self._newProperties['userList']
-        
-        #if matId == None:           
-        #    raise ServiceError("No material was specified!")        
-        #
-        #self._material = self._target.getMaterialById(matId)
-        
-        
+
+        materialPM = ParameterManager(self._newProperties)
+
+        self._title = materialPM.extract('title', pType=str, allowEmpty=True, defaultValue="NO TITLE ASSIGNED")
+        self._description = materialPM.extract('description', pType=str, allowEmpty=True)
+        self._protection = materialPM.extract('protection', pType=int)
+        self._hidden = materialPM.extract('hidden', pType=int)
+        self._accessKey = materialPM.extract('accessKey', pType=str, allowEmpty=True)
+
     def _getAnswer(self):
         """
         Updates the material with the new properties
@@ -263,7 +266,12 @@ class EditMaterialClassBase(MaterialModifBase, UserListChange):
 
         self.changeUserList(self._material, self._newUserList)
 
-        DictPickler.update(self._material, self._newProperties)            
+        self._material.setTitle(self._title);
+        self._material.setDescription(self._description);
+        self._material.setProtection(self._protection);
+        self._material.setHidden(self._hidden);
+        self._material.setAccessKey(self._accessKey);
+
         return DictPickler.pickle(self._material)
 
 class DeleteMaterialClassBase(MaterialModifBase):
