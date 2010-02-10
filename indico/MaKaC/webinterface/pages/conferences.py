@@ -7457,6 +7457,7 @@ class WConfModifContribList(wcomponents.WTemplated):
             dict["tracks"] = self._filterCrit.getField("track").getValues()
             if self._filterCrit.getField("track").getShowNoValue():
                 dict["trackShowNoValue"] = "1"
+
         if self._filterCrit.getField("session"):
             dict["sessions"] = self._filterCrit.getField("session").getValues()
             if self._filterCrit.getField("session").getShowNoValue():

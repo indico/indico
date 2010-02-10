@@ -254,6 +254,7 @@ class Config:
             "xml":"Simple xml",
             "alice_meeting":"ALICE meeting",
             "administrative3": "Administrative style 2",
+            "administrative4": "Administrative style (all material)",
             "atlas":"ATLAS Meeting",
             "text":"Simple text",
             "totem_meeting":"TOTEM Meeting",
@@ -279,6 +280,7 @@ class Config:
         "conference": [
             "it",
             "administrative3",
+            "administrative4",
             "cdsagenda",
             "text",
             "egee_meeting",
@@ -307,6 +309,7 @@ class Config:
             "xml",
             "alice_meeting",
             "administrative3",
+            "administrative4",
             "atlas",
             "text",
             "totem_meeting",
@@ -505,8 +508,8 @@ class Config:
             return True
         else:
             return False
-        
-    
+
+
     def getInstance(cls):
         """returns an instance of the Config class ensuring only a single
            instance is created. All the clients should use this method for
@@ -659,7 +662,7 @@ class Config:
 
     def getArchivedFileURL(self, localFile):
         return "%s/getFile.py?%s" % (self.getBaseURL(), localFile.getLocator().getURLForm() )
-    
+
 
     def hasFileConverter(self):
         return self.getFileConverter().get("conversion_server", "") != ""
