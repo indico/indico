@@ -58,7 +58,7 @@
             <tr>
             <td>&nbsp;</td>
             <td align="left" style="padding-top: 5px; padding-bottom: 15px;">
-                <form action="<%=removeAssignRefereeURL %>" method="post">
+                 <form id="removeReferee" action="<%= removeAssignRefereeURL %>" method="post" onsubmit="<%=removeRefereeConfirm%>">
                     <input type="submit" class=btn value="Remove">
                 </form>
             </td>
@@ -334,7 +334,7 @@
                 <% elif len(AvailableReviewers) == 0: %>
                 <td>&nbsp;</td>
                 <td>
-                        <%= _("No more content reviewers available in this conference.")%>
+                        <%= _("No more content reviewers available to assign in this conference.")%>
                 </td>
                 </tr>
                 <% end %>

@@ -82,6 +82,10 @@ class WContributionReviewing(wcomponents.WTemplated):
         vars["IsReferee"] = self.__target.getReviewManager().isReferee(self._rh._getUser())
         vars["Review"] = self.__target.getReviewManager().getLastReview()
         vars["TrackList"] = self._conf.getTrackList()
+        if reviewManager.hasEditor() or reviewManager.hasReviewers():
+            vars["removeRefereeConfirm"] =  "javascript:return confirm( 'The reviewers already assigned to this contribution will be removed. Do you want to remove the referee anyway?');"
+        else:
+            vars["removeRefereeConfirm"] = ""
         
         return vars
 

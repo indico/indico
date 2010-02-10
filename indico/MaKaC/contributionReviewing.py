@@ -132,6 +132,10 @@ class ReviewManager(Persistent):
 
         self._referee.unlinkTo(self._contribution, "referee")
         self.getConfReview().removeRefereeContribution(self._referee, self._contribution)
+        if self.hasEditor():
+            self.removeEditor()
+        if self.hasReviewers():
+            self.removeAllReviewers()
         #e-mail notification will be send when referee is removed from contribution only if the manager enable the option in 'Automatic e-mails' section
         if self.getConfReview()._enableRefereeEmailNotifForContribution == True:
             notification = ContributionReviewingRemoveNotification(self._referee, 'Referee', self._contribution)
