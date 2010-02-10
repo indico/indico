@@ -231,6 +231,15 @@ class RH(RequestHandlerBase):
     def getRequestHTTPHeaders( self ):
         return self._req.headers_in
 
+    def _disableCaching(self):
+        """
+        Disables caching, i.e. for materials
+        """
+
+        self._req.headers_out["Pragma"] = "no-cache"
+        self._req.headers_out["Cache-Control"] = "no-store, no-cache, must-revalidate"
+
+
     def _redirect( self, targetURL, noCache=False ):
         """Utility for redirecting the client web browser to the specified
             URL.
@@ -242,18 +251,14 @@ class RH(RequestHandlerBase):
             if "\r" in str(targetURL) or "\n" in str(targetURL):
                 raise MaKaCError(_("http header CRLF injection detected"))
         self._req.headers_out["Location"] = str(targetURL)
-        
+
         if noCache:
-            # Http 1.1
-            self._req.headers_out["Cache-Control"] = "no-store, no-cache, must-revalidate"
-            # Http 1.0
-            self._req.headers_out["Pragma"] = "no-cache"
-        
+            self._disableCaching()
         try:
             self._req.status = apache.HTTP_MOVED_PERMANENTLY
         except NameError:
             pass
-    
+
     def _checkHttpsRedirect(self):
         if self._tohttps and not self._req.is_https():
             current_url = self._req.construct_url(self._req.unparsed_uri)
@@ -751,7 +756,7 @@ class RHDisplayBaseProtected( RHProtected ):
         if self.getHostIP() in ipList:
             # let Private OAI harvesters access protected (display) pages
             return
-        
+
         if not self._target.canAccess( self.getAW() ):
             from MaKaC.conference import Link, LocalFile, Category
             if isinstance(self._target,Link) or isinstance(self._target,LocalFile):

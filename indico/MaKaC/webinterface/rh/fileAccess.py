@@ -43,6 +43,9 @@ class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
         RHDisplayBaseProtected._checkProtection( self )
     
     def _process( self ):
+
+        self._disableCaching()
+
         if self._file.getId() != "minutes":
             #self._req.headers_out["Accept-Ranges"] = "bytes"
             self._req.headers_out["Content-Length"] = "%s"%self._file.getSize()

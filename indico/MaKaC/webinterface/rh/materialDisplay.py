@@ -54,6 +54,10 @@ class RHMaterialDisplay( RHMaterialDisplayBase ):
     _uh = urlHandlers.UHMaterialDisplay
     
     def _process( self ):
+
+        # material pages should not be cached, since protection can change
+        self._disableCaching()
+
         if len(self._material.getResourceList()) == 1:
             res = self._material.getResourceList()[0]
             if isinstance(res, conference.Link):
@@ -63,11 +67,11 @@ class RHMaterialDisplay( RHMaterialDisplayBase ):
                     self._redirect( urlwmv )
                 elif url.find(".flv") != -1 or url.find(".f4v") != -1 or url.find("rtmp://") != -1:
                     urlflash = urlHandlers.UHVideoFlashAccess().getURL(res)
-                    self._redirect( urlflash)
+                    self._redirect( urlflash, noCache=True)
                 else:
-                    self._redirect( res.getURL() )
+                    self._redirect( res.getURL(), noCache=True )
             elif isinstance(res, conference.LocalFile):
-                self._redirect( urlHandlers.UHFileAccess.getURL( res ) )
+                self._redirect( urlHandlers.UHFileAccess.getURL( res ), noCache=True )
         else:
             #raise "%s"%self._material.getOwner()
             if self._material.getConference()!=None:

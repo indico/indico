@@ -1,4 +1,3 @@
-var debugVar, debugVar2;
 
 type("AddMaterialDialog", ["ExclusivePopup"], {
 
@@ -783,8 +782,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
                 self.set(id,
                          material);
 
-                debugVar = self;
-                debugVar2 = material;
+
             }
         });
     },
