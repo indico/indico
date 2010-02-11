@@ -1,5 +1,5 @@
 var executeOnload = false;
-var __globalEditorTable = {}; 
+var __globalEditorTable = {};
 
 type("RichTextEditor", ["IWidget", "Accessor"],
      {
@@ -21,12 +21,12 @@ type("RichTextEditor", ["IWidget", "Accessor"],
 
 	 postDraw: function() {
 	     this.div.set('');
-	     
+
 	     this.div.dom.innerHTML = this.editor.CreateHtml();
 
 	     var self = this;
 
-	     this.onLoadFunc = function() {			      
+	     this.onLoadFunc = function() {
 
                  if (self.text) {
 		     self.set(self.text);
@@ -35,16 +35,16 @@ type("RichTextEditor", ["IWidget", "Accessor"],
 		 each(self.onLoadList,
 		      function(callback) {
 			  callback();
-		      });		 
+		      });
 
-		 self.editor.Events.AttachEvent( 'OnSelectionChange', 
+		 self.editor.Events.AttachEvent( 'OnSelectionChange',
 						 function() {
-						     if (!self.observing) {							 
+						     if (!self.observing) {
 							 self.startObserving();
 						     }
-						 } ) ;			      
+						 } ) ;
 	     };
-	     
+
 	     if (this.editor && this.editor.SetData) {
 		 this.onLoadFunc();
 	     } else {
@@ -52,7 +52,7 @@ type("RichTextEditor", ["IWidget", "Accessor"],
 	     }
 
 	 },
-	 
+
          set: function(text) {
              var self = this;
 
@@ -126,7 +126,7 @@ type("RichTextWidget", ["IWidget", "Accessor"],
          observe: function(callback) {
              var self = this;
 
-	     var observeFunc = function(value) {		 
+	     var observeFunc = function(value) {
 
 		 self.plain.unbind();
 		 self.rich.unbind();
@@ -142,7 +142,7 @@ type("RichTextWidget", ["IWidget", "Accessor"],
 		 }
 	     };
 
-	     this.selected.observe(observeFunc);	    
+	     this.selected.observe(observeFunc);
 	     observeFunc(this.selected.get());
          },
 
@@ -233,7 +233,7 @@ type("RichTextWidget", ["IWidget", "Accessor"],
          this.switchLink = new Chooser(
              {
                  toPlain: command(
-                     toPlainFunc, 
+                     toPlainFunc,
 		     $T("switch to plain text")),
                  toRich: command(
                      toRichFunc,
@@ -249,12 +249,62 @@ type("RichTextWidget", ["IWidget", "Accessor"],
 	 } else {
 	     toPlainFunc();
 	 }
-	
+
 	 this.rich.onLoad(function() {
 	     self.loaded = true;
              self.set(self.currentText, true);
 	 });
      });
+
+
+type("RichTextInlineEditWidget", ["InlineEditWidget"],
+        {
+            _handleEditMode: function(value) {
+
+                this.description = new RichTextWidget(600, 400,{},'','rich','IndicoMinimal');
+                this.description.set(value);
+                return this.description.draw();
+            },
+
+            _handleDisplayMode: function(value) {
+
+                var iframeId = "descFrame";
+                var iframe = Html.iframe({id: iframeId,name: iframeId, style:{width: pixels(600),
+                                                                              height:pixels(100),
+                                                                              border: "1px dotted #ECECEC"}});
+
+                var loadFunc = function() {
+                    var doc;
+
+                    if (Browser.IE) {
+                        doc = document.frames[iframeId].document;
+                    } else {
+                        doc = $E(iframeId).dom.contentDocument;
+                    }
+                    if (value == "") {
+                        value = '<em>No description</em>';
+                    }
+                    doc.body.innerHTML = '<link href="css/Default.css" type="text/css" rel="stylesheet">' + value;
+                };
+
+                if (Browser.IE) {
+                    iframe.dom.onreadystatechange = loadFunc;
+                } else {
+                    // for normal browsers
+                    iframe.observeEvent("load", loadFunc);
+                }
+
+                return iframe;
+            },
+
+            _getNewValue: function() {
+                return this.description.get();
+            }
+        },
+        function(method, attributes, initValue) {
+            this.InlineEditWidget(method, attributes, initValue);
+        });
+
 
 
 function FCKeditor_OnComplete( editorInstance )
@@ -268,7 +318,7 @@ function FCKeditor_OnChange( id ) {
 
     if(value.editor.IsDirty()) {
 	each(value.callbacks, function(func) {
-	    func();	    
+	    func();
 	})
 	value.editor.ResetIsDirty();
     }

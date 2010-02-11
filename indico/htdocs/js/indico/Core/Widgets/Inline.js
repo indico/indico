@@ -66,7 +66,7 @@ type("InlineRemoteWidget", ["InlineWidget"],
          this.ready = new WatchValue();
          this.ready.set(false);
          this.loadOnStartup = loadOnStartup;
-         this.source = indicoSource(method, attributes, false, !loadOnStartup);
+         this.source = indicoSource(method, attributes, null, !loadOnStartup);
      });
 
 /*
@@ -825,6 +825,14 @@ function(button){
 type("InlineEditWidget", ["InlineRemoteWidget"],
      {
 
+        _buildFrame: function(modeChooser, switchChooser) {
+            return Html.div({},
+                            modeChooser,
+                            Html.div({style:{marginTop: '5px'}},
+                                     switchChooser));
+
+        },
+
          _handleError: function(error) {
              this._error(error);
          },
@@ -875,6 +883,11 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
              return this._buildFrame(Widget.block(modeChooser),
                                      Widget.block(switchChooser));
 
+         },
+
+         /* By default, any input is accepted */
+         _verifyInput: function() {
+             return true;
          },
 
 
