@@ -1,23 +1,37 @@
 <% from MaKaC.reviewing import ConferenceReview %>
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 
+<% if not Review.isAuthorSubmitted(): %>
+<table width="90%%" align="center" border="0" style="margin-bottom: 1em">
+    <% if len(Review.getReviewManager().getVersioning()) == 1: %>
+    <tr>
+        <td>
+            <p style="padding-left: 25px;"><font color="gray">
+            <%= _("Warning: the author(s) of this contribution have still not marked their initial materials as submitted.")%><br>
+            <%= _("You must wait until then to start the reviewing process.")%>
+            </font></p>
+        </td>
+    </tr>
+    <% end %>
+    <% else: %>
+    <tr>
+        <td>
+            <p style="padding-left: 25px;"><font color="gray">
+            <%= _("Warning: since this contribution was marked 'To be corrected', the author(s) has not submitted new materials.")%><br>
+            <%= _("You must wait until then to restart the reviewing process.")%><br>
+            </font></p>
+        </td>
+    </tr>
+    <% end %>
+</table>
+<% end %>
+<% else: %>
 <table width="90%%" align="center" border="0" style="padding-top: 15px;">
     <tr>
-        <td colspan="5" class="groupTitle" style="border: none"><%= _("Give opinion on layout of a contribution")%>
+        <td colspan="5" class="groupTitle" style="border: none"><%= _("Give opinion on the layout of a contribution")%>
             <% inlineContextHelp(_('Here is displayed the judgement given by the Layout Reviewer.<br/>Only the Layout Reviewer of this contribution can change this.')) %>
         </td>
     </tr>
-    <% if not Review.isAuthorSubmitted(): %>
-                <tr>
-                    <td colspan="2" align="left" style="padding-top: 10px; padding-left: 10px;">
-                        <span>
-                            <%= _("The author has not submitted the materials yet.")%><br>
-                            <%= _("Please wait until he/she does so.")%>
-                        </span>
-                    </td>
-                </tr>
-            <% end %>
-    <% else: %>
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Reviewing questions")%>:</span></td>
         <td width="60%%" id="criteriaListDisplay">
@@ -46,10 +60,9 @@
             <span id="submitbutton"></span>
             <span id="submittedmessage"></span>
 		</td>
-    </tr>
-  <% end %>  
+    </tr> 
 </table>
-
+<% end %>
 <script type="text/javascript">
 
 var observer = function(value) {

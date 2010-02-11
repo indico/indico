@@ -6,9 +6,34 @@
 <% format = "%a %d %b %Y at %H\x3a%M" %>
 
 
-<div style="padding-left: 10px; padding-top: 10px">
+<div style="padding-left: 10px; padding-top: 10px; padding-bottom: 10px;">
 <em><%= _("The reviewing mode choosen for this conference is")%>: <%= ConferenceChoiceStr%></em>
 </div>
+<% if not Review.isAuthorSubmitted(): %>
+<table width="90%%" align="center" border="0" style="margin-bottom: 1em">
+    <% if len(Review.getReviewManager().getVersioning()) == 1: %>
+    <tr>
+        <td>
+            <p style="padding-left: 25px;"><font color="gray">
+            <%= _("Warning: the author(s) of this contribution have still not marked their initial materials as submitted.")%><br>
+            <%= _("You must wait until then to start the reviewing process.")%>
+            </font></p>
+        </td>
+    </tr>
+    <% end %>
+    <% else: %>
+    <tr>
+        <td>
+            <p style="padding-left: 25px;"><font color="gray">
+            <%= _("Warning: since this contribution was marked 'To be corrected', the author(s) has not submitted new materials.")%><br>
+            <%= _("You must wait until then to restart the reviewing process.")%><br>
+            </font></p>
+        </td>
+    </tr>
+    <% end %>
+</table>
+<% end %>
+<% else: %>
 <!-- Judgement of the editor -->
 <% if ConferenceChoice == 3 or ConferenceChoice == 4:%>
 <table width="90%%" align="center" border="0" style="margin-bottom: 1em; margin-top: 1em">
@@ -63,17 +88,6 @@
             <% inlineContextHelp(_('Here is displayed the judgement given by the Referee.<br/>If you are the Referee of this contribution, you can change this.')) %>    
         </td>
     </tr>
-    <% if not Review.isAuthorSubmitted(): %>
-                <tr>
-                    <td colspan="2" align="left">
-                        <span>
-                            <%= _("The author has not submitted the materials yet.")%><br>
-                            <%= _("Please wait until he/she does so.")%>
-                        </span>
-                    </td>
-                </tr>
-            <% end %>
-    <% else: %>
         <% if IsReferee: %>
                 <% if ConferenceChoice == 4 and not Editing.isSubmitted(): %>
                    <tr>
@@ -136,10 +150,9 @@
             </td>
         </tr>
         <% end %>  
-   <% end %>
 </table>
 <% end %>
-
+<% end %>
 <script type="text/javascript">
 
 var observer = function(value) {

@@ -28,21 +28,10 @@
 <% else: %>
 <table width="90%%" align="center" border="0" style="padding-top: 15px;">
     <tr>
-        <td colspan="5" class="groupTitle" style="border: none"><%= _("Give opinion on content of a contribution")%>
+        <td colspan="5" class="groupTitle" style="border: none"><%= _("Give opinion on the content of a contribution")%>
             <% inlineContextHelp(_('Here is displayed the judgement given by the Content Reviewers<br/>Only the Content Reviewers of this contribution can change their respective judgements.')) %>
         </td>
     </tr>
-    <% if not Review.isAuthorSubmitted(): %>
-                <tr>
-                    <td colspan="2" align="left" style="padding-top: 10px; padding-left: 10px;">
-                        <span>
-                            <%= _("The author has not submitted the materials yet.")%><br>
-                            <%= _("Please wait until he/she does so.")%>
-                        </span>
-                    </td>
-                </tr>
-            <% end %>
-    <% else: %>
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Reviewing questions")%></span></td>
         <td width="60%%" id="questionListDisplay">
