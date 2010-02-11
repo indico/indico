@@ -87,22 +87,23 @@ class UserAddToBasket(LoggedOnlyService):
 
 class UserRemoveFromBasket(LoggedOnlyService):
     def _checkParams(self):
-        LoggedOnlyService._checkParams(self)        
-        
+        LoggedOnlyService._checkParams(self)
 
-        self._obj = user.AvatarHolder().getById(self._params['id'])        
-        self._target = self.getAW().getUser()  
-        
+        self._userData = self._params['value']
+
+        self._target = self.getAW().getUser()
+
     def _getAnswer( self):
 
-##        raise ServiceError("ERR-FOO","For no apparent reason")
+        for obj in self._userData:
+            self._obj = user.AvatarHolder().getById(obj['id'])
 
-        if (self._obj == None):
-            raise ServiceError("ERR-U0","User does not exist!")
-        if (self._target.getPersonalInfo().getBasket().deleteElement(self._obj)):
-            return
-        else:
-            raise ServiceError("ERR-U2","Element not in list!")
+            if (self._obj == None):
+                raise ServiceError("ERR-U0","User does not exist!")
+            if (self._target.getPersonalInfo().getBasket().deleteElement(self._obj)):
+                return
+            else:
+                raise ServiceError("ERR-U2","Element not in list!")
         
 
 class UserListBasket(LoggedOnlyService):
