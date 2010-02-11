@@ -1,6 +1,7 @@
 FCKConfig.ToolbarSets["IndicoMinimal"] = [
     ['Bold','Italic','Underline','StrikeThrough','-','Subscript','Superscript','-'],
     ['Indent', 'Outdent', 'OrderedList','UnorderedList','Blockquote','-','Link','Unlink','Anchor'],
+    ['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],
     ['SpecialChar']
 ] ;
 
