@@ -429,17 +429,13 @@ class EditorJudgement(Judgement):
             If the judgement is 'To be corrected', versioning takes place.
             A new Review object is then created as 'last review'.
         """
-        if self.getReviewManager().getConference().getConfReview().getChoice() == 3:
-            Judgement.setSubmitted(self, submitted)
-            
+        Judgement.setSubmitted(self, submitted)
+        if self.getReviewManager().getConference().getConfReview().getChoice() == 3 and self._judgement == "To be corrected":
             matReviewing = self.getReviewManager().getContribution().getReviewing()
-        
             self.getReview().copyMaterials(matReviewing)
-                                                   
-            if self._judgement == "To be corrected":
-                self.getReviewManager().newReview()
-                # remove reviewing materials from the contribution
-                self.getReviewManager().getContribution().removeMaterial(matReviewing)
+            self.getReviewManager().newReview()
+            # remove reviewing materials from the contribution
+            self.getReviewManager().getContribution().removeMaterial(matReviewing)
             
     def getAnswers(self):
         return zip(self.getConfReview().getLayoutCriteria(), (self.getAnswer(k) for k in self.getConfReview().getLayoutCriteria()))

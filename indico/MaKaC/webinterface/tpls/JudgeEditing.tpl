@@ -2,10 +2,22 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 
 <table width="90%%" align="center" border="0" style="padding-top: 15px;">
-        <td colspan="5" class="groupTitle"><%= _("Give opinion on layout of a contribution")%>
+    <tr>
+        <td colspan="5" class="groupTitle" style="border: none"><%= _("Give opinion on layout of a contribution")%>
             <% inlineContextHelp(_('Here is displayed the judgement given by the Layout Reviewer.<br/>Only the Layout Reviewer of this contribution can change this.')) %>
         </td>
     </tr>
+    <% if not Review.isAuthorSubmitted(): %>
+                <tr>
+                    <td colspan="2" align="left" style="padding-top: 10px; padding-left: 10px;">
+                        <span>
+                            <%= _("The author has not submitted the materials yet.")%><br>
+                            <%= _("Please wait until he/she does so.")%>
+                        </span>
+                    </td>
+                </tr>
+            <% end %>
+    <% else: %>
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Reviewing questions")%>:</span></td>
         <td width="60%%" id="criteriaListDisplay">
@@ -35,9 +47,18 @@
             <span id="submittedmessage"></span>
 		</td>
     </tr>
+  <% end %>  
 </table>
 
 <script type="text/javascript">
+
+var observer = function(value) {
+                if(value!="None"){
+                        submitButton.dom.disabled = false;
+                        $E('submitHelpPopUp').set("");
+                        $E('submitHelpPopUp').dom.display = 'none';
+                        }
+}
 
 var showWidgets = function(firstLoad) {
                            
@@ -175,7 +196,9 @@ var submitButton = new IndicoUI.Widgets.Generic.simpleButton($E('submitbutton'),
         function(result, error){
             if (!error) {
                 submitted = !submitted;
-                updatePage(false)
+               /* updatePage(false)*/
+               location.href = "<%= urlHandlers.UHContributionModifReviewing.getURL(Contribution) %>"
+               location.reload(true)
             } else {
                 alert (error)
             }

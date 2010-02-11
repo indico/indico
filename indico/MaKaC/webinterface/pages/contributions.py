@@ -415,12 +415,16 @@ class WPContributionModifBase( WPConferenceModifBase  ):
     
             if (confReviewChoice == 3 or confReviewChoice == 4) and \
                 self._contrib.getReviewManager().isEditor(self._rh._getUser()) and \
+<<<<<<< HEAD:indico/MaKaC/webinterface/pages/contributions.py
                 (not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or confReviewChoice == 3) and \
                 self._contrib.getReviewManager().getLastReview().isAuthorSubmitted():
 <<<<<<< HEAD:indico/MaKaC/webinterface/pages/contributions.py
 
                 self._tabJudgeEditing = self._tabCtrl.newTab( "editing", "Editing", \
 =======
+=======
+                (not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or confReviewChoice == 3):
+>>>>>>> [IMP] - if materials not submitted - no exception:indico/MaKaC/webinterface/pages/contributions.py
                 
                 self._tabJudgeEditing = self._subtabReviewing.newSubTab( "editing", "Judge Layout", \
 >>>>>>> [DEVELOPMENT] - new subtabs + other:indico/MaKaC/webinterface/pages/contributions.py
@@ -428,8 +432,7 @@ class WPContributionModifBase( WPConferenceModifBase  ):
 
             if (confReviewChoice == 2 or confReviewChoice == 4) and \
                 self._contrib.getReviewManager().isReviewer(self._rh._getUser()) and \
-                not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() and \
-                self._contrib.getReviewManager().getLastReview().isAuthorSubmitted():
+                not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
                 
                 self._tabGiveAdvice = self._subtabReviewing.newSubTab( "advice", "Judge Content", \
                                       urlHandlers.UHContributionGiveAdvice.getURL(self._target))

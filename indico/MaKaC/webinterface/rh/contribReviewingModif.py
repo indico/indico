@@ -295,8 +295,6 @@ class RHEditorBase(RHContribModifBase):
             
     def _checkParams(self, params):
         RHContribModifBase._checkParams(self, params)
-        if not (self._target.getReviewManager().getLastReview().isAuthorSubmitted()):
-            raise MaKaCError("You must wait until the author has submitted the materials")
         if self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() and \
            not self._target.getConference().getConfReview().getChoice() == 3:
             raise MaKaCError("The final judgement has been submitted")
@@ -314,6 +312,8 @@ class RHJudgeEditing(RHEditorBase):
     
     def _checkParams( self, params ):
         RHEditorBase._checkParams( self, params )
+        if not (self._target.getReviewManager().getLastReview().isAuthorSubmitted()):
+            raise MaKaCError("You must wait until the author has submitted the materials")
         if self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() and \
             not self._target.getConference().getConfReview().getChoice() == 3:
             raise MaKaCError("This contribution has already been judged by the referee.")
@@ -358,8 +358,6 @@ class RHReviewerBase(RHContribModifBase):
             
     def _checkParams(self, params):
         RHContribModifBase._checkParams(self, params)
-        if not (self._target.getReviewManager().getLastReview().isAuthorSubmitted()):
-            raise MaKaCError("You must wait until the author has submitted the materials")
         if self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
             raise MaKaCError("The final judgement has been submitted")
 
@@ -380,6 +378,8 @@ class RHGiveAdvice(RHReviewerBase):
     
     def _checkParams( self, params ):
         RHReviewerBase._checkParams( self, params )
+        if not (self._target.getReviewManager().getLastReview().isAuthorSubmitted()):
+            raise MaKaCError("You must wait until the author has submitted the materials")
         if self._target.getReviewManager().getLastReview().isSubmitted():
             raise MaKaCError("This contribution has already been judged by the referee.")
         self._reviewer = self.getAW().getUser()
