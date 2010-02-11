@@ -337,7 +337,7 @@ class test_indico(Command):
             print "Some jars could not be downloaded. Please download the missing jars manually"
             sys.exit(-1)
 
-        from indicop.Indicop import Indicop
+        from tests.Indicop import Indicop
         testsToRun = []
 
         if self.unit:
@@ -372,8 +372,8 @@ class test_indico(Command):
 
 
     def checkDBStatus(self, testsToRun, specify):
-        from indicop.TestsConfig import TestsConfig
-        from indicop.util import TestZEOServer
+        from tests.TestsConfig import TestsConfig
+        from tests.util import TestZEOServer
         from MaKaC.common.Configuration import Config
 
         FakeDBManaging = 0
@@ -419,21 +419,21 @@ i.e. try 'easy_install %s'""" % (package, package)
         return validPackages
 
     def checkIndicopJars(self):
-        from indicop.TestsConfig import TestsConfig
+        from tests.TestsConfig import TestsConfig
 
         """check if needed jars are here, if not, dowloading them and unzip a file if necessary"""
         jarsList = {}
         currentFilePath = os.path.dirname(__file__)
         try:
             jarsList['jsunit'] = {'path':     os.path.join(currentFilePath,
-                                                           'indicop',
+                                                           'tests',
                                                            'javascript',
                                                            'unit'),
                                   'url':      TestsConfig.getInstance().getJsunitURL(),
                                   'filename': TestsConfig.getInstance().getJsunitFilename()}
 
             jarsList['jscoverage'] = {'path':     os.path.join(currentFilePath,
-                                                               'indicop',
+                                                               'tests',
                                                                'javascript',
                                                                'unit',
                                                                'plugins'),
@@ -441,7 +441,7 @@ i.e. try 'easy_install %s'""" % (package, package)
                                       'filename': TestsConfig.getInstance().getJscoverageFilename()}
 
             jarsList['selenium'] = {'path':      os.path.join(currentFilePath,
-                                                              'indicop',
+                                                              'tests',
                                                               'python',
                                                               'functional'),
                                     'url':       TestsConfig.getInstance().getSeleniumURL(),

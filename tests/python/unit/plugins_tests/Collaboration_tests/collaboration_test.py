@@ -96,6 +96,11 @@ makeCopy = True
 doCleanUp = True
 doRemove = True
 
+def setup_module():
+    #this test is a performance test and takes too much time to execute
+    import nose
+    raise nose.SkipTest
+
 class TestResponsiveness(unittest.TestCase):
 
     def createDBServer(self, file, port):

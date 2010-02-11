@@ -28,6 +28,9 @@ class TestInitializedContextManager(unittest.TestCase):
     def setUp(self):
         ContextManager.create()
 
+    def tearDown(self):
+        ContextManager.destroy()
+
     def testGetDefaultWorks(self):
         self.assertEquals(ContextManager.getdefault('test', '42'), '42')
 

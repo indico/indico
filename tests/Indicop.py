@@ -59,7 +59,7 @@ class Unit(BaseTest):
         sys.stderr = outerr
 
 
-        #retrieving tests from Indicop folder
+        #retrieving tests from tests folder
         args = ['nose', '--nologcapture', '--logging-clear-handlers', '-v',
                 os.path.join(self.setupDir, 'python', 'unit')]
         #retrieving tests from plugins folder
@@ -86,7 +86,7 @@ class Unit(BaseTest):
             return returnString + "PY Unit tests succeeded\n"
         else:
             return returnString + \
-                "[FAIL] Unit tests - report in indicop/report/pyunit.txt\n"
+                "[FAIL] Unit tests - report in tests/report/pyunit.txt\n"
 
     def walkThroughPluginsFolders(self):
         rootPluginsPath = os.path.join(self.setupDir,
@@ -123,7 +123,7 @@ class Coverage(BaseTest):
             figleaf.annotate_html.report_as_html(coverageOutput,
                                                  coverageDir, [], {})
         return ("PY Coverage - Report generated in "
-                             "report/pycoverage/index.html\n")
+                             "tests/report/pycoverage/index.html\n")
 
     def getInstance(cls):
         if cls.__instance == None:
@@ -153,7 +153,7 @@ class Functional(BaseTest):
             outerr = StringIO.StringIO()
             sys.stderr = outerr
 
-            #retrieving tests from Indicop folder
+            #retrieving tests from tests folder
             args = ['nose', '--nologcapture', '--logging-clear-handlers', '-v',
                     os.path.join(self.setupDir, 'python', 'functional')]
             #retrieving tests from plugins folder
@@ -181,7 +181,7 @@ class Functional(BaseTest):
             report = returnString + "PY Functional tests succeeded\n"
         else:
             report = returnString + ("[FAIL] Functional tests - report in"
-                    " indicop/report/pyfunctional.txt\n")
+                    " tests/report/pyfunctional.txt\n")
         return report
 
     def walkThroughPluginsFolders(self):
@@ -325,7 +325,7 @@ class Grid(BaseTest):
                     returnString += "PY Functional (%s) tests succeeded\n" % env
                 else:
                     returnString += ("[FAIL] Functional (%s) tests - report in"
-                            " indicop/report/pygrid.txt\n") % env
+                            " tests/report/pygrid.txt\n") % env
 
             #restoring the stderr
             sys.stderr = sys.__stderr__
@@ -403,7 +403,7 @@ class Pylint(BaseTest):
                                                                 statusOutput[1])
         else:
             returnString += self.writeReport("pylint", statusOutput[1])
-            return returnString + "PY Lint - report in indicop/report/pylint.txt\n"
+            return returnString + "PY Lint - report in tests/report/pylint.txt\n"
 
 
 class Jsunit(BaseTest):
@@ -504,7 +504,7 @@ class Jsunit(BaseTest):
                                       "in your PATH. (%s)\n" % genOutput[1])
                 else:
                     coverageReport = ("JS Coverage - generated in "
-                                     "indicop/report/jscoverage/index.html\n")
+                                     "tests/report/jscoverage/index.html\n")
 
             #delete built conf file
             os.unlink(confFile)
@@ -525,7 +525,7 @@ class Jsunit(BaseTest):
                 success = successRegexp.match(jsTest)
                 if not success:
                     report += ("[FAIL] JS Unit Tests - report in "
-                          "indicop/report/jsunit.txt\n")
+                          "tests/report/jsunit.txt\n")
                 else:
                     report += ("JS Unit tests succeeded\n")
         except OSError, e:
@@ -573,13 +573,13 @@ class Jsunit(BaseTest):
             confTemplate = f.read()
             f.close()
 
-            #adding tests files from Indicop folder
+            #adding tests files from tests folder
             for root, dirs, files in os.walk(absoluteTestsFolder):
                 for name in files:
                     if name.endswith(".js"):
                         absoluteFilePath = os.path.join(root, name)
                         splitPath = absoluteFilePath.split(relativeTestsFolder)
-                        relativeFilePath = relativeTestsFolder + splitPath[1]
+                        relativeFilePath = relativeTestsFolder + splitPath[2]
 
                         confTemplate += "\n  - %s" % os.path.join(relativeFilePath)
 
@@ -661,7 +661,7 @@ class Jslint(BaseTest):
                                                           'plugins'))
 
         returnString += self.writeReport("jslint", outputString)
-        return returnString + "JS Lint - report in indicop/report/jslint.txt\n"
+        return returnString + "JS Lint - report in tests/report/jslint.txt\n"
 
     def walkThroughFolders(self, path, folderRestriction=''):
         returnString = ""

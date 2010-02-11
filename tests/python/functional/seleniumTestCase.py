@@ -1,8 +1,8 @@
 from MaKaC.common.db import DBMgr
 from MaKaC.conference import ConferenceHolder
 from MaKaC.errors import MaKaCError
-from indicop.BaseTest import BaseTest
-from indicop.Indicop import GridData
+from tests.BaseTest import BaseTest
+from tests.Indicop import GridData
 import unittest
 from twill import commands as tc
 from selenium import selenium

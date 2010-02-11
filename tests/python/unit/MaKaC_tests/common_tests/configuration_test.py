@@ -23,6 +23,17 @@ import sys
 from MaKaC.common.Configuration import Config
 from MaKaC.consoleScripts.installBase import modifyOnDiskIndicoConfOption
 
+def setup_module():
+    #this test module is deprecated
+    import nose
+    raise nose.SkipTest
+
+    DBMgr.getInstance().startRequest()
+
+def teardown_module():
+    DBMgr.getInstance().abort()
+    DBMgr.getInstance().endRequest()
+
 class TestConfiguration(unittest.TestCase):
     def testGetInstanceShouldWork(self):
         self.config = Config.getInstance()
@@ -34,11 +45,11 @@ class TestConfiguration(unittest.TestCase):
 
     def testSmtpUseTLS(self):
         self.testGetInstanceShouldWork()
-        
+
         modifyOnDiskIndicoConfOption('etc/indico.conf.local', 'SmtpUseTLS', 'no')
         self.config.forceReload()
         self.assertEquals(False, self.config.getSmtpUseTLS())
-        
+
         modifyOnDiskIndicoConfOption('etc/indico.conf.local', 'SmtpUseTLS', 'yes')
         self.config.forceReload()
         self.assertEquals(True, self.config.getSmtpUseTLS())
