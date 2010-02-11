@@ -30,6 +30,9 @@ class IConferenceMinimalFossil(IFossil):
     def getTitle(self):
         """Conference title"""
 
+    def getDescription(self):
+        """Conference description"""
+
     def getLocation(self):
         """ Location (CERN/...) """
     getLocation.convert = lambda l: l and l.getName()
