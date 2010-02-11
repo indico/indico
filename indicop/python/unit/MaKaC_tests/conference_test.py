@@ -46,14 +46,7 @@ def teardown_module():
 #From testCategories.py
 class TestCategories(unittest.TestCase):
 
-#    def setUp(self):
-#        DBMgr.getInstance().startRequest()
-#
-#    def tearDown(self):
-#        DBMgr.getInstance().endRequest(True)
-
     def testBasicAddAndRemoveConferences(self):
-#        DBMgr.getInstance().startRequest()
 
         #creation of basic category structure over which perform the tests
         croot=conference.Category()
@@ -92,9 +85,6 @@ class TestCategories(unittest.TestCase):
         assert (c1.getNumConferences()==0)
         assert (c2.getNumConferences()==0)
         assert (croot.getNumConferences()==0)
-
-#        DBMgr.getInstance().getDBConnCache().close()
-#        DBMgr.getInstance().endRequest(True)#
 
     def testAddAndRemoveSubCategories(self):
         #checks that the conference counter works fine when adding a new

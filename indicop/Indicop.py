@@ -30,6 +30,7 @@ import socket
 import time
 import commands
 import StringIO
+import re
 import shutil
 import signal
 import tempfile
@@ -211,7 +212,7 @@ class Functional(BaseTest):
             return ("[ERR] Could not start selenium server - command \"java\""
                     " needs to be in your PATH. (%s)\n" % e)
         except KeyError:
-            return "[ERR] Please specify a SeleniumFilename in tests.conf"
+            return "[ERR] Please specify a SeleniumFilename in tests.conf\n"
 
         sel = selenium("localhost", 4444, "*chrome", "http://www.cern.ch/")
         for i in range(5):
@@ -290,7 +291,7 @@ class Grid(BaseTest):
         self.startMessage("Starting grid tests")
 
         if not self.configExists:
-            return "[ERR] Grid - Please specify hub configuration in tests.conf"
+            return "[ERR] Grid - Please specify hub configuration in tests.conf\n"
 
         try:
             self.gridData.setActive(True)
@@ -336,7 +337,7 @@ class Grid(BaseTest):
                     "hub's settings (%s:%s)") % \
                     (self.gridData.getUrl(), self.gridData.getPort())
         except TimeoutException, e:
-            return "[ERR] Selenium Grid - Hub is probably down (%s:%s) (%s)" % \
+            return "[ERR] Selenium Grid - Hub is probably down (%s:%s) (%s)\n" % \
                     (self.gridData.getUrl(), self.gridData.getPort(), e)
         finally:
             #disable alarm
@@ -518,13 +519,20 @@ class Jsunit(BaseTest):
                 report = "JS Unit Tests - Output in console\n"
             else:
                 report += self.writeReport("jsunit", jsTest)
-                report += ("JS Unit Tests - report in "
+
+                #check if all tests succedded
+                successRegexp = re.compile('(.|\n)*\nTotal\s[0-9]+\stests\s\(Passed:\s[0-9]+;\sFails:\s0;\sErrors:\s0\).*\n(.|\n)*')
+                success = successRegexp.match(jsTest)
+                if not success:
+                    report += ("[FAIL] JS Unit Tests - report in "
                           "indicop/report/jsunit.txt\n")
+                else:
+                    report += ("JS Unit tests succeeded\n")
         except OSError, e:
             return ("[ERR] Could not start js-test-driver server - command "
                     "\"java\" needs to be in your PATH. (%s)\n" % e)
         except KeyError:
-            return "[ERR] Please specify a JsunitFilename in tests.conf"
+            return "[ERR] Please specify a JsunitFilename in tests.conf\n"
 
         #stopping the server
         server.kill()
@@ -556,7 +564,7 @@ class Jsunit(BaseTest):
     module: \"com.google.jstestdriver.coverage.CoverageModule\"""" % \
         TestsConfig.getInstance().getJscoverageFilename()
         except KeyError:
-            return "[ERR] Please, specify a JscoverageFilename in tests.conf"
+            return "[ERR] Please, specify a JscoverageFilename in tests.conf\n"
 
 
         try:
@@ -696,27 +704,18 @@ class Indicop(object):
                  'grid': Grid()}
 
 
-    def main(self, stopAndStartProductionDB, specify, coverage, testsToRun):
+    def main(self, FakeDBManaging, specify, coverage, testsToRun):
 
         returnString = "\n\n=============== ~INDICOP SAYS~ ===============\n\n"
 
         #To not pollute the installation of Indico
         self.configureTempFolders()
 
-        #managing the databases
-        if ('functional' in testsToRun) or ('grid' in testsToRun):
-            if stopAndStartProductionDB:
-                self.stopProductionDB()
-            self.startFakeDB(Config.getInstance().getDBConnectionParams()[1])
-            self.createDummyUser()
-        elif 'unit' in testsToRun or 'specify' in testsToRun:
-            self.startFakeDB(TestsConfig.getInstance().getFakeDBPort())
-            self.createDummyUser()
 
+        self.startManageDB(FakeDBManaging)
 
         if coverage:
             Coverage.instantiate()
-
 
         #specified test can either be unit or functional.
         if specify:
@@ -729,15 +728,7 @@ class Indicop(object):
                     returnString += ("[ERR] Test %s does not exist. "
                       "It has to be added in the testsDict variable\n") % test
 
-        #restoring db environment
-        if ('functional' in testsToRun) or ('grid' in testsToRun):
-            self.stopFakeDB()
-            if stopAndStartProductionDB:
-                self.startProductionDB()
-            self.restoreDBInstance()
-        elif 'unit' in testsToRun or 'specify' in testsToRun:
-            self.stopFakeDB()
-            self.restoreDBInstance()
+        self.stopManageDB(FakeDBManaging)
 
         return returnString
 
@@ -755,6 +746,35 @@ class Indicop(object):
     def deleteTempFolders(self):
         for k in self.newValues:
             shutil.rmtree(self.newValues[k])
+
+################## Start of DB Managing functions ##################
+    def startManageDB(self, FakeDBManaging):
+        """FakeDBManaging == 0, the tests to run do not need any DB
+        FakeDBManaging == 1, unit tests need a fake DB that can be run in parallel
+        of the production DB
+        FakeDBManaging == 2, production DB is not running and functional tests
+        need fake DB which is going to be run on production port.
+        FakeDBManaging == 3, production DB is running, we need to stop it and
+        and start a fake DB on the production port. we will restart production DB"""
+        if FakeDBManaging == 1:
+            self.startFakeDB(TestsConfig.getInstance().getFakeDBPort())
+            self.createDummyUser()
+        elif FakeDBManaging == 2:
+            self.startFakeDB(Config.getInstance().getDBConnectionParams()[1])
+            self.createDummyUser()
+        elif FakeDBManaging == 3:
+            self.stopProductionDB()
+            self.startFakeDB(Config.getInstance().getDBConnectionParams()[1])
+            self.createDummyUser()
+
+    def stopManageDB(self, FakeDBManaging):
+        if FakeDBManaging == 1 or FakeDBManaging == 2:
+            self.stopFakeDB()
+            self.restoreDBInstance()
+        elif FakeDBManaging == 3:
+            self.stopFakeDB()
+            self.startProductionDB()
+            self.restoreDBInstance()
 
     def startFakeDB(self, zeoPort):
         self.createNewDBFile()
@@ -782,14 +802,14 @@ class Indicop(object):
         try:
             commands.getstatusoutput(TestsConfig.getInstance().getStartDBCmd())
         except KeyError:
-            print "[ERR] Not found in tests.conf: command to start production DB"
+            print "[ERR] Not found in tests.conf: command to start production DB\n"
             sys.exit(1)
 
     def stopProductionDB(self):
         try:
             commands.getstatusoutput(TestsConfig.getInstance().getStopDBCmd())
         except KeyError:
-            print "[ERR] Not found in tests.conf: command to stop production DB"
+            print "[ERR] Not found in tests.conf: command to stop production DB\n"
             sys.exit(1)
 
     def createNewDBFile(self):
@@ -821,6 +841,7 @@ class Indicop(object):
         else:
             server = TestZEOServer(port, file)
             server.start()
+################## End of DB Managing functions ##################
 
     def createDummyUser(self):
         from MaKaC import user

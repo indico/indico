@@ -337,10 +337,7 @@ class test_indico(Command):
             print "Some jars could not be downloaded. Please download the missing jars manually"
             sys.exit(-1)
 
-        from indicop.util import TestZEOServer
         from indicop.Indicop import Indicop
-        from indicop.TestsConfig import TestsConfig
-        from MaKaC.common.Configuration import Config
         testsToRun = []
 
         if self.unit:
@@ -365,27 +362,44 @@ class test_indico(Command):
             testsToRun.append('jsunit')
             testsToRun.append('jslint')
 
-        #Check if we need to shutdown the production DB to run functional tests
-        stopAndStartProductionDB = False
-        if ('functional' in testsToRun) or ('grid' in testsToRun) or ((self.specify != None) and (self.specify.find('unit/') < 0)):
+        #this variable will tell what to do with the databases
+        FakeDBManaging = self.checkDBStatus(testsToRun, self.specify)
+
+        indicop = Indicop(self.jsspecify, self.jscoverage)
+        result = indicop.main(FakeDBManaging, self.specify, self.coverage, testsToRun)
+
+        print result
+
+
+    def checkDBStatus(self, testsToRun, specify):
+        from indicop.TestsConfig import TestsConfig
+        from indicop.util import TestZEOServer
+        from MaKaC.common.Configuration import Config
+
+        FakeDBManaging = 0
+        if ('functional' in testsToRun) or ('grid' in testsToRun) or ((specify != None) and (specify.find('unit/') < 0)):
+
+            #checking if production db is running
             server = TestZEOServer(Config.getInstance().getDBConnectionParams()[1], 'test')
             if server.server.can_connect(server.options.family, server.options.address):
                 print """Your production database is currently running.
 Do you want to stop it using this command '%s' and run the tests?
 (We will restart your produduction after the tests with this command '%s')""" % \
 (TestsConfig.getInstance().getStartDBCmd(), TestsConfig.getInstance().getStopDBCmd())
+
                 userInput = raw_input("Press enter or type 'yes' to accept: ")
                 if userInput == 'yes' or userInput == '':
-                    stopAndStartProductionDB = True
+                    FakeDBManaging = 3
                 else:
                     print "Exiting testing framework..."
                     sys.exit(1)
 
+            else:
+                FakeDBManaging = 2
+        elif 'unit' in testsToRun or 'specify' in testsToRun:
+            FakeDBManaging = 1
 
-        indicop = Indicop(self.jsspecify, self.jscoverage)
-        result = indicop.main(stopAndStartProductionDB, self.specify, self.coverage, testsToRun)
-
-        print result
+        return FakeDBManaging
 
     def checkIndicopPackages(self):
         packagesList = ['figleaf',
