@@ -213,14 +213,19 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
         RHConferenceModifKey._checkParams(self, params)
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCAbstractManager, RCReferee
         from MaKaC.webinterface.rh.collaboration import RCVideoServicesManager
+        from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin
+        from MaKaC.webinterface.rh.collaboration import RCCollaborationPluginAdmin
         self._isRegistrar = self._target.isRegistrar( self._getUser() )
         self._isPRM = RCPaperReviewManager.hasRights(self)
         self._isAM = RCAbstractManager.hasRights(self)
         self._isReferee = RCReferee.hasRights(self)
-        self._isVideoServicesManager = RCVideoServicesManager.hasRights(self, 'any')
+        self._isVideoServicesManagerOrAdmin = (RCVideoServicesManager.hasRights(self, 'any') or
+                                               RCCollaborationAdmin.hasRights(self) or
+                                               RCCollaborationPluginAdmin.hasRights(self, plugins = 'any'))
+
 
     def _checkProtection(self):
-        if not (self._isRegistrar or self._isPRM or self._isAM or self._isReferee or self._isVideoServicesManager):
+        if not (self._isRegistrar or self._isPRM or self._isAM or self._isReferee or self._isVideoServicesManagerOrAdmin):
             RHConferenceModifKey._checkProtection(self)
 
     def _process( self ):
@@ -239,11 +244,12 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
             url = urlHandlers.UHConfModifReviewingAbstractSetup.getURL( self._conf )
         elif self._isReferee:
             url = urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf )
-        elif self._isVideoServicesManager:
+        elif self._isVideoServicesManagerOrAdmin:
             url = urlHandlers.UHConfModifCollaboration.getURL(self._conf)
 
         else:
             url = urlHandlers.UHConfManagementAccess.getURL( self._conf )
+
         self._redirect( url )
 
 class RHConferenceCloseModifKey( RHConferenceBase ):

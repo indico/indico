@@ -18,7 +18,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 
 import urllib
 import os
@@ -2081,6 +2080,7 @@ class WPConferenceModifBase( main.WPMainBase ):
         self._generalSection.addItem( self._regFormMenuItem)
 
         if self._conf.getCSBookingManager() is not None and self._conf.getCSBookingManager().isCSAllowed():
+            from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
             self._videoServicesMenuItem = wcomponents.SideMenuItem(_("Video Services"),
                 urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = CollaborationTools.isUsingHTTPS()))
             self._generalSection.addItem( self._videoServicesMenuItem)

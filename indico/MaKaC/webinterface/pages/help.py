@@ -24,13 +24,12 @@ from MaKaC.webinterface.pages.main import WPMainBase
 import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC.webinterface.rh.admins import RCAdmin
 from MaKaC.plugins.base import PluginsHolder
-from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin
 from MaKaC.i18n import _
-        
+
 
 class WPHelp(WPMainBase):
     def _getNavigationDrawer(self):
-        return wcomponents.WSimpleNavigationDrawer(_("Help"), urlHandlers.UHConferenceHelp.getURL )
+        return wcomponents.WSimpleNavigationDrawer(_("Help"), urlHandlers.UHConferenceHelp.getURL)
 
     def _getBody(self, params):
         wc = WHelp(self._rh)
@@ -38,15 +37,19 @@ class WPHelp(WPMainBase):
 
 
 class WHelp(wcomponents.WTemplated):
-    
+
     def __init__(self, rh):
         self._rh = rh
-    
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
-        
+
         vars["HasCollaboration"] = PluginsHolder().hasPluginType("Collaboration")
         vars["IsAdmin"] = RCAdmin.hasRights(self._rh)
-        vars["IsCollaborationAdmin"] = RCCollaborationAdmin.hasRights(self._rh)
-        
+        if PluginsHolder().hasPluginType("Collaboration"):
+            from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin
+            vars["IsCollaborationAdmin"] = RCCollaborationAdmin.hasRights(self._rh)
+        else:
+            vars["IsCollaborationAdmin"] = False
+
         return vars

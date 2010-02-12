@@ -21,7 +21,7 @@
 
 from datetime import timedelta
 from MaKaC.webinterface import wcomponents, urlHandlers
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase,\
+from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, \
     WPConferenceDefaultDisplayBase
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.common.timezoneUtils import nowutc, setAdjustedDate, DisplayTZ
@@ -37,7 +37,7 @@ from MaKaC.plugins.Collaboration.base import CollaborationException
 ################################################### Server Wide pages #########################################
 
 class WPAdminCollaboration(WPMainBase):
-    
+
     def __init__(self, rh, queryParams):
         WPMainBase.__init__(self, rh)
         self._queryParams = queryParams
@@ -46,21 +46,21 @@ class WPAdminCollaboration(WPMainBase):
 
     def getJSFiles(self):
         return WPMainBase.getJSFiles(self) + self._includeJSPackage('Collaboration')
-    
-    def _getHeader( self ):
-        wc = wcomponents.WHeader( self._getAW() )
-        return wc.getHTML( { "subArea": _("Video Services Administration"), \
-                             "loginURL": self._escapeChars(str(self.getLoginURL())),\
+
+    def _getHeader(self):
+        wc = wcomponents.WHeader(self._getAW())
+        return wc.getHTML({ "subArea": _("Video Services Administration"), \
+                             "loginURL": self._escapeChars(str(self.getLoginURL())), \
                              "logoutURL": self._escapeChars(str(self.getLogoutURL())), \
                              "tabControl": self._getTabControl(), \
-                             "loginAsURL": self.getLoginAsURL() } )
+                             "loginAsURL": self.getLoginAsURL() })
 
-    def _getBody( self, params ):      
+    def _getBody(self, params):
         return WAdminCollaboration(self._queryParams, self._pluginsWithIndexing).getHTML()
-    
+
     def _getNavigationDrawer(self):
-        return wcomponents.WSimpleNavigationDrawer("Video Services Admin", urlHandlers.UHAdminCollaboration.getURL )
-    
+        return wcomponents.WSimpleNavigationDrawer("Video Services Admin", urlHandlers.UHAdminCollaboration.getURL)
+
     def _buildExtraJS(self):
         for pluginName in self._pluginsWithIndexing:
             extraJS = CollaborationTools.getExtraJS(pluginName, None)
@@ -68,15 +68,15 @@ class WPAdminCollaboration(WPMainBase):
                 self.addExtraJS(extraJS)
 
 class WAdminCollaboration(wcomponents.WTemplated):
-    
+
     def __init__(self, queryParams, pluginsWithIndexing):
         wcomponents.WTemplated.__init__(self)
         self._queryParams = queryParams
         self._pluginsWithIndexing = pluginsWithIndexing # list of names
-    
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        
+
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+
         #dictionary where the keys are names of false "indexes" for the user, and the values are IndexInformation objects
         vars["Indexes"] = CollaborationTools.getCollaborationPluginType().getOption("pluginsPerIndex").getValue()
         vars["InitialIndex"] = self._queryParams["indexName"]
@@ -94,7 +94,7 @@ class WAdminCollaboration(wcomponents.WTemplated):
         vars["InitialResultsPerPage"] = self._queryParams["resultsPerPage"]
         vars["InitialPage"] = self._queryParams["page"]
         vars["BaseURL"] = urlHandlers.UHAdminCollaboration.getURL()
-        
+
         if self._queryParams["queryOnLoad"]:
             ci = IndexesHolder().getById('collaboration')
             tz = self._rh._getUser().getTimezone()
@@ -121,58 +121,58 @@ class WAdminCollaboration(wcomponents.WTemplated):
                 except ValueError, e:
                     raise CollaborationException(_("Parameter 'toDays' is not an integer"), inner = e)
                 maxKey = nowutc() + timedelta(days = toDays)
-            
+
             if self._queryParams["conferenceId"]:
                 conferenceId = self._queryParams["conferenceId"]
             else:
                 conferenceId = None
-            
+
             if self._queryParams["categoryId"]:
                 categoryId = self._queryParams["categoryId"]
             else:
                 categoryId = None
-            
+
             result = ci.getBookings(
                         self._queryParams["indexName"],
                         self._queryParams["viewBy"],
                         self._queryParams["orderBy"],
                         minKey,
                         maxKey,
-                        tz = tz,         
+                        tz = tz,
                         onlyPending = self._queryParams["onlyPending"],
                         conferenceId = conferenceId,
                         categoryId = categoryId,
                         pickle = True,
-                        dateFormat='%a %d %b %Y',
+                        dateFormat = '%a %d %b %Y',
                         page = self._queryParams["page"],
                         resultsPerPage = self._queryParams["resultsPerPage"])
-            
+
             vars["InitialBookings"] = result["results"]
             vars["InitialNumberOfBookings"] = result["nBookings"]
             vars["InitialTotalInIndex"] = result["totalInIndex"]
             vars["InitialNumberOfPages"] = result["nPages"]
-        
+
         else:
             vars["InitialBookings"] = None
             vars["InitialNumberOfBookings"] = -1
             vars["InitialTotalInIndex"] = -1
             vars["InitialNumberOfPages"] = -1
-            
+
         JSCodes = {}
         for pluginName in self._pluginsWithIndexing:
             templateClass = CollaborationTools.getTemplateClass(pluginName, "WIndexing")
             if templateClass:
                 JSCodes[pluginName] = templateClass(pluginName, None).getHTML()
-     
+
         vars["JSCodes"] = JSCodes
-     
+
         return vars
 
 
 ################################################### Event Modif pages ###############################################
 
 class WPConfModifCSBase (WPConferenceModifBase):
-    
+
     def __init__(self, rh, conf):
         """ Constructor
             The rh is expected to have the attributes _tabs, _activeTab, _tabPlugins (like for ex. RHConfModifCSBookings)
@@ -182,10 +182,10 @@ class WPConfModifCSBase (WPConferenceModifBase):
         self._tabs = {} # list of Indico's Tab objects
         self._tabNames = rh._tabs
         self._activeTabName = rh._activeTabName
-    
+
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
-        
+
         isUsingHTTPS = CollaborationTools.isUsingHTTPS()
         for tabName in self._tabNames:
             if tabName == 'Managers':
@@ -193,17 +193,17 @@ class WPConfModifCSBase (WPConferenceModifBase):
             else:
                 url = urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = isUsingHTTPS, tab = tabName)
             self._tabs[tabName] = self._tabCtrl.newTab(tabName, tabName, url)
-        
+
         self._setActiveTab()
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._tabs[self._activeTabName].setActive()
-        
+
     def _setActiveSideMenuItem(self):
         self._videoServicesMenuItem.setActive()
 
-class WPConfModifCollaboration( WPConfModifCSBase ):
-    
+class WPConfModifCollaboration(WPConfModifCSBase):
+
     def __init__(self, rh, conf):
         """ Constructor
             The rh is expected to have the attributes _tabs, _activeTabName, _tabPlugins (like RHConfModifCSBookings)
@@ -215,14 +215,14 @@ class WPConfModifCollaboration( WPConfModifCSBase ):
 
     def getJSFiles(self):
         return WPMainBase.getJSFiles(self) + self._includeJSPackage('Collaboration') + self._includeJSPackage("Management")
-                        
+
     ######### private methods ###############
     def _buildExtraCSS(self):
         for plugin in self._tabPlugins:
             extraCSS = CollaborationTools.getExtraCSS(plugin.getName())
             if extraCSS:
                 self.addExtraCSS(extraCSS)
-                
+
     def _buildExtraJS(self):
         for plugin in self._tabPlugins:
             extraJS = CollaborationTools.getExtraJS(plugin.getName(), self._conf)
@@ -231,41 +231,41 @@ class WPConfModifCollaboration( WPConfModifCSBase ):
 
     ############## overloading methods #################
 
-    def _getPageContent( self, params ):
+    def _getPageContent(self, params):
         if len(self._tabNames) > 0:
             self._createTabCtrl()
-            wc = WConfModifCollaboration( self._conf, self._rh.getAW().getUser(), self._activeTabName, self._tabPlugins)
-            return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( wc.getHTML({}) )
+            wc = WConfModifCollaboration(self._conf, self._rh.getAW().getUser(), self._activeTabName, self._tabPlugins)
+            return wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(wc.getHTML({}))
         else:
             return _("No available plugins, or no active plugins")
-        
 
-class WConfModifCollaboration( wcomponents.WTemplated ):
-    
-    def __init__( self, conference, user, activeTab, tabPlugins ):
+
+class WConfModifCollaboration(wcomponents.WTemplated):
+
+    def __init__(self, conference, user, activeTab, tabPlugins):
         self._conf = conference
         self._user = user
         self._activeTab = activeTab
         self._tabPlugins = tabPlugins
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+
         plugins = self._tabPlugins
         singleBookingPlugins, multipleBookingPlugins = CollaborationTools.splitPluginsByAllowMultiple(plugins)
         CSBookingManager = self._conf.getCSBookingManager()
-        
+
         bookingsS = {}
         for p in singleBookingPlugins:
             bookingList = CSBookingManager.getBookingList(filterByType = p.getName())
             if len(bookingList) > 0:
                 bookingsS[p.getName()] = DictPickler.pickle(bookingList[0])
-                
+
         bookingsM = DictPickler.pickle(CSBookingManager.getBookingList(
             sorted = True,
             notify = True,
             filterByType = [p.getName() for p in multipleBookingPlugins]))
-        
+
         vars["Conference"] = self._conf
         vars["AllPlugins"] = plugins
         vars["SingleBookingPlugins"] = singleBookingPlugins
@@ -273,45 +273,45 @@ class WConfModifCollaboration( wcomponents.WTemplated ):
         vars["MultipleBookingPlugins"] = multipleBookingPlugins
         vars["BookingsM"] = bookingsM
         vars["Tab"] = self._activeTab
-        vars["EventDate"] = formatDateTime(getAdjustedDate(nowutc(),self._conf))
-        
+        vars["EventDate"] = formatDateTime(getAdjustedDate(nowutc(), self._conf))
+
         from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin, RCCollaborationPluginAdmin
         vars["UserIsAdmin"] = RCCollaborationAdmin.hasRights(user = self._user) or RCCollaborationPluginAdmin.hasRights(user = self._user, plugins = self._tabPlugins)
-        
+
         singleBookingForms = {}
         multipleBookingForms = {}
         JSCodes = {}
         canBeNotified = {}
-        
+
         for plugin in singleBookingPlugins:
             pluginName = plugin.getName()
             templateClass = CollaborationTools.getTemplateClass(pluginName, "WNewBookingForm")
             singleBookingForms[pluginName] = templateClass(self._conf, pluginName, self._user).getHTML()
-            
+
         for plugin in multipleBookingPlugins:
             pluginName = plugin.getName()
             templateClass = CollaborationTools.getTemplateClass(pluginName, "WNewBookingForm")
             multipleBookingForms[pluginName] = templateClass(self._conf, pluginName, self._user).getHTML()
-        
+
         for plugin in plugins:
             pluginName = plugin.getName()
-            
+
             templateClass = CollaborationTools.getTemplateClass(pluginName, "WMain")
             JSCodes[pluginName] = templateClass(pluginName, self._conf).getHTML()
-            
+
             bookingClass = CollaborationTools.getCSBookingClass(pluginName)
             canBeNotified[pluginName] = bookingClass._canBeNotifiedOfEventDateChanges
-            
-        vars["SingleBookingForms"] = singleBookingForms    
+
+        vars["SingleBookingForms"] = singleBookingForms
         vars["MultipleBookingForms"] = multipleBookingForms
         vars["JSCodes"] = JSCodes
         vars["CanBeNotified"] = canBeNotified
-        
+
         return vars
-    
-    
-class WPConfModifCollaborationProtection( WPConfModifCSBase ):
-    
+
+
+class WPConfModifCollaborationProtection(WPConfModifCSBase):
+
     def __init__(self, rh, conf):
         """ Constructor
             The rh is expected to have the attributes _tabs, _activeTab, _tabPlugins (like RHConfModifCSBookings)
@@ -319,69 +319,69 @@ class WPConfModifCollaborationProtection( WPConfModifCSBase ):
         WPConfModifCSBase.__init__(self, rh, conf)
         self._user = rh._getUser()
 
-    def _getPageContent( self, params ):
+    def _getPageContent(self, params):
         if len(self._tabNames) > 0:
             self._createTabCtrl()
-            wc = WConfModifCollaborationProtection( self._conf, self._user )
-            return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( wc.getHTML({}) )
+            wc = WConfModifCollaborationProtection(self._conf, self._user)
+            return wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(wc.getHTML({}))
         else:
-            return _("No available plugins, or no active plugins")  
+            return _("No available plugins, or no active plugins")
 
-class WConfModifCollaborationProtection( wcomponents.WTemplated ):
-    
-    def __init__( self, conference, user ):
+class WConfModifCollaborationProtection(wcomponents.WTemplated):
+
+    def __init__(self, conference, user):
         self._conf = conference
         self._user = user
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
         vars["Conference"] = self._conf
         vars["CSBM"] = self._conf.getCSBookingManager()
         vars["Favorites"] = DictPickler.pickle(self._user.getPersonalInfo().getBasket().getUsers())
         return vars
 
 ################################################### Event Display pages ###############################################
-class WPCollaborationDisplay( WPConferenceDefaultDisplayBase ):
-    
-    def _defineSectionMenu( self ): 
+class WPCollaborationDisplay(WPConferenceDefaultDisplayBase):
+
+    def _defineSectionMenu(self):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._collaborationOpt)
-    
-    def _getBody( self, params ):
-        
-        wc = WCollaborationDisplay( self._getAW(), self._conf )
+
+    def _getBody(self, params):
+
+        wc = WCollaborationDisplay(self._getAW(), self._conf)
         return wc.getHTML()
-    
-class WCollaborationDisplay( wcomponents.WTemplated ):
-    
+
+class WCollaborationDisplay(wcomponents.WTemplated):
+
     def __init__(self, aw, conference):
         wcomponents.WTemplated.__init__(self)
         self._conf = conference
         self._tz = DisplayTZ(aw, conference).getDisplayTZ()
-        
+
     def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
-        
+        vars = wcomponents.WTemplated.getVars(self)
+
         csbm = self._conf.getCSBookingManager()
         pluginNames = csbm.getEventDisplayPlugins()
         bookings = csbm.getBookingList(filterByType = pluginNames, notify = True, onlyPublic = True)
         bookings.sort(key = lambda b: b.getStartDate())
-        
+
         ongoingBookings = []
         scheduledBookings = {} #date, list of bookings
-            
+
         for b in bookings:
             if b.canBeStarted():
                 ongoingBookings.append(b)
             if b.getStartDate() and b.getAdjustedStartDate('UTC') > nowutc():
                 scheduledBookings.setdefault(b.getAdjustedStartDate(self._tz).date(), []).append(b)
-                
+
         keys = scheduledBookings.keys()
         keys.sort()
         scheduledBookings = [(date, scheduledBookings[date]) for date in keys]
-        
+
         vars["OngoingBookings"] = ongoingBookings
         vars["ScheduledBookings"] = scheduledBookings
         vars["Timezone"] = self._tz
-        
+
         return vars
