@@ -2179,8 +2179,9 @@ class WPConferenceModifBase( main.WPMainBase ):
         if not self._advancedOptionsSection.hasVisibleItems():
             self._advancedOptionsSection.setVisible(False)
 
-        #tabs forced to be disabled for now
-        self._participantsMenuItem.setVisible(False)
+        # we disable the Participants section for events of type conference
+        if self._conf.getType() == 'conference':
+            self._participantsMenuItem.setVisible(False)
 
         # make sure that the section evaluation is always activated
         # for all conferences
