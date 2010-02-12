@@ -36,9 +36,9 @@
                     </td>
                 </tr>
                 <tr>
-                    <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Notification")%></span></td>
+                    <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Email Notification")%></span></td>
                     <td>
-                        <input type="checkbox" name="notify" value="true" checked><%= _(" Automatic Notification")%>
+                        <input type="checkbox" name="notify" value="true" checked><%= _(" Automatic Email Notification")%>
                     </td>
                 </tr>
             </table>

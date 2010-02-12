@@ -5,8 +5,8 @@
     <td class="blacktext" colspan="2">
       <form action="%(setStatusURL)s" method="POST">
 	<div>
-	  <input name="changeTo" type="hidden" value="%(changeTo)s" /> 
-	  <b>%(status)s</b> 
+	  <input name="changeTo" type="hidden" value="%(changeTo)s" />
+	  <b>%(status)s</b>
 	  <small><input type="submit" class="btn" value="%(changeStatus)s" /></small>
 	</div>
       </form>
@@ -62,7 +62,7 @@
     </td>
   </tr>
   <tr>
-    <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Notification (new registrations)")%></span></td>
+    <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Email notification (on new registrations)")%></span></td>
     <td class="blacktext">
       %(notification)s
     </td>
@@ -145,7 +145,7 @@
 	  </tr>
 	</table>
       </form>
-    </td>		
+    </td>
   </tr>
   <tr>
     <td colspan="3" class="horizontalLine">&nbsp;</td>
@@ -153,4 +153,3 @@
 </table>
 <br/>
 
-  
