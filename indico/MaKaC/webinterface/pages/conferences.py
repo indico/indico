@@ -2130,15 +2130,12 @@ class WPConferenceModifBase( main.WPMainBase ):
 
         #we decide which side menu item appear and which don't
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCAbstractManager, RCReviewingStaff
-        from MaKaC.webinterface.rh.collaboration import RCVideoServicesManager
-        #we decide which side menu item appear and which don't
-        from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCAbstractManager, RCReviewingStaff
+        from MaKaC.webinterface.rh.collaboration import RCVideoServicesManager, RCCollaborationAdmin, RCCollaborationPluginAdmin
 
         canModify = self._conf.canModify(self._rh.getAW())
         isReviewingStaff = RCReviewingStaff.hasRights(self._rh)
         isPRM = RCPaperReviewManager.hasRights(self._rh)
         isAM = RCAbstractManager.hasRights(self._rh)
-        isAnyCollaborationPluginManager = RCVideoServicesManager.hasRights(self._rh, 'any')
         isRegistrar = self._conf.canManageRegistration(self._rh.getAW().getUser())
 
         if not canModify:
@@ -2172,7 +2169,9 @@ class WPConferenceModifBase( main.WPMainBase ):
             if isReviewingStaff and not canModify:
                 self._reviewingMenuItem.setVisible(True)
 
-        if not (canModify or isAnyCollaborationPluginManager):
+        if not (canModify or
+                RCVideoServicesManager.hasRights(self._rh, 'any') or
+                RCCollaborationAdmin.hasRights(self._rh) or RCCollaborationPluginAdmin.hasRights(self._rh, plugins = 'any')):
             self._videoServicesMenuItem.setVisible(False)
 
         #we hide the Advanced Options section if it has no items
