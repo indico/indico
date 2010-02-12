@@ -294,51 +294,52 @@ class Grid(BaseTest):
             return "[ERR] Grid - Please specify hub configuration in tests.conf\n"
 
         try:
-            self.gridData.setActive(True)
+            try:
+                self.gridData.setActive(True)
 
-            #Checking if hub is online
-            sel = selenium(self.gridData.getUrl(), self.gridData.getPort(),
-                           self.hubEnv[0], "http://www.cern.ch/")
+                #Checking if hub is online
+                sel = selenium(self.gridData.getUrl(), self.gridData.getPort(),
+                               self.hubEnv[0], "http://www.cern.ch/")
 
-            signal.signal(signal.SIGALRM, raise_timeout)
-            signal.alarm(15)
-            sel.start()
-            sel.open("/")
-            sel.stop()
-            #disable the alarm signal
-            signal.alarm(0)
+                signal.signal(signal.SIGALRM, raise_timeout)
+                signal.alarm(15)
+                sel.start()
+                sel.open("/")
+                sel.stop()
+                #disable the alarm signal
+                signal.alarm(0)
 
-            #capturing the stderr
-            outerr = StringIO.StringIO()
-            sys.stderr = outerr
+                #capturing the stderr
+                outerr = StringIO.StringIO()
+                sys.stderr = outerr
 
-            returnString = ""
-            for env in self.hubEnv:
-                self.gridData.setEnv(env)
-                sys.stderr.write('\n~ %s ~\n' % env)
-                result = nose.run(argv=['nose', '--nologcapture',
-                                        '--logging-clear-handlers', '-v',
-                                        os.path.join(self.setupDir,
-                                                     'python',
-                                                     'functional')])
-                if result:
-                    returnString += "PY Functional (%s) tests succeeded\n" % env
-                else:
-                    returnString += ("[FAIL] Functional (%s) tests - report in"
-                            " tests/report/pygrid.txt\n") % env
+                returnString = ""
+                for env in self.hubEnv:
+                    self.gridData.setEnv(env)
+                    sys.stderr.write('\n~ %s ~\n' % env)
+                    result = nose.run(argv=['nose', '--nologcapture',
+                                            '--logging-clear-handlers', '-v',
+                                            os.path.join(self.setupDir,
+                                                         'python',
+                                                         'functional')])
+                    if result:
+                        returnString += "PY Functional (%s) tests succeeded\n" % env
+                    else:
+                        returnString += ("[FAIL] Functional (%s) tests - report in"
+                                " tests/report/pygrid.txt\n") % env
 
-            #restoring the stderr
-            sys.stderr = sys.__stderr__
+                #restoring the stderr
+                sys.stderr = sys.__stderr__
 
-            s = outerr.getvalue()
-            returnString += self.writeReport("pygrid", s)
-        except socket.error:
-            return ("[ERR] Selenium Grid - Connection refused, check your "
-                    "hub's settings (%s:%s)") % \
-                    (self.gridData.getUrl(), self.gridData.getPort())
-        except TimeoutException, e:
-            return "[ERR] Selenium Grid - Hub is probably down (%s:%s) (%s)\n" % \
-                    (self.gridData.getUrl(), self.gridData.getPort(), e)
+                s = outerr.getvalue()
+                returnString += self.writeReport("pygrid", s)
+            except socket.error:
+                return ("[ERR] Selenium Grid - Connection refused, check your "
+                        "hub's settings (%s:%s)") % \
+                        (self.gridData.getUrl(), self.gridData.getPort())
+            except TimeoutException, e:
+                return "[ERR] Selenium Grid - Hub is probably down (%s:%s) (%s)\n" % \
+                        (self.gridData.getUrl(), self.gridData.getPort(), e)
         finally:
             #disable alarm
             signal.alarm(0)

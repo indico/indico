@@ -385,7 +385,7 @@ class test_indico(Command):
                 print """Your production database is currently running.
 Do you want to stop it using this command '%s' and run the tests?
 (We will restart your produduction after the tests with this command '%s')""" % \
-(TestsConfig.getInstance().getStartDBCmd(), TestsConfig.getInstance().getStopDBCmd())
+(TestsConfig.getInstance().getStopDBCmd(), TestsConfig.getInstance().getStartDBCmd())
 
                 userInput = raw_input("Press enter or type 'yes' to accept: ")
                 if userInput == 'yes' or userInput == '':
