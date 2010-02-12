@@ -530,5 +530,10 @@ DlgAboutInfo		: "Fyri fleiri upplýsingar, far til",
 DlgDivGeneralTab	: "Generelt",
 DlgDivAdvancedTab	: "Fjølbroytt",
 DlgDivStyle		: "Typografi",
-DlgDivInlineStyle	: "Inline typografi"
+DlgDivInlineStyle	: "Inline typografi",
+
+ScaytTitle			: "SCAYT",	//MISSING
+ScaytTitleOptions	: "Options",	//MISSING
+ScaytTitleLangs		: "Languages",	//MISSING
+ScaytTitleAbout		: "About"	//MISSING
 };

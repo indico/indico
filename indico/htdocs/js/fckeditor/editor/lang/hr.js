@@ -530,5 +530,10 @@ DlgAboutInfo		: "Za više informacija posjetite",
 DlgDivGeneralTab	: "Općenito",
 DlgDivAdvancedTab	: "Napredno",
 DlgDivStyle		: "Stil",
-DlgDivInlineStyle	: "Stil u redu"
+DlgDivInlineStyle	: "Stil u redu",
+
+ScaytTitle			: "SCAYT",	//MISSING
+ScaytTitleOptions	: "Options",	//MISSING
+ScaytTitleLangs		: "Languages",	//MISSING
+ScaytTitleAbout		: "About"	//MISSING
 };

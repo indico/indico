@@ -146,6 +146,7 @@
 		<File path="editor/_source/classes/fcktoolbarfontscombo.js" />
 		<File path="editor/_source/classes/fcktoolbarfontsizecombo.js" />
 		<File path="editor/_source/classes/fcktoolbarpanelbutton.js" />
+		<File path="editor/_source/internals/fckscayt.js" />
 		<File path="editor/_source/internals/fcktoolbaritems.js" />
 		<File path="editor/_source/classes/fcktoolbar.js" />
 		<File path="editor/_source/classes/fcktoolbarbreak_ie.js" />
@@ -242,6 +243,7 @@
 		<File path="editor/_source/classes/fcktoolbarfontscombo.js" />
 		<File path="editor/_source/classes/fcktoolbarfontsizecombo.js" />
 		<File path="editor/_source/classes/fcktoolbarpanelbutton.js" />
+		<File path="editor/_source/internals/fckscayt.js" />
 		<File path="editor/_source/internals/fcktoolbaritems.js" />
 		<File path="editor/_source/classes/fcktoolbar.js" />
 		<File path="editor/_source/classes/fcktoolbarbreak_gecko.js" />

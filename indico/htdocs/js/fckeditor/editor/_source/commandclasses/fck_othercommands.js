@@ -40,7 +40,7 @@ var FCKDialogCommand = function( name, title, url, width, height, getStateFuncti
 
 FCKDialogCommand.prototype.Execute = function()
 {
-	FCKDialog.OpenDialog( 'FCKDialog_' + this.Name , this.Title, this.Url, this.Width, this.Height, this.CustomValue, null, this.Resizable ) ;
+	FCKDialog.OpenDialog( 'FCKDialog_' + this.Name , this.Title, this.Url, this.Width, this.Height, this.CustomValue, this.Resizable ) ;
 }
 
 FCKDialogCommand.prototype.GetState = function()
@@ -186,7 +186,7 @@ FCKSourceCommand.prototype.Execute = function()
 	{
 		var iWidth	= FCKConfig.ScreenWidth * 0.65 ;
 		var iHeight	= FCKConfig.ScreenHeight * 0.65 ;
-		FCKDialog.OpenDialog( 'FCKDialog_Source', FCKLang.Source, 'dialog/fck_source.html', iWidth, iHeight, null, null, true ) ;
+		FCKDialog.OpenDialog( 'FCKDialog_Source', FCKLang.Source, 'dialog/fck_source.html', iWidth, iHeight, null, true ) ;
 	}
 	else
 	    FCK.SwitchEditMode() ;

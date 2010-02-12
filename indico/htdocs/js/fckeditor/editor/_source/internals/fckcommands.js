@@ -142,6 +142,9 @@ FCKCommands.GetCommand = function( commandName )
 		// Generic Undefined command (usually used when a command is under development).
 		case 'Undefined'	: oCommand = new FCKUndefinedCommand() ; break ;
 
+		case 'Scayt' : oCommand = FCKScayt.CreateCommand() ; break ;
+		case 'ScaytContext' : oCommand = FCKScayt.CreateContextCommand() ; break ;
+
 		// By default we assume that it is a named command.
 		default:
 			if ( FCKRegexLib.NamedCommands.test( commandName ) )

@@ -231,6 +231,9 @@ FCKPanel.prototype.Show = function( x, y, relElement, width, height )
 			this.RelativeElement = relElement ;
 		}
 
+		// Save the popup related arguments so they can be used by others (e.g. SCAYT).
+		this._PopupArgs = [x, y, iMainWidth, eMainNode.offsetHeight, relElement];
+
 		// Second call: Show the Popup at the specified location, with the correct size.
 		this._Popup.show( x, y, iMainWidth, eMainNode.offsetHeight, relElement ) ;
 

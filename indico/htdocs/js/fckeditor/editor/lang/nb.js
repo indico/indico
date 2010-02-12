@@ -530,5 +530,10 @@ DlgAboutInfo		: "For mer informasjon, se",
 DlgDivGeneralTab	: "Generelt",
 DlgDivAdvancedTab	: "Avansert",
 DlgDivStyle		: "Stil",
-DlgDivInlineStyle	: "Inline Style"	//MISSING
+DlgDivInlineStyle	: "Inline Style",	//MISSING
+
+ScaytTitle			: "SCAYT",	//MISSING
+ScaytTitleOptions	: "Options",	//MISSING
+ScaytTitleLangs		: "Languages",	//MISSING
+ScaytTitleAbout		: "About"	//MISSING
 };

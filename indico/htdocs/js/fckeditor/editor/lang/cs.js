@@ -530,5 +530,10 @@ DlgAboutInfo		: "Více informací získáte na",
 DlgDivGeneralTab	: "Obecné",
 DlgDivAdvancedTab	: "Rozšířené",
 DlgDivStyle		: "Styl",
-DlgDivInlineStyle	: "Vložený styl"
+DlgDivInlineStyle	: "Vložený styl",
+
+ScaytTitle			: "SCAYT",	//MISSING
+ScaytTitleOptions	: "Options",	//MISSING
+ScaytTitleLangs		: "Languages",	//MISSING
+ScaytTitleAbout		: "About"	//MISSING
 };

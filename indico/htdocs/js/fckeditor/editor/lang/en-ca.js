@@ -530,5 +530,10 @@ DlgAboutInfo		: "For further information go to",
 DlgDivGeneralTab	: "General",
 DlgDivAdvancedTab	: "Advanced",
 DlgDivStyle		: "Style",
-DlgDivInlineStyle	: "Inline Style"
+DlgDivInlineStyle	: "Inline Style",
+
+ScaytTitle			: "SCAYT",	//MISSING
+ScaytTitleOptions	: "Options",	//MISSING
+ScaytTitleLangs		: "Languages",	//MISSING
+ScaytTitleAbout		: "About"	//MISSING
 };

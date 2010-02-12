@@ -530,5 +530,10 @@ DlgAboutInfo		: "Για περισσότερες πληροφορίες",
 DlgDivGeneralTab	: "General",	//MISSING
 DlgDivAdvancedTab	: "Advanced",	//MISSING
 DlgDivStyle		: "Style",	//MISSING
-DlgDivInlineStyle	: "Inline Style"	//MISSING
+DlgDivInlineStyle	: "Inline Style",	//MISSING
+
+ScaytTitle			: "SCAYT",	//MISSING
+ScaytTitleOptions	: "Options",	//MISSING
+ScaytTitleLangs		: "Languages",	//MISSING
+ScaytTitleAbout		: "About"	//MISSING
 };

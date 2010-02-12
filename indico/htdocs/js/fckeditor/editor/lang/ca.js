@@ -530,5 +530,10 @@ DlgAboutInfo		: "Per a més informació aneu a",
 DlgDivGeneralTab	: "General",
 DlgDivAdvancedTab	: "Avançat",
 DlgDivStyle		: "Estil",
-DlgDivInlineStyle	: "Estil en línia"
+DlgDivInlineStyle	: "Estil en línia",
+
+ScaytTitle			: "SCAYT",	//MISSING
+ScaytTitleOptions	: "Options",	//MISSING
+ScaytTitleLangs		: "Languages",	//MISSING
+ScaytTitleAbout		: "About"	//MISSING
 };

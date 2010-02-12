@@ -530,5 +530,10 @@ DlgAboutInfo		: "想獲得更多資訊請至 ",
 DlgDivGeneralTab	: "一般",
 DlgDivAdvancedTab	: "進階",
 DlgDivStyle		: "樣式",
-DlgDivInlineStyle	: "CSS 樣式"
+DlgDivInlineStyle	: "CSS 樣式",
+
+ScaytTitle			: "SCAYT",	//MISSING
+ScaytTitleOptions	: "Options",	//MISSING
+ScaytTitleLangs		: "Languages",	//MISSING
+ScaytTitleAbout		: "About"	//MISSING
 };

@@ -530,5 +530,10 @@ DlgAboutInfo		: "Nánari upplýsinar, sjá:",
 DlgDivGeneralTab	: "Almennt",
 DlgDivAdvancedTab	: "Sérhæft",
 DlgDivStyle		: "Stíll",
-DlgDivInlineStyle	: "Línulægur stíll"
+DlgDivInlineStyle	: "Línulægur stíll",
+
+ScaytTitle			: "SCAYT",	//MISSING
+ScaytTitleOptions	: "Options",	//MISSING
+ScaytTitleLangs		: "Languages",	//MISSING
+ScaytTitleAbout		: "About"	//MISSING
 };

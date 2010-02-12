@@ -530,5 +530,10 @@ DlgAboutInfo		: "מידע נוסף ניתן למצוא כאן:",
 DlgDivGeneralTab	: "כללי",
 DlgDivAdvancedTab	: "מתקדם",
 DlgDivStyle		: "סגנון",
-DlgDivInlineStyle	: "סגנון בתוך השורה"
+DlgDivInlineStyle	: "סגנון בתוך השורה",
+
+ScaytTitle			: "SCAYT",	//MISSING
+ScaytTitleOptions	: "Options",	//MISSING
+ScaytTitleLangs		: "Languages",	//MISSING
+ScaytTitleAbout		: "About"	//MISSING
 };

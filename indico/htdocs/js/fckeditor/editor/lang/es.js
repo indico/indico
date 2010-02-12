@@ -530,5 +530,10 @@ DlgAboutInfo		: "Para mayor información por favor dirigirse a",
 DlgDivGeneralTab	: "General",
 DlgDivAdvancedTab	: "Avanzado",
 DlgDivStyle		: "Estilo",
-DlgDivInlineStyle	: "Estilos CSS"
+DlgDivInlineStyle	: "Estilos CSS",
+
+ScaytTitle			: "SCAYT",	//MISSING
+ScaytTitleOptions	: "Options",	//MISSING
+ScaytTitleLangs		: "Languages",	//MISSING
+ScaytTitleAbout		: "About"	//MISSING
 };
