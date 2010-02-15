@@ -92,6 +92,10 @@ class ReviewManager(Persistent):
     def getReviewById(self, reviewId):
         return self._versioning[int(reviewId)]
     
+    def getSortedVerioning(self):     
+        versioning = self._versioning
+        versioning.sort(key = lambda c: c.getId(), reverse=True)
+        return versioning
     
     def isInReviewingTeamforContribution(self, user):
         """ Returns if the user is in the reviewing team for this contribution 

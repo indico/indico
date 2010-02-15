@@ -3,7 +3,6 @@
 <% from MaKaC.conference import LocalFile %>
 <% from MaKaC.conference import Link %>
 
-<% Versioning.reverse() %>
 <% for review in Versioning: %>
         
             <table width="90%%" align="center" border="0" style="padding-bottom: 10px;">

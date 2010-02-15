@@ -259,6 +259,6 @@ class WContributionReviewingHistory(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
         
         vars["ConferenceChoice"] = self._conf.getConfReview().getChoice()
-        vars["Versioning"] = self._contribution.getReviewManager().getVersioning()
+        vars["Versioning"] = self._contribution.getReviewManager().getSortedVerioning()
 
         return vars
