@@ -3,21 +3,13 @@
 <% from MaKaC.conference import LocalFile %>
 <% from MaKaC.conference import Link %>
 
+<% Versioning.reverse() %>
 <% for review in Versioning: %>
-
-    <% if review.getRefereeJudgement().isSubmitted() or (ConferenceChoice==3 and review.getEditorJudgement().isSubmitted()): %>
-        <table width="90%%" align="center" border="0" style="padding-bottom: 10px;">
-		    <tr>
-                <td colspan="3" class="groupTitle" style="padding-top:20px; border-bottom: none; font-size: 20px;">
-                    <%= _("Judgement details for ")%><%= _("Review ")%> <%= review.getVersion() %>
-		        </td>
-		    </tr>
-		</table>
-            
+        
             <table width="90%%" align="center" border="0" style="padding-bottom: 10px;">
                 <tr>
 		            <td colspan="1" class="dataCaptionTD" style="width: 25%;padding-right: 1px">
-		                    <span class="titleCellFormat" style="font-size: 12px;"><strong><%= _("Material:")%></strong></span>
+		             <em><%= _("Review ")%> <%= review.getVersion() %><span class="titleCellFormat" style="font-size: 12px;"><%= _(" of material:")%></span></em>
 		            </td>
 		            <td>
 		             <% for m in review.getMaterials(): %>
@@ -42,6 +34,4 @@
         <% includeTpl ('ContributionReviewingDisplay',
                         Editing = review.getEditorJudgement(), AdviceList = review.getReviewerJudgements(), Review = review,
                         ConferenceChoice = ConferenceChoice) %>
-        
-    <% end %>
 <% end %>

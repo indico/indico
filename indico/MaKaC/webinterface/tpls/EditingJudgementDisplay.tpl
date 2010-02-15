@@ -1,13 +1,15 @@
 <% from MaKaC.reviewing import ConferenceReview %>
-            <table cellspacing="0" cellpadding="2" width="100%%" style="padding-bottom: 10px;">
+            <table cellspacing="0" cellpadding="2" width="100%%" >
                 <tr>
                     <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
-                        <span class="titleCellFormat" style="font-size: 12px;"><strong><%= _("Layout Judgement:")%></strong></span>
+                        <span class="titleCellFormat" style="font-size: 12px;"><%= _("Layout judgement:")%></span>
                     </td>
                     <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                        <strong><%= Editing.getJudgement() %></strong>
+                        <strong><%= Editing.getJudgement() %></strong>,
+                        <%= _(" submitted on ") %><%= Editing.getAdjustedSubmissionDate().strftime(format) %>
                     </td>
                 </tr>
+                <% if Editing.getComments(): %>
                 <tr>
                     <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
                         <span class="titleCellFormat" style="font-size: 12px;"><%= _("Comments:")%></span>
@@ -16,6 +18,8 @@
                         <%= Editing.getComments() %>
                     </td>
                 </tr>
+                <% end %>
+                <% if Editing.getAnswers(): %>
                 <tr>
                     <td class="dataCaptionTD" width="100%" style="width: 25%;padding-right: 1px">
                         <span class="titleCellFormat" style="font-size: 12px;"><%= _("Criteria Evaluation:")%></span>
@@ -27,6 +31,7 @@
                         <% end %>
                     </td>
                 </tr>
+                <% end %>
                 <% if ShowEditor: %>
                 <tr>
                     <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
@@ -37,12 +42,4 @@
                     </td>
                 </tr>
                 <% end %>
-                <tr>
-                    <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
-                        <span class="titleCellFormat" style="font-size: 12px;"><%= _("Submission date:")%></span>
-                    </td>
-                    <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                        <%= Editing.getAdjustedSubmissionDate().strftime(format) %>
-                    </td>
-                </tr>
             </table>

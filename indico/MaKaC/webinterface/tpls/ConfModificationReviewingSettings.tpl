@@ -259,17 +259,17 @@ ToDo: to remove the code which is not using any more, but to know that we have t
             <% display = 'none' %>
         <% end %>
 	    <tr id="autoEmails" style="display:<%=display%>">
-	        <td id="automaticNotificationHelp" colspan="5" class="reviewingsubtitle"><%= _("Automatic e-mails can be send to")%>:
+	        <td id="automaticNotificationHelp" colspan="5" class="reviewingsubtitle"><%= _("Automatic e-mails can be send")%>:
 	           <% inlineContextHelp(_('Here you can enable/disable automatic e-mails sending.<br/>Notifications can be send to the Reviewing Team in the next several situations<br/><ul><li>when are added/removed Reviewers for the conference</li><li>when are assinged/removed contributions to Reviewers</li><li>when authors of the contributions have been submitted materials</li></ul>Notifications can be send to the authors when their contributions had been judged by the Reviewers.'))%>
 	        </td>
 	    </tr>
 	    <tr id="autoEmailsPRMLabel" style="display:<%=display%>">
            <td style="padding-top: 10px;">
-               <%= _("Paper Review Managers when")%>:
+               <%= _("To the Paper Review Managers when")%>:
            </td>
         </tr>
        <tr id="PRMNotif" style="white-space:nowrap; display: <%=display%>">
-        <td>
+        <td style="padding-left: 50px;">
             <div>
                 <span id="PRMNotifButton">                    
                 </span>
@@ -284,11 +284,11 @@ ToDo: to remove the code which is not using any more, but to know that we have t
         <% end %>
         <tr id="autoEmailsRefereeLabel" style="display:<%=display%>">
            <td style="padding-top: 10px;">
-               <%= _("Referees when")%>:
+               <%= _("To the Referees when")%>:
            </td>
         </tr>
 	   <tr id="refereeNotif" style="white-space:nowrap; display: <%=display%>">
-	    <td>
+	    <td style="padding-left: 50px;">
             <div>
                 <span id="refereeNotifButton">                    
                 </span>
@@ -296,7 +296,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
         </td>
        </tr>
        <tr id="refereeNotifForContribution" style="white-space:nowrap; display: <%=display%>">
-        <td>
+        <td style="padding-left: 50px;">
             <div>
                 <span id="refereeNotifForContributionButton">                    
                 </span>
@@ -304,7 +304,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
         </td>
        </tr>
        <tr id="authorSubmittedMatRefereeNotif" style="white-space:nowrap; display: <%=display%>">
-        <td>
+        <td style="padding-left: 50px;">
             <div>
                 <span id="authorSubmittedMatRefereeNotifButton">                    
                 </span>
@@ -313,11 +313,11 @@ ToDo: to remove the code which is not using any more, but to know that we have t
        </tr>
         <tr id="autoEmailsContentLabel" style="display:<%=display%>">
            <td style="padding-top: 10px;">
-               <%= _("Content Reviewers when")%>:
+               <%= _("To the Content Reviewers when")%>:
            </td>
         </tr>
        <tr id="reviewerNotif" style="white-space:nowrap; display: <%=display%>">
-        <td>
+        <td style="padding-left: 50px;">
             <div>
                 <span id="reviewerNotifButton">                   
                 </span>
@@ -325,7 +325,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
         </td>
        </tr>
        <tr id="reviewerNotifForContribution" style="white-space:nowrap; display: <%=display%>">
-        <td>
+        <td style="padding-left: 50px;">
             <div>
                 <span id="reviewerNotifForContributionButton">                   
                 </span>
@@ -333,7 +333,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
         </td>
        </tr>
        <tr id="authorSubmittedMatReviewerNotif" style="white-space:nowrap; display: <%=display%>">
-        <td>
+        <td style="padding-left: 50px;">
             <div>
                 <span id="authorSubmittedMatReviewerNotifButton">                   
                 </span>
@@ -348,11 +348,11 @@ ToDo: to remove the code which is not using any more, but to know that we have t
         <% end %>
         <tr id="autoEmailsEditorLabel" style="display:<%=display%>">
            <td style="padding-top: 10px;">
-               <%= _("Layout Reviewers when")%>:
+               <%= _("To the Layout Reviewers when")%>:
            </td>
         </tr>
        <tr id="editorNotif" style="white-space:nowrap; display: <%=display%>">
-          <td>
+          <td style="padding-left: 50px;">
             <div>
                 <span id="editorNotifButton">                    
                 </span>
@@ -360,7 +360,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
          </td>
        </tr>
        <tr id="editorNotifForContribution" style="white-space:nowrap; display: <%=display%>">
-          <td>
+          <td style="padding-left: 50px;">
             <div>
                 <span id="editorNotifForContributionButton">                    
                 </span>
@@ -368,7 +368,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
          </td>
        </tr>
        <tr id="authorSubmittedMatEditorNotif" style="white-space:nowrap; display: <%=display%>">
-          <td>
+          <td style="padding-left: 50px;">
             <div>
                 <span id="authorSubmittedMatEditorNotifButton">                    
                 </span>
@@ -383,7 +383,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
         <% end %>
         <tr id="autoEmailsAuthor" style="display:<%=display%>">
            <td style="padding-top: 10px;">
-               <%= _("Author of the paper when a judgement is submitted by")%>:
+               <%= _("To the Author of the paper when a judgement is submitted by")%>:
            </td>
         </tr>
          <% if ConfReview.hasPaperReviewing(): %>
@@ -393,7 +393,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
             <% display = 'none' %>
         <% end %>
        <tr id="refereeJudgementNotif" style="white-space:nowrap; display: <%=display%>">
-        <td>
+        <td style="padding-left: 50px;">
             <div>
                 <span id="refereeJudgementNotifButton">                    
                 </span>
@@ -401,7 +401,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
         </td>
        </tr>
        <tr id="reviewerJudgementNotif" style="white-space:nowrap; display: <%=display%>">
-        <td>
+        <td style="padding-left: 50px;">
             <div>
                 <span id="reviewerJudgementNotifButton">                   
                 </span>
@@ -415,7 +415,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
             <% display = 'none' %>
         <% end %>
        <tr id="editorJudgementNotif" style="white-space:nowrap; display: <%=display%>">
-          <td>
+          <td style="padding-left: 50px;">
             <div>
                 <span id="editorJudgementNotifButton">                    
                 </span>
@@ -911,19 +911,19 @@ $E('editorJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton
                                             'Layout Reviewer',
                                             true
 ));
-$E('authorSubmittedMatRefereeNotif').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatRefereeNotif', 
+$E('authorSubmittedMatRefereeNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatRefereeNotif', 
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Referee'}, 
                                             'the author submits a paper',
                                             true
 ));
-$E('authorSubmittedMatReviewerNotif').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatEditorNotif', 
+$E('authorSubmittedMatReviewerNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatEditorNotif', 
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Reviewer'}, 
                                             'the author submits a paper',
                                             true
 ));
-$E('authorSubmittedMatEditorNotif').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatReviewerNotif', 
+$E('authorSubmittedMatEditorNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatReviewerNotif', 
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Editor'}, 
                                             'the author submits a paper',

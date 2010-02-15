@@ -1,5 +1,6 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 
+
 <table width="100%%" align="center">
 
 <tr>
@@ -77,10 +78,8 @@
                     <% else: %>
                         %(material)s
                     <% end %>
-					<tr><td>&nbsp;</td></tr>
                     %(inSession)s
                     %(inTrack)s
-					<tr><td>&nbsp;</td></tr>
                     %(subConts)s
                     <% if Contribution.getConference() and Contribution.getConference().hasEnabledSection('paperReviewing') and Contribution.getConference().getConfReview().hasReviewing() : %>
                         <% if Contribution.canUserSubmit(self._aw.getUser()) or Contribution.canModify(self._aw): %>
@@ -115,7 +114,6 @@
                                         <%= "<br>".join(Contribution.getReviewManager().getLastReview().getReviewingStatus(forAuthor = True)) %>
                                     </td>
                                 </tr>
-                                <tr><td>&nbsp;</td></tr>
                                 <% if  Contribution.getConference().getConfReview().getChoice() == 3: %> 
                                     <% if not Contribution.getReviewManager().getLastReview().getEditorJudgement().isSubmitted():%>
                                         <% display = 'table' %>
@@ -140,7 +138,6 @@
                                         <% display = 'none' %>
                                     <% end %>
                                 <% end %>
-                                   <tr><td>&nbsp;</td></tr>
                                     <table align="center" style="display:<%=display%>">
                                     <tr>
                                         <td colspan="2" align="center">
@@ -160,32 +157,59 @@
                         </tr>
                         <% end %>
                     <% end %>
-                 </table>
-                 </td>
-              </tr>
-              <tr><td>%(reviewingStuffDisplay)s</td></tr>
-              <tr><td>&nbsp;</td></tr>
-              <tr><td>&nbsp;</td></tr>
+                 
               <% if Contribution.getConference() and Contribution.getConference().hasEnabledSection('paperReviewing') and Contribution.getConference().getConfReview().hasReviewing() and len(Contribution.getReviewManager().getVersioning()) > 1: %>
+                 
+                 <table align="center" width="80%%"> 
                   <tr>
-                      <td align="center" class="displayField" nowrap>
-                            <b><%=_("Reviewing history")%></b>
+                      <td align="right" valign="top" class="displayField" style="border-right:5px solid #FFFFFF;" nowrap>
+                            <b><%=_("Reviewing history")%>:</b>
                       </td>
+                      <td width="100%%" valing="top"><div id="showHideHistory" style="display:inline"></div></td>
                   </tr>
-                  <tr>
+               </table>
+               
+               <table id="HistoryTable" align="center" width="100%%">
+               <tbody> 
+               <tr>
                       <td colspan="2">
                            %(reviewingHistoryStuffDisplay)s
                       </td>
                   </tr>
+               </tbody>    
+               </table>     
               <% end %>
+              </table>
+                 </td>
+              </tr>
               </table>
            </td>
         </tr>
-
         </table>
     </td>
 </tr>
 </table>
-<script type="text/javascript">
 
+<script type="text/javascript">
+/**
+ * Builds the 'link' to show and hide the reviewing history.
+ */
+var buildShowHideHistory = function() {
+    var option = new Chooser({
+        showHistory: command(function(){
+            $E('HistoryTable').dom.style.display = '';
+            option.set('hideHistory');
+        }, $T('Show History')),
+        hideHistory: command(function(){
+            $E('HistoryTable').dom.style.display = 'none';
+            option.set('showHistory');
+        }, $T('Hide History'))
+    });
+    option.set('showHistory');
+    
+    $E('showHideHistory').set(Widget.link(option));
+}
+
+buildShowHideHistory();
+$E('HistoryTable').dom.style.display = 'none';
 </script>

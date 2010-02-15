@@ -88,23 +88,7 @@
             <% inlineContextHelp(_('Here is displayed the judgement given by the Referee.<br/>If you are the Referee of this contribution, you can change this.')) %>    
         </td>
     </tr>
-        <% if IsReferee: %>
-                <% if ConferenceChoice == 4 and not Editing.isSubmitted(): %>
-                   <tr>
-                       <td colspan="2" align="left">
-                           <font><%= _("Warning: the layout reviewer has not given his judgement yet.")%></span> 
-                       </td>
-                   </tr>
-                <% end %>
-                <% if (ConferenceChoice == 2 or ConferenceChoice == 4) and not Review.allReviewersHaveGivenAdvice(): %>
-                   <tr>
-                       <td colspan="2" align="left">
-                           <font><%= _("Warning: all your content reviewers have not given their advices yet.")%></span>
-                       </td>
-                   </tr>
-                <% end %>
-            <% end %>
-        <% else: %>
+        <% if not IsReferee: %>
             <% if not Review.getRefereeJudgement().isSubmitted(): %>
                 <tr>
                     <td colspan="2" align="left">

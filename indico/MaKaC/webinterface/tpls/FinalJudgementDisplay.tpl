@@ -5,9 +5,11 @@
                     <span class="titleCellFormat" style="font-size: 12px;"><strong><%= _("Final Judgement:")%></strong></span>
                 </td>
                 <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                    <strong><%= Review.getRefereeJudgement().getJudgement() %></strong>
+                    <strong><%= Review.getRefereeJudgement().getJudgement() %></strong>,
+                    <%= _(" submitted on ") %><%= Review.getRefereeJudgement().getAdjustedSubmissionDate().strftime(format) %>
                 </td>
            </tr>
+           <% if Review.getRefereeJudgement().getComments(): %>
            <tr>     
                 <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
                     <span class="titleCellFormat" style="font-size: 12px;"><%= _("Comments:")%></span>
@@ -16,6 +18,8 @@
                     <%= Review.getRefereeJudgement().getComments() %>
                 </td>
            </tr>
+           <% end %>
+           <% if Review.getRefereeJudgement().getAnswers(): %>
            <tr>
                 <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
                     <span class="titleCellFormat" style="font-size: 12px;"><%= _("Approved questions:")%></span>
@@ -27,6 +31,7 @@
                     <% end %>                
                 </td>
           </tr>
+          <% end %>
           <% if ShowReferee: %>
           <tr>
                 <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
@@ -37,12 +42,4 @@
                 </td>
          </tr>
          <% end %>
-         <tr>
-                <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
-                    <span class="titleCellFormat" style="font-size: 12px;"><%= _("Submission date:")%></span>
-                </td>
-                <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                    <%= Review.getRefereeJudgement().getAdjustedSubmissionDate().strftime(format) %>
-                </td>
-            </tr>
         </table>

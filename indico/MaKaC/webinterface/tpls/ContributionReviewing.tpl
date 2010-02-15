@@ -8,35 +8,10 @@
 <div style="padding-left: 10px; padding-top: 10px; padding-bottom: 10px">
 <em><%= _("The reviewing mode choosen for this conference is")%>: <%= ConferenceChoiceStr%></em>
 </div>
-<% if not Review.isAuthorSubmitted(): %>
-<table width="90%%" align="center" border="0" style="margin-bottom: 1em">
-    <% if len(Review.getReviewManager().getVersioning()) == 1: %>
-    <tr>
-        <td>
-            <span>
-            <%= _("Warning: the author(s) of this contribution have still not marked their initial materials as submitted.")%><br>
-            <%= _("You must wait until then to start the reviewing process.")%>
-            </span>
-        </td>
-    </tr>
-    <% end %>
-    <% else: %>
-    <tr>
-        <td>
-            <span>
-            <%= _("Warning: since this contribution was marked 'To be corrected', the author(s) has not submitted new materials.")%><br>
-            <%= _("You must wait until then to restart the reviewing process.")%><br>
-            </span>
-        </td>
-    </tr>
-    <% end %>
-</table>
-<% end %>
 
 <% if ConferenceChoice == 2 or ConferenceChoice == 4: %>
 <table class="newsDisplayItem" width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <!-- Assign or remove a referee -->
-     
     <tr>
         <td id="assignRefereeHelp" colspan="5" class="groupTitle" style="border: none; padding-bottom:10px;"><%= _("Assign a Referee")%></td>
     </tr>
