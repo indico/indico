@@ -3,7 +3,16 @@
 %(existingMaterialsTitle)s
 <div id="reviewingMaterialListPlace"><!-- DOM-filled materials list --></div>
 <span id="container"></span>
-                                   
+<% if self._target.getReviewManager().getLastReview().isAuthorSubmitted(): %>
+    <% display = 'none' %>
+<% end %>
+<% else: %>
+    <% display = 'form' %>
+<% end %>
+<form id="SendBtnForm" action="<%=urlHandlers.UHContributionSubmitForRewiewing.getURL(self._target)%>" method="POST" style="visibility:hidden; display:<%=display%>">
+    <input id="SendBtn" type="submit" class="btn" value="Send" >
+    <% inlineContextHelp(_('By clicking on this button you will send your materials for reviewing. They will be locked until the end of the process')) %>
+</form>                                   
 <script type="text/javascript">
 
 <% import MaKaC.conference as conference %>
@@ -14,6 +23,7 @@ var args = {
         contribution: '<%= self._target.getId() %>',
         contribId: '<%= self._target.getId() %>'
     };
+   
     var uploadAction = Indico.Urls.UploadAction.contribution;
     var visibility = '';
                                  <% if  self._target.getConference().getConfReview().getChoice() == 3: %> 
@@ -40,11 +50,20 @@ var args = {
                                         visibility = 'hidden';
                                     <% end %>
                                 <% end %>
-    
-    
-var mlist = new ReviewingMaterialListWidget(args, <%= RHSubmitMaterialBase._allowedMatsforReviewing %>, uploadAction);
+       
+var mlist = new ReviewingMaterialListWidget(args, <%= RHSubmitMaterialBase._allowedMatsforReviewing %>, uploadAction,null,null,null,$E("SendBtnForm"));
 
 $E('reviewingMaterialListPlace').set(mlist.draw());
 
+<% if self._target.getReviewManager().getLastReview().isAuthorSubmitted(): %>
+   $E('SendBtnForm').dom.style.display = 'none';
+<% end %>
+
+<% if existingMaterialsTitle == " ": %>
+    $E('SendBtnForm').dom.style.display = '';
+<% end %>
+<% else: %>
+    $E('SendBtnForm').dom.style.display = 'none';
+<% end %>
 </script>
 

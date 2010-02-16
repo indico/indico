@@ -90,22 +90,7 @@
                                 <%=ReviewingMatList%>
                             </td>
                         </tr>
-                            <% if not Contribution.getReviewManager().getLastReview().isAuthorSubmitted(): %>
-                                  <tr>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <form action="<%=urlHandlers.UHContributionSubmitForRewiewing.getURL(Contribution)%>" method="POST">
-                                            <input type="submit" class="btn" value="Send materials" >
-                                        </form>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td>
-                                        <%=_("By clicking on this button you will lock your materials until they are reviewed")%>.
-                                    </td>
-                            <% end %>
-                            <% else: %>
+                            <% if Contribution.getReviewManager().getLastReview().isAuthorSubmitted(): %>
                                     <tr>
 		                            <td align="right" valign="top" class="displayField" style="border-right:5px solid #FFFFFF;" nowrap>
 		                                <b><%=_("Reviewing status")%>:</b>
@@ -131,11 +116,11 @@
                                     <% end %>
                                 <% end %>
                                 <% if  Contribution.getConference().getConfReview().getChoice() == 4: %>
-                                    <% if not (Contribution.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or Contribution.getReviewManager().getLastReview().anyReviewerHasGivenAdvice() or Contribution.getReviewManager().getLastReview().getEditorJudgement().isSubmitted()): %>                              
-                                        <% display = 'table' %>
+                                    <% if Contribution.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or Contribution.getReviewManager().getLastReview().anyReviewerHasGivenAdvice() or Contribution.getReviewManager().getLastReview().getEditorJudgement().isSubmitted(): %>                              
+                                        <% display = 'none' %>
                                     <% end %>
                                     <% else: %>
-                                        <% display = 'none' %>
+                                        <% display = 'table' %>
                                     <% end %>
                                 <% end %>
                                     <table align="center" style="display:<%=display%>">
@@ -143,14 +128,8 @@
                                         <td colspan="2" align="center">
                                             <form action="<%=urlHandlers.UHContributionRemoveSubmittedMarkForReviewing.getURL(Contribution)%>" method="POST">
                                                 <input type="submit" class="btn" value="UNDO sending" >
+                                                <% inlineContextHelp(_('Press this button only if you made some mistake when submitting the materials.The reviewing team will be notified and the reviewing process will be stopped until you mark the materials as submitted again')) %>
                                             </form>
-                                        </td>
-                                    <tr>
-                                        <td colspan="2" align="left">
-                                            <font>
-                                                <%=_("Press this button only if you made some mistake when submitting the materials")%>.<br>
-                                                <%=_("The reviewing team will be notified and the reviewing process will be stopped until you mark the materials as submitted again")%>.
-                                            </font>
                                         </td>
                                      </table>
                             <% end %>

@@ -1386,7 +1386,8 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
             }
         });
     },
-
+   
+    
     drawContent: function() {
 
         var self = this;
@@ -1466,6 +1467,8 @@ type("ReviewingMaterialListWidget", ["RemoteWidget", "ListWidget"], {
                        );
             }
         };
+        
+       
         var reviewingState = material.get('reviewingState');
         
         var menu;
@@ -1561,7 +1564,7 @@ type("ReviewingMaterialListWidget", ["RemoteWidget", "ListWidget"], {
             self.set(key, obj);
         });
         
-       
+                      
         var link = Widget.link(command(function(){
                     IndicoUI.Dialogs.Material.add(self.args,
                                                   self,
@@ -1576,6 +1579,7 @@ type("ReviewingMaterialListWidget", ["RemoteWidget", "ListWidget"], {
                                                   });
                 }, $T("Add Material")));
         
+               
         return Html.div(
             {},
             Html.div({style:{textAlign: 'left', visibility: visibility}}, link),
@@ -1584,8 +1588,7 @@ type("ReviewingMaterialListWidget", ["RemoteWidget", "ListWidget"], {
         );
     }
 },
-
-     function(args, types, uploadAction, width, height, visibility) {
+     function(args, types, uploadAction, width, height, visibility, sendToReviewButton) {
          var self = this;
          this.width = width;
          this.height = height;
@@ -1593,7 +1596,17 @@ type("ReviewingMaterialListWidget", ["RemoteWidget", "ListWidget"], {
          this.args = args;
          this.types = types;
          this.uploadAction = uploadAction;
+         this.sendToReviewButton = sendToReviewButton;
          this.ListWidget("materialList");
+         
+         this.observe(function(){
+                if (self.isEmpty()) {
+                    self.sendToReviewButton.dom.style.visibility = 'hidden';
+                }else {
+                    self.sendToReviewButton.dom.style.visibility = 'visible';
+                }
+            });
+         
          this.RemoteWidget('material.list',
                            args);
 
