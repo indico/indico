@@ -56,9 +56,9 @@ def searchForId(idxName, id):
     DBMgr.getInstance().startRequest()
     idx = IndexesHolder().getIndex(idxName)
 
-    for k,l in idx._words.iteritems():
-        for v in l[:]:
-            if v.id == id:
+    for k,l in idx._ids.iteritems():
+        for v in l:
+            if v == id:
                 print "%s" % k
     DBMgr.getInstance().endRequest()
 
