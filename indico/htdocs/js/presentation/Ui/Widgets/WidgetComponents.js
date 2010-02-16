@@ -39,8 +39,8 @@ Widget.option = function(item) {
  */
 Widget.clickable = function(command, target) {
 	invoke(target.stopClickable);
-	target.stopClickable = target.observeClick(function() {
-		command();
+	target.stopClickable = target.observeClick(function(event) {
+		command(event);
 		return false;
 	});
 	if (target.getTag() == "a") {
