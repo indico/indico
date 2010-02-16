@@ -1538,11 +1538,12 @@ class WCSPageTemplateBase(WCSTemplateBase):
 
 class WJSBase(WCSTemplateBase):
     """ Base class for Collaboration templates for Javascript code template.
-        It overloads _setTPLFile so that indico can find the Main.js files.
+        It overloads _setTPLFile so that indico can find the Main.js, Extra.js and Indexing.js files.
     """
-    def __init__(self, pluginName, conf):
+    def __init__(self, conf, pluginName, user):
         WCSTemplateBase.__init__(self, pluginName)
         self._conf = conf
+        self._user = user
 
     def _setTPLFile(self):
         dir = os.path.join(Collaboration.__path__[0], self._pluginName, "tpls")

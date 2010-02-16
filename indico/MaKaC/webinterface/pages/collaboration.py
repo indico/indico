@@ -44,6 +44,7 @@ class WPAdminCollaboration(WPMainBase):
     def __init__(self, rh, queryParams):
         WPMainBase.__init__(self, rh)
         self._queryParams = queryParams
+        self._user = self._rh.getAW().getUser()
         self._pluginsWithIndexing = CollaborationTools.pluginsWithIndexing() # list of names
         self._buildExtraJS()
 
@@ -59,23 +60,24 @@ class WPAdminCollaboration(WPMainBase):
                              "loginAsURL": self.getLoginAsURL() })
 
     def _getBody(self, params):
-        return WAdminCollaboration(self._queryParams, self._pluginsWithIndexing).getHTML()
+        return WAdminCollaboration(self._queryParams, self._pluginsWithIndexing, self._user).getHTML()
 
     def _getNavigationDrawer(self):
         return wcomponents.WSimpleNavigationDrawer("Video Services Admin", urlHandlers.UHAdminCollaboration.getURL, secure=CollaborationTools.isUsingHTTPS())
 
     def _buildExtraJS(self):
         for pluginName in self._pluginsWithIndexing:
-            extraJS = CollaborationTools.getExtraJS(pluginName, None)
+            extraJS = CollaborationTools.getExtraJS(None, pluginName, self._user)
             if extraJS:
                 self.addExtraJS(extraJS)
 
 class WAdminCollaboration(wcomponents.WTemplated):
 
-    def __init__(self, queryParams, pluginsWithIndexing):
+    def __init__(self, queryParams, pluginsWithIndexing, user):
         wcomponents.WTemplated.__init__(self)
         self._queryParams = queryParams
         self._pluginsWithIndexing = pluginsWithIndexing # list of names
+        self._user = user
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
@@ -161,13 +163,13 @@ class WAdminCollaboration(wcomponents.WTemplated):
             vars["InitialTotalInIndex"] = -1
             vars["InitialNumberOfPages"] = -1
 
-        JSCodes = {}
+        jsCodes = {}
         for pluginName in self._pluginsWithIndexing:
             templateClass = CollaborationTools.getTemplateClass(pluginName, "WIndexing")
             if templateClass:
-                JSCodes[pluginName] = templateClass(pluginName, None).getHTML()
+                jsCodes[pluginName] = templateClass(None, pluginName, self._user).getHTML()
 
-        vars["JSCodes"] = JSCodes
+        vars["JSCodes"] = jsCodes
 
         return vars
 
@@ -188,9 +190,9 @@ class WPConfModifCSBase (WPConferenceModifBase):
         self._tabNames = rh._tabs
         self._activeTabName = rh._activeTabName
 
-    def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
 
+    def _createTabCtrl(self):
         isUsingHTTPS = CollaborationTools.isUsingHTTPS()
         for tabName in self._tabNames:
             if tabName == 'Managers':
@@ -231,7 +233,7 @@ class WPConfModifCollaboration(WPConfModifCSBase):
 
     def _buildExtraJS(self):
         for plugin in self._tabPlugins:
-            extraJS = CollaborationTools.getExtraJS(plugin.getName(), self._conf)
+            extraJS = CollaborationTools.getExtraJS(self._conf, plugin.getName(), self._getAW().getUser())
             if extraJS:
                 self.addExtraJS(extraJS)
 
@@ -259,15 +261,15 @@ class WConfModifCollaboration(wcomponents.WTemplated):
 
         plugins = self._tabPlugins
         singleBookingPlugins, multipleBookingPlugins = CollaborationTools.splitPluginsByAllowMultiple(plugins)
-        CSBookingManager = self._conf.getCSBookingManager()
+        csBookingManager = self._conf.getCSBookingManager()
 
         bookingsS = {}
         for p in singleBookingPlugins:
-            bookingList = CSBookingManager.getBookingList(filterByType = p.getName())
+            bookingList = csBookingManager.getBookingList(filterByType = p.getName())
             if len(bookingList) > 0:
                 bookingsS[p.getName()] = DictPickler.pickle(bookingList[0])
 
-        bookingsM = DictPickler.pickle(CSBookingManager.getBookingList(
+        bookingsM = DictPickler.pickle(csBookingManager.getBookingList(
             sorted = True,
             notify = True,
             filterByType = [p.getName() for p in multipleBookingPlugins]))
@@ -286,7 +288,7 @@ class WConfModifCollaboration(wcomponents.WTemplated):
 
         singleBookingForms = {}
         multipleBookingForms = {}
-        JSCodes = {}
+        jsCodes = {}
         canBeNotified = {}
 
         for plugin in singleBookingPlugins:
@@ -310,14 +312,14 @@ class WConfModifCollaboration(wcomponents.WTemplated):
             pluginName = plugin.getName()
 
             templateClass = CollaborationTools.getTemplateClass(pluginName, "WMain")
-            JSCodes[pluginName] = templateClass(pluginName, self._conf).getHTML()
+            jsCodes[pluginName] = templateClass(self._conf, pluginName, self._user).getHTML()
 
             bookingClass = CollaborationTools.getCSBookingClass(pluginName)
             canBeNotified[pluginName] = bookingClass._canBeNotifiedOfEventDateChanges
 
         vars["SingleBookingForms"] = singleBookingForms
         vars["MultipleBookingForms"] = multipleBookingForms
-        vars["JSCodes"] = JSCodes
+        vars["JSCodes"] = jsCodes
         vars["CanBeNotified"] = canBeNotified
 
         return vars
