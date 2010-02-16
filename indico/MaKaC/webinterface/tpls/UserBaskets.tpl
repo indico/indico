@@ -11,9 +11,8 @@
     var userList = <%= offlineRequest(self._rh, 'user.favorites.listUsers', {}) %>;            
     var removeUser = function(user, setResult){
 	
-        jsonRpc(Indico.Urls.JsonRpcService, "user.favorites.removeUser", {
-            'id': user.get('id')
-        }, function(result, error){
+        jsonRpc(Indico.Urls.JsonRpcService, "user.favorites.removeUser",
+        {value: [{'id': user.get('id')}]}, function(result, error){
             if (exists(error)) {
                 IndicoUtil.errorReport(error);
 		setResult(false);
