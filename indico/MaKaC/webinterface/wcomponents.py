@@ -438,6 +438,19 @@ class WConferenceHeader( WHeader ):
 #        else:
 #            vars["confModif"] = ""
 
+        # Default values to avoid NameError while executing the template
+        vars["viewoptions"] = []
+        vars["SelectedStyle"] = ""
+        vars["pdfURL"] = ""
+
+        # Setting the buttons that will be displayed in the header menu
+        vars["showFilterButton"] = False
+        vars["showMoreButton"] = True
+        vars["showExportToICal"] = True
+        vars["showExportToPDF"] = False
+        vars["showDLMaterial"] = False
+        vars["showLayout"] = False
+
         vars["usingModifKey"]=False
         if self._conf.canKeyModify(self._aw):
             vars["usingModifKey"]=True
@@ -561,7 +574,6 @@ class WMenuConferenceHeader( WConferenceHeader ):
         else:
             vars["searchBox"] = ""
 
-
         return vars
 
 class WMenuMeetingHeader( WConferenceHeader ):
@@ -597,9 +609,13 @@ class WMenuMeetingHeader( WConferenceHeader ):
                 viewoptions.append({"id": stylesheet, "name": styleMgr.getStylesheetName(stylesheet) })
         vars["viewoptions"] = viewoptions
         vars["SelectedStyle"] = styleMgr.getStylesheetName(vars["currentView"])
+
+        # Setting the buttons that will be displayed in the header menu
         vars["showFilterButton"] = True
         vars["showExportToPDF"] = True
-        vars["showMore"] = True
+        vars["showDLMaterial"] = True
+        vars["showLayout"] = True
+
 
         # Dates Menu
         tz = DisplayTZ(self._aw,self._conf,useServerTZ=1).getDisplayTZ()
@@ -686,19 +702,10 @@ class WMenuSimpleEventHeader( WMenuMeetingHeader ):
         vars["confModif"] = """<a href=%s>manage</a>"""%quoteattr(str(urlHandlers.UHConfEnterModifKey.getURL(self._conf)))
         if self._conf.canKeyModify(self._aw):
             vars["confModif"] = """<a href=%s>exit manage</a>"""%quoteattr(str(urlHandlers.UHConfCloseModifKey.getURL(self._conf)))
-        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        stylesheets = styleMgr.getStylesheetListForEventType(vars["type"])
-        viewoptions = []
-        if len(stylesheets) != 0:
-            stylesheets.sort(key=styleMgr.getStylesheetName)
-            for stylesheet in stylesheets:
-                viewoptions.append({"id": stylesheet, "name": styleMgr.getStylesheetName(stylesheet) })
-        vars["viewoptions"] = viewoptions
-        vars["SelectedStyle"] = styleMgr.getStylesheetName(vars["currentView"])
 
+        # Setting the buttons that will be displayed in the header menu
         vars["showFilterButton"] = False
         vars["showExportToPDF"] = False
-        vars["showMore"] = True
 
         vars["accessWrapper"] = self._aw
         return vars
