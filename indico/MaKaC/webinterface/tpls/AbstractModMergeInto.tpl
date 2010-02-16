@@ -27,12 +27,12 @@
                 <tr>
 					<td>&nbsp;</td>
                     <td align="left">
-                        <input type="checkbox" name="includeAuthors"%(includeAuthorsChecked)s><font color="gray"> <%= _("include authors into the target abstarct")%></font>
+                        <input type="checkbox" name="includeAuthors"%(includeAuthorsChecked)s><font color="gray"> <%= _("Include authors into the target abstarct")%></font>
                     </td>
                 </tr>
                 <tr>
                     <td align="center" colspan="2">
-                        <input type="checkbox" name="notify"%(notifyChecked)s><font color="gray"><%= _("Automatic Notification")%></font>
+                        <input type="checkbox" name="notify"%(notifyChecked)s><font color="gray"><%= _("Automatic email notification")%></font>
                     </td>
                 </tr>
             </table>

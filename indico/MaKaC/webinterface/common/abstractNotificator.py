@@ -210,7 +210,7 @@ class Notificator:
     def getVarList(cls):
         return cls._vars
     getVarList=classmethod(getVarList)
-    
+
     def _getVars(self,abstract):
         d={}
         for v in self.getVarList():
@@ -219,14 +219,14 @@ class Notificator:
 
 
 class EmailNotificator(Notificator):
-    
+
     def apply(self,abstract,tpl):
         vars=self._getVars(abstract)
         subj=tpl.getTplSubject()%vars
         try:
             b=tpl.getTplBody()%vars
         except ValueError, e:
-            raise MaKaCError( _("Some of the the notification template's tags are invalid. Note that the format of the tags should be: %(tag_name)s"))
+            raise MaKaCError( _("Some of the mail notification template's tags are invalid. Note that the format of the tags should be: %(tag_name)s"))
         fa=tpl.getFromAddr()
         cc=tpl.getCCAddrList()
         tl = []
@@ -234,11 +234,11 @@ class EmailNotificator(Notificator):
             if not user.getEmail() in tl:
                 tl.append(user.getEmail())
         return Notification(subject=subj,body=b,fromAddr=fa,toList=tl,ccList=cc)
-    
+
     def notify(self,abstract,tpl):
         #if no from address is specified we should put the default one
         if tpl.getFromAddr().strip() == "":
             tpl.setFromAddr(tpl.getConference().getSupportEmail(returnNoReply=True))
 
         sm=GenericMailer.send(self.apply(abstract,tpl))
-        
+

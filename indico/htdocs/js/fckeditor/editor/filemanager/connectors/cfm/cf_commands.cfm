@@ -108,7 +108,17 @@
 			<cffile action="move" source="#sTempFilePath#" destination="#destination#" mode="755">
 			<!--- omit CF 6.1 error during moving uploaded file, just copy that file instead of moving --->
 			<cfcatch type="any">
-				<cffile action="copy" source="#sTempFilePath#" destination="#destination#" mode="755">
+				<cftry>
+					<cffile action="copy" source="#sTempFilePath#" destination="#destination#" mode="755">
+					<cfcatch type="any">
+						<cfset errorNumber = 102>
+					</cfcatch>
+				</cftry>
+				<cftry>
+					<cffile action="delete" file="#sTempFilePath#">
+					<cfcatch type="any">
+					</cfcatch>
+				</cftry>
 			</cfcatch>
 		</cftry>
 		</cflock>

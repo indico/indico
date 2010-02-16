@@ -7,7 +7,7 @@
         <td class="blacktext">
             <form action="%(setStatusURL)s" method="POST">
                 %(locator)s
-                <b>%(status)s</b> 
+                <b>%(status)s</b>
                 <small>%(changeStatus)s</small>
             </form>
         </td>
@@ -17,7 +17,7 @@
         <td class="blacktext"><div style="width:50%%;">%(principalTable)s</div></td>
     </tr>
     <tr>
-        <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Notify event creation to")%>:</span></td>
+        <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Notify event creation by email to")%>:</span></td>
         <form action="%(setNotifyCreationURL)s" method="POST">
         <td class="blacktext">
         <table><tr><td><small><input name="notifyCreationList" size="30" value=%(notifyCreationList)s> ( <%= _("email addresses separated by semi-colons")%>)</small></td>

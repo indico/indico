@@ -287,9 +287,12 @@ function Ok()
 
 	var eCaption = oEditor.FCKDomTools.GetFirstChild( table, 'CAPTION' ) ;
 
+	if ( eCaption && !oEditor.FCKBrowserInfo.IsIE )
+		eCaption.parentNode.removeChild( eCaption ) ;
+
 	if ( document.getElementById('txtCaption').value != '' )
 	{
-		if ( !eCaption )
+		if ( !eCaption || !oEditor.FCKBrowserInfo.IsIE )
 		{
 			eCaption = oDoc.createElement( 'CAPTION' ) ;
 			table.insertBefore( eCaption, table.firstChild ) ;
@@ -303,8 +306,6 @@ function Ok()
 		// table.deleteCaption() (see #505).
 		if ( oEditor.FCKBrowserInfo.IsIE )
 			eCaption.innerHTML = '' ;
-		else
-			eCaption.parentNode.removeChild( eCaption ) ;
 	}
 
 	return true ;

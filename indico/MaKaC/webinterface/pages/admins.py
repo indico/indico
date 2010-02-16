@@ -71,36 +71,36 @@ class WPAdminsBase( WPMainBase ):
                              "logoutURL": self._escapeChars(str(self.getLogoutURL())), \
                              "tabControl": self._getTabControl(), \
                              "loginAsURL": self.getLoginAsURL() } )
-    
+
     def _createSideMenu(self):
         self._sideMenu = wcomponents.ManagementSideMenu()
-        
+
         mainSection = wcomponents.SideMenuSection()
-        
+
         self._generalSettingsMenuItem = wcomponents.SideMenuItem(_("General settings"),
             urlHandlers.UHAdminArea.getURL())
         mainSection.addItem( self._generalSettingsMenuItem)
-        
+
         self._localdefMenuItem = wcomponents.SideMenuItem(_("Local Definitions"),
             urlHandlers.UHAdminLocalDefinitions.getURL())
         mainSection.addItem( self._localdefMenuItem)
-        
+
         self._usersAndGroupsMenuItem = wcomponents.SideMenuItem(_("Users and Groups"),
             urlHandlers.UHUserManagement.getURL())
         mainSection.addItem( self._usersAndGroupsMenuItem)
-        
+
         self._domainsMenuItem = wcomponents.SideMenuItem(_("IP Domains"),
             urlHandlers.UHDomains.getURL())
         mainSection.addItem( self._domainsMenuItem)
-        
+
         self._roomsMenuItem = wcomponents.SideMenuItem(_("Rooms"),
             urlHandlers.UHRoomBookingPluginAdmin.getURL())
         mainSection.addItem( self._roomsMenuItem)
-        
+
         self._templatesMenuItem = wcomponents.SideMenuItem(_("Templates"),
             urlHandlers.UHTemplates.getURL())
         mainSection.addItem( self._templatesMenuItem)
-        
+
         self._servicesMenuItem = wcomponents.SideMenuItem(_("Services"),
             urlHandlers.UHWebcast.getURL())
         mainSection.addItem( self._servicesMenuItem)
@@ -108,17 +108,17 @@ class WPAdminsBase( WPMainBase ):
         self._pluginsMenuItem = wcomponents.SideMenuItem(_("Plugins"),
             urlHandlers.UHAdminPlugins.getURL())
         mainSection.addItem( self._pluginsMenuItem)
-        
+
         self._homepageMenuItem = wcomponents.SideMenuItem(_("Homepage"),
             urlHandlers.UHUpdateNews.getURL())
         mainSection.addItem( self._homepageMenuItem)
-        
+
         self._systemMenuItem = wcomponents.SideMenuItem(_("System"),
             urlHandlers.UHAdminsSystem.getURL())
         mainSection.addItem( self._systemMenuItem)
-        
+
         self._sideMenu.addSection(mainSection)
-    
+
 
     def _getBody( self, params ):
         self._createSideMenu()
@@ -126,36 +126,36 @@ class WPAdminsBase( WPMainBase ):
 
         self._createTabCtrl()
         self._setActiveTab()
-        
+
         frame = WAdminFrame()
         p = { "body": self._getPageContent( params ),
               "sideMenu": self._sideMenu.getHTML() }
-        
+
         return frame.getHTML( p )
-    
+
     def _getNavigationDrawer(self):
         return wcomponents.WSimpleNavigationDrawer(_("Server Admin"), urlHandlers.UHAdminArea.getURL, bgColor="white" )
-    
+
     def _createTabCtrl(self):
         pass
-    
+
     def _getTabContent(self):
         return "nothing"
-    
+
     def _setActiveTab(self):
         pass
-    
+
     def _setActiveSideMenuItem(self):
         pass
-    
+
     def _getPageContent(self, params):
         return "nothing"
 
 class WAdmins(wcomponents.WTemplated):
-    
+
     def __init__(self):
         pass
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -174,8 +174,8 @@ class WAdmins(wcomponents.WTemplated):
             else:
                 vars["address"] = "%s"%minfo.getCountry()
         try:
-            vars["timezone"] = minfo.getTimezone() 
-        except: 
+            vars["timezone"] = minfo.getTimezone()
+        except:
             vars["timezone"] = 'UTC'
         vars["adminList"] = wcomponents.WPrincipalTable().getHTML( minfo.getAdminList().getList(),  None, vars["addAdminsURL"], vars["removeAdminsURL"], selectable=False )
         vars["systemIconAdmins"] = Config.getInstance().getSystemIconURL( "admin" )
@@ -206,7 +206,7 @@ class WAdmins(wcomponents.WTemplated):
 
 
 class WAdminFrame(wcomponents.WTemplated):
-    
+
     def __init__( self ):
         pass
 
@@ -216,15 +216,15 @@ class WAdminFrame(wcomponents.WTemplated):
         vars["titleTabPixels"] = self.getTitleTabPixels()
         vars["intermediateVTabPixels"] = self.getIntermediateVTabPixels()
         return vars
-        
+
     def getIntermediateVTabPixels( self ):
         return 0
-        
+
     def getTitleTabPixels( self ):
         return 260
 
 class WPAdmins( WPAdminsBase ):
-    
+
     def _setActiveSideMenuItem(self):
         self._generalSettingsMenuItem.setActive()
 
@@ -233,7 +233,7 @@ class WPAdmins( WPAdminsBase ):
         pars = { "GeneralInfoModifURL": urlHandlers.UHGeneralInfoModification.getURL(), \
                 "addAdminsURL": urlHandlers.UHAdminsSelectUsers.getURL(), \
                 "removeAdminsURL": urlHandlers.UHAdminsRemoveUsers.getURL() }
-        return wc.getHTML( pars )        
+        return wc.getHTML( pars )
 
 class WPAdminSelectUsers( WPAdmins ):
 
@@ -253,7 +253,7 @@ class WPAdminSelectUsers( WPAdmins ):
         return "%s%s"%(html,"""</td></tr></table>""")
 
 class WGeneralInfoModification(wcomponents.WTemplated):
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         genInfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -274,51 +274,51 @@ class WGeneralInfoModification(wcomponents.WTemplated):
 
 
 class WPAdminLocalDefinitions( WPAdminsBase ):
-    
+
     def __init__(self, rh):
         WPAdminsBase.__init__(self, rh)
-    
-    def __getAvailableTemplates(self):        
-        tplDir = Config.getInstance().getTPLDir()                
-        
+
+    def __getAvailableTemplates(self):
+        tplDir = Config.getInstance().getTPLDir()
+
         tplRE = re.compile('^([^\.]+)\.([^\.]+)\.tpl$')
-        
+
         templates = {}
-        
+
         fnames = os.listdir(tplDir);
         for fname in fnames:
             m = tplRE.match(fname)
             if m:
                 templates[m.group(2)] = None
-        
+
         tplRE = re.compile('^([^\.]+)\.([^\.]+)\.wohl$')
-        
+
         fnames = os.listdir(os.path.join(tplDir,'chelp'));
         for fname in fnames:
             m = tplRE.match(fname)
             if m:
                 templates[m.group(2)] = None
-        
+
         return templates.keys()
-    
+
     def _getPageContent( self, params ):
         wc = WAdminLocalDefinitions()
         pars = {    "defaultTemplateSet": info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultTemplateSet(),
                     "availableTemplates": self.__getAvailableTemplates(),
                     "formURL": urlHandlers.UHAdminSaveTemplateSet.getURL() }
         return wc.getHTML( pars )
-    
+
     def _setActiveSideMenuItem( self ):
         self._localdefMenuItem.setActive()
-    
+
 class WAdminLocalDefinitions(wcomponents.WTemplated):
-    
+
     pass
-    
+
 
 
 class WPGenInfoModification( WPAdmins ):
-    
+
     def _getPageContent( self, params ):
         wc = WGeneralInfoModification()
         pars = { "postURL": urlHandlers.UHGeneralInfoPerformModification.getURL() }
@@ -327,25 +327,25 @@ class WPGenInfoModification( WPAdmins ):
 class WPHomepageCommon( WPAdminsBase ):
     def _setActiveSideMenuItem(self):
         self._homepageMenuItem.setActive()
-    
+
     def _createTabCtrl( self ):
         self._tabCtrl = wcomponents.TabControl()
 
         self._subTabNews = self._tabCtrl.newTab( "news", _("News"), \
-                urlHandlers.UHUpdateNews.getURL() )  
+                urlHandlers.UHUpdateNews.getURL() )
         self._subTabAnnouncements = self._tabCtrl.newTab( "announcements", _("Announcements"), \
-                urlHandlers.UHAnnouncement.getURL() )  
+                urlHandlers.UHAnnouncement.getURL() )
         self._subTabUpcoming = self._tabCtrl.newTab( "upcoming", _("Upcoming Events"), \
-                urlHandlers.UHConfigUpcomingEvents.getURL() )  
-    
+                urlHandlers.UHConfigUpcomingEvents.getURL() )
+
     def _getPageContent(self, params):
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
 
 class WPUpdateNews( WPHomepageCommon ):
-    
+
     def _setActiveTab( self ):
         self._subTabNews.setActive()
-        
+
     def _getTabContent( self, params ):
         tz = timezone(timezoneUtils.DisplayTZ(self._getAW()).getDisplayTZ())
         wc = WUpdateNews()
@@ -362,7 +362,7 @@ class WPUpdateNews( WPHomepageCommon ):
         return wc.getHTML( pars )
 
 class WUpdateNews(wcomponents.WTemplated):
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["baseURL"] = Config.getInstance().getBaseURL()
@@ -370,61 +370,61 @@ class WUpdateNews(wcomponents.WTemplated):
         return vars
 
 class WPConfigUpcomingEvents( WPHomepageCommon ):
-    
+
     def _setActiveTab( self ):
         self._subTabUpcoming.setActive()
-        
+
     def _getTabContent( self, params ):
         wc = WConfigUpcomingEvents()
         pars = {}
         return wc.getHTML( pars )
 
 class WConfigUpcomingEvents(wcomponents.WTemplated):
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         return vars
 
-    
+
 class WPAnnouncementModif( WPHomepageCommon ):
-    
+
     def _setActiveTab( self ):
         self._subTabAnnouncements.setActive()
-        
+
     def _getTabContent( self, params ):
         wc = WAnnouncementModif()
-        pars = {"saveURL": urlHandlers.UHAnnouncementSave.getURL() }    
-        return wc.getHTML( pars )   
+        pars = {"saveURL": urlHandlers.UHAnnouncementSave.getURL() }
+        return wc.getHTML( pars )
 
 class WAnnouncementModif(wcomponents.WTemplated):
-    
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         an = getAnnoucementMgrInstance()
         vars["announcement"] = escape(an.getText()).replace("\"", "&#34;")
         return vars
-    
-    
+
+
 class WPAdminPlugins( WPAdminsBase ):
-    
+
     def __init__(self, rh, pluginTypeId, initialPlugin):
         WPAdminsBase.__init__(self, rh)
         self._pluginTypeId = pluginTypeId
         self._initialPlugin = initialPlugin
         self._user = rh._getUser()
         self._tabs = {}
-    
+
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
-        
+
         self._tabs["Main"] = self._tabCtrl.newTab("Main", _("Main"), urlHandlers.UHAdminPlugins.getURL())
-        
+
         pluginTypes = PluginsHolder().getPluginTypes(sorted = True)
         for pluginType in pluginTypes:
             if pluginType.isVisible() and pluginType.isActive():
                 self._tabs[pluginType.getId()] = self._tabCtrl.newTab(pluginType.getName(), pluginType.getName(),
                                                                        urlHandlers.UHAdminPlugins.getURL( pluginType ))
-    
+
     def _setActiveSideMenuItem(self):
         self._pluginsMenuItem.setActive()
 
@@ -433,41 +433,41 @@ class WPAdminPlugins( WPAdminsBase ):
             self._tabs["Main"].setActive()
         else:
             self._tabs[self._pluginTypeId].setActive()
-    
+
     def _getPageContent(self, params):
         if self._pluginTypeId is None:
             html = WAdminPluginsMainTab().getHTML(params)
         else:
             html = WAdminPlugins(self._pluginTypeId, self._initialPlugin, self._user).getHTML( params )
-            
+
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( html )
-    
+
 class WAdminPlugins (wcomponents.WTemplated):
-    
+
     def __init__(self, pluginType, initialPlugin, user):
         self._pluginType = pluginType
         self._initialPlugin = initialPlugin
         self._user = user
-    
+
     def getVars (self):
         vars = wcomponents.WTemplated.getVars( self )
-        
+
         vars["PluginType"] = PluginsHolder().getPluginType(self._pluginType)
         vars["InitialPlugin"] = self._initialPlugin
         vars["Favorites"] = DictPickler.pickle(self._user.getPersonalInfo().getBasket().getUsers())
-        
+
         return vars
-    
+
 class WAdminPluginsMainTab(wcomponents.WTemplated):
-    
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
-        
+
         vars["PluginsHolder"] = PluginsHolder()
-        
+
         return vars
-        
-    
+
+
 class WPServicesCommon( WPAdminsBase ):
 
     def _setActiveSideMenuItem(self):
@@ -475,19 +475,19 @@ class WPServicesCommon( WPAdminsBase ):
 
     def _createTabCtrl( self ):
         self._tabCtrl = wcomponents.TabControl()
-        
+
         self._subTabWebcast = self._tabCtrl.newTab( "webcast", _("Webcast"), \
-                urlHandlers.UHWebcast.getURL() )  
+                urlHandlers.UHWebcast.getURL() )
         self._subTabWebcast_Live = self._subTabWebcast.newSubTab( "live", _("Live"), \
-                urlHandlers.UHWebcast.getURL() )  
+                urlHandlers.UHWebcast.getURL() )
         self._subTabWebcast_Archive = self._subTabWebcast.newSubTab( "archive", _("Archive"), \
-                urlHandlers.UHWebcastArchive.getURL() )  
+                urlHandlers.UHWebcastArchive.getURL() )
         self._subTabWebcast_Setup = self._subTabWebcast.newSubTab( "setup", _("Setup"), \
-                urlHandlers.UHWebcastSetup.getURL() )  
+                urlHandlers.UHWebcastSetup.getURL() )
         self._subTabRecording = self._tabCtrl.newTab( "recording", _("Recording"), \
-                urlHandlers.UHRecording.getURL() )       
+                urlHandlers.UHRecording.getURL() )
         self._subTabOAIPrivateConfig = self._tabCtrl.newTab( "oai-private", _("OAI Private Gateway"), \
-                urlHandlers.UHOAIPrivateConfig.getURL() )  
+                urlHandlers.UHOAIPrivateConfig.getURL() )
 
     def _getPageContent(self, params):
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
@@ -506,7 +506,7 @@ class WPRecording( WPServicesCommon ):
 
     def _setActiveTab( self ):
         self._subTabRecording.setActive()
-        
+
 class WPWebcast( WPServicesCommon ):
 
     pageURL = "adminServices.py/webcast"
@@ -523,7 +523,7 @@ class WPWebcast( WPServicesCommon ):
 
 
 class WWebcast( wcomponents.WTemplated ):
-        
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
@@ -589,8 +589,8 @@ class WWebcast( wcomponents.WTemplated ):
         vars["addwebcastURL"] = urlHandlers.UHWebcastAddWebcast.getURL()
         vars["webcasts"] = list_webcasts
         return vars
-    
-    
+
+
 class WPWebcastArchive( WPServicesCommon ):
 
     pageURL = "adminServices.py/webcastArchive"
@@ -604,10 +604,10 @@ class WPWebcastArchive( WPServicesCommon ):
 
     def _setActiveTab( self ):
         self._subTabWebcast_Archive.setActive()
-        
-        
+
+
 class WWebcastArchive( wcomponents.WTemplated ):
-        
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         iconunarchive = Config.getInstance().getSystemIconURL( "unarchive" )
@@ -624,7 +624,7 @@ class WWebcastArchive( wcomponents.WTemplated ):
             list_webcasts += "<TD>%s - %s</TD><TD>"% (wc.getStartDate().strftime("%Y-%m-%d %H:%M"),title)
             urlunarchivewebcast = urlHandlers.UHWebcastUnArchiveWebcast.getURL()
             urlunarchivewebcast.addParam("webcastid",wc.getId())
-                
+
             urlremovewebcast = urlHandlers.UHWebcastRemoveWebcast.getURL()
             urlremovewebcast.addParam("webcastid",wc.getId())
             list_webcasts += """<a href="%s"><img src="%s" border="0" alt="unarchive webcast"></a></td><td><a href="%s"><img src="%s" border="0" alt="delete webcast"></a>""" % (urlunarchivewebcast,iconunarchive,urlremovewebcast,iconremove)
@@ -632,7 +632,7 @@ class WWebcastArchive( wcomponents.WTemplated ):
         vars["webcasts"] = list_webcasts
         return vars
 
-    
+
 class WPWebcastSetup( WPServicesCommon ):
 
     pageURL = "adminServices.py/webcastSetup"
@@ -646,10 +646,10 @@ class WPWebcastSetup( WPServicesCommon ):
 
     def _setActiveTab( self ):
         self._subTabWebcast_Setup.setActive()
-        
-        
+
+
 class WWebcastSetup( wcomponents.WTemplated ):
-        
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
@@ -725,17 +725,17 @@ class WWebcastSetup( wcomponents.WTemplated ):
         list_channels += "</table>"
         vars["channels"] = list_channels
         vars["postURL"] = urlHandlers.UHWebcastAddChannel.getURL()
-        
+
         vars["saveWebcastServiceURL"] = urlHandlers.UHWebcastSaveWebcastServiceURL.getURL()
         vars["webcastServiceURL"] = wm.getWebcastServiceURL()
-        
+
         vars["saveWebcastSynchronizationURL"] = urlHandlers.UHWebcastSaveWebcastSynchronizationURL.getURL()
         vars["webcastSynchronizationURL"] = wm.getWebcastSynchronizationURL()
-        
+
         vars["webcastManualSynchronize"] = urlHandlers.UHWebcastManualSynchronization.getURL()
-        
+
         return vars
-    
+
 class WPWebcastSelectManager( WPWebcastSetup ):
 
     def _getTabContent( self, params ):
@@ -744,14 +744,14 @@ class WPWebcastSelectManager( WPWebcastSetup ):
         params["addURL"] =  urlHandlers.UHWebcastAddManager.getURL()
         return wc.getHTML( params )
 
-    
+
 class WPTemplatesCommon( WPAdminsBase ):
-    
+
     def getJSFiles(self):
         return [ 'js/prototype/prototype.js',
                  'js/scriptaculous/scriptaculous.js' ] + \
                 WPAdminsBase.getJSFiles(self)
-    
+
     def _setActiveSideMenuItem(self):
         self._templatesMenuItem.setActive()
 
@@ -761,12 +761,12 @@ class WPTemplatesCommon( WPAdminsBase ):
         self._subTabBadges = self._tabCtrl.newTab( "badges", _("Badges"), \
                 urlHandlers.UHBadgeTemplates.getURL() )
         self._subTabPosters = self._tabCtrl.newTab( "posters", _("Posters"), \
-                urlHandlers.UHPosterTemplates.getURL() )  
+                urlHandlers.UHPosterTemplates.getURL() )
         self._subTabStyles = self._tabCtrl.newTab( "styles", _("Timetable Styles"), \
-                urlHandlers.UHAdminsStyles.getURL() )     
+                urlHandlers.UHAdminsStyles.getURL() )
         self._subTabCSSTpls = self._tabCtrl.newTab( "styles", _("Conference Styles"), \
-                urlHandlers.UHAdminsConferenceStyles.getURL() )     
-    
+                urlHandlers.UHAdminsConferenceStyles.getURL() )
+
     def _getPageContent(self, params):
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
         if self._showAdmin:
@@ -784,7 +784,7 @@ class WPAdminsConferenceStyles( WPTemplatesCommon ):
         self._subTabCSSTpls.setActive()
 
 class WAdminsConferenceStyles(wcomponents.WTemplated):
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["contextHelpText"] = _("This is the list of templates that an organizer can use to customize a conference")
@@ -804,7 +804,7 @@ class WPAdminsStyles( WPTemplatesCommon ):
         self._subTabStyles.setActive()
 
 class WAdminsStyles(wcomponents.WTemplated):
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
@@ -822,7 +822,7 @@ class WPAdminsAddStyle( WPAdminsStyles ):
         return wp.getHTML(params)
 
 class WAdminsAddStyle(wcomponents.WTemplated):
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
@@ -840,7 +840,7 @@ class WAdminsAddStyle(wcomponents.WTemplated):
         return vars
 
 class WAdminTemplates(wcomponents.WTemplated):
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         return vars
@@ -872,59 +872,59 @@ class WPPosterTemplates( WPTemplatesCommon ):
         self._subTabPosters.setActive()
 
 class WPBadgeTemplateDesign( WPTemplatesCommon ):
-    
+
     def __init__(self, rh, conf, templateId = None, new = False):
         WPTemplatesCommon.__init__(self, rh)
         self._conf = conf
         self.__templateId = templateId
         self.__new = new
-    
+
     def _setActiveTab( self ):
         self._subTabBadges.setActive()
-    
+
     def _getTabContent( self, params ):
         wc = conferences.WConfModifBadgeDesign( self._conf, self.__templateId, self.__new )
         return wc.getHTML()
 
 class WPPosterTemplateDesign( WPTemplatesCommon ):
-    
+
     def __init__(self, rh, conf, templateId = None, new = False):
         WPTemplatesCommon.__init__(self, rh)
         self._conf = conf
         self.__templateId = templateId
         self.__new = new
-    
+
     def _setActiveTab( self ):
         self._subTabPosters.setActive()
-    
+
     def _getTabContent( self, params ):
         wc = conferences.WConfModifPosterDesign( self._conf, self.__templateId, self.__new )
         return wc.getHTML()
-        
+
 class WBadgeTemplates( wcomponents.WTemplated ):
 
     def __init__( self, conference, user=None ):
         self.__conf = conference
         self._user=user
-        
+
     def getVars( self ):
-        
+
         dconf = self.__conf
-        
+
         vars = wcomponents.WTemplated.getVars( self )
         vars["NewDefaultTemplateURL"] = str(urlHandlers.UHModifDefTemplateBadge.getURL(dconf,
                                                                              dconf.getBadgeTemplateManager().getNewTemplateId(), new = True))
-        
+
         templateListHTML = []
         first = True
-    
-    
+
+
         sortedTemplates = dconf.getBadgeTemplateManager().getTemplates().items()
         sortedTemplates.sort(lambda item1, item2: cmp(item1[1].getName(), item2[1].getName()))
         for templateId, template in sortedTemplates:
             templateListHTML.append("""              <tr>""")
             templateListHTML.append("""                <td>""")
-            
+
             radio = []
             radio.append("""                  <input type="radio" name="templateId" value='""")
             radio.append(str(templateId))
@@ -943,7 +943,7 @@ class WBadgeTemplates( wcomponents.WTemplated ):
                                               template.getName(),
                                               """</label>""",
                                               """&nbsp;&nbsp;&nbsp;"""]))
-            
+
             edit = []
             edit.append("""                  <a href='""")
             edit.append(str(urlHandlers.UHConfModifBadgeDesign.getURL(dconf, templateId)))
@@ -951,7 +951,7 @@ class WBadgeTemplates( wcomponents.WTemplated ):
             edit.append(str(Config.getInstance().getSystemIconURL("file_edit")))
             edit.append("""' border='0'></a>&nbsp;""")
             templateListHTML.append("".join(edit))
-            
+
             delete = []
             delete.append("""                  <a href='""")
             delete.append(str(urlHandlers.UHConfModifBadgePrinting.getURL(dconf, deleteTemplateId=templateId)))
@@ -959,40 +959,40 @@ class WBadgeTemplates( wcomponents.WTemplated ):
             delete.append(str(Config.getInstance().getSystemIconURL("smallDelete")))
             delete.append("""' border='0'></a>&nbsp;""")
             templateListHTML.append("".join(delete))
-            
+
             templateListHTML.append("""                </td>""")
             templateListHTML.append("""              </tr>""")
-            
+
         vars["templateList"] = "\n".join(templateListHTML)
-        
+
         vars['PDFOptions'] = WConfModifBadgePDFOptions(dconf, showKeepValues = False, showTip = False).getHTML()
-        
+
         return vars
-        
+
 class WPosterTemplates( wcomponents.WTemplated ):
 
     def __init__( self, conference, user=None ):
         self.__conf = conference
         self._user=user
-        
+
     def getVars( self ):
-        
+
         dconf = self.__conf
-        
+
         vars = wcomponents.WTemplated.getVars( self )
         vars["NewDefaultTemplateURL"] = str(urlHandlers.UHModifDefTemplatePoster.getURL(dconf,
                                                                              dconf.getPosterTemplateManager().getNewTemplateId(), new = True))
-        
+
         templateListHTML = []
         first = True
-    
-    
+
+
         sortedTemplates = dconf.getPosterTemplateManager().getTemplates().items()
         sortedTemplates.sort(lambda item1, item2: cmp(item1[1].getName(), item2[1].getName()))
         for templateId, template in sortedTemplates:
             templateListHTML.append("""              <tr>""")
             templateListHTML.append("""                <td>""")
-            
+
             radio = []
             radio.append("""                  <input type="radio" name="templateId" value='""")
             radio.append(str(templateId))
@@ -1011,7 +1011,7 @@ class WPosterTemplates( wcomponents.WTemplated ):
                                               template.getName(),
                                               """</label>""",
                                               """&nbsp;&nbsp;&nbsp;"""]))
-            
+
             edit = []
             edit.append("""                  <a href='""")
             edit.append(str(urlHandlers.UHConfModifPosterDesign.getURL(dconf, templateId)))
@@ -1019,7 +1019,7 @@ class WPosterTemplates( wcomponents.WTemplated ):
             edit.append(str(Config.getInstance().getSystemIconURL("file_edit")))
             edit.append("""' border='0'></a>&nbsp;""")
             templateListHTML.append("".join(edit))
-            
+
             delete = []
             delete.append("""                  <a href='""")
             delete.append(str(urlHandlers.UHConfModifPosterPrinting.getURL(dconf, deleteTemplateId=templateId)))
@@ -1034,12 +1034,12 @@ class WPosterTemplates( wcomponents.WTemplated ):
             clone.append("""' border='0'></a>&nbsp;""")
             templateListHTML.append("".join(delete))
             templateListHTML.append("".join(clone))
-            
+
             templateListHTML.append("""                </td>""")
             templateListHTML.append("""              </tr>""")
-            
+
         vars["templateList"] = "\n".join(templateListHTML)
-        
+
         return vars
 
 
@@ -1050,23 +1050,23 @@ class WPUsersAndGroupsCommon(WPAdminsBase):
 
     def _createTabCtrl( self ):
         self._tabCtrl = wcomponents.TabControl()
-        
+
         self._subTabMain = self._tabCtrl.newTab( "main", _("Main"), \
                 urlHandlers.UHUserManagement.getURL() )
         self._subTabUsers = self._tabCtrl.newTab( "users", _("Manage Users"), \
                 urlHandlers.UHUsers.getURL() )
         self._subTabGroups = self._tabCtrl.newTab( "groups", _("Manage Groups"), \
                 urlHandlers.UHGroups.getURL() )
-    
+
     def _getPageContent(self, params):
 
         #if self._showAdmin:
         #    html = WPAdminsBase._getBody( self, params )
         #else:
         #    html = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
-        
+
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
-    
+
     #def _getBody(self, params):
     #    if self._showAdmin:
     #        return WPAdminsBase._getBody( self, params )
@@ -1092,7 +1092,7 @@ class WUserManagement( wcomponents.WTemplated ):
             icon = iconEnabled
         else:
             icon = iconDisabled
-        vars["accountCreationData"] += _("""<br><a href="%s"><img src="%s" border="0"> _("Notify Account Creation")</a>""") % (str(url), icon)
+        vars["accountCreationData"] += _("""<br><a href="%s"><img src="%s" border="0"> _("Notify Account Creation by Email")</a>""") % (str(url), icon)
         url = urlHandlers.UHUserManagementSwitchModerateAccountCreation.getURL()
         if minfo.getModerateAccountCreation():
             icon = iconEnabled
@@ -1102,7 +1102,7 @@ class WUserManagement( wcomponents.WTemplated ):
         vars["moderators"] = ""
         vars["moderatorsURL"] = ""
         return vars
-        
+
 
 class WPUserManagement( WPUsersAndGroupsCommon ):
     pageURL = "userManagement.py"
@@ -1128,7 +1128,7 @@ class WBrowseUsers( wcomponents.WTemplated ):
     def __init__( self, letter=None, browseIndex="surName" ):
         self._letter = letter
         self._browseIndex = browseIndex
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         nameIndex = indexes.IndexesHolder().getById(self._browseIndex)
@@ -1165,7 +1165,7 @@ class WBrowseUsers( wcomponents.WTemplated ):
                 res.sort()
             vars["browseResult"] = WHTMLUserList(res).getHTML(vars)
         return vars
-        
+
 class WHTMLUserList(wcomponents.WTemplated):
 
     def __init__(self, userList):
@@ -1205,13 +1205,13 @@ class WHTMLUserList(wcomponents.WTemplated):
             vars["userList"] += _("""<tr>
                             <td><br><span class="blacktext">&nbsp;&nbsp;&nbsp; _("No users returned")</span></td></tr>""")
         return vars
-    
+
 class WUserList(wcomponents.WTemplated):
 
     def __init__( self, criteria, onlyActivated=True ):
         self._criteria = criteria
         self._onlyActivated=onlyActivated
-    
+
     def _performSearch( self, criteria ):
         ah = user.AvatarHolder()
         if  criteria["surName"] == "*" or \
@@ -1271,12 +1271,12 @@ class WPUserList(WPUserCommon):
 
 
 class WPUserCreation(WPUserCommon):
-    
+
     def __init__(self, rh, params, participation=None):
         WPUserCommon.__init__(self, rh)
         self._params = params
         self._participation=participation
-    
+
     def _getTabContent(self, params ):
         pars = self._params
         p = wcomponents.WUserRegistration()
@@ -1298,62 +1298,62 @@ class WPUserCreation(WPUserCommon):
         return p.getHTML( pars )
 
 class WPUserCreationNonAdmin(WPUserCreation):
-    
+
     def _getNavigationDrawer(self):
         pass
-    
+
     def _getBody(self, params):
         return WPUserCreation._getTabContent(self, params)
-    
+
 class WPUserCreated( WPUserCommon ):
-    
+
     def __init__(self, rh, av):
         WPUserCommon.__init__(self, rh)
         self._av = av
-    
+
     def _getTabContent(self, params ):
         p = wcomponents.WUserCreated(self._av)
         pars = {"signInURL" : urlHandlers.UHSignIn.getURL()}
         return p.getHTML( pars )
 
 class WPUserCreatedNonAdmin(WPUserCreated):
-    
+
     def _getNavigationDrawer(self):
         pass
-    
+
     def _getBody(self, params):
         return WPUserCreated._getTabContent(self, params)
 
 
 class WPUserExistWithIdentity( WPUserCommon ):
-    
+
     def __init__(self, rh, av):
         WPUserCommon.__init__(self, rh)
         self._av = av
-        
+
     def _getTabContent(self, params ):
         p = wcomponents.WUserSendIdentity(self._av)
         pars = {"postURL" : urlHandlers.UHSendLogin.getURL(self._av)}
         return p.getHTML( pars )
 
 class WPUserExistWithIdentityNonAdmin(WPUserExistWithIdentity):
-    
+
     def _getNavigationDrawer(self):
         pass
-    
+
     def _getBody(self, params):
         return WPUserExistWithIdentity._getTabContent(self, params)
 
 
 class WPUserBase(WPUserCommon):
-    
+
     def __init__( self, rh, av=None ):
         WPUserCommon.__init__( self, rh )
         self._avatar = av
 
 
 class WUserIdentitiesTable(wcomponents.WTemplated):
-    
+
     def __init__( self, av ):
         self._avatar = av
 
@@ -1392,7 +1392,7 @@ class WUserIdentitiesTable(wcomponents.WTemplated):
 
 
 class WUserBaskets(wcomponents.WTemplated):
-    
+
     def __init__(self, av):
         self._avatar = av
 
@@ -1402,7 +1402,7 @@ class WUserBaskets(wcomponents.WTemplated):
 
 
 class WUserPreferences(wcomponents.WTemplated):
-    
+
     def __init__(self, av):
         self._avatar = av
 
@@ -1411,7 +1411,7 @@ class WUserPreferences(wcomponents.WTemplated):
         return wcomponents.WTemplated.getHTML( self, params )
 
 class WUserDetails(wcomponents.WTemplated):
-    
+
     def __init__(self, av):
         self._avatar = av
 
@@ -1448,7 +1448,7 @@ class WUserDetails(wcomponents.WTemplated):
         vars["locator"] = self.htmlText(self._avatar.getLocator().getWebForm())
         vars["identities"] = ""
         vars["status"] = self._avatar.getStatus()
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance() 
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         al = minfo.getAdminList()
         if self._currentUser == self._avatar or \
               self._currentUser in al.getList() or \
@@ -1468,7 +1468,7 @@ class WUserDetails(wcomponents.WTemplated):
         for event in events:
             vars["eventManager"] += """<a href="%s">%s</a><br>""" % (urlHandlers.UHConferenceDisplay.getURL(event), event.getTitle())
         return vars
-    
+
     def getEmailsHTML(self, u):
         html = [self.htmlText(u.getEmails()[0])]
         if u.getSecondaryEmails():
@@ -1476,12 +1476,12 @@ class WUserDetails(wcomponents.WTemplated):
             html.append(", ".join(u.getSecondaryEmails()))
             html.append(")</small></font>")
         return "".join(html)
-                
+
 class WPPersonalArea(WPUserBase):
-    
+
     def _getBody( self, params ):
         self._createTabCtrl()
-        self._setActiveTab()                
+        self._setActiveTab()
         html = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
         frame = personalization.WPersAreaFrame()
         p = { "body": html,
@@ -1492,21 +1492,21 @@ class WPPersonalArea(WPUserBase):
         self._tabCtrl = wcomponents.TabControl()
         self._tabDetails = self._tabCtrl.newTab( "details", _("Account Details"), \
                 urlHandlers.UHUserDetails.getURL(self._avatar) )
-        
+
         """
-            This tab is not needed any more. Currently only has information about 
+            This tab is not needed any more. Currently only has information about
             showing or hiding advacned tabs. These advanced tabs has been turned into
             a side menu. Maybe the tab is needed in the future.
         """
         #self._tabPreferences = self._tabCtrl.newTab( "preferences", _("Preferences"), \
-        #        urlHandlers.UHUserPreferences.getURL() )    
+        #        urlHandlers.UHUserPreferences.getURL() )
 
         self._tabBaskets = self._tabCtrl.newTab( "baskets", _("Favorites"), \
                 urlHandlers.UHUserBaskets.getURL() )
- 
+
     def _getNavigationDrawer(self):
         return wcomponents.WSimpleNavigationDrawer(_("User Details"))
-    
+
 
 class WPUserDetails( WPPersonalArea ):
 
@@ -1533,7 +1533,7 @@ class WPUserBaskets( WPPersonalArea ):
         self._tabBaskets.setActive()
 
 
-class WPUserPreferences( WPPersonalArea ):    
+class WPUserPreferences( WPPersonalArea ):
 
     def _getTabContent( self, params ):
         c = WUserPreferences( self._avatar )
@@ -1544,10 +1544,10 @@ class WPUserPreferences( WPPersonalArea ):
 
 
 class WUserModify(wcomponents.WTemplated):
-    
+
     def __init__( self, avatar ):
         self._avatar = avatar
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         u = self._avatar
@@ -1572,7 +1572,7 @@ class WUserModify(wcomponents.WTemplated):
         vars["telephone"] = vars.get("telephone", u.getTelephones()[0])
         vars["fax"] =  vars.get("fax", u.getFaxes()[0])
         return vars
-    
+
     def _getSecEmailHTML(self, secEmails):
         html = [ _("""<input type="text" name="secEmailAdd" value="" size="25"><input type="submit" name="addSecEmail" value="_("Add")"><br>""")]
         emails = []
@@ -1582,34 +1582,34 @@ class WUserModify(wcomponents.WTemplated):
         html.append("<br>".join(emails))
         if secEmails:
             html.append( _("""<input type="submit" name="removeSecEmail" value="_("Remove")">"""))
-        
+
         return "\n".join(html)
 
 
 class WPUserModification( WPUserBase ):
-    
+
     def __init__(self, rh, avatar, params):
         WPUserBase.__init__(self, rh)
         self._avatar = avatar
         self._params = params
-    
+
     def _getTabContent( self, params ):
         p = WUserModify( self._avatar )
         self._params["postURL"] =  urlHandlers.UHUserModification.getURL()
         if self._params["msg"] != "":
             self._params["msg"] = "<table bgcolor=\"gray\"><tr><td bgcolor=\"white\">\n<font size=\"+1\" color=\"red\"><b>%s</b></font>\n</td></tr></table>"%self._params["msg"]
-        return p.getHTML( self._params )        
+        return p.getHTML( self._params )
 
 
 class WIdentityModification(wcomponents.WTemplated):
-    
+
     def __init__( self, av, identity=None ):
         self._avatar = av
         self._identity = identity
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        
+
         locatorList = ["""<input type="hidden" name="userId" value="%s">"""%self._avatar.getId() ]
         if self._identity == None:
             WTitle = _("New Identity for user")+" :<br>%s"%(self._avatar.getFullName())
@@ -1617,25 +1617,25 @@ class WIdentityModification(wcomponents.WTemplated):
             login = vars.get("login",self._avatar.getEmail())
             password = ""
         else:
-            WTitle, WDescription = "", ""     
+            WTitle, WDescription = "", ""
             login = self._identity.getId()
-            password = ""   
-        
+            password = ""
+
         vars["login"] = login
-        vars["password"] = password        
-        
-        if vars.get("WTitle",None) is None :            
+        vars["password"] = password
+
+        if vars.get("WTitle",None) is None :
             vars["WTitle"] = WTitle
-        if vars.get("WDescription",None) is None :            
+        if vars.get("WDescription",None) is None :
             vars["WDescription"] = WDescription
         if vars.get("disabledLogin",None) is None :
             vars["disabledLogin"] = ""
             vars["hiddenLogin"] = ""
         else :
-            vars["hiddenLogin"] = """<input type=hidden name="login" value="%s">"""%vars["login"]        
+            vars["hiddenLogin"] = """<input type=hidden name="login" value="%s">"""%vars["login"]
         if vars.get("disabledSystem",None) is None :
             vars["disabledSystem"] = ""
-        
+
         vars["locator"] = "\n".join(locatorList)
         html = ""
         am = AuthenticatorMgr()
@@ -1646,30 +1646,30 @@ class WIdentityModification(wcomponents.WTemplated):
 
 
 class WPIdentityCreation(WPUserBase):
-    
+
     def __init__(self, rh, av, params):
         WPUserBase.__init__(self, rh)
         self._avatar = av
         self._params = params
-    
+
     def _getTabContent(self, params):
         c = WIdentityModification( self._avatar )
         self._params["identityId"] = ""
         self._params["postURL"] = urlHandlers.UHUserIdentityCreation.getURL()
         return c.getHTML( self._params )
-    
+
 
 class WPIdentityChangePassword(WPUserBase):
-    
+
     def __init__(self, rh, av, params):
         WPUserBase.__init__(self, rh)
         self._avatar = av
         self._params = params
-    
+
     def _getTabContent(self, params):
-        
+
         identity = self._avatar.getIdentityById(self._params["identityId"],"Local")
-        c = WIdentityModification( self._avatar, identity )        
+        c = WIdentityModification( self._avatar, identity )
         postURL = urlHandlers.UHUserIdentityChangePassword.getURL()
         self._params["postURL"] = postURL
         self._params["WTitle"] = _("Change password for user")+" :<br>%s"%self._avatar.getFullName()
@@ -1681,13 +1681,13 @@ class WPIdentityChangePassword(WPUserBase):
 
 
 class WPGroupCommon(WPUsersAndGroupsCommon):
-    
+
     def __init__( self, rh ):
         WPUsersAndGroupsCommon.__init__( self, rh )
 
     def _setActiveTab( self ):
         self._subTabGroups.setActive()
-  
+
 class WHTMLGroupList(wcomponents.WTemplated):
 
     def __init__(self, groupList):
@@ -1718,12 +1718,12 @@ class WHTMLGroupList(wcomponents.WTemplated):
             vars["groupList"] += _("""<tr>
                             <td><br><span class="blacktext">&nbsp;&nbsp;&nbsp; _("No group returned")</span></td></tr>""")
         return vars
-    
+
 class WBrowseGroups( wcomponents.WTemplated ):
 
     def __init__( self, letter=None ):
         self._letter = letter
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         gh = user.GroupHolder()
@@ -1751,7 +1751,7 @@ class WBrowseGroups( wcomponents.WTemplated ):
             res.sort(utils.sortGroupsByName)
             vars["browseResult"] = WHTMLGroupList(res).getHTML(vars)
         return vars
-        
+
 class WGroupList(wcomponents.WTemplated):
 
     def __init__( self, criteria ):
@@ -1761,7 +1761,7 @@ class WGroupList(wcomponents.WTemplated):
         gh = user.GroupHolder()
         res = gh.match(criteria,forceWithoutExtAuth=True)
         return res
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["createGroupURL"] = urlHandlers.UHNewGroup.getURL()
@@ -1781,7 +1781,7 @@ class WPGroupList(WPGroupCommon):
     def __init__(self, rh, params):
         WPGroupCommon.__init__(self,rh)
         self._params = params
-        
+
     def _getTabContent( self, params ):
         criteria = {}
         if filter(lambda x: self._params[x], self._params):
@@ -1792,10 +1792,10 @@ class WPGroupList(WPGroupCommon):
 
 
 class WGroupModification(wcomponents.WTemplated):
-    
+
     def __init__( self, group=None ):
         self._group = group
-    
+
     def __setNewGroupVars( self, vars={} ):
         vars["Wtitle"] = _("Creating a new group")
         vars["name"] = ""
@@ -1820,7 +1820,7 @@ class WGroupModification(wcomponents.WTemplated):
 
 
 class WPGroupCreation(WPGroupCommon):
-    
+
     def _getTabContent( self, params ):
         comp = WGroupModification()
         pars = {"postURL": urlHandlers.UHGroupPerformRegistration.getURL(), \
@@ -1828,7 +1828,7 @@ class WPGroupCreation(WPGroupCommon):
         return comp.getHTML( pars )
 
 class WPLDAPGroupCreation(WPGroupCommon):
-    
+
     def _getTabContent( self, params ):
         comp = WLDAPGroupModification()
         pars = {"postURL": urlHandlers.UHLDAPGroupPerformRegistration.getURL() }
@@ -1836,14 +1836,14 @@ class WPLDAPGroupCreation(WPGroupCommon):
 
 
 class WPGroupBase( WPGroupCommon ):
-    
+
     def __init__( self, rh, grp ):
         WPGroupCommon.__init__( self, rh )
         self._group = grp
 
 
 class WGroupDetails(wcomponents.WTemplated):
-    
+
     def __init__( self, group ):
         self._group = group
 
@@ -1865,7 +1865,7 @@ class WGroupDetails(wcomponents.WTemplated):
 
 
 class WPGroupDetails( WPGroupBase ):
-    
+
     def _getTabContent( self, params ):
         c = WGroupDetails( self._group )
         pars = { \
@@ -1874,7 +1874,7 @@ class WPGroupDetails( WPGroupBase ):
     "addMembersURL": urlHandlers.UHGroupSelectMembers.getURL(self._group),\
     "removeMembersURL": urlHandlers.UHGroupRemoveMembers.getURL(self._group), \
     "backURL": urlHandlers.UHGroups.getURL() }
-        return c.getHTML( pars )        
+        return c.getHTML( pars )
 
 
 class WPGroupModificationBase( WPGroupBase ):
@@ -1882,10 +1882,10 @@ class WPGroupModificationBase( WPGroupBase ):
 
 
 class WLDAPGroupModification(wcomponents.WTemplated):
-    
+
     def __init__( self, group=None ):
         self._group = group
-    
+
     def __setNewGroupVars( self, vars={} ):
         vars["Wtitle"] = _("Creating a new LDAP group")
         vars["name"] = ""
@@ -1908,7 +1908,7 @@ class WLDAPGroupModification(wcomponents.WTemplated):
 
 
 class WPGroupModification( WPGroupModificationBase ):
-    
+
     def _getTabContent( self, params ):
         comp = WGroupModification( self._group )
         params["postURL"] = urlHandlers.UHGroupPerformModification.getURL()
@@ -1917,10 +1917,10 @@ class WPGroupModification( WPGroupModificationBase ):
 
 
 class WPGroupSelectMembers( WPGroupModificationBase ):
-    
+
     def _getTabContent( self, params ):
-        searchExt = params.get("searchExt","")        
-        
+        searchExt = params.get("searchExt","")
+
         if searchExt != "":
             searchLocal = False
         else:
@@ -1928,15 +1928,15 @@ class WPGroupSelectMembers( WPGroupModificationBase ):
         comp = wcomponents.WPrincipalSelection( urlHandlers.UHGroupSelectMembers.getURL(),forceWithoutExtAuth=searchLocal )
         params["addURL"] = urlHandlers.UHGroupAddMembers.getURL()
         return comp.getHTML( params )
-    
-    
+
+
 class WPSelectUserToLogAs(WPUserCommon ):
-    
+
 #    def _getTabContent( self, params ):
 #        wc = WSelectUserToLogAs()
 #        pars = {"submitURL":urlHandlers.UHLogMeAs.getURL()}
 #        return wc.getHTML( pars )
-    
+
     def _getTabContent( self, params ):
         searchURL = urlHandlers.UHLogMeAs.getURL()
         #cancelURL = urlHandlers.UHUsers.getURL()
@@ -1947,10 +1947,10 @@ class WPSelectUserToLogAs(WPUserCommon ):
         return wc.getHTML( params )
 
 
-    
+
 
 class WPUserMerge( WPUserCommon ):
-    
+
     def __init__(self, rh, prin, toMerge):
         WPUserCommon.__init__(self, rh)
         self.prin = prin
@@ -1960,13 +1960,13 @@ class WPUserMerge( WPUserCommon ):
         wc = WUserMerge(self.prin, self.toMerge)
         pars = {"submitURL":urlHandlers.UHUserMerge.getURL()}
         return wc.getHTML( pars )
-    
+
 class WUserMerge(wcomponents.WTemplated):
-    
+
     def __init__(self, prin, toMerge):
         self.prin = prin
         self.toMerge = toMerge
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["prinId"] = ""
@@ -1989,7 +1989,7 @@ class WUserMerge(wcomponents.WTemplated):
         vars["mtelephone"] = ""
         vars["mfax"] = ""
         vars["mlogins"] = ""
-        
+
         if self.prin:
             vars["prinId"] = self.prin.getId()
             vars["ptitle"] = self.prin.getTitle()
@@ -2014,7 +2014,7 @@ class WUserMerge(wcomponents.WTemplated):
                             """%(item.getLogin(), item.getAuthenticatorTag()) )
             il.append("</table>")
             vars["plogins"] = "".join( il )
-        
+
         if self.toMerge:
             vars["toMergeId"] = self.toMerge.getId()
             vars["mtitle"] = self.toMerge.getTitle()
@@ -2039,13 +2039,13 @@ class WUserMerge(wcomponents.WTemplated):
                             """%(item.getLogin(), item.getAuthenticatorTag()) )
             il.append("</table>")
             vars["mlogins"] = "".join( il )
-        
-        
-        
+
+
+
         return vars
 
 class WPUserMergeSelectPrin(WPUserMerge):
-    
+
     def _getTabContent( self, params ):
         searchURL = urlHandlers.UHUserMerge.getURL()
         #searchURL.addParam("selectPrin", "sp")
@@ -2067,7 +2067,7 @@ class WPUserMergeSelectPrin(WPUserMerge):
         return "%s%s"%(html,"""</td></tr></table>""")
 
 class WPUserMergeSelectToMerge(WPUserMerge):
-    
+
     def _getTabContent( self, params ):
         searchURL = urlHandlers.UHUserMerge.getURL()
         #searchURL.addParam("selectToMerge", "sp")
@@ -2108,7 +2108,7 @@ class WPRoomsBase( WPAdminsBase ):
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
 
 class WPRoomMapperBase( WPRoomsBase ):
-    
+
     def __init__( self, rh ):
         WPRoomsBase.__init__( self, rh )
 
@@ -2124,7 +2124,7 @@ class WRoomMapperList(wcomponents.WTemplated):
         rmh = roomMapping.RoomMapperHolder()
         res = rmh.match(criteria)
         return res
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["createRoomMapperURL"] = urlHandlers.UHNewRoomMapper.getURL()
@@ -2175,7 +2175,7 @@ class WPRoomMapperList( WPRoomMapperBase ):
 
 
 class WRoomMapperDetails(wcomponents.WTemplated):
-    
+
     def __init__( self, rm):
         self._roomMapper = rm
 
@@ -2194,7 +2194,7 @@ class WPRoomMapperDetails( WPRoomMapperBase ):
     def __init__(self, rh, roomMapper):
         WPRoomMapperBase.__init__(self, rh)
         self._roomMapper = roomMapper
-    
+
     def _getTabContent( self, params ):
         comp = WRoomMapperDetails( self._roomMapper )
         pars = {"modifyURL": urlHandlers.UHRoomMapperModification.getURL( self._roomMapper ) }
@@ -2202,7 +2202,7 @@ class WPRoomMapperDetails( WPRoomMapperBase ):
 
 
 class WRoomMapperEdit(wcomponents.WTemplated):
-    
+
     def __init__( self, rm=None ):
         self._roomMapper = rm
 
@@ -2229,7 +2229,7 @@ class WPRoomMapperModification( WPRoomMapperBase ):
     def __init__(self, rh, domain):
         WPRoomMapperBase.__init__(self, rh)
         self._domain = domain
-    
+
     def _getTabContent( self, params ):
         comp = WRoomMapperEdit( self._domain )
         pars = {"postURL": urlHandlers.UHRoomMapperPerformModification.getURL() }
@@ -2243,10 +2243,10 @@ class WPRoomMapperCreation( WPRoomMapperBase ):
         pars = {"postURL": urlHandlers.UHRoomMapperPerformCreation.getURL()}
         return comp.getHTML( pars )
 
-    
+
 
 class WPDomainBase( WPAdminsBase ):
-    
+
     def __init__( self, rh ):
         WPAdminsBase.__init__( self, rh )
 
@@ -2257,7 +2257,7 @@ class WBrowseDomains( wcomponents.WTemplated ):
 
     def __init__( self, letter=None ):
         self._letter = letter
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         dh = domain.DomainHolder()
@@ -2285,7 +2285,7 @@ class WBrowseDomains( wcomponents.WTemplated ):
             res.sort(utils.sortDomainsByName)
             vars["browseResult"] = WHTMLDomainList(vars,res).getHTML()
         return vars
-        
+
 class WDomainList(wcomponents.WTemplated):
 
     def __init__( self, criteria, params ):
@@ -2296,7 +2296,7 @@ class WDomainList(wcomponents.WTemplated):
         dh = domain.DomainHolder()
         res = dh.match(criteria)
         return res
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["createDomainURL"] = urlHandlers.UHNewDomain.getURL()
@@ -2309,7 +2309,7 @@ class WDomainList(wcomponents.WTemplated):
             domainList = self._performSearch(self._criteria)
             vars["domains"] = WHTMLDomainList(vars,domainList).getHTML()
         return vars
-    
+
 class WHTMLDomainList:
 
     def __init__(self, vars, list):
@@ -2358,7 +2358,7 @@ class WPDomainList( WPDomainBase ):
 
 
 class WDomainDetails(wcomponents.WTemplated):
-    
+
     def __init__( self, dom):
         self._domain = dom
 
@@ -2375,7 +2375,7 @@ class WPDomainDetails( WPDomainBase ):
     def __init__(self, rh, domain):
         WPDomainBase.__init__(self, rh)
         self._domain = domain
-    
+
     def _getPageContent( self, params ):
         comp = WDomainDetails( self._domain )
         pars = {"modifyURL": urlHandlers.UHDomainModification.getURL( self._domain ) }
@@ -2383,7 +2383,7 @@ class WPDomainDetails( WPDomainBase ):
 
 
 class WDomainDataModification(wcomponents.WTemplated):
-    
+
     def __init__( self, dom ):
         self._domain = dom
 
@@ -2401,7 +2401,7 @@ class WPDomainModification( WPDomainBase ):
     def __init__(self, rh, domain):
         WPDomainBase.__init__(self, rh)
         self._domain = domain
-    
+
     def _getPageContent( self, params ):
         comp = WDomainDataModification( self._domain )
         pars = {"postURL": urlHandlers.UHDomainPerformModification.getURL() }
@@ -2410,7 +2410,7 @@ class WPDomainModification( WPDomainBase ):
 
 class WDomainCreation(wcomponents.WTemplated):
     pass
-    
+
 
 class WPDomainCreation( WPDomainBase ):
 
@@ -2419,13 +2419,13 @@ class WPDomainCreation( WPDomainBase ):
         pars = {"postURL": urlHandlers.UHDomainPerformCreation.getURL()}
         return comp.getHTML( pars )
 
-    
+
 
 # Room Booking Module ========================================
 
 
 class WPRoomBookingPluginAdminBase( WPRoomsBase ):
-    
+
     def __init__( self, rh ):
         WPRoomsBase.__init__( self, rh )
 
@@ -2441,20 +2441,20 @@ class WPRoomBookingPluginAdmin( WPRoomBookingPluginAdminBase ):
     def __init__( self, rh, params ):
         WPRoomBookingPluginAdminBase.__init__( self, rh )
         self._params = params
-        
+
     def _setActiveTab( self ):
         WPRoomBookingPluginAdminBase._setActiveTab( self )
         self._subTabMain.setActive()
-        
+
     def _getTabContent( self, params ):
         wc = WRoomBookingPluginAdmin( self._rh )
         return wc.getHTML( params )
 
 class WRoomBookingPluginAdmin( wcomponents.WTemplated ):
-    
+
     def __init__( self, rh ):
         self._rh = rh
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -2474,7 +2474,7 @@ class WRoomBookingPluginAdmin( wcomponents.WTemplated ):
         vars["zodbRealm"] = self._rh._realm
         vars["zodbUser"] = self._rh._user
         vars["zodbPassword"] = self._rh._password
-        
+
         return vars
 
 
@@ -2487,11 +2487,11 @@ class WPRoomBookingRoomForm( WPRoomBookingPluginAdminBase ):
     def _setActiveTab( self ):
         WPRoomBookingPluginAdminBase._setActiveTab( self )
         self._subTabConfig.setActive()
-        
+
     def _getTabContent( self, params ):
         wc = wcomponents.WRoomBookingRoomForm( self._rh )
         return wc.getHTML( params )
-    
+
 class WPRoomBookingAdmin( WPRoomBookingPluginAdminBase ):
 
     def __init__( self, rh ):
@@ -2500,11 +2500,11 @@ class WPRoomBookingAdmin( WPRoomBookingPluginAdminBase ):
 
     def _setActiveTab( self ):
         self._subTabConfig.setActive()
-        
+
     def _getTabContent( self, params ):
         wc = wcomponents.WRoomBookingAdmin( self._rh )
         return wc.getHTML( params )
-    
+
 class WPRoomBookingAdminLocation( WPRoomBookingPluginAdminBase ):
 
     def __init__( self, rh, location, actionSucceeded = False ):
@@ -2515,16 +2515,16 @@ class WPRoomBookingAdminLocation( WPRoomBookingPluginAdminBase ):
 
     def _setActiveTab( self ):
         self._subTabConfig.setActive()
-        
+
     def _getTabContent( self, params ):
         wc = wcomponents.WRoomBookingAdminLocation( self._rh, self._location )
         params['actionSucceeded'] = self._actionSucceeded
         return wc.getHTML( params )
-    
+
 class WPAdminsSystemBase(WPAdminsBase):
     def __init__( self, rh ):
         WPAdminsBase.__init__( self, rh )
-        
+
     def _setActiveSideMenuItem(self):
         self._systemMenuItem.setActive()
 
@@ -2532,26 +2532,26 @@ class WPAdminsSystemBase(WPAdminsBase):
         self._tabCtrl = wcomponents.TabControl()
 
         self._subTabConfiguration = self._tabCtrl.newTab( "configuration", _("Configuration"), \
-                urlHandlers.UHAdminsSystem.getURL() ) 
+                urlHandlers.UHAdminsSystem.getURL() )
         self._subTabTaskManager = self._tabCtrl.newTab( "tasks", _("Task Manager"), \
-                urlHandlers.UHTaskManager.getURL() ) 
+                urlHandlers.UHTaskManager.getURL() )
         self._subTabMaintenance = self._tabCtrl.newTab( "maintenance", _("Maintenance"), \
                 urlHandlers.UHMaintenance.getURL() )
-        
+
     def _getPageContent(self, params):
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
 
 class WPAdminsSystem(WPAdminsSystemBase):
-    
+
     def _setActiveTab( self ):
         self._subTabConfiguration.setActive()
-        
+
     def _getTabContent( self, params ):
         wc = WAdminsSystem()
         return wc.getHTML( params )
 
 class WAdminsSystem(wcomponents.WTemplated):
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -2560,13 +2560,13 @@ class WAdminsSystem(wcomponents.WTemplated):
         return vars
 
 class WPAdminsSystemModif(WPAdminsSystemBase):
-    
+
     def _getTabContent( self, params ):
         wc = WAdminsSystemModif()
         return wc.getHTML( params )
 
 class WAdminsSystemModif(wcomponents.WTemplated):
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -2575,21 +2575,21 @@ class WAdminsSystemModif(wcomponents.WTemplated):
         return vars
 
 class WPMaintenanceBase( WPAdminsSystemBase ):
-    
+
     def __init__( self, rh ):
         WPAdminsBase.__init__( self, rh )
-    
+
     def _setActiveTab( self ):
         self._subTabMaintenance.setActive()
-    
+
 class WPMaintenance( WPMaintenanceBase ):
-    
+
     def __init__(self, rh, s, dbSize, nWebsessions):
         WPMaintenanceBase.__init__(self, rh)
         self._stat = s
         self._dbSize = dbSize
         self._nWebsessions = nWebsessions
-    
+
     def _getTabContent( self, params ):
         wc = WAdminMaintenance()
         pars = { "cleanupURL": urlHandlers.UHMaintenanceTmpCleanup.getURL(), \
@@ -2603,16 +2603,16 @@ class WPMaintenance( WPMaintenanceBase ):
         return wc.getHTML( pars )
 
 class WAdminMaintenance(wcomponents.WTemplated):
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         return vars
 
 class WPMaintenanceTmpCleanup(WPMaintenanceBase):
-    
+
     def __init__(self,rh):
         WPMaintenanceBase.__init__(self,rh)
-    
+
     def _getTabContent(self,params):
         wc=wcomponents.WConfirmation()
         msg="""Are you sure you want to delete the temporary directory
@@ -2633,10 +2633,10 @@ class WPMaintenanceTmpCleanup(WPMaintenanceBase):
                 """%wc.getHTML(msg,url,{})
 
 class WPMaintenancePack(WPMaintenanceBase):
-    
+
     def __init__(self,rh):
         WPMaintenanceBase.__init__(self,rh)
-    
+
     def _getTabContent(self,params):
         wc=wcomponents.WConfirmation()
         msg="""Are you sure you want to pack the database?"""
@@ -2656,10 +2656,10 @@ class WPMaintenancePack(WPMaintenanceBase):
                 """%wc.getHTML(msg,url,{})
 
 class WPMaintenanceWebsessionCleanup(WPMaintenanceBase):
-    
+
     def __init__(self,rh):
         WPMaintenanceBase.__init__(self,rh)
-    
+
     def _getTabContent(self,params):
         wc=wcomponents.WConfirmation()
         msg="""Are you sure you want to delete all the web sessions?"""
@@ -2680,26 +2680,26 @@ class WPMaintenanceWebsessionCleanup(WPMaintenanceBase):
 
 
 class WPTaskManagerBase(WPAdminsSystemBase):
-    
+
     def __init__( self, rh ):
         WPAdminsBase.__init__( self, rh )
 
     def _setActiveTab( self ):
         self._subTabTaskManager.setActive()
-    
+
 class WPTaskManager( WPTaskManagerBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WTaskManager(HelperTaskList.getTaskListInstance())
-        
+
         pars = {}
         return wc.getHTML( pars )
 
 class WTaskManager(wcomponents.WTemplated):
-    
+
     def  __init__(self, taskList):
         self.taskList = taskList
-    
+
     def groupTasks(self, taskList):
         tasks = {}
         for task in taskList:
@@ -2718,7 +2718,7 @@ class WTaskManager(wcomponents.WTemplated):
             else:
                 tasks.setdefault("Other", []).append(task)
         return tasks
-    
+
     def getHTMLTasks(self, type, taskList):
         html = []
         taskList.sort(lambda x,y: cmp(x.getId(),y.getId()))
@@ -2744,7 +2744,7 @@ class WTaskManager(wcomponents.WTemplated):
                     <td>%s</td>
                     <td>%s</td></tr>"""%(delete, task.getId(), confHtml, date))
             html.append("</table></td></tr>")
-        
+
         elif type == PendingSubmitterReminder:
             html.append("""<tr><td valign="top"><b>Pending submitters</b></td></tr>""")
             html.append("""<tr><td><table><tr>
@@ -2790,8 +2790,8 @@ class WTaskManager(wcomponents.WTemplated):
                     <td nowrap>%s days</td>
                     <td nowrap>%s</td></tr>"""%(delete, task.getId(), pending, email, contibHtml, lastDate, str(task.getInterval().days), str(task.getEndDate().strftime("%Y-%m-%d %H:%M")) ))
             html.append("</table></td></tr>")
-        
-        
+
+
         elif type == PendingManagerReminder:
             html.append("""<tr><td valign="top"><b>Pending Managers</b></td></tr>""")
             html.append("""<tr><td><table><tr>
@@ -2833,8 +2833,8 @@ class WTaskManager(wcomponents.WTemplated):
                     <td nowrap>%s</td>
                     <td nowrap>%s</td></tr>"""%(delete, task.getId(), pending, email, sesHtml, lastDate))
             html.append("</table></td></tr>")
-        
-        
+
+
         elif type == PendingCoordinatorReminder:
             html.append("""<tr><td valign="top"><b>Pending Coordinators</b></td></tr>""")
             html.append("""<tr><td><table><tr>
@@ -2888,13 +2888,13 @@ class WTaskManager(wcomponents.WTemplated):
                 else:
                     interval = ""
                 html.append("""<tr><td>%s</td><td>%s day</td><td>%s</td></tr>""" % (task.getObjList()[0].getId(),interval,lastdate))
-            html.append("""</table></td></tr>""")    
+            html.append("""</table></td></tr>""")
         return "\n".join(html)
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         tasks = self.groupTasks(self.taskList.getTasks())
-        
+
         html = []
         keys = tasks.keys()
         keys.sort()
@@ -2902,7 +2902,7 @@ class WTaskManager(wcomponents.WTemplated):
         if "Other" in keys:
             other = keys.pop(keys.index("Other"))
             keys.append(other)
-        
+
         for t in keys:
             html.append(self.getHTMLTasks(t, tasks[t]))
         vars["tasks"] = """<table>""" + "<tr><td><br><br></td></tr>".join(html) + """</table>"""
@@ -2910,11 +2910,11 @@ class WTaskManager(wcomponents.WTemplated):
 
 
 class WPConfirmDelete(WPTaskManagerBase):
-    
+
     def __init__(self, req, taskId):
         WPTaskManagerBase.__init__(self, req)
         self._taskId = taskId
-    
+
     def _getTabContent( self, params ):
         wc = wcomponents.WConfirmation()
         msg="""Are you sure you want to delete the following task?<br><ul>%s</ul>
@@ -2923,7 +2923,7 @@ class WPConfirmDelete(WPTaskManagerBase):
         return wc.getHTML( msg, postURL, {"taskId":self._taskId} )
 
 class WPOAIPrivateConfig( WPServicesCommon ):
-    
+
     def __init__( self, rh, addedIP=None ):
         WPServicesCommon.__init__( self, rh )
         self._addedIP = addedIP
@@ -2937,7 +2937,7 @@ class WPOAIPrivateConfig( WPServicesCommon ):
         self._subTabOAIPrivateConfig.setActive()
 
 class WOAIPrivateConfig(wcomponents.WTemplated):
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()

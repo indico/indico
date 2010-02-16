@@ -11,7 +11,7 @@
                 <input type="hidden" name="comments" value=%(comments)s>
                 <input type="hidden" name="confirm" value="True">
                 <font size="+1" color="red"><%= _("WARNING")%>!!</font> <%= _("No notification template has been found.")%><br>
-                <%= _("If you still want to procced with the rejection, please press \"Reject\" but please note that the abstract authors will not be notified.")%>
+                <%= _("If you still want to procced with the rejection, please press \"Reject\" but please note that the abstract authors will not be notified by mail.")%>
                 <br><br>
         </td>
     </tr>

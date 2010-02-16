@@ -448,7 +448,7 @@ class Config:
             'TPLVars'                 : {"MaKaCHomeURL": "%sindex.py" % self.getBaseURL()},
             'FileTypes'               : MaKaCConfig.FileTypes,
             'HelpDir'                 : os.path.join(self.getHtdocsDir(), 'ihelp'),
-            'WorkerName'              : socket.gethostname(),
+            'WorkerName'              : socket.getfqdn(),
             'StylesheetsDir'          : os.path.join(os.path.dirname(__file__), '..', 'webinterface', 'stylesheets'),
             'ImagesDir'               : os.path.join(self.getHtdocsDir(), 'images'),
             'PublicURL'               : "%s/%s" % (self.getBaseURL(), self.getPublicFolder()),

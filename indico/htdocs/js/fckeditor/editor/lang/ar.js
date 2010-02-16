@@ -530,5 +530,10 @@ DlgAboutInfo		: "لمزيد من المعلومات تفضل بزيارة",
 DlgDivGeneralTab	: "عام",
 DlgDivAdvancedTab	: "متقدم",
 DlgDivStyle		: "المظهر",
-DlgDivInlineStyle	: "المظهر المضمن"
+DlgDivInlineStyle	: "المظهر المضمن",
+
+ScaytTitle			: "SCAYT",	//MISSING
+ScaytTitleOptions	: "Options",	//MISSING
+ScaytTitleLangs		: "Languages",	//MISSING
+ScaytTitleAbout		: "About"	//MISSING
 };

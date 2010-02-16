@@ -1573,10 +1573,14 @@ class RHRoomBookingAcceptBooking( RHRoomBookingBase ):
 
     def _checkProtection( self ):
         RHRoomBookingBase._checkProtection(self)
-        user = self._getUser()
-        # Only responsible and admin can ACCEPT
-        if ( not self._resv.room.isOwnedBy( user ) ) and \
-            ( not self._getUser().isAdmin() ):
+
+        # only do the remaining checks the rest if the basic ones were successful
+        # (i.e. user is logged in)
+        if self._doProcess:
+            user = self._getUser()
+            # Only responsible and admin can ACCEPT
+            if ( not self._resv.room.isOwnedBy( user ) ) and \
+                ( not self._getUser().isAdmin() ):
                 raise MaKaCError( "You are not authorized to take this action." )
 
     def _process( self ):

@@ -22,12 +22,12 @@
                     <tr>
 						<td></td>
                         <td nowrap>
-                            <input type="checkbox" name="includeAuthors"%(inclAuthChecked)s><font color="gray"> <%= _("include authors in target abstract")%>
+                            <input type="checkbox" name="includeAuthors"%(inclAuthChecked)s><font color="gray"> <%= _("Include authors in target abstract")%>
                         </td>
                     </tr>
                     <tr>
                         <td align="center" colspan="2">
-                            <input type="checkbox" name="notify"%(notifyChecked)s><font color="gray"> <%= _("automatic notification")%></font>
+                            <input type="checkbox" name="notify"%(notifyChecked)s><font color="gray"> <%= _("Automatic email notification")%></font>
                         </td>
                     </tr>
                     <tr>

@@ -530,5 +530,10 @@ DlgAboutInfo		: "より詳しい情報はこちらで",
 DlgDivGeneralTab	: "全般",
 DlgDivAdvancedTab	: "高度な設定",
 DlgDivStyle		: "スタイル",
-DlgDivInlineStyle	: "インラインスタイル"
+DlgDivInlineStyle	: "インラインスタイル",
+
+ScaytTitle			: "SCAYT",	//MISSING
+ScaytTitleOptions	: "Options",	//MISSING
+ScaytTitleLangs		: "Languages",	//MISSING
+ScaytTitleAbout		: "About"	//MISSING
 };

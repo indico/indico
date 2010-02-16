@@ -89,14 +89,6 @@ type("StartEndDateWidget", ["InlineEditWidget"],
                                       end));
          },
 
-         _buildFrame: function(modeChooser, switchChooser) {
-             return Html.div({},
-                             modeChooser,
-                             Html.div({style:{marginTop: '5px'}},
-                                      switchChooser));
-
-         },
-
          __verifyDates: function() {
 
              var valid = true;

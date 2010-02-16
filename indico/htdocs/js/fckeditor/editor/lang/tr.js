@@ -530,5 +530,10 @@ DlgAboutInfo		: "Daha fazla bilgi için:",
 DlgDivGeneralTab	: "Genel",
 DlgDivAdvancedTab	: "Gelişmiş",
 DlgDivStyle		: "Sitil",
-DlgDivInlineStyle	: "Satıriçi Sitil"
+DlgDivInlineStyle	: "Satıriçi Sitil",
+
+ScaytTitle			: "SCAYT",	//MISSING
+ScaytTitleOptions	: "Options",	//MISSING
+ScaytTitleLangs		: "Languages",	//MISSING
+ScaytTitleAbout		: "About"	//MISSING
 };

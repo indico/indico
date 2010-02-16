@@ -70,13 +70,21 @@ var IndicoUI = {
         }
         this.__globalLayerLevels[parseInt(level)] = false;
     },
-    __count : 0,
+    __loadCount : 0,
+    __unloadCount : 0,
     loadTimeFuncs : {},
+    unloadTimeFuncs : {},
 
     executeOnLoad : function(func) {
-        IndicoUI.loadTimeFuncs[IndicoUI.__count] = (func);
-        IndicoUI.__count++;
+        IndicoUI.loadTimeFuncs[IndicoUI.__loadCount] = (func);
+        IndicoUI.__loadCount++;
+    },
+
+    executeOnUnload : function(func) {
+        IndicoUI.unloadTimeFuncs[IndicoUI.__unloadCount] = (func);
+        IndicoUI.__unloadCount++;
     }
+
 };
 
 window.onload = function() {
@@ -108,4 +116,10 @@ window.onload = function() {
             IndicoUtil.onclickFunctions.removeAt(idx);
         });
     });
+};
+
+window.onunload = function() {
+    for (var f in IndicoUI.unloadTimeFuncs) {
+        IndicoUI.unloadTimeFuncs[f]();
+    }
 };

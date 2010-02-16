@@ -530,5 +530,10 @@ DlgAboutInfo		: "Додаткову інформацію дивіться на "
 DlgDivGeneralTab	: "Загальна",
 DlgDivAdvancedTab	: "Розширена",
 DlgDivStyle		: "Стиль",
-DlgDivInlineStyle	: "Inline стиль"
+DlgDivInlineStyle	: "Inline стиль",
+
+ScaytTitle			: "SCAYT",	//MISSING
+ScaytTitleOptions	: "Options",	//MISSING
+ScaytTitleLangs		: "Languages",	//MISSING
+ScaytTitleAbout		: "About"	//MISSING
 };

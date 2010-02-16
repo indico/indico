@@ -530,5 +530,10 @@ DlgAboutInfo		: "Papildomą informaciją galima gauti",
 DlgDivGeneralTab	: "Bendros savybės",
 DlgDivAdvancedTab	: "Papildomos savybės",
 DlgDivStyle		: "Stilius",
-DlgDivInlineStyle	: "Stilius kode"
+DlgDivInlineStyle	: "Stilius kode",
+
+ScaytTitle			: "SCAYT",	//MISSING
+ScaytTitleOptions	: "Options",	//MISSING
+ScaytTitleLangs		: "Languages",	//MISSING
+ScaytTitleAbout		: "About"	//MISSING
 };
