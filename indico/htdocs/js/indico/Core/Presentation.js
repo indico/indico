@@ -127,6 +127,18 @@ function eventTarget(event) {
     return any(event.srcElement, event.target);
 }
 
+function relatedTarget(event) {
+    return any(event.relatedTarget, event.toElement);
+}
+
+function stopPropagation(event) {
+    if (event.stopProgagation) {
+        event.stopPropagation();
+    } else {
+        event.cancelBubble = true;
+    }
+}
+
 function $N(name) {
     return translate(document.getElementsByName(name), $E);
 }

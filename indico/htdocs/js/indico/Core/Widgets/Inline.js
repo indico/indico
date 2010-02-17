@@ -101,18 +101,20 @@ type("RemoteSwitchButton", ["InlineWidget"],
 
              var chooser = new Chooser(
                  { 'disable': command(
-                     function(){
+                     function(event){
                          chooser.set('progress');
                          // server request to disable the button
                          request('disable','enable',self.enableMethod);
+                         stopPropagation(event);
                          return false;
                      }, this.imgEnabled),
 
                    'enable': command(
-                       function(){
+                       function(event){
                            chooser.set('progress');
                            // server request to enable the button
                            request('enable','disable',self.disableMethod);
+                           stopPropagation(event);
                            return false;
                        }, this.imgDisabled),
 
