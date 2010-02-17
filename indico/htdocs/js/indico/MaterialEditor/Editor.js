@@ -1601,9 +1601,9 @@ type("ReviewingMaterialListWidget", ["RemoteWidget", "ListWidget"], {
          
          this.observe(function(){
                 if (self.isEmpty()) {
-                    self.sendToReviewButton.dom.style.visibility = 'hidden';
+                    self.sendToReviewButton.dom.disabled = true;
                 }else {
-                    self.sendToReviewButton.dom.style.visibility = 'visible';
+                    self.sendToReviewButton.dom.disabled = false;
                 }
             });
          

@@ -9,9 +9,11 @@
 <% else: %>
     <% display = 'form' %>
 <% end %>
-<form id="SendBtnForm" action="<%=urlHandlers.UHContributionSubmitForRewiewing.getURL(self._target)%>" method="POST" style="visibility:hidden; display:<%=display%>">
-    <input id="SendBtn" type="submit" class="btn" value="Send" >
-    <% inlineContextHelp(_('By clicking on this button you will send your materials for reviewing. They will be locked until the end of the process')) %>
+<form id="SendBtnForm" action="<%=urlHandlers.UHContributionSubmitForRewiewing.getURL(self._target)%>" method="POST" style="disabled:true; display:<%=display%>">
+    <input id="SendBtn" type="submit" class="btn" value="Send" style="display:<%=display%>">
+    <div id="SendHelp" style="display:<%=display%>">
+        <% inlineContextHelp(_('First you should add the materials and then by clicking on this button you will send them for reviewing. They will be locked until the end of the process')) %>
+    </div>
 </form>                                   
 <script type="text/javascript">
 
@@ -51,12 +53,14 @@ var args = {
                                     <% end %>
                                 <% end %>
        
-var mlist = new ReviewingMaterialListWidget(args, <%= RHSubmitMaterialBase._allowedMatsforReviewing %>, uploadAction,null,null,null,$E("SendBtnForm"));
+var mlist = new ReviewingMaterialListWidget(args, <%= RHSubmitMaterialBase._allowedMatsforReviewing %>, uploadAction,null,null,null,$E("SendBtn"));
 
 $E('reviewingMaterialListPlace').set(mlist.draw());
 
 <% if self._target.getReviewManager().getLastReview().isAuthorSubmitted(): %>
    $E('SendBtnForm').dom.style.display = 'none';
+   $E('SendBtn').dom.style.display = 'none';
+   $E('SendHelp').dom.style.display = 'none';
 <% end %>
 
 <% if existingMaterialsTitle == " ": %>
