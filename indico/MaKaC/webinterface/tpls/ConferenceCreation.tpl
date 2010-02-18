@@ -2,7 +2,7 @@
 <form id="conferenceCreationForm" action="%(postURL)s" method="POST">
     <input type="hidden" name="event_type" value="%(event_type)s">
 
-    <em><%= _("Please, follow the steps to create a conference")%></em>
+    <em><%= _("Please follow the steps to create a conference")%></em>
 
     <div class="groupTitle"><%= _("Step 1: Choose a category")%></div>
 
@@ -11,7 +11,7 @@
         <span class="selectedCategoryName"><%= _("The event will be created in:")%> <span id="categTitle" class="categTitleChosen"><%= categ['title'] %></span></span><input <% if nocategs: %>style="display: none;"<% end %> id="buttonCategChooser" type="button" value="<%= _("Browse...")%>" onclick="categoryChooser.open()"/>
     </div>
 
-	<div class="groupTitle"><%= _("Step 2: Fill the main information of the conference") %></div>
+	<div class="groupTitle"><%= _("Step 2: Enter basic information about the conference") %></div>
 
     <table class="groupTable">
         <tr>
@@ -40,7 +40,7 @@
                 <input type="hidden" id="eYear" name="eYear" value="%(eYear)s">
                 <input type="hidden" id="eHour" name="eHour" value="%(eHour)s">
                 <input type="hidden" id="eMinute" name="eMinute" value="%(eMinute)s">
-		        <span><a href="#" onclick="new ShowConcurrentEvents(createDatesDict()).execute()"><%= _("Show events during these dates")%></a></span>
+		        <span><a href="#" onclick="new ShowConcurrentEvents(createDatesDict()).execute()"><%= _("Show existing events during these dates")%></a></span>
             </td>
         </tr>
         <!-- Fermi timezone awareness -->
