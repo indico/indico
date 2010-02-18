@@ -4330,14 +4330,21 @@ class WAddPersonModule(WTemplated):
 
     def __addBasketPeople(self, peopleList):
 
-        basket = self._rh._getUser().getPersonalInfo().getBasket().getUsers()
+        user = self._rh._getUser()
 
-        peopleList += """<option value=""></option>"""
+        # add extra options if the user is logged in
+        if user:
+            basket = user.getPersonalInfo().getBasket().getUsers()
 
-        for userId in basket:
-            peopleList += """<option class="favoriteItem" value="%s">%s</option>"""%(userId,basket[userId].getStraightFullName())
+            peopleList += """<option value=""></option>"""
 
-        return peopleList
+            for userId in basket:
+                peopleList += """<option class="favoriteItem" value="%s">%s</option>"""%(userId,basket[userId].getStraightFullName())
+
+            return peopleList
+        # just add nothing if the user is not logged in
+        else:
+            return ""
 
     def __init__(self,personType, displayName=""):
         self._personType = personType

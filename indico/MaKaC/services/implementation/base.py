@@ -248,27 +248,10 @@ class ServiceBase(RequestHandlerBase):
         raise MaKaCError("No answer was returned")
 
 
-
 class ProtectedService(ServiceBase):
     """
-    A ProtectedService can only be accessed by authenticated users
+    ProtectedService is a parent class for ProtectedDisplayService and ProtectedModificationService
     """
-
-    def _checkSessionUser(self):
-        """
-        Checks that the current user exists (is authenticated)
-        """
-        if self._getUser() == None:
-            self._doProcess = False
-            raise ServiceAccessError("ERR-P4", "You are currently not authenticated. Please log in again.")
-
-    def _checkProtection(self):
-        """
-        Overloads ServiceBase._checkProtection, assuring that the user
-        is authenticated
-        """
-        ServiceBase._checkProtection(self)
-        self._checkSessionUser()
 
 
 class ProtectedDisplayService(ProtectedService):
@@ -276,14 +259,14 @@ class ProtectedDisplayService(ProtectedService):
     A ProtectedDisplayService can only be accessed by users that
     are authorized to "see" the target resource
     """
-    
+
     def _checkProtection( self ):
         """
         Overloads ProtectedService._checkProtection, assuring that
         the user is authorized to view the target resource
         """
         if not self._target.canView( self.getAW() ):
-            
+
             from MaKaC.conference import Link, LocalFile
 
             # in some cases, the target does not directly have an owner
@@ -303,13 +286,22 @@ class ProtectedDisplayService(ProtectedService):
 
 class LoggedOnlyService(ProtectedService):
     """
-    Nothing new relating to ProtectedService,
-    but the name is nicer, and didn't want to break
-    the Protected(.*)Service name scheme
+    Only accessible to users who are logged in (access keys not allowed)
     """
-    pass
 
-            
+    def _checkProtection( self ):
+        self._checkSessionUser()
+
+    def _checkSessionUser(self):
+        """
+        Checks that the current user exists (is authenticated)
+        """
+
+        if self._getUser() == None:
+            self._doProcess = False
+            raise ServiceAccessError("ERR-P4", "You are currently not authenticated. Please log in again.")
+
+
 
 class ProtectedModificationService(ProtectedService):
     """
@@ -337,7 +329,7 @@ class ProtectedModificationService(ProtectedService):
             if target.getConference().isClosed():
                 raise ServiceAccessError("ERR-P6", "Conference %s is closed"%target.getConference().getId())
 
-class AdminService(ProtectedService):
+class AdminService(LoggedOnlyService):
     """
     A AdminService can only be accessed by administrators
     """
@@ -346,7 +338,7 @@ class AdminService(ProtectedService):
         Overloads ProtectedService._checkProtection
         """
 
-        ProtectedService._checkProtection(self)
+        LoggedOnlyService._checkProtection(self)
 
         if not self._getUser().isAdmin():
             raise ServiceAccessError("ERR-P7", _("Only administrators can perform this operation"))
