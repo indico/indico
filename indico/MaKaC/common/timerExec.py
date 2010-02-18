@@ -41,7 +41,7 @@ from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.i18n import _
 from pytz import timezone
-from pytz import common_timezones
+from pytz import all_timezones
 
 class toExec:
     """
@@ -325,7 +325,7 @@ class task(Persistent):
     def getAdjustedStartDate(self,tz=None):
         if not tz:
             tz = self.getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
            tz = 'UTC'
         return self.getStartDate().astimezone(timezone(tz))
     
@@ -339,7 +339,7 @@ class task(Persistent):
     def getAdjustedEndDate(self,tz=None):
         if not tz:
             tz = self.getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
            tz = 'UTC'
         return self.getEndDate().astimezone(timezone(tz))
     
@@ -379,7 +379,7 @@ class task(Persistent):
     def getAdjustedLastDate(self,tz=None):
         if not tz:
             tz = self.getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
            tz = 'UTC'
         if self.getLastDate():
             return self.getLastDate().astimezone(timezone(tz))
@@ -665,7 +665,7 @@ class Alarm(task):
     def getAdjustedStartDate(self,tz=None):
         if not tz:
             tz = self.conf.getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
            tz = 'UTC'
         if self.timeBefore:
             return self.conf.getStartDate().astimezone(timezone(tz)) - self.timeBefore

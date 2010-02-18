@@ -90,6 +90,7 @@ def upgrade_indico_conf(existing_conf, new_conf, mixinValues={}):
     new_values.update(existing_values)
     new_values.update(mixinValues)
 
+
     # We have to preserve options not currently present in the bundled indico.conf because they
     # may belong to a plugin. This functionality can lead to forget adding new options to
     # Configuration.py so be careful my friend.
@@ -102,6 +103,7 @@ def upgrade_indico_conf(existing_conf, new_conf, mixinValues={}):
 
     # We update a current copy of indico.conf with the new values
     new_contents = open(new_conf).read()
+
     for k in new_values:
         if new_values[k].__class__ == str:
             regexp = re.compile('^(%s[ ]*=[ ]*[\'"]{1})([^\'"]*)([\'"]{1})' % k, re.MULTILINE)
@@ -124,7 +126,7 @@ def upgrade_indico_conf(existing_conf, new_conf, mixinValues={}):
                 new_contents = "%s\n%s = %s" % (new_contents, k, str(result_values[k]))
 
         elif new_values[k].__class__ == dict:
-            regexp = re.compile('^(%s[ ]*=[ ]*)[\{]{1}([^\}]+)[\}]{1}' % k, re.MULTILINE)
+            regexp = re.compile('^(%s[ ]*=[ ]*)[\{](.+)[\}$]' % k, re.MULTILINE)
             if regexp.search(new_contents):
                 new_contents = re.sub(regexp, "\\g<1>%s" % str(result_values[k]), new_contents)
             else:
@@ -140,6 +142,7 @@ def upgrade_indico_conf(existing_conf, new_conf, mixinValues={}):
             raise 'Invalid config value "%s = %s"' % (k, new_values[k])
 
     # We write unknown options to the end of the file, they may not be just outdated options but plugins'
+
     open(existing_conf, 'w').write(new_contents)
 
 
@@ -484,13 +487,15 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
         dbDir = targetDirs['db']
         del targetDirs['db']
 
+    print "Creating directories for resources... ",
     # Create the directories where the resources will be installed
     createDirs(targetDirs)
+    print "done!"
 
     # target configuration file (may exist or not)
     newConf = os.path.join(targetDirs['etc'],'indico.conf')
     # source configuration file (package)
-    sourceConf = os.path.join(sourceDirs['etc'], 'indico.conf')
+    sourceConf = os.path.join(sourceDirs['etc'], 'indico.conf.sample')
 
     # if there is a source config
     if os.path.exists(sourceConf):
@@ -498,8 +503,10 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
             # just copy if there is no config yet
             shutil.copy(sourceConf, newConf)
         else:
+            print "Upgrading indico.conf...",
             # upgrade the existing one
-            upgrade_indico_conf(sourceConf, newConf)
+            upgrade_indico_conf(newConf, sourceConf)
+            print "done!"
 
     # change MaKaCConfig.py to include the config
     updateIndicoConfPathInsideMaKaCConfig(newConf,

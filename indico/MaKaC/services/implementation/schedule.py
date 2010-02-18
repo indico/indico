@@ -224,7 +224,7 @@ class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.Confere
             DictPickler.update(convener, convenerValues)
 
             session.addConvener(convener)
-            if convenerValues['email'].strip() != '':
+            if convenerValues.get('email','').strip() != '':
                 session._addCoordinatorEmail(convenerValues['email'])
             if convenerValues.has_key("submission") and \
                 convenerValues['submission'] :

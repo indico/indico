@@ -147,6 +147,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
         return wc.getHTML( { "loginURL": self.getLoginURL(),\
                              "logoutURL": self.getLogoutURL(),\
                              "loginAsURL": self.getLoginAsURL(), \
+                             "confId": self._conf.getId(), \
                              "dark": True} )
 
     def _defineSectionMenu( self ):

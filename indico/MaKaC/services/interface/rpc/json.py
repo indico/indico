@@ -20,7 +20,10 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import simplejson
-from mod_python import apache
+try:
+    from mod_python import apache
+except ImportError:
+    pass
 
 from MaKaC.common.PickleJar import DictPickler
 

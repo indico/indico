@@ -3,19 +3,19 @@
 
     <input type="hidden" name="event_type" value="<%= event_type %>">
 
-    <em><%= _("Please, follow the steps to create a lecture")%></em> 
+    <em><%= _("Please follow the steps to create a lecture")%></em>
     <div class="groupTitle"><%= _("Step 1: Choose a category")%></div>
     <div style="padding: 10px">
         <input type="hidden" value="<%= categ['id'] %>" name="categId" id="createCategId"/>
         <span class="selectedCategoryName"><%= _("The event will be created in:")%> <span id="categTitle" class="categTitleChosen"><%= categ['title'] %></span></span><input <% if nocategs: %>style="display: none;"<% end %> id="buttonCategChooser" type="button" value="<%= _("Browse...")%>" onclick="categoryChooser.open()"/>
     </div>
 
-    <div class="groupTitle"><%= _("Step 2: Fill the main information of the lecture") %></div>
+    <div class="groupTitle"><%= _("Step 2: Enter basic information about the lecture") %></div>
 
     <table class="groupTable">
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Title")%></span></td>
-            <td nowrap class="contentCellTD">            	
+            <td nowrap class="contentCellTD">
                     <input type="text" name="title" size="80" value="<%= title %>">
             </td>
         </tr>
@@ -23,7 +23,7 @@
         <tr>
             <td rowspan="2" nowrap class="titleCellTD"><span class="titleCellFormat">Dates</span><br></td>
             <td class="contentCellTD">
-                <%= _("The lecture will take place in")%> 
+                <%= _("The lecture will take place in")%>
                 <select id="nbDates"  name="nbDates" onChange="javascript:nbDatesChanged();">
                     <option value="1"> 1 </option>
                     <option value="2"> 2 </option>
@@ -34,7 +34,7 @@
                     <option value="7"> 7 </option>
                     <option value="8"> 8 </option>
                     <option value="9"> 9 </option>
-                </select>    
+                </select>
                 <%= _("date(s)")%>
             </td>
         </tr>
@@ -43,7 +43,7 @@
                 <div id="datesContainer">
                     <!-- Filled through DOM manipulation   -->
                 </div>
-            </td>			 
+            </td>
         </tr>
         <!-- </Date and time> -->
         <!-- Fermi timezone awareness -->
@@ -71,7 +71,7 @@
         </tr>
 
         <tr id="advancedOptions" style="display:none"><td colspan="2">
-        
+
                 <table class="groupTable">
                     <tr>
                         <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Description")%></span></td>
@@ -90,7 +90,7 @@
                             <textarea name="keywords" cols="60" rows="3"><%= keywords %></textarea>
                         </td>
                     </tr>
-                </table>        
+                </table>
             </td>
         </tr>
     </table>
@@ -118,12 +118,12 @@
         }else {
             $E("advancedOptions").dom.style.display = "";
             $E("advancedOptionsText").set('<%= _("Hide advanced options...")%>');
-        }   
+        }
         advOptSwitch = !advOptSwitch;
     }
 
     //---- chairperson management
-    
+
     var userList = [];
     <% from MaKaC.common.PickleJar import DictPickler %>
     var uf = new UserListField('VeryShortPeopleListDiv', 'PluginPeopleList',
@@ -133,7 +133,7 @@
 		    true, true, false,
 		    userListNothing, userListNothing, userListNothing, false,
             {"grant-manager": ["event modification", false]});
-    
+
     $E('chairpersonsContainer').set(uf.draw());
 
 
@@ -177,10 +177,10 @@
         verifyDates();
 
 
-	var editor = new RichTextWidget(500, 200, {name: 'description'});		
+	var editor = new RichTextWidget(500, 200, {name: 'description'});
 	$E('descriptionBox').set(editor.draw());
 
-		
+
 	});
 
 

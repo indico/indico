@@ -1,5 +1,5 @@
 from MaKaC.services.implementation.base import ProtectedDisplayService
-from MaKaC.services.implementation.base import LoggedOnlyService
+from MaKaC.services.implementation.base import LoggedOnlyService, ProtectedService
 from MaKaC.services.implementation.base import ServiceBase
 
 import MaKaC.conference as conference
@@ -12,13 +12,13 @@ from MaKaC.common import info
 import time
 
 class UserListEvents(LoggedOnlyService):
-    
+
     def _checkParams(self):
         LoggedOnlyService._checkParams(self)
-        
-        self._time = self._params.get('time',None)      
-        self._target = self.getAW().getUser()  
-    
+
+        self._time = self._params.get('time',None)
+        self._target = self.getAW().getUser()
+
     def __exportElemDataFactory(self, moment):
         return lambda elem: {
             'id': elem[0].getId(),
@@ -32,33 +32,33 @@ class UserListEvents(LoggedOnlyService):
             'type': moment,
             'evtType': elem[0].getVerboseType()
         }
-    
+
     def _getAnswer( self):
-        
+
         events = []
-        
+
         self._target.getTimedLinkedEvents().sync()
-        
+
         if (not self._time) or self._time == 'past':
             events.extend( map( self.__exportElemDataFactory('past'),
                                self._target.getTimedLinkedEvents().getPast()))
-        
+
         if (not self._time) or self._time == 'present':
-            events.extend( map(self.__exportElemDataFactory('present'), 
+            events.extend( map(self.__exportElemDataFactory('present'),
                               self._target.getTimedLinkedEvents().getPresent()))
-        
+
         if (not self._time) or self._time == 'future':
-            events.extend( map(self.__exportElemDataFactory('future'), 
+            events.extend( map(self.__exportElemDataFactory('future'),
                               self._target.getTimedLinkedEvents().getFuture()))
-        
+
         jsonData = {}
-        
+
         for event in events:
             if jsonData.has_key(event['id']):
                 jsonData[event['id']]['roles'].append(event['roles'][0])
             else:
                 jsonData[event['id']] = event
-        
+
         return jsonData;
 
 class UserAddToBasket(LoggedOnlyService):
@@ -104,43 +104,45 @@ class UserRemoveFromBasket(LoggedOnlyService):
                 return
             else:
                 raise ServiceError("ERR-U2","Element not in list!")
-        
 
-class UserListBasket(LoggedOnlyService):
-    
+class UserListBasket(ProtectedService):
+
+    """
+    Service that lists the users belonging to the the user's "favorites"
+    Should return None in case the user is not logged in.
+    """
+
     def _checkParams(self):
-        LoggedOnlyService._checkParams(self)  
-        
+        ProtectedService._checkParams(self)
+
         self._target = self.getAW().getUser()
 
     def _getAnswer( self):
-        
-        users = []
-        
-        userDict = self._target.getPersonalInfo().getBasket().getUsers()
-        
-        for user in userDict.itervalues():
-            users.append(DictPickler.pickle(user))
-            
-        return users
-        
-class UserGetPersonalInfo(LoggedOnlyService):
-    
-    def _checkParams(self):
-        LoggedOnlyService._checkParams(self)  
-        
-        self._target = self.getAW().getUser()
-       
 
-    def _getAnswer( self):            
+        if self._target:
+            users = self._target.getPersonalInfo().getBasket().getUsers().values()
+            return DictPickler.pickle(users)
+        else:
+            return None
+
+
+class UserGetPersonalInfo(LoggedOnlyService):
+
+    def _checkParams(self):
+        LoggedOnlyService._checkParams(self)
+
+        self._target = self.getAW().getUser()
+
+
+    def _getAnswer( self):
         return DictPickler.pickle(self._target.getPersonalInfo())
 
 class UserGetEmail(LoggedOnlyService):
-    
+
     def _checkParams(self):
-        LoggedOnlyService._checkParams(self)          
+        LoggedOnlyService._checkParams(self)
         self._target = self.getAW().getUser()
-       
+
 
     def _getAnswer( self):
         if self._target:
@@ -149,20 +151,20 @@ class UserGetEmail(LoggedOnlyService):
             raise ServiceError("ERR-U4","User is not logged in")
 
 class UserSetPersonalInfo(LoggedOnlyService):
-    
+
     def _checkParams(self):
-        LoggedOnlyService._checkParams(self)  
-        
+        LoggedOnlyService._checkParams(self)
+
         self._target = self.getAW().getUser()
         self._info = self._params.get("value",None)
 
     def _getAnswer( self):
-        
+
         if self._info == None:
             return UserGetPersonalInfo(self._params, self._aw.getIP(), self._aw.getSession()).process()
-        
+
         pInfo = self._target.getPersonalInfo()
-        
+
         DictPickler.update(pInfo, self._info)
         return DictPickler.pickle(pInfo)
 
