@@ -602,9 +602,9 @@
                         </script>
                       ]]>
                   </xsl:text>
-                </xsl:if> 
-              
-              
+                </xsl:if>
+
+
                 <xsl:if test="./title='live webcast'">
                   <a href="{./displayURL}">
                     <strong>View the live webcast</strong>
@@ -613,14 +613,14 @@
                     <img src="images/protected.png" border="0" alt="locked" style="margin-left: 3px;"/>
                   </xsl:if>
                 </xsl:if>
-                
+
                 <xsl:if test="./title='forthcoming webcast'">
                   Please note that this event will be available <em>live</em> via the
                   <a href="{./displayURL}">
                     <strong>Webcast Service</strong>.
                   </a>
                 </xsl:if>
-                
+
               </xsl:for-each>
             </td>
           </tr>
@@ -949,6 +949,16 @@
             </td>
           </tr>
 
+        </xsl:if>
+
+
+        <xsl:if test="./supportEmail != ''">
+          <tr>
+            <td class="leftCol">Support</td>
+            <td>
+              <xsl:apply-templates select="./supportEmail"/>
+            </td>
+          </tr>
         </xsl:if>
 
       </tbody>

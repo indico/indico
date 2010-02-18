@@ -30,14 +30,14 @@ body {
     border-bottom: 2px solid #999;
 }
 
-.headline { 
+.headline {
    color: #006;
-   background: transparent; 
+   background: transparent;
 }
-.headerselected { 
-   color: #fff; 
-   background: #006; 
-} 
+.headerselected {
+   color: #fff;
+   background: #006;
+}
 .parts {
 	COLOR: #fff;
 	margin: 0px;
@@ -127,7 +127,7 @@ ul.topLevelSCList li {
     border-bottom: 1px dotted #AAA;
 }
 
-.subEventLevelAbstract { 
+.subEventLevelAbstract {
     margin-bottom: 5px;
     margin-left: 70px;
     color: #666666;
@@ -213,7 +213,7 @@ span.subLevelTitle {
 	vertical-align: middle;
 	padding: 3px;
 }
-td.settings > a { 
+td.settings > a {
         color: #fff;
 }
 .abstract {
@@ -412,9 +412,9 @@ a.materialGroup {
 }
 
 div.eventInfoBox {
-	color: white;	
-	float: right;	
-	padding: 10px;	
+	color: white;
+	float: right;
+	padding: 10px;
 }
 
 h1 {
@@ -437,9 +437,9 @@ div.meetingEventHeader {
     background: #1a64a0;
     color: white;
     font-size: 12pt;
-    position: relative; 
-    
-    min-height: 130px;
+    position: relative;
+
+    min-height: 125px;
     margin: 0px;
     padding: 10px 30px 10px;
 }
@@ -465,19 +465,19 @@ div.meetingEventHeader .details {
 }
 
 div.meetingEventSubHeader {
-    background: #ECECEC;            
+    background: #ECECEC;
     font-size: 12px;
-    color: black;   
+    color: black;
     margin: 0;
     padding: 3px 10px;
     border-bottom: 1px solid #AAA;
 }
 
 div.meetingEventBody {
-    background: white;            
+    background: white;
     font-size: 10pt;
-    color: black;   
-    margin: 0px;  
+    color: black;
+    margin: 0px;
     padding: 10px 50px;
     position: relative;
 }
@@ -488,11 +488,11 @@ div.partList {
 	height: 20px;
 }
 
-div.materialList h3, div.partList h3{	
+div.materialList h3, div.partList h3{
 	font-size: 11pt;
 	color: black;
 	margin-left: 10px;
-	display: inline;	
+	display: inline;
 }
 
 div.descriptionBox {
@@ -511,7 +511,7 @@ div.lectureEventBody pre {
 }
 
 div.lectureExtraInfo {
-	margin: 10px;	
+	margin: 10px;
 }
 
 div.participantInfo {
@@ -566,21 +566,21 @@ table p {
     margin-top: 0;
 }
 
-table.eventDetails { 
+table.eventDetails {
     margin: 0 40px 0 10px;
     padding: 0;
     font-size: 11pt;
     width: 910px;
 }
 
-table.eventDetails td { 
+table.eventDetails td {
     color: #222222;
     vertical-align: top;
     padding: 3px;
     width: 700px;
 }
 
-table.eventDetails td.leftCol { 
+table.eventDetails td.leftCol {
     font-weight: bold;
     text-align: right;
     padding-right: 6px;
@@ -593,7 +593,7 @@ table.sessionDetails {
     font-size: 12px;
 }
 
-table.sessionDetails td { 
+table.sessionDetails td {
     color: #444444;
     vertical-align: top;
     padding: 2px;
@@ -613,11 +613,11 @@ div.partList {
     height: 20px;
 }
 
-div.materialList h3, div.partList h3{   
+div.materialList h3, div.partList h3{
     font-size: 11pt;
     color: black;
     margin-left: 10px;
-    display: inline;    
+    display: inline;
 }
 
 .confModifIcon {
