@@ -11,9 +11,9 @@
 <% end %>
 <form id="SendBtnForm" action="<%=urlHandlers.UHContributionSubmitForRewiewing.getURL(self._target)%>" method="POST" style="disabled:true; display:<%=display%>">
     <input id="SendBtn" type="submit" class="btn" value="Send" style="display:<%=display%>">
-    <div id="SendHelp" style="display:<%=display%>">
+    <span id="SendHelp" style="display:<%=display%>">
         <% inlineContextHelp(_('First you should add the materials and then by clicking on this button you will send them for reviewing. They will be locked until the end of the process')) %>
-    </div>
+    </span>
 </form>                                   
 <script type="text/javascript">
 
@@ -59,8 +59,6 @@ $E('reviewingMaterialListPlace').set(mlist.draw());
 
 <% if self._target.getReviewManager().getLastReview().isAuthorSubmitted(): %>
    $E('SendBtnForm').dom.style.display = 'none';
-   $E('SendBtn').dom.style.display = 'none';
-   $E('SendHelp').dom.style.display = 'none';
 <% end %>
 
 <% if existingMaterialsTitle == " ": %>
