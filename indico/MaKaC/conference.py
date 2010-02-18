@@ -40,7 +40,7 @@ from MaKaC.contributionReviewing import ReviewManager
 from reviewing import ConferenceReview as ConferenceReview
 
 from pytz import timezone
-from pytz import common_timezones
+from pytz import all_timezones
 
 from persistent import Persistent
 from BTrees.OOBTree import OOBTree
@@ -680,7 +680,7 @@ class Category(Persistent):
     ##################################
     def getTimezone(self):
         try:
-           if self._timezone not in common_timezones:
+           if self._timezone not in all_timezones:
                self.setTimezone('UTC')
            return self._timezone
         except:
@@ -2911,7 +2911,7 @@ class Conference(Persistent, Fossilizable):
     def getAdjustedStartDate(self,tz=None):
         if not tz:
             tz = self.getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
             tz = 'UTC'
         return self.getStartDate().astimezone(timezone(tz))
 
@@ -3019,7 +3019,7 @@ class Conference(Persistent, Fossilizable):
     def getAdjustedEndDate(self,tz=None):
         if not tz:
             tz = self.getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
             tz = 'UTC'
         return self.getEndDate().astimezone(timezone(tz))
 
@@ -5902,7 +5902,7 @@ class Session(Persistent):
     def getAdjustedStartDate(self,tz=None):
         if not tz:
             tz = self.getConference().getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
             tz = 'UTC'
         return self.startDate.astimezone(timezone(tz))
 
@@ -7181,7 +7181,7 @@ class SessionSlot(Persistent):
     def getAdjustedStartDate(self,tz=None):
         if not tz:
             tz = self.getConference().getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
             tz = 'UTC'
         return self.startDate.astimezone(timezone(tz))
 
@@ -7194,7 +7194,7 @@ class SessionSlot(Persistent):
     def getAdjustedEndDate( self, tz=None ):
         if not tz:
             tz = self.getConference().getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
             tz = 'UTC'
         if self.getEndDate():
             return self.getEndDate().astimezone(timezone(tz))
@@ -8592,7 +8592,7 @@ class Contribution(Persistent, Fossilizable):
             return None
         if not tz:
             tz = self.getConference().getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
             tz = 'UTC'
         return self.getStartDate().astimezone(timezone(tz))
 
@@ -8604,7 +8604,7 @@ class Contribution(Persistent, Fossilizable):
     def getAdjustedEndDate(self,tz=None):
         if not tz:
             tz = self.getConference().getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
             tz = 'UTC'
         if self.getEndDate():
             return self.getEndDate().astimezone(timezone(tz))

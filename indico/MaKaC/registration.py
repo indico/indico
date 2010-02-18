@@ -22,7 +22,7 @@
 import md5, random, time
 from datetime import datetime,timedelta
 from pytz import timezone
-from pytz import common_timezones
+from pytz import all_timezones
 from MaKaC.common.timezoneUtils import nowutc
 from persistent import Persistent
 from persistent.mapping import PersistentMapping
@@ -3332,7 +3332,7 @@ class Registrant(Persistent):
     def getAdjustedRegistrationDate(self,tz=None):
         if not tz:
             tz = self.getConference().getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
             tz = 'UTC'
         return self.getRegistrationDate().astimezone(timezone(tz))
 
