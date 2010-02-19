@@ -931,9 +931,10 @@ class RHMaterials(RHSessionModUnrestrictedContribMngCoordBase):
 
     def _checkParams(self, params):
         RHSessionModUnrestrictedContribMngCoordBase._checkParams(self, params)
-        if not hasattr(self, "_rhSubmitMaterial"):
-            self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
-        self._rhSubmitMaterial._checkParams(params)
+
+        #if not hasattr(self, "_rhSubmitMaterial"):
+        #    self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
+        #self._rhSubmitMaterial._checkParams(params)
         params["days"] = params.get("day", "all")
         if params.get("day", None) is not None :
             del params["day"]

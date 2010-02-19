@@ -29,6 +29,7 @@ try:
 except ImportError:
     pass
 import string,re
+import simplejson
 
 import MaKaC.conference as conference
 import MaKaC.schedule as schedule
@@ -45,6 +46,7 @@ from MaKaC.common.timezoneUtils import DisplayTZ, nowutc, getAdjustedDate
 from MaKaC.common.utils import getHierarchicalId
 from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
 from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
+from MaKaC.common.PickleJar import DictPickler
 
 
 def fake(string1=""):
@@ -199,6 +201,21 @@ class outputGenerator:
         if  vars and vars.has_key("webcastAdminURL"):
             out.writeTag("webcastAdminLink",vars["webcastAdminURL"])
 
+        materials = set(material.getTitle() for material in conf.getMaterialList())
+
+        from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
+
+        if conf.getType() == 'conference':
+            standardMaterials = set(RHSubmitMaterialBase._allowedMatsConference)
+        elif conf.getType() == 'simple_event':
+            standardMaterials = set(RHSubmitMaterialBase._allowedMatsForSE)
+        elif conf.getType() == 'meeting':
+            standardMaterials = set(RHSubmitMaterialBase._allowedMatsForMeetings)
+
+        customMaterials = list(materials.difference(standardMaterials))
+
+        out.writeTag("customMaterialList", simplejson.dumps(customMaterials))
+            
         if conf.getOrgText() != "":
             out.writeTag("organiser", conf.getOrgText())
 

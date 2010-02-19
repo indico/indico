@@ -943,6 +943,74 @@ type("ShowablePasswordField", ["IWidget"], {
 );
 
 
+type("TypeSelector", ["IWidget", "WatchAccessor"],
+{
+    draw: function() {
+        var self = this;
+
+        var chooser = new Chooser(new Lookup({
+            select: function() {
+                self.pm.remove(self.text);
+                self.pm.add(self.select);
+                self.selected = true;
+                return Html.div({}, bind.element(self.select, $L(self.types),
+                                          function(value) {
+                                              return Html.option({'value': value}, value);
+                                          }),
+                         " ",
+                         $T("or"),
+                         " ",
+                         Widget.link(command(function() {
+                             chooser.set('write');
+                         }, $T("other"))));
+            },
+
+            write: function() {
+                bind.detach(self.select);
+                self.pm.remove(self.select);
+                self.pm.add(self.text);
+                self.selected = false;
+                return Html.div({}, self.text,
+                                " ",
+                               $T("or"),
+                               " ",
+                                Widget.link(command(function() {
+                                    chooser.set('select');
+                                }, $T("select from list"))));
+            }
+        }));
+        chooser.set('select');
+
+        return Widget.block(chooser);
+    },
+
+    isSelect: function(){
+        var self = this;
+        return self.selected;
+    },
+
+    get: function() {
+        var self = this;
+        if(self.selected){
+            return self.select.get();
+        }
+        else{
+            return self.text.get();
+        }
+    },
+
+    getSelectBox: function() {
+        return this.select;
+    }
+},
+function(parameterManager, types){
+    //var self = this;
+    this.select = Html.select({name: 'materialId', id:Html.generateId()});
+    this.text = Html.edit({name: 'materialId', id:Html.generateId()});
+    this.pm = parameterManager;
+    this.types = types;
+}
+);
 
 type("InlineEditWidget", ["InlineRemoteWidget"],
      {

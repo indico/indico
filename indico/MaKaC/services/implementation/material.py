@@ -19,11 +19,11 @@ from MaKaC.errors import ModificationError, MaKaCError
 class UserListChange(object):
 
     def changeUserList(self, object, newList):
-        # clone the list, to avoid problems 
+        # clone the list, to avoid problems
         allowedUsers = object.getAllowedToAccessList()[:]
 
         # user can be a user or group
-        for user in allowedUsers:            
+        for user in allowedUsers:
             if not user.getId() in newList:
                 object.revokeAccess(user)
             else:
@@ -45,27 +45,27 @@ class MaterialBase(object):
 
             self._material = None
             self._conf = None
-        
+
             l.setMaterial( self._params, 0 )
             self._target = l.getObject()
-            
+
             if isinstance(self._target, conference.Material):
-                self._material = self._target                
+                self._material = self._target
 
             if isinstance(self._target, conference.Category):
                 self._categ = self._target
-            else:                
-                self._conf = self._target.getConference()                    
-            
+            else:
+                self._conf = self._target.getConference()
+
             if self._conf == None:
                 self._categ=self._target.getCategory()
-                    
 
-        except Exception, e:           
+
+        except Exception, e:
             raise ServiceError("ERR-M0", str(e))
 
 class MaterialDisplayBase(ProtectedDisplayService, MaterialBase):
-    
+
     def _checkParams(self):
         MaterialBase._checkParams(self)
         ProtectedDisplayService._checkParams(self)
@@ -75,7 +75,7 @@ class MaterialModifBase(MaterialBase, ProtectedModificationService):
     def _checkParams(self):
         MaterialBase._checkParams(self)
         ProtectedModificationService._checkParams(self)
-    
+
     def _checkProtection(self):
 
         if self._material: #target is a material
@@ -102,7 +102,7 @@ class ResourceBase(object):
     """
     Base class for material resource access
     """
-    
+
     #def _checkProtection(self):
     #    """
     #    Makes sure that the user is allowed to view the material the
@@ -112,7 +112,7 @@ class ResourceBase(object):
     #    if not self._material.canView(self._aw):
     #        from MaKaC.services.interface.rpc.common import PermissionError
     #        raise PermissionError("You're not allowed to access these contents")
-    
+
     def _checkParams(self):
         """
         Checks the materialId, and retrieves the material using it
@@ -120,30 +120,30 @@ class ResourceBase(object):
 
         self._material = None
         self._conf = None
-        
+
         l = locators.WebLocator()
-        
+
         try:
 
             l.setResource( self._params, 0 )
             self._target = l.getObject()
-            
+
             if isinstance(self._target, conference.Resource):
                 self._resource = self._target
                 self._material = self._target.getOwner()
-                
+
             if isinstance(self._target, conference.Material):
-                self._material = self._target                
+                self._material = self._target
 
             if isinstance(self._target, conference.Category):
                 self._categ = self._target
             else:
                 self._conf = self._target.getConference()
-            
+
             if self._conf == None:
                 self._categ=self._target.getCategory()
-                    
-        except Exception, e:           
+
+        except Exception, e:
             raise ServiceError("ERR-M0", str(e))
 
 
@@ -151,13 +151,13 @@ class ResourceDisplayBase(ProtectedDisplayService, ResourceBase):
 
     def _checkProtection(self):
         ProtectedDisplayService._checkParams(self)
-    
+
     def _checkParams(self):
         ResourceBase._checkParams(self)
         ProtectedDisplayService._checkParams(self)
 
 class ResourceModifBase(ResourceBase, MaterialModifBase):
-    
+
     def _checkParams(self):
         ResourceBase._checkParams(self)
 
@@ -175,11 +175,11 @@ class GetMaterialClassesBase(MaterialDisplayBase):
         resource (conference, session, contribution, etc...)
         """
         matList = {}
-                
+
         for mat in self._target.getAllMaterialList():
             matList[mat.getId()] = DictPickler.pickle(mat)
-            
-        return matList            
+
+        return matList
 
 class GetMaterial(MaterialDisplayBase):
     """
@@ -190,7 +190,7 @@ class GetMaterial(MaterialDisplayBase):
         """
         Provides the list of material classes, based on the target
         resource (conference, session, contribution, etc...)
-        """            
+        """
         return DictPickler.pickle(self._material)
 
 
@@ -202,6 +202,21 @@ class GetMaterialAllowedUsers(MaterialModifBase):
         """
         return DictPickler.pickle(self._material.getAllowedToAccessList())
 
+class GetMaterialProtection(MaterialModifBase):
+
+    def _getAnswer(self):
+        """
+        Returns the material's protection
+        """
+        try:
+            materialId = self._target.getMaterialById(self._params['matId'])
+        except:
+        #it's not in the material list, we return the parent's level of protection
+        #WATCH OUT! This is the default value to inherit from parent in Editor.js, if that value is changed
+        #for any reason this function may not work properly
+            return 0
+        else:
+            return materialId.getAccessProtectionLevel()
 
 class AddMaterialClassBase(MaterialModifBase):
     """
@@ -212,23 +227,22 @@ class AddMaterialClassBase(MaterialModifBase):
         """
         Gets the parameters for the new material class
         (name and description)
-        """        
+        """
         MaterialModifBase._checkParams(self)
         self._matName = self._params.get('materialName', None)
         self._matDescription = self._params.get('description', None)
 
-        
     def _getAnswer(self):
         """
         Creates the material class, and sets its properties
         """
-        
+
         mats = self._target.getMaterialList()
-        
+
         for m in mats:
-            if m.getTitle() == self._matName:                
+            if m.getTitle() == self._matName:
                 raise ServiceError("ERR-M1", _("A material with this same name already exists"))
-        
+
         mat = conference.Material()
         mat.setTitle(self._matName)
         mat.setDescription(self._matDescription)
@@ -275,53 +289,53 @@ class EditMaterialClassBase(MaterialModifBase, UserListChange):
         return DictPickler.pickle(self._material)
 
 class DeleteMaterialClassBase(MaterialModifBase):
-    
+
     #def _checkParams(self):
         #matId = self._params.get("materialId",None)
         #
         #if matId == None:
-        #    raise ServiceError("No material was specified!")        
+        #    raise ServiceError("No material was specified!")
         #
         #self._material = self._target.getMaterialById(matId)
-        
-        
-    def _getAnswer(self):                   
-        id = self._material.getId()        
+
+
+    def _getAnswer(self):
+        id = self._material.getId()
         self._target.getOwner().removeMaterial(self._material)
         return id
 
 class GetResourcesBase(ResourceDisplayBase):
-    
-#    def _checkParams(self):                
+
+#    def _checkParams(self):
 #        ResourceBase._checkParams(self)
-        
-#    def _checkProtection(self):                
+
+#    def _checkProtection(self):
 #        ResourceBase._checkProtection(self)
-        
-    def _getAnswer(self):                   
-        resList = {}        
-                
-        for resource in self._material.getResourceList():                        
+
+    def _getAnswer(self):
+        resList = {}
+
+        for resource in self._material.getResourceList():
             resList[resource.getId()] = DictPickler.pickle(resource)
         return resList
 
 class EditResourceBase(ResourceModifBase, UserListChange):
 
     def _checkParams(self):
-        ResourceModifBase._checkParams(self)        
-        
+        ResourceModifBase._checkParams(self)
+
         resId = self._params.get("resourceId",None)
         self._newProperties = self._params.get("resourceInfo",None)
         self._newUserList = self._newProperties['userList']
-        
+
 #        if resId == None:
 #            raise ServiceError("No resource was specified!")
-#        
+#
 #        self._resource = self._material.getResourceById(resId)
 
-#    def _checkProtection(self):                
+#    def _checkProtection(self):
 #        ResourceBase._checkProtection(self)
-                
+
     def _getAnswer(self):
 
         self.changeUserList(self._resource, self._newUserList)
@@ -339,19 +353,19 @@ class GetResourceAllowedUsers(ResourceModifBase):
 
 
 class DeleteResourceBase(ResourceModifBase):
-    
+
     def _checkParams(self):
         ResourceModifBase._checkParams(self)
-        
+
         #resId = self._params.get("resourceId",None)
 #
-#        if resId == None:            
+#        if resId == None:
 #            raise ServiceError("No resource was specified!")
-#                
+#
 #        self._resource = self._material.getResourceById(resId)
-        
-    def _getAnswer(self):                   
-        id = self._resource.getId()        
+
+    def _getAnswer(self):
+        id = self._resource.getId()
 
         # remove the resource
         self._material.removeResource(self._resource)
@@ -360,7 +374,7 @@ class DeleteResourceBase(ResourceModifBase):
         # just delete it
         if len(self._material.getResourceList()) == 0:
             self._material.getOwner().removeMaterial(self._material)
-        
+
         return id
 
 #def getMixedInClass(base, mixin):
@@ -375,7 +389,7 @@ class DeleteResourceBase(ResourceModifBase):
 #    class MixedInClass(mixin, base):
 #        """
 #        The resulting class, with parameter checking
-#        done in the correct order 
+#        done in the correct order
 #        """
 #        def _checkParams(self):
 #            """
@@ -395,6 +409,7 @@ methodMap = {
     "get": GetMaterial,
     "edit": EditMaterialClassBase,
     "delete": DeleteMaterialClassBase,
+    "getProtection": GetMaterialProtection,
 
     # Resource add is quite hacky, and uses a normal RH, because of file upload
     # So, you won't find it here...

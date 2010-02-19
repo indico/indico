@@ -230,6 +230,7 @@ class RHSubmitMaterialBase:
         filesToDelete = []
         self._action = ""
         self._overwrite = False
+        #if request has already been handled (DB conflict), then we keep the existing files list
 
         self._file = {}
         self._link = {}
@@ -238,6 +239,13 @@ class RHSubmitMaterialBase:
         self._uploadType = params.get("uploadType","")
         self._materialId = params.get("materialId","")
         self._description = params.get("description","")
+        self._statusSelection = int(params.get("statusSelection", 1))
+        self._visibility = int(params.get("visibility", 0))
+        self._password = params.get("password","")
+
+        from MaKaC.services.interface.rpc import json
+        self._userList = json.decode(params.get("userList", ""))
+
 
         if self._uploadType == "file":
             if type(params["file"]) != str and params["file"].filename.strip() != "":
@@ -257,7 +265,6 @@ class RHSubmitMaterialBase:
             link["url"]=params.get("url","")
             link["matType"]=params.get("materialType","")
             self._link = link
-
 
     def _getErrorList(self):
         res=[]
@@ -297,6 +304,7 @@ class RHSubmitMaterialBase:
 
         errorList=[]
         user = rh.getAW().getUser()
+
         try:
             owner = self._target
             title = owner.getTitle()
@@ -321,7 +329,6 @@ class RHSubmitMaterialBase:
         resource = None
 
         Logger.get('requestHandler').debug('Adding %s - request %s ' % (self._uploadType, id(self._callerRH._req)))
-
         if self._uploadType == "file":
             if len(errorList)==0:
                 mat = self._getMaterial()
@@ -329,12 +336,22 @@ class RHSubmitMaterialBase:
                 if mat == None:
                     errorList.append("Unknown material");
                 else:
+                    mat.setProtection(self._statusSelection)
+                    mat.setHidden(self._visibility)
+                    mat.setAccessKey(self._password)
+                    from MaKaC.user import AvatarHolder
+                    ah = AvatarHolder()
+                    for userElement in self._userList:
+                        userAvatar = ah.getById(userElement['id'])
+                        mat.grantAccess(userAvatar)
+
                     resource = LocalFile()
                     resource.setFileName(fDict["fileName"])
                     resource.setName(resource.getFileName())
                     resource.setFilePath(fDict["filePath"])
                     resource.setDescription(self._description)
                     mat.addResource(resource, forcedFileId=self._repositoryId)
+
                     #apply conversion
                     if self._topdf and fileConverter.CDSConvFileConverter.hasAvailableConversionsFor(os.path.splitext(resource.getFileName())[1].strip().lower()):
                         fileConverter.CDSConvFileConverter.convert(resource.getFilePath(), "pdf", mat)
@@ -359,6 +376,16 @@ class RHSubmitMaterialBase:
                     mat = Material()
                     mat.setTitle(link["matType"])
                     self._target.addMaterial( mat )
+                else:
+                    mat.setProtection(self._statusSelection)
+                    mat.setHidden(self._visibility)
+                    mat.setAccessKey(self._password)
+                    from MaKaC.user import AvatarHolder
+                    ah = AvatarHolder()
+                    for userElement in self._userList:
+                        userAvatar = ah.getById(userElement['id'])
+                        mat.grantAccess(userAvatar)
+
                 resource = Link()
                 resource.setURL(link["url"])
                 resource.setName(resource.getURL())

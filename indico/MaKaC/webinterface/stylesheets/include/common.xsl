@@ -122,11 +122,19 @@
             '<xsl:value-of select="$subContId"/>',true);m.close();}return false;},
         </xsl:if>
         <xsl:if test="$item/materialLink != ''">
-            'Manage material': function(m){IndicoUI.Dialogs.Material.editor('<xsl:value-of select="$confId"/>',
-            '<xsl:value-of select="$sessId"/>',
-            '<xsl:value-of select="$contId"/>',
-            '<xsl:value-of select="$subContId"/>',
-            Indico.Data.MaterialTypes.meeting, <xsl:value-of select="$uploadURL"/>, true);m.close();return false;}
+            'Manage material': function(m){
+                IndicoUI.Dialogs.Material.editor('<xsl:value-of select="$confId"/>',
+                '<xsl:value-of select="$sessId"/>',
+                '<xsl:value-of select="$contId"/>',
+                '<xsl:value-of select="$subContId"/>',
+                Indico.Data.MaterialTypes.meeting,
+                <xsl:value-of select="$uploadURL"/>,
+                true,
+                customMaterialList);
+
+                m.close();
+                return false;
+           }
         </xsl:if>
         <xsl:text disable-output-escaping="yes">
         <![CDATA[
