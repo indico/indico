@@ -72,7 +72,6 @@ import MaKaC.task as task
 import MaKaC.common.info as info
 from MaKaC.badge import BadgeTemplateManager
 from MaKaC.poster import PosterTemplateManager
-import MaKaC.common.info as info
 from MaKaC.common.cache import CategoryCache, EventCache
 from MaKaC.common import mail
 from MaKaC.common.utils import getHierarchicalId
@@ -2798,14 +2797,14 @@ class Conference(Persistent, Fossilizable):
         if sDate==oldStartDate and eDate==oldEndDate:
             return
         self.unindexConf()
-        
+
         self.setStartDate(sDate, check=0, moveEntries = moveEntries, index=False, notifyObservers = False)
         self.setEndDate(eDate, check=0, index=False, notifyObservers = False)
-        
+
         self._checkInnerSchedule()
         self.indexConf()
         self.cleanCategoryCache()
-        
+
         for observer in self.getObservers():
             try:
                 observer.notifyEventDateChanges(oldStartDate, self.getStartDate(), oldEndDate, self.getEndDate())
@@ -2840,7 +2839,7 @@ class Conference(Persistent, Fossilizable):
             self.verifyStartDate(sDate)
         oldSdate = self.getStartDate()
         diff = sDate - oldSdate
-        
+
         if index:
             self.unindexConf()
         self.startDate  = sDate
@@ -2880,7 +2879,7 @@ class Conference(Persistent, Fossilizable):
     def setStartTime(self, hours=0, minutes=0, notifyObservers = True):
         """ Changes the current conference starting time (not date) to the one specified by the parameters.
         """
-        
+
         sdate = self.getStartDate()
         self.startDate = datetime( sdate.year, sdate.month, sdate.day,
                                                     int(hours), int(minutes) )
@@ -3060,7 +3059,7 @@ class Conference(Persistent, Fossilizable):
     def setTimezone(self, tz):
         oldTimezone = self.timezone
         self.timezone = tz
-        
+
         for observer in self.getObservers():
             try:
                 observer.notifyTimezoneChange(oldTimezone, tz)
@@ -3114,11 +3113,11 @@ class Conference(Persistent, Fossilizable):
     def setTitle(self, title):
         """changes the current title of the conference to the one specified"""
         oldTitle = self.title
-        
+
         self.title = title
         self.cleanCategoryCache()
         self.notifyModification()
-        
+
         #we notify the observers that the conference's title has changed
         for observer in self.getObservers():
             try:
@@ -3811,7 +3810,7 @@ class Conference(Persistent, Fossilizable):
             if track.isCoordinator( av ):
                 self._v_isallowedtoaccess[av] = True
                 return True
-            
+
         # video services managers are also allowed to access the conference
         if PluginsHolder().hasPluginType("Collaboration"):
             if self.getCSBookingManager().isPluginManagerOfAnyPlugin(av):
@@ -3853,6 +3852,14 @@ class Conference(Persistent, Fossilizable):
             self._v_canaccess = {}
         except KeyError:
             pass
+
+        # Allow harvesters (Invenio, offline cache) to access
+        # protected pages
+        if self.__ac.isHarvesterIP(aw.getIP()):
+            self._v_canaccess[aw] =  True
+            return True
+        #####################################################
+
         if not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and not self.isAllowedToAccess( aw.getUser() ):
             self._v_canaccess[aw] = False
             return False
@@ -3908,7 +3915,7 @@ class Conference(Persistent, Fossilizable):
         if isinstance(prin, ConferenceChair):
             email = prin.getEmail()
         elif isinstance(prin, str):
-            email = prin 
+            email = prin
         if email != None:
             if email == "":
                 return
@@ -3923,7 +3930,7 @@ class Conference(Persistent, Fossilizable):
             #The user is registered in Indico and is activated as well
             elif len(results) == 1 and results[0] is not None and results[0].isActivated():
                 self.__ac.grantModification(results[0])
-                results[0].linkTo(self, "manager") 
+                results[0].linkTo(self, "manager")
         else:
             self.__ac.grantModification( prin )
             if isinstance(prin, MaKaC.user.Avatar):
@@ -5029,7 +5036,7 @@ class Observer(object):
     _shouldBeTitleNotified = False
     _shouldBeDateChangeNotified = False
     _shouldBeDeletionNotified = False
-    
+
     def getObserverName(self):
         name = "'Observer of class" + self.__class__.__name__
         try:
@@ -5038,29 +5045,29 @@ class Observer(object):
         except AttributeError:
             pass
         return name
-    
+
     def notifyTitleChange(self, oldTitle, newTitle):
         if self._shouldBeTitleNotified:
             self._notifyTitleChange(oldTitle, newTitle)
-            
+
     def notifyEventDateChanges(self, oldStartDate = None, newStartDate = None, oldEndDate = None, newEndDate = None):
         if self._shouldBeDateChangeNotified:
             self._notifyEventDateChanges(oldStartDate, newStartDate, oldEndDate, newEndDate)
-            
+
     def notifyTimezoneChange(self, oldTimezone, newTimezone):
         if self._shouldBeDateChangeNotified:
             self._notifyTimezoneChange(oldTimezone, newTimezone)
-            
+
     def notifyDeletion(self):
         if self._shouldBeDeletionNotified:
             self._notifyDeletion()
-            
-    def _notifyTitleChange(self, oldTitle, newTitle): 
+
+    def _notifyTitleChange(self, oldTitle, newTitle):
         """ To be implemented by inheriting classes
             Notifies the observer that the Conference object's title has changed
         """
         raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method _notifyTitleChange")
-    
+
     def _notifyEventDateChanges(self, oldStartDate, newStartDate, oldEndDate, newEndDate):
         """ To be implemented by inheriting classes
             Notifies the observer that the start and / or end dates of the object it is attached to has changed.
@@ -5069,7 +5076,7 @@ class Observer(object):
             in the 'dateChangeNotificationProblems' context variable (which is a list of strings).
         """
         raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyStartDateChange")
-    
+
     def _notifyTimezoneChange(self, oldTimezone, newTimezone):
         """ To be implemented by inheriting classes.
             Notifies the observer that the end date of the object it is attached to has changed.
@@ -5078,7 +5085,7 @@ class Observer(object):
             If there are no problems, the DateChangeObserver should return an empty list.
         """
         raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyTimezoneChange")
-    
+
     def _notifyDeletion(self):
         """ To be implemented by inheriting classes
             Notifies the observer that the Conference object it is attached to has been deleted
@@ -6370,6 +6377,14 @@ class Session(Persistent):
             self._v_canaccess = {}
         except KeyError:
             pass
+
+        # Allow harvesters (Invenio, offline cache) to access
+        # protected pages
+        if self.__ac.isHarvesterIP(aw.getIP()):
+            self._v_canaccess[aw] =  True
+            return True
+        #####################################################
+
         if not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and not self.isAllowedToAccess( aw.getUser() ):
             self._v_canaccess[aw] = False
             return False
@@ -7419,7 +7434,7 @@ class SessionSlot(Persistent):
 
 
 class ContributionParticipation(Persistent, Fossilizable):
-    
+
     fossilizes(IContributionParticipationFossil)
 
     def __init__( self ):
@@ -7833,7 +7848,7 @@ class Contribution(Persistent, Fossilizable):
         the useful operations to access and manage them. A contribution can be
         attached either to a session or to a conference.
     """
-    
+
     fossilizes(IContributionFossil, IContributionWithSpeakersFossil, IContributionWithSubContribsFossil)
 
     def __init__(self,**contribData):
@@ -9030,6 +9045,7 @@ class Contribution(Persistent, Fossilizable):
         self.setSpeakerText( "%s, %s"%(self.getSpeakerText(), newText.strip()) )
 
     def canIPAccess( self, ip ):
+
         try:
             return self._v_canipaccess[ip]
         except AttributeError:
@@ -9125,9 +9141,18 @@ class Contribution(Persistent, Fossilizable):
             self._v_canaccess = {}
         except KeyError:
             pass
+
+        # Allow harvesters (Invenio, offline cache) to access
+        # protected pages
+        if self.__ac.isHarvesterIP(aw.getIP()):
+            self._v_canaccess[aw] =  True
+            return True
+        #####################################################
+
         if self.canModify(aw):
             self._v_canaccess[aw] =  True
             return True
+
         if not self.canIPAccess(aw.getIP()) and not self.isAllowedToAccess( aw.getUser() ):
             self._v_canaccess[aw] = False
             return False
@@ -9706,7 +9731,7 @@ class Contribution(Persistent, Fossilizable):
 
     def setReportNumberHolder(self, rnh):
         self._reportNumberHolder=rnh
-        
+
     @classmethod
     def contributionStartDateForSort(cls, contribution):
         """ Function that can be used as "key" argument to sort a list of contributions by start date
@@ -9886,7 +9911,7 @@ class ContribStatusNone(ContribStatus):
         return csn
 
 class SubContribParticipation(Persistent, Fossilizable):
-    
+
     fossilizes(ISubContribParticipationFossil)
 
     def __init__( self ):
@@ -10137,7 +10162,7 @@ class SubContribParticipation(Persistent, Fossilizable):
 class SubContribution(Persistent, Fossilizable):
     """
     """
-    
+
     fossilizes(ISubContributionFossil, ISubContributionWithSpeakersFossil)
 
     def __init__( self, **subContData ):
@@ -11261,6 +11286,14 @@ class Material(Persistent):
             self._v_canaccess = {}
         except KeyError:
             pass
+
+        # Allow harvesters (Invenio, offline cache) to access
+        # protected pages
+        if self.__ac.isHarvesterIP(aw.getIP()):
+            self._v_canaccess[aw] =  True
+            return True
+        #####################################################
+
         canUserAccess = self.isAllowedToAccess( aw.getUser() )
         canIPAccess = self.canIPAccess( aw.getIP() )
         if not self.isProtected():
@@ -11734,6 +11767,15 @@ class Resource(Persistent):
             self._v_canaccess = {}
         except KeyError:
             pass
+
+        # Allow harvesters (Invenio, offline cache) to access
+        # protected pages
+        if self.__ac.isHarvesterIP(aw.getIP()):
+            self._v_canaccess[aw] =  True
+            return True
+        #####################################################
+
+
         if not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and not self.isAllowedToAccess( aw.getUser() ):
             self._v_canaccess[aw] = False
             return False
