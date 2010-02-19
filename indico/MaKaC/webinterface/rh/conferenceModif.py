@@ -553,6 +553,9 @@ class RHConfModifSchedule( RoomBookingDBMixin, RHConferenceModifBase ):
 
     def _process( self ):
 
+        # The timetable management page shouldn't be cached
+        self._disableCaching();
+
         params = self._getRequestParams()
 
         if self._conf.isClosed():
