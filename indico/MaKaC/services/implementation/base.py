@@ -169,22 +169,22 @@ class ServiceBase(RequestHandlerBase):
                                 #   must be carried out; this is useful for
                                 #   the checkProtection methods
         self._tempFilesToDelete = []
-    
+
     # Methods =============================================================
-        
+
     def _getSession( self ):
         """
-        Returns the web session associated to the received mod_python 
+        Returns the web session associated to the received mod_python
         request.
         """
         return self._websession
-    
+
     def _checkParams(self):
         """
         Checks the request parameters (normally overloaded)
         """
         pass
-    
+
     def _checkProtection( self ):
         """
         Checks protection when accessing resources (normally overloaded)
@@ -197,9 +197,9 @@ class ServiceBase(RequestHandlerBase):
         @param e: the exception
         @type e: An Exception-derived type
         """
-        
+
         trace = traceback.format_exception(*sys.exc_info())
-        
+
         return ''.join(trace)
 
     def _sendEmails( self ):
@@ -211,7 +211,7 @@ class ServiceBase(RequestHandlerBase):
         if len(self._tempFilesToDelete) > 0:
             for file in self._tempFilesToDelete:
                 os.remove(file)
-      
+
     def process(self):
         """
         Processes the request, analyzing the parameters, and feeding them to the
@@ -228,14 +228,14 @@ class ServiceBase(RequestHandlerBase):
                                    self._aw)
         except (htmlScriptError, htmlForbiddenTag), e:
             raise HTMLSecurityError('ERR-X0','HTML Security problem - you might be using forbidden tags: %s ' % str(e))
-            
+
         if self._doProcess:
             answer = self._getAnswer()
 
             self._sendEmails()
             self._deleteTempFiles()
-            
-            return answer 
+
+            return answer
 
     def _getAnswer(self):
         """
@@ -252,6 +252,15 @@ class ProtectedService(ServiceBase):
     """
     ProtectedService is a parent class for ProtectedDisplayService and ProtectedModificationService
     """
+
+    def _checkSessionUser(self):
+        """
+        Checks that the current user exists (is authenticated)
+        """
+
+        if self._getUser() == None:
+            self._doProcess = False
+            raise ServiceAccessError("ERR-P4", "You are currently not authenticated. Please log in again.")
 
 
 class ProtectedDisplayService(ProtectedService):
@@ -292,16 +301,6 @@ class LoggedOnlyService(ProtectedService):
     def _checkProtection( self ):
         self._checkSessionUser()
 
-    def _checkSessionUser(self):
-        """
-        Checks that the current user exists (is authenticated)
-        """
-
-        if self._getUser() == None:
-            self._doProcess = False
-            raise ServiceAccessError("ERR-P4", "You are currently not authenticated. Please log in again.")
-
-
 
 class ProtectedModificationService(ProtectedService):
     """
@@ -317,7 +316,7 @@ class ProtectedModificationService(ProtectedService):
         target = self._target
         if (type(target) == conference.SessionSlot):
             target = target.getSession()
-        
+
         if not target.canModify( self.getAW() ):
             if target.getModifKey() != "":
                 raise ServiceAccessError("ERR-P5", "You don't have the rights to modify this object")
@@ -351,7 +350,7 @@ class TextModificationBase( object ):
     def _getAnswer( self ):
         """ Calls _handleGet() or _handleSet() on the derived classes, in order to make it happen. Provides
             them with self._value.
-            
+
             When calling _handleGet(), it will return the value to return.
             When calling _handleSet(), it will return:
             -either self._value if there were no problems
@@ -383,17 +382,17 @@ class HTMLModificationBase( object ):
         Calls _handle() on the derived classes, in order to make it happen. Provides
         them with self._value.
         """
-        
+
         if self._params.has_key('value'):
             self._value = self._params['value']
         else:
             self._value = None
-        
+
         if self._value == None:
             return self._handleGet()
         else:
             self._handleSet()
-        
+
         return self._value
 
 
@@ -403,7 +402,7 @@ class DateTimeModificationBase( TextModificationBase ):
         DateTimeModificationBase's _handletSet method will call the _setParam method
         from the classes that inherits from DateTimeModificationBase.
         _handleSet will return whatever _setParam returns (usually None if there were no problems,
-        or a FieldModificationWarning object with information about a problem / warning to give to the user) 
+        or a FieldModificationWarning object with information about a problem / warning to give to the user)
     """
     def _handleSet(self):
         try:
@@ -424,19 +423,19 @@ class ListModificationBase ( object ):
         -a _handleGet() method that returns a list.
         -a _handleSet() method which can use self._value to process the input. self._value will be a list.
     """
-    
+
     def _getAnswer(self):
         if self._params.has_key('value'):
             pm = ParameterManager(self._params)
             self._value = pm.extract("value", pType=list, allowEmpty=True)
         else:
             self._value = None
-            
+
         if self._value == None:
             return self._handleGet()
         else:
             self._handleSet()
-        
+
         return self._value
 
 class TwoListModificationBase ( object ):
@@ -446,24 +445,22 @@ class TwoListModificationBase ( object ):
         -a _handleSet() method which can use self._value and self._destination to process the input.
         self._value will be a list. self._destination will be 'left' or 'right'
     """
-    
+
     def _getAnswer(self):
         self._destination = self._params.get('destination', None)
         if self._destination == None or (self._destination != 'right' and self._destination != 'left'):
             #TODO: add this error to the wiki
             raise ServiceError("ERR-E4", 'Destination list not set to "right" or "left"')
-            
+
         if self._params.has_key('value'):
             pm = ParameterManager(self._params)
             self._value = pm.extract("value", pType=list, allowEmpty=False)
         else:
             self._value = None
-            
+
         if self._value == None:
             return self._handleGet()
         else:
             self._handleSet()
-        
-        return self._value
-    
 
+        return self._value
