@@ -25,7 +25,7 @@ from MaKaC.common.indexes import IndexesHolder
 from MaKaC.webinterface import urlHandlers
 from MaKaC.conference import ConferenceHolder
 
-WGET_COMMAND = """wget -mk --accept '*confId=%s*,*conferenceTimeTable.py*,*confAuthorIndex.py*,*internalPage.py*,*materialDisplay.py*,*access*,*sessionDisplay.py*,*contributionDisplay.py*,*contributionListDisplay.py*,*conferenceProgram.py*,*.png,*.jpg,*.gif,*.css,*.js' --html-extension %s -P %s"""
+WGET_COMMAND = """wget -mk --accept '*confId=%s*,*conferenceTimeTable.py*,*confAuthorIndex.py*,*internalPage.py*,*materialDisplay.py*,*access*,*sessionDisplay.py*,*contributionDisplay.py*,*contributionListDisplay.py*,*conferenceProgram.py*,*getVars*,*.ico,*.png,*.jpg,*.gif,*.css,*.js' --html-extension %s -P %s --domains='%s'"""
 
 
 def main():
@@ -62,16 +62,19 @@ def cacheDay(dest, day):
 
     for confId in objs:
 
+	if confId == '': continue
+
         obj = ConferenceHolder().getById(confId)
         url = str(urlHandlers.UHConferenceDisplay.getURL(obj))
 
+        savedDirs = re.match(r'http:\/\/(.*)', url).group(1).split('/')
+
         print "Calling wget for %s..." % url
         os.system(WGET_COMMAND % (confId, url,
-                                  os.path.join(dest, confId)))
+                                  os.path.join(dest, confId),
+                                  savedDirs[0]))
 
         print "done!"
-
-        savedDirs = re.match(r'http:\/\/(.*)', url).group(1).split('/')
 
         index[confId] = (os.path.join(confId,*savedDirs)+'.html', obj.getTitle())
 
