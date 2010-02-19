@@ -4822,7 +4822,7 @@ ul.popupListChained {
 }
 
 ul.popupList li {
-    list-style-type:none;
+    list-style-type: none;
 }
 
 ul.popupList input {
@@ -4965,14 +4965,13 @@ ul.darkPopupList li a.selected {
     background: #666;
 }
 
-ul.darkPopupList li a:hover {
+ul.darkPopupList li a:hover, ul.darkPopupList li.current {
     background: #777;
 }
 
 ul.darkPopupList li a {
     color: #ECECEC;
     font-weight: normal;
-
 }
 
 ul.timetableManagementPopupList li a {

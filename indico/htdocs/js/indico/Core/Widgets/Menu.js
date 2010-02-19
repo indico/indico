@@ -130,8 +130,13 @@ type("PopupMenu", ["ChainedPopupWidget"],
                                   });
             }
 
-            var listItem = Html.li({},
-                link);
+            var listItem = null;
+            if(pair.key === this.currentItem) {
+                listItem = Html.li("current", link);
+            }
+            else {
+                listItem = Html.li({}, link);
+            }
             return listItem;
         },
         close: function() {
@@ -151,9 +156,10 @@ type("PopupMenu", ["ChainedPopupWidget"],
             return this.PopupWidget.prototype.draw.call(this, content, x, y);
         }
     },
-    function(items, chainElements, cssClass, closeOnClick, alignRight, closeHandler) {
+    function(items, chainElements, cssClass, closeOnClick, alignRight, closeHandler, currentItem) {
         this.ChainedPopupWidget(chainElements, alignRight);
         this.items = items;
+        this.currentItem = currentItem;
         this.selected = null;
         this.cssClass = "popupList " + any(cssClass,"");
         this.closeOnClick = any(closeOnClick, false);
