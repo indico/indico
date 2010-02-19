@@ -1,4 +1,4 @@
-from pytz import timezone, common_timezones
+from pytz import timezone, all_timezones
 from datetime import datetime, timedelta
 import MaKaC.common.info as info
 import calendar
@@ -56,7 +56,7 @@ def setAdjustedDate(date, object = None, tz=None):
         tz = object.getTimezone()
     if isinstance(tz, basestring):
         tz = timezone(tz)
-    if tz.zone not in common_timezones:
+    if tz.zone not in all_timezones:
         tz = timezone('UTC')
     return tz.localize(date).astimezone(timezone('UTC'))
 
@@ -68,7 +68,7 @@ def getAdjustedDate(date, object = None, tz=None):
         tz = object.getTimezone()
     if isinstance(tz, basestring):
         tz = timezone(tz)
-    if tz.zone not in common_timezones:
+    if tz.zone not in all_timezones:
         tz = timezone('UTC')
     return date.astimezone(tz)
 

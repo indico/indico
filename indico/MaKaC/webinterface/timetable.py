@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 ##
 ## $Id: timetable.py,v 1.24 2009/05/14 18:05:56 jose Exp $
 ##
@@ -25,7 +25,7 @@ import sets
 from datetime import timedelta,datetime
 import pytz
 from pytz import timezone
-from pytz import common_timezones
+from pytz import all_timezones
 from MaKaC.errors import MaKaCError
 
 class TimeTable(object):
@@ -1021,14 +1021,14 @@ class SessionSlot(object):
     def getAdjustedStartDate(self,tz=None):
         if not tz:
             tz = self.getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
            tz = 'UTC'
         return self.getStartDate().astimezone(timezone(tz))
 
     def getAdjustedEndDate(self,tz=None):
         if not tz:
             tz = self.getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
            tz = 'UTC'
         return self.getStartDate().astimezone(timezone(tz))
 
@@ -1059,13 +1059,13 @@ class ConfEntry(object):
     def getAdjustedStartDate(self,tz=None):
         if not tz:
             tz = self.getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
            tz = 'UTC'
         return self.getStartDate().astimezone(timezone(tz))
 
     def getAdjustedEndDate(self,tz=None):
         if not tz:
             tz = self.getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
            tz = 'UTC'
         return self.getStartDate().astimezone(timezone(tz))

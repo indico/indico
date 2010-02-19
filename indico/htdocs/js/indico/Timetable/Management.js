@@ -67,16 +67,20 @@ type("TimetableManagementActions", [], {
         info.set('conference', eventData.conferenceId);
         info.set('sessionTimetable', this.isSessionTimetable);
 
-
         var method = this.methods[type]['delete'];
+
+        var killProgress = IndicoUI.Dialogs.Util.progress($T("Deleting entry..."));
 
         indicoRequest(method, info, function(result, error){
             if (error) {
+                killProgress();
                 IndicoUtil.errorReport(error);
             }else {
 
                 var data = self.timetable.getData();
                 var day = IndicoUtil.formatDate2(IndicoUtil.parseJsonDate(eventData.startDate));
+
+                killProgress();
 
                 if (self.session) {
                     delete data[eventData.id];

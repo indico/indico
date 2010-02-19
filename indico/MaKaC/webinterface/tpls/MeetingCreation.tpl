@@ -2,8 +2,8 @@
 <form id="eventCreationForm" action="<%= postURL %>"  method="POST">
     <input type="hidden" name="event_type" value="<%= event_type %>">
     <input type="hidden" name="sessionSlots" value="disabled"/>
-    
-    <em><%= _("Please, follow the steps to create a meeting")%></em> 
+
+    <em><%= _("Please follow the steps to create a meeting")%></em>
 
     <div class="groupTitle"><%= _("Step 1: Choose a category")%></div>
 
@@ -12,12 +12,12 @@
         <span class="selectedCategoryName"><%= _("The event will be created in:")%> <span id="categTitle" class="categTitleChosen"><%= categ['title'] %></span></span><input <% if nocategs: %>style="display: none;"<% end %> id="buttonCategChooser" type="button" value="<%= _("Browse...")%>" onclick="categoryChooser.open()"/>
     </div>
 
-	<div class="groupTitle"><%= _("Step 2: Fill the main information of the meeting") %></div>
+	<div class="groupTitle"><%= _("Step 2: Enter basic information about the meeting") %></div>
 
     <table class="groupTable">
 	    <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Title")%></span></td>
-            <td nowrap class="contentCellTD">            	
+            <td nowrap class="contentCellTD">
                     <input type="text" name="title" size="80" value="<%= title %>">
             </td>
         </tr>
@@ -25,7 +25,7 @@
             <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Start date")%></span></td>
             <td class="contentCellTD">
 				<span id="sDatePlace"></span>
-				<input type="hidden" value="" name="sDay" id="sDay"/>						                
+				<input type="hidden" value="" name="sDay" id="sDay"/>
 				<input type="hidden" value="" name="sMonth" id="sMonth"/>
 				<input type="hidden" value="" name="sYear" id="sYear"/>
                 <input type="hidden" name="sHour" id="sHour" value=""/>
@@ -36,12 +36,12 @@
             <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("End date")%></span></td>
             <td class="contentCellTD">
 				<span id="eDatePlace"></span>
-				<input type="hidden" value="" name="eDay" id="eDay"/>						                
+				<input type="hidden" value="" name="eDay" id="eDay"/>
 				<input type="hidden" value="" name="eMonth" id="eMonth"/>
 				<input type="hidden" value="" name="eYear" id="eYear"/>
                 <input type="hidden" id="eHour" name="eHour" value="">
                 <input type="hidden" id="eMinute" name="eMinute" value="">
-				<span><a href="#" onclick="new ShowConcurrentEvents(createDatesDict()).execute()"><%= _("Show events during these dates")%></a></span>
+				<span><a href="#" onclick="new ShowConcurrentEvents(createDatesDict()).execute()"><%= _("Show existing events during these dates")%></a></span>
             </td>
         </tr>
         <!-- Fermi timezone awareness -->
@@ -53,7 +53,7 @@
         </tr>
         <!-- Fermi timezone awareness(end) -->
 
-    	<% includeTpl('EventLocationInfo', modifying=False, showParent=False) %>	
+    	<% includeTpl('EventLocationInfo', modifying=False, showParent=False) %>
 
         <tr>
             <td>&nbsp;</td>
@@ -61,7 +61,7 @@
         </tr>
 
         <tr id="advancedOptions" style="display:none"><td colspan="2">
-        
+
             <table class="groupTable">
             <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Description")%></span></td>
@@ -101,8 +101,8 @@
             </td>
         </tr>
     </table>
-    
-     
+
+
 </form>
 </div>
 <% includeTpl('EventCreationJS') %>
@@ -116,12 +116,12 @@
         }else {
             $E("advancedOptions").dom.style.display = "";
             $E("advancedOptionsText").set('<%= _("Hide advanced options...")%>');
-        }   
+        }
         advOptSwitch = !advOptSwitch;
     }
 
     //---- chairperson management
-    
+
     var userList = [];
     <% from MaKaC.common.PickleJar import DictPickler %>
     var uf = new UserListField('VeryShortPeopleListDiv', 'PluginPeopleList',
@@ -131,7 +131,7 @@
 		    true, true, false,
 		    userListNothing, userListNothing, userListNothing, false,
             {"grant-manager": ['<%= _("event modification")%>', false]});
-    
+
     $E('chairpersonsContainer').set(uf.draw());
 
     // ----- show concurrent events
@@ -164,7 +164,7 @@
 
     // ---- On Load
     IndicoUI.executeOnLoad(function()
-	{		
+	{
         showAdvancedOptions();
 
         if ("<%=categ["id"]%>" != ""){
@@ -173,21 +173,21 @@
 
 		var startDate = IndicoUI.Widgets.Generic.dateField(true,null,['sDay', 'sMonth', 'sYear','sHour', 'sMinute']);
 		$E('sDatePlace').set(startDate);
-			
-		var endDate = IndicoUI.Widgets.Generic.dateField(true,null,['eDay', 'eMonth', 'eYear', 'eHour', 'eMinute']); 
+
+		var endDate = IndicoUI.Widgets.Generic.dateField(true,null,['eDay', 'eMonth', 'eYear', 'eHour', 'eMinute']);
 		$E('eDatePlace').set(endDate);
-		
+
 		<% if sDay != '': %>
 			startDate.set('<%= sDay %>/<%= sMonth %>/<%= sYear %><%= " " %><%= sHour %>:<%= sMinute %>');
 		<% end %>
-		
+
 		<% if eDay != '': %>
 			endDate.set('<%= eDay %>/<%= eMonth %>/<%= eYear %><%= " " %><%= eHour %>:<%= eMinute %>');
-		<% end %>	
-				
+		<% end %>
+
 		dates.append(startDate);
 		dates.append(endDate);
-		
+
         injectValuesInForm($E('eventCreationForm'),function() {
                 if (!verifyDates()) {
                     var popup = new ErrorPopup('<%= _("Invalid dates")%>', ["<%= _("Dates have an invalid format: dd/mm/yyyy hh:mm")%>"], "");
@@ -202,11 +202,11 @@
                     $E('chairperson').set(Json.write(uf.getUsers()));
                 }
         });
-        
+
 	verifyDates();
 
 	var editor = new RichTextWidget(500, 200, {name: 'description'});
-	$E('descriptionBox').set(editor.draw());	
+	$E('descriptionBox').set(editor.draw());
 	});
 
 </script>

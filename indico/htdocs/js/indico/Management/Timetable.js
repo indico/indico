@@ -558,10 +558,13 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
          this.startTimeField = IndicoUI.Widgets.Generic.timeField(attributes);
          this.timeField = IndicoUI.Widgets.Generic.durationField(20);
 
+         var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
+
          var self = this;
          this.PreLoadHandler(
              self._preload,
              function() {
+                 killProgress();
                  self.open();
              });
 
@@ -655,9 +658,11 @@ type("ChangeEditDialog", // silly name!
 
          this.successFunc = successFunc;
 
+         var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
          this.PreLoadHandler(
              this._preload,
              function() {
+                 killProgress();
                  self.open();
              });
 

@@ -46,7 +46,7 @@ from MaKaC.common.PickleJar import Retrieves
 from MaKaC.common.PickleJar import Updates
 
 #import ldap
-from pytz import common_timezones
+from pytz import all_timezones
 import httplib
 import urllib
 import base64
@@ -978,7 +978,7 @@ class Avatar(Persistent):
     def getTimezone(self):
         tz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
         try:
-            if self.timezone in common_timezones:
+            if self.timezone in all_timezones:
                 return self.timezone
             else:
                 self.setTimezone(tz)

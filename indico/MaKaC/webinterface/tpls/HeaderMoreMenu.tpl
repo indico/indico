@@ -26,10 +26,18 @@ moreMenu.observeClick(function(e) {
     var menuItems = {}
     var menu = new PopupMenu(menuItems, [moreMenu], <% if dark: %>'darkPopupList'<% end %><% else: %>null<% end %>);
 
+    <% if showExportToICal: %>
     menuItems['<%= _("Export to iCal") %>'] = '<%= urlHandlers.UHConferenceToiCal.getURL(self._rh._conf) %>';
-    <% if showExportToPDF: %>menuItems['<%= _("Export to PDF") %>'] = '<%= pdfURL %>';<% end %>
+    <% end %>
+    <% if showExportToPDF: %>
+    menuItems['<%= _("Export to PDF") %>'] = '<%= pdfURL %>';
+    <% end %>
+    <% if showDLMaterial: %>
     menuItems['<%= _("Download material") %>'] = '<%= urlHandlers.UHConferenceDisplayMaterialPackage.getURL(self._rh._conf) %>';
+    <% end %>
+    <% if showLayout: %>
     menuItems['<%= _("Layout") %>'] = new PopupMenu(layoutMenuItems, [moreMenu, menu], <% if dark: %>'darkPopupList'<% end %><% else: %>null<% end %>);
+    <% end %>
 
     var pos = moreMenu.getAbsolutePosition();
     menu.open(pos.x - 8, pos.y + 20);

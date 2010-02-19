@@ -19,7 +19,7 @@
      59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 -->
 
-<xsl:stylesheet version='1.0' 
+<xsl:stylesheet version='1.0'
    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 <xsl:include href="include/date.xsl"/>
@@ -32,7 +32,7 @@
 <xsl:template match="iconf">
 
 	<div class="eventWrapper">
-	
+
 <div class="meetingEventHeader">
 	<h1>
 		<xsl:text disable-output-escaping="yes"></xsl:text><xsl:value-of select="./title" disable-output-escaping="yes"/><xsl:text disable-output-escaping="yes"></xsl:text>
@@ -43,9 +43,9 @@
 		</span>
     </xsl:if>
     <div class="details">
-    
-    
-    
+
+
+
         <xsl:choose>
         <xsl:when test="substring(./startDate,0,11) = substring(./endDate,0,11)">
             <xsl:call-template name="prettydate">
@@ -55,12 +55,12 @@
             to <strong><xsl:value-of select="substring(./endDate,12,5)"/></strong>
         </xsl:when>
         <xsl:otherwise>
-            from 
+            from
             <xsl:call-template name="prettydate">
                 <xsl:with-param name="dat" select="substring(./startDate,0,11)"/>
             </xsl:call-template>
             at <strong><xsl:value-of select="substring(./startDate,12,5)"/></strong>
-            to 
+            to
             <xsl:call-template name="prettydate">
             <xsl:with-param name="dat" select="substring(./endDate,0,11)"/>
             </xsl:call-template>
@@ -85,7 +85,7 @@
       <xsl:with-param name="uploadURL">Indico.Urls.UploadAction.conference</xsl:with-param>
     </xsl:call-template>
 
-</div>  
+</div>
 
 	    <xsl:call-template name="meetingEventBody"><xsl:with-param name="minutes">off</xsl:with-param></xsl:call-template>
 
