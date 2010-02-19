@@ -750,13 +750,6 @@ class RHDisplayBaseProtected( RHProtected ):
     
     def _checkProtection( self ):
 
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        ipList = minfo.getOAIPrivateHarvesterList()[:]
-
-        if self.getHostIP() in ipList:
-            # let Private OAI harvesters access protected (display) pages
-            return
-
         if not self._target.canAccess( self.getAW() ):
             from MaKaC.conference import Link, LocalFile, Category
             if isinstance(self._target,Link) or isinstance(self._target,LocalFile):
