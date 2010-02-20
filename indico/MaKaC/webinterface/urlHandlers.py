@@ -4501,19 +4501,3 @@ class UHHelper(object):
     @classmethod
     def getDisplayUH(cls, klazz, type=""):
         return cls.displayUHs.get("%s%s"%(klazz.__name__, type), None)
-
-class UHSwitchInterface( URLHandler ):
-    _relativeURL = "switchInterface.py"
-
-    def getURL( cls, whereTo, returnURL="" ):
-        """
-        whereTo - 'future' or 'past'
-        """
-        url = cls._getURL()
-        if str(returnURL).strip() == "":
-            url.addParam( "returnURL", UHWelcome.getURL())
-        else:
-            url.addParam( "returnURL", returnURL )
-        url.addParam("to", whereTo)
-        return url
-

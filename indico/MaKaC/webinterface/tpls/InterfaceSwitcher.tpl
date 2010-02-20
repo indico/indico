@@ -4,7 +4,7 @@
 <span style="font-weight: normal; padding-left:5px; padding-right:5px;">|</span>
 <a href="mailto:indico-team@cern.ch">send feedback</a>
 <span style="font-weight: normal; padding-left:5px; padding-right:5px;">|</span>
-<a href="<%= urlHandlers.UHSwitchInterface().getURL('prev', returnURL=self._rh.getCurrentURL()) %>">old interface</a>
+<a href="http://indicoprev.cern.ch">old interface</a>
 </div>
 Welcome to the new Indico version!
 </div>
