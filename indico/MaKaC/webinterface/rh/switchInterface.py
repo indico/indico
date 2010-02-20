@@ -5,7 +5,7 @@ class RHSwitch(base.RH):
     def _checkParams(self, params):
         self._whereTo = params.get('to','future')
 
-        if self._whereTo not in ['past', 'future']:
+        if self._whereTo not in ['past', 'prev', 'future']:
             raise Exception('Unknown value')
 
         self._returnURL = params.get( "returnURL", "")
@@ -15,8 +15,6 @@ class RHSwitch(base.RH):
 
         url = self._returnURL
 
-        if self._whereTo == 'future':
-            url = url.replace('indico.cern.ch','indicobeta.cern.ch')
-        else:
-            url = url.replace('indicobeta.cern.ch','indico.cern.ch')
+        if self._whereTo == 'prev':
+            url = url.replace('indico.cern.ch','indicoprev.cern.ch')
         self._redirect(url)

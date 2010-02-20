@@ -417,9 +417,9 @@ class RH(RequestHandlerBase):
         from MaKaC.webinterface.session.base import RequestWrapper
 
         interface = RequestWrapper(self._req).cookies.get("INDICO_INTERFACE")
-        if interface == 'past':
+        if interface == 'prev':
             current_url = self._req.construct_url(self._req.unparsed_uri)
-            self._redirect(current_url.replace('indicobeta.cern.ch','indico.cern.ch'))
+            self._redirect(current_url.replace('indico.cern.ch','indicoprev.cern.ch'))
     ### ***
 
     def process( self, params ):
