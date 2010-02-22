@@ -15,11 +15,18 @@ type("AddMaterialDialog", ["ExclusivePopup"], {
         // textContent would be more appropriate, but IE...
         var res = Json.read(doc.body.innerHTML);
 
+        var self = this;
+
         if (res.status == "ERROR") {
             IndicoUtil.errorReport(res.info);
         } else {
             this.onUpload(res.info);
-            this.close();
+            // Firefox will keep "loading" if the iframe is destroyed
+            // right now. Let's wait a bit.
+            setTimeout(
+                function() {
+                    self.close();
+                }, 100);
         }
     },
 

@@ -41,7 +41,7 @@ class RHCustomizable( RH ):
     def __init__( self, req ):
         RH.__init__( self, req )
         self._wf = ""
-    
+
     def getWebFactory( self ):
         if self._wf == "":
            wr = webFactoryRegistry.WebFactoryRegistry()
@@ -50,7 +50,7 @@ class RHCustomizable( RH ):
 
 
 class RHConferenceSite( RHCustomizable ):
-    
+
     def _setMenuStatus(self,params):
         if params.has_key("menuStatus"):
             self._getSession().setVar("menuStatus",params["menuStatus"])
@@ -58,13 +58,13 @@ class RHConferenceSite( RHCustomizable ):
  #       self._wf = wr.getFactory( self._conf )
  #       if self._wf is not None:
  #           self._getSession().setVar("menuStatus","close")
-    
+
     def _checkParams( self, params ):
         l = locators.WebLocator()
         l.setConference( params )
         self._conf = self._target = l.getObject()
         self._setMenuStatus(params)
-    
+
     def _getLoginURL( self ):
         #url = self.getCurrentURL()
         url = self.getRequestURL()
@@ -84,7 +84,7 @@ class RHConferenceBase( RHConferenceSite ):
 
 
 class RHSessionBase( RHConferenceSite ):
-    
+
     def _checkParams( self, params ):
         l = locators.WebLocator()
         l.setSession( params )
@@ -93,7 +93,7 @@ class RHSessionBase( RHConferenceSite ):
         self._setMenuStatus(params)
 
 class RHSessionSlotBase( RHConferenceSite ):
-    
+
     def _checkParams( self, params ):
         l = locators.WebLocator()
         l.setSlot( params )
@@ -104,7 +104,7 @@ class RHSessionSlotBase( RHConferenceSite ):
 
 
 class RHContributionBase( RHConferenceSite ):
-    
+
     def _checkParams( self, params ):
         l = locators.WebLocator()
         l.setContribution( params )
@@ -113,18 +113,18 @@ class RHContributionBase( RHConferenceSite ):
         self._setMenuStatus(params)
 
 class RHSubContributionBase( RHConferenceSite ):
-    
+
     def _checkParams( self, params ):
         l = locators.WebLocator()
         l.setSubContribution( params )
-        self._subContrib = self._target = l.getObject()        
+        self._subContrib = self._target = l.getObject()
         self._contrib = self._subContrib.getParent()
         self._conf = self._contrib.getConference()
         self._setMenuStatus(params)
 
 
 class RHMaterialBase( RHConferenceSite ):
-    
+
     def _checkParams( self, params ):
         l = locators.WebLocator()
         l.setMaterial( params )
@@ -133,12 +133,12 @@ class RHMaterialBase( RHConferenceSite ):
             raise MaKaCError( _("The material you are trying to access does not exist or was removed"))
         self._conf = self._material.getConference()
         if self._conf == None:
-            self._categ=self._material.getCategory()  
+            self._categ=self._material.getCategory()
         self._setMenuStatus(params)
 
 
 class RHFileBase( RHConferenceSite ):
-    
+
     def _checkParams( self, params ):
         l = locators.WebLocator()
         l.setResource( params )
@@ -152,7 +152,7 @@ class RHFileBase( RHConferenceSite ):
 
 
 class RHAlarmBase( RHConferenceSite ):
-    
+
     def _checkParams( self, params ):
         l = locators.WebLocator()
         l.setAlarm( params )
@@ -162,19 +162,19 @@ class RHAlarmBase( RHConferenceSite ):
 
 
 class RHLinkBase( RHConferenceSite ):
-    
+
     def _checkParams( self, params ):
         l = locators.WebLocator()
         l.setResource( params )
         self._link = self._target = l.getObject()
         self._conf = self._link.getConference()
         if self._conf == None:
-            self._categ=self._link.getCategory() 
+            self._categ=self._link.getCategory()
         self._setMenuStatus(params)
 
 
 class RHTrackBase( RHConferenceSite ):
-    
+
     def _checkParams( self, params ):
         l = locators.WebLocator()
         l.setTrack( params )
@@ -184,10 +184,10 @@ class RHTrackBase( RHConferenceSite ):
         if params.has_key("subTrackId"):
             self._subTrack = self._track.getSubTrackById(params["subTrackId"])
         self._setMenuStatus(params)
-        
+
 
 class RHAbstractBase( RHConferenceSite ):
-    
+
     def _checkParams( self, params ):
         l = locators.WebLocator()
         l.setAbstract( params )
@@ -223,34 +223,32 @@ class RHSubmitMaterialBase:
         return fileName
 
     def _checkParams(self,params):
-        """ This function will return the list of temp files to delete 
-        after the end of the transaction"""
-        filesToDelete=[]
-        self._action=""
-        self._overwrite=False
-        #if request has already been handled (DB conflict), then we keep the existing files list
+
+        filesToDelete = []
+        self._action = ""
+        self._overwrite = False
 
         self._file = {}
         self._link = {}
         self._topdf=params.has_key("topdf")
-        
-        self._uploadType = params.get("uploadType","")     
+
+        self._uploadType = params.get("uploadType","")
         self._materialId = params.get("materialId","")
         self._description = params.get("description","")
 
         if self._uploadType == "file":
             if type(params["file"]) != str and params["file"].filename.strip() != "":
-                file = {}
-                file["filePath"]=self._saveFileToTemp(params["file"].file)
+                fDict = {}
+                fDict["filePath"]=self._saveFileToTemp(params["file"].file)
 
                 # TODO: Check this!
                 if self._callerRH != None:
-                    self._callerRH._tempFilesToDelete.append(file["filePath"])
-            
-                file["fileName"]=params["file"].filename                      
-                file["size"] = int(os.stat(file["filePath"])[stat.ST_SIZE])
-                self._file = file
-        
+                    self._callerRH._tempFilesToDelete.append(fDict["filePath"])
+
+                fDict["fileName"]=params["file"].filename
+                fDict["size"] = int(os.stat(fDict["filePath"])[stat.ST_SIZE])
+                self._file = fDict
+
         elif self._uploadType == "link":
             link={}
             link["url"]=params.get("url","")
@@ -260,8 +258,8 @@ class RHSubmitMaterialBase:
 
     def _getErrorList(self):
         res=[]
-        
-        if self._uploadType == "file":       
+
+        if self._uploadType == "file":
             if self._file == {}:
                 res.append("""A file must be submitted.""")
             if hasattr(self._file, "filePath") and self._file["filePath"].strip()=="":
@@ -271,7 +269,7 @@ class RHSubmitMaterialBase:
         elif self._uploadType == "link":
             if self._link["url"].strip()=="":
                 res.append("""A valid URL must be specified.""")
-        
+
         if self._materialId=="":
             res.append("""A material ID must be selected.""")
         return res
@@ -280,7 +278,7 @@ class RHSubmitMaterialBase:
 
         """ Returns the Material object to which the ressource is being submitted
         """
-        
+
         mf = self._target.getMaterialRegistry().getById(self._materialId)
 
         material = mf.get(self._target)
@@ -290,10 +288,10 @@ class RHSubmitMaterialBase:
         return material
 
     def _process(self, rh, params):
-        
+
         # We will need to pickle the data back into JSON
         from MaKaC.common.PickleJar import DictPickler
-        
+
         errorList=[]
         user = rh.getAW().getUser()
         try:
@@ -315,31 +313,31 @@ class RHSubmitMaterialBase:
             text = ""
 
         errorList=self._getErrorList()
-        file = self._file
-        link = self._link        
+        fDict = self._file
+        link = self._link
         resource = None
-        
+
         if self._uploadType == "file":
             if len(errorList)==0:
                 mat = self._getMaterial()
-                
+
                 if mat == None:
                     errorList.append("Unknown material");
                 else:
                     resource = LocalFile()
-                    resource.setFileName(file["fileName"])
+                    resource.setFileName(fDict["fileName"])
                     resource.setName(resource.getFileName())
-                    resource.setFilePath(file["filePath"])
+                    resource.setFilePath(fDict["filePath"])
                     resource.setDescription(self._description)
                     mat.addResource(resource)
                     #apply conversion
                     if self._topdf and fileConverter.CDSConvFileConverter.hasAvailableConversionsFor(os.path.splitext(resource.getFileName())[1].strip().lower()):
                         fileConverter.CDSConvFileConverter.convert(resource.getFilePath(), "pdf", mat)
                     if not type(self._target) is Category:
-                        self._target.getConference().getLogHandler().logAction({"subject":"Added file %s%s" % (file["fileName"],text)},"Files",user)
+                        self._target.getConference().getLogHandler().logAction({"subject":"Added file %s%s" % (fDict["fileName"],text)},"Files",user)
                     # in case of db conflict we do not want to send the file to conversion again
                     self._topdf = False
-    
+
             if len(errorList) > 0:
                 status = "ERROR"
                 info = errorList
@@ -347,7 +345,7 @@ class RHSubmitMaterialBase:
                 status = "OK"
                 info = DictPickler.pickle(resource)
                 info['material'] = mat.getId();
-        
+
         elif self._uploadType == "link":
             if len(errorList)==0:
                 mat = self._getMaterial()
@@ -362,20 +360,20 @@ class RHSubmitMaterialBase:
                 mat.addResource(resource)
                 if not type(self._target) is Category:
                     self._target.getConference().getLogHandler().logAction({"subject":"Added link %s%s" % (resource.getURL(),text)},"Files",user)
-            
+
                 status = "OK"
                 info = DictPickler.pickle(resource)
                 info['material'] = mat.getId();
             else:
                 status = "ERROR"
                 info = errorList
-        
+
         else:
             status = "ERROR"
             info = "Unknown upload type"
-          
+
         # hackish, because of mime types. Konqueror, for instance, would assume text if there were no tags,
         # and would try to open it
         from MaKaC.services.interface.rpc import json
         return "<html><head></head><body>"+json.encode({'status': status, 'info': info})+"</body></html>"
-    
+
