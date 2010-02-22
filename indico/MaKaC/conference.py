@@ -5749,6 +5749,8 @@ class Session(Persistent):
             self.setLocation( loc )
             loc.setName( sessionData["locationName"] )
             loc.setAddress( sessionData.get("locationAddress", "") )
+        else:
+            self.setLocation(None)
 
         #same as for the location
         if "roomName" in sessionData:
@@ -5757,6 +5759,8 @@ class Session(Persistent):
                 room = CustomRoom()
             self.setRoom( room )
             room.setName( sessionData["roomName"] )
+        else:
+            self.setRoom(None)
 
         if sessionData.get("sDate",None) is not None:
             self.setStartDate(sessionData["sDate"],check,moveEntries=moveEntries)
@@ -6934,23 +6938,24 @@ class SessionSlot(Persistent):
         # Do we move all entries in the slot
         move = int(data.get("move",0))
 
-        if data.get( "locationName", "" ).strip() == "":
-            self.setLocation( None )
-        else:
+        if "locationName" in data:
             loc = self.getOwnLocation()
             if not loc:
                 loc = CustomLocation()
             self.setLocation( loc )
             loc.setName( data["locationName"] )
             loc.setAddress( data.get("locationAddress", "") )
-        if data.get( "roomName", "" ).strip() == "":
-            self.setRoom( None )
         else:
+            self.setLocation( None )
+
+        if "roomName" in data:
             room = self.getOwnRoom()
             if not room:
                 room = CustomRoom()
             self.setRoom( room )
             room.setName( data["roomName"] )
+        else:
+            self.setRoom( None )
         sDate = eDate = None
         confTZ = self.getOwner().getConference().getTimezone()
         if data.get("sDate",None) is not None:
@@ -8081,6 +8086,8 @@ class Contribution(Persistent, Fossilizable):
             self.setLocation(loc)
             loc.setName(data["locationName"])
             loc.setAddress(data.get("locationAddress", ""))
+        else:
+            self.setLocation(None)
 
         #same as for the location
         if "roomName" in data:
@@ -8089,6 +8096,8 @@ class Contribution(Persistent, Fossilizable):
                 room=CustomRoom()
             self.setRoom(room)
             room.setName(data["roomName"])
+        else:
+            self.setRoom(None)
         tz = 'UTC'
         if self.getConference():
             tz = self.getConference().getTimezone()

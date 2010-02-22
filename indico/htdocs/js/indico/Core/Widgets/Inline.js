@@ -573,15 +573,12 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
          _startNew: function() {
              this._hideOptions();
              this.input.enable();
-             this.freeMode.set(true);
              this.input.setFocus();
 
              this.input.set('');
              this.value.set('');
 
-             $B(this.value, this.input);
-
-             this._observeBlurEvents();
+             //this._observeBlurEvents();
 
          },
 
@@ -592,10 +589,9 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
                  this.input.disable();
                  bind.detach(this.input);
                  bind.detach(this.value);
-                 this._stopObservingBlurEvents();
+                 //this._stopObservingBlurEvents();
              }
 
-             this.freeMode.set(false);
              this._notify();
          },
 
@@ -637,6 +633,7 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
                  this.input.set(this.list.get(value));
              } else {
                  this.input.set(value);
+                 this.enableInput();
              }
 
              this.value.set(value);
@@ -675,23 +672,23 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
              this.input.enable();
          },
          setOptionList: function(list) {
-             this.disableInput();
+             //this.disableInput();
              this.list.clear();
              this.list.update(list);
              this.list.sort(this.sortCriteria);
-             this.freeMode.set(false);
 
              var self = this;
              if (keys(list).length === 0) {
                  this.trigger.dom.style.display = 'none';
+             }
+             if ( !exists(this.list.get(this.value.get()))) {
                  this.enableInput();
-                 this.freeMode.set(true);
                  $B(this.input, this.value);
 
-                 this._observeBlurEvents(true);
+                 //this._observeBlurEvents(true);
 
                  // focus() needs some time to get ready (?)
-                 setTimeout(function() {self.input.setFocus();}, 20);
+                 //setTimeout(function() {self.input.setFocus();}, 20);
              }
          },
          setLoading: function(state) {
@@ -705,18 +702,6 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
          detach: function() {
              bind.detach(this.value);
              this.input.unbind();
-         },
-
-         _checkEmpty: function(value) {
-             if (!value ) {
-                 if (this.freeMode.get()) {
-                     this.notificationField.set("write...");
-                 } else {
-                     this.notificationField.set("choose...");
-                 }
-             } else {
-                 this.notificationField.set("");
-             }
          }
 
 
@@ -733,7 +718,6 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
          this.disabled = false;
          this.inputDisabled = true;
          this.loading = new WatchValue();
-         this.freeMode = new WatchValue(false);
          this.observers = [];
 
          this.notificationField = Html.div({style:{color: '#AAAAAA', position:'absolute', top: '0px', left: '5px'}});
@@ -745,16 +729,13 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
 
          this.trigger = Html.div('arrowExpandIcon');
 
+         $B(this.value, this.input);
+         this.value.observe(function(value) {
+             self._notify();
+         });
+
          this.loading.observe(function(value) {
              self.trigger.dom.className = value?'progressIcon':'arrowExpandIcon';
-         });
-
-         this.value.observe(function(value) {
-             self._checkEmpty(value);
-         });
-
-         this.freeMode.observe(function() {
-             self._checkEmpty(self.value.get());
          });
 
          $E(document.body).observeClick(function(event) {
@@ -767,8 +748,6 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
                  self._hideOptions();
              }
          });
-
-         this._checkEmpty();
 
          this.WatchAccessor(this.get, this.set, this.observe, this.invokeObserver);
 

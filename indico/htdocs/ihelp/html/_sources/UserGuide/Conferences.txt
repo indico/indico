@@ -6,7 +6,7 @@ Conference
 ----------
 
 A conference is the most comprehensive event in Indico.
-You should be able to manage its complete life-cycle, 
+You should be able to manage its complete life-cycle,
 for instance, among other functionalities you can setup:
 
 * a conference web portal fully customizable
@@ -25,23 +25,23 @@ Creating a Conference
 ---------------------
 
 In order to create a conference, you just need to click on
-*Create event* and *Create conference*, in blue bar at the top of 
+*Create event* and *Create conference*, in blue bar at the top of
 the page. You will be presented with a form in which you:
 
 1. choose the category where you want to place your conference and
-2. fill the details of the conference you wish to create.  
+2. fill the details of the conference you wish to create.
 
 Once this is done your conference will be created and you will be
 redirected to the Management Area of the conference. If you want
 to see the Home page of your conference, click in the link *View
 event page*.
 
-The creator of this conference will by default have modification 
-rights to it and is referred to as a Conference Manager as is anyone 
+The creator of this conference will by default have modification
+rights to it and is referred to as a Conference Manager as is anyone
 else listed in the Modification control list.
 
 Remember that the category, in which you want to create your conference,
-must be public or you must have access rights to it. 
+must be public or you must have access rights to it.
 
 To access the Management Area of a conference you need to
 click on the modification icon |image7| in the top bar of the event
@@ -70,8 +70,8 @@ setting up the conference from the Management Area.
 Conference Management Area
 --------------------------
 
-The Management Area allows you to control, manage, setup and 
-modify the different parts of your conference. The following 
+The Management Area allows you to control, manage, setup and
+modify the different parts of your conference. The following
 sections will show each area of the Conference Management.
 
 |image8|
@@ -89,7 +89,7 @@ From the option General Settings in the left menu you can:
 |image10|
 
 
-* Modify the general information of the conference, e.g. title, description, dates, etc. 
+* Modify the general information of the conference, e.g. title, description, dates, etc.
 * Modify the support email, if you supply one will be the support email linked from the bottom of the menu that is displayed in the home page of the conference `(see Conference Display) <#conference-display-area>`_.
 
 |image11|
@@ -118,8 +118,8 @@ contributions can belong. Inside tracks you can do the
 following:
 
 * General settings:
- 
-  - Modify the Code: a code can be used if you prefer to use codes as opposed to using long titles. This codes will be used in listings for contributions and abstracts. 
+
+  - Modify the Code: a code can be used if you prefer to use codes as opposed to using long titles. This codes will be used in listings for contributions and abstracts.
   - Modify the Title and the Description of the track.
 
 |image13|
@@ -155,7 +155,7 @@ From the Contributions menu you can:
 * Create a zip file of material from contributions
 * Create a zip file of the whole proceedings.
 
-You can also filter the list of contributions by session, track, 
+You can also filter the list of contributions by session, track,
 contribution type, status (scheduled, not scheduled, withdrawn) and material.
 In order to open the filtering criteria, you must click in the small arrow
 close to *Filtering criteria*, choose the options you want to match, and press
@@ -172,7 +172,7 @@ From inside the Main tab you can:
 
 |image16|
 
-* Modify the main details of the contribution, for example, name, 
+* Modify the main details of the contribution, for example, name,
   duration, etc.
 * Change the track to which this contribution is assigned.
 * Change the session in which this contribution is included
@@ -181,7 +181,7 @@ From inside the Main tab you can:
 * Add/change the presenters of the contribution.
 * Withdraw the contribution from the Conference.
 
-From the Material tab you can add and access the material of the 
+From the Material tab you can add and access the material of the
 contribution `(see Material) <#material>`_.
 
 From the Sub-contributions tab you can:
@@ -198,14 +198,14 @@ From the Access Control tab you can:
 
 |image18|
 
-* List the users that can submit material `(see Material) <#material>`_ 
-  to the contributions, by default nobody can submit material, we need 
+* List the users that can submit material `(see Material) <#material>`_
+  to the contributions, by default nobody can submit material, we need
   to specify it.
 * List the users that can modify the contributions.
-* Make the contribution Public or Private: 
+* Make the contribution Public or Private:
 
-  - *Public*: Any user can view (not modify) the contributions. 
-  - *Private:* Only users listed in the access/modification/submission 
+  - *Public*: Any user can view (not modify) the contributions.
+  - *Private:* Only users listed in the access/modification/submission
     control can access the contribution.
 * List the domains (e.g. CERN domain) that can access the contribution
   (this is only available if the contribution is public)
@@ -249,7 +249,7 @@ You can upload files or simply add URL links.
 
 |image21|
 
-Access rights can be set for each material. From inside Access Control 
+Access rights can be set for each material. From inside Access Control
 you can list those users that can view the material.
 
 |image22|
@@ -263,7 +263,7 @@ The Abstracts Management in Indico has four tabs:
 
 * Setup: configuration of the call for abstracts.
 * Preview: preview of the submission form.
-* List of Abstracts: all the abstracts that have been submitted or 
+* List of Abstracts: all the abstracts that have been submitted or
   created by the organizers.
 * Book of Abstracts Setup.
 
@@ -272,11 +272,11 @@ The Abstracts Management in Indico has four tabs:
 Call for Abstracts Setup
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-The call for abstracts needs to be enabled first from the *Setup* 
+The call for abstracts needs to be enabled first from the *Setup*
 tab. From here you can set:
 
 * Submission period: dates between authors can submit abstracts.
-* Modification deadline: deadline for any abstract modification. 
+* Modification deadline: deadline for any abstract modification.
 * Announcement: information displayed in the home page of the event when
   accessing the call for abstracts menu.
 * Submission notification: email addresses that will receive an email
@@ -312,7 +312,7 @@ In order to create a Notification Template you have to:
 
    1. Title: This is just a title for the notification template. It is
       just a definition of the template. It will not be used in the email.
-   2. Description: This is just a description for the notification 
+   2. Description: This is just a description for the notification
       template. It will not be used in the email.
    3. From address: the FROM address in the automatic email.
    4. To addresses: who will receive the email, submitters and/or primary
@@ -356,13 +356,13 @@ submitted to the conference:
 
 From the List of Abstracts tab you can add new abstracts, create PDFs of
 the abstracts, create an XML file of abstracts, and obtain the authors
-list. You can also access each abstract `see Abstracts <#abstracts>`_; 
+list. You can also access each abstract `see Abstracts <#abstracts>`_;
 an abstract can be in one of 10 states:
 
 * Accepted |image26|
 * Rejected |image27|
-* Proposed Rejection |image28| 
-* Withdrawn |image29| 
+* Proposed Rejection |image28|
+* Withdrawn |image29|
 * Merged |image30|
 * Submitted |image31|
 * Under Review |image32|
@@ -380,9 +380,9 @@ Abstracts
 ^^^^^^^^^
 
 An abstract is either submitted by a user or manually
-added by a Abstract Manager (conference organizers). Once an 
-abstract is accepted it is automatically changed into a contribution 
-and added to the contributions list in the conference 
+added by a Abstract Manager (conference organizers). Once an
+abstract is accepted it is automatically changed into a contribution
+and added to the contributions list in the conference
 `(see Contributions Management) <#contributions-management>`_.
 
 |image36|
@@ -400,7 +400,7 @@ from the tab *Track judgements*.
 |image37|
 
 Internal comments can be made from the tab *Internal comments* (it's like
-a message box). And a notification log, with the emails sent to the author, 
+a message box). And a notification log, with the emails sent to the author,
 can also be viewed from inside the tab *Notification log*.
 
 --------------
@@ -410,7 +410,7 @@ Book of Abstracts
 
 The *Book of Abstracts* tab lets you add any additional comments
 that you would like to appear in the first page of the book of Abstracts.
-This is a PDF file which can be generated from the conference home page 
+This is a PDF file which can be generated from the conference home page
 `(see Conference Display) <#conference-display-area>`_ containing all the
 abstracts.
 
@@ -419,7 +419,7 @@ abstracts.
 Timetable Management
 ~~~~~~~~~~~~~~~~~~~~
 
-You can organise your conference from the Timetable tab in a conference. 
+You can organise your conference from the Timetable tab in a conference.
 When you start with a timetable it will look like this:
 
 |image38|
@@ -439,16 +439,16 @@ Sessions
 ^^^^^^^^
 
 A session is essentially a time interval within which you organise many
-presentations of your conference. You can create sessions base on 
+presentations of your conference. You can create sessions base on
 different reasons:
 
-* You could use a session for each track, for example. 
-* There can also be more than one session scheduled at the same time 
-  (parallel sessions). 
-* The same session can also be happing in different time intervals. For 
+* You could use a session for each track, for example.
+* There can also be more than one session scheduled at the same time
+  (parallel sessions).
+* The same session can also be happing in different time intervals. For
   example, you may have a morning interval, then a break, and then an afternoon
-  interval within the same session. Also, one day you have a session on a 
-  particular subject for a couple of hours and then two days later you may have 
+  interval within the same session. Also, one day you have a session on a
+  particular subject for a couple of hours and then two days later you may have
   another session on that subject. This can be done using *Add new* > *Session*
   > *Add interval to:* an already existing session (see previous image).
 
@@ -459,12 +459,12 @@ Adding Sessions and Breaks to a Timetable
 
 To add a session to your timetable, use the menu *Add new* and the
 option *Session* > *Create a new session*, at the top of the timetable.
-This will present you with a form that you fill in with the details of 
-your session. Once the session is created it will appear in your timetable. 
+This will present you with a form that you fill in with the details of
+your session. Once the session is created it will appear in your timetable.
 
 |image40|
 
-From the same menu *Add new* but in the option *Break* you can add a break. 
+From the same menu *Add new* but in the option *Break* you can add a break.
 
 In order to modify sessions and breaks, you need to click on the entry and
 an edition balloon will be displayed. For sessions, you can edit their
@@ -500,12 +500,12 @@ Session Management
 ^^^^^^^^^^^^^^^^^^
 
 You can access the Management area for a session from the edition
-balloon (this is the balloon that appears when clicking on the entry), 
+balloon (this is the balloon that appears when clicking on the entry),
 by clicking *Edit* > *Session properties*.
 
 |image97|
 
-This new page will allow to modify everything within that Session. 
+This new page will allow to modify everything within that Session.
 You will see different tabs from which you can:
 
 * Edit the general settings.
@@ -513,14 +513,14 @@ You will see different tabs from which you can:
 * Modify the inner timetable for that session.
 * Write some comments that other session coordinators can read.
 * Attach files.
-* Set its protection and the coordinators (people with rights just to 
-  schedule talks). 
+* Set its protection and the coordinators (people with rights just to
+  schedule talks).
 
 |image98|
 
 --------------
 
-Intervals 
+Intervals
 '''''''''
 
 A session can happen in different intervals of time.
@@ -530,10 +530,10 @@ the menu (in the top bar of the timetable)  *Add new* > *Session*  >
 *Add interval to:* an already existing session.
 
 However, this is optional, intervals can be used when the session takes
-place over more than one period of time. For example, if you may have a 
-morning interval, then a break, and then an afternoon interval within the 
-same session. Also, you may have one day you have a session on a particular 
-subject for a couple of hours and then two days later you may have another 
+place over more than one period of time. For example, if you may have a
+morning interval, then a break, and then an afternoon interval within the
+same session. Also, you may have one day you have a session on a particular
+subject for a couple of hours and then two days later you may have another
 session on that subject.
 
 --------------
@@ -556,13 +556,13 @@ once they have been added
 
 --------------
 
-Protection Tab 
+Protection Tab
 ''''''''''''''
 
 From the Protection tab in Session you can set the access
 rights for modification, access, and domain control in the same way as you
 can for the conference `(see Protection Management) <#protection-management>`_.
-The only difference is the Co-ordination control in which you can assign 
+The only difference is the Co-ordination control in which you can assign
 someone to be the Co-ordinator, which means they can add and remove contributions
 and breaks to that particular session.
 
@@ -598,8 +598,8 @@ session.
 
 Once you have selected the contributions they will appear inside
 the Contributions tab in the session. You can then use the option
-*Add new* > *Contribution* from the Session timetable and select 
-from the contributions you imported. When you have added a contribution 
+*Add new* > *Contribution* from the Session timetable and select
+from the contributions you imported. When you have added a contribution
 to your session timetable you can edit the times and duration by clicking
 on the contribution box.
 
@@ -635,7 +635,7 @@ will get a message as the following:
 
 |image50|
 
-*Domain Control* This option is only for public events. It allows 
+*Domain Control* This option is only for public events. It allows
 to specify which domain (e.g. CERN) can access the conference.
 Therefore, just people from inside this domain will be able to access.
 
@@ -659,7 +659,7 @@ You can access the registration module from the option *Registration*
 in the menu of the left.
 
 From the Setup tab you can enable or disable the registration.
-You can also modify the start/end dates of registration, the 
+You can also modify the start/end dates of registration, the
 maximum number of registrants you will take, any announcements
 and if you want to receive an email when a new registrant applies.
 
@@ -670,7 +670,7 @@ in the registration form with many fields in it.
 You can choose which sections of the form you wish to use
 (see the following sections listed below). To enable or disable one of these
 sections, click on the |image52| image next to that section, when it is
-red it is disabled and when it is green it is enabled. Clicking on the 
+red it is disabled and when it is green it is enabled. Clicking on the
 section name will let you modify it to allow the registrants to enter the
 information you need `(see Registration Area) <#registration-area>`_.
 
@@ -732,7 +732,7 @@ additional information for the registrants.
 
 --------------
 
-General Sections 
+General Sections
 ''''''''''''''''
 
 From the button *New sect.*, you can create a customizable section
@@ -747,7 +747,7 @@ online payment system.
 Registrants
 ^^^^^^^^^^^
 
-The Registrants tab will show a list of all the registrants 
+The Registrants tab will show a list of all the registrants
 for your conference.
 
 |image58|
@@ -780,7 +780,7 @@ Display Menu Customization
 The menu customization allows you to activate or disable menu
 items and move them up or down the list. You may add your own
 external links (using the button *add link*), create a new page
-for your conference home page (*add page*) or just customize 
+for your conference home page (*add page*) or just customize
 the already existing system links.
 
 |image62|
@@ -860,7 +860,7 @@ of all the materials that have been used in the conference.
 
 .. Create an Offline Version of a Conference
 .. ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. 
+..
 .. Using the *Offline web for your conference* option you can create
 .. a copy of your conference that can be used offline, for example, if
 .. you wish to store your conference on a DVD.
@@ -903,6 +903,10 @@ order for you to navigate or view the display area:
 |image72| This is placed at the top left of the display view and
 will take you back to home page of Indico.
 
+|image100| This is also placed at the top left of the display
+view and allows you to use additional features (e.g. export
+the details of the conference in iCalendar format)
+
 |image73| This will be underneath the display menu and enables
 you to email the event support if conference management have
 entered one.
@@ -940,7 +944,7 @@ Submitting an Abstract
 ^^^^^^^^^^^^^^^^^^^^^^
 
 You need to be logged in as a user and the dates of submission
-must be in the time range to allow you to submit an abstract. Once 
+must be in the time range to allow you to submit an abstract. Once
 logged in you can fill in the form to submit your abstract.
 
 |image80|
@@ -1040,7 +1044,7 @@ Contribution Material Display
 '''''''''''''''''''''''''''''
 
 The material that belongs to a contribution can be viewed by
-accessing the Contribution Display `(see Contribution Display) <#contribution-display>`_. 
+accessing the Contribution Display `(see Contribution Display) <#contribution-display>`_.
 Here, there is a section *Material* with all the resources attached.
 
 |image87|
@@ -1108,7 +1112,7 @@ registration.
 
 If the epayment is enabled. The user will be able to click the button
 *next* and proceed with the payment online.
- 
+
 The menu option which was *New registration* will also change to
 *Modify my registration*. This will present you with the form you
 filled in originally and will allow you to change the information
@@ -1146,7 +1150,7 @@ Timetable Area
 
 The Timetable area shows all the session, contributions, and
 breaks for the conference. You can access each session content
-by clicking on the session name. This will show you any 
+by clicking on the session name. This will show you any
 contributions/breaks inside this session.
 
 |image95|
@@ -1265,3 +1269,4 @@ session. You may also make a PDF of the session.
 .. |image97| image:: UserGuidePics/confsm01.png
 .. |image98| image:: UserGuidePics/confsm02.png
 .. |image99| image:: UserGuidePics/confrf01.png
+.. |image100| image:: UserGuidePics/confd21.png

@@ -18,7 +18,7 @@
     var info = $O();
   <% end %>
 
-  var parentEvt = 
+  var parentEvt =
   <% if showParent: %>
     $O(<%= jsonEncode(parentRoomInfo) %>)
   <% end %>
@@ -34,7 +34,7 @@
   <% else: %>
     <% eventFavorites = [] %>
   <% end %>
-  
+
   var rbWidget = new RoomBookingWidget(Indico.Data.Locations, info, parentEvt, nullRoomInfo(info), <%= eventFavorites %>);
 
   var domContent = rbWidget.draw();
@@ -48,18 +48,20 @@
   function injectValuesInForm(form, otherActions) {
 
      form.observeEvent('submit', function() {
-        each({'room': 'roomName','location': 'locationName', 'address': 'locationAddress'}, 
+        each({'room': 'roomName','location': 'locationName', 'address': 'locationAddress'},
              function(val, key) {
 	       // prevent problem with back button
 	       var input = $E('jsGenerated_'+key) || Html.input('hidden', {id: 'jsGenerated_'+key, name: val});
-	       input.set(info.get(key));
-	       form.append(input);
+	       if (info.get(key) != null) {
+	           input.set(info.get(key));
+	           form.append(input);
+	       }
 	     });
 	if (otherActions) {
 	   return otherActions();
 	}
       });
-    
+
     };
 
 

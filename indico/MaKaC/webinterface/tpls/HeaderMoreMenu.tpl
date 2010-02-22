@@ -36,7 +36,7 @@ moreMenu.observeClick(function(e) {
     menuItems['<%= _("Download material") %>'] = '<%= urlHandlers.UHConferenceDisplayMaterialPackage.getURL(self._rh._conf) %>';
     <% end %>
     <% if showLayout: %>
-    menuItems['<%= _("Layout") %>'] = new PopupMenu(layoutMenuItems, [moreMenu, menu], <% if dark: %>'darkPopupList'<% end %><% else: %>null<% end %>);
+    menuItems['<%= _("Layout") %>'] = new PopupMenu(layoutMenuItems, [moreMenu, menu], <% if dark: %>'darkPopupList'<% end %><% else: %>null<% end %>, null, null, null, '<%= SelectedStyle %>');
     <% end %>
 
     var pos = moreMenu.getAbsolutePosition();
