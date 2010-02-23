@@ -35,6 +35,7 @@ from persistent import Persistent
 from BTrees import OOBTree
 from MaKaC.common.Counter import Counter
 
+from MaKaC.common.logger import Logger
 
 class Repository:
     """Generic class for file repositories. A file repository knows where to
@@ -163,6 +164,9 @@ class MaterialLocalRepository(Persistent):
             newFile.setArchivedId( self, id )
         except IOError, e:
             raise Exception( _("Couldn't archive file %s to %s")%( newFile.getFilePath(), destPath ) )
+
+        Logger.get('storage').info("stored resource %s (%s) at %s" % (id, newFile.getFileName(), os.path.join(volume, interPath)))
+
         return id
 
     def recoverFile(self, recFile):
