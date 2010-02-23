@@ -1,5 +1,5 @@
 <br><br>
-<form action=%(getPDFURL)s method="post">
+<form id="pdfForm" action=%(getPDFURL)s method="post">
     <input type="hidden" name="showDays" value="%(showDays)s">
     <input type="hidden" name="showSessions" value="%(showSessions)s">
     <table width="40%%" align="center" border="0" style="background-color: white; border-left: 1px solid #777777; border-top: 1px solid #777777;">
@@ -102,7 +102,8 @@
         <tr><td>&nbsp;</td></tr>
         <tr>
             <td>
-                <input type="submit" class="btn" value="<%= _("get pdf")%>" name="ok">
+                <input type="submit" class="btn" value="<%= _("get pdf")%>" name="action" />&nbsp;
+                <input type="submit" class="btn" value="<%= _("cancel") %>" id="cancel" name="cancel" />
             </td>
         </tr>
     </table>

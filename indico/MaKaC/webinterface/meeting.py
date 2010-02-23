@@ -126,8 +126,8 @@ class WebFactory(WebFactory):
         return WPMConfAddContribution(rh,conf, targetday)
 
     @staticmethod
-    def getTimeTableCustomizePDF(rh, conf):
-        return WPMTimeTableCustomizePDF(rh, conf)
+    def getTimeTableCustomizePDF(rh, conf, view):
+        return WPMTimeTableCustomizePDF(rh, conf, view)
 
     @staticmethod
     def getConferenceDisplayWriteMinutes(rh, contrib):
@@ -1303,11 +1303,17 @@ class WPMeetingDisplay( WPConferenceDisplayBase ):
     def _getHeader( self ):
         """
         """
+
+        if hasattr(self, "_view"):
+            currentView = self._view
+        else:
+            currentView = "static"
+
         wc = wcomponents.WMenuMeetingHeader( self._getAW(), self._getNavigationDrawer(),self._conf )
         return wc.getHTML( { "loginURL": self.getLoginURL(),\
                              "logoutURL": self.getLogoutURL(),\
                              "confId": self._conf.getId(),\
-                             "currentView": "static",\
+                             "currentView": currentView,\
                              "type": WebFactory.getId(),\
                              "filterActive": False,\
                              "dark": True,\
@@ -1786,8 +1792,11 @@ class WPMConfAddAlarm(WPMConfModifTools, conferences.WPConfAddAlarm):
 
 class WPMTimeTableCustomizePDF(WPMeetingDisplay):
 
-    def __init__(self, rh, conf):
+    def __init__(self, rh, conf, view):
         WPMeetingDisplay.__init__(self, rh, conf)
+        # We keep track of the view so that we can return to the meeting
+        # display page with the same layout when cancelling the pdf export
+        self._view = view
         # An hack to make sure that the background is the same as the header
         self._extraCSS.append("body { background: #424242; } ")
 
@@ -1797,17 +1806,21 @@ class WPMTimeTableCustomizePDF(WPMeetingDisplay):
         return wc.getHTML(p)
 
     def _getBody( self, params ):
-        wc = WMTimeTableCustomizePDF( self._conf )
+        wc = WMTimeTableCustomizePDF( self._conf, self._view )
         return wc.getHTML(params)
 
 class WMTimeTableCustomizePDF(wcomponents.WTemplated):
 
-    def __init__(self, conf):
+    def __init__(self, conf, view):
         self._conf = conf
+        self._view = view
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         url=urlHandlers.UHConfTimeTablePDF.getURL(self._conf)
+        # Add the view as a parameter so we can keep track of it
+        # when the pdf export is cancelled.
+        url.addParam("view", self._view)
         vars["getPDFURL"]=quoteattr(str(url))
         return vars
 

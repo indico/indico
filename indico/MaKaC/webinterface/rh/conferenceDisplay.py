@@ -393,7 +393,7 @@ class RHConferenceBaseDisplay( RHConferenceBase, RHDisplayBaseProtected ):
     def _checkProtection( self ):
         from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin, RCCollaborationPluginAdmin
         if not RCCollaborationAdmin.hasRights(self, None) and \
-            not RCCollaborationPluginAdmin.hasRights(self, plugins = "any"): 
+            not RCCollaborationPluginAdmin.hasRights(self, plugins = "any"):
             RHDisplayBaseProtected._checkProtection( self )
 
 
@@ -657,6 +657,9 @@ class RHTimeTablePDF(RHConferenceTimeTable):
         self._showSpeakerAffiliation = False
         if params.has_key("showSpeakerAffiliation"):
             self._showSpeakerAffiliation = True
+        # Keep track of the used layout for getting back after cancelling
+        # the export.
+        self._view = params.get("view", displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).getDefaultStyle())
 
     def _reduceFontSize( self ):
         index = self.fontsizes.index(self._fontsize)
@@ -667,76 +670,86 @@ class RHTimeTablePDF(RHConferenceTimeTable):
 
     def _process(self):
         tz = timezoneUtils.DisplayTZ(self._aw,self._target).getDisplayTZ()
-        params=self._getRequestParams()
+        params = self._getRequestParams()
         ttPDFFormat=TimetablePDFFormat(params)
 
-        retry = True
-        while retry:
-            if params.get("typeTT","normalTT")=="normalTT":
-                filename = "timetable.pdf"
-                pdf = TimeTablePlain(self._target,self.getAW(),
+        # Choose action depending on the button pressed
+        if params.has_key("cancel"):
+            # If the export is cancelled, redirect to the display
+            # page
+            url = urlHandlers.UHConferenceDisplay.getURL(self._conf)
+            url.addParam("view", self._view)
+            self._redirect(url)
+        else :
+            retry = True
+            while retry:
+                if params.get("typeTT","normalTT")=="normalTT":
+                    filename = "timetable.pdf"
+                    pdf = TimeTablePlain(self._target,self.getAW(),
+                            showSessions=self._showSessions,showDays=self._showDays,
+                            sortingCrit=self._sortingCrit, ttPDFFormat=ttPDFFormat,
+                            pagesize = self._pagesize, fontsize = self._fontsize,
+                            firstPageNumber = self._firstPageNumber,
+                            showSpeakerAffiliation = self._showSpeakerAffiliation)
+                else:
+                    filename = "SimplifiedTimetable.pdf"
+                    pdf = SimplifiedTimeTablePlain(self._target,self.getAW(),
                         showSessions=self._showSessions,showDays=self._showDays,
                         sortingCrit=self._sortingCrit, ttPDFFormat=ttPDFFormat,
-                        pagesize = self._pagesize, fontsize = self._fontsize,
-                        firstPageNumber = self._firstPageNumber,
-                        showSpeakerAffiliation = self._showSpeakerAffiliation)
-            else:
-                filename = "SimplifiedTimetable.pdf"
-                pdf = SimplifiedTimeTablePlain(self._target,self.getAW(),
-                    showSessions=self._showSessions,showDays=self._showDays,
-                    sortingCrit=self._sortingCrit, ttPDFFormat=ttPDFFormat,
-                    pagesize = self._pagesize, fontsize = self._fontsize)
-            try:
-                data=pdf.getPDFBin()
-                retry = False
-            except LayoutError, e:
-                if not self._reduceFontSize():
-                    raise MaKaCError("Error in PDF generation - One of the paragraphs does not fit on a page")
-            except Exception, e:
-                raise e
+                        pagesize = self._pagesize, fontsize = self._fontsize)
+                try:
+                    data=pdf.getPDFBin()
+                    retry = False
+                except LayoutError, e:
+                    if not self._reduceFontSize():
+                        raise MaKaCError("Error in PDF generation - One of the paragraphs does not fit on a page")
+                except Exception, e:
+                    raise e
 
-##        tries = 5
-##        while tries:
-##            if params.get("typeTT","normalTT")=="normalTT":
-##                filename = "timetable.pdf"
-##                pdf = TimeTablePlain(self._target,self.getAW(),
-##                        showSessions=self._showSessions,showDays=self._showDays,
-##                        sortingCrit=self._sortingCrit, ttPDFFormat=ttPDFFormat,
-##                        pagesize = self._pagesize, fontsize = self._fontsize, firstPageNumber = self._firstPageNumber, tz=tz)
-##            else:
-##                filename = "SimplifiedTimetable.pdf"
-##                pdf = SimplifiedTimeTablePlain(self._target,self.getAW(),
-##                    showSessions=self._showSessions,showDays=self._showDays,
-##                    sortingCrit=self._sortingCrit, ttPDFFormat=ttPDFFormat,
-##                    pagesize = self._pagesize, fontsize = self._fontsize, tz=tz)
-##            try:
-##                data=pdf.getPDFBin()
-##                tries = 0
-##            except LayoutError, e:
-##                if self._reduceFontSize():
-##                    tries -= 1
-##                else:
-##                    tries = 0
-##                    raise MaKaCError(str(e))
+    ##        tries = 5
+    ##        while tries:
+    ##            if params.get("typeTT","normalTT")=="normalTT":
+    ##                filename = "timetable.pdf"
+    ##                pdf = TimeTablePlain(self._target,self.getAW(),
+    ##                        showSessions=self._showSessions,showDays=self._showDays,
+    ##                        sortingCrit=self._sortingCrit, ttPDFFormat=ttPDFFormat,
+    ##                        pagesize = self._pagesize, fontsize = self._fontsize, firstPageNumber = self._firstPageNumber, tz=tz)
+    ##            else:
+    ##                filename = "SimplifiedTimetable.pdf"
+    ##                pdf = SimplifiedTimeTablePlain(self._target,self.getAW(),
+    ##                    showSessions=self._showSessions,showDays=self._showDays,
+    ##                    sortingCrit=self._sortingCrit, ttPDFFormat=ttPDFFormat,
+    ##                    pagesize = self._pagesize, fontsize = self._fontsize, tz=tz)
+    ##            try:
+    ##                data=pdf.getPDFBin()
+    ##                tries = 0
+    ##            except LayoutError, e:
+    ##                if self._reduceFontSize():
+    ##                    tries -= 1
+    ##                else:
+    ##                    tries = 0
+    ##                    raise MaKaCError(str(e))
 
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg=Config.getInstance()
-        mimetype=cfg.getFileTypeMimeType("PDF")
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"]="""inline; filename="%s\""""%filename
-        return data
+            self._req.headers_out["Content-Length"] = "%s"%len(data)
+            cfg=Config.getInstance()
+            mimetype=cfg.getFileTypeMimeType("PDF")
+            self._req.content_type = """%s"""%(mimetype)
+            self._req.headers_out["Content-Disposition"]="""inline; filename="%s\""""%filename
+            return data
 
 class RHTimeTableCustomizePDF(RHConferenceTimeTable):
 
     def _checkParams(self,params):
         RHConferenceTimeTable._checkParams(self,params)
         self._cancel = params.has_key("cancel")
+        self._view = params.get("view", "standard")
 
     def _process(self):
-        p=conferences.WPTimeTableCustomizePDF(self,self._target)
+        # TODO: why not construct p this way only if wf == None?
+        p=conferences.WPTimeTableCustomizePDF(self, self._target)
         wf = self.getWebFactory()
         if wf != None:
-            p=wf.getTimeTableCustomizePDF(self, self._target)
+            p=wf.getTimeTableCustomizePDF(self, self._target, self._view)
         return p.display(**self._getRequestParams())
 
 
