@@ -825,16 +825,11 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
                 return;
             }
 
-            var sTime = startEndTimeField.accessor.get('startTime');
-            var eTime = startEndTimeField.accessor.get('endTime');
+            var startDate = clone(self.eventData.startDate);
+            var endDate = clone(self.eventData.startDate);
 
-            var startDate = IndicoUtil.parseJsonDate(self.eventData.startDate);
-            var endDate = IndicoUtil.parseJsonDate(self.eventData.startDate);
-            startDate.setHours(sTime.substring(0,2));
-            startDate.setMinutes(sTime.substr(3,2));
-
-            endDate.setHours(eTime.substr(0,2));
-            endDate.setMinutes(eTime.substr(3,2));
+            startDate.time = startEndTimeField.accessor.get('startTime');
+            endDate.time = startEndTimeField.accessor.get('endTime');
 
             self.managementActions.editEntryStartEndDate(Util.formatDateTime(startDate, IndicoDateTimeFormats.Server),
                                                          Util.formatDateTime(endDate, IndicoDateTimeFormats.Server),

@@ -54,8 +54,8 @@ var Util = {
         } else if (typeof(obj) == 'object'){
             // handle datetime dictionaries
             // data comes from the server in %Y-%m-%d %H:%M:%S
-            m1 = obj.date.match(/(\d+)[-\/](\d+)[-\/](\d+)/);
-            m2 = obj.time.match(/(\d+):(\d+):(\d+)/);
+            m1 = obj.date.match(/(\d+)[\-\/](\d+)[\-\/](\d+)/);
+            m2 = obj.time.match(/(\d+):(\d+)(?:\:(\d+))?/);
         } else if (sourceFormat){
             // handle strings
 

@@ -36,6 +36,8 @@ from MaKaC.export import fileConverter
 from MaKaC.conference import Conference,Session,Contribution,SubContribution
 from MaKaC.i18n import _
 
+from MaKaC.common.logger import Logger
+
 class RHCustomizable( RH ):
 
     def __init__( self, req ):
@@ -316,6 +318,8 @@ class RHSubmitMaterialBase:
         fDict = self._file
         link = self._link
         resource = None
+
+        Logger.get('requestHandler').debug('Adding %s - request %s ' % (self._uploadType, id(self._callerRH._req)))
 
         if self._uploadType == "file":
             if len(errorList)==0:

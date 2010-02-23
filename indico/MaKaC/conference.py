@@ -11106,6 +11106,7 @@ class Material(Persistent):
         newRes.archive( self._getRepository() )
         self.__resources[newRes.getId()] = newRes
         self.notifyModification()
+        Logger.get('storage').debug("Finished storing resource %s for material %s" % (newRes.getId(), self.getLocator()))
 
     @Retrieves (['MaKaC.conference.Material',
                  'MaKaC.conference.Minutes',
