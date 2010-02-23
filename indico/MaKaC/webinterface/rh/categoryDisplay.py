@@ -66,9 +66,9 @@ class RHCategDisplayBase( base.RHDisplayBaseProtected ):
 
 class RHCategoryDisplay( RHCategDisplayBase ):
     _uh = urlHandlers.UHCategoryDisplay
-    
+
     def _process( self ):
-        
+
         wfReg = webFactoryRegistry.WebFactoryRegistry()
         p = category.WPCategoryDisplay( self, self._target, wfReg )
         return p.display()
@@ -76,14 +76,14 @@ class RHCategoryDisplay( RHCategDisplayBase ):
 
 class RHCategoryMap( RHCategDisplayBase ):
     _uh = urlHandlers.UHCategoryMap
-    
+
     def _process( self ):
         p = category.WPCategoryMap( self, self._target )
         return p.display()
 
 class RHCategoryStatistics( RHCategDisplayBase ):
     _uh = urlHandlers.UHCategoryStatistics
-    
+
     def _process( self ):
         wfReg = webFactoryRegistry.WebFactoryRegistry()
         stats = statistics.CategoryStatistics(self._target).getStatistics()
@@ -91,7 +91,7 @@ class RHCategoryStatistics( RHCategDisplayBase ):
         return p.display()
 
 class RHCategOverviewDisplay( RHCategDisplayBase ):
-    
+
     def _checkParams( self, params ):
         id = params.get("selCateg", "")
         if id != "" and not params.has_key("categId"):
@@ -114,21 +114,21 @@ class RHCategOverviewDisplay( RHCategDisplayBase ):
         else:
             self._cal = wcalendar.Overview( self._aw, sd, [self._target] )
         self._cal.setDetailLevel( params.get("detail", "conference") )
-    
+
     def _process( self ):
         p = category.WPCategOverview( self, self._target, self._cal )
         return p.display()
 
 class RHConferenceCreationBase( RHCategoryDisplay ):
-    
-    def _checkProtection( self ): 
+
+    def _checkProtection( self ):
         self._checkSessionUser()
         RHCategoryDisplay._checkProtection( self )
         if not self._target.isConferenceCreationRestricted():
             return
         if not self._target.canCreateConference( self._getUser() ):
             raise MaKaCError( _("You are not allowed to create conferences inside this category"))
-    
+
     def _checkParams( self, params, mustExist=1 ):
         RHCategoryDisplay._checkParams( self, params, mustExist )
         #if self._target.getSubCategoryList():
@@ -138,7 +138,7 @@ class RHConferenceCreationBase( RHCategoryDisplay ):
         et = params.get("event_type", "").strip()
         if et != "" and et !="default":
             self._wf = self._wfReg.getFactoryById( et )
-        
+
 
 #-------------------------------------------------------------------------------------
 
@@ -191,7 +191,7 @@ class RHConferencePerformCreation( RHConferenceCreationBase ):
             self._confirm = True
         return
 
-    def _process( self ):   
+    def _process( self ):
         params = self._getRequestParams()
         if params["title"]=="":
             params["title"]="No Title"
@@ -230,7 +230,7 @@ class RHConferencePerformCreation( RHConferenceCreationBase ):
                             lecture.addMaterial(mat)
                 c = lectures[0]
             self._redirect(urlHandlers.UHConferenceModification.getURL( c ) )
-        else :     
+        else :
             url = urlHandlers.UHCategoryDisplay.getURL(self._target)
             self._redirect(url)
 
@@ -247,7 +247,7 @@ class RHConferencePerformCreation( RHConferenceCreationBase ):
             else :
                 c.disableSessionSlots()
         return c
-            
+
     def _getPersons(self):
         avatars, newUsers = [], []
         from MaKaC.services.interface.rpc import json
@@ -308,23 +308,23 @@ _Date%s_
 _Access%s_
 %s """ % (i,c.getStartDate(), c.getEndDate(), i,urlHandlers.UHConferenceDisplay.getURL(c))
                 i+=1
-        
+
         msg = ("Content-Type: text/plain; charset=\"utf-8\"\r\nFrom: %s\r\nReturn-Path: %s\r\nTo: %s\r\nCc: \r\nSubject: %s\r\n\r\n"%(fromAddr, fromAddr, addrs, subject))
         msg = msg + text
-        maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }        
+        maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
         self._emailsToBeSent.append(maildata)
         # Category notification
         if conf.getOwner().getNotifyCreationList() != "":
             addrs2 = [ conf.getOwner().getNotifyCreationList() ]
             maildata2 = { "fromAddr": fromAddr, "toList": addrs2, "subject": subject, "body": text }
             self._emailsToBeSent.append(maildata2)
-        
-        
+
+
 class UtilPersons:
-        
+
     @staticmethod
-    def addToConf( avatars, newUsers, conf, grantManager): 
-        
+    def addToConf( avatars, newUsers, conf, grantManager):
+
         if newUsers :
             for newUser in newUsers:
                 person = ConferenceChair()
@@ -342,29 +342,29 @@ class UtilPersons:
                 else :
                     #self._errorList.append("%s has been already defined as %s of this conference"%(person.getFullName(),self._typeName))
                     pass
-        
+
         if avatars:
 
             for selected in avatars :
-                if isinstance(selected, user.Avatar) :                    
+                if isinstance(selected, user.Avatar) :
                     person = ConferenceChair()
                     person.setDataFromAvatar(selected)
                     if not UtilPersons._alreadyDefined(person):
                         #TODO: add to conf
                         UtilPersons._add(conf, person, grantManager)
-                    else :                        
+                    else :
                         #self._errorList.append("%s has been already defined as %s of this conference"%(person.getFullName(),self._typeName))
                         pass
-                        
-                #elif isinstance(selected, user.Group) : 
+
+                #elif isinstance(selected, user.Group) :
                 #    for member in selected.getMemberList() :
                 #        person = ConferenceChair()
                 #        person.setDataFromAvatar(member)
                 #        if not self._alreadyDefined(person, definedList) :
-                #            definedList.append([person,params.has_key("submissionControl")])            
+                #            definedList.append([person,params.has_key("submissionControl")])
                 #        else :
                 #            self._errorList.append("%s has been already defined as %s of this conference"%(presenter.getFullName(),self._typeName))
-        
+
     @staticmethod
     def _alreadyDefined(person):#, definedList):
         #if person is None :
@@ -441,7 +441,7 @@ class UtilsConference:
                 l = conference.CustomLocation()
                 c.setLocation( l )
             l.setName( confData["locationName"] )
-            l.setAddress( confData["locationAddress"] )
+            l.setAddress( confData.get("locationAddress","") )
 
         roomName = confData.get( "locationBookedRoom" )  or  confData.get( "roomName" )  or  ""
         if roomName.strip() == "":
@@ -471,7 +471,7 @@ class UtilsConference:
 
 
 class RHCategoryGetIcon(RHCategDisplayBase):
-    
+
     def _process(self):
         icon=self._target.getIcon()
         self._req.headers_out["Content-Length"]="%s"%icon.getSize()
@@ -500,7 +500,7 @@ class RHCategoryOpenService(base.RH):
         return self._processData()
 
 class RHCategoryToiCal(RHCategoryOpenService):
-    
+
     def _processData( self ):
         filename = "%s - Event.ics"%self._target.getName().replace("/","")
         data = ""
@@ -517,7 +517,7 @@ class RHCategoryToRSS(RHCategoryOpenService):
 
     def _getRSS( self, tz ):
         return CategoryToRSS(self._target,tz=tz).getBody()
-    
+
     def _processData( self ):
         data = ""
         tz = DisplayTZ(self._aw).getDisplayTZ()
@@ -528,11 +528,11 @@ class RHCategoryToRSS(RHCategoryOpenService):
         return data
 
 class RHTodayCategoryToRSS(RHCategoryToRSS):
-    
+
     def _getRSS( self, tz ):
         return CategoryToRSS(self._target, date=nowutc().astimezone(timezone(tz)), tz=tz).getBody()
-    
+
 
 def sortByStartDate(conf1,conf2):
-    return cmp(conf1.getStartDate(),conf2.getStartDate()) 
+    return cmp(conf1.getStartDate(),conf2.getStartDate())
 
