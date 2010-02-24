@@ -1,4 +1,4 @@
-<% from MaKaC.common.PickleJar import DictPickler %>
+<% from MaKaC.fossils.user import IAvatarDetailedFossil %>
 
     <% if ObjectType == "PluginType" :%>
     <form method="post" action="<%= urlHandlers.UHAdminPluginsTypeSaveOptions.getURL(Object, subtab = Index) %>" >
@@ -6,7 +6,7 @@
     <% else: %>
     <form method="post" action="<%= urlHandlers.UHAdminPluginsSaveOptions.getURL(Object, subtab = Index) %>" >
     <% end %>
-    
+
     <table>
         <% for option in Object.getOptionList(sorted = True, includeOnlyEditable = True, includeOnlyVisible = True): %>
         <tr>
@@ -20,11 +20,11 @@
                 <% else: %>
                     <% name = Object.getOwner().getName() + '.' + Object.getName() + "." + option.getName() %>
                 <% end %>
-                
+
                 <% if option.getType() == "users": %>
                     <div id="userList<%=name%>">
                     </div>
-                    
+
                     <script type="text/javascript">
                         var newPersonsHandler = function(userList, setResult) {
                             indicoRequest(
@@ -60,9 +60,9 @@
                                 }
                             );
                         }
-                        
+
                         var uf = new UserListField('PluginPeopleListDiv', 'PluginPeopleList',
-                                                   <%= jsonEncode(DictPickler.pickle(option.getValue())) %>,
+                                                   <%= jsonEncode(fossilize(option.getValue(), IAvatarDetailedFossil)) %>,
                                                    null,
                                                    <%=jsonEncode(Favorites)%>,
                                                    true, false, false,
@@ -129,7 +129,7 @@
                     <% else: %>
                         <% value = str(option.getValue()) %>
                     <% end %>
-                                    
+
                     <% if option.getType() == bool: %>
                         <% checked = '' %>
                         <% if option.getValue(): %>
@@ -140,7 +140,7 @@
                     <% else: %>
                     <input name="<%= name %>" type="text" size="50" value="<%= value %>">
                     <% end %>
-                    
+
                     <% if option.hasActions(): %>
                         <% for action in option.getActions(): %>
                             <input type="submit" name="<%= 'action.' + Object.getType() + '.' + Object.getName() + "." + action.getName() %>" value="<%= action.getButtonText() %>" />
@@ -168,7 +168,7 @@
             <% end %>
         </tr>
         <% end %>
-        
+
         <% for option in Object.getOptionList(sorted = True, includeOnlyNonEditable = True, includeOnlyVisible = True): %>
         <tr>
             <td style="text-align: right; vertical-align:top; padding-right: 10px;width: 50%%;">
@@ -184,7 +184,7 @@
             </td>
         </tr>
         <% end %>
-        
+
         <% if Object.hasAnyActions(includeOnlyNonAssociated = True): %>
         <tr>
             <td style="text-align: right; white-space: nowrap;padding-right: 10px;">

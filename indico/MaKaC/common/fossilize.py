@@ -34,6 +34,9 @@ class NonFossilizableException(Exception):
 class WrongFossilTypeException(Exception):
     pass
 
+class InvalidFossilException(Exception):
+    pass
+
 class IFossil(zope.interface.Interface):
     """
     Fossil base interface. All fossil classes should derive from this one.
@@ -45,13 +48,15 @@ class Fossilizable(object):
     Base class for all the objects that can be fossilized
     """
 
-    __nameRE = re.compile('^get(.*)$')
+    __fossilNameRE = re.compile('^I(.*)Fossil$')
+    __methodNameRE = re.compile('^get(.*)$')
+
 
     @classmethod
     def __extractName(cls, name):
         """ 'De-camelcase' the name """
 
-        m = cls.__nameRE.match(name)
+        m = cls.__methodNameRE.match(name)
 
         if not m:
             raise Exception("method name '%s' is not valid! has to start by 'get' or use 'name' tag" % name)
@@ -64,7 +69,7 @@ class Fossilizable(object):
         if type(obj) == list:
             return map(lambda elem: cls.__fossilizeIterable(elem, interface, **kwargs), obj)
         elif type(obj) == dict:
-            return dict((k,cls.__fossilizeIterable(v, interface, **kwargs)) for k,v in obj.iteritems())
+            return dict((k, cls.__fossilizeIterable(v, interface, **kwargs)) for k,v in obj.iteritems())
         else:
             return obj.fossilize(interface, **kwargs)
 
@@ -78,6 +83,10 @@ class Fossilizable(object):
 
         if not interface.providedBy(self):
             raise WrongFossilTypeException("Interface '%s' not provided by '%s'" % (interface.__name__, self.__class__.__name__))
+
+        fossilNameMatch = Fossilizable.__fossilNameRE.match(interface.getName())
+        if fossilNameMatch is None:
+            raise InvalidFossilException("Invalid fossil name: %s. A fossil name should follow the pattern: I******Fossil." % interface.getName())
 
         result = {}
 
@@ -107,6 +116,16 @@ class Fossilizable(object):
 
             result[attrName] = methodResult
 
+        if "_type" in result or "_fossil" in result:
+            raise InvalidFossilException('"_type" or "_fossil" cannot be a fossil attribute name')
+        else:
+            result["_type"] = self.__class__.__name__
+            innerFossilName = fossilNameMatch.group(1)
+            if innerFossilName: #we check that it's not an empty string
+                result["_fossil"] = innerFossilName[0].lower() + innerFossilName[1:]
+            else:
+                result["_fossil"] = ""
+
         return result
 
 def fossilize(target, interface, **kwargs):
@@ -127,7 +146,7 @@ def fossilize(target, interface, **kwargs):
         elif t in [list, set]:
             return map(lambda elem: fossilize(elem, interface, **kwargs), target)
         elif t is dict:
-            return dict((k, fossilize(v, interface, **kwargs)) for k,v in target.iteritems())
+            return dict((k, fossilize(v, interface, **kwargs)) for k, v in target.iteritems())
         else:
             raise NonFossilizableException()
 

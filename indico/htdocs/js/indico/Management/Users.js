@@ -505,9 +505,7 @@ type("UserListField", ["IWidget"], {
                     var newUserIds = getSelectedItems(self.userSelectPopup.selectList);
                     each(newUserIds, function(newUserId) {
                         var newUser = self.allOptions.get(newUserId).clone();
-                        if (self.userList.get("existingAv"+newUserId)) {
-                            self.userList.set("existingAv"+newUserId, null);
-                        }
+
                         self.newProcess([newUser], function(result) {
                             if (result) {
                                 self.userList.set("existingAv"+newUserId, newUser);
@@ -569,7 +567,7 @@ type("UserListField", ["IWidget"], {
          var self = this;
 
          each(initialUsers, function(user){
-             if (any(user.isAvatar, false)) {
+             if (any(user._type, null) === 'Avatar') {
                  self.userList.set('existingAv' + user.id, $O(user));
              } else {
                  self.userList.set(user.id, $O(user));

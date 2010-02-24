@@ -1,8 +1,25 @@
-from MaKaC.services.implementation.base import ProtectedDisplayService
+# -*- coding: utf-8 -*-
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 from MaKaC.services.implementation.base import LoggedOnlyService, ProtectedService
 from MaKaC.services.implementation.base import ServiceBase
 
-import MaKaC.conference as conference
 import MaKaC.user as user
 from MaKaC.services.interface.rpc.common import ServiceError
 
@@ -10,13 +27,16 @@ from MaKaC.common.PickleJar import DictPickler
 from MaKaC.common import info
 
 import time
+from MaKaC.fossils.user import IAvatarAllDetailsFossil, IAvatarDetailedFossil,\
+    IAvatarMinimalFossil
+from MaKaC.common.fossilize import fossilize
 
 class UserListEvents(LoggedOnlyService):
 
     def _checkParams(self):
         LoggedOnlyService._checkParams(self)
 
-        self._time = self._params.get('time',None)
+        self._time = self._params.get('time', None)
         self._target = self.getAW().getUser()
 
     def __exportElemDataFactory(self, moment):
@@ -59,9 +79,11 @@ class UserListEvents(LoggedOnlyService):
             else:
                 jsonData[event['id']] = event
 
-        return jsonData;
+        return jsonData
+
 
 class UserAddToBasket(LoggedOnlyService):
+
     def _checkParams(self):
         LoggedOnlyService._checkParams(self)
 
@@ -82,8 +104,9 @@ class UserAddToBasket(LoggedOnlyService):
             raise ServiceError("ERR-U0","No users specified!")
 
         for user in self._userList:
-            if (not self._target.getPersonalInfo().getBasket().addElement(user)):
-                raise ServiceError("ERR-U1","Element already exists in list!")
+            #we do not care if the user is already in the favourites
+            self._target.getPersonalInfo().getBasket().addElement(user)
+
 
 class UserRemoveFromBasket(LoggedOnlyService):
     def _checkParams(self):
@@ -100,10 +123,10 @@ class UserRemoveFromBasket(LoggedOnlyService):
 
             if (self._obj == None):
                 raise ServiceError("ERR-U0","User does not exist!")
-            if (self._target.getPersonalInfo().getBasket().deleteElement(self._obj)):
-                return
-            else:
-                raise ServiceError("ERR-U2","Element not in list!")
+
+            #we do not care if the user is already out of the favourites
+            self._target.getPersonalInfo().getBasket().deleteElement(self._obj)
+
 
 class UserListBasket(ProtectedService):
 
@@ -116,12 +139,21 @@ class UserListBasket(ProtectedService):
         ProtectedService._checkParams(self)
 
         self._target = self.getAW().getUser()
+        self._detailLevel = self._params.get("detailLevel", "max")
 
     def _getAnswer( self):
 
         if self._target:
             users = self._target.getPersonalInfo().getBasket().getUsers().values()
-            return DictPickler.pickle(users)
+
+            if self._detailLevel == "min":
+                fossilToUse = IAvatarMinimalFossil
+            elif self._detailLevel == "medium":
+                fossilToUse = IAvatarDetailedFossil
+            elif self._detailLevel == "max":
+                fossilToUse = IAvatarAllDetailsFossil
+
+            return fossilize(users, fossilToUse)
         else:
             return None
 
@@ -137,6 +169,7 @@ class UserGetPersonalInfo(LoggedOnlyService):
     def _getAnswer( self):
         return DictPickler.pickle(self._target.getPersonalInfo())
 
+
 class UserGetEmail(LoggedOnlyService):
 
     def _checkParams(self):
@@ -150,13 +183,14 @@ class UserGetEmail(LoggedOnlyService):
         else:
             raise ServiceError("ERR-U4","User is not logged in")
 
+
 class UserSetPersonalInfo(LoggedOnlyService):
 
     def _checkParams(self):
         LoggedOnlyService._checkParams(self)
 
         self._target = self.getAW().getUser()
-        self._info = self._params.get("value",None)
+        self._info = self._params.get("value", None)
 
     def _getAnswer( self):
 
@@ -168,6 +202,7 @@ class UserSetPersonalInfo(LoggedOnlyService):
         DictPickler.update(pInfo, self._info)
         return DictPickler.pickle(pInfo)
 
+
 class UserGetTimezone(ServiceBase):
 
     def _getAnswer(self):
@@ -177,11 +212,13 @@ class UserGetTimezone(ServiceBase):
             tz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
         return tz
 
+
 class UserGetSessionTimezone(ServiceBase):
 
     def _getAnswer(self):
         tz = self.getAW().getSession().getVar("ActiveTimezone")
         return tz
+
 
 class UserGetSessionLanguage(ServiceBase):
 
@@ -191,6 +228,7 @@ class UserGetSessionLanguage(ServiceBase):
         else:
             minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
             return minfo.getLang()
+
 
 methodMap = {
     "event.list": UserListEvents,
