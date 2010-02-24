@@ -2,7 +2,7 @@
 <!--
 Room Calendar is composed of day rows ( RoomBookingRoomCalendar*DayRow* )
 Day row is composed of of bars, showing particular reservations ( RoomBookingRoomCalendar*Bar* )
-Calendar 1-----* DayRow 1-----* Bar 
+Calendar 1-----* DayRow 1-----* Bar
 -->
 
 <!-- Conflicts - Textual ============================================================ -->
@@ -11,7 +11,7 @@ Calendar 1-----* DayRow 1-----* Bar
     <span class="formTitle" style="border-bottom-width: 0px">Conflicts</span><br /><br />
     <p style="margin-left: 10px;">
         <% if thereAreConflicts: %>
-            <span style="color: Red; font-weight: bold;"><%= conflictsNumber %>  <%= _("conflict(s) with other bookings")%></span><br /><br />
+            <span style="color: Red; font-weight: bold;"><%= conflictsNumber %>&nbsp;<%= _("conflict(s) with other bookings")%></span><br /><br />
             <% includeTpl( 'RoomBookingConflicts' ) %>
         <% end %>
         <% if not thereAreConflicts: %>
@@ -80,8 +80,8 @@ cross-browser way to position relatively to parent element.
                     if ( barDiv.id.indexOf( 'barDiv' ) == -1 )
                         continue;
                     // Get parent position
-                    dayDiv = barDiv.parentNode 
-                    dayPos = findPos( dayDiv ) 
+                    dayDiv = barDiv.parentNode
+                    dayPos = findPos( dayDiv )
                     dayX = dayPos[0]
                     dayY = dayPos[1]
                     // Set div position
