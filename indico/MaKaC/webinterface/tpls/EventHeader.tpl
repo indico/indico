@@ -82,7 +82,8 @@ except NameError:
             <% includeTpl('HeaderMoreMenu', viewoptions = viewoptions, \
                 SelectedStyle = SelectedStyle, pdfURL=pdfURL, \
                 showExportToICal=showExportToICal, showExportToPDF=showExportToPDF, \
-                showDLMaterial=showDLMaterial, showLayout=showLayout) %>
+                showDLMaterial=showDLMaterial, showLayout=showLayout, \
+                displayURL=displayURL) %>
 		<% end %>
 
         <div class="separator"></div>

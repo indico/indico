@@ -209,6 +209,7 @@ class RHSubmitMaterialBase:
     def __init__(self, target, rh = None):
         self._target=target
         self._callerRH = rh
+        self._repositoryId = None
 
     def _getNewTempFile( self ):
         cfg = Config.getInstance()
@@ -333,14 +334,15 @@ class RHSubmitMaterialBase:
                     resource.setName(resource.getFileName())
                     resource.setFilePath(fDict["filePath"])
                     resource.setDescription(self._description)
-                    mat.addResource(resource)
+                    mat.addResource(resource, forcedFileId=self._repositoryId)
                     #apply conversion
                     if self._topdf and fileConverter.CDSConvFileConverter.hasAvailableConversionsFor(os.path.splitext(resource.getFileName())[1].strip().lower()):
                         fileConverter.CDSConvFileConverter.convert(resource.getFilePath(), "pdf", mat)
                     if not type(self._target) is Category:
                         self._target.getConference().getLogHandler().logAction({"subject":"Added file %s%s" % (fDict["fileName"],text)},"Files",user)
-                    # in case of db conflict we do not want to send the file to conversion again
+                    # in case of db conflict we do not want to send the file to conversion again, nor re-store the file
                     self._topdf = False
+                    self._repositoryId = resource.getRepositoryId()
 
             if len(errorList) > 0:
                 status = "ERROR"

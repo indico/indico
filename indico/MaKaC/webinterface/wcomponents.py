@@ -442,6 +442,7 @@ class WConferenceHeader( WHeader ):
         vars["viewoptions"] = []
         vars["SelectedStyle"] = ""
         vars["pdfURL"] = ""
+        vars["displayURL"] = ""
 
         # Setting the buttons that will be displayed in the header menu
         vars["showFilterButton"] = False
@@ -609,6 +610,7 @@ class WMenuMeetingHeader( WConferenceHeader ):
                 viewoptions.append({"id": stylesheet, "name": styleMgr.getStylesheetName(stylesheet) })
         vars["viewoptions"] = viewoptions
         vars["SelectedStyle"] = styleMgr.getStylesheetName(vars["currentView"])
+        vars["displayURL"] = urlHandlers.UHConferenceDisplay.getURL(self._rh._conf)
 
         # Setting the buttons that will be displayed in the header menu
         vars["showFilterButton"] = True
@@ -687,6 +689,9 @@ class WMenuMeetingHeader( WConferenceHeader ):
         urlCustPDF=urlHandlers.UHConfTimeTableCustomizePDF.getURL(self._conf)
         urlCustPDF.addParam("showDays", vars.get("selectedDate", "all"))
         urlCustPDF.addParam("showSessions", vars.get("selectedSession", "all"))
+        # Add the view as a parameter to keep track of the current layout
+        # when exporting a pdf
+        urlCustPDF.addParam("view", vars["currentView"])
         vars["pdfURL"]=str(urlCustPDF)
 
 
