@@ -10,7 +10,7 @@
             </td>
             <td>
                 <span class="WRNoteText">
-                    <%=_("In order to send a Webcast request, you need to select a room capable of webcasting. ")%> 
+                    <%=_("In order to send a Webcast request, you need to select a room capable of webcasting. ")%>
                     <span class='fakeLink' onclick='toggleWebcastCapableRooms();' id="webcastRoomsText"><%=_("See list of webcast-able rooms")%></span>
                 </span>
             </td>
@@ -47,7 +47,7 @@
     <div>
         <span class="WRNoteTitle"><%=_("Note:")%></span>
         <span class="WRNoteText">
-            <%=_("In order to send a webcastrequest you need to select a room capable of webcasting. However there are not currently marked as capable in the database.")%> 
+            <%=_("In order to send a Webcast Request you need to select a room capable of webcasting. However there are not currently marked as capable in the database.")%>
         </span>
     </div>
     <% end %>
@@ -81,9 +81,9 @@
         </div>
     </div>
     <% end %>
-    
-    
-    
+
+
+
     <!-- DRAW BOX AROUND SECTION 1: SELECT CONTRIBUTIONS -->
 <% if not IsLecture: %>
     <div class="WRFormSection" id="contributionselectionDiv">
@@ -147,22 +147,22 @@
                         <% end %>
                         <% else:%>
                         <label for="chooseTalksRB" id="chooseTalksRBLabel"><%=_("Choose among webcast-able talks.")%></label>
-                        <% end %>    
+                        <% end %>
                     </td>
-                </tr>                    
+                </tr>
             </table>
         </div>
-        
+
         <% displayText = ('none', 'block')[DisplayTalks and InitialChoose] %>
         <div id="contributionsDiv" class="WRFormSubsection" style="display: <%= displayText %>;">
             <span class="WRQuestion"><%=_("Please choose among the webcast-able contributions below:")%></span>
-            
+
             <% if HasWebcastCapableTalks: %>
             <span class="fakeLink" style="margin-left: 20px;" onclick="WRSelectAllContributions()">Select all</span>
             <span class="horizontalSeparator">|</span>
             <span class="fakeLink" onclick="WRUnselectAllContributions()">Select none</span>
             <% end %>
-            
+
             <div class="WRContributionListDiv">
                 <ul class="WROptionList" id="contributionList">
                 </ul>
@@ -174,7 +174,7 @@
         </div>
     </div>
 <% end %>
-    
+
     <div class="WRFormSection">
         <div class="WRFormSubsection">
         <span class="WRQuestion"><%=_("Have all the speakers given permission to have their talks webcasted?")%></span>
@@ -186,7 +186,7 @@
         <span style="margin-left: 2em;"><%=_("Here is the ")%><a href="<%= ConsentFormURL %>"><%=_("Webcast Consent Form")%></a> <%=_("to be signed by each speaker.")%></span>
         </div>
     </div>
-    
+
     <!-- DRAW BOX AROUND SECTION 2: TECHNICAL DETAILS FOR WEBCAST -->
     <div class="WRFormSection">
         <!-- SLIDES? CHALKBOARD? -->
@@ -200,7 +200,7 @@
                 <% end %>
             </select>
         </div>
-        
+
         <!-- WHAT TYPE OF TALK IS IT -->
         <div class="WRFormSubsection">
             <span class="WRQuestion"><%=_("What type of event is it?")%></span>
@@ -212,7 +212,7 @@
                 <% end %>
             </select>
         </div>
-    
+
         <!-- HOW URGENTLY IS POSTING NEEDED -->
         <div class="WRFormSubsection">
             <span class="WRQuestion"><%=_("All webcasts are recorded. How soon do you need your recording posted online afterwards?")%></span>
@@ -224,30 +224,30 @@
                 <% end %>
             </select>
         </div>
-    
+
        <!-- HOW MANY WEBCAST VIEWERS -->
         <div class="WRFormSubsection">
             <span class="WRQuestion"><%=_("How many people do you expect to view the realtime webcast?")%></span>
             <br />
             <input type="text" size="20" name="numWebcastViewers" value="" />
         </div>
-    
+
         <!-- HOW MANY REMOTE VIEWERS -->
         <div class="WRFormSubsection">
             <span class="WRQuestion"><%=_("How many people do you expect to view the online recordings afterward?")%></span>
             <br />
             <input type="text" size="20" name="numRecordingViewers" value="" />
         </div>
-    
+
         <!-- HOW MANY ATTENDEES -->
         <div class="WRFormSubsection">
             <span class="WRQuestion"><%=_("How many people do you expect to attend the event in person?")%></span>
             <br />
             <input type="text" size="20" name="numAttendees" value="" />
         </div>
-    
+
     </div>
-    
+
     <!-- DRAW BOX AROUND SECTION 3: METADATA AND SURVEY INFO -->
     <div class="WRFormSection">
         <!-- PURPOSE OF WEBCAST -->
@@ -287,7 +287,7 @@
             </ul>
         </div>
     </div>
-    
+
     <!-- SECTION 4: Extra comments -->
     <div class="WRFormSection">
         <div class="WRFormSubsection">
@@ -295,8 +295,8 @@
             <textarea rows="10" cols="60" name="otherComments" style="display:block;"></textarea>
         </div>
     </div>
-    
-    
+
+
     <% if IsSingleBooking: %>
     <div style="margin-top: 1em;">
         <div id="sendWebcastRequestBottom" style="display:none;">
@@ -320,7 +320,7 @@
     var WRWebcastCapable = <%= jsBoolean(WebcastCapable) %>;
 
     var WR_contributions = <%= jsonEncode(Contributions) %>;
-    
+
     var WR_contributionsLoaded = <%= jsBoolean(DisplayTalks or not HasWebcastCapableTalks) %>;
 </script>
 
@@ -329,7 +329,7 @@
     var webcastSwitch = false;
     var toggleWebcastCapableRooms = function () {
         IndicoUI.Effect.toggleAppearance($E('webcastCapableRoomsDiv'));
-        if (webcastSwitch) { 
+        if (webcastSwitch) {
             $E("webcastRoomsText").dom.innerHTML = $T("See list of webcast-able rooms.");
         } else {
             $E("webcastRoomsText").dom.innerHTML = $T("Hide list of webcast-able rooms.");

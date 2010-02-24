@@ -22,10 +22,9 @@ from MaKaC.webinterface.mail import GenericNotification
 
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
-from MaKaC.plugins.Collaboration.RecordingRequest.common import typeOfEvents,\
-    postingUrgency, recordingPurpose, intendedAudience, subjectMatter, lectureOptions,\
+from MaKaC.plugins.Collaboration.RecordingRequest.common import typeOfEvents, \
+    postingUrgency, recordingPurpose, intendedAudience, subjectMatter, lectureOptions, \
     getTalks
-from MaKaC.webinterface import urlHandlers
 
 
 class RecordingRequestNotificationBase(GenericNotification):
@@ -33,19 +32,20 @@ class RecordingRequestNotificationBase(GenericNotification):
     """
     def __init__(self, booking):
         GenericNotification.__init__(self)
-        
+
         self._booking = booking
         self._bp = booking._bookingParams
         self._conference = booking.getConference()
-        
+        self._isLecture = self._conference.getType() == 'simple_event'
+
         self._modifLink = str(booking.getModificationURL())
-        
+
         self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
         self.setContentType("text/html")
-            
+
     def _getRequestDetails(self, typeOfMail):
         bp = self._bp
-        
+
         return """
 Request details:<br />
 <table style="border-spacing: 10px 10px;">
@@ -164,70 +164,81 @@ Request details:<br />
         </td>
     </tr>
 </table>
-"""%(self._booking.getId(),
-     MailTools.bookingCreationDate(self._booking),
-     MailTools.bookingModificationDate(self._booking, typeOfMail),
-     self._getTalksShortMessage(),
-     self._getTalkSelectionComments(),
-     bp["permission"],
-     dict(lectureOptions)[bp["lectureOptions"]],
-     dict(typeOfEvents)[bp['lectureStyle']],
-     dict(postingUrgency)[bp['postingUrgency']],
-     bp['numRemoteViewers'],
-     bp['numAttendees'],
-     self._getPurposes(),
-     self._getAudiences(),
-     self._getMatters(),
-     self._getComments(),
-     self._getTalks()
-     )
-        
+""" % (self._booking.getId(),
+       MailTools.bookingCreationDate(self._booking),
+       MailTools.bookingModificationDate(self._booking, typeOfMail),
+       self._getTalksShortMessage(),
+       self._getTalkSelectionComments(),
+       bp["permission"],
+       dict(lectureOptions)[bp["lectureOptions"]],
+       dict(typeOfEvents)[bp['lectureStyle']],
+       dict(postingUrgency)[bp['postingUrgency']],
+       bp['numRemoteViewers'],
+       bp['numAttendees'],
+       self._getPurposes(),
+       self._getAudiences(),
+       self._getMatters(),
+       self._getComments(),
+       self._getTalks())
+
     def _getTalks(self):
-        #"all" "choose" "neither"
-        if self._bp["talks"] == "all":
-            text = ["""The user chose "All Talks". List of talks:"""]
-            allTalks = getTalks(self._conference)
-            if allTalks:
-                text.extend(MailTools.talkListText(self._conference, allTalks))
-                text.append("<strong>Important note:</strong> room is only shown if different from event.")
-            else:
-                text.append("(This event has no talks)")
-            return "<br />".join(text)
-            
-        elif self._bp["talks"] == "neither":
-            return """Please see the talk selection comments"""
-        
+        if self._isLecture:
+            return """(This event is a lecture. Therefore, it has no talks)"""
+
         else:
-            text = ["""The user chose the following talks:"""]
-            selectedTalks = [self._conference.getContributionById(id) for id in self._bp["talkSelection"]]
-            if selectedTalks:
-                text.extend(MailTools.talkListText(self._conference, selectedTalks))
-                text.append("<strong>Important note:</strong> room is only shown if different from event.")
+            #"all" "choose" "neither"
+            if self._bp["talks"] == "all":
+                text = ["""The user chose "All Talks". List of talks:"""]
+                allTalks = getTalks(self._conference)
+                if allTalks:
+                    text.extend(MailTools.talkListText(self._conference, allTalks))
+                    text.append("<strong>Important note:</strong> room is only shown if different from event.")
+                else:
+                    text.append("(This event has no talks)")
+                return "<br />".join(text)
+
+            elif self._bp["talks"] == "neither":
+                return """Please see the talk selection comments"""
+
             else:
-                text.append("(User did not choose any talks)")
-            
-            return "<br />".join(text)
-                
+                text = ["""The user chose the following talks:"""]
+                selectedTalks = [self._conference.getContributionById(contribId) for contribId in self._bp["talkSelection"]]
+                if selectedTalks:
+                    text.extend(MailTools.talkListText(self._conference, selectedTalks))
+                    text.append("<strong>Important note:</strong> room is only shown if different from event.")
+                else:
+                    text.append("(User did not choose any talks)")
+
+                return "<br />".join(text)
+
     def _getTalksShortMessage(self):
-        if self._bp["talks"] == "all":
-            return """The user chose "All Talks". The list of all talks can be found at the end of this e-mail."""
-        elif self._bp["talks"] == "neither":
-            return """Please see the talk selection comments"""
+        if self._isLecture:
+            return """(This event is a lecture. Therefore, it has no talks)"""
         else:
-            return """The user chose "Choose talks". The list of chosen talks can be found at the end of this e-mail."""
-        
+            if self._bp["talks"] == "all":
+                return """The user chose "All Talks". The list of all talks can be found at the end of this e-mail."""
+            elif self._bp["talks"] == "neither":
+                return """Please see the talk selection comments"""
+            else:
+                return """The user chose "Choose talks". The list of chosen talks can be found at the end of this e-mail."""
+
     def _getTalkSelectionComments(self):
-        comments = self._bp["talkSelectionComments"].strip()
-        if comments:
-            return comments
-        return "(User didn't write any comments)"
-    
+        if self._isLecture:
+            return """(This event is a lecture. Therefore, it has no talk selection comments)"""
+        else:
+            comments = None
+            if self._bp["talkSelectionComments"]:
+                comments = self._bp["talkSelectionComments"].strip()
+            if comments:
+                return comments
+            return "(User didn't write any comments)"
+
     def _getComments(self):
         comments = self._bp["otherComments"].strip()
         if comments:
             return comments
-        return "(User didn't write any comments)" 
-        
+        return "(User didn't write any comments)"
+
     def _getLectureOptions(self):
         options = self._bp['lectureOptions']
         lodict = dict(lectureOptions)
@@ -235,7 +246,7 @@ Request details:<br />
             return MailTools.listToStr([lodict[k] for k in options])
         else:
             return "No lecture options were selected"
-        
+
     def _getPurposes(self):
         purposes = self._bp['recordingPurpose']
         rpdict = dict(recordingPurpose)
@@ -243,7 +254,7 @@ Request details:<br />
             return MailTools.listToStr([rpdict[k] for k in purposes])
         else:
             return "No purposes were selected"
-        
+
     def _getAudiences(self):
         audiences = self._bp['intendedAudience']
         iadict = dict(intendedAudience)
@@ -251,7 +262,7 @@ Request details:<br />
             return MailTools.listToStr([iadict[k] for k in audiences])
         else:
             return "No audiences were selected"
-        
+
     def _getMatters(self):
         matters = self._bp['subjectMatter']
         smdict = dict(subjectMatter)
@@ -281,13 +292,13 @@ class RecordingRequestManagerNotificationBase(RecordingRequestNotificationBase):
 class NewRequestNotification(RecordingRequestAdminNotificationBase):
     """ Template to build an email notification to the recording responsible
     """
-    
+
     def __init__(self, booking):
         RecordingRequestAdminNotificationBase.__init__(self, booking)
-        
+
         self.setSubject("""[RecReq] New recording request: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
-        
+
         self.setBody("""Dear Recording Responsible,<br />
 <br />
 There is a <strong>new recording request</strong> in <a href="%s">%s</a><br />
@@ -306,19 +317,19 @@ Click <a href="%s">here</a> to accept or reject the request.<br />
         MailTools.eventDetails(self._conference),
         self._getRequestDetails('new')
         ))
-        
-        
-        
+
+
+
 class RequestModifiedNotification(RecordingRequestAdminNotificationBase):
     """ Template to build an email notification to the recording responsible
     """
-    
+
     def __init__(self, booking):
         RecordingRequestAdminNotificationBase.__init__(self, booking)
-        
+
         self.setSubject("""[RecReq] Recording request modified: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
-        
+
         self.setBody("""Dear Recording Responsible,<br />
 <br />
 A recording request <strong>has been modified</strong> in <a href="%s">%s</a><br />
@@ -337,19 +348,19 @@ Click <a href="%s">here</a> to accept or reject the request.<br />
         MailTools.organizerDetails(self._conference),
         self._getRequestDetails('modify')
         ))
-        
-        
-        
+
+
+
 class RequestDeletedNotification(RecordingRequestAdminNotificationBase):
     """ Template to build an email notification to the recording responsible
     """
-    
+
     def __init__(self, booking):
         RecordingRequestAdminNotificationBase.__init__(self, booking)
-        
+
         self.setSubject("""[RecReq] Recording request withdrawn: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
-        
+
         self.setBody("""Dear Recording Responsible,<br />
 <br />
 A recording request <strong>has been withdrawn</strong> in <a href="%s">%s</a><br />
@@ -366,18 +377,18 @@ A recording request <strong>has been withdrawn</strong> in <a href="%s">%s</a><b
         MailTools.organizerDetails(self._conference),
         self._getRequestDetails('remove')
         ))
-        
+
 class RequestAcceptedNotification(RecordingRequestManagerNotificationBase):
     """ Template to build an email notification to the event managers
         when a request gets accepted.
     """
-    
+
     def __init__(self, booking):
         RecordingRequestManagerNotificationBase.__init__(self, booking)
-        
+
         self.setSubject("""[Indico] Recording request accepted: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
-        
+
         self.setBody("""Dear Event Manager,<br />
 <br />
 Your recording request for the event: "%s" has been accepted.<br />
@@ -389,17 +400,17 @@ Recording Responsibles
 """ % ( self._conference.getTitle(),
         self._modifLink
       ))
-        
+
 class RequestAcceptedNotificationAdmin(RecordingRequestAdminNotificationBase):
     """ Template to build an email notification to the admins when a request gets accepted
     """
-    
+
     def __init__(self, booking):
         RecordingRequestAdminNotificationBase.__init__(self, booking)
-        
+
         self.setSubject("""[RecReq] Recording request accepted: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
-        
+
         self.setBody("""Dear Recording Responsible,<br />
 <br />
 A recording request for the event: "%s" has been accepted in <a href="%s">%s</a><br />
@@ -417,11 +428,11 @@ class RequestRejectedNotification(RecordingRequestManagerNotificationBase):
         when a request gets accepted.
     """
 
-    
+
     def __init__(self, booking):
 
         RecordingRequestManagerNotificationBase.__init__(self, booking)
-        
+
         self.setSubject("""[Indico] Recording request rejected: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         self.setBody("""Dear Event Manager,<br /><br />
@@ -439,17 +450,17 @@ Recording Responsibles
         self._modifLink,
         self._booking.getRejectReason().strip()
         ))
-        
+
 class RequestRejectedNotificationAdmin(RecordingRequestAdminNotificationBase):
     """ Template to build an email notification to the admins when a request gets accepted
     """
-    
+
     def __init__(self, booking):
         RecordingRequestAdminNotificationBase.__init__(self, booking)
-        
+
         self.setSubject("""[RecReq] Recording request rejected: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
-        
+
         self.setBody("""Dear Recording Responsible,<br />
 <br />
 A recording request for the event: "%s" has been rejected in <a href="%s">%s</a><br />
