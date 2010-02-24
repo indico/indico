@@ -11688,7 +11688,7 @@ class Resource(Persistent):
     def getDescription( self ):
         return self.description
 
-    def archive( self, repository=None ):
+    def archive( self, repository=None, forcedFileId=None ):
         """performs necessary operations to ensure the archiving of the
             resource. By default is doing nothing as the persistence of the
             system already ensures the archiving of the basic resource data"""

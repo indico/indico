@@ -160,15 +160,21 @@ class MaterialLocalRepository(Persistent):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         volume = minfo.getArchivingVolume()
         destPath = os.path.join( self.__getRepositoryPath(), volume, interPath, id )
-        os.makedirs( destPath )
+
+        if forcedFileId == None:
+            os.makedirs( destPath )
+
         destPath = os.path.join( destPath, newFile.getFileName() )
         relativePath = os.path.join( volume, interPath, id, newFile.getFileName())
-        try:
-            shutil.copyfile( newFile.getFilePath(), destPath )
-            self.__files[id] = relativePath
-            newFile.setArchivedId( self, id )
-        except IOError, e:
-            raise Exception( _("Couldn't archive file %s to %s")%( newFile.getFilePath(), destPath ) )
+
+        if forcedFileId == None:
+            try:
+                shutil.copyfile( newFile.getFilePath(), destPath )
+            except IOError, e:
+                raise Exception( _("Couldn't archive file %s to %s")%( newFile.getFilePath(), destPath ) )
+
+        self.__files[id] = relativePath
+        newFile.setArchivedId( self, id )
 
         Logger.get('storage').info("stored resource %s (%s) at %s" % (id, newFile.getFileName(), os.path.join(volume, interPath)))
 
