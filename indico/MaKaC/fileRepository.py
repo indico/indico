@@ -112,7 +112,7 @@ class MaterialLocalRepository(Persistent):
     def getFilePath( self, id ):
         return self.__getFilePath(id)
 
-    def storeFile( self, newFile ):
+    def storeFile( self, newFile, forcedFileId=None ):
         #this id generation can cause concurrency problems as it is not writen
         #   till the transaction is comited which could make that if the copying
         #   of the file to the archive is long two or more clients have the
@@ -120,7 +120,12 @@ class MaterialLocalRepository(Persistent):
         #   will have modify the counter so the DB will raise a read conflict
         #   for the one who commits later, but at least it will prevent from
         #   having 2 files with the same id
-        id = self.__getNewFileId()
+
+        if forcedFileId:
+            id = forcedFileId
+        else:
+            id = self.__getNewFileId()
+
         cat = newFile.getCategory()
         #raise "%s"%cat
         if cat:
@@ -269,7 +274,7 @@ class LocalRepository(Persistent):
         return os.path.join( self.__getRepositoryPath(), id, os.path.split(self.__files[id])[1] )
     
 
-    def storeFile( self, newFile ):
+    def storeFile( self, newFile, forcedFileId=None ):
         #this id generation can cause concurrency problems as it is not writen
         #   till the transaction is comited which could make that if the copying
         #   of the file to the archive is long two or more clients have the
@@ -277,7 +282,10 @@ class LocalRepository(Persistent):
         #   will have modify the counter so the DB will raise a read conflict
         #   for the one who commits later, but at least it will prevent from
         #   having 2 files with the same id
-        id = self.__getNewFileId()
+        if forcedFileId:
+            id = forcedFileId
+        else:
+            id = self.__getNewFileId()
         destPath = os.path.join( self.__getRepositoryPath(), id )
         #if not os.access( destPath, os.F_OK ):
         os.makedirs( destPath )

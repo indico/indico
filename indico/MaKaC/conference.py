@@ -11100,10 +11100,10 @@ class Material(Persistent):
                 return True
         return False
 
-    def addResource( self, newRes ):
+    def addResource( self, newRes, forcedFileId=None ):
         newRes.setOwner( self )
         newRes.setId( str( self.__resourcesIdGen.newCount() ) )
-        newRes.archive( self._getRepository() )
+        newRes.archive( self._getRepository(), forcedFileId=forcedFileId )
         self.__resources[newRes.getId()] = newRes
         self.notifyModification()
         Logger.get('storage').debug("Finished storing resource %s for material %s" % (newRes.getId(), self.getLocator()))
@@ -12050,14 +12050,14 @@ class LocalFile(Resource):
             raise MaKaCError( _("File not available until it has been archived") , _("File Archiving"))
         self.__repository.replaceContent( self.__archivedId, newContent )
 
-    def archive( self, repository=None ):
+    def archive( self, repository=None, forcedFileId=None ):
         if self.isArchived():
             raise Exception( _("File is already archived"))
         if not repository:
             raise Exception( _("Destination repository not set"))
         if self.filePath == "":
             return _("Nothing to archive")
-        repository.storeFile( self )
+        repository.storeFile( self, forcedFileId=forcedFileId)
         self.filePath = ""
         self.notifyModification()
 

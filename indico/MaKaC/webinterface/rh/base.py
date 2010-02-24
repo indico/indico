@@ -483,11 +483,13 @@ class RH(RequestHandlerBase):
                         #DBMgr.getInstance().endRequest(False)
                         res = self._processError(e)
                 except ConflictError:
+                    Logger.get('requestHandler').debug('Conflict in Database! (Request %s)' % id(self._req))
                     self._abortSpecific2RH()
                     DBMgr.getInstance().abort()
                     retry -= 1
                     continue
                 except ClientDisconnected:
+                    Logger.get('requestHandler').debug('Client Disconnected! (Request %s)' % id(self._req) )
                     self._abortSpecific2RH()
                     DBMgr.getInstance().abort()
                     retry -= 1
