@@ -204,6 +204,13 @@ type("SessionSectionPopupMenu", ["SectionPopupMenu"], {
         var self = this;
         var value = pair.get();
         var color = null;
+        var title = null;
+
+        if(exists(value.title)){
+            title = value.title;
+        }else {
+            title = pair.key;
+        }
 
         if(exists(value.color)){
             color = value.color;
@@ -215,7 +222,7 @@ type("SessionSectionPopupMenu", ["SectionPopupMenu"], {
             colorSquare = Html.div({style:{backgroundColor: color, color: color, cssFloat: 'right', width: '15px', height:'15px'}});
         }
 
-        var link = Html.a({className:'fakeLink', style:{display: 'inline', padding: 0, paddingLeft: '4px', paddingRight: '4px'}}, Util.truncate(pair.key));
+        var link = Html.a({className:'fakeLink', style:{display: 'inline', padding: 0, paddingLeft: '4px', paddingRight: '4px'}}, Util.truncate(title));
         var divInput = Html.div({style:{height:'20px', overflow:'auto'}}, colorSquare, link);
 
         if(typeof value == "string" ) {

@@ -244,9 +244,10 @@ type("TimetableManagementActions", [], {
             } else {
                 var sessions = {};
                 each(this.eventInfo.sessions, function(session, key) {
-                    sessions[session.title] = {};
-                    sessions[session.title].func = function() { self.addSessionSlot(session); };
-                    sessions[session.title].color = self._retrieveSessionColor(session);
+                    sessions[session.id] = {};
+                    sessions[session.id].func = function() { self.addSessionSlot(session); };
+                    sessions[session.id].color = self._retrieveSessionColor(session);
+                    sessions[session.id].title = session.title;
                 });
 
                 var menuu = {
