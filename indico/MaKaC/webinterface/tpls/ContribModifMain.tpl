@@ -27,7 +27,7 @@
                         <input type="submit" class="btn" value="<%= _("modify")%>">
                     </td>
                     </form>
-                </tr> 
+                </tr>
                 <%
                 if self._rh._target.getConference().hasEnabledSection("cfa") and self._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
                 %>
@@ -35,7 +35,7 @@
                 <%end%>
                 <%
                     else:
-                %>        
+                %>
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Description")%></span></td>
                     <td bgcolor="white" class="blacktext">
@@ -73,6 +73,7 @@
                 <tr>
                     <td colspan="3" class="horizontalLine">&nbsp;</td>
                 </tr>
+                <% if eventType == "conference":%>
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Track")%></span></td>
                     <td bgcolor="white" class="blacktext" colspan="2">
@@ -123,8 +124,9 @@
                 <tr>
                     <td colspan="3" class="horizontalLine">&nbsp;</td>
                 </tr>
+                <% end %>
                 <tr>
-                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Presenters")%></span</td>
+                    <td class="dataCaptionTD"><span class="dataCaptionFormat"><% if eventType == "conference":%><%= _("Presenters")%><%end%><%else:%><%= _("Speakers")%><%end%></span</td>
                     <td bgcolor="white" class="blacktext" colspan="2">
                         <table width="100%%">
                             <tr>
@@ -135,23 +137,33 @@
                                 <td valign="bottom" align="right">
                                         <input type="submit" class="btn" name="remove" value="<%= _("remove")%>">
                                     </form>
+                                    <% if eventType == "conference":%>
                                     <form style="padding:0px;margin:0px;" action=%(addSpeakersURL)s method="POST">
                                         <table cellspacing="0px" cellpadding="0px" border="0"><tr><td>
                                         <select name="selAuthor">%(authorsForSpeakers)s</select></td>
                                         <td><input type="submit" class="btn" name="add" value="<%= _("add")%>">
                                         </td></tr></table>
-									</form>
-									<form style="padding:0px;margin:0px;" action=%(newSpeakerURL)s method="POST">
-										<input type="submit" class="btn" name="new" value="<%= _("new")%>">
                                     </form>
-									<form style="padding:0px;margin:0px;" action=%(searchSpeakersURL)s method="POST">
-										<input type="submit" class="btn" name="search" value="<%= _("search")%>">
+                                    <%end%>
+                                    <form style="padding:0px;margin:0px;" action=%(newSpeakerURL)s method="POST">
+                                        <input type="submit" class="btn" name="new" value="<%= _("new")%>">
+                                    </form>
+                                    <form style="padding:0px;margin:0px;" action=%(searchSpeakersURL)s method="POST">
+                                        <input type="submit" class="btn" name="search" value="<%= _("search")%>">
                                 </td>
                                     </form>
                             </tr>
                         </table>
                     </td>
                 </tr>
+                <tr>
+                    <td colspan="3" class="horizontalLine">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Report numbers")%></span</td>
+                    <td bgcolor="white" colspan="2"><i>%(reportNumbersTable)s</i></td>
+                </tr>
+                <tr>
                 <tr>
                     <td colspan="3" class="horizontalLine">&nbsp;</td>
                 </tr>
@@ -167,7 +179,7 @@
 									<%= _("This contribution is withdrawn:")%>
 									<input type="submit" class="btn" name ="REACTIVATE" value="reactivate">
 								</td>
-							
+
 								<% end %>
 								<% if not withdrawDisabled: %>
 
@@ -180,7 +192,7 @@
                         </table>
                     </td>
                 </tr>
-            
+
             </table>
         </td>
     </tr>

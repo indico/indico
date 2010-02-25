@@ -114,7 +114,7 @@ class ScheduleAddContribution(ScheduleOperation, LocationSetter):
         self._roomInfo = self._pManager.extract("roomInfo", pType=dict, allowEmpty=True)
         self._keywords = self._pManager.extract("keywords", pType=list,
                                           allowEmpty=True)
-        self._boardNumber = self._pManager.extract("boardNumber", pType=str, allowEmpty=True)
+        self._boardNumber = self._pManager.extract("boardNumber", pType=str, allowEmpty=True, defaultValue="")
         self._needsToBeScheduled = self._params.get("schedule", True)
         if self._needsToBeScheduled:
             self._dateTime = self._pManager.extract("startDate", pType=datetime.datetime)

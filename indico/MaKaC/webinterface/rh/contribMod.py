@@ -44,7 +44,7 @@ class RHContribModifBase(RHModificationBaseProtected):
     """ Base RH for contribution modification.
         Sets the _target (the contribution) and the _conf (the conference)
     """
-    
+
     def _checkParams(self, params):
         l = locators.WebLocator()
         l.setContribution(params)
@@ -55,7 +55,7 @@ class RHContribModifBase(RHModificationBaseProtected):
         wr = webFactoryRegistry.WebFactoryRegistry()
         self._wf = wr.getFactory(self._target.getConference())
         return self._wf
-    
+
 class RCSessionCoordinator(object):
     @staticmethod
     def hasRights(request):
@@ -65,9 +65,9 @@ class RCSessionCoordinator(object):
             return request._target.getSession().canCoordinate(request.getAW(), "modifContribs")
         else:
             return False
-        
+
 class RCContributionPaperReviewingStaff(object):
-    
+
     @staticmethod
     def hasRights(request):
         """ Returns true if the user is a PRM, or a Referee / Editor / Reviewer of the target contribution
@@ -80,31 +80,31 @@ class RCContributionPaperReviewingStaff(object):
                (reviewManager.hasReferee() and reviewManager.isReferee(user)) or \
                ((confReviewChoice == 3 or confReviewChoice == 4) and reviewManager.hasEditor() and reviewManager.isEditor(user)) or \
                ((confReviewChoice == 2 or confReviewChoice == 4) and request._target.getReviewManager().isReviewer(user)))
-        
+
 class RCContributionReferee(object):
     @staticmethod
     def hasRights(request):
         """ Returns true if the user is a referee of the target contribution
-        """ 
+        """
         user = request.getAW().getUser()
         reviewManager = request._target.getReviewManager()
         return reviewManager.hasReferee() and reviewManager.isReferee(user)
-    
+
 class RCContributionEditor(object):
     @staticmethod
     def hasRights(request):
         """ Returns true if the user is an editor of the target contribution
-        """ 
+        """
 
         user = request.getAW().getUser()
         reviewManager = request._target.getReviewManager()
         return reviewManager.hasEditor() and reviewManager.isEditor(user)
-    
+
 class RCContributionReviewer(object):
     @staticmethod
     def hasRights(request):
         """ Returns true if the user is a reviewer of the target contribution
-        """ 
+        """
         user = request.getAW().getUser()
         reviewManager = request._target.getReviewManager()
         return reviewManager.isReviewer(user)
@@ -116,7 +116,7 @@ class RHContribModifBaseSpecialSesCoordRights(RHContribModifBase):
     def _checkProtection(self):
         if not RCSessionCoordinator.hasRights(self):
             RHContribModifBase._checkProtection(self)
-        
+
 class RHContribModifBaseReviewingStaffRights(RHContribModifBase):
     """ Base class for any RH where a member of the Paper Reviewing staff
         (a PRM, or a Referee / Editor / Reviewer of the target contribution)
@@ -126,7 +126,7 @@ class RHContribModifBaseReviewingStaffRights(RHContribModifBase):
     def _checkProtection(self):
         if not RCContributionPaperReviewingStaff.hasRights(self):
             RHContribModifBase._checkProtection(self);
-            
+
 class RHContribModifBaseSpecialSesCoordAndReviewingStaffRights(RHContribModifBase):
     """ Base class for any RH where a member of the Paper Reviewing staff
         (a PRM, or a Referee / Editor / Reviewer of the target contribution),
@@ -134,28 +134,29 @@ class RHContribModifBaseSpecialSesCoordAndReviewingStaffRights(RHContribModifBas
     """
 
     def _checkProtection(self):
-        if not (RCSessionCoordinator.hasRights(self) or RCContributionPaperReviewingStaff.hasRights(self)): 
+        if not (RCSessionCoordinator.hasRights(self) or RCContributionPaperReviewingStaff.hasRights(self)):
             RHContribModifBase._checkProtection(self);
 
-        
+
 class RHContributionModification(RHContribModifBaseSpecialSesCoordAndReviewingStaffRights):
     _uh = urlHandlers.UHContributionModification
-    
+
     def _checkParams(self, params):
         RHContribModifBase._checkParams(self, params)
         params["days"] = params.get("day", "all")
         if params.get("day", None) is not None :
             del params["day"]
-    
+
     def _process(self):
         params = self._getRequestParams()
         if self._target.getOwner().isClosed():
             p = contributions.WPContributionModificationClosed(self, self._target)
         else:
-            p = contributions.WPContributionModification(self, self._target)
             wf = self.getWebFactory()
             if wf != None:
                 p = wf.getContributionModification(self, self._target)
+            else:
+                p = contributions.WPContributionModification(self, self._target)
         return p.display(**params)
 
 class RHWithdraw(RHContribModifBaseSpecialSesCoordRights):
@@ -172,7 +173,7 @@ class RHWithdraw(RHContribModifBaseSpecialSesCoordRights):
             self._comment=params.get("comment", "")
         elif params.has_key("CANCEL"):
             self._action="CANCEL"
-    
+
     def _process(self):
         url=urlHandlers.UHContributionModification.getURL(self._target)
         if self._action=="REACTIVATE":
@@ -198,7 +199,7 @@ class RHContributionAC(RHContribModifBaseSpecialSesCoordAndReviewingStaffRights)
         params["days"] = params.get("day", "all")
         if params.get("day", None) is not None :
             del params["day"]
-                
+
     def _process(self):
         params = self._getRequestParams()
         if self._target.getOwner().isClosed():
@@ -213,13 +214,13 @@ class RHContributionAC(RHContribModifBaseSpecialSesCoordAndReviewingStaffRights)
 
 class RHContributionSC(RHContribModifBaseSpecialSesCoordAndReviewingStaffRights):
     _uh = urlHandlers.UHContribModifSubCont
-    
+
     def _checkParams(self, params):
         RHContribModifBase._checkParams(self, params)
         params["days"] = params.get("day", "all")
         if params.get("day", None) is not None :
             del params["day"]
-    
+
     def _process(self):
         params = self._getRequestParams()
         p = contributions.WPContribModifSC(self, self._target)
@@ -281,14 +282,14 @@ class _ActionSubContribMove:
 
         #for sc in scList:
         #    sc.setOrder(scList.index(sc))
-    
+
 #-------------------------------------------------------------------------------------
 
 class RHContributionAddSC(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContribAddSubCont
-    
+
     def _process(self):
-        p = contributions.WPContribAddSC(self, self._target)        
+        p = contributions.WPContribAddSC(self, self._target)
         params = self._getRequestParams()
         if params.get("recalled", None) is None :
             self._removePreservedParams()
@@ -297,32 +298,32 @@ class RHContributionAddSC(RHContribModifBaseSpecialSesCoordRights):
         wf = self.getWebFactory()
         if wf != None:
             p = wf.getContribAddSC(self, self._target)
-            
+
         params["presenterDefined"] = self._getDefinedDisplayList("presenter")
         params["presenterOptions"] = self._getPersonOptions("presenter")
-        
+
         params["days"] = params.get("day", "all")
         if params.get("day", None) is not None :
             del params["day"]
-        
+
         return p.display(**params)
 
     def _getDefinedDisplayList(self, typeName):
         return self._websession.getVar("%sList"%typeName)
-    
+
     def _getPreservedParams(self):
         params = self._websession.getVar("preservedParams")
         if params is None :
             return {}
         return params
-        
+
     def _removePreservedParams(self):
         self._websession.setVar("preservedParams", None)
-    
+
     def _removeDefinedList(self, typeName):
-        self._websession.setVar("%sList"%typeName, None)        
-    
-    def _personInDefinedList(self, typeName, person):    
+        self._websession.setVar("%sList"%typeName, None)
+
+    def _personInDefinedList(self, typeName, person):
         list = self._websession.getVar("%sList"%typeName)
         if list is None :
             return False
@@ -330,7 +331,7 @@ class RHContributionAddSC(RHContribModifBaseSpecialSesCoordRights):
             if person.getFullName()+" "+person.getEmail() == p[0].getFullName()+" "+p[0].getEmail() :
                 return True
         return False
-        
+
     def _getPersonOptions(self, typeName):
         html = []
         names = []
@@ -356,36 +357,36 @@ class RHContributionAddSC(RHContribModifBaseSpecialSesCoordRights):
         for name in names:
             html.append(text[name])
         return "".join(html)
-    
-    
+
+
 #-------------------------------------------------------------------------------------
 
 class RHContributionCreateSC(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContribCreateSubCont
-    
+
     def _process(self):
-        
+
         params = self._getRequestParams()
         #params.update(self._getPreservedParams())
         sc = self._target
         """self._target - contribution owning new subcontribution"""
-        
-        if ("ok" in params):            
+
+        if ("ok" in params):
             sc = self._target.newSubContribution()
             sc.setTitle( params.get("title", "") )
             sc.setDescription( params.get("description", "") )
             sc.setKeywords( params.get("keywords", "") )
             sc.setDuration( params.get("durationHours", ""), \
-                             params.get("durationMinutes", "") )   
+                             params.get("durationMinutes", "") )
             sc.setSpeakerText( params.get("speakers", "") )
             sc.setParent(self._target)
             for presenter in self._getDefinedList("presenter") :
                 sc.newSpeaker(presenter[0])
-            
+
             logInfo = sc.getLogInfo()
             logInfo["subject"] = "Create new subcontribution: %s"%sc.getTitle()
             self._target.getConference().getLogHandler().logAction(logInfo, "Timetable/SubContribution", self._getUser())
-                
+
             self._removePreservedParams()
             self._removeDefinedList("presenter")
             self._redirect(urlHandlers.UHContribModifSubCont.getURL(sc))
@@ -407,34 +408,34 @@ class RHContributionCreateSC(RHContribModifBaseSpecialSesCoordRights):
             url = urlHandlers.UHContribAddSubCont.getURL(self._target)
             url.addParam("recalled", "true")
             self._redirect(url)
-        else:        
+        else:
             self._removePreservedParams()
             self._removeDefinedList("presenter")
-            self._redirect(urlHandlers.UHContribModifSubCont.getURL(sc))    
+            self._redirect(urlHandlers.UHContribModifSubCont.getURL(sc))
 
     def _getPreservedParams(self):
         params = self._websession.getVar("preservedParams")
         if params is None :
             return {}
         return params
-    
+
     def _preserveParams(self, params):
         self._websession.setVar("preservedParams", params)
-        
+
     def _removePreservedParams(self):
         self._websession.setVar("preservedParams", None)
-        
+
     def _getDefinedList(self, typeName):
         definedList = self._websession.getVar("%sList"%typeName)
         if definedList is None :
             return []
         return definedList
-    
+
     def _setDefinedList(self, definedList, typeName):
         self._websession.setVar("%sList"%typeName, definedList)
-    
+
     def _removeDefinedList(self, typeName):
-        self._websession.setVar("%sList"%typeName, None)        
+        self._websession.setVar("%sList"%typeName, None)
 
     def _removePersons(self, params, typeName):
         persons = self._normaliseListParam(params.get("%ss"%typeName, []))
@@ -445,7 +446,7 @@ class RHContributionCreateSC(RHContribModifBaseSpecialSesCoordRights):
                 personsToRemove.append(definedList[int(p)])
         for person in personsToRemove :
             definedList.remove(person)
-        self._setDefinedList(definedList, typeName)        
+        self._setDefinedList(definedList, typeName)
 
 #-------------------------------------------------------------------------------------
 
@@ -454,10 +455,10 @@ class RHNewSubcontributionPresenterSearch(RHContribModifBaseSpecialSesCoordRight
 
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
-        
+
     def _process(self):
         params = self._getRequestParams()
-        
+
         params["newButtonAction"] = str(urlHandlers.UHContribCreateSubContPresenterNew.getURL())
         addURL = urlHandlers.UHContribCreateSubContPersonAdd.getURL()
         addURL.addParam("orgin", "selected")
@@ -473,7 +474,7 @@ class RHNewSubcontributionPresenterNew(RHContribModifBaseSpecialSesCoordRights):
 
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
-        
+
     def _process(self):
         p = contributions.WSubContributionCreationPresenterNew(self, self._target)
         return p.display()
@@ -487,16 +488,16 @@ class RHNewSubcontributionPersonAdd(RHContribModifBaseSpecialSesCoordRights):
         RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
         self._typeName = params.get("typeName", None)
         if self._typeName  is None :
-            raise MaKaCError( _("Type name of the person to add is not set."))        
-        
+            raise MaKaCError( _("Type name of the person to add is not set."))
+
     def _process(self):
         params = self._getRequestParams()
-        self._errorList = []        
-        
+        self._errorList = []
+
         definedList = self._getDefinedList(self._typeName)
         if definedList is None :
             definedList = []
-        
+
         if params.get("orgin", "") == "new" :
             if params.get("ok", None) is None :
                 url = urlHandlers.UHContribAddSubCont.getURL(self._target)
@@ -512,40 +513,40 @@ class RHNewSubcontributionPersonAdd(RHContribModifBaseSpecialSesCoordRights):
                 person.setAddress(params["address"])
                 person.setPhone(params["phone"])
                 person.setTitle(params["title"])
-                person.setFax(params["fax"])                
+                person.setFax(params["fax"])
                 if not self._alreadyDefined(person, definedList) :
                     definedList.append([person, params.has_key("submissionControl")])
                 else :
                     self._errorList.append("%s has been already defined as %s of this session"%(person.getFullName(), self._typeName))
-        
+
         elif params.get("orgin", "") == "selected" :
             selectedList = self._normaliseListParam(self._getRequestParams().get("selectedPrincipals", []))
-            
+
             for s in selectedList :
                 if s[0:8] == "*author*" :
                     auths = self._target.getConference().getAuthorIndex()
                     selected = auths.getById(s[9:])[0]
                 else :
                     ph = user.PrincipalHolder()
-                    selected = ph.getById(s)                            
-                if isinstance(selected, user.Avatar) :                    
+                    selected = ph.getById(s)
+                if isinstance(selected, user.Avatar) :
                     person = SubContribParticipation()
                     person.setDataFromAvatar(selected)
-                    if not self._alreadyDefined(person, definedList) :                        
+                    if not self._alreadyDefined(person, definedList) :
                         definedList.append([person, params.has_key("submissionControl")])
-                    else :                        
+                    else :
                         self._errorList.append("%s has been already defined as %s of this session"%(person.getFullName(), self._typeName))
-                        
-                elif isinstance(selected, user.Group) : 
+
+                elif isinstance(selected, user.Group) :
                     for member in selected.getMemberList() :
                         person = SubContribParticipation()
                         person.setDataFromAvatar(member)
                         if not self._alreadyDefined(person, definedList) :
-                            definedList.append([person, params.has_key("submissionControl")])            
+                            definedList.append([person, params.has_key("submissionControl")])
                         else :
                             self._errorList.append("%s has been already defined as %s of this session"%(person.getFullName(), self._typeName))
-                else : 
-                    person = SubContribParticipation()                                            
+                else :
+                    person = SubContribParticipation()
                     person.setTitle(selected.getTitle())
                     person.setFirstName(selected.getFirstName())
                     person.setFamilyName(selected.getFamilyName())
@@ -558,24 +559,24 @@ class RHNewSubcontributionPersonAdd(RHContribModifBaseSpecialSesCoordRights):
                         definedList.append([person, params.has_key("submissionControl")])
                     else :
                         self._errorList.append("%s has been already defined as %s of this session"%(person.getFullName(), self._typeName))
-                
-        elif params.get("orgin", "") == "added" :        
+
+        elif params.get("orgin", "") == "added" :
             preservedParams = self._getPreservedParams()
             chosen = preservedParams.get("%sChosen"%self._typeName, None)
-            if chosen is None or chosen == "" : 
+            if chosen is None or chosen == "" :
                 url = urlHandlers.UHContribAddSubCont.getURL(self._target)
                 url.addParam("recalled", "true")
                 self._redirect(url)
-                return            
+                return
             index = chosen.find("-")
             objectId = chosen[1:index]
             chosenId = chosen[index+1:len(chosen)]
-            if chosen[0:1] == "d" :                
+            if chosen[0:1] == "d" :
                 object = self._target.getConference().getSessionById(objectId)
             else :
                 object = self._target.getConference().getContributionById(objectId)
             chosenPerson = None
-            if chosen[0:1] == "s" :                                
+            if chosen[0:1] == "s" :
                 chosenPerson = object.getSpeakerById(chosenId)
             elif chosen[0:1] == "a" :
                 chosenPerson = object.getAuthorById(chosenId)
@@ -586,7 +587,7 @@ class RHNewSubcontributionPersonAdd(RHContribModifBaseSpecialSesCoordRights):
             if chosenPerson is None :
                 self._redirect(urlHandlers.UHConfModScheduleNewContrib.getURL(self._target))
                 return
-            person = SubContribParticipation()                                            
+            person = SubContribParticipation()
             person.setTitle(chosenPerson.getTitle())
             person.setFirstName(chosenPerson.getFirstName())
             person.setFamilyName(chosenPerson.getFamilyName())
@@ -596,7 +597,7 @@ class RHNewSubcontributionPersonAdd(RHContribModifBaseSpecialSesCoordRights):
             person.setPhone(chosenPerson.getPhone())
             person.setFax(chosenPerson.getFax())
             if not self._alreadyDefined(person, definedList) :
-                definedList.append([person, params.has_key("submissionControl")])    
+                definedList.append([person, params.has_key("submissionControl")])
             else :
                 self._errorList.append("%s has been already defined as %s of this session"%(person.getFullName(), self._typeName))
         else :
@@ -606,7 +607,7 @@ class RHNewSubcontributionPersonAdd(RHContribModifBaseSpecialSesCoordRights):
         preservedParams["errorMsg"] = self._errorList
         self._preserveParams(preservedParams)
         self._websession.setVar("%sList"%self._typeName, definedList)
-        
+
         url = urlHandlers.UHContribAddSubCont.getURL(self._target)
         url.addParam("recalled", "true")
         self._redirect(url)
@@ -617,7 +618,7 @@ class RHNewSubcontributionPersonAdd(RHContribModifBaseSpecialSesCoordRights):
         if definedList is None :
             return []
         return definedList
-        
+
     def _alreadyDefined(self, person, definedList):
         if person is None :
             return True
@@ -634,10 +635,10 @@ class RHNewSubcontributionPersonAdd(RHContribModifBaseSpecialSesCoordRights):
         if params is None :
             return {}
         return params
-    
+
     def _preserveParams(self, params):
         self._websession.setVar("preservedParams", params)
-        
+
     def _removePreservedParams(self):
         self._websession.setVar("preservedParams", None)
 
@@ -646,11 +647,11 @@ class RHNewSubcontributionPersonAdd(RHContribModifBaseSpecialSesCoordRights):
 
 #class RHContributionDeleteSC( RHContribModifBase ):
 #    _uh = urlHandlers.UHContriDeleteSubCont
-#    
+#
 #    def _checkParams( self, params ):
 #        RHContribModifBase._checkParams( self, params )
 #        self._confirm = params.has_key( "confirm" )
-#        self._cancel = params.has_key( "cancel" ) 
+#        self._cancel = params.has_key( "cancel" )
 #        self._scIds = self._normaliseListParam( params.get("selSubContribs", []) )
 
 #    def _process( self ):
@@ -662,33 +663,33 @@ class RHNewSubcontributionPersonAdd(RHContribModifBaseSpecialSesCoordRights):
 
 class RHContributionUpSC(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContribUpSubCont
-    
+
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
-        self._scId = params.get("subContId", "") 
+        self._scId = params.get("subContId", "")
 
     def _process(self):
         sc = self._target.getSubContributionById(self._scId)
         self._target.upSubContribution(sc)
         self._redirect(urlHandlers.UHContribModifSubCont.getURL(self._target))
-        
+
 
 class RHContributionDownSC(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContribDownSubCont
-    
+
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
-        self._scId = params.get("subContId", "") 
+        self._scId = params.get("subContId", "")
 
     def _process(self):
         sc = self._target.getSubContributionById(self._scId)
         self._target.downSubContribution(sc)
         self._redirect(urlHandlers.UHContribModifSubCont.getURL(self._target))
-        
+
 
 class RHContributionTools(RHContribModifBaseSpecialSesCoordAndReviewingStaffRights):
     _uh = urlHandlers.UHContribModifTools
-    
+
     def _process(self):
         if self._target.getOwner().isClosed():
             p = contributions.WPContributionModificationClosed(self, self._target)
@@ -705,9 +706,9 @@ class RHContributionData( RoomBookingDBMixin, RHContribModifBaseSpecialSesCoordR
 
     def _checkParams( self, params ):
         RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
-        
+
         self._evt = self._target
-    
+
     def _process(self):
         if self._target.getOwner().isClosed():
             p = contributions.WPContributionModificationClosed(self, self._target)
@@ -729,7 +730,7 @@ class RHContributionModifData(RHContribModifBaseSpecialSesCoordRights):
         if params.has_key("type") and params["type"].strip()!="":
             self._type=self._target.getConference().getContribTypeById(params["type"])
         self._cancel = params.has_key("cancel")
-    
+
     def _process(self):
         if not self._cancel:
             params = self._getRequestParams()
@@ -791,7 +792,7 @@ class RHSearchAddPrimaryAuthor (RHContribModifBaseSpecialSesCoordRights):
         auth.setFax(a.getFax())
         self._target.addPrimaryAuthor(auth)
         return auth
-        
+
     def _process(self):
         params=self._getRequestParams()
         if "selectedPrincipals" in params:
@@ -841,7 +842,7 @@ class RHSearchAddCoAuthor (RHContribModifBaseSpecialSesCoordRights):
         auth.setFax(a.getFax())
         self._target.addCoAuthor(auth)
         return auth
-        
+
     def _process(self):
         params=self._getRequestParams()
         if "selectedPrincipals" in params:
@@ -892,7 +893,7 @@ class RHSearchAddSpeakers (RHContribModifBaseSpecialSesCoordRights):
         auth.setFax(a.getFax())
         self._target.newSpeaker(auth)
         return auth
-        
+
     def _process(self):
         params=self._getRequestParams()
         if "selectedPrincipals" in params:
@@ -909,7 +910,7 @@ class RHSearchAddSpeakers (RHContribModifBaseSpecialSesCoordRights):
         self._redirect(urlHandlers.UHContributionModification.getURL(self._target))
 
 class RHNewPrimaryAuthor(RHContribModifBaseSpecialSesCoordRights):
-    
+
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
         self._action, self._new="", False
@@ -934,8 +935,8 @@ class RHNewPrimaryAuthor(RHContribModifBaseSpecialSesCoordRights):
         auth.setFax(p.get("fax", ""))
         self._target.addPrimaryAuthor(auth)
         return auth
-            
-    
+
+
     def _process(self):
         url=urlHandlers.UHContributionModification.getURL(self._target)
         if self._action=="cancel":
@@ -960,7 +961,7 @@ class RHPrimaryAuthorsActions:
     """
     def __init__(self, req):
         self._req = req
-    
+
     def process(self, params):
         if params.has_key("REMOVE"):
             return RHRemPrimaryAuthors(self._req).process(params)
@@ -995,10 +996,10 @@ class RHMovePrimaryToCoAuthors(RHContribModifBaseSpecialSesCoordRights):
             self._target.addCoAuthor(auth)
         url=urlHandlers.UHContributionModification.getURL(self._target)
         self._redirect(url)
-        
+
 
 class RHEditPrimaryAuthor(RHContribModifBaseSpecialSesCoordRights):
-    
+
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
         self._authorId=params["authorId"]
@@ -1021,19 +1022,19 @@ class RHEditPrimaryAuthor(RHContribModifBaseSpecialSesCoordRights):
 
         grantSubm=False
         if auth.getEmail().lower().strip() != p.get("email", "").lower().strip():
-            #----If it's already in the pending queue in order to grant 
+            #----If it's already in the pending queue in order to grant
             #    submission rights we must unindex and after the modification of the email,
             #    index again...
             if self._target.getConference().getPendingQueuesMgr().isPendingSubmitter(auth):
                 self._target.getConference().getPendingQueuesMgr().removePendingSubmitter(auth)
                 grantSubm=True
             #-----
-            
+
         auth.setEmail(p.get("email", ""))
-        
+
         if grantSubm:
             self._target.grantSubmission(auth)
-    
+
     def _process(self):
         if self._action != "":
             if self._action == "perform":
@@ -1047,7 +1048,7 @@ class RHEditPrimaryAuthor(RHContribModifBaseSpecialSesCoordRights):
 
 
 class RHNewCoAuthor(RHContribModifBaseSpecialSesCoordRights):
-    
+
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
         self._action, self._new="", False
@@ -1072,7 +1073,7 @@ class RHNewCoAuthor(RHContribModifBaseSpecialSesCoordRights):
         auth.setFax(p.get("fax", ""))
         self._target.addCoAuthor(auth)
         return auth
-    
+
     def _process(self):
         url=urlHandlers.UHContributionModification.getURL(self._target)
         if self._action=="cancel":
@@ -1097,7 +1098,7 @@ class RHCoAuthorsActions:
     """
     def __init__(self, req):
         self._req = req
-    
+
     def process(self, params):
         if params.has_key("REMOVE"):
             return RHRemCoAuthors(self._req).process(params)
@@ -1107,7 +1108,7 @@ class RHCoAuthorsActions:
 
 
 class RHRemCoAuthors(RHContribModifBaseSpecialSesCoordRights):
-    
+
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
         self._list = []
@@ -1135,7 +1136,7 @@ class RHMoveCoToPrimaryAuthors(RHContribModifBaseSpecialSesCoordRights):
         self._redirect(url)
 
 class RHEditCoAuthor(RHContribModifBaseSpecialSesCoordRights):
-    
+
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
         self._authorId=params["authorId"]
@@ -1158,19 +1159,19 @@ class RHEditCoAuthor(RHContribModifBaseSpecialSesCoordRights):
 
         grantSubm=False
         if auth.getEmail().lower().strip() != p.get("email", "").lower().strip():
-            #----If it's already in the pending queue in order to grant 
+            #----If it's already in the pending queue in order to grant
             #    submission rights we must unindex and after the modification of the email,
             #    index again...
             if self._target.getConference().getPendingQueuesMgr().isPendingSubmitter(auth):
                 self._target.getConference().getPendingQueuesMgr().removePendingSubmitter(auth)
                 grantSubm=True
             #-----
-        
+
         auth.setEmail(p.get("email", ""))
-        
+
         if grantSubm:
             self._target.grantSubmission(auth)
-    
+
     def _process(self):
         if self._action != "":
             if self._action == "perform":
@@ -1184,7 +1185,7 @@ class RHEditCoAuthor(RHContribModifBaseSpecialSesCoordRights):
 
 
 class RHRemSpeakers(RHContribModifBaseSpecialSesCoordRights):
-    
+
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
         self._list = []
@@ -1198,10 +1199,10 @@ class RHRemSpeakers(RHContribModifBaseSpecialSesCoordRights):
             self._target.removeSpeaker(auth)
         url=urlHandlers.UHContributionModification.getURL(self._target)
         self._redirect(url)
-        
+
 
 class RHAddSpeakers(RHContribModifBaseSpecialSesCoordRights):
-    
+
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
         self._list = []
@@ -1218,13 +1219,13 @@ class RHAddSpeakers(RHContribModifBaseSpecialSesCoordRights):
 
 
 class RHSetTrack(RHContribModifBase):
-        
+
     def _checkParams(self, params):
         RHContribModifBase._checkParams(self, params)
         self._track=None
         if params.has_key("selTrack") and params["selTrack"].strip() != "":
             self._track = self._target.getConference().getTrackById(params["selTrack"])
-    
+
     def _process(self):
         self._target.setTrack(self._track)
         url=urlHandlers.UHContributionModification.getURL(self._target)
@@ -1232,13 +1233,13 @@ class RHSetTrack(RHContribModifBase):
 
 
 class RHSetSession(RHContribModifBase):
-        
+
     def _checkParams(self, params):
         RHContribModifBase._checkParams(self, params)
         self._session=None
         if params.has_key("selSession") and params["selSession"].strip() != "":
             self._session=self._target.getConference().getSessionById(params["selSession"])
-    
+
     def _process(self):
         self._target.setSession(self._session)
         url=urlHandlers.UHContributionModification.getURL(self._target)
@@ -1247,7 +1248,7 @@ class RHSetSession(RHContribModifBase):
 
 #class RHContributionSelectSpeakers( RHContribModifBase ):
 #    _uh = urlHandlers.UHContributionSelectSpeakers
-#    
+#
 #    def _process( self ):
 #        p = contributions.WPcontribSelectChairs( self, self._target )
 #        return p.display( **self._getRequestParams() )
@@ -1255,7 +1256,7 @@ class RHSetSession(RHContribModifBase):
 #
 #class RHContributionAddSpeakers( RHContribModifBase ):
 #    _uh = urlHandlers.UHContributionAddSpeakers
-#    
+#
 #    def _checkParams( self, params ):
 #        RHContribModifBase._checkParams( self, params )
 #        selSpeakerId = self._normaliseListParam( params.get( "selectedPrincipals", [] ) )
@@ -1263,7 +1264,7 @@ class RHSetSession(RHContribModifBase):
 #        self._speakers = []
 #        for id in selSpeakerId:
 #            self._speakers.append( ah.getById( id ) )
-#    
+#
 #    def _process( self ):
 #        for av in self._speakers:
 #            self._target.addSpeaker( av )
@@ -1272,7 +1273,7 @@ class RHSetSession(RHContribModifBase):
 #
 #class RHContributionRemoveSpeakers( RHContribModifBase ):
 #    _uh = urlHandlers.UHContributionRemoveSpeakers
-#    
+#
 #    def _checkParams( self, params ):
 #        RHContribModifBase._checkParams( self, params )
 #        selSpeakerId = self._normaliseListParam( params.get( "selectedPrincipals", [] ) )
@@ -1280,7 +1281,7 @@ class RHSetSession(RHContribModifBase):
 #        self._speakers = []
 #        for id in selSpeakerId:
 #            self._speakers.append( ah.getById( id ) )
-#    
+#
 #    def _process( self ):
 #        for av in self._speakers:
 #            self._target.removeSpeaker( av )
@@ -1289,20 +1290,20 @@ class RHSetSession(RHContribModifBase):
 
 class RHContributionAddMaterial(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionAddMaterial
-    
+
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
         typeMat = params.get("typeMaterial", "notype")
         if typeMat=="notype" or typeMat.strip()=="":
             raise FormValuesError("Please choose a material type")
         self._mf = materialFactories.ContribMFRegistry().getById(typeMat)
-        
+
     def _process(self):
         if self._mf:
             if not self._mf.needsCreationPage():
                 m = RHContributionPerformAddMaterial.create(self._target, self._mf, self._getRequestParams())
                 self._redirect(urlHandlers.UHMaterialModification.getURL(m))
-                return 
+                return
         p = contributions.WPContribAddMaterial(self, self._target, self._mf)
         wf = self.getWebFactory()
         if wf != None:
@@ -1312,7 +1313,7 @@ class RHContributionAddMaterial(RHContribModifBaseSpecialSesCoordRights):
 
 class RHContributionPerformAddMaterial(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionPerformAddMaterial
-    
+
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
         typeMat = params.get("typeMaterial", "")
@@ -1335,7 +1336,7 @@ class RHContributionPerformAddMaterial(RHContribModifBaseSpecialSesCoordRights):
 
 class RHContributionRemoveMaterials(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionRemoveMaterials
-    
+
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
         #typeMat = params.get( "typeMaterial", "" )
@@ -1343,7 +1344,7 @@ class RHContributionRemoveMaterials(RHContribModifBaseSpecialSesCoordRights):
         self._materialIds = self._normaliseListParam(params.get("deleteMaterial", []))
         self._materialIds = self._normaliseListParam( params.get("materialId", []) )
         self._returnURL = params.get("returnURL","")
-    
+
     def _process(self):
         for id in self._materialIds:
             #Performing the deletion of special material types
@@ -1375,8 +1376,8 @@ class RHMaterialsAdd(RHContribModifBase):
         RHContribModifBase._checkParams(self, params)
         if not hasattr(self,"_rhSubmitMaterial"):
             self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
-        self._rhSubmitMaterial._checkParams(params)    
-    
+        self._rhSubmitMaterial._checkParams(params)
+
     def _process( self ):
         if self._target.getConference().isClosed():
             p = WPConferenceModificationClosed( self, self._target )
@@ -1385,12 +1386,12 @@ class RHMaterialsAdd(RHContribModifBase):
             r=self._rhSubmitMaterial._process(self, self._getRequestParams())
         if r is None:
             self._redirect(self._uh.getURL(self._target))
-        
+
         return r
 
 class RHContributionSelectManagers(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionSelectManagers
-    
+
     def _process(self):
         p = contributions.WPContributionSelectManagers(self, self._target)
         return p.display(**self._getRequestParams())
@@ -1398,7 +1399,7 @@ class RHContributionSelectManagers(RHContribModifBaseSpecialSesCoordRights):
 
 class RHContributionAddManagers(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionAddManagers
-    
+
     def _process(self):
         params = self._getRequestParams()
         if "selectedPrincipals" in params:
@@ -1410,7 +1411,7 @@ class RHContributionAddManagers(RHContribModifBaseSpecialSesCoordRights):
 
 class RHContributionRemoveManagers(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionRemoveManagers
-    
+
     def _process(self):
         params = self._getRequestParams()
         if ("selectedPrincipals" in params) and \
@@ -1423,7 +1424,7 @@ class RHContributionRemoveManagers(RHContribModifBaseSpecialSesCoordRights):
 
 class RHContributionSetVisibility(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionSetVisibility
-    
+
     def _process(self):
         params = self._getRequestParams()
         privacy = params.get("visibility","PUBLIC")
@@ -1436,11 +1437,11 @@ class RHContributionSetVisibility(RHContribModifBaseSpecialSesCoordRights):
             self._protect = -1
         self._target.setProtection(self._protect)
         self._redirect(urlHandlers.UHContribModifAC.getURL(self._target))
-    
+
 
 class RHContributionSelectAllowed(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionSelectAllowed
-    
+
     def _process(self):
         p = contributions.WPContributionSelectAllowed(self, self._target)
         return p.display(**self._getRequestParams())
@@ -1448,7 +1449,7 @@ class RHContributionSelectAllowed(RHContribModifBaseSpecialSesCoordRights):
 
 class RHContributionAddAllowed(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionAddAllowed
-    
+
     def _process(self):
         params = self._getRequestParams()
         if "selectedPrincipals" in params:
@@ -1460,7 +1461,7 @@ class RHContributionAddAllowed(RHContribModifBaseSpecialSesCoordRights):
 
 class RHContributionRemoveAllowed(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionRemoveAllowed
-    
+
     def _process(self):
         params = self._getRequestParams()
         if ("selectedPrincipals" in params) and \
@@ -1473,7 +1474,7 @@ class RHContributionRemoveAllowed(RHContribModifBaseSpecialSesCoordRights):
 
 class RHContributionAddDomains(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionAddDomain
-    
+
     def _process(self):
         params = self._getRequestParams()
         if ("addDomain" in params) and (len(params["addDomain"])!=0):
@@ -1485,7 +1486,7 @@ class RHContributionAddDomains(RHContribModifBaseSpecialSesCoordRights):
 
 class RHContributionRemoveDomains(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionRemoveDomain
-    
+
     def _process(self):
         params = self._getRequestParams()
         if ("selectedDomain" in params) and (len(params["selectedDomain"])!=0):
@@ -1498,21 +1499,21 @@ class RHContributionRemoveDomains(RHContribModifBaseSpecialSesCoordRights):
 
 class RHContributionDeletion(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionDelete
-    
+
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
         self._cancel = False
         if "cancel" in params:
             self._cancel = True
         self._confirmation = params.has_key("confirm")
-    
+
     def _perform(self):
         conf = self._target.getConference()
         self._target.getOwner().getSchedule().removeEntry(self._target.getSchEntry())
         #self._target.getOwner().removeContribution(self._target)
         self._target.delete()
         #conf.removeContribution(self._target)
-    
+
     def _process(self):
         if self._cancel:
             self._redirect(urlHandlers.UHContribModifTools.getURL(self._target))
@@ -1530,7 +1531,7 @@ class RHContributionDeletion(RHContribModifBaseSpecialSesCoordRights):
 
 class RHContributionMove(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionMove
-    
+
     def _process(self):
         p = contributions.WPcontribMove(self, self._target)
         return p.display(**self._getRequestParams())
@@ -1538,11 +1539,11 @@ class RHContributionMove(RHContribModifBaseSpecialSesCoordRights):
 
 class RHContributionPerformMove(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionPerformMove
-    
+
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
         self._dest = params["Destination"]
-    
+
     def _process(self):
         conf = self._target.getConference()
         if self._dest == 'CONF':
@@ -1551,9 +1552,9 @@ class RHContributionPerformMove(RHContribModifBaseSpecialSesCoordRights):
             newOwner = conf.getSessionById(self._dest)
         self._moveContrib(newOwner)
         self._redirect(urlHandlers.UHContribModifTools.getURL(self._target))
-        
+
         return "done"
-    
+
     def _moveContrib(self, newOwner):
         owner = self._target.getOwner()
         owner.removeContribution(self._target)
@@ -1585,7 +1586,7 @@ class RHContributionWriteMinutes(RHContribModifBaseSpecialSesCoordRights):
 
 class RHContributionToXML(RHContributionModification):
     _uh = urlHandlers.UHContribToXMLConfManager
-    
+
     def _process(self):
         filename = "%s - contribution.xml"%self._target.getTitle()
         x = XMLGen()
@@ -1613,15 +1614,15 @@ class RHContributionToXML(RHContributionModification):
                 x.closeTag("PrimaryAuthor")
             else:
                 l.append(au)
-        
+
         for au in l:
             x.openTag("Co-Author")
             x.writeTag("FirstName", au.getFirstName())
             x.writeTag("FamilyName", au.getFamilyName())
             x.writeTag("Email", au.getEmail())
             #x.writeTag("Affiliation", au.getAffiliation())
-            x.closeTag("Co-Author") 
-        
+            x.closeTag("Co-Author")
+
         for au in self._target.getSpeakerList():
             x.openTag("Speaker")
             x.writeTag("FirstName", au.getFirstName ())
@@ -1629,18 +1630,18 @@ class RHContributionToXML(RHContributionModification):
             x.writeTag("Email", au.getEmail())
             #x.writeTag("Affiliation", au.getAffiliation())
             x.closeTag("Speaker")
-        
+
         #To change for the new contribution type system to:
         x.writeTag("ContributionType", self._target.getType())
-        
+
         t = self._target.getTrack()
         if t!=None:
             x.writeTag("Track", t.getTitle())
-        
+
         x.closeTag("contribution")
-        
+
         data = x.getXml()
-        
+
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType("XML")
         self._req.content_type = """%s"""%(mimetype)
@@ -1651,7 +1652,7 @@ class RHContributionToXML(RHContributionModification):
 
 class RHContributionToPDF(RHContributionModification):
     _uh = urlHandlers.UHContribToPDFConfManager
-    
+
     def _process(self):
         tz = self._target.getConference().getTimezone()
         filename = "%s - Contribution.pdf"%self._target.getTitle()
@@ -1673,7 +1674,7 @@ class RHAuthBase(RHContribModifBaseSpecialSesCoordRights):
 
 
 class RHPrimAuthUp(RHAuthBase):
-    
+
     def _process(self):
         contrib=self._target
         contrib.upPrimaryAuthor(self._auth)
@@ -1681,7 +1682,7 @@ class RHPrimAuthUp(RHAuthBase):
 
 
 class RHPrimAuthDown(RHAuthBase):
-    
+
     def _process(self):
         contrib=self._target
         contrib.downPrimaryAuthor(self._auth)
@@ -1689,7 +1690,7 @@ class RHPrimAuthDown(RHAuthBase):
 
 
 class RHCoAuthUp(RHAuthBase):
-    
+
     def _process(self):
         contrib=self._target
         contrib.upCoAuthor(self._auth)
@@ -1697,14 +1698,14 @@ class RHCoAuthUp(RHAuthBase):
 
 
 class RHCoAuthDown(RHAuthBase):
-    
+
     def _process(self):
         contrib=self._target
         contrib.downCoAuthor(self._auth)
         self._redirect(urlHandlers.UHContributionModification.getURL(contrib))
 
 class RHNewSpeaker(RHContribModifBaseSpecialSesCoordRights):
-    
+
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
         self._action=""
@@ -1726,7 +1727,7 @@ class RHNewSpeaker(RHContribModifBaseSpecialSesCoordRights):
         auth.setFax(p.get("fax", ""))
         self._target.newSpeaker(auth)
         return auth
-    
+
     def _process(self):
         if self._action != "":
             if self._action == "perform":
@@ -1745,7 +1746,7 @@ class RHNewSpeaker(RHContribModifBaseSpecialSesCoordRights):
             return p.display()
 
 class RHEditSpeaker(RHContribModifBaseSpecialSesCoordRights):
-    
+
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
         self._authorId=params["authorId"]
@@ -1766,17 +1767,17 @@ class RHEditSpeaker(RHContribModifBaseSpecialSesCoordRights):
             auth.setAddress(p.get("address", ""))
             auth.setPhone(p.get("phone", ""))
             auth.setFax(p.get("fax", ""))
-            
+
             grantSubm=False
             if auth.getEmail().lower().strip() != p.get("email", "").lower().strip():
-                #----If it's already in the pending queue in order to grant 
+                #----If it's already in the pending queue in order to grant
                 #    submission rights we must unindex and after the modification of the email,
                 #    index again...
                 if self._target.getConference().getPendingQueuesMgr().isPendingSubmitter(auth):
                     self._target.getConference().getPendingQueuesMgr().removePendingSubmitter(auth)
                     grantSubm=True
                 #-----
-            
+
             auth.setEmail(p.get("email", ""))
 
             if grantSubm:
@@ -1787,7 +1788,7 @@ class RHEditSpeaker(RHContribModifBaseSpecialSesCoordRights):
                 if p.get("email", "").strip() == "":
                     raise FormValuesError("If you want to add the speaker as submitter, please enter their email")
                 self._target.grantSubmission(auth)
-    
+
     def _process(self):
         if self._action != "":
             if self._action == "perform":
@@ -1817,7 +1818,7 @@ class RHSubmittersRem(RHContribModifBaseSpecialSesCoordRights):
                 self._pendings.append(id)
             else:
                 self._submitters.append(av)
-    
+
     def _process(self):
         for sub in self._submitters:
             self._target.revokeSubmission(sub)
@@ -1828,7 +1829,7 @@ class RHSubmittersRem(RHContribModifBaseSpecialSesCoordRights):
 
 class RHSubmittersSel(RHContribModifBaseSpecialSesCoordRights):
     _uh=urlHandlers.UHContribModSubmittersSel
-    
+
     def _process(self):
         p=contributions.WPModSubmittersSel(self, self._target)
         return p.display(**self._getRequestParams())
@@ -1840,7 +1841,7 @@ class RHSubmittersAdd(RHContribModifBaseSpecialSesCoordRights):
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
         self._submitterRole=self._normaliseListParam(params.get("submitterRole", []))
-    
+
     def _process(self):
         params=self._getRequestParams()
         if "selectedPrincipals" in params:
@@ -1864,7 +1865,7 @@ class RHSubmittersAdd(RHContribModifBaseSpecialSesCoordRights):
 
 class RHMaterials(RHContribModifBaseSpecialSesCoordAndReviewingStaffRights):
     _uh = urlHandlers.UHContribModifMaterials
-    
+
     def _checkProtection(self):
         """ This disables people that are not conference managers or track coordinators to
             delete files from a contribution.
@@ -1873,7 +1874,7 @@ class RHMaterials(RHContribModifBaseSpecialSesCoordAndReviewingStaffRights):
         for key in self._paramsForCheckProtection.keys():
             if key.find("delete")!=-1:
                 RHContribModifBaseSpecialSesCoordRights._checkProtection(self)
-    
+
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordAndReviewingStaffRights._checkParams(self, params)
         if not hasattr(self, "_rhSubmitMaterial"):
@@ -1885,9 +1886,9 @@ class RHMaterials(RHContribModifBaseSpecialSesCoordAndReviewingStaffRights):
         # note from DavidMC: i wrote this long parameter name in order
         # not to overwrite a possibly existing _params in a base class
         # we need to store the params so that _checkProtection can know
-        # if the action is to upload a file, delete etc. 
+        # if the action is to upload a file, delete etc.
         self._paramsForCheckProtection = params
-    
+
     def _process(self):
         if self._target.getOwner().isClosed():
             p = WPConferenceModificationClosed( self, self._target )
@@ -1896,14 +1897,14 @@ class RHMaterials(RHContribModifBaseSpecialSesCoordAndReviewingStaffRights):
         p = contributions.WPContributionModifMaterials( self, self._target )
         return p.display(**self._getRequestParams())
 
-        
+
 
 class RHContributionReportNumberEdit(RHContribModifBase):
 
     def _checkParams(self, params):
         RHContribModifBase._checkParams(self, params)
         self._reportNumberSystem=params.get("reportNumberSystem","")
-        
+
     def _process(self):
         if self._reportNumberSystem!="":
             p=contributions.WPContributionReportNumberEdit(self,self._target, self._reportNumberSystem)
@@ -1917,7 +1918,7 @@ class RHContributionReportNumberPerformEdit(RHContribModifBase):
         RHContribModifBase._checkParams(self, params)
         self._reportNumberSystem=params.get("reportNumberSystem","")
         self._reportNumber=params.get("reportNumber","")
-        
+
     def _process(self):
         if self._reportNumberSystem!="" and self._reportNumber!="":
             self._target.getReportNumberHolder().addReportNumber(self._reportNumberSystem, self._reportNumber)
@@ -1929,7 +1930,7 @@ class RHContributionReportNumberRemove(RHContribModifBase):
     def _checkParams(self, params):
         RHContribModifBase._checkParams(self, params)
         self._reportNumberIdsToBeDeleted=self._normaliseListParam( params.get("deleteReportNumber",[]))
-        
+
     def _process(self):
         nbDeleted = 0
         for id in self._reportNumberIdsToBeDeleted:
