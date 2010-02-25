@@ -189,9 +189,8 @@ class ConferenceScheduleAddContribution(ScheduleAddContribution, conferenceServi
         contribution.setParent(self._target)
 
     def _schedule(self, contribution):
-        # 'check' param = 1 - dates will be checked for errors
         if self._needsToBeScheduled:
-            self._target.getSchedule().addEntry(contribution.getSchEntry(),1)
+            self._target.getSchedule().addEntry(contribution.getSchEntry(),2)
 
     def _getSlotEntry(self):
         return None
