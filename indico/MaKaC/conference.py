@@ -2766,7 +2766,8 @@ class Conference(Persistent, Fossilizable):
         #the link in every manager to the conference then, when the manager goes to his "My profile" he
         #will see a link to a conference that doesn't exist. Therefore, we need to delete that link as well
         for manager in self.getManagerList():
-            manager.unlinkTo(self, "manager")
+            if isinstance(manager, MaKaC.user.Avatar):
+                manager.unlinkTo(self, "manager")
 
         TrashCanManager().add(self)
 
