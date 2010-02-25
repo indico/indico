@@ -52,7 +52,7 @@
 <font size="+1" face="arial">
 ORGANISATION EUROP<xsl:text disable-output-escaping="yes">&#38;Eacute;</xsl:text>ENNE POUR LA RECHERCHE NUCL<xsl:text disable-output-escaping="yes">&#38;Eacute;</xsl:text>AIRE<br/>
 <font size="+3" face="arial">
-CERN 
+CERN
 </font>
 EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
 </font>
@@ -86,9 +86,9 @@ EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
 </font>
 
 <font size="+1" face="Times">
-<xsl:if test="count(child::location) != 0">
+<xsl:if test="count(child::location) != 0 and (./location/name !='' or ./location/room !='')">
 	<xsl:apply-templates select="./location"/>
-</xsl:if> - 
+</xsl:if> -
 <xsl:choose>
 <xsl:when test="substring(./startDate,0,11) = substring(./endDate,0,11)">
   <xsl:call-template name="prettydate"><xsl:with-param name="dat" select="substring(./startDate,0,11)"/></xsl:call-template>
@@ -97,12 +97,12 @@ EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
   </xsl:if>
 </xsl:when>
 <xsl:otherwise>
-    from 
+    from
     <xsl:call-template name="prettydate">
     <xsl:with-param name="dat" select="substring(./startDate,0,11)"/>
     </xsl:call-template>
     (<xsl:value-of select="substring(./startDate,12,5)"/>)
-    to 
+    to
     <xsl:call-template name="prettydate">
     <xsl:with-param name="dat" select="substring(./endDate,0,11)"/>
     </xsl:call-template>
@@ -170,7 +170,7 @@ EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
 
   <xsl:value-of select="./title" disable-output-escaping="yes"/>
   </b>
-  <xsl:if test="count(child::location) != 0">
+  <xsl:if test="count(child::location) != 0 and (./location/name !='' or ./location/room !='')">
     <xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
     (<xsl:apply-templates select="./location"/>)
   </xsl:if>
@@ -206,14 +206,14 @@ EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
 		</font><br/><br/></td>
 	</tr>
 	</xsl:if>
-<tr><td colspan="3"></td></tr>  
+<tr><td colspan="3"></td></tr>
 <tr>
         <td valign="top">
 	<xsl:choose>
 	<xsl:when test="/iconf/type != 'olist'">
 	        <b>
 	        <xsl:if test="substring(./startDate,12,5) != '00:00'">
-	                <font face="times" size="+1"><xsl:value-of select="substring(./startDate,12,5)"/></font> 
+	                <font face="times" size="+1"><xsl:value-of select="substring(./startDate,12,5)"/></font>
 	        </xsl:if>
 	        </b>
 	</xsl:when>
@@ -226,7 +226,7 @@ EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
 	<td valign="top">
 
     <xsl:if test="name(..) = 'session'">
-	<xsl:call-template name="displayModifIcons">	    
+	<xsl:call-template name="displayModifIcons">
 	  <xsl:with-param name="item" select="."/>
 	  <xsl:with-param name="confId" select="../../ID"/>
 	  <xsl:with-param name="sessId" select="../ID"/>
@@ -236,7 +236,7 @@ EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
 	</xsl:call-template>
       </xsl:if>
       <xsl:if test="name(..) != 'session'">
-	<xsl:call-template name="displayModifIcons">	    
+	<xsl:call-template name="displayModifIcons">
 	  <xsl:with-param name="item" select="."/>
 	  <xsl:with-param name="confId" select="../ID"/>
 	  <xsl:with-param name="sessId">null</xsl:with-param>
@@ -253,7 +253,7 @@ EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
 		<br/>
 	</xsl:if>
 	<font face="times" size="+1">
-	<xsl:value-of select="./title" disable-output-escaping="yes"/> 
+	<xsl:value-of select="./title" disable-output-escaping="yes"/>
 	</font>
 	<br/>
         <xsl:if test="./abstract != ''">
@@ -295,7 +295,7 @@ EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
 			</xsl:if>
 		</xsl:for-each></font>
 	</xsl:if>
-	</td>	
+	</td>
 </tr>
 <xsl:for-each select="./subcontribution">
   <xsl:apply-templates select="."/>
@@ -316,7 +316,7 @@ EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
 	<td valign="top">
 
     <xsl:if test="name(../..) = 'session'">
-	<xsl:call-template name="displayModifIcons">	    
+	<xsl:call-template name="displayModifIcons">
 	  <xsl:with-param name="item" select="."/>
 	  <xsl:with-param name="confId" select="../../../ID"/>
 	  <xsl:with-param name="sessId" select="../../ID"/>
@@ -326,7 +326,7 @@ EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
 	</xsl:call-template>
       </xsl:if>
       <xsl:if test="name(../..) != 'session'">
-	<xsl:call-template name="displayModifIcons">	    
+	<xsl:call-template name="displayModifIcons">
 	  <xsl:with-param name="item" select="."/>
 	  <xsl:with-param name="confId" select="../../ID"/>
 	  <xsl:with-param name="sessId">null</xsl:with-param>
@@ -339,7 +339,7 @@ EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
 	<xsl:if test="./category != ''">
 		<B>
 		<xsl:value-of select="./category"/>
-		</B>:    
+		</B>:
 	</xsl:if>
 	<font face="times" size="+0"><xsl:value-of select="./title" disable-output-escaping="yes"/></font>
 	</td>
@@ -423,7 +423,7 @@ EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
 	<xsl:value-of select="./@first" disable-output-escaping="yes"/>
 	<xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
 	<xsl:value-of select="./@last" disable-output-escaping="yes"/>
-</xsl:template>	
+</xsl:template>
 
 <xsl:template match="location">
 	<b><xsl:value-of select="./name"/></b>

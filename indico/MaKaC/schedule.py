@@ -167,7 +167,7 @@ class TimeSchedule(Schedule, Persistent):
         else:
             if entry.getStartDate() < self.getStartDate('UTC'):
                 if check==1:
-                    raise TimingError( _("Cannot schedule this entry because its start date (%s) is before its parents (%s)")%(entry.getStartDate(),self.getStartDate('UTC')),_("Add Entry"))
+                    raise TimingError( _("Cannot schedule this entry because its start date (%s) is before its parents (%s)")%(entry.getAdjustedStartDate(),self.getAdjustedStartDate()),_("Add Entry"))
                 elif check == 2:
                     ContextManager.get('autoOps').append((owner,
                                                           "OWNER_START_DATE_EXTENDED",
@@ -176,7 +176,7 @@ class TimeSchedule(Schedule, Persistent):
                     owner.setStartDate(entry.getStartDate(),check)
             elif entry.getEndDate()>self.getEndDate('UTC'):
                 if check==1:
-                    raise TimingError( _("Cannot schedule this entry because its end date (%s) is after its parents (%s)")%(entry.getEndDate(),self.getEndDate('UTC')),_("Add Entry"))
+                    raise TimingError( _("Cannot schedule this entry because its end date (%s) is after its parents (%s)")%(entry.getAdjustedEndDate(),self.getAdjustedEndDate()),_("Add Entry"))
                 elif check == 2:
                     ContextManager.get('autoOps').append((owner,
                                                           "OWNER_END_DATE_EXTENDED",
@@ -188,7 +188,7 @@ class TimeSchedule(Schedule, Persistent):
         if entry.getEndDate() is not None and \
                 (entry.getEndDate()<self.getStartDate('UTC') or \
                 entry.getEndDate()>self.getEndDate('UTC')):
-            raise TimingError( _("Cannot schedule this entry because its end date (%s) is after its parents (%s)")%(entry.getEndDate(),self.getEndDate()), _("Add Entry"))
+            raise TimingError( _("Cannot schedule this entry because its end date (%s) is after its parents (%s)")%(entry.getAdjustedEndDate(),self.getAdjustedEndDate()), _("Add Entry"))
         self._entries.append(entry)
         entry.setSchedule(self,self._getNewEntryId())
         self.reSchedule()

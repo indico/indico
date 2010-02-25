@@ -9,7 +9,7 @@ import MaKaC.schedule as schedule
 
 from MaKaC.common.PickleJar import DictPickler
 
-from MaKaC.services.interface.rpc.common import ServiceError
+from MaKaC.services.interface.rpc.common import ServiceError, TimingNoReportError
 
 from MaKaC.services.implementation import conference as conferenceServices
 from MaKaC.services.implementation import base
@@ -78,7 +78,7 @@ class ScheduleOperation:
         try:
             return self._performOperation()
         except TimingError, e:
-            raise ServiceError("ERR-E2", e.getMsg())
+            raise TimingNoReportError("ERR-E2", e.getMsg())
 
     def initializeAutoOps(self):
         ContextManager.set('autoOps',[])
@@ -114,7 +114,7 @@ class ScheduleAddContribution(ScheduleOperation, LocationSetter):
         self._roomInfo = self._pManager.extract("roomInfo", pType=dict, allowEmpty=True)
         self._keywords = self._pManager.extract("keywords", pType=list,
                                           allowEmpty=True)
-        self._boardNumber = self._pManager.extract("boardNumber", pType=str, allowEmpty=True)
+        self._boardNumber = self._pManager.extract("boardNumber", pType=str, allowEmpty=True, defaultValue="")
         self._needsToBeScheduled = self._params.get("schedule", True)
         if self._needsToBeScheduled:
             self._dateTime = self._pManager.extract("startDate", pType=datetime.datetime)
@@ -189,9 +189,8 @@ class ConferenceScheduleAddContribution(ScheduleAddContribution, conferenceServi
         contribution.setParent(self._target)
 
     def _schedule(self, contribution):
-        # 'check' param = 1 - dates will be checked for errors
         if self._needsToBeScheduled:
-            self._target.getSchedule().addEntry(contribution.getSchEntry(),1)
+            self._target.getSchedule().addEntry(contribution.getSchEntry(),2)
 
     def _getSlotEntry(self):
         return None

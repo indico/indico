@@ -26,7 +26,7 @@ from MaKaC.common.logger import Logger
 from MaKaC.common.logger import Logger
 from MaKaC.common import timezoneUtils
 
-import os, shutil, pickle, datetime
+import os, shutil, pickle, datetime, fcntl
 
 class IndicoCache:
     """ Used to cache some pages in Indico """
@@ -150,11 +150,13 @@ class MultiLevelCache(object):
         if len(path) == 0:
             filePath = os.path.join(fsPath, fileName)
             f = open(filePath, 'wb')
+            fcntl.fcntl(f, fcntl.LOCK_EX)
             f.write(data)
+            fcntl.fcntl(f, fcntl.LOCK_UN)
             f.close()
         else:
             dirPath = os.path.join(fsPath, path[0])
-            
+
             if not os.path.exists(dirPath):
                 os.makedirs(dirPath)
 
@@ -162,19 +164,19 @@ class MultiLevelCache(object):
 
     def getCacheDir(self):
         return os.path.join(Config().getInstance().getXMLCacheDir(), self.cacheName)
-        
+
     def cacheObject(self, path, fileName, obj):
         """ path - Path where to store
         fileName - File name to use
         obj - MultiLevelCacheEntry to store
         """
-        
+
         obj.setDate(timezoneUtils.nowutc())
         self._saveObject(self.getCacheDir(), path, fileName, obj.pickle())
         Logger.get('cache/%s'%self.cacheName).debug("Saved %s/%s" % (path, fileName))
 
     def loadObject(self, fnList):
-        
+
         filePath = os.path.join(*([self.getCacheDir()] + fnList))
 
         Logger.get('cache/%s'%self.cacheName).debug("Checking %s...", filePath)
@@ -182,20 +184,25 @@ class MultiLevelCache(object):
             # (Possible) Cache hit!
             # check dirty state first
 
-            f = file(filePath, 'rb')
+            f = open(filePath, 'rb')
+
+            # Lock file
+            fcntl.fcntl(f, fcntl.LOCK_SH)
             data = f.read()
+            fcntl.fcntl(f, fcntl.LOCK_UN)
             f.close()
+
             obj = MultiLevelCacheEntry.unpickle(data)
-                
+
             if self.isDirty(filePath, obj):
                 Logger.get('cache/%s'%self.cacheName).debug("DIRTY")
-                # if the file is older, remove it, and report a miss
-                os.remove(filePath)
+                # if the file is older, report a miss
+                # os.remove(filePath)
                 return None
             else:
                 Logger.get('cache/%s'%self.cacheName).debug("HIT")
                 return obj
-            
+
         else:
             Logger.get('cache/%s'%self.cacheName).debug("MISS")
             # Cache miss!

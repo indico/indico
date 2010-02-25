@@ -469,6 +469,7 @@ class RH(RequestHandlerBase):
                             else:
                                 res = self._process()
                         self._endRequestSpecific2RH( True ) # I.e. implemented by Room Booking request handlers
+
                         DBMgr.getInstance().endRequest( True )
                         Logger.get('requestHandler').info('Request %s successful' % (id(self._req)))
 
@@ -483,7 +484,8 @@ class RH(RequestHandlerBase):
                         #DBMgr.getInstance().endRequest(False)
                         res = self._processError(e)
                 except ConflictError:
-                    Logger.get('requestHandler').debug('Conflict in Database! (Request %s)' % id(self._req))
+                    import traceback
+                    Logger.get('requestHandler').debug('Conflict in Database! (Request %s)\n%s' % (id(self._req), traceback.format_exc()))
                     self._abortSpecific2RH()
                     DBMgr.getInstance().abort()
                     retry -= 1

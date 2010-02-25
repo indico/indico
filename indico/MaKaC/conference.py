@@ -2766,7 +2766,8 @@ class Conference(Persistent, Fossilizable):
         #the link in every manager to the conference then, when the manager goes to his "My profile" he
         #will see a link to a conference that doesn't exist. Therefore, we need to delete that link as well
         for manager in self.getManagerList():
-            manager.unlinkTo(self, "manager")
+            if isinstance(manager, MaKaC.user.Avatar):
+                manager.unlinkTo(self, "manager")
 
         TrashCanManager().add(self)
 
@@ -11100,10 +11101,10 @@ class Material(Persistent):
                 return True
         return False
 
-    def addResource( self, newRes, forcedFileId=None ):
+    def addResource( self, newRes, forcedFileId = None ):
         newRes.setOwner( self )
         newRes.setId( str( self.__resourcesIdGen.newCount() ) )
-        newRes.archive( self._getRepository(), forcedFileId=forcedFileId )
+        newRes.archive( self._getRepository(), forcedFileId = forcedFileId )
         self.__resources[newRes.getId()] = newRes
         self.notifyModification()
         Logger.get('storage').debug("Finished storing resource %s for material %s" % (newRes.getId(), self.getLocator()))
@@ -11515,7 +11516,7 @@ class Minutes(Material):
         self.title = newTitle.strip()
         self.notifyModification()
 
-    def _setFile( self ):
+    def _setFile( self, forcedFileId = None ):
         #XXX: unsafe; it must be changed by mkstemp when migrating to python 2.3
         tmpFileName = tempfile.mktemp()
         fh = open(tmpFileName, "w")
@@ -11524,15 +11525,15 @@ class Minutes(Material):
         self.file = LocalFile()
         self.file.setId("minutes")
         self.file.setName("minutes")
-        self.file.setFilePath( tmpFileName )
-        self.file.setFileName( "minutes.txt" )
-        self.file.setOwner( self )
-        self.file.archive( self._getRepository() )
+        self.file.setFilePath(tmpFileName)
+        self.file.setFileName("minutes.txt")
+        self.file.setOwner(self)
+        self.file.archive(self._getRepository(), forcedFileId = forcedFileId)
 
-    def setText( self, text ):
+    def setText( self, text, forcedFileId = None ):
         if self.file:
             self.file.delete()
-        self._setFile()
+        self._setFile(forcedFileId = forcedFileId)
         self.file.replaceContent( text )
         self.getOwner().notifyModification()
 
@@ -11688,7 +11689,7 @@ class Resource(Persistent):
     def getDescription( self ):
         return self.description
 
-    def archive( self, repository=None, forcedFileId=None ):
+    def archive( self, repository = None, forcedFileId = None ):
         """performs necessary operations to ensure the archiving of the
             resource. By default is doing nothing as the persistence of the
             system already ensures the archiving of the basic resource data"""
@@ -12050,14 +12051,14 @@ class LocalFile(Resource):
             raise MaKaCError( _("File not available until it has been archived") , _("File Archiving"))
         self.__repository.replaceContent( self.__archivedId, newContent )
 
-    def archive( self, repository=None, forcedFileId=None ):
+    def archive( self, repository=None, forcedFileId = None ):
         if self.isArchived():
             raise Exception( _("File is already archived"))
         if not repository:
             raise Exception( _("Destination repository not set"))
         if self.filePath == "":
             return _("Nothing to archive")
-        repository.storeFile( self, forcedFileId=forcedFileId)
+        repository.storeFile( self, forcedFileId = forcedFileId)
         self.filePath = ""
         self.notifyModification()
 

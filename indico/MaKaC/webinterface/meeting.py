@@ -42,7 +42,7 @@ from MaKaC.common.general import *
 from MaKaC.webinterface.general import WebFactory
 from MaKaC.webinterface.pages.category import WPConferenceCreationMainData
 from MaKaC.webinterface.pages.conferences import WPConferenceDisplayBase
-from MaKaC.webinterface.materialFactories import ConfMFRegistry
+from MaKaC.webinterface.materialFactories import ConfMFRegistry, ContribMFRegistry
 from MaKaC.webinterface.pages import evaluations
 from MaKaC.i18n import _
 import MaKaC.common.timezoneUtils as timezoneUtils
@@ -630,8 +630,11 @@ class WPMSessionDisplayWriteMinutes(WPMSessionDisplay):
 #        return banner + body
 
 class WPMContributionModification(contributions.WPContributionModification):
-    pass
-    # Share with Conference
+
+    def _getTabContent( self, params ):
+        from MaKaC.webinterface.pages.contributions import WContribModifMain
+        wc = WContribModifMain( self._contrib, ContribMFRegistry(), eventType = "meeting" )
+        return wc.getHTML()
 
 class WPMModSpeaker(contributions.WPModSpeaker):
     pass

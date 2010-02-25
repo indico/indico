@@ -42,12 +42,12 @@ import MaKaC.common.timezoneUtils as timezoneUtils
 
 
 class WPContributionBase( WPMainBase, WPConferenceBase ):
-    
+
     def __init__( self, rh, contribution ):
         self._contrib = self._target = contribution
         WPConferenceBase.__init__( self, rh, self._contrib.getConference() )
         self._navigationTarget = contribution
-    
+
 
 class WPContributionDefaultDisplayBase( WPConferenceDefaultDisplayBase, WPContributionBase ):
 
@@ -61,7 +61,7 @@ class WPContributionDefaultDisplayBase( WPConferenceDefaultDisplayBase, WPContri
 
 
 class WContributionDisplayBase(wcomponents.WTemplated):
-    
+
     def __init__(self, aw, contrib):
         self._aw = aw
         self._contrib = contrib
@@ -83,8 +83,8 @@ class WContributionDisplayBase(wcomponents.WTemplated):
             id = f.getId()
             caption = f.getName()
             html+=self._getHTMLRow(caption, self._contrib.getField(id))
-        return html             
-    
+        return html
+
     def _getSubContributionItem(self, sc, modifURL):
         modifyItem = ""
         url = urlHandlers.UHSubContributionDisplay.getURL(sc)
@@ -210,11 +210,11 @@ class WContributionDisplayBase(wcomponents.WTemplated):
         else:
             if self._contrib.getBoardNumber()!="":
                 vars["location"]= _("""%s <br> _("board #"): %s""")%(vars["location"],self._contrib.getBoardNumber())
-            
+
         vars["location"]=self._getHTMLRow( _("Place"),vars["location"])
-        
+
         authIndex = self._contrib.getConference().getAuthorIndex()
-        
+
         l=[]
         for speaker in self._contrib.getSpeakerList():
             l.append(self.htmlText(speaker.getFullName()))
@@ -239,14 +239,14 @@ class WContributionDisplayBase(wcomponents.WTemplated):
         vars["contribType"]=""
         if self._contrib.getType() != None:
             vars["contribType"]=self._getHTMLRow( _("Contribution type"),self.htmlText(self._contrib.getType().getName()))
-        
+
         #TODO: fuse this two lines into one, so that they are not both executed...
         #but the 1st line generates a lot of HTML in Python...
         vars["material"]=self._getMaterialHTML()
-        
+
         from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
         vars["MaterialList"] = wcomponents.WShowExistingMaterial(self._contrib).getHTML()
-        
+
         vars["duration"]=""
         if self._contrib.getDuration() is not None:
             vars["duration"]=(datetime(1900,1,1)+self._contrib.getDuration()).strftime("%M'")
@@ -294,7 +294,7 @@ class WContributionDisplayMin(WContributionDisplayBase):
 
 
 class WContributionDisplay:
-    
+
     def __init__(self, aw, contrib):
         self._aw = aw
         self._contrib = contrib
@@ -330,7 +330,7 @@ class WPContributionDisplay( WPContributionDefaultDisplayBase ):
         self._toolBar.addItem(pdf)
         self._toolBar.addItem(xml)
         self._toolBar.addItem(ical)
-    
+
     def _getBody( self, params ):
         wc=WContributionDisplay( self._getAW(), self._contrib )
         return wc.getHTML()
@@ -338,8 +338,8 @@ class WPContributionDisplay( WPContributionDefaultDisplayBase ):
 
 
 class WPContributionModifBase( WPConferenceModifBase  ):
-    
-    def __init__( self, rh, contribution ):        
+
+    def __init__( self, rh, contribution ):
         WPConferenceModifBase.__init__( self, rh, contribution.getConference() )
         self._contrib = self._target = contribution
 
@@ -349,9 +349,9 @@ class WPContributionModifBase( WPConferenceModifBase  ):
     def _getNavigationDrawer(self):
         pars = {"target": self._contrib , "isModif": True}
         return wcomponents.WNavigationDrawer( pars, bgColor="white" )
-    
+
     def _createTabCtrl( self ):
-        
+
         self._tabCtrl = wcomponents.TabControl()
         self._tabMain = self._tabCtrl.newTab( "main", _("Main"), \
                 urlHandlers.UHContributionModification.getURL( self._target ) )
@@ -365,31 +365,31 @@ class WPContributionModifBase( WPConferenceModifBase  ):
                 urlHandlers.UHContribModifAC.getURL( self._target ) )
         self._tabTools = self._tabCtrl.newTab( "tools", _("Tools"), \
                 urlHandlers.UHContribModifTools.getURL( self._target ) )
-        
+
         hasReviewingEnabled = self._contrib.getConference().hasEnabledSection('paperReviewing')
         confReviewChoice = self._contrib.getConference().getConfReview().getChoice()
-        
+
         if hasReviewingEnabled and confReviewChoice != 1:
 
             self._tabReviewing = self._tabCtrl.newTab( "reviewing", "Reviewing", \
                 urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
-    
+
             if (confReviewChoice == 3 or confReviewChoice == 4) and \
                 self._contrib.getReviewManager().isEditor(self._rh._getUser()) and \
                 (not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self._conf.getConfReview().getChoice() == 3) and \
                 self._contrib.getReviewManager().getLastReview().isAuthorSubmitted():
-                
+
                 self._tabJudgeEditing = self._tabCtrl.newTab( "editing", "Editing", \
                                          urlHandlers.UHContributionEditingJudgement.getURL(self._target) )
-            
+
             if (confReviewChoice == 2 or confReviewChoice == 4) and \
                 self._contrib.getReviewManager().isReviewer(self._rh._getUser()) and \
                 not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() and \
                 self._contrib.getReviewManager().getLastReview().isAuthorSubmitted():
-                
+
                 self._tabGiveAdvice = self._tabCtrl.newTab( "advice", "Advice on reviewing", \
                                       urlHandlers.UHContributionGiveAdvice.getURL(self._target))
-                
+
             if len(self._contrib.getReviewManager().getVersioning()) > 1 or self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
                 self._tabReviewingHistory = self._tabCtrl.newTab( "reviewing_history", "Reviewing History", \
                                             urlHandlers.UHContributionModifReviewingHistory.getURL( self._target ) )
@@ -402,7 +402,7 @@ class WPContributionModifBase( WPConferenceModifBase  ):
 
     def _setupTabCtrl(self):
         pass
-    
+
     def _setActiveSideMenuItem(self):
         if self._target.isScheduled():
             self._timetableMenuItem.setActive(True)
@@ -419,15 +419,15 @@ class WPContributionModifBase( WPConferenceModifBase  ):
             banner = wcomponents.WContribListBannerModif(self._target).getHTML()
         body = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
         return banner + body
-    
+
 
 class WPContribModifMain( WPContributionModifBase ):
-    
+
     def _setActiveTab( self ):
-        self._tabMain.setActive()  
+        self._tabMain.setActive()
 
 class WPContributionModifTools( WPContributionModifBase ):
-    
+
     def _setActiveTab( self ):
         self._tabTools.setActive()
 
@@ -437,12 +437,12 @@ class WPContributionModifTools( WPContributionModifBase ):
 "deleteContributionURL": urlHandlers.UHContributionDelete.getURL( self._target ), \
 "MoveContributionURL": urlHandlers.UHContributionMove.getURL( self._target ), \
 "writeMinutes": urlHandlers.UHContributionWriteMinutes.getURL( self._target ) }
-        return wc.getHTML( pars )  
+        return wc.getHTML( pars )
 
 class WPContributionModifMaterials( WPContributionModifBase ):
     def __init__(self, rh, contribution):
         WPContributionModifBase.__init__(self, rh, contribution)
-    
+
     def _setActiveTab( self ):
         self._tabMaterials.setActive()
 
@@ -493,7 +493,7 @@ class WPModSearchSpeaker ( WPContribModifMain ):
         return wc.getHTML( params )
 
 class WAuthorTable(wcomponents.WTemplated):
-    
+
     def __init__(self, authList, contrib):
         self._list = authList
         self._conf = contrib.getConference()
@@ -531,7 +531,7 @@ class WAuthorTable(wcomponents.WTemplated):
         return vars
 
 class WContribModifClosed(wcomponents.WTemplated):
-    
+
     def __init__(self):
         pass
 
@@ -539,12 +539,13 @@ class WContribModifClosed(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars(self)
         vars["closedIconURL"] = Config.getInstance().getSystemIconURL("closed")
         return vars
-    
+
 class WContribModifMain(wcomponents.WTemplated):
-    
-    def __init__( self, contribution, mfRegistry ):
+
+    def __init__( self, contribution, mfRegistry, eventType = "conference" ):
         self._contrib = contribution
         self._mfRegistry = mfRegistry
+        self._eventType = eventType
 
     def _getAbstractHTML( self ):
         if not self._contrib.getConference().hasEnabledSection("cfa"):
@@ -584,7 +585,7 @@ class WContribModifMain(wcomponents.WTemplated):
                 if spk.getEmail() in emails:
                     submitter = _(""" <small>( _("Submitter"))</small>""")
                     break
-                
+
             #if not self._contrib.isAuthor(spk):
             fullName = """<a href=%s>%s</a>"""%(quoteattr(str(urlHandlers.UHContribModSpeaker.getURL(spk))), \
                                                 self.htmlText(spk.getFullName()))
@@ -620,7 +621,7 @@ class WContribModifMain(wcomponents.WTemplated):
         for session in self._contrib.getConference().getSessionListSorted():
             if self._contrib.getSession()==session:
                 continue
-            from MaKaC.common.TemplateExec import truncateTitle 
+            from MaKaC.common.TemplateExec import truncateTitle
             res.append("""<option value=%s>%s</option>"""%(quoteattr(str(session.getId())),self.htmlText(truncateTitle(session.getTitle(), 60))))
         return "".join(res)
 
@@ -654,7 +655,7 @@ class WContribModifMain(wcomponents.WTemplated):
     <tr>
         <td colspan="3" class="horizontalLine">&nbsp;</td>
     </tr>
-            """)%(d,resp,comment) 
+            """)%(d,resp,comment)
         return html
 
     def _getAdditionalFieldsHTML(self):
@@ -670,10 +671,11 @@ class WContribModifMain(wcomponents.WTemplated):
                         <td bgcolor="white" class="blacktext"><table class="tablepre"><tr><td><pre>%s</pre></td></tr></table></td>
                     </tr>"""%(caption, self.htmlText( self._contrib.getField(id) ))
         return html
-        
+
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
+        vars["eventType"] = self._eventType
         vars["withdrawnNotice"]=self._getWithdrawnNoticeHTML()
         vars["locator"] = self._contrib.getLocator().getWebForm()
         vars["title"] = self._contrib.getTitle()
@@ -707,7 +709,7 @@ class WContribModifMain(wcomponents.WTemplated):
         room=self._contrib.getRoom()
         if room is not None and room.getName().strip()!="":
             vars["place"]= _("""%s <br> _("Room"): %s""")%(vars["place"],self.htmlText(room.getName()))
-        if self._contrib.getBoardNumber()!="":
+        if self._contrib.getBoardNumber()!="" and self._contrib.getBoardNumber() is not None:
             vars["place"]= _("""%s<br> _("Board #")%s""")%(vars["place"],self.htmlText(self._contrib.getBoardNumber()))
         vars["id"] = self.htmlText( self._contrib.getId() )
         vars["dataModificationURL"] = str( urlHandlers.UHContributionDataModification.getURL( self._contrib ) )
@@ -755,21 +757,21 @@ class WPContributionModification( WPContribModifMain ):
 
     def _getTabContent( self, params ):
         wc = WContribModifMain( self._contrib, materialFactories.ContribMFRegistry() )
-        return wc.getHTML() 
+        return wc.getHTML()
 
 class WPContributionModificationClosed( WPContribModifMain ):
 
     def _createTabCtrl( self ):
         self._tabCtrl = wcomponents.TabControl()
         self._tabMain = self._tabCtrl.newTab( "main", _("Main"), "")
-        
+
     def _getTabContent( self, params ):
         wc = WContribModifClosed()
-        return wc.getHTML() 
+        return wc.getHTML()
 
 
 class WContribModNewPrimAuthor(wcomponents.WTemplated):
-    
+
     def __init__(self,contrib):
         self._contrib = contrib
 
@@ -782,16 +784,16 @@ class WContribModNewPrimAuthor(wcomponents.WTemplated):
 
 
 class WPModNewPrimAuthor( WPContribModifMain ):
-    
+
     def _getTabContent( self, params ):
         wc = WContribModNewPrimAuthor(self._contrib)
         return wc.getHTML()
 
 
 class WContribModPrimAuthor(wcomponents.WTemplated):
-    
+
     def __init__(self,auth):
-        self._auth=auth 
+        self._auth=auth
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
@@ -808,13 +810,13 @@ class WContribModPrimAuthor(wcomponents.WTemplated):
 
 
 class WPModPrimAuthor( WPContribModifMain ):
-    
+
     def _getTabContent( self, params ):
         wc = WContribModPrimAuthor(params["author"])
         return wc.getHTML()
-    
+
 class WContribModNewCoAuthor(wcomponents.WTemplated):
-    
+
     def __init__(self,contrib):
         self._contrib = contrib
 
@@ -826,13 +828,13 @@ class WContribModNewCoAuthor(wcomponents.WTemplated):
 
 
 class WPModNewCoAuthor( WPContribModifMain ):
-    
+
     def _getTabContent( self, params ):
         wc = WContribModNewCoAuthor(self._contrib)
         return wc.getHTML()
 
 class WContribModNewSpeaker(wcomponents.WTemplated):
-    
+
     def __init__(self,contrib):
         self._contrib = contrib
 
@@ -844,16 +846,16 @@ class WContribModNewSpeaker(wcomponents.WTemplated):
 
 
 class WPModNewSpeaker( WPContribModifMain ):
-    
+
     def _getTabContent( self, params ):
         wc = WContribModNewSpeaker(self._contrib)
         return wc.getHTML()
 
 
 class WContribModCoAuthor(wcomponents.WTemplated):
-    
+
     def __init__(self,auth):
-        self._auth=auth 
+        self._auth=auth
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
@@ -870,15 +872,15 @@ class WContribModCoAuthor(wcomponents.WTemplated):
 
 
 class WPModCoAuthor( WPContribModifMain ):
-    
+
     def _getTabContent( self, params ):
         wc = WContribModCoAuthor(params["author"])
         return wc.getHTML()
 
 class WContribModSpeaker(wcomponents.WTemplated):
-    
+
     def __init__(self,auth):
-        self._auth=auth 
+        self._auth=auth
 
     def _getAddAsSubmitterHTML(self):
         html= _("""
@@ -925,13 +927,13 @@ class WContribModSpeaker(wcomponents.WTemplated):
 
 
 class WPModSpeaker( WPContribModifMain ):
-    
+
     def _getTabContent( self, params ):
         wc = WContribModSpeaker(params["author"])
         return wc.getHTML()
 
 class WContribModWithdraw(wcomponents.WTemplated):
-    
+
     def __init__(self,contrib):
         self._contrib=contrib
 
@@ -945,10 +947,10 @@ class WPModWithdraw(WPContribModifMain):
 
     def _getTabContent(self,params):
         wc=WContribModWithdraw(self._target)
-        return wc.getHTML() 
+        return wc.getHTML()
 
 class WContribModifAC(wcomponents.WTemplated):
-    
+
     def __init__( self, contrib ):
         self._contrib = contrib
 
@@ -964,7 +966,7 @@ class WContribModifAC(wcomponents.WTemplated):
         for email in self._contrib.getSubmitterEmailList():
             res.append( _("""<input type="checkbox" name="selUsers" value=%s>%s <small>( _("Pending"))</small>""")%(quoteattr(email),email))
         return "<br>".join(res)
-    
+
     def getVars( self ):
         vars=wcomponents.WTemplated.getVars( self )
         vars["submitters"]=self._getSubmittersHTML()
@@ -988,17 +990,17 @@ class WContribModifAC(wcomponents.WTemplated):
 
 
 class WPContribModifAC( WPContributionModifBase ):
-    
+
     def _setActiveTab( self ):
         self._tabAC.setActive()
-    
+
     def _getTabContent( self, params ):
         wc=WContribModifAC(self._target)
-        return wc.getHTML()   
+        return wc.getHTML()
 
 
 class WPContribModifSC( WPContributionModifBase ):
-    
+
     def _setActiveTab( self ):
         self._tabSubCont.setActive()
 
@@ -1017,10 +1019,10 @@ class WPContribModifSC( WPContributionModifBase ):
 #-----------------------------------------------------------------------------
 
 class WSubContributionCreation(wcomponents.WTemplated):
-    
+
     def __init__( self, target ):
         self.__owner = target
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["title"] = vars.get("title","")
@@ -1030,8 +1032,8 @@ class WSubContributionCreation(wcomponents.WTemplated):
         vars["keywords"] = vars.get("keywords","")
         vars["locator"] = self.__owner.getLocator().getWebForm()
         vars["speakers"] = ""
-        
-        vars["presenterDefined"] = vars.get("presenterDefined","")        
+
+        vars["presenterDefined"] = vars.get("presenterDefined","")
         return vars
 
     def _getPersonOptions(self):
@@ -1061,21 +1063,21 @@ class WSubContributionCreation(wcomponents.WTemplated):
         return "".join(html)
 
 class WPContribAddSC( WPContributionModifBase ):
-    
+
     def _setActiveTab( self ):
         self._tabSubCont.setActive()
-    
+
     def _getTabContent( self, params ):
-        
+
         wc = WSubContributionCreation( self._target )
         pars = { \
             "postURL": urlHandlers.UHContribCreateSubCont.getURL()}
         params.update(pars)
-        
+
         wpresenter = wcomponents.WAddPersonModule("presenter")
         params["presenterOptions"] = params.get("presenterOptions",self._getPersonOptions())
         params["presenter"] = wpresenter.getHTML(params)
-        
+
         return wc.getHTML( params )
 
     def _getPersonOptions(self):
@@ -1107,10 +1109,10 @@ class WPContribAddSC( WPContributionModifBase ):
 #---------------------------------------------------------------------------
 
 class WSubContributionCreationPresenterSelect(WPContributionModifBase ):
-    
+
     def _setActiveTab( self ):
         self._tabSubCont.setActive()
-        
+
     def _getTabContent( self, params ):
         searchAction = str(self._rh.getCurrentURL())
         searchExt = params.get("searchExt","")
@@ -1124,13 +1126,13 @@ class WSubContributionCreationPresenterSelect(WPContributionModifBase ):
 #---------------------------------------------------------------------------
 
 class WSubContributionCreationPresenterNew(WPContributionModifBase):
-    
+
     def _setActiveTab( self ):
         self._tabSubCont.setActive()
-        
+
     def _getTabContent( self, params ):
         p = wcomponents.WNewPerson()
-        
+
         if params.get("formTitle",None) is None :
             params["formTitle"] = _("Define new presenter")
         if params.get("titleValue",None) is None :
@@ -1149,18 +1151,18 @@ class WSubContributionCreationPresenterNew(WPContributionModifBase):
             params["phoneValue"] = ""
         if params.get("faxValue",None) is None :
             params["faxValue"] = ""
-        
-        formAction = urlHandlers.UHContribCreateSubContPersonAdd.getURL(self._contrib)        
+
+        formAction = urlHandlers.UHContribCreateSubContPersonAdd.getURL(self._contrib)
         formAction.addParam("orgin","new")
         formAction.addParam("typeName","presenter")
         params["formAction"] = formAction
-        
+
         return p.getHTML(params)
 
 #---------------------------------------------------------------------------
 
 class WPContributionSelectManagers( WPContribModifAC ):
-    
+
     def _getTabContent( self, params ):
         searchExt = params.get("searchExt","")
         if searchExt != "":
@@ -1173,7 +1175,7 @@ class WPContributionSelectManagers( WPContribModifAC ):
 
 
 class WPContributionSelectAllowed( WPContribModifAC ):
-    
+
     def _getTabContent( self, params ):
         searchExt = params.get("searchExt","")
         if searchExt != "":
@@ -1186,31 +1188,31 @@ class WPContributionSelectAllowed( WPContribModifAC ):
 
 
 class WContributionDataModificationBoard(wcomponents.WTemplated):
-    
+
     def __init__(self):
         pass
-        
+
     def getVars( self ):
-        vars=wcomponents.WTemplated.getVars(self) 
+        vars=wcomponents.WTemplated.getVars(self)
         return vars
-    
+
 class WContributionDataModificationType(wcomponents.WTemplated):
-    
+
     def __init__(self):
         pass
-        
+
     def getVars( self ):
-        vars=wcomponents.WTemplated.getVars(self) 
+        vars=wcomponents.WTemplated.getVars(self)
         return vars
-    
+
 class WContributionDataModification(wcomponents.WTemplated):
-    
+
     def __init__( self, contribution, conf, rh = None ):
         self._contrib = contribution
         self._owner = self._contrib.getOwner()
         self._conf = conf
         self._rh = rh
-    
+
     def _getTypeItemsHTML(self):
         res = ["""<option value=""></option>"""]
         conf=self._contrib.getConference()
@@ -1335,14 +1337,14 @@ class WContributionDataModification(wcomponents.WTemplated):
         else:
             vars["Type"]=""
             vars["Board"]=""
-        
+
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars["useRoomBookingModule"] = minfo.getRoomBookingModuleActive()
         return vars
 
 
 class WPEditData(WPContribModifMain):
-    
+
     def _getTabContent( self, params ):
         wc = WContributionDataModification(self._target, self._conf)
 
@@ -1353,11 +1355,11 @@ class WPEditData(WPContribModifMain):
 
 
 class WPContribAddMaterial( WPContribModifMain ):
-    
+
     def __init__( self, rh, contrib, mf ):
         WPContribModifMain.__init__( self, rh, contrib )
         self._mf = mf
-    
+
     def _getTabContent( self, params ):
         if self._mf:
             comp = self._mf.getCreationWC( self._target )
@@ -1367,7 +1369,7 @@ class WPContribAddMaterial( WPContribModifMain ):
         return comp.getHTML( pars )
 
 class WPContributionDeletion( WPContributionModifTools ):
-    
+
     def _getTabContent( self, params ):
         wc = wcomponents.WContributionDeletion( [self._target] )
         return wc.getHTML( urlHandlers.UHContributionDelete.getURL( self._target ) )
@@ -1394,7 +1396,7 @@ class WContributionMove(wcomponents.WTemplated):
 
 
 class WPcontribMove( WPContributionModifTools ):
-    
+
     def _getTabContent( self, params ):
         wc = WContributionMove( self._target, self._target.getConference() )
         params["cancelURL"] = urlHandlers.UHContribModifTools.getURL( self._target )
@@ -1402,7 +1404,7 @@ class WPcontribMove( WPContributionModifTools ):
         return wc.getHTML( params )
 
 class WPContributionWriteMinutes( WPContributionModifTools ):
-    
+
     def _getTabContent( self, params ):
         wc = wcomponents.WWriteMinutes( self._target )
         pars = {"postURL": urlHandlers.UHContributionWriteMinutes.getURL(self._target) }
@@ -1410,7 +1412,7 @@ class WPContributionWriteMinutes( WPContributionModifTools ):
 
 
 class WPModSubmittersSel(WPContribModifAC):
-    
+
     def _getTabContent(self,params):
         wf=self._rh.getWebFactory()
         addTo=1
@@ -1427,11 +1429,11 @@ class WPModSubmittersSel(WPContribModifAC):
         return wc.getHTML( params )
 
 class WPContributionDisplayRemoveMaterialsConfirm( WPContributionDefaultDisplayBase ):
-    
+
     def __init__(self,rh, conf, mat):
         WPContributionDefaultDisplayBase.__init__(self,rh,conf)
         self._mat=mat
-    
+
     def _getBody(self,params):
         wc=wcomponents.WDisplayConfirmation()
         msg= _(""" _("Are you sure you want to delete the following material")?<br>

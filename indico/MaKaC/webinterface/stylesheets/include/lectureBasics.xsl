@@ -18,24 +18,24 @@
      along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
      59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
      -->
-<xsl:stylesheet version='1.0' 
+<xsl:stylesheet version='1.0'
    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 
 
 
 
-<xsl:template name="eventInfoBox">	
+<xsl:template name="eventInfoBox">
 	<h1>
 		<xsl:text disable-output-escaping="yes"></xsl:text><xsl:value-of select="./title" disable-output-escaping="yes"/><xsl:text disable-output-escaping="yes"></xsl:text>
 	</h1>
-	
+
 	<xsl:if test="count(child::chair) != 0">
 		<h2>
 			by <xsl:apply-templates select="./chair"/>
 		</h2>
 	</xsl:if>
-	
+
 	<div class="details">
 		<xsl:call-template name="prettydate">
 			<xsl:with-param name="dat" select="substring(./startDate,0,11)"/>
@@ -47,8 +47,8 @@
 			to <strong><xsl:value-of select="substring(./endDate,12,5)"/></strong>
 		</xsl:if>
 		(<xsl:value-of select="substring(./timezone,0,25)"/>)
-		
-		<xsl:if test="count(child::location) != 0">
+
+		<xsl:if test="count(child::location) != 0 and (./location/name !='' or ./location/room !='')">
 			<br />at <strong><xsl:apply-templates select="./location"><xsl:with-param name="span">headerRoomLink</xsl:with-param></xsl:apply-templates></strong>
 		</xsl:if>
 	</div>
@@ -70,7 +70,7 @@
     <xsl:if test="name() = 'user'">
       <xsl:call-template select="." name="fulluser">
 	<xsl:with-param name="span">author</xsl:with-param>
-      </xsl:call-template>    
+      </xsl:call-template>
     </xsl:if>
     <xsl:if test="name() = 'UnformatedUser'">
       <xsl:apply-templates select="." />

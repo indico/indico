@@ -88,7 +88,7 @@ EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
 </font>
 
 <font size="+1" face="Times">
-<xsl:if test="count(child::location) != 0">
+<xsl:if test="count(child::location) != 0 and (./location/name !='' or ./location/room !='')">
 	<xsl:apply-templates select="./location"/>
 </xsl:if> -
 <xsl:choose>
@@ -180,7 +180,7 @@ EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
 
   <xsl:value-of select="./title" disable-output-escaping="yes"/>
   </b>
-  <xsl:if test="count(child::location) != 0">
+  <xsl:if test="count(child::location) != 0 and (./location/name !='' or ./location/room !='')">
     <xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
     (<xsl:apply-templates select="./location"/>)
   </xsl:if>
