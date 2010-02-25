@@ -9,7 +9,7 @@ import MaKaC.schedule as schedule
 
 from MaKaC.common.PickleJar import DictPickler
 
-from MaKaC.services.interface.rpc.common import ServiceError
+from MaKaC.services.interface.rpc.common import ServiceError, TimingNoReportError
 
 from MaKaC.services.implementation import conference as conferenceServices
 from MaKaC.services.implementation import base
@@ -78,7 +78,7 @@ class ScheduleOperation:
         try:
             return self._performOperation()
         except TimingError, e:
-            raise ServiceError("ERR-E2", e.getMsg())
+            raise TimingNoReportError("ERR-E2", e.getMsg())
 
     def initializeAutoOps(self):
         ContextManager.set('autoOps',[])

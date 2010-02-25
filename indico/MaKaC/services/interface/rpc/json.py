@@ -116,7 +116,13 @@ def process(req):
 
     except CausedError, e:
 
-        errorInfo = DictPickler.pickle(e);
+        try:
+            errorInfo = DictPickler.pickle(e);
+        except Exception, e2:
+            # This is to catch Exceptions that are not registered as Pickles.
+            errorInfo  = {'code':'', 'message': str(e)}
+            Logger.get('dev').exception('Exception not registered as pickle')
+
 
         if isinstance(e, NoReportError):
             # NoReport errors (i.e. not logged in) shouldn't be logged
