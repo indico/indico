@@ -19,7 +19,7 @@
      59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 -->
 
-<xsl:stylesheet version='1.0' 
+<xsl:stylesheet version='1.0'
    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 <xsl:template name="header">
@@ -64,7 +64,7 @@
         <tr>
           <td valign="top" align="right">
             <b><strong>
-              Date/Time: 
+              Date/Time:
             </strong></b>
           </td>
           <td style="width:90%">
@@ -83,7 +83,7 @@
               </xsl:if>
             </xsl:when>
             <xsl:otherwise>
-              from 
+              from
               <xsl:call-template name="prettydate">
                 <xsl:with-param name="dat" select="substring(./startDate,0,11)"/>
               </xsl:call-template>
@@ -103,7 +103,7 @@
             </small>
           </td>
         </tr>
-        <xsl:if test="count(child::location) != 0">
+        <xsl:if test="count(child::location) != 0 and (./location/name !='' or ./location/room !='')">
         <tr>
           <td valign="top" align="right">
             <b><strong>
@@ -159,7 +159,7 @@
           </td>
         </tr>
         </xsl:if>
-        
+
         <xsl:if test="./participants != ''">
         <tr>
           <td valign="top" align="right">
@@ -245,7 +245,7 @@
             <tr>
                 <td>
                     <table bgcolor="white" cellpadding="2" cellspacing="0" border="0" width="100%">
-   
+
                         <xsl:for-each select="session">
                             <tr>
                                 <td valign="top" class="headerselected" bgcolor="#000060">
@@ -327,7 +327,7 @@
             <xsl:text disable-output-escaping="yes">
             &#60;/font&#62;
             &#60;/td&#62;
-            </xsl:text> 
+            </xsl:text>
         </xsl:when>
         <xsl:otherwise>
             <xsl:choose>

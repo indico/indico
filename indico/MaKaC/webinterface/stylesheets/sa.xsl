@@ -52,7 +52,7 @@
 <font size="+1" face="arial">
 ASSOCIATION DU PERSONNEL<br/>
 <font size="+3" face="arial">
-CERN 
+CERN
 </font>
 STAFF ASSOCIATION
 </font>
@@ -91,9 +91,9 @@ STAFF ASSOCIATION
 </xsl:if>
 <br/>
 <font size="+1" face="Times">
-<xsl:if test="count(child::location) != 0">
+<xsl:if test="count(child::location) != 0 and (./location/name !='' or ./location/room !='')">
   <xsl:value-of select="./location/room"/>
-</xsl:if> - 
+</xsl:if> -
 <xsl:choose>
 <xsl:when test="substring(./startDate,0,11) = substring(./endDate,0,11)">
   <xsl:call-template name="prettydate"><xsl:with-param name="dat" select="substring(./startDate,0,11)"/></xsl:call-template>
@@ -102,12 +102,12 @@ STAFF ASSOCIATION
   </xsl:if>
 </xsl:when>
 <xsl:otherwise>
-    from 
+    from
     <xsl:call-template name="prettydate">
     <xsl:with-param name="dat" select="substring(./startDate,0,11)"/>
     </xsl:call-template>
     (<xsl:value-of select="substring(./startDate,12,5)"/>)
-    to 
+    to
     <xsl:call-template name="prettydate">
     <xsl:with-param name="dat" select="substring(./endDate,0,11)"/>
     </xsl:call-template>
@@ -181,7 +181,7 @@ STAFF ASSOCIATION
 
   <xsl:value-of select="./title" disable-output-escaping="yes"/>
   </b>
-  <xsl:if test="count(child::location) != 0">
+  <xsl:if test="count(child::location) != 0 and (./location/name !='' or ./location/room !='')">
     <xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
     (<xsl:apply-templates select="./location"/>)
   </xsl:if>
@@ -219,14 +219,14 @@ STAFF ASSOCIATION
 	</tr>
 	</xsl:if>
 -->
-<tr><td colspan="3"></td></tr>  
+<tr><td colspan="3"></td></tr>
 <tr>
         <td valign="top">
 	<xsl:choose>
 	<xsl:when test="/iconf/type != 'olist'">
 	        <b>
 	        <xsl:if test="substring(./startDate,12,5) != '00:00'">
-	                <font face="times" size="+1"><xsl:value-of select="substring(./startDate,12,5)"/></font> 
+	                <font face="times" size="+1"><xsl:value-of select="substring(./startDate,12,5)"/></font>
 	        </xsl:if>
 	        </b>
 	</xsl:when>
@@ -239,7 +239,7 @@ STAFF ASSOCIATION
 	<td valign="top">
 
     <xsl:if test="name(..) = 'session'">
-	<xsl:call-template name="displayModifIcons">	    
+	<xsl:call-template name="displayModifIcons">
 	  <xsl:with-param name="item" select="."/>
 	  <xsl:with-param name="confId" select="../../ID"/>
 	  <xsl:with-param name="sessId" select="../ID"/>
@@ -249,7 +249,7 @@ STAFF ASSOCIATION
 	</xsl:call-template>
       </xsl:if>
       <xsl:if test="name(..) != 'session'">
-	<xsl:call-template name="displayModifIcons">	    
+	<xsl:call-template name="displayModifIcons">
 	  <xsl:with-param name="item" select="."/>
 	  <xsl:with-param name="confId" select="../ID"/>
 	  <xsl:with-param name="sessId">null</xsl:with-param>
@@ -266,7 +266,7 @@ STAFF ASSOCIATION
 		<br/>
 	</xsl:if>
 	<font face="times" size="+1">
-	<xsl:value-of select="./title" disable-output-escaping="yes"/> 
+	<xsl:value-of select="./title" disable-output-escaping="yes"/>
 	</font>
 	<br/>
       <xsl:for-each select="material">
@@ -315,7 +315,7 @@ STAFF ASSOCIATION
 			</xsl:if>
 		</xsl:for-each></font>
 	</xsl:if>
-	</td>	
+	</td>
 </tr>
 <xsl:for-each select="./subcontribution">
   <xsl:apply-templates select="."/>
@@ -339,7 +339,7 @@ STAFF ASSOCIATION
 	<td valign="top">
 
     <xsl:if test="name(../..) = 'session'">
-	<xsl:call-template name="displayModifIcons">	    
+	<xsl:call-template name="displayModifIcons">
 	  <xsl:with-param name="item" select="."/>
 	  <xsl:with-param name="confId" select="../../../ID"/>
 	  <xsl:with-param name="sessId" select="../../ID"/>
@@ -349,7 +349,7 @@ STAFF ASSOCIATION
 	</xsl:call-template>
       </xsl:if>
       <xsl:if test="name(../..) != 'session'">
-	<xsl:call-template name="displayModifIcons">	    
+	<xsl:call-template name="displayModifIcons">
 	  <xsl:with-param name="item" select="."/>
 	  <xsl:with-param name="confId" select="../../ID"/>
 	  <xsl:with-param name="sessId">null</xsl:with-param>
@@ -362,7 +362,7 @@ STAFF ASSOCIATION
 	<xsl:if test="./category != ''">
 		<B>
 		<xsl:value-of select="./category"/>
-		</B>:    
+		</B>:
 	</xsl:if>
 	<font face="times" size="+0"><xsl:value-of select="./title" disable-output-escaping="yes"/></font>
 
@@ -455,7 +455,7 @@ STAFF ASSOCIATION
 	<xsl:value-of select="./@first" disable-output-escaping="yes"/>
 	<xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
 	<xsl:value-of select="./@last" disable-output-escaping="yes"/>
-</xsl:template>	
+</xsl:template>
 
 <xsl:template match="location">
 	<b><xsl:value-of select="./name"/></b>

@@ -63,7 +63,7 @@
             </xsl:call-template> (<xsl:value-of select="substring(./endDate,12,5)"/>) </b>
             (<xsl:value-of select="substring(./timezone,0,25)"/>) </xsl:otherwise>
       </xsl:choose>
-      <xsl:if test="count(child::location) != 0">
+      <xsl:if test="count(child::location) != 0 and (./location/name !='' or ./location/room !='')">
         <br/>at <b>
           <xsl:apply-templates select="./location">
             <xsl:with-param name="span">author</xsl:with-param>

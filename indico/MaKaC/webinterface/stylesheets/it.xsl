@@ -19,7 +19,7 @@
      59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 -->
 
-<xsl:stylesheet version='1.0' 
+<xsl:stylesheet version='1.0'
    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 <xsl:include href="include/date.xsl"/>
@@ -59,7 +59,7 @@
 </xsl:if>
 	<br/><br/>
 	<span lang="EN-GB" style="font-size: 8pt; font-family: Arial;">
-	Description : 
+	Description :
         <xsl:apply-templates select="./description"/>
 	</span>
 
@@ -76,7 +76,7 @@
           Videoconference:
           <xsl:for-each select="./videoconference">
             <xsl:apply-templates select="."/>
-          </xsl:for-each> 
+          </xsl:for-each>
 	</span>
 </xsl:if>
 
@@ -86,10 +86,10 @@
           Audioconference:
           <xsl:for-each select="./audioconference">
             <xsl:apply-templates select="."/>
-          </xsl:for-each> 
+          </xsl:for-each>
 	</span>
 </xsl:if>
-	
+
 </td>
 </tr>
 </table>
@@ -167,7 +167,7 @@
 		<span lang="EN-GB" style="font-size: 8pt; font-family: Arial;">Topic</span></p></td>
 		<td width="144" valign="top" style="border-style: none solid solid none; border-width: medium 1pt 1pt medium; border-right: 1pt solid #669999; border-bottom: 1pt solid #669999; padding: 0cm 5.4pt;">
 		<p class="MsoNormal" align="center" style="margin: 3pt -5.4pt 1e-04pt; text-align: center;">
-		<span lang="EN-GB" style="font-size: 8pt; font-family: Arial;">CERN 
+		<span lang="EN-GB" style="font-size: 8pt; font-family: Arial;">CERN
 		speakers / participants</span></p></td>
 		<td width="24" valign="top" style="border-style: none solid solid none; border-width: medium 1pt 1pt medium; border-right: 1pt solid #669999; border-bottom: 1pt solid #669999; padding: 0cm 5.4pt;">
 		<p class="MsoNormal" align="center" style="margin: 3pt -2.85pt 1e-04pt; text-align: center;">
@@ -268,7 +268,7 @@
 
 	<td rowspan="{$nbcontributions}" valign="top" style="border-style: none solid solid none; border-width: medium 1.5pt 1pt medium; border-right: 1.5pt solid #669999; border-bottom: 1pt solid #669999; padding: 0cm 5.4pt;">
 	<span lang="EN-GB" style="font-size: 8pt; font-family: Arial;">
-	<xsl:if test="count(child::location) != 0">
+	<xsl:if test="count(child::location) != 0 and (./location/name !='' or ./location/room !='')">
 		<xsl:apply-templates select="./location"/>
 	</xsl:if>
 	</span>
@@ -308,7 +308,7 @@
 	<a name="{./ID}"/>
 	<xsl:variable name="idt" select="./ID"/>
 
-        <xsl:call-template name="displayModifIcons">	    
+        <xsl:call-template name="displayModifIcons">
           <xsl:with-param name="item" select="."/>
           <xsl:with-param name="confId" select="../ID"/>
           <xsl:with-param name="sessId">null</xsl:with-param>
@@ -364,7 +364,7 @@
 
 	<td rowspan="{$nbsubcontributions}" valign="top" style="border-style: none solid solid none; border-width: medium 1.5pt 1pt medium; border-right: 1.5pt solid #669999; border-bottom: 1pt solid #669999; padding: 0cm 5.4pt;">
 	<span lang="EN-GB" style="font-size: 8pt; font-family: Arial;">
-	<xsl:if test="count(child::location) != 0">
+	<xsl:if test="count(child::location) != 0 and (./location/name !='' or ./location/room !='')">
 		<xsl:apply-templates select="./location"/>
 	</xsl:if>
 	</span>
@@ -390,7 +390,7 @@
 	<a name="{./ID}"/>
 	<xsl:variable name="idt" select="./ID"/>
 
-        <xsl:call-template name="displayModifIcons">	    
+        <xsl:call-template name="displayModifIcons">
           <xsl:with-param name="item" select="."/>
           <xsl:with-param name="confId" select="../../ID"/>
           <xsl:with-param name="sessId" select="../ID"/>
@@ -467,7 +467,7 @@
 	<xsl:variable name="idt" select="./ID"/>
 
     <xsl:if test="name(../..) = 'session'">
-	<xsl:call-template name="displayModifIcons">	    
+	<xsl:call-template name="displayModifIcons">
 	  <xsl:with-param name="item" select="."/>
 	  <xsl:with-param name="confId" select="../../../ID"/>
 	  <xsl:with-param name="sessId" select="../../ID"/>
@@ -477,7 +477,7 @@
 	</xsl:call-template>
       </xsl:if>
       <xsl:if test="name(../..) != 'session'">
-	<xsl:call-template name="displayModifIcons">	    
+	<xsl:call-template name="displayModifIcons">
 	  <xsl:with-param name="item" select="."/>
 	  <xsl:with-param name="confId" select="../../ID"/>
 	  <xsl:with-param name="sessId">null</xsl:with-param>
@@ -527,7 +527,7 @@
 	</xsl:choose>
 	<span lang="EN-GB" style="font-size: 8pt; font-family: Arial;">
 		<xsl:call-template name="prettyduration"><xsl:with-param name="duration" select="./duration"/></xsl:call-template>
-	</span>	
+	</span>
 	<xsl:text disable-output-escaping="yes">&#60;/td&#62;</xsl:text>
 </tr>
 </xsl:template>
@@ -573,7 +573,7 @@
 	<xsl:value-of select="./@first" disable-output-escaping="yes"/>
 	<xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
 	<xsl:value-of select="./@last" disable-output-escaping="yes"/>
-</xsl:template>	
+</xsl:template>
 
 <xsl:template match="location">
 	<b><xsl:value-of select="./name"/></b>
