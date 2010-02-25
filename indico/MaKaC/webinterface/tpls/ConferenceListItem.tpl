@@ -1,4 +1,4 @@
-<%! 
+<%!
 from datetime import datetime, timedelta
 from pytz import timezone
 from MaKaC.common.timezoneUtils import DisplayTZ, nowutc
@@ -20,16 +20,26 @@ elif (startDate.month != endDate.month) or (startDate.day != endDate.day):
     evtDate = "%s - %s" % (startDate.strftime("%d %b"),endDate.strftime("%d %b"))
 else:
     evtDate = "%s"%startDate.strftime("%d %b")
+
+eventTitle = escape(lItem.getTitle().strip()) or "[no title]"
+
+if lItem.getType() == "simple_event":
+    if len(lItem.getChairList()) > 0:
+        speakerList=[]
+        for spk in lItem.getChairList():
+            speakerList.append(spk.getDirectFullName())
+        eventTitle = "%s, \"%s\"" % (", ".join(speakerList),eventTitle)
+
 %>
 <li>
     <span class="ical">
         <a href="<%= urlHandlers.UHConferenceToiCal.getURL(lItem) %>"><img src="<%= systemIcon("ical_grey") %>" alt="iCal export" /></a>
     </span>
     <span class="listName">
-        <span class="date <%= happeningNowClass %>"><%= evtDate %></span><a href="<%= conferenceDisplayURLGen(lItem) %>"><%= escape(lItem.getTitle().strip()) or "[no title]" %></a>
+        <span class="date <%= happeningNowClass %>"><%= evtDate %></span><a href="<%= conferenceDisplayURLGen(lItem) %>"><%= eventTitle %></a>
 
       	<span class="protected">
-      	   
+
 			<% if lItem.hasAnyProtection(): %>
                 <% # if it is public but it is protected by domain (when private domain is not valid) %>
                 <% if not lItem.isProtected(): %>
