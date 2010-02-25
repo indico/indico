@@ -36,7 +36,7 @@ from MaKaC.webinterface import urlHandlers
 import MaKaC.common.info as info
 from MaKaC.common.timezoneUtils import nowutc
 from pytz import timezone
-from pytz import common_timezones
+from pytz import all_timezones
 
 def index(req, **params):
   """This script displays the list of meetings taking place in a given category
@@ -51,7 +51,7 @@ def index(req, **params):
     of = params.get('of','text')
     rooms = params.get('rooms',[])
     tzstring = params.get('tz',info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone())
-    if tzstring not in common_timezones:
+    if tzstring not in all_timezones:
         tzstring = 'UTC'
     tz = timezone(tzstring)
     protected = int(params.get('protected',1))
