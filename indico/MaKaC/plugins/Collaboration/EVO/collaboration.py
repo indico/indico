@@ -228,7 +228,8 @@ class CSBooking(CSBookingBase): #already Fossilizable
                 raise EVOException(_("The booking could not be created due to a problem with the EVO Server\n.The EVO Server sent the following error message: ") + e.message, e)
 
 
-    def _modify(self):
+
+    def _modify(self, oldBookingParams):
         """ Modifies a booking in the EVO server if all conditions are met.
         """
         if self._created:
@@ -438,6 +439,9 @@ class CSBooking(CSBookingBase): #already Fossilizable
         self._bookingParams["communityId"] = attributes["com"]
 
         self.checkCanStart()
+
+        if changesFromEVO:
+            return ChangesFromEVOError(changesFromEVO)
 
     def bookingOK(self):
         self._statusMessage = _("Booking created")

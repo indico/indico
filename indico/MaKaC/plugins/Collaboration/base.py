@@ -255,7 +255,7 @@ class CSBookingManager(Persistent, Observer):
             CSBookingManager._rollbackChanges(booking, oldBookingParams, oldModificationDate)
             raise CollaborationServiceException("Problem while modifying a booking of type " + booking.getType())
         else:
-            modifyResult = booking._modify()
+            modifyResult = booking._modify(oldBookingParams)
             if isinstance(modifyResult, CSErrorBase):
                 CSBookingManager._rollbackChanges(booking, oldBookingParams, oldModificationDate)
                 return modifyResult
@@ -1389,12 +1389,14 @@ class CSBookingBase(Persistent, Fossilizable):
         """
         raise CollaborationException("Method _create was not overriden for the plugin type " + str(self._type))
 
-    def _modify(self):
+    def _modify(self, oldBookingParams):
         """ To be overriden by inheriting classes.
             This method is called when a booking is modifying, after setting the booking parameters.
             The plugin should decide if the booking is accepted or not.
             Often this will involve communication with another entity, like an MCU for the multi-point H.323 plugin
             or a EVO HTTP server in the EVO case.
+            A dictionary with the previous booking params is passed. This dictionary is the one obtained
+            by the method self.getBookingParams() before the new params input by the user are applied.
         """
         raise CollaborationException("Method _modify was not overriden for the plugin type " + str(self._type))
 

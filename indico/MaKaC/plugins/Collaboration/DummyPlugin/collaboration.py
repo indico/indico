@@ -23,18 +23,17 @@ from MaKaC.plugins.Collaboration.base import CSBookingBase
 class CSBooking(CSBookingBase):
 
     _allowMultiple = True
-        
+
     def __init__(self, type, conf):
         CSBookingBase.__init__(self, type, conf)
         self._bookingParams = {}
-            
+
     def _create(self):
         pass
 
-    def _modify(self):
+    def _modify(self, oldBookingParams):
         pass
-    
+
     def _delete(self):
         pass
-        
-    
+

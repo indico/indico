@@ -90,7 +90,8 @@ class CSBooking(CSBookingBase):
                 return RecordingRequestError('create', e)
 
 
-    def _modify(self):
+
+    def _modify(self, oldBookingParams):
         self._statusMessage = _("Request successfully sent")
         self._statusClass = "statusMessageOther"
 

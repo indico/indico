@@ -84,11 +84,11 @@ class CSBooking(CSBookingBase):
                                      self.getConference().getCreator())
             except Exception,e:
                 Logger.get('RecReq').exception(
-                    """Could not send NewRequestNotification for request with id %s of event %s, exception: %s""" % (self._id, str(e)))
+                    """Could not send NewRequestNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
                 return WebcastRequestError('create', e)
 
 
-    def _modify(self):
+    def _modify(self, oldBookingParams):
         self._statusMessage = _("Request successfully sent")
         self._statusClass = "statusMessageOther"
 

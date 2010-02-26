@@ -294,7 +294,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
         except socket.error, e:
             handleSocketError(e)
 
-    def _modify(self):
+    def _modify(self, oldBookingParams):
         """ Relays to the MCU the changes donde by the user to the Indico booking object.
             For the participants, we retrieve a list of existing participants.
             If a participant is both in the MCU and the Indico booking, it is not touched.
