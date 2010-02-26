@@ -1,14 +1,27 @@
 include(ScriptRoot + "fckeditor/fckeditor.js");
 
+var indicoSource = null;
+var indicoRequest = null;
+var imageSrc = null;
+
+function imageFunctionGenerator(url) {
+    return function (imageId) {
+        if (Indico.SystemIcons[imageId]) {
+            return url + '/' + Indico.SystemIcons[imageId];
+        } else {
+            return url + '/' + imageId;
+        }
+    };
+}
 
 if (location.protocol == "https:") {
-    var indicoSource = curry(jsonRpcValue, Indico.Urls.SecureJsonRpcService);
-    var indicoRequest = curry(jsonRpc, Indico.Urls.SecureJsonRpcService);
-    var imageSrc = function (imageId) {return Indico.Urls.SecureImagesBase + '/' + Indico.SystemIcons[imageId] };
+    indicoSource = curry(jsonRpcValue, Indico.Urls.SecureJsonRpcService);
+    indicoRequest = curry(jsonRpc, Indico.Urls.SecureJsonRpcService);
+    imageSrc = imageFunctionGenerator(Indico.Urls.SecureImagesBase);
 } else {
-    var indicoSource = curry(jsonRpcValue, Indico.Urls.JsonRpcService);
-    var indicoRequest = curry(jsonRpc, Indico.Urls.JsonRpcService);
-    var imageSrc = function (imageId) {return Indico.Urls.ImagesBase + '/' + Indico.SystemIcons[imageId] }
+    indicoSource = curry(jsonRpcValue, Indico.Urls.JsonRpcService);
+    indicoRequest = curry(jsonRpc, Indico.Urls.JsonRpcService);
+    imageSrc = imageFunctionGenerator(Indico.Urls.ImagesBase);
 }
 
 
