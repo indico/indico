@@ -70,6 +70,9 @@
                     <% if Contribution.canUserSubmit(self._aw.getUser()) or Contribution.canModify(self._aw): %>
                         <td class="displayField" nowrap="" align="right" valign="top">
                             <b><%=_("Material")%>:</b>
+                            <% if Contribution.getConference() and Contribution.getConference().hasEnabledSection('paperReviewing') and Contribution.getConference().getConfReview().hasReviewing() : %>
+                                <% inlineContextHelp(_('Here you should add the general materials for your contribution. They will not be subject of reviewing.')) %>
+                            <% end %>
                         </td>
                         <td width="100%%" valign="top" style="padding-top:5px;">
                             <%=MaterialList%>
@@ -83,8 +86,9 @@
                     %(subConts)s
                     <% if Contribution.getConference() and Contribution.getConference().hasEnabledSection('paperReviewing') and Contribution.getConference().getConfReview().hasReviewing() : %>
                         <% if Contribution.canUserSubmit(self._aw.getUser()) or Contribution.canModify(self._aw): %>
-                        <tr><td align="right" valign="top" class="displayField" style="border-right:5px solid #FFFFFF;" nowrap>
+                        <tr><td align="right" valign="top" class="displayField" nowrap>
                                 <b><%=_("Reviewing materials")%>:</b>
+                                <% inlineContextHelp(_('Here you should add the materials for reviewing. They will be judged by the reviewing team.')) %>
                             </td>
                             <td>
                                 <%=ReviewingMatList%>

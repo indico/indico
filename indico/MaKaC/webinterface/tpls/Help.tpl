@@ -97,13 +97,32 @@
                 <div class="icons"><a href="ihelp/pdf/IndicoQSGTrackCoordinator.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
                 <a href="ihelp/html/QuickStartGuides/QSGTrackCoordinator/index.html"><%= _("Track Coordinator") %></a>
         	</div>
-            <div class="item clearfix">
-                <div class="icons"><a href="ihelp/pdf/IndicoQSGAgendaUsers.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
-                <a href="ihelp/html/QuickStartGuides/QSGAgendaUsers/index.html"><%= _("CDS Agenda Users")%></a>
-            </div>
         </div>
-
-
+    
+    	  
+        <div class="title"><%= _("Paper Reviewing Guides")%></div>
+        <div class="content">
+            <div class="item clearfix">
+                <div class="icons"><a href="ihelp/pdf/IndicoReviewingRole.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
+                <a href="ihelp/html/PaperReviewingGuides/PaperReviewingRoles/index.html"><%= _("Workflows and Roles")%></a>
+            </div>
+            <div class="item clearfix">
+                <div class="icons"><a href="ihelp/pdf/IndicoReviewingManager.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
+                <a href="ihelp/html/PaperReviewingGuides/PaperReviewingManagers/index.html"><%= _("Manager of the Paper Reviewing")%></a>
+            </div>
+            <div class="item clearfix">
+                <div class="icons"><a href="ihelp/pdf/IndicoReferee.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
+                <a href="ihelp/html/PaperReviewingGuides/PaperReviewingReferees/index.html"><%= _("Referee")%></a>
+            </div>
+            <div class="item clearfix">
+                <div class="icons"><a href="ihelp/pdf/IndicoContentReviewer.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
+                <a href="ihelp/html/PaperReviewingGuides/PaperReviewingEditors/index.html"><%= _("Content Reviewer")%></a>
+            </div>
+            <div class="item clearfix">
+                <div class="icons"><a href="ihelp/pdf/IndicoLayoutReviewer.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
+                <a href="ihelp/html/PaperReviewingGuides/PaperReviewingReviewers/index.html"><%= _("Layout Reviewer")%></a>
+            </div>
+       </div>
     	<div class="title"><%= _("General Help") %></div>
 
         <div class="content">

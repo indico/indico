@@ -204,6 +204,16 @@ latex_documents = [
    u'Indico Team', 'manual'),
   ('Glossary/Glossary', 'IndicoGlossary.tex', u'Indico Documentation',
    u'Indico Team', 'manual'),
+   ('PaperReviewingGuides/PaperReviewingEditors/index', 'IndicoLayoutReviewer.tex', u'Indico Documentation',
+   u'Indico Team', 'manual'),
+   ('PaperReviewingGuides/PaperReviewingManagers/index', 'IndicoReviewingManager.tex', u'Indico Documentation',
+   u'Indico Team', 'manual'),
+   ('PaperReviewingGuides/PaperReviewingReferees/index', 'IndicoReferee.tex', u'Indico Documentation',
+   u'Indico Team', 'manual'),
+   ('PaperReviewingGuides/PaperReviewingReviewers/index', 'IndicoContentReviewer.tex', u'Indico Documentation',
+   u'Indico Team', 'manual'),
+   ('PaperReviewingGuides/PaperReviewingRoles/index', 'IndicoReviewingRole.tex', u'Indico Documentation',
+   u'Indico Team', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

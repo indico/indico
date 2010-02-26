@@ -441,7 +441,8 @@ class WPContributionModifBase( WPConferenceModifBase  ):
                 self._subTabRevMaterial = self._subtabReviewing.newSubTab( "revmaterial", _("Material to Review"), \
                 urlHandlers.UHContribModifReviewingMaterials.getURL( self._target ) )
                 
-            if len(self._contrib.getReviewManager().getVersioning()) > 1 or self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
+            if self._canModify or self._isPRM or self._contrib.getReviewManager().isReferee(self._rh._getUser()) or \
+            len(self._contrib.getReviewManager().getVersioning()) > 1 or self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
                 self._subTabReviewingHistory = self._subtabReviewing.newSubTab( "reviewing_history", "History", \
                                             urlHandlers.UHContributionModifReviewingHistory.getURL( self._target ) )
 

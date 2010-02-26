@@ -3,23 +3,21 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Indico's documentation!
-==================================
+Indico's Paper Reviewing Guides
+===============================
 
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :numbered:
+   :maxdepth: 1
 
-   ./UserGuide/index.rst
-   ./QuickStartGuides/index.rst
-   ./VideoServicesGuides/index.rst
-   ./AdminGuide/index.rst
-   ./Glossary/Glossary.rst
-   ./FAQ/FAQ.rst
-   ./PaperReviewingGuides/index.rst
-
-
+   ./PaperReviewingRoles/index.rst
+   ./PaperReviewingManagers/index.rst
+   ./PaperReviewingReferees/index.rst
+   ./PaperReviewingEditors/index.rst
+   ./PaperReviewingReviewers/index.rst
+   
 .. Indices and tables
 .. ==================
 

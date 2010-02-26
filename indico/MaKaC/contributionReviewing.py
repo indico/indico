@@ -580,16 +580,16 @@ class Review(Persistent):
         
         else:
             if self._reviewManager.hasReferee() and self.getConfReview()._enableAuthorSubmittedMatRefereeEmailNotif == True:
-                notification = MaterialsChangedNotification(self._reviewManager.getReferee(), self._reviewManager.getContribution())
+                notification = MaterialsChangedNotification(self._reviewManager.getReferee(), 'Referee', self._reviewManager.getContribution())
                 GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "MaKaC/reviewing.py", self._reviewManager.getReferee())
             
             if self._reviewManager.hasEditor() and self.getConfReview()._enableAuthorSubmittedMatEditorEmailNotif == True:
-                notification = MaterialsChangedNotification(self._reviewManager.getEditor(), self._reviewManager.getContribution())
+                notification = MaterialsChangedNotification(self._reviewManager.getEditor(), 'Layout Reviewer', self._reviewManager.getContribution())
                 GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "MaKaC/reviewing.py", self._reviewManager.getEditor())
 
             for reviewer in self._reviewManager.getReviewersList():
                 if self.getConfReview()._enableAuthorSubmittedMatReviewerEmailNotif == True:
-                    notification = MaterialsChangedNotification(reviewer, self._reviewManager.getContribution())
+                    notification = MaterialsChangedNotification(reviewer, 'Content Reviewer', self._reviewManager.getContribution())
                     GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "MaKaC/reviewing.py", reviewer)
         
     def getVersion(self):
@@ -990,8 +990,8 @@ class MaterialsSubmittedNotification(GenericNotification):
         """ % ( contribution.getTitle(), str(contribution.getId()), conference.getTitle(), str(conference.getId()), role))
 
 class MaterialsChangedNotification(GenericNotification):
-
-    def __init__(self, user, contribution):
+    
+    def __init__(self, user, role, contribution):
         conference = contribution.getConference()
         GenericNotification.__init__(self)
         self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
@@ -1002,9 +1002,9 @@ class MaterialsChangedNotification(GenericNotification):
 
         The author of the contribution %s (id: %s) of the conference %s (id: %s) has removed the 'submitted' mark from his / her materials.
         This means that he may have changed the content of the materials.
-        Thus, you should wait until he has marked the materials again to start / continue the reviewing process.
-
+        Thus, you should wait until he has marked the materials again to start / continue the reviewing process as a %s.
+        
         Thank you for using our system.
-        """ % ( contribution.getTitle(), str(contribution.getId()), conference.getTitle(), str(conference.getId())))
-
-
+        """ % ( contribution.getTitle(), str(contribution.getId()), conference.getTitle(), str(conference.getId()), role))
+        
+        

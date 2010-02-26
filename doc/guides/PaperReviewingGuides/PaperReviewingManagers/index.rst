@@ -3,22 +3,16 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Indico's documentation!
-==================================
+Manager's Guide
+============================
 
 Contents:
 
 .. toctree::
+   :numbered:
    :maxdepth: 2
 
-   ./UserGuide/index.rst
-   ./QuickStartGuides/index.rst
-   ./VideoServicesGuides/index.rst
-   ./AdminGuide/index.rst
-   ./Glossary/Glossary.rst
-   ./FAQ/FAQ.rst
-   ./PaperReviewingGuides/index.rst
-
+   ./PaperReviewingManagers.rst
 
 .. Indices and tables
 .. ==================
