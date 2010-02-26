@@ -337,7 +337,10 @@ class WConfModifCollaborationProtection(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars(self)
         vars["Conference"] = self._conf
         vars["CSBM"] = self._conf.getCSBookingManager()
-        vars["Favorites"] = DictPickler.pickle(self._user.getPersonalInfo().getBasket().getUsers())
+        if self._user:
+            vars["Favorites"] = DictPickler.pickle(self._user.getPersonalInfo().getBasket().getUsers())
+        else:
+            vars["Favorites"] = []
         return vars
 
 ################################################### Event Display pages ###############################################
