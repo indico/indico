@@ -11,7 +11,7 @@ from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
 from MaKaC.common import timezoneUtils, indexes
 
 from MaKaC.common.PickleJar import Retrieves
- 
+
 import MaKaC.conference as conference
 
 from MaKaC.common.logger import Logger
@@ -26,21 +26,21 @@ class UECacheEntry(MultiLevelCacheEntry):
     def getContents(self):
         return self._entryList
 
-class UpcomingEventsCache(MultiLevelCache):
+class UpcomingEventsCache(MultiLevelCache, Persistent):
 
     """
     Cache for upcoming events (per user)
     """
 
-    def __init__(self, ttl=datetime.timedelta(minutes=5)):
+    def __init__(self, ttl=datetime.timedelta(minutes=5), dirty=False):
         self._ttl = ttl
-        self._dirty = True
+        self._dirty = dirty
         MultiLevelCache.__init__(self, 'upcoming_events')
 
     def isDirty(self, path, object):
 
         creationTime = datetime.datetime(*time.localtime(os.path.getmtime(path))[:6])
-                                         
+
         if self._dirty or (datetime.datetime.now() - creationTime) > self._ttl:
             return True
         else:
@@ -51,6 +51,10 @@ class UpcomingEventsCache(MultiLevelCache):
 
     def setTTL(self, ttl):
         self._ttl = ttl
+
+    def getTTL(self):
+        return self._ttl
+
 
     def loadObject(self, path):
         # TODO: Use user IDs, private events
@@ -69,7 +73,7 @@ class ObservedObject(Persistent):
         weight - the weight that is associated with
         the object
         """
-        
+
         self.obj = obj
         self.weight = weight
         self.advertisingDelta = advertisingDelta
@@ -95,22 +99,20 @@ class UpcomingEventsModule(modules.Module):
     id = "upcoming_events"
 
     def __init__(self):
-        
+
         # id, weight dictionary = id is the category id and
         # weight determines the position of the categories'
         # events in the list
         self._objects = []
-        self._cacheTTL = datetime.timedelta(minutes=5)
         self._maxEvents = 10
-        self._cache = UpcomingEventsCache(ttl=self._cacheTTL)
+        self._cache = UpcomingEventsCache()
 
     def setCacheTTL(self, ttl):
-        self._cacheTTL = ttl
         self._cache.setTTL(ttl)
         self._cache.invalidate()
-        
+
     def getCacheTTL(self):
-        return self._cacheTTL
+        return self._cache.getTTL()
 
     def setNumberItems(self, number):
         self._maxEvents = number
@@ -155,14 +157,13 @@ class UpcomingEventsModule(modules.Module):
     def processEvent(self, date, eventObj, obj, objDict):
 
         if (not eventObj.hasAnyProtection() and
-            (date > (eventObj.getStartDate() - obj.getAdvertisingDelta()))):                    
+            (date > (eventObj.getStartDate() - obj.getAdvertisingDelta()))):
             weight = float(obj.getWeight())
-            
             if not objDict.has_key(weight):
                 objDict[weight] = []
-            
+
             objDict[weight].append(eventObj)
-            
+
 
     def _processEventDisplay(self, event):
 
