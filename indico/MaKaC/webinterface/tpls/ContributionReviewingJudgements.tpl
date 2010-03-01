@@ -212,8 +212,11 @@ var showValues = function() {
             },
             function(result, error){
                 if (!error) {
-                    $E('inPlaceEditComments').set(result)
-                    $E('commentsMessage').set('')
+                    if(result.length == 0){
+                        $E('inPlaceEditComments').set($T('No comments given.'));
+                    } else {
+                        $E('inPlaceEditComments').set(result)
+                    }
                 }
             }
         )
