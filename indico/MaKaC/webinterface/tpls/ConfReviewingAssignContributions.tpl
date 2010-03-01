@@ -443,7 +443,7 @@ var contributionTemplate = function(contribution) {
 
     // Cell4: contribution type
     var cell4 = Html.td({style:{"marginLeft":"5px"}});
-    cell4.set(contribution.type)
+    cell4.set(contribution.type ? contribution.type.name : "")
     row.append(cell4);
     
     // Cell5: contribution track
