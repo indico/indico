@@ -165,7 +165,7 @@ span.topLevelTitle {
 span.subLevelTitle {
     font-family: Verdana, Arial, Helvetica, sans-serif;
     font-size: 12px;
-    font-weight: bold;
+    /*font-weight: bold;*/
     color: #333;
 }
 
