@@ -182,10 +182,49 @@ def sortPrincipalsByName(x,y):
         cmpRes = cmp(firstNamex.lower(),firstNamey.lower())
     return cmpRes
 
-def validMail(email):
-    if re.search("^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$",email):
-        return True
-    return False
+def validMail(emailstr):
+    """
+    Check the validity of an email address or serie of email addresses
+    - emailstr: a string representing a single email address or several
+    email addresses separated by separators
+    Returns True if the email/emails is/are valid.
+    """
+    # Convert the separators into valid ones. For now only, mix of whitespaces,
+    # semi-colons and commas are handled and replaced by commas. This way the
+    # method only checks the validity of the email addresses without taking
+    # care of the separators
+    emails = setValidEmailSeparators(emailstr)
+
+    # Creates a list of emails
+    emaillist = emails.split(",")
+
+    # Checks the validity of each email in the list
+    if emaillist != None or emaillist != []:
+        for em in emaillist:
+
+            if re.search(r"^[-a-zA-Z0-9!#$%&'*+/=?\^_`{|}~]+(?:.[-a-zA-Z0-9!#$%&'*+/=?^_`{|}~]+)*@(?:[a-zA-Z0-9](?:[-a-zA-Z0-9]*[a-zA-Z0-9])?.)+[a-zA-Z0-9](?:[-a-zA-Z0-9]*[a-zA-Z0-9])?$",
+                         em) == None:
+    #        if re.search("^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$",
+    #                     em) == None:
+                return False
+    return True
+
+def setValidEmailSeparators(emailstr):
+    """
+    Replace occurrences of separators in a string of email addresses by
+    occurrences of "," in order to get a string of emails valid with the
+    html 'a' tag. Separators that could be replaced are semi-colons,
+    whitespaces and mixes of the previous two along with commas. This allows
+    the handling of multiple email addresses.
+    - emailstr: the string of emails in which we want to convert the separators
+    into commas
+    """
+    # remove occurences of separators at the beginning and at the end of
+    # the string
+    emails = re.subn(r"(?:^[ ;,]+)|(?:[ ;,]+$)", "", emailstr)[0]
+
+    # return the string obtained after replacing the separators
+    return re.subn(r"[ ;,]+", ",", emails)[0]
 
 def validIP(ip):
     """
@@ -383,7 +422,7 @@ def formatDate(date, showWeek=False, format=None):
         return datetime.strftime(date, week+'%d/%m/%Y')
     else:
         return datetime.strftime(date, format)
-    
+
 def formatTime(time):
     return time.strftime('%H:%M')
 
@@ -395,10 +434,10 @@ def parseDate(dateStr, format='%d/%m/%Y'):
 def formatDuration(duration, units = 'minutes', truncate = True):
     """ Formats a duration (a timedelta object)
     """
-    
+
     seconds = duration.days * 86400 + duration.seconds
-    
-        
+
+
     if units == 'seconds':
         result = seconds
     elif units == 'minutes':
@@ -407,13 +446,13 @@ def formatDuration(duration, units = 'minutes', truncate = True):
         result = seconds / 3600
     elif units == 'days':
         result = seconds / 86400
-        
+
     elif units == 'hours_minutes':
         #truncate has no effect here
         minutes = int(seconds / 60) % 60
         hours = int(seconds / 3600)
         return str(hours) + 'h' + str(minutes).zfill(2) + 'm'
-    
+
     elif units == '(hours)_minutes':
         #truncate has no effect here
         minutes = int(seconds / 60) % 60
@@ -422,20 +461,20 @@ def formatDuration(duration, units = 'minutes', truncate = True):
             return str(hours) + 'h' + str(minutes).zfill(2) + 'm'
         else:
             return str(minutes) + 'm'
-    
+
     else:
         raise Exception("Unknown duration unit: " + str(units))
-    
+
     if truncate:
         return int(result)
     else:
         return result
-    
 
-    
-    
-            
-    
+
+
+
+
+
 def formatTwoDates(date1, date2, tz = None, useToday = False, useTomorrow = False, dayFormat = None, capitalize = True, showWeek = False):
     """ Formats two dates, such as an event start and end date, taking into account if they happen the same day
         (given a timezone).
@@ -444,21 +483,21 @@ def formatTwoDates(date1, date2, tz = None, useToday = False, useTomorrow = Fals
          tz can be a string or a timezone "object"
         -dayFormat and showWeek are passed to formatDate function, so they behave the same way as in that function
         -capitalize: capitalize week days AND first letter of sentence if there is one
-        
+
         Examples: 17/07/2009 from 08:00 to 18:00 (default args, 2 dates in same day)
                   from 17/07/2009 at 08:00 to 19/07/2009 at 14:00 (default args, 2 dates in different day)
                   Fri 17/07/2009 from 08:00 to 18:00 (showWeek = True, default args, 2 dates in same day)
                   today from 10:00 to 11:00 (useToday = True, default args, 2 dates in same day and it happens to be today)
     """
-    
+
     if not tz:
         tz = date1.tzinfo
-    
+
     date1 = getAdjustedDate(date1, tz = tz)
     date2 = getAdjustedDate(date2, tz = tz)
-    
+
     sameDay = isSameDay(date1, date2, tz)
-    
+
     date1text = ''
     date2text = ''
     if useToday:
@@ -471,8 +510,8 @@ def formatTwoDates(date1, date2, tz = None, useToday = False, useTomorrow = Fals
             date1text = "isTomorrow"
         if isTomorrow(date2, tz):
             date2text = "isTomorrow"
-            
-    
+
+
     if not date1text:
         date1text = formatDate(date1.date(), showWeek, dayFormat)
         if capitalize:
@@ -481,10 +520,10 @@ def formatTwoDates(date1, date2, tz = None, useToday = False, useTomorrow = Fals
         date2text = formatDate(date2.date(), showWeek, dayFormat)
         if capitalize:
             date2text = date2text.capitalize()
-    
+
     time1text = formatTime(date1.time())
     time2text = formatTime(date2.time())
-        
+
     if sameDay:
         result = date1text + ' from ' + time1text + ' to ' + time2text
     else:
@@ -493,9 +532,9 @@ def formatTwoDates(date1, date2, tz = None, useToday = False, useTomorrow = Fals
         else:
             fromText = 'from '
         result = fromText + date1text + ' at ' + time1text + ' to ' + date2text + ' at ' + time2text
-    
+
     return result
-    
+
 
 def parseTime(timeStr, format='%H:%M'):
     t=time.strptime(timeStr, format)

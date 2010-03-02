@@ -180,10 +180,12 @@ Util.Validation = {
     isEmailAddress: function(address) {
         // Adapted RFC2822 (thanks to Jan Goyvaerts)
         return exists(address.toLowerCase().match(/^[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+(?:\.[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+)*@(?:[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?$/));
+    },
+
+    isEmailList: function(emails) {
+        // check if the emails given are valid and if valid separators are used
+        return exists(emails.toLowerCase().match(/^(?:[ ,;]*)(?:[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+(?:\.[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+)*@(?:[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?)(?:[ ,;]+(?:[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+(?:\.[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+)*@(?:[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?))*(?:[ ,;]*)$/));
     }
-
-
-
 };
 
 var IndicoSortCriteria = {

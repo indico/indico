@@ -891,3 +891,65 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
          this.InlineRemoteWidget(method, attributes, false);
      });
 
+type("SupportEditWidget", ["InlineEditWidget"],
+        {
+            /* builds the basic structure for both display and
+               edit modes */
+            __buildStructure: function(captionValue, emailValue) {
+                // keep everything in separate lines
+                 return Html.table({},
+                         Html.tbody({},
+                                 Html.tr("support",
+                                         Html.td("supportEntry", "Caption :"),
+                                         Html.td({}, captionValue)),
+                                 Html.tr("support",
+                                         Html.td("supportEntry", "Email :"),
+                                         Html.td({}, emailValue))));
+            },
+
+            _handleEditMode: function(value) {
+
+                // create support fields and set them to the values transmitted
+                this.caption = Html.edit({}, value.caption);
+                this.email = Html.edit({}, value.email);
+
+
+                // add the fields to the parameter manager
+                this.__parameterManager.add(this.caption, 'text', false);
+                this.__parameterManager.add(this.email, 'emaillist', true);
+
+                // call buildStructure with modification widgets
+                return this.__buildStructure(this.caption, this.email);
+            },
+
+            _handleDisplayMode: function(value) {
+                // call buildStructure with spans
+                return this.__buildStructure(value.caption, value.email);
+            },
+
+            _getNewValue: function() {
+                // clean the email list from its separators. This function is mostly used
+                // for formatting the list when saving support emails asynchronously
+
+                // removes separators at the beginning and at the end
+                emaillist = this.email.get().replace(/(^[ ,;]+)|([ ,;]+$)/g, '');
+                // replaces all the other groups of separators by commas
+                emaillist = emaillist.replace(/[ ,;]+/g, ',');
+
+                return {caption: this.caption.get(),
+                        email: emaillist};
+            },
+
+            _verifyInput: function() {
+                if (!this.__parameterManager.check()) {
+                    return false;
+                }
+                return true;
+            }
+        },
+        function(method, attributes, initValue) {
+            this.InlineEditWidget(method, attributes, initValue);
+            this.__parameterManager = new IndicoUtil.parameterManager();
+        });
+
+

@@ -428,7 +428,9 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         vars["supportEmail"] = ""
         if self._conf.hasSupportEmail():
             mailto = quoteattr("""mailto:%s?subject=%s"""%(self._conf.getSupportEmail(), urllib.quote( self._conf.getTitle() ) ))
-            vars["supportEmail"] = """<a href=%s class="confSupportEmail"><img src="%s" border="0" alt="email"> support</a>"""%(mailto, Config.getInstance().getSystemIconURL("smallEmail") )
+            vars["supportEmail"] = """<a href=%s class="confSupportEmail"><img src="%s" border="0" alt="email"> %s</a>"""%(mailto,
+                                                Config.getInstance().getSystemIconURL("smallEmail"),
+                                                displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getSupportEmailCaption())
         p={"closeMenuURL": vars["closeMenuURL"], \
             "menuStatus": vars["menuStatus"], \
             "supportEmail": vars["supportEmail"] \
@@ -2736,6 +2738,7 @@ class WConfModifMainData(wcomponents.WTemplated):
         vars["remChairsURL"]=quoteattr(str(urlHandlers.UHConferenceRemoveChairs.getURL(self._conf)))
         vars["searchChairURL"]=quoteattr(str(urlHandlers.UHConfModifSelectChairs.getURL(self._conf)))
         vars["chairs"] = self._conf.getChairList()
+        vars["supportEmailCaption"] = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getSupportEmailCaption()
         vars["supportEmail"] = _("""--_("not set")--""")
         if self._conf.hasSupportEmail():
             vars["supportEmail"] = self.htmlText(self._conf.getSupportEmail())
@@ -2997,6 +3000,7 @@ class WConferenceDataModification(wcomponents.WTemplated):
 
         vars["locationAddress"] = locAddress
 
+        vars["supportCaption"] = quoteattr(displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getSupportEmailCaption())
         vars["supportEmail"] = quoteattr( self._conf.getSupportEmail() )
         vars["locator"] = self._conf.getLocator().getWebForm()
         vars["event_type"] = ""

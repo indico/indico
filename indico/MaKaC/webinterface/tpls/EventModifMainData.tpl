@@ -5,6 +5,7 @@
 from MaKaC.fossils.conference import IConferenceMinimalFossil
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 import MaKaC.webinterface.urlHandlers as urlHandlers
+import MaKaC.webinterface.displayMgr as displayMgr
 from xml.sax.saxutils import escape
 
 wr = webFactoryRegistry.WebFactoryRegistry()
@@ -105,10 +106,10 @@ favoriteRooms = confObj.getFavoriteRooms();
 <%end%>
 <tr>
     <td class="dataCaptionTD">
-        <span class="dataCaptionFormat"><%= _("Support email")%></span>
+        <span class="dataCaptionFormat"><%= _("Support") %></span>
     </td>
     <td class="blacktext">
-        <span id="inPlaceEditSupportEmail"><%=supportEmail %></span>
+        <span id="inPlaceEditSupport"><%= supportEmail %></span>
     </td>
 </tr>
 <% if evtType == 'lecture':%>
@@ -232,7 +233,9 @@ var confFossile = <%= jsonEncode(confObj.fossilize(IConferenceMinimalFossil, tz=
 
 <%= macros.genericField(macros.FIELD_TEXT, 'inPlaceEditTitle', 'event.main.changeTitle', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh) %>
 
-<%= macros.genericField(macros.FIELD_TEXT, 'inPlaceEditSupportEmail', 'event.main.changeSupportEmail', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh) %>
+<% dMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(confObj) %>
+
+$E('inPlaceEditSupport').set(new SupportEditWidget('event.main.changeSupport', <%= jsonEncode({'conference': "%s"%conferenceId}) %>, {'caption': "<%= dMgr.getSupportEmailCaption() %>", 'email': confFossile.supportEmail}).draw());
 
 <% if evtType == 'lecture':%>
     <%= macros.genericField(macros.FIELD_TEXT, 'inPlaceEditOrganiserText', 'event.main.changeOrganiserText', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh) %>

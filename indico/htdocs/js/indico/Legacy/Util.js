@@ -480,6 +480,9 @@ var IndicoUtil = {
                 else if (dataType == 'email' && !(allowEmpty && trim(component.get()) === '') && !Util.Validation.isEmailAddress(component.get())) {
                     error = Html.span({}, "Invalid e-mail address");
                 }
+                else if (dataType == 'emaillist' && !(allowEmpty && trim(component.get()) === '') && !Util.Validation.isEmailList(component.get())){
+                    error = Html.span({}, "List contains invalid e-mail address or invalid separator");
+                }
                 else if (dataType == 'ip' && !(allowEmpty && trim(component.get()) === '') &&  !Util.Validation.isIPAddress(component.get())) {
                     error = Html.span({}, "That doesn't seem like a valid IP Address. Example of valid IP Address: 132.156.31.38");
                 } else if (dataType == 'time' && !IndicoUtil.isTime(trim(component.get()))) {

@@ -49,4 +49,7 @@ class IConferenceMinimalFossil(IFossil):
         """ End Date """
     getEndDate.convert = Conversion.datetime
 
+    def getSupportEmail(self):
+        """ Support Email """
+
 
