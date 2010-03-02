@@ -167,6 +167,7 @@
                 <tr>
                     <td colspan="3" class="horizontalLine">&nbsp;</td>
                 </tr>
+                <% if eventType == "conference":%>
 				%(abstract)s
                 %(withdrawnInfo)s
 				<tr>
@@ -192,6 +193,7 @@
                         </table>
                     </td>
                 </tr>
+                <% end %>
 
             </table>
         </td>
