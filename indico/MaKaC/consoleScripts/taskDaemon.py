@@ -98,7 +98,7 @@ def initDefaultTasks():
     su.setId("StatisticsUpdater")
     ta = task()
     d = nowutc() + timedelta(days=1)
-    ta.setStartDate(datetime(d.year, d.month, d.day, 0, 0, tzinfo=timezone('UTC')))
+    ta.setStartDate(datetime(d.year, d.month, d.day, 1, 0, tzinfo=timezone('UTC')))
     ta.setInterval(timedelta(days=1))
     ta.addObj(su)
     tl.addTask(ta)
