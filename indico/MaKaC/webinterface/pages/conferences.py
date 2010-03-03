@@ -1138,6 +1138,14 @@ class WPInternalPageDisplay( WPConferenceDefaultDisplayBase ):
         wc = WInternalPageDisplay( self._conf, self._page )
         return wc.getHTML()
 
+    def _defineSectionMenu( self ):
+        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
+
+        for link in self._sectionMenu.getAllLinks():
+            if link.getType() == 'page' and link.getPage().getId() == self._page.getId():
+                self._sectionMenu.setCurrentItem(link)
+                break
+
 
 class WConferenceTimeTable(wcomponents.WTemplated):
 
