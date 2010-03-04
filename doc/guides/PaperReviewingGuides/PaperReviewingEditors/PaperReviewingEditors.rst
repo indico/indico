@@ -1,13 +1,13 @@
-===============================================
+=================================================
 Paper Reviewing Module - Layout Reviewers's Guide
-===============================================
+=================================================
 
-Start using the system
-----------------------
+Getting started
+---------------
 
- As a layout reviewer your responsibility is to judge the layout of all of the contributions
- you are assigned to. You may log in the system and you will find a link in the left menu under 
- ``My Conference``.
+ As a layout reviewer, your responsibility is to judge the layout of all of the contributions
+ you are assigned to. Firstlly, you must log in the system and you will find a link in the left menu under 
+ ``My Conference``, called ``Layout Reviewer area``.
 
         |image1|
 
@@ -16,16 +16,16 @@ Start using the system
 Layout Reviewer Area
 --------------------
         
- When you access the Layout Reviewers Area you will find a list of all the contributions that are assign
- to you for judgment. You can see the state for every contribution.
+ When you access the Layout Reviewers Area you will find a list of all the contributions
+ that are assigned to you for judgment. You also see the state for every contribution.
         
         |image2|
         
- First you should fill in the approved requirements given by the Paper Review Manager. Then give 
- your judgment for the layout of the contribution: ``to be corrected``, ``rejected``, ``accepted``. 
- The comments that you will write down should help the Referee to give his judgment. If the Managers
- of the Paper Reviewing set this option - the authors of the contribution will receive automatically
- generated e-mail notification containing your comments and judgment.
+ First you should fill in the questions provided by the Paper Review Manager, after this, 
+ you can give your judgement for the layout of the contribution: ``to be corrected``, ``rejected``, 
+ ``accepted``. The comments that you will write down should help the Referee to give his judgment. 
+ The authors of the contribution will receive an automatic e-mail notification containing your comments
+ and judgment, if the Managers of the Paper Reviewing set this option.
         
        |image3|
         

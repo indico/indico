@@ -42,14 +42,12 @@ Depending on the choice of the conference manager we can determine 4 kinds of wo
 Layout reviewing workflow
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In this case the
-conference manager has chosen to judge only the paper`s layout. The
-contribution is assigned to a layout reviewer who will judge the
-layout as ``accepted``, ``rejected`` or ``to be corrected``. If it is
-accepted or rejected the workflow is finished. If it has to be
-corrected then we have two choices: 
-* to be sent back for correction by the author
-* the layout reviewer can also correct the layout himself if needed.
+ In this case the conference manager has chosen to judge only the paper`s layout. 
+ The contribution is assigned to a layout reviewer who will judge the layout as 
+ ``accepted``, ``rejected`` or ``to be corrected``. If it is accepted or rejected the workflow is finished. 
+ If it has to be corrected then the layout reviewer has two choices:
+  * to sent it back for correction by the author
+  * to correct the layout himself, if needed
 
         |image2|
 
@@ -75,14 +73,11 @@ again.
 Content and Layout reviewing workflow
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The conference
-manager has chosen to be checked both the contribution`s layout and
-content. The first step is assigning of the contribution; the
-referee chooses the content and the layout reviewers. Then the
-layout reviewer must check the layout, and if it is judged as ``to
-be corrected`` the contribution is sent back for correction to the
-author with the layout reviewer`s comments. Or the layout reviewer
-can correct it by himself.
+The conference manager has chosen to be checked both the contribution`s layout and content. 
+The first step is to assign the contribution; the referee chooses the content and the layout 
+reviewers for each contribution. Then the layout reviewer must check the layout, and if it is 
+judged as ``to be corrected`` the contribution is sent back for correction to the author with the 
+layout reviewer`s comments, or the layout reviewer can correct it by himself.
 
         |image4|
 

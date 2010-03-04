@@ -1,35 +1,34 @@
-=======================================
+========================================
 Paper Reviewing Module - Referee's Guide
-=======================================
+========================================
 
-Start using the system
-----------------------
+ Getting started
+----------------
 
- As a referee your responsibilities are to assign contributions to the reviewers and to 
- give the final judgement for all of the contributions you are assigned to. 
- You may log in the system and you will find in the left menu two links under ``My Conference``.
+ As a referee, your responsibilities are to assign contributions to the reviewers and to give the 
+ final judgement for all of the contributions you have been assigned to. You may log in the system 
+ and you will find in the left menu two links under ``My Conference``, ``Assign Contributions`` and ``Referee Area``.
 
         |image1|
 
 -----------------
 
-Assign Contributions to the Reviewers
--------------------------------------
+Assigning Contributions to the Reviewers
+----------------------------------------
 
- The Paper Reviewing module gives you the 
- opportunity to assign more than one contributions 
- to the same Reviewers by selecting them using the check boxes.
- Depending on the chosen reviewing mode you need to assign different
- team of reviewers.
+ You can assign more than one contribution to the same Reviewers by selecting them using the check boxes. 
+ Depending on the chosen reviewing mode (``Content reviewing`` or ``Content and layout reviewing``) you need to 
+ assign different kinds of reviewers.
  
         |image2| 
 
- Use the dialog popup to select the reviewer you wish to assign. 
- If there are defined competences for him, they will be shown in the dialog.
+ After checking the checkboxes and clicking the ``Assign`` button, a dialog will be displaied. 
+ Use the popup dialog to select the reviewer you wish to assign to the selected contributions. 
+ If there are pre-defined competences for him, they will be shown close to his name.
 
         |image3|
         
- By click on the name of a contribution you can assign reviewing team per contribution.
+ Also, you can click on the name of a contribution and assign a reviewing team for it.
 
         |image4|
         
@@ -40,32 +39,32 @@ Referee Area
 
         |image7|
         
- When you access the Referee Area you will find a list of all the contributions that are assign
- to you for judgment. You can follow if the author of the contribution had submitted the mateials 
- for reviewing. You can see the state for every contribution - if it is judged by the 
- Content Reviewers or by the Layout Reviewer, or by both. Once the Layout Reviewer has given
- a judgment and Content Reviewers have given their opinion of the contribution you can see their status:
+ When you access the Referee Area you will find a list of all the contributions that are assign 
+ to you for judgment. You can follow:
+  * if the author of the contribution has submitted the mateials for reviewing
+  * the state for every contribution, if it is judged by the Content Reviewers or by the Layout Reviewer, 
+    or by both.
         
         |image5|
         
- Your responsibility as Referee will be to give the final judgment for the contribution: 
- ``to be corrected``, ``rejected``, ``accepted`` or one of the statues added by the Managers.
- Accessing again the reviewing part (by clicking on the contribution's Title) you will be able 
- to see the judgments and the opinions of the layout and the content given by the reviewing team.
+ Your responsibility as Referee will be to give the **final judgment** for the contribution: ``to be corrected``, 
+ ``rejected``, ``accepted`` or one of the customized statues added by the Managers. Accessing again the reviewing 
+ area (by clicking on the contribution's title) you will be able to see the judgments and the opinions of 
+ the layout and the content given by the reviewing team.
  
- To submit your final judgment click on ``Send`` button. If the Managers of the Paper Reviewing
- set this option - the authors of the contribution will receive automatically generated e-mail 
- notification containing your comments and judgment.  
+ In order to submit your final judgment click on ``Send`` button. The authors of the contribution will receive 
+ automatically generated e-mail notification containing your comments and judgment, if the Managers of the 
+ Paper Reviewing set this option.
         
         |image6|
         
- The material which is subject of reviewing is accessible for the Referees.
+ The material which is subject of reviewing is accessible for the Referees from the ``Material to Review`` tab.
  
         |image8|
         
- The system gives you the opportunity to follow the reviewing history for every contribution.
- The reviewing history is build when there are more than one reviews per contribution.  
- You can access it just right after you send your final judgment.
+ The system gives you the opportunity to follow the reviewing history for every contribution. 
+ The reviewing history is built when there are more than one reviews per paper. You can access 
+ it just right after you send your final judgment from the ``History`` tab.
  
         |image9|
 
