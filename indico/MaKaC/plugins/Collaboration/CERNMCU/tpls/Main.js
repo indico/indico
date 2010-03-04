@@ -31,18 +31,6 @@
                 }
                 return errors;
             }],
-            'pin': ['text', true, function(pin, values){
-                errors = [];
-                if (exists(pin) && pin !== '') {
-                    if (!IndicoUtil.isInteger(pin)) {
-                        errors.push($T('The pin has to be a number.'));
-                    }
-                    if (pin.length >= 32) {
-                        errors.push($T("The pin cannot have more than 31 characters."));
-                    }
-                }
-                return errors;
-            }],
             'startDate' : ['datetime', false, function(startDateString, values){
                 var errors = [];
                 var startDate = IndicoUtil.parseDateTime(startDateString);
@@ -152,90 +140,92 @@
     },
 
     showInfo : function(booking) {
-        infoHTML = '<div><table><tbody>';
+        var infoTbody = Html.tbody();
 
         if (booking.error) {
-            infoHTML +=
-                '<tr><td colspan="2">'+
-                    '<span class="collaborationWarning">';
+            var errorCell = Html.td({colspan:2, colSpan:2});
 
             switch(booking.faultCode) {
             case 2:
-                infoHTML += $T("The Conference name already exists in the MCU. Please choose another one.");
+                errorCell.append(Html.span('collaborationWarning', $T("The Conference name already exists in the MCU. Please choose another one.")));
                 break;
             case 18:
-                infoHTML += $T("The Conference ID already exists in the MCU. Please choose another one.");
+                errorCell.append(Html.span('collaborationWarning', $T("The Conference ID already exists in the MCU. Please choose another one.")));
                 break;
             case 'tooManyTries':
-                infoHTML += $T("Indico tried repeatedly to obtain a unique ID in the MCU and failed. Please contact Indico support.");
+                errorCell.append(Html.span('collaborationWarning', $T("Indico tried repeatedly to obtain a unique ID in the MCU and failed. Please contact Indico support.")));
                 break;
             default:
-                alert('default')
+                errorCell.append($T("MCU fault ") + booking.faultCode);
             }
-            infoHTML +=
-                    '<\/span>' +
-                '<\/td><\/tr>'
+            infoTbody.append(Html.tr({}, errorCell));
         }
 
-        infoHTML +=
-             '<tr><td class="collaborationInfoLeftCol">' + $T('Conference name:') + '<\/td><td>' +
-                (booking.error && booking.faultCode == 2 ?
-                    '<span class="collaborationWarning">' + booking.bookingParams.name + ' (duplicated)<\/span>' :
-                    booking.bookingParams.name) +
-            '<\/td><\/tr>'+
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('Conference name:')),
+            Html.td({}, booking.error && booking.faultCode == 2 ?
+                        Html.span('collaborationWarning', booking.bookingParams.name + $T(' (duplicated)')) :
+                        booking.bookingParams.name )));
 
-            '<tr><td class="collaborationInfoLeftCol">' + $T('Conference description:') + '<\/td><td>' +
-                booking.bookingParams.description +
-            '<\/td><\/tr>'+
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('Description:')),
+            Html.td({}, booking.bookingParams.description)));
 
-            '<tr><td class="collaborationInfoLeftCol">' + $T('Conference MCU ID:') + '<\/td><td>' +
-                (booking.error && booking.faultCode == 18 ?
-                        '<span class="collaborationWarning">' + booking.bookingParams.id + ' (duplicated)<\/span>' :
-                        (booking.bookingParams.id ? booking.bookingParams.id : ('<span class="collaborationWarning">' + $T('No ID yet') + '<\/span>'))) +
-            '<\/td><\/tr>'+
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('MCU Conf. ID:')),
+            Html.td({}, booking.error && booking.faultCode == 18 ?
+                        Html.span('collaborationWarning', booking.bookingParams.id + $T(' (duplicated)')) :
+                        booking.bookingParams.id ? booking.bookingParams.id : Html.span('collaborationWarning', $T('No ID yet')))));
 
-            '<tr><td class="collaborationInfoLeftCol">' + $T('Start date:') + '<\/td><td>' +
-                formatDateStringCS(booking.bookingParams.startDate) +
-            '<\/td><\/tr>'+
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('Start date:')),
+            Html.td({}, formatDateStringCS(booking.bookingParams.startDate))));
 
-            '<tr><td class="collaborationInfoLeftCol">' + $T('End date:') + '<\/td><td>' +
-                formatDateStringCS(booking.bookingParams.endDate) +
-            '<\/td><\/tr>'+
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('End date:')),
+            Html.td({}, formatDateStringCS(booking.bookingParams.endDate))));
 
-            '<tr><td class="collaborationInfoLeftCol">' + $T('PIN:') + '<\/td><td>' +
-                (booking.bookingParams.hasPin? $T("PIN hidden") : $T("No PIN was defined")) +
-            '<\/td><\/tr>'+
-
-            '<tr><td class="collaborationInfoLeftCol">' + $T('Visibility') + '<\/td><td>' +
-                (booking.bookingParams.hidden? $T("Hidden") : $T("Visible")) +
-            '<\/td><\/tr>';
-
-        if (!booking.error) { infoHTML +=
-
-            '<tr><td class="collaborationInfoLeftCol">' + $T('How to join:') + '<\/td><td>' +
-                $T('1) If you are registered in the CERN Gatekeeper, please dial ') + '<%= CERNGatekeeperPrefix %>' + booking.bookingParams.id + '<br \/>' +
-                $T('2) If you have GDS enabled in your endpoint, please call ') + '<%= GDSPrefix %>' + booking.bookingParams.id + '<br \/>' +
-                $T('3) Otherwise dial ') + '<%= MCU_IP %>' + $T(' and using FEC (Far-End Controls) with your remote, enter "') + booking.bookingParams.id + $T('" followed by the "#".<br \/>') +
-                $T('4) To join by phone dial ') + '<%= Phone_number %>' + $T(', enter "') + booking.bookingParams.id + $T('" followed by the "#".') +
-             '<\/td><\/tr>';
+        var pinInfo;
+        if (booking.bookingParams.hasPin) {
+            pinInfo = new HiddenText(booking.bookingParams.pin, Html.span("CERNMCUHiddenPIN", "****"), false).draw();
+        } else {
+            pinInfo = $T("No PIN was defined");
         }
 
-        infoHTML +=
-            '<tr><td class="collaborationInfoLeftCol">' + $T('Indico booking ID:') + '<\/td><td>' +
-                booking.id +
-            '<\/td><\/tr>' +
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('Pin:')),
+            Html.td({}, pinInfo)));
 
-            '<tr><td class="collaborationInfoLeftCol">' + $T('Booking created on:') + '<\/td><td>' +
-                formatDateTimeCS(booking.creationDate) +
-            '<\/td><\/tr>' +
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('Visibility:')),
+            Html.td({}, booking.bookingParams.hidden? $T("Hidden") : $T("Visible"))));
 
-            '<tr><td class="collaborationInfoLeftCol">' + $T('Booking last modified on:') + '<\/td><td>' +
-                formatDateTimeCS(booking.modificationDate) +
-            '<\/td><\/tr>' +
+        if (!booking.error) {
+            infoTbody.append(Html.tr({},
+                Html.td("collaborationInfoLeftCol", $T('How to join:')),
+                Html.td({},
+                        $T('1) If you are registered in the CERN Gatekeeper, please dial ') + '<%= CERNGatekeeperPrefix %>' + booking.bookingParams.id,
+                        Html.br(),
+                        $T('2) If you have GDS enabled in your endpoint, please call ') + '<%= GDSPrefix %>' + booking.bookingParams.id,
+                        Html.br(),
+                        $T('3) Otherwise dial ') + '<%= MCU_IP %>' + $T(' and using FEC (Far-End Controls) with your remote, enter "') + booking.bookingParams.id + $T('" followed by the "#".'),
+                        Html.br(),
+                        $T('4) To join by phone dial ') + '<%= Phone_number %>' + $T(', enter "') + booking.bookingParams.id + $T('" followed by the "#".'))));
+        }
 
-        '<\/tbody><\/table><\/div>'
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('Indico booking ID:')),
+            Html.td({}, booking.id)));
 
-        return infoHTML;
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('Created on:')),
+            Html.td({}, formatDateTimeCS(booking.creationDate))));
+
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('Last modified on:')),
+            Html.td({}, formatDateTimeCS(booking.modificationDate))));
+
+        return Html.div({}, Html.table({}, infoTbody));
     },
 
     getPopupDimensions: function() {
@@ -295,6 +285,9 @@
 
         $E('participantsCell').set(pf.draw());
 
+        CERNMCUPinField = new ShowablePasswordField('pin', '', false);
+        $E('PINField').set(CERNMCUPinField.draw());
+
         CERNMCUDrawContextHelpIcons();
     },
 
@@ -318,6 +311,9 @@
 
         pf = new ParticipantListField(booking.bookingParams.participants)
         $E('participantsCell').set(pf.draw());
+
+        CERNMCUPinField = new ShowablePasswordField('pin', booking.bookingParams.pin, false);
+        $E('PINField').set(CERNMCUPinField.draw());
 
         CERNMCUDrawContextHelpIcons();
     },
@@ -343,6 +339,23 @@
                 ips[participant.get("ip")] = true;
             }
 
+        }
+
+        var pin = CERNMCUPinField.getPassword();
+        values["pin"] = pin;
+        if (exists(pin) && pin !== '') {
+            var pinErrorMessages = [];
+            if (!IndicoUtil.isInteger(pin)) {
+                errors = true;
+                pinErrorMessages.push($T("The pin has to be a number."));
+            }
+            if (pin.length >= 32) {
+                errors = true;
+                pinErrorMessages.push($T("The pin cannot have more than 31 characters."));
+            }
+            if (pinErrorMessages.length > 0) {
+                CERNMCUPinField.markAsInvalid(CSErrorList(pinErrorMessages));
+            }
         }
 
         return !errors;

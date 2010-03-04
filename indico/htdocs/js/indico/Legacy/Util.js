@@ -368,7 +368,9 @@ var IndicoUtil = {
      * If the value of the field changes / the user types in the field, the red color and the tooltip will disappear
      * @param {XElement} component: the field to mark as invalid
      * @param {XElement} error: the string or Html object that will be displayed in the error popup.
-     * @return {Array of functions} returns an array of functions that should be called to cancel all the event observations.
+     * @return {[XElement, Array of functions]} returns an array with 2 elements:
+     *                                          -An Html.div() XElement with the tooltip that was created.
+     *                                          -An array of functions that should be called to cancel all the event observations.
      */
     markInvalidField: function(component, error) {
         if ( startsWith(component.dom.type, 'select')) {
@@ -414,7 +416,7 @@ var IndicoUtil = {
             }));
         }
 
-        return oList;
+        return [tooltip, oList];
     },
 
     /**
@@ -499,15 +501,18 @@ var IndicoUtil = {
                 if (exists(error)) {
                     hasErrors = true;
 
+                    var oList = [];
+
                     if (component.dom.type != 'radio') {
-                        oList = IndicoUtil.markInvalidField(component, error);
+                        var result = IndicoUtil.markInvalidField(component, error);
+                        oList = result[1];
 
                     } else {
                         component.dom.className += ' invalid';
                         $E(component.dom.id + 'Label').dom.className += ' invalidLabel';
 
                         var tooltip;
-                        var oList = []; //list of functions that we will call to stop observing events
+                        oList = []; //list of functions that we will call to stop observing events
 
                         var stopObserving = component.observeEvent('mouseover', function(event){
                             tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, error, "tooltipError");

@@ -48,13 +48,13 @@
             <span id="endDateHelp"></span>
         </td>
     </tr>
-    
+
     <tr>
         <td class="bookingFormFieldName">
             <span>Access password</span>
         </td>
         <td>
-            <input type="password" size="20" name="accessPassword" value="" />
+            <span id="passwordField"></span>
             <span id="passwordHelp"></span>
         </td>
     </tr>

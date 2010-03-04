@@ -7,12 +7,12 @@
             iframeElement.location.href = booking.url;
         }
     },
-        
+
     checkStart : function(booking) {
         booking.permissionToStart = true;
         return true;
     },
-    
+
     checkParams: function() {
         return {
             'communityId': ['text', false, function(option, values){
@@ -24,28 +24,28 @@
             }],
             'meetingTitle' : ['text', false],
             'meetingDescription' : ['text', false],
-            
+
             'startDate' : ['datetime', false, function(startDateString, values){
                 var errors = [];
                 var startDate = IndicoUtil.parseDateTime(startDateString);
-                              
+
                 //check start date is not in the past
                 var startDatePlusExtraTime = new Date();
                 startDatePlusExtraTime.setTime(startDate.getTime() + <%= AllowedStartMinutes %> *60*1000);
                 if (beforeNow(startDatePlusExtraTime)) {
                     errors.push($T("Start date cannot be before the past <%= AllowedStartMinutes %> minutes"));
                 }
-                
+
                 // check start date is not before the minimum start date (event start date - <%= AllowedMarginMinutes %> min )
                 if (startDate < IndicoUtil.parseDateTime("<%= MinStartDate %>")) {
                     errors.push($T("Start date cannot be <%= AllowedMarginMinutes %> minutes before the Indico event start date. Please choose it after <%= MinStartDate %>"));
                 }
-                
+
                 // check start date is not after the maximum start date (event end date + <%= AllowedMarginMinutes %> min )
                 if (startDate > IndicoUtil.parseDateTime("<%= MaxEndDate %>")) {
                     errors.push($T("Start date cannot be <%= AllowedMarginMinutes %> minutes after the Indico event end date. Please choose it before <%= MaxEndDate %>"));
                 }
-                
+
                 // check start date is not after end date, if end date exists
                 var endDate = IndicoUtil.parseDateTime(values["endDate"]);
                 if (endDate) {
@@ -53,29 +53,29 @@
                         errors.push($T("End date cannot be before start date."));
                     }
                 }
-                
+
                 return errors;
             }],
-            
+
             'endDate' : ['datetime', false, function(endDateString, values){
                 var errors = [];
                 var endDate = IndicoUtil.parseDateTime(endDateString);
-                              
+
                 //check end date is not in the past
                 if (beforeNow(endDate)) {
                     errors.push($T("End date cannot be before the past <%= AllowedStartMinutes %> minutes"));
                 }
-              
+
                 // check end date is not after the maximum start date (event end date + <%= AllowedMarginMinutes %> min )
                 if (endDate > IndicoUtil.parseDateTime("<%= MaxEndDate %>")) {
                     errors.push($T("End date cannot be <%= AllowedMarginMinutes %> minutes after the Indico event end date. Please choose it before <%= MaxEndDate %>"));
                 }
-                
+
                 // check start date is not before the minimum start date (event start date - <%= AllowedMarginMinutes %> min )
                 if (endDate < IndicoUtil.parseDateTime("<%= MinStartDate %>")) {
                     errors.push($T("End date cannot be <%= AllowedMarginMinutes %> minutes before the Indico event start date. Please choose it after <%= MinStartDate %>"));
                 }
-              
+
                 // check start date is not after end date, if start date exists
                 var startDate = IndicoUtil.parseDateTime(values["startDate"]);
                 if (startDate) {
@@ -83,12 +83,12 @@
                         errors.push($T("End date cannot be before start date."));
                     }
                 }
-              
+
                 return errors;
             }]
         }
     },
-    
+
     errorHandler: function(event, error) {
         if (event == 'create' || event == 'edit') {
             if (error.errorType == 'duplicated') {
@@ -97,33 +97,29 @@
                 IndicoUtil.markInvalidField($E('startDate'), message);
                 IndicoUtil.markInvalidField($E('endDate'), message);
             }
-            
+
             if (error.errorType == 'overlapped') {
-                var message = $T('The start and/or end times of this booking overlap with the booking with title "') + 
+                var message = $T('The start and/or end times of this booking overlap with the booking with title "') +
                               error.overlappedBooking.bookingParams.meetingTitle +
-                              '" (' + formatDateStringCS(error.overlappedBooking.bookingParams.startDate) + 
+                              '" (' + formatDateStringCS(error.overlappedBooking.bookingParams.startDate) +
                               $T(' to ') + formatDateStringCS(error.overlappedBooking.bookingParams.endDate) + ')'
                 IndicoUtil.markInvalidField($E('startDate'), message);
                 IndicoUtil.markInvalidField($E('endDate'), message);
             }
-            
+
             if (error.errorType == 'start_in_past') {
                 var message = $T('EVO considers that this meeting is starting too much in the past. Please change the start time.');
                 IndicoUtil.markInvalidField($E('startDate'), message);
             }
         }
-        
+
         if (event == 'checkStatus') {
             if (error.errorType == 'deletedByEVO') {
                 CSErrorPopup($T("Meeting removed by EVO"), $T("This meeting seems to have been deleted in EVO for some reason.<br />") +
                         $T("Please delete it and try to create it again."));
             }
-            if (error.errorType == 'changesFromEVO') {
-                CSErrorPopup($T("Changes in the EVO server"), $T("This meeting seems to have been changes in EVO for some reason.<br />") +
-                        $T("The fields that were changed are: ") + error.changes.join(', '));
-            }
         }
-        
+
         if (event == 'remove') {
             if (error.errorType == 'cannotDeleteOld') {
                 CSErrorPopup($T("Cannot remove"), [$T("It is not possible to delete an old EVO meeting")]);
@@ -136,7 +132,7 @@
             }
         }
     },
-    
+
     customText: function(booking) {
         if (booking.error && booking.errorMessage) {
             return '<span class="collaborationWarning">' + booking.errorMessage + '<\/span>'
@@ -144,109 +140,132 @@
             return booking.bookingParams.startDate.substring(11) + " to " + booking.bookingParams.endDate.substring(11) + " for " + booking.bookingParams.communityName;
         }
     },
-    
-    showInfo : function(booking) {
-        infoHTML = '<div><table><tbody>';
-        
-        if (booking.error && booking.errorDetails) {
-            infoHTML +=
-            '<tr><td colspan="2">'+
-                '<span class="collaborationWarning">';
-                    booking.errorDetails +
-                '<\/span>' +
-            '<\/td><\/tr>'
-        }
-        
-        if (booking.changesFromEVO.length > 0) {
-            infoHTML +=
-            '<tr><td colspan="2">'+
-                '<div class="collaborationWarning" style="display: inline;">' +
-                    $T('Changed by EVO Staff:') + 
-                    '<ul>'
-            
-            for (var i=0; i<booking.changesFromEVO.length; i++) {
-                infoHTML +=
-                        '<li>' +
-                            booking.changesFromEVO[i] +            
-                        '<\/li>'
-            }
-            
-            infoHTML +=
-                    '<\/ul>' +
-                '<\/div>' +
-            '<\/td><\/tr>'
-        }
-        
-        infoHTML +=
-            '<tr><td class="collaborationInfoLeftCol">' + $T('Meeting title:') + '<\/td><td>' +
-                booking.bookingParams.meetingTitle +
-            '<\/td><\/tr>'+
-            
-            '<tr><td class="collaborationInfoLeftCol">' + $T('Community:') + '<\/td><td>' +
-                booking.bookingParams.communityName +
-            '<\/td><\/tr>'+
-    
-            '<tr><td class="collaborationInfoLeftCol">' + $T('Start date:') + '<\/td><td>' +
-                formatDateStringCS(booking.bookingParams.startDate) +
-            '<\/td><\/tr>'+
-            
-            '<tr><td class="collaborationInfoLeftCol">' + $T('End date:') + '<\/td><td>' +
-                formatDateStringCS(booking.bookingParams.endDate) +
-            '<\/td><\/tr>'+
-            
-            '<tr><td class="collaborationInfoLeftCol">' + $T('Meeting description:') + '<\/td><td>' +
-                booking.bookingParams.meetingDescription +
-            '<\/td><\/tr>'+
-            
-            '<tr><td class="collaborationInfoLeftCol">' + $T('Access password:') + '<\/td><td>' +
-                (booking.bookingParams.hasAccessPassword? $T("Access password hidden") : $T("No access password was defined")) + 
-            '<\/td><\/tr>'+
-            
-            '<tr><td class="collaborationInfoLeftCol">' + $T('Visibility') + '<\/td><td>' +
-                (booking.bookingParams.hidden? $T("Hidden") : $T("Visible")) + 
-            '<\/td><\/tr>'+
-            
-            '<tr><td class="collaborationInfoLeftCol">' + $T('Auto-join URL:') + '<\/td><td>' +
-                (booking.url? booking.url : $T("not assigned yet")) + 
-            '<\/td><\/tr>'+
-            
-            '<tr><td class="collaborationInfoLeftCol">' + $T('Indico booking ID:') + '<\/td><td>' +
-                booking.id + 
-            '<\/td><\/tr>'+
-            
-            '<tr><td class="collaborationInfoLeftCol">' + $T('Booking created on:') + '<\/td><td>' +
-                formatDateTimeCS(booking.creationDate) +
-            '<\/td><\/tr>'+
-            
-            '<tr><td class="collaborationInfoLeftCol">' + $T('Booking last modified on:') + '<\/td><td>' +
-                formatDateTimeCS(booking.modificationDate) +
-            '<\/td><\/tr>'+
 
-        '<\/tbody><\/table><\/div>'
-            
-        return infoHTML;
+    showInfo : function(booking) {
+        var infoTbody = Html.tbody();
+
+        if (booking.error && booking.errorDetails) {
+            var errorCell = Html.td({colspan:2, colSpan:2});
+            errorCell.append(Html.span('collaborationWarning', booking.errorDetails));
+            infoTbody.append(Html.tr({}, errorCell));
+        }
+
+        if (booking.changesFromEVO.length > 0) {
+            var changesCell = Html.td({colspan:2, colSpan:2});
+            var changesDiv = Html.div({className: 'collaborationWarning', style:{display:'inline'}});
+
+            changesDiv.append(Html.span({}, $T('Changed by EVO Staff:')));
+            var changesList = Html.ul();
+
+            for (var i=0; i<booking.changesFromEVO.length; i++) {
+                changesList.append(Html.li({}, booking.changesFromEVO[i]));
+            }
+
+            changesDiv.append(changesList);
+            changesCell.append(changesDiv);
+            infoTbody.append(Html.tr({}, changesCell));
+        }
+
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('Title:')),
+            Html.td({}, booking.bookingParams.meetingTitle)));
+
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('Community:')),
+            Html.td({}, booking.bookingParams.communityName)));
+
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('Start date:')),
+            Html.td({}, formatDateStringCS(booking.bookingParams.startDate))));
+
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('End date:')),
+            Html.td({}, formatDateStringCS(booking.bookingParams.endDate))));
+
+        var passwordInfo;
+        if (booking.bookingParams.hasAccessPassword) {
+            passwordInfo = new HiddenText(booking.bookingParams.accessPassword, Html.span("EVOHiddenPassword", "********"), false).draw();
+        } else {
+            passwordInfo = $T("No access password was defined");
+        }
+
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('Password:')),
+            Html.td({}, passwordInfo)));
+
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('Phone Bridge ID:')),
+            Html.td({}, booking.phoneBridgeId)));
+
+        var phoneBridgePasswordInfo = null;
+        if (exists(booking.phoneBridgePassword)) {
+            phoneBridgePasswordInfo = new HiddenText(booking.phoneBridgePassword, Html.span("EVOHiddenPassword", "********"), false).draw();
+        } else {
+            phoneBridgePasswordInfo = $T("No access password was defined");
+        }
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('Phone Bridge password:')),
+            Html.td({}, phoneBridgePasswordInfo)));
+
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('Description:')),
+            Html.td({}, booking.bookingParams.meetingDescription)));
+
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('Visibility:')),
+            Html.td({}, booking.bookingParams.hidden? $T("Hidden") : $T("Visible"))));
+
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('Auto-join URL:')),
+            Html.td({}, booking.url? booking.url : $T("not assigned yet"))));
+
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('Indico booking ID:')),
+            Html.td({}, booking.id)));
+
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('Created on:')),
+            Html.td({}, formatDateTimeCS(booking.creationDate))));
+
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('Last modified on:')),
+            Html.td({}, formatDateTimeCS(booking.modificationDate))));
+
+        return Html.div({}, Html.table({}, infoTbody));
     },
-    
+
     getDateFields : function() {
         return ["startDate", "endDate"]
     },
-    
-    onCreate: function() {
-        EVODrawContextHelpIcons();
-    },
-    
-    onEdit: function() {
-        EVODrawContextHelpIcons();
-    },
-    
-    postCreate: function(booking) {
-        
-    },
-    
-    postEdit: function(booking) {
 
+    onCreate: function() {
+        EVOPasswordField = new ShowablePasswordField('accessPassword', '', false);
+        $E('passwordField').set(EVOPasswordField.draw());
+        EVODrawContextHelpIcons();
     },
-    
+
+    onEdit: function(booking) {
+        EVOPasswordField = new ShowablePasswordField('accessPassword', booking.bookingParams.accessPassword, false);
+        $E('passwordField').set(EVOPasswordField.draw());
+        EVODrawContextHelpIcons();
+    },
+
+    onSave: function(values) {
+        var password = EVOPasswordField.getPassword();
+        values["accessPassword"] = password;
+        return true;
+    },
+
+    postCheckStatus: function(booking) {
+        if (booking.changesFromEVO.length > 0) {
+            CSErrorPopup($T("Changes in the EVO server"),
+                         [Html.span({}, $T("This meeting seems to have been changed in EVO for some reason."),
+                                       Html.br(),
+                                       $T("The fields that were changed are: ") + booking.changesFromEVO.join(', ') + "."),
+                                       $T("You can also check them in the booking's details.")]);
+        }
+    },
+
     postDelete: function(booking) {
         if (booking.warning) {
             if (booking.warning.message === 'cannotDeleteNonExistant') {
