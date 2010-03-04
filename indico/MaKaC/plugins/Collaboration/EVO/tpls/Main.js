@@ -31,7 +31,7 @@
 
                 //check start date is not in the past
                 var startDatePlusExtraTime = new Date();
-                startDatePlusExtraTime.setTime(startDate.getTime() + <%= AllowedStartMinutes %> *60*1000);
+                startDatePlusExtraTime.setTime(startDate.getTime() + (<%= AllowedStartMinutes %> - 1) *60*1000);
                 if (beforeNow(startDatePlusExtraTime)) {
                     errors.push($T("Start date cannot be before the past <%= AllowedStartMinutes %> minutes"));
                 }
