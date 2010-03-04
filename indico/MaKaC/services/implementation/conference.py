@@ -33,7 +33,7 @@ from MaKaC.errors import TimingError
 from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
 
-from MaKaC.services.interface.rpc.common import ServiceError, Warning
+from MaKaC.services.interface.rpc.common import ServiceError, Warning, ResultWithWarning
 
 class ConferenceBase(object):
     """
@@ -325,7 +325,7 @@ class ConferenceStartEndDateTimeModification( ConferenceModifBase ):
 
         if (self._startDate > self._endDate):
             raise ServiceError("ERR-E3",
-                               "Date/time of start cannot "+
+                               "Date/time of start cannot " +
                                "be greater than date/time of end")
 
         try:
@@ -341,9 +341,11 @@ class ConferenceStartEndDateTimeModification( ConferenceModifBase ):
             for problemGroup in dateChangeNotificationProblems.itervalues():
                 warningContent.extend(problemGroup)
 
-            return Warning(_('Warning'), [_('The start date of your event was changed correctly.'),
-                                          _('However, there were the following problems:'),
-                                          warningContent])
+            w = Warning(_('Warning'), [_('The start date of your event was changed correctly.'),
+                                       _('However, there were the following problems:'),
+                                       warningContent])
+
+            return DictPickler.pickle(ResultWithWarning(self._params.get('value'), w))
 
         else:
             return self._params.get('value')

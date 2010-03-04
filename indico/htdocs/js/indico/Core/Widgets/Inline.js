@@ -880,9 +880,15 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
              return progressIndicator(true, false);
          },
 
-         _handleLoaded: function(value) {
+         _handleLoaded: function(result) {
              // save the final value once and for all
-             this.value = value;
+             if (exists(result.hasWarning) && result.hasWarning === true) {
+                 var popup = new WarningPopup(result.warning.title, result.warning.content);
+                 popup.open();
+                 this.value = result.result;
+             } else {
+                 this.value = result;
+             }
          }
 
      },
