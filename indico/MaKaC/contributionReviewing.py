@@ -527,17 +527,18 @@ class Review(Persistent):
                 if self._refereeJudgement.isSubmitted():
                     status.append(_("Judged: ") + str(self._refereeJudgement.getJudgement()))
                 else:
-                    status.append(_("Pending referee decision"))
+                    #status.append(_("Pending referee decision"))
                     if not forAuthor:
                         if self.getConfReview().getChoice() == 4:
-                            if self._editorJudgement.isSubmitted():
+                            editor = self._reviewManager.getEditor()
+                            if self._reviewManager.isEditor(editor) and self._editorJudgement.isSubmitted():
                                 status.append(_("Layout judged: ") + str(self._editorJudgement.getJudgement()))
                             else:
                                 status.append(_("Pending layout reviewer decision"))
                             
                         if self.anyReviewerHasGivenAdvice():
-                            for a in self.getReviewerJudgements():
-                                status.append(_("Content judged: ") + str(a.getJudgement()))
+                            for reviewer in self._reviewManager.getReviewersList():
+                                status.append(_("Content judged: ") + str(self._reviewManager.getLastReview().getReviewerJudgement(reviewer).getJudgement()))
                             if not self.allReviewersHaveGivenAdvice():
                                 status.append(_("Some content reviewers have not decided yet"))
                         else:

@@ -5,8 +5,8 @@
                     <span class="titleCellFormat" style="font-size: 12px;"><strong><%= _("Final Judgement:")%></strong></span>
                 </td>
                 <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                    <strong><%= Review.getRefereeJudgement().getJudgement() %></strong>,
-                    <%= _(" submitted on ") %><%= Review.getRefereeJudgement().getAdjustedSubmissionDate().strftime(format) %>
+                    <%= Review.getRefereeJudgement().getJudgement() %>,
+                    <em><%= _(" submitted on ") %><%= Review.getRefereeJudgement().getAdjustedSubmissionDate().strftime(format) %></em>
                 </td>
            </tr>
            <% if Review.getRefereeJudgement().getComments(): %>

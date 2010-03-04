@@ -10,7 +10,7 @@
     <% display = 'form' %>
 <% end %>
 <form id="SendBtnForm" action="<%=urlHandlers.UHContributionSubmitForRewiewing.getURL(self._target)%>" method="POST" style="disabled:true; display:<%=display%>">
-    <input id="SendBtn" type="submit" class="btn" value="Send" style="display:<%=display%>">
+    <input id="SendBtn" type="submit" class="btn" value="Send" disabled="disabled" style="display:<%=display%>">
     <span id="SendHelp" style="display:<%=display%>">
         <% inlineContextHelp(_('First you should add the materials and then by clicking on this button you will send them for reviewing. They will be locked until the end of the process')) %>
     </span>

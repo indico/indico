@@ -4,8 +4,8 @@
                         <span class="titleCellFormat" style="font-size: 12px;"><%= _("Content judgement:")%></span>
                     </td>
                     <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                        <strong><%= advice.getJudgement() %></strong>,
-                        <%= _(" submitted on ") %><%= advice.getAdjustedSubmissionDate().strftime(format) %>
+                        <%= advice.getJudgement() %>,
+                        <em><%= _(" submitted on ") %><%= advice.getAdjustedSubmissionDate().strftime(format) %></em>
                     </td>
                 </tr>
                 <% if advice.getComments(): %>

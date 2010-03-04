@@ -37,7 +37,7 @@
     <%end%>
 	<tr>
 	  <td>
-            <table align="center" width="90%%">
+            <table align="center" width="95%%">
                 <%
                 if self._rh._target.getConference().getAbstractMgr().isActive() and self._rh._target.getConference().hasEnabledSection("cfa") and self._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
                 %>
@@ -61,7 +61,7 @@
 		    </tr>
 		    <tr>
 		        <td align="right" valign="top" class="displayField"><b><%= _("Duration")%>:</b></td>
-			<td width="100%%">%(duration)s</td>
+			    <td width="100%%">%(duration)s</td>
 		    </tr>
 					%(contribType)s
 					%(primaryAuthors)s
@@ -96,7 +96,7 @@
                         </tr>
                             <% if Contribution.getReviewManager().getLastReview().isAuthorSubmitted(): %>
                                     <tr>
-		                            <td align="right" valign="top" class="displayField" style="border-right:5px solid #FFFFFF;" nowrap>
+		                            <td align="right" valign="top" class="displayField" nowrap>
 		                                <b><%=_("Reviewing status")%>:</b>
 		                            </td>
                                     <td style="border-left:5px solid #FFFFFF;">
@@ -127,40 +127,30 @@
                                         <% display = 'table' %>
                                     <% end %>
                                 <% end %>
-                                    <table align="center" style="display:<%=display%>">
-                                    <tr>
-                                        <td colspan="2" align="center">
+                                <tr>
+                                <td>&nbsp;</td>
+                                        <td colspan="2" align="left">
                                             <form action="<%=urlHandlers.UHContributionRemoveSubmittedMarkForReviewing.getURL(Contribution)%>" method="POST">
                                                 <input type="submit" class="btn" value="UNDO sending" >
                                                 <% inlineContextHelp(_('Press this button only if you made some mistake when submitting the materials.The reviewing team will be notified and the reviewing process will be stopped until you mark the materials as submitted again')) %>
                                             </form>
                                         </td>
-                                     </table>
-                            <% end %>
-                        </tr>
-                        <% end %>
-                    <% end %>
-                 
-              <% if Contribution.getConference() and Contribution.getConference().hasEnabledSection('paperReviewing') and Contribution.getConference().getConfReview().hasReviewing() and len(Contribution.getReviewManager().getVersioning()) > 1: %>
-                 
-                 <table align="center" width="80%%"> 
-                  <tr>
-                      <td align="right" valign="top" class="displayField" style="border-right:5px solid #FFFFFF;" nowrap>
-                            <b><%=_("Reviewing history")%>:</b>
-                      </td>
-                      <td width="100%%" valing="top"><div id="showHideHistory" style="display:inline"></div></td>
-                  </tr>
-               </table>
-               
-               <table id="HistoryTable" align="center" width="100%%">
-               <tbody> 
-               <tr>
-                      <td colspan="2">
-                           %(reviewingHistoryStuffDisplay)s
-                      </td>
-                  </tr>
-               </tbody>    
-               </table>     
+                                </tr>
+                      <% if len(Contribution.getReviewManager().getVersioning()) > 1: %>
+                      <tr>
+		                      <td align="right" valign="top" class="displayField" nowrap>
+		                            <b><%=_("Reviewing history")%>:</b>
+		                      </td>
+		                      <td width="100%%" valing="top"><div id="showHideHistory" style="display:inline"></div></td>
+	               </tr>
+	               <tr>
+	                   <td id="HistoryTable" align="center" width="100%%" colspan="2">
+			               %(reviewingHistoryStuffDisplay)s    
+		               </td>
+               </tr> 
+               <% end %>   
+              <% end %>
+              <% end %>
               <% end %>
               </table>
                  </td>

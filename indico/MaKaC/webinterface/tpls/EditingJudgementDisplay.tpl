@@ -5,8 +5,8 @@
                         <span class="titleCellFormat" style="font-size: 12px;"><%= _("Layout judgement:")%></span>
                     </td>
                     <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                        <strong><%= Editing.getJudgement() %></strong>,
-                        <%= _(" submitted on ") %><%= Editing.getAdjustedSubmissionDate().strftime(format) %>
+                        <%= Editing.getJudgement() %>,
+                        <em><%= _(" submitted on ") %><%= Editing.getAdjustedSubmissionDate().strftime(format) %></em>
                     </td>
                 </tr>
                 <% if Editing.getComments(): %>
