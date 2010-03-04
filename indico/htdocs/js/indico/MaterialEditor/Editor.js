@@ -293,7 +293,6 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
         // make typeSelector available to the object
         this.typeSelector = typeSelector;
 
-<<<<<<< HEAD:indico/htdocs/js/indico/MaterialEditor/Editor.js
         return Html.div({},
                         IndicoUtil.createFormFromMap(
                             [
