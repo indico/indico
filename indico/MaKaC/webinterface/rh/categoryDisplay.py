@@ -460,7 +460,7 @@ class UtilsConference:
             raise FormValuesError("One of the emails specified or one of the separators is invalid")
 
         c.setSupportEmail(emailstr)
-        displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(c).setSupportEmailCaption(confData.get("supportCaption",""))
+        displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(c).setSupportEmailCaption(confData.get("supportCaption","Support"))
         displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(c).setDefaultStyle(confData.get("defaultStyle",""))
         if c.getVisibility() != confData.get("visibility",999):
             c.setVisibility( confData.get("visibility",999) )
