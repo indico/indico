@@ -456,11 +456,10 @@ class UtilsConference:
 
         emailstr = setValidEmailSeparators(confData.get("supportEmail", ""))
 
-        if not validMail(emailstr):
+        if (emailstr != "") and not validMail(emailstr):
             raise FormValuesError("One of the emails specified or one of the separators is invalid")
 
         c.setSupportEmail(emailstr)
-#        c.setSupportEmail( confData.get("supportEmail", "")  )
         displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(c).setSupportEmailCaption(confData.get("supportCaption",""))
         displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(c).setDefaultStyle(confData.get("defaultStyle",""))
         if c.getVisibility() != confData.get("visibility",999):
