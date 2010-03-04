@@ -1,5 +1,5 @@
 <div class="container" style="max-width: 1000px;">
-<form id="eventCreationForm" action="<%= postURL %>" method="POST">
+<form id="eventCreationForm" style="height:620px" action="<%= postURL %>" method="POST">
 
     <input type="hidden" name="event_type" value="<%= event_type %>">
 

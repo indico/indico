@@ -1,5 +1,5 @@
 <div class="container" style="max-width: 1000px;">
-<form id="conferenceCreationForm" action="%(postURL)s" method="POST">
+<form id="conferenceCreationForm" style="height:620px" action="%(postURL)s" method="POST">
     <input type="hidden" name="event_type" value="%(event_type)s">
 
     <em><%= _("Please follow the steps to create a conference")%></em>
