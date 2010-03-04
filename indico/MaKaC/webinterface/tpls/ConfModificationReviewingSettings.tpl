@@ -175,7 +175,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
 <% end %>
 <table id="defaultDueDatesTable" width="90%%" align="center" border="0" style="margin-bottom:1em; display:<%=display%>">
     <tr>
-        <td id="defaultDatesHelp" colspan="5" class="reviewingsubtitle"><%= _("Deadlines for reviewing team")%></td>
+        <td id="defaultDatesHelp" colspan="5" class="reviewingsubtitle"><%= _("Default deadlines for the new contributions")%></td>
     </tr>
     <% if ConfReview.hasPaperReviewing(): %>
         <% display = 'table-row' %>
