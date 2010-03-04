@@ -35,19 +35,21 @@ var IndicoUtil = {
         }
         for (var i=0; i < formNodes.length; i++) {
             var node = formNodes[i];
-            if (node.type == "checkbox") {
-                if (!exists(values[node.name])) {
-                    values[node.name] = [];
-                }
-                if (node.checked) {
-                    values[node.name].push(node.value);
-                }
-            } else if (node.type == "radio") {
-                if (node.checked) {
+            if (exists(node.name) && node.name) {
+                if (node.type == "checkbox") {
+                    if (!exists(values[node.name])) {
+                        values[node.name] = [];
+                    }
+                    if (node.checked) {
+                        values[node.name].push(node.value);
+                    }
+                } else if (node.type == "radio") {
+                    if (node.checked) {
+                        values[node.name] = node.value;
+                    }
+                } else {
                     values[node.name] = node.value;
                 }
-            } else {
-                values[node.name] = node.value;
             }
         }
         return values;
@@ -479,6 +481,9 @@ var IndicoUtil = {
                 }
                 else if (dataType == 'email' && !(allowEmpty && trim(component.get()) === '') && !Util.Validation.isEmailAddress(component.get())) {
                     error = Html.span({}, "Invalid e-mail address");
+                }
+                else if (dataType == 'emaillist' && !(allowEmpty && trim(component.get()) === '') && !Util.Validation.isEmailList(component.get())){
+                    error = Html.span({}, "List contains invalid e-mail address or invalid separator");
                 }
                 else if (dataType == 'ip' && !(allowEmpty && trim(component.get()) === '') &&  !Util.Validation.isIPAddress(component.get())) {
                     error = Html.span({}, "That doesn't seem like a valid IP Address. Example of valid IP Address: 132.156.31.38");

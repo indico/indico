@@ -27,7 +27,7 @@ which action to carry out in order to handle the request made. This means that
 each of the possible HTTP ports of the system will have a rh which will know 
 what to do depending on the parameter values received, etc.
 """
-import copy, time, os, sys, random
+import copy, time, os, sys, random, re
 import StringIO
 from datetime import datetime, timedelta
 
@@ -237,7 +237,13 @@ class RH(RequestHandlerBase):
         """
 
         self._req.headers_out["Pragma"] = "no-cache"
-        self._req.headers_out["Cache-Control"] = "no-store, no-cache, must-revalidate"
+
+        # IE doesn't seem to like 'no-cache' Cache-Control headers...
+        if (re.match(r'.*MSIE.*', self._req.headers_in["User-Agent"])):
+            self._req.headers_out["Cache-Control"] = "private"
+            self._req.headers_out["Expires"] = "-1"
+        else:
+            self._req.headers_out["Cache-Control"] = "no-store, no-cache, must-revalidate"
 
 
     def _redirect( self, targetURL, noCache=False ):

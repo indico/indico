@@ -135,7 +135,7 @@
         <tr>
           <td valign="top" align="right">
               <b><strong>
-                  Contact:
+                  <xsl:value-of select="./supportEmail/@caption"/>
               </strong></b>
           </td>
           <td>

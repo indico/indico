@@ -21,6 +21,7 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+  <!-- This template seems to not being used -->
   <xsl:template name="header">
     <td width="60%">
       <xsl:call-template name="displayModifIcons">
@@ -954,7 +955,9 @@
 
         <xsl:if test="./supportEmail != ''">
           <tr>
-            <td class="leftCol">Support</td>
+            <td class="leftCol">
+                <xsl:value-of select="./supportEmail/@caption" />
+            </td>
             <td>
               <xsl:apply-templates select="./supportEmail"/>
             </td>

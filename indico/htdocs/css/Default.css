@@ -5521,11 +5521,20 @@ div.posterEntry:hover {
     margin-top: 5px;
 }
 
-.startEndDate {
+.startEndDate, .support {
     margin-top: 5px;
 }
-.startEndDate span {
+
+.startEndDate td, .support td {
+    color: #000;
+}
+td.startEndDateEntry, td.supportEntry {
     color: #666;
+    padding-right: 6px;
+}
+
+.support td input {
+    width: 300px;
 }
 
 .siteTitle {

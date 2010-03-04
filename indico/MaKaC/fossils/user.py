@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: contribution.py,v 1.39 2009/06/25 15:21:49 dmartinc Exp $
-##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
 ##
@@ -20,36 +18,43 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.common.fossilize import IFossil
-from MaKaC.common.Conversion import Conversion
 
-class IConferenceMinimalFossil(IFossil):
+class IAvatarMinimalFossil(IFossil):
 
     def getId(self):
-        """Conference id"""
+        """ Avatar id"""
 
-    def getTitle(self):
-        """Conference title"""
+    def getStraightFullName(self):
+        """ Avatar full name, the one usually displayed """
+    getStraightFullName.name = "name"
 
-    def getDescription(self):
-        """Conference description"""
-
-    def getLocation(self):
-        """ Location (CERN/...) """
-    getLocation.convert = lambda l: l and l.getName()
-
-    def getRoom(self):
-        """ Room (inside location) """
-    getRoom.convert = lambda r: r and r.getName()
-
-    def getStartDate(self):
-        """ Start Date """
-    getStartDate.convert = Conversion.datetime
-
-    def getEndDate(self):
-        """ End Date """
-    getEndDate.convert = Conversion.datetime
-
-    def getSupportEmail(self):
-        """ Support Email """
+    def getEmail( self ):
+        """ Avatar email """
 
 
+class IAvatarDetailedFossil(IAvatarMinimalFossil):
+
+    def getFirstName(self):
+        """ Avatar first name """
+
+    def getFamilyName(self):
+        """ Avatar family name """
+
+    def getTitle( self ):
+        """ Avatar name title (Mr, Mrs..) """
+
+    def getOrganisation( self ):
+        """ Avatar organisation / affiliation """
+    getOrganisation.name = "affiliation"
+
+
+class IAvatarAllDetailsFossil(IAvatarDetailedFossil):
+
+    def getAddress( self ):
+        """ Avatar address """
+
+    def getTelephone( self ):
+        """ Avatar telephone """
+
+    def getFax(self):
+        """ Avatar fax """

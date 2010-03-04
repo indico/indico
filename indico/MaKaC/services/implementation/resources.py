@@ -3,24 +3,6 @@ from MaKaC.services.interface.rpc.common import ServiceError
 from MaKaC.common import Config
 from MaKaC import i18n
 
-class GetFileTypeIcon(ServiceBase):
-    
-    def _checkParams(self):
-  
-        self._fileType = self._params.get('fileType',None)
-    
-        if (self._fileType == None):
-            raise ServiceError("ERR-MR0", "File type was not specified")
-    
-    def _getAnswer(self):
-        cfg = Config.getInstance()
-        url = cfg.getFileTypeIconURL(self._fileType)
-        
-        if url == "":
-            return None
-        else:
-            return url
-
 class GetTimezones(ServiceBase):
     
     def _getAnswer(self):

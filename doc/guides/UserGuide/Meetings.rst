@@ -51,7 +51,7 @@ General Settings Management
 
 From the Main tab, you are able to modify the details of the
 meeting including title, description, location, default style of
-the display. You can also add/remove any chairpersons.
+the display, support emails and caption. You can also add/remove any chairpersons.
 
 |image100|
 

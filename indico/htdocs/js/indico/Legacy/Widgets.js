@@ -320,34 +320,6 @@ IndicoUI.Widgets = {
             return button;
         },
 
-        remoteIcon: function(filetype){
-
-            var elem = Html.img({
-                alt: filetype,
-                style: {
-                    width: '20px',
-                    height: '20px'
-                }
-            });
-
-            jsonRpc(Indico.Urls.JsonRpcService, 'resources.filetype.icon', {
-                'fileType': filetype
-            }, function(result, error){
-                if (exists(error)) {
-                    IndicoUtil.errorReport(error);
-                }
-                else
-                    if (result === null) {
-                        Dom.List.remove(elem.dom.parentNode, elem);
-                    }
-                else {
-                    elem.dom.src = result;
-                }
-            });
-
-            return elem;
-        },
-
         switchOptionButton: function(method, attributes, caption) {
             var button = new SwitchOptionButton(method, attributes, caption);
             return button.draw();

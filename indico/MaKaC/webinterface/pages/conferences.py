@@ -18,7 +18,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 
 import urllib
 import os
@@ -428,7 +427,9 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         vars["supportEmail"] = ""
         if self._conf.hasSupportEmail():
             mailto = quoteattr("""mailto:%s?subject=%s"""%(self._conf.getSupportEmail(), urllib.quote( self._conf.getTitle() ) ))
-            vars["supportEmail"] = """<a href=%s class="confSupportEmail"><img src="%s" border="0" alt="email"> support</a>"""%(mailto, Config.getInstance().getSystemIconURL("smallEmail") )
+            vars["supportEmail"] = """<a href=%s class="confSupportEmail"><img src="%s" border="0" alt="email"> %s</a>"""%(mailto,
+                                                Config.getInstance().getSystemIconURL("smallEmail"),
+                                                displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getSupportEmailCaption())
         p={"closeMenuURL": vars["closeMenuURL"], \
             "menuStatus": vars["menuStatus"], \
             "supportEmail": vars["supportEmail"] \
@@ -1135,6 +1136,14 @@ class WPInternalPageDisplay( WPConferenceDefaultDisplayBase ):
     def _getBody( self, params ):
         wc = WInternalPageDisplay( self._conf, self._page )
         return wc.getHTML()
+
+    def _defineSectionMenu( self ):
+        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
+
+        for link in self._sectionMenu.getAllLinks():
+            if link.getType() == 'page' and link.getPage().getId() == self._page.getId():
+                self._sectionMenu.setCurrentItem(link)
+                break
 
 
 class WConferenceTimeTable(wcomponents.WTemplated):
@@ -2071,6 +2080,7 @@ class WPConferenceModifBase( main.WPMainBase ):
         self._generalSection.addItem( self._regFormMenuItem)
 
         if self._conf.getCSBookingManager() is not None and self._conf.getCSBookingManager().isCSAllowed():
+            from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
             self._videoServicesMenuItem = wcomponents.SideMenuItem(_("Video Services"),
                 urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = CollaborationTools.isUsingHTTPS()))
             self._generalSection.addItem( self._videoServicesMenuItem)
@@ -2120,15 +2130,12 @@ class WPConferenceModifBase( main.WPMainBase ):
 
         #we decide which side menu item appear and which don't
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCAbstractManager, RCReviewingStaff
-        from MaKaC.webinterface.rh.collaboration import RCVideoServicesManager
-        #we decide which side menu item appear and which don't
-        from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCAbstractManager, RCReviewingStaff
+        from MaKaC.webinterface.rh.collaboration import RCVideoServicesManager, RCCollaborationAdmin, RCCollaborationPluginAdmin
 
         canModify = self._conf.canModify(self._rh.getAW())
         isReviewingStaff = RCReviewingStaff.hasRights(self._rh)
         isPRM = RCPaperReviewManager.hasRights(self._rh)
         isAM = RCAbstractManager.hasRights(self._rh)
-        isAnyCollaborationPluginManager = RCVideoServicesManager.hasRights(self._rh, 'any')
         isRegistrar = self._conf.canManageRegistration(self._rh.getAW().getUser())
 
         if not canModify:
@@ -2162,15 +2169,18 @@ class WPConferenceModifBase( main.WPMainBase ):
             if isReviewingStaff and not canModify:
                 self._reviewingMenuItem.setVisible(True)
 
-        if not (canModify or isAnyCollaborationPluginManager):
+        if not (canModify or
+                RCVideoServicesManager.hasRights(self._rh, 'any') or
+                RCCollaborationAdmin.hasRights(self._rh) or RCCollaborationPluginAdmin.hasRights(self._rh, plugins = 'any')):
             self._videoServicesMenuItem.setVisible(False)
 
         #we hide the Advanced Options section if it has no items
         if not self._advancedOptionsSection.hasVisibleItems():
             self._advancedOptionsSection.setVisible(False)
 
-        #tabs forced to be disabled for now
-        self._participantsMenuItem.setVisible(False)
+        # we disable the Participants section for events of type conference
+        if self._conf.getType() == 'conference':
+            self._participantsMenuItem.setVisible(False)
 
         # make sure that the section evaluation is always activated
         # for all conferences
@@ -2736,6 +2746,7 @@ class WConfModifMainData(wcomponents.WTemplated):
         vars["remChairsURL"]=quoteattr(str(urlHandlers.UHConferenceRemoveChairs.getURL(self._conf)))
         vars["searchChairURL"]=quoteattr(str(urlHandlers.UHConfModifSelectChairs.getURL(self._conf)))
         vars["chairs"] = self._conf.getChairList()
+        vars["supportEmailCaption"] = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getSupportEmailCaption()
         vars["supportEmail"] = _("""--_("not set")--""")
         if self._conf.hasSupportEmail():
             vars["supportEmail"] = self.htmlText(self._conf.getSupportEmail())
@@ -2997,6 +3008,7 @@ class WConferenceDataModification(wcomponents.WTemplated):
 
         vars["locationAddress"] = locAddress
 
+        vars["supportCaption"] = quoteattr(displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getSupportEmailCaption())
         vars["supportEmail"] = quoteattr( self._conf.getSupportEmail() )
         vars["locator"] = self._conf.getLocator().getWebForm()
         vars["event_type"] = ""

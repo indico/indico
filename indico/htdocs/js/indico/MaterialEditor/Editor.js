@@ -563,12 +563,20 @@ type("ResourceListWidget", ["ListWidget"], {
             labelAndValue('Size',Math.floor(info.get('fileSize')/1024)+ " KB");
             labelAndValue('Creation Date',info.get('creationDate'));
 
+            var filetype = info.get('fileType');
+
             return Html.div(
                 "resourceContainer",
                 Html.div({style: {'float':'left'}},
-                         IndicoUI.Widgets.Generic.remoteIcon(info.get('fileType'))),
-                Html.div({style:{'float': 'left'}},list)
-            );
+                                    Html.img({
+                                        alt: filetype,
+                                        style: {
+                                            width: '20px',
+                                            height: '20px'
+                                        },
+                                        src: imageSrc(Indico.FileTypeIcons[filetype.toLowerCase()])
+                                    }),
+                         Html.div({style:{'float': 'left'}},list)));
         };
 
         var removeButton;

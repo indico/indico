@@ -709,7 +709,7 @@ class WContribModifMain(wcomponents.WTemplated):
         room=self._contrib.getRoom()
         if room is not None and room.getName().strip()!="":
             vars["place"]= _("""%s <br> _("Room"): %s""")%(vars["place"],self.htmlText(room.getName()))
-        if self._contrib.getBoardNumber()!="" and self._contrib.getBoardNumber() is not None:
+        if self._eventType == "conference" and self._contrib.getBoardNumber()!="" and self._contrib.getBoardNumber() is not None:
             vars["place"]= _("""%s<br> _("Board #")%s""")%(vars["place"],self.htmlText(self._contrib.getBoardNumber()))
         vars["id"] = self.htmlText( self._contrib.getId() )
         vars["dataModificationURL"] = str( urlHandlers.UHContributionDataModification.getURL( self._contrib ) )

@@ -19,7 +19,6 @@ methodMap = {
     "roomBooking.rooms.list": roomBooking.RoomBookingListRooms,
     "roomBooking.locationsAndRooms.list" :roomBooking.RoomBookingListLocationsAndRooms,
     
-    "resources.filetype.icon": resources.GetFileTypeIcon,
     "resources.timezones.getAll": resources.GetTimezones,
     "resources.languages.getAll": resources.GetLanguages,
     

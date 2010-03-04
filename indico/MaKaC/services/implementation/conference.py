@@ -10,7 +10,7 @@ import MaKaC.webinterface.displayMgr as displayMgr
 
 from MaKaC.common.Configuration import Config
 from MaKaC.common import filters
-from MaKaC.common.utils import validMail
+from MaKaC.common.utils import validMail, setValidEmailSeparators
 from MaKaC.common.PickleJar import DictPickler
 from MaKaC.common import indexes, info
 
@@ -33,7 +33,7 @@ from MaKaC.errors import TimingError
 from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
 
-from MaKaC.services.interface.rpc.common import ServiceError, Warning
+from MaKaC.services.interface.rpc.common import ServiceError, Warning, ResultWithWarning
 
 class ConferenceBase(object):
     """
@@ -232,14 +232,47 @@ class ConferenceSupportEmailModification( ConferenceTextModificationBase ):
     Conference support e-mail modification
     """
     def _handleSet(self):
-        if validMail(self._value) or self._value == '':
-            self._target.setSupportEmail(self._value)
+        # handling the case of a list of emails with separators different than ","
+        emailstr = setValidEmailSeparators(self._value)
+
+        if validMail(emailstr) or emailstr == '':
+            self._target.setSupportEmail(emailstr)
         else:
             raise ServiceError('ERR-E0', 'E-mail address %s is not valid!' %
                                self._value)
 
     def _handleGet(self):
         return self._target.getSupportEmail()
+
+class ConferenceSupportModification( ConferenceTextModificationBase ):
+    """
+    Conference support caption and e-mail modification
+    """
+    def _handleSet(self):
+        dMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target)
+        caption = self._value.get("caption","")
+        email = self._value.get("email")
+
+        if caption == "":
+            raise ServiceError("ERR-E2", "The caption cannot be empty")
+        dMgr.setSupportEmailCaption(caption)
+
+        # handling the case of a list of emails with separators different than ","
+        email = setValidEmailSeparators(email)
+
+        if validMail(email) or email == "":
+            self._target.setSupportEmail(email)
+        else:
+            raise ServiceError('ERR-E0', 'E-mail address %s is not valid!' %
+                               self._value)
+
+    def _handleGet(self):
+        dMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target)
+        caption = dMgr.getSupportEmailCaption()
+        email = self._target.getSupportEmail()
+
+        return { "caption": caption,
+                 "email": email }
 
 class ConferenceDefaultStyleModification( ConferenceTextModificationBase ):
     """
@@ -292,7 +325,7 @@ class ConferenceStartEndDateTimeModification( ConferenceModifBase ):
 
         if (self._startDate > self._endDate):
             raise ServiceError("ERR-E3",
-                               "Date/time of start cannot "+
+                               "Date/time of start cannot " +
                                "be greater than date/time of end")
 
         try:
@@ -308,9 +341,11 @@ class ConferenceStartEndDateTimeModification( ConferenceModifBase ):
             for problemGroup in dateChangeNotificationProblems.itervalues():
                 warningContent.extend(problemGroup)
 
-            return Warning(_('Warning'), [_('The start date of your event was changed correctly.'),
-                                          _('However, there were the following problems:'),
-                                          warningContent])
+            w = Warning(_('Warning'), [_('The start date of your event was changed correctly.'),
+                                       _('However, there were the following problems:'),
+                                       warningContent])
+
+            return DictPickler.pickle(ResultWithWarning(self._params.get('value'), w))
 
         else:
             return self._params.get('value')
@@ -582,6 +617,7 @@ class ConferenceParticipationForm(ConferenceDisplayBase):
 methodMap = {
     "main.changeTitle": ConferenceTitleModification,
     "main.changeSupportEmail": ConferenceSupportEmailModification,
+    "main.changeSupport": ConferenceSupportModification,
     "main.changeSpeakerText": ConferenceSpeakerTextModification,
     "main.changeOrganiserText": ConferenceOrganiserTextModification,
     "main.changeDefaultStyle": ConferenceDefaultStyleModification,

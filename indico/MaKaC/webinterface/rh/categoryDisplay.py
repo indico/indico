@@ -50,6 +50,7 @@ import MaKaC.common.info as info
 from MaKaC.i18n import _
 from MaKaC.rb_location import Location, CrossLocationQueries
 from MaKaC.webinterface.user import UserListModificationBase
+from MaKaC.common.utils import validMail, setValidEmailSeparators
 
 class RHCategDisplayBase( base.RHDisplayBaseProtected ):
 
@@ -453,7 +454,13 @@ class UtilsConference:
                 c.setRoom( r )
             r.setName( roomName )
 
-        c.setSupportEmail( confData.get("supportEmail", "")  )
+        emailstr = setValidEmailSeparators(confData.get("supportEmail", ""))
+
+        if (emailstr != "") and not validMail(emailstr):
+            raise FormValuesError("One of the emails specified or one of the separators is invalid")
+
+        c.setSupportEmail(emailstr)
+        displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(c).setSupportEmailCaption(confData.get("supportCaption",""))
         displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(c).setDefaultStyle(confData.get("defaultStyle",""))
         if c.getVisibility() != confData.get("visibility",999):
             c.setVisibility( confData.get("visibility",999) )

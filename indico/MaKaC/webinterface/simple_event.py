@@ -68,7 +68,6 @@ class WebFactory(WebFactory):
         webPageWithSideMenu._contribListMenuItem.setVisible(False)
         webPageWithSideMenu._regFormMenuItem.setVisible(False)
         webPageWithSideMenu._listingsMenuItem.setVisible(False)
-        webPageWithSideMenu._participantsMenuItem.setVisible(True)    
 
     @staticmethod
     def customiseToolsTabCtrl( tabCtrl ):

@@ -82,11 +82,14 @@ type("StartEndDateWidget", ["InlineEditWidget"],
             edit modes */
          __buildStructure: function(start, end) {
              // keep everything in separate lines
-             return Html.div({},
-                             Html.div("startEndDate", Html.span({},"starts "),
-                                      start),
-                             Html.div("startEndDate", Html.span({},"ends "),
-                                      end));
+             return Html.table({},
+                     Html.tbody({},
+                             Html.tr("startEndDate",
+                                     Html.td("startEndDateEntry", "Starts :"),
+                                     Html.td({}, start)),
+                             Html.tr("startEndDate",
+                                     Html.td("startEndDateEntry", "Ends :"),
+                                     Html.td({}, end))));
          },
 
          __verifyDates: function() {
