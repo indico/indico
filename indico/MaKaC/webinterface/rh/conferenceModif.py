@@ -2197,18 +2197,18 @@ class RHConfModifParticipantsAction(RHConferenceModifBase):
         action = params.get("participantsAction","")
         selectedList = self._normaliseListParam(self._getRequestParams().get("participants",[]))
 
-        if action == "Remove participant" :
+        if action == _("Remove participant") :
             for id in selectedList :
                 self._conf.getParticipation().removeParticipant(id, self._getUser())
-        elif action == "Mark absence" :
+        elif action == _("Mark absence") :
             for id in selectedList :
                 participant = self._conf.getParticipation().getParticipantById(id)
                 participant.setAbsent()
-        elif action == "Mark present":
+        elif action == _("Mark present"):
             for id in selectedList :
                 participant = self._conf.getParticipation().getParticipantById(id)
                 participant.setPresent()
-        elif action == "Ask for excuse" :
+        elif action == _("Ask for excuse") :
             data = self._conf.getParticipation().prepareAskForExcuse(self._getUser(), selectedList)
             if data is not None :
                 params["emailto"] = ", ".join(data["toList"])
@@ -2233,13 +2233,13 @@ class RHConfModifParticipantsAction(RHConferenceModifBase):
                     errorList.append( _("""One of the error situations listed below occured :"""))
                     errorList.append( _(""" - None of the selected participants was absent in the event"""))
                     errorList.append( _(""" - None of the selected participants has an email address specified"""))
-        elif action == "Excuse absence" :
+        elif action == _("Excuse absence") :
             for id in selectedList :
                 participant = self._conf.getParticipation().getParticipantById(id)
                 if not participant.setStatusExcused() and participant.isPresent() :
                     errorList.append( _("""You cannot excuse absence of %s %s %s - this participant was present
                     in the event""")%(participant.getTitle(), participant.getFirstName(), participant.getFamilyName()))
-        elif action == "Send email to" :
+        elif action == _("Send email to") :
             toList = []
             for id in selectedList :
                 participant = self._conf.getParticipation().getParticipantById(id)
@@ -2266,7 +2266,7 @@ class RHConfModifParticipantsAction(RHConferenceModifBase):
             self._req.content_type = """%s"""%(mimetype)
             self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
             return data
-        elif action == "Inform about adding" :
+        elif action == _("Inform about adding") :
             selected = []
             for id in selectedList :
                 selected.append(self._conf.getParticipation().getParticipantById(id))
