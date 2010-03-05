@@ -232,7 +232,7 @@
         if (Browser.IE) {
                 var height = 370;
         } else {
-                var height = 390;
+                var height = 410;
         }
         return {width : 600, height: height};
     },
