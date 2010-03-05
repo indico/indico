@@ -151,10 +151,16 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
                                        self._hideSuggestions();
                                    }
 
-                                   if (self.get() != expression &&
-                                       self.get().length > 1) {
-                                       self._retrieveOptions(self.get());
-                                   } else if (self.get().length <= 1){
+                                   currentText = self.get().trim();
+
+                                   // if the text changed meanwhile and it
+                                   // is still long enough
+                                   if (currentText != expression &&
+                                       currentText.length > 1) {
+                                       // request
+                                       self._retrieveOptions(currentText);
+                                   } else if (currentText.length <= 1){
+                                       // if it is not long enough
                                        self._hideSuggestions();
                                    }
                                } else {
@@ -164,10 +170,17 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
                            });
          },
 
+         /*
+          * Called each time a new character is typed
+          * strips white spaces, and calls for a request if needed
+          */
          _textTyped: function(key) {
-             if(this.get().length > 1) {
+
+             var text = this.get().trim();
+
+             if(text.length > 1) {
                  if(!this.querying) {
-                     this._retrieveOptions(this.get());
+                     this._retrieveOptions(text);
                  }
              } else if (this.suggestionBox) {
                  this._hideSuggestions();
@@ -182,6 +195,9 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
              return true;
          },
 
+         /*
+          * Move the selector (gray area) up or down
+          */
          _moveSelector: function(direction) {
 
              if (this.suggestionBox) {
