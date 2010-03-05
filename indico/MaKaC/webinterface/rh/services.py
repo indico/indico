@@ -128,7 +128,7 @@ class RHWebcastAddManager( RHWebcastBase ):
 
     def _process( self ):
         params = self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             al = self._wm.getManagers()
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):

@@ -163,7 +163,7 @@ class RHSubContributionAddSpeakers( RHSubContribModifBase ):
     
     def _process( self ):
         params=self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ah=user.AvatarHolder()
             authIndex = self._target.getConference().getAuthorIndex()
             for id in self._normaliseListParam(params["selectedPrincipals"]):
