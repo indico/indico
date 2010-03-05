@@ -387,9 +387,11 @@ type("WarningPopup", ["AlertPopup"],
                 var result = Html.ul(level === 0 ? 'warningLevel0' : 'warningLevel1');
                 each (content, function(line){
                     if (isString(line)) {
-                        result.append(Html.li('', self._formatLine(line)));
-                    } else if (isArray(content)) {
+                        result.append(Html.li({}, self._formatLine(line)));
+                    } else if (isArray(line)) {
                         result.append(self._formatContent(line, level + 1));
+                    } else {
+                        result.append(Html.li({}, line));
                     }
                 });
                 return result;

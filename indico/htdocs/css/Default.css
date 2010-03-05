@@ -3914,7 +3914,7 @@ span.statusMessage {
 
 td.collaborationInfoLeftCol {
     vertical-align: top;
-    text-align: right;
+    text-align: left;
     padding-right: 5px;
     white-space: nowrap;
     color: #523D04;

@@ -1,6 +1,6 @@
 
 <script type="text/javascript">
-    
+
     // Displays div with dates and hours
     function display_availability( bool)
     {
@@ -25,47 +25,47 @@
 
         // Init
         isValid = true
-        
+
         // Simple search -------------------------------------
-        // Availability 
+        // Availability
         if ( !$('searchForm').availability[2].checked ) // only if NOT "Don't care"
         {
             isValid = validate_period( f1 )
         }
         // capacity
-        if ( $F( 'capacity' ).length > 0 && parseInt( $F( 'capacity' ), 10 ).toString() == 'NaN' ) 
+        if ( $F( 'capacity' ).length > 0 && parseInt( $F( 'capacity' ), 10 ).toString() == 'NaN' )
         {
             f1.capacity.className = 'invalid'
             isValid = false
         }
-        
+
         // Holidays warning
         if ( isValid && !onSubmit )
         {
             new Ajax.Updater(
                 'holidays-warning',
                 '<%= urlHandlers.UHRoomBookingGetDateWarning.getURL() %>',
-                { parameters: $(f1).serialize(true) } 
+                { parameters: $(f1).serialize(true) }
             );
         }
-        
+
         if (f1.sdate.value == '' ){
               f1.sdate.className = 'invalid'
-              isValid = false;              
+              isValid = false;
            }
-           
+
         if (f1.edate.value == ''){
               f1.edate.className = 'invalid'
-              isValid = false;              
+              isValid = false;
            }
-        
+
         return isValid
     }
 </script>
 
         <!-- CONTEXT HELP DIVS -->
 	    <div id="tooltipPool" style="display: none">
-            <!-- Choose Button --> 
+            <!-- Choose Button -->
             <div id="chooseButtonHelp" class="tip">
                 <span>Black</span> -  <%= _("rooms that <b>does not</b> require confirmation")%><br />
                 <span class="moderatedRoom">Orange</span> -  <%= _("rooms that <b>require confirmation")%></b><br />
@@ -83,7 +83,7 @@
                     <li class="tip-no-borders"> <%= _("telephone")%></li>
                     <li class="tip-no-borders">...</li>
                 </ul>
-                 <%= _("Results will include rooms that have at least one of the specified words somewhere in description.") %> 
+                 <%= _("Results will include rooms that have at least one of the specified words somewhere in description.") %>
                 <br />
                  <%= _("Examples") %>:
                 <ul>
@@ -100,7 +100,7 @@
                 <!--<span style="width: 30px; background-color: Red">&nbsp;</span><span style="width: 80px; background-color: Lime">&nbsp;</span><span style="width: 80px; background-color: Green">&nbsp;</span>!<br />
                 -->
                  <%= _("""Find only rooms having capacity within 20%% range.
-                In example for capacity = 20, rooms having capacity 16 - 24 
+                In example for capacity = 20, rooms having capacity 16 - 24
                 will be included in searching results.""")%><br />
             </p>
             <p class="tip-no-borders">
@@ -126,7 +126,7 @@
         <!-- END OF CONTEXT HELP DIVS -->
 
 
-		<table cellpadding="0" cellspacing="0" border="0" width="80%%"> 
+		<table cellpadding="0" cellspacing="0" border="0" width="80%%">
 		<% if standalone: %>
 		    <tr>
 		    <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%%">&nbsp;</td> <!-- lastvtabtitle -->
@@ -170,14 +170,14 @@
                                                   <option value="<%= url %>" <%= selected %> class="<%=roomClass( room )%>"><%= room.locationName + ": &nbsp; " + room.getFullName() %></option>
                                                 <% end %>
                                                 </select>
-                                                
+
                                                 <% if forNewBooking: %>
                                                     <input class="btn" type="submit" value="<%= _("Book")%>" onclick="document.location = $F( 'roomName' ); return false;" />
                                                 <% end %>
                                                 <% if not forNewBooking: %>
                                                     <input class="btn" type="submit" value="<%= _("Room details")%>" onclick="document.location = $F( 'roomName' ); return false;" />
                                                 <% end %>
-                                                
+
                                                 <!-- Help -->
                                                 <% contextHelp( 'chooseButtonHelp' ) %>
                                             </form>
@@ -244,7 +244,7 @@
                                                     <tr id='includePrebookingsTR'>
                                                         <td class="subFieldWidth" align="right" ><small> <%= _("PRE-Bookings")%></small></td>
                                                         <td align="left" class="blacktext">
-                                                            <input id="includePrebookings" name="includePrebookings" type="checkbox" />
+                                                            <input id="includePrebookings" name="includePrebookings" type="checkbox" checked="checked"/>
                                                              <%= _("Check conflicts against pre-bookings")%>
                                                             <% inlineContextHelp(  _("[v] Check if you want to avoid conflicts with PRE-bookings. By default conflicts are checked only against confirmed bookings.") ) %>
                                                         </td>
@@ -297,7 +297,7 @@
                                                     <tr>
                                                         <td width="80px" align="right" valign="top"><small> <%= _("Auto confirm")%>&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext">
-                                                            <input id="isAutoConfirmed" name="isAutoConfirmed" type="checkbox"/> 
+                                                            <input id="isAutoConfirmed" name="isAutoConfirmed" type="checkbox"/>
                                                             <% inlineContextHelp(  _("[v] Include only rooms, where bookings are automatically confirmed. This is the case for most rooms.") ) %>
                                                             <br />
                                                         </td>
@@ -340,7 +340,7 @@
         </table>
         <!-- Just to initialize -->
         <script type="text/javascript">
-            Event.observe( window, 'load', 
+            Event.observe( window, 'load',
                 function () {
                     if ( forms_are_valid() )
                         set_repeatition_comment();

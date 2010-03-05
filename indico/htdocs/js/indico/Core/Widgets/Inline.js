@@ -753,7 +753,7 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
 
      });
 
-/*
+/**
  * This type creates a DIV containing a button which is disabled and
  * it places another DIV over it in order to be able to observe events.
  *
@@ -800,6 +800,149 @@ function(button){
     this.div = Html.div({style:{display:"inline", position:Browser.IE?"":"relative"}},button, this.topTransparentDiv);
 }
 );
+
+/**
+ * This widget displays a text with a (Hide) fakelink next to it.
+ * If the (Hide) fakelink is clicked, a message will appear and the (Hide) button will change to (Show)
+ * Example of usage: we want to display a password to a user but show it initially hidden
+ *
+ * @param {String} text The text that we want to optionally show or not.
+ * @param {String} hiddenMessage The text to show when "text" is hidden.
+ * @param {Boolean} true if we want to show the text initially, false otherwise
+ */
+type("HiddenText", ["IWidget"], {
+    draw: function() {
+        var self = this;
+
+        var content = $B(Html.div({style:{display:"inline"}}), this.show, function(show) {
+            var message;
+            var button;
+            if (show) {
+                message = self.text;
+                button = Html.span("fakeLink", " (" + $T("Hide") + ")");
+                button.observeClick(function(){
+                    self.show.set(false);
+                });
+            } else {
+                message = self.hiddenMessage;
+                button = Html.span("fakeLink", " (" + $T("Show") + ")");
+                button.observeClick(function(){
+                    self.show.set(true);
+                });
+            }
+            return Html.span({}, message, button);
+        });
+
+        return this.IWidget.prototype.draw.call(this, content);
+    }
+},
+    function(text, hiddenMessage, initialShow) {
+        this.text = text;
+        this.hiddenMessage = hiddenMessage;
+        this.show = $V(initialShow);
+    }
+);
+
+
+/**
+ * This widget displays a text with a (Hide) fakelink next to it.
+ * If the (Hide) fakelink is clicked, a message will appear and the (Hide) button will change to (Show)
+ * Example of usage: we want to display a password to a user but show it initially hidden
+ *
+ * @param {String} text The text that we want to optionally show or not.
+ * @param {String} hiddenMessage The text to show when "text" is hidden.
+ * @param {Boolean} true if we want to show the text initially, false otherwise
+ */
+type("ShowablePasswordField", ["IWidget"], {
+
+    __clearInvalid: function() {
+        // We normally could do: Dom.Event.dispatch(this.passwordField.dom, 'change');
+        // but it seems that IE does not like to dispatch events on elements that are not in the DOM tree,
+        // so we have to do things manually
+
+        // we remove the "invalid" word from the class if needed
+        this.passwordField.dom.className = this.passwordField.dom.className.replace(" invalid", "");
+        this.clearTextField.dom.className = this.passwordField.dom.className.replace(" invalid", "");
+
+        // we remove the tooltip divs from the DOM
+        each(this.invalidFieldTooltips, function(tooltip){
+            Dom.List.remove(document.body, tooltip);
+        });
+        this.invalidFieldTooltips = [];
+
+        // we detach the observers
+        each(this.invalidFieldObserverDetachers, function(detacher){
+            detacher();
+        });
+        this.invalidFieldObserverDetachers = [];
+    },
+
+    setPassword: function(newPassword) {
+        this.passwordField.dom.value = newPassword;
+        this.clearTextField.dom.value = newPassword;
+        this.__clearInvalid();
+    },
+
+    getPassword: function(newPassword) {
+        if (this.show.get()) {
+            return this.clearTextField.dom.value;
+        } else {
+            return this.passwordField.dom.value;
+        }
+    },
+
+    markAsInvalid: function(errors){
+        var result1 = IndicoUtil.markInvalidField(this.passwordField, errors);
+        var result2 = IndicoUtil.markInvalidField(this.clearTextField, errors);
+
+        this.invalidFieldTooltips.push(result1[0]);
+        this.invalidFieldTooltips.push(result2[0]);
+        this.invalidFieldObserverDetachers = this.invalidFieldObserverDetachers.concat(result1[1].concat(result2[1]));
+    },
+
+    draw: function() {
+        var self = this;
+
+        var content = $B(Html.div({style:{display:"inline"}}), this.show, function(show) {
+            var field;
+            var button;
+            if (show) {
+                field = self.clearTextField;
+                field.dom.value = self.passwordField.dom.value;
+                self.button.set(" (" + $T("Hide") + ")");
+            } else {
+                field = self.passwordField;
+                field.dom.value = self.clearTextField.dom.value;
+                self.button.set(" (" + $T("Show") + ")");
+            }
+            self.__clearInvalid();
+            return Html.span({}, field, self.button);
+        });
+        return this.IWidget.prototype.draw.call(this, content);
+    }
+},
+    function(name, initialPassword, initialShow) {
+        this.name = name;
+        this.show = $V(initialShow);
+
+        // We do not use $B and $V for the password because of a bug with two dual bindings between 2 XElements and a $V
+        this.passwordField = Html.input('password', {name: this.name}, initialPassword);
+        this.clearTextField = Html.input('text', {name: this.name}, initialPassword);
+
+        this.button = Html.span("fakeLink");
+
+        var self = this;
+        this.button.observeClick(function(){
+            self.show.set(!self.show.get());
+        });
+
+        this.invalidFieldTooltips = [];
+        this.invalidFieldObserverDetachers = [];
+
+    }
+);
+
+
 
 type("InlineEditWidget", ["InlineRemoteWidget"],
      {

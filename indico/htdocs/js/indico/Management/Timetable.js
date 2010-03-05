@@ -269,6 +269,56 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
         return this.ServiceDialog.prototype.draw.call(this, content);
     },
 
+    _configureDaySelect: function(conferenceDays) {
+        var self = this;
+
+        conferenceDays.set(Util.formatDateTime(self.dayStartDate, IndicoDateTimeFormats.Ordinal, IndicoDateTimeFormats.ServerHourless));
+
+        // We need to update the value of Time and endDateTime every time that is changed by the user
+        // value is the new date
+        conferenceDays.observe(function(value) {
+            // it is neccesary to update the date in dateArgs with the new date
+            self.dateArgs.selectedDay = Util.formatDateTime(value, IndicoDateTimeFormats.ServerHourless, IndicoDateTimeFormats.Ordinal);
+            // but we need to check if the contribution is inside a session and if the day changed, in order
+            // to make the request for the session timetable or the top level timetable
+            if(exists(self.timetable.parentTimetable)){
+                if(self.previousDate.substr(0,10) != self.dateArgs.selectedDay) {
+                    self.timeStartMethod = self.timetable.managementActions.methods.Event.getDayEndDate;
+                } else {
+                    self.timeStartMethod = self.timetable.managementActions.methods.SessionSlot.getDayEndDate;
+                }
+            }
+
+            // we make a timeStartMethod request specifying the date for the request
+            // and we get the result of the request in result
+            indicoRequest(self.timeStartMethod, self.dateArgs , function(result, error){
+                if (error) {
+                    IndicoUtil.errorReport(error);
+                }
+                else {
+                    // update startDate and endDate and assign it to the variables in info
+                    var startDate = Util.parseJSDateTime(result, IndicoDateTimeFormats.Server);
+
+                    if (startDate.getHours() >= 23) {
+                        startDate.setHours(23);
+                        startDate.setMinutes(0);
+                    }
+                    info.set('startDate', Util.formatDateTime(startDate, IndicoDateTimeFormats.Server));
+               }
+            });
+
+            /*
+             * parameterManager is not called because if you just change the date and it's not correct you just need
+             * to have red fields in the date, so what we're doing is just adding a dispatchEvent for both hour fields
+             * (they are Html.input, so they can be added to the dispatchEvent) to know when they have changed
+             */
+            self.startTimeField.dispatchEvent('change');
+        });
+
+        return [$T('Date'), conferenceDays];
+
+    },
+
     _drawMainTab: function(info, conferenceDays) {
         var self = this;
 
@@ -288,51 +338,11 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
         $B(info.accessor('presenters'), presListWidget.getUsers());
         info.set('privileges', presListWidget.getPrivileges());
 
-        conferenceDays.set(Util.formatDateTime(self.datStartDate, IndicoDateTimeFormats.Ordinal, IndicoDateTimeFormats.ServerHourless));
+        var startTimeLine, daySelect, datecomponent;
 
-        //We need to update the value of Time and endDateTime every time that is changed by the user
-        //value is the new date
-        conferenceDays.observe(function(value) {
-            //it is neccesary to update the date in dateArgs with the new date
-            self.dateArgs.selectedDay = Util.formatDateTime(value, IndicoDateTimeFormats.ServerHourless, IndicoDateTimeFormats./*DefaultHourless*/Ordinal);
-            //but we need to check if the contribution is inside a session and if the day changed, in order
-            //to make the request for the session timetable or the top level timetable
-            if(exists(self.timetable.parentTimetable)){
-                if(self.previousDate.substr(0,10) != self.dateArgs.selectedDay) {
-                    self.timeStartMethod = self.timetable.managementActions.methods.Event.getDayEndDate;
-                } else {
-                    self.timeStartMethod = self.timetable.managementActions.methods.SessionSlot.getDayEndDate;
-                }
-            }
+        if (conferenceDays) {
 
-            //we make a timeStartMethod request specifying the date for the request
-            //and we get the result of the request in result
-            indicoRequest(self.timeStartMethod, self.dateArgs , function(result, error){
-                if (error) {
-                    IndicoUtil.errorReport(error);
-                }
-                else {
-                    //update startDate and endDate and assign it to the variables in info
-                    var startDate = Util.parseJSDateTime(result, IndicoDateTimeFormats.Server);
-
-                    if (startDate.getHours() >= 23) {
-                        startDate.setHours(23);
-                        startDate.setMinutes(0);
-                    }
-                    info.set('startDate', Util.formatDateTime(startDate, IndicoDateTimeFormats.Server));
-               }
-            });
-
-            /*
-             * parameterManager is not called because if you just change the date and it's not correct you just need
-             * to have red fields in the date, so what we're doing is just adding a dispatchEvent for both hour fields
-             * (they are Html.input, so they can be added to the dispatchEvent) to know when they have changed
-             */
-            self.startTimeField.dispatchEvent('change');
-        });
-
-        var startTimeComponent;
-        var timeTranslation = {
+            var timeTranslation = {
                 toTarget: function (value) {
                     var aux = conferenceDays.get();
                     return Util.formatDateTime(aux, IndicoDateTimeFormats.ServerHourless, IndicoDateTimeFormats.Ordinal) + ' ' + value;
@@ -340,18 +350,24 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
                 toSource: function(value) {
                     return value.substr(11,5);
                 }
-        };
+            };
 
-        var datecomponent;
-        var duration;
-        if (this.timeStartMethod !== null) {
+
+            startTimeLine = [$T('Start time'), Html.div({className: 'popUpLabel', style:{textAlign: 'left'}}, this.startTimeField,
+                                                        $T(' Duration '), this.timeField, $T('min'))];
+            daySelect = self._configureDaySelect(conferenceDays);
+
             $B(info.accessor('startDate'), self.startTimeField, timeTranslation);
             $B(info.accessor('duration'), self.timeField);
 
             datecomponent = [$T('Date/Time'), conferenceDays];
             self.parameterManager.add(self.startTimeField, 'time', false);
             self.parameterManager.add(self.timeField, 'unsigned_int', false);
-        }else{
+
+        } else {
+            startTimeLine = [$T(' Duration '), Html.div({className: 'popUpLabel', style:{textAlign: 'left'}}, this.timeField, $T('min'))];
+            daySelect = [];
+
             $B(info.accessor('duration'), self.timeField);
             datecomponent = [$T('Duration'), self.timeField];
         }
@@ -364,9 +380,8 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
                        info.accessor('title'))
                 ],
                 [$T('Place'), Html.div({style: {marginBottom: '15px'}}, this.roomEditor.draw())],
-                [$T('Date'), conferenceDays],
-                [$T('Start time'), Html.div({className: 'popUpLabel', style:{textAlign: 'left'}}, this.startTimeField,
-                            $T(' Duration '), this.timeField, $T('min'))],
+                daySelect,
+                startTimeLine,
                 [$T('Presenter(s)'), presListWidget.draw()]
             ]);
 
@@ -482,8 +497,11 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
             self.close();
         });
 
-        //Create the list of the days in which the conference is being held
-        var conferenceDays = bind.element(
+        var tabs = null;
+
+        if (self.timetable) {
+            //Create the list of the days in which the conference is being held
+            var conferenceDays = bind.element(
                 Html.select({name: 'type'}),
                 self.days,
                 function(elem) {
@@ -492,23 +510,27 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
                 }
             );
 
+            tabs = [[$T("Basic"), self._drawMainTab(self.info, conferenceDays)]];
+        } else {
+            tabs = [[$T("Basic"), self._drawMainTab(self.info)]];
+        }
+
         addButton.observeClick(function(){
             //check if the day changed
-            if(Util.formatDateTime(conferenceDays.get(), IndicoDateTimeFormats.ServerHourless, IndicoDateTimeFormats.Ordinal) !=
-                self.previousDate.substr(0,10)){
+            if(self.timetable &&
+               Util.formatDateTime(conferenceDays.get(), IndicoDateTimeFormats.ServerHourless, IndicoDateTimeFormats.Ordinal) !=
+               self.previousDate.substr(0,10)){
                 self.dayChanged = true;
-            }
 
-            //if we are inside a session and the new contribution is set for a different day, we suppose that the contribution is not part of the session
-            if(self.dayChanged){
+                //if we are inside a session and the new contribution is set for a different day, we suppose that the contribution is not part of the session
                 self.method = self.timetable.managementActions.methods.Contribution.add;
             }
+
             submitInfo();
         });
 
-        cancelButton.dom.style.marginLeft = pixels(10);
 
-        var tabs = [[$T("Basic"), self._drawMainTab(self.info, conferenceDays)]];
+        cancelButton.dom.style.marginLeft = pixels(10);
 
         if (this.isConference) {
             tabs.push([$T("Authors"), self._drawAuthorsTab(self.info)]);
@@ -536,7 +558,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
          this.timeStartMethod = timeStartMethod;
          this.roomInfo = roomInfo;
          this.confStartDate = confStartDate;
-         this.datStartDate = dayStartDate;
+         this.dayStartDate = dayStartDate;
          this.parentRoomData = parentRoomData;
          this.existing = existing;
          this.isConference = isConference;
