@@ -221,6 +221,9 @@ class WPDecorated( WPBase ):
         """
         return False
 
+    def _isRoomBooking(self):
+        return False
+
     def _currentCategory(self):
         """
             Whenever in category display mode this is overloaded with the current category

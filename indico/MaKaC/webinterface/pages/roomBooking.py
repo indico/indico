@@ -39,11 +39,11 @@ import MaKaC.common.info as info
 #        the same update in:
 #        roomBooking.py / WPRoomBookingBase0  AND
 #        conferences.py / WPConfModifRoomBookingBase
-#        
-#        For complex reasons, these two inheritance chains 
+#
+#        For complex reasons, these two inheritance chains
 #        should not have common root, so this duplication is
 #        necessary evil. (In general, one chain is for standalone
-#        room booking and second is for conference-context room 
+#        room booking and second is for conference-context room
 #        booking.)
 #        """
 #        baseurl = self._getBaseURL()
@@ -52,20 +52,20 @@ import MaKaC.common.info as info
 #        <!-- Lightbox -->
 #        <link rel="stylesheet" href="%s/js/lightbox/lightbox.css"> <!--lightbox.css-->
 #        <script type="text/javascript" src="%s/js/lightbox/lightbox.js"></script>
-#        
+#
 #        <!-- Our libs -->
 #        <script type="text/javascript" src="%s/js/indico/validation.js"></script>
-#        
-#        <!-- Calendar -->        
+#
+#        <!-- Calendar -->
 #        <link rel="stylesheet" type="text/css" href="%s/css/calendar-blue.css" />
 #        <script type="text/javascript" src="%s"></script>
-#        <script type="text/javascript" src="%s"></script>        
+#        <script type="text/javascript" src="%s"></script>
 #        """ % ( baseurl, baseurl, baseurl, baseurl, urlHandlers.UHJavascriptCalendar.getURL(),
 #                urlHandlers.UHJavascriptCalendarSetup.getURL() )
 
 
 class WPRoomBookingBase( WPMainBase ):
-    
+
     def _getTitle(self):
         return WPMainBase._getTitle(self) + " - " + _("Room Booking")
 
@@ -73,7 +73,7 @@ class WPRoomBookingBase( WPMainBase ):
         return [ 'js/prototype/prototype.js',
                  'js/scriptaculous/scriptaculous.js' ] + \
                 WPMainBase.getJSFiles(self)
-    
+
     def _getHeadContent( self ):
         """
         !!!! WARNING
@@ -81,11 +81,11 @@ class WPRoomBookingBase( WPMainBase ):
         the same update in:
         roomBooking.py / WPRoomBookingBase0  AND
         conferences.py / WPConfModifRoomBookingBase
-        
-        For complex reasons, these two inheritance chains 
+
+        For complex reasons, these two inheritance chains
         should not have common root, so this duplication is
         necessary evil. (In general, one chain is for standalone
-        room booking and second is for conference-context room 
+        room booking and second is for conference-context room
         booking.)
         """
         baseurl = self._getBaseURL()
@@ -93,22 +93,22 @@ class WPRoomBookingBase( WPMainBase ):
         <!-- Lightbox -->
         <link rel="stylesheet" href="%s/js/lightbox/lightbox.css"> <!--lightbox.css-->
         <script type="text/javascript" src="%s/js/lightbox/lightbox.js"></script>
-        
+
         <!-- Our libs -->
-        <script type="text/javascript" src="%s/js/indico/Legacy/validation.js"></script>        
-        """ % ( baseurl, baseurl, baseurl)    
-    
+        <script type="text/javascript" src="%s/js/indico/Legacy/validation.js"></script>
+        """ % ( baseurl, baseurl, baseurl)
+
     def _getSideMenu(self):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        
+
         self._leftMenu = wcomponents.BasicSideMenu(self._getAW().getUser() != None)
 
         self._showResponsible = False
 
 
-        if minfo.getRoomBookingModuleActive() and CrossLocationDB.isConnected(): 
+        if minfo.getRoomBookingModuleActive() and CrossLocationDB.isConnected():
             self._showResponsible = ( self._getAW().getUser() != None ) and self._getAW().getUser().isResponsibleForRooms()
-                           
+
         self._roomsOpt = wcomponents.SideMenuSection(_("View Rooms"), \
                                         urlHandlers.UHRoomBookingSearch4Rooms.getURL() )
         self._roomSearchOpt = wcomponents.SideMenuItem(_("Search rooms"),
@@ -144,7 +144,7 @@ class WPRoomBookingBase( WPMainBase ):
                                         urlHandlers.UHRoomBookingBookingList.getURL( ofMyRooms = True, onlyPrebookings = True, autoCriteria = True ),
                                         enabled=self._showResponsible)
 
-        
+
         self._leftMenu.addSection( self._roomsOpt )
         self._roomsOpt.addItem( self._roomSearchOpt )
         self._roomsOpt.addItem( self._roomMapOpt )
@@ -159,9 +159,12 @@ class WPRoomBookingBase( WPMainBase ):
         self._bookingsOpt.addItem( self._usersPrebookings )
         return self._leftMenu
 
+    def _isRoomBooking(self):
+        return True
+
 
 class WPRoomBookingWelcome( WPRoomBookingBase ):
-    
+
     def _getBody( self, params ):
         wc = wcomponents.WRoomBookingWelcome()
         return wc.getHTML( params )
@@ -170,15 +173,15 @@ class WPRoomBookingWelcome( WPRoomBookingBase ):
 # 1. Searching ...
 
 class WPRoomBookingSearch4Rooms( WPRoomBookingBase ):
-    
+
     def __init__( self, rh, forNewBooking = False ):
         self._rh = rh
         self._forNewBooking = forNewBooking
         WPRoomBookingBase.__init__( self, rh )
-        
+
     def _getTitle(self):
         return WPRoomBookingBase._getTitle(self) + " - " + _("Search for rooms")
-        
+
     def _setCurrentMenuItem( self ):
         if self._forNewBooking:
             self._bookARoomOpt.setActive(True)
@@ -190,14 +193,14 @@ class WPRoomBookingSearch4Rooms( WPRoomBookingBase ):
         return wc.getHTML( params )
 
 class WPRoomBookingSearch4Bookings( WPRoomBookingBase ):
-    
+
     def __init__( self, rh ):
         self._rh = rh
         WPRoomBookingBase.__init__( self, rh )
-        
+
     def _getTitle(self):
         return WPRoomBookingBase._getTitle(self) + " - " + _("Search for bookings")
-        
+
     def _setCurrentMenuItem( self ):
         self._bookingListSearchOpt.setActive(True)
 
@@ -226,20 +229,20 @@ class WPRoomBookingRoomList( WPRoomBookingBase ):
         self._rh = rh
         self._onlyMy = onlyMy
         WPRoomBookingBase.__init__( self, rh )
-        
+
     def _getTitle(self):
         if self._onlyMy:
             return WPRoomBookingBase._getTitle(self) + " - " + _("My Rooms")
-        else:   
-            return WPRoomBookingBase._getTitle(self) + " - " + _("Found rooms")    
-        
+        else:
+            return WPRoomBookingBase._getTitle(self) + " - " + _("Found rooms")
+
     def _setCurrentMenuItem( self ):
         if self._onlyMy:
             self._myRoomListOpt.setActive(True)
         else:
             self._bookingListSearchOpt.setActive(True)
-            
-        
+
+
     def _getBody( self, params ):
         wc = wcomponents.WRoomBookingRoomList( self._rh, standalone = True )
         return wc.getHTML( params )
@@ -249,11 +252,11 @@ class WPRoomBookingBookingList( WPRoomBookingBase ):
     def __init__( self, rh, today=False, onlyMy=False, onlyPrebookings=False, onlyMyRooms=False ):
         self._rh = rh
         WPRoomBookingBase.__init__( self, rh )
-        
+
     def _getTitle(self):
         if self._rh._today:
             return WPRoomBookingBase._getTitle(self) + " - " + _("Calendar")
-        elif self._rh._onlyMy and self._rh._onlyPrebookings:   
+        elif self._rh._onlyMy and self._rh._onlyPrebookings:
             return WPRoomBookingBase._getTitle(self) + " - " + _("My PRE-bookings")
         elif self._rh._onlyMy:
             return WPRoomBookingBase._getTitle(self) + " - " + _("My bookings")
@@ -263,7 +266,7 @@ class WPRoomBookingBookingList( WPRoomBookingBase ):
             return WPRoomBookingBase._getTitle(self) + " - " + _("Bookings in my rooms")
         else:
             return WPRoomBookingBase._getTitle(self) + " - " + _("Found bookings")
-        
+
     def _setCurrentMenuItem( self ):
         if self._rh._today:
             self._bookingListCalendarOpt.setActive(True)
@@ -277,7 +280,7 @@ class WPRoomBookingBookingList( WPRoomBookingBase ):
             self._usersBookings.setActive(True)
         else:
             self._bookingListSearchOpt.setActive(True)
-    
+
     def _getBody( self, pars ):
         wc = wcomponents.WRoomBookingBookingList( self._rh )
         return wc.getHTML( pars )
@@ -290,10 +293,10 @@ class WPRoomBookingRoomDetails( WPRoomBookingBase ):
     def __init__( self, rh ):
         self._rh = rh
         WPRoomBookingBase.__init__( self, rh )
-        
+
     def _getTitle(self):
-        return WPRoomBookingBase._getTitle(self) + " - " + _("Room Details")    
-        
+        return WPRoomBookingBase._getTitle(self) + " - " + _("Room Details")
+
     def _setCurrentMenuItem( self ):
         self._roomSearchOpt.setActive(True)
 
@@ -306,7 +309,7 @@ class WPRoomBookingRoomStats( WPRoomBookingBase ):
     def __init__( self, rh ):
         self._rh = rh
         WPRoomBookingBase.__init__( self, rh )
-    
+
     def _setCurrentMenuItem( self ):
         self._roomSearchOpt.setActive(True)
 
@@ -319,7 +322,7 @@ class WPRoomBookingBookingDetails( WPRoomBookingBase ):
     def __init__( self, rh ):
         self._rh = rh
         WPRoomBookingBase.__init__( self, rh )
-        
+
     def _setCurrentMenuItem( self ):
         self._bookingListSearchOpt.setActive(True)
 
@@ -351,9 +354,9 @@ class WPRoomBookingStatement( WPRoomBookingBase ):
     def _getBody( self, params ):
         wc = wcomponents.WRoomBookingStatement( self._rh )
         return wc.getHTML( params )
-    
+
 class WPRoomBookingConfirmBooking( WPRoomBookingBase ):
-    
+
     def __init__( self, rh ):
         self._rh = rh
         WPRoomBookingBase.__init__( self, rh )
