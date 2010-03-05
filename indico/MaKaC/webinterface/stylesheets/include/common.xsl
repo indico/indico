@@ -127,7 +127,8 @@
                 '<xsl:value-of select="$sessId"/>',
                 '<xsl:value-of select="$contId"/>',
                 '<xsl:value-of select="$subContId"/>',
-                Indico.Data.MaterialTypes.meeting,
+                <xsl:value-of select="$item/parentProtection"/>,
+                <xsl:value-of select="$item/materialList"/>,
                 <xsl:value-of select="$uploadURL"/>,
                 true,
                 customMaterialList);

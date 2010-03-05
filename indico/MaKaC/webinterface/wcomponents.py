@@ -41,7 +41,7 @@ from MaKaC.errors import UserError
 from MaKaC.common.url import URL
 from MaKaC.common import Config
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
-from MaKaC.conference import Conference
+from MaKaC.conference import Conference, Category
 
 from MaKaC.webinterface.common.timezones import TimezoneRegistry, DisplayTimezoneRegistry
 import MaKaC.webinterface.common.timezones as convertTime
@@ -5540,9 +5540,32 @@ class WShowExistingMaterial(WTemplated):
     def __init__(self,target):
         self._target=target
 
+        from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
+        if isinstance(target, Category):
+            self._allowedMats = RHSubmitMaterialBase._allowedMatsCategory
+        else:
+            self._allowedMats = RHSubmitMaterialBase._allowedMatsEvent[self._target.getConference().getType()]
+
+    # TODO: Put this out of here, and unify with outputGenerator._generateMaterialList
+    # (when we have a better class hierarchy)
+    def _generateMaterialList(self):
+        """
+        Generates a list containing all the materials, with the
+        corresponding Ids for those that already exist
+        """
+
+        matDict = dict((title.lower(), title) for title in self._allowedMats)
+
+        for material in self._target.getMaterialList():
+            title = material.getTitle().lower()
+            matDict[title] = material.getId()
+
+        return sorted(list((matId, title.title()) for title, matId in matDict.iteritems()))
 
     def getVars(self):
         vars=WTemplated.getVars(self)
+
+        vars["materialList"] = self._generateMaterialList()
 
         vars["materialModifHandler"] = vars.get("materialModifHandler", None)
         vars["materialProtectHandler"] = vars.get("materialProtectHandler", None)

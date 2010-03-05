@@ -118,10 +118,10 @@ var Indico = {
     },
 
     Data: {
-        MaterialTypes: { meeting : <%= RHSubmitMaterialBase._allowedMatsForMeetings %>,
-        simple_event: <%= RHSubmitMaterialBase._allowedMatsForSE %>,
-        conference: <%= RHSubmitMaterialBase._allowedMatsConference %>,
-        category: <%= RHSubmitMaterialBase._allowedMatsCategory %>},
+        MaterialTypes: { meeting : <%= simplejson.dumps(list((k,k.title()) for k in RHSubmitMaterialBase._allowedMatsForMeetings)) %>,
+        simple_event: <%= simplejson.dumps(list((k,k.title()) for k in RHSubmitMaterialBase._allowedMatsForSE)) %>,
+        conference: <%= simplejson.dumps(list((k,k.title()) for k in RHSubmitMaterialBase._allowedMatsConference)) %>,
+        category: <%= simplejson.dumps(list((k,k.title()) for k in RHSubmitMaterialBase._allowedMatsCategory)) %>},
         WeekDays: <%= [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ] %>,
         DefaultLocation: '<%= str(Location.getDefaultLocation().friendlyName) %>',
         Locations: <%= jsonEncode(locationList) %>

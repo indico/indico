@@ -78,16 +78,9 @@ function contains(a, obj){
     var targetType = 'category';
 <% end %>
 
-var matList = Indico.Data.MaterialTypes[targetType];
-var customMatList = $L();
+var matList = <%= DictPickler.pickle(materialList) %>
 
-each(<%= jsonEncode(DictPickler.pickle(self._target.getMaterialList())) %>, function(material){
-    if (!contains(matList, material.title)){
-        customMatList.append(material.title);
-    }
-    });
-
-var mlist = new MaterialListWidget(args, matList, customMatList, uploadAction);
+var mlist = new MaterialListWidget(args, matList, uploadAction);
 
 $E('materialListPlace').set(mlist.draw());
 

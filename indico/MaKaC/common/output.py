@@ -110,6 +110,29 @@ class outputGenerator:
         from MaKaC.webinterface.webFactoryRegistry import WebFactoryRegistry
         self.webFactory = WebFactoryRegistry()
 
+    # TODO: Put this out of here, and unify with WShowExistingMaterial._generateMaterialList
+    # (when we have a better class hierarchy)
+    def _generateMaterialList(self, obj):
+        """
+        Generates a list containing all the materials, with the
+        corresponding Ids for those that already exist
+        """
+
+        from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
+        if isinstance(obj, conference.Category):
+            _allowedMats = RHSubmitMaterialBase._allowedMatsCategory
+        else:
+            _allowedMats = RHSubmitMaterialBase._allowedMatsEvent[obj.getConference().getType()]
+
+        matDict = dict((title.lower(), title) for title in _allowedMats)
+
+        for material in obj.getMaterialList():
+            title = material.getTitle().lower()
+            matDict[title] = material.getId()
+
+        return sorted(list((matId, title.title()) for title, matId in matDict.iteritems()))
+
+
     def getOutput(self, conf, stylesheet, vars=None, includeSession=1,includeContribution=1,includeMaterial=1,showSession="all",showDate="all",showContribution="all"):
         # get xml conference
         start_time_XML = time.time()
@@ -188,6 +211,9 @@ class outputGenerator:
         else:
             out.writeTag("category","")
 
+        out.writeTag("parentProtection", simplejson.dumps(conf.getAccessController().isProtected()))
+        out.writeTag("materialList", simplejson.dumps(self._generateMaterialList(conf)))
+
         if conf.canModify( self.__aw ) and vars and modificons:
             out.writeTag("modifyLink",vars["modifyURL"])
         if conf.canModify( self.__aw ) and vars and modificons:
@@ -215,7 +241,7 @@ class outputGenerator:
         customMaterials = list(materials.difference(standardMaterials))
 
         out.writeTag("customMaterialList", simplejson.dumps(customMaterials))
-            
+
         if conf.getOrgText() != "":
             out.writeTag("organiser", conf.getOrgText())
 
@@ -451,6 +477,7 @@ class outputGenerator:
             modificons = 1
         out.openTag("session")
         out.writeTag("ID",session.getId())
+
         if session.getCode() not in ["no code", ""]:
             out.writeTag("code",session.getCode())
         else:
@@ -534,6 +561,11 @@ class outputGenerator:
             modificons = 1
         out.openTag("session")
         out.writeTag("ID",session.getId())
+
+        out.writeTag("parentProtection", simplejson.dumps(session.getAccessController().isProtected()))
+        out.writeTag("materialList", simplejson.dumps(self._generateMaterialList(session)))
+
+
         slotCode = session.getSortedSlotList().index(slot) + 1
         if session.getCode() not in ["no code", ""]:
             out.writeTag("code","%s-%s" % (session.getCode(),slotCode))
@@ -608,6 +640,10 @@ class outputGenerator:
             modificons = 1
         out.openTag("contribution")
         out.writeTag("ID",cont.getId())
+
+        out.writeTag("parentProtection", simplejson.dumps(cont.getAccessController().isProtected()))
+        out.writeTag("materialList", simplejson.dumps(self._generateMaterialList(cont)))
+
         if cont.getBoardNumber() != "":
             out.writeTag("board",cont.getBoardNumber())
         if cont.getTrack() != None:
@@ -707,6 +743,10 @@ class outputGenerator:
             modificons = 1
         out.openTag("subcontribution")
         out.writeTag("ID",subCont.getId())
+
+        out.writeTag("parentProtection", simplejson.dumps(subCont.getContribution().getAccessController().isProtected()))
+        out.writeTag("materialList", simplejson.dumps(self._generateMaterialList(subCont)))
+
         if subCont.canModify( self.__aw ) and vars and modificons:
             out.writeTag("modifyLink",vars["subContribModifyURLGen"](subCont))
         if (subCont.canModify( self.__aw ) or subCont.canUserSubmit( self.__aw.getUser())) and vars and modificons:

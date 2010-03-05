@@ -149,52 +149,70 @@ type("RemoteSwitchButton", ["InlineWidget"],
 
 
 
-type("RadioFieldWidget", ["InlineWidget"],
+type("RadioFieldWidget", ["InlineWidget", "WatchAccessor"],
      {
          draw: function() {
              var self = this;
 
-             return $B(Html.ul(this.cssClassRadios),
-                       this.orderedItems,
-                       function(item) {
-                           var radio = self.radioDict[item.key];
-                           radio.observeClick(function() {
-                               self.select(item.key);
-                           });
-                           self.options.accessor(item.key).observe(
-                               function(value) {
-                                   radio.set(value);
-                               });
+             return $B(
+                 Html.table(
+                     this.cssClassRadios,
+                     Html.tbody({})
+                 ),
+                 this.orderedItems,
+                 function(item) {
+                     var radio = self.radioDict[item.key];
+                     radio.observeClick(function() {
+                         self.select(item.key);
+                     });
+                     self.options.accessor(item.key).observe(
+                         function(value) {
+                             radio.set(value);
+                             if (value) {
+                                 liItem.dom.className = 'selectedItem';
+                             } else {
+                                 liItem.dom.className = '';
+                             }
+                         });
 
-                           var itemContent = item.get();
+                     var itemContent = item.get();
 
-                           if (itemContent.IWidget) {
-                               itemContent = itemContent.draw();
-                           }
+                     if (itemContent.IWidget) {
+                         itemContent = itemContent.draw();
+                     } else {
+                         itemContent = Html.span({style:{verticalAlign: 'middle'}}, itemContent);
+                     }
 
-                           // create li item, add visibility info too
-                           var liItem = Html.li(self.visibility.get(item.key)?{}:'disabledRadio', keys(self.radioDict).length > 1?radio:'', itemContent);
-                           radio.dom.disabled = !self.visibility.get(item.key);
+                     // create li item, add visibility info too
+                     var liItem = Html.tr(
+                         self.visibility.get(item.key) ? {} : 'disabledRadio',
+                         keys(self.radioDict).length > 1 ? Html.td({}, radio):'',
+                         Html.td( {}, itemContent ));
+                     radio.dom.disabled = !self.visibility.get(item.key);
 
-
-                           // observe future changes in visibility
-                           self.visibility.accessor(item.key).observe(
-                               function(value) {
-                                   if (!value) {
-                                       liItem.dom.className = 'disabledRadio';
-                                       radio.dom.disabled = true;
-                                   } else {
-                                       liItem.dom.className = 'enabledRadio';
-                                       radio.dom.disabled = false;
-                                   }
-                                   if (!value && radio.get()) {
-                                       self.selectLast();
-                                   }
-                               });
+                     if (self.options.get(item.key)) {
+                         liItem.dom.className = 'selectedItem';
+                     }
 
 
-                           return liItem;
-                       });
+                     // observe future changes in visibility
+                     self.visibility.accessor(item.key).observe(
+                         function(value) {
+                             if (!value) {
+                                 liItem.dom.className = 'disabledRadio';
+                                 radio.dom.disabled = true;
+                             } else {
+                                 liItem.dom.className = 'enabledRadio';
+                                 radio.dom.disabled = false;
+                             }
+                             if (!value && radio.get()) {
+                                 self.selectLast();
+                             }
+                         });
+
+
+                     return liItem;
+                 });
          },
 
          setVisibility: function(key, visible) {
@@ -202,6 +220,44 @@ type("RadioFieldWidget", ["InlineWidget"],
          },
 
          onSelect: function(state) {
+         },
+
+         set: function(state) {
+             this.select(state);
+         },
+
+         get: function() {
+             var selKey = null;
+
+             each(this.options, function(value, key){
+                 if (value) {
+                     selKey = key;
+                 }
+             });
+
+             return selKey;
+         },
+
+         enable: function() {
+             each(this.radioDict,
+                  function(value, key) {
+                      value.dom.disabled = false;
+                  });
+         },
+
+         disable: function() {
+             each(this.radioDict,
+                  function(value, key) {
+                      value.dom.disabled = true;
+                  });
+         },
+
+         observe: function(callback) {
+             this.options.observe(function(value, key){
+                 if (value) {
+                     callback(key);
+                 }
+             });
          },
 
          select: function(state, /* optional */ fromSource) {
@@ -219,6 +275,7 @@ type("RadioFieldWidget", ["InlineWidget"],
              self.state.set(state);
              // set every other option to false
              self.options.each(function(value, key) {
+
                  if (value) {
                      self.options.set(key, false);
                  }
@@ -230,6 +287,7 @@ type("RadioFieldWidget", ["InlineWidget"],
                  }
 
              });
+
              self.options.set(state, true);
 
              // update the DOM element
@@ -259,8 +317,8 @@ type("RadioFieldWidget", ["InlineWidget"],
          }
      },
 
-     function(items, order, cssClassRadios) {
-         this.items = items;
+     function(items, cssClassRadios) {
+         this.items = {};
          this.radioDict = {};
          this.options = new WatchObject();
          this.visibility = new WatchObject();
@@ -271,22 +329,19 @@ type("RadioFieldWidget", ["InlineWidget"],
 
          var name = Html.generateId();
 
-         // consider ordering of elements, if specified
-         if (order) {
-             this.orderedItems = $L();
-             each(order,
-                  function(key) {
-                      self.orderedItems.append(new WatchPair(key, items[key]));
+         this.orderedItems = $L();
+         each(items,
+              function(item) {
+                  var key = item[0];
+                  self.items[key] = item[1];
+                  self.orderedItems.append(new WatchPair(key, item[1]));
 
-                      // add some extra stuff, since we're in the loop
-                      self.visibility.set(key, true);
-                      self.options.set(key, false);
-                      self.radioDict[key] = Html.radio({'name': name});
-                  });
-
-         } else {
-             this.orderedItems = $L(items);
-         }
+                  // add some extra stuff, since we're in the loop
+                  self.visibility.set(key, true);
+                  self.options.set(key, false);
+                  self.radioDict[key] = Html.radio({'name': name,
+                                                    style: {verticalAlign: 'middle'}});
+              });
 
          this.state = new Chooser(map(items,
                                       function(value, key) {
@@ -955,13 +1010,14 @@ type("TypeSelector", ["IWidget", "WatchAccessor"],
                 self.selected = true;
                 return Html.div({}, bind.element(self.select, $L(self.types),
                                           function(value) {
-                                              return Html.option({'value': value}, value);
+                                              return Html.option({'value': value[0]}, value[1]);
                                           }),
                          " ",
                          $T("or"),
                          " ",
                          Widget.link(command(function() {
                              chooser.set('write');
+                             self.text.dom.focus();
                          }, $T("other"))));
             },
 
@@ -976,6 +1032,7 @@ type("TypeSelector", ["IWidget", "WatchAccessor"],
                                " ",
                                 Widget.link(command(function() {
                                     chooser.set('select');
+                                    self.select.dom.focus();
                                 }, $T("select from list"))));
             }
         }));
@@ -989,6 +1046,19 @@ type("TypeSelector", ["IWidget", "WatchAccessor"],
         return self.selected;
     },
 
+    set: function(value) {
+        if(this.selected){
+            this.select.set(value);
+        } else {
+            this.text.set(value);
+        }
+
+        each(this.observers,
+             function(observer) {
+                 observer(value);
+             });
+    },
+
     get: function() {
         var self = this;
         if(self.selected){
@@ -999,18 +1069,44 @@ type("TypeSelector", ["IWidget", "WatchAccessor"],
         }
     },
 
+    observe: function(callback) {
+        var self = this;
+        this.observers.push(callback);
+
+        this.select.observe(
+            function(value) {
+                if (self.selected) {
+                    callback(value);
+                }
+            });
+
+        this.text.observe(
+            function(value) {
+                if (!self.selected) {
+                    callback(value);
+                }
+            });
+
+    },
+
     getSelectBox: function() {
         return this.select;
     }
 },
-function(parameterManager, types){
-    //var self = this;
-    this.select = Html.select({name: 'materialId', id:Html.generateId()});
-    this.text = Html.edit({name: 'materialId', id:Html.generateId()});
-    this.pm = parameterManager;
-    this.types = types;
-}
-);
+     function(parameterManager, types, params){
+         params = params || {};
+
+         this.select = Html.select(params);
+         params.id = Html.generateId();
+         this.text = Html.edit(params);
+
+         this.selected = true;
+         this.pm = parameterManager;
+         this.types = types;
+
+         this.observers = [];
+     }
+    );
 
 type("InlineEditWidget", ["InlineRemoteWidget"],
      {
