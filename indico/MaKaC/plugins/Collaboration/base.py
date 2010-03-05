@@ -566,6 +566,8 @@ class CSBookingManager(Persistent, Observer):
                                                      (str(booking.getId()), str(self._conf.getId())))
                         oldBookingStartDate = booking.getStartDate()
                         oldBookingEndDate = booking.getEndDate()
+                        oldBookingParams = booking.getBookingParams() #this is a copy so it's ok
+
                         if startDateChanged:
                             booking.setStartDate(oldBookingStartDate + (newStartDate - oldStartDate) )
                         if endDateChanged:
@@ -574,7 +576,7 @@ class CSBookingManager(Persistent, Observer):
                         rollback = False
                         modifyResult = None
                         try:
-                            modifyResult = booking._modify()
+                            modifyResult = booking._modify(oldBookingParams)
                             if isinstance(modifyResult, CSErrorBase):
                                 Logger.get('VideoServ').warning("""Error while changing the dates of booking %s of event %s after event dates changed: %s""" %
                                                                 (str(booking.getId()), str(self._conf.getId()), modifyResult.getLogMessage()))
