@@ -4078,7 +4078,7 @@ class WConferenceParticipants(wcomponents.WTemplated):
         vars["participants"] = self.getParticipantsList()
         vars["statisticAction"] = str(urlHandlers.UHConfModifParticipantsStatistics.getURL(self._conf))
         vars["sendButton"] = _("""<input type="submit" class="btn" value="_("Send email to")" name="participantsAction" />""")
-        vars["excelButton"] = """<input type="submit" class="btn" value="Export to Excel" name="participantsAction"/>"""
+        vars["excelButton"] = _("""<input type="submit" class="btn" value="_("Export to Excel")" name="participantsAction"/>""")
         vars["participantsAction"] = str(urlHandlers.UHConfModifParticipantsAction.getURL(self._conf))
         if nowutc() < self._conf.getStartDate() :
             vars["inviteButton"] = _("""<input type="submit" class="btn" value="_("Invite participant")" />""")

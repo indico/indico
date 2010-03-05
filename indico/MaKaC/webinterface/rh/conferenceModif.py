@@ -2249,7 +2249,7 @@ class RHConfModifParticipantsAction(RHConferenceModifBase):
             params["fromDisabled"] = True
             p = conferences.WPConfModifParticipantsEMail( self, self._target )
             return p.display(**params)
-        elif action == "Export to Excel" :
+        elif action == _("Export to Excel") :
             toList = []
             if selectedList == []:
                 toList = self._conf.getParticipation().getParticipantList()
