@@ -90,7 +90,7 @@ From the option General Settings in the left menu you can:
 
 
 * Modify the general information of the conference, e.g. title, description, dates, etc.
-* Modify the support email, if you supply one will be the support email linked from the bottom of the menu that is displayed in the home page of the conference `(see Conference Display) <#conference-display-area>`_.
+* Modify the support email along with the caption. This will change the support email link located at the bottom of the menu that is displayed on the home page of the conference `(see Conference Display) <#conference-display-area>`_. You can specify more than one email address for the support. Just make sure of separating each of the addresses by a comma (",").
 
 |image11|
 
