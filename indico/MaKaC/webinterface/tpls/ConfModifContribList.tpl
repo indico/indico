@@ -121,8 +121,13 @@ var addContribution = function() {
                        parentEventRoomData,
                        '',
                        '',
-                       <%= jsBoolean(rbActive) %>,
-                       <%= jsBoolean(self._conf.getType() != 'meeting') %>
+                       <%= jsBoolean(self._conf.getType() != 'meeting') %>,
+                       [],
+                       null,
+                       null,
+                       function() {
+                          window.location.reload();
+                       }
                        );
 
     dialog.execute();

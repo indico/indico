@@ -36,10 +36,10 @@ class ConfDisplayMgrRegistery:
     """
     Class to get the DisplayMgr for a conference
     """
-    
+
     def __init__(self):
         self._displayMgrRegistery = None
-    
+
     def _getDisplayMgrRegistery( self ):
         #DBMgr.getInstance().commit()
         if not self._displayMgrRegistery:
@@ -50,8 +50,8 @@ class ConfDisplayMgrRegistery:
                 self._displayMgrRegistery = OOBTree.OOBTree()
                 db_root["displayRegistery"] = self._displayMgrRegistery
         return self._displayMgrRegistery
-    
-    
+
+
     def registerDisplayMgr( self, conference, dispMgr ):
         """Associates a given conference with a confDispplayMgr
         """
@@ -78,7 +78,7 @@ class DisplayMgr(Persistent):
     """
     base class for the DisplayMgr object
     """
-    
+
     def __init__(self):
         pass
 
@@ -86,7 +86,7 @@ class ConfDisplayMgr(DisplayMgr):
     """
     DisplayMgr for a conference
     """
-    
+
     def __init__(self, conf, menu=None, format=None, tickerTape=None):
         self._conf = conf
         if menu:
@@ -109,7 +109,7 @@ class ConfDisplayMgr(DisplayMgr):
         #################################
         # Fermi timezone awareness(end) #
         #################################
-        
+
         # Search is enabled, by default
         self._searchEnabled = True
 
@@ -118,6 +118,9 @@ class ConfDisplayMgr(DisplayMgr):
 
         #Manager for CSS file rendering the main display page for the conference
         self._styleMngr = StyleManager(conf)
+
+        # Caption for the email support
+        self._supportEmailCaption = "Support"
 
     def clone(self, conf):
         newCdm = ConfDisplayMgrRegistery().getDisplayMgr(conf)
@@ -142,10 +145,10 @@ class ConfDisplayMgr(DisplayMgr):
         except:
             self._defaultstyle = ""
             return self._defaultstyle
-       
+
     def setDefaultStyle( self, style ):
         self._defaultstyle = style
-    
+
     #################################
     # Fermi timezone awareness      #
     #################################
@@ -162,12 +165,12 @@ class ConfDisplayMgr(DisplayMgr):
     #################################
     # Fermi timezone awareness(end) #
     #################################
- 
+
     def getMenu(self):
         if self._menu.getParent() == None:
             self._menu.setParent(self)
         return self._menu
-    
+
     def getConference(self):
         return self._conf
 
@@ -178,7 +181,7 @@ class ConfDisplayMgr(DisplayMgr):
         except AttributeError, e:
             self._format = Format()
         return self._format
-    
+
     def getSearchEnabled(self):
         # check if _SearchEnabled exists in the db structure
         try:
@@ -214,12 +217,20 @@ class ConfDisplayMgr(DisplayMgr):
             self._styleMngr = StyleManager(self._conf)
         return self._styleMngr
 
+    def getSupportEmailCaption(self):
+        # check if _supportEmailCaption exists in the db
+        if not hasattr(self, "_supportEmailCaption"):
+           self._supportEmailCaption = "Support"
+        return self._supportEmailCaption
+
+    def setSupportEmailCaption(self, value):
+        self._supportEmailCaption = value
 
 class Menu(Persistent):
     """
     class to configure a menu
     """
-    
+
     def __init__(self, conf, parent=None):
         self._listLink = []
         self._parent = parent
@@ -244,13 +255,13 @@ class Menu(Persistent):
         if len(newList) != 0:
             newMenu._listLink = newList
         return newMenu
-    
+
     def enable(self):
         pass
 
     def disable(self):
         pass
-    
+
     def getName(self):
         return ""
 
@@ -262,11 +273,11 @@ class Menu(Persistent):
         systemLinkData = SystemLinkData(self._conf)
         linksData = systemLinkData.getLinkData()
         linksDataOrderedKeys = systemLinkData.getLinkDataOrderedKeys()
-        
+
         #remove system links (and sublinks) which are not define in linksData
         for link in self.getAllLinks():
             if isinstance(link, SystemLink):
-                if link.getParent() is not None:            
+                if link.getParent() is not None:
                     if not link.getName() in linksData:
                         link.getParent().removeLink(link)
                     elif link.getParent().getName() != linksData[link.getName()]["parent"]:
@@ -283,7 +294,7 @@ class Menu(Persistent):
             else:
                 #we must create the link
                 self._createSystemLink(name, linksData)
-    
+
     def _createSystemLink(self, name, linksData):
         data = linksData.get(name, None)
         if data == None:
@@ -313,9 +324,9 @@ class Menu(Persistent):
             link.disable()
             if data.get("visibilityByDefault", True):
                 link.enable()
-    
+
     def _generateNewLinkId( self ):
-        """Returns a new unique identifier for the current conference 
+        """Returns a new unique identifier for the current conference
             contributions
         """
         return str(self._linkGenerator.newCount())
@@ -330,28 +341,28 @@ class Menu(Persistent):
                 return True
         else:
             return True
-    
+
     def getLocator( self ):
-        """Gives back a globaly unique identification encapsulated in a Locator 
+        """Gives back a globaly unique identification encapsulated in a Locator
             object for the session instance
         """
         if self._parent == None:
             return Locator()
         lconf = self._parent.getConference().getLocator()
         return lconf
-    
+
     def setParent(self, parent):
         self._parent = parent
-    
+
     def getParent(self):
         return self._parent
-    
+
     def getIndent(self):
         return self._indent
-    
+
     def setIndent(self, indent):
         self._indent = indent
-    
+
     def addLink(self, link):
         self._listLink.append(link)
         link.setParent(self)
@@ -360,14 +371,14 @@ class Menu(Persistent):
             id = self._generateNewLinkId()
         link.setId(id)
         self._p_changed = 1
-    
+
     def removeLink(self, link):
         if link in self._listLink:
             self._listLink.remove(link)
             link.setParent(None)
             link.delete()
             self._p_changed = 1
-    
+
     def upLink(self, link):
         if link in self._listLink:
             index = self._listLink.index(link)
@@ -380,8 +391,8 @@ class Menu(Persistent):
             else:
                 self._listLink.append(link)
             self._p_changed = 1
-                
-    
+
+
     def downLink(self, link):
         if link in self._listLink:
             index = self._listLink.index(link)
@@ -394,7 +405,7 @@ class Menu(Persistent):
             else:
                 self._listLink.insert(0, link)
             self._p_changed = 1
-    
+
     def getLinkById(self, id):
         for link in self._listLink:
             if link.getId() == id:
@@ -403,7 +414,7 @@ class Menu(Persistent):
             if ret:
                 return ret
         return None
-    
+
     def getLinkByName(self, name):
         for link in self._listLink:
             if link.getName() == name:
@@ -421,16 +432,16 @@ class Menu(Persistent):
             l.append(link)
             l.extend(link._listLink)
         return l
-    
+
     def getLinkList(self):
         return self._listLink
-    
+
     def getEnabledLinkList(self):
         l = []
         for link in self._listLink:
             if link.isEnabled():
                 l.append(link)
-        return l  
+        return l
 
     def isCurrentItem(self, item):
         return self._currentItem == item
@@ -440,7 +451,7 @@ class Menu(Persistent):
 
     def getCurrentItem(self):
         return self._currentItem
-    
+
     def __str__(self):
         str = ""
         for link in self._listLink:
@@ -463,20 +474,20 @@ class Spacer(Persistent):
         newSpacer.setId(self.getId())
         newSpacer.setEnabled(self.isEnabled())
         return newSpacer
- 
+
     def getParent(self):
         return self._parent
-    
+
     def getId(self):
         return self._id
-    
+
     def setId(self, id):
         self._id = id
         if self._name == "":
             self._name = "spacer %s"%id
-    
+
     def getLocator( self ):
-        """Gives back a globaly unique identification encapsulated in a Locator 
+        """Gives back a globaly unique identification encapsulated in a Locator
             object for the session instance
         """
         if self._parent == None:
@@ -484,22 +495,22 @@ class Spacer(Persistent):
         lparent = self._parent.getLocator()
         lparent["linkId"] = self.getId()
         return lparent
-    
+
     def getLinkById(self, id):
         return None
-    
+
     def getLinkByName(self, name):
         return None
-    
+
     def setParent(self, parent):
         self._parent = parent
-    
+
     def getType(self):
         return self.Type
-    
+
     def enable(self):
         self._active = True
-    
+
     def disable(self):
         self._active = False
 
@@ -508,17 +519,17 @@ class Spacer(Persistent):
             self.enable()
         else:
             self.disable()
-    
+
     def isEnabled(self):
         return self._active
-    
+
     def setName(self, name):
         self._name = name
-    
+
     def getName(self):
         return self._name
-    
-    def __str__(self, indent=""):        
+
+    def __str__(self, indent=""):
         str = """%s<br>\n"""%indent
         return str
 
@@ -539,13 +550,13 @@ class Spacer(Persistent):
     def recover(self):
         TrashCanManager().remove(self)
 
- 
+
 class Link(Persistent):
     """
     base class for the links of a menu
     """
     Type = "Link"
-    
+
     def __init__(self, name, parent=None):
         self._name = name
         self._listLink = []
@@ -555,18 +566,18 @@ class Link(Persistent):
         self._caption = ""
         self._v_visible=True
         self._displayTarget = "_blank"
-    
+
     def getId(self):
         return self._id
-    
+
     def setId(self, id):
         self._id = id
-    
+
     def getParent(self):
         return self._parent
-    
+
     def getLocator( self ):
-        """Gives back a globaly unique identification encapsulated in a Locator 
+        """Gives back a globaly unique identification encapsulated in a Locator
             object for the session instance
         """
         if self._parent == None:
@@ -574,17 +585,17 @@ class Link(Persistent):
         lparent = self._parent.getLocator()
         lparent["linkId"] = self.getId()
         return lparent
-    
+
     def _generateNewLinkId( self ):
-        """Returns a new unique identifier for the current conference 
+        """Returns a new unique identifier for the current conference
             contributions
         """
         if self._parent:
             return self._parent._generateNewLinkId()
-    
+
     def setParent(self, parent):
         self._parent = parent
-    
+
     def getType(self):
         return self.Type
 
@@ -598,7 +609,7 @@ class Link(Persistent):
 
     def setDisplayTarget(self, t):
         self._displayTarget = t
-    
+
     def enable(self):
         previousState = self._active
         self._active = True
@@ -607,7 +618,7 @@ class Link(Persistent):
                 link.enable()
             self._p_changed = 1
         self._parent.enable()
-    
+
     def disable(self):
         self._active = False
         for link in self._listLink:
@@ -619,22 +630,22 @@ class Link(Persistent):
             self.enable()
         else:
             self.disable()
-    
+
     def isEnabled(self):
         return self._active
-    
+
     def setName(self, name):
         self._name = name
-    
+
     def getName(self):
         return self._name
-    
+
     def setCaption(self, caption):
         self._caption = caption
-    
+
     def getCaption(self):
         return self._caption
-    
+
     def addLink(self, link):
         self._listLink.append(link)
         link.setParent(self)
@@ -643,14 +654,14 @@ class Link(Persistent):
             id = self._generateNewLinkId()
         link.setId(id)
         self._p_changed = 1
-    
+
     def removeLink(self, link):
         if link in self._listLink:
             self._listLink.remove(link)
             link.setParent(None)
             link.delete()
-            self._p_changed = 1    
-    
+            self._p_changed = 1
+
     def upLink(self, link):
         if link in self._listLink:
             if self._listLink.index(link) != 0:
@@ -658,7 +669,7 @@ class Link(Persistent):
                 sb = self._listLink.pop(index)
                 self._listLink.insert(index-1, sb)
                 self._p_changed = 1
-    
+
     def downLink(self, link):
         if link in self._listLink:
             if self._listLink.index(link) < len(self._listLink)-1:
@@ -666,7 +677,7 @@ class Link(Persistent):
                 sb = self._listLink.pop(index)
                 self._listLink.insert(index+1, sb)
                 self._p_changed = 1
-    
+
     def getLinkByName(self, name):
         for link in self._listLink:
             if link.getName() == name:
@@ -675,7 +686,7 @@ class Link(Persistent):
             if ret:
                 return ret
         return None
-    
+
     def getLinkById(self, id):
         for link in self._listLink:
             if link.getId() == id:
@@ -684,22 +695,22 @@ class Link(Persistent):
             if ret:
                 return ret
         return None
-    
+
     def getLinkList(self):
         return self._listLink
-    
+
     def getEnabledLinkList(self):
         l = []
         for link in self._listLink:
             if link.isEnabled():
                 l.append(link)
         return l
-    
+
     def getURL(self):
         return ""
-    
+
     def __str__(self, indent=""):
-        
+
         str = """%s<a href="%s">%s</a><br>\n"""%(indent, self.getURL(), self.getName())
         for link in self._listLink:
             if link.isEnabled():
@@ -735,21 +746,21 @@ class SystemLink(Link):
 
     def getURL(self):
         return self._v_URL
-    
+
     def setURL(self, url):
         self._v_URL = url
 
     def getStaticURL(self):
         return self._v_staticURL
-    
+
     def setStaticURL(self, url):
         self._v_staticURL = url
-    
+
     def getCaption(self):
         if self._caption != "":
             return self._caption
         return self._v_caption
-    
+
     def setCaption(self, caption, store=False):
         if store:
             self._caption = caption
@@ -757,7 +768,7 @@ class SystemLink(Link):
 
 
 class SystemLinkData:
-    
+
     def __init__(self, conf=None):
         #the following dict is used to update the system link of the menu. each new entry is added to the menu,
         #and all entries in the menu whiche are not is this dict are removed.
@@ -930,7 +941,7 @@ class SystemLinkData:
                                         "newEvaluation",
                                         "viewMyEvaluation",
                                         "collaboration"]
-    
+
     def getLinkData(self):
         return self._linkData
     def getLinkDataOrderedKeys(self):
@@ -955,10 +966,10 @@ class ExternLink(Link):
         newLink.setCaption(self.getCaption())
         newLink.setDisplayTarget(self.getDisplayTarget())
         return newLink
-    
+
     def getURL(self):
         return self._URL
-    
+
     def setURL(self, URL):
         self._URL = URL
 
@@ -967,7 +978,7 @@ class PageLink(Link):
     class for link create by the user to a fixed link
     """
     Type = "page"
-    
+
     def __init__(self, name, page):
         Link.__init__(self, name)
         self._page = page
@@ -996,7 +1007,7 @@ class PageLink(Link):
 
 
 class _FormatDefaultData:
-    
+
     def __init__(self):
         self._data={
             "titleBgColor":{"code":"",\
@@ -1058,7 +1069,7 @@ class TickerTape(Persistent):
     def __init__(self):
         # active will be set to true everytime the now
         # happening is enabled or the setText is called
-        # this to avoid having an extra button in the interface 
+        # this to avoid having an extra button in the interface
         # for activating the TickerTape
         self._active = False
         self._text=""
@@ -1088,7 +1099,7 @@ class TickerTape(Persistent):
 
     def deactivate(self):
         self._active=False
-    
+
     def setActive(self, v):
         self._active=v
 
@@ -1103,7 +1114,7 @@ class TickerTape(Persistent):
     def setNowHappeningEnabled(self, v):
         self._active = True
         self._enabledNowPlaying = v
-            
+
     def isSimpleTextEnabled(self):
         try:
             if self._enabledSimpleText:
@@ -1181,7 +1192,7 @@ class ImagesManager(Persistent):
         except:
             self._picList = {}
         return self._picList
-    
+
     def _getPicsCounter(self):
         try:
             if self._picsCounter:
@@ -1189,7 +1200,7 @@ class ImagesManager(Persistent):
         except:
             self._picsCounter = Counter()
         return self._picsCounter
-    
+
     def addPic( self, picFile ):
         """ function for adding new picture item """
         picId = self._getPicsCounter().newCount()
@@ -1200,14 +1211,14 @@ class ImagesManager(Persistent):
         picFile.archive( self._conf._getRepository() )
         pic = ImageWrapper(picFile)
         self.getPicList()[picId] = pic
-        self.notifyModification()  
+        self.notifyModification()
         return pic
-        
+
     def getPic( self,picId ):
         if self.getPicList().has_key(picId):
             return self.getPicList()[picId]
         return None
-        
+
     def removePic(self,picId):
         """ function for removing pictures, used in picture uploader """
         pic = self.getPic(picId)
@@ -1215,7 +1226,7 @@ class ImagesManager(Persistent):
             self.getPicList()[picId].delete()
             del self.getPicList()[picId]
         self.notifyModification()
-    
+
     # Logo should be migrated to this class in the near future.
     def setLogo( self, logoFile ):
         logoFile.setOwner( self._conf )
@@ -1224,7 +1235,7 @@ class ImagesManager(Persistent):
         if self._logo != None:
             self._logo.delete()
         self._logo = logoFile
-    
+
     def getLogo( self ):
         return self._logo
 
@@ -1314,7 +1325,7 @@ class StyleManager(Persistent):
         self._conf = conf
         self._css = None
         self._usingTemplate = None
-        
+
     def clone(self, newCdm):
         newSM = newCdm.getStyleManager()
         newSM._conf = newCdm.getConference()
@@ -1347,7 +1358,7 @@ class StyleManager(Persistent):
                 self._css.delete()
             self._usingTemplate = None
             self._css = CSSWrapper(self._conf, cssFile)
-        
+
     def getLocalCSS( self ):
         return self._css
 
@@ -1355,7 +1366,7 @@ class StyleManager(Persistent):
         if self._usingTemplate:
             return self._usingTemplate
         return self.getLocalCSS()
-    
+
     def getCSSURL( self ):
         if self.getCSS():
             return self.getCSS().getURL()

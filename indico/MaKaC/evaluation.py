@@ -1463,7 +1463,8 @@ class Submission(Persistent):
                     subject = "Notification for evaluation '%s'"%evaluation.getTitle()
                     from MaKaC.common.timerExec import sendMail
                     sm = sendMail()
-                    sm.setFromAddr( HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail() )
+                    supportEmail = evaluation.getConference().getSupportEmail(returnNoReply=True)
+                    sm.setFromAddr(supportEmail)
                     for to in toList:
                         sm.addToAddr(to)
                     for cc in ccList:

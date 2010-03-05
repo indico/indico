@@ -33,26 +33,26 @@ from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 class RCCollaborationAdmin(object):
     @staticmethod
     def hasRights(request = None, user = None):
-        """ Returns True if the user is a Server Admin or a Collaboration admin 
+        """ Returns True if the user is a Server Admin or a Collaboration admin
             request: an RH or Service object
             user: an Avatar object
             If user is not None, the request object will be used to check the user's privileges.
-            Otherwise the user will be retrieved from the request object 
+            Otherwise the user will be retrieved from the request object
         """
         if not PluginsHolder().hasPluginType("Collaboration"):
             return False
-        
+
         if user is None:
             if request is None:
                 return False
             else:
                 user = request._getUser()
-        
+
         # check if user is Server Admin, Collaboration Admin
         collaborationAdmins = PluginsHolder().getPluginType('Collaboration').getOption('collaborationAdmins').getValue()
-        
+
         return RCAdmin.hasRights(None, user) or user in collaborationAdmins
-        
+
 class RCCollaborationPluginAdmin(object):
     @staticmethod
     def hasRights(request = None, user = None, plugins = []):
@@ -62,31 +62,32 @@ class RCCollaborationPluginAdmin(object):
         """
         if not PluginsHolder().hasPluginType("Collaboration"):
             return False
-        
+
         if user is None:
             if request is None:
                 return False
             else:
                 user = request._getUser()
-        
-        coll = PluginsHolder().getPluginType('Collaboration')
-        
-        if plugins == 'any':
-            plugins = []
-            for p in CollaborationTools.getCollaborationPluginType().getPluginList():
-                plugins.append(p.getName())
-        
-        if plugins:
-            for plugin in plugins:
-                if not isinstance(plugin, Plugin):
-                    plugin = coll.getPlugin(plugin)
-                
-                if user in plugin.getOption('admins').getValue():
-                    return True
-                
+
+        if user:
+            collaborationPluginType = PluginsHolder().getPluginType('Collaboration')
+
+            if plugins == 'any':
+                plugins = []
+                for p in CollaborationTools.getCollaborationPluginType().getPluginList():
+                    plugins.append(p.getName())
+
+            if plugins:
+                for plugin in plugins:
+                    if not isinstance(plugin, Plugin):
+                        plugin = collaborationPluginType.getPlugin(plugin)
+
+                    if user in plugin.getOption('admins').getValue():
+                        return True
+
         return False
-    
-    
+
+
 class RCVideoServicesManager(object):
     @staticmethod
     def hasRights(request, plugins = []):
@@ -95,7 +96,7 @@ class RCVideoServicesManager(object):
                 -the user is a Video Services manager (can operate with all plugins)
                 -the user is a plugin manager of one of the plugins
             Of course, it's also true if the user is event manager or server admin, but this class does not cover that case.
-             
+
             request: an RH or Service object
             plugins: either a list of plugin names, or Plugin objects (we will then check if the user is manager of any of those plugins),
                      or the string 'any' (we will then check if the user is manager of any plugin),
@@ -103,28 +104,29 @@ class RCVideoServicesManager(object):
         """
         if not PluginsHolder().hasPluginType("Collaboration"):
             return False
-        
+
         user = request.getAW().getUser()
-        
-        csbm = request._conf.getCSBookingManager()
-        if csbm.isVideoServicesManager(user):
-            return True
-        
-        if plugins == 'any':
-            return csbm.isPluginManagerOfAnyPlugin(user)
-        
-        for plugin in plugins:
-            if isinstance(plugin, Plugin):
-                plugin = plugin.getName()
-            if csbm.isPluginManager(plugin, user):
+
+        if user:
+            csbm = request._conf.getCSBookingManager()
+            if csbm.isVideoServicesManager(user):
                 return True
-            
+
+            if plugins == 'any':
+                return csbm.isPluginManagerOfAnyPlugin(user)
+
+            for plugin in plugins:
+                if isinstance(plugin, Plugin):
+                    plugin = plugin.getName()
+                if csbm.isPluginManager(plugin, user):
+                    return True
+
         return False
-    
+
 ################################################### Server Wide pages #########################################
 class RHAdminCollaboration(RHAdminBase):
     _uh = urlHandlers.UHAdminCollaboration
-    
+
     def _checkParams( self, params ):
         RHAdminBase._checkParams( self, params )
         self._queryParams = {}
@@ -143,29 +145,29 @@ class RHAdminCollaboration(RHAdminBase):
         self._queryParams["onlyPending"] = (params.get('onlyPending', None) == 'true')
         self._queryParams["conferenceId"] = params.get('conferenceId', '').strip()
         self._queryParams["categoryId"] = params.get('categoryId', '').strip()
-    
+
     def _checkProtection( self ):
         if not PluginsHolder().hasPluginType("Collaboration"):
             raise PluginError("Collaboration plugin system is not active")
-        
+
         if not RCCollaborationAdmin.hasRights(self, None) and not RCCollaborationPluginAdmin.hasRights(self, plugins = "any"): #RCCollaborationPluginAdmin.hasRights(self, None, self._tabPlugins):
             RHAdminBase._checkProtection(self)
-            
+
     def _process(self):
         p = collaboration.WPAdminCollaboration( self , self._queryParams)
         return p.display()
-        
-    
-################################################### Event Modification Request Handlers ####################################                     
+
+
+################################################### Event Modification Request Handlers ####################################
 
 class RHConfModifCSBase(RHConferenceModifBase):
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
-        
+
         self._activeTabName = params.get("tab", None)
-        
+
         self._canSeeAllPluginTabs = self._target.canModify(self.getAW()) or RCCollaborationAdmin.hasRights(self) or RCVideoServicesManager.hasRights(self)
-        
+
         # we build the list 'allowedTabs', a list of all tabs that the user can see
         if self._canSeeAllPluginTabs:
             #if the logged in user is event manager, server admin or collaboration admin: we show all plugin tabs
@@ -173,56 +175,61 @@ class RHConfModifCSBase(RHConferenceModifBase):
         else:
             #else we show only the tabs of plugins of which the user is admin
             allowedTabs = CollaborationTools.getTabs(self._conf, self._getUser())
-            
+
         if self._target.canModify(self.getAW()) or RCVideoServicesManager.hasRights(self):
             allowedTabs.append('Managers')
-            
+
         # we order the list of allowedTabs into the self._tabs list
         tabOrder = CollaborationTools.getCollaborationOptionValue('tabOrder')
         self._tabs = []
-        
+
         for tabName in tabOrder:
             if tabName in allowedTabs:
                 self._tabs.append(tabName)
                 allowedTabs.remove(tabName)
-                
+
         for tabName in allowedTabs:
             if tabName != 'Managers':
                 self._tabs.append(tabName)
 
         if 'Managers' in allowedTabs:
             self._tabs.append('Managers')
-        
+
 
 class RHConfModifCSBookings(RHConfModifCSBase):
     _uh = urlHandlers.UHConfModifCollaboration
 
     def _checkParams(self, params):
         RHConfModifCSBase._checkParams(self, params)
-        
+
         if self._activeTabName and not self._activeTabName in self._tabs:
-            raise MaKaCError(_("That Video Services tab doesn't exist or you cannot access it"), _("Video Services"))
-        elif not self._activeTabName and self._tabs:
-            self._activeTabName = self._tabs[0]
-            
-        if self._canSeeAllPluginTabs:
-            self._tabPlugins = CollaborationTools.getPluginsByTab(self._activeTabName, self._conf)
+            self._cannotViewTab = True
         else:
-            self._tabPlugins = CollaborationTools.getPluginsByTab(self._activeTabName, self._conf, self._getUser())
-    
+            self._cannotViewTab = False
+            if not self._activeTabName and self._tabs:
+                self._activeTabName = self._tabs[0]
+
+            if self._canSeeAllPluginTabs:
+                self._tabPlugins = CollaborationTools.getPluginsByTab(self._activeTabName, self._conf)
+            else:
+                self._tabPlugins = CollaborationTools.getPluginsByTab(self._activeTabName, self._conf, self._getUser())
+
     def _checkProtection(self):
         if not PluginsHolder().hasPluginType("Collaboration"):
             raise PluginError("Collaboration plugin system is not active")
-        
-        hasRights = RCCollaborationAdmin.hasRights(self, None) or \
-                    RCCollaborationPluginAdmin.hasRights(self, None, self._tabPlugins) or \
-                    RCVideoServicesManager.hasRights(self, self._tabPlugins)
-        
+
+        hasRights = (not self._cannotViewTab) and \
+                    (RCCollaborationAdmin.hasRights(self, None) or
+                     RCCollaborationPluginAdmin.hasRights(self, None, self._tabPlugins) or
+                     RCVideoServicesManager.hasRights(self, self._tabPlugins) )
+
         if not hasRights:
             RHConferenceModifBase._checkProtection(self)
-        
+
+
+
     def _process( self ):
-        
+
         if self._conf.isClosed():
             p = conferences.WPConferenceModificationClosed( self, self._target )
             return p.display()
@@ -232,10 +239,13 @@ class RHConfModifCSBookings(RHConfModifCSBase):
                 self._tohttps = True
                 if self._checkHttpsRedirect():
                     return ""
-            
-            p = collaboration.WPConfModifCollaboration( self, self._conf)
-            return p.display()
-        
+
+            if self._cannotViewTab:
+                raise MaKaCError(_("That Video Services tab doesn't exist"), _("Video Services"))
+            else:
+                p = collaboration.WPConfModifCollaboration( self, self._conf)
+                return p.display()
+
 
 class RHConfModifCSProtection(RHConfModifCSBase):
     _uh = urlHandlers.UHConfModifCollaborationManagers
@@ -243,27 +253,27 @@ class RHConfModifCSProtection(RHConfModifCSBase):
     def _checkParams(self, params):
         RHConfModifCSBase._checkParams(self, params)
         self._activeTabName = 'Managers'
-    
+
     def _checkProtection(self):
         if not PluginsHolder().hasPluginType("Collaboration"):
             raise PluginError("Collaboration plugin system is not active")
         if not RCVideoServicesManager.hasRights(self):
             RHConferenceModifBase._checkProtection(self)
-        
+
     def _process( self ):
-        
+
         if self._conf.isClosed():
             p = conferences.WPConferenceModificationClosed( self, self._target )
             return p.display()
         else:
             p = collaboration.WPConfModifCollaborationProtection( self, self._conf)
             return p.display()
-        
+
 
 ################################################### Event Display Request Handlers ####################################
 class RHCollaborationDisplay(RHConferenceBaseDisplay):
     _uh = urlHandlers.UHCollaborationDisplay
-    
+
     def _process( self ):
         p = collaboration.WPCollaborationDisplay( self, self._target )
         return p.display()

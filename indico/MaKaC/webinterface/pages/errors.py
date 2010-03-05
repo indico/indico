@@ -161,7 +161,7 @@ class WPUnexpectedError( WPDecorated ):
         wc = WUnexpectedError( self._rh )
         return wc.getHTML()
 
-class WAccessError( WTemplated):
+class WAccessError( WTemplated ):
 
     def __init__( self, rh ):
         self._rh = rh
@@ -215,6 +215,24 @@ class WPAccessError( WPDecorated ):
             wc = WAccessKeyError( self._rh, msg )
         else:
             wc = WAccessError( self._rh )
+        return wc.getHTML()
+
+class WHostnameError( WGenericError ):
+
+    def getVars( self ):
+        vars = WGenericError.getVars( self )
+        vars["msg"] = _("A problem has occurred while resolving your hostname. This can be due to proxy configuration and/or reverse DNS issues. If you believe this is not the case, please submit an error report. ")
+        vars["area"]= ""
+        return vars
+
+class WPHostnameResolveError( WPDecorated ):
+
+    def __init__( self, rh):
+        WPDecorated.__init__( self, rh )
+
+
+    def _getBody( self, params ):
+        wc = WHostnameError( self._rh, params.get("showDetails", False) )
         return wc.getHTML()
 
 

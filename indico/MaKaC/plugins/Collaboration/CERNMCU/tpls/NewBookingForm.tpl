@@ -50,8 +50,8 @@
         <td class="bookingFormFieldName">
             <span>PIN</span>
         </td>
-        <td>
-            <input type="password" size="10" name="pin" value="" />
+        <td style="padding-top: 10px;">
+            <span id="PINField"></span>
             <span id="PINHelp"></span>
         </td>
     </tr>
@@ -62,5 +62,5 @@
         <td style="padding-top: 10px;" id="participantsCell">
         </td>
     </tr>
-    
+
 </table>

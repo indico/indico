@@ -581,7 +581,7 @@ on behalf of %s %s
             title = participant.getFirstName()
         
         createURL = urlHandlers.UHUserCreation.getURL()
-        data["fromAddr"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+        data["fromAddr"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
         toList = []
         toList.append(participant.getEmail())
         data["toList"] = toList
@@ -615,7 +615,7 @@ on behalf of %s %s
             return False
             
         data = {}
-        data["fromAddr"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+        data["fromAddr"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
         if len(self._dateNegotiation.getSolutionList()) == 0:
             
             """ TODO: Prepate URLs..!! """
@@ -1032,7 +1032,7 @@ class Participant (Persistent, Negotiator):
 
         if sendMail:
             data = {}
-            data["fromAddr"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+            data["fromAddr"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
             confTitle = self._participation.getConference().getTitle()
             data["subject"] = _("Your application for attendance in %s declined")%confTitle
             toList = []

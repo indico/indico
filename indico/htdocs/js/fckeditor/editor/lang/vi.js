@@ -530,5 +530,10 @@ DlgAboutInfo		: "Để biết thêm thông tin, hãy truy cập",
 DlgDivGeneralTab	: "Chung",
 DlgDivAdvancedTab	: "Nâng cao",
 DlgDivStyle		: "Kiểu Style",
-DlgDivInlineStyle	: "Kiểu Style Trực tiếp"
+DlgDivInlineStyle	: "Kiểu Style Trực tiếp",
+
+ScaytTitle			: "SCAYT",	//MISSING
+ScaytTitleOptions	: "Options",	//MISSING
+ScaytTitleLangs		: "Languages",	//MISSING
+ScaytTitleAbout		: "About"	//MISSING
 };

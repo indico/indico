@@ -18,7 +18,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 
 import urllib
 import os
@@ -147,6 +146,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
         return wc.getHTML( { "loginURL": self.getLoginURL(),\
                              "logoutURL": self.getLogoutURL(),\
                              "loginAsURL": self.getLoginAsURL(), \
+                             "confId": self._conf.getId(), \
                              "dark": True} )
 
     def _defineSectionMenu( self ):
@@ -322,9 +322,9 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
         if onAirURL:
             webcastURL = onAirURL
         else:
-            webcastURL = wm.getWebcastServiceURL() 
+            webcastURL = wm.getWebcastServiceURL()
         forthcomingWebcast = not onAirURL and wm.getForthcomingWebcast(self._conf)
-        
+
         frameParams = {\
             "confModifURL": urlHandlers.UHConferenceModification.getURL(self._conf), \
             "logoURL": urlHandlers.UHConferenceLogo.getURL( self._conf), \
@@ -427,7 +427,9 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         vars["supportEmail"] = ""
         if self._conf.hasSupportEmail():
             mailto = quoteattr("""mailto:%s?subject=%s"""%(self._conf.getSupportEmail(), urllib.quote( self._conf.getTitle() ) ))
-            vars["supportEmail"] = """<a href=%s class="confSupportEmail"><img src="%s" border="0" alt="email"> support</a>"""%(mailto, Config.getInstance().getSystemIconURL("smallEmail") )
+            vars["supportEmail"] = """<a href=%s class="confSupportEmail"><img src="%s" border="0" alt="email"> %s</a>"""%(mailto,
+                                                Config.getInstance().getSystemIconURL("smallEmail"),
+                                                displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getSupportEmailCaption())
         p={"closeMenuURL": vars["closeMenuURL"], \
             "menuStatus": vars["menuStatus"], \
             "supportEmail": vars["supportEmail"] \
@@ -1134,6 +1136,14 @@ class WPInternalPageDisplay( WPConferenceDefaultDisplayBase ):
     def _getBody( self, params ):
         wc = WInternalPageDisplay( self._conf, self._page )
         return wc.getHTML()
+
+    def _defineSectionMenu( self ):
+        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
+
+        for link in self._sectionMenu.getAllLinks():
+            if link.getType() == 'page' and link.getPage().getId() == self._page.getId():
+                self._sectionMenu.setCurrentItem(link)
+                break
 
 
 class WConferenceTimeTable(wcomponents.WTemplated):
@@ -2034,13 +2044,6 @@ class WPConferenceModifBase( main.WPMainBase ):
     def _createSideMenu(self):
         self._sideMenu = wcomponents.ManagementSideMenu()
 
-        # Section containing the view event page link
-        self._viewSection = wcomponents.SideMenuSection()
-        self._viewEventPageMenuItem = wcomponents.SideMenuItem(_("View event page"),
-            urlHandlers.UHConferenceDisplay.getURL( self._conf ))
-        self._viewSection.addItem( self._viewEventPageMenuItem)
-        self._sideMenu.addSection(self._viewSection)
-
         # The main section containing most menu items
         self._generalSection = wcomponents.SideMenuSection()
 
@@ -2077,6 +2080,7 @@ class WPConferenceModifBase( main.WPMainBase ):
         self._generalSection.addItem( self._regFormMenuItem)
 
         if self._conf.getCSBookingManager() is not None and self._conf.getCSBookingManager().isCSAllowed():
+            from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
             self._videoServicesMenuItem = wcomponents.SideMenuItem(_("Video Services"),
                 urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = CollaborationTools.isUsingHTTPS()))
             self._generalSection.addItem( self._videoServicesMenuItem)
@@ -2126,15 +2130,12 @@ class WPConferenceModifBase( main.WPMainBase ):
 
         #we decide which side menu item appear and which don't
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCAbstractManager, RCReviewingStaff
-        from MaKaC.webinterface.rh.collaboration import RCVideoServicesManager
-        #we decide which side menu item appear and which don't
-        from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCAbstractManager, RCReviewingStaff
+        from MaKaC.webinterface.rh.collaboration import RCVideoServicesManager, RCCollaborationAdmin, RCCollaborationPluginAdmin
 
         canModify = self._conf.canModify(self._rh.getAW())
         isReviewingStaff = RCReviewingStaff.hasRights(self._rh)
         isPRM = RCPaperReviewManager.hasRights(self._rh)
         isAM = RCAbstractManager.hasRights(self._rh)
-        isAnyCollaborationPluginManager = RCVideoServicesManager.hasRights(self._rh, 'any')
         isRegistrar = self._conf.canManageRegistration(self._rh.getAW().getUser())
 
         if not canModify:
@@ -2168,15 +2169,18 @@ class WPConferenceModifBase( main.WPMainBase ):
             if isReviewingStaff and not canModify:
                 self._reviewingMenuItem.setVisible(True)
 
-        if not (canModify or isAnyCollaborationPluginManager):
+        if not (canModify or
+                RCVideoServicesManager.hasRights(self._rh, 'any') or
+                RCCollaborationAdmin.hasRights(self._rh) or RCCollaborationPluginAdmin.hasRights(self._rh, plugins = 'any')):
             self._videoServicesMenuItem.setVisible(False)
-            
+
         #we hide the Advanced Options section if it has no items
         if not self._advancedOptionsSection.hasVisibleItems():
             self._advancedOptionsSection.setVisible(False)
-        
-        #tabs forced to be disabled for now
-        self._participantsMenuItem.setVisible(False)
+
+        # we disable the Participants section for events of type conference
+        if self._conf.getType() == 'conference':
+            self._participantsMenuItem.setVisible(False)
 
         # make sure that the section evaluation is always activated
         # for all conferences
@@ -2742,6 +2746,7 @@ class WConfModifMainData(wcomponents.WTemplated):
         vars["remChairsURL"]=quoteattr(str(urlHandlers.UHConferenceRemoveChairs.getURL(self._conf)))
         vars["searchChairURL"]=quoteattr(str(urlHandlers.UHConfModifSelectChairs.getURL(self._conf)))
         vars["chairs"] = self._conf.getChairList()
+        vars["supportEmailCaption"] = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getSupportEmailCaption()
         vars["supportEmail"] = _("""--_("not set")--""")
         if self._conf.hasSupportEmail():
             vars["supportEmail"] = self.htmlText(self._conf.getSupportEmail())
@@ -3003,6 +3008,7 @@ class WConferenceDataModification(wcomponents.WTemplated):
 
         vars["locationAddress"] = locAddress
 
+        vars["supportCaption"] = quoteattr(displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getSupportEmailCaption())
         vars["supportEmail"] = quoteattr( self._conf.getSupportEmail() )
         vars["locator"] = self._conf.getLocator().getWebForm()
         vars["event_type"] = ""
@@ -3966,7 +3972,7 @@ class WPConfModifToolsBase( WPConferenceModifBase ):
                 urlHandlers.UHConfModifPosterPrinting.getURL(self._conf) )
         self._tabBadges = self._tabCtrl.newTab( "badges", _("Badges/Tablesigns"), \
                 urlHandlers.UHConfModifBadgePrinting.getURL(self._conf) )
-        self._tabClose = self._tabCtrl.newTab( "close", _("Close"), \
+        self._tabClose = self._tabCtrl.newTab( "close", _("Lock"), \
                 urlHandlers.UHConferenceClose.getURL( self._conf ) )
         self._tabDelete = self._tabCtrl.newTab( "delete", _("Delete"), \
                 urlHandlers.UHConfDeletion.getURL(self._conf) )
@@ -4009,9 +4015,8 @@ class WPConfClosing(WPConfModifToolsBase):
 
     def _getTabContent( self, params ):
         msg = _("""
-        <font size="+2"> _("Are you sure that you want to CLOSE the event") <i>"%s"</i>?</font><br>
-        ( _("Note that if you close the event, you will not be able to change its details any more
-        <br>Only the administrator of the system can re-open an event"))
+        <font size="+2"> _("Are you sure that you want to LOCK the event") <i>"%s"</i>?</font><br>
+        (_("Note that if you lock the event, you will not be able to change its details any more <br>Only the administrator of the system can unlock an event"))
               """)%(self._conf.getTitle())
         wc = wcomponents.WConfirmation()
         return wc.getHTML( msg, \
@@ -4071,7 +4076,6 @@ class WConferenceParticipants(wcomponents.WTemplated):
         vars["deselectAll"] = Config.getInstance().getSystemIconURL("uncheckAll")
 
         vars["participants"] = self.getParticipantsList()
-        vars["statisticButton"] = _("""<input type="submit" class="btn" value="_("Attendance statistics")" />""")
         vars["statisticAction"] = str(urlHandlers.UHConfModifParticipantsStatistics.getURL(self._conf))
         vars["sendButton"] = _("""<input type="submit" class="btn" value="_("Send email to")" name="participantsAction" />""")
         vars["excelButton"] = """<input type="submit" class="btn" value="Export to Excel" name="participantsAction"/>"""
@@ -4095,7 +4099,7 @@ class WConferenceParticipants(wcomponents.WTemplated):
             vars["addButton"] = vars["addAction"] = ""
             vars["removeButton"] = vars["sendAddedInfoButton"] = ""
 
-        vars["addButton"] = _("""<input type="submit" class="btn" value="_("Search participant")" />""")
+        vars["addButton"] = _("""<input type="submit" class="btn" value="_("Search database")" />""")
         vars["addAction"] = str(urlHandlers.UHConfModifParticipantsSelectToAdd.getURL(self._conf))
         vars["removeButton"] = _("""<input type="submit" class="btn" value="_("Remove participant")" name="participantsAction" />""")
 
@@ -4205,21 +4209,21 @@ class WConferenceParticipantsStatistics(wcomponents.WTemplated):
         else :
             vars["present"] = _("""
             <tr>
-                <td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"> _("Present participants") </td>
+                <td class="titleCellFormat"> _("Present participants") </td>
                 <td><b>%s</b></td>
             </tr>
             """)%self.__conf.getParticipation().getPresentNumber()
 
             vars["absent"] = _("""
             <tr>
-                <td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"> _("Absent participants") </td>
+                <td class="titleCellFormat"> _("Absent participants") </td>
                 <td><b>%s</b></td>
             </tr>
             """)%self.__conf.getParticipation().getAbsentNumber()
 
             vars["excused"] = _("""
             <tr>
-                <td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">&nbsp;&nbsp;&nbsp;&nbsp; _("Excused participants") </td>
+                <td class="titleCellFormat"> _("Excused participants") </td>
                 <td><b>%s</b></td>
             </tr>
             """)%self.__conf.getParticipation().getExcusedNumber()
@@ -7466,6 +7470,7 @@ class WConfModifContribList(wcomponents.WTemplated):
             dict["tracks"] = self._filterCrit.getField("track").getValues()
             if self._filterCrit.getField("track").getShowNoValue():
                 dict["trackShowNoValue"] = "1"
+
         if self._filterCrit.getField("session"):
             dict["sessions"] = self._filterCrit.getField("session").getValues()
             if self._filterCrit.getField("session").getShowNoValue():
@@ -12196,11 +12201,11 @@ class WConfModifBadgeDesign( wcomponents.WTemplated ):
             vars["saveTemplateURL"]=urlHandlers.UHConfModifBadgePrinting.getURL(self.__conf)
             vars["titleMessage"]= _("Editing badge template")
             vars["editingTemplate"]="true"
-            
+
             from MaKaC.services.interface.rpc.json import encode as jsonEncode
             templateDataString = jsonEncode(self.__conf.getBadgeTemplateManager().getTemplateData(self.__templateId))
             vars["templateData"]= templateDataString
-            
+
             usedBackgroundId = self.__conf.getBadgeTemplateManager().getTemplateById(self.__templateId).getUsedBackgroundId()
             vars["backgroundId"] = usedBackgroundId
             if usedBackgroundId != -1:
@@ -12390,7 +12395,7 @@ class WConfModifPosterPDFOptions( wcomponents.WTemplated ):
         for pagesizeName in pagesizeNames:
             pagesizeOptions.append('<option')
             if pagesizeName == 'A4':
-                pagesizeOptions.append( _("SELECTED"))
+                pagesizeOptions.append(" SELECTED")
             pagesizeOptions.append('>')
             pagesizeOptions.append(pagesizeName)
             pagesizeOptions.append('</option>')

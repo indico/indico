@@ -29,14 +29,12 @@ __revision__ = "$Id: i18n_extract_from_source.py,v 1.10 2008/08/04 13:13:56 pvog
 
 
 import sys, re, os, glob, os.path, MaKaC
-import MaKaC.common.MaKaCConfig as MaKaCConfig
+from MaKaC.common import Config
 from i18nlib import i18nUtil
 from os import system
 
 #Indicate here top folders that can contain files needing any translation
-list_folders_to_translate=[os.path.normpath(os.path.split(MaKaC.__file__)[0]), \
-                            MaKaCConfig.TPL_dir \
-                            ]
+list_folders_to_translate=[os.path.normpath(os.path.split(MaKaC.__file__)[0]) ]
 
 
 # To find " _( )" tags, new lines and white spaces

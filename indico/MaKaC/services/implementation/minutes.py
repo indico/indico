@@ -1,9 +1,12 @@
 from MaKaC.services.implementation.base import ParameterManager, TextModificationBase
 from MaKaC.services.implementation.base import ProtectedModificationService
 
-import MaKaC.webinterface.locators as locators
-from MaKaC.common.utils import isStringHTML,sortContributionByDate
 from MaKaC import conference
+from MaKaC.common.contextManager import ContextManager
+from MaKaC.common.utils import isStringHTML,sortContributionByDate
+import MaKaC.webinterface.locators as locators
+
+
 
 class MinutesEdit(TextModificationBase, ProtectedModificationService):
 
@@ -37,10 +40,21 @@ class MinutesEdit(TextModificationBase, ProtectedModificationService):
             ProtectedModificationService._checkProtection(self);
 
     def _handleSet(self):
+
+        # Account for possible retries (due to conflicts)
+        # If 'minutesFileId' is defined, there was a previous try
+        fileId = ContextManager.getdefault('minutesFileId', None)
+
         minutes = self._target.getMinutes()
         if not minutes:
             minutes = self._target.createMinutes()
-        minutes.setText( self._text )
+        minutes.setText( self._text, forcedFileId=fileId)
+
+        # save the fileId, in case there is a conflict error
+        # in the worst case scenario the file will be rewritten multiple times
+        res = minutes.getResourceById('minutes')
+        ContextManager.set('minutesFileId', res.getRepositoryId())
+
 
     def _handleGet(self):
         if self._compile:

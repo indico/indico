@@ -1,15 +1,17 @@
 <% declareTemplate(newTemplateStyle=True) %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+            "http://www.w3.org/TR/html4/loose.dtd">
 <html>
     <head>
         <title><%= page._getTitle() %><%= area %></title>
+        <meta http-equiv="X-UA-Compatible" content="IE=8" />
+
         <link rel="shortcut icon" type="image/x-icon" href="<%= systemIcon('addressBarIcon') %>">
         <link rel="stylesheet" type="text/css" href="<%= baseurl %>/css/<%= stylesheet %>">
         <link rel="stylesheet" type="text/css" href="<%= baseurl %>/css/calendar-blue.css" >
 
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
         <script type="text/javascript">
                 var TextRoot = "<%= baseurl %>/js/indico/i18n/";

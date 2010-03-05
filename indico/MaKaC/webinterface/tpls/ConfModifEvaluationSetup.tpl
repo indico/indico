@@ -4,7 +4,7 @@
     <td class="blacktext" colspan="2">
       <form action="<%=setStatusURL%>" method="post">
       	<div>
-	        <input name="changeTo" type="hidden" value="<%=changeTo%>"/> 
+	        <input name="changeTo" type="hidden" value="<%=changeTo%>"/>
 	        <strong><%=status%></strong> <%=statusMoreInfo%>
 	        <span style="margin-right:10px;" id="statusHelp"></span>
 	        <small><input type="submit" class="btn" value="<%=changeStatus%>"/></small>
@@ -15,7 +15,7 @@
   <tr>
     <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Evaluation start date")%></span></td>
     <td class="blacktext" <% if not evaluation.isVisible():  %>id="hiddenNoDate"<% end %> colspan="2">
-      <%=startDate%>      
+      <%=startDate%>
     </td>
   </tr>
   <tr>
@@ -34,20 +34,20 @@
     <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Announcement")%></span></td>
     <td class="blacktext" colspan="2">
     	<pre>
-    		<% if evaluation.getAnnouncement(): %> 
-    			<%= evaluation.getAnnouncement() %>
-			<% end %>
-		</pre>
+          <% if evaluation.getAnnouncement(): %>
+              <%= evaluation.getAnnouncement() %>
+	  <% end %>
+	</pre>
 	</td>
   </tr>
   <tr>
     <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Max number of submissions")%></span></td>
     <td class="blacktext" colspan="2"><%=submissionsLimit%></td>
-  </tr>  
+  </tr>
   <tr>
-    <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Notifications")%></span></td>
+    <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Email notifications")%></span></td>
     <td colspan="2">
-      <span style="font-weight:bold;" id="startEvaluation"><%= _("start of evaluation")%></span>      
+      <span style="font-weight:bold;" id="startEvaluation"><%= _("start of evaluation")%></span>
       <table class="notificationShow">
         <tr>
           <td class="blacktext"> <%= _("To")%>:</td>
@@ -59,7 +59,7 @@
         </tr>
       </table>
       <br/>
-      <span style="font-weight:bold;" id="newSubmission"><%= _("new submission")%></span>      
+      <span style="font-weight:bold;" id="newSubmission"><%= _("new submission")%></span>
       <table class="notificationShow">
         <tr>
           <td class="blacktext"> <%= _("To")%>:</td>
@@ -99,7 +99,7 @@
             <form action="<%=specialActionURL%>" method="post">
             	<div>
             		<input type="submit" class="btn" name="exportXML" value="<%= _("export evaluation")%>"/>
-            	</div>              
+                </div>
             </form>
           </td>
           <td> <%= _("Export the evaluation with its questions to an XML file.")%></td>

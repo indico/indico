@@ -111,6 +111,7 @@ class Config:
                  "arrowRightMenuConfSelected": "arrowRightMenuConfSelected.png",
                  "bulletMenuConf": "bulletMenuConf.png",
                  "logoIndico": "logo_indico.png",
+                 "indico_small": "indico_small.png",
                  "login": "pict_login.png",
                  "table": "img_table.png",
                  "lectureMenu": "pict_event_negb.png",
@@ -253,6 +254,7 @@ class Config:
             "xml":"Simple xml",
             "alice_meeting":"ALICE meeting",
             "administrative3": "Administrative style 2",
+            "administrative4": "Administrative style (all material)",
             "atlas":"ATLAS Meeting",
             "text":"Simple text",
             "totem_meeting":"TOTEM Meeting",
@@ -278,6 +280,7 @@ class Config:
         "conference": [
             "it",
             "administrative3",
+            "administrative4",
             "cdsagenda",
             "text",
             "egee_meeting",
@@ -306,6 +309,7 @@ class Config:
             "xml",
             "alice_meeting",
             "administrative3",
+            "administrative4",
             "atlas",
             "text",
             "totem_meeting",
@@ -385,6 +389,7 @@ class Config:
             'SmtpUseTLS'           : 'no',
             'SupportEmail'         : 'root@localhost',
             'PublicSupportEmail'   : 'root@localhost',
+            'NoReplyEmail'         : 'noreply-root@localhost',
             'IndicoSearchServer'   : '',
             'IndicoSearchClass'    : 'MaKaC.search.invenioSEA.InvenioSEA',
             'FileConverter'        : {"conversion_server": "", "response_url": "http://localhost/getConvertedFile.py"},
@@ -443,7 +448,7 @@ class Config:
             'TPLVars'                 : {"MaKaCHomeURL": "%sindex.py" % self.getBaseURL()},
             'FileTypes'               : MaKaCConfig.FileTypes,
             'HelpDir'                 : os.path.join(self.getHtdocsDir(), 'ihelp'),
-            'WorkerName'              : socket.gethostname(),
+            'WorkerName'              : socket.getfqdn(),
             'StylesheetsDir'          : os.path.join(os.path.dirname(__file__), '..', 'webinterface', 'stylesheets'),
             'ImagesDir'               : os.path.join(self.getHtdocsDir(), 'images'),
             'PublicURL'               : "%s/%s" % (self.getBaseURL(), self.getPublicFolder()),
@@ -503,8 +508,8 @@ class Config:
             return True
         else:
             return False
-        
-    
+
+
     def getInstance(cls):
         """returns an instance of the Config class ensuring only a single
            instance is created. All the clients should use this method for
@@ -536,7 +541,7 @@ class Config:
     def getTimezoneList(self):
         # Dont move outside, we need to call Config.getInstance() from setup.py and if
 	    # the system has no pytz module then the import will break
-        from pytz import common_timezones as Timezones
+        from pytz import all_timezones as Timezones
         return Timezones
 
 
@@ -657,7 +662,7 @@ class Config:
 
     def getArchivedFileURL(self, localFile):
         return "%s/getFile.py?%s" % (self.getBaseURL(), localFile.getLocator().getURLForm() )
-    
+
 
     def hasFileConverter(self):
         return self.getFileConverter().get("conversion_server", "") != ""

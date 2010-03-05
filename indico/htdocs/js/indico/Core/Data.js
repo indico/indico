@@ -54,8 +54,8 @@ var Util = {
         } else if (typeof(obj) == 'object'){
             // handle datetime dictionaries
             // data comes from the server in %Y-%m-%d %H:%M:%S
-            m1 = obj.date.match(/(\d+)[-\/](\d+)[-\/](\d+)/);
-            m2 = obj.time.match(/(\d+):(\d+):(\d+)/);
+            m1 = obj.date.match(/(\d+)[\-\/](\d+)[\-\/](\d+)/);
+            m2 = obj.time.match(/(\d+):(\d+)(?:\:(\d+))?/);
         } else if (sourceFormat){
             // handle strings
 
@@ -169,6 +169,23 @@ var Util = {
                 time: zeropad(obj.getHours())+':'+zeropad(obj.getMinutes())+':'+zeropad(obj.getSeconds())};
     }
 
+};
+
+Util.Validation = {
+    isIPAddress: function(address) {
+        // thanks to Jan Goyvaerts
+        return exists(address.match(/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/));
+    },
+
+    isEmailAddress: function(address) {
+        // Adapted RFC2822 (thanks to Jan Goyvaerts)
+        return exists(address.toLowerCase().match(/^[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+(?:\.[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+)*@(?:[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?$/));
+    },
+
+    isEmailList: function(emails) {
+        // check if the emails given are valid and if valid separators are used
+        return exists(emails.toLowerCase().match(/^(?:[ ,;]*)(?:[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+(?:\.[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+)*@(?:[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?)(?:[ ,;]+(?:[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+(?:\.[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+)*@(?:[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?))*(?:[ ,;]*)$/));
+    }
 };
 
 var IndicoSortCriteria = {

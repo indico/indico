@@ -12,9 +12,9 @@
 		<td>&nbsp;</td>
 	</tr>
 	<tr>
-		<td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Notification")%></span></td>
+		<td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Email Notification")%></span></td>
 		<td>
-			<input type="checkbox" name="notify" value="true" checked> <%= _("automatic notification")%>
+			<input type="checkbox" name="notify" value="true" checked> <%= _("Automatic Email Notification")%>
 		</td>
 	</tr>
 	<tr><td>&nbsp;</td></tr>

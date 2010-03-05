@@ -19,7 +19,7 @@
      59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 -->
 
-<xsl:stylesheet version='1.0' 
+<xsl:stylesheet version='1.0'
    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 <xsl:include href="include/date.xsl"/>
@@ -43,7 +43,7 @@
                 </xsl:call-template>
 		<span class="titles"><xsl:text disable-output-escaping="yes">&#38;quot;</xsl:text><xsl:value-of select="./title" disable-output-escaping="yes"/><xsl:text disable-output-escaping="yes">&#38;quot;</xsl:text></span><br/>
 		<xsl:if test="count(child::chair/user) != 0">
-                        <span class="author">chaired by 
+                        <span class="author">chaired by
 			<xsl:apply-templates select="./chair"/>
 			</span>
 		</xsl:if>
@@ -82,12 +82,12 @@
             </xsl:otherwise>
             </xsl:choose>
 
-		<xsl:if test="count(child::location) != 0">
-			<br/>at 
+		<xsl:if test="count(child::location) != 0 and (./location/name !='' or ./location/room !='')">
+			<br/>at
 			<xsl:apply-templates select="./location"/>
 		</xsl:if>
 		<xsl:if test="./announcer/user/name/@first != ''">
-			<br/>announced by: 
+			<br/>announced by:
                         <xsl:apply-templates select="./announcer"/>
 		</xsl:if>
  </td>
@@ -105,7 +105,7 @@
 	  </td>
         </tr>
 	</xsl:if>
-	
+
 	<xsl:if test="./participants != ''">
         <tr>
           <td valign="top" nowrap="1" class="abstract"><xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text></td>
@@ -115,7 +115,7 @@
 		  </td>
         </tr>
 	</xsl:if>
-	
+
 
 	<xsl:if test="count(./material) != 0">
         <tr class="headerselected2">
@@ -137,7 +137,7 @@
 			</xsl:if>
 		</xsl:for-each>
 		</div>
-		
+
 	  </td>
         </tr>
 	</xsl:if>
@@ -158,11 +158,11 @@
 	  </td>
 	</tr>
 
-	
+
 	<tr class="headertimetable">
 	<td colspan="3">
 
-	<xsl:for-each select="./session|./contribution|./break">	
+	<xsl:for-each select="./session|./contribution|./break">
 	<xsl:variable name="ids" select="./ID"/>
 	<xsl:variable name="day" select="substring(./startDate,0,11)"/>
 
@@ -187,7 +187,7 @@
 
 	</td>
 	</tr>
-	
+
       	</table>
     <div align="center"></div>
     </td>
@@ -216,7 +216,7 @@
                     <xsl:with-param name="item" select="."/>
                 </xsl:call-template>
 		<span class="sessiontitle">
-		<xsl:value-of select="./title"/>	
+		<xsl:value-of select="./title"/>
 		</span>
 	<xsl:if test="count(child::convener/user) != 0">
 		(Convener:
@@ -283,7 +283,7 @@
 	<tr>
 		<td align="right" valign="top" width="1%" class="headers">
 		<xsl:if test="substring(./startDate,12,5) != '00:00'">
-			<xsl:value-of select="substring(./startDate,12,5)"/>  
+			<xsl:value-of select="substring(./startDate,12,5)"/>
 		</xsl:if>
 		<xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
 		<xsl:if test="./broadcasturl != ''">
@@ -327,7 +327,7 @@
 			<xsl:apply-templates select="./speakers"/>
 		</xsl:if>
 		</td>
-	</tr>	
+	</tr>
 
 	<xsl:if test="./abstract != ''">
 	<tr>
@@ -408,7 +408,7 @@
 		<tr>
 		<td align="right" valign="top" width="1%" class="headerbreak">
 		<xsl:if test="substring(./startDate,12,5) != '00:00'">
-			<xsl:value-of select="substring(./startDate,12,5)"/>  
+			<xsl:value-of select="substring(./startDate,12,5)"/>
 		</xsl:if>
 		<xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
 		<xsl:if test="./broadcasturl != ''">

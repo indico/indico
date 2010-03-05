@@ -34,6 +34,7 @@ import MaKaC.conference as conference
 import MaKaC.schedule as schedule
 import MaKaC.webcast as webcast
 import MaKaC.webinterface.urlHandlers as urlHandlers
+import MaKaC.webinterface.displayMgr as displayMgr
 from MaKaC.common.general import DEVELOPMENT
 from MaKaC.webinterface.linking import RoomLinker
 from Configuration import Config
@@ -55,12 +56,12 @@ def stringToDate( str ):
     return datetime(int(year),months[month],int(day))
 
 class XSLTransformer:
-    
+
     def __init__(self, stylesheet):
         # instanciate stylesheet object
         styledoc = libxml2.parseFile(stylesheet)
         self.__style = libxslt.parseStylesheetDoc(styledoc)
-        
+
     def process (self, xml):
         try:
             doc = libxml2.parseDoc(xml)
@@ -83,7 +84,7 @@ class outputGenerator:
     and also provides a method to format it using an XSLt stylesheet
     (getFormattedOutput method)
     """
-    
+
     def __init__(self, aw, XG = None, dataInt=None):
         self.__aw = aw
         if XG != None:
@@ -102,7 +103,7 @@ class outputGenerator:
             self.cache = ProtectedXMLCache(dataInt)
         else:
             self.cache = XMLCache()
-            
+
         from MaKaC.webinterface.webFactoryRegistry import WebFactoryRegistry
         self.webFactory = WebFactoryRegistry()
 
@@ -126,8 +127,8 @@ class outputGenerator:
         self.time_XML = end_time_XML - start_time_XML
         self.time_HTML = end_time_HTML - start_time_HTML
         return self.text
-        
-        
+
+
     def getFormattedOutput(self, conf, stylesheet, vars=None, includeSession=1,includeContribution=1,includeMaterial=1,showSession="all",showDate="all",showContribution="all"):
         """
         conf: conference object
@@ -155,7 +156,7 @@ class outputGenerator:
         self._confToXML(conf,vars,includeSession,includeContribution,includeMaterial,showSession,showDate, showContribution,out=out)
         out.closeTag("iconf")
         return out.getXml()
-       
+
     def _userToXML(self, user, out):
         out.openTag("user")
         out.writeTag("title",user.getTitle())
@@ -167,23 +168,23 @@ class outputGenerator:
         except:
             pass
         out.closeTag("user")
-    
+
     def _confToXML(self, conf, vars, includeSession=1, includeContribution=1, includeMaterial=1, showSession="all", showDate="all",showContribution="all", showWithdrawed=True, useSchedule=True, out=None):
         if not out:
             out = self._XMLGen
-            
+
         if vars and vars.has_key("frame") and vars["frame"] == "no":
             modificons = 0
         else:
             modificons = 1
-            
+
         out.writeTag("ID",conf.getId())
-        
+
         if conf.getOwnerList():
             out.writeTag("category",conf.getOwnerList()[0].getName())
         else:
             out.writeTag("category","")
-            
+
         if conf.canModify( self.__aw ) and vars and modificons:
             out.writeTag("modifyLink",vars["modifyURL"])
         if conf.canModify( self.__aw ) and vars and modificons:
@@ -196,19 +197,19 @@ class outputGenerator:
             out.writeTag("iCalLink",vars["iCalURL"])
         if  vars and vars.has_key("webcastAdminURL"):
             out.writeTag("webcastAdminLink",vars["webcastAdminURL"])
-            
+
         if conf.getOrgText() != "":
             out.writeTag("organiser", conf.getOrgText())
-            
+
         out.openTag("announcer")
-        chair = conf.getCreator() 
+        chair = conf.getCreator()
         if chair != None:
             self._userToXML(chair, out)
         out.closeTag("announcer")
-        
+
         if conf.getSupportEmail() != '':
-            out.writeTag("supportEmail", conf.getSupportEmail()) 
-            
+            out.writeTag("supportEmail", conf.getSupportEmail(), [["caption", displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(conf).getSupportEmailCaption()]])
+
         rnh = conf.getReportNumberHolder()
         rns = rnh.listReportNumbers()
         if len(rns) != 0:
@@ -217,20 +218,20 @@ class outputGenerator:
                 out.writeTag("system",rn[0])
                 out.writeTag("rn",rn[1])
                 out.closeTag("repno")
-                
+
         out.writeTag("title",conf.getTitle())
-        
+
         out.writeTag("description",conf.getDescription())
-        
+
         if conf.getParticipation().displayParticipantList() :
             out.writeTag("participants",conf.getParticipation().getPresentParticipantListText())
         if conf.getType() == "meeting" and conf.getParticipation().isAllowedForApplying() and conf.getStartDate() > nowutc():
             out.writeTag("apply",urlHandlers.UHConfParticipantsNewPending.getURL(conf))
-            
+
         evaluation = conf.getEvaluation()
         if evaluation.isVisible() and evaluation.inEvaluationPeriod() and evaluation.getNbOfQuestions()>0 :
             out.writeTag("evaluationLink",urlHandlers.UHConfEvaluationDisplay.getURL(conf))
-            
+
 #        if len(conf.getBookingsList()):
 #            out.openTag("videoconference")
 #            for b in conf.getBookingsList():
@@ -239,7 +240,7 @@ class outputGenerator:
 #                    out.writeTag("description",b.getPublicDescription())
 #                out.closeTag(b.getSystem())
 #            out.closeTag("videoconference")
-            
+
         if conf.getLocationList()!=[] or conf.getRoom():
             out.openTag("location")
             loc=None
@@ -256,7 +257,7 @@ class outputGenerator:
             else:
                 out.writeTag("room","")
             out.closeTag("location")
-            
+
         tzUtil = DisplayTZ(self.__aw,conf)
         tz = tzUtil.getDisplayTZ()
         adjusted_startDate = conf.getAdjustedStartDate(tz)
@@ -266,7 +267,7 @@ class outputGenerator:
         out.writeTag("creationDate",conf.getCreationDate().astimezone(timezone(tz)).strftime("%Y-%m-%dT%H:%M:%S"))
         out.writeTag("modificationDate",conf.getModificationDate().strftime("%Y-%m-%dT%H:%M:%S"))
         out.writeTag("timezone","%s" %(tz))
-        
+
         uList = conf.getChairList()
         if len(uList) > 0 or conf.getChairmanText() != "":
             out.openTag("chair")
@@ -275,16 +276,16 @@ class outputGenerator:
             if conf.getChairmanText() != "":
                 out.writeTag("UnformatedUser",conf.getChairmanText())
             out.closeTag("chair")
-            
+
         if showContribution != "all" and conf.getContributionById(showContribution) != None:
             self._contribToXML(conf.getContributionById(showContribution),vars,includeMaterial,conf, out=out)
         elif useSchedule:
-            confSchedule = conf.getSchedule()   
+            confSchedule = conf.getSchedule()
             if showDate == "all":
                 entrylist = confSchedule.getEntries()
             else:
                 entrylist = confSchedule.getEntriesOnDay(timezone(tz).localize(stringToDate(showDate)))
-            for entry in entrylist: 
+            for entry in entrylist:
                 if type(entry) is schedule.BreakTimeSchEntry: #TODO: schedule.BreakTimeSchEntry doesn't seem to exist!
                     self._breakToXML(entry, out=out)
                 elif type(entry) is conference.ContribSchEntry:
@@ -310,7 +311,7 @@ class outputGenerator:
                                 self._slotToXML(owner,vars,includeContribution,includeMaterial, showWithdrawed=showWithdrawed, out=out)
         else:
             confSchedule = conf.getSchedule()
-            for entry in confSchedule.getEntries(): 
+            for entry in confSchedule.getEntries():
                 if type(entry) is conference.ContribSchEntry:
                     owner = entry.getOwner()
                     if owner.canView(self.__aw):
@@ -320,13 +321,13 @@ class outputGenerator:
             for session in sessionList:
                 if session.canAccess(self.__aw) and includeSession:
                     self._sessionToXML(session, vars, includeContribution, includeMaterial, showWithdrawed=showWithdrawed, useSchedule=False, out=out)
-        
+
         mList = conf.getAllMaterialList()
         for mat in mList:
             if mat.canView(self.__aw) and mat.getTitle() != "Internal Page Files":
                 if includeMaterial:
                     self._materialToXML(mat, vars, out=out)
-        
+
         wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
         url = wm.isOnAir(conf)
         if url:
@@ -345,40 +346,40 @@ class outputGenerator:
             out.writeTag("type","")
             out.writeTag("displayURL", wm.getWebcastServiceURL())
             out.closeTag("material")
-        
+
         #plugins XML
         out.openTag("plugins")
         if PluginsHolder().hasPluginType("Collaboration"):
-            
+
             #collaboration XML
             out.openTag("collaboration")
             csbm = conf.getCSBookingManager()
-            
+
             out.writeComment("Needed for timezone awareness")
             out.writeTag("todayReference", getAdjustedDate(nowutc(), None, tz).strftime("%Y-%m-%d"))
             out.writeTag("tomorrowReference", getAdjustedDate(nowutc() + timedelta(days = 1), None, tz).strftime("%Y-%m-%d"))
-            
+
             pluginNames = csbm.getEventDisplayPlugins()
-            
+
             bookingXmlGenerators = {}
-            
+
             from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
             for pluginName in pluginNames:
                 xmlGenerator = CollaborationTools.getXMLGenerator(pluginName)
                 bookingXmlGenerators[pluginName] = xmlGenerator
-            
+
             bookings = csbm.getBookingList(filterByType = pluginNames, notify = True, onlyPublic = True)
             bookings.sort(key = lambda b: b.getStartDate())
-            
+
             ongoingBookings = []
             scheduledBookings = []
-            
+
             for b in bookings:
                 if b.canBeStarted():
                     ongoingBookings.append(b)
                 if b.hasStartDate() and b.getAdjustedStartDate('UTC') > nowutc():
                     scheduledBookings.append(b)
-            
+
             for b in ongoingBookings :
                 bookingType = b.getType()
                 out.openTag("booking")
@@ -391,7 +392,7 @@ class outputGenerator:
                 out.writeTag("endDate",b.getAdjustedEndDate(tz).strftime("%Y-%m-%dT%H:%M:%S"))
                 bookingXmlGenerators[bookingType].getCustomBookingXML(b, tz, out)
                 out.closeTag("booking")
-                
+
             for b in scheduledBookings :
                 bookingType = b.getType()
                 out.openTag("booking")
@@ -404,14 +405,14 @@ class outputGenerator:
                 out.writeTag("endDate",b.getAdjustedEndDate(tz).strftime("%Y-%m-%dT%H:%M:%S"))
                 bookingXmlGenerators[bookingType].getCustomBookingXML(b, tz, out)
                 out.closeTag("booking")
-            
+
             out.closeTag("collaboration")
-            
+
         out.closeTag("plugins")
-            
 
 
-    def _sessionToXML(self,session,vars,includeContribution,includeMaterial, showWithdrawed=True, useSchedule=True, out=None):    
+
+    def _sessionToXML(self,session,vars,includeContribution,includeMaterial, showWithdrawed=True, useSchedule=True, out=None):
         if not out:
             out = self._XMLGen
         if vars and vars.has_key("frame") and vars["frame"] == "no":
@@ -470,7 +471,7 @@ class outputGenerator:
         if includeContribution:
             if useSchedule:
                 sessionSchedule = session.getSchedule()
-                for entry in sessionSchedule.getEntries(): 
+                for entry in sessionSchedule.getEntries():
                     if type(entry) is schedule.BreakTimeSchEntry: #TODO: schedule.BreakTimeSchEntry doesn't seem to exist!
                         self._breakToXML(entry, out=out)
                     elif type(entry) is schedule.LinkedTimeSchEntry: #TODO: schedule.LinkedTimeSchEntry doesn't seem to exist!
@@ -484,7 +485,7 @@ class outputGenerator:
                     if contrib.canView(self.__aw):
                         if showWithdrawed or not isinstance(contrib.getCurrentStatus(), conference.ContribStatusWithdrawn):
                             self._contribToXML(contrib, vars, includeMaterial, conf,out=out)
-        
+
         mList = session.getAllMaterialList()
         for mat in mList:
             self._materialToXML(mat, vars, out=out)
@@ -492,7 +493,7 @@ class outputGenerator:
 
 
 
-    def _slotToXML(self,slot,vars,includeContribution,includeMaterial, showWithdrawed=True, out=None):      
+    def _slotToXML(self,slot,vars,includeContribution,includeMaterial, showWithdrawed=True, out=None):
         if not out:
             out = self._XMLGen
         session = slot.getSession()
@@ -552,7 +553,7 @@ class outputGenerator:
         out.writeTag("endDate","%d-%s-%sT%s:%s:00" %(endDate.year, string.zfill(endDate.month,2), string.zfill(endDate.day,2),string.zfill(endDate.hour,2), string.zfill(endDate.minute,2)))
         out.writeTag("duration","%s:%s" %(string.zfill((datetime(1900,1,1)+slot.duration).hour,2), string.zfill((datetime(1900,1,1)+slot.duration).minute,2)))
         if includeContribution:
-            for entry in slot.getSchedule().getEntries(): 
+            for entry in slot.getSchedule().getEntries():
                 if type(entry) is schedule.BreakTimeSchEntry: #TODO: schedule.BreakTimeSchEntry doesn't seem to exist!
                     self._breakToXML(entry, out=out)
                 else:
@@ -643,7 +644,7 @@ class outputGenerator:
         tz = tzUtil.getDisplayTZ()
 
         startDate = cont.startDate.astimezone(timezone(tz))
-        
+
         startDate = None
         if cont.startDate:
             startDate = cont.startDate.astimezone(timezone(tz))
@@ -658,14 +659,14 @@ class outputGenerator:
         matList = cont.getAllMaterialList()
         for mat in matList:
             if mat.canView(self.__aw):
-                if includeMaterial:                
+                if includeMaterial:
                     self._materialToXML(mat, vars, out=out)
                 else:
                     out.writeTag("material",out.writeTag("id",mat.id))
         for subC in cont.getSubContributionList():
             self._subContributionToXML(subC,vars,includeMaterial, out=out)
         out.closeTag("contribution")
-        
+
 
     def _subContributionToXML(self, subCont, vars, includeMaterial, out=None):
         if not out:
@@ -705,7 +706,7 @@ class outputGenerator:
         matList = subCont.getAllMaterialList()
         for mat in matList:
             if mat.canView(self.__aw):
-                if includeMaterial:                
+                if includeMaterial:
                     self._materialToXML(mat, vars, out=out)
         out.closeTag("subcontribution")
 
@@ -778,7 +779,7 @@ class outputGenerator:
         if mat.isItselfProtected():
             out.writeTag("locked","yes")
         out.closeTag("material")
-        
+
     def _resourcesToXML(self, rList, out=None):
         if not out:
             out = self._XMLGen
@@ -804,7 +805,7 @@ class outputGenerator:
         out.writeTag("description",res.getDescription())
         out.writeTag("url",res.getURL())
         out.closeTag("resourceLink")
-        
+
     def _resourceFileToXML(self,res, out=None):
         if not out:
             out = self._XMLGen
@@ -819,7 +820,7 @@ class outputGenerator:
         creationDateStr = "%d-%s-%sT%s:%s:00Z" %(cDate.year, string.zfill(cDate.month,2), string.zfill(cDate.day,2), string.zfill(cDate.hour,2), string.zfill(cDate.minute,2))
         out.writeTag("creationDate",creationDateStr)
         out.closeTag("resourceFile")
-        
+
     def _breakToXML(self,br, out=None):
         if not out:
             out = self._XMLGen
@@ -850,7 +851,7 @@ class outputGenerator:
             out.closeTag("location")
         out.closeTag("break")
 
-    
+
     def confToXML(self,conf,includeSession,includeContribution,includeMaterial,showSession="all", showContribution="all", out=None, forceCache=False):
         if not out:
             out = self._XMLGen
@@ -869,14 +870,14 @@ class outputGenerator:
         #    out.writeTag("cache", "not found in cache")
         #else:
         #    out.writeTag("cache", "found in cache")
-        
-        out.writeXML(xml)        
+
+        out.writeXML(xml)
         #return xml
-        
-        
-        
-    #fb   
-    
+
+
+
+    #fb
+
     def confToXMLMarc21(self,conf,includeSession=1,includeContribution=1,includeMaterial=1,out=None, forceCache=False):
 
         if not out:
@@ -896,34 +897,34 @@ class outputGenerator:
             # save XML in cache
             self.cache.cacheObject(conf, version, xml)
         out.writeXML(xml)
-    
+
     def _confToXMLMarc21(self,conf,includeSession=1,includeContribution=1,includeMaterial=1,out=None):
         if not out:
             out = self._XMLGen
-        
+
         out.openTag("marc:datafield",[["tag","245"],["ind1"," "],["ind2"," "]])
         out.writeTag("marc:subfield",conf.getTitle(),[["code","a"]])
         out.closeTag("marc:datafield")
-            
+
         out.writeTag("marc:leader", "00000nmm  2200000uu 4500")
         out.openTag("marc:datafield",[["tag","111"],["ind1"," "],["ind2"," "]])
         out.writeTag("marc:subfield",conf.title,[["code","a"]])
 
         # XXX: If there is ROOM and not LOCATION....There will be information missed.
-        for l in conf.getLocationList(): 
+        for l in conf.getLocationList():
             loc = ""
             if l.getName() != "":
                 loc = conf.getLocation().getName()
             if l.getAddress() != "":
                 loc = loc +", "+conf.getLocation().getAddress()
-              
+
             if conf.getRoom():
                 loc = loc + ", "+conf.getRoom().getName()
-                
-            if l.getName() != "":    
+
+            if l.getName() != "":
                 out.writeTag("marc:subfield",loc,[["code","c"]])
-     
-         
+
+
         #out.writeTag("marc:subfield","%d-%s-%sT%s:%s:00Z" %(conf.getStartDate().year, string.zfill(conf.getStartDate().month,2), string.zfill(conf.getStartDate().day,2), string.zfill(conf.getStartDate().hour,2), string.zfill(conf.getStartDate().minute,2)),[["code","9"]])
         #out.writeTag("marc:subfield","%d-%s-%sT%s:%s:00Z" %(conf.getEndDate().year, string.zfill(conf.getEndDate().month,2), string.zfill(conf.getEndDate().day,2), string.zfill(conf.getEndDate().hour,2), string.zfill(conf.getEndDate().minute,2)),[["code","z"]])
         #tz = conf.getTimezone()
@@ -935,8 +936,8 @@ class outputGenerator:
         out.writeTag("marc:subfield","%d-%s-%sT%s:%s:00Z" %(ed.year, string.zfill(ed.month,2), string.zfill(ed.day,2), string.zfill(ed.hour,2), string.zfill(ed.minute,2)),[["code","z"]])
 
         out.writeTag("marc:subfield", self.dataInt.objToId(conf),[["code","g"]])
-        out.closeTag("marc:datafield") 
-        
+        out.closeTag("marc:datafield")
+
         for path in conf.getCategoriesPath():
             out.openTag("marc:datafield",[["tag","650"],["ind1"," "],["ind2","7"]])
             out.writeTag("marc:subfield", ":".join(path), [["code","a"]])
@@ -958,26 +959,26 @@ class outputGenerator:
         ####################################
         # Fermi timezone awareness(end)    #
         ####################################
-        
+
         out.openTag("marc:datafield",[["tag","520"],["ind1"," "],["ind2"," "]])
         out.writeTag("marc:subfield",conf.getDescription(),[["code","a"]])
         out.closeTag("marc:datafield")
-        
+
         if conf.getReportNumberHolder().listReportNumbers():
             out.openTag("marc:datafield",[["tag","088"],["ind1"," "],["ind2"," "]])
             for report in conf.getReportNumberHolder().listReportNumbers():
                 out.writeTag("marc:subfield",report[1],[["code","a"]])
             out.closeTag("marc:datafield")
-        
-        
+
+
         out.openTag("marc:datafield",[["tag","653"],["ind1","1"],["ind2"," "]])
         keywords = conf.getKeywords()
         keywords.replace("\r\n", "\n")
         for keyword in keywords.split("\n"):
             out.writeTag("marc:subfield",keyword,[["code","a"]])
         out.closeTag("marc:datafield")
-        
-        
+
+
         import MaKaC.webinterface.simple_event as simple_event
         import MaKaC.webinterface.meeting as meeting
         type = "Conference"
@@ -987,74 +988,74 @@ class outputGenerator:
             type = "Meeting"
         out.openTag("marc:datafield",[["tag","650"],["ind1","2"],["ind2","7"]])
         out.writeTag("marc:subfield",type,[["code","a"]])
-        out.closeTag("marc:datafield") 
-        #### t o d o 
-        
+        out.closeTag("marc:datafield")
+        #### t o d o
+
         #out.openTag("datafield",[["tag","650"],["ind1","3"],["ind2","7"]])
         #out.writeTag("subfield",,[["code","a"]])
-        #out.closeTag("datafield")         
-        
-        
+        #out.closeTag("datafield")
+
+
         # tag 700 chair name
         uList = conf.getChairList()
         for chair in uList:
             out.openTag("marc:datafield",[["tag","906"],["ind1"," "],["ind2"," "]])
             nom = chair.getFamilyName() + " " + chair.getFirstName()
-            out.writeTag("marc:subfield",nom,[["code","p"]]) 
+            out.writeTag("marc:subfield",nom,[["code","p"]])
             out.writeTag("marc:subfield",chair.getAffiliation(),[["code","u"]])
-            out.closeTag("marc:datafield") 
-            
-            
+            out.closeTag("marc:datafield")
+
+
         #out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
         matList = conf.getAllMaterialList()
         for mat in matList:
             if self.dataInt.isPrivateDataInt() or mat.canView(self.__aw):
-                if includeMaterial:                
+                if includeMaterial:
                     self.materialToXMLMarc21(mat, out=out)
-        #out.closeTag("datafield") 
-        
+        #out.closeTag("datafield")
+
         #if respEmail != "":
         #    out.openTag("datafield",[["tag","859"],["ind1"," "],["ind2"," "]])
         #   out.writeTag("subfield",respEmail,[["code","f"]])
-        #   out.closeTag("datafield")      
+        #   out.closeTag("datafield")
         # tag 859 email
         uList = conf.getChairList()
         for chair in uList:
             out.openTag("marc:datafield",[["tag","859"],["ind1"," "],["ind2"," "]])
             out.writeTag("marc:subfield",chair.getEmail(),[["code","f"]])
             out.closeTag("marc:datafield")
-        
+
         edate = conf.getCreationDate()
-        creaDate = datetime( edate.year, edate.month, edate.day )  
-        
+        creaDate = datetime( edate.year, edate.month, edate.day )
+
         out.openTag("marc:datafield",[["tag","961"],["ind1"," "],["ind2"," "]])
         out.writeTag("marc:subfield","%d-%s-%sT"%(creaDate.year, string.zfill(creaDate.month,2), string.zfill(creaDate.day,2)),[["code","x"]])
-        out.closeTag("marc:datafield")    
-        
+        out.closeTag("marc:datafield")
+
         edate = conf.getModificationDate()
-        modifDate = datetime( edate.year, edate.month, edate.day )  
-        
+        modifDate = datetime( edate.year, edate.month, edate.day )
+
         out.openTag("marc:datafield",[["tag","961"],["ind1"," "],["ind2"," "]])
         out.writeTag("marc:subfield","%d-%s-%sT"%(modifDate.year, string.zfill(modifDate.month,2), string.zfill(modifDate.day,2)),[["code","c"]])
-        out.closeTag("marc:datafield") 
-        
+        out.closeTag("marc:datafield")
+
         out.openTag("marc:datafield",[["tag","980"],["ind1"," "],["ind2"," "]])
         confcont = "Indico"
         out.writeTag("marc:subfield",confcont,[["code","a"]])
         out.closeTag("marc:datafield")
-        
+
         out.openTag("marc:datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
         out.writeTag("marc:subfield","INDICO." + self.dataInt.objToId(conf),[["code","a"]])
-        out.closeTag("marc:datafield") 
-        
+        out.closeTag("marc:datafield")
+
         out.openTag("marc:datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
         url = str(urlHandlers.UHConferenceDisplay.getURL(conf))
         out.writeTag("marc:subfield",url,[["code","u"]])
         out.writeTag("marc:subfield", "Event details", [["code","y"]])
         out.closeTag("marc:datafield")
 
-       
-        
+
+
     ## def sessionToXMLMarc21(self,session,includeMaterial=1, out=None, forceCache=False):
     ##     if not out:
     ##         out = self._XMLGen
@@ -1067,39 +1068,39 @@ class outputGenerator:
     ##         self._sessionToXMLMarc21(session,includeMaterial, out=temp)
     ##         xml = temp.getXml()
     ##     out.writeXML(xml)
-    
-    
-    ## def _sessionToXMLMarc21(self,session,includeMaterial=1, out=None): 
+
+
+    ## def _sessionToXMLMarc21(self,session,includeMaterial=1, out=None):
     ##     if not out:
     ##         out = self._XMLGen
-        
+
     ##     out.writeTag("marc:leader", "00000nmm  2200000uu 4500")
     ##     out.openTag("marc:datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
     ##     out.writeTag("marc:subfield","INDICO%s"%(self.dataInt.objToId(session, separator="."), session.getId()),[["code","a"]])
     ##     out.closeTag("marc:datafield")
-        
+
     ##     out.openTag("marc:datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
     ##     out.writeTag("marc:subfield",self.dataInt.objToId(session, separator="."),[["code","a"]])
     ##     out.writeTag("marc:subfield","Indico",[["code","9"]])
     ##     out.closeTag("marc:datafield")
-        
+
     ##     out.openTag("marc:datafield",[["tag","245"],["ind1"," "],["ind2"," "]])
     ##     out.writeTag("marc:subfield",session.getTitle(),[["code","a"]])
-    ##     out.closeTag("marc:datafield") 
-        
+    ##     out.closeTag("marc:datafield")
+
     ##     out.openTag("marc:datafield",[["tag","300"],["ind1"," "],["ind2"," "]])
     ##     out.writeTag("marc:subfield",session.getDuration(),[["code","a"]])
-    ##     out.closeTag("marc:datafield") 
-        
+    ##     out.closeTag("marc:datafield")
+
     ##     out.openTag("marc:datafield",[["tag","111"],["ind1"," "],["ind2"," "]])
     ##     out.writeTag("marc:subfield", self.dataInt.objToId(session.getConference()),[["code","g"]])
     ##     out.closeTag("marc:datafield")
-        
+
     ##     for path in session.getConference().getCategoriesPath():
     ##         out.openTag("marc:datafield",[["tag","650"],["ind1"," "],["ind2","7"]])
     ##         out.writeTag("marc:subfield", ":".join(path), [["code","a"]])
     ##         out.closeTag("marc:datafield")
-        
+
     ##     l=session.getLocation()
     ##     if (l and l.getName() != "") or session.getStartDate() is not None:
     ##         out.openTag("marc:datafield",[["tag","518"],["ind1"," "],["ind2"," "]])
@@ -1114,18 +1115,18 @@ class outputGenerator:
     ##     out.openTag("marc:datafield",[["tag","520"],["ind1"," "],["ind2"," "]])
     ##     out.writeTag("marc:subfield",session.getDescription(),[["code","a"]])
     ##     out.closeTag("marc:datafield")
-        
+
     ##     out.openTag("marc:datafield",[["tag","611"],["ind1","2"],["ind2","4"]])
     ##     out.writeTag("marc:subfield",session.getConference().getTitle(),[["code","a"]])
     ##     out.closeTag("marc:datafield")
     ##     out.openTag("marc:datafield",[["tag","650"],["ind1","1"],["ind2","7"]])
     ##     out.writeTag("marc:subfield","SzGeCERN",[["code","2"]])
-    ##     out.closeTag("marc:datafield") 
-        
-        
+    ##     out.closeTag("marc:datafield")
+
+
     ##     # tag 100/700 Convener name
     ##     cList = session.getConvenerList()
-        
+
     ##     for user in cList:
     ##         if user == cList[0]:
     ##             code = "100"
@@ -1133,41 +1134,41 @@ class outputGenerator:
     ##             code = "700"
     ##         out.openTag("marc:datafield",[["tag",code],["ind1"," "],["ind2"," "]])
     ##         fullName = user.getFamilyName() + " " + user.getFirstName()
-    ##         out.writeTag("marc:subfield",fullName,[["code","a"]]) 
-    ##         out.writeTag("marc:subfield","Convener",[["code","e"]]) 
+    ##         out.writeTag("marc:subfield",fullName,[["code","a"]])
+    ##         out.writeTag("marc:subfield","Convener",[["code","e"]])
     ##         out.writeTag("marc:subfield",user.getAffiliation(),[["code","u"]])
     ##         out.closeTag("marc:datafield")
-        
+
     ##     matList = session.getAllMaterialList()
     ##     for mat in matList:
     ##         if mat.canView(self.__aw):
-    ##             if includeMaterial:                
+    ##             if includeMaterial:
     ##                 self.materialToXMLMarc21(mat, out=out)
-        
+
     ##     out.openTag("marc:datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
-    ##     out.writeTag("marc:subfield","INDICO.%s"%self.dataInt.objToId(session.getConference()),[["code","b"]]) 
-    ##     out.closeTag("marc:datafield") 
-        
+    ##     out.writeTag("marc:subfield","INDICO.%s"%self.dataInt.objToId(session.getConference()),[["code","b"]])
+    ##     out.closeTag("marc:datafield")
+
     ##     out.openTag("marc:datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
     ##     confses = "INDICO." + self.dataInt.objToId(session.getConference(), separator=".")
     ##     out.writeTag("marc:subfield",confses,[["code","a"]])
     ##     out.closeTag("marc:datafield")
-        
+
     ##     out.openTag("marc:datafield",[["tag","980"],["ind1"," "],["ind2"," "]])
     ##     confcont = "INDICO." + self.dataInt.objToId(session.getConference())
     ##     out.writeTag("marc:subfield",confcont,[["code","a"]])
     ##     out.closeTag("marc:datafield")
-        
+
     ##     out.openTag("marc:datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
     ##     url = str(urlHandlers.UHSessionDisplay.getURL(session))
     ##     out.writeTag("marc:subfield",url,[["code","u"]])
     ##     out.writeTag("marc:subfield", "Session details", [["code","y"]])
     ##     out.closeTag("marc:datafield")
-             
-          
+
+
     #fb
-    
-    def contribToXMLMarc21(self,cont,includeMaterial=1, out=None, forceCache=False): 
+
+    def contribToXMLMarc21(self,cont,includeMaterial=1, out=None, forceCache=False):
         if not out:
             out = self._XMLGen
         #try to get a cache
@@ -1185,40 +1186,40 @@ class outputGenerator:
             # save XML in cache
             self.cache.cacheObject(cont, version, xml)
         out.writeXML(xml)
-    
-    
-    def _contribToXMLMarc21(self,cont,includeMaterial=1, out=None): 
+
+
+    def _contribToXMLMarc21(self,cont,includeMaterial=1, out=None):
         if not out:
             out = self._XMLGen
-        
-        #out.writeTag("controlfield","SzGeCERN",[["tag","003"]]) 
+
+        #out.writeTag("controlfield","SzGeCERN",[["tag","003"]])
         out.writeTag("marc:leader", "00000nmm  2200000uu 4500")
         out.openTag("marc:datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
         out.writeTag("marc:subfield","INDICO.%s"%self.dataInt.objToId(cont, separator="."),[["code","a"]])
-        out.closeTag("marc:datafield")   
+        out.closeTag("marc:datafield")
     #
         out.openTag("marc:datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
         out.writeTag("marc:subfield",self.dataInt.objToId(cont, separator="t"),[["code","a"]])
         out.writeTag("marc:subfield","Indico",[["code","9"]])
         out.closeTag("marc:datafield")
-        
+
         out.openTag("marc:datafield",[["tag","245"],["ind1"," "],["ind2"," "]])
         out.writeTag("marc:subfield",cont.getTitle(),[["code","a"]])
-        out.closeTag("marc:datafield") 
-        
+        out.closeTag("marc:datafield")
+
         out.openTag("marc:datafield",[["tag","300"],["ind1"," "],["ind2"," "]])
         out.writeTag("marc:subfield",cont.getDuration(),[["code","a"]])
-        out.closeTag("marc:datafield") 
-        
+        out.closeTag("marc:datafield")
+
         out.openTag("marc:datafield",[["tag","111"],["ind1"," "],["ind2"," "]])
         out.writeTag("marc:subfield", self.dataInt.objToId(cont.getConference()),[["code","g"]])
         out.closeTag("marc:datafield")
-        
+
         for path in cont.getConference().getCategoriesPath():
             out.openTag("marc:datafield",[["tag","650"],["ind1"," "],["ind2","7"]])
             out.writeTag("marc:subfield", ":".join(path), [["code","a"]])
             out.closeTag("marc:datafield")
-        
+
         l=cont.getLocation()
         if (l and l.getName() != "") or cont.getStartDate() is not None:
             out.openTag("marc:datafield",[["tag","518"],["ind1"," "],["ind2"," "]])
@@ -1233,35 +1234,35 @@ class outputGenerator:
         out.openTag("marc:datafield",[["tag","520"],["ind1"," "],["ind2"," "]])
         out.writeTag("marc:subfield",cont.getDescription(),[["code","a"]])
         out.closeTag("marc:datafield")
-        
+
         out.openTag("marc:datafield",[["tag","611"],["ind1","2"],["ind2","4"]])
         out.writeTag("marc:subfield",cont.getConference().getTitle(),[["code","a"]])
         out.closeTag("marc:datafield")
-        
-        
+
+
         if cont.getReportNumberHolder().listReportNumbers():
             out.openTag("marc:datafield",[["tag","088"],["ind1"," "],["ind2"," "]])
             for report in cont.getReportNumberHolder().listReportNumbers():
                 out.writeTag("marc:subfield",report[1],[["code","a"]])
             out.closeTag("marc:datafield")
-        
-        
+
+
         out.openTag("marc:datafield",[["tag","653"],["ind1","1"],["ind2"," "]])
         keywords = cont.getKeywords()
         keywords.replace("\r\n", "\n")
         for keyword in keywords.split("\n"):
             out.writeTag("marc:subfield",keyword,[["code","a"]])
         out.closeTag("marc:datafield")
-        
-        
+
+
     #
         out.openTag("marc:datafield",[["tag","650"],["ind1","1"],["ind2","7"]])
         out.writeTag("marc:subfield","SzGeCERN",[["code","2"]])
         if cont.getTrack():
             out.writeTag("marc:subfield",cont.getTrack().getTitle(),[["code","a"]])
-        out.closeTag("marc:datafield") 
-        
-        
+        out.closeTag("marc:datafield")
+
+
         # tag 700 Speaker name
         aList = cont.getAuthorList()
         sList = cont.getSpeakerList()
@@ -1276,77 +1277,77 @@ class outputGenerator:
                     list[user].append("Author")
             else:
                 list[user] = ["Author"]
-        
+
         for user in sList:
             if user in list:
                 list[user].append("Speaker")
             else:
                 list[user] = ["Speaker"]
-        
+
         if auth:
             user = auth
             out.openTag("marc:datafield",[["tag","100"],["ind1"," "],["ind2"," "]])
             fullName = auth.getFamilyName() + " " + auth.getFirstName()
-            out.writeTag("marc:subfield",fullName,[["code","a"]]) 
+            out.writeTag("marc:subfield",fullName,[["code","a"]])
             for val in list[user]:
                 out.writeTag("marc:subfield",val,[["code","e"]])
             out.writeTag("marc:subfield",auth.getAffiliation(),[["code","u"]])
             out.closeTag("marc:datafield")
             del list[auth]
-    
+
         for user in list.keys():
             out.openTag("marc:datafield",[["tag","700"],["ind1"," "],["ind2"," "]])
             fullName = user.getFamilyName() + " " + user.getFirstName()
-            out.writeTag("marc:subfield",fullName,[["code","a"]]) 
+            out.writeTag("marc:subfield",fullName,[["code","a"]])
             for val in list[user]:
-                out.writeTag("marc:subfield",val,[["code","e"]]) 
+                out.writeTag("marc:subfield",val,[["code","e"]])
             out.writeTag("marc:subfield",user.getAffiliation(),[["code","u"]])
             out.closeTag("marc:datafield")
 
-       
-       
-        
-        
+
+
+
+
         matList = cont.getAllMaterialList()
         for mat in matList:
             #out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
             if self.dataInt.isPrivateDataInt() or mat.canView(self.__aw):
-                if includeMaterial:                
+                if includeMaterial:
                     self.materialToXMLMarc21(mat, out=out)
             #   else:
             #       out.writeTag("material",out.writeTag("id",mat.id))
         # no subContibution
         #for subC in cont.getSubContributionList():
         #    self.subContributionToXML(subC,includeMaterial)
-            #out.closeTag("datafield") 
-        
-        
-        
+            #out.closeTag("datafield")
+
+
+
         out.openTag("marc:datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
-        out.writeTag("marc:subfield","INDICO.%s"%self.dataInt.objToId(cont.getConference()),[["code","b"]]) 
-        out.closeTag("marc:datafield") 
-        
+        out.writeTag("marc:subfield","INDICO.%s"%self.dataInt.objToId(cont.getConference()),[["code","b"]])
+        out.closeTag("marc:datafield")
+
         out.openTag("marc:datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
         confcont = "INDICO." + self.dataInt.objToId(cont, separator=".")
         out.writeTag("marc:subfield",confcont,[["code","a"]])
         out.closeTag("marc:datafield")
-        
+
         out.openTag("marc:datafield",[["tag","980"],["ind1"," "],["ind2"," "]])
         confcont = "INDICO." + self.dataInt.objToId(cont.getConference())
         out.writeTag("marc:subfield",confcont,[["code","a"]])
         out.closeTag("marc:datafield")
-        
+
         out.openTag("marc:datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
         url = str(urlHandlers.UHContributionDisplay.getURL(cont))
         out.writeTag("marc:subfield",url,[["code","u"]])
         out.writeTag("marc:subfield", "Contribution details", [["code","y"]])
         out.closeTag("marc:datafield")
-        
-    ####    
-    #fb    
-    
-    
-    def subContribToXMLMarc21(self,subCont,includeMaterial=1, out=None, forceCache=False): 
+
+    ####
+    #fb
+
+
+    def subContribToXMLMarc21(self,subCont,includeMaterial=1, out=None, forceCache=False):
         if not out:
             out = self._XMLGen
         #try to get a cache
@@ -1364,55 +1365,55 @@ class outputGenerator:
             # save XML in cache
             self.cache.cacheObject(subCont, version, xml)
         out.writeXML(xml)
-    
-    
-    def _subContribToXMLMarc21(self,subCont,includeMaterial=1, out=None): 
+
+
+    def _subContribToXMLMarc21(self,subCont,includeMaterial=1, out=None):
         if not out:
             out = self._XMLGen
-        
-        #out.writeTag("controlfield","SzGeCERN",[["tag","003"]]) 
+
+        #out.writeTag("controlfield","SzGeCERN",[["tag","003"]])
         out.writeTag("marc:leader", "00000nmm  2200000uu 4500")
         out.openTag("marc:datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
         out.writeTag("marc:subfield","INDICO.%s"%(self.dataInt.objToId(subCont, separator=".")),[["code","a"]])
-        out.closeTag("marc:datafield")   
+        out.closeTag("marc:datafield")
     #
         out.openTag("marc:datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
         out.writeTag("marc:subfield",self.dataInt.objToId(subCont, separator=["t","sc"]),[["code","a"]])
         out.writeTag("marc:subfield","Indico",[["code","9"]])
         out.closeTag("marc:datafield")
-        
+
         out.openTag("marc:datafield",[["tag","245"],["ind1"," "],["ind2"," "]])
         out.writeTag("marc:subfield",subCont.getTitle(),[["code","a"]])
-        out.closeTag("marc:datafield") 
-        
+        out.closeTag("marc:datafield")
+
         out.openTag("marc:datafield",[["tag","300"],["ind1"," "],["ind2"," "]])
         out.writeTag("marc:subfield",subCont.getDuration(),[["code","a"]])
-        out.closeTag("marc:datafield") 
-        
+        out.closeTag("marc:datafield")
+
         out.openTag("marc:datafield",[["tag","111"],["ind1"," "],["ind2"," "]])
         out.writeTag("marc:subfield", self.dataInt.objToId(subCont.getConference(), separator="."),[["code","g"]])
         out.closeTag("marc:datafield")
-        
+
         if subCont.getReportNumberHolder().listReportNumbers():
             out.openTag("marc:datafield",[["tag","088"],["ind1"," "],["ind2"," "]])
             for report in subCont.getReportNumberHolder().listReportNumbers():
                 out.writeTag("marc:subfield",report[1],[["code","a"]])
             out.closeTag("marc:datafield")
-        
-        
+
+
         out.openTag("marc:datafield",[["tag","653"],["ind1","1"],["ind2"," "]])
         keywords = subCont.getKeywords()
         keywords.replace("\r\n", "\n")
         for keyword in keywords.split("\n"):
             out.writeTag("marc:subfield",keyword,[["code","a"]])
         out.closeTag("marc:datafield")
-        
-        
+
+
         for path in subCont.getConference().getCategoriesPath():
             out.openTag("marc:datafield",[["tag","650"],["ind1"," "],["ind2","7"]])
             out.writeTag("marc:subfield", ":".join(path), [["code","a"]])
             out.closeTag("marc:datafield")
-        
+
         l=subCont.getLocation()
         if (l and l.getName() != "") or subCont.getContribution().getStartDate() is not None:
             out.openTag("marc:datafield",[["tag","518"],["ind1"," "],["ind2"," "]])
@@ -1427,7 +1428,7 @@ class outputGenerator:
         out.openTag("marc:datafield",[["tag","520"],["ind1"," "],["ind2"," "]])
         out.writeTag("marc:subfield",subCont.getDescription(),[["code","a"]])
         out.closeTag("marc:datafield")
-        
+
         out.openTag("marc:datafield",[["tag","611"],["ind1","2"],["ind2","4"]])
         out.writeTag("marc:subfield",subCont.getConference().getTitle(),[["code","a"]])
         out.closeTag("marc:datafield")
@@ -1436,9 +1437,9 @@ class outputGenerator:
         out.writeTag("marc:subfield","SzGeCERN",[["code","2"]])
         if subCont.getContribution().getTrack():
             out.writeTag("marc:subfield",subCont.getContribution().getTrack().getTitle(),[["code","a"]])
-        out.closeTag("marc:datafield") 
-        
-        
+        out.closeTag("marc:datafield")
+
+
         # tag 700 Speaker name
         aList = subCont.getContribution().getAuthorList()
         sList = subCont.getSpeakerList()
@@ -1453,70 +1454,70 @@ class outputGenerator:
                     list[user].append("Author")
             else:
                 list[user] = ["Author"]
-        
+
         for user in sList:
             if user in list:
                 list[user].append("Speaker")
             else:
                 list[user] = ["Speaker"]
-        
+
         if auth:
             user = auth
             out.openTag("marc:datafield",[["tag","100"],["ind1"," "],["ind2"," "]])
             fullName = auth.getFamilyName() + " " + auth.getFirstName()
-            out.writeTag("marc:subfield",fullName,[["code","a"]]) 
+            out.writeTag("marc:subfield",fullName,[["code","a"]])
             for val in list[user]:
                 out.writeTag("marc:subfield",val,[["code","e"]])
             out.writeTag("marc:subfield",auth.getAffiliation(),[["code","u"]])
             out.closeTag("marc:datafield")
             del list[auth]
-    
+
         for user in list.keys():
             out.openTag("marc:datafield",[["tag","700"],["ind1"," "],["ind2"," "]])
             fullName = user.getFamilyName() + " " + user.getFirstName()
-            out.writeTag("marc:subfield",fullName,[["code","a"]]) 
+            out.writeTag("marc:subfield",fullName,[["code","a"]])
             for val in list[user]:
-                out.writeTag("marc:subfield",val,[["code","e"]]) 
+                out.writeTag("marc:subfield",val,[["code","e"]])
             out.writeTag("marc:subfield",user.getAffiliation(),[["code","u"]])
             out.closeTag("marc:datafield")
 
-       
-       
-        
-        
+
+
+
+
         matList = subCont.getAllMaterialList()
         for mat in matList:
             #out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
             if self.dataInt.isPrivateDataInt() or mat.canView(self.__aw):
-                if includeMaterial:                
+                if includeMaterial:
                     self.materialToXMLMarc21(mat, out=out)
             #    else:
             #        out.writeTag("material",out.writeTag("id",mat.id))
-         
-        
-        
-        
+
+
+
+
         out.openTag("marc:datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
-        out.writeTag("marc:subfield","INDICO.%s"%self.dataInt.objToId(subCont.getConference()),[["code","b"]]) 
-        out.closeTag("marc:datafield") 
-        
+        out.writeTag("marc:subfield","INDICO.%s"%self.dataInt.objToId(subCont.getConference()),[["code","b"]])
+        out.closeTag("marc:datafield")
+
         out.openTag("marc:datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
         confcont = "INDICO." + self.dataInt.objToId(subCont, separator=".")
         out.writeTag("marc:subfield",confcont,[["code","a"]])
         out.closeTag("marc:datafield")
-        
+
         out.openTag("marc:datafield",[["tag","980"],["ind1"," "],["ind2"," "]])
         confcont = "INDICO." + self.dataInt.objToId(subCont.getConference())
         out.writeTag("marc:subfield",confcont,[["code","a"]])
         out.closeTag("marc:datafield")
-        
+
         out.openTag("marc:datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
         url = str(urlHandlers.UHSubContributionDisplay.getURL(subCont))
         out.writeTag("marc:subfield",url,[["code","u"]])
         out.writeTag("marc:subfield", "Contribution details", [["code","y"]])
         out.closeTag("marc:datafield")
-    
-    
+
+
     def materialToXMLMarc21(self,mat, out=None):
         if not out:
             out = self._XMLGen
@@ -1528,7 +1529,7 @@ class outputGenerator:
         rList = mat.getResourceList()
         self.resourcesToXMLMarc21(rList, out=out)
         #out.closeTag("material")
-        
+
     def resourcesToXMLMarc21(self, rList, out=None):
         if not out:
             out = self._XMLGen
@@ -1537,8 +1538,8 @@ class outputGenerator:
             if self.dataInt.isPrivateDataInt() or res.canView(self.__aw):
                 self.resourceToXMLMarc21(res, out=out)
         #out.closeTag("resources")
-    
-    
+
+
 
     def resourceToXMLMarc21(self,res, out=None):
         if not out:
@@ -1551,7 +1552,7 @@ class outputGenerator:
     def resourceLinkToXMLMarc21(self,res, out=None):
         if not out:
             out = self._XMLGen
-        
+
         #out.writeTag("name",res.getName())
         out.openTag("marc:datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
         out.writeTag("marc:subfield",res.getDescription(),[["code","a"]])
@@ -1561,11 +1562,11 @@ class outputGenerator:
         out.writeTag("marc:subfield", "resource", [["code","x"]])
         out.writeTag("marc:subfield", res.getOwner().getTitle(), [["code","y"]])
         out.closeTag("marc:datafield")
-        
+
     def resourceFileToXMLMarc21(self,res, out=None):
         if not out:
             out = self._XMLGen
-        
+
         #out.writeTag("name",res.getName())
         #out.writeTag("description",res.getDescription())
         #out.writeTag("type",res.fileType)
@@ -1576,7 +1577,7 @@ class outputGenerator:
         except:
             pass
         #out.writeTag("subfield",res.getURL(),[["code","u"]])
-       
+
         #out.writeTag("subfield",res.getFileName(),[["code","q"]])
         url = str(urlHandlers.UHFileAccess.getURL( res ))
         out.writeTag("marc:subfield",url,[["code","u"]])
@@ -1604,7 +1605,7 @@ class XMLCache(MultiLevelCache):
 
     def _getRecordId(self, obj):
         """ Retrieves the ID of a given record """
-        
+
         return getHierarchicalId(obj)
 
     def _generateFileName(self, id, version):
@@ -1631,7 +1632,7 @@ class XMLCache(MultiLevelCache):
 
     def loadObject(self, obj, version):
         return MultiLevelCache.loadObject(self, self._generatePath(obj) + [self._generateFileName(obj.getId(), version)])
-            
+
 class ProtectedXMLCache(XMLCache):
 
     def __init__(self, dataInt):

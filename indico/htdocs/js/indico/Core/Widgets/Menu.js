@@ -47,6 +47,9 @@ type("ChainedPopupWidget", ["PopupWidget"],
          },
 
          postDraw: function () {
+
+             this.PopupWidget.prototype.postDraw.call(this);
+
              if (this.alignRight) {
                  // Hide it to avoid flickering
                  this.canvas.dom.style.visibility = 'hidden';
@@ -127,8 +130,13 @@ type("PopupMenu", ["ChainedPopupWidget"],
                                   });
             }
 
-            var listItem = Html.li({},
-                link);
+            var listItem = null;
+            if(pair.key === this.currentItem) {
+                listItem = Html.li("current", link);
+            }
+            else {
+                listItem = Html.li({}, link);
+            }
             return listItem;
         },
         close: function() {
@@ -148,9 +156,10 @@ type("PopupMenu", ["ChainedPopupWidget"],
             return this.PopupWidget.prototype.draw.call(this, content, x, y);
         }
     },
-    function(items, chainElements, cssClass, closeOnClick, alignRight, closeHandler) {
+    function(items, chainElements, cssClass, closeOnClick, alignRight, closeHandler, currentItem) {
         this.ChainedPopupWidget(chainElements, alignRight);
         this.items = items;
+        this.currentItem = currentItem;
         this.selected = null;
         this.cssClass = "popupList " + any(cssClass,"");
         this.closeOnClick = any(closeOnClick, false);
@@ -195,6 +204,13 @@ type("SessionSectionPopupMenu", ["SectionPopupMenu"], {
         var self = this;
         var value = pair.get();
         var color = null;
+        var title = null;
+
+        if(exists(value.title)){
+            title = value.title;
+        }else {
+            title = pair.key;
+        }
 
         if(exists(value.color)){
             color = value.color;
@@ -206,7 +222,7 @@ type("SessionSectionPopupMenu", ["SectionPopupMenu"], {
             colorSquare = Html.div({style:{backgroundColor: color, color: color, cssFloat: 'right', width: '15px', height:'15px'}});
         }
 
-        var link = Html.a({className:'fakeLink', style:{display: 'inline', padding: 0, paddingLeft: '4px', paddingRight: '4px'}}, Util.truncate(pair.key));
+        var link = Html.a({className:'fakeLink', style:{display: 'inline', padding: 0, paddingLeft: '4px', paddingRight: '4px'}}, Util.truncate(title));
         var divInput = Html.div({style:{height:'20px', overflow:'auto'}}, colorSquare, link);
 
         if(typeof value == "string" ) {

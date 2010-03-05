@@ -18,11 +18,11 @@ var WRSpeakersTemplate = function(speakerList) {
 }
 
 var WRTalkTemplate = function(talk) {
-    
+
     // Checkbox
     var checkBox = Html.input('checkbox', {name: "talkSelection", id: "talk" + talk.id + "CB"});
     checkBox.dom.value = talk.id;
-    
+
     // Start date text
     var talkStartDateText;
     if (exists(talk.startDate)) {
@@ -37,12 +37,12 @@ var WRTalkTemplate = function(talk) {
     } else {
         talkStartDateText = "(Not Scheduled) ";
     }
-        
+
     var talkStartDate = Html.span("WRContributionStartDate", talkStartDateText);
-    
+
     // Title
     var talkName = Html.span("WRContributionName", talk.title);
-    
+
     // Duration
     var duration;
     if (exists(talk.duration)) {
@@ -50,11 +50,11 @@ var WRTalkTemplate = function(talk) {
     } else {
         duration = '';
     }
-    
+
     // We build the label
     var label = Html.label({}, talkStartDate, talkName, duration);
     label.dom.htmlFor = "talk" + talk.id + "CB";
-    
+
     // After the label, the speakers (optionally)
     if (talk.speakerList.length > 0) {
         label.append(Html.span("WRSpeakers", WRSpeakersTemplate(talk.speakerList)))
@@ -69,7 +69,7 @@ var WRTalkTemplate = function(talk) {
     if (exists(talk.room) && trim(talk.room)) {
         contribRoom = trim(talk.room);
     }
-    
+
     if (contribLocation != WR_confLocation || contribRoom != WR_confRoom) {
         if (contribLocation) {
             var locationText = ' (' + contribLocation;
@@ -80,12 +80,12 @@ var WRTalkTemplate = function(talk) {
             label.append(Html.span("WRSpeakers", locationText));
         }
     }
-    
+
     // Finally, the id
     label.append(Html.span("WRContributionId", "(id: " + talk.id + ")"));
-    
-    return Html.li('', checkBox, label);    
-    
+
+    return Html.li('', checkBox, label);
+
 };
 
 var WRUpdateContributionList = function () {
@@ -96,22 +96,24 @@ var WRUpdateContributionList = function () {
             $E('contributionList').append(WRTalkTemplate(contribution));
         }
     } else {
-        $E('contributionList').set(Html.span({style:{paddingLeft: pixels(20)}}, $T("This event has no talks, or none of the talks take place in a room capable of webcasting."))); // make this more beautiful
+        if (exists($E('contributionList'))) { // we are not in a lecture
+            $E('contributionList').set(Html.span({style:{paddingLeft: pixels(20)}}, $T("This event has no talks, or none of the talks take place in a room capable of webcasting.")));
+        }
     }
 }
 
 var WR_loadTalks = function () {
-    
+
     var fetchContributions = function() {
-        
+
         var talkTemplate = function(talk) {
             var checkBox = Html.input('checkbox', {name: "talkSelection", id: "talk" + talk.id + "CB"});
-            checkBox.dom.value = talk.id; 
+            checkBox.dom.value = talk.id;
             var talkId = Html.span("WRContributionId", "[" + talk.id + "] ")
             var talkName = Html.span("WRContributionName", talk.title)
             var label = Html.label({}, talkId, talkName);
             label.dom.htmlFor = "talk" + talk.id + "CB";
-            
+
             if (talk.speakerList.length > 0) {
                 var speakers = ", by "
                 enumerate(talk.speakerList, function(speaker, index) {
@@ -122,7 +124,7 @@ var WR_loadTalks = function () {
                 });
                 label.append(Html.span("WRSpeakers", speakers))
             }
-            
+
             if (exists(talk.location) && trim(talk.location)) {
                 var locationText = ' (' + talk.location;
                 if (exists(talk.room) && trim(talk.room)) {
@@ -131,13 +133,13 @@ var WR_loadTalks = function () {
                 locationText += ')';
                 label.append(Html.span("WRSpeakers", locationText))
             }
-            
+
             var li = Html.li();
             li.append(checkBox);
             li.append(label);
             return li;
         };
-        
+
         var killProgress = IndicoUI.Dialogs.Util.progress($T("Fetching talks, may take a while..."));
         indicoRequest('collaboration.pluginService',
             {
@@ -159,13 +161,13 @@ var WR_loadTalks = function () {
             }
         );
     };
-    
+
     if (WR_contributionsLoaded) {
         IndicoUI.Effect.appear($E('contributionsDiv'));
     } else {
         fetchContributions();
     }
-    
+
 }
 
 

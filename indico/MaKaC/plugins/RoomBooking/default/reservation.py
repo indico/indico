@@ -31,6 +31,7 @@ from MaKaC.rb_location import CrossLocationQueries
 from MaKaC.plugins.RoomBooking.default.factory import Factory
 
 from datetime import datetime
+from MaKaC.common.logger import Logger
 
 # Branch name in ZODB root
 _RESERVATIONS = 'Reservations'
@@ -39,19 +40,19 @@ _USER_RESERVATIONS_INDEX = 'UserReservationsIndex'
 _DAY_RESERVATIONS_INDEX = 'DayReservationsIndex'
 
 class Reservation( Persistent, ReservationBase ):
-    """ 
-    ZODB specific implementation. 
-    
+    """
+    ZODB specific implementation.
+
     For documentation of methods see base class.
     """
-    
+
     __dalManager = Factory.getDALManager()
 
     def __init__( self ):
         ReservationBase.__init__( self )
         self._excludedDays = []
         self.useVC = []
-    
+
     def getUseVC( self ):
         try:
             return self.useVC
@@ -74,7 +75,7 @@ class Reservation( Persistent, ReservationBase ):
     @staticmethod
     def getDayReservationsIndexRoot( ):
         return Reservation.__dalManager.getRoot(_DAY_RESERVATIONS_INDEX)
-    
+
     def insert( self ):
         """ Documentation in base class. """
         ReservationBase.insert( self )
@@ -89,7 +90,7 @@ class Reservation( Persistent, ReservationBase ):
                 self.id = 1 # Can not use maxKey for 1st record in a tree
         # Add self to the BTree
         resvBTree[self.id] = self
-        
+
         # Update room => room reservations index
         roomReservationsIndexBTree = Reservation.getRoomReservationsIndexRoot()
         resvs = roomReservationsIndexBTree.get( self.room.id )
@@ -107,10 +108,10 @@ class Reservation( Persistent, ReservationBase ):
             userReservationsIndexBTree.insert( self.createdBy, resvs )
         resvs.append( self )
         userReservationsIndexBTree[self.createdBy] = resvs
-        
+
         # Update day => reservations index
         self._addToDayReservationsIndex()
-    
+
     def update( self, udpateReservationIndex=True ):
         """ Documentation in base class. """
         ReservationBase.update( self )
@@ -119,16 +120,16 @@ class Reservation( Persistent, ReservationBase ):
             self._addToDayReservationsIndex()
             self._p_changed = True
 
-        # Warning: 
+        # Warning:
         # createdBy, once assigned to rerservation, CAN NOT be changed later (index!)
         # room, once assigned to reservation, CAN NOT be changed later (index!)
-        
-        
+
+
     def remove( self ):
         """ Documentation in base class. """
         resvBTree = Reservation.getReservationsRoot()
         del resvBTree[self.id]
-        
+
         # Update room => room reservations index
         roomReservationsIndexBTree = Reservation.getRoomReservationsIndexRoot()
         resvs = roomReservationsIndexBTree[self.room.id] # must exist
@@ -139,14 +140,14 @@ class Reservation( Persistent, ReservationBase ):
         userReservationsIndexBTree = Reservation.getUserReservationsIndexRoot()
         resvs = userReservationsIndexBTree[self.createdBy] # must exist
         resvs.remove( self )
-        userReservationsIndexBTree[self.createdBy] = resvs 
+        userReservationsIndexBTree[self.createdBy] = resvs
 
         # Update day => reservations index
         self._removeFromDayReservationsIndex()
 
     def _addToDayReservationsIndex( self ):
         dayReservationsIndexBTree = Reservation.getDayReservationsIndexRoot()
-        
+
         for period in self.splitToPeriods():
             day = period.startDT.date()
             resvs = dayReservationsIndexBTree.get( day )
@@ -159,18 +160,18 @@ class Reservation( Persistent, ReservationBase ):
     def _removeFromDayReservationsIndex( self ):
         dayReservationsIndexBTree = Reservation.getDayReservationsIndexRoot()
 
-        # Search for self in the whole index 
+        # Search for self in the whole index
         # (the key may have changed)
         days = []
         for day, resvs in dayReservationsIndexBTree.iteritems():
             if self in resvs:
                 days.append( day )
-        
+
         for day in days:
             resvs = dayReservationsIndexBTree[day]
             resvs.remove( self )
             dayReservationsIndexBTree[day] = resvs
-    
+
 
     @staticmethod
     def getReservations( *args, **kwargs ):
@@ -184,14 +185,14 @@ class Reservation( Persistent, ReservationBase ):
         heavy = kwargs.get( 'heavy' )
         location = kwargs.get( 'location' )
         days = kwargs.get( 'days' )
-        
+
         ret_lst = []
         counter = 0
         root = Factory.getDALManager().root
-        
+
         if resvID != None:
             return root[_RESERVATIONS].get( resvID )
-        
+
         resvCandidates = None
 
         alreadyRoomFiltered = False
@@ -205,7 +206,7 @@ class Reservation( Persistent, ReservationBase ):
                 if roomResvs != None:
                     resvCandidates += roomResvs
             alreadyRoomFiltered = True
-        
+
         if resvCandidates == None and resvEx != None and resvEx.createdBy != None:
             resvCandidates = Reservation.getUserReservationsIndexRoot().get( resvEx.createdBy )
             if resvCandidates == None:
@@ -227,17 +228,17 @@ class Reservation( Persistent, ReservationBase ):
                     if resvsInDays.has_key( resv ):
                         new.append( resv )
                 resvCandidates = new
-    
+
         if resvCandidates == None:
             resvCandidates = Reservation.getReservationsRoot().itervalues()
 
         for resvCandidate in resvCandidates:
-            # Apply all conditions 
+            # Apply all conditions
 
             if archival != None:
                 if resvCandidate.isArchival != archival:
                     continue
-            
+
             if location != None:
                 # If location is specified, use only rooms from this location
                 if not resvCandidate.locationName == location:
@@ -246,7 +247,7 @@ class Reservation( Persistent, ReservationBase ):
             if heavy != None:
                 if resvCandidate.isHeavy != heavy:
                     continue
-                
+
             # Does the reservation overlap on the specified period?
             if resvEx != None:
                 if resvEx.startDT != None and resvEx.endDT != None:
@@ -256,19 +257,19 @@ class Reservation( Persistent, ReservationBase ):
                 if rooms != None and not alreadyRoomFiltered:
                     if resvCandidate.room not in rooms:
                         continue
-                
+
                 if resvEx.createdDT != None:
                     if resvEx.createdDT != resvCandidate.createdDT:
                         continue
-                
+
                 if resvEx.bookedForName != None:
-                    if resvCandidate.bookedForName == None: 
+                    if resvCandidate.bookedForName == None:
                         continue
                     if not containsExactly_OR_containsAny( resvEx.bookedForName, resvCandidate.bookedForName ):
                         continue
-    
+
                 if resvEx.reason != None:
-                    if resvCandidate.reason == None: 
+                    if resvCandidate.reason == None:
                         continue
                     if not containsExactly_OR_containsAny( resvEx.reason, resvCandidate.reason ):
                         continue
@@ -314,19 +315,19 @@ class Reservation( Persistent, ReservationBase ):
                 if resvEx.needsAVCSupport != None:
                     if not resvCandidate.needsAVCSupport == resvEx.needsAVCSupport:
                         continue
-                
+
             # META-PROGRAMMING STYLE OF CHECKING ATTRIBUTES EQUALITY
             # ABANDONED DUE TO PERFORMANCE PROBLEMS
             # Are standard conditions met? (other attributes equality)
             #if not qbeMatch( resvEx, resvCandidate, Reservation.__attrSpecialEqual ):
             #    continue
 
-            
+
             # All conditions are met: add reservation to the results
             counter += 1
             if not countOnly:
                 ret_lst.append( resvCandidate )
-            
+
         #print "Found " + str( counter ) + " reservations."
         if not countOnly: return ret_lst
         else: return counter
@@ -345,21 +346,31 @@ class Reservation( Persistent, ReservationBase ):
         lst = copy( self._excludedDays )
         lst.sort()
         return lst
-    
+
     def setExcludedDays( self, excludedDays ):
         ReservationBase.setExcludedDays( self, excludedDays )
         self._excludedDays = excludedDays
-    
-    def excludeDay( self, dayD ):
+
+    def excludeDay( self, dayD, unindex = False ):
         """
         Inserts dayD into list of excluded days.
         dayD should be of date type (NOT datetime).
         """
         ReservationBase.excludeDay( self, dayD )
-        lst = self._excludedDays 
+        lst = self._excludedDays
         if not dayD in lst:
             lst.append( dayD )
         self._excludedDays = lst  # Force update
+
+        if unindex:
+            dayReservationsIndexBTree = Reservation.getDayReservationsIndexRoot()
+            if dayReservationsIndexBTree.has_key(dayD):
+                try:
+                    resvs = dayReservationsIndexBTree[dayD]
+                    resvs.remove( self )
+                    dayReservationsIndexBTree[dayD] = resvs
+                except ValueError, e:
+                    Logger.get('RoomBooking').debug("excludeDay: Unindexing a day (%s) which is not indexed"%dayD)
 
     def includeDay( self, dayD ):
         """
@@ -367,15 +378,24 @@ class Reservation( Persistent, ReservationBase ):
         dayD should be of date type (not datetime).
         """
         ReservationBase.includeDay( self, dayD )
-        lst = self._excludedDays 
+        lst = self._excludedDays
         lst.remove( dayD )
         self._excludedDays = lst  # Force update
-        
+
+        # Re-indexing that day
+        dayReservationsIndexBTree = Reservation.getDayReservationsIndexRoot()
+        resvs = dayReservationsIndexBTree.get(dayD)
+        if resvs is None:
+            resvs = []
+            dayReservationsIndexBTree.insert( dayD, resvs )
+        resvs.append( self )
+        dayReservationsIndexBTree[dayD] = resvs
+
     def dayIsExcluded( self, dayD ):
         ReservationBase.dayIsExcluded( self, dayD )
         return dayD in self.getExcludedDays()
 
-    # Statistical 
+    # Statistical
 
     @staticmethod
     def getNumberOfReservations( *args, **kwargs ):
@@ -384,7 +404,7 @@ class Reservation( Persistent, ReservationBase ):
         """
         location = kwargs.get( 'location', Location.getDefaultLocation().friendlyName )
         return Reservation.countReservations( location = location )
-        
+
     @staticmethod
     def getNumberOfLiveReservations( *args, **kwargs ):
         """ Documentation in base class. """
@@ -404,7 +424,7 @@ class Reservation( Persistent, ReservationBase ):
         return Reservation.countReservations( archival = True, location = location )
 
     # ==== Private ===================================================
-    
+
     @classmethod
     def __attrSpecialEqual( cls, attrName, attrValExample, attrValCandidate ):
         # Skip checking for now, these must be checked another way
@@ -425,7 +445,7 @@ class Reservation( Persistent, ReservationBase ):
                 for word in words:
                     if word in attrValCandidate.lower():
                         return True
-            
+
         return None
 
     def _getLocationName( self ):
@@ -438,18 +458,18 @@ class Reservation( Persistent, ReservationBase ):
 # ============================================================================
 
 class Test( object ):
-    
+
     dalManager = Factory.getDALManager()
 
     @staticmethod
     def getReservations():
         from MaKaC.rb_room import RoomBase
-        
+
         Test.dalManager.connect()
 
         roomEx = Factory.newRoom()
         roomEx.name = 'TH AMPHITHEATRE'
-        
+
         resvEx = Factory.newReservation()
         resvEx.startDT = datetime( 2006, 12, 01, 10 )
         resvEx.endDT = datetime( 2006, 12, 14, 15 )
@@ -459,22 +479,22 @@ class Test( object ):
         for resv in resvs:
             print "============================="
             print resv
-        
+
         Test.dalManager.disconnect()
 
     @staticmethod
     def getReservations2():
         from MaKaC.rb_room import RoomBase
-        
+
         Test.dalManager.connect()
-        
+
         resvEx = Factory.newReservation()
         resvEx.startDT = datetime( 2006, 12, 01, 10 )
         resvEx.endDT = datetime( 2006, 12, 14, 15 )
         resvEx.repeatability = 0 # Daily
-        
+
         #ReservationBase.getReservations( \
-        #    roomExample = roomEx, 
+        #    roomExample = roomEx,
         #    resvExample = resvEx,
         #    available = True )
 
@@ -501,7 +521,7 @@ class Test( object ):
 
         dayReservationsIndexBTree = OOBTree()
         raise str( dir( dayReservationsIndexBTree ) )
-        
+
         Factory.getDALManager().disconnect()
         DBMgr.getInstance().endRequest()
 
@@ -524,7 +544,7 @@ class Test( object ):
 #            c += 1
 #            if c % 100 == 0:
 #                print c
-        
+
         CrossLocationDB.commit()
         CrossLocationDB.disconnect()
         DBMgr.getInstance().endRequest()
@@ -546,10 +566,10 @@ class Test( object ):
         allResvs = CrossLocationQueries.getReservations( resvExample = resvEx )
         print "There are " + str( len( allResvs ) ) + " resvs and pre-resvs to index..."
         c = 0
-        
+
         root[_ROOM_RESERVATIONS_INDEX] = OOBTree()
         print "Room => Reservations Index branch created"
-        
+
         for resv in allResvs:
             roomReservationsIndexBTree = root[_ROOM_RESERVATIONS_INDEX]
             resvs = roomReservationsIndexBTree.get( resv.room.id )
@@ -561,7 +581,7 @@ class Test( object ):
             c += 1
             if c % 100 == 0:
                 print c
-        
+
         CrossLocationDB.commit()
         CrossLocationDB.disconnect()
         DBMgr.getInstance().endRequest()
@@ -580,7 +600,7 @@ class Test( object ):
         rooms = CrossLocationQueries.getRooms( roomExample = roomEx )
         for r in rooms:
             print r
-            
+
         CrossLocationDB.commit()
         CrossLocationDB.disconnect()
         DBMgr.getInstance().endRequest()

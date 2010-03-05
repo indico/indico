@@ -52,7 +52,7 @@ class DataInt:
     """
         DataInt - main class for an OAI gateway (default: public)
     """
-    
+
     def  __init__(self,XG):
         self.categoryRoot = conference.CategoryManager().getRoot()
         import MaKaC.accessControl as accessControl
@@ -61,8 +61,8 @@ class DataInt:
         self._config = Config.getInstance()
         self._info = HelperMaKaCInfo.getMaKaCInfoInstance()
         self._outGen = outputGenerator(self.OAIuser, self._XMLGen, dataInt=self)
-        
-        self.namespace               = self._config.getOAINameSpace()
+
+        self.namespace               = self._config.getOAINamespace()
         self.iconfNamespace          = self._config.getIconfNamespace()
         self.iconfXSD                = self._config.getIconfXSD()
         self.oai_marcXSD             = self._config.getBaseURL() + "/oai_marc.xsd"
@@ -99,17 +99,17 @@ class DataInt:
 
     def extractPrefixId(self, id):
         m = re.match("(\D)(.*)", id)
-        
+
         if m:
             return m.group(1), m.group(2)
         else:
             return None, None
-    
+
     def objToId(self, obj, separator=[':',':']):
 
         if type(separator) == str:
             separator = [separator]*2
-        
+
         if isinstance(obj, conference.Conference):
             oid = obj.getId()
         elif isinstance(obj, conference.Contribution):
@@ -119,14 +119,14 @@ class DataInt:
         else:
             oid = obj.getId()
         return "%s%s" % (self.getIdPrefix(), oid)
-    
+
     def idToObj(self, origId):
 
         prefix, id = self.extractPrefixId(origId)
 
         if id == None:
             return None
-        
+
         if self.isDeletedItem(origId):
             try:
                 doh = conference.DeletedObjectHolder()
@@ -158,7 +158,7 @@ class DataInt:
             return "idDoesNotExist", None
         else:
             return None, id
-    
+
     def OAIGetDeletedItem(self, identifier, metadataPrefix=None):
         # change object holder
         doh = conference.DeletedObjectHolder()
@@ -168,10 +168,10 @@ class DataInt:
         except:
             return None
 
-    def OAIGetItemList(self, MetadataFormat, set, date_from, date_until):        
+    def OAIGetItemList(self, MetadataFormat, set, date_from, date_until):
 
         Logger.get('oai').debug('OAIGetItemList called')
-        
+
         #Return list of item identifier for the OAI set 'set', modified from 'date_from' until 'date_until' and which can be disseminated with 'MetadataFormat'.
         #self._XMLGen.writeTag("test","conf num:%d" %len(ConferenceHolder()) )
 
@@ -188,7 +188,7 @@ class DataInt:
         if set and not (date_from or date_until):
 
             objList = []
-            
+
             if set[0] == "0":
                 catId = set.split(":")[-1]
                 items = IndexesHolder().getById("category").getItems(catId)
@@ -203,7 +203,7 @@ class DataInt:
                                 objList.append(self.objToId(contrib))
                                 for subContrib in contrib.getSubContributionList():
                                     objList.append(self.objToId(subContrib))
-                                
+
             prefixObjList = objList
         else:
 
@@ -224,7 +224,7 @@ class DataInt:
                     cat = conference.CategoryManager().getById(catId)
 
                     removeList = []
-                    
+
                     for objId in objList:
 
                         # event does not belong to category
@@ -232,10 +232,10 @@ class DataInt:
                             removeList.append(objId)
 
                     for removeId in removeList:
-                        objList.remove(removeId)                
+                        objList.remove(removeId)
                 else:
                     objList = []
-                    
+
                 Logger.get('oai').debug('Done! (%s)' % len(objList))
 
             prefixObjList = []
@@ -244,7 +244,7 @@ class DataInt:
                 prefixObjList.append("%s%s" % (prefix, obj))
 
         return prefixObjList
-    
+
     def OAIGetDeletedItemList(self, MetadataFormat, set, date_from, date_until):
 
         #process deleted event
@@ -273,7 +273,7 @@ class DataInt:
         Logger.get('oai').debug('Fetching all deleted conferences (index)...')
         objList = confIdx.getConferencesIds(date_from, date_until)
         Logger.get('oai').debug('Done!')
-        
+
         if addContrib:
             #Logger.get('oai').debug('Fetching all deleted contributions (index)...')
             objList.extend(contIdx.getContributionsIds(date_from, date_until))
@@ -285,8 +285,8 @@ class DataInt:
                 catId = set.split(":")[-1]
                 cat = conference.CategoryManager().getById(catId)
 
-                removeList = []                
-                
+                removeList = []
+
                 for objId in objList[:]:
 
                     obj = self.idToObj(prefix+objId)
@@ -295,10 +295,10 @@ class DataInt:
                         catPath = obj.getCategoryPath()
                     else:
                         catPath = obj.getConference().getCategoriesPath()
-                    
+
                     if not cat in catPath:
                         removeList.append(objId)
-                        
+
                 for removeId in removeList:
                     objList.remove(removeId)
 
@@ -313,7 +313,7 @@ class DataInt:
             prefixRet.append("%s%s" % (prefix, obj))
 
         return prefixRet
-    
+
     def isDeletedItem(self, origId):
         """
         returns True if the item was deleted from the visible index
@@ -325,7 +325,7 @@ class DataInt:
 
 
         prefix, id = self.extractPrefixId(origId)
-        
+
         doh = conference.DeletedObjectHolder()
 
         # if it's in the deleted object holder
@@ -344,7 +344,7 @@ class DataInt:
         if len(id.split(":")) > 1:
             # contribution or subcontribution
             return id in self.getInvisibleContributionIndex().getContributionsIds(None,None)
-            
+
         else:
             # conference
             return id in self.getInvisibleConferenceIndex().getConferencesIds(None,None)
@@ -378,9 +378,9 @@ class DataInt:
             obj = self.idToObj(item)
         date = obj.getOAIModificationDate()
         return string.zfill(date.year,4) + "-" + string.zfill(date.month,2) + "-" + string.zfill(date.day,2)
-        
-        
-        
+
+
+
 
 
     def getRepositoryIdentifier(self):
@@ -407,7 +407,7 @@ class DataInt:
         #recursive function to list the category
         #if category has conference, return
         #else, call recursive in sub-category
-        if len(cat.getSubCategoryList())==0: # 
+        if len(cat.getSubCategoryList())==0: #
 #        if len(cat.getConferenceList())>0:   # to add only categories with conference
             out=list
             if path == "":
@@ -469,7 +469,7 @@ class DataInt:
     def getMetadataList(self,ID=None):
         #return a list as [["MetadataPrefix","schema","nameSpace",self.method_to_call ],[...]]
         #if ID is given, then return the list of metadata supported by this element
-        
+
         if ID:
             ##get the confId and the contribId if there is one
             #id = ID[int(len("oai:" + self.namespace + ":")):]
@@ -485,7 +485,7 @@ class DataInt:
             #if idContrib:
             #    cont = conf.getContributionById(idContrib)
             err, obj = self.OAIGetItem(ID)
-            
+
             #raise "%s  %s    %s"%(err, obj, ID)
             if err:
                 return "idDoesNotExist", None
@@ -505,8 +505,8 @@ class DataInt:
                 ["oai_dc", "http://www.openarchives.org/OAI/2.0/oai_dc.xsd", "http://www.openarchives.org/OAI/2.0/oai_dc/", self.toXMLDC], \
                 ["dc", "http://www.openarchives.org/OAI/2.0/oai_dc.xsd", "http://www.openarchives.org/OAI/2.0/oai_dc/", self.toXMLDC], \
                 ["marcxml",self.oai_marcXSD,self.iconfNamespace,self.toMarc]]
-            
-            
+
+
 
     def toMarc(self,obj, out=None):
         if not out:
@@ -518,7 +518,7 @@ class DataInt:
         elif isinstance(obj, conference.SubContribution):
             return self.subContToXMLMarc(obj, out=out)
         raise "unknown object type"
-    
+
     def confToXMLMarc(self,obj, out=None):
         if not out:
             out = self._XMLGen
@@ -526,14 +526,14 @@ class DataInt:
         out.openTag("marc:record", [["xmlns:marc","http://www.loc.gov/MARC21/slim"],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation", "http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"]])
         self._outGen.confToXMLMarc21(obj, out=out)
         out.closeTag("marc:record")
-    
+
     def sessionToXMLMarc(self,obj, out=None):
         if not out:
             out = self._XMLGen
         out.openTag("marc:record", [["xmlns:marc","http://www.loc.gov/MARC21/slim"],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation", "http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"]])
         self._outGen.sessionToXMLMarc21(obj, out=out)
         out.closeTag("marc:record")
-        
+
     def contToXMLMarc(self,obj, out=None):
         if not out:
             out = self._XMLGen
@@ -541,7 +541,7 @@ class DataInt:
         out.openTag("marc:record", [["xmlns:marc", "http://www.loc.gov/MARC21/slim"],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation", "http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"]])
         self._outGen.contribToXMLMarc21(obj, out=out)
         out.closeTag("marc:record")
-    
+
     def subContToXMLMarc(self,obj, out=None):
         if not out:
             out = self._XMLGen
@@ -549,7 +549,7 @@ class DataInt:
         out.openTag("marc:record", [["xmlns:marc", "http://www.loc.gov/MARC21/slim"],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation", "http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"]])
         self._outGen.subContribToXMLMarc21(obj, out=out)
         out.closeTag("marc:record")
-    
+
     #Write here methods for build metadata (!!always using built-in methods!!)
     def toXMLDC(self, obj, out=None):
         if not out:
@@ -561,7 +561,7 @@ class DataInt:
         elif isinstance(obj, conference.SubContribution):
             return self.subContToXMLDC(obj, out=out)
         raise "Unknown object type: %s id=%s"%(obj, obj.getId())
-    
+
     def subContToXMLDC(self, subCont, out=None):
         if not out:
             out = self._XMLGen
@@ -573,7 +573,7 @@ class DataInt:
         if subCont.getContribution().startDate:
             out.writeTag("dc:date","%d-%s-%s" %(subCont.getContribution().startDate.year, string.zfill(subCont.getContribution().startDate.month,2), string.zfill(subCont.getContribution().startDate.day,2)))
         out.closeTag("oai_dc:dc")
-    
+
     def contToXMLDC(self, cont, out=None):
         if not out:
             out = self._XMLGen
@@ -596,7 +596,7 @@ class DataInt:
         out.writeTag("dc:description",conf.description)
         out.writeTag("dc:date","%d-%s-%s" %(conf.startDate.year, string.zfill(conf.startDate.month,2), string.zfill(conf.startDate.day,2)))
         out.closeTag("oai_dc:dc")
-        
+
     def confToXML(self,conf,includeSession=1,includeContribution=1,includeMaterial=1, out=None):
         if not out:
             out = self._XMLGen
@@ -604,7 +604,7 @@ class DataInt:
         out.openTag("iconf",[["xmlns",self.iconfNamespace],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation", self.iconfNamespace + " " + self.iconfXSD]])
         self._outGen.confToXML(conf, includeSession, includeContribution, includeMaterial, out=out)
         out.closeTag("iconf")
-    
+
     def get_earliest_datestamp(self):
         ih = IndexesHolder()
         date = []
@@ -636,7 +636,7 @@ class PrivateDataInt(DataInt):
         """
 
         return "r"
-    
+
     def targetIsVisible(self, target):
         return target.hasAnyProtection()
 
@@ -660,7 +660,7 @@ class PrivateDataInt(DataInt):
         return True
 
 class OAIResponse:
-    
+
     _accessURL = "oai.py"
 
     @classmethod
@@ -681,11 +681,11 @@ class OAIResponse:
         else:
             # DataInt should only display public events
             self._DataInt = DataInt(self._XMLGen)
-        
+
         self._config = Config.getInstance()
-        
-        ## OAI config variables    
-        
+
+        ## OAI config variables
+
         self.nb_records_in_resume     = self._config.getNbRecordsInResume()
         self.nb_identifiers_in_resume = self._config.getNbIdentifiersInResume()
         self.oai_rt_expire            = self._config.getOAIRtExpire()
@@ -694,7 +694,7 @@ class OAIResponse:
     def print_oai_header(self,verb,params={}):
         #Print OAI header
         self._XMLGen.openTag("OAI-PMH",[["xmlns","http://www.openarchives.org/OAI/2.0/"],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation","http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd"]])
-    
+
         self._XMLGen.writeTag("responseDate",self.OAIGetResponseDate())
         if verb:
             list=[["verb",verb]]
@@ -706,21 +706,21 @@ class OAIResponse:
             self._XMLGen.openTag(verb)
         else:
             self._XMLGen.writeTag("request", self.OAIGetRequestURL())
-    
+
     def getHostName(self):
         return self.__hostname
 
     def getURI(self):
         return self.__uri
-    
+
     def print_oai_footer(self, verb):
         "Print OAI footer"
-    
+
         if verb:
             self._XMLGen.closeTag(verb)
         self._XMLGen.closeTag("OAI-PMH")
-    
-    
+
+
     def print_record(self, sysno, format='oai_dc', out=None):
         if not out:
             out = self._XMLGen
@@ -731,27 +731,27 @@ class OAIResponse:
         if self._DataInt.isDeletedItem(self._DataInt.objToId(sysno)):
             self.print_deleted_record(sysno, out)
             return
-        
+
         out.openTag("record")
         out.openTag("header")
-        out.writeTag("identifier","oai:" + self._DataInt.namespace + ":" + self._DataInt.getIdPrefix() + self._DataInt.getItemId(sysno)) 
+        out.writeTag("identifier","oai:" + self._DataInt.namespace + ":" + self._DataInt.getIdPrefix() + self._DataInt.getItemId(sysno))
         out.writeTag("datestamp", self._DataInt.get_modification_date(sysno))
         for set in self._DataInt.getItemSetList(sysno):
             out.writeTag("setSpec", self._DataInt.getSetSpec(set))
         out.closeTag("header")
         out.openTag("metadata")
-        
 
-        
+
+
         for i in self._DataInt.getMetadataList()[1]:
             if i[0] == format:
                 i[3](sysno, out=out)
-        
-            
-            
+
+
+
         out.closeTag("metadata")
         out.closeTag("record")
-    
+
     def print_deleted_record(self, sysno, out=None):
         if not out:
             out = self._XMLGen
@@ -759,22 +759,22 @@ class OAIResponse:
 
         out.openTag("record")
         out.openTag("header", [["status","deleted"]])
-        out.writeTag("identifier","oai:" + self._DataInt.namespace + ":" + self._DataInt.getIdPrefix() + self._DataInt.getItemId(sysno)) 
+        out.writeTag("identifier","oai:" + self._DataInt.namespace + ":" + self._DataInt.getIdPrefix() + self._DataInt.getItemId(sysno))
         out.writeTag("datestamp", self._DataInt.get_modification_date(sysno))
         for set in self._DataInt.getItemSetList(sysno):
             out.writeTag("setSpec", self._DataInt.getSetSpec(set))
         out.closeTag("header")
         out.closeTag("record")
 
-    
+
     def isDate(self, date):
         #date format must be "yyyy-mm-dd"
         if not len(date) == len("yyyy-mm-dd"):
             return False
-        
+
         if date[4] != "-" or date[7] != "-":
             return False
-        
+
         try:
             int(date[0:4])
             int(date[5:7])
@@ -782,23 +782,23 @@ class OAIResponse:
             return True
         except:
             return False
-            
-    
-    
+
+
+
     def oaiResponseMaker(self,param):
         "Main function which analyses the request and invokes search corresponding to an OAI verb"
-    
-       
+
+
         self._XMLGen.initXml()
-        
-        
-    
+
+
+
         if param.has_key('verb'):
             verb = param['verb']#.value #value method is use only with CGI interface or with a file type parameter with modpython
             if isinstance(verb, list):
                 self.oai_error("badArgument","multiple verb")
                 return self._XMLGen.getXml()
-            
+
             if param.has_key('metadataPrefix'):
                 metadataPrefix = param['metadataPrefix']#.value
                 if isinstance(metadataPrefix, list):
@@ -806,31 +806,31 @@ class OAIResponse:
                     return self._XMLGen.getXml()
             else:
                 metadataPrefix = ""
-            
+
             if param.has_key('from'):
                 fromDate = param['from']#.value
                 if isinstance(fromDate, list):
                     self.oai_error("badArgument","multiple from")
                     return self._XMLGen.getXml()
-                
+
                 if not self.isDate(fromDate):
                     self.oai_error("badArgument","from: invalid date")
                     return self._XMLGen.getXml()
             else:
                 fromDate = ""
-            
+
             if param.has_key('until'):
                 untilDate = param['until']#.value
                 if isinstance(untilDate, list):
                     self.oai_error("badArgument","multiple until")
                     return self._XMLGen.getXml()
-                
+
                 if not self.isDate(untilDate):
                     self.oai_error("badArgument","until: invalid date")
                     return self._XMLGen.getXml()
             else:
                 untilDate = ""
-            
+
             if param.has_key('set'):
                 set = param['set']#.value
                 if isinstance(set, list):
@@ -838,7 +838,7 @@ class OAIResponse:
                     return self._XMLGen.getXml()
             else:
                 set = ""
-            
+
             if param.has_key('identifier'):
                 identifier = param['identifier']#.value
                 if isinstance(identifier, list):
@@ -846,7 +846,7 @@ class OAIResponse:
                     return self._XMLGen.getXml()
             else:
                 identifier = ""
-            
+
             if param.has_key('resumptionToken'):
                 #resumptionToken exclusive
                 if len(param) == 2:
@@ -859,16 +859,16 @@ class OAIResponse:
                     return self._XMLGen.getXml()
             else:
                 resumptionToken = ""
-    
+
             if verb == "Identify":
                 if len(param) == 1:
                     self.OAIIdentify()
                 else:
                     self.oai_error("badArgument","The request includes illegal arguments")
-            
+
             elif verb == "ListMetadataFormats":
                 self.OAIListMetadataFormats(identifier,resumptionToken)
-            
+
             elif verb == "ListRecords":
                 flag = 0
                 err, metaList = self._DataInt.getMetadataList(identifier)
@@ -885,7 +885,7 @@ class OAIResponse:
                             self.oai_error("cannotDisseminateFormat","invalid metadataPrefix")
                 else:
                     self.oai_error(err,"invalid record Identifier")
-            
+
             elif verb == "ListIdentifiers":
                 flag = 0
                 err, metaList = self._DataInt.getMetadataList(identifier)
@@ -902,7 +902,7 @@ class OAIResponse:
                             self.oai_error("cannotDisseminateFormat","invalid metadataPrefix")
                 else:
                     self.oai_error(err,"invalid record Identifier")
-            
+
             elif verb == "GetRecord":
                 if identifier:
                     flag = 0
@@ -922,26 +922,26 @@ class OAIResponse:
                         self.oai_error(err,"invalid record Identifier")
                 else:
                     self.oai_error("badArgument","Record Identifier Missing")
-            
+
             elif verb == "ListSets":
                 if (((len(param)) > 2 ) or ((len(param) == 2) and (resumptionToken == ""))):
                     self.oai_error("badArgument","The request includes illegal arguments")
                 self.OAIListSets(resumptionToken)
-            
+
             else:
                 self.oai_error("badVerb","Illegal OAI verb")
         else:
             self.oai_error("badVerb","Illegal OAI verb")
         return self._XMLGen.getXml()
-    
-    
+
+
     def OAIListMetadataFormats(self, identifier,resumptionToken):
         "Generates response to OAIListMetadataFormats verb."
-    
-        
-        
+
+
+
         err, list = self._DataInt.getMetadataList(identifier)
-            
+
         if err:
             self.oai_error(err,"invalid record Identifier")
         else:
@@ -953,17 +953,17 @@ class OAIResponse:
                 self._XMLGen.writeTag("metadataNamespace",meta[2])
                 self._XMLGen.closeTag("metadataFormat")
             self.print_oai_footer("ListMetadataFormats")
-        
-    
+
+
     def OAIListRecords(self, fromDate,untilDate,set,metadataPrefix,resumptionToken):
         "Generates response to OAIListRecords verb."
 
 
         Logger.get('oai').debug('Listing all records...')
-    
+
         sysnos = []
         sysno = []
-    
+
 
         # check if the resumptionToken did not expire
         if resumptionToken:
@@ -971,7 +971,7 @@ class OAIResponse:
             if os.path.exists(filename) == 0:
                 self.oai_error("badResumptionToken","ResumptionToken expired")
                 return
-        
+
         if resumptionToken:
             Logger.get('oai').debug('Resuming %s' % resumptionToken)
             sysno = self.OAICacheOut(resumptionToken)
@@ -979,7 +979,7 @@ class OAIResponse:
             metadataPrefix = sysno.pop()
             #XML of record is already generated
             self.print_oai_header("ListRecords",{'fromDate':fromDate,"untilDate":untilDate,'set':set,'metadataPrefix':metadataPrefix,'resumptionToken':resumptionToken})
-            
+
             sysnos = sysno[:self.nb_identifiers_in_resume]
             sysno = sysno[self.nb_identifiers_in_resume:]
 
@@ -988,7 +988,7 @@ class OAIResponse:
             for s in sysnos:
                 if s:
                     self.print_record(self._DataInt.idToObj(s.replace('.',':')), metadataPrefix)
-            
+
             if sysno:
                 resumptionToken = self.OAIGenResumptionToken()
                 extdate = self.OAIGetResponseDate(self.oai_rt_expire)
@@ -998,7 +998,7 @@ class OAIResponse:
                     self._XMLGen.writeTag("resumptionToken",resumptionToken)
                 self.OAICacheClean()
                 sysno.append(metadataPrefix)
-                
+
                 Logger.get('oai').debug('Caching in resumption token %s...' % resumptionToken)
                 self.OAICacheIn(resumptionToken,sysno)
                 Logger.get('oai').debug('Done!')
@@ -1016,14 +1016,14 @@ class OAIResponse:
             deletedItems = self._DataInt.OAIGetDeletedItemList(metadataPrefix, set, fromDate, untilDate)
 
             Logger.get('oai').debug('%s deleted items: %s' % (len(deletedItems), deletedItems))
-            
+
             sysno.extend(deletedItems)
 
 
             Logger.get('oai').debug('Done!')
 
             Logger.get('oai').debug('%s objects will be returned' % len(sysno))
-            
+
             if len(sysno) == 0: # noRecordsMatch error
                 self.oai_error("noRecordsMatch","no records correspond to the request")
             else:
@@ -1037,7 +1037,7 @@ class OAIResponse:
                         self.print_record(obj, metadataPrefix)
                     else:
                         Logger.get('oai').warning('An empty record was generated!')
-                
+
                 if sysno:
                     resumptionToken = self.OAIGenResumptionToken()
                     extdate = self.OAIGetResponseDate(self.oai_rt_expire)
@@ -1049,22 +1049,22 @@ class OAIResponse:
                     sysno.append(metadataPrefix)
                     self.OAICacheIn(resumptionToken,sysno)
                 self.print_oai_footer("ListRecords")
-        
+
     def OAIListSets(self, resumptionToken):
         "Lists available sets for OAI metadata harvesting."
-    
+
         # todo: flow control in ListSets
-        
+
         self.print_oai_header("ListSets",{'resumptionToken':resumptionToken})
-    
+
         sets = self._DataInt.get_sets()
-    
+
         for s in sets:
-    
+
             self._XMLGen.openTag("set")
             self._XMLGen.writeTag("setSpec", s[0])
             self._XMLGen.writeTag("setName", s[1])
-            
+
             for se in s[2]:
                 if se:
                     self._XMLGen.openTag("setDescription")
@@ -1074,15 +1074,15 @@ class OAIResponse:
                     self._XMLGen.closeTag("setDescription")
                     #self._XMLGen.writeTag("setDescription",se)
             self._XMLGen.closeTag("set")
-    
+
         self.print_oai_footer("ListSets")
-        
+
     def OAIGetRecord(self, identifier, metadataPrefix):
         """Returns record 'identifier' according to 'metadataPrefix' format for OAI metadata harvesting."""
-        
+
         err, sysno = self._DataInt.OAIGetItem(identifier)
-        
-            
+
+
         if not err and sysno:
             #datestamp = self.get_modification_date(sysno)
             self.print_oai_header("GetRecord",{'identifier':identifier,'metadataPrefix':metadataPrefix})
@@ -1093,33 +1093,33 @@ class OAIResponse:
                 self.oai_error("cannotDisseminateFormat","This record cannot be disseminated with this format")
             else:
                 self.oai_error("idDoesNotExist","invalid record Identifier")
-            
-    
-        
-    
+
+
+
+
     def OAIListIdentifiers(self, metadataPrefix, fromDate,untilDate,set,resumptionToken):
         "Prints OAI response to the ListIdentifiers verb."
 
-    
+
         sysno = []
         sysnos = []
-    
+
         if resumptionToken:
             filename = "%s/RTdata/%s" % (self.runtimelogdir, resumptionToken)
             if os.path.exists(filename) == 0:
                 self.oai_error("badResumptionToken","ResumptionToken expired")
                 return
-    
+
         if resumptionToken:
             #sysnos = self.OAICacheOut(resumptionToken)
             sysno = self.OAICacheOut(resumptionToken)
             metadataPrefix = sysno.pop()
             #XML of record is already generated
             self.print_oai_header("ListIdentifiers",{'fromDate':fromDate,"untilDate":untilDate,'set':set,'metadataPrefix':metadataPrefix,'resumptionToken':resumptionToken})
-            
+
             sysnos = sysno[:self.nb_identifiers_in_resume]
             sysno = sysno[self.nb_identifiers_in_resume:]
-            
+
             for s in sysnos:
                 if s:
                     if self._DataInt.isDeletedItem(self._DataInt.getItemId(s)):
@@ -1146,7 +1146,7 @@ class OAIResponse:
         else:
             #Generate the xml
             sysno = self._DataInt.OAIGetItemList(metadataPrefix, set, fromDate, untilDate)
-            
+
 
             sysno.extend( self._DataInt.OAIGetDeletedItemList(metadataPrefix, set, fromDate, untilDate))
             if len(sysno) == 0: # noRecordsMatch error
@@ -1167,9 +1167,9 @@ class OAIResponse:
                                 self._XMLGen.writeTag("setSpec", self._DataInt.getSetSpec(set))
                             self._XMLGen.closeTag("header")
                             #self.print_record(self._DataInt.idToObj(s), metadataPrefix)
-                    
-                
-                
+
+
+
                 if sysno:
                     resumptionToken = self.OAIGenResumptionToken()
                     extdate = self.OAIGetResponseDate(self.oai_rt_expire)
@@ -1180,16 +1180,16 @@ class OAIResponse:
                     self.OAICacheClean()
                     sysno.append(metadataPrefix)
                     self.OAICacheIn(resumptionToken,sysno)
-                
+
                 self.print_oai_footer("ListIdentifiers")
             """sysnos = self._DataInt.OAIGetItemList(metadataPrefix, set, fromDate, untilDate)
-    
+
         if len(sysnos) == 0: # noRecordsMatch error
             self.oai_error("noRecordsMatch","no records correspond to the request")
         else:
-    
+
             self.print_oai_header("ListIdentifiers",{'fromDate':fromDate,"untilDate":untilDate,'set':set,'resumptionToken':resumptionToken})
-    
+
             i = 0
             for s in sysnos:
                 if s:
@@ -1210,28 +1210,28 @@ class OAIResponse:
                         for set in self._DataInt.getItemSetList(s):
                             self._XMLGen.writeTag("setSpec", self._DataInt.getSetSpec(set))
                         self._XMLGen.closeTag("header")
-                        
+
             if i > self.nb_identifiers_in_resume:
                 self.OAICacheClean() # clean cache from expired resumptionTokens
                 self.OAICacheIn(resumptionToken,sysno)
-    
+
             self.print_oai_footer("ListIdentifiers")"""
-    
-    
+
+
     def OAIIdentify(self):
         "Generates response to OAIIdentify verb."
-            
+
         responseDate          = self.OAIGetResponseDate()
         requestURL            = self.OAIGetRequestURL()
         baseURL               = "http://" + self.getHostName() + self.getURI()
         protocolVersion       = "2.0"
         adminEmail            = self._DataInt.supportemail
-        
-       
-        
-    
+
+
+
+
         self.print_oai_header("Identify",{})
-    
+
         self._XMLGen.writeTag("repositoryName", self._DataInt.repositoryName)
         self._XMLGen.writeTag("baseURL", baseURL)
         self._XMLGen.writeTag("protocolVersion", protocolVersion)
@@ -1241,12 +1241,12 @@ class OAIResponse:
         self._XMLGen.writeTag("granularity","YYYY-MM-DD")
         #    self._XMLGen.writeTag("compression","")
         self._DataInt.oaiidentifydescription()
-    
+
         self.print_oai_footer("Identify")
-        
+
     def OAIGetRequestURL(self):
         "Generates requestURL tag for OAI."
-    
+
         if os.environ.has_key('SERVER_NAME'):
             server_name = os.environ['SERVER_NAME']
         else:
@@ -1259,56 +1259,56 @@ class OAIResponse:
             script_name = os.environ['SCRIPT_NAME']
         else:
             script_name = ""
-    
+
         requestURL = "http://" + self.getHostName() + self.getURI()
-    
+
         return requestURL
-    
+
     def OAIGetResponseDate(self, delay=0):
         "Generates responseDate tag for OAI."
-        
+
         return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() + delay))
-    
-    
+
+
     def oai_error(self, code, msg):
         "OAI error occured"
 
 
         Logger.get('oai').warning('OAI Error returned - %s: %s' % (code, msg))
-    
+
         self.print_oai_header("",{})
         self._XMLGen.writeTag("error",msg,[["code",code]])
         self.print_oai_footer("")
 
 
 
-    
-    
+
+
     def OAIGenResumptionToken(self):
         "Generates unique ID for resumption token management."
-    
+
         return md5.new(str(time.time())).hexdigest()
-    
-    
+
+
     def OAICacheIn(self, resumptionToken, sysnos):
         "Stores or adds sysnos in cache.  Input is a string of sysnos separated by commas."
-    
+
         filename = "%s/RTdata/%s" % (self.runtimelogdir, resumptionToken)
-    
+
         fil = open(filename,"w")
-        
+
         cPickle.dump(sysnos,fil)
         fil.close()
         return 1
-    
-    
+
+
     def OAICacheOut(self, resumptionToken):
         "Restores string of comma-separated system numbers from cache."
-        
+
         sysnos = []
-    
+
         filename = "%s/RTdata/%s" % (self.runtimelogdir, resumptionToken)
-    
+
         if self.OAICacheStatus(resumptionToken):
             fil = open(filename,"r")
             sysnos = cPickle.load(fil)
@@ -1316,27 +1316,27 @@ class OAIResponse:
         else:
             return 0
         return sysnos
-    
+
     def OAICacheClean(self):
         "Removes cached resumptionTokens older than specified"
-        
+
         directory = "%s/RTdata" % self.runtimelogdir
-    
+
         files = os.listdir(directory)
-    
+
         for f in files:
             filename = directory + "/" + f
             # cache entry expires when not modified during a specified period of time
             if ((time.time() - os.path.getmtime(filename)) > self.oai_rt_expire):
                 os.remove(filename)
-    
+
         return 1
-    
+
     def OAICacheStatus(self, resumptionToken):
         "Checks cache status.  Returns 0 for empty, 1 for full."
-        
+
         filename = "%s/RTdata/%s" % (self.runtimelogdir, resumptionToken)
-        
+
         if os.path.exists(filename):
             if os.path.getsize(filename) > 0:
                 return 1
@@ -1344,7 +1344,7 @@ class OAIResponse:
                 return 0
         else:
             return 0
-    
+
     def get_earliest_datestamp(self):
         "Returns earliest datestamp"
         date = self._DataInt.get_earliest_datestamp()
@@ -1353,7 +1353,7 @@ class OAIResponse:
             n=nowutc().astimezone(timezone(tz))
             return string.zfill(n.year,4) + "-" + string.zfill(n.month,2) + "-" + string.zfill(n.day,2)
         return date
-    
+
 def oai(verb="Identify", metadataPrefix="", fr="", until="",set="",identifier="",resumptionToken=""):
     #function called by modPython
     start = datetime.now()
@@ -1374,7 +1374,7 @@ def oai(verb="Identify", metadataPrefix="", fr="", until="",set="",identifier=""
         dict["identifier"] = identifier
     if resumptionToken:
         dict["resumptionToken"] = resumptionToken
-    
+
     response = a.oaiResponseMaker(dict)
     stop = datetime.now()
     #fd = open("/home/bourillo/www/oaiLog/oailog","a")

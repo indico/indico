@@ -1,24 +1,24 @@
 <script type="text/javascript">
 // ---- On Load
     IndicoUI.executeOnLoad(function()
-    {       
-        
+    {
+
         var startDate = IndicoUI.Widgets.Generic.dateField(false,null,['sDay', 'sMonth', 'sYear']);
         $E('sDatePlace').set(startDate);
-            
-        var endDate = IndicoUI.Widgets.Generic.dateField(false,null,['eDay', 'eMonth', 'eYear']); 
+
+        var endDate = IndicoUI.Widgets.Generic.dateField(false,null,['eDay', 'eMonth', 'eYear']);
         $E('eDatePlace').set(endDate);
-        
+
         <% if sDay != '': %>
             startDate.set('<%= sDay %>/<%= sMonth %>/<%= sYear %>');
         <% end %>
-        
+
         <% if eDay != '': %>
             endDate.set('<%= eDay %>/<%= eMonth %>/<%= eYear %>');
-        <% end %>   
-       
-     });     
-    
+        <% end %>
+
+     });
+
 </script>
 
 <!-- context help dialogs : start -->
@@ -53,18 +53,18 @@
       <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Start date")%></span></td>
       <td bgcolor="white" width="100%%">
                 <span id="sDatePlace"></span>
-                <input type="hidden" value="<%= sDay %>" name="sDay" id="sDay"/>                                       
+                <input type="hidden" value="<%= sDay %>" name="sDay" id="sDay"/>
                 <input type="hidden" value="<%= sMonth %>" name="sMonth" id="sMonth"/>
-                <input type="hidden" value="<%= sYear %>" name="sYear" id="sYear"/>                        
+                <input type="hidden" value="<%= sYear %>" name="sYear" id="sYear"/>
        </td>
     </tr>
     <tr>
       <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("End date")%></span></td>
       <td bgcolor="white" width="100%%">
                 <span id="eDatePlace"></span>
-                <input type="hidden" value="<%= eDay %>" name="eDay" id="eDay"/>                                       
+                <input type="hidden" value="<%= eDay %>" name="eDay" id="eDay"/>
                 <input type="hidden" value="<%= eMonth %>" name="eMonth" id="eMonth"/>
-                <input type="hidden" value="<%= eYear %>" name="eYear" id="eYear"/>               
+                <input type="hidden" value="<%= eYear %>" name="eYear" id="eYear"/>
       </td>
     </tr>
     <tr>
@@ -86,7 +86,7 @@
       <td class="modifRight"><input type="text" size="50" name="contactInfo" value="<%=contactInfo%>"/></td>
     </tr>
     <tr>
-      <td class="titleCellTD"><span class="titleCellFormat"><%= _("Notifications")%></span></td>
+      <td class="titleCellTD"><span class="titleCellFormat"><%= _("Email notifications")%></span></td>
       <td class="modifRight">
         <table class="notificationEdit">
           <tr>
@@ -148,7 +148,7 @@
         <% contextHelp("anonymousHelp") %>
       </td>
     </tr>
-    
+
     <tr><td>&nbsp;</td></tr>
     <tr>
       <td colspan="2">

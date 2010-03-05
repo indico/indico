@@ -25,7 +25,7 @@
             </select>
           </td>
           <td>
-            <input type="submit" class="btn" value="<- <%= _("add")%><" onClick="if (this.form.addDomain.value=='<%= _("Select:")%>') { return false; } else { this.form.action='%(addURL)s'; }">
+            <input type="submit" class="btn" value="<- <%= _("add")%><" onClick="if (this.form.addDomain.value=='<%= _("Select")%>:') { return false; } else { this.form.action='%(addURL)s'; }">
           </td>
         </tr>
         </table>

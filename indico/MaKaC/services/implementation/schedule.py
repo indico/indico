@@ -9,7 +9,7 @@ import MaKaC.schedule as schedule
 
 from MaKaC.common.PickleJar import DictPickler
 
-from MaKaC.services.interface.rpc.common import ServiceError
+from MaKaC.services.interface.rpc.common import ServiceError, TimingNoReportError
 
 from MaKaC.services.implementation import conference as conferenceServices
 from MaKaC.services.implementation import base
@@ -55,25 +55,20 @@ class LocationSetter:
         location = self._roomInfo.get('location', None)
 
         if location != None:
-            if location.strip()=="":
-                target.setLocation(None)
-            else:
-                loc = target.getOwnLocation()
-                if not loc:
-                    loc = conference.CustomLocation()
-                target.setLocation(loc)
-                loc.setName(location)
-                loc.setAddress(address)
+            loc = target.getOwnLocation()
+            if not loc:
+                loc = conference.CustomLocation()
+            target.setLocation(loc)
+            loc.setName(location)
+            loc.setAddress(address)
+
         #same as for the location
         if room != None:
-            if room.strip()=="":
-                target.setRoom(None)
-            else:
-                r = target.getOwnRoom()
-                if not r:
-                    r = conference.CustomRoom()
-                target.setRoom(r)
-                r.setName(room)
+            r = target.getOwnRoom()
+            if not r:
+                r = conference.CustomRoom()
+            target.setRoom(r)
+            r.setName(room)
 
 class ScheduleOperation:
     def _getAnswer(self):
@@ -83,7 +78,7 @@ class ScheduleOperation:
         try:
             return self._performOperation()
         except TimingError, e:
-            raise ServiceError("ERR-E2", e.getMsg())
+            raise TimingNoReportError("ERR-E2", e.getMsg())
 
     def initializeAutoOps(self):
         ContextManager.set('autoOps',[])
@@ -119,7 +114,7 @@ class ScheduleAddContribution(ScheduleOperation, LocationSetter):
         self._roomInfo = self._pManager.extract("roomInfo", pType=dict, allowEmpty=True)
         self._keywords = self._pManager.extract("keywords", pType=list,
                                           allowEmpty=True)
-        self._boardNumber = self._pManager.extract("boardNumber", pType=str, allowEmpty=True)
+        self._boardNumber = self._pManager.extract("boardNumber", pType=str, allowEmpty=True, defaultValue="")
         self._needsToBeScheduled = self._params.get("schedule", True)
         if self._needsToBeScheduled:
             self._dateTime = self._pManager.extract("startDate", pType=datetime.datetime)
@@ -194,9 +189,8 @@ class ConferenceScheduleAddContribution(ScheduleAddContribution, conferenceServi
         contribution.setParent(self._target)
 
     def _schedule(self, contribution):
-        # 'check' param = 1 - dates will be checked for errors
         if self._needsToBeScheduled:
-            self._target.getSchedule().addEntry(contribution.getSchEntry(),1)
+            self._target.getSchedule().addEntry(contribution.getSchEntry(),2)
 
     def _getSlotEntry(self):
         return None
@@ -229,7 +223,7 @@ class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.Confere
             DictPickler.update(convener, convenerValues)
 
             session.addConvener(convener)
-            if convenerValues['email'].strip() != '':
+            if convenerValues.get('email','').strip() != '':
                 session._addCoordinatorEmail(convenerValues['email'])
             if convenerValues.has_key("submission") and \
                 convenerValues['submission'] :
@@ -267,7 +261,6 @@ class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.Confere
                      "sDate": self._startDateTime,
                      "eDate": self._endDateTime
                      })
-
         conf.addSession(session)
         session.setScheduleType(self._scheduleType)
         session.setTextColor(self._textColor)
@@ -301,11 +294,28 @@ class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.Confere
         pickledData = DictPickler.pickle(schEntry, timezone=conf.getTimezone())
         pickledData['entries'] = {}
 
+        self.initializeFilteringCriteria(session.getId(), schEntry.getSchedule().getOwner().getId())
+
         return {'day': slot.getAdjustedStartDate().strftime("%Y%m%d"),
                 'id': pickledData['id'],
                 'entry': pickledData,
                 'session': DictPickler.pickle(session, timezone=self._conf.getTimezone()),
                 'autoOps': translateAutoOps(self.getAutoOps())}
+
+    def initializeFilteringCriteria(self, sessionId, conferenceId):
+        # Filtering criteria: by default make new session type checked
+        websession = self._getSession()
+        sessionDict = websession.getVar("ContributionFilterConf%s"%conferenceId)
+        if not sessionDict:
+            #Create a new dictionary
+            sessionDict = {}
+        if sessionDict.has_key('sessions'):
+            #Append the new type to the existing list
+            sessionDict['sessions'].append(sessionId)
+            websession._p_changed = 1
+        else:
+            #Create a new entry for the dictionary containing the new type
+            sessionDict['sessions'] = [sessionId]
 
 class ConferenceScheduleDeleteSession(ScheduleOperation, conferenceServices.ConferenceScheduleModifBase):
 
@@ -379,7 +389,6 @@ class ScheduleEditBreakBase(ScheduleOperation, LocationSetter):
                        tz = self._conf.getTimezone())
 
         self._setLocationInfo(self._brk)
-
         self._addToSchedule(self._brk)
 
         pickledDataSlotSchEntry = self._getSlotEntry()

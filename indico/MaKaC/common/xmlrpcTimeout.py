@@ -48,7 +48,10 @@ def getServerWithTimeout(uri, transport=None, encoding=None, verbose=0,
         transport = TransportWithTimeout()
     transport.setTimeout(timeout)
     
-    if sys.version_info[1] < 5: #python 2.4. example version_info: version_info = (2,4,4,'final',0)
-        return xmlrpclib.ServerProxy(uri, transport, encoding, verbose, allow_none)
+    if sys.version_info[0] == 2:
+        if sys.version_info[1] < 5: #python 2.4. example version_info: version_info = (2,4,4,'final',0)
+            return xmlrpclib.ServerProxy(uri, transport, encoding, verbose, allow_none)
+        else:
+            return xmlrpclib.ServerProxy(uri, transport, encoding, verbose, allow_none, use_datetime)
     else:
-        return xmlrpclib.ServerProxy(uri, transport, encoding, verbose, allow_none, use_datetime)
+        raise Exception("This code will probably need fixing with Python 3")

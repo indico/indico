@@ -39,29 +39,29 @@ import MaKaC.common.info as info
 ERROR_PATH = Config.getInstance().getTempDir()
 
 class TemplateExecException( Exception ):
-    
+
     def __init__( self, value ):
         self.value = value
         if hasattr(value, 'template_tracebacks'):
             self.template_tracebacks = value.template_tracebacks
         if hasattr(value, 'problematic_templates'):
             self.problematic_templates = value.problematic_templates
-            
+
     def __str__(self):
         s = str( type(self.value).__name__) + ": " + str(self.value )
         if s[-1] != "}":
 
             if hasattr(self, 'problematic_templates'):
                 s += """ - - - -> {Python code generated from templates is available in %s/%s.tpl.error.py""" % ( ERROR_PATH, self.problematic_templates[0])
-            
+
                 for template_name in self.problematic_templates[1:]:
                     s += ", %s/%s.py"%(ERROR_PATH, template_name)
                 s += " file(s)}"
-                         
+
         return s
 
 def declareTemplate(newTemplateStyle=False):
-    
+
     objDict = globals()['_objDict']
     objDict['newTemplateStyle'] = newTemplateStyle
 
@@ -69,11 +69,11 @@ def includeTpl( tplFileName, *args, **kwargs ):
     """
     Use:
     <% includeTpl( 'TemplateName', paramA = 2, paramB = 3 ) %>
-    """ 
+    """
 
     # Resurrect dictionary from globals - ugly hack.
     # In the recurrent exec, we still need an old dictCopy.
-    # This old dictCopy is resurrected from the global scope. 
+    # This old dictCopy is resurrected from the global scope.
     objDict = globals()['_dictCopy']
     for k, v in kwargs.iteritems():
         objDict[k] = v
@@ -81,9 +81,9 @@ def includeTpl( tplFileName, *args, **kwargs ):
 
     from MaKaC.webinterface import wcomponents
     result = wcomponents.WTemplated(tplFileName).getHTML(objDict)
-    
+
     globals()['_objDict']["newTemplateStyle"] = True
-    
+
     print( result.replace('%', '%%') )
 
 def contextHelp( helpId ):
@@ -92,13 +92,13 @@ def contextHelp( helpId ):
     Help content is defined in <div id="helpId"></div>.
     """
     includeTpl( 'ContextHelp', helpId = helpId, imgSrc = Config.getInstance().getSystemIconURL( "help" ) )
-    
+
 def inlineContextHelp( helpContent ):
     """
     Allows you to put [?], the context help marker.
     Help content passed as argument helpContent.
     """
-    includeTpl( 'InlineContextHelp', helpContent = helpContent, imgSrc = Config.getInstance().getSystemIconURL( "help" ) ) 
+    includeTpl( 'InlineContextHelp', helpContent = helpContent, imgSrc = Config.getInstance().getSystemIconURL( "help" ) )
 
 def escapeAttrVal( s ):
     """
@@ -120,14 +120,14 @@ def escapeAttrVal( s ):
 
 def verbose( s, default = "" ):
     """
-    Purpose: avoid showing "None" to user; show default value instead. 
+    Purpose: avoid showing "None" to user; show default value instead.
     """
     if isinstance( s, bool ) and s != None:
         if s:
             return "yes"
         else:
             return "no"
-    
+
     return s or default
 
 def verbose_dt( dt, default = "" ):
@@ -157,11 +157,11 @@ def quoteattr( s ):
     return quoteattr( s )
 
 def roomClass( room ):
-    if room.isReservable: 
+    if room.isReservable:
         roomClass = ""
-    if not room.isReservable: 
-        roomClass = "privateRoom" 
-    if room.isReservable and room.resvsNeedConfirmation: 
+    if not room.isReservable:
+        roomClass = "privateRoom"
+    if room.isReservable and room.resvsNeedConfirmation:
         roomClass = "moderatedRoom"
     return roomClass
 
@@ -185,18 +185,18 @@ def deepstr(obj):
         However this method does not support objects that are not lists or dictionaries.
         Author: David Martin Clavo
     """
-    
+
     # stringfy objects inside a list
     if isinstance(obj,list):
         for i in range(0, len(obj)):
             obj[i] = deepstr(obj[i])
-            
+
     #stringfy objects inside a dictionary
     if isinstance(obj,dict):
         for k,v in obj.items():
             del obj[k] #we delete the old key
             obj[deepstr(k)] = deepstr(v)
-                
+
     return str(obj)
 
 def beautify(obj, classNames = {"UlClassName": "optionList", "KeyClassName": "optionKey"}, level = 0):
@@ -207,7 +207,7 @@ def beautify(obj, classNames = {"UlClassName": "optionList", "KeyClassName": "op
         supported types are: UlClassName, LiClassName, DivClassName, KeyClassName
         See BeautifulHTMLList.tpl and BeautifulHTMLDict.tpl to see how they are used.
         In the CSS file, you should define classes like: ul.optionList1, ul.optionList2, ul.optionKey1 (the number is the level of recursivity)
-        -level: the level of recursivity. 
+        -level: the level of recursivity.
     """
     from MaKaC.webinterface import wcomponents
     if isinstance(obj,list):
@@ -233,7 +233,7 @@ def truncateTitle(title, maxSize=30):
         return title[:maxSize]+'...'
     else:
         return title
-    
+
 def escapeHTMLForJS(s):
     """ Replaces some restricted characters in JS strings.
         \ -> \\
@@ -246,7 +246,7 @@ def escapeHTMLForJS(s):
         (carriage return) -> \r
         (backspace) -> \b
         (form feed) -> \f
-        
+
         TODO: try to optimize this (or check if it's optimum already).
         translate() doesn't work, because we are replacing characters by couples of characters.
         explore use of regular expressions, or maybe split the string and then join it manually, or just replace them by
@@ -259,31 +259,31 @@ def escapeHTMLForJS(s):
 class TemplateExec:
     """
     Enables template execution.
-    
+
     Template is a string mixing any text (HTML, e-mail, etc.)
     with Python code.
 
     WARNING: certain restrictions apply. See in the end.
 
     Every Python expression put between <%= %> will be EVALUATED
-    and result will be put in place of expression. 
-    
+    and result will be put in place of expression.
+
     Every Python statements put between <% %> will be EXECUTED.
     Standard output (stdout) will be put in place of these statements.
     (so you can do <% print %>)
-    
+
     Every strings put between %()s will be SUBSTITUTED with the
     corresponding value from given dictionary.
-    
+
     Examples of templates:
-    
+
     # Example 1:
     <tr><td> <%= 2 + 5 %> </td> </tr>
-    
+
     # Example 2:
     Hello <%= person.fistName %>!
     Your reservation for <%= period.startDT %> -- <%= period.endDT %> is confirmed.
-    
+
     # Example 3:
     <html>
     <head>
@@ -291,7 +291,7 @@ class TemplateExec:
     </head>
     <body>
         <h1> <%= room.name.capitalize() %> </h1>
-    
+
         <% import os %> <!-- Not necessary here - just to show you can do this -->
         Let's skip odd columns.
         <table>
@@ -299,7 +299,7 @@ class TemplateExec:
                 <tr>
                 <% for column in xrange( 0, 6 ): %>
                     <% if column % 2 == 0: %>
-                        <td style="background-color:lightgray"> Row = <%= row %>, Column = <%= column %> </td> 
+                        <td style="background-color:lightgray"> Row = <%= row %>, Column = <%= column %> </td>
                     <% end %>
                 <% end %>
                 </tr>
@@ -311,23 +311,23 @@ class TemplateExec:
 
     Template is execution context => objects live through the hole template,
     and not only in their <% %> tag.
-    
+
     You can include another templates via includeTpl( 'TemplateName' ).
     The child templates inherit execution context, so all parent objects
-    are available to it.        
+    are available to it.
 
     Restrictions:
     1) There must be no ":" in Python code, in any form, except as block start.
        => you CAN NOT use strings like "foo:goo"
        => you CAN NOT initialize dictionaries dic = { a: 2, b: 3 }
-       => you can write statements like: for i in xrange( 0, 10 ): 
+       => you can write statements like: for i in xrange( 0, 10 ):
     2) You CAN NOT put blok in the same line as statement:
-       => BAD: 
+       => BAD:
           if a == 2: break
           Use instead:
           if a == 2:
               break
-    
+
     These limitations are consequence of Python syntax-by-indentation rules.
     """
 
@@ -343,23 +343,23 @@ class TemplateExec:
         See class description for more info.
 
         Returns resulting string.
-        
+
         tpl - template string
         objDict - context dictionary; insert objects and strings there.
-        """        
+        """
         # IMPLEMENTATION
         # General idea is to convert template into Python code and then execute it.
         # With includeTpl(), these may go recurrent.
-        #global recurrenceLevel 
+        #global recurrenceLevel
         #recurrenceLevel += 1
 
         pythonCode = "import sys\n"   # Template is converted into Python code
         lastIx = 0        # Index of last Python code in template
         indentLevel = 0   # Indentation level
-        
+
         # Copy the dictionary, since it will be modified.
         # We do not want to mess up with the oryginal dict.
-        dictCopy = objDict.copy()        
+        dictCopy = objDict.copy()
 
         TemplateExec.__registerHelpers( dictCopy )
 
@@ -370,21 +370,21 @@ class TemplateExec:
         #if not globals().has_key( '_dictCopy' ):
         globals()['_dictCopy'] = dictCopy
         globals()['_objDict'] = objDict
-        
+
         while True:
             ixSt, ixEnd, type, statement = TemplateExec.__nextPythonCode( tpl, lastIx )
-            
+
             # Human text between Python codes: convert to Python code (print)
             humanText = tpl[lastIx:ixSt]
             if len( humanText.strip() ) > 0:
                 humanText = TemplateExec.__neutralizeLastChar( humanText )
                 pythonCode += '\n%ssys.stdout.write( """%s""" )' % ( TemplateExec.__indent( indentLevel ), humanText )
-            
-            if TemplateExec.__isBlockEnd( statement ): 
+
+            if TemplateExec.__isBlockEnd( statement ):
                 indentLevel -= 1
-            
+
             # Deal with Python code
-            if statement == None: 
+            if statement == None:
                 break
 
             if type == 'Expression':
@@ -395,24 +395,24 @@ class TemplateExec:
             elif not TemplateExec.__isBlockEnd( statement ):
                 pythonCode += "\n%s%s" % ( TemplateExec.__indent( indentLevel ),  statement )
                 # Try to find all trailing ':'  <== OVERSIMPLIFIED
-                indentLevel += statement.count( ':' ) 
+                indentLevel += statement.count( ':' )
             lastIx = ixEnd + 2  # Move after this Python code
 
-        try:            
-            newTpl = TemplateExec.__executePythonCode( pythonCode, dictCopy, tplFilename )            
+        try:
+            newTpl = TemplateExec.__executePythonCode( pythonCode, dictCopy, tplFilename )
         except TemplateExecException, e:
-                
+
             try: open( ERROR_PATH + "/" + tplFilename + ".tpl.py", "w" ).write( pythonCode )
             except: pass
             raise TemplateExecException( e )
-        except Exception, e:            
+        except Exception, e:
             try: open( ERROR_PATH + "/" + tplFilename + ".tpl.error.py", "w" ).write( pythonCode )
             except: pass
             raise TemplateExecException( e )
         #except:
-        #    raise pythonCode        
+        #    raise pythonCode
 
-        
+
         try:
             if (not objDict.has_key( "isIncluded" ) and \
                 not (objDict.has_key("newTemplateStyle") and objDict['newTemplateStyle'])):
@@ -443,7 +443,7 @@ class TemplateExec:
 
         #recurrenceLevel -= 1
 
-        #if recurrenceLevel == 0 and globals().has_key( '_dictCopy' ): 
+        #if recurrenceLevel == 0 and globals().has_key( '_dictCopy' ):
             ## Clean up - we do not want to mess up with global scope
             #global _dictCopy
             #del _dictCopy
@@ -452,7 +452,7 @@ class TemplateExec:
         return newTpl
 
     # PRIVATE ================================================================
-    
+
     @staticmethod
     def __saveDebugInfo(e, tplFilename):
         if hasattr(e, 'template_tracebacks'):
@@ -468,7 +468,7 @@ class TemplateExec:
     @staticmethod
     def __executePythonCode( pythonCode, objDict, tplFilename ):
         global recurrenceLevel
-        # Execute the pythonCode ------------------------- 
+        # Execute the pythonCode -------------------------
 
         # create file-like string to capture output
         codeOut = StringIO.StringIO()
@@ -494,21 +494,21 @@ class TemplateExec:
             TemplateExec.__saveDebugInfo(e, tplFilename)
 
             raise e
-        
+
         sys.stdout = stdoutBackup
         sys.stderr = stderrBackup
-        
+
         newTpl = ""
-        
+
         s = codeErr.getvalue()
         if s: newTpl += "<font color='red'>%s</font>" % s
-        
+
         s = codeOut.getvalue()
         if s: newTpl += s
-        
+
         codeOut.close()
-        codeErr.close()        
-        
+        codeErr.close()
+
         return newTpl
 
     @staticmethod
@@ -581,7 +581,7 @@ class TemplateExec:
                 objDict['roomBookingActive'] = minfo.getRoomBookingModuleActive()
             except:
                 # if the connection to the database is not started, there is no need to set the variable and
-                # we avoid an error report. 
+                # we avoid an error report.
                 # THIS IS NEEDED, when using JSContent. JSContent does not need connection to the database
                 # and this is causing an unexpected exception.
                 pass
@@ -608,7 +608,7 @@ class TemplateExec:
             objDict['beautify'] = beautify
         # allow fossilization
         if not 'fossilize' in objDict:
-            from MaKaC.common import fossilize
+            from MaKaC.common.fossilize import fossilize
             objDict['fossilize'] = fossilize
         #if not 'minfo' in objDict:
         #    objDict['minfo'] = info.HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -629,12 +629,12 @@ class TemplateExec:
         INDENTATION = "    "
         return INDENTATION * n
 
-    @staticmethod        
+    @staticmethod
     def __nextPythonCode( tpl, afterIx ):
         """
         Returns a tuple:
-        ( 
-            start index, 
+        (
+            start index,
             end index,
             type,
             string of the statement
@@ -654,10 +654,10 @@ class TemplateExec:
             type = 'IndentBlock'
             statement = tpl[ixSt + 3 : ixEnd].strip()
         else:
-            type = 'NonIndentBlock'            
+            type = 'NonIndentBlock'
             statement = tpl[ixSt + 2 : ixEnd].strip()
-        
-        
+
+
         return ( ixSt, ixEnd, type, statement )
 
     @staticmethod
@@ -694,7 +694,7 @@ class Test:
             <tr>
             <% for column in xrange( 0, 6 ): %>
                 <% if column % 2 == 0: %>
-                    <td style="background-color:lightgray"> Row = <%= row %>, Column = <%= column %> </td> 
+                    <td style="background-color:lightgray"> Row = <%= row %>, Column = <%= column %> </td>
                 <% end %>
             <% end %>
             </tr>
@@ -704,7 +704,7 @@ class Test:
 </body>
 </html>
 """
-        
+
         dic = {}
         dic['title'] = "Templating example"
         dic['room'] = Warning()

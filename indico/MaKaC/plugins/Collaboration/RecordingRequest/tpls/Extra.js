@@ -17,11 +17,11 @@ var RRSpeakersTemplate = function(speakerList) {
 }
 
 var RRTalkTemplate = function(talk) {
-    
+
     // Checkbox
     var checkBox = Html.input('checkbox', {name: "talkSelection", id: "talk" + talk.id + "CB"});
     checkBox.dom.value = talk.id;
-    
+
     // Start date text
     var talkStartDateText;
     if (exists(talk.startDate)) {
@@ -36,12 +36,12 @@ var RRTalkTemplate = function(talk) {
     } else {
         talkStartDateText = "(Not Scheduled) ";
     }
-        
+
     var talkStartDate = Html.span("RRContributionStartDate", talkStartDateText);
-    
+
     // Title
     var talkName = Html.span("RRContributionName", talk.title);
-    
+
     // Duration
     var duration;
     if (exists(talk.duration)) {
@@ -49,11 +49,11 @@ var RRTalkTemplate = function(talk) {
     } else {
         duration = '';
     }
-    
+
     // We build the label
     var label = Html.label({}, talkStartDate, talkName, duration);
     label.dom.htmlFor = "talk" + talk.id + "CB";
-    
+
     // After the label, the speakers (optionally)
     if (talk.speakerList.length > 0) {
         label.append(Html.span("RRSpeakers", RRSpeakersTemplate(talk.speakerList)))
@@ -68,7 +68,7 @@ var RRTalkTemplate = function(talk) {
     if (exists(talk.room) && trim(talk.room)) {
         contribRoom = trim(talk.room);
     }
-    
+
     if (contribLocation != RR_confLocation || contribRoom != RR_confRoom) {
         if (contribLocation) {
             var locationText = ' (' + contribLocation;
@@ -79,12 +79,12 @@ var RRTalkTemplate = function(talk) {
             label.append(Html.span("RRSpeakers", locationText));
         }
     }
-    
+
     // Finally, the id
     label.append(Html.span("RRContributionId", "(id: " + talk.id + ")"));
-    
-    return Html.li('', checkBox, label);    
-    
+
+    return Html.li('', checkBox, label);
+
 };
 
 var RRUpdateContributionList = function () {
@@ -95,14 +95,16 @@ var RRUpdateContributionList = function () {
             $E('contributionList').append(RRTalkTemplate(contribution));
         }
     } else {
-        $E('contributionList').set(Html.span({style:{paddingLeft: pixels(20)}}, $T("This event has no talks."))); // make this more beautiful
+        if (exists($E('contributionList'))) { // we are not in a lecture
+            $E('contributionList').set(Html.span({style:{paddingLeft: pixels(20)}}, $T("This event has no talks.")));
+        }
     }
 }
 
 var RR_loadTalks = function () {
-    
+
     var fetchContributions = function() {
-        
+
         var talkTemplate = function(talk) {
             var checkBox = Html.input('checkbox', {name: "talkSelection", id: "talk" + talk.id + "CB"});
             checkBox.dom.value = talk.id;
@@ -110,7 +112,7 @@ var RR_loadTalks = function () {
             var talkName = Html.span("RRContributionName", talk.title)
             var label = Html.label({}, talkId, talkName);
             label.dom.htmlFor = "talk" + talk.id + "CB";
-            
+
             if (talk.speakerList.length > 0) {
                 var speakers = ", by "
                 enumerate(talk.speakerList, function(speaker, index) {
@@ -121,7 +123,7 @@ var RR_loadTalks = function () {
                 });
                 label.append(Html.span("RRSpeakers", speakers))
             }
-            
+
             if (exists(talk.location) && trim(talk.location)) {
                 var locationText = ' (' + talk.location;
                 if (exists(talk.room) && trim(talk.room)) {
@@ -130,12 +132,12 @@ var RR_loadTalks = function () {
                 locationText += ')';
                 label.append(Html.span("RRSpeakers", locationText))
             }
-            
+
             return Html.li('', checkBox, label);
         };
-        
+
         var killProgress = IndicoUI.Dialogs.Util.progress($T("Fetching talks, may take a while..."));
-        
+
         indicoRequest('collaboration.pluginService',
                 {
                     plugin: 'RecordingRequest',
@@ -156,10 +158,10 @@ var RR_loadTalks = function () {
             }
         );
     };
-    
+
     if (RR_contributionsLoaded) {
         IndicoUI.Effect.appear($E('contributionsDiv'));
-        
+
     } else {
         fetchContributions();
     }

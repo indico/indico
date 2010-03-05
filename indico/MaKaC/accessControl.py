@@ -23,6 +23,7 @@ import ZODB
 from persistent import Persistent
 
 from MaKaC.common import DBMgr
+from MaKaC.common import info
 import MaKaC
 
 class AccessController( Persistent ):
@@ -164,9 +165,23 @@ class AccessController( Persistent ):
                 return True
         return False
 
+    @classmethod
+    def isHarvesterIP( cls, ip ):
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        ipList = minfo.getOAIPrivateHarvesterList()[:]
+
+        if ip in ipList:
+            # let Private OAI harvesters access protected (display) pages
+            return True
+        else:
+            return False
+
+
     def canIPAccess( self, ip ):
         """
         """
+
+        #Domain protection
         if len(self.getRequiredDomainList())<=0:
             return True
         for domain in self.getRequiredDomainList():

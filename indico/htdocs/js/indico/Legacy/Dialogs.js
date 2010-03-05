@@ -15,6 +15,8 @@ extend(IndicoUI.Dialogs,
                //for the first day in the list, select a time just after the last session/contribution/break
                dateArgs.selectedDay = dayStartDate;
 
+               var killLoadProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
+
                IndicoUtil.waitLoad([
                    function(hook) {
                        // Get "end date" for container, so that the break be added after the rest
@@ -57,6 +59,8 @@ extend(IndicoUI.Dialogs,
                            }
                        });
                    }], function(retValue) {
+
+                       killLoadProgress();
 
                        var submitInfo = function() {
                            each(args, function(value, key) {

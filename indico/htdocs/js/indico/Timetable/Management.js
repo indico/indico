@@ -67,16 +67,20 @@ type("TimetableManagementActions", [], {
         info.set('conference', eventData.conferenceId);
         info.set('sessionTimetable', this.isSessionTimetable);
 
-
         var method = this.methods[type]['delete'];
+
+        var killProgress = IndicoUI.Dialogs.Util.progress($T("Deleting entry..."));
 
         indicoRequest(method, info, function(result, error){
             if (error) {
+                killProgress();
                 IndicoUtil.errorReport(error);
             }else {
 
                 var data = self.timetable.getData();
                 var day = IndicoUtil.formatDate2(IndicoUtil.parseJsonDate(eventData.startDate));
+
+                killProgress();
 
                 if (self.session) {
                     delete data[eventData.id];
@@ -240,9 +244,10 @@ type("TimetableManagementActions", [], {
             } else {
                 var sessions = {};
                 each(this.eventInfo.sessions, function(session, key) {
-                    sessions[session.title] = {};
-                    sessions[session.title].func = function() { self.addSessionSlot(session); };
-                    sessions[session.title].color = self._retrieveSessionColor(session);
+                    sessions[session.id] = {};
+                    sessions[session.id].func = function() { self.addSessionSlot(session); };
+                    sessions[session.id].color = self._retrieveSessionColor(session);
+                    sessions[session.id].title = session.title;
                 });
 
                 var menuu = {
@@ -327,7 +332,6 @@ type("TimetableManagementActions", [], {
         } else {
             params = this._addParams('Contribution');
         }
-
         var dialog = new AddContributionDialog(
             this.methods[params.type].add,
             this.methods[params.parentType].dayEndDate,
@@ -395,7 +399,7 @@ type("TimetableManagementActions", [], {
         args.set('type', params.type);
 
         args.set('startDate', Util.formatDateTime(eventData.startDate, IndicoDateTimeFormats.Server));
-        args.set('roomInfo',$O({"location": eventData.inheritLoc?null:eventData.location,
+        args.set('roomInfo',$O({"location": eventData.inheritLoc?'':eventData.location,
                                 "room": eventData.inheritRoom?null:eventData.room,
                                 "address": eventData.inheritLoc?'':eventData.address}));
 

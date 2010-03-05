@@ -530,5 +530,10 @@ DlgAboutInfo		: "अधिक जानकारी के लिये यह�
 DlgDivGeneralTab	: "सामान्य",
 DlgDivAdvancedTab	: "एड्वान्स्ड",
 DlgDivStyle		: "स्टाइल",
-DlgDivInlineStyle	: "इनलाइन स्टाइल"
+DlgDivInlineStyle	: "इनलाइन स्टाइल",
+
+ScaytTitle			: "SCAYT",	//MISSING
+ScaytTitleOptions	: "Options",	//MISSING
+ScaytTitleLangs		: "Languages",	//MISSING
+ScaytTitleAbout		: "About"	//MISSING
 };

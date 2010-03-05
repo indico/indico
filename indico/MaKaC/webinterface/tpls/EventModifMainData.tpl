@@ -5,29 +5,30 @@
 from MaKaC.fossils.conference import IConferenceMinimalFossil
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 import MaKaC.webinterface.urlHandlers as urlHandlers
+import MaKaC.webinterface.displayMgr as displayMgr
 from xml.sax.saxutils import escape
 
 wr = webFactoryRegistry.WebFactoryRegistry()
 typeList = { "conference" : "conference" }
 for fact in wr.getFactoryList():
     val = fact.getId()
-    
+
     if val == 'simple_event':
         val = 'lecture'
-    
-    typeList[fact.getId()] = val 
+
+    typeList[fact.getId()] = val
 
 visibilityList = {}
 topcat = confObj.getOwnerList()[0]
-level = 0        
+level = 0
 visibilityList[0] = 'Nowhere'
 while topcat:
-    level += 1                        
+    level += 1
     if topcat.getId() != "0":
         from MaKaC.common.TemplateExec import truncateTitle
         visibilityList[level] = truncateTitle(topcat.getName(), 50)
-    topcat = topcat.getOwner()        
-visibilityList[999] = 'Everywhere'     
+    topcat = topcat.getOwner()
+visibilityList[999] = 'Everywhere'
 
 numRows = 11
 
@@ -55,7 +56,7 @@ favoriteRooms = confObj.getFavoriteRooms();
         <span class="dataCaptionFormat"><%= _("Description")%></span>
     </td>
     <td>
-        <div class="blacktext" id="inPlaceEditDescription"><%=description %></span>
+        <div class="blacktext" id="inPlaceEditDescription"><%=description %></div>
     </td>
 </tr>
 <tr>
@@ -105,10 +106,10 @@ favoriteRooms = confObj.getFavoriteRooms();
 <%end%>
 <tr>
     <td class="dataCaptionTD">
-        <span class="dataCaptionFormat"><%= _("Support email")%></span>
+        <span class="dataCaptionFormat"><%= _("Support") %></span>
     </td>
     <td class="blacktext">
-        <span id="inPlaceEditSupportEmail"><%=supportEmail %></span>
+        <span id="inPlaceEditSupport"><%= supportEmail %></span>
     </td>
 </tr>
 <% if evtType == 'lecture':%>
@@ -158,10 +159,10 @@ favoriteRooms = confObj.getFavoriteRooms();
 <tr>
     <% if Config.getInstance().getShortEventURL() != "": %>
       <td class="dataCaptionTD">
-        <span class="dataCaptionFormat"><%= _("Short display URL")%></span>   
-      </td>     
-      <% if shortURL == "" : %>    
-        <td class="blacktext"><em><%= _("There is not any short url yet. Click \"Modify\" to setup.")%></em></td>      
+        <span class="dataCaptionFormat"><%= _("Short display URL")%></span>
+      </td>
+      <% if shortURL == "" : %>
+        <td class="blacktext"><em><%= _("There is not any short url yet. Click \"Modify\" to setup.")%></em></td>
       <% end %>
       <% else : %>
       <td class="blacktext"><%=shortURL%></td>
@@ -232,7 +233,9 @@ var confFossile = <%= jsonEncode(confObj.fossilize(IConferenceMinimalFossil, tz=
 
 <%= macros.genericField(macros.FIELD_TEXT, 'inPlaceEditTitle', 'event.main.changeTitle', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh) %>
 
-<%= macros.genericField(macros.FIELD_TEXT, 'inPlaceEditSupportEmail', 'event.main.changeSupportEmail', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh) %>
+<% dMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(confObj) %>
+
+$E('inPlaceEditSupport').set(new SupportEditWidget('event.main.changeSupport', <%= jsonEncode({'conference': "%s"%conferenceId}) %>, {'caption': "<%= dMgr.getSupportEmailCaption() %>", 'email': confFossile.supportEmail}).draw());
 
 <% if evtType == 'lecture':%>
     <%= macros.genericField(macros.FIELD_TEXT, 'inPlaceEditOrganiserText', 'event.main.changeOrganiserText', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh) %>
@@ -240,7 +243,7 @@ var confFossile = <%= jsonEncode(confObj.fossilize(IConferenceMinimalFossil, tz=
 
 <%  from MaKaC.common import info %>
 
-<%= macros.genericField(macros.FIELD_SELECT, 'inPlaceEditDefaultStyle', 'event.main.changeDefaultStyle', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh, options=info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager().getStylesheetListForEventType(confObj.getType())) %>
+<%= macros.genericField(macros.FIELD_SELECT, 'inPlaceEditDefaultStyle', 'event.main.changeDefaultStyle', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh, options=info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager().getStylesheetDictForEventType(confObj.getType())) %>
 
 <%= macros.genericField(macros.FIELD_SELECT, 'inPlaceEditVisibility', 'event.main.changeVisibility', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh, options=visibilityList) %>
 
@@ -248,7 +251,7 @@ var confFossile = <%= jsonEncode(confObj.fossilize(IConferenceMinimalFossil, tz=
 
 $E('inPlaceEditStartEndDate').set(new StartEndDateWidget('event.main.changeDates', <%= jsonEncode({'conference': "%s"%conferenceId}) %>, {'startDate': confFossile.startDate, 'endDate': confFossile.endDate}).draw());
 
-<%= macros.genericField(macros.FIELD_RICHTEXT, 'inPlaceEditDescription', 'event.main.changeDescription', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh, options=(600,400)) %>
+$E('inPlaceEditDescription').set(new RichTextInlineEditWidget('event.main.changeDescription', <%= jsonEncode({'conference': "%s"%conferenceId}) %>, confFossile.description).draw());
 
 <% if evtType == 'conference':%>
     <%= macros.genericField(macros.FIELD_RICHTEXT, 'inPlaceEditAdditionalInfo', 'event.main.changeAdditionalInfo', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh, options=(400,200)) %>

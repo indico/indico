@@ -27,7 +27,7 @@ which action to carry out in order to handle the request made. This means that
 each of the possible HTTP ports of the system will have a rh which will know 
 what to do depending on the parameter values received, etc.
 """
-import copy, time, os, sys, random
+import copy, time, os, sys, random, re
 import StringIO
 from datetime import datetime, timedelta
 
@@ -46,7 +46,7 @@ from MaKaC.common.general import *
 
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common import DBMgr, Config, security
-from MaKaC.errors import MaKaCError, ModificationError, AccessError, TimingError, ParentTimingError, EntryTimingError, FormValuesError, NoReportError, htmlScriptError, htmlForbiddenTag, ConferenceClosedError
+from MaKaC.errors import MaKaCError, ModificationError, AccessError, TimingError, ParentTimingError, EntryTimingError, FormValuesError, NoReportError, htmlScriptError, htmlForbiddenTag, ConferenceClosedError, HostnameResolveError
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from xml.sax.saxutils import escape
 
@@ -171,17 +171,26 @@ class RH(RequestHandlerBase):
         RH._currentRH = self
     
     # Methods =============================================================
-    
+
     def getHostIP(self):
         import socket
-        hostIP = socket.gethostbyname(str(self._req.get_remote_host(apache.REMOTE_NOLOOKUP)))
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.useProxy():
-            xff = self._req.headers_in.get("X-Forwarded-For",hostIP).split(", ")[-1]
-            return socket.gethostbyname(xff)
-        else:
-            return hostIP
-    
+
+        host = str(self._req.get_remote_host(apache.REMOTE_NOLOOKUP))
+
+        try:
+            hostIP = socket.gethostbyname(host)
+            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+            if minfo.useProxy():
+                # if we're behind a proxy, use X-Forwarded-For
+                xff = self._req.headers_in.get("X-Forwarded-For",hostIP).split(", ")[-1]
+                return socket.gethostbyname(xff)
+            else:
+                return hostIP
+        except socket.gaierror, e:
+            # in case host resolution fails
+            raise HostnameResolveError("Error resolving host '%s' : %s" % (host, e))
+
+
     def getTarget( self ):
         return self._target 
     
@@ -222,6 +231,21 @@ class RH(RequestHandlerBase):
     def getRequestHTTPHeaders( self ):
         return self._req.headers_in
 
+    def _disableCaching(self):
+        """
+        Disables caching, i.e. for materials
+        """
+
+        self._req.headers_out["Pragma"] = "no-cache"
+
+        # IE doesn't seem to like 'no-cache' Cache-Control headers...
+        if (re.match(r'.*MSIE.*', self._req.headers_in["User-Agent"])):
+            self._req.headers_out["Cache-Control"] = "private"
+            self._req.headers_out["Expires"] = "-1"
+        else:
+            self._req.headers_out["Cache-Control"] = "no-store, no-cache, must-revalidate"
+
+
     def _redirect( self, targetURL, noCache=False ):
         """Utility for redirecting the client web browser to the specified
             URL.
@@ -233,18 +257,14 @@ class RH(RequestHandlerBase):
             if "\r" in str(targetURL) or "\n" in str(targetURL):
                 raise MaKaCError(_("http header CRLF injection detected"))
         self._req.headers_out["Location"] = str(targetURL)
-        
+
         if noCache:
-            # Http 1.1
-            self._req.headers_out["Cache-Control"] = "no-store, no-cache, must-revalidate"
-            # Http 1.0
-            self._req.headers_out["Pragma"] = "no-cache"
-        
+            self._disableCaching()
         try:
             self._req.status = apache.HTTP_MOVED_PERMANENTLY
         except NameError:
             pass
-    
+
     def _checkHttpsRedirect(self):
         if self._tohttps and not self._req.is_https():
             current_url = self._req.construct_url(self._req.unparsed_uri)
@@ -305,6 +325,15 @@ class RH(RequestHandlerBase):
         Logger.get('requestHandler').exception('Request %s failed: "%s"\n\nurl: %s\n\nparameters: %s\n\n' % (id(self._req), e,self.getRequestURL(), self._getTruncatedParams()))
         p=errors.WPUnexpectedError(self)
         return p.display()
+
+    def _processHostnameResolveError(self,e):
+        """Unexpected errors
+        """
+
+        Logger.get('requestHandler').exception('Request %s failed: "%s"\n\nurl: %s\n\nparameters: %s\n\n' % (id(self._req), e,self.getRequestURL(), self._getTruncatedParams()))
+        p=errors.WPHostnameResolveError(self)
+        return p.display()
+
     
     def _processAccessError(self,e):
         """Treats access errors occured during the process of a RH.
@@ -446,6 +475,7 @@ class RH(RequestHandlerBase):
                             else:
                                 res = self._process()
                         self._endRequestSpecific2RH( True ) # I.e. implemented by Room Booking request handlers
+
                         DBMgr.getInstance().endRequest( True )
                         Logger.get('requestHandler').info('Request %s successful' % (id(self._req)))
 
@@ -460,11 +490,14 @@ class RH(RequestHandlerBase):
                         #DBMgr.getInstance().endRequest(False)
                         res = self._processError(e)
                 except ConflictError:
+                    import traceback
+                    Logger.get('requestHandler').debug('Conflict in Database! (Request %s)\n%s' % (id(self._req), traceback.format_exc()))
                     self._abortSpecific2RH()
                     DBMgr.getInstance().abort()
                     retry -= 1
                     continue
                 except ClientDisconnected:
+                    Logger.get('requestHandler').debug('Client Disconnected! (Request %s)' % id(self._req) )
                     self._abortSpecific2RH()
                     DBMgr.getInstance().abort()
                     retry -= 1
@@ -473,6 +506,10 @@ class RH(RequestHandlerBase):
         except AccessError, e:
             #Access error treatment
             res = self._processAccessError( e )
+            self._endRequestSpecific2RH( False )
+            DBMgr.getInstance().endRequest(False)
+        except HostnameResolveError, e:
+            res = self._processHostnameResolveError( e )
             self._endRequestSpecific2RH( False )
             DBMgr.getInstance().endRequest(False)
         except ModificationError, e:
@@ -723,13 +760,6 @@ class RHDisplayBaseProtected( RHProtected ):
     
     def _checkProtection( self ):
 
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        ipList = minfo.getOAIPrivateHarvesterList()[:]
-
-        if self.getHostIP() in ipList:
-            # let Private OAI harvesters access protected (display) pages
-            return
-        
         if not self._target.canAccess( self.getAW() ):
             from MaKaC.conference import Link, LocalFile, Category
             if isinstance(self._target,Link) or isinstance(self._target,LocalFile):

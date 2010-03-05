@@ -1,4 +1,3 @@
-var debugVar, debugVar2;
 
 type("AddMaterialDialog", ["ExclusivePopup"], {
 
@@ -16,11 +15,18 @@ type("AddMaterialDialog", ["ExclusivePopup"], {
         // textContent would be more appropriate, but IE...
         var res = Json.read(doc.body.innerHTML);
 
+        var self = this;
+
         if (res.status == "ERROR") {
             IndicoUtil.errorReport(res.info);
         } else {
             this.onUpload(res.info);
-            this.close();
+            // Firefox will keep "loading" if the iframe is destroyed
+            // right now. Let's wait a bit.
+            setTimeout(
+                function() {
+                    self.close();
+                }, 100);
         }
     },
 
@@ -557,12 +563,20 @@ type("ResourceListWidget", ["ListWidget"], {
             labelAndValue('Size',Math.floor(info.get('fileSize')/1024)+ " KB");
             labelAndValue('Creation Date',info.get('creationDate'));
 
+            var filetype = info.get('fileType');
+
             return Html.div(
                 "resourceContainer",
                 Html.div({style: {'float':'left'}},
-                         IndicoUI.Widgets.Generic.remoteIcon(info.get('fileType'))),
-                Html.div({style:{'float': 'left'}},list)
-            );
+                                    Html.img({
+                                        alt: filetype,
+                                        style: {
+                                            width: '20px',
+                                            height: '20px'
+                                        },
+                                        src: imageSrc(Indico.FileTypeIcons[filetype.toLowerCase()])
+                                    }),
+                         Html.div({style:{'float': 'left'}},list)));
         };
 
         var removeButton;
@@ -783,8 +797,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
                 self.set(id,
                          material);
 
-                debugVar = self;
-                debugVar2 = material;
+
             }
         });
     },

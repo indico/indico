@@ -21,6 +21,7 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+  <!-- This template seems to not being used -->
   <xsl:template name="header">
     <td width="60%">
       <xsl:call-template name="displayModifIcons">
@@ -63,7 +64,7 @@
             </xsl:call-template> (<xsl:value-of select="substring(./endDate,12,5)"/>) </b>
             (<xsl:value-of select="substring(./timezone,0,25)"/>) </xsl:otherwise>
       </xsl:choose>
-      <xsl:if test="count(child::location) != 0">
+      <xsl:if test="count(child::location) != 0 and (./location/name !='' or ./location/room !='')">
         <br/>at <b>
           <xsl:apply-templates select="./location">
             <xsl:with-param name="span">author</xsl:with-param>
@@ -276,6 +277,17 @@
               </xsl:call-template>
             </em>
           </xsl:if>
+
+          <xsl:if
+            test="count(./location) != 0 and normalize-space(string(../location)) != normalize-space(string(./location))"
+            >
+            <span style="margin-left: 15px;">(
+            <xsl:apply-templates select="./location">
+              <xsl:with-param name="span"/>
+            </xsl:apply-templates>)</span>
+          </xsl:if>
+
+
       </span>
 
       <xsl:if test="string-length(./abstract) > 1">
@@ -324,12 +336,6 @@
               </td>
             </tr>
           </xsl:if>
-
-          <xsl:if
-            test="count(./location) != 0 and normalize-space(string(../location)) != normalize-space(string(./location))"
-            > (<xsl:apply-templates select="./location">
-              <xsl:with-param name="span"/>
-            </xsl:apply-templates>) </xsl:if>
 
         </tbody>
       </table>
@@ -597,9 +603,9 @@
                         </script>
                       ]]>
                   </xsl:text>
-                </xsl:if> 
-              
-              
+                </xsl:if>
+
+
                 <xsl:if test="./title='live webcast'">
                   <a href="{./displayURL}">
                     <strong>View the live webcast</strong>
@@ -608,14 +614,14 @@
                     <img src="images/protected.png" border="0" alt="locked" style="margin-left: 3px;"/>
                   </xsl:if>
                 </xsl:if>
-                
+
                 <xsl:if test="./title='forthcoming webcast'">
                   Please note that this event will be available <em>live</em> via the
                   <a href="{./displayURL}">
                     <strong>Webcast Service</strong>.
                   </a>
                 </xsl:if>
-                
+
               </xsl:for-each>
             </td>
           </tr>
@@ -944,6 +950,18 @@
             </td>
           </tr>
 
+        </xsl:if>
+
+
+        <xsl:if test="./supportEmail != ''">
+          <tr>
+            <td class="leftCol">
+                <xsl:value-of select="./supportEmail/@caption" />
+            </td>
+            <td>
+              <xsl:apply-templates select="./supportEmail"/>
+            </td>
+          </tr>
         </xsl:if>
 
       </tbody>

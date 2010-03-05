@@ -12,7 +12,7 @@ modules:
 * Participants: you can add all the participants for the Meeting
   or you can open the participation so users can apply for it.
 * Timetable: in which you can directly add Sessions, Contributions, and
-  Breaks. 
+  Breaks.
 
 As well, as for conferences, you can set the Access Control for the meeting
 and you have Tools in which you can remove, clone, and set alarms.
@@ -75,7 +75,7 @@ and breaks.
 The management of the timetable is the same as for conferences. The
 only difference is while adding contributions. In conferences, you can
 add unscheduled contributions to the timetable. On the other hand, in
-meetings, unscheduled contributions don't exist, you need always to 
+meetings, unscheduled contributions don't exist, you need always to
 create the contribution.
 
 Here, we will just explain how to create contributions. For more details and
@@ -99,7 +99,7 @@ presenters, and the starting time and duration of this contribution.
 |image104|
 
 In order to edit the contribution, you can click on it and a edition balloon
-will show up. In this balloon, you can modify the timing or the whole 
+will show up. In this balloon, you can modify the timing or the whole
 contribution.
 
 --------------
@@ -155,7 +155,7 @@ the material access control page.
 
 --------------
 
-Tools Tab 
+Tools Tab
 ~~~~~~~~~
 
 The meeting Tools allow you to make certain actions on the whole
@@ -239,6 +239,21 @@ to access the Management Area by clicking the icon |image133|.
 
 |image134|
 
+You can see a bunch of additional buttons next to the navigation options
+on the top left of the page:
+
+|image141| This will print a printable version of the display area
+
+|image142| This will let you set filters to focus on events depending on
+their date or the session they are included in.
+
+|image140| This button allows you to use the following additional features:
+
+* Export to ICalendar of PDF formats
+* Download a package with all the material linked to the meeting
+* Change the style of the display. The following sections give you some examples
+  of available styles.
+
 --------------
 
 IT Style
@@ -262,7 +277,7 @@ The simple text style:
 Administrative Style
 ~~~~~~~~~~~~~~~~~~~~
 
-The Administration style:
+The Administrative style:
 
 |image137|
 
@@ -329,3 +344,6 @@ The Parellel style:
 .. |image137| image:: UserGuidePics/meetd4.png
 .. |image138| image:: UserGuidePics/meetd5.png
 .. |image139| image:: UserGuidePics/meetd6.png
+.. |image140| image:: UserGuidePics/confd21.png
+.. |image141| image:: UserGuidePics/meetd7.png
+.. |image142| image:: UserGuidePics/meetd8.png

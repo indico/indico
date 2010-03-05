@@ -56,7 +56,7 @@ window.onload = function ()
 			'javascript:void( (function(){' +
 				'document.open() ;' +
 				'document.domain=\'' + document.domain + '\' ;' +
-				'document.write(\'<html><head><script>window.onerror = function() { return true ; };<\/script><\/head><body><\/body><\/html>\') ;' +
+				'document.write(\'<html><head><scr' + 'ipt>window.onerror = function() { return true ; };<\/script><\/head><body><\/body><\/html>\') ;' +
 				'document.close() ;' +
 				'document.body.contentEditable = true ;' +
 				'window.focus() ;' +
@@ -73,7 +73,7 @@ window.onload = function ()
 			// Avoid errors if the pasted content has any script that fails: #389
 			var oDoc = oFrame.contentWindow.document ;
 			oDoc.open() ;
-			oDoc.write('<html><head><script>window.onerror = function() { return true ; };<\/script><\/head><body><\/body><\/html>') ;
+			oDoc.write('<html><head><scr' + 'ipt>window.onerror = function() { return true ; };<\/script><\/head><body><\/body><\/html>') ;
 			oDoc.close() ;
 
 			if ( FCKBrowserInfo.IsIE )

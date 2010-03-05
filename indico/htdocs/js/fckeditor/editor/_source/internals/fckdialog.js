@@ -79,7 +79,7 @@ var FCKDialog = ( function()
 		/**
 		 * Opens a dialog window using the standard dialog template.
 		 */
-		OpenDialog : function( dialogName, dialogTitle, dialogPage, width, height, customValue, parentWindow, resizable )
+		OpenDialog : function( dialogName, dialogTitle, dialogPage, width, height, customValue, resizable )
 		{
 			if ( !topDialog )
 				this.DisplayMainCover() ;

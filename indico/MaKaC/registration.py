@@ -22,7 +22,7 @@
 import md5, random, time
 from datetime import datetime,timedelta
 from pytz import timezone
-from pytz import common_timezones
+from pytz import all_timezones
 from MaKaC.common.timezoneUtils import nowutc
 from persistent import Persistent
 from persistent.mapping import PersistentMapping
@@ -627,7 +627,7 @@ class Notification(Persistent):
         return text
 
     def sendEmailNewRegistrant(self, regForm, rp):
-        fromAddr=regForm.getConference().getSupportEmail()
+        fromAddr=regForm.getConference().getSupportEmail(returnNoReply=True)
         url = urlHandlers.UHConferenceDisplay.getURL(regForm.getConference())
 
 #        if rp.getConference().getModPay().isActivated():
@@ -638,9 +638,6 @@ class Notification(Persistent):
             epaymentLink = ""
             paymentWarning = "."
 
-        if fromAddr.strip()=="":
-            info = HelperMaKaCInfo.getMaKaCInfoInstance()
-            fromAddr = "%s <%s>"%(info.getTitle(), info.getSupportEmail())
         subject= _("""New registrant in '%s': %s""")%(strip_ml_tags(regForm.getConference().getTitle()), rp.getFullName())
         body=_("""
              _("Event"): %s
@@ -674,14 +671,11 @@ class Notification(Persistent):
     def sendEmailNewRegistrantDetailsPay(self, regForm,registrant):
         if not registrant.getConference().getModPay().isEnableSendEmailPaymentDetails():
             return
-        fromAddr=registrant.getConference().getSupportEmail()
+        fromAddr=registrant.getConference().getSupportEmail(returnNoReply=True)
         date=registrant.getConference().getStartDate()
         getTitle=strip_ml_tags(registrant.getConference().getTitle())
         idRegistrant=registrant.getIdPay()
         detailPayment=registrant.getConference().getModPay().getPaymentDetails()
-        if fromAddr.strip()=="":
-            info = HelperMaKaCInfo.getMaKaCInfoInstance()
-            fromAddr = "%s <%s>"%(info.getTitle(), info.getSupportEmail())
         subject=_("""New registrant in '%s': %s - payment""")%(strip_ml_tags(registrant.getConference().getTitle()), registrant.getFullName())
         body= _("""
 Please use this information for your payment (except for e-payment):\n
@@ -738,14 +732,11 @@ detail of Booking:
             GenericMailer.send(GenericNotification(maildata))
 
     def sendEmailNewRegistrantConfirmPay(self, regForm,registrant):
-        fromAddr=registrant.getConference().getSupportEmail()
+        fromAddr=registrant.getConference().getSupportEmail(returnNoReply=True)
         date=registrant.getConference().getStartDate()
         getTitle=strip_ml_tags(registrant.getConference().getTitle())
         idRegistrant=registrant.getIdPay()
 
-        if fromAddr.strip()=="":
-            info = HelperMaKaCInfo.getMaKaCInfoInstance()
-            fromAddr = "%s <%s>"%(info.getTitle(), info.getSupportEmail())
         subject= _("""New registrant in '%s': %s""")%(strip_ml_tags(registrant.getConference().getTitle()), registrant.getFullName())
         body= _("""
         thank you for the payment :\n
@@ -802,10 +793,7 @@ detail of Booking:
             GenericMailer.send(GenericNotification(maildata))
 
     def sendEmailModificationRegistrant(self, regForm, rp):
-        fromAddr=regForm.getConference().getSupportEmail()
-        if fromAddr.strip()=="":
-            info = HelperMaKaCInfo.getMaKaCInfoInstance()
-            fromAddr = "%s <%s>"%(info.getTitle(), info.getSupportEmail())
+        fromAddr=regForm.getConference().getSupportEmail(returnNoReply=True)
         subject= _("""Registration modified for '%s': %s""")%(strip_ml_tags(regForm.getConference().getTitle()), rp.getFullName())
         body= _("""
               _("Registrant Id"): %s
@@ -3344,7 +3332,7 @@ class Registrant(Persistent):
     def getAdjustedRegistrationDate(self,tz=None):
         if not tz:
             tz = self.getConference().getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
             tz = 'UTC'
         return self.getRegistrationDate().astimezone(timezone(tz))
 

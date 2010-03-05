@@ -203,6 +203,7 @@ class RHGeneralInfoPerformModification( RHAdminBase ):
             self._minfo.setOrganisation( params["organisation"] )
             self._minfo.setSupportEmail( params["supportEmail"] )
             self._minfo.setPublicSupportEmail( params["publicSupportEmail"] )
+            self._minfo.setNoReplyEmail( params["noReplyEmail"] )
             self._minfo.setCity( params["city"] )
             self._minfo.setCountry( params["country"] )
             self._minfo.setTimezone( params["timezone"] )

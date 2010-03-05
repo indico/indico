@@ -30,6 +30,9 @@ class IConferenceMinimalFossil(IFossil):
     def getTitle(self):
         """Conference title"""
 
+    def getDescription(self):
+        """Conference description"""
+
     def getLocation(self):
         """ Location (CERN/...) """
     getLocation.convert = lambda l: l and l.getName()
@@ -45,5 +48,8 @@ class IConferenceMinimalFossil(IFossil):
     def getEndDate(self):
         """ End Date """
     getEndDate.convert = Conversion.datetime
+
+    def getSupportEmail(self):
+        """ Support Email """
 
 

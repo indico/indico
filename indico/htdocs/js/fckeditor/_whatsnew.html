@@ -33,21 +33,23 @@
 	<h1>
 		FCKeditor ChangeLog - What's New?</h1>
 	<h3>
-		Version 2.6.5 (SVN)</h3>
+		Version 2.6.5</h3>
 	<p>
 		New Features and Improvements:</p>
 	<ul>
-		<li></li>
+		<li>Introduced the Spell Check As You Type (SCAYT) spell checking option.</li>
 	</ul>
 	<p>
 		Fixed Bugs:</p>
 	<ul>
+		<li><strong>Security release, upgrade is highly recommended</strong> (fixed security issues in ASP and ColdFusion scripts).
+			</li>
 		<li>[<a target="_blank" href="http://dev.fckeditor.net/ticket/2856">#2856</a>] Fixed
 			problem with inches in paste dialog.</li>
 		<li>[<a target="_blank" href="http://dev.fckeditor.net/ticket/3120">#3120</a>]
-			# (pound sign) is not correctly escaped in file urls</li>
+			# (pound sign) is not correctly escaped in file urls.</li>
 		<li>[<a target="_blank" href="http://dev.fckeditor.net/ticket/2915">#2915</a>]
-			About plugin shows misleading user language</li>
+			About plugin shows misleading user language.</li>
 		<li>[<a target="_blank" href="http://dev.fckeditor.net/ticket/2821">#2821</a>] Configuration
 			items that used floating point numbers were parsed as integers.</li>
 		<li>[<a target="_blank" href="http://dev.fckeditor.net/ticket/2604">#2064</a>] The asp
@@ -60,13 +62,16 @@
 			could raise an error in IE8.</li>
 		<li>[<a target="_blank" href="http://dev.fckeditor.net/ticket/2156">#2156</a>]
 			After calling GetData() the style removal operations didn't work in IE. Thanks to
-			Compendium Blogware</li>
+			Compendium Blogware.</li>
 	  <li>[<a target="_blank" href="http://dev.fckeditor.net/ticket/3427">#3427</a>] Improved
  			compatibility of Document properties dialog with Eclipse.</li>
 		<li>Language file updates for the following languages:
 			<ul>
 				<li>[<a target="_blank" href="http://dev.fckeditor.net/ticket/2908">#2908</a>] Czech </li>
 				<li>[<a target="_blank" href="http://dev.fckeditor.net/ticket/2849">#2849</a>] Lithuanian</li>
+				<li>[<a target="_blank" href="http://dev.fckeditor.net/ticket/3636">#3636</a>] Polish</li>
+				<li>[<a target="_blank" href="http://dev.fckeditor.net/ticket/3741">#3741</a>] Korean</li>
+				<li>[<a target="_blank" href="http://dev.fckeditor.net/ticket/2861">#2861</a>] Slovenian</li>
 			</ul>
 		</li>
 		<li>[<a target="_blank" href="http://dev.fckeditor.net/ticket/3439">#3439</a>] IgnoreEmptyParagraphValue
@@ -81,6 +86,20 @@
 			of caption tag in tables with table headers.</li>
 		<li>[<a target="_blank" href="http://dev.fckeditor.net/ticket/3818">#3818</a>] Fixed layout error
 			in text and background color popups when more colors button is disabled.</li>
+ 		<li>[<a target="_blank" href="http://dev.fckeditor.net/ticket/3481">#3481</a>] Fixed an issue in
+ 			WebKit where paste actions inside table cells may leak outside of the table cell.</li>
+ 		<li>[<a target="_blank" href="http://dev.fckeditor.net/ticket/3677">#3677</a>] Fixed JavaScript
+ 			error when trying to create link for images inside floating div containers.</li>
+ 		<li>[<a target="_blank" href="http://dev.fckeditor.net/ticket/3925">#3925</a>] Removed obsolete
+ 			parentWindow reference from FCKDialog.OpenDialog().</li>
+ 		<li>[<a target="_blank" href="http://dev.fckeditor.net/ticket/2936">#2936</a>] Added protection
+			in the PHP upload if the destination folder is placed at the root and doesn't exit.</li>
+ 		<li>[<a target="_blank" href="http://dev.fckeditor.net/ticket/4357">#4357</a>] Avoid problem in
+			the paste dialog if IIS is set to process HTML files as Asp.</li>
+		<li>[<a target="_blank" href="http://dev.fckeditor.net/ticket/2201">#2201</a>] Fixed a crash in IE
+ 			in an object is selected (with handles) on unload of the editor.</li>
+		<li>[<a target="_blank" href="http://dev.fckeditor.net/ticket/3053">#3053</a>] Fixed problems with
+			the height of the content area in Safari and Chrome.</li>
 	</ul>
 	<p>
 		<a href="_whatsnew_history.html">See previous versions history</a></p>

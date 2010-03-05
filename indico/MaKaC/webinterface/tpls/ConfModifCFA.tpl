@@ -4,8 +4,8 @@
         <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Current status")%></span></td>
         <td bgcolor="white" width="100%%" class="blacktext" colspan="2">
             <form action="%(setStatusURL)s" method="POST">
-                <input name="changeTo" type="hidden" value="%(changeTo)s"> 
-                <b>%(status)s</b> 
+                <input name="changeTo" type="hidden" value="%(changeTo)s">
+                <b>%(status)s</b>
                 <small><input type="submit" class="btn" value="%(changeStatus)s"></small>
             </form>
         </td>
@@ -41,7 +41,7 @@
     </tr>
 
     <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Submission notification")%></span></td>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Email notification on submission")%></span></td>
         <td bgcolor="white" width="100%%">
           <table>
             <tr>
@@ -86,7 +86,7 @@
     </tr>
     <tr>
         <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Late submission authorised users")%></span></td>
-        <td bgcolor="white" width="100%%" class="blacktext" colspan="2">  
+        <td bgcolor="white" width="100%%" class="blacktext" colspan="2">
             %(submitters)s
         </td>
     </tr>
@@ -94,9 +94,9 @@
         <td colspan="3" class="horizontalLine">&nbsp;</td>
     </tr>
     <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Notification templates")%></span></td>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Email notification templates")%></span></td>
         <form action=%(remNotifTplURL)s method="POST">
-        <td bgcolor="white" width="100%%" class="blacktext">  
+        <td bgcolor="white" width="100%%" class="blacktext">
             <table width="98%%" border="0" align="left">
                 %(notifTpls)s
             </table>

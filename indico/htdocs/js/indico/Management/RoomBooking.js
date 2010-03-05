@@ -115,9 +115,9 @@ type("RoomBookingWidget", ["IWidget"],
      function(locations, info, parent, inheritDefault, eventFavorites) {
          var self = this;
 
-         this.locationChooser = new FlexibleSelect(locations, 75);
+         this.locationChooser = new FlexibleSelect(locations, 177);
          this.roomChooser = new FlexibleSelect({},
-                                               120,
+                                               177,
                                                function(e1, e2){ return self._favoriteSort(e1, e2); },
                                                function(key, elem){ return self._favoriteDecorator(key, elem); });
          this.addressArea = new RealtimeTextArea({});
@@ -158,6 +158,7 @@ type("RoomBookingWidget", ["IWidget"],
                      self.locationChooser.enable();
                      self.roomChooser.enable();
                      self.addressArea.enable();
+
                      self._startBind();
                  }
              });

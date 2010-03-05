@@ -35,19 +35,21 @@ var IndicoUtil = {
         }
         for (var i=0; i < formNodes.length; i++) {
             var node = formNodes[i];
-            if (node.type == "checkbox") {
-                if (!exists(values[node.name])) {
-                    values[node.name] = [];
-                }
-                if (node.checked) {
-                    values[node.name].push(node.value);
-                }
-            } else if (node.type == "radio") {
-                if (node.checked) {
+            if (exists(node.name) && node.name) {
+                if (node.type == "checkbox") {
+                    if (!exists(values[node.name])) {
+                        values[node.name] = [];
+                    }
+                    if (node.checked) {
+                        values[node.name].push(node.value);
+                    }
+                } else if (node.type == "radio") {
+                    if (node.checked) {
+                        values[node.name] = node.value;
+                    }
+                } else {
                     values[node.name] = node.value;
                 }
-            } else {
-                values[node.name] = node.value;
             }
         }
         return values;
@@ -351,28 +353,6 @@ var IndicoUtil = {
     },
 
     /**
-     * Determines if a string is a valid IP address ("A.B.C.D")
-     * @param {String} s The input string
-     * @return {Booleab} true if the string is a valid IP address, false otherwise
-     */
-    isIpAddress: function(s) {
-        var valid = true;
-        var numbers = s.split('.');
-        if (numbers.length == 4) {
-            for (var i=0; i < 4; i++) {
-                var n = numbers[i];
-                if (!(n == trim(n) && n.length >= 1 && n.length <= 3 && IndicoUtil.isInteger(n))) {
-                    valid = false;
-                    break;
-                }
-            }
-        } else {
-            valid = false;
-        }
-        return valid;
-    },
-
-    /**
     * Determines if a string is in a valid time format (hh:mm)
     * @param {String} s The input string
     * @return {Booleab} true if the string is a valid time string, false otherwise
@@ -388,7 +368,9 @@ var IndicoUtil = {
      * If the value of the field changes / the user types in the field, the red color and the tooltip will disappear
      * @param {XElement} component: the field to mark as invalid
      * @param {XElement} error: the string or Html object that will be displayed in the error popup.
-     * @return {Array of functions} returns an array of functions that should be called to cancel all the event observations.
+     * @return {[XElement, Array of functions]} returns an array with 2 elements:
+     *                                          -An Html.div() XElement with the tooltip that was created.
+     *                                          -An array of functions that should be called to cancel all the event observations.
      */
     markInvalidField: function(component, error) {
         if ( startsWith(component.dom.type, 'select')) {
@@ -434,7 +416,7 @@ var IndicoUtil = {
             }));
         }
 
-        return oList;
+        return [tooltip, oList];
     },
 
     /**
@@ -499,7 +481,13 @@ var IndicoUtil = {
                 else if (dataType == 'datetime' && !(allowEmpty && trim(component.get()) === '') && !IndicoUtil.parseDateTime(component.get())) {
                     error = Html.span({}, "Date format is not valid. It should be dd/mm/yyyy hh:mm");
                 }
-                else if (dataType == 'ip' && !(allowEmpty && trim(component.get()) === '') && !IndicoUtil.isIpAddress(component.get())) {
+                else if (dataType == 'email' && !(allowEmpty && trim(component.get()) === '') && !Util.Validation.isEmailAddress(component.get())) {
+                    error = Html.span({}, "Invalid e-mail address");
+                }
+                else if (dataType == 'emaillist' && !(allowEmpty && trim(component.get()) === '') && !Util.Validation.isEmailList(component.get())){
+                    error = Html.span({}, "List contains invalid e-mail address or invalid separator");
+                }
+                else if (dataType == 'ip' && !(allowEmpty && trim(component.get()) === '') &&  !Util.Validation.isIPAddress(component.get())) {
                     error = Html.span({}, "That doesn't seem like a valid IP Address. Example of valid IP Address: 132.156.31.38");
                 } else if (dataType == 'time' && !IndicoUtil.isTime(trim(component.get()))) {
                     error = Html.span({}, "Time format is not valid. It should be hh:mm");
@@ -513,15 +501,18 @@ var IndicoUtil = {
                 if (exists(error)) {
                     hasErrors = true;
 
+                    var oList = [];
+
                     if (component.dom.type != 'radio') {
-                        oList = IndicoUtil.markInvalidField(component, error);
+                        var result = IndicoUtil.markInvalidField(component, error);
+                        oList = result[1];
 
                     } else {
                         component.dom.className += ' invalid';
                         $E(component.dom.id + 'Label').dom.className += ' invalidLabel';
 
                         var tooltip;
-                        var oList = []; //list of functions that we will call to stop observing events
+                        oList = []; //list of functions that we will call to stop observing events
 
                         var stopObserving = component.observeEvent('mouseover', function(event){
                             tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, error, "tooltipError");

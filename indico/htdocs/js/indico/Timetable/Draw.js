@@ -62,7 +62,8 @@ type("TimetableBlockBase", [],
                  sections[section] = menuItems;
                  each(value.resources, function(item) {
                      var name = item.name;
-                     menuItems[name] = item.url;
+                     // set the URL instead of the title, if there's no title
+                     menuItems[name ? name : item.url] = item.url;
                  });
              });
 
@@ -825,16 +826,11 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
                 return;
             }
 
-            var sTime = startEndTimeField.accessor.get('startTime');
-            var eTime = startEndTimeField.accessor.get('endTime');
+            var startDate = clone(self.eventData.startDate);
+            var endDate = clone(self.eventData.startDate);
 
-            var startDate = IndicoUtil.parseJsonDate(self.eventData.startDate);
-            var endDate = IndicoUtil.parseJsonDate(self.eventData.startDate);
-            startDate.setHours(sTime.substring(0,2));
-            startDate.setMinutes(sTime.substr(3,2));
-
-            endDate.setHours(eTime.substr(0,2));
-            endDate.setMinutes(eTime.substr(3,2));
+            startDate.time = startEndTimeField.accessor.get('startTime');
+            endDate.time = startEndTimeField.accessor.get('endTime');
 
             self.managementActions.editEntryStartEndDate(Util.formatDateTime(startDate, IndicoDateTimeFormats.Server),
                                                          Util.formatDateTime(endDate, IndicoDateTimeFormats.Server),
@@ -1317,7 +1313,6 @@ type("TimetableDrawer", ["IWidget"],
                          result[subkey] = clone(subentry);
                          result[subkey].color = entry.color;
                          result[subkey].textColor = entry.textColor;
-                         result[subkey].fontWeight = 'normal';
                      });
                  } else {
                      result[key] = entry;

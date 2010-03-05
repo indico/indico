@@ -530,5 +530,10 @@ DlgAboutInfo		: "Voor meer informatie ga naar ",
 DlgDivGeneralTab	: "Algemeen",
 DlgDivAdvancedTab	: "Geavanceerd",
 DlgDivStyle		: "Style",
-DlgDivInlineStyle	: "Inline Style"
+DlgDivInlineStyle	: "Inline Style",
+
+ScaytTitle			: "SCAYT",	//MISSING
+ScaytTitleOptions	: "Options",	//MISSING
+ScaytTitleLangs		: "Languages",	//MISSING
+ScaytTitleAbout		: "About"	//MISSING
 };

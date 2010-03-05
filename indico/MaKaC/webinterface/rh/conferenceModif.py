@@ -213,14 +213,19 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
         RHConferenceModifKey._checkParams(self, params)
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCAbstractManager, RCReferee
         from MaKaC.webinterface.rh.collaboration import RCVideoServicesManager
+        from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin
+        from MaKaC.webinterface.rh.collaboration import RCCollaborationPluginAdmin
         self._isRegistrar = self._target.isRegistrar( self._getUser() )
         self._isPRM = RCPaperReviewManager.hasRights(self)
         self._isAM = RCAbstractManager.hasRights(self)
         self._isReferee = RCReferee.hasRights(self)
-        self._isVideoServicesManager = RCVideoServicesManager.hasRights(self, 'any')
+        self._isVideoServicesManagerOrAdmin = (RCVideoServicesManager.hasRights(self, 'any') or
+                                               RCCollaborationAdmin.hasRights(self) or
+                                               RCCollaborationPluginAdmin.hasRights(self, plugins = 'any'))
+
 
     def _checkProtection(self):
-        if not (self._isRegistrar or self._isPRM or self._isAM or self._isReferee or self._isVideoServicesManager):
+        if not (self._isRegistrar or self._isPRM or self._isAM or self._isReferee or self._isVideoServicesManagerOrAdmin):
             RHConferenceModifKey._checkProtection(self)
 
     def _process( self ):
@@ -239,11 +244,12 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
             url = urlHandlers.UHConfModifReviewingAbstractSetup.getURL( self._conf )
         elif self._isReferee:
             url = urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf )
-        elif self._isVideoServicesManager:
+        elif self._isVideoServicesManagerOrAdmin:
             url = urlHandlers.UHConfModifCollaboration.getURL(self._conf)
 
         else:
             url = urlHandlers.UHConfManagementAccess.getURL( self._conf )
+
         self._redirect( url )
 
 class RHConferenceCloseModifKey( RHConferenceBase ):
@@ -552,6 +558,9 @@ class RHConfModifSchedule( RoomBookingDBMixin, RHConferenceModifBase ):
             del params["day"]
 
     def _process( self ):
+
+        # The timetable management page shouldn't be cached
+        self._disableCaching();
 
         params = self._getRequestParams()
 
@@ -3453,6 +3462,20 @@ class RHConfPerformAddTrack( RHConferenceModifBase ):
             params = self._getRequestParams()
             t.setTitle(params["title"])
             t.setDescription(params["description"])
+            # Filtering criteria: by default make new contribution type checked
+            websession = self._getSession()
+            dict = websession.getVar("ContributionFilterConf%s"%self._conf.getId())
+            if not dict:
+                    #Create a new dictionary
+                    dict = {}
+            if dict.has_key('tracks'):
+                    #Append the new type to the existing list
+                    newDict = dict['tracks'][:]
+                    newDict.append(t.getId())
+                    dict['tracks'] = newDict[:]
+            else:
+                    #Create a new entry for the dictionary containing the new type
+                    dict['tracks'] = [t.getId()]
             self._redirect( urlHandlers.UHConfModifProgram.getURL( self._conf ) )
 
 class RHConfDelTracks( RHConferenceModifBase ):

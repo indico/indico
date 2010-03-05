@@ -378,22 +378,27 @@ FCK.CreateLink = function( url, noUndo )
 {
 	// Creates the array that will be returned. It contains one or more created links (see #220).
 	var aCreatedLinks = new Array() ;
+	var isControl = FCKSelection.GetType() == 'Control' ;
+	var selectedElement = isControl && FCKSelection.GetSelectedElement() ;
 
 	// Remove any existing link in the selection.
-	FCK.ExecuteNamedCommand( 'Unlink', null, false, !!noUndo ) ;
+	// IE BUG: Unlinking a floating control selection that is not inside a link
+	// will collapse the selection. (#3677)
+	if ( !( isControl && !FCKTools.GetElementAscensor( selectedElement, 'a' ) ) )
+		FCK.ExecuteNamedCommand( 'Unlink', null, false, !!noUndo ) ;
 
 	if ( url.length > 0 )
 	{
 		// If there are several images, and you try to link each one, all the images get inside the link:
 		// <img><img> -> <a><img></a><img> -> <a><img><img></a> due to the call to 'CreateLink' (bug in IE)
-		if (FCKSelection.GetType() == 'Control')
+		if ( isControl )
 		{
 			// Create a link
 			var oLink = this.EditorDocument.createElement( 'A' ) ;
 			oLink.href = url ;
 
 			// Get the selected object
-			var oControl = FCKSelection.GetSelectedElement() ;
+			var oControl = selectedElement ;
 			// Put the link just before the object
 			oControl.parentNode.insertBefore(oLink, oControl) ;
 			// Move the object inside the link

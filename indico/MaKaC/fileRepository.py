@@ -35,6 +35,7 @@ from persistent import Persistent
 from BTrees import OOBTree
 from MaKaC.common.Counter import Counter
 
+from MaKaC.common.logger import Logger
 
 class Repository:
     """Generic class for file repositories. A file repository knows where to
@@ -111,7 +112,7 @@ class MaterialLocalRepository(Persistent):
     def getFilePath( self, id ):
         return self.__getFilePath(id)
 
-    def storeFile( self, newFile ):
+    def storeFile( self, newFile, forcedFileId=None ):
         #this id generation can cause concurrency problems as it is not writen
         #   till the transaction is comited which could make that if the copying
         #   of the file to the archive is long two or more clients have the
@@ -119,7 +120,12 @@ class MaterialLocalRepository(Persistent):
         #   will have modify the counter so the DB will raise a read conflict
         #   for the one who commits later, but at least it will prevent from
         #   having 2 files with the same id
-        id = self.__getNewFileId()
+
+        if forcedFileId:
+            id = forcedFileId
+        else:
+            id = self.__getNewFileId()
+
         cat = newFile.getCategory()
         #raise "%s"%cat
         if cat:
@@ -154,15 +160,24 @@ class MaterialLocalRepository(Persistent):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         volume = minfo.getArchivingVolume()
         destPath = os.path.join( self.__getRepositoryPath(), volume, interPath, id )
-        os.makedirs( destPath )
+
+        if forcedFileId == None:
+            os.makedirs( destPath )
+
         destPath = os.path.join( destPath, newFile.getFileName() )
         relativePath = os.path.join( volume, interPath, id, newFile.getFileName())
-        try:
-            shutil.copyfile( newFile.getFilePath(), destPath )
-            self.__files[id] = relativePath
-            newFile.setArchivedId( self, id )
-        except IOError, e:
-            raise Exception( _("Couldn't archive file %s to %s")%( newFile.getFilePath(), destPath ) )
+
+        if forcedFileId == None:
+            try:
+                shutil.copyfile( newFile.getFilePath(), destPath )
+            except IOError, e:
+                raise Exception( _("Couldn't archive file %s to %s")%( newFile.getFilePath(), destPath ) )
+
+        self.__files[id] = relativePath
+        newFile.setArchivedId( self, id )
+
+        Logger.get('storage').info("stored resource %s (%s) at %s" % (id, newFile.getFileName(), os.path.join(volume, interPath)))
+
         return id
 
     def recoverFile(self, recFile):
@@ -265,7 +280,7 @@ class LocalRepository(Persistent):
         return os.path.join( self.__getRepositoryPath(), id, os.path.split(self.__files[id])[1] )
     
 
-    def storeFile( self, newFile ):
+    def storeFile( self, newFile, forcedFileId=None ):
         #this id generation can cause concurrency problems as it is not writen
         #   till the transaction is comited which could make that if the copying
         #   of the file to the archive is long two or more clients have the
@@ -273,7 +288,10 @@ class LocalRepository(Persistent):
         #   will have modify the counter so the DB will raise a read conflict
         #   for the one who commits later, but at least it will prevent from
         #   having 2 files with the same id
-        id = self.__getNewFileId()
+        if forcedFileId:
+            id = forcedFileId
+        else:
+            id = self.__getNewFileId()
         destPath = os.path.join( self.__getRepositoryPath(), id )
         #if not os.access( destPath, os.F_OK ):
         os.makedirs( destPath )

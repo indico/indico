@@ -98,7 +98,7 @@ function CreateServerFolder( $folderPath, $lastFolder = null )
 	}
 
 	// Check if the parent exists, or create it.
-	if ( !file_exists( $sParent ) )
+	if ( !empty($sParent) && !file_exists( $sParent ) )
 	{
 		//prevents agains infinite loop when we can't create root folder
 		if ( !is_null( $lastFolder ) && $lastFolder === $sParent) {

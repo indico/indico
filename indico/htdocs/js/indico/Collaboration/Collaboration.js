@@ -180,7 +180,7 @@ var refreshTableHead = function() {
 
         var firstCell = Html.td();
         headRow.append(firstCell);
-        
+
         var typeCell = Html.td({className: "collaborationTitleCell"});
         var typeSpan = Html.span({style:{fontSize: "medium"}}, "Type");
         typeCell.set(typeSpan);
@@ -195,7 +195,7 @@ var refreshTableHead = function() {
         var infoSpan = Html.span({style:{fontSize: "medium"}}, "Info");
         infoCell.set(infoSpan);
         headRow.append(infoCell);
-        
+
         var emptyCell = Html.td({className: "collaborationTitleCell"});
         headRow.append(emptyCell);
 
@@ -203,7 +203,7 @@ var refreshTableHead = function() {
         var actionsSpan = Html.span({style:{fontSize: "medium"}}, "Actions");
         actionsCell.set(actionsSpan);
         headRow.append(actionsCell);
-        
+
         var lastCell = Html.td({width: "100%", colspan: 1, colSpan: 1})
         headRow.append(lastCell);
     }
@@ -212,7 +212,7 @@ var refreshTableHead = function() {
 var refreshStartAllStopAllButtons = function() {
     var startShouldAppear = false;
     var stopShouldAppear = false;
-    
+
     var length = bookings.length.get();
     if (length > 1) {
         var nCanStart = 0;
@@ -221,12 +221,12 @@ var refreshStartAllStopAllButtons = function() {
         var typesStop = {};
         var nTypesStart = 0;
         var nTypesStop = 0;
-        
+
         for (i=0; i < length; i++) {
             booking = bookings.item(i);
             if (booking.hasStart && booking.canBeStarted) {
                 if (booking.hasStartStopAll) {
-                    nCanStart++;    
+                    nCanStart++;
                 }
                 if (!(booking.type in typesStart)) {
                     typesStart[booking.type] = true;
@@ -235,7 +235,7 @@ var refreshStartAllStopAllButtons = function() {
             }
             if (booking.hasStop && booking.canBeStopped) {
                 if (booking.hasStartStopAll) {
-                    nCanStop++;    
+                    nCanStop++;
                 }
                 if (!(booking.type in typesStop)) {
                     typesStop[booking.type] = true;
@@ -243,17 +243,17 @@ var refreshStartAllStopAllButtons = function() {
                 }
             }
         };
-        
+
         startShouldAppear = nTypesStart > 1 || nCanStart > 1 ;
         stopShouldAppear = nTypesStop > 1 || nCanStop > 1 ;
     }
-    
+
     if (startShouldAppear) {
         IndicoUI.Effect.appear($E('startAll'), 'inline');
     } else {
         IndicoUI.Effect.disappear($E('startAll'));
     }
-    
+
     if (stopShouldAppear) {
         IndicoUI.Effect.appear($E('stopAll'), 'inline');
     } else {
@@ -274,7 +274,7 @@ var refreshStartAllStopAllButtons = function() {
 var bookingTemplateM = function(booking) {
 
     var row = Html.tr({id: "bookingRow" + booking.id});
-    
+
     var cellShowInfo;
     if (pluginHasFunction(booking.type, "showInfo")) {
         cellShowInfo = Html.td({className : "collaborationCellNarrow"});
@@ -342,7 +342,7 @@ var bookingTemplateM = function(booking) {
     cellEditRemove.append(editButton);
     cellEditRemove.append(removeButton);
     row.append(cellEditRemove);
-    
+
     var cellStart;
     if (booking.hasStart) {
         var cellStart = Html.td({className : "collaborationCellNarrow"});
@@ -367,7 +367,7 @@ var bookingTemplateM = function(booking) {
         cellStop.set(stopButton);
         row.append(cellStop);
     };
-    
+
     //var cellMail = Html.td({className : "collaborationCellNarrow"});
     //cellMail.set(Html.img({src: imageSrc("mail_big"), style: {'verticalAlign': 'middle', marginLeft: '3px', marginRight: '3px'}}));
     //row.append(cellMail);
@@ -638,6 +638,9 @@ var checkBookingStatus = function(booking, conferenceId) {
                     codes[booking.type].errorHandler('checkStatus', result);
                 } else {
                     refreshBooking(result);
+                    if (pluginHasFunction(booking.type, 'postCheckStatus')) {
+                        codes[booking.type].postCheckStatus(result);
+                    }
                     killProgress();
                 }
             } else {
@@ -810,8 +813,12 @@ var showInfoRow = function(booking) {
 var updateInfoRow = function(booking) {
     var existingInfoCell = $E("infoCell" + booking.id);
     if (existingInfoCell != null) { // we update
-        var infoHTML = codes[booking.type].showInfo(booking)
-        existingInfoCell.dom.innerHTML = infoHTML;
+        var infoHTML = codes[booking.type].showInfo(booking);
+        if (isString(infoHTML)) {
+            existingInfoCell.dom.innerHTML = infoHTML;
+        } else if(infoHTML.XElement) {
+            existingInfoCell.set(infoHTML);
+        }
     } //otherwise ignore
 };
 
@@ -874,7 +881,7 @@ var dateChangeDisabledHelpPopup = function(event) {
  */
 var hiddenHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px">' + 
+        '<div style="padding:3px">' +
             $T('By activating this option, you keep') + '<br \/>' +
             $T('the booking from appearing in the') + '<br \/>' +
             $T('event\'s display page.') + '<br \/>' +
@@ -885,7 +892,7 @@ var sanitizationError = function(invalidFields) {
     each(invalidFields, function(fieldName) {
         var fields = $N(fieldName);
         each(fields, function(field){
-            IndicoUtil.markInvalidField(field, $T("Tags in the <tag> form are not allowed. Please remove any '<' and '>' characters.")); 
+            IndicoUtil.markInvalidField(field, $T("Tags in the <tag> form are not allowed. Please remove any '<' and '>' characters."));
         });
     });
 }
@@ -902,7 +909,7 @@ var sanitizationError = function(invalidFields) {
  * -If the booking is actually sent to the server, 2 things can occur:
  *    +there have been no problems, so the booking is added to the 'bookings' watchlist, so the table is updated, and an iframe is created.
  *    +there have been problems, an exception message will appear.
- *    
+ *
  * @param {string} popupType A string whose value should be 'create' or 'edit'
  * @param {string} bookingType The type of the booking being created / edited.
  * @param {object} booking If 'create' mode, leave to null. If 'edit' mode, the booking object
@@ -917,15 +924,15 @@ type ("BookingPopup", ["ExclusivePopup"],
         },
         draw: function() {
             var self = this;
-            
+
             // We get the form HTML
             var form = Html.div();
             form.dom.innerHTML = forms[self.bookingType];
-            
+
             var formNodes = IndicoUtil.findFormFields(form);
             var values = {};
-            
-            // We put calendar widgets on the date fields 
+
+            // We put calendar widgets on the date fields
             if (pluginHasFunction(self.bookingType, "getDateFields")) {
                 var fieldList = codes[self.bookingType].getDateFields();
                 var fieldDict = {};
@@ -938,12 +945,12 @@ type ("BookingPopup", ["ExclusivePopup"],
                     }
                 });
             }
-            
+
             // If we are modifying a booking, we put the booking's values in the form in the Basic tab
             if (self.popupType === 'edit') {
                 IndicoUtil.setFormValues(formNodes, self.booking.bookingParams);
             }
-            
+
             // We initialize the parameter manager in order to make checks on the fields
             var needsCheck = pluginHasFunction (self.bookingType, "checkParams");
             var parameterManager;
@@ -952,10 +959,10 @@ type ("BookingPopup", ["ExclusivePopup"],
             }
 
             var advancedDiv = Html.div();
-            
+
             // If this kind of booking can be notified of date changes, we offer a checkbox (checked by default)
             if (canBeNotifiedOnDateChanges[self.bookingType]) {
-                
+
                 // If this booking in particular cannot be notified of date changes any more, we disable the checkbox
                 var dateCheckBox = Html.checkbox({id : "dateCheckBox"});
                 var dateLabel = Html.label({style: {fontWeight: "normal"}}, $T("Keep booking synchronized with event"));
@@ -964,7 +971,7 @@ type ("BookingPopup", ["ExclusivePopup"],
                 dateChangeHelpImg.dom.onmouseover = dateChangeHelpPopup;
                 var dateChangeDiv = Html.div({style : {display: "block", marginTop:pixels(10), marginLeft: pixels(50)}},
                         dateCheckBox, dateLabel, dateChangeHelpImg);
-                
+
                 if (self.popupType === 'create') {
                     dateCheckBox.dom.checked = true;
                 } else if (self.popupType === 'edit'){
@@ -975,10 +982,10 @@ type ("BookingPopup", ["ExclusivePopup"],
                         dateChangeHelpImg.dom.onmouseover = dateChangeDisabledHelpPopup;
                     }
                 }
-                
+
                 advancedDiv.append(dateChangeDiv);
             }
-            
+
             // Privacy option
             var hiddenCheckBox = Html.checkbox({id : "hiddenCheckBox"});
             var hiddenLabel = Html.label({style: {fontWeight: "normal"}}, $T("Keep this booking hidden"));
@@ -991,7 +998,7 @@ type ("BookingPopup", ["ExclusivePopup"],
                 hiddenCheckBox.dom.checked = self.booking.bookingParams["hidden"];
             }
             advancedDiv.append(hiddenDiv);
-            
+
             // We construct the "save" button and what happens when it's pressed
             var saveButton = Html.button(null, "Save");
             saveButton.observeClick(function(){
@@ -1015,10 +1022,10 @@ type ("BookingPopup", ["ExclusivePopup"],
                     if (pluginHasFunction(self.bookingType, "onSave")) {
                         onSaveResult = codes[self.bookingType].onSave(values);
                     }
-                    
+
                     if (onSaveResult) {
                         var killProgress = IndicoUI.Dialogs.Util.progress("Saving your booking...");
-        
+
                         if (self.popupType === 'create') {
                             indicoRequest(
                                 'collaboration.createCSBooking',
@@ -1041,18 +1048,19 @@ type ("BookingPopup", ["ExclusivePopup"],
                                             }
                                         } else {
                                             hideAllInfoRows(false);
+                                            showInfo[result.id] = true; // we initialize the show info boolean for this booking
                                             bookings.append(result);
                                             showAllInfoRows(false);
                                             addIFrame(result);
-                                            showInfo[result.id] = false; // we initialize the show info boolean for this booking
                                             refreshStartAllStopAllButtons();
                                             refreshTableHead();
-                                            killProgress();
-                                            hightlightBookingM(result);
-                                            self.close();
                                             if (pluginHasFunction(self.bookingType, 'postCreate')) {
                                                 codes[self.bookingType].postCreate(result);
                                             }
+                                            killProgress();
+                                            hightlightBookingM(result);
+                                            self.close();
+
                                         }
                                     } else {
                                         killProgress();
@@ -1061,7 +1069,7 @@ type ("BookingPopup", ["ExclusivePopup"],
                                     }
                                 }
                             );
-                            
+
                         } else if (self.popupType === 'edit') {
                             indicoRequest(
                                 'collaboration.editCSBooking',
@@ -1081,12 +1089,13 @@ type ("BookingPopup", ["ExclusivePopup"],
                                                 codes[self.bookingType].errorHandler('edit', result);
                                             }
                                         } else {
-                                            refreshBooking(result);
-                                            killProgress();
-                                            self.close();
                                             if (pluginHasFunction(self.bookingType, 'postEdit')) {
                                                 codes[self.bookingType].postEdit(result);
                                             }
+                                            showInfo[result.id] = true;
+                                            refreshBooking(result);
+                                            killProgress();
+                                            self.close();
                                         }
                                     } else {
                                         killProgress();
@@ -1101,7 +1110,7 @@ type ("BookingPopup", ["ExclusivePopup"],
                     self.switchToBasicTab();
                 }
             });
-            
+
             // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
             var cancelButton = Html.button({style:{marginLeft:pixels(5)}}, "Cancel");
             cancelButton.observeClick(function(){
@@ -1109,9 +1118,9 @@ type ("BookingPopup", ["ExclusivePopup"],
             });
 
             var buttonDiv = Html.div('dialogButtons', saveButton, cancelButton)
-            
+
             if (pluginHasFunction(self.bookingType, "getPopupDimensions")) {
-                var dimensions = codes[self.bookingType].getPopupDimensions(); 
+                var dimensions = codes[self.bookingType].getPopupDimensions();
                 var width = dimensions['width'];
                 var height = dimensions['height'];
                 width = width > 400 ? width : 400;
@@ -1120,10 +1129,10 @@ type ("BookingPopup", ["ExclusivePopup"],
                 var width = 600;
                 var height = 0;
             }
-            
+
             var tabControl = new TabWidget([["Basic", form], ["Advanced", advancedDiv]], width, height);
             this.tabControl = tabControl;
-            
+
             return this.ExclusivePopup.prototype.draw.call(this, Widget.block([tabControl.draw(), buttonDiv]));
         }
     },
@@ -1149,7 +1158,7 @@ type ("BookingPopup", ["ExclusivePopup"],
  * @param {string} conferenceId the conferenceId of the current event
  */
 var createBooking = function(pluginName, conferenceId) {
-    
+
     var popup = new BookingPopup('create', pluginName, null, conferenceId);
     popup.open();
     if (pluginHasFunction(pluginName, "onCreate")) {
@@ -1164,7 +1173,7 @@ var createBooking = function(pluginName, conferenceId) {
  * @param {string} conferenceId the conferenceId of the current event
  */
 var editBooking = function(booking, conferenceId) {
-    
+
     var popup = new BookingPopup('edit', booking.type, booking, conferenceId);
     popup.open();
     if (pluginHasFunction(booking.type, "onEdit")) {
@@ -1266,10 +1275,10 @@ var startAll = function(){
     var length = bookings.length.get();
     var startedTypes = {};
     var warningsGiven = {};
-    
+
     for (var i=0; i < length; i++) {
         var booking = bookings.item(i);
-        
+
         if (startedTypes[booking.type]) {
             if (!(warningsGiven[booking.type])) {
                 var popup = new AlertPopup("Booking start", Html.span({},"Multiple " + booking.type + " bookings cannot start at the same time,",
@@ -1279,9 +1288,9 @@ var startAll = function(){
                 warningsGiven[booking.type] = true;
             }
         } else {
-            setTimeout("start(bookings.item(" + i + "))", i*1000);            
+            setTimeout("start(bookings.item(" + i + "))", i*1000);
         }
-        
+
         if (!booking.hasStartStopAll) {
             startedTypes[booking.type] = true;
         }

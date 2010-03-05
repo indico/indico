@@ -2,8 +2,10 @@
 <% from MaKaC.common import Config %>
 <% import MaKaC.common.info as info %>
 <% from MaKaC.rb_location import Location %>
+<% import simplejson %>
 <%!
-authenticators = Config.getInstance().getAuthenticatorList()
+config = Config.getInstance()
+authenticators = config.getAuthenticatorList()
 extAuths = []
 for auth in authenticators:
     if auth.lower() != "local":
@@ -72,8 +74,12 @@ var Indico = {
         starGrey: "<%= iconFileName("starGrey")%>",
         warning_yellow: "<%= iconFileName("warning_yellow")%>",
         arrow_up: "<%= iconFileName("upArrow")%>",
-        arrow_down: "<%= iconFileName("downArrow")%>"
+        arrow_down: "<%= iconFileName("downArrow")%>",
+        indico_small: "<%= iconFileName("indico_small")%>"
     },
+    FileTypeIcons:
+        <%= simplejson.dumps(dict((k.lower(),v[2]) for k,v in config.getFileTypes().iteritems())) %>
+    ,
     Urls: {
         JsonRpcService: "<%= urlHandlers.UHJsonRpcService.getURL() %>",
         SecureJsonRpcService: "<%= urlHandlers.UHSecureJsonRpcService.getURL() %>",

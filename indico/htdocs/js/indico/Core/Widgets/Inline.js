@@ -66,7 +66,7 @@ type("InlineRemoteWidget", ["InlineWidget"],
          this.ready = new WatchValue();
          this.ready.set(false);
          this.loadOnStartup = loadOnStartup;
-         this.source = indicoSource(method, attributes, false, !loadOnStartup);
+         this.source = indicoSource(method, attributes, null, !loadOnStartup);
      });
 
 /*
@@ -573,15 +573,12 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
          _startNew: function() {
              this._hideOptions();
              this.input.enable();
-             this.freeMode.set(true);
              this.input.setFocus();
 
              this.input.set('');
              this.value.set('');
 
-             $B(this.value, this.input);
-
-             this._observeBlurEvents();
+             //this._observeBlurEvents();
 
          },
 
@@ -592,10 +589,9 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
                  this.input.disable();
                  bind.detach(this.input);
                  bind.detach(this.value);
-                 this._stopObservingBlurEvents();
+                 //this._stopObservingBlurEvents();
              }
 
-             this.freeMode.set(false);
              this._notify();
          },
 
@@ -637,6 +633,7 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
                  this.input.set(this.list.get(value));
              } else {
                  this.input.set(value);
+                 this.enableInput();
              }
 
              this.value.set(value);
@@ -675,23 +672,23 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
              this.input.enable();
          },
          setOptionList: function(list) {
-             this.disableInput();
+             //this.disableInput();
              this.list.clear();
              this.list.update(list);
              this.list.sort(this.sortCriteria);
-             this.freeMode.set(false);
 
              var self = this;
              if (keys(list).length === 0) {
                  this.trigger.dom.style.display = 'none';
+             }
+             if ( !exists(this.list.get(this.value.get()))) {
                  this.enableInput();
-                 this.freeMode.set(true);
                  $B(this.input, this.value);
 
-                 this._observeBlurEvents(true);
+                 //this._observeBlurEvents(true);
 
                  // focus() needs some time to get ready (?)
-                 setTimeout(function() {self.input.setFocus();}, 20);
+                 //setTimeout(function() {self.input.setFocus();}, 20);
              }
          },
          setLoading: function(state) {
@@ -705,18 +702,6 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
          detach: function() {
              bind.detach(this.value);
              this.input.unbind();
-         },
-
-         _checkEmpty: function(value) {
-             if (!value ) {
-                 if (this.freeMode.get()) {
-                     this.notificationField.set("write...");
-                 } else {
-                     this.notificationField.set("choose...");
-                 }
-             } else {
-                 this.notificationField.set("");
-             }
          }
 
 
@@ -733,7 +718,6 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
          this.disabled = false;
          this.inputDisabled = true;
          this.loading = new WatchValue();
-         this.freeMode = new WatchValue(false);
          this.observers = [];
 
          this.notificationField = Html.div({style:{color: '#AAAAAA', position:'absolute', top: '0px', left: '5px'}});
@@ -745,16 +729,13 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
 
          this.trigger = Html.div('arrowExpandIcon');
 
+         $B(this.value, this.input);
+         this.value.observe(function(value) {
+             self._notify();
+         });
+
          this.loading.observe(function(value) {
              self.trigger.dom.className = value?'progressIcon':'arrowExpandIcon';
-         });
-
-         this.value.observe(function(value) {
-             self._checkEmpty(value);
-         });
-
-         this.freeMode.observe(function() {
-             self._checkEmpty(self.value.get());
          });
 
          $E(document.body).observeClick(function(event) {
@@ -768,13 +749,11 @@ type("FlexibleSelect", ["IWidget", "WatchAccessor"],
              }
          });
 
-         this._checkEmpty();
-
          this.WatchAccessor(this.get, this.set, this.observe, this.invokeObserver);
 
      });
 
-/*
+/**
  * This type creates a DIV containing a button which is disabled and
  * it places another DIV over it in order to be able to observe events.
  *
@@ -822,8 +801,159 @@ function(button){
 }
 );
 
+/**
+ * This widget displays a text with a (Hide) fakelink next to it.
+ * If the (Hide) fakelink is clicked, a message will appear and the (Hide) button will change to (Show)
+ * Example of usage: we want to display a password to a user but show it initially hidden
+ *
+ * @param {String} text The text that we want to optionally show or not.
+ * @param {String} hiddenMessage The text to show when "text" is hidden.
+ * @param {Boolean} true if we want to show the text initially, false otherwise
+ */
+type("HiddenText", ["IWidget"], {
+    draw: function() {
+        var self = this;
+
+        var content = $B(Html.div({style:{display:"inline"}}), this.show, function(show) {
+            var message;
+            var button;
+            if (show) {
+                message = self.text;
+                button = Html.span("fakeLink", " (" + $T("Hide") + ")");
+                button.observeClick(function(){
+                    self.show.set(false);
+                });
+            } else {
+                message = self.hiddenMessage;
+                button = Html.span("fakeLink", " (" + $T("Show") + ")");
+                button.observeClick(function(){
+                    self.show.set(true);
+                });
+            }
+            return Html.span({}, message, button);
+        });
+
+        return this.IWidget.prototype.draw.call(this, content);
+    }
+},
+    function(text, hiddenMessage, initialShow) {
+        this.text = text;
+        this.hiddenMessage = hiddenMessage;
+        this.show = $V(initialShow);
+    }
+);
+
+
+/**
+ * This widget displays a text with a (Hide) fakelink next to it.
+ * If the (Hide) fakelink is clicked, a message will appear and the (Hide) button will change to (Show)
+ * Example of usage: we want to display a password to a user but show it initially hidden
+ *
+ * @param {String} text The text that we want to optionally show or not.
+ * @param {String} hiddenMessage The text to show when "text" is hidden.
+ * @param {Boolean} true if we want to show the text initially, false otherwise
+ */
+type("ShowablePasswordField", ["IWidget"], {
+
+    __clearInvalid: function() {
+        // We normally could do: Dom.Event.dispatch(this.passwordField.dom, 'change');
+        // but it seems that IE does not like to dispatch events on elements that are not in the DOM tree,
+        // so we have to do things manually
+
+        // we remove the "invalid" word from the class if needed
+        this.passwordField.dom.className = this.passwordField.dom.className.replace(" invalid", "");
+        this.clearTextField.dom.className = this.passwordField.dom.className.replace(" invalid", "");
+
+        // we remove the tooltip divs from the DOM
+        each(this.invalidFieldTooltips, function(tooltip){
+            Dom.List.remove(document.body, tooltip);
+        });
+        this.invalidFieldTooltips = [];
+
+        // we detach the observers
+        each(this.invalidFieldObserverDetachers, function(detacher){
+            detacher();
+        });
+        this.invalidFieldObserverDetachers = [];
+    },
+
+    setPassword: function(newPassword) {
+        this.passwordField.dom.value = newPassword;
+        this.clearTextField.dom.value = newPassword;
+        this.__clearInvalid();
+    },
+
+    getPassword: function(newPassword) {
+        if (this.show.get()) {
+            return this.clearTextField.dom.value;
+        } else {
+            return this.passwordField.dom.value;
+        }
+    },
+
+    markAsInvalid: function(errors){
+        var result1 = IndicoUtil.markInvalidField(this.passwordField, errors);
+        var result2 = IndicoUtil.markInvalidField(this.clearTextField, errors);
+
+        this.invalidFieldTooltips.push(result1[0]);
+        this.invalidFieldTooltips.push(result2[0]);
+        this.invalidFieldObserverDetachers = this.invalidFieldObserverDetachers.concat(result1[1].concat(result2[1]));
+    },
+
+    draw: function() {
+        var self = this;
+
+        var content = $B(Html.div({style:{display:"inline"}}), this.show, function(show) {
+            var field;
+            var button;
+            if (show) {
+                field = self.clearTextField;
+                field.dom.value = self.passwordField.dom.value;
+                self.button.set(" (" + $T("Hide") + ")");
+            } else {
+                field = self.passwordField;
+                field.dom.value = self.clearTextField.dom.value;
+                self.button.set(" (" + $T("Show") + ")");
+            }
+            self.__clearInvalid();
+            return Html.span({}, field, self.button);
+        });
+        return this.IWidget.prototype.draw.call(this, content);
+    }
+},
+    function(name, initialPassword, initialShow) {
+        this.name = name;
+        this.show = $V(initialShow);
+
+        // We do not use $B and $V for the password because of a bug with two dual bindings between 2 XElements and a $V
+        this.passwordField = Html.input('password', {name: this.name}, initialPassword);
+        this.clearTextField = Html.input('text', {name: this.name}, initialPassword);
+
+        this.button = Html.span("fakeLink");
+
+        var self = this;
+        this.button.observeClick(function(){
+            self.show.set(!self.show.get());
+        });
+
+        this.invalidFieldTooltips = [];
+        this.invalidFieldObserverDetachers = [];
+
+    }
+);
+
+
+
 type("InlineEditWidget", ["InlineRemoteWidget"],
      {
+
+        _buildFrame: function(modeChooser, switchChooser) {
+            return Html.div({},
+                            modeChooser,
+                            Html.div({style:{marginTop: '5px'}},
+                                     switchChooser));
+
+        },
 
          _handleError: function(error) {
              this._error(error);
@@ -877,6 +1007,11 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
 
          },
 
+         /* By default, any input is accepted */
+         _verifyInput: function() {
+             return true;
+         },
+
 
          /* Enables/disables saving */
          _setSave: function(state) {
@@ -888,9 +1023,15 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
              return progressIndicator(true, false);
          },
 
-         _handleLoaded: function(value) {
+         _handleLoaded: function(result) {
              // save the final value once and for all
-             this.value = value;
+             if (exists(result.hasWarning) && result.hasWarning === true) {
+                 var popup = new WarningPopup(result.warning.title, result.warning.content);
+                 popup.open();
+                 this.value = result.result;
+             } else {
+                 this.value = result;
+             }
          }
 
      },
@@ -898,4 +1039,66 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
          this.value = initValue;
          this.InlineRemoteWidget(method, attributes, false);
      });
+
+type("SupportEditWidget", ["InlineEditWidget"],
+        {
+            /* builds the basic structure for both display and
+               edit modes */
+            __buildStructure: function(captionValue, emailValue) {
+                // keep everything in separate lines
+                 return Html.table({},
+                         Html.tbody({},
+                                 Html.tr("support",
+                                         Html.td("supportEntry", "Caption :"),
+                                         Html.td({}, captionValue)),
+                                 Html.tr("support",
+                                         Html.td("supportEntry", "Email :"),
+                                         Html.td({}, emailValue))));
+            },
+
+            _handleEditMode: function(value) {
+
+                // create support fields and set them to the values transmitted
+                this.caption = Html.edit({}, value.caption);
+                this.email = Html.edit({}, value.email);
+
+
+                // add the fields to the parameter manager
+                this.__parameterManager.add(this.caption, 'text', false);
+                this.__parameterManager.add(this.email, 'emaillist', true);
+
+                // call buildStructure with modification widgets
+                return this.__buildStructure(this.caption, this.email);
+            },
+
+            _handleDisplayMode: function(value) {
+                // call buildStructure with spans
+                return this.__buildStructure(value.caption, value.email);
+            },
+
+            _getNewValue: function() {
+                // clean the email list from its separators. This function is mostly used
+                // for formatting the list when saving support emails asynchronously
+
+                // removes separators at the beginning and at the end
+                emaillist = this.email.get().replace(/(^[ ,;]+)|([ ,;]+$)/g, '');
+                // replaces all the other groups of separators by commas
+                emaillist = emaillist.replace(/[ ,;]+/g, ',');
+
+                return {caption: this.caption.get(),
+                        email: emaillist};
+            },
+
+            _verifyInput: function() {
+                if (!this.__parameterManager.check()) {
+                    return false;
+                }
+                return true;
+            }
+        },
+        function(method, attributes, initValue) {
+            this.InlineEditWidget(method, attributes, initValue);
+            this.__parameterManager = new IndicoUtil.parameterManager();
+        });
+
 

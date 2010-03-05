@@ -611,17 +611,13 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         vars["actionPostURL"]=quoteattr(str(urlHandlers.UHConfModifRegistrantListAction.getURL(self._conf)))
 
         if l == []:
-            vars["emailIconURL"]=""
-            vars["printIconURL"]=""
-            vars["infoIconURL"]=""
-            vars["excelIconURL"]=""
             vars ["reglist"]=""
         else:
             vars ["reglist"]=",".join(regl)
-            vars["emailIconURL"]="""<input type="image" name="email" src=%s border="0">"""%quoteattr(str(Config.getInstance().getSystemIconURL("envelope")))
-            vars["printIconURL"]="""<input type="image" name="pdf" src=%s border="0">"""%quoteattr(str(Config.getInstance().getSystemIconURL("pdf")))
-            vars["infoIconURL"]="""<input type="image" name="info" src=%s border="0">"""%quoteattr(str(Config.getInstance().getSystemIconURL("info")))
-            vars["excelIconURL"]="""<input type="image" name="excel" src=%s border="0">"""%quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
+        vars["emailIconURL"]="""<input type="image" name="email" src=%s border="0">"""%quoteattr(str(Config.getInstance().getSystemIconURL("envelope")))
+        vars["printIconURL"]="""<input type="image" name="pdf" src=%s border="0">"""%quoteattr(str(Config.getInstance().getSystemIconURL("pdf")))
+        vars["infoIconURL"]="""<input type="image" name="info" src=%s border="0">"""%quoteattr(str(Config.getInstance().getSystemIconURL("info")))
+        vars["excelIconURL"]="""<input type="image" name="excel" src=%s border="0">"""%quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
         vars ["acom"] = self._getAcomHTML()
         vars ["ses"]=self._getSessHTML()
         vars ["eve"]+=self._getEventHTML()
@@ -758,6 +754,8 @@ class WEmailToRegistrants(wcomponents.WTemplated):
         vars["from"] = self._fromemail
         vars["cc"] = ""
         vars["toEmails"]= ", ".join(toEmails)
+        if vars["toEmails"] == "":
+            vars["toEmails"] = "No registrants have been selected"
         vars["toIds"]= "".join(toIds)
         vars["postURL"]=urlHandlers.UHRegistrantsSendEmail.getURL(self._conf)
         vars["subject"]=""
@@ -1304,7 +1302,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
             </form>
             """)%(quoteattr(str(url)), gsf.getTitle(), self._getMiscInfoItemsHTML(gsf) ) )
         return "".join(html)
-    
+
     def _getFormSections(self):
         sects = []
         regForm = self._conf.getRegistrationForm()

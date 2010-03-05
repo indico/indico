@@ -1,7 +1,7 @@
 <form action=%(postURL)s method="POST">
 <table width="90%%" cellspacing="0" align="center" border="0" style="border-left: 1px solid #777777;padding-left:2px">
 	<tr>
-		<td colspan="3" class="groupTitle"> <%= _("Defining a new notification template")%></td>
+		<td colspan="3" class="groupTitle"> <%= _("Defining a new mail notification template")%></td>
     </tr>
 	%(errors)s
     <tr>
@@ -65,7 +65,7 @@
 	<tr><td colspan="3"><br></td></tr>
 	<tr align="left">
 		<td colspan="3" style="border-top:1px solid #777777;" valign="bottom" align="left">
-			<input type="submit" class="btn" name="save" value="<%= _("save")%>"> 
+			<input type="submit" class="btn" name="save" value="<%= _("save")%>">
 			<input type="submit" class="btn" name="cancel" value="<%= _("cancel")%>">
 		</td>
     </tr>

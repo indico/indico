@@ -35,7 +35,7 @@
     <xsl:param name="uploadURL"/>
     <xsl:param name="manageLink"/>
     <xsl:param name="manageLinkBgColor">#ECECEC</xsl:param>
-    <!-- 
+    <!--
         If true the menu is aligned to the right with respect
         to the popup menu arrow.
     -->
@@ -44,7 +44,7 @@
 
     <xsl:if test="$item/modifyLink != '' or $item/materialLink != '' or $item/minutesLink != ''">
         <!-- script that creates a variable for a menu  -->
-        
+
         <xsl:choose>
             <xsl:when test="$manageLink != ''">
                 <xsl:text disable-output-escaping="yes"><![CDATA[<div class="manageLink" style="background: ]]></xsl:text>
@@ -60,27 +60,27 @@
                 <xsl:text disable-output-escaping="yes"><![CDATA["></span>]]></xsl:text>
              </xsl:otherwise>
         </xsl:choose>
-        
+
         <xsl:text disable-output-escaping="yes">
             <![CDATA[<script type="text/javascript"> $E(']]></xsl:text><xsl:value-of select="$menuName"/>
-        <xsl:text disable-output-escaping="yes"><![CDATA[').observeClick(function() { 
+        <xsl:text disable-output-escaping="yes"><![CDATA[').observeClick(function() {
             var element = $E(']]></xsl:text>
             <xsl:value-of select="$menuName"/><xsl:text disable-output-escaping="yes"><![CDATA[');
         ]]></xsl:text>
-        <xsl:value-of select="$menuName"/><xsl:text disable-output-escaping="yes"><![CDATA[.open(element.getAbsolutePosition().x]]> 
+        <xsl:value-of select="$menuName"/><xsl:text disable-output-escaping="yes"><![CDATA[.open(element.getAbsolutePosition().x]]>
         </xsl:text>
-        
+
         <xsl:if test="$alignMenuRight = 'true'">
             <xsl:text disable-output-escaping="yes"><![CDATA[+element.dom.offsetWidth+1]]></xsl:text>
         </xsl:if>
-        
+
         <xsl:if test="$manageLink != ''">
             <xsl:text disable-output-escaping="yes"><![CDATA[+9]]></xsl:text>
         </xsl:if>
-        
+
         <xsl:text disable-output-escaping="yes"><![CDATA[, element.getAbsolutePosition().y+element.dom.offsetHeight);});
-          
-            var ]]> 
+
+            var ]]>
         </xsl:text>
         <xsl:value-of select="$menuName"/>
         <xsl:text disable-output-escaping="yes">
@@ -91,7 +91,7 @@
         <xsl:choose>
             <xsl:when test="$item/modifyLink != '' and $sessId = '' and $contId = '' and $subContId = ''">
             'Edit event': '<xsl:value-of select="$item/modifyLink"/>',
-            </xsl:when> 
+            </xsl:when>
             <xsl:when test="$item/modifyLink != '' and $subContId != 'null'">
             'Edit subcontribution': '<xsl:value-of select="$item/modifyLink"/>',
             </xsl:when>
@@ -129,13 +129,13 @@
             Indico.Data.MaterialTypes.meeting, <xsl:value-of select="$uploadURL"/>, true);m.close();return false;}
         </xsl:if>
         <xsl:text disable-output-escaping="yes">
-        <![CDATA[        
+        <![CDATA[
         },[$E("]]></xsl:text>
         <xsl:value-of select="$menuName"/>
         <xsl:text disable-output-escaping="yes"><![CDATA[")],null, false, ]]></xsl:text>
         <xsl:value-of select="$alignMenuRight"/>
         <xsl:text disable-output-escaping="yes"><![CDATA[);</script>]]></xsl:text>
-        
+
         <!--
         <xsl:if test="$item/modifyLink != ''">
             <a href="{$item/modifyLink}"><img src="images/manage.png"  alt="modify this item" title="modify this item" style="vertical-align: middle;"/></a>
@@ -199,7 +199,7 @@
 		<xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
 	</xsl:if>
 	<xsl:value-of select="./@last" disable-output-escaping="yes"/>
-</xsl:template>	
+</xsl:template>
 
 
 
@@ -236,7 +236,6 @@
 </xsl:template>
 
 <xsl:template match="supportEmail">
-        <br/>support: 
         <a href="mailto:{.}">
         <xsl:value-of select="."/>
         </a>

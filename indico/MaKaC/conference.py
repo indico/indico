@@ -40,7 +40,7 @@ from MaKaC.contributionReviewing import ReviewManager
 from reviewing import ConferenceReview as ConferenceReview
 
 from pytz import timezone
-from pytz import common_timezones
+from pytz import all_timezones
 
 from persistent import Persistent
 from BTrees.OOBTree import OOBTree
@@ -72,7 +72,6 @@ import MaKaC.task as task
 import MaKaC.common.info as info
 from MaKaC.badge import BadgeTemplateManager
 from MaKaC.poster import PosterTemplateManager
-import MaKaC.common.info as info
 from MaKaC.common.cache import CategoryCache, EventCache
 from MaKaC.common import mail
 from MaKaC.common.utils import getHierarchicalId
@@ -401,6 +400,13 @@ class Category(Persistent):
         recMat.recover()
         self.notifyModification()
 
+    def getMaterialRegistry(self):
+        """
+        Return the correct material registry for this type
+        """
+        from MaKaC.webinterface.materialFactories import CategoryMFRegistry
+        return CategoryMFRegistry
+
     def getMaterialById( self, matId ):
         if matId.lower() == 'paper':
             return self.getPaper()
@@ -673,7 +679,7 @@ class Category(Persistent):
     ##################################
     def getTimezone(self):
         try:
-           if self._timezone not in common_timezones:
+           if self._timezone not in all_timezones:
                self.setTimezone('UTC')
            return self._timezone
         except:
@@ -2760,7 +2766,8 @@ class Conference(Persistent, Fossilizable):
         #the link in every manager to the conference then, when the manager goes to his "My profile" he
         #will see a link to a conference that doesn't exist. Therefore, we need to delete that link as well
         for manager in self.getManagerList():
-            manager.unlinkTo(self, "manager")
+            if isinstance(manager, MaKaC.user.Avatar):
+                manager.unlinkTo(self, "manager")
 
         TrashCanManager().add(self)
 
@@ -2791,14 +2798,14 @@ class Conference(Persistent, Fossilizable):
         if sDate==oldStartDate and eDate==oldEndDate:
             return
         self.unindexConf()
-        
+
         self.setStartDate(sDate, check=0, moveEntries = moveEntries, index=False, notifyObservers = False)
         self.setEndDate(eDate, check=0, index=False, notifyObservers = False)
-        
+
         self._checkInnerSchedule()
         self.indexConf()
         self.cleanCategoryCache()
-        
+
         for observer in self.getObservers():
             try:
                 observer.notifyEventDateChanges(oldStartDate, self.getStartDate(), oldEndDate, self.getEndDate())
@@ -2833,7 +2840,7 @@ class Conference(Persistent, Fossilizable):
             self.verifyStartDate(sDate)
         oldSdate = self.getStartDate()
         diff = sDate - oldSdate
-        
+
         if index:
             self.unindexConf()
         self.startDate  = sDate
@@ -2873,7 +2880,7 @@ class Conference(Persistent, Fossilizable):
     def setStartTime(self, hours=0, minutes=0, notifyObservers = True):
         """ Changes the current conference starting time (not date) to the one specified by the parameters.
         """
-        
+
         sdate = self.getStartDate()
         self.startDate = datetime( sdate.year, sdate.month, sdate.day,
                                                     int(hours), int(minutes) )
@@ -2904,7 +2911,7 @@ class Conference(Persistent, Fossilizable):
     def getAdjustedStartDate(self,tz=None):
         if not tz:
             tz = self.getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
             tz = 'UTC'
         return self.getStartDate().astimezone(timezone(tz))
 
@@ -3012,7 +3019,7 @@ class Conference(Persistent, Fossilizable):
     def getAdjustedEndDate(self,tz=None):
         if not tz:
             tz = self.getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
             tz = 'UTC'
         return self.getEndDate().astimezone(timezone(tz))
 
@@ -3053,7 +3060,7 @@ class Conference(Persistent, Fossilizable):
     def setTimezone(self, tz):
         oldTimezone = self.timezone
         self.timezone = tz
-        
+
         for observer in self.getObservers():
             try:
                 observer.notifyTimezoneChange(oldTimezone, tz)
@@ -3107,11 +3114,11 @@ class Conference(Persistent, Fossilizable):
     def setTitle(self, title):
         """changes the current title of the conference to the one specified"""
         oldTitle = self.title
-        
+
         self.title = title
         self.cleanCategoryCache()
         self.notifyModification()
-        
+
         #we notify the observers that the conference's title has changed
         for observer in self.getObservers():
             try:
@@ -3132,15 +3139,24 @@ class Conference(Persistent, Fossilizable):
         self.description = desc
         self.notifyModification()
 
-    def getSupportEmail( self ):
-        """Returns the support email address associated with the conference
+    def getSupportEmail( self, returnNoReply=False ):
+        """
+        Returns the support email address associated with the conference
+        :param returnNoReply: Return no-reply address in case there's no support e-mail (default True)
+        :type returnNoReply: bool
+
         """
         try:
             if self._supportEmail:
                 pass
         except AttributeError, e:
             self._supportEmail = ""
-        return self._supportEmail
+        if self._supportEmail.strip() == "" and returnNoReply:
+            # In case there's no conference support e-mail, return the no-reply
+            # address, and the 'global' support e-mail if there isn't one
+            return HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
+        else:
+            return self._supportEmail
 
     def setSupportEmail( self, newSupportEmail ):
         self._supportEmail = newSupportEmail.strip()
@@ -3795,7 +3811,7 @@ class Conference(Persistent, Fossilizable):
             if track.isCoordinator( av ):
                 self._v_isallowedtoaccess[av] = True
                 return True
-            
+
         # video services managers are also allowed to access the conference
         if PluginsHolder().hasPluginType("Collaboration"):
             if self.getCSBookingManager().isPluginManagerOfAnyPlugin(av):
@@ -3837,6 +3853,14 @@ class Conference(Persistent, Fossilizable):
             self._v_canaccess = {}
         except KeyError:
             pass
+
+        # Allow harvesters (Invenio, offline cache) to access
+        # protected pages
+        if self.__ac.isHarvesterIP(aw.getIP()):
+            self._v_canaccess[aw] =  True
+            return True
+        #####################################################
+
         if not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and not self.isAllowedToAccess( aw.getUser() ):
             self._v_canaccess[aw] = False
             return False
@@ -3892,7 +3916,7 @@ class Conference(Persistent, Fossilizable):
         if isinstance(prin, ConferenceChair):
             email = prin.getEmail()
         elif isinstance(prin, str):
-            email = prin 
+            email = prin
         if email != None:
             if email == "":
                 return
@@ -3907,7 +3931,7 @@ class Conference(Persistent, Fossilizable):
             #The user is registered in Indico and is activated as well
             elif len(results) == 1 and results[0] is not None and results[0].isActivated():
                 self.__ac.grantModification(results[0])
-                results[0].linkTo(self, "manager") 
+                results[0].linkTo(self, "manager")
         else:
             self.__ac.grantModification( prin )
             if isinstance(prin, MaKaC.user.Avatar):
@@ -4043,6 +4067,13 @@ class Conference(Persistent, Fossilizable):
         self.materials[recMat.getId()] = recMat
         recMat.recover()
         self.notifyModification()
+
+    def getMaterialRegistry(self):
+        """
+        Return the correct material registry for this type
+        """
+        from MaKaC.webinterface.materialFactories import ConfMFRegistry
+        return ConfMFRegistry
 
     def getMaterialById( self, matId ):
         if matId.lower() == 'paper':
@@ -5006,7 +5037,7 @@ class Observer(object):
     _shouldBeTitleNotified = False
     _shouldBeDateChangeNotified = False
     _shouldBeDeletionNotified = False
-    
+
     def getObserverName(self):
         name = "'Observer of class" + self.__class__.__name__
         try:
@@ -5015,29 +5046,29 @@ class Observer(object):
         except AttributeError:
             pass
         return name
-    
+
     def notifyTitleChange(self, oldTitle, newTitle):
         if self._shouldBeTitleNotified:
             self._notifyTitleChange(oldTitle, newTitle)
-            
+
     def notifyEventDateChanges(self, oldStartDate = None, newStartDate = None, oldEndDate = None, newEndDate = None):
         if self._shouldBeDateChangeNotified:
             self._notifyEventDateChanges(oldStartDate, newStartDate, oldEndDate, newEndDate)
-            
+
     def notifyTimezoneChange(self, oldTimezone, newTimezone):
         if self._shouldBeDateChangeNotified:
             self._notifyTimezoneChange(oldTimezone, newTimezone)
-            
+
     def notifyDeletion(self):
         if self._shouldBeDeletionNotified:
             self._notifyDeletion()
-            
-    def _notifyTitleChange(self, oldTitle, newTitle): 
+
+    def _notifyTitleChange(self, oldTitle, newTitle):
         """ To be implemented by inheriting classes
             Notifies the observer that the Conference object's title has changed
         """
         raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method _notifyTitleChange")
-    
+
     def _notifyEventDateChanges(self, oldStartDate, newStartDate, oldEndDate, newEndDate):
         """ To be implemented by inheriting classes
             Notifies the observer that the start and / or end dates of the object it is attached to has changed.
@@ -5046,7 +5077,7 @@ class Observer(object):
             in the 'dateChangeNotificationProblems' context variable (which is a list of strings).
         """
         raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyStartDateChange")
-    
+
     def _notifyTimezoneChange(self, oldTimezone, newTimezone):
         """ To be implemented by inheriting classes.
             Notifies the observer that the end date of the object it is attached to has changed.
@@ -5055,7 +5086,7 @@ class Observer(object):
             If there are no problems, the DateChangeObserver should return an empty list.
         """
         raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyTimezoneChange")
-    
+
     def _notifyDeletion(self):
         """ To be implemented by inheriting classes
             Notifies the observer that the Conference object it is attached to has been deleted
@@ -5711,29 +5742,27 @@ class Session(Persistent):
             else:
                 self.setTextColor(self._getCorrectTextColor(textcolor))
         self.setTextColorToLinks(sessionData.has_key("textcolortolinks"))
-        #if the location is not defined we set the location of the session
-        #   to None so it will be considered to be the same as for the
-        #   conference
-        if sessionData.get( "locationName", "" ).strip() == "":
-            self.setLocation( None )
-        else:
-            #if the location name is defined we must set a new location (or
-            #   modify the existing one) for the session
+
+        if "locationName" in sessionData:
             loc = self.getOwnLocation()
             if not loc:
                 loc = CustomLocation()
             self.setLocation( loc )
             loc.setName( sessionData["locationName"] )
             loc.setAddress( sessionData.get("locationAddress", "") )
-        #same as for the location
-        if sessionData.get( "roomName", "" ).strip() == "":
-                self.setRoom( None )
         else:
+            self.setLocation(None)
+
+        #same as for the location
+        if "roomName" in sessionData:
             room = self.getOwnRoom()
             if not room:
                 room = CustomRoom()
             self.setRoom( room )
             room.setName( sessionData["roomName"] )
+        else:
+            self.setRoom(None)
+
         if sessionData.get("sDate",None) is not None:
             self.setStartDate(sessionData["sDate"],check,moveEntries=moveEntries)
         if sessionData.get("eDate",None) is not None:
@@ -5885,7 +5914,7 @@ class Session(Persistent):
     def getAdjustedStartDate(self,tz=None):
         if not tz:
             tz = self.getConference().getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
             tz = 'UTC'
         return self.startDate.astimezone(timezone(tz))
 
@@ -6353,6 +6382,14 @@ class Session(Persistent):
             self._v_canaccess = {}
         except KeyError:
             pass
+
+        # Allow harvesters (Invenio, offline cache) to access
+        # protected pages
+        if self.__ac.isHarvesterIP(aw.getIP()):
+            self._v_canaccess[aw] =  True
+            return True
+        #####################################################
+
         if not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and not self.isAllowedToAccess( aw.getUser() ):
             self._v_canaccess[aw] = False
             return False
@@ -6489,6 +6526,13 @@ class Session(Persistent):
         self.materials[ recMat.getId() ] = recMat
         recMat.recover()
         self.notifyModification()
+
+    def getMaterialRegistry(self):
+        """
+        Return the correct material registry for this type
+        """
+        from MaKaC.webinterface.materialFactories import SessionMFRegistry
+        return SessionMFRegistry
 
     def getMaterialById( self, matId ):
         if matId.lower() == 'minutes':
@@ -6895,23 +6939,24 @@ class SessionSlot(Persistent):
         # Do we move all entries in the slot
         move = int(data.get("move",0))
 
-        if data.get( "locationName", "" ).strip() == "":
-            self.setLocation( None )
-        else:
+        if "locationName" in data:
             loc = self.getOwnLocation()
             if not loc:
                 loc = CustomLocation()
             self.setLocation( loc )
             loc.setName( data["locationName"] )
             loc.setAddress( data.get("locationAddress", "") )
-        if data.get( "roomName", "" ).strip() == "":
-            self.setRoom( None )
         else:
+            self.setLocation( None )
+
+        if "roomName" in data:
             room = self.getOwnRoom()
             if not room:
                 room = CustomRoom()
             self.setRoom( room )
             room.setName( data["roomName"] )
+        else:
+            self.setRoom( None )
         sDate = eDate = None
         confTZ = self.getOwner().getConference().getTimezone()
         if data.get("sDate",None) is not None:
@@ -7157,7 +7202,7 @@ class SessionSlot(Persistent):
     def getAdjustedStartDate(self,tz=None):
         if not tz:
             tz = self.getConference().getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
             tz = 'UTC'
         return self.startDate.astimezone(timezone(tz))
 
@@ -7170,7 +7215,7 @@ class SessionSlot(Persistent):
     def getAdjustedEndDate( self, tz=None ):
         if not tz:
             tz = self.getConference().getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
             tz = 'UTC'
         if self.getEndDate():
             return self.getEndDate().astimezone(timezone(tz))
@@ -7395,7 +7440,7 @@ class SessionSlot(Persistent):
 
 
 class ContributionParticipation(Persistent, Fossilizable):
-    
+
     fossilizes(IContributionParticipationFossil)
 
     def __init__( self ):
@@ -7809,7 +7854,7 @@ class Contribution(Persistent, Fossilizable):
         the useful operations to access and manage them. A contribution can be
         attached either to a session or to a conference.
     """
-    
+
     fossilizes(IContributionFossil, IContributionWithSpeakersFossil, IContributionWithSubContribsFossil)
 
     def __init__(self,**contribData):
@@ -8034,31 +8079,26 @@ class Contribution(Persistent, Fossilizable):
                 id = f.getId()
                 if data.has_key("f_%s"%id):
                     self.setField(id, data["f_%s"%id])
-        #if the location is not defined we set the location of the contribution
-        #   to None so it will be considered to be the same as for the
-        #   conference
-        if data.has_key("locationName"):
-            if data["locationName"].strip()=="":
-                self.setLocation(None)
-            else:
-                #if the location name is defined we must set a new location (or
-                #   modify the existing one) for the contribution
-                loc=self.getOwnLocation()
-                if not loc:
-                    loc=CustomLocation()
-                self.setLocation(loc)
-                loc.setName(data["locationName"])
-                loc.setAddress(data.get("locationAddress", ""))
+
+        if "locationName" in data:
+            loc=self.getOwnLocation()
+            if not loc:
+                loc=CustomLocation()
+            self.setLocation(loc)
+            loc.setName(data["locationName"])
+            loc.setAddress(data.get("locationAddress", ""))
+        else:
+            self.setLocation(None)
+
         #same as for the location
-        if data.has_key("roomName"):
-            if data["roomName"].strip()=="":
-                self.setRoom(None)
-            else:
-                room=self.getOwnRoom()
-                if not room:
-                    room=CustomRoom()
-                self.setRoom(room)
-                room.setName(data["roomName"])
+        if "roomName" in data:
+            room=self.getOwnRoom()
+            if not room:
+                room=CustomRoom()
+            self.setRoom(room)
+            room.setName(data["roomName"])
+        else:
+            self.setRoom(None)
         tz = 'UTC'
         if self.getConference():
             tz = self.getConference().getTimezone()
@@ -8577,7 +8617,7 @@ class Contribution(Persistent, Fossilizable):
             return None
         if not tz:
             tz = self.getConference().getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
             tz = 'UTC'
         return self.getStartDate().astimezone(timezone(tz))
 
@@ -8589,7 +8629,7 @@ class Contribution(Persistent, Fossilizable):
     def getAdjustedEndDate(self,tz=None):
         if not tz:
             tz = self.getConference().getTimezone()
-        if tz not in common_timezones:
+        if tz not in all_timezones:
             tz = 'UTC'
         if self.getEndDate():
             return self.getEndDate().astimezone(timezone(tz))
@@ -9015,6 +9055,7 @@ class Contribution(Persistent, Fossilizable):
         self.setSpeakerText( "%s, %s"%(self.getSpeakerText(), newText.strip()) )
 
     def canIPAccess( self, ip ):
+
         try:
             return self._v_canipaccess[ip]
         except AttributeError:
@@ -9110,9 +9151,18 @@ class Contribution(Persistent, Fossilizable):
             self._v_canaccess = {}
         except KeyError:
             pass
+
+        # Allow harvesters (Invenio, offline cache) to access
+        # protected pages
+        if self.__ac.isHarvesterIP(aw.getIP()):
+            self._v_canaccess[aw] =  True
+            return True
+        #####################################################
+
         if self.canModify(aw):
             self._v_canaccess[aw] =  True
             return True
+
         if not self.canIPAccess(aw.getIP()) and not self.isAllowedToAccess( aw.getUser() ):
             self._v_canaccess[aw] = False
             return False
@@ -9229,6 +9279,13 @@ class Contribution(Persistent, Fossilizable):
         self.materials[ recMat.getId() ] =  recMat
         recMat.recover()
         self.notifyModification()
+
+    def getMaterialRegistry(self):
+        """
+        Return the correct material registry for this type
+        """
+        from MaKaC.webinterface.materialFactories import ContribMFRegistry
+        return ContribMFRegistry
 
     def getMaterialById( self, matId ):
         if matId.lower() == 'paper':
@@ -9684,7 +9741,7 @@ class Contribution(Persistent, Fossilizable):
 
     def setReportNumberHolder(self, rnh):
         self._reportNumberHolder=rnh
-        
+
     @classmethod
     def contributionStartDateForSort(cls, contribution):
         """ Function that can be used as "key" argument to sort a list of contributions by start date
@@ -9864,7 +9921,7 @@ class ContribStatusNone(ContribStatus):
         return csn
 
 class SubContribParticipation(Persistent, Fossilizable):
-    
+
     fossilizes(ISubContribParticipationFossil)
 
     def __init__( self ):
@@ -10115,7 +10172,7 @@ class SubContribParticipation(Persistent, Fossilizable):
 class SubContribution(Persistent, Fossilizable):
     """
     """
-    
+
     fossilizes(ISubContributionFossil, ISubContributionWithSpeakersFossil)
 
     def __init__( self, **subContData ):
@@ -10496,6 +10553,13 @@ class SubContribution(Persistent, Fossilizable):
         self.materials[ recMat.getId() ] =  recMat
         recMat.recover()
         self.notifyModification()
+
+    def getMaterialRegistry(self):
+        """
+        Return the correct material registry for this type
+        """
+        from MaKaC.webinterface.materialFactories import SubContributionMFRegistry
+        return SubContributionMFRegistry
 
     def getMaterialById( self, matId ):
         if matId.lower() == 'paper':
@@ -11037,12 +11101,13 @@ class Material(Persistent):
                 return True
         return False
 
-    def addResource( self, newRes ):
+    def addResource( self, newRes, forcedFileId = None ):
         newRes.setOwner( self )
         newRes.setId( str( self.__resourcesIdGen.newCount() ) )
-        newRes.archive( self._getRepository() )
+        newRes.archive( self._getRepository(), forcedFileId = forcedFileId )
         self.__resources[newRes.getId()] = newRes
         self.notifyModification()
+        Logger.get('storage').debug("Finished storing resource %s for material %s" % (newRes.getId(), self.getLocator()))
 
     @Retrieves (['MaKaC.conference.Material',
                  'MaKaC.conference.Minutes',
@@ -11232,6 +11297,14 @@ class Material(Persistent):
             self._v_canaccess = {}
         except KeyError:
             pass
+
+        # Allow harvesters (Invenio, offline cache) to access
+        # protected pages
+        if self.__ac.isHarvesterIP(aw.getIP()):
+            self._v_canaccess[aw] =  True
+            return True
+        #####################################################
+
         canUserAccess = self.isAllowedToAccess( aw.getUser() )
         canIPAccess = self.canIPAccess( aw.getIP() )
         if not self.isProtected():
@@ -11443,7 +11516,7 @@ class Minutes(Material):
         self.title = newTitle.strip()
         self.notifyModification()
 
-    def _setFile( self ):
+    def _setFile( self, forcedFileId = None ):
         #XXX: unsafe; it must be changed by mkstemp when migrating to python 2.3
         tmpFileName = tempfile.mktemp()
         fh = open(tmpFileName, "w")
@@ -11452,15 +11525,15 @@ class Minutes(Material):
         self.file = LocalFile()
         self.file.setId("minutes")
         self.file.setName("minutes")
-        self.file.setFilePath( tmpFileName )
-        self.file.setFileName( "minutes.txt" )
-        self.file.setOwner( self )
-        self.file.archive( self._getRepository() )
+        self.file.setFilePath(tmpFileName)
+        self.file.setFileName("minutes.txt")
+        self.file.setOwner(self)
+        self.file.archive(self._getRepository(), forcedFileId = forcedFileId)
 
-    def setText( self, text ):
+    def setText( self, text, forcedFileId = None ):
         if self.file:
             self.file.delete()
-        self._setFile()
+        self._setFile(forcedFileId = forcedFileId)
         self.file.replaceContent( text )
         self.getOwner().notifyModification()
 
@@ -11616,7 +11689,7 @@ class Resource(Persistent):
     def getDescription( self ):
         return self.description
 
-    def archive( self, repository=None ):
+    def archive( self, repository = None, forcedFileId = None ):
         """performs necessary operations to ensure the archiving of the
             resource. By default is doing nothing as the persistence of the
             system already ensures the archiving of the basic resource data"""
@@ -11705,6 +11778,15 @@ class Resource(Persistent):
             self._v_canaccess = {}
         except KeyError:
             pass
+
+        # Allow harvesters (Invenio, offline cache) to access
+        # protected pages
+        if self.__ac.isHarvesterIP(aw.getIP()):
+            self._v_canaccess[aw] =  True
+            return True
+        #####################################################
+
+
         if not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and not self.isAllowedToAccess( aw.getUser() ):
             self._v_canaccess[aw] = False
             return False
@@ -11969,14 +12051,14 @@ class LocalFile(Resource):
             raise MaKaCError( _("File not available until it has been archived") , _("File Archiving"))
         self.__repository.replaceContent( self.__archivedId, newContent )
 
-    def archive( self, repository=None ):
+    def archive( self, repository=None, forcedFileId = None ):
         if self.isArchived():
             raise Exception( _("File is already archived"))
         if not repository:
             raise Exception( _("Destination repository not set"))
         if self.filePath == "":
             return _("Nothing to archive")
-        repository.storeFile( self )
+        repository.storeFile( self, forcedFileId = forcedFileId)
         self.filePath = ""
         self.notifyModification()
 

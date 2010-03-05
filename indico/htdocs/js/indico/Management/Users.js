@@ -301,7 +301,7 @@ type("UserDataPopup", ["ExclusivePopup"],
                      [$T('Family Name'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), userData.accessor('familyName'))],
                      [$T('First Name'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('firstName'))],
                      [$T('Affiliation'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('affiliation'))],
-                     [$T('Email'), $B(self.parameterManager.add(Html.edit({style: {width: '200px'}}), 'text', false), userData.accessor('email'))],
+                     [$T('Email'),  $B(self.parameterManager.add(Html.edit({style: {width: '200px'}}), 'email', true), userData.accessor('email'))],
                      [$T('Address'), $B(Html.textarea(), userData.accessor('address'))],
                      [$T('Telephone'), $B(Html.edit({style: {width: '150px'}}), userData.accessor('telephone'))],
                      [$T('Fax'), $B(Html.edit({style: {width: '150px'}}), userData.accessor('fax'))],
@@ -345,15 +345,17 @@ type("UserListWidget", ["ListWidget"],
                      'Change user data',
                      userData.clone(),
                      function(newData, suicideHook) {
-                         self.editProcess(userData, function(result) {
-                             if (result) {
-                                 userData.update(newData.getAll());
-                                 if (!startsWith(userData.get('id'), 'newUser')) {
-                                     userData.set('id', 'edited' + userData.get('id'));
+                         if (editPopup.parameterManager.check()) {
+                             self.editProcess(userData, function(result) {
+                                 if (result) {
+                                     userData.update(newData.getAll());
+                                     if (!startsWith(userData.get('id'), 'newUser')) {
+                                         userData.set('id', 'edited' + userData.get('id'));
+                                     }
                                  }
-                             }
-                         });
-                         suicideHook();
+                             });
+                             suicideHook();
+                         }
                      }
                  );
                  editPopup.open();
@@ -503,9 +505,7 @@ type("UserListField", ["IWidget"], {
                     var newUserIds = getSelectedItems(self.userSelectPopup.selectList);
                     each(newUserIds, function(newUserId) {
                         var newUser = self.allOptions.get(newUserId).clone();
-                        if (self.userList.get("existingAv"+newUserId)) {
-                            self.userList.set("existingAv"+newUserId, null);
-                        }
+
                         self.newProcess([newUser], function(result) {
                             if (result) {
                                 self.userList.set("existingAv"+newUserId, newUser);
@@ -567,7 +567,7 @@ type("UserListField", ["IWidget"], {
          var self = this;
 
          each(initialUsers, function(user){
-             if (any(user.isAvatar, false)) {
+             if (any(user._type, null) === 'Avatar') {
                  self.userList.set('existingAv' + user.id, $O(user));
              } else {
                  self.userList.set(user.id, $O(user));

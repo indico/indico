@@ -5,7 +5,7 @@
     <tr>
         <td><br></td>
     </tr>
-    <tr><td align="center"><font size="+3" color="#3366AA"><b> <%= _("Notification Sent")%></b></font></td>
+    <tr><td align="center"><font size="+3" color="#3366AA"><b> <%= _("Email Notification Sent")%></b></font></td>
     </tr>
     <tr>
         <td><br></td>

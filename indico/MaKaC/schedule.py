@@ -136,7 +136,6 @@ class TimeSchedule(Schedule, Persistent):
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
-
         if entry.isScheduled():
             # remove it from the old schedule and add it to this one
             entry.getSchedule().removeEntry(entry)
@@ -168,7 +167,7 @@ class TimeSchedule(Schedule, Persistent):
         else:
             if entry.getStartDate() < self.getStartDate('UTC'):
                 if check==1:
-                    raise TimingError( _("Cannot schedule this entry because its start date (%s) is before its parents (%s)")%(entry.getStartDate(),self.getStartDate('UTC')),_("Add Entry"))
+                    raise TimingError( _("Cannot schedule this entry because its start date (%s) is before its parents (%s)")%(entry.getAdjustedStartDate(),self.getAdjustedStartDate()),_("Add Entry"))
                 elif check == 2:
                     ContextManager.get('autoOps').append((owner,
                                                           "OWNER_START_DATE_EXTENDED",
@@ -177,7 +176,7 @@ class TimeSchedule(Schedule, Persistent):
                     owner.setStartDate(entry.getStartDate(),check)
             elif entry.getEndDate()>self.getEndDate('UTC'):
                 if check==1:
-                    raise TimingError( _("Cannot schedule this entry because its end date (%s) is after its parents (%s)")%(entry.getEndDate(),self.getEndDate('UTC')),_("Add Entry"))
+                    raise TimingError( _("Cannot schedule this entry because its end date (%s) is after its parents (%s)")%(entry.getAdjustedEndDate(),self.getAdjustedEndDate()),_("Add Entry"))
                 elif check == 2:
                     ContextManager.get('autoOps').append((owner,
                                                           "OWNER_END_DATE_EXTENDED",
@@ -189,7 +188,7 @@ class TimeSchedule(Schedule, Persistent):
         if entry.getEndDate() is not None and \
                 (entry.getEndDate()<self.getStartDate('UTC') or \
                 entry.getEndDate()>self.getEndDate('UTC')):
-            raise TimingError( _("Cannot schedule this entry because its end date (%s) is after its parents (%s)")%(entry.getEndDate(),self.getEndDate()), _("Add Entry"))
+            raise TimingError( _("Cannot schedule this entry because its end date (%s) is after its parents (%s)")%(entry.getAdjustedEndDate(),self.getAdjustedEndDate()), _("Add Entry"))
         self._entries.append(entry)
         entry.setSchedule(self,self._getNewEntryId())
         self.reSchedule()
@@ -727,7 +726,6 @@ class SlotSchedule(TimeSchedule):
         """
 
         owner = self.getOwner()
-
         if (entry is None) or self.hasEntry(entry):
             return
         if isinstance(entry,LinkedTimeSchEntry):
@@ -939,7 +937,7 @@ class LinkedTimeSchEntry(TimeSchEntry):
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'sessionId', lambda x: x.getOwner().getSession().getId())
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'sessionSlotId', lambda x: x.getOwner().getId())
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'entryType', lambda x: 'Session')
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'material', lambda x: DictPickler.pickle(x.getOwner().getSession().getMaterialList()))
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'material', lambda x: DictPickler.pickle(x.getOwner().getSession().getAllMaterialList()))
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'color', lambda x: x.getOwner().getSession().getColor())
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'textColor', lambda x: x.getOwner().getSession().getTextColor())
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'isPoster', lambda x: x.getOwner().getSession().getScheduleType() == 'poster')
@@ -1170,7 +1168,6 @@ class BreakTimeSchEntry(IndTimeSchEntry):
         return values
 
     def setValues( self, data, check=2, moveEntriesBelow=0, tz='UTC'):
-
         from MaKaC.conference import CustomLocation, CustomRoom
         # In order to move the entries below, it is needed to know the diff (we have to move them)
         # and the list of entries to move. It's is needed to take those datas in advance because they
@@ -1424,7 +1421,7 @@ class ContribSchEntry(LinkedTimeSchEntry):
     @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'sessionId', Conversion.parentSession)
     @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'sessionSlotId', Conversion.parentSlot)
     @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'contributionId', lambda x: x.getOwner().getId())
-    @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'material', lambda x: DictPickler.pickle(x.getOwner().getMaterialList()))
+    @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'material', lambda x: DictPickler.pickle(x.getOwner().getAllMaterialList()))
     @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'description', lambda x: x.getOwner().getDescription())
     @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'presenters', lambda x: x.getOwner().getSpeakerList(), isPicklableObject=True)
 
