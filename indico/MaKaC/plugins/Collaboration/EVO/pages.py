@@ -19,16 +19,15 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase,\
-    WCSCSSBase
+from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase, WCSCSSBase
 from MaKaC.common.utils import formatDateTime
 from datetime import timedelta
 from MaKaC.webinterface.common.tools import strip_ml_tags, unescape_html
-from MaKaC.plugins.Collaboration.EVO.common import getMinStartDate,\
-    getMaxEndDate
+from MaKaC.plugins.Collaboration.EVO.common import getMinStartDate, getMaxEndDate
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.i18n import _
 from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate
+from MaKaC.webinterface import urlHandlers
 
 class WNewBookingForm(WCSPageTemplateBase):
 
@@ -38,12 +37,12 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["EventTitle"] = self._conf.getTitle()
         vars["EventDescription"] = unescape_html(strip_ml_tags( self._conf.getDescription())).strip()
 
-        defaultStartDate = self._conf.getAdjustedStartDate() - timedelta(0,0,0,0,CollaborationTools.getCollaborationOptionValue("startMinutes"))
-        nowStartDate = getAdjustedDate(nowutc() - timedelta(0,0,0,0, self._EVOOptions["allowedPastMinutes"].getValue() / 2), self._conf)
+        defaultStartDate = self._conf.getAdjustedStartDate() - timedelta(0, 0, 0, 0, CollaborationTools.getCollaborationOptionValue("startMinutes"))
+        nowStartDate = getAdjustedDate(nowutc() - timedelta(0, 0, 0, 0, self._EVOOptions["allowedPastMinutes"].getValue() / 2), self._conf)
         vars["DefaultStartDate"] = formatDateTime(max(defaultStartDate, nowStartDate))
 
         defaultEndDate = self._conf.getAdjustedEndDate()
-        nowEndDate = nowStartDate + timedelta(0,0,0,0, self._EVOOptions["allowedMinutes"].getValue())
+        nowEndDate = nowStartDate + timedelta(0, 0, 0, 0, self._EVOOptions["allowedMinutes"].getValue())
         vars["DefaultEndDate"] = formatDateTime(max(defaultEndDate, nowEndDate))
 
         communities = self._EVOOptions["communityList"].getValue() #a dict communityId : communityName
@@ -62,6 +61,8 @@ class WMain (WJSBase):
         vars["MinStartDate"] = formatDateTime(getMinStartDate(self._conf))
         vars["MaxEndDate"] = formatDateTime(getMaxEndDate(self._conf))
         vars["AllowedMarginMinutes"] = self._EVOOptions["allowedMinutes"].getValue()
+        vars["PossibleToCreateOrModify"] = getAdjustedDate(nowutc(), self._conf) < getMaxEndDate(self._conf)
+        vars["GeneralSettingsURL"] = urlHandlers.UHConferenceModification.getURL(self._conf)
 
         return vars
 

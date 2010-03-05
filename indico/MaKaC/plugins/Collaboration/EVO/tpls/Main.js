@@ -242,12 +242,36 @@
         EVOPasswordField = new ShowablePasswordField('accessPassword', '', false);
         $E('passwordField').set(EVOPasswordField.draw());
         EVODrawContextHelpIcons();
+        <% if not PossibleToCreateOrModify: %>
+            var popup = new WarningPopup($T("Impossible to create an EVO booking"),
+                    [$T("The start and ending dates of your event are in the past."),
+                     $T("It is not possible to create an EVO booking in the past"),
+                     $T("or outside the start / ending times of your event."),
+                     Html.br(),
+                     $T("If you really need to create an EVO booking, please go first to"),
+                     $T("the [[" + "<%= GeneralSettingsURL %>" + " General Settings]] page and change"),
+                     $T("the start / end time of your event.")
+                     ]);
+            popup.open();
+        <% end %>
     },
 
     onEdit: function(booking) {
         EVOPasswordField = new ShowablePasswordField('accessPassword', booking.bookingParams.accessPassword, false);
         $E('passwordField').set(EVOPasswordField.draw());
         EVODrawContextHelpIcons();
+        <% if not PossibleToCreateOrModify: %>
+            var popup = new WarningPopup($T("Impossible to modify this EVO booking"),
+                [$T("The start and ending dates of your event are in the past."),
+                 $T("It is not possible to modify an EVO booking in the past"),
+                 $T("or outside the start / ending times of your event."),
+                 Html.br(),
+                 $T("If you really need to modify this EVO booking, please go first to"),
+                 $T("the [[" + "<%= GeneralSettingsURL %>" + " General Settings]] page and change"),
+                 $T("the start / end time of your event.")
+                 ]);
+            popup.open();
+        <% end %>
     },
 
     onSave: function(values) {
