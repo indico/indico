@@ -158,14 +158,19 @@ class ConferenceBookingModification( ConferenceTextModificationBase ):
             room = conference.CustomRoom()
             self._target.setRoom(room)
 
-        room.setName( self._value['room'] )
+        # if a room name is not passed, it is assumed
+        # as empty
+        if 'room' in self._value:
+            room.setName( self._value['room'] )
 
         loc = self._target.getLocation()
         if not loc:
             loc = conference.CustomLocation()
             self._target.setLocation(loc)
 
-        loc.setName( self._value['location'] )
+        if 'location' in self._value:
+            loc.setName( self._value['location'] )
+
         loc.setAddress( self._value['address'] )
 
     def _handleGet(self):
