@@ -1812,7 +1812,7 @@ class RHConfAddManagers( RHConferenceModifBase ):
 
     def _process( self ):
         params = self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 p = ph.getById( id )
@@ -1848,7 +1848,7 @@ class RHConfAddRegistrars( RHConferenceModifBase ):
 
     def _process( self ):
         params = self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 p = ph.getById( id )
@@ -3755,7 +3755,7 @@ class RHConfModifCFAAddSubmitter(RHConfModifCFABase):
 
     def _process( self ):
         params = self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 if id:
@@ -6992,7 +6992,7 @@ class RHConfModifAddChairs(RHConferenceModifBase):
 
     def _process( self ):
         params = self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ah = user.AvatarHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 av=ah.getById( id )

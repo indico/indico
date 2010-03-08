@@ -656,7 +656,7 @@ class WWebcastSetup( wcomponents.WTemplated ):
         managers = wm.getManagers()
         urlselectmanager = urlHandlers.UHWebcastSelectManager.getURL()
         urlremovemanager = urlHandlers.UHWebcastRemoveManager.getURL()
-        vars["adminList"] = wcomponents.WPrincipalTable().getHTML( managers,  None, urlselectmanager, urlremovemanager )
+        vars["adminList"] = wcomponents.WPrincipalTable().getHTML( managers,  None, urlselectmanager, urlremovemanager, selectable=False )
         channels = wm.getChannels()
         iconremove = Config.getInstance().getSystemIconURL( "remove" )
         iconadd = Config.getInstance().getSystemIconURL( "add" )

@@ -655,7 +655,7 @@ class RHSessionDataModificationConvenerAdd( RHSessionModifBase ):
                 if params.has_key("managerControl") :
                     self._session.grantModification(person)
             
-        elif params.get("orgin","") == "selected" :
+        elif params.get("orgin","") == "selected" and not "cancel" in params:
             selectedList = self._normaliseListParam(self._getRequestParams().get("selectedPrincipals",[]))
             
             for s in selectedList :
@@ -1202,7 +1202,9 @@ class RHSessionAddAllowed( RHSessionModifBase ):
     
     def _checkParams( self, params ):
         RHSessionModifBase._checkParams( self, params )
-        selAllowedId = self._normaliseListParam( params.get( "selectedPrincipals", [] ) )
+        selAllowedId = []
+        if "cancel" not in params:
+            selAllowedId = self._normaliseListParam( params.get( "selectedPrincipals", [] ) )
         #ah = user.AvatarHolder()
         ph = user.PrincipalHolder()
         self._allowed = []
@@ -1274,7 +1276,7 @@ class RHSessionAddManagers( RHSessionModifBase ):
     
     def _process( self ):
         params = self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 av=ph.getById( id )
@@ -1321,7 +1323,7 @@ class RHCoordinatorsAdd(RHSessionModifBase):
     
     def _process( self ):
         params=self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ph=user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 av=ph.getById( id )

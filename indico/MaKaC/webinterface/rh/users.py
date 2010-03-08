@@ -95,7 +95,7 @@ class RHUserManagementLogMeAs( admins.RHAdminBase ):
         if "returnURL" in params.keys():
             self._returnURL = params["returnURL"]
         
-        if "selectedPrincipals" in params.keys():
+        if "selectedPrincipals" in params.keys() and not "cancel" in params:
             self._userId = params["selectedPrincipals"]
             try:
                 self._av = user.AvatarHolder().getById(self._userId)

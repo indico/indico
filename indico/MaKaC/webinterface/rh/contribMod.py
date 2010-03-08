@@ -519,7 +519,7 @@ class RHNewSubcontributionPersonAdd(RHContribModifBaseSpecialSesCoordRights):
                 else :
                     self._errorList.append("%s has been already defined as %s of this session"%(person.getFullName(), self._typeName))
 
-        elif params.get("orgin", "") == "selected" :
+        elif params.get("orgin", "") == "selected":
             selectedList = self._normaliseListParam(self._getRequestParams().get("selectedPrincipals", []))
 
             for s in selectedList :
@@ -795,7 +795,7 @@ class RHSearchAddPrimaryAuthor (RHContribModifBaseSpecialSesCoordRights):
 
     def _process(self):
         params=self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ah=user.AvatarHolder()
             authIndex = self._target.getConference().getAuthorIndex()
             for id in self._normaliseListParam(params["selectedPrincipals"]):
@@ -845,7 +845,7 @@ class RHSearchAddCoAuthor (RHContribModifBaseSpecialSesCoordRights):
 
     def _process(self):
         params=self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ah=user.AvatarHolder()
             authIndex = self._target.getConference().getAuthorIndex()
             for id in self._normaliseListParam(params["selectedPrincipals"]):
@@ -896,7 +896,7 @@ class RHSearchAddSpeakers (RHContribModifBaseSpecialSesCoordRights):
 
     def _process(self):
         params=self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ah=user.AvatarHolder()
             authIndex = self._target.getConference().getAuthorIndex()
             for id in self._normaliseListParam(params["selectedPrincipals"]):
@@ -1402,7 +1402,7 @@ class RHContributionAddManagers(RHContribModifBaseSpecialSesCoordRights):
 
     def _process(self):
         params = self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam(params["selectedPrincipals"]):
                 self._target.grantModification(ph.getById(id))
@@ -1452,7 +1452,7 @@ class RHContributionAddAllowed(RHContribModifBaseSpecialSesCoordRights):
 
     def _process(self):
         params = self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam(params["selectedPrincipals"]):
                 self._target.grantAccess(ph.getById(id))
@@ -1844,7 +1844,7 @@ class RHSubmittersAdd(RHContribModifBaseSpecialSesCoordRights):
 
     def _process(self):
         params=self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ah=user.PrincipalHolder()
             for id in self._normaliseListParam(params["selectedPrincipals"]):
                 av=ah.getById(id)

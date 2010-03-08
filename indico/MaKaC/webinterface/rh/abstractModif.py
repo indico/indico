@@ -144,7 +144,7 @@ class RHAbstractSetSubmitter(RHAbstractModifBase):
     
     def _process( self ):
         params = self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ph = user.PrincipalHolder()
             id  = params["selectedPrincipals"]
             self._target.setSubmitter( ph.getById( id ) )

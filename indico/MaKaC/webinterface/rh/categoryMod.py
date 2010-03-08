@@ -596,7 +596,7 @@ class RHCategoryAddAllowed( RHCategModifBase ):
     
     def _process( self ):
         params = self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 self._target.grantAccess( ph.getById( id ) )
@@ -665,7 +665,7 @@ class RHCategoryAddConfCreators( RHCategModifBase ):
     
     def _process( self ):
         params = self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 entity = ph.getById( id )

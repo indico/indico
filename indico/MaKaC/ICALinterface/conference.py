@@ -28,10 +28,10 @@ from MaKaC.common.utils import encodeUnicode
 
 
 class ProgrammeToiCal(ICALBase):
-    
+
     def __init__(self, conf):
         self._conf = conf
-            
+
     def getBody(self):
         return ""
 
@@ -47,7 +47,7 @@ class WebcastToiCal(ICALBase):
                 text += ConferenceToiCal(webcast.getEvent()).getCore()
         text += self._printFooter()
         return text
-    
+
 class CategoryToiCal(ICALBase):
 
     def __init__(self, categ):
@@ -61,7 +61,7 @@ class CategoryToiCal(ICALBase):
         return text
 
 class ConferenceToiCal(ICALBase):
-    
+
     def __init__(self, conf):
         self._conf = conf
         self._protected = conf.hasAnyProtection()
@@ -70,7 +70,7 @@ class ConferenceToiCal(ICALBase):
         return "\\n".join(encodeUnicode(text).splitlines())
 
     def getCore(self):
-        url = str( urlHandlers.UHConferenceDisplay.getURL( self._conf ) ) 
+        url = str( urlHandlers.UHConferenceDisplay.getURL( self._conf ) )
         text = self._printEventHeader(self._conf)
         text += "URL;VALUE=URI:%s\n" % url
         text += "DTSTART:%s\n" % escape(self._conf.getStartDate().strftime("%Y%m%dT%H%M00Z"))
@@ -81,13 +81,13 @@ class ConferenceToiCal(ICALBase):
             av = self._conf.getChairList()[0]
             chair = fullchair = av.getDirectFullName()
             if av.getAffiliation() != "":
-                fullchair = "%s (%s)" % (fullchair,av.getAffiliation())                
+                fullchair = "%s (%s)" % (fullchair,av.getAffiliation())
         if not self._protected:
             if self._conf.getDescription() != "":
                 desc = self._lt(self._conf.getDescription())+"\\n"
             if fullchair != "":
-                desc = "%s%s\\n" % (desc,fullchair)
-        
+                desc = "%s%s\\n" % (desc,self._lt(fullchair))
+
         text += "DESCRIPTION:%s%s\n" % (desc,url)
         room=""
         if self._conf.getRoom() is not None:
@@ -125,7 +125,7 @@ class SessionToiCal(ICALBase):
     def __init__(self, conf, session):
         self._conf = conf
         self._session = session
-     
+
     def getCore(self):
 
         url = quoteattr( str( urlHandlers.UHSessionDisplay.getURL( self._session ) ) )
@@ -159,7 +159,7 @@ class SessionToiCal(ICALBase):
         return text
 
 class ContribToiCal(ICALBase):
-    
+
     def __init__(self, conf, contrib):
         self._conf = conf
         self._contrib = contrib
@@ -184,12 +184,12 @@ class ContribToiCal(ICALBase):
         text += "SUMMARY:%s\n" % self._contrib.getTitle()
         text += self._printEventFooter()
         return text
-    
+
     def getBody(self):
         url = quoteattr( str( urlHandlers.UHContributionDisplay.getURL( self._contrib ) ) )
         text = self._printHeader()
         text += self.getCore()
         text += self._printFooter()
         return text
-        
-        
+
+

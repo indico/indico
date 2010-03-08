@@ -99,7 +99,7 @@ extend(IndicoUI.Dialogs,
                            info.set('roomInfo', $O(roomInfo));
 
 
-                           roomEditor = new RoomBookingWidget(Indico.Data.Locations, info.get('roomInfo'), parentRoomInfo, true, favoriteRooms);
+                           roomEditor = new RoomBookingWidget(Indico.Data.Locations, info.get('roomInfo'), parentRoomInfo, true, favoriteRooms, null);
 
                            cancelButton.observeClick(function(){
                                self.close();
@@ -375,7 +375,8 @@ extend(IndicoUI.Dialogs,
                                                               info.get('roomInfo'),
                                                               parentRoomInfo,
                                                               nullRoomInfo(info.get('roomInfo')),
-                                                              favoriteRooms);
+                                                              favoriteRooms,
+                                                              null);
 
 
                            cancelButton.observeClick(function(){
