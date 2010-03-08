@@ -508,7 +508,7 @@ class Avatar(Persistent, Fossilizable):
             if userData.has_key( "surName" ):
                 self.setSurName( userData["surName"] )
             if userData.has_key( "title" ):
-                self.setName( userData["title"] )
+                self.setTitle( userData["title"] )
             if userData.has_key( "organisation" ):
                 if len(userData["organisation"])>0:
                     for org in userData["organisation"]:
