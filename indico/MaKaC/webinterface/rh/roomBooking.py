@@ -786,7 +786,7 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
         self._autoCriteria = False
         if params.get( "autoCriteria" ) == "True" or not resvEx.startDT:
             now = datetime.now()
-            after = now + timedelta( 30 ) # 1 month later
+            after = now + timedelta( 7 ) # 1 week later
 
             resvEx.startDT = datetime( now.year, now.month, now.day, 0, 0, 0 )
             resvEx.endDT = datetime( after.year, after.month, after.day, 23, 59, 00 )

@@ -6029,7 +6029,7 @@ class WRoomBookingSearch4Bookings( WTemplated ):
         vars = WTemplated.getVars( self )
 
         vars["today"] = datetime.now()
-        vars["monthLater"] = datetime.now() + timedelta( 30 )
+        vars["weekLater"] = datetime.now() + timedelta( 7 )
         vars["Location"] = Location
         vars["rooms"] = self._rh._rooms
         vars["repeatability"] = None
