@@ -16,7 +16,7 @@
             </td>
             <% if Conference.hasEnabledSection("paperReviewing") and not ConfReviewingChoice == 1: %>
             <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"> 
-                Reviewing Status
+                <%= _("Reviewing Status")%>
             </td>
             <% end %>
         </tr>
@@ -30,7 +30,7 @@
             </td>
             <% if Conference.hasEnabledSection("paperReviewing") and not ConfReviewingChoice == 1: %>
             <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;" valign="top">
-                <%="<br>".join(c.getReviewManager().getLastReview().getReviewingStatus())%>
+                <%="<br>".join(c.getReviewManager().getLastReview().getReviewingStatus(forAuthor = True))%>
             </td>
             <% end %>
         </tr>

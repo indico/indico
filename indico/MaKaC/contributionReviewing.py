@@ -526,9 +526,9 @@ class Review(Persistent):
             elif self.getConfReview().getChoice() == 4 or self.getConfReview().getChoice() == 2:
                 if self._refereeJudgement.isSubmitted():
                     status.append(_("Judged: ") + str(self._refereeJudgement.getJudgement()))
+                elif forAuthor:
+                    status.append(_("Pending referee decision"))
                 else:
-                    #status.append(_("Pending referee decision"))
-                    if not forAuthor:
                         if self.getConfReview().getChoice() == 4:
                             editor = self._reviewManager.getEditor()
                             if self._reviewManager.isEditor(editor) and self._editorJudgement.isSubmitted():
@@ -536,13 +536,13 @@ class Review(Persistent):
                             else:
                                 status.append(_("Pending layout reviewer decision"))
                             
-                        if self.anyReviewerHasGivenAdvice():
-                            for reviewer in self._reviewManager.getReviewersList():
-                                status.append(_("Content judged by ") + str(reviewer.getFullName())+ _(" as: ") + str(self._reviewManager.getLastReview().getReviewerJudgement(reviewer).getJudgement()))
-                            if not self.allReviewersHaveGivenAdvice():
-                                status.append(_("Some content reviewers have not decided yet"))
-                        else:
-                            status.append(_("No content reviewers have decided yet"))
+                            if self.anyReviewerHasGivenAdvice():
+                                for reviewer in self._reviewManager.getReviewersList():
+                                    status.append(_("Content judged by ") + str(reviewer.getFullName())+ _(" as: ") + str(self._reviewManager.getLastReview().getReviewerJudgement(reviewer).getJudgement()))
+                                if not self.allReviewersHaveGivenAdvice():
+                                    status.append(_("Some content reviewers have not decided yet"))
+                            else:
+                                status.append(_("No content reviewers have decided yet"))
         else:
             status.append(_("Materials not submitted yet"))
         return status

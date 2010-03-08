@@ -122,6 +122,10 @@
                 <div class="icons"><a href="ihelp/pdf/IndicoLayoutReviewer.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
                 <a href="ihelp/html/PaperReviewingGuides/PaperReviewingReviewers/index.html"><%= _("Layout Reviewer")%></a>
             </div>
+            <div class="item clearfix">
+                <div class="icons"><a href="ihelp/pdf/IndicoAuthor.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
+                <a href="ihelp/html/PaperReviewingGuides/PaperReviewingAuthors/index.html"><%= _("Contributions' authors")%></a>
+            </div>
        </div>
     	<div class="title"><%= _("General Help") %></div>
 

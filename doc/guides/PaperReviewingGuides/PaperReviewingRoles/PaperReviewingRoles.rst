@@ -45,7 +45,8 @@ Layout reviewing workflow
  In this case the conference manager has chosen to judge only the paper`s layout. 
  The contribution is assigned to a layout reviewer who will judge the layout as 
  ``accepted``, ``rejected`` or ``to be corrected``. If it is accepted or rejected the workflow is finished. 
- If it has to be corrected then the layout reviewer has two choices:
+ If it has to be corrected then the layout reviewer has two choices
+ 
   * to sent it back for correction by the author
   * to correct the layout himself, if needed
 

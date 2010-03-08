@@ -53,7 +53,7 @@ var args = {
                                     <% end %>
                                 <% end %>
        
-var mlist = new ReviewingMaterialListWidget(args, <%= RHSubmitMaterialBase._allowedMatsforReviewing %>, uploadAction,null,null,null,$E("SendBtn"));
+var mlist = new ReviewingMaterialListWidget(args, <%= RHSubmitMaterialBase._allowedMatsforReviewing %>, uploadAction,null, null, visibility,$E("SendBtn"));
 
 $E('reviewingMaterialListPlace').set(mlist.draw());
 

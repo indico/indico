@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Layout Reviewers's Guide
-========================
+Contributions' authors Guide
+============================
 
 Contents:
 
@@ -12,7 +12,7 @@ Contents:
    :numbered:
    :maxdepth: 2
 
-   ./PaperReviewingEditors.rst
+   ./PaperReviewingAuthors.rst
 
 .. Indices and tables
 .. ==================

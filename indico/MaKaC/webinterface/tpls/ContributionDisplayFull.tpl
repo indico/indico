@@ -130,12 +130,13 @@
                                 <tr>
                                 <td>&nbsp;</td>
                                         <td colspan="2" align="left">
-                                            <form action="<%=urlHandlers.UHContributionRemoveSubmittedMarkForReviewing.getURL(Contribution)%>" method="POST">
+                                            <form action="<%=urlHandlers.UHContributionRemoveSubmittedMarkForReviewing.getURL(Contribution)%>" method="POST" style="display:<%=display%>">
                                                 <input type="submit" class="btn" value="UNDO sending" >
                                                 <% inlineContextHelp(_('Press this button only if you made some mistake when submitting the materials.The reviewing team will be notified and the reviewing process will be stopped until you mark the materials as submitted again')) %>
                                             </form>
                                         </td>
                                 </tr>
+                          <% end %>
                       <% if len(Contribution.getReviewManager().getVersioning()) > 1: %>
                       <tr>
 		                      <td align="right" valign="top" class="displayField" nowrap>
@@ -148,7 +149,7 @@
 			               %(reviewingHistoryStuffDisplay)s    
 		               </td>
                </tr> 
-               <% end %>   
+                 
               <% end %>
               <% end %>
               <% end %>
@@ -183,6 +184,8 @@ var buildShowHideHistory = function() {
     $E('showHideHistory').set(Widget.link(option));
 }
 
+<% if len(Contribution.getReviewManager().getVersioning()) > 1: %>
 buildShowHideHistory();
 $E('HistoryTable').dom.style.display = 'none';
+<% end %>
 </script>

@@ -17,6 +17,7 @@ Contents:
    ./PaperReviewingReferees/index.rst
    ./PaperReviewingEditors/index.rst
    ./PaperReviewingReviewers/index.rst
+   ./PaperReviewingAuthors/index.rst
    
 .. Indices and tables
 .. ==================

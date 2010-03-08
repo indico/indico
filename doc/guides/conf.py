@@ -214,6 +214,8 @@ latex_documents = [
    u'Indico Team', 'manual'),
    ('PaperReviewingGuides/PaperReviewingRoles/index', 'IndicoReviewingRole.tex', u'Indico Documentation',
    u'Indico Team', 'manual'),
+   ('PaperReviewingGuides/PaperReviewingAuthors/index', 'IndicoReviewingAuthors.tex', u'Indico Documentation',
+   u'Indico Team', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

@@ -27,7 +27,7 @@
             <% end %>
             <% else: %>
                 <span><%= _("Not judged yet")%></span><br>
-                <%= "<br>".join(c.getReviewManager().getLastReview().getReviewingStatus()) %>
+                <%= "<br>".join(c.getReviewManager().getLastReview().getReviewingStatus(forAuthor = False)) %>
             <% end %>
             </td>    
             <td style="padding-right:5px;padding-left:5px;" onmouseover="this.style.borderColor='#ECECEC'" onmouseout="this.style.borderColor='transparent'">

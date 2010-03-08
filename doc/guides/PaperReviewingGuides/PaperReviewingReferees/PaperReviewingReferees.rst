@@ -2,12 +2,13 @@
 Paper Reviewing Module - Referee's Guide
 ========================================
 
- Getting started
-----------------
+Getting started
+---------------
 
  As a referee, your responsibilities are to assign contributions to the reviewers and to give the 
  final judgement for all of the contributions you have been assigned to. You may log in the system 
- and you will find in the left menu two links under ``My Conference``, ``Assign Contributions`` and ``Referee Area``.
+ and you will find in the left menu two links under ``My Conference``, ``Assign Contributions`` and 
+ ``Referee Area``.
 
         |image1|
 
@@ -40,7 +41,8 @@ Referee Area
         |image7|
         
  When you access the Referee Area you will find a list of all the contributions that are assign 
- to you for judgment. You can follow:
+ to you for judgment. You can follow
+ 
   * if the author of the contribution has submitted the mateials for reviewing
   * the state for every contribution, if it is judged by the Content Reviewers or by the Layout Reviewer, 
     or by both.

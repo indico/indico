@@ -35,7 +35,6 @@ of the Paper Reviewing you can access it by clicking on
 Paper Reviewing Management
 --------------------------
 
-
 Setup the Module
 ~~~~~~~~~~~~~~~~
 

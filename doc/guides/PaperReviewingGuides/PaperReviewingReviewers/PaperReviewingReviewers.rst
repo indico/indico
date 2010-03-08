@@ -25,7 +25,7 @@ Content Reviewer Area
  From list you can click on a contribution's title and access the page which will allow you to judge 
  that contribution. Once in that page, you should fill in the questions provided by the Paper Review Manager. 
  The comments that you will write down should help the Referee to give his judgement. As a final step, give 
- your judgement for the content of the contribution: to be ``corrected``, ``rejected``, accepted``. The authors of the 
+ your judgement for the content of the contribution: to be ``corrected``, ``rejected``, ``accepted``. The authors of the 
  contribution will receive an automatic e-mail notification containing your comments and judgment, if the 
  Managers of the Paper Reviewing set this option.
         
