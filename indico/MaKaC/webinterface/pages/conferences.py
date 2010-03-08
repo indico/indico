@@ -4895,7 +4895,7 @@ class WPConfAllSpeakers( WPConfModifListings ):
 
 class WPConfAllPrimaryAuthors( WPConfModifListings ):
 
-    def _getTabContent( self, params ):
+    def _getPageContent( self, params ):
         p = WConfModifAllContribParticipants( self._conf, self._conf.getPrimaryAuthorIndex() )
         return p.getHTML({"title": _("All primary authors list"), \
                           "participantMainPageURL":urlHandlers.UHConfAllPrimaryAuthors.getURL(self._conf), \
@@ -4903,7 +4903,7 @@ class WPConfAllPrimaryAuthors( WPConfModifListings ):
 
 class WPConfAllCoAuthors( WPConfModifListings ):
 
-    def _getTabContent( self, params ):
+    def _getPageContent( self, params ):
         p = WConfModifAllContribParticipants( self._conf, self._conf.getCoAuthorIndex() )
         return p.getHTML({"title": _("All co-authors list"), \
                           "participantMainPageURL":urlHandlers.UHConfAllCoAuthors.getURL(self._conf), \
@@ -4914,7 +4914,7 @@ class WPEMailContribParticipants ( WPConfModifListings):
         WPConfModifListings.__init__(self, rh, conf)
         self._participantList = participantList
 
-    def _getTabContent(self,params):
+    def _getPageContent(self,params):
         wc = WEmailToContribParticipants(self._conf, self._getAW().getUser(), self._participantList)
         return wc.getHTML()
 
