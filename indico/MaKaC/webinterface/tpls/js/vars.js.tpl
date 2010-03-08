@@ -120,6 +120,7 @@ var Indico = {
         conference: <%= RHSubmitMaterialBase._allowedMatsConference %>,
         category: <%= RHSubmitMaterialBase._allowedMatsCategory %>},
         WeekDays: <%= [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ] %>,
+        DefaultLocation: '<%= str(Location.getDefaultLocation().friendlyName) %>',
         Locations: <%= jsonEncode(locationList) %>
     },
     Settings: {

@@ -26,6 +26,9 @@ type("RoomBookingWidget", ["IWidget"],
          },
 
          postDraw: function() {
+             if(this.defaultLocation != null) {
+                 this.locationChooser.set(this.defaultLocation);
+             }
              if (this.parentInfo) {
                  this.inheritCheckbox.set(this.inheritDefault);
              }
@@ -38,7 +41,6 @@ type("RoomBookingWidget", ["IWidget"],
                                                           Html.span({},
                                                                     this.parentInfo.get('room') + " (" +
                                                                     this.parentInfo.get('location') + ")")):'';
-
              return Html.table('roomWidget',
                                Html.tbody({},
                                           Html.tr({}, Html.th({}, Html.div('roomWidgetTitle', $T("Location"))),
@@ -112,9 +114,10 @@ type("RoomBookingWidget", ["IWidget"],
 
          }
      },
-     function(locations, info, parent, inheritDefault, eventFavorites) {
+     function(locations, info, parent, inheritDefault, eventFavorites, defaultLocation) {
          var self = this;
 
+         this.defaultLocation = defaultLocation;
          this.locationChooser = new FlexibleSelect(locations, 177);
          this.roomChooser = new FlexibleSelect({},
                                                177,
@@ -151,7 +154,6 @@ type("RoomBookingWidget", ["IWidget"],
                      self.info.set('location', null);
                      self.info.set('room', null);
                      self.info.set('address', null);
-
 
                  } else {
                      self.inheritText.dom.className = '';

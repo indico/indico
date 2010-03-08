@@ -324,7 +324,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
 
         info.set('roomInfo', $O(self.roomInfo));
 
-        this.roomEditor = new RoomBookingWidget(Indico.Data.Locations, info.get('roomInfo'), self.parentRoomData, true, self.favoriteRooms);
+        this.roomEditor = new RoomBookingWidget(Indico.Data.Locations, info.get('roomInfo'), self.parentRoomData, true, self.favoriteRooms, null);
 
         var presListWidget = new UserListField(
             'VeryShortPeopleListDiv', 'PluginPeopleList',
@@ -718,7 +718,8 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                                                      this.info.get('roomInfo'),
                                                      this.parentRoomInfo,
                                                      this.isEdit?nullRoomInfo(this.info.get('roomInfo')):true,
-                                                     this.favoriteRooms);
+                                                     this.favoriteRooms,
+                                                     null);
 
              cancelButton.observeClick(function(){
                  self.close();

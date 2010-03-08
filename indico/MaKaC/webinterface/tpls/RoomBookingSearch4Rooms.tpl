@@ -199,9 +199,11 @@
                                                         <td class="subFieldWidth" align="right" ><small> <%= _("Location")%>&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext">
                                                             <select name="roomLocation" id="roomLocation">
-                                                                <option value="">--  <%= _("all")%> --</option>
+                                                                <option value=""><%= Location.getDefaultLocation().friendlyName %></option>
 												                <% for loc in Location.allLocations: %>
-                                                                    <option value="<%=loc.friendlyName%>" ><%= loc.friendlyName %></option>
+                                                                    <% if loc.friendlyName != Location.getDefaultLocation().friendlyName: %>
+                                                                        <option value="<%=loc.friendlyName%>" ><%= loc.friendlyName %></option>
+                                                                    <% end %>
 												                <% end %>
                                                             </select>
                                                             <!-- HACK to make form submitable with ENTER. This is just submit button copied and hidden. -->
