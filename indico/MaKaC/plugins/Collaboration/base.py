@@ -576,7 +576,7 @@ class CSBookingManager(Persistent, Observer):
                 ContextManager.get('dateChangeNotificationProblems')['Collaboration'] = [
                     'Some Video Services bookings could not be moved:',
                     problems,
-                    'Go to [[' + str(urlHandlers.UHConfModifCollaboration.getURL(self.getOwner())) + ' the Video Services section]] to modify them yourself.'
+                    'Go to [[' + str(urlHandlers.UHConfModifCollaboration.getURL(self.getOwner(), secure = CollaborationTools.isUsingHTTPS())) + ' the Video Services section]] to modify them yourself.'
                 ]
 
 

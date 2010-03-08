@@ -59,7 +59,7 @@ class WPAdminCollaboration(WPMainBase):
         return WAdminCollaboration(self._queryParams, self._pluginsWithIndexing).getHTML()
 
     def _getNavigationDrawer(self):
-        return wcomponents.WSimpleNavigationDrawer("Video Services Admin", urlHandlers.UHAdminCollaboration.getURL)
+        return wcomponents.WSimpleNavigationDrawer("Video Services Admin", urlHandlers.UHAdminCollaboration.getURL, secure=CollaborationTools.isUsingHTTPS())
 
     def _buildExtraJS(self):
         for pluginName in self._pluginsWithIndexing:
@@ -93,7 +93,7 @@ class WAdminCollaboration(wcomponents.WTemplated):
         vars["InitialToTitle"] = self._queryParams["toTitle"]
         vars["InitialResultsPerPage"] = self._queryParams["resultsPerPage"]
         vars["InitialPage"] = self._queryParams["page"]
-        vars["BaseURL"] = urlHandlers.UHAdminCollaboration.getURL()
+        vars["BaseURL"] = urlHandlers.UHAdminCollaboration.getURL(secure = CollaborationTools.isUsingHTTPS())
 
         if self._queryParams["queryOnLoad"]:
             ci = IndexesHolder().getById('collaboration')

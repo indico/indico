@@ -369,7 +369,7 @@ class WHeader(WTemplated):
                 from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin, RCCollaborationPluginAdmin
                 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
                 if (self._currentuser.isAdmin() or RCCollaborationAdmin.hasRights(user = self._currentuser) or RCCollaborationPluginAdmin.hasRights(user = self._currentuser, plugins = "any")) and CollaborationTools.anyPluginsAreActive():
-                    adminItemList.append({'url': urlHandlers.UHAdminCollaboration.getURL(), 'text': _("Video Services Overview")})
+                    adminItemList.append({'url': urlHandlers.UHAdminCollaboration.getURL(secure = CollaborationTools.isUsingHTTPS()), 'text': _("Video Services Overview")})
             if webcast.HelperWebcastManager.getWebcastManagerInstance().isManager(self._currentuser):
                 adminItemList.append({'url': urlHandlers.UHWebcast.getURL(), 'text': _("Webcast Admin")})
 
