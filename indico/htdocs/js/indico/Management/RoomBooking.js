@@ -27,7 +27,9 @@ type("RoomBookingWidget", ["IWidget"],
 
          postDraw: function() {
              if(this.defaultLocation != null) {
-                 this.locationChooser.set(this.defaultLocation);
+                 if (this.locationChooser.get() != this.defaultLocation) {
+                     this.locationChooser.set(this.defaultLocation);
+                 }
              }
              if (this.parentInfo) {
                  this.inheritCheckbox.set(this.inheritDefault);
@@ -84,24 +86,26 @@ type("RoomBookingWidget", ["IWidget"],
 
              var cacheEntry = this.roomCache[newLocation];
 
-             if (cacheEntry) {
+             if (this.loading){
+                 // do nothing
+             }
+             else if (cacheEntry) {
                  this.roomChooser.setOptionList(cacheEntry);
                  this.roomChooser.setLoading(false);
              } else {
                  var self = this;
-                 indicoRequest('roomBooking.rooms.list',
-                               {location: newLocation},
+                 indicoRequest('roomBooking.rooms.fullNameList',
+                               {'location': newLocation},
                                function(result, error) {
-                                   self.querying = false;
+                                   self.loading = false;
                                    if (!error) {
                                        var dict = {};
 
                                        each(result, function(value) {
-                                           dict[value] = value;
+                                           dict[value[0]] = value[1];
                                        });
 
                                        self.roomCache[newLocation] = dict;
-
                                        self.roomChooser.setOptionList(dict);
                                        self.roomChooser.setLoading(false);
                                    } else {
@@ -110,6 +114,7 @@ type("RoomBookingWidget", ["IWidget"],
                                    }
 
                                });
+                 this.loading = true;
              }
 
          }

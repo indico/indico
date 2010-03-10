@@ -255,7 +255,7 @@ class outputGenerator:
                 roomName = conf.getRoom().getName()
 
                 # if there is a connection to the room booking DB
-                if CrossLocationDB.isConnected():
+                if CrossLocationDB.isConnected() and loc:
                     # get the room info
                     roomFromDB = CrossLocationQueries.getRooms( roomName = roomName, location = loc.getName() )
                     # if there's a room with such name

@@ -6643,7 +6643,7 @@ class WAbstracts( wcomponents.WTemplated ):
         for abstract in abstractList :
             abstracts.append(abstract.getId())
         if len(abstracts) > 0 :
-            generateIcon = Config.getInstance().getSystemIconURL("excel")
+            generateExcelIcon = Config.getInstance().getSystemIconURL("excel")
             generateExcelURL = urlHandlers.UHAbstractsConfManagerDisplayExcel.getURL(self._conf)
             hiddenAbstracts=[]
             for abs in abstracts:

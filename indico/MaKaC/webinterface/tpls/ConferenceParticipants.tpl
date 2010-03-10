@@ -42,7 +42,7 @@ function deselectAll()
 							</form>
 						<% end %>
 						<% else: %>
-							The attendance to this event is
+							The attendance to this event is&nbsp;
 								<% if self._conf.getParticipation().isObligatory(): %>
 									<strong>mandatory</strong>
 								<% end %>
@@ -67,7 +67,7 @@ function deselectAll()
 							</form>
 						<% end %>
 						<% else: %>
-							<%= _("When an event manager adds a participant, email notification will")%>
+							<%= _("When an event manager adds a participant, email notification will")%>&nbsp;
 								<% if self._conf.getParticipation().isAddedInfo(): %>
 									<strong><%= _("be sent")%></strong>
 								<% end %>
@@ -104,7 +104,7 @@ function deselectAll()
 							</form>
 						<% end %>
 						<% else: %>
-							<%= _("Users")%>
+							<%= _("Users")%>&nbsp;
 								<% if self._conf.getParticipation().isAllowedForApplying(): %>
 									<strong><%= _("may apply")%></strong>
 								<% end %>
@@ -129,7 +129,7 @@ function deselectAll()
                             </form>
                         <% end %>
                         <% else: %>
-                            <%= _("Participation requests")%>
+                            <%= _("Participation requests")%>&nbsp;
                                 <% if self._conf.getParticipation().getAutoAccept(): %>
                                     <strong><%= _("are auto-approved")%></strong>
                                 <% end %>
@@ -141,10 +141,10 @@ function deselectAll()
                 </td>
             </tr>
 
-        	<% if self._conf.getParticipation().getPendingNumber() > 0 : %>
+               <% if self._conf.getParticipation().getPendingNumber() > 0 : %>
                 <tr>
                 	<td>
-                		<span style="color:green"><%= _("""Some users have applied for participation in this event.
+                          <span style="color:green"><%= _("""Some users have applied for participation in this event.
 							See""")%> <a href="<%= urlHandlers.UHConfModifParticipantsPending.getURL(self._conf) %>"><%= _("pending participants")%></a>
 						</span>
 					</td>
