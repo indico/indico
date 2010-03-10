@@ -1304,10 +1304,29 @@ span.horizontalSeparator {
     color: Red; margin-left: 6px; font-weight: bold;
 }
 
-.publicRoom { color: Green; }
-.moderatedRoom { color: #D37209; }
-.privateRoom { color: Red; }
+a.roomLink:hover, a.dateLink:hover {
+    text-decoration: underline;
+}
 
+a.basicRoom {
+    color: #0b63a5;
+}
+
+option.publicRoom, span.publicRoom, a.publicRoom {
+    color: Green;
+}
+
+option.moderatedRoom, span.moderatedRoom, a.moderatedRoom {
+    color: #D37209;
+}
+
+option.privateRoom, span.privateRoom, a.privateRoom, a.weekend {
+    color: Red;
+}
+
+a.weekday {
+    color: Black;
+}
 
 /********************/
 /**** Evaluation ****/
