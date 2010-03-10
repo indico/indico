@@ -370,14 +370,17 @@ type("UserListWidget", ["ListWidget"],
 
              }, IndicoUI.Buttons.removeButton()));
 
-             return Html.div({style:{display: 'inline'}},
-                             userData.get('isGroup')?
-                             $B(Html.span(), userData.accessor('name')):
-                             Html.span({},
-                                     Html.div({style: {cssFloat: "right", paddingRight: "10px"}}, self.allowEdit ? editButton : '',removeButton),
-                                     $B(Html.span(), userData.accessor('familyName'), function(name){return name.toUpperCase();}),
-                                       ', ',
-                                       $B(Html.span(), userData.accessor('firstName'))));
+             if (userData.get('isGroup')) {
+                 return Html.span({},
+                                  Html.div({style: {cssFloat: "right", paddingRight: "10px"}}, removeButton),
+                                  $B(Html.span(), userData.accessor('name')));
+             } else {
+                 return Html.span({},
+                                  Html.div({style: {cssFloat: "right", paddingRight: "10px"}}, self.allowEdit ? editButton : '',removeButton),
+                                  $B(Html.span(), userData.accessor('familyName'), function(name){return name.toUpperCase();}),
+                                  ', ',
+                                  $B(Html.span(), userData.accessor('firstName')));
+             }
          }
      },
 
@@ -448,11 +451,13 @@ type("UserListField", ["IWidget"], {
                     self.newProcess(userList, function(value) {
                         if (value) {
                             each(userList, function(user){
-                                if (self.userList.get("existingAv"+user.id)) {
-                                    self.userList.set("existingAv"+user.id, null);
+                                var userId = user.isGroup ? user.id : ("existingAv" + user.id);
+
+                                if (self.userList.get(userId)) {
+                                    self.userList.set(userId, null);
                                 }
-                                self.userList.set("existingAv"+user.id, $O(user));
-                                self._highlightNewUser("existingAv"+user.id);
+                                self.userList.set(userId, $O(user));
+                                //self._highlightNewUser(userId);
                             });
                         }
                     });
@@ -477,7 +482,7 @@ type("UserListField", ["IWidget"], {
                             self.newProcess([newUser], function(result) {
                                 if (result) {
                                     self.userList.set(newUserId, newUser);
-                                    self._highlightNewUser(newUserId);
+                                    //self._highlightNewUser(newUserId);
                                 }
                             });
                             suicideHook();
@@ -509,7 +514,7 @@ type("UserListField", ["IWidget"], {
                         self.newProcess([newUser], function(result) {
                             if (result) {
                                 self.userList.set("existingAv"+newUserId, newUser);
-                                self._highlightNewUser("existingAv"+newUserId);
+                                //self._highlightNewUser("existingAv"+newUserId);
                             }
                         });
                     });

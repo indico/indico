@@ -20,7 +20,7 @@
                             <% if not title: %>
                                 <!-- Generic title -->
                                 <%= len( reservations ) %>  <%= _("Booking(s) found")%>:
-                            <% end %> 
+                            <% end %>
                             <% if title: %>
                                 <%= title + " (" + str(len(reservations)) + ")" %>:
                             <% end %>
@@ -31,17 +31,17 @@
                                 <p style="margin-left: 6px;"><%= description %></p>
                             <% end %>
                             <br /><br />
-                            
+
 <table width="100%%" class="filesTab">
 <tr>
 <td>
 
     <script type="text/javascript">
     isOver = false
-    function handleMouseOverResv( id ) { 
+    function handleMouseOverResv( id ) {
         if ( isOver )
 		{
-		 return;	
+		 return;
 		}
         isOver = true;
         resvTR = document.getElementById( id );
@@ -55,7 +55,7 @@
     </script>
 
 	<% includeTpl( 'RoomBookingBookingListPrevNext' ) %>
-    
+
     <% if not overload: %>
       	<table style="width: 736px;">
     		<tr>
@@ -63,7 +63,7 @@
                     <div style="margin: 22px 0px 16px 0px;">
                         <% if manyRooms: %>
                             <% includeTpl( 'RoomBookingManyRoomsCalendar' ) %>
-                        <% end %>   
+                        <% end %>
                         <% else: %>
                             <% includeTpl( 'RoomBookingRoomCalendar', room = room ) %>
                         <% end %>
@@ -79,34 +79,38 @@
 	<table style="width: 736px;">
 		<tr>
     <% if withPhoto: %>
+          <% columnNumber = 6 %>
 		  <td style="width: 90px;" class="dataCaptionFormat">Photo</td>
+    <% end %>
+    <% else: %>
+          <% columnNumber = 5 %>
     <% end %>
 		  <td style="width: 100px;" class="dataCaptionFormat"><% orderBy('Room','room') %></td>
 		  <td class="dataCaptionFormat"><% orderBy('Reason','reason') %> / <br /><% orderBy('For whom','for') %></td>
 		  <td style="width: 88px;" nowrap class="dataCaptionFormat">
-		    <% orderBy('Date','date') %>             
+		    <% orderBy('Date','date') %>
 		  </td>
 		  <td style="width: 46px;" class="dataCaptionFormat" ><% orderBy('Hours', 'hours') %></td>
-		  <td style="width: 52px;" class="dataCaptionFormat"><%= _("Actions")%></td>
+		  <td style="width: 52px; padding-right: 15px;" class="dataCaptionFormat"><%= _("Actions")%></td>
 		</tr>
 		<tr>
-			<td class="titleCellTD" colspan="6" style="height: 0px">&nbsp;</td>
+			<td colspan="<%= columnNumber %>" style="height: 0px;">&nbsp;</td>
 		</tr>
 
         <% if not overload: %>
-			<% for collision in unrolledReservations: %>		    	
-		    	<% includeTpl( 'RoomBookingListItem', reservation = collision.withReservation, occurrence = collision, withPhoto = withPhoto ) %>		    	
+			<% for collision in unrolledReservations: %>
+		    	<% includeTpl( 'RoomBookingListItem', reservation = collision.withReservation, occurrence = collision, withPhoto = withPhoto ) %>
 			<% end %>
 		<% end %>
 		<% if overload: %>
-		    <tr><td colspan="6"><strong><br /> <%= _("Too many searching results or too large time span. Please issue more specific query.")%></strong></td></tr>
+		    <tr><td colspan="<%= columnNumber %>"><strong><br /> <%= _("Too many searching results or too large time span. Please issue more specific query.")%></strong></td></tr>
 		<% end %>
 
         <% if showRejectAllButton: %>
             <tr>
-                <td colspan="6" style="text-align: right;">
+                <td colspan="<%= columnNumber %>" style="text-align: right;">
                 <form action="<%= urlHandlers.UHRoomBookingRejectAllConflicting.getURL() %>">
-                    <input type="submit" class="btn" value="<%= _("Reject ALL Conflicting PRE-Bookings")%>" 
+                    <input type="submit" class="btn" value="<%= _("Reject ALL Conflicting PRE-Bookings")%>"
                         onclick="if ( !confirm(  <%= _("'Are you sure you want to REJECT ALL conflicting PRE-bookings?'")%> ) ) return false;" />
                 </form>
                 </td>
@@ -114,13 +118,13 @@
         <% end %>
 
 		<tr>
-			<td class="titleCellTD" colspan="6" style="height: 0px">&nbsp;</td>
+			<td colspan="<%= columnNumber %>" style="height: 0px">&nbsp;</td>
 		</tr>
 		<tr>
-		    <td colspan="50">
+		    <td colspan="<%= columnNumber %>">
 		    <% if title and 'My ' in title: %>
 		        <b> <%= _("Note")%>:</b>  <%= _("""Your bookings and pre-bookings from <b>old CRBS</b> are not shown on this list.
-		        You will see here only bookings done in Indico. 
+		        You will see here only bookings done in Indico.
 		        To see your old bookings, you must click 'View Bookings' option and find them manually.""")%>
 		    <% end %>
 		    </td>
@@ -133,7 +137,7 @@
 </td>
 </tr>
 </table>
-                        
+
                         </td>
                     </tr>
                 </table>
