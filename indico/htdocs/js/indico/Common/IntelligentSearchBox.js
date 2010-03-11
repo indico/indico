@@ -151,7 +151,7 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
                                        self._hideSuggestions();
                                    }
 
-                                   currentText = self.get().trim();
+                                   currentText = trim(self.get());
 
                                    // if the text changed meanwhile and it
                                    // is still long enough
@@ -176,7 +176,7 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
           */
          _textTyped: function(key) {
 
-             var text = this.get().trim();
+             var text = trim(this.get());
 
              if(text.length > 1) {
                  if(!this.querying) {
