@@ -18,11 +18,11 @@ var eventInfo = <%= eventInfo %>;
 //Variables used to resize the timetable.
 var minWidth = 600;
 var widthOffset = 300;
-var previousWidth = window.innerWidth - widthOffset;
+var previousWidth = document.body.clientWidth - widthOffset;
 var minResize = 30;
 
 var historyBroker = new BrowserHistoryBroker();
-var timetable = new TopLevelManagementTimeTable(ttdata, eventInfo, window.innerWidth - widthOffset < minWidth ? minWidth : window.innerWidth - widthOffset,$E('timetableDiv'), false, historyBroker);
+var timetable = new TopLevelManagementTimeTable(ttdata, eventInfo, document.body.clientWidth - widthOffset < minWidth ? minWidth : document.body.clientWidth - widthOffset,$E('timetableDiv'), false, historyBroker);
 
 IndicoUI.executeOnLoad(function(){
 
@@ -35,11 +35,11 @@ IndicoUI.executeOnLoad(function(){
 window.onresize = function (){
 
     //Updating only if a window was resized by certain legnth
-    if(previousWidth - window.innerWidth + widthOffset > minResize || previousWidth - window.innerWidth + widthOffset < -minResize)
+    if(previousWidth - document.body.clientWidth + widthOffset > minResize || previousWidth - document.body.clientWidth + widthOffset < -minResize)
         //Updating only if a window size is greater than minimal timetable size
-        if(timetable.width > minWidth || window.innerWidth - widthOffset > minWidth)
+        if(timetable.width > minWidth || document.body.clientWidth - widthOffset > minWidth)
         {
-            var newWidth = window.innerWidth - widthOffset < minWidth ? minWidth : window.innerWidth - widthOffset;
+            var newWidth = document.body.clientWidth - widthOffset < minWidth ? minWidth : document.body.clientWidth - widthOffset;
             //timetable.width = window.innerWidth - widthOffset < minWidth ? minWidth : window.innerWidth - widthOffset;
             timetable = new TopLevelManagementTimeTable(ttdata, eventInfo, newWidth, $E('timetableDiv'), false, historyBroker);
             $E('timetableDiv').set(timetable.draw());
