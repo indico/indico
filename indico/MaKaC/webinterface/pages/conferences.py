@@ -4362,7 +4362,7 @@ class WPConfModifParticipantsEMail(WPConferenceModifBase):
     def _setActiveTab( self ):
         self._tabParticipants.setActive()
 
-    def _getTabContent( self, params ):
+    def _getPageContent( self, params ):
         toemail = params["emailto"]
         params["postURL"] = urlHandlers.UHConfModifParticipantsSendEmail.getURL( self._conf )
         wc = WEmail(self._conf, self._getAW().getUser(), toemail)
