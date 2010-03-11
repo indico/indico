@@ -25,7 +25,7 @@ import MaKaC.webinterface.rh.roomBooking as roomBooking
 def index( req, **params ):
     return roomBooking.RHRoomBookingWelcome( req ).process( params )
 
-# 1. Searching 
+# 1. Searching
 def search4Rooms( req, **params ):
     return roomBooking.RHRoomBookingSearch4Rooms( req ).process( params )
 def search4Bookings( req, **params ):
@@ -103,7 +103,7 @@ def deleteCustomAttribute( req, **params ):
     return roomBooking.RHRoomBookingDeleteCustomAttribute(req).process(params)
 
 #    import wingdbstub
-#    if wingdbstub.debugger != None: 
+#    if wingdbstub.debugger != None:
 #        wingdbstub.debugger.StartDebug()
 
 def sendRoomPhoto( req, **params ):

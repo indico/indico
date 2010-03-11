@@ -32,9 +32,9 @@ from MaKaC.common.Configuration import Config
 _ROOMS = 'Rooms'
 
 class Room( Persistent, RoomBase ):
-    """ 
-    ZODB specific implementation. 
-    
+    """
+    ZODB specific implementation.
+
     For documentation of methods see base class.
     """
 
@@ -45,10 +45,10 @@ class Room( Persistent, RoomBase ):
         RoomBase.__init__( self )
         self.customAtts = PersistentMapping()
         self.avaibleVC = []
-    
+
     def setAvailableVC(self, avc):
         self.avaibleVC = avc
-    
+
     def getAvailableVC(self):
         try:
             return self.avaibleVC
@@ -59,7 +59,7 @@ class Room( Persistent, RoomBase ):
     @staticmethod
     def getRoot():
         return Room.__dalManager.getRoot(_ROOMS)
-    
+
     def insert( self ):
         """ Documentation in base class. """
         RoomBase.insert( self )
@@ -72,12 +72,12 @@ class Room( Persistent, RoomBase ):
             else:
                 self.id = 1 # Can not use maxKey for 1st record in a tree
         # Add self to the BTree
-        roomsBTree[self.id] = self 
-    
+        roomsBTree[self.id] = self
+
     def update( self ):
         """ Documentation in base class. """
         RoomBase.update( self )
-        
+
         # Check Simba mailing list
         listName = self.customAtts.get( 'Simba List' )
         if listName:
@@ -87,9 +87,9 @@ class Room( Persistent, RoomBase ):
                 groups = GroupHolder().match( { 'name': listName } )
             if not groups:
                 self.customAtts['Simba List'] = 'Error: unknown mailing list'
-        
+
         self._p_changed = True
-    
+
     def remove( self ):
         """ Documentation in base class. """
         RoomBase.remove( self )
@@ -97,10 +97,10 @@ class Room( Persistent, RoomBase ):
         del roomsBTree[self.id]
         from MaKaC.user import AvatarHolder
         AvatarHolder().invalidateRoomManagerIdList()
-    
+
     # Typical actions
     @staticmethod
-    def getRooms( *args, **kwargs ): 
+    def getRooms( *args, **kwargs ):
         """ Documentation in base class. """
 
         roomsBTree = Room.getRoot()
@@ -111,7 +111,7 @@ class Room( Persistent, RoomBase ):
 
         if kwargs.get( 'reallyAllFast' ) == True:
             return [ room for room in roomsBTree.values() if (not location or room.locationName == location) ]
-        
+
         if len( kwargs ) == 0:
             ret_lst = []
             for room in roomsBTree.values():
@@ -129,7 +129,7 @@ class Room( Persistent, RoomBase ):
         ownedBy = kwargs.get( 'ownedBy' )
         customAtts = kwargs.get( 'customAtts' )
 #        responsibleID = kwargs.get( 'responsibleID' )
-        
+
         ret_lst = []
         counter = 0
         if roomID != None:
@@ -140,12 +140,12 @@ class Room( Persistent, RoomBase ):
                     if location == None or room.locationName == location:
                         return room
             return None
-        
+
         for room in roomsBTree.itervalues():
             # Apply all conditions =========
             if location != None:
                 if room.locationName != location:
-                    continue            
+                    continue
             if roomEx != None:
                 if not qbeMatch( roomEx, room, Room.__attrSpecialEqual, minCapacity = minCapacity ):
                     continue
@@ -181,7 +181,7 @@ class Room( Persistent, RoomBase ):
                         break
                 if discard:
                     continue
-            
+
             # All conditions are met: add room to the results
             counter += 1
             if not countOnly:
@@ -206,7 +206,7 @@ class Room( Persistent, RoomBase ):
         """ Documentation in base class. """
         location = kwargs.get( 'location', Location.getDefaultLocation().friendlyName )
         return Room.countRooms( location = location )
-    
+
     @staticmethod
     def getNumberOfActiveRooms( *args, **kwargs ):
         """ Documentation in base class. """
@@ -223,12 +223,12 @@ class Room( Persistent, RoomBase ):
         room.isReservable = True
         room.isActive = True
         return Room.countRooms( roomExample = room, location = location )
-    
+
     def getLocationName( self ):
         #from MaKaC.plugins.RoomBooking.default.factory import Factory
         #return Factory.locationName
         return self._locationName
-    
+
     def setLocationName( self, locationName ):
         self._locationName = locationName
 
@@ -242,7 +242,7 @@ class Room( Persistent, RoomBase ):
         f = open( fullPath, "wb" )
         f.write( photoPath.file.read() )
         f.close()
-    
+
     def saveSmallPhoto( self, photoPath ):
         filePath = Config.getInstance().getRoomSmallPhotosDir()
         fileName = self._doGetPhotoId( force = True ) + ".jpg"
@@ -254,7 +254,7 @@ class Room( Persistent, RoomBase ):
         f.write( photoPath.file.read() )
         f.close()
 
-    
+
     # ==== Private ===================================================
 
     def _getSafeLocationName( self ):
@@ -274,7 +274,7 @@ class Room( Persistent, RoomBase ):
 
     def _doGetPhotoId( self, force = False ):
         photoId = "%s-%s-%s-%s" % ( str( self._getSafeLocationName() ), str( self.building ).strip(), str( self.floor ).strip(), str( self.roomNr ).strip() )
-        
+
         filePath = Config.getInstance().getRoomPhotosDir()
         fileName = photoId + ".jpg"
         fullPath = os.path.join( filePath, fileName )
@@ -297,14 +297,14 @@ class Room( Persistent, RoomBase ):
             if self.__hasOneFreeText( freeText ):
                 return True
         return False
-    
+
     def __hasOneFreeText( self, freeText ):
         # Look for freeText in all string and int attributes
         for attrName in dir( self ):
-            if attrName[0] == '_': 
-                continue 
+            if attrName[0] == '_':
+                continue
             attrType = eval( 'self.' + attrName + '.__class__.__name__' )
-            if attrType == 'str': 
+            if attrType == 'str':
                 attrVal = eval( 'self.' + attrName )
                 if attrVal.lower().find( freeText ) != -1:
                     return True
@@ -312,26 +312,26 @@ class Room( Persistent, RoomBase ):
         # Look for freeText in equipment
         if self.__hasEquipment( [ freeText ] ):
             return True
-        
+
         # Look for freeText in responsible
         if self.responsibleId != None:
             user = self.getResponsible();
             if freeText in user.getFullName().lower()  or  freeText in user.getEmail().lower():
                 return True
-        
+
         # Look for freeText in custom attributes
         for value in self.customAtts.itervalues():
             if value and ( freeText in value.lower() ):
                 return True
-        
+
         # Not found
         return False
-        
+
     @staticmethod
     def __goodCapacity( val1, val2, minCapacity = None ):
         # Difference in capacity less than 20%
         if val1 < 1: val1 = 1
-        
+
         if not minCapacity:
             return abs( val1 - val2 ) / float( val1 ) <= 0.2
         else:
@@ -349,7 +349,7 @@ class Room( Persistent, RoomBase ):
             minCapacity = kwargs.get( 'minCapacity' )
             return cls.__goodCapacity( exampleVal, candidateVal, minCapacity )
         if attrName == 'customAtts':
-            # Check if all values in exampleVal are contained 
+            # Check if all values in exampleVal are contained
             # in corresponding values of candidateVal
             for k, v in exampleVal.iteritems():
                 if v: # If value is specified
@@ -361,7 +361,7 @@ class Room( Persistent, RoomBase ):
                         return False
             return True
         return None
-        
+
     def __hasEquipment( self, requiredEquipmentList ):
         iHave = self.getEquipment()
         for reqEq in requiredEquipmentList:
@@ -379,7 +379,7 @@ class Room( Persistent, RoomBase ):
 # ============================================================================
 
 class Test( object ):
-    
+
     dalManager = Factory.getDALManager()
 
     @staticmethod
@@ -392,7 +392,7 @@ class Test( object ):
         em.setPossibleEquipment( saved )
         Test.dalManager.commit()
         Test.dalManager.disconnect()
-        
+
         # Get equipment
         Test.dalManager.connect()
         loaded = em.getPossibleEquipment()
@@ -402,55 +402,55 @@ class Test( object ):
     @staticmethod
     def getRoomsByExample():
         Test.dalManager.connect()
-        
+
         # By ID
         room = RoomBase.getRooms( roomID = 176 )
         assert( room.name == '4-1-021' )
-        
+
         # By other attributes
         roomEx = Factory.newRoom()
         roomEx.site = 'prevessin'
         roomEx.comments = 'res'
         rooms = RoomBase.getRooms( roomExample = roomEx )
         assert( len( rooms ) == 8 ) # 20
-        
+
         roomEx = Factory.newRoom()
         roomEx.capacity = 20
         rooms = RoomBase.getRooms( roomExample = roomEx )
         assert( len( rooms ) == 26 )
-        
+
         roomEx = Factory.newRoom()
         roomEx.isReservable = True
         roomEx.setEquipment( [ 'Video projector', 'Wireless' ] )
         rooms = RoomBase.getRooms( roomExample = roomEx )
         assert( len( rooms ) == 33 )
-        
+
         Test.dalManager.disconnect()
-    
+
     @staticmethod
     def getRoomsByFreeText():
         Test.dalManager.connect()
-        
+
         rooms = RoomBase.getRooms( freeText = 'meyrin vrvs' ) # 78828
         assert( len( rooms ) == 12 )
-        
+
         Test.dalManager.disconnect()
 
     @staticmethod
     def getRoomsByExampleDemo():
         Test.dalManager.connect()
-        
+
         roomEx = Factory.newRoom()
-        
+
         roomEx.building = 513
         roomEx.capacity = 20
-        
+
         rooms = CrossLocationQueries.getRooms( roomExample = roomEx )
-        
+
         for room in rooms:
             print "============================="
             print room
-            
+
         Test.dalManager.disconnect()
 
     @staticmethod
@@ -464,23 +464,23 @@ class Test( object ):
     @staticmethod
     def getAvailableRooms():
         Test.dalManager.connect()
-        
+
         from datetime import datetime
-        
+
         roomEx = Factory.newRoom()
         roomEx.isActive = True
         roomEx.isReservable = True
-        
+
         resvEx = Factory.newReservation()
         resvEx.startDT = datetime( 2006, 12, 01, 10 )
         resvEx.endDT = datetime( 2006, 12, 14, 15 )
         resvEx.repeatability = 0 # Daily
-        
+
         rooms = RoomBase.getRooms( \
             roomExample = roomEx,
             resvExample = resvEx,
             available = True )
-        
+
         for room in rooms:
             print "\n=======================================\n"
             print room

@@ -420,7 +420,8 @@ class RH(RequestHandlerBase):
     def process( self, params ):
         """
         """
-        profile = False
+
+        profile = Config.getInstance().getProfile()
         proffilename = ""
         res = ""
         retry = 10
@@ -456,7 +457,6 @@ class RH(RequestHandlerBase):
                         if self._getUser():
                             Logger.get('requestHandler').debug('Request %s identified with user %s (%s)' % (id(self._req), self._getUser().getFullName(), self._getUser().getId()))
 
-
                         #if self._getUser() != None and self._getUser().getId() == "893":
                         #    profile = True
                         self._reqParams = copy.copy( params )
@@ -467,11 +467,11 @@ class RH(RequestHandlerBase):
                                                self._aw)
                         if self._doProcess:
                             if profile:
-                                import hotshot, hotshot.stats
+                                import profile, pstats
                                 proffilename = os.path.join(Config.getInstance().getTempDir(), "stone%s.prof" % str(random.random()))
-                                prof = hotshot.Profile(proffilename)
-                                res = prof.runcall(self._process)
-                                prof.close()
+                                result = [None]
+                                profile.runctx("result[0] = self._process()", globals(), locals(), proffilename)
+                                res = result[0]
                             else:
                                 res = self._process()
                         self._endRequestSpecific2RH( True ) # I.e. implemented by Room Booking request handlers
@@ -589,15 +589,15 @@ class RH(RequestHandlerBase):
         textLog.append("%s : Request ended"%totalTime)
 
         # log request timing
-        if profile and totalTime > timedelta(0, 1):
+        if profile and totalTime > timedelta(0, 1) and os.path.isfile(proffilename):
             rep = Config.getInstance().getTempDir()
-            stats = hotshot.stats.load(proffilename)
+            stats = pstats.Stats(proffilename)
             stats.strip_dirs()
             stats.sort_stats('cumulative', 'time', 'calls')
             stats.dump_stats(os.path.join(rep, "IndicoRequestProfile.log"))
             output = StringIO.StringIO()
             sys.stdout = output
-            stats.print_stats(40)
+            stats.print_stats(100)
             sys.stdout = sys.__stdout__
             s = output.getvalue()
             f = file(os.path.join(rep, "IndicoRequest.log"), 'a+')
@@ -611,7 +611,7 @@ class RH(RequestHandlerBase):
             f.write(s)
             f.write("--------------------------------\n\n")
             f.close()
-        if profile and proffilename != "":
+        if profile and proffilename != "" and os.path.exists(proffilename):
             os.remove(proffilename)
 
         if res == "" or res == None:

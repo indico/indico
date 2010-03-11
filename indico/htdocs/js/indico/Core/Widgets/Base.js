@@ -627,7 +627,8 @@ type("PreloadedWidget", ["IWidget"],
      });
 
 progressIndicator = function(small, center) {
-    return Html.div(center?{style:{textAlign: 'center'}}:{},Html.img({src: imageSrc(small?"loading":"ui_loading"), alt: "Loading..."
+    var htmlTag = small?Html.span:Html.div;
+    return htmlTag(center?{style:{textAlign: 'center'}}:{},Html.img({src: imageSrc(small?"loading":"ui_loading"), alt: "Loading..."
 }));
 };
 

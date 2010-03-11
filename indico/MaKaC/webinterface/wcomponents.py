@@ -6020,8 +6020,6 @@ class WRoomBookingSearch4Rooms( WTemplated ):
             vars["detailsUH"] = urlHandlers.UHConfModifRoomBookingRoomDetails
             vars["bookingFormUH"] =  urlHandlers.UHConfModifRoomBookingBookingForm
 
-        vars['youCannot'] = "javascript:alert( 'You cannot book this room' );"
-
         return vars
 
 class WRoomBookingSearch4Bookings( WTemplated ):

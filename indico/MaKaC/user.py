@@ -236,6 +236,7 @@ class CERNGroup(Group):
         return [ avList[0] for avList in avatarLists if avList ]
 
     def containsUser( self, avatar ):
+
         if avatar == None:
             return False
         try:
@@ -369,6 +370,7 @@ class GroupHolder(ObjectHolder):
         return result
 
     def match(self,criteria,forceWithoutExtAuth=False, exact=False):
+
         crit={}
         result = []
         for f,v in criteria.items():
@@ -378,10 +380,11 @@ class GroupHolder(ObjectHolder):
         if "Nice" in Config.getInstance().getAuthenticatorList() and not forceWithoutExtAuth:
             self.updateCERNGroupMatch(crit["name"][0],exact)
         match = self.getIndex().matchGroup(crit["name"][0], exact=exact)
+
         if match != None:
             for groupid in match:
-                if self.getById(groupid) not in result:
-                    gr=self.getById(groupid)
+                gr = self.getById(groupid)
+                if gr not in result:
                     result.append(gr)
         return result
 
@@ -1180,14 +1183,24 @@ class Avatar(Persistent, Fossilizable):
     # Room booking related
 
     def isMemberOfSimbaList( self, simbaListName ):
+
+        # Try to get the result from the cache
         try:
             if simbaListName in self._v_isMember.keys():
                 return self._v_isMember[simbaListName]
         except:
             self._v_isMember = {}
-        groups = GroupHolder().match( { 'name': simbaListName }, forceWithoutExtAuth = True, exact=True )
-        if not groups:
-            groups = GroupHolder().match( { 'name': simbaListName }, exact=True )
+
+        groups = []
+        try:
+            # try to get the exact match first, which is what we expect since
+            # there shouldn't be uppercase letters
+            groups.append(GroupHolder().getById(simbaListName))
+        except KeyError:
+            groups = GroupHolder().match( { 'name': simbaListName }, forceWithoutExtAuth = True, exact=True)
+            if not groups:
+                groups = GroupHolder().match( { 'name': simbaListName }, exact=True)
+
         if groups:
             result = groups[0].containsUser( self )
             self._v_isMember[simbaListName] = result
@@ -1309,7 +1322,7 @@ class AvatarHolder( ObjectHolder ):
         root = DBMgr.getInstance().getDBConnection().root()
         allRooms = CrossLocationQueries.getRooms()
 
-        idList = [ room.getResponsible().id for room in allRooms ]
+        idList = [ room.getResponsible().id for room in allRooms if room.getResponsible()]
 
         for room in allRooms:
             if room.customAtts.get( 'Simba List' ):

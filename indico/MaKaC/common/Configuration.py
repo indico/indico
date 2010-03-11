@@ -410,6 +410,7 @@ class Config:
             'RepositoryIdentifier' : '',
             'ApacheUser'           : 'nobody',
             'ApacheGroup'          : 'nogroup',
+            'Profile'              : False,
 
             # Room Booking Related
             'LightboxCssStylesheetName': "lightbox/lightbox.css",

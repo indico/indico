@@ -41,7 +41,7 @@ from zope.index.text import textindex
 
 class Index(Persistent):
     _name = ""
-    
+
     def __init__( self, name='' ):
         if name != '':
             self._name = name
@@ -61,7 +61,7 @@ class Index(Persistent):
                 letters.append(word[0].lower())
         letters.sort()
         return letters
-    
+
     def _addItem( self, value, item ):
         if value != "":
             words = self._words
@@ -71,7 +71,7 @@ class Index(Persistent):
             else:
                 words[value] = [ item ]
             self.setIndex(words)
-            
+
     def _withdrawItem( self, value, item ):
         if self._words.has_key(value):
             if item in self._words[value]:
@@ -85,9 +85,12 @@ class Index(Persistent):
             if key[0].lower() == letter.lower():
                 result += self._words[key]
         return result
-        
+
     def _match( self, value, cs=1, exact=1 ):
+
         result = []
+        lowerCaseValue = value.lower()
+
         if exact == 1 and cs == 1:
             if self._words.has_key(value) and len(self._words[value]) != 0:
                 if '' in self._words[value]:
@@ -97,7 +100,7 @@ class Index(Persistent):
                 return None
         elif exact == 1 and cs == 0:
             for key in self._words.keys():
-                if key.lower() == value.lower() and len(self._words[key]) != 0:
+                if key.lower() == lowerCaseValue and len(self._words[key]) != 0:
                     if '' in self._words[key]:
                         self._words[key].remove('')
                     result = result + self._words[key]
@@ -111,16 +114,16 @@ class Index(Persistent):
             return result
         else:
             for key in self._words.keys():
-                if key.lower().find(value.lower()) != -1 and len(self._words[key]) != 0:
+                if key.lower().find(lowerCaseValue) != -1 and len(self._words[key]) != 0:
                     if '' in self._words[key]:
                         self._words[key].remove('')
                     result = result + self._words[key]
             return result
         return None
-            
+
     def dump(self):
         return self._words
-        
+
     def setIndex(self, words):
         self._words = words
 
@@ -129,19 +132,19 @@ class Index(Persistent):
 
 class EmailIndex( Index ):
     _name = "email"
-    
+
     def indexUser( self, user ):
         email = user.getEmail()
         self._addItem( email, user.getId() )
         for email in user.getSecondaryEmails():
             self._addItem( email, user.getId() )
-        
+
     def unindexUser( self, user ):
         email = user.getEmail()
         self._withdrawItem( email, user.getId() )
         for email in user.getSecondaryEmails():
             self._withdrawItem( email, user.getId() )
-        
+
     def matchUser( self, email, cs=0, exact=0 ):
         """this match is an approximative case insensitive match"""
         return self._match(email,cs,exact)
@@ -152,11 +155,11 @@ class NameIndex( Index ):
     def indexUser( self, user ):
         name = user.getName()
         self._addItem( name, user.getId() )
-        
+
     def unindexUser( self, user ):
         name = user.getName()
         self._withdrawItem( name, user.getId() )
-        
+
     def matchUser( self, name, cs=0, exact=0 ):
         """this match is an approximative case insensitive match"""
         return self._match(name,cs,exact)
@@ -167,11 +170,11 @@ class SurNameIndex( Index ):
     def indexUser( self, user ):
         surName = user.getSurName()
         self._addItem( surName, user.getId() )
-        
+
     def unindexUser( self, user ):
         surName = user.getSurName()
         self._withdrawItem( surName, user.getId() )
-        
+
     def matchUser( self, surName, cs=0, exact=0 ):
         """this match is an approximative case insensitive match"""
         return self._match(surName,cs,exact)
@@ -182,11 +185,11 @@ class OrganisationIndex( Index ):
     def indexUser( self, user ):
         org = user.getOrganisation()
         self._addItem( org, user.getId() )
-        
+
     def unindexUser( self, user ):
         org = user.getOrganisation()
         self._withdrawItem( org, user.getId() )
-        
+
     def matchUser( self, org, cs=0, exact=0 ):
         """this match is an approximative case insensitive match"""
         return self._match(org,cs,exact)
@@ -200,19 +203,19 @@ class StatusIndex( Index ):
         ah = AvatarHolder()
         for av in ah.getList():
             self.indexUser(av)
-            
+
     def indexUser( self, user ):
         status = user.getStatus()
         self._addItem( status, user.getId() )
-        
+
     def unindexUser( self, user ):
         status = user.getStatus()
         self._withdrawItem( status, user.getId() )
-        
+
     def matchUser( self, status, cs=0, exact=1 ):
         """this match is an approximative case insensitive match"""
         return self._match(status,cs,exact)
-    
+
 class GroupIndex( Index ):
     _name = "group"
 
@@ -228,15 +231,15 @@ class GroupIndex( Index ):
         if name == "":
             return []
         return self._match(name,cs,exact)
-        
+
 class CategoryIndex(Persistent):
-    
+
     def __init__( self ):
         self._idxCategItem = OOBTree()
-        
+
     def dump(self):
         return list(self._idxCategItem.items())
-        
+
     def _indexConfById(self, categid, confid):
         # only the more restrictive setup is taken into account
         categid = str(categid)
@@ -246,54 +249,54 @@ class CategoryIndex(Persistent):
             res = []
         res.append(confid)
         self._idxCategItem[categid] = res
-        
+
     def unindexConf(self, conf):
         confid = str(conf.getId())
         self.unindexConfById(confid)
-    
+
     def unindexConfById(self, confid):
         for categid in self._idxCategItem.keys():
             if confid in self._idxCategItem[categid]:
                 res = self._idxCategItem[categid]
                 res.remove(confid)
                 self._idxCategItem[categid] = res
-        
+
     def reindexCateg(self, categ):
         for subcat in categ.getSubCategoryList():
             self.reindexCateg(subcat)
         for conf in categ.getConferenceList():
             self.reindexConf(conf)
-        
+
     def reindexConf(self, conf):
         self.unindexConf(conf)
         self.indexConf(conf)
 
     def indexConf(self, conf):
         categs = conf.getOwnerPath()
-        level = 0 
+        level = 0
         for categ in conf.getOwnerPath():
             if conf.getFullVisibility() > level:
                 self._indexConfById(categ.getId(),conf.getId())
             level+=1
         if conf.getFullVisibility() > level:
             self._indexConfById("0",conf.getId())
-    
+
     def getItems(self, categid):
         categid = str(categid)
         if self._idxCategItem.has_key(categid):
             return self._idxCategItem[categid]
         else:
             return []
-        
+
 class CalendarIndex(Persistent):
-    """Implements a persistent calendar-like index. Objects (need to implement 
-        the __hash__ method) with a starting and ending dates can be added to 
-        the index so it's faster and esaier to perform queries in order to 
-        fetch objects which are happening wihtin a given date. Indexing and 
+    """Implements a persistent calendar-like index. Objects (need to implement
+        the __hash__ method) with a starting and ending dates can be added to
+        the index so it's faster and esaier to perform queries in order to
+        fetch objects which are happening wihtin a given date. Indexing and
         unindexing of objects must be explicitely notified by index handlers
         i.e. these objects won't be updated when the starting or ending dates
         are changed.
-       
+
        Atttributes:
         idxSDate - (IOBTree) Inverted index containing all the objects which
             are starting on a certain date.
@@ -312,11 +315,11 @@ class CalendarIndex(Persistent):
 
     def dump(self):
         return list(self._idxSdate.items())+list(self._idxEdate.items())
-        
+
     def indexConf(self, conf):
-        """Adds an object to the index for the specified starting and ending 
+        """Adds an object to the index for the specified starting and ending
             dates.
-           
+
            Parameters:
             conf - (Conference) Object to be indexed.
         """
@@ -337,21 +340,21 @@ class CalendarIndex(Persistent):
         if not confid in res:
             res.append(confid)
             self._idxEdate[edate] = res
-        
+
     def unindexConf( self, conf):
-        """Removes the given object from the index for the specified starting 
-            and ending dates. If the object is not indexed at any of the 
+        """Removes the given object from the index for the specified starting
+            and ending dates. If the object is not indexed at any of the
             2 values the operation won't be executed.
-           
+
            Raises:
             Exception - the specified object is not indexed at the specified
                     dates
-           
+
            Parameters:
             conf - (Conference) Object to be removed from the index.
             sdate - (datetime) Starting date at which the object is indexed.
-            edate - (datetime) [optional] Ending date at which the object 
-                is indexed. If it is not specified the starting date will be 
+            edate - (datetime) [optional] Ending date at which the object
+                is indexed. If it is not specified the starting date will be
                 used as ending one.
         """
         confid = conf.getId()
@@ -371,7 +374,7 @@ class CalendarIndex(Persistent):
                 res.remove(confid)
                 self._idxSdate[sdate] = res
             if len(self._idxSdate[sdate]) == 0:
-                del self._idxSdate[sdate]        
+                del self._idxSdate[sdate]
         if not self._idxEdate.has_key( edate ):
             for key in self._idxEdate.keys():
                 res = self._idxEdate[key]
@@ -392,7 +395,7 @@ class CalendarIndex(Persistent):
         """Returns all the objects starting before the specified day (excluded).
 
            Parameters:
-            date - (tz aware datetime) Date for which all the indexed objects starting 
+            date - (tz aware datetime) Date for which all the indexed objects starting
                 before have to be fecthed and returned.
            Returns:
             (Set) - set of objects starting before the specified day
@@ -402,12 +405,12 @@ class CalendarIndex(Persistent):
         for val in self._idxSdate.values(self._idxSdate.minKey(), date):
             res.union_update( sets.Set( val ) )
         return res
-    
+
     def _getObjectsStartingAfter( self, date ):
         """Returns all the objects starting after the specified day (excluded).
 
            Parameters:
-            date - (tz aware datetime) Date for which all the indexed objects starting 
+            date - (tz aware datetime) Date for which all the indexed objects starting
                 after have to be fecthed and returned.
            Returns:
             (Set) - set of objects starting before the specified day
@@ -417,12 +420,12 @@ class CalendarIndex(Persistent):
         for val in self._idxSdate.values(date):
             res.union_update( sets.Set( val ) )
         return res
-    
+
     def _getObjectsEndingBefore( self, date ):
         """Returns all the objects ending before the specified day (excluded).
 
            Parameters:
-            date - (tz aware datetime) Date for which all the indexed objects ending 
+            date - (tz aware datetime) Date for which all the indexed objects ending
                 before have to be fecthed and returned.
            Returns:
             (Set) - set of objects ending before the specified day
@@ -432,16 +435,16 @@ class CalendarIndex(Persistent):
         for val in self._idxEdate.values(self._idxEdate.minKey(), date):
             res.union_update( sets.Set( val ) )
         return res
-    
+
     def _getObjectsEndingAfter( self, date ):
         """Returns all the objects ending after the specified day (included).
 
            Parameters:
-            date - (tz aware datetime) Date for which all the indexed objects ending 
+            date - (tz aware datetime) Date for which all the indexed objects ending
                 after have to be fecthed and returned.
            Returns:
             (Set) - set of objects ending after the specified day
-        """        
+        """
         date = date2utctimestamp(date)
         res = sets.Set()
         for val in self._idxEdate.values(date):
@@ -450,23 +453,23 @@ class CalendarIndex(Persistent):
 
     def getObjectsStartingInDay( self, date ):
         """Returns all the objects which are starting on the specified date.
-          
+
            Parameters:
             date - (tz aware datetime) day
-           
+
            Returns:
             (Set) - set of objects happening within the specified date interval.
         """
         sDate = date.replace(hour=0, minute=0, second=0, microsecond=0)
         eDate = date.replace(hour=23, minute=59, second=59, microsecond=0)
         return self.getObjectsStartingIn(sDate,eDate)
-    
+
     def getObjectsInDay( self, date ):
         """Returns all the objects which are happening on the specified date.
-          
+
            Parameters:
             date - (tz aware datetime) day
-           
+
            Returns:
             (Set) - set of objects happening within the specified date interval.
         """
@@ -475,13 +478,13 @@ class CalendarIndex(Persistent):
         return self.getObjectsIn(sDate,eDate)
 
     def getObjectsStartingIn( self, sDate, eDate):
-        """Returns all the objects which are starting whithin the specified 
+        """Returns all the objects which are starting whithin the specified
             date interval.
-          
+
            Parameters:
-            sDate - (tz aware datetime) Lower date of the interval to be considered. 
-            eDate - (tz aware datetime) Higher date of the interval to be considered. 
-           
+            sDate - (tz aware datetime) Lower date of the interval to be considered.
+            eDate - (tz aware datetime) Higher date of the interval to be considered.
+
            Returns:
             (Set) - set of objects happening within the specified date interval.
         """
@@ -491,13 +494,13 @@ class CalendarIndex(Persistent):
         s1 = self._getObjectsStartingBefore( eDate )
         s2.intersection_update( s1 )
         return s2
-    
+
     def getObjectsEndingIn( self, sDate, eDate):
-        """Returns all the objects which are ending whithin the specified 
-            date interval.          
+        """Returns all the objects which are ending whithin the specified
+            date interval.
            Parameters:
-            sDate - (tz aware datetime) Lower date of the interval to be considered. 
-            eDate - (tz aware datetime) Higher date of the interval to be considered.            
+            sDate - (tz aware datetime) Lower date of the interval to be considered.
+            eDate - (tz aware datetime) Higher date of the interval to be considered.
            Returns:
             (Set) - set of objects ending within the specified date interval.
         """
@@ -507,28 +510,28 @@ class CalendarIndex(Persistent):
         s1 = self._getObjectsEndingBefore( eDate )
         s2.intersection_update( s1 )
         return s2
-    
+
     def getObjectsEndingInDay( self, date ):
         """Returns all the objects which are ending on the specified date.
-          
+
            Parameters:
             date - (tz aware datetime) day
-           
+
            Returns:
             (Set) - set of objects happening within the specified date interval.
         """
         sDate = date.replace(hour=0, minute=0, second=0, microsecond=0)
         eDate = date.replace(hour=23, minute=59, second=59, microsecond=0)
         return self.getObjectsEndingIn(sDate,eDate)
-    
+
     def getObjectsIn( self, sDate, eDate ):
-        """Returns all the objects which are happening whithin the specified 
+        """Returns all the objects which are happening whithin the specified
             date interval.
-          
+
            Parameters:
-            sDate - (tz aware datetime) Lower date of the interval to be considered. 
-            eDate - (tz aware datetime) Higher date of the interval to be considered. 
-           
+            sDate - (tz aware datetime) Lower date of the interval to be considered.
+            eDate - (tz aware datetime) Higher date of the interval to be considered.
+
            Returns:
             (Set) - set of objects happening within the specified date interval.
         """
@@ -544,7 +547,7 @@ class CalendarIndex(Persistent):
 
     def getObjectsStartingAfter( self, date ):
         return self._getObjectsStartingAfter( date )
-    
+
     #def getObjectsStartingInYear( self, year ):
     #    lastDay = datetime( year, 12, 31 )
     #    s1 = sets.Set()
@@ -561,13 +564,13 @@ class CalendarIndex(Persistent):
     #    return s1
 
 class CategoryDateIndex(Persistent):
-    
+
     def __init__( self ):
         self._idxCategItem = OOBTree()
-        
+
     def dump(self):
         return map(lambda idx: (idx[0], idx[1].dump()), list(self._idxCategItem.items()))
-    
+
     def unindexConf(self, conf):
         for owner in conf.getOwnerPath():
             self._idxCategItem[owner.getId()].unindexConf(conf)
@@ -584,7 +587,7 @@ class CategoryDateIndex(Persistent):
             self.indexCateg(subcat)
         for conf in categ.getConferenceList():
             self.indexConf(conf)
-        
+
     def _indexConf(self, categid, conf):
         # only the more restrictive setup is taken into account
         if self._idxCategItem.has_key(categid):
@@ -596,11 +599,11 @@ class CategoryDateIndex(Persistent):
 
     def indexConf(self, conf):
         categs = conf.getOwnerPath()
-        level = 0 
+        level = 0
         for categ in conf.getOwnerPath():
             self._indexConf(categ.getId(), conf)
         self._indexConf("0",conf)
-            
+
     def getObjectsIn(self, categid, sDate, eDate):
         categid = str(categid)
         if self._idxCategItem.has_key(categid):
@@ -622,7 +625,7 @@ class PendingQueuesUsersIndex( Index ):
         email = user.getEmail().lower()
         self._addItem( email, user )
         self.notifyModification()
-        
+
     def unindexPendingUser( self, user ):
         email = user.getEmail().lower()
         self._withdrawItem( email, user )
@@ -633,19 +636,19 @@ class PendingQueuesUsersIndex( Index ):
         if self._words.has_key(value):
             if self._words[value]==[]:
                 del self._words[value]
-        
+
     def matchPendingUser( self, email, cs=0, exact=1 ):
         """this match is an approximative case insensitive match"""
         return self._match(email,cs,exact)
 
 class PendinQueuesTasksIndex( Index ):
     _name = ""
-    
+
     def indexTask( self, email, task ):
         email = email.lower().strip()
         self._addItem( email, task )
         self.notifyModification()
-        
+
     def unindexTask( self, email, task ):
         email = email.lower().strip()
         self._withdrawItem( email, task )
@@ -656,7 +659,7 @@ class PendinQueuesTasksIndex( Index ):
         if self._words.has_key(value):
             if self._words[value]==[]:
                 del self._words[value]
-        
+
     def matchTask( self, email, cs=0, exact=1 ):
         """this match is an approximative case insensitive match"""
         return self._match(email,cs,exact)
@@ -668,7 +671,7 @@ class PendingSubmittersIndex( PendingQueuesUsersIndex ):
 class PendingSubmittersTasksIndex( PendinQueuesTasksIndex ):
     _name = "pendingSubmittersTasks"
     pass
-    
+
 class PendingManagersIndex( PendingQueuesUsersIndex ):
     _name = "pendingManagers"
     pass
@@ -686,13 +689,13 @@ class PendingCoordinatorsTasksIndex( PendinQueuesTasksIndex ):
     pass
 
 class DoubleIndex(Index):
-    
+
     def __init__( self, name='' ):
         if name != '':
             self._name = name
         self._words = OOBTree()
         self._ids = OOBTree()
-    
+
     def _addItem( self, value, item ):
         if value != "":
             words = self._words
@@ -713,9 +716,9 @@ class DoubleIndex(Index):
             else:
                 self._ids[value] = [id]
             self._p_changed = 1
-            
+
     def _withdrawItem( self, value, item ):
-        if self._words.has_key(value):            
+        if self._words.has_key(value):
             if item in self._words[value]:
                 words = self._words
                 l = words[value]
@@ -729,16 +732,16 @@ class DoubleIndex(Index):
                 l.remove(id)
                 self._ids[value] = l
         self._p_changed = 1
-    
+
     def _itemToId(self, item):
         #to be overloaded
         return ""
-    
+
     def initIndex(self):
         self._words = OOBTree()
         self._ids = OOBTree()
         self._p_changed = 1
-    
+
     def getLowerIndex(self):
         if self._words.keys():
             return min(self._words.keys())
@@ -753,7 +756,7 @@ class OAIDoubleIndex(DoubleIndex):
     def initIndex( self ):
         DoubleIndex.initIndex(self)
         self.firstDate = nowutc().replace( hour=0, minute=0, second=0, microsecond=0 )
-        
+
     def getElements(self, from_date, until_date):
         if not (from_date or until_date):
             res = []
@@ -778,11 +781,11 @@ class OAIDoubleIndex(DoubleIndex):
                 res.extend(self._words[date.strftime("%Y-%m-%d")])
             date = date + delta
         return res
-    
+
     def getElementIds(self, from_date, until_date):
         if not (from_date or until_date):
             return self.getAllElementIds()
-        
+
         fd = self.firstDate
         if from_date:
 #            fd = server2utc(datetime(int(from_date[0:4]), int(from_date[5:7]), int(from_date[8:10])))
@@ -801,19 +804,19 @@ class OAIDoubleIndex(DoubleIndex):
                 res.extend(self._ids[date.strftime("%Y-%m-%d")])
             date = date + delta
         return res
-    
+
     def getAllElements(self):
         res = []
         for date in self._words.keys():
             res.extend(self._words[date])
         return res
-    
+
     def getAllElementIds(self):
         res = []
         for date in self._ids.keys():
             res.extend(self._ids[date])
         return res
-    
+
     def unindexElement( self, cont ):
         date = cont.getOAIModificationDate().strftime("%Y-%m-%d")
         self._withdrawItem( date, cont )
@@ -827,7 +830,7 @@ class OAIContributionIndex( OAIDoubleIndex ):
     def initIndex( self ):
         OAIDoubleIndex.initIndex(self)
         self.firstDate = nowutc().replace( hour=0, minute=0, second=0, microsecond=0 )
-        
+
     def _itemToId(self, item):
         from MaKaC.conference import Contribution, SubContribution
         if isinstance(item, Contribution):
@@ -844,12 +847,12 @@ class OAIContributionIndex( OAIDoubleIndex ):
 
     def getAllContributions(self):
         return OAIDoubleIndex.getAllElements(self)
-    
+
     def getAllContributionsIds(self):
         return OAIDoubleIndex.getAllElementIds(self)
 
     def unindexContribution( self, cont ):
-        return OAIDoubleIndex.unindexElement(self, cont)    
+        return OAIDoubleIndex.unindexElement(self, cont)
 
     def indexContribution( self, cont ):
 #        Logger.get('oai/indexes').debug("\tINDEXING %s from conf %s" % (cont.getId(), cont.getConference().getId()))
@@ -867,18 +870,18 @@ class OAIContributionIndex( OAIDoubleIndex ):
 
 class OAIContributionModificationDateIndex( OAIContributionIndex ):
     _name = "OAIContributionModificationDate"
-     
+
     def isIndexable(self, conf):
         # only public conferences shoud be indexed
         return not conf.hasAnyProtection()
 
-    
+
 class OAIPrivateContributionModificationDateIndex( OAIContributionIndex ):
     _name = "OAIPrivateContributionModificationDate"
-    
+
     def __init__( self, name='' ):
         OAIContributionIndex.__init__(self, name)
-    
+
     def indexContribution( self, cont ):
         if not cont.hasAnyProtection():
             self.unindexContribution(cont)
@@ -893,7 +896,7 @@ class OAIPrivateContributionModificationDateIndex( OAIContributionIndex ):
 
 class OAIDeletedContributionModificationDateIndex( OAIContributionModificationDateIndex ):
     _name = "OAIDeletedContributionModificationDate"
- 
+
     def indexContribution( self, cont ):
         date = cont.getOAIModificationDate()
         strDate = date.strftime("%Y-%m-%d")
@@ -903,17 +906,17 @@ class OAIDeletedContributionModificationDateIndex( OAIContributionModificationDa
 
 class OAIDeletedPrivateContributionModificationDateIndex(OAIDeletedContributionModificationDateIndex):
     _name = "OAIDeletedPrivateContributionModificationDate"
-   
-  
+
+
 class OAIDeletedContributionCategoryIndex( OAIContributionIndex ):
     _name = "OAIDeletedContributionCategory"
-        
+
     def __init__( self, name='' ):
         OAIContributionIndex.__init__(self, name)
-    
+
     def _itemToId(self, item):
         return item.getId()
-    
+
     def indexContribution( self, cont ):
         for catId in cont.getCategoryPath():
             self._addItem( catId, cont )
@@ -921,23 +924,23 @@ class OAIDeletedContributionCategoryIndex( OAIContributionIndex ):
     def unindexContribution( self, cont ):
         for catId in cont.getCategoryPath():
             self._withdrawItem( catId, cont )
-    
+
     def getContributions(self, catId):
         if not catId in self._ids.keys():
             return []
         return self._words[catId]
-   
+
     def getContributionsIds(self, catId):
         if not catId in self._ids.keys():
             return []
         return self._ids[catId]
-    
+
     def getAllConferences(self):
         res = []
         for catId in self._words.keys():
             res.extend(self._words[catId])
         return res
-    
+
     def getAllConferencesIds(self):
         res = []
         for catId in self._ids.keys():
@@ -947,7 +950,7 @@ class OAIDeletedContributionCategoryIndex( OAIContributionIndex ):
 class OAIDeletedPrivateContributionCategoryIndex( OAIDeletedContributionCategoryIndex ):
     _name = "OAIDeletedPrivateContributionCategory"
 
- 
+
 class OAIConferenceIndex( OAIDoubleIndex ):
 
     def __init__( self, name='' ):
@@ -960,14 +963,14 @@ class OAIConferenceIndex( OAIDoubleIndex ):
 
     def _itemToId(self, item):
         return item.getId()
-    
+
     def unindexElement( self, conf ):
         date = conf.getOAIModificationDate().strftime("%Y-%m-%d")
         self._withdrawItem( date, conf )
 
     def unindexConference( self, conf ):
         self.unindexElement(conf)
-        
+
     def getConferences(self, from_date, until_date):
         return OAIDoubleIndex.getElements(self, from_date, until_date)
 
@@ -977,7 +980,7 @@ class OAIConferenceIndex( OAIDoubleIndex ):
             for key in self._ids.keys():
                 res.extend(self._ids[key])
             return res
-        
+
         fd = self.firstDate
         if from_date:
             #fd = server2utc(datetime(int(from_date[0:4]), int(from_date[5:7]), int(from_date[8:10])))
@@ -997,22 +1000,22 @@ class OAIConferenceIndex( OAIDoubleIndex ):
             date = date + delta
 
         return res
-    
+
     def getAllConferences(self):
         return OAIDoubleIndex.getAllElements(self)
-    
+
     def getAllConferencesIds(self):
         return OAIDoubleIndex.getAllElementIds(self)
 
     def unindexConference( self, cont ):
         return OAIDoubleIndex.unindexElement(self, cont)
-    
+
 class OAIConferenceModificationDateIndex( OAIConferenceIndex ):
     _name = "OAIConferenceModificationDate"
-    
+
     def __init__( self, name='' ):
         OAIConferenceIndex.__init__(self, name)
-    
+
     def indexConference( self, conf ):
 
         if conf.hasAnyProtection():
@@ -1027,14 +1030,14 @@ class OAIConferenceModificationDateIndex( OAIConferenceIndex ):
     def isIndexable(self, conf):
         # only public conferences shoud be indexed
         return not conf.hasAnyProtection()
- 
+
 
 class OAIPrivateConferenceModificationDateIndex( OAIConferenceModificationDateIndex ):
     _name = "OAIPrivateConferenceModificationDate"
-    
+
     def __init__( self, name='' ):
         OAIConferenceIndex.__init__(self, name)
-    
+
     def indexConference( self, conf ):
         if not conf.hasAnyProtection():
             self.unindexConference(conf)
@@ -1047,43 +1050,43 @@ class OAIPrivateConferenceModificationDateIndex( OAIConferenceModificationDateIn
 
 class OAIDeletedConferenceModificationDateIndex( OAIConferenceModificationDateIndex ):
     _name = "OAIDeletedConferenceModificationDate"
-        
+
     def isIndexable(self, conf):
         # only public conferences shoud be indexed
         return not conf.hasAnyProtection()
 
 class OAIDeletedPrivateConferenceModificationDateIndex( OAIPrivateConferenceModificationDateIndex ):
     _name = "OAIDeletedPrivateConferenceModificationDate"
-    
+
 
 class OAIDeletedPrivateConferenceModificationDateIndex( OAIPrivateConferenceModificationDateIndex ):
     _name = "OAIDeletedPrivateConferenceModificationDate"
 
-    
+
 class OAIDeletedConferenceCategoryIndex( OAIConferenceIndex ):
     _name = "OAIDeletedConferenceCategory"
-    
+
     def __init__( self, name='' ):
         OAIConferenceIndex.__init__(self, name)
-    
+
     def indexConference( self, conf ):
         for catId in conf.getCategoryPath():
             self._addItem( catId, conf )
-    
+
     def unindexConference( self, conf ):
         for catId in conf.getCategoryPath():
             self._withdrawItem( catId, conf )
-    
+
     def getConferences(self, catId):
         if not catId in self._ids.keys():
             return []
         return self._words[catId]
-    
+
     def getConferencesIds(self, catId):
         if not catId in self._ids.keys():
             return []
         return self._ids[catId]
-    
+
     def getAllConferences(self):
         res = []
         for catId in self._words.keys():
@@ -1311,5 +1314,5 @@ class IndexesHolder( ObjectHolder ):
 if __name__ == "__main__":
     print _("done")
 
-    
-    
+
+

@@ -61,6 +61,45 @@
 
         return isValid
     }
+    // Check whether a room can be booked (or pre-booked) by the user
+    // If not, pop up a dialog
+    function isBookable()
+    {
+        // Get the selected option in the SELECT
+        var selectedURL = $F('roomName');
+        var roomLocationPattern = /roomLocation=([a-zA-Z0-9\-]*)(?:&|$)/;
+        var roomIDPattern = /roomID=([a-zA-Z0-9\-]*)(?:&|$)/;
+
+        // Get the room location and id from the url
+        var roomLocation = selectedURL.match(roomLocationPattern);
+        var roomID = selectedURL.match(roomIDPattern);
+
+        var bookButton = $E("bookButton");
+        var bookButtonWrapper = $E("bookButtonWrapper");
+        bookButtonWrapper.set(progressIndicator(true, false));
+
+        // Send an asynchronous request to the server
+        // Depending of result, either redirect to the
+        // Room Booking form or pop up a dialog
+        indicoRequest('user.canBook',
+            {roomLocation: roomLocation[1], roomID: roomID[1]},
+            function(result, error) {
+                if(!error) {
+                    if (result) {
+                        document.location = selectedURL;
+                    } else {
+                        bookButtonWrapper.set(bookButton);
+                        var popup = new AlertPopup('Booking Not Allowed',
+                                "You\'re not allowed to book this room");
+                        popup.open();
+                    }
+                } else {
+                    bookButtonWrapper.set(bookButton);
+                    IndicoUtil.errorReport(error);
+                }
+            });
+    }
+
 </script>
 
         <!-- CONTEXT HELP DIVS -->
@@ -151,7 +190,7 @@
                                         <tr>
                                         <td nowrap="nowrap" class="titleCellTD"><span class="titleCellFormat"> <%= _("Room")%></span></td>
                                         <td width="80%%">
-                                            <form method="post">
+                                            <form id="chooseForm" method="post">
                                                 <select name="roomName" id="roomName">
                                                 <% for room in rooms: %>
                                                   <% selected = "" %>
@@ -160,22 +199,17 @@
                                                   <% end %>
                                                   <% url = detailsUH.getURL( room ) %>
                                                   <% if forNewBooking: %>
-                                                    <% if room.canPrebook( user ): %>
                                                       <% url = bookingFormUH.getURL( room ) %>
-                                                    <% end %>
-                                                    <% if not room.canPrebook( user ): %>
-                                                      <% url = youCannot %>
-                                                    <% end %>
                                                   <% end %>
                                                   <option value="<%= url %>" <%= selected %> class="<%=roomClass( room )%>"><%= room.locationName + ": &nbsp; " + room.getFullName() %></option>
                                                 <% end %>
                                                 </select>
 
                                                 <% if forNewBooking: %>
-                                                    <input class="btn" type="submit" value="<%= _("Book")%>" onclick="document.location = $F( 'roomName' ); return false;" />
+                                                    <span id="bookButtonWrapper"><input id="bookButton" class="btn" type="button" value="<%= _("Book")%>" onclick="isBookable();" /></span>
                                                 <% end %>
                                                 <% if not forNewBooking: %>
-                                                    <input class="btn" type="submit" value="<%= _("Room details")%>" onclick="document.location = $F( 'roomName' ); return false;" />
+                                                    <input class="btn" type="button" value="<%= _("Room details")%>" onclick="document.location = $F( 'roomName' ); return false;" />
                                                 <% end %>
 
                                                 <!-- Help -->
