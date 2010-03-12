@@ -44,6 +44,7 @@ from MaKaC.i18n import _
 from MaKaC.common.timezoneUtils import DisplayTZ, nowutc, getAdjustedDate
 from MaKaC.common.utils import getHierarchicalId
 from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
+from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
 
 
 def fake(string1=""):
@@ -250,7 +251,19 @@ class outputGenerator:
                 out.writeTag("name",l.getName())
                 out.writeTag("address",l.getAddress())
             if conf.getRoom():
-                out.writeTag("room",conf.getRoom().getName())
+                # get the name that is saved
+                roomName = conf.getRoom().getName()
+
+                # if there is a connection to the room booking DB
+                if CrossLocationDB.isConnected():
+                    # get the room info
+                    roomFromDB = CrossLocationQueries.getRooms( roomName = roomName, location = loc.getName() )
+                    # if there's a room with such name
+                    if roomFromDB:
+                        # use the full name instead
+                        roomName = roomFromDB.getFullName()
+
+                out.writeTag("room", roomName)
                 url=RoomLinker().getURL(conf.getRoom(), loc)
                 if url != "":
                     out.writeTag("roomMapURL",url)
