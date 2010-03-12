@@ -7,7 +7,7 @@
     <div class="groupTitle"><%= _("Step 1: Choose a category")%></div>
     <div style="padding: 10px">
         <input type="hidden" value="<%= categ['id'] %>" name="categId" id="createCategId"/>
-        <span class="selectedCategoryName"><%= _("The event will be created in:")%> <span id="categTitle" class="categTitleChosen"><%= categ['title'] %></span></span><input <% if nocategs: %>style="display: none;"<% end %> id="buttonCategChooser" type="button" value="<%= _("Browse...")%>" onclick="categoryChooser.open()"/>
+        <span class="selectedCategoryName"><%= _("The event will be created in:")%> <span id="categTitle" class="categTitleChosen"><%= categ['title'] %></span></span><input <% if nocategs: %>style="display: none;"<% end %> id="buttonCategChooser" type="button" value="<%= _("Browse...")%>" onclick="openCategoryChooser()"/>
     </div>
 
     <div class="groupTitle"><%= _("Step 2: Enter basic information about the lecture") %></div>
@@ -144,7 +144,11 @@
         $E("buttonCategChooser").set("<%= _("Change...")%>")
         IndicoUI.Effect.highLightBackground("categTitle");
     };
-    var categoryChooser = new CategoryChooser(<%= categ %>, categoryChooserHandler, true);
+
+    var openCategoryChooser = function() {
+        var categoryChooserPopup = new CategoryChooser(<%= categ %>, categoryChooserHandler, true);
+        categoryChooserPopup.open();
+    }
 
     // ---- On Load
 

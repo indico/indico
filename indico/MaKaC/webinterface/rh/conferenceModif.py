@@ -203,7 +203,7 @@ class RHConferenceModifKey( RHConferenceModifBase ):
 #        else:
 #            url = urlHandlers.UHConferenceModification.getURL( self._conf )
         else:
-            url = urlHandlers.UHConferenceModification.getURL( self._conf )
+            url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
         self._redirect( url )
 
 class RHConferenceModifManagementAccess( RHConferenceModifKey ):
@@ -245,7 +245,8 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
         elif self._isReferee:
             url = urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf )
         elif self._isVideoServicesManagerOrAdmin:
-            url = urlHandlers.UHConfModifCollaboration.getURL(self._conf)
+            from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
+            url = urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = CollaborationTools.isUsingHTTPS())
 
         else:
             url = urlHandlers.UHConfManagementAccess.getURL( self._conf )

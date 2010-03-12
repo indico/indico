@@ -158,7 +158,7 @@ def quoteattr( s ):
 
 def roomClass( room ):
     if room.isReservable:
-        roomClass = ""
+        roomClass = "basicRoom"
     if not room.isReservable:
         roomClass = "privateRoom"
     if room.isReservable and room.resvsNeedConfirmation:

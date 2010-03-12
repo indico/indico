@@ -1,9 +1,3 @@
-function trimString (str) {
-  var str = this != window? this : str;
-  return str.replace(/^\s+/g, '').replace(/\s+$/g, '');
-}
-String.prototype.trim = trimString;
-
 function is_valid_int( s )
 {
     var i = parseInt( s, 10 )

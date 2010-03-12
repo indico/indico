@@ -1,7 +1,7 @@
 <% calendarIconURL = Config.getInstance().getSystemIconURL("calendar") %>
 
 <script type="text/javascript">
-    
+
     // Displays div with dates and hours
 	function period_clean_redouts( f1 )
 	{
@@ -31,26 +31,26 @@
 
         // Init
         isValid = true
-        
+
         // Simple search
         if ( !all_date_fields_are_blank() )
             isValid = validate_period( f1, false, true, 1 ) // 1: validate only dates
         if ( !all_time_fields_are_blank() )
             isValid = isValid && validate_period( f1, false, true, 2 ) // 2: validate only times
-        
+
         // Holidays warning
         if ( isValid && !onSubmit )
         {
             new Ajax.Updater(
                 'holidays-warning',
                 '<%= urlHandlers.UHRoomBookingGetDateWarning.getURL() %>',
-                { parameters: $(f1).serialize(true) } 
+                { parameters: $(f1).serialize(true) }
             );
         }
 
         return isValid
     }
-    
+
     function confirm_search()
     {
         if ( $F('onlyMy') )
@@ -67,14 +67,14 @@
         alert( 'Please select a room (or several rooms).' )
         return false;
     }
-    
+
     IndicoUI.executeOnLoad(function()
-    {       
-        
+    {
+
         var startDate = IndicoUI.Widgets.Generic.dateField_sdate(false,null,['sDay', 'sMonth', 'sYear']);
         $E('sDatePlace').set(startDate);
-            
-        var endDate = IndicoUI.Widgets.Generic.dateField_edate(false,null,['eDay', 'eMonth', 'eYear']); 
+
+        var endDate = IndicoUI.Widgets.Generic.dateField_edate(false,null,['eDay', 'eMonth', 'eYear']);
         $E('eDatePlace').set(endDate);
 
 
@@ -93,20 +93,20 @@
                 startDate.dom.onchange();
             }
         });
-        
+
        <% if today.day != '': %>
             startDate.set('<%= today.day %>/<%= today.month %>/<%= today.year %>');
         <% end %>
-        
-        <% if monthLater.day != '': %>
-            endDate.set('<%= monthLater.day %>/<%= monthLater.month %>/<%= monthLater.year %>');
+
+        <% if weekLater.day != '': %>
+            endDate.set('<%= weekLater.day %>/<%= weekLater.month %>/<%= weekLater.year %>');
         <% end %>
-        
-     });   
+
+     });
 </script>
         <!-- CONTEXT HELP DIVS -->
 	    <div id="tooltipPool" style="display: none">
-            <!-- Choose Button --> 
+            <!-- Choose Button -->
             <div id="chooseButtonHelp" class="tip">
                 Directly choose the room.
             </div>
@@ -114,7 +114,7 @@
         </div>
         <!-- END OF CONTEXT HELP DIVS -->
 
-		<table cellpadding="0" cellspacing="0" border="0" width="80%%"> 
+		<table cellpadding="0" cellspacing="0" border="0" width="80%%">
 	    <tr>
 	    <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%%">&nbsp;</td> <!-- lastvtabtitle -->
 	    </tr>
@@ -161,31 +161,31 @@
                                             <td class="titleCellTD" style="width: 125px;"><span class="titleCellFormat"> <%= _("Spans over")%></span></td>
                                             <td>
                                                 <table width="100%%">
-                                                
+
                                                 <tr id="sdatesTR" >
                                             <td class="subFieldWidth" align="right" ><small> <%= _("Start Date")%>&nbsp;&nbsp;</small></td>
                                             <td class="blacktext">
                                                 <span id="sDatePlace"></span>
                                                 <input type="hidden" value="<%= today.day %>" name="sDay" id="sDay" onchange="this.form.eDay.value=this.value;"/>
                                                 <input type="hidden" value="<%= today.month %>" name="sMonth" id="sMonth" onchange="this.form.eMonth.value=this.value;"/>
-                                                <input type="hidden" value="<%= today.year %>" name="sYear" id="sYear" onchange="this.form.eYear.value=this.value;"/>  
+                                                <input type="hidden" value="<%= today.year %>" name="sYear" id="sYear" onchange="this.form.eYear.value=this.value;"/>
                                             </td>
-                                          </tr>  
-                                         <tr id="edatesTR" >   
+                                          </tr>
+                                         <tr id="edatesTR" >
                                             <td class="subFieldWidth" align="right" ><small> <%= _("End Date")%>&nbsp;&nbsp;</small></td>
-                                            <td>                                                 
+                                            <td>
                                                 <span id="eDatePlace"></span>
-                                                <input type="hidden" value="<%= monthLater.day %>" name="eDay" id="eDay"/>
-                                                <input type="hidden" value="<%= monthLater.month %>" name="eMonth" id="eMonth"/>
-                                                <input type="hidden" value="<%= monthLater.year %>" name="eYear" id="eYear"/>
-                                            </td> 
+                                                <input type="hidden" value="<%= weekLater.day %>" name="eDay" id="eDay"/>
+                                                <input type="hidden" value="<%= weekLater.month %>" name="eMonth" id="eMonth"/>
+                                                <input type="hidden" value="<%= weekLater.year %>" name="eYear" id="eYear"/>
+                                            </td>
                                         </tr>
-                                                
-                                                
+
+
                                                 <tr id="hoursTR" >
                                                     <td align="right" ><small> <%= _("Hours")%>&nbsp;&nbsp;</small></td>
                                                     <td align="left" class="blacktext">
-                                                        <input name="sTime" id="sTime" maxlength="5" size="5" type="text" value="" /> &nbsp;&mdash;&nbsp; 
+                                                        <input name="sTime" id="sTime" maxlength="5" size="5" type="text" value="" /> &nbsp;&mdash;&nbsp;
                                                         <input name="eTime" id="eTime" maxlength="5" size="5" type="text" value="" />
                                                         <span id="holidays-warning" style="color: Red; font-weight:bold;"></span>
                                                     </td>
@@ -326,7 +326,7 @@
         </table>
         <!-- Just to initialize -->
         <script type="text/javascript">
-            Event.observe( window, 'load', 
+            Event.observe( window, 'load',
                 function() { new Form.Observer( 'searchForm', 0.4, forms_are_valid ); }
             );
         </script>

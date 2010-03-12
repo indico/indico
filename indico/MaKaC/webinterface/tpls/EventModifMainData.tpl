@@ -243,11 +243,11 @@ $E('inPlaceEditSupport').set(new SupportEditWidget('event.main.changeSupport', <
 
 <%  from MaKaC.common import info %>
 
-<%= macros.genericField(macros.FIELD_SELECT, 'inPlaceEditDefaultStyle', 'event.main.changeDefaultStyle', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh, options=info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager().getStylesheetDictForEventType(confObj.getType())) %>
+<%= macros.genericField(macros.FIELD_SELECT, 'inPlaceEditDefaultStyle', 'event.main.changeDefaultStyle', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh, options=info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager().getStylesheetDictForEventType(confObj.getType()), orderOptionsBy = "value") %>
 
-<%= macros.genericField(macros.FIELD_SELECT, 'inPlaceEditVisibility', 'event.main.changeVisibility', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh, options=visibilityList) %>
+<%= macros.genericField(macros.FIELD_SELECT, 'inPlaceEditVisibility', 'event.main.changeVisibility', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh, options=visibilityList, orderOptionsBy = "key") %>
 
-<%= macros.genericField(macros.FIELD_SELECT, 'inPlaceEditType', 'event.main.changeType', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh, options=typeList) %>
+<%= macros.genericField(macros.FIELD_SELECT, 'inPlaceEditType', 'event.main.changeType', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh, options=typeList, orderOptionsBy = "value") %>
 
 $E('inPlaceEditStartEndDate').set(new StartEndDateWidget('event.main.changeDates', <%= jsonEncode({'conference': "%s"%conferenceId}) %>, {'startDate': confFossile.startDate, 'endDate': confFossile.endDate}).draw());
 
@@ -266,19 +266,19 @@ $E('inPlaceEditLocation').set([
     function(target, source){
         var info = $O(source.get().getAll());
         var rbWidget = new RoomBookingWidget(Indico.Data.Locations, info, null, nullRoomInfo(info), <%= favoriteRooms %>, null);
-	target.set(rbWidget.draw())
+    target.set(rbWidget.draw())
         return {
-	  activate: function(){},
-	  save: function(){
-	    // force the observers to be called,
-	    // since objects look immutable to presentation,
-	    // as references are compared
-	    source.set($O(info.getAll()));
-	  },
-	  stop: function(){
-	    bind.detach(target);
-	  }
-	};
+      activate: function(){},
+      save: function(){
+        // force the observers to be called,
+        // since objects look immutable to presentation,
+        // as references are compared
+        source.set($O(info.getAll()));
+      },
+      stop: function(){
+        bind.detach(target);
+      }
+    };
     }
   )(IndicoUtil.cachedRpcValue(Indico.Urls.JsonRpcService, 'event.main.changeBooking',{conference: '<%= conferenceId %>'}, $O(<%= offlineRequest(self._rh,'event.main.changeBooking',{'conference': "%s"%conferenceId})%>)), context),
     IndicoUI.Aux.defaultEditMenu(context)]);
