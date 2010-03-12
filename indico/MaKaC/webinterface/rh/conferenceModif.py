@@ -203,7 +203,7 @@ class RHConferenceModifKey( RHConferenceModifBase ):
 #        else:
 #            url = urlHandlers.UHConferenceModification.getURL( self._conf )
         else:
-            url = urlHandlers.UHConferenceModification.getURL( self._conf )
+            url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
         self._redirect( url )
 
 class RHConferenceModifManagementAccess( RHConferenceModifKey ):
