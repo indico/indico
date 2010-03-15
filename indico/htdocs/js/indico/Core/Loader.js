@@ -1,5 +1,6 @@
 include(ScriptRoot + "indico/Core/Components.js");
 include(ScriptRoot + "indico/Core/Data.js");
+include(ScriptRoot + "indico/Core/Util.js");
 
 include(ScriptRoot + "indico/Core/Presentation.js");
 include(ScriptRoot + "indico/Core/Browser.js");
