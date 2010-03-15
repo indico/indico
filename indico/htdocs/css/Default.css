@@ -5271,6 +5271,21 @@ ul.UnscheduledContribList li.selected {
     background-color: #CDEB8B;
 }
 
+div.popupWithButtonsMainContent {
+    background-color: #FFFFFF;
+    padding: 10px;
+}
+
+div.popupButtonBar {
+    border-top: 1px solid #CCCCCC;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    text-align: center;
+    position:relative;
+    top:-10px;
+}
+
 div.dialogButtons {
     background:#F8F8F8 none repeat scroll 0 0;
     border-top:1px solid #CCCCCC;

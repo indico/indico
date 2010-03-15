@@ -53,6 +53,7 @@ type("PopupDialog", ["PopupWidget"], {
     );
 
 type("ExclusivePopup", ["PopupWidget", "Printable"], {
+
     open : function() {
         this.PopupWidget.prototype.open.call(this);
     },
@@ -118,16 +119,25 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
 
         return this.PopupWidget.prototype.draw.call(this, this.container, 0, 0);
     },
+
     close: function() {
         IndicoUI.unAssignLayerLevel(this.greyBg);
         $E(document.body).remove(this.greyBg);
 
         this.PopupWidget.prototype.close.call(this);
     },
-    postDraw: function() {
-        var winDim = getWindowDimensions();
 
-        var winHeight = winDim.height - 100;
+    postDraw: function() {
+
+        this.winDim = getWindowDimensions();
+
+        this._adjustContentWrapper();
+        this._postDrawPositionDialog();
+        this._postDrawAdjustTitle();
+    },
+
+    _calculateContentHeight: function(){
+        var winHeight = this.winDim.height - 100;
         var contentHeight = this.contentWrapper.dom.offsetHeight;
 
         // If content is to big for the window
@@ -140,23 +150,31 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
                 contentHeight = winHeight;
             }
         }
+        return contentHeight;
+    },
 
+    _adjustContentWrapper: function(){
         // This is done in order to make sure that the scrollbar is shown
         // if the content is too big or if new content is added after the popup
         // dialog is displayed.
+        var contentHeight = this._calculateContentHeight();
         this.contentWrapper.setStyle('height', pixels(contentHeight));
         //this.contentWrapper.setStyle('marginTop', pixels((this.closeHandler && !this.title) ? 30 : 10));
         this.contentWrapper.setStyle('marginBottom', '10px');
         this.contentWrapper.setStyle('overflowY', 'auto');
         this.contentWrapper.setStyle('overflowX', 'hidden');
         this.contentWrapper.setStyle('paddingRight', '10px');
+    },
 
-        var left = Math.floor((winDim.width-this.container.dom.offsetWidth)/2);
-        var top = Math.floor((winDim.height-this.container.dom.offsetHeight)/2);
+    _postDrawPositionDialog: function(){
+        var left = Math.floor((this.winDim.width - this.container.dom.offsetWidth) / 2);
+        var top = Math.floor((this.winDim.height - this.container.dom.offsetHeight) / 2);
 
         this.canvas.dom.style.left = pixels(left);
         this.canvas.dom.style.top = pixels(top);
+    },
 
+    _postDrawAdjustTitle: function() {
         // Make sure the title has correct right padding depending on close button and
         // print button;
         var titlePaddingRight = 20;
@@ -167,8 +185,8 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
             titlePaddingRight += this.printLink.dom.offsetWidth;
         }
         this.titleDiv.dom.style.paddingRight = pixels(titlePaddingRight);
-
     },
+
     print: function() {
         if (!exists(this.printDiv)) {
             this.printDiv = Html.div({className: 'onlyPrint', style: {position: 'absolute', top: '10px', left: '10px'}});
@@ -185,7 +203,7 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
 
          // Called when user clicks the close button, if the function
          // returns true the dialog will be closed.
-         this.closeHandler = any(closeButtonHandler, function() {return true; });
+         this.closeHandler = any(closeButtonHandler, positive);
 
          // The maximum allowed height, used since it doesn't look
          // very nice it the dialog gets too big.
@@ -203,6 +221,62 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
          this.showPrintButton = any(showPrintButton && title && printable, false);
 
          this.PopupWidget();
+    }
+);
+
+/**
+ * Builds an exclusive popup with a button bar
+ * Constructor arguments: the same ones as ExclusivePopup
+ */
+type("ExclusivePopupWithButtons", ["ExclusivePopup"], {
+
+    /**
+     * Draws the dialog
+     * @param {XElement} mainContent the content that will go in the center of the popup
+     * @param {XElement} buttonContent the content that will go in the button bar
+     * @param {object} popupCustomStyle An object with custom styles attributes, will be passed to ExclusivePopup.draw
+     * @param {object} mainContentStyle An object with custom styles attributes for the "mainContent" of the dialog,
+     *                                  useful if we do not want padding:10px, for example
+     * @param {object} buttonBarStyle An object with custom styles attributes for the "buttonBarStyle" of the dialog,
+     *                                useful if we do not want text-align: center, for example
+     */
+    draw: function(mainContent, buttonContent, popupCustomStyle, mainContentStyle, buttonBarStyle) {
+
+        popupCustomStyle = any(popupCustomStyle, {});
+        if (!exists(popupCustomStyle.backgroundColor)) {
+            popupCustomStyle.backgroundColor = '#F8F8F8';
+        }
+
+        mainContentStyle = any(mainContentStyle, {});
+        var mainContentDiv = Html.div({className: "popupWithButtonsMainContent", style:mainContentStyle}, mainContent);
+
+        var canvas = this.ExclusivePopup.prototype.draw.call(this, mainContentDiv, popupCustomStyle);
+
+        buttonBarStyle = any(buttonBarStyle, {});
+        var buttonDiv = Html.div({className: "popupButtonBar", style: buttonBarStyle}, buttonContent);
+
+        this.container.append(buttonDiv);
+
+        return canvas;
+
+    },
+
+    /**
+     * Overloads ExclusivePopup._adjustContentWrapper
+     */
+    _adjustContentWrapper: function() {
+        this.contentWrapper.setStyle('padding', pixels(0));
+        this.contentWrapper.setStyle('overflowY', 'auto');
+        this.contentWrapper.setStyle('overflowX', 'hidden');
+        this.contentWrapper.setStyle('position', 'relative');
+        this.contentWrapper.setStyle('top', pixels(-10));
+
+        var contentHeight = this._calculateContentHeight();
+        this.contentWrapper.setStyle('height', pixels(contentHeight));
+    }
+},
+    function(title, closeButtonHandler, printable, showPrintButton){
+        this.ExclusivePopup(title, closeButtonHandler, printable, showPrintButton);
     }
 );
 
