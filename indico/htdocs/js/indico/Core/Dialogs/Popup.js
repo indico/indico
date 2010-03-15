@@ -422,6 +422,50 @@ type("AlertPopup", ["ExclusivePopup"],
     }
 );
 
+/**
+ * Utility function to display a simple alert popup.
+ * You can think of it as an "confirm" replacement.
+ * It will have a title, a close button, an OK button and a Cancel button.
+ * @param {Html or String} title The title of the error popup.
+ * @param {Element} content Anything you want to put inside.
+ * @param {function} handler A function that will be called with a boolean as argument:
+ *                   true if the user pressers "ok", or false if the user presses "cancel"
+ */
+type("ConfirmPopup", ["ExclusivePopupWithButtons"],
+    {
+         draw: function() {
+             var self = this;
+
+             var okButton = Html.button({style:{marginRight: pixels(3)}}, $T('OK'));
+             okButton.observeClick(function(){
+                 self.close();
+                 self.handler(true);
+             });
+
+             var cancelButton = Html.button({style:{marginLeft: pixels(3)}}, $T('Cancel'));
+             cancelButton.observeClick(function(){
+                 self.close();
+                 self.handler(false);
+             });
+
+             return this.ExclusivePopupWithButtons.prototype.draw.call(this,
+                     this.content,
+                     Html.div({}, okButton, cancelButton));
+         }
+    },
+
+    function(title, content, handler) {
+        var self = this;
+
+        this.content = content;
+        this.handler = handler;
+        this.ExclusivePopupWithButtons(Html.div({style:{textAlign: 'center'}}, title), function(){
+            self.handler(false);
+            return true;
+        });
+    }
+);
+
 type("WarningPopup", ["AlertPopup"],
     {
         _formatLine: function(line) {
