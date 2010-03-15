@@ -82,7 +82,7 @@ function required_fields( fieldNames )
     for ( i = 0; i < fieldNames.length; ++i )
     {
         fieldName = fieldNames[i]
-        if ( $F( fieldName ).trim().length == 0 )
+        if ( trim($F( fieldName )).length == 0 )
         {
             $( fieldName ).className = 'invalid'
             isValid = false
