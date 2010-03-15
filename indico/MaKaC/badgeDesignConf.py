@@ -63,6 +63,28 @@ class RegistrantFullName4(RegistrantBadge):
     def getValue(cls, reg):
         return reg.getFullName(title=False, firstNameFirst=True)
 
+class RegistrantFullName5(RegistrantBadge):
+    """
+    FullName with Title, the FirstName first and uppercase in surname.
+    """
+    @classmethod
+    def getValue(cls, reg):
+        res = "%s %s"%( reg.getFirstName(), reg.getFamilyName().upper())
+        res = res.strip()
+        if reg.getTitle() != "":
+            res = "%s %s"%( reg.getTitle(), res )
+        return res
+
+class RegistrantFullName6(RegistrantBadge):
+    """
+    FullName without Title, the FirstName first and uppercase inthe surname.
+    """
+    @classmethod
+    def getValue(cls, reg):
+        res = "%s %s"%( reg.getFirstName(), reg.getFamilyName().upper())
+        res = res.strip()
+        return res
+
 class ConferenceDates:
 
     @classmethod
@@ -89,7 +111,7 @@ class BadgeDesignConfiguration:
     -groups organizes the item names into groups. These groups are used for the
     <select> box in the WConfModifBadgeDesign.tpl file.
     """
-    
+
     """ Dictionary that maps the name of an item to the action that should be taken
     at the time it is drawed.
     An action can be:
@@ -106,15 +128,17 @@ class BadgeDesignConfiguration:
        Depending on what is returned, we will pass a different object to the getValue() method.
        *it must have a getValue(object) method, to which a Conference instance, a Registrant instance or a
        BadgeTemplateItem instance must be passed, depending on the result of the getArgumentType() method.
-      
+
       """
     def __init__(self):
-          
+
             self.items_actions = { _("Title") : Registrant.getTitle,
                                _("Full Name") : Registrant.getFullName,
                                _("Full Name (w/o title)") : RegistrantFullName2,
                                _("Full Name B") : RegistrantFullName3,
                                _("Full Name B (w/o title)") : RegistrantFullName4,
+                               _("Full Name C") : RegistrantFullName5,
+                               _("Full Name C (w/o title)") : RegistrantFullName6,
                                _("First Name") : Registrant.getFirstName,
                                _("Surname") : Registrant.getSurName,
                                _("Position") : Registrant.getPosition,
@@ -131,11 +155,11 @@ class BadgeDesignConfiguration:
                                _("Conference Dates") : ConferenceDates,
                                _("Fixed Text") : BadgeTemplateItem.getFixedText
                             }
-            
+
             """ Dictionary that maps group names to the item names that fall into that group.
             The groups are only used for the <select> box in the WConfModifBadgeDesign.tpl file.
             """
-            self.groups = [( _("Registrant Data"), [ _("Title"), _("Full Name"), _("Full Name (w/o title)"), _("Full Name B"), _("Full Name B (w/o title)"),  _("First Name"),  _("Surname"),  _("Position"),
+            self.groups = [( _("Registrant Data"), [ _("Title"), _("Full Name"), _("Full Name (w/o title)"), _("Full Name B"), _("Full Name B (w/o title)"), _("Full Name C"), _("Full Name C (w/o title)"), _("First Name"),  _("Surname"),  _("Position"),
                                                      _("Institution"),  _("Country"),  _("City"), _("Address"), _("Phone"), _("Fax"), _("Email"), _("Personal homepage"), _("Amount")]),
                       ( _("Conference Data"), [ _("Conference Name"),  _("Conference Dates")]),
                       ( _("Fixed Elements"), [ _("Fixed Text")])]
