@@ -24,10 +24,8 @@ Part of Room Booking Module (rb_)
 Responsible: Piotr Wlodarek
 """
 from MaKaC.rb_tools import Impersistant, checkPresence, iterdays
-from MaKaC.rb_location import ReservationGUID, Location, RoomGUID, CrossLocationQueries
-from MaKaC.rb_customAttributesManager import CustomAttributesManagerBase
+from MaKaC.rb_location import Location, RoomGUID, CrossLocationQueries
 from MaKaC.user import Avatar, AvatarHolder
-from MaKaC import accessControl
 from MaKaC.accessControl import AccessWrapper
 from datetime import datetime, timedelta
 

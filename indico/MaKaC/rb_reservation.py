@@ -148,10 +148,10 @@ class ReservationBase( object ):
             if self.contactEmail != None and self.contactEmail != "":
                 to2 = self.contactEmail
             if self.isConfirmed:
-                subject = NOTIFICATION_SUBJECT_PREFIX + "You have booked " + self.room.name + " on " + formatDateTime(self.startDT)
+                subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] You have made a New Booking on " + formatDateTime(self.startDT)
                 wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingInsertion' )
             else:
-                subject = NOTIFICATION_SUBJECT_PREFIX + "Your PRE-Booking Waits for Acceptance"
+                subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Your PRE-Booking waits for Acceptance"
                 wc = WTemplated( 'RoomBookingEmail_2UserAfterPreBookingInsertion' )
             text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self } )
             fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -172,10 +172,10 @@ class ReservationBase( object ):
         toMain = self.room.getResponsible().getEmail()
 
         if self.isConfirmed:
-            subject = NOTIFICATION_SUBJECT_PREFIX + "New Booking for " + self.room.name + " on " + formatDateTime(self.startDT)
+            subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] New Booking on " + formatDateTime(self.startDT)
             bookingMessage = "Book"
         else:
-            subject = NOTIFICATION_SUBJECT_PREFIX + "New PRE-Booking for " + self.room.name + " on " + formatDateTime(self.startDT)
+            subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] New PRE-Booking on " + formatDateTime(self.startDT)
             bookingMessage = "PRE-book"
         wc = WTemplated( 'RoomBookingEmail_2ResponsibleAfterBookingInsertion' )
         text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'bookingMessage': bookingMessage } )
@@ -198,7 +198,7 @@ class ReservationBase( object ):
         if self.isConfirmed  and  self.usesAVC: # Inform only about confirmed bookings
             to = Location.parse( self.locationName ).getAVCSupportEmails()
             if to:
-                subject = NOTIFICATION_SUBJECT_PREFIX + "New Booking for " + self.room.name + " on " + formatDateTime(self.startDT)
+                subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] New Booking on " + formatDateTime(self.startDT)
                 wc = WTemplated( 'RoomBookingEmail_2AVCSupportAfterBookingInsertion' )
                 text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation': self } )
                 fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -238,7 +238,7 @@ class ReservationBase( object ):
 
         if self.createdByUser(): # Imported bookings does not have creator
             to = self.createdByUser().getEmail()
-            subject = NOTIFICATION_SUBJECT_PREFIX + "Cancellation Confirmation for " + self.room.name + " on " + startDate + " %s" % occurrenceText
+            subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Cancellation Confirmation on " + startDate + " %s" % occurrenceText
             wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingCancellation' )
             text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'date':date } )
             fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -256,7 +256,7 @@ class ReservationBase( object ):
 
         toMain = self.room.getResponsible().getEmail()
 
-        subject = NOTIFICATION_SUBJECT_PREFIX + "Cancelled Booking for " + self.room.name + " on " + startDate + " %s" % occurrenceText
+        subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Cancelled Booking on " + startDate + " %s" % occurrenceText
         wc = WTemplated( 'RoomBookingEmail_2ResponsibleAfterBookingCancellation' )
         text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'date':date } )
         fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -277,7 +277,7 @@ class ReservationBase( object ):
         if self.isCancelled and self.isConfirmed  and  self.usesAVC: # Inform only about confirmed bookings
             to = Location.parse( self.locationName ).getAVCSupportEmails()
             if to:
-                subject = NOTIFICATION_SUBJECT_PREFIX + "Booking Cancelled for " + self.room.name + " on " + startDate
+                subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Booking Cancelled on " + startDate
                 wc = WTemplated( 'RoomBookingEmail_2AVCSupportAfterBookingCancellation' )
                 text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation': self } )
                 fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -320,7 +320,7 @@ class ReservationBase( object ):
             firstName = "User"
 
         if to:
-            subject = NOTIFICATION_SUBJECT_PREFIX + "REJECTED Booking for " + self.room.name + " on " + startDate
+            subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] REJECTED Booking on " + startDate
             wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingRejection' )
             text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'firstName':firstName, 'reason':reason, 'date':date } )
             fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -362,7 +362,7 @@ class ReservationBase( object ):
             firstName = "User"
 
         if to:
-            subject = NOTIFICATION_SUBJECT_PREFIX + "Confirmed Booking for " + self.room.name + " on " + startDate
+            subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Confirmed Booking on " + startDate
             wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingConfirmation' )
             text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'firstName':firstName } )
             fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -381,7 +381,7 @@ class ReservationBase( object ):
         if self.isConfirmed  and  self.usesAVC: # Inform only about confirmed bookings
             to = Location.parse( self.locationName ).getAVCSupportEmails()
             if to:
-                subject = NOTIFICATION_SUBJECT_PREFIX + "New Booking for " + self.room.name + " on " + startDate
+                subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] New Booking on " + startDate
                 wc = WTemplated( 'RoomBookingEmail_2AVCSupportAfterBookingInsertion' )
                 text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation': self } )
                 fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -416,7 +416,7 @@ class ReservationBase( object ):
 
         if self.createdByUser(): # Imported bookings does not have creator
             to = self.createdByUser().getEmail()
-            subject = NOTIFICATION_SUBJECT_PREFIX + "Booking Modified for " + self.room.name + " on " + startDate
+            subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Booking Modified on " + startDate
             wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingModification' )
             text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self } )
             fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -434,7 +434,7 @@ class ReservationBase( object ):
 
         toMain = self.room.getResponsible().getEmail()
 
-        subject = NOTIFICATION_SUBJECT_PREFIX + "Booking Modified for " + self.room.name + " on " + startDate
+        subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Booking Modified on " + startDate
         wc = WTemplated( 'RoomBookingEmail_2ResponsibleAfterBookingModification' )
         text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self } )
         fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -455,7 +455,7 @@ class ReservationBase( object ):
         if self.isConfirmed  and  self.usesAVC: # Inform only about confirmed bookings
             to = Location.parse( self.locationName ).getAVCSupportEmails()
             if to:
-                subject = NOTIFICATION_SUBJECT_PREFIX + "Modified booking for " + self.room.name + " on " + startDate
+                subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Modified booking on " + startDate
                 wc = WTemplated( 'RoomBookingEmail_2AVCSupportAfterBookingModification' )
                 text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation': self } )
                 fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -491,7 +491,7 @@ class ReservationBase( object ):
         # ---- Email user ----
         if self.createdByUser(): # Imported bookings does not have creator
             to = self.createdByUser().getEmail()
-            subject = NOTIFICATION_SUBJECT_PREFIX + "Request for Booking Prolongation for " + self.room.name + " on " + startDate
+            subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Request for Booking Prolongation on " + startDate
             wc = WTemplated( 'RoomBookingEmail_2UserRequestProlongation' )
             text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self } )
             fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -520,7 +520,7 @@ class ReservationBase( object ):
 
         toMain = self.room.getResponsible().getEmail()
 
-        subject = NOTIFICATION_SUBJECT_PREFIX + "Consider Rejecting This Booking"
+        subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Consider Rejecting This Booking"
         wc = WTemplated( 'RoomBookingEmail_2ResponsibleConsiderRejecting' )
         text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self } )
         fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
