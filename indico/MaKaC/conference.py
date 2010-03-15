@@ -91,6 +91,63 @@ from MaKaC.webinterface import urlHandlers
 from MaKaC.common.logger import Logger
 from MaKaC.common.contextManager import ContextManager
 
+class CommonObjectBase():
+    """This class is for holding commonly used methods that are used by several classes.
+    It is inherited by the following classes:
+    Category
+    Conference
+    Session
+    Contribution
+    Subcontribution
+    Material
+    Resource
+"""
+    def getRecursiveAllowedToAccessList(self):
+        """Returns a set of Avatar resp. CERNGroup objects for those people resp. e-groups allowed to access
+        this category as well as all parent objects.
+        """
+
+        # Initialize set of avatars/groups: this will hold those people/groups explicitly
+        # allowed to access this object
+        av_set = set()
+
+        # Get the AccessProtectionLevel for this
+        apl = self.getAccessProtectionLevel()
+
+        # If this category is "absolutely public", then return an empty set
+        if apl == -1:
+            pass
+
+        # If this category is protected "all by itself", then get the list of
+        # people/groups allowed to access it, and ignore all owners' permissions.
+        elif apl == 1:
+            al = self.getAllowedToAccessList()
+            if al is not None:
+                for av in al:
+                    av_set.add(av)
+
+        # If access settings are inherited from its owners, look at those.
+        elif apl == 0:
+            # If event is protected, then get list of people/groups allowed to access,
+            # and add that to the set of avatars.
+            # NOTE: I'm not sure this ever happens, i.e. an event having protection
+            # level 0 and also having its own access list, but it doesn't hurt anything
+            # to leave this in for now.
+            al = self.getAllowedToAccessList()
+            if al is not None:
+                for av in al:
+                    av_set.add(av)
+
+            # Add list of avatars/groups allowed to access parents objects.
+            owner = self.getOwner()
+            if owner is not None:
+                owner_al = owner.getRecursiveAllowedToAccessList()
+                if owner_al is not None:
+                    for av in owner_al:
+                        av_set.add(av)
+
+        # return set containing whatever avatars/groups we may have collected
+        return av_set
 
 class CategoryManager( ObjectHolder ):
     idxName = "categories"
@@ -136,7 +193,7 @@ class CategoryManager( ObjectHolder ):
 
 
 
-class Category(Persistent):
+class Category(Persistent, CommonObjectBase):
 
     def __init__( self ):
 
@@ -1967,7 +2024,7 @@ class ReportNumberHolder(Persistent):
         if self.getOwner() != None:
             self.getOwner().notifyModification()
 
-class Conference(Persistent, Fossilizable):
+class Conference(Persistent, Fossilizable, CommonObjectBase):
     """This class represents the real world conferences themselves. Objects of
         this class will contain basic data about the confence and will provide
         access to other objects representing certain parts of the conferences
@@ -5378,7 +5435,7 @@ class SCIndex(Persistent):
         self._idx._p_changed=1
 
 
-class Session(Persistent, Fossilizable):
+class Session(Persistent, Fossilizable, CommonObjectBase):
     """This class implements a conference session, being the different parts
         in which the conference can be divided and the contributions can be
         organised in. The class contains necessary attributes to store session
@@ -7926,7 +7983,7 @@ class _PrimAuthIdx(_AuthIdx):
             for auth in contrib.getPrimaryAuthorList():
                 self.index(auth)
 
-class Contribution(Persistent, Fossilizable):
+class Contribution(Persistent, Fossilizable, CommonObjectBase):
     """This class implements a conference contribution, being the concrete
         contributes of the conference participants. The class contains
         necessary attributes to store contribution basic meta data and provides
@@ -10262,7 +10319,7 @@ class SubContribParticipation(Persistent, Fossilizable):
             res = "%s%s."%(res, self.getFirstName()[0].upper())
         return res
 
-class SubContribution(Persistent, Fossilizable):
+class SubContribution(Persistent, Fossilizable, CommonObjectBase):
     """
     """
 
@@ -10639,7 +10696,6 @@ class SubContribution(Persistent, Fossilizable):
             self.removePoster()
             self.notifyModification()
 
-
     def recoverMaterial(self, recMat):
     # Id must already be set in recMat.
         recMat.setOwner( self )
@@ -10886,7 +10942,7 @@ class SubContribution(Persistent, Fossilizable):
     def setReportNumberHolder(self, rnh):
         self._reportNumberHolder=rnh
 
-class Material(Persistent, Fossilizable):
+class Material(Persistent, Fossilizable, CommonObjectBase):
     """This class represents a set of electronic documents (resources) which can
         be attached to a conference, a session or a contribution.
         A material can be of several types (achieved by specialising this class)
@@ -11633,7 +11689,7 @@ class Minutes(Material):
             Material.recoverResource(self, recRes)
 
 
-class Resource(Persistent, Fossilizable):
+class Resource(Persistent, Fossilizable, CommonObjectBase):
     """This is the base class for representing individual resources which can
         be included in material containers for lately being attached to
         conference objects (i.e. conferences, sessions or contributions). This
