@@ -5294,6 +5294,50 @@ div.dialogButtons {
     text-align:center;
 }
 
+
+/* Reschedule dialog */
+
+div.rescheduleSection {
+    padding-bottom: 20px;
+}
+
+div.rescheduleTitle {
+    font-size: 14pt;
+    padding-bottom: 5px;
+}
+
+
+tr.selectedAction {
+    background-color: #CDEB8B;
+}
+
+td.rescheduleAction {
+    vertical-align:top;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+div.rescheduleLabelTitle {
+    font-size:12pt;
+    cursor: default;
+}
+
+div.rescheduleLabelDetails {
+    font-size:9pt;
+    font-style: italic;
+    cursor: default;
+}
+
+
+
+.rescheduleWarning {
+    font-weight: bold;
+    color: #D01F3C;
+}
+
+/* End of reschedule dialog */
+
+
 .slotTitle {
     font-size:14px;
 }

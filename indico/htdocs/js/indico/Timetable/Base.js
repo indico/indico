@@ -662,14 +662,12 @@ type("ManagementTimeTable",["TimeTable"], {
         });
 
         this.separator = Html.span({}, " | ");
-        // TODO: implement reschedule function
-        var href = Indico.Urls.Reschedule;
-        this.rescheduleLink = Html.a({style: {margin: '0 15px'}}, Html.span({style: {cursor: 'default', color: '#888'}}, 'Reschedule'));
 
-        var underConstr = function(event) {
-            IndicoUI.Widgets.Generic.tooltip(this, event,"This option will be available soon");
-        };
-        this.rescheduleLink.dom.onmouseover = underConstr;
+        this.rescheduleLink = Html.span({className: 'fakeLink', style:{paddingLeft: pixels(15), paddingRight: pixels(15)}}, 'Reschedule');
+        this.rescheduleLink.observeClick(function(){
+            var popup = new RescheduleDialog(self);
+            popup.open();
+        });
 
         // JUST FOR SessionManagementTimetable
         this.addIntervalLink = Html.span('fakeLink', 'Add new interval');

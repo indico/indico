@@ -1565,6 +1565,9 @@ class RHSlotCalc(RHSessionModCoordinationBase):
         self._hour=params.get("hour","")
         self._minute=params.get("minute","")
         self._action=params.get("action","duration")
+        self._currentDay = params.get("currentDay", "")
+        self._inSessionTimetable = (params.get("inSessionTimetable", "no") == "yes")
+
         if self._ok:
             if self._hour.strip() == "" or self._minute.strip() == "":
                 raise MaKaCError( _("Please write the time with the format HH:MM. For instance, 00:05 to indicate 'O hours' and '5 minutes'"))
@@ -1573,6 +1576,17 @@ class RHSlotCalc(RHSessionModCoordinationBase):
                     pass
             except ValueError, e:
                 raise MaKaCError( _("Please write a number to specify the time HH:MM. For instance, 00:05 to indicate 'O hours' and '5 minutes'"))
+
+    def _formatRedirectURL(self, baseURL):
+        target = "".join([str(baseURL),
+                        "#",
+                        self._currentDay,
+                        ".s",
+                        self._session.getId(),
+                        "l",
+                        self._slotId])
+
+        return target
 
     def _process(self):
         if not self._cancel:
@@ -1583,7 +1597,11 @@ class RHSlotCalc(RHSessionModCoordinationBase):
             else:
                 t=timedelta(hours=int(self._hour), minutes=int(self._minute))
                 slot.recalculateTimes(self._action, t)
-        self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._session))
+
+        if (self._inSessionTimetable):
+            self._redirect(self._formatRedirectURL(urlHandlers.UHSessionModifSchedule.getURL(self._session)))
+        else:
+            self._redirect(self._formatRedirectURL(urlHandlers.UHConfModifSchedule.getURL(self._conf)))
 
 class RHSlotEdit( RoomBookingDBMixin, RHSessionModUnrestrictedTTCoordinationBase ):
 

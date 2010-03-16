@@ -7042,11 +7042,13 @@ class RHReschedule(RHConferenceModifBase):
         self._hour=params.get("hour","")
         self._minute=params.get("minute","")
         self._action=params.get("action","duration")
-        self._targetDay=params.get("targetDay",None)
+        self._targetDay=params.get("targetDay",None) #comes in format YYYYMMDD, ex: 20100317
         if self._targetDay is None:
             raise MaKaCError( _("Error while rescheduling timetable: not target day"))
         else:
-            self._day=timezone(self._conf.getTimezone()).localize(datetime(int(params["targetDay"][0:4]),int(params["targetDay"][5:7]),int(params["targetDay"][8:])))
+            self._day=timezone(self._conf.getTimezone()).localize(datetime(int(params["targetDay"][0:4]),
+                                                                           int(params["targetDay"][4:6]),
+                                                                           int(params["targetDay"][6:8])))
         if self._ok:
             if self._hour.strip() == "" or self._minute.strip() == "":
                 raise FormValuesError( _("Please write the time with the format HH:MM. For instance, 00:05 to indicate 'O hours' and '5 minutes'"))

@@ -1202,3 +1202,304 @@ type("MoveEntryDialog", ["ExclusivePopup"],
                                     self.close();
                                 });
         });
+
+
+/**
+ * Dialog to reschedule a timetable day or an interval
+ * @param {Timetable} parentTimetable The timetable object from which this dialog is launched.
+ */
+type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
+
+    /**
+     * For top level timetable, returns the current day formatted as Fri 26/07
+     */
+    __getCurrentDayText: function(){
+        return this.tt._titleTemplate(this.tt.currentDay);
+    },
+
+    /**
+     * For an interval timetable, returns the title of the interval
+     */
+    __getIntervalTitle: function(){
+        return '"' + this.tt.contextInfo.title + '"';
+    },
+
+    /**
+     * Draws the step 1: choose "starting time" or "duration" as action
+     */
+    __drawChooseAction: function(){
+        var self = this;
+
+        // Step 1: choose action
+        var actionChooseTitle = Html.div("rescheduleTitle", $T("Step 1: Choose type of rescheduling"));
+
+        var startTimeRescheduleRB = Html.radio({name:"rescheduleAction", id:"startTimeRescheduleRB", style:{verticalAlign: "middle"}});
+        var startTimeRescheduleLabel = Html.label({style: {fontWeight: "normal"}},
+                Html.div("rescheduleLabelTitle", $T("Adjust starting time of all entries")),
+                Html.div("rescheduleLabelDetails",
+                    this.isTopLevelTimetable ?
+                        $T("Move the entries of ") + this.__getCurrentDayText() +$T(" by changing their") :
+                        $T("Move the entries of the interval ") + this.__getIntervalTitle() + $T(" by changing their"),
+                    Html.strong({}, $T(" starting times. ")),
+                    this.isTopLevelTimetable ?
+                            $T("The first entry will start when the event starts (") + this.tt.eventInfo.startDate.time.slice(0,5) + "), " :
+                            $T("The first entry will start when the interval starts (") + this.tt.contextInfo.startDate.time.slice(0,5) + "), " ,
+                    $T("and the other entries will follow consecutively after it (with no gaps by default). The durations of the entries will not change.")));
+
+        startTimeRescheduleLabel.dom.htmlFor = "startTimeRescheduleRB";
+
+        var durationRescheduleRB = Html.radio({name:"rescheduleAction", id:"durationRescheduleRB", style:{verticalAlign: "middle"}});
+        var durationRescheduleLabel = Html.label({style: {fontWeight: "normal"}},
+                Html.div("rescheduleLabelTitle", $T("Adjust duration of all entries")),
+                Html.div("rescheduleLabelDetails",
+                    $T("Adjust the "), Html.strong({}, $T(" duration ")), $T("of the entries of "),
+                    this.isTopLevelTimetable ?
+                        this.__getCurrentDayText() + "," :
+                        $T("the interval ") + this.__getIntervalTitle(),
+                        $T(" so that there are no entries running in parallel (and no gaps by default). "),
+                    $T("The starting times will not change.")));
+
+        durationRescheduleLabel.dom.htmlFor = "durationRescheduleRB";
+
+        var actionChoose = Html.table({cellpadding:0, cellPadding:0, cellspacing:0, cellSpacing:0});
+        var actionChooseTbody = Html.tbody();
+
+        var startTimeRescheduleTr = Html.tr();
+        startTimeRescheduleTr.append(Html.td("rescheduleAction", startTimeRescheduleRB));
+        startTimeRescheduleTr.append(Html.td({className: "rescheduleAction", style:{paddingRight:pixels(5)}}, startTimeRescheduleLabel));
+        actionChooseTbody.append(startTimeRescheduleTr);
+
+        var durationRescheduleTr = Html.tr();
+        durationRescheduleTr.append(Html.td("rescheduleAction", durationRescheduleRB));
+        durationRescheduleTr.append(Html.td({className: "rescheduleAction", style:{paddingRight:pixels(5)}}, durationRescheduleLabel));
+        actionChooseTbody.append(durationRescheduleTr);
+
+        actionChoose.append(actionChooseTbody);
+
+        startTimeRescheduleRB.observeClick(function(){
+            self.rescheduleButton.enable();
+            self.rescheduleAction = "startingTime";
+            startTimeRescheduleTr.dom.className = "selectedAction";
+            durationRescheduleTr.dom.className = "";
+        });
+        durationRescheduleRB.observeClick(function(){
+            self.rescheduleButton.enable();
+            self.rescheduleAction = "duration";
+            durationRescheduleTr.dom.className = "selectedAction";
+            startTimeRescheduleTr.dom.className = "";
+        });
+
+        return Html.div("rescheduleSection", actionChooseTitle, actionChoose);
+    },
+
+
+    /**
+     * Draws the step 2: choose gap between entries
+     */
+    __drawChooseInterval: function (){
+        var self = this;
+        // Step 2: choose interval between entries
+        var intervalTitle = Html.div("rescheduleTitle", $T("Step 2: Choose time gap between entries"));
+
+        this.minuteInput = Html.input("text", {style:{width:"3em", textAlign:"right", marginTop: pixels(5), marginBottom: pixels(5)}}, "00");
+        var timeInputLabel = Html.span({style:{marginLeft: pixels(5)}}, "(minutes)");
+        var intervalInputDiv = Html.div({style:{textAlign:"center"}}, this.minuteInput, timeInputLabel);
+
+        this.intervalExplanationDiv = Html.div();
+
+        this.minuteInput.observeEvent("change", function(event){
+            self.__intervalObserver();
+        });
+
+        return Html.div("rescheduleSection", intervalTitle, intervalInputDiv, this.intervalExplanationDiv);
+    },
+
+
+    /**
+     * Function that will be called when the gap between entries changes
+     */
+    __intervalObserver: function(){
+
+        var minutes = this.minuteInput.get();
+
+        var errors = false;
+        if (!IndicoUtil.isInteger(minutes) || minutes < 0) {
+            return;
+        }
+
+        minutes = parseInt(minutes, 10);
+
+        if (minutes === 0) {
+            this.intervalExplanationDiv.set($T("There will be no gaps between consecutive entries."));
+        } else {
+            var h = Math.floor(minutes / 60);
+            var m = minutes % 60;
+
+            intervalExplanationText = $T("Entries will be separated by gaps of ");
+            if (h === 1) {
+                intervalExplanationText += $T("1 hour ");
+            } else if (h > 0) {
+                intervalExplanationText += h + $T(" hours ");
+            }
+
+            if (h !==0 && m!== 0) {
+                intervalExplanationText += $T("and ");
+            }
+
+            if (m === 1) {
+                intervalExplanationText += $T("1 minute.");
+            } else  if (m > 0) {
+                intervalExplanationText += m + $T(" minutes.");
+            }
+
+            this.intervalExplanationDiv.set(intervalExplanationText);
+        }
+    },
+
+
+    /**
+     * Draws the reschedule and cancel buttons
+     */
+    __drawButtons: function() {
+        var self = this;
+        // Reschedule and cancel buttons
+        this.rescheduleButton = new DisabledButton(Html.input("button", {disabled:true, style:{marginRight:pixels(3)}}, $T("Reschedule")));
+        var rescheduleButtonTooltip;
+        this.rescheduleButton.observeEvent('mouseover', function(event){
+            if (!self.rescheduleButton.isEnabled()) {
+                rescheduleButtonTooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, $T("Please select type of rescheduling"), "tooltipError");
+            }
+        });
+        this.rescheduleButton.observeEvent('mouseout', function(event){
+            Dom.List.remove(document.body, rescheduleButtonTooltip);
+        });
+
+        this.rescheduleButton.observeClick(function() {
+            self.__reschedule();
+        });
+
+        var cancelButton = Html.input("button", {style:{marginLeft:pixels(3)}}, $T("Cancel"));
+        cancelButton.observeClick(function(){self.close();});
+
+        return Html.div({}, this.rescheduleButton.draw(), cancelButton);
+    },
+
+
+    /**
+     * Builds the parameter manager that checks validity of fields
+     */
+    __buildParameterManager: function() {
+        this.parameterManager = new IndicoUtil.parameterManager();
+        this.parameterManager.add(this.minuteInput, "non_negative_int", false);
+    },
+
+
+    /**
+     * Function called when the user presses the reschedule button
+     */
+    __reschedule: function() {
+        var self = this;
+
+        if (this.parameterManager.check()) {
+
+            var confirmHandler = function(confirm) {
+
+                if (confirm) {
+
+                    if (self.isTopLevelTimetable) {
+                        // We are in a top level management timetable
+
+                        IndicoUI.Dialogs.Util.progress($T("Rescheduling day ") + self.__getCurrentDayText() + "...");
+
+                        Util.postRequest(Indico.Urls.Reschedule,
+                                {
+                                    confId: self.tt.eventInfo.id
+                                },
+                                {
+                                    OK: "ok",
+                                    action: self.rescheduleAction,
+                                    hour: "0",
+                                    minute: self.minuteInput.get(),
+                                    targetDay: self.tt.currentDay
+                                });
+
+                    } else if (self.isIntervalTimetable) {
+
+                        // We are in an interval management timetable
+
+                        IndicoUI.Dialogs.Util.progress($T("Rescheduling interval... "));
+
+                        var inSessionTimetable = "no";
+                        if (exists(self.tt.parentTimetable.isSessionTimetable) && self.tt.parentTimetable.isSessionTimetable === true) {
+                            inSessionTimetable = "yes";
+                        }
+
+                        Util.postRequest(Indico.Urls.SlotCalc,
+                                {
+                                    confId: self.tt.eventInfo.id,
+                                    sessionId: self.tt.contextInfo.sessionId,
+                                    slotId: self.tt.contextInfo.sessionSlotId
+                                },
+                                {
+                                    OK: "ok",
+                                    action: self.rescheduleAction,
+                                    hour: "0",
+                                    minute: self.minuteInput.get(),
+                                    currentDay: self.tt.currentDay,
+                                    inSessionTimetable: inSessionTimetable
+                                });
+                    }
+                }
+            };
+
+            var confirmText = Html.div({},
+                Html.div({}, $T("Are you sure you want to reschedule? ")),
+                Html.div({}, $T("All entries "),
+                        this.isTopLevelTimetable ? "on " + this.__getCurrentDayText() : "of the interval " + this.__getIntervalTitle() ,
+                        $T(" will have their "),
+                        this.rescheduleAction === "startingTime" ? $T("starting times") : $T("duration"),
+                        $T(" changed.")),
+                Html.br(),
+                Html.div("rescheduleWarning", "This change cannot be undone.")
+            );
+
+            var confirmPopup = new ConfirmPopup($T("Please review your choice"), confirmText, confirmHandler);
+            confirmPopup.open();
+        }
+
+    },
+
+    /**
+     * Draw the dialog
+     */
+    draw: function(){
+        var self = this;
+
+        var actionChooseDiv = this.__drawChooseAction();
+        var intervalDiv = this.__drawChooseInterval();
+
+        this.mainContent = Html.div({style:{width:pixels(450)}}, actionChooseDiv, intervalDiv);
+        var buttonContent = this.__drawButtons();
+
+        this.__intervalObserver();
+        this.__buildParameterManager();
+
+        return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.mainContent, buttonContent);
+
+    }
+},
+    /**
+     * Constructor
+     */
+    function(parentTimetable){
+        this.ExclusivePopupWithButtons(Html.div({style:{textAlign:"center"}},$T("Reschedule Entries")), positive);
+        this.tt = parentTimetable;
+
+        this.isTopLevelTimetable = exists(this.tt.TopLevelManagementTimeTable);
+        this.isIntervalTimetable = exists(this.tt.IntervalManagementTimeTable);
+
+        this.rescheduleAction = null;
+        this.timeInput = null;
+        this.rescheduleButton = null;
+    }
+);
