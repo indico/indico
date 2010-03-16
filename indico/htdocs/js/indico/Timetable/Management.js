@@ -5,36 +5,42 @@ type("TimetableManagementActions", [], {
             edit: 'schedule.session.editSlot',
             dayEndDate: 'schedule.slot.getDayEndDate',
             modifyStartEndDate: 'schedule.event.modifyStartEndDate',
-            'delete': 'schedule.session.deleteSlot'
+            'delete': 'schedule.session.deleteSlot',
+            moveUpDown: 'schedule.event.moveEntryUpDown'
         },
         'SessionContribution': {
             add: 'schedule.slot.addContribution',
             modifyStartEndDate: 'schedule.slot.modifyStartEndDate',
-            'delete': 'schedule.slot.deleteContribution'
+            'delete': 'schedule.slot.deleteContribution',
+            moveUpDown: 'schedule.slot.moveEntryUpDown'
         },
         'SessionBreak': {
             add: 'schedule.slot.addBreak',
             edit: 'schedule.slot.editBreak',
             modifyStartEndDate: 'schedule.slot.modifyStartEndDate',
-            'delete': 'schedule.slot.deleteBreak'
+            'delete': 'schedule.slot.deleteBreak',
+            moveUpDown: 'schedule.slot.moveEntryUpDown'
         },
         'Session': {
             add: 'schedule.event.addSession',
             dayEndDate: 'schedule.session.getDayEndDate',
             'delete': 'schedule.event.deleteSession',
             changeColors: 'schedule.session.changeColors',
-            modifyStartEndDate: 'schedule.session.modifyStartEndDate'
+            modifyStartEndDate: 'schedule.session.modifyStartEndDate',
+            moveUpDown: 'schedule.session.moveEntryUpDown'
         },
         'Contribution': {
             add: 'schedule.event.addContribution',
             modifyStartEndDate: 'schedule.event.modifyStartEndDate',
-            'delete': 'schedule.event.deleteContribution'
+            'delete': 'schedule.event.deleteContribution',
+            moveUpDown: 'schedule.event.moveEntryUpDown'
         },
         'Break': {
             add: 'schedule.event.addBreak',
             edit: 'schedule.event.editBreak',
             modifyStartEndDate: 'schedule.event.modifyStartEndDate',
-            'delete': 'schedule.event.deleteBreak'
+            'delete': 'schedule.event.deleteBreak',
+            moveUpDown: 'schedule.event.moveEntryUpDown'
         },
         'Event': {
             'dayEndDate': 'schedule.event.getDayEndDate'
@@ -332,6 +338,7 @@ type("TimetableManagementActions", [], {
         } else {
             params = this._addParams('Contribution');
         }
+
         var dialog = new AddContributionDialog(
             this.methods[params.type].add,
             this.methods[params.parentType].dayEndDate,
@@ -520,14 +527,32 @@ type("TimetableManagementActions", [], {
          * false - down
          */
 
-        info = this._getLocatorParams(eventData);
-        info.set('direction', direction);
-
         var self = this;
+
+        var info = this._getLocatorParams(eventData);
+
+        info.set('scheduleEntry', eventData.scheduleEntryId);
+        info.set('conference', eventData.conferenceId);
+        info.set('sessionTimetable', this.isSessionTimetable);
+
+        var type = eventData.entryType;
+
+        if (exists(eventData.sessionId)) {
+            info.set('session', eventData.sessionId);
+            info.set('slot', eventData.sessionSlotId);
+
+            if (type != 'Session') {
+                type = 'Session' + eventData.entryType;
+            } else if (!self.isSessionTimetable){
+                type = 'SessionSlot';
+            }
+        }
+
+        info.set('direction', direction);
 
         var killProgress = IndicoUI.Dialogs.Util.progress();
 
-        indicoRequest('schedule.moveEntryUpDown',
+        indicoRequest(this.methods[type].moveUpDown,
                       info,
                       function(result, error){
                           killProgress();

@@ -346,7 +346,8 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
                                                                  this.eventInfo,
                                                                  this.width,
                                                                  this.canvas,
-                                                                 'contribution');
+                                                                 'contribution',
+                                                                this.isSessionTimetable);
 
         this.intervalTimeTable.setData(intervalInfo);
         this.canvas.set(this.intervalTimeTable.draw());
@@ -983,10 +984,10 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
     }
 
 },
-     function(parent, data, contextInfo, eventInfo, width, wrappingElement, detailLevel) {
+     function(parent, data, contextInfo, eventInfo, width, wrappingElement, detailLevel, isSessionTimetable) {
 
          this.ManagementTimeTable(data, contextInfo, eventInfo, width, wrappingElement, detailLevel);
-         var managementActions = new IntervalTimeTableManagementActions(this, eventInfo, contextInfo, false);
+         var managementActions = new IntervalTimeTableManagementActions(this, eventInfo, contextInfo, isSessionTimetable);
          this.IntervalTimeTableMixin(parent, width, wrappingElement, managementActions);
 
          this.canvas = Html.div({});

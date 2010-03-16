@@ -53,6 +53,18 @@ class SessionModifBase(SessionBase, ProtectedModificationService):
     def _checkProtection(self):
         ProtectedModificationService._checkProtection(self)
 
+    def _getCheckFlag(self):
+
+        aw = self.getAW()
+
+        if self._session.canModify(aw):
+            # automatically adapt everything
+            return 2
+        elif self._session.canCoordinate(self.getAW(), "unrestrictedSessionTT"):
+            return 2
+        else:
+            return 1
+
 class SessionModifCoordinationBase(SessionModifBase):
 
     def _checkProtection(self):
@@ -61,6 +73,7 @@ class SessionModifCoordinationBase(SessionModifBase):
             return
         SessionModifBase._checkProtection( self )
 
+
 class SessionModifUnrestrictedTTCoordinationBase(SessionModifBase):
 
     def _checkProtection(self):
@@ -68,12 +81,14 @@ class SessionModifUnrestrictedTTCoordinationBase(SessionModifBase):
             return
         SessionModifBase._checkProtection( self )
 
+
 class SessionModifUnrestrictedContribMngCoordBase(SessionModifBase):
 
     def _checkProtection(self):
         if self._session.canCoordinate(self.getAW(), "modifContribs"):
             return
         SessionModifBase._checkProtection( self )
+
 
 class SessionSlotBase(SessionBase):
 

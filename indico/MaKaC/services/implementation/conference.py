@@ -50,6 +50,18 @@ class ConferenceBase(object):
         except:
             raise ServiceError("ERR-E4", "Invalid conference id.")
 
+
+    def _getCheckFlag(self):
+        """
+        Returns the "check" flag, a value that specifies what kind of
+        checking should be done before modifying. Classes that wish
+        to change this behavior should overload it.
+        """
+
+        # automatically adapt everything
+        return 2
+
+
 class ConferenceModifBase(ProtectedModificationService, ConferenceBase):
     def _checkParams(self):
         ConferenceBase._checkParams(self)
@@ -564,7 +576,7 @@ class ShowConcurrentEvents(ServiceBase):
         return evtsByCateg
 
 
-class ConferenceGetFieldsAndContribTypes(ConferenceModifBase):
+class ConferenceGetFieldsAndContribTypes(ConferenceDisplayBase):
     def _getAnswer( self ):
         afm = self._target.getAbstractMgr().getAbstractFieldsMgr()
         afmDict =  dict([(f.getId(), f.getName()) for f in afm.getFields()])

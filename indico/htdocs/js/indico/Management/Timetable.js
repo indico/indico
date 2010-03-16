@@ -222,6 +222,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
 
         function(hook) {
             var self = this;
+
             var parameterManager = new IndicoUtil.parameterManager();
             this.parameterManager = parameterManager;
             if (this.isConference) {
