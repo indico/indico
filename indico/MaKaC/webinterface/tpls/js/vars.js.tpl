@@ -97,7 +97,7 @@ var Indico = {
         ContribToPDF: "<%= urlHandlers.UHContribToPDF.getURL() %>",
         ContribToiCal: "<%= urlHandlers.UHContribToiCal.getURL() %>",
 
-        SessionToPDF: "<%= urlHandlers.UHSessionToiCal.getURL() %>",
+        SessionToiCal:  "<%= urlHandlers.UHSessionToiCal.getURL() %>",
         ConfTimeTablePDF: "<%= urlHandlers.UHConfTimeTablePDF.getURL() %>",
 
         SessionModification: "<%= urlHandlers.UHSessionModification.getURL() %>",
