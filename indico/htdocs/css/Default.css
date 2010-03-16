@@ -4427,6 +4427,14 @@ div.timetableBlockLocation {
     font-size: 11px;
 }
 
+div.timetableBlockConvener {
+    position: absolute;
+    left: 4px;
+    font-style: italic;
+    padding-top: 4px;
+    font-size: 11px;
+}
+
 div.timetableBlockContribs {
     margin: 4px;
     border: 1px solid #CCC;

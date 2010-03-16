@@ -99,9 +99,21 @@ type("TimetableBlockBase", [],
              return button;
          },
 
-         _getRightSideDecorators: function()
-         {
+         _getRightSideDecorators: function() {
              return Html.span({});
+         },
+
+         _formatConveners: function(conveners) {
+             if (conveners) {
+                 return translate(
+                     conveners,
+                     function(conv) {
+                         return conv.firstName + ' ' +
+                             conv.familyName;
+                     }).join(', ');
+             } else {
+                 return '';
+             }
          }
 
      },
@@ -162,6 +174,12 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
 
                     //this.titleWrapper.insert(this.createManageButton());
 
+                    //Add converner's info
+                    this.convenerDiv = Html.div(
+                        'timetableBlockConvener',
+                        self._formatConveners(this.eventData.conveners));
+
+                    this.div.append(this.convenerDiv);
                     this.div.append(this.timeDiv);
                     this.div.append(this.locationDiv);
                 }
@@ -260,7 +278,7 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                 var parentDivHeight = this.div.dom.parentNode.offsetHeight;
                 var parentDivWidth = this.div.dom.parentNode.offsetWidth;
 
-                // If nothin has been drawn do nothing
+                // If nothing has been drawn do nothing
                 if (!parentDivHeight) {
                     return;
                 }
@@ -287,6 +305,18 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                     // Presenters information should not take more than half of the space of the block
                     if (this.presentersDiv && this.presentersDiv.dom.offsetWidth > parentDivWidth / 2) {
                         this.presentersDiv.dom.style.display = 'none';
+                    }
+
+                    // Convener information should not take more than half of the space of the block
+                    // if not truncate the string.
+                    if (this.convenerDiv && this.convenerDiv.dom.offsetWidth > parentDivWidth / 2) {
+                        var newLength = parentDivWidth / 2 / this.convenerDiv.dom.offsetWidth * this.convenerDiv.get().length;
+                        this.convenerDiv.set(this.truncateTitle(newLength - 1, this.convenerDiv.get()));
+                    }
+
+                    // If checks if height of the cell is enough to paint convener's name.
+                    if (this.convenerDiv && this.convenerDiv.dom.offsetHeight + contentHeight() > parentDivHeight) {
+                        this.convenerDiv.dom.style.display = 'none';
                     }
                 }
 
@@ -598,6 +628,20 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
         if (self.eventData.location) {
             infoContentDiv.append(Html.strong({style:{fontStyle: 'normal'}}, 'Location: '));
             infoContentDiv.append(self.eventData.location);
+            infoContentDiv.append(Html.br());
+        }
+
+        if(self.eventData.conveners &&
+           self.eventData.conveners.length > 0)
+        {
+            //Using plural if there are multiple conveners
+            infoContentDiv.append(
+                Html.strong({style:{fontStyle: 'normal'}},
+                            (self.eventData.conveners.length > 1)?
+                            $T('Conveners'):
+                            $T('Convener'), ': '));
+
+            infoContentDiv.append(self._formatConveners(this.eventData.conveners));
             infoContentDiv.append(Html.br());
         }
 
