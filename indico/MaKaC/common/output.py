@@ -21,6 +21,10 @@
 from datetime import datetime
 from pytz import timezone
 from MaKaC.plugins.base import PluginsHolder
+
+from MaKaC.user import Avatar
+from MaKaC.user import CERNGroup
+
 try:
     import libxml2
     import libxslt
@@ -1051,6 +1055,29 @@ class outputGenerator:
         out.closeTag("marc:datafield")
 
 
+# I need to check to see if plugin is activated, and if request is coming from plugin
+        # Access control information, if event is protected
+        # Get set containing Avatar objects (if empty, that means event is public)
+        allowed_avatars = conf.getRecursiveAllowedToAccessList()
+        if allowed_avatars is not None and len(allowed_avatars) > 0:
+            # Build a list holding email strings instead of Avatar objects
+            allowed_emails = []
+            for av in allowed_avatars:
+                if isinstance(av, Avatar):
+                    allowed_emails.append(av.getEmail())
+                elif isinstance(av, CERNGroup):
+                    allowed_emails.append(av.getId() + " [CERN]")
+                else:
+                    allowed_emails.append("UNKNOWN: %s" % av.getId())
+
+            out.openTag("marc:datafield",[["tag","506"], ["ind1","1"], ["ind2"," "]])
+            out.writeTag("marc:subfield", "Restricted",  [["code", "a"]])
+            for email_id in allowed_emails:
+                out.writeTag("marc:subfield", email_id,  [["code", "d"]])
+            out.writeTag("marc:subfield", "group",       [["code", "f"]])
+            out.writeTag("marc:subfield", "CDS Invenio", [["code", "2"]]) # <-- should not be hard coded here
+            out.writeTag("marc:subfield", "SzGeCERN",    [["code", "5"]]) # <-- should not be hard coded here
+            out.closeTag("marc:datafield")
 
     ## def sessionToXMLMarc21(self,session,includeMaterial=1, out=None, forceCache=False):
     ##     if not out:
