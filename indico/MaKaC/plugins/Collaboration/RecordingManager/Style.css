@@ -1,0 +1,183 @@
+<% declareTemplate(newTemplateStyle=True) %>
+
+/* jherr stuff follows... */
+
+div.RMHolderPane {
+    display: none;
+}
+
+div.RMMatchPane {
+    background-color: #F6F6F6;
+    padding: 10px 20px 10px 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    -moz-border-radius-bottomleft:10px;
+    -moz-border-radius-bottomright:10px;
+    -moz-border-radius-topleft:10px;
+    -moz-border-radius-topright:10px;
+    border-bottom:1px solid #AAAAAA;
+    border-right:1px solid #AAAAAA;
+    min-height: 300px;
+    max-height: 450px;
+    overflow: auto;
+}
+
+span.RMbuttonDisplay {
+    background-color: #FFFFFF;
+    border-style: solid;
+    border-width: 1px;
+    padding: 2px;
+}
+
+span.RMbuttonHover {
+    background-color: #FFFFCC;
+    border-style: solid;
+    border-width: 1px;
+    padding: 2px;
+}
+
+span.RMbuttonSelected {
+    background-color: #DDDDFF;
+    border-style: solid;
+    border-width: 1px;
+    padding: 2px;
+}
+
+div.RMtalkDisplay {
+    background-color: #F6F6F6;
+    border: 1px;
+    border-color: #F6F6F6;
+    border-style: solid;
+    height: 30px;
+    font-family: serif;
+    font-size: -2;
+    line-height: 1;
+    margin: 0px;
+    padding: 2px;
+}
+
+div.RMtalkHover {
+    background-color: #FFFFCC;
+    border-width: 1px;
+    border-style: dashed;
+    height: 30px;
+    font-family: serif;
+    font-size: -1;
+    line-height: 1;
+    margin: 0px;
+    padding: 2px;
+}
+
+div.RMtalkSelected {
+    background-color: #FFFFFF;
+    border-width: 1px;
+    border-style: solid;
+    height: 30px;
+    font-family: serif;
+    font-size: -1;
+    font-style: bold;
+    line-height: 1;
+    margin: 0px;
+    padding: 2px;
+}
+
+div.RMLODisplay {
+    background-color: #F6F6F6;
+    border: 1px;
+    border-color: #F6F6F6;
+    border-style: solid;
+    height: 220px;
+    font-family: sans-serif;
+    font-size: -1;
+    margin: 0px;
+    padding: 2px;
+}
+
+div.RMLOHover {
+    background-color: #FFFFCC;
+    border-width: 1px;
+    border-style: dashed;
+    height: 220px;
+    font-family: sans-serif;
+    font-size: -1;
+    font-style: bold;
+    margin: 0px;
+    padding: 2px;
+}
+
+div.RMLOSelected {
+    background-color: #FFFFFF;
+    border-width: 1px;
+    border-style: solid;
+    height: 220px;
+    font-family: sans-serif;
+    font-size: -1;
+    font-style: bold;
+    margin: 0px;
+    padding: 2px;
+}
+
+div.RMStatusMessage {
+    width: 50%;
+    height: 20px;
+}
+
+span.RRNoteTitle {
+    font-weight: bold;
+    font-style: italic;
+    text-decoration: underline;
+}
+span.RRNoteText {
+    font-style: italic;
+}
+
+div.RRFormSubsection {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+span.RRQuestion {
+    font-weight: bold;
+}
+
+ul.RROptionList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+ul.RROptionList li.RRInnerQuestion {
+    padding-left: 0px;
+    font-weight: bold;
+}
+
+div.RRFormSection label {
+    font-weight: normal;
+}
+
+div.RRFormSection input, select {
+    margin-left: 20px;
+}
+
+div.RRContributionListDiv {
+    max-height: 400px;
+    overflow: auto;
+}
+
+span.RRContributionStartDate {
+    margin-left: 5px;
+}
+
+span.RRContributionId {
+    margin-left: 5px;
+    font-size: smaller;
+}
+
+span.RRContributionName {
+	font-style: italic;
+	margin-left: 2px;
+}
+
+span.RRSpeakers {
+	overflow: auto;
+}
