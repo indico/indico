@@ -478,6 +478,9 @@ var IndicoUtil = {
                 else if (dataType == 'unsigned_int' && !(allowEmpty && trim(component.get()) === '') && (!IndicoUtil.isInteger(component.get()) || component.get()<=0)) {
                     error = Html.span({}, "Field must be a positive number");
                 }
+                else if (dataType == 'non_negative_int' && !(allowEmpty && trim(component.get()) === '') && (!IndicoUtil.isInteger(component.get()) || component.get()<0)) {
+                    error = Html.span({}, "Field must be a positive number");
+                }
                 else if (dataType == 'datetime' && !(allowEmpty && trim(component.get()) === '') && !IndicoUtil.parseDateTime(component.get())) {
                     error = Html.span({}, "Date format is not valid. It should be dd/mm/yyyy hh:mm");
                 }

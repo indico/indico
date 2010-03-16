@@ -103,7 +103,10 @@ var Indico = {
         SessionModification: "<%= urlHandlers.UHSessionModification.getURL() %>",
         ContributionModification: "<%= urlHandlers.UHContributionModification.getURL() %>",
         BreakModification: "<%= urlHandlers.UHConfModifyBreak.getURL() %>",
+
         Reschedule: "<%= urlHandlers.UHConfModifReschedule.getURL() %>",
+        SlotCalc: "<%= urlHandlers.UHSessionModSlotCalc.getURL() %>",
+        FitSession: "<%= urlHandlers.UHSessionModFit.getURL() %>",
 
         UploadAction: {
             subContribution: '<%= str(urlHandlers.UHSubContribModifAddMaterials.getURL()) %>',

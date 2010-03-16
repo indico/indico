@@ -5271,6 +5271,21 @@ ul.UnscheduledContribList li.selected {
     background-color: #CDEB8B;
 }
 
+div.popupWithButtonsMainContent {
+    background-color: #FFFFFF;
+    padding: 10px;
+}
+
+div.popupButtonBar {
+    border-top: 1px solid #CCCCCC;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    text-align: center;
+    position:relative;
+    top:-10px;
+}
+
 div.dialogButtons {
     background:#F8F8F8 none repeat scroll 0 0;
     border-top:1px solid #CCCCCC;
@@ -5278,6 +5293,59 @@ div.dialogButtons {
     padding:10px;
     text-align:center;
 }
+
+
+/* Reschedule dialog */
+
+div.rescheduleSection {
+    padding-bottom: 20px;
+}
+
+div.rescheduleTitle {
+    font-size: 14pt;
+    padding-bottom: 5px;
+}
+
+
+tr.selectedAction {
+    background-color: #CDEB8B;
+}
+
+td.rescheduleAction {
+    vertical-align:top;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+div.rescheduleLabelTitle {
+    font-size:12pt;
+    cursor: default;
+}
+
+div.rescheduleLabelDetails {
+    font-size:9pt;
+    font-style: italic;
+    cursor: default;
+}
+
+
+
+.rescheduleWarning {
+    font-weight: bold;
+    color: #D01F3C;
+}
+
+/* End of reschedule dialog */
+
+/* Fit inner timetable dialog */
+
+div.fitInnerTimetableDialog {
+    width: 350px;
+}
+
+/* End of inner timetable dialog */
+
+
 
 .slotTitle {
     font-size:14px;
