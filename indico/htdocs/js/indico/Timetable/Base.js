@@ -663,19 +663,25 @@ type("ManagementTimeTable",["TimeTable"], {
 
         this.separator = Html.span({}, " | ");
 
-        this.rescheduleLink = Html.span({className: 'fakeLink', style:{paddingLeft: pixels(15), paddingRight: pixels(15)}}, 'Reschedule');
+        this.rescheduleLink = Html.span({className: 'fakeLink', style:{paddingLeft: pixels(15), paddingRight: pixels(15)}}, $T('Reschedule'));
         this.rescheduleLink.observeClick(function(){
             var popup = new RescheduleDialog(self);
             popup.open();
         });
 
         // JUST FOR SessionManagementTimetable
-        this.addIntervalLink = Html.span('fakeLink', 'Add new interval');
+        this.addIntervalLink = Html.span({className: 'fakeLink', style:{paddingLeft: pixels(15), paddingRight: pixels(15)}}, $T('Add new interval'));
+        this.separator2 = Html.span({}, " | ");
+        this.fitInnerTimetableLink = Html.span({className: 'fakeLink', style:{paddingLeft: pixels(15), paddingRight: pixels(15)}}, $T('Fit inner timetable'));
 
 
         if (self.isSessionTimetable) {
             this.addIntervalLink.observeClick(function() {
                 self.managementActions.addSessionSlot(self.eventInfo.timetableSession);
+            });
+            this.fitInnerTimetableLink.observeClick(function(){
+                var popup = new FitInnerTimetableDialog(self);
+                popup.open();
             });
         }
 
@@ -687,7 +693,9 @@ type("ManagementTimeTable",["TimeTable"], {
                              this.addMenuLink,
                              this.addIntervalLink,
                              this.separator,
-                             this.rescheduleLink);
+                             this.rescheduleLink,
+                             this.separator2,
+                             this.fitInnerTimetableLink);
         return Html.div({}, this.warningArea, Html.div('clearfix', this.menu, this.infoBox));
     }
 },
@@ -843,6 +851,8 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
             this.separator.dom.style.display = "none";
         } else {
             this.addIntervalLink.dom.style.display = "none";
+            this.separator2.dom.style.display = "none";
+            this.fitInnerTimetableLink.dom.style.display = "none";
         }
 
         return '';
@@ -949,6 +959,8 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
     getTTMenu: function() {
         var self = this;
 
+        this.separator2.dom.style.display = "none";
+        this.fitInnerTimetableLink.dom.style.display = "none";
         if (this.isSessionTimetable) {
             this.addMenuLink.dom.style.display = "inline";
             this.addIntervalLink.dom.style.display = "none";

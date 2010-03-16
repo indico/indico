@@ -1503,3 +1503,57 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
         this.rescheduleButton = null;
     }
 );
+
+
+/**
+ * Dialog to fit a session
+ * @param {Timetable} parentTimetable The timetable object from which this dialog is launched.
+ */
+type("FitInnerTimetableDialog", ["ConfirmPopup"], {
+
+    /**
+     * Returns the title of the session
+     */
+    __getSessionTitle: function(){
+        return '"' + this.tt.contextInfo.title + '"';
+    },
+
+    /**
+     * Builds the content for the ConfirmPopup
+     */
+    __getContent: function() {
+        var content = Html.div("fitInnerTimetableDialog",
+                $T("This will ajdust the starting and ending times of the session "),
+                this.__getSessionTitle(),
+                $T(" so that it encompasses all the blocks and entries defined in this session timetable."),
+                Html.br(),
+                $T("Are you sure you want to proceed?"));
+        return content;
+    },
+
+    /**
+     * Handler when the user closes or presses OK / Cancel
+     */
+    __handler: function(confirm) {
+        var self = this;
+
+        if (confirm) {
+            IndicoUI.Dialogs.Util.progress($T("Fitting inner timetable"));
+            Util.postRequest(Indico.Urls.FitSession,
+                    {
+                        confId: self.tt.eventInfo.id,
+                        sessionId: self.tt.contextInfo.timetableSession.id
+                    },
+                    {});
+        }
+    }
+},
+
+    /**
+     * Constructor
+     */
+    function(parentTimetable) {
+        this.tt = parentTimetable;
+        this.ConfirmPopup($T("Fit inner timetable"), this.__getContent(), this.__handler);
+    }
+);

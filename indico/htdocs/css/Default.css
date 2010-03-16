@@ -5337,6 +5337,15 @@ div.rescheduleLabelDetails {
 
 /* End of reschedule dialog */
 
+/* Fit inner timetable dialog */
+
+div.fitInnerTimetableDialog {
+    width: 350px;
+}
+
+/* End of inner timetable dialog */
+
+
 
 .slotTitle {
     font-size:14px;
