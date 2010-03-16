@@ -257,6 +257,7 @@ extend(IndicoUI.Dialogs,
                var parentRoomData;
                previousDay = dateArgs.selectedDay;
 
+               var killLoadProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
 
                IndicoUtil.waitLoad([
                    isEdit?function(hook){
@@ -314,6 +315,9 @@ extend(IndicoUI.Dialogs,
                            }
                        });
                    }], function(retVal) {
+
+                       killLoadProgress();
+
                        var submitInfo = function(){
                            each(info, function(value, key) {
                                args[key] = value;
