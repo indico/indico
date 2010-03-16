@@ -22,6 +22,7 @@ from datetime import datetime
 from pytz import timezone
 from MaKaC.plugins.base import PluginsHolder
 
+from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.user import Avatar
 from MaKaC.user import CERNGroup
 
@@ -1055,40 +1056,58 @@ class outputGenerator:
         out.closeTag("marc:datafield")
 
 
-# I need to check to see if plugin is activated, and if request is coming from plugin
-        # Access control information, if event is protected
-        # Get set containing Avatar objects (if empty, that means event is public)
+        # Check to make sure this request is coming from the Recording Manager.
+        # We don't want to provide CERN access list information to external sources like OAI harvesters.
         if source is not None and source == 'RecordingManager':
-            allowed_users = conf.getRecursiveAllowedToAccessList()
-            if allowed_users is not None and len(allowed_users) > 0:
-                # Populate two lists holding email/group strings instead of Avatar/Group objects
-                allowed_emails = []
-                allowed_groups = []
-                for av in allowed_users:
-                    if isinstance(av, Avatar):
-                        allowed_emails.append(av.getEmail())
-                    elif isinstance(av, CERNGroup):
-                        allowed_groups.append(av.getId() + " [CERN]")
-                    else:
-                        allowed_emails.append("UNKNOWN: %s" % av.getId())
 
-                out.openTag("marc:datafield",[["tag","506"], ["ind1","1"], ["ind2"," "]])
-                out.writeTag("marc:subfield", "Restricted",  [["code", "a"]])
-                for email_id in allowed_groups:
-                    out.writeTag("marc:subfield", email_id,  [["code", "d"]])
-                out.writeTag("marc:subfield", "group",       [["code", "f"]])
-                out.writeTag("marc:subfield", "CDS Invenio", [["code", "2"]]) # <-- should not be hard coded here
-                out.writeTag("marc:subfield", "SzGeCERN",    [["code", "5"]]) # <-- should not be hard coded here
-                out.closeTag("marc:datafield")
+            # Also check to make sure that the RecordingManager plugin is installed and active
+            if (PluginsHolder().hasPluginType("Collaboration") and
+                PluginsHolder().getPluginType("Collaboration").hasPlugin("RecordingManager") and
+                PluginsHolder().getPluginType("Collaboration").getPlugin("RecordingManager").isActive()):
 
-                out.openTag("marc:datafield",[["tag","506"], ["ind1","1"], ["ind2"," "]])
-                out.writeTag("marc:subfield", "Restricted",  [["code", "a"]])
-                for email_id in allowed_emails:
-                    out.writeTag("marc:subfield", email_id,  [["code", "d"]])
-                out.writeTag("marc:subfield", "email",       [["code", "f"]])
-                out.writeTag("marc:subfield", "CDS Invenio", [["code", "2"]]) # <-- should not be hard coded here
-                out.writeTag("marc:subfield", "SzGeCERN",    [["code", "5"]]) # <-- should not be hard coded here
-                out.closeTag("marc:datafield")
+                # Only provide MARC tag 506 information if there is any access list
+                # Get set containing Avatar objects (if empty, that means event is public)
+                allowed_users = conf.getRecursiveAllowedToAccessList()
+                if allowed_users is not None and len(allowed_users) > 0:
+                    # Populate two lists holding email/group strings instead of Avatar/Group objects
+                    allowed_emails = []
+                    allowed_groups = []
+                    for user_obj in allowed_users:
+                        if isinstance(user_obj, Avatar):
+                            allowed_emails.append(user_obj.getEmail())
+                        elif isinstance(user_obj, CERNGroup):
+                            allowed_groups.append(user_obj.getId() + " [CERN]")
+                        else:
+                            allowed_emails.append("UNKNOWN: %s" % user_obj.getId())
+
+                    # Get subfields from plugin settings:
+
+
+                    field506tag2 = CollaborationTools.getOptionValue("RecordingManager", "MarcField506Subfield2")
+#                    PluginsHolder().getPluginType("Collaboration").getPlugin("RecordingManager").
+                    field506tag5 = CollaborationTools.getOptionValue("RecordingManager", "MarcField506Subfield5")
+
+                    # Create section for tag 506, listing allowed groups
+                    if len(allowed_groups) > 0:
+                        out.openTag("marc:datafield",[["tag","506"], ["ind1","1"], ["ind2"," "]])
+                        out.writeTag("marc:subfield", "Restricted",  [["code", "a"]])
+                        for group_id in allowed_groups:
+                            out.writeTag("marc:subfield", group_id,  [["code", "d"]])
+                        out.writeTag("marc:subfield", "group",       [["code", "f"]])
+                        out.writeTag("marc:subfield", field506tag2, [["code", "2"]])
+                        out.writeTag("marc:subfield", field506tag5, [["code", "5"]])
+                        out.closeTag("marc:datafield")
+
+                    # Create another section for tag 506, listing allowed users
+                    if len(allowed_users) > 0:
+                        out.openTag("marc:datafield",[["tag","506"], ["ind1","1"], ["ind2"," "]])
+                        out.writeTag("marc:subfield", "Restricted",  [["code", "a"]])
+                        for email_id in allowed_emails:
+                            out.writeTag("marc:subfield", email_id,  [["code", "d"]])
+                        out.writeTag("marc:subfield", "email",       [["code", "f"]])
+                        out.writeTag("marc:subfield", field506tag2, [["code", "2"]])
+                        out.writeTag("marc:subfield", field506tag5, [["code", "5"]])
+                        out.closeTag("marc:datafield")
 
     ## def sessionToXMLMarc21(self,session,includeMaterial=1, out=None, forceCache=False):
     ##     if not out:
