@@ -877,7 +877,7 @@ class outputGenerator:
 
     #fb
 
-    def confToXMLMarc21(self,conf,includeSession=1,includeContribution=1,includeMaterial=1,out=None, forceCache=False):
+    def confToXMLMarc21(self,conf,includeSession=1,includeContribution=1,includeMaterial=1,out=None, forceCache=False, source=None):
 
         if not out:
             out = self._XMLGen
@@ -891,13 +891,13 @@ class outputGenerator:
         else:
             # No cache, build the XML
             temp = XMLGen(init=False)
-            self._confToXMLMarc21(conf,includeSession,includeContribution,includeMaterial, out=temp)
+            self._confToXMLMarc21(conf,includeSession,includeContribution,includeMaterial, out=temp, source=source)
             xml = temp.getXml()
             # save XML in cache
             self.cache.cacheObject(version, xml, conf)
         out.writeXML(xml)
 
-    def _confToXMLMarc21(self,conf,includeSession=1,includeContribution=1,includeMaterial=1,out=None):
+    def _confToXMLMarc21(self,conf,includeSession=1,includeContribution=1,includeMaterial=1,out=None, source=None):
         if not out:
             out = self._XMLGen
 
@@ -1058,26 +1058,37 @@ class outputGenerator:
 # I need to check to see if plugin is activated, and if request is coming from plugin
         # Access control information, if event is protected
         # Get set containing Avatar objects (if empty, that means event is public)
-        allowed_avatars = conf.getRecursiveAllowedToAccessList()
-        if allowed_avatars is not None and len(allowed_avatars) > 0:
-            # Build a list holding email strings instead of Avatar objects
-            allowed_emails = []
-            for av in allowed_avatars:
-                if isinstance(av, Avatar):
-                    allowed_emails.append(av.getEmail())
-                elif isinstance(av, CERNGroup):
-                    allowed_emails.append(av.getId() + " [CERN]")
-                else:
-                    allowed_emails.append("UNKNOWN: %s" % av.getId())
+        if source is not None and source == 'RecordingManager':
+            allowed_users = conf.getRecursiveAllowedToAccessList()
+            if allowed_users is not None and len(allowed_users) > 0:
+                # Populate two lists holding email/group strings instead of Avatar/Group objects
+                allowed_emails = []
+                allowed_groups = []
+                for av in allowed_users:
+                    if isinstance(av, Avatar):
+                        allowed_emails.append(av.getEmail())
+                    elif isinstance(av, CERNGroup):
+                        allowed_groups.append(av.getId() + " [CERN]")
+                    else:
+                        allowed_emails.append("UNKNOWN: %s" % av.getId())
 
-            out.openTag("marc:datafield",[["tag","506"], ["ind1","1"], ["ind2"," "]])
-            out.writeTag("marc:subfield", "Restricted",  [["code", "a"]])
-            for email_id in allowed_emails:
-                out.writeTag("marc:subfield", email_id,  [["code", "d"]])
-            out.writeTag("marc:subfield", "group",       [["code", "f"]])
-            out.writeTag("marc:subfield", "CDS Invenio", [["code", "2"]]) # <-- should not be hard coded here
-            out.writeTag("marc:subfield", "SzGeCERN",    [["code", "5"]]) # <-- should not be hard coded here
-            out.closeTag("marc:datafield")
+                out.openTag("marc:datafield",[["tag","506"], ["ind1","1"], ["ind2"," "]])
+                out.writeTag("marc:subfield", "Restricted",  [["code", "a"]])
+                for email_id in allowed_groups:
+                    out.writeTag("marc:subfield", email_id,  [["code", "d"]])
+                out.writeTag("marc:subfield", "group",       [["code", "f"]])
+                out.writeTag("marc:subfield", "CDS Invenio", [["code", "2"]]) # <-- should not be hard coded here
+                out.writeTag("marc:subfield", "SzGeCERN",    [["code", "5"]]) # <-- should not be hard coded here
+                out.closeTag("marc:datafield")
+
+                out.openTag("marc:datafield",[["tag","506"], ["ind1","1"], ["ind2"," "]])
+                out.writeTag("marc:subfield", "Restricted",  [["code", "a"]])
+                for email_id in allowed_emails:
+                    out.writeTag("marc:subfield", email_id,  [["code", "d"]])
+                out.writeTag("marc:subfield", "email",       [["code", "f"]])
+                out.writeTag("marc:subfield", "CDS Invenio", [["code", "2"]]) # <-- should not be hard coded here
+                out.writeTag("marc:subfield", "SzGeCERN",    [["code", "5"]]) # <-- should not be hard coded here
+                out.closeTag("marc:datafield")
 
     ## def sessionToXMLMarc21(self,session,includeMaterial=1, out=None, forceCache=False):
     ##     if not out:
