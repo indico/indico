@@ -126,15 +126,19 @@ type("TimetableBlockBase", [],
 
 type("TimetableBlockNormal", ["TimetableBlockBase"],
         {
+            _getTitle: function(){
+                var title = this.eventData.title;
+
+                if (this.eventData.slotTitle && this.eventData.slotTitle !== "") {
+                    title += ": " + this.eventData.slotTitle;
+                }
+                return title;
+            },
+
             _blockDescription: function(block, event) {
                 var self = this;
 
-                this.titleDiv = Html.div({className: 'timetableBlockTitle', style: {fontWeight: this.eventData.fontWeight}}, this.eventData.title);
-                // If it's a session slot it might have a slot title that should be
-                // added to the title
-                if (this.eventData.slotTitle && this.eventData.slotTitle !== "") {
-                    this.titleDiv.append(": " + this.eventData.slotTitle);
-                }
+                this.titleDiv = Html.div({className: 'timetableBlockTitle', style: {fontWeight: this.eventData.fontWeight}}, this._getTitle());
 
                 this.titleWrapper = Html.div({}, this._getRightSideDecorators(), this.titleDiv);
 
@@ -257,7 +261,8 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
            },
             postDraw: function(hook) {
                 var self = this;
-                var title = this.eventData.title;
+                var title = this._getTitle();
+
 
                 // Returns the total height of the divs in the block
                 var contentHeight = function() {
@@ -335,11 +340,25 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                     return;
                 }
 
-                // Truncate title based on a ratio: div height / content height
-                this.titleDiv.set(this.truncateTitle(Math.ceil(this.eventData.title.length * ((parentDivHeight) / contentHeight())), title));
+                //Calculates the the width of title, presenters and possible arrows
+                var topContentWidth = function() {
+                    var width = 2 * self.margin;
 
-                var step = Math.ceil(parentDivWidth / 40);
-                while (contentHeight() > parentDivHeight && title.length > step) {
+                    if(self.titleDiv)
+                        width += self.titleDiv.dom.offsetWidth;
+                    if(self.presentersDiv)
+                        width += self.presentersDiv.dom.offsetWidth;
+
+                    return width;
+                }
+
+                // Truncate title based on a ratio: div height / content height
+                title = this.truncateTitle(Math.ceil(title.length * ((parentDivHeight) / contentHeight())), title);
+                this.titleDiv.set(title);
+                //String will be shorten by the value of 'step'
+                var step = 2;
+                //Truncating the title since it can be displayed in a single line
+                while (contentHeight() > parentDivHeight && topContentWidth() > parentDivWidth * 0.8) {
                     title = this.truncateTitle(-step, title);
                     this.titleDiv.set(title);
                 }
@@ -526,7 +545,9 @@ type("TimetableBlockManagementMixin",[],
              });
 
 
-         this.arrows = Html.div({style: {cssFloat: 'right', padding: '2px'}}, arrowUp, arrowDown);
+         this.arrows = Html.div({},
+                             Html.div({className: "ttentryArrowsBackground"}),
+                             Html.div({className: "ttentryArrows"}, arrowUp, arrowDown));
      });
 
 type("TimetableBlockWholeDayDisplay", ["TimetableBlockWholeDayBase", "TimetableBlockDisplayMixin"],
