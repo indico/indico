@@ -3373,7 +3373,7 @@ msgstr "Italique"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/SubContributionCreation.tpl:5
 msgid "Creating a new sub contribution (basic data)"
-msgstr "Créer une nouvelle présentation: %s"
+msgstr "Créer une nouvelle présentation:"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/RoomBookingRoomForm.tpl:26
 msgid "Whether bookings must be accepted by person responsible."

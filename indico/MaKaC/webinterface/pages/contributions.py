@@ -1010,7 +1010,7 @@ class WPContribModifSC( WPContributionModifBase ):
         wc = wcomponents.WContribModifSC( self._target )
         pars = { \
             "moveSubContribURL": urlHandlers.UHSubContribActions.getURL(self._contrib), \
-            "addSubContURL": urlHandlers.UHContribAddSubCont.getURL(), \
+            "addSubContURL": urlHandlers.UHContribAddSubCont.getURL(self._contrib), \
             "subContModifURL": urlHandlers.UHSubContribModification.getURL, \
             "subContUpURL": urlHandlers.UHContribUpSubCont.getURL(), \
             "subContDownURL": urlHandlers.UHContribDownSubCont.getURL()}
