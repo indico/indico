@@ -1,6 +1,6 @@
 <% declareTemplate(newTemplateStyle=True) %>
 
-<a name="top" />
+<a name="top" id="scroll_down"/>
 
 <table>
   <tr>

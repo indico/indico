@@ -1081,10 +1081,7 @@ class outputGenerator:
                             allowed_emails.append("UNKNOWN: %s" % user_obj.getId())
 
                     # Get subfields from plugin settings:
-
-
                     field506tag2 = CollaborationTools.getOptionValue("RecordingManager", "MarcField506Subfield2")
-#                    PluginsHolder().getPluginType("Collaboration").getPlugin("RecordingManager").
                     field506tag5 = CollaborationTools.getOptionValue("RecordingManager", "MarcField506Subfield5")
 
                     # Create section for tag 506, listing allowed groups
