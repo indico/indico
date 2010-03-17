@@ -26,17 +26,17 @@ from MaKaC.webinterface.common.countries import CountryHolder
 # -------------- FILTERING ------------------
 class AccommFilterField( filters.FilterField ):
     """Contains the filtering criteria for the track of a contribution.
-        
+
         Inherits from: AbstractFilterField
 
         Attributes:
             _values -- (list) List of track identifiers;
-            _showNoValue -- (bool) Tells whether an contribution satisfies the 
+            _showNoValue -- (bool) Tells whether an contribution satisfies the
                 filter if it hasn't belonged to any track.
     """
-    
+
     _id = "accomm"
-   
+
     def satisfies( self, reg ):
         """
         """
@@ -51,9 +51,9 @@ class SessionFilterField( filters.FilterField ):
     """
     """
     _id = "session"
-    
+
     def satisfies( self, reg ):
-        
+
         """
         """
         if reg.getSessionList():
@@ -70,9 +70,9 @@ class SessionFirstPriorityFilterField( filters.FilterField ):
     """
     """
     _id = "sessionfirstpriority"
-    
+
     def satisfies( self, reg ):
-        
+
         """
         """
         if len(reg.getSessionList()) > 0:
@@ -94,6 +94,7 @@ class EventFilterField(filters.FilterField):
     def satisfies(self, reg):
         """
         """
+
         if reg.getSocialEvents():
             for event in reg.getSocialEvents():
                 if event.getId() in self._values:
@@ -104,12 +105,49 @@ class EventFilterField(filters.FilterField):
             return self._showNoValue
         return False
 
+class StatusesFilterField(filters.FilterField):
+    """
+    Filter used for filtering by the statuses (if they exist).
+    The statuse's values are represented following this format:
+        -NameOfTheStatus + IdOfTheStatus + "-" + IdOfTheValue
+        -For "-- not set --" values:
+         NameOfTheStatus + IdOfTheStatus + "-NoValue"
+    """
+    _id = "statuses"
+
+    def __init__(self,conf,values,showNoValue=True ):
+        filters.FilterField.__init__(self, conf, values, showNoValue)
+        self._confStatusSet = set([status.getCaption()+"-"+status.getId() for status in self._conf.getRegistrationForm().getStatusesList()])
+
+    def satisfies(self, reg):
+        """
+        """
+        statusDict = reg.getStatuses()
+
+        if statusDict:
+            for status in statusDict:
+                if statusDict[status].getCaption()+"-"+statusDict[status].getId() in self._confStatusSet:
+                    if statusDict[status] and statusDict[status].getStatusValue():
+                        field = statusDict[status].getCaption()+statusDict[status].getId() + "-" +statusDict[status].getStatusValue().getCaption() + ""
+                        if field not in self._values:
+                            return False
+                    else:
+                        if statusDict[status].getCaption()+statusDict[status].getId()+"-NoValue" not in self._values:
+                            return False
+                else:
+                    continue
+            return True
+        else:
+            return True
+
+
 class RegFilterCrit(filters.FilterCriteria):
     _availableFields = { \
         AccommFilterField.getId():AccommFilterField,
         SessionFilterField.getId():SessionFilterField,
         SessionFirstPriorityFilterField.getId():SessionFirstPriorityFilterField,
-        EventFilterField.getId():EventFilterField}
+        EventFilterField.getId():EventFilterField,
+        StatusesFilterField.getId():StatusesFilterField}
 
 #------------- SORTING --------------------
 class RegistrantSortingField(filters.SortingField):
@@ -348,9 +386,9 @@ class IsPayedSF(RegistrantSortingField):
 
     def compare( self, r1, r2 ):
         """
-        """ 
+        """
         return cmp( r1.isPayedText(), r2.isPayedText() )
-        
+
 class IdPayment(RegistrantSortingField):
     _id="idpayment"
 
@@ -396,5 +434,5 @@ class SortingCriteria( filters.SortingCriteria ):
             else:
                 self._sortingField = self._createField( GeneralFieldSF )
                 self._sortingField._specialId=crit[0]
-                
+
 

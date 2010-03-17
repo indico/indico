@@ -3970,6 +3970,98 @@ div.actionButton {
     margin-left: 5px;
 }
 
+/* Conference, Registrants List */
+
+.CRLgroupTitleNoBorder {
+   font-family: "Times New Roman", Verdana, Arial;
+   font-size: 19px;
+   color: #4E4C46;
+   letter-spacing: 1px;
+   padding: 3px;
+}
+
+.CRLabstractLeftDataCell {
+    padding-right:5px;
+    border-bottom: 1px solid #DDDDDD;
+    vertical-align: top;
+}
+
+.CRLabstractDataCell {
+    padding:5px;
+    border-bottom: 1px solid #DDDDDD;
+    vertical-align: top;
+}
+
+.CRLNoSelection {
+    color: #881122;
+    font-family: Verdana;
+    font-size: 16px;
+    font-weight: bold;
+ }
+
+.btnRemove {
+    color: red;
+    background-color: transparent;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+}
+
+div.CRLDiv {
+    background: #ECECEC url('../images/grey_gradient2.png') scroll repeat-x bottom left;
+    padding: 10px 20px 10px 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    color: #444;
+    border: 1px solid #AAA;
+    -moz-border-radius-bottomleft:10px;
+    -moz-border-radius-bottomright:10px;
+    -moz-border-radius-topleft:10px;
+    -moz-border-radius-topright:10px;
+    border-bottom:1px solid #AAAAAA;
+    border-right:1px solid #AAAAAA;
+}
+
+
+.CRLIndexSelected  {
+    color: #B38B1F;
+}
+
+.CRLIndexUnselected {
+    color: #4C6A83;
+}
+
+ul.CRLIndexList {
+    display: block;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    padding-top: 10px;
+    padding-bottom: 5px;
+}
+
+ul.CRLIndexList li {
+    display: inline;
+    position: relative;
+    padding-right: 15px;
+    padding-left: 15px;
+    border-right: 1px solid #AAAAAA;
+}
+
+ul.CRLIndexList a {
+    font-family: Verdana;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+ul.CRLIndexList a:hover
+{
+    color: #dbb03a;
+}
+
+
 /* Collaboration Admin */
 
 ul.CAIndexList {

@@ -44,6 +44,10 @@ class WPConfModifRegistrantListBase( registrationForm.WPConfModifRegFormBase ):
         self._tabRegistrants.setActive()
 
 class WPConfModifRegistrantList( WPConfModifRegistrantListBase ):
+    def __init__( self, rh, conference, filterUsed = False ):
+        WPConfModifRegistrantListBase.__init__(self, rh, conference)
+        self._filterUsed = filterUsed
+
 
     def _getTabContent( self, params ):
         filterCrit=params.get("filterCrit",None)
@@ -53,12 +57,14 @@ class WPConfModifRegistrantList( WPConfModifRegistrantListBase ):
         sessionFilterName=params.get("sessionFilterName", "session")
         menustatus = params.get("menuStatus", None)
         websession = self._rh._getSession()
-        wc = WConfModifRegistrants(self._conf,filterCrit,sortingCrit,display, websession, order, sessionFilterName, menustatus)
+
+        wc = WConfModifRegistrants(self._conf,filterCrit,sortingCrit,display, websession, order, sessionFilterName, menustatus, self._filterUsed)
         return wc.getHTML()
 
 class WConfModifRegistrants( wcomponents.WTemplated ):
 
-    def __init__( self, conference,filterCrit, sortingCrit, display, websession, order="down", sessionFilterName="session", menustatus=None ):
+    def __init__( self, conference,filterCrit, sortingCrit, display, websession, order="down", sessionFilterName="session", menustatus=None, filterUsed = False ):
+
         self._conf = conference
         self._filterCrit=filterCrit
         self._sortingCrit=sortingCrit
@@ -66,7 +72,9 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         self._sessionFilterName = sessionFilterName
         self._menustatus = menustatus
         self._display = display
+        self._filterUsed = filterUsed
         self._setDispOpts()
+        self._setStatusesOpts()
 
         dict = websession.getVar("registrantsFilterAndSortingConf%s"%self._conf.getId())
         if not dict:
@@ -89,6 +97,9 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
             if self._filterCrit.getField("event").getShowNoValue():
                 dict["eventShowNoValue"] = "1"
 
+        if self._filterCrit.getField("statuses"):
+            dict["statuses"] = self._filterCrit.getField("statuses").getValues()
+
         if self._sortingCrit.getField():
             dict["sortBy"] = self._sortingCrit.getField().getId()
             dict["order"] = "down"
@@ -96,6 +107,12 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         dict["disp"] = self._getDisplay()
         websession.setVar("registrantsFilterAndSortingConf%s"%self._conf.getId(), dict)
 
+    def _setStatusesOpts(self):
+        """
+        """
+        self._statuses = {}
+        for st in self._conf.getRegistrationForm().getStatusesList():
+            self._statuses[st.getId()] = st.getStatusValues()
 
     def _setDispOpts(self):
         """
@@ -128,6 +145,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
             #
             #jmf-end
             ################
+
     def _getKeyDispOpts(self, value):
         """
         Returns the key which contains the done value.
@@ -197,6 +215,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
             These are the 'display' options selected by the user. In case no options were selected we add some of them by default.
         """
         display=self._display[:]
+
         if display == []:
             display=["Email", "Institution","Phone","City","Country"]
             if self._conf.hasEnabledSection("epay"):
@@ -260,6 +279,12 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
             res.append("""<input type="checkbox" name="event" value=%s%s>%s"""%(quoteattr(str(event.getId())),checked,self.htmlText(event.getCaption())))
         return "<br>".join(res)
 
+    def _getStatusesHTML(self):
+        self._statusesObjects = {}
+        for st in self._conf.getRegistrationForm().getStatusesList():
+            self._statusesObjects[st.getId()] = st
+        return WRegistrantsFilterStatuses(self._statuses, self._filterCrit, self._statusesObjects).getHTML()
+
     def _getDispHTML(self):
         """
         Filtering criteria: table with all the options for the columns we need to display.
@@ -300,6 +325,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
             if counter==2:
                 counter=0
                 res.append("""</tr>""")
+
             else:
                 counter+=1
         if counter in [1,2]:
@@ -333,7 +359,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
                     idImg = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                     url.addParam("order","down")
             idSortingURL=quoteattr("%s#results"%str(url))
-            resgroups["PersonalData"]=[ _("""<td nowrap class="titleCellFormat" style="border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%s<a href=%s> _("Id")</a></td>""")%(idImg, idSortingURL)]
+            resgroups["PersonalData"]=[ _("""<td nowrap class="titleCellFormat" style="border-left:5px solid #FFFFFF;border-bottom: 1px solid #888;">%s<a href=%s> _("Id")</a></td>""")%(idImg, idSortingURL)]
 
         url=self._getURL()
         url.addParam("sortBy","Name")
@@ -348,7 +374,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
                 url.addParam("order","down")
         nameSortingURL=quoteattr("%s#results"%str(url))
 
-        resgroups["PersonalData"].append( _("""<td nowrap class="titleCellFormat" style="border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%s<a href=%s> _("Name")</a></td>""")%(nameImg, nameSortingURL))
+        resgroups["PersonalData"].append( _("""<td nowrap class="titleCellFormat" style="border-left:5px solid #FFFFFF;border-bottom: 1px solid #888;">%s<a href=%s> _("Name")</a></td>""")%(nameImg, nameSortingURL))
         if "Id" in display:
             pdil=["Id", "Name"]
         else:
@@ -374,40 +400,21 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
                 self._groupsorder[kg]=[]
                 resgroups[kg]=[]
             self._groupsorder[kg].append(key)
-            resgroups[kg].append("""<td class="titleCellFormat" style="border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%s<a href=%s>%s</a></td>"""%(img, sortingURL, self.htmlText(columns[key].replace('<span style="color:red;font-size: 75%">(disabled)</span>',''))))
-        # Setting up the two headers, one for the groups and one for the fields
-        groups=["""
-                <tr><td>&nbsp;</td></tr>
-                <tr>
-                    <td width="1px">%s</td>
-                """%currentSortingHTML]
+            resgroups[kg].append("""<td class="titleCellFormat" style="border-left:5px solid #FFFFFF;border-bottom: 1px solid #888;">%s<a href=%s>%s</a></td>"""%(img, sortingURL, self.htmlText(columns[key].replace('<span style="color:red;font-size: 75%">(disabled)</span>',''))))
         fields=["""
-                <tr><td></td></tr>
                 <tr>
-                    <td align="right" nowrap><img src="%s" border="0" alt="Select all" onclick="javascript:selectAll()"><img src="%s" border="0" alt="Deselect all" onclick="javascript:deselectAll()">%s</td>"""%(Config.getInstance().getSystemIconURL("checkAll"),Config.getInstance().getSystemIconURL("uncheckAll"),currentSortingHTML)]
+                    <td align="right" nowrap></td>"""]
         # First we want to display the personal data...
         groupkey="PersonalData"
-        groups.append("""
-                    <td nowrap colspan="%s" style="color:black;border-left:5px solid #FFFFFF;border-bottom: 1px solid black;"><b>%s</b></td>
-
-                    """%(len(resgroups[groupkey]), self.htmlText(columns[groupkey].replace('<span style="color:red;font-size: 75%">(disabled)</span>',''))))
         fields += resgroups[groupkey]
         del resgroups[groupkey]
         #...and them all the other info:
         for groupkey in resgroups.keys():
-            groups.append("""
-                        <td nowrap colspan="%s" style="color:black;border-left:5px solid #FFFFFF;border-bottom: 1px solid black;"><b>%s</b></td>
-
-                        """%(len(resgroups[groupkey]), self.htmlText(columns[groupkey].replace('<span style="color:red;font-size: 75%">(disabled)</span>',''))))
             fields += resgroups[groupkey]
-        groups.append("""
-                        </tr>
-                        """)
         fields.append("""
                         </tr>
                         """)
-
-        return "%s%s"%("\r\n".join(groups), "\r\n".join(fields))
+        return "<tr><td colspan=4 style='padding: 5px 0px 10px;' nowrap>Select: <a style='color: #0B63A5;' alt='Select all' onclick='javascript:selectAll()'> All</a>, <a style='color: #0B63A5;' alt='Unselect all' onclick='javascript:deselectAll()'>None</a></td></tr>%s"%("\r\n".join(fields))
 
 
     def _getRegistrantsHTML( self, reg ):
@@ -468,14 +475,14 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
                     regdict["%s-%s"%(group.getId(),fld.getId())]=fld.getValue()
 
         res =[]
-        res.append("""<td valign="top" align="right"  width="1px"><input type="checkbox" name="registrants" value="%s"></td>
-                    """%(self.htmlText(reg.getId())))
+        res.append("""<td valign="top" align="right" width="3%%"><input onchange="javascript:isSelected('registrant%s')" type="checkbox" name="registrant" value="%s"></td>
+                    """%(reg.getId(),self.htmlText(reg.getId())))
         if "Id" in self._groupsorder["PersonalData"]:
-            res.append("""<td valign="top" nowrap class="abstractLeftDataCell">%s</td>
-                          <td valign="top" nowrap class="abstractDataCell"><a href=%s>%s</a></td>
+            res.append("""<td valign="top" nowrap class="CRLabstractLeftDataCell">%s</td>
+                          <td valign="top" nowrap class="CRLabstractDataCell"><a href=%s>%s</a></td>
                        """%(reg.getId(), quoteattr(str(url)), self.htmlText(fullName)))
         else:
-            res.append("""<td valign="top" nowrap class="abstractDataCell"><a href=%s>%s</a></td>
+            res.append("""<td valign="top" nowrap class="CRLabstractDataCell"><a href=%s>%s</a></td>
                     """%(quoteattr(str(url)), self.htmlText(fullName)))
         # Fisrtly the "PersonalData"
         for key in self._groupsorder["PersonalData"]:
@@ -484,7 +491,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
             v = "&nbsp;"
             if regdict.has_key(key) and regdict[key].strip() != "":
                 v = regdict[key]
-            res.append( """<td valign="top"  class="abstractDataCell">%s</td>"""%v)
+            res.append( """<td valign="top"  class="CRLabstractDataCell">%s</td>"""%v)
         for groupkey in self._groupsorder.keys():
             if groupkey == "PersonalData":
                 continue
@@ -492,12 +499,12 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
                 v = "&nbsp;"
                 if regdict.has_key(key) and str(regdict[key]).strip() != "":
                     v = regdict[key]
-                res.append( """<td valign="top"  class="abstractDataCell">%s</td>"""%v)
+                res.append( """<td valign="top"  class="CRLabstractDataCell">%s</td>"""%v)
         html = """
-            <tr>
+            <tr id="registrant%s" style="background-color: transparent;" onmouseout="javascript:onMouseOut('registrant%s')" onmouseover="javascript:onMouseOver('registrant%s')">
                 %s
             </tr>
-                """%"".join(res)
+                """%(reg.getId(),reg.getId(),reg.getId(), "".join(res))
         return html
 
     def _getDisplayOptionsHTML(self):
@@ -527,12 +534,56 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         url.addParam("currentURL", self._getURL())
         return url
 
-    def _getMenu(self):
-        if self._menustatus == "open":
-            menu =  _("""<table width="95%%" align="center" border="0" style="border-left: 1px solid #777777">
+    def _getFilterMenu(self):
+        menu =  _("""<div class="CRLDiv" style="display: none;" id="filterMenu"><table width="95%%" align="center" border="0">
         <tr>
-            <td class="groupTitle"><a href="%(closeMenuURL)s"><img src=%(openMenuImg)s alt="_("hide menu")" border="0"></a>  _("Filtering criteria") </td>
+            <td>
+                <table width="100%%">
+                    <tr>
+                    </tr>
+                    <tr>
+                        <td>
+                            <table align="center" cellspacing="0" width="100%%">
+                                <tr>
+                                    <td width="33%%" class="titleCellFormat" style="border-bottom: 1px solid #888;">%(accomtitle)s %(checkAcco)s%(uncheckAcco)s</td>
+                    <td width="33%%"class="titleCellFormat" style="border-bottom: 1px solid #888;">%(eventtitle)s %(checkEvent)s%(uncheckEvent)s</td>
+                    <td width="33%%"class="titleCellFormat" style="border-bottom: 1px solid #888;">%(sesstitle)s %(checkSession)s%(uncheckSession)s</td>
+                                </tr>
+                                <tr>
+                                    <td valign="top" >%(acom)s</td>
+                    <td valign="top" >%(eve)s</td>
+                    <td valign="top">%(ses)s</td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    """)
+        if self._conf.getRegistrationForm().getStatusesList():
+            menu +=  _("""<tr>
+                        <td>
+                            <table align="center" cellspacing="0" width="100%%">
+                                <tr>
+                                    <td align="left" class="titleCellFormat" style="border-bottom: 1px solid #888; padding-right:10px">  _("Statuses") %(checkStatuses)s%(uncheckStatuses)s</td>
+                                </tr>
+                                <tr>
+                                    <td valign="top">%(status)s</td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>""")
+        menu +=  _("""
+                    <tr>
+                        <td align="center" ><input type="submit" class="btn" name="OK" value=  _("apply filter")></td>
+                    </tr>
+                </table>
+            </td>
         </tr>
+    </table></div>""")
+
+        return menu
+
+    def _getDisplayMenu(self):
+        menu =  _("""<div class="CRLDiv" style="display: none;" id="displayMenu"><table width="95%%" align="center" border="0">
         <tr>
             <td>
                 <table width="100%%">
@@ -543,51 +594,27 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
                     </tr>
                     <tr>
                         <td>
-                            <table align="center" cellspacing="10" width="100%%">
+                            <table align="center" cellspacing="0" width="100%%">
                                 <tr>
-                                    <td width="33%%" class="titleCellFormat" style="border-bottom: 1px solid #5294CC;">%(accomtitle)s %(checkAcco)s%(uncheckAcco)s</td>
-                    <td width="33%%"class="titleCellFormat" style="border-bottom: 1px solid #5294CC;">%(eventtitle)s %(checkEvent)s%(uncheckEvent)s</td>
-                    <td width="33%%"class="titleCellFormat" style="border-bottom: 1px solid #5294CC;">%(sesstitle)s %(checkSession)s%(uncheckSession)s</td>
+                                    <td align="left" class="titleCellFormat" style="border-bottom: 1px solid #888; padding-right:10px" nowrap> <a onclick="selectDisplay()">_("Select all")</a> | <a onclick="unselectDisplay()">_("Unselect all")</a> </td>
                                 </tr>
                                 <tr>
-                                    <td valign="top" style="border-right:1px solid #777777;">%(acom)s</td>
-                    <td valign="top" style="border-right:1px solid #777777;">%(eve)s</td>
-                    <td valign="top" style="border-right:1px solid #777777;">%(ses)s</td>
+                                    <td valign="top">%(disp)s</td>
                                 </tr>
                             </table>
                         </td>
                     </tr>
                     <tr>
-                        <td>
-                            <table align="center" cellspacing="10" width="100%%">
-                                <tr>
-                                    <td align="left" class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px">  _("Display") %(checkDisplay)s%(uncheckDisplay)s</td>
-                                </tr>
-                                <tr>
-                                    <td valign="top" style="border-right:1px solid #777777;">%(disp)s</td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td align="center" style="border-top:1px solid #777777;padding:10px"><input type="submit" class="btn" name="OK" value=  _("apply filter")></td>
+                        <td align="center"><input type="submit" class="btn" name="OK" value=  _("apply filter")></td>
                     </tr>
                 </table>
             </td>
         </tr>
-    </table>""")
-        else:
-            menu =  _("""<table width="95%%" align="center" border="0" style="border-left: 1px solid #777777">
-        <tr>
-            <td class="groupTitle"><a href="%(openMenuURL)s"><img src=%(closeMenuImg)s alt="Show menu" border="0"></a>  _("Filtering criteria")</td>
-        </tr>
-        <tr><td align="left"><small>  _("Note that you can open the filtering criteria by clicking in the icon") <img src=%(closeMenuImg)s alt="Show menu" border="0">  _("which is above this line").</small></td></tr>
-    </table>""")
-
+    </table></div>""")
         return menu
 
-
     def getVars( self ):
+
         vars = wcomponents.WTemplated.getVars( self )
 
         sortingField = self._sortingCrit.getField()
@@ -603,11 +630,16 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         for reg in f.apply(cl):
             l.append(self._getRegistrantsHTML(reg))
             regl.append(reg.getId())
+
         if self._order =="up":
             l.reverse()
             regl.reverse()
         vars["registrants"] = "".join(l)
-        vars["numRegistrants"]=str(len(l))
+        vars["filteredNumberRegistrants"]=str(len(l))
+        vars["totalNumberRegistrants"]=str(len(cl))
+        vars["filterUsed"] = self._filterUsed
+
+
         vars["actionPostURL"]=quoteattr(str(urlHandlers.UHConfModifRegistrantListAction.getURL(self._conf)))
 
         if l == []:
@@ -618,9 +650,12 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         vars["printIconURL"]="""<input type="image" name="pdf" src=%s border="0">"""%quoteattr(str(Config.getInstance().getSystemIconURL("pdf")))
         vars["infoIconURL"]="""<input type="image" name="info" src=%s border="0">"""%quoteattr(str(Config.getInstance().getSystemIconURL("info")))
         vars["excelIconURL"]="""<input type="image" name="excel" src=%s border="0">"""%quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
+        vars["pdfUrl"] = quoteattr(str(Config.getInstance().getSystemIconURL("pdf")))
+        vars["excelUrl"] = quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
         vars ["acom"] = self._getAcomHTML()
         vars ["ses"]=self._getSessHTML()
         vars ["eve"]+=self._getEventHTML()
+        vars ["status"]= self._getStatusesHTML()
         vars ["disp"]= self._getDispHTML()
         tit=self._conf.getRegistrationForm().getAccommodationForm().getTitle()
         if not self._conf.getRegistrationForm().getAccommodationForm().isEnabled():
@@ -650,10 +685,29 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         vars["uncheckSession"] = """<img src=%s border="0" alt="Unselect all" onclick="javascript:unselectSession()">"""%quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))
         vars["checkDisplay"] = """<img src=%s border="0" alt="Select all" onclick="javascript:selectDisplay()">"""%quoteattr(Config.getInstance().getSystemIconURL("checkAll"))
         vars["uncheckDisplay"] = """<img src=%s border="0" alt="Unselect all" onclick="javascript:unselectDisplay()">"""%quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))
+        vars["checkStatuses"] = """<img src=%s border="0" alt="Select all" onclick="javascript:selectStatuses()">"""%quoteattr(Config.getInstance().getSystemIconURL("checkAll"))
+        vars["uncheckStatuses"] = """<img src=%s border="0" alt="Unselect all" onclick="javascript:unselectStatuses()">"""%quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))
+        vars["displayMenu"] = self._getDisplayMenu()%vars
+        vars["filterMenu"] = self._getFilterMenu()%vars
 
-        vars["menu"] = self._getMenu()%vars
         return vars
 
+class WRegistrantsFilterStatuses (wcomponents.WTemplated):
+    def __init__(self, statuses, filter, statusObjects):
+        wcomponents.WTemplated.__init__(self)
+        self._statuses = statuses
+        self._filterCrit = filter
+        self._statusObjects = statusObjects
+
+    def getVars(self):
+
+        vars = wcomponents.WTemplated.getVars( self )
+        vars["statuses"] = self._statuses
+        vars["filter"] = self._filterCrit
+        vars["showNoAnswer"] = self._filterCrit.getField("statuses").getShowNoValue()
+        vars["statusObjects"] = self._statusObjects
+
+        return vars
 
 class WRegSentMail  (wcomponents.WTemplated):
     def __init__(self,conf):
@@ -2050,6 +2104,7 @@ class WConfRegistrantsList( wcomponents.WTemplated ):
         # --- Sessions
 
         vars["sessionsTitle"] = ""
+
         if self._regForm.getSessionsForm().isEnabled():
             url=self._getURL()
             url.addParam("sortBy","Sessions")
