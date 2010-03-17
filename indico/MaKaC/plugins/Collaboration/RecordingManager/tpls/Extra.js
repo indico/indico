@@ -99,7 +99,7 @@ var RRTalkTemplate = function(talk) {
 //}
 //}
 
-// added by jherr - I just copied and modified RRUpdateContributionList
+// following added by jherr - I just copied and modified RRUpdateContributionList
 var REUpdateOrphanList = function () {
     if (RE_orphans.length > 0) {
         $E('orphanList').set('');
@@ -111,6 +111,10 @@ var REUpdateOrphanList = function () {
         $E('orphanList').set(Html.span({style:{paddingLeft: pixels(20)}}, $T("No orphans found.."))); // make this more beautiful
     }
 }
+
+var Button = new DisabledButton(Html.input("button", {disabled:true}, $T("Add")));
+
+IndicoUI.Effect.appear($E('RMlowerPane'), "block")
 
 // jherr: this is the part that loads the list of contributions
 var RR_loadTalks = function () {
@@ -200,20 +204,20 @@ var RMselectedTalk = '';
 var RMselectedLO   = '';
 var RMviewMode     = '';
 
-function RMtoggleLectureVideo(mode) {
+function RMbuttonModeSelect(mode) {
     RMviewMode = mode;
     if (mode == 'plain_video') {
-        RMbuttonModeSelected('plain_video');
+        $E("RMbuttonWebLecture").dom.className = 'RMbuttonNotSelected';
+        $E("RMbuttonPlainVideo").dom.className = 'RMbuttonSelected';
         IndicoUI.Effect.disappear($E('RMrightPaneWebLecture'));
         IndicoUI.Effect.appear($E('RMrightPanePlainVideo'), "block");
     }
     else if (mode == 'web_lecture') {
-        RMbuttonModeSelected('web_lecture');
+        $E("RMbuttonPlainVideo").dom.className = 'RMbuttonNotSelected';
+        $E("RMbuttonWebLecture").dom.className = 'RMbuttonSelected';
         IndicoUI.Effect.disappear($E('RMrightPanePlainVideo'));
         IndicoUI.Effect.appear($E('RMrightPaneWebLecture'), "block");
     }
-    // do make the lower pane appear the first time a choice is made, and stay visible
-    IndicoUI.Effect.appear($E('RMlowerPane'), "block")
 }
 
 function RMbuttonModeOnHover(mode) {
@@ -234,17 +238,6 @@ function RMbuttonModeOffHover(mode) {
     }
 }
 
-function RMbuttonModeSelected(mode) {
-    if (mode == 'web_lecture') {
-        $E("RMbuttonPlainVideo").dom.className = 'RMbuttonDisplay';
-        $E("RMbuttonWebLecture").dom.className = 'RMbuttonSelected';
-    }
-    else if (mode == 'plain_video') {
-        $E("RMbuttonWebLecture").dom.className = 'RMbuttonDisplay';
-        $E("RMbuttonPlainVideo").dom.className = 'RMbuttonSelected';
-    }
-}
-
 function RMtalkBoxOffHover(IndicoID) {
     var DivID = 'div' + IndicoID;
     if (RMselectedTalk != IndicoID) {
@@ -254,7 +247,6 @@ function RMtalkBoxOffHover(IndicoID) {
 
 function RMtalkBoxOnHover(IndicoID) {
     var DivID = 'div' + IndicoID;
-//    alert('selected: ' + RMselectedTalk + ' DivID: ' + DivID)
     if (RMselectedTalk != IndicoID) {
         document.getElementById(DivID).className = 'RMtalkHover';
     }
@@ -262,8 +254,8 @@ function RMtalkBoxOnHover(IndicoID) {
 
 function RMtalkSelect(IndicoID) {
     var DivID = 'div' + IndicoID;
-    // first reset last selected talk div to default color
-    if (RMselectedTalk != '') {
+    // reset last selected talk div to default color before setting new background
+    if (typeof RMselectedTalk != 'undefined' && RMselectedTalk != '') {
         document.getElementById('div' + RMselectedTalk).className = 'RMtalkDisplay';
     }
     RMselectedTalk = IndicoID;
@@ -288,7 +280,7 @@ function RMLOBoxOnHover(DBID) {
 function RMLOSelect(DBID) {
     var DivID = 'lo' + DBID;
     // reset last selected LO div to default color before setting new background
-    if (RMselectedLO != '') {
+    if (typeof RMselectedLO != 'undefined' && RMselectedLO != '') {
         document.getElementById('lo' + RMselectedLO).className = 'RMLODisplay';
     }
     RMselectedLO = DBID;

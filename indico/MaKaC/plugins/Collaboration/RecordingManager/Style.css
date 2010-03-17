@@ -2,12 +2,17 @@
 
 /* jherr stuff follows... */
 
-div.RMHolderPane {
+/* For stuff you don't want to be visible at first */
+div.RMHolderPaneDefaultInvisible {
     display: none;
 }
 
+/* A div to hold stuff starting off visible (seems kinda pointless) */
+div.RMHolderPaneDefaultVisible {
+    display: block;
+}
 div.RMMatchPane {
-    background-color: #F6F6F6;
+    background-color: #FFFFFF;
     padding: 10px 20px 10px 10px;
     margin-top: 10px;
     margin-bottom: 10px;
@@ -25,28 +30,42 @@ div.RMMatchPane {
 span.RMbuttonDisplay {
     background-color: #FFFFFF;
     border-style: solid;
+    border-color: #FFFFFF;
     border-width: 1px;
-    padding: 2px;
+    padding: 4px;
+    font-weight: normal;
 }
 
 span.RMbuttonHover {
-    background-color: #FFFFCC;
+    background-color: #FFF6DF;
     border-style: solid;
     border-width: 1px;
-    padding: 2px;
+    padding: 4px;
 }
 
 span.RMbuttonSelected {
-    background-color: #DDDDFF;
+    background-color: #FFFFFF;
     border-style: solid;
     border-width: 1px;
-    padding: 2px;
+    border-color: #000000;
+    padding: 4px;
+    font-weight: bold;
+}
+
+span.RMbuttonNotSelected {
+    background-color: #FFFFFF;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #FFFFFF;
+    padding: 4px;
+    font-weight: normal;
+    color: #CCCCCC;
 }
 
 div.RMtalkDisplay {
-    background-color: #F6F6F6;
+    background-color: #FFFFFF;
     border: 1px;
-    border-color: #F6F6F6;
+    border-color: #FFFFFF;
     border-style: solid;
     height: 30px;
     font-family: serif;
@@ -57,7 +76,7 @@ div.RMtalkDisplay {
 }
 
 div.RMtalkHover {
-    background-color: #FFFFCC;
+    background-color: #FFF6DF;
     border-width: 1px;
     border-style: dashed;
     height: 30px;
@@ -69,22 +88,22 @@ div.RMtalkHover {
 }
 
 div.RMtalkSelected {
-    background-color: #FFFFFF;
+    background-color: #CDEB8B;
     border-width: 1px;
     border-style: solid;
     height: 30px;
     font-family: serif;
     font-size: -1;
-    font-style: bold;
+    font-weight: bold;
     line-height: 1;
     margin: 0px;
     padding: 2px;
 }
 
 div.RMLODisplay {
-    background-color: #F6F6F6;
+    background-color: #FFFFFF;
     border: 1px;
-    border-color: #F6F6F6;
+    border-color: #FFFFFF;
     border-style: solid;
     height: 220px;
     font-family: sans-serif;
@@ -94,25 +113,23 @@ div.RMLODisplay {
 }
 
 div.RMLOHover {
-    background-color: #FFFFCC;
+    background-color: #FFF6DF;
     border-width: 1px;
     border-style: dashed;
     height: 220px;
     font-family: sans-serif;
     font-size: -1;
-    font-style: bold;
     margin: 0px;
     padding: 2px;
 }
 
 div.RMLOSelected {
-    background-color: #FFFFFF;
+    background-color: #CDEB8B;
     border-width: 1px;
     border-style: solid;
     height: 220px;
     font-family: sans-serif;
     font-size: -1;
-    font-style: bold;
     margin: 0px;
     padding: 2px;
 }

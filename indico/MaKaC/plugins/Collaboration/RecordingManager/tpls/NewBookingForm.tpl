@@ -1,6 +1,9 @@
-<% declareTemplate(newTemplateStyle=True) %>
+<div><span>
+<a id="scroll_down" name="top"></a>
+<br />
+</span></div>
 
-<a name="top" id="scroll_down"/>
+<% declareTemplate(newTemplateStyle=True) %>
 
 <table>
   <tr>
@@ -56,10 +59,10 @@
     </td>
     <td width="620px" valign="top">
         <b><%= _("2. Select content type: ") %></b>
-        <span id="RMbuttonPlainVideo" class="RMbuttonDisplay" onclick="RMtoggleLectureVideo('plain_video')" onmouseover="RMbuttonModeOnHover('plain_video');" onmouseout="RMbuttonModeOffHover('plain_video')"><%= _("plain video") %></span>
+        <span id="RMbuttonPlainVideo" class="RMbuttonDisplay" onclick="RMbuttonModeSelect('plain_video')" onmouseover="RMbuttonModeOnHover('plain_video');" onmouseout="RMbuttonModeOffHover('plain_video')"><%= _("plain video") %></span>
         &nbsp;<%= _(" or ") %>&nbsp;
-        <span id="RMbuttonWebLecture" class="RMbuttonDisplay" onclick="RMtoggleLectureVideo('web_lecture')" onmouseover="RMbuttonModeOnHover('web_lecture');" onmouseout="RMbuttonModeOffHover('web_lecture')"><%= _("web lecture") %></span>
-        <div id="RMrightPaneWebLecture" class="RMHolderPane">
+        <span id="RMbuttonWebLecture" class="RMbuttonDisplay" onclick="RMbuttonModeSelect('web_lecture')" onmouseover="RMbuttonModeOnHover('web_lecture');" onmouseout="RMbuttonModeOffHover('web_lecture')"><%= _("web lecture") %></span>
+        <div id="RMrightPaneWebLecture" class="RMHolderPaneDefaultInvisible">
             <br />
             <b><%= _("3. Select an orphan lecture object: ") %></b>
         <div class="RMMatchPane">
@@ -92,7 +95,7 @@
             <% end %>
         </div>
         </div>
-        <div id="RMrightPanePlainVideo" class="RMHolderPane">
+        <div id="RMrightPanePlainVideo" class="RMHolderPaneDefaultInvisible">
             <br />
             <b><%= _("3. Select options: ") %></b>
             <div class="RMMatchPane" style="height: 200px;">
@@ -107,7 +110,7 @@
     </td>
   </tr>
 <table>
-<div id="RMlowerPane" class="RMHolderPane" style="margin-left: 150px;">
+<div id="RMlowerPane" class="RMHolderPaneDefaultVisible" style="margin-left: 150px;">
     <span>
         <br />
         <b><%= _("4. Create CDS record (and update micala database)") %></b>
