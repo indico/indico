@@ -388,7 +388,9 @@ class CrossLocationQueries( object ):
             return rooms
         else:
             # Return only from one location
-            rooms = Location.parse( location ).factory.newRoom().getRooms( **kwargs )
+            locObj = Location.parse( location )
+            if locObj is None: return []
+            rooms = locObj.factory.newRoom().getRooms( **kwargs )
             if rooms != None: return rooms
             else: return []
 
