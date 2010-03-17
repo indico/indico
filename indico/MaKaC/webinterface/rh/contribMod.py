@@ -1367,8 +1367,8 @@ class RHMaterialsAdd(RHContribModifBase):
 
     def _checkProtection(self):
         material = self._rhSubmitMaterial._getMaterial()
-        if self._target.canUserSubmit(self._aw.getUser()) \
-            and material.getReviewingState() < 3:
+        if self._target.canUserSubmit(self._aw.getUser()):# \
+            #and material.getReviewingState() < 3:
             return
         RHContribModifBase._checkProtection(self)
 
