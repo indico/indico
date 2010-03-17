@@ -397,7 +397,7 @@ class RHConferenceBaseDisplay( RHConferenceBase, RHDisplayBaseProtected ):
             RHDisplayBaseProtected._checkProtection( self )
 
 
-class RHConferenceDisplay( RHConferenceBaseDisplay ):
+class RHConferenceDisplay( RoomBookingDBMixin, RHConferenceBaseDisplay ):
     _uh = urlHandlers.UHConferenceDisplay
 
     def _process( self ):

@@ -490,6 +490,9 @@ var IndicoUtil = {
                 else if (dataType == 'emaillist' && !(allowEmpty && trim(component.get()) === '') && !Util.Validation.isEmailList(component.get())){
                     error = Html.span({}, "List contains invalid e-mail address or invalid separator");
                 }
+                else if (dataType == 'url' && !(allowEmpty && trim(component.get()) === '') && !Util.Validation.isURL(component.get())) {
+                    error = Html.span({}, "Invalid URL");
+                }
                 else if (dataType == 'ip' && !(allowEmpty && trim(component.get()) === '') &&  !Util.Validation.isIPAddress(component.get())) {
                     error = Html.span({}, "That doesn't seem like a valid IP Address. Example of valid IP Address: 132.156.31.38");
                 } else if (dataType == 'time' && !IndicoUtil.isTime(trim(component.get()))) {
@@ -504,7 +507,7 @@ var IndicoUtil = {
                 if (exists(error)) {
                     hasErrors = true;
 
-                    var oList = [];
+                    var oList;
 
                     if (component.dom.type != 'radio') {
                         var result = IndicoUtil.markInvalidField(component, error);

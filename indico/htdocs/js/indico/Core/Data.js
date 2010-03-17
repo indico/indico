@@ -185,6 +185,27 @@ Util.Validation = {
     isEmailList: function(emails) {
         // check if the emails given are valid and if valid separators are used
         return exists(emails.toLowerCase().match(/^(?:[ ,;]*)(?:[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+(?:\.[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+)*@(?:[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?)(?:[ ,;]+(?:[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+(?:\.[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+)*@(?:[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?))*(?:[ ,;]*)$/));
+    },
+    isURL: function(address) {
+        // thanks to Jan Goyvaerts
+        return exists(address.match(/^http\:\/\/(.+)$/));
+    }
+
+
+};
+
+Protection = {
+
+    ParentRestrictionMessages: {
+        '1': $T("(currently restricted to some users, but can change)"),
+        '-1': $T("(currently open to everyone, but can change)") },
+
+    resolveProtection: function(resourceProtection, parentProtection) {
+        if (resourceProtection === 0) {
+            return parentProtection;
+        } else {
+            return resourceProtection;
+        }
     }
 };
 

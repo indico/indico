@@ -299,11 +299,10 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
     },
 
     _followArgs_interval: function(hash, data) {
+
         var m = hash.match(/#(\d{8})(?:\.(s\d+l\d+))?/);
 
         if (m) {
-
-            this.currentDay = m[1];
 
             if (m[2]) {
                 this.switchToInterval(m[2]);
@@ -318,20 +317,9 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
 
         var m = hash.match(/#(\d{8}|all)(?:\.(s\d+l\d+))?/);
 
-        if (m) {
+        var currentDay = m ? m[1] : null;
 
-            this.currentDay = m[1];
-
-            var tab = 0;
-
-            for (k in this.sortedKeys) {
-                if (this.sortedKeys[k] == this.currentDay) {
-                    return tab;
-                }
-                tab++;
-            }
-            return -1;
-        }
+        return exists(data[currentDay]) ? currentDay : null;
     },
 
     switchToInterval : function(intervalId) {
@@ -363,8 +351,8 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
 
     switchToTopLevel : function() {
         this.enable();
-        this.set(this.currentDay);
-        this.canvas.set(Widget.block(this));
+        this.setSelectedTab(this.currentDay);
+        this._drawContent();
         this.menu.dom.style.display = 'block';
         this.timetableDrawer.redraw();
     }
@@ -395,25 +383,26 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
          var today = new Date();
          var todayStr = IndicoUtil.formatDate2(today);
 
+         var originalHash = window.location.hash;
+
          // parse "command line" arguments
-         var initialTab = this._followArgs_day(window.location.hash, data);
+         var initialTab = this._followArgs_day(originalHash, data);
 
          // if nothing is found
-         if (initialTab == -1) {
+         if (initialTab === null) {
              // look for today
-             while (exists(data[todayStr])) {
-                 today.setDate(today.getDate()-1);
-                 todayStr = IndicoUtil.formatDate2(today);
-                 initialTab++;
+             if (exists(data[todayStr])) {
+                 initialTab = todayStr;
+             } else {
+                 // otherwise use the default
+                 initialTab = keys(data)[0];
              }
          }
 
-         // if today not found, set initial tab to the first one
-         if (initialTab == -1) {
-             initialTab = 0;
-         }
+         this.currentDay = initialTab;
 
          this.LookupTabWidget( translate(this.sortedKeys, function(key) {
+
              return [key, function() {
                  self.currentDay = key;
                  // each time one tab is clicked,
@@ -436,7 +425,7 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
              }];
          }), this.width, 100, initialTab, this._functionButtons(), this.canvas);
 
-         this._followArgs_interval(window.location.hash, data);
+         this._followArgs_interval(originalHash, data);
 
      });
 
@@ -714,8 +703,8 @@ type("ManagementTimeTable",["TimeTable"], {
 type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"], {
 
     _retrieveHistoryState: function(hash) {
-        this._followArgs_day(hash, this.data);
-        this.setSelectedTab(this.currentDay);
+        var currentDay = this._followArgs_day(hash, this.data);
+        this.setSelectedTab(currentDay);
     }
 
 
@@ -860,10 +849,10 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
     },
 
     _retrieveHistoryState: function(hash) {
-        this._followArgs_day(hash, this.data);
+        var currentDay = this._followArgs_day(hash, this.data) || keys(this.data)[0];
         if (!this._followArgs_interval(hash, this.data)) {
             this.switchToTopLevel();
-            this.setSelectedTab(this.currentDay);
+            this.setSelectedTab(currentDay);
         }
     }
 

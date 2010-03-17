@@ -1,5 +1,16 @@
+type("AddMaterialDialog", ["ButtonBarExclusivePopup"], {
 
-type("AddMaterialDialog", ["ExclusivePopup"], {
+    _drawButtons: function() {
+
+        var self = this;
+
+        var buttonDiv = Html.div({},
+            Widget.button(command(function() {
+                self._upload();
+            }, "Create Resource")));
+
+        return buttonDiv;
+    },
 
     _iFrameLoaded : function(iframeId) {
 
@@ -30,123 +41,291 @@ type("AddMaterialDialog", ["ExclusivePopup"], {
         }
     },
 
-    _drawTypeSelector: function(pm) {
-        var self = this;
-        var select = Html.select({name: 'materialId'});
-        var text = Html.edit({name: 'materialId'});
+    /*
+     * Draws a pane that switches between a URL input and a file upload dialog.
+     *
+     * pm - A parameter manager
+     * locationSelector - the locationSelector that will 'control' the pane
+     */
+    _drawResourcePathPane: function(locationSelector) {
 
-        var chooser = new Chooser(new Lookup({
-            select: function() {
-                pm.remove(text);
-                pm.add(select);
-                return Html.div({}, bind.element(select, $L(self.types),
-                                          function(value) {
-                                              return Html.option({'value': value}, value);
-                                          }),
-                         " ",
-                         $T("or"),
-                         " ",
-                         Widget.link(command(function() {
-                             chooser.set('write');
-                         }, $T("other"))));
-            },
-
-            write: function() {
-                bind.detach(select);
-                pm.remove(select);
-                pm.add(text);
-                return Html.div({}, text,
-                                " ",
-                               $T("or"),
-                               " ",
-                                Widget.link(command(function() {
-                                    chooser.set('select');
-                                }, $T("select from list"))));
-            }
-        }));
-        chooser.set('select');
-
-        return Widget.block(chooser);
-    },
-
-    _drawFileUpload: function() {
-        var self = this;
-
-        var pm = new IndicoUtil.parameterManager();
-
-        var uploadType = Html.input('hidden', {name: 'uploadType'});
-        var convert = Html.checkbox({}, true);
-        var selector = this._drawTypeSelector(pm);
         var file = Html.input('file', {name: 'file'});
-        var description = Html.textarea({name: 'description'});
+        var url = Html.edit({name: 'url'});
+        var toPDFCheckbox = Html.checkbox({name: 'topdf', style: {verticalAlign: 'middle'}}, true);
 
-        uploadType.set('file');
-
-        // FIX: presentation issue
-        convert.dom.name = 'topdf';
-
-        pm.add(selector, 'text', false);
-        pm.add(file, 'text', false);
-        pm.add(description, 'text', true);
-
-        return Html.div({},
-                        IndicoUtil.createFormFromMap(
-                            [
-                                [$T('Type'), selector],
-                                [$T('File'), file],
-                                [$T('Description'), description],
-                                [$T('Convert to PDF'), convert]
-                            ]),
-                        uploadType,
-                        Html.div({style: {'textAlign': 'center'}},
-                                 Widget.button(command(
-                                     function() {
-                                         if (pm.check()) {
-                                             self.killProgress = IndicoUI.Dialogs.Util.progress($T('Uploading...'));
-                                             self.uploading = true;
-                                             self.form.dom.submit();
-                                         }
-                                     }, $T("Upload")))));
-    },
-
-    _drawLinkUpload: function() {
         var self = this;
 
-        var pm = new IndicoUtil.parameterManager();
+        var resourcePathPane = new Chooser(
+            new Lookup({
+                'local':  function() {
+                    self.pm.remove(url);
+                    return Html.div({},
+                                    self.pm.add(file, 'text'),
+                                    Html.div({style:{marginTop: '5px'}},
+                                             toPDFCheckbox,
+                                             Html.label({style: {verticalAlign: 'middle'}, className: 'emphasis'}
+                                                        , $T("Convert to PDF (when applicable)")))
+                                   );
+                },
+                'remote': function() {
+                    self.pm.remove(file);
+                    url.set('http://');
+                    url.dom.focus();
+                    return Html.div({},
+                                    Html.label('popUpLabel', $T("URL")),
+                                    self.pm.add(url, 'url'),
+                                    Html.div("smallGrey", "Example: http://www.example.com/YourPDFFile.pdf"));
+                }
+            }));
 
-        var uploadType = Html.input('hidden', {name: 'uploadType'});
-        var selector = this._drawTypeSelector(pm);
-        var url = Html.edit({name: 'url'});
-        var description = Html.textarea({name: 'description'});
+        // whenever the user selects a different location,
+        // change between an http link field and an upload box.
+        // This could be done simply with:
+        // $B(resourcePathPane, locationSelector);
+        // but we need to change the focus too, so let's use an observer
 
-        uploadType.set('link');
+        locationSelector.observe(function(value) {
+            // switch to the appropriate panel
+            resourcePathPane.set(value);
 
-        pm.add(selector, 'text', false);
-        pm.add(url, 'text', false);
-        pm.add(description, 'text', true);
+            // set the focus
+            if (value == 'local') {
+                file.dom.focus();
+            } else {
+                url.dom.focus();
+            }
+        });
+
+        // change the upload type that will be sent in the request
+        // (bind it with the selection box)
+        $B(this.uploadType,
+           locationSelector,
+           {
+               toSource: function(value) {
+                   // unused;
+               },
+               toTarget: function(value) {
+                   return value=='local'?'file':'link';
+               }
+           });
+
+        // default is 'local' (local file)
+        locationSelector.set('local');
+
+        return resourcePathPane;
+
+    },
+
+    _parentText: function(args) {
+        var text = null;
+
+        if (args.subContId) {
+            text = $T("Same people as parent Subcontribution");
+        } else if (args.contribId) {
+            text = $T("Same people as parent Contribution");
+        } else if (args.sessionId) {
+            text = $T("Same people as parent Session");
+        } else if (args.confId) {
+            text = $T("Same people as parent Conference");
+        } else if (args.categId) {
+            text = $T("Same people as parent Category");
+        }
+
+        text = Html.span({}, text, " ",
+                         Html.span({style: {fontStyle: 'italic'}}," ",
+                                   Protection.ParentRestrictionMessages[args.parentProtected?1:-1]));
+
+        return text;
+    },
+
+    _drawProtectionPane: function(value) {
+
+        var text = null;
+        var entry = this.list.get(value);
+        var selector = null;
+
+        // if the material is already in the tree, protection inheritance must
+        // be resolved
+        if (exists(entry)) {
+
+            this.creationMode = 'resource';
+
+            text = Html.span({}, $T("You're adding a resource to the existing material type"), " ", Html.span({style:{fontWeight: 'bold'}}, entry.get('title')), ". ", $T("Please specify who will be able to access it."));
+
+            // if the material is set to inherit from the parent, display it properly
+            // and set the inherited protection accordingly
+            var protection = Protection.resolveProtection(
+                entry.get('protection'),
+                entry.get('protectedOwner')?1:-1);
+
+            var inheritanceText = Html.span({style: {fontStyle: 'italic'}},
+                                            Protection.ParentRestrictionMessages[protection]);
+
+
+            selector = new RadioFieldWidget([
+                ['inherit', Html.span({}, $T("Same people as the parent material type ")+"\""+entry.get('title')+"\" ", inheritanceText)],
+                ['private', $T("Only me and the users I specify")],
+                ['public', $T("Everyone")]
+            ], 'nobulletsListWrapping');
+
+
+        } else {
+
+            this.creationMode = 'material';
+
+            text = $T("You're about to create a new material type. Please select who can access it.");
+
+            selector = new RadioFieldWidget([
+                ['inherit', this._parentText(this.args)],
+                ['private', $T("Only me and the users I specify")],
+                ['public', $T("Everyone")]
+            ], 'nobulletsListWrapping');
+        }
+
+        this.protectionSelector = selector;
+
+        var self = this;
+
+        this.protectionSelector.observe(function(state) {
+
+            self.userList.userList.clear();
+            self.visibility.set(0);
+            self.password.set('');
+
+            // if 'private' is chosen or 'inherit' was chosen
+            // and the parent resource is protected
+            if (state == 'private') {
+                self.tabWidget.enableTab(1);
+
+                // depending on whether we're creating a new
+                // material or just a result, we will enable/disable
+                // visibility and access key
+                if (self.creationMode == 'material') {
+                    self.visibility.enable();
+                    self.password.enable();
+                } else {
+                    self.visibility.disable();
+                    self.password.disable();
+                }
+
+                // draw a little notification saying that
+                // the added tab can be used
+                self.notification  = new NotificationBalloonPopup(
+                    selector.radioDict[state],
+                    Html.div({style:{width: '120px'}}, $T("You can specify users using this tab")));
+
+                var pos = self.tabWidget.tabs[1].getAbsolutePosition();
+
+                // open it, pointing to tab
+                self.notification.open(pos.x + self.tabWidget.tabs[1].dom.offsetWidth/2, pos.y);
+
+            } else {
+                self.tabWidget.disableTab(1);
+            }
+
+            // set the appropriate data structure behind the scenes
+            self.protectionStatus.set('statusSelection',
+                                      {'private': 1,
+                                       'inherit': 0,
+                                       'public': -1}[state]);
+        });
+
+        // set protection default to 'inherit'
+        if (this.tabWidget) {
+            this.protectionSelector.set('inherit');
+        }
+
+        return Html.div({style:{marginTop: '10px',
+                                height: '150px'
+                               }},
+                        Html.div({style: {textAlign: 'center', fontStyle: 'italic', color: '#881122'}},
+                                 $T(text)),
+                        Html.div({style: {marginTop: '10px'}},
+                                 selector ? selector.draw() : ''));
+    },
+
+    _drawUpload: function() {
+
+        var self = this;
+
+        this.pm = new IndicoUtil.parameterManager();
+        var typeSelector = new TypeSelector(this.pm, this.types, {style:{width: '150px'}});
+        var description = Html.textarea({name: 'description', style:{width:'220px', height: '60px'}});
+
+        // local file vs. url
+        var locationSelector = new RadioFieldWidget([['local',$T('Local file')],['remote',$T('External resource (hyperlink)')]]);
+
+        // draw the resource pane
+        var resourcePathPane = this._drawResourcePathPane(locationSelector);
+        // protection page
+        var protectionPane = $B(
+            Html.div({}),
+            typeSelector,
+            function(value) {
+                return self._drawProtectionPane(value);
+            });
+
+        // make typeSelector available to the object
+        this.typeSelector = typeSelector;
 
         return Html.div({},
                         IndicoUtil.createFormFromMap(
                             [
-                                [$T('Type'),selector],
-                                [$T('URL'), url],
-                                [$T('Description'), description]
+                                [
+                                    $T('Location'),
+                                    Html.div({},
+                                             locationSelector.draw(),
+                                             Html.div({style:{paddingTop: '15px',
+                                                              paddingBottom: '10px',
+                                                              minHeight: '50px'}},
+                                                      Widget.block(resourcePathPane)))
+                                ],
+                                [
+                                    $T('Description'),
+                                    description
+                                ],
+                                [
+                                    $T('Material type'),
+                                    typeSelector.draw()
+                                ]
+
                             ]),
-                        uploadType,
-                        Html.div({style: {'textAlign': 'center'}},
-                                 Widget.button(command(
-                                     function() {
-                                         if (pm.check()) {
-                                             self.killProgress = IndicoUI.Dialogs.Util.progress();
-                                             self.uploading = true;
-                                             self.form.dom.submit();
-                                         }
-                                     }, $T("Upload")))));
+                        protectionPane);
+
+   },
+
+    _upload: function() {
+
+        var check = this.pm.check();
+
+        if (check) {
+            this.killProgress = IndicoUI.Dialogs.Util.progress();
+
+            this.uploading = true;
+
+            this.formDict.userList.set(Json.write(this.userList.getUsers()));
+
+            this.formDict.statusSelection.set(this.protectionStatus.get('statusSelection'));
+
+            this.formDict.visibility.set(this.protectionStatus.get('visibility'));
+            this.formDict.password.set(this.protectionStatus.get('password'));
+            this.formDict.uploadType.set(this.uploadType.get());
+
+            // depending on whether we are selecting a material from the list
+            // or adding a new one, we'll send either an id or a name
+
+            this.formDict.materialId.set(this.typeSelector.get());
+
+            this.form.dom.submit();
+
+        }
     },
+
 
     _drawWidget: function() {
         var self = this;
 
+        this.formDict = {};
         this.frameId = Html.generateId();
 
         var iframe = Html.iframe({id: this.frameId, name: this.frameId, style: {display: 'none'}});
@@ -161,6 +340,13 @@ type("AddMaterialDialog", ["ExclusivePopup"], {
             },
             this.tabWidget.draw());
 
+        each(['statusSelection', 'visibility', 'password', 'userList', 'uploadType', 'materialId'],
+             function(fieldName) {
+                 var elem = Html.input('hidden', {name: fieldName});
+                 self.formDict[fieldName] = elem;
+                 self.form.append(elem);
+             });
+
         var loadFunc = function() {
             if (self.uploading) {
                 self.killProgress();
@@ -171,7 +357,6 @@ type("AddMaterialDialog", ["ExclusivePopup"], {
         };
 
         if (Browser.IE) {
-            // cof! cof!
             iframe.dom.onreadystatechange = loadFunc;
         } else {
             // for normal browsers
@@ -182,20 +367,87 @@ type("AddMaterialDialog", ["ExclusivePopup"], {
             self.form.append(Html.input('hidden',{name: key}, value));
         });
 
-        return Html.div({}, this.form, iframe);
+        return Html.div({},
+                        this.form,
+                        iframe);
 
     },
 
-    draw: function() {
-        this.tabWidget = new TabWidget([[$T('Upload File'), this._drawFileUpload()],
-                                        [$T('Add Link'), this._drawLinkUpload()]],
-                                       400, 200);
+    postDraw: function() {
 
-        return this.ExclusivePopup.prototype.draw.call(this,
+        var selection = "slides";
+
+        // We're not sure that the type "Slides"
+        // will have a "standard" id
+        for (i in this.types) {
+            if (this.types[i][1] == "Slides") {
+                selection = this.types[i][0];
+            }
+        }
+
+        this.typeSelector.set(selection);
+        this.ButtonBarExclusivePopup.prototype.postDraw.call(this);
+    },
+
+    _drawProtectionDiv: function() {
+        this.visibility = new RadioFieldWidget([
+            [0, Html.span({}, $T("This resource is visible to everyone"))],
+            [1, $T("Only people who can access the resource can see it")]]);
+
+        this.password = Html.input('password',{});
+
+        this.userList =  new UserListField('ShortPeopleListDiv',
+                'PluginPeopleList',
+                this.allowedUsers,
+                null,
+                null,
+                true, false, false,
+                userListNothing, userListNothing, userListNothing, true);
+
+        // Bind fields to data structure
+        $B(this.protectionStatus.accessor('visibility'), this.visibility);
+        $B(this.protectionStatus.accessor('password'), this.password);
+
+        this.visibility.set(0);
+        this.password.set('');
+
+        var privateInfoDiv = IndicoUtil.createFormFromMap(
+                            [
+                                [
+                                    $T('Allowed users and groups'),
+                                    this.userList.draw()
+                                ],
+                                [
+                                    $T('Visibility'),
+                                    this.visibility.draw()
+                                ],
+                                [
+                                    $T('Access key'),
+                                    this.password
+                                ]
+                            ]);
+
+        return privateInfoDiv;
+    },
+
+    draw: function() {
+        var self = this;
+
+        self.newMaterial = $O();
+
+        var protectionDiv = this._drawProtectionDiv();
+
+        this.tabWidget = new TabWidget([[$T('Upload'), this._drawUpload()],
+                                        [$T("Protection"), protectionDiv]],
+                                       400, 300);
+
+        return this.ButtonBarExclusivePopup.prototype.draw.call(this,
                                                        this._drawWidget());
     }
 
+
 }, function(args, list, types, uploadAction, onUpload) {
+
     var self = this;
     this.list = list;
     this.types = types;
@@ -206,7 +458,10 @@ type("AddMaterialDialog", ["ExclusivePopup"], {
     this.args = clone(args);
 //    this.args.materialId = material;
 
-    this.ExclusivePopup($T("Upload Material"),
+    this.protectionStatus = $O();
+    this.uploadType = new WatchValue();
+
+    this.ButtonBarExclusivePopup($T("Upload Material"),
                         function() {
                             self.close();
                         });
@@ -232,6 +487,25 @@ type("EditMaterialDialog", ["ServiceDialog", "PreLoadHandler"], {
         var params = clone(this.args);
         params.materialInfo = this.newMaterial;
         this.newMaterial.set('userList', this.userList.getUsers());
+
+        // get a list of material titles
+        var matTitles = translate(this.list,
+            function(mat){
+                return mat.get('title');
+            });
+
+        // look for one with the same name
+        var i = -1;
+        for (var j in matTitles) {
+            if (matTitles[i] == params.materialInfo.get('title')) {
+                i = j;
+            }
+        }
+
+        if (i < 0) {
+            this.types.push([params.materialInfo.get('id'), params.materialInfo.get('title')]);
+        }
+
         this.request(params);
     },
 
@@ -254,11 +528,11 @@ type("EditMaterialDialog", ["ServiceDialog", "PreLoadHandler"], {
         );
 
         statusSelection.observe(function(value) {
-            if (value === 0 && self.material.get('protectedOwner') ||
+            if (value == 0 && self.material.get('protectedOwner') ||
                 value == 1) {
-                privateInfoDiv.setStyle('border',null);
+                self.privateInfoDiv.show();
             } else {
-                IndicoUI.Effect.frame(privateInfoDiv);
+                self.privateInfoDiv.hide();
             }
         });
 
@@ -277,21 +551,23 @@ type("EditMaterialDialog", ["ServiceDialog", "PreLoadHandler"], {
                                            userListNothing, userListNothing, userListNothing, true);
 
 
-        var privateInfoDiv = Html.div(
+        self.privateInfoDiv = Html.div(
             {style:{padding:pixels(2)}},
             Html.div({},
                      Html.label({}, $T('Allowed users')),
                      self.userList.draw()),
-            Html.div({style:{marginTop: pixels(4)}},
+            Html.div({style:{marginTop: pixels(8)}},
                      Html.label({}, $T('Visibility: ')),
                      $B(visibility,
                         self.newMaterial.accessor('hidden'))),
-            Html.div({},
+            Html.div({style:{marginTop: pixels(5)}},
                      Html.label({}, $T('Access Key: ')),
                      $B(Html.input('password',{}),
                         self.newMaterial.accessor('accessKey')))
         );
-
+        if ( !self.material.get('protectedOwner')) {
+            self.privateInfoDiv.hide();
+        }
 
         var protectionDiv = Html.div(
             {style: {marginTop: pixels(5)}},
@@ -300,12 +576,13 @@ type("EditMaterialDialog", ["ServiceDialog", "PreLoadHandler"], {
                      $B(statusSelection,
                         self.newMaterial.accessor('protection'))
                     ),
-            privateInfoDiv);
+            self.privateInfoDiv);
 
         var title = Html.input('text',{});
         var titleDiv = Widget.block([Html.label({},"Title: "),title]);
         var description = Html.textarea({name:'description',style: {width: '250px'}});
         var descDiv = Widget.block([Widget.block(Html.label({},"Description: ")),description]);
+
         var buttonDiv = Widget.block([
             Widget.button(command(function() {
                 self._saveCategory();
@@ -318,9 +595,11 @@ type("EditMaterialDialog", ["ServiceDialog", "PreLoadHandler"], {
         $B(title, self.newMaterial.accessor('title'));
         $B(description, self.newMaterial.accessor('description'));
 
+        statusSelection.notifyObservers();
+
         var tabControl = new TabWidget([
             [$T("Information"), Widget.block([titleDiv,descDiv])],
-            [$T("Access Control") , protectionDiv]], 300,200, 0);
+            [$T("Protection") , protectionDiv]], 300,300);
 
         return this.ExclusivePopup.prototype.draw.call(
             this,
@@ -330,9 +609,10 @@ type("EditMaterialDialog", ["ServiceDialog", "PreLoadHandler"], {
     }
 },
 
-     function(args, material, list, title) {
+     function(args, types, material, list, title) {
          this.material = material;
          this.materialId = this.material.get('id');
+         this.types = types;
          this.list = list;
 
          args = clone(args);
@@ -408,41 +688,61 @@ type("EditResourceDialog", ["ServiceDialog", "PreLoadHandler"], {
                                           true, false, false,
                                           userListNothing, userListNothing, userListNothing, true);
 
+        var isFatherProtected;
+        if(self.material.materialProtection == -1){
+            isFatherProtected = false;
+        }
+        else if(self.material.materialProtection == 1){
+            isFatherProtected = true;
+        }
+        //then its value is 0
+        else{
+            //check the value of the material's parent
+            isFatherProtected = self.material.parentProtected;
+        }
         var statusSelection = Widget.select(
-            $L({
-                0:(self.resource.get('protectedOwner')?$T('Private'):$T('Public'))+' '+$T('(from parent)'),
-                1:$T('Private (by itself)'),
-                '-1':$T('Public (by itself)')
-            })
-        );
+                $L({
+                    0:(isFatherProtected?$T('Private'):$T('Public'))+' '+$T('(from parent)'),
+                    1:$T('Private (by itself)'),
+                    '-1':$T('Public (by itself)')
+                })
+            );
 
         statusSelection.observe(function(value) {
-            if (value === 0 && self.resource.get('protectedOwner') ||
-                value == 1) {
-                privateInfoDiv.setStyle('border',null);
-            } else {
-                IndicoUI.Effect.frame(privateInfoDiv);
+
+            if (value == 0 && isFatherProtected || value == 1) {
+                self.privateInfoDiv.show();
+            }
+            else {
+                self.privateInfoDiv.hide();
             }
         });
 
-        var privateInfoDiv = Html.div(
+        self.privateInfoDiv = Html.div(
             {style:{padding:pixels(2)}},
             Html.div({},
                      Html.label({}, $T('Allowed users')),
                      self.userList.draw()));
+
+        if ( !isFatherProtected) {
+            self.privateInfoDiv.hide();
+        }
 
         var protectionDiv = Html.div(
             {style: {marginTop: pixels(5)}},
             Html.div({},
                      Html.label({},$T("Status: ")),
                      $B(statusSelection,
-                        self.newResource.accessor('protection'))), privateInfoDiv);
+                        self.newResource.accessor('protection'))), self.privateInfoDiv);
 
         var tabControl = new TabWidget([
             [$T("Information"), Widget.block([nameDiv,this.resource.type=='stored'?[]:urlDiv,descDiv])],
-            [$T("Access Control")   , protectionDiv]], 300,200, 0);
-        tabControl.options = $L([$T("Information"), $T("Access Control")]);
+            [$T("Protection")   , protectionDiv]], 300,200);
+        tabControl.options = $L([$T("Information"), $T("Protection")]);
         tabControl.selected.set($T("Information"));
+
+        statusSelection.notifyObservers();
+
 
         return this.ExclusivePopup.prototype.draw.call(
             this,
@@ -545,6 +845,7 @@ type("ResourceListWidget", ["ListWidget"], {
                                 var parent = resourceNode.dom.parentNode;
                                 self.resources.remove(resource);
                                 self.set(resourceId, null);
+                                //if it's in the custom material list and it's the last resource in it, we delete it
                                 killProgress();
                             }
                         }
@@ -621,11 +922,10 @@ type("ResourceListWidget", ["ListWidget"], {
         return resourceNode;
     }
 
-}, function(resources, matParams) {
-
+}, function(resources, matParams, materialTitle) {
     this.matParams = matParams;
     this.resources = resources;
-
+    this.materialName = materialTitle;
     this.ListWidget();
 
     var self = this;
@@ -642,6 +942,15 @@ type("ResourceListWidget", ["ListWidget"], {
 
 });
 
+function contains(a, obj){
+    for(var i = 0; i < a.length; i++) {
+      if(a[i] === obj){
+        return true;
+      }
+    }
+    return false;
+}
+
 type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
 
     _drawItem: function(pair) {
@@ -652,7 +961,9 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
         var args = clone(self.args);
         var materialId = pair.key;
         args.materialId = materialId;
-
+        //we use lowercase because for the default materials it is saved in the server like for example 'Paper',
+        //but then in the selectBox it will be like 'paper'
+        args.materialIdsList.set(material.get('title').toLowerCase(), materialId);
         var deleteMaterial = function() {
             if (confirm("Are you sure you want to delete '"+material.get('title')+"'?")) {
                 var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
@@ -665,6 +976,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
                                 IndicoUtil.errorReport(error);
                             } else {
                                 self.set(materialId, null);
+                                //if it's in the custom material list, we delete it
                                 killProgress();
                             }
                         }
@@ -691,6 +1003,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
                     function(){
                         IndicoUI.Dialogs.Material.editMaterial(
                             self.args,
+                            self.types,
                             material,
                             self);
                     },
@@ -714,7 +1027,8 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
             menu = Html.span({},ab,rb,eb,revStateImg);
         }
 
-        var matWidget = new ResourceListWidget(material.get('resources'), args);
+        args.materialProtection = material.get('protection');
+        var matWidget = new ResourceListWidget(material.get('resources'), args, material.get('title'));
 
         // check whenever a material gets empty (no resources) and delete it
         material.get('resources').observe(
@@ -780,6 +1094,26 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
         return this.RemoteWidget.prototype.draw.call(this);
     },
 
+    _updateMaterialList: function(material) {
+        // add type to custom list, if not there
+        var i = -1;
+
+        for (var j in this.types) {
+            if (this.types[i][1] == material.get('title')) {
+                i = j;
+                break;
+            }
+        }
+
+        var newElement = [material.get('id'), material.get('title')];
+
+        if (i >= 0) {
+            this.types[i] = newElement;
+        } else {
+            this.types.push(newElement);
+        }
+    },
+
     _loadMaterial: function(id) {
         var self = this;
 
@@ -789,6 +1123,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
         var source = indicoSource('material.get', args);
 
         source.state.observe(function(state) {
+
             if (state == SourceState.Loaded) {
                 var material = $O($O(source).getAll());
                 var obj = watchize(clone(material.get('resources')));
@@ -797,6 +1132,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
                 self.set(id,
                          material);
 
+                self._updateMaterialList(material);
 
             }
         });
@@ -806,26 +1142,27 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
 
         var self = this;
 
-
         $O(self.source).each(function(value, key){
             var obj = watchize(value);
             self.set(key, obj);
         });
 
+        var materialLoadFunction = function(info) {
+            if (self.get(info.material)) {
+                self.get(info.material).get('resources').append(watchize(info));
+            } else {
+                self._loadMaterial(info.material);
+            }
+        };
+
         var link = Widget.link(command(function(){
+
             IndicoUI.Dialogs.Material.add(self.args,
                                           self,
                                           self.types,
                                           self.uploadAction,
-                                          function(info) {
-                                              if (self.get(info.material)) {
-                                                  self.get(info.material).get('resources').append(watchize(info));
-                                              } else {
-                                                  self._loadMaterial(info.material);
-                                              }
-                                          });
+                                          materialLoadFunction);
         }, $T("Add Material")));
-
         return Html.div(
             {},
             Html.div({style:{textAlign: 'left'}}, link),
@@ -845,11 +1182,25 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
          this.ListWidget("materialList");
          this.RemoteWidget('material.list',
                            args);
-
+         this.args.materialIdsList = $O();
      }
-    );
+);
 
-type("MaterialEditorDialog", ["ExclusivePopup"], {
+type("MaterialEditorDialog", ["ButtonBarExclusivePopup"], {
+
+    _drawButtons: function() {
+
+        var self = this;
+        var buttonDiv = Html.div({},
+            Widget.button(command(function() {
+                self.close();
+                window.location.reload(true);
+            }, $T("Close"))));
+
+        return buttonDiv;
+    },
+
+
     draw: function() {
         var self = this;
         var changes = 0;
@@ -859,7 +1210,8 @@ type("MaterialEditorDialog", ["ExclusivePopup"], {
             'confId': intToStr(this.confId),
             'sessionId': intToStr(this.sessId),
             'contribId': intToStr(this.contId),
-            'subContId': intToStr(this.subContId)
+            'subContId': intToStr(this.subContId),
+            'parentProtected': this.parentProtected
         };
 
         // Remove null parameters
@@ -871,19 +1223,15 @@ type("MaterialEditorDialog", ["ExclusivePopup"], {
 
         var mlist = new MaterialListWidget(args, this.types, this.uploadAction, this.width, this.height);
 
-        return this.ExclusivePopup.prototype.draw.call(
+        return this.ButtonBarExclusivePopup.prototype.draw.call(
             this,
             Html.div({style: {width: pixels(this.width),
                               height: pixels(this.height+50)}},
-                     mlist.draw(),
-                     Widget.button(command(function() {
-                         self.close();
-                         window.location.reload(true);
-                     }, $T("Close")))));
+                     mlist.draw()));
     }
 },
 
-     function(confId, sessId, contId, subContId, types, uploadAction, title, width, height, refresh) {
+     function(confId, sessId, contId, subContId, parentProtected, types, uploadAction, title, width, height, refresh) {
          this.confId = confId;
          this.sessId = sessId;
          this.contId = contId;
@@ -893,7 +1241,8 @@ type("MaterialEditorDialog", ["ExclusivePopup"], {
          this.width = width;
          this.height = height;
          this.refresh = refresh;
-         this.ExclusivePopup(title);
+         this.parentProtected = parentProtected;
+         this.ButtonBarExclusivePopup(title);
      });
 
 IndicoUI.Dialogs.Material = {
@@ -902,8 +1251,8 @@ IndicoUI.Dialogs.Material = {
         var dialog = new AddMaterialDialog(args, list, types, uploadAction, onUpload);
         dialog.open();
     },
-    editMaterial: function(args, material, list) {
-        var dialog = new EditMaterialDialog(args, material, list, $T("Edit Material"));
+    editMaterial: function(args, types, material, list) {
+        var dialog = new EditMaterialDialog(args, types, material, list, $T("Edit Material"));
         dialog.execute();
     },
 
@@ -912,8 +1261,8 @@ IndicoUI.Dialogs.Material = {
         dialog.execute();
     },
 
-    editor: function(confId, sessId, contId, subContId, types, uploadAction, refresh) {
-        var dialog = new MaterialEditorDialog(confId, sessId, contId, subContId, types, uploadAction, $T("Edit Materials"), 400, 300, refresh);
+    editor: function(confId, sessId, contId, subContId, parentProtected, types, uploadAction, refresh) {
+        var dialog = new MaterialEditorDialog(confId, sessId, contId, subContId, parentProtected, types, uploadAction, $T("Edit Materials"), 400, 300, refresh);
         dialog.open();
     }
 };

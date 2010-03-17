@@ -332,67 +332,61 @@ class DefaultMaterialFactory(MaterialFactory):
     """ Default factory, searches for material with same name,
     and creates new one if needed. """
 
-    # inheritance from MaterialFactory is actually not needed
+    def __init__(self, matId):
+        self.name = matId
 
-    def __init__(self, name):
-        self.name = name
-    
     def get( self, owner ):
         """returns the material"""
 
         for mat in owner.getMaterialList():
-            if mat.getTitle() == self.name:
+            if mat.getTitle().lower() == self.name.lower():
                 return mat
-
-        return None
-
-    def getTitle(self):
-        return self.name
-
-    def getId(self):
-        return self.id
 
     def remove( self, owner ):
         """performs the deletion of the slides from the owner"""
         owner.removeMaterial(self.get(owner))
 
     def canAdd( self, target ):
-        #only one slide can be added to a contribution
         return True
 
     def canDelete( self, target ):
-        #only a slide which is already set in a contribution can be deleted
         return len(target.getMaterialList) > 0
 
     def getModificationURL( self, mat ):
-        """returns the URL for accessing to the modification view of the 
+        """returns the URL for accessing to the modification view of the
             material"""
         return urlHandlers.UHMaterialModification.getURL( mat )
 
-    def create( self, target ):
+    def create(self, target):
         m = conference.Material()
-        m.setTitle(self.name)
+        m.setTitle(self.name.title())
         target.addMaterial( m )
         return m
+
 
     @classmethod
     def getInstance(cls, name):
         return cls(name)
 
+
 class MaterialFactoryRegistry:
-    """Keeps a list of material factories. When a new material type wants to be 
+    """Keeps a list of material factories. When a new material type wants to be
         added one just needs to implement the corresponding factory and add the
         entry in the "_registry" attribute of this class
     """
-    _registry = {} 
+    _registry = {}
 
     @classmethod
-    def getById( cls, id ):
-        return cls._registry.get(id.lower().strip(), DefaultMaterialFactory.getInstance(id))
+    def getById( cls, matId ):
+        return cls._registry.get(matId, DefaultMaterialFactory.getInstance(matId))
 
     @classmethod
     def getList( cls ):
         return cls._registry.values()
+
+    @classmethod
+    def getIdList( cls ):
+        return cls._registry.keys()
 
     @classmethod
     def get(cls,mat):

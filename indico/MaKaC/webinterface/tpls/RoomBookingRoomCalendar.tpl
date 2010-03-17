@@ -23,7 +23,10 @@ Calendar 1-----* DayRow 1-----* Bar
 
 <!-- Room Calendar ================================================================== -->
 <br /><br />
-<span class="formTitle" style="border-bottom-width: 0px">Availability for <%= room.name %></span>
+<span class="formTitle" style="border-bottom-width: 0px">Availability for <%= room.building %>-<%= room.floor %>-<%= room.roomNr %>
+    <% if room.name != str(room.building) + '-' + str(room.floor) + '-' + str(room.roomNr): %>
+        <small>(<%= room.name %>)</small>
+    <% end %></span>
 <% if not withConflicts: %>
     <a href="<%= urlHandlers.UHRoomBookingRoomDetails.getURL( room, calendarMonths = True ) %>"<small>( <%= _("show 3 months preview")%>)</small></a>
 <% end %>

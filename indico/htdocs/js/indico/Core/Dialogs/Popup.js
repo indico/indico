@@ -280,13 +280,30 @@ type("ExclusivePopupWithButtons", ["ExclusivePopup"], {
     }
 );
 
+/* ExclusivePopup with a grey bar where buttons can be put */
+type("ButtonBarExclusivePopup", ["ExclusivePopup"],
+     {
+         draw: function(content, style) {
+
+             var menu = Html.div("buttonBar", this._drawButtons());
+
+             var canvas = this.ExclusivePopup.prototype.draw.call(this, content, style);
+             this.container.append(menu);
+
+             return canvas;
+         }
+     },
+     function(title, closeButtonHandler, printable, showPrintButton) {
+         this.ExclusivePopup(title, closeButtonHandler, printable, showPrintButton);
+     });
+
 type("BalloonPopup", ["PopupDialog"], {
     draw: function(x, y) {
         var self = this;
 
         this.closeButton = Html.div({className: 'balloonPopupCloseButton'});
-        this.balloonContent = Html.div({className: 'balloonPopup'}, this.closeButton, this.content);
-        this.arrowDiv = Html.div({className: 'balloonPopupArrow', style: {width: this.arrowWidth, height: this.arrowHeight}});
+        this.balloonContent = Html.div({className: this.balloonClass}, this.hasCloseButton ? this.closeButton : '', this.content);
+        this.arrowDiv = Html.div({className: this.arrowClass, style: {width: this.arrowWidth, height: this.arrowHeight}});
         this.mainDiv = Html.div({}, this.balloonContent, this.arrowDiv);
 
         // Hide it until everything is prepared
@@ -298,7 +315,10 @@ type("BalloonPopup", ["PopupDialog"], {
         var toReturn = this.PopupDialog.prototype.draw.call(this, this.mainDiv, x, y);
 
         this.arrowDiv.dom.style.left = pixels(0);
-        this.closeButton.observeClick(function() {self.close();});
+
+        if (this.hasCloseButton) {
+            this.closeButton.observeClick(function() {self.close();});
+        }
 
         return toReturn;
     },
@@ -386,8 +406,13 @@ type("BalloonPopup", ["PopupDialog"], {
             this.arrowDiv.dom.offsetHeight;
     }
     },
-     function(content, triggerElement, closeHandler, nonCloseElements) {
+     function(content, triggerElement, closeHandler, nonCloseElements, balloonClass, arrowClass) {
          this.PopupDialog(content, triggerElement, closeHandler, nonCloseElements);
+
+         this.hasCloseButton = exists(closeHandler);
+
+         this.balloonClass = balloonClass || 'balloonPopup';
+         this.arrowClass = arrowClass || 'balloonPopupArrow';
 
          // Constants
          this.arrowHeight = 19;
@@ -395,6 +420,29 @@ type("BalloonPopup", ["PopupDialog"], {
          this.cornerRadius = 6;
      }
 );
+
+/**
+ * Utility function to display a simple notification popup.
+ * @param {XElement} pointElement The element that triggers the event (onClick on it will be ignored)
+ * @param {XElement} content Anything you want to put inside.
+ */
+type("NotificationBalloonPopup", ["BalloonPopup"],
+     {
+     },
+     function(pointElement, content) {
+         this.pointElement = pointElement;
+
+         var canvas = Html.div({style:
+                                {padding: '5px'}}, content);
+
+         this.BalloonPopup(canvas,
+                           pointElement,
+                           null,
+                           null,
+                           'balloonPopup yellowBalloon',
+                           'balloonPopupArrow yellowArrow');
+     });
+
 
 /**
  * Utility function to display a simple alert popup.

@@ -29,6 +29,7 @@ try:
 except ImportError:
     pass
 import string,re
+import simplejson
 
 import MaKaC.conference as conference
 import MaKaC.schedule as schedule
@@ -44,6 +45,8 @@ from MaKaC.i18n import _
 from MaKaC.common.timezoneUtils import DisplayTZ, nowutc, getAdjustedDate
 from MaKaC.common.utils import getHierarchicalId
 from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
+from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
+from MaKaC.common.PickleJar import DictPickler
 
 
 def fake(string1=""):
@@ -106,6 +109,29 @@ class outputGenerator:
 
         from MaKaC.webinterface.webFactoryRegistry import WebFactoryRegistry
         self.webFactory = WebFactoryRegistry()
+
+    # TODO: Put this out of here, and unify with WShowExistingMaterial._generateMaterialList
+    # (when we have a better class hierarchy)
+    def _generateMaterialList(self, obj):
+        """
+        Generates a list containing all the materials, with the
+        corresponding Ids for those that already exist
+        """
+
+        from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
+        if isinstance(obj, conference.Category):
+            _allowedMats = RHSubmitMaterialBase._allowedMatsCategory
+        else:
+            _allowedMats = RHSubmitMaterialBase._allowedMatsEvent[obj.getConference().getType()]
+
+        matDict = dict((title.lower(), title) for title in _allowedMats)
+
+        for material in obj.getMaterialList():
+            title = material.getTitle().lower()
+            matDict[title] = material.getId()
+
+        return sorted(list((matId, title.title()) for title, matId in matDict.iteritems()))
+
 
     def getOutput(self, conf, stylesheet, vars=None, includeSession=1,includeContribution=1,includeMaterial=1,showSession="all",showDate="all",showContribution="all"):
         # get xml conference
@@ -185,6 +211,9 @@ class outputGenerator:
         else:
             out.writeTag("category","")
 
+        out.writeTag("parentProtection", simplejson.dumps(conf.getAccessController().isProtected()))
+        out.writeTag("materialList", simplejson.dumps(self._generateMaterialList(conf)))
+
         if conf.canModify( self.__aw ) and vars and modificons:
             out.writeTag("modifyLink",vars["modifyURL"])
         if conf.canModify( self.__aw ) and vars and modificons:
@@ -197,6 +226,21 @@ class outputGenerator:
             out.writeTag("iCalLink",vars["iCalURL"])
         if  vars and vars.has_key("webcastAdminURL"):
             out.writeTag("webcastAdminLink",vars["webcastAdminURL"])
+
+        materials = set(material.getTitle() for material in conf.getMaterialList())
+
+        from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
+
+        if conf.getType() == 'conference':
+            standardMaterials = set(RHSubmitMaterialBase._allowedMatsConference)
+        elif conf.getType() == 'simple_event':
+            standardMaterials = set(RHSubmitMaterialBase._allowedMatsForSE)
+        elif conf.getType() == 'meeting':
+            standardMaterials = set(RHSubmitMaterialBase._allowedMatsForMeetings)
+
+        customMaterials = list(materials.difference(standardMaterials))
+
+        out.writeTag("customMaterialList", simplejson.dumps(customMaterials))
 
         if conf.getOrgText() != "":
             out.writeTag("organiser", conf.getOrgText())
@@ -250,7 +294,19 @@ class outputGenerator:
                 out.writeTag("name",l.getName())
                 out.writeTag("address",l.getAddress())
             if conf.getRoom():
-                out.writeTag("room",conf.getRoom().getName())
+                # get the name that is saved
+                roomName = conf.getRoom().getName()
+
+                # if there is a connection to the room booking DB
+                if CrossLocationDB.isConnected() and loc:
+                    # get the room info
+                    roomFromDB = CrossLocationQueries.getRooms( roomName = roomName, location = loc.getName() )
+                    # if there's a room with such name
+                    if roomFromDB:
+                        # use the full name instead
+                        roomName = roomFromDB.getFullName()
+
+                out.writeTag("room", roomName)
                 url=RoomLinker().getURL(conf.getRoom(), loc)
                 if url != "":
                     out.writeTag("roomMapURL",url)
@@ -421,6 +477,7 @@ class outputGenerator:
             modificons = 1
         out.openTag("session")
         out.writeTag("ID",session.getId())
+
         if session.getCode() not in ["no code", ""]:
             out.writeTag("code",session.getCode())
         else:
@@ -504,6 +561,11 @@ class outputGenerator:
             modificons = 1
         out.openTag("session")
         out.writeTag("ID",session.getId())
+
+        out.writeTag("parentProtection", simplejson.dumps(session.getAccessController().isProtected()))
+        out.writeTag("materialList", simplejson.dumps(self._generateMaterialList(session)))
+
+
         slotCode = session.getSortedSlotList().index(slot) + 1
         if session.getCode() not in ["no code", ""]:
             out.writeTag("code","%s-%s" % (session.getCode(),slotCode))
@@ -578,6 +640,10 @@ class outputGenerator:
             modificons = 1
         out.openTag("contribution")
         out.writeTag("ID",cont.getId())
+
+        out.writeTag("parentProtection", simplejson.dumps(cont.getAccessController().isProtected()))
+        out.writeTag("materialList", simplejson.dumps(self._generateMaterialList(cont)))
+
         if cont.getBoardNumber() != "":
             out.writeTag("board",cont.getBoardNumber())
         if cont.getTrack() != None:
@@ -677,6 +743,10 @@ class outputGenerator:
             modificons = 1
         out.openTag("subcontribution")
         out.writeTag("ID",subCont.getId())
+
+        out.writeTag("parentProtection", simplejson.dumps(subCont.getContribution().getAccessController().isProtected()))
+        out.writeTag("materialList", simplejson.dumps(self._generateMaterialList(subCont)))
+
         if subCont.canModify( self.__aw ) and vars and modificons:
             out.writeTag("modifyLink",vars["subContribModifyURLGen"](subCont))
         if (subCont.canModify( self.__aw ) or subCont.canUserSubmit( self.__aw.getUser())) and vars and modificons:

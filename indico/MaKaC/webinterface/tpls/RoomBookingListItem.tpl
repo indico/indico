@@ -4,14 +4,14 @@
         var reason = prompt( 'Are you sure you want to REJECT the booking for '+date+'? If so, please give a reason:', '' );
         if ( reason == null )
             return false;
-        
+
         element.href = element.href + '&reason=' + encodeURI( reason );
-		return true;        
+		return true;
     }
-	
+
 	function confirm_reject_reservation(date)
-    {                
-		return confirm( 'Are you sure you want to REJECT the booking for '+date+'? If so, please give a reason:', '' );        
+    {
+		return confirm( 'Are you sure you want to REJECT the booking for '+date+'? If so, please give a reason:', '' );
     }
 </script>
 <%
@@ -53,10 +53,15 @@ occurrenceId = 'resv%s%s' % (reservation.id, occurrence.startDT)
           <% end %>
         </td>
     <% end %>
-    <td <%=onClickDetails%> style="padding: 0px 10px 6px 0px; cursor: pointer;"><nobr><%= reservation.room.name %></nobr></td>
+    <td <%=onClickDetails%> style="padding: 0px 10px 6px 0px; cursor: pointer;"><nobr><%= room.building %>-<%= room.floor %>-<%= room.roomNr %>
+        <% if room.name != str(room.building) + '-' + str(room.floor) + '-' + str(room.roomNr): %>
+            <small>(<%= room.name %>)</small>
+        <% end %>
+        </nobr>
+    </td>
     <td <%=onClickDetails%> style="padding: 0px 10px 6px 0px; cursor: pointer;"><%= str( reservation.reason ) + "<br />" + str( reservation.bookedForName ) %></td>
     <td <%=onClickDetails%> style="padding: 0px 10px 6px 0px; cursor: pointer;">
-        <%= formatDate(occurrence.startDT.date()) %> 
+        <%= formatDate(occurrence.startDT.date()) %>
     </td>
     <td <%=onClickDetails%> style="padding: 0px 10px 6px 0px; cursor: pointer;"><%= verbose_t( reservation.startDT.time() ) %><br /><%= verbose_t( reservation.endDT.time() ) %></td>
     <td style="padding: 0px 10px 6px 0px;">

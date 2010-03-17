@@ -19,8 +19,8 @@
                                 <%= title %>:
                             <% end %>
                             </span><br /><br />
-                            
-                            
+
+
 <table width="100%%" class="filesTab">
 <tr>
 <td>
@@ -29,7 +29,7 @@
 			<td style="white-space: nowrap;">
                 <script type="text/javascript">
                 isOver = false
-                function handleMouseOverResv( id ) { 
+                function handleMouseOverResv( id ) {
 	                if ( isOver ) return
 	                isOver = true
 	                resvTR = document.getElementById( id )
@@ -63,8 +63,12 @@
 					                <img src="<%= room.getSmallPhotoURL() %>" />
 					            <% end %>
 					        </td>
-					        <td <%=onClickDetails%> ><%= room.name %></td>
-					        <td <%=onClickDetails%> ><%= room.capacity %></td>
+					        <td <%=onClickDetails%> ><%= room.building %>-<%= room.floor %>-<%= room.roomNr %>
+                                <% if room.name != str(room.building) + '-' + str(room.floor) + '-' + str(room.roomNr): %>
+                                    <small>(<%= room.name %>)</small>
+                                <% end %>
+                            </td>
+					        <td <%=onClickDetails%> align = 'center'><%= room.capacity %></td>
 					        <td <%=onClickDetails%> ><%= room.site %></td>
                             <td>
                                 <a href="<%= myDetails %>" > <%= _("view")%></a> <br />
@@ -95,7 +99,7 @@
 </td>
 </tr>
 </table>
-                        
+
                         </td>
                     </tr>
                 </table>

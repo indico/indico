@@ -108,9 +108,17 @@ type("SelectableListWidget", ["ListWidget"],
     }
 );
 
-type("TabWidget", ["Chooser", "IWidget"],{
+type("TabWidget", ["IWidget"],{
     _titleTemplate: function(text) {
         return text;
+    },
+
+    enableTab: function(index) {
+        this.tabs[index].dom.style.display = 'inline';
+    },
+
+    disableTab: function(index) {
+        this.tabs[index].dom.style.display = 'none';
     },
 
     enable: function() {
@@ -119,6 +127,28 @@ type("TabWidget", ["Chooser", "IWidget"],{
 
     disable: function() {
         this.disableOverlay.dom.style.display = 'block';
+    },
+
+    _drawContent: function() {
+
+        var self = this;
+
+        try {
+
+            each(this.optionDict,
+                 function(value, key) {
+                     if (key == self.selected.get()) {
+                         value.dom.style.display = 'block';
+                     } else {
+                         value.dom.style.display = 'none';
+                     }
+                 });
+
+        } catch(e) {
+            if (e == "stopDrawing") {
+                // Otherwise stop drawing
+            }
+        }
     },
 
     draw: function(dataRetrievalFunc) {
@@ -209,19 +239,16 @@ type("TabWidget", ["Chooser", "IWidget"],{
 
         // this piece of code is sensitive to exceptions
         // coming from the drawing functions (for LookupTabWidget)
-        try {
-            if(dataRetrievalFunc) {
-                dataRetrievalFunc.call(this);
-            }
-
-            // if everything goes OK, replace the canvas
-            this.canvas.set(Widget.block(this));
-
-        } catch(e) {
-            if (e == "stopDrawing") {
-                // Otherwise stop drawing
-            }
+        if(dataRetrievalFunc) {
+            dataRetrievalFunc.call(this);
+        } else {
+            each(this.optionDict,
+                 function(value, key) {
+                     self.canvas.append(value);
+                 });
         }
+
+        this._drawContent();
 
         var wrapperStyle = this.width?{width: pixels(this.width)}:{};
 
@@ -423,7 +450,7 @@ type("TabWidget", ["Chooser", "IWidget"],{
          this.canvas = canvas || Html.div('canvas');
 
          if (!exists(initialSelection)) {
-             initialSelection = 0;
+             initialSelection = options[0][0];
          }
 
          this.options = new WatchList();
@@ -434,25 +461,20 @@ type("TabWidget", ["Chooser", "IWidget"],{
              var key = pair[0];
 
              self.options.append(key);
-             if (value.getParent()) {
-                 value.getParent().dom.removeChild(value.dom);
-                 value.setStyle('display','');
-             }
          });
 
-         this.selected = new WatchValue(this.options.item(initialSelection));
+         this.optionDict = {};
+         each(options, function(item) {
+             self.optionDict[item[0]] = item[1];
+         });
+
+         this.selected = new WatchValue();
 
          this.selected.observe(function(value) {
-             self.set(value);
+             self._drawContent();
          });
 
-         var optionDict = {};
-         each(options, function(item) {
-             optionDict[item[0]] = item[1];
-         });
-
-         this.Chooser(optionDict);
-         this.set(this.selected.get());
+         this.selected.set(initialSelection);
 
          this.initializeDisableOverlay();
      }
@@ -460,51 +482,32 @@ type("TabWidget", ["Chooser", "IWidget"],{
 
 type("LookupTabWidget", ["TabWidget"],
      {
+         _drawContent: function() {
+             var self = this;
+
+             try {
+                 this.canvas.set(this.optionDict[self.selected.get()]());
+
+             } catch(e) {
+                 if (e == "stopDrawing") {
+                     // Otherwise stop drawing
+                 }
+             }
+         },
+
          draw: function() {
              return this.TabWidget.prototype.draw.call(
                  this,
                  function() {
-                     this.set(this.selected.get());
+                     this.canvas.set(Html.div({}));
                  });
          }
      },
+
      function(options, width, height, initialSelection, extraButtons, canvas) {
-
-         var self = this;
-         this.width = width;
-         this.height = height;
-         this.tabs = [];
-         this.leftTabIndex = 0;
-         this.rightTabIndex = 0;
-         this.scrollArrows = {};
-         this.scrollArrowStates = {};
-         this.extraButtons = any(extraButtons, []);
-         this.canvas = canvas || Html.div('canvas');
-
-         this.initializeDisableOverlay();
-
-         if (!exists(initialSelection)) {
-             initialSelection = 0;
-         }
-         this.options = $L(translate(options,
-                                     function(value) {
-                                         return value[0];
-                                     }));
-
-         this.selected = new WatchValue(this.options.item(initialSelection));
-
-         this.selected.observe(function(value) {
-             self.set(value);
-         });
-
-         var optionDict = {};
-         each(options, function(item) {
-             optionDict[item[0]] = item[1];
-         });
-
-         this.Chooser(new Lookup(optionDict));
-
+         this.TabWidget(options, width, height, initialSelection, extraButtons, canvas);
      }
+
     );
 
 type("RemoteWidget", [],
@@ -741,8 +744,8 @@ type("PopupWidget", [], {
         this.isopen = false;
     }
     },
-    function() {
-        this.canvas = Html.div();
+    function(styleData) {
+        this.canvas = Html.div({style: styleData}||{});
     }
 );
 

@@ -4503,6 +4503,20 @@ div.exclusivePopupCloseButton {
     width: 15px;
     height: 15px;
 }
+div.exclusivePopup .buttonBar {
+    text-align: center;
+    background: #F8F8F8;
+    border: 0px;
+    -moz-border-radius-bottomleft: 10px;
+    -webkit-border-bottom-left-radius:10px;
+    -moz-border-radius-bottomright: 10px;
+    -webkit-border-bottom-right-radius:10px;
+    behavior: url(border-radius.htc);
+    border-top: 1px solid #CCC;
+    min-height: 40px;
+    padding-top: 10px;
+}
+
 
 div.balloonPopup {
     position: absolute;
@@ -4520,7 +4534,20 @@ div.balloonPopupArrow {
     background: transparent url('../images/balloon_popup_arrows.png') scroll no-repeat 0 -19px;
     background-repeat: no-repeat;
     background-position: 0 -19px;
+    opacity: 0.95;
 }
+
+div.yellowBalloon {
+    color: #000;
+    border: 1px solid black;
+    background-color: #ffed92;
+    opacity: 0.95;
+}
+
+div.yellowArrow {
+    background: transparent url('../images/balloon_popup_arrows_yellow.png') scroll no-repeat 0 -19px;
+}
+
 
 div.balloonPopupCloseButton {
     position: absolute;
@@ -5161,6 +5188,22 @@ ul.nobulletsListInline li
     display: inline;
 }
 
+ul.nobulletsListWrapping
+{
+    position: relative;
+    margin:0px;
+    margin-top: 10px;
+    padding-left: 0px;
+    color: #777;
+}
+
+ul.nobulletsListWrapping li
+{
+    margin-top: 5px;
+    overflow: visible;
+    list-style-type: none;
+}
+
 div.FavoritePeopleListDiv {
     margin-bottom: 10px;
     height: 300px;
@@ -5684,4 +5727,23 @@ div.eventModifButtonBar .separator {
     width: 1px;
     height: 18px;
     border-right: 1px dotted #999;
+}
+
+label.normal {
+    font-weight: normal;
+}
+
+label.emphasis {
+    font-weight: normal;
+    font-style: italic;
+}
+
+.smallGrey {
+    margin-top: 2px;
+    font-size: 9px;
+    color: #777;
+}
+
+tr.selectedItem td {
+    color: #000;
 }

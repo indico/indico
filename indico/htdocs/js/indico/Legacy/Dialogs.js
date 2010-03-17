@@ -120,9 +120,10 @@ extend(IndicoUI.Dialogs,
 
                            $B(info.accessor('conveners'), convListWidget.getUsers());
 
-                           var sesType = new RadioFieldWidget({'standard':$T('Standard'),'poster':$T('Poster')},['standard','poster'],'nobulletsListInline');
+                           var sesType = new RadioFieldWidget([['standard', $T('Standard')],['poster',$T('Poster')]],'nobulletsListInline');
+                           $B(info.accessor('sessionType'), sesType);
+
                            sesType.select('standard');
-                           $B(info.accessor('sessionType'), sesType.state);
 
                            //Create the list of the days in which the conference is being held
                            var conferenceDays = bind.element(

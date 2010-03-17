@@ -27,7 +27,7 @@ from MaKaC.common import info
 import MaKaC
 
 class AccessController( Persistent ):
-    """This class keeps access control information both for accessing and 
+    """This class keeps access control information both for accessing and
         modifying which can be related to any conference object. The fact that
         we have a separated class which handles this allows us to reuse the code
         and have a common policy.
@@ -35,11 +35,11 @@ class AccessController( Persistent ):
         who can access the related object and another one the users which can
         modify it) along wiht methods for managing them (granting or revoking
         privileges).
-       Conference objects can delegate the access control to one of this 
+       Conference objects can delegate the access control to one of this
         objects so they don't need to implement again the AC mechanism.
        Parameters:
         __accessProtection -- (int) Flag which indicates whether the resource
-            the current access controller is related to is protected (on) or 
+            the current access controller is related to is protected (on) or
             not (off).
         managers -- (PList) List of recognised users or groups (Principal)
             allowed to modify the related resource
@@ -58,10 +58,10 @@ class AccessController( Persistent ):
         self.requiredDomains = []
         self.accessKey = ""
         self.owner = None
-    
+
     def getOwner(self):
         return self.owner
-    
+
     def setOwner(self, owner):
         self.owner = owner
 
@@ -74,14 +74,14 @@ class AccessController( Persistent ):
 
     def getAccessProtectionLevel( self ):
         return self._getAccessProtection()
-    
+
     def _getFatherProtection( self ):
         try:
             return self._fatherProtection
         except:
             self._fatherProtection = 0
             return 0
-            
+
     def isHidden( self ):
         try:
             return self._hideFromUnauthorizedUsers
@@ -112,34 +112,34 @@ class AccessController( Persistent ):
         self._p_changed = 1
 
     def grantAccess( self, principal ):
-        """grants read access for the related resource to the specified 
+        """grants read access for the related resource to the specified
             principal"""
         if principal not in self.allowed and (isinstance(principal, MaKaC.user.Avatar) or isinstance(principal, MaKaC.user.CERNGroup) or isinstance(principal, MaKaC.user.Group)):
             self.allowed.append( principal )
             self._p_changed = 1
-    
+
     def getAccessEmail(self):
         try:
             return self.allowedEmail
         except:
             self.allowedEmail = []
         return self.allowedEmail
-    
+
     def grantAccessEmail(self, email):
         if not email in self.getAccessEmail():
             self.getAccessEmail().append(email)
-    
+
     def revokeAccessEmail(self, email):
         if email in self.getAccessEmail.keys():
             self.getAccessEmail().remove(email)
-        
+
 
     def revokeAccess( self, principal ):
-        """revokes read access for the related resource to the specified 
+        """revokes read access for the related resource to the specified
             principal"""
         #ToDo: Revoking access to a user is quite more complex than this. We can
-        #   just remove the user, but if there's a group in the list that 
-        #   contains the user, the access to the user is not revoked, he still 
+        #   just remove the user, but if there's a group in the list that
+        #   contains the user, the access to the user is not revoked, he still
         #   has access. But dunno what to do in that case: raise an exception??
         #   Certainly removing the user from the group or the group itself
         #   wouldn't be acceptable solutions.
@@ -149,14 +149,14 @@ class AccessController( Persistent ):
 
     def setAccessKey( self, key="" ):
         self.accessKey = key
-                
+
     def getAccessKey( self ):
         try:
             return self.accessKey
         except:
             self.setAccessKey()
             return ""
-            
+
     def canKeyAccess( self, key ):
         """
         """
@@ -213,32 +213,32 @@ class AccessController( Persistent ):
         #self._v_canuseraccess[av] = False
         #return self._v_canuseraccess[av]
         return False
-    
+
     def getAccessList( self ):
         """returns a list of those principals which have access privileges"""
         return self.allowed
-    
+
     def getModificationEmail(self):
         try:
             return self.managersEmail
         except:
             self.managersEmail = []
         return self.managersEmail
-    
+
     def grantModificationEmail(self, email):
         """looks if the email is in the managersEmail list (list with the users with access to modification)
         and if it's not it adds the email to the list"""
         if not email in self.getModificationEmail():
             self.getModificationEmail().append(email)
             self._p_changed = 1
-    
+
     def revokeModificationEmail(self, email):
         if email in self.getModificationEmail():
             self.getModificationEmail().remove(email)
             self._p_changed = 1
-    
+
     def grantModification( self, principal ):
-        """grants modification access for the related resource to the specified 
+        """grants modification access for the related resource to the specified
             principal"""
         # ToDo: should the groups allowed to be managers?
         if principal not in self.managers and (isinstance(principal, MaKaC.user.Avatar) or isinstance(principal, MaKaC.user.CERNGroup) or isinstance(principal, MaKaC.user.Group)):
@@ -246,7 +246,7 @@ class AccessController( Persistent ):
             self._p_changed = 1
 
     def revokeModification( self, principal ):
-        """revokes modification access for the related resource to the 
+        """revokes modification access for the related resource to the
             specified principal"""
         if principal in self.managers:
             self.managers.remove( principal )
@@ -278,13 +278,13 @@ class AccessController( Persistent ):
                     ret = True
                     user.linkTo(self.getOwner(), "manager")
         return ret
-        
+
         #self._v_canmodify[user] = 0
         #return self._v_canmodify[user]
         #return False
-    
+
     def getModifierList( self ):
-        """returns a list of those principals which have modification 
+        """returns a list of those principals which have modification
             privileges"""
         if None in self.managers:
             self.revokeModification(None)
@@ -310,7 +310,7 @@ class AccessController( Persistent ):
         """
         """
         return self.requiredDomains
-    
+
     def isDomainProtected(self):
         if self.getRequiredDomainList():
             return 1
@@ -318,14 +318,14 @@ class AccessController( Persistent ):
 
 
 class CategoryAC(AccessController):
-    
+
     def __init__( self ):
         pass
 
 
 
 class _AdminList(Persistent):
-    
+
     def __init__(self):
         self.__list = []
 
@@ -353,7 +353,7 @@ class _AdminList(Persistent):
 
 
 class AdminList:
-    
+
     def getInstance( self ):
         dbroot = DBMgr.getInstance().getDBConnection().root()
         if dbroot.has_key("adminlist"):
@@ -366,10 +366,10 @@ class AdminList:
 
 class AccessWrapper:
     """This class encapsulates the information about an access to the system. It
-            must be initialised by clients if they want to perform access 
+            must be initialised by clients if they want to perform access
             control operations over the objects in the system.
     """
-    
+
     def __init__( self ):
         self._currentUser = None
         self._ip = ""
@@ -396,4 +396,4 @@ class AccessWrapper:
 
 if __name__ == "__main__":
     pass
-    
+

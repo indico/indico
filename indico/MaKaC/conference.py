@@ -10969,12 +10969,6 @@ class Material(Persistent):
             return self.getOwner()
         return None
 
-    @Updates (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster'],'title')
     def setTitle( self, newTitle ):
         self.title = newTitle.strip()
         self.notifyModification()
@@ -10988,12 +10982,6 @@ class Material(Persistent):
     def getTitle( self ):
         return self.title
 
-    @Updates (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster'], 'description')
     def setDescription( self, newDescription ):
         self.description = newDescription.strip()
         self.notifyModification()
@@ -11205,13 +11193,6 @@ class Material(Persistent):
             return self.getOwner().isProtected()
         return False
 
-    @Updates (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-               'MaKaC.conference.Poster'], 'protection', lambda(x): int(x))
-
     def setProtection( self, private ):
         self.__ac.setProtection( private )
         self.updateFullyPublic()
@@ -11226,22 +11207,9 @@ class Material(Persistent):
     def isHidden( self ):
         return self.__ac.isHidden()
 
-    @Updates (['MaKaC.conference.Material',
-               'MaKaC.conference.Minutes',
-               'MaKaC.conference.Paper',
-               'MaKaC.conference.Slides',
-               'MaKaC.conference.Video',
-               'MaKaC.conference.Poster'], 'hidden')
     def setHidden( self, hidden ):
         self.__ac.setHidden( hidden )
         self._p_changed = 1
-
-    @Updates (['MaKaC.conference.Material',
-               'MaKaC.conference.Minutes',
-               'MaKaC.conference.Paper',
-               'MaKaC.conference.Slides',
-               'MaKaC.conference.Video',
-               'MaKaC.conference.Poster'], 'accessKey')
 
     def setAccessKey( self, pwd="" ):
         self.__ac.setAccessKey(pwd)

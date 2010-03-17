@@ -100,9 +100,10 @@
 <% end %>
 
 <script type="text/javascript">
-var tabControl = new TabWidget([
+var tabList = [
     <%= ",\n".join(['["' + plugin.getName() + '" , $E("' + plugin.getName() + 'OptionsDiv")]' for plugin in pluginList])%>
-], null, null, <%= InitialPlugin %>);
+]
+var tabControl = new TabWidget(tabList, null, null, tabList[<%= InitialPlugin %>][0]);
 $E('pluginTabs').set(tabControl.draw());
 
 </script>
