@@ -11,7 +11,7 @@ newsList = newsModule.getNewsItemsList()
             <a href="<%= urlHandlers.UHIndicoNews.getURL()%>">
                 <%= newItem.getTitle() %>
             </a>
-            <em><%= _('Posted on') %>&nbsp;<%= formatDateTime(newItem.getAdjustedCreationDate(tz)) %></em>
+            <em><%= _('Posted on') %>&nbsp;<%= formatDate(newItem.getAdjustedCreationDate(tz)) %></em>
         </li>
     <% end %>
     <% end %>
