@@ -182,7 +182,7 @@ type("TabWidget", ["IWidget"],{
         var arrow, bg;
 
         arrow = Html.div({className: 'tabScrollArrow', style: {backgroundPosition: '0 -30px'}});
-        bg = Html.div({className: 'tabScrollArrowBg', style: {left: pixels(self.width - 17)}}, arrow);
+        bg = Html.div({className: 'tabScrollArrowBg'}, arrow);
         this.scrollArrows.right = [bg, arrow];
 
         arrow = Html.div({className: 'tabScrollArrow', style: {backgroundPosition: '0 -15px'}});
@@ -250,7 +250,7 @@ type("TabWidget", ["IWidget"],{
 
         this._drawContent();
 
-        var wrapperStyle = this.width?{width: pixels(this.width)}:{};
+        var wrapperStyle = this.width?{width: this.width}:{};
 
         this.container = this.IWidget.prototype.draw.call(
             this,
@@ -261,7 +261,7 @@ type("TabWidget", ["IWidget"],{
                                        Html.div({className: 'tabBorderGradient', style: {cssFloat: 'right'}})*/)
                              ),
                      Html.div({style: {marginTop: pixels(10),
-                                       width: self.width ? pixels(self.width) : 'auto',
+                                       width: self.width ? self.width : 'auto',
                                        minHeight: self.height ? pixels(self.height) : 'auto' }},
                               this.canvas),
                      this.disableOverlay));
@@ -289,6 +289,8 @@ type("TabWidget", ["IWidget"],{
                 break;
             }
         }
+
+        this.scrollArrows.right[0].dom.style.left = pixels(this.container.dom.clientWidth - 17);
 
         // Initially allow scroll right but not left
         this.setScrollArrowState('right', true);
@@ -439,7 +441,9 @@ type("TabWidget", ["IWidget"],{
      function(options, width, height, initialSelection, extraButtons, canvas) {
 
          var self = this;
-         this.width = width;
+
+         this.width = exists(width) ? ((typeof(width)=='string' && width.indexOf('%') >= 0) ? width : pixels(width)) : width;
+
          this.height = height;
          this.tabs = [];
          this.leftTabIndex = 0;

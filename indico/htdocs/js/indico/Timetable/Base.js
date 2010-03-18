@@ -45,7 +45,7 @@ type("TimeTable", ["HistoryListener"], {
 
     _draw: function(timetableDiv) {
 
-        return Html.div({style:{width: pixels(this.width)}},
+        return Html.div({style:{width: this.width}},
                         this.header,
                         timetableDiv,
                         this.loadingIndicator);

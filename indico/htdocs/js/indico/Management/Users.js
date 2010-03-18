@@ -263,7 +263,7 @@ type ("UserSearchPopup", ["ExclusivePopup"], {
                   [
                       ["Users", self._drawUsers()],
                       ["Groups", self._drawGroups()]
-                  ], 350, 150, 1);
+                  ], '100%', 150, 1);
           } else {
               this.parametersWidget = self._drawUsers();
           }
