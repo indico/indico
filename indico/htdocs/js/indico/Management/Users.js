@@ -27,15 +27,19 @@ type ("UserSearchPopup", ["ExclusivePopup"], {
 
         var famName = new EnterObserverTextBox("text",{}, function() {
             self._clickSearchAction();
+            return false;
             });
         var firstName = new EnterObserverTextBox("text",{}, function() {
             self._clickSearchAction();
+            return false;
         });
         var email = new EnterObserverTextBox("text",{}, function() {
             self._clickSearchAction();
+            return false;
         });
         var org = new EnterObserverTextBox("text",{}, function() {
             self._clickSearchAction();
+            return false;
         });
         var exactMatch = Html.checkbox({});
 
@@ -56,6 +60,7 @@ type ("UserSearchPopup", ["ExclusivePopup"], {
             ["Group name",
              $B( new EnterObserverTextBox("text",{}, function() {
                  self._clickSearchAction();
+                 return false;
              }).draw(), criteria.accessor('group'))]]);
     },
 

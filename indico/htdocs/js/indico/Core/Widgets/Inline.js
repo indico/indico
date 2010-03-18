@@ -542,7 +542,7 @@ type("EnterObserverTextBox", ["IWidget", "WatchAccessor"],
             this.input.observeEvent('keypress', function(event) {
                 if (event.keyCode == 13) {
                     Dom.Event.dispatch(self.input.dom, 'change');
-                    keyPressAction();
+                    return keyPressAction();
                 }
                 Dom.Event.dispatch(self.input.dom, 'change');
             });
