@@ -90,6 +90,8 @@ var Indico = {
 
         Login: "<%= urlHandlers.UHSignIn.getURL() %>",
 
+        Favourites: "<%= urlHandlers.UHUserBaskets.getURL() %>",
+
         ConferenceDisplay: "<%= urlHandlers.UHConferenceDisplay.getURL() %>",
         ContributionDisplay: "<%= urlHandlers.UHContributionDisplay.getURL() %>",
         SessionDisplay: "<%= urlHandlers.UHSessionDisplay.getURL() %>",
