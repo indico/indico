@@ -167,18 +167,25 @@ var IndicoUtil = {
     * @param {List} map A map, conforming to the described format
     * @return An element (DIV) containing the form
     */
-    createFormFromMap: function(map) {
+    createFormFromMap: function(map, expand) {
+        expand = any(expand, false);
+        var labelStyle = {style:{textAlign:'right', verticalAlign: 'top'}};
+        var fieldStyle = {style:{verticalAlign: 'top'}};
+        if (expand) {
+            labelStyle.style.whiteSpace = "nowrap";
+            fieldStyle.style.width = "100%";
+        }
         var list = [];
         $L(map).each(function(item) {
             // if the key is an int, do not print the label
             if (item.length == 2) {
                 list.push(Html.tr({style:{marginTop:'10px'}},
-                                  Html.td({style:{textAlign:'right', verticalAlign: 'top'}},Html.label("popUpLabel",item[0])),
-                                  Html.td({style:{verticalAlign: 'top'}}, Html.div('popUpTdContent', item[1]))));
+                                  Html.td(labelStyle, Html.label("popUpLabel",item[0])),
+                                  Html.td(fieldStyle, Html.div('popUpTdContent', item[1]))));
             } else {
                 list.push(Html.tr({style:{marginTop:'10px'}},
                                   Html.td(),
-                                  Html.td(item[0])));
+                                  Html.td(fieldStyle, item[0])));
             }
         });
         var tbody = Html.tbody();
