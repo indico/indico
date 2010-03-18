@@ -2238,7 +2238,8 @@ msgstr ""
 "l'espoir de vous rencontrer à %s Votre Indico, sur demande de %s %s"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/EventHeader.tpl:144
-msgid "Manage event"
+#: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConfModifHeader.tpl:2
+msgid "Switch to management area for this event"
 msgstr "Gérer l´évènement"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/SignIn.tpl:118
@@ -8833,10 +8834,6 @@ msgstr "Données personnelles"
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/BadgeTemplates.tpl:32
 msgid "Initial PDF options after a conference is created."
 msgstr "Options PDF initiales après la création d´une conférence."
-
-#: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConfModifHeader.tpl:2
-msgid "Manage Event"
-msgstr "Gérer l'évènement"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/RoomBookingSearch4Rooms.tpl:289
 msgid "Is public"
@@ -17399,7 +17396,7 @@ msgid "Report numbers"
 msgstr "Numéros de rapport"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConferenceModifFrame.tpl:23
-msgid "View event page"
+msgid "Switch to event page"
 msgstr "Page d'accueil de l'évènement"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/pages/admins.py:204

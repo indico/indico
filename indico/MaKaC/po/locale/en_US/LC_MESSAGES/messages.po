@@ -13755,7 +13755,7 @@ msgid "Report numbers"
 msgstr ""
 
 #: /home/pferreir/projects/indico/indico-development/code/code/MaKaC/webinterface/pages/conferences.py:2012
-msgid "View event page"
+msgid "Switch to event page"
 msgstr ""
 
 #: /home/pferreir/projects/indico/indico-development/code/code/tpls/RoomBookingSearch4Bookings.tpl:189
