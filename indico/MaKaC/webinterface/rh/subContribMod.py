@@ -276,9 +276,9 @@ class RHMaterialsAdd(RHSubContribModifBase):
     _uh = urlHandlers.UHSubContribModifAddMaterials
 
     def _checkProtection(self):
-        material = self._rhSubmitMaterial._getMaterial()
+        material, _ = self._rhSubmitMaterial._getMaterial()
         if self._target.canUserSubmit(self._aw.getUser()) \
-            and material.getReviewingState() < 3:
+            and (not material or material.getReviewingState() < 3):
             return
         RHSubContribModifBase._checkProtection(self)
 
