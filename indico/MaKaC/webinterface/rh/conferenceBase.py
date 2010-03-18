@@ -288,7 +288,7 @@ class RHSubmitMaterialBase:
             res.append("""A material ID must be selected.""")
         return res
 
-    def _getMaterial(self):
+    def _getMaterial(self, forceCreate = True):
         """
         Returns the Material object to which the resource is being added
         """
@@ -313,7 +313,7 @@ class RHSubmitMaterialBase:
             material = mf.get(self._target)
 
             # if the factory returns an empty material (doesn't exist)
-            if material == None:
+            if material == None and forceCreate:
                 # create one
                 material = mf.create(self._target)
                 newlyCreated = True
