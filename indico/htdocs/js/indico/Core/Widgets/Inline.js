@@ -2,8 +2,7 @@
 type("InlineWidget", ["IWidget"],
      {
          _error: function(error) {
-             var dialog = new ErrorReportDialog(error);
-             dialog.open();
+             IndicoUI.Dialogs.Util.error(error);
          }
      });
 

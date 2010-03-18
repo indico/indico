@@ -160,10 +160,8 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
         var contentHeight = this._calculateContentHeight();
         this.contentWrapper.setStyle('height', pixels(contentHeight));
         //this.contentWrapper.setStyle('marginTop', pixels((this.closeHandler && !this.title) ? 30 : 10));
-        this.contentWrapper.setStyle('marginBottom', '10px');
         this.contentWrapper.setStyle('overflowY', 'auto');
         this.contentWrapper.setStyle('overflowX', 'hidden');
-        this.contentWrapper.setStyle('paddingRight', '10px');
 
     },
 
@@ -444,13 +442,13 @@ type("AlertPopup", ["ExclusivePopup"],
                  self.close();
              });
 
-             return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {maxWidth: pixels(400), textAlign: 'center'}}, Html.div({style: {textAlign: 'left'}}, this.content), okButton));
+             return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {maxWidth: pixels(400), padding: pixels(10), textAlign: 'center'}}, Html.div({style: {textAlign: 'left'}}, this.content), okButton));
          }
     },
 
     function(title, content) {
         this.content = content;
-        this.ExclusivePopup(Html.div({style:{textAlign: 'center'}},title), positive);
+        this.ExclusivePopup(Html.div({style:{textAlign: 'center'}}, title), positive);
     }
 );
 

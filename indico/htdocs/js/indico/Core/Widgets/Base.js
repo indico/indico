@@ -524,8 +524,7 @@ type("RemoteWidget", [],
      {
 
          _error: function(error) {
-             var dialog = new ErrorReportDialog(error);
-             dialog.open();
+            IndicoUI.Dialogs.Util.error(error);
          },
 
          run: function(content) {
@@ -635,8 +634,7 @@ progressIndicator = function(small, center) {
 type("ServiceWidget", ["IWidget"],
      {
          _error: function(error) {
-             var dialog = new ErrorReportDialog(error);
-             dialog.open();
+             IndicoUI.Dialogs.Util.error(error);
          },
 
          request: function(extraArgs) {
