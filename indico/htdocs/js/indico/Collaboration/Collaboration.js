@@ -686,7 +686,7 @@ var rejectBooking = function(booking, conferenceId) {
         var span2 = Html.span('', "The reason will be displayed to the user.");
 
         // We construct the "ok" button and what happens when it's pressed
-        var okButton = Html.button('', "OK");
+        var okButton = Html.input('button', '', "OK");
         okButton.observeClick(function() {
             var killProgress = IndicoUI.Dialogs.Util.progress("Rejecting booking...");
             var reason = textarea.get();
@@ -712,7 +712,7 @@ var rejectBooking = function(booking, conferenceId) {
         });
 
         // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
-        var cancelButton = Html.button({style:{marginLeft:pixels(5)}}, "Cancel Rejection");
+        var cancelButton = Html.input('button', {style:{marginLeft:pixels(5)}}, "Cancel Rejection");
         cancelButton.observeClick(function(){
             self.close();
         });
@@ -1000,7 +1000,7 @@ type ("BookingPopup", ["ExclusivePopup"],
             advancedDiv.append(hiddenDiv);
 
             // We construct the "save" button and what happens when it's pressed
-            var saveButton = Html.button(null, "Save");
+            var saveButton = Html.input('button', null, "Save");
             saveButton.observeClick(function(){
 
                 // We retrieve the values from the form
@@ -1112,7 +1112,7 @@ type ("BookingPopup", ["ExclusivePopup"],
             });
 
             // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
-            var cancelButton = Html.button({style:{marginLeft:pixels(5)}}, "Cancel");
+            var cancelButton = Html.input('button', {style:{marginLeft:pixels(5)}}, "Cancel");
             cancelButton.observeClick(function(){
                 self.close();
             });
@@ -1201,7 +1201,7 @@ var removeBooking = function(booking, conferenceId) {
         var span = Html.span("", "Are you sure you want to remove that " + booking.type + " booking?");
 
         // We construct the "ok" button and what happens when it's pressed
-        var okButton = Html.button(null, "Remove");
+        var okButton = Html.input('button', null, "Remove");
         okButton.observeClick(function() {
             var killProgress = IndicoUI.Dialogs.Util.progress("Removing your booking...");
 
@@ -1240,7 +1240,7 @@ var removeBooking = function(booking, conferenceId) {
         });
 
         // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
-        var cancelButton = Html.button({style:{marginLeft:pixels(5)}}, "Cancel");
+        var cancelButton = Html.input('button', {style:{marginLeft:pixels(5)}}, "Cancel");
         cancelButton.observeClick(function(){
             self.close();
         });
@@ -1447,7 +1447,7 @@ var withdrawRequest = function(pluginName, conferenceId) {
             var span = Html.span("", "Are you sure you want to withdraw the request?");
 
             // We construct the "ok" button and what happens when it's pressed
-            var okButton = Html.button(null, "Withdraw");
+            var okButton = Html.input('button', null, "Withdraw");
             okButton.observeClick(function() {
                 var killProgress = IndicoUI.Dialogs.Util.progress("Withdrawing your request...");
 
@@ -1489,7 +1489,7 @@ var withdrawRequest = function(pluginName, conferenceId) {
             });
 
             // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
-            var cancelButton = Html.button({style:{marginLeft:pixels(5)}}, "Cancel");
+            var cancelButton = Html.input('button', {style:{marginLeft:pixels(5)}}, "Cancel");
             cancelButton.observeClick(function(){
                 self.close();
             });

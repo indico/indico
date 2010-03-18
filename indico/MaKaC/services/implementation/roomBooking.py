@@ -2,12 +2,12 @@
 Asynchronous request handlers for room booking
 """
 
-from MaKaC.services.implementation.base import ProtectedService
+from MaKaC.services.implementation.base import ServiceBase
 
 from MaKaC.rb_location import Location
 from MaKaC.rb_location import CrossLocationQueries
 
-class RoomBookingListLocations( ProtectedService ):
+class RoomBookingListLocations( ServiceBase ):
 
     def _getAnswer( self ):
         """
@@ -25,7 +25,7 @@ class RoomBookingListLocations( ProtectedService ):
         return result
 
 
-class RoomBookingListRooms( ProtectedService ):
+class RoomBookingListRooms( ServiceBase ):
 
     def _checkParams( self ):
 
@@ -58,7 +58,7 @@ class RoomBookingFullNameListRooms( RoomBookingListRooms):
 
         return list((k,res[k]) for k in sorted(res))
 
-class RoomBookingListLocationsAndRooms( ProtectedService ):
+class RoomBookingListLocationsAndRooms( ServiceBase ):
 
     def _getAnswer( self ):
         result = {}
@@ -68,7 +68,7 @@ class RoomBookingListLocationsAndRooms( ProtectedService ):
                 result[loc +":" +room.name] = loc +":" +room.name;
         return sorted(result)
 
-class GetBookingBase(ProtectedService):
+class GetBookingBase(object):
 
     def _getRoomInfo(self, target):
         location = target.getOwnLocation()

@@ -3683,11 +3683,11 @@ ul.keywordList li.multipleLinesListItem_last {
 }
 
 .invalidLabel {
-    color: #D01F3C;
+    color: #881122;
 }
 
 select.invalidSelect {
-    color: #D01F3C;
+    color: #881122;
 }
 
 .tooltipError {
@@ -3708,11 +3708,11 @@ ul.errorList {
 }
 
 ul.errorList li {
-    color: #D01F3C;
+    color: #881122;
 }
 
 .errorList {
-    color: #D01F3C;
+    color: #881122;
 }
 
 ul.warningList {
@@ -3723,13 +3723,13 @@ ul.warningList {
 
 span.errorTitle {
     font-size: medium;
-    color: #D01F3C;
+    color: #881122;
     font-weight: bold;
 }
 
 span.messageAfterErrors {
     margin-top: 1em;
-    color: #D01F3C;
+    color: #881122;
 }
 
 span.warningTitle {
@@ -3920,7 +3920,7 @@ span.statusMessage {
 }
 
 .statusMessageError {
-    color: #D01F3C;
+    color: #881122;
 }
 
 .statusMessageOK {
@@ -3941,7 +3941,7 @@ td.collaborationInfoLeftCol {
 
 .collaborationWarning {
     font-weight: bold;
-    color: #D01F3C;
+    color: #881122;
 }
 
 td.bookingFormFieldName {
@@ -5375,7 +5375,7 @@ div.rescheduleLabelDetails {
 
 .rescheduleWarning {
     font-weight: bold;
-    color: #D01F3C;
+    color: #881122;
 }
 
 /* End of reschedule dialog */

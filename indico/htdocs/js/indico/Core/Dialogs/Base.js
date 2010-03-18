@@ -101,7 +101,7 @@ type("ErrorReportDialog", ["ServiceDialog"],
                            }
                           );
          },
-         
+
          _drawError: function() {
              var self = this;
              var email = new WatchObject();
@@ -124,35 +124,35 @@ type("ErrorReportDialog", ["ServiceDialog"],
                                   function() {
                                       self._sendReport(email);
                                   },
-                                  Html.button({},'Send report'))),
+                                  Html.input('button', {},'Send report'))),
                               Widget.link(command(
                                   function() {
                                       self.close();
                                   },
-                                  Html.button({style:{marginLeft: pixels(5)}},'Do not send report')
+                                  Html.input('button', {style:{marginLeft: pixels(5)}},'Do not send report')
                               ))
                              )
                  ));
          },
-         
+
          _drawWarning: function() {
-             
+
              var content = [this.error.message];
-             
+
              var content = Html.div({style: {textAlign: 'center'}});
              content.append(Html.span('',this.error.message));
              if (this.error.code == 'ERR-P4') {
                  content.append(Html.br());
                  content.append(Html.a({href: Indico.Urls.Login+'?returnURL='+document.URL}, "Go to login page"));
              }
-             
+
              var popup = new AlertPopup(Html.span('warningTitle', "Warning"), content);
              popup.open();
          },
 
          draw: function() {
              var self = this;
-             
+
              if (this.error.type == "noReport") {
                  self._drawWarning();
              }else {

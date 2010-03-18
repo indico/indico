@@ -17,7 +17,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.services.implementation.base import LoggedOnlyService, ProtectedService
+from MaKaC.services.implementation.base import LoggedOnlyService
 from MaKaC.services.implementation.base import ServiceBase
 
 import MaKaC.user as user
@@ -128,7 +128,7 @@ class UserRemoveFromBasket(LoggedOnlyService):
             self._target.getPersonalInfo().getBasket().deleteElement(self._obj)
 
 
-class UserListBasket(ProtectedService):
+class UserListBasket(ServiceBase):
 
     """
     Service that lists the users belonging to the the user's "favorites"
@@ -136,7 +136,7 @@ class UserListBasket(ProtectedService):
     """
 
     def _checkParams(self):
-        ProtectedService._checkParams(self)
+        ServiceBase._checkParams(self)
 
         self._target = self.getAW().getUser()
         self._detailLevel = self._params.get("detailLevel", "max")

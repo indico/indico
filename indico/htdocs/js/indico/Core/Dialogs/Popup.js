@@ -164,6 +164,7 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
         this.contentWrapper.setStyle('overflowY', 'auto');
         this.contentWrapper.setStyle('overflowX', 'hidden');
         this.contentWrapper.setStyle('paddingRight', '10px');
+        this.contentWrapper.setStyle('background', '#FFFFFF');
     },
 
     _postDrawPositionDialog: function(){
@@ -270,6 +271,7 @@ type("ExclusivePopupWithButtons", ["ExclusivePopup"], {
         this.contentWrapper.setStyle('overflowX', 'hidden');
         this.contentWrapper.setStyle('position', 'relative');
         this.contentWrapper.setStyle('top', pixels(-10));
+        this.contentWrapper.setStyle('background', '#FFFFFF');
 
         var contentHeight = this._calculateContentHeight();
         this.contentWrapper.setStyle('height', pixels(contentHeight));
@@ -438,7 +440,7 @@ type("AlertPopup", ["ExclusivePopup"],
     {
          draw: function() {
              var self = this;
-             var okButton = Html.button({style:{marginTop: pixels(20)}}, $T('OK'));
+             var okButton = Html.input('button', {style:{marginTop: pixels(20)}}, $T('OK'));
              okButton.observeClick(function(){
                  self.close();
              });
@@ -467,13 +469,13 @@ type("ConfirmPopup", ["ExclusivePopupWithButtons"],
          draw: function() {
              var self = this;
 
-             var okButton = Html.button({style:{marginRight: pixels(3)}}, $T('OK'));
+             var okButton = Html.input('button', {style:{marginRight: pixels(3)}}, $T('OK'));
              okButton.observeClick(function(){
                  self.close();
                  self.handler(true);
              });
 
-             var cancelButton = Html.button({style:{marginLeft: pixels(3)}}, $T('Cancel'));
+             var cancelButton = Html.input('button', {style:{marginLeft: pixels(3)}}, $T('Cancel'));
              cancelButton.observeClick(function(){
                  self.close();
                  self.handler(false);

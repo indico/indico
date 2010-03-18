@@ -189,7 +189,7 @@ type("TimeTableFilter", ["IWidget"], {
 
         this.tableRow.insert(Html.td({style: {width: '90px', color: '#777', fontWeight: 'bold'}}, $T('Filter options')));
 
-        var resetButton = Html.button({style: {cssFloat: 'right', marginRight: '50px'}}, $T('Reset filter'));
+        var resetButton = Html.input('button', {style: {cssFloat: 'right', marginRight: '50px'}}, $T('Reset filter'));
         resetButton.observeClick(function() {
             each(TimetableDefaults.filters, function(TTfilter) {
                 TTfilter.filter.reset()

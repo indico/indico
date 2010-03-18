@@ -187,8 +187,8 @@ Util.Validation = {
         return exists(emails.toLowerCase().match(/^(?:[ ,;]*)(?:[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+(?:\.[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+)*@(?:[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?)(?:[ ,;]+(?:[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+(?:\.[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+)*@(?:[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?))*(?:[ ,;]*)$/));
     },
     isURL: function(address) {
-        // thanks to Jan Goyvaerts
-        return exists(address.match(/^http\:\/\/(.+)$/));
+        // per RFC2396, but forcing xxx: prefix and at least some text after
+        return exists(address.match(/^(([^:\/?#]+):)((\/\/)?([^\/?#]+))([^?#]*)(\?([^#]*))?(#(.*))?$/));
     }
 
 
