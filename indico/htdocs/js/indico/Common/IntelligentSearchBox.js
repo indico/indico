@@ -250,12 +250,15 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
          this.observeOtherKeys(function(text, key, event) {
              if (key == 38 || key == 40) {
                  self._moveSelector(key==38?'up':'down');
+                 return false;
              } else if (key == 27) {
                  self._hideSuggestions();
+                 return false;
              } else if (key == 13) {
                  return self._openSelection(event);
+             } else {
+                 return true;
              }
-             return false;
          });
 
          $E(document.body).observeClick(function(event) {

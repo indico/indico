@@ -50,7 +50,7 @@ type("AddMaterialDialog", ["ButtonBarExclusivePopup"], {
     _drawResourcePathPane: function(locationSelector) {
 
         var file = Html.input('file', {name: 'file'});
-        var url = Html.edit({name: 'url'});
+        var urlBox = Html.edit({name: 'url'});
         var toPDFCheckbox = Html.checkbox({name: 'topdf', style: {verticalAlign: 'middle'}}, true);
 
         var self = this;
@@ -58,7 +58,7 @@ type("AddMaterialDialog", ["ButtonBarExclusivePopup"], {
         var resourcePathPane = new Chooser(
             new Lookup({
                 'local':  function() {
-                    self.pm.remove(url);
+                    self.pm.remove(urlBox);
                     return Html.div({},
                                     self.pm.add(file, 'text'),
                                     Html.div({style:{marginTop: '5px'}},
@@ -69,11 +69,11 @@ type("AddMaterialDialog", ["ButtonBarExclusivePopup"], {
                 },
                 'remote': function() {
                     self.pm.remove(file);
-                    url.set('http://');
-                    url.dom.focus();
+                    setTimeout(function() { urlBox.dom.focus();
+                                            urlBox.set('http://'); }, 200);
                     return Html.div({},
                                     Html.label('popUpLabel', $T("URL")),
-                                    self.pm.add(url, 'url'),
+                                    self.pm.add(urlBox, 'url'),
                                     Html.div("smallGrey", "Example: http://www.example.com/YourPDFFile.pdf"));
                 }
             }));
@@ -92,7 +92,7 @@ type("AddMaterialDialog", ["ButtonBarExclusivePopup"], {
             if (value == 'local') {
                 file.dom.focus();
             } else {
-                url.dom.focus();
+                urlBox.dom.focus();
             }
         });
 
