@@ -197,8 +197,8 @@ Util.Validation = {
 Protection = {
 
     ParentRestrictionMessages: {
-        '1': $T("(currently restricted to some users, but can change)"),
-        '-1': $T("(currently open to everyone, but can change)") },
+        '1': $T("(currently <strong>restricted</strong> to some users, but can change)"),
+        '-1': $T("(currently <strong>open</strong> to everyone, but can change)") },
 
     resolveProtection: function(resourceProtection, parentProtection) {
         if (resourceProtection === 0) {

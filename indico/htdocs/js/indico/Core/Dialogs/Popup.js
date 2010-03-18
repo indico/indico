@@ -280,23 +280,6 @@ type("ExclusivePopupWithButtons", ["ExclusivePopup"], {
     }
 );
 
-/* ExclusivePopup with a grey bar where buttons can be put */
-type("ButtonBarExclusivePopup", ["ExclusivePopup"],
-     {
-         draw: function(content, style) {
-
-             var menu = Html.div("buttonBar", this._drawButtons());
-
-             var canvas = this.ExclusivePopup.prototype.draw.call(this, content, style);
-             this.container.append(menu);
-
-             return canvas;
-         }
-     },
-     function(title, closeButtonHandler, printable, showPrintButton) {
-         this.ExclusivePopup(title, closeButtonHandler, printable, showPrintButton);
-     });
-
 type("BalloonPopup", ["PopupDialog"], {
     draw: function(x, y) {
         var self = this;

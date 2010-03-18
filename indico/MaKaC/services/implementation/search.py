@@ -12,6 +12,8 @@ from MaKaC.common.logger import Logger
 
 from MaKaC.webinterface import urlHandlers
 
+from zope.index.text import parsetree
+
 class SearchUsersGroups(ProtectedService):
 
     @staticmethod
@@ -54,7 +56,11 @@ class SearchCategoryNames(ServiceBase):
         import MaKaC.common.indexes as indexes
         nameIdx = indexes.IndexesHolder().getIndex('categoryName')
 
-        foundEntries = nameIdx.search(' AND '.join(map(lambda x: '*%s*' % x, filter(lambda x: len(x) > 0, self._searchString.split(' ')))))
+        try:
+            query = ' AND '.join(map(lambda y: "*%s*" % y, filter(lambda x: len(x) > 0, self._searchString.split(' '))))
+            foundEntries = nameIdx.search(query)
+        except parsetree.ParseError:
+            foundEntries = []
 
         number = len(foundEntries)
 

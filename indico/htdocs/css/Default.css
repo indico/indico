@@ -5747,3 +5747,7 @@ label.emphasis {
 tr.selectedItem td {
     color: #000;
 }
+
+.strongRed strong{
+    color: #881122;
+}
