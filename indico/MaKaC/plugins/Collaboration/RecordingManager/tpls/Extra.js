@@ -112,9 +112,60 @@ var REUpdateOrphanList = function () {
     }
 }
 
-var Button = new DisabledButton(Html.input("button", {disabled:true}, $T("Add")));
 
-IndicoUI.Effect.appear($E('RMlowerPane'), "block")
+var ButtonCreateIndicoLink = new DisabledButton(Html.input("button", {disabled:true}, $T("Create Indico Link")));
+var ButtonCreateCDSRecord  = new DisabledButton(Html.input("button", {disabled:true}, $T("Create CDS Record")));
+
+ButtonCreateCDSRecord.observeClick(function(){
+    if (ButtonCreateCDSRecord.isEnabled()) {
+        if (typeof RMselectedTalkId != 'undefined' &&
+                RMselectedTalkId != '' &&
+                RMselectedLOID != 'undefined' &&
+                RMselectedLOID != '') {
+
+            RMCreateCDSRecord();
+        }
+    }
+});
+
+ButtonCreateCDSRecord.observeEvent('mouseover', function(event){
+    if (!ButtonCreateCDSRecord.isEnabled()) {
+        tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY,
+                $T("First select talk and Lecture Object"), "tooltipError");
+    }
+});
+
+ButtonCreateCDSRecord.observeEvent('mouseout', function(event){
+    if (!ButtonCreateCDSRecord.isEnabled()) {
+        Dom.List.remove(document.body, tooltip);
+    }
+});
+
+ButtonCreateIndicoLink.observeClick(function(){
+    if (!ButtonCreateIndicoLink.isEnabled()) {
+        if (typeof RMselectedTalkId != 'undefined' &&
+                RMselectedTalkId != '' &&
+                RMselectedLOID != 'undefined' &&
+                RMselectedLOID != '') {
+
+            RMCreateIndicoLink();
+        }
+    }
+});
+
+ButtonCreateIndicoLink.observeEvent('mouseover', function(event){
+    if (!ButtonCreateIndicoLink.isEnabled()) {
+        tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY,
+                $T("Please select both talk and Lecture Object first"), "tooltipError");
+    }
+});
+
+ButtonCreateIndicoLink.observeEvent('mouseout', function(event){
+    Dom.List.remove(document.body, tooltip);
+});
+
+
+IndicoUI.Effect.appear($E('RMlowerPane'), "block");
 
 // jherr: this is the part that loads the list of contributions
 var RR_loadTalks = function () {
@@ -183,26 +234,12 @@ var RR_loadTalks = function () {
     }
 }
 
-var RR_hideTalks = function (){
-    IndicoUI.Effect.disappear($E('contributionsDiv'));
-}
-
-var RRSelectAllContributions = function() {
-    each($N('talkSelection'), function(checkbox) {
-        checkbox.dom.checked = true;
-    });
-}
-
-var RRUnselectAllContributions = function() {
-    each($N('talkSelection'), function(checkbox) {
-        checkbox.dom.checked = false;
-    });
-}
-
 // jherr stuff
-var RMselectedTalk = '';
-var RMselectedLO   = '';
-var RMviewMode     = '';
+var RMselectedTalkId   = '';
+var RMselectedLOID     = '';
+var RMselectedTalkName = '';
+var RMselectedLOName   = '';
+var RMviewMode         = '';
 
 function RMbuttonModeSelect(mode) {
     RMviewMode = mode;
@@ -240,14 +277,14 @@ function RMbuttonModeOffHover(mode) {
 
 function RMtalkBoxOffHover(IndicoID) {
     var DivID = 'div' + IndicoID;
-    if (RMselectedTalk != IndicoID) {
+    if (RMselectedTalkId != IndicoID) {
         document.getElementById(DivID).className = 'RMtalkDisplay';
     }
 }
 
 function RMtalkBoxOnHover(IndicoID) {
     var DivID = 'div' + IndicoID;
-    if (RMselectedTalk != IndicoID) {
+    if (RMselectedTalkId != IndicoID) {
         document.getElementById(DivID).className = 'RMtalkHover';
     }
 }
@@ -255,24 +292,32 @@ function RMtalkBoxOnHover(IndicoID) {
 function RMtalkSelect(IndicoID) {
     var DivID = 'div' + IndicoID;
     // reset last selected talk div to default color before setting new background
-    if (typeof RMselectedTalk != 'undefined' && RMselectedTalk != '') {
-        document.getElementById('div' + RMselectedTalk).className = 'RMtalkDisplay';
+    if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '') {
+        document.getElementById('div' + RMselectedTalkId).className = 'RMtalkDisplay';
     }
-    RMselectedTalk = IndicoID;
-    document.getElementById('div' + RMselectedTalk).className = 'RMtalkSelected';
-    RMStatusMessage(RMselectedTalk, RMselectedLO)
+    RMselectedTalkId = IndicoID;
+    document.getElementById('div' + RMselectedTalkId).className = 'RMtalkSelected';
+    RMMatchSummaryMessage(RMselectedTalkId, RMselectedLOID);
+
+    if (typeof RMselectedTalkId != 'undefined' &&
+            RMselectedTalkId != '' &&
+            typeof RMselectedLOID != 'undefined' &&
+            RMselectedLOID != '') {
+        ButtonCreateCDSRecord.enable();
+        ButtonCreateIndicoLink.enable();
+    }
 }
 
 function RMLOBoxOffHover(DBID) {
     var DivID = 'lo' + DBID;
-    if (RMselectedLO != DBID) {
+    if (RMselectedLOID != DBID) {
         document.getElementById(DivID).className = 'RMLODisplay';
     }
 }
 
 function RMLOBoxOnHover(DBID) {
     var DivID = 'lo' + DBID;
-    if (RMselectedLO != DBID) {
+    if (RMselectedLOID != DBID) {
         document.getElementById(DivID).className = 'RMLOHover';
     }
 }
@@ -280,16 +325,33 @@ function RMLOBoxOnHover(DBID) {
 function RMLOSelect(DBID) {
     var DivID = 'lo' + DBID;
     // reset last selected LO div to default color before setting new background
-    if (typeof RMselectedLO != 'undefined' && RMselectedLO != '') {
-        document.getElementById('lo' + RMselectedLO).className = 'RMLODisplay';
+    if (typeof RMselectedLOID != 'undefined' && RMselectedLOID != '') {
+        document.getElementById('lo' + RMselectedLOID).className = 'RMLODisplay';
     }
-    RMselectedLO = DBID;
-    document.getElementById('lo' + RMselectedLO).className = 'RMLOSelected';
-    RMStatusMessage(RMselectedTalk, RMselectedLO)
+    RMselectedLOID = DBID;
+    document.getElementById('lo' + RMselectedLOID).className = 'RMLOSelected';
+    RMMatchSummaryMessage(RMselectedTalkId, RMselectedLOID);
+
+    if (typeof RMselectedTalkId != 'undefined' &&
+            RMselectedTalkId != '' &&
+            typeof RMselectedLOID != 'undefined' &&
+            RMselectedLOID != '') {
+        ButtonCreateCDSRecord.enable();
+        ButtonCreateIndicoLink.enable();
+    }
 }
 
-function RMStatusMessage(talk, LO) {
-    document.getElementById('RMStatusMessageID').innerHTML = 'To export metadata from talk id ' + talk + ' to the orphan lecture ' + LO + ' ';
+function RMMatchSummaryMessage(talk, LO) {
+    if (typeof talk != 'undefined' &&
+            talk != '' &&
+            typeof LO != 'undefined' &&
+            LO != '') {
+        document.getElementById('RMMatchSummaryMessage').innerHTML = '<em>Match talk id</em> <b>' + talk + '</b> <em>to orphan</em> <b>' + LO + '</b>';
+    }
+}
+
+function RMStatusMessage(message) {
+    document.getElementById('RMStatusMessageID').innerHTML = message;
 }
 
 function RMchooseVideoFormat(format_string) {
@@ -313,8 +375,8 @@ function RMLink() {
                 plugin: 'RecordingManager',
                 service: 'RMLink',
                 conference: '<%= ConferenceId %>',
-                IndicoID: RMselectedTalk,
-                LOID: RMselectedLO
+                IndicoID: RMselectedTalkId,
+                LOID: RMselectedLOID
             },
         function(result, error){
             if (!error) {
@@ -337,8 +399,36 @@ function RMCreateCDSRecord() {
                 plugin: 'RecordingManager',
                 service: 'RMCreateCDSRecord',
                 conference: '<%= ConferenceId %>',
-                IndicoID: RMselectedTalk,
-                LOID: RMselectedLO
+                IndicoID: RMselectedTalkId,
+                LOID: RMselectedLOID
+            },
+        function(result, error){
+                document.getElementById('RMMatchSummaryMessage').innerHTML = result;
+
+                if (!error) {
+
+                // I don't have anything here yet. This is where we could do something with the result if we want. Don't know what that would be.
+                killProgress(); // turn off the progress indicator
+
+            } else {
+                killProgress(); // turn off the progress indicator
+                IndicoUtil.errorReport(error);
+            }
+        }
+    );
+}
+
+function RMCreateIndicoLink() {
+
+    var killProgress = IndicoUI.Dialogs.Util.progress($T("Creating Indico link..."));
+
+    indicoRequest('collaboration.pluginService',
+            {
+                plugin: 'RecordingManager',
+                service: 'RMCreateIndicoLink',
+                conference: '<%= ConferenceId %>',
+                IndicoID: RMselectedTalkId,
+                LOID: RMselectedLOID
             },
         function(result, error){
             if (!error) {

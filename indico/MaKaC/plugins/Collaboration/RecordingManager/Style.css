@@ -11,17 +11,18 @@ div.RMHolderPaneDefaultInvisible {
 div.RMHolderPaneDefaultVisible {
     display: block;
 }
+
+div.nicebox {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #CCCCCC;
+}
+
 div.RMMatchPane {
     background-color: #FFFFFF;
     padding: 10px 20px 10px 10px;
     margin-top: 10px;
     margin-bottom: 10px;
-    -moz-border-radius-bottomleft:10px;
-    -moz-border-radius-bottomright:10px;
-    -moz-border-radius-topleft:10px;
-    -moz-border-radius-topright:10px;
-    border-bottom:1px solid #AAAAAA;
-    border-right:1px solid #AAAAAA;
     min-height: 300px;
     max-height: 450px;
     overflow: auto;
@@ -94,7 +95,7 @@ div.RMtalkSelected {
     height: 30px;
     font-family: serif;
     font-size: -1;
-    font-weight: bold;
+    font-weight: normal;
     line-height: 1;
     margin: 0px;
     padding: 2px;
@@ -134,9 +135,20 @@ div.RMLOSelected {
     padding: 2px;
 }
 
-div.RMStatusMessage {
-    width: 50%;
+div.RMlowerPane {
+    width: 100%;
+}
+
+span.RMButtonCreateCDSRecord {
+    display:inline;
+}
+
+span.RMMatchSummaryMessage {
+    width: 300px;
     height: 20px;
+    border-width: 1px;
+    border-style: solid;
+    display:inline;
 }
 
 span.RRNoteTitle {

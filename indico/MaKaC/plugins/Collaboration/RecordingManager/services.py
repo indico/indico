@@ -21,8 +21,6 @@
 
 from MaKaC.services.implementation.collaboration import CollaborationPluginServiceBase
 from MaKaC.plugins.Collaboration.RecordingRequest.common import getTalks
-from MaKaC.common.fossilize import fossilize
-from MaKaC.fossils.contribution import IContributionWithSpeakersFossil
 from MaKaC.plugins.Collaboration.RecordingManager.common import RecordingManagerException,\
     updateMicala, createCDSRecord
 
@@ -68,8 +66,35 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
 
 #        raise RecordingManagerException("got this far")
 
-# this line is almost certainly wrong. Dno't know how this works yet.
-        return {'result':resultCreateCDSRecord}
+        # this line is almost certainly wrong. Dno't know how this works yet.
+        return str(resultUpdateMicala) + ', ' + str(resultCreateCDSRecord)
+
+class RMCreateIndicoLinkService(CollaborationPluginServiceBase):
+
+    def _checkParams(self):
+        CollaborationPluginServiceBase._checkParams(self) #puts the Conference in self._conf
+        self._IndicoID = self._params.get('IndicoID', None)
+        self._LOID     = self._params.get('LOID', None)
+        self._confId   = self._params.get('conference', None)
+
+        if not self._IndicoID:
+            raise RecordingManagerException("No IndicoID supplied")
+        if not self._LOID:
+            raise RecordingManagerException("No LOID supplied")
+        if not self._confId:
+            raise RecordingManagerException("No conference ID supplied")
+
+    def _getAnswer(self):
+        # Update the micala database
+        resultUpdateMicala = updateMicala(self._IndicoID, self._params.get('LOID', None))
+
+        # Get the MARC XML and submit it to CDS
+        resultCreateCDSRecord = createCDSRecord(self._confId, self._aw)
+
+#        raise RecordingManagerException("got this far")
+
+        # this line is almost certainly wrong. Dno't know how this works yet.
+        return str(resultUpdateMicala) + ', ' + str(resultCreateCDSRecord)
 
 # In case we want to update list of orphans after page has loaded...
 class RMOrphansService():

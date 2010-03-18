@@ -7,11 +7,12 @@
 
 <table>
   <tr>
-    <td width="400px" valign="top">
+    <td width="440px" valign="top">
         <b><%= _("1. Select a record:") %></b>
         <br /> <!-- line breaks to make the pretty boxes below to line up -->
         <br />
         <br />
+        <div class="nicebox">
         <div class="RMMatchPane">
             <% for talk in Talks: %>
                 <% IndicoID = talk["IndicoID"] %>
@@ -19,7 +20,7 @@
                   <span>
                     <table cellspacing="0" cellpadding="0" border="0">
                     <tr>
-                    <td width="350px">
+                    <td width="380px">
 <!--
                         <tt><b><%= {'conference':      "E&nbsp;",
                                  'session':         "&nbsp;S&nbsp;",
@@ -42,12 +43,17 @@
                     </td>
                     <td align="top">
                         <% if talk["LOID"] != '': %>
-                        <b><tt>M</tt></b>
+                        <b><tt>MATCH</tt></b>
                         <% end %>
-                    </td>
-                    <td align="top">
+                        <% else: %>
+                        <b><tt>&nbsp;</tt></b>
+                        <% end %>
+                        <br />
                         <% if talk["CDS"] != '': %>
-                        <b><tt>C</tt></b>
+                        <b><tt>CDS</tt></b>
+                        <% end %>
+                        <% else: %>
+                        <b><tt>&nbsp;</tt></b>
                         <% end %>
                     </td>
                     </tr>
@@ -55,6 +61,7 @@
                     </span>
                 </div>
             <% end %>
+        </div>
         </div>
     </td>
     <td width="620px" valign="top">
@@ -65,6 +72,7 @@
         <div id="RMrightPaneWebLecture" class="RMHolderPaneDefaultInvisible">
             <br />
             <b><%= _("3. Select an orphan lecture object: ") %></b>
+        <div class="nicebox">
         <div class="RMMatchPane">
             <% for orphan in Orphans: %>
                 <% lectureDBid = orphan["id"] %>
@@ -95,6 +103,7 @@
             <% end %>
         </div>
         </div>
+        </div>
         <div id="RMrightPanePlainVideo" class="RMHolderPaneDefaultInvisible">
             <br />
             <b><%= _("3. Select options: ") %></b>
@@ -109,13 +118,20 @@
         </div>
     </td>
   </tr>
-<table>
+</table>
+
 <div id="RMlowerPane" class="RMHolderPaneDefaultVisible" style="margin-left: 150px;">
     <span>
         <br />
         <b><%= _("4. Create CDS record (and update micala database)") %></b>
         <br />
-        <button onclick="RMCreateCDSRecord()">Create CDS record</button>
+        <span id="RMbuttonCreateCDSRecord">
+        <!--  Javascript button here -->
+        </span>
+        <span id="RMMatchSummaryMessage">
+        </span>
+
+<!--         <input type="button" disabled="" id="RMbuttonCreateCDSRecord" onclick="RMCreateCDSRecord()" value=<%= _("\"Create CDS record\"") %> /> -->
     </span>
     <br />
     <br />
@@ -123,15 +139,11 @@
     <span>
         <b><%= _("5. Create Indico link to CDS record") %></b>
         <br />
-        <button onclick="RMcreateIndicoLink()">Create Indico link</button>
+        <div id="RMbuttonCreateIndicoLink">
+        <!--  Javascript button here -->
+        </div>
+<!--         <input type="button" disabled="" id="RMbuttonCreateIndicoLink" onclick="RMcreateIndicoLink()" value="<%= _("Create Indico link") %>" /> -->
     </span>
-</div>
-
-<br />
-<br />
-<br />
-<div id="RMStatusMessageID" class="RMStatusMessage">
-    <span>Put update messages here</span>
 </div>
 
 <script type="text/javascript">
@@ -139,4 +151,10 @@
     var RR_contributions = <%= jsonEncode(Contributions) %>;
     var RR_contributionsLoaded = <%= jsBoolean(DisplayTalks or not HasTalks) %>;
     var RM_orphans = <%= jsonEncode(Orphans) %>;
+
+    // Draw the two buttons, which start out as disabled until
+    // the user has selected both talk and LO
+    $E('RMbuttonCreateCDSRecord').set(ButtonCreateCDSRecord.draw());
+    $E('RMbuttonCreateIndicoLink').set(ButtonCreateIndicoLink.draw());
+
 </script>
