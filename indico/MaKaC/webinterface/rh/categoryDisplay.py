@@ -479,6 +479,16 @@ class UtilsConference:
 
 class RHCategoryGetIcon(RHCategDisplayBase):
 
+    def _checkProtection( self ):
+        # Since the object of the request is the icon, and not
+        # the conference, we do a first check for the icon
+        icon = self._target.getIcon()
+        if icon.canAccess( self.getAW() ):
+            return
+        else:
+            RHCategDisplayBase._checkProtection(self)
+
+
     def _process(self):
         icon=self._target.getIcon()
         self._req.headers_out["Content-Length"]="%s"%icon.getSize()

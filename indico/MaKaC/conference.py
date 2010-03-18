@@ -1147,6 +1147,10 @@ class Category(Persistent):
     def getAllowedToAccessList( self ):
         return self.__ac.getAccessList()
 
+    def canKeyAccess( self, aw ):
+        # Categories don't allow access keys
+        return False
+
     def canIPAccess( self, ip ):
         try:
             return self._v_canipaccess[ip]
@@ -11624,7 +11628,14 @@ class Resource(Persistent):
         return None
 
     def getConference( self ):
-        return self._owner.getConference()
+        # this check owes itself to the fact that some
+        # protection checking functions call getConference()
+        # directly on resources, without caring whether they
+        # are owned by Conferences or Categories
+        if isinstance(self._owner, Category):
+            return None
+        else:
+            return self._owner.getConference()
 
     def getSession( self ):
         return self._owner.getSession()
