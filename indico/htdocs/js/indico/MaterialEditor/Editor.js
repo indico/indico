@@ -391,8 +391,8 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
 
     _drawProtectionDiv: function() {
         this.visibility = new RadioFieldWidget([
-            [0, Html.span({}, $T("This resource is visible to everyone"))],
-            [1, $T("Only people who can access the resource can see it")]]);
+            [0, Html.unescaped.span('strongRed', $T("The link for this material will <strong>visible</strong> from the event page, to everyone"))],
+            [1, Html.unescaped.span('strongRed', $T("The link will be <strong>invisible</strong> by default - only people who can access the material will be able to see it"))]]);
 
         this.password = Html.input('password',{});
 
@@ -443,7 +443,7 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
 
         return this.ExclusivePopupWithButtons.prototype.draw.call(this,
                                                                   this._drawWidget(),
-                                                                  this._drawButtons());
+                                                                  this._drawButtons(), null, {backgroundColor: 'white'});
     }
 
 

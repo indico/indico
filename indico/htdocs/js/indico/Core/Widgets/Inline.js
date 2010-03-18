@@ -154,69 +154,81 @@ type("RadioFieldWidget", ["InlineWidget", "WatchAccessor"],
          draw: function() {
              var self = this;
 
-             return $B(
-                 Html.table(
-                     this.cssClassRadios,
-                     Html.tbody({})
-                 ),
-                 this.orderedItems,
-                 function(item) {
-                     var radio = self.radioDict[item.key];
-                     radio.observeClick(function() {
-                         self.select(item.key);
-                     });
-                     self.options.accessor(item.key).observe(
-                         function(value) {
-                             radio.set(value);
-                             if (value) {
-                                 liItem.dom.className = 'selectedItem';
-                             } else {
-                                 liItem.dom.className = '';
-                             }
+             this.canvas = Html.div(
+                 {style:{position:'relative'}},
+                 $B(
+                     Html.table(
+                         this.cssClassRadios,
+                         Html.tbody({})
+                     ),
+                     this.orderedItems,
+                     function(item) {
+                         var radio = self.radioDict[item.key];
+                         radio.observeClick(function() {
+                             self.select(item.key);
                          });
+                         self.options.accessor(item.key).observe(
+                             function(value) {
+                                 radio.set(value);
+                                 if (value) {
+                                     liItem.dom.className = 'selectedItem';
+                                 } else {
+                                     liItem.dom.className = '';
+                                 }
+                             });
 
-                     var itemContent = item.get();
+                         var itemContent = item.get();
 
-                     if (itemContent.IWidget) {
-                         itemContent = itemContent.draw();
-                     } else {
-                         itemContent = Html.span({style:{verticalAlign: 'middle'}}, itemContent);
-                     }
+                         if (itemContent.IWidget) {
+                             itemContent = itemContent.draw();
+                         } else {
+                             itemContent = Html.span({style:{verticalAlign: 'middle'}}, itemContent);
+                         }
 
-                     // create li item, add visibility info too
-                     var liItem = Html.tr(
-                         self.visibility.get(item.key) ? {} : 'disabledRadio',
-                         keys(self.radioDict).length > 1 ? Html.td({}, radio):'',
-                         Html.td( {}, itemContent ));
-                     radio.dom.disabled = !self.visibility.get(item.key);
+                         // create li item, add visibility info too
+                         var liItem = Html.tr(
+                             self.visibility.get(item.key) ? {} : 'disabledRadio',
+                             keys(self.radioDict).length > 1 ? Html.td({}, radio):'',
+                             Html.td( {}, itemContent ));
+                         radio.dom.disabled = !self.visibility.get(item.key);
 
-                     if (self.options.get(item.key)) {
-                         liItem.dom.className = 'selectedItem';
-                     }
-
-
-                     // observe future changes in visibility
-                     self.visibility.accessor(item.key).observe(
-                         function(value) {
-                             if (!value) {
-                                 liItem.dom.className = 'disabledRadio';
-                                 radio.dom.disabled = true;
-                             } else {
-                                 liItem.dom.className = 'enabledRadio';
-                                 radio.dom.disabled = false;
-                             }
-                             if (!value && radio.get()) {
-                                 self.selectLast();
-                             }
-                         });
+                         if (self.options.get(item.key)) {
+                             liItem.dom.className = 'selectedItem';
+                         }
 
 
-                     return liItem;
-                 });
+                         // observe future changes in visibility
+                         self.visibility.accessor(item.key).observe(
+                             function(value) {
+                                 if (!value) {
+                                     liItem.dom.className = 'disabledRadio';
+                                     radio.dom.disabled = true;
+                                 } else {
+                                     liItem.dom.className = 'enabledRadio';
+                                     radio.dom.disabled = false;
+                                 }
+                                 if (!value && radio.get()) {
+                                     self.selectLast();
+                                 }
+                             });
+
+
+                         return liItem;
+                     }));
+
+             return this.canvas;
          },
 
          setVisibility: function(key, visible) {
              this.visibility.set(key, visible);
+         },
+
+         show: function() {
+             this.canvas.dom.style.display =  'block';
+         },
+
+         hide: function() {
+             this.canvas.dom.style.display =  'none';
          },
 
          onSelect: function(state) {
@@ -238,11 +250,14 @@ type("RadioFieldWidget", ["InlineWidget", "WatchAccessor"],
              return selKey;
          },
 
+
          enable: function() {
              each(this.radioDict,
                   function(value, key) {
                       value.dom.disabled = false;
                   });
+
+             this.canvas.dom.style.opacity = 1;
          },
 
          disable: function() {
@@ -250,6 +265,9 @@ type("RadioFieldWidget", ["InlineWidget", "WatchAccessor"],
                   function(value, key) {
                       value.dom.disabled = true;
                   });
+
+             this.canvas.dom.style.opacity = 0.4;
+
          },
 
          observe: function(callback) {

@@ -15,6 +15,12 @@ type("IWidget", [],
          },
 
          enable: function() {
+         },
+
+         show: function() {
+         },
+
+         hide: function() {
          }
 
      });

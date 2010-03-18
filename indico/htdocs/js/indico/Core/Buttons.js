@@ -222,7 +222,7 @@ IndicoUI.Buttons = {
             function2 = function1;
         }
 
-        var button = Html.button();
+        var button = Html.input('button', {});
         if (state) {
             button.set(text1);
         } else {

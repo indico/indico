@@ -491,8 +491,8 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
             }
         };
 
-        var addButton = Html.button({},$T("Add"));
-        var cancelButton = Html.button({}, $T("Cancel"));
+        var addButton = Html.input('button',{},$T("Add"));
+        var cancelButton = Html.input('button',{}, $T("Cancel"));
 
         cancelButton.observeClick(function(){
             self.close();
@@ -711,8 +711,8 @@ type("AddBreakDialog", ["ChangeEditDialog"],
          draw: function(){
              var self = this;
 
-             var addButton = Html.button({}, this.isEdit?$T("Save"):$T("Add"));
-             var cancelButton = Html.button({}, $T("Cancel"));
+             var addButton = Html.input('button', {}, this.isEdit?$T("Save"):$T("Add"));
+             var cancelButton = Html.input('button', {}, $T("Cancel"));
              cancelButton.dom.style.marginLeft = pixels(10);
 
              this.roomEditor = new RoomBookingWidget(Indico.Data.Locations,
@@ -1114,7 +1114,7 @@ type("MoveEntryDialog", ["ExclusivePopup"],
                     $T("Please select the place where you want to move it to."));
 
                 // We construct the "ok" button and what happens when it's pressed
-                var okButton = Html.button('', "OK");
+                var okButton = Html.input('button', '', "OK");
                 okButton.observeClick(function() {
                     var killProgress = IndicoUI.Dialogs.Util.progress("Moving the entry...");
 
@@ -1139,7 +1139,7 @@ type("MoveEntryDialog", ["ExclusivePopup"],
                 });
 
                 // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
-                var cancelButton = Html.button( {
+                var cancelButton = Html.input('button',  {
                     style : {
                         marginLeft : pixels(5)
                     }

@@ -819,7 +819,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
                                  }
                              });
 
-        var saveButton = Html.button({}, 'Save');
+        var saveButton = Html.input('button', {}, 'Save');
         saveButton.observeClick(function() {
 
             if (!parameterManager.check()) {
@@ -838,7 +838,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
                                                          rescheduleCheckbox.get());
             self.close();
         });
-        var cancelButton = Html.button({}, 'Cancel');
+        var cancelButton = Html.input('button', {}, 'Cancel');
         cancelButton.observeClick(function() {
             timeEditDiv.dom.style.display = 'none';
             timeDiv.dom.style.display = 'block';

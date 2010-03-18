@@ -92,8 +92,8 @@ extend(IndicoUI.Dialogs,
 
                        popup.draw = function(){
                            var self = this;
-                           var addButton = Html.button({},$T("Add"));
-                           var cancelButton = Html.button({},$T("Cancel"));
+                           var addButton = Html.input('button', {},$T("Add"));
+                           var cancelButton = Html.input('button', {},$T("Cancel"));
                            cancelButton.dom.style.marginLeft = pixels(10);
 
                            info.set('roomInfo', $O(roomInfo));
@@ -353,8 +353,8 @@ extend(IndicoUI.Dialogs,
 
                        popup.draw = function() {
                            var self = this;
-                           var addButton = Html.button({}, $T("Add"));
-                           var cancelButton = Html.button({}, $T("Cancel"));
+                           var addButton = Html.input('button', {}, $T("Add"));
+                           var cancelButton = Html.input('button', {}, $T("Cancel"));
                            cancelButton.dom.style.marginLeft = pixels(10);
 
                            /******************************************************
@@ -547,8 +547,8 @@ extend(IndicoUI.Dialogs,
 
                        var self = this;
 
-                       var addButton = Html.button({},$T("Add"));
-                       var cancelButton = Html.button({},$T("Cancel"));
+                       var addButton = Html.input('button', {},$T("Add"));
+                       var cancelButton = Html.input('button', {},$T("Cancel"));
                        cancelButton.dom.style.marginLeft = pixels(10);
 
                        cancelButton.observeClick(function(){
