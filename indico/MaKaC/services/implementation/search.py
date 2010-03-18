@@ -2,7 +2,6 @@
 
 from MaKaC.conference import CategoryManager
 
-from MaKaC.services.implementation.base import ProtectedService
 from MaKaC.services.implementation.base import ServiceBase
 
 from MaKaC.common import search
@@ -14,7 +13,7 @@ from MaKaC.webinterface import urlHandlers
 
 from zope.index.text import parsetree
 
-class SearchUsersGroups(ProtectedService):
+class SearchUsersGroups(ServiceBase):
 
     @staticmethod
     def _cmpUsers(x, y):
