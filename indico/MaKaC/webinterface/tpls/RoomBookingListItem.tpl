@@ -53,9 +53,9 @@ occurrenceId = 'resv%s%s' % (reservation.id, occurrence.startDT)
           <% end %>
         </td>
     <% end %>
-    <td <%=onClickDetails%> style="padding: 0px 10px 6px 0px; cursor: pointer;"><nobr><%= room.building %>-<%= room.floor %>-<%= room.roomNr %>
-        <% if room.name != str(room.building) + '-' + str(room.floor) + '-' + str(room.roomNr): %>
-            <small>(<%= room.name %>)</small>
+    <td <%=onClickDetails%> style="padding: 0px 10px 6px 0px; cursor: pointer;"><nobr><%= reservation.room.building %>-<%= reservation.room.floor %>-<%= reservation.room.roomNr %>
+        <% if reservation.room.name != str(reservation.room.building) + '-' + str(reservation.room.floor) + '-' + str(reservation.room.roomNr): %>
+            <small>(<%= reservation.room.name %>)</small>
         <% end %>
         </nobr>
     </td>
