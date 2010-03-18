@@ -202,6 +202,9 @@ class WPConfModifCSBase (WPConferenceModifBase):
     def _setActiveSideMenuItem(self):
         self._videoServicesMenuItem.setActive()
 
+    def _includeFavList(self):
+        return True
+
 class WPConfModifCollaboration(WPConfModifCSBase):
 
     def __init__(self, rh, conf):

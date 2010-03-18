@@ -1262,12 +1262,18 @@ class WPConferenceCreationMainData( WPCategoryDisplayBase ):
                              "loginAsURL": self.getLoginAsURL() } )
 
     def _getNavigationDrawer(self):
-
         if self._target and self._target.isRoot():
             return
         else:
             pars = {"target": self._target, "isModif": False}
             return wcomponents.WNavigationDrawer( pars )
+        return wcomponents.WNavigationDrawer( pars )
+
+    def _includeFavIds(self):
+        return True
+
+    def _includeFavList(self):
+        return True
 
     def _getWComponent( self ):
         return WConferenceCreation( self._target, "", self._rh )
@@ -1284,6 +1290,9 @@ class WPCategoryModifBase( WPCategoryBase ):
     def getJSFiles(self):
         return WPCategoryBase.getJSFiles(self) + \
                self._includeJSPackage('Management')
+
+    def _includeFavouriteInfo(self):
+        return True
 
     def _getHeader( self ):
         """
@@ -1344,6 +1353,9 @@ class WPCategoryModifBase( WPCategoryBase ):
 
     def _setActiveSideMenuItem( self ):
         pass
+
+    def _includeFavIds(self):
+        return True
 
     def _getBody( self, params ):
         self._createSideMenu()
@@ -2155,6 +2167,9 @@ class WPCategoryModifExistingMaterials( WPCategoryModifBase ):
     def _getPageContent( self, pars ):
         wc=wcomponents.WShowExistingMaterial(self._target)
         return wc.getHTML( pars )
+
+    def _includeFavList(self):
+        return True
 
     def _setActiveSideMenuItem( self ):
         self._filesMenuItem.setActive()

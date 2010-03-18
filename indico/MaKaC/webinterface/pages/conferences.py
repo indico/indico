@@ -2039,6 +2039,9 @@ class WPConferenceModifBase( main.WPMainBase ):
         pars = {"target": self._conf, "isModif": True }
         return wcomponents.WNavigationDrawer( pars, bgColor="white" )
 
+    def _includeFavIds(self):
+        return True
+
     def _createSideMenu(self):
         self._sideMenu = wcomponents.ManagementSideMenu()
 
@@ -3196,6 +3199,9 @@ class WPConfModifScheduleGraphic( WPConferenceModifBase ):
     def getJSFiles(self):
         return WPConferenceModifBase.getJSFiles(self) + \
                self._includeJSPackage('Timetable')
+
+    def _includeFavList(self):
+        return True
 
     def _generateTimetable(self):
         tz = self._conf.getTimezone()
@@ -7868,6 +7874,9 @@ class WPModifContribList( WPConferenceModifBase ):
     def _setActiveSideMenuItem(self):
         self._contribListMenuItem.setActive(True)
 
+    def _includeFavList(self):
+        return True
+
     def _getPageContent( self, params ):
         filterCrit=params.get("filterCrit",None)
         sortingCrit=params.get("sortingCrit",None)
@@ -11767,6 +11776,9 @@ class WPConfModifExistingMaterials( WPConferenceModifBase ):
 
     def _setActiveSideMenuItem( self ):
         self._materialMenuItem.setActive()
+
+    def _includeFavList(self):
+        return True
 
 class WPConfModifDisplayImageBrowser (wcomponents.WTemplated):
 

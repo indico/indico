@@ -73,6 +73,12 @@ class WPBase:
     def _getJavaScriptInclude(self, scriptPath):
         return '<script src="'+ scriptPath +'" type="text/javascript"></script>\n'
 
+    def _includeFavIds(self):
+        return False
+
+    def _includeFavList(self):
+        return False
+
     def _getHeadContent( self ):
         """
         Returns _additional_ content between <head></head> tags.

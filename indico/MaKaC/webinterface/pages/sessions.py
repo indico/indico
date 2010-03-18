@@ -1455,6 +1455,9 @@ class WPSessionModifSchedule( WPSessionModifBase, WPConfModifScheduleGraphic  ):
     def getJSFiles(self):
         return WPConfModifScheduleGraphic.getJSFiles(self)
 
+    def _includeFavList(self):
+        return True
+
     def _generateTimetable(self):
 
         tz = self._conf.getTimezone()
@@ -2819,6 +2822,9 @@ class WPSessionModifMaterials( WPSessionModifBase ):
     def _getTabContent( self, pars ):
         wc=wcomponents.WShowExistingMaterial(self._target)
         return wc.getHTML( pars )
+
+    def _includeFavList(self):
+        return True
 
 class WPSessionDatesModification(WPSessionModifSchedule):
 

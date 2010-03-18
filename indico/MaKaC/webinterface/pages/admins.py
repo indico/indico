@@ -144,6 +144,9 @@ class WPAdminsBase( WPMainBase ):
     def _setActiveTab(self):
         pass
 
+    def _includeFavIds(self):
+        return True
+
     def _setActiveSideMenuItem(self):
         pass
 
@@ -432,6 +435,9 @@ class WPAdminPlugins( WPAdminsBase ):
             self._tabs["Main"].setActive()
         else:
             self._tabs[self._pluginTypeId].setActive()
+
+    def _includeFavList(self):
+        return True
 
     def _getPageContent(self, params):
         if self._pluginTypeId is None:
@@ -2486,6 +2492,9 @@ class WPRoomBookingRoomForm( WPRoomBookingPluginAdminBase ):
     def _setActiveTab( self ):
         WPRoomBookingPluginAdminBase._setActiveTab( self )
         self._subTabConfig.setActive()
+
+    def _includeFavList(self):
+        return True
 
     def _getTabContent( self, params ):
         wc = wcomponents.WRoomBookingRoomForm( self._rh )

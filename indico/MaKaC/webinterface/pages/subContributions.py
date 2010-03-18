@@ -34,13 +34,13 @@ from MaKaC.common.utils import isStringHTML
 from MaKaC.i18n import _
 
 class WPSubContributionBase( WPMainBase, WPConferenceBase ):
-    
+
     def __init__( self, rh, subContribution ):
         self._subContrib = self._target = subContribution
         self._conf = self._target.getConference()
         self._contrib = self._subContrib.getOwner()
         WPConferenceBase.__init__( self, rh, self._conf )
-    
+
 #    def _createMenu( self ):
 #        main.WPMainBase._createMenu( self )
 #        c = self._target
@@ -55,7 +55,7 @@ class WPSubContributionBase( WPMainBase, WPConferenceBase ):
 
 
 class WPSubContributionDefaultDisplayBase( WPConferenceDefaultDisplayBase, WPSubContributionBase ):
-    
+
     def getJSFiles(self):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
             self._includeJSPackage('Management') + \
@@ -138,7 +138,7 @@ class WSubContributionDisplayBase(wcomponents.WTemplated):
         if room is not None:
             roomLink=linking.RoomLinker().getHTMLLink(room,loc)
             vars["location"]= _("""%s<br><small> _("Room"):</small> %s""")%(\
-                vars["location"],roomLink)         
+                vars["location"],roomLink)
         vars["location"]=self._getHTMLRow( _("Place"),vars["location"])
         vars["material"]=self._getMaterialHTML()
         vars["inContrib"]=""
@@ -148,7 +148,7 @@ class WSubContributionDisplayBase(wcomponents.WTemplated):
             vars["inContrib"]="""<a href=%s>%s</a>"""%(\
                 quoteattr(str(url)),self.htmlText(ContribCaption))
         vars["inContrib"]=self._getHTMLRow( _("Included in contribution"),vars["inContrib"])
-        l=[] 
+        l=[]
         for speaker in self._subContrib.getSpeakerList():
             l.append(self.htmlText(speaker.getFullName()))
         vars["speakers"]=self._getHTMLRow( _("Presenters"),"<br>".join(l))
@@ -261,7 +261,7 @@ class WSubContributionDisplayBase(wcomponents.WTemplated):
         if room is not None:
             roomLink=linking.RoomLinker().getHTMLLink(room,loc)
             vars["location"]= _("""%s<br><small> _("Room"):</small> %s""")%(\
-                vars["location"],roomLink)         
+                vars["location"],roomLink)
         vars["location"]=self._getHTMLRow( _("Place"),vars["location"])
         vars["material"]=self._getMaterialHTML()
         vars["inContrib"]=""
@@ -271,7 +271,7 @@ class WSubContributionDisplayBase(wcomponents.WTemplated):
             vars["inContrib"]="""<a href=%s>%s</a>"""%(\
                 quoteattr(str(url)),self.htmlText(ContribCaption))
         vars["inContrib"]=self._getHTMLRow( _("Included in contribution"),vars["inContrib"])
-        l=[] 
+        l=[]
         for speaker in self._subContrib.getSpeakerList():
             l.append(self.htmlText(speaker.getFullName()))
         vars["speakers"]=self._getHTMLRow( _("Presenters"),"<br>".join(l))
@@ -310,11 +310,11 @@ class WPSubContributionDisplay(WPSubContributionDefaultDisplayBase):
         wc=WSubContributionDisplay(self._getAW(),self._subContrib)
         return wc.getHTML()
 
-    
+
 
 ##
 class WPSubContributionModifBase( WPConferenceModifBase ):
-    
+
     def __init__( self, rh, subContribution ):
         WPConferenceModifBase.__init__( self, rh, subContribution.getConference() )
         self._subContrib = self._target = subContribution
@@ -341,9 +341,9 @@ class WPSubContributionModifBase( WPConferenceModifBase ):
 
         banner = wcomponents.WTimetableBannerModif(self._target).getHTML()
         body = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
-        
+
         return banner + body
-    
+
     def _setActiveSideMenuItem(self):
         if self._contrib.isScheduled():
             self._timetableMenuItem.setActive(True)
@@ -355,16 +355,16 @@ class WPSubContributionModifBase( WPConferenceModifBase ):
 
 
 class WPSubContribModifMain( WPSubContributionModifBase ):
-    
+
     def _setActiveTab( self ):
         self._tabMain.setActive()
 
 
 class WSubContribModifTool(wcomponents.WTemplated):
-    
+
     def __init__( self, subContrib ):
         self._subContrib = subContrib
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["deleteIconURL"] = Config.getInstance().getSystemIconURL("delete")
@@ -373,7 +373,7 @@ class WSubContribModifTool(wcomponents.WTemplated):
 
 
 class WPSubContributionModifTools( WPSubContributionModifBase ):
-    
+
     def _setActiveTab( self ):
         self._tabTools.setActive()
 
@@ -382,26 +382,29 @@ class WPSubContributionModifTools( WPSubContributionModifBase ):
         pars = { \
 "deleteSubContributionURL": urlHandlers.UHSubContributionDelete.getURL( self._target ), \
 "writeMinutes": urlHandlers.UHSubContributionWriteMinutes.getURL( self._target ) }
-        return wc.getHTML( pars )  
+        return wc.getHTML( pars )
 
 
 class WPSubContributionModifMaterials( WPSubContributionModifBase ):
     #TODO: maybe join it with contributions.WPContributionModifMaterials
-    
+
     def __init__(self, rh, subcontribution):
         WPSubContributionModifBase.__init__(self, rh, subcontribution)
-    
+
     def _setActiveTab( self ):
         self._tabMaterials.setActive()
 
-    def _getTabContent( self, pars ):        
+    def _getTabContent( self, pars ):
         wc=wcomponents.WShowExistingMaterial(self._target)
         #pars["materialTypes"] = self._matTypes
-        return wc.getHTML()          
-    
+        return wc.getHTML()
+
+    def _includeFavList(self):
+        return True
+
 
 class WSubContribModNewSpeaker(wcomponents.WTemplated):
-    
+
     def __init__(self,subcontrib):
         self._subcontrib = subcontrib
 
@@ -412,16 +415,16 @@ class WSubContribModNewSpeaker(wcomponents.WTemplated):
         return vars
 
 class WPSubModNewSpeaker( WPSubContribModifMain ):
-    
+
     def _getTabContent( self, params ):
         wc = WSubContribModNewSpeaker(self._subContrib)
-        return wc.getHTML( params )   
+        return wc.getHTML( params )
 
 
 
 class WPSubContributionModification( WPSubContribModifMain ):
     def _getTabContent( self, params ):
-        wc = WSubContribModifMain( self._target, materialFactories.ContribMFRegistry() )        
+        wc = WSubContribModifMain( self._target, materialFactories.ContribMFRegistry() )
         place = ""
         if self._target.getLocation() is not None:
             place = self._target.getLocation().getName()
@@ -441,14 +444,14 @@ class WPSubContributionModification( WPSubContribModifMain ):
                 "removeSpeakersURL": quoteattr(str(urlHandlers.UHSubContributionRemoveSpeakers.getURL(self._target))),\
                 "modSpeakerURLGen":urlHandlers.UHSubContribModPresenter.getURL,\
                 "newSpeakerURL": quoteattr(str(urlHandlers.UHSubContributionNewSpeaker.getURL(self._target)))}
-        return wc.getHTML( pars ) 
+        return wc.getHTML( pars )
 
 class WSubContributionDataModification(wcomponents.WTemplated):
-    
+
     def __init__( self, subContribution ):
         self.__subContrib = subContribution
-        self.__owner = self.__subContrib.getOwner() 
-    
+        self.__owner = self.__subContrib.getOwner()
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["title"] = self.__subContrib.getTitle()
@@ -482,11 +485,11 @@ class WPSubContribSelectSpeakers( WPSubContribModifMain ):
 
 
 class WPSubContribAddMaterial( WPSubContribModifMain ):
-    
+
     def __init__( self, rh, contrib, mf ):
         WPSubContribModifMain.__init__( self, rh, contrib )
         self._mf = mf
-    
+
     def _getTabContent( self, params ):
         if self._mf:
             comp = self._mf.getCreationWC( self._target )
@@ -496,7 +499,7 @@ class WPSubContribAddMaterial( WPSubContribModifMain ):
         return comp.getHTML( pars )
 
 class WSubContributionDeletion(object):
-    
+
     def __init__( self, subContribList ):
         self._subContribList = subContribList
 
@@ -517,15 +520,15 @@ class WSubContributionDeletion(object):
 
 
 class WPSubContributionDeletion( WPSubContributionModifTools ):
-    
+
     def _getTabContent( self, params ):
         wc = WSubContributionDeletion( [self._target] )
         return wc.getHTML( urlHandlers.UHSubContributionDelete.getURL( self._target ) )
 
 class WSubContribModPresenter(wcomponents.WTemplated):
-    
+
     def __init__(self,auth):
-        self._auth=auth 
+        self._auth=auth
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
@@ -541,7 +544,7 @@ class WSubContribModPresenter(wcomponents.WTemplated):
         return vars
 
 class WPModPresenter( WPSubContribModifMain ):
-    
+
     def _getTabContent( self, params ):
         wc = WSubContribModPresenter(params["author"])
         return wc.getHTML()
@@ -574,7 +577,7 @@ class WSubContribSpeakerTable(wcomponents.WTemplated):
         return vars
 
 class WSubContribModifMain(wcomponents.WTemplated):
-    
+
     def __init__( self, subContribution, mfRegistry ):
         self._subContrib = subContribution
         self._mfRegistry = mfRegistry
@@ -603,7 +606,7 @@ class WSubContribModifMain(wcomponents.WTemplated):
         return vars
 
 class WPSubContributionWriteMinutes( WPSubContributionModifTools ):
-    
+
     def _getTabContent( self, params ):
         wc = wcomponents.WWriteMinutes( self._target )
         pars = {"postURL": urlHandlers.UHSubContributionWriteMinutes.getURL(self._target) }
@@ -611,7 +614,7 @@ class WPSubContributionWriteMinutes( WPSubContributionModifTools ):
 
 class WPSubContributionDisplayWriteMinutes( WPSubContributionDefaultDisplayBase ):
     navigationEntry=navigation.NESubContributionDisplay
-    
+
     def _getBody( self, params ):
         wc = wcomponents.WWriteMinutes( self._target )
         pars = {"postURL": urlHandlers.UHSubContributionDisplayWriteMinutes.getURL(self._target) }
@@ -626,7 +629,7 @@ class WPSubContributionReportNumberEdit(WPSubContributionModifBase):
     def _setActiveTab( self ):
         #self._innerTabMain.setActive()
         pass
-       
+
 
     def _getTabContent( self, params):
         wc=wcomponents.WModifReportNumberEdit(self._target, self._reportNumberSystem, "subcontribution")

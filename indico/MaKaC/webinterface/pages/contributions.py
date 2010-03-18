@@ -449,6 +449,9 @@ class WPContributionModifMaterials( WPContributionModifBase ):
         wc=wcomponents.WShowExistingMaterial(self._target)
         return wc.getHTML( pars )
 
+    def _includeFavList(self):
+        return True
+
 class WPModSearchPrimAuthor ( WPContribModifMain ):
 
     def _getTabContent(self,params):
