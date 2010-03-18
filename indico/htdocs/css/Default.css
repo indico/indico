@@ -4503,19 +4503,6 @@ div.exclusivePopupCloseButton {
     width: 15px;
     height: 15px;
 }
-div.exclusivePopup .buttonBar {
-    text-align: center;
-    background: #F8F8F8;
-    border: 0px;
-    -moz-border-radius-bottomleft: 10px;
-    -webkit-border-bottom-left-radius:10px;
-    -moz-border-radius-bottomright: 10px;
-    -webkit-border-bottom-right-radius:10px;
-    behavior: url(border-radius.htc);
-    border-top: 1px solid #CCC;
-    min-height: 40px;
-    padding-top: 10px;
-}
 
 
 div.balloonPopup {
@@ -5320,13 +5307,21 @@ div.popupWithButtonsMainContent {
 }
 
 div.popupButtonBar {
+    border: 0;
     border-top: 1px solid #CCCCCC;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-top: 10px;
+    padding: 10px;
     text-align: center;
     position:relative;
     top:-10px;
+    background: #F8F8F8;
+    margin-bottom: -10px;
+
+    -moz-border-radius-bottomleft: 10px;
+    -webkit-border-bottom-left-radius:10px;
+    -moz-border-radius-bottomright: 10px;
+    -webkit-border-bottom-right-radius:10px;
+    behavior: url(border-radius.htc);
+
 }
 
 div.dialogButtons {
