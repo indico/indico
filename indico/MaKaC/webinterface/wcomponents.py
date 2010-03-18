@@ -410,10 +410,10 @@ class WConferenceHeader( WHeader ):
         the conferences' web interface.
     """
 
-    def __init__(self, aw, navDrawer, conf):
+    def __init__(self, aw, conf):
         self._conf = conf
         self._aw = aw
-        WHeader.__init__(self, self._aw, navDrawer, tpl_name='EventHeader')
+        WHeader.__init__(self, self._aw, tpl_name='EventHeader')
         tzUtil = DisplayTZ(self._aw,self._conf)
         self._locTZ = tzUtil.getDisplayTZ()
 
@@ -461,11 +461,11 @@ class WMenuConferenceHeader( WConferenceHeader ):
     """Templating web component for generating the HTML header for
         the conferences' web interface with a menu
     """
-    def __init__(self, aw, navDrawer, conf, modifKey=False):
+    def __init__(self, aw, conf, modifKey=False):
         self._conf = conf
         self._modifKey=modifKey
         self._aw=aw
-        WConferenceHeader.__init__(self, self._aw, navDrawer, conf)
+        WConferenceHeader.__init__(self, self._aw, conf)
 
     def getVars( self ):
         vars = WConferenceHeader.getVars( self )
@@ -581,11 +581,11 @@ class WMenuMeetingHeader( WConferenceHeader ):
     """Templating web component for generating the HTML header for
         the meetings web interface with a menu
     """
-    def __init__(self, aw, navDrawer, conf, modifKey=False):
+    def __init__(self, aw, conf, modifKey=False):
         self._conf = conf
         self._modifKey=modifKey
         self._aw=aw
-        WHeader.__init__(self, self._aw, navDrawer, tpl_name='EventHeader')
+        WHeader.__init__(self, self._aw, tpl_name='EventHeader')
         tzUtil = DisplayTZ(self._aw,self._conf)
         self._locTZ = tzUtil.getDisplayTZ()
 

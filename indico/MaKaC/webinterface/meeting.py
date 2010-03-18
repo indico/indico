@@ -1297,7 +1297,7 @@ class WPMeetingDisplay( WPConferenceDisplayBase ):
         else:
             currentView = "static"
 
-        wc = wcomponents.WMenuMeetingHeader( self._getAW(), self._getNavigationDrawer(),self._conf )
+        wc = wcomponents.WMenuMeetingHeader( self._getAW(),self._conf )
         return wc.getHTML( { "loginURL": self.getLoginURL(),\
                              "logoutURL": self.getLogoutURL(),\
                              "confId": self._conf.getId(),\

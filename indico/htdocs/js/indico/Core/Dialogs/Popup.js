@@ -162,6 +162,7 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
         //this.contentWrapper.setStyle('marginTop', pixels((this.closeHandler && !this.title) ? 30 : 10));
         this.contentWrapper.setStyle('overflowY', 'auto');
         this.contentWrapper.setStyle('overflowX', 'hidden');
+        this.contentWrapper.setStyle('paddingRight', '10px');
 
     },
 

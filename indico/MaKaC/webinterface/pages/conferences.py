@@ -142,7 +142,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
     def _getHeader( self ):
         """
         """
-        wc = wcomponents.WConferenceHeader( self._getAW(), self._getNavigationDrawer(), self._conf )
+        wc = wcomponents.WConferenceHeader( self._getAW(), self._conf )
         return wc.getHTML( { "loginURL": self.getLoginURL(),\
                              "logoutURL": self.getLogoutURL(),\
                              "loginAsURL": self.getLoginAsURL(), \
@@ -950,11 +950,11 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
         """
         """
         if self._type == "simple_event":
-            wc = wcomponents.WMenuSimpleEventHeader( self._getAW(), self._getNavigationDrawer(), self._conf )
+            wc = wcomponents.WMenuSimpleEventHeader( self._getAW(), self._conf )
         elif self._type == "meeting":
-            wc = wcomponents.WMenuMeetingHeader( self._getAW(), self._getNavigationDrawer(), self._conf )
+            wc = wcomponents.WMenuMeetingHeader( self._getAW(), self._conf )
         else:
-            wc = wcomponents.WMenuConferenceHeader( self._getAW(), self._getNavigationDrawer(), self._conf )
+            wc = wcomponents.WMenuConferenceHeader( self._getAW(), self._conf )
         return wc.getHTML( { "loginURL": self.getLoginURL(),\
                              "logoutURL": self.getLogoutURL(),\
                              "confId": self._conf.getId(),\

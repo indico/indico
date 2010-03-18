@@ -28,8 +28,11 @@ class WPSearchCategory(WPSearch, WPCategoryDisplayBase):
         params['categId'] = self._target.getId()
 
     def _getNavigationDrawer(self):
-        pars = {"target": self._target, "isModif": False}
-        return WNavigationDrawer( pars )
+        if self._target.isRoot():
+            return
+        else:
+            pars = {"target": self._target, "isModif": False}
+            return WNavigationDrawer( pars )
 
 
 class WPSearchConference(WPSearch, WPConferenceDisplayBase):

@@ -46,19 +46,19 @@ class WebFactory(WebFactory):
     iconURL = Configuration.Config.getInstance().getSystemIconURL( "lecture" )
     name = "Lecture"
     description = """select this type if you want to set up a simple event thing without schedule, sessions, contributions, ... """
-        
-    def getConferenceDisplayPage( rh, conf, params): 
+
+    def getConferenceDisplayPage( rh, conf, params):
         return WPSimpleEventDisplay( rh, conf )
     getConferenceDisplayPage = staticmethod( getConferenceDisplayPage )
 
-    def getEventCreationPage( rh, targetCateg ): 
+    def getEventCreationPage( rh, targetCateg ):
         return WPSimpleEventCreation( rh, targetCateg )
     getEventCreationPage = staticmethod( getEventCreationPage )
-    
-    def getIconURL(): 
+
+    def getIconURL():
         return WebFactory.iconURL
     getIconURL = staticmethod( getIconURL )
-    
+
     @staticmethod
     def customiseSideMenu( webPageWithSideMenu ):
         webPageWithSideMenu._programMenuItem.setVisible(False)
@@ -76,7 +76,7 @@ class WebFactory(WebFactory):
         tabCtrl.getTabById("posters").enable()
         tabCtrl.getTabById("close").enable()
         tabCtrl.getTabById("delete").enable()
-        tabCtrl.getTabById("badges").disable()       
+        tabCtrl.getTabById("badges").disable()
 
     def getConfModif(rh, conf):
         return WPSEConfModif(rh, conf)
@@ -93,7 +93,7 @@ class WebFactory(WebFactory):
     def getConfModifBookings(rh, conf, bs):
         return WPSEConfModifBookings(rh, conf, bs)
     getConfModifBookings = staticmethod(getConfModifBookings)
-    
+
     def getConfClone(rh, conf):
         return WPSEConfClone(rh, conf)
     getConfClone = staticmethod(getConfClone)
@@ -109,11 +109,11 @@ class WebFactory(WebFactory):
     def getConferenceDisplayWriteMinutes(rh, contrib):
         return WPSEConferenceDisplayWriteMinutes(rh,contrib)
     getConferenceDisplayWriteMinutes = staticmethod(getConferenceDisplayWriteMinutes)
-    
+
     @staticmethod
     def getDisplayFullMaterialPackage(rh, conf):
         return WPSEDisplayFullMaterialPackage(rh,conf)
-    
+
 #################### Participants #####################################
 
     def getConfModifParticipantsNewPending(rh, conf):
@@ -125,27 +125,27 @@ class WebFactory(WebFactory):
     def getEvaluationDisplay(rh, conf):
         return WPSEEvaluationDisplay(rh, conf)
     getEvaluationDisplay = staticmethod(getEvaluationDisplay)
-    
+
     def getEvaluationDisplayModif(rh, conf):
         return WPSEEvaluationDisplayModif(rh, conf)
     getEvaluationDisplayModif = staticmethod(getEvaluationDisplayModif)
-    
+
     def getEvaluationSubmitted(rh, conf, mode):
         return WPSEEvaluationSubmitted(rh, conf, mode)
     getEvaluationSubmitted = staticmethod(getEvaluationSubmitted)
-    
+
     def getEvaluationFull(rh, conf):
         return WPSEEvaluationFull(rh, conf)
     getEvaluationFull = staticmethod(getEvaluationFull)
-    
+
     def getEvaluationClosed(rh, conf):
         return WPSEEvaluationClosed(rh, conf)
     getEvaluationClosed = staticmethod(getEvaluationClosed)
-    
+
     def getEvaluationSignIn(rh, conf):
         return WPSEEvaluationSignIn(rh, conf)
     getEvaluationSignIn = staticmethod(getEvaluationSignIn)
-    
+
     def getEvaluationInactive(rh, conf):
         return WPSEEvaluationInactive(rh, conf)
     getEvaluationInactive = staticmethod(getEvaluationInactive)
@@ -155,7 +155,7 @@ class WebFactory(WebFactory):
         return WPSEConfAddAlarm(rh, conf)
     getConfAddAlarm = staticmethod(getConfAddAlarm)
 
-    
+
 
 
 SimpleEventWebFactory = WebFactory
@@ -166,7 +166,7 @@ class WPMMaterialDisplayBase( conferences.WPConferenceDefaultDisplayBase):
         conferences.WPConferenceDefaultDisplayBase.__init__( self, rh, self._material.getConference())
         self._navigationTarget = self._material
         self._extraCSS.append(" body { background: #424242; } ")
- 
+
     def _getNavigationBarHTML(self):
         item = self.navigationEntry
         itemList = []
@@ -176,10 +176,10 @@ class WPMMaterialDisplayBase( conferences.WPConferenceDefaultDisplayBase):
             else:
                 itemList.insert(0, """<a href=%s>%s</a>"""%( quoteattr(str(item.getURL(self._navigationTarget))), wcomponents.WTemplated.htmlText(item.getTitle())  ) )
             item = item.getParent(self._navigationTarget)
-       
+
         itemList.insert(0, """<a href=%s>%s</a>"""%(quoteattr(str(urlHandlers.UHConferenceDisplay.getURL(self._conf))), self._conf.getTitle() ))
         return " &gt; ".join(itemList)
-   
+
     def _applyConfDisplayDecoration( self, body ):
         frame = WMConfDisplayFrame( self._getAW(), self._conf )
         frameParams = {\
@@ -187,7 +187,7 @@ class WPMMaterialDisplayBase( conferences.WPConferenceDefaultDisplayBase):
                       }
         if self._conf.getLogo():
             frameParams["logoURL"] = urlHandlers.UHConferenceLogo.getURL( self._conf)
-           
+
         colspan=""
         imgOpen=""
         padding=""
@@ -196,7 +196,7 @@ class WPMMaterialDisplayBase( conferences.WPConferenceDefaultDisplayBase):
         body =  _("""
                 <td class="confBodyBox" %s %s>
                     %s
-                    <table border="0" cellpadding="0" cellspacing="0" 
+                    <table border="0" cellpadding="0" cellspacing="0"
                                 align="center" valign="top" width="95%%">
                         <tr>
                             <td><div class="groupTitle">_("Added Material")</div></td>
@@ -213,7 +213,7 @@ class WPMMaterialDisplayBase( conferences.WPConferenceDefaultDisplayBase):
                         self._getNavigationBarHTML(),
                         body)
         return frame.getHTML( body, frameParams)
-    
+
     def _getFooter( self ):
         wc = wcomponents.WFooter()
         p = {"dark":True}
@@ -227,7 +227,7 @@ class WMConfDisplayFrame(conferences.WConfDisplayFrame):
             vars["logo"] = "<img src=\"%s\" alt=\"%s\" border=\"0\">"%(vars["logoURL"], self._conf.getTitle())
         vars["confTitle"] = self._conf.getTitle()
         vars["displayURL"] = urlHandlers.UHConferenceDisplay.getURL(self._conf)
-        vars["imgConferenceRoom"] = Config.getInstance().getSystemIconURL( "conferenceRoom" ) 
+        vars["imgConferenceRoom"] = Config.getInstance().getSystemIconURL( "conferenceRoom" )
         tzUtil = timezoneUtils.DisplayTZ(self._aw,self._conf)
         tz = tzUtil.getDisplayTZ()
         adjusted_sDate = self._conf.getStartDate().astimezone(timezone(tz))
@@ -240,7 +240,7 @@ class WMConfDisplayFrame(conferences.WConfDisplayFrame):
             vars["confDateInterval"] = adjusted_sDate.strftime("%d %B %Y") + " (" + tz + ")"
         elif self._conf.getStartDate().month == self._conf.getEndDate().month:
             vars["confDateInterval"] = "%s-%s %s %s"%(adjusted_sDate.day, adjusted_eDate.day, adjusted_sDate.strftime("%B %Y"), tz)
-        vars["body"] = self._body     
+        vars["body"] = self._body
         vars["confLocation"] = ""
         if self._conf.getLocationList():
             vars["confLocation"] =  self._conf.getLocationList()[0].getName()
@@ -251,7 +251,7 @@ class WMConfDisplayFrame(conferences.WConfDisplayFrame):
         format = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getFormat()
         vars["bgColorCode"] = format.getFormatOption("titleBgColor")["code"]
         vars["textColorCode"] = format.getFormatOption("titleTextColor")["code"]
-        return vars                      
+        return vars
 
     def getHTML( self, body, params ):
         self._body = body
@@ -262,7 +262,7 @@ class WPMMaterialDisplay( WPMMaterialDisplayBase):
     def __init__(self, rh, material):
         WPMMaterialDisplayBase.__init__(self, rh, material)
 
-    
+
     def _getBody( self, params ):
         wc = material.WMaterialDisplay( self._getAW(), self._material )
         pars = { "fileAccessURLGen": urlHandlers.UHFileAccess.getURL }
@@ -279,12 +279,12 @@ class WPSEConfModif(conferences.WPConferenceModification):
 
 class WSEConfModifMainData(meeting.WMConfModifMainData):
     def getVars(self):
-        
-        #enable Evaluation by default        
+
+        #enable Evaluation by default
         self._conf.enableSection('evaluation')
-        
+
         vars = conferences.WConfModifMainData.getVars( self )
- 
+
         return vars
 
 
@@ -297,13 +297,13 @@ class WSEConfModifAC(conferences.WConfModifAC):
 
 
 #####Tools # Stays the same as conference for now
-class WPSEConfModifToolsBase (conferences.WPConfModifToolsBase):  
+class WPSEConfModifToolsBase (conferences.WPConfModifToolsBase):
 
     def __init__(self, rh, conf):
         conferences.WPConfModifToolsBase.__init__(self, rh, conf)
 
 class WPSEConfClone(WPSEConfModifToolsBase):
-    
+
     def _setActiveTab( self ):
         self._tabCloneEvent.setActive()
 
@@ -345,7 +345,7 @@ class WPSEConfAddContribution(conferences.WPModScheduleNewContrib):
         conferences.WPConfAddContribution.__init__(self, rh, conf)
         self._targetDay = targetDay
 
-        
+
     def _getTabContent( self, params ):
         p = WSEContributionCreation( self._conf )
         pars = {"postURL": urlHandlers.UHMConfPerformAddContribution.getURL(), \
@@ -353,13 +353,13 @@ class WPSEConfAddContribution(conferences.WPModScheduleNewContrib):
         "calendarSelectURL":  urlHandlers.UHSimpleCalendar.getURL(), \
         "targetDay": self._targetDay}
         return p.getHTML(pars)
-        
+
 
 class WSEContributionCreation(conferences.WContributionCreation):
     def getVars( self ):
         vars = conferences.WContributionCreation.getVars( self )
         return vars
-    
+
 #################### Material Modif #####################################
 
 #class WPSEMaterialDataModif (material.WPMaterialDataModification):
@@ -379,30 +379,30 @@ class WSEContributionCreation(conferences.WContributionCreation):
 
 #################### Event Creation #####################################
 class WPSimpleEventCreation( WPConferenceCreationMainData):
-    
+
     def _getWComponent( self ):
         return WSimpleEventCreation( self._target, rh = self._rh )
-        
+
 
 class WSimpleEventCreation(category.WConferenceCreation):
     def __init__( self, targetCateg, type="simple_event", rh = None ):
         self._categ = targetCateg
         self._type = type
-        self._rh = rh        
-    
+        self._rh = rh
+
     def getVars( self ):
         vars = category.WConferenceCreation.getVars( self )
         vars["event_type"] = WebFactory.getId()
         return vars
-            
+
 ##################### Event Display ###################################
-    
+
 class WPSimpleEventDisplay( conferences.WPConferenceDisplayBase ):
-    
+
     def _getHeader( self ):
         """
         """
-        wc = wcomponents.WMenuSimpleEventHeader( self._getAW(), self._getNavigationDrawer(),self._conf )
+        wc = wcomponents.WMenuSimpleEventHeader( self._getAW(),self._conf )
         return wc.getHTML( { "loginURL": self.getLoginURL(),\
                              "logoutURL": self.getLogoutURL(),\
                              "confId": self._conf.getId(),\
@@ -410,7 +410,7 @@ class WPSimpleEventDisplay( conferences.WPConferenceDisplayBase ):
                              "type": WebFactory.getId(),\
                              "dark": True,\
                              "loginAsURL": self.getLoginAsURL() } )
-    
+
     def _getBody( self, params ):
         wc = WSimpleEventDisplay( self._getAW(), self._conf )
         pars = { \
@@ -422,7 +422,7 @@ class WPSimpleEventDisplay( conferences.WPConferenceDisplayBase ):
         return wc.getHTML( pars )
 
 #class WSimpleEventDataModification(WConferenceDataModification):
-#    
+#
 #    def getVars( self ):
 #        vars = WConferenceDataModification.getVars( self )
 #        vars["event_type"] = WebFactory.getId()
@@ -430,7 +430,7 @@ class WPSimpleEventDisplay( conferences.WPConferenceDisplayBase ):
 
 
 #class WSimpleEventCreation(category.WConferenceCreation):
-#    
+#
 #    def getVars( self ):
 #        self._type = WebFactory.getId()
 #        vars = category.WConferenceCreation.getVars( self )
@@ -442,7 +442,7 @@ class WSimpleEventDisplay:
 
     def __init__( self, aw, conference ):
         self._aw = aw
-        self._conf = conference 
+        self._conf = conference
 
     def getHTML( self, params ):
         if self._conf.canAccess( self._aw ):
@@ -452,10 +452,10 @@ class WSimpleEventDisplay:
 
 
 class WSimpleEventBaseDisplay(wcomponents.WTemplated):
-    
+
     def __init__( self, aw, conference ):
         self._aw = aw
-        self._conf = conference 
+        self._conf = conference
 
     def __getHTMLRow( self, title, body, allowEmptyBody=1 ):
         str = """
@@ -530,7 +530,7 @@ class WSimpleEventMinDisplay(WSimpleEventBaseDisplay):
 #################### Participants #####################################
 
 class WPSEConfModifParticipantsNewPending(WPSimpleEventDisplay,conferences.WPConfModifParticipantsNewPending):
-   
+
    def __init__(self, rh, conf):
        WPSimpleEventDisplay.__init__(self, rh, conf)
 
@@ -541,7 +541,7 @@ class WPSEConfModifParticipantsNewPending(WPSimpleEventDisplay,conferences.WPCon
 
 class WPSEEvaluationBase( WPSimpleEventDisplay ):
     """[DisplayArea] Base class."""
-    
+
     def _getHeadContent( self ):
         """import needed javascript"""
         baseurl = self._getBaseURL()
@@ -554,7 +554,7 @@ class WPSEEvaluationBase( WPSimpleEventDisplay ):
 
 class WPSEEvaluationDisplay (WPSEEvaluationBase, evaluations.WPEvaluationDisplay):
     """[Meeting] Evaluation default display."""
-    
+
     def __init__(self, rh, conf):
         WPSimpleEventDisplay.__init__(self, rh, conf)
         # An hack to make sure that the background is the same as the header
@@ -571,75 +571,75 @@ class WPSEEvaluationDisplay (WPSEEvaluationBase, evaluations.WPEvaluationDisplay
 
 class WPSEEvaluationDisplayModif (WPSEEvaluationBase, evaluations.WPEvaluationDisplayModif):
     """[Meeting] The user can modify his already submitted evaluation."""
-    
+
     def __init__(self, rh, conf):
         WPSimpleEventDisplay.__init__(self, rh, conf)
-    
+
     def _getBody(self, params):
         return evaluations.WPEvaluationDisplayModif._getBody(self, params)
 
 class WPSEEvaluationSubmitted (WPSEEvaluationBase, evaluations.WPEvaluationSubmitted):
     """[Meeting] Submitted evaluation."""
-    
+
     def __init__(self, rh, conf, mode):
         self._mode = mode
         WPSimpleEventDisplay.__init__(self, rh, conf)
-    
+
     def _getBody(self, params):
         return evaluations.WPEvaluationSubmitted._getBody(self, params)
 
 class WPSEEvaluationFull (WPSEEvaluationBase, evaluations.WPEvaluationFull):
     """[Meeting] Evaluation is full."""
-    
+
     def __init__(self, rh, conf):
         WPSimpleEventDisplay.__init__(self, rh, conf)
-    
+
     def _getBody(self, params):
         return evaluations.WPEvaluationFull._getBody(self, params)
 
 class WPSEEvaluationClosed (WPSEEvaluationBase, evaluations.WPEvaluationClosed):
     """[Meeting] Evaluation is closed."""
-    
+
     def __init__(self, rh, conf):
         WPSimpleEventDisplay.__init__(self, rh, conf)
-    
+
     def _getBody(self, params):
         return evaluations.WPEvaluationClosed._getBody(self, params)
 
 class WPSEEvaluationSignIn (WPSEEvaluationBase, evaluations.WPEvaluationSignIn):
     """[Meeting] Invite user to login/signin."""
-    
+
     def __init__(self, rh, conf):
         WPSimpleEventDisplay.__init__(self, rh, conf)
-    
+
     def _getBody(self, params):
         return evaluations.WPEvaluationSignIn._getBody(self, params)
 
 class WPSEEvaluationInactive (WPSEEvaluationBase, evaluations.WPEvaluationInactive):
     """[Meeting] Inactive evaluation."""
-    
+
     def __init__(self, rh, conf):
         WPSimpleEventDisplay.__init__(self, rh, conf)
-    
+
     def _getBody(self, params):
         return evaluations.WPEvaluationInactive._getBody(self, params)
 
 #################### Alarms #####################################
 
 class WPSEConfDisplayAlarm(WPSEConfModifToolsBase, conferences.WPConfDisplayAlarm):
-    
+
     def _getTabContent(self, params):
         return conferences.WPConfDisplayAlarm._getTabContent(self, params)
-    
+
     def _setActiveTab( self ):
         self._tabAlarms.setActive()
-    
-        
+
+
 class WPSEConfAddAlarm(WPSEConfModifToolsBase, conferences.WPConfAddAlarm ):
 
     def __init__(self, rh, conf):
         WPSEConfModifToolsBase.__init__(self, rh, conf)
-        
+
     def _getTabContent(self, params):
         params["toAllParticipants"] = """
         <tr>
@@ -657,11 +657,11 @@ class WPSEConferenceDisplayWriteMinutes(WPSimpleEventDisplay):
         wc = wcomponents.WWriteMinutes( self._conf )
         pars = {"postURL": urlHandlers.UHConferenceDisplayWriteMinutes.getURL(self._conf) }
         return wc.getHTML( pars )
-    
+
 
 ######################## Get file package ######################
 class WPSEDisplayFullMaterialPackage(WPSimpleEventDisplay, conferences.WPDisplayFullMaterialPackage):
-    
+
     def __init__(self, rh, conf):
         WPSimpleEventDisplay.__init__(self, rh, conf)
         # An hack to make sure that the background is the same as the header

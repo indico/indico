@@ -27,7 +27,7 @@ from MaKaC.webinterface.pages.category import WPCategoryBase
 from MaKaC.i18n import _
 
 class WPLinkBase( WPConferenceBase, WPCategoryBase ):
-    
+
     def __init__( self, rh, file ):
         self._file = file
         if self._file.getConference()!=None:
@@ -47,7 +47,7 @@ class WPLinkBase( WPConferenceBase, WPCategoryBase ):
             return wc.getHTML()
 
 class WPLinkDisplayBase( WPConferenceDefaultDisplayBase ):
-    
+
     def __init__(self, rh, link):
         self._link = link
         WPConferenceDefaultDisplayBase.__init__( self, rh, self._link.getConference() )
@@ -55,11 +55,11 @@ class WPLinkDisplayBase( WPConferenceDefaultDisplayBase ):
 
 
 class WPLinkModifBase( WPLinkBase ):
-    
+
     def _getHeader( self ):
         """
         """
-        wc = wcomponents.WManagementHeader( self._getAW(), self._getNavigationDrawer() )
+        wc = wcomponents.WManagementHeader( self._getAW() )
         return wc.getHTML( { "loginURL": urlHandlers.UHSignIn.getURL("%s"%self._rh.getCurrentURL()),\
                              "logoutURL": urlHandlers.UHSignOut.getURL(),\
                              "loginAsURL": self.getLoginAsURL() } )
@@ -74,7 +74,7 @@ class WPLinkModifBase( WPLinkBase ):
             target = self._file.getCategory()
         else:
             target = self._parentCateg
-            
+
         pars = {"target": target, "isModif": True}
         return wcomponents.WNavigationDrawer( pars )
 
@@ -114,7 +114,7 @@ class WPLinkModifBase( WPLinkBase ):
 
 
 class WLinkModifMain( wcomponents.WTemplated ):
-    
+
     def __init__( self, link ):
         self._link = link
 
@@ -127,10 +127,10 @@ class WLinkModifMain( wcomponents.WTemplated ):
 
 
 class WPLinkModification( WPLinkModifBase ):
-    
+
     def _setActiveTab( self ):
         self._tabMain.setActive()
-    
+
     def _getTabContent( self, params ):
         wc = WLinkModifMain( self._file )
         pars = { \
@@ -139,7 +139,7 @@ class WPLinkModification( WPLinkModifBase ):
 
 
 class WLinkDataModification(wcomponents.WResourceDataModification):
-    
+
     def getVars( self ):
         vars = wcomponents.WResourceDataModification.getVars( self )
         vars["url"] = self._resource.getURL()
@@ -147,10 +147,10 @@ class WLinkDataModification(wcomponents.WResourceDataModification):
 
 
 class WPLinkDataModification( WPLinkModifBase ):
-    
+
     def _setActiveTab( self ):
         self._tabMain.setActive()
-    
+
     def _getTabContent( self, params ):
         wc = WLinkDataModification( self._file )
         pars = { "postURL": urlHandlers.UHLinkPerformModifyData.getURL() }
@@ -158,7 +158,7 @@ class WPLinkDataModification( WPLinkModifBase ):
 
 
 class WLinkModifAC( wcomponents.WTemplated ):
-    
+
     def __init__( self, link ):
         self._link = link
 
@@ -173,10 +173,10 @@ class WLinkModifAC( wcomponents.WTemplated ):
 
 
 class WPLinkModifAC( WPLinkModifBase ):
-    
+
     def _setActiveTab( self ):
         self._tabAC.setActive()
-    
+
     def _getTabContent( self, params ):
         wc = WLinkModifAC( self._file )
         pars = { \
@@ -187,7 +187,7 @@ class WPLinkModifAC( WPLinkModifBase ):
 
 
 class WPLinkSelectAllowed( WPLinkModifAC ):
-    
+
     def _getTabContent( self, params ):
         searchExt = params.get("searchExt","")
         if searchExt != "":
@@ -201,7 +201,7 @@ class WPLinkSelectAllowed( WPLinkModifAC ):
 
 #class WPLinkDisplayModification( WPLinkDisplayBase ):
 #    navigationEntry = navigation.NELinkDisplayModification
-#    
+#
 #    def _getBody( self, params ):
 #        wc = WLinkDisplayModification( self._link )
 #        pars = { \
@@ -210,7 +210,7 @@ class WPLinkSelectAllowed( WPLinkModifAC ):
 
 
 #class WLinkDisplayModification(wcomponents.WTemplated):
-#    
+#
 #    def __init__( self, link ):
 #        self._link = link
 #
@@ -223,7 +223,7 @@ class WPLinkSelectAllowed( WPLinkModifAC ):
 
 #class WPLinkDisplayDataModification( WPLinkDisplayBase ):
 #    navigationEntry = navigation.NELinkDisplayModification
-#    
+#
 #    def _getBody( self, params ):
 #        wc = WLinkDisplayDataModification( self._link )
 #        pars = { "postURL": urlHandlers.UHLinkDisplayPerformDataModification.getURL() }
@@ -243,7 +243,7 @@ class WPLinkSelectAllowed( WPLinkModifAC ):
 #              """%(params["postURL"],\
 #                   self._resource.getLocator().getWebForm(),\
 #                   wcomponents.WTemplated.getHTML( self, params ) )
-#        return str    
+#        return str
 #
 #    def getVars( self ):
 #        vars = wcomponents.WTemplated.getVars( self )
