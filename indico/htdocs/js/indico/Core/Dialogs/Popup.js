@@ -164,7 +164,7 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
         this.contentWrapper.setStyle('overflowY', 'auto');
         this.contentWrapper.setStyle('overflowX', 'hidden');
         this.contentWrapper.setStyle('paddingRight', '10px');
-        this.contentWrapper.setStyle('background', '#FFFFFF');
+
     },
 
     _postDrawPositionDialog: function(){
@@ -271,7 +271,6 @@ type("ExclusivePopupWithButtons", ["ExclusivePopup"], {
         this.contentWrapper.setStyle('overflowX', 'hidden');
         this.contentWrapper.setStyle('position', 'relative');
         this.contentWrapper.setStyle('top', pixels(-10));
-        this.contentWrapper.setStyle('background', '#FFFFFF');
 
         var contentHeight = this._calculateContentHeight();
         this.contentWrapper.setStyle('height', pixels(contentHeight));

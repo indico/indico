@@ -443,7 +443,7 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
 
         return this.ExclusivePopupWithButtons.prototype.draw.call(this,
                                                                   this._drawWidget(),
-                                                                  this._drawButtons(), null, {backgroundColor: 'white'});
+                                                                  this._drawButtons(), {backgroundColor: 'white'}, {backgroundColor: 'white'});
     }
 
 
