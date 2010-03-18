@@ -1072,6 +1072,7 @@ class Avatar(Persistent, Fossilizable):
     @Retrieves('MaKaC.user.Avatar', 'telephone')
     def getTelephone( self ):
         return self.telephone[0]
+    getPhone = getTelephone
 
     def setTelephone(self, tel, item=0 ):
         self.telephone[item] = tel

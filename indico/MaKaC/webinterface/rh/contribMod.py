@@ -584,6 +584,9 @@ class RHNewSubcontributionPersonAdd(RHContribModifBaseSpecialSesCoordRights):
                 chosenPerson = object.getCoAuthorById(chosenId)
             elif chosen[0:1] == "d" :
                 chosenPerson = object.getConvenerById(chosenId)
+            elif index ==  -1 : #person data doesn't contain proper id
+                if self._getUser() and chosenId in self._getUser().getPersonalInfo().getBasket().getUsers() :   #checking if such person is listed on favourites
+                    chosenPerson = self._getUser().getPersonalInfo().getBasket().getUsers()[chosenId]
             if chosenPerson is None :
                 self._redirect(urlHandlers.UHConfModScheduleNewContrib.getURL(self._target))
                 return
