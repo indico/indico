@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.fossils.user import IAvatarMinimalFossil, IAvatarDetailedFossil,\
-    IAvatarAllDetailsFossil
+    IAvatarAllDetailsFossil, IGroupFossil
 from MaKaC.common.fossilize import Fossilizable, fossilizes
 from random import random
 
@@ -56,7 +56,9 @@ from copy import copy
 """Contains the classes that implement the user management subsystem
 """
 
-class Group(Persistent):
+class Group(Persistent, Fossilizable):
+    fossilizes(IGroupFossil)
+
     """
     """
     groupType = "Default"

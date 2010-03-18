@@ -19,6 +19,17 @@
 
 from MaKaC.common.fossilize import IFossil
 
+class IGroupFossil(IFossil):
+
+    def getId(self):
+        """ Group id """
+
+    def getName(self):
+        """ Group name """
+
+    def getEmail(self):
+        """ Group email """
+
 class IAvatarMinimalFossil(IFossil):
 
     def getId(self):
