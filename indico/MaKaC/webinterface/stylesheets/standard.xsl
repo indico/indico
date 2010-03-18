@@ -86,10 +86,6 @@
     </xsl:call-template>
 
 
-    <script type="text/javascript">
-    var customMaterialList  = $L(<xsl:value-of select="./customMaterialList" disable-output-escaping="yes"/>);
-    </script>
-
 </div>
 
 	    <xsl:call-template name="meetingEventBody"><xsl:with-param name="minutes">off</xsl:with-param></xsl:call-template>

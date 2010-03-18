@@ -81,6 +81,7 @@ EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
     <xsl:with-param name="uploadURL">Indico.Urls.UploadAction.conference</xsl:with-param>
 </xsl:call-template>
 
+
 <font size="+1" face="Times">
 <xsl:value-of select="./title" disable-output-escaping="yes"/><br/>
 </font>

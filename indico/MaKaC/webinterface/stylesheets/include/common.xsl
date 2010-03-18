@@ -130,8 +130,7 @@
                 <xsl:value-of select="$item/parentProtection"/>,
                 <xsl:value-of select="$item/materialList"/>,
                 <xsl:value-of select="$uploadURL"/>,
-                true,
-                customMaterialList);
+                true);
 
                 m.close();
                 return false;
