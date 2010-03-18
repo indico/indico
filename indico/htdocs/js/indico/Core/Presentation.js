@@ -331,3 +331,12 @@ String.prototype.replaceAll = Browser.Gecko?
     function(pattern, replace) {
         return this.replace( new RegExp( pattern, "g" ), replace );
     };
+
+
+Html.unescaped = map({'div': null, 'span': null}, function(value, elemType) {
+    return function() {
+        var res = Html[elemType].apply(this, arguments);
+        res.dom.innerHTML = res.get();
+        return res;
+    };
+});

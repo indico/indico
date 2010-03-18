@@ -1,4 +1,4 @@
-type("AddMaterialDialog", ["ButtonBarExclusivePopup"], {
+type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
 
     _drawButtons: function() {
 
@@ -132,7 +132,7 @@ type("AddMaterialDialog", ["ButtonBarExclusivePopup"], {
         }
 
         text = Html.span({}, text, " ",
-                         Html.span({style: {fontStyle: 'italic'}}," ",
+                         Html.unescaped.span({className: 'strongRed', style: {fontStyle: 'italic'}}," ",
                                    Protection.ParentRestrictionMessages[args.parentProtected?1:-1]));
 
         return text;
@@ -150,7 +150,7 @@ type("AddMaterialDialog", ["ButtonBarExclusivePopup"], {
 
             this.creationMode = 'resource';
 
-            text = Html.span({}, $T("You're adding a resource to the existing material type"), " ", Html.span({style:{fontWeight: 'bold'}}, entry.get('title')), ". ", $T("Please specify who will be able to access it."));
+            text = Html.span({}, $T("You're adding a resource to the existing material type"), " ", Html.span({style:{fontWeight: 'bold'}}, entry.get('title')), ". ", $T("Please specify who will be able to access it:"));
 
             // if the material is set to inherit from the parent, display it properly
             // and set the inherited protection accordingly
@@ -158,8 +158,8 @@ type("AddMaterialDialog", ["ButtonBarExclusivePopup"], {
                 entry.get('protection'),
                 entry.get('protectedOwner')?1:-1);
 
-            var inheritanceText = Html.span({style: {fontStyle: 'italic'}},
-                                            Protection.ParentRestrictionMessages[protection]);
+            var inheritanceText = Html.unescaped.span({className: 'strongRed', style: {fontStyle: 'italic'}},
+                Protection.ParentRestrictionMessages[protection]);
 
 
             selector = new RadioFieldWidget([
@@ -173,7 +173,7 @@ type("AddMaterialDialog", ["ButtonBarExclusivePopup"], {
 
             this.creationMode = 'material';
 
-            text = $T("You're about to create a new material type. Please select who can access it.");
+            text = $T("You're about to create a new material type. Please select who can access it:");
 
             selector = new RadioFieldWidget([
                 ['inherit', this._parentText(this.args)],
@@ -238,7 +238,7 @@ type("AddMaterialDialog", ["ButtonBarExclusivePopup"], {
         return Html.div({style:{marginTop: '10px',
                                 height: '150px'
                                }},
-                        Html.div({style: {textAlign: 'center', fontStyle: 'italic', color: '#881122'}},
+                        Html.div({style: {textAlign: 'left', fontStyle: 'italic', color: '#881122'}},
                                  $T(text)),
                         Html.div({style: {marginTop: '10px'}},
                                  selector ? selector.draw() : ''));
@@ -386,7 +386,7 @@ type("AddMaterialDialog", ["ButtonBarExclusivePopup"], {
         }
 
         this.typeSelector.set(selection);
-        this.ButtonBarExclusivePopup.prototype.postDraw.call(this);
+        this.ExclusivePopupWithButtons.prototype.postDraw.call(this);
     },
 
     _drawProtectionDiv: function() {
@@ -441,8 +441,9 @@ type("AddMaterialDialog", ["ButtonBarExclusivePopup"], {
                                         [$T("Protection"), protectionDiv]],
                                        400, 300);
 
-        return this.ButtonBarExclusivePopup.prototype.draw.call(this,
-                                                       this._drawWidget());
+        return this.ExclusivePopupWithButtons.prototype.draw.call(this,
+                                                                  this._drawWidget(),
+                                                                  this._drawButtons());
     }
 
 
@@ -461,7 +462,7 @@ type("AddMaterialDialog", ["ButtonBarExclusivePopup"], {
     this.protectionStatus = $O();
     this.uploadType = new WatchValue();
 
-    this.ButtonBarExclusivePopup($T("Upload Material"),
+    this.ExclusivePopupWithButtons($T("Upload Material"),
                         function() {
                             self.close();
                         });
@@ -1186,7 +1187,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
      }
 );
 
-type("MaterialEditorDialog", ["ButtonBarExclusivePopup"], {
+type("MaterialEditorDialog", ["ExclusivePopupWithButtons"], {
 
     _drawButtons: function() {
 
@@ -1223,11 +1224,13 @@ type("MaterialEditorDialog", ["ButtonBarExclusivePopup"], {
 
         var mlist = new MaterialListWidget(args, this.types, this.uploadAction, this.width, this.height);
 
-        return this.ButtonBarExclusivePopup.prototype.draw.call(
+        return this.ExclusivePopupWithButtons.prototype.draw.call(
             this,
             Html.div({style: {width: pixels(this.width),
-                              height: pixels(this.height+50)}},
-                     mlist.draw()));
+                              height: pixels(this.height+10)}},
+                     mlist.draw()),
+            this._drawButtons()
+        );
     }
 },
 
@@ -1242,7 +1245,7 @@ type("MaterialEditorDialog", ["ButtonBarExclusivePopup"], {
          this.height = height;
          this.refresh = refresh;
          this.parentProtected = parentProtected;
-         this.ButtonBarExclusivePopup(title);
+         this.ExclusivePopupWithButtons(title);
      });
 
 IndicoUI.Dialogs.Material = {
