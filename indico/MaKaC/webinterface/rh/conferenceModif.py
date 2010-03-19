@@ -4068,7 +4068,7 @@ class RHAbstractList(RHConfModifCFABase):
         if not filterUsed:
             for track in self._conf.getTrackList():
                 ltracks.append( track.getId() )
-        filter["track"] = dict.get("selTracks", ltracks)
+        filter["track"] = utils.normalizeToList(dict.get("selTracks", ltracks))
         ltypes = []
         if not filterUsed:
             for type in self._conf.getContribTypeList():
@@ -4081,8 +4081,8 @@ class RHAbstractList(RHConfModifCFABase):
         if not filterUsed:
             for status in AbstractStatusList().getStatusList():
                 lstatus.append( AbstractStatusList().getId( status ) )
-        filter["status"] = dict.get("selStatus", lstatus)
-        filter["acc_track"]=dict.get("selAccTracks",ltracks)
+        filter["status"] = utils.normalizeToList(dict.get("selStatus", lstatus))
+        filter["acc_track"] = utils.normalizeToList(dict.get("selAccTracks",ltracks))
         ltypes = []
         if not filterUsed:
             for type in self._conf.getContribTypeList():

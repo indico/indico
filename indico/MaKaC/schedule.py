@@ -725,6 +725,8 @@ class SlotSchedule(TimeSchedule):
             2: check and adapt the owner dates
         """
 
+        tz = timezone(self.getTimezone())
+
         owner = self.getOwner()
         if (entry is None) or self.hasEntry(entry):
             return
@@ -736,7 +738,7 @@ class SlotSchedule(TimeSchedule):
                 raise MaKaCError( _("Cannot schedule into this session a contribution which does not belong to it"), _("Slot"))
         if entry.getStartDate()!=None and entry.getStartDate() < self.getOwner().getStartDate():
             if check == 1:
-                raise ParentTimingError( _("Cannot add entry which starts before (%s) the time slot (%s)")%\
+                raise ParentTimingError( _("The entry would start at %s, which is before the start time of the time slot (%s)")%\
                     (entry.getEndDate().strftime('%Y-%m-%d %H:%M'),\
                     self.getOwner().getStartDate().strftime('%Y-%m-%d %H:%M')),\
                       _("Slot"))
@@ -744,19 +746,19 @@ class SlotSchedule(TimeSchedule):
                 ContextManager.get('autoOps').append((owner,
                                                       "OWNER_START_DATE_EXTENDED",
                                                       owner,
-                                                      entry.getAdjustedStartDate(tz=self.getTimezone())))
+                                                      entry.getAdjustedStartDate(tz=tz)))
                 self.getOwner().setStartDate(entry.getStartDate(),check,0)
         if entry.getEndDate()!=None and entry.getEndDate() > self.getOwner().getEndDate():
             if check == 1:
-                raise ParentTimingError( _("Cannot add entry which finishes after (%s) the time slot (%s)")%\
-                    (entry.getEndDate().strftime('%Y-%m-%d %H:%M'),\
-                    self.getOwner().getEndDate().strftime('%Y-%m-%d %H:%M')),\
+                raise ParentTimingError( _("The entry would finish at %s, which is after the end of the time slot (%s)")%\
+                    (entry.getAdjustedEndDate(tz=tz).strftime('%Y-%m-%d %H:%M'),\
+                    self.getOwner().getAdjustedEndDate(tz=tz).strftime('%Y-%m-%d %H:%M')),\
                      "Slot")
             elif check == 2:
                 ContextManager.get('autoOps').append((owner,
                                                       "OWNER_END_DATE_EXTENDED",
                                                       owner,
-                                                      entry.getAdjustedEndDate(tz=self.getTimezone())))
+                                                      entry.getAdjustedEndDate(tz=tz)))
                 self.getOwner().setEndDate(entry.getEndDate(),check)
         self._setEntryDuration(entry)
         self._addEntry(entry,check)

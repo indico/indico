@@ -871,7 +871,8 @@ class ScheduleContributions(ScheduleOperation):
                                             allowEmpty=False)
 
         # convert date to datetime
-        self._date = datetime.datetime(*(date.timetuple()[:6]+(0, pytz.timezone(self._target.getTimezone()))))
+        self._date = pytz.timezone(self._target.getTimezone()).localize(datetime.datetime(*(date.timetuple()[:6]+(0,))))
+
 
     def _performOperation(self):
 
@@ -903,8 +904,15 @@ class ScheduleContributions(ScheduleOperation):
 
 class SessionSlotScheduleContributions(ScheduleContributions, sessionServices.SessionSlotModifCoordinationBase):
     def _checkParams(self):
+
         sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
         ScheduleContributions._checkParams(self)
+
+        pManager = ParameterManager(self._params,
+                                    timezone = self._target.getTimezone())
+
+        self._isSessionTimetable = pManager.extract("sessionTimetable", pType=bool, allowEmpty=True)
+
 
     def _getContributionId(self, contribId):
         return self._target.getSession().getContributionById(contribId)
@@ -914,7 +922,13 @@ class SessionSlotScheduleContributions(ScheduleContributions, sessionServices.Se
             contrib.setStartDate(self._slot.getStartDate())
 
     def _getSlotEntry(self):
-        return DictPickler.pickle(self._slot.getConfSchEntry(), timezone=self._conf.getTimezone())
+
+        if self._isSessionTimetable:
+            entry = self._slot.getSessionSchEntry()
+        else:
+            entry = self._slot.getConfSchEntry()
+
+        return DictPickler.pickle(entry, timezone=self._conf.getTimezone())
 
 class ConferenceScheduleContributions(ScheduleContributions, conferenceServices.ConferenceModifBase):
     def _checkParams(self):
