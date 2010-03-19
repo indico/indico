@@ -1,4 +1,4 @@
-<% from MaKaC.common.PickleJar import DictPickler %>
+<% from MaKaC.fossils.user import IAvatarFossil %>
 
 <p style="font-style: italic; padding-bottom: 20px;" >
     Event managers have all the necessary rights for all of the <strong>Video Services</strong> section.<br />
@@ -7,7 +7,7 @@
 </p>
 
 <div style="padding-bottom: 30px;">
-    <div class="groupTitle"><%= _("Video Services Managers")%></div> 
+    <div class="groupTitle"><%= _("Video Services Managers")%></div>
     <p style="font-style: italic;" >
         Users added here will be able to access <strong>all</strong> of the the Video Services section of this event, including this <strong>Protection</strong> tab.
     </p>
@@ -31,7 +31,7 @@
         </td>
         <td style="padding-bottom: 30px;">
             <div style="padding-left: 20px;" id="userList_<%= name %>">
-            </div>        
+            </div>
         </td>
     </tr>
 <% end %>
@@ -75,13 +75,13 @@
             }
         );
     }
-    
-    var uf = new UserListField('PluginPeopleListDiv', 'PluginPeopleList',
-                               <%= jsonEncode(DictPickler.pickle(CSBM.getPluginManagers(name))) %>,
-                               null,
-                               <%=jsonEncode(Favorites)%>,
-                               true, false, false,
-                               newPersonsHandler, userListNothing, removePersonHandler)
+
+    var uf = new NewUserListField('PeopleListDiv', 'PeopleList',
+                               <%= jsonEncode(fossilize(CSBM.getPluginManagers(name), IAvatarFossil)) %>,
+                               <%= offlineRequest(self._rh, 'user.favorites.listUsers') %>,
+                               true, false, false, false,
+                               false, false, true,
+                               newPersonsHandler, singleUserNothing, removePersonHandler)
     $E('userList_<%=name%>').set(uf.draw())
     <% end %>
 </script>

@@ -33,6 +33,9 @@ from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.plugins.Collaboration.base import CollaborationException,\
     WCSPageTemplateBase
+from MaKaC.plugins.Collaboration.base import CollaborationException
+from MaKaC.common.fossilize import fossilize
+from MaKaC.fossils.user import IAvatarFossil
 
 ################################################### Server Wide pages #########################################
 
@@ -363,7 +366,7 @@ class WConfModifCollaborationProtection(wcomponents.WTemplated):
         vars["Conference"] = self._conf
         vars["CSBM"] = self._conf.getCSBookingManager()
         if self._user:
-            vars["Favorites"] = DictPickler.pickle(self._user.getPersonalInfo().getBasket().getUsers())
+            vars["Favorites"] = fossilize(self._user.getPersonalInfo().getBasket().getUsers(), IAvatarFossil)
         else:
             vars["Favorites"] = []
         return vars
