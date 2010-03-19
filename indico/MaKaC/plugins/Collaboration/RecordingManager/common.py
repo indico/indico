@@ -253,10 +253,10 @@ def parseIndicoID(IndicoID):
     """Given an "Indico ID" of the form shown above, determine whether it is
     a conference, subcontribution etc, and return that info with the individual IDs."""
 
-    pConference      = re.compile('^(\d+)$')
-    pSession         = re.compile('^(\d+)s(\d+)$')
-    pContribution    = re.compile('^(\d+)c(\d+)$')
-    pSubcontribution = re.compile('^(\d+)s(\d+)sc(\d+)$')
+    pConference      = re.compile('(\d+)')
+    pSession         = re.compile('(\d+)s(\d+)')
+    pContribution    = re.compile('(\d+)c(\d+)')
+    pSubcontribution = re.compile('(\d+)s(\d+)sc(\d+)')
 
     mE  = pConference.search(IndicoID)
     mS  = pSession.search(IndicoID)
@@ -367,7 +367,7 @@ def updateMicala(IndicoID, LOID):
     cursor.close()
     connection.close()
 
-def createCDSRecord(confId, aw):
+def createCDSRecord(IndicoID, aw):
     '''Retrieve a MARC XML string for the given conference, then package it up and send it to CDS.'''
 
     # I don't understand what some of the following lines do. Pedro did some of it for me.
@@ -376,11 +376,31 @@ def createCDSRecord(confId, aw):
     og = outputGenerator(aw, dataInt=di)
 
     xmlGen.openTag("iconf")
-    conf = ConferenceHolder().getById(confId)
+
+    parsed = parseIndicoID(IndicoID)
+    Logger.get('RecMan').info("IndicoID = %s", IndicoID)
+    Logger.get('RecMan').info("parsed[conference] = %s", str(parsed["conference"]))
+
+    conf = ConferenceHolder().getById(parsed["conference"])
     # setting source='RecordingManager' is how we identify ourselves to the outputGenerator
     # Nobody else should need to know this access information, and it shouldn't be accessible
     # to e.g. OAI harvesters outside CERN.
-    og.confToXMLMarc21(conf, 1, 1, 1, forceCache=True, out=xmlGen, source='RecordingManager')
+    if parsed["type"] == 'conference':
+        og.confToXMLMarc21(conf, 1, 1, 1, forceCache=True, out=xmlGen, source='RecordingManager')
+    elif parsed["type"] == 'session':
+        # there is no such method for sessions yet for some reason...
+        # og.confToXMLMarc21(conf, 1, 1, 1, forceCache=True, out=xmlGen, source='RecordingManager')
+        pass
+    elif parsed["type"] == 'contribution':
+        cont = conf.getContributionById(parsed["contribution"])
+        og.contToXMLMarc21(cont, 1, 1, 1, forceCache=True, out=xmlGen, source='RecordingManager')
+    elif parsed["type"] == 'subcontribution':
+        cont = conf.getContributionById(parsed["contribution"])
+        subCont = cont.getSubcontributionById(parsed["subcontribution"])
+        og.subContToXMLMarc21(subCont, 1, 1, 1, forceCache=True, out=xmlGen, source='RecordingManager')
+    else:
+        Logger.get('RecMan').info("IndicoID = %s", IndicoID)
+
     xmlGen.closeTag("iconf")
 
     # Get the MARC XML
@@ -455,14 +475,10 @@ def doesExistIndicoLink(obj):
     Each of those has a getAllMaterialList() method. Call that method and search for a title "Video in CDS"
     and make sure it has a link."""
 
-    Logger.get('RecMan').info("doesExistIndicoLink")
-
     flagLinkFound = False
 
     materials = obj.getAllMaterialList()
     if materials is not None and len(materials) > 0:
-        Logger.get('RecMan').info("found materials")
-
         for mat in materials:
             if mat.getTitle() == "Video in CDS" and isinstance(mat.getMainResource(), Link):
                 flagLinkFound = True

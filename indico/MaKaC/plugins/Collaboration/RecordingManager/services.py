@@ -62,11 +62,10 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
         resultUpdateMicala = updateMicala(self._IndicoID, self._params.get('LOID', None))
 
         # Get the MARC XML and submit it to CDS
-        resultCreateCDSRecord = createCDSRecord(self._confId, self._aw)
+        resultCreateCDSRecord = createCDSRecord(self._IndicoID, self._aw)
 
 #        raise RecordingManagerException("got this far")
 
-        # this line is almost certainly wrong. Dno't know how this works yet.
         return str(resultUpdateMicala) + ', ' + str(resultCreateCDSRecord)
 
 class RMCreateIndicoLinkService(CollaborationPluginServiceBase):
@@ -85,16 +84,10 @@ class RMCreateIndicoLinkService(CollaborationPluginServiceBase):
             raise RecordingManagerException("No conference ID supplied")
 
     def _getAnswer(self):
-        # Update the micala database
-        resultUpdateMicala = updateMicala(self._IndicoID, self._params.get('LOID', None))
+        # Create the Indico link
+        resultCreateIndicoLink = createIndicoLink(self._IndicoID)
 
-        # Get the MARC XML and submit it to CDS
-        resultCreateCDSRecord = createCDSRecord(self._confId, self._aw)
-
-#        raise RecordingManagerException("got this far")
-
-        # this line is almost certainly wrong. Dno't know how this works yet.
-        return str(resultUpdateMicala) + ', ' + str(resultCreateCDSRecord)
+        return str(resultCreateIndicoLink)
 
 # In case we want to update list of orphans after page has loaded...
 class RMOrphansService():

@@ -22,10 +22,6 @@ from datetime import datetime
 from pytz import timezone
 from MaKaC.plugins.base import PluginsHolder
 
-from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
-from MaKaC.user import Avatar
-from MaKaC.user import CERNGroup
-
 try:
     import libxml2
     import libxslt
@@ -1055,56 +1051,18 @@ class outputGenerator:
         out.writeTag("marc:subfield", "Event details", [["code","y"]])
         out.closeTag("marc:datafield")
 
-
+        # Access list info (tag 506)
         # Check to make sure this request is coming from the Recording Manager.
-        # We don't want to provide CERN access list information to external sources like OAI harvesters.
+        # We don't want to provide CERN-specific access list information to external sources like OAI harvesters.
         if source is not None and source == 'RecordingManager':
-
             # Also check to make sure that the RecordingManager plugin is installed and active
             if (PluginsHolder().hasPluginType("Collaboration") and
                 PluginsHolder().getPluginType("Collaboration").hasPlugin("RecordingManager") and
                 PluginsHolder().getPluginType("Collaboration").getPlugin("RecordingManager").isActive()):
 
-                # Only provide MARC tag 506 information if there is any access list
-                # Get set containing Avatar objects (if empty, that means event is public)
-                allowed_users = conf.getRecursiveAllowedToAccessList()
-                if allowed_users is not None and len(allowed_users) > 0:
-                    # Populate two lists holding email/group strings instead of Avatar/Group objects
-                    allowed_emails = []
-                    allowed_groups = []
-                    for user_obj in allowed_users:
-                        if isinstance(user_obj, Avatar):
-                            allowed_emails.append(user_obj.getEmail())
-                        elif isinstance(user_obj, CERNGroup):
-                            allowed_groups.append(user_obj.getId() + " [CERN]")
-                        else:
-                            allowed_emails.append("UNKNOWN: %s" % user_obj.getId())
-
-                    # Get subfields from plugin settings:
-                    field506tag2 = CollaborationTools.getOptionValue("RecordingManager", "MarcField506Subfield2")
-                    field506tag5 = CollaborationTools.getOptionValue("RecordingManager", "MarcField506Subfield5")
-
-                    # Create section for tag 506, listing allowed groups
-                    if len(allowed_groups) > 0:
-                        out.openTag("marc:datafield",[["tag","506"], ["ind1","1"], ["ind2"," "]])
-                        out.writeTag("marc:subfield", "Restricted",  [["code", "a"]])
-                        for group_id in allowed_groups:
-                            out.writeTag("marc:subfield", group_id,  [["code", "d"]])
-                        out.writeTag("marc:subfield", "group",       [["code", "f"]])
-                        out.writeTag("marc:subfield", field506tag2, [["code", "2"]])
-                        out.writeTag("marc:subfield", field506tag5, [["code", "5"]])
-                        out.closeTag("marc:datafield")
-
-                    # Create another section for tag 506, listing allowed users
-                    if len(allowed_users) > 0:
-                        out.openTag("marc:datafield",[["tag","506"], ["ind1","1"], ["ind2"," "]])
-                        out.writeTag("marc:subfield", "Restricted",  [["code", "a"]])
-                        for email_id in allowed_emails:
-                            out.writeTag("marc:subfield", email_id,  [["code", "d"]])
-                        out.writeTag("marc:subfield", "email",       [["code", "f"]])
-                        out.writeTag("marc:subfield", field506tag2, [["code", "2"]])
-                        out.writeTag("marc:subfield", field506tag5, [["code", "5"]])
-                        out.closeTag("marc:datafield")
+                # only now do we know it's safe to import the necessary method
+                from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator
+                MarcAccessListGenerator().generateAccessList(out, conf)
 
     ## def sessionToXMLMarc21(self,session,includeMaterial=1, out=None, forceCache=False):
     ##     if not out:
@@ -1218,7 +1176,7 @@ class outputGenerator:
 
     #fb
 
-    def contribToXMLMarc21(self,cont,includeMaterial=1, out=None, forceCache=False):
+    def contribToXMLMarc21(self,cont,includeMaterial=1, out=None, forceCache=False, source=None):
         if not out:
             out = self._XMLGen
         #try to get a cache
@@ -1231,14 +1189,14 @@ class outputGenerator:
         else:
             # No cache, build the XML
             temp = XMLGen(init=False)
-            self._contribToXMLMarc21(cont,includeMaterial, out=temp)
+            self._contribToXMLMarc21(cont,includeMaterial, out=temp, source=source)
             xml = temp.getXml()
             # save XML in cache
             self.cache.cacheObject(version, xml, cont)
         out.writeXML(xml)
 
 
-    def _contribToXMLMarc21(self,cont,includeMaterial=1, out=None):
+    def _contribToXMLMarc21(self,cont,includeMaterial=1, out=None, source=None):
         if not out:
             out = self._XMLGen
 
@@ -1393,11 +1351,24 @@ class outputGenerator:
         out.writeTag("marc:subfield", "Contribution details", [["code","y"]])
         out.closeTag("marc:datafield")
 
+        # Access list info (tag 506)
+        # Check to make sure this request is coming from the Recording Manager.
+        # We don't want to provide CERN-specific access list information to external sources like OAI harvesters.
+        if source is not None and source == 'RecordingManager':
+            # Also check to make sure that the RecordingManager plugin is installed and active
+            if (PluginsHolder().hasPluginType("Collaboration") and
+                PluginsHolder().getPluginType("Collaboration").hasPlugin("RecordingManager") and
+                PluginsHolder().getPluginType("Collaboration").getPlugin("RecordingManager").isActive()):
+
+                # only now do we know it's safe to import the necessary method
+                from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator
+                MarcAccessListGenerator().generateAccessList(out, cont)
+
     ####
     #fb
 
 
-    def subContribToXMLMarc21(self,subCont,includeMaterial=1, out=None, forceCache=False):
+    def subContribToXMLMarc21(self,subCont,includeMaterial=1, out=None, forceCache=False, source=None):
         if not out:
             out = self._XMLGen
         #try to get a cache
@@ -1410,14 +1381,14 @@ class outputGenerator:
         else:
             # No cache, build the XML
             temp = XMLGen(init=False)
-            self._subContribToXMLMarc21(subCont,includeMaterial, out=temp)
+            self._subContribToXMLMarc21(subCont,includeMaterial, out=temp, source=source)
             xml = temp.getXml()
             # save XML in cache
             self.cache.cacheObject(version, xml, subCont)
         out.writeXML(xml)
 
 
-    def _subContribToXMLMarc21(self,subCont,includeMaterial=1, out=None):
+    def _subContribToXMLMarc21(self,subCont,includeMaterial=1, out=None, source=None):
         if not out:
             out = self._XMLGen
 
@@ -1567,6 +1538,18 @@ class outputGenerator:
         out.writeTag("marc:subfield", "Contribution details", [["code","y"]])
         out.closeTag("marc:datafield")
 
+        # Access list info (tag 506)
+        # Check to make sure this request is coming from the Recording Manager.
+        # We don't want to provide CERN-specific access list information to external sources like OAI harvesters.
+        if source is not None and source == 'RecordingManager':
+            # Also check to make sure that the RecordingManager plugin is installed and active
+            if (PluginsHolder().hasPluginType("Collaboration") and
+                PluginsHolder().getPluginType("Collaboration").hasPlugin("RecordingManager") and
+                PluginsHolder().getPluginType("Collaboration").getPlugin("RecordingManager").isActive()):
+
+                # only now do we know it's safe to import the necessary method
+                from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator
+                MarcAccessListGenerator().generateAccessList(out, subCont)
 
     def materialToXMLMarc21(self,mat, out=None):
         if not out:
