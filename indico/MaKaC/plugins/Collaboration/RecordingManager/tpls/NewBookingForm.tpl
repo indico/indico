@@ -42,6 +42,7 @@
                         <% end %>
                     </td>
                     <td align="top">
+                        <div style="font-size: 70%;">
                         <% if talk["LOID"] != '': %>
                         <b><tt>MATCH</tt></b>
                         <% end %>
@@ -55,6 +56,13 @@
                         <% else: %>
                         <b><tt>&nbsp;</tt></b>
                         <% end %>
+                        <% if talk["IndicoLink"] != '': %>
+                        <b><tt>LINK</tt></b>
+                        <% end %>
+                        <% else: %>
+                        <b><tt>&nbsp;</tt></b>
+                        <% end %>
+                        </div>
                     </td>
                     </tr>
                     </table>

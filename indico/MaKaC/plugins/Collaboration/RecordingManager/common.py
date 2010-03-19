@@ -35,6 +35,7 @@ from time import mktime
 from MaKaC.common.xmlGen import XMLGen
 from MaKaC.export.oai2 import DataInt
 from MaKaC.common.output import outputGenerator
+from MaKaC.conference import Link
 
 from urllib2 import Request, urlopen
 import re
@@ -65,6 +66,8 @@ def getTalks(conference, oneIsEnough = False, sort = False):
     # this always comes first, so just pretend it's 0 seconds past the epoch
     event_info["date"]       = 0
     event_info["LOID"]       = ""
+    event_info["IndicoLink"] = doesExistIndicoLink(conference)
+
 #    event_info["CDS"]        = getCDSRecord(event_info["IndicoID"])
 
     recordable_events.append(event_info)
@@ -74,6 +77,7 @@ def getTalks(conference, oneIsEnough = False, sort = False):
     filter = PosterFilterField(conference, False, False)
     for contribution in conference.getContributionList():
         if filter.satisfies(contribution):
+
             talks.append(contribution)
             speaker_str = ""
             speaker_list = contribution.getSpeakerList()
@@ -103,6 +107,8 @@ def getTalks(conference, oneIsEnough = False, sort = False):
                 event_info["date"]       = 1
 
             event_info["LOID"]       = ""
+            event_info["IndicoLink"] = doesExistIndicoLink(contribution)
+
 #            event_info["CDS"]        = getCDSRecord(event_info["IndicoID"])
 
             recordable_events.append(event_info)
@@ -136,6 +142,8 @@ def getTalks(conference, oneIsEnough = False, sort = False):
                 # and add the counter ctr_sc to that
                 event_info["date"]     = int(mktime(subcontribution.getOwner().getStartDate().timetuple()) + ctr_sc)
                 event_info["LOID"]       = ""
+                event_info["IndicoLink"] = doesExistIndicoLink(subcontribution)
+
 #                event_info["CDS"]        = getCDSRecord(event_info["IndicoID"])
 
                 recordable_events.append(event_info)
@@ -158,6 +166,7 @@ def getTalks(conference, oneIsEnough = False, sort = False):
         # Get start time as seconds since the epoch so we can sort
         event_info["date"]     = int(mktime(session.getStartDate().timetuple()))
         event_info["LOID"]       = ""
+        event_info["IndicoLink"] = doesExistIndicoLink(session)
 #        event_info["CDS"]        = getCDSRecord(event_info["IndicoID"])
 
         recordable_events.append(event_info)
@@ -223,6 +232,13 @@ def generateIndicoID(conference     = None,
                     session         = None,
                     contribution    = None,
                     subcontribution = None):
+    """Given the conference, session, contribution and subcontribution IDs,
+    return an "Indico ID" of the form:
+    12345
+    12345s1
+    12345c0
+    12345c0sc3
+    """
     IndicoID = ""
 
     if session is not None:
@@ -235,6 +251,47 @@ def generateIndicoID(conference     = None,
         IndicoID = "%dc%d" % (int(conference), int(contribution))
 
     return IndicoID
+
+def parseIndicoID(IndicoID):
+    """Given an "Indico ID" of the form shown above, determine whether it is
+    a conference, subcontribution etc, and return that info with the individual IDs."""
+
+    pConference      = re.compile('^(\d+)$')
+    pSession         = re.compile('^(\d+)s(\d+)$')
+    pContribution    = re.compile('^(\d+)c(\d+)$')
+    pSubcontribution = re.compile('^(\d+)s(\d+)sc(\d+)$')
+
+    mE  = pConference.search(IndicoID)
+    mS  = pSession.search(IndicoID)
+    mC  = pContribution.search(IndicoID)
+    mSC = pSubcontribution.search(IndicoID)
+
+    if mE:
+        return {'type':           'conference',
+                'conference':     mE.group(1),
+                'session':        '',
+                'contribution':   '',
+                'subcontribution':''}
+    elif mS:
+        return {'type':           'session',
+                'conference':     mS.group(1),
+                'session':        mS.group(2),
+                'contribution':   '',
+                'subcontribution':''}
+    elif mC:
+        return {'type':           'contribution',
+                'conference':     mC.group(1),
+                'session':        '',
+                'contribution':   mC.group(2),
+                'subcontribution':''}
+    elif mSC:
+        return {'type':           'subcontribution',
+                'conference':     mSC.group(1),
+                'session':        '',
+                'contribution':   mSC.group(2),
+                'subcontribution':mSC.group(3)}
+    else:
+        return None
 
 def getMatches(confID):
     """For the current conference, get list from the database of IndicoID's already matched to Lecture Object."""
@@ -389,6 +446,28 @@ def getCDSRecords(confId):
 #            results.append({"CDSID": CDSID, "IndicoID": IndicoID})
 
     return results
+
+def createIndicoLink(IndicoID):
+    """Create a link in Indico to the CDS record."""
+
+    eventInfo = parseIndicoID(IndicoID)
+
+
+def doesExistIndicoLink(obj):
+    """This function will be called with a conference, session, contribution or subcontribution object.
+    Each of those has a getAllMaterialList() method. Call that method and search for a title "Video in CDS"
+    and make sure it has a link."""
+
+    flagLinkFound = False
+
+    if obj == 'conference':
+        materials = obj.getAllMaterialList()
+        if materials is not None and len(materials) > 0:
+            for mat in materials:
+                if mat.getTitle() == "Video in CDS" and isinstance(mat.getMainResource, Link):
+                    flagLinkFound = True
+
+    return flagLinkFound
 
 def formatLOID(LOID):
     """Given a LOID of the form YYYYMMDD-recordingDev-HHMMSS, split it up into nicely readable parts: time, date, recording_device."""
