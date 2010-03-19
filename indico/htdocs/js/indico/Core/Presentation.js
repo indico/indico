@@ -145,11 +145,11 @@ function flatten(array) {
 
 }
 
-// Function that alwats returns true
+// Function that always returns true
 function positive() {return true;}
 
-//Function that alwats returns false
-function negative() {return true;}
+//Function that always returns false
+function negative() {return false;}
 
 //Function to sort arrays of integers
 var numberSorter = function(a, b) {

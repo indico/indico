@@ -25,24 +25,84 @@ type("IWidget", [],
 
      });
 
+/**
+ * Base class for widgets that store internally a list and want to represent each item with a template;
+ * the list will be a <ul> and the items a <li> each, bound to the item data.
+ *
+ * The <ul> will have a random DOM id and each <li> will also have a DOM id: the <ul>'s id + _ + item_key.
+ *
+ * Inherits from WatchObject: each item will have a key and a value (the item data).
+ * When adding a new item, it will always appear last in the DOM.
+ * To add / remove items use the corresponding WatchObject methods: "set(key, item)" to add, or "set(key, null)" to remove.
+ *
+ * This class also has a "setMessage" method, which will delete all the items in the <ul> and display the message inside.
+ *
+ * Inheriting classes will have to implement the _drawItem method.
+ *
+ * @param {String} listCssClass CSS class for the <ul> element.
+ * @param {function} mouseoverObserver A function that will be called when the user hovers the mouse over one of the <li>.
+ *                                     It will be called with 4 arguments:
+ *                                     1. true / false. true for mouseover, false for mouseout.
+ *                                     2. a "pair" object representing the item corresponding to the <li>.
+ *                                     pair.key will be the item's key and pair.get() the item's data.
+ *                                     3. the <li> XElement that received the event
+ *                                     4. the event object
+ *
+ */
 type("ListWidget", ["WatchObject", "IWidget"],
     {
+        /**
+         * The DOM id of the <ul> element, chosen randomly at construction.
+         */
         getId: function(){
             return this.id;
         },
 
+        /**
+         * We cannot call this function "clear" because
+         * WatchObject's "clear" is defined in the WatchObject constructor
+         * and would squash our function.
+         */
+        clearList: function() {
+            var self = this;
+            self.message = null;
+            self.clear(); // this gets rid of the <li> representing (key,values)
+            self.domList.clear(); //this gets rid of eventual messages
+        },
+
+        /**
+         * Sets a message inside the list.
+         * This will delete all the internal data.
+         */
+        setMessage: function(message) {
+            this.clearList();
+            this.message = message;
+            this.domList.append(Html.li('listMessage', message));
+        },
+
         draw: function() {
             var self = this;
 
-            self.domList = Html.ul(self.listCssClass);
+            var returnedDom = $B(self.domList, self,
+                function(pair) {
+                    var listItem =  Html.li({id: self.id + '_' + pair.key}, self._drawItem(pair));
+                    if (exists(self.mouseoverObserver)) {
+                        listItem.observeEvent('mouseover', function(event){
+                            self.mouseoverObserver(true, pair, listItem, event);
+                        });
+                        listItem.observeEvent('mouseout', function(event){
+                            self.mouseoverObserver(false, pair, listItem, event);
+                        });
+                    }
+                    return listItem;
+                });
 
-            return this.IWidget.prototype.draw.call(
-                this,
-                $B(self.domList, self,
-                    function(pair) {
-                        return Html.li({id: self.id + '_' + pair.key},
-                                       self._drawItem(pair));
-                   }));
+            if (exists(this.message)) {
+                this.domList.append(Html.li('listMessage', this.message));
+            }
+
+            return this.IWidget.prototype.draw.call(this, returnedDom);
+
         },
 
         _drawItem: function(pair) {
@@ -52,44 +112,117 @@ type("ListWidget", ["WatchObject", "IWidget"],
         }
     },
 
-    function(listCssClass) {
+    /**
+     * Constructor
+     */
+    function(listCssClass, mouseoverObserver) {
         this.WatchObject();
         this.id = Html.generateId();
+        this.domList = Html.ul({id: this.id, className: listCssClass});
         this.listCssClass = listCssClass;
+        this.mouseoverObserver = mouseoverObserver;
     }
 );
 
+/**
+ * Base class which adds selection capability to ListWidget.
+ * See first the documentation of ListWidget.
+ *
+ * @param {function} selectedObserver Function that will be called when an item is selected / unselected.
+ *                                    It will be passed the list of currently selected items, as a WatchObject
+ *                                    similar to the internal WatchObject that holds all the items.
+ *
+ * @param {Boolean} onlyOne false by default. If true, selecting an item will deselect a previously selected item.
+ *
+ * @param {String} listCssClass see ListWidget doc.
+ * @param {String} selectedCssClass CSS class that will be added to the <li> if they are selected.
+ * @param {String} unselectedCssClass CSS class that will be added to the <li> if they are unselected.
+ *
+ * @param {function} mouseoverObserver see ListWidget doc.
+ */
 type("SelectableListWidget", ["ListWidget"],
     {
-        _getSelectedList: function() {
+        getSelectedList: function() {
             return this.selectedList;
         },
+
+        clearSelection: function() {
+            var self = this;
+            each(self.domList, function(listItem) {
+                if (listItem.dom.className.search(self.selectedCssClass) >= 0) {
+                    listItem.dom.className = listItem.dom.className.replace(self.selectedCssClass, self.unselectedCssClass);
+                }
+            });
+            this.selectedList.clear();
+        },
+
+        /**
+         * We cannot call this function "clear" because
+         * WatchObject's "clear" is defined in the WatchObject constructor
+         * and would squash our function.
+         */
+        clearList: function() {
+            this.clearSelection();
+            this.ListWidget.prototype.clearList.call(this);
+        },
+
+        /**
+         * Sets a message inside the list.
+         * This will delete all the internal data.
+         */
+        setMessage: function(message) {
+            this.clearSelection();
+            this.ListWidget.prototype.setMessage.call(this, message);
+        },
+
         draw: function() {
             var self = this;
 
-            self.domList = Html.ul(self.listCssClass);
+            var returnedDom = $B(self.domList, self,
 
-            return this.IWidget.prototype.draw.call(
-                this,
-                $B(self.domList, self,
-                    function(pair) {
-                        var listItem = Html.li({id: self.id + '_' + pair.key}, self._drawItem(pair));
-                        if (pair.get().get("unselectable") === true) {
-                            listItem.dom.className += ' unselectable';
-                        } else {
-                            listItem.observeClick(function(){
-                                if (exists(self.selectedList.get(pair.key))) {
-                                    self.selectedList.set(pair.key, null);
-                                    listItem.dom.className = self.unselectedCssClass;
-                                } else {
-                                    self.selectedList.set(pair.key, pair.get());
-                                    listItem.dom.className = self.selectedCssClass;
+                function(pair) {
+
+                    var listItem = Html.li({id: self.id + '_' + pair.key}, self._drawItem(pair));
+
+                    if (pair.get().get("unselectable") === true) {
+                        listItem.dom.className += ' unselectable';
+
+                    } else {
+                        listItem.observeClick(function(event){
+
+                            if (exists(self.selectedList.get(pair.key))) {
+                                self.selectedList.set(pair.key, null);
+                                listItem.dom.className = self.unselectedCssClass;
+                            } else {
+                                if (self.onlyOne) {
+                                    self.clearSelection();
                                 }
+                                self.selectedList.set(pair.key, pair.get());
+                                listItem.dom.className = self.selectedCssClass;
+                            }
+
+                            if (exists(self.selectedObserver)) {
                                 self.selectedObserver(self.selectedList);
-                            });
-                        }
-                        return listItem;
-                   }));
+                            }
+
+                        });
+                    }
+                    if (exists(self.mouseoverObserver)) {
+                        listItem.observeEvent('mouseover', function(event){
+                            self.mouseoverObserver(true, pair, listItem, event);
+                        });
+                        listItem.observeEvent('mouseout', function(event){
+                            self.mouseoverObserver(false, pair, listItem, event);
+                        });
+                    }
+                    return listItem;
+               });
+
+            if (exists(this.message)) {
+                this.domList.append(Html.li('listMessage', this.message));
+            }
+
+            return this.IWidget.prototype.draw.call(this, returnedDom);
         },
         _drawItem: function(pair) {
             // Function to be overloaded by inheriting classes
@@ -97,9 +230,10 @@ type("SelectableListWidget", ["ListWidget"],
             return '';
         }
     },
-    function (selectedObserver, listCssClass, selectedCssClass, unselectedCssClass) {
+    function (selectedObserver, onlyOne, listCssClass, selectedCssClass, unselectedCssClass, mouseoverObserver) {
         this.selectedList = $O();
         this.selectedObserver = selectedObserver;
+        this.onlyOne = any(onlyOne, false);
         if (exists (selectedCssClass)) {
             this.selectedCssClass = selectedCssClass;
         } else {
@@ -110,7 +244,7 @@ type("SelectableListWidget", ["ListWidget"],
         } else {
             this.unselectedCssClass = "unselectedListItem";
         }
-        this.ListWidget(listCssClass);
+        this.ListWidget(listCssClass, mouseoverObserver);
     }
 );
 
@@ -477,6 +611,7 @@ type("TabWidget", ["IWidget"],{
          this.options = new WatchList();
 
          //replace with appropriate method, when ready
+
          $L(options).each(function(pair) {
              var value = pair[1];
              var key = pair[0];

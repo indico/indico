@@ -131,7 +131,7 @@ type("H323RoomList", ["SelectableListWidget"],
         }
     },
     function (selectedObserver) {
-        this.SelectableListWidget(selectedObserver, "UIPeopleList CERNMCU_H323RoomList");
+        this.SelectableListWidget(selectedObserver, false, "UIPeopleList CERNMCU_H323RoomList");
     }
 )
 
@@ -144,7 +144,7 @@ type("H323RoomPopup", ["ExclusivePopupWithButtons"],
 
             var saveButton = new DisabledButton(Html.input("button", {disabled:true}, $T("Save") ));
             saveButton.observeClick(function(){
-                self.action(roomList._getSelectedList(), closePopup);
+                self.action(roomList.getSelectedList(), closePopup);
             });
             saveButton.disable();
 
