@@ -9671,7 +9671,7 @@ class Contribution(Persistent, Fossilizable):
             if r is not None and r.isActivated():
                 self._grantSubmission(r)
             elif sb.getEmail() != "":
-                self.getConference().getPendingQueuesMgr().addPendingSubmitter(sb)
+                self.getConference().getPendingQueuesMgr().addPendingSubmitter(sb, False)
                 self._grantSubmissionEmail(sb.getEmail())
                 #send email once
                 try :
