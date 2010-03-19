@@ -332,7 +332,7 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
                                                                  data,
                                                                  intervalInfo,
                                                                  this.eventInfo,
-                                                                 this.width,
+                                                                 this.width.slice(0,-2),
                                                                  this.canvas,
                                                                  'contribution',
                                                                 this.isSessionTimetable);
