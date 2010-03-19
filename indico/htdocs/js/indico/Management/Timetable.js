@@ -328,7 +328,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
         this.roomEditor = new RoomBookingWidget(Indico.Data.Locations, info.get('roomInfo'), self.parentRoomData, true, self.favoriteRooms, null);
 
         var presListWidget = new UserListField(
-            'VeryShortPeopleListDiv', 'PluginPeopleList',
+            'VeryShortPeopleListDiv', 'PeopleList',
             [],
             null,
             self.favorites,
@@ -438,7 +438,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
     _drawAuthorsTab: function(info) {
         var self = this;
         var authorListWidget = new UserListField(
-            'VeryShortPeopleListDiv', 'PluginPeopleList',
+            'VeryShortPeopleListDiv', 'PeopleList',
             [],
             null,
             self.favorites,
@@ -447,7 +447,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
             this.args.conference);
 
         var coauthorListWidget = new UserListField(
-            'VeryShortPeopleListDiv', 'PluginPeopleList',
+            'VeryShortPeopleListDiv', 'PeopleList',
             [],
             null,
             self.favorites,

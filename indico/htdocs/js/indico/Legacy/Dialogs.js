@@ -111,7 +111,7 @@ extend(IndicoUI.Dialogs,
                            });
 
                            var convListWidget = new UserListField(
-                               'VeryShortPeopleListDiv', 'PluginPeopleList',
+                               'VeryShortPeopleListDiv', 'PeopleList',
                                [],
                                null,
                                favorites,
@@ -391,7 +391,7 @@ extend(IndicoUI.Dialogs,
                            });
 
                            var convListWidget = new UserListField(
-                               'VeryShortPeopleListDiv', 'PluginPeopleList',
+                               'VeryShortPeopleListDiv', 'PeopleList',
                                isEdit?params.conveners:params.sessionConveners,
                                null,
                                favorites,
@@ -561,7 +561,7 @@ extend(IndicoUI.Dialogs,
 
 
                        var presListWidget = new UserListField(
-                           'VeryShortPeopleListDiv', 'PluginPeopleList',
+                           'VeryShortPeopleListDiv', 'PeopleList',
                            [],
                            null,
                            favorites,

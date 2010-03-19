@@ -1819,6 +1819,9 @@ ul.CategoryList li:hover{
     margin: 20px 0 0;
 }
 
+
+/* ListWidget, list of users styles */
+
 li.selectedListItem {
     background-color: #CDEB8B;
 }
@@ -1832,18 +1835,7 @@ li.unselectable {
     color: #888888;
 }
 
-div.UISearchPeopleListDiv {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    height: 200px;
-    width: 100%;
-    max-width: 450px;
-    min-width: 450px;
-    border: 1px solid #CCCCCC;
-    overflow: auto;
-}
-
-div.UIPeopleListDiv {
+div.UIPeopleListDiv { /* for lists of users in forms */
     margin-top: 10px;
     margin-bottom: 10px;
     height: 200px;
@@ -1852,8 +1844,26 @@ div.UIPeopleListDiv {
     overflow: auto;
 }
 
-ul.UIPeopleList
-{
+div.UISearchPeopleListDiv, div.UISuggestedPeopleListDiv {
+    overflow: auto;
+}
+
+div.UISearchPeopleListDiv {
+    height: 200px;
+    border: 1px solid #CCCCCC;
+    margin-top:10px;
+    max-width:450px;
+    min-width:450px;
+    overflow:auto;
+    width:100%;
+}
+
+div.UISuggestedPeopleListDiv {
+    border-top: 1px dotted #DDDDDD;
+    height: 300px;
+}
+
+ul.PeopleList, ul.UIPeopleList, ul.UISuggestedPeopleList { /* UIPeopleList: for all lists of users, among them, found users */
     border: none;
     display: block;
     list-style-type: none;
@@ -1861,19 +1871,54 @@ ul.UIPeopleList
     margin: 0;
 }
 
-ul.UIPeopleList li{
-    border-bottom: 1px solid #DDDDDD;
+ul.PeopleList li, ul.UIPeopleList li, ul.UISuggestedPeopleList li {
     margin: 0;
     display: block;
     margin-bottom: 0px;
     line-height: 25px;
-    vertical-align: middle;
-    cursor: pointer;
     padding-left: 5px;
+    vertical-align: middle;
+}
+
+ul.UIPeopleList li, ul.UISuggestedPeopleList li {
+    border-bottom: 1px dotted #DDDDDD;
+    cursor: pointer;
+}
+
+ul.PeopleList li:hover {
+    background-color: #ECECEC;
+}
+
+ul.UIPeopleList li:hover, ul.UISuggestedPeopleList li:hover {
+    background-color: #FFF6DF;
+}
+
+ul.UIPeopleList li.listMessage, ul.UISuggestedPeopleList li.listMessage {
+    border-bottom: none;
+    font-style: italic;
+    padding: 10px;
+    cursor: auto;
+    line-height: normal;
+}
+
+ul.UIPeopleList li.listMessage, ul.UISuggestedPeopleList li.listMessage {
+    background-color: transparent;
 }
 
 ul.UIPeopleList li .nameLink {
     padding: 4px 30px;
+}
+
+ul.UIPeopleList li .foundUserEmail, ul.UISuggestedPeopleList li .foundUserEmail {
+    font-style: italic;
+    font-size: 8pt;
+    padding-left: 5px;
+    line-height: 15px;
+    display:none;
+}
+
+ul.UIPeopleList li:hover > .foundUserEmail, ul.UISuggestedPeopleList li:hover > .foundUserEmail {
+    display:inline;
 }
 
 ul.UIPeopleList li.selectedUser {
@@ -1881,12 +1926,43 @@ ul.UIPeopleList li.selectedUser {
 }
 
 ul.UIPeopleList li.unselectedUser {
-    background-color: #FFFFFF;
 }
 
 ul.UIPeopleList li.unselectable {
     cursor: default;
     color: #888888;
+}
+
+div.searchUsersButtonDiv {
+    text-align: center;
+    padding-top: 5px;
+    padding-bottom: 15px;
+}
+
+div.suggestedUsersTitle {
+    text-align: center;
+    font-size: 14pt;
+    padding-top: 10px;
+    padding-bottom: 20px;
+}
+
+td.searchUsersGroupsPanel, td.suggestedUsersPanel {
+    vertical-align: top;
+    padding-bottom: 10px;
+}
+
+td.searchUsersGroupsPanel {
+    width: 450px;
+    padding-left: 10px;
+    background-color: white;
+    padding-top: 10px;
+    padding-right:10px;
+}
+
+td.suggestedUsersPanel {
+    width: 250px;
+    background-color: #F8F8F8;
+    border-left: 1px dotted #CCCCCC;
 }
 
 ul.UIListNestedMenu
@@ -3854,32 +3930,6 @@ span.optionKey1 {
     font-weight: bold;
 }
 
-div.PluginPeopleListDiv {
-    margin-bottom: 10px;
-    height: 100px;
-    width: 300px;
-    border: 1px solid #CCCCCC;
-    overflow: auto;
-}
-
-ul.PluginPeopleList
-{
-    border: none;
-    display: block;
-    list-style-type: none;
-    padding-left: 0px;
-    margin: 0;
-}
-
-ul.PluginPeopleList li{
-    margin: 0;
-    display: block;
-    margin-bottom: 0px;
-    line-height: 25px;
-    padding-left: 5px;
-    vertical-align: middle;
-}
-
 /* COLLABORATION */
 
 span.createBookingText {
@@ -5342,6 +5392,14 @@ ul.nobulletsListWrapping li
     margin-top: 5px;
     overflow: visible;
     list-style-type: none;
+}
+
+div.PeopleListDiv {
+    margin-bottom: 10px;
+    height: 100px;
+    width: 300px;
+    border: 1px solid #CCCCCC;
+    overflow: auto;
 }
 
 div.FavoritePeopleListDiv {

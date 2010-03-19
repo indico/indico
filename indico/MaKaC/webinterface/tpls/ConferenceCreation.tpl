@@ -128,7 +128,7 @@
 
     var userList = [];
     <% from MaKaC.common.PickleJar import DictPickler %>
-    var uf = new UserListField('VeryShortPeopleListDiv', 'PluginPeopleList',
+    var uf = new UserListField('VeryShortPeopleListDiv', 'PeopleList',
             userList,
 		    null,
 		    <%= jsonEncode(DictPickler.pickle(rh._getUser().getPersonalInfo().getBasket().getUsers())) %>,

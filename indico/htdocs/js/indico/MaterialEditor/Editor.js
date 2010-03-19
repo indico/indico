@@ -420,7 +420,7 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
         this.password = Html.input('password',{});
 
         this.userList =  new UserListField('ShortPeopleListDiv',
-                'PluginPeopleList',
+                'PeopleList',
                 this.allowedUsers,
                 null,
                 null,
@@ -570,7 +570,7 @@ type("EditMaterialDialog", ["ServiceDialog", "PreLoadHandler"], {
         );
 
         self.userList =  new UserListField('ShortPeopleListDiv',
-                                           'PluginPeopleList',
+                                           'PeopleList',
                                            self.allowedUsers,
                                            null,
                                            null,
@@ -708,7 +708,7 @@ type("EditResourceDialog", ["ServiceDialog", "PreLoadHandler"], {
         $B(url, self.newResource.accessor('url'));
 
         self.userList = new UserListField('VeryShortPeopleListDiv',
-                                          'PluginPeopleList',
+                                          'PeopleList',
                                           self.allowedUsers,
                                           null,
                                           null,

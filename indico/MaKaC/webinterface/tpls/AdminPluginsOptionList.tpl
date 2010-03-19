@@ -1,4 +1,4 @@
-<% from MaKaC.fossils.user import IAvatarDetailedFossil %>
+<% from MaKaC.fossils.user import IAvatarFossil %>
 
     <% if ObjectType == "PluginType" :%>
     <form method="post" action="<%= urlHandlers.UHAdminPluginsTypeSaveOptions.getURL(Object, subtab = Index) %>" >
@@ -61,8 +61,8 @@
                             );
                         }
 
-                        var uf = new UserListField('PluginPeopleListDiv', 'PluginPeopleList',
-                                                   <%= jsonEncode(fossilize(option.getValue(), IAvatarDetailedFossil)) %>,
+                        var uf = new UserListField('PeopleListDiv', 'PeopleList',
+                                                   <%= jsonEncode(fossilize(option.getValue(), IAvatarFossil)) %>,
                                                    null,
                                                    <%=jsonEncode(Favorites)%>,
                                                    true, false, false,
@@ -71,7 +71,7 @@
                     </script>
                 <% end %>
                 <% elif option.getType() =="rooms": %>
-                    <div id="roomList" class="PluginPeopleListDiv"></div>
+                    <div id="roomList" class="PeopleListDiv"></div>
                     <div id="roomChooser"></div>
                     <div id="roomAddButton"></div>
                     <script type="text/javascript">
@@ -111,7 +111,7 @@
                                     }
                                 );
                         });
-                        var roomList = new RoomListWidget('PluginPeopleList',removeRoomHandler);
+                        var roomList = new RoomListWidget('PeopleList',removeRoomHandler);
                         //var temp = roomChooser.source.get()["CERN:1"];
                         var roomSelectedBefore=<%= option.getValue() %>
                         each (roomSelectedBefore,function(room){

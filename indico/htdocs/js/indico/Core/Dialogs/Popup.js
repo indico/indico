@@ -245,9 +245,6 @@ type("ExclusivePopupWithButtons", ["ExclusivePopup"], {
     draw: function(mainContent, buttonContent, popupCustomStyle, mainContentStyle, buttonBarStyle) {
 
         popupCustomStyle = any(popupCustomStyle, {});
-        if (!exists(popupCustomStyle.backgroundColor)) {
-            popupCustomStyle.backgroundColor = '#F8F8F8';
-        }
 
         mainContentStyle = any(mainContentStyle, {});
         var mainContentDiv = Html.div({className: "popupWithButtonsMainContent", style:mainContentStyle}, mainContent);
