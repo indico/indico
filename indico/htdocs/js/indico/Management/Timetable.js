@@ -1086,7 +1086,7 @@ type("MoveEntryDialog", ["ExclusivePopup"],
                                       $T(self._titleTemplate(key)),
                                       self._drawMoveEntryDay(tabData[key], key)
                                   ];
-                              }), 400, 200, dateKeys.indexOf(self.currentDay));
+                              }), 400, 200, self._titleTemplate(self.currentDay));
 
                 // define where the contribution is (display purpose)
                 var contribLocation = null;
