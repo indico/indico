@@ -68,8 +68,6 @@ def getTalks(conference, oneIsEnough = False, sort = False):
     event_info["LOID"]       = ""
     event_info["IndicoLink"] = doesExistIndicoLink(conference)
 
-#    event_info["CDS"]        = getCDSRecord(event_info["IndicoID"])
-
     recordable_events.append(event_info)
 
     # Posters are contributions that are not recordable,
@@ -109,8 +107,6 @@ def getTalks(conference, oneIsEnough = False, sort = False):
             event_info["LOID"]       = ""
             event_info["IndicoLink"] = doesExistIndicoLink(contribution)
 
-#            event_info["CDS"]        = getCDSRecord(event_info["IndicoID"])
-
             recordable_events.append(event_info)
             ctr_sc = 0
             for subcontribution in contribution.getSubContributionList():
@@ -144,8 +140,6 @@ def getTalks(conference, oneIsEnough = False, sort = False):
                 event_info["LOID"]       = ""
                 event_info["IndicoLink"] = doesExistIndicoLink(subcontribution)
 
-#                event_info["CDS"]        = getCDSRecord(event_info["IndicoID"])
-
                 recordable_events.append(event_info)
 
             if oneIsEnough:
@@ -167,7 +161,6 @@ def getTalks(conference, oneIsEnough = False, sort = False):
         event_info["date"]     = int(mktime(session.getStartDate().timetuple()))
         event_info["LOID"]       = ""
         event_info["IndicoLink"] = doesExistIndicoLink(session)
-#        event_info["CDS"]        = getCDSRecord(event_info["IndicoID"])
 
         recordable_events.append(event_info)
 
@@ -194,6 +187,10 @@ def getTalks(conference, oneIsEnough = False, sort = False):
 
         if matching_LOID != "":
             talk["LOID"] = matching_LOID
+
+    # Now that we have all the micala, CDS and IndicoLink info, set up the bg images
+    for talk in recordable_events:
+        talk["bg"]         = chooseBGImage(talk)
 
     # Next, sort the list of events by startDate for display purposes
     recordable_events.sort(startTimeCompare)
@@ -458,14 +455,17 @@ def doesExistIndicoLink(obj):
     Each of those has a getAllMaterialList() method. Call that method and search for a title "Video in CDS"
     and make sure it has a link."""
 
+    Logger.get('RecMan').info("doesExistIndicoLink")
+
     flagLinkFound = False
 
-    if obj == 'conference':
-        materials = obj.getAllMaterialList()
-        if materials is not None and len(materials) > 0:
-            for mat in materials:
-                if mat.getTitle() == "Video in CDS" and isinstance(mat.getMainResource, Link):
-                    flagLinkFound = True
+    materials = obj.getAllMaterialList()
+    if materials is not None and len(materials) > 0:
+        Logger.get('RecMan').info("found materials")
+
+        for mat in materials:
+            if mat.getTitle() == "Video in CDS" and isinstance(mat.getMainResource(), Link):
+                flagLinkFound = True
 
     return flagLinkFound
 
@@ -481,6 +481,29 @@ def formatLOID(LOID):
     recording_device = LOID.split('-')[1]
 
     return(time, date, recording_device)
+
+def chooseBGImage(talk):
+    """Given a talk dictionary, check if it has an LOID, CDS record, and IndicoLink.
+    Pick the appropriate image RecordingManagerNNN.png to match that.
+    This image will be used for the div background.
+    """
+
+    if talk["LOID"] != '':
+        flagLOID = '1'
+    else:
+        flagLOID = '0'
+
+    if talk["CDS"] != '':
+        flagCDS = '1'
+    else:
+        flagCDS = '0'
+
+    if talk["IndicoLink"] == True:
+        flagIndicoLink = '1'
+    else:
+        flagIndicoLink = '0'
+
+    return "/indico/images/RecordingManager%s%s%s.png" % (flagLOID, flagCDS, flagIndicoLink)
 
 class RecordingManagerError(CSErrorBase):
     def __init__(self, operation, inner):

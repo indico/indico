@@ -156,7 +156,7 @@ ButtonCreateIndicoLink.observeClick(function(){
 ButtonCreateIndicoLink.observeEvent('mouseover', function(event){
     if (!ButtonCreateIndicoLink.isEnabled()) {
         tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY,
-                $T("Please select both talk and Lecture Object first"), "tooltipError");
+                $T("First select talk and Lecture Object"), "tooltipError");
     }
 });
 

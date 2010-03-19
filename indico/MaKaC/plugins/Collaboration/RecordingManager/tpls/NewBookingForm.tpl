@@ -16,7 +16,7 @@
         <div class="RMMatchPane">
             <% for talk in Talks: %>
                 <% IndicoID = talk["IndicoID"] %>
-                <div id="div<%= IndicoID %>" class="RMtalkDisplay" onclick="RMtalkSelect('<%= IndicoID %>')" onmouseover="RMtalkBoxOnHover('<%= IndicoID %>');" onmouseout="RMtalkBoxOffHover('<%= IndicoID %>');">
+                <div id="div<%= IndicoID %>" class="RMtalkDisplay" onclick="RMtalkSelect('<%= IndicoID %>')" onmouseover="RMtalkBoxOnHover('<%= IndicoID %>');" onmouseout="RMtalkBoxOffHover('<%= IndicoID %>');" style="background-image: url(<%= talk["bg"] %>)">
                   <span>
                     <table cellspacing="0" cellpadding="0" border="0">
                     <tr>
@@ -40,29 +40,6 @@
                         <% if talk["speakers"] != '': %>
                         <%=    talk["speakers"] %>
                         <% end %>
-                    </td>
-                    <td align="top">
-                        <div style="font-size: 70%;">
-                        <% if talk["LOID"] != '': %>
-                        <b><tt>MATCH</tt></b>
-                        <% end %>
-                        <% else: %>
-                        <b><tt>&nbsp;</tt></b>
-                        <% end %>
-                        <br />
-                        <% if talk["CDS"] != '': %>
-                        <b><tt>CDS</tt></b>
-                        <% end %>
-                        <% else: %>
-                        <b><tt>&nbsp;</tt></b>
-                        <% end %>
-                        <% if talk["IndicoLink"] != '': %>
-                        <b><tt>LINK</tt></b>
-                        <% end %>
-                        <% else: %>
-                        <b><tt>&nbsp;</tt></b>
-                        <% end %>
-                        </div>
                     </td>
                     </tr>
                     </table>

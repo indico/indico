@@ -74,6 +74,8 @@ div.RMtalkDisplay {
     line-height: 1;
     margin: 0px;
     padding: 2px;
+    background-position: right;
+    background-repeat: no-repeat;
 }
 
 div.RMtalkHover {
@@ -86,6 +88,8 @@ div.RMtalkHover {
     line-height: 1;
     margin: 0px;
     padding: 2px;
+    background-position: right;
+    background-repeat: no-repeat;
 }
 
 div.RMtalkSelected {
@@ -99,6 +103,8 @@ div.RMtalkSelected {
     line-height: 1;
     margin: 0px;
     padding: 2px;
+    background-position: right;
+    background-repeat: no-repeat;
 }
 
 div.RMLODisplay {
