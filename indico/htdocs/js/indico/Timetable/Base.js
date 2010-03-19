@@ -298,28 +298,15 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
 
     },
 
-    _followArgs_interval: function(hash, data) {
 
+    _parseDayInterval: function(hash) {
         var m = hash.match(/#(\d{8})(?:\.(s\d+l\d+))?/);
 
         if (m) {
-
-            if (m[2]) {
-                this.switchToInterval(m[2]);
-                return true;
-            }
+            return [m[1],m[2]];
+        } else {
+            return [null, null];
         }
-
-        return false;
-    },
-
-    _followArgs_day: function(hash,data) {
-
-        var m = hash.match(/#(\d{8}|all)(?:\.(s\d+l\d+))?/);
-
-        var currentDay = m ? m[1] : null;
-
-        return exists(data[currentDay]) ? currentDay : null;
     },
 
     switchToInterval : function(intervalId) {
@@ -338,7 +325,8 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
                                                                 this.isSessionTimetable);
 
         this.intervalTimeTable.setData(intervalInfo);
-        this.canvas.set(this.intervalTimeTable.draw());
+        var content = this.intervalTimeTable.draw()
+        this.canvas.set(content);
         this.menu.dom.style.display = 'none';
 
     },
@@ -385,8 +373,12 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
 
          var originalHash = window.location.hash;
 
-         // parse "command line" arguments
-         var initialTab = this._followArgs_day(originalHash, data);
+         var dayAndInterval = this._parseDayInterval(originalHash);
+         var initialTab = null;
+
+         if (dayAndInterval[0]) {
+             initialTab = dayAndInterval[0];
+         }
 
          // if nothing is found
          if (initialTab === null) {
@@ -425,7 +417,12 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
              }];
          }), this.width, 100, initialTab, this._functionButtons(), this.canvas);
 
-         this._followArgs_interval(originalHash, data);
+         if (dayAndInterval[1]) {
+             // TODO: replace with appropriate notification system
+             setTimeout(function() {
+                 self.switchToInterval(dayAndInterval[1]);
+             }, 500);
+         }
 
      });
 
@@ -703,7 +700,7 @@ type("ManagementTimeTable",["TimeTable"], {
 type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"], {
 
     _retrieveHistoryState: function(hash) {
-        var currentDay = this._followArgs_day(hash, this.data);
+        var currentDay = this._parseDayInterval(hash)[0];
         this.setSelectedTab(currentDay);
     }
 
@@ -849,10 +846,15 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
     },
 
     _retrieveHistoryState: function(hash) {
-        var currentDay = this._followArgs_day(hash, this.data) || keys(this.data)[0];
-        if (!this._followArgs_interval(hash, this.data)) {
+        var dayInterval = this._parseDayInterval(hash);
+
+        var currentDay =  dayInterval[0] || keys(this.data)[0];
+        if (dayInterval[1]) {
+            this.setSelectedTab(dayInterval[0]);
+            this.switchToInterval(dayInterval[1]);
+        } else {
             this.switchToTopLevel();
-            this.setSelectedTab(currentDay);
+            this.setSelectedTab(dayInterval[0]);
         }
     }
 
