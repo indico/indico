@@ -27,11 +27,24 @@ from MaKaC.common.PickleJar import DictPickler
 from MaKaC.common import info
 
 import time
-from MaKaC.fossils.user import IAvatarAllDetailsFossil, IAvatarDetailedFossil,\
-    IAvatarMinimalFossil
+from MaKaC.fossils.user import IAvatarAllDetailsFossil, IAvatarFossil
 from MaKaC.common.fossilize import fossilize
 
 from MaKaC.rb_location import CrossLocationQueries
+
+class UserComparator(object):
+
+    @staticmethod
+    def cmpUsers(x, y):
+        cmpResult = cmp(x["familyName"].lower(), y["familyName"].lower())
+        if cmpResult == 0:
+            cmpResult = cmp(x["firstName"].lower(), y["firstName"].lower())
+        return cmpResult
+
+    @staticmethod
+    def cmpGroups(x, y):
+        return cmp(x["name"].lower(), y["name"].lower())
+
 
 class UserListEvents(LoggedOnlyService):
 
@@ -141,21 +154,22 @@ class UserListBasket(ServiceBase):
         ServiceBase._checkParams(self)
 
         self._target = self.getAW().getUser()
-        self._detailLevel = self._params.get("detailLevel", "max")
+        self._allDetails = self._params.get("allDetails", False)
 
     def _getAnswer( self):
 
         if self._target:
             users = self._target.getPersonalInfo().getBasket().getUsers().values()
 
-            if self._detailLevel == "min":
-                fossilToUse = IAvatarMinimalFossil
-            elif self._detailLevel == "medium":
-                fossilToUse = IAvatarDetailedFossil
-            elif self._detailLevel == "max":
+            if self._allDetails:
                 fossilToUse = IAvatarAllDetailsFossil
+            else:
+                fossilToUse = IAvatarFossil
 
-            return fossilize(users, fossilToUse)
+            fossilizedResult = fossilize(users, fossilToUse)
+            fossilizedResult.sort(cmp=UserComparator.cmpUsers)
+            return fossilizedResult
+
         else:
             return None
 

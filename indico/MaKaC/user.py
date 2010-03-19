@@ -18,8 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.fossils.user import IAvatarMinimalFossil, IAvatarDetailedFossil,\
-    IAvatarAllDetailsFossil, IGroupFossil
+from MaKaC.fossils.user import IAvatarFossil, IAvatarAllDetailsFossil, IGroupFossil
 from MaKaC.common.fossilize import Fossilizable, fossilizes
 from random import random
 
@@ -423,7 +422,7 @@ class Avatar(Persistent, Fossilizable):
        Basically it contains personal data from them which is relevant for the
        system.
     """
-    fossilizes(IAvatarMinimalFossil, IAvatarDetailedFossil, IAvatarAllDetailsFossil)
+    fossilizes(IAvatarFossil, IAvatarAllDetailsFossil)
 
     linkedToBase = {"category":{"creator":[],
                                 "manager":[],

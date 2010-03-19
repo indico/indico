@@ -30,7 +30,7 @@ class IGroupFossil(IFossil):
     def getEmail(self):
         """ Group email """
 
-class IAvatarMinimalFossil(IFossil):
+class IAvatarFossil(IFossil):
 
     def getId(self):
         """ Avatar id"""
@@ -41,9 +41,6 @@ class IAvatarMinimalFossil(IFossil):
 
     def getEmail( self ):
         """ Avatar email """
-
-
-class IAvatarDetailedFossil(IAvatarMinimalFossil):
 
     def getFirstName(self):
         """ Avatar first name """
@@ -59,7 +56,7 @@ class IAvatarDetailedFossil(IAvatarMinimalFossil):
     getOrganisation.name = "affiliation"
 
 
-class IAvatarAllDetailsFossil(IAvatarDetailedFossil):
+class IAvatarAllDetailsFossil(IAvatarFossil):
 
     def getAddress( self ):
         """ Avatar address """

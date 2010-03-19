@@ -19,67 +19,82 @@
 
 from MaKaC.conference import CategoryManager
 
-from MaKaC.services.implementation.base import ServiceBase, ProtectedService
+from MaKaC.services.implementation.base import ServiceBase
 
 from MaKaC.common import search
 
 from MaKaC.common.PickleJar import DictPickler
 
 from MaKaC.webinterface import urlHandlers
-from MaKaC.fossils.user import IAvatarDetailedFossil, IGroupFossil
+from MaKaC.fossils.user import IAvatarFossil, IGroupFossil
 from MaKaC.common.fossilize import fossilize
 
 from zope.index.text import parsetree
+from MaKaC.services.implementation.user import UserComparator
+
+from MaKaC.common.Configuration import Config
 
 #################################
 # User and group search
 #################################
 
-class SearchComparator(object):
+class SearchBase(ServiceBase):
 
-    @staticmethod
-    def cmpUsers(x, y):
-        cmpResult = cmp(x["familyName"].lower(), y["familyName"].lower())
-        if cmpResult == 0:
-            cmpResult = cmp(x["firstName"].lower(), y["firstName"].lower())
-        return cmpResult
+    def _checkParams(self):
+        """ Checks for external authenticators
+            For now the underlying MaKaC.common.search code only supports
+            1 external authenticator, so we just see if a proper external authenticator is present or not
+        """
+        self._searchExt = False
+        config = Config.getInstance()
+        for authenticatorName in config.getAuthenticatorList():
+            authParamName = "searchExternal-" + authenticatorName
+            if authParamName in self._params and self._params[authParamName]:
+                self._searchExt = True
+                break
 
-    @staticmethod
-    def cmpGroups(x, y):
-        return cmp(x["name"].lower(), y["name"].lower())
 
+class SearchUsers(SearchBase):
 
-class SearchUsers(ServiceBase):
+    def _checkParams(self):
+        SearchBase._checkParams(self)
+        self._surName = self._params.get("surName", "")
+        self._name = self._params.get("name", "")
+        self._organisation = self._params.get("organisation", "")
+        self._email = self._params.get("email", "")
+        self._confId = self._params.get("conferenceId", None)
+        self._exactMatch = self._params.get("exactMatch", False)
 
     def _getAnswer(self):
 
-        results = search.searchUsers(surName = self._params.get("surName", ""),
-                               name = self._params.get("name", ""),
-                               organisation = self._params.get("organisation", ""),
-                               email = self._params.get("email", ""),
-                               conferenceId = self._params.get("conferenceId", None),
-                               exactMatch = self._params.get("exactMatch", False),
-                               searchExt = self._params.get("searchExt", False))
+        results = search.searchUsers(self._surName, self._name, self._organisation, self._email,
+                                     self._confId, self._exactMatch, self._searchExt)
 
-        fossilizedResults = fossilize(results, IAvatarDetailedFossil)
-        fossilizedResults.sort(cmp=SearchComparator.cmpUsers)
+        #will use either IAvatarFossil or IContributionParticipationFossil
+        fossilizedResults = fossilize(results)
+        fossilizedResults.sort(cmp=UserComparator.cmpUsers)
 
         return fossilizedResults
 
-class SearchGroups(ServiceBase):
+
+class SearchGroups(SearchBase):
+
+    def _checkParams(self):
+        SearchBase._checkParams(self)
+        self._group = self._params.get("group", "")
 
     def _getAnswer(self):
 
-        results = search.searchGroups(group = self._params.get("group", ""),
-                               searchExt = self._params.get("searchExt", False))
+        results = search.searchGroups(self._group, self._searchExt)
 
         fossilizedResults = fossilize(results, IGroupFossil)
-        fossilizedResults.sort(cmp=SearchComparator.cmpGroups)
+        fossilizedResults.sort(cmp=UserComparator.cmpGroups)
 
         for fossilizedGroup in fossilizedResults:
             fossilizedGroup["isGroup"] = True
 
         return fossilizedResults
+
 
 class SearchUsersGroups(ServiceBase):
 
@@ -99,13 +114,14 @@ class SearchUsersGroups(ServiceBase):
         pickledUsers = [DictPickler.pickle(human) for human in users]
         pickledGroups = [DictPickler.pickle(group) for group in groups]
 
-        pickledUsers.sort(cmp=SearchComparator.cmpUsers)
-        pickledGroups.sort(cmp=SearchComparator.cmpGroups)
+        pickledUsers.sort(cmp=UserComparator.cmpUsers)
+        pickledGroups.sort(cmp=UserComparator.cmpGroups)
 
         results["people"] = pickledUsers
         results["groups"] = pickledGroups
 
         return results
+
 
 #################################
 # Category search
