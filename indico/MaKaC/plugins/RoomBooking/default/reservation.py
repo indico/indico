@@ -112,18 +112,17 @@ class Reservation( Persistent, ReservationBase ):
         # Update day => reservations index
         self._addToDayReservationsIndex()
 
-    def update( self, udpateReservationIndex=True ):
-        """ Documentation in base class. """
-        ReservationBase.update( self )
-        if udpateReservationIndex:
-            self._removeFromDayReservationsIndex()
-            self._addToDayReservationsIndex()
-            self._p_changed = True
-
         # Warning:
         # createdBy, once assigned to rerservation, CAN NOT be changed later (index!)
         # room, once assigned to reservation, CAN NOT be changed later (index!)
 
+    def indexDayReservations(self):
+        self._addToDayReservationsIndex()
+        self._p_changed = True
+
+    def unindexDayReservations(self):
+        self._removeFromDayReservationsIndex()
+        self._p_changed = True
 
     def remove( self ):
         """ Documentation in base class. """
@@ -160,18 +159,15 @@ class Reservation( Persistent, ReservationBase ):
     def _removeFromDayReservationsIndex( self ):
         dayReservationsIndexBTree = Reservation.getDayReservationsIndexRoot()
 
-        # Search for self in the whole index
-        # (the key may have changed)
-        days = []
-        for day, resvs in dayReservationsIndexBTree.iteritems():
-            if self in resvs:
-                days.append( day )
+        # For each of the periods, checks if it is in the index
+        # and removes the entry
 
-        for day in days:
-            resvs = dayReservationsIndexBTree[day]
-            resvs.remove( self )
-            dayReservationsIndexBTree[day] = resvs
-
+        for period in self.splitToPeriods():
+            day = period.startDT.date()
+            resvs = dayReservationsIndexBTree.get( day )
+            if resvs != None and self in resvs:
+                resvs.remove(self)
+                dayReservationsIndexBTree[day] = resvs
 
     @staticmethod
     def getReservations( *args, **kwargs ):

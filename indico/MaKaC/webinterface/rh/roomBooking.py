@@ -1213,11 +1213,13 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
                         session.setVar( "title", 'You have successfully made a <span style="color: Red;">PRE</span>-booking.' )
                         session.setVar( "description", 'NOTE: PRE-bookings are subject to acceptance or rejection. Expect an e-mail with acceptance/rejection information.' )
                 elif self._formMode == FormMode.MODIF:
+                    self._orig_candResv.unindexDayReservations()
                     if self._forceAddition:
                         self._loadResvCandidateFromSession( self._orig_candResv, self._params )
                     else:
                         self._loadResvCandidateFromParams( self._orig_candResv, self._params )
                     self._orig_candResv.update()
+                    self._orig_candResv.indexDayReservations()
                     self._emailsToBeSent += self._orig_candResv.notifyAboutUpdate()
                     session.setVar( "title", 'Booking updated.' )
                     session.setVar( "description", 'Please review details below.' )
@@ -1462,7 +1464,7 @@ class RHRoomBookingCancelBooking( RHRoomBookingBase ):
         # Booking deletion is always possible - just delete
         self._emailsToBeSent = []
         self._resv.cancel()    # Just sets isCancel = True
-        self._resv.update(udpateReservationIndex=False)
+        self._resv.update()
         self._emailsToBeSent += self._resv.notifyAboutCancellation()
 
         self._websession.setVar( 'actionSucceeded', True )
@@ -1494,7 +1496,7 @@ class RHRoomBookingCancelBookingOccurrence( RHRoomBookingBase ):
     def _process( self ):
         self._emailsToBeSent = []
         self._resv.excludeDay( self._date, unindex=True )
-        self._resv.update(udpateReservationIndex=False)
+        self._resv.update()
         self._emailsToBeSent += self._resv.notifyAboutCancellation( date = self._date )
 
         self._websession.setVar( 'actionSucceeded', True )
@@ -1527,7 +1529,7 @@ class RHRoomBookingRejectBooking( RHRoomBookingBase ):
     def _process( self ):
         self._emailsToBeSent = []
         self._resv.reject()    # Just sets isRejected = True
-        self._resv.update(udpateReservationIndex=False)
+        self._resv.update()
         self._emailsToBeSent += self._resv.notifyAboutRejection()
 
         self._websession.setVar( 'actionSucceeded', True )
@@ -1606,7 +1608,7 @@ class RHRoomBookingAcceptBooking( RHRoomBookingBase ):
         if len( self._resv.getCollisions( sansID = self._resv.id ) ) == 0:
             # No conflicts
             self._resv.isConfirmed = True
-            self._resv.update(False)
+            self._resv.update()
             self._emailsToBeSent += self._resv.notifyAboutConfirmation()
 
             session.setVar( 'actionSucceeded', True )
@@ -1910,7 +1912,7 @@ class RHRoomBookingRejectBookingOccurrence( RHRoomBookingBase ):
     def _process( self ):
         self._emailsToBeSent = []
         self._resv.excludeDay( self._date, unindex=True )
-        self._resv.update(udpateReservationIndex=False)
+        self._resv.update()
         self._emailsToBeSent += self._resv.notifyAboutRejection( date = self._date, reason = self._rejectionReason )
 
         self._websession.setVar( 'actionSucceeded', True )

@@ -111,7 +111,14 @@
                                     <table>
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small> <%= _("Responsible")%>&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><%= room.getResponsible().getFullName() %><% contextHelp( 'responsibleHelp' ) %></td>
+                                            <% responsible = room.getResponsible() %>
+                                            <% if responsible: %>
+                                                <% responsibleName = responsible.getFullName() %>
+                                            <% end %>
+                                            <% else: %>
+                                                <% responsibleName = "" %>
+                                            <% end %>
+                                            <td align="left" class="blacktext"><%= responsibleName %><% contextHelp( 'responsibleHelp' ) %></td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> <%= _("Where is key?")%>&nbsp;&nbsp;</small></td>

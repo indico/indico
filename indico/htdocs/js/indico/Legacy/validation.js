@@ -128,7 +128,7 @@ function add_load_event(func) {
 }
 
 /*
-Validation for Period Module (dates, hours and repeatition)
+Validation for Period Module (dates, hours and repetition)
 Parameters:
 - f1 : form object
 - withRepeatability : whether to check 'repeatibility' field
@@ -142,40 +142,40 @@ repeatability
 */
 function validate_period( f1, withRepeatability, allowPast, what )
 {
-    var DATES_AND_TIMES = 0; var ONLY_DATES = 1; var ONLY_TIMES = 2
+    var DATES_AND_TIMES = 0; var ONLY_DATES = 1; var ONLY_TIMES = 2;
 
-    if ( withRepeatability == null ) withRepeatability = true
-    if ( allowPast == null ) allowPast = false
-    if ( what == null ) what = DATES_AND_TIMES
+    if ( withRepeatability == null ) withRepeatability = true;
+    if ( allowPast == null ) allowPast = false;
+    if ( what == null ) what = DATES_AND_TIMES;
 
-    var isValid = true
+    var isValid = true;
     if ( what != ONLY_TIMES )
     {
         // sDate
         if ( !is_valid_date( $F('sDay'), $F('sMonth'), $F('sYear') ) )
         {
-            f1.sDay.className = f1.sMonth.className = f1.sYear.className = f1.sdate.className = 'invalid'
-            isValid = false
+            f1.sDay.className = f1.sMonth.className = f1.sYear.className = f1.sdate.className = 'invalid';
+            isValid = false;
         }
         // eDate
         if ( !is_valid_date( $F('eDay'), $F('eMonth'), $F('eYear') ) )
         {
-            f1.eDay.className = f1.eMonth.className = f1.eYear.className = f1.edate.className = 'invalid'
-            isValid = false
+            f1.eDay.className = f1.eMonth.className = f1.eYear.className = f1.edate.className = 'invalid';
+            isValid = false;
         }
 
         // sDate < eDate
-        var sDate = new Date( parseInt( $F('sYear'), 10 ), parseInt( $F('sMonth'), 10 ) - 1, parseInt( $F('sDay'), 10 ) )
-        var eDate = new Date( parseInt( $F('eYear'), 10 ), parseInt( $F('eMonth'), 10 ) - 1, parseInt( $F('eDay'), 10 ) )
+        var sDate = new Date( parseInt( $F('sYear'), 10 ), parseInt( $F('sMonth'), 10 ) - 1, parseInt( $F('sDay'), 10 ) );
+        var eDate = new Date( parseInt( $F('eYear'), 10 ), parseInt( $F('eMonth'), 10 ) - 1, parseInt( $F('eDay'), 10 ) );
         if ( isValid )
         {
-            todayDate = new Date()
-            todayDate.setHours( 0, 0, 0, 0 )
+            todayDate = new Date();
+            todayDate.setHours( 0, 0, 0, 0 );
             if ( !allowPast && ( sDate.valueOf() < (todayDate).valueOf()) )
             {
-                f1.eDay.className = f1.eMonth.className = f1.eYear.className = f1.edate.className = 'invalid'
-                f1.sDay.className = f1.sMonth.className = f1.sYear.className = f1.sdate.className = 'invalid'
-                isValid = false
+                f1.eDay.className = f1.eMonth.className = f1.eYear.className = f1.edate.className = 'invalid';
+                f1.sDay.className = f1.sMonth.className = f1.sYear.className = f1.sdate.className = 'invalid';
+                isValid = false;
             }
         }
     }
@@ -190,20 +190,79 @@ function validate_period( f1, withRepeatability, allowPast, what )
         // eTime
         if ( !is_valid_time( $F( 'eTime' ) ) )
         {
-            f1.eTime.className = 'invalid';  isValid = false
+            f1.eTime.className = 'invalid';  isValid = false;
         }
         // sTime < eTime
         if ( !isBefore( $F( 'sTime' ), $F( 'eTime' ) ) )
         {
-            f1.sTime.className = f1.eTime.className = 'invalid';  isValid = false
+            f1.sTime.className = f1.eTime.className = 'invalid';  isValid = false;
         }
     }
-    // Repeatition
-    if ( withRepeatability )
-        if ( $F('repeatability') == 'None'  &&  sDate.valueOf() != eDate.valueOf() )
-        {
-            f1.repeatability.className = 'invalid'; isValid = false
+    // Repetition. Assume eDate >= sDate since the checking was made before
+    if ( withRepeatability ) {
+
+        var ms_in_one_day = 1000*60*60*24;
+        var isRepeatabilityValid = true;
+
+        switch($F('repeatability')) {
+        // Single Day
+        case "None":
+            if( sDate.valueOf() != eDate.valueOf() ) {
+                isRepeatabilityValid = false;
+            }
+            break;
+        // Repeat Every Day
+        case "0":
+            if( Math.floor((eDate.getTime() - sDate.getTime()) / ms_in_one_day) < 1 )
+            {
+                isRepeatabilityValid = false;
+            }
+            break;
+        // Repeat Once a Week
+        case "1":
+            if( Math.floor((eDate.getTime() - sDate.getTime()) / ms_in_one_day) < 6 )
+            {
+                isRepeatabilityValid = false;
+            }
+            break;
+        // Repeat Every Two Weeks
+        case "2":
+            if( Math.floor((eDate.getTime() - sDate.getTime()) / ms_in_one_day) < 13 )
+            {
+                isRepeatabilityValid = false;
+            }
+            break;
+        // Repeat Every Three Weeks
+        case "3":
+            if( Math.floor((eDate.getTime() - sDate.getTime()) / ms_in_one_day) < 20 )
+            {
+                isRepeatabilityValid = false;
+            }
+            break;
+        // Repeat Every Month
+        // TODO: if eDate.year and sDate year are different, there could also be
+        // a difference of less than one month (30-12-2009, 1-1-2010)
+        case "4":
+            if( eDate.getFullYear() == sDate.getFullYear() &&
+                    (eDate.getMonth() <= sDate.getMonth() ||
+                            (eDate.getMonth() - sDate.getMonth() == 1 &&
+                                    eDate.getDate() < sDate.getDate() )))
+            {
+                isRepeatabilityValid = false;
+            }
+            break;
+        // Otherwise
+        default:
+            isRepeatabilityValid = false;
+            break;
         }
+
+        if (!isRepeatabilityValid) {
+            f1.repeatability.className = 'invalid';
+            f1.edate.className = 'invalid';
+            isValid = false;
+        }
+    }
 
     return isValid
 
