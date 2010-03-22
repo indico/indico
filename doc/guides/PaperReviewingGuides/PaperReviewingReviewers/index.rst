@@ -6,12 +6,10 @@
 Content Reviewers's Guide
 ============================
 
-Contents:
 
 .. toctree::
    :numbered:
-   :maxdepth: 2
-
+   
    ./PaperReviewingReviewers.rst
 
 .. Indices and tables

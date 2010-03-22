@@ -13,14 +13,17 @@ Getting Started
 -----------------
 
 My Contributions Area
-----------------------
-        
- You may proceed as follows:
- 
- * Access the list of contributions and follow their status. 
+----------------------        
+  
+ You can access the list of contributions and follow their status from ``My contributions``: 
         
        |image2|
+   
+   By clicking on the name you can access the specific information to the contribution.
         
+How to submit the material for the contribution 
+-----------------------------------------------
+ 
  * The next step will be to submit your materilas. You can do it by clicking on hte contributions's name. 
    Use ``Add Material`` link, next to ``Reviewing materials``. Here you must add the materials to be reviewed.
    Only the materials added in this section will be judged by the reviewing team.
@@ -36,7 +39,7 @@ My Contributions Area
    
   * You will sent your added materials for reviewing only by clicking on the ``Send`` button. 
     By doing this you will "lock" your materials until the end of the revieiwng process.
-    You cannot add or remove material any more, except that you have made
+    You cannot add or remove material any more, except if you have made
     a mistake while sending. In this case, use the ``UNDO sending`` button.
     Now you see the ``Reviewing status`` of your contribution.
     

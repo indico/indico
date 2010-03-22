@@ -6,12 +6,10 @@
 Contributions' authors Guide
 ============================
 
-Contents:
 
 .. toctree::
    :numbered:
-   :maxdepth: 2
-
+   
    ./PaperReviewingAuthors.rst
 
 .. Indices and tables

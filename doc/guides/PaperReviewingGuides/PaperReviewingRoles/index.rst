@@ -6,12 +6,10 @@
 Actors and workflows Guide
 ==========================================
 
-Contents:
 
 .. toctree::
    :numbered:
-   :maxdepth: 2
-
+  
    ./PaperReviewingRoles.rst
 
 .. Indices and tables

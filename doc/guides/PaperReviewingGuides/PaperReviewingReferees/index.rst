@@ -6,12 +6,10 @@
 Referee's Guide
 ============================
 
-Contents:
 
 .. toctree::
    :numbered:
-   :maxdepth: 2
-
+   
    ./PaperReviewingReferees.rst
 
 .. Indices and tables
