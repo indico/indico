@@ -1363,7 +1363,7 @@ var sendRequest = function(pluginName, conferenceId) {
 
     // If there are no errors, the booking is sent to the server
     if (checkOK) {
-        var killProgress = IndicoUI.Dialogs.Util.progress("Sending your request...");
+        var killProgress = IndicoUI.Dialogs.Util.progress($T("Sending your request..."));
         var commonHandler = function(result,error) {
             if (!error) {
                 if (result.error) {
@@ -1431,7 +1431,7 @@ var sendRequest = function(pluginName, conferenceId) {
             }
         });
         // If there are problems, we show them
-        CSErrorPopup("Errors detected", allErrors, "The corresponding fields have been marked in red");
+        CSErrorPopup($T("Errors detected"), allErrors, $T("The corresponding fields have been marked in red."));
     }
 };
 
@@ -1439,17 +1439,17 @@ var withdrawRequest = function(pluginName, conferenceId) {
 
     if (exists(singleBookings[pluginName])) {
         var self = this;
-        var title = "Withdraw request";
+        var title = $T("Withdraw request");
 
         var popup = new ExclusivePopup(title, function(){return true;});
         popup.draw = function(){
             var self = this;
-            var span = Html.span("", "Are you sure you want to withdraw the request?");
+            var span = Html.span("", $T("Are you sure you want to withdraw the request?"));
 
             // We construct the "ok" button and what happens when it's pressed
             var okButton = Html.input('button', null, "Withdraw");
             okButton.observeClick(function() {
-                var killProgress = IndicoUI.Dialogs.Util.progress("Withdrawing your request...");
+                var killProgress = IndicoUI.Dialogs.Util.progress($T("Withdrawing your request..."));
 
                 indicoRequest(
                     'collaboration.removeCSBooking',
@@ -1489,7 +1489,7 @@ var withdrawRequest = function(pluginName, conferenceId) {
             });
 
             // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
-            var cancelButton = Html.input('button', {style:{marginLeft:pixels(5)}}, "Cancel");
+            var cancelButton = Html.input('button', {style:{marginLeft:pixels(5)}}, $T("Cancel"));
             cancelButton.observeClick(function(){
                 self.close();
             });
@@ -1505,8 +1505,8 @@ var withdrawRequest = function(pluginName, conferenceId) {
 var buildShowHideButton = function(pluginName) {
     var showHideButton = IndicoUI.Buttons.customTextSwitchButton(
         true,
-        "Show",
-        "Hide",
+        $T("Show"),
+        $T("Hide"),
         null,
         function() {IndicoUI.Effect.appear($E(pluginName + "Div"), '');},
         function() {IndicoUI.Effect.disappear($E(pluginName + "Div"), '');}
