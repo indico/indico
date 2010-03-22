@@ -1,4 +1,4 @@
-<% from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase %>
+<% from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry %>
 <% from MaKaC.common import Config %>
 <% import MaKaC.common.info as info %>
 <% from MaKaC.rb_location import Location %>
@@ -118,10 +118,10 @@ var Indico = {
     },
 
     Data: {
-        MaterialTypes: { meeting : <%= simplejson.dumps(list((k,k.title()) for k in RHSubmitMaterialBase._allowedMatsForMeetings)) %>,
-        simple_event: <%= simplejson.dumps(list((k,k.title()) for k in RHSubmitMaterialBase._allowedMatsForSE)) %>,
-        conference: <%= simplejson.dumps(list((k,k.title()) for k in RHSubmitMaterialBase._allowedMatsConference)) %>,
-        category: <%= simplejson.dumps(list((k,k.title()) for k in RHSubmitMaterialBase._allowedMatsCategory)) %>},
+        MaterialTypes: { meeting : <%= simplejson.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['meeting'])) %>,
+        simple_event: <%= simplejson.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['simple_event'])) %>,
+        conference: <%= simplejson.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['conference'])) %>,
+        category: <%= simplejson.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['category'])) %>},
         WeekDays: <%= [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ] %>,
         DefaultLocation: '<%= str(Location.getDefaultLocation().friendlyName) %>',
         Locations: <%= jsonEncode(locationList) %>

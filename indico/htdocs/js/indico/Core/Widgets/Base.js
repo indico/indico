@@ -36,6 +36,10 @@ type("ListWidget", ["WatchObject", "IWidget"],
 
             self.domList = Html.ul(self.listCssClass);
 
+            self.observe(function(value, v2) {
+                var x = arguments;
+            })
+
             return this.IWidget.prototype.draw.call(
                 this,
                 $B(self.domList, self,

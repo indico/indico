@@ -79,8 +79,10 @@ class ConferenceReview(Persistent):
         self._defaultAbstractReviwerDueDate = None
 
         self._reviewableMaterials = ["paper"]
-        from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
-        self._nonReviewableMaterials = RHSubmitMaterialBase._allowedMatsConference + RHSubmitMaterialBase._allowedMatsForMeetings
+        from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry
+
+        self._nonReviewableMaterials = MaterialFactoryRegistry._allowedMaterials['conference'] + MaterialFactoryRegistry._allowedMaterials['category']
+
         self._nonReviewableMaterials.remove("paper")
 
         self._states = [] # list of content reviewing and final judgement non-default states

@@ -374,7 +374,19 @@ class MaterialFactoryRegistry:
         added one just needs to implement the corresponding factory and add the
         entry in the "_registry" attribute of this class
     """
-    _registry = {}
+    _registry = { PaperFactory._id: PaperFactory, \
+                  SlidesFactory._id: SlidesFactory, \
+                  MinutesFactory._id: MinutesFactory, \
+                  VideoFactory._id: VideoFactory, \
+                  PosterFactory._id: PosterFactory }
+
+    _allowedMaterials = {
+        'simple_event': [ "paper", "slides", "poster", "minutes", "agenda", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast", "video", "streaming video", "downloadable video" ],
+        'meeting': [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ],
+        'conference' : ["paper", "slides", "poster", "minutes"],
+        'category': [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ]
+        }
+
 
     @classmethod
     def getById( cls, matId ):
@@ -389,33 +401,57 @@ class MaterialFactoryRegistry:
         return cls._registry.keys()
 
     @classmethod
-    def get(cls,mat):
+    def get(cls, material):
         for factory in cls._registry.values():
-            if factory.appliesToMaterial(mat):
+            if factory.appliesToMaterial(material):
                 return factory
 
+    @classmethod
+    def getAllowed(cls, target):
+        return cls._allowedMaterials[target.getConference().getType()]
 
-class ConfMFRegistry( MaterialFactoryRegistry ):
+    @classmethod
+    def getMaterialList(cls, target):
+        """
+        Generates a list containing all the materials, with the
+        corresponding Ids for those that already exist.
+        The format is [(id, title), ...] and materials from the allowed
+        material list and the existing material list are unified by title.
+        """
 
-    _registry = { PaperFactory._id: PaperFactory, \
-                  SlidesFactory._id: SlidesFactory, \
-                  MinutesFactory._id: MinutesFactory, \
-                  VideoFactory._id: VideoFactory, \
-                  PosterFactory._id: PosterFactory }
+        # NOTE: This method is a bit alien. It's just here because
+        # we couldn't find a better place
 
-class SessionMFRegistry( MaterialFactoryRegistry ):
+        matDict = dict((title.lower(), title) for title in cls.getAllowed(target))
+
+        for material in target.getMaterialList():
+            title = material.getTitle().lower()
+            matDict[title] = material.getId()
+
+        return sorted(list((matId, title.title())
+                 for title, matId in matDict.iteritems()))
+
+
+
+class CategoryMFRegistry(MaterialFactoryRegistry):
+
+    @classmethod
+    def getAllowed(cls, target):
+        return cls._allowedMaterials['category']
+
+
+class ConfMFRegistry(MaterialFactoryRegistry):
+    pass
+
+
+class SessionMFRegistry(MaterialFactoryRegistry):
+
     _registry = { MinutesFactory._id: MinutesFactory }
 
 
 class ContribMFRegistry(MaterialFactoryRegistry):
-    _registry = { PaperFactory._id: PaperFactory, \
-                  SlidesFactory._id: SlidesFactory, \
-                  MinutesFactory._id: MinutesFactory, \
-                  VideoFactory._id: VideoFactory, \
-                  PosterFactory._id: PosterFactory }
-
-class CategoryMFRegistry( ContribMFRegistry ):
     pass
 
-class SubContributionMFRegistry( ContribMFRegistry ):
+
+class SubContributionMFRegistry(MaterialFactoryRegistry):
     pass

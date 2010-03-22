@@ -201,16 +201,6 @@ class RHAbstractBase( RHConferenceSite ):
 
 class RHSubmitMaterialBase:
 
-    _allowedMatsConference=["paper", "slides", "poster", "minutes"]
-    _allowedMatsForMeetings = [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ]
-    _allowedMatsForSE = [ "paper", "slides", "poster", "minutes", "agenda", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast", "video", "streaming video", "downloadable video" ]
-    _allowedMatsCategory = [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ]
-
-    _allowedMatsEvent = {
-        'simple_event': [ "paper", "slides", "poster", "minutes", "agenda", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast", "video", "streaming video", "downloadable video" ],
-        'meeting': [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ],
-        'conference' : ["paper", "slides", "poster", "minutes"]
-        }
 
     def __init__(self, target, rh = None):
         self._target=target
@@ -293,14 +283,7 @@ class RHSubmitMaterialBase:
         Returns the Material object to which the resource is being added
         """
 
-        material = None
         registry = self._target.getMaterialRegistry()
-
-        if isinstance(self._target, Category):
-            namedMats = RHSubmitMaterialBase._allowedMatsCategory
-        else:
-            namedMats = RHSubmitMaterialBase._allowedMatsEvent[self._target.getConference().getType()]
-
         material = self._target.getMaterialById(self._materialId)
 
         if material:

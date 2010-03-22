@@ -103,16 +103,6 @@ class ResourceBase(object):
     Base class for material resource access
     """
 
-    #def _checkProtection(self):
-    #    """
-    #    Makes sure that the user is allowed to view the material the
-    #    resource is contained in
-    #    """
-    #
-    #    if not self._material.canView(self._aw):
-    #        from MaKaC.services.interface.rpc.common import PermissionError
-    #        raise PermissionError("You're not allowed to access these contents")
-
     def _checkParams(self):
         """
         Checks the materialId, and retrieves the material using it
@@ -286,31 +276,31 @@ class EditMaterialClassBase(MaterialModifBase, UserListChange):
         self._material.setHidden(self._hidden);
         self._material.setAccessKey(self._accessKey);
 
-        return DictPickler.pickle(self._material)
+        event = self._material.getOwner()
+        materialRegistry = event.getMaterialRegistry()
+
+        return {
+            'material': DictPickler.pickle(self._material),
+            'newMaterialTypes': materialRegistry.getMaterialList(event)
+            }
 
 class DeleteMaterialClassBase(MaterialModifBase):
 
-    #def _checkParams(self):
-        #matId = self._params.get("materialId",None)
-        #
-        #if matId == None:
-        #    raise ServiceError("No material was specified!")
-        #
-        #self._material = self._target.getMaterialById(matId)
-
-
     def _getAnswer(self):
-        id = self._material.getId()
+        materialId = self._material.getId()
+        event = self._material.getOwner()
+
+        # actually delete it
         self._target.getOwner().removeMaterial(self._material)
-        return id
+
+        materialRegistry = event.getMaterialRegistry()
+
+        return {
+            'deletedMaterialId': materialId,
+            'newMaterialTypes': materialRegistry.getMaterialList(event)
+            }
 
 class GetResourcesBase(ResourceDisplayBase):
-
-#    def _checkParams(self):
-#        ResourceBase._checkParams(self)
-
-#    def _checkProtection(self):
-#        ResourceBase._checkProtection(self)
 
     def _getAnswer(self):
         resList = {}
@@ -328,14 +318,6 @@ class EditResourceBase(ResourceModifBase, UserListChange):
         self._newProperties = self._params.get("resourceInfo",None)
         self._newUserList = self._newProperties['userList']
 
-#        if resId == None:
-#            raise ServiceError("No resource was specified!")
-#
-#        self._resource = self._material.getResourceById(resId)
-
-#    def _checkProtection(self):
-#        ResourceBase._checkProtection(self)
-
     def _getAnswer(self):
 
         self.changeUserList(self._resource, self._newUserList)
@@ -344,28 +326,18 @@ class EditResourceBase(ResourceModifBase, UserListChange):
         return DictPickler.pickle(self._resource)
 
 class GetResourceAllowedUsers(ResourceModifBase):
+    """
+    Lists the users that allowed to access the material
+    """
 
     def _getAnswer(self):
-        """
-        Lists the users that allowed to access the material
-        """
         return DictPickler.pickle(self._resource.getAllowedToAccessList())
 
 
 class DeleteResourceBase(ResourceModifBase):
 
-    def _checkParams(self):
-        ResourceModifBase._checkParams(self)
-
-        #resId = self._params.get("resourceId",None)
-#
-#        if resId == None:
-#            raise ServiceError("No resource was specified!")
-#
-#        self._resource = self._material.getResourceById(resId)
-
     def _getAnswer(self):
-        id = self._resource.getId()
+        resourceId = self._resource.getId()
 
         # remove the resource
         self._material.removeResource(self._resource)
@@ -373,32 +345,17 @@ class DeleteResourceBase(ResourceModifBase):
         # if there are no resources left inside the material,
         # just delete it
         if len(self._material.getResourceList()) == 0:
-            self._material.getOwner().removeMaterial(self._material)
+            event = self._material.getOwner()
+            event.removeMaterial(self._material)
+            newMaterialTypes = event.getMaterialRegistry().getMaterialList(event)
+        else:
+            newMaterialTypes = []
 
-        return id
+        return {
+            'deletedResourceId': resourceId,
+            'newMaterialTypes': newMaterialTypes
+            }
 
-#def getMixedInClass(base, mixin):
-#    """
-#    It would be a pain in the %#@ replicating almost the
-#    same code for every class that deals with materials/resources,
-#    belonging to conferences, contributions, sessions and
-#    subcontributions. Being so, this kind of 'hacky' solution
-#    is used.
-#    """
-#
-#    class MixedInClass(mixin, base):
-#        """
-#        The resulting class, with parameter checking
-#        done in the correct order
-#        """
-#        def _checkParams(self):
-#            """
-#            Parameter checking: (first base class, i.e. "conference",
-#            and then mixin class "add material")
-#            """
-#            base._checkParams(self)
-#            mixin._checkParams(self)
-#    return MixedInClass
 
 
 methodMap = {
