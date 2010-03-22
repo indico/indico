@@ -2311,14 +2311,15 @@ class Conference(Persistent, Fossilizable):
 
 
     def getEnableSessionSlots(self):
-        try :
-            if self._enableSessionSlots  :
-                pass
-        except AttributeError :
-            self._enableSessionSlots = True
-        if self.getType() == "conference":
-            return True
-        return self._enableSessionSlots
+        #try :
+        #    if self._enableSessionSlots  :
+        #        pass
+        #except AttributeError :
+        #    self._enableSessionSlots = True
+        #if self.getType() == "conference":
+        #    return True
+        #return self._enableSessionSlots
+        return True
 
     def getEnableSessions(self):
         try :
@@ -5591,8 +5592,8 @@ class Session(Persistent):
             self._contributionDuration = timedelta(hours=hour,minutes=min)
 
     def fit(self):
-        if not self.getConference().getEnableSessionSlots():
-            self.getSlotList()[0].fit()
+        #if not self.getConference().getEnableSessionSlots():
+        #    self.getSlotList()[0].fit()
         self.setStartDate(self.getMinSlotStartDate(),0,0)
         self.setEndDate(self.getMaxSlotEndDate(),0)
 
@@ -5604,6 +5605,7 @@ class Session(Persistent):
         self.getSchedule().addEntry(newSlot.getSessionSchEntry(),2)
         if self.getConference() is not None:
             self.getConference().getSchedule().addEntry(newSlot.getConfSchEntry(),2)
+        self.fit()
         self.notifyModification()
 
     def _removeSlot(self,slot):
@@ -5618,6 +5620,7 @@ class Session(Persistent):
             if len(self.slots)==1 and not force:
                 raise MaKaCError( _("A session must have at least one slot"), _("Session"))
             self._removeSlot(slot)
+            self.fit()
             self.notifyModification()
 
     def recoverSlot(self, slot):
@@ -6044,8 +6047,8 @@ class Session(Persistent):
             self.verifyEndDate(newDate,check)
         self.duration=newDate-self.getStartDate()
         # A session is not always linked to a conference (for eg. at creation time)
-        if self.getConference() and not self.getConference().getEnableSessionSlots() and self.getSlotList()[0].getEndDate() != newDate:
-            self.getSlotList()[0].duration = self.duration
+        #if self.getConference() and not self.getConference().getEnableSessionSlots() and self.getSlotList()[0].getEndDate() != newDate:
+        #    self.getSlotList()[0].duration = self.duration
         self.notifyModification()
 
     def setDates(self,sDate,eDate,check=1,moveEntries=0):
@@ -7188,6 +7191,7 @@ class SessionSlot(Persistent):
         # synchronize with other timetables
         self.getSessionSchEntry().synchro()
         self.getConfSchEntry().synchro()
+        self.getSession().fit()
         self.notifyModification()
 
     def setEndDate(self,eDate,check=2):
@@ -7198,6 +7202,7 @@ class SessionSlot(Persistent):
         self.setDuration(dur=eDate-self.startDate,check=check)
         if self.getConference() and not self.getConference().getEnableSessionSlots() and self.getSession().getEndDate() != eDate:
             self.getSession().setEndDate(eDate, check)
+        self.getSession().fit()
         self.notifyModification()
 
     def getStartDate( self ):
