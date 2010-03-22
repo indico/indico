@@ -5540,32 +5540,13 @@ class WShowExistingMaterial(WTemplated):
     def __init__(self,target):
         self._target=target
 
-        from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
-        if isinstance(target, Category):
-            self._allowedMats = RHSubmitMaterialBase._allowedMatsCategory
-        else:
-            self._allowedMats = RHSubmitMaterialBase._allowedMatsEvent[self._target.getConference().getType()]
-
-    # TODO: Put this out of here, and unify with outputGenerator._generateMaterialList
-    # (when we have a better class hierarchy)
-    def _generateMaterialList(self):
-        """
-        Generates a list containing all the materials, with the
-        corresponding Ids for those that already exist
-        """
-
-        matDict = dict((title.lower(), title) for title in self._allowedMats)
-
-        for material in self._target.getMaterialList():
-            title = material.getTitle().lower()
-            matDict[title] = material.getId()
-
-        return sorted(list((matId, title.title()) for title, matId in matDict.iteritems()))
-
     def getVars(self):
         vars=WTemplated.getVars(self)
 
-        vars["materialList"] = self._generateMaterialList()
+        # yes, this may look a bit redundant, but materialRegistry isn't
+        # bound to a particular target
+        materialRegistry = self._target.getMaterialRegistry()
+        vars["materialList"] = materialRegistry.getMaterialList(self._target)
 
         vars["materialModifHandler"] = vars.get("materialModifHandler", None)
         vars["materialProtectHandler"] = vars.get("materialProtectHandler", None)

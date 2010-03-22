@@ -110,27 +110,16 @@ class outputGenerator:
         from MaKaC.webinterface.webFactoryRegistry import WebFactoryRegistry
         self.webFactory = WebFactoryRegistry()
 
-    # TODO: Put this out of here, and unify with WShowExistingMaterial._generateMaterialList
-    # (when we have a better class hierarchy)
     def _generateMaterialList(self, obj):
         """
         Generates a list containing all the materials, with the
         corresponding Ids for those that already exist
         """
 
-        from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
-        if isinstance(obj, conference.Category):
-            _allowedMats = RHSubmitMaterialBase._allowedMatsCategory
-        else:
-            _allowedMats = RHSubmitMaterialBase._allowedMatsEvent[obj.getConference().getType()]
-
-        matDict = dict((title.lower(), title) for title in _allowedMats)
-
-        for material in obj.getMaterialList():
-            title = material.getTitle().lower()
-            matDict[title] = material.getId()
-
-        return sorted(list((matId, title.title()) for title, matId in matDict.iteritems()))
+        # yes, this may look a bit redundant, but materialRegistry isn't
+        # bound to a particular target
+        materialRegistry = obj.getMaterialRegistry()
+        return materialRegistry.getMaterialList(obj.getConference())
 
 
     def getOutput(self, conf, stylesheet, vars=None, includeSession=1,includeContribution=1,includeMaterial=1,showSession="all",showDate="all",showContribution="all"):

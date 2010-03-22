@@ -1,3 +1,12 @@
+function updateMaterialList(oldList, newList) {
+    oldList.length = 0;
+
+    for (var i in newList) if (newList[i]) {
+        oldList.push(newList[i]);
+    }
+}
+
+
 type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
 
     _drawButtons: function() {
@@ -512,7 +521,10 @@ type("EditMaterialDialog", ["ServiceDialog", "PreLoadHandler"], {
 
     _success: function(response) {
         this.list.set(this.materialId, null);
-        this.list.set(this.materialId, watchize(response));
+        this.list.set(this.materialId, watchize(response.material));
+
+        updateMaterialList(this.types, response.newMaterialTypes);
+
     },
 
     draw: function() {
@@ -846,8 +858,12 @@ type("ResourceListWidget", ["ListWidget"], {
                                 var parent = resourceNode.dom.parentNode;
                                 self.resources.remove(resource);
                                 self.set(resourceId, null);
-                                //if it's in the custom material list and it's the last resource in it, we delete it
                                 killProgress();
+
+                                if (response.newMaterialTypes) {
+                                    updateMaterialList(self.materialTypes, response.newMaterialTypes);
+                                }
+
                             }
                         }
                        );
@@ -923,10 +939,11 @@ type("ResourceListWidget", ["ListWidget"], {
         return resourceNode;
     }
 
-}, function(resources, matParams, materialTitle) {
+}, function(resources, matParams, materialTitle, materialTypes) {
     this.matParams = matParams;
     this.resources = resources;
     this.materialName = materialTitle;
+    this.materialTypes = materialTypes;
     this.ListWidget();
 
     var self = this;
@@ -977,8 +994,9 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
                                 IndicoUtil.errorReport(error);
                             } else {
                                 self.set(materialId, null);
-                                //if it's in the custom material list, we delete it
                                 killProgress();
+
+                                updateMaterialList(self.types, response.newMaterialTypes);
                             }
                         }
                        );
@@ -1029,7 +1047,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
         }
 
         args.materialProtection = material.get('protection');
-        var matWidget = new ResourceListWidget(material.get('resources'), args, material.get('title'));
+        var matWidget = new ResourceListWidget(material.get('resources'), args, material.get('title'), self.types);
 
         // check whenever a material gets empty (no resources) and delete it
         material.get('resources').observe(
@@ -1100,7 +1118,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
         var i = -1;
 
         for (var j in this.types) {
-            if (this.types[i][1] == material.get('title')) {
+            if (this.types[j][1] == material.get('title')) {
                 i = j;
                 break;
             }

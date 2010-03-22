@@ -109,7 +109,7 @@ type("WatchObject", ["Dictionary", "Observable"], {
 		this.clear = function() {
 			var old = properties;
 			properties = {};
-			enumerate(old, function(key, value) {
+			enumerate(old, function(value, key) {
 				notify(null, key, value);
 			});
 			return old;
