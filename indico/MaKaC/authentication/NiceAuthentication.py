@@ -22,18 +22,15 @@
 import httplib
 import urllib
 import base64
-##import re
-##import ldap
-
+import os
 from MaKaC.common.general import *
 from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity
 from MaKaC.errors import MaKaCError
 from MaKaC.webinterface import urlHandlers
-
+from MaKaC.externUsers import NiceUser
+from MaKaC.user import Avatar
 from MaKaC.common import Configuration
 from MaKaC.common.Configuration import Config
-import os
-
 from MaKaC.i18n import _
 
 
@@ -46,47 +43,60 @@ class NiceAuthenticator(Authenthicator):
     def __init__(self):
         Authenthicator.__init__(self)
         self.UserCreator = NiceUserCreator()
-    
+
     def createIdentity(self, li, avatar):
         if NiceChecker().check(li.getLogin(), li.getPassword()):
             return NiceIdentity( li.getLogin(), avatar )
         else:
             return None
-    
+
     def autoLogin(self, rh):
         """
         Login using Shibbolet.
         """
         req = rh._req
         req.add_common_vars()
-        if req.subprocess_env.has_key("REMOTE_USER"):
-            email = req.subprocess_env["REMOTE_USER"]
+        if  req.subprocess_env.has_key("HTTP_ADFS_EMAIL"):
+            email = req.subprocess_env["HTTP_ADFS_EMAIL"]
+            login = req.subprocess_env["HTTP_ADFS_LOGIN"]
             from MaKaC.user import AvatarHolder
             ah = AvatarHolder()
-            av = ah.match({"email":email},exact=1)
+            av = ah.match({"email":email},exact=1, forceWithoutExtAuth=True)
             if av:
-                av = av[0]
-                if av.getStatus() == 'NotCreated':
-                    #checking if comming from Nice
-                    if av.getId()[:len(self.id)] == self.id:
-                        av.setId("")
+                return av[0]
+            else:
+                avDict = NiceUser().getByLoginOrUPN(login)
+                if avDict:
+                    # In the case of connected accounts (serveral accounts are related just to one
+                    # of them), even if the login/email is different, the master account can already
+                    # exist:
+                    av = ah.match({"email":avDict["email"][0]},exact=1, forceWithoutExtAuth=True)
+                    if av:
+                        av = av[0]
+                        if av.getStatus() == 'NotCreated':
+                            #checking if comming from Nice
+                            if av.getId()[:len(self.id)] == self.id:
+                                av.setId("")
+                                ah.add(av)
+                                av.activateAccount()
+                            else:
+                                return None
+                        elif not av.isActivated():
+                            av.activateAccount()
+                    else:
+                        av = Avatar(avDict)
                         ah.add(av)
                         av.activateAccount()
-                        return av
-                elif not av.isActivated():
-                    av.activateAccount()
-                    return av
-                else:
                     return av
         return None
-    
+
     def autoLogout(self, rh):
         return "https://login.cern.ch/adfs/ls/?wa=wsignout1.0"
 
 
 
 class NiceIdentity(PIdentity):
-    
+
     def authenticate( self, id ):
         ret = NiceChecker().check(id.getLogin(), id.getPassword())
         if ret:
@@ -96,13 +106,13 @@ class NiceIdentity(PIdentity):
                 else:
                     return None
         return None
-    
+
     def getAuthenticatorTag(self):
         return NiceAuthenticator.getId()
 
 
 class NiceChecker:
-    
+
 ##    def check(self, userName, Password):
 ##        params = urllib.urlencode({'Username': userName, 'Password': Password})
 ##        headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
@@ -137,7 +147,7 @@ class NiceChecker:
 ##            data = response.read()
 ##            #print data
 ##            conn.close()
-##            
+##
 ##            from xml.dom.minidom import parseString
 ##            doc = parseString(data)
 ##            auth = doc.getElementsByTagName("auth")[0].childNodes[0].nodeValue.encode("utf-8")
@@ -175,17 +185,17 @@ class NiceChecker:
             data = response.read()
             #print data
             conn.close()
-            
+
             if "<auth>" in data:
                 auth = self.nodeText( data, "auth" )
                 if auth != "3":
                     return None
             else:
                 return None
-            
+
             #from xml.dom.minidom import parseString
             #doc = parseString(data)
-            
+
             #if doc.getElementsByTagName("auth"):
             #    auth = doc.getElementsByTagName("auth")[0].childNodes[0].nodeValue.encode("utf-8")
             #    if auth != "3":
@@ -194,22 +204,22 @@ class NiceChecker:
             #    return None
 
             ret = {'building': '',
-                'division': '', 
-                'group': '', 
-                'cn': '', 
+                'division': '',
+                'group': '',
+                'cn': '',
                 'ccid': '',
-                'l': '', 
-                'o': '', 
-                'pmailbox': '', 
-                'telephonenumber': '', 
-                'sn': '', 
-                'uid': '', 
-                'mail': '', 
-                'ou': '', 
-                'givenname': '', 
-                'section': '', 
+                'l': '',
+                'o': '',
+                'pmailbox': '',
+                'telephonenumber': '',
+                'sn': '',
+                'uid': '',
+                'mail': '',
+                'ou': '',
+                'givenname': '',
+                'section': '',
                 'homeinstitute': ''}
-            
+
             if "<department>" in data:
                 ret['group'] = self.nodeText( data, "department" )
             if "<name>" in data:
@@ -235,7 +245,7 @@ class NiceChecker:
                 ret['mail'] = self.nodeText( data, "email" )
             if "<company>" in data:
                 ret['homeinstitute'] = self.nodeText( data, "company" )
-                
+
 #            if doc.getElementsByTagName("department"):
 #                if doc.getElementsByTagName("department")[0].childNodes:
 #                    ret['group'] = doc.getElementsByTagName("department")[0].childNodes[0].nodeValue.encode("utf-8")
@@ -248,14 +258,14 @@ class NiceChecker:
 #            if doc.getElementsByTagName("lastname"):
 #                if doc.getElementsByTagName("lastname")[0].childNodes:
 #                    ret['givenname'] = doc.getElementsByTagName("lastname")[0].childNodes[0].nodeValue.encode("utf-8")
-#                
+#
 #            if doc.getElementsByTagName("ccid"):
 #                if doc.getElementsByTagName("ccid")[0].childNodes:
 #                    ret['ccid'] = doc.getElementsByTagName("ccid")[0].childNodes[0].nodeValue.encode("utf-8")
 #                    if ret['ccid'] == "-1":
 #                        if doc.getElementsByTagName("respccid"):
 #                            ret['ccid'] = doc.getElementsByTagName("respccid")[0].childNodes[0].nodeValue.encode("utf-8")
-#            
+#
 #            if doc.getElementsByTagName("telephonenumber"):
 #                if doc.getElementsByTagName("telephonenumber")[0].childNodes:
 #                    ret['telephonenumber'] = doc.getElementsByTagName("telephonenumber")[0].childNodes[0].nodeValue.encode("utf-8")
@@ -268,7 +278,7 @@ class NiceChecker:
 #            if doc.getElementsByTagName("company"):
 #                if doc.getElementsByTagName("company")[0].childNodes:
 #                    ret['homeinstitute'] = doc.getElementsByTagName("company")[0].childNodes[0].nodeValue.encode("utf-8")
-           
+
             return ret
 ##        except:
 ##            self.log("----------------------------")
@@ -284,8 +294,8 @@ class NiceChecker:
         f.write(txt)
         f.write("\n")
         f.close()
-        
-    # Dirty hack due to core dump in Python XML libraries 
+
+    # Dirty hack due to core dump in Python XML libraries
     # when run within mod_python with Python 2.4.5
     def nodeText( self, document, elementName ):
         """
@@ -298,7 +308,7 @@ class NiceChecker:
         startIx = document.index( "<" + elementName + ">" ) + len( elementName ) + 2
         endIx = document.index( "</" + elementName + ">" )
         return document[startIx:endIx]
-    
+
 
 class NiceUserCreator:
 
@@ -307,10 +317,10 @@ class NiceUserCreator:
         data = NiceChecker().check(li.getLogin(), li.getPassword())
         if not data:
             return None
-        
+
         if (data["ccid"] == '') and (data['email'] == ""):
             return None
-        
+
         if not data:
             # cannot get user data
             return None
@@ -340,8 +350,8 @@ class NiceUserCreator:
         id = na.createIdentity( li, av)
         na.add(id)
         return av
-        
-    
+
+
 ##    def getLdap(self, searchFilter):
 ##        ## first you must open a connection to the server
 ##        try:
@@ -350,19 +360,19 @@ class NiceUserCreator:
 ##            ## and do a bind as shown in the above example.
 ##            # you can also set this to ldap.VERSION2 if you're using a v2 directory
 ##            # you should  set the next option to ldap.VERSION2 if you're using a v2 directory
-##            l.protocol_version = ldap.VERSION3    
+##            l.protocol_version = ldap.VERSION3
 ##        except ldap.LDAPError, e:
 ##            print e
 ##            # handle error however you like
-##        
-##        
+##
+##
 ##        ## The next lines will also need to be changed to support your search requirements and directory
 ##        baseDN = "ou=people, o=cern, c=ch"
 ##        searchScope = ldap.SCOPE_ONELEVEL
 ##        ## retrieve all attributes - again adjust to your needs - see documentation for more options
-##        retrieveAttributes = None 
+##        retrieveAttributes = None
 ##        #searchFilter = "ccid=%s"%ccid
-##        
+##
 ##        try:
 ##            ldap_result_id = l.search(baseDN, searchScope, searchFilter, retrieveAttributes)
 ##            result_set = []
@@ -373,7 +383,7 @@ class NiceUserCreator:
 ##                else:
 ##                    ## here you don't have to append to a list
 ##                    ## you could do whatever you want with the individual entry
-##                    ## The appending to list is just for illustration. 
+##                    ## The appending to list is just for illustration.
 ##                    if result_type == ldap.RES_SEARCH_ENTRY:
 ##                        result_set.append(result_data)
 ##            ret = {}
@@ -383,20 +393,20 @@ class NiceUserCreator:
 ##            """
 ##            return a dictionary. The keys are:
 ##                'building': '',
-##                'division': '', 
-##                'group': '', 
-##                'cn': 'first and last name', 
+##                'division': '',
+##                'group': '',
+##                'cn': 'first and last name',
 ##                'ccid': '',
-##                'l': 'town', 
-##                'o': 'user status', 
-##                'pmailbox': '', 
-##                'telephonenumber': '', 
-##                'sn': 'last name', 
-##                'uid': '', 
-##                'mail': 'address email', 
-##                'ou': 'division group section', 
-##                'givenname': 'first name', 
-##                'section': '', 
+##                'l': 'town',
+##                'o': 'user status',
+##                'pmailbox': '',
+##                'telephonenumber': '',
+##                'sn': 'last name',
+##                'uid': '',
+##                'mail': 'address email',
+##                'ou': 'division group section',
+##                'givenname': 'first name',
+##                'section': '',
 ##                'homeinstitute': ''
 ##            """
 ##        except ldap.LDAPError, e:

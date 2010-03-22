@@ -542,7 +542,7 @@ class Avatar(Persistent, Fossilizable):
             if userData.has_key("timezone"):
                self.setTimezone(userData["timezone"])
             else:
-               self.setTimezone("UTC")
+               self.setTimezone(info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone())
 
             ################################
             #Fermi timezone awareness(end) #
