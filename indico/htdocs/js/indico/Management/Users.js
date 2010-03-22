@@ -1571,6 +1571,7 @@ type("OldUserListField", ["IWidget"], {
  *                   the exclusivePopup method, and is called by the
  *                   function when the dialog needs to be destroyed.
  */
+/*
 type ("AdditionalUsersPopup", ["ExclusivePopup"], {
 
     draw: function () {
@@ -1660,7 +1661,7 @@ type ("AdditionalUsersPopup", ["ExclusivePopup"], {
           this.ExclusivePopup(title, function(){return true;});
       }
      );
-
+*/
 
 
 /**
@@ -1706,7 +1707,7 @@ type ("AdditionalUsersPopup", ["ExclusivePopup"], {
  *
  * @param {Boolean} showFavouritizeButtons. false by default. If true, favouritize buttons will not be shown.
  */
-type("NewUserListField", ["IWidget"], {
+type("UserListField", ["IWidget"], {
 
     _highlightNewUser: function(userId) {
         IndicoUI.Effect.highLightBackground(this.userList.getId() + '_' + userId);

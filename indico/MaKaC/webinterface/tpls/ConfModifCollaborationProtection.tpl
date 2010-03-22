@@ -76,7 +76,7 @@
         );
     }
 
-    var uf = new NewUserListField('PeopleListDiv', 'PeopleList',
+    var uf = new UserListField('PeopleListDiv', 'PeopleList',
                                <%= jsonEncode(fossilize(CSBM.getPluginManagers(name), IAvatarFossil)) %>,
                                <%= offlineRequest(self._rh, 'user.favorites.listUsers') %>,
                                true, false, false, false,

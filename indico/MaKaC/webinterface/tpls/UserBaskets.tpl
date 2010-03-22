@@ -37,7 +37,7 @@
     };
 
 
-    var uf = new NewUserListField(
+    var uf = new UserListField(
             'FavoritePeopleListDiv', 'PeopleList',
             favouriteList, false, null,
             true, false, null, null,

@@ -61,7 +61,7 @@
                             );
                         }
 
-                        var uf = new NewUserListField('PluginOptionPeopleListDiv', 'PeopleList',
+                        var uf = new UserListField('PluginOptionPeopleListDiv', 'PeopleList',
                                                    <%= jsonEncode(fossilize(option.getValue(), IAvatarFossil)) %>, true, null,
                                                    true, false, null, null,
                                                    false, false, true,

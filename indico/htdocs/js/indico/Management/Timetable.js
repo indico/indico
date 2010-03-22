@@ -321,7 +321,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
 
         this.roomEditor = new RoomBookingWidget(Indico.Data.Locations, info.get('roomInfo'), self.parentRoomData, true, self.favoriteRooms, null);
 
-        var presListWidget = new NewUserListField(
+        var presListWidget = new UserListField(
             'VeryShortPeopleListDiv', 'PeopleList',
             null, true, null,
             true, false, self.args.conference, {"presenter-grant-submission": [$T("submission rights"), true]},
@@ -430,14 +430,14 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
     _drawAuthorsTab: function(info) {
         var self = this;
 
-        var authorListWidget = new NewUserListField(
+        var authorListWidget = new UserListField(
             'VeryShortPeopleListDiv', 'PeopleList',
             null, true, null,
             true, false, this.args.conference, {"author-grant-submission": [$T("submission rights"), true]},
             true, true, true,
             userListNothing, userListNothing, userListNothing);
 
-        var coauthorListWidget = new NewUserListField(
+        var coauthorListWidget = new UserListField(
                 'VeryShortPeopleListDiv', 'PeopleList',
                 null, true, null,
                 true, false, this.args.conference, {"coauthor-grant-submission": [$T("submission rights"), true]},

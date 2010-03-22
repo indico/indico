@@ -419,7 +419,7 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
 
         this.password = Html.input('password',{});
 
-        this.userList = new NewUserListField(
+        this.userList = new UserListField(
             'ShortPeopleListDiv', 'PeopleList',
             null, true, null,
             true, true, null, null,
@@ -571,7 +571,7 @@ type("EditMaterialDialog", ["ServiceDialogWithButtons", "PreLoadHandler"], {
             Html.option({value: 1},$T('Hidden from unauth. users'))
         );
 
-        this.userList = new NewUserListField(
+        this.userList = new UserListField(
                 'ShortPeopleListDiv', 'PeopleList',
                 this.allowedUsers, true, null,
                 true, true, null, null,
@@ -700,7 +700,7 @@ type("EditResourceDialog", ["ServiceDialogWithButtons", "PreLoadHandler"], {
         $B(description, self.newResource.accessor('description'));
         $B(url, self.newResource.accessor('url'));
 
-        this.userList = new NewUserListField(
+        this.userList = new UserListField(
                 'VeryShortPeopleListDiv', 'PeopleList',
                 this.allowedUsers, true, null,
                 true, true, null, null,
