@@ -23,7 +23,7 @@ from MaKaC.common.timezoneUtils import nowutc, setAdjustedDate, getAdjustedDate
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.CERNMCU.common import CERNMCUException,\
     ParticipantPerson, ParticipantRoom, getCERNMCUOptionValueByName,\
-    CERNMCUError, handleSocketError
+    CERNMCUError, handleSocketError, getMinStartDate, getMaxEndDate
 from MaKaC.common.utils import formatDateTime, validIP, unicodeLength,\
     unicodeSlice
 from MaKaC.plugins.Collaboration.CERNMCU.mcu import MCU, MCUConfCommonParams, MCUTime,\
@@ -212,11 +212,11 @@ class CSBooking(CSBookingBase):
         if self.getAdjustedEndDate('UTC')  < (nowutc()):
             raise CERNMCUException("End date cannot be in the past. Booking id: %s"% (str(self._id)))
 
-        minStartDate = self.getConference().getAdjustedStartDate()
+        minStartDate = getMinStartDate(self.getConference())
         if self.getAdjustedStartDate() < minStartDate:
             raise CERNMCUException("Cannot create a booking before the Indico event's start date. Please create it after %s"%(formatDateTime(minStartDate)))
 
-        maxEndDate = self.getConference().getAdjustedEndDate()
+        maxEndDate = getMaxEndDate(self.getConference())
         if self.getAdjustedStartDate() > maxEndDate:
             raise CERNMCUException("Cannot create a booking after before the Indico event's end date. Please create it after %s"%(formatDateTime(maxEndDate)))
 

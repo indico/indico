@@ -89,4 +89,17 @@ globalOptions = [
                               "defaultValue": "H323 IP",
                               "editable": True,
                               "visible": True}),
+
+    ("extraMinutesBefore", {"description" : _("Extra minutes allowed before Indico event start time"),
+                            "type": int,
+                            "defaultValue": 60} ),
+    ("extraMinutesAfter", {"description" : _("Extra minutes allowed after Indico event start time"),
+                            "type": int,
+                            "defaultValue": 120} ),
+    ("defaultMinutesBefore", {"description" : _("Default extra minutes before Indico event start time"),
+                            "type": int,
+                            "defaultValue": 30} ),
+    ("defaultMinutesAfter", {"description" : _("Default extra minutes after Indico event start time"),
+                            "type": int,
+                            "defaultValue": 60} ),
 ]

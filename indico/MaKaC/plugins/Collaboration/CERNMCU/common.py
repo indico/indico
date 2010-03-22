@@ -24,6 +24,7 @@ from MaKaC.plugins.base import PluginsHolder
 from random import Random
 from MaKaC.common.PickleJar import Retrieves
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
+from datetime import timedelta
 import socket
 import errno
 from MaKaC.common.fossilize import fossilizes, Fossilizable
@@ -42,6 +43,12 @@ def getRangeLength():
     idRangeString = getCERNMCUOptionValueByName("idRange")
     min, max = [int(s) for s in idRangeString.split('-')]
     return max - min
+
+def getMinStartDate(conference):
+    return conference.getAdjustedStartDate() - timedelta(0,0,0,0, getCERNMCUOptionValueByName("extraMinutesBefore"))
+
+def getMaxEndDate(conference):
+    return conference.getAdjustedEndDate() + timedelta(0,0,0,0, getCERNMCUOptionValueByName("extraMinutesAfter"))
 
 def getGlobalData():
     return PluginsHolder().getPluginType('Collaboration').getPlugin('CERNMCU').getGlobalData()

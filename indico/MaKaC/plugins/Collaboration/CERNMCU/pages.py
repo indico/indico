@@ -23,13 +23,14 @@ from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase,\
 from MaKaC.common.utils import formatDateTime, validIP
 from MaKaC.webinterface.common.tools import strip_ml_tags, unescape_html
 from MaKaC.plugins.Collaboration.CERNMCU.common import getCERNMCUOptionValueByName,\
-    RoomWithH323
+    RoomWithH323, getMinStartDate, getMaxEndDate
 from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
 from MaKaC.errors import MaKaCError
 from MaKaC.common.logger import Logger
 from MaKaC.common import info
 from MaKaC.i18n import _
 from MaKaC.webinterface.pages.collaboration import WAdvancedTabBase
+from datetime import timedelta
 
 class WNewBookingForm(WCSPageTemplateBase):
 
@@ -38,8 +39,8 @@ class WNewBookingForm(WCSPageTemplateBase):
 
         vars["EventTitle"] = self._conf.getTitle()
         vars["EventDescription"] = unescape_html(strip_ml_tags( self._conf.getDescription())).strip()
-        vars["DefaultStartDate"] = formatDateTime(self._conf.getAdjustedStartDate())
-        vars["DefaultEndDate"] = formatDateTime(self._conf.getAdjustedEndDate())
+        vars["DefaultStartDate"] = formatDateTime(self._conf.getAdjustedStartDate() - timedelta(0, 0, 0, 0, getCERNMCUOptionValueByName("defaultMinutesBefore")))
+        vars["DefaultEndDate"] = formatDateTime(self._conf.getAdjustedEndDate() + timedelta(0, 0, 0, 0, getCERNMCUOptionValueByName("defaultMinutesAfter")))
         vars["MinStartDate"] = formatDateTime(self._conf.getAdjustedStartDate())
         vars["MaxEndDate"] = formatDateTime(self._conf.getAdjustedEndDate())
 
@@ -56,8 +57,10 @@ class WMain (WJSBase):
     def getVars(self):
         vars = WJSBase.getVars( self )
 
-        vars["MinStartDate"] = formatDateTime(self._conf.getAdjustedStartDate())
-        vars["MaxEndDate"] = formatDateTime(self._conf.getAdjustedEndDate())
+        vars["MinStartDate"] = formatDateTime(getMinStartDate(self._conf))
+        vars["MaxEndDate"] = formatDateTime(getMaxEndDate(self._conf))
+        vars["ExtraMinutesBefore"] = getCERNMCUOptionValueByName("extraMinutesBefore")
+        vars["ExtraMinutesAfter"] = getCERNMCUOptionValueByName("extraMinutesAfter")
 
         # Code to retrieve the event's location and room in order to include the event's room
         # as an initial participant
@@ -255,16 +258,15 @@ class XMLGenerator(object):
         out.closeTag("section")
 
         if booking.getHasPin():
+            out.openTag("section")
+            out.writeTag("title", _('PIN:'))
+
             if booking.getBookingParamByName("displayPin"):
-                out.openTag("section")
-                out.writeTag("title", _('PIN:'))
                 out.writeTag("line", str(booking.getPin()))
-                out.closeTag("section")
             else:
-                out.openTag("section")
-                out.writeTag("title", _('PIN:'))
                 out.writeTag("line", _('This conference is protected by a PIN.'))
-                out.closeTag("section")
+
+            out.closeTag("section")
 
         out.openTag("section")
         out.writeTag("title", _('Description:'))

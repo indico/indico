@@ -76,15 +76,27 @@ globalOptions = [
     ("verifyMinutes", {"description" : _("Minutes to verify the booking before meeting"),
                       "type": list,
                       "defaultValue": [10,30]} ),
-    ("allowedMinutes", {"description" : _("Temporal margin around Indico event times where we allow EVO meeting creation (minutes)"),
+
+    ("extraMinutesBefore", {"description" : _("Extra minutes allowed before Indico event start time"),
                             "type": int,
                             "defaultValue": 60} ),
+    ("extraMinutesAfter", {"description" : _("Extra minutes allowed after Indico event start time"),
+                            "type": int,
+                            "defaultValue": 120} ),
+    ("defaultMinutesBefore", {"description" : _("Default extra minutes before Indico event start time"),
+                            "type": int,
+                            "defaultValue": 30} ),
+    ("defaultMinutesAfter", {"description" : _("Default extra minutes after Indico event start time"),
+                            "type": int,
+                            "defaultValue": 60} ),
+
     ("allowedPastMinutes", {"description" : _("Time that we allow EVO meetings to be created in the past (minutes)"),
                             "type": int,
                             "defaultValue": 30} ),
     ("phoneBridgeNumberList", {"description" : _("Link to list of EVO Phone Bridge numbers"),
                             "type": str,
                             "defaultValue": "http://evo.caltech.edu/evoGate/telephone.jsp"}),
+
     ("APIMap", {"description" : _("Map of actions and URLs"),
                "type": dict,
                "defaultValue": {

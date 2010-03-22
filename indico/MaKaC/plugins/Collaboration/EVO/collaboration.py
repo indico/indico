@@ -164,11 +164,11 @@ class CSBooking(CSBookingBase):
 
         minStartDate = getMinStartDate(self.getConference())
         if self.getAdjustedStartDate() < minStartDate:
-            raise EVOException("Cannot create a booking %s minutes before the Indico event's start date. Please create it after %s"%(self._EVOOptions["allowedMinutes"].getValue(), formatDateTime(minStartDate)))
+            raise EVOException("Cannot create a booking %s minutes before the Indico event's start date. Please create it after %s"%(self._EVOOptions["extraMinutesBefore"].getValue(), formatDateTime(minStartDate)))
 
         maxEndDate = getMaxEndDate(self.getConference())
         if self.getAdjustedEndDate() > maxEndDate:
-            raise EVOException("Cannot create a booking %s minutes after before the Indico event's end date. Please create it before %s"%(self._EVOOptions["allowedMinutes"].getValue(), formatDateTime(maxEndDate)))
+            raise EVOException("Cannot create a booking %s minutes after before the Indico event's end date. Please create it before %s"%(self._EVOOptions["extraMinutesAfter"].getValue(), formatDateTime(maxEndDate)))
 
         if False: #for now, we don't detect overlapping
             for booking in self.getBookingsOfSameType():

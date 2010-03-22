@@ -46,59 +46,59 @@ def getActionURL(actionString):
         return EVOServerURL + actionServlet
     else:
         return EVOServerURL + '/' + actionServlet
-    
+
 def getRequestURL(action, arguments = {}):
-    
+
     actionURL = getActionURL(action)
-    
+
     indicoID = getEVOOptionValueByName("indicoUserID")
     indicoPassword = getEVOOptionValueByName("indicoPassword")
     expirationTime = int(datetimeToUnixTime(nowutc() + timedelta(minutes = getEVOOptionValueByName('expirationTime'))) * 1000)
-    
+
     arguments["from"] = createLoginKey(indicoID, indicoPassword, expirationTime)
-    
+
     url = URL(actionURL)
     url.setParams(arguments)
     url.setSeparator('&')
-    
+
     return url
-    
+
 def getEVOAnswer(action, arguments = {}, eventId = '', bookingId = ''):
-    
+
     url = getRequestURL(action, arguments)
-        
+
     Logger.get('EVO').info("""Evt:%s, booking:%s, sending request to EVO: [%s]""" % (eventId, bookingId, str(url)))
-    
+
     try:
         answer = urlOpenWithTimeout(str(url) , secondsToWait).read(readLimit).strip() #we remove any whitespaces, etc. We won't read more than 100k characters
         Logger.get('EVO').info("""Evt:%s, booking:%s, got answer (unprocessed): [%s]""" % (eventId, bookingId, str(answer)))
-        
+
     except HTTPError, e:
         code = e.code
         shortMessage = BaseHTTPRequestHandler.responses[code][0]
         longMessage = BaseHTTPRequestHandler.responses[code][1]
-        
+
         Logger.get('EVO').error("""Evt:%s, booking:%s, request: [%s] triggered HTTPError: %s (code = %s, shortMessage = '%s', longMessage = '%s'""" % (eventId, bookingId, str(url), str(e), code, shortMessage, longMessage))
-        
+
         if str(code) == '404':
             raise EVOException('Indico could not find the EVO Server at ' + getEVOOptionValueByName("httpServerLocation") + "(HTTP error 404)")
         elif str(code) == '500':
             raise EVOException("The EVO server has an internal problem (HTTP error 500)", e)
         else:
             raise EVOException("""Problem when Indico tried to contact the EVO Server.\nReason: HTTPError: %s (code = %s, shortMessage = '%s', longMessage = '%s', url = '%s'""" % (str(e), code, shortMessage, longMessage, str(url)), e)
-    
+
     except URLError, e:
         Logger.get('EVO').error("""Evt:%s, booking:%s, request: [%s] triggered exception: %s""" % (eventId, bookingId, str(url), str(e)))
         if str(e.reason).strip() == 'timed out':
             raise EVOException("The EVO server is not responding.", e)
         raise EVOException('URLError when contacting the EVO server for action: ' + action + '. Reason="' + str(e.reason)+'"', e)
-    
+
     else: #we parse the answer
         encodingTextStart = '<fmt:requestEncoding value='
         encodingTextEnd = '/>'
-        
+
         answer = answer.strip()
-        
+
         #we parse an eventual encoding specification, like <fmt:requestEncoding value="UTF-8"/>
         if answer.startswith(encodingTextStart):
             endOfEncondingStart = answer.find(encodingTextStart) + len(encodingTextStart)
@@ -106,15 +106,15 @@ def getEVOAnswer(action, arguments = {}, eventId = '', bookingId = ''):
             valueStartIndex = max(answer.find('"', endOfEncondingStart, endOfEncodingEnd), answer.find("'", endOfEncondingStart, endOfEncodingEnd)) + 1 #find returns -1 if not found
             valueEndIndex = max(answer.find('"', valueStartIndex, endOfEncodingEnd), answer.find("'", valueStartIndex, endOfEncodingEnd))
             encoding = answer[valueStartIndex:valueEndIndex].strip()
-            
+
             answer = answer[endOfEncodingEnd:].strip()
             answer = answer.decode(encoding).encode('utf-8')
-        
+
         if answer.startswith("OK:"):
             answer = answer[3:].strip() #we remove the "OK:"
             Logger.get('EVO').info("""Evt:%s, booking:%s, got answer (processed): [%s]""" % (eventId, bookingId, str(answer)))
             return answer
-        
+
         elif answer.startswith("ERROR:"):
             error = answer[6:].strip()
             Logger.get('EVO').warning("""Evt:%s, booking:%s, request: [%s] triggered EVO error: %s""" % (eventId, bookingId, str(url), error))
@@ -129,14 +129,14 @@ def getEVOAnswer(action, arguments = {}, eventId = '', bookingId = ''):
                 raise EVOControlledException(error)
         else:
             raise EVOException('Error when contacting the EVO server for action: ' + action + '. Message from the EVO server did not start by ERROR or OK', answer)
-        
+
 def parseEVOAnswer(answer):
     """ Parses an answer such as
         meet=48760&&start=0&&end=1000&&com=4&&type=0&&title=NewTestTitle&&desc=TestDesc&&url=[meeting=e9eIeivDveaeaBIDaaI9]
         and returns a tuple of attributes.
         the url attribute is transformed to the real koala URL
     """
-    
+
     attributesStringList = answer.split('&&')
     attributes = {}
     for attributeString in attributesStringList:
@@ -162,18 +162,18 @@ def createLoginKey(EVOID, password, time):
     EVOID = str(EVOID)
     password = str(password)
     time = str(time)
-    
+
     if len(EVOID) > 8:
         raise EVOException("EVOID has to be 8 digits max")
     if len(password) != 4:
         raise EVOException("password has to be 4 digits")
     if len(time) > 13:
         raise EVOException("unix time has to be 13 digits max")
-    
+
     key = array('c', ' '*25)
     EVOID = EVOID.zfill(8)
     time = time.zfill(13)
-    
+
     for index, char in enumerate(time):
         key[index*2] = char
 
@@ -205,25 +205,25 @@ def parseLoginKey(key):
     return (EVOID, password, time)
 
 def getMinStartDate(conference):
-    return conference.getAdjustedStartDate() - timedelta(0,0,0,0, getEVOOptionValueByName("allowedMinutes"))
+    return conference.getAdjustedStartDate() - timedelta(0,0,0,0, getEVOOptionValueByName("extraMinutesBefore"))
 
 def getMaxEndDate(conference):
-    return conference.getAdjustedEndDate() + timedelta(0,0,0,0, getEVOOptionValueByName("allowedMinutes"))
-    
+    return conference.getAdjustedEndDate() + timedelta(0,0,0,0, getEVOOptionValueByName("extraMinutesAfter"))
+
 class EVOError(CSErrorBase):
-    
+
     def __init__(self, errorType, requestURL = None, userMessage = None):
         CSErrorBase.__init__(self)
         self._errorType = errorType
         self._requestURL = requestURL
         self._userMessage = None
-        
+
     @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.EVOError',
                 'MaKaC.plugins.Collaboration.EVO.common.OverlappedError',
                 'MaKaC.plugins.Collaboration.EVO.common.ChangesFromEVOError'], 'origin')
     def getOrigin(self):
         return 'EVO'
-        
+
     @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.EVOError',
                 'MaKaC.plugins.Collaboration.EVO.common.OverlappedError',
                 'MaKaC.plugins.Collaboration.EVO.common.ChangesFromEVOError'],
@@ -237,7 +237,7 @@ class EVOError(CSErrorBase):
                'requestURL')
     def getRequestURL(self):
         return self._requestURL
-    
+
     def getUserMessage(self):
         if self._userMessage:
             return self._userMessage
@@ -248,34 +248,34 @@ class EVOError(CSErrorBase):
                 return "This EVO meeting could not be created or changed because EVO does not allow meetings starting in the past."
             else:
                 return self._errorType
-    
+
     def getLogMessage(self):
         return "EVO Error: " + str(self._errorType) + " for request " + str(self._requestURL)
 
-    
-    
+
+
 class OverlappedError(EVOError):
     def __init__(self, overlappedBooking):
         EVOError.__init__(self, 'overlapped')
         self._overlappedBooking = overlappedBooking
-        
+
     @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.OverlappedError'],
                'overlappedBooking', isPicklableObject = True)
     def getSuperposedBookingId(self):
         return self._overlappedBooking
-    
+
 class ChangesFromEVOError(EVOError):
 
     def __init__(self, changes):
         EVOError.__init__(self, 'changesFromEVO')
         self._changes = changes
-        
+
     @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.ChangesFromEVOError'],
                'changes')
     def getChanges(self):
         return self._changes
-    
-    
+
+
 class EVOException(CollaborationException):
     def __init__(self, msg, inner = None):
         CollaborationException.__init__(self, msg, 'EVO', inner)
@@ -283,21 +283,21 @@ class EVOException(CollaborationException):
 class EVOControlledException(Exception):
     def __init__(self, message):
         self.message = message
-    
+
     def __str__(self):
         return "EVOControlledException. Message = " + self.message
-        
+
 class EVOWarning(object):
-    
+
     def __init__(self, msg, exception = None):
         self._msg = msg
         self._exception = exception
-    
+
     @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.EVOWarning'],
                'message')
     def getMessage(self):
         return self._msg
-    
+
     @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.EVOWarning'],
                'exception')
     def getException(self):

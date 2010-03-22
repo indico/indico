@@ -37,9 +37,6 @@ globalOptions = [
     ("useHTTPS", {"description": _("Use HTTPS in collaboration pages?"),
                      "type" : bool,
                      "defaultValue": False} ),
-    ("startMinutes", {"description": _("Default start time before Indico event start time (minutes)"),
-                     "type" : int,
-                     "defaultValue": 30} ),
     ("tabOrder", {"description": _("Order in which the tabs will appear"),
                   "type": list,
                   "defaultValue": ["Videoconferencing", "Recording Request", "Webcast Request"]
