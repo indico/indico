@@ -14,6 +14,7 @@ from MaKaC.services.implementation.base import ParameterManager
 from MaKaC.services.implementation.base import ProtectedModificationService
 from MaKaC.services.implementation.base import ProtectedDisplayService
 from MaKaC.errors import ModificationError, MaKaCError
+from MaKaC.common.fossilize import fossilize
 
 
 class UserListChange(object):
@@ -212,12 +213,13 @@ class GetMaterial(MaterialDisplayBase):
 
 
 class GetMaterialAllowedUsers(MaterialModifBase):
+    """
+    Lists the users that allowed to access the material
+    """
 
     def _getAnswer(self):
-        """
-        Lists the users that allowed to access the material
-        """
-        return DictPickler.pickle(self._material.getAllowedToAccessList())
+        #will use IAvatarFossil or IGroupFossil
+        return fossilize(self._material.getAllowedToAccessList())
 
 class GetMaterialProtection(MaterialModifBase):
 
@@ -324,11 +326,12 @@ class EditResourceBase(ResourceModifBase, UserListChange):
 
 class GetResourceAllowedUsers(ResourceModifBase):
     """
-    Lists the users that allowed to access the material
+    Lists the users that allowed to access the resource
     """
 
     def _getAnswer(self):
-        return DictPickler.pickle(self._resource.getAllowedToAccessList())
+        #will use IAvatarFossil or IGroupFossil
+        return fossilize(self._resource.getAllowedToAccessList())
 
 
 class DeleteResourceBase(ResourceModifBase):

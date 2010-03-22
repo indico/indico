@@ -40,40 +40,49 @@ type("PreLoadHandler", [],
 
 
 type("ServiceDialog", ["ExclusivePopup"],
-     {
-         _error: function(error) {
-             IndicoUI.Dialogs.Util.error(error);
-         },
+    {
+        _error: function(error) {
+            IndicoUI.Dialogs.Util.error(error);
+        },
 
-         request: function(extraArgs) {
-             var self = this;
-             var args = extend(clone(this.args), extraArgs);
+        request: function(extraArgs) {
+            var self = this;
+            var args = extend(clone(this.args), extraArgs);
 
-             var progressDialog = new ProgressDialog();
-             progressDialog.open();
+            var killProgress = IndicoUI.Dialogs.Util.progress();
 
-             jsonRpc(Indico.Urls.JsonRpcService, this.method, args,
-                     function(response,error) {
-                         if(exists(error)) {
-                             progressDialog.close();
-                             self._error(error);
-                         } else {
-                             self._success(response);
-                             progressDialog.close();
-                             self.close();
-                         }
-                     }
-                    );
-         }
-     },
+            jsonRpc(Indico.Urls.JsonRpcService, this.method, args,
+                function(response,error) {
+                    if(exists(error)) {
+                        killProgress();
+                        self._error(error);
+                    } else {
+                        self._success(response);
+                        killProgress();
+                        self.close();
+                    }
+                }
+            );
+        }
+    },
 
-     function(endPoint, method, args, title, closeHandler) {
-         this.endPoint = endPoint;
-         this.method = method;
-         this.args = args;
-         this.ExclusivePopup(title, closeHandler);
-     }
-    );
+    function(endPoint, method, args, title, closeHandler) {
+       this.endPoint = endPoint;
+       this.method = method;
+       this.args = args;
+       this.ExclusivePopup(title, closeHandler);
+    }
+);
+
+
+type("ServiceDialogWithButtons", ["ExclusivePopupWithButtons", "ServiceDialog"], {},
+    function(endPoint, method, args, title, closeHandler){
+        this.endPoint = endPoint;
+        this.method = method;
+        this.args = args;
+        this.ExclusivePopupWithButtons(title, closeHandler);
+    }
+);
 
 
 

@@ -37,13 +37,13 @@
              <%= _("Room's telephone.")%>
         </div>
         <div id="capacityCH" class="tip">
-            <b> <%= _("Required.")%></b>  <%= _("Must be a positive number.")%> 
+            <b> <%= _("Required.")%></b>  <%= _("Must be a positive number.")%>
         </div>
         <div id="departmentCH" class="tip">
             ??!
         </div>
         <div id="surfaceCH" class="tip">
-            <b> <%= _("Required.")%></b>  <%= _("Surface in square meters. Must be a positive number.")%> 
+            <b> <%= _("Required.")%></b>  <%= _("Surface in square meters. Must be a positive number.")%>
         </div>
         <div id="commentsCH" class="tip">
              <%= _("Any other comments - recommended.")%>
@@ -265,11 +265,16 @@
 
 <script type="text/javascript">
   function searchForUsers() {
-    var popup = new UserSearchPopup('Select a responsible',
-                                    function(users) {
-                                    $E('responsibleName').set(users[0].name);
-                                    $E('responsibleId').set(users[0].id);
-                                    }, null, null, true);
+
+    var popup = new ChooseUsersPopup($T('Select a responsible'),
+                                     true,
+                                     null, false,
+                                     true, null,
+                                     true, true,
+                                     function(users) {
+                                         $E('responsibleName').set(users[0].name);
+                                         $E('responsibleId').set(users[0].id);
+                                     });
 
     popup.open();
   }

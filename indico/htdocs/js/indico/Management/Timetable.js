@@ -5,50 +5,33 @@ function nullRoomInfo(info) {
         (!exists(info.get('room')));
 }
 
-type("UnscheduledContributionList", ["ListWidget"],
+type("UnscheduledContributionList", ["SelectableListWidget"],
      {
          _drawItem: function(pair) {
              var self = this;
-             var elem = pair.get();
-             var speakers = '';
+             var elem = pair.get(); // elem is a WatchObject
+
+             var speakers = translate(elem.get('speakerList'), function(speaker) {
+                 return speaker.familyName;
+             }).join(", ");
              var selected = false;
 
-             each(elem.speakerList,
-                  function(speaker, iter) {
-                      speakers += speaker.familyName;
-                      if (iter != (elem.speakerList.length-1)) {
-                          speakers += ', ';
-                      }
-                  });
-
-             var id = Html.em({style: {paddingLeft: "5px", fontSize: '0.9em'}}, elem.id);
-             var item = Html.div({},  elem.title + ( speakers ? (' (' + speakers + ')') : ''), id);
-
-             item.observeClick(function() {
-                 selected = !selected;
-
-                 if (selected) {
-                     self.selected.append(elem.id);
-                     item.getParent().dom.className = 'selected';
-                 } else {
-                     self.selected.remove(elem.id);
-                     item.getParent().dom.className = '';
-                 }
-             });
+             var id = Html.em({style: {paddingLeft: "5px", fontSize: '0.9em'}}, elem.get('id'));
+             var item = Html.div({},  elem.get('title') + ( speakers ? (' (' + speakers + ')') : ''), id);
 
              return item;
          },
 
          getList: function() {
-             return this.selected;
+             return this.getSelectedList();
          }
 
-     }, function(existing) {
+     }, function(existing, observer) {
          var self = this;
 
          this.selected = new WatchList();
 
-         this.ListWidget('UnscheduledContribList');
+         this.SelectableListWidget(observer, false, 'UnscheduledContribList');
 
          // Sort by name and add to the list
          var items = {};
@@ -57,27 +40,31 @@ type("UnscheduledContributionList", ["ListWidget"],
          });
          var ks = keys(items);
          ks.sort();
+
          for (k in ks) {
-             this.add(items[ks[k]]);
+             this.set(k, $O(items[ks[k]]));
          }
      }
     );
 
-type("AddContributionDialog", ["ExclusivePopup", "PreLoadHandler"],
+type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
      {
          _preload: [
              function(hook) {
                  var self = this;
+                 var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
                  var source = indicoSource(
                      self.args.session?'schedule.session.getUnscheduledContributions':
                          'schedule.event.getUnscheduledContributions',
                      self.args);
                  source.state.observe(function(state) {
                      if (state == SourceState.Loaded) {
+                         killProgress();
                          self.existing = $L(source);
                          self._processDialogState();
                          hook.set(true);
                      } else if (state == SourceState.Error) {
+                         killProgress();
                          IndicoUtil.errorReport(source.error);
                      }
                  });
@@ -102,13 +89,21 @@ type("AddContributionDialog", ["ExclusivePopup", "PreLoadHandler"],
                  return;
              } else {
 
-                 this.ExclusivePopup($T("Add Contribution"),
+                 this.ExclusivePopupWithButtons($T("Add Contribution"),
                                      function() {
                                          self.close();
                                      });
 
              }
 
+         },
+
+         existingSelectionObserver: function(selectedList) {
+             if(selectedList.isEmpty()){
+                 this.button.disable();
+             } else {
+                 this.button.enable();
+             }
          },
 
          addExisting: function(contribs, date) {
@@ -135,34 +130,40 @@ type("AddContributionDialog", ["ExclusivePopup", "PreLoadHandler"],
          draw: function() {
              var self = this;
 
-             var unscheduledList = new UnscheduledContributionList(self.existing);
+             var unscheduledList = new UnscheduledContributionList(self.existing, function(selectedList) {
+                 self.existingSelectionObserver(selectedList);
+             });
 
-             var chooseDialog = Html.div(
-                 {},
-                 $T("You may choose to:"),
-                 Html.ul(
-                     {},
-                     Html.li(
-                         {style:{marginBottom: '10px'}},
-                         Widget.link(command(
-                             function() {
-                                 var dialog = createObject(
-                                     AddNewContributionDialog,
-                                     self.newArgs);
+             var content = Html.div({},
+                     $T("You may choose to:"),
+                     Html.ul({},
+                         Html.li({style:{marginBottom: '10px'}},
+                             Widget.link(command(function() {
+                                 var dialog = createObject(AddNewContributionDialog, self.newArgs);
                                  self.close();
                                  dialog.execute();
-                             }, $T("Create a new one")
-                         ))), Html.li({},
-                                      $T("Choose one (or more) unscheduled"),
-                                      Html.div("UnscheduledContribListDiv",
-                                               unscheduledList.draw()),
-                                      Widget.button(command(function() {
-                                          self.addExisting(unscheduledList.getList(),
-                                                           self.selectedDay);
-                                      }, "Add selected"))
-                                     )));
+                             }, $T("Create a new one")))),
+                         Html.li({},
+                             $T("Choose one (or more) unscheduled"),
+                             Html.div("UnscheduledContribListDiv",
+                             unscheduledList.draw()))));
 
-             return this.ExclusivePopup.prototype.draw.call(this, Html.span({}, chooseDialog));
+             this.button = new DisabledButton(Html.input("button", {disabled:true}, $T("Add selected")));
+             var tooltip;
+             this.button.observeEvent('mouseover', function(event){
+                 if (!self.button.isEnabled()) {
+                     tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, $T("To add an unscheduled contribution, please select at least one"), "tooltipError");
+                 }
+             });
+             this.button.observeEvent('mouseout', function(event){
+                 Dom.List.remove(document.body, tooltip);
+             });
+
+             this.button.observeClick(function(){
+                 self.addExisting(unscheduledList.getList(), self.selectedDay);
+             });
+
+             return this.ExclusivePopupWithButtons.prototype.draw.call(this, content, this.button.draw());
          }
      },
      function(method, timeStartMethod, args, roomInfo, parentRoomData,
@@ -185,7 +186,7 @@ type("AddContributionDialog", ["ExclusivePopup", "PreLoadHandler"],
 
      });
 
-type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
+type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"], {
     _preload: [
         function(hook) {
             var self = this;
@@ -243,22 +244,12 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
                 // if it's a meeting, don't bother getting the fields
                 hook.set(true);
             }
-        },
-        function(hook) {
-            var self = this;
-            var source = indicoSource('user.favorites.listUsers', {});
-            source.state.observe(function(state) {
-                if (state == SourceState.Loaded) {
-                    self.favorites = $L(source);
-                    hook.set(true);
-                }
-            });
         }
     ],
 
     postDraw: function() {
         this.roomEditor.postDraw();
-        this.ExclusivePopup.prototype.postDraw.call(this);
+        this.ServiceDialogWithButtons.prototype.postDraw.call(this);
     },
 
     _success: function(response) {
@@ -266,8 +257,11 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
     },
 
     draw: function() {
-        var content = this._drawNewForm();
-        return this.ServiceDialog.prototype.draw.call(this, content);
+        var newForm = this._drawNewForm();
+        var contentDiv = newForm[0];
+        var buttons = newForm[1];
+        return this.ServiceDialogWithButtons.prototype.draw.call(this, contentDiv, buttons,
+                {backgroundColor: 'white'}); // because of variable content
     },
 
     _configureDaySelect: function(conferenceDays) {
@@ -327,14 +321,12 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
 
         this.roomEditor = new RoomBookingWidget(Indico.Data.Locations, info.get('roomInfo'), self.parentRoomData, true, self.favoriteRooms, null);
 
-        var presListWidget = new UserListField(
+        var presListWidget = new NewUserListField(
             'VeryShortPeopleListDiv', 'PeopleList',
-            [],
-            null,
-            self.favorites,
+            null, true, null,
+            true, false, self.args.conference, {"presenter-grant-submission": [$T("submission rights"), true]},
             true, true, true,
-            userListNothing, userListNothing, userListNothing, false, {"presenter-grant-submission": [$T("submission rights"), true]},
-            self.args.conference);
+            userListNothing, userListNothing, userListNothing);
 
         $B(info.accessor('presenters'), presListWidget.getUsers());
         info.set('privileges', presListWidget.getPrivileges());
@@ -437,24 +429,20 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
 
     _drawAuthorsTab: function(info) {
         var self = this;
-        var authorListWidget = new UserListField(
-            'VeryShortPeopleListDiv', 'PeopleList',
-            [],
-            null,
-            self.favorites,
-            true, true, true,
-            userListNothing, userListNothing, userListNothing, false, {"author-grant-submission": [$T("submission rights"), true]},
-            this.args.conference);
 
-        var coauthorListWidget = new UserListField(
+        var authorListWidget = new NewUserListField(
             'VeryShortPeopleListDiv', 'PeopleList',
-            [],
-            null,
-            self.favorites,
+            null, true, null,
+            true, false, this.args.conference, {"author-grant-submission": [$T("submission rights"), true]},
             true, true, true,
-            userListNothing, userListNothing, userListNothing, false, {"coauthor-grant-submission": [$T("submission rights"), true]},
-            this.args.conference);
+            userListNothing, userListNothing, userListNothing);
 
+        var coauthorListWidget = new NewUserListField(
+                'VeryShortPeopleListDiv', 'PeopleList',
+                null, true, null,
+                true, false, this.args.conference, {"coauthor-grant-submission": [$T("submission rights"), true]},
+                true, true, true,
+                userListNothing, userListNothing, userListNothing);
 
         $B(info.accessor('authors'), authorListWidget.getUsers());
         $B(info.accessor('coauthors'), coauthorListWidget.getUsers());
@@ -462,7 +450,8 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
         return IndicoUtil.createFormFromMap(
             [
                 [$T('Author(s)'), authorListWidget.draw()],
-                [$T('Co-author(s)'), coauthorListWidget.draw()]
+                [Html.div({style:{paddingTop:pixels(30)}}, $T('Co-author(s)')),
+                 Html.div({style:{paddingTop:pixels(30)}}, coauthorListWidget.draw())]
             ]);
     },
 
@@ -540,9 +529,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
         tabs.push([$T("Advanced"), self._drawAdvancedTab(self.info)]);
         var tabWidget = new TabWidget(tabs, 600, 400);
 
-        return Html.div({},
-                        tabWidget.draw(),
-                        Html.div('dialogButtons', [addButton, cancelButton]));
+        return [tabWidget.draw(), [addButton, cancelButton]];
 
     }
 },
@@ -593,7 +580,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
                  self.open();
              });
 
-         this.ServiceDialog(Indico.Urls.JsonRpcService, method, args, $T("Add Contribution"),
+         this.ServiceDialogWithButtons(Indico.Urls.JsonRpcService, method, args, $T("Add Contribution"),
                             function() {
                                 self.close();
                             });
@@ -622,7 +609,7 @@ type("AddNewContributionDialog", ["ServiceDialog", "PreLoadHandler"], {
  */
 
 type("ChangeEditDialog", // silly name!
-     ["ServiceDialog", "PreLoadHandler"],
+     ["ServiceDialogWithButtons", "PreLoadHandler"],
      {
          _preload: [
              function(hook) {
@@ -692,7 +679,7 @@ type("ChangeEditDialog", // silly name!
                  self.open();
              });
 
-         this.ServiceDialog(Indico.Urls.JsonRpcService, method, args,
+         this.ServiceDialogWithButtons(Indico.Urls.JsonRpcService, method, args,
                             title,
                             function() {
                                 this.close();
@@ -705,7 +692,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
 
          postDraw: function() {
              this.roomEditor.postDraw();
-             this.ExclusivePopup.prototype.postDraw.call(this);
+             this.ChangeEditDialog.prototype.postDraw.call(this);
          },
 
 
@@ -841,27 +828,18 @@ type("AddBreakDialog", ["ChangeEditDialog"],
              self.parameterManager.add(self.startTimeField, 'time', false);
              self.parameterManager.add(self.timeField, 'unsigned_int', false);
 
-             return this.ServiceDialog.prototype.draw.call(
-                 this,
-                 Widget.block([IndicoUtil.createFormFromMap([
-
-                 [$T('Title'), $B(self.parameterManager.add(Html.edit({
-                     style: {
-                         width: '300px'
-                     }
-                 })), this.info.accessor('title'))],
-
-                 [$T('Description'), $B(Html.textarea({
-                     cols: 40,
-                     rows: 2
-                 }), this.info.accessor('description'))],
+             var contentDiv = IndicoUtil.createFormFromMap([
+                 [$T('Title'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}})), this.info.accessor('title'))],
+                 [$T('Description'), $B(Html.textarea({cols: 40, rows: 2}), this.info.accessor('description'))],
                  [$T('Place'), this.roomEditor.draw()],
                  [$T('Date'), conferenceDays],
-                 [$T('Start time'), Html.div({className: 'popUpLabel', style:{textAlign: 'left'}}, this.startTimeField,
-                             $T(' Duration '), this.timeField, $T('min'))]
-                  ]),
-                               Html.div('dialogButtons',
-                                        [addButton, cancelButton])]));
+                 [$T('Start time'), Html.div({className: 'popUpLabel', style:{textAlign: 'left'}},
+                         this.startTimeField, $T(' Duration '), this.timeField, $T('min'))]
+             ]);
+
+             var buttonDiv = Html.div({}, addButton, cancelButton);
+
+             return this.ServiceDialogWithButtons.prototype.draw.call(this, contentDiv, buttonDiv);
          },
 
          _saveInfo: function() {
@@ -920,7 +898,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
 
          if (isEdit) {
              this.info = args;
-             this.ExclusivePopup($T("Edit Break"));
+             this.ExclusivePopupWithButtons($T("Edit Break"));
              this.timeStartMethod = managementActions.methods[args.get('parentType')].dayEndDate;
              this.dateArgs = args;
          } else {
@@ -1147,8 +1125,20 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
                     });
                 });
 
+                // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
+                var cancelButton = Html.input('button',  {
+                    style : {
+                        marginLeft : pixels(5)
+                    }
+                }, "Cancel");
+                cancelButton.observeClick(function() {
+                    self.close();
+                });
 
-                return this.ExclusivePopupWithButtons.prototype.draw.call(this, Widget.block( [Html.div({}, span1, span2), this.tabWidget.draw()]), okButton);
+                var content = Widget.block( [Html.div({}, span1, span2), this.tabWidget.draw(), Html.br()] );
+                var buttons = Html.div({}, okButton, cancelButton);
+
+                return this.ExclusivePopupWithButtons.prototype.draw.call(this, content, buttons);
             },
 
             /*
@@ -1186,9 +1176,9 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
             var self = this;
 
             this.ExclusivePopupWithButtons($T("Move Timetable Entry"),
-                                           function() {
-                                               self.close();
-                                           });
+                                function() {
+                                    self.close();
+                                });
         });
 
 

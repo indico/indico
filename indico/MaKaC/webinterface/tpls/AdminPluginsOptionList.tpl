@@ -22,7 +22,7 @@
                 <% end %>
 
                 <% if option.getType() == "users": %>
-                    <div id="userList<%=name%>">
+                    <div id="userList<%=name%>" style="margin-bottom: 10px">
                     </div>
 
                     <script type="text/javascript">
@@ -35,11 +35,11 @@
                                 },
                                 function(result,error) {
                                     if (!error) {
-                        setResult(true);
+                                        setResult(true);
                                     } else {
                                         IndicoUtil.errorReport(error);
-                    setResult(false);
-                    }
+                                        setResult(false);
+                                    }
                                 }
                             );
                         }
@@ -52,20 +52,19 @@
                                 },
                                 function(result,error) {
                                     if (!error) {
-                        setResult(true);
+                                        setResult(true);
                                     } else {
                                         IndicoUtil.errorReport(error);
-                    setResult(false);
+                                        setResult(false);
                                     }
                                 }
                             );
                         }
 
-                        var uf = new UserListField('PeopleListDiv', 'PeopleList',
-                                                   <%= jsonEncode(fossilize(option.getValue(), IAvatarFossil)) %>,
-                                                   null,
-                                                   <%=jsonEncode(Favorites)%>,
-                                                   true, false, false,
+                        var uf = new NewUserListField('PluginOptionPeopleListDiv', 'PeopleList',
+                                                   <%= jsonEncode(fossilize(option.getValue(), IAvatarFossil)) %>, true, null,
+                                                   true, false, null, null,
+                                                   false, false, true,
                                                    newPersonsHandler, userListNothing, removePersonHandler)
                         $E('userList<%=name%>').set(uf.draw())
                     </script>

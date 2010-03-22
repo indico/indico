@@ -60,6 +60,9 @@ from MaKaC.i18n import _
 from MaKaC.i18n import langList
 
 from MaKaC.common.TemplateExec import truncateTitle
+from MaKaC.fossils.user import IAvatarFossil
+from MaKaC.common.fossilize import fossilize
+from MaKaC.common.contextManager import ContextManager
 
 
 class WTemplated:
@@ -1886,21 +1889,29 @@ class WUserTableItem(WTemplated):
     def __init__(self, multi=True):
         self._multi = multi
 
-    def getHTML( self, user, selected=False, selectable=True ):
+    def getHTML( self, user, selected=False, selectable=True, parentPrincipalTableId=None ):
         self.__user = user
         self._selected = selected
         self._selectable = selectable
+        self._parentPrincipalTableId = parentPrincipalTableId
         return WTemplated.getHTML( self, {} )
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
+
+        vars["ParentPrincipalTableId"] = self._parentPrincipalTableId
+
+        vars["avatar"] = fossilize(self.__user, IAvatarFossil)
+
         vars["id"] = self.__user.getId()
         vars["email"] = self.__user.getEmail()
         vars["fullName"] = self.__user.getFullName()
-        vars["type"] = "checkbox"
+
+        vars["selectable"] = self._selectable
+        vars["inputType"] = "checkbox"
         selectionText = "checked"
         if not self._multi:
-            vars["type"] = "radio"
+            vars["inputType"] = "radio"
             selectionText = "selected"
         vars["selected"] = ""
         if self._selected:
@@ -1910,8 +1921,6 @@ class WUserTableItem(WTemplated):
             vars["currentUserBasket"] = self._rh._getUser().getPersonalInfo().getBasket()
         else:
             vars["currentUserBasket"] = None
-
-        vars["selectable"] = self._selectable
 
         return vars
 
@@ -2009,6 +2018,13 @@ class WAuthorTableItem(WTemplated):
 
 class WPrincipalTable(WTemplated):
 
+    def __init__(self):
+        WTemplated.__init__(self)
+        if not ContextManager.has("principalTableCounter"):
+            ContextManager.set("principalTableCounter", 0)
+        self._principalTableId = ContextManager.get("principalTableCounter")
+        ContextManager.set("principalTableCounter", self._principalTableId + 1)
+
     def getHTML( self, principalList, target, addPrincipalsURL, removePrincipalsURL, pendings=[], selectable=True ):
         self.__principalList = principalList
         self.__principalList.sort(utils.sortPrincipalsByName)
@@ -2029,7 +2045,7 @@ class WPrincipalTable(WTemplated):
             selected = True
         for principal in self.__principalList:
             if isinstance(principal, user.Avatar):
-                ul.append( WUserTableItem().getHTML( principal, selected, self.__selectable ) )
+                ul.append( WUserTableItem().getHTML( principal, selected, self.__selectable, self._principalTableId ) )
             elif isinstance(principal, user.CERNGroup):
                 ul.append( WGroupNICETableItem().getHTML( principal, selected, self.__selectable ) )
             elif isinstance(principal, user.Group):

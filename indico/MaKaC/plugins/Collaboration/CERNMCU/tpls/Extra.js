@@ -372,7 +372,7 @@ type("ParticipantListField", ["IWidget"],
                         openNewPopup();
                     }
                 }
-                var popup = new UserSearchPopup($T("Add existing person"), handler);
+                var popup = new ChooseUsersPopup($T("Add existing person"), true, null, false, true, null, false, true, handler);
                 popup.open();
             });
 

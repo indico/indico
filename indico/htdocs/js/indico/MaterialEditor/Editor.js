@@ -419,13 +419,12 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
 
         this.password = Html.input('password',{});
 
-        this.userList =  new UserListField('ShortPeopleListDiv',
-                'PeopleList',
-                this.allowedUsers,
-                null,
-                null,
-                true, false, false,
-                userListNothing, userListNothing, userListNothing, true);
+        this.userList = new NewUserListField(
+            'ShortPeopleListDiv', 'PeopleList',
+            null, true, null,
+            true, true, null, null,
+            false, false, true,
+            userListNothing, userListNothing, userListNothing);
 
         // Bind fields to data structure
         $B(this.protectionStatus.accessor('visibility'), this.visibility);
@@ -492,15 +491,18 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
 });
 
 
-type("EditMaterialDialog", ["ServiceDialog", "PreLoadHandler"], {
+type("EditMaterialDialog", ["ServiceDialogWithButtons", "PreLoadHandler"], {
     _preload: [
         function(hook){
             var self = this;
+
+            var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
             var users = indicoSource('material.listAllowedUsers', self.args);
 
             users.state.observe(function(state) {
                 if (state == SourceState.Loaded) {
                     self.allowedUsers = users.get();
+                    killProgress();
                     hook.set(true);
                 }
             });
@@ -569,25 +571,23 @@ type("EditMaterialDialog", ["ServiceDialog", "PreLoadHandler"], {
             Html.option({value: 1},$T('Hidden from unauth. users'))
         );
 
-        self.userList =  new UserListField('ShortPeopleListDiv',
-                                           'PeopleList',
-                                           self.allowedUsers,
-                                           null,
-                                           null,
-                                           true, false, false,
-                                           userListNothing, userListNothing, userListNothing, true);
-
+        this.userList = new NewUserListField(
+                'ShortPeopleListDiv', 'PeopleList',
+                this.allowedUsers, true, null,
+                true, true, null, null,
+                false, false, true,
+                userListNothing, userListNothing, userListNothing);
 
         self.privateInfoDiv = Html.div(
             {style:{padding:pixels(2)}},
             Html.div({},
                      Html.label({}, $T('Allowed users')),
                      self.userList.draw()),
-            Html.div({style:{marginTop: pixels(8)}},
+            Html.div({style:{marginTop: pixels(15)}},
                      Html.label({}, $T('Visibility: ')),
                      $B(visibility,
                         self.newMaterial.accessor('hidden'))),
-            Html.div({style:{marginTop: pixels(5)}},
+            Html.div({style:{marginTop: pixels(10)}},
                      Html.label({}, $T('Access Key: ')),
                      $B(Html.input('password',{}),
                         self.newMaterial.accessor('accessKey')))
@@ -598,7 +598,7 @@ type("EditMaterialDialog", ["ServiceDialog", "PreLoadHandler"], {
 
         var protectionDiv = Html.div(
             {style: {marginTop: pixels(5)}},
-            Html.div({},
+            Html.div({style:{paddingBottom:pixels(10)}},
                      Html.label({},$T("Status: ")),
                      $B(statusSelection,
                         self.newMaterial.accessor('protection'))
@@ -606,18 +606,9 @@ type("EditMaterialDialog", ["ServiceDialog", "PreLoadHandler"], {
             self.privateInfoDiv);
 
         var title = Html.input('text',{});
-        var titleDiv = Widget.block([Html.label({},"Title: "),title]);
-        var description = Html.textarea({name:'description',style: {width: '250px'}});
-        var descDiv = Widget.block([Widget.block(Html.label({},"Description: ")),description]);
-
-        var buttonDiv = Widget.block([
-            Widget.button(command(function() {
-                self._saveCategory();
-            },$T('Save'))),
-            Widget.button(command(function() {
-                self.close();
-            }, $T('Cancel')))
-        ]);
+        var titleDiv = Html.div({style:{paddingBottom:pixels(20)}}, Html.label({},"Title: "), title);
+        var description = Html.textarea({name:'description', style: {width: '100%'}});
+        var descDiv = Html.div({style:{paddingRight:pixels(10)}}, Html.label({}, $T("Description: ")), description);
 
         $B(title, self.newMaterial.accessor('title'));
         $B(description, self.newMaterial.accessor('description'));
@@ -626,13 +617,19 @@ type("EditMaterialDialog", ["ServiceDialog", "PreLoadHandler"], {
 
         var tabControl = new TabWidget([
             [$T("Information"), Widget.block([titleDiv,descDiv])],
-            [$T("Protection") , protectionDiv]], 300,300);
+            [$T("Protection") , protectionDiv]], 300,325);
 
-        return this.ExclusivePopup.prototype.draw.call(
-            this,
-            Html.div({},
-                     tabControl.draw(),
-                     buttonDiv));
+        var saveButton = Html.input('button', {style: {marginRight: pixels(3)}}, $T('Save'));
+        var cancelButton = Html.input('button', {style: {marginLeft: pixels(3)}}, $T('Cancel'));
+        saveButton.observeClick(function(){
+            self._saveCategory();
+        });
+        cancelButton.observeClick(function(){
+            self.close();
+        });
+        var buttonDiv = Html.div({}, saveButton, cancelButton);
+
+        return this.ServiceDialogWithButtons.prototype.draw.call(this, tabControl.draw(), buttonDiv);
     }
 },
 
@@ -652,21 +649,24 @@ type("EditMaterialDialog", ["ServiceDialog", "PreLoadHandler"], {
                  self.open();
              }
          );
-         this.ServiceDialog(Indico.Urls.JsonRpcService, 'material.edit', args, title);
+         this.ServiceDialogWithButtons(Indico.Urls.JsonRpcService, 'material.edit', args, title);
      }
 
     );
 
-type("EditResourceDialog", ["ServiceDialog", "PreLoadHandler"], {
+type("EditResourceDialog", ["ServiceDialogWithButtons", "PreLoadHandler"], {
     _preload:
     [
         function(hook){
             var self = this;
+
+            var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
             var users = indicoSource('material.resources.listAllowedUsers', self.args);
 
             users.state.observe(function(state) {
                 if (state == SourceState.Loaded) {
                     self.allowedUsers = users.get();
+                    killProgress();
                     hook.set(true);
                 }
             });
@@ -689,31 +689,23 @@ type("EditResourceDialog", ["ServiceDialog", "PreLoadHandler"], {
 
         self.newResource = clone(this.resource);
         var name = Html.input('text',{});
-        var nameDiv = Widget.block([Html.label({},$T("Name: ")),name]);
-        var description = Html.textarea({name:'description',style: {width: '200px'}});
-        var descDiv = Widget.block([Widget.block(Html.label({},$T("Description: "))),description]);
+        var nameDiv = Html.div({style:{paddingBottom:pixels(10)}}, Html.label({},$T("Name: ")),name);
         var url = Html.input('text',{name:'url'});
-        var urlDiv = Widget.block([Html.label({},$T("URL: ")),url]);
-        var buttonDiv = Widget.block([
-            Widget.button(command(function() {
-                self._saveResource();
-            }, $T('Save'))),
-            Widget.button(command(function() {
-                self.close();
-            }, $T('Cancel')))
-        ]);
+        var urlDiv = Html.div({style:{paddingBottom:pixels(10)}}, Html.label({},$T("URL: ")), url);
+        var description = Html.textarea({name:'description',style: {width: '100%'}});
+        var descDiv = Html.div({style:{paddingRight:pixels(5)}}, Html.label({},$T("Description: ")), description);
+
 
         $B(name, self.newResource.accessor('name'));
         $B(description, self.newResource.accessor('description'));
         $B(url, self.newResource.accessor('url'));
 
-        self.userList = new UserListField('VeryShortPeopleListDiv',
-                                          'PeopleList',
-                                          self.allowedUsers,
-                                          null,
-                                          null,
-                                          true, false, false,
-                                          userListNothing, userListNothing, userListNothing, true);
+        this.userList = new NewUserListField(
+                'VeryShortPeopleListDiv', 'PeopleList',
+                this.allowedUsers, true, null,
+                true, true, null, null,
+                false, false, true,
+                userListNothing, userListNothing, userListNothing);
 
         var isFatherProtected;
         if(self.material.materialProtection == -1){
@@ -757,7 +749,7 @@ type("EditResourceDialog", ["ServiceDialog", "PreLoadHandler"], {
 
         var protectionDiv = Html.div(
             {style: {marginTop: pixels(5)}},
-            Html.div({},
+            Html.div({style:{paddingBottom:pixels(10)}},
                      Html.label({},$T("Status: ")),
                      $B(statusSelection,
                         self.newResource.accessor('protection'))), self.privateInfoDiv);
@@ -770,10 +762,18 @@ type("EditResourceDialog", ["ServiceDialog", "PreLoadHandler"], {
 
         statusSelection.notifyObservers();
 
+        var saveButton = Html.input('button', {style: {marginRight: pixels(3)}}, $T('Save'));
+        var cancelButton = Html.input('button', {style: {marginLeft: pixels(3)}}, $T('Cancel'));
+        saveButton.observeClick(function(){
+            self._saveResource();
+        });
+        cancelButton.observeClick(function(){
+            self.close();
+        });
+        var buttonDiv = Html.div({}, saveButton, cancelButton);
 
-        return this.ExclusivePopup.prototype.draw.call(
-            this,
-            Html.div({}, tabControl.draw(), buttonDiv));
+        return this.ServiceDialogWithButtons.prototype.draw.call(this, tabControl.draw(), buttonDiv);
+
     }
 },
 
@@ -797,7 +797,7 @@ type("EditResourceDialog", ["ServiceDialog", "PreLoadHandler"], {
          args.resourceId = this.resourceId;
          args.materialId = this.materialId;
 
-         this.ServiceDialog(Indico.Urls.JsonRpcService, 'material.resources.edit', args, title);
+         this.ServiceDialogWithButtons(Indico.Urls.JsonRpcService, 'material.resources.edit', args, title);
      }
     );
 

@@ -124,15 +124,11 @@
 
     //---- chairperson management
 
-    var userList = [];
-    <% from MaKaC.common.PickleJar import DictPickler %>
-    var uf = new UserListField('VeryShortPeopleListDiv', 'PeopleList',
-            userList,
-		    null,
-		    <%= jsonEncode(DictPickler.pickle(rh._getUser().getPersonalInfo().getBasket().getUsers())) %>,
-		    true, true, false,
-		    userListNothing, userListNothing, userListNothing, false,
-            {"grant-manager": ["event modification", false]});
+    var uf = new NewUserListField('VeryShortPeopleListDiv', 'PeopleList',
+            null, true, null,
+            true, false, false, {"grant-manager": ['<%= _("event modification")%>', false]},
+            true, false, true,
+            userListNothing, userListNothing, userListNothing);
 
     $E('chairpersonsContainer').set(uf.draw());
 

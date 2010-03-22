@@ -1844,6 +1844,11 @@ div.UIPeopleListDiv { /* for lists of users in forms */
     overflow: auto;
 }
 
+div.PluginOptionPeopleListDiv {
+    border: 1px dashed #CCCCCC;
+    min-height: 25px;
+}
+
 div.UISearchPeopleListDiv, div.UISuggestedPeopleListDiv {
     overflow: auto;
 }

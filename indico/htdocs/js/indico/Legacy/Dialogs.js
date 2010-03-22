@@ -8,7 +8,6 @@ extend(IndicoUI.Dialogs,
            addSession: function(method, timeStartMethod, args, roomInfo, parentRoomInfo, dayStartDate, favoriteRooms, days, successFunc){
 
                var parameterManager = new IndicoUtil.parameterManager();
-               var favorites;
 
                var info = new WatchObject();
                var dateArgs = clone(args);
@@ -48,16 +47,6 @@ extend(IndicoUI.Dialogs,
                                hook.set(true);
                            }
                        });
-                   },
-                   function(hook) {
-                       var self = this;
-                       var source = indicoSource('user.favorites.listUsers', {});
-                       source.state.observe(function(state) {
-                           if (state == SourceState.Loaded) {
-                               favorites = $L(source);
-                               hook.set(true);
-                           }
-                       });
                    }], function(retValue) {
 
                        killLoadProgress();
@@ -81,7 +70,7 @@ extend(IndicoUI.Dialogs,
                            }
                        };
 
-                       var popup = new ExclusivePopup($T('Add Session'));
+                       var popup = new ExclusivePopupWithButtons($T('Add Session'));
 
                        var roomEditor;
 
@@ -110,11 +99,10 @@ extend(IndicoUI.Dialogs,
                                submitInfo();
                            });
 
-                           var convListWidget = new UserListField(
+                           var convListWidget = new NewUserListField(
                                'VeryShortPeopleListDiv', 'PeopleList',
-                               [],
-                               null,
-                               favorites,
+                               null, true, null,
+                               true, false, null, null,
                                true, true, true,
                                userListNothing, userListNothing, userListNothing);
 
@@ -208,20 +196,20 @@ extend(IndicoUI.Dialogs,
                            colorPicker.setFixedPosition();
                            var colorPickerComponent = ['Color', Html.div({style: {padding: '5px 0 10px 0'}}, colorPicker.getLink(null, 'Choose a color'))];
 
+                           var contentDiv = Html.div({},
+                               IndicoUtil.createFormFromMap([
+                                   [$T('Title'), $B(parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), info.accessor('title'))],
+                                   [$T('Description'), $B(Html.textarea({cols: 40, rows: 2}), info.accessor('description'))],
+                                   [$T('Date'), conferenceDays],
+                                   startEndTimeComponent,
+                                   [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
+                                   colorPickerComponent,
+                                   [$T('Convener(s)'), convListWidget.draw()],
+                                   [$T('Session type'), sesType.draw()]]));
 
-                           return this.ExclusivePopup.prototype.draw.call(
-                               this,
-                               Html.div({},
-                                        IndicoUtil.createFormFromMap([
-                                            [$T('Title'), $B(parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), info.accessor('title'))],
-                                            [$T('Description'), $B(Html.textarea({cols: 40, rows: 2}), info.accessor('description'))],
-                                            [$T('Date'), conferenceDays],
-                                            startEndTimeComponent,
-                                            [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
-                                            colorPickerComponent,
-                                            [$T('Convener(s)'), convListWidget.draw()],
-                                            [$T('Session type'), sesType.draw()]]),
-                                        Html.div({style:{marginTop: pixels(10), textAlign: 'center', background: '#DDDDDD', padding: pixels(2)}},[addButton, cancelButton])));
+                           var buttonDiv = Html.div({}, addButton, cancelButton);
+
+                           return this.ExclusivePopupWithButtons.prototype.draw.call(this, contentDiv, buttonDiv);
                        };
                        popup.open();
                    }).run();
@@ -248,11 +236,10 @@ extend(IndicoUI.Dialogs,
            addSessionSlot: function(method, timeStartMethod, params, roomInfo, parentRoomInfo, confStartDate, dayStartDate, favoriteRooms, days, successFunc, editOn){
                var parameterManager = new IndicoUtil.parameterManager();
                var isEdit = exists(editOn)?editOn:false;
-               var args = isEdit?params:params.args
+               var args = isEdit?params:params.args;
                var dateArgs = clone(args);
                dateArgs.selectedDay = dayStartDate;
                var info = new WatchObject();
-               var favorites;
                var parentRoomData;
                previousDay = dateArgs.selectedDay;
 
@@ -303,16 +290,6 @@ extend(IndicoUI.Dialogs,
                            }
                        });
 
-                   },
-                   function(hook) {
-                       var self = this;
-                       var source = indicoSource('user.favorites.listUsers', {});
-                       source.state.observe(function(state) {
-                           if (state == SourceState.Loaded) {
-                               favorites = $L(source);
-                               hook.set(true);
-                           }
-                       });
                    }], function(retVal) {
 
                        killLoadProgress();
@@ -336,7 +313,7 @@ extend(IndicoUI.Dialogs,
                            }
                        };
 
-                       var popup = new ExclusivePopup(
+                       var popup = new ExclusivePopupWithButtons(
                            isEdit?$T('Edit session block'):$T('Add session block'),
                            function() {
                                popup.close();
@@ -346,7 +323,7 @@ extend(IndicoUI.Dialogs,
 
                        popup.postDraw = function() {
                            roomEditor.postDraw();
-                           this.ExclusivePopup.prototype.postDraw.call(this);
+                           this.ExclusivePopupWithButtons.prototype.postDraw.call(this);
                        };
 
                        popup.draw = function() {
@@ -361,16 +338,16 @@ extend(IndicoUI.Dialogs,
                            if (isEdit){
                                info.set('startDateTime', IndicoUtil.formatDateTime(IndicoUtil.parseJsonDate(params.startDate)));
                                info.set('endDateTime', IndicoUtil.formatDateTime(IndicoUtil.parseJsonDate(params.endDate)));
-                               info.set('title', params.slotTitle)
+                               info.set('title', params.slotTitle);
                                info.set('scheduleEntry', params.scheduleEntryId);
                                info.set('roomInfo',$O({"location": params.inheritLoc?null:params.location,
                                        "room": params.inheritRoom?null:params.room,
                                        "address": params.inheritLoc?'':params.address}));
-                               info.set("conveners", params.conveners)
+                               info.set("conveners", params.conveners);
 
                            }/******************************************************/
                            else {
-                               info.set("conveners", params.sessionConveners)
+                               info.set("conveners", params.sessionConveners);
                                info.set('roomInfo', $O({location: null, room: null}));
                            }
 
@@ -390,11 +367,10 @@ extend(IndicoUI.Dialogs,
                                submitInfo();
                            });
 
-                           var convListWidget = new UserListField(
+                           var convListWidget = new NewUserListField(
                                'VeryShortPeopleListDiv', 'PeopleList',
-                               isEdit?params.conveners:params.sessionConveners,
-                               null,
-                               favorites,
+                               isEdit?params.conveners:params.sessionConveners, true, null,
+                               true, false, null, null,
                                true, true, true,
                                userListNothing, userListNothing, userListNothing);
 
@@ -471,17 +447,16 @@ extend(IndicoUI.Dialogs,
 
                            $B(info.accessor('conveners'), convListWidget.getUsers());
 
-                           return this.ExclusivePopup.prototype.draw.call(
-                               this,
-                               Widget.block([IndicoUtil.createFormFromMap([isEdit ? [$T('Sub-Title'), $B(Html.edit({style: { width: '300px'}}), info.accessor('title'))]:[],
-                                                                           [$T('Date'), conferenceDays],
-                                                                           startEndTimeComponent,
-                                                                           [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
-                                                                           [$T('Convener(s)'), convListWidget.draw()]
-                                                                            ]),
-                                             Html.div('dialogButtons',
-                                                      [addButton, cancelButton])]
-                                           ));
+                           var content = IndicoUtil.createFormFromMap([
+                               isEdit ? [$T('Sub-Title'), $B(Html.edit({style: { width: '300px'}}), info.accessor('title'))]:[],
+                               [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
+                               [$T('Date'), conferenceDays],
+                               startEndTimeComponent,
+                               [$T('Convener(s)'), convListWidget.draw()]]);
+
+                           var buttons = Html.div({}, addButton, cancelButton);
+
+                           return this.ExclusivePopupWithButtons.prototype.draw.call(this, content, buttons);
                        };
 
                        popup.open();
@@ -560,13 +535,12 @@ extend(IndicoUI.Dialogs,
                    });
 
 
-                       var presListWidget = new UserListField(
-                           'VeryShortPeopleListDiv', 'PeopleList',
-                           [],
-                           null,
-                           favorites,
-                           true, true, true,
-                       userListNothing, userListNothing, userListNothing);
+                       var presListWidget = new NewUserListField(
+                               'VeryShortPeopleListDiv', 'PeopleList',
+                               null, true, null,
+                               true, false, null, null,
+                               true, true, true,
+                               userListNothing, userListNothing, userListNothing);
 
                        var keywordField = IndicoUI.Widgets.keywordList('oneLineListItem');
 
