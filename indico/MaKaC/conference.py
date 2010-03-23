@@ -10668,6 +10668,14 @@ class SubContribution(Persistent, Fossilizable, CommonObjectBase):
     def canUserSubmit( self, av ):
         return self.getOwner().canUserSubmit( av )
 
+    def getAllowedToAccessList( self ):
+        """Currently the SubContribution class has no access list.
+        But instead of returning the owner Contribution's access list,
+        I am returning an empty list. Methods such as getRecursiveAllowedToAccess()
+        will call the owner Contribution anyway.
+        """
+        return []
+
     def addMaterial( self, newMat ):
         newMat.setId( str(self.__materialGenerator.newCount()) )
         newMat.setOwner( self )

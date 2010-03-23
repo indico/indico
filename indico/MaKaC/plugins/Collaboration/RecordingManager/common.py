@@ -253,35 +253,39 @@ def parseIndicoID(IndicoID):
     """Given an "Indico ID" of the form shown above, determine whether it is
     a conference, subcontribution etc, and return that info with the individual IDs."""
 
-    pConference      = re.compile('(\d+)')
-    pSession         = re.compile('(\d+)s(\d+)')
-    pContribution    = re.compile('(\d+)c(\d+)')
-    pSubcontribution = re.compile('(\d+)s(\d+)sc(\d+)')
+    pConference      = re.compile('(\d+)$')
+    pSession         = re.compile('(\d+)s(\d+)$')
+    pContribution    = re.compile('(\d+)c(\d+)$')
+    pSubcontribution = re.compile('(\d+)c(\d+)sc(\d+)$')
 
-    mE  = pConference.search(IndicoID)
-    mS  = pSession.search(IndicoID)
-    mC  = pContribution.search(IndicoID)
-    mSC = pSubcontribution.search(IndicoID)
+    mE  = pConference.match(IndicoID)
+    mS  = pSession.match(IndicoID)
+    mC  = pContribution.match(IndicoID)
+    mSC = pSubcontribution.match(IndicoID)
 
     if mE:
+        Logger.get('RecMan').info("searched %s, matched %s" % (IndicoID, 'conference'))
         return {'type':           'conference',
                 'conference':     mE.group(1),
                 'session':        '',
                 'contribution':   '',
                 'subcontribution':''}
     elif mS:
+        Logger.get('RecMan').info("searched %s, matched %s" % (IndicoID, 'session'))
         return {'type':           'session',
                 'conference':     mS.group(1),
                 'session':        mS.group(2),
                 'contribution':   '',
                 'subcontribution':''}
     elif mC:
+        Logger.get('RecMan').info("searched %s, matched %s" % (IndicoID, 'contribution'))
         return {'type':           'contribution',
                 'conference':     mC.group(1),
                 'session':        '',
                 'contribution':   mC.group(2),
                 'subcontribution':''}
     elif mSC:
+        Logger.get('RecMan').info("searched %s, matched %s" % (IndicoID, 'subcontribution'))
         return {'type':           'subcontribution',
                 'conference':     mSC.group(1),
                 'session':        '',
@@ -375,7 +379,7 @@ def createCDSRecord(IndicoID, aw):
     di = DataInt(xmlGen)
     og = outputGenerator(aw, dataInt=di)
 
-    xmlGen.openTag("iconf")
+    xmlGen.openTag("record")
 
     parsed = parseIndicoID(IndicoID)
     Logger.get('RecMan').info("IndicoID = %s", IndicoID)
@@ -386,22 +390,29 @@ def createCDSRecord(IndicoID, aw):
     # Nobody else should need to know this access information, and it shouldn't be accessible
     # to e.g. OAI harvesters outside CERN.
     if parsed["type"] == 'conference':
+        Logger.get('RecMan').info("generating MARC XML for a conference")
         og.confToXMLMarc21(conf, 1, 1, 1, forceCache=True, out=xmlGen, source='RecordingManager')
+#        conf,includeSession,includeContribution,includeMaterial,showSession="all", showContribution="all", out=None, forceCache=False
     elif parsed["type"] == 'session':
+        Logger.get('RecMan').info("generating MARC XML for a session (no such thing)")
         # there is no such method for sessions yet for some reason...
         # og.confToXMLMarc21(conf, 1, 1, 1, forceCache=True, out=xmlGen, source='RecordingManager')
         pass
     elif parsed["type"] == 'contribution':
+        Logger.get('RecMan').info("generating MARC XML for a contribution")
         cont = conf.getContributionById(parsed["contribution"])
-        og.contToXMLMarc21(cont, 1, 1, 1, forceCache=True, out=xmlGen, source='RecordingManager')
+        og.contribToXMLMarc21(cont, includeMaterial=1, forceCache=True, out=xmlGen, source='RecordingManager')
+#                              cont,includeMaterial=1, out=None, forceCache=False, source=None
     elif parsed["type"] == 'subcontribution':
+        Logger.get('RecMan').info("generating MARC XML for a subcontribution")
         cont = conf.getContributionById(parsed["contribution"])
-        subCont = cont.getSubcontributionById(parsed["subcontribution"])
-        og.subContToXMLMarc21(subCont, 1, 1, 1, forceCache=True, out=xmlGen, source='RecordingManager')
+        subCont = cont.getSubContributionById(parsed["subcontribution"])
+        og.subContribToXMLMarc21(subCont, includeMaterial=1, forceCache=True, out=xmlGen, source='RecordingManager')
+#                                subCont,includeMaterial=1, out=None, forceCache=False, source=None
     else:
         Logger.get('RecMan').info("IndicoID = %s", IndicoID)
 
-    xmlGen.closeTag("iconf")
+    xmlGen.closeTag("record")
 
     # Get the MARC XML
     marc = xmlGen.getXml()
