@@ -6196,6 +6196,9 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
         newParams4Next['eMonth'] = nextEndD.month
         newParams4Next['eYear'] = nextEndD.year
 
+        #Number of the RoomBookingBookingListPrevNext templates used in the code.
+        #Variable increments when new template is put.
+        vars["prevNextNo"] = 0
         vars["withPrevNext"] = True
         vars["prevURL"] = urlHandlers.UHRoomBookingBookingList.getURL( newParams = newParams4Previous )
         vars["nextURL"] = urlHandlers.UHRoomBookingBookingList.getURL( newParams = newParams4Next )
