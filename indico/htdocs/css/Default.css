@@ -5746,3 +5746,17 @@ tr.selectedItem td {
 .strongRed strong{
     color: #881122;
 }
+
+div.cloneElements {
+    background: #ECECEC url('../images/grey_gradient2.png') scroll repeat-x bottom left;
+    padding: 10px 20px 10px 10px;
+    color: #444;
+    border: 1px solid #AAA;
+    -moz-border-radius-bottomleft:10px;
+    -moz-border-radius-bottomright:10px;
+    -moz-border-radius-topleft:10px;
+    -moz-border-radius-topright:10px;
+    border-bottom:1px solid #AAAAAA;
+    border-right:1px solid #AAAAAA;
+    width: 450px;
+}

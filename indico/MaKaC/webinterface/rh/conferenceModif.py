@@ -2928,7 +2928,7 @@ class RHConfPerformCloning( RHConferenceModifBase ):
             elif self._cloneType == "days" :
                 self._days(options)
             else :
-                self._redirect( urlHandlers.UHConfModifTools.getURL( self._conf ) )
+                self._redirect( urlHandlers.UHConfClone.getURL( self._conf ) )
         else:
             if self._cloneType == "once" :
                 nbClones = 1
@@ -2946,7 +2946,7 @@ class RHConfPerformCloning( RHConferenceModifBase ):
         elif params["freq"] == "week":
             inter = timedelta( 7*int(params["period"]))
 
-        if params["func"] == "until":
+        if params["intEndDateChoice"] == "until":
             date=self._date
             endDate = datetime(int(params["stdyi"]),int(params["stdmi"]),int(params["stddi"]), self._conf.getEndDate().hour,self._conf.getEndDate().minute)
             while date <= endDate:
@@ -2965,9 +2965,8 @@ class RHConfPerformCloning( RHConferenceModifBase ):
                 elif params["freq"] == "year":
                     date = datetime(int(date.year)+int(params["period"]),int(date.month),int(date.day), int(date.hour), int(date.minute))
 
-        elif params["func"] == "ntimes":
+        elif params["intEndDateChoice"] == "ntimes":
             date = self._date
-            endDate = datetime(int(params["stdyi"]),int(params["stdmi"]),int(params["stddi"]),self._conf.getEndDate().hour,self._conf.getEndDate().minute)
             i=0
             stop = int(params["numi"])
             while i < stop:
@@ -2987,7 +2986,7 @@ class RHConfPerformCloning( RHConferenceModifBase ):
                 elif params["freq"] == "year":
                     date = datetime(int(date.year)+int(params["period"]),int(date.month),int(date.day), int(date.hour), int(date.minute))
         if confirmed:
-            self._redirect( urlHandlers.UHConfModifTools.getURL( self._conf ) )
+            self._redirect( urlHandlers.UHCategoryDisplay.getURL( self._conf.getOwner() ) )
             return "done"
         else:
             return nbClones
@@ -3040,13 +3039,12 @@ class RHConfPerformCloning( RHConferenceModifBase ):
         nbClones = 0
         params = self._getRequestParams()
         #search the first day of the month
-        startDate = self._date
 
         if params["day"] == "NOVAL":
             #self._endRequest()
-            self.redirect( WPConferenceClone.getURL( self._target ) )
+            self.redirect( urlHandlers.UHConfClone.getURL( self._target ) )
 
-        if params["func"] == "until":
+        if params["daysEndDateChoice"] == "until":
             date = self._date
 
             endDate = datetime(int(params["stdyd"]),int(params["stdmd"]),int(params["stddd"]),self._conf.getEndDate().hour,self._conf.getEndDate().minute)
@@ -3087,7 +3085,7 @@ class RHConfPerformCloning( RHConferenceModifBase ):
                     year = year + 1
                 date = datetime(year,month,1, int(date.hour), int(date.minute))
 
-        elif params["func"] == "ntimes":
+        elif params["daysEndDateChoice"] == "ntimes":
 
             date = self._date
             if params["day"] == "OpenDay":
@@ -3126,7 +3124,7 @@ class RHConfPerformCloning( RHConferenceModifBase ):
                     year = year + 1
                 date = datetime(year,month,int(date.day), int(date.hour), int(date.minute))
         if confirmed:
-            self._redirect( urlHandlers.UHConfModifTools.getURL( self._conf ) )
+            self._redirect( urlHandlers.UHCategoryDisplay.getURL( self._conf.getOwner() ) )
         else:
             return nbClones
 

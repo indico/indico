@@ -1362,7 +1362,7 @@ class RHContributionRemoveMaterials(RHContribModifBaseSpecialSesCoordRights):
         self._redirect( url )
 
 
-class RHMaterialsAdd(RHContribModifBase):
+class RHMaterialsAdd(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContribModifAddMaterials
 
     def _checkProtection(self):
@@ -1370,7 +1370,7 @@ class RHMaterialsAdd(RHContribModifBase):
         if self._target.canUserSubmit(self._aw.getUser()) \
             and (not material or material.getReviewingState() < 3):
             return
-        RHContribModifBase._checkProtection(self)
+        RHContribModifBaseSpecialSesCoordRights._checkProtection(self)
 
     def _checkParams(self, params):
         RHContribModifBase._checkParams(self, params)

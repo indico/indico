@@ -11552,8 +11552,8 @@ msgid "Adding a new convener"
 msgstr "Ajouter un nouveau président de session"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConferenceClone.tpl:64
-msgid "Clone the conference :"
-msgstr "Cloner la conférence"
+msgid "Clone the event:"
+msgstr "Cloner l'événement"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/participant.py:401
 msgid "Removed participant %s %s (%s)"
