@@ -32,6 +32,15 @@ function userSort(user1, user2) {
     }
 }
 
+function updateFavList(favouriteList) {
+    IndicoGlobalVars.favIds = {};
+    IndicoGlobalVars.favList = [];
+    each(favouriteList, function(user) {
+        IndicoGlobalVars.favIds[user.id] = true;
+        IndicoGlobalVars.favList.push(user);
+    });
+}
+
 /**
  * @param {String} style The class name of the <ul> element inside this FoundPeopleList
  *                       If left to null, it will be "UIPeopleList"
@@ -95,6 +104,9 @@ type ("FoundPeopleList", ["SelectableListWidget"], {
     }
 },
 
+    /**
+     * Constructor for FoundPeopleList
+     */
     function(style, onlyOne, selectionObserver, showFavouritizeButtons, favouriteButtonObserver) {
 
         if (!exists(style)) {
@@ -198,7 +210,7 @@ type ("SimpleSearchPanel", ["IWidget"], {
 },
 
     /**
-     * Constructor
+     * Constructor for SimpleSearchPanel
      */
     function(onlyOne, selectionObserver, showFavouritizeButtons, favouriteButtonObserver) {
 
@@ -319,7 +331,7 @@ type ("UserSearchPanel", ["SimpleSearchPanel"], {
 },
 
     /**
-     * Constructor
+     * Constructor for UserSearchPanel
      */
     function(onlyOne, selectionObserver, conferenceId, showFavouritizeButtons, favouriteButtonObserver){
         this.SimpleSearchPanel(onlyOne, selectionObserver, showFavouritizeButtons, favouriteButtonObserver);
@@ -402,7 +414,7 @@ type ("GroupSearchPanel", ["SimpleSearchPanel"], {
 },
 
     /**
-     * Constructor
+     * Constructor for GroupSearchPanel
      */
     function(onlyOne, selectionObserver, conferenceId, showFavouritizeButtons){
         this.SimpleSearchPanel(onlyOne, selectionObserver, conferenceId, showFavouritizeButtons);
@@ -474,7 +486,7 @@ type ("UserAndGroupsSearchPanel", ["IWidget"], {
 },
 
     /**
-     * Constructor
+     * Constructor for UserAndGroupsSearchPanel
      */
     function(onlyOne, selectionObserver, conferenceId, showFavouritizeButtons, favouriteButtonObserver){
         this.IWidget();
@@ -593,7 +605,32 @@ type ("SuggestedUsersPanel", ["IWidget"], {
  * @param {Function} process A function that will be called when new users (from new data, or from the search dialog, or from the suggested list) is added to the list.
  *                           The function will be passed a list of WatchObjects representing the users, even when onlyOne is true.
  */
-type("ChooseUsersPopup", ["ExclusivePopupWithButtons"], {
+type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
+
+    _preload: [
+
+        function(hook) {
+            var self = this;
+
+            if (exists(IndicoGlobalVars.favList)) {
+                hook.set(true);
+            } else {
+                var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
+                indicoRequest('user.favorites.listUsers', {},
+                    function(result, error) {
+                        if (!error) {
+                            updateFavList(result);
+                            killProgress();
+                            hook.set(true);
+                        } else {
+                            killProgress();
+                            IndicoUI.Dialogs.Util.error(error);
+                        }
+                    }
+                );
+            }
+        }
+    ],
 
     __buildSearchPanel: function(container) {
         var self = this;
@@ -760,6 +797,7 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons"], {
              onlyOne, showFavouritizeButtons,
              chooseProcess) {
 
+        var self = this;
 
         this.allowSearch = allowSearch;
         this.conferenceId = conferenceId;
@@ -781,6 +819,11 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons"], {
         this.cellSuggested = null;
 
         // We build the dialog.
+        this.PreLoadHandler(
+            self._preload,
+            function() {
+                self.open();
+            });
         this.ExclusivePopupWithButtons(title, positive);
     }
 );
@@ -884,7 +927,7 @@ type("SingleUserField", ["IWidget"], {
                                                            self.includeFavourites, self.suggestedUsers,
                                                            true, true,
                                                            chooseUserHandler);
-                userChoosePopup.open();
+                userChoosePopup.execute();
             });
 
             fixedButtonsDiv.append(chooseButton);
@@ -1323,7 +1366,7 @@ type("UserListWidget", ["ListWidget"],
 
                  var buttonDiv = Html.div({style: {cssFloat: "right", paddingRight: pixels(10), paddingTop: pixels(5)}});
 
-                 if (IndicoGlobalVars.isUserAuthenticated && this.showFavouritizeButtons && userData.get('_type') === "Avatar") {
+                 if (IndicoGlobalVars.isUserAuthenticated && exists(IndicoGlobalVars.favIds) && this.showFavouritizeButtons && userData.get('_type') === "Avatar") {
                      var favouritizeButton = new FavouritizeButton(userData.getAll()).draw();
                      buttonDiv.append(favouritizeButton);
                  }
@@ -1769,7 +1812,7 @@ type("UserListField", ["IWidget"], {
             chooseUserButton.observeClick(function() {
                 var chooseUsersPopup = new ChooseUsersPopup(title, self.allowSearch, self.conferenceId, self.enableGroups,
                         self.includeFavourites, self.suggestedUsers, false, self.showFavouritizeButtons, peopleAddedHandler);
-                chooseUsersPopup.open();
+                chooseUsersPopup.execute();
             });
 
             buttonDiv.append(chooseUserButton);

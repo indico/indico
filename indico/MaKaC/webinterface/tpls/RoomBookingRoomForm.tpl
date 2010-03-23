@@ -276,6 +276,6 @@
                                          $E('responsibleId').set(users[0].id);
                                      });
 
-    popup.open();
+    popup.execute();
   }
 </script>

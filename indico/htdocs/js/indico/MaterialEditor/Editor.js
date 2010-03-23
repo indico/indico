@@ -491,21 +491,47 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
 });
 
 
-type("EditMaterialDialog", ["ServiceDialogWithButtons", "PreLoadHandler"], {
+type("EditMaterialResourceBase", ["ServiceDialogWithButtons"], {
+
+    _preloadAllowedUsers: function(hook, method) {
+        var self = this;
+
+        var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
+        if (IndicoGlobalVars.isUserAuthenticated && !exists(IndicoGlobalVars.favIds)) {
+            self.args.includeFavList = true;
+        } else {
+            self.args.includeFavList = false;
+        }
+        var users = indicoSource(method, self.args);
+
+        users.state.observe(function(state) {
+            if (state == SourceState.Loaded) {
+                var result = users.get();
+                if (self.args.includeFavList) {
+                    self.allowedUsers = result[0];
+                    updateFavList(result[1]);
+                } else {
+                    self.allowedUsers = result;
+                }
+                killProgress();
+                hook.set(true);
+            } else if (state == SourceState.Error) {
+                killProgress();
+                IndicoUtil.errorReport(users.error.get());
+            }
+        });
+    }
+},
+
+    function(endPoint, method, args, title, closeHandler) {
+        this.ServiceDialogWithButtons(endPoint, method, args, title, closeHandler);
+    }
+);
+
+type("EditMaterialDialog", ["EditMaterialResourceBase", "PreLoadHandler"], {
     _preload: [
         function(hook){
-            var self = this;
-
-            var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
-            var users = indicoSource('material.listAllowedUsers', self.args);
-
-            users.state.observe(function(state) {
-                if (state == SourceState.Loaded) {
-                    self.allowedUsers = users.get();
-                    killProgress();
-                    hook.set(true);
-                }
-            });
+            this._preloadAllowedUsers(hook, 'material.listAllowedUsers');
         }
     ],
 
@@ -629,7 +655,7 @@ type("EditMaterialDialog", ["ServiceDialogWithButtons", "PreLoadHandler"], {
         });
         var buttonDiv = Html.div({}, saveButton, cancelButton);
 
-        return this.ServiceDialogWithButtons.prototype.draw.call(this, tabControl.draw(), buttonDiv);
+        return this.EditMaterialResourceBase.prototype.draw.call(this, tabControl.draw(), buttonDiv);
     }
 },
 
@@ -649,27 +675,16 @@ type("EditMaterialDialog", ["ServiceDialogWithButtons", "PreLoadHandler"], {
                  self.open();
              }
          );
-         this.ServiceDialogWithButtons(Indico.Urls.JsonRpcService, 'material.edit', args, title);
+         this.EditMaterialResourceBase(Indico.Urls.JsonRpcService, 'material.edit', args, title);
      }
 
     );
 
-type("EditResourceDialog", ["ServiceDialogWithButtons", "PreLoadHandler"], {
+type("EditResourceDialog", ["EditMaterialResourceBase", "PreLoadHandler"], {
     _preload:
     [
         function(hook){
-            var self = this;
-
-            var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
-            var users = indicoSource('material.resources.listAllowedUsers', self.args);
-
-            users.state.observe(function(state) {
-                if (state == SourceState.Loaded) {
-                    self.allowedUsers = users.get();
-                    killProgress();
-                    hook.set(true);
-                }
-            });
+            this._preloadAllowedUsers(hook, 'material.resources.listAllowedUsers');
         }
     ],
 
@@ -772,7 +787,7 @@ type("EditResourceDialog", ["ServiceDialogWithButtons", "PreLoadHandler"], {
         });
         var buttonDiv = Html.div({}, saveButton, cancelButton);
 
-        return this.ServiceDialogWithButtons.prototype.draw.call(this, tabControl.draw(), buttonDiv);
+        return this.EditMaterialResourceBase.prototype.draw.call(this, tabControl.draw(), buttonDiv);
 
     }
 },
@@ -797,7 +812,7 @@ type("EditResourceDialog", ["ServiceDialogWithButtons", "PreLoadHandler"], {
          args.resourceId = this.resourceId;
          args.materialId = this.materialId;
 
-         this.ServiceDialogWithButtons(Indico.Urls.JsonRpcService, 'material.resources.edit', args, title);
+         this.EditMaterialResourceBase(Indico.Urls.JsonRpcService, 'material.resources.edit', args, title);
      }
     );
 

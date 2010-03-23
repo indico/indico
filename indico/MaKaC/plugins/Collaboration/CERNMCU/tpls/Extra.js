@@ -373,7 +373,7 @@ type("ParticipantListField", ["IWidget"],
                     }
                 }
                 var popup = new ChooseUsersPopup($T("Add existing person"), true, null, false, true, null, false, true, handler);
-                popup.open();
+                popup.execute();
             });
 
             addNewRoomButton.observeClick(function(){
