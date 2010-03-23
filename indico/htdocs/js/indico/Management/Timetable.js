@@ -951,7 +951,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
 
      });
 
-type("MoveEntryDialog", ["ExclusivePopup"],
+type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
         {
 
             getChosenValue: function() {
@@ -1114,13 +1114,19 @@ type("MoveEntryDialog", ["ExclusivePopup"],
                     $T("Please select the place where you want to move it to."));
 
                 // We construct the "ok" button and what happens when it's pressed
-                var okButton = Html.input('button', '', "OK");
+                var okButton = Html.input('button', '', $T("Move Entry"));
                 okButton.observeClick(function() {
+                    var value = self.getChosenValue();
+
+                    // if nothing has been selected yet
+                    if (!value) {
+                        return false;
+                    }
+
                     var killProgress = IndicoUI.Dialogs.Util.progress("Moving the entry...");
 
                     indicoRequest('schedule.moveEntry', {
-                        value : self.getChosenValue(),
-                        OK : 'OK',
+                        value : value,
                         conference : self.confId,
                         scheduleEntryId : self.scheduleEntryId,
                         sessionId : self.sessionId,
@@ -1138,24 +1144,8 @@ type("MoveEntryDialog", ["ExclusivePopup"],
                     });
                 });
 
-                // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
-                var cancelButton = Html.input('button',  {
-                    style : {
-                        marginLeft : pixels(5)
-                    }
-                }, "Cancel");
-                cancelButton.observeClick(function() {
-                    self.close();
-                });
 
-                var buttonDiv = Html.div( {
-                    style : {
-                        textAlign : "center",
-                        marginTop : pixels(10)
-                    }
-                }, okButton, cancelButton);
-
-                return this.ExclusivePopup.prototype.draw.call(this, Widget.block( [Html.div({}, span1, span2), this.tabWidget.draw(), Html.br(), buttonDiv ]));
+                return this.ExclusivePopupWithButtons.prototype.draw.call(this, Widget.block( [Html.div({}, span1, span2), this.tabWidget.draw()]), okButton);
             },
 
             /*
@@ -1179,7 +1169,7 @@ type("MoveEntryDialog", ["ExclusivePopup"],
             },
             postDraw: function(){
                 this.tabWidget.postDraw();
-                this.ExclusivePopup.prototype.postDraw.call(this);
+                this.ExclusivePopupWithButtons.prototype.postDraw.call(this);
             }
         },
 
@@ -1198,10 +1188,10 @@ type("MoveEntryDialog", ["ExclusivePopup"],
 
             var self = this;
 
-            this.ExclusivePopup($T("Move Timetable Entry"),
-                                function() {
-                                    self.close();
-                                });
+            this.ExclusivePopupWithButtons($T("Move Timetable Entry"),
+                                           function() {
+                                               self.close();
+                                           });
         });
 
 
