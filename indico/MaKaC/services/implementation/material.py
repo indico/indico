@@ -8,7 +8,7 @@ from MaKaC.common.PickleJar import DictPickler
 import MaKaC.webinterface.locators as locators
 from MaKaC.user import AvatarHolder, GroupHolder
 
-from MaKaC.services.interface.rpc.common import ServiceError
+from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
 
 from MaKaC.services.implementation.base import ParameterManager
 from MaKaC.services.implementation.base import ProtectedModificationService
@@ -49,16 +49,22 @@ class MaterialBase(object):
             l.setMaterial( self._params, 0 )
             self._target = l.getObject()
 
-            if isinstance(self._target, conference.Material):
-                self._material = self._target
 
-            if isinstance(self._target, conference.Category):
-                self._categ = self._target
-            else:
-                self._conf = self._target.getConference()
+            #if isinstance(self._target, conference.Material):
+            self._material = self._target
+            self._conf = self._target.getConference()
+            self._categ = self._conf.getOwner()
 
-            if self._conf == None:
-                self._categ=self._target.getCategory()
+            ## TODO: remove this, since material/resource creation
+            ## doesn't come through this method
+
+            ## if isinstance(self._target, conference.Category):
+            ##     self._categ = self._target
+            ## else:
+            ##     self._conf = self._target.getConference()
+
+            ## if self._conf == None:
+            ##     self._categ=self._target.getCategory()
 
 
         except Exception, e:
@@ -78,23 +84,37 @@ class MaterialModifBase(MaterialBase, ProtectedModificationService):
 
     def _checkProtection(self):
 
-        if self._material: #target is a material
-            if isinstance(self._material.getOwner(), conference.Contribution) and \
-                self._material.getOwner().canUserSubmit(self._aw.getUser()) and \
-                self._material.getReviewingState() < 3:
+        owner = self._material.getOwner()
+
+        # There are two exceptions to the normal permission scheme:
+        # (sub-)contribution submitters and session coordinators
+
+        # in case the owner is a (sub-)contribution, we should
+        # allow submitters
+        if isinstance(owner, conference.Contribution) or \
+           isinstance(owner, conference.SubContribution):
+
+            reviewingState = self._material.getReviewingState()
+
+            if (reviewingState < 3 and
+                owner.canUserSubmit(self._aw.getUser())):
+                # Submitters have access
                 return
-            elif self._material.getSession() != None and \
-                   self._material.getSession().canCoordinate(self._aw, "modifContribs"):
-                # Session coordiantors have access
+            elif owner.getSession() and owner.getSession().canCoordinate(self._aw, "modifContribs"):
+                # Coordinators of the parent session have access
                 return
-        elif isinstance(self._target, conference.Contribution): #target is a contribution
-            if self._target.canUserSubmit(self._aw.getUser()):
-                return
+
+        # if it's associated with a session, coordinators
+        # should be allowed
+        elif self._material.getSession() != None and \
+            self._material.getSession().canCoordinate(self._aw, "modifContribs"):
+            # Session coordinators have access
+            return
 
         try:
             ProtectedModificationService._checkProtection(self)
         except ModificationError:
-            raise ServiceError("ERR-M2", _("you are not authorised to manage material for this contribution"))
+            raise ServiceAccessError("ERR-P5", _("you are not authorised to manage material for this contribution"))
         except Exception, e:
             raise e
 
@@ -208,36 +228,6 @@ class GetMaterialProtection(MaterialModifBase):
         else:
             return materialId.getAccessProtectionLevel()
 
-class AddMaterialClassBase(MaterialModifBase):
-    """
-    Base class for addition of material classes
-    """
-
-    def _checkParams(self):
-        """
-        Gets the parameters for the new material class
-        (name and description)
-        """
-        MaterialModifBase._checkParams(self)
-        self._matName = self._params.get('materialName', None)
-        self._matDescription = self._params.get('description', None)
-
-    def _getAnswer(self):
-        """
-        Creates the material class, and sets its properties
-        """
-
-        mats = self._target.getMaterialList()
-
-        for m in mats:
-            if m.getTitle() == self._matName:
-                raise ServiceError("ERR-M1", _("A material with this same name already exists"))
-
-        mat = conference.Material()
-        mat.setTitle(self._matName)
-        mat.setDescription(self._matDescription)
-        self._target.addMaterial( mat )
-        return DictPickler.pickle(mat)
 
 class EditMaterialClassBase(MaterialModifBase, UserListChange):
     """
@@ -362,7 +352,6 @@ methodMap = {
 
     "list": GetMaterialClassesBase,
     "listAllowedUsers": GetMaterialAllowedUsers,
-    "add": AddMaterialClassBase,
     "get": GetMaterial,
     "edit": EditMaterialClassBase,
     "delete": DeleteMaterialClassBase,
