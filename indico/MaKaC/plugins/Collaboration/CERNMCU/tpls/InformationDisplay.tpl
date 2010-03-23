@@ -1,12 +1,20 @@
 <table>
     <tbody>
+        <tr>
+            <td class="collaborationConfDisplayInfoLeftCol">
+                <span><%= _('Name')%>:</span>
+            </td>
+            <td class="collaborationConfDisplayInfoRightCol">
+                <%= Booking._bookingParams["name"] %>
+            </td>
+        </tr>
         <% if Booking.getHasPin(): %>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
                 <span><%= _('Protection')%>:</span>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                <%= _("This conference is protected by a PIN.") %>      
+                <%= _("This conference is protected by a PIN.") %>
             </td>
         </tr>
         <% end %>
@@ -15,7 +23,7 @@
                 <span><%= _('Description')%>:</span>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                <%= Booking._bookingParams["description"] %>      
+                <%= Booking._bookingParams["description"] %>
             </td>
         </tr>
         <tr>

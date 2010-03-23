@@ -139,8 +139,6 @@ class CSBooking(CSBookingBase):
     def _getTitle(self):
         return self._bookingParams["meetingTitle"]
 
-    def _getPluginDisplayName(self):
-        return "EVO"
 
     def _checkBookingParams(self):
         if self._bookingParams["communityId"] not in self._EVOOptions["communityList"].getValue(): #change when list of community names is ok

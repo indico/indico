@@ -771,57 +771,11 @@
 
                 <!-- Start of a booking line -->
                 <div class="collaborationDisplayBookingLine">
-                  <xsl:if test="count(child::information) = 0">
-                    <span class="collaborationDisplayBookingTitle"><xsl:value-of select="./title"/></span>
+
+                  <span class="collaborationDisplayBookingType">
+                    <xsl:value-of select="./typeDisplayName"/>
                     <xsl:text>:</xsl:text>
-                  </xsl:if>
-
-                  <xsl:if test="count(child::information) = 1">
-                    <span class="fakeLink" id="collaborationBookingTitle{./id}"><xsl:value-of select="./title"/></span>
-                    <xsl:text>:</xsl:text>
-
-                    <xsl:text disable-output-escaping="yes"><![CDATA[
-                    <script type="text/javascript">
-
-                      $E('collaborationBookingTitle]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                        <xsl:text disable-output-escaping="yes"><![CDATA[').dom.onmouseover = function (event) {
-                          IndicoUI.Widgets.Generic.tooltip($E('collaborationBookingTitle]]></xsl:text>
-                            <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                            <xsl:text disable-output-escaping="yes"><![CDATA[').dom, event, ]]></xsl:text>
-                              <xsl:text disable-output-escaping="yes">'&lt;div class=&quot;collaborationLinkTooltipMeetingLecture&quot;&gt;</xsl:text>
-                              <xsl:text>Click here to show / hide detailed information.</xsl:text>
-                              <xsl:text disable-output-escaping="yes">&lt;/div&gt;'</xsl:text>
-                              <xsl:text disable-output-escaping="yes"><![CDATA[
-                              );
-                        }
-
-                      var bookingInfoState]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                      <xsl:text disable-output-escaping="yes"><![CDATA[ = false;
-                      $E('collaborationBookingTitle]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                      <xsl:text disable-output-escaping="yes"><![CDATA[').observeClick(function() {
-                        if (bookingInfoState]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                      <xsl:text disable-output-escaping="yes"><![CDATA[) {
-                        IndicoUI.Effect.disappear($E('collaborationInfoLine]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                        <xsl:text disable-output-escaping="yes"><![CDATA['));
-                      } else {
-                        IndicoUI.Effect.appear($E('collaborationInfoLine]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                        <xsl:text disable-output-escaping="yes"><![CDATA['));
-                      }
-                      bookingInfoState]]></xsl:text>
-                      <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                    <xsl:text disable-output-escaping="yes"><![CDATA[ = !bookingInfoState]]></xsl:text>
-                      <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                    <xsl:text disable-output-escaping="yes"><![CDATA[
-                    });
-                  </script>
-                    ]]></xsl:text>
-                  </xsl:if>
+                  </span>
 
                   <xsl:choose>
                     <xsl:when test="./kind = 'scheduled' and substring(./startDate,0,11) = substring(./endDate,0,11)">
@@ -887,13 +841,64 @@
                       <xsl:value-of select="substring(./endDate,12,5)"/>
                     </xsl:otherwise>
                   </xsl:choose>
+                  <xsl:text>. </xsl:text>
 
-                  <xsl:text> (</xsl:text>
-                  <xsl:value-of select="./typeDisplayName"/>
-                  <xsl:text>) </xsl:text>
+                  <xsl:if test="count(child::firstLineInfo) = 1">
+                    <xsl:value-of select="./firstLineInfo"/>
+                  </xsl:if>
+
+                  <xsl:if test="count(child::information) = 1">
+                    <span class="fakeLink collaborationDisplayLink" id="collaborationBookingMoreInfo{./id}">More Info</span>
+
+                    <xsl:text disable-output-escaping="yes"><![CDATA[
+                    <script type="text/javascript">
+
+                      $E('collaborationBookingMoreInfo]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                        <xsl:text disable-output-escaping="yes"><![CDATA[').dom.onmouseover = function (event) {
+                          IndicoUI.Widgets.Generic.tooltip($E('collaborationBookingMoreInfo]]></xsl:text>
+                            <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                            <xsl:text disable-output-escaping="yes"><![CDATA[').dom, event, ]]></xsl:text>
+                              <xsl:text disable-output-escaping="yes">'&lt;div class=&quot;collaborationLinkTooltipMeetingLecture&quot;&gt;</xsl:text>
+                              <xsl:text>Click here to show / hide detailed information.</xsl:text>
+                              <xsl:text disable-output-escaping="yes">&lt;/div&gt;'</xsl:text>
+                              <xsl:text disable-output-escaping="yes"><![CDATA[
+                              );
+                        }
+
+                      var bookingInfoState]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                      <xsl:text disable-output-escaping="yes"><![CDATA[ = false;
+                      $E('collaborationBookingMoreInfo]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                      <xsl:text disable-output-escaping="yes"><![CDATA[').observeClick(function() {
+                        if (bookingInfoState]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                      <xsl:text disable-output-escaping="yes"><![CDATA[) {
+                        IndicoUI.Effect.disappear($E('collaborationInfoLine]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                        <xsl:text disable-output-escaping="yes"><![CDATA['));
+                      } else {
+                        IndicoUI.Effect.appear($E('collaborationInfoLine]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                        <xsl:text disable-output-escaping="yes"><![CDATA['));
+                      }
+                      bookingInfoState]]></xsl:text>
+                      <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                    <xsl:text disable-output-escaping="yes"><![CDATA[ = !bookingInfoState]]></xsl:text>
+                      <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                    <xsl:text disable-output-escaping="yes"><![CDATA[
+                    });
+                  </script>
+                    ]]></xsl:text>
+                  </xsl:if>
+
+                  <xsl:if test="count(child::information) = 1 and count(child::launchInfo) = 1">
+                    <span class="collaborationDisplayLink">|</span>
+                  </xsl:if>
 
                   <xsl:if test="count(child::launchInfo) = 1">
-                    <a href="{./launchInfo/launchLink}" id="bookingLaunchLink{./id}">
+                    <a class="collaborationDisplayLink" href="{./launchInfo/launchLink}" id="bookingLaunchLink{./id}">
                       <xsl:value-of select="./launchInfo/launchText"/>
                     </a>
                     <xsl:text disable-output-escaping="yes"><![CDATA[

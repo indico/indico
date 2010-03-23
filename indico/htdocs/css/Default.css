@@ -4346,8 +4346,8 @@ div.collaborationDisplayDateGroup {
     padding-bottom: 15px;
 }
 
-span.collaborationDisplayBookingTitle {
-    color: black;
+.collaborationDisplayLink {
+    margin-left: 5px;
 }
 
 div.collaborationDisplayBookingLine {

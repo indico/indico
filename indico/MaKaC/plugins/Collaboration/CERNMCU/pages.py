@@ -59,9 +59,9 @@ class WMain (WJSBase):
         if location and room and location.getName() and room.getName() and location.getName().strip() and room.getName().strip():
             locationName = location.getName()
             roomName = room.getName()
-            
+
             vars["IncludeInitialRoom"] = True
-            vars["IPRetrievalResult"] = -1 # 0 = OK, 1 = room without H323 IP, 2 = room with invalid H323 IP, 3 = connection to RB problem, 4 = another unknown problem 
+            vars["IPRetrievalResult"] = -1 # 0 = OK, 1 = room without H323 IP, 2 = room with invalid H323 IP, 3 = connection to RB problem, 4 = another unknown problem
             vars["InitialRoomName"] = roomName
             if self._conf.getLocation():
                 vars["InitialRoomInstitution"] = locationName
@@ -80,7 +80,7 @@ class WMain (WJSBase):
 
                     try:
                         returnedRooms = CrossLocationQueries.getRooms( location = locationName, roomName = roomName )
-    
+
                         if isinstance(returnedRooms, list):
                             if len(returnedRooms) == 0:
                                 returnedRoom = None
@@ -88,9 +88,9 @@ class WMain (WJSBase):
                                 returnedRoom = returnedRooms[0]
                         else:
                             returnedRoom = returnedRooms
-    
+
                         if (returnedRoom != None) and (attName in returnedRoom.customAtts):
-    
+
                             initialRoomIp = returnedRoom.customAtts[attName]
                             if (initialRoomIp.strip() == ""):
                                 vars["IPRetrievalResult"] = 1
@@ -98,11 +98,11 @@ class WMain (WJSBase):
                                 vars["IPRetrievalResult"] = 2
                             else:
                                 vars["IPRetrievalResult"] = 0
-    
+
                         else:
                             initialRoomIp = "IP not defined for this room."
                             vars["IPRetrievalResult"] = 2
-                            
+
                     except AttributeError:
                         #CrossLocationQueries.getRooms fails because it does not handle location names that are not in the DB
                         initialRoomIp = "Please enter IP"
@@ -152,7 +152,7 @@ class WExtra (WJSBase):
         roomsWithH323IP = []
 
         if self._conf:
-            
+
             # Code to get a list of H.323 Videoconference-able rooms
             # by querying Indico's RB database
             location = self._conf.getLocation()
@@ -179,10 +179,10 @@ class WExtra (WJSBase):
                                     returnedRooms = [returnedRooms]
                                 else:
                                     returnedRooms = []
-    
+
                             for room in returnedRooms:
                                 roomsWithH323IP.append(RoomWithH323(locationName, room._getName(), room.customAtts[attName]))
-                                
+
                         except AttributeError:
                             #CrossLocationQueries.getRooms fails because it does not handle location names that are not in the DB
                             pass
@@ -224,17 +224,22 @@ class XMLGenerator(object):
 
     @classmethod
     def getDisplayName(cls):
-        return "MCU"
+        return "MCU Conference"
 
     @classmethod
     def getCustomBookingXML(cls, booking, displayTz, out):
 
         out.openTag("information")
 
+        out.openTag("section")
+        out.writeTag("title", _('Name:'))
+        out.writeTag("line", booking._bookingParams["name"])
+        out.closeTag("section")
+
         if booking.getHasPin():
             out.openTag("section")
             out.writeTag("title", _('Protection:'))
-            out.writeTag("line", _('This conference is protected by a PIN'))
+            out.writeTag("line", _('This conference is protected by a PIN.'))
             out.closeTag("section")
 
         out.openTag("section")

@@ -104,7 +104,7 @@ class XMLGenerator(object):
 
     @classmethod
     def getDisplayName(cls):
-        return "EVO"
+        return "EVO Meeting"
 
     @classmethod
     def getCustomBookingXML(cls, booking, displayTz, out):
@@ -118,13 +118,20 @@ class XMLGenerator(object):
 
         out.openTag("information")
 
+        out.openTag("section")
+        out.writeTag("title", _('Title:'))
+        out.writeTag("line", booking._bookingParams["meetingTitle"])
+        out.closeTag("section")
+
         if booking.getHasAccessPassword():
             out.openTag("section")
             out.writeTag("title", _('Protection:'))
-            out.writeTag("line", _('This EVO meeting is protected by a password'))
+            out.writeTag("line", _('This EVO meeting is protected by a password.'))
             out.closeTag("section")
+
         out.openTag("section")
         out.writeTag("title", _('Description:'))
         out.writeTag("line", booking._bookingParams["meetingDescription"])
         out.closeTag("section")
+
         out.closeTag("information")

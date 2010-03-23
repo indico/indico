@@ -19,7 +19,6 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from datetime import datetime
-from datetime import timedelta
 from pytz import timezone
 from MaKaC.plugins.base import PluginsHolder
 try:
@@ -41,7 +40,7 @@ from Configuration import Config
 from xmlGen import XMLGen
 import os, time
 from MaKaC.i18n import _
-from MaKaC.common.timezoneUtils import DisplayTZ, nowutc, getAdjustedDate
+from MaKaC.common.timezoneUtils import DisplayTZ, nowutc
 from MaKaC.common.utils import getHierarchicalId
 from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
 from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
@@ -378,64 +377,8 @@ class outputGenerator:
         #plugins XML
         out.openTag("plugins")
         if PluginsHolder().hasPluginType("Collaboration"):
-
-            #collaboration XML
-            out.openTag("collaboration")
-            csbm = conf.getCSBookingManager()
-
-            out.writeComment("Needed for timezone awareness")
-            out.writeTag("todayReference", getAdjustedDate(nowutc(), None, tz).strftime("%Y-%m-%d"))
-            out.writeTag("tomorrowReference", getAdjustedDate(nowutc() + timedelta(days = 1), None, tz).strftime("%Y-%m-%d"))
-
-            pluginNames = csbm.getEventDisplayPlugins()
-
-            bookingXmlGenerators = {}
-
-            from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
-            for pluginName in pluginNames:
-                xmlGenerator = CollaborationTools.getXMLGenerator(pluginName)
-                bookingXmlGenerators[pluginName] = xmlGenerator
-
-            bookings = csbm.getBookingList(filterByType = pluginNames, notify = True, onlyPublic = True)
-            bookings.sort(key = lambda b: b.getStartDate())
-
-            ongoingBookings = []
-            scheduledBookings = []
-
-            for b in bookings:
-                if b.canBeStarted():
-                    ongoingBookings.append(b)
-                if b.hasStartDate() and b.getAdjustedStartDate('UTC') > nowutc():
-                    scheduledBookings.append(b)
-
-            for b in ongoingBookings :
-                bookingType = b.getType()
-                out.openTag("booking")
-                out.writeTag("id", b.getId())
-                out.writeTag("title", b._getTitle())
-                out.writeTag("kind", "ongoing")
-                out.writeTag("type", bookingType)
-                out.writeTag("typeDisplayName", b._getPluginDisplayName())
-                out.writeTag("startDate", b.getAdjustedStartDate(tz).strftime("%Y-%m-%dT%H:%M:%S"))
-                out.writeTag("endDate",b.getAdjustedEndDate(tz).strftime("%Y-%m-%dT%H:%M:%S"))
-                bookingXmlGenerators[bookingType].getCustomBookingXML(b, tz, out)
-                out.closeTag("booking")
-
-            for b in scheduledBookings :
-                bookingType = b.getType()
-                out.openTag("booking")
-                out.writeTag("id", b.getId())
-                out.writeTag("title", b._getTitle())
-                out.writeTag("kind", "scheduled")
-                out.writeTag("type", bookingType)
-                out.writeTag("typeDisplayName", b._getPluginDisplayName())
-                out.writeTag("startDate", b.getAdjustedStartDate(tz).strftime("%Y-%m-%dT%H:%M:%S"))
-                out.writeTag("endDate",b.getAdjustedEndDate(tz).strftime("%Y-%m-%dT%H:%M:%S"))
-                bookingXmlGenerators[bookingType].getCustomBookingXML(b, tz, out)
-                out.closeTag("booking")
-
-            out.closeTag("collaboration")
-
+            from MaKaC.plugins.Collaboration.output import OutputGenerator
+            OutputGenerator.collaborationToXML(out, conf, tz)
         out.closeTag("plugins")
 
 
