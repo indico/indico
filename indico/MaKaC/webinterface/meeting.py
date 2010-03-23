@@ -873,28 +873,12 @@ class WPMConfClone(conferences.WPConfClone):
 "cloneInterval": urlHandlers.UHConfPerformCloneInterval.getURL( self._conf ), \
 "cloneday": urlHandlers.UHConfPerformCloneDays.getURL( self._conf ), \
 "cloning" : urlHandlers.UHConfPerformCloning.getURL( self._conf ),
-"cloneOptions": _("""<table>
-                <tr><td width="10%%"></td>
-                    <td width="10%%"><input type="checkbox" name="cloneTimetable" id="cloneTimetable" value="1" checked="checked"></td>
-                    <td width="80%%"> _("Full timetable") :</td></tr>
-                <!--<tr><td width="10%%"></td>
-                    <td width="10%%"></td>
-                    <td width="80%%"><input type="checkbox" name="cloneAbstracts" id="cloneAbstracts" value="1" >
-                                        _("with abstracts")</td></tr>-->
-                <tr><td width="10%%"></td>
-                    <td width="10%%"><input type="checkbox" name="cloneSessions" id="cloneSessions" value="1" ></td>
-                    <td width="80%%"> _("Sessions")</td></tr>
-                <tr><td width="10%%"></td>
-                    <td width="10%%"><input type="checkbox" name="cloneParticipants" id="cloneParticipants" value="1" checked="checked"></td>
-                    <td width="80%%"> _("Participants")</td></tr>
-                <tr><td width="10%%"></td>
-                    <td width="10%%">
-                    <td width="80%%"><input type="checkbox" name="cloneAddedInfo" id="cloneAddedInfo" value="1" >
-                                         _("send email to the participants of the created event")</td></tr>
-                <tr><td width="10%%"></td>
-                    <td width="10%%"><input type="checkbox" name="cloneEvaluation" id="cloneEvaluation" value="1" ></td>
-                    <td width="80%%"> _("Evaluation")</td></tr>
-           </table>""") }
+"cloneOptions": _("""<li><input type="checkbox" name="cloneTimetable" id="cloneTimetable" value="1" checked="checked" />_("Full timetable")</li>
+                     <li><ul style="list-style-type: none;"><li><input type="checkbox" name="cloneSessions" id="cloneSessions" value="1" />_("Sessions")</li></ul></li>
+                     <li><input type="checkbox" name="cloneParticipants" id="cloneParticipants" value="1" checked="checked" />_("Participants")</li>
+                     <li><ul style="list-style-type: none;"><li><input type="checkbox" name="cloneAddedInfo" id="cloneAddedInfo" value="1" />_("send email to the participants of the created event")</li></ul></li>
+                     <li><input type="checkbox" name="cloneEvaluation" id="cloneEvaluation" value="1" />_("Evaluation")</li>
+               """) }
         return p.getHTML( pars )
 
 ##TimeTable view##

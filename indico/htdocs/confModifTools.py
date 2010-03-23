@@ -34,15 +34,6 @@ def clone( req, **params ):
 def performCloning( req, **params ):
     return conferenceModif.RHConfPerformCloning(req).process(params)
 
-def performCloneOnce( req, **params ):
-    return conferenceModif.RHConfPerformCloneOnce( req ).process( params )
-
-def performCloneInterval( req, **params ):
-    return conferenceModif.RHConfPerformCloneInterval( req ).process( params )
-
-def performCloneDays( req, **params ):
-    return conferenceModif.RHConfPerformCloneDays( req ).process( params )
-
 def allSessionsConveners( req, **params ):
     return conferenceModif.RHConfAllSessionsConveners( req ).process( params )
 
