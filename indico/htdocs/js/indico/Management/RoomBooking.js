@@ -126,7 +126,9 @@ type("RoomBookingWidget", ["IWidget"],
          this.locationChooser = new FlexibleSelect(locations, 177);
          this.roomChooser = new FlexibleSelect({},
                                                177,
-                                               function(e1, e2){ return self._favoriteSort(e1, e2); },
+                                               function(e1, e2){
+                                                     return self._favoriteSort(self.roomChooser.list.get(e1), self.roomChooser.list.get(e2));
+                                               },
                                                function(key, elem){ return self._favoriteDecorator(key, elem); });
          this.addressArea = new RealtimeTextArea({});
          this.inheritCheckbox = Html.checkbox({});

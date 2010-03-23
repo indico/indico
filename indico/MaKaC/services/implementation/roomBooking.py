@@ -50,13 +50,13 @@ class RoomBookingFullNameListRooms( RoomBookingListRooms):
 
     def _getAnswer( self ):
 
-        res = {}
+        res = []
 
         if Location.parse( self._location ):
             for room in CrossLocationQueries.getRooms( location = self._location ):
-                res[room.name] = room.getFullName()
+                res.append((room.name, room.getFullName()))
 
-        return list((k,res[k]) for k in sorted(res))
+        return res
 
 class RoomBookingListLocationsAndRooms( ServiceBase ):
 
