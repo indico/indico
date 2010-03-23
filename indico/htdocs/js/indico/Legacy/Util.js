@@ -8,17 +8,24 @@ var IndicoUtil = {
     /**
      * Utility function that, given a container element, will look at all of the nodes inside it, and
      * return the list of nodes that are of type "input", "select", and "textArea".
-     * @param {XElement} containerElement The XElement that we want to scan for form-like nodes.
+     * @param {multiple XElement} A variable number of XElement's that we want to scan for form-like nodes.
      * @return {Array of DOM nodes} Returns an array of DOM nodes that are of type "input", "select", and "textArea".
      */
-    findFormFields : function(containerElement) {
-        var inputNodes = containerElement.dom.getElementsByTagName("input");
-        var selectNodes = containerElement.dom.getElementsByTagName("select");
-        var textAreaNodes = containerElement.dom.getElementsByTagName("textArea");
-        formNodes = [];
-        for (var i=0; i < inputNodes.length; i++) {formNodes.push(inputNodes[i]);}
-        for (var i=0; i < selectNodes.length; i++) {formNodes.push(selectNodes[i]);}
-        for (var i=0; i < textAreaNodes.length; i++) {formNodes.push(textAreaNodes[i]);}
+    findFormFields : function() {
+        var formNodes = [];
+
+        for (var i=0; i < arguments.length; i++) {
+            var xelement = arguments[i];
+
+            var inputNodes = xelement.dom.getElementsByTagName("input");
+            var selectNodes = xelement.dom.getElementsByTagName("select");
+            var textAreaNodes = xelement.dom.getElementsByTagName("textArea");
+
+            for (var j=0; j < inputNodes.length; j++) {formNodes.push(inputNodes[j]);}
+            for (var j=0; j < selectNodes.length; j++) {formNodes.push(selectNodes[j]);}
+            for (var j=0; j < textAreaNodes.length; j++) {formNodes.push(textAreaNodes[j]);}
+        }
+
         return formNodes;
     },
 

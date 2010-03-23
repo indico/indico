@@ -68,7 +68,7 @@
 
 // HTML code for the popup dialog that will appear when adding or editing a booking, depending on the booking type
 var forms = {
-<%= ",\n". join(['"' + pluginName + '" \x3a "' + escapeHTMLForJS(form) + '"' for pluginName, form in MultipleBookingForms.items()]) %>
+<%= ",\n". join(['"' + pluginName + '" \x3a ["' + escapeHTMLForJS(newBookingForm) + '", "' + escapeHTMLForJS(advancedTabForm) + '"]' for pluginName, (newBookingForm, advancedTabForm) in MultipleBookingForms.items()]) %>
 }
 
 /**
@@ -106,7 +106,7 @@ var bookings = $L(<%= jsonEncode(BookingsM) %>);
 var createButton;
 var createButtonTooltip;
 
-  
+
 /* ------------------------------ UTILITY / HELPER FUNCTIONS -------------------------------*/
 
 /**
@@ -115,7 +115,7 @@ var createButtonTooltip;
  * @return {String}
  */
 var getSelectedPlugin = function() {
-    value = $E('pluginSelect').dom.value; 
+    value = $E('pluginSelect').dom.value;
     return value == 'noneSelected' ? null : value;
 }
 
@@ -136,7 +136,7 @@ var pluginSelectChanged = function() {
  */
 var create = function() {
     selectedPlugin = getSelectedPlugin();
-    if (exists(selectedPlugin)) { 
+    if (exists(selectedPlugin)) {
         createBooking(selectedPlugin, '<%= Conference.getId() %>');
     }
 }
@@ -163,7 +163,7 @@ var edit = function(booking) {
  */
 var CreateHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px">' + 
+        '<div style="padding:3px">' +
             $T('Select a <strong>booking type<\/strong> from the drop-down list and press the "Create" button.') +
         '<\/div>');
 };
@@ -173,13 +173,13 @@ var CreateHelpPopup = function(event) {
 IndicoUI.executeOnLoad(function(){
     // This is strictly necessary in this page because the progress dialog touches the body element of the page,
     // and IE doesn't like when this is done at page load by a script that is not inside the body element.
-    
+
     // We configure the "create" button and the list of plugins.
     createButton = new DisabledButton(Html.input("button", {disabled:true, style:{marginLeft: '6px'}}, $T("Create") ));
 
     createButton.observeEvent('mouseover', function(event) {
         if (!createButton.isEnabled()) {
-            createButtonTooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, 
+            createButtonTooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY,
                      $T("Please select a booking type from the list."), "tooltipError");
         }
     });
@@ -198,7 +198,7 @@ IndicoUI.executeOnLoad(function(){
 
     $E('pluginSelect').dom.value = 'noneSelected';
     pluginSelectChanged();
-    
+
     // We display the bookings
     displayBookings();
 });

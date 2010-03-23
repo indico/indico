@@ -936,10 +936,13 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
             var self = this;
 
             // We get the form HTML
-            this.form = Html.div();
-            this.form.dom.innerHTML = forms[self.bookingType];
+            this.basicTabForm = Html.div();
+            this.basicTabForm.dom.innerHTML = forms[self.bookingType][0];
 
-            this.formNodes = IndicoUtil.findFormFields(this.form);
+            this.advancedTabForm = Html.div();
+            this.advancedTabForm.dom.innerHTML = forms[self.bookingType][1];
+
+            this.formNodes = IndicoUtil.findFormFields(this.basicTabForm, this.advancedTabForm);
             this.values = {};
 
             // We put calendar widgets on the date fields
@@ -951,130 +954,18 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
             }
 
             // We initialize the parameter manager in order to make checks on the fields
-            var parameterManager = this.__buildParameterManager();
+            this.__buildParameterManager();
 
             this.advancedDiv = Html.div();
-            // If this kind of booking can be notified of date changes, we offer a checkbox (checked by default)
-            this.__drawSynchroInfo();
-
-
-            // Privacy option
-            this.__drawHiddenOption();
 
             // We construct the "save" button and what happens when it's pressed
-            var saveButton = Html.input('button', null, "Save");
+            var saveButton = Html.input('button', null, $T("Save"));
             saveButton.observeClick(function(){
-
-                // We retrieve the values from the form
-                IndicoUtil.getFormValues(self.formNodes, self.values);
-                if (exists (dateCheckBox)) {
-                    self.values["notifyOnDateChanges"] = dateCheckBox.dom.checked;
-                }
-                self.values["hidden"] = hiddenCheckBox.dom.checked;
-
-                // We check if there are errors
-                var checkOK = true;
-                if (needsCheck) {
-                    checkOK = parameterManager.check();
-                }
-
-                // If there are no errors, the booking is sent to the server
-                if (checkOK) {
-                    var onSaveResult = true;
-                    if (pluginHasFunction(self.bookingType, "onSave")) {
-                        onSaveResult = codes[self.bookingType].onSave(self.values);
-                    }
-
-                    if (onSaveResult) {
-                        var killProgress = IndicoUI.Dialogs.Util.progress("Saving your booking...");
-
-                        if (self.popupType === 'create') {
-                            indicoRequest(
-                                'collaboration.createCSBooking',
-                                {
-                                    conference: self.conferenceId,
-                                    type: self.bookingType,
-                                    bookingParams: self.values
-                                },
-                                function(result,error) {
-                                    if (!error) {
-                                        // If the server found no problems, a booking object is returned in the result.
-                                        // We add it to the watchlist and create an iframe.
-                                        if (result.error) {
-                                            killProgress();
-                                            self.switchToBasicTab();
-                                            if (result.origin === 'sanitization') {
-                                                sanitizationError(result.invalidFields);
-                                            } else {
-                                                codes[self.bookingType].errorHandler('create', result);
-                                            }
-                                        } else {
-                                            hideAllInfoRows(false);
-                                            showInfo[result.id] = true; // we initialize the show info boolean for this booking
-                                            bookings.append(result);
-                                            showAllInfoRows(false);
-                                            addIFrame(result);
-                                            refreshStartAllStopAllButtons();
-                                            refreshTableHead();
-                                            if (pluginHasFunction(self.bookingType, 'postCreate')) {
-                                                codes[self.bookingType].postCreate(result);
-                                            }
-                                            killProgress();
-                                            hightlightBookingM(result);
-                                            self.close();
-
-                                        }
-                                    } else {
-                                        killProgress();
-                                        self.close();
-                                        IndicoUtil.errorReport(error);
-                                    }
-                                }
-                            );
-
-                        } else if (self.popupType === 'edit') {
-                            indicoRequest(
-                                'collaboration.editCSBooking',
-                                {
-                                    conference: self.conferenceId,
-                                    bookingId: self.booking.id,
-                                    bookingParams: self.values
-                                },
-                                function(result,error) {
-                                    if (!error) {
-                                        if (result.error) {
-                                            killProgress();
-                                            self.switchToBasicTab();
-                                            if (result.origin === 'sanitization') {
-                                                sanitizationError(result.invalidFields);
-                                            } else {
-                                                codes[self.bookingType].errorHandler('edit', result);
-                                            }
-                                        } else {
-                                            if (pluginHasFunction(self.bookingType, 'postEdit')) {
-                                                codes[self.bookingType].postEdit(result);
-                                            }
-                                            showInfo[result.id] = true;
-                                            refreshBooking(result);
-                                            killProgress();
-                                            self.close();
-                                        }
-                                    } else {
-                                        killProgress();
-                                        self.close();
-                                        IndicoUtil.errorReport(error);
-                                    }
-                                }
-                            );
-                        }
-                    }
-                } else { // Parameter manager detected errors
-                    self.switchToBasicTab();
-                }
+                self.__save();
             });
 
             // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
-            var cancelButton = Html.input('button', {style:{marginLeft:pixels(5)}}, "Cancel");
+            var cancelButton = Html.input('button', {style:{marginLeft:pixels(5)}}, $T("Cancel"));
             cancelButton.observeClick(function(){
                 self.close();
             });
@@ -1087,11 +978,31 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
                 width = width > 400 ? width : 400;
             }
 
-            var tabControl = new TabWidget([["Basic", this.form], ["Advanced", this.advancedDiv]], width, null);
+            var tabControl = new TabWidget([[$T("Basic"), this.basicTabForm], [$T("Advanced"), this.advancedTabForm]], width, null);
             this.tabControl = tabControl;
 
             return this.ExclusivePopupWithButtons.prototype.draw.call(this, tabControl.draw(), buttonDiv,
                     {backgroundColor: "#FFFFFF"});
+        },
+
+        postDraw: function() {
+            if (exists($E('dateSyncHelpImg'))){
+                $E('dateSyncHelpImg').dom.onmouseover = dateChangeHelpPopup;
+            }
+
+            if (this.popupType === 'edit' && !this.booking.canBeNotifiedOfEventDateChanges) {
+                if (exists($E('dateSyncCheckBox'))) {
+                    $E('dateSyncCheckBox').dom.disabled = true;
+                    $E('dateSyncCheckBox').dom.className = 'disabled';
+                }
+                if (exists($E('dateSyncHelpImg'))){
+                    $E('dateSyncHelpImg').dom.onmouseover = dateChangeDisabledHelpPopup;
+                }
+            }
+            if(exists($E('hiddenHelpImg'))) {
+                $E('hiddenHelpImg').dom.onmouseover = hiddenHelpPopup;
+            }
+            this.ExclusivePopupWithButtons.prototype.postDraw.call(this);
         },
 
         __drawCalendarWidgets: function() {
@@ -1112,61 +1023,122 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
 
         __buildParameterManager: function() {
 
-            var needsCheck = pluginHasFunction (this.bookingType, "checkParams");
+            this.needsCheck = pluginHasFunction (this.bookingType, "checkParams");
 
-            if (needsCheck) {
-                return buildParameterManager(this.bookingType, this.formNodes, this.values);
+            if (this.needsCheck) {
+                this.parameterManager = buildParameterManager(this.bookingType, this.formNodes, this.values);
             } else {
-                return null;
+                this.parameterManager = null;
             }
 
         },
 
-        __drawSynchroInfo: function() {
+        __save: function(){
+            var self = this;
 
-            if (canBeNotifiedOnDateChanges[this.bookingType]) {
-                // If this booking in particular cannot be notified of date changes any more, we disable the checkbox
-                var dateCheckBox = Html.checkbox({id : "dateCheckBox"});
-                var dateLabel = Html.label({style: {fontWeight: "normal"}}, $T("Keep booking synchronized with event"));
-                dateLabel.dom.htmlFor = "dateCheckBox";
+            // We retrieve the values from the form
+            IndicoUtil.getFormValues(this.formNodes, this.values);
 
-                var dateChangeHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
-                dateChangeHelpImg.dom.onmouseover = dateChangeHelpPopup;
+            // We check if there are errors
+            var checkOK = true;
+            if (this.needsCheck) {
+                checkOK = this.parameterManager.check();
+            }
 
-                var dateChangeDiv = Html.div({style : {display: "block", marginTop:pixels(10), marginLeft: pixels(50)}},
-                        dateCheckBox, dateLabel, dateChangeHelpImg);
-
-                if (this.popupType === 'create') {
-                    dateCheckBox.dom.checked = true;
-
-                } else if (this.popupType === 'edit'){
-                    dateCheckBox.dom.checked = this.booking.bookingParams["notifyOnDateChanges"];
-                    if (!this.booking.canBeNotifiedOfEventDateChanges) {
-                        dateCheckBox.dom.disabled = true;
-                        dateLabel.dom.className = 'disabled';
-                        dateChangeHelpImg.dom.onmouseover = dateChangeDisabledHelpPopup;
-                    }
+            // If there are no errors, the booking is sent to the server
+            if (checkOK) {
+                var onSaveResult = true;
+                if (pluginHasFunction(self.bookingType, "onSave")) {
+                    onSaveResult = codes[this.bookingType].onSave(this.values);
                 }
 
-                this.advancedDiv.append(dateChangeDiv);
+                if (onSaveResult) {
+                    var killProgress = IndicoUI.Dialogs.Util.progress("Saving your booking...");
+
+                    if (this.popupType === 'create') {
+                        indicoRequest(
+                            'collaboration.createCSBooking',
+                            {
+                                conference: this.conferenceId,
+                                type: this.bookingType,
+                                bookingParams: this.values
+                            },
+                            function(result,error) {
+                                if (!error) {
+                                    // If the server found no problems, a booking object is returned in the result.
+                                    // We add it to the watchlist and create an iframe.
+                                    if (result.error) {
+                                        killProgress();
+                                        self.switchToBasicTab();
+                                        if (result.origin === 'sanitization') {
+                                            sanitizationError(result.invalidFields);
+                                        } else {
+                                            codes[self.bookingType].errorHandler('create', result);
+                                        }
+                                    } else {
+                                        hideAllInfoRows(false);
+                                        showInfo[result.id] = true; // we initialize the show info boolean for this booking
+                                        bookings.append(result);
+                                        showAllInfoRows(false);
+                                        addIFrame(result);
+                                        refreshStartAllStopAllButtons();
+                                        refreshTableHead();
+                                        if (pluginHasFunction(self.bookingType, 'postCreate')) {
+                                            codes[self.bookingType].postCreate(result);
+                                        }
+                                        killProgress();
+                                        hightlightBookingM(result);
+                                        self.close();
+
+                                    }
+                                } else {
+                                    killProgress();
+                                    self.close();
+                                    IndicoUtil.errorReport(error);
+                                }
+                            }
+                        );
+
+                    } else if (this.popupType === 'edit') {
+                        indicoRequest(
+                            'collaboration.editCSBooking',
+                            {
+                                conference: self.conferenceId,
+                                bookingId: self.booking.id,
+                                bookingParams: self.values
+                            },
+                            function(result,error) {
+                                if (!error) {
+                                    if (result.error) {
+                                        killProgress();
+                                        self.switchToBasicTab();
+                                        if (result.origin === 'sanitization') {
+                                            sanitizationError(result.invalidFields);
+                                        } else {
+                                            codes[self.bookingType].errorHandler('edit', result);
+                                        }
+                                    } else {
+                                        if (pluginHasFunction(self.bookingType, 'postEdit')) {
+                                            codes[self.bookingType].postEdit(result);
+                                        }
+                                        showInfo[result.id] = true;
+                                        refreshBooking(result);
+                                        killProgress();
+                                        self.close();
+                                    }
+                                } else {
+                                    killProgress();
+                                    self.close();
+                                    IndicoUtil.errorReport(error);
+                                }
+                            }
+                        );
+                    }
+                }
+            } else { // Parameter manager detected errors
+                this.switchToBasicTab();
             }
-        },
 
-        __drawHiddenOption: function() {
-            var hiddenCheckBox = Html.checkbox({id : "hiddenCheckBox"});
-            var hiddenLabel = Html.label({style: {fontWeight: "normal"}}, $T("Keep this booking hidden"));
-            hiddenLabel.dom.htmlFor = "hiddenCheckBox";
-
-            var hiddenHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
-            hiddenHelpImg.dom.onmouseover = hiddenHelpPopup;
-
-            var hiddenDiv = Html.div({style : {display: "block", marginTop:pixels(10), marginLeft: pixels(50)}},
-                    hiddenCheckBox, hiddenLabel, hiddenHelpImg);
-
-            if (this.popupType === 'edit') {
-                hiddenCheckBox.dom.checked = this.booking.bookingParams["hidden"];
-            }
-            this.advancedDiv.append(hiddenDiv);
         }
     },
 

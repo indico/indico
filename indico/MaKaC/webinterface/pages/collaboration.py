@@ -31,7 +31,8 @@ from MaKaC.common.PickleJar import DictPickler
 from MaKaC.webinterface.rh.admins import RCAdmin
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.common.indexes import IndexesHolder
-from MaKaC.plugins.Collaboration.base import CollaborationException
+from MaKaC.plugins.Collaboration.base import CollaborationException,\
+    WCSPageTemplateBase
 
 ################################################### Server Wide pages #########################################
 
@@ -290,7 +291,14 @@ class WConfModifCollaboration(wcomponents.WTemplated):
         for plugin in multipleBookingPlugins:
             pluginName = plugin.getName()
             templateClass = CollaborationTools.getTemplateClass(pluginName, "WNewBookingForm")
-            multipleBookingForms[pluginName] = templateClass(self._conf, pluginName, self._user).getHTML()
+            newBookingFormHTML = templateClass(self._conf, pluginName, self._user).getHTML()
+
+            advancedTabClass = CollaborationTools.getTemplateClass(pluginName, "WAdvancedTab")
+            if advancedTabClass:
+                advancedTabClassHTML = advancedTabClass(self._conf, pluginName, self._user).getHTML()
+            else:
+                advancedTabClassHTML = WConfModifCollaborationDefaultAdvancedTab(self._conf, pluginName, self._user).getHTML()
+            multipleBookingForms[pluginName] = (newBookingFormHTML, advancedTabClassHTML)
 
         for plugin in plugins:
             pluginName = plugin.getName()
@@ -307,6 +315,21 @@ class WConfModifCollaboration(wcomponents.WTemplated):
         vars["CanBeNotified"] = canBeNotified
 
         return vars
+
+class WAdvancedTabBase(WCSPageTemplateBase):
+
+    def getVars(self):
+        variables = WCSPageTemplateBase.getVars(self)
+
+        bookingClass = CollaborationTools.getCSBookingClass(self._pluginName)
+        variables["CanBeNotified"] = bookingClass._canBeNotifiedOfEventDateChanges
+
+        return variables
+
+class WConfModifCollaborationDefaultAdvancedTab(WAdvancedTabBase):
+
+    def _setTPLFile(self):
+        wcomponents.WTemplated._setTPLFile(self)
 
 
 class WPConfModifCollaborationProtection(WPConfModifCSBase):

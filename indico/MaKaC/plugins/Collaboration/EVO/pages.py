@@ -27,6 +27,7 @@ from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.i18n import _
 from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate
 from MaKaC.webinterface import urlHandlers
+from MaKaC.webinterface.pages.collaboration import WAdvancedTabBase
 
 class WNewBookingForm(WCSPageTemplateBase):
 
@@ -50,6 +51,16 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["Communities"] = communityItems
 
         return vars
+
+class WAdvancedTab(WAdvancedTabBase):
+
+    def getVars(self):
+        variables = WAdvancedTabBase.getVars(self)
+
+        bookingClass = CollaborationTools.getCSBookingClass(self._pluginName)
+        variables["CanBeNotified"] = bookingClass._canBeNotifiedOfEventDateChanges
+
+        return variables
 
 class WMain (WJSBase):
 

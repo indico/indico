@@ -1064,7 +1064,8 @@ class CSBookingBase(Persistent):
         bookingParams["endDate"] = self.getEndDateAsString()
         if self.needsToBeNotifiedOfDateChanges():
             bookingParams["notifyOnDateChanges"] = ["notifyOnDateChanges"]
-        bookingParams["hidden"] = self.isHidden()
+        if self.isHidden():
+            bookingParams["hidden"] = ["hidden"]
 
         return bookingParams
 
@@ -1091,8 +1092,8 @@ class CSBookingBase(Persistent):
         if sanitizeResult:
             return sanitizeResult
 
-        self.setHidden(params.pop("hidden", False))
-        self.setNeedsToBeNotifiedOfDateChanges(params.pop("notifyOnDateChanges", False))
+        self.setHidden(params.pop("hidden", False) == ["hidden"])
+        self.setNeedsToBeNotifiedOfDateChanges(params.pop("notifyOnDateChanges", False) == ["notifyOnDateChanges"])
 
         startDate = params.pop("startDate", None)
         if startDate is not None:
