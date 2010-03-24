@@ -19,7 +19,7 @@ ul.CERNMCUParticipantsList
     margin: 0;
 }
 
-ul.CERNMCUParticipantsList li{
+ul.CERNMCUParticipantsList > li {
     margin: 0;
     display: block;
     margin-bottom: 0px;
@@ -30,10 +30,21 @@ ul.CERNMCUParticipantsList li{
 
 div.CERNMCU_H323RoomList_Div {
     height: 300px;
+    width: 400px;
+    border:1px solid #CCCCCC;
+    margin-top:10px;
+    overflow:auto;
 }
 
-ul.CERNMCU_H323RoomList li{
+ul.CERNMCU_H323RoomList > li {
     padding-left: 10px;
+}
+
+ul.CERNMCU_H323RoomList > li span.CERNMCU_H323RoomIP {
+    font-size: 8pt;
+    color: #666666;
+    float: right;
+    padding-right: 10px;
 }
 
 ul.CERNMCU_H323RoomList div.selectedRoom {

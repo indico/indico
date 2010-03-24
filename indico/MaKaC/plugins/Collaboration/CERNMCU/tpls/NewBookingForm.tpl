@@ -1,6 +1,6 @@
 <% declareTemplate(newTemplateStyle=True) %>
 
-<table style="margin-top: 10px;">
+<table>
     <tr>
         <td class="bookingFormFieldName">
             <span>Name</span>

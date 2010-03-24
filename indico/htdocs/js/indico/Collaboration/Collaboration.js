@@ -915,100 +915,62 @@ var sanitizationError = function(invalidFields) {
  * @param {object} booking If 'create' mode, leave to null. If 'edit' mode, the booking object
  * @param {string} conferenceId the conferenceId of the current event
  */
-type ("BookingPopup", ["ExclusivePopup"],
+type ("BookingPopup", ["ExclusivePopupWithButtons"],
     {
         switchToBasicTab: function() {
             if (this.tabControl.getSelectedTab() === 'Advanced') {
                 this.tabControl.setSelectedTab('Basic');
             }
         },
+
+        /**
+         * Opens the popup, but does NOT call postdraw()
+         * Necessary so that we can call plugin's onCreate() or onEdit() between draw() and postdraw()
+         */
+        open: function() {
+            $E(document.body).append(this.draw());
+            this.isopen = true;
+        },
+
         draw: function() {
             var self = this;
 
             // We get the form HTML
-            var form = Html.div();
-            form.dom.innerHTML = forms[self.bookingType];
+            this.form = Html.div();
+            this.form.dom.innerHTML = forms[self.bookingType];
 
-            var formNodes = IndicoUtil.findFormFields(form);
-            var values = {};
+            this.formNodes = IndicoUtil.findFormFields(this.form);
+            this.values = {};
 
             // We put calendar widgets on the date fields
-            if (pluginHasFunction(self.bookingType, "getDateFields")) {
-                var fieldList = codes[self.bookingType].getDateFields();
-                var fieldDict = {};
-                each(fieldList, function(name){
-                    fieldDict[name] = true;
-                });
-                each(formNodes, function(node){
-                    if (node.name in fieldDict) {
-                        IndicoUI.Widgets.Generic.input2dateField($E(node), true, null)
-                    }
-                });
-            }
+            this.__drawCalendarWidgets();
 
             // If we are modifying a booking, we put the booking's values in the form in the Basic tab
             if (self.popupType === 'edit') {
-                IndicoUtil.setFormValues(formNodes, self.booking.bookingParams);
+                IndicoUtil.setFormValues(this.formNodes, self.booking.bookingParams);
             }
 
             // We initialize the parameter manager in order to make checks on the fields
-            var needsCheck = pluginHasFunction (self.bookingType, "checkParams");
-            var parameterManager;
-            if (needsCheck) {
-                parameterManager = buildParameterManager(self.bookingType, formNodes, values);
-            }
+            var parameterManager = this.__buildParameterManager();
 
-            var advancedDiv = Html.div();
-
+            this.advancedDiv = Html.div();
             // If this kind of booking can be notified of date changes, we offer a checkbox (checked by default)
-            if (canBeNotifiedOnDateChanges[self.bookingType]) {
+            this.__drawSynchroInfo();
 
-                // If this booking in particular cannot be notified of date changes any more, we disable the checkbox
-                var dateCheckBox = Html.checkbox({id : "dateCheckBox"});
-                var dateLabel = Html.label({style: {fontWeight: "normal"}}, $T("Keep booking synchronized with event"));
-                dateLabel.dom.htmlFor = "dateCheckBox";
-                var dateChangeHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
-                dateChangeHelpImg.dom.onmouseover = dateChangeHelpPopup;
-                var dateChangeDiv = Html.div({style : {display: "block", marginTop:pixels(10), marginLeft: pixels(50)}},
-                        dateCheckBox, dateLabel, dateChangeHelpImg);
-
-                if (self.popupType === 'create') {
-                    dateCheckBox.dom.checked = true;
-                } else if (self.popupType === 'edit'){
-                    dateCheckBox.dom.checked = self.booking.bookingParams["notifyOnDateChanges"];
-                    if (!self.booking.canBeNotifiedOfEventDateChanges) {
-                        dateCheckBox.dom.disabled = true;
-                        dateLabel.dom.className = 'disabled';
-                        dateChangeHelpImg.dom.onmouseover = dateChangeDisabledHelpPopup;
-                    }
-                }
-
-                advancedDiv.append(dateChangeDiv);
-            }
 
             // Privacy option
-            var hiddenCheckBox = Html.checkbox({id : "hiddenCheckBox"});
-            var hiddenLabel = Html.label({style: {fontWeight: "normal"}}, $T("Keep this booking hidden"));
-            hiddenLabel.dom.htmlFor = "hiddenCheckBox";
-            var hiddenHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
-            hiddenHelpImg.dom.onmouseover = hiddenHelpPopup;
-            var hiddenDiv = Html.div({style : {display: "block", marginTop:pixels(10), marginLeft: pixels(50)}},
-                    hiddenCheckBox, hiddenLabel, hiddenHelpImg);
-            if (self.popupType === 'edit') {
-                hiddenCheckBox.dom.checked = self.booking.bookingParams["hidden"];
-            }
-            advancedDiv.append(hiddenDiv);
+            this.__drawHiddenOption();
 
             // We construct the "save" button and what happens when it's pressed
             var saveButton = Html.input('button', null, "Save");
             saveButton.observeClick(function(){
 
                 // We retrieve the values from the form
-                IndicoUtil.getFormValues(formNodes, values);
+                IndicoUtil.getFormValues(self.formNodes, self.values);
                 if (exists (dateCheckBox)) {
-                    values["notifyOnDateChanges"] = dateCheckBox.dom.checked;
+                    self.values["notifyOnDateChanges"] = dateCheckBox.dom.checked;
                 }
-                values["hidden"] = hiddenCheckBox.dom.checked;
+                self.values["hidden"] = hiddenCheckBox.dom.checked;
 
                 // We check if there are errors
                 var checkOK = true;
@@ -1020,7 +982,7 @@ type ("BookingPopup", ["ExclusivePopup"],
                 if (checkOK) {
                     var onSaveResult = true;
                     if (pluginHasFunction(self.bookingType, "onSave")) {
-                        onSaveResult = codes[self.bookingType].onSave(values);
+                        onSaveResult = codes[self.bookingType].onSave(self.values);
                     }
 
                     if (onSaveResult) {
@@ -1032,7 +994,7 @@ type ("BookingPopup", ["ExclusivePopup"],
                                 {
                                     conference: self.conferenceId,
                                     type: self.bookingType,
-                                    bookingParams: values
+                                    bookingParams: self.values
                                 },
                                 function(result,error) {
                                     if (!error) {
@@ -1076,7 +1038,7 @@ type ("BookingPopup", ["ExclusivePopup"],
                                 {
                                     conference: self.conferenceId,
                                     bookingId: self.booking.id,
-                                    bookingParams: values
+                                    bookingParams: self.values
                                 },
                                 function(result,error) {
                                     if (!error) {
@@ -1117,25 +1079,100 @@ type ("BookingPopup", ["ExclusivePopup"],
                 self.close();
             });
 
-            var buttonDiv = Html.div('dialogButtons', saveButton, cancelButton)
+            var buttonDiv = Html.div({}, saveButton, cancelButton)
 
-            if (pluginHasFunction(self.bookingType, "getPopupDimensions")) {
-                var dimensions = codes[self.bookingType].getPopupDimensions();
-                var width = dimensions['width'];
-                var height = dimensions['height'];
+            var width = 600;
+            if (pluginHasFunction(self.bookingType, "getPopupWidth")) {
+                var width = codes[self.bookingType].getPopupWidth();
                 width = width > 400 ? width : 400;
-                height = height > 200 ? height : 0;
-            } else {
-                var width = 600;
-                var height = 0;
             }
 
-            var tabControl = new TabWidget([["Basic", form], ["Advanced", advancedDiv]], width, height);
+            var tabControl = new TabWidget([["Basic", this.form], ["Advanced", this.advancedDiv]], width, null);
             this.tabControl = tabControl;
 
-            return this.ExclusivePopup.prototype.draw.call(this, Widget.block([tabControl.draw(), buttonDiv]));
+            return this.ExclusivePopupWithButtons.prototype.draw.call(this, tabControl.draw(), buttonDiv,
+                    {backgroundColor: "#FFFFFF"});
+        },
+
+        __drawCalendarWidgets: function() {
+
+            if (pluginHasFunction(this.bookingType, "getDateFields")) {
+                var fieldList = codes[this.bookingType].getDateFields();
+                var fieldDict = {};
+                each(fieldList, function(name){
+                    fieldDict[name] = true;
+                });
+                each(this.formNodes, function(node){
+                    if (node.name in fieldDict) {
+                        IndicoUI.Widgets.Generic.input2dateField($E(node), true, null)
+                    }
+                });
+            }
+        },
+
+        __buildParameterManager: function() {
+
+            var needsCheck = pluginHasFunction (this.bookingType, "checkParams");
+
+            if (needsCheck) {
+                return buildParameterManager(this.bookingType, this.formNodes, this.values);
+            } else {
+                return null;
+            }
+
+        },
+
+        __drawSynchroInfo: function() {
+
+            if (canBeNotifiedOnDateChanges[this.bookingType]) {
+                // If this booking in particular cannot be notified of date changes any more, we disable the checkbox
+                var dateCheckBox = Html.checkbox({id : "dateCheckBox"});
+                var dateLabel = Html.label({style: {fontWeight: "normal"}}, $T("Keep booking synchronized with event"));
+                dateLabel.dom.htmlFor = "dateCheckBox";
+
+                var dateChangeHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
+                dateChangeHelpImg.dom.onmouseover = dateChangeHelpPopup;
+
+                var dateChangeDiv = Html.div({style : {display: "block", marginTop:pixels(10), marginLeft: pixels(50)}},
+                        dateCheckBox, dateLabel, dateChangeHelpImg);
+
+                if (this.popupType === 'create') {
+                    dateCheckBox.dom.checked = true;
+
+                } else if (this.popupType === 'edit'){
+                    dateCheckBox.dom.checked = this.booking.bookingParams["notifyOnDateChanges"];
+                    if (!this.booking.canBeNotifiedOfEventDateChanges) {
+                        dateCheckBox.dom.disabled = true;
+                        dateLabel.dom.className = 'disabled';
+                        dateChangeHelpImg.dom.onmouseover = dateChangeDisabledHelpPopup;
+                    }
+                }
+
+                this.advancedDiv.append(dateChangeDiv);
+            }
+        },
+
+        __drawHiddenOption: function() {
+            var hiddenCheckBox = Html.checkbox({id : "hiddenCheckBox"});
+            var hiddenLabel = Html.label({style: {fontWeight: "normal"}}, $T("Keep this booking hidden"));
+            hiddenLabel.dom.htmlFor = "hiddenCheckBox";
+
+            var hiddenHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
+            hiddenHelpImg.dom.onmouseover = hiddenHelpPopup;
+
+            var hiddenDiv = Html.div({style : {display: "block", marginTop:pixels(10), marginLeft: pixels(50)}},
+                    hiddenCheckBox, hiddenLabel, hiddenHelpImg);
+
+            if (this.popupType === 'edit') {
+                hiddenCheckBox.dom.checked = this.booking.bookingParams["hidden"];
+            }
+            this.advancedDiv.append(hiddenDiv);
         }
     },
+
+    /**
+     * Constructor
+     */
     function(popupType, pluginType, booking, conferenceId) {
         this.popupType = popupType;
         this.bookingType = pluginType;
@@ -1146,7 +1183,7 @@ type ("BookingPopup", ["ExclusivePopup"],
             var title = this.bookingType + ' booking modification';
         }
         this.conferenceId = conferenceId;
-        this.ExclusivePopup(title, positive);
+        this.ExclusivePopupWithButtons(title, positive);
     }
 );
 
@@ -1164,6 +1201,7 @@ var createBooking = function(pluginName, conferenceId) {
     if (pluginHasFunction(pluginName, "onCreate")) {
         codes[pluginName].onCreate();
     }
+    popup.postDraw();
 }
 
 /**
@@ -1179,6 +1217,7 @@ var editBooking = function(booking, conferenceId) {
     if (pluginHasFunction(booking.type, "onEdit")) {
         codes[booking.type].onEdit(booking);
     }
+    popup.postDraw();
 }
 
 /**

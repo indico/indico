@@ -89,19 +89,25 @@ class WMain (WJSBase):
                         else:
                             returnedRoom = returnedRooms
 
-                        if (returnedRoom != None) and (attName in returnedRoom.customAtts):
+                        if returnedRoom != None:
+                            vars["InitialRoomName"] = returnedRoom.getFullName()
+                            if attName in returnedRoom.customAtts:
+                                initialRoomIp = returnedRoom.customAtts[attName]
+                                if (initialRoomIp.strip() == ""):
+                                    initialRoomIp = "Please enter IP."
+                                    vars["IPRetrievalResult"] = 1
+                                elif not validIP(initialRoomIp):
+                                    vars["IPRetrievalResult"] = 2
+                                else:
+                                    vars["IPRetrievalResult"] = 0
 
-                            initialRoomIp = returnedRoom.customAtts[attName]
-                            if (initialRoomIp.strip() == ""):
-                                vars["IPRetrievalResult"] = 1
-                            elif not validIP(initialRoomIp):
-                                vars["IPRetrievalResult"] = 2
                             else:
-                                vars["IPRetrievalResult"] = 0
+                                initialRoomIp = "IP not defined for this room."
+                                vars["IPRetrievalResult"] = 1
 
                         else:
-                            initialRoomIp = "IP not defined for this room."
-                            vars["IPRetrievalResult"] = 2
+                            initialRoomIp = "Please enter IP."
+                            vars["IPRetrievalResult"] = 1
 
                     except AttributeError:
                         #CrossLocationQueries.getRooms fails because it does not handle location names that are not in the DB
@@ -181,7 +187,7 @@ class WExtra (WJSBase):
                                     returnedRooms = []
 
                             for room in returnedRooms:
-                                roomsWithH323IP.append(RoomWithH323(locationName, room._getName(), room.customAtts[attName]))
+                                roomsWithH323IP.append(RoomWithH323(locationName, room.getFullName(), room.customAtts[attName]))
 
                         except AttributeError:
                             #CrossLocationQueries.getRooms fails because it does not handle location names that are not in the DB
@@ -194,6 +200,7 @@ class WExtra (WJSBase):
                 except Exception, e:
                     Logger.get("CERNMCU").warning("Location: " + locationName + "Exception when retrieving the list of all rooms with a H323 IP: " + str(e))
 
+        roomsWithH323IP.sort(key = lambda room: room.getLocation()+':'+room.getName())
         vars["RoomsWithH323IP"] = roomsWithH323IP
         return vars
 

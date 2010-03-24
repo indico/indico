@@ -54,6 +54,9 @@ type("PopupDialog", ["PopupWidget"], {
 
 type("ExclusivePopup", ["PopupWidget", "Printable"], {
 
+    /**
+     * Opens the popup
+     */
     open : function() {
         this.PopupWidget.prototype.open.call(this);
     },

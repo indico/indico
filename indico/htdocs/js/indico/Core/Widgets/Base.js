@@ -698,6 +698,11 @@ type("PopupWidget", [], {
         return this.canvas;
     },
 
+    /**
+     * Opens the PopupWidget
+     * @param {Integer} x The horizontal position of the top left corner.
+     * @param {Integer} y The vertical position of the top left corner.
+     */
     open: function(x, y) {
         $E(document.body).append(this.draw(x,y));
         this.isopen = true;

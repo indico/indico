@@ -1,5 +1,3 @@
-<% from MaKaC.common.PickleJar import DictPickler %>
-
 var enableCustomId = function() {
     IndicoUI.Effect.enableDisableTextField($E('customId'), true);
 }
@@ -12,7 +10,7 @@ var pf = null; //place where to keep a ParticipantListField object to access lat
 var CERNMCUPinField = null; //place where to keep a ShowablePasswordField object to access later
 
 <% if RoomsWithH323IP: %>
-var existingRoomData = <%= jsonEncode(DictPickler.pickle(RoomsWithH323IP)) %>
+var existingRoomData = <%= jsonEncode(fossilize(RoomsWithH323IP)) %>
 <% end %>
 
 /**
@@ -26,7 +24,7 @@ var existingRoomData = <%= jsonEncode(DictPickler.pickle(RoomsWithH323IP)) %>
  * @param {Function} cancelAction (optional) A callback function that will be called if the user presses cancel. The function will be passed
  *                                 a function that must be called to close the popup. If no function is passed the popup will be closed.
  */
-type("PersonDataPopup", ["ExclusivePopup"],
+type("PersonDataPopup", ["ExclusivePopupWithButtons"],
     {
         draw: function() {
             var self = this;
@@ -49,19 +47,17 @@ type("PersonDataPopup", ["ExclusivePopup"],
                 }
             });
 
-            var buttonDiv = Html.div({style:{textAlign:"center", marginTop:pixels(10)}}, saveButton, cancelButton)
+            var buttonDiv = Html.div({}, saveButton, cancelButton)
 
+            var content = IndicoUtil.createFormFromMap([
+                ['Title', $B(Html.select({}, Html.option({}, ""), Html.option({}, "Mr."), Html.option({}, "Mrs."), Html.option({}, "Ms."), Html.option({}, "Dr."), Html.option({}, "Prof.")), personData.accessor('title'))],
+                ['Family Name', $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), personData.accessor('familyName'))],
+                ['First Name', $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), personData.accessor('firstName'))],
+                ['Affiliation', $B(Html.edit({style: {width: '300px'}}), personData.accessor('affiliation'))],
+                ['Endpoint IP', $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'ip', false), personData.accessor('ip'))]
+            ]);
 
-            return this.ExclusivePopup.prototype.draw.call(this, Widget.block([
-                IndicoUtil.createFormFromMap([
-                    ['Title', $B(Html.select({}, Html.option({}, ""), Html.option({}, "Mr."), Html.option({}, "Mrs."), Html.option({}, "Ms."), Html.option({}, "Dr."), Html.option({}, "Prof.")), personData.accessor('title'))],
-                    ['Family Name', $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), personData.accessor('familyName'))],
-                    ['First Name', $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), personData.accessor('firstName'))],
-                    ['Affiliation', $B(Html.edit({style: {width: '300px'}}), personData.accessor('affiliation'))],
-                    ['Endpoint IP', $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'ip', false), personData.accessor('ip'))]
-                ]),
-                buttonDiv
-            ]));
+            return this.ExclusivePopupWithButtons.prototype.draw.call(this, content, buttonDiv);
         } // end of draw
     },
 
@@ -70,7 +66,7 @@ type("PersonDataPopup", ["ExclusivePopup"],
         this.action = action;
         this.cancelAction = cancelAction;
         this.parameterManager = new IndicoUtil.parameterManager();
-        this.ExclusivePopup(title, positive);
+        this.ExclusivePopupWithButtons(title, positive);
     }
 );
 
@@ -84,7 +80,7 @@ type("PersonDataPopup", ["ExclusivePopup"],
  * @param {Function} action A callback function that will be called if the user presses ok. The function will be passed
  *                          a WatchObject with the new values and a function that must be called to close the popup.
  */
-type("RoomDataPopup", ["ExclusivePopup"],
+type("RoomDataPopup", ["ExclusivePopupWithButtons"],
     {
         draw: function() {
             var self = this;
@@ -103,16 +99,15 @@ type("RoomDataPopup", ["ExclusivePopup"],
                 closePopup();
             });
 
-            var buttonDiv = Html.div({style:{textAlign:"center", marginTop:pixels(10)}}, saveButton, cancelButton)
+            var buttonDiv = Html.div({}, saveButton, cancelButton)
 
-            return this.ExclusivePopup.prototype.draw.call(this, Widget.block([
-                IndicoUtil.createFormFromMap([
-                    ['Room Name', $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), roomData.accessor('name'))],
-                    ['Institution', $B(Html.edit({style: {width: '300px'}}), roomData.accessor('institution'))],
-                    ['Endpoint IP', $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'ip', false), roomData.accessor('ip'))]
-                ]),
-                buttonDiv
-            ]));
+            var content = IndicoUtil.createFormFromMap([
+                ['Room Name', $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), roomData.accessor('name'))],
+                ['Institution', $B(Html.edit({style: {width: '300px'}}), roomData.accessor('institution'))],
+                ['Endpoint IP', $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'ip', false), roomData.accessor('ip'))]
+            ]);
+
+            return this.ExclusivePopupWithButtons.prototype.draw.call(this, content, buttonDiv);
         } // end of draw
     },
 
@@ -120,7 +115,7 @@ type("RoomDataPopup", ["ExclusivePopup"],
         this.roomData = roomData;
         this.action = action;
         this.parameterManager = new IndicoUtil.parameterManager();
-        this.ExclusivePopup(title, positive);
+        this.ExclusivePopupWithButtons(title, positive);
     }
 );
 
@@ -130,15 +125,9 @@ type("H323RoomList", ["SelectableListWidget"],
             var self = this;
             var roomData = room.get();
 
-            var roomDiv = Html.div({style:{display: 'inline'}});
-            roomDiv.appendMany([
-                $B(Html.span(), roomData.accessor('name')),
-                ' (',
-                $B(Html.span(), roomData.accessor('institution')),
-                ') - ',
-                $B(Html.span(), roomData.accessor('ip'))
-            ]);
-            return roomDiv;
+            var roomName = Html.span({}, roomData.get('name') + ' (' + roomData.get('institution') + ')');
+            var roomIP = Html.span('CERNMCU_H323RoomIP', 'IP: ' + roomData.get('ip'));
+            return [roomName, roomIP];
         }
     },
     function (selectedObserver) {
@@ -146,7 +135,7 @@ type("H323RoomList", ["SelectableListWidget"],
     }
 )
 
-type("H323RoomPopup", ["ExclusivePopup"],
+type("H323RoomPopup", ["ExclusivePopupWithButtons"],
     {
         draw: function() {
             var self = this;
@@ -206,19 +195,18 @@ type("H323RoomPopup", ["ExclusivePopup"],
 
             });
 
-            var buttonDiv = Html.div({style:{textAlign:"center", marginTop:pixels(10)}}, saveButton.draw(), cancelButton)
+            var buttonDiv = Html.div({}, saveButton.draw(), cancelButton)
 
-            return this.ExclusivePopup.prototype.draw.call(this, Widget.block([
-                Html.div("UIPeopleListDiv CERNMCU_H323RoomList_Div", roomList.draw()),
-                buttonDiv
-            ]));
+            return this.ExclusivePopupWithButtons.prototype.draw.call(this,
+                Html.div("CERNMCU_H323RoomList_Div", roomList.draw()),
+                buttonDiv);
         } // end of draw
     },
     function(title, rooms, participantListField, action) {
         this.rooms = rooms;
         this.action = action;
         this.participantListField = participantListField;
-        this.ExclusivePopup(title, positive);
+        this.ExclusivePopupWithButtons(title, positive);
     }
 );
 

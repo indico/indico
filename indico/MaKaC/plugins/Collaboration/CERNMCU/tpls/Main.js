@@ -100,10 +100,13 @@
                 break;
             case 3:
                 CSErrorPopup("MCU Error", [$T("Participant with IP ") + error.info + $T(" already exists in the MCU.")]);
+                break;
             case 6:
                 CSErrorPopup("MCU Error", [$T("There are too many conferences in the MCU. No more can be created right now.")]);
+                break;
             case 7:
                 CSErrorPopup("MCU Error", [$T("There are too many participants in the MCU. No more can be created right now.")]);
+                break;
             case 18:
                 if ($E('autoYesRB').dom.checked) {
                     CSErrorPopup("MCU Error", [$T("Indico was not able to find an unoccupied ID in the MCU")]);
@@ -228,15 +231,6 @@
         return Html.div({}, Html.table({}, infoTbody));
     },
 
-    getPopupDimensions: function() {
-        if (Browser.IE) {
-                var height = 370;
-        } else {
-                var height = 410;
-        }
-        return {width : 600, height: height};
-    },
-
     getDateFields : function() {
         return ["startDate", "endDate"]
     },
@@ -253,26 +247,26 @@
 
             switch (ipRetrievalResult) {
             case 1:
-                var popup = new AlertPopup("Room H.323 IP", Html.span({},"We have added this event's room as a participant.",
+                var popup = new AlertPopup($T("Room H.323 IP"), Html.span({}, $T("We have added this event's room as a participant."),
                                                                           Html.br(),
-                                                                          "But it does not have an H.323 IP defined.",
+                                                                          $T("But it does not have an H.323 IP defined."),
                                                                           Html.br(),
-                                                                          "Please remember to fill its IP by editing it."));
+                                                                          $T("Please remember to fill its IP by editing it.")));
                 popup.open();
                 break;
             case 2:
-                CSErrorPopup("Room H.323 IP", ["The event's room doesn't has an H.323 IP defined, but it's not a valid IP.",
-                                               "Please fill the IP yourself."]);
+                CSErrorPopup("Room H.323 IP", [$T("The event's room has an H.323 IP defined, but it is not a valid IP."),
+                                               $T("Please fill the IP yourself.")]);
                 break;
             case 3:
-                CSErrorPopup("Room H.323 IP", ["Indico could not retrieve the H.323 IP for this event's room.",
-                                               "(Indico could not connect to its Room Booking database)",
-                                               "Please remember to fill its IP yourself by editing the room"])
+                CSErrorPopup("Room H.323 IP", [$T("Indico could not retrieve the H.323 IP for this event's room."),
+                                               $T("(Indico could not connect to its Room Booking database)"),
+                                               $T("Please remember to fill its IP yourself by editing the room")])
                 break;
             case 4:
-                CSErrorPopup("Room H.323 IP", ["Indico could not retrieve the H.323 IP for this event's room.",
-                                               "(Unknown problem when querying the Room Booking database)",
-                                               "Please remember to fill its IP yourself by editing the room."]);
+                CSErrorPopup("Room H.323 IP", [$T("Indico could not retrieve the H.323 IP for this event's room."),
+                                               $T("(Unknown problem when querying the Room Booking database)"),
+                                               $T("Please remember to fill its IP yourself by editing the room.")]);
                 break;
             default:
                 break;
@@ -329,10 +323,10 @@
             ip = participant.get("ip");
             if (participant.get("ip") in ips) {
                 errors = true;
-                CSErrorPopup("Invalid participants", ["There is more than one participant with the ip " + participant.get("ip")]);
+                CSErrorPopup($T("Invalid participants"), [$T("There is more than one participant with the ip ") + participant.get("ip")]);
                 break;
             } else if (!Util.Validation.isIPAddress(ip)) {
-                CSErrorPopup("Invalid participants", ["The participant " + (i + 1) + " does not have a correct IP"]);
+                CSErrorPopup($T("Invalid participants"), [$T("The participant ") + (i + 1) + $T(" does not have a correct IP")]);
                 errors = true;
                 break;
             } else {
