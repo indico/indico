@@ -46,7 +46,6 @@ from MaKaC.common.timezoneUtils import DisplayTZ, nowutc, getAdjustedDate
 from MaKaC.common.utils import getHierarchicalId
 from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
 from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
-from MaKaC.common.PickleJar import DictPickler
 
 
 def fake(string1=""):
@@ -682,8 +681,6 @@ class outputGenerator:
             out.closeTag("location")
         tzUtil = DisplayTZ(self.__aw,conf)
         tz = tzUtil.getDisplayTZ()
-
-        startDate = cont.startDate.astimezone(timezone(tz))
 
         startDate = None
         if cont.startDate:
