@@ -60,7 +60,8 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
 
         var file = Html.input('file', {name: 'file'});
         var urlBox = Html.edit({name: 'url'});
-        var toPDFCheckbox = Html.checkbox({name: 'topdf', style: {verticalAlign: 'middle'}}, true);
+        var toPDFCheckbox = Html.checkbox({style: {verticalAlign: 'middle'}}, true);
+        toPDFCheckbox.dom.name = 'topdf';
 
         var self = this;
 
