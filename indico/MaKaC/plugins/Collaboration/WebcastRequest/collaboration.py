@@ -30,38 +30,37 @@ from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from MaKaC.i18n import _
 
 class CSBooking(CSBookingBase):
-    
+
     _hasStart = False
     _hasStop = False
     _hasCheckStatus = True
     _hasAcceptReject = True
-    
+
     _needsBookingParamsCheck = True
-    
+
     _allowMultiple = False
-    
+
     _hasStartDate = False
-        
+
+    _simpleParamaters = {
+        "talks" : (str, ''),
+        "talkSelectionComments": (str, ''),
+        "talkSelection": (list, []),
+        "permission": (str, ''),
+        "lectureOptions": (str, ''),
+        "lectureStyle": (str, ''),
+        "postingUrgency": (str, ''),
+        "numWebcastViewers": (str, ''),
+        "numRecordingViewers": (str, ''),
+        "numAttendees": (str, ''),
+        "webcastPurpose": (list, []),
+        "intendedAudience" : (list, []),
+        "subjectMatter": (list, []),
+        "otherComments": (str, '')}
+
     def __init__(self, type, conf):
         CSBookingBase.__init__(self, type, conf)
-        self._bookingParams = {
-            "talks" : None,
-            "talkSelectionComments": None,
-            "talkSelection": [],
-            "permission": None,
-            "lectureOptions": [],
-            "lectureStyle": None,
-            "postingUrgency": None,
-            "numWebcastViewers": 0,
-            "numRecordingViewers": 0,
-            "numAttendees": 0,
-            "webcastPurpose": [],
-            "intendedAudience" : [],
-            "subjectMatter": [],
-            "otherComments": None,
-            "eventWebcastCapable": None  
-        }
-    
+
     def _checkBookingParams(self):
         if not self._bookingParams["permission"]:
             raise WebcastRequestException("permission parameter cannot be left empty")
@@ -76,7 +75,7 @@ class CSBooking(CSBookingBase):
     def _create(self):
         self._statusMessage = _("Request successfully sent")
         self._statusClass = "statusMessageOther"
-        
+
         if MailTools.needToSendEmails('WebcastRequest'):
             try:
                 notification = NewRequestNotification(self)
@@ -87,12 +86,12 @@ class CSBooking(CSBookingBase):
                 Logger.get('RecReq').exception(
                     """Could not send NewRequestNotification for request with id %s of event %s, exception: %s""" % (self._id, str(e)))
                 return WebcastRequestError('create', e)
-        
+
 
     def _modify(self):
         self._statusMessage = _("Request successfully sent")
         self._statusClass = "statusMessageOther"
-        
+
         if MailTools.needToSendEmails('WebcastRequest'):
             try:
                 notification = RequestModifiedNotification(self)
@@ -104,16 +103,16 @@ class CSBooking(CSBookingBase):
                     """Could not send RequestModifiedNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
                 return WebcastRequestError('edit', e)
 
-                                
+
     def _checkStatus(self):
         pass
 
     def _accept(self):
         self._statusMessage = _("Request accepted")
         self._statusClass = "statusMessageOK"
-        import MaKaC.webcast as webcast 
+        import MaKaC.webcast as webcast
         webcast.HelperWebcastManager.getWebcastManagerInstance().addForthcomingWebcast(self._conf)
-        
+
         try:
             notification = RequestAcceptedNotification(self)
             GenericMailer.sendAndLog(notification, self.getConference(),
@@ -123,7 +122,7 @@ class CSBooking(CSBookingBase):
             Logger.get('RecReq').exception(
                 """Could not send RequestAcceptedNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
             return WebcastRequestError('accept', e)
-        
+
         if MailTools.needToSendEmails('WebcastRequest'):
             try:
                 notification = RequestAcceptedNotificationAdmin(self)
@@ -134,11 +133,11 @@ class CSBooking(CSBookingBase):
                 Logger.get('RecReq').exception(
                     """Could not send RequestAcceptedNotificationAdmin for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
                 return WebcastRequestError('accept', e)
-        
+
     def _reject(self):
         self._statusMessage = _("Request rejected by responsible")
         self._statusClass = "statusMessageError"
-        
+
         try:
             notification = RequestRejectedNotification(self)
             GenericMailer.sendAndLog(notification, self.getConference(),
@@ -148,7 +147,7 @@ class CSBooking(CSBookingBase):
             Logger.get('RecReq').exception(
                 """Could not send RequestRejectedNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
             return WebcastRequestError('reject', e)
-        
+
         if MailTools.needToSendEmails('WebcastRequest'):
             try:
                 notification = RequestRejectedNotificationAdmin(self)
@@ -159,7 +158,7 @@ class CSBooking(CSBookingBase):
                 Logger.get('RecReq').exception(
                     """Could not send RequestRejectedNotificationAdmin for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
                 return WebcastRequestError('reject', e)
-                                        
+
     def _delete(self):
         if MailTools.needToSendEmails('WebcastRequest'):
             try:

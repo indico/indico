@@ -58,15 +58,15 @@ class CSBooking(CSBookingBase):
 
     _commonIndexes = ["All Videoconference"]
 
+    _simpleParamaters = {
+        "name": (str, ''),
+        "description": (str, ''),
+        "id": (str, '')}
+
     _complexParameters = ["pin", "hasPin", "autoGenerateId", "customId", "participants"]
 
     def __init__(self, type, conf):
         CSBookingBase.__init__(self, type, conf)
-        self._bookingParams = {
-            "name": None,
-            "description": None,
-            "id": None
-        }
 
         self._oldName = None
         self._pin = None

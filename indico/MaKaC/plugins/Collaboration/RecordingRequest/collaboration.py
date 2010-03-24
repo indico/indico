@@ -42,23 +42,23 @@ class CSBooking(CSBookingBase):
 
     _hasStartDate = False
 
+    _simpleParamaters = {
+        "talks" : (str, ''),
+        "talkSelectionComments": (str, ''),
+        "talkSelection": (list, []),
+        "permission": (str, ''),
+        "lectureOptions": (str, ''),
+        "lectureStyle": (str, ''),
+        "postingUrgency": (str, ''),
+        "numRemoteViewers": (str, ''),
+        "numAttendees": (str, ''),
+        "recordingPurpose": (list, []),
+        "intendedAudience" : (list, []),
+        "subjectMatter": (list, []),
+        "otherComments": (str, '')}
+
     def __init__(self, type, conf):
         CSBookingBase.__init__(self, type, conf)
-        self._bookingParams = {
-            "talks" : None,
-            "talkSelectionComments": None,
-            "talkSelection": [],
-            "permission": None,
-            "lectureOptions": [],
-            "lectureStyle": None,
-            "postingUrgency": None,
-            "numRemoteViewers": 0,
-            "numAttendees": 0,
-            "recordingPurpose": [],
-            "intendedAudience" : [],
-            "subjectMatter": [],
-            "otherComments": None
-        }
 
     def _checkBookingParams(self):
         if not self._bookingParams["permission"]:

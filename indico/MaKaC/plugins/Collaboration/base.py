@@ -710,6 +710,7 @@ class CSBookingBase(Persistent):
     _hasStartDate = True
     _hasEventDisplay = False
     _hasTitle = False
+    _simpleParameters = {}
     _complexParameters = []
 
     def __init__(self, bookingType, conf):
@@ -755,11 +756,13 @@ class CSBookingBase(Persistent):
         self._endDate = None
         self._startDateTimestamp = None
         self._endDateTimestamp = None
-        self._bookingParams = None # a dict that should be initialized by the implementing class
         self._statusMessage = ""
         self._statusClass = ""
         self._acceptRejectStatus = None #None = not yet accepted / rejected; True = accepted; False = rejected
         self._rejectReason = ""
+
+        for k,v in self._simpleParameters.iteritems():
+            self._bookingParams[k] = v[1]
 
         self._canBeDeleted = True
         self._canBeStarted = self._hasStart
@@ -1050,10 +1053,20 @@ class CSBookingBase(Persistent):
         if self._bookingParams is None:
             raise CollaborationServiceException("This CSBooking object with id " + str(id) + " of the class " + str(self.__class__) + " doesn't have an attribute _bookingParams defined")
 
-        bookingParams = self._bookingParams.copy()
-        if len(self._complexParameters) > 0:
+        bookingParams = {}
+        for k, v in self.__class__._simpleParamaters.iteritems():
+            if k in self._bookingParams:
+                value = self._bookingParams[k]
+            else:
+                value = v[1] #we use the default value
+            if v[0] is bool and value is True: #we assume it will be used in a single checkbox
+                value = ["yes"]
+            if value: #we do not include False, '', []
+                bookingParams[k] = value
+
+        if len(self.__class__._complexParameters) > 0:
             getterMethods = dict(inspect.getmembers(self, lambda m: inspect.ismethod(m) and m.__name__.startswith('get')))
-            for paramName in self._complexParameters:
+            for paramName in self.__class__._complexParameters:
                 getMethodName = 'get' + paramName[0].upper() + paramName[1:]
                 if getMethodName in getterMethods:
                     bookingParams[paramName] = getterMethods[getMethodName]()
@@ -1063,9 +1076,9 @@ class CSBookingBase(Persistent):
         bookingParams["startDate"] = self.getStartDateAsString()
         bookingParams["endDate"] = self.getEndDateAsString()
         if self.needsToBeNotifiedOfDateChanges():
-            bookingParams["notifyOnDateChanges"] = ["notifyOnDateChanges"]
+            bookingParams["notifyOnDateChanges"] = ["yes"]
         if self.isHidden():
-            bookingParams["hidden"] = ["hidden"]
+            bookingParams["hidden"] = ["yes"]
 
         return bookingParams
 
@@ -1092,8 +1105,8 @@ class CSBookingBase(Persistent):
         if sanitizeResult:
             return sanitizeResult
 
-        self.setHidden(params.pop("hidden", False) == ["hidden"])
-        self.setNeedsToBeNotifiedOfDateChanges(params.pop("notifyOnDateChanges", False) == ["notifyOnDateChanges"])
+        self.setHidden(params.pop("hidden", False) == ["yes"])
+        self.setNeedsToBeNotifiedOfDateChanges(params.pop("notifyOnDateChanges", False) == ["yes"])
 
         startDate = params.pop("startDate", None)
         if startDate is not None:
@@ -1103,7 +1116,12 @@ class CSBookingBase(Persistent):
             self.setEndDateFromString(endDate)
 
         for k,v in params.iteritems():
-            if k in self._bookingParams:
+            if k in self._simpleParamaters:
+                if self._simpleParamaters[k][0]:
+                    try:
+                        v = self._simpleParamaters[k][0](v)
+                    except ValueError:
+                        raise CollaborationServiceException("Tried to set value of parameter with name " + str(k) + ", recognized as a simple parameter of type" + str(self._simpleParamaters[k]) + ", but the conversion failed")
                 self._bookingParams[k] = v
             elif k in self._complexParameters:
                 setterMethods = dict(inspect.getmembers(self, lambda m: inspect.ismethod(m) and m.__name__.startswith('set')))
