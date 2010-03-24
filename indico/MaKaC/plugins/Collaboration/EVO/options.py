@@ -82,6 +82,9 @@ globalOptions = [
     ("allowedPastMinutes", {"description" : _("Time that we allow EVO meetings to be created in the past (minutes)"),
                             "type": int,
                             "defaultValue": 30} ),
+    ("phoneBridgeNumberList", {"description" : _("Link to list of EVO Phone Bridge numbers"),
+                            "type": str,
+                            "defaultValue": "http://evo.caltech.edu/evoGate/telephone.jsp"}),
     ("APIMap", {"description" : _("Map of actions and URLs"),
                "type": dict,
                "defaultValue": {

@@ -22,7 +22,8 @@ from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase, WCSCS
 from MaKaC.common.utils import formatDateTime
 from datetime import timedelta
 from MaKaC.webinterface.common.tools import strip_ml_tags, unescape_html
-from MaKaC.plugins.Collaboration.EVO.common import getMinStartDate, getMaxEndDate
+from MaKaC.plugins.Collaboration.EVO.common import getMinStartDate, getMaxEndDate,\
+    getEVOOptionValueByName
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.i18n import _
 from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate
@@ -57,8 +58,7 @@ class WAdvancedTab(WAdvancedTabBase):
     def getVars(self):
         variables = WAdvancedTabBase.getVars(self)
 
-        bookingClass = CollaborationTools.getCSBookingClass(self._pluginName)
-        variables["CanBeNotified"] = bookingClass._canBeNotifiedOfEventDateChanges
+        variables["PhoneBridgeListLink"] = getEVOOptionValueByName("phoneBridgeNumberList")
 
         return variables
 
@@ -127,6 +127,9 @@ class XMLGenerator(object):
             out.writeTag("launchTooltip", _('Click here to join the EVO meeting!'))
             out.closeTag("launchInfo")
 
+        if booking.isDisplayPhoneBridgeId():
+            out.writeTag("firstLineInfo", _('Phone Bridge ID:') + booking.getPhoneBridgeId())
+
         out.openTag("information")
 
         out.openTag("section")
@@ -135,9 +138,36 @@ class XMLGenerator(object):
         out.closeTag("section")
 
         if booking.getHasAccessPassword():
+            if not booking.isDisplayPassword() and not booking.isDisplayPhoneBridgePassword():
+                out.openTag("section")
+                out.writeTag("title", _('Protection:'))
+                out.writeTag("line", _('This EVO meeting is protected by a password.'))
+                out.closeTag("section")
+            else:
+                if booking.isDisplayPassword():
+                    out.openTag("section")
+                    out.writeTag("title", _('Password:'))
+                    out.writeTag("line", booking.getAccessPassword())
+                    out.closeTag("section")
+                if booking.isDisplayPhoneBridgePassword():
+                    out.openTag("section")
+                    out.writeTag("title", _('Phone Bridge Password:'))
+                    out.writeTag("line", booking.getPhoneBridgePassword())
+                    out.closeTag("section")
+
+        if booking.isDisplayPhoneBridgeNumbers():
             out.openTag("section")
-            out.writeTag("title", _('Protection:'))
-            out.writeTag("line", _('This EVO meeting is protected by a password.'))
+            out.writeTag("title", _('Phone bridge numbers:'))
+            out.openTag("linkLine")
+            out.writeTag("href", getEVOOptionValueByName("phoneBridgeNumberList"))
+            out.writeTag("caption", _("List of phone bridge numbers."))
+            out.closeTag("linkLine")
+            out.closeTag("section")
+
+        if booking.isDisplayURL():
+            out.openTag("section")
+            out.writeTag("title", _('Auto-join URL:'))
+            out.writeTag("line", booking.getURL())
             out.closeTag("section")
 
         out.openTag("section")

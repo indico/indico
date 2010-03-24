@@ -203,6 +203,10 @@ a.img:active {
     background: transparent url(../images/menu_arrow_up_black.png) scroll no-repeat center right;
 }
 
+.centeredCheckBox {
+    vertical-align: middle;
+}
+
 .listtitle {
    font-weight: bold;
    font-size: 16px;
@@ -1214,7 +1218,7 @@ span.horizontalSeparator {
     font-size: 11px;
 }
 
-.tip ul {
+.tip ul, .tip strong, .tip em {
     color:#222222;
     font-size:11px;
 }
@@ -3931,6 +3935,25 @@ span.statusMessage {
     color: #7A7A7A;/*#356AA0;*/
 }
 
+div.collaborationAdvancedTabTitle {
+    font-size:13px;
+    background:none repeat scroll 0 0 white;
+    position:absolute;
+    padding-right:5px;
+}
+
+div.collaborationAdvancedTabTitleLine {
+    height: 9px;
+    border-bottom: 1px dotted #777;
+    position: relative;
+    min-width: 200px;
+}
+
+div.collaborationAdvancedTabCheckboxDiv {
+    margin-left:50px;
+    padding-top:5px;
+}
+
 td.collaborationInfoLeftCol {
     vertical-align: top;
     text-align: left;
@@ -4346,8 +4369,21 @@ div.collaborationDisplayDateGroup {
     padding-bottom: 15px;
 }
 
-.collaborationDisplayLink {
-    margin-left: 5px;
+.collaborationDisplayMoreInfo {
+    color: #0B63A5;
+}
+
+.collaborationDisplayHideInfo {
+    color: #B38B1F;
+}
+
+.collaborationDisplayMoreInfo , .collaborationDisplayHideInfo {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.collaborationDisplayMoreInfo:hover , .collaborationDisplayHideInfo:hover {
+    color: #DBB03A;
 }
 
 div.collaborationDisplayBookingLine {
@@ -4401,20 +4437,7 @@ table.eventDetails td.collaborationDisplayInfoRightCol {
     font-size: 10px;
 }
 
-td.collaborationConfDisplayInfoLeftCol {
-    padding: 0px;
-    padding-right: 10px;
-    vertical-align: top;
-    text-align: right;
-    white-space: nowrap;
-    width: 0px;
-    color: #222222;
-    font-size: 10px;
-}
-
-td.collaborationConfDisplayInfoRightCol {
-    padding: 0px;
-    vertical-align: top;
+td.collaborationDisplayInfoRightCol a {
     font-size: 10px;
 }
 

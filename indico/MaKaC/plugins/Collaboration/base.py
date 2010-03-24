@@ -710,8 +710,6 @@ class CSBookingBase(Persistent):
     _hasStartDate = True
     _hasEventDisplay = False
     _hasTitle = False
-    _simpleParameters = {}
-    _complexParameters = []
 
     def __init__(self, bookingType, conf):
         """ Constructor for the CSBookingBase class.
@@ -760,10 +758,7 @@ class CSBookingBase(Persistent):
         self._statusClass = ""
         self._acceptRejectStatus = None #None = not yet accepted / rejected; True = accepted; False = rejected
         self._rejectReason = ""
-
-        for k,v in self._simpleParameters.iteritems():
-            self._bookingParams[k] = v[1]
-
+        self._bookingParams = {}
         self._canBeDeleted = True
         self._canBeStarted = self._hasStart
         self._canBeStopped = False
@@ -1064,7 +1059,7 @@ class CSBookingBase(Persistent):
             if value: #we do not include False, '', []
                 bookingParams[k] = value
 
-        if len(self.__class__._complexParameters) > 0:
+        if hasattr(self.__class__, "_complexParameters") and len(self.__class__._complexParameters) > 0:
             getterMethods = dict(inspect.getmembers(self, lambda m: inspect.ismethod(m) and m.__name__.startswith('get')))
             for paramName in self.__class__._complexParameters:
                 getMethodName = 'get' + paramName[0].upper() + paramName[1:]

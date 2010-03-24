@@ -78,20 +78,49 @@ var EVOPasswordHelpPopup = function(event) {
         '<\/div>');
 };
 
+
+/**
+ * Mouseover help popup for the 'displayPassword' field
+ */
+var EVODisplayPasswordHelpPopup = function(event) {
+    IndicoUI.Widgets.Generic.tooltip(this, event,
+        '<div style="padding:3px">' +
+            $T('The EVO Meeting password will be displayed <strong><em>in clear</em></strong> in the event display page. '+
+               'Any person that can see the event page will see the password. Please use this option carefully.') +
+        '<\/div>');
+};
+
+/**
+ * Mouseover help popup for the 'displayPhonePassword' field
+ */
+var EVODisplayPhonePasswordHelpPopup = function(event) {
+    IndicoUI.Widgets.Generic.tooltip(this, event,
+        '<div style="padding:3px">' +
+        $T('The Phone bridge password will be displayed <strong><em>in clear</em></strong> in the event display page. '+
+           'Any person that can see the event page will see the password. Please use this option carefully.') +
+        '<\/div>');
+};
+
+/**
+ * Mouseover help popup for the 'displayURL' field
+ */
+var EVODisplayURLHelpPopup = function(event) {
+    IndicoUI.Widgets.Generic.tooltip(this, event,
+        '<div style="padding:3px">' +
+            $T('The auto-join URL will be displayed. Please note that when it is possible to join the EVO meeting, '+
+               'a <em>Join Now!</em> link will appear. People will be able to join the meeting by clicking on this link.') +
+        '<\/div>');
+};
+
 /**
  * Draws the context help icons and assigns the appropiate popups to each one.
  */
 var EVODrawContextHelpIcons = function() {
-    var startDateHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
-    startDateHelpImg.dom.onmouseover = EVOStartDateHelpPopup;
 
-    var endDateHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
-    endDateHelpImg.dom.onmouseover = EVOEndDateHelpPopup;
-
-    var passwordHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
-    passwordHelpImg.dom.onmouseover = EVOPasswordHelpPopup;
-
-    $E('startDateHelp').set(startDateHelpImg);
-    $E('endDateHelp').set(endDateHelpImg);
-    $E('passwordHelp').set(passwordHelpImg);
+    $E('startDateHelpImg').dom.onmouseover = EVOStartDateHelpPopup;
+    $E('endDateHelpImg').dom.onmouseover = EVOEndDateHelpPopup;
+    $E('passwordHelpImg').dom.onmouseover = EVOPasswordHelpPopup;
+    $E('displayPasswordHelpImg').dom.onmouseover = EVODisplayPasswordHelpPopup;
+    $E('displayPhonePasswordHelpImg').dom.onmouseover = EVODisplayPhonePasswordHelpPopup;
+    $E('displayURLHelpImg').dom.onmouseover = EVODisplayURLHelpPopup;
 }
