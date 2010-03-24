@@ -15,7 +15,7 @@
 
         <span id="add_<%= domId %>_to_basket" class="UIRowButton" style="padding: 3px; height: 16px;"></span>
         <script type="text/javascript">
-            $E('add_<%= domId %>_to_basket').set(new FavouritizeButton(<%= jsonEncode(avatar) %>, {}, <%= jsBoolean(currentUserBasket.hasUserId(id)) %>).draw());
+            $E('add_<%= domId %>_to_basket').set(new ToggleFavouriteButton(<%= jsonEncode(avatar) %>, {}, <%= jsBoolean(currentUserBasket.hasUserId(id)) %>).draw());
         </script>
     <% end %>
 
