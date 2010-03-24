@@ -201,7 +201,7 @@ class outputGenerator:
         return roomName
 
 
-    def _confToXML(self, conf, vars, includeSession=1, includeContribution=1, includeMaterial=1, showSession="all", showDate="all",showContribution="all", showWithdrawed=True, useSchedule=True, out=None):
+    def _confToXML(self, conf, vars, includeSession=1, includeContribution=1, includeMaterial=1, showSession="all", showDate="all",showContribution="all", showWithdrawed=True, useSchedule=True, out=None, source=None):
         if not out:
             out = self._XMLGen
 
@@ -219,6 +219,22 @@ class outputGenerator:
 
         out.writeTag("parentProtection", simplejson.dumps(conf.getAccessController().isProtected()))
         out.writeTag("materialList", simplejson.dumps(self._generateMaterialList(conf)))
+
+        # Access list info (tag 506)
+        # Check to make sure this request is coming from the Recording Manager.
+        # We don't want to provide CERN-specific access list information to external sources like OAI harvesters.
+        if source is not None and source == 'RecordingManager':
+            # Also check to make sure that the RecordingManager plugin is installed and active
+            if (PluginsHolder().hasPluginType("Collaboration") and
+                PluginsHolder().getPluginType("Collaboration").hasPlugin("RecordingManager") and
+                PluginsHolder().getPluginType("Collaboration").getPlugin("RecordingManager").isActive()):
+
+                from MaKaC.common.logger import Logger
+
+                Logger.get('RecMan').info('Called _confToXML() with RecordingManager')
+                # only now do we know it's safe to import the necessary method
+                from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator
+                MarcAccessListGenerator().generateAccessListXML(out, conf)
 
         if conf.canModify( self.__aw ) and vars and modificons:
             out.writeTag("modifyLink",vars["modifyURL"])
@@ -848,7 +864,7 @@ class outputGenerator:
         out.closeTag("break")
 
 
-    def confToXML(self,conf,includeSession,includeContribution,includeMaterial,showSession="all", showContribution="all", out=None, forceCache=False):
+    def confToXML(self,conf,includeSession,includeContribution,includeMaterial,showSession="all", showContribution="all", out=None, forceCache=False, source=None):
         if not out:
             out = self._XMLGen
         #try to get a cache
@@ -860,7 +876,7 @@ class outputGenerator:
             xml = obj.getContent()
         else:
             temp = XMLGen(init=False)
-            self._confToXML(conf,None,includeSession,includeContribution,includeMaterial,showSession=showSession, showDate="all", showContribution=showContribution, showWithdrawed=False, useSchedule=False, out=temp)
+            self._confToXML(conf,None,includeSession,includeContribution,includeMaterial,showSession=showSession, showDate="all", showContribution=showContribution, showWithdrawed=False, useSchedule=False, out=temp, source=source)
             xml = temp.getXml()
             self.cache.cacheObject(version, xml, conf)
         #    out.writeTag("cache", "not found in cache")

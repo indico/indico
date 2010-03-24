@@ -34,11 +34,13 @@ from MaKaC.common.logger import Logger
 from time import mktime
 from MaKaC.common.xmlGen import XMLGen
 from MaKaC.export.oai2 import DataInt
-from MaKaC.common.output import outputGenerator
+from MaKaC.common.output import outputGenerator, XSLTransformer
 from MaKaC.conference import Link
 
 from urllib2 import Request, urlopen
 import re
+import os
+import sys
 
 def getTalks(conference, oneIsEnough = False, sort = False):
     """ oneIsEnough: the algorithm will stop at the first contribution found
@@ -376,10 +378,12 @@ def createCDSRecord(IndicoID, aw):
 
     # I don't understand what some of the following lines do. Pedro did some of it for me.
     xmlGen = XMLGen()
+    xmlGen.initXml()
     di = DataInt(xmlGen)
-    og = outputGenerator(aw, dataInt=di)
+#    og = outputGenerator(aw, dataInt=di)
+    og = outputGenerator(aw, xmlGen)
 
-    xmlGen.openTag("record")
+    xmlGen.openTag("event")
 
     parsed = parseIndicoID(IndicoID)
     Logger.get('RecMan').info("IndicoID = %s", IndicoID)
@@ -391,10 +395,11 @@ def createCDSRecord(IndicoID, aw):
     # to e.g. OAI harvesters outside CERN.
     if parsed["type"] == 'conference':
         Logger.get('RecMan').info("generating MARC XML for a conference")
-        og.confToXMLMarc21(conf, 1, 1, 1, forceCache=True, out=xmlGen, source='RecordingManager')
+#        og.confToXMLMarc21(conf, 1, 1, 1, forceCache=True, out=xmlGen, source='RecordingManager')
+        og.confToXML(conf, 0, 0, 1, source='RecordingManager')
 #        conf,includeSession,includeContribution,includeMaterial,showSession="all", showContribution="all", out=None, forceCache=False
     elif parsed["type"] == 'session':
-        Logger.get('RecMan').info("generating MARC XML for a session (no such thing)")
+        Logger.get('RecMan').info("generating MARC XML for a session (no such thing yet)")
         # there is no such method for sessions yet for some reason...
         # og.confToXMLMarc21(conf, 1, 1, 1, forceCache=True, out=xmlGen, source='RecordingManager')
         pass
@@ -412,14 +417,30 @@ def createCDSRecord(IndicoID, aw):
     else:
         Logger.get('RecMan').info("IndicoID = %s", IndicoID)
 
-    xmlGen.closeTag("record")
+    xmlGen.closeTag("event")
 
     # Get the MARC XML
-    marc = xmlGen.getXml()
+    marcxml = xmlGen.getXml()
+
+    from MaKaC.common import Config
+
+    outputData = ""
+    stylepath = "%s/%s.xsl" % (Config.getInstance().getStylesheetsDir(),
+                               'cds_marcxml_presentation')
+    if os.path.exists(stylepath):
+        try:
+            Logger.get('RecMan').info("Trying to do XSLT using path %s" % stylepath)
+            parser = XSLTransformer(stylepath)
+            outputData = parser.process(marcxml)
+        except:
+            outputData = "Cannot parse stylesheet: %s" % sys.exc_info()[0]
+    else:
+        outputData = marcxml
+
 
     # temporary, for my own debugging
     f = open('/tmp/marc.xml', 'w')
-    f.write(marc)
+    f.write(outputData)
     f.close()
 
     # Next step: submit this marc xml to CDS
