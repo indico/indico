@@ -833,6 +833,10 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
  *
  * @param {Object} initialUser A user that will appear initially. Example: <%= jsonEncode(DictPickler.pickle(AvatarHolder().getById(1))) %>
  *
+ * @param {String} hiddenFieldName The name attribute for the hidden field that will be drawn along with the rest of the widget.
+ *                                 This hidden field will have the currently selected user's id.
+ *                                 If left to null, there will be no hidden field.
+ *
  * @param {Boolean} allowChoose If true, a 'Choose User' dialog will be present when pressing on the "choose" button.
  *
  * @param {Boolean} includeFavourites If True, favourites will appear in the list of suggested users of the ChooseUsersPopup.
@@ -856,11 +860,22 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
 type("SingleUserField", ["IWidget"], {
 
     /**
-     * @return {Object} Returns an object (a plain object, such as {id: '0', name: 'John'}, not a $O) with the user information.
-     *                  If no user has been chosen yet, the object will have an id with value "null".
+     * @return {String} The id of the currently selected user
      */
-    getUser: function() {
+    get: function() {
         return this.user.getAll();
+    },
+
+    set: function(user) {
+        this.user.replace(user);
+        this.__userChosenObserver();
+    },
+
+    /**
+     * @return {String} the name of the inner hidden field
+     */
+    getName: function() {
+        return this.hiddenFieldName;
     },
 
     /**
@@ -878,7 +893,9 @@ type("SingleUserField", ["IWidget"], {
      * Updates the buttons to be shown next to the user name after the user changes
      * @param {Object} user a dictionary with the user info.
      */
-    __userChosenObserver: function(user) {
+    __userChosenObserver: function() {
+        user = this.user.getAll();
+
         this.variableButtonsDiv.clear();
         if (IndicoGlobalVars.isUserAuthenticated && this.userChosen && user._type === "Avatar") {
             var favButtonDiv = Html.div({style:{display:"inline", paddingLeft:pixels(5)}}, new ToggleFavouriteButton(user).draw());
@@ -891,7 +908,7 @@ type("SingleUserField", ["IWidget"], {
                 self.userChosen.set(false);
                 var notChosenUser = self.__getNotChosenUser();
                 self.user.replace(notChosenUser);
-                self.__userChosenObserver(notChosenUser);
+                self.__userChosenObserver();
             }, IndicoUI.Buttons.removeButton()));
 
             var removeButtonDiv = Html.div({style:{display:"inline"}}, removeButton);
@@ -905,11 +922,19 @@ type("SingleUserField", ["IWidget"], {
     draw: function() {
         var self = this;
 
+        var contentDiv = Html.div({style:{display:"inline"}});
+
+        // Draw the hidden field
+        if (exists(this.hiddenFieldName)) {
+            contentDiv.append($B(Html.input('hidden'), {name: this.hiddenFieldName}, self.user.accessor('id')));
+        }
+
         // Draw the user if there is one
         var userNameDiv = $B(Html.span({style:{verticalAlign:'middle'}}), self.user.accessor('name'));
+        contentDiv.append(userNameDiv);
 
         this.variableButtonsDiv = Html.div({style: {display: 'inline'}});
-        this.__userChosenObserver(this.user.getAll());
+        this.__userChosenObserver();
 
         var fixedButtonsDiv = Html.div({style: {display: 'inline'}});
         // Draw the choose button
@@ -921,7 +946,7 @@ type("SingleUserField", ["IWidget"], {
                     if (value) { // the assignProcess function returned true
                         var returnedUser = userList[0];
                         self.user.replace(returnedUser);
-                        self.__userChosenObserver(returnedUser);
+                        self.__userChosenObserver();
                         self.userChosen.set(true);
                     }
                 });
@@ -940,7 +965,7 @@ type("SingleUserField", ["IWidget"], {
         }
 
         return Html.div({style: {display: 'inline'}},
-                        userNameDiv,
+                        contentDiv,
                         this.variableButtonsDiv,
                         fixedButtonsDiv);
     }
@@ -949,6 +974,7 @@ type("SingleUserField", ["IWidget"], {
      * Constructor of SingleUserField
      */
     function(initialUser,
+             hiddenFieldName,
              allowChoose,
              includeFavourites, suggestedUsers,
              conferenceId, enableGroups,
@@ -960,6 +986,8 @@ type("SingleUserField", ["IWidget"], {
         // we store the selected user
         this.user = $O(exists(initialUser) ? initialUser : this.__getNotChosenUser());
         this.userChosen = new WatchValue(exists(initialUser));
+
+        this.hiddenFieldName = hiddenFieldName;
 
         this.allowChoose = any(allowChoose, true);
 

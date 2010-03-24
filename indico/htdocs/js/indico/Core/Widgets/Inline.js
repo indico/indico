@@ -932,92 +932,79 @@ type("HiddenText", ["IWidget"], {
  * @param {String} hiddenMessage The text to show when "text" is hidden.
  * @param {Boolean} true if we want to show the text initially, false otherwise
  */
-type("ShowablePasswordField", ["IWidget"], {
+type("ShowablePasswordField", ["IWidget", "ErrorAware"], {
 
-    __clearInvalid: function() {
-        // We normally could do: Dom.Event.dispatch(this.passwordField.dom, 'change');
-        // but it seems that IE does not like to dispatch events on elements that are not in the DOM tree,
-        // so we have to do things manually
-
-        // we remove the "invalid" word from the class if needed
-        this.passwordField.dom.className = this.passwordField.dom.className.replace(" invalid", "");
-        this.clearTextField.dom.className = this.passwordField.dom.className.replace(" invalid", "");
-
-        // we remove the tooltip divs from the DOM
-        each(this.invalidFieldTooltips, function(tooltip){
-            Dom.List.remove(document.body, tooltip);
-        });
-        this.invalidFieldTooltips = [];
-
-        // we detach the observers
-        each(this.invalidFieldObserverDetachers, function(detacher){
-            detacher();
-        });
-        this.invalidFieldObserverDetachers = [];
+    _setErrorState: function(text) {
+        if (this.show) {
+            this._setElementErrorState(this.clearTextField, text);
+        } else {
+            this._setElementErrorState(this.passwordField, text);
+        }
     },
 
-    setPassword: function(newPassword) {
+    getName: function() {
+        return this.name;
+    },
+
+    set: function(newPassword) {
         this.passwordField.dom.value = newPassword;
         this.clearTextField.dom.value = newPassword;
-        this.__clearInvalid();
+        this.setError(false);
     },
 
-    getPassword: function(newPassword) {
-        if (this.show.get()) {
+    get: function(newPassword) {
+        if (this.show) {
             return this.clearTextField.dom.value;
         } else {
             return this.passwordField.dom.value;
         }
     },
 
-    markAsInvalid: function(errors){
-        var result1 = IndicoUtil.markInvalidField(this.passwordField, errors);
-        var result2 = IndicoUtil.markInvalidField(this.clearTextField, errors);
-
-        this.invalidFieldTooltips.push(result1[0]);
-        this.invalidFieldTooltips.push(result2[0]);
-        this.invalidFieldObserverDetachers = this.invalidFieldObserverDetachers.concat(result1[1].concat(result2[1]));
+    refresh: function() {
+        if (this.show) {
+            this.button.set(" (" + $T("Hide") + ")");
+            this.inputDiv.set(this.clearTextField);
+        } else {
+            this.button.set(" (" + $T("Show") + ")");
+            this.inputDiv.set(this.passwordField);
+        }
     },
 
     draw: function() {
         var self = this;
 
-        var content = $B(Html.div({style:{display:"inline"}}), this.show, function(show) {
-            var field;
-            var button;
-            if (show) {
-                field = self.clearTextField;
-                field.dom.value = self.passwordField.dom.value;
-                self.button.set(" (" + $T("Hide") + ")");
+        this.inputDiv = Html.div({style:{display:'inline'}});
+
+        // We do not use $B and $V for the password because of a bug with two dual bindings between 2 XElements and a $V
+        this.passwordField = Html.input('password', {name: this.name}, this.initialPassword);
+        this.clearTextField = Html.input('text', {name: this.name}, this.initialPassword);
+
+        this.button = Html.span("fakeLink");
+
+        this.button.observeClick(function(){
+            if (self.show) {
+                self.passwordField.set(self.clearTextField.get());
             } else {
-                field = self.passwordField;
-                field.dom.value = self.clearTextField.dom.value;
-                self.button.set(" (" + $T("Show") + ")");
+                self.clearTextField.set(self.passwordField.get());
             }
-            self.__clearInvalid();
-            return Html.span({}, field, self.button);
+            self.show = !self.show;
+            self.refresh();
+            self.setError(false);
         });
+
+        this.refresh();
+
+        var content = Html.div({style:{display:"inline"}}, this.inputDiv, this.button);
         return this.IWidget.prototype.draw.call(this, content);
     }
 },
     function(name, initialPassword, initialShow) {
         this.name = name;
-        this.show = $V(initialShow);
-
-        // We do not use $B and $V for the password because of a bug with two dual bindings between 2 XElements and a $V
-        this.passwordField = Html.input('password', {name: this.name}, initialPassword);
-        this.clearTextField = Html.input('text', {name: this.name}, initialPassword);
-
-        this.button = Html.span("fakeLink");
-
-        var self = this;
-        this.button.observeClick(function(){
-            self.show.set(!self.show.get());
-        });
+        this.initialPassword = initialPassword;
+        this.show = initialShow;
 
         this.invalidFieldTooltips = [];
         this.invalidFieldObserverDetachers = [];
-
     }
 );
 

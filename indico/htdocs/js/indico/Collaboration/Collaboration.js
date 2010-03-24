@@ -105,22 +105,32 @@ var beforeNow = function(date) {
 /**
  * Builds a parameter manager to verify a form's parameter
  * @param {String} pluginName The name of the plugin that the form belongs to.
- * @param {Array of nodes} formNodes An array of nodes such as the one that can be obtained with
- *                                   var formNodes = IndicoUtil.findFormFields(containerElement)
  * @param {object} values The values of the input nodes of the form. This is needed because checks
  *                        on some fields depend on values of others.
- * @return The parameterManager object so that we can call parameterManager.check() later.
  */
-var buildParameterManager = function(pluginName, formNodes, values) {
-    var parameterManager = new IndicoUtil.parameterManager();
-    var checks = codes[pluginName].checkParams();
-    each(formNodes, function(node){
-        var checkData = checks[node.name]
+type("CSParameterManager", [], {
+
+    __addComponent: function(component) {
+        var self = this;
+
+        var name;
+        var componentToAdd;
+        if (component.ErrorAware) {
+            name = component.getName();
+            componentToAdd = component;
+        } else if (isDom(component)){
+            name = component.name;
+            componentToAdd = $E(component);
+        } else {
+            return;
+        }
+        var checkData = this.checks[name];
+
         if (exists(checkData)) {
             var customCheckFunction = checkData[2];
             if (exists(customCheckFunction)) {
-                parameterManager.add($E(node), checkData[0], checkData[1], function(value){
-                    var errors = checkData[2](value, values);
+                this.parameterManager.add(componentToAdd, checkData[0], checkData[1], function(value){
+                    var errors = checkData[2](value, self.values);
                     if (errors.length == 0) {
                         return null;
                     } else {
@@ -128,12 +138,43 @@ var buildParameterManager = function(pluginName, formNodes, values) {
                     }
                 });
             } else {
-                parameterManager.add($E(node), checkData[0], checkData[1]);
+                this.parameterManager.add(componentToAdd, checkData[0], checkData[1]);
             }
         }
-    });
-    return parameterManager;
-};
+    },
+
+    /**
+     * Adds component(s) to the inner parameter manager, looking for what checks should be done
+     * in the corresponding plugin code.
+     * @param {object} formNodes An array of nodes or ErrorAware components.
+     *                           For example, an array of nodes can be obtained with
+     *                           var formNodes = IndicoUtil.findFormFields(containerElement)
+     */
+    add: function(components) {
+        var self = this;
+
+        if(!isArrayOrListable(components)) {
+            components = [components];
+        }
+        each(components, function(component) {
+            self.__addComponent(component);
+        });
+    },
+
+    /**
+     * Executes check() on the inner parameterManager
+     */
+    check: function() {
+        return this.parameterManager.check();
+    }
+},
+    function(pluginName, values) {
+        this.parameterManager = new IndicoUtil.parameterManager();
+        this.values = values;
+        this.checks = codes[pluginName].checkParams();
+    }
+);
+
 
 var formatDateStringCS = function(dateString) {
     return (dateString.substring(0,10) + ' at ' + dateString.substring(11, 16));
@@ -940,21 +981,11 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
             this.advancedTabForm = Html.div();
             this.advancedTabForm.dom.innerHTML = forms[self.bookingType][1];
 
-            this.formNodes = IndicoUtil.findFormFields(this.basicTabForm, this.advancedTabForm);
-            this.values = {};
-
-            // We put calendar widgets on the date fields
-            this.__drawCalendarWidgets();
-
-            // If we are modifying a booking, we put the booking's values in the form in the Basic tab
-            if (self.popupType === 'edit') {
-                IndicoUtil.setFormValues(this.formNodes, self.booking.bookingParams);
-            }
+            // We scan the input nodes inside the dialog
+            this.components = IndicoUtil.findFormFields(this.basicTabForm, this.advancedTabForm);
 
             // We initialize the parameter manager in order to make checks on the fields
             this.__buildParameterManager();
-
-            this.advancedDiv = Html.div();
 
             // We construct the "save" button and what happens when it's pressed
             var saveButton = Html.input('button', null, $T("Save"));
@@ -968,7 +999,7 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
                 self.close();
             });
 
-            var buttonDiv = Html.div({}, saveButton, cancelButton)
+            var buttonDiv = Html.div({}, saveButton, cancelButton);
 
             var width = 600;
             if (pluginHasFunction(self.bookingType, "getPopupWidth")) {
@@ -983,6 +1014,12 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
         },
 
         postDraw: function() {
+
+            // If we are modifying a booking, we put the booking's values the dialog's input fields
+            if (this.popupType === 'edit') {
+                IndicoUtil.setFormValues(this.components, this.booking.bookingParams);
+            }
+
             if (exists($E('dateSyncHelpImg'))){
                 $E('dateSyncHelpImg').dom.onmouseover = dateChangeHelpPopup;
             }
@@ -1002,41 +1039,23 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
 
             this.tabControl.heightToTallestTab();
             this.ExclusivePopupWithButtons.prototype.postDraw.call(this);
+
+            // We put calendar widgets on the date fields
+            this.__drawCalendarWidgets();
         },
 
-        __drawCalendarWidgets: function() {
-
-            if (pluginHasFunction(this.bookingType, "getDateFields")) {
-                var fieldList = codes[this.bookingType].getDateFields();
-                var fieldDict = {};
-                each(fieldList, function(name){
-                    fieldDict[name] = true;
-                });
-                each(this.formNodes, function(node){
-                    if (node.name in fieldDict) {
-                        IndicoUI.Widgets.Generic.input2dateField($E(node), true, null)
-                    }
-                });
-            }
-        },
-
-        __buildParameterManager: function() {
-
-            this.needsCheck = pluginHasFunction (this.bookingType, "checkParams");
-
-            if (this.needsCheck) {
-                this.parameterManager = buildParameterManager(this.bookingType, this.formNodes, this.values);
-            } else {
-                this.parameterManager = null;
-            }
-
+        /**
+         * Adds a HTML node or an ErrorAware widget to the parameter manager
+         */
+        addComponent: function(component) {
+            this.components.push(component);
+            this.parameterManager.add(component);
         },
 
         __save: function(){
             var self = this;
 
-            // We retrieve the values from the form
-            IndicoUtil.getFormValues(this.formNodes, this.values);
+            IndicoUtil.getFormValues(this.components, this.values);
 
             // We check if there are errors
             var checkOK = true;
@@ -1137,7 +1156,34 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
             } else { // Parameter manager detected errors
                 this.switchToBasicTab();
             }
+        },
 
+        __buildParameterManager: function() {
+            this.needsCheck = pluginHasFunction(this.bookingType, "checkParams");
+
+            if (this.needsCheck) {
+                this.parameterManager = new CSParameterManager(this.bookingType, this.values);
+                this.parameterManager.add(this.components);
+            } else {
+                this.parameterManager = null;
+            }
+
+        },
+
+        __drawCalendarWidgets: function() {
+
+            if (pluginHasFunction(this.bookingType, "getDateFields")) {
+                var fieldList = codes[this.bookingType].getDateFields();
+                var fieldDict = {};
+                each(fieldList, function(name){
+                    fieldDict[name] = true;
+                });
+                each(this.components, function(node){
+                    if (node.name in fieldDict) {
+                        IndicoUI.Widgets.Generic.input2dateField($E(node), true, null)
+                    }
+                });
+            }
         }
     },
 
@@ -1155,8 +1201,15 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
         }
         this.conferenceId = conferenceId;
         this.ExclusivePopupWithButtons(title, positive);
+
+        // We initialize the dictionary where the values sent to the server
+        // will be sent on save
+        this.values = {};
+
+        this.extraComponents = [];
     }
 );
+
 
 
 /**
@@ -1170,7 +1223,7 @@ var createBooking = function(pluginName, conferenceId) {
     var popup = new BookingPopup('create', pluginName, null, conferenceId);
     popup.open();
     if (pluginHasFunction(pluginName, "onCreate")) {
-        codes[pluginName].onCreate();
+        codes[pluginName].onCreate(popup);
     }
     popup.postDraw();
 }
@@ -1186,7 +1239,7 @@ var editBooking = function(booking, conferenceId) {
     var popup = new BookingPopup('edit', booking.type, booking, conferenceId);
     popup.open();
     if (pluginHasFunction(booking.type, "onEdit")) {
-        codes[booking.type].onEdit(booking);
+        codes[booking.type].onEdit(booking, popup);
     }
     popup.postDraw();
 }
@@ -1344,7 +1397,8 @@ var sendRequest = function(pluginName, conferenceId) {
     var needsCheck = pluginHasFunction (pluginName, "checkParams");
     var parameterManager;
     if (needsCheck) {
-        parameterManager = buildParameterManager(pluginName, formNodes, values);
+        parameterManager = new CSParameterManager(pluginName, values);
+        parameterManager.add(formNodes);
     }
 
     // We check if there are errors

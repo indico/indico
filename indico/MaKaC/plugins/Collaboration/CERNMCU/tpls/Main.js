@@ -89,6 +89,14 @@
                 }
 
                 return errors;
+            }],
+            'pin': ['non_negative_int', true, function(pin, values) {
+                var errors = [];
+
+                if (pin.length >= 32) {
+                    errors.push($T("The pin cannot have more than 31 characters."));
+                }
+                return errors;
             }]
         }
     },
@@ -236,7 +244,7 @@
         return ["startDate", "endDate"]
     },
 
-    onCreate : function() {
+    onCreate : function(bookingPopup) {
         $E('autoYesRB').dom.checked = true;
         disableCustomId();
         <% if IncludeInitialRoom: %>
@@ -280,13 +288,14 @@
 
         $E('participantsCell').set(pf.draw());
 
-        CERNMCUPinField = new ShowablePasswordField('pin', '', false);
+        var CERNMCUPinField = new ShowablePasswordField('pin', '', false);
         $E('PINField').set(CERNMCUPinField.draw());
+        bookingPopup.addComponent(CERNMCUPinField);
 
         CERNMCUDrawContextHelpIcons();
     },
 
-    onEdit: function(booking) {
+    onEdit: function(booking, bookingPopup) {
         // setFormValues has problems with radio buttons constructed with .innerHTML in IE7
         if (Browser.IE) {
             if (booking.bookingParams.autoGenerateId == 'no') {
@@ -307,8 +316,9 @@
         pf = new ParticipantListField(booking.bookingParams.participants)
         $E('participantsCell').set(pf.draw());
 
-        CERNMCUPinField = new ShowablePasswordField('pin', booking.bookingParams.pin, false);
+        var CERNMCUPinField = new ShowablePasswordField('pin', '', false);
         $E('PINField').set(CERNMCUPinField.draw());
+        bookingPopup.addComponent(CERNMCUPinField);
 
         CERNMCUDrawContextHelpIcons();
     },
@@ -334,23 +344,6 @@
                 ips[participant.get("ip")] = true;
             }
 
-        }
-
-        var pin = CERNMCUPinField.getPassword();
-        values["pin"] = pin;
-        if (exists(pin) && pin !== '') {
-            var pinErrorMessages = [];
-            if (!IndicoUtil.isInteger(pin)) {
-                errors = true;
-                pinErrorMessages.push($T("The pin has to be a number."));
-            }
-            if (pin.length >= 32) {
-                errors = true;
-                pinErrorMessages.push($T("The pin cannot have more than 31 characters."));
-            }
-            if (pinErrorMessages.length > 0) {
-                CERNMCUPinField.markAsInvalid(CSErrorList(pinErrorMessages));
-            }
         }
 
         return !errors;

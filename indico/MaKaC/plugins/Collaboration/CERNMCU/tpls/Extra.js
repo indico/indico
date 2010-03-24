@@ -7,7 +7,6 @@ var disableCustomId = function() {
 }
 
 var pf = null; //place where to keep a ParticipantListField object to access later
-var CERNMCUPinField = null; //place where to keep a ShowablePasswordField object to access later
 
 <% if RoomsWithH323IP: %>
 var existingRoomData = <%= jsonEncode(fossilize(RoomsWithH323IP)) %>

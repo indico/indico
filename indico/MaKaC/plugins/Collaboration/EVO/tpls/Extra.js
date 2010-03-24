@@ -1,5 +1,3 @@
-var EVOPasswordField = null; //place where to keep a ShowablePasswordField object to access later
-
 /**
  * Mouseover help popup for EVOLaunchClientPopup
  */

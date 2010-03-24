@@ -32,13 +32,15 @@ var IndicoUtil = {
     /**
     * Utility function that, given a container element, will find the "form" nodes inside it
     * and extract the values from those elements.
-    * @param {Array} formNodes An array of input nodes. You can obtain it easily like this: var formNodes = IndicoUtil.findFormFields(containerElement)
+    * @param {Array} components An array of input nodes / custom components.
+    *                           Nodes can be obtained easily like this: var formNodes = IndicoUtil.findFormFields(containerElement)
+    *                           Custom components have to have a .get() and a .getName() method.
     * @param {Object} values An object where there values will be stored; this object will be "cleaned" and then returned.
     *                        If left to null, a new object will be returned.
     * @return {Array} an object whose keys are the "name" attribute of the form nodes, and the values
     *                 are the values of those nodes.
     */
-    getFormValues : function(formNodes, values) {
+    getFormValues : function(components, values) {
         if (!exists(values)) {
             values = {};
         } else {
@@ -46,22 +48,29 @@ var IndicoUtil = {
                 delete values[key];
             });
         }
-        for (var i=0; i < formNodes.length; i++) {
-            var node = formNodes[i];
-            if (exists(node.name) && node.name) {
-                if (node.type == "checkbox") {
-                    if (!exists(values[node.name])) {
-                        values[node.name] = [];
-                    }
-                    if (node.checked) {
-                        values[node.name].push(node.value);
-                    }
-                } else if (node.type == "radio") {
-                    if (node.checked) {
+        for (var i=0; i < components.length; i++) {
+            var component = components[i];
+            if (isDom(component)) {
+                var node = component;
+                if (exists(node.name) && node.name) {
+                    if (node.type == "checkbox") {
+                        if (!exists(values[node.name])) {
+                            values[node.name] = [];
+                        }
+                        if (node.checked) {
+                            values[node.name].push(node.value);
+                        }
+                    } else if (node.type == "radio") {
+                        if (node.checked) {
+                            values[node.name] = node.value;
+                        }
+                    } else {
                         values[node.name] = node.value;
                     }
-                } else {
-                    values[node.name] = node.value;
+                }
+            } else {
+                if(exists(component.get) && exists(component.getName)) {
+                    values[component.getName()] = component.get();
                 }
             }
         }
@@ -72,29 +81,38 @@ var IndicoUtil = {
     * Utility function that, given a container element, and an object with key/value pairs, will find the "form" nodes inside it
     * and put those values in each node. To find the correct node for each value, the "name" attribute of the nodes are compared
     * to the 'keys' of the object.
-    * @param {Array} formNodes An array of input nodes. You can obtain it easily like this: var formNodes = IndicoUtil.findFormFields(containerElement)
+    * @param {Array} components An array of input nodes / custom components.
+    *                           Nodes can be obtained easily like this: var formNodes = IndicoUtil.findFormFields(containerElement)
+    *                           Custom components have to have a .get() and a .getName() method.
     * @param {Array} an object whose keys are the "name" attribute of the form nodes, and the values
     *                are the values of those nodes.
     */
-    setFormValues : function(formNodes, values) {
-        for (var i=0; i < formNodes.length; i++) {
-            var node = formNodes[i];
-            if (node.type == "checkbox") {
-                if (node.name in values && exists($L(values[node.name]).indexOf(node.value))) {
-                    node.checked = true;
+    setFormValues : function(components, values) {
+
+        for (var i=0; i < components.length; i++) {
+            var component = components[i];
+            if (isDom(component)) {
+                var node = component;
+                if (node.type == "checkbox") {
+                    if (node.name in values && exists($L(values[node.name]).indexOf(node.value))) {
+                        node.checked = true;
+                    } else {
+                        node.checked = false;
+                    }
+                } else if (node.type == "radio") {
+                    if (node.name in values && values[node.name] == node.value) {
+                        node.checked = true;
+                    } else {
+                        node.checked = false;
+                    }
                 } else {
-                    node.checked = false;
-                }
-            } else if (node.type == "radio") {
-                if (node.name in values && values[node.name] == node.value) {
-                    node.checked = true;
-                } else {
-                    node.checked = false;
+                    node.value = values[node.name];
                 }
             } else {
-                node.value = values[node.name];
+                if(exists(component.set) && exists(component.getName)) {
+                    component.set(values[component.getName()]);
+                }
             }
-
         }
     },
 

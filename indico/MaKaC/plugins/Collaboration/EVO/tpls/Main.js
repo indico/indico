@@ -238,9 +238,11 @@
         return ["startDate", "endDate"]
     },
 
-    onCreate: function() {
-        EVOPasswordField = new ShowablePasswordField('accessPassword', '', false);
+    onCreate: function(bookingPopup) {
+        var EVOPasswordField = new ShowablePasswordField('accessPassword', '', false);
         $E('passwordField').set(EVOPasswordField.draw());
+        bookingPopup.addComponent(EVOPasswordField);
+
         EVODrawContextHelpIcons();
         <% if not PossibleToCreateOrModify: %>
             var popup = new WarningPopup($T("Impossible to create an EVO booking"),
@@ -256,9 +258,11 @@
         <% end %>
     },
 
-    onEdit: function(booking) {
-        EVOPasswordField = new ShowablePasswordField('accessPassword', booking.bookingParams.accessPassword, false);
+    onEdit: function(booking, bookingPopup) {
+        var EVOPasswordField = new ShowablePasswordField('accessPassword', '', false);
         $E('passwordField').set(EVOPasswordField.draw());
+        bookingPopup.addComponent(EVOPasswordField);
+
         EVODrawContextHelpIcons();
         <% if not PossibleToCreateOrModify: %>
             var popup = new WarningPopup($T("Impossible to modify this EVO booking"),
@@ -272,12 +276,6 @@
                  ]);
             popup.open();
         <% end %>
-    },
-
-    onSave: function(values) {
-        var password = EVOPasswordField.getPassword();
-        values["accessPassword"] = password;
-        return true;
     },
 
     postCheckStatus: function(booking) {
