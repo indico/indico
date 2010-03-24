@@ -854,10 +854,10 @@ var showAllInfoRows = function(showAll) {
 
 var dateChangeHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px">' +
-            $T('By activating this option, you ensure that') + '<br \/>' +
-            $T('if a manager changes the event\'s dates,') + '<br \/>' +
-            $T('this booking\'s dates change accordingly.') + '<br \/>' +
+        '<div style="padding:3px; width: 200px;"">' +
+        $T('This option ensures that ' +
+                'if a manager changes the event\'s dates, ' +
+                'this booking\'s dates change accordingly. ') +
         '<\/div>');
 };
 
@@ -867,12 +867,12 @@ var dateChangeHelpPopup = function(event) {
 
 var dateChangeDisabledHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px">' +
-            $T('By activating this option, you ensure that') + '<br \/>' +
-            $T('if a manager changes the event\'s dates,') + '<br \/>' +
-            $T('this booking\'s dates change accordingly.') + '<br \/>' +
-            $T('The event already took place,') + '<br \/>' +
-            $T('so you cannot activate this option.') + '<br \/>' +
+        '<div style="padding:3px; width: 300px;"">' +
+            $T('This option ensures that ' +
+            'if a manager changes the event\'s dates, ' +
+            'this booking\'s dates change accordingly. ' +
+            'The event already took place, ' +
+            'so you cannot activate this option.') +
         '<\/div>');
 };
 
@@ -881,10 +881,8 @@ var dateChangeDisabledHelpPopup = function(event) {
  */
 var hiddenHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px">' +
-            $T('By activating this option, you keep') + '<br \/>' +
-            $T('the booking from appearing in the') + '<br \/>' +
-            $T('event\'s display page.') + '<br \/>' +
+        '<div style="padding:3px; width: 150px;"">' +
+            $T('This option hides the booking in the event page.') +
         '<\/div>');
 };
 

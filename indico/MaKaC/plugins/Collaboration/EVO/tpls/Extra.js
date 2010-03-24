@@ -6,10 +6,10 @@ var EVOPasswordField = null; //place where to keep a ShowablePasswordField objec
 
 var EVOLaunchClientHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px">' +
-            $T('If you are using Internet Explorer, Indico cannot load the EVO client directly;') + '<br \/>' +
-            $T('you need to click on the link.') + '<br \/>' +
-            $T('You can avoid this by using another browser. Sorry for the inconvenience.') +
+        '<div style="padding:3px;width:300px;">' +
+            $T('If you are using Internet Explorer, Indico cannot load the EVO client directly; '  +
+            'you need to click on the link. ' +
+            'You can avoid this by using another browser. Sorry for the inconvenience.') +
         '<\/div>');
 };
 
@@ -19,15 +19,16 @@ type("EVOLaunchClientPopup", ["ExclusivePopup"],
             var self = this;
 
             var linkClicked = function(){
-                self.close();return true;
-            }
+                self.close();
+                return true;
+            };
 
             var clientLink = Html.a({href: this.bookingUrl, onclick : linkClicked, style:{display: 'block'}},
                     $T("Click here to launch the EVO client"));
 
             var infoLink = Html.span({className: 'fakeLink', style: {display: 'block', fontSize: 'smaller', paddingTop: pixels(10)}},
                 $T('(Why am I getting this popup?)'));
-            infoLink.dom.onmouseover = EVOLaunchClientHelpPopup
+            infoLink.dom.onmouseover = EVOLaunchClientHelpPopup;
 
             var cancelButton = Html.button({style: {marginTop: pixels(10)}}, $T("Cancel"));
             cancelButton.observeClick(function(){
@@ -50,10 +51,10 @@ type("EVOLaunchClientPopup", ["ExclusivePopup"],
  */
 var EVOStartDateHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px">' +
-            $T('Please create your booking between <%= MinStartDate %> and <%= MaxEndDate %>.') + '<br \/>' +
-            $T("(Allowed dates \/ times based on your event's start date and end date)") + '<br \/>' +
-            $T('Also remember the start date cannot be more than <%= AllowedStartMinutes %> in the past.') +
+        '<div style="padding:3px; width: 300px;"">' +
+            $T('Please create your booking between <strong><%= MinStartDate %></strong> and <strong><%= MaxEndDate %></strong> ' +
+            "(Allowed dates \/ times based on your event's start date and end date). " +
+            'Also, please remember the start date cannot be more than <%= AllowedStartMinutes %> minutes in the past.') +
         '<\/div>');
 };
 
@@ -62,9 +63,9 @@ var EVOStartDateHelpPopup = function(event) {
  */
 var EVOEndDateHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px">' +
-            $T('Please create your booking between <%= MinStartDate %> and <%= MaxEndDate %>') + '<br \/>' +
-            $T("(Allowed dates \/ times based on your event's start date and end date)") +
+        '<div style="padding:3px; width: 300px;"">' +
+            $T('Please create your booking between <strong><%= MinStartDate %></strong> and <strong><%= MaxEndDate %></strong> ' +
+            "(Allowed dates \/ times based on your event's start date and end date).") +
         '<\/div>');
 };
 
@@ -73,8 +74,9 @@ var EVOEndDateHelpPopup = function(event) {
  */
 var EVOPasswordHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px">' +
-            $T('If you want to <strong>protect<\/strong> your EVO meeting with a password, please input it here. Otherwise, leave this field empty.') +
+        '<div style="padding:3px; width: 300px;"">' +
+            $T('If you want to <strong>protect<\/strong> your EVO meeting with a password, please input it here. ' +
+                    'Otherwise, leave this field empty.') +
         '<\/div>');
 };
 
@@ -84,9 +86,9 @@ var EVOPasswordHelpPopup = function(event) {
  */
 var EVODisplayPasswordHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px">' +
-            $T('The EVO Meeting password will be displayed <strong><em>in clear</em></strong> in the event display page. '+
-               'Any person that can see the event page will see the password. Please use this option carefully.') +
+        '<div style="padding:3px; width: 300px;"">' +
+            $T('The EVO Meeting password will be displayed in the event page. '+
+               '<strong>Any person that can see the event page will see the password.</strong> Please use this option carefully.') +
         '<\/div>');
 };
 
@@ -95,9 +97,9 @@ var EVODisplayPasswordHelpPopup = function(event) {
  */
 var EVODisplayPhonePasswordHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px">' +
-        $T('The Phone bridge password will be displayed <strong><em>in clear</em></strong> in the event display page. '+
-           'Any person that can see the event page will see the password. Please use this option carefully.') +
+        '<div style="padding:3px; width: 300px;"">' +
+        $T('The Phone bridge password will be displayed in the event page. '+
+           '<strong>Any person that can see the event page will see the password.</strong> Please use this option carefully.') +
         '<\/div>');
 };
 
@@ -106,9 +108,9 @@ var EVODisplayPhonePasswordHelpPopup = function(event) {
  */
 var EVODisplayURLHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px">' +
-            $T('The auto-join URL will be displayed. Please note that when it is possible to join the EVO meeting, '+
-               'a <em>Join Now!</em> link will appear. People will be able to join the meeting by clicking on this link.') +
+        '<div style="padding:3px; width: 300px;">' +
+            $T('Please note that regardless of this option, when the EVO meeting starts, '+
+               'a <em>Join Now!</em> link will appear.') +
         '<\/div>');
 };
 

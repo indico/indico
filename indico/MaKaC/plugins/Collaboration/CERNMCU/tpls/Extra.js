@@ -436,11 +436,11 @@ type("ParticipantListField", ["IWidget"],
 
 var CERNMCUPINHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px">' +
-            $T('If you want to <strong>protect<\/strong> your MCU conference with a PIN, write it here.') + '<br \/>' +
-            $T('The PIN has to be <strong>numeric<\/strong> (only digits, no letters).') + '<br \/>' +
-            $T('Users will have to input the PIN in order to access the conference.') + '<br \/>' +
-            $T('Otherwise, leave empty.') +
+        '<div style="padding:3px; width: 300px;"">' +
+            $T('If you want to <strong>protect<\/strong> your MCU conference with a PIN, write it here. ' +
+            'The PIN has to be <strong>numeric<\/strong> (only digits, no letters). ' +
+            'Users will have to input the PIN in order to access the conference. ' +
+            'Otherwise, leave empty.') +
         '<\/div>');
 };
 
@@ -449,9 +449,9 @@ var CERNMCUPINHelpPopup = function(event) {
  */
 var CERNMCUCustomIDHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px">' +
-            $T('If for some reason you want to choose youself the MCU ID of this conference, type it here.') + '<br \/>' +
-            $T('The MCU ID has to be a 5-digit number.') +
+        '<div style="padding:3px; width: 250px;"">' +
+            $T('If for some reason you want to choose youself the MCU ID of this conference, type it here. ' +
+            'The MCU ID has to be a <strong>5-digit number.</strong>') +
         '<\/div>');
 };
 
