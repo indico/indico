@@ -1070,6 +1070,7 @@ class Category(Persistent):
         iconFile.setOwner( self )
         iconFile.setId( "icon" )
         iconFile.archive( self._getRepository() )
+        iconFile.setProtection( -1 )
         if self.getIcon() != None:
             self._icon.delete()
         self._icon = iconFile
