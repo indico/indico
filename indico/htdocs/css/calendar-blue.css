@@ -32,7 +32,7 @@
 div.calendar {
     position: relative;
     z-index: 4;
-    border: 1px solid #444;
+    border: 1px solid #888888;
     padding: 1px;
 }
 
@@ -96,7 +96,7 @@ div.calendar {
   color: #000;
   border: 1px solid #AAA;
   border-top: none;
-  padding: 1px;
+  padding: 3px;
 }
 
 .calendar thead .active { /* Active (pressed) buttons in header */
@@ -251,7 +251,7 @@ div.calendar {
   border: 1px solid #889;
   font-weight: bold;
   background-color: #fff;
-  
+
 }
 
 .calendar td.time .ampm {
