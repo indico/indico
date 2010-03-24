@@ -654,10 +654,9 @@ class WPSessionModifBase( WPConferenceModifBase ):
                 urlHandlers.UHSessionModifMaterials.getURL( self._session ) )
         self._tabAC = self._tabCtrl.newTab( "ac", _("Protection"), \
                 urlHandlers.UHSessionModifAC.getURL( self._session ) )
-        canCoord=self._session.canCoordinate(self._getAW())
+
         canModify=self._session.canModify(self._getAW())
         self._tabAC.setEnabled(canModify)
-        self._tabMaterials.setEnabled(canModify)
         self._tabTools = self._tabCtrl.newTab( "tools", _("Tools"), \
                 urlHandlers.UHSessionModifTools.getURL( self._session ) )
         self._tabTools.setEnabled(canModify)
