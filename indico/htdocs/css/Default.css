@@ -5439,7 +5439,7 @@ div.rescheduleSection {
 }
 
 div.rescheduleTitle {
-    font-size: 14pt;
+    font-size: 18px;
     padding-bottom: 5px;
 }
 
@@ -5455,12 +5455,12 @@ td.rescheduleAction {
 }
 
 div.rescheduleLabelTitle {
-    font-size:12pt;
+    font-size:16px;
     cursor: default;
 }
 
 div.rescheduleLabelDetails {
-    font-size:9pt;
+    font-size:12px;
     font-style: italic;
     cursor: default;
 }
