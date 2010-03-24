@@ -780,46 +780,61 @@ type("HistoryListener", [],
 
      });
 
-type("ErrorSensitive", [],
+type("ErrorAware", [],
      {
          _setElementErrorState: function(element, text) {
-
-             var tooltip;
-
-             this.oldClassName = element.dom.className;
-             element.dom.className += ' invalid';
-
-             this.errorElement = element;
-
-             this._stopObservingError =
-                 element.observeEvent('mouseover', function(event) {
-                     tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, text, "tooltipError");
-                 });
-
-             this._stopObservingErrorOut =
-                 element.observeEvent('mouseout', function(event) {
-                     Dom.List.remove(document.body, tooltip);
-                 });
+             this._stopErrorList = IndicoUtil.markInvalidField(element, text)[1];
          },
 
          setError: function(text) {
              if (!text) {
                  // everything back to normal
-                 if (this._stopObservingError){
-                     this._stopObservingError();
-                     //this._stopObservingErrorOut();
+                 if (this._stopErrorList){
 
-                     this.errorElement.dom.className = this.oldClassName;
+                     each(this._stopErrorList,
+                          function(elem) {
+                              elem();
+                          });
 
                      this._inError = false;
+                     this._stopErrorList = [];
                  }
              } else {
                  this._setErrorState(text);
                  this._inError = true;
              }
+             return this._stopErrorList;
          },
 
          inError: function() {
              return this._inError;
+         },
+
+         askForErrorCheck: function() {
+             var errorState = this._checkErrorState();
+
+             if (errorState) {
+                 // if we're already in error state,
+                 // no need to do anything
+
+                 if (!this._inError) {
+                     // otherwise, we have to set it
+                     this.setError(errorState);
+                 }
+                 return errorState;
+             } else {
+                 this.setError(null);
+                 return null;
+             }
          }
+     },
+     function(parameterManager) {
+         this.parameterManager = parameterManager;
+
+         var self = this;
+
+         parameterManager.add(self, null, null,
+                              function(){
+                                  return self.askForErrorCheck();
+                              });
      });

@@ -434,8 +434,16 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor"],
      });
 
 
-type("RealtimeTextBox", ["IWidget", "WatchAccessor"],
+type("RealtimeTextBox", ["IWidget", "WatchAccessor", "ErrorAware"],
      {
+         _setErrorState: function(text) {
+             this._setElementErrorState(this.input, text);
+         },
+
+         _checkErrorState: function() {
+             return null;
+         },
+
          draw: function() {
              this.enableEvent();
              return this.IWidget.prototype.draw.call(this, this.input);
@@ -528,6 +536,7 @@ type("RealtimeTextArea", ["RealtimeTextBox"],
      {
      },
      function(args) {
+
          this.RealtimeTextBox(clone(args));
          this.input = Html.textarea(args);
      });
@@ -1016,35 +1025,47 @@ type("ShowablePasswordField", ["IWidget"], {
 );
 
 
-type("TypeSelector", ["IWidget", "WatchAccessor"],
+type("TypeSelector", ["IWidget", "WatchAccessor", "ErrorAware"],
 {
+
+    _checkErrorState: function() {
+        if (this.selectOn) {
+            return null;
+        } else {
+            return this.text._checkErrorState();
+        }
+    },
+
+    setError: function(text) {
+        this.text.setError(text);
+    },
+
     draw: function() {
         var self = this;
 
         var chooser = new Chooser(new Lookup({
             select: function() {
-                self.pm.remove(self.text);
-                self.pm.add(self.select);
-                self.selected = true;
-                return Html.div({}, bind.element(self.select, $L(self.types),
-                                          function(value) {
-                                              return Html.option({'value': value[0]}, value[1]);
-                                          }),
+                self.selectOn = true;
+
+                self._notifyObservers(self.select.get());
+
+                return Html.div({}, self.select,
                          " ",
                          $T("or"),
                          " ",
                          Widget.link(command(function() {
                              chooser.set('write');
-                             self.text.dom.focus();
+                             self.text.setFocus();
                          }, $T("other"))));
             },
 
             write: function() {
                 bind.detach(self.select);
-                self.pm.remove(self.select);
-                self.pm.add(self.text);
-                self.selected = false;
-                return Html.div({}, self.text,
+                self.selectOn = false;
+
+                self._notifyObservers(self.text.get());
+
+                return Html.div({}, self.text.draw(),
                                 " ",
                                $T("or"),
                                " ",
@@ -1061,25 +1082,29 @@ type("TypeSelector", ["IWidget", "WatchAccessor"],
 
     isSelect: function(){
         var self = this;
-        return self.selected;
+        return self.selectOn;
     },
 
-    set: function(value) {
-        if(this.selected){
-            this.select.set(value);
-        } else {
-            this.text.set(value);
-        }
-
+    _notifyObservers: function(value) {
         each(this.observers,
              function(observer) {
                  observer(value);
              });
     },
 
+    set: function(value) {
+        if(this.selectOn){
+            this.select.set(value);
+        } else {
+            this.text.set(value);
+        }
+
+        this._notifyObservers(value);
+    },
+
     get: function() {
         var self = this;
-        if(self.selected){
+        if(self.selectOn){
             return self.select.get();
         }
         else{
@@ -1093,14 +1118,14 @@ type("TypeSelector", ["IWidget", "WatchAccessor"],
 
         this.select.observe(
             function(value) {
-                if (self.selected) {
+                if (self.selectOn) {
                     callback(value);
                 }
             });
 
         this.text.observe(
             function(value) {
-                if (!self.selected) {
+                if (!self.selectOn) {
                     callback(value);
                 }
             });
@@ -1111,18 +1136,36 @@ type("TypeSelector", ["IWidget", "WatchAccessor"],
         return this.select;
     }
 },
-     function(parameterManager, types, params){
-         params = params || {};
+     function(parameterManager, types, selParams, textParams){
+         selParams = selParams || {};
+         textParams = textParams || {};
 
-         this.select = Html.select(params);
-         params.id = Html.generateId();
-         this.text = Html.edit(params);
+         this.select = bind.element(Html.select(selParams),
+                                    $L(types),
+                                    function(value) {
+                                        return Html.option({'value': value[0]}, value[1]);
+                                    });
 
-         this.selected = true;
+         textParams.id = Html.generateId();
+
+         this.text = new RealtimeTextBox(textParams);
+
+         // just to avoid defining yet another class
+         this.text._checkErrorState = function() {
+             if (this.get() !== '') {
+                 return null;
+             } else {
+                 return $T('Please select a material type');
+             }
+         };
+
+         this.selectOn = true;
          this.pm = parameterManager;
          this.types = types;
 
          this.observers = [];
+
+         this.ErrorAware(parameterManager);
      }
     );
 

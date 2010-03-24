@@ -372,7 +372,10 @@ var IndicoUtil = {
      *                                          -An Html.div() XElement with the tooltip that was created.
      *                                          -An array of functions that should be called to cancel all the event observations.
      */
-    markInvalidField: function(component, error) {
+    markInvalidField: function(component, error, passive) {
+
+        // passive - don't check actively for changes / keypresses
+
         if ( startsWith(component.dom.type, 'select')) {
             component.dom.className+=' invalidSelect';
         } else {
@@ -388,6 +391,12 @@ var IndicoUtil = {
             });
         };
 
+        // we'll add a function that removes the coloring first of all
+        oList.push(function() {
+                Dom.List.remove(document.body, tooltip);
+                component.dom.className = component.dom.className.substring(0, component.dom.className.length-8);
+        });
+
         oList.push(component.observeEvent('mouseover', function(event){
             tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, error, "tooltipError");
         }));
@@ -396,24 +405,21 @@ var IndicoUtil = {
             Dom.List.remove(document.body, tooltip);
         }));
 
-        oList.push(component.observeEvent('keypress', function(event){
-            component.dom.className = component.dom.className.substring(0, component.dom.className.length-8);
-            Dom.List.remove(document.body, tooltip);
-            stopObserving();
-        }));
+        if (!passive) {
 
-        oList.push(component.observeEvent('change', function(event){
-            component.dom.className = component.dom.className.substring(0, component.dom.className.length-8);
-            Dom.List.remove(document.body, tooltip);
-            stopObserving();
-        }));
-
-        if ( startsWith(component.dom.type, 'select')) {
-            oList.push(component.observeEvent('click', function(event){
-                component.dom.className = component.dom.className.substring(0, component.dom.className.length-14);
-                Dom.List.remove(document.body, tooltip);
+            oList.push(component.observeEvent('keypress', function(event){
                 stopObserving();
             }));
+
+            oList.push(component.observeEvent('change', function(event){
+                stopObserving();
+            }));
+
+            if ( startsWith(component.dom.type, 'select')) {
+                oList.push(component.observeEvent('click', function(event){
+                    stopObserving();
+                }));
+            }
         }
 
         return [tooltip, oList];
@@ -453,18 +459,26 @@ var IndicoUtil = {
                 var extraCheckFunction = value[3];
                 var error = null;
 
-                //--- Restore original values (if it is the second time, there must
-                //    be components with error styles)  ---
-                component.dom.className = classList[component.dom.id];
-                if (exists(eventList[component.dom.id])) {
-                    // --- Remove all the ERROR observers
-                    $L(eventList[component.dom.id]).each(function(value){
-                        value();
-                    });
+                // ErrorAware classes don't want to do this
+                if (!component.ErrorAware) {
+                    //--- Restore original values (if it is the second time, there must
+                    //    be components with error styles)  ---
 
-                    delete eventList[component.dom.id];
+                    component.dom.className = classList[component.dom.id];
+
+                    if (exists(eventList[component.dom.id])) {
+                        // --- Remove all the ERROR observers
+                        $L(eventList[component.dom.id]).each(function(value){
+                            value();
+                        });
+
+                        delete eventList[component.dom.id];
+                    }
+                    //---------------------------------
+
+                } else {
+                    component.setError(false);
                 }
-                //---------------------------------
 
                 //--- Check if there are errors ---
                 if (dataType == "radio" && !allowEmpty && !self.checkRadioButton(component)) {
@@ -509,7 +523,10 @@ var IndicoUtil = {
 
                     var oList;
 
-                    if (component.dom.type != 'radio') {
+                    if (component.ErrorAware) {
+                        oList = component.setError(error);
+
+                    } else if (component.dom.type != 'radio') {
                         var result = IndicoUtil.markInvalidField(component, error);
                         oList = result[1];
 
@@ -555,7 +572,9 @@ var IndicoUtil = {
                         });
                     }
 
-                    eventList[component.dom.id] = oList;
+                    if (!component.ErrorAware) {
+                        eventList[component.dom.id] = oList;
+                    }
                 }
                 //----------------------------
             });
@@ -587,12 +606,16 @@ var IndicoUtil = {
             // Add new entry
             entryList.append([component, dataType, allowEmpty, extraCheckFunction]);
 
-            // Assign an auto ID, if the object has no ID
-            if (!component.dom.id) {
-                component.dom.id = Html.generateId();
-            }
+            // only for DOM elements
+            if (!component.ErrorAware) {
+                // Assign an auto ID, if the object has no ID (if it's a DOM element)
+                if (!component.dom.id) {
+                    component.dom.id = Html.generateId();
+                }
 
-            classList[component.dom.id] = component.dom.className;
+                classList[component.dom.id] = component.dom.className;
+
+            }
             return component;
         };
 

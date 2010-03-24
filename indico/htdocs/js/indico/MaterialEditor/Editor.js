@@ -148,15 +148,28 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
         return text;
     },
 
+    _findTypeName: function(id) {
+        for (var i in this.types) {
+            if (this.types[i][0] == id) {
+                return this.types[i][1];
+            }
+        }
+        return id;
+    },
+
     _drawProtectionPane: function(value) {
 
         var text = null;
         var entry = this.list.get(value);
         var selector = null;
 
-        // if the material is already in the tree, protection inheritance must
-        // be resolved
-        if (exists(entry)) {
+        if (value == '') {
+            return Html.div({});
+
+        } else if (exists(entry)) {
+
+            // if the material is already in the tree, protection inheritance must
+            // be resolved
 
             this.creationMode = 'resource';
 
@@ -183,7 +196,7 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
 
             this.creationMode = 'material';
 
-            text = $T("You're about to create a new material type. Please select who can access it:");
+            text = Html.span({}, $T("This will be the first resource of type")," ", Html.span({style:{fontWeight: 'bold'}}, this._findTypeName(value)), ". ", $T("Please select who will be able to access this material type:"));
 
             selector = new RadioFieldWidget([
                 ['inherit', this._parentText(this.args)],
@@ -259,7 +272,7 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
         var self = this;
 
         this.pm = new IndicoUtil.parameterManager();
-        var typeSelector = new TypeSelector(this.pm, this.types, {style:{width: '150px'}});
+        var typeSelector = new TypeSelector(this.pm, this.types, {style:{width: '150px'}},{style:{width: '150px'}, maxlength: '50'});
         var description = Html.textarea({name: 'description', style:{width:'220px', height: '60px'}});
 
         // local file vs. url
@@ -296,7 +309,7 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
                                 ],
                                 [
                                     $T('Material type'),
-                                    typeSelector.draw()
+                                    Html.div({style:{height: '40px'}}, typeSelector.draw())
                                 ]
 
                             ]),
