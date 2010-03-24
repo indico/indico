@@ -725,7 +725,7 @@ class SlotSchedule(TimeSchedule):
             2: check and adapt the owner dates
         """
 
-        tz = timezone(self.getTimezone())
+        tz = self.getTimezone();
 
         owner = self.getOwner()
         if (entry is None) or self.hasEntry(entry):
