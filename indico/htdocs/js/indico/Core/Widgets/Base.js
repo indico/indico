@@ -303,6 +303,17 @@ type("TabWidget", ["IWidget"],{
         this.setScrollArrowState('left', false);
     },
 
+    heightToTallestTab: function() {
+        var currentSelectedTab = this.getSelectedTab();
+        var maxHeight = 0;
+        for(var i = this.tabs.length-1; i >= 0; i--) {
+            this.setSelectedTab(this.options.item(i));
+            maxHeight = Math.max(maxHeight, this.container.dom.offsetHeight);
+        }
+        this.container.setStyle('height', maxHeight);
+        this.setSelectedTab(currentSelectedTab);
+    },
+
     checkTabOverflow: function(tab) {
         // some magic numbers used... it would be great if a better solution
         // was possible

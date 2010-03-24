@@ -33,12 +33,18 @@ var IndicoUtil = {
     * Utility function that, given a container element, will find the "form" nodes inside it
     * and extract the values from those elements.
     * @param {Array} formNodes An array of input nodes. You can obtain it easily like this: var formNodes = IndicoUtil.findFormFields(containerElement)
+    * @param {Object} values An object where there values will be stored; this object will be "cleaned" and then returned.
+    *                        If left to null, a new object will be returned.
     * @return {Array} an object whose keys are the "name" attribute of the form nodes, and the values
     *                 are the values of those nodes.
     */
     getFormValues : function(formNodes, values) {
         if (!exists(values)) {
             values = {};
+        } else {
+            each(values, function(value, key){
+                delete values[key];
+            });
         }
         for (var i=0; i < formNodes.length; i++) {
             var node = formNodes[i];

@@ -978,10 +978,9 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
                 width = width > 400 ? width : 400;
             }
 
-            var tabControl = new TabWidget([[$T("Basic"), this.basicTabForm], [$T("Advanced"), this.advancedTabForm]], width, null);
-            this.tabControl = tabControl;
+            this.tabControl = new TabWidget([[$T("Basic"), this.basicTabForm], [$T("Advanced"), this.advancedTabForm]], width, null);
 
-            return this.ExclusivePopupWithButtons.prototype.draw.call(this, tabControl.draw(), buttonDiv,
+            return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.tabControl.draw(), buttonDiv,
                     {backgroundColor: "#FFFFFF"});
         },
 
@@ -1002,6 +1001,8 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
             if(exists($E('hiddenHelpImg'))) {
                 $E('hiddenHelpImg').dom.onmouseover = hiddenHelpPopup;
             }
+
+            this.tabControl.heightToTallestTab();
             this.ExclusivePopupWithButtons.prototype.postDraw.call(this);
         },
 
