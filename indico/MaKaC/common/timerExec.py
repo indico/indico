@@ -65,11 +65,11 @@ class toExec:
                     else:
                         self._printOutput(e)
                         raise e
-    
+
     def _closeLog(self):
         if self._file:
             self._file.close()
-    
+
     def _printOutput(self, text):
         text = "[%s] %s"%(id(self),text)
         if self._logFilename:
@@ -124,7 +124,7 @@ class toExec:
                         if task.getStartDate() == None or task.getStartDate() < nowutc():
                             self._printOutput("\t (SINGLE RUN)")
                             # the task is started
-                            if task.getInterval() == None or task.getLastDate() == None: 
+                            if task.getInterval() == None or task.getLastDate() == None:
                                 # the task is run once or never runned
                                 task.setRunning(True)
                                 conn.commit()
@@ -132,6 +132,7 @@ class toExec:
                                 if abort:
                                     self._printOutput("\t<---Task <%s> was aborted."%task.getId())
                                     task.setRunning(False)
+                                    conn.commit()
                                     continue
                                 for obj in task.getObjList():
                                     self._printOutput("\t\tRunning object <%s> (start date: %s)"%(obj.getId(),task.getStartDate()))
@@ -149,7 +150,7 @@ class toExec:
                                 else:
                                     self._printOutput("\t\tTask is periodic (getInterval: %s)" % task.getInterval())
                             else:
-                                self._printOutput("\t (PERIODIC TASK)")                                
+                                self._printOutput("\t (PERIODIC TASK)")
                                 # the task is to be run multiple times
                                 if task.getLastDate() + task.getInterval() < nowutc():
                                     task.setRunning(True)
@@ -158,6 +159,7 @@ class toExec:
                                     if abort:
                                         self._printOutput("\t<---Task <%s> was aborted."%task.getId())
                                         task.setRunning(False)
+                                        conn.commit()
                                         continue
                                     # it's time to launch the task!!!
                                     for obj in task.getObjList():
@@ -202,7 +204,7 @@ class toExec:
         sm.setSubject("[Indico] Error running a task")
         sm.setText("""
 
-                    - Details of the exception: 
+                    - Details of the exception:
                         %s
 
                     - Traceback:
@@ -214,7 +216,7 @@ class toExec:
                     <Indico support> indico-project @ cern.ch
                     """%(e, "\n".join( tracebackList )) )
         sm.run()
-      
+
 class taskList(Persistent):
     """
     Persistant class which keep the list of task to do
@@ -222,10 +224,10 @@ class taskList(Persistent):
     def __init__(self):
         self.listTask = {}
         self._taskGenerator = Counter()
-    
+
     def getTasks(self):
         return self.listTask.values()
-    
+
     def addTask(self, task):
         id = task.getId()
         if id == "":
@@ -233,27 +235,27 @@ class taskList(Persistent):
             task.setId(id)
         self.listTask[id] = task
         self._p_changed=1
-    
+
     def removeTask(self, task):
         task.delete()
         if task in self.listTask.values():
             del self.listTask[task.getId()]
             self._p_changed=1
-    
+
     def getTaskById(self, id):
         return self.listTask[id]
 
 
 class HelperTaskList:
-    """Helper class used for getting and instance of taskList. 
-        It will be migrated into a static method in taskList class once the 
-        ZODB4 is released and the Persistent classes are no longer Extension 
+    """Helper class used for getting and instance of taskList.
+        It will be migrated into a static method in taskList class once the
+        ZODB4 is released and the Persistent classes are no longer Extension
         ones.
     """
-    
+
     def getTaskListInstance(cls):
-        dbmgr = db.DBMgr.getInstance()        
-        root = dbmgr.getDBConnection().root()        
+        dbmgr = db.DBMgr.getInstance()
+        root = dbmgr.getDBConnection().root()
         try:
             tlist = root["taskList"]["main"]
         except KeyError, e:
@@ -261,9 +263,9 @@ class HelperTaskList:
             root["taskList"] = OOBTree.OOBTree()
             root["taskList"]["main"] = tlist
         return tlist
-    
+
     getTaskListInstance = classmethod( getTaskListInstance )
-    
+
 
 class task(Persistent):
     """
@@ -283,10 +285,10 @@ class task(Persistent):
     def prerun(self):
         """prerun returns False if the prerun was ok and True in case we need to abort the task."""
         return False
-    
+
     def getOwner(self):
         return self.owner
-    
+
     def setOwner(self, owner):
         self.owner = owner
 
@@ -300,13 +302,13 @@ class task(Persistent):
 
     def setRunning(self, r):
         self.running = r
-    
+
     def getId(self):
         return self.id
-    
+
     def setId(self, id):
         self.id = id
-    
+
     def getTimezone(self):
         if self.owner:
             try:
@@ -314,45 +316,45 @@ class task(Persistent):
             except:
                 return None
         return None
-    
+
     def setStartDate(self, date):
         self.startDate = date
         self._p_changed=1
-    
+
     def getStartDate(self):
         return self.startDate
-    
+
     def getAdjustedStartDate(self,tz=None):
         if not tz:
             tz = self.getTimezone()
         if tz not in all_timezones:
            tz = 'UTC'
         return self.getStartDate().astimezone(timezone(tz))
-    
+
     def setEndDate(self, date):
         self.endDate = date
         self._p_changed=1
-    
+
     def getEndDate(self):
         return self.endDate
-    
+
     def getAdjustedEndDate(self,tz=None):
         if not tz:
             tz = self.getTimezone()
         if tz not in all_timezones:
            tz = 'UTC'
         return self.getEndDate().astimezone(timezone(tz))
-    
+
     def setInterval(self, interval):
         self.interval = interval
         self._p_changed=1
-    
+
     def getInterval(self):
         return self.interval
-    
+
     def getObjList(self):
         return self.listObj.values()
-    
+
     def addObj(self, obj):
         id = obj.getId()
         if id == "":
@@ -360,22 +362,22 @@ class task(Persistent):
             obj.setId(id)
         self.listObj[id] = obj
         self._p_changed=1
-    
+
     def removeObj(self, obj):
         if obj in self.listObj.values():
             del self.listObj[ obj.getId() ]
             self._p_changed=1
-    
+
     def getObjById(self, id):
         return self.listObj[id]
-    
+
     def setLastDate(self, date):
         self.lastDate = date
         self._p_changed=1
-    
+
     def getLastDate(self):
         return self.lastDate
-    
+
     def getAdjustedLastDate(self,tz=None):
         if not tz:
             tz = self.getTimezone()
@@ -396,7 +398,7 @@ class obj(Persistent):
 
     def __init__(self):
         self.id = ""
-    
+
     def run(self):
         """
         This method contain the code to do when the object is activated
@@ -406,17 +408,17 @@ class obj(Persistent):
     def endTask(self):
         """This method will be called when the task finish"""
         pass
-    
+
     def getId(self):
         try:
             return self.id
         except:
             self.id = ""
             return self.id
-    
+
     def setId(self, id):
         self.id = id
-    
+
 
 
 class sendMail(obj):
@@ -431,7 +433,7 @@ class sendMail(obj):
         self.subject = ""
         self.text = ""
         self.smtpServer = Config.getInstance().getSmtpServer()
-    
+
     def run(self):
         addrs = []
         ccaddrs = []
@@ -443,18 +445,18 @@ class sendMail(obj):
             addrs.append(smtplib.quoteaddr(user.getEmail()))
         maildata = { "fromAddr": self.fromAddr, "toList": addrs, "ccList": ccaddrs, "subject": self.subject, "body": self.text }
         GenericMailer.send(GenericNotification(maildata))
-        
+
     def setFromAddr(self, addr):
         self.fromAddr = addr
         self._p_changed = 1
-    
+
     def getFromAddr(self):
         return self.fromAddr
 
     def initialiseToAddr( self ):
         self.toAddr = []
         self._p_changed=1
-    
+
     def addToAddr(self, addr):
         if not addr in self.toAddr:
             self.toAddr.append(addr)
@@ -464,50 +466,50 @@ class sendMail(obj):
         if not addr in self.ccAddr:
             self.ccAddr.append(addr)
             self._p_changed=1
-    
+
     def removeToAddr(self, addr):
         if addr in self.toAddr:
             self.toAddr.remove(addr)
             self._p_changed=1
-    
+
     def setToAddrList(self, addrList):
         """Params: addrList -- addresses of type : list of str."""
         self.toAddr = addrList
         self._p_changed=1
-    
+
     def getToAddrList(self):
         return self.toAddr
-    
+
     def setCcAddrList(self, addrList):
         """Params: addrList -- addresses of type : list of str."""
         self.ccAddr = addrList
         self._p_changed=1
-    
+
     def getCcAddrList(self):
         return self.ccAddr
-    
+
     def addToUser(self, user):
         if not user in self.toUser:
             self.toUser.append(user)
             self._p_changed=1
-    
+
     def removeToUser(self, user):
         if user in self.toUser:
             self.toUser.remove(user)
             self._p_changed=1
-    
+
     def getToUserList(self):
         return self.toUser
-    
+
     def setSubject(self, subject):
         self.subject = subject
-    
+
     def getSubject(self):
         return self.subject
-    
+
     def setText(self, text):
         self.text = text
-    
+
     def getText(self):
         return self.text
 
@@ -521,26 +523,26 @@ class sendMail(obj):
 
 class FoundationSync( obj ):
     """
-    Synchronizes room data (along with associated room managers 
+    Synchronizes room data (along with associated room managers
     and equipment) with Foundation database.
-    
+
     Also, updates list of CERN Official Holidays
 
     (This is object for a task class)
     """
     def __init__(self):
         obj.__init__(self)
-        
+
     def run(self):
         from MaKaC.common.FoundationSync.foundationSync import FoundationSync
         FoundationSync().doAll()
-        
+
     def delete(self):
         TrashCanManager().add( self )
-        
+
     def recover(self):
         TrashCanManager().remove( self )
-        
+
     @staticmethod
     def register():
         """
@@ -550,7 +552,7 @@ class FoundationSync( obj ):
         db.DBMgr.getInstance().startRequest()
         db.DBMgr.getInstance().sync()
         TASK_ID = 'FoundationSyncTask'
-        
+
         t = task()
         t.setId( TASK_ID )
         d = nowutc() + timedelta( days = 1 )
@@ -567,7 +569,7 @@ class FoundationSync( obj ):
 
         # Task does not exist: add it
         taskList.addTask( t )
-        
+
         # Disconnect from Indico DB
         db.DBMgr.getInstance().endRequest()
         print "Successfully registered " + TASK_ID
@@ -582,13 +584,13 @@ class timer(Thread):
         self._inter = interval
         self.log = log
         self.st = 0
-    
+
     def stop(self):
         self.st = 1
-    
+
     def setInterval(self, interval):
         self._inter = interval
-    
+
     def run(self):
         while not self.st:
             w = worker(self.log)
@@ -604,7 +606,7 @@ class worker(Thread):
     def __init__(self, log):
         Thread.__init__(self)
         self.log = log
-    
+
     def run(self):
         workerFilename = os.path.join(os.path.abspath(os.path.dirname(__file__)), "execProcess.py")
         log=""
@@ -612,7 +614,7 @@ class worker(Thread):
             log="\"%s\""%self.log
         os.system("%s \"%s\" %s"%(sys.executable, workerFilename, log))
 
-    
+
 
 class Alarm(task):
     """
@@ -628,17 +630,17 @@ class Alarm(task):
         self.note = ""
         self.confSumary = False
         self.toAllParticipants = False
-        
+
     def getToAllParticipants(self):
-        try: 
+        try:
             return self.toAllParticipants
         except:
             self.toAllParticipants = False
-            return self.toAllParticipants 
-            
+            return self.toAllParticipants
+
     def setToAllParticipants(self, toAllParticipants):
         self.toAllParticipants = toAllParticipants
-    
+
     def clone(self, conference):
         alarm = Alarm(conference)
         alarm.initialiseToAddr()
@@ -655,13 +657,13 @@ class Alarm(task):
             alarm.setStartDate(copy.copy(self.getStartDate()))
         alarm.setToAllParticipants(self.getToAllParticipants())
         return alarm
-        
+
     def getStartDate(self):
         if self.timeBefore:
             return self.conf.getStartDate() - self.timeBefore
         else:
             return task.getStartDate(self)
-    
+
     def getAdjustedStartDate(self,tz=None):
         if not tz:
             tz = self.conf.getTimezone()
@@ -676,22 +678,22 @@ class Alarm(task):
         if self.getStartDate():
             return self.getStartDate().astimezone(timezone(tz))
         return None
-    
+
     def setStartDate(self, date):
         #we don't need timeBefore if startDate is set
         self.startDate = date
         self.timeBefore = None
         self._p_changed=1
-    
+
     def setTimeBefore(self, timeDelta):
         #we don't need startDate if timeBefore is set
         self.timeBefore = timeDelta
         self.startDate = None
         self._p_changed=1
-    
+
     def getTimeBefore(self):
         return self.timeBefore
-        
+
     def setFromAddr(self, addr):
         self.mail.setFromAddr(addr)
 
@@ -700,66 +702,66 @@ class Alarm(task):
 
     def initialiseToAddr(self):
         self.mail.initialiseToAddr()
-    
+
     def addToAddr(self, addr):
         self.mail.addToAddr(addr)
-    
+
     def addCcAddr(self, addr):
         self.mail.addCcAddr(addr)
-    
+
     def removeToAddr(self, addr):
         self.mail.removeToAddr(addr)
-    
+
     def setToAddrList(self, addrList):
         self.mail.setToAddrList(addrList)
-    
+
     def getToAddrList(self):
         return self.mail.getToAddrList()
-    
+
     def setCcAddrList(self, addrList):
         self.mail.setCcAddrList(addrList)
-    
+
     def getCcAddrList(self):
         return self.mail.getCcAddrList()
-    
+
     def addToUser(self, user):
         self.mail.addToUser(user)
         if isinstance(user, Avatar):
             user.linkTo(self, "to")
-    
+
     def removeToUser(self, user):
         self.mail.removeToUser(user)
         if isinstance(user, Avatar):
             user.unlinkTo(self, "to")
-    
+
     def getToUserList(self):
         return self.mail.getToUserList()
-    
+
     def setSubject(self, subject):
         self.mail.setSubject(subject)
-    
+
     def getSubject(self):
         return self.mail.getSubject()
-    
+
     def setText(self, text):
         self.text = text
         self._setMailText()
         self._p_changed=1
-    
+
     def getText(self):
         return self.text
-    
+
     def getLocator(self):
         d = self.getOwner().getLocator()
         d["alarmId"] = self.getId()
         return d
-    
+
     def canAccess(self, aw):
         return self.getOwner().canAccess(aw)
-    
+
     def canModify(self, aw):
         return self.getOwner().canModify(aw)
-    
+
     def _setMailText(self):
         text = self.text
         if self.note:
@@ -788,20 +790,20 @@ class Alarm(task):
             #except:
             #    text += "\n\n\nSorry could not embed text version of the agenda..."
         self.mail.setText(text)
-    
+
     def setNote(self, note):
         self.note = note
         self._setMailText()
         self._p_changed=1
-    
+
     def getNote(self):
         return self.note
-    
+
     def setConfSumary(self, val):
         self.confSumary = val
         self._setMailText()
         self._p_changed=1
-    
+
     def getConfSumary(self):
         return self.confSumary
 
@@ -810,8 +812,8 @@ class Alarm(task):
         from MaKaC.conference import ConferenceHolder
         if not ConferenceHolder().hasKey(self.conf.getId()) or \
                 self.conf.getStartDate() <= nowutc():
-           self.conf.removeAlarm(self) 
-           return True
+            self.conf.removeAlarm(self)
+            return True
         # Email
         self.setSubject("Event reminder: %s"%self.conf.getTitle())
         try:
@@ -824,11 +826,11 @@ class Alarm(task):
             locationText = ""
         if locationText != "":
             locationText = _(""" _("Location"): %s""") % locationText
-        
+
         if self.getToAllParticipants() :
             for p in self.conf.getParticipation().getParticipantList():
                 self.addToUser(p)
-        
+
         from MaKaC.webinterface import urlHandlers
         if Config.getInstance().getShortEventURL() != "":
             url = "%s%s" % (Config.getInstance().getShortEventURL(),self.conf.getId())
@@ -837,10 +839,10 @@ class Alarm(task):
         self.setText("""Hello,
     Please note that the event "%s" will start on %s (%s).
     %s
-    
+
     You can access the full event here:
     %s
-    
+
 Best Regards
 
     """%(self.conf.getTitle(),\
@@ -851,7 +853,7 @@ Best Regards
                 ))
         self._setMailText()
         return False
-    
+
     def delete(self):
         for obj in self.getObjList():
             self.removeObj(obj)
@@ -870,7 +872,7 @@ class StatisticsUpdater(obj):
 
     def run( self ):
         CategoryStatistics.updateStatistics(self._cat)
-    
+
     def delete(self):
         for obj in self.getObjList():
             self.removeObj(obj)
