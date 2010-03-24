@@ -540,9 +540,14 @@ class Avatar(Persistent, Fossilizable):
             ############################
 
             if userData.has_key("timezone"):
-               self.setTimezone(userData["timezone"])
+                self.setTimezone(userData["timezone"])
             else:
-               self.setTimezone(info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone())
+                self.setTimezone(info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone())
+
+            if userData.has_key("displayTZMode"):
+                self.setDisplayTZMode(userData["displayTZMode"])
+            else:
+                self.setDisplayTZMode("Event Timezone")
 
             ################################
             #Fermi timezone awareness(end) #

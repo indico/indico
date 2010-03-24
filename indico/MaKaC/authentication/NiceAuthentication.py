@@ -56,9 +56,12 @@ class NiceAuthenticator(Authenthicator):
         """
         req = rh._req
         req.add_common_vars()
-        if  req.subprocess_env.has_key("HTTP_ADFS_EMAIL"):
-            email = req.subprocess_env["HTTP_ADFS_EMAIL"]
-            login = req.subprocess_env["HTTP_ADFS_LOGIN"]
+        if  req.subprocess_env.has_key("ADFS_EMAIL"):
+            email = req.subprocess_env["ADFS_EMAIL"]
+            login = req.subprocess_env["ADFS_LOGIN"]
+#            phone = req.subprocess_env.get("ADFS_PHONENUMBER","")
+#            lastname = req.subprocess_env.get("ADFS_LASTNAME","")
+#            firstname = req.subprocess_env.get("ADFS_FIRSTNAME","")
             from MaKaC.user import AvatarHolder
             ah = AvatarHolder()
             av = ah.match({"email":email},exact=1, forceWithoutExtAuth=True)
