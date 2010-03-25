@@ -122,33 +122,6 @@ class CSBooking(CSBookingBase):
             self._phoneBridgePassword = None
         return self._phoneBridgePassword
 
-
-    def isDisplayPhoneBridgeId(self):
-        if not "displayPhoneBridgeId" in self._bookingParams:
-            self._bookingParams["displayPhoneBridgeId"] = True
-        return self._bookingParams["displayPhoneBridgeId"]
-
-    def isDisplayPassword(self):
-        if not "displayPassword" in self._bookingParams:
-            self._bookingParams["displayPassword"] = False
-        return self._bookingParams["displayPassword"]
-
-    def isDisplayPhoneBridgePassword(self):
-        if not "displayPhonePassword" in self._bookingParams:
-            self._bookingParams["displayPhonePassword"] = False
-        return self._bookingParams["displayPhonePassword"]
-
-    def isDisplayPhoneBridgeNumbers(self):
-        if not "displayPhoneBridgeNumbers" in self._bookingParams:
-            self._bookingParams["displayPhoneBridgeNumbers"] = True
-        return self._bookingParams["displayPhoneBridgeNumbers"]
-
-    def isDisplayURL(self):
-        if not "displayURL" in self._bookingParams:
-            self._bookingParams["displayURL"] = False
-        return self._bookingParams["displayURL"]
-
-
     @Retrieves(['MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking'], 'errorMessage')
     def getErrorMessage(self):
         return self._errorMessage

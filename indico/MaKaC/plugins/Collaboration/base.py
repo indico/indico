@@ -1044,10 +1044,6 @@ class CSBookingBase(Persistent):
             to the methods getCommunityName, getAccessPassword, getHasAccessPassword.
             If you include a parameter in the _complexParameters list, you always have to implement the corresponding getter method.
         """
-
-        if self._bookingParams is None:
-            raise CollaborationServiceException("This CSBooking object with id " + str(id) + " of the class " + str(self.__class__) + " doesn't have an attribute _bookingParams defined")
-
         bookingParams = {}
         for k, v in self.__class__._simpleParamaters.iteritems():
             if k in self._bookingParams:
@@ -1056,7 +1052,7 @@ class CSBookingBase(Persistent):
                 value = v[1] #we use the default value
             if v[0] is bool and value is True: #we assume it will be used in a single checkbox
                 value = ["yes"]
-            if value: #we do not include False, '', []
+            if value is not False: #we do not include False, it means the single checkbox is not checked
                 bookingParams[k] = value
 
         if hasattr(self.__class__, "_complexParameters") and len(self.__class__._complexParameters) > 0:
@@ -1076,6 +1072,22 @@ class CSBookingBase(Persistent):
             bookingParams["hidden"] = ["yes"]
 
         return bookingParams
+
+
+    def getBookingParamByName(self, paramName):
+        if paramName in self.__class__._simpleParamaters:
+            if not paramName in self._bookingParams:
+                self._bookingParams[paramName] = self.__class__._simpleParamaters[paramName][1]
+            return self._bookingParams[paramName]
+        elif hasattr(self.__class__, "_complexParameters") and paramName in self.__class__._complexParameters:
+            getterMethods = dict(inspect.getmembers(self, lambda m: inspect.ismethod(m) and m.__name__.startswith('get')))
+            getMethodName = 'get' + paramName[0].upper() + paramName[1:]
+            if getMethodName in getterMethods:
+                return getterMethods[getMethodName]()
+            else:
+                raise CollaborationServiceException("Tried to retrieve complex parameter " + str(paramName) + " but the corresponding getter method " + getMethodName + " is not implemented")
+        else:
+            raise CollaborationServiceException("Tried to retrieve parameter " + str(paramName) + " but this parameter does not exist")
 
 
     def setBookingParams(self, params):

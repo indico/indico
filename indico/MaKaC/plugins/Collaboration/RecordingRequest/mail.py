@@ -33,7 +33,7 @@ class RecordingRequestNotificationBase(GenericNotification):
         GenericNotification.__init__(self)
 
         self._booking = booking
-        self._bp = booking._bookingParams
+        self._bp = booking.getBookingParams()
         self._conference = booking.getConference()
         self._isLecture = self._conference.getType() == 'simple_event'
 
