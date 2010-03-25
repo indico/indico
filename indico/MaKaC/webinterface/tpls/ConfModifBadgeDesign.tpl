@@ -13,7 +13,7 @@
 
     // Number of pixels per cm
     var pixelsPerCm = 50;
-    
+
     // Id of the background used
     var backgroundId = -1
 
@@ -31,13 +31,16 @@
     // Last selected item (holds the div for that item)
     var lastSelectedDiv;
 
+    // Translation dictionary from key to name in current language.
+    var translate = <%=translateName%>;
+
     // List of badge template items
     var items = [];
 
     // Item class
-    function Item(itemId, name) {
+    function Item(itemId, key) {
       this.id = itemId;
-      this.name = name;
+      this.key = key;
       this.x = initialOffset;
       this.y = initialOffset;
       this.fontFamily = "Times New Roman";
@@ -63,11 +66,11 @@
               ' width="' + this.width + '" bgColor="' + (this.selected? "#CCCCFF" : "white") +
               '" style="cursor:move; font-weight:' + (this.bold ? 'bold' : 'normal') + '; font-style:' + (this.italic ? 'italic' : 'normal') +
               '; text-align: ' + this.textAlign + ';"' +
-              '><tbody><tr><td><span style="color:' + this.color + '; font-family: ' + this.fontFamily + '; font-size:' + this.fontSize + ';">' + 
-              (this.name == "Fixed Text" ? this.text : this.name) + 
+              '><tbody><tr><td><span style="color:' + this.color + '; font-family: ' + this.fontFamily + '; font-size:' + this.fontSize + ';">' +
+              (this.key == "Fixed Text" ? this.text : translate[this.key]) +
               '</span></td></tr></tbody></table>';
       }
-      
+
     // Dimensions class
     function Dimensions(width, height) {
       this.width = width
@@ -105,7 +108,7 @@
     //       -absolute x,y position
     //       -an inner HTML with its content
       itemId++;
-    
+
       var newDiv = document.createElement('div');
 
       newDiv.id = itemId;
@@ -151,12 +154,12 @@
         },
 
         snap: ($F('snap checkbox') == "on") ? mySnap : false
-      }); 
+      });
 
       // We store the initial position as a good position which to return to
       newDiv.lastGoodPositionLeft = 0;
       newDiv.lastGoodPositionTop = 0;
-      
+
       return newDiv;
 	}
 
@@ -173,7 +176,7 @@
       if (!lastSelectedDiv) {
         markSelected(newDiv);
       }
-      
+
       initialOffset += 10
 
     }
@@ -210,7 +213,7 @@
     function markSelected(newSelectedDiv) {
 
       // Change the text that says which item is selected
-      $E('selection text').dom.innerHTML = items[newSelectedDiv.id].name;
+      $E('selection text').dom.innerHTML = translate[items[newSelectedDiv.id].key];
 
       // TODO: add check to see if there's a table inside and not an image
 
@@ -232,7 +235,7 @@
       $E('style selector').dom.selectedIndex = newSelectedItem.styleIndex;
       $E('color selector').dom.selectedIndex = newSelectedItem.colorIndex;
       $E('width field').dom.value = newSelectedItem.width / pixelsPerCm;
-      if (newSelectedItem.name == "Fixed Text") {
+      if (newSelectedItem.key == "Fixed Text") {
         $E('fixed text field').dom.value = newSelectedItem.text
       } else {
       $E('fixed text field').dom.value = "--"
@@ -276,7 +279,7 @@
       }
 
     }
-    
+
     // This function displays all the items in the 'items' array on the screen
     // If there are already some items being displayed, it does not erase them
     function displayItems() {
@@ -431,7 +434,7 @@
         lastSelectedDiv.innerHTML = item.toHTML();
       }
     }
-    
+
     function changeText() {
       if(lastSelectedDiv) {
         var item = items[lastSelectedDiv.id];
@@ -453,13 +456,13 @@
       $E('templateData').dom.value = template.toJSON();
       document.hiddenform.submit()
     }
-    
+
     function sending() {
       Element.show('loadingIcon');
     }
-    
+
     firstLoad = true;
-    
+
     function sent() {
       if (firstLoad) {
         firstLoad = false;
@@ -485,7 +488,7 @@
     function backgroundReceived() {
       Element.hide('loadingIcon');
     }
-    
+
     function displayBackground(backgroundURL) {
         var newBackground = document.createElement('img');
         newBackground.id = 'background';
@@ -499,9 +502,9 @@
         newBackground.onload = backgroundReceived;
         var template = $E("templateDiv").dom;
         template.appendChild(newBackground);
-    
+
     }
-    
+
     function removeBackground() {
       if (backgroundId != -1) {
         backgroundId = -1;
@@ -510,10 +513,10 @@
     }
 
   </script>
-  
+
 <!-- CONTEXT HELP DIVS -->
 <div id="tooltipPool" style="display: none">
-    <!-- Where is key? --> 
+    <!-- Where is key? -->
     <div id="features" class="tip">
         <b>FullName can have four different formats:</b><br>
         - <b>FullName</b>: Mr. DOE, Jonh<br>
@@ -522,9 +525,9 @@
         - <b>FullName B Full Name (w/o title)</b>: Jonh Doe<br>
     </div>
 </div>
-<!-- END OF CONTEXT HELP DIVS -->  
-  
-  
+<!-- END OF CONTEXT HELP DIVS -->
+
+
 <iframe id="uploadTarget" name="uploadTarget" src="" style="width:0px;height:0px;border:0" onload="sent()"></iframe>
 
 <div style="width:100%%">
@@ -592,7 +595,7 @@
           <input name="Insert Template Element Button" class="btn" value="<%= _("Insert")%>" type="button" onclick="insertElement()">
           <input name="Delete Template Element Button" class="btn" value="<%= _("Remove")%>" type="button" onclick="removeElement()">
 
-          <br/><br/> 
+          <br/><br/>
 
           <select name="Template Elements List" id="elementList">
             <%=selectOptions%>
@@ -812,12 +815,12 @@
       </tr>
     </tbody>
   </table>
-  
+
   <form name="hiddenform" action="<%=saveTemplateURL%>" method="POST">
   	<input name="templateId" value="<%=templateId%>" type="hidden">
   	<input id="templateData" name="templateData" type="hidden">
   </form>
-  
+
 <!--
   <table id='test' width="200" height="200" border="1" onclick="alert(Element.getDimensions(this).width);this.width = parseInt(this.width) + 10; return false">
     <tr><td></tr></td>
@@ -825,7 +828,7 @@
 -->
 
   <script type="text/javascript">
-  
+
     // We load the template if we are editing a template
     if (%(editingTemplate)s) {
        var template = %(templateData)s
@@ -841,18 +844,18 @@
     } else {
        templateDimensions = new Dimensions(425,270); //put here the initial dimensions of templateDiv. This is CERN default of 85mm x 54mm
     }
-	
+
     previousTemplateDimensions = new Dimensions(0,0)
-    
+
     $E('badge width').dom.value = templateDimensions.width / pixelsPerCm;
     $E('badge height').dom.value = templateDimensions.height / pixelsPerCm;
-    
+
     // This function initialises the rulers
     updateRulers();
-    
+
     // This function displays the items, if any have been loaded, on the screen
     displayItems()
-    
+
     if (<%=editingTemplate%> && <%=hasBackground%>) {
        backgroundId = <%=backgroundId%>
        displayBackground("<%=backgroundURL%>")

@@ -198,6 +198,15 @@ class BadgeTemplate (Persistent):
         """ Returns the list with all the information of the template.
         Useful so that javascript can analyze it on its own.
         """
+
+        # ensure that each item's got a key (in order to avoid
+        # using the name as key).
+        for item in self.__templateData[4]:
+            itemName = item['name']
+            if not "key" in item:
+                item['key'] = itemName
+        ##############################
+
         return self.__templateData
 
     def setData(self, templateData):
@@ -384,11 +393,14 @@ class BadgeTemplateItem:
         self.__itemData = itemData
         self.__badgeTemplate = badgeTemplate
 
-    def getName(self):
-        """ Returns the name of the item.
+    def getKey(self):
+        """ Returns the key of the item (non-translated name).
         The name of an item idientifies the kind of item it is: "Name", "Country", "Fixed Text"...
         """
-        return self.__itemData['name']
+        if "key" in self.__itemData:
+            return self.__itemData['key']
+        else:
+            return self.__itemData['name']
 
     def getFixedText(self):
         """ Returns the text content of a Fixed Text item.
