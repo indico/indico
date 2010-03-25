@@ -110,8 +110,12 @@
     <tr>
         <td><%= _("Referee")%>:</td>
         <td id="assignRefereeHelp">
-            <input id="assignRefereeButton_top" type="button" class="popUpButton" value="Assign">
-            <input id="removeRefereeButton_top" type="button" class="popUpButton" value="Remove">
+            <a id="assignRefereeButton_top" class="fakeLink" style="margin-left: 15px; margin-right: 15px"><%= _("Assign")%></a>|
+            <span id="assignMenu_referee_top" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
+                <a id="assignRefereePerTrackButton_top" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Assign per ...")%>
+                </a>
+            </span>|
+            <a id="removeRefereeButton_top" class="fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Remove")%></a>
         </td>
     </tr>
     <% end %>
@@ -119,8 +123,12 @@
     <tr>
         <td><%= _("Layout Reviewer")%>:</td>
         <td id="assignEditorHelp">
-            <input id="assignEditorButton_top" type="button" class="popUpButton" value="Assign">
-            <input id="removeEditorButton_top" type="button" class="popUpButton" value="Remove">
+            <a id="assignEditorButton_top" class="fakeLink" style="margin-left: 15px; margin-right: 15px"><%= _("Assign")%></a>|
+            <span id="assignMenu_editor_top" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
+                <a id="assignEditorPerTrackButton_top" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Assign per ...")%>
+                </a>
+            </span>|
+            <a id="removeEditorButton_top" class="fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Remove")%></a>
         </td>
     </tr>
     <% end %>
@@ -128,9 +136,13 @@
     <tr>
         <td><%= _("Content Reviewers")%>:</td>
         <td id="assignReviewerHelp">
-            <input id="addReviewerButton_top" type="button" class="popUpButton" value="Assign">
-            <input id="removeReviewerButton_top" type="button" class="popUpButton" value="Remove">
-            <input id="removeAllReviewersButton_top" type="button" class="popUpButton" value="Remove All">
+            <a id="addReviewerButton_top" class="fakeLink" style="margin-left: 15px; margin-right: 15px"><%= _("Assign")%></a>|
+            <span id="assignMenu_reviewer_top" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
+                <a id="assignReviewerPerTrackButton_top" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Assign per ...")%>
+                </a>
+            </span>|
+            <a id="removeReviewerButton_top" class="fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Remove")%></a>|
+            <a id="removeAllReviewersButton_top" class="fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Remove All")%>
         </td>
     </tr>
     <% end %>
@@ -283,17 +295,25 @@
     <tr>
         <td><%= _("Referee")%>:</td>
         <td id="assignRefereeHelp">
-            <input id="assignRefereeButton_bottom" type="button" class="popUpButton" value="Assign">
-            <input id="removeRefereeButton_bottom" type="button" class="popUpButton" value="Remove">
+            <a id="assignRefereeButton_bottom" class="fakeLink" style="margin-left: 15px; margin-right: 15px"><%= _("Assign")%></a>|
+            <span id="assignMenu_referee_bottom" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
+                <a id="assignRefereePerTrackButton_top" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Assign per ...")%>
+                </a>
+            </span>|
+            <a id="removeRefereeButton_bottom" class="fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Remove")%></a>
         </td>
     </tr>
     <% end %>
-    <% if not (ConfReview.getChoice() == 2 or ConfReview.getChoice() == 1): %>
+    <%if not (ConfReview.getChoice() == 2 or ConfReview.getChoice() == 1):%>
     <tr>
         <td><%= _("Layout Reviewer")%>:</td>
         <td id="assignEditorHelp">
-            <input id="assignEditorButton_bottom" type="button" class="popUpButton" value="Assign">
-            <input id="removeEditorButton_bottom" type="button" class="popUpButton" value="Remove">
+            <a id="assignEditorButton_bottom" class="fakeLink" style="margin-left: 15px; margin-right: 15px"><%= _("Assign")%></a>|
+            <span id="assignMenu_editor_bottom" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
+                <a id="assignEditorPerTrackButton_bottom" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Assign per ...")%>
+                </a>
+            </span>|
+            <a id="removeEditorButton_bottom" class="fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Remove")%></a>
         </td>
     </tr>
     <% end %>
@@ -301,12 +321,16 @@
     <tr>
         <td><%= _("Content Reviewers")%>:</td>
         <td id="assignReviewerHelp">
-            <input id="addReviewerButton_bottom" type="button" class="popUpButton" value="Assign">
-            <input id="removeReviewerButton_bottom" type="button" class="popUpButton" value="Remove">
-            <input id="removeAllReviewersButton_bottom" type="button" class="popUpButton" value="Remove All">
+            <a id="addReviewerButton_bottom" class="fakeLink" style="margin-left: 15px; margin-right: 15px"><%= _("Assign")%></a>|
+            <span id="assignMenu_reviewer_bottom" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
+                <a id="assignReviewerPerTrackButton_bottom" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Assign per ...")%>
+                </a>
+            </span>|
+            <a id="removeReviewerButton_bottom" class="fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Remove")%></a>|
+            <a id="removeAllReviewersButton_bottom" class="fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Remove All")%>
         </td>
     </tr>
-    <% end %>
+   <% end %>
 </table>
 
 <div id="userSelection_bottom" style="margin-top: 1em">
@@ -319,6 +343,25 @@
 
 
 <script type="text/javascript">
+var assignPerTrackMenus = function(role, place){
+    var assignMenu = $E('assignMenu'+'_'+role+'_'+place);
+    var order = 'assign';
+    if(role=='reviewer'){
+       order = 'add';
+    } 
+    assignMenu.observeClick(function(e) {
+        var menuItems = {};
+    
+        menuItems[$T('Track')] = function(){ fetchUsersPerAttribute(order, role, 'track'); };
+        menuItems[$T('Session')] = function(){ fetchUsersPerAttribute(order, role, 'session'); };
+        menuItems[$T('Type')] = function(){ fetchUsersPerAttribute(order, role, 'type'); };
+    
+        var menu = new PopupMenu(menuItems, [assignMenu], "popupList");
+        var pos = assignMenu.getAbsolutePosition();
+        menu.open(pos.x, pos.y + 20);
+        return false;
+    });
+}
 
 var contributions = $L(); // watchlist of contribution objects, pickled from Indico Contribution objects
 var contributionsIndexes = []; //array that maps contribution ids to the index of the contribution in the 'contributions' watchlist
@@ -389,12 +432,17 @@ var buildShowHideFiltering = function() {
  * @param {Object} contribution
  */
 var backgroundColorOver = function() {
-    IndicoUI.Widgets.Generic.tooltip(this.style.backgroundColor='#ECECEC');
+    IndicoUI.Widgets.Generic.tooltip(this.style.backgroundColor='#FFF6DF');
 }
 
 var backgroundColorOut = function() {
     IndicoUI.Widgets.Generic.tooltip(this.style.backgroundColor='transparent');
 }
+
+var backgroundColorOnClick = function() {
+    IndicoUI.Widgets.Generic.tooltip(this.style.backgroundColor='#CDEB8B');
+}
+
 
 var contributionTemplate = function(contribution) {
         
@@ -422,7 +470,7 @@ var contributionTemplate = function(contribution) {
     */
     var checkbox = Html.input('checkbox', {id: id, name:name});
     checkbox.dom.value = contribution.id;
-    cell1.set(checkbox);
+     cell1.set(checkbox);
     
     row.append(cell1);
     
@@ -658,7 +706,7 @@ var deselectWithoutReviewer = function(contributions) {
  * @param {Object} order
  * @param {Object} role
  */
-var checkAllHaveReferee = function(contributions, order, role) {
+var checkAllHaveReferee = function(contributions, order, role, assignPerAttribute) {
     var contributionsWithoutReferee = []
     for (i in contributions) {
         contributionId = contributions[i]
@@ -669,12 +717,18 @@ var checkAllHaveReferee = function(contributions, order, role) {
     }
     if (contributionsWithoutReferee.length == contributions.length) {
         alert($T("None of the contributions you checked have a Referee.") +
-            $T("You can only add an editor or a reviewer if the contribution has a referee.")
+            $T("You can only add a layout reviewer or a content reviewer if the contribution has a referee.")
         );
         return false;
     }
     
     if (contributionsWithoutReferee.length > 0) {
+        
+        if(assignPerAttribute){
+            alert($T("Some of the contributions you checked have a Referee.") +
+            $T("You can only add a layout reviewer or a content reviewer if the contribution has a referee."));
+            return false;
+        } else {
         title =$T('Contributions without referee');    
             
         var popup = new ExclusivePopup(title, function(){popup.close();});
@@ -702,6 +756,7 @@ var checkAllHaveReferee = function(contributions, order, role) {
              popup.open();
           
         return false;
+    }
     }
     return true;
 }
@@ -731,7 +786,7 @@ var removeReviewersAlerts = function(contributions, role) {
         return false;
     }
     
-    contributionsWithoutEditor = []
+    /*contributionsWithoutEditor = []
     for (i in contributions) {
         contributionId = contributions[i]
         contribution = getContribution(contributionId)
@@ -744,7 +799,7 @@ var removeReviewersAlerts = function(contributions, role) {
         alert($T("There is no assigned Layout Reviewer to remove.")
         );
         return false;
-    } 
+    } */
     
     if (contributionsWithoutReviewers.length > 0) {
         title =$T('Contributions without reviewer');    
@@ -873,13 +928,24 @@ var removeRefereeAlertsMessage = function(contributions){
  * added as a referee, added as an editor, removed as a reviewer, etc on the checked contributions.
  * @param {Object} user The user that has been clicked.
  */
-var userSelected = function(user){
+var userSelected = function(user, contrPerAttribute){
     
     var checkedContributions = getCheckedContributions()
-
-    if (checkedContributions.length > 0) {
-        
+    
+       
+    if (checkedContributions.length > 0){
         var params = {conference: '<%= Conference.getId() %>',contributions: checkedContributions, user: user.id}
+      } 
+    
+        
+    if(checkedContributions.length == 0 && contrPerAttribute.length > 0){
+        var params = {conference: '<%= Conference.getId() %>',contributions: contrPerAttribute, user: user.id}
+        var checkedContributions = contrPerAttribute;
+    }
+       
+    if (checkedContributions.length > 0 || (checkedContributions.length == 0 && contrPerAttribute.length > 0)) {
+        
+       
         
         switch(action) {
         case 'assign_referee':
@@ -1052,10 +1118,10 @@ var fetchUsers = function(order, role) {
     
     if ((order == 'assign' && role == 'editor') || (order == 'add' && role == 'reviewer')) {
         <% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
-	        if (!checkAllHaveReferee(checkedContributions, order, role)) {
-	            return;
-	        } 
-	    <% end %>
+            if (!checkAllHaveReferee(checkedContributions, order, role, false)) {
+                return;
+            } 
+        <% end %>
    }
    
    if (order == 'remove' && role == 'reviewer')  {
@@ -1144,6 +1210,180 @@ var fetchUsers = function(order, role) {
             } else {
                 IndicoUtil.errorReport(error);
             }
+        }
+    );
+}
+
+var fetchUsersPerAttribute = function(order, role, attribute) {
+    
+    var checkedContributions = getCheckedContributions();
+    if (checkedContributions.length > 0) {        
+        deselectAll('selectedContributions');        
+    }         
+    
+            
+    indicoRequest(
+        'reviewing.conference.userCompetencesList',
+        {conference: '<%= Conference.getId() %>', role: role},
+        function(result,error) {
+            if (!error) {               
+                
+                action = order + '_' + role;
+                
+                var title = ''; 
+                if (role == 'editor') {
+                    title = $T('Follow the steps to ') + order + $T(' a layout reviewer:');
+                } 
+                if (role == 'reviewer') {
+                    title = $T('Follow the steps to ') + order + $T(' a content reviewer:');
+                } 
+                if (role == 'referee') {
+                    title = $T('Follow the steps to ') + order + ' a ' + role + ':';
+                } 
+                
+                var popup = new ExclusivePopup(title, function(){popup.close();});
+                
+                popup.draw = function(){
+                
+                     var AttributeDiv = Html.div();
+                     
+                     var attributeList = function () {
+                        indicoRequest(
+                        'reviewing.conference.attributeList',
+                        {conference: '<%= Conference.getId()%>', attribute: attribute},
+                        function(result, error){
+                            if(!error){
+                                    var attributes = $L();
+                                    var attributeTemplate = function(att){
+		                                var li = Html.li({style:{listStyleType:"none", paddingBottom:'3px'}});
+		                                var id = (att.id);
+		                                var name = ("selected"+attribute);
+		                                var checkbox = Html.input('checkbox', {id: id, name: name});
+		                                var attributeName = Html.span({style:{marginLeft:'5px', fontSize: '13px'}}, att.title);
+		                                    
+		                                li.set(Widget.inline([checkbox, attributeName]));
+		                                    
+		                                return li;
+                                    }
+	                                var step1 = Html.span({style:{fontSize:'18px'}, className:'groupTitle groupTitleNoBorder'}, 'Step 1: Choose a '+ attribute);                                
+	                                var attList = Html.ul();
+	                                bind.element(attList, attributes, attributeTemplate);
+	                                for (i in result) {
+	                                attributes.append(result[i]);
+	                                }                            
+                                    AttributeDiv.set(Widget.block([step1,attList]));
+                            } else {
+                                    IndicoUtil.errorReport(error);
+                            }
+                        }
+                        ); 
+                     }
+                     var getCheckedAttributes = function() {    
+                            var checkBoxes = document.getElementsByName("selected"+attribute);
+                            var checkedAttributes = []
+                            for (var i=0; i<checkBoxes.length; i++) {
+                                var cb = checkBoxes[i];
+                                if (cb.checked) {
+                                    checkedAttributes.push(cb.id)
+                                }
+                            }
+                            return checkedAttributes;
+                     }
+                     var assignButton = Html.button({style:{marginLeft:pixels(5)}}, $T("Assign"));
+                      
+                     var users = $L(); 
+                     var contrPerAttribute = [];
+                                           
+                     var contributionsIdList = function (user, chAtt){
+                                    indicoRequest(
+                                        'reviewing.conference.contributionsIdPerSelectedAttribute',
+                                        {conference: '<%= Conference.getId()%>', attribute: attribute, selectedAttributes:chAtt },
+                                        function(result, error){
+                                            if(!error){
+                                                    for (i in result) {
+                                                          contrPerAttribute.push(result[i]);
+                                                    }
+                                                    if ((order == 'assign' && role == 'editor') || (order == 'add' && role == 'reviewer')) {
+													        <% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
+													            if (!checkAllHaveReferee(contrPerAttribute, order, role, true)) {
+													                return;
+													            } 
+													        <% end %>
+													   }
+                                                    userSelected(user, contrPerAttribute);
+                                            }                                                           
+                                            else {
+                                                IndicoUtil.errorReport(error);
+                                            }
+                                        }
+                                   );
+                                }
+                     var userTemplate = function(user) {
+                            var li = Html.li({style:{listStyleType:"none", paddingBottom:'3px'}});
+                            var name = ("radioBtn");
+                            var radioButton = Html.input('radio', {id: user.id, name: name});  
+                            var userName = Html.label({style:{fontWeight: 'normal'}}, user.name); 
+                        
+                            var userCompetences = Html.span({style:{marginLeft:'5px', fontSize: '11px'}},
+                                user.competences.length == 0 ? $T('(no competences defined)') : $T('(competences: ') + user.competences.join(', ') + ')'
+                            );
+                            
+                            li.set(Widget.inline([radioButton, userName, userCompetences]));
+                            return li;
+                     }
+                     var step2 = Html.span({style:{fontSize:'18px'}, className:'groupTitle groupTitleNoBorder'}, 'Step 2: Click on a user name to assign a '+ role);                    
+                     var userList = Html.ul();
+                     bind.element(userList, users, userTemplate);
+                        
+                     for (i in result) {
+                        users.append(result[i]);
+                     }
+                        
+                     attributeList(); 
+                                           
+                     assignButton.observeClick(function(){
+                                var chAtt = getCheckedAttributes();
+                                if(chAtt.length == 0){
+                                    alert($T('You must select at least one attribute.'));
+                                } else {
+	                                var checkedBtn = function(){
+		                                var allBtn = document.getElementsByName('radioBtn');
+			                            for (var i=0; i<allBtn.length; i++) {
+			                                var cb = allBtn[i];
+			                                if (cb.checked) {
+			                                   return cb.id  
+			                                }
+			                            }
+		                           }
+		                           var checkedBtnId = checkedBtn();
+		                           if(checkedBtnId == null){
+		                               alert($T('You must select at least one user.'));
+		                           } else {
+									   for (var i=0; i < users.length.get(); i++) {
+									       user = users.item(i);
+									       if (user.id == checkedBtnId) {
+									           contributionsIdList(user, chAtt);
+									       }
+									   }
+		                               var killProgress = IndicoUI.Dialogs.Util.progress()
+		                               popup.close();
+		                               killProgress();
+	                               }
+                                }
+                            });  
+                             
+                     var cancelButton = Html.button({style:{marginLeft:pixels(5)}}, $T("Cancel"));
+                          cancelButton.observeClick(function(){
+                          popup.close();
+                     });
+                      
+                     return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {height: 'auto', width: 'auto'}},Widget.block([AttributeDiv, step2, userList, assignButton, cancelButton])));  
+                };
+              popup.open();
+              
+              } else {
+                  IndicoUtil.errorReport(error);
+              }
         }
     );
 }
@@ -1251,6 +1491,8 @@ $E('applyFilter').observeClick(fetchContributions);
 
 <% if not IsOnlyReferee and not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
 $E('assignRefereeButton_top').observeClick(function(){ fetchUsers('assign', 'referee'); });
+assignPerTrackMenus('referee', 'top');
+assignPerTrackMenus('referee', 'bottom');
 $E('assignRefereeButton_bottom').observeClick(function(){ fetchUsers('assign', 'referee'); });
 $E('removeRefereeButton_top').observeClick(function(){ removeUser('referee') });
 $E('removeRefereeButton_bottom').observeClick(function(){ removeUser('referee') });
@@ -1258,6 +1500,8 @@ $E('removeRefereeButton_bottom').observeClick(function(){ removeUser('referee') 
 
 <% if not (ConfReview.getChoice() == 2 or ConfReview.getChoice() == 1): %>
 $E('assignEditorButton_top').observeClick(function(){ fetchUsers('assign', 'editor'); });
+assignPerTrackMenus('editor', 'top');
+assignPerTrackMenus('editor', 'bottom');
 $E('assignEditorButton_bottom').observeClick(function(){ fetchUsers('assign', 'editor'); });
 $E('removeEditorButton_top').observeClick(function(){ removeUser('editor') });
 $E('removeEditorButton_bottom').observeClick(function(){ removeUser('editor') });
@@ -1265,13 +1509,14 @@ $E('removeEditorButton_bottom').observeClick(function(){ removeUser('editor') })
 
 <% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
 $E('addReviewerButton_top').observeClick(function(){ fetchUsers('add', 'reviewer'); });
+assignPerTrackMenus('reviewer', 'top');
+assignPerTrackMenus('reviewer', 'bottom');
 $E('addReviewerButton_bottom').observeClick(function(){ fetchUsers('add', 'reviewer'); });
 $E('removeReviewerButton_top').observeClick(function(){ fetchUsers('remove', 'reviewer'); });
 $E('removeReviewerButton_bottom').observeClick(function(){ fetchUsers('remove', 'reviewer'); });
 $E('removeAllReviewersButton_top').observeClick(function(){ removeUser('allReviewers') });
 $E('removeAllReviewersButton_bottom').observeClick(function(){ removeUser('allReviewers') });
 <% end %>
-
 
 fetchContributions();
     

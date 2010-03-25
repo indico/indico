@@ -10,7 +10,7 @@
         <td nowrap id="reviewingModeHelp" class="groupTitle"><%= _("Step 1: Choose type of paper reviewing for the conference")%>
         </td>
     </tr>
-        <em><%= _("Please, follow the steps to set up the Paper Reviewing Module")%></em> 
+        <em><%= _("Please, follow these steps to set up the Paper Reviewing Module")%></em> 
 </table>
         
 <table width="90%%" border="0" style="margin-bottom:1em">

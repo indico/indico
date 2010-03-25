@@ -1,18 +1,27 @@
 <% from MaKaC.reviewing import ConferenceReview %>
 <% from MaKaC.common.PickleJar import DictPickler %>
 
-<% if ConfReview.hasReviewing(): %>
+
 <table width="85%%" align="center" border="0">
+    <tr>
         <td id="revControlRefereeEditorReviewerHelp"  colspan="3" class="groupTitle"  style="padding-top: 15px; padding-bottom: 15px;">
             <%= _("Step 2: Assign Reviewers")%>
         </td>
     </tr>
+    <% if not ConfReview.hasReviewing(): %>
+    <tr>
+        <td>
+            <p style="padding-left: 25px;"><font color="gray"><%= _("Type of reviewing has not been chosen yet.")%></font></p>
+        </td>
+    </tr>
+    <% end %>
+    <% else: %>
     <tr>
         <td>
             <% if ConfReview.getEnableRefereeEmailNotif() or ConfReview.getEnableEditorEmailNotif() or ConfReview.getEnableReviewerEmailNotif(): %>
                 <div style="padding-top: 10px; padding-bottom: 15px;">
-                    <em><%=_("An automatically generated e-mail will be send to the Reviewers you will assign")%></em><br>
-                    <em><%= _("You  can  modify this from the Paper Reviewing Setup")%></em>
+                    <em><%=_("An automatically generated e-mail will be sent to newly assigned Reviewers.")%></em><br>
+                    <em><%= _("You  can  modify this from the Paper Reviewing Setup.")%></em>
                 </div>
             <% end %>
         </td>

@@ -1,10 +1,7 @@
 <% from MaKaC.reviewing import ConferenceReview %>
 <% from MaKaC.common.PickleJar import DictPickler %>
 
-<% if not ConfReview.hasReviewing(): %>
-<p style="padding-left: 25px;"><font color="gray"><%= _("Type of reviewing has not been chosen yet")%></font></p>
-<% end %>
-<%else:%>
+
 <br>
 <table width="85%%" align="center" border="0">
     <tr> 
@@ -14,8 +11,8 @@
         <td colspan="3">
             <% if ConfReview.getEnablePRMEmailNotif(): %>
                 <div style="padding-top: 10px; padding-bottom: 15px;">
-                    <em><%=_("An automatically generated e-mail will be send to the Paper Review Managers you will assign")%></em><br>
-                    <em><%= _("You  can  modify this from the Paper Reviewing Setup")%></em>
+                    <em><%=_("An automatically generated e-mail will be sent to newly assigned Paper Review Managers.")%></em><br>
+                    <em><%= _("You  can  modify this from the Paper Reviewing Setup.")%></em>
                 </div>
             <% end %>
         </td>
@@ -71,4 +68,3 @@
                                                    newPRMHandler, userListNothing, removePRMHandler)
                         $E('PRMList').set(uf.draw())
 </script>
-<% end %>

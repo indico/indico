@@ -429,6 +429,74 @@ class ConferenceReviewingReviewableMaterialsModification(TwoListModificationBase
             self._confReview.removeReviewableMaterials(self._value)
 
 
+class ConferenceReviewingContributionsAttributeList(ListModificationBase, ConferenceReviewingPRMRefereeBase):
+    #Note: don't change the order of the inheritance here!
+    """ Class to return all the tracks or sessions or types of the conference
+    """
+    def _checkParams(self):
+        ConferenceReviewingPRMRefereeBase._checkParams(self)
+        self._attribute = self._params.get("attribute", None)
+        if self._attribute is None:
+            raise ServiceError("ERR-REV5",_("No type/session/track specified"))
+        
+    def _handleGet(self):
+        attributes = []
+        for c in self._conf.getContributionList():
+            if self._attribute == 'type':
+                if c.getType() is not None and c.getType() not in attributes:
+                    attributes.append(c.getType())
+            elif self._attribute == 'track':
+                if c.getTrack() is not None and c.getTrack() not in attributes:
+                    attributes.append(c.getTrack())
+            elif self._attribute == 'session':
+                if c.getSession() is not None and c.getSession() not in attributes:
+                    attributes.append(c.getSession())
+            else:
+                raise ServiceError("ERR-REV5",_("No attribute specified"))     
+        
+        if self._attribute == 'type':
+            return [{"id": attribute.getId(), "title": attribute.getName()}
+                for attribute in attributes]
+        else:
+            return [{"id": attribute.getId(), "title": attribute.getTitle()}
+                for attribute in attributes]
+            
+class ConferenceReviewingContributionsPerSelectedAttributeList(ListModificationBase, ConferenceReviewingPRMRefereeBase):
+    #Note: don't change the order of the inheritance here!
+    """ Class to return all the contributions ids for the selected track/session/type of the conference
+    """
+    def _checkParams(self):
+        ConferenceReviewingPRMRefereeBase._checkParams(self)
+        self._attribute = self._params.get("attribute", None)
+        if self._attribute is None:
+            raise ServiceError("ERR-REV5",_("No type/session/track specified"))
+        self._selectedAttribute = self._params.get("selectedAttributes", None)
+        if self._selectedAttribute is None:
+            raise ServiceError("ERR-REV5",_("No attribute specified"))
+        
+    def _handleGet(self):
+        contributionsPerSelectedAttribute = []
+        for c in self._conf.getContributionList():
+            for att in self._selectedAttribute:
+                if self._attribute == 'type':
+                    if c.getType() is not None and c.getId() not in contributionsPerSelectedAttribute:
+                        if c.getType().getId() == att:
+                            contributionsPerSelectedAttribute.append(c.getId())
+                elif self._attribute == 'track':
+                    if c.getTrack() is not None and c.getId() not in contributionsPerSelectedAttribute:
+                        if c.getTrack().getId() == att:
+                            contributionsPerSelectedAttribute.append(c.getId())
+                elif self._attribute == 'session':
+                    if c.getSession() is not None and c.getId() not in contributionsPerSelectedAttribute:
+                        if c.getSession().getId() == att:
+                            contributionsPerSelectedAttribute.append(c.getId())
+                else:
+                    raise ServiceError("ERR-REV5",_("No attribute specified"))     
+             
+        
+        return contributionsPerSelectedAttribute
+            
+        
 class ConferenceReviewingUserCompetenceList(ListModificationBase, ConferenceReviewingPRMRefereeBase):
     #Note: don't change the order of the inheritance here!
     """ Class to return all the referees / editors / reviewers of the conference,
@@ -848,6 +916,8 @@ methodMap = {
     "conference.changeDefaultDueDate" : ConferenceReviewingDefaultDueDateModification,
     "conference.changeAbstractReviewerDefaultDueDate" : ConferenceAbstractReviewingDefaultDueDateModification,
     "conference.changeReviewableMaterials" : ConferenceReviewingReviewableMaterialsModification,
+    "conference.attributeList" : ConferenceReviewingContributionsAttributeList,
+    "conference.contributionsIdPerSelectedAttribute" : ConferenceReviewingContributionsPerSelectedAttributeList,
     "conference.userCompetencesList": ConferenceReviewingUserCompetenceList,
 
     "conference.assignReferee" : ConferenceReviewingAssignReferee,

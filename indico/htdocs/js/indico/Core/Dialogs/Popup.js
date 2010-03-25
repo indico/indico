@@ -161,7 +161,7 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
         // if the content is too big or if new content is added after the popup
         // dialog is displayed.
         var contentHeight = this._calculateContentHeight();
-        this.contentWrapper.setStyle('height', pixels(contentHeight));
+        //this.contentWrapper.setStyle('height', pixels(contentHeight));
         //this.contentWrapper.setStyle('marginTop', pixels((this.closeHandler && !this.title) ? 30 : 10));
         this.contentWrapper.setStyle('overflowY', 'auto');
         this.contentWrapper.setStyle('overflowX', 'hidden');
