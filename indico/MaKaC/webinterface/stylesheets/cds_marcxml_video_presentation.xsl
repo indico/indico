@@ -1,5 +1,5 @@
 <?xml version='1.0'?>
-<!--
+<!-- $Id: cds_marcxml_presentation.xsl,v 1.2 2008/04/24 16:59:56 jose Exp $
 
      This file is part of CDS Indico.
      Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -78,6 +78,28 @@
   <subfield code="v"><xsl:value-of select="substring(./startDate,0,5)" disable-output-escaping="yes"/></subfield>
 </xsl:if>
 </datafield>
+<xsl:if test="./allowedAccessGroups != '' and count(./allowedAccessGroups) != 0">
+<datafield tag="506" ind1="1" ind2=" ">
+    <subfield code="a">Restricted</subfield>
+    <xsl:for-each select="./allowedAccessGroups/group">
+    <subfield code="d"><xsl:value-of select="." /></subfield>
+    </xsl:for-each>
+    <subfield code="f">group</subfield>
+    <subfield code="2">CDS Invenio</subfield>
+    <subfield code="5">SzGeCERN</subfield>
+</datafield>
+</xsl:if>
+<xsl:if test="./allowedAccessEmails != '' and count(./allowedAccessEmails) != 0">
+<datafield tag="506" ind1="1" ind2=" ">
+    <subfield code="a">Restricted</subfield>
+    <xsl:for-each select="./allowedAccessEmails/email">
+    <subfield code="d"><xsl:value-of select="." /></subfield>
+    </xsl:for-each>
+    <subfield code="f">email</subfield>
+    <subfield code="2">CDS Invenio</subfield>
+    <subfield code="5">SzGeCERN</subfield>
+</datafield>
+</xsl:if>
 <datafield tag="518" ind1=" " ind2=" ">
   <subfield code="d"><xsl:value-of select="./startDate" disable-output-escaping="yes"/></subfield>
 </datafield>

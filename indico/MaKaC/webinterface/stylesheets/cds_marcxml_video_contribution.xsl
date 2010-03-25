@@ -1,5 +1,5 @@
 <?xml version='1.0'?>
-<!--
+<!-- $Id: cds_marcxml_contribution.xsl,v 1.2 2008/08/13 13:31:23 jose Exp $
 
      This file is part of CDS Indico.
      Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -38,20 +38,20 @@
   <subfield code="a"><xsl:value-of select="./title"/></subfield>
   </xsl:if>
   <subfield code="c"><xsl:value-of select="./location/name" disable-output-escaping="yes"/> - <xsl:value-of select="./location/room" disable-output-escaping="yes"/></subfield>
-  <subfield code="9"><xsl:value-of select="./startDate" disable-output-escaping="yes"/></subfield>
-  <subfield code="z"><xsl:value-of select="./endDate" disable-output-escaping="yes"/></subfield>
+  <subfield code="9"><xsl:value-of select="./contribution/startDate" disable-output-escaping="yes"/></subfield>
+  <subfield code="z"><xsl:value-of select="./contribution/endDate" disable-output-escaping="yes"/></subfield>
   <subfield code="g"><xsl:value-of select="./ID" disable-output-escaping="yes"/></subfield>
 </datafield>
-<xsl:if test="./title!=''">
+<xsl:if test="./contribution/title!=''">
 <datafield tag="245" ind1=" " ind2=" ">
-  <subfield code="a"><xsl:value-of select="./title"/></subfield>
+  <subfield code="a"><xsl:value-of select="./contribution/title"/></subfield>
 </datafield>
 </xsl:if>
 <datafield tag="260" ind1=" " ind2=" ">
-  <subfield code="c"><xsl:value-of select="substring(./startDate,0,5)" disable-output-escaping="yes"/></subfield>
+  <subfield code="c"><xsl:value-of select="substring(./contribution/startDate,0,5)" disable-output-escaping="yes"/></subfield>
 </datafield>
 <datafield tag="269" ind1=" " ind2=" ">
-  <subfield code="c"><xsl:value-of select="substring(./startDate,0,11)" disable-output-escaping="yes"/></subfield>
+  <subfield code="c"><xsl:value-of select="substring(./contribution/startDate,0,11)" disable-output-escaping="yes"/></subfield>
 </datafield>
 <datafield tag="300" ind1=" " ind2=" ">
   <subfield code="a">Streaming video</subfield>
@@ -62,28 +62,16 @@
 </datafield>
 <datafield tag="490" ind1=" " ind2=" ">
   <subfield code="a"><xsl:value-of select="./category"/></subfield>
-<xsl:if test="substring(./category,0,26)='Academic Training Lecture'">
-  <subfield code="v">
-  <xsl:choose>
-  <xsl:when test="substring(./startDate,6,2)='01' or substring(./startDate,6,2)='02' or substring(./startDate,6,2)='03' or substring(./startDate,6,2)='04' or substring(./startDate,6,2)='05' or substring(./startDate,6,2)='06' or substring(./startDate,6,2)='07' or substring(./startDate,6,2)='08'">
-<xsl:value-of select="number(substring(./startDate,0,5))-1" disable-output-escaping="yes"/>-<xsl:value-of select="substring(./startDate,0,5)" disable-output-escaping="yes"/>
-  </xsl:when>
-  <xsl:otherwise>
-<xsl:value-of select="substring(./startDate,0,5)" disable-output-escaping="yes"/>-<xsl:value-of select="number(substring(./startDate,0,5))+1" disable-output-escaping="yes"/>
-  </xsl:otherwise>
-  </xsl:choose>
-  </subfield>
-</xsl:if>
-<xsl:if test="substring(./category,0,23)='Summer Student Lecture'">
-  <subfield code="v"><xsl:value-of select="substring(./startDate,0,5)" disable-output-escaping="yes"/></subfield>
-</xsl:if>
+</datafield>
+<datafield tag="490" ind1=" " ind2=" ">
+  <subfield code="a"><xsl:value-of select="./title" disable-output-escaping="yes"/></subfield>
 </datafield>
 <datafield tag="518" ind1=" " ind2=" ">
-  <subfield code="d"><xsl:value-of select="./startDate" disable-output-escaping="yes"/></subfield>
+  <subfield code="d"><xsl:value-of select="./contribution/startDate" disable-output-escaping="yes"/></subfield>
 </datafield>
-<xsl:if test="./description!=''">
+<xsl:if test="./contribution/abstract!=''">
 <datafield tag="520" ind1=" " ind2=" ">
-  <subfield code="a">&lt;!--HTML--&gt;<xsl:value-of select="./description"/></subfield>
+  <subfield code="a">&lt;!--HTML--&gt;<xsl:value-of select="./contribution/abstract"/></subfield>
 </datafield>
 </xsl:if>
 <datafield tag="650" ind1="1" ind2="7">
@@ -98,8 +86,8 @@
 <datafield tag="690" ind1="C" ind2=" ">
   <subfield code="a">CERN</subfield>
 </datafield>
-<xsl:if test="count(./chair) != 0">
-<xsl:for-each select="./chair/user">
+<xsl:if test="count(./contribution/speakers) != 0">
+<xsl:for-each select="./contribution/speakers/user">
 <datafield tag="700" ind1=" " ind2=" ">
   <subfield code="a"><xsl:apply-templates select="./name"/></subfield>
   <subfield code="e">speaker</subfield>
@@ -109,6 +97,10 @@
 </datafield>
 </xsl:for-each>
 </xsl:if>
+<datafield tag="856" ind1="4" ind2=" ">
+  <subfield code="u">http://indico.cern.ch/contributionDisplay.py?confId=<xsl:value-of select="./ID" disable-output-escaping="yes"/>&amp;contribId=<xsl:value-of select="./contribution/ID" disable-output-escaping="yes"/></subfield>
+  <subfield code="y">Talk details</subfield>
+</datafield>
 <datafield tag="856" ind1="4" ind2=" ">
   <subfield code="u">http://indico.cern.ch/conferenceDisplay.py?confId=<xsl:value-of select="./ID" disable-output-escaping="yes"/></subfield>
   <subfield code="y">Event details</subfield>
@@ -130,47 +122,19 @@
   <subfield code="x"><xsl:value-of select="./creationDate" disable-output-escaping="yes"/></subfield>
   <subfield code="c"><xsl:value-of select="./modificationDate" disable-output-escaping="yes"/></subfield>
 </datafield>
-<xsl:if test="substring(./category,0,26)='Academic Training Lecture'">
-<datafield tag="962" ind1=" " ind2=" ">
-  <subfield code="n">cern<xsl:choose>
-  <xsl:when test="substring(./startDate,6,2)='01' or substring(./startDate,6,2)='02' or substring(./startDate,6,2)='03' or substring(./startDate,6,2)='04' or substring(./startDate,6,2)='05' or substring(./startDate,6,2)='06' or substring(./startDate,6,2)='07' or substring(./startDate,6,2)='08'">
-<xsl:value-of select="number(substring(./startDate,0,5))-1" disable-output-escaping="yes"/>
-  </xsl:when>
-  <xsl:otherwise>
-<xsl:value-of select="substring(./startDate,0,5)" disable-output-escaping="yes"/>
-  </xsl:otherwise>
-  </xsl:choose>0901</subfield>
-</datafield>
-</xsl:if>
-<xsl:if test="substring(./category,0,23)='Summer Student Lecture'">
-<datafield tag="962" ind1=" " ind2=" ">
-  <subfield code="n">cern<xsl:value-of select="substring(./startDate,0,5)" disable-output-escaping="yes"/>0701</subfield>
-</datafield>
-</xsl:if>
 <datafield tag="963" ind1=" " ind2=" ">
   <subfield code="a">PUBLIC</subfield>
 </datafield>
 <datafield tag="970" ind1=" " ind2=" ">
-  <subfield code="a">INDICO.<xsl:value-of select="./ID" disable-output-escaping="yes"/></subfield>
+  <subfield code="a">INDICO.<xsl:value-of select="./ID" disable-output-escaping="yes"/>c<xsl:value-of select="./contribution/ID" disable-output-escaping="yes"/></subfield>
 </datafield>
 <datafield tag="980" ind1=" " ind2=" ">
   <subfield code="a">Indico</subfield>
 </datafield>
-<xsl:if test="substring(./category,0,26)='Academic Training Lecture'">
-<datafield tag="980" ind1=" " ind2=" ">
-  <subfield code="b">ACAD</subfield>
-</datafield>
-</xsl:if>
-<xsl:if test="substring(./category,0,23)='Summer Student Lecture'">
-<datafield tag="980" ind1=" " ind2=" ">
-  <subfield code="b">SSLP</subfield>
-</datafield>
-</xsl:if>
-<xsl:if test="substring(./category,0,23)!='Summer Student Lecture' and substring(./category,0,26)!='Academic Training Lecture'">
 <datafield tag="980" ind1=" " ind2=" ">
   <subfield code="b">TALK</subfield>
 </datafield>
-</xsl:if>
+
 </record>
 
 </xsl:template>
@@ -181,7 +145,7 @@
   <xsl:text disable-output-escaping="yes">, </xsl:text>
   </xsl:if>
   <xsl:value-of select="./@first" disable-output-escaping="yes"/>
-</xsl:template>
+</xsl:template>	
 
 </xsl:stylesheet>
 
