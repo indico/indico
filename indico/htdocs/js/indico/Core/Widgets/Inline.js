@@ -156,11 +156,8 @@ type("RadioFieldWidget", ["InlineWidget", "WatchAccessor"],
 
              this.canvas = Html.div(
                  {style:{position:'relative'}},
-                 $B(
-                     Html.table(
-                         this.cssClassRadios,
-                         Html.tbody({})
-                     ),
+                 Html.table(this.cssClassRadios,
+                 $B(Html.tbody({}),
                      this.orderedItems,
                      function(item) {
                          var radio = self.radioDict[item.key];
@@ -214,7 +211,7 @@ type("RadioFieldWidget", ["InlineWidget", "WatchAccessor"],
 
 
                          return liItem;
-                     }));
+                     })));
 
              return this.canvas;
          },
@@ -267,7 +264,6 @@ type("RadioFieldWidget", ["InlineWidget", "WatchAccessor"],
                   });
 
              this.canvas.dom.style.opacity = 0.4;
-
          },
 
          observe: function(callback) {
