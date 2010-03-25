@@ -457,7 +457,7 @@ class RHConferenceDisplay( RoomBookingDBMixin, RHConferenceBaseDisplay ):
         return warningText + p.display(**params)
 
 
-class RHConferenceOtherViews( RHConferenceBaseDisplay ):
+class RHConferenceOtherViews( RoomBookingDBMixin, RHConferenceBaseDisplay ):
     """this class is for the conference type objects only
     it is an alternative to the standard TimeTable view"""
     _uh = urlHandlers.UHConferenceOtherViews
