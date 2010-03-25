@@ -44,7 +44,7 @@ from MaKaC.common.info import HelperMaKaCInfo
 class WPEvaluationBase( conferences.WPConferenceDefaultDisplayBase ):
     """[DisplayArea] Base class."""
     pass
-    
+
 class WPEvaluationMainInformation( WPEvaluationBase ):
     """[DisplayArea] display evaluation general information."""
     navigationEntry = NEEvaluationMainInformation
@@ -53,7 +53,7 @@ class WPEvaluationMainInformation( WPEvaluationBase ):
         pars = {"menuStatus":self._rh._getSession().getVar("menuStatus") or "open"}
         return WEvaluationMainInformation(self._conf, self._getAW().getUser()).getHTML(pars)
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._evaluationOpt)
 
@@ -83,8 +83,8 @@ class WEvaluationMainInformation(wcomponents.WTemplated):
             else:
                 vars["actionsDisplayEval"] = urlHandlers.UHConfEvaluationDisplay.getURL(self._conf)
         return vars
-    
-    
+
+
 class WPEvaluationDisplay( WPEvaluationBase ):
     """[DisplayArea] Evaluation default display."""
     navigationEntry = NEEvaluationDisplay
@@ -95,10 +95,10 @@ class WPEvaluationDisplay( WPEvaluationBase ):
         pars["user"] = self._rh._getUser()
         return WEvaluationDisplay(self._conf).getHTML(pars)
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._newEvaluationOpt)
-    
+
 class WEvaluationDisplay(wcomponents.WTemplated):
     """[DisplayArea] Evaluation default display."""
 
@@ -112,8 +112,8 @@ class WEvaluationDisplay(wcomponents.WTemplated):
         vars["hasSubmittedEvaluation"] = isinstance(user,Avatar) and user.hasSubmittedEvaluation(self._conf.getEvaluation())
         vars["actionUrl"] = urlHandlers.UHConfEvaluationSubmit.getURL(self._conf, mode=Evaluation._SUBMIT)
         return vars
-    
-    
+
+
 class WPEvaluationDisplayModif( WPEvaluationBase ):
     """[DisplayArea] The user modifies his already submitted evaluation."""
     navigationEntry = NEEvaluationDisplayModif
@@ -124,16 +124,16 @@ class WPEvaluationDisplayModif( WPEvaluationBase ):
         pars["user"] = self._rh._getUser()
         return WEvaluationDisplayModif(self._conf).getHTML(pars)
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._viewEvaluationOpt)
 
 class WEvaluationDisplayModif( WEvaluationDisplay ):
     """[DisplayArea] The user modifies his already submitted evaluation."""
-    
+
     def __init__(self, conf):
         self._conf = conf
-        
+
     def getVars( self ):
         vars = WEvaluationDisplay.getVars(self)
         vars["actionUrl"] = urlHandlers.UHConfEvaluationSubmit.getURL(self._conf, mode=Evaluation._EDIT)
@@ -143,7 +143,7 @@ class WEvaluationDisplayModif( WEvaluationDisplay ):
 class WPEvaluationSubmitted( WPEvaluationBase ):
     """[DisplayArea] Submitted Evaluation."""
     navigationEntry = NEEvaluationMainInformation
-    
+
     def __init__(self, rh, conf, mode):
         self._mode = mode
         conferences.WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
@@ -157,17 +157,17 @@ class WPEvaluationSubmitted( WPEvaluationBase ):
             pars["redirection"] = None
         return WEvaluationSubmitted(self._conf, self._mode).getHTML(pars)
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._evaluationOpt)
-    
+
 class WEvaluationSubmitted( wcomponents.WTemplated ):
     """Submitted Evaluation."""
-    
+
     def __init__( self, conference, mode=Evaluation._SUBMIT ):
         self._conf = conference
         self._mode = mode
-        
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
         if not vars.has_key("redirection"):
@@ -183,8 +183,8 @@ class WEvaluationSubmitted( wcomponents.WTemplated ):
             else:
                 vars["status"] = _("submitted")
         return vars
-    
-    
+
+
 class WPEvaluationFull( WPEvaluationBase ):
     """[DisplayArea] Evaluation is full."""
     navigationEntry = NEEvaluationDisplay
@@ -192,13 +192,13 @@ class WPEvaluationFull( WPEvaluationBase ):
     def _getBody( self, params ):
         return WEvaluationFull(self._conf).getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._evaluationOpt)
-        
+
 class WEvaluationFull( wcomponents.WTemplated ):
     """[DisplayArea] Evaluation is full."""
-    
+
     def __init__(self, conf):
         self._conf = conf
 
@@ -207,7 +207,7 @@ class WEvaluationFull( wcomponents.WTemplated ):
         vars["limit"] = self._conf.getEvaluation().getSubmissionsLimit()
         return vars
 
-    
+
 class WPEvaluationClosed( WPEvaluationBase ):
     """[DisplayArea] Evaluation is closed."""
     navigationEntry = NEEvaluationDisplay
@@ -215,10 +215,10 @@ class WPEvaluationClosed( WPEvaluationBase ):
     def _getBody( self, params ):
         return WEvaluationClosed(self._conf).getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._evaluationOpt)
-        
+
 class WEvaluationClosed( wcomponents.WTemplated ):
     """[DisplayArea] Evaluation is closed."""
 
@@ -250,7 +250,7 @@ class WPEvaluationSignIn( WPEvaluationBase ):
     def _getBody( self, params ):
         return WEvaluationSignIn( self._conf ).getHTML(params)
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._newEvaluationOpt)
 
@@ -264,15 +264,15 @@ class WEvaluationSignIn(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
         vars["signInURL"] = urlHandlers.UHSignIn.getURL(urlHandlers.UHConfEvaluationDisplay.getURL(self._conf))
         return vars
-    
-    
+
+
 class WPEvaluationInactive( WPEvaluationBase ):
     """[DisplayArea] Inactive evaluation."""
 
     def _getBody( self, params ):
         return WEvaluationInactive().getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._evaluationOpt)
 
@@ -289,7 +289,7 @@ class WEvaluationInactive(wcomponents.WTemplated):
 
 class WPConfModifEvaluationBase( conferences.WPConferenceModifBase ):
     """[ManagementArea] Base class."""
-    
+
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
         self._tabEvaluationSetup = self._tabCtrl.newTab( "evaluationsetup", _("Setup"), \
@@ -306,10 +306,10 @@ class WPConfModifEvaluationBase( conferences.WPConferenceModifBase ):
             self._tabEvaluationPreview.disable()
             self._tabEvaluationResults.disable()
         self._setActiveTab()
-            
+
     def _setActiveTab( self ):
         self._tabEvaluationEdit.disable()
-        
+
     def _setActiveSideMenuItem( self ):
         self._evaluationMenuItem.setActive()
 
@@ -324,16 +324,16 @@ class WPConfModifEvaluationBase( conferences.WPConferenceModifBase ):
 
 class WPConfModifEvaluationSetup( WPConfModifEvaluationBase ):
     """[ManagementArea] Modification of an Evaluation."""
-    
+
     def _getTabContent( self, params ):
         return WConfModifEvaluationSetup(self._conf).getHTML()
-            
+
     def _setActiveTab( self ):
         self._tabEvaluationSetup.setActive()
 
 class WConfModifEvaluationSetup( wcomponents.WTemplated ):
     """[ManagementArea] Modification of an Evaluation."""
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
@@ -413,13 +413,13 @@ class WConfModifEvaluationSetup( wcomponents.WTemplated ):
 
 class WPConfModifEvaluationSetupImportXml( WPConfModifEvaluationSetup ):
     """[ManagementArea] Import an evaluation from an XML file."""
-    
+
     def _getTabContent( self, params ):
         return WConfModifEvaluationSetupImportXml(self._conf).getHTML()
 
 class WConfModifEvaluationSetupImportXml( WConfModifEvaluationSetup ):
     """[ManagementArea] Import an evaluation from an XML file."""
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
@@ -432,13 +432,13 @@ class WConfModifEvaluationSetupImportXml( WConfModifEvaluationSetup ):
 
 class WPConfModifEvaluationSetupDataModif( WPConfModifEvaluationSetup ):
     """[ManagementArea] called when you want to change general parameters of your evaluation."""
-    
+
     def _getTabContent( self, params ):
         return WConfModifEvaluationSetupDataModif(self._conf).getHTML()
 
 class WConfModifEvaluationSetupDataModif( WConfModifEvaluationSetup ):
     """[ManagementArea] change general parameters of your evaluation."""
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
@@ -507,21 +507,21 @@ class WConfModifEvaluationSetupDataModif( WConfModifEvaluationSetup ):
             vars["newSubmissionNotifyTo"]   = ", ".join(newSubmissionNotification.getToList())
             vars["newSubmissionNotifyCc"]   = ", ".join(newSubmissionNotification.getCCList())
         return vars
-    
-    
-    
+
+
+
 class WPConfModifEvaluationEdit( WPConfModifEvaluationBase ):
     """[ManagementArea] Edition of Evaluation questions."""
-    
+
     def _getTabContent( self, params ):
         return WConfModifEvaluationEdit(self._conf).getHTML(self._rh.getRequestParams())
-            
+
     def _setActiveTab( self ):
         self._tabEvaluationEdit.setActive()
 
 class WConfModifEvaluationEdit( wcomponents.WTemplated ):
     """[ManagementArea] General frame for editing Evaluation questions."""
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
@@ -534,12 +534,12 @@ class WConfModifEvaluationEdit( wcomponents.WTemplated ):
         error = vars.get("error","")            #error message
         questionType = vars.get("type","")      #which question type is selected
         questionPos = int(vars.get("questionPos",-1)) #position of selected question, used when mode is EDIT.
-        
+
         ###########
         #left menu#
         ###########
         self._leftMenu(questionType, vars)
-        
+
         ######
         #main#
         ######
@@ -560,7 +560,7 @@ class WConfModifEvaluationEdit( wcomponents.WTemplated ):
             for q in self._conf.getEvaluation().getQuestions():
                 vars["main"] += str(WConfModifEvaluationEditQuestionView(q).getHTML())
         return vars
-    
+
     def _leftMenu(self, questionType, vars):
         """ create left menu of the webpage. Be aware that 'vars' is mutable.
             Params:
@@ -580,7 +580,7 @@ class WConfModifEvaluationEdit( wcomponents.WTemplated ):
         vars["form_slct"]= self._createQuestionImgButton(url_slct, questionType, Question._SELECT)
         vars["form_radi"]= self._createQuestionImgButton(url_radi, questionType, Question._RADIO)
         vars["form_chck"]= self._createQuestionImgButton(url_chck, questionType, Question._CHECKBOX)
-    
+
     def _createQuestionImgButton(self, url, questionType, qType):
         """ Depending on selected questionType it creates changing button or fixed image.
             This short function is just a shortcut.
@@ -596,7 +596,7 @@ class WConfModifEvaluationEdit( wcomponents.WTemplated ):
 
 class WConfModifEvaluationEditQuestionView( wcomponents.WTemplated ):
     """[ManagementArea] This is the presentation of a question when editing the whole evaluation form structure."""
-    
+
     def __init__( self, question ):
         self._question = question
 
@@ -642,10 +642,10 @@ class WConfModifEvaluationEditQuestionView( wcomponents.WTemplated ):
 
 class WConfModifEvaluationEditQuestion( wcomponents.WTemplated ):
     """[ManagementArea] Edition of one particular Evaluation question."""
-    
+
     #constant for function _choiceItems()
     _CHOICEITEMS_NB_MIN = 2
-    
+
     def __init__( self, conference, mode, error, questionType, question ):
         """Params:
             conference -- current conference (obvious!).
@@ -666,7 +666,7 @@ class WConfModifEvaluationEditQuestion( wcomponents.WTemplated ):
         nbQuestions = self._evaluation.getNbOfQuestions()
         #actionUrl
         url = urlHandlers.UHConfModifEvaluationEditPerformChanges.getURL(self._conf, mode=self._mode)
-        
+
         ###########
         #Edit mode#
         ###########
@@ -691,7 +691,7 @@ class WConfModifEvaluationEditQuestion( wcomponents.WTemplated ):
             else: #Unused, but : Better to prevent than to heal!
                 defaultAnswer    = ""
             url.addParam("questionPos",self._question.getPosition())
-            
+
         ##########
         #Add mode#
         ##########
@@ -709,7 +709,7 @@ class WConfModifEvaluationEditQuestion( wcomponents.WTemplated ):
             vars["saveButtonText"]= _("add question")
             vars["choiceItems"]   = self._choiceItems();
             defaultAnswer         = ""
-        
+
         #######
         #Other#
         #######
@@ -739,7 +739,7 @@ class WConfModifEvaluationEditQuestion( wcomponents.WTemplated ):
         #actionUrl
         vars["actionUrl"] = url
         return vars
-    
+
     def _choiceItems(self, question=None):
         """ generates HTML code for showing the choice items.
             Params:
@@ -795,9 +795,9 @@ class WConfModifEvaluationEditQuestion( wcomponents.WTemplated ):
                       </span>"""
         html = html%(htmlInsert)
         return html
-    
-    
-    
+
+
+
 class WPConfModifEvaluationPreview( WPConfModifEvaluationBase ):
     """[ManagementArea] Preview of an Evaluation."""
     def _getTabContent( self, params ):
@@ -810,17 +810,17 @@ class WPConfModifEvaluationPreview( WPConfModifEvaluationBase ):
 
 class WConfModifEvaluationPreview( WEvaluationDisplay ):
     """[ManagementArea] Preview of an Evaluation."""
-    
+
     def __init__( self, conference ):
         self._conf = conference
-        
+
     def getVars( self ):
         vars = WEvaluationDisplay.getVars(self)
         vars["hasSubmittedEvaluation"] = False
         vars["actionUrl"] = urlHandlers.UHConfModifEvaluationPreview.getURL(self._conf, status=_("submitted"))
         return vars
-    
-    
+
+
 class WPConfModifEvaluationPreviewSubmitted( WPConfModifEvaluationBase ):
     """[ManagementArea] Preview of an Evaluation when it has been submitted."""
     def _getTabContent( self, params ):
