@@ -14,7 +14,7 @@
         <% else: %>
             <% additionalStyle = '' %>
         <% end %>
-        
+
         <a id="index_<%=indexName%>" onclick="indexSelectedObs('<%=indexName%>', false)" class="CAIndexUnselected" <%=additionalStyle%> >
             <%= indexName[0].upper() + indexName[1:] %>
         </a>
@@ -46,7 +46,7 @@
             <%= _("Results per page:")%> <input type="text" id="resultsPerPage" size="5" onkeypress="updateFilterButton()" value="<%= InitialResultsPerPage %>"/>
         </div>
     </div>
-    
+
     <div id="dateFilter" style="padding-top: 10px">
         <div>
             <% if InitialFromDays: %>
@@ -60,24 +60,24 @@
             <input type="radio" name="dateFilterType" id="sinceToDateRadio" onclick="updateDateFilterType()" class="CARadio" <%= checked1 %> />
             <%= _("Since")%> <input type="text" size="16" id="sinceDate" onkeypress="updateFilterButton()" value="<%= InitialSinceDate %>"/>
             <%= _("to")%> <input type="text" size="16" id="toDate" onkeypress="updateFilterButton()" value="<%= InitialToDate %>"/>
-            <span class="CAMinMaxKeySuggestion">Please input dates</span>
+            <span class="CAMinMaxKeySuggestion"><%= _("Please input dates") %></span>
         </div>
         <div style="padding-top: 5px">
             <input type="radio" name="dateFilterType" id="fromToDaysRadio" onclick="updateDateFilterType()" class="CARadio" <%= checked2 %> />
             <%= _("From")%> <input type="text" size="3" id="fromDays" onkeypress="updateFilterButton()" value="<%= InitialFromDays %>"/>
             <%= _("days ago to")%> <input type="text" size="3" id="toDays" onkeypress="updateFilterButton()" value="<%= InitialToDays %>"/>
             <%= _("days in the future") %>
-            <span class="CAMinMaxKeySuggestion">Please input integers</span>
+            <span class="CAMinMaxKeySuggestion"><%= _("Please input integers") %></span>
         </div>
     </div>
     <div id="titleFilter" style="padding-top: 10px">
         <div>
             <%= _("From")%> <input type="text" size="16" id="fromTitle" onkeypress="updateFilterButton()" value="<%= InitialFromTitle %>"/>
             <%= _("to")%> <input type="text" size="16" id="toTitle" onkeypress="updateFilterButton()" value="<%= InitialToTitle %>"/>
-            <span class="CAMinMaxKeySuggestion">Please input a conference title or the beginning of it</span>
+            <span class="CAMinMaxKeySuggestion"><%= _("Please input a conference title or the beginning of it") %></span>
         </div>
     </div>
-    
+
     <div style="padding-top: 10px">
         <input type="button" id="filterButton" value="<%= _("Refresh")%>" onclick="refresh()"/>
     </div>
@@ -87,7 +87,7 @@
     <div class="CAOrderByDiv">
         <span class="CAViewBySpan"><%= _("Order:")%> </span>
         <a class="CAViewByLink" id="ascendingViewBy" onclick="orderByObs('ascending')"><%= _("Ascending")%></a>
-        <a class="CAViewByLink" id="descendingViewBy" onclick="orderByObs('descending')" ><%= _("Descending")%></a> 
+        <a class="CAViewByLink" id="descendingViewBy" onclick="orderByObs('descending')" ><%= _("Descending")%></a>
     </div>
     <div class="CAViewByDiv">
         <span class="CAViewBySpan"><%= _("View by:")%> </span>
@@ -97,12 +97,12 @@
         <a class="CAViewByLink" id="modificationDateViewBy" onclick="viewByObs('modificationDate')"><%= _("Modification Date")%></a>
         <a class="CAViewByLink" id="startDateViewBy" onclick="viewByObs('startDate')"><%= _("Start Date")%></a>
     </div>
-    
+
     <div class="CAInfoDiv">
         <div class="CATypesDiv">
-            <%= _("This list can have bookings of the following type(s):")%> <span class="pluginNames" id="indexPluginTypes"></span> 
+            <%= _("This list can have bookings of the following type(s):")%> <span class="pluginNames" id="indexPluginTypes"></span>
         </div>
-    
+
         <div class="CAStaticURLDiv">
             <a class="CAStaticURLSwitch" onclick="staticURLSwitch()"><%= _("Static URL for this result")%></a> <%= _("(Use it for bookmarks)")%><br />
             <input type="text" id="staticURL" style="width: 50%%; display: none; margin-top: 5px;"/>
@@ -116,10 +116,10 @@
         <span id="resultsMessage"><%= _("(Results will appear here)")%></span>
         <div id="resultsInfo" style="display:none;">
             <div class="CATotalInIndexDiv">
-                <span id="totalInIndex"></span><span>&nbsp;bookings in this index.</span>
+                <span id="totalInIndex"></span><span>&nbsp;<%= _("bookings in this index.") %></span>
             </div>
             <div class="CANResultsDiv">
-                <span>Query returned&nbsp;</span><span id="nBookings"></span><span>&nbsp;bookings.</span>
+                <span>Query returned&nbsp;</span><span id="nBookings"></span><span>&nbsp;<%= _("bookings.") %></span>
             </div>
         </div>
         <table cellpadding="0" cellspacing="0" class="CAResultsTable" id ="results">
@@ -167,21 +167,21 @@ var codes = {
 var buildIndexTooltips = function() {
     for (var i=0; i<indexNames.length; i++) {
         $E('index_' + indexNames[i]).dom.onmouseover = function(event) {
-            IndicoUI.Widgets.Generic.tooltip(this, event, '<div style="padding:5px">Plugins in this index:<br \/>' +
+            IndicoUI.Widgets.Generic.tooltip(this, event, '<div style="padding:5px">' + $T("Plugins in this index:") + '<br \/>' +
                     indexInformation[this.id.substring(6)].plugins.join(", ") +
                     '<\/div>');
         }
-    }    
+    }
 }
 
 var alertNoIndexSelected = function() {
-    var popup = new AlertPopup("No index selected", Html.span('',"Please select an index name"), Html.br(),
+    var popup = new AlertPopup($T("No index selected"), Html.span({},$T("Please select an index name")), Html.br(),
             Html.span(indexNames.join(', ')));
     popup.open();
 }
 
 var indexSelectedObs = function(selectedIndexName, firstTime) {
-    
+
     for (var i=0; i<indexNames.length; i++) {
         var name = indexNames[i];
         if(name == selectedIndexName) {
@@ -196,7 +196,7 @@ var indexSelectedObs = function(selectedIndexName, firstTime) {
 
     var hasViewByStartDate = indexInformation[selectedIndexName].hasViewByStartDate;
     var hasShowOnlyPending = indexInformation[selectedIndexName].hasShowOnlyPending;
-    
+
     if (hasViewByStartDate) {
         IndicoUI.Effect.appear($E('startDateViewBy'));
     } else {
@@ -228,7 +228,7 @@ var viewByObs = function(viewBySelected, firstTime) {
         	$E(name + 'ViewBy').dom.className = "CAViewByUnselected";
         }
     }
-    
+
     if ((endsWith(queryParams.viewBy, 'Date') || firstTime) && viewBySelected == 'conferenceTitle') {
         if (!(firstTime && bookings)) {
             $E('fromTitle').set('');
@@ -249,7 +249,7 @@ var viewByObs = function(viewBySelected, firstTime) {
         IndicoUI.Effect.appear($E('dateFilter'));
         orderByObs('descending', true); // we put true because we don't want to trigger another request
     }
-    
+
     queryParams.viewBy = viewBySelected;
 
     if (!firstTime) {
@@ -290,11 +290,11 @@ var orderByObs = function(orderBySelected, firstTime) {
 }
 
 var confIdObs = function() {
-	$E('categoryId').dom.disabled = ($E('conferenceId').get() != '') 
+	$E('categoryId').dom.disabled = ($E('conferenceId').get() != '')
 }
 
 var updateFilterButton = function() {
-    $E('filterButton').dom.value = '<%= _("Apply Filter")%>';   
+    $E('filterButton').dom.value = $T("Apply Filter");
 }
 
 var refresh = function() {
@@ -307,7 +307,7 @@ var refresh = function() {
 }
 
 var applyFilter = function(){
-    
+
     queryParams.showOnlyPending = $E('pendingCB').dom.checked;
     queryParams.conferenceId = $E('conferenceId').get();
     queryParams.categoryId = $E('categoryId').get();
@@ -335,8 +335,8 @@ var applyFilter = function(){
     }
     queryParams.resultsPerPage = $E('resultsPerPage').get();
     queryParams.page = 1;
-    $E('filterButton').dom.value = '<%= _("Refresh")%>';
-    
+    $E('filterButton').dom.value = $T('Refresh');
+
 }
 
 var query = function() {
@@ -348,7 +348,7 @@ var query = function() {
         return;
     }
 
-    var killProgress = IndicoUI.Dialogs.Util.progress("<%= _("Retrieving the data...")%>");
+    var killProgress = IndicoUI.Dialogs.Util.progress($T("Retrieving the data..."));
     updateStaticURL();
 
     indicoRequest(
@@ -383,12 +383,12 @@ var query = function() {
             }
         }
     );
-    
+
 }
 
 var updateStaticURL = function() {
-    var url = '<%= BaseURL %>' + 
-              '?queryOnLoad=true' + 
+    var url = '<%= BaseURL %>' +
+              '?queryOnLoad=true' +
               '&page=' + queryParams.page +
               '&resultsPerPage=' + queryParams.resultsPerPage +
               '&indexName=' + queryParams.indexName +
@@ -427,7 +427,7 @@ var confTitleGroupTemplate = function(group, isFirst){
     var bookings = group[1];
 
     var result = Html.tbody({},
-        Html.tr({}, Html.td({className : 'ACBookingGroupTitle', colspan: 10, colSpan: 10}, 
+        Html.tr({}, Html.td({className : 'ACBookingGroupTitle', colspan: 10, colSpan: 10},
             Html.a({className : 'ACConfLink', href : conference.videoServicesDisplayURL},
                     Html.span('ACConfTitle', conference.title),
                     Html.span('ACConfId', ' (ID: ' + conference.id + ') '),
@@ -449,7 +449,7 @@ var confTitleBookingTemplate = function(booking) {
     var cell = Html.td('ACBookingCellNoWrap', Html.span(booking.statusClass, booking.statusMessage));
     row.append(cell);
 
-    var cell = Html.td('ACBookingCellNoWrap', '<%= _("Last modification:")%> ' + formatDateTimeCS(booking.modificationDate) );
+    var cell = Html.td('ACBookingCellNoWrap', $T("Last modification:") + formatDateTimeCS(booking.modificationDate) );
     row.append(cell);
 
     if (pluginHasFunction(booking.type, 'customText')) {
@@ -474,17 +474,17 @@ var dateBookingTemplate = function(booking, viewBy) {
 
     var time = booking[viewBy].time.substring(0,5) // we can do this because viewBy will be creationDate, etc. which are the same
                                                    // names of the fields of the booking
-    
+
     var cell = Html.td('ACBookingFirstCell ACBookingTime', time);
     row.append(cell);
 
-    var cell = Html.td('ACBookingCellNoWrap', Html.span('', booking.type));
+    var cell = Html.td('ACBookingCellNoWrap', Html.span({}, booking.type));
     row.append(cell);
 
     var cell = Html.td('ACBookingCellNoWrap', Html.span(booking.statusClass, booking.statusMessage));
     row.append(cell);
 
-    var cell = Html.td('ACBookingCell', Html.span('', '<%= _("In event:")%> '), Html.span('', booking.conference.title));
+    var cell = Html.td('ACBookingCell', Html.span({}, $T("In event: ")), Html.span({}, booking.conference.title));
     row.append(cell);
 
     if (pluginHasFunction(booking.type, 'customText')) {
@@ -494,13 +494,13 @@ var dateBookingTemplate = function(booking, viewBy) {
         row.append(Html.td());
     }
 
-    var cell = Html.td('ACBookingCellNoWrap', Html.a({href: booking.modificationURL}, 'Change'),
+    var cell = Html.td('ACBookingCellNoWrap', Html.a({href: booking.modificationURL}, $T('Change')),
             Html.span('horizontalSeparator', '|'),
-            Html.a({href: booking.conference.videoServicesDisplayURL}, 'Event Display'));
+            Html.a({href: booking.conference.videoServicesDisplayURL}, $T('Event Display')));
     row.append(cell);
 
     IndicoUI.Effect.mouseOver(row.dom);
-    
+
     return row;
 }
 
@@ -509,7 +509,7 @@ var dateGroupTemplate = function(group, isFirst, viewBy) {
     var bookings = group[1];
 
     var result = Html.tbody({},
-            Html.tr({}, Html.td({className : 'ACBookingGroupTitle', colspan: 10, colSpan: 10}, 
+            Html.tr({}, Html.td({className : 'ACBookingGroupTitle', colspan: 10, colSpan: 10},
                 Html.span({}, date)
             )));
     each(bookings, function(booking){
@@ -525,11 +525,11 @@ var updateList = function() {
 }
 
 var updateResults = function() {
-    
+
     $E('results').clear();
 
     if (nBookings < 1) {
-        $E('resultsMessage').set('<%= _("No results found")%>');
+        $E('resultsMessage').set($T("No results found"));
         IndicoUI.Effect.appear($E('resultsMessage'));
         IndicoUI.Effect.disappear($E('resultsInfo'));
     } else {
@@ -572,7 +572,7 @@ IndicoUI.executeOnLoad(function(){
         indexSelectedObs('<%= InitialIndex %>', true);
     <% end %>
     updateStaticURL();
-    
+
     $E('pageNumberList').set(pf.draw());
 
     dateParameterManager.add($E('sinceDate'), 'datetime', true);
@@ -582,10 +582,10 @@ IndicoUI.executeOnLoad(function(){
 
     resultsPerPageParameterManager.add($E('resultsPerPage'), 'int', false, function(value) {
         if (value < 1) {
-            return "<%= _("Please input number higher than 0")%>";
+            return $T("Please input number higher than 0");
         }
     })
-    
+
     if (bookings) {
         updateResults();
     }
