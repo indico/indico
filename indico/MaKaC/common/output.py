@@ -200,8 +200,7 @@ class outputGenerator:
                 roomName = roomFromDB.getFullName()
         return roomName
 
-
-    def _confToXML(self, conf, vars, includeSession=1, includeContribution=1, includeMaterial=1, showSession="all", showDate="all",showContribution="all", showWithdrawed=True, useSchedule=True, out=None, source=None):
+    def _confToXML(self, conf, vars, includeSession=1, includeContribution=1, includeMaterial=1, showSession="all", showDate="all",showContribution="all", showWithdrawed=True, useSchedule=True, out=None, source=None, videoFormat=None):
         if not out:
             out = self._XMLGen
 
@@ -235,6 +234,7 @@ class outputGenerator:
                 # only now do we know it's safe to import the necessary method
                 from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator
                 MarcAccessListGenerator().generateAccessListXML(out, conf)
+                MarcAccessListGenerator().generateVideoXML(out, conf, videoFormat)
 
         if conf.canModify( self.__aw ) and vars and modificons:
             out.writeTag("modifyLink",vars["modifyURL"])
@@ -864,7 +864,7 @@ class outputGenerator:
         out.closeTag("break")
 
 
-    def confToXML(self,conf,includeSession,includeContribution,includeMaterial,showSession="all", showContribution="all", out=None, forceCache=False, source=None):
+    def confToXML(self,conf,includeSession,includeContribution,includeMaterial,showSession="all", showContribution="all", out=None, forceCache=False, source=None, videoFormat=None):
         if not out:
             out = self._XMLGen
         #try to get a cache
@@ -876,7 +876,7 @@ class outputGenerator:
             xml = obj.getContent()
         else:
             temp = XMLGen(init=False)
-            self._confToXML(conf,None,includeSession,includeContribution,includeMaterial,showSession=showSession, showDate="all", showContribution=showContribution, showWithdrawed=False, useSchedule=False, out=temp, source=source)
+            self._confToXML(conf,None,includeSession,includeContribution,includeMaterial,showSession=showSession, showDate="all", showContribution=showContribution, showWithdrawed=False, useSchedule=False, out=temp, source=source, videoFormat=videoFormat)
             xml = temp.getXml()
             self.cache.cacheObject(version, xml, conf)
         #    out.writeTag("cache", "not found in cache")

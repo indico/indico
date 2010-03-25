@@ -55,7 +55,7 @@
 </datafield>
 <datafield tag="300" ind1=" " ind2=" ">
   <subfield code="a">Streaming video</subfield>
-  <subfield code="b">720x576 4/3, 25</subfield>
+  <subfield code="b"><xsl:value-of select="./videoFormat" /></subfield>
 </datafield>
 <datafield tag="340" ind1=" " ind2=" ">
   <subfield code="a">Streaming video</subfield>

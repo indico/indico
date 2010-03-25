@@ -77,3 +77,14 @@ class MarcAccessListGenerator():
                 for email_id in allowed_emails:
                     out.writeTag("email", email_id)
                 out.closeTag("allowedAccessEmails")
+
+    def generateVideoXML(self, out, obj, videoFormat):
+        """Generate XML variables needed for video records."""
+
+        videoTagStandard = CollaborationTools.getOptionValue("RecordingManager", "videoFormatStandard")
+        videoTagWide     = CollaborationTools.getOptionValue("RecordingManager", "videoFormatWide")
+
+        if videoFormat == 'standard':
+            out.writeTag("videoFormat", videoTagStandard)
+        elif videoFormat == 'wide':
+            out.writeTag("videoFormat", videoTagWide)

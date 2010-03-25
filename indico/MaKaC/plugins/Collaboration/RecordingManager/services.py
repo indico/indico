@@ -46,9 +46,10 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
 
     def _checkParams(self):
         CollaborationPluginServiceBase._checkParams(self) #puts the Conference in self._conf
-        self._IndicoID = self._params.get('IndicoID', None)
-        self._LOID     = self._params.get('LOID', None)
-        self._confId   = self._params.get('conference', None)
+        self._IndicoID    = self._params.get('IndicoID', None)
+        self._LOID        = self._params.get('LOID', None)
+        self._confId      = self._params.get('conference', None)
+        self._videoFormat = self._params.get('videoFormat', None)
 
         if not self._IndicoID:
             raise RecordingManagerException("No IndicoID supplied")
@@ -56,13 +57,15 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
             raise RecordingManagerException("No LOID supplied")
         if not self._confId:
             raise RecordingManagerException("No conference ID supplied")
+        if not self._videoFormat:
+            raise RecordingManagerException("No video format supplied")
 
     def _getAnswer(self):
         # Update the micala database
         resultUpdateMicala = updateMicala(self._IndicoID, self._params.get('LOID', None))
 
         # Get the MARC XML and submit it to CDS
-        resultCreateCDSRecord = createCDSRecord(self._IndicoID, self._aw)
+        resultCreateCDSRecord = createCDSRecord(self._IndicoID, self._aw, self._videoFormat)
 
 #        raise RecordingManagerException("got this far")
 

@@ -373,7 +373,7 @@ def updateMicala(IndicoID, LOID):
     cursor.close()
     connection.close()
 
-def createCDSRecord(IndicoID, aw):
+def createCDSRecord(IndicoID, aw, videoFormat):
     '''Retrieve a MARC XML string for the given conference, then package it up and send it to CDS.'''
 
     # I don't understand what some of the following lines do. Pedro did some of it for me.
@@ -396,7 +396,7 @@ def createCDSRecord(IndicoID, aw):
     if parsed["type"] == 'conference':
         Logger.get('RecMan').info("generating MARC XML for a conference")
 #        og.confToXMLMarc21(conf, 1, 1, 1, forceCache=True, out=xmlGen, source='RecordingManager')
-        og.confToXML(conf, 0, 0, 1, source='RecordingManager')
+        og.confToXML(conf, 0, 0, 1, source='RecordingManager', videoFormat=videoFormat)
 #        conf,includeSession,includeContribution,includeMaterial,showSession="all", showContribution="all", out=None, forceCache=False
     elif parsed["type"] == 'session':
         Logger.get('RecMan').info("generating MARC XML for a session (no such thing yet)")
@@ -406,7 +406,7 @@ def createCDSRecord(IndicoID, aw):
     elif parsed["type"] == 'contribution':
         Logger.get('RecMan').info("generating MARC XML for a contribution")
         cont = conf.getContributionById(parsed["contribution"])
-        og.contribToXMLMarc21(cont, includeMaterial=1, forceCache=True, out=xmlGen, source='RecordingManager')
+        og.contribToXMLMarc21(cont, includeMaterial=1, forceCache=True, out=xmlGen, source='RecordingManager', videoFormat=videoFormat)
 #                              cont,includeMaterial=1, out=None, forceCache=False, source=None
     elif parsed["type"] == 'subcontribution':
         Logger.get('RecMan').info("generating MARC XML for a subcontribution")

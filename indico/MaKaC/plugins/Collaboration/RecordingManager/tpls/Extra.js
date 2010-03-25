@@ -240,6 +240,7 @@ var RMselectedLOID     = '';
 var RMselectedTalkName = '';
 var RMselectedLOName   = '';
 var RMviewMode         = '';
+var RMvideoFormat      = 'standard';
 
 function RMbuttonModeSelect(mode) {
     RMviewMode = mode;
@@ -355,13 +356,7 @@ function RMStatusMessage(message) {
 }
 
 function RMchooseVideoFormat(format_string) {
-    if (format_string == '4/3') {
-
-    }
-    else if (format_string == '16/9') {
-
-    }
-
+    RMvideoFormat = format_string;
 }
 
 function RMLink() {
@@ -400,7 +395,8 @@ function RMCreateCDSRecord() {
                 service: 'RMCreateCDSRecord',
                 conference: '<%= ConferenceId %>',
                 IndicoID: RMselectedTalkId,
-                LOID: RMselectedLOID
+                LOID: RMselectedLOID,
+                videoFormat: RMvideoFormat
             },
         function(result, error){
                 document.getElementById('RMMatchSummaryMessage').innerHTML = result;

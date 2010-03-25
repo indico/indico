@@ -94,6 +94,18 @@ globalOptions = [
                "editable": True,
                "visible": True} ),
 
+    ("videoFormatStandard", {"description" : _("Standard video format"),
+               "type": str,
+               "defaultValue": "720x576 4/3, 25",
+               "editable": True,
+               "visible": True} ),
+
+    ("videoFormatWide", {"description" : _("Wide-screen video format"),
+               "type": str,
+               "defaultValue": "720x576 16/9, 25",
+               "editable": True,
+               "visible": True} ),
+
     ("MarcField506Subfield2", {"description" : _("MARC datafield 506 subfield 2"),
                "type": str,
                "defaultValue": "CDS Invenio",
