@@ -1129,7 +1129,7 @@ class RHConferenceToXML(RHConferenceBaseDisplay):
         xmlgen.closeTag("event")
         basexml = xmlgen.getXml()
         path = Config.getInstance().getStylesheetsDir()
-        stylepath = "%s/%s.xsl" % (path,self._xmltype)
+        stylepath = "%s.xsl" % (os.path.join(path,self._xmltype))
         if self._xmltype != "standard" and os.path.exists(stylepath):
             try:
                 parser = XSLTransformer(stylepath)

@@ -81,11 +81,11 @@ def moveFile(res, repository):
         os.rmdir(oldDestPath.decode('utf-8'))
         repository.getFiles()[id] = relativePath
         res.notifyModification()
-        print "File \"%s\" (%s/%s/%s) moved."%(res.getFileName(), conf.getId(), cont.getId(), subcont.getId())
+        print "File \"%s\" (%s) moved."%(res.getFileName(), os.path.join(conf.getId(), cont.getId(), subcont.getId()))
     except IOError, e:
-        print "Couldn't move file \"%s\" (%s/%s/%s) (%s)."%(res.getFileName(), conf.getId(), cont.getId(), subcont.getId(), e)
+        print "Couldn't move file \"%s\" (%s) (%s)."%(res.getFileName(), os.path.join(conf.getId(), cont.getId(), subcont.getId()), e)
     except OSError, e:
-        print "Error while moving file \"%s\" (%s/%s/%s) (%s)."%(res.getFileName(), conf.getId(), cont.getId(), subcont.getId(), e)
+        print "Error while moving file \"%s\" (%s) (%s)."%(res.getFileName(), os.path.join(conf.getId(), cont.getId(), subcont.getId()), e)
 
 if __name__ == "__main__":
     main()

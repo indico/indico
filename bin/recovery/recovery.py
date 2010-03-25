@@ -1885,7 +1885,7 @@ class TmpDBMgr:
             names = []
             l = os.listdir(backupsPath)
             for f in l:
-                if os.path.isfile("%s/%s"%(backupsPath, f)) and (".fsz" in f):
+                if os.path.isfile(os.path.join(backupsPath, f)) and (".fsz" in f):
                     names.append(os.path.splitext(f)[0])
             names.append("current")
             names.sort()

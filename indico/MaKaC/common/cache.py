@@ -37,7 +37,7 @@ class IndicoCache:
 
     def getFileName( self ):
         return ""
-    
+
     def lockCache( self, file, flag=True):
         global fp
         try:
@@ -62,7 +62,7 @@ class IndicoCache:
             except:
                 pass
         return path
-        
+
     def getFilePath( self ):
         return os.path.join(self.getCachePath(), self.getFileName())
 
@@ -97,7 +97,7 @@ class IndicoCache:
 
 class CategoryCache( IndicoCache ):
     _subDirName = "categories"
-    
+
     def __init__( self, vars={} ):
         self._categId = vars.get("categId","")
 
@@ -120,7 +120,7 @@ class MultiLevelCacheEntry(object):
     def __init__(self):
         self._date = None
 
-    def pickle(self):                
+    def pickle(self):
         return pickle.dumps(self)
 
     def setDate(self, date):
@@ -130,13 +130,13 @@ class MultiLevelCacheEntry(object):
         return self._date
 
     @classmethod
-    def unpickle(self, data):        
+    def unpickle(self, data):
         return pickle.loads(data)
 
-    
+
 class MultiLevelCache(object):
-    """ A multilevel cache """    
-    
+    """ A multilevel cache """
+
     def __init__(self, cacheName):
         self.cacheName = cacheName
         cacheDir = self.getCacheDir()
@@ -173,7 +173,7 @@ class MultiLevelCache(object):
 
         obj.setDate(timezoneUtils.nowutc())
         self._saveObject(self.getCacheDir(), path, fileName, obj.pickle())
-        Logger.get('cache/%s'%self.cacheName).debug("Saved %s/%s" % (path, fileName))
+        Logger.get('cache/%s'%self.cacheName).debug("Saved %s" % (os.path.join(*(path + [fileName]))))
 
     def loadObject(self, fnList):
 

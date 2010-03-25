@@ -25,7 +25,7 @@ import sys
 import MaKaC.conference as conference
 import MaKaC.webinterface.pages.contributions as contributions
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.webinterface.rh.base import RHDisplayBaseProtected 
+from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHContributionBase, RHSubmitMaterialBase
 from MaKaC.PDFinterface.conference import ContribToPDF
 from MaKaC.ICALinterface.conference import ContribToiCal
@@ -48,7 +48,7 @@ class RHContributionDisplayBase( RHContributionBase, RHDisplayBaseProtected ):
 
 class RHContributionDisplay( RHContributionDisplayBase ):
     _uh = urlHandlers.UHContributionDisplay
-    
+
     def _process( self ):
         p = contributions.WPContributionDisplay( self, self._contrib )
         wf=self.getWebFactory()
@@ -59,11 +59,11 @@ class RHContributionDisplay( RHContributionDisplayBase ):
 
 class RHContributionToXML(RHContributionDisplay):
     _uh = urlHandlers.UHContribToXML
-    
-    def _checkParams( self, params ): 
+
+    def _checkParams( self, params ):
         RHContributionDisplay._checkParams( self, params )
         self._xmltype = params.get("xmltype","standard")
-        
+
     def _process( self ):
         filename = "%s - contribution.xml"%self._target.getTitle()
         from MaKaC.common.output import outputGenerator, XSLTransformer
@@ -75,7 +75,7 @@ class RHContributionToXML(RHContributionDisplay):
         xmlgen.closeTag("event")
         basexml = xmlgen.getXml()
         path = Config.getInstance().getStylesheetsDir()
-        stylepath = "%s/%s.xsl" % (path,self._xmltype)
+        stylepath = "%s.xsl" % (os.path.join(path,self._xmltype))
         if self._xmltype != "standard" and os.path.exists(stylepath):
             try:
                 parser = XSLTransformer(stylepath)
@@ -93,7 +93,7 @@ class RHContributionToXML(RHContributionDisplay):
 
 
 class RHContributionToPDF(RHContributionDisplay):
-    
+
     def _process( self ):
         tz = timezoneUtils.DisplayTZ(self._aw,self._target.getConference()).getDisplayTZ()
         filename = "%s - Contribution.pdf"%self._target.getTitle()
@@ -108,7 +108,7 @@ class RHContributionToPDF(RHContributionDisplay):
 
 
 class RHContributionToiCal(RHContributionDisplay):
-    
+
     def _process( self ):
         filename = "%s - Contribution.ics"%self._target.getTitle()
         ical = ContribToiCal(self._target.getConference(), self._target)
@@ -119,9 +119,9 @@ class RHContributionToiCal(RHContributionDisplay):
         self._req.content_type = """%s"""%(mimetype)
         self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
         return data
-            
+
 class RHContributionToMarcXML(RHContributionDisplay):
-    
+
     def _process( self ):
         filename = "%s - Contribution.xml"%self._target.getTitle().replace("/","")
         from MaKaC.common.xmlGen import XMLGen
@@ -139,7 +139,7 @@ class RHContributionToMarcXML(RHContributionDisplay):
         self._req.content_type = """%s"""%(mimetype)
         self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
         return data
-        
+
 
 class RHContributionMaterialSubmissionRightsBase(RHContributionDisplay):
 
@@ -153,7 +153,7 @@ class RHContributionMaterialSubmissionRightsBase(RHContributionDisplay):
                 raise ModificationError()
 
 class RHSubmitMaterial(RHContributionMaterialSubmissionRightsBase):
-    
+
     def _checkProtection(self):
         RHContributionMaterialSubmissionRightsBase._checkProtection(self)
         if self._target.getReviewManager().getLastReview().isAuthorSubmitted():
@@ -163,7 +163,7 @@ class RHSubmitMaterial(RHContributionMaterialSubmissionRightsBase):
         RHContributionDisplay._checkParams(self,params)
         if not hasattr(self, "_rhSubmitMaterial"):
             self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
-        self._rhSubmitMaterial._checkParams(params) 
+        self._rhSubmitMaterial._checkParams(params)
 
     def _process(self):
         wf=self.getWebFactory()
@@ -187,13 +187,13 @@ class RHContributionDisplayRemoveMaterial( RHContributionDisplay ):
         RHContributionDisplay._checkProtection(self)
         if not self._contrib.canUserSubmit(self._aw.getUser()):
             raise MaKaCError( _("you are not authorised to manage material for this contribution"))
-    
+
     def _checkParams( self, params ):
         RHContributionDisplay._checkParams( self, params )
         self._materialIds = self._normaliseListParam( params.get("deleteMaterial", []) )
         self._confirmed=params.has_key("confirm") or params.has_key("cancel")
         self._remove=params.has_key("confirm")
-        
+
     def _process( self ):
         if self._materialIds != []:
             if self._confirmed:
@@ -237,7 +237,7 @@ class RHWriteMinutes( RHContributionDisplay ):
                 self._checkSessionUser()
             else:
                 raise ModificationError()
-    
+
     def _preserveParams(self):
         preservedParams = self._getRequestParams().copy()
         self._websession.setVar("minutesPreservedParams",preservedParams)
@@ -260,7 +260,7 @@ class RHWriteMinutes( RHContributionDisplay ):
         self._cancel = params.has_key("cancel")
         self._save = params.has_key("OK")
         self._text = params.get("text", "")#.strip()
-        
+
     def _process( self ):
         wf=self.getWebFactory()
         if self._save:

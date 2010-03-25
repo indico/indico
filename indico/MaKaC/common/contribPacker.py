@@ -36,7 +36,7 @@ from MaKaC.PDFinterface.conference import ProceedingsTOC, ProceedingsChapterSepa
 from MaKaC.i18n import _
 
 class ZIPFileHandler:
-    
+
     def __init__(self):
         (fh,name)=tempfile.mkstemp(prefix="Indico",dir=Config.getInstance().getTempDir())
         os.fdopen(fh).close()
@@ -72,7 +72,7 @@ class ZIPFileHandler:
 class ContribPacker:
     """
     """
-    
+
     def __init__(self,conf):
         self._conf=conf
 
@@ -110,7 +110,7 @@ class ContribPacker:
 
 
 class ConferencePacker:
-    
+
     def __init__(self,conf,aw):
         self._conf=conf
         self._confDirName="%s"%self._normalisePathItem(self._conf.getTitle().strip())
@@ -123,7 +123,7 @@ class ConferencePacker:
         if fromDate != "":
             [ day, month, year] = fromDate.split(" ")
             fromDate = datetime(int(year),int(month),int(day))
-            
+
         di=self._conf.getSchedule().getAdjustedStartDate()
         confED=self._conf.getSchedule().getAdjustedEndDate()
         ed = confED.replace(hour=23,minute=59,second=59)
@@ -135,10 +135,10 @@ class ConferencePacker:
                     for entry in self._conf.getSchedule().getEntriesOnDay(di):
                         if isinstance(entry,schedule.LinkedTimeSchEntry) and isinstance(entry.getOwner(),conference.Contribution):
                             contrib=entry.getOwner()
-                            self._packContrib(contrib, "", dirName, materialTypes,days,mainResource,fromDate,fileHandler)                            
+                            self._packContrib(contrib, "", dirName, materialTypes,days,mainResource,fromDate,fileHandler)
                             for subcontrib in contrib.getSubContributionList():
                                 self._packContrib(subcontrib, "", dirName, materialTypes,days,mainResource,fromDate,fileHandler)
-            di+=timedelta(days=1)            
+            di+=timedelta(days=1)
         for session in self._conf.getSessionList():
             if len(sessions) == 0 or session.getId() in sessions:
                 di=session.getSchedule().getAdjustedStartDate()
@@ -166,7 +166,7 @@ class ConferencePacker:
         # add "root" materials as well
         # (totally hacky... a general method for adding
         # materials should be added... check copy below)
-        
+
         for mat in self._conf.getAllMaterialList():
 
             if "other" in materialTypes or mat.getTitle().lower() in materialTypes:
@@ -181,12 +181,12 @@ class ConferencePacker:
                 # URLs cannot be packed, only local files
                 if isinstance(resource, conference.LocalFile) and resource.canAccess(self._aw):
                     if fromDate == "" or resource.getCreationDate().strftime("%Y-%m-%d") >= fromDate.strftime("%Y-%m-%d"):
-                        fileHandler.add("%s/%s-%s" % (self._confDirName,
-                                                           mat.getTitle(),
+                        fileHandler.add("%s-%s" % (os.path.join(self._confDirName,
+                                                           mat.getTitle()),
                                                            self._normalisePathItem(resource.getFileName())),
                                         resource.getFilePath())
 
-        fileHandler.close()        
+        fileHandler.close()
         return fileHandler.getPath()
 
     def _packContrib(self, contrib, sessionDirName="", slotDirName="", materialTypes=[],days=[], mainResource=False, fromDate="", fileHandler=None):
@@ -197,12 +197,12 @@ class ConferencePacker:
         else:
             spk = ""
 
-        if contrib.getAllMaterialList() is not None:            
+        if contrib.getAllMaterialList() is not None:
             for mat in contrib.getAllMaterialList():
 
                 # either "other" was selected, or this type is in the list of desired ones
                 if "other" in materialTypes or mat.getTitle().lower() in materialTypes:
-                    if mainResource:                    
+                    if mainResource:
                         resources = [mat.getMainResource()]
                     else:
                         resources = mat.getResourceList()
@@ -212,11 +212,11 @@ class ConferencePacker:
                 for resource in resources:
                     # URLs cannot be packed, only local files
                     if isinstance(resource, conference.LocalFile) and resource.canAccess(self._aw):
-                        if fromDate == "" or resource.getCreationDate().strftime("%Y-%m-%d") >= fromDate.strftime("%Y-%m-%d"):                            
-                            fileHandler.add("%s/%s/%s/%s-%s%s-%s" % (self._confDirName,
+                        if fromDate == "" or resource.getCreationDate().strftime("%Y-%m-%d") >= fromDate.strftime("%Y-%m-%d"):
+                            fileHandler.add("%s-%s%s-%s" % (os.path.join(self._confDirName,
                                                                      sessionDirName,
                                                                      slotDirName,
-                                                                     self._normalisePathItem(contrib.getId()),
+                                                                     self._normalisePathItem(contrib.getId())),
                                                                      mat.getTitle(),
                                                                      spk,
                                                                      self._normalisePathItem(resource.getFileName())),
@@ -249,7 +249,7 @@ class PDFPagesCounter:
 class ProceedingsPacker:
     """
     """
-    
+
     def __init__(self,conf):
         self._conf=conf
 
@@ -300,7 +300,7 @@ class ProceedingsPacker:
                     paperName="%04d-%s.pdf"%(i,self._normalisePathItem(contrib.getTitle()))
                     mr= contrib.getPaper().getMainResource()
                     fileHandler.add(paperName, mr.getFilePath())
-                    contribDictNPages[contrib.getId()] = int(PDFPagesCounter.countPages(mr.getFilePath()))                    
+                    contribDictNPages[contrib.getId()] = int(PDFPagesCounter.countPages(mr.getFilePath()))
                     i += 1
             # Get TOC
             pdf = ProceedingsTOC(self._conf, trackDict=trackDict, trackOrder=trackOrder, npages=contribDictNPages)
@@ -323,7 +323,7 @@ class ProceedingsPacker:
                                     paperName="%04d-%s.pdf"%(i,self._normalisePathItem(contrib.getTitle()))
                                     mr= contrib.getPaper().getMainResource()
                                     fileHandler.add(paperName, mr.getFilePath())
-                                    contribDictNPages[contrib.getId()] = int(PDFPagesCounter.countPages(mr.getFilePath()))                  
+                                    contribDictNPages[contrib.getId()] = int(PDFPagesCounter.countPages(mr.getFilePath()))
                                     i += 1
                 elif isinstance(entry,schedule.LinkedTimeSchEntry) and \
                         isinstance(entry.getOwner(),conference.Contribution):
@@ -335,14 +335,14 @@ class ProceedingsPacker:
                             paperName="%04d-%s.pdf"%(i,self._normalisePathItem(contrib.getTitle()))
                             mr= contrib.getPaper().getMainResource()
                             fileHandler.add(paperName, mr.getFilePath())
-                            contribDictNPages[contrib.getId()] = int(PDFPagesCounter.countPages(mr.getFilePath()))                    
+                            contribDictNPages[contrib.getId()] = int(PDFPagesCounter.countPages(mr.getFilePath()))
                             i += 1
             # Get TOC
             pdf = ProceedingsTOC(self._conf, contribList=contribList, npages=contribDictNPages)
-        
+
         i = 0
         fileHandler.addNewFile("%04d-TOC.pdf"%i, pdf.getPDFBin())
-        
+
         fileHandler.close()
         return fileHandler.getPath()
 

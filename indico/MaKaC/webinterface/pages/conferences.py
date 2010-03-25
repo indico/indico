@@ -1007,7 +1007,7 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
         view = self._view
         outGen = outputGenerator(self._getAW())
         path = Config.getInstance().getStylesheetsDir()
-        if os.path.exists("%s/%s.xsl" % (path,view)):
+        if os.path.exists("%s.xsl" % (os.path.join(path,view))):
             minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
             tz = DisplayTZ(self._getAW(),self._conf).getDisplayTZ()
             useCache = minfo.isCacheActive() and frame and self._params.get("detailLevel", "") in [ "", "contribution" ] and self._view == self._conf.getDefaultStyle() and self._params.get("showSession","all") == "all" and self._params.get("showDate","all") == "all" and tz == self._conf.getTimezone()
@@ -1021,7 +1021,7 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
                 cache = EventCache({"id": self._conf.getId(), "type": "normal"})
                 body = cache.getCachePage()
             if body == "":
-                stylepath = "%s/%s.xsl" % (path,view)
+                stylepath = "%s.xsl" % (os.path.join(path,view))
                 if self._params.get("detailLevel", "") == "contribution" or self._params.get("detailLevel", "") == "":
                     includeContribution = 1
                 else:
@@ -10470,7 +10470,7 @@ class WPStaticMeetingBase(WPConferenceStaticDefaultDisplayBase):
                        <link rel="stylesheet" href="%s/css/common.css">""" % \
                     (self.getRootDir(self._target), Config.getInstance().getCssStylesheetName(), self.getRootDir(self._target))
         try:
-            if os.path.exists("%s/%s.css" % (path,self._view)):
+            if os.path.exists("%s.css" % (os.path.join(path,self._view))):
                 styleText += """
                      <style type="text/css">
                         %s
@@ -10542,8 +10542,8 @@ class WPXSLMeetingStaticDisplay( WPStaticMeetingBase ):
         from MaKaC.accessControl import AccessWrapper
         outGen = outputGenerator(AccessWrapper())
         path = Config.getInstance().getStylesheetsDir()
-        if os.path.exists("%s/%s.xsl" % (path,view)):
-            stylepath = "%s/%s.xsl" % (path,view)
+        if os.path.exists("%s.xsl" % (os.path.join(path,view))):
+            stylepath = "%s.xsl" % (os.path.join(path,view))
             if self._params.get("detailLevel", "") == "contribution" or self._params.get("detailLevel", "") == "":
                 includeContribution = 1
             else:
