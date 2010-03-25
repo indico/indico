@@ -881,62 +881,9 @@
 
                   <xsl:if test="count(child::information) = 1">
 
-                  <xsl:text disable-output-escaping="yes"><![CDATA[
-                    <script type="text/javascript">
-
-                      $E('collaborationBookingMoreInfo]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                        <xsl:text disable-output-escaping="yes"><![CDATA[').dom.onmouseover = function (event) {
-                          IndicoUI.Widgets.Generic.tooltip($E('collaborationBookingMoreInfo]]></xsl:text>
-                            <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                            <xsl:text disable-output-escaping="yes"><![CDATA[').dom, event, ]]></xsl:text>
-                              <xsl:text disable-output-escaping="yes">'&lt;div class=&quot;collaborationLinkTooltipMeetingLecture&quot;&gt;</xsl:text>
-                              <xsl:text>Click here to show / hide detailed information.</xsl:text>
-                              <xsl:text disable-output-escaping="yes">&lt;/div&gt;'</xsl:text>
-                              <xsl:text disable-output-escaping="yes"><![CDATA[
-                              );
-                        }
-
-                      var bookingInfoState]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                      <xsl:text disable-output-escaping="yes"><![CDATA[ = false;
-                      $E('collaborationBookingMoreInfo]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                      <xsl:text disable-output-escaping="yes"><![CDATA[').observeClick(function() {
-                        if (bookingInfoState]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                      <xsl:text disable-output-escaping="yes"><![CDATA[) {
-                        IndicoUI.Effect.disappear($E('collaborationInfoLine]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                        <xsl:text disable-output-escaping="yes"><![CDATA['));
-                        $E('collaborationBookingMoreInfo]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                        <xsl:text disable-output-escaping="yes"><![CDATA[').set('More info');
-                        $E('collaborationBookingMoreInfo]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                        <xsl:text disable-output-escaping="yes"><![CDATA[').dom.className = "collaborationDisplayMoreInfo";
-                      } else {
-                        IndicoUI.Effect.appear($E('collaborationInfoLine]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                        <xsl:text disable-output-escaping="yes"><![CDATA['));
-                        $E('collaborationBookingMoreInfo]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                        <xsl:text disable-output-escaping="yes"><![CDATA[').set('Hide info');
-                        $E('collaborationBookingMoreInfo]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                        <xsl:text disable-output-escaping="yes"><![CDATA[').dom.className = "collaborationDisplayHideInfo";
-                      }
-                      bookingInfoState]]></xsl:text>
-                      <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                    <xsl:text disable-output-escaping="yes"><![CDATA[ = !bookingInfoState]]></xsl:text>
-                      <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                    <xsl:text disable-output-escaping="yes"><![CDATA[
-                    });
-                  </script>
-                  ]]></xsl:text>
-
                   <!-- Start of a booking info line -->
-                  <div class="collaborationDisplayInfoLine" id="collaborationInfoLine{./id}" style="display:none;">
+                  <div id="collaborationInfoLine{./id}" style="visibility: hidden; overflow: hidden;">
+                    <div class="collaborationDisplayInfoLine">
                     <table>
                       <tbody>
                         <xsl:for-each select="./information/section">
@@ -962,7 +909,74 @@
                         </xsl:for-each>
                       </tbody>
                     </table>
+                    </div>
                   </div>
+
+                  <xsl:text disable-output-escaping="yes"><![CDATA[
+                    <script type="text/javascript">
+
+                      $E('collaborationBookingMoreInfo]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                        <xsl:text disable-output-escaping="yes"><![CDATA[').dom.onmouseover = function (event) {
+                          IndicoUI.Widgets.Generic.tooltip($E('collaborationBookingMoreInfo]]></xsl:text>
+                            <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                            <xsl:text disable-output-escaping="yes"><![CDATA[').dom, event, ]]></xsl:text>
+                              <xsl:text disable-output-escaping="yes">'&lt;div class=&quot;collaborationLinkTooltipMeetingLecture&quot;&gt;</xsl:text>
+                              <xsl:text>Click here to show / hide detailed information.</xsl:text>
+                              <xsl:text disable-output-escaping="yes">&lt;/div&gt;'</xsl:text>
+                              <xsl:text disable-output-escaping="yes"><![CDATA[
+                              );
+                        }
+
+                      var bookingInfoState]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                      <xsl:text disable-output-escaping="yes"><![CDATA[ = false;
+
+                      var height]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                      <xsl:text disable-output-escaping="yes"><![CDATA[ = IndicoUI.Effect.prepareForSlide('collaborationInfoLine]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                      <xsl:text disable-output-escaping="yes"><![CDATA[', true);
+
+                      $E('collaborationBookingMoreInfo]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                      <xsl:text disable-output-escaping="yes"><![CDATA[').observeClick(function() {
+                        if (bookingInfoState]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                      <xsl:text disable-output-escaping="yes"><![CDATA[) {
+                        IndicoUI.Effect.slide('collaborationInfoLine]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                        <xsl:text disable-output-escaping="yes"><![CDATA[', height]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                      <xsl:text disable-output-escaping="yes"><![CDATA[);
+                        $E('collaborationBookingMoreInfo]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                        <xsl:text disable-output-escaping="yes"><![CDATA[').set('More info');
+                        $E('collaborationBookingMoreInfo]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                        <xsl:text disable-output-escaping="yes"><![CDATA[').dom.className = "collaborationDisplayMoreInfo";
+                      } else {
+                        IndicoUI.Effect.slide('collaborationInfoLine]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                        <xsl:text disable-output-escaping="yes"><![CDATA[', height]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                      <xsl:text disable-output-escaping="yes"><![CDATA[);
+                        $E('collaborationBookingMoreInfo]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                        <xsl:text disable-output-escaping="yes"><![CDATA[').set('Hide info');
+                        $E('collaborationBookingMoreInfo]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                        <xsl:text disable-output-escaping="yes"><![CDATA[').dom.className = "collaborationDisplayHideInfo";
+                      }
+                      bookingInfoState]]></xsl:text>
+                      <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                    <xsl:text disable-output-escaping="yes"><![CDATA[ = !bookingInfoState]]></xsl:text>
+                      <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                    <xsl:text disable-output-escaping="yes"><![CDATA[
+                    });
+                  </script>
+                  ]]></xsl:text>
+
                   </xsl:if>
                 <!-- End of a booking info line -->
                 </div>

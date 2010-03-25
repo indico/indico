@@ -1165,10 +1165,12 @@ class CSBookingBase(Persistent):
     def _getTypeDisplayName(self):
         return CollaborationTools.getXMLGenerator(self._type).getDisplayName()
 
+    def _getFirstLineInfo(self, tz):
+        return CollaborationTools.getXMLGenerator(self._type).getFirstLineInfo(self, tz)
+
     def _getTitle(self):
         if self.hasEventDisplay():
             raise CollaborationException("Method _getTitle was not overriden for the plugin type " + str(self._type))
-
 
     def _getInformationDisplay(self, tz):
         templateClass = CollaborationTools.getTemplateClass(self.getType(), "WInformationDisplay")

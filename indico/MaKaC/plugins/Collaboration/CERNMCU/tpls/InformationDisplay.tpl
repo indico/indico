@@ -1,8 +1,8 @@
-<table>
+<table cellpadding="0" cellspacing="0">
     <tbody>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <span><%= _('Name')%>:</span>
+                <%= _('Name:')%>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
                 <%= Booking._bookingParams["name"] %>
@@ -11,7 +11,7 @@
         <% if Booking.getHasPin(): %>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <span><%= _('Protection')%>:</span>
+                <%= _('Protection:')%>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
                 <%= _("This conference is protected by a PIN.") %>
@@ -20,7 +20,7 @@
         <% end %>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <span><%= _('Description')%>:</span>
+                <%= _('Description:')%>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
                 <%= Booking._bookingParams["description"] %>
@@ -28,12 +28,12 @@
         </tr>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <span><%= _('Participants')%>:</span>
+                <%= _('Participants:')%>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
                 <% if Booking.getParticipantList(): %>
                     <% for p in Booking.getParticipantList(): %>
-                        <div><%= p.getDisplayName() %></div>
+                        <div><%= p.getDisplayName(truncate=False) %></div>
                     <% end %>
                 <% end %>
                 <% else: %>
@@ -43,7 +43,7 @@
         </tr>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <span><%= _('How to join')%>:</span>
+                <%= _('How to join:')%>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
                 <% bookingIdInMCU = str(Booking._bookingParams["id"]) %>

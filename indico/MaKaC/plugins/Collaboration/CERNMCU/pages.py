@@ -234,6 +234,10 @@ class XMLGenerator(object):
         return "MCU Conference"
 
     @classmethod
+    def getFirstLineInfo(cls, booking, displayTz):
+        return None
+
+    @classmethod
     def getCustomBookingXML(cls, booking, displayTz, out):
 
         out.openTag("information")

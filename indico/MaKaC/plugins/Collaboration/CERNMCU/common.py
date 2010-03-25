@@ -141,7 +141,7 @@ class ParticipantPerson(Participant):
     def getAffiliation(self):
         return self._affiliation
 
-    def getDisplayName(self):
+    def getDisplayName(self, truncate=True):
         result = []
         if self._title:
             result.append(self._title)
@@ -153,7 +153,11 @@ class ParticipantPerson(Participant):
             result.append(' (')
             result.append(self._affiliation)
             result.append(')')
-        return ("".join(result))[:31] #31 is the max length accepted by the MCU
+        result = "".join(result)
+        if truncate:
+            return result[:31] #31 is the max length accepted by the MCU
+        else:
+            return result
 
 
 class ParticipantRoom(Participant):
@@ -172,11 +176,14 @@ class ParticipantRoom(Participant):
             self._institution = ''
         return self._institution
 
-    def getDisplayName(self):
+    def getDisplayName(self, truncate=True):
         result = self._name
         if self._institution:
             result = result + ' (' + self._institution + ')'
-        return result[:31] #31 is the max length accepted by the MCU
+        if truncate:
+            return result[:31] #31 is the max length accepted by the MCU
+        else:
+            return result
 
 class RoomWithH323(Fossilizable):
     fossilizes(IRoomWithH323Fossil)

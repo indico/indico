@@ -105,6 +105,7 @@ class WInformationDisplay(WCSPageTemplateBase):
         vars = WCSPageTemplateBase.getVars( self )
 
         vars["Booking"] = self._booking
+        vars["ListOfPhoneBridgeNumbersURL"] = getEVOOptionValueByName("phoneBridgeNumberList")
 
         return vars
 
@@ -118,6 +119,10 @@ class XMLGenerator(object):
         return "EVO Meeting"
 
     @classmethod
+    def getFirstLineInfo(cls, booking, displayTz):
+        return _('Phone Bridge ID:') + booking.getPhoneBridgeId()+ '.'
+
+    @classmethod
     def getCustomBookingXML(cls, booking, displayTz, out):
         booking.checkCanStart()
         if (booking.canBeStarted()):
@@ -128,7 +133,7 @@ class XMLGenerator(object):
             out.closeTag("launchInfo")
 
         if booking.getBookingParamByName("displayPhoneBridgeId"):
-            out.writeTag("firstLineInfo", _('Phone Bridge ID:') + booking.getPhoneBridgeId())
+            out.writeTag("firstLineInfo", XMLGenerator.getFirstLineInfo(booking, displayTz))
 
         out.openTag("information")
 
@@ -140,8 +145,8 @@ class XMLGenerator(object):
         if booking.getHasAccessPassword():
             if not booking.getBookingParamByName("displayPassword") and not booking.getBookingParamByName("displayPhonePassword"):
                 out.openTag("section")
-                out.writeTag("title", _('Protection:'))
-                out.writeTag("line", _('This EVO meeting is protected by a password.'))
+                out.writeTag("title", _('Password:'))
+                out.writeTag("line", _('This EVO meeting is protected by a private password.'))
                 out.closeTag("section")
             else:
                 if booking.getBookingParamByName("displayPassword"):
@@ -160,7 +165,7 @@ class XMLGenerator(object):
             out.writeTag("title", _('Phone bridge numbers:'))
             out.openTag("linkLine")
             out.writeTag("href", getEVOOptionValueByName("phoneBridgeNumberList"))
-            out.writeTag("caption", _("List of phone bridge numbers."))
+            out.writeTag("caption", _("List of phone bridge numbers"))
             out.closeTag("linkLine")
             out.closeTag("section")
 

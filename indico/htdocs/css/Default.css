@@ -4390,6 +4390,36 @@ div.collaborationDisplayBookingLine {
     padding-bottom: 5px;
 }
 
+div.collaborationConfDisplayBookingLine {
+    font-size:12px;
+}
+
+td.collaborationConfDisplayInfoLeftCol {
+    white-space: nowrap;
+    text-align: right;
+    padding-right: 10px;
+    padding-left: 5px;
+}
+
+td.collaborationConfDisplayInfoLeftCol, td.collaborationConfDisplayInfoRightCol {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    vertical-align: top;
+    font-size: 11px;
+}
+
+td.collaborationConfDisplayInfoRightCol {
+    padding-right: 5px;
+}
+
+td.collaborationConfDisplayInfoRightCol a {
+    font-size: 11px;
+}
+
+div.collaborationDisplayInfoLine tr:hover {
+    background-color: #ECECEC;
+}
+
 div.collaborationLinkTooltipMeetingLecture {
     padding: 3px;
     background-color: white;
@@ -4401,7 +4431,8 @@ div.collaborationLinkTooltipConference {
 
 div.collaborationDisplayInfoLine {
     padding-top: 5px;
-    padding-bottom: 10px;
+    padding-bottom: 15px;
+    padding-left: 20px;
 }
 
 span.collShowHideBookingsText {

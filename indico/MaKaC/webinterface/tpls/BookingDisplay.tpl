@@ -4,8 +4,9 @@
 
 <div class="collaborationDisplayBookingLine" style="padding-left: 20px">
 
+    <div class="collaborationConfDisplayBookingLine">
     <span class="collaborationDisplayBookingType" style="font-style:italic">
-        <%= Booking._getTypeDisplayName() %>:
+        <%= Booking._getTypeDisplayName() %>
     </span>
 
     <% if Kind == 'scheduled' and isSameDay(Booking.getStartDate(), Booking.getEndDate(), Timezone): %>
@@ -62,15 +63,24 @@
         <%= formatTime(Booking.getAdjustedEndDate(Timezone).time()) %>
     <% end %>.
 
+    <% firstLineInfo = Booking._getFirstLineInfo(Timezone) %>
+    <% if firstLineInfo: %>
+        <%= firstLineInfo %>
+    <% end %>
+
     <% displayInfo = Booking._getInformationDisplay(Timezone) %>
     <% launchInfo = Booking._getLaunchDisplayInfo() %>
 
+    <% if displayInfo or launchInfo: %>
+    <span style="margin-left:20px;"></span>
+    <% end %>
+
     <% if displayInfo: %>
-        <span class="fakeLink collaborationDisplayLink" id="collaborationBookingMoreInfo<%=id%>"><%= _("More Info") %></span>
+        <span class="collaborationDisplayMoreInfo" id="collaborationBookingMoreInfo<%=id%>"><%= _("More Info") %></span>
     <% end %>
 
     <% if displayInfo and Kind == 'ongoing' and launchInfo: %>
-        <span class="collaborationDisplayLink">|</span>
+        <span style="margin-left: 5px; margin-right:5px;">|</span>
     <% end %>
 
     <% if Kind == 'ongoing' and launchInfo: %>
@@ -84,6 +94,7 @@
             }
         </script>
     <% end %>
+    </div>
 
     <% if displayInfo: %>
         <div id="collaborationInfoLine<%=id%>" style="visibility: hidden; overflow: hidden;">
@@ -98,8 +109,12 @@
             $E('collaborationBookingMoreInfo<%=id%>').observeClick(function(){
                 if (bookingInfoState<%= Booking.getId() %>) {
                     IndicoUI.Effect.slide('collaborationInfoLine<%=id%>', height<%=id%>);
+                    $E('collaborationBookingMoreInfo<%=id%>').set($T('More info'));
+                    $E('collaborationBookingMoreInfo<%=id%>').dom.className = 'collaborationDisplayMoreInfo';
                 } else {
                     IndicoUI.Effect.slide('collaborationInfoLine<%=id%>', height<%=id%>);
+                    $E('collaborationBookingMoreInfo<%=id%>').set($T('Hide info'));
+                    $E('collaborationBookingMoreInfo<%=id%>').dom.className = 'collaborationDisplayHideInfo';
                 }
                 bookingInfoState<%=id%> = !bookingInfoState<%=id%>;
             });
