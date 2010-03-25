@@ -347,40 +347,46 @@ def getOrphans():
 
     return (rows)
 
-def updateMicala(IndicoID, LOID):
+def updateMicala(IndicoID, contentType, LOID):
     """Submit Indico ID to the micala DB"""
 
 #    Logger.get('RecMan').exception("inside updateMicala.")
 
-    try:
-        connection = MySQLdb.connect(host   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBServer"),
-                                     port   = int(CollaborationTools.getOptionValue("RecordingManager", "micalaDBPort")),
-                                     user   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBUser"),
-                                     passwd = CollaborationTools.getOptionValue("RecordingManager", "micalaDBPW"),
-                                     db     = CollaborationTools.getOptionValue("RecordingManager", "micalaDBName"))
-    except MySQLdb.Error, e:
-        raise RecordingManagerException("MySQL database error %d: %s" % (e.args[0], e.args[1]))
+    if contentType == 'web_lecture':
+        try:
+            connection = MySQLdb.connect(host   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBServer"),
+                                         port   = int(CollaborationTools.getOptionValue("RecordingManager", "micalaDBPort")),
+                                         user   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBUser"),
+                                         passwd = CollaborationTools.getOptionValue("RecordingManager", "micalaDBPW"),
+                                         db     = CollaborationTools.getOptionValue("RecordingManager", "micalaDBName"))
+        except MySQLdb.Error, e:
+            raise RecordingManagerException("MySQL database error %d: %s" % (e.args[0], e.args[1]))
 
-    cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+        cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
 
-    try:
-        cursor.execute("UPDATE Lectures SET IndicoID=%s WHERE id=%s",
-                       (IndicoID, LOID))
-        connection.commit()
-    except MySQLdb.Error, e:
-        raise RecordingManagerException("MySQL database error %d: %s" % (e.args[0], e.args[1]))
+        try:
+            cursor.execute("UPDATE Lectures SET IndicoID=%s WHERE id=%s",
+                           (IndicoID, LOID))
+            connection.commit()
+        except MySQLdb.Error, e:
+            raise RecordingManagerException("MySQL database error %d: %s" % (e.args[0], e.args[1]))
 
-    cursor.close()
-    connection.close()
+        cursor.close()
+        connection.close()
 
-def createCDSRecord(IndicoID, aw, videoFormat):
+    elif contentType == 'plain_video':
+        # Should update the database here as well.
+        # first need to backup the DB, create a new column called contentType
+        # (I already created this column in micala.sql, just need to recreate DB from this file)
+        pass
+
+def createCDSRecord(aw, IndicoID, contentType, videoFormat):
     '''Retrieve a MARC XML string for the given conference, then package it up and send it to CDS.'''
 
     # I don't understand what some of the following lines do. Pedro did some of it for me.
     xmlGen = XMLGen()
     xmlGen.initXml()
-    di = DataInt(xmlGen)
-#    og = outputGenerator(aw, dataInt=di)
+
     og = outputGenerator(aw, xmlGen)
 
     xmlGen.openTag("event")
@@ -425,12 +431,19 @@ def createCDSRecord(IndicoID, aw, videoFormat):
     from MaKaC.common import Config
 
     outputData = ""
-    stylepath = "%s/%s.xsl" % (Config.getInstance().getStylesheetsDir(),
-                               'cds_marcxml_presentation')
-    if os.path.exists(stylepath):
+    stylePath  = ""
+
+    if parsed["type"] == 'contribution':
+        stylePath = "%s.xsl" % (os.path.join(Config.getInstance().getStylesheetsDir(),
+                                             'cds_marcxml_video_contribution'))
+    else:
+        stylePath = "%s.xsl" % (os.path.join(Config.getInstance().getStylesheetsDir(),
+                                             'cds_marcxml_video_presentation'))
+
+    if os.path.exists(stylePath):
         try:
-            Logger.get('RecMan').info("Trying to do XSLT using path %s" % stylepath)
-            parser = XSLTransformer(stylepath)
+            Logger.get('RecMan').info("Trying to do XSLT using path %s" % stylePath)
+            parser = XSLTransformer(stylePath)
             outputData = parser.process(marcxml)
         except:
             outputData = "Cannot parse stylesheet: %s" % sys.exc_info()[0]

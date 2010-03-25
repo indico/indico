@@ -2,6 +2,8 @@ from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.user import Avatar
 from MaKaC.user import CERNGroup
 
+from MaKaC.common.logger import Logger
+
 class MarcAccessListGenerator():
     def __init__(self):
         pass
@@ -80,6 +82,8 @@ class MarcAccessListGenerator():
 
     def generateVideoXML(self, out, obj, videoFormat):
         """Generate XML variables needed for video records."""
+
+        Logger.get('RecMan').info("videoFormat = %s" % videoFormat)
 
         videoTagStandard = CollaborationTools.getOptionValue("RecordingManager", "videoFormatStandard")
         videoTagWide     = CollaborationTools.getOptionValue("RecordingManager", "videoFormatWide")

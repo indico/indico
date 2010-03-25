@@ -23,8 +23,7 @@ div.RMMatchPane {
     padding: 10px 20px 10px 10px;
     margin-top: 10px;
     margin-bottom: 10px;
-    min-height: 300px;
-    max-height: 450px;
+    height: 450px;
     overflow: auto;
 }
 

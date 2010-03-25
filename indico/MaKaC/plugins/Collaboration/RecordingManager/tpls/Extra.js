@@ -233,12 +233,6 @@ var RR_loadTalks = function () {
 }
 
 // jherr stuff
-var RMselectedTalkId   = '';
-var RMselectedLOID     = '';
-var RMselectedTalkName = '';
-var RMselectedLOName   = '';
-var RMviewMode         = '';
-var RMvideoFormat      = 'standard';
 
 function RMbuttonModeSelect(mode) {
     RMviewMode = mode;
@@ -411,7 +405,8 @@ function RMCreateCDSRecord() {
                 conference: '<%= ConferenceId %>',
                 IndicoID: RMselectedTalkId,
                 LOID: RMselectedLOID,
-                videoFormat: RMvideoFormat
+                videoFormat: RMvideoFormat,
+                contentType: RMviewMode
             },
         function(result, error){
                 document.getElementById('RMMatchSummaryMessage').innerHTML = result;

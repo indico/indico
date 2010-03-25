@@ -137,6 +137,13 @@
     var RR_contributionsLoaded = <%= jsBoolean(DisplayTalks or not HasTalks) %>;
     var RM_orphans = <%= jsonEncode(Orphans) %>;
 
+    var RMselectedTalkId   = '';
+    var RMselectedLOID     = '';
+    var RMselectedTalkName = '';
+    var RMselectedLOName   = '';
+    var RMviewMode         = '';
+    var RMvideoFormat      = 'standard';
+
     // Draw the two buttons, which start out as disabled until
     // the user has selected both talk and LO
     $E('RMbuttonCreateCDSRecord').set(ButtonCreateCDSRecord.draw());
