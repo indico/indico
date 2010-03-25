@@ -118,10 +118,9 @@ var ButtonCreateCDSRecord  = new DisabledButton(Html.input("button", {disabled:t
 
 ButtonCreateCDSRecord.observeClick(function(){
     if (ButtonCreateCDSRecord.isEnabled()) {
-        if (typeof RMselectedTalkId != 'undefined' &&
-                RMselectedTalkId != '' &&
-                RMselectedLOID != 'undefined' &&
-                RMselectedLOID != '') {
+        if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '' &&
+                (RMviewMode == 'plain_video' ||
+                        typeof RMselectedLOID != 'undefined' && RMselectedLOID != '')) {
 
             RMCreateCDSRecord();
         }
@@ -143,10 +142,9 @@ ButtonCreateCDSRecord.observeEvent('mouseout', function(event){
 
 ButtonCreateIndicoLink.observeClick(function(){
     if (!ButtonCreateIndicoLink.isEnabled()) {
-        if (typeof RMselectedTalkId != 'undefined' &&
-                RMselectedTalkId != '' &&
-                RMselectedLOID != 'undefined' &&
-                RMselectedLOID != '') {
+        if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '' &&
+                (RMviewMode == 'plain_video' ||
+                        typeof RMselectedLOID != 'undefined' && RMselectedLOID != '')) {
 
             RMCreateIndicoLink();
         }
@@ -249,12 +247,23 @@ function RMbuttonModeSelect(mode) {
         $E("RMbuttonPlainVideo").dom.className = 'RMbuttonSelected';
         IndicoUI.Effect.disappear($E('RMrightPaneWebLecture'));
         IndicoUI.Effect.appear($E('RMrightPanePlainVideo'), "block");
+
+        if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '') {
+            ButtonCreateCDSRecord.enable();
+            ButtonCreateIndicoLink.enable();
+        }
     }
     else if (mode == 'web_lecture') {
         $E("RMbuttonPlainVideo").dom.className = 'RMbuttonNotSelected';
         $E("RMbuttonWebLecture").dom.className = 'RMbuttonSelected';
         IndicoUI.Effect.disappear($E('RMrightPanePlainVideo'));
         IndicoUI.Effect.appear($E('RMrightPaneWebLecture'), "block");
+
+        if (typeof RMselectedTalkId == 'undefined' || RMselectedTalkId == '' ||
+            typeof RMselectedLOID == 'undefined' || RMselectedLOID == '') {
+                ButtonCreateCDSRecord.disable();
+                ButtonCreateIndicoLink.disable();
+        }
     }
 }
 
@@ -300,10 +309,9 @@ function RMtalkSelect(IndicoID) {
     document.getElementById('div' + RMselectedTalkId).className = 'RMtalkSelected';
     RMMatchSummaryMessage(RMselectedTalkId, RMselectedLOID);
 
-    if (typeof RMselectedTalkId != 'undefined' &&
-            RMselectedTalkId != '' &&
-            typeof RMselectedLOID != 'undefined' &&
-            RMselectedLOID != '') {
+    if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '' &&
+            (RMviewMode == 'plain_video' ||
+                    typeof RMselectedLOID != 'undefined' && RMselectedLOID != '')) {
         ButtonCreateCDSRecord.enable();
         ButtonCreateIndicoLink.enable();
     }
@@ -333,10 +341,9 @@ function RMLOSelect(DBID) {
     document.getElementById('lo' + RMselectedLOID).className = 'RMLOSelected';
     RMMatchSummaryMessage(RMselectedTalkId, RMselectedLOID);
 
-    if (typeof RMselectedTalkId != 'undefined' &&
-            RMselectedTalkId != '' &&
-            typeof RMselectedLOID != 'undefined' &&
-            RMselectedLOID != '') {
+    if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '' &&
+            (RMviewMode == 'plain_video' ||
+                    typeof RMselectedLOID != 'undefined' && RMselectedLOID != '')) {
         ButtonCreateCDSRecord.enable();
         ButtonCreateIndicoLink.enable();
     }
@@ -357,6 +364,14 @@ function RMStatusMessage(message) {
 
 function RMchooseVideoFormat(format_string) {
     RMvideoFormat = format_string;
+
+    if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '' &&
+            (RMviewMode == 'plain_video' ||
+                    typeof RMselectedLOID != 'undefined' && RMselectedLOID != '')) {
+        ButtonCreateCDSRecord.enable();
+        ButtonCreateIndicoLink.enable();
+    }
+
 }
 
 function RMLink() {

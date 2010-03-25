@@ -94,11 +94,11 @@
             <b><%= _("3. Select options: ") %></b>
             <div class="RMMatchPane" style="height: 200px;">
                 Select video aspect ratio:
-                <input type="radio" name="talks" value="4/3" id="RMvideoFormat4to3" onclick="RMchooseVideoFormat('4/3')" checked>
-                <label for="RMvideoFormat4to3">4/3</label>
+                <input type="radio" name="talks" value="standard" id="RMvideoFormat4to3" onclick="RMchooseVideoFormat('standard')" checked>
+                <label for="RMvideoFormat4to3">standard (4/3)</label>
                 &nbsp;&nbsp;&nbsp;
-                <input type="radio" name="talks" value="16/9" id="RMvideoFormat16to9" onclick="RMchooseVideoFormat('16/9')">
-                <label for="RMvideoFormat16to9">16/9</label>
+                <input type="radio" name="talks" value="wide" id="RMvideoFormat16to9" onclick="RMchooseVideoFormat('wide')">
+                <label for="RMvideoFormat16to9">wide (16/9)</label>
             </div>
         </div>
     </td>
