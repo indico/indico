@@ -18,9 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.plugins import getModules, initModule
 modules = {}
-topModule = None
 
 
 
@@ -40,7 +38,7 @@ def preprocessParams(params):
         if params['szReturnCode'] == '1':
            params['requestTag'] = 'confirm'
         else:
-           params['requestTag'] = 'cancel' 
+           params['requestTag'] = 'cancel'
     #raise("preprocessParams ... " + str(params))
     return True
   except Exception,e:

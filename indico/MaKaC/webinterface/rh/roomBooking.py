@@ -40,8 +40,8 @@ from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum
 from MaKaC.rb_factory import Factory
 from MaKaC.rb_location import CrossLocationQueries, RoomGUID, Location
 from MaKaC.rb_tools import intd, FormMode
-from MaKaC import plugins
 from MaKaC.errors import MaKaCError
+from MaKaC.plugins.pluginLoader import PluginLoader
 
 class CandidateDataFrom( object ):
     DEFAULTS, PARAMS, SESSION = xrange( 3 )
@@ -1699,7 +1699,7 @@ class RHRoomBookingSaveLocation( RHRoomBookingAdminBase ):
         self._locationName = params["newLocationName"].strip()
         self._pluginClass = None
         name = params.get("pluginName","default")
-        plugs = plugins.getPluginsByType("RoomBooking")
+        plugs = PluginLoader.getPluginsByType("RoomBooking")
         for plug in plugs:
             if plug.pluginName == name:
                 self._pluginClass = plug.roombooking.getRBClass()

@@ -38,7 +38,7 @@ pluginTypeActions = [
 ]
 
 class IndexPluginsPerEventTypeAction(ActionBase):
-    
+
     def call(self):
         allowedPlugins = {"conference": [], "meeting": [], "simple_event": []}
         for plugin in self._pluginType.getPluginList(includeNonActive = True):
@@ -50,32 +50,32 @@ class IndexPluginsPerEventTypeAction(ActionBase):
                     raise CollaborationException("Allowed kinds of events: conference, meeting, simple_event. %s is not allowed" % str(eventType), inner = e)
 
         self._pluginType.getOption("pluginsPerEventType").setValue(allowedPlugins)
-        
+
 class IndexPluginsPerIndexAction(ActionBase):
-    
+
     def call(self):
         result = []
         itiAll = IndexInformation("all")
         pluginIndexes = []
         commonIndexes = {}
-        plugins = self._pluginType.getPluginList(sorted = True, includeNonActive = True)
+        plugins = self._pluginType.getPluginList(doSort = True, includeNonActive = True)
         pluginNames = [p.getName() for p in plugins]
-        
+
         for pluginName in pluginNames:
             csBookingClass = CollaborationTools.getCSBookingClass(pluginName)
-            
+
             itiAll.addPlugin(pluginName)
             if csBookingClass._hasAcceptReject:
                 itiAll.setHasShowOnlyPending(True)
             if csBookingClass._hasStartDate:
                 itiAll.setHasViewByStartDate(True)
-            
+
             iti = IndexInformation(pluginName)
             iti.addPlugin(pluginName)
             iti.setHasShowOnlyPending(csBookingClass._hasAcceptReject)
             iti.setHasViewByStartDate(csBookingClass._hasStartDate)
             pluginIndexes.append(iti)
-            
+
             for commonIndexName in csBookingClass._commonIndexes:
                 if not commonIndexName in commonIndexes:
                     commonIndexes[commonIndexName] = IndexInformation(commonIndexName)
@@ -85,32 +85,32 @@ class IndexPluginsPerIndexAction(ActionBase):
                     iti.setHasShowOnlyPending(True)
                 if csBookingClass._hasStartDate:
                     iti.setHasViewByStartDate(True)
-                
+
         commonIndexNames = commonIndexes.keys()
         commonIndexNames.sort()
-        
+
         result.append(itiAll)
         result.extend(pluginIndexes)
         result.extend([commonIndexes[k] for k in commonIndexNames])
-                
+
         self._pluginType.getOption("pluginsPerIndex").setValue(result)
-        
+
 class RestoreCSBookingManagersAsObserversAction(ActionBase):
-    
+
     def call(self):
         cf = ConferenceHolder()
         for conf in cf.getValuesToList():
             csbm = conf.getCSBookingManager()
             csbm.restoreAsObserver()
-        
+
 class ReindexAllBookingsAction(ActionBase):
-    
+
     def call(self):
         collaborationIndex = IndexesHolder().getById("collaboration")
         collaborationIndex.reindexAll()
-        
+
 class DeleteAllBookingsAction(ActionBase):
-    
+
     def call(self):
         cf = ConferenceHolder()
         for conf in cf.getValuesToList():

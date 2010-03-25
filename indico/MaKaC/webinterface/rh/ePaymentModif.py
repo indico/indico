@@ -18,7 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import MaKaC.webinterface.urlHandlers as urlHandlers 
+import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.epayments as ePayments
 import MaKaC.epayment as ePayment
 from datetime import datetime
@@ -30,24 +30,24 @@ from MaKaC.common import HelperMaKaCInfo
 from MaKaC.i18n import _
 
 class RHEPaymentModifBase( conferenceModif.RHConferenceModifBase ):
-    
+
     def _checkProtection( self ):
         conferenceModif.RHConferenceModifBase._checkProtection(self)
         if not self._conf.hasEnabledSection("epay"):
             raise MaKaCError( _("The registration form was disabled by the conference managers"))
-        
+
 class RHEPaymentModif( RHEPaymentModifBase ):
-    
+
     def _process( self ):
         p = ePayments.WPConfModifEPayment( self, self._conf )
         return p.display()
 
 class RHEPaymentModifChangeStatus( RHEPaymentModifBase ):
-    
+
     def _checkParams( self, params ):
         RHEPaymentModifBase._checkParams( self, params )
         self._newStatus = params["changeTo"]
-    
+
     def _process( self ):
         epay = self._conf.getModPay()
         if self._newStatus == "True":
@@ -55,20 +55,20 @@ class RHEPaymentModifChangeStatus( RHEPaymentModifBase ):
         else:
             epay.deactivate()
         self._redirect(urlHandlers.UHConfModifEPayment.getURL(self._conf))
-            
+
 class RHEPaymentModifDataModification( RHEPaymentModifBase ):
-    
+
     def _process( self ):
         p = ePayments.WPConfModifEPaymentDataModification( self, self._conf )
         return p.display()
-        
+
 class RHEPaymentModifPerformDataModification( RHEPaymentModifBase ):
 
     def _checkParams( self, params ):
         RHEPaymentModifBase._checkParams( self, params )
         self._cancel = params.has_key("cancel")
 
-    
+
     def _process( self ):
         if not self._cancel:
             modpay = self._conf.getModPay()
@@ -82,26 +82,26 @@ class RHEPaymentModifPerformDataModification( RHEPaymentModifBase ):
             if al.isAdmin( self._getUser() ):
                 modpay.setPaymentConditions(params.get("conditionsPayment", ""))
                 modpay.setPaymentConditionsEnabled(params.has_key("conditionsEnabled"))
-        self._redirect(urlHandlers.UHConfModifEPayment.getURL(self._conf))    
+        self._redirect(urlHandlers.UHConfModifEPayment.getURL(self._conf))
 
 ##class RHEPaymentmodifYellowPay( RHEPaymentModifBase ):
-##    
+##
 ##    def _process( self ):
 ##        p = ePayments.WPConfModifEPaymentYellowPay( self, self._conf )
 ##        return p.display()
-##        
+##
 ##class RHEPaymentmodifYellowPayDataModif( RHEPaymentModifBase ):
-##    
+##
 ##    def _process( self ):
 ##        p = ePayments.WPConfModifEPaymentYellowPayDataModif( self, self._conf )
 ##        return p.display()
 
 class RHEPaymentModifEnableSection( RHEPaymentModifBase ):
-    
+
     def _checkParams( self, params ):
         RHEPaymentModifBase._checkParams( self, params )
         self._epayment = params.get("epayment", "")
-    
+
     def _process( self ):
         modPay = self._conf.getModPay().getModPayById(self._epayment)
         if modPay is not None:
@@ -115,13 +115,13 @@ class RHEPaymentModifEnableSection( RHEPaymentModifBase ):
         self._redirect(urlHandlers.UHConfModifEPayment.getURL(self._conf))
 
 ##class RHEPaymentmodifYellowPay( RHEPaymentModifBase ):
-##    
+##
 ##    def _process( self ):
 ##        p = ePayments.WPConfModifEPaymentYellowPay( self, self._conf )
 ##        return p.display()
-##        
+##
 ##class RHEPaymentmodifYellowPayDataModif( RHEPaymentModifBase ):
-##    
+##
 ##    def _process( self ):
 ##        p = ePayments.WPConfModifEPaymentYellowPayDataModif( self, self._conf )
 ##        return p.display()
@@ -131,31 +131,31 @@ class RHEPaymentModifEnableSection( RHEPaymentModifBase ):
 ##    def _checkParams( self, params ):
 ##        RHEPaymentModifBase._checkParams( self, params )
 ##        self._cancel = params.has_key("cancel")
-##    
+##
 ##    def _process( self ):
 ##        if not self._cancel:
 ##            ses = self._conf.getModPay().getModYellowPay()
 ##            ses.setValues(self._getRequestParams())
-##        self._redirect(urlHandlers.UHConfModifEPaymentYellowPay.getURL(self._conf))  
+##        self._redirect(urlHandlers.UHConfModifEPaymentYellowPay.getURL(self._conf))
 
 ##class RHEPaymentmodifPayPal( RHEPaymentModifBase ):
-##    
+##
 ##    def _process( self ):
 ##        p = ePayments.WPConfModifEPaymentPayPal( self, self._conf )
 ##        return p.display()
-##        
+##
 ##class RHEPaymentmodifPayPalDataModif( RHEPaymentModifBase ):
-##    
+##
 ##    def _process( self ):
 ##        p = ePayments.WPConfModifEPaymentPayPalDataModif( self, self._conf )
 ##        return p.display()
 
 ##class RHEPaymentModifEnableSection( RHEPaymentModifBase ):
-##    
+##
 ##    def _checkParams( self, params ):
 ##        RHEPaymentModifBase._checkParams( self, params )
 ##        self._epayment = params.get("epayment", "")
-##    
+##
 ##    def _process( self ):
 ##        modPay = self._conf.getModPay().getModPayById(self._epayment)
 ##        if modPay is not None:
@@ -168,21 +168,21 @@ class RHEPaymentmodifPayPalPerformDataModif( RHEPaymentModifBase ):
         RHEPaymentModifBase._checkParams( self, params )
         self._params=params
         self._cancel = params.has_key("cancel")
-    
+
     def _process( self ):
         if not self._cancel:
             ses = self._conf.getModPay().getPayModByTag("PayPal")
             ses.setValues(self._params)
-        self._redirect(urlHandlers.UHConfModifEPaymentPayPal.getURL(self._conf))          
-             
+        self._redirect(urlHandlers.UHConfModifEPaymentPayPal.getURL(self._conf))
+
 ####################################################################################
 class RHRegistrationFormDisplayBase( RHConferenceBaseDisplay ):
     #_uh = urlHandlers.UHConfRegistrationFormDisplay
-    
+
     def _checkParams( self, params ):
         RHConferenceBaseDisplay._checkParams(self, params)
-        self._regForm = self._conf.getRegistrationForm()    
-        
+        self._regForm = self._conf.getRegistrationForm()
+
     def _getLoginURL( self ):
         url = self.getCurrentURL()
         if url == "":
@@ -192,18 +192,18 @@ class RHRegistrationFormDisplayBase( RHConferenceBaseDisplay ):
         if Config.getInstance().getLoginURL().startswith("https"):
             urlLogin = urlLogin.replace("http://", "https://")
         return urlLogin
-        
+
     def _processIfActive( self ):
-        """only override this method if the RegForm must be activated for 
+        """only override this method if the RegForm must be activated for
             carrying on the handler execution"""
-        return "regForm"        
-    
+        return "regForm"
+
     def _checkProtection( self ):
         RHConferenceBaseDisplay._checkProtection(self)
         if self._regForm.isMandatoryAccount() and self._getUser() == None:
             self._redirect( self._getLoginURL() )
             self._doProcess = False
-            
+
     def _process( self ):
         #if the RegForm is not activated we show up a form informing about that.
         #   This must be done at RH level because there can be some RH not
@@ -213,16 +213,16 @@ class RHRegistrationFormDisplayBase( RHConferenceBaseDisplay ):
             p = registrationForm.WPRegFormInactive( self, self._conf )
             return p.display()
         else:
-            return self._processIfActive()            
+            return self._processIfActive()
 
 
 class RHModifModule:
     def __init__(self, req):
         self._req = req
-    
+
     def process(self, params):
-        from MaKaC import plugins
-        epaymentModules = plugins.getPluginsByType("EPayment")
+        from MaKaC.plugins.pluginLoader import PluginLoader
+        epaymentModules = PluginLoader.getPluginsByType("EPayment")
         module = None
         for mod in epaymentModules:
             if mod.pluginName == params.get("EPaymentName","No module name"):

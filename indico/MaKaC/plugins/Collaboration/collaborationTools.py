@@ -193,10 +193,10 @@ class CollaborationTools(object):
 
             #we get the plugins of this tab
             return cls.getCollaborationPluginType().getPluginList(
-                sorted = True,
-                filter = lambda plugin: cls.getPluginTab(plugin) == tabName and
-                                        (allowedPlugins is None or plugin in allowedPlugins) and
-                                        cls.canUserManagePlugin(conference, plugin, user)
+                doSort = True,
+                filterFunction = lambda plugin: cls.getPluginTab(plugin) == tabName and
+                                                (allowedPlugins is None or plugin in allowedPlugins) and
+                                                cls.canUserManagePlugin(conference, plugin, user)
             )
         else:
             return []

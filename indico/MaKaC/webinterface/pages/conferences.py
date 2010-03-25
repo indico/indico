@@ -65,7 +65,6 @@ from MaKaC.webinterface.pages import base
 import MaKaC.common.info as info
 from MaKaC.common.cache import EventCache
 from MaKaC.i18n import _
-from MaKaC.plugins import importPlugin
 from MaKaC.modules.base import ModulesHolder
 import MaKaC.webcast as webcast
 from MaKaC.common.PickleJar import DictPickler
@@ -2330,11 +2329,11 @@ class WPConfModifBookings( WPConferenceModifBase ):
         elif self._bs.strip()=="VRVS":
             wc = WBookingsWarning(self._conf)
             return wc.getHTML(p)
-        elif self._bs.strip()=="MCU":
-            wc = importPlugin("Collaboration", "Hermes", "CreateComponent")(self._conf)
-            if (wc == None):
-                wc= WBookingsNotYetAvailable(self._conf)
-            return wc.getHTML(p)
+#        elif self._bs.strip()=="MCU":
+#            wc = importPlugin("Collaboration", "Hermes", "CreateComponent")(self._conf)
+#            if (wc == None):
+#                wc= WBookingsNotYetAvailable(self._conf)
+#            return wc.getHTML(p)
 
 class WConfModifBookings( wcomponents.WTemplated ):
 
@@ -2530,11 +2529,11 @@ class WPBookingsDetail(WPConferenceModifBase):
 "listOfBookings": quoteattr(str(urlHandlers.UHConfModifBookings.getURL(self._conf)))}
             wc = WBookingsVRVSDetail(self._booking)
             return wc.getHTML(p)
-        elif self._booking.getSystem()=="HERMES":
-            wc = importPlugin("Collaboration", "Hermes", "ShowComponent")(self._conf, self._booking)
-            if (wc == None):
-                wc= WBookingsNotYetAvailable(self._conf)
-            return wc.getHTML()
+#        elif self._booking.getSystem()=="HERMES":
+#            wc = importPlugin("Collaboration", "Hermes", "ShowComponent")(self._conf, self._booking)
+#            if (wc == None):
+#                wc= WBookingsNotYetAvailable(self._conf)
+#            return wc.getHTML()
 
 class WBookingsVRVSPerformed(WBookingsVRVS):
 

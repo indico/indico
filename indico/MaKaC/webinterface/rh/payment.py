@@ -21,14 +21,14 @@
 from copy import copy
 
 class RHPaymentModule:
-    
+
     def __init__(self, req):
         self._req = req
-    
-    
+
+
     def process(self, params):
-        from MaKaC import plugins
-        epaymentModules = plugins.getPluginsByType("EPayment")
+        from MaKaC.plugins.pluginLoader import PluginLoader
+        epaymentModules = PluginLoader.getPluginsByType("EPayment")
         module = None
         for mod in epaymentModules:
             params2 = copy(params)

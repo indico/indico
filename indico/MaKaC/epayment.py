@@ -22,15 +22,15 @@
 from persistent import Persistent
 from MaKaC.common.Locators import Locator
 from MaKaC.trashCan import TrashCanManager
-from MaKaC import plugins
+from MaKaC.plugins.pluginLoader import PluginLoader
 
 class EPayment(Persistent):
-    
+
     def __init__(self, conf, groupData=None):
         self._conf = conf
         if groupData is None:
             self.activated = False
-  
+
         else:
             self.activated = groupData.get("activated", False)
         self.paymentDetails = ""
@@ -42,7 +42,7 @@ class EPayment(Persistent):
 
     def loadPlugins(self, initSorted=True):
         self.payMods = {}
-        epaymentModules = plugins.getPluginsByType("EPayment")
+        epaymentModules = PluginLoader.getPluginsByType("EPayment")
         for mod in epaymentModules:
             try:
                 self.payMods[mod.pluginName] = mod.epayment.getPayMod()
@@ -59,9 +59,9 @@ class EPayment(Persistent):
 ##        self.payPal = PayPalMod()
 ##        self.worldPay = WorldPayMod()
 ##        #All SortedForms
-    
+
     def updatePlugins(self, initSorted=True):
-        epaymentModules = plugins.getPluginsByType("EPayment")
+        epaymentModules = PluginLoader.getPluginsByType("EPayment")
         changed = False
         for mod in epaymentModules:
             try:
@@ -83,7 +83,7 @@ class EPayment(Persistent):
             self._p_changed = 1
         if initSorted:
             self.initSortedModPay()
-    
+
 
     def initSortedModPay(self):
         try:
@@ -93,7 +93,7 @@ class EPayment(Persistent):
         self.updatePlugins(initSorted=False)
         self._sortedModPay = self.payMods.values()
         self._p_changed = 1
-    
+
     def getPayModByTag(self, tag):
         try:
             if not self.payMods.keys():
@@ -121,7 +121,7 @@ class EPayment(Persistent):
         except:
             self.paymentDetails = ""
         return self.paymentDetails
-    
+
     def setPaymentDetails(self, txt):
         self.paymentDetails = txt
 
@@ -131,7 +131,7 @@ class EPayment(Persistent):
         except:
             self.specificPaymentConditions = ""
         return self.specificPaymentConditions
-    
+
     def setPaymentSpecificConditions(self, txt):
         self.specificPaymentConditions = txt
 
@@ -141,7 +141,7 @@ class EPayment(Persistent):
         except:
             self.paymentConditions = EPaymentDefaultValues.getDefaultConditions()
         return self.paymentConditions
-    
+
     def setPaymentConditions(self, txt):
         self.paymentConditions = txt
 
@@ -191,7 +191,7 @@ class EPayment(Persistent):
 
     def setMandatoryAccount(self, v=True):
         self._mandatoryAccount = v
-    
+
     def setTitle( self, newName ):
         self.title = newName.strip()
 
@@ -210,29 +210,29 @@ class EPayment(Persistent):
         self.enableSendEmailPaymentDetails = v
 
 ##    def getModPayPal(self):
-##        return self.payPal  
-##    
+##        return self.payPal
+##
 ##    def getModYellowPay(self):
 ##        try:
 ##            return self.yellowPay
 ##        except:
 ##            self.yellowPay = YellowPayMod()
 ##        return self.yellowPay
-##    
+##
 ##    def getModPayLater(self):
 ##        try:
 ##            return self.payLater
 ##        except:
 ##            self.payPal = PayPalMod()
 ##        return self.payLater
-##    
+##
 ##    def getModWorldPay(self):
 ##        try:
 ##            return self.worldPay
 ##        except:
 ##            self.worldPay = WorldPayMod()
 ##        return self.worldPay
-    
+
     def getSortedModPay(self):
 ##        try:
 ##            if self._sortedModPay:
@@ -260,22 +260,22 @@ class EPayment(Persistent):
             return False
         self.notifyModification()
         return True
-    
+
     def getModPayById(self, id):
         return self.getPayModByTag(id)
 ##        if id == "yellowpay":
 ##            return self.getModYellowPay()
 ##        if id == "paylater":
-##            return self.getModPayLater()   
+##            return self.getModPayLater()
 ##        if id == "paypal":
 ##            return self.getModPayPal()
 ##        if id == "worldPay":
 ##            return self.getModWorldPay()
-##        return None 
-        
-        
+##        return None
+
+
     def getLocator( self ):
-        """Gives back (Locator) a globaly unique identification encapsulated in 
+        """Gives back (Locator) a globaly unique identification encapsulated in
             a Locator object for the RegistrationForm instance """
         if self.getConference() == None:
             return Locator()
@@ -291,7 +291,7 @@ class EPayment(Persistent):
         self._conf.notifyModification()
 
 class EPaymentDefaultValues:
-    
+
     @staticmethod
     def getDefaultConditions():
         return """
@@ -299,7 +299,7 @@ CANCELLATION :
 
 All refunds requests must be in writing by mail to the Conference Secretary as soon as possible.
 The Conference committee reserves the right to refuse reimbursement of part or all of the fee in the case of late cancellation. However, each case of cancellation would be considered individually.
-"""        
+"""
 
 class BaseEPayMod(Persistent):
 
@@ -307,10 +307,10 @@ class BaseEPayMod(Persistent):
         self._enabled = False
         self._title = ""
         self._id = ""
-    
+
     def getId(self):
         return self._id
-    
+
     def getTitle(self):
         return self._title
 
@@ -326,38 +326,38 @@ class BaseEPayMod(Persistent):
                 pass
         except AttributeError, e:
             self._enabled = False
-        return self._enabled  
-    
+        return self._enabled
+
     def getFormHTML(self,prix,Currency):
         """
         Returns the html form that will be used to send the information to the epayment server.
-        """        
+        """
         raise Exception("This method must be overloaded")
-    
+
     def getConfModifEPaymentURL(self, conf):
         """
         For each plugin there is just one URL for all requests. The plugin will have its own parameters to manage different URLs (have a look to urlHandler.py). This method returns that general URL.
         """
         raise Exception("This method must be overloaded")
-    
+
     def setValues(self, data):
         """ Saves the values coming in a dict (data) in the corresping class variables. (e.g. title, url, business, etc) """
         raise Exception("This method must be overloaded")
-    
+
 ##class YellowPayMod(BaseEPayMod):
 ##
 ##    def __init__(self, data=None):
 ##        BaseEPayMod.__init__(self)
 ##        self._title = "yellowpay"
 ##
-##        self._url="https://yellowpay.postfinance.ch/checkout/Yellowpay.aspx?userctrl=Invisible"    
+##        self._url="https://yellowpay.postfinance.ch/checkout/Yellowpay.aspx?userctrl=Invisible"
 ##        self._shopID= ""
 ##        self._masterShopID  = ""
-##        self._hashSeed = ""              
+##        self._hashSeed = ""
 ##        if data is not None:
 ##            setValue(data)
 ##        self._id="yellowpay"
-## 
+##
 ##    def getId(self):
 ##        try:
 ##            if self._id:
@@ -368,53 +368,53 @@ class BaseEPayMod(Persistent):
 ##
 ##    def clone(self, newSessions):
 ##        sesf = YellowPayMod()
-##        sesf.setTitle(self.getTitle())        
+##        sesf.setTitle(self.getTitle())
 ##        sesf.setUrl(self.getUrl())
 ##        sesf.setShopID(self.getShopID())
 ##        sesf.setMasterShopID(self.getMasterShopID())
-##        sesf.setHashSeed(self.getHashSeed())  
-##        sesf.setEnabled(self.isEnabled())        
-##        
+##        sesf.setHashSeed(self.getHashSeed())
+##        sesf.setEnabled(self.isEnabled())
+##
 ##        return sesf
 ##
 ##    def setValues(self, data):
-##        self.setTitle(data.get("title", "epayment"))        
+##        self.setTitle(data.get("title", "epayment"))
 ##        self.setUrl(data.get("url", ""))
 ##        self.setShopID(data.get("shopid", ""))
 ##        self.setMasterShopID(data.get("mastershopid", ""))
-##        self.setHashSeed(data.get("hashseed", ""))    
+##        self.setHashSeed(data.get("hashseed", ""))
 ##
 ##    def getTitle(self):
 ##        return self._title
 ##    def setTitle(self, title):
 ##        self._title = title
-##        
+##
 ##    def getUrl(self):
-##        return self._url    
+##        return self._url
 ##    def setUrl(self,url):
-##        self._url=url    
-##    
+##        self._url=url
+##
 ##    def getShopID(self):
 ##        return self._shopID
 ##    def setShopID(self,shopID):
 ##        self._shopID= shopID
-##        
+##
 ##    def getMasterShopID(self):
 ##        return self._masterShopID
 ##    def setMasterShopID(self,masterShopID):
 ##        self._masterShopID  = masterShopID
-##        
+##
 ##    def getHashSeed(self):
 ##        return self._hashSeed
 ##    def setHashSeed(self,hashSeed):
-##        self._hashSeed  =  hashSeed    
+##        self._hashSeed  =  hashSeed
 ##
-##        
+##
 ##    def getFormHTML(self,prix,Currency,conf,registrant):
 ##        l=[]
 ##        l.append("%s=%s"%("confId",conf.getId()))
 ##        l.append("%s=%s"%("registrantId",registrant.getId()))
-##        param= "&".join( l )                
+##        param= "&".join( l )
 ##        #Shop-ID + txtArtCurrency + txtOrderTotal + Hash seed
 ##        m=md5.new()
 ##        m.update(self.getShopID())
@@ -432,64 +432,64 @@ class BaseEPayMod(Persistent):
 ##                      <input type="hidden" name="txtHash" value="%s">
 ##                      <input type="hidden" name="txtShopPara" value="%s">
 ##                      <td align="center"><input type="submit" value="%s" ></td>
-##                   </form>                           
-##                       """%(self.getUrl(),self.getMasterShopID(),"2057",prix,Currency,txtHash,param,"submit")         
+##                   </form>
+##                       """%(self.getUrl(),self.getMasterShopID(),"2057",prix,Currency,txtHash,param,"submit")
 ##        #s=cgi.escape(s)
 ##        return s
-    
+
 class BaseTransaction(Persistent):
 
-    def __init__(self):      
+    def __init__(self):
         pass
-    
+
     def getId(self):
         return""
-    
+
     def getTransactionHTML(self):
         return ""
-    
+
     def getTransactionHTMLModif(self):
-        return "" 
-    
+        return ""
+
     def isChangeable(self):
         return False
-    
+
 ##class TransactionYellowPay(BaseTransaction):
 ##
 ##    def __init__(self,parms):
 ##        BaseTransaction.__init__(self)
-##        self._Data=parms   
-##    
-##    
+##        self._Data=parms
+##
+##
 ##    def getId(self):
 ##        try:
 ##            if self._id:
 ##                pass
 ##        except AttributeError, e:
 ##            self._id="yellowpay"
-##        return self._id            
-##        
+##        return self._id
+##
 ##    def getTransactionHTML(self):
 ##
 ##        textOption="""
 ##                          <tr>
 ##                            <td align="right"><b>ESR Member:</b></td>
 ##                            <td align="left">%s</td>
-##                          </tr> 
+##                          </tr>
 ##                          <tr>
 ##                            <td align="right"><b>ESR Ref:</b></td>
 ##                            <td align="left">%s</td>
-##                          </tr>           
+##                          </tr>
 ##         """%(self._Data["ESR_Member"],self._Data["ESR_Ref"])
 ##        return"""<table>
 ##                          <tr>
 ##                            <td align="right"><b>Payment with:</b></td>
 ##                            <td align="left">YellowPay</td>
-##                          </tr>   
+##                          </tr>
 ##                          <tr>
 ##                            <td align="right"><b>Payment Date:</b></td>
 ##                            <td align="left">%s</td>
-##                          </tr>                                  
+##                          </tr>
 ##                          <tr>
 ##                            <td align="right"><b>TransactionID:</b></td>
 ##                            <td align="left">%s</td>
@@ -504,12 +504,12 @@ class BaseTransaction(Persistent):
 ##                          </tr>
 ##                          %s
 ##                        </table>"""%(self._Data["payment_date"],self._Data["TransactionID"], self._Data["OrderTotal"], \
-##                             self._Data["Currency"], self._Data["PayMet"],textOption)  
-##    def getTransactionTxt(self):   
+##                             self._Data["Currency"], self._Data["PayMet"],textOption)
+##    def getTransactionTxt(self):
 ##        textOption="""
 ##\tESR Member:%s\n
-##\tESR Ref:%s\n         
-##"""%(self._Data["ESR_Member"],self._Data["ESR_Ref"])        
+##\tESR Ref:%s\n
+##"""%(self._Data["ESR_Member"],self._Data["ESR_Ref"])
 ##        return"""
 ##\tPayment with:YellowPay\n
 ##\tPayment Date:%s\n
@@ -518,18 +518,18 @@ class BaseTransaction(Persistent):
 ##\tPayMet:%s
 ##%s
 ##"""%(self._Data["payment_date"],self._Data["TransactionID"], self._Data["OrderTotal"], \
-##                             self._Data["Currency"], self._Data["PayMet"],textOption)               
-        
+##                             self._Data["Currency"], self._Data["PayMet"],textOption)
+
 class PayLaterMod(BaseEPayMod):
 
     def __init__(self, data=None):
         BaseEPayMod.__init__(self)
-        self._title = "pay later"   
+        self._title = "pay later"
         self._detailPayment= ""
         if data is not None:
             setValue(data) #TODO: check this, it will fail
         self._id="paylater"
- 
+
     def getId(self):
         try:
             if self._id:
@@ -540,72 +540,72 @@ class PayLaterMod(BaseEPayMod):
 
     def clone(self, newSessions):
         sesf = PayLaterMod()
-        sesf.setTitle(self.getTitle())        
-        
-        
+        sesf.setTitle(self.getTitle())
+
+
         return sesf
 
     def setValues(self, data):
-        self.setTitle(data.get("title", "epayment"))   
+        self.setTitle(data.get("title", "epayment"))
         self.setdetailPayment(data.get("detailPayment", ""))
- 
+
     def getdetailPayment(self):
         return self._detailPayment
     def setdetailPayment(self, detailPayment):
-        self._detailPayment= detailPayment        
-        
+        self._detailPayment= detailPayment
+
     def getTitle(self):
         return self._title
     def setTitle(self, title):
         self._title = title
- 
-                             
+
+
 class TransactionPayLaterMod(BaseTransaction):
 
     def __init__(self,parms):
         BaseTransaction.__init__(self)
-        self._Data=parms   
-    
-    def isChangeable(self): return True  
-    
+        self._Data=parms
+
+    def isChangeable(self): return True
+
     def getId(self):
         try:
             if self._id:
                 pass
         except AttributeError, e:
             self._id="paylater"
-        return self._id            
-        
+        return self._id
+
     def getTransactionHTML(self):
 
         return"""<table>
                           <tr>
                             <td align="right"><b>Payment with:</b></td>
                             <td align="left">Pay later</td>
-                          </tr>                                 
+                          </tr>
                           <tr>
                             <td align="right"><b>OrderTotal:</b></td>
                             <td align="left">%s %s</td>
                           </tr>
                         </table>"""%(self._Data["OrderTotal"], \
-                             self._Data["Currency"])  
-                        
+                             self._Data["Currency"])
 
-        
-        
+
+
+
 ##class PayPalMod(BaseEPayMod):
 ##
 ##    def __init__(self, data=None):
 ##        BaseEPayMod.__init__(self)
 ##        self._title = "paypal"
 ##
-##        self._url="https://www.paypal.com/cgi-bin/webscr"    
+##        self._url="https://www.paypal.com/cgi-bin/webscr"
 ##        self._business= ""
-##          
+##
 ##        if data is not None:
 ##            setValue(data)
 ##        self._id="paypal"
-## 
+##
 ##    def getId(self):
 ##        try:
 ##            if self._id:
@@ -616,14 +616,14 @@ class TransactionPayLaterMod(BaseTransaction):
 ##
 ##    def clone(self, newSessions):
 ##        sesf = PayPalMod()
-##        sesf.setTitle(self.getTitle())        
+##        sesf.setTitle(self.getTitle())
 ##        sesf.setUrl(self.getUrl())
 ##        sesf.setBusiness(self.getBusiness())
 ##
 ##        return sesf
 ##
 ##    def setValues(self, data):
-##        self.setTitle(data.get("title", "epayment"))        
+##        self.setTitle(data.get("title", "epayment"))
 ##        self.setUrl(data.get("url", ""))
 ##        self.setBusiness(data["business"])
 ##
@@ -631,19 +631,19 @@ class TransactionPayLaterMod(BaseTransaction):
 ##        return self._title
 ##    def setTitle(self, title):
 ##        self._title = title
-##        
+##
 ##    def getUrl(self):
-##        return self._url    
+##        return self._url
 ##    def setUrl(self,url):
-##        self._url=url    
-##    
+##        self._url=url
+##
 ##    def getBusiness(self):
 ##        return self._business
 ##    def setBusiness(self,business):
 ##        self._business= business
-##          
 ##
-##        
+##
+##
 ##    def getFormHTML(self,prix,Currency,conf,registrant):
 ##        url_return=urlHandlers.UHPayConfirmPayPal.getURL(registrant)
 ##        url_cancel_return=urlHandlers.UHPayCancelPayPal.getURL(registrant)
@@ -658,32 +658,32 @@ class TransactionPayLaterMod(BaseTransaction):
 ##                        <input type="hidden" name="cancel_return" value="%s">
 ##                        <input type="hidden" name="notify_url" value="%s">
 ##                        <td align="center"><input type="submit" value="%s" ></td>
-##                   </form>                           
+##                   </form>
 ##                       """%(self.getUrl(),self.getBusiness(),prix,Currency,\
-##                            url_return,url_cancel_return,url_notify,"submit")         
+##                            url_return,url_cancel_return,url_notify,"submit")
 ##        #s=cgi.escape(s)
-##        return s        
+##        return s
 ##class TransactionPayPal(BaseTransaction):
 ##
 ##    def __init__(self,parms):
 ##        BaseTransaction.__init__(self)
-##        self._Data=parms   
-##    
-##    
+##        self._Data=parms
+##
+##
 ##    def getId(self):
 ##        try:
 ##            if self._id:
 ##                pass
 ##        except AttributeError, e:
 ##            self._id="paypal"
-##        return self._id            
-##        
-##    def getTransactionHTML(self):                
+##        return self._id
+##
+##    def getTransactionHTML(self):
 ##        return"""<table>
 ##                          <tr>
 ##                            <td align="right"><b>Payment with:</b></td>
 ##                            <td align="left">PayPal</td>
-##                          </tr>                                 
+##                          </tr>
 ##                          <tr>
 ##                            <td align="right"><b>Payment Date:</b></td>
 ##                            <td align="left">%s</td>
@@ -691,7 +691,7 @@ class TransactionPayLaterMod(BaseTransaction):
 ##                          <tr>
 ##                            <td align="right"><b>Payment ID:</b></td>
 ##                            <td align="left">%s</td>
-##                          </tr>                                  
+##                          </tr>
 ##                          <tr>
 ##                            <td align="right"><b>Order Total:</b></td>
 ##                            <td align="left">%s %s</td>
@@ -701,8 +701,8 @@ class TransactionPayLaterMod(BaseTransaction):
 ##                            <td align="left">%s</td>
 ##                          </tr>
 ##                        </table>"""%(self._Data["payment_date"],self._Data["payer_id"], self._Data["mc_gross"], \
-##                             self._Data["mc_currency"], self._Data["verify_sign"])           
-##    def getTransactionTxt(self):                
+##                             self._Data["mc_currency"], self._Data["verify_sign"])
+##    def getTransactionTxt(self):
 ##        return"""
 ##\tPayment with:PayPal\n
 ##\tPayment Date:%s\n
@@ -710,7 +710,7 @@ class TransactionPayLaterMod(BaseTransaction):
 ##\tOrder Total:%s %s\n
 ##\tverify sign:%s
 ##"""%(self._Data["payment_date"],self._Data["payer_id"], self._Data["mc_gross"], \
-##                             self._Data["mc_currency"], self._Data["verify_sign"])           
+##                             self._Data["mc_currency"], self._Data["verify_sign"])
 ##
 ### WorldPay module
 ##class WorldPayMod( BaseEPayMod ):
@@ -732,7 +732,7 @@ class TransactionPayLaterMod(BaseTransaction):
 ##                pass
 ##        except AttributeError, e:
 ##            self._id="worldpay"
-##        return self._id   
+##        return self._id
 ##
 ##    def getInstId(self):
 ##        try:
@@ -740,54 +740,54 @@ class TransactionPayLaterMod(BaseTransaction):
 ##        except:
 ##            self._instId = ""
 ##        return self._instId
-##    
+##
 ##    def setInstId(self, instId):
 ##        self._instId = instId
-##    
+##
 ##    def getTextCallBackSuccess(self):
 ##        try:
 ##            return self._textCallBackSuccess
 ##        except:
 ##            self._textCallBackSuccess = ""
 ##        return self._textCallBackSuccess
-##    
+##
 ##    def setTextCallBackSuccess(self, txt):
 ##        self._textCallBackSuccess = txt
-##    
+##
 ##    def getTextCallBackCancelled(self):
 ##        try:
 ##            return self._textCallBackCancelled
 ##        except:
 ##            self._textCallBackCancelled = ""
 ##        return self._textCallBackCancelled
-##    
+##
 ##    def setTextCallBackCancelled(self, txt):
 ##        self._textCallBackCancelled = txt
-##    
-##    
+##
+##
 ##    def getDescription(self):
 ##        try:
 ##            return self._description
 ##        except:
 ##            self._description = ""
 ##        return self._description
-##    
+##
 ##    def setDescription(self, description):
 ##        self._description = description
-##    
+##
 ##    def getTestMode(self):
 ##        try:
 ##            return self._testMode
 ##        except:
 ##            self._testMode = ""
 ##        return self._testMode
-##    
+##
 ##    def setTestMode(self, testMode):
 ##        self._testMode = testMode
 ##
 ##
 ##    def setValues(self, data):
-##        self.setTitle(data.get("title", "epayment"))        
+##        self.setTitle(data.get("title", "epayment"))
 ##        self.setUrl(data.get("url", ""))
 ##        self.setInstId(data["instId"])
 ##        self.setDescription(data["description"])
@@ -830,12 +830,12 @@ class TransactionPayLaterMod(BaseTransaction):
 ##        return self._title
 ##    def setTitle(self, title):
 ##        self._title = title
-##        
+##
 ##    def getUrl(self):
-##        return self._url  
-##      
+##        return self._url
+##
 ##    def setUrl(self,url):
-##        self._url=url   
+##        self._url=url
 ##
 ### World pay transaction
 ##
@@ -844,7 +844,7 @@ class TransactionPayLaterMod(BaseTransaction):
 ##
 ##    def __init__(self,params):
 ##        BaseTransaction.__init__(self)
-##        self._Data=params   
+##        self._Data=params
 ##
 ##    def getId(self):
 ##        try:
@@ -852,18 +852,18 @@ class TransactionPayLaterMod(BaseTransaction):
 ##                pass
 ##        except AttributeError, e:
 ##            self._id="worldpay"
-##        return self._id 
+##        return self._id
 ##
 ##    def getTransactionHTML(self):
 ##        return"""<table>
 ##                          <tr>
 ##                            <td align="right"><b>Payment with:</b></td>
 ##                            <td align="left">WorldPay</td>
-##                          </tr>   
+##                          </tr>
 ##                          <tr>
 ##                            <td align="right"><b>Payment date:</b></td>
 ##                            <td align="left">%s</td>
-##                          </tr>                                  
+##                          </tr>
 ##                          <tr>
 ##                            <td align="right"><b>TransactionID:</b></td>
 ##                            <td align="left">%s</td>
@@ -877,10 +877,10 @@ class TransactionPayLaterMod(BaseTransaction):
 ##                            <td align="left">%s</td>
 ##                          </tr>
 ##                  </table>"""%(self._Data["payment_date"],self._Data["transId"], self._Data["amount"], \
-##                             self._Data["currency"], self._Data["name"]) 
-##    
+##                             self._Data["currency"], self._Data["name"])
+##
 ##    def getTransactionTxt(self):
-##        """this is used for notification email """                
+##        """this is used for notification email """
 ##        return"""
 ##\tPayment with:WorldPay\n
 ##\tPayment Date:%s\n
@@ -888,4 +888,4 @@ class TransactionPayLaterMod(BaseTransaction):
 ##\tOrder Total:%s %s\n
 ##\tName n:%s
 ##"""%(self._Data["payment_date"],self._Data["transId"], self._Data["amount"], \
-##                             self._Data["currency"], self._Data["name"])   
+##                             self._Data["currency"], self._Data["name"])

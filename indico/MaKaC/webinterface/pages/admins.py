@@ -42,7 +42,6 @@ from MaKaC.common.pendingQueues import PendingSubmitterReminder, PendingManagerR
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC import roomMapping
 from MaKaC import domain
-from MaKaC import plugins
 from MaKaC.plugins.base import PluginsHolder
 import MaKaC.common.indexes as indexes
 import MaKaC.webinterface.personalization as personalization
@@ -50,6 +49,7 @@ from cgi import escape
 import re
 from MaKaC.i18n import _
 from MaKaC.modules.base import ModulesHolder
+from MaKaC.plugins.pluginLoader import PluginLoader
 
 class WPAdminsBase( WPMainBase ):
 
@@ -422,7 +422,7 @@ class WPAdminPlugins( WPAdminsBase ):
 
         self._tabs["Main"] = self._tabCtrl.newTab("Main", _("Main"), urlHandlers.UHAdminPlugins.getURL())
 
-        pluginTypes = PluginsHolder().getPluginTypes(sorted = True)
+        pluginTypes = PluginsHolder().getPluginTypes(doSort = True)
         for pluginType in pluginTypes:
             if pluginType.isVisible() and pluginType.isActive():
                 self._tabs[pluginType.getId()] = self._tabCtrl.newTab(pluginType.getName(), pluginType.getName(),
@@ -2471,7 +2471,7 @@ class WRoomBookingPluginAdmin( wcomponents.WTemplated ):
         else:
             vars["iconURL"] = iconDisabled
             vars["activationText"] = _("Click to ACTIVATE Room Booking Module")
-        rbPlugins = plugins.getPluginsByType("RoomBooking")
+        rbPlugins = PluginLoader.getPluginsByType("RoomBooking")
         vars["plugins"] = rbPlugins
         vars["zodbHost"] = self._rh._host
         vars["zodbPort"] = self._rh._port

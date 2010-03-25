@@ -8,7 +8,7 @@
     <% end %>
 
     <table>
-        <% for option in Object.getOptionList(sorted = True, includeOnlyEditable = True, includeOnlyVisible = True): %>
+        <% for option in Object.getOptionList(doSort = True, includeOnlyEditable = True, includeOnlyVisible = True): %>
         <tr>
             <td style="text-align: right;vertical-align:top; padding-right: 10px; width: 60%%;">
                 <%= option.getDescription() %>:
@@ -168,7 +168,7 @@
         </tr>
         <% end %>
 
-        <% for option in Object.getOptionList(sorted = True, includeOnlyNonEditable = True, includeOnlyVisible = True): %>
+        <% for option in Object.getOptionList(doSort = True, includeOnlyNonEditable = True, includeOnlyVisible = True): %>
         <tr>
             <td style="text-align: right; vertical-align:top; padding-right: 10px;width: 50%%;">
                 <%= option.getDescription() %>:
