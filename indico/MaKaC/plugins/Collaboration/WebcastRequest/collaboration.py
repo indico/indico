@@ -42,7 +42,7 @@ class CSBooking(CSBookingBase):
 
     _hasStartDate = False
 
-    _simpleParamaters = {
+    _simpleParameters = {
         "talks" : (str, ''),
         "talkSelectionComments": (str, ''),
         "talkSelection": (list, []),

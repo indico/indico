@@ -1045,7 +1045,7 @@ class CSBookingBase(Persistent):
             If you include a parameter in the _complexParameters list, you always have to implement the corresponding getter method.
         """
         bookingParams = {}
-        for k, v in self.__class__._simpleParamaters.iteritems():
+        for k, v in self.__class__._simpleParameters.iteritems():
             if k in self._bookingParams:
                 value = self._bookingParams[k]
             else:
@@ -1075,9 +1075,9 @@ class CSBookingBase(Persistent):
 
 
     def getBookingParamByName(self, paramName):
-        if paramName in self.__class__._simpleParamaters:
+        if paramName in self.__class__._simpleParameters:
             if not paramName in self._bookingParams:
-                self._bookingParams[paramName] = self.__class__._simpleParamaters[paramName][1]
+                self._bookingParams[paramName] = self.__class__._simpleParameters[paramName][1]
             return self._bookingParams[paramName]
         elif hasattr(self.__class__, "_complexParameters") and paramName in self.__class__._complexParameters:
             getterMethods = dict(inspect.getmembers(self, lambda m: inspect.ismethod(m) and m.__name__.startswith('get')))
@@ -1108,6 +1108,7 @@ class CSBookingBase(Persistent):
             Note: even if a parameter is in this list, you can decide not to implement its corresponding set
             method if you never expect the parameter name to come up inside 'params'.
         """
+
         sanitizeResult = self.sanitizeParams(params)
         if sanitizeResult:
             return sanitizeResult
@@ -1123,14 +1124,14 @@ class CSBookingBase(Persistent):
             self.setEndDateFromString(endDate)
 
         for k,v in params.iteritems():
-            if k in self._simpleParamaters:
-                if self._simpleParamaters[k][0]:
+            if k in self.__class__._simpleParameters:
+                if self.__class__._simpleParameters[k][0]:
                     try:
-                        v = self._simpleParamaters[k][0](v)
+                        v = self.__class__._simpleParameters[k][0](v)
                     except ValueError:
-                        raise CollaborationServiceException("Tried to set value of parameter with name " + str(k) + ", recognized as a simple parameter of type" + str(self._simpleParamaters[k]) + ", but the conversion failed")
+                        raise CollaborationServiceException("Tried to set value of parameter with name " + str(k) + ", recognized as a simple parameter of type" + str(self._simpleParameters[k]) + ", but the conversion failed")
                 self._bookingParams[k] = v
-            elif k in self._complexParameters:
+            elif k in self.__class__._complexParameters:
                 setterMethods = dict(inspect.getmembers(self, lambda m: inspect.ismethod(m) and m.__name__.startswith('set')))
                 setMethodName = 'set' + k[0].upper() + k[1:]
                 if setMethodName in setterMethods:
@@ -1139,6 +1140,10 @@ class CSBookingBase(Persistent):
                     raise CollaborationServiceException("Tried to set value of parameter with name " + str(k) + ", recognized as a complex parameter, but the corresponding setter method " + setMethodName + " is not implemented")
             else:
                 raise CollaborationServiceException("Tried to set the value of a parameter with name " + str(k) + " that was not declared")
+
+        for k, v in self.__class__._simpleParameters.iteritems():
+            if not k in self._bookingParams:
+                self._bookingParams[k] = self.__class__._simpleParameters[k][1]
 
         if self.needsBookingParamsCheck():
             return self._checkBookingParams()

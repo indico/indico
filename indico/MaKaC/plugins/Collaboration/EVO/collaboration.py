@@ -50,7 +50,7 @@ class CSBooking(CSBookingBase):
 
     _commonIndexes = ["All Videoconference"]
 
-    _simpleParamaters = {
+    _simpleParameters = {
         "communityId": (str, ''),
         "meetingTitle": (str, ''),
         "meetingDescription": (str, None),
