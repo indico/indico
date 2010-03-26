@@ -179,6 +179,13 @@ class GetMaterialClassesBase(MaterialDisplayBase):
     Base class for obtaining a listing of material classes
     """
 
+    def _checkParams( self ):
+        l = locators.WebLocator()
+
+        l.setMaterial( self._params, 0 )
+        self._target = l.getObject()
+
+
     def _getAnswer(self):
         """
         Provides the list of material classes, based on the target
