@@ -25,6 +25,8 @@ from MaKaC.common.utils import formatDateTime, formatTwoDates, formatTime,\
 from MaKaC.common.timezoneUtils import getAdjustedDate, isSameDay
 from MaKaC.common.Configuration import Config
 from MaKaC.conference import Contribution
+from MaKaC.plugins.Collaboration.fossils import ICSBookingBaseIndexingFossil,\
+    IQueryResultFossil
 
 class CollaborationTools(object):
     """ Class with utility classmethods for the Collaboration plugins core and plugins
@@ -280,6 +282,29 @@ class CollaborationTools(object):
             if cls.getCSBookingClass(pluginName)._shouldBeIndexed:
                 l.append(pluginName)
         return l
+
+    @classmethod
+    def getIndexingFossil(cls, pluginName):
+        """ Utility function that returns the fossil that should be used for indexing for a given plugin
+        """
+        fossilsModule = cls.getModule(pluginName).fossils
+        if hasattr(fossilsModule, "ICSBookingIndexingFossil"):
+            return fossilsModule.ICSBookingIndexingFossil
+        else:
+            return ICSBookingBaseIndexingFossil
+
+    @classmethod
+    def updateIndexingFossilsDict(cls):
+        """ Utility function that updates IQueryResultFossil's getResults method
+            with the proper dict in order to fossilize bookings for the VS Overview page
+        """
+        fossilDict = {}
+        for pluginName in cls.getCollaborationPluginType().getPlugins():
+            classObject = cls.getCSBookingClass(pluginName)
+            fossilClassObject = cls.getIndexingFossil(pluginName)
+            fossilDict[classObject] = fossilClassObject
+
+        IQueryResultFossil.get('getResults').setTaggedValue('result', fossilDict)
 
     @classmethod
     def getXMLGenerator(cls, pluginName):

@@ -36,8 +36,12 @@ from MaKaC.common.logger import Logger
 from MaKaC.common.Counter import Counter
 from MaKaC.services.interface.rpc.json import unicodeToUtf8
 import socket
+from MaKaC.plugins.Collaboration.CERNMCU.fossils import ICSBookingIndexingFossil
+from MaKaC.common.fossilize import fossilizes
+from MaKaC.plugins.Collaboration.fossils import ICSBookingBaseConfModifFossil
 
-class CSBooking(CSBookingBase):
+class CSBooking(CSBookingBase): #already Fossilizable
+    fossilizes(ICSBookingBaseConfModifFossil, ICSBookingIndexingFossil)
 
     _hasTitle = True
     _hasStart = True

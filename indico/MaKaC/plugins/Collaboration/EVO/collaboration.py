@@ -32,11 +32,12 @@ from MaKaC.common.mail import GenericMailer
 from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
-from MaKaC.plugins.Collaboration.EVO.fossils import ICSBookingConfModifFossil
+from MaKaC.plugins.Collaboration.EVO.fossils import ICSBookingConfModifFossil,\
+    ICSBookingIndexingFossil
 from MaKaC.common.fossilize import fossilizes
 
 class CSBooking(CSBookingBase): #already Fossilizable
-    fossilizes(ICSBookingConfModifFossil)
+    fossilizes(ICSBookingConfModifFossil, ICSBookingIndexingFossil)
 
     _hasTitle = True
     _hasStart = True

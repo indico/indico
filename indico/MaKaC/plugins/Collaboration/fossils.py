@@ -188,7 +188,9 @@ class IQueryResultFossil(IFossil):
 
     def getResults(self):
         pass
-    getResults.result = ICSBookingBaseIndexingFossil
+    getResults.result = None
+    #the .result tag will be updated at run time because it is a dictionary whose values
+    #depend on the loaded plugins, therefore, on the database state
 
     def getNumberOfBookings(self):
         pass

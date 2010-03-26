@@ -100,7 +100,8 @@ class CollaborationIndex(Persistent):
             finalResult = QueryResult([], 0, 0, 0)
 
         if pickle:
-            return fossilize(finalResult, None, tz = tz)
+            CollaborationTools.updateIndexingFossilsDict()
+            return fossilize(finalResult, IQueryResultFossil, tz = tz)
         else:
             return finalResult
 

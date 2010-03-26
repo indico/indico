@@ -18,7 +18,22 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.common.fossilize import IFossil
-from MaKaC.plugins.Collaboration.fossils import ICSErrorBaseFossil
+from MaKaC.plugins.Collaboration.fossils import ICSErrorBaseFossil,\
+    ICSBookingBaseIndexingFossil
+
+
+
+def removePin(bookingParams):
+    del bookingParams["pin"]
+    return bookingParams
+
+class ICSBookingIndexingFossil(ICSBookingBaseIndexingFossil):
+
+    def getBookingParams(self):
+        """ Overloading of ICSBookingBaseFossil's getBookingParams to remove the pin """
+    getBookingParams.convert = lambda bookingParams: removePin(bookingParams)
+
+
 
 class IParticipantFossil(IFossil):
 

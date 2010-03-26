@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.plugins.Collaboration.fossils import ICSBookingBaseConfModifFossil,\
-    ICSErrorBaseFossil
+    ICSErrorBaseFossil, ICSBookingBaseIndexingFossil
 from MaKaC.common.fossilize import IFossil
 
 class ICSBookingConfModifFossil(ICSBookingBaseConfModifFossil):
@@ -40,6 +40,17 @@ class ICSBookingConfModifFossil(ICSBookingBaseConfModifFossil):
 
     def getChangesFromEVO(self):
         pass
+
+
+def removeAccessPassword(bookingParams):
+    del bookingParams["accessPassword"]
+    return bookingParams
+
+class ICSBookingIndexingFossil(ICSBookingBaseIndexingFossil):
+
+    def getBookingParams(self):
+        """ Overloading of ICSBookingBaseFossil's getBookingParams to remove the pin """
+    getBookingParams.convert = lambda bookingParams: removeAccessPassword(bookingParams)
 
 
 class IEVOErrorFossil(ICSErrorBaseFossil):
