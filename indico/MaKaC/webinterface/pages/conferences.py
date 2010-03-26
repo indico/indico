@@ -11844,12 +11844,7 @@ class WPConfModifRoomBookingBase( WPConferenceModifBase ):
         <!-- Our libs -->
         <script type="text/javascript" src="%s/js/indico/Legacy/validation.js"></script>
 
-        <!-- Calendar -->
-        <link rel="stylesheet" type="text/css" href="%s/css/calendar-blue.css" />
-        <script type="text/javascript" src="%s"></script>
-        <script type="text/javascript" src="%s"></script>
-        """ % ( baseurl, baseurl, baseurl, baseurl, urlHandlers.UHJavascriptCalendar.getURL(),
-                urlHandlers.UHJavascriptCalendarSetup.getURL() )
+        """ % ( baseurl, baseurl, baseurl )
 
     def _setActiveSideMenuItem(self):
         self._roomBookingMenuItem.setActive()
