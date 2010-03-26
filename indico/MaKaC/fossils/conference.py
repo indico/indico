@@ -20,6 +20,7 @@
 
 from MaKaC.common.fossilize import IFossil
 from MaKaC.common.Conversion import Conversion
+from MaKaC.webinterface import urlHandlers
 
 class IConferenceMinimalFossil(IFossil):
 
@@ -54,4 +55,119 @@ class IConferenceMinimalFossil(IFossil):
     def getSupportEmail(self):
         """ Support Email """
 
+class IConferenceParticipationFossil(IFossil):
 
+    def getFirstName( self ):
+        """ Conference Participation First Name """
+
+    def getFamilyName( self ):
+        """ Conference Participation Family Name """
+
+
+class IResourceFossil(IFossil):
+
+    def getName(self):
+        """ Name of the Resource """
+
+
+class ILinkFossil(IResourceFossil):
+
+    def getURL(self):
+        """ URL of the file pointed by the link """
+    getURL.name = "url"
+
+class ILocalFileFossil(IResourceFossil):
+
+    def getURL(self):
+        """ URL of the Local File """
+    getURL.produce = lambda s: str(urlHandlers.UHFileAccess.getURL(s))
+    getURL.name = "url"
+
+
+class IMaterialFossil(IFossil):
+
+    def getTitle( self ):
+        """ Material Title """
+
+    def getResourceList(self):
+        """ Material Resource List """
+    getResourceList.result = {"MaKaC.conference.Link": ILinkFossil, "MaKaC.conference.LocalFile": ILocalFileFossil}
+    getResourceList.name = "resources"
+
+
+class ISessionFossil(IFossil):
+
+    def getTitle(self):
+        """ Session Title """
+
+    def getId(self):
+        """ Session Id """
+    getId.name = "sessionId"
+
+    def getDescription(self):
+        """ Session Description """
+
+    def getAllMaterialList(self):
+        """ Session List of all material """
+    getAllMaterialList.result = IMaterialFossil
+    getAllMaterialList.name = "material"
+
+    def getColor(self):
+        """ Session Color """
+
+    def getTextColor(self):
+        """ Session Text Color """
+
+    def isPoster(self):
+        """ Is self a Poster Session ? """
+    isPoster.produce = lambda s: s.getScheduleType() == 'poster'
+
+
+class ISessionSlotFossil(IFossil):
+
+    def getSession(self):
+        """ Slot Session """
+    getSession.result = ISessionFossil
+
+    def getId(self):
+        """ Session Slot Id """
+    getId.name = "sessionSlotId"
+
+    def getTitle(self):
+        """ Session Slot Title """
+    getTitle.name = "slotTitle"
+
+    def getConference(self):
+        """ Session Slot Conference """
+    getConference.result = IConferenceMinimalFossil
+
+    def getRoom(self):
+        """ Session Slot Room """
+    getRoom.convert = Conversion.roomName
+
+    def getLocationName(self):
+        """ Session Slot Location Name """
+    getLocationName.produce = lambda s: s.getLocation()
+    getLocationName.convert = Conversion.locationName
+    getLocationName.name = "location"
+
+    def getLocationAddress(self):
+        """ Session Slot Location Address """
+    getLocationAddress.produce = lambda s: s.getLocation()
+    getLocationAddress.convert = Conversion.locationAddress
+    getLocationAddress.name = "address"
+
+    def inheritRoom(self):
+        """ Does the Session inherit a Room ?"""
+    inheritRoom.produce = lambda s: s.getOwnRoom() is None
+    inheritRoom.name = "inheritRoom"
+
+    def inheritLocation(self):
+        """ Does the Session inherit a Location ?"""
+    inheritLocation.produce = lambda s: s.getOwnLocation() is None
+    inheritLocation.name = "inheritLoc"
+
+    def getOwnConvenerList(self):
+        """ Session Slot Conveners List """
+    getOwnConvenerList.result = IConferenceParticipationFossil
+    getOwnConvenerList.name = "conveners"

@@ -35,6 +35,11 @@ from MaKaC.common.PickleJar import Retrieves
 from MaKaC.common.PickleJar import DictPickler
 from MaKaC.common.Conversion import Conversion
 from MaKaC.common.contextManager import ContextManager
+from MaKaC.common.fossilize import Fossilizable, fossilizes
+from MaKaC.fossils.schedule import IContribSchEntryDisplayFossil,\
+        IContribSchEntryMgmtFossil, IBreakTimeSchEntryFossil,\
+        IBreakTimeSchEntryMgmtFossil,\
+        ILinkedTimeSchEntryDisplayFossil, ILinkedTimeSchEntryMgmtFossil
 
 class Schedule:
     """base schedule class. Do NOT instantiate
@@ -463,7 +468,7 @@ class TimeSchedule(Schedule, Persistent):
                 entry.setStartDate(entry.getStartDate()+diff, check=0, moveEntries=1)
 
 
-class SchEntry(Persistent):
+class SchEntry(Persistent, Fossilizable):
     """base schedule entry class. Do NOT instantiate
     """
 
@@ -554,9 +559,11 @@ class SchEntry(Persistent):
     def recover(self):
         pass
 
-class ConferenceSchedule(TimeSchedule):
+class ConferenceSchedule(TimeSchedule, Fossilizable):
     """
     """
+
+#    fossilizes(IConferenceScheduleDisplayFossil, IConferenceScheduleMgmtFossil)
 
     def __init__(self,conf):
         TimeSchedule.__init__(self,conf)
@@ -584,6 +591,7 @@ class ConferenceSchedule(TimeSchedule):
     def moveUpEntry(self,entry,tz=None):
         #not very smart, should be improved: contribs with same start date,
         #   can cause overlapings
+
         if not tz:
             tz = self.getTimezone()
         entriesDay=self.getEntriesOnDay(entry.getAdjustedStartDate())
@@ -930,6 +938,8 @@ class TimeSchEntry(SchEntry):
 
 class LinkedTimeSchEntry(TimeSchEntry):
 
+    fossilizes(ILinkedTimeSchEntryDisplayFossil,
+               ILinkedTimeSchEntryMgmtFossil)
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'title', lambda x: x.getOwner().getSession().getTitle())
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'slotTitle', lambda x: x.getOwner().getTitle())
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'id', Conversion.locatorString)
@@ -937,8 +947,8 @@ class LinkedTimeSchEntry(TimeSchEntry):
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'sessionSlotId', lambda x: x.getOwner().getId())
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'entryType', lambda x: 'Session')
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'material', lambda x: DictPickler.pickle(x.getOwner().getSession().getAllMaterialList()))
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'color', lambda x: x.getOwner().getSession().getColor())
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'textColor', lambda x: x.getOwner().getSession().getTextColor())
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'color', lambda x: x.getOwner().getColor())
+    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'textColor', lambda x: x.getOwner().getTextColor())
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'isPoster', lambda x: x.getOwner().getSession().getScheduleType() == 'poster')
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'room', lambda x: Conversion.roomName(x.getOwner().getRoom()))
     @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'location', lambda x: Conversion.locationName(x.getOwner().getLocation()))
@@ -1118,6 +1128,7 @@ class IndTimeSchEntry(TimeSchEntry):
 
 class BreakTimeSchEntry(IndTimeSchEntry):
 
+    fossilizes(IBreakTimeSchEntryFossil, IBreakTimeSchEntryMgmtFossil)
     @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'], 'entryType', lambda x: 'Break')
     @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'], 'conferenceId', lambda x: x.getOwner().getConference().getId())
     @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'sessionId', Conversion.parentSession)
@@ -1417,6 +1428,9 @@ class BreakTimeSchEntry(IndTimeSchEntry):
 
 class ContribSchEntry(LinkedTimeSchEntry):
 
+    fossilizes(IContribSchEntryDisplayFossil,
+               IContribSchEntryMgmtFossil )
+
     @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'entryType', lambda x: 'Contribution')
     @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'sessionId', Conversion.parentSession)
     @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'sessionSlotId', Conversion.parentSlot)
@@ -1454,10 +1468,23 @@ class ContribSchEntry(LinkedTimeSchEntry):
 class ScheduleToJson:
 
     @staticmethod
-    def processEntry(obj, tz, aw):
+    def processEntry(obj, tz, aw, mgmtMode = False, useAttrCache = False):
 
-        #raise "duration: " + (datetime(1900,1,1)+obj.getDuration()).strftime("%Hh%M'") + ''
-        entry = DictPickler.pickle(obj, timezone=tz)
+        if mgmtMode:
+            if isinstance(obj, BreakTimeSchEntry):
+                entry = obj.fossilize(IBreakTimeSchEntryMgmtFossil, useAttrCache = useAttrCache)
+            elif isinstance(obj, ContribSchEntry):
+                entry = obj.fossilize(IContribSchEntryMgmtFossil, useAttrCache = useAttrCache)
+            elif isinstance(obj, LinkedTimeSchEntry):
+                entry = obj.fossilize(ILinkedTimeSchEntryMgmtFossil, useAttrCache = useAttrCache)
+            else:
+                entry = obj.fossilize(useAttrCache = useAttrCache)
+        else:
+            # the fossils used for the display of entries
+            # will be taken by default, since they're first
+            # in the list of their respective Fossilizable
+            # objects
+            entry = obj.fossilize(useAttrCache = useAttrCache)
 
         genId = entry['id']
 
@@ -1470,7 +1497,20 @@ class ScheduleToJson:
             entries = {}
             for contrib in sessionSlot.getSchedule().getEntries():
                 if ScheduleToJson.checkProtection(contrib, aw):
-                    contribData = DictPickler.pickle(contrib, timezone=tz)
+                    if mgmtMode:
+                        if isinstance(contrib, ContribSchEntry):
+                            contribData = contrib.fossilize(IContribSchEntryMgmtFossil, useAttrCache = useAttrCache)
+                        elif isinstance(contrib, BreakTimeSchEntry):
+                            contribData = contrib.fossilize(IBreakTimeSchEntryMgmtFossil, useAttrCache = useAttrCache)
+                        else:
+                            contribData = contrib.fossilize(useAttrCache = useAttrCache)
+                    else:
+                        # the fossils used for the display of entries
+                        # will be taken by default, since they're first
+                        # in the list of their respective Fossilizable
+                        # objects
+                        contribData = contrib.fossilize(useAttrCache = useAttrCache)
+
                     entries[contribData['id']] = contribData
 
             entry['entries'] = entries
@@ -1496,28 +1536,29 @@ class ScheduleToJson:
                 canBeDisplayed = True
         return canBeDisplayed
 
-
     @staticmethod
-    def process(schedule, tz, aw, days = None):
+    def process(schedule, tz, aw, days = None, mgmtMode = False, useAttrCache = False):
 
         scheduleDict={}
 
         if not days:
             days = daysBetween(schedule.getAdjustedStartDate(tz), schedule.getAdjustedEndDate(tz))
 
-        for day in days:
-            dayEntry = {}
+        dates = [d.strftime("%Y%m%d") for d in days]
 
-            for obj in schedule.getEntriesOnDay(day):
+        # Generating the days dictionnary
+        for d in dates:
+            scheduleDict[d] = {}
 
-                if ScheduleToJson.checkProtection(obj, aw):
-                    genId, pickledData = ScheduleToJson.processEntry(obj, tz, aw)
+        # Filling the day dictionnary with entries
+        for obj in schedule.getEntries():
 
-                    # exclude entries that start in the day before
-                    if obj.getAdjustedStartDate(tz).date() == day.date():
-                        dayEntry[genId] = pickledData
-
-            scheduleDict[day.strftime("%Y%m%d")] = dayEntry
+            if ScheduleToJson.checkProtection(obj, aw):
+                genId, resultData = ScheduleToJson.processEntry(obj, tz, aw, mgmtMode, useAttrCache)
+                day = obj.getAdjustedStartDate(tz).strftime("%Y%m%d")
+                # verify that start date is in dates
+                if day in dates:
+                    scheduleDict[day][genId] = resultData
 
         return scheduleDict
 

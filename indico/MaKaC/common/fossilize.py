@@ -32,7 +32,6 @@ import inspect
 import re
 import zope.interface
 from types import NoneType, ClassType, TypeType
-from persistent.interfaces import IPersistent
 
 
 def fossilizes(*classList):
@@ -85,9 +84,10 @@ class Fossilizable:
 
     __fossilNameRE = re.compile('^I(\w+)Fossil$')
     __methodNameRE = re.compile('^get(\w+)|(has\w+)|(is\w+)$')
-    __methodNameRE = re.compile('^get(.*)|(has.+)|(is.+)$')
     __methodNameCache = {}
     __fossilNameCache = {}
+    __fossilAttrsCache = {} # Attribute Cache for Fossils with
+                            # fields that are repeated
 
     @classmethod
     def __extractName(cls, name):
@@ -147,8 +147,8 @@ class Fossilizable:
         """
         if interfaceArg is None:
             #we try to take the 1st interface declared with fossilizes
-            implementedInterfaces = list(zope.interface.implementedBy(self.__class__))
-            if not implementedInterfaces or implementedInterfaces[0] == IPersistent:
+            implementedInterfaces = list(i for i in zope.interface.implementedBy(self.__class__) if i.extends(IFossil))
+            if not implementedInterfaces:
                 raise NonFossilizableException("Object %s of class %s cannot be fossilized,"
                                                "no fossils were declared for it" %
                                                (str(self),
@@ -158,20 +158,13 @@ class Fossilizable:
 
         elif type(interfaceArg) is dict:
 
-            found = False
-            clazz = self.__class__
+            className = self.__class__.__module__ + '.' + \
+                        self.__class__.__name__
 
-            for key in interfaceArg.iterkeys():
-                if (key == clazz.__name__ or #class name
-                    key == "%s.%s" % (clazz.__module__, clazz.__name__) or #full class name
-                    key == clazz or #class
-                    (type(key) == ClassType or type(key) == TypeType or type(key) == tuple) and isinstance(self, key)): #class (including base classes)
-
-                    interface = interfaceArg[key]
-                    found = True
-                    break
-
-            if not found:
+            # interfaceArg is a dictionary of class:Fossil pairs
+            if className in interfaceArg:
+                interface = interfaceArg[className]
+            else:
                 raise NonFossilizableException("Object %s of class %s cannot be fossilized; "
                                                "its class was not a key in the provided fossils dictionary" %
                                                (str(self),
@@ -180,6 +173,7 @@ class Fossilizable:
             interface = interfaceArg
 
         if not interface.providedBy(self):
+
             raise WrongFossilTypeException("Interface '%s' not provided"
                                            " by '%s'" %
                                            (interface.__name__,
@@ -189,14 +183,14 @@ class Fossilizable:
 
 
     @classmethod
-    def _fossilizeIterable(cls, target, interface, **kwargs):
+    def _fossilizeIterable(cls, target, interface, useAttrCache = False, **kwargs):
         """
         Fossilizes an object, be it a 'direct' fossilizable
         object, or an iterable (dict, list, set);
         """
 
         if isinstance(target, Fossilizable):
-            return target.fossilize(interface, **kwargs)
+            return target.fossilize(interface, useAttrCache, **kwargs)
         else:
             ttype = type(target)
             if ttype in [int, str, float, NoneType]:
@@ -204,25 +198,27 @@ class Fossilizable:
             elif ttype in [list, set, tuple]:
                 container = [] #we turn sets and tuples into lists since JSON does not have sets / tuples
                 for elem in target:
-                    container.append(fossilize(elem, interface, **kwargs))
+                    container.append(fossilize(elem, interface, useAttrCache, **kwargs))
                 return container
             elif ttype is dict:
                 container = {}
                 for key, value in target.iteritems():
-                    container[key] = fossilize(value, interface, **kwargs)
+                    container[key] = fossilize(value, interface, useAttrCache, **kwargs)
                 return container
             else:
                 raise NonFossilizableException()
 
-            return fossilize(target, interface)
+            return fossilize(target, interface, useAttrCache)
 
-
-    def fossilize(self, interfaceArg = None, **kwargs):
+    def fossilize(self, interfaceArg = None, useAttrCache = False, **kwargs):
         """
         Fossilizes the object, using the fossil provided by `interface`.
 
         :param interfaceArg: the target fossile type
         :type interfaceArg: IFossil, NoneType, or dict
+        :param useAttrCache: use caching of attributes if same fields are
+            repeated for a fossil
+        :type useAttrCache: boolean
         """
 
         interface = self.__obtainInterface(interfaceArg)
@@ -235,16 +231,35 @@ class Fossilizable:
         for method in interface:
 
             tags = interface[method].getTaggedValueTags()
-            #Please use 'produce' as little as possible; there is almost always a more elegant and modular solution!
-            if 'produce' in tags:
-                methodResult = interface[method].getTaggedValue('produce')(self)
-            else:
-                methodResult = getattr(self, method)()
+
+            # In some cases it is better to use the attribute cache to
+            # speed up the fossilization
+            cacheUsed = False
+            if useAttrCache:
+                try:
+                    methodResult = self.__fossilAttrsCache[self._p_oid][method]
+                    cacheUsed = True
+                except KeyError:
+                    pass
+            if not cacheUsed:
+                #Please use 'produce' as little as possible; there is almost always a more elegant and modular solution!
+                if 'produce' in tags:
+                    methodResult = interface[method].getTaggedValue('produce')(self)
+                else:
+                    methodResult = getattr(self, method)()
+
+                if hasattr(self, "_p_oid"):
+                    try:
+                        self.__fossilAttrsCache[self._p_oid]
+                    except KeyError:
+                        self.__fossilAttrsCache[self._p_oid] = {}
+                    self.__fossilAttrsCache[self._p_oid][method] = methodResult
 
             # Result conversion
             if 'result' in tags:
                 targetInterface = interface[method].getTaggedValue('result')
                 #targetInterface = globals()[targetInterfaceName]
+
                 methodResult = Fossilizable._fossilizeIterable(
                     methodResult, targetInterface, **kwargs)
 
@@ -263,7 +278,27 @@ class Fossilizable:
             else:
                 attrName = self.__extractName(method)
 
-            result[attrName] = methodResult
+            # In case the name contains dots, each of the 'domains' but the
+            # last one are translated into nested dictionnaries. For example,
+            # if we want to re-name an attribute into "foo.bar.tofu", the
+            # corresponding fossilized attribute will be of the form:
+            # {"foo":{"bar":{"tofu": res,...},...},...}
+            # instead of:
+            # {"foo.bar.tofu": res, ...}
+
+            current = result
+            attrList = attrName.split('.')
+
+            while len(attrList) > 1:
+                attr = attrList.pop(0)
+                try:
+                    current = current[attr]
+                except KeyError:
+                    current[attr] = {}
+                    current = current[attr]
+
+            # For the last attribute level
+            current[attrList[0]] = methodResult
 
         if "_type" in result or "_fossil" in result:
             raise InvalidFossilException('"_type" or "_fossil"'
@@ -278,7 +313,7 @@ class Fossilizable:
         return result
 
 
-def fossilize(target, interfaceArg = None, **kwargs):
+def fossilize(target, interfaceArg = None, useAttrCache = False, **kwargs):
     """
     Method that allows the "fossilization" process to
     be called on data structures (lists, dictionaries
@@ -288,5 +323,7 @@ def fossilize(target, interfaceArg = None, **kwargs):
     :type target: Fossilizable
     :param interfaceArg: target fossil type
     :type interfaceArg: IFossil, NoneType, or dict
+    :param useAttrCache: use the attribute caching
+    :type useAttrCache: boolean
     """
-    return Fossilizable._fossilizeIterable(target, interfaceArg, **kwargs)
+    return Fossilizable._fossilizeIterable(target, interfaceArg, useAttrCache, **kwargs)

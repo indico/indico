@@ -884,11 +884,6 @@ class WPMConfClone(conferences.WPConfClone):
 class WPMConfModifSchedule(conferences.WPConfModifScheduleGraphic):
     pass
 
-class WMConfModifSchedule(conferences.WConfModifScheduleGraphic):
-
-    def __init__(self, conf, aw, timetable, days):
-        conferences.WConfModifScheduleGraphic.__init__(self, conf, aw, timetable, days, tpl_name='ConfModifScheduleGraphic')
-
 ## Add Contributions to main meeting ##
 class WPMConfAddContribution(conferences.WPModScheduleNewContrib):
 

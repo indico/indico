@@ -50,10 +50,43 @@ class IContributionFossil(IFossil):
         pass
     getDuration.convert = Conversion.duration
 
-class IContributionParticipationFossil(IFossil):
+    def getDescription(self):
+        pass
+
+
+class IContributionParticipationTTDisplayFossil(IFossil):
+    """
+    Minimal Fossil for Contribution Participation to be
+    used by the timetable display
+    """
+
+    def getAffiliation(self):
+        pass
+
+    def getFullNameNoTitle(self):
+        pass
+    getFullNameNoTitle.name = "name"
+
+
+class IContributionParticipationTTMgmtFossil(IFossil):
+    """
+    Minimal Fossil for Contribution Participation to be
+    used by the timetable management
+    """
+
+    def getFullNameNoTitle(self):
+        pass
+    getFullNameNoTitle.name = "name"
+
+class IContributionParticipationMinimalFossil(IFossil):
 
     def getId(self):
         pass
+
+    def getFullName(self):
+        pass
+
+class IContributionParticipationFossil(IContributionParticipationMinimalFossil):
 
     def getTitle(self):
         pass
@@ -62,9 +95,6 @@ class IContributionParticipationFossil(IFossil):
         pass
 
     def getFamilyName(self):
-        pass
-
-    def getFullName(self):
         pass
 
     def getEmail(self):
@@ -83,12 +113,11 @@ class IContributionParticipationFossil(IFossil):
         pass
 
 
-
 class IContributionWithSpeakersFossil(IContributionFossil):
 
     def getSpeakerList(self):
         pass
-    getSpeakerList.result = IContributionParticipationFossil
+    getSpeakerList.result = IContributionParticipationMinimalFossil
 
 class IContributionWithSubContribsFossil(IContributionFossil):
 

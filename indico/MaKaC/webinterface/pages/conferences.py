@@ -1153,7 +1153,9 @@ class WConferenceTimeTable(wcomponents.WTemplated):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         tz = DisplayTZ(self._aw,self._conf).getDisplayTZ()
-        vars["ttdata"] = simplejson.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(), tz, self._aw))
+        vars["ttdata"] = simplejson.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(),
+                                                                          tz, self._aw,
+                                                                          useAttrCache = True))
         vars['eventInfo'] = simplejson.dumps(DictPickler.pickle(self._conf, timezone=tz))
         return vars
 
@@ -3142,12 +3144,9 @@ class WScheduleSlot(wcomponents.WTemplated):
 
 class WConfModifScheduleGraphic(wcomponents.WTemplated):
 
-    def __init__(self, conference, aw, timetable, dayList, **params):
+    def __init__(self, conference, **params):
         wcomponents.WTemplated.__init__(self, **params)
         self._conf = conference
-        self._aw = aw
-        self._timetable = timetable
-        self._dayList = dayList
 
     def getVars( self ):
         vars=wcomponents.WTemplated.getVars(self)
@@ -3163,24 +3162,8 @@ class WConfModifScheduleGraphic(wcomponents.WTemplated):
         #################################
         vars["editURL"]=quoteattr(str(urlHandlers.UHConfModScheduleDataEdit.getURL(self._conf)))
 
-        # the list of days specified by the user through the option box
-        vars["daysParam"] = self._dayList
-        # the list of days from the timetable
-        vars["dayList"]=self._timetable.getDayList()
-        # the first day of the list
-        vars["dayDate"]=self._dayList[0].getDate()
-
-        vars["addSessionURL"]=urlHandlers.UHConfAddSession.getURL(self._conf)
-        vars["addBreakURL"]=urlHandlers.UHConfAddBreak.getURL(self._conf)
-
-        originURL = urlHandlers.UHConfModifSchedule.getURL(self._conf)
-        newContribURL = urlHandlers.UHConfModScheduleNewContrib.getURL(self._conf)
-        newContribURL.addParam("originURL",originURL)
-        newContribURL.addParam("eventType","meeting")
-        vars["newContribURL"] = newContribURL
-        vars['rbActive'] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
-
-        vars['ttdata'] = simplejson.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(), tz, None))
+        vars['ttdata'] = simplejson.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(), tz, None,
+                                                                          days = None, mgmtMode = True))
         vars['eventInfo'] = simplejson.dumps(DictPickler.pickle(self._conf, timezone=tz))
 
         return vars
@@ -3191,7 +3174,6 @@ class WPConfModifScheduleGraphic( WPConferenceModifBase ):
 
     def __init__(self, rh, conf):
         WPConferenceModifBase.__init__(self, rh, conf)
-        self._session = None
         self._contrib = None
 
     def _setActiveSideMenuItem( self ):
@@ -3201,45 +3183,8 @@ class WPConfModifScheduleGraphic( WPConferenceModifBase ):
         return WPConferenceModifBase.getJSFiles(self) + \
                self._includeJSPackage('Timetable')
 
-    def _generateTimetable(self):
-        tz = self._conf.getTimezone()
-        timeTable = timetable.TimeTable(self._conf.getSchedule(), tz)
-        #######################################
-        # Fermi timezone awareness            #
-        #######################################
-        sDate = self._conf.getSchedule().getStartDate(tz)
-        eDate = self._conf.getSchedule().getEndDate(tz)
-        #######################################
-        # Fermi timezone awareness(end)       #
-        #######################################
-        timeTable.setStartDate(sDate)
-        timeTable.setEndDate(eDate)
-        #timeTable.setStartDayTime(7,0)
-        #timeTable.setEndDayTime(21,59)
-        timeTable.mapEntryList(self._conf.getSchedule().getEntries())
-
-        return timeTable
-
-    def _getSchedule(self):
-        return WConfModifScheduleGraphic( self._conf, self._getAW(), self._timetable, self._days)
-
     def _getTTPage( self, params ):
-
-        params["session"] = self._session
-
-        days = params.get("days", None)
-
-        timeTable= self._generateTimetable()
-
-        if days == None or days == 'all':
-            dayList = timeTable.getDayList()
-        else:
-            dayList = [timeTable.getDayList()[int(days)]]
-
-        self._days = dayList
-        self._timetable = timeTable
-
-        wc = self._getSchedule()
+        wc = WConfModifScheduleGraphic( self._conf)
         return wc.getHTML(params)
 
     def _getPageContent(self, params):

@@ -1,4 +1,4 @@
-{ 
+{
     checkParams : function () {
         return {
             "permission": ["radio", false, function(option, values){
@@ -24,7 +24,7 @@
             }]
         }
     },
-    
+
     errorHandler: function(event, error) {
         if (error.operation == "create") {
             CSErrorPopup($T("Could not send email to responsible"),
@@ -39,13 +39,13 @@
                         [Html.span("", $T("There was a problem when sending the notification email to the Webcast responsible:"), Html.br(), error.inner)])
         }
     },
-    
+
     customText : function(booking) {
-        if (booking.acceptRejectStatus === false && trim(booking.rejectionReason)) {
-            return $T("Rejection reason: ") + trim(booking.rejectionReason);
+        if (booking.acceptRejectStatus === false && trim(booking.rejectReason)) {
+            return $T("Rejection reason: ") + trim(booking.rejectReason);
         }
     },
-    
+
     clearForm : function () {
         var formNodes = IndicoUtil.findFormFields($E('WebcastRequestForm'));
         IndicoUtil.setFormValues(formNodes, {'talkSelectionComments':'', 'numWebcastViewers':'','numRecordingViewers':'', 'numAttendees':'', 'otherComments':''})
@@ -53,26 +53,26 @@
             $E('allTalksRB').dom.checked = true;
             IndicoUI.Effect.disappear($E('contributionsDiv'));
         }
-        
+
         $E('permissionYesRB').dom.checked = false;
         $E('permissionNoRB').dom.checked = false;
         $E('lectureOptions').dom.value = "chooseOne";
         $E('lectureStyle').dom.value = "chooseOne";
         $E('postingUrgency').dom.value = "never";
     },
-    
+
     onLoad : function() {
-        
+
         WRUpdateContributionList();
-        
+
         IndicoUtil.enableDisableForm($E("WRForm"), WRWebcastCapable);
-        
+
         if (!isLecture) {
             if (singleBookings['WebcastRequest'] && singleBookings['WebcastRequest'].bookingParams.talks == 'choose') {
                 IndicoUI.Effect.appear($E('contributionsDiv'));
             }
         }
-        
+
         if(!singleBookings['WebcastRequest']) {
             callFunction('WebcastRequest', 'clearForm');
         }

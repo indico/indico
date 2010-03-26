@@ -24,9 +24,14 @@ from MaKaC.common.utils import formatDateTime
 from MaKaC.fossils.subcontribution import ISubContribParticipationFossil,\
     ISubContributionFossil, ISubContributionWithSpeakersFossil
 from MaKaC.fossils.contribution import IContributionParticipationFossil,\
-    IContributionFossil, IContributionWithSpeakersFossil,\
-    IContributionWithSubContribsFossil
-from MaKaC.fossils.conference import IConferenceMinimalFossil
+    IContributionFossil, IContributionWithSpeakersFossil, IContributionParticipationMinimalFossil, \
+    IContributionWithSubContribsFossil,\
+    IContributionParticipationTTDisplayFossil, \
+    IContributionParticipationTTMgmtFossil
+from MaKaC.fossils.conference import IConferenceMinimalFossil,\
+    ISessionFossil, ISessionSlotFossil, IMaterialFossil,\
+    IConferenceParticipationFossil, IResourceFossil, ILinkFossil,\
+    ILocalFileFossil
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 
 import re, os
@@ -1504,7 +1509,9 @@ class CustomRoom(Persistent):
         return self.name
 
 
-class ConferenceParticipation(Persistent):
+class ConferenceParticipation(Persistent, Fossilizable):
+
+    fossilizes(IConferenceParticipationFossil)
 
     @Retrieves(['MaKaC.conference.ConferenceParticipation',
                  'MaKaC.conference.SessionChair',
@@ -5350,7 +5357,7 @@ class SCIndex(Persistent):
         self._idx._p_changed=1
 
 
-class Session(Persistent):
+class Session(Persistent, Fossilizable):
     """This class implements a conference session, being the different parts
         in which the conference can be divided and the contributions can be
         organised in. The class contains necessary attributes to store session
@@ -5359,6 +5366,7 @@ class Session(Persistent):
         conference but it is allowed for flexibility.
     """
 
+    fossilizes(ISessionFossil)
 
     @Retrieves(['MaKaC.conference.Session'], 'numSlots', lambda x : len(x.getSlotList()))
 
@@ -6840,7 +6848,9 @@ class Session(Persistent):
         return cmp( s1, s2 )
     _cmpTitle=staticmethod(_cmpTitle)
 
-class SessionSlot(Persistent):
+class SessionSlot(Persistent, Fossilizable):
+
+    fossilizes(ISessionSlotFossil)
 
     def __init__(self,session,**sessionSlotData):
         self.session = session
@@ -7487,7 +7497,9 @@ class SessionSlot(Persistent):
 
 class ContributionParticipation(Persistent, Fossilizable):
 
-    fossilizes(IContributionParticipationFossil)
+    fossilizes(IContributionParticipationFossil, IContributionParticipationMinimalFossil,\
+               IContributionParticipationTTDisplayFossil,\
+               IContributionParticipationTTMgmtFossil)
 
     def __init__( self ):
         self._contrib = None
@@ -7901,7 +7913,8 @@ class Contribution(Persistent, Fossilizable):
         attached either to a session or to a conference.
     """
 
-    fossilizes(IContributionFossil, IContributionWithSpeakersFossil, IContributionWithSubContribsFossil)
+    fossilizes(IContributionFossil, IContributionWithSpeakersFossil,\
+                IContributionWithSubContribsFossil)
 
     def __init__(self,**contribData):
         self.parent = None
@@ -9798,6 +9811,19 @@ class Contribution(Persistent, Fossilizable):
         else:
             return maxDatetime()
 
+    @Retrieves(['MaKaC.conference.Contribution'], 'color')
+    def getColor(self):
+        res=""
+        if self.getSession() is not None:
+            res=self.getSession().getColor()
+        return res
+
+    @Retrieves(['MaKaC.conference.Contribution'], 'textColor')
+    def getTextColor(self):
+        res=""
+        if self.getSession() is not None:
+            res=self.getSession().getTextColor()
+        return res
 
 class AcceptedContribution( Contribution ):
     """This class represents a contribution which has been created from an
@@ -10839,7 +10865,7 @@ class SubContribution(Persistent, Fossilizable):
     def setReportNumberHolder(self, rnh):
         self._reportNumberHolder=rnh
 
-class Material(Persistent):
+class Material(Persistent, Fossilizable):
     """This class represents a set of electronic documents (resources) which can
         be attached to a conference, a session or a contribution.
         A material can be of several types (achieved by specialising this class)
@@ -10859,6 +10885,8 @@ class Material(Persistent):
             material. Dictionary of references to Resource objects indexed
             by their unique relative id.
     """
+
+    fossilizes(IMaterialFossil)
 
     def __init__( self, materialData=None ):
         self.id = "not assigned"
@@ -11584,7 +11612,7 @@ class Minutes(Material):
             Material.recoverResource(self, recRes)
 
 
-class Resource(Persistent):
+class Resource(Persistent, Fossilizable):
     """This is the base class for representing individual resources which can
         be included in material containers for lately being attached to
         conference objects (i.e. conferences, sessions or contributions). This
@@ -11602,6 +11630,8 @@ class Resource(Persistent):
         __owner - (Material) reference to the material object in which the
             current resource is included.
     """
+
+    fossilizes(IResourceFossil)
 
     @Retrieves (['MaKaC.conference.Link',
                  'MaKaC.conference.LocalFile'], 'type', lambda r: if_else(type(r) == Link , 'external', 'stored'))
@@ -11944,6 +11974,8 @@ class Link(Resource):
         url -- (string) Contains the URL to the internet target resource.
     """
 
+    fossilizes(ILinkFossil)
+
     def __init__( self, resData = None ):
         Resource.__init__( self, resData )
         self.url = ""
@@ -11980,6 +12012,8 @@ class LocalFile(Resource):
         __archivedId -- (string) It contains a unique identifier for the file
             inside the repository where it is archived.
     """
+
+    fossilizes(ILocalFileFossil)
 
     def __init__( self, resData = None ):
         Resource.__init__( self, resData )

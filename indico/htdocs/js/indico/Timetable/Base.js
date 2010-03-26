@@ -868,7 +868,7 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
         if ((result.day == this.eventInfo.endDate.date.replaceAll('-','')) &&
             (result.entry.endDate.time.replaceAll(':','') >
              this.eventInfo.endDate.time.replaceAll(':',''))) {
-            this.eventInfo.endDate.time = result.endTime;
+            this.eventInfo.endDate.time = result.entry.endDate.time;
         }
 
         this.timetableDrawer.redraw();

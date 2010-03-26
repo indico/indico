@@ -62,27 +62,12 @@ class Conversion:
     @classmethod
     def parentSlot(cls, entry):
         from MaKaC.schedule import ContribSchEntry, BreakTimeSchEntry
-        from MaKaC.conference import SessionSlot, Session
+        from MaKaC.conference import SessionSlot#, Session
 
         slot = None
 
-        if type(entry) == ContribSchEntry:
-            contrib = entry.getOwner()
-            session = contrib.getSession()
-
-            # If the contribution is not owned by a session return nothing
-            if type(session) != Session:
-                return None
-
-            # TODO: This should be fixed. There's currently no easy way
-            # of knowing in which session slot a contribution belongs.
-            # Loop through all the session slots and look if the contribution
-            # exists in the schedule.
-            for sl in session.getSlotList():
-                for e in sl.getEntries():
-                    if e.getOwner() == contrib:
-                        slot = sl
-                        break
+        if type(entry) == ContribSchEntry and entry.getSchedule() is not None:
+            slot = entry.getSchedule().getOwner()
 
         elif type(entry) == BreakTimeSchEntry:
             slot = entry.getOwner()
@@ -101,6 +86,7 @@ class Conversion:
 
     @classmethod
     def locatorString(cls, obj):
+
         locator = obj.getOwner().getLocator()
         if not locator.has_key('sessionId'):
             if locator.has_key('contribId'):
@@ -118,3 +104,12 @@ class Conversion:
         Converts a timedelta to integer minutes
         """
         return int(obj.seconds / 60)
+
+#    @classmethod
+#    def resourceType(cls, obj):
+#
+#        from MaKaC.conference import Link
+#        if type(obj) == Link:
+#            return 'external'
+#        else:
+#            return 'stored'
