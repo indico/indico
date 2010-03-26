@@ -1460,7 +1460,7 @@ class UHConfModifBookingModification(URLHandler):
 
 
 ## New Collaboration related
-class UHAdminCollaboration(OptionallySecureURLHandler):
+class UHAdminCollaboration(URLHandler):
     _relativeURL = "adminCollaboration.py"
 
 class UHConfModifCollaboration(OptionallySecureURLHandler):
@@ -3379,13 +3379,13 @@ class UHWebcastMoveChannelDown( URLHandler ):
 
 class UHWebcastSaveWebcastServiceURL( URLHandler ):
     _relativeURL = "adminServices.py/webcastSaveWebcastServiceURL"
-    
+
 class UHWebcastSaveWebcastSynchronizationURL( URLHandler ):
     _relativeURL = "adminServices.py/webcastSaveWebcastSynchronizationURL"
-    
+
 class UHWebcastManualSynchronization( URLHandler ):
     _relativeURL = "adminServices.py/webcastManualSynchronization"
-    
+
 class UHWebcastAddStream( URLHandler ):
     _relativeURL = "adminServices.py/webcastAddStream"
 

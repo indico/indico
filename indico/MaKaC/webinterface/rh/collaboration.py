@@ -152,11 +152,6 @@ class RHAdminCollaboration(RHAdminBase):
             RHAdminBase._checkProtection(self)
 
     def _process(self):
-        ph = PluginsHolder()
-        if ph.getPluginType('Collaboration').getOption("useHTTPS").getValue():
-            self._tohttps = True
-            if self._checkHttpsRedirect():
-                return ""
         p = collaboration.WPAdminCollaboration( self , self._queryParams)
         return p.display()
 
