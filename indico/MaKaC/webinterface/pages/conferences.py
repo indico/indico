@@ -914,9 +914,6 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
         return wc.getHTML(p)
 
     def _getHeadContent( self ):
-        if self._view in ["xml","text","jacow"] and (self._params.get("frame","")=="no" or self._params.get("fr","")=="no"):
-            return ""
-        path = Config.getInstance().getStylesheetsDir()
         htdocs = Config.getInstance().getHtdocsDir()
         # First include the default Indico stylesheet
         styleText = """<link rel="stylesheet" href="%s/css/%s">\n""" % \
@@ -932,6 +929,9 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
         return styleText
 
     def _getHTMLHeader( self ):
+
+        if self._view in ["xml","text","jacow"] and (self._params.get("frame","")=="no" or self._params.get("fr","")=="no"):
+            return ""
 
         tpl = wcomponents.WHTMLHeader();
 
@@ -971,11 +971,14 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
         """
         """
         if self._params.get("frame","")=="no" or self._params.get("fr","")=="no":
-            return WPrintPageFrame().getHTML({"content":body})
+            if self._view in ["xml","text","jacow"]:
+                return body
+            else:
+                return WPrintPageFrame().getHTML({"content":body})
         return WPConferenceBase._applyDecoration(self, body)
 
     def _getHTMLFooter( self ):
-        if ("xml" in self._view or "text" in self._view or "jacow" in self._view) and (self._params.get("frame","")=="no" or self._params.get("fr","")=="no"):
+        if (self._view in ["xml","text","jacow"]) and (self._params.get("frame","")=="no" or self._params.get("fr","")=="no"):
             return ""
         return WPConferenceBase._getHTMLFooter(self)
 
@@ -1095,10 +1098,6 @@ class WConfProgram(wcomponents.WTemplated):
 
 
 class WPConferenceProgram( WPConferenceDefaultDisplayBase ):
-
-    def __init__(*params):
-        WPConferenceDefaultDisplayBase.__init__(*params)
-        navigationEntry = navigation.NEConferenceProgramme()
 
     def _getBody( self, params ):
         wc = WConfProgram( self._getAW(), self._conf )

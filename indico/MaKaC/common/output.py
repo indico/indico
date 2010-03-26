@@ -128,7 +128,7 @@ class outputGenerator:
         end_time_XML = start_time_HTML = time.time()
         if not os.path.exists(stylesheet):
             self.text = _("Cannot find stylesheet")
-        if stylesheet == "xml.xsl":
+        if os.path.basename(stylesheet) == "xml.xsl":
             self.text = xml
         else:
             # instanciate the XSL tool
