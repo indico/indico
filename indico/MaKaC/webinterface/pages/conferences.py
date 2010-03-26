@@ -12127,11 +12127,12 @@ class WConfModifBadgeDesign( wcomponents.WTemplated ):
         vars["saveBackgroundURL"]=urlHandlers.UHConfModifBadgeSaveBackground.getURL(self.__conf, self.__templateId)
         vars["loadingIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("loading")))
         vars["templateId"]=self.__templateId
+
+        badgeDesignConfiguration = BadgeDesignConfiguration()
         from MaKaC.services.interface.rpc.json import encode as jsonEncode
-        vars["translateName"]= jsonEncode(dict([(key, value[0]) for key, value in BadgeDesignConfiguration().items_actions.iteritems()]))
+        vars["translateName"]= jsonEncode(dict([(key, value[0]) for key, value in badgeDesignConfiguration.items_actions.iteritems()]))
 
         cases = []
-        badgeDesignConfiguration = BadgeDesignConfiguration()
         for itemKey in badgeDesignConfiguration.items_actions.keys():
             case = []
             case.append('case "')
@@ -12190,7 +12191,6 @@ class WConfModifBadgeDesign( wcomponents.WTemplated ):
             vars["titleMessage"]= _("Editing badge template")
             vars["editingTemplate"]="true"
 
-            from MaKaC.services.interface.rpc.json import encode as jsonEncode
             templateDataString = jsonEncode(self.__conf.getBadgeTemplateManager().getTemplateData(self.__templateId))
             vars["templateData"]= templateDataString
 
@@ -12427,15 +12427,20 @@ class WConfModifPosterDesign( wcomponents.WTemplated ):
         vars["loadingIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("loading")))
         vars["templateId"]=self.__templateId
 
+        posterDesignConfiguration = PosterDesignConfiguration()
+        from MaKaC.services.interface.rpc.json import encode as jsonEncode
+        vars["translateName"]= jsonEncode(dict([(key, value[0]) for key, value in posterDesignConfiguration.items_actions.iteritems()]))
+
+
         cases = []
-        for itemName in PosterDesignConfiguration().items_actions.keys():
+        for itemKey in posterDesignConfiguration.items_actions.keys():
             case = []
             case.append('case "')
-            case.append(itemName)
+            case.append(itemKey)
             case.append('":')
             case.append('\n')
             case.append('items[itemId] = new Item(itemId, "')
-            case.append(itemName)
+            case.append(itemKey)
             case.append('");')
             case.append('\n')
             case.append('newDiv.innerHTML = items[itemId].toHTML();')
@@ -12446,15 +12451,15 @@ class WConfModifPosterDesign( wcomponents.WTemplated ):
         vars['switchCases'] = "\n".join(cases)
 
         optgroups = []
-        for optgroupName, options in PosterDesignConfiguration().groups:
+        for optgroupName, options in posterDesignConfiguration.groups:
             optgroup = []
             optgroup.append('<optgroup label="')
             optgroup.append(optgroupName)
             optgroup.append('">')
             optgroup.append('\n')
             for optionName in options:
-                optgroup.append('<option>')
-                optgroup.append(optionName)
+                optgroup.append('<option value="%s">'%optionName)
+                optgroup.append(posterDesignConfiguration.items_actions[optionName][0])
                 optgroup.append('</option>')
                 optgroup.append('\n')
             optgroup.append('</optgroup>')
@@ -12480,7 +12485,7 @@ class WConfModifPosterDesign( wcomponents.WTemplated ):
             vars["backgroundURL"]="false"
             vars["backgroundId"]=-1
             vars["backgroundPos"]="Stretch"
-            vars["templateData"] == "''"
+            vars["templateData"] = "''"
             vars["editingTemplate"]="false"
 
 
@@ -12488,7 +12493,6 @@ class WConfModifPosterDesign( wcomponents.WTemplated ):
             vars["saveTemplateURL"]=urlHandlers.UHConfModifPosterPrinting.getURL(self.__conf)
             vars["titleMessage"]= _("Editing poster template")
             vars["editingTemplate"]="true"
-            from MaKaC.services.interface.rpc.json import encode as jsonEncode
             templateDataString = jsonEncode(self.__conf.getPosterTemplateManager().getTemplateData(self.__templateId))
             vars["templateData"]=quoteattr(templateDataString)
 

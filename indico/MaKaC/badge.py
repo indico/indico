@@ -202,9 +202,8 @@ class BadgeTemplate (Persistent):
         # ensure that each item's got a key (in order to avoid
         # using the name as key).
         for item in self.__templateData[4]:
-            itemName = item['name']
             if not "key" in item:
-                item['key'] = itemName
+                item['key'] = item['name']
         ##############################
 
         return self.__templateData
@@ -378,7 +377,7 @@ class BadgeTemplateItem:
         """ Constructor
             -itemData must be a dictionary with the attributes of the item
             Example:
-            {'fontFamilyIndex': 0, 'styleIndex': 1, 'bold': True, 'name': 'Country', 'fontFamily': 'Arial',
+            {'fontFamilyIndex': 0, 'styleIndex': 1, 'bold': True, 'key': 'Country', 'fontFamily': 'Arial',
             'color': 'blue', 'selected': false, 'fontSizeIndex': 5, 'id': 0, 'width': 250, 'italic': False,
             'fontSize': 'x-large', 'textAlignIndex': 1, 'y': 40, 'x': 210, 'textAlign': 'Right',
             'colorIndex': 2}

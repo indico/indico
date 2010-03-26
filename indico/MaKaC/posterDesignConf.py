@@ -26,44 +26,44 @@ from MaKaC.webinterface.common.countries import CountryHolder
 
 
 class ConferenceDates:
-    
+
     def getArgumentType(cls):
         return Conference
     getArgumentType = classmethod (getArgumentType)
-    
+
     def getValue(cls, conf):
         if conf.getStartDate().date() == conf.getEndDate().date():
             return conf.getAdjustedStartDate().strftime("%a %d/%m/%Y %H:%M")
         else:
             return str(conf.getAdjustedStartDate().date()) + ' - ' + str(conf.getAdjustedEndDate().date())
     getValue = classmethod (getValue)
-    
+
 class ConferenceLocation:
-    
+
     def getArgumentType(cls):
         return Conference
     getArgumentType = classmethod (getArgumentType)
-    
+
     def getValue(cls, conf):
-        return conf.getLocation().getName()           
+        return conf.getLocation().getName()
     getValue = classmethod (getValue)
 
 
 class ConferenceAddress:
-    
+
     def getArgumentType(cls):
         return Conference
     getArgumentType = classmethod (getArgumentType)
-    
+
     def getValue(cls, conf):
         return conf.getLocation().getAddress()
     getValue = classmethod (getValue)
-    
+
 class LectureCategory:
     def getArgumentType(cls):
         return Conference
     getArgumentType = classmethod (getArgumentType)
-    
+
     def getValue(cls, conf):
         return conf.getOwner().getTitle()
     getValue = classmethod (getValue)
@@ -72,7 +72,7 @@ class Organisers:
     def getArgumentType(cls):
         return Conference
     getArgumentType = classmethod (getArgumentType)
-    
+
     def getValue(cls, conf):
         return conf.getOrgText()
     getValue = classmethod (getValue)
@@ -81,23 +81,23 @@ class ConferenceRoom:
     def getArgumentType(cls):
         return Conference
     getArgumentType = classmethod (getArgumentType)
-    
+
     def getValue(cls, conf):
         if conf.getRoom():
             return conf.getRoom().getName()
         else:
             return ""
     getValue = classmethod (getValue)
-    
+
 class ConferenceChairperson:
     def getArgumentType(cls):
         return Conference
     getArgumentType = classmethod (getArgumentType)
-    
+
     def getValue(cls, conf):
         list = conf.getChairList()
         return list
-       
+
     getValue = classmethod (getValue)
 
 
@@ -108,7 +108,7 @@ class PosterDesignConfiguration:
     -groups organizes the item names into groups. These groups are used for the
     <select> box in the WConfModifPosterDesign.tpl file.
     """
-    
+
     """ Dictionary that maps the name of an item to the action that should be taken
     at the time it is drawed.
     An action can be:
@@ -125,25 +125,26 @@ class PosterDesignConfiguration:
        Depending on what is returned, we will pass a different object to the getValue() method.
        *it must have a getValue(object) method, to which a Conference instance, a Registrant instance or a
        PosterTemplateItem instance must be passed, depending on the result of the getArgumentType() method.
-      
+
       """
     def __init__(self):
-          
+
         self.items_actions = {
-                         _("Lecture Category") : LectureCategory,
-                         _("Lecture Name") : Conference.getTitle,                     
-                         _("Lecture Date(s)") : ConferenceDates,                     
-                         _("Speaker(s)") : ConferenceChairperson,
-                         _("Description") : Conference.getDescription,                   
-                         _("Location (name)") : ConferenceLocation,
-                         _("Location (address)") : ConferenceAddress,
-                         _("Location (room)") : ConferenceRoom,
-                         _("Organisers") : Organisers,
-                         _("Fixed Text") : PosterTemplateItem.getFixedText
+                         "Lecture Category": (_("Lecture Category"), LectureCategory),
+                         "Lecture Name": (_("Lecture Name"), Conference.getTitle),
+                         "Lecture Date(s)": (_("Lecture Date(s)"), ConferenceDates),
+                         "Speaker(s)": (_("Speaker(s)"), ConferenceChairperson),
+                         "Description": (_("Description"), Conference.getDescription),
+                         "Location (name)": (_("Location (name)"), ConferenceLocation),
+                         "Location (address)": (_("Location (address)"), ConferenceAddress),
+                         "Location (room)": (_("Location (room)"), ConferenceRoom),
+                         "Organisers": (_("Organisers"), Organisers),
+                         "Fixed Text": (_("Fixed Text"), PosterTemplateItem.getFixedText)
                         }
-        
+
         """ Dictionary that maps group names to the item names that fall into that group.
         The groups are only used for the <select> box in the WConfModifPosterDesign.tpl file.
         """
-        self.groups = [( _("Lecture Data"), [ _("Lecture Category"),  _("Lecture Name"),  _("Lecture Date(s)"), _("Speaker(s)"),  _("Description"),  _("Location (name)"),  _("Location (address)"),  _("Location (room)"), _("Organisers")]),
-                  ( _("Fixed Elements"), [ _("Fixed Text")])]
+        self.groups = [( _("Lecture Data"), ["Lecture Category", "Lecture Name", "Lecture Date(s)","Speaker(s)",
+                                             "Description", "Location (name)", "Location (address)", "Location (room)","Organisers"]),
+                        ( _("Fixed Elements"), ["Fixed Text"])]

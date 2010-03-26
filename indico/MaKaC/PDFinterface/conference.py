@@ -2963,7 +2963,7 @@ class LectureToPosterPDF:
         for item in self.__posterTemplate.getItems():
 
             # First we determine the actual text that has to be drawed.
-            action = PosterDesignConfiguration().items_actions[item.getName()]
+            action = PosterDesignConfiguration().items_actions[item.getKey()][1]
 
             if isinstance(action, str):
                 # If for this kind of item we have to draw always the same string, let's draw it.
