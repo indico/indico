@@ -1971,8 +1971,6 @@ class Conference(Persistent, Fossilizable):
 
     #TODO: Move to fossilize! (Some conference fossiles already available)
 
-    @Retrieves ('MaKaC.conference.Conference', 'videoServicesDisplayURL',
-                lambda conf: (str(urlHandlers.UHConferenceDisplay.getURL(conf)), str(urlHandlers.UHCollaborationDisplay.getURL(conf)))[conf.getType() == 'conference'])
     @Retrieves ('MaKaC.conference.Conference', 'displayURL', lambda conf: str(urlHandlers.UHConferenceDisplay.getURL(conf)))
     @Retrieves ('MaKaC.conference.Conference', 'modifURL', lambda conf: str(urlHandlers.UHConferenceModification.getURL(conf)))
     @Retrieves(['MaKaC.conference.Conference'], 'sessions', lambda conf: DictPickler.pickle(Conversion.sessionList(conf)))

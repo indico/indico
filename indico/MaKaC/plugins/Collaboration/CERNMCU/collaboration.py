@@ -126,11 +126,11 @@ class CSBooking(CSBookingBase):
         """
         return self._pin
 
-    def setPin(self, accessPassword):
-        if accessPassword.strip() == "":
+    def setPin(self, pin):
+        if not pin or pin.strip() == "":
             self._pin = ""
         else:
-            self._pin = accessPassword
+            self._pin = pin
 
     def getHasPin(self):
         return self._pin is not None and len(self._pin) > 0

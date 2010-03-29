@@ -17,77 +17,57 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from MaKaC.plugins.Collaboration.fossils import ICSBookingBaseConfModifFossil,\
+    ICSErrorBaseFossil
 from MaKaC.common.fossilize import IFossil
-from MaKaC.plugins.Collaboration.fossils import ICSErrorBaseFossil
 
-class IParticipantFossil(IFossil):
+class ICSBookingConfModifFossil(ICSBookingBaseConfModifFossil):
 
-    def getType(self):
+    def getURL(self):
         pass
 
-    def getId(self):
-        pass
-    getId.name = "participantId"
-
-    def getParticipantName(self):
+    def getPhoneBridgeId(self):
         pass
 
-    def getDisplayName(self):
+    def getPhoneBridgePassword(self):
         pass
 
-    def getIp(self):
+    def getErrorMessage(self):
         pass
 
-    def getParticipantType(self):
+    def getErrorDetails(self):
         pass
 
-    def getParticipantProtocol(self):
-        pass
-
-    def getCallState(self):
-        pass
-
-class IParticipantPersonFossil(IParticipantFossil):
-
-    def getTitle(self):
-        pass
-
-    def getFamilyName(self):
-        pass
-
-    def getFirstName(self):
-        pass
-
-    def getAffiliation(self):
+    def getChangesFromEVO(self):
         pass
 
 
-class IParticipantRoomFossil(IParticipantFossil):
+class IEVOErrorFossil(ICSErrorBaseFossil):
 
-    def getName(self):
+    def getErrorType(self):
         pass
 
-    def getInstitution(self):
+    def getRequestURL(self):
+        pass
+
+class IOverlappedErrorFossil(IEVOErrorFossil):
+
+    def getSuperposedBooking(self):
+        return self._overlappedBooking
+    getSuperposedBooking.name = 'overlappedBooking'
+    getSuperposedBooking.result = ICSBookingConfModifFossil
+
+
+class IChangesFromEVOErrorFossil(IEVOErrorFossil):
+
+    def getChanges(self):
         pass
 
 
-class IRoomWithH323Fossil(IFossil):
+class IEVOWarningFossil(IFossil):
 
-    def getLocation(self):
-        pass
-    getLocation.name = "institution"
-
-    def getName(self):
+    def getMessage(self):
         pass
 
-    def getIp(self):
-
-
-
-class ICERNMCUErrorFossil(ICSErrorBaseFossil):
-
-    def getFaultCode(self):
-        pass
-
-    def getInfo(self):
+    def getException(self):
         pass

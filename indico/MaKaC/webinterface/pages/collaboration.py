@@ -27,15 +27,13 @@ from MaKaC.common.timezoneUtils import nowutc, setAdjustedDate, DisplayTZ
 from MaKaC.common.utils import formatDateTime, parseDateTime
 from MaKaC.common.timezoneUtils import getAdjustedDate
 from MaKaC.i18n import _
-from MaKaC.common.PickleJar import DictPickler
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.common.indexes import IndexesHolder
-from MaKaC.plugins.Collaboration.base import CollaborationException,\
-    WCSPageTemplateBase
-from MaKaC.plugins.Collaboration.base import CollaborationException
+from MaKaC.plugins.Collaboration.base import CollaborationException, WCSPageTemplateBase
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.user import IAvatarFossil
 from MaKaC.services.implementation.user import UserComparator
+from MaKaC.plugins.Collaboration.fossils import IIndexInformationFossil
 
 ################################################### Server Wide pages #########################################
 
@@ -83,7 +81,10 @@ class WAdminCollaboration(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars(self)
 
         #dictionary where the keys are names of false "indexes" for the user, and the values are IndexInformation objects
-        vars["Indexes"] = CollaborationTools.getCollaborationPluginType().getOption("pluginsPerIndex").getValue()
+        indexes = CollaborationTools.getCollaborationPluginType().getOption("pluginsPerIndex").getValue()
+        vars["Indexes"] = indexes
+        vars["IndexInformation"] = fossilize(dict([(i.getName(), i) for i in indexes]), IIndexInformationFossil)
+
         vars["InitialIndex"] = self._queryParams["indexName"]
         vars["InitialViewBy"] = self._queryParams["viewBy"]
         vars["InitialOrderBy"] = self._queryParams["orderBy"]
@@ -267,12 +268,12 @@ class WConfModifCollaboration(wcomponents.WTemplated):
         for p in singleBookingPlugins:
             bookingList = csBookingManager.getBookingList(filterByType = p.getName())
             if len(bookingList) > 0:
-                bookingsS[p.getName()] = DictPickler.pickle(bookingList[0])
+                bookingsS[p.getName()] = fossilize(bookingList[0]) #will use ICSBookingConfModifBaseFossil or inheriting fossil
 
-        bookingsM = DictPickler.pickle(csBookingManager.getBookingList(
+        bookingsM = fossilize(csBookingManager.getBookingList(
             sorted = True,
             notify = True,
-            filterByType = [p.getName() for p in multipleBookingPlugins]))
+            filterByType = [p.getName() for p in multipleBookingPlugins])) #will use ICSBookingConfModifBaseFossil or inheriting fossil
 
         vars["Conference"] = self._conf
         vars["AllPlugins"] = plugins

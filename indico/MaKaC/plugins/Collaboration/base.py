@@ -19,8 +19,6 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from persistent import Persistent
-from MaKaC.common.PickleJar import Retrieves
-from MaKaC.common.Conversion import Conversion
 from MaKaC.common.Counter import Counter
 from MaKaC.common.utils import formatDateTime, parseDateTime
 from MaKaC.common.timezoneUtils import getAdjustedDate, setAdjustedDate,\
@@ -42,6 +40,9 @@ from MaKaC.common.mail import GenericMailer
 import os, inspect
 import MaKaC.plugins.Collaboration as Collaboration
 from MaKaC.i18n import _
+from MaKaC.common.fossilize import Fossilizable, fossilizes
+from MaKaC.plugins.Collaboration.fossils import ICSErrorBaseFossil, ICSSanitizationErrorFossil,\
+    ICSBookingBaseConfModifFossil, ICSBookingBaseIndexingFossil
 
 
 class CSBookingManager(Persistent, Observer):
@@ -678,7 +679,9 @@ class CSBookingManager(Persistent, Observer):
 
 
 
-class CSBookingBase(Persistent):
+class CSBookingBase(Persistent, Fossilizable):
+    fossilizes(ICSBookingBaseConfModifFossil, ICSBookingBaseIndexingFossil)
+
     """ Base class that represents a Collaboration Systems booking.
         Every Collaboration plugin will have to implement this class.
         In the base class are gathered all the functionalities / elements that are common for all plugins.
@@ -782,7 +785,6 @@ class CSBookingBase(Persistent):
         setattr(self, "_" + bookingType + "Options", CollaborationTools.getPlugin(bookingType).getOptions())
 
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'id')
     def getId(self):
         """ Returns the internal, per-conference id of the booking.
             This attribute will be available in Javascript with the "id" identifier.
@@ -794,22 +796,17 @@ class CSBookingBase(Persistent):
         """
         self._id = id
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'type')
     def getType(self):
         """ Returns the type of the booking, as a string: "EVO", "DummyPlugin"
             This attribute will be available in Javascript with the "type" identifier.
         """
         return self._type
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'],
-               'conference', isPicklableObject = True)
     def getConference(self):
         """ Returns the owner of this CSBookingBase object, which is a Conference object representing the meeting.
         """
         return self._conf
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'],
-               'warning', isPicklableObject = True)
     def getWarning(self):
         """ Returns a warning attached to this booking.
             A warning is a plugin-defined object, with information to show to the user when
@@ -827,8 +824,6 @@ class CSBookingBase(Persistent):
             self._creationDate = nowutc()
         return self._creationDate
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'],
-               'creationDate', Conversion.datetime)
     def getAdjustedCreationDate(self, tz=None):
         """ Returns the booking creation date, adjusted to a given timezone.
             If no timezone is provided, the event's timezone is used
@@ -847,8 +842,6 @@ class CSBookingBase(Persistent):
             self._modificationDate = nowutc()
         return self._modificationDate
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'],
-               'modificationDate', Conversion.datetime)
     def getAdjustedModificationDate(self, tz=None):
         """ Returns the booking last modification date, adjusted to a given timezone.
             If no timezone is provided, the event's timezone is used
@@ -895,8 +888,6 @@ class CSBookingBase(Persistent):
         """
         return self._startDate
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'],
-               'startDate', Conversion.datetime)
     def getAdjustedStartDate(self, tz=None):
         """ Returns the booking start date, adjusted to a given timezone.
             If no timezone is provided, the event's timezone is used
@@ -983,14 +974,12 @@ class CSBookingBase(Persistent):
             except ValueError:
                 raise CollaborationServiceException("endDate parameter (" + endDateString +" ) is in an incorrect format for booking with id: " + str(self._id))
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'statusMessage')
     def getStatusMessage(self):
         """ Returns the status message as a string.
             This attribute will be available in Javascript with the "statusMessage"
         """
         return self._statusMessage
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'statusClass')
     def getStatusClass(self):
         """ Returns the status message CSS class as a string.
             This attribute will be available in Javascript with the "statusClass"
@@ -1017,7 +1006,6 @@ class CSBookingBase(Persistent):
         """
         self._acceptRejectStatus = None
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'acceptRejectStatus')
     def getAcceptRejectStatus(self):
         """ Returns the Accept/Reject status of the booking
             This attribute will be available in Javascript with the "acceptRejectStatus"
@@ -1030,7 +1018,6 @@ class CSBookingBase(Persistent):
             self._acceptRejectStatus = None
         return self._acceptRejectStatus
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'rejectionReason')
     def getRejectReason(self):
         """ Returns the rejection reason.
             This attribute will be available in Javascript with the "rejectReason"
@@ -1039,7 +1026,6 @@ class CSBookingBase(Persistent):
             self._rejectReason = ""
         return self._rejectReason
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'bookingParams')
     def getBookingParams(self):
         """ Returns a dictionary with the booking params.
             This attribute will be available in Javascript with the "bookingParams"
@@ -1210,14 +1196,12 @@ class CSBookingBase(Persistent):
         if self.needsBookingParamsCheck():
             raise CollaborationServiceException("Method _checkBookingParams was not overriden for the plugin type " + str(self._type))
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'hasStart')
     def hasStart(self):
         """ Returns if this booking belongs to a plugin who has a "start" concept.
             This attribute will be available in Javascript with the "hasStart" attribute
         """
         return self._hasStart
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'hasStartStopAll')
     def hasStartStopAll(self):
         """ Returns if this booking belongs to a plugin who has a "start" concept, and all of its bookings for a conference
             can be started simultanously.
@@ -1225,56 +1209,48 @@ class CSBookingBase(Persistent):
         """
         return self._hasStartStopAll
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'hasStop')
     def hasStop(self):
         """ Returns if this booking belongs to a plugin who has a "stop" concept.
             This attribute will be available in Javascript with the "hasStop" attribute
         """
         return self._hasStop
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'hasCheckStatus')
     def hasCheckStatus(self):
         """ Returns if this booking belongs to a plugin who has a "check status" concept.
             This attribute will be available in Javascript with the "hasCheckStatus" attribute
         """
         return self._hasCheckStatus
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'hasAcceptReject')
     def hasAcceptReject(self):
         """ Returns if this booking belongs to a plugin who has a "accept or reject" concept.
             This attribute will be available in Javascript with the "hasAcceptReject" attribute
         """
         return self._hasAcceptReject
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'requiresServerCallForStart')
     def requiresServerCallForStart(self):
         """ Returns if this booking belongs to a plugin who requires a server call when the start button is pressed.
             This attribute will be available in Javascript with the "requiresServerCallForStart" attribute
         """
         return self._requiresServerCallForStart
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'requiresServerCallForStop')
     def requiresServerCallForStop(self):
         """ Returns if this booking belongs to a plugin who requires a server call when the stop button is pressed.
             This attribute will be available in Javascript with the "requiresServerCallForStop" attribute
         """
         return self._requiresServerCallForStop
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'requiresClientCallForStart')
     def requiresClientCallForStart(self):
         """ Returns if this booking belongs to a plugin who requires a client call when the start button is pressed.
             This attribute will be available in Javascript with the "requiresClientCallForStart" attribute
         """
         return self._requiresClientCallForStart
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'requiresClientCallForStop')
     def requiresClientCallForStop(self):
         """ Returns if this booking belongs to a plugin who requires a client call when the stop button is pressed.
             This attribute will be available in Javascript with the "requiresClientCallForStop" attribute
         """
         return self._requiresClientCallForStop
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'canBeDeleted')
     def canBeDeleted(self):
         """ Returns if this booking can be deleted, in the sense that the "Remove" button will be active and able to be pressed.
             This attribute will be available in Javascript with the "canBeDeleted" attribute
@@ -1284,21 +1260,18 @@ class CSBookingBase(Persistent):
             self._canBeDeleted = True
         return self._canBeDeleted
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'canBeStarted')
     def canBeStarted(self):
         """ Returns if this booking can be started, in the sense that the "Start" button will be active and able to be pressed.
             This attribute will be available in Javascript with the "canBeStarted" attribute
         """
         return self._canBeStarted
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'canBeStopped')
     def canBeStopped(self):
         """ Returns if this booking can be stopped, in the sense that the "Stop" button will be active and able to be pressed.
             This attribute will be available in Javascript with the "canBeStopped" attribute
         """
         return self._canBeStopped
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'permissionToStart')
     def isPermittedToStart(self):
         """ Returns if this booking is allowed to start, in the sense that it will be started after the "Start" button is pressed.
             For example a booking should not be permitted to start before a given time, even if the button is active.
@@ -1306,7 +1279,6 @@ class CSBookingBase(Persistent):
         """
         return self._permissionToStart
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'permissionToStop')
     def isPermittedToStop(self):
         """ Returns if this booking is allowed to stop, in the sense that it will be started after the "Stop" button is pressed.
             This attribute will be available in Javascript with the "isPermittedToStop" attribute
@@ -1323,7 +1295,6 @@ class CSBookingBase(Persistent):
         """
         return self._needsToBeNotifiedOnView
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'canBeNotifiedOfEventDateChanges')
     def canBeNotifiedOfEventDateChanges(self):
         """ Returns if bookings of this type should be able to be notified
             of their owner Event changing start date, end date or timezone.
@@ -1357,7 +1328,6 @@ class CSBookingBase(Persistent):
         """
         self._hidden = hidden
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'allowMultiple')
     def isAllowMultiple(self):
         """ Returns if this booking belongs to a type that allows multiple bookings per event.
         """
@@ -1375,8 +1345,6 @@ class CSBookingBase(Persistent):
         """
         return self._commonIndexes
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'],
-                'modificationURL', lambda url: str(url))
     def getModificationURL(self):
         return urlHandlers.UHConfModifCollaboration.getURL(self.getConference(),
                                                            secure = CollaborationTools.isUsingHTTPS(),
@@ -1562,22 +1530,12 @@ class WCSCSSBase(WCSTemplateBase):
         self.tplFile = os.path.join(dir, file)
         self.helpFile = ''
 
-class CSErrorBase(object):
+class CSErrorBase(Fossilizable):
+    fossilizes(ICSErrorBaseFossil)
+
     """ When _create, _modify or _remove want to return an error,
         they should return an error that inherits from this class
     """
-
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSErrorBase',
-                'MaKaC.plugins.Collaboration.base.CSSanitizationError',
-                'MaKaC.plugins.Collaboration.EVO.common.EVOError',
-                'MaKaC.plugins.Collaboration.EVO.common.OverlappedError',
-                'MaKaC.plugins.Collaboration.EVO.common.ChangesFromEVOError',
-                'MaKaC.plugins.Collaboration.RecordingRequest.common.RecordingRequestError',
-                'MaKaC.plugins.Collaboration.WebcastRequest.common.WebcastRequestError',
-                'MaKaC.plugins.Collaboration.CERNMCU.common.CERNMCUError'],
-                'error')
-    def getError(self):
-        return True
 
     def getUserMessage(self):
         """ To be overloaded.
@@ -1591,21 +1549,17 @@ class CSErrorBase(object):
         """
         raise CollaborationException("Method getLogMessage was not overriden for the a CSErrorBase object of class " + self.__class__.__name__)
 
-class CSSanitizationError(CSErrorBase):
+class CSSanitizationError(CSErrorBase): #already Fossilizable
+    fossilizes(ICSSanitizationErrorFossil)
+
     """ Class used to return which fields have a sanitization error (invalid html / script tags)
     """
 
     def __init__(self, invalidFields):
         self._invalidFields = invalidFields
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSSanitizationError'], 'origin')
-    def getOrigin(self):
-        return 'sanitization'
-
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSSanitizationError'], 'invalidFields')
     def invalidFields(self):
         return self._invalidFields
-
 
 
 class CollaborationException(MaKaCError):

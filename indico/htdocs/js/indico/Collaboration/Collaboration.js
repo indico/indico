@@ -548,7 +548,7 @@ var bookingTemplateS = function(booking) {
  * refreshBookingS (for bookings of plugins who allow only one booking)
  */
 var refreshBooking = function(booking) {
-    if (booking.allowMultiple) {
+    if (booking.isAllowMultiple) {
         refreshBookingM(booking);
     } else {
         refreshBookingS(booking);
@@ -1071,7 +1071,7 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
                 }
 
                 if (onSaveResult) {
-                    var killProgress = IndicoUI.Dialogs.Util.progress("Saving your booking...");
+                    var killProgress = IndicoUI.Dialogs.Util.progress($T("Saving your booking..."));
 
                     if (this.popupType === 'create') {
                         indicoRequest(
@@ -1088,7 +1088,7 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
                                     if (result.error) {
                                         killProgress();
                                         self.switchToBasicTab();
-                                        if (result.origin === 'sanitization') {
+                                        if (result._type === 'CSSanitizationError') {
                                             sanitizationError(result.invalidFields);
                                         } else {
                                             codes[self.bookingType].errorHandler('create', result);
@@ -1130,7 +1130,7 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
                                     if (result.error) {
                                         killProgress();
                                         self.switchToBasicTab();
-                                        if (result.origin === 'sanitization') {
+                                        if (result._type === 'CSSanitizationError') {
                                             sanitizationError(result.invalidFields);
                                         } else {
                                             codes[self.bookingType].errorHandler('edit', result);
@@ -1414,7 +1414,7 @@ var sendRequest = function(pluginName, conferenceId) {
             if (!error) {
                 if (result.error) {
                     killProgress();
-                    if (result.origin === 'sanitization') {
+                    if (result._type === 'CSSanitizationError') {
                         sanitizationError(result.invalidFields);
                     } else {
                         codes[pluginName].errorHandler(exists(singleBookings[pluginName]) ? 'edit' : 'create', result)
@@ -1507,7 +1507,7 @@ var withdrawRequest = function(pluginName, conferenceId) {
                         if (!error) {
                             if (result.error) {
                                 killProgress();
-                                if (result.origin === 'sanitization') {
+                                if (result._type === 'CSSanitizationError') {
                                     sanitizationError(result.invalidFields);
                                 } else {
                                     codes[pluginName].errorHandler('remove', result);

@@ -19,6 +19,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import simplejson
+from MaKaC.common.fossilize import fossilize, NonFossilizableException
+from MaKaC.fossils.error import ICausedErrorFossil
 try:
     from mod_python import apache
 except ImportError:
@@ -116,11 +118,15 @@ def process(req):
     except CausedError, e:
 
         try:
-            errorInfo = DictPickler.pickle(e);
-        except Exception, e2:
-            # This is to catch Exceptions that are not registered as Pickles.
-            errorInfo  = {'code':'', 'message': str(e)}
-            Logger.get('dev').exception('Exception not registered as pickle')
+            errorInfo = fossilize(e, ICausedErrorFossil)
+        except NonFossilizableException, e2:
+
+            try:
+                errorInfo = DictPickler.pickle(e);
+            except Exception, e3:
+                # This is to catch Exceptions that are not registered as Pickles.
+                errorInfo  = {'code':'', 'message': str(e)}
+                Logger.get('dev').exception('Exception not registered as pickle')
 
 
         if isinstance(e, NoReportError):

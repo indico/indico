@@ -136,7 +136,7 @@ var totalInIndex = <%= InitialTotalInIndex %>
 var nPages = <%= InitialNumberOfPages %>;
 
 var indexNames = <%=[index.getName() for index in Indexes]%>;
-var indexInformation = <%= jsonEncode(DictPickler.pickle(dict([(i.getName(), i) for i in Indexes])))%>
+var indexInformation = <%= jsonEncode(IndexInformation)%>;
 var viewBy = ['conferenceTitle','conferenceStartDate', 'creationDate','modificationDate','startDate'];
 
 var queryParams = {
@@ -422,13 +422,17 @@ var staticURLSwitch = function() {
     staticURLState = !staticURLState;
 }
 
+var buildVideoServicesDisplayUrl = function(conference){
+    return (conference.type === 'conference' ? Indico.Urls.ConfCollaborationDisplay : Indico.Urls.ConferenceDisplay ) + '?confId=' + conference.id;
+};
+
 var confTitleGroupTemplate = function(group, isFirst){
     var conference = group[0];
     var bookings = group[1];
 
     var result = Html.tbody({},
         Html.tr({}, Html.td({className : 'ACBookingGroupTitle', colspan: 10, colSpan: 10},
-            Html.a({className : 'ACConfLink', href : conference.videoServicesDisplayURL},
+            Html.a({className : 'ACConfLink', href : buildVideoServicesDisplayUrl(conference)},
                     Html.span('ACConfTitle', conference.title),
                     Html.span('ACConfId', ' (ID: ' + conference.id + ') '),
                     Html.span('ACConfDates', conference.startDate.date + (conference.startDate.date != conference.endDate.date? ' - ' + conference.endDate.date : ''))
@@ -461,7 +465,7 @@ var confTitleBookingTemplate = function(booking) {
 
     var cell = Html.td('ACBookingCellNoWrap', Html.a({href: booking.modificationURL}, 'Change'),
                                               Html.span('horizontalSeparator', '|'),
-                                              Html.a({href: booking.conference.videoServicesDisplayURL}, 'Event Display'));
+                                              Html.a({href: buildVideoServicesDisplayUrl(booking.conference)}, 'Event Display'));
     row.append(cell);
 
     IndicoUI.Effect.mouseOver(row.dom);
@@ -496,7 +500,7 @@ var dateBookingTemplate = function(booking, viewBy) {
 
     var cell = Html.td('ACBookingCellNoWrap', Html.a({href: booking.modificationURL}, $T('Change')),
             Html.span('horizontalSeparator', '|'),
-            Html.a({href: booking.conference.videoServicesDisplayURL}, $T('Event Display')));
+            Html.a({href: buildVideoServicesDisplayUrl(booking.conference)}, $T('Event Display')));
     row.append(cell);
 
     IndicoUI.Effect.mouseOver(row.dom);

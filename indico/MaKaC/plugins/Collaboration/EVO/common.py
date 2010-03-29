@@ -28,8 +28,10 @@ from MaKaC.common.url import URL
 from array import array
 from MaKaC.common.timezoneUtils import nowutc, datetimeToUnixTime
 from MaKaC.common.logger import Logger
-from MaKaC.common.PickleJar import Retrieves
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
+from MaKaC.common.fossilize import Fossilizable, fossilizes
+from MaKaC.plugins.Collaboration.EVO.fossils import IEVOWarningFossil,\
+    IEVOErrorFossil, IOverlappedErrorFossil, IChangesFromEVOErrorFossil
 
 readLimit = 100000;
 secondsToWait = 10;
@@ -210,7 +212,8 @@ def getMinStartDate(conference):
 def getMaxEndDate(conference):
     return conference.getAdjustedEndDate() + timedelta(0,0,0,0, getEVOOptionValueByName("extraMinutesAfter"))
 
-class EVOError(CSErrorBase):
+class EVOError(CSErrorBase): #already Fossilizable
+    fossilizes(IEVOErrorFossil)
 
     def __init__(self, errorType, requestURL = None, userMessage = None):
         CSErrorBase.__init__(self)
@@ -218,23 +221,9 @@ class EVOError(CSErrorBase):
         self._requestURL = requestURL
         self._userMessage = None
 
-    @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.EVOError',
-                'MaKaC.plugins.Collaboration.EVO.common.OverlappedError',
-                'MaKaC.plugins.Collaboration.EVO.common.ChangesFromEVOError'], 'origin')
-    def getOrigin(self):
-        return 'EVO'
-
-    @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.EVOError',
-                'MaKaC.plugins.Collaboration.EVO.common.OverlappedError',
-                'MaKaC.plugins.Collaboration.EVO.common.ChangesFromEVOError'],
-               'errorType')
     def getErrorType(self):
         return self._errorType
 
-    @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.EVOError',
-                'MaKaC.plugins.Collaboration.EVO.common.OverlappedError',
-                'MaKaC.plugins.Collaboration.EVO.common.ChangesFromEVOError'],
-               'requestURL')
     def getRequestURL(self):
         return self._requestURL
 
@@ -254,24 +243,23 @@ class EVOError(CSErrorBase):
 
 
 
-class OverlappedError(EVOError):
+class OverlappedError(EVOError): #already Fossilizable
+    fossilizes(IOverlappedErrorFossil)
+
     def __init__(self, overlappedBooking):
         EVOError.__init__(self, 'overlapped')
         self._overlappedBooking = overlappedBooking
 
-    @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.OverlappedError'],
-               'overlappedBooking', isPicklableObject = True)
-    def getSuperposedBookingId(self):
+    def getSuperposedBooking(self):
         return self._overlappedBooking
 
-class ChangesFromEVOError(EVOError):
+class ChangesFromEVOError(EVOError): #already Fossilizable
+    fossilizes(IChangesFromEVOErrorFossil)
 
     def __init__(self, changes):
         EVOError.__init__(self, 'changesFromEVO')
         self._changes = changes
 
-    @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.ChangesFromEVOError'],
-               'changes')
     def getChanges(self):
         return self._changes
 
@@ -287,18 +275,15 @@ class EVOControlledException(Exception):
     def __str__(self):
         return "EVOControlledException. Message = " + self.message
 
-class EVOWarning(object):
+class EVOWarning(Fossilizable):
+    fossilizes(IEVOWarningFossil)
 
     def __init__(self, msg, exception = None):
         self._msg = msg
         self._exception = exception
 
-    @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.EVOWarning'],
-               'message')
     def getMessage(self):
         return self._msg
 
-    @Retrieves(['MaKaC.plugins.Collaboration.EVO.common.EVOWarning'],
-               'exception')
     def getException(self):
         return self._exception

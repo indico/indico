@@ -20,9 +20,10 @@
 
 from MaKaC.plugins.Collaboration.base import CollaborationServiceException,\
     CSErrorBase
-from MaKaC.common.PickleJar import Retrieves
 from MaKaC.webinterface.common.contribFilters import PosterFilterField
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
+from MaKaC.plugins.Collaboration.WebcastRequest.fossils import IWebcastRequestErrorFossil
+from MaKaC.common.fossilize import fossilizes
 
 lectureOptions = [
     ("none", "None"),
@@ -87,10 +88,10 @@ def getCommonTalkInformation(conference):
     #a talk is defined as a non-poster contribution
     filter = PosterFilterField(conference, False, False)
     talks = [cont for cont in conference.getContributionList() if filter.satisfies(cont)]
-    
+
     #list of "locationName:roomName" strings
     webcastCapableRooms = CollaborationTools.getOptionValue('WebcastRequest', "webcastCapableRooms")
-    
+
     #a webcast-able talk is defined as a talk talking place in a webcast-able room
     webcastAbleTalks = []
     for t in talks:
@@ -98,35 +99,29 @@ def getCommonTalkInformation(conference):
         room = t.getRoom()
         if location and room and (location.getName() + ":" + room.getName() in webcastCapableRooms):
             webcastAbleTalks.append(t)
-            
+
     return (talks, webcastCapableRooms, webcastAbleTalks)
-    
-class WebcastRequestError(CSErrorBase):
+
+class WebcastRequestError(CSErrorBase): #already fossilizable
+    fossilizes(IWebcastRequestErrorFossil)
+
     def __init__(self, operation, inner):
         CSErrorBase.__init__(self)
         self._operation = operation
         self._inner = inner
-        
-    @Retrieves(['MaKaC.plugins.Collaboration.WebcastRequest.common.WebcastRequestError'], 'origin')
-    def getOrigin(self):
-        return 'WebcastRequest'
-        
-    @Retrieves(['MaKaC.plugins.Collaboration.WebcastRequest.common.WebcastRequestError'],
-               'operation')
+
     def getOperation(self):
         return self._operation
-    
-    @Retrieves(['MaKaC.plugins.Collaboration.WebcastRequest.common.WebcastRequestError'],
-               'inner')
+
     def getInner(self):
         return str(self._inner)
-    
+
     def getUserMessage(self):
         return ''
-    
+
     def getLogMessage(self):
         return "Webcast Request error for operation: " + str(self._operation) + ", inner exception: " + str(self._inner)
-    
-    
+
+
 class WebcastRequestException(CollaborationServiceException):
     pass

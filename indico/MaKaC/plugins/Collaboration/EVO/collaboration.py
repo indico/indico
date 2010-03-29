@@ -32,8 +32,11 @@ from MaKaC.common.mail import GenericMailer
 from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
+from MaKaC.plugins.Collaboration.EVO.fossils import ICSBookingConfModifFossil
+from MaKaC.common.fossilize import fossilizes
 
-class CSBooking(CSBookingBase):
+class CSBooking(CSBookingBase): #already Fossilizable
+    fossilizes(ICSBookingConfModifFossil)
 
     _hasTitle = True
     _hasStart = True
@@ -104,33 +107,27 @@ class CSBooking(CSBookingBase):
     def getHasAccessPassword(self):
         return self._accessPassword is not None
 
-    @Retrieves(['MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking'], 'url')
     def getURL(self):
         if self._url.startswith("meeting"): #the first part of the URL is not there
             self._url = getEVOOptionValueByName("koalaLocation") + '?' + self._url
         return self._url
 
-    @Retrieves(['MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking'], 'phoneBridgeId')
     def getPhoneBridgeId(self):
         if not hasattr(self, '_phoneBridgeId'):
             self._phoneBridgeId = None
         return self._phoneBridgeId
 
-    @Retrieves(['MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking'], 'phoneBridgePassword')
     def getPhoneBridgePassword(self):
         if not hasattr(self, '_phoneBridgePassword'):
             self._phoneBridgePassword = None
         return self._phoneBridgePassword
 
-    @Retrieves(['MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking'], 'errorMessage')
     def getErrorMessage(self):
         return self._errorMessage
 
-    @Retrieves(['MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking'], 'errorDetails')
     def getErrorDetails(self):
         return self._errorDetails
 
-    @Retrieves(['MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking'], 'changesFromEVO')
     def getChangesFromEVO(self):
         return self._changesFromEVO
 

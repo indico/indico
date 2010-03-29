@@ -28,7 +28,7 @@ from datetime import timedelta
 import socket
 import errno
 from MaKaC.common.fossilize import fossilizes, Fossilizable
-from MaKaC.plugins.Collaboration.CERNMCU.fossils import IRoomWithH323Fossil
+from MaKaC.plugins.Collaboration.CERNMCU.fossils import IRoomWithH323Fossil, ICERNMCUErrorFossil
 
 secondsToWait = 10
 
@@ -210,22 +210,18 @@ class RoomWithH323(Fossilizable):
         return self._ip
 
 
-class CERNMCUError(CSErrorBase):
+
+class CERNMCUError(CSErrorBase): #already fossilizable
+    fossilizes(ICERNMCUErrorFossil)
 
     def __init__(self, faultCode, info = ''):
         CSErrorBase.__init__(self)
         self._faultCode = faultCode
         self._info = info
 
-    @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.CERNMCUError'], 'origin')
-    def getOrigin(self):
-        return 'CERNMCU'
-
-    @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.CERNMCUError'], 'faultCode')
     def getFaultCode(self):
         return self._faultCode
 
-    @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.CERNMCUError'], 'info')
     def getInfo(self):
         return self._info
 

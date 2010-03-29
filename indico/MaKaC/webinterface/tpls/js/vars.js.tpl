@@ -95,6 +95,7 @@ var Indico = {
         ConferenceDisplay: "<%= urlHandlers.UHConferenceDisplay.getURL() %>",
         ContributionDisplay: "<%= urlHandlers.UHContributionDisplay.getURL() %>",
         SessionDisplay: "<%= urlHandlers.UHSessionDisplay.getURL() %>",
+        ConfCollaborationDisplay: "<%= urlHandlers.UHCollaborationDisplay.getURL() %>",
 
         ContribToXML: "<%= urlHandlers.UHContribToXML.getURL() %>",
         ContribToPDF: "<%= urlHandlers.UHContribToPDF.getURL() %>",

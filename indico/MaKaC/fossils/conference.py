@@ -26,6 +26,9 @@ class IConferenceMinimalFossil(IFossil):
     def getId(self):
         """Conference id"""
 
+    def getType(self):
+        """ Event type: 'conference', 'meeting', 'simple_event' """
+
     def getTitle(self):
         """Conference title"""
 
