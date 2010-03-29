@@ -1,5 +1,8 @@
 """
-`fossilize` allows us to "serialize" complex python objects into dictionaries and lists. Such operation is very useful for generating JSON data structures from business objects.
+`fossilize` allows us to "serialize" complex python
+objects into dictionaries and lists. Such operation
+is very useful for generating JSON data structures
+from business objects.
 It works as a wrapper around `zope.interface`.
 
 Some of the features are:
@@ -13,7 +16,12 @@ import zope.interface
 
 
 def fossilizes(*classList):
-    zope.interface.declarations._implements("fossilizes", classList, zope.interface.classImplements)
+    """
+    Simple wrapper around 'implements'
+    """
+    zope.interface.declarations._implements("fossilizes",
+                                            classList,
+                                            zope.interface.classImplements)
 
 def addFossil(klazz, fossils):
     """ Declares fossils for a class
@@ -29,49 +37,105 @@ def addFossil(klazz, fossils):
         zope.interface.classImplements(klazz, fossil)
 
 class NonFossilizableException(Exception):
-    pass
+    """
+    Object is not fossilizable (doesn't implement Fossilizable)
+    """
 
 class WrongFossilTypeException(Exception):
-    pass
+    """
+    Fossil type doesn't apply to target object
+    """
 
 class InvalidFossilException(Exception):
-    pass
+    """
+    The fossil name doesn't follow the convention I(\w+)Fossil
+    """
 
 class IFossil(zope.interface.Interface):
     """
     Fossil base interface. All fossil classes should derive from this one.
     """
-    pass
 
 class Fossilizable(object):
     """
     Base class for all the objects that can be fossilized
     """
 
-    __fossilNameRE = re.compile('^I(.*)Fossil$')
-    __methodNameRE = re.compile('^get(.*)$')
-
+    __fossilNameRE = re.compile('^I(\w+)Fossil$')
+    __methodNameRE = re.compile('^get(\w+)$')
+    __methodNameCache = {}
+    __fossilNameCache = {}
 
     @classmethod
     def __extractName(cls, name):
-        """ 'De-camelcase' the name """
+        """
+        'De-camelcase' the name
+        """
 
-        m = cls.__methodNameRE.match(name)
-
-        if not m:
-            raise Exception("method name '%s' is not valid! has to start by 'get' or use 'name' tag" % name)
+        if name in cls.__methodNameCache:
+            return cls.__methodNameCache[name]
         else:
-            return m.group(1)[0:1].lower() + m.group(1)[1:]
+            nmatch = cls.__methodNameRE.match(name)
+
+            if not nmatch:
+                raise Exception("method name '%s' is not valid!"
+                                " has to start by 'get' or use "
+                                "'name' tag" % name)
+            else:
+                extractedName = nmatch.group(1)[0:1].lower() + \
+                                nmatch.group(1)[1:]
+                cls.__methodNameCache[name] = extractedName
+                return extractedName
 
     @classmethod
-    def __fossilizeIterable(cls, obj, interface, **kwargs):
+    def __extractFossilName(cls, name):
+        """
+        Extracts the fossil name from a I(.*)Fossil
+        class name.
+        IMyObjectBasicFossil -> myObjectBasic
+        """
 
-        if type(obj) == list:
-            return map(lambda elem: cls.__fossilizeIterable(elem, interface, **kwargs), obj)
-        elif type(obj) == dict:
-            return dict((k, cls.__fossilizeIterable(v, interface, **kwargs)) for k,v in obj.iteritems())
+        if name in cls.__fossilNameCache:
+            fossilName = cls.__fossilNameCache[name]
         else:
-            return obj.fossilize(interface, **kwargs)
+            fossilNameMatch = Fossilizable.__fossilNameRE.match(name)
+            if fossilNameMatch is None:
+                raise InvalidFossilException("Invalid fossil name: %s."
+                                             " A fossil name should follow the"
+                                             " pattern: I(\w+)Fossil." % name)
+            else:
+                fossilName = fossilNameMatch.group(1)[0].lower() + fossilNameMatch.group(1)[1:]
+                cls.__fossilNameCache[name] = fossilName
+        return fossilName
+
+
+    @classmethod
+    def _fossilizeIterable(cls, target, interface, **kwargs):
+        """
+        Fossilizes an object, be it a 'direct' fossilizable
+        object, or an iterable (dict, list, set);
+        """
+
+        if isinstance(target, Fossilizable):
+            return target.fossilize(interface, **kwargs)
+        else:
+            ttype = type(target)
+            if ttype in [int, str, float]:
+                return target
+            elif ttype in [list, set]:
+                container = ttype()
+                for elem in target:
+                    container.append(fossilize(elem, interface, **kwargs))
+                return container
+            elif ttype is dict:
+                container = {}
+                for key, value in target.iteritems():
+                    container[key] = fossilize(value, interface, **kwargs)
+                return container
+            else:
+                raise NonFossilizableException()
+
+            return fossilize(target, interface)
 
     def fossilize(self, interface, **kwargs):
         """
@@ -82,15 +146,17 @@ class Fossilizable(object):
         """
 
         if not interface.providedBy(self):
-            raise WrongFossilTypeException("Interface '%s' not provided by '%s'" % (interface.__name__, self.__class__.__name__))
+            raise WrongFossilTypeException("Interface '%s' not provided"
+                                           " by '%s'" %
+                                           (interface.__name__,
+                                            self.__class__.__name__))
 
-        fossilNameMatch = Fossilizable.__fossilNameRE.match(interface.getName())
-        if fossilNameMatch is None:
-            raise InvalidFossilException("Invalid fossil name: %s. A fossil name should follow the pattern: I******Fossil." % interface.getName())
+        name = interface.getName()
+        fossilName = self.__extractFossilName(name)
 
         result = {}
 
-        for method in list(interface):
+        for method in interface:
 
             methodResult = getattr(self, method)()
             tags = interface[method].getTaggedValueTags()
@@ -99,13 +165,16 @@ class Fossilizable(object):
             if 'result' in tags:
                 targetInterface = interface[method].getTaggedValue('result')
                 #targetInterface = globals()[targetInterfaceName]
-                methodResult = self.__fossilizeIterable(methodResult, targetInterface, **kwargs)
+                methodResult = Fossilizable._fossilizeIterable(
+                    methodResult, targetInterface, **kwargs)
 
             # Conversion function
             if 'convert' in tags:
                 convertFunction = interface[method].getTaggedValue('convert')
                 converterArgNames = inspect.getargspec(convertFunction)[0]
-                converterArgs = dict((name, kwargs[name]) for name in converterArgNames if name in kwargs)
+                converterArgs = dict((name, kwargs[name])
+                                     for name in converterArgNames
+                                     if name in kwargs)
                 methodResult = convertFunction(methodResult, **converterArgs)
 
             # Re-name the attribute produced by the method
@@ -117,12 +186,12 @@ class Fossilizable(object):
             result[attrName] = methodResult
 
         if "_type" in result or "_fossil" in result:
-            raise InvalidFossilException('"_type" or "_fossil" cannot be a fossil attribute name')
+            raise InvalidFossilException('"_type" or "_fossil"'
+                                         ' cannot be a fossil attribute  name')
         else:
             result["_type"] = self.__class__.__name__
-            innerFossilName = fossilNameMatch.group(1)
-            if innerFossilName: #we check that it's not an empty string
-                result["_fossil"] = innerFossilName[0].lower() + innerFossilName[1:]
+            if fossilName: #we check that it's not an empty string
+                result["_fossil"] = fossilName
             else:
                 result["_fossil"] = ""
 
@@ -130,23 +199,13 @@ class Fossilizable(object):
 
 def fossilize(target, interface, **kwargs):
     """
-    Method that allows the "fossilization" process to be called on data structures (lists, dictionaries and sets) as well as normal `Fossilizable` objects.
+    Method that allows the "fossilization" process to
+    be called on data structures (lists, dictionaries
+    and sets) as well as normal `Fossilizable` objects.
 
     :param target: target object to be fossilized
     :type target: Fossilizable
     :param interface: target fossil type
     :type interface: IFossil
     """
-    if isinstance(target, Fossilizable):
-        return target.fossilize(interface, **kwargs)
-    else:
-        t = type(target)
-        if t in [int, str, float]:
-            return target
-        elif t in [list, set]:
-            return map(lambda elem: fossilize(elem, interface, **kwargs), target)
-        elif t is dict:
-            return dict((k, fossilize(v, interface, **kwargs)) for k, v in target.iteritems())
-        else:
-            raise NonFossilizableException()
-
+    return  Fossilizable._fossilizeIterable(target, interface, **kwargs)
