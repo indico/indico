@@ -32,6 +32,7 @@ import inspect
 import re
 import zope.interface
 from types import NoneType, ClassType, TypeType
+from persistent.interfaces import IPersistent
 
 
 def fossilizes(*classList):
@@ -84,6 +85,7 @@ class Fossilizable:
 
     __fossilNameRE = re.compile('^I(\w+)Fossil$')
     __methodNameRE = re.compile('^get(\w+)|(has\w+)|(is\w+)$')
+    __methodNameRE = re.compile('^get(.*)|(has.+)|(is.+)$')
     __methodNameCache = {}
     __fossilNameCache = {}
 
@@ -137,16 +139,16 @@ class Fossilizable:
         :param interfaceArg: the target fossile type
         :type interfaceArg: IFossil, NoneType, or dict
 
-            * If IFossil, we will use it.
-            * If None, we will take the default fossil (the first one of this class's "fossilizes" list)
-            * If a dict, we will use the object's class, class name, or full class name as key.
+            -If IFossil, we will use it.
+            -If None, we will take the default fossil (the first one of this class's "fossilizes" list)
+            -If a dict, we will use the object's class, class name, or full class name as key.
 
         Also verifies that the interface obtained through these 3 methods is effectively provided by the object.
         """
         if interfaceArg is None:
             #we try to take the 1st interface declared with fossilizes
-            implementedInterfaces = list(i for i in zope.interface.implementedBy(self.__class__) if i.extends(IFossil))
-            if not implementedInterfaces:
+            implementedInterfaces = list(zope.interface.implementedBy(self.__class__))
+            if not implementedInterfaces or implementedInterfaces[0] == IPersistent:
                 raise NonFossilizableException("Object %s of class %s cannot be fossilized,"
                                                "no fossils were declared for it" %
                                                (str(self),
@@ -156,13 +158,20 @@ class Fossilizable:
 
         elif type(interfaceArg) is dict:
 
-            className = self.__class__.__module__ + '.' + \
-                        self.__class__.__name__
+            found = False
+            clazz = self.__class__
 
-            # interfaceArg is a dictionary of class:Fossil pairs
-            if className in interfaceArg:
-                interface = interfaceArg[className]
-            else:
+            for key in interfaceArg.iterkeys():
+                if (key == clazz.__name__ or #class name
+                    key == "%s.%s" % (clazz.__module__, clazz.__name__) or #full class name
+                    key == clazz or #class
+                    (type(key) == ClassType or type(key) == TypeType or type(key) == tuple) and isinstance(self, key)): #class (including base classes)
+
+                    interface = interfaceArg[key]
+                    found = True
+                    break
+
+            if not found:
                 raise NonFossilizableException("Object %s of class %s cannot be fossilized; "
                                                "its class was not a key in the provided fossils dictionary" %
                                                (str(self),
