@@ -66,6 +66,28 @@
 <datafield tag="490" ind1=" " ind2=" ">
   <subfield code="a"><xsl:value-of select="./title" disable-output-escaping="yes"/></subfield>
 </datafield>
+<xsl:if test="./contribution/allowedAccessGroups != '' and count(./contribution/allowedAccessGroups) != 0">
+<datafield tag="506" ind1="1" ind2=" ">
+    <subfield code="a">Restricted</subfield>
+    <xsl:for-each select="./contribution/allowedAccessGroups/group">
+    <subfield code="d"><xsl:value-of select="." /></subfield>
+    </xsl:for-each>
+    <subfield code="f">group</subfield>
+    <subfield code="2">CDS Invenio</subfield>
+    <subfield code="5">SzGeCERN</subfield>
+</datafield>
+</xsl:if>
+<xsl:if test="./contribution/allowedAccessEmails != '' and count(./contribution/allowedAccessEmails) != 0">
+<datafield tag="506" ind1="1" ind2=" ">
+    <subfield code="a">Restricted</subfield>
+    <xsl:for-each select="./contribution/allowedAccessEmails/email">
+    <subfield code="d"><xsl:value-of select="." /></subfield>
+    </xsl:for-each>
+    <subfield code="f">email</subfield>
+    <subfield code="2">CDS Invenio</subfield>
+    <subfield code="5">SzGeCERN</subfield>
+</datafield>
+</xsl:if>
 <datafield tag="518" ind1=" " ind2=" ">
   <subfield code="d"><xsl:value-of select="./contribution/startDate" disable-output-escaping="yes"/></subfield>
 </datafield>

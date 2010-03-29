@@ -395,15 +395,21 @@ def createCDSRecord(aw, IndicoID, contentType, videoFormat):
     Logger.get('RecMan').info("IndicoID = %s", IndicoID)
     Logger.get('RecMan').info("parsed[conference] = %s", str(parsed["conference"]))
 
-    conf = ConferenceHolder().getById(parsed["conference"])
+    conference = ConferenceHolder().getById(parsed["conference"])
     # setting source='RecordingManager' is how we identify ourselves to the outputGenerator
     # Nobody else should need to know this access information, and it shouldn't be accessible
     # to e.g. OAI harvesters outside CERN.
     if parsed["type"] == 'conference':
         Logger.get('RecMan').info("generating MARC XML for a conference")
-#        og.confToXMLMarc21(conf, 1, 1, 1, forceCache=True, out=xmlGen, source='RecordingManager')
-        og.confToXML(conf, 0, 0, 1, source='RecordingManager', videoFormat=videoFormat)
-#        conf,includeSession,includeContribution,includeMaterial,showSession="all", showContribution="all", out=None, forceCache=False
+        og.confToXML(conference,
+                     0, # includeSession
+                     0, # includeContribution
+                     1, # includeMaterial
+                     showContribution = None,
+                     forceCache       = True,
+                     source           = 'RecordingManager',
+                     contentType      = contentType,
+                     videoFormat      = videoFormat)
     elif parsed["type"] == 'session':
         Logger.get('RecMan').info("generating MARC XML for a session (no such thing yet)")
         # there is no such method for sessions yet for some reason...
@@ -411,22 +417,29 @@ def createCDSRecord(aw, IndicoID, contentType, videoFormat):
         pass
     elif parsed["type"] == 'contribution':
         Logger.get('RecMan').info("generating MARC XML for a contribution")
-        cont = conf.getContributionById(parsed["contribution"])
-        og.contribToXMLMarc21(cont, includeMaterial=1, forceCache=True, out=xmlGen, source='RecordingManager', videoFormat=videoFormat)
-#                              cont,includeMaterial=1, out=None, forceCache=False, source=None
+        contribution = conference.getContributionById(parsed["contribution"])
+        og.contributionToXML(contribution,
+                             0, # includeSubContribution
+                             1, # includeMaterial
+                             conference,
+                             showSubContribution = None,
+                             out                 = xmlGen,
+                             forceCache          = True,
+                             source              = 'RecordingManager',
+                             contentType         = contentType,
+                             videoFormat         = videoFormat)
     elif parsed["type"] == 'subcontribution':
         Logger.get('RecMan').info("generating MARC XML for a subcontribution")
-        cont = conf.getContributionById(parsed["contribution"])
-        subCont = cont.getSubContributionById(parsed["subcontribution"])
-        og.subContribToXMLMarc21(subCont, includeMaterial=1, forceCache=True, out=xmlGen, source='RecordingManager')
-#                                subCont,includeMaterial=1, out=None, forceCache=False, source=None
+        contribution = conference.getContributionById(parsed["contribution"])
+        subContribution = contribution.getSubContributionById(parsed["subcontribution"])
+        og.subContribToXMLMarc21(subContribution, includeMaterial=1, forceCache=True, out=xmlGen, source='RecordingManager')
     else:
         Logger.get('RecMan').info("IndicoID = %s", IndicoID)
 
     xmlGen.closeTag("event")
 
-    # Get the MARC XML
-    marcxml = xmlGen.getXml()
+    # Get base XML
+    basexml = xmlGen.getXml()
 
     from MaKaC.common import Config
 
@@ -444,12 +457,17 @@ def createCDSRecord(aw, IndicoID, contentType, videoFormat):
         try:
             Logger.get('RecMan').info("Trying to do XSLT using path %s" % stylePath)
             parser = XSLTransformer(stylePath)
-            outputData = parser.process(marcxml)
+            outputData = parser.process(basexml)
         except:
             outputData = "Cannot parse stylesheet: %s" % sys.exc_info()[0]
     else:
-        outputData = marcxml
+        outputData = basexml
 
+
+    # temporary, for my own debugging
+    f = open('/tmp/base.xml', 'w')
+    f.write(basexml)
+    f.close()
 
     # temporary, for my own debugging
     f = open('/tmp/marc.xml', 'w')

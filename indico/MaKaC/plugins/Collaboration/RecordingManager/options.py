@@ -106,15 +106,9 @@ globalOptions = [
                "editable": True,
                "visible": True} ),
 
-    ("MarcField506Subfield2", {"description" : _("MARC datafield 506 subfield 2"),
+    ("contentTypeWebLecture", {"description" : _("Web lecture identifier"),
                "type": str,
-               "defaultValue": "CDS Invenio",
-               "editable": True,
-               "visible": True} ),
-
-    ("MarcField506Subfield5", {"description" : _("MARC datafield 506 subfield 5"),
-               "type": str,
-               "defaultValue": "SzGeCERN",
+               "defaultValue": "WLAPLectureObject-v0.2",
                "editable": True,
                "visible": True} )
 
