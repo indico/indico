@@ -34,7 +34,7 @@ from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.i18n import _
 
 class WPTrackBase(WPConferenceBase):
-    
+
     def __init__( self, rh, track, subTrack=None):
         WPConferenceBase.__init__( self, rh, track.getConference() )
         self._track = track
@@ -46,7 +46,7 @@ class WPTrackDisplayBase( WPTrackBase ):
 
 
 class WPTrackDefaultDisplayBase( WPTrackDisplayBase, WPConferenceDefaultDisplayBase ):
-    
+
     def __init__( self, rh, track ):
         WPTrackDisplayBase.__init__( self, rh, track )
 
@@ -58,7 +58,7 @@ class WPTrackDefaultDisplayBase( WPTrackDisplayBase, WPConferenceDefaultDisplayB
 
 
 class WPTrackDisplay( WPTrackDefaultDisplayBase ):
-    
+
     def _getBody( self, params ):
         wc = wcomponents.WTrackDisplay( self._getAW(), self._track )
         pars = { \
@@ -74,7 +74,7 @@ class WPTrackModifBase( WPConferenceModifBase ):
         WPConferenceModifBase.__init__( self, rh, track.getConference() )
         self._track = track
         self._subTrack = subTrack
-    
+
     def _getNavigationDrawer(self):
         if self._subTrack:
             target = self._subTrack
@@ -105,13 +105,13 @@ class WPTrackModifBase( WPConferenceModifBase ):
 
     def _setActiveTab( self ):
         pass
-    
+
     def _setActiveSideMenuItem( self ):
         self._programMenuItem.setActive()
 
     def _getPageContent( self, params ):
         self._createTabCtrl()
-        banner = wcomponents.WTrackBannerModif(self._track).getHTML()
+        banner = wcomponents.WTrackBannerModif(self._track, isManager=self._tabMain.isEnabled()).getHTML()
         html = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
         return banner+html
 
@@ -120,10 +120,10 @@ class WPTrackModifBase( WPConferenceModifBase ):
 
 
 class WTrackModifMain(wcomponents.WTemplated):
-    
+
     def __init__(self,track):
         self._track = track
-    
+
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
         vars["title"]=self.htmlText(self._track.getTitle())
@@ -141,11 +141,11 @@ class WPTrackModification( WPTrackModifBase ):
 
 
 class WTrackDataModification(wcomponents.WTemplated):
-    
+
     def __init__(self,track):
         self._track=track
         self._conf=track.getConference()
-    
+
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
         vars["code"]=quoteattr(str(self._track.getCode()))
@@ -156,7 +156,7 @@ class WTrackDataModification(wcomponents.WTemplated):
 
 
 class WPTrackDataModification( WPTrackModification ):
-    
+
     def _getTabContent( self, params ):
         p=WTrackDataModification(self._track)
         return p.getHTML()
@@ -171,7 +171,7 @@ class _AbstractStatusTrackView:
     def __init__( self, track, abstract ):
         self._track = track
         self._abstract = abstract
-    
+
     def getLabel( cls ):
         return _(cls._label)
     #ne pas oublier d'appeler la fonction de traduction
@@ -218,7 +218,7 @@ class _ASTrackViewAccepted( _AbstractStatusTrackView ):
 
     def getResponsible( self ):
         return self._abstract.getCurrentStatus().getResponsible()
-    
+
     def getDate( self ):
         return self._abstract.getCurrentStatus().getDate()
 
@@ -235,10 +235,10 @@ class _ASTrackViewAcceptedForOther( _AbstractStatusTrackView ):
 
     def getComment( self ):
         return  self._abstract.getCurrentStatus().getComments()
-    
+
     def getResponsible( self ):
         return self._abstract.getCurrentStatus().getResponsible()
-    
+
     def getDate( self ):
         return self._abstract.getCurrentStatus().getDate()
 
@@ -252,13 +252,13 @@ class _ASTrackViewRejected( _AbstractStatusTrackView ):
     _icon = "ats_rejected"
     #don't modify it _("rejected")
     _label = "rejected"
- 
+
     def getComment( self ):
         return  self._abstract.getCurrentStatus().getComments()
-    
+
     def getResponsible( self ):
         return self._abstract.getCurrentStatus().getResponsible()
-    
+
     def getDate( self ):
         return self._abstract.getCurrentStatus().getDate()
 
@@ -274,11 +274,11 @@ class _ASTrackViewPA( _AbstractStatusTrackView ):
     def getComment( self ):
         jud = self._abstract.getTrackJudgement( self._track )
         return jud.getComment()
-    
+
     def getResponsible( self ):
         jud = self._abstract.getTrackJudgement( self._track )
         return jud.getResponsible()
-    
+
     def getDate( self ):
         jud = self._abstract.getTrackJudgement( self._track )
         return jud.getDate()
@@ -291,7 +291,7 @@ class _ASTrackViewPA( _AbstractStatusTrackView ):
         #Event if the abstract is not in "in conflict" status we want to
         #   show up current conflicts
         acc = self._abstract.getTrackAcceptanceList()
-        #If there is only 1 track judgement accepting the abstract and it's 
+        #If there is only 1 track judgement accepting the abstract and it's
         #   ours, then no conflict is reported
         if len( acc ) == 1 and acc[0].getTrack() == self._track:
             return []
@@ -308,11 +308,11 @@ class _ASTrackViewPR( _AbstractStatusTrackView ):
     def getComment( self ):
         jud = self._abstract.getTrackJudgement( self._track )
         return jud.getComment()
-    
+
     def getResponsible( self ):
         jud = self._abstract.getTrackJudgement( self._track )
         return jud.getResponsible()
-    
+
     def getDate( self ):
         jud = self._abstract.getTrackJudgement( self._track )
         return jud.getDate()
@@ -322,17 +322,17 @@ class _ASTrackViewPFOT( _AbstractStatusTrackView ):
     _color = "white"
     _id = "pfot"
     _icon = "ats_prop_other_track"
-    #don't modify it _("rejected") 
+    #don't modify it _("rejected")
     _label = "proposed for other tracks"
 
     def getComment( self ):
         jud = self._abstract.getTrackJudgement( self._track )
         return jud.getComment()
-    
+
     def getResponsible( self ):
         jud = self._abstract.getTrackJudgement( self._track )
         return jud.getResponsible()
-    
+
     def getDate( self ):
         jud = self._abstract.getTrackJudgement( self._track )
         return jud.getDate()
@@ -345,10 +345,10 @@ class _ASTrackViewPFOT( _AbstractStatusTrackView ):
 class _ASTrackViewWithdrawn( _AbstractStatusTrackView ):
     _color = "white"
     _id = "withdrawn"
-    _icon = "ats_withdrawn" 
-    #don't modify it _("withdrawn") 
+    _icon = "ats_withdrawn"
+    #don't modify it _("withdrawn")
     _label = "withdrawn"
-   
+
     def getComment( self ):
         return  self._abstract.getCurrentStatus().getComments()
 
@@ -360,15 +360,15 @@ class _ASTrackViewDuplicated( _AbstractStatusTrackView ):
     _color = "white"
     _id = "duplicated"
     _icon = "ats_withdrawn"
-    #don't modify it _("duplicated") 
+    #don't modify it _("duplicated")
     _label = "duplicated"
-    
+
     def getComment( self ):
         return  self._abstract.getCurrentStatus().getComments()
 
     def getResponsible( self ):
         return self._abstract.getCurrentStatus().getResponsible()
-    
+
     def getDate( self ):
         return self._abstract.getCurrentStatus().getDate()
 
@@ -380,15 +380,15 @@ class _ASTrackViewMerged(_AbstractStatusTrackView):
     _color = "white"
     _id = "merged"
     _icon = "ats_withdrawn"
-    #don't modify it _("merged") 
+    #don't modify it _("merged")
     _label = "merged"
-    
+
     def getComment( self ):
         return  self._abstract.getCurrentStatus().getComments()
 
     def getResponsible( self ):
         return self._abstract.getCurrentStatus().getResponsible()
-    
+
     def getDate( self ):
         return self._abstract.getCurrentStatus().getDate()
 
@@ -396,9 +396,9 @@ class _ASTrackViewMerged(_AbstractStatusTrackView):
         return self._abstract.getCurrentStatus().getTargetAbstract()
 
 class AbstractStatusTrackViewFactory:
-    
+
     def __init__(self):
-        self._status = { 
+        self._status = {
             _ASTrackViewSubmitted.getId(): _ASTrackViewSubmitted, \
             _ASTrackViewAccepted.getId(): _ASTrackViewAccepted, \
             _ASTrackViewAcceptedForOther.getId(): _ASTrackViewAcceptedForOther, \
@@ -409,7 +409,7 @@ class AbstractStatusTrackViewFactory:
             _ASTrackViewWithdrawn.getId(): _ASTrackViewWithdrawn,\
             _ASTrackViewDuplicated.getId(): _ASTrackViewDuplicated, \
             _ASTrackViewMerged.getId(): _ASTrackViewMerged }
-        
+
     def getStatus( track, abstract ):
         d = { \
         review.AbstractStatusSubmitted: _ASTrackViewSubmitted, \
@@ -421,10 +421,10 @@ class AbstractStatusTrackViewFactory:
         status = abstract.getCurrentStatus()
         if d.has_key( status.__class__ ):
             return d[ status.__class__ ](track, abstract)
-        #   return d[ status.__class__ ](track, abstract) 
-        #For the accepted status, we need to know if it has been accepted for 
+        #   return d[ status.__class__ ](track, abstract)
+        #For the accepted status, we need to know if it has been accepted for
         #   the current track
-        if status.__class__ == review.AbstractStatusAccepted: 
+        if status.__class__ == review.AbstractStatusAccepted:
             if status.getTrack() != track:
                 return _ASTrackViewAcceptedForOther( track, abstract )
             return _ASTrackViewAccepted( track, abstract )
@@ -438,20 +438,20 @@ class AbstractStatusTrackViewFactory:
                 return _ASTrackViewPR( track, abstract )
             elif jud.__class__ == review.AbstractReallocation:
                 return _ASTrackViewPFOT( track, abstract )
-        #If no judgement exists for the current track the abstract is in 
+        #If no judgement exists for the current track the abstract is in
         #   SUBMITTED status for the track
         return _ASTrackViewSubmitted( track, abstract )
     getStatus = staticmethod( getStatus )
-    
+
     def getStatusList( self ):
         return self._status.values()
-    
+
     def getStatusById( self, id ):
         return self._status[id]
 
-    
+
 class WTrackModifAbstracts( wcomponents.WTemplated ):
-    
+
     def __init__( self, track, filterCrit, sortingCrit ):
         self._track = track
 
@@ -598,7 +598,7 @@ class WTrackModifAbstracts( wcomponents.WTemplated ):
         vars["number"] = str(len(abstractList))
         vars["abstracts"] = "".join( al )
         vars["abstractsToPrint"] = "\n".join(abstractsToPrint)
-        
+
         sortingField = self._sortingCrit.getField()
         vars["currentSorting"] = ""
         url = self._getURL()
@@ -622,7 +622,7 @@ class WTrackModifAbstracts( wcomponents.WTemplated ):
         if sortingField and sortingField.getId() == "number":
             vars["numberImg"] = """<img src=%s alt="">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
             vars["currentSorting"] = """<input type="hidden" name="sortBy" value="number">"""
-        
+
         url = self._getURL()
         url.addParam("sortBy", "date")
         vars["dateSortingURL"] = quoteattr( str( url ) )
@@ -647,11 +647,11 @@ class WTrackModifAbstracts( wcomponents.WTemplated ):
 
 
 class WPTrackModifAbstracts( WPTrackModifBase ):
-    
+
     def __init__(self, rh, track, msg):
         self._msg = msg
         WPTrackModifBase.__init__(self, rh, track)
-    
+
     def _setActiveTab( self ):
         conf = self._track.getConference()
         if not conf.canModify( self._getAW() ):
@@ -660,7 +660,7 @@ class WPTrackModifAbstracts( WPTrackModifBase ):
         self._tabAbstracts.setActive()
 
     def _getTabContent( self, params ):
-        
+
         wc = WTrackModifAbstracts( self._track, \
                                     params["filterCrit"], \
                                     params["sortingCrit"]  )
@@ -670,7 +670,7 @@ class WPTrackModifAbstracts( WPTrackModifBase ):
 
 
 #class WTrackModifFrame(wcomponents.WTemplated):
-#    
+#
 #    def __init__( self, track, aw):
 #        self._track = track
 #        self._aw = aw
@@ -688,24 +688,24 @@ class WPTrackModifAbstracts( WPTrackModifBase ):
 #        owner = self._track.getOwner()
 #        wc = wcomponents.WConferenceModifFrame(owner, self._aw)
 #        return wc
-#    
+#
 #    def getIntermediateVTabPixels( self ):
 #        wc = self.getOwnerComponent()
 #        return 7 + wc.getIntermediateVTabPixels()
-#        
+#
 #    def getTitleTabPixels( self ):
 #        wc = self.getOwnerComponent()
 #        return wc.getTitleTabPixels() - 7
-#    
+#
 #    def getCloseHeaderTags( self ):
 #        wc = self.getOwnerComponent()
 #        return "</table></td></tr>" + wc.getCloseHeaderTags()
 
 
 #class WTrackModifHeader(wcomponents.WTemplated):
-#    
+#
 #    def __init__( self, track, aw ):
-#        self._track = track 
+#        self._track = track
 #        self._aw = aw
 #
 #    def getHTML( self, params ):
@@ -726,7 +726,7 @@ class WPTrackModifAbstracts( WPTrackModifBase ):
 
 
 class WPTrackAbstractModifBase( WPConferenceModifBase ):
-    
+
     def __init__( self, rh, track, abstract ):
         self._abstract = abstract
         self._track = track
@@ -738,7 +738,7 @@ class WPTrackAbstractModifBase( WPConferenceModifBase ):
 
     def _getPageContent( self, params ):
         self._createTabCtrl()
-        banner = wcomponents.WTrackBannerModif(self._track, self._abstract).getHTML()
+        banner = wcomponents.WTrackBannerModif(self._track, self._abstract, isManager=self._abstract.getConference().canModify( self._getAW() )).getHTML()
         body = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
         return banner + body
 
@@ -758,13 +758,13 @@ class WPTrackAbstractModifBase( WPConferenceModifBase ):
 
     def _getTabContent( self, params ):
         return _("nothing")
-    
+
     def _setActiveSideMenuItem(self):
         self._programMenuItem.setActive()
 
 
 class WTrackAbstractModification( wcomponents.WTemplated ):
-    
+
     def __init__( self, track, abstract ):
         self._track = track
         self._abstract = abstract
@@ -879,7 +879,7 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
                     </tr>
                 """%(self.htmlText(caption), self.htmlText(self._abstract.getField(id)) )
         return html
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["title"] = self.htmlText( self._abstract.getTitle() )
@@ -908,14 +908,14 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
         vars["submitter"] = self._getAuthorHTML( self._abstract.getSubmitter() )
         vars["submissionDate"] = self._abstract.getSubmissionDate().strftime( "%d %B %Y %H:%M" )
         vars["modificationDate"] = self._abstract.getModificationDate().strftime( "%d %B %Y %H:%M" )
-        
+
         aStatus = AbstractStatusTrackViewFactory().getStatus( self._track, self._abstract )
         vars["statusDetails"] = self._getStatusDetailsHTML( aStatus )
         vars["statusComment"] = self._getStatusCommentsHTML( aStatus )
         vars["statusColor"] = aStatus.getColor()
         vars["modifyStatusURL"],vars["modifyStatusBtn"]=quoteattr(""),""
         vars["PA_defaults"]=""
-        
+
         vars["proposeToAcceptButton"] = _("""<input type="submit" class="btn" value="_("propose to be accepted")" style="width:205px">""")
         vars["proposeToRejectButton"] = _("""<input type="submit" class="btn" value="_("propose to be rejected")" style="width:205px">""")
         vars["proposeForOtherTracksButton"] = _("""<input type="submit" class="btn" value="_("propose for other tracks")" style="width:205px">""")
@@ -945,12 +945,12 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
 
 
 class WPTrackAbstractModif( WPTrackAbstractModifBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WTrackAbstractModification( self._track, self._abstract )
         return wc.getHTML()
-   
-   
+
+
 class WTrackAbstractPropToAcc( wcomponents.WTemplated ):
 
     def __init__( self, track, abstract ):
@@ -985,16 +985,16 @@ class WTrackAbstractPropToAcc( wcomponents.WTemplated ):
 		                    </tr>
                                     """)%("".join(l))
         return vars
-    
+
 
 class WPTrackAbstractPropToAcc( WPTrackAbstractModifBase ):
-    
+
     def _getTabContent( self, params ):
         wc=WTrackAbstractPropToAcc(self._track,self._abstract)
         p={"comment":params.get("comment",""),\
             "contribType":params.get("contribType",self._abstract.getContribType())}
         return wc.getHTML(p)
-    
+
 
 class WTrackAbstractPropToRej( wcomponents.WTemplated ):
 
@@ -1008,17 +1008,17 @@ class WTrackAbstractPropToRej( wcomponents.WTemplated ):
         vars["trackTitle"] = self._track.getTitle()
         vars["postURL"] = urlHandlers.UHTrackAbstractPropToRej.getURL( self._track, self._abstract )
         return vars
-    
+
 
 class WPTrackAbstractPropToRej( WPTrackAbstractModifBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WTrackAbstractPropToRej( self._track, self._abstract )
         return wc.getHTML()
 
 
 class WTrackAbstractPropForOtherTrack(wcomponents.WTemplated):
-    
+
     def __init__( self, track, abstract ):
         self._abstract = abstract
         self._track = track
@@ -1039,14 +1039,14 @@ class WTrackAbstractPropForOtherTrack(wcomponents.WTemplated):
         return vars
 
 class WPAbstractPropForOtherTracks( WPTrackAbstractModifBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WTrackAbstractPropForOtherTrack( self._track, self._abstract )
         return wc.getHTML()
 
 
 class WPModAbstractMarkAsDup(WPTrackAbstractModifBase):
-    
+
     def _getTabContent( self, params ):
         wc = wcomponents.WAbstractModMarkAsDup(self._abstract)
         p={"comments":params.get("comments",""),
@@ -1058,7 +1058,7 @@ class WPModAbstractMarkAsDup(WPTrackAbstractModifBase):
 
 
 class WPModAbstractUnMarkAsDup(WPTrackAbstractModifBase):
-    
+
     def _getTabContent( self, params ):
         wc = wcomponents.WAbstractModUnMarkAsDup(self._abstract)
         p={ "comments":params.get("comments",""),
@@ -1068,7 +1068,7 @@ class WPModAbstractUnMarkAsDup(WPTrackAbstractModifBase):
 
 
 class WTrackModifCoordination( wcomponents.WTemplated ):
-    
+
     def __init__( self, track ):
         self._track = track
 
@@ -1085,7 +1085,7 @@ class WTrackModifCoordination( wcomponents.WTemplated ):
 
 
 class WPTrackModifCoordination( WPTrackModifBase ):
-    
+
     def _setActiveTab( self ):
         self._tabCoordination.setActive()
 
@@ -1095,7 +1095,7 @@ class WPTrackModifCoordination( WPTrackModifBase ):
 
 
 class WPTrackModifSelectCoordinators( WPTrackModifCoordination ):
-    
+
     def _getTabContent( self, params ):
         url = urlHandlers.UHTrackSelectCoordinators.getURL()
         searchExt = params.get("searchExt","")
@@ -1109,13 +1109,13 @@ class WPTrackModifSelectCoordinators( WPTrackModifCoordination ):
 
 
 class WPModAbstractIntComments(WPTrackAbstractModifBase):
-    
+
     def _setActiveTab( self ):
         self._tabComments.setActive()
 
     def _commentEditURLGen(self,comment):
         return urlHandlers.UHTrackAbstractModIntCommentEdit.getURL(self._track,comment)
-    
+
     def _commentRemURLGen(self,comment):
         return urlHandlers.UHTrackAbstractModIntCommentRem.getURL(self._track,comment)
     def _getTabContent( self, params ):
@@ -1124,10 +1124,10 @@ class WPModAbstractIntComments(WPTrackAbstractModifBase):
             "commentEditURLGen":self._commentEditURLGen,
             "commentRemURLGen":self._commentRemURLGen }
         return wc.getHTML(p)
-   
+
 
 class WPModAbstractIntCommentNew(WPModAbstractIntComments):
-    
+
     def _getTabContent( self, params ):
         wc=wcomponents.WAbstractModNewIntComment(self._getAW(),self._abstract)
         p={"postURL":urlHandlers.UHTrackAbstractModIntCommentNew.getURL(self._track,self._abstract)}
@@ -1135,11 +1135,11 @@ class WPModAbstractIntCommentNew(WPModAbstractIntComments):
 
 
 class WPModAbstractIntCommentEdit(WPModAbstractIntComments):
-    
+
     def __init__(self,rh,track,comment):
         self._comment=comment
         WPModAbstractIntComments.__init__(self,rh,track,comment.getAbstract())
-    
+
     def _getTabContent( self, params ):
         wc=wcomponents.WAbstractModIntCommentEdit(self._comment)
         p={"postURL": urlHandlers.UHTrackAbstractModIntCommentEdit.getURL(self._track,self._comment)}
@@ -1261,7 +1261,7 @@ class WTrackModContribList(wcomponents.WTemplated):
             caption=ContribStatusList().getCaption(st)
             res.append("""<input type="checkbox" name="status" value=%s%s> (%s) %s"""%(quoteattr(str(id)),checked,self.htmlText(code),self.htmlText(caption)))
         return "<br>".join(res)
-            
+
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
@@ -1279,7 +1279,7 @@ class WTrackModContribList(wcomponents.WTemplated):
         if sortingField is not None:
             self._currentSorting=sortingField.getId()
         vars["currentSorting"]=""
-        
+
         url=self._getURL()
         url.addParam("sortBy","number")
         vars["numberImg"]=""
@@ -1354,10 +1354,10 @@ class WTrackModContribList(wcomponents.WTemplated):
                 vars["typeImg"]="""<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                 url.addParam("order","up")
             elif self._order == "up":
-                vars["typeImg"]="""<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow"))) 
+                vars["typeImg"]="""<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
         vars["typeSortingURL"] = quoteattr( str( url ) )
-        
+
         f=filters.SimpleFilter(self._filterCrit,self._sortingCrit)
         numContribs=0
         l=[]
@@ -1375,7 +1375,7 @@ class WTrackModContribList(wcomponents.WTemplated):
         vars["contributionsPDFURL"]=quoteattr(str(urlHandlers.UHTrackModToPDF.getURL(self._track)))
         vars["participantListURL"]=quoteattr(str(urlHandlers.UHTrackModParticipantList.getURL(self._track)))
         totaldur = self._totaldur
-        days = totaldur.days        
+        days = totaldur.days
         hours = (totaldur.seconds)/3600
         dayhours = (days * 24)+hours
         mins = ((totaldur.seconds)/60)-(hours*60)
@@ -1384,12 +1384,13 @@ class WTrackModContribList(wcomponents.WTemplated):
 
 
 class WPModContribList(WPTrackModifBase):
-    
+
     def _setActiveTab( self ):
         conf = self._track.getConference()
         if not conf.canModify( self._getAW() ):
             self._tabMain.disable()
             self._tabCoordination.disable()
+            self._hidingTrackTabs = True
         self._tabContribs.setActive()
 
     def _getTabContent( self, params ):
@@ -1400,13 +1401,13 @@ class WPModContribList(WPTrackModifBase):
         return wc.getHTML()
 
 class WPModParticipantList( WPTrackModifBase ):
-    
+
     def __init__(self, rh, conf, emailList, displayedGroups, contribs):
         WPTrackModifBase.__init__(self, rh, conf)
         self._emailList = emailList
         self._displayedGroups = displayedGroups
         self._contribs = contribs
-    
+
     def _getBody( self, params ):
         WPTrackModifBase._getBody(self, params)
         wc = WContribParticipantList(self._conf, self._emailList, self._displayedGroups, self._contribs)
