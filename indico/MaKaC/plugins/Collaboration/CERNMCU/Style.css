@@ -40,6 +40,10 @@ ul.CERNMCU_H323RoomList > li {
     padding-left: 10px;
 }
 
+ul.CERNMCU_H323RoomList > li.selectedListItem {
+    background-color: #CDEB8B;
+}
+
 ul.CERNMCU_H323RoomList > li span.CERNMCU_H323RoomIP {
     font-size: 8pt;
     color: #666666;
