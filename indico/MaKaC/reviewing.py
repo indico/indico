@@ -92,7 +92,8 @@ class ConferenceReview(Persistent):
         self._enableAuthorSubmittedMatEditorEmailNotif = False
         self._enableAuthorSubmittedMatReviewerEmailNotif = False
 
-        self._reviewableMaterials = ["reviewing"]
+        from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry 
+        self._reviewableMaterials = MaterialFactoryRegistry._allowedMaterials['reviewing']
         #from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
         self._nonReviewableMaterials = []#this is not used any more, since we have new material type used only for reviewing
 

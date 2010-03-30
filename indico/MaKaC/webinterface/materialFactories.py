@@ -332,7 +332,7 @@ class WReviewingCreation( WSpecialMaterialCreationBase ):
 class ReviewingFactory(MaterialFactory):
 
     _id = "reviewing"
-    _title = "reviewing"
+    _title = "Reviewing"
     _iconURL = Config.getInstance().getSystemIconURL("material")
     _creationWC = WReviewingCreation
     _materialKlasses=[conference.Reviewing]
@@ -427,13 +427,15 @@ class MaterialFactoryRegistry:
                   SlidesFactory._id: SlidesFactory, \
                   MinutesFactory._id: MinutesFactory, \
                   VideoFactory._id: VideoFactory, \
-                  PosterFactory._id: PosterFactory }
+                  PosterFactory._id: PosterFactory, \
+                  ReviewingFactory._id: ReviewingFactory }
 
     _allowedMaterials = {
         'simple_event': [ "paper", "slides", "poster", "minutes", "agenda", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast", "video", "streaming video", "downloadable video" ],
         'meeting': [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ],
         'conference' : ["paper", "slides", "poster", "minutes"],
-        'category': [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ]
+        'category': [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ],
+        'reviewing' : ["reviewing"]
         }
 
 
@@ -499,8 +501,9 @@ class SessionMFRegistry(MaterialFactoryRegistry):
 
 
 class ContribMFRegistry(MaterialFactoryRegistry):
-                  PosterFactory._id: PosterFactory }, \
+                  { PosterFactory._id: PosterFactory, \
                   ReviewingFactory._id: ReviewingFactory }
+                  
 class CategoryMFRegistry( ContribMFRegistry ):
     pass
 

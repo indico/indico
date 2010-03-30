@@ -274,7 +274,9 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
                     self._assignContribOpt.setVisible(True)
 
             if "referee" in conferenceRoles and "editor" in conferenceRoles and "reviewer" in conferenceRoles:
-                showrefereearea = self._conf in awUser.getLinkedTo()["conference"]["referee"] 
+                showrefereearea = self._conf in awUser.getLinkedTo()["conference"]["referee"]
+                showreviewerarea = self._conf in awUser.getLinkedTo()["conference"]["reviewer"]
+                showeditorarea = self._conf in awUser.getLinkedTo()["conference"]["editor"]  
 
                
                 if showrefereearea and (self._conf.getConfReview().getChoice()==2 or self._conf.getConfReview().getChoice()==4):
@@ -295,20 +297,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
         if csbm is not None and csbm.hasBookings() and csbm.isCSAllowed():
             self._collaborationOpt.setVisible(True)
                 
-        if showrefereearea:
-			self._judgeListOpt.setVisible(True)
-                
-            showreviewerarea = self._conf in awUser.getLinkedTo()["conference"]["reviewer"]
-                
-        if showreviewerarea:
-        	self._judgereviewerListOpt.setVisible(True)
-                    
-            showeditorarea = self._conf in awUser.getLinkedTo()["conference"]["editor"] 
-                      
-        if showeditorarea:
-            self._judgeeditorListOpt.setVisible(True)                
-                
-            
+                  
 
     def _defineToolBar(self):
         pass

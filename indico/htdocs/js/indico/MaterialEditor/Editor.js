@@ -284,12 +284,12 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
 
         // protection page
         var protectionPane = $B(
-            Html.div({}),
+            Html.div({style:{visibility:this.forReviewing?['hidden']:['visible']}}),
             typeSelector,
             function(value) {
                 return self._drawProtectionPane(value);
             });
-
+        
         // make typeSelector available to the object
         this.typeSelector = typeSelector;
 
@@ -299,7 +299,7 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
                                 [
                                     $T('Location'),
                                     Html.div({},
-                                             locationSelector.draw(),
+                                             this.forReviewing?[]:[locationSelector.draw()],
                                              Html.div({style:{paddingTop: '15px',
                                                               paddingBottom: '10px',
                                                               minHeight: '50px'}},
@@ -430,7 +430,7 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
                 selection = this.types[i][0];
             }
         }
-
+        
         this.typeSelector.set(selection);
         this.ExclusivePopupWithButtons.prototype.postDraw.call(this);
     },
@@ -493,7 +493,7 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
     }
 
 
-}, function(args, list, types, uploadAction, onUpload) {
+}, function(args, list, types, uploadAction, onUpload, forReviewing) {
 
     var self = this;
     this.list = list;
@@ -501,6 +501,7 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
     this.uploadAction = uploadAction;
     this.uploading = false;
     this.onUpload = onUpload;
+    this.forReviewing = forReviewing;
 
     this.args = clone(args);
 //    this.args.materialId = material;
@@ -508,7 +509,7 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
     this.protectionStatus = $O();
     this.uploadType = new WatchValue();
 
-    this.ExclusivePopupWithButtons($T("Upload Material"),
+    this.ExclusivePopupWithButtons(this.forReviewing?[$T("Upload Material for Reviewing")]:[$T("Upload Material")],
                         function() {
                             self.close();
                             
@@ -1281,6 +1282,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
                        );
             }
         };
+        
         var reviewingState = material.get('reviewingState');
         var menu;
 
@@ -1447,7 +1449,6 @@ type("ReviewingMaterialListWidget", ["RemoteWidget", "ListWidget"], {
         var materialId = pair.key;
         args.materialId = materialId;
         
-
         var deleteMaterial = function() {
             if (confirm("Are you sure you want to delete '"+material.get('title')+"'?")) {
                 var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
@@ -1461,6 +1462,8 @@ type("ReviewingMaterialListWidget", ["RemoteWidget", "ListWidget"], {
                             } else {
                                 self.set(materialId, null);
                                 killProgress();
+                                
+                                updateMaterialList(self.types, response.newMaterialTypes);                                
                             }
                         }
                        );
@@ -1506,6 +1509,7 @@ type("ReviewingMaterialListWidget", ["RemoteWidget", "ListWidget"], {
             menu = Html.span({},rb,eb);
         }
         
+        args.materialProtection = material.get('protection');        
         var matWidget = new ResourceListWidget(material.get('resources'), args);
 
         // check whenever a material gets empty (no resources) and delete it
@@ -1517,6 +1521,7 @@ type("ReviewingMaterialListWidget", ["RemoteWidget", "ListWidget"], {
                 }
             });
         var item = [];
+        
         if(material.get('reviewingState') > 1){
 	        var matWidgetDiv = matWidget.draw();
 	        
@@ -1531,6 +1536,27 @@ type("ReviewingMaterialListWidget", ["RemoteWidget", "ListWidget"], {
         return this.RemoteWidget.prototype.draw.call(this);
     },
 
+     _updateMaterialList: function(material) {
+        // add type to custom list, if not there
+        var i = -1;
+
+        for (var j in this.types) {
+            if (this.types[j][1] == material.get('title')) {
+                i = j;
+                break;
+            }
+        }
+
+        var newElement = [material.get('id'), material.get('title')];
+
+        if (i >= 0) {
+            this.types[i] = newElement;
+        } else {
+            this.types.push(newElement);
+        }
+    },
+    
+    
     _loadMaterial: function(id) {
         var self = this;
 
@@ -1548,8 +1574,8 @@ type("ReviewingMaterialListWidget", ["RemoteWidget", "ListWidget"], {
                 self.set(id,
                          material);
 
-                debugVar = self;
-                debugVar2 = material;
+                self._updateMaterialList(material);
+
             }
         });
     },
@@ -1575,8 +1601,9 @@ type("ReviewingMaterialListWidget", ["RemoteWidget", "ListWidget"], {
                                                       } else {
                                                           self._loadMaterial(info.material);
                                                       }
-                                                  });
-                }, $T("Add Material")));
+                                                  },
+                                                  true);
+                }, $T("Add Material for review")));
         
                
         return Html.div(
@@ -1611,7 +1638,6 @@ type("ReviewingMaterialListWidget", ["RemoteWidget", "ListWidget"], {
 
      }
     );
-
 
 
 type("MaterialEditorDialog", ["ExclusivePopupWithButtons"], {
@@ -1677,10 +1703,11 @@ type("MaterialEditorDialog", ["ExclusivePopupWithButtons"], {
 
 IndicoUI.Dialogs.Material = {
 
-    add: function(args, list, types, uploadAction, onUpload) {
-        var dialog = new AddMaterialDialog(args, list, types, uploadAction, onUpload);
+    add: function(args, list, types, uploadAction, onUpload, forReviewing) {
+        var dialog = new AddMaterialDialog(args, list, types, uploadAction, onUpload, forReviewing);
         dialog.open();
     },
+    
     editMaterial: function(args, types, material, list) {
         var dialog = new EditMaterialDialog(args, types, material, list, $T("Edit Material"));
         dialog.execute();

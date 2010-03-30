@@ -18,12 +18,14 @@
 <script type="text/javascript">
 
 <% import MaKaC.conference as conference %>
+<% from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry %>
 
 var args = {
         conference: '<%= self._target.getConference().getId() %>',
         confId: '<%= self._target.getConference().getId() %>',
         contribution: '<%= self._target.getId() %>',
-        contribId: '<%= self._target.getId() %>'
+        contribId: '<%= self._target.getId() %>',
+        parentProtected: <%= jsBoolean(self._target.getAccessController().isProtected()) %>
     };
    
     var uploadAction = Indico.Urls.UploadAction.contribution;
@@ -53,7 +55,7 @@ var args = {
                                     <% end %>
                                 <% end %>
        
-var mlist = new ReviewingMaterialListWidget(args, <%= RHSubmitMaterialBase._allowedMatsforReviewing %>, uploadAction,null, null, visibility,$E("SendBtn"));
+var mlist = new ReviewingMaterialListWidget(args, <%= jsonEncode(list([k, k.title()] for k in MaterialFactoryRegistry._allowedMaterials['reviewing'])) %>, uploadAction,null, null, visibility,$E("SendBtn"));
 
 $E('reviewingMaterialListPlace').set(mlist.draw());
 
