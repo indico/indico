@@ -250,7 +250,7 @@ var IndicoUtil = {
             return null;
         }
 
-        setDate(sdatetime, sdate);
+        var sdatetime = new Date(sdate[2], sdate[1]-1, sdate[0]);
         setTime(sdatetime, stime);
 
         return sdatetime;
@@ -265,8 +265,9 @@ var IndicoUtil = {
             return null;
         }
 
+        var sdatetime = new Date(sdate[2], sdate[1]-1, sdate[0]);
         setTime(sdatetime, [0,0,0,0]);
-        setDate(sdatetime, sdate);
+
 
         return sdatetime;
     },
@@ -709,5 +710,3 @@ var IndicoUtil = {
     errorReport: IndicoUI.Dialogs.Util.error
 
 };
-
-

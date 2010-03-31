@@ -1464,13 +1464,8 @@ type("TimetableDrawer", ["IWidget"],
                      headerStyle.marginTop = '0';
                  }
 
-                 // Format the day string
-                 var d = day.substring(6,8);
-                 var m = day.substring(4,6);
-                 var strDate =  d + '/' + m + '/' + day.substring(0,4);
-                 var nDate = new Date();
-                 setDate(nDate, parseDate(strDate));
-                 var dayStr = Indico.Data.WeekDays[nDate.getDay()].substring(0,3)+' '+d+'/'+m;
+                 var nDate = Util.parseJSDateTime(day, IndicoDateTimeFormats.Ordinal);
+                 var dayStr = Indico.Data.WeekDays[nDate.getDay()].substring(0,3)+' '+nDate.getDate()+'/'+(nDate.getMonth()+1);
 
                  header = Html.div({className: 'timetableHeader', style: headerStyle}, dayStr);
                  div.append(header);

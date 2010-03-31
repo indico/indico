@@ -129,9 +129,7 @@ var Util = {
             return null;
         }
 
-        var date = new Date();
-
-        setDate(date, [results['%d'],results['%m'],results['%Y']]);
+        var date = new Date(results['%Y'],results['%m']-1,results['%d']);
         setTime(date, [results['%H'],results['%M'],results['%S']]);
 
         return date;
@@ -156,9 +154,8 @@ var Util = {
         m1 = obj.date.match(/(\d+)[\-\/](\d+)[\-\/](\d+)/);
         m2 = obj.time.match(/(\d+):(\d+):(\d+)/);
 
-        var date = new Date();
 
-        setDate(date, [m1[3],m1[2],m1[1]]);
+        var date = new Date(m1[1],m1[2],m1[3]);
         setTime(date, [m2[1],m2[2],m2[3]]);
 
         return date;

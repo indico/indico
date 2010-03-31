@@ -630,6 +630,7 @@ type("ChangeEditDialog", // silly name!
                  var self = this;
                  //change timestartmethod
                  // Get "end date" for container, so that the break be added after the rest
+
                  indicoRequest(this.timeStartMethod, this.dateArgs , function(result, error){
                      if (error) {
                          IndicoUtil.errorReport(error);
@@ -761,6 +762,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                      }
                  );
 
+
              conferenceDays.set(Util.formatDateTime(self.info.get('startDate'), IndicoDateTimeFormats.Ordinal, IndicoDateTimeFormats.Server/*Hourless*/));
 
              //We need to update the value of Time and endDateTime every time that is changed by the user
@@ -794,6 +796,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                              startDate.setHours(23);
                              startDate.setMinutes(0);
                          }
+
                          self.info.set('startDate', Util.formatDateTime(startDate, IndicoDateTimeFormats.Server));
                     }
                  });
@@ -1157,15 +1160,9 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
                     return 'All days';
                 }
 
-                var day = text.substring(6,8);
-                var month = text.substring(4,6);
+                var nDate = Util.parseJSDateTime(text, IndicoDateTimeFormats.Ordinal);
 
-                var strDate =  day + '/' + month + '/' + text.substring(0,4);
-
-                var nDate = new Date();
-                setDate(nDate, parseDate(strDate));
-
-                return Indico.Data.WeekDays[nDate.getDay()].substring(0,3)+' '+day+'/'+month;
+                return Indico.Data.WeekDays[nDate.getDay()].substring(0,3) + ' ' + nDate.getDate() + '/' + (nDate.getMonth() + 1);
             },
             postDraw: function(){
                 this.tabWidget.postDraw();
