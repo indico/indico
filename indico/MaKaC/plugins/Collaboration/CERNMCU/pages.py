@@ -29,6 +29,7 @@ from MaKaC.errors import MaKaCError
 from MaKaC.common.logger import Logger
 from MaKaC.common import info
 from MaKaC.i18n import _
+from MaKaC.webinterface.pages.collaboration import WAdvancedTabBase
 
 class WNewBookingForm(WCSPageTemplateBase):
 
@@ -43,6 +44,12 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["MaxEndDate"] = formatDateTime(self._conf.getAdjustedEndDate())
 
         return vars
+
+class WAdvancedTab(WAdvancedTabBase):
+
+    def getVars(self):
+        variables = WAdvancedTabBase.getVars(self)
+        return variables
 
 class WMain (WJSBase):
 
@@ -248,10 +255,16 @@ class XMLGenerator(object):
         out.closeTag("section")
 
         if booking.getHasPin():
-            out.openTag("section")
-            out.writeTag("title", _('Protection:'))
-            out.writeTag("line", _('This conference is protected by a PIN.'))
-            out.closeTag("section")
+            if booking.getBookingParamByName("displayPin"):
+                out.openTag("section")
+                out.writeTag("title", _('PIN:'))
+                out.writeTag("line", str(booking.getPin()))
+                out.closeTag("section")
+            else:
+                out.openTag("section")
+                out.writeTag("title", _('PIN:'))
+                out.writeTag("line", _('This conference is protected by a PIN.'))
+                out.closeTag("section")
 
         out.openTag("section")
         out.writeTag("title", _('Description:'))

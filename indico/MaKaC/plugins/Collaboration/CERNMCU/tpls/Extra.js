@@ -433,7 +433,6 @@ type("ParticipantListField", ["IWidget"],
 /**
  * Mouseover help popup for the 'PIN' field
  */
-
 var CERNMCUPINHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
         '<div style="padding:3px; width: 300px;"">' +
@@ -450,21 +449,28 @@ var CERNMCUPINHelpPopup = function(event) {
 var CERNMCUCustomIDHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
         '<div style="padding:3px; width: 250px;"">' +
-            $T('If for some reason you want to choose youself the MCU ID of this conference, type it here. ' +
+            $T('If for some reason you want to choose yourself the MCU ID of this conference, type it here. ' +
             'The MCU ID has to be a <strong>5-digit number.</strong>') +
         '<\/div>');
 };
 
 /**
+ * Mouseover help popup for the 'Display PIN' checkbox
+ */
+var CERNMCUDisplayPinHelpPopup = function(event) {
+    IndicoUI.Widgets.Generic.tooltip(this, event,
+            '<div style="padding:3px; width: 300px;"">' +
+                $T("The MCU conference's PIN will be displayed in the event page. " +
+                   '<strong>Any person that can see the event page will see the PIN.</strong> Please use this option carefully.') +
+            '<\/div>');
+};
+
+
+/**
  * Draws the context help icons and assigns the appropiate popups to each one.
  */
 var CERNMCUDrawContextHelpIcons = function() {
-    var PINHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
-    PINHelpImg.dom.onmouseover = CERNMCUPINHelpPopup;
-
-    var customIDHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
-    customIDHelpImg.dom.onmouseover = CERNMCUCustomIDHelpPopup;
-
-    $E('PINHelp').set(PINHelpImg);
-    $E('customIdHelp').set(customIDHelpImg);
+    $E('PINHelpImg').dom.onmouseover = CERNMCUPINHelpPopup;
+    $E('customIdHelpImg').dom.onmouseover = CERNMCUCustomIDHelpPopup;
+    $E('displayPinHelpImg').dom.onmouseover = CERNMCUDisplayPinHelpPopup;
 }

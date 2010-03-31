@@ -27,7 +27,7 @@
             <input type="radio" id="autoNoRB" name="autoGenerateId" value="no" onclick="enableCustomId()" />
             <label for="autoNoRB">Choose one manually: </label>
             <input type="text" size="10" name="customId" id="customId" disabled />
-            <span id="customIdHelp"></span>
+            <img id="customIdHelpImg" src="<%= systemIcon('help')%>" style="margin-left:5px; vertical-align:middle;" />
         </td>
     </tr>
     <tr>
@@ -52,7 +52,7 @@
         </td>
         <td style="padding-top: 10px;">
             <span id="PINField"></span>
-            <span id="PINHelp"></span>
+            <img id="PINHelpImg" src="<%= systemIcon('help')%>" style="margin-left:5px; vertical-align:middle;" />
         </td>
     </tr>
     <tr>

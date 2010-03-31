@@ -61,7 +61,8 @@ class CSBooking(CSBookingBase):
     _simpleParameters = {
         "name": (str, ''),
         "description": (str, ''),
-        "id": (str, '')}
+        "id": (str, ''),
+        "displayPin": (bool, False)}
 
     _complexParameters = ["pin", "hasPin", "autoGenerateId", "customId", "participants"]
 

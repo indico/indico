@@ -11,11 +11,18 @@
         <% if Booking.getHasPin(): %>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <%= _('Protection:')%>
+                <%= _('PIN:')%>
             </td>
+            <% if Booking.getBookingParamByName("displayPin"): %>
+            <td class="collaborationConfDisplayInfoRightCol">
+                <%= Booking.getPin() %>
+            </td>
+            <% end %>
+            <% else: %>
             <td class="collaborationConfDisplayInfoRightCol">
                 <%= _("This conference is protected by a PIN.") %>
             </td>
+            <% end %>
         </tr>
         <% end %>
         <tr>
