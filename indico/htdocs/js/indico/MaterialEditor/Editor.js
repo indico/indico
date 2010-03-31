@@ -956,7 +956,7 @@ type("EditResourceDialog", ["EditMaterialResourceBase", "PreLoadHandler"], {
         var tabControl = new TabWidget([
             [$T("Information"), Widget.block([nameDiv,this.resource.type=='stored'?[]:urlDiv,descDiv])],
             [$T("Protection")   , protectionDiv]], 300,200);
-        tabControl.options = $L([$T("Information"), $T("Protection")]);
+        tabControl.options = $L(this.forReviewing?[$T("Information")]:[$T("Information"), $T("Protection")]);
         tabControl.selected.set($T("Information"));
 
         statusSelection.notifyObservers();
@@ -976,7 +976,7 @@ type("EditResourceDialog", ["EditMaterialResourceBase", "PreLoadHandler"], {
     }
 },
 
-     function(args, material, resource, domItem, appender, title) {
+     function(args, material, resource, domItem, appender, title, forReviewing) {
          args = clone(args);
 
          this.material = material;
@@ -985,6 +985,7 @@ type("EditResourceDialog", ["EditMaterialResourceBase", "PreLoadHandler"], {
          this.resourceId = resource.id;
          this.domItem = domItem;
          this.appender = appender;
+         this.forReviewing = forReviewing;
 
          var self = this;
          this.PreLoadHandler(
@@ -1167,12 +1168,15 @@ type("ResourceListWidget", ["ListWidget"], {
         var setMain;
 
         if (resource.get('reviewingState') < 3) {
+            if(resource.get('reviewingState') == 2){
+                var flag = true;
+            } else { var flag = false;}
             removeButton = Widget.link(command(deleteResource,IndicoUI.Buttons.removeButton()));
             editButton = Widget.link(command(function() {
                 IndicoUI.Dialogs.Material.editResource(resParams, self.matParams, resource, resourceNode, function(resource) {
                     self.set(resource.get('id'), null);
                     self.set(resource.get('id'), resource);
-                });
+                }, flag);
             },
                                              IndicoUI.Buttons.editButton())
                                     );
@@ -1713,8 +1717,8 @@ IndicoUI.Dialogs.Material = {
         dialog.execute();
     },
 
-    editResource: function(args, material, resource, domItem, appender) {
-        var dialog = new EditResourceDialog(args, material, resource, domItem, appender, $T("Edit Resource"));
+    editResource: function(args, material, resource, domItem, appender, forReviewing) {
+        var dialog = new EditResourceDialog(args, material, resource, domItem, appender, $T("Edit Resource"), forReviewing);
         dialog.execute();
     },
 

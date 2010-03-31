@@ -1268,9 +1268,16 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
 	                                var step1 = Html.span({style:{fontSize:'18px'}, className:'groupTitle groupTitleNoBorder'}, 'Step 1: Choose a '+ attribute);                                
 	                                var attList = Html.ul();
 	                                bind.element(attList, attributes, attributeTemplate);
+                                    if(result.length==0) {
+                                        var killProgress = IndicoUI.Dialogs.Util.progress()
+                                        popup.close();
+                                        killProgress();
+                                        alert('There is no '+attribute+' define.');
+                                    }
 	                                for (i in result) {
 	                                attributes.append(result[i]);
-	                                }                            
+	                                }	                                                                  
+	                                            
                                     AttributeDiv.set(Widget.block([step1,attList]));
                             } else {
                                     IndicoUtil.errorReport(error);
@@ -1278,6 +1285,7 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
                         }
                         ); 
                      }
+                     
                      var getCheckedAttributes = function() {    
                             var checkBoxes = document.getElementsByName("selected"+attribute);
                             var checkedAttributes = []

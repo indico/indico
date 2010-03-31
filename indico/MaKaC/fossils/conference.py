@@ -212,6 +212,9 @@ class IMaterialFossil(IMaterialMinimalFossil):
     def getMainResource(self):
         """ The main resource"""
 
+    def getType(self):
+        """ The type of material"""
+
 
 class ISessionFossil(IFossil):
 

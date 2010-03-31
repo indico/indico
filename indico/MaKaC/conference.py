@@ -9601,7 +9601,7 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
         except AttributeError, e:
             self.minutes = None
         return self.minutes
-    
+
     def setReviewing( self, newReviewing ):
         if self.getReviewing() != None:
             raise MaKaCError( _("The reviewing maretial for this contribution has already been set"), _("Contribution"))
@@ -11050,13 +11050,6 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
     def setId( self, newId ):
         self.id = str(newId).strip()
 
-    @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster',
-                 'MaKaC.conference.Reviewing'],'id')
     def getId( self ):
         return self.id
 
@@ -11116,13 +11109,6 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         self.title = newTitle.strip()
         self.notifyModification()
 
-    @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster',
-                 'MaKaC.conference.Reviewing'],'title')
     def getTitle( self ):
         return self.title
 
@@ -11137,13 +11123,6 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         self.description = newDescription.strip()
         self.notifyModification()
 
-    @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster',
-                 'MaKaC.conference.Reviewing'], 'description')
     def getDescription( self ):
         return self.description
 
@@ -11151,44 +11130,9 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         self.type = newType.strip()
         self.notifyModification()
 
-    @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster',
-                 'MaKaC.conference.Reviewing'], 'type')
     def getType( self ):
         return self.type
 
-    @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster',
-                 'MaKaC.conference.Reviewing'], 'subjectToReviewing')
-    def isSubjectToReviewing(self):
-        """ Returns if a material is subject to reviewing.
-            This only has sense if the material belongs to a contribuion. Otherwise, the returned value is None.
-            If the material belongs to a contribution, the strings 'Yes' or 'No' are returned.
-        """
-        if isinstance(self.owner, Contribution):
-            reviewableMaterials = self.owner.getConference().getConfReview().getReviewableMaterials()
-            if self.id in reviewableMaterials:
-                return 'Yes'
-            else:
-                return 'No'
-        else:
-            return None
-
-    @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster',
-                 'MaKaC.conference.Reviewing'], 'reviewingState')
     def getReviewingState(self):
         """ Returns the reviewing state of a material.
             The state is represented by an integer:
@@ -11252,13 +11196,6 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         self.notifyModification()
         Logger.get('storage').debug("Finished storing resource %s for material %s" % (newRes.getId(), self.getLocator()))
 
-    @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster',
-                 'MaKaC.conference.Reviewing'],'resources', isPicklableObject = True)
     def getResourceList( self ):
         list = self.__resources.values()
         list.sort(utils.sortFilesByName)
@@ -11324,14 +11261,6 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         # tells if a material is protected or not
         return (self.hasProtectedOwner() + self.getAccessProtectionLevel()) > 0
 
-    @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster',
-                 'MaKaC.conference.Reviewing'], 'protection')
-
     def getAccessProtectionLevel( self ):
         return self.__ac.getAccessProtectionLevel()
 
@@ -11339,13 +11268,6 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         return self.__ac.isItselfProtected()
 
 
-    @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster',
-                 'MaKaC.conference.Reviewing'], 'protectedOwner')
     def hasProtectedOwner( self ):
         if self.getOwner() != None:
             return self.getOwner().isProtected()
@@ -11365,13 +11287,6 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         self.updateFullyPublic()
         self._p_changed = 1
 
-    @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster',
-                 'MaKaC.conference.Reviewing'], 'hidden')
     def isHidden( self ):
         return self.__ac.isHidden()
 
@@ -11400,13 +11315,6 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         self._p_changed = 1
         self.resetAccessCache()
 
-    @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster',
-                 'MaKaC.conference.Reviewing'], 'accessKey')
     def getAccessKey( self ):
         return self.__ac.getAccessKey()
 

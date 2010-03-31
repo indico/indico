@@ -244,8 +244,8 @@ class RHSubmitMaterialBase:
         self._visibility = int(params.get("visibility", 0))
         self._password = params.get("password","")
 
-        from MaKaC.services.interface.rpc import json
-        self._userList = json.decode(params.get("userList", ""))
+        from MaKaC.services.interface.rpc import json        
+        self._userList = json.decode(params.get("userList", "[]"))
 
         if self._uploadType == "file":
             if type(params["file"]) != str and params["file"].filename.strip() != "":
