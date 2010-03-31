@@ -499,6 +499,15 @@ class CSBookingManager(Persistent, Observer):
     def isPluginManager(self, plugin, user):
         return user in self.getManagers().setdefault(plugin, [])
 
+    def getAllManagers(self):
+        """ Returns a list with all the managers, no matter their type
+            The returned list is not ordered.
+        """
+        managers = set()
+        for managerList in self.getManagers().itervalues():
+            managers = managers.union(managerList)
+        return list(managers)
+
     def isPluginManagerOfAnyPlugin(self, user):
         #TODO: this method is not optimal. to be optimal, we should store somewhere an index where the key
         #is the user, and the value is a list of plugins where they are managers.

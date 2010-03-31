@@ -512,7 +512,7 @@ type ("UserAndGroupsSearchPanel", ["IWidget"], {
  * @param {Boolean} onlyOne If true, only 1 item can be selected at a time.
  * @param {Boolean} includeFavourites If True, favourites will appear in the list of suggested users of the ChooseUsersPopup.
  * @param {WatchObject} suggestedUsers A list of users that will be used as list of suggested users.
- *                                     This argument has to be a WatchObject where the keys are the user ids and the values are WatchObjects with the user data.
+ *                                     This argument has to be an array or WatchList where the keys are the user ids and the values are fossils/dictionaries with the user data.
  *                                     If null, there will be no suggestedUsers panel.
  * @param {function} selectionObserver Function that will be called when the selected users xor groups change.
  *                                     Will be passed to the inner FoundPeopleList.
@@ -554,19 +554,17 @@ type ("SuggestedUsersPanel", ["IWidget"], {
         this.onlyOne = any(onlyOne, false);
 
         includeFavourites = any(includeFavourites, true);
-        this.suggestedUsers = suggestedUsers;
 
         this.suggestedUserList = new FoundPeopleList(null, this.onlyOne, selectionObserver, showToggleFavouriteButtons);
 
         var self = this;
 
-        if (exists(this.suggestedUsers)) {
-            each(this.suggestedUsers, function(user){
-                var userData = user.getAll();
-                if (any(userData._type, null) === "Avatar") {
-                    self.suggestedUserList.set('existingAv' + userData.id, user);
+        if (exists(suggestedUsers)) {
+            each(suggestedUsers, function(user){
+                if (any(user._type, null) === "Avatar") {
+                    self.suggestedUserList.set('existingAv' + user.id, $O(user));
                 } else {
-                    self.suggestedUserList.set(userData.id, user);
+                    self.suggestedUserList.set(user.id, $O(user));
                 }
             });
         }
@@ -596,8 +594,8 @@ type ("SuggestedUsersPanel", ["IWidget"], {
  * @param {Boolean} enableGroups If allowSearch is true, and if this is true, groups will be available for search and add.
  *
  * @param {Boolean} includeFavourites If True, favourites will appear in the list of suggested users of the ChooseUsersPopup.
- * @param {WatchObject} suggestedUsers A list of users that will be used as list of suggested users.
- *                                     This argument has to be a WatchObject where the keys are the user ids and the values are WatchObjects with the user data.
+ * @param {WatchObject} suggestedUsers An array or WatchList of users that will be used as list of suggested users. The users
+ *                                     should be fossils / dictionaries with the user data.
  *                                     If null, there will be no suggestedUsers panel.
  *
  * @param {Boolean} onlyOne If true, only 1 user will be able to be chosen in the dialog..
@@ -876,19 +874,26 @@ type("SingleUserField", ["IWidget"], {
         return {id: null, name: "Choose a user"};
     },
 
+    /**
+     * Updates the buttons to be shown next to the user name after the user changes
+     * @param {Object} user a dictionary with the user info.
+     */
     __userChosenObserver: function(user) {
         this.variableButtonsDiv.clear();
-
-        if (IndicoGlobalVars.isUserAuthenticated && this.userChosen && this.user.get("_type") === "Avatar") {
+        if (IndicoGlobalVars.isUserAuthenticated && this.userChosen && user._type === "Avatar") {
             var favButtonDiv = Html.div({style:{display:"inline", paddingLeft:pixels(5)}}, new ToggleFavouriteButton(user).draw());
             this.variableButtonsDiv.append(favButtonDiv);
         }
 
         if (this.allowDelete && this.userChosen) {
+
             var removeButton = Widget.link(command(function(){
                 self.userChosen.set(false);
-                self.user.replace(self.__getNotChosenUser());
+                var notChosenUser = self.__getNotChosenUser();
+                self.user.replace(notChosenUser);
+                self.__userChosenObserver(notChosenUser);
             }, IndicoUI.Buttons.removeButton()));
+
             var removeButtonDiv = Html.div({style:{display:"inline"}}, removeButton);
             this.variableButtonsDiv.append(removeButtonDiv);
         }
@@ -904,7 +909,7 @@ type("SingleUserField", ["IWidget"], {
         var userNameDiv = $B(Html.span({style:{verticalAlign:'middle'}}), self.user.accessor('name'));
 
         this.variableButtonsDiv = Html.div({style: {display: 'inline'}});
-        this.__userChosenObserver(this.user);
+        this.__userChosenObserver(this.user.getAll());
 
         var fixedButtonsDiv = Html.div({style: {display: 'inline'}});
         // Draw the choose button
@@ -916,6 +921,7 @@ type("SingleUserField", ["IWidget"], {
                     if (value) { // the assignProcess function returned true
                         var returnedUser = userList[0];
                         self.user.replace(returnedUser);
+                        self.__userChosenObserver(returnedUser);
                         self.userChosen.set(true);
                     }
                 });
@@ -953,19 +959,22 @@ type("SingleUserField", ["IWidget"], {
 
         // we store the selected user
         this.user = $O(exists(initialUser) ? initialUser : this.__getNotChosenUser());
-        this.user.observe(this.__userChosenObserver);
         this.userChosen = new WatchValue(exists(initialUser));
 
         this.allowChoose = any(allowChoose, true);
 
         this.includeFavourites = any(includeFavourites, true);
         if (exists(suggestedUsers)) {
-            this.suggestedUsers = new WatchObject();
-            each(suggestedUsers, function(user){
-                self.suggestedUsers.set(user.id, $O(user));
-            });
+            if (suggestedUsers.WatchList) {
+                this.suggestedUsers = suggestedUsers;
+            } else {
+                this.suggestedUsers = new WatchList();
+                each(suggestedUsers, function(user){
+                    self.suggestedUsers.append(user);
+                });
+            }
         } else {
-            self.suggestedUsers = null;
+            this.suggestedUsers = null;
         }
 
         this.conferenceId = any(conferenceId, null);
@@ -1896,10 +1905,14 @@ type("UserListField", ["IWidget"], {
 
         this.includeFavourites = any(includeFavourites, true);
         if (exists(suggestedUsers)) {
-            this.suggestedUsers = new WatchObject();
-            each(suggestedUsers, function(user){
-                self.suggestedUsers.set(user.id, $O(user));
-            });
+            if (suggestedUsers.WatchList) {
+                this.suggestedUsers = suggestedUsers;
+            } else {
+                this.suggestedUsers = new WatchList();
+                each(suggestedUsers, function(user){
+                    self.suggestedUsers.append(user);
+                });
+            }
         } else {
             this.suggestedUsers = null;
         }

@@ -38,6 +38,8 @@
 </table>
 
 <script type="text/javascript">
+    var allManagers = $L(<%= jsonEncode(AllManagers)%>);
+
     <% for name in ["all"] + allowedPluginNames: %>
     var newPersonsHandler = function(userList, setResult) {
         indicoRequest(
@@ -50,6 +52,9 @@
             function(result,error) {
                 if (!error) {
                     setResult(true);
+                    each(userList, function(user){
+                        allManagers.append(user);
+                    });
                 } else {
                     IndicoUtil.errorReport(error);
                     setResult(false);
@@ -77,9 +82,8 @@
     }
 
     var uf = new UserListField('PeopleListDiv', 'PeopleList',
-                               <%= jsonEncode(fossilize(CSBM.getPluginManagers(name), IAvatarFossil)) %>,
-                               <%= offlineRequest(self._rh, 'user.favorites.listUsers') %>,
-                               true, false, false, false,
+                               <%= jsonEncode(fossilize(CSBM.getPluginManagers(name), IAvatarFossil)) %>, true, allManagers,
+                               true, false, null, null,
                                false, false, true,
                                newPersonsHandler, singleUserNothing, removePersonHandler)
     $E('userList_<%=name%>').set(uf.draw())

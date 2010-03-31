@@ -28,7 +28,6 @@ from MaKaC.common.utils import formatDateTime, parseDateTime
 from MaKaC.common.timezoneUtils import getAdjustedDate
 from MaKaC.i18n import _
 from MaKaC.common.PickleJar import DictPickler
-from MaKaC.webinterface.rh.admins import RCAdmin
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.plugins.Collaboration.base import CollaborationException,\
@@ -36,6 +35,7 @@ from MaKaC.plugins.Collaboration.base import CollaborationException,\
 from MaKaC.plugins.Collaboration.base import CollaborationException
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.user import IAvatarFossil
+from MaKaC.services.implementation.user import UserComparator
 
 ################################################### Server Wide pages #########################################
 
@@ -364,11 +364,10 @@ class WConfModifCollaborationProtection(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["Conference"] = self._conf
-        vars["CSBM"] = self._conf.getCSBookingManager()
-        if self._user:
-            vars["Favorites"] = fossilize(self._user.getPersonalInfo().getBasket().getUsers(), IAvatarFossil)
-        else:
-            vars["Favorites"] = []
+        csbm = self._conf.getCSBookingManager()
+        vars["CSBM"] = csbm
+        allManagers = fossilize(csbm.getAllManagers(), IAvatarFossil)
+        vars["AllManagers"] = sorted(allManagers, cmp = UserComparator.cmpUsers)
         return vars
 
 ################################################### Event Display pages ###############################################
