@@ -387,18 +387,37 @@ def createCDSRecord(aw, IndicoID, contentType, videoFormat):
     xmlGen = XMLGen()
     xmlGen.initXml()
 
+    # aw stands for AccessWrapper. I don't really understand exactly what
+    # this command does, but it is apparently necessary
     og = outputGenerator(aw, xmlGen)
 
+    # Generate XML tag to enclose the entire conference
     xmlGen.openTag("event")
 
+    # Given the IndicoID, retrieve the type of talk and IDs
     parsed = parseIndicoID(IndicoID)
-    Logger.get('RecMan').info("IndicoID = %s", IndicoID)
-    Logger.get('RecMan').info("parsed[conference] = %s", str(parsed["conference"]))
 
+    # populate dictionary with parameters to be used by methods in outputGenerator
+    # such as confToXML, _confToXML, _sessionToXML, _contribToXML, _subContributionToXML
+    tags = {'talkType': parsed['type'],
+            'talkId':   parsed[parsed['type']],
+            'contentType': contentType,
+            'videoFormat': videoFormat}
+
+    Logger.get('RecMan').info("tags: [%s] [%s] [%s] [%s]" %\
+                              (tags['talkType'],
+                              tags['talkId'],
+                              tags['contentType'],
+                              tags['videoFormat']))
+
+    # Given the conference ID, retrieve the corresponding Conference object
     conference = ConferenceHolder().getById(parsed["conference"])
-    # setting source='RecordingManager' is how we identify ourselves to the outputGenerator
-    # Nobody else should need to know this access information, and it shouldn't be accessible
-    # to e.g. OAI harvesters outside CERN.
+
+    # Defining the dictionary 'tags' is how we identify ourselves to the outputGenerator
+    # methods.
+    # Nobody outside CERN should have access to CERN access lists.
+    # OAI harvesters outside CERN call the same methods we'll be calling,
+    # and we don't want to make the access lists available to them.
     if parsed["type"] == 'conference':
         Logger.get('RecMan').info("generating MARC XML for a conference")
         og.confToXML(conference,
@@ -409,48 +428,40 @@ def createCDSRecord(aw, IndicoID, contentType, videoFormat):
                      showContribution    = None,
                      showSubContribution = None,
                      forceCache          = True,
-                     source              = 'RecordingManager',
-                     contentType         = contentType,
-                     videoFormat         = videoFormat)
-
+                     recordingManagerTags = tags)
     elif parsed["type"] == 'session':
-        Logger.get('RecMan').info("generating MARC XML for a session (no such thing yet)")
-        # there is no such method for sessions yet for some reason...
-        # og.confToXMLMarc21(conf, 1, 1, 1, forceCache=True, out=xmlGen, source='RecordingManager')
-        pass
-
+        Logger.get('RecMan').info("generating MARC XML for a session")
+        og.confToXML(conference,
+                     1, # includeSession
+                     0, # includeContribution
+                     1, # includeMaterial
+                     showSession         = parsed["session"],
+                     showContribution    = None,
+                     showSubContribution = None,
+                     forceCache          = True,
+                     recordingManagerTags = tags)
     elif parsed["type"] == 'contribution':
         Logger.get('RecMan').info("generating MARC XML for a contribution")
-        contribution = conference.getContributionById(parsed["contribution"])
         og.confToXML(conference,
                      1, # includeSession
                      1, # includeContribution
                      1, # includeMaterial
-                     showSession         = None,
+                     showSession         = parsed["session"],
                      showContribution    = parsed["contribution"],
                      showSubContribution = None,
                      forceCache          = True,
-                     source              = 'RecordingManager',
-                     contentType         = contentType,
-                     videoFormat         = videoFormat)
-
+                     recordingManagerTags = tags)
     elif parsed["type"] == 'subcontribution':
         Logger.get('RecMan').info("generating MARC XML for a subcontribution")
-#        contribution = conference.getContributionById(parsed["contribution"])
-#        subcontribution = contribution.getSubContributionById(parsed["subcontribution"])
-
         og.confToXML(conference,
                      1, # includeSession
                      1, # includeContribution
                      1, # includeMaterial
                      showSession         = None,
-                     showContribution    = None,
+                     showContribution    = parsed["contribution"], # maybe I should turn this on?
                      showSubContribution = parsed["subcontribution"],
                      forceCache          = True,
-                     source              = 'RecordingManager',
-                     contentType         = contentType,
-                     videoFormat         = videoFormat)
-
+                     recordingManagerTags = tags)
     else:
         Logger.get('RecMan').info("IndicoID = %s", IndicoID)
 
@@ -518,11 +529,13 @@ def getCDSRecords(confId):
     # The first number is the CDS record ID, with leading zeros
     # The second number is the MARC XML tag
     # The third string contains the Indico ID
+    # (see http://www.loc.gov/marc/bibliographic for detailed information on MARC)
     request = Request(url)
     f = urlopen(request)
     lines = f.readlines()
     f.close()
 
+    # Read each line, extracting the IndicoIDs and their corresponding CDS IDs
     for line in lines:
         print line,
         result = line.strip()
@@ -560,8 +573,14 @@ def doesExistIndicoLink(obj):
 
     materials = obj.getAllMaterialList()
     if materials is not None and len(materials) > 0:
-        for mat in materials:
-            if mat.getTitle() == "Video in CDS" and isinstance(mat.getMainResource(), Link):
+        for material in materials:
+            # If the material in question is a link
+            # whose title is either the original "Video in CDS"
+            # or whatever other title might be specified in the RecordingManager
+            # plugin options, then we've found a link.
+            if isinstance(material.getMainResource(), Link) and \
+            (material.getTitle() == "Video in CDS" or material.getTitle() == \
+             CollaborationTools.getOptionValue("RecordingManager", "videoLinkName") ):
                 flagLinkFound = True
 
     return flagLinkFound

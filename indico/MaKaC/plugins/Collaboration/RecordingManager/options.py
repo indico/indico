@@ -94,6 +94,12 @@ globalOptions = [
                "editable": True,
                "visible": True} ),
 
+    ("videoLinkName", {"description" : _("Name of Indico link to CDS"),
+               "type": str,
+               "defaultValue": "Video in CDS",
+               "editable": True,
+               "visible": True} ),
+
     ("videoFormatStandard", {"description" : _("Standard video format"),
                "type": str,
                "defaultValue": "720x576 4/3, 25",

@@ -9,7 +9,8 @@ class MarcAccessListGenerator():
         pass
 
     def generateAccessListXML(self, out, obj):
-        """obj could be a Conference, Session, Contribution, or SubContribution object."""
+        """Generate a comprehensive access list showing all users and e-groups who may access
+        this object. obj could be a Conference, Session, Contribution, or SubContribution object."""
 
         allowed_users = obj.getRecursiveAllowedToAccessList()
         if allowed_users is not None and len(allowed_users) > 0:
@@ -38,21 +39,23 @@ class MarcAccessListGenerator():
                     out.writeTag("email", email_id)
                 out.closeTag("allowedAccessEmails")
 
-    def generateVideoXML(self, out, obj, contentType, videoFormat):
+    def generateVideoXML(self, out, recordingManagerTags):
         """Generate XML variables needed for video records."""
 
-        Logger.get('RecMan').info("videoFormat = %s" % videoFormat)
+        Logger.get('RecMan').info("in generateVideoXML(), contentType = %s" % recordingManagerTags["contentType"])
+        Logger.get('RecMan').info("in generateVideoXML(), contentType = %s" % recordingManagerTags["videoFormat"])
 
+        # retrieve actual syntax to use from RecordingManager plug-in options.
         videoTagStandard      = CollaborationTools.getOptionValue("RecordingManager", "videoFormatStandard")
         videoTagWide          = CollaborationTools.getOptionValue("RecordingManager", "videoFormatWide")
         contentTypeWebLecture = CollaborationTools.getOptionValue("RecordingManager", "contentTypeWebLecture")
 
-        Logger.get('RecMan').info("in generateVideoXML(), contentType = %s" % contentType)
-
-        if contentType == 'plain_video':
-            if videoFormat == 'standard':
+        # If it's plain video, specify whether standard or wide format
+        if recordingManagerTags["contentType"] == 'plain_video':
+            if recordingManagerTags["videoFormat"] == 'standard':
                 out.writeTag("videoFormat", videoTagStandard)
-            elif videoFormat == 'wide':
+            elif recordingManagerTags["videoFormat"] == 'wide':
                 out.writeTag("videoFormat", videoTagWide)
-        elif contentType == 'web_lecture':
+        # if it's a web lecture, then specify that.
+        elif recordingManagerTags["contentType"] == 'web_lecture':
             out.writeTag("videoFormat", contentTypeWebLecture)
