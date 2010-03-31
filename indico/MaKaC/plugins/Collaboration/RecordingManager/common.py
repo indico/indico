@@ -405,34 +405,52 @@ def createCDSRecord(aw, IndicoID, contentType, videoFormat):
                      0, # includeSession
                      0, # includeContribution
                      1, # includeMaterial
-                     showContribution = None,
-                     forceCache       = True,
-                     source           = 'RecordingManager',
-                     contentType      = contentType,
-                     videoFormat      = videoFormat)
+                     showSession         = None,
+                     showContribution    = None,
+                     showSubContribution = None,
+                     forceCache          = True,
+                     source              = 'RecordingManager',
+                     contentType         = contentType,
+                     videoFormat         = videoFormat)
+
     elif parsed["type"] == 'session':
         Logger.get('RecMan').info("generating MARC XML for a session (no such thing yet)")
         # there is no such method for sessions yet for some reason...
         # og.confToXMLMarc21(conf, 1, 1, 1, forceCache=True, out=xmlGen, source='RecordingManager')
         pass
+
     elif parsed["type"] == 'contribution':
         Logger.get('RecMan').info("generating MARC XML for a contribution")
         contribution = conference.getContributionById(parsed["contribution"])
-        og.contributionToXML(contribution,
-                             0, # includeSubContribution
-                             1, # includeMaterial
-                             conference,
-                             showSubContribution = None,
-                             out                 = xmlGen,
-                             forceCache          = True,
-                             source              = 'RecordingManager',
-                             contentType         = contentType,
-                             videoFormat         = videoFormat)
+        og.confToXML(conference,
+                     1, # includeSession
+                     1, # includeContribution
+                     1, # includeMaterial
+                     showSession         = None,
+                     showContribution    = parsed["contribution"],
+                     showSubContribution = None,
+                     forceCache          = True,
+                     source              = 'RecordingManager',
+                     contentType         = contentType,
+                     videoFormat         = videoFormat)
+
     elif parsed["type"] == 'subcontribution':
         Logger.get('RecMan').info("generating MARC XML for a subcontribution")
-        contribution = conference.getContributionById(parsed["contribution"])
-        subContribution = contribution.getSubContributionById(parsed["subcontribution"])
-        og.subContribToXMLMarc21(subContribution, includeMaterial=1, forceCache=True, out=xmlGen, source='RecordingManager')
+#        contribution = conference.getContributionById(parsed["contribution"])
+#        subcontribution = contribution.getSubContributionById(parsed["subcontribution"])
+
+        og.confToXML(conference,
+                     1, # includeSession
+                     1, # includeContribution
+                     1, # includeMaterial
+                     showSession         = None,
+                     showContribution    = None,
+                     showSubContribution = parsed["subcontribution"],
+                     forceCache          = True,
+                     source              = 'RecordingManager',
+                     contentType         = contentType,
+                     videoFormat         = videoFormat)
+
     else:
         Logger.get('RecMan').info("IndicoID = %s", IndicoID)
 
@@ -444,14 +462,14 @@ def createCDSRecord(aw, IndicoID, contentType, videoFormat):
     from MaKaC.common import Config
 
     outputData = ""
-    stylePath  = ""
 
-    if parsed["type"] == 'contribution':
-        stylePath = "%s.xsl" % (os.path.join(Config.getInstance().getStylesheetsDir(),
-                                             'cds_marcxml_video_contribution'))
-    else:
-        stylePath = "%s.xsl" % (os.path.join(Config.getInstance().getStylesheetsDir(),
-                                             'cds_marcxml_video_presentation'))
+    # Choose the appropriate stylesheet:
+    # - cds_marcxml_video_conference.xsl
+    # - cds_marcxml_video_session.xsl
+    # - cds_marcxml_video_contribution.xsl
+    # - cds_marcxml_video_subcontribution.xsl
+    styleSheet = "%s_%s.xsl" % ('cds_marcxml_video', parsed["type"])
+    stylePath = os.path.join(Config.getInstance().getStylesheetsDir(), styleSheet)
 
     if os.path.exists(stylePath):
         try:
