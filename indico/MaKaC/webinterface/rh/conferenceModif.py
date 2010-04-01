@@ -3913,12 +3913,12 @@ class AbstractStatusFilter( filters.FilterField ):
     _id = "status"
 
     def satisfies( self, abstract ):
-        status = AbstractStatusList().getId( abstract.getCurrentStatus().__class__ )
+        status = AbstractStatusList.getInstance().getId( abstract.getCurrentStatus().__class__ )
         return status in self._values
 
     def needsToBeApplied(self):
         for s in AbstractStatusList.getStatusList():
-            if AbstractStatusList().getId(s) not in self._values:
+            if AbstractStatusList.getInstance().getId(s) not in self._values:
                 return True
         return False
 
@@ -3947,8 +3947,8 @@ class _AbstractStatusSF( filters.SortingField ):
         a1Stat, a2Stat = a1.getCurrentStatus(), a2.getCurrentStatus()
         if a1Stat == a2Stat:
             return 0
-        a1StatLabel = AbstractStatusList().getCaption( a1Stat.__class__ )
-        a2StatLabel = AbstractStatusList().getCaption( a2Stat.__class__ )
+        a1StatLabel = AbstractStatusList.getInstance().getCaption( a1Stat.__class__ )
+        a2StatLabel = AbstractStatusList.getInstance().getCaption( a2Stat.__class__ )
         return cmp( a1StatLabel, a2StatLabel )
 
 
@@ -4082,8 +4082,8 @@ class RHAbstractList(RHConfModifCFABase):
         filter["type"] = ltypes
         lstatus = []
         if not filterUsed:
-            for status in AbstractStatusList().getStatusList():
-                lstatus.append( AbstractStatusList().getId( status ) )
+            for status in AbstractStatusList.getInstance().getStatusList():
+                lstatus.append( AbstractStatusList.getInstance().getId( status ) )
         filter["status"] = utils.normalizeToList(dict.get("selStatus", lstatus))
         filter["acc_track"] = utils.normalizeToList(dict.get("selAccTracks",ltracks))
         ltypes = []
@@ -4211,7 +4211,7 @@ class RHAbstractsMerge(RHConfModifCFABase):
                                             review.AbstractStatusWithdrawn,\
                                             review.AbstractStatusDuplicated,\
                                             review.AbstractStatusMerged):
-                            label=AbstractStatusList().getCaption(statusKlass)
+                            label=AbstractStatusList.getInstance().getCaption(statusKlass)
                             errorList.append( _("ABSTRACT TO BE MERGED %s is in status which does not allow to merge (%s)")%(abs.getId(),label.upper()))
                         self._abstracts.append(abs)
             if self._targetAbsId=="":
@@ -4229,7 +4229,7 @@ class RHAbstractsMerge(RHConfModifCFABase):
                                         review.AbstractStatusWithdrawn,\
                                         review.AbstractStatusMerged,\
                                         review.AbstractStatusDuplicated):
-                        label=AbstractStatusList().getCaption(statusKlass)
+                        label=AbstractStatusList.getInstance().getInstance().getCaption(statusKlass)
                         errorList.append( _("TARGET ABSTRACT is in status which does not allow to merge (%s)")%label.upper())
             if len(errorList)==0:
                 for abs in self._abstracts:

@@ -441,7 +441,7 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
             target=status.getTargetAbstract()
             st = _(""" _("MERGED") (%s : %s)""")%(target.getId(), target.getTitle())
         else:
-            st = AbstractStatusList().getCaption( status.__class__ ).upper()
+            st = AbstractStatusList.getInstance().getCaption( status.__class__ ).upper()
         text = _("""<b> _("Status")</b> : %s""")%escape(st)
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)

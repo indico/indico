@@ -6307,11 +6307,11 @@ class WAbstracts( wcomponents.WTemplated ):
 
     def _getStatusFilterItemList( self ):
         l = []
-        for status in AbstractStatusList().getStatusList():
+        for status in AbstractStatusList.getInstance().getStatusList():
             checked = ""
-            statusId = AbstractStatusList().getId( status )
-            statusCaption = AbstractStatusList().getCaption( status )
-            statusCode=AbstractStatusList().getCode(status)
+            statusId = AbstractStatusList.getInstance().getId( status )
+            statusCaption = AbstractStatusList.getInstance().getCaption( status )
+            statusCode=AbstractStatusList.getInstance().getCode(status)
             statusIconURL= AbstractStatusList().getIconURL( status )
             field=self._filterCrit.getField("status")
             if field is not None and statusId in field.getValues():

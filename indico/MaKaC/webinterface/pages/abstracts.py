@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from xml.sax.saxutils import quoteattr
-import urllib 
+import urllib
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -33,7 +33,7 @@ from MaKaC.i18n import _
 from MaKaC.common.timezoneUtils import nowutc
 
 class WConfCFADeactivated(wcomponents.WTemplated):
-    
+
     def __init__(self, aw, conf):
         self._conf = conf
         self._aw = aw
@@ -69,7 +69,7 @@ class WPCFAClosed( WPConferenceDefaultDisplayBase ):
 
 
 class WConfCFA(wcomponents.WTemplated):
-    
+
     def __init__(self, aw, conf):
         self._conf = conf
         self._aw = aw
@@ -92,7 +92,7 @@ class WConfCFA(wcomponents.WTemplated):
                 </ul>
                        """)%( submitOpt, urlHandlers.UHUserAbstracts.getURL( self._conf ) )
         return html
-        
+
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
@@ -110,20 +110,20 @@ class WConfCFA(wcomponents.WTemplated):
 
 class WPConferenceCFA( WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NEConferenceCFA
-    
+
     def _getBody( self, params ):
         wc = WConfCFA( self._getAW(), self._conf )
         pars = {"menuStatus":self._rh._getSession().getVar("menuStatus") or "open"}
         return wc.getHTML( pars )
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._cfaOpt)
 
 
 class WNewAbstractSubmission( wcomponents.WTemplated ):
-    
-    def __init__( self, aw, conf ): 
+
+    def __init__( self, aw, conf ):
         self._aw = aw
         self._conf = conf
 
@@ -131,7 +131,7 @@ class WNewAbstractSubmission( wcomponents.WTemplated ):
         if not msgList:
             return ""
         return """
-            <table align="center" cellspacing="0" cellpadding="0"> 
+            <table align="center" cellspacing="0" cellpadding="0">
                 <tr>
                     <td>
                         <table align="center" valign="middle" style="padding:10px; border:1px solid #5294CC; background:#F6F6F6">
@@ -156,23 +156,23 @@ class WNewAbstractSubmission( wcomponents.WTemplated ):
         return vars
 
 
-    
+
 
 class WPAbstractSubmission( WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NEAbstractSubmission
-    
+
     def _getBody( self, params ):
         wc = WNewAbstractSubmission( self._getAW(), self._conf )
         return wc.getHTML( params )
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._cfaNewSubmissionOpt)
 
 
-        
+
 class WUserAbstracts( wcomponents.WTemplated ):
-    
+
     def __init__( self, aw, conf ):
         self._aw = aw
         self._conf = conf
@@ -230,13 +230,13 @@ class WPUserAbstracts( WPConferenceDefaultDisplayBase ):
         wc = WUserAbstracts( self._getAW(), self._conf )
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._cfaViewSubmissionsOpt)
-    
+
 
 class WPAbstractDisplayBase( WPConferenceDefaultDisplayBase ):
-    
+
     def __init__( self, rh, abstract ):
         conf = abstract.getConference()
         WPConferenceDefaultDisplayBase.__init__( self, rh, conf )
@@ -244,20 +244,20 @@ class WPAbstractDisplayBase( WPConferenceDefaultDisplayBase ):
 
 
 class WAbstractCannotBeModified( wcomponents.WTemplated ):
-    
+
     def __init__( self, abstract ):
         self._abstract = abstract
 
 
 class WPAbstractCannotBeModified( WPAbstractDisplayBase ):
-    
-    def _getBody( self, params ):    
+
+    def _getBody( self, params ):
         wc = WAbstractCannotBeModified( self._abstract )
         return wc.getHTML()
-        
+
 
 class WAbstractSubmissionConfirmation( wcomponents.WTemplated ):
-    
+
     def __init__( self, aw, abstract ):
         self._aw = aw
         self._abstract = abstract
@@ -276,14 +276,14 @@ class WAbstractSubmissionConfirmation( wcomponents.WTemplated ):
 
 class WPAbstractSubmissionConfirmation( WPAbstractDisplayBase ):
     navigationEntry = navigation.NEAbstractSubmissionConfirmation
-    
+
     def _getBody( self, params ):
         wc = WAbstractSubmissionConfirmation( self._getAW(), self._abstract )
         return wc.getHTML()
 
 
 class WAbstractDisplay( wcomponents.WTemplated ):
-    
+
     def __init__(self, aw, abstract):
         self._abstract = abstract
         self._aw = aw
@@ -293,7 +293,7 @@ class WAbstractDisplay( wcomponents.WTemplated ):
         if author.getAffiliation() != "":
             res = "%s (%s)"%(res, author.getAffiliation())
         return self.htmlText( res )
-    
+
     def _getAdditionalFieldsHTML(self):
         html=""
         afm = self._abstract.getConference().getAbstractMgr().getAbstractFieldsMgr()
@@ -314,8 +314,8 @@ class WAbstractDisplay( wcomponents.WTemplated ):
                                             </td>
                                         </tr>
                 """%(caption, self._abstract.getField(id) )
-        return html             
-    
+        return html
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["title"] = self.htmlText( self._abstract.getTitle() )
@@ -424,7 +424,7 @@ class WAbstractDisplay( wcomponents.WTemplated ):
 
 class WPAbstractDisplay( WPAbstractDisplayBase ):
     navigationEntry = navigation.NEAbstractDisplay
-    
+
     def _getBody( self, params ):
         wc = WAbstractDisplay( self._getAW(), self._abstract )
         return wc.getHTML()
@@ -437,7 +437,7 @@ class WPAbstractDisplay( WPAbstractDisplayBase ):
 
 
 class WAbstractDataModificationAuthorItem( wcomponents.WTemplated ):
-    
+
     def __init__( self, authorData ):
         self._authorData = authorData
 
@@ -478,12 +478,12 @@ class WAbstractDataModificationSecondaryAuthorItem( WAbstractDataModificationAut
 
 
 class WAbstractDataModificationTrackItem( wcomponents.WTemplated ):
-    
+
     def __init__( self, track, checked=0, multipleTracks=True ):
         self._track = track
         self._checked = checked
         self._multipleTracks = multipleTracks
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["checked"] = ""
@@ -500,7 +500,7 @@ class WAbstractDataModificationTrackItem( wcomponents.WTemplated ):
 
 
 class WAbstractDataModification( wcomponents.WTemplated ):
-    
+
     def __init__( self, conf ):
         self._conf = conf
 
@@ -580,7 +580,7 @@ class WAbstractDataModification( wcomponents.WTemplated ):
             types.append( """<option value=%s%s>%s</option>
                             """%(quoteattr( str( contribType.getId() ) ), \
                                     selected, \
-                                    self.htmlText( contribType.getName() ) ) )    
+                                    self.htmlText( contribType.getName() ) ) )
         vars["types"] = ""
         if len(types)>0:
             selected = ""
@@ -599,14 +599,14 @@ class WAbstractDataModification( wcomponents.WTemplated ):
                                 </td>
                             </tr>
                             """)%("\n".join( types ))
-            
+
         vars["comments"] = str( vars.get("comments", "") )
-        vars["additionalFields"] = self._getAdditionalFieldsHTML(vars) 
+        vars["additionalFields"] = self._getAdditionalFieldsHTML(vars)
         return vars
 
 
 class WAbstractModification( wcomponents.WTemplated ):
-    
+
     def __init__( self, aw, abstract ):
         self._aw = aw
         self._abstract = abstract
@@ -643,54 +643,54 @@ class WAbstractModification( wcomponents.WTemplated ):
 
 class WPAbstractModify( WPAbstractDisplayBase ):
     navigationEntry = navigation.NEAbstractModify
-    
+
     def _getBody( self, params ):
         wc = WAbstractModification( self._getAW(), self._abstract )
         return wc.getHTML( params )
 
 
 class WAbstractWithdraw( wcomponents.WTemplated ):
-    
+
     def __init__( self, abstract ):
         self._abstract = abstract
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["title"] = self.htmlText( self._abstract.getTitle() ) 
+        vars["title"] = self.htmlText( self._abstract.getTitle() )
         vars["postURL"] = urlHandlers.UHAbstractWithdraw.getURL( self._abstract )
         return vars
 
 
 class WPAbstractWithdraw( WPAbstractDisplayBase ):
     navigationEntry = navigation.NEAbstractWithdraw
-    
+
     def _getBody( self, params ):
         wc = WAbstractWithdraw( self._abstract )
         return wc.getHTML()
 
 
 class WAbstractRecovery( wcomponents.WTemplated ):
-    
+
     def __init__( self, abstract ):
         self._abstract = abstract
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["title"] = self.htmlText( self._abstract.getTitle() ) 
+        vars["title"] = self.htmlText( self._abstract.getTitle() )
         vars["postURL"] = urlHandlers.UHAbstractRecovery.getURL( self._abstract )
         return vars
 
 
 class WPAbstractRecovery( WPAbstractDisplayBase ):
     navigationEntry = navigation.NEAbstractRecovery
-    
+
     def _getBody( self, params ):
         wc = WAbstractRecovery( self._abstract )
         return wc.getHTML()
 
 
 class WPAbstractManagementBase( WPConferenceModifBase ):
-    
+
     def __init__( self, rh, abstract ):
         self._abstract = self._target = abstract
         WPConferenceModifBase.__init__( self, rh, self._abstract.getConference() )
@@ -698,7 +698,7 @@ class WPAbstractManagementBase( WPConferenceModifBase ):
     def _getNavigationDrawer(self):
         pars = {"target": self._abstract, "isModif": True}
         return wcomponents.WNavigationDrawer( pars )
-    
+
     def _createTabCtrl( self ):
         self._tabCtrl = wcomponents.TabControl()
         self._tabMain = self._tabCtrl.newTab("main", _("Main"), \
@@ -720,11 +720,11 @@ class WPAbstractManagementBase( WPConferenceModifBase ):
 
     def _getPageContent( self, params ):
         self._createTabCtrl()
-        
+
         banner = wcomponents.WAbstractBannerModif(self._abstract).getHTML()
         html = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
         return banner + html
-    
+
     def _setActiveSideMenuItem(self):
         self._abstractMenuItem.setActive(True)
 
@@ -733,12 +733,12 @@ class WPAbstractManagementBase( WPConferenceModifBase ):
 
 
 class WAbstractManagment( wcomponents.WTemplated ):
-    
+
     def __init__( self, aw, abstract ):
         self._abstract = abstract
         self._aw = aw
         self._conf = abstract.getOwner().getOwner()
-    
+
     def _getAuthorHTML( self, auth ):
         tmp = "%s (%s)"%(auth.getFullName(), auth.getAffiliation())
         tmp = self.htmlText( tmp )
@@ -751,7 +751,7 @@ class WAbstractManagment( wcomponents.WTemplated ):
 
     def _getStatusHTML( self ):
         status = self._abstract.getCurrentStatus()
-        html = """<b>%s</b>"""%AbstractStatusList().getCaption( status.__class__ ).upper()
+        html = """<b>%s</b>"""%AbstractStatusList.getInstance().getCaption( status.__class__ ).upper()
 
         if status.__class__  == review.AbstractStatusAccepted:
             trackTitle, contribTitle = "", ""
@@ -837,7 +837,7 @@ class WAbstractManagment( wcomponents.WTemplated ):
             id = self.htmlText(contrib.getId())
             res = """<a href=%s>%s - %s</a>"""%(quoteattr(str(url)),id,title)
         return res
-    
+
     def _getMergeFromHTML(self):
         abstracts = self._abstract.getMergeFromList()
         if not abstracts:
@@ -848,7 +848,7 @@ class WAbstractManagment( wcomponents.WTemplated ):
                 l.append("""<a href="%s">%s : %s</a><br>\n"""%(urlHandlers.UHAbstractManagment.getURL(abstract), abstract.getId(), abstract.getTitle()))
             else:
                 l.append("""%s : %s [DELETED]<br>\n"""%(abstract.getId(), abstract.getTitle()))
-        
+
         return _("""<tr>
                     <td class="dataCaptionTD" nowrap><span class="dataCaptionFormat"> _("Merged from")</span></td>
                     <td bgcolor="white" valign="top" colspan="3">%s</td>
@@ -866,8 +866,8 @@ class WAbstractManagment( wcomponents.WTemplated ):
                         <td bgcolor="white" valign="top"><table class="tablepre"><tr><td><pre>%s</pre></td></tr></table></td>
                     </tr>
                 """%(self.htmlText(caption), self._abstract.getField(id) )
-        return html             
-    
+        return html
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["title"] = self.htmlText(self._abstract.getTitle())
@@ -904,7 +904,7 @@ class WAbstractManagment( wcomponents.WTemplated ):
             vars["disable"] = "disabled"
             vars["mergeDisable"] = "disabled"
             vars["dupDisable"] = "disabled"
-        
+
         vars["duplicatedButton"] = _("mark as duplicated")
         vars["duplicateURL"]=quoteattr(str(urlHandlers.UHAbstractModMarkAsDup.getURL(self._abstract)))
         if self._abstract.getCurrentStatus().__class__ == review.AbstractStatusDuplicated:
@@ -912,7 +912,7 @@ class WAbstractManagment( wcomponents.WTemplated ):
             vars["duplicateURL"]=quoteattr(str(urlHandlers.UHAbstractModUnMarkAsDup.getURL(self._abstract)))
             vars["mergeDisable"] = "disabled"
             vars["disable"] = "disabled"
-        
+
         vars["mergeButton"] = _("merge into")
         vars["mergeIntoURL"]=quoteattr(str(urlHandlers.UHAbstractModMergeInto.getURL(self._abstract)))
         if self._abstract.getCurrentStatus().__class__ == review.AbstractStatusMerged:
@@ -920,9 +920,9 @@ class WAbstractManagment( wcomponents.WTemplated ):
             vars["mergeButton"] = _("unmerge")
             vars["dupDisable"] = "disabled"
             vars["disable"] = "disabled"
-        
+
         vars["mergeFrom"] = self._getMergeFromHTML()
-        
+
         vars["abstractListURL"] = quoteattr( str( urlHandlers.UHConfAbstractManagment.getURL( self._conf ) ) )
         vars["viewTrackDetailsURL"] = quoteattr( str (urlHandlers.UHAbstractTrackProposalManagment.getURL( self._abstract) ) )
         vars["comments"] = self._abstract.getComments()
@@ -953,20 +953,20 @@ class WAbstractManagment( wcomponents.WTemplated ):
 
 
 class WPAbstractManagment(WPAbstractManagementBase):
-    
+
     def _setActiveTab( self ):
         self._tabMain.setActive()
-    
+
     def _getTabContent( self, params ):
         wc = WAbstractManagment( self._getAW(), self._target )
         return wc.getHTML( params )
 
 
 class WPAbstractSelectSubmitter(WPAbstractManagementBase):
-    
+
     def _setActiveTab( self ):
         self._tabMain.setActive()
-    
+
     def _getTabContent( self, params ):
         searchExt = params.get("searchExt","")
         if searchExt != "":
@@ -979,11 +979,11 @@ class WPAbstractSelectSubmitter(WPAbstractManagementBase):
 
 
 class WPModEditData(WPAbstractManagment):
-    
+
     def __init__(self, rh, abstract, abstractData):
         WPAbstractManagment.__init__(self,rh,abstract)
         self._abstractData=abstractData
-    
+
     def _getTabContent(self,params):
         wc=wcomponents.WConfModAbstractEditData(self._target.getConference(),self._abstractData)
         p={"postURL": urlHandlers.UHAbstractModEditData.getURL(self._abstract)}
@@ -1000,7 +1000,7 @@ class WPModEditData(WPAbstractManagment):
 
 
 class WAbstractManagmentAccept( wcomponents.WTemplated ):
-    
+
     def __init__( self, aw, abstract ):
         self._abstract = abstract
         self._aw = aw
@@ -1018,7 +1018,7 @@ class WAbstractManagmentAccept( wcomponents.WTemplated ):
             items.append( """<option value=%s%s>%s</option>"""%(\
                         quoteattr(type.getId()), default, self.htmlText(title)))
         return items
-    
+
     def _getTrackItemsHTML( self ):
         items = [ _("""<option value="conf">--_("no track")--</option>""")]
         for track in self._conf.getTrackList():
@@ -1058,14 +1058,14 @@ class WAbstractManagmentAccept( wcomponents.WTemplated ):
 
 
 class WPAbstractManagmentAccept(WPAbstractManagment):
-    
+
     def _getTabContent( self, params ):
         wc = WAbstractManagmentAccept( self._getAW(), self._target )
         return wc.getHTML()
 
 
 class WAbsModAcceptConfirmation(wcomponents.WTemplated):
-    
+
     def __init__(self,abstract):
         self._abstract=abstract
 
@@ -1080,7 +1080,7 @@ class WAbsModAcceptConfirmation(wcomponents.WTemplated):
 
 
 class WPModAcceptConfirmation(WPAbstractManagment):
-    
+
     def _getTabContent(self,params):
         wc = WAbsModAcceptConfirmation(self._target)
         p={"track":params["track"],
@@ -1091,7 +1091,7 @@ class WPModAcceptConfirmation(WPAbstractManagment):
 
 
 class WAbsModRejectConfirmation(wcomponents.WTemplated):
-    
+
     def __init__(self,abstract):
         self._abstract=abstract
 
@@ -1104,7 +1104,7 @@ class WAbsModRejectConfirmation(wcomponents.WTemplated):
 
 
 class WPModRejectConfirmation(WPAbstractManagment):
-    
+
     def _getTabContent(self,params):
         wc = WAbsModRejectConfirmation(self._target)
         p={ "comments":params["comments"] }
@@ -1112,29 +1112,29 @@ class WPModRejectConfirmation(WPAbstractManagment):
 
 
 class WAbstractManagmentReject( wcomponents.WTemplated ):
-    
+
     def __init__( self, aw, abstract ):
         self._abstract = abstract
         self._aw = aw
         self._conf = abstract.getOwner().getOwner()
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["abstractName"] = self._abstract.getTitle()
         vars["rejectURL"] = quoteattr(str(urlHandlers.UHAbstractManagmentReject.getURL(self._abstract)))
         vars["cancelURL"] = quoteattr(str(urlHandlers.UHAbstractManagment.getURL(self._abstract)))
         return vars
-    
+
 
 class WPAbstractManagmentReject(WPAbstractManagment):
-    
+
     def _getTabContent( self, params ):
         wc = WAbstractManagmentReject( self._getAW(), self._target )
         return wc.getHTML( params )
 
 
 class WPModMarkAsDup(WPAbstractManagment):
-    
+
     def _getTabContent( self, params ):
         wc = wcomponents.WAbstractModMarkAsDup(self._target)
         p={"comments":params.get("comments",""),
@@ -1146,7 +1146,7 @@ class WPModMarkAsDup(WPAbstractManagment):
 
 
 class WPModUnMarkAsDup(WPAbstractManagment):
-    
+
     def _getTabContent( self, params ):
         wc = wcomponents.WAbstractModUnMarkAsDup(self._target)
         p={ "comments":params.get("comments",""),
@@ -1156,7 +1156,7 @@ class WPModUnMarkAsDup(WPAbstractManagment):
 
 
 class WAbstractModMergeInto(wcomponents.WTemplated):
-        
+
     def __init__(self,abstract):
         self._abstract=abstract
 
@@ -1195,7 +1195,7 @@ class WAbstractModMergeInto(wcomponents.WTemplated):
 
 
 class WPModMergeInto(WPAbstractManagment):
-    
+
     def _getTabContent( self, params ):
         wc=WAbstractModMergeInto(self._target)
         p={"cancelURL":urlHandlers.UHAbstractManagment.getURL(self._abstract),\
@@ -1209,7 +1209,7 @@ class WPModMergeInto(WPAbstractManagment):
 
 
 class WAbstractModUnMerge(wcomponents.WTemplated):
-        
+
     def __init__(self,abstract):
         self._abstract=abstract
 
@@ -1221,7 +1221,7 @@ class WAbstractModUnMerge(wcomponents.WTemplated):
 
 
 class WPModUnMerge(WPAbstractManagment):
-    
+
     def _getTabContent( self, params ):
         wc = WAbstractModUnMerge(self._target)
         p={ "comments":params.get("comments",""),
@@ -1274,7 +1274,7 @@ class WConfModAbstractPropToAcc(wcomponents.WTemplated):
 
 
 class WPModPropToAcc(WPAbstractManagment):
-    
+
     def _getTabContent( self, params ):
         wc=WConfModAbstractPropToAcc(self._rh.getAW(),self._abstract)
         return wc.getHTML()
@@ -1315,19 +1315,19 @@ class WConfModAbstractPropToRej(wcomponents.WTemplated):
 
 
 class WPModPropToRej(WPAbstractManagment):
-    
+
     def _getTabContent( self, params ):
         wc=WConfModAbstractPropToRej(self._rh.getAW(),self._abstract)
         return wc.getHTML()
 
 
 class WAbstractManagmentChangeTrack( wcomponents.WTemplated ):
-    
+
     def __init__( self, aw, abstract ):
         self._abstract = abstract
         self._aw = aw
         self._conf = abstract.getOwner().getOwner()
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["abstractName"] = self._abstract.getTitle()
@@ -1342,10 +1342,10 @@ class WAbstractManagmentChangeTrack( wcomponents.WTemplated ):
 
 
 class WPAbstractManagmentChangeTrack(WPAbstractManagementBase):
-    
+
     def _setActiveTab( self ):
         self._tabMain.setActive()
-    
+
     def _getTabContent( self, params ):
         wc = WAbstractManagmentChangeTrack( self._getAW(), self._target )
         params["saveURL"] = quoteattr(str(urlHandlers.UHAbstractManagmentChangeTrack.getURL(self._abstract)))
@@ -1354,7 +1354,7 @@ class WPAbstractManagmentChangeTrack(WPAbstractManagementBase):
 
 
 class WAbstractTrackManagment(wcomponents.WTemplated):
-    
+
     def __init__( self, aw, abstract ):
         self._abstract = abstract
         self._aw = aw
@@ -1374,7 +1374,7 @@ class WAbstractTrackManagment(wcomponents.WTemplated):
             href = quoteattr( mailtoURL )
             tmp = """<a href=%s><font size=\"-2\">%s</font></a>"""%(href, tmp)
         return tmp
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         tracks = ""
@@ -1446,17 +1446,17 @@ class WAbstractTrackManagment(wcomponents.WTemplated):
 
 
 class WPAbstractTrackManagment(WPAbstractManagementBase):
-    
+
     def _setActiveTab( self ):
         self._tabTracks.setActive()
-    
+
     def _getTabContent( self, params ):
         wc = WAbstractTrackManagment( self._getAW(), self._target )
         return wc.getHTML( params )
 
 
 class WAbstractModAC(wcomponents.WTemplated):
-    
+
     def __init__(self,abstract):
         self._abstract=abstract
 
@@ -1470,20 +1470,20 @@ class WAbstractModAC(wcomponents.WTemplated):
 
 
 class WPModAC(WPAbstractManagementBase):
-    
+
     def _setActiveTab( self ):
         self._tabAC.setActive()
-    
+
     def _getTabContent( self, params ):
         wc=WAbstractModAC(self._target)
         return wc.getHTML()
 
 
 class WPModIntComments(WPAbstractManagementBase):
-    
+
     def _setActiveTab( self ):
         self._tabComments.setActive()
-    
+
     def _getTabContent( self, params ):
         wc=wcomponents.WAbstractModIntComments(self._getAW(),self._target)
         p={"newCommentURL":urlHandlers.UHAbstractModNewIntComment.getURL(self._abstract),
@@ -1494,7 +1494,7 @@ class WPModIntComments(WPAbstractManagementBase):
 
 
 class WPModNewIntComment(WPModIntComments):
-    
+
     def _getTabContent( self, params ):
         wc=wcomponents.WAbstractModNewIntComment(self._getAW(),self._target)
         p={"postURL":urlHandlers.UHAbstractModNewIntComment.getURL(self._abstract)}
@@ -1502,11 +1502,11 @@ class WPModNewIntComment(WPModIntComments):
 
 
 class WPModIntCommentEdit(WPModIntComments):
-    
+
     def __init__(self,rh,comment):
         self._comment=comment
         WPModIntComments.__init__(self,rh,comment.getAbstract())
-    
+
     def _getTabContent( self, params ):
         wc=wcomponents.WAbstractModIntCommentEdit(self._comment)
         p={"postURL": urlHandlers.UHAbstractModIntCommentEdit.getURL(self._comment)}
@@ -1514,7 +1514,7 @@ class WPModIntCommentEdit(WPModIntComments):
 
 
 class WAbstractModNotifLog(wcomponents.WTemplated):
-    
+
     def __init__(self,abstract):
         self._abstract=abstract
 
@@ -1554,13 +1554,13 @@ class WAbstractModNotifLog(wcomponents.WTemplated):
                         """)%(self.htmlText(d),self._getResponsibleHTML(resp),tplLink))
         vars["entries"]="".join(res)
         return vars
-    
+
 
 class WPModNotifLog(WPAbstractManagementBase):
-    
+
     def _setActiveTab( self ):
         self._tabNotifLog.setActive()
-    
+
     def _getTabContent( self, params ):
         wc=WAbstractModNotifLog(self._target)
         return wc.getHTML()
@@ -1580,23 +1580,23 @@ class WConfModAbstractWithdraw(wcomponents.WTemplated):
 
 
 class WPModWithdraw(WPAbstractManagment):
-    
+
     def _getTabContent( self, params ):
         wc=WConfModAbstractWithdraw(self._rh.getAW(),self._abstract)
         return wc.getHTML()
 
 class WAbstractModifTool(wcomponents.WTemplated):
-    
+
     def __init__( self, contrib ):
         self._contrib = contrib
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["deleteIconURL"] = Config.getInstance().getSystemIconURL("delete")
         return vars
 
 class WPModTools( WPAbstractManagment ):
-    
+
     def _setActiveTab( self ):
         self._tabTools.setActive()
 
@@ -1605,14 +1605,14 @@ class WPModTools( WPAbstractManagment ):
         pars = { \
             "deleteContributionURL": urlHandlers.UHAbstractDelete.getURL( self._target )
                 }
-        return wc.getHTML( pars )  
+        return wc.getHTML( pars )
 
 class WPModRemConfirmation(WPModTools):
-    
+
     def __init__(self,rh,abs):
         WPAbstractManagment.__init__(self,rh,abs)
         self._abs=abs
-    
+
     def _getTabContent(self,params):
         wc=wcomponents.WConfirmation()
         msg= _("""Are you sure you want to delete the abstract "%s"?""")%(self._abs.getTitle())

@@ -27,15 +27,18 @@ from MaKaC.review import AbstractStatusSubmitted, AbstractStatusAccepted,\
                 AbstractStatusDuplicated,AbstractStatusMerged
 from MaKaC.common import Config
 from MaKaC.i18n import _
-    
+
 
 class AbstractStatusList:
     """Provides unified captions and colors for the different abstract status.
 
         Abstract status must be shown in the interface in several places, this
-        class centralises the captions, colors and other properties of the 
-        different abstract status classes.
+        class centralises the captions, colors and other properties of the
+        different abstract status classes. Singleton
     """
+
+    _instance = None
+
     def __init__(self):
         self._statusProps = {"submitted": [ _("submitted"), "white", "as_submitted", _("S")], \
                         "accepted": [ _("accepted"), "white", "as_accepted", _("A")], \
@@ -46,8 +49,8 @@ class AbstractStatusList:
                         "conflict":[ _("in conflict"),"white","as_conflict", _("C")], \
                         "withdrawn": [ _("withdrawn"), "white", "as_withdrawn", _("W")], \
                         "duplicated": [ _("duplicated"),"white","as_withdrawn", _("D")],\
-                        "merged": [ _("merged"),"white","as_withdrawn", _("M")] } 
-                        
+                        "merged": [ _("merged"),"white","as_withdrawn", _("M")] }
+
         self._statusIds = { AbstractStatusSubmitted: "submitted", \
                             AbstractStatusAccepted: "accepted", \
                             AbstractStatusRejected: "rejected", \
@@ -58,23 +61,28 @@ class AbstractStatusList:
                             AbstractStatusWithdrawn: "withdrawn",\
                             AbstractStatusDuplicated: "duplicated",\
                             AbstractStatusMerged: "merged" }
-        
-    
+
+    @classmethod
+    def getInstance( cls ):
+        if cls._instance == None:
+            cls._instance = AbstractStatusList()
+        return cls._instance
+
     def _getCaption( self, statusId ):
         return self._statusProps.get( statusId,[""] )[0]
-    
+
     def _getCode(self,statusId):
         return self._statusProps.get(statusId,["","","",""])[3]
-    
+
     def _getColor( self, statusId ):
         return self._statusProps.get( statusId, ["",""] )[1]
 
     def _getIconURL( self, statusId ):
         return Config.getInstance().getSystemIconURL( self._statusProps.get( statusId, ["","",""])[2])
-    
+
     def getId(self, statusClass):
         return self._statusIds.get(statusClass, "")
-    
+
     def getStatus( self, id ):
         for i in self._statusIds.iteritems():
             if i[1] == id:
@@ -95,7 +103,7 @@ class AbstractStatusList:
         """Returns the color for a given abstract status.
         """
         return self._getColor( self.getId( statusClass ) )
-    
+
     def getIconURL( self, statusClass ):
         """
         """
