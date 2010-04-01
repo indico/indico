@@ -1,5 +1,5 @@
 <?xml version='1.0'?>
-<!-- $Id: cds_marcxml_contribution.xsl,v 1.2 2008/08/13 13:31:23 jose Exp $
+<!-- $Id: cds_marcxml_video_session.xsl,v 1.2 2008/08/13 13:31:23 jose Exp $
 
      This file is part of CDS Indico.
      Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -38,24 +38,24 @@
   <subfield code="a"><xsl:value-of select="./title"/></subfield>
   </xsl:if>
   <subfield code="c"><xsl:value-of select="./location/name" disable-output-escaping="yes"/> - <xsl:value-of select="./location/room" disable-output-escaping="yes"/></subfield>
-  <subfield code="9"><xsl:value-of select="./contribution/startDate" disable-output-escaping="yes"/></subfield>
-  <subfield code="z"><xsl:value-of select="./contribution/endDate" disable-output-escaping="yes"/></subfield>
+  <subfield code="9"><xsl:value-of select="./session/startDate" disable-output-escaping="yes"/></subfield>
+  <subfield code="z"><xsl:value-of select="./session/endDate" disable-output-escaping="yes"/></subfield>
   <subfield code="g"><xsl:value-of select="./ID" disable-output-escaping="yes"/></subfield>
 </datafield>
-<xsl:if test="./contribution/title!=''">
+<xsl:if test="./session/title!=''">
 <datafield tag="245" ind1=" " ind2=" ">
-  <subfield code="a"><xsl:value-of select="./contribution/title"/></subfield>
+  <subfield code="a"><xsl:value-of select="./session/title"/></subfield>
 </datafield>
 </xsl:if>
 <datafield tag="260" ind1=" " ind2=" ">
-  <subfield code="c"><xsl:value-of select="substring(./contribution/startDate,0,5)" disable-output-escaping="yes"/></subfield>
+  <subfield code="c"><xsl:value-of select="substring(./session/startDate,0,5)" disable-output-escaping="yes"/></subfield>
 </datafield>
 <datafield tag="269" ind1=" " ind2=" ">
-  <subfield code="c"><xsl:value-of select="substring(./contribution/startDate,0,11)" disable-output-escaping="yes"/></subfield>
+  <subfield code="c"><xsl:value-of select="substring(./session/startDate,0,11)" disable-output-escaping="yes"/></subfield>
 </datafield>
 <datafield tag="300" ind1=" " ind2=" ">
   <subfield code="a">Streaming video</subfield>
-  <subfield code="b"><xsl:value-of select="./contribution/videoFormat" /></subfield>
+  <subfield code="b"><xsl:value-of select="./session/videoFormat" /></subfield>
 </datafield>
 <datafield tag="340" ind1=" " ind2=" ">
   <subfield code="a">Streaming video</subfield>
@@ -66,10 +66,10 @@
 <datafield tag="490" ind1=" " ind2=" ">
   <subfield code="a"><xsl:value-of select="./title" disable-output-escaping="yes"/></subfield>
 </datafield>
-<xsl:if test="./contribution/allowedAccessGroups != '' and count(./contribution/allowedAccessGroups) != 0">
+<xsl:if test="./session/allowedAccessGroups != '' and count(./session/allowedAccessGroups) != 0">
 <datafield tag="506" ind1="1" ind2=" ">
     <subfield code="a">Restricted</subfield>
-    <xsl:for-each select="./contribution/allowedAccessGroups/group">
+    <xsl:for-each select="./session/allowedAccessGroups/group">
     <subfield code="d"><xsl:value-of select="." /></subfield>
     </xsl:for-each>
     <subfield code="f">group</subfield>
@@ -77,10 +77,10 @@
     <subfield code="5">SzGeCERN</subfield>
 </datafield>
 </xsl:if>
-<xsl:if test="./contribution/allowedAccessEmails != '' and count(./contribution/allowedAccessEmails) != 0">
+<xsl:if test="./session/allowedAccessEmails != '' and count(./session/allowedAccessEmails) != 0">
 <datafield tag="506" ind1="1" ind2=" ">
     <subfield code="a">Restricted</subfield>
-    <xsl:for-each select="./contribution/allowedAccessEmails/email">
+    <xsl:for-each select="./session/allowedAccessEmails/email">
     <subfield code="d"><xsl:value-of select="." /></subfield>
     </xsl:for-each>
     <subfield code="f">email</subfield>
@@ -89,11 +89,11 @@
 </datafield>
 </xsl:if>
 <datafield tag="518" ind1=" " ind2=" ">
-  <subfield code="d"><xsl:value-of select="./contribution/startDate" disable-output-escaping="yes"/></subfield>
+  <subfield code="d"><xsl:value-of select="./session/startDate" disable-output-escaping="yes"/></subfield>
 </datafield>
-<xsl:if test="./contribution/abstract!=''">
+<xsl:if test="./session/abstract!=''">
 <datafield tag="520" ind1=" " ind2=" ">
-  <subfield code="a">&lt;!--HTML--&gt;<xsl:value-of select="./contribution/abstract"/></subfield>
+  <subfield code="a">&lt;!--HTML--&gt;<xsl:value-of select="./session/abstract"/></subfield>
 </datafield>
 </xsl:if>
 <datafield tag="650" ind1="1" ind2="7">
@@ -108,8 +108,8 @@
 <datafield tag="690" ind1="C" ind2=" ">
   <subfield code="a">CERN</subfield>
 </datafield>
-<xsl:if test="count(./contribution/speakers) != 0">
-<xsl:for-each select="./contribution/speakers/user">
+<xsl:if test="count(./session/speakers) != 0">
+<xsl:for-each select="./session/speakers/user">
 <datafield tag="700" ind1=" " ind2=" ">
   <subfield code="a"><xsl:apply-templates select="./name"/></subfield>
   <subfield code="e">speaker</subfield>
@@ -120,7 +120,7 @@
 </xsl:for-each>
 </xsl:if>
 <datafield tag="856" ind1="4" ind2=" ">
-  <subfield code="u">http://indico.cern.ch/contributionDisplay.py?confId=<xsl:value-of select="./ID" disable-output-escaping="yes"/>&amp;contribId=<xsl:value-of select="./contribution/ID" disable-output-escaping="yes"/></subfield>
+  <subfield code="u">http://indico.cern.ch/sessionDisplay.py?confId=<xsl:value-of select="./ID" disable-output-escaping="yes"/>&amp;sessionId=<xsl:value-of select="./session/ID" disable-output-escaping="yes"/></subfield>
   <subfield code="y">Talk details</subfield>
 </datafield>
 <datafield tag="856" ind1="4" ind2=" ">
@@ -148,7 +148,7 @@
   <subfield code="a">PUBLIC</subfield>
 </datafield>
 <datafield tag="970" ind1=" " ind2=" ">
-  <subfield code="a">INDICO.<xsl:value-of select="./ID" disable-output-escaping="yes"/>c<xsl:value-of select="./contribution/ID" disable-output-escaping="yes"/></subfield>
+  <subfield code="a">INDICO.<xsl:value-of select="./ID" disable-output-escaping="yes"/>s<xsl:value-of select="./session/ID" disable-output-escaping="yes"/></subfield>
 </datafield>
 <datafield tag="980" ind1=" " ind2=" ">
   <subfield code="a">Indico</subfield>

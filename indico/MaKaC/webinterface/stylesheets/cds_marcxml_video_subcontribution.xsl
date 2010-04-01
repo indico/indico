@@ -89,7 +89,7 @@
 </datafield>
 </xsl:if>
 <datafield tag="518" ind1=" " ind2=" ">
-  <subfield code="d"><xsl:value-of select="./contribution/subcontribution/startDate" disable-output-escaping="yes"/></subfield>
+  <subfield code="d"><xsl:value-of select="./contribution/startDate" disable-output-escaping="yes"/></subfield>
 </datafield>
 <xsl:if test="./contribution/subcontribution/abstract!=''">
 <datafield tag="520" ind1=" " ind2=" ">

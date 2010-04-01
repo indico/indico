@@ -568,7 +568,7 @@ class outputGenerator:
 
 
 
-    def _slotToXML(self,slot,vars,includeContribution,includeMaterial, showWithdrawed=True, out=None, source=None, videoFormat=None):
+    def _slotToXML(self,slot,vars,includeContribution,includeMaterial, showWithdrawed=True, out=None, recordingManagerTags=None):
         if not out:
             out = self._XMLGen
         session = slot.getSession()
@@ -1076,7 +1076,7 @@ class outputGenerator:
         #return xml
 
 
-    def confToXMLMarc21(self,conf,includeSession=1,includeContribution=1,includeMaterial=1,out=None, forceCache=False, source=None):
+    def confToXMLMarc21(self,conf,includeSession=1,includeContribution=1,includeMaterial=1,out=None, forceCache=False):
 
         if not out:
             out = self._XMLGen
