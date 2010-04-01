@@ -44,6 +44,15 @@ class ConfURLTplVar(TplVar):
         return str(urlHandlers.UHConferenceDisplay.getURL(registrant.getConference()))
     getValue=classmethod(getValue)
 
+class RegistrantIdTplVar(TplVar):
+    _name="registrant_id"
+    _description=""
+
+    def getValue(cls,registrant):
+        return registrant.getId()
+    getValue=classmethod(getValue)
+
+
 class RegistrantFirstNameTplVar(TplVar):
     _name="registrant_first_name"
     _description=""
@@ -89,7 +98,7 @@ class RegistrantSocialEventsTplVar(TplVar):
             selist.append("%s [%s place(s)]"%(se.getCaption(), se.getNoPlaces()))
         return ", ".join(selist)
     getValue=classmethod(getValue)
-        
+
 class RegistrantSessionsTplVar(TplVar):
     _name="registrant_sessions"
     _description=""
@@ -122,14 +131,14 @@ class RegistrantDepartureDateTplVar(TplVar):
             departureDate = registrant.getAccommodation().getDepartureDate().strftime("%d-%B-%Y")
         return departureDate
     getValue=classmethod(getValue)
-    
+
 class Notificator:
-    _vars=[ConfTitleTplVar,ConfURLTplVar, RegistrantFirstNameTplVar, RegistrantFamilyNameTplVar, RegistrantTitleTplVar, RegistrantAccommodationTplVar, RegistrantSocialEventsTplVar, RegistrantSessionsTplVar, RegistrantArrivalDateTplVar, RegistrantDepartureDateTplVar]
+    _vars=[ConfTitleTplVar,ConfURLTplVar, RegistrantIdTplVar, RegistrantFirstNameTplVar, RegistrantFamilyNameTplVar, RegistrantTitleTplVar, RegistrantAccommodationTplVar, RegistrantSocialEventsTplVar, RegistrantSessionsTplVar, RegistrantArrivalDateTplVar, RegistrantDepartureDateTplVar]
 
     def getVarList(cls):
         return cls._vars
     getVarList=classmethod(getVarList)
-    
+
     def _getVars(self,registrant):
         d={}
         for v in self.getVarList():
@@ -138,7 +147,7 @@ class Notificator:
 
 
 class EmailNotificator(Notificator):
-    
+
     def apply(self,registrant,params):
         vars=self._getVars(registrant)
         subj=params.get("subject","")%vars
@@ -147,7 +156,7 @@ class EmailNotificator(Notificator):
         tl=params.get("to",[])
         cc = params.get("cc",[])
         return Notification(subject=subj,body=b,fromAddr=fa,toList=tl,ccList=cc)
-    
+
     def notify(self,registrant,params):
         if params.has_key("conf"):
             sm=GenericMailer.sendAndLog(self.apply(registrant,params),params["conf"])
@@ -165,5 +174,4 @@ class EmailNotificator(Notificator):
             sm = GenericMailer.sendAndLog(notification, params["conf"])
         else:
             sm = GenericMailer.send(notification)
-        
-        
+
