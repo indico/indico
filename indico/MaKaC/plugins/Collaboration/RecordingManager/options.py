@@ -94,9 +94,29 @@ globalOptions = [
                "editable": True,
                "visible": True} ),
 
+    ("CDSBaseURL", {"description" : _("Base URL for CDS record"),
+               "type": str,
+               "defaultValue": "http://cdsweb.cern.ch/record/%s",
+               "editable": True,
+               "visible": True} ),
+
     ("videoLinkName", {"description" : _("Name of Indico link to CDS"),
                "type": str,
                "defaultValue": "Video in CDS",
+               "editable": True,
+               "visible": True} ),
+
+# need to look over this again:
+    ("mediaArchiveFormatPlainVideo", {"description" : _("Format of plain video filename"),
+               "type": str,
+               "defaultValue": "http://mediaarchive.cern.ch/MediaArchive/Video/Public2/WebLectures/%s/%s",
+               "editable": True,
+               "visible": True} ),
+
+# need to look over this again:
+    ("mediaArchiveFormatWebLecture", {"description" : _("Format of web lecture filename"),
+               "type": str,
+               "defaultValue": "http://mediaarchive.cern.ch/MediaArchive/Video/Public2/WebLectures/%s/%s",
                "editable": True,
                "visible": True} ),
 

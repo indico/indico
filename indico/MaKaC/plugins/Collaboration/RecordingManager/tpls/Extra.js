@@ -100,6 +100,9 @@ var RRTalkTemplate = function(talk) {
 //}
 
 // following added by jherr - I just copied and modified RRUpdateContributionList
+var ButtonCreateIndicoLink = new DisabledButton(Html.input("button", {disabled:true}, $T("Create Indico Link")));
+var ButtonCreateCDSRecord  = new DisabledButton(Html.input("button", {disabled:true}, $T("Create CDS Record")));
+
 var REUpdateOrphanList = function () {
     if (RE_orphans.length > 0) {
         $E('orphanList').set('');
@@ -111,10 +114,6 @@ var REUpdateOrphanList = function () {
         $E('orphanList').set(Html.span({style:{paddingLeft: pixels(20)}}, $T("No orphans found.."))); // make this more beautiful
     }
 }
-
-
-var ButtonCreateIndicoLink = new DisabledButton(Html.input("button", {disabled:true}, $T("Create Indico Link")));
-var ButtonCreateCDSRecord  = new DisabledButton(Html.input("button", {disabled:true}, $T("Create CDS Record")));
 
 ButtonCreateCDSRecord.observeClick(function(){
     if (ButtonCreateCDSRecord.isEnabled()) {
@@ -141,7 +140,7 @@ ButtonCreateCDSRecord.observeEvent('mouseout', function(event){
 });
 
 ButtonCreateIndicoLink.observeClick(function(){
-    if (!ButtonCreateIndicoLink.isEnabled()) {
+    if (ButtonCreateIndicoLink.isEnabled()) {
         if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '' &&
                 (RMviewMode == 'plain_video' ||
                         typeof RMselectedLOID != 'undefined' && RMselectedLOID != '')) {

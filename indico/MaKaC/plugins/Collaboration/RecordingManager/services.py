@@ -20,9 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.services.implementation.collaboration import CollaborationPluginServiceBase
-from MaKaC.plugins.Collaboration.RecordingRequest.common import getTalks
 from MaKaC.plugins.Collaboration.RecordingManager.common import RecordingManagerException,\
-    updateMicala, createCDSRecord
+    updateMicala, createCDSRecord, createIndicoLink
 
 
 class RMLinkService(CollaborationPluginServiceBase):
@@ -46,9 +45,9 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
 
     def _checkParams(self):
         CollaborationPluginServiceBase._checkParams(self) #puts the Conference in self._conf
-        self._IndicoID    = self._params.get('IndicoID', None)
-        self._LOID        = self._params.get('LOID', None)
-        self._confId      = self._params.get('conference', None)
+        self._IndicoID    = self._params.get('IndicoID',    None)
+        self._LOID        = self._params.get('LOID',        None)
+        self._confId      = self._params.get('conference',  None)
         self._videoFormat = self._params.get('videoFormat', None)
         self._contentType = self._params.get('contentType', None)
 
@@ -87,20 +86,18 @@ class RMCreateIndicoLinkService(CollaborationPluginServiceBase):
 
     def _checkParams(self):
         CollaborationPluginServiceBase._checkParams(self) #puts the Conference in self._conf
-        self._IndicoID = self._params.get('IndicoID', None)
-        self._LOID     = self._params.get('LOID', None)
+        self._IndicoID = self._params.get('IndicoID',   None)
+        self._LOID     = self._params.get('LOID',       None)
         self._confId   = self._params.get('conference', None)
 
         if not self._IndicoID:
             raise RecordingManagerException("No IndicoID supplied")
-        if not self._LOID:
-            raise RecordingManagerException("No LOID supplied")
         if not self._confId:
             raise RecordingManagerException("No conference ID supplied")
 
     def _getAnswer(self):
         # Create the Indico link
-        resultCreateIndicoLink = createIndicoLink(self._IndicoID)
+        resultCreateIndicoLink = createIndicoLink(self._IndicoID, "12345")
 
         return str(resultCreateIndicoLink)
 

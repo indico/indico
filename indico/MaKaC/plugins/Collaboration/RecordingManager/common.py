@@ -36,6 +36,7 @@ from MaKaC.common.xmlGen import XMLGen
 from MaKaC.export.oai2 import DataInt
 from MaKaC.common.output import outputGenerator, XSLTransformer
 from MaKaC.conference import Link
+from MaKaC import conference
 
 from urllib2 import Request, urlopen
 import re
@@ -267,28 +268,37 @@ def parseIndicoID(IndicoID):
 
     if mE:
         Logger.get('RecMan').info("searched %s, matched %s" % (IndicoID, 'conference'))
+        conference = ConferenceHolder().getById(mE.group(1))
         return {'type':           'conference',
+                'object':         conference,
                 'conference':     mE.group(1),
                 'session':        '',
                 'contribution':   '',
                 'subcontribution':''}
     elif mS:
         Logger.get('RecMan').info("searched %s, matched %s" % (IndicoID, 'session'))
+        conference = ConferenceHolder().getById(mS.group(1))
         return {'type':           'session',
+                'object':         conference.getSessionById(mS.group(2)),
                 'conference':     mS.group(1),
                 'session':        mS.group(2),
                 'contribution':   '',
                 'subcontribution':''}
     elif mC:
         Logger.get('RecMan').info("searched %s, matched %s" % (IndicoID, 'contribution'))
+        conference = ConferenceHolder().getById(mC.group(1))
         return {'type':           'contribution',
+                'object':         conference.getContributionById(mC.group(2)),
                 'conference':     mC.group(1),
                 'session':        '',
                 'contribution':   mC.group(2),
                 'subcontribution':''}
     elif mSC:
         Logger.get('RecMan').info("searched %s, matched %s" % (IndicoID, 'subcontribution'))
+        conference = ConferenceHolder().getById(mSC.group(1))
+        contribution = conference.getContributionById(mSC.group(2))
         return {'type':           'subcontribution',
+                'object':         contribution.getSubContributionById(mSC.group(3)),
                 'conference':     mSC.group(1),
                 'session':        '',
                 'contribution':   mSC.group(2),
@@ -383,7 +393,7 @@ def updateMicala(IndicoID, contentType, LOID):
 def createCDSRecord(aw, IndicoID, contentType, videoFormat):
     '''Retrieve a MARC XML string for the given conference, then package it up and send it to CDS.'''
 
-    # I don't understand what some of the following lines do. Pedro did some of it for me.
+    # Incantation to initialize XML that I don't fully understand
     xmlGen = XMLGen()
     xmlGen.initXml()
 
@@ -391,7 +401,7 @@ def createCDSRecord(aw, IndicoID, contentType, videoFormat):
     # this command does, but it is apparently necessary
     og = outputGenerator(aw, xmlGen)
 
-    # Generate XML tag to enclose the entire conference
+    # Generate XML event tag to enclose the entire conference
     xmlGen.openTag("event")
 
     # Given the IndicoID, retrieve the type of talk and IDs
@@ -558,10 +568,32 @@ def getCDSRecords(confId):
 
     return results
 
-def createIndicoLink(IndicoID):
+def createIndicoLink(IndicoID, CDSID):
     """Create a link in Indico to the CDS record."""
 
-    eventInfo = parseIndicoID(IndicoID)
+    Logger.get('RecMan').info("in createIndicoLink()")
+    # From IndicoID, get info
+    talkInfo = parseIndicoID(IndicoID)
+    obj = talkInfo["object"]
+
+    # Only one link per talk allowed.
+    if doesExistIndicoLink(obj):
+        pass
+    else:
+        Logger.get('RecMan').info("trying to create new link in Indico")
+
+        # material object holds link object.
+        # First create a material object with title "Video in CDS" or whatever the current text is.
+        material = conference.Material()
+        material.setTitle(CollaborationTools.getOptionValue("RecordingManager", "videoLinkName"))
+
+        videoLink = Link()
+        videoLink.setOwner(material)
+        videoLink.setName("Name goes here")
+        videoLink.setDescription("Description goes here")
+        videoLink.setURL(CollaborationTools.getOptionValue("RecordingManager", "CDSBaseURL") % str(CDSID))
+        material.addResource(videoLink)
+        obj.addMaterial(material)
 
 
 def doesExistIndicoLink(obj):
