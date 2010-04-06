@@ -26,9 +26,9 @@ from MaKaC.authentication.LocalAuthentication import LocalAuthenticator
 
 
 class AuthenticatorMgr:
-    
+
     def __init__(self):
-        
+
         self.AuthenticatorList = []
         config = Config.getInstance()
         for  auth in config.getAuthenticatorList():
@@ -38,8 +38,8 @@ class AuthenticatorMgr:
                 from MaKaC.authentication.NiceAuthentication import NiceAuthenticator
                 self.AuthenticatorList.append( NiceAuthenticator() )
         self.create = True
-    
-    
+
+
     def add( self, newId):
         auth = self.getById( newId.getAuthenticatorTag() )
         auth.add( newId )
@@ -76,7 +76,62 @@ class AuthenticatorMgr:
                                 user.activateAccount()
                             return user
         return None
-    
+
+    def getAvatarByLogin(self, login, authenticator = None):
+        """ Returns an Avatar object based on the person's login.
+            If authenticator is set, we will only look in the given authenticator.
+            If not set, we will look in all autheticators.
+            If we find this login in more than one authenticator, and there is at least 2
+            different Avatar objects, we will return a dictionary authenticatorName:Avatar object.
+            If nothing is found, we will return None
+
+            :param login: the user login
+            :type login: str
+
+            :param login: the name of an authenticator to use, or a list of authenticator names, or None
+            :type login: str, list or NoneType
+        """
+
+        if type(authenticator) is str:
+            #only one authenticator
+            auth = self.getById(authenticator)
+            try:
+                return auth.getAvatarByLogin(login)
+            except KeyError:
+                return None
+
+        else:
+            #multiple authenticators, we build a list of authenticators
+            if type(authenticator) is list:
+                authenticatorList = []
+                for authName in authenticator:
+                    authenticatorList.append(self.getById(authName))
+            else:
+                authenticatorList = self.AuthenticatorList
+
+            #we search for Avatars in each authenticator
+            foundAvatars = {}
+            avatarIdsFound = set()
+            for auth in authenticatorList:
+                try:
+                    avatar = auth.getAvatarByLogin(login)
+                    foundAvatars[auth.getId().strip()] = avatar
+                    avatarIdsFound.add(avatar.getId())
+                except KeyError:
+                    pass
+
+            if foundAvatars:
+                if len(foundAvatars) == 1 or len(avatarIdsFound) == 1:
+                    #there's only one different avatar
+                    return foundAvatars.values()[0]
+                else:
+                    #there's more than 1 avatar, we return a dictionary
+                    return foundAvatars
+            else:
+                #we found nothing, we return None
+                return None
+
+
     def isLoginFree( self, login):
         for au in self.AuthenticatorList:
             try:
@@ -85,10 +140,10 @@ class AuthenticatorMgr:
             except KeyError,e:
                 pass
         return True
-    
+
     def _getDefaultAuthenticator( self ):
-        return self.AuthenticatorList[0]    
-    
+        return self.AuthenticatorList[0]
+
     def getList(self):
         return self.AuthenticatorList
 
@@ -97,13 +152,13 @@ class AuthenticatorMgr:
         if not auth:
             auth = self._getDefaultAuthenticator()
         return auth.createIdentity(li, avatar)
-    
+
     def removeIdentity( self, Id):
         #check if there is almost another one identity
         if len(Id.getUser().getIdentityList()) > 1:
             auth = self.getById(Id.getAuthenticatorTag())
             auth.remove(Id)
-    
+
     def getIdentityById(self, id):
         for auth in self.AuthenticatorList:
             try:
@@ -123,7 +178,7 @@ class AuthenticatorMgr:
                 rh._getSession().setVar("autoLogin", auth.getId())
                 return av
         return None
-    
+
     def autoLogout(self, rh):
         authId = rh._getSession().getVar("autoLogin")
         if authId:
@@ -131,4 +186,4 @@ class AuthenticatorMgr:
             auth = self.getById(authId)
             return auth.autoLogout(rh)
 
-    
+
