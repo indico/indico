@@ -1202,64 +1202,46 @@ var editBooking = function(booking, conferenceId) {
  */
 var removeBooking = function(booking, conferenceId) {
 
-    var title = "Remove booking";
+    var confirmHandler = function(confirm) { if (confirm) {
 
-    var popup = new ExclusivePopup(title, function(){return true;});
+        var killProgress = IndicoUI.Dialogs.Util.progress($T("Removing your booking..."));
 
-    popup.draw = function(){
-        var self = this;
-        var span = Html.span("", "Are you sure you want to remove that " + booking.type + " booking?");
-
-        // We construct the "ok" button and what happens when it's pressed
-        var okButton = Html.input('button', null, "Remove");
-        okButton.observeClick(function() {
-            var killProgress = IndicoUI.Dialogs.Util.progress("Removing your booking...");
-
-            indicoRequest(
-                'collaboration.removeCSBooking',
-                {
-                    conference: conferenceId,
-                    bookingId: booking.id
-                },
-                function(result,error) {
-                    if (!error) {
-                        // If the server found no problems, we remove the booking from the watchlist and remove the corresponding iframe.
-                        if (result && result.error) {
-                            killProgress();
-                            codes[booking.type].errorHandler('remove', result);
-                        } else {
-                            hideAllInfoRows(false);
-                            bookings.removeAt(getBookingIndexById(booking.id))
-                            showAllInfoRows(false);
-                            removeIFrame(booking);
-                            refreshStartAllStopAllButtons();
-                            refreshTableHead();
-
-                            if (pluginHasFunction(booking.type, 'postDelete')) {
-                                codes[booking.type].postDelete(result);
-                            }
-                        }
+        indicoRequest(
+            'collaboration.removeCSBooking',
+            {
+                conference: conferenceId,
+                bookingId: booking.id
+            },
+            function(result,error) {
+                if (!error) {
+                    // If the server found no problems, we remove the booking from the watchlist and remove the corresponding iframe.
+                    if (result && result.error) {
                         killProgress();
+                        codes[booking.type].errorHandler('remove', result);
                     } else {
-                        killProgress();
-                        IndicoUtil.errorReport(error);
+                        hideAllInfoRows(false);
+                        bookings.removeAt(getBookingIndexById(booking.id))
+                        showAllInfoRows(false);
+                        removeIFrame(booking);
+                        refreshStartAllStopAllButtons();
+                        refreshTableHead();
+
+                        if (pluginHasFunction(booking.type, 'postDelete')) {
+                            codes[booking.type].postDelete(result);
+                        }
                     }
+                    killProgress();
+                } else {
+                    killProgress();
+                    IndicoUtil.errorReport(error);
                 }
-            );
-            self.close();
-        });
+            }
+        );
+    }};
 
-        // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
-        var cancelButton = Html.input('button', {style:{marginLeft:pixels(5)}}, "Cancel");
-        cancelButton.observeClick(function(){
-            self.close();
-        });
-
-        var buttonDiv = Html.div({style:{textAlign:"center", marginTop:pixels(10)}}, okButton, cancelButton)
-
-        return this.ExclusivePopup.prototype.draw.call(this, Widget.block([span, Html.br(), buttonDiv]));
-    };
-    popup.open();
+    IndicoUI.Dialogs.Util.confirm($T("Remove booking"),
+            Html.div({style:{paddingTop:pixels(10), paddingBottom:pixels(10)}}, $T("Are you sure you want to remove that ") + booking.type + $T(" booking?")),
+            confirmHandler);
 };
 
 
