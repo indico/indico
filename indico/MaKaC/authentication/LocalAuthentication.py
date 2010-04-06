@@ -26,15 +26,15 @@ from MaKaC.i18n import _
 
 class LocalAuthenticator(Authenthicator):
     idxName = "localIdentities"
-    id = _("Local")
+    id = "Local"
     name = "Indico"
     desciption = "Indico Login"
     UserCreator = None
-    
+
     def createIdentity(self, li, avatar):
         return LocalIdentity(li.getLogin(), li.getPassword(), avatar)
-    
-    
+
+
 
 
 
@@ -42,7 +42,7 @@ class LocalAuthenticator(Authenthicator):
 
 
 class LocalIdentity(PIdentity):
-    
+
     def __init__(self, login, password, user):
         PIdentity.__init__( self, login, user )
         self.setPassword( password )
@@ -55,7 +55,7 @@ class LocalIdentity(PIdentity):
             self.password == id.getPassword():
             return self.user
         return None
-    
+
     def getAuthenticatorTag(self):
         return LocalAuthenticator.getId()
 
