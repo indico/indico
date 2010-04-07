@@ -23,7 +23,8 @@ from MaKaC.webinterface import wcomponents, urlHandlers
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, \
     WPConferenceDefaultDisplayBase
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
-from MaKaC.common.timezoneUtils import nowutc, setAdjustedDate, DisplayTZ
+from MaKaC.common.timezoneUtils import nowutc, setAdjustedDate, DisplayTZ,\
+    minDatetime
 from MaKaC.common.utils import formatDateTime, parseDateTime
 from MaKaC.common.timezoneUtils import getAdjustedDate
 from MaKaC.i18n import _
@@ -398,7 +399,7 @@ class WCollaborationDisplay(wcomponents.WTemplated):
         csbm = self._conf.getCSBookingManager()
         pluginNames = csbm.getEventDisplayPlugins()
         bookings = csbm.getBookingList(filterByType = pluginNames, notify = True, onlyPublic = True)
-        bookings.sort(key = lambda b: b.getStartDate())
+        bookings.sort(key = lambda b: b.getStartDate() or minDatetime())
 
         ongoingBookings = []
         scheduledBookings = {} #date, list of bookings
