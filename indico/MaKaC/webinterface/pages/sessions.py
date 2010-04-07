@@ -343,7 +343,7 @@ class WSessionDisplayBase(wcomponents.WTemplated):
             speakerList.append(spkcapt)
         speakers =""
         if speakerList != []:
-            speakers = _("""<br><small> _("by") %s</small>"%"; """).join(speakerList)
+            speakers = _("""<br><small> _("by") %s</small>""")%"; ".join(speakerList)
         linkColor=""
         if contrib.getSession().isTextColorToLinks():
             linkColor="color:%s"%contrib.getSession().getTextColor()
