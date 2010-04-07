@@ -363,8 +363,11 @@ class CSBookingManager(Persistent, Observer):
     def checkBookingStatus(self, id):
         booking = self._bookings[id]
         if booking.hasCheckStatus():
-            booking._checkStatus()
-            return booking
+            result = booking._checkStatus()
+            if isinstance(result, CSErrorBase):
+                return result
+            else:
+                return booking
         else:
             raise ServiceError(_("Tried to check status of booking ") + str(id) + _(" of meeting ") + str(self._conf.getId()) + _(" but this booking does not support the check status service."))
 
