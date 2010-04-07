@@ -172,9 +172,9 @@ def getTalks(conference, oneIsEnough = False, sort = False):
 
     for event_info in recordable_events:
         try:
-            event_info["CDS"] = cds_indico_matches[event_info["IndicoID"]]
+            event_info["CDSID"] = cds_indico_matches[event_info["IndicoID"]]
         except KeyError:
-            event_info["CDS"] = ""
+            event_info["CDSID"] = ""
             pass
 
 
@@ -580,21 +580,20 @@ def createIndicoLink(IndicoID, CDSID):
     if doesExistIndicoLink(obj):
         pass
     else:
-        Logger.get('RecMan').info("trying to create new link in Indico")
+        Logger.get('RecMan').info("creating a new link in Indico")
 
         # material object holds link object.
         # First create a material object with title "Video in CDS" or whatever the current text is.
         material = conference.Material()
         material.setTitle(CollaborationTools.getOptionValue("RecordingManager", "videoLinkName"))
-
         videoLink = Link()
         videoLink.setOwner(material)
-        videoLink.setName("Name goes here")
-        videoLink.setDescription("Description goes here")
+#        videoLink.setName("Name goes here")
+#        videoLink.setDescription("Description goes here")
         videoLink.setURL(CollaborationTools.getOptionValue("RecordingManager", "CDSBaseURL") % str(CDSID))
         material.addResource(videoLink)
+        material.setMainResource(videoLink)
         obj.addMaterial(material)
-
 
 def doesExistIndicoLink(obj):
     """This function will be called with a conference, session, contribution or subcontribution object.
@@ -641,7 +640,7 @@ def chooseBGImage(talk):
     else:
         flagLOID = '0'
 
-    if talk["CDS"] != '':
+    if talk["CDSID"] != '':
         flagCDS = '1'
     else:
         flagCDS = '0'

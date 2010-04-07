@@ -144,6 +144,22 @@
     var RMviewMode         = '';
     var RMvideoFormat      = 'standard';
 
+    // Pass the metadata we need for each talk to JavaScript
+    var RMTalkList = {
+    <% for talk in Talks: %>
+    "<%= talk["IndicoID"]   %>": {
+        "title":      "<%= talk["title"]      %>",
+        "titleshort": "<%= talk["titleshort"] %>",
+        "CDSID":      "<%= talk["CDSID"]      %>",
+        "type":       "<%= talk["type"]       %>",
+        "speakers":   "<%= talk["speakers"]   %>",
+        "date":       "<%= talk["date"]       %>",
+        "LOID":       "<%= talk["LOID"]       %>",
+        "IndicoLink": "<%= talk["IndicoLink"] %>"
+    },
+    <% end %>
+    };
+
     // Draw the two buttons, which start out as disabled until
     // the user has selected both talk and LO
     $E('RMbuttonCreateCDSRecord').set(ButtonCreateCDSRecord.draw());

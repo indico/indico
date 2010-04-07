@@ -433,7 +433,8 @@ function RMCreateIndicoLink() {
                 service: 'RMCreateIndicoLink',
                 conference: '<%= ConferenceId %>',
                 IndicoID: RMselectedTalkId,
-                LOID: RMselectedLOID
+                LOID: RMselectedLOID,
+                CDSID: RMTalkList[RMselectedTalkId]
             },
         function(result, error){
             if (!error) {

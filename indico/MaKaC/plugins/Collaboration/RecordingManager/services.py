@@ -89,15 +89,18 @@ class RMCreateIndicoLinkService(CollaborationPluginServiceBase):
         self._IndicoID = self._params.get('IndicoID',   None)
         self._LOID     = self._params.get('LOID',       None)
         self._confId   = self._params.get('conference', None)
+        self._CDSID    = self._params.get('CDSID', None)
 
         if not self._IndicoID:
             raise RecordingManagerException("No IndicoID supplied")
         if not self._confId:
             raise RecordingManagerException("No conference ID supplied")
+        if not self._CDSID:
+            raise RecordingManagerException("No CDS record ID supplied")
 
     def _getAnswer(self):
         # Create the Indico link
-        resultCreateIndicoLink = createIndicoLink(self._IndicoID, "12345")
+        resultCreateIndicoLink = createIndicoLink(self._IndicoID, self._CDSID)
 
         return str(resultCreateIndicoLink)
 
