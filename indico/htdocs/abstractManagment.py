@@ -19,6 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import MaKaC.webinterface.rh.abstractModif as abstractModif
+import MaKaC.webinterface.rh.conferenceModif as conferenceModif
 
 
 def index( req, **params ):
@@ -27,6 +28,14 @@ def index( req, **params ):
 
 def accept( req, **params ):
     return abstractModif.RHAbstractManagmentAccept( req ).process( params )
+
+
+def acceptMultiple( req, **params ):
+    return conferenceModif.RHAbstractManagmentAcceptMultiple( req ).process( params )
+
+
+def rejectMultiple( req, **params ):
+    return conferenceModif.RHAbstractManagmentRejectMultiple( req ).process( params )
 
 
 def reject( req, **params ):

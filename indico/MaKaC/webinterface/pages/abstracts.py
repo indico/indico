@@ -25,7 +25,7 @@ import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.navigation as navigation
 import MaKaC.review as review
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
+from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase, WPConferenceModifAbstractBase
 from MaKaC.common import Config
 from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
@@ -1053,14 +1053,58 @@ class WAbstractManagmentAccept( wcomponents.WTemplated ):
         vars["types"] = "".join( self._getTypeItemsHTML() )
         vars["acceptURL"] = quoteattr(str(urlHandlers.UHAbstractManagmentAccept.getURL(self._abstract)))
         vars["cancelURL"] = quoteattr(str(urlHandlers.UHAbstractManagment.getURL(self._abstract)))
-        vars["types"] = "".join( self._getTypeItemsHTML() )
         return vars
 
+class WAbstractManagmentAcceptMultiple( wcomponents.WTemplated):
+
+    def __init__( self, abstracts ):
+        wcomponents.WTemplated.__init__(self)
+        self._abstracts = abstracts
+        if len(abstracts) > 0:
+            self._conf = abstracts[0].getOwner().getOwner()
+
+    def getVars( self ):
+        vars = wcomponents.WTemplated.getVars( self )
+        vars["abstractsQuantity"] = len(self._abstracts)
+        vars["tracks"] = self._conf.getTrackList()
+        vars["sessions"] = self._conf.getSessionList()
+        vars["types"] = self._conf.getContribTypeList()
+        vars["listOfAbstracts"] = []
+        acceptURL = urlHandlers.UHAbstractManagmentAcceptMultiple.getURL(self._conf)
+        IDs = []
+        for abstract in self._abstracts:
+            IDs.append(abstract.getId())
+            vars["listOfAbstracts"].append(abstract.getId() + ". " + abstract.getTitle())
+        acceptURL.addParams({'abstracts':IDs})
+        vars["acceptURL"] = quoteattr(str(acceptURL))
+        vars["cancelURL"] = quoteattr(str(urlHandlers.UHConfAbstractManagment.getURL(self._conf)))
+        return vars
 
 class WPAbstractManagmentAccept(WPAbstractManagment):
 
     def _getTabContent( self, params ):
         wc = WAbstractManagmentAccept( self._getAW(), self._target )
+        return wc.getHTML()
+
+class WPAbstractManagmentAcceptMultiple(WPConferenceModifAbstractBase):
+
+    def __init__( self, rh, abstracts ):
+        WPConferenceModifAbstractBase.__init__(self, rh, abstracts[0].getConference())
+        self._abstracts = abstracts
+
+    def _getPageContent( self, params ):
+        wc = WAbstractManagmentAcceptMultiple( self._abstracts )
+        return wc.getHTML()
+
+
+class WPAbstractManagmentRejectMultiple(WPConferenceModifAbstractBase):
+
+    def __init__( self, rh, abstracts ):
+        WPConferenceModifAbstractBase.__init__(self, rh, abstracts[0].getConference())
+        self._abstracts = abstracts
+
+    def _getPageContent( self, params ):
+        wc = WAbstractManagmentRejectMultiple( self._abstracts )
         return wc.getHTML()
 
 
@@ -1125,6 +1169,27 @@ class WAbstractManagmentReject( wcomponents.WTemplated ):
         vars["cancelURL"] = quoteattr(str(urlHandlers.UHAbstractManagment.getURL(self._abstract)))
         return vars
 
+
+class WAbstractManagmentRejectMultiple( wcomponents.WTemplated ):
+
+    def __init__( self, abstracts ):
+        self._abstracts = abstracts
+        if len(abstracts) > 0:
+            self._conf = abstracts[0].getOwner().getOwner()
+
+    def getVars( self ):
+        vars = wcomponents.WTemplated.getVars( self )
+        vars["abstractsQuantity"] = len(self._abstracts)
+        vars["listOfAbstracts"] = []
+        rejectURL = urlHandlers.UHAbstractManagmentRejectMultiple.getURL(self._conf)
+        IDs = []
+        for abstract in self._abstracts:
+            IDs.append(abstract.getId())
+            vars["listOfAbstracts"].append(abstract.getId() + ". " + abstract.getTitle())
+        rejectURL.addParams({'abstracts':IDs})
+        vars["rejectURL"] = quoteattr(str(rejectURL))
+        vars["cancelURL"] = quoteattr(str(urlHandlers.UHConfAbstractManagment.getURL(self._conf)))
+        return vars
 
 class WPAbstractManagmentReject(WPAbstractManagment):
 

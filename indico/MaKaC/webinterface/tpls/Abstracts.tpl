@@ -241,6 +241,12 @@ document.optionForm.showSubmissionDate.checked=false
                                             <td>
                                                 <input type="submit" class="btn" name="AUTH" value="<%= _("get author list of selected abstracts")%>" style="width:264px">
                                             </td>
+                                            <td>
+                                                <input type="submit" class="btn" name="acceptMultiple" value="Accept multiple">
+                                            </td>
+                                            <td>
+                                                <input type="submit" class="btn" name="rejectMultiple" value="Reject multiple">
+                                            </td>
                             </form>
                                         </tr>
                                     </table>
