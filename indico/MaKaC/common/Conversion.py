@@ -103,7 +103,10 @@ class Conversion:
     def locatorString(cls, obj):
         locator = obj.getOwner().getLocator()
         if not locator.has_key('sessionId'):
-            return "c%(contribId)s" % locator
+            if locator.has_key('contribId'):
+                return "c%(contribId)s" % locator
+            else:
+                return ""
         elif not locator.has_key('contribId'):
             return "s%(sessionId)sl%(slotId)s" % locator
         else:

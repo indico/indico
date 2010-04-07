@@ -16,7 +16,6 @@ from MaKaC.services.implementation import base
 from MaKaC.services.implementation import roomBooking
 from MaKaC.services.implementation import session as sessionServices
 from MaKaC.common.timezoneUtils import setAdjustedDate
-from MaKaC.common.logger import Logger
 from MaKaC.common.utils import getHierarchicalId, formatTime, formatDateTime, parseDate
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.errors import TimingError
@@ -535,11 +534,11 @@ class ModifyStartEndDate(ScheduleOperation):
             self._schEntry.getSchedule().moveEntriesBelow(diff, entriesList)
 
             # retrieve results
-            pickledData = schedule.ScheduleToJson.process(self._schEntry.getSchedule(), self._conf.getTimezone(), days = [self._schEntry.getAdjustedStartDate()])
+            pickledData = schedule.ScheduleToJson.process(self._schEntry.getSchedule(), self._conf.getTimezone(), None, days = [self._schEntry.getAdjustedStartDate()])
             entryId = pickledData.keys()[0]
             pickledData = pickledData.values()[0]
         else:
-            entryId, pickledData = schedule.ScheduleToJson.processEntry(self._schEntry, self._conf.getTimezone())
+            entryId, pickledData = schedule.ScheduleToJson.processEntry(self._schEntry, self._conf.getTimezone(), None)
 
         return {'day': self._schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
                 'id': entryId,
@@ -663,7 +662,7 @@ class ScheduleEditSlotBase(ScheduleOperation, LocationSetter):
             schEntry = self._slot.getSessionSchEntry()
         else:
             schEntry = self._slot.getConfSchEntry()
-        entryId, pickledData = schedule.ScheduleToJson.processEntry(schEntry, self._conf.getTimezone())
+        entryId, pickledData = schedule.ScheduleToJson.processEntry(schEntry, self._conf.getTimezone(), None)
 
         return {'day': schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
                 'id': pickledData['id'],
@@ -1050,7 +1049,7 @@ class MoveEntryUpDown(ScheduleOperation):
         else:
             sched.moveDownEntry(schEntry)
 
-        return schedule.ScheduleToJson.process(sched, self._conf.getTimezone(), days = [ schEntry.getAdjustedStartDate() ])
+        return schedule.ScheduleToJson.process(sched, self._conf.getTimezone(), None, days = [ schEntry.getAdjustedStartDate() ])
 
 
 class ConferenceTimetableMoveEntryUpDown(MoveEntryUpDown, conferenceServices.ConferenceModifBase):

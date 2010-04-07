@@ -211,6 +211,17 @@ type("DisplayTimeTable", ["TimeTable"], {
         this.filter.draw();
     },
 
+    toggleDetailedView: function() {
+        var detailLevel = this.timetableDrawer.detail.get();
+        var newDetailLevel = detailLevel == 'contribution' ? 'session' : 'contribution';
+        this.timetableDrawer.detail.set(newDetailLevel);
+        var state = (newDetailLevel == 'contribution');
+        this.inDetailedMode = state;
+        //detailsButton.btn.set(state ? "Hide details" : "Show details");
+        this.detailsButton.btn.getParent().dom.style.background = state ? "#9F883B" : "";
+        this._addToHistory(this.currentDay + (state?'.detailed':''));
+    },
+
     _functionButtons: function() {
         var self = this;
 
@@ -223,15 +234,8 @@ type("DisplayTimeTable", ["TimeTable"], {
         // TODO: Needs to be implemented
         var linkButton = Html.div('linkButtonWhite', $T('Link'));
 
-        var detailsButton = {'btn': Html.div('buttonWhite', Html.span({}, $T('Detailed view'))),
-            'onclick': function(btnContainer) {
-                var detailLevel = self.timetableDrawer.detail.get();
-                var newDetailLevel = detailLevel == 'contribution' ? 'session' : 'contribution';
-                self.timetableDrawer.detail.set(newDetailLevel);
-                var state = (newDetailLevel == 'contribution');
-                //detailsButton.btn.set(state ? "Hide details" : "Show details");
-                btnContainer.dom.style.background = state ? "#9F883B" : "";
-            }};
+        this.detailsButton = {'btn': Html.div('buttonWhite', Html.span({}, $T('Detailed view'))),
+            'onclick': function() {self.toggleDetailedView();}};
 
         var filterButton = {'btn': Html.div('buttonWhite', $T('Filter')),
             'onclick': function(btnContainer) {
@@ -245,7 +249,7 @@ type("DisplayTimeTable", ["TimeTable"], {
                            };
 
         return [printButton,
-                detailsButton,
+                this.detailsButton,
                 filterButton];
     }
 },
@@ -301,7 +305,7 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
 
 
     _parseDayInterval: function(hash) {
-        var m = hash.match(/#(\d{8})(?:\.(s\d+l\d+))?/);
+        var m = hash.match(/#(\d{8})(?:\.((?:s\d+l\d+)|detailed))?/);
 
         if (m) {
             return [m[1],m[2]];
@@ -397,11 +401,14 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
          this.LookupTabWidget( translate(this.sortedKeys, function(key) {
 
              return [key, function() {
+
+                 detailed = self.inDetailedMode?'.detailed':'';
+
                  self.currentDay = key;
                  // each time one tab is clicked,
                  // drawDay is called over a different day
                  if (key == 'all') {
-                     self._addToHistory('all');
+                     self._addToHistory('all' + detailed);
                      return self._draw(self.timetableDrawer.drawAllDays());
                  } else {
 
@@ -412,16 +419,21 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
                          throw "stopDrawing";
                      }
 
-                     self._addToHistory(key);
+                     self._addToHistory(key + detailed);
                      return self._draw(self.timetableDrawer.drawDay(key));
                  }
              }];
          }), this.width, 100, initialTab, this._functionButtons(), this.canvas);
 
          if (dayAndInterval[1]) {
+             var subref = dayAndInterval[1];
              // TODO: replace with appropriate notification system
              setTimeout(function() {
-                 self.switchToInterval(dayAndInterval[1]);
+                 if (subref == 'detailed') {
+                     self.toggleDetailedView();
+                 } else {
+                     self.switchToInterval(subref);
+                 }
              }, 500);
          }
 

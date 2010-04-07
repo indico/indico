@@ -478,8 +478,6 @@ class SchEntry(Persistent):
         self.description = ""
         self._id=""
 
-
-    @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'], 'id')
     def getId(self):
         try:
             if self._id:
@@ -1131,6 +1129,7 @@ class BreakTimeSchEntry(IndTimeSchEntry):
     @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'address', lambda x: Conversion.locationAddress(x.getLocation()))
     @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'inheritLoc', lambda x: x.getOwnLocation() is None)
     @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'inheritRoom', lambda x: x.getOwnRoom() is None)
+    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'id', lambda x:Conversion.locatorString(x)+"b"+x.getId())
 
     def __init__(self):
         IndTimeSchEntry.__init__(self)
@@ -1456,7 +1455,7 @@ class ContribSchEntry(LinkedTimeSchEntry):
 class ScheduleToJson:
 
     @staticmethod
-    def processEntry(obj, tz):
+    def processEntry(obj, tz, aw):
 
         #raise "duration: " + (datetime(1900,1,1)+obj.getDuration()).strftime("%Hh%M'") + ''
         entry = DictPickler.pickle(obj, timezone=tz)
@@ -1471,16 +1470,36 @@ class ScheduleToJson:
             # get session content
             entries = {}
             for contrib in sessionSlot.getSchedule().getEntries():
-                contribData = DictPickler.pickle(contrib, timezone=tz)
-                entries[contribData['id']] = contribData
+                if ScheduleToJson.checkProtection(contrib, aw):
+                    contribData = DictPickler.pickle(contrib, timezone=tz)
+                    entries[contribData['id']] = contribData
 
             entry['entries'] = entries
 
         return genId, entry
 
+    @staticmethod
+    def checkProtection(obj, aw):
+
+        if aw is None:
+            return True
+
+        from MaKaC.conference import SessionSlot
+
+        canBeDisplayed = False
+        if isinstance(obj, BreakTimeSchEntry):
+            canBeDisplayed = True
+        else: #contrib or session slot
+            owner = obj.getOwner()
+            if owner.canAccess(aw):
+                canBeDisplayed = True
+            elif isinstance(owner, SessionSlot) and owner.canView(aw):
+                canBeDisplayed = True
+        return canBeDisplayed
+
 
     @staticmethod
-    def process(schedule, tz, days = None):
+    def process(schedule, tz, aw, days = None):
 
         scheduleDict={}
 
@@ -1492,11 +1511,12 @@ class ScheduleToJson:
 
             for obj in schedule.getEntriesOnDay(day):
 
-                genId, pickledData = ScheduleToJson.processEntry(obj, tz)
+                if ScheduleToJson.checkProtection(obj, aw):
+                    genId, pickledData = ScheduleToJson.processEntry(obj, tz, aw)
 
-                # exclude entries that start in the day before
-                if obj.getAdjustedStartDate(tz).date() == day.date():
-                    dayEntry[genId] = pickledData
+                    # exclude entries that start in the day before
+                    if obj.getAdjustedStartDate(tz).date() == day.date():
+                        dayEntry[genId] = pickledData
 
             scheduleDict[day.strftime("%Y%m%d")] = dayEntry
 

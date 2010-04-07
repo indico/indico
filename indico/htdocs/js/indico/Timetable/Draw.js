@@ -1376,7 +1376,7 @@ type("TimetableDrawer", ["IWidget"],
                  if (entry.entryType == 'Session' && !entry.isPoster) {
                      each(entry.entries, function(subentry, subkey) {
                          result[subkey] = clone(subentry);
-                         result[subkey].color = entry.color;
+                         result[subkey].color = subentry.entryType == 'Break' ? subentry.color:entry.color;
                          result[subkey].textColor = entry.textColor;
                      });
                  } else {
