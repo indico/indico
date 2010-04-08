@@ -268,7 +268,11 @@ type("ExclusivePopupWithButtons", ["ExclusivePopup"], {
         this.contentWrapper.setStyle('overflowY', 'auto');
         this.contentWrapper.setStyle('overflowX', 'hidden');
         this.contentWrapper.setStyle('position', 'relative');
-        this.contentWrapper.setStyle('top', pixels(-10));
+        if (this.title && this.title !== '') {
+            this.contentWrapper.setStyle('top', pixels(-10));
+        } else {
+            this.contentWrapper.setStyle('top', pixels(10));
+        }
 
         var contentHeight = this._calculateContentHeight();
         this.contentWrapper.setStyle('height', pixels(contentHeight));

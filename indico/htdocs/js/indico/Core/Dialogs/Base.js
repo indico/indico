@@ -90,7 +90,7 @@ type("ServiceDialogWithButtons", ["ExclusivePopupWithButtons", "ServiceDialog"],
  * Dialog for unforeseen errors that will ask to the user if he wants
  * to send an error report.
  */
-type("ErrorReportDialog", ["ServiceDialog"],
+type("ErrorReportDialog", ["ServiceDialogWithButtons"],
      {
          _sendReport: function(email) {
              var self = this;
@@ -120,30 +120,28 @@ type("ErrorReportDialog", ["ServiceDialog"],
              // TODO: force unidirectional binding?
              $B(email.accessor(), indicoSource('user.data.email.get', {}));
 
-             return this.ServiceDialog.prototype.draw.call(
-                 this,
-                 Html.div(
-                     {style:{padding:pixels(10)}},
+             var content = Html.div({style:{paddingLeft:pixels(10), paddingRight: pixels(10), paddingBottom:pixels(10)}},
                      Html.div({style:{marginBottom: pixels(10), width:'300px', textAlign: 'center'}}, $T('An error has occurred while processing your request. We advise you to submit an error report, by clicking "Send report".')),
-                     Html.div({style:{color: 'red', marginBottom: pixels(10), width: '300px', height: '75px', textAlign: 'center', overflow: 'auto'}},
+                     Html.div({style:{color: 'red', marginBottom: pixels(10), width: '300px', maxHeight: '75px', textAlign: 'center', overflow: 'auto'}},
                               this.error.code+": "+this.error.message),
                      Html.div({style:{marginBottom: pixels(10), textAlign: 'center'}},
                               Html.label({},"Your e-mail: "),
-                              $B(Html.input("text",{}), email.accessor())),
-                     Html.div({style:{textAlign: 'center'}},
-                              Widget.link(command(
-                                  function() {
-                                      self._sendReport(email);
-                                  },
-                                  Html.input('button', {},'Send report'))),
-                              Widget.link(command(
-                                  function() {
-                                      self.close();
-                                  },
-                                  Html.input('button', {style:{marginLeft: pixels(5)}},'Do not send report')
-                              ))
-                             )
-                 ));
+                              $B(Html.input("text",{}), email.accessor())));
+
+             var buttons = Html.div({},
+                     Widget.link(command(
+                         function() {
+                             self._sendReport(email);
+                         },
+                         Html.input('button', {}, $T('Send report')))),
+                     Widget.link(command(
+                         function() {
+                             self.close();
+                         },
+                         Html.input('button', {style:{marginLeft: pixels(5)}}, $T('Do not send report'))
+                     )));
+
+             return this.ServiceDialogWithButtons.prototype.draw.call(this, content, buttons);
          }
      },
      function(error) {
