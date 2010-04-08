@@ -758,28 +758,29 @@ class OAIDoubleIndex(DoubleIndex):
 
     def getElements(self, from_date, until_date):
         if not (from_date or until_date):
-            res = []
-            for key in self._words.keys():
-                res.extend(self._words[key])
-            return res
-        fd = self.firstDate
+            return self._words.values()
+
         if from_date:
             fd = datetime(int(from_date[0:4]), int(from_date[5:7]), int(from_date[8:10]), tzinfo=timezone('UTC'))
-#            fd = server2utc(datetime(int(from_date[0:4]), int(from_date[5:7]), int(from_date[8:10])))
-        ud = nowutc().replace( hour=23, minute=59, second=59, microsecond=0 )
+        else:
+            fd = self.firstDate
+
         if until_date:
-#            ud = server2utc(datetime(int(until_date[0:4]), int(until_date[5:7]), int(until_date[8:10]))
             ud = datetime(int(until_date[0:4]), int(until_date[5:7]), int(until_date[8:10]), tzinfo=timezone('UTC'))
+        else:
+            ud = nowutc().replace( hour=23, minute=59, second=59, microsecond=0 )
+
         res = []
         if fd > ud:
             return res
-        date = fd
         delta = timedelta(1)
-        while date <= ud:
-            if date.strftime("%Y-%m-%d") in self._words.keys():
-                res.extend(self._words[date.strftime("%Y-%m-%d")])
-            date = date + delta
+        while fd <= ud:
+            d = fd.strftime("%Y-%m-%d")
+            if d in self._words:
+                res.extend(self._words[d])
+            fd += delta
         return res
+
 
     def getElementIds(self, from_date, until_date):
         if not (from_date or until_date):
