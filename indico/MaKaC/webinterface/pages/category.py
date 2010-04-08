@@ -1264,7 +1264,7 @@ class WPConferenceCreationMainData( WPCategoryDisplayBase ):
 
     def _getNavigationDrawer(self):
 
-        if self._target.isRoot():
+        if self._target and self._target.isRoot():
             return
         else:
             pars = {"target": self._target, "isModif": False}

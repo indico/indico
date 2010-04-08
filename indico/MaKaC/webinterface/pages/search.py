@@ -28,7 +28,7 @@ class WPSearchCategory(WPSearch, WPCategoryDisplayBase):
         params['categId'] = self._target.getId()
 
     def _getNavigationDrawer(self):
-        if self._target.isRoot():
+        if self._target.isRoot() and self._target.isRoot():
             return
         else:
             pars = {"target": self._target, "isModif": False}
