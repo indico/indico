@@ -68,116 +68,157 @@ class RHRegistrantListMenuOpen(RHRegistrantListModifBase):
 class RHRegistrantListModif( RHRegistrantListModifBase ):
     _uh = urlHandlers.UHConfModifRegistrantList
 
-    def _checkParams( self, params ):
-        self._filterUsed = False
-        RHRegistrantListModifBase._checkParams(self, params)
+    def _resetFilters( self, sessionData ):
+
         regForm = self._conf.getRegistrationForm()
-        websession = self._getSession()
-        dict = websession.getVar("registrantsFilterAndSortingConf%s"%self._conf.getId())
-        noMemory = False
-        if not dict:
-            noMemory = True
-            dict = {}
+        accommform = regForm.getAccommodationForm()
+        laccomm = map(lambda accom: accom.getId(),
+                      accommform.getAccommodationTypesList())
+
+        lstatuses = []
+        for st in self._conf.getRegistrationForm().getStatusesList():
+            lstatuses.append(st.getCaption()+st.getId()+"-NoValue")
+            for stInt in st.getStatusValues():
+                lstatuses.append(st.getCaption()+st.getId()+"-"+st.getStatusValues()[stInt].getCaption())
+
+        sessform =regForm.getSessionsForm()
+        sesstypes = sessform.getSessionList()
+        lsessions = map(lambda session: session.getId(), sesstypes)
+
+        eventForm = regForm.getSocialEventForm()
+        events = eventForm.getSocialEventList()
+        levents = map(lambda event: event.getId(), events)
+
+        sessionData["accomm"] = laccomm
+        sessionData["statuses"] = lstatuses
+        sessionData[self._sessionFilterName] = lsessions
+        sessionData["event"] = levents
+
+        sessionData["accommShowNoValue"] = True
+        sessionData["sessionShowNoValue"] = True
+        sessionData["eventShowNoValue"] = True
+        sessionData["statusesShowNoValue"] = True
+
+        return sessionData
+
+    def _updateFilters( self, sessionData, params ):
+
+        sessionData['event'] = []
+        sessionData['accomm'] = []
+        sessionData['statuses'] = []
+        sessionData['session'] = []
+        sessionData['sessionfirstpriority'] = []
+
+        sessionData.update(params)
+        sessionData[self._sessionFilterName] = params.get('session',[])
+
+        # update these elements in the session so that the parameters that are
+        # passed are always taken into account (sessionData.update is not
+        # enough, since the elements that are ommitted in params would just be
+        # ignored
+
+        sessionData['accommShowNoValue'] = params.has_key('accommShowNoValue')
+        sessionData['eventShowNoValue'] = params.has_key('eventShowNoValue')
+        sessionData['sessionShowNoValue'] = params.has_key('sessionShowNoValue')
+        sessionData['statusesShowNoValue'] = params.has_key('statusesShowNoValue')
+
+        return sessionData
+
+    def _checkFilterParams( self, params, filtersActive, sessionData, operation ):
+
+        # user chose to reset the filters
+        if operation ==  'resetFilters':
+            self._filterUsed = False
+            sessionData = self._resetFilters(sessionData)
+        # user set the filters
+        elif operation ==  'setFilters':
+            self._filterUsed = True
+            sessionData = self._updateFilters(sessionData, params)
+        # user has changed the display options
+        elif operation == 'setDisplay':
+            self._filterUsed = filtersActive
+            sessionData['disp'] = params.get('disp',[])
+        # session is empty (first time)
+        elif not filtersActive:
+            self._filterUsed = False
+            sessionData = self._resetFilters(sessionData)
         else:
-            dict = dict.copy()
+            self._filterUsed = True
 
-        if not noMemory and params.has_key("disp"):
-            if "accommShowNoValue" in dict:
-                del dict["accommShowNoValue"]
-            if "eventShowNoValue" in dict:
-                del dict["eventShowNoValue"]
-            if "sessionShowNoValue" in dict:
-                del dict["sessionShowNoValue"]
-            if not params.has_key("event") and "event" in dict:
-                del dict["event"]
-            if not params.has_key("session") and "session" in dict:
-                del dict["session"]
-            if not params.has_key("accomm") and "accomm" in dict:
-                del dict["accomm"]
-            if not params.has_key("statuses") and "statuses" in dict:
-                del dict["statuses"]
+        return sessionData
 
-        dict.update(params)
-        self._display = dict.get("disp",[])
-        if not isinstance(self._display, list):
-            self._display = [self._display]
-        if dict.has_key("firstChoice"):
+    def _checkParams( self, params ):
+
+        RHRegistrantListModifBase._checkParams(self, params)
+
+        operationType = params.get('operationType')
+
+        # session data
+        websession = self._getSession()
+        sessionData = websession.getVar("registrantsFilterAndSortingConf%s"%self._conf.getId())
+
+        # check if there is information already
+        # set in the session variables
+        if sessionData:
+            # work on a copy
+            sessionData = sessionData.copy()
+            filtersActive =  sessionData['filtersActive']
+        else:
+            # set a default, empty dict
+            sessionData = {}
+            filtersActive = False
+
+        if params.has_key("resetFilters"):
+            operation =  'resetFilters'
+        elif operationType ==  'filter':
+            operation =  'setFilters'
+        elif operationType ==  'display':
+            operation =  'setDisplay'
+        else:
+            operation = None
+
+        # the filter name will be different, depending
+        # on whether only  the first choice for the session
+        # is taken into account
+
+        if params.has_key("firstChoice"):
             self._sessionFilterName="sessionfirstpriority"
         else:
             self._sessionFilterName="session"
 
-        resetFilters = params.has_key("removeFilters")
-        if not noMemory:
-            self._filterUsed = True
-        filter = {}
+        sessionData = self._checkFilterParams(params, filtersActive, sessionData, operation)
 
-        laccomm = []
-        accommform = regForm.getAccommodationForm()
-        accommtypes = accommform.getAccommodationTypesList()
-        if not self._filterUsed or resetFilters:
-            for accomm in accommtypes:
-                laccomm.append(accomm.getId())
-            filter["accomm"]=laccomm
-        else:
-            filter["accomm"]=dict.get("accomm",laccomm)
 
-        lstatuses = []
-        if not self._filterUsed or resetFilters:
-            for st in self._conf.getRegistrationForm().getStatusesList():
-                lstatuses.append(st.getCaption()+st.getId()+"-NoValue")
-                for stInt in st.getStatusValues():
-                    lstatuses.append(st.getCaption()+st.getId()+"-"+st.getStatusValues()[stInt].getCaption())
-            filter["statuses"]=lstatuses
-        else:
-            filter["statuses"]=dict.get("statuses",lstatuses)
+        self._filterCrit = regFilters.RegFilterCrit(self._conf, sessionData)
 
-        sessform =regForm.getSessionsForm()
-        sesstypes = sessform.getSessionList()
-        lsessions = []
-        if not self._filterUsed or resetFilters:
-            for sess in sesstypes:
-                lsessions.append( sess.getId() )
-            filter[self._sessionFilterName]=lsessions
-        else:
-            filter[self._sessionFilterName]=dict.get("session",lsessions)
 
-        eventForm = regForm.getSocialEventForm()
-        events = eventForm.getSocialEventList()
-        levents = []
-        if not self._filterUsed or resetFilters:
-            for event in events:
-                levents.append( event.getId() )
-            filter["event"]=levents
-        else:
-            filter["event"]=dict.get("event",levents)
+        self._filterCrit.getField("accomm").setShowNoValue(
+            sessionData.get("accommShowNoValue") )
+        self._filterCrit.getField(self._sessionFilterName).setShowNoValue(
+            sessionData.get("sessionShowNoValue") )
+        self._filterCrit.getField("event").setShowNoValue(
+            sessionData.get("eventShowNoValue") )
+        self._filterCrit.getField("statuses").setShowNoValue(
+            sessionData.get("statusesShowNoValue") )
 
-        self._filterCrit=regFilters.RegFilterCrit(self._conf,filter)
-        accommShowNoValue=True
-        sessionShowNoValue=True
-        eventShowNoValue=True
-        statusesShowNoValue=True
+        self._sortingCrit = regFilters.SortingCriteria( [sessionData.get( "sortBy", "Name" ).strip()] )
 
-        if (self._filterUsed or dict.has_key("disp")) and not resetFilters:
-            accommShowNoValue =  dict.has_key("accommShowNoValue")
-            sessionShowNoValue =  dict.has_key("sessionShowNoValue")
-            eventShowNoValue =  dict.has_key("eventShowNoValue")
 
-        self._filterCrit.getField("accomm").setShowNoValue( accommShowNoValue )
-        self._filterCrit.getField(self._sessionFilterName).setShowNoValue( sessionShowNoValue )
-        self._filterCrit.getField("event").setShowNoValue( eventShowNoValue )
-        self._filterCrit.getField("statuses").setShowNoValue( statusesShowNoValue )
+        self._order = sessionData.get("order","down")
 
-        self._sortingCrit = regFilters.SortingCriteria( [dict.get( "sortBy", "Name" ).strip()] )
-        self._order = dict.get("order","down")
+        self._display = sessionData.get("disp",[])
 
-        self._menuStatus = websession.getVar("RegistrantListMenuStatus")
+        # normalize ?
+        if not isinstance(self._display, list):
+            self._display = [self._display]
 
-        if resetFilters:
-            self._filterUsed = False
+        sessionData['filtersActive'] = self._filterUsed;
+        websession.setVar("registrantsFilterAndSortingConf%s"%self._conf.getId(), sessionData)
+
 
     def _process( self ):
         p = registrants.WPConfModifRegistrantList( self, self._conf, self._filterUsed )
-        return p.display(filterCrit = self._filterCrit, sortingCrit=self._sortingCrit, display = self._display, sessionFilterName = self._sessionFilterName, order=self._order, menuStatus=self._menuStatus, )
+        return p.display(filterCrit = self._filterCrit, sortingCrit=self._sortingCrit, display = self._display, sessionFilterName = self._sessionFilterName, order=self._order )
 
 
 class RHRegistrantListModifAction( RHRegistrantListModifBase ):

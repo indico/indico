@@ -55,57 +55,24 @@ class WPConfModifRegistrantList( WPConfModifRegistrantListBase ):
         display = params.get("display",None)
         order = params.get("order",None)
         sessionFilterName=params.get("sessionFilterName", "session")
-        menustatus = params.get("menuStatus", None)
         websession = self._rh._getSession()
 
-        wc = WConfModifRegistrants(self._conf,filterCrit,sortingCrit,display, websession, order, sessionFilterName, menustatus, self._filterUsed)
+        wc = WConfModifRegistrants(self._conf,filterCrit,sortingCrit,display, websession, order, sessionFilterName, self._filterUsed)
         return wc.getHTML()
 
 class WConfModifRegistrants( wcomponents.WTemplated ):
 
-    def __init__( self, conference,filterCrit, sortingCrit, display, websession, order="down", sessionFilterName="session", menustatus=None, filterUsed = False ):
+    def __init__( self, conference,filterCrit, sortingCrit, display, websession, order="down", sessionFilterName="session", filterUsed = False ):
 
         self._conf = conference
         self._filterCrit=filterCrit
         self._sortingCrit=sortingCrit
         self._order = order
         self._sessionFilterName = sessionFilterName
-        self._menustatus = menustatus
         self._display = display
         self._filterUsed = filterUsed
         self._setDispOpts()
         self._setStatusesOpts()
-
-        dict = websession.getVar("registrantsFilterAndSortingConf%s"%self._conf.getId())
-        if not dict:
-            dict = {}
-        if self._filterCrit.getField("accomm"):
-            dict["accomm"] = self._filterCrit.getField("accomm").getValues()
-            if self._filterCrit.getField("accomm").getShowNoValue():
-                dict["accommShowNoValue"] = "1"
-
-        if self._filterCrit.getField(self._sessionFilterName):
-            dict["session"] = self._filterCrit.getField(self._sessionFilterName).getValues()
-            if self._filterCrit.getField(self._sessionFilterName).getShowNoValue():
-                dict["sessionShowNoValue"] = "1"
-
-        if self._sessionFilterName == "sessionfirstpriority":
-            dict["firstChoice"] = "1"
-
-        if self._filterCrit.getField("event"):
-            dict["event"] = self._filterCrit.getField("event").getValues()
-            if self._filterCrit.getField("event").getShowNoValue():
-                dict["eventShowNoValue"] = "1"
-
-        if self._filterCrit.getField("statuses"):
-            dict["statuses"] = self._filterCrit.getField("statuses").getValues()
-
-        if self._sortingCrit.getField():
-            dict["sortBy"] = self._sortingCrit.getField().getId()
-            dict["order"] = "down"
-
-        dict["disp"] = self._getDisplay()
-        websession.setVar("registrantsFilterAndSortingConf%s"%self._conf.getId(), dict)
 
     def _setStatusesOpts(self):
         """

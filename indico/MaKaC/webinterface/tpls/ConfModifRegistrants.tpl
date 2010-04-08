@@ -177,7 +177,6 @@
 
 <a href="" name="results"></a>
 <table width="100%%" cellspacing="0" align="center" border="0">
-    <form action=%(filterPostURL)s method="post" name="optionForm">
         <tr>
            <td nowrap colspan="10">
                 <div class="CRLgroupTitleNoBorder"><%= _("Displaying")%><strong> %(filteredNumberRegistrants)s </strong>
@@ -191,13 +190,19 @@
                     (<%= _("Total")%>: <strong>%(totalNumberRegistrants)s</strong>)
                 <% end %>
             </div>
+            <form action=%(filterPostURL)s method="post" name="optionForm">
             <div class="CRLIndexList" >
                 <% if filterUsed: %>
-                    <input type="submit" class="btnRemove" name="removeFilters" value="Reset filters">
+                    <input type="submit" class="btnRemove" name="resetFilters" value="Reset filters">
                     <span style="padding: 0px 6px 0px 6px">|</span>
                 <% end %>
                 <a id="index_filter" onclick="showFilters()" class="CAIndexUnselected" font-size="16" font-weight="bold" font-family="Verdana">
+                  <% if filterUsed: %>
+                    <%= _("Show filters")%>
+                  <% end %>
+                  <% else: %>
                     <%= _("Apply filters")%>
+                  <% end %>
                 </a>
                 <span style="padding: 0px 6px 0px 6px">|</span>
                 <a id="index_display" onclick="showDisplay()" class="CAIndexUnselected" font-size="16">
@@ -208,24 +213,23 @@
         </tr>
         <tr>
             <td colspan="10" align="left" width="100%%">
+              <form action=%(filterPostURL)s method="post" name="optionForm">
+                <input type="hidden" name="operationType" value="display" />
                 %(displayMenu)s
+                %(sortingOptions)s
+              </form>
+              <form action=%(filterPostURL)s method="post" name="optionForm">
+                <input type="hidden" name="operationType" value="filter" />
                 %(filterMenu)s
                 %(sortingOptions)s
+              </form>
             </td>
 	   </tr>
-    </form>
         <tr>
             <td colspan="10">
                 <div>
                     <input type="hidden" name="reglist" value="%(reglist)s">
                         %(displayOptions)s
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="10">
-                <div  id="registrantAlert" align="left" class="CRLNoSelection" style="display: none;" nowrap>
-                    <%= _("No Registrant selected")%>
                 </div>
             </td>
         </tr>
@@ -236,15 +240,15 @@
 		    <table>
              <form action=%(actionPostURL)s method="post" name="registrantsForm" onSubmit="return atLeastOneSelected()">
 
-    					<td valign="bottom" align="left" class="eventModifButtonBar">
+                   <td valign="bottom" align="left" class="eventModifButtonBar">
                             <input type="submit" class="btn" name="newRegistrant" onclick="newUser = true;" value="<%= _("Add New")%>">
-    			        </td>
-    					<td valign="bottom" align="left">
-    						<input type="submit" class="btn" name="removeRegistrants" value="<%= _("Remove")%>">
-    			        </td>
-    					<td valign="bottom" align="left">
-    						<input type="submit" class="btn" name="emailSelected" value="<%= _("Email")%>">
-    			        </td>
+                   </td>
+                   <td valign="bottom" align="left">
+                            <input type="submit" class="btn" name="removeRegistrants" value="<%= _("Remove")%>">
+                            </td>
+                            <td valign="bottom" align="left">
+                             <input type="submit" class="btn" name="emailSelected" value="<%= _("Email")%>">
+                            </td>
                         <td valign="bottom" align="left">
                             <input type="submit" class="btn" name="printBadgesSelected" value="<%= _("Print Badges")%>">
                         </td>
@@ -262,7 +266,7 @@
                         </td>
 
 
-	        </table>
+        </table>
         </td>
     </tr>
     <tr>
@@ -271,8 +275,8 @@
     %(registrants)s
     </tbody>
     </tr>
-	<tr>
-        <td colspan="40" style="border-bottom:2px solid #777777;padding-top:5px" valign="bottom" align="left">
+        <tr>
+        <td colspan="40" style="border-top: 2px solid #777777; padding-top: 3px;" valign="bottom" align="left">
             <table>
                 <tbody>
 
@@ -342,7 +346,10 @@
                     }
                 }
             }
-            $E("registrantAlert").dom.style.display = "";
+
+            var dialog = new WarningPopup($T("Warning"), $T("No registrant selected! Please select at least one."));
+            dialog.open();
+
             return false;
         } else {
             return true;
@@ -370,7 +377,12 @@
             $E("displayMenu").dom.style.display = "none";
         }
         if ($E("filterMenu").dom.style.display == "") {
+<% if filterUsed: %>
+            $E("index_filter").set('<%= _("Show filters")%>');
+<% end %>
+<% else: %>
             $E("index_filter").set('<%= _("Apply filters")%>');
+<% end %>
             $E('index_filter').dom.className = "CRLIndexUnselected";
             $E("filterMenu").dom.style.display = "none";
         }else {
@@ -381,8 +393,13 @@
     }
     function showDisplay() {
         if ($E("filterMenu").dom.style.display == "") {
-            $E("index_filter").set('<%= _("Apply filters")%>')
-            $E('index_filter').dom.className = "CRLIndexUnselected";
+<% if filterUsed: %>
+            $E("index_filter").set('<%= _("Show filters")%>')
+<% end %>
+<% else: %>
+            $E("index_filter").set('<%= _("Apply filters")%>');
+<% end %>
+           $E('index_filter').dom.className = "CRLIndexUnselected";
             $E("filterMenu").dom.style.display = "none";
         }
         if ($E("displayMenu").dom.style.display == "") {
