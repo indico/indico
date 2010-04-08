@@ -923,26 +923,20 @@ class OAIDeletedContributionCategoryIndex( OAIContributionIndex ):
             self._withdrawItem( catId, cont )
 
     def getContributions(self, catId):
-        if not catId in self._ids.keys():
+        if not catId in self._ids:
             return []
         return self._words[catId]
 
     def getContributionsIds(self, catId):
-        if not catId in self._ids.keys():
+        if not catId in self._ids:
             return []
         return self._ids[catId]
 
     def getAllConferences(self):
-        res = []
-        for catId in self._words.keys():
-            res.extend(self._words[catId])
-        return res
+        return self._words.values()
 
     def getAllConferencesIds(self):
-        res = []
-        for catId in self._ids.keys():
-            res.extend(self._ids[catId])
-        return res
+        return self._ids.values()
 
 class OAIDeletedPrivateContributionCategoryIndex( OAIDeletedContributionCategoryIndex ):
     _name = "OAIDeletedPrivateContributionCategory"
@@ -1075,26 +1069,20 @@ class OAIDeletedConferenceCategoryIndex( OAIConferenceIndex ):
             self._withdrawItem( catId, conf )
 
     def getConferences(self, catId):
-        if not catId in self._ids.keys():
+        if not catId in self._ids:
             return []
         return self._words[catId]
 
     def getConferencesIds(self, catId):
-        if not catId in self._ids.keys():
+        if not catId in self._ids:
             return []
         return self._ids[catId]
 
     def getAllConferences(self):
-        res = []
-        for catId in self._words.keys():
-            res.extend(self._words[catId])
-        return res
+        return self._words.values()
 
     def getAllConferencesIds(self):
-        res = []
-        for catId in self._ids.keys():
-            res.extend(self._ids[catId])
-        return res
+        return self._ids.values()
 
 class OAIDeletedPrivateConferenceCategoryIndex( OAIDeletedConferenceCategoryIndex ):
     _name = "OAIDeletedPrivateConferenceCategory"
@@ -1232,7 +1220,7 @@ class IndexesHolder( ObjectHolder ):
         if id not in self.__allowedIdxs:
             raise MaKaCError( _("Unknown index: %s")%id)
         Idx = self._getIdx()
-        if id in Idx.keys():
+        if id in Idx:
             return Idx[id]
         else:
             if id=="email":
