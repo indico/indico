@@ -786,36 +786,33 @@ class OAIDoubleIndex(DoubleIndex):
         if not (from_date or until_date):
             return self.getAllElementIds()
 
-        fd = self.firstDate
         if from_date:
-#            fd = server2utc(datetime(int(from_date[0:4]), int(from_date[5:7]), int(from_date[8:10])))
             fd = datetime(int(from_date[0:4]), int(from_date[5:7]), int(from_date[8:10]), tzinfo=timezone('UTC'))
-        ud = nowutc().replace( hour=23, minute=59, second=59, microsecond=0 )
+        else:
+            fd = self.firstDate
+
         if until_date:
-#            ud = server2utc(datetime(int(until_date[0:4]), int(until_date[5:7]), int(until_date[8:10])))
             ud = datetime(int(until_date[0:4]), int(until_date[5:7]), int(until_date[8:10]), tzinfo=timezone('UTC'))
+        else:
+            ud = nowutc().replace( hour=23, minute=59, second=59, microsecond=0 )
+
         res = []
         if fd > ud:
             return res
-        date = fd
+
         delta = timedelta(1)
-        while date <= ud:
-            if date.strftime("%Y-%m-%d") in self._ids.keys():
-                res.extend(self._ids[date.strftime("%Y-%m-%d")])
-            date = date + delta
+        while fd <= ud:
+            d = fd.strftime("%Y-%m-%d")
+            if d in self._ids:
+                res.extend(d)
+            fd += delta
         return res
 
     def getAllElements(self):
-        res = []
-        for date in self._words.keys():
-            res.extend(self._words[date])
-        return res
+        return self._words.values()
 
     def getAllElementIds(self):
-        res = []
-        for date in self._ids.keys():
-            res.extend(self._ids[date])
-        return res
+        return self._ids.values()
 
     def unindexElement( self, cont ):
         date = cont.getOAIModificationDate().strftime("%Y-%m-%d")
