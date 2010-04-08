@@ -28,7 +28,16 @@
 
 <record xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
 <datafield tag="041" ind1=" " ind2=" ">
-  <subfield code="a">eng</subfield>
+  <xsl:choose>
+    <xsl:when test="./session/languages != ''">
+      <xsl:for-each select="./session/languages/code">
+        <subfield code="a"><xsl:value-of select="." /></subfield>
+      </xsl:for-each>
+    </xsl:when>
+    <xsl:otherwise>
+      <subfield code="a">eng</subfield>
+    </xsl:otherwise>
+  </xsl:choose>
 </datafield>
 <datafield tag="110" ind1=" " ind2=" ">
   <subfield code="a">CERN. Geneva</subfield>

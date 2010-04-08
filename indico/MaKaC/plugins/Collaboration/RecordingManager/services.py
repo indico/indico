@@ -50,6 +50,7 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
         self._confId      = self._params.get('conference',  None)
         self._videoFormat = self._params.get('videoFormat', None)
         self._contentType = self._params.get('contentType', None)
+        self._languages   = self._params.get('languages',   None)
 
         if not self._contentType:
             raise RecordingManagerException("No content type supplied (plain video or web lecture)")
@@ -66,6 +67,9 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
         if not self._confId:
             raise RecordingManagerException("No conference ID supplied")
 
+        if not self._languages:
+            raise RecordingManagerException("No languages supplied")
+
     def _getAnswer(self):
         # Update the micala database
         resultUpdateMicala = updateMicala(self._IndicoID,
@@ -76,7 +80,8 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
         resultCreateCDSRecord = createCDSRecord(self._aw,
                                                 self._IndicoID,
                                                 self._contentType,
-                                                self._videoFormat)
+                                                self._videoFormat,
+                                                self._languages)
 
 #        raise RecordingManagerException("got this far")
 

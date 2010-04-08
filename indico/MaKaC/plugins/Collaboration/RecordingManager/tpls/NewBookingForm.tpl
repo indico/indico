@@ -8,7 +8,7 @@
 <table>
   <tr>
     <td width="440px" valign="top">
-        <b><%= _("1. Select a record:") %></b>
+        <b>1. <%= _("Select a record:") %></b>
         <br /> <!-- line breaks to make the pretty boxes below to line up -->
         <br />
         <br />
@@ -50,13 +50,13 @@
         </div>
     </td>
     <td width="620px" valign="top">
-        <b><%= _("2. Select content type: ") %></b>
+        <b>2. <%= _("Select content type: ") %></b>
         <span id="RMbuttonPlainVideo" class="RMbuttonDisplay" onclick="RMbuttonModeSelect('plain_video')" onmouseover="RMbuttonModeOnHover('plain_video');" onmouseout="RMbuttonModeOffHover('plain_video')"><%= _("plain video") %></span>
         &nbsp;<%= _(" or ") %>&nbsp;
         <span id="RMbuttonWebLecture" class="RMbuttonDisplay" onclick="RMbuttonModeSelect('web_lecture')" onmouseover="RMbuttonModeOnHover('web_lecture');" onmouseout="RMbuttonModeOffHover('web_lecture')"><%= _("web lecture") %></span>
         <div id="RMrightPaneWebLecture" class="RMHolderPaneDefaultInvisible">
             <br />
-            <b><%= _("3. Select an orphan lecture object: ") %></b>
+            <b>3. <%= _("Select an orphan lecture object: ") %></b>
         <div class="nicebox">
         <div class="RMMatchPane">
             <% for orphan in Orphans: %>
@@ -91,7 +91,7 @@
         </div>
         <div id="RMrightPanePlainVideo" class="RMHolderPaneDefaultInvisible">
             <br />
-            <b><%= _("3. Select options: ") %></b>
+            <b>3. <%= _("Select options: ") %></b>
             <div class="RMMatchPane" style="height: 200px;">
                 Select video aspect ratio:
                 <input type="radio" name="talks" value="standard" id="RMvideoFormat4to3" onclick="RMchooseVideoFormat('standard')" checked>
@@ -108,7 +108,32 @@
 <div id="RMlowerPane" class="RMHolderPaneDefaultVisible" style="margin-left: 150px;">
     <span>
         <br />
-        <b><%= _("4. Create CDS record (and update micala database)") %></b>
+        <b>4. <%= _("Select language(s) in which the talk was given") %></b>
+        <br />
+        <!-- http://www.loc.gov/marc/languages/ -->
+
+        <input type="checkbox" value="<%= LanguageList[0][0] %>" id="RMLanguagePrimary" onclick="RMLanguageTogglePrimary('<%= LanguageList[0][0] %>')"><%= LanguageList[0][1] %></input>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <input type="checkbox" id="RMLanguageSecondary" onclick="RMLanguageToggleSecondary('<%= LanguageList[1][0] %>')"><%= LanguageList[1][1] %></input>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <input type="checkbox" name="Other" value="other" id="RMLanguageOther" onclick="RMLanguageToggleOther()">Other</input>
+        <select id="RMLanguageOtherSelect">
+            <option value="chooseOne" onclick="RMLanguageSelectOther(0)">-- <%= _('Choose one') %> --</option>
+            <% for languageCode, languageName in LanguageList: %>
+                <% if languageName != 'English' and languageName != 'French': %>
+                <option value="<%=languageCode%>" onclick="RMLanguageSelectOther('<%=languageCode%>')"><%=languageName%></option>
+                <% end %>
+            <% end %>
+        </select>
+        <span id="RMSelectLanguage">
+        <!--  Javascript button here -->
+        </span>
+
+<!--         <input type="button" disabled="" id="RMbuttonCreateCDSRecord" onclick="RMCreateCDSRecord()" value=<%= _("\"Create CDS record\"") %> /> -->
+    </span>
+    <span>
+        <br />
+        <b>5. <%= _("Create CDS record (and update micala database)") %></b>
         <br />
         <span id="RMbuttonCreateCDSRecord">
         <!--  Javascript button here -->
@@ -122,7 +147,7 @@
     <br />
     <br />
     <span>
-        <b><%= _("5. Create Indico link to CDS record") %></b>
+        <b>6. <%= _("Create Indico link to CDS record") %></b>
         <br />
         <div id="RMbuttonCreateIndicoLink">
         <!--  Javascript button here -->
@@ -137,12 +162,18 @@
     var RR_contributionsLoaded = <%= jsBoolean(DisplayTalks or not HasTalks) %>;
     var RM_orphans = <%= jsonEncode(Orphans) %>;
 
-    var RMselectedTalkId   = '';
-    var RMselectedLOID     = '';
-    var RMselectedTalkName = '';
-    var RMselectedLOName   = '';
-    var RMviewMode         = '';
-    var RMvideoFormat      = 'standard';
+    var RMselectedTalkId    = '';
+    var RMselectedLOID      = '';
+    var RMselectedTalkName  = '';
+    var RMselectedLOName    = '';
+    var RMviewMode          = '';
+    var RMvideoFormat       = 'standard';
+    var RMLanguageFlagPrimary   = true;
+    var RMLanguageFlagSecondary = false;
+    var RMLanguageFlagOther     = false;
+    var RMLanguageValuePrimary   = '<%= LanguageList[0][0] %>';
+    var RMLanguageValueSecondary = '<%= LanguageList[1][0] %>';
+    var RMLanguageValueOther    = 0;
 
     // Pass the metadata we need for each talk to JavaScript
     var RMTalkList = {

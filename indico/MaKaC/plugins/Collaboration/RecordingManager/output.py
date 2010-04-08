@@ -10,7 +10,8 @@ class MarcAccessListGenerator():
 
     def generateAccessListXML(self, out, obj):
         """Generate a comprehensive access list showing all users and e-groups who may access
-        this object. obj could be a Conference, Session, Contribution, or SubContribution object."""
+        this object, taking into account the permissions and access lists of its owners.
+        obj could be a Conference, Session, Contribution, or SubContribution object."""
 
         allowed_users = obj.getRecursiveAllowedToAccessList()
         if allowed_users is not None and len(allowed_users) > 0:
@@ -59,3 +60,13 @@ class MarcAccessListGenerator():
         # if it's a web lecture, then specify that.
         elif recordingManagerTags["contentType"] == 'web_lecture':
             out.writeTag("videoFormat", contentTypeWebLecture)
+
+    def generateLanguagesXML(self, out, recordingManagerTags):
+        """Generate XML variables needed for language information."""
+
+        if len(recordingManagerTags["languages"]) > 0:
+            out.openTag("languages")
+            for l in recordingManagerTags["languages"]:
+                Logger.get('RecMan').info("in generateLanguagesXML(), language = %s" % l)
+                out.writeTag("code", l)
+            out.closeTag("languages")

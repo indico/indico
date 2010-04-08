@@ -43,6 +43,34 @@ import re
 import os
 import sys
 
+# If you want to add more languages,
+# use the MARC language codes http://www.loc.gov/marc/languages
+# Also, make sure English and French come first in the list,
+# and the rest in alphabetical order.
+languageList = [
+# English and French are the first two
+    ("eng", _("English")),
+    ("fre", _("French")),
+# now start the rest of the list
+    ("bul", _("Bulgarian")),
+    ("chi", _("Chinese")),
+    ("cze", _("Czech")),
+    ("dan", _("Danish")),
+    ("dut", _("Dutch/Flemish")),
+    ("fin", _("Finnish")),
+    ("ger", _("German")),
+    ("gre", _("Greek")),
+    ("hun", _("Hungarian")),
+    ("ita", _("Italian")),
+    ("jpn", _("Japanese")),
+    ("nor", _("Norweigan")),
+    ("pol", _("Polish")),
+    ("por", _("Portuguese")),
+    ("slo", _("Slovak")),
+    ("spa", _("Spanish")),
+    ("swe", _("Swedish"))
+]
+
 def getTalks(conference, oneIsEnough = False, sort = False):
     """ oneIsEnough: the algorithm will stop at the first contribution found
                      it will then return a list with a single element
@@ -390,7 +418,7 @@ def updateMicala(IndicoID, contentType, LOID):
         # (I already created this column in micala.sql, just need to recreate DB from this file)
         pass
 
-def createCDSRecord(aw, IndicoID, contentType, videoFormat):
+def createCDSRecord(aw, IndicoID, contentType, videoFormat, languages):
     '''Retrieve a MARC XML string for the given conference, then package it up and send it to CDS.'''
 
     # Incantation to initialize XML that I don't fully understand
@@ -407,18 +435,21 @@ def createCDSRecord(aw, IndicoID, contentType, videoFormat):
     # Given the IndicoID, retrieve the type of talk and IDs
     parsed = parseIndicoID(IndicoID)
 
-    # populate dictionary with parameters to be used by methods in outputGenerator
+    # populate dictionary with RecordingManager parameters to be used by methods in outputGenerator
     # such as confToXML, _confToXML, _sessionToXML, _contribToXML, _subContributionToXML
-    tags = {'talkType': parsed['type'],
-            'talkId':   parsed[parsed['type']],
+    tags = {'talkType':    parsed['type'],
+            'talkId':      parsed[parsed['type']],
             'contentType': contentType,
-            'videoFormat': videoFormat}
+            'videoFormat': videoFormat,
+            'languages':   languages}
 
     Logger.get('RecMan').info("tags: [%s] [%s] [%s] [%s]" %\
                               (tags['talkType'],
                               tags['talkId'],
                               tags['contentType'],
                               tags['videoFormat']))
+    for l in tags["languages"]:
+        Logger.get('RecMan').info("language: %s" % l)
 
     # Given the conference ID, retrieve the corresponding Conference object
     conference = ConferenceHolder().getById(parsed["conference"])

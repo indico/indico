@@ -24,7 +24,7 @@ from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase, WCSCS
 #from MaKaC.plugins.Collaboration.RecordingManager.common import typeOfEvents,\
 #    postingUrgency, recordingPurpose, intendedAudience, subjectMatter, lectureOptions,\
 #    getTalks
-from MaKaC.plugins.Collaboration.RecordingManager.common import getTalks, getOrphans
+from MaKaC.plugins.Collaboration.RecordingManager.common import getTalks, getOrphans, languageList
 from MaKaC.conference import Contribution
 from MaKaC.common.timezoneUtils import isSameDay
 from MaKaC.common.fossilize import fossilize
@@ -95,6 +95,8 @@ class WNewBookingForm(WCSPageTemplateBase):
         xmlGen.closeTag("iconf")
 
         vars["marcxml"] = xmlGen.getXml()
+
+        vars["LanguageList"] = languageList
 
         return vars
 

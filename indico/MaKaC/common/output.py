@@ -269,6 +269,7 @@ class outputGenerator:
                     from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator
                     MarcAccessListGenerator().generateAccessListXML(out, conf)
                     MarcAccessListGenerator().generateVideoXML(out, recordingManagerTags)
+                    MarcAccessListGenerator().generateLanguagesXML(out, recordingManagerTags)
 
         if conf.canModify( self.__aw ) and vars and modificons:
             out.writeTag("modifyLink",vars["modifyURL"])
@@ -563,6 +564,7 @@ class outputGenerator:
                     from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator
                     MarcAccessListGenerator().generateAccessListXML(out, session)
                     MarcAccessListGenerator().generateVideoXML(out, recordingManagerTags)
+                    MarcAccessListGenerator().generateLanguagesXML(out, recordingManagerTags)
 
         out.closeTag("session")
 
@@ -796,6 +798,7 @@ class outputGenerator:
                     from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator
                     MarcAccessListGenerator().generateAccessListXML(out, contribution)
                     MarcAccessListGenerator().generateVideoXML(out, recordingManagerTags)
+                    MarcAccessListGenerator().generateLanguagesXML(out, recordingManagerTags)
 
         out.closeTag("contribution")
 
@@ -880,6 +883,7 @@ class outputGenerator:
                     from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator
                     MarcAccessListGenerator().generateAccessListXML(out, subCont)
                     MarcAccessListGenerator().generateVideoXML(out, recordingManagerTags)
+                    MarcAccessListGenerator().generateLanguagesXML(out, recordingManagerTags)
 
         out.closeTag("subcontribution")
 
