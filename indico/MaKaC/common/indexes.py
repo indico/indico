@@ -998,8 +998,6 @@ class OAIConferenceIndex( OAIDoubleIndex ):
     def getAllConferencesIds(self):
         return OAIDoubleIndex.getAllElementIds(self)
 
-    def unindexConference( self, cont ):
-        return OAIDoubleIndex.unindexElement(self, cont)
 
 class OAIConferenceModificationDateIndex( OAIConferenceIndex ):
     _name = "OAIConferenceModificationDate"
@@ -1050,10 +1048,6 @@ class OAIDeletedPrivateConferenceModificationDateIndex( OAIPrivateConferenceModi
     _name = "OAIDeletedPrivateConferenceModificationDate"
 
 
-class OAIDeletedPrivateConferenceModificationDateIndex( OAIPrivateConferenceModificationDateIndex ):
-    _name = "OAIDeletedPrivateConferenceModificationDate"
-
-
 class OAIDeletedConferenceCategoryIndex( OAIConferenceIndex ):
     _name = "OAIDeletedConferenceCategory"
 
@@ -1086,10 +1080,6 @@ class OAIDeletedConferenceCategoryIndex( OAIConferenceIndex ):
 
 class OAIDeletedPrivateConferenceCategoryIndex( OAIDeletedConferenceCategoryIndex ):
     _name = "OAIDeletedPrivateConferenceCategory"
-
-
-class OAIDeletedPrivateContributionCategoryIndex( OAIDeletedContributionCategoryIndex ):
-    _name = "OAIDeletedPrivateContributionCategory"
 
 
 class IndexException(Exception):
