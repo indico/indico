@@ -99,6 +99,9 @@ class CollaborationIndex(Persistent):
             Logger.get("VideoServ").warning("Tried to retrieve index with name " + indexName + " but the index did not exist. Maybe no bookings have been added to it yet")
             finalResult = QueryResult([], 0, 0, 0)
 
+        if CollaborationTools.hasCollaborationOption("verifyIndexingResults") and CollaborationTools.getCollaborationOptionValue("verifyIndexingResults"):
+            finalResult.purgeNonExistingBookings()
+
         if pickle:
             CollaborationTools.updateIndexingFossilsDict()
             return fossilize(finalResult, IQueryResultFossil, tz = tz)
@@ -560,25 +563,40 @@ class QueryResult(Fossilizable):
         self._totalInIndex = totalInIndex
         self._nPages = nPages
 
-#    @Retrieves(['MaKaC.plugins.Collaboration.indexes.QueryResult'], 'results', isPicklableObject = True)
     def getResults(self):
         return self._results
 
-#    @Retrieves(['MaKaC.plugins.Collaboration.indexes.QueryResult'], 'nBookings')
     def getNumberOfBookings(self):
         return self._nBookings
 
-#    @Retrieves(['MaKaC.plugins.Collaboration.indexes.QueryResult'], 'nGroups')
     def getNumberOfGroups(self):
         return self._nGroups
 
-#    @Retrieves(['MaKaC.plugins.Collaboration.indexes.QueryResult'], 'totalInIndex')
     def getTotalInIndex(self):
         return self._totalInIndex
 
-#    @Retrieves(['MaKaC.plugins.Collaboration.indexes.QueryResult'], 'nPages')
     def getNPages(self):
         return self._nPages
+
+    def purgeNonExistingBookings(self):
+        pluginList = set(CollaborationTools.getCollaborationPluginType().getPlugins())
+        for result in list(self._results):
+            bookings = result[1]
+            for b in list(bookings):
+                doRemove = False
+                try:
+                    if b.getType() not in pluginList:
+                        doRemove = True
+                except AttributeError:
+                    doRemove = True
+                if doRemove:
+                    bookings.remove(b)
+                    self._nBookings = self._nBookings - 1
+            if len(bookings) == 0:
+                self._results.remove(result)
+                self._nGroups = self._nGroups - 1
+
+
 
 
 def _bookingToDump(booking):

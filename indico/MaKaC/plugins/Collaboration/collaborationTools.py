@@ -76,6 +76,10 @@ class CollaborationTools(object):
         return ph.getPluginType("Collaboration").getPlugin(pluginName).getOption(optionName).getValue()
 
     @classmethod
+    def hasCollaborationOption(cls, optionName):
+        return cls.getCollaborationPluginType().hasOption(optionName)
+
+    @classmethod
     def getCollaborationOptionValue(cls, optionName):
         """ Returns the value of an option of the Collaboration plugin type (plugins/Collaboration/options.py)
         """

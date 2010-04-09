@@ -49,4 +49,7 @@ globalOptions = [
                          "type": list, #a list of IndexInformation objects
                          "editable": False,
                          "visible": True} )
+    ("verifyIndexingResults", {"description": _("""Verify that indexing results do not contain bookings from plugins that have been removed in order to avoid exceptions (not efficient)"""),
+                         "type": bool,
+                         "defaultValue": False})
 ]
