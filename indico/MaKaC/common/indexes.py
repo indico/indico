@@ -758,7 +758,7 @@ class OAIDoubleIndex(DoubleIndex):
 
     def getElements(self, from_date, until_date):
         if not (from_date or until_date):
-            return self._words.values()
+            return self.getAllElements()
 
         if from_date:
             fd = datetime(int(from_date[0:4]), int(from_date[5:7]), int(from_date[8:10]), tzinfo=timezone('UTC'))
@@ -809,10 +809,16 @@ class OAIDoubleIndex(DoubleIndex):
         return res
 
     def getAllElements(self):
-        return self._words.values()
+        res = []
+        for date in self._words.keys():
+            res.extend(self._words[date])
+        return res
 
     def getAllElementIds(self):
-        return self._ids.values()
+        res = []
+        for date in self._ids.keys():
+            res.extend(self._ids[date])
+        return res
 
     def unindexElement( self, cont ):
         date = cont.getOAIModificationDate().strftime("%Y-%m-%d")
@@ -933,10 +939,10 @@ class OAIDeletedContributionCategoryIndex( OAIContributionIndex ):
         return self._ids[catId]
 
     def getAllConferences(self):
-        return self._words.values()
+        return OAIDoubleIndex.getAllElements(self)
 
     def getAllConferencesIds(self):
-        return self._ids.values()
+        return OAIDoubleIndex.getAllElementsIds(self)
 
 class OAIDeletedPrivateContributionCategoryIndex( OAIDeletedContributionCategoryIndex ):
     _name = "OAIDeletedPrivateContributionCategory"
@@ -967,7 +973,7 @@ class OAIConferenceIndex( OAIDoubleIndex ):
 
     def getConferencesIds(self, from_date, until_date):
         if not (from_date or until_date):
-            return self._ids.values()
+            return self.getAllConferencesIds()
 
         if from_date:
             fd = datetime(int(from_date[0:4]), int(from_date[5:7]), int(from_date[8:10]), tzinfo=timezone('UTC'))
@@ -1072,11 +1078,6 @@ class OAIDeletedConferenceCategoryIndex( OAIConferenceIndex ):
             return []
         return self._ids[catId]
 
-    def getAllConferences(self):
-        return self._words.values()
-
-    def getAllConferencesIds(self):
-        return self._ids.values()
 
 class OAIDeletedPrivateConferenceCategoryIndex( OAIDeletedConferenceCategoryIndex ):
     _name = "OAIDeletedPrivateConferenceCategory"
