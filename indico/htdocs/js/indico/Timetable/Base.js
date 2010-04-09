@@ -175,8 +175,8 @@ type("DisplayTimeTable", ["TimeTable"], {
         var timetableElements = translate(self.timetableDrawer.canvas.dom.childNodes, function(value) {return $E(value);});
         var elements = translate($E(document.body).dom.childNodes, function(value) {return $E(value);});
 
-        var goBackLink = Html.a({href: '#', style: {fontSize: '17px'}}, 'Go back');
-        var printLink = Html.a({href: '#', style: {fontSize: '17px'}}, 'Print');
+        var goBackLink = Html.a({href: window.location.hash, style: {fontSize: '17px'}}, $T('Go back'));
+        var printLink = Html.a({href: window.location.hash, style: {fontSize: '17px'}}, $T('Print'));
 
         var links = Html.span({style: {cssFloat: 'right'}}, printLink, ' | ', goBackLink);
 
@@ -199,6 +199,52 @@ type("DisplayTimeTable", ["TimeTable"], {
         var timetableDiv = Html.div({style: {paddingTop: pixels(20), position: 'relative'}}, timetableElements);
         $E(document.body).set(header, timetableDiv);
         $E(document.body).setStyle('padding', pixels(30));
+    },
+
+    fullScreen: function() {
+        var self = this;
+
+        //self.timetableDrawer.setPrintableVersion(true);
+
+        var bodyPadding = $E(document.body).dom.style.padding;
+        var elements = translate($E(document.body).dom.childNodes, function(value) {return $E(value);});
+        IndicoUI.Dialogs.Util.progress($T("Switching to full screen mode..."));
+
+        var goBackLink = Html.a({href: window.location.hash, style: {fontSize: '17px'}}, $T('Go back'));
+
+        var links = Html.span({style: {cssFloat: 'right'}}, goBackLink);
+
+        self.previousWidth = self.timetableDrawer.width;
+
+        goBackLink.observeClick(function(e) {
+            IndicoUI.Dialogs.Util.progress($T("Switching to normal mode..."));
+            // This timeout is needed in order to give time to the progress indicator to be rendered
+            setTimeout(function(){
+                self.timetableDrawer.width = self.previousWidth;
+                self.timetableDrawer.setPrintableVersion(false);
+                $E(document.body).setStyle('padding', bodyPadding);
+                $E(document.body).set(elements);
+                self.timetableDrawer.redraw(self.currentDay);
+            }, 50);
+        });
+
+     // This timeout is needed in order to give time to the progress indicator to be rendered
+        setTimeout(function(){
+            self.timetableDrawer.width = $E(document.body).dom.clientWidth - 50; // 50 is a width offset.
+
+            var headerStyle = {padding: '0px 5px 5px 5px',
+                    borderBottom: '1px solid black',
+                    textAlign: 'center',
+                    width: pixels(self.timetableDrawer.width)};
+            var header = Html.div({className: 'timetableHeader clearfix', style: headerStyle}, links,
+                Html.span({style: {cssFloat: 'left'}}, self._titleTemplate(self.timetableDrawer.day)));
+
+            self.timetableDrawer.redraw(self.currentDay);
+            var timetableElements = translate(self.timetableDrawer.canvas.dom.childNodes, function(value) {return $E(value);});
+            var timetableDiv = Html.div({style: {paddingTop: pixels(20), position: 'relative'}}, timetableElements);
+            $E(document.body).set(header, timetableDiv);
+            $E(document.body).setStyle('padding', pixels(30));
+        }, 50);
     },
 
     _filterSetup: function() {
@@ -229,7 +275,13 @@ type("DisplayTimeTable", ["TimeTable"], {
             'onclick': function(btnContainer) {
                 self.print();
             }
-                          };
+        };
+
+        var fullScreenButton = {'btn': Html.div('buttonWhite', $T('Full screen')),
+                'onclick': function(btnContainer) {
+                    self.fullScreen();
+                }
+        };
 
         // TODO: Needs to be implemented
         var linkButton = Html.div('linkButtonWhite', $T('Link'));
@@ -246,9 +298,10 @@ type("DisplayTimeTable", ["TimeTable"], {
                 var state = self.filter.state.get();
                 btnContainer.dom.style.background = state ? "#9F883B" : "";
             }
-                           };
+        };
 
         return [printButton,
+                fullScreenButton,
                 this.detailsButton,
                 filterButton];
     }
