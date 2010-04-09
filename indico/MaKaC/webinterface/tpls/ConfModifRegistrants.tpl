@@ -4,91 +4,91 @@
 
     function selectAcco()
     {
-        document.optionForm.accommShowNoValue.checked=true
-        if (!document.optionForm.accomm.length)
+        document.filterOptionForm.accommShowNoValue.checked=true
+        if (!document.filterOptionForm.accomm.length)
         {
-            document.optionForm.accomm.checked=true
+            document.filterOptionForm.accomm.checked=true
         }else{
-            for (i = 0; i < document.optionForm.accomm.length; i++)
+            for (i = 0; i < document.filterOptionForm.accomm.length; i++)
             {
-                document.optionForm.accomm[i].checked=true
+                document.filterOptionForm.accomm[i].checked=true
             }
         }
     }
 
     function unselectAcco()
     {
-        document.optionForm.accommShowNoValue.checked=false
-        if (!document.optionForm.accomm.length)
+        document.filterOptionForm.accommShowNoValue.checked=false
+        if (!document.filterOptionForm.accomm.length)
         {
-            document.optionForm.accomm.checked=false
+            document.filterOptionForm.accomm.checked=false
         }else{
-            for (i = 0; i < document.optionForm.accomm.length; i++)
+            for (i = 0; i < document.filterOptionForm.accomm.length; i++)
             {
-                document.optionForm.accomm[i].checked=false
+                document.filterOptionForm.accomm[i].checked=false
             }
         }
     }
     function selectEvent()
     {
-        document.optionForm.eventShowNoValue.checked=true
-        if (!document.optionForm.event.length)
+        document.filterOptionForm.eventShowNoValue.checked=true
+        if (!document.filterOptionForm.event.length)
         {
-            document.optionForm.event.checked=true
+            document.filterOptionForm.event.checked=true
         }else{
-            for (i = 0; i < document.optionForm.event.length; i++)
+            for (i = 0; i < document.filterOptionForm.event.length; i++)
             {
-                document.optionForm.event[i].checked=true
+                document.filterOptionForm.event[i].checked=true
             }
         }
     }
 
     function unselectEvent()
     {
-        document.optionForm.eventShowNoValue.checked=false
-        if (!document.optionForm.event.length)
+        document.filterOptionForm.eventShowNoValue.checked=false
+        if (!document.filterOptionForm.event.length)
         {
-            document.optionForm.event.checked=false
+            document.filterOptionForm.event.checked=false
         }else{
-            for (i = 0; i < document.optionForm.event.length; i++)
+            for (i = 0; i < document.filterOptionForm.event.length; i++)
         	{
-	            document.optionForm.event[i].checked=false
+	            document.filterOptionForm.event[i].checked=false
     	    }
         }
     }
     function selectSession()
     {
-        document.optionForm.sessionShowNoValue.checked=true
-        if (!document.optionForm.session.length)
+        document.filterOptionForm.sessionShowNoValue.checked=true
+        if (!document.filterOptionForm.session.length)
         {
-            document.optionForm.session.checked=true
+            document.filterOptionForm.session.checked=true
         }else{
-            for (i = 0; i < document.optionForm.session.length; i++)
+            for (i = 0; i < document.filterOptionForm.session.length; i++)
             {
-                document.optionForm.session[i].checked=true
+                document.filterOptionForm.session[i].checked=true
             }
         }
     }
 
     function unselectSession()
     {
-        document.optionForm.sessionShowNoValue.checked=false
-        if (!document.optionForm.session.length)
+        document.filterOptionForm.sessionShowNoValue.checked=false
+        if (!document.filterOptionForm.session.length)
         {
-            document.optionForm.session.checked=false
+            document.filterOptionForm.session.checked=false
         }else{
-            for (i = 0; i < document.optionForm.session.length; i++)
+            for (i = 0; i < document.filterOptionForm.session.length; i++)
             {
-                document.optionForm.session[i].checked=false;
+                document.filterOptionForm.session[i].checked=false;
             }
         }
     }
 
     function selectStatuses()
     {
-        for (i = 0; i < document.optionForm.statuses.length; i++)
+        for (i = 0; i < document.filterOptionForm.statuses.length; i++)
         {
-            document.optionForm.statuses[i].checked=true;
+            document.filterOptionForm.statuses[i].checked=true;
         }
     }
 
@@ -118,25 +118,25 @@
 
     function unselectStatuses()
     {
-        for (i = 0; i < document.optionForm.statuses.length; i++)
+        for (i = 0; i < document.filterOptionForm.statuses.length; i++)
         {
-            document.optionForm.statuses[i].checked=false
+            document.filterOptionForm.statuses[i].checked=false
         }
     }
 
     function selectDisplay()
     {
-        for (i = 0; i < document.optionForm.disp.length; i++)
+        for (i = 0; i < document.displayOptionForm.disp.length; i++)
         {
-        	document.optionForm.disp[i].checked=true
+        	document.displayOptionForm.disp[i].checked=true
     	}
     }
 
     function unselectDisplay()
     {
-        for (i = 0; i < document.optionForm.disp.length; i++)
+        for (i = 0; i < document.displayOptionForm.disp.length; i++)
     	{
-	        document.optionForm.disp[i].checked=false
+	        document.displayOptionForm.disp[i].checked=false
     	}
     }
 
@@ -209,16 +209,17 @@
                     <%= _("Columns to display")%>
                 </a>
             </div>
+            </form>
             </td>
         </tr>
         <tr>
             <td colspan="10" align="left" width="100%%">
-              <form action=%(filterPostURL)s method="post" name="optionForm">
+              <form action=%(filterPostURL)s method="post" name="displayOptionForm">
                 <input type="hidden" name="operationType" value="display" />
                 %(displayMenu)s
                 %(sortingOptions)s
               </form>
-              <form action=%(filterPostURL)s method="post" name="optionForm">
+              <form action=%(filterPostURL)s method="post" name="filterOptionForm">
                 <input type="hidden" name="operationType" value="filter" />
                 %(filterMenu)s
                 %(sortingOptions)s
