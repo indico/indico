@@ -47,6 +47,12 @@ class Index(Persistent):
         self._words = {}
 
     def getLength( self ):
+        """ Length of an index.
+
+        May be extremely slow for big indexes stored as persistent objects.
+        Do not use unless you really have to!
+
+        """
         return len(self._words.keys())
 
     def getKeys( self ):
@@ -939,10 +945,10 @@ class OAIDeletedContributionCategoryIndex( OAIContributionIndex ):
         return self._ids[catId]
 
     def getAllConferences(self):
-        return OAIDoubleIndex.getAllElements(self)
+        return self.getAllElements()
 
     def getAllConferencesIds(self):
-        return OAIDoubleIndex.getAllElementsIds(self)
+        return self.getAllElementIds()
 
 class OAIDeletedPrivateContributionCategoryIndex( OAIDeletedContributionCategoryIndex ):
     _name = "OAIDeletedPrivateContributionCategory"
