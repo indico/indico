@@ -2897,7 +2897,7 @@ class Conference(Persistent, Fossilizable):
                     observer.notifyEventDateChanges(sdate, self.startDate, None, None)
                 except Exception, e:
                     try:
-                        Logger.get('Conference').error("Exception while notifying the observer %s of a start date change from %s to %s for conference %s: "%
+                        Logger.get('Conference').error("Exception while notifying the observer %s of a start date change from %s to %s for conference %s: %s"%
                                                        (observer.getObserverName(), formatDateTime(sdate), formatDateTime(self.startDate), self.getId(), str(e)))
                     except Exception, e2:
                         Logger.get('Conference').error("Exception while notifying a start time change: %s (origin: %s)"%(str(e2), str(e)))
@@ -2985,7 +2985,7 @@ class Conference(Persistent, Fossilizable):
                     observer.notifyEventDateChanges(None, None, oldEdate, eDate)
                 except Exception, e:
                     try:
-                        Logger.get('Conference').error("Exception while notifying the observer %s of a end date change from %s to %s for conference %s: "%
+                        Logger.get('Conference').error("Exception while notifying the observer %s of a end date change from %s to %s for conference %s: %s" %
                                                        (observer.getObserverName(), formatDateTime(oldEdate), formatDateTime(eDate), self.getId(), str(e)))
                     except Exception, e2:
                         Logger.get('Conference').error("Exception while notifying a end date change: %s (origin: %s)"%(str(e2), str(e)))
@@ -3005,7 +3005,7 @@ class Conference(Persistent, Fossilizable):
                     observer.notifyEventDateChanges(None, None, edate, self.endDate)
                 except Exception, e:
                     try:
-                        Logger.get('Conference').error("Exception while notifying the observer %s of a end timet change from %s to %s for conference %s: "%
+                        Logger.get('Conference').error("Exception while notifying the observer %s of a end timet change from %s to %s for conference %s: %s" %
                                                        (observer.getObserverName(), formatDateTime(edate), formatDateTime(self.endDate), self.getId(), str(e)))
                     except Exception, e2:
                         Logger.get('Conference').error("Exception while notifying a end time change: %s (origin: %s)"%(str(e2), str(e)))
@@ -3069,7 +3069,7 @@ class Conference(Persistent, Fossilizable):
                 observer.notifyTimezoneChange(oldTimezone, tz)
             except Exception, e:
                 try:
-                    Logger.get('Conference').error("Exception while notifying the observer %s of a timezone change from %s to %s for conference %s: "%
+                    Logger.get('Conference').error("Exception while notifying the observer %s of a timezone change from %s to %s for conference %s: %s" %
                                                    (observer.getObserverName(), str(oldTimezone), str(tz), self.getId(), str(e)))
                 except Exception, e2:
                     Logger.get('Conference').error("Exception while notifying a timezone change: %s (origin: %s)"%(str(e2), str(e)))

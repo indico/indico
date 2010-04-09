@@ -276,7 +276,10 @@ class CSBooking(CSBookingBase): #already Fossilizable
                 if e.message == "START_IN_PAST":
                     return EVOError('start_in_past', str(requestURL))
                 if e.message == "UNKNOWN_MEETING":
-                    return EVOError('deletedByEVO', str(requestURL), 'This EVO meeting could not be modified because it was deleted in the EVO system')
+                    return EVOError('deletedByEVO', str(requestURL), _('This EVO meeting could not be modified because it was deleted in the EVO system'))
+                if e.message == "END_BEFORE_START":
+                    return EVOError('end_before_start', str(requestURL),
+                                    _("This EVO meeting could not be moved because it would have been resulting in the end date being before the start date"))
 
                 raise EVOException(_("The booking could not be modified due to a problem with the EVO Server\n.The EVO Server sent the following error message: ") + e.message, e)
 

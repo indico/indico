@@ -548,6 +548,9 @@ class CSBookingManager(Persistent, Observer):
         endDateChanged = oldEndDate is not None and newEndDate is not None and not oldEndDate == newEndDate
         someDateChanged = startDateChanged or endDateChanged
 
+        Logger.get("VideoServ").info("""CSBookingManager: starting notifyEventDateChanges. Arguments: confId=%s, oldStartDate=%s, newStartDate=%s, oldEndDate=%s, newEndDate=%s""" %
+                                     (str(self._conf.getId()), str(oldStartDate), str(newStartDate), str(oldEndDate), str(newEndDate)))
+
         if someDateChanged:
             problems = []
             for booking in self.getBookingList():
@@ -559,6 +562,8 @@ class CSBookingManager(Persistent, Observer):
                             Logger.get('VideoServ').error("Exception while reindexing a booking in the event start date index because its event's start date changed: " + str(e))
 
                     if booking.needsToBeNotifiedOfDateChanges():
+                        Logger.get("VideoServ").info("""CSBookingManager: notifying date changes to booking %s of event %s""" %
+                                                     (str(booking.getId()), str(self._conf.getId())))
                         oldBookingStartDate = booking.getStartDate()
                         oldBookingEndDate = booking.getEndDate()
                         if startDateChanged:
@@ -571,10 +576,12 @@ class CSBookingManager(Persistent, Observer):
                         try:
                             modifyResult = booking._modify()
                             if isinstance(modifyResult, CSErrorBase):
-                                Logger.get('VideoServ').warning("Error while changing a booking's dates after event dates changed: " + modifyResult.getLogMessage())
+                                Logger.get('VideoServ').warning("""Error while changing the dates of booking %s of event %s after event dates changed: %s""" %
+                                                                (str(booking.getId()), str(self._conf.getId()), modifyResult.getLogMessage()))
                                 rollback = True
                         except Exception, e:
-                            Logger.get('VideoServ').error("Exception while changing a booking's dates after event dates changed: " + str(e))
+                            Logger.get('VideoServ').error("""Exception while changing the dates of booking %s of event %s after event dates changed: %s""" %
+                                                          (str(booking.getId()), str(self._conf.getId()), str(e)))
                             rollback = True
 
                         if rollback:
