@@ -205,7 +205,7 @@ class CSBookingManager(Persistent, Observer):
 
             error = newBooking.setBookingParams(bookingParams)
 
-            if isinstance(error, CSSanitizationError):
+            if isinstance(error, CSErrorBase):
                 return error
             elif error:
                 raise CollaborationServiceException("Problem while creating a booking of type " + bookingType)
@@ -256,6 +256,8 @@ class CSBookingManager(Persistent, Observer):
             return error
         elif error:
             CSBookingManager._rollbackChanges(booking, oldBookingParams, oldModificationDate)
+            if isinstance(error, CSErrorBase):
+                return error
             raise CollaborationServiceException("Problem while modifying a booking of type " + booking.getType())
         else:
             modifyResult = booking._modify(oldBookingParams)
