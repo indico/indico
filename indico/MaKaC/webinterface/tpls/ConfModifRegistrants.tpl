@@ -226,51 +226,50 @@
               </form>
             </td>
 	   </tr>
+
         <tr>
-            <td colspan="10">
-                <div>
-                    <input type="hidden" name="reglist" value="%(reglist)s">
-                        %(displayOptions)s
-                </div>
-            </td>
+          <td colspan="40" style="border-bottom:2px solid #777777;padding-top:5px" valign="bottom" align="left">
+            <form action=%(actionPostURL)s method="post" name="registrantsForm" onSubmit="return atLeastOneSelected()">
+	      <table>
+                <tr>
+                <tr>
+                  <td colspan="10">
+                    <div>
+                      <input type="hidden" name="reglist" value="%(reglist)s">
+                      %(displayOptions)s
+                    </div>
+                  </td>
+                </tr>
+
+                <td valign="bottom" align="left" class="eventModifButtonBar">
+                  <input type="submit" class="btn" name="newRegistrant" onclick="newUser = true;" value="<%= _("Add New")%>">
+                </td>
+                <td valign="bottom" align="left">
+                  <input type="submit" class="btn" name="removeRegistrants" value="<%= _("Remove")%>">
+                </td>
+                <td valign="bottom" align="left">
+                  <input type="submit" class="btn" name="emailSelected" value="<%= _("Email")%>">
+                </td>
+                <td valign="bottom" align="left">
+                  <input type="submit" class="btn" name="printBadgesSelected" value="<%= _("Print Badges")%>">
+                </td>
+                <td valign="bottom" align="left">
+                  <input type="submit" class="btn" name="info.x" value="<%= _("Show Stats")%>">
+                </td>
+                <td valign="bottom" align="left">
+                  Export to:
+                </td>
+                <td valign="bottom" align="left">
+                  %(printIconURL)s
+                </td>
+                <td valign="bottom" align="left">
+                  %(excelIconURL)s
+                </td>
+                </tr>
+              </table>
+          </td>
         </tr>
-
-
-    <tr>
-        <td colspan="40" style="border-bottom:2px solid #777777;padding-top:5px" valign="bottom" align="left">
-		    <table>
-             <form action=%(actionPostURL)s method="post" name="registrantsForm" onSubmit="return atLeastOneSelected()">
-
-                   <td valign="bottom" align="left" class="eventModifButtonBar">
-                            <input type="submit" class="btn" name="newRegistrant" onclick="newUser = true;" value="<%= _("Add New")%>">
-                   </td>
-                   <td valign="bottom" align="left">
-                            <input type="submit" class="btn" name="removeRegistrants" value="<%= _("Remove")%>">
-                            </td>
-                            <td valign="bottom" align="left">
-                             <input type="submit" class="btn" name="emailSelected" value="<%= _("Email")%>">
-                            </td>
-                        <td valign="bottom" align="left">
-                            <input type="submit" class="btn" name="printBadgesSelected" value="<%= _("Print Badges")%>">
-                        </td>
-                        <td valign="bottom" align="left">
-                            <input type="submit" class="btn" name="info.x" value="<%= _("Show Stats")%>">
-                        </td>
-                        <td valign="bottom" align="left">
-                            Export to:
-                        </td>
-                        <td valign="bottom" align="left">
-                                %(printIconURL)s
-                        </td>
-                        <td valign="bottom" align="left">
-                            %(excelIconURL)s
-                        </td>
-
-
-        </table>
-        </td>
-    </tr>
-    <tr>
+        <tr>
     %(columns)s
     <tbody id="registrantsItems">
     %(registrants)s
