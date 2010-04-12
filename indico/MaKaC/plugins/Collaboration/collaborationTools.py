@@ -20,13 +20,14 @@
 
 from MaKaC.plugins.base import PluginsHolder, Plugin
 from MaKaC.webinterface import urlHandlers
-from MaKaC.common.utils import formatDateTime, formatTwoDates, formatTime,\
+from MaKaC.common.utils import formatDateTime, formatTwoDates, formatTime, \
     formatDuration
 from MaKaC.common.timezoneUtils import getAdjustedDate, isSameDay
 from MaKaC.common.Configuration import Config
-from MaKaC.conference import Contribution
-from MaKaC.plugins.Collaboration.fossils import ICSBookingBaseIndexingFossil,\
+from MaKaC.conference import Contribution, Conference
+from MaKaC.plugins.Collaboration.fossils import ICSBookingBaseIndexingFossil, \
     IQueryResultFossil
+from MaKaC.fossils.conference import IConferenceMinimalFossil
 
 class CollaborationTools(object):
     """ Class with utility classmethods for the Collaboration plugins core and plugins
@@ -302,7 +303,7 @@ class CollaborationTools(object):
         """ Utility function that updates IQueryResultFossil's getResults method
             with the proper dict in order to fossilize bookings for the VS Overview page
         """
-        fossilDict = {}
+        fossilDict = {Conference: IConferenceMinimalFossil}
         for pluginName in cls.getCollaborationPluginType().getPlugins():
             classObject = cls.getCSBookingClass(pluginName)
             fossilClassObject = cls.getIndexingFossil(pluginName)

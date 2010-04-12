@@ -476,8 +476,14 @@ var confTitleBookingTemplate = function(booking) {
 var dateBookingTemplate = function(booking, viewBy) {
     var row = Html.tr();
 
-    var time = booking[viewBy].time.substring(0,5) // we can do this because viewBy will be creationDate, etc. which are the same
-                                                   // names of the fields of the booking
+    var time = null;
+    if (viewBy === "creationDate") {
+        time = booking.creationDate.time.substring(0,5);
+    } else if (viewBy === "modificationDate") {
+        time = booking.modificationDate.time.substring(0,5);
+    } else if (viewBy === "startDate") {
+        time = booking.bookingParams.startDate.substring(11,16);
+    }
 
     var cell = Html.td('ACBookingFirstCell ACBookingTime', time);
     row.append(cell);
