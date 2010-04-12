@@ -352,6 +352,8 @@ class RHSubmitMaterialBase:
             info = "Unknown upload type"
             return mat, status, info
 
+        # forcedFileId - in case there is a conflict, use the file that is
+        # already stored
         mat.addResource(resource, forcedFileId=self._repositoryId)
 
         #apply conversion

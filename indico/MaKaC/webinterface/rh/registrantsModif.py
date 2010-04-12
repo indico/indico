@@ -145,6 +145,10 @@ class RHRegistrantListModif( RHRegistrantListModifBase ):
         else:
             self._filterUsed = True
 
+        # preserve the order and sortBy parameters, whatever happens
+        sessionData['order'] = params.get('order', 'down')
+        sessionData['sortBy'] = params.get('sortBy', 'Name')
+
         return sessionData
 
     def _checkParams( self, params ):
