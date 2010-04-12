@@ -34,6 +34,7 @@ div.calendar {
     z-index: 4;
     border: 1px solid #888888;
     padding: 1px;
+    width: 183px;
 }
 
 .calendar, .calendar table {
@@ -82,7 +83,7 @@ div.calendar {
 
 .calendar thead .name { /* Cells <TD> containing the day names */
   border-bottom: 1px solid #AAA;
-  padding: 4px;
+  padding: 4px 2px;
   text-align: center;
   color: #000;
 }
@@ -96,7 +97,7 @@ div.calendar {
   color: #000;
   border: 1px solid #AAA;
   border-top: none;
-  padding: 3px;
+  padding: 1px;
 }
 
 .calendar thead .active { /* Active (pressed) buttons in header */
@@ -110,7 +111,7 @@ div.calendar {
   width: 2em;
   color: black;
   text-align: right;
-  padding: 3px 4px;
+  padding: 3px 2px;
 }
 .calendar tbody .day.othermonth {
   font-size: 80%;
@@ -137,7 +138,7 @@ div.calendar {
 
 .calendar tbody td.hilite { /* Hovered cells <TD> */
   background: #EED79A;
-  padding: 1px 3px 1px 1px;
+  padding: 1px 1px 1px 1px;
   border: 1px solid #AAA;
 }
 
@@ -148,7 +149,7 @@ div.calendar {
 
 .calendar tbody td.selected { /* Cell showing today date */
   font-weight: bold;
-  padding: 1px 3px 1px 1px;
+  padding: 1px 1px 1px 1px;
   background: #fff;
   color: #000;
 }
@@ -261,6 +262,7 @@ div.calendar {
 .calendar td.time .colon {
   padding: 0px 2px 0px 3px;
   font-weight: bold;
+  display: None;
 }
 
 .calendar td.time span.hilite {

@@ -280,7 +280,7 @@ a.img:active {
 /* styles used for the category overview page */
 
 .categoryOverview {
-    margin-top: 20px;
+    margin-top: 0px;
 }
 
 .categoryOverview table.item {

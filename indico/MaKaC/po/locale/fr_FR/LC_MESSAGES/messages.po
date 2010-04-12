@@ -320,7 +320,7 @@ msgstr ""
 "la personne se verra automatiquement attribuer les droits de soumission."
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/CategoryOverview.tpl:26
-msgid "Details level"
+msgid "Detail level"
 msgstr "Niveau de détails"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConfModificationReviewingSettings.tpl:68

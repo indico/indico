@@ -800,7 +800,7 @@ class WCategoryOverview(wcomponents.WTemplated):
                 cm= CategoryManager()
                 categ=cm.getById(str(icon))
                 otherOW = self._ow.getOverviewOtherCateg(categ)
-                a=(""" <a href="%s" style="font-size: 1.0em;"><img src="%s" width="16" height="16" border="0" alt="category">&nbsp;%s</a>  <BR>""" %(\
+                a=(""" <a href="%s" style="font-size: 1.0em;"><img src="%s" width="16" height="16" border="0">&nbsp;%s</a>  <br/>""" %(\
                                         vars["categOverviewURLGen"]( otherOW ),\
                                         urlHandlers.UHCategoryIcon.getURL(categ),\
                                         categ.getName().replace(" ","&nbsp;")))
