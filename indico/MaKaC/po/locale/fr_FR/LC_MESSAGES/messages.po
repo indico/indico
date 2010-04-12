@@ -319,10 +319,6 @@ msgstr ""
 "envoyépour lui demander de créer un compte utilisateur. Une fois ceci fait , "
 "la personne se verra automatiquement attribuer les droits de soumission."
 
-#: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/CategoryOverview.tpl:26
-msgid "Detail level"
-msgstr "Niveau de détails"
-
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConfModificationReviewingSettings.tpl:68
 msgid "Add questions for paper reviewing"
 msgstr "Ajouter des questions pour la revue des papiers"
@@ -11854,6 +11850,7 @@ msgstr "Tout sélectioner"
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConferenceSessionTimeTable.tpl:31
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConferencePlainTimeTable.tpl:31
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConferenceHighDetailTimeTable.tpl:30
+#: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/CategoryOverview.tpl:26
 msgid "Detail level"
 msgstr "Niveau de détails"
 
