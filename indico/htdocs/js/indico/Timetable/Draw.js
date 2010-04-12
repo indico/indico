@@ -934,6 +934,15 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
 
         var menu = Html.div({className: 'menuBar managementMenuBar'});
 
+        if (self.eventData.entryType == 'Session') {
+            var addInterval = Html.a('fakeLink', "Add block");
+            addInterval.observeClick(function() {
+                self.managementActions.addSessionSlot(self.eventData);
+                self.close();
+            });
+            menu.insert(addInterval);
+        }
+
         var deleteLink = Html.a('fakeLink', "Delete");
         deleteLink.observeClick(function() {
             self.managementActions.deleteEntry(self.eventData);
