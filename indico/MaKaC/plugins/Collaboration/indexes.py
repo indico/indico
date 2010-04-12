@@ -511,7 +511,6 @@ class IndexInformation(Persistent, Fossilizable):
         self._hasShowOnlyPending = False
         self._hasViewByStartDate = False
 
-#    @Retrieves(['MaKaC.plugins.Collaboration.indexes.IndexInformation'], 'name')
     def getName(self):
         return self._name
 
@@ -519,21 +518,18 @@ class IndexInformation(Persistent, Fossilizable):
         self._plugins.append(pluginName)
         self._p_changed = 1
 
-#    @Retrieves(['MaKaC.plugins.Collaboration.indexes.IndexInformation'], 'plugins')
     def getPlugins(self):
         return self._plugins
 
     def setHasShowOnlyPending(self, value):
         self._hasShowOnlyPending = value
 
-#    @Retrieves(['MaKaC.plugins.Collaboration.indexes.IndexInformation'], 'hasShowOnlyPending')
     def hasShowOnlyPending(self):
         return self._hasShowOnlyPending
 
     def setHasViewByStartDate(self, value):
         self._hasViewByStartDate = value
 
-#    @Retrieves(['MaKaC.plugins.Collaboration.indexes.IndexInformation'], 'hasViewByStartDate')
     def hasViewByStartDate(self):
         return self._hasViewByStartDate
 
