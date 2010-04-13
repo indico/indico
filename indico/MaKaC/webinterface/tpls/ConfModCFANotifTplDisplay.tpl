@@ -45,7 +45,6 @@
                             %(conditions)s
                     </td>
                     <td align="right" valign="bottom" nowrap>
-                        <input type="submit" class="btn" value="<%= _("remove")%>">
 						</form>
                         <form action=%(newConditionURL)s method="POST">
                             <select name="condType">%(availableConditions)s</select><input type="submit" class="btn" value="<%= _("create new condition")%>">

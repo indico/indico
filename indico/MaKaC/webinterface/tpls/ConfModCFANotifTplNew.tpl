@@ -62,6 +62,17 @@
 		<textarea name="body" rows="26" cols="80">%(body)s</textarea>
         </td>
     </tr>
+    <tr>
+        <!-- translate 'Condition' -->
+        <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Condition") %></span></td>
+        <td>
+            <select name="condType">
+            <% for cond in availableConditions: %>
+                <option value= <%= quoteattr(cond.getId()) %> > <%= self.htmlText(cond.getLabel()) %> </option>
+            <% end %>
+            </select>
+        </td>
+    </tr>
 	<tr><td colspan="3"><br></td></tr>
 	<tr align="left">
 		<td colspan="3" style="border-top:1px solid #777777;" valign="bottom" align="left">

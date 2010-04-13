@@ -3556,6 +3556,7 @@ class RHCFANotifTplNew(RHConfModifCFABase):
         self._ccList=params.get("CCAddrs","").split(",")
         self._cancel=params.get("cancel", None)
         self._save=params.get("save", None)
+        self._tplCondition = params.get("condType", None)
 
     def _process(self):
         error = []
@@ -3565,6 +3566,9 @@ class RHCFANotifTplNew(RHConfModifCFABase):
         elif self._save:
             if len(self._toList)<=0:
                 error.append( _("""At least one "To Address" must be selected"""))
+            elif self._tplCondition is None:
+                #TODO: translate
+                error.append( _("Choose a condition"))
             else:
                 tpl=review.NotificationTemplate()
                 tpl.setName(self._title)
@@ -3578,7 +3582,9 @@ class RHCFANotifTplNew(RHConfModifCFABase):
                     if toAddrWrapper:
                         toAddrWrapper.addToAddr(tpl)
                 self._conf.getAbstractMgr().addNotificationTpl(tpl)
-                self._redirect(urlHandlers.UHConfModifCFA.getURL(self._conf))
+                url = urlHandlers.UHConfModNotifTplConditionNew.getURL(tpl)
+                url.addParams({"condType":self._tplCondition})
+                self._redirect(url)
                 return
         p=conferences.WPModCFANotifTplNew(self,self._target)
         return p.display(title=self._title,\

@@ -5656,6 +5656,7 @@ class WConfModCFANotifTplNew(wcomponents.WTemplated):
         vars["CCAddrs"]=quoteattr(str(",".join(vars.get("ccList",[]))))
         vars["toAddrs"] = self._getToAddrsHTML()
         vars["vars"]=self._getAvailableTagsHTML()
+        vars["availableConditions"]= NotifTplConditionsFactory.getConditionList()
         return vars
 
 
@@ -6003,7 +6004,7 @@ class WConfModCFANotifTplDisplay(wcomponents.WTemplated):
                 caption= _("""REJECTED""")
             elif isinstance(cond,review.NotifTplCondMerged):
                 caption= _("""MERGED""")
-            res.append("""<input type="checkbox" name="selCond" value=%s>%s"""%(quoteattr(str(cond.getId())),caption))
+            res.append(""" <input type="image" name="selCond" value=%s src="%s"> %s"""%(quoteattr(str(cond.getId())), Config.getInstance().getSystemIconURL( "remove" ), caption))
         return "<br>".join(res)
 
     def _getToAddrsHTML(self):

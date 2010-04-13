@@ -20,7 +20,7 @@
 
 """ Simple script to parse and do some corrections HTML exported by the source OpenOffice documents
     used to produce the Video Services guides.
-    
+
     It assumes you are using it from indico's bin directory in development mode.
     If this isn't right, please change the 'ihelppath' variable and the end of this file.
 """
@@ -31,10 +31,10 @@ import os
 
 
 class MyHTMLParser(HTMLParser):
-    
+
     def __init__(self):
         HTMLParser.__init__(self)
-        
+
     def process(self, target):
         if not os.path.exists(target):
             print 'Could not find file: ' + target
@@ -48,7 +48,7 @@ class MyHTMLParser(HTMLParser):
         os.remove(target)
         os.rename(outName, target)
         self.close()
-        
+
     @classmethod
     def _processAttrs(cls, tag, attrs):
         attrs = dict(attrs)
@@ -57,35 +57,35 @@ class MyHTMLParser(HTMLParser):
             attrs.pop('HEIGHT','')
             attrs.pop('width','')
             attrs.pop('WIDTH','')
-        
+
             if not 'style' in attrs or attrs['style'].find('text-align: center') == -1:
                 attrs['style'] = attrs.pop('style','') + ";text-align: center;"
-            
+
         if tag.lower() == 'p' and ('align' in attrs and attrs['align'].lower() == 'center' or 'ALIGN' in attrs and attrs['ALIGN'].lower() == 'center'):
             attrs.pop('align','')
             attrs.pop('ALIGN','')
             if not 'style' in attrs or attrs['style'].find('text-align: center') == -1:
                 attrs['style'] = attrs.pop('style','') + ";text-align: center;"
-        
+
         return tag, attrs
-        
+
     def handle_starttag(self, tag, attrs):
         if tag.lower() == 'style':
             self._inStyleTag = True
         tag, attrs = MyHTMLParser._processAttrs(tag, attrs)
         strattrs = "".join([' %s="%s"' % (key, value) for key, value in attrs.iteritems()])
         self._out.write("<%s%s>" % (tag, strattrs))
-        
+
     def handle_startendtag(self, tag, attrs):
         tag, attrs = MyHTMLParser._processAttrs(tag, attrs)
         strattrs = "".join([' %s="%s"' % (key, value) for key, value in attrs])
         self._out.write("<%s%s />" % (tag, strattrs))
-        
+
     def handle_endtag(self, tag):
         if tag.lower() == 'style':
             self._inStyleTag = False
         self._out.write("</%s>" % tag)
-        
+
     def handle_data(self, text):
         if self._inStyleTag:
             iPStyle1 = text.find("P {")
@@ -100,19 +100,18 @@ class MyHTMLParser(HTMLParser):
             self._out.write(text[endIPStyle:])
         else:
             self._out.write("%s" % text)
-        
+
     def handle_comment(self, comment):
-        import pydevd;pydevd.settrace()
         self._out.write("<!-- %s -->\n" % comment)
-        
+
     def handle_entityref(self, ref):
         self._out.write("&%s" % ref)
         if htmlentitydefs.entitydefs.has_key(ref):
             self._out.write(";")
-    
+
     def handle_charref(self, ref):
         self._out.write("&#%s;" % ref)
-        
+
     def handle_pi(self, text):
         self._out.write("<?%s>" % text)
 
