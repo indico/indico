@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: conferenceDisplay.py,v 1.86 2009/05/15 11:51:10 eragners Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

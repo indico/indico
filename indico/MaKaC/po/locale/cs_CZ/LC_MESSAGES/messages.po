@@ -1,4 +1,3 @@
-# $Id: messages.po,v 1.4 2009/05/18 09:50:29 cangelov Exp $
 #
 # This file is part of Indico.
 # Copyright (C) 2007 CERN.

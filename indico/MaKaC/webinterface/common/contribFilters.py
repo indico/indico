@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: contribFilters.py,v 1.14 2009/03/24 17:52:44 dmartinc Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

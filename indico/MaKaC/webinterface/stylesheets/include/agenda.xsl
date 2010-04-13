@@ -1,5 +1,5 @@
 <?xml version='1.0'?>
-<!-- $Id: agenda.xsl,v 1.4 2009/06/18 14:37:55 eragners Exp $
+<!--
 
      This file is part of CDS Indico.
      Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

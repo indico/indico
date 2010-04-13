@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: utils.py,v 1.45 2009/06/29 12:29:58 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

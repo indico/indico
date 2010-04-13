@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: sessions.py,v 1.121 2009/06/23 09:48:49 pferreir Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

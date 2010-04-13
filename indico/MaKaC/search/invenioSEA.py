@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: invenioSEA.py,v 1.7 2009/05/19 12:53:27 pferreir Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

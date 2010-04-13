@@ -1,4 +1,3 @@
-## $Id: install_pot_file.py,v 1.2 2008/08/01 07:49:55 pvogt Exp $
 ##
 ## This file is part of Indico.
 ## Copyright (C) 2008 CERN.
@@ -24,9 +23,6 @@ The sentences to translate are marked with the following tag:
 
 These tags can span several lines. Extra whitespace is discarded. 
 """
-
-__revision__ = "$Id: install_pot_file.py,v 1.2 2008/08/01 07:49:55 pvogt Exp $"
-
 
 import sys, re, os, glob, os.path, shutil, MaKaC
 import MaKaC.common.MaKaCConfig as MaKaCConfig

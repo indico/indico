@@ -1,5 +1,5 @@
 <?xml version='1.0'?>
-<!-- $Id: jacow.xsl,v 1.6 2009/05/14 18:06:17 jose Exp $
+<!--
 
      This file is part of CDS Indico.
      Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

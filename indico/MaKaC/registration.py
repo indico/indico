@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: registration.py,v 1.57 2009/06/15 14:06:06 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

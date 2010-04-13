@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: indexes.py,v 1.38 2009/06/24 16:49:07 pferreir Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

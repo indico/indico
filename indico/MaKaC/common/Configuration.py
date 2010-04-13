@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: Configuration.py,v 1.81 2009/06/24 12:13:18 eragners Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

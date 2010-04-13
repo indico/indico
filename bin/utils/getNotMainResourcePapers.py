@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: getNotMainResourcePapers.py,v 1.3 2008/04/24 17:00:19 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

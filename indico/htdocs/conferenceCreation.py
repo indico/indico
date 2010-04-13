@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: conferenceCreation.py,v 1.9 2009/04/29 13:38:37 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

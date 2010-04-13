@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: roomBooking.py,v 1.19 2009/06/02 14:33:23 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: materialFactories.py,v 1.16 2009/04/21 16:03:50 pferreir Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

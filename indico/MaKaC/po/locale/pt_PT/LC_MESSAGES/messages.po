@@ -14353,7 +14353,6 @@ msgstr ""
 msgid "change track assignment"
 msgstr ""
 
-# $Id: messages.po,v 1.1 2009/05/19 13:52:22 pferreir Exp $
 #
 # This file is part of Indico.
 # Copyright (C) 2007 CERN.

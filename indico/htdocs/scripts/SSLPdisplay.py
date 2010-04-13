@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: SSLPdisplay.py,v 1.5 2009/06/08 15:28:49 pferreir Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

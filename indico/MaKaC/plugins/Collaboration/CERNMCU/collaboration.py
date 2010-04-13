@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: collaboration.py,v 1.6 2009/04/25 17:30:35 dmartinc Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

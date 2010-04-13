@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: evaluation.py,v 1.18 2008/08/13 13:31:04 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

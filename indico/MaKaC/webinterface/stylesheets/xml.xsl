@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!-- $Id: xml.xsl,v 1.2 2008/04/24 16:59:56 jose Exp $
+<!--
 
      This file is part of CDS Indico.
      Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

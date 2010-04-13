@@ -1,5 +1,5 @@
 <?xml version='1.0'?>
-<!-- $Id: egee_lecture.xsl,v 1.10 2009/04/28 10:08:48 eragners Exp $
+<!--
 
      This file is part of CDS Indico.
      Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

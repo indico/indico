@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: security.py,v 1.1 2009/04/22 14:51:42 pferreir Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

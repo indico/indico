@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: sessionManagement.py,v 1.17 2008/07/22 14:43:37 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

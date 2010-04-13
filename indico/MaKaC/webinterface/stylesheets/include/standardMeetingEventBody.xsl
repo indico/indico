@@ -1,5 +1,5 @@
 <?xml version='1.0'?>
-<!-- $Id: standardMeetingEventBody.xsl,v 1.5 2009/06/16 14:59:27 eragners Exp $
+<!--
 
      This file is part of CDS Indico.
      Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

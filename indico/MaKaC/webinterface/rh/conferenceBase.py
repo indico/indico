@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: conferenceBase.py,v 1.40 2009/05/27 10:05:40 pferreir Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

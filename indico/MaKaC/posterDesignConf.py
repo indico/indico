@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: posterDesignConf.py,v 1.4 2008/06/19 16:07:01 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

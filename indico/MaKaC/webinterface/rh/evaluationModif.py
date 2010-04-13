@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: evaluationModif.py,v 1.14 2009/05/27 14:44:31 cangelov Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

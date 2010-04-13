@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: base.py,v 1.24 2009/04/25 13:55:18 dmartinc Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: oai2.py,v 1.42 2009/06/02 13:04:56 pferreir Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

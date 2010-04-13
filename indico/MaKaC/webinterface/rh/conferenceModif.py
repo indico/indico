@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: conferenceModif.py,v 1.202 2009/06/11 18:42:45 cangelov Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

@@ -1,4 +1,3 @@
-## $Id: i18n_extract_from_source.py,v 1.10 2008/08/04 13:13:56 pvogt Exp $
 ##
 ## This file is part of Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -24,9 +23,6 @@ The sentences to translate are marked with the following tag:
 
 These tags can span several lines. Extra whitespace is discarded. 
 """
-
-__revision__ = "$Id: i18n_extract_from_source.py,v 1.10 2008/08/04 13:13:56 pvogt Exp $"
-
 
 import sys, re, os, glob, os.path, MaKaC
 from MaKaC.common import Config
@@ -115,8 +111,7 @@ def extract_from_files():
 
     # Print .po header:
     potfile = open(potfilepath, 'w')
-    potfile.write(r'''# $Id: i18n_extract_from_source.py,v 1.10 2008/08/04 13:13:56 pvogt Exp $
-#
+    potfile.write(r'''#
 # This file is part of Indico.
 # Copyright (C) 2007 CERN.
 #
@@ -140,7 +135,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
-''')    
+''')
 
     # Print db content in .po file:
     for original, refs in db.items():

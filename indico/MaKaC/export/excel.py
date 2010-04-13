@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: excel.py,v 1.11 2009/05/14 18:05:54 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

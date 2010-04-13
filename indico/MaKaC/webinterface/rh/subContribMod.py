@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: subContribMod.py,v 1.21 2009/06/03 14:36:40 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

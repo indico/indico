@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: contribution.py,v 1.39 2009/06/25 15:21:49 dmartinc Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
