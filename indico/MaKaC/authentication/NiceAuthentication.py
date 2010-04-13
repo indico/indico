@@ -76,6 +76,10 @@ class NiceAuthenticator(Authenthicator):
                     av = ah.match({"email":avDict["email"][0]},exact=1, forceWithoutExtAuth=True)
                     if av:
                         av = av[0]
+                        # don't allow disabled accounts
+                        if av.isDisabled():
+                            return None
+                        # if not created, create and activate
                         if av.getStatus() == 'NotCreated':
                             #checking if comming from Nice
                             if av.getId()[:len(self.id)] == self.id:
@@ -84,6 +88,7 @@ class NiceAuthenticator(Authenthicator):
                                 av.activateAccount()
                             else:
                                 return None
+                        # if not activated
                         elif not av.isActivated():
                             av.activateAccount()
                     else:
