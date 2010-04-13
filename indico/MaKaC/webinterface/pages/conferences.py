@@ -4931,7 +4931,7 @@ class WPEMailConveners ( WPConfModifListings):
         WPConfModifListings.__init__(self, rh, conf)
         self._convenerList = convenerList
 
-    def _getTabContent(self,params):
+    def _getPageContent(self,params):
         wc = WEmailToConveners(self._conf, self._getAW().getUser(), self._convenerList)
         return wc.getHTML()
 
