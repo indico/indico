@@ -5878,3 +5878,7 @@ div.cloneElements {
     position: absolute;
     right:0px;
 }
+
+.filterTable {
+    border-collapse: collapse;
+}

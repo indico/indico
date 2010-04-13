@@ -100,18 +100,10 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         self._dispopts["ReasonParticipation"]=["ReasonParticipation"]
         self._dispopts["more"]=["RegistrationDate"]
         for sect in self._conf.getRegistrationForm().getGeneralSectionFormsList():
-            #if sect.isEnabled():
             self._dispopts[sect.getId()]=[]
-            ################
-            #jmf-start
-            #
-            #for fld in sect.getFields():
-            #    self._dispopts[sect.getId()].append("%s-%s"%(sect.getId(),fld.getId()))
+
             for fld in sect.getSortedFields():
                 self._dispopts[sect.getId()].append("%s-%s"%(sect.getId(),fld.getId()))
-            #
-            #jmf-end
-            ################
 
     def _getKeyDispOpts(self, value):
         """
@@ -196,55 +188,19 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
 
         return url
 
-    def _getSessHTML(self):
-        regForm = self._conf.getRegistrationForm()
-        sessform =regForm.getSessionsForm()
-        sesstypes = sessform.getSessionList()
-        checked=""
-        if self._filterCrit.getField(self._sessionFilterName).getShowNoValue():
-            checked=" checked"
-        res=[ _("""<input type="checkbox" name="sessionShowNoValue" value="--none--"%s> --_("not specified")--""")%checked]
-        for sess in sesstypes:
-            checked=""
-            if sess.getId() in self._filterCrit.getField(self._sessionFilterName).getValues():
-                checked=" checked"
-            res.append("""<input type="checkbox" name="session" value=%s%s>%s"""%(quoteattr(str(sess.getId())),checked,self.htmlText(sess.getTitle())))
-        if sessform.getType() == "2priorities":
-            checked=""
-            if self._sessionFilterName == "sessionfirstpriority":
-                checked=" checked"
-            res.append( _("""<b>------</b><br><input type="checkbox" name="firstChoice" value="firstChoice"%s><i> _("Only by first choice")</i>""")%checked)
-        return "<br>".join(res)
 
-    def _getAcomHTML(self):
+    def _getFilterBoxesHTML(self):
         regForm = self._conf.getRegistrationForm()
-        accommform = regForm.getAccommodationForm()
-        accommtypes = accommform.getAccommodationTypesList()
-        checked=""
-        if self._filterCrit.getField("accomm").getShowNoValue():
-            checked=" checked"
-        res=[ _("""<input type="checkbox" name="accommShowNoValue" value="--none--"%s> --_("not specified")--""")%checked]
-        for accomm in accommtypes:
-            checked=""
-            if accomm.getId() in self._filterCrit.getField("accomm").getValues():
-                checked=" checked"
-            res.append("""<input type="checkbox" name="accomm" value=%s%s>%s"""%(quoteattr(str(accomm.getId())),checked,self.htmlText(accomm.getCaption())))
-        return "<br>".join(res)
 
-    def _getEventHTML(self):
-        regForm = self._conf.getRegistrationForm()
-        eventForm = regForm.getSocialEventForm()
-        events = eventForm.getSocialEventList()
-        checked=""
-        if self._filterCrit.getField("event").getShowNoValue():
-            checked=" checked"
-        res=[ _("""<input type="checkbox" name="eventShowNoValue" value="--none--"%s> --_("not specified")--""")%checked]
-        for event in events:
-            checked=""
-            if event.getId() in self._filterCrit.getField("event").getValues():
-                checked=" checked"
-            res.append("""<input type="checkbox" name="event" value=%s%s>%s"""%(quoteattr(str(event.getId())),checked,self.htmlText(event.getCaption())))
-        return "<br>".join(res)
+        options = [
+            ('accomm', regForm.getAccommodationForm()),
+            ('event', regForm.getSocialEventForm()),
+            (self._sessionFilterName, regForm.getSessionsForm())
+            ]
+
+        p = WFilterCriteria(options, self._filterCrit)
+
+        return p.getHTML()
 
     def _getStatusesHTML(self):
         self._statusesObjects = {}
@@ -502,33 +458,11 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         return url
 
     def _getFilterMenu(self):
-        menu =  _("""<div class="CRLDiv" style="display: none;" id="filterMenu"><table width="95%%" align="center" border="0">
-        <tr>
-            <td>
-                <table width="100%%">
-                    <tr>
-                    </tr>
-                    <tr>
-                        <td>
-                            <table align="center" cellspacing="0" width="100%%">
-                                <tr>
-                                    <td width="33%%" class="titleCellFormat" style="border-bottom: 1px solid #888;">%(accomtitle)s %(checkAcco)s%(uncheckAcco)s</td>
-                    <td width="33%%"class="titleCellFormat" style="border-bottom: 1px solid #888;">%(eventtitle)s %(checkEvent)s%(uncheckEvent)s</td>
-                    <td width="33%%"class="titleCellFormat" style="border-bottom: 1px solid #888;">%(sesstitle)s %(checkSession)s%(uncheckSession)s</td>
-                                </tr>
-                                <tr>
-                                    <td valign="top" >%(acom)s</td>
-                    <td valign="top" >%(eve)s</td>
-                    <td valign="top">%(ses)s</td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
+        menu =  _("""<div class="CRLDiv" style="display: none;" id="filterMenu">
+                     %(filterBoxes)s
                     """)
         if self._conf.getRegistrationForm().getStatusesList():
-            menu +=  _("""<tr>
-                        <td>
-                            <table align="center" cellspacing="0" width="100%%">
+            menu +=  _("""<table align="center" cellspacing="0" width="100%%">
                                 <tr>
                                     <td align="left" class="titleCellFormat" style="border-bottom: 1px solid #888; padding-right:10px">  _("Statuses") %(checkStatuses)s%(uncheckStatuses)s</td>
                                 </tr>
@@ -536,16 +470,8 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
                                     <td valign="top">%(status)s</td>
                                 </tr>
                             </table>
-                        </td>
-                    </tr>""")
-        menu +=  _("""
-                    <tr>
-                        <td align="center" ><input type="submit" class="btn" name="OK" value=  _("apply filter")></td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table></div>""")
+                        """)
+        menu +=  _("""<div style="text-align: center;"><input type="submit" class="btn" name="OK" value=  _("Apply filter")></div></div>""")
 
         return menu
 
@@ -619,9 +545,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         vars["excelIconURL"]="""<input type="image" name="excel" src=%s border="0">"""%quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
         vars["pdfUrl"] = quoteattr(str(Config.getInstance().getSystemIconURL("pdf")))
         vars["excelUrl"] = quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
-        vars ["acom"] = self._getAcomHTML()
-        vars ["ses"]=self._getSessHTML()
-        vars ["eve"]+=self._getEventHTML()
+        vars ["filterBoxes"] = self._getFilterBoxesHTML()
         vars ["status"]= self._getStatusesHTML()
         vars ["disp"]= self._getDispHTML()
         tit=self._conf.getRegistrationForm().getAccommodationForm().getTitle()
@@ -660,6 +584,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         return vars
 
 class WRegistrantsFilterStatuses (wcomponents.WTemplated):
+
     def __init__(self, statuses, filter, statusObjects):
         wcomponents.WTemplated.__init__(self)
         self._statuses = statuses
@@ -675,6 +600,76 @@ class WRegistrantsFilterStatuses (wcomponents.WTemplated):
         vars["statusObjects"] = self._statusObjects
 
         return vars
+
+
+
+class WFilterCriteria(wcomponents.WTemplated):
+    """
+    Draws the options for a filter criteria object
+    This means rendering the actual table that contains
+    all the HTML for the several criteria
+    """
+
+    def __init__(self, options, filterCrit):
+        wcomponents.WTemplated.__init__(self)
+        self._filterCrit = filterCrit
+        self._options = options
+
+    def _drawFieldOptions(self, formName, form):
+
+        # since sessions have a special extra checkbox ("only by first choice"),
+        # we need to use a different template
+
+        if formName in ['session', 'sessionfirstpriority']:
+            page = WFilterSessionCriterionOptions(formName, form, self._filterCrit)
+        else:
+            page = WFilterCriterionOptions(formName, form, self._filterCrit)
+
+        # TODO: remove when we have a better template system
+        return page.getHTML().replace('%','%%')
+
+    def getVars(self):
+
+        vars = wcomponents.WTemplated.getVars( self )
+
+        vars["content"] =  list((name, self._drawFieldOptions(name, form))
+                                for (name, form) in self._options)
+        return vars
+
+
+class WFilterCriterionOptions(wcomponents.WTemplated):
+    """
+    Draws the list of options (and checkboxes) for a specific filter criterion,
+    with all the checkboxes (properly checked if necessary)
+    """
+
+    def __init__(self, formName, formData, filterCrit):
+        self._formName = formName
+        self._formData = formData
+        self._filterCrit = filterCrit
+
+    def getVars(self):
+        parentVars = wcomponents.WTemplated.getVars( self )
+        parentVars["critFormName"] = self._formName
+        parentVars["htmlFormName"] = self._formName
+        parentVars["form"] = self._formData
+        parentVars["filterCrit"] = self._filterCrit
+
+        return parentVars
+
+
+class WFilterSessionCriterionOptions(WFilterCriterionOptions):
+    """
+    Sub-class for the session "criterion", since it requires an
+    extra checkbox.
+    """
+
+    def getVars(self):
+        parentVars = WFilterCriterionOptions.getVars( self )
+        parentVars["htmlFormName"] = "session"
+
+        return parentVars
+
 
 class WRegSentMail  (wcomponents.WTemplated):
     def __init__(self,conf):

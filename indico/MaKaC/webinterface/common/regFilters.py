@@ -53,9 +53,9 @@ class SessionFilterField( filters.FilterField ):
     _id = "session"
 
     def satisfies( self, reg ):
+        """
+        """
 
-        """
-        """
         if reg.getSessionList():
             for sess in reg.getSessionList():
                 if sess.getId() in self._values:
@@ -75,6 +75,7 @@ class SessionFirstPriorityFilterField( filters.FilterField ):
 
         """
         """
+
         if len(reg.getSessionList()) > 0:
             sess=reg.getSessionList()[0]
             if sess.getId() in self._values:

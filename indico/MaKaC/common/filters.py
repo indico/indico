@@ -184,6 +184,7 @@ class FilterCriteria:
                     and the values must be a list of the values the field must
                     satisfy in order to make it pass the filter.
         """
+
         self._conf=conf
         self._fields = {}
         #Match the criteria keys with the allowed fields and construct the 

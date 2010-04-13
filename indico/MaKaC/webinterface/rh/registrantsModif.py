@@ -66,51 +66,57 @@ class RHRegistrantListMenuOpen(RHRegistrantListModifBase):
         self._redirect(self._currentURL)
 
 class RHRegistrantListModif( RHRegistrantListModifBase ):
+    """
+    Registrant List - management area
+    Handles filtering and display of different columns
+    """
+
     _uh = urlHandlers.UHConfModifRegistrantList
 
     def _resetFilters( self, sessionData ):
+        """
+        Brings the filter data to a consistent state (websession),
+        marking everything as "checked"
+        """
 
         regForm = self._conf.getRegistrationForm()
-        accommform = regForm.getAccommodationForm()
-        laccomm = map(lambda accom: accom.getId(),
-                      accommform.getAccommodationTypesList())
+        accommTypes = regForm.getAccommodationForm().getAccommodationTypesList()
+        sessionData["accomm"] = map(lambda accom: accom.getId(),
+                                    accommTypes)
 
         lstatuses = []
-        for st in self._conf.getRegistrationForm().getStatusesList():
-            lstatuses.append(st.getCaption()+st.getId()+"-NoValue")
+        for st in regForm.getStatusesList():
+            lstatuses.append(st.getCaption() + st.getId() + "-NoValue")
             for stInt in st.getStatusValues():
-                lstatuses.append(st.getCaption()+st.getId()+"-"+st.getStatusValues()[stInt].getCaption())
-
-        sessform =regForm.getSessionsForm()
-        sesstypes = sessform.getSessionList()
-        lsessions = map(lambda session: session.getId(), sesstypes)
-
-        eventForm = regForm.getSocialEventForm()
-        events = eventForm.getSocialEventList()
-        levents = map(lambda event: event.getId(), events)
-
-        sessionData["accomm"] = laccomm
+                lstatuses.append(st.getCaption() + st.getId() + "-" +
+                                 st.getStatusValues()[stInt].getCaption())
         sessionData["statuses"] = lstatuses
-        sessionData[self._sessionFilterName] = lsessions
-        sessionData["event"] = levents
 
+        sessTypes = regForm.getSessionsForm().getSessionList()
+        sessionData["session"] = map(lambda session: session.getId(), sessTypes)
+
+        socialEvents = regForm.getSocialEventForm().getSocialEventList()
+        sessionData["event"] = map(lambda event: event.getId(), socialEvents)
+
+        # By default, check '--none--'
         sessionData["accommShowNoValue"] = True
         sessionData["sessionShowNoValue"] = True
         sessionData["eventShowNoValue"] = True
-        sessionData["statusesShowNoValue"] = True
 
         return sessionData
 
     def _updateFilters( self, sessionData, params ):
+        """
+        Updates the filter parameters in the websession with those
+        coming from the HTTP request
+        """
 
         sessionData['event'] = []
         sessionData['accomm'] = []
         sessionData['statuses'] = []
-        sessionData['session'] = []
-        sessionData['sessionfirstpriority'] = []
 
         sessionData.update(params)
-        sessionData[self._sessionFilterName] = params.get('session',[])
+        sessionData['session'] = utils.normalizeToList(params.get('session',[]))
 
         # update these elements in the session so that the parameters that are
         # passed are always taken into account (sessionData.update is not
@@ -120,24 +126,54 @@ class RHRegistrantListModif( RHRegistrantListModifBase ):
         sessionData['accommShowNoValue'] = params.has_key('accommShowNoValue')
         sessionData['eventShowNoValue'] = params.has_key('eventShowNoValue')
         sessionData['sessionShowNoValue'] = params.has_key('sessionShowNoValue')
-        sessionData['statusesShowNoValue'] = params.has_key('statusesShowNoValue')
+        sessionData['firstChoice'] = params.has_key("firstChoice")
 
         return sessionData
 
-    def _checkFilterParams( self, params, filtersActive, sessionData, operation ):
+    def _buildFilteringCriteria(self, sessionData):
+        """
+        Creates the Filtering Criteria object, without changint the existing
+        session data (sessionData is cloned, not directly changed)
+        """
+        sessionCopy = sessionData.copy()
+
+        # filtering criteria needs a proper "filter name"
+        del sessionCopy['session']
+        sessionCopy[self._sessionFilterName] = sessionData['session']
+
+        # Build the filtering criteria
+        filterCrit = regFilters.RegFilterCrit(self._conf, sessionCopy)
+
+        filterCrit.getField("accomm").setShowNoValue(
+            sessionCopy.get("accommShowNoValue") )
+        filterCrit.getField(self._sessionFilterName).setShowNoValue(
+            sessionCopy.get("sessionShowNoValue") )
+        filterCrit.getField("event").setShowNoValue(
+            sessionCopy.get("eventShowNoValue") )
+
+        return filterCrit
+
+    def _checkAction( self, params, filtersActive, sessionData, operation ):
+        """
+        Decides what to do with the request parameters, depending
+        on the type of operation that is requested
+        """
 
         # user chose to reset the filters
         if operation ==  'resetFilters':
             self._filterUsed = False
             sessionData = self._resetFilters(sessionData)
+
         # user set the filters
         elif operation ==  'setFilters':
             self._filterUsed = True
             sessionData = self._updateFilters(sessionData, params)
+
         # user has changed the display options
         elif operation == 'setDisplay':
             self._filterUsed = filtersActive
             sessionData['disp'] = params.get('disp',[])
+
         # session is empty (first time)
         elif not filtersActive:
             self._filterUsed = False
@@ -152,6 +188,9 @@ class RHRegistrantListModif( RHRegistrantListModifBase ):
         return sessionData
 
     def _checkParams( self, params ):
+        """
+        Main parameter checking routine
+        """
 
         RHRegistrantListModifBase._checkParams(self, params)
 
@@ -190,34 +229,21 @@ class RHRegistrantListModif( RHRegistrantListModifBase ):
         else:
             self._sessionFilterName="session"
 
-        sessionData = self._checkFilterParams(params, filtersActive, sessionData, operation)
+        sessionData = self._checkAction(params, filtersActive, sessionData, operation)
 
+        # Maintain the state abotu filter usage
+        sessionData['filtersActive'] = self._filterUsed;
 
-        self._filterCrit = regFilters.RegFilterCrit(self._conf, sessionData)
+        # Save the web session
+        websession.setVar("registrantsFilterAndSortingConf%s"%self._conf.getId(), sessionData)
 
-
-        self._filterCrit.getField("accomm").setShowNoValue(
-            sessionData.get("accommShowNoValue") )
-        self._filterCrit.getField(self._sessionFilterName).setShowNoValue(
-            sessionData.get("sessionShowNoValue") )
-        self._filterCrit.getField("event").setShowNoValue(
-            sessionData.get("eventShowNoValue") )
-        self._filterCrit.getField("statuses").setShowNoValue(
-            sessionData.get("statusesShowNoValue") )
+        self._filterCrit = self._buildFilteringCriteria(sessionData)
 
         self._sortingCrit = regFilters.SortingCriteria( [sessionData.get( "sortBy", "Name" ).strip()] )
 
-
         self._order = sessionData.get("order","down")
 
-        self._display = sessionData.get("disp",[])
-
-        # normalize ?
-        if not isinstance(self._display, list):
-            self._display = [self._display]
-
-        sessionData['filtersActive'] = self._filterUsed;
-        websession.setVar("registrantsFilterAndSortingConf%s"%self._conf.getId(), sessionData)
+        self._display = utils.normalizeToList(sessionData.get("disp",[]))
 
 
     def _process( self ):
@@ -226,7 +252,6 @@ class RHRegistrantListModif( RHRegistrantListModifBase ):
 
 
 class RHRegistrantListModifAction( RHRegistrantListModifBase ):
-
     def _checkParams( self, params ):
         RHRegistrantListModifBase._checkParams(self, params)
         self._selectedRegistrants = self._normaliseListParam(params.get("registrant",[]))
