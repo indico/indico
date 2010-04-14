@@ -201,6 +201,10 @@ def getTalks(conference, oneIsEnough = False, sort = False):
     Logger.get('RecMan').info('cds_indico_pending...')
     cds_indico_pending = MicalaCommunication().getCDSPending(conference.getId(), cds_indico_matches)
 
+    # In case there are any records that were pending and are now appearing in CDS,
+    # then update the micala database accordingly.
+    MicalaCommunication().updateMicalaCDSExport(cds_indico_matches, cds_indico_pending)
+
     Logger.get('RecMan').info("cds_indico_matches: %s, cds_indico_pending: %s" % (cds_indico_matches, cds_indico_pending))
     for event_info in recordable_events:
         try:
@@ -507,6 +511,8 @@ def createCDSRecord(aw, IndicoID, contentType, videoFormat, languages):
     idMachine = MicalaCommunication().getIdMachine(CollaborationTools.getOptionValue("RecordingManager", "micalaDBMachineName"))
     idTask    = MicalaCommunication().getIdTask(CollaborationTools.getOptionValue("RecordingManager", "micalaDBStatusExportCDS"))
     idLecture = MicalaCommunication().getIdLecture(IndicoID, pattern_cern, pattern_umich)
+    if idLecture == '':
+        idLecture = MicalaCommunication().createNewMicalaLecture(IndicoID, contentType, pattern_cern, pattern_umich)
     MicalaCommunication().reportStatus('START', '', idMachine, idTask, idLecture)
 
     # temporary, for my own debugging
@@ -597,6 +603,7 @@ def createIndicoLink(IndicoID, CDSID):
         material.setTitle(CollaborationTools.getOptionValue("RecordingManager", "videoLinkName"))
         videoLink = Link()
         videoLink.setOwner(material)
+#    I don't think this stuff is necessary:
 #        videoLink.setName("Name goes here")
 #        videoLink.setDescription("Description goes here")
         videoLink.setURL(CollaborationTools.getOptionValue("RecordingManager", "CDSBaseURL") % str(CDSID))
@@ -644,6 +651,7 @@ def chooseBGColor(talk):
     This image will be used for the div background.
     """
 
+    # NB: not currently used
     # I might change this later to gray out talks that have already been matched etc.
 
     return "#FFFFFF"

@@ -55,6 +55,9 @@
                         <% if talk["CDSID"] != 'none' and talk["CDSID"] != 'pending': %>
                             <a href="<%= talk["CDSURL"] %>" target="newtab">CDS</a>
                         <% end %>
+                        <% elif talk["CDSID"] == 'pending': %>
+                            pending
+                        <% end %>
                         </div>
                     </td>
                     <td width="50px">

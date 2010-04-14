@@ -20,9 +20,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.services.implementation.collaboration import CollaborationPluginServiceBase
-from MaKaC.plugins.Collaboration.RecordingManager.common import RecordingManagerException,\
-    updateMicala, createCDSRecord, createIndicoLink
-
+from MaKaC.plugins.Collaboration.RecordingManager.exceptions import RecordingManagerException
+from MaKaC.plugins.Collaboration.RecordingManager.common import createIndicoLink, createCDSRecord
+from MaKaC.plugins.Collaboration.RecordingManager.micala import MicalaCommunication
 
 class RMLinkService(CollaborationPluginServiceBase):
 
@@ -38,7 +38,7 @@ class RMLinkService(CollaborationPluginServiceBase):
 
     def _getAnswer(self):
 #        here is where we make a submission to the database?
-        updateMicala(self._params.get('IndicoID', None), self._params.get('LOID', None))
+        MicalaCommunication().updateMicala(self._params.get('IndicoID', None), self._params.get('LOID', None))
         return {'some':'thing'}
 
 class RMCreateCDSRecordService(CollaborationPluginServiceBase):
@@ -72,7 +72,7 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
 
     def _getAnswer(self):
         # Update the micala database
-        resultUpdateMicala = updateMicala(self._IndicoID,
+        resultUpdateMicala = MicalaCommunication().updateMicala(self._IndicoID,
                                           self._contentType,
                                           self._params.get('LOID', None))
 
