@@ -12251,9 +12251,9 @@ class WConfCommonPDFOptions( wcomponents.WTemplated ):
         pagesizeNames.sort()
         pagesizeOptions = []
         for pagesizeName in pagesizeNames:
-            pagesizeOptions.append('<option')
+            pagesizeOptions.append('<option ')
             if pagesizeName == 'A4':
-                pagesizeOptions.append( _("SELECTED"))
+                pagesizeOptions.append('selected="selected"')
             pagesizeOptions.append('>')
             pagesizeOptions.append(pagesizeName)
             pagesizeOptions.append('</option>')
@@ -12262,9 +12262,9 @@ class WConfCommonPDFOptions( wcomponents.WTemplated ):
 
         fontsizeOptions = []
         for fontsizeName in PDFSizes().PDFfontsizes:
-            fontsizeOptions.append('<option')
+            fontsizeOptions.append('<option ')
             if fontsizeName == 'normal':
-                fontsizeOptions.append( _("SELECTED"))
+                fontsizeOptions.append('selected="selected"')
             fontsizeOptions.append('>')
             fontsizeOptions.append(fontsizeName)
             fontsizeOptions.append('</option>')
@@ -12374,9 +12374,9 @@ class WConfModifPosterPDFOptions( wcomponents.WTemplated ):
         pagesizeNames.sort()
         pagesizeOptions = []
         for pagesizeName in pagesizeNames:
-            pagesizeOptions.append('<option')
+            pagesizeOptions.append('<option ')
             if pagesizeName == 'A4':
-                pagesizeOptions.append(" SELECTED")
+                pagesizeOptions.append('selected="selected"')
             pagesizeOptions.append('>')
             pagesizeOptions.append(pagesizeName)
             pagesizeOptions.append('</option>')
