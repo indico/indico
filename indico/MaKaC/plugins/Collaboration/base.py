@@ -600,6 +600,13 @@ class CSBookingManager(Persistent, Observer):
                             problems.append(CSBookingManager._booking2NotifyProblem(booking, modifyResult))
                         elif startDateChanged:
                             self._changeStartDateInIndex(booking, oldBookingStartDate, booking.getStartDate())
+
+                if hasattr(booking, "notifyEventDateChanges"):
+                    try:
+                        booking.notifyEventDateChanges(oldStartDate, newStartDate, oldEndDate, newEndDate)
+                    except Exception, e:
+                        Logger.get('VideoServ').exception("Exception while notifying a plugin of an event date changed: " + str(e))
+
             if problems:
                 ContextManager.get('dateChangeNotificationProblems')['Collaboration'] = [
                     'Some Video Services bookings could not be moved:',
