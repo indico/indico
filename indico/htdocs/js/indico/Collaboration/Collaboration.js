@@ -676,7 +676,7 @@ var checkBookingStatus = function(booking, conferenceId) {
             if (!error) {
                 if (result.error) {
                     killProgress();
-                    codes[booking.type].errorHandler('checkStatus', result);
+                    codes[booking.type].errorHandler('checkStatus', result, booking);
                 } else {
                     refreshBooking(result);
                     if (pluginHasFunction(booking.type, 'postCheckStatus')) {
@@ -811,13 +811,16 @@ var getBookingIndexById = function(id) {
 * Since just changing the object doesn't notify the watchlist of the change, we have to remove and insert it.
 * @param {object} booking A booking object that has to be inside the 'bookings' watchlist.
 */
-var refreshBookingM = function(booking) {
+var refreshBookingM = function(booking, doHighlight) {
+    doHighlight = any(doHighlight, true);
     var index = getBookingIndexById(booking.id);
     hideAllInfoRows(false);
     bookings.removeAt(index);
     bookings.insert(booking, index+"");
     showAllInfoRows(false);
-    hightlightBookingM(booking);
+    if (doHighlight) {
+        hightlightBookingM(booking);
+    }
 };
 
 /**
@@ -1133,7 +1136,7 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
                                         if (result._type === 'CSSanitizationError') {
                                             sanitizationError(result.invalidFields);
                                         } else {
-                                            codes[self.bookingType].errorHandler('edit', result);
+                                            codes[self.bookingType].errorHandler('edit', result, self.booking);
                                         }
                                     } else {
                                         if (pluginHasFunction(self.bookingType, 'postEdit')) {
@@ -1270,7 +1273,7 @@ var removeBooking = function(booking, conferenceId) {
                     // If the server found no problems, we remove the booking from the watchlist and remove the corresponding iframe.
                     if (result && result.error) {
                         killProgress();
-                        codes[booking.type].errorHandler('remove', result);
+                        codes[booking.type].errorHandler('remove', result, booking);
                     } else {
                         hideAllInfoRows(false);
                         bookings.removeAt(getBookingIndexById(booking.id))
@@ -1417,7 +1420,11 @@ var sendRequest = function(pluginName, conferenceId) {
                     if (result._type === 'CSSanitizationError') {
                         sanitizationError(result.invalidFields);
                     } else {
-                        codes[pluginName].errorHandler(exists(singleBookings[pluginName]) ? 'edit' : 'create', result)
+                        if (exists(singleBookings[pluginName])) {
+                            codes[pluginName].errorHandler('edit', result, singleBookings[pluginName]);
+                        } else {
+                            codes[pluginName].errorHandler('create', result);
+                        }
                     }
                 } else {
                  // If the server found no problems, a booking object is returned in the result.
@@ -1510,7 +1517,7 @@ var withdrawRequest = function(pluginName, conferenceId) {
                                 if (result._type === 'CSSanitizationError') {
                                     sanitizationError(result.invalidFields);
                                 } else {
-                                    codes[pluginName].errorHandler('remove', result);
+                                    codes[pluginName].errorHandler('remove', result, singleBookings[pluginName]);
                                 }
                             } else {
                                 // If the server found no problems, we remove the booking from the watchlist and remove the corresponding iframe.
