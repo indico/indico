@@ -99,6 +99,7 @@ var Indico = {
 
         SessionToiCal:  "<%= urlHandlers.UHSessionToiCal.getURL() %>",
         ConfTimeTablePDF: "<%= urlHandlers.UHConfTimeTablePDF.getURL() %>",
+        ConfTimeTableCustomPDF: "<%= urlHandlers.UHConfTimeTableCustomizePDF.getURL() %>",
 
         SessionModification: "<%= urlHandlers.UHSessionModification.getURL() %>",
         ContributionModification: "<%= urlHandlers.UHContributionModification.getURL() %>",

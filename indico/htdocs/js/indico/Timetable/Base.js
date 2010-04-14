@@ -201,6 +201,10 @@ type("DisplayTimeTable", ["TimeTable"], {
         $E(document.body).setStyle('padding', pixels(30));
     },
 
+    pdf: function() {
+        window.location = Indico.Urls.ConfTimeTableCustomPDF + '?confId=' + this.eventInfo.id + '&showDays=all&showSessions=all';
+    },
+
     fullScreen: function() {
         var self = this;
 
@@ -277,6 +281,12 @@ type("DisplayTimeTable", ["TimeTable"], {
             }
         };
 
+        var pdfButton = {'btn': Html.div('buttonWhite', $T('PDF')),
+                'onclick': function(btnContainer) {
+                    self.pdf();
+                }
+        };
+
         var fullScreenButton = {'btn': Html.div('buttonWhite', $T('Full screen')),
                 'onclick': function(btnContainer) {
                     self.fullScreen();
@@ -301,6 +311,7 @@ type("DisplayTimeTable", ["TimeTable"], {
         };
 
         return [printButton,
+                pdfButton,
                 fullScreenButton,
                 this.detailsButton,
                 filterButton];
