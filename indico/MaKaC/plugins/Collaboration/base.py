@@ -541,7 +541,7 @@ class CSBookingManager(Persistent, Observer):
             try:
                 self._changeConfTitleInIndex(booking, oldTitle, newTitle)
             except Exception, e:
-                Logger.get('VideoServ').error("Exception while reindexing a booking in the event title index because its event's title changed: " + str(e))
+                Logger.get('VideoServ').exception("Exception while reindexing a booking in the event title index because its event's title changed: " + str(e))
 
 
     def notifyEventDateChanges(self, oldStartDate = None, newStartDate = None, oldEndDate = None, newEndDate = None):
@@ -654,7 +654,7 @@ class CSBookingManager(Persistent, Observer):
                     Logger.get('VideoServ').warning("Error while deleting a booking of type %s after deleting an event: %s"%(booking.getType(), removeResult.getLogMessage() ))
                 self._unindexBooking(booking)
             except Exception, e:
-                Logger.get('VideoServ').error("Exception while deleting a booking of type %s after deleting an event: %s"%(booking.getType(), str(e) ))
+                Logger.get('VideoServ').exception("Exception while deleting a booking of type %s after deleting an event: %s" % (booking.getType(), str(e)))
 
 
     def getEventDisplayPlugins(self, sorted = False):
@@ -819,6 +819,12 @@ class CSBookingBase(Persistent, Fossilizable):
         """ Sets the internal, per-conference id of the booking
         """
         self._id = id
+
+    def getUniqueId(self):
+        """ Returns an unique Id that identifies this booking server-wide.
+            Useful for ExternalOperationsManager
+        """
+        return "%scsbook%s" % (self.getConference().getUniqueId(), self.getId())
 
     def getType(self):
         """ Returns the type of the booking, as a string: "EVO", "DummyPlugin"
