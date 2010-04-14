@@ -12714,22 +12714,22 @@ class DeletedObjectHolder(ObjectHolder):
 
     def get_earliest_datestamp(self):
         date = []
-        idxConf = indexes.IndexesHolder().getConferenceDateIndex(private=True)
+        idxConf = DeletedObjectHolder.getConferenceDateIndex(private=True)
         d = idxConf.getLowerIndex()
         if d:
             date.append(d)
 
-        idxCont = indexes.IndexesHolder().getContributionDateIndex(private=True)
+        idxCont = DeletedObjectHolder.getContributionDateIndex(private=True)
         d = idxCont.getLowerIndex()
         if d:
             date.append(d)
 
-        idxConf = indexes.IndexesHolder().getConferenceDateIndex(private=False)
+        idxConf = DeletedObjectHolder.getConferenceDateIndex(private=False)
         d = idxConf.getLowerIndex()
         if d:
             date.append(d)
 
-        idxCont = indexes.IndexesHolder().getContributionDateIndex(private=False)
+        idxCont = DeletedObjectHolder.getContributionDateIndex(private=False)
         d = idxCont.getLowerIndex()
         if d:
             date.append(d)
