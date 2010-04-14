@@ -28,7 +28,7 @@
                                  'subcontribution': "&nbsp;&nbsp;&nbsp;SC&nbsp;"}[talk["type"]] %></b></tt>
                         <%= talk["titleshort"] %><br />&nbsp;
 -->
-                        <div id="div<%= IndicoID %>" class="RMtalkDisplay" onclick="RMtalkSelect('<%= IndicoID %>')" onmouseover="RMtalkBoxOnHover('<%= IndicoID %>');" onmouseout="RMtalkBoxOffHover('<%= IndicoID %>');" style="background-color: <%= talk["bg"] %>">
+                        <div id="div<%= IndicoID %>" class="RMtalkDisplay" onclick="RMtalkSelect('<%= IndicoID %>')" onmouseover="RMtalkBoxOnHover('<%= IndicoID %>');" onmouseout="RMtalkBoxOffHover('<%= IndicoID %>');">
                             <tt><b><%= {'conference':      "E&nbsp;",
                                      'session':         "S&nbsp;&nbsp;",
                                      'contribution':    "C&nbsp;&nbsp;&nbsp;",
@@ -92,16 +92,16 @@
                                 box:  <%= orphan["box"]  %>
                             </td>
                             <td width="70%" align="right">
-                                <img src="http://lectureprocessing01.cern.ch/previews/<%= LOID %>/video0001.jpg">
-                                <img src="http://lectureprocessing01.cern.ch/previews/<%= LOID %>/video0002.jpg"><br />
+                                <img src="<%= PreviewURL %><%= LOID %>/video0001.jpg">
+                                <img src="<%= PreviewURL %><%= LOID %>/video0002.jpg"><br />
                             </td>
                         </tr>
                         <tr width="100%">
                             <td width="100%" colspan="2">
-                            <img src="http://lectureprocessing01.cern.ch/previews/<%= LOID %>/content0001.jpg">
-                            <img src="http://lectureprocessing01.cern.ch/previews/<%= LOID %>/content0002.jpg">
-                            <img src="http://lectureprocessing01.cern.ch/previews/<%= LOID %>/content0003.jpg">
-                            <img src="http://lectureprocessing01.cern.ch/previews/<%= LOID %>/content0004.jpg">
+                            <img src="<%= PreviewURL %><%= LOID %>/content0001.jpg">
+                            <img src="<%= PreviewURL %><%= LOID %>/content0002.jpg">
+                            <img src="<%= PreviewURL %><%= LOID %>/content0003.jpg">
+                            <img src="<%= PreviewURL %><%= LOID %>/content0004.jpg">
                             </td>
                         </tr>
                     </table>

@@ -80,22 +80,7 @@ class WNewBookingForm(WCSPageTemplateBase):
         talks = getTalks(self._conf, sort = True)
         vars["Talks"] = talks
         vars["Conference"] = self._conf
-
-        from MaKaC.export.oai2 import DataInt, XMLGen
-
-        # I don't understand what the following lines do. Pedro did this for me.
-        xmlGen = XMLGen()
-        di = DataInt(xmlGen)
-        og = outputGenerator(self._rh.getAW(), dataInt=di)
-
-        vars["selftype"] = type(self)
-
-        xmlGen.openTag("iconf")
-        og.confToXMLMarc21(self._conf, 1, 1, 1, forceCache=True, out=xmlGen)
-        xmlGen.closeTag("iconf")
-
-        vars["marcxml"] = xmlGen.getXml()
-
+        vars["PreviewURL"] = CollaborationTools.getOptionValue("RecordingManager", "micalaPreviewURL")
         vars["LanguageList"] = languageList
 
         return vars

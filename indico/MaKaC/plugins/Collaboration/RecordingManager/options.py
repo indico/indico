@@ -106,7 +106,13 @@ globalOptions = [
                "editable": True,
                "visible": True} ),
 
-    ("CDSQueryUrl", {"description" : _("CDS query URL"),
+    ("micalaPreviewURL", {"description" : _("URL for web directory containing lecture object previews"),
+               "type": str,
+               "defaultValue": "http://lectureprocessing01.cern.ch/previews",
+               "editable": True,
+               "visible": True} ),
+
+    ("CDSQueryURL", {"description" : _("CDS query URL"),
                "type": str,
                "defaultValue": "http://cdsweb.cern.ch/search?p=sysno%%3A%%22INDICO.%s%%22&f=&action_search=Search&sf=&so=d&rm=&rg=1000&sc=1&ot=970&of=t&ap=0",
                "editable": True,
