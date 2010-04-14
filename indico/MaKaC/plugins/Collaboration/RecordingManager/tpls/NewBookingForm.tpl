@@ -7,7 +7,7 @@
 
 <table>
   <tr>
-    <td width="440px" valign="top">
+    <td width="590px" valign="top">
         <b>1. <%= _("Select a record:") %></b>
         <br /> <!-- line breaks to make the pretty boxes below to line up -->
         <br />
@@ -16,7 +16,7 @@
         <div class="RMMatchPane">
             <% for talk in Talks: %>
                 <% IndicoID = talk["IndicoID"] %>
-                <div id="div<%= IndicoID %>" class="RMtalkDisplay" onclick="RMtalkSelect('<%= IndicoID %>')" onmouseover="RMtalkBoxOnHover('<%= IndicoID %>');" onmouseout="RMtalkBoxOffHover('<%= IndicoID %>');" style="background-image: url(<%= talk["bg"] %>)">
+
                   <span>
                     <table cellspacing="0" cellpadding="0" border="0">
                     <tr>
@@ -28,23 +28,44 @@
                                  'subcontribution': "&nbsp;&nbsp;&nbsp;SC&nbsp;"}[talk["type"]] %></b></tt>
                         <%= talk["titleshort"] %><br />&nbsp;
 -->
-                        <tt><b><%= {'conference':      "E&nbsp;",
-                                 'session':         "S&nbsp;&nbsp;",
-                                 'contribution':    "C&nbsp;&nbsp;&nbsp;",
-                                 'subcontribution': "SC&nbsp;&nbsp;&nbsp;&nbsp;"}[talk["type"]] %></b></tt>
-                        <%= talk["titleshort"] %><br />&nbsp;
-                        <tt><%= {'conference':      "&nbsp;&nbsp;",
-                                 'session':         "&nbsp;&nbsp;&nbsp;",
-                                 'contribution':    "&nbsp;&nbsp;&nbsp;&nbsp;",
-                                 'subcontribution': "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"}[talk["type"]] %></b></tt>
-                        <% if talk["speakers"] != '': %>
-                        <%=    talk["speakers"] %>
+                        <div id="div<%= IndicoID %>" class="RMtalkDisplay" onclick="RMtalkSelect('<%= IndicoID %>')" onmouseover="RMtalkBoxOnHover('<%= IndicoID %>');" onmouseout="RMtalkBoxOffHover('<%= IndicoID %>');" style="background-color: <%= talk["bg"] %>">
+                            <tt><b><%= {'conference':      "E&nbsp;",
+                                     'session':         "S&nbsp;&nbsp;",
+                                     'contribution':    "C&nbsp;&nbsp;&nbsp;",
+                                     'subcontribution': "SC&nbsp;&nbsp;&nbsp;&nbsp;"}[talk["type"]] %></b></tt>
+                            <%= talk["titleshort"] %><br />&nbsp;
+                            <tt><%= {'conference':      "&nbsp;&nbsp;",
+                                     'session':         "&nbsp;&nbsp;&nbsp;",
+                                     'contribution':    "&nbsp;&nbsp;&nbsp;&nbsp;",
+                                     'subcontribution': "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"}[talk["type"]] %></b></tt>
+                            <% if talk["speakers"] != '': %>
+                            <%=    talk["speakers"] %>
+                            <% end %>
+                        </div>
+                    </td>
+                    <td width="50px">
+                        <div id="columnMicala">
+                        <% if talk["LOID"] != '': %>
+                            micala
+                        <% end %>
+                        </div>
+                    </td>
+                    <td width="50px">
+                        <div id="columnCDS">
+                        <% if talk["CDSID"] != 'none' and talk["CDSID"] != 'pending': %>
+                            <a href="<%= talk["CDSURL"] %>" target="newtab">CDS</a>
+                        <% end %>
+                        </div>
+                    </td>
+                    <td width="50px">
+                        <div id="columnIndicoLink">
+                        <% if talk["IndicoLink"] == True: %>
+                            Link
                         <% end %>
                     </td>
                     </tr>
                     </table>
                     </span>
-                </div>
             <% end %>
         </div>
         </div>
@@ -182,6 +203,7 @@
         "title":      "<%= talk["title"]      %>",
         "titleshort": "<%= talk["titleshort"] %>",
         "CDSID":      "<%= talk["CDSID"]      %>",
+        "CDSURL":     "<%= talk["CDSURL"]     %>",
         "type":       "<%= talk["type"]       %>",
         "speakers":   "<%= talk["speakers"]   %>",
         "date":       "<%= talk["date"]       %>",

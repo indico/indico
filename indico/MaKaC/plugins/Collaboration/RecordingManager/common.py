@@ -19,15 +19,13 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.plugins.Collaboration.base import CollaborationServiceException,\
-    CSErrorBase
+from MaKaC.plugins.Collaboration.base import CSErrorBase
+from MaKaC.plugins.Collaboration.RecordingManager.exceptions import RecordingManagerException
 from MaKaC.common.PickleJar import Retrieves
 from MaKaC.webinterface.common.contribFilters import PosterFilterField
-from MaKaC.conference import Contribution, ConferenceHolder
+from MaKaC.conference import ConferenceHolder, Contribution, Session
 import MySQLdb
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
-from MaKaC.conference import Contribution
-from MaKaC.conference import Session
 
 from MaKaC.common.logger import Logger
 
@@ -42,6 +40,7 @@ from urllib2 import Request, urlopen
 import re
 import os
 import sys
+from MaKaC.plugins.Collaboration.RecordingManager.micala import MicalaCommunication
 
 # If you want to add more languages,
 # use the MARC language codes http://www.loc.gov/marc/languages
@@ -76,6 +75,8 @@ def getTalks(conference, oneIsEnough = False, sort = False):
                      it will then return a list with a single element
         sort: if True, contributions are sorted by start date (non scheduled contributions at the end)
     """
+
+    Logger.get('RecMan').info('in getTalks()')
 
     # max length for title string
     title_length = 39
@@ -197,17 +198,25 @@ def getTalks(conference, oneIsEnough = False, sort = False):
 
     # Get list of matching IndicoIDs and CDS records from CDS
     cds_indico_matches = getCDSRecords(conference.getId())
+    Logger.get('RecMan').info('cds_indico_pending...')
+    cds_indico_pending = MicalaCommunication().getCDSPending(conference.getId(), cds_indico_matches)
 
+    Logger.get('RecMan').info("cds_indico_matches: %s, cds_indico_pending: %s" % (cds_indico_matches, cds_indico_pending))
     for event_info in recordable_events:
         try:
-            event_info["CDSID"] = cds_indico_matches[event_info["IndicoID"]]
+            event_info["CDSID"]     = cds_indico_matches[event_info["IndicoID"]]
+            event_info["CDSURL"]    = CollaborationTools.getOptionValue("RecordingManager", "CDSBaseURL") % event_info["CDSID"]
         except KeyError:
-            event_info["CDSID"] = ""
-            pass
-
+            Logger.get('RecMan').info("caught Got KeyError for %s" % event_info["title"])
+            if cds_indico_pending is not None and event_info["IndicoID"] in set(cds_indico_pending):
+                event_info["CDSID"]  = 'pending'
+                event_info["CDSURL"] = ""
+            else:
+                event_info["CDSID"]  = "none"
+                event_info["CDSURL"] = ""
 
     # Get list of matching IndicoID's and LOIDs from the Micala database
-    existing_matches = getMatches(conference.getId())
+    existing_matches = MicalaCommunication().getMatches(conference.getId())
 
     # insert any existing matches into the recordable_events array
     for talk in recordable_events:
@@ -221,10 +230,12 @@ def getTalks(conference, oneIsEnough = False, sort = False):
 
     # Now that we have all the micala, CDS and IndicoLink info, set up the bg images
     for talk in recordable_events:
-        talk["bg"]         = chooseBGImage(talk)
+        talk["bg"]         = chooseBGColor(talk)
 
     # Next, sort the list of events by startDate for display purposes
     recordable_events.sort(startTimeCompare)
+
+    Logger.get('RecMan').info('leaving getTalks()')
 
     return recordable_events
 
@@ -280,6 +291,32 @@ def generateIndicoID(conference     = None,
 
     return IndicoID
 
+def getOrphans():
+    """Get list of Lecture Objects in the database that have no IndicoID assigned"""
+
+    try:
+        connection = MySQLdb.connect(host   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBServer"),
+                                     port   = int(CollaborationTools.getOptionValue("RecordingManager", "micalaDBPort")),
+                                     user   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBReaderUser"),
+                                     passwd = CollaborationTools.getOptionValue("RecordingManager", "micalaDBReaderPW"),
+                                     db     = CollaborationTools.getOptionValue("RecordingManager", "micalaDBName"))
+    except MySQLdb.Error, e:
+        raise RecordingManagerException("MySQL database error %d: %s" % (e.args[0], e.args[1]))
+
+    cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+    cursor.execute("SELECT id, LOID, IndicoID, Title, Creator FROM Lectures WHERE NOT IndicoID")
+    connection.commit()
+    rows = cursor.fetchall()
+    cursor.close()
+    connection.close()
+
+    for lecture in rows:
+        lecture["time"] = formatLOID(lecture["LOID"])[0]
+        lecture["date"] = formatLOID(lecture["LOID"])[1]
+        lecture["box"]  = formatLOID(lecture["LOID"])[2]
+
+    return (rows)
+
 def parseIndicoID(IndicoID):
     """Given an "Indico ID" of the form shown above, determine whether it is
     a conference, subcontribution etc, and return that info with the individual IDs."""
@@ -334,92 +371,15 @@ def parseIndicoID(IndicoID):
     else:
         return None
 
-def getMatches(confID):
-    """For the current conference, get list from the database of IndicoID's already matched to Lecture Object."""
-
-    try:
-        connection = MySQLdb.connect(host   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBServer"),
-                                     port   = int(CollaborationTools.getOptionValue("RecordingManager", "micalaDBPort")),
-                                     user   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBReaderUser"),
-                                     passwd = CollaborationTools.getOptionValue("RecordingManager", "micalaDBReaderPW"),
-                                     db     = CollaborationTools.getOptionValue("RecordingManager", "micalaDBName"))
-    except MySQLdb.Error, e:
-        raise RecordingManagerException("MySQL database error %d: %s" % (e.args[0], e.args[1]))
-
-    cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
-    cursor.execute('''SELECT IndicoID, LOID FROM Lectures WHERE IndicoID LIKE "%s%%"''' % confID)
-    connection.commit()
-    rows = cursor.fetchall()
-    cursor.close()
-    connection.close()
-
-    match_array = {}
-    for row in rows:
-        match_array[row["IndicoID"]] = row["LOID"]
-
-    return (match_array)
-
-def getOrphans():
-    """Get list of Lecture Objects in the database that have no IndicoID assigned"""
-
-    try:
-        connection = MySQLdb.connect(host   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBServer"),
-                                     port   = int(CollaborationTools.getOptionValue("RecordingManager", "micalaDBPort")),
-                                     user   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBReaderUser"),
-                                     passwd = CollaborationTools.getOptionValue("RecordingManager", "micalaDBReaderPW"),
-                                     db     = CollaborationTools.getOptionValue("RecordingManager", "micalaDBName"))
-    except MySQLdb.Error, e:
-        raise RecordingManagerException("MySQL database error %d: %s" % (e.args[0], e.args[1]))
-
-    cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
-    cursor.execute("SELECT id, LOID, IndicoID, Title, Creator FROM Lectures WHERE NOT IndicoID")
-    connection.commit()
-    rows = cursor.fetchall()
-    cursor.close()
-    connection.close()
-
-    for lecture in rows:
-        lecture["time"] = formatLOID(lecture["LOID"])[0]
-        lecture["date"] = formatLOID(lecture["LOID"])[1]
-        lecture["box"]  = formatLOID(lecture["LOID"])[2]
-
-    return (rows)
-
-def updateMicala(IndicoID, contentType, LOID):
-    """Submit Indico ID to the micala DB"""
-
-#    Logger.get('RecMan').exception("inside updateMicala.")
-
-    if contentType == 'web_lecture':
-        try:
-            connection = MySQLdb.connect(host   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBServer"),
-                                         port   = int(CollaborationTools.getOptionValue("RecordingManager", "micalaDBPort")),
-                                         user   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBUser"),
-                                         passwd = CollaborationTools.getOptionValue("RecordingManager", "micalaDBPW"),
-                                         db     = CollaborationTools.getOptionValue("RecordingManager", "micalaDBName"))
-        except MySQLdb.Error, e:
-            raise RecordingManagerException("MySQL database error %d: %s" % (e.args[0], e.args[1]))
-
-        cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
-
-        try:
-            cursor.execute("UPDATE Lectures SET IndicoID=%s WHERE id=%s",
-                           (IndicoID, LOID))
-            connection.commit()
-        except MySQLdb.Error, e:
-            raise RecordingManagerException("MySQL database error %d: %s" % (e.args[0], e.args[1]))
-
-        cursor.close()
-        connection.close()
-
-    elif contentType == 'plain_video':
-        # Should update the database here as well.
-        # first need to backup the DB, create a new column called contentType
-        # (I already created this column in micala.sql, just need to recreate DB from this file)
-        pass
-
 def createCDSRecord(aw, IndicoID, contentType, videoFormat, languages):
     '''Retrieve a MARC XML string for the given conference, then package it up and send it to CDS.'''
+
+# I need to break this up into 2 functions: one to simply get the MARC XML,
+# and another one to retrieve that and submit it to CDS.
+# Then I need another function to get the MARC XML (or even just the base xml, not sure)
+# and somehow submit the metadata to micala. I don't know how to handle the submission yet.
+# Also I guess I will need to create XSL file(s) for lecture.xml / metadata.xml
+#
 
     # Incantation to initialize XML that I don't fully understand
     xmlGen = XMLGen()
@@ -533,6 +493,21 @@ def createCDSRecord(aw, IndicoID, contentType, videoFormat, languages):
     else:
         outputData = basexml
 
+    # pattern to match for the signal file
+    # Here we are looking for
+    # CONFID
+    # or CONFIDcCONTRID
+    # or CONFIDcCONTRIDscSCONTRID
+    # or CONFIDsSESSID
+    pattern_cern  = re.compile('([sc\d]+)$')
+    # Here we are looking for YYYYMMDD-DEVICENAME-HHMMSS
+    pattern_umich = re.compile('(\d+\-[\w\d]+\-\d)$')
+
+    # Update the micala database with our current task
+    idMachine = MicalaCommunication().getIdMachine(CollaborationTools.getOptionValue("RecordingManager", "micalaDBMachineName"))
+    idTask    = MicalaCommunication().getIdTask(CollaborationTools.getOptionValue("RecordingManager", "micalaDBStatusExportCDS"))
+    idLecture = MicalaCommunication().getIdLecture(IndicoID, pattern_cern, pattern_umich)
+    MicalaCommunication().reportStatus('START', '', idMachine, idTask, idLecture)
 
     # temporary, for my own debugging
     f = open('/tmp/base.xml', 'w')
@@ -551,6 +526,8 @@ def createCDSRecord(aw, IndicoID, contentType, videoFormat, languages):
 def getCDSRecords(confId):
     '''Query CDS to see if it has an entry for the given event as well as all its sessions, contributions and subcontributions.
     If yes return a dictionary pairing CDS IDs with Indico IDs.'''
+
+    # Also, this method should then make sure that the database Status table has been updated to show that the export to CDS task is complete
 
     # Slap a wildcard on the end of the ID to find the conference itself as well as all children.
     id_plus_wildcard = confId + "*"
@@ -598,6 +575,7 @@ def getCDSRecords(confId):
 #            results.append({"CDSID": CDSID, "IndicoID": IndicoID})
 
     return results
+
 
 def createIndicoLink(IndicoID, CDSID):
     """Create a link in Indico to the CDS record."""
@@ -660,28 +638,15 @@ def formatLOID(LOID):
 
     return(time, date, recording_device)
 
-def chooseBGImage(talk):
+def chooseBGColor(talk):
     """Given a talk dictionary, check if it has an LOID, CDS record, and IndicoLink.
     Pick the appropriate image RecordingManagerNNN.png to match that.
     This image will be used for the div background.
     """
 
-    if talk["LOID"] != '':
-        flagLOID = '1'
-    else:
-        flagLOID = '0'
+    # I might change this later to gray out talks that have already been matched etc.
 
-    if talk["CDSID"] != '':
-        flagCDS = '1'
-    else:
-        flagCDS = '0'
-
-    if talk["IndicoLink"] == True:
-        flagIndicoLink = '1'
-    else:
-        flagIndicoLink = '0'
-
-    return "/indico/images/RecordingManager%s%s%s.png" % (flagLOID, flagCDS, flagIndicoLink)
+    return "#FFFFFF"
 
 class RecordingManagerError(CSErrorBase):
     def __init__(self, operation, inner):
@@ -709,6 +674,3 @@ class RecordingManagerError(CSErrorBase):
     def getLogMessage(self):
         return "Recording Request error for operation: " + str(self._operation) + ", inner exception: " + str(self._inner)
 
-
-class RecordingManagerException(CollaborationServiceException):
-    pass

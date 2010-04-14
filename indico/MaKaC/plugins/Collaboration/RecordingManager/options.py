@@ -88,6 +88,24 @@ globalOptions = [
                "editable": True,
                "visible": True} ),
 
+    ("micalaDBMachineName", {"description" : _("The host name of this machine"),
+               "type": str,
+               "defaultValue": "indico.cern.ch",
+               "editable": True,
+               "visible": True} ),
+
+    ("micalaDBStatusExportCDS", {"description" : _("DB status message for CDS export"),
+               "type": str,
+               "defaultValue": "metadata export to CDS",
+               "editable": True,
+               "visible": True} ),
+
+    ("micalaDBStatusExportMicala", {"description" : _("DB status message for micala export"),
+               "type": str,
+               "defaultValue": "metadata export to micala",
+               "editable": True,
+               "visible": True} ),
+
     ("CDSQueryUrl", {"description" : _("CDS query URL"),
                "type": str,
                "defaultValue": "http://cdsweb.cern.ch/search?p=sysno%%3A%%22INDICO.%s%%22&f=&action_search=Search&sf=&so=d&rm=&rg=1000&sc=1&ot=970&of=t&ap=0",
