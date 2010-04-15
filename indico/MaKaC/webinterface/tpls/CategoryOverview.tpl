@@ -11,7 +11,7 @@
     <table width = "100%%" cellSpacing="3px" cellPadding="2px">
         <tbody>
             <tr>
-                <td valign="top">
+                <td valign="top" style="width: 210px;">
                     <div style="margin-top: 30px; float: none; width: 100%%" class="sideBar clearfix">
                         <div class="leftCorner"></div>
                         <div class="rightCorner"></div>
