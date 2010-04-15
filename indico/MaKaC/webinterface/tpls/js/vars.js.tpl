@@ -75,7 +75,8 @@ var Indico = {
         warning_yellow: "<%= iconFileName("warning_yellow")%>",
         arrow_up: "<%= iconFileName("upArrow")%>",
         arrow_down: "<%= iconFileName("downArrow")%>",
-        indico_small: "<%= iconFileName("indico_small")%>"
+        indico_small: "<%= iconFileName("indico_small")%>",
+        protected: "<%= iconFileName("protected")%>"
     },
     FileTypeIcons:
         <%= simplejson.dumps(dict((k.lower(),v[2]) for k,v in config.getFileTypes().iteritems())) %>
