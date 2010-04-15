@@ -5882,3 +5882,23 @@ div.cloneElements {
 .filterTable {
     border-collapse: collapse;
 }
+
+.eventActionsToolBarLabel {
+    padding:3px 7px 5px;
+    -moz-border-radius-topright: 5px;
+    -moz-border-radius-topleft: 5px;
+    border: 1px solid #AAA;
+    border-bottom: 0px;
+    background-color: #fff;
+    font-size:8pt;
+}
+
+.eventActionsToolBarButtons {
+    padding:4px;
+    border: 1px solid #AAA;
+    border-top:0px;
+    -moz-border-radius-bottomright: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    background-color: #fff;
+    height: 24px;
+}
