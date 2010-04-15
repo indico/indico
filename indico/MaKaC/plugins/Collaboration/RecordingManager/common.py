@@ -36,6 +36,7 @@ from MaKaC.common.output import outputGenerator, XSLTransformer
 from MaKaC.conference import Link
 from MaKaC import conference
 
+from urllib import urlencode
 from urllib2 import Request, urlopen
 import re
 import os
@@ -375,15 +376,9 @@ def parseIndicoID(IndicoID):
     else:
         return None
 
-def createCDSRecord(aw, IndicoID, contentType, videoFormat, languages):
-    '''Retrieve a MARC XML string for the given conference, then package it up and send it to CDS.'''
 
-# I need to break this up into 2 functions: one to simply get the MARC XML,
-# and another one to retrieve that and submit it to CDS.
-# Then I need another function to get the MARC XML (or even just the base xml, not sure)
-# and somehow submit the metadata to micala. I don't know how to handle the submission yet.
-# Also I guess I will need to create XSL file(s) for lecture.xml / metadata.xml
-#
+def getBasicXMLRepresentation(aw, IndicoID, contentType, videoFormat, languages):
+    '''Generate the basic XML that is to be transformed using one of the XSL files.'''
 
     # Incantation to initialize XML that I don't fully understand
     xmlGen = XMLGen()
@@ -473,11 +468,26 @@ def createCDSRecord(aw, IndicoID, contentType, videoFormat, languages):
     xmlGen.closeTag("event")
 
     # Get base XML
-    basexml = xmlGen.getXml()
+    return xmlGen.getXml()
+
+def createCDSRecord(aw, IndicoID, contentType, videoFormat, languages):
+    '''Retrieve a MARC XML string for the given conference, then package it up and send it to CDS.'''
+
+# I need to break this up into 2 functions: one to simply get the MARC XML,
+# and another one to retrieve that and submit it to CDS.
+# Then I need another function to get the MARC XML (or even just the base xml, not sure)
+# and somehow submit the metadata to micala. I don't know how to handle the submission yet.
+# Also I guess I will need to create XSL file(s) for lecture.xml / metadata.xml
+#
+
+    basexml = getBasicXMLRepresentation(aw, IndicoID, contentType, videoFormat, languages)
 
     from MaKaC.common import Config
 
-    outputData = ""
+    marcxml = ""
+
+    # Given the IndicoID, retrieve the type of talk and IDs, so we know which XSL file to use.
+    parsed = parseIndicoID(IndicoID)
 
     # Choose the appropriate stylesheet:
     # - cds_marcxml_video_conference.xsl
@@ -491,11 +501,11 @@ def createCDSRecord(aw, IndicoID, contentType, videoFormat, languages):
         try:
             Logger.get('RecMan').info("Trying to do XSLT using path %s" % stylePath)
             parser = XSLTransformer(stylePath)
-            outputData = parser.process(basexml)
+            marcxml = parser.process(basexml)
         except:
-            outputData = "Cannot parse stylesheet: %s" % sys.exc_info()[0]
+            marcxml = "Cannot parse stylesheet: %s" % sys.exc_info()[0]
     else:
-        outputData = basexml
+        marcxml = basexml
 
     # pattern to match for the signal file
     # Here we are looking for
@@ -507,7 +517,7 @@ def createCDSRecord(aw, IndicoID, contentType, videoFormat, languages):
     # Here we are looking for YYYYMMDD-DEVICENAME-HHMMSS
     pattern_umich = re.compile('(\d+\-[\w\d]+\-\d)$')
 
-    # Update the micala database with our current task
+    # Update the micala database with our current task status
     idMachine = MicalaCommunication().getIdMachine(CollaborationTools.getOptionValue("RecordingManager", "micalaDBMachineName"))
     idTask    = MicalaCommunication().getIdTask(CollaborationTools.getOptionValue("RecordingManager", "micalaDBStatusExportCDS"))
     idLecture = MicalaCommunication().getIdLecture(IndicoID, pattern_cern, pattern_umich)
@@ -522,12 +532,26 @@ def createCDSRecord(aw, IndicoID, contentType, videoFormat, languages):
 
     # temporary, for my own debugging
     f = open('/tmp/marc.xml', 'w')
-    f.write(outputData)
+    f.write(marcxml)
     f.close()
 
-    # Next step: submit this marc xml to CDS
+    # Submit MARC XML record to CDS
+    data = urlencode({
+        "file": marcxml,
+        "mode": "-ir"
+    })
+    headers = {"User-Agent": "invenio_webupload"}
+    req = Request(CollaborationTools.getOptionValue("RecordingManager", "CDSUploadURL"), data, headers)
+    f = urlopen(req)
 
-    return True
+    result = f.read()
+
+    # temporary, for my own debugging
+    f = open('/tmp/cds_result.txt', 'w')
+    f.write(result)
+    f.close()
+
+    return result
 
 def getCDSRecords(confId):
     '''Query CDS to see if it has an entry for the given event as well as all its sessions, contributions and subcontributions.
@@ -535,14 +559,15 @@ def getCDSRecords(confId):
 
     # Also, this method should then make sure that the database Status table has been updated to show that the export to CDS task is complete
 
+    Logger.get('RecMan').info('in getCDSRecords()')
+
     # Slap a wildcard on the end of the ID to find the conference itself as well as all children.
     id_plus_wildcard = confId + "*"
 
     # Here is a help page describing the GET args,
     # if this CDS query needs to be changed (thanks jerome.caffaro@cern.ch):
     # http://invenio-demo.cern.ch/help/hacking/search-engine-api
-    url = "http://cdsweb.cern.ch/search?p=sysno%%3A%%22INDICO.%s%%22&f=&action_search=Search&sf=&so=d&rm=&rg=1000&sc=1&ot=970&of=t&ap=0" \
-        % (id_plus_wildcard)
+    url = CollaborationTools.getOptionValue("RecordingManager", "CDSQueryURL") % id_plus_wildcard
 
     # This dictionary will contain CDS ID's, referenced by Indico ID's
     results = {}
@@ -561,7 +586,7 @@ def getCDSRecords(confId):
 
     # Read each line, extracting the IndicoIDs and their corresponding CDS IDs
     for line in lines:
-        print line,
+        Logger.get('RecMan').info(" CDS query result: %s" % line)
         result = line.strip()
         if result != "":
 

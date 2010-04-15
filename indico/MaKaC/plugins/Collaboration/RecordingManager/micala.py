@@ -274,7 +274,7 @@ class MicalaCommunication():
 
         talk_array = []
         for row in rows:
-            Logger.get('RecMan').info("Started CDS export for: %s" % row["IndicoID"])
+            Logger.get('RecMan').info(" CDS export pending for: %s" % row["IndicoID"])
             talk_array.append(row["IndicoID"])
 
         return talk_array
@@ -285,14 +285,15 @@ class MicalaCommunication():
         cds_indico_pending is a list of IndicoIDs.'''
 
         for pending in cds_indico_pending:
+            Logger.get('RecMan').info('Looping through cds_indico_pending: %s' % pending)
             try:
                 new_record = cds_indico_matches[pending]
-                idMachine = self().getIdMachine(CollaborationTools.getOptionValue("RecordingManager", "micalaDBMachineName"))
-                idTask    = self().getIdTask(CollaborationTools.getOptionValue("RecordingManager", "micalaDBStatusExportCDS"))
+                idMachine = self.getIdMachine(CollaborationTools.getOptionValue("RecordingManager", "micalaDBMachineName"))
+                idTask    = self.getIdTask(CollaborationTools.getOptionValue("RecordingManager", "micalaDBStatusExportCDS"))
                 import re
                 pattern_cern  = re.compile('([sc\d]+)$')
                 pattern_umich = re.compile('(\d+\-[\w\d]+\-\d)$')
-                idLecture = self().getIdLecture(pending, pattern_cern, pattern_umich)
+                idLecture = self.getIdLecture(pending, pattern_cern, pattern_umich)
                 self.reportStatus("COMPLETE", "CDS record: %s" % new_record, idMachine, idTask, idLecture)
 
                 # I should still update the Lectures table to add the CDS record

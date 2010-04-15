@@ -114,13 +114,19 @@ globalOptions = [
 
     ("CDSQueryURL", {"description" : _("CDS query URL"),
                "type": str,
-               "defaultValue": "http://cdsweb.cern.ch/search?p=sysno%%3A%%22INDICO.%s%%22&f=&action_search=Search&sf=&so=d&rm=&rg=1000&sc=1&ot=970&of=t&ap=0",
+               "defaultValue": '''http://cdsdev.cern.ch/search?p=sysno:"INDICO.%s"&f=&action_search=Search&sf=&so=d&rm=&rg=1000&sc=1&ot=970&of=t&ap=0''',
                "editable": True,
                "visible": True} ),
 
     ("CDSBaseURL", {"description" : _("Base URL for CDS record"),
                "type": str,
                "defaultValue": "http://cdsweb.cern.ch/record/%s",
+               "editable": True,
+               "visible": True} ),
+
+    ("CDSUploadURL", {"description" : _("URL for CDS web upload"),
+               "type": str,
+               "defaultValue": "http://cdsdev.cern.ch/webupload.py",
                "editable": True,
                "visible": True} ),
 
