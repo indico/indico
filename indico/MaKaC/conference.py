@@ -5601,10 +5601,10 @@ class Session(Persistent):
         if id == "not assigned":
             newSlot.setId(str(self.__slotGenerator.newCount()))
         self.slots[newSlot.getId()]=newSlot
+        self.fit()
         self.getSchedule().addEntry(newSlot.getSessionSchEntry(),2)
         if self.getConference() is not None:
             self.getConference().getSchedule().addEntry(newSlot.getConfSchEntry(),2)
-        self.fit()
         self.notifyModification()
 
     def _removeSlot(self,slot):
@@ -5956,9 +5956,9 @@ class Session(Persistent):
             self.verifyStartDate(newDate,check)
         oldSdate = self.getStartDate()
         try:
-           tz = str(self.getStartDate().tzinfo)
+            tz = str(self.getStartDate().tzinfo)
         except:
-           tz = 'UTC'
+            tz = 'UTC'
         diff = newDate - oldSdate
         self.startDate=copy.copy(newDate)
         if moveEntries == 1 and diff is not None and diff != timedelta(0):
@@ -5970,14 +5970,14 @@ class Session(Persistent):
                 entries = self.getSchedule().getEntriesOnDay(newDateTz)[:]
             self.getSchedule().moveEntriesBelow(diff, entries)
 
-        if self.getConference() and \
+        if moveEntries != 0 and self.getConference() and \
                not self.getConference().getEnableSessionSlots() and \
                self.getSlotList() != [] and \
-               self.getSlotList()[0].getStartDate() != newDate and \
-               moveEntries != 0:
+               self.getSlotList()[0].getStartDate() != newDate:
             self.getSlotList()[0].startDate = newDate
+
         if check == 1:
-           self._checkInnerSchedule()
+            self._checkInnerSchedule()
         self.notifyModification()
 
     def _checkInnerSchedule( self ):
@@ -6849,10 +6849,9 @@ class SessionSlot(Persistent):
         slot = SessionSlot(session)
         slot.session = session
         slot.setTitle(self.getTitle())
-
-        timeDifference = session.getStartDate() - self.getSession().getStartDate()
+        timeDifference = session.getConference().getStartDate() - self.getSession().getConference().getStartDate()
         slot.setStartDate(self.getStartDate() + timeDifference)
-        slot.setDuration(dur=self.getDuration())
+        slot.setDuration(dur=self.getDuration(), check=2)
 
         #places
         if self.getOwnLocation() is not None:
@@ -7162,12 +7161,14 @@ class SessionSlot(Persistent):
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
-
         if sDate is None:
             return
         if not sDate.tzname():
             raise MaKaCError("date should be timezone aware")
         if check != 0:
+            #If not using .fit() at the end of this method, comment it out
+            #if self.getSession().getStartDate() > sDate:
+            #    self.getSession().duration += self.getSession().getStartDate() - sDate
             self.verifyStartDate(sDate,check)
 
         # calculate the difference betwwen old and new date
@@ -7295,6 +7296,7 @@ class SessionSlot(Persistent):
         self.duration = dur
         self.getSessionSchEntry().synchro()
         self.getConfSchEntry().synchro()
+        self.getSession().fit()
         self.notifyModification()
 
     def getLocationParent( self ):

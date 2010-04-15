@@ -17,7 +17,6 @@
     {
 
         var isValid = dateOnce.processDate();
-        debugger;
 
         if (isValid == true)
         {
