@@ -4385,6 +4385,10 @@ table.CAResultsTable {
     padding: 0;
 }
 
+table.CAResultsTable tr.ACBookingLine:hover {
+    background-color: #ECECEC;
+}
+
 table.CAResultsTable td.ACBookingGroupTitle {
     padding-top: 20px;
     color: #555555;
