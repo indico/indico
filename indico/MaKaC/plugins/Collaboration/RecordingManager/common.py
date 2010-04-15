@@ -471,7 +471,7 @@ def getBasicXMLRepresentation(aw, IndicoID, contentType, videoFormat, languages)
     return xmlGen.getXml()
 
 def createCDSRecord(aw, IndicoID, contentType, videoFormat, languages):
-    '''Retrieve a MARC XML string for the given conference, then package it up and send it to CDS.'''
+    '''Retrieve a MARC XML string for the given conference, then web upload it to CDS.'''
 
 # I need to break this up into 2 functions: one to simply get the MARC XML,
 # and another one to retrieve that and submit it to CDS.

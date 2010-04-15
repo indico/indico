@@ -44,26 +44,38 @@
                         </div>
                     </td>
                     <td width="50px">
-                        <div id="columnMicala">
                         <% if talk["LOID"] != '': %>
-                            micala
+                            <div class="columnStatus" style="background-image: url('<%= "/indico/images/RecordingManagerMicalaCheck.png" %>');">
+                            &nbsp;</div>
                         <% end %>
-                        </div>
+                        <% else: %>
+                            <div class="columnStatus">
+                            </div>
+                        <% end %>
                     </td>
                     <td width="50px">
-                        <div id="columnCDS">
                         <% if talk["CDSID"] != 'none' and talk["CDSID"] != 'pending': %>
-                            <a href="<%= talk["CDSURL"] %>" target="newtab">CDS</a>
+                            <div class="columnStatus" style="background-image: url('<%= "/indico/images/RecordingManagerCDSCheck.png" %>');">
+                                <a href="<%= talk["CDSURL"] %>" target="newtab">link</a>
+                            </div>
                         <% end %>
                         <% elif talk["CDSID"] == 'pending': %>
-                            pending
+                            <div class="columnStatus" style="background-image: url('<%= "/indico/images/RecordingManagerCDSPending.png" %>');">
+                            </div>
                         <% end %>
-                        </div>
+                        <% else: %>
+                            <div class="columnStatus">
+                            </div>
+                        <% end %>
                     </td>
                     <td width="50px">
-                        <div id="columnIndicoLink">
                         <% if talk["IndicoLink"] == True: %>
-                            Link
+                            <div class="columnStatus" style="background-image: url('<%= "/indico/images/RecordingManagerIndicoCheck.png" %>');">
+                            </div>
+                        <% end %>
+                        <% else: %>
+                            <div class="columnStatus">
+                            </div>
                         <% end %>
                     </td>
                     </tr>

@@ -140,6 +140,12 @@ div.RMLOSelected {
     padding: 2px;
 }
 
+div.columnStatus {
+    width: 50px;
+    height: 28px;
+    text-align: center;
+}
+
 div.RMlowerPane {
     width: 100%;
 }
