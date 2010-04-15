@@ -139,10 +139,14 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
          _retrieveOptions: function(expression) {
              this.querying = true;
              var self = this;
+
              indicoRequest('search.categoryName',
                            {value: expression},
                            function(result, error) {
+
                                self.querying = false;
+                               self.timeOfLastQuery = (new Date()).getTime();
+
                                if (!error) {
                                    if (result.list.length > 0) {
                                        self.suggestions = result.list;
@@ -158,7 +162,7 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
                                    if (currentText != expression &&
                                        currentText.length > 1) {
                                        // request
-                                       self._retrieveOptions(currentText);
+                                       self._textTyped()
                                    } else if (currentText.length <= 1){
                                        // if it is not long enough
                                        self._hideSuggestions();
@@ -166,8 +170,29 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
                                } else {
                                    IndicoUtil.errorReport(error);
                                }
-
                            });
+         },
+
+         _getTimeSinceLastQuery: function() {
+             var now = new Date();
+             return now.getTime() - this.timeOfLastQuery;
+         },
+
+         _waitForRequestTime: function() {
+             var self = this;
+             if (!this.queuedRequest) {
+                 // This should never happen...
+                 return;
+             }
+
+             if (this._getTimeSinceLastQuery() > 1000) {
+                 this._textTyped();
+                 this.queuedRequest = false;
+             } else {
+                 setTimeout(function() {
+                         self._waitForRequestTime();
+                     }, 300);
+             }
          },
 
          /*
@@ -176,11 +201,23 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
           */
          _textTyped: function(key) {
 
+             var self = this;
              var text = trim(this.get());
 
              if(text.length > 1) {
-                 if(!this.querying) {
+
+                 // if we're not already querying and enough time has passed
+                 // since the last request
+                 if(!this.querying && this._getTimeSinceLastQuery() > 1000) {
                      this._retrieveOptions(text);
+                 } else if (!this.queuedRequest) {
+                     // otherwise, if we can't do a request right now
+                     // and no other request is queued
+                     this.queuedRequest = true;
+
+                     setTimeout(function() {
+                             self._waitForRequestTime();
+                         }, 300);
                  }
              } else if (this.suggestionBox) {
                  this._hideSuggestions();
@@ -239,6 +276,7 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
          this.selectorPos = -1;
          this.querying = false;
          this.container = container;
+         this.timeOfLastQuery = 0;
 
          var self = this;
 
