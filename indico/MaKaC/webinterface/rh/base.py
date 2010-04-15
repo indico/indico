@@ -97,8 +97,8 @@ class RequestHandlerBase(object):
     def _setLang(self):
         lang=self._websession.getLang()
         Logger.get('i18n').debug("lang:%s"%lang)
-        #if lang is None:
-        #    lang = "en_US"
+        if lang is None:
+            lang = "en_US"
         from MaKaC import i18n
         i18n.install('messages', lang, unicode=True)
 
