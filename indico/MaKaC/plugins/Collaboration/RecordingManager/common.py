@@ -23,7 +23,7 @@ from MaKaC.plugins.Collaboration.base import CSErrorBase
 from MaKaC.plugins.Collaboration.RecordingManager.exceptions import RecordingManagerException
 from MaKaC.common.PickleJar import Retrieves
 from MaKaC.webinterface.common.contribFilters import PosterFilterField
-from MaKaC.conference import ConferenceHolder, Contribution, Session
+from MaKaC.conference import ConferenceHolder, Contribution
 import MySQLdb
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 
@@ -260,14 +260,14 @@ def startTimeCompare(a, b):
     else:  #a < b
         return -1
 
-def truncate_str(str, length):
+def truncate_str(string, length):
     '''Truncates given string to the desired length and if it
     was longer than that, sticks ellipses on the end'''
 
-    if len(str) < length:
-        return str
+    if len(string) < length:
+        return string
     else:
-        return str[:length] + "..."
+        return string[:length] + "..."
 
 def generateIndicoID(conference     = None,
                     session         = None,
@@ -499,7 +499,7 @@ def createCDSRecord(aw, IndicoID, contentType, videoFormat, languages):
             Logger.get('RecMan').info("Trying to do XSLT using path %s" % stylePath)
             parser = XSLTransformer(stylePath)
             marcxml = parser.process(basexml)
-        except:
+        except Exception:
             marcxml = "Cannot parse stylesheet: %s" % sys.exc_info()[0]
     else:
         marcxml = basexml
