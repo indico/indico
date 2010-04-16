@@ -32,7 +32,10 @@ class WNewBookingForm(WCSPageTemplateBase):
         talks = getTalks(self._conf, sort = True)
         vars["Talks"] = talks
         vars["Conference"] = self._conf
-        vars["PreviewURL"] = CollaborationTools.getOptionValue("RecordingManager", "micalaPreviewURL")
+        previewURL = CollaborationTools.getOptionValue("RecordingManager", "micalaPreviewURL")
+        if CollaborationTools.isUsingHTTPS():
+            previewURL = previewURL.replace("http","https")
+        vars["PreviewURL"] = previewURL
         vars["LanguageList"] = languageList
         return vars
 
