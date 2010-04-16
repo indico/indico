@@ -123,16 +123,8 @@
                 Html.td({}, booking.url? booking.url : $T("not assigned yet"))));
 
         infoTbody.append(Html.tr({},
-                Html.td("collaborationInfoLeftCol", $T('Vidyo room ID:')),
-                Html.td({}, booking.roomId)));
-
-        infoTbody.append(Html.tr({},
             Html.td("collaborationInfoLeftCol", $T('Visibility:')),
             Html.td({}, booking.bookingParams.hidden? $T("Hidden") : $T("Visible"))));
-
-        infoTbody.append(Html.tr({},
-            Html.td("collaborationInfoLeftCol", $T('Indico booking ID:')),
-            Html.td({}, booking.id)));
 
         infoTbody.append(Html.tr({},
             Html.td("collaborationInfoLeftCol", $T('Created on:')),
