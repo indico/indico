@@ -402,6 +402,8 @@ class Room( Persistent, RoomBase ):
                 return False
         return True
 
+    locationName = property( getLocationName, setLocationName )
+
 class NonBookableDate(Persistent):
 
     def __init__(self, startDate, endDate):

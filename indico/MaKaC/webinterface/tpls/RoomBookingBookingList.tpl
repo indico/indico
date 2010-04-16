@@ -98,9 +98,7 @@
 		</tr>
 
         <% if not overload: %>
-			<% for collision in unrolledReservations: %>
-		    	<% includeTpl( 'RoomBookingListItem', reservation = collision.withReservation, occurrence = collision, withPhoto = withPhoto ) %>
-			<% end %>
+		    	<% includeTpl( 'RoomBookingListItem', unrolledReservations = unrolledReservations, withPhoto = withPhoto ) %>
 		<% end %>
 		<% if overload: %>
 		    <tr><td colspan="<%= columnNumber %>"><strong><br /> <%= _("Too many searching results or too large time span. Please issue more specific query.")%></strong></td></tr>
