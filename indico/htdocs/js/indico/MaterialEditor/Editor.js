@@ -1079,6 +1079,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
 
         var protectionIcon = Html.span({}, protection==1?
                                        Html.img({src: imageSrc('protected'),
+                                                 style: {verticalAlign: 'middle'},
                                                  alt: "protected",
                                                  title: $T("This material is protected")})
                                        :'');
@@ -1086,7 +1087,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
         var item = [
             IndicoUI.Buttons.arrowExpandIcon(matWidgetDiv, true),
             protectionIcon,
-            $B(Html.span({}),material.accessor('title')),
+            $B(Html.span({verticalAlign: 'middle'}),material.accessor('title')),
             menu,
             $B(Html.div("descriptionLine"), material.accessor('description')),
             matWidgetDiv
