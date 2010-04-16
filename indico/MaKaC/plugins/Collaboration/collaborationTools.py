@@ -303,11 +303,11 @@ class CollaborationTools(object):
         """ Utility function that updates IQueryResultFossil's getResults method
             with the proper dict in order to fossilize bookings for the VS Overview page
         """
-        fossilDict = {Conference: IConferenceMinimalFossil}
+        fossilDict = {"Conference": IConferenceMinimalFossil}
         for pluginName in cls.getCollaborationPluginType().getPlugins():
             classObject = cls.getCSBookingClass(pluginName)
             fossilClassObject = cls.getIndexingFossil(pluginName)
-            fossilDict[classObject] = fossilClassObject
+            fossilDict["%s.%s" % (classObject.__module__, classObject.__name__)] = fossilClassObject
 
         IQueryResultFossil.get('getResults').setTaggedValue('result', fossilDict)
 
