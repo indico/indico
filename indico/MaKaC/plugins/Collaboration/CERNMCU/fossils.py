@@ -96,7 +96,7 @@ class IRoomWithH323Fossil(IFossil):
         pass
 
     def getIp(self):
-
+        pass
 
 
 class ICERNMCUErrorFossil(ICSErrorBaseFossil):
