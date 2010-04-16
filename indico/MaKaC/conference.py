@@ -91,7 +91,7 @@ from MaKaC.webinterface import urlHandlers
 from MaKaC.common.logger import Logger
 from MaKaC.common.contextManager import ContextManager
 
-class CommonObjectBase():
+class CommonObjectBase(object):
     """This class is for holding commonly used methods that are used by several classes.
     It is inherited by the following classes:
     Category

@@ -1,9 +1,9 @@
+<% declareTemplate(newTemplateStyle=True) %>
+
 <div><span>
 <a id="scroll_down" name="top"></a>
 <br />
 </span></div>
-
-<% declareTemplate(newTemplateStyle=True) %>
 
 <table>
   <tr>
@@ -192,9 +192,6 @@
 </div>
 
 <script type="text/javascript">
-    var isLecture = <%= jsBoolean(IsLecture) %>;
-    var RR_contributions = <%= jsonEncode(Contributions) %>;
-    var RR_contributionsLoaded = <%= jsBoolean(DisplayTalks or not HasTalks) %>;
     var RM_orphans = <%= jsonEncode(Orphans) %>;
 
     var RMselectedTalkId    = '';

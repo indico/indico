@@ -4,7 +4,7 @@ from MaKaC.user import CERNGroup
 
 from MaKaC.common.logger import Logger
 
-class MarcAccessListGenerator():
+class MarcAccessListGenerator(object):
     def __init__(self):
         pass
 

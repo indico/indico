@@ -4,7 +4,7 @@ from MaKaC.common.logger import Logger
 
 import MySQLdb
 
-class MicalaCommunication():
+class MicalaCommunication(object):
     def _init_(self):
         pass
 

@@ -25,14 +25,14 @@ from MaKaC.common.fossilize import addFossil
 from MaKaC.conference import Contribution
 
 
-class IContributionRRFossil(IContributionWithSpeakersFossil):
+class IContributionRMFossil(IContributionWithSpeakersFossil):
     """ This fossil is ready for when we add subcontribution granularity to contributions
         and to provide an example for a plugin-specific fossil
     """
-    
+
     def getSubContributionList(self):
         pass
     getSubContributionList.result = ISubContributionWithSpeakersFossil
-    
+
 # We cannot include this fossil in the Contribution class directly because it belongs to a plugin
-addFossil(Contribution, IContributionRRFossil)
+addFossil(Contribution, IContributionRMFossil)

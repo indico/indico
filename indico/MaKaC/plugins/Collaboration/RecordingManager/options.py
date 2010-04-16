@@ -34,7 +34,7 @@ globalOptions = [
                "editable": True,
                "visible": True,
                "mustReload": False} ),
-    ("admins", {"description": _("Recording Request admins / responsibles"),
+    ("admins", {"description": _("Recording Manager admins / responsibles"),
                       "type": 'users',
                       "defaultValue": [],
                       "editable": True,

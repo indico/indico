@@ -31,7 +31,6 @@ from MaKaC.common.logger import Logger
 
 from time import mktime
 from MaKaC.common.xmlGen import XMLGen
-from MaKaC.export.oai2 import DataInt
 from MaKaC.common.output import outputGenerator, XSLTransformer
 from MaKaC.conference import Link
 from MaKaC import conference
@@ -42,6 +41,7 @@ import re
 import os
 import sys
 from MaKaC.plugins.Collaboration.RecordingManager.micala import MicalaCommunication
+from MaKaC.i18n import _
 
 # If you want to add more languages,
 # use the MARC language codes http://www.loc.gov/marc/languages
@@ -71,10 +71,8 @@ languageList = [
     ("swe", _("Swedish"))
 ]
 
-def getTalks(conference, oneIsEnough = False, sort = False):
-    """ oneIsEnough: the algorithm will stop at the first contribution found
-                     it will then return a list with a single element
-        sort: if True, contributions are sorted by start date (non scheduled contributions at the end)
+def getTalks(conference, sort = False):
+    """" sort: if True, contributions are sorted by start date (non scheduled contributions at the end)
     """
 
     Logger.get('RecMan').info('in getTalks()')
@@ -175,9 +173,8 @@ def getTalks(conference, oneIsEnough = False, sort = False):
 
                 recordable_events.append(event_info)
 
-            if oneIsEnough:
-                break
-    if sort and not oneIsEnough:
+
+    if sort:
         talks.sort(key = Contribution.contributionStartDateForSort)
 
     for session in conference.getSessionList():
