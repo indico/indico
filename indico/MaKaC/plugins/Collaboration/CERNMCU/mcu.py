@@ -26,15 +26,15 @@ import datetime
 import xmlrpclib
 
 class MCU(object):
-    _instance = None    
-    
+    _instance = None
+
     @classmethod
     def getInstance(cls):
         if cls._instance is None:
             cls._instance = getServerWithTimeout(getCERNMCUOptionValueByName('MCUAddress'), encoding='UTF-8', timeout = secondsToWait)
-            
+
         return cls._instance
-    
+
 def MCUTrue():
     return xmlrpclib.boolean(True)
 
@@ -71,12 +71,11 @@ confCommonParams = {
 }
 
 participantCommonParams = {
-    "participantProtocol": 'h323',
     "participantType" : 'by_address',
     "deferConnection" : MCUTrue(),
     "displayNameOverrideStatus": MCUTrue()
 }
-    
+
 def MCUParams(**args):
     args["authenticationUser"] = getCERNMCUOptionValueByName('indicoID')
     args["authenticationPassword"] = getCERNMCUOptionValueByName('indicoPassword')
@@ -94,6 +93,5 @@ def paramsForLog(args_in):
     args_out = args_in.copy()
     args_out["authenticationPassword"] = "(hidden)"
     return args_out
-    
 
-        
+

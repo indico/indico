@@ -346,11 +346,11 @@ class CollaborationCustomPluginService(CollaborationBase):
     def _checkParams(self):
         CollaborationBase._checkParams(self)
 
-        self._pluginName = self._params.pop('plugin')
+        self._pluginName = self._params.get('plugin', None)
         if not self._pluginName:
             raise CollaborationException(_("No 'plugin' paramater in CollaborationPluginService"))
 
-        serviceName = self._params.pop('service')
+        serviceName = self._params.get('service', None)
         if not serviceName:
             raise CollaborationException(_("No 'service' paramater in CollaborationPluginService"))
 
@@ -389,6 +389,20 @@ class CollaborationPluginServiceBase(CollaborationBase):
 
     def _getAnswer(self):
         raise CollaborationException("No answer was returned")
+
+class CollaborationPluginServiceBookingModifBase(CollaborationPluginServiceBase):
+
+    def __init__(self, params, aw):
+        CollaborationPluginServiceBase.__init__(self, params, aw)
+        self._booking = None
+
+    def _checkParams(self):
+        CollaborationPluginServiceBase._checkParams(self)
+        bookingId = self._params.get("booking", None)
+        if bookingId:
+            self._booking = self._CSBookingManager.getBooking(bookingId)
+        else:
+            raise CollaborationException(_("Service " + str(self.__class__.__name__) + _(" was called without a 'booking' parameter ")))
 
 
 class CollaborationCreateTestCSBooking(CollaborationCreateCSBooking):

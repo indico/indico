@@ -58,3 +58,11 @@ ul.CERNMCU_H323RoomList div.selectedRoom {
 ul.CERNMCU_H323RoomList div.unselectedRoom {
     background-color: #FFFFFF;
 }
+
+ul.CERNMCUParticipantsListDisplay {
+    border: none;
+    display: block;
+    list-style-type: none;
+    padding-left: 0px;
+    margin: 0;
+}

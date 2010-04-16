@@ -165,6 +165,8 @@ class WExtra (WJSBase):
     def getVars(self):
         vars = WJSBase.getVars( self )
 
+        vars["ConferenceId"] = self._conf.getId()
+
         roomsWithH323IP = []
 
         if self._conf:

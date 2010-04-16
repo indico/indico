@@ -1,16 +1,47 @@
 var enableCustomId = function() {
     IndicoUI.Effect.enableDisableTextField($E('customId'), true);
-}
+};
 
 var disableCustomId = function() {
     IndicoUI.Effect.enableDisableTextField($E('customId'), false);
-}
+};
 
 var pf = null; //place where to keep a ParticipantListField object to access later
 
 <% if RoomsWithH323IP: %>
-var existingRoomData = <%= jsonEncode(fossilize(RoomsWithH323IP)) %>
+var existingRoomData = <%= jsonEncode(fossilize(RoomsWithH323IP)) %>;
 <% end %>
+
+type("WithProtocolLinePopup", ["ExclusivePopupWithButtons"], {
+
+    _getProtocolLine: function(itemData) {
+        var h323RadioButton = Html.radio({id:"h323rb", name:"participantProtocol", value:"h323"});
+        var h323RadioButtonLabel = Html.label({style:{fontWeight:"normal"}}, "H.323");
+        h323RadioButtonLabel.dom.htmlFor = "h323rb";
+
+        var sipRadioButton = Html.radio({id:"siprb", name:"participantProtocol", value:"sip"});
+        var sipRadioButtonLabel = Html.label({style:{fontWeight:"normal"}}, "SIP");
+        sipRadioButtonLabel.dom.htmlFor = "siprb";
+
+        // h323 is the default
+        if (exists(itemData.get("participantProtocol")) && itemData.get("participantProtocol") === 'sip') {
+            sipRadioButton.dom.checked = true;
+        } else {
+            h323RadioButton.dom.checked = true;
+            itemData.set("participantProtocol", "h323");
+        }
+
+        h323RadioButton.observeClick(function(){
+            itemData.set("participantProtocol", "h323");
+        });
+
+        sipRadioButton.observeClick(function(){
+            itemData.set("participantProtocol", "sip");
+        });
+
+        return ['Device type', Html.span({}, h323RadioButton, h323RadioButtonLabel, sipRadioButton, sipRadioButtonLabel)];
+    }
+});
 
 /**
  * Creates a participant (person) data creation / edit pop-up dialog.
@@ -23,16 +54,19 @@ var existingRoomData = <%= jsonEncode(fossilize(RoomsWithH323IP)) %>
  * @param {Function} cancelAction (optional) A callback function that will be called if the user presses cancel. The function will be passed
  *                                 a function that must be called to close the popup. If no function is passed the popup will be closed.
  */
-type("PersonDataPopup", ["ExclusivePopupWithButtons"],
+type("PersonDataPopup", ["WithProtocolLinePopup"],
     {
         draw: function() {
             var self = this;
             var personData = self.personData;
-            var closePopup = function(){self.close()}
+            var closePopup = function(){self.close();};
+
+            var protocolLine = this._getProtocolLine(personData);
 
             var saveButton = Html.button({style:{marginLeft:pixels(5)}}, "Save");
             saveButton.observeClick(function(){
                 if (self.parameterManager.check()) {
+                    personData.set('participantType', 'by_address');
                     self.action(personData, closePopup);
                 }
             });
@@ -40,7 +74,7 @@ type("PersonDataPopup", ["ExclusivePopupWithButtons"],
             var cancelButton = Html.button({style:{marginLeft:pixels(5)}}, "Cancel");
             cancelButton.observeClick(function(){
                 if (self.cancelAction) {
-                    self.cancelAction(closePopup)
+                    self.cancelAction(closePopup);
                 } else {
                     closePopup();
                 }
@@ -53,10 +87,11 @@ type("PersonDataPopup", ["ExclusivePopupWithButtons"],
                 ['Family Name', $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), personData.accessor('familyName'))],
                 ['First Name', $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), personData.accessor('firstName'))],
                 ['Affiliation', $B(Html.edit({style: {width: '300px'}}), personData.accessor('affiliation'))],
-                ['Endpoint IP', $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'ip', false), personData.accessor('ip'))]
+                ['Endpoint IP', $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'ip', false), personData.accessor('ip'))],
+                protocolLine
             ]);
 
-            return this.ExclusivePopupWithButtons.prototype.draw.call(this, content, buttonDiv);
+            return this.WithProtocolLinePopup.prototype.draw.call(this, content, buttonDiv);
         } // end of draw
     },
 
@@ -79,16 +114,19 @@ type("PersonDataPopup", ["ExclusivePopupWithButtons"],
  * @param {Function} action A callback function that will be called if the user presses ok. The function will be passed
  *                          a WatchObject with the new values and a function that must be called to close the popup.
  */
-type("RoomDataPopup", ["ExclusivePopupWithButtons"],
+type("RoomDataPopup", ["WithProtocolLinePopup"],
     {
         draw: function() {
             var self = this;
             var roomData = self.roomData;
-            var closePopup = function(){self.close()}
+            var closePopup = function(){self.close();};
+
+            var protocolLine = this._getProtocolLine(roomData);
 
             var saveButton = Html.button({style:{marginLeft:pixels(5)}}, "Save");
             saveButton.observeClick(function(){
                 if (self.parameterManager.check()) {
+                    roomData.set('participantType', 'by_address');
                     self.action(roomData, closePopup);
                 }
             });
@@ -103,10 +141,11 @@ type("RoomDataPopup", ["ExclusivePopupWithButtons"],
             var content = IndicoUtil.createFormFromMap([
                 ['Room Name', $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), roomData.accessor('name'))],
                 ['Institution', $B(Html.edit({style: {width: '300px'}}), roomData.accessor('institution'))],
-                ['Endpoint IP', $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'ip', false), roomData.accessor('ip'))]
+                ['Endpoint IP', $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'ip', false), roomData.accessor('ip'))],
+                protocolLine
             ]);
 
-            return this.ExclusivePopupWithButtons.prototype.draw.call(this, content, buttonDiv);
+            return this.WithProtocolLinePopup.prototype.draw.call(this, content, buttonDiv);
         } // end of draw
     },
 
@@ -132,18 +171,22 @@ type("H323RoomList", ["SelectableListWidget"],
     function (selectedObserver) {
         this.SelectableListWidget(selectedObserver, false, "UIPeopleList CERNMCU_H323RoomList");
     }
-)
+);
 
 type("H323RoomPopup", ["ExclusivePopupWithButtons"],
     {
         draw: function() {
             var self = this;
             var roomData = self.roomData;
-            var closePopup = function(){self.close()}
+            var closePopup = function(){self.close();};
 
             var saveButton = new DisabledButton(Html.input("button", {disabled:true}, $T("Save") ));
             saveButton.observeClick(function(){
-                self.action(roomList.getSelectedList(), closePopup);
+                var selectedList = roomList.getSelectedList();
+                each(selectedList, function(room){
+                    room.set('participantType', 'by_address');
+                });
+                self.action(selectedList, closePopup);
             });
             saveButton.disable();
 
@@ -171,7 +214,7 @@ type("H323RoomPopup", ["ExclusivePopupWithButtons"],
                 } else {
                     saveButton.enable();
                 }
-            }
+            };
 
             var roomList = new H323RoomList(selectedObserver);
             var addedParticipants = self.participantListField.getParticipants();
@@ -225,56 +268,67 @@ type("ParticipantListWidget", ["ListWidget"],
             var self = this;
             var participantData = participant.get();
 
-            var editButton = Widget.link(command(
-                function() {
-                    var editPopup = null;
+            var editButton = null;
 
-                    var commonHandler = function(newData, closePopup) {
-                        participantData.update(newData.getAll());
-                        closePopup();
-                    }
+            if (participantData.get("participantType") === 'by_address') {
+                editButton = Widget.link(command(
+                    function() {
+                        var editPopup = null;
 
-                    if (participantData.get('type') == 'person') {
-                        editPopup = new PersonDataPopup(
-                            'Change person data',
-                            participantData.clone(),
-                            commonHandler
-                        );
-                    } else {
-                        editPopup = new RoomDataPopup(
-                            'Change room data',
-                            participantData.clone(),
-                            commonHandler
-                        );
-                    }
-                    editPopup.open();
-                }, // end of function
-                IndicoUI.Buttons.editButton()
-            ));
+                        var commonHandler = function(newData, closePopup) {
+                            participantData.update(newData.getAll());
+                            closePopup();
+                        };
 
-            var removeButton = Widget.link(command(
-                function() {
-                    self.set(participant.key, null);
-                },
-                IndicoUI.Buttons.removeButton()
-            ));
+                        if (participantData.get('type') === 'person') {
+                            editPopup = new PersonDataPopup(
+                                'Change person data',
+                                participantData.clone(),
+                                commonHandler);
+                        } else {
+                            editPopup = new RoomDataPopup(
+                                'Change room data',
+                                participantData.clone(),
+                                commonHandler);
+                        }
+                        editPopup.open();
+                    }, // end of function
+                    IndicoUI.Buttons.editButton()
+                ));
+            } else if (participantData.get("participantType") === 'ad_hoc') {
+                editButton = IndicoUI.Buttons.editButton(true, $T("Ad-hoc participants cannot be edited"));
+            } else if (participantData.get("participantType") === 'by_name') {
+                editButton = IndicoUI.Buttons.editButton(true, $T("Pre-configured endpoints cannot be edited"));
+            }
+
+            var removeButton = null;
+            if (participantData.get("participantType") !== 'by_name') {
+                removeButton = Widget.link(command(
+                    function() {
+                        self.set(participant.key, null);
+                    },
+                    IndicoUI.Buttons.removeButton()
+                ));
+            } else {
+                removeButton = IndicoUI.Buttons.removeButton(true, $T("Pre-configured endpoints cannot be deleted"));
+            }
 
             var participantDiv = Html.div({style:{display: 'inline'}});
 
-            if (participantData.get('type') == 'person') {
+            if (participantData.get('type') === 'person') {
                 participantDiv.appendMany([
                     Html.img({alt: "Person", title: "Person", src: imageSrc("user"),
                               style: {verticalAlign: 'middle', marginRight: pixels(5)}}),
                 $B(Html.span(), participantData.accessor('title'),
                     function(title) {
-                        if(title) {return title + ' '}
+                        if (title) {return title + ' ';}
                     }),
-                $B(Html.span(), participantData.accessor('familyName'), function(name){if (name) {return name.toUpperCase()}}),
+                $B(Html.span(), participantData.accessor('familyName'), function(name){if (name) {return name.toUpperCase();}}),
                 ', ',
                 $B(Html.span(), participantData.accessor('firstName')),
                 $B(Html.span(), participantData.accessor('affiliation'),
                     function(affiliation) {
-                        if (affiliation) { return ' (' + affiliation + ')'}
+                        if (affiliation) { return ' (' + affiliation + ')';}
                     }),
                 ' (IP:',
                 $B(Html.span(), participantData.accessor('ip')),
@@ -286,7 +340,7 @@ type("ParticipantListWidget", ["ListWidget"],
                     $B(Html.span(), participantData.accessor('name')),
                     $B(Html.span(), participantData.accessor('institution'),
                             function(institution) {
-                                if (institution) { return ' (' + institution + ')'}
+                                if (institution) { return ' (' + institution + ')';}
                             }),
                     ' (IP: ',
                     $B(Html.span(), participantData.accessor('ip')),
@@ -318,7 +372,7 @@ type("ParticipantListField", ["IWidget"],
 
         _addNewParticipant : function(participant, type) {
             var newId = this.newParticipantCounter++;
-            participant.set('type', type)
+            participant.set('type', type);
             this.participantList.set(newId, participant);
             this._highlightNewParticipant(newId);
         },
@@ -338,7 +392,7 @@ type("ParticipantListField", ["IWidget"],
                 var handler = function(participant, closePopup) {
                     self._addNewParticipant(participant, 'person');
                     closePopup();
-                }
+                };
                 var popup = new PersonDataPopup("Add new person", $O(), handler);
                 popup.open();
             });
@@ -354,18 +408,18 @@ type("ParticipantListField", ["IWidget"],
                             popup.open();
                             i++;
                         }
-                    }
+                    };
 
                     var ipSaveHandler = function(participant, closePopup) {
                         self._addNewParticipant(participant, 'person');
                         closePopup();
                         openNewPopup();
-                    }
+                    };
 
                     var ipCancelHandler = function(closePopup) {
                         closePopup();
                         openNewPopup();
-                    }
+                    };
 
                     if (participantList.length > 0) {
                         openNewPopup();
@@ -379,7 +433,7 @@ type("ParticipantListField", ["IWidget"],
                 var handler = function(participant, closePopup) {
                     self._addNewParticipant(participant, 'room');
                     closePopup();
-                }
+                };
                 var popup = new RoomDataPopup($T("Add new room"), $O(), handler);
                 popup.open();
             });
@@ -429,6 +483,131 @@ type("ParticipantListField", ["IWidget"],
 );
 
 
+type("CERNMCUBuildParticipantsInfo", ["IWidget"], {
+
+    __connectParticipant: function(participant) {
+        var self = this;
+
+        var killProgress = IndicoUI.Dialogs.Util.progress($T("Connecting individual participant..."));
+        indicoRequest('collaboration.pluginService',
+            {
+                plugin: 'CERNMCU',
+                service: 'ConnectParticipant',
+                conference: '<%= ConferenceId %>',
+                booking: self.booking.id,
+                participantId: participant.get("participantId")
+            },
+            function(result, error){
+                if (!error) {
+                    if (!exists(result.error)) {
+                        refreshBooking(result);
+                    }
+                    killProgress();
+                } else {
+                    killProgress();
+                    IndicoUtil.errorReport(error);
+                }
+            }
+        );
+    },
+
+    __disconnectParticipant: function(participant) {
+        var self = this;
+
+        var killProgress = IndicoUI.Dialogs.Util.progress($T("Disconnecting individual participant..."));
+        indicoRequest('collaboration.pluginService',
+            {
+                plugin: 'CERNMCU',
+                service: 'DisconnectParticipant',
+                conference: '<%= ConferenceId %>',
+                booking: self.booking.id,
+                participantId: participant.get("participantId")
+            },
+            function(result, error){
+                if (!error) {
+                    if (!exists(result.error)) {
+                        refreshBooking(result);
+                    }
+                    killProgress();
+                } else {
+                    killProgress();
+                    IndicoUtil.errorReport(error);
+                }
+            }
+        );
+    },
+
+    draw: function(){
+
+        var participantList = Html.ul('CERNMCUParticipantsListDisplay');
+
+        var self = this;
+
+        each(this.participants, function(participant) {
+            // participant is a WatchObject
+
+            var participantLine = Html.li();
+
+            if (participant.get("type") === 'person') {
+                participantLine.append(Html.img({alt: "Person", title: "Person", src: imageSrc("user"),
+                                                 style: {verticalAlign: 'middle', marginRight: pixels(5)}}));
+            } else {
+                participantLine.append(Html.img({alt: "Room", title: "Room", src: imageSrc("room"),
+                                                 style: {verticalAlign: 'middle', marginRight: pixels(5)}}));
+            }
+
+            participantText = Html.span();
+            participantText.append(participant.get("displayName") + ' (IP: ' + participant.get("ip"));
+            if (participant.get("participantType") === 'ad_hoc') {
+                participantText.append(', ' + $T('ad-hoc'));
+            } else if (participant.get("participantType") === 'by_name') {
+                participantText.append(', ' + $T('Pre-configured'));
+            }
+            participantText.append(', ');
+            participantText.append($B(Html.span(), participant.accessor("callState")));
+            participantText.append(')');
+
+            participantLine.append(participantText);
+
+            var playButton = $B(Html.span(), participant.accessor("callState"), function(state){
+                if (state === "connected" || !self.booking.canBeStarted ) {
+                    return IndicoUI.Buttons.playButton(true, true);
+                } else {
+                    return Widget.link(command(function(){
+                        self.__connectParticipant(participant);
+                    } , IndicoUI.Buttons.playButton(false, true)));
+                }
+            });
+            participantLine.append(playButton);
+
+            var stopButton = $B(Html.span(), participant.accessor("callState"), function(state){
+                if (state === "disconnected" || state === "dormant" || !self.booking.canBeStopped) {
+                    return IndicoUI.Buttons.stopButton(true, true);
+                } else {
+                    return Widget.link(command(function(){
+                        self.__disconnectParticipant(participant);
+                    } , IndicoUI.Buttons.stopButton(false, true)));
+                }
+            });
+            participantLine.append(stopButton);
+
+            participantList.append(participantLine);
+        });
+        return this.IWidget.prototype.draw.call(this, participantList);
+    }
+},
+    function(booking){
+        this.booking = booking;
+        this.participants = []; // List of WatchObjects
+        var self = this;
+        each (booking.bookingParams.participants, function(participant) {
+            participantWO = $O(participant);
+            self.participants.push(participantWO);
+        });
+    }
+);
+
+
 /**
  * Mouseover help popup for the 'PIN' field
  */
@@ -472,4 +651,4 @@ var CERNMCUDrawContextHelpIcons = function() {
     $E('PINHelpImg').dom.onmouseover = CERNMCUPINHelpPopup;
     $E('customIdHelpImg').dom.onmouseover = CERNMCUCustomIDHelpPopup;
     $E('displayPinHelpImg').dom.onmouseover = CERNMCUDisplayPinHelpPopup;
-}
+};

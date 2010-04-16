@@ -180,16 +180,6 @@
                         booking.bookingParams.name )));
 
         infoTbody.append(Html.tr({},
-            Html.td("collaborationInfoLeftCol", $T('Description:')),
-            Html.td({}, booking.bookingParams.description)));
-
-        infoTbody.append(Html.tr({},
-            Html.td("collaborationInfoLeftCol", $T('MCU Conf. ID:')),
-            Html.td({}, booking.error && booking.faultCode == 18 ?
-                        Html.span('collaborationWarning', booking.bookingParams.id + $T(' (duplicated)')) :
-                        booking.bookingParams.id ? booking.bookingParams.id : Html.span('collaborationWarning', $T('No ID yet')))));
-
-        infoTbody.append(Html.tr({},
             Html.td("collaborationInfoLeftCol", $T('Start date:')),
             Html.td({}, formatDateStringCS(booking.bookingParams.startDate))));
 
@@ -207,6 +197,28 @@
         infoTbody.append(Html.tr({},
             Html.td("collaborationInfoLeftCol", $T('Pin:')),
             Html.td({}, pinInfo)));
+
+        var participantsInfo;
+        if (booking.bookingParams.participants.length > 0) {
+            participantsInfo = new CERNMCUBuildParticipantsInfo(booking).draw();
+        } else {
+            participantsInfo = $T("No participants have been configured yet.");
+        }
+
+        infoTbody.append(Html.tr({},
+                Html.td("collaborationInfoLeftCol", $T('Participants:')),
+                Html.td({}, participantsInfo)));
+
+        infoTbody.append(Html.tr({},
+                Html.td("collaborationInfoLeftCol", $T('MCU Conf. ID:')),
+                Html.td({}, booking.error && booking.faultCode == 18 ?
+                            Html.span('collaborationWarning', booking.bookingParams.id + $T(' (duplicated)')) :
+                            booking.bookingParams.id ? booking.bookingParams.id : Html.span('collaborationWarning', $T('No ID yet')))));
+
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('Description:')),
+            Html.td({}, booking.bookingParams.description)));
+
 
         infoTbody.append(Html.tr({},
             Html.td("collaborationInfoLeftCol", $T('Visibility:')),
@@ -251,7 +263,8 @@
             pf = new ParticipantListField([{type: 'room',
                                            name: "<%= InitialRoomName %>",
                                            institution: "<%= InitialRoomInstitution %>",
-                                           ip: "<%= InitialRoomIP %>"}])
+                                           ip: "<%= InitialRoomIP %>",
+                                           participantType: 'by_address'}])
             var ipRetrievalResult = <%= IPRetrievalResult %>
 
             switch (ipRetrievalResult) {

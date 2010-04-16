@@ -29,6 +29,8 @@ import socket
 import errno
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.plugins.Collaboration.CERNMCU.fossils import IRoomWithH323Fossil, ICERNMCUErrorFossil
+from MaKaC.plugins.Collaboration.CERNMCU.fossils import IParticipantPersonFossil,\
+    IParticipantRoomFossil, IRoomWithH323Fossil, ICERNMCUErrorFossil
 
 secondsToWait = 10
 
@@ -41,8 +43,8 @@ def getMinMaxId():
 
 def getRangeLength():
     idRangeString = getCERNMCUOptionValueByName("idRange")
-    min, max = [int(s) for s in idRangeString.split('-')]
-    return max - min
+    minimum, maximum = [int(s) for s in idRangeString.split('-')]
+    return maximum - minimum
 
 def getMinStartDate(conference):
     return conference.getAdjustedStartDate() - timedelta(0,0,0,0, getCERNMCUOptionValueByName("extraMinutesBefore"))
@@ -74,12 +76,12 @@ class GlobalData(Persistent):
             raise CERNMCUException("No more Conference ids available for the MCU")
 
         while True:
-            id = self._idList[self._counter % len(self._idList)]
+            mcuConferenceId = self._idList[self._counter % len(self._idList)]
             self._counter = self._counter + 1
-            if not id in self._usedIds:
+            if not mcuConferenceId in self._usedIds:
                 break
 
-        return id
+        return mcuConferenceId
 
     def getMinMax(self):
         return self._min, self._max
@@ -87,64 +89,135 @@ class GlobalData(Persistent):
     def resetIdList(self):
         self._idList = None
 
-    def addConferenceId(self, id):
-        self._usedIds.add(id)
+    def addConferenceId(self, mcuConferenceId):
+        self._usedIds.add(mcuConferenceId)
 
-    def returnConferenceId(self, id):
-        self._usedIds.remove(id)
+    def removeConferenceId(self, mcuConferenceId):
+        self._usedIds.remove(mcuConferenceId)
+
 
 class Participant(Persistent):
-    def __init__(self, type, booking, id, ip, createdByIndico = True):
-        self._type = type
+
+    def __init__(self, personOrRoom, booking, participantIndicoId, ip,
+                 participantName = None, participantType = "by_address", participantProtocol = "h323",
+                 createdByIndico = True):
+        """ personOrRoom: a string which can be "person" or "room"
+            booking: the CSBooking object parent of this participant
+            participantIndicoId: an auto-increment integer, indexing the participants of the same booking, no matter their nature
+            participantName: if left to None, we will generate it, example: i-c10b2p4
+                             otherwise, we pick whatever comes as argument (useful for ad-hoc participants)
+            participantType: the participantType attribute of this participant in the MCU (can be by_address for Indico created
+                             participants, ad_hoc for ad_hoc ones, by_name for permanent ones pre-configured in the MCU)
+            participantProtocol: the participantProtocol attribute of the participant in the MCU
+            createdByIndico: a boolean stating if the participant was created by Indico or was created by someone else in the MCU.
+        """
+
+        self._type = personOrRoom
         self._booking = booking
-        self._id = id
+        self._id = participantIndicoId
         self._ip = ip
+
+        self._participantName = participantName
+
+        self._participantType = participantType
+        self._participantProtocol = participantProtocol
         self._createdByIndico = createdByIndico
 
-    @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.ParticipantPerson',
-                'MaKaC.plugins.Collaboration.CERNMCU.common.ParticipantRoom'], 'type')
+        self._callState = "dormant" #dormant: at creation, before start. others: connected (after start), disconnected (after stop or ad hoc when leaves)
+
+    def updateData(self, newData):
+        """ To be overloaded by inheriting classes
+        """
+        pass
+
     def getType(self):
         return self._type
 
-    @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.ParticipantPerson',
-                'MaKaC.plugins.Collaboration.CERNMCU.common.ParticipantRoom'], 'participantId')
     def getId(self):
         return self._id
 
     def getParticipantName(self):
-        if self._createdByIndico:
-            confId = self._booking.getConference().getId()
-            bookingId = self._booking.getId()
-            return "p%sb%sc%s"%(self._id, bookingId, confId)
-        else:
-            return self._id
+        """ During booking creation, this method should not be called before
+            the booking object has an id (see CSBookingManager.createBooking method).
+        """
+        if not hasattr(self, "_participantName") or self._participantName is None:
+            self._participantName = self._createParticipantName()
+        return self._participantName
 
-    @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.ParticipantPerson',
-                'MaKaC.plugins.Collaboration.CERNMCU.common.ParticipantRoom'], 'ip')
+    def getDisplayName(self):
+        """ To be overloaded by inheriting classes
+        """
+        pass
+
     def getIp(self):
         return self._ip
 
-class ParticipantPerson(Participant):
-    def __init__(self, booking, id, data):
-        Participant.__init__(self, 'person', booking, id, data.get("ip",''))
+    def setIp(self, ip):
+        self._ip = ip
+
+    def getParticipantType(self):
+        if not hasattr(self, "_participantType"):
+            self._participantType = "by_address"
+        return self._participantType
+
+    def setParticipantType(self, participantType):
+        self._participantType = participantType
+
+    def getParticipantProtocol(self):
+        if not hasattr(self, "_participantProtocol"):
+            self._participantProtocol = "h323"
+        return self._participantProtocol
+
+    def setParticipantProtocol(self, participantProtocol):
+        self._participantProtocol = participantProtocol
+
+    def getCallState(self):
+        if not hasattr(self, "_callState"):
+            self._callState = "dormant"
+        return self._callState
+
+    def setCallState(self, callState):
+        self._callState = callState
+
+    def _createParticipantName(self):
+        confId = self._booking.getConference().getId()
+        bookingId = self._booking.getId()
+        participantName = "i-c%sb%sp%s" % (confId, bookingId, self._id)
+        if len(participantName) > 31:
+            raise CERNMCUException("Generated participantName is longer than 31 characters. Conf %s, booking %s, participant %s (%s)" %
+                                   (confId, bookingId, self._id, self.getDisplayName()))
+        return participantName
+
+
+class ParticipantPerson(Participant, Fossilizable):
+    fossilizes(IParticipantPersonFossil)
+
+    def __init__(self, booking, participantIndicoId, data):
+
         self._title = data.get("title", '')
         self._familyName = data.get("familyName", '')
         self._firstName = data.get("firstName", '')
         self._affiliation = data.get("affiliation", '')
+        Participant.__init__(self, 'person', booking, participantIndicoId, data.get("ip",''),
+                             participantName = None, participantType = "by_address", participantProtocol = data.get("participantProtocol", "h323"),
+                             createdByIndico = True)
 
-    @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.ParticipantPerson'], 'title')
+    def updateData(self, newData):
+        self._title = newData.get("title", '')
+        self._familyName = newData.get("familyName", '')
+        self._firstName = newData.get("firstName", '')
+        self._affiliation = newData.get("affiliation", '')
+        self.setIp(newData.get("ip", ''))
+
     def getTitle(self):
         return self._title
 
-    @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.ParticipantPerson'], 'familyName')
     def getFamilyName(self):
         return self._familyName
 
-    @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.ParticipantPerson'], 'firstName')
     def getFirstName(self):
         return self._firstName
 
-    @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.ParticipantPerson'], 'affiliation')
     def getAffiliation(self):
         return self._affiliation
 
@@ -166,22 +239,37 @@ class ParticipantPerson(Participant):
         else:
             return result
 
+class ParticipantRoom(Participant, Fossilizable):
+    fossilizes(IParticipantRoomFossil)
 
-class ParticipantRoom(Participant):
-    def __init__(self, booking, id, data):
-        Participant.__init__(self, 'room', booking, id, data.get("ip",''))
+    def __init__(self, booking, participantIndicoId, data,
+                 participantName = None, participantType = "by_address",
+                 createdByIndico = True):
+
         self._name = data.get("name",'')
         self._institution = data.get("institution", '')
+        Participant.__init__(self, 'room', booking, participantIndicoId, data.get("ip",''),
+                             participantName, participantType, data.get("participantProtocol", "h323"),
+                             createdByIndico)
 
-    @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.ParticipantRoom'], 'name')
+    def updateData(self, newData):
+        self._name = newData.get("name",'')
+        self._institution = newData.get("institution", '')
+        self.setIp(newData.get("ip", ''))
+
     def getName(self):
         return self._name
 
-    @Retrieves(['MaKaC.plugins.Collaboration.CERNMCU.common.ParticipantRoom'], 'institution')
+    def setName(self, name):
+        self._name = name
+
     def getInstitution(self):
         if not hasattr(self, '_institution'):
             self._institution = ''
         return self._institution
+
+    def setInstitution(self, institution):
+        self._institution = institution
 
     def getDisplayName(self, truncate=True):
         result = self._name
@@ -191,6 +279,7 @@ class ParticipantRoom(Participant):
             return result[:31] #31 is the max length accepted by the MCU
         else:
             return result
+
 
 class RoomWithH323(Fossilizable):
     fossilizes(IRoomWithH323Fossil)

@@ -22,8 +22,8 @@ IndicoUI.Buttons = {
     /**
         * Returns an image with an 'remove' icon
         */
-    removeButton: function(faded){
-        var caption = faded ? 'Remove (blocked)' : 'Remove';
+    removeButton: function(faded, fadedCaption){
+        var caption = faded ? (exists(fadedCaption)? fadedCaption : 'Remove (blocked)') : 'Remove';
         return Html.img({
             alt: caption,
             title: caption,
@@ -37,8 +37,8 @@ IndicoUI.Buttons = {
     /**
         * Returns an image with an 'edit' icon
         */
-    editButton: function(faded){
-        var caption = faded ? 'Edit (blocked)' : 'Edit';
+    editButton: function(faded, fadedCaption){
+        var caption = faded ? (exists(fadedCaption) ? fadedCaption: 'Edit (blocked)') : 'Edit';
         return Html.img({
 
             alt: caption,
@@ -53,12 +53,15 @@ IndicoUI.Buttons = {
     /**
      * Returns an image with an 'play' icon
      */
-    playButton: function(faded){
+    playButton: function(faded, small){
         var caption = faded ? 'Start (blocked)' : 'Start';
+        var imageName = "play";
+        if (faded) { imageName += "_faded"; }
+        if (small) { imageName += "_small"; }
         return Html.img({
             alt: caption,
             title: caption,
-            src: faded ? imageSrc("play_faded") : imageSrc("play"),
+            src: imageSrc(imageName),
             style: {
                 'marginLeft': '3px',
                 'marginRight': '3px',
@@ -69,12 +72,15 @@ IndicoUI.Buttons = {
     /**
      * Returns an image with an 'stop' icon
      */
-    stopButton: function(faded){
+    stopButton: function(faded, small){
         var caption = faded ? 'Stop (blocked)' : 'Stop';
+        var imageName = "stop";
+        if (faded) { imageName += "_faded"; }
+        if (small) { imageName += "_small"; }
         return Html.img({
             alt: caption,
             title: caption,
-            src: faded ? imageSrc("stop_faded") : imageSrc("stop"),
+            src: imageSrc(imageName),
             style: {
                 'marginLeft': '3px',
                 'marginRight': '3px',
