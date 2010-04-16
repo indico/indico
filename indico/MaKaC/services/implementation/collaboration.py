@@ -214,7 +214,7 @@ class CollaborationChangePluginManagersBase(CollaborationBase):
         else:
             raise CollaborationException(_("Plugin name not set when trying to add or remove a manager on event: ") + str(self._conf.getId()) + _(" with the service ") + str(self.__class__) )
 
-        if CollaborationTools.isAdminOnlyPlugin(self._plugin):
+        if CollaborationTools.getCollaborationPluginType().hasPlugin(self._plugin) and CollaborationTools.isAdminOnlyPlugin(self._plugin):
             raise CollaborationException(_("Tried to add or remove a manager for an admin-only plugin on event : ") + str(self._conf.getId()) + _(" with the service ") + str(self.__class__) )
 
     def _checkProtection(self):
