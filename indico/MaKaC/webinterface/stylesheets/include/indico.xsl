@@ -867,7 +867,7 @@
                   </xsl:if>
 
                   <xsl:if test="count(child::launchInfo) = 1">
-                    <a href="{./launchInfo/launchLink}" id="bookingLaunchLink{./id}">
+                    <a target="_blank" href="{./launchInfo/launchLink}" id="bookingLaunchLink{./id}">
                       <xsl:value-of select="./launchInfo/launchText"/>
                     </a>
                     <xsl:text disable-output-escaping="yes"><![CDATA[
@@ -893,7 +893,7 @@
                   <!-- Start of a booking info line -->
                   <div id="collaborationInfoLine{./id}" style="visibility: hidden; overflow: hidden;">
                     <div class="collaborationDisplayInfoLine">
-                    <table>
+                    <table cellpadding="0" cellspacing="0">
                       <tbody>
                         <xsl:for-each select="./information/section">
                           <tr>
