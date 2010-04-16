@@ -38,7 +38,7 @@ class RMLinkService(CollaborationPluginServiceBase):
 
     def _getAnswer(self):
 #        here is where we make a submission to the database?
-        MicalaCommunication().updateMicala(self._params.get('IndicoID', None), self._params.get('LOID', None))
+        MicalaCommunication.updateMicala(self._params.get('IndicoID', None), self._params.get('LOID', None))
         return {'some':'thing'}
 
 class RMCreateCDSRecordService(CollaborationPluginServiceBase):
@@ -72,7 +72,7 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
 
     def _getAnswer(self):
         # Update the micala database
-        resultUpdateMicala = MicalaCommunication().updateMicala(self._IndicoID,
+        resultUpdateMicala = MicalaCommunication.updateMicala(self._IndicoID,
                                           self._contentType,
                                           self._params.get('LOID', None))
 

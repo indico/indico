@@ -5,14 +5,14 @@ from MaKaC.common.logger import Logger
 import MySQLdb
 
 class MicalaCommunication(object):
-    def _init_(self):
-        pass
 
-    def getIp(self):
+    @classmethod
+    def getIp(cls):
         '''This should return the IP of the current machine.'''
         return("")
 
-    def getIdMachine(self, machine_name):
+    @classmethod
+    def getIdMachine(cls, machine_name):
         '''Look up ID of this machine in database'''
 
         Logger.get('RecMan').info('machine_name = %s' % machine_name)
@@ -45,7 +45,8 @@ class MicalaCommunication(object):
 
         return(idMachine)
 
-    def getIdTask(self, task_name):
+    @classmethod
+    def getIdTask(cls, task_name):
         '''Look up ID of this task in database'''
 
         Logger.get('RecMan').info('task_name = [%s]' % task_name)
@@ -76,7 +77,8 @@ class MicalaCommunication(object):
 
         return(idTask)
 
-    def getIdLecture(self, lecture_name, pattern_cern, pattern_umich):
+    @classmethod
+    def getIdLecture(cls, lecture_name, pattern_cern, pattern_umich):
         '''Look up ID of this lecture in database'''
 
         Logger.get('RecMan').info('lecture_name = [%s]' % lecture_name)
@@ -115,7 +117,8 @@ class MicalaCommunication(object):
 
         return(idLecture)
 
-    def createNewMicalaLecture(self, lecture_name, contentType, pattern_cern, pattern_umich):
+    @classmethod
+    def createNewMicalaLecture(cls, lecture_name, contentType, pattern_cern, pattern_umich):
         '''insert a record into the micala database for a new lecture'''
 
         Logger.get('RecMan').info('createNewMicalaLecture for [%s]' % lecture_name)
@@ -152,9 +155,10 @@ class MicalaCommunication(object):
 
         connection.close()
 
-        return self.getIdLecture(lecture_name, pattern_cern, pattern_umich)
+        return cls.getIdLecture(lecture_name, pattern_cern, pattern_umich)
 
-    def getMatches(self, confID):
+    @classmethod
+    def getMatches(cls, confID):
         '''For the current conference, get list from the database of IndicoID's already matched to Lecture Object.'''
 
         try:
@@ -179,7 +183,8 @@ class MicalaCommunication(object):
 
         return (match_array)
 
-    def reportStatus(self, status, message, idMachine, idTask, idLecture):
+    @classmethod
+    def reportStatus(cls, status, message, idMachine, idTask, idLecture):
         '''Make status report to the database'''
 
         if idLecture == '':
@@ -205,7 +210,8 @@ class MicalaCommunication(object):
         connection.close()
 
     # WHO THE HELL CALLS THIS?!
-    def updateMicala(self, IndicoID, contentType, LOID):
+    @classmethod
+    def updateMicala(cls, IndicoID, contentType, LOID):
         """Submit Indico ID to the micala DB"""
 
     #    Logger.get('RecMan').exception("inside updateMicala.")
@@ -238,7 +244,8 @@ class MicalaCommunication(object):
             # (I already created this column in micala.sql, just need to recreate DB from this file)
             pass
 
-    def getCDSPending(self, confId, cds_indico_matches):
+    @classmethod
+    def getCDSPending(cls, confId, cds_indico_matches):
         """Query the Micala database to find Indico IDs whose MARC has been exported to CDS, but no CDS record exists yet.
         Return a list of these Indico IDs."""
 
@@ -279,7 +286,8 @@ class MicalaCommunication(object):
 
         return talk_array
 
-    def updateMicalaCDSExport(self, cds_indico_matches, cds_indico_pending):
+    @classmethod
+    def updateMicalaCDSExport(cls, cds_indico_matches, cds_indico_pending):
         '''If there are records found in CDS but not yet listed in the micala database as COMPLETE, then update it.
         cds_indico_matches is a dictionary of key-value pairs { IndicoID1: CDSID1, IndicoID2: CDSID2, ... }
         cds_indico_pending is a list of IndicoIDs.'''
@@ -288,13 +296,13 @@ class MicalaCommunication(object):
             Logger.get('RecMan').info('Looping through cds_indico_pending: %s' % pending)
             try:
                 new_record = cds_indico_matches[pending]
-                idMachine = self.getIdMachine(CollaborationTools.getOptionValue("RecordingManager", "micalaDBMachineName"))
-                idTask    = self.getIdTask(CollaborationTools.getOptionValue("RecordingManager", "micalaDBStatusExportCDS"))
+                idMachine = cls.getIdMachine(CollaborationTools.getOptionValue("RecordingManager", "micalaDBMachineName"))
+                idTask    = cls.getIdTask(CollaborationTools.getOptionValue("RecordingManager", "micalaDBStatusExportCDS"))
                 import re
                 pattern_cern  = re.compile('([sc\d]+)$')
                 pattern_umich = re.compile('(\d+\-[\w\d]+\-\d)$')
-                idLecture = self.getIdLecture(pending, pattern_cern, pattern_umich)
-                self.reportStatus("COMPLETE", "CDS record: %s" % new_record, idMachine, idTask, idLecture)
+                idLecture = cls.getIdLecture(pending, pattern_cern, pattern_umich)
+                cls.reportStatus("COMPLETE", "CDS record: %s" % new_record, idMachine, idTask, idLecture)
 
                 # I should still update the Lectures table to add the CDS record
 

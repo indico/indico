@@ -5,10 +5,9 @@ from MaKaC.user import CERNGroup
 from MaKaC.common.logger import Logger
 
 class MarcAccessListGenerator(object):
-    def __init__(self):
-        pass
 
-    def generateAccessListXML(self, out, obj):
+    @classmethod
+    def generateAccessListXML(cls, out, obj):
         """Generate a comprehensive access list showing all users and e-groups who may access
         this object, taking into account the permissions and access lists of its owners.
         obj could be a Conference, Session, Contribution, or SubContribution object."""
@@ -40,7 +39,8 @@ class MarcAccessListGenerator(object):
                     out.writeTag("email", email_id)
                 out.closeTag("allowedAccessEmails")
 
-    def generateVideoXML(self, out, recordingManagerTags):
+    @classmethod
+    def generateVideoXML(cls, out, recordingManagerTags):
         """Generate XML variables needed for video records."""
 
         Logger.get('RecMan').info("in generateVideoXML(), contentType = %s" % recordingManagerTags["contentType"])
@@ -61,7 +61,8 @@ class MarcAccessListGenerator(object):
         elif recordingManagerTags["contentType"] == 'web_lecture':
             out.writeTag("videoFormat", contentTypeWebLecture)
 
-    def generateLanguagesXML(self, out, recordingManagerTags):
+    @classmethod
+    def generateLanguagesXML(cls, out, recordingManagerTags):
         """Generate XML variables needed for language information."""
 
         if len(recordingManagerTags["languages"]) > 0:

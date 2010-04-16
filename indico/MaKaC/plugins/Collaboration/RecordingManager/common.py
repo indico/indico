@@ -197,11 +197,11 @@ def getTalks(conference, sort = False):
     # Get list of matching IndicoIDs and CDS records from CDS
     cds_indico_matches = getCDSRecords(conference.getId())
     Logger.get('RecMan').info('cds_indico_pending...')
-    cds_indico_pending = MicalaCommunication().getCDSPending(conference.getId(), cds_indico_matches)
+    cds_indico_pending = MicalaCommunication.getCDSPending(conference.getId(), cds_indico_matches)
 
     # In case there are any records that were pending and are now appearing in CDS,
     # then update the micala database accordingly.
-    MicalaCommunication().updateMicalaCDSExport(cds_indico_matches, cds_indico_pending)
+    MicalaCommunication.updateMicalaCDSExport(cds_indico_matches, cds_indico_pending)
 
     Logger.get('RecMan').info("cds_indico_matches: %s, cds_indico_pending: %s" % (cds_indico_matches, cds_indico_pending))
     for event_info in recordable_events:
@@ -218,7 +218,7 @@ def getTalks(conference, sort = False):
                 event_info["CDSURL"] = ""
 
     # Get list of matching IndicoID's and LOIDs from the Micala database
-    existing_matches = MicalaCommunication().getMatches(conference.getId())
+    existing_matches = MicalaCommunication.getMatches(conference.getId())
 
     # insert any existing matches into the recordable_events array
     for talk in recordable_events:
@@ -515,12 +515,12 @@ def createCDSRecord(aw, IndicoID, contentType, videoFormat, languages):
     pattern_umich = re.compile('(\d+\-[\w\d]+\-\d)$')
 
     # Update the micala database with our current task status
-    idMachine = MicalaCommunication().getIdMachine(CollaborationTools.getOptionValue("RecordingManager", "micalaDBMachineName"))
-    idTask    = MicalaCommunication().getIdTask(CollaborationTools.getOptionValue("RecordingManager", "micalaDBStatusExportCDS"))
-    idLecture = MicalaCommunication().getIdLecture(IndicoID, pattern_cern, pattern_umich)
+    idMachine = MicalaCommunication.getIdMachine(CollaborationTools.getOptionValue("RecordingManager", "micalaDBMachineName"))
+    idTask    = MicalaCommunication.getIdTask(CollaborationTools.getOptionValue("RecordingManager", "micalaDBStatusExportCDS"))
+    idLecture = MicalaCommunication.getIdLecture(IndicoID, pattern_cern, pattern_umich)
     if idLecture == '':
-        idLecture = MicalaCommunication().createNewMicalaLecture(IndicoID, contentType, pattern_cern, pattern_umich)
-    MicalaCommunication().reportStatus('START', '', idMachine, idTask, idLecture)
+        idLecture = MicalaCommunication.createNewMicalaLecture(IndicoID, contentType, pattern_cern, pattern_umich)
+    MicalaCommunication.reportStatus('START', '', idMachine, idTask, idLecture)
 
     # temporary, for my own debugging
     f = open('/tmp/base.xml', 'w')

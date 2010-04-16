@@ -267,9 +267,9 @@ class outputGenerator:
                     # Now we know it's safe to import the necessary methods,
                     # because we have verified that the RecordingManager plugin is installed.
                     from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator
-                    MarcAccessListGenerator().generateAccessListXML(out, conf)
-                    MarcAccessListGenerator().generateVideoXML(out, recordingManagerTags)
-                    MarcAccessListGenerator().generateLanguagesXML(out, recordingManagerTags)
+                    MarcAccessListGenerator.generateAccessListXML(out, conf)
+                    MarcAccessListGenerator.generateVideoXML(out, recordingManagerTags)
+                    MarcAccessListGenerator.generateLanguagesXML(out, recordingManagerTags)
 
         if conf.canModify( self.__aw ) and vars and modificons:
             out.writeTag("modifyLink",vars["modifyURL"])
@@ -562,9 +562,9 @@ class outputGenerator:
                     Logger.get('RecMan').info('Called _sessionToXML() with RecordingManager')
                     # only now do we know it's safe to import the necessary method
                     from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator
-                    MarcAccessListGenerator().generateAccessListXML(out, session)
-                    MarcAccessListGenerator().generateVideoXML(out, recordingManagerTags)
-                    MarcAccessListGenerator().generateLanguagesXML(out, recordingManagerTags)
+                    MarcAccessListGenerator.generateAccessListXML(out, session)
+                    MarcAccessListGenerator.generateVideoXML(out, recordingManagerTags)
+                    MarcAccessListGenerator.generateLanguagesXML(out, recordingManagerTags)
 
         out.closeTag("session")
 
@@ -796,9 +796,9 @@ class outputGenerator:
 
                     # only now do we know it's safe to import the necessary method
                     from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator
-                    MarcAccessListGenerator().generateAccessListXML(out, contribution)
-                    MarcAccessListGenerator().generateVideoXML(out, recordingManagerTags)
-                    MarcAccessListGenerator().generateLanguagesXML(out, recordingManagerTags)
+                    MarcAccessListGenerator.generateAccessListXML(out, contribution)
+                    MarcAccessListGenerator.generateVideoXML(out, recordingManagerTags)
+                    MarcAccessListGenerator.generateLanguagesXML(out, recordingManagerTags)
 
         out.closeTag("contribution")
 
@@ -881,9 +881,9 @@ class outputGenerator:
 
                     # only now do we know it's safe to import the necessary method
                     from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator
-                    MarcAccessListGenerator().generateAccessListXML(out, subCont)
-                    MarcAccessListGenerator().generateVideoXML(out, recordingManagerTags)
-                    MarcAccessListGenerator().generateLanguagesXML(out, recordingManagerTags)
+                    MarcAccessListGenerator.generateAccessListXML(out, subCont)
+                    MarcAccessListGenerator.generateVideoXML(out, recordingManagerTags)
+                    MarcAccessListGenerator.generateLanguagesXML(out, recordingManagerTags)
 
         out.closeTag("subcontribution")
 
