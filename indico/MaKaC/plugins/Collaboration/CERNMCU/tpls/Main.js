@@ -238,10 +238,6 @@
         }
 
         infoTbody.append(Html.tr({},
-            Html.td("collaborationInfoLeftCol", $T('Indico booking ID:')),
-            Html.td({}, booking.id)));
-
-        infoTbody.append(Html.tr({},
             Html.td("collaborationInfoLeftCol", $T('Created on:')),
             Html.td({}, formatDateTimeCS(booking.creationDate))));
 
