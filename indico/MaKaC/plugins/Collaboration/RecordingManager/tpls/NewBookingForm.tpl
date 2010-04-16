@@ -86,9 +86,9 @@
     </td>
     <td width="620px" valign="top">
         <b>2. <%= _("Select content type: ") %></b>
-        <span id="RMbuttonPlainVideo" class="RMbuttonDisplay" onclick="RMbuttonModeSelect('plain_video')" onmouseover="RMbuttonModeOnHover('plain_video');" onmouseout="RMbuttonModeOffHover('plain_video')"><%= _("plain video") %></span>
+        <span id="RMbuttonPlainVideo" class="RMbuttonDisplay" onclick="RMbuttonModeSelect('plain_video')" ><%= _("plain video") %></span>
         &nbsp;<%= _(" or ") %>&nbsp;
-        <span id="RMbuttonWebLecture" class="RMbuttonDisplay" onclick="RMbuttonModeSelect('web_lecture')" onmouseover="RMbuttonModeOnHover('web_lecture');" onmouseout="RMbuttonModeOffHover('web_lecture')"><%= _("web lecture") %></span>
+        <span id="RMbuttonWebLecture" class="RMbuttonDisplay" onclick="RMbuttonModeSelect('web_lecture')" ><%= _("web lecture") %></span>
         <div id="RMrightPaneWebLecture" class="RMHolderPaneDefaultInvisible">
             <br />
             <b>3. <%= _("Select an orphan lecture object: ") %></b>

@@ -88,24 +88,6 @@ function RMbuttonModeSelect(mode) {
     }
 }
 
-function RMbuttonModeOnHover(mode) {
-    if (mode == 'plain_video' && RMviewMode != 'plain_video') {
-        $E("RMbuttonPlainVideo").dom.className = 'RMbuttonHover';
-    }
-    if (mode == 'web_lecture' && RMviewMode != 'web_lecture') {
-        $E("RMbuttonWebLecture").dom.className = 'RMbuttonHover';
-    }
-}
-
-function RMbuttonModeOffHover(mode) {
-    if (mode == 'plain_video' && RMviewMode != 'plain_video') {
-        $E("RMbuttonPlainVideo").dom.className = 'RMbuttonDisplay';
-    }
-    if (mode == 'web_lecture' && RMviewMode != 'web_lecture') {
-        $E("RMbuttonWebLecture").dom.className = 'RMbuttonDisplay';
-    }
-}
-
 function RMtalkBoxOffHover(IndicoID) {
     var DivID = 'div' + IndicoID;
     if (RMselectedTalkId != IndicoID) {

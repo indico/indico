@@ -36,13 +36,6 @@ span.RMbuttonDisplay {
     font-weight: normal;
 }
 
-span.RMbuttonHover {
-    background-color: #FFF6DF;
-    border-style: solid;
-    border-width: 1px;
-    padding: 4px;
-}
-
 span.RMbuttonSelected {
     background-color: #FFFFFF;
     border-style: solid;
@@ -60,6 +53,18 @@ span.RMbuttonNotSelected {
     padding: 4px;
     font-weight: normal;
     color: #CCCCCC;
+}
+
+span.RMbuttonDisplay, span.RMbuttonSelected, span.RMbuttonNotSelected {
+    cursor: pointer;
+}
+
+span.RMbuttonDisplay:hover, span.RMbuttonNotSelected:hover {
+    background-color: #FFF6DF;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #000000;
+    padding: 4px;
 }
 
 div.RMtalkDisplay {
