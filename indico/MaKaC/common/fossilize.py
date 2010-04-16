@@ -1,9 +1,27 @@
+# -*- coding: utf-8 -*-
+##
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """
-`fossilize` allows us to "serialize" complex python
-objects into dictionaries and lists. Such operation
-is very useful for generating JSON data structures
-from business objects.
-It works as a wrapper around `zope.interface`.
+`fossilize` allows us to "serialize" complex python objects into dictionaries
+and lists. Such operation is very useful for generating JSON data structures
+from business objects. It works as a wrapper around `zope.interface`.
 
 Some of the features are:
  * Different "fossil" types for the same source class;
@@ -14,7 +32,6 @@ import inspect
 import re
 import zope.interface
 from types import NoneType, ClassType, TypeType
-from persistent.interfaces import IPersistent
 
 
 def fossilizes(*classList):
@@ -26,11 +43,12 @@ def fossilizes(*classList):
                                             zope.interface.classImplements)
 
 def addFossil(klazz, fossils):
-    """ Declares fossils for a class
+    """
+    Declares fossils for a class
 
-        :param klazz: a class object
-        :type klass: class object
-        :param fossils: a fossil class (or a list of fossil classes)
+    :param klazz: a class object
+    :type klass: class object
+    :param fossils: a fossil class (or a list of fossil classes)
     """
     if not type(fossils) is list:
         fossils = [fossils]
@@ -119,16 +137,16 @@ class Fossilizable(object):
         :param interfaceArg: the target fossile type
         :type interfaceArg: IFossil, NoneType, or dict
 
-            -If IFossil, we will use it.
-            -If None, we will take the default fossil (the first one of this class's "fossilizes" list)
-            -If a dict, we will use the object's class, class name, or full class name as key.
+            * If IFossil, we will use it.
+            * If None, we will take the default fossil (the first one of this class's "fossilizes" list)
+            * If a dict, we will use the object's class, class name, or full class name as key.
 
         Also verifies that the interface obtained through these 3 methods is effectively provided by the object.
         """
         if interfaceArg is None:
             #we try to take the 1st interface declared with fossilizes
-            implementedInterfaces = list(zope.interface.implementedBy(self.__class__))
-            if not implementedInterfaces or implementedInterfaces[0] == IPersistent:
+            implementedInterfaces = list(i for i in zope.interface.implementedBy(self.__class__) if i.extends(IFossil))
+            if not implementedInterfaces:
                 raise NonFossilizableException("Object %s of class %s cannot be fossilized,"
                                                "no fossils were declared for it" %
                                                (str(self),
@@ -138,25 +156,17 @@ class Fossilizable(object):
 
         elif type(interfaceArg) is dict:
 
-            found = False
-            clazz = self.__class__
+            className = self.__class__.__module__ + '.' + \
+                        self.__class__.__name__
 
-            for key in interfaceArg.iterkeys():
-                if (key == clazz.__name__ or #class name
-                    key == "%s.%s" % (clazz.__module__, clazz.__name__) or #full class name
-                    key == clazz or #class
-                    (type(key) == ClassType or type(key) == TypeType or type(key) == tuple) and isinstance(self, key)): #class (including base classes)
-
-                    interface = interfaceArg[key]
-                    found = True
-                    break
-
-            if not found:
+            # interfaceArg is a dictionary of class:Fossil pairs
+            if className in interfaceArg:
+                interface = interfaceArg[className]
+            else:
                 raise NonFossilizableException("Object %s of class %s cannot be fossilized; "
                                                "its class was not a key in the provided fossils dictionary" %
                                                (str(self),
                                                 self.__class__.__name__))
-
         else:
             interface = interfaceArg
 

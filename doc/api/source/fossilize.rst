@@ -83,18 +83,17 @@ Advanced topics
 Valid fossil names. Fossil base class
 -------------------------------------
 
-Valid fossil names have to start with "I" (from "interface") and finish with "Fossil", i.e. they have
-to comply with the regular expression:: '^I(\w+)Fossil$' .
+Valid fossil names have to start with ``I`` (from "interface") and finish with ``Fossil``, i.e. they have to comply with the regular expression:: ``^I(\w+)Fossil$`` .
 
-Also, fossils have to always inherit directly or indirectly from the IFossil fossil,
-which in turns inherits from zope.interface.Interface.
+Also, fossils have to always inherit directly or indirectly from the ``IFossil`` fossil,
+which in turns inherits from ``zope.interface.Interface``.
 
 
 _type and _fossil
 -----------------
 
-All of the fossilized objects produced will have a '_type' attribute, with the name of the original object's class,
-and a '_fossil' attribute with the name of the fossil used:
+All of the fossilized objects produced will have a ``_type`` attribute, with the name of the original object's class,
+and a ``_fossil`` attribute with the name of the fossil used:
 
     >>> u = User(1, 'john')
     >>> u.fossilize(u, ISimpleUserFossil)
@@ -103,7 +102,7 @@ and a '_fossil' attribute with the name of the fossil used:
 Valid method names
 ------------------
 
-A fossil's method names have to be in the getXyz form, hasXyz form, or isXyz form. Otherwise, the 'name' tag is needed.
+A fossil's method names have to be in the ``get*`` form, ``has*`` form, or ``is*`` form. Otherwise, the ``name`` tag is needed.
 Example::
 
     class ISomeFossil(IFossil):
@@ -127,8 +126,7 @@ Fossilizing an imaginary user object with this fossil would result in:
     >>> u.fossilize(ISomeFossil)
     { 'name': 'bob', 'hasChildren': False, 'isMarried': True, 'requiresAcc': True, '_type': 'User', '_fossil': 'someFossil'}
 
-As shown, the getXwz methods correspond to a xwz attribute, the hasXwz methods correspond to a xwz attribute, and the isXwz methods
-correspond to a isXwz attribute. The other methods need a 'name' tag or an InvalidFossilException exception will be thrown.
+As shown, the ``getXyz`` methods correspond to a ``xwz`` attribute, the ``hasXwz`` methods correspond to a ``xwz`` attribute, and so on... The other methods need a ``name`` tag or an ``InvalidFossilException`` will be thrown.
 
 
 Method tags
@@ -136,11 +134,11 @@ Method tags
 
 As seen in the example, it is possible to apply valued tags to the fossil methods:
 
-    * 'name' tag: overrides the normal name that would be given to the attribute by the fossilizing engine.
+    * ``name`` tag: overrides the normal name that would be given to the attribute by the fossilizing engine.
 
-    * 'convert' tag: applies a function to the result of the object's method. Useful to covert datetime objects into strings, capitalize strings, etc.
+    * ``convert`` tag: applies a function to the result of the object's method. Useful to covert datetime objects into strings, capitalize strings, etc.
 
-    * 'result' tag: when the result of an object's method is another object that might be fossilized, you can specify which interface (fossil) to use with the 'result' tag.
+    * ``result`` tag: when the result of an object's method is another object that might be fossilized, you can specify which interface (fossil) to use with the ``result`` tag.
 
 
 Different ways of specifying the fossil to use
@@ -164,12 +162,11 @@ The normal way to specify which fossil to use is to just write the fossil class:
 
 This way should be used whenever we are sure that the object we are fossilizing is of a given class.
 
-However, in some cases we are not sure of the interface that should be used. Or, we may be fossilizing a list of
-heteregenous objects and we cannot or we do not want to use the same fossil for all of them.
+However, in some cases we are not sure of the interface that should be used. Or, we may be fossilizing a list of heteregenous objects and we cannot or we do not want to use the same fossil for all of them.
 
 In this case, there are currently two options:
 
-    * Use "None" as the interface (or leaving the interface argument empty). In this case, the "default" fossil will be used for each object, which means the first fossil declared with the "fossilizes" declaration in the object's class. If the object's class does not declare 'fossilizes' but one of its super-classes does, the first fossil from that super-class will be used. Example::
+    * Use ``None`` as the interface (or leaving the interface argument empty). In this case, the "default" fossil will be used for each object, which means the first fossil declared with the ``fossilizes`` declaration in the object's class. If the object's class does not invoke ``fossilizes`` but one of its super-classes does, the first fossil from that super-class will be used. Example::
 
         >>> friends = [User(1, 'john'), Group(5, 'family')]
         >>> fossilize(friends)
@@ -192,7 +189,7 @@ Changing a fossil in execution time
 -----------------------------------
 
 If for some reason you need to change a fossil behaviour in execution time (i.e. after it has been imported),
-know that it is possible. All fossils inherit from zope.interface.Interface, which defines methods so that this is possible.
+know that it is possible, but **please, avoid doing this unless you have a very good reason for it**. All fossils inherit from zope.interface.Interface, which defines methods so that this is possible.
 
 Example: change the 'name' tag of a given method of a fossil:
 
