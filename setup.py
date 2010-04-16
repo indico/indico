@@ -114,7 +114,7 @@ def _getInstallRequires():
 
     These are the ones needed for runtime.'''
 
-    base =  ['pytz', 'ZODB3>=3.8,<3.9.0a', 'zope.index', 'zope.interface', 'simplejson', 'cds-indico-extras']
+    base =  ['pytz', 'ZODB3>=3.8,<3.9.0a', 'zope.index', 'zope.interface', 'simplejson', 'suds', 'cds-indico-extras']
     if sys.version_info[1] < 5: # hashlib is part of Python 2.5+
         base.append('hashlib')
 
@@ -252,7 +252,7 @@ Please specify the directory where you'd like it to be placed.
         if prefixDir == '':
             prefixDir = os.getcwd()
 
-        directories = dict((d,os.path.join(prefixDir, d)) for d in
+        directories = dict((d, os.path.join(prefixDir, d)) for d in
                            ['db', 'log', 'tmp', 'cache', 'archive'])
 
         print 'Creating directories...',
@@ -272,9 +272,9 @@ Please specify the directory where you'd like it to be placed.
         if sys.platform == "linux2":
             # find the apache user/group
             user, group = _findApacheUserGroup(None, None)
-            _checkDirPermissions(directories, dbInstalledBySetupPy=directories['db'], accessuser=user, accessgroup=group)
+            _checkDirPermissions(directories, dbInstalledBySetupPy = directories['db'], accessuser = user, accessgroup = group)
 
-        _updateDbConfigFiles(directories['db'], directories['log'], os.path.join(sourcePath,'etc'), directories['tmp'], user)
+        _updateDbConfigFiles(directories['db'], directories['log'], os.path.join(sourcePath, 'etc'), directories['tmp'], user)
 
         _updateMaKaCEggCache(os.path.join(os.path.dirname(__file__), 'indico', 'MaKaC', '__init__.py'), directories['tmp'])
 
@@ -322,7 +322,7 @@ if __name__ == '__main__':
     dataFiles = _getDataFiles(x)
 
     setup(name = "cds-indico",
-          cmdclass={'sdist': sdist_indico,
+          cmdclass = {'sdist': sdist_indico,
                     'bdist': _bdist_indico(dataFiles),
                     'bdist_egg': _bdist_egg_indico(dataFiles),
                     'jsbuild': jsbuild,
@@ -348,7 +348,7 @@ if __name__ == '__main__':
                                  ]
           },
           zip_safe = False,
-          packages = find_packages(where='indico', exclude=('htdocs',)),
+          packages = find_packages(where = 'indico', exclude = ('htdocs',)),
           install_requires = _getInstallRequires(),
           data_files = dataFiles,
           package_data = {'indico': ['*.*'] },

@@ -1,0 +1,57 @@
+span.VidyoHiddenPIN {
+    color: #AAAAAA;
+}
+
+.VPrefix {
+    width: 20px;
+    margin-right: 0px;
+    padding-right: 0px;
+}
+
+.VSuffix {
+    width: 100px;
+    margin-left: 0px;
+    padding-left: 0px;
+}
+
+.VidyoParticipantsDiv {
+    height: 93px;
+    width: 500px;
+    border: 1px solid #CCCCCC;
+    overflow: auto;
+    margin-bottom: 10px;
+}
+
+ul.VidyoParticipantsList
+{
+    border: none;
+    display: block;
+    list-style-type: none;
+    padding-left: 0px;
+    margin: 0;
+}
+
+ul.VidyoParticipantsList li{
+    margin: 0;
+    display: block;
+    margin-bottom: 0px;
+    line-height: 25px;
+    padding-left: 5px;
+    vertical-align: middle;
+}
+
+div.Vidyo_H323RoomList_Div {
+    height: 300px;
+}
+
+ul.Vidyo_H323RoomList li{
+    padding-left: 10px;
+}
+
+ul.Vidyo_H323RoomList div.selectedRoom {
+    background-color: #CDEB8B;
+}
+
+ul.Vidyo_H323RoomList div.unselectedRoom {
+    background-color: #FFFFFF;
+}
