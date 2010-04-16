@@ -114,7 +114,7 @@ globalOptions = [
 
     ("CDSQueryURL", {"description" : _("CDS query URL"),
                "type": str,
-               "defaultValue": '''http://cdsdev.cern.ch/search?p=sysno:"INDICO.%s"&f=&action_search=Search&sf=&so=d&rm=&rg=1000&sc=1&ot=970&of=t&ap=0''',
+               "defaultValue": '''http://cdsdev.cern.ch/search?p=sysno%%3A%%22INDICO.%s%%22&f=&action_search=Search&sf=&so=d&rm=&rg=1000&sc=1&ot=970&of=t&ap=0''',
                "editable": True,
                "visible": True} ),
 
@@ -139,7 +139,7 @@ globalOptions = [
 # need to look over this again:
     ("mediaArchiveFormatPlainVideo", {"description" : _("Format of plain video filename"),
                "type": str,
-               "defaultValue": "http://mediaarchive.cern.ch/MediaArchive/Video/Public2/WebLectures/%s/%s",
+               "defaultValue": "http://mediaarchive.cern.ch/MediaArchive/Video/Public/Conferences/%s/%s",
                "editable": True,
                "visible": True} ),
 
