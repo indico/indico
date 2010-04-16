@@ -138,6 +138,24 @@ function RMtalkSelect(IndicoID) {
     }
 }
 
+function RMCDSDoneOnHover(IndicoID) {
+    divID = 'divCDS' + IndicoID;
+
+    document.getElementById(divID).className = 'RMcolumnStatusCDSDoneHover';
+
+}
+
+function RMCDSDoneOffHover(IndicoID) {
+    divID = 'divCDS' + IndicoID;
+
+    document.getElementById(divID).className = 'RMcolumnStatusCDSDone';
+
+}
+
+function RMCDSDoneClick(url) {
+    window.location = url;
+}
+
 function RMLOBoxOffHover(DBID) {
     var DivID = 'lo' + DBID;
     if (RMselectedLOID != DBID) {

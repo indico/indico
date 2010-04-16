@@ -140,10 +140,32 @@ div.RMLOSelected {
     padding: 2px;
 }
 
-div.columnStatus {
+div.RMcolumnStatusNone {
     width: 50px;
     height: 28px;
     text-align: center;
+}
+
+div.RMcolumnStatusCDSPending {
+    width: 50px;
+    height: 28px;
+    text-align: center;
+    background-image: url(/indico/images/RecordingManagerCDSPending.png);
+}
+
+div.RMcolumnStatusCDSDone {
+    width: 50px;
+    height: 28px;
+    text-align: center;
+    background-image: url(/indico/images/RecordingManagerCDSCheck.png);
+}
+
+div.RMcolumnStatusCDSDoneHover {
+    width: 50px;
+    height: 28px;
+    text-align: center;
+    cursor: pointer;
+    background-image: url(/indico/images/RecordingManagerCDSHover.png);
 }
 
 div.RMlowerPane {

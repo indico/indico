@@ -45,36 +45,35 @@
                     </td>
                     <td width="50px">
                         <% if talk["LOID"] != '': %>
-                            <div class="columnStatus" style="background-image: url('<%= "/indico/images/RecordingManagerMicalaCheck.png" %>');">
+                            <div class="RMcolumnStatusNone" style="background-image: url('<%= "/indico/images/RecordingManagerMicalaCheck.png" %>');">
                             &nbsp;</div>
                         <% end %>
                         <% else: %>
-                            <div class="columnStatus">
+                            <div class="RMcolumnStatusNone">
                             </div>
                         <% end %>
                     </td>
                     <td width="50px">
                         <% if talk["CDSID"] != 'none' and talk["CDSID"] != 'pending': %>
-                            <div class="columnStatus" style="background-image: url('<%= "/indico/images/RecordingManagerCDSCheck.png" %>');">
-                                <a href="<%= talk["CDSURL"] %>" target="newtab">link</a>
+                            <div class="RMcolumnStatusCDSDone" id="divCDS<%= talk["IndicoID"] %>" onclick="RMCDSDoneClick('<%= talk["CDSURL"] %>')" onmouseover="RMCDSDoneOnHover('<%= talk["IndicoID"] %>')" onmouseout="RMCDSDoneOffHover('<%= talk["IndicoID"] %>')">
                             </div>
                         <% end %>
                         <% elif talk["CDSID"] == 'pending': %>
-                            <div class="columnStatus" style="background-image: url('<%= "/indico/images/RecordingManagerCDSPending.png" %>');">
+                            <div class="RMcolumnStatusCDSPending">
                             </div>
                         <% end %>
                         <% else: %>
-                            <div class="columnStatus">
+                            <div class="RMcolumnStatusNone">
                             </div>
                         <% end %>
                     </td>
                     <td width="50px">
                         <% if talk["IndicoLink"] == True: %>
-                            <div class="columnStatus" style="background-image: url('<%= "/indico/images/RecordingManagerIndicoCheck.png" %>');">
+                            <div class="RMcolumnStatusNone" style="background-image: url('<%= "/indico/images/RecordingManagerIndicoCheck.png" %>');">
                             </div>
                         <% end %>
                         <% else: %>
-                            <div class="columnStatus">
+                            <div class="RMcolumnStatusNone">
                             </div>
                         <% end %>
                     </td>
