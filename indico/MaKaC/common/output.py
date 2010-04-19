@@ -181,6 +181,25 @@ class outputGenerator:
             pass
         out.closeTag("user")
 
+    def _getRoom(self, room, location):
+        # get the name that is saved
+        roomName = room.getName()
+
+        # if there is a connection to the room booking DB
+        if CrossLocationDB.isConnected() and location:
+            # get the room info
+            roomFromDB = CrossLocationQueries.getRooms( roomName = roomName, location = location.getName() )
+            #roomFromDB can be a list or an object room
+            if isinstance(roomFromDB,list) and roomFromDB != []:
+                roomFromDB = roomFromDB[0]
+            # If there's a room with such name.
+            # Sometimes CrossLocationQueries.getRooms returns a list with None elements
+            if roomFromDB:
+                # use the full name instead
+                roomName = roomFromDB.getFullName()
+        return roomName
+
+
     def _confToXML(self, conf, vars, includeSession=1, includeContribution=1, includeMaterial=1, showSession="all", showDate="all",showContribution="all", showWithdrawed=True, useSchedule=True, out=None):
         if not out:
             out = self._XMLGen
@@ -265,18 +284,7 @@ class outputGenerator:
                 out.writeTag("name",l.getName())
                 out.writeTag("address",l.getAddress())
             if conf.getRoom():
-                # get the name that is saved
-                roomName = conf.getRoom().getName()
-
-                # if there is a connection to the room booking DB
-                if CrossLocationDB.isConnected() and loc:
-                    # get the room info
-                    roomFromDB = CrossLocationQueries.getRooms( roomName = roomName, location = loc.getName() )
-                    # if there's a room with such name
-                    if roomFromDB != []:
-                        # use the full name instead
-                        roomName = roomFromDB[0].getFullName()
-
+                roomName = self._getRoom(conf.getRoom(), loc)
                 out.writeTag("room", roomName)
                 url=RoomLinker().getURL(conf.getRoom(), loc)
                 if url != "":
@@ -419,17 +427,7 @@ class outputGenerator:
                 out.writeTag("name",l.getName())
                 out.writeTag("address",l.getAddress())
             if session.getRoom():
-                # get the name that is saved
-                roomName = session.getRoom().getName()
-
-                # if there is a connection to the room booking DB
-                if CrossLocationDB.isConnected() and l:
-                    # get the room info
-                    roomFromDB = CrossLocationQueries.getRooms( roomName = roomName, location = l.getName() )
-                    # if there's a room with such name
-                    if roomFromDB != []:
-                        # use the full name instead
-                        roomName = roomFromDB[0].getFullName()
+                roomName = self._getRoom(session.getRoom(), l)
                 out.writeTag("room", roomName)
                 url=RoomLinker().getURL(session.getRoom(), l)
                 if url != "":
@@ -526,16 +524,7 @@ class outputGenerator:
                 out.writeTag("name",l.getName())
                 out.writeTag("address",l.getAddress())
             if room:
-                # get the name that is saved
-                roomName = room.getName()
-                # if there is a connection to the room booking DB
-                if CrossLocationDB.isConnected() and l:
-                    # get the room info
-                    roomFromDB = CrossLocationQueries.getRooms( roomName = roomName, location = l.getName() )
-                    # if there's a room with such name
-                    if roomFromDB != []:
-                        # use the full name instead
-                        roomName = roomFromDB[0].getFullName()
+                roomName = self._getRoom(room, l)
                 out.writeTag("room", roomName)
                 url=RoomLinker().getURL(room, l)
                 if url != "":
@@ -635,15 +624,7 @@ class outputGenerator:
                 out.writeTag("name",l.getName())
                 out.writeTag("address",l.getAddress())
             if cont.getRoom():
-                roomName = cont.getRoom().getName()
-                # if there is a connection to the room booking DB
-                if CrossLocationDB.isConnected() and l:
-                    # get the room info
-                    roomFromDB = CrossLocationQueries.getRooms( roomName = roomName, location = l.getName() )
-                    # if there's a room with such name
-                    if roomFromDB != []:
-                        # use the full name instead
-                        roomName = roomFromDB[0].getFullName()
+                roomName = self._getRoom(cont.getRoom(), l)
                 out.writeTag("room", roomName)
                 url=RoomLinker().getURL(cont.getRoom(), l)
                 if url != "":
@@ -855,15 +836,7 @@ class outputGenerator:
                 out.writeTag("name",l.getName())
                 out.writeTag("address",l.getAddress())
             if br.getRoom():
-                roomName = br.getRoom().getName()
-                # if there is a connection to the room booking DB
-                if CrossLocationDB.isConnected() and l:
-                    # get the room info
-                    roomFromDB = CrossLocationQueries.getRooms( roomName = roomName, location = l.getName() )
-                    # if there's a room with such name
-                    if roomFromDB != []:
-                        # use the full name instead
-                        roomName = roomFromDB[0].getFullName()
+                roomName = self._getRoom(br.getRoom(), l)
                 out.writeTag("room", roomName)
                 url=RoomLinker().getURL(br.getRoom(), l)
                 if url != "":
@@ -941,15 +914,7 @@ class outputGenerator:
                 loc = loc +", "+conf.getLocation().getAddress()
 
             if conf.getRoom():
-                roomName = conf.getRoom().getName()
-                # if there is a connection to the room booking DB
-                if CrossLocationDB.isConnected() and l:
-                    # get the room info
-                    roomFromDB = CrossLocationQueries.getRooms( roomName = roomName, location = l.getName() )
-                    # if there's a room with such name
-                    if roomFromDB != []:
-                        # use the full name instead
-                        roomName = roomFromDB[0].getFullName()
+                roomName = self._getRoom(conf.getRoom(), l)
                 loc = loc + ", " + roomName
 
             if l.getName() != "":
