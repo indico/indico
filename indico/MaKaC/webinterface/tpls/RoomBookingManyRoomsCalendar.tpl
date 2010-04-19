@@ -47,7 +47,6 @@
                 <!-- Render each room -->
                 <% for roomBars in bars[dayD]: %>
                     <% room = roomBars.room %>
-                    <% bars = roomBars.bars %>
                     <tr>
                         <!-- Room Column -->
                         <td width="120px">
@@ -66,7 +65,7 @@
                             <div class="dayDiv"> <!-- id="roomDiv_<= room.guid >" -->
 
                                 <!-- Render each bar... -->
-                                <% for bar in bars: %>
+                                <% for bar in roomBars.bars: %>
                                     <% r = bar.forReservation %>
                                     <% left = int( 1.0 * ( (bar.startDT.hour-START_H) * 60 + bar.startDT.minute ) / (24*60) * DAY_WIDTH_PX  ) %>
                                     <% diff = ( bar.endDT.hour - bar.startDT.hour ) * 60 + ( bar.endDT.minute - bar.startDT.minute ) %>

@@ -6248,7 +6248,7 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
             # (collision is just a helper object, it's not the best notion here)
 
             for r in rh._resvs:
-                for p in r.splitToPeriods(endDT=calendarEndDT):
+                for p in r.splitToPeriods(endDT=calendarEndDT, startDT=calendarStartDT):
                     if p.startDT >= calendarStartDT and p.endDT <= calendarEndDT:
                         collisionsOfResvs.append( Collision( ( p.startDT, p.endDT ), r ) )
 

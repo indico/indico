@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 ##
+## $Id: rb_reservation.py,v 1.14 2009/05/14 18:05:51 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -1212,14 +1213,18 @@ class ReservationBase( object ):
         return user
 
 
-    def splitToPeriods( self, endDT = None ):
+    def splitToPeriods( self, endDT = None, startDT = None ):
         """
         Returns the list of Periods that represent this reservation.
 
         For non-repeating reservations it is just the reservation period.
         For repeating ones, the list will include all repeatings.
         """
-        lastDT = self.startDT - timedelta( 1 )   # One day before the beginning
+        if startDT is None:
+            lastDT = self.startDT - timedelta( 1 )   # One day before the beginning
+        else:
+            lastDT = startDT - timedelta( 1 )
+
         periods = []
 
         while True:

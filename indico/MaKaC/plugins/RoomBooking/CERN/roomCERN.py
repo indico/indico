@@ -40,8 +40,13 @@ class RoomCERN( Room ):
 
     def __eq__( self, other ):
         try:
-            return self.id == other.id
-        except:
+            if self.id != None  and  other.id != None:
+                return self.id == other.id
+            else:
+                return self.name == other.name and self.building == other.building \
+                    and self.floor == other.floor and self.locationName == other.locationName
+
+        except AttributeError:
             if self is None and other is None:
                 return True
             else:

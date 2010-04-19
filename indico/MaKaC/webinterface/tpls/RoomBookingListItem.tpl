@@ -16,7 +16,11 @@
 </script>
 <% for collision in unrolledReservations: %>
     <%
-    reservation = collision.withReservation
+    if hasattr(collision, 'withReservation'):
+        reservation = collision.withReservation
+    else:
+        reservation = collision
+
     occurrence = collision
     myDetails = bookingDetailsUH.getURL( reservation )
     rejectOccurrence = urlHandlers.UHRoomBookingRejectBookingOccurrence.getURL( reservation, formatDate(occurrence.startDT.date()) )
@@ -40,6 +44,8 @@
     occurrenceId = 'resv%s%s' % (reservation.id, occurrence.startDT)
 
     %>
+    <% end %>
+    <% end %>
     <% end %>
     <% end %>
 
