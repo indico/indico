@@ -497,7 +497,7 @@ type("EditMaterialResourceBase", ["ServiceDialogWithButtons"], {
         var self = this;
 
         var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
-        if (IndicoGlobalVars.isUserAuthenticated && !exists(IndicoGlobalVars.favIds)) {
+        if (IndicoGlobalVars.isUserAuthenticated && !exists(IndicoGlobalVars['favorite-user-ids'])) {
             self.args.includeFavList = true;
         } else {
             self.args.includeFavList = false;

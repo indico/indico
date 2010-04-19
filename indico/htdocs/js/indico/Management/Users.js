@@ -33,11 +33,11 @@ function userSort(user1, user2) {
 }
 
 function updateFavList(favouriteList) {
-    IndicoGlobalVars.favIds = {};
-    IndicoGlobalVars.favList = [];
+    IndicoGlobalVars['favorite-user-ids'] = {};
+    IndicoGlobalVars['favorite-user-list'] = [];
     each(favouriteList, function(user) {
-        IndicoGlobalVars.favIds[user.id] = true;
-        IndicoGlobalVars.favList.push(user);
+        IndicoGlobalVars['favorite-user-ids'][user.id] = true;
+        IndicoGlobalVars['favorite-user-list'].push(user);
     });
 }
 
@@ -52,35 +52,6 @@ function updateFavList(favouriteList) {
  */
 type ("FoundPeopleList", ["SelectableListWidget"], {
 
-    /*
-    __mouseoverObserver: function(inOut, pair, listItem, event) {
-
-        if (inOut) {
-            if (!exists(this.lastTargetListItem) || this.lastTargetListItem.dom.id !== listItem.dom.id) {
-                if (!pair.get().get("isGroup")) {
-                    IndicoUI.Effect.appear($E(listItem.dom.id + "_email"));
-                    if (exists(this.lastTargetListItem)) {
-                        IndicoUI.Effect.disappear($E(this.lastTargetListItem.dom.id + "_email"));
-                    }
-                }
-                this.lastTargetListItem = listItem;
-            }
-        } else {
-            var movedToTarget = $E(relatedTarget(event));
-            var insideListItem = $E(this.id).ancestorOf(movedToTarget);
-
-            if (!insideListItem) {
-                if (!pair.get().get("isGroup")) {
-                    IndicoUI.Effect.disappear($E(this.lastTargetListItem.dom.id + "_email"));
-                }
-                this.lastTargetListItem = null;
-            }
-        }
-
-
-    },
-    */
-
     _drawItem: function(pair) {
         var self = this;
         var peopleData = pair.get();
@@ -90,7 +61,7 @@ type ("FoundPeopleList", ["SelectableListWidget"], {
         } else {
 
             var userName = Html.span({}, peopleData.get("familyName").toUpperCase(), ', ', peopleData.get("firstName"));
-            var userEmail = Html.span({id: self.id + "_" + pair.key + "_email", className: "foundUserEmail"}, Html.br(), peopleData.get("email"));
+            var userEmail = Html.span({id: self.id + "_" + pair.key + "_email", className: "foundUserEmail"}, Html.br(), Util.truncate(peopleData.get("email"), 40));
 
             if (this.showToggleFavouriteButtons && IndicoGlobalVars.isUserAuthenticated && peopleData.get('_type') == "Avatar") {
                 var favouritizeButton = new ToggleFavouriteButton(peopleData.getAll(), null, null, this.favouriteButtonObserver).draw();
@@ -570,9 +541,9 @@ type ("SuggestedUsersPanel", ["IWidget"], {
         }
 
         if (includeFavourites) {
-            each(IndicoGlobalVars.favList, function(user){
+            each(IndicoGlobalVars['favorite-user-list'], function(user){
                 var id = user.id;
-                if (exists(IndicoGlobalVars.favIds[id]) && IndicoGlobalVars.favIds[id] && !self.suggestedUserList.get('existingAv' + id)) {
+                if (exists(IndicoGlobalVars['favorite-user-ids'][id]) && IndicoGlobalVars['favorite-user-ids'][id] && !self.suggestedUserList.get('existingAv' + id)) {
                     self.suggestedUserList.set('existingAv' + id, $O(user));
                 }
             });
@@ -610,7 +581,7 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
         function(hook) {
             var self = this;
 
-            if (exists(IndicoGlobalVars.favList)) {
+            if (exists(IndicoGlobalVars['favorite-user-list'])) {
                 hook.set(true);
             } else {
                 var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
@@ -1369,6 +1340,7 @@ type("UserListWidget", ["ListWidget"],
                      userData.clone(),
                      function(newData, suicideHook) {
                          if (editPopup.parameterManager.check()) {
+                             //  editProcess will be passed a WatchObject representing the user.
                              self.editProcess(userData, function(result) {
                                  if (result) {
                                      userData.update(newData.getAll());
@@ -1384,12 +1356,14 @@ type("UserListWidget", ["ListWidget"],
                  editPopup.open();
              }, IndicoUI.Buttons.editButton()));
 
-             var removeButton = Widget.link(command(function() {
-                 self.removeProcess(userData, function(result) {
-                     if (result) {
-                         self.set(user.key, null);
-                     }
-                 });
+             var removeButton =
+                 Widget.link(command(function() {
+                             // removeProcess will be passed a WatchObject representing the user.
+                             self.removeProcess(userData, function(result) {
+                                     if (result) {
+                                         self.set(user.key, null);
+                                     }
+                                 });
 
              }, IndicoUI.Buttons.removeButton()));
 
@@ -1403,7 +1377,7 @@ type("UserListWidget", ["ListWidget"],
 
                  var buttonDiv = Html.div({style: {cssFloat: "right", paddingRight: pixels(10), paddingTop: pixels(5)}});
 
-                 if (IndicoGlobalVars.isUserAuthenticated && exists(IndicoGlobalVars.favIds) && this.showToggleFavouriteButtons && userData.get('_type') === "Avatar") {
+                 if (IndicoGlobalVars.isUserAuthenticated && exists(IndicoGlobalVars['favorite-user-ids']) && this.showToggleFavouriteButtons && userData.get('_type') === "Avatar") {
                      var favouritizeButton = new ToggleFavouriteButton(userData.getAll()).draw();
                      buttonDiv.append(favouritizeButton);
                  }
@@ -1434,358 +1408,17 @@ type("UserListWidget", ["ListWidget"],
      }
     );
 
-/**
- * Creates a form field with a list of users.
- * Users can be added from an initial list of users, from the currently logged in user's favorites (user basket),
- * from a user search dialog, or from a 'new user' dialog.
- * The list of users (a UserListWidget, i.e. a WatchObject) can be retrieved by calling getUsers().
- *
- * The 'id' attribute of the users in the list will depend from their origin.
- * -If it was added from the search dialog, the id will be a number (corresponding to the avatar id).
- * -It it was added from the 'new user' dialog, the id will be 'newUserXX', where XX is auto-increment starting from 0.
- * -If it was added from the list of suggested users, it will retain the id of the user that was put in the list.
- * -It the user was edited, and the edited user corresponded to an Avatar, the id will be 'editedXX' where XX is the id of the Avatar used initially.
- *
- * @param {String } userDivStyle A CSS class for the div that will sourround the user list.
- * @param {String } userListStyle A CSS class for the user list. It will be passed to the inner UserListWidget.
- * @param {list} initialUsers A list of users that will appear initially. Example: <%= jsonEncode(DictPickler.pickle([AvatarHolder().getById(1), AvatarHolder().getById(2)])) %>
- * @param {list} optionalUsers A list of users that will be offered as options to be added. Example: <%= jsonEncode(DictPickler.pickle([AvatarHolder().getById(3), AvatarHolder().getById(4)])) %>
- * @param {list} favouriteUsers A list of users that will be offered as options to be added, under the category "Favorite users" Example: <%= jsonEncode(DictPickler.pickle(some_user.getPersonalInfo().getBasket().getUsers()) %>
- * @param {Boolean} allowSearch If True, a 'Search User' button will be present.
- * @param {Boolean} allowNew If True, a 'New User' button will be present.
- * @param {Boolean} allowEdit If True, users in the list will be able to be edited.
- * @param {Function} newProcess A function that will be called when new users (from new data, or from the search dialog, or from the suggested list) is added to the list.
- *                              The function will be passed a list of WatchObjects representing the users.
- * @param {Function} editProcess A function that will be called when a user is edited.
- *                               The function will be passed a WatchObject representing the user.
- * @param {Function} removeProcess A function that will be called when a user is removed.
- *                                 The function will be passed a WatchObject representing the user.
- * @param {Boolean} enableGroups If True, the "Choose user" dialog will propose to search groups.
- * @param {list} privileges dictionary with the privileges that we can set for the users. There is a key and a tuple as vale: (label, default value for checked). E.g. {"grant-manager": ["event modification", false]}
- * @param {string} conferenceId for author list search
- * @param {Boolean} showToggleFavouriteButtons. false by default. If true, favouritize buttons will not be shown.
- */
-/*
-type("OldUserListField", ["IWidget"], {
-    _highlightNewUser: function(userId) {
-        var self = this;
-        IndicoUI.Effect.highLightBackground(self.userList.getId() + '_' + userId);
-    },
-
-    getUsers: function() {
-        return $L(this.userList);
-    },
-
-    getPrivileges: function() {
-        return this.selectedPrivileges;
-    },
-
-    draw: function() {
-        var self = this;
-
-        var select;
-        var buttons1 = Html.div({style:{marginTop: pixels(10)}});
-
-        if (self.allowSearch) {
-            var searchUserButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add Existing') );
-            searchUserButton.observeClick(function(){
-                var handler = function(userList) {
-                    self.newProcess(userList, function(value) {
-                        if (value) {
-                            each(userList, function(user){
-                                var userId = (user.isGroup || user._fossil === 'group') ? user.id : ("existingAv" + user.id);
-
-                                if (self.userList.get(userId)) {
-                                    self.userList.set(userId, null);
-                                }
-                                self.userList.set(userId, $O(user));
-                                //self._highlightNewUser(userId);
-                            });
-                        }
-                    });
-                };
-                var userSearchPopup = new UserSearchPopup("Search users", handler, self.enableGroups, self.conferenceId);
-                userSearchPopup.open();
-            });
-            buttons1.append(searchUserButton);
-        }
-
-        if (self.allowNew) {
-            var addNewUserButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add New') );
-            addNewUserButton.observeClick(function(){
-                var newUserId = 'newUser' + self.newUserCounter++;
-                var newUser = $O({'id': newUserId});
-                newUserPopup = new UserDataPopup(
-                    $T('New user'),
-                    newUser,
-                    function(newData, suicideHook) {
-                        if (newUserPopup.parameterManager.check()) {
-                            newUser.update(newData.getAll());
-                            self.newProcess([newUser], function(result) {
-                                if (result) {
-                                    self.userList.set(newUserId, newUser);
-                                    //self._highlightNewUser(newUserId);
-                                }
-                            });
-                            suicideHook();
-                        }
-                    }
-                );
-                newUserPopup.open();
-            });
-            buttons1.append(addNewUserButton);
-        }
-
-        self.allOptions = new WatchObject();
-        if (self.favouriteUsers) {
-            self.allOptions.update(self.favouriteUsers.getAll());
-        }
-        if (self.optionalUsers) {
-            self.allOptions.update(self.optionalUsers.getAll());
-        }
-
-        if (self.favouriteUsers || self.optionalUsers) {
-
-            var addUserButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add from favourites') );
-            self.userSelectPopup = new AdditionalUsersPopup($T("Add from favourites and others"), self.favouriteUsers, self.optionalUsers, function(){
-
-                    var newUserIds = getSelectedItems(self.userSelectPopup.selectList);
-                    each(newUserIds, function(newUserId) {
-                        var newUser = self.allOptions.get(newUserId).clone();
-
-                        self.newProcess([newUser], function(result) {
-                            if (result) {
-                                self.userList.set("existingAv"+newUserId, newUser);
-                                //self._highlightNewUser("existingAv"+newUserId);
-                            }
-                        });
-                    });
-
-                    return true;
-            });
-
-            addUserButton.observeClick(function(){
-                self.userSelectPopup.open();
-            });
-            buttons1.append(addUserButton);
-
-        }
-
-        var privilegesDiv = Html.span({style:{marginTop: pixels(10)}});
-        var keysList = keys(this.privileges);
-        if (keysList.length>0) {
-            privilegesDiv.append(Html.span({},$T("Grant all these users with privileges: ")));
-        }
-        var comma = ", ";
-        for (var i=0; i<keysList.length; i++) {
-            if (i+1 == keysList.length) {
-                comma = "";
-            }
-            var key = keysList[i];
-            var value = this.privileges[key];
-            var checkbox = Html.checkbox({id:key, style:{verticalAlign:"middle"}}, value[1]?value[1]:null);
-            $B(this.selectedPrivileges.accessor(key), checkbox);
-            privilegesDiv.append(Html.span({},checkbox, value[0] + comma));
-        }
-
-        return Widget.block([Html.div(this.userDivStyle,this.userList.draw()), privilegesDiv, buttons1]);
-
-    }
-},
-     function(userDivStyle, userListStyle, initialUsers, optionalUsers, favouriteUsers, allowSearch,
-              allowNew, allowEdit, newProcess, editProcess, removeProcess, enableGroups, privileges, conferenceId, showToggleFavouriteButtons) {
-         this.userList = new UserListWidget(userListStyle, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons);
-         if (!exists(userDivStyle)) {
-             userDivStyle = "UIPeopleListDiv";
-         }
-         this.userDivStyle = userDivStyle;
-         this.optionalUsers = new WatchObject();
-         this.favouriteUsers = new WatchObject();
-         this.newProcess = newProcess;
-         this.newUserCounter = 0;
-         this.allowSearch = allowSearch;
-         this.allowNew = allowNew;
-         this.enableGroups = exists(enableGroups)?enableGroups:false;
-         this.privileges = exists(privileges)?privileges:{};
-         this.selectedPrivileges = new WatchObject();
-         this.conferenceId = exists(conferenceId)?conferenceId:null;
-
-         var self = this;
-
-         each(initialUsers, function(user){
-             if (any(user._type, null) === 'Avatar') {
-                 self.userList.set('existingAv' + user.id, $O(user));
-             } else {
-                 self.userList.set(user.id, $O(user));
-             }
-
-         });
-
-         if (optionalUsers) {
-             each(optionalUsers, function(user){
-                 self.optionalUsers.set(user.id, $O(user));
-             });
-         } else {
-             self.optionalUsers = null;
-         }
-
-         if (favouriteUsers) {
-             each(favouriteUsers, function(user){
-                 self.favouriteUsers.set(user.id, $O(user));
-             });
-         } else {
-             self.favouriteUsers = null;
-         }
-
-     }
-    );
-*/
-
-/**
- * Creates a user search pop-up dialog that queries the user
- * database.
- * @param {Function} process Callback method that is invoked
- *                   in order to process the users that are selected
- *                   from the list.
- * @param {Function} suicideHook A callback method that is passed by
- *                   the exclusivePopup method, and is called by the
- *                   function when the dialog needs to be destroyed.
- */
-/*
-type ("AdditionalUsersPopup", ["ExclusivePopup"], {
-
-    draw: function () {
-
-        var self = this;
-
-        var userSelect = function(){
-
-            var favouriteUsersOptGroup;
-            var optionalUsersOptGroup;
-
-            if (self.favouriteUsers) {
-                favouriteUsersOptGroup = Html.optgroup({label: $T('Favourite Users')});
-                bind.element(favouriteUsersOptGroup, self.favouriteUsers, function(item){
-                    return Html.option({value: item.key, className: 'favoriteUser'},
-                                       item.get().get('familyName').toUpperCase() + ', ' + item.get().get('firstName'));
-                });
-            }
-
-            if (self.optionalUsers) {
-                optionalUsersOptGroup = Html.optgroup({label: $T('Other Users')});
-                bind.element(optionalUsersOptGroup, self.optionalUsers, function(item){
-                    return Html.option({value: item.key, className: 'favoriteUser'},
-                                       item.get().get('familyName').toUpperCase() + ', ' + item.get().get('firstName'));
-                });
-            }
-
-            return bind.element(Html.select({multiple: true, size:"20", style:{width:pixels(420), marginRight: pixels(5), padding:pixels(10)}}),
-                                [self.favouriteUsers ? favouriteUsersOptGroup : '',
-                                 self.optionalUsers ? optionalUsersOptGroup : '']);
-
-
-
-        }; //end of userSelect
-
-        self.selectList = userSelect();
-
-        self.selectList.observe(function(){
-            if (getSelectedItems(self.selectList).length > 0) {
-                addButton.enable();
-            }else {
-                addButton.disable();
-            }
-        });
-
-        var addButton = new DisabledButton(Html.input("button", {disabled:true}, $T("Add")));
-        var cancelButton = Html.input("button", {style:{marginLeft: pixels(5)}}, $T("Cancel"));
-        var buttons = Html.div("dialogButtons", addButton.draw(), cancelButton);
-
-        cancelButton.observeClick(function(){
-            self.close();
-        });
-
-        var tooltip;
-
-        addButton.observeEvent('mouseover', function(event){
-            if (!addButton.isEnabled()) {
-                tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, $T("You must select at least one item from the list"), "tooltipError");
-            }
-        });
-
-        addButton.observeEvent('mouseout', function(event){
-            Dom.List.remove(document.body, tooltip);
-        });
-
-        addButton.observeClick(function(){
-            self.processFunction();
-            self.close();
-        });
-
-        return this.ExclusivePopup.prototype.draw.call(
-            this,
-            Html.div({},
-                     Widget.block([
-                         self.selectList,
-                         buttons
-                     ])));
-    }
-
-    },
-      function(title, favouriteUsers, optionalUsers, process) {
-          var self = this;
-          self.favouriteUsers = favouriteUsers;
-          self.optionalUsers = optionalUsers;
-
-          this.processFunction = process;
-          this.ExclusivePopup(title, function(){return true;});
-      }
-     );
-*/
-
 
 /**
  * Creates a form field with a list of users.
  * Users can be added from an initial list of users, from a 'new user' dialog, or from a "choose user"
  * dialog which will enable both to search users/groups and propose a list of suggested users (favourites and others).
- *
- * The list of users (a UserListWidget, i.e. a WatchObject) can be retrieved by calling getUsers().
- *
  * The 'id' attribute of the users in the list will depend from their origin.
- * -If it was added from the search dialog, the id will be 'existingAvXX' (where XX corresponds to the avatar id).
- * -It it was added from the 'new user' dialog, the id will be 'newUserXX', where XX is auto-increment starting from 0.
- * -If it was added from the list of suggested users, it will retain the id of the user that was put in the list.
- * -It the user was edited, and the edited user corresponded to an Avatar, the id will be 'editedXX' where XX is the id of the Avatar used initially.
+ * - If it was added from the search dialog, the id will be 'existingAvXX' (where XX corresponds to the avatar id).
+ * - It it was added from the 'new user' dialog, the id will be 'newUserXX', where XX is auto-increment starting from 0.
+ * - If it was added from the list of suggested users, it will retain the id of the user that was put in the list.
+ * - It the user was edited, and the edited user corresponded to an Avatar, the id will be 'editedXX' where XX is the id of the Avatar used initially.
  *
- * @param {String} userDivStyle A CSS class for the div that will sourround the user list.
- * @param {String} userListStyle A CSS class for the user list. It will be passed to the inner UserListWidget.
- *
- * @param {list} initialUsers A list of users that will appear initially. Example: <%= jsonEncode(fossilize([AvatarHolder().getById(1), AvatarHolder().getById(2)]), IAvatarFossil) %>
- * @param {Boolean} includeFavourites If True, favourites will appear in the list of suggested users of the ChooseUsersPopup.
- * @param {list} suggestedUsers A list of users that will be offered as options to be added.
- *                              Example: <%= jsonEncode(fossilize([AvatarHolder().getById(3), AvatarHolder().getById(4)] + some_user.getPersonalInfo().getBasket().getUsers())) %>
- *
- * @param {Boolean} allowSearch If True, the "Choose user" dialog will propose to search.
- * @param {Boolean} enableGroups If True, the "Choose user" dialog will propose to search groups.
- * @param {string} conferenceId for author list search
- * @param {list} privileges dictionary with the privileges that we can set for the users. There is a key and a tuple as vale: (label, default value for checked). E.g. {"grant-manager": ["event modification", false]}
- *
- * @param {Boolean} allowNew If True, a 'New User' button will be present.
- * @param {Boolean} allowEdit If True, users in the list will be able to be edited.
- * @param {Boolean} showToggleFavouriteButtons. false by default. If true, favouritize buttons will not be shown.
- *
- * @param {Function} newProcess A function that will be called when new users (from new data, or from the search dialog, or from the suggested list) is added to the list.
- *                              The function will be passed a list of WatchObjects representing the users.
- * @param {Function} editProcess A function that will be called when a user is edited.
- *                               The function will be passed a WatchObject representing the user.
- * @param {Function} removeProcess A function that will be called when a user is removed.
- *                                 The function will be passed a WatchObject representing the user.
- *
- *
- *
- *
- *
- * @param {Boolean} showToggleFavouriteButtons. false by default. If true, favouritize buttons will not be shown.
  */
 type("UserListField", ["IWidget"], {
 
@@ -1820,6 +1453,7 @@ type("UserListField", ["IWidget"], {
 
             var peopleAddedHandler = function(peopleList){
 
+                // newProcess will be passed a list of WatchObjects representing the users.
                 self.newProcess(peopleList, function(value) {
                     if (value) {
                         each(peopleList, function(person){
@@ -1908,6 +1542,25 @@ type("UserListField", ["IWidget"], {
 
     }
 },
+    /*
+     * @param {String} userDivStyle A CSS class for the div that will sourround the user list.
+     * @param {String} userListStyle A CSS class for the user list. It will be passed to the inner UserListWidget.
+     *
+     * @param {list} initialUsers A list of (fossilized) avatars that will appear initially.
+     * @param {Boolean} includeFavourites If True, favourites will appear in the list of suggested users of the ChooseUsersPopup.
+     * @param {list} suggestedUsers A list of users that will be offered as options to be added.
+     * @param {Boolean} allowSearch If True, the "Choose user" dialog will propose to search.
+     * @param {Boolean} enableGroups If True, the "Choose user" dialog will propose to search groups.
+     * @param {string} conferenceId for author list search
+     * @param {list} privileges dictionary with the privileges that we can set for the users. There is a key and a tuple as vale: (label, default value for checked). E.g. {"grant-manager": ["event modification", false]}
+     * @param {Boolean} allowNew If True, a 'New User' button will be present.
+     * @param {Boolean} allowEdit If True, users in the list will be able to be edited.
+     * @param {Boolean} showToggleFavouriteButtons. false by default. If true, favouritize buttons will not be shown.
+     * @param {Function} newProcess A function that will be called when new users (from new data, or from the search dialog, or from the suggested list) is added to the list.
+     * @param {Function} editProcess A function that will be called when a user is edited.
+     * @param {Function} removeProcess A function that will be called when a user is removed.
+     * @param {Boolean} showToggleFavouriteButtons. false by default. If true, favouritize buttons will not be shown.
+     */
     function(userDivStyle, userListStyle,
              initialUsers, includeFavourites, suggestedUsers,
              allowSearch, enableGroups, conferenceId, privileges,
@@ -2006,7 +1659,7 @@ type("ToggleFavouriteButton", ["InlineWidget"], {
                 function(result,error){
                     content.set(starIcon);
                     if(!error) {
-                        IndicoGlobalVars.favIds[self.avatar.id] = false;
+                        IndicoGlobalVars['favorite-user-ids'][self.avatar.id] = false;
                         self.stateWatchValue.set(false);
                         if (exists(self.observer)) {
                             self.observer(self.avatar, false);
@@ -2027,10 +1680,10 @@ type("ToggleFavouriteButton", ["InlineWidget"], {
                     function(result,error){
                         content.set(starIcon);
                         if(!error) {
-                            IndicoGlobalVars.favIds[self.avatar.id] = true;
-                            if (exists(IndicoGlobalVars.favList)) {
-                                IndicoGlobalVars.favList.push(self.avatar);
-                                IndicoGlobalVars.favList.sort(userSort);
+                            IndicoGlobalVars['favorite-user-ids'][self.avatar.id] = true;
+                            if (exists(IndicoGlobalVars['favorite-user-list'])) {
+                                IndicoGlobalVars['favorite-user-list'].push(self.avatar);
+                                IndicoGlobalVars['favorite-user-list'].sort(userSort);
                             }
                             self.stateWatchValue.set(true);
                             if (exists(self.observer)) {
@@ -2062,20 +1715,20 @@ type("ToggleFavouriteButton", ["InlineWidget"], {
 
         this.stateWatchValue = null;
 
-        if (!exists(IndicoGlobalVars.favIds)) {
-            IndicoGlobalVars.favIds = {};
-            IndicoGlobalVars.favList = [];
+        if (!exists(IndicoGlobalVars['favorite-user-ids'])) {
+            IndicoGlobalVars['favorite-user-ids'] = {};
+            IndicoGlobalVars['favorite-user-list'] = [];
         }
         if (!exists(IndicoGlobalVars.userFavouritesWatchValues)) {
             IndicoGlobalVars.userFavouritesWatchValues = {};
         }
 
         if(!exists(IndicoGlobalVars.userFavouritesWatchValues[avatar.id])) {
-            if(exists(IndicoGlobalVars.favIds[avatar.id])) {
-                IndicoGlobalVars.userFavouritesWatchValues[avatar.id] = $V(IndicoGlobalVars.favIds[avatar.id] === true);
+            if(exists(IndicoGlobalVars['favorite-user-ids'][avatar.id])) {
+                IndicoGlobalVars.userFavouritesWatchValues[avatar.id] = $V(IndicoGlobalVars['favorite-user-ids'][avatar.id] === true);
             } else {
-                if (!exists(IndicoGlobalVars.favIds) && !exists(initialState)) {
-                    alert("Warning: ToggleFavouriteButton used without IndicoGlobalVars.favIds variable and without initialState");
+                if (!exists(IndicoGlobalVars['favorite-user-ids']) && !exists(initialState)) {
+                    alert("Warning: ToggleFavouriteButton used without IndicoGlobalVars['favorite-user-ids'] variable and without initialState");
                 }
                 initialState = any(initialState, false);
                 IndicoGlobalVars.userFavouritesWatchValues[avatar.id] = $V(initialState);
@@ -2085,4 +1738,3 @@ type("ToggleFavouriteButton", ["InlineWidget"], {
         this.stateWatchValue = IndicoGlobalVars.userFavouritesWatchValues[avatar.id];
     }
 );
-
