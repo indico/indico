@@ -285,11 +285,14 @@ def toUTC( localNaiveDT ):
 
 
 def fromUTC( utcNaiveDT ):
-    if utcNaiveDT == None:
+    #if utcNaiveDT == None:
+    #    return None
+    try:
+        if utcNaiveDT.tzinfo != None:
+            raise 'This methods converts only _naive_ datetimes, assuming they are in UTC time. Naive datetimes does not contain information about timezone.'
+        return utcNaiveDT - timedelta( 0, time.altzone )
+    except AttributeError:
         return None
-    if utcNaiveDT.tzinfo != None:
-        raise 'This methods converts only _naive_ datetimes, assuming they are in UTC time. Naive datetimes does not contain information about timezone.'
-    return utcNaiveDT - timedelta( 0, time.altzone )
 
 def formatDate(date):
     # Convert the date to the Indico "de facto" standard

@@ -7,9 +7,9 @@
 <% end %>
 
     <table cellpadding="0" cellspacing="0" border="0" width="80%%">
-	    <tr>
-	    <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%%">&nbsp;</td>
-	    </tr>
+        <tr>
+        <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%%">&nbsp;</td>
+        </tr>
         <tr>
             <td class="bottomvtab" width="100%%">
                 <table width="100%%" cellpadding="0" cellspacing="0" class="htab" border="0">
@@ -40,9 +40,9 @@
     isOver = false
     function handleMouseOverResv( id ) {
         if ( isOver )
-		{
-		 return;
-		}
+        {
+         return;
+        }
         isOver = true;
         resvTR = document.getElementById( id );
         resvTR.bgColor = '#f0f0f0';
@@ -54,12 +54,12 @@
     }
     </script>
 
-	<% includeTpl( 'RoomBookingBookingListPrevNext' ) %>
+    <% includeTpl( 'RoomBookingBookingListPrevNext' ) %>
 
     <% if not overload: %>
-      	<table style="width: 736px;">
-    		<tr>
-    		    <td>
+          <table style="width: 736px;">
+            <tr>
+                <td>
                     <div style="margin: 22px 0px 16px 0px;">
                         <% if manyRooms: %>
                             <% includeTpl( 'RoomBookingManyRoomsCalendar' ) %>
@@ -72,37 +72,37 @@
             </tr>
         </table>
         <br /><br />
-		<% includeTpl( 'RoomBookingBookingListPrevNext' ) %>
+        <% includeTpl( 'RoomBookingBookingListPrevNext' ) %>
     <% end %>
 
 
-	<table style="width: 736px;">
-		<tr>
+    <table style="width: 736px;">
+        <tr>
     <% if withPhoto: %>
           <% columnNumber = 6 %>
-		  <td style="width: 90px;" class="dataCaptionFormat">Photo</td>
+          <td style="width: 90px;" class="dataCaptionFormat">Photo</td>
     <% end %>
     <% else: %>
           <% columnNumber = 5 %>
     <% end %>
-		  <td style="width: 100px;" class="dataCaptionFormat"><% orderBy('Room','room') %></td>
-		  <td class="dataCaptionFormat"><% orderBy('Reason','reason') %> / <br /><% orderBy('For whom','for') %></td>
-		  <td style="width: 88px;" nowrap class="dataCaptionFormat">
-		    <% orderBy('Date','date') %>
-		  </td>
-		  <td style="width: 46px;" class="dataCaptionFormat" ><% orderBy('Hours', 'hours') %></td>
-		  <td style="width: 52px; padding-right: 15px;" class="dataCaptionFormat"><%= _("Actions")%></td>
-		</tr>
-		<tr>
-			<td colspan="<%= columnNumber %>" style="height: 0px;">&nbsp;</td>
-		</tr>
+          <td style="width: 100px;" class="dataCaptionFormat"><% orderBy('Room','room') %></td>
+          <td class="dataCaptionFormat"><% orderBy('Reason','reason') %> / <br /><% orderBy('For whom','for') %></td>
+          <td style="width: 88px;" nowrap class="dataCaptionFormat">
+            <% orderBy('Date','date') %>
+          </td>
+          <td style="width: 46px;" class="dataCaptionFormat" ><% orderBy('Hours', 'hours') %></td>
+          <td style="width: 52px; padding-right: 15px;" class="dataCaptionFormat"><%= _("Actions")%></td>
+        </tr>
+        <tr>
+            <td colspan="<%= columnNumber %>" style="height: 0px;">&nbsp;</td>
+        </tr>
 
         <% if not overload: %>
-		    	<% includeTpl( 'RoomBookingListItem', unrolledReservations = unrolledReservations, withPhoto = withPhoto ) %>
-		<% end %>
-		<% if overload: %>
-		    <tr><td colspan="<%= columnNumber %>"><strong><br /> <%= _("Too many searching results or too large time span. Please issue more specific query.")%></strong></td></tr>
-		<% end %>
+                <% includeTpl( 'RoomBookingListItem', unrolledReservations = unrolledReservations, withPhoto = withPhoto ) %>
+        <% end %>
+        <% if overload: %>
+            <tr><td colspan="<%= columnNumber %>"><strong><br /> <%= _("Too many searching results or too large time span. Please issue more specific query.")%></strong></td></tr>
+        <% end %>
 
         <% if showRejectAllButton: %>
             <tr>
@@ -115,21 +115,21 @@
             </tr>
         <% end %>
 
-		<tr>
-			<td colspan="<%= columnNumber %>" style="height: 0px">&nbsp;</td>
-		</tr>
-		<tr>
-		    <td colspan="<%= columnNumber %>">
-		    <% if title and 'My ' in title: %>
-		        <b> <%= _("Note")%>:</b>  <%= _("""Your bookings and pre-bookings from <b>old CRBS</b> are not shown on this list.
-		        You will see here only bookings done in Indico.
-		        To see your old bookings, you must click 'View Bookings' option and find them manually.""")%>
-		    <% end %>
-		    </td>
-		</tr>
-	</table>
+        <tr>
+            <td colspan="<%= columnNumber %>" style="height: 0px">&nbsp;</td>
+        </tr>
+        <tr>
+            <td colspan="<%= columnNumber %>">
+            <% if title and 'My ' in title: %>
+                <b> <%= _("Note")%>:</b>  <%= _("""Your bookings and pre-bookings from <b>old CRBS</b> are not shown on this list.
+                You will see here only bookings done in Indico.
+                To see your old bookings, you must click 'View Bookings' option and find them manually.""")%>
+            <% end %>
+            </td>
+        </tr>
+    </table>
 
-	<% includeTpl( 'RoomBookingBookingListPrevNext' ) %>
+    <% includeTpl( 'RoomBookingBookingListPrevNext' ) %>
 
 
 </td>

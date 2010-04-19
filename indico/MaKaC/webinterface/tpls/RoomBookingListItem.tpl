@@ -6,12 +6,12 @@
             return false;
 
         element.href = element.href + '&reason=' + encodeURI( reason );
-		return true;
+        return true;
     }
 
-	function confirm_reject_reservation(date)
+    function confirm_reject_reservation(date)
     {
-		return confirm( 'Are you sure you want to REJECT the booking for '+date+'? If so, please give a reason:', '' );
+        return confirm( 'Are you sure you want to REJECT the booking for '+date+'? If so, please give a reason:', '' );
     }
 </script>
 <% for collision in unrolledReservations: %>
@@ -75,12 +75,12 @@
         <td <%=onClickDetails%> style="padding: 0px 10px 6px 0px; cursor: pointer;"><%= verbose_t( reservation.startDT.time() ) %><br /><%= verbose_t( reservation.endDT.time() ) %></td>
         <td style="padding: 0px 10px 6px 0px;">
             <% if canReject and not reservation.isCancelled and not reservation.isRejected: %>
-    			<% if reservation.repeatability != None: %>
-                	<a href="<%= rejectOccurrence %>" onclick="return confirm_reject_occurrence(this, '<%= occurrence.startDT %>');" ><%= _("reject")%></a><br />
-    			<% end %>
-    			<% else: %>
-    				<a href="<%= rejectReservation %>" onclick="return confirm_reject_reservation('<%= occurrence.startDT %>');" ><%= _("reject")%></a><br />
-    			<% end %>
+                <% if reservation.repeatability != None: %>
+                    <a href="<%= rejectOccurrence %>" onclick="return confirm_reject_occurrence(this, '<%= occurrence.startDT %>');" ><%= _("reject")%></a><br />
+                <% end %>
+                <% else: %>
+                    <a href="<%= rejectReservation %>" onclick="return confirm_reject_reservation('<%= occurrence.startDT %>');" ><%= _("reject")%></a><br />
+                <% end %>
             <% end %>
         </td>
     </tr>

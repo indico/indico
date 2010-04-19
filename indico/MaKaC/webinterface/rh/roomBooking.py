@@ -884,7 +884,7 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
                 # Prepare 'days' so .getReservations will use days index
                 if resvEx.repeatability == None:
                     resvEx.repeatability = RepeatabilityEnum.daily
-                periods = resvEx.splitToPeriods()
+                periods = resvEx.splitToPeriods(endDT = resvEx.endDT)
                 days = [ period.startDT.date() for period in periods ]
                 if len( days ) > 32:
                     days = None # Using day index won't help
