@@ -260,7 +260,7 @@ type("TimetableManagementActions", [], {
                     '' : {
                         'Create a new session': function() { self.addSession(); }
                     },
-                    'Add interval to:': sessions
+                    'Add another block to:': sessions
                 };
 
                 menuItems[$T('Session')] = new SessionSectionPopupMenu(menuu, [triggerElement, this.addMenu], 'timetableSectionPopupList popupListChained', true, true);

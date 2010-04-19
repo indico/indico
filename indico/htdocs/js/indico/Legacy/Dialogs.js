@@ -213,13 +213,11 @@ extend(IndicoUI.Dialogs,
                                this,
                                Html.div({},
                                         IndicoUtil.createFormFromMap([
-
                                             [$T('Title'), $B(parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), info.accessor('title'))],
-                                            [$T('Sub-title'), $B(parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', true), info.accessor('subtitle'))],
                                             [$T('Description'), $B(Html.textarea({cols: 40, rows: 2}), info.accessor('description'))],
-                                            [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
                                             [$T('Date'), conferenceDays],
                                             startEndTimeComponent,
+                                            [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
                                             colorPickerComponent,
                                             [$T('Convener(s)'), convListWidget.draw()],
                                             [$T('Session type'), sesType.draw()]]),
@@ -299,8 +297,8 @@ extend(IndicoUI.Dialogs,
 
                                dateArgs.startDate = startDate;
                                dateArgs.endDate = endDate;
-                               info.set('startDateTime', Util.formatDateTime(startDate, IndicoDateTimeFormats.ServerHourless));
-                               info.set('endDateTime', Util.formatDateTime(endDate, IndicoDateTimeFormats.ServerHourless));
+                               info.set('startDateTime', Util.formatDateTime(startDate, IndicoDateTimeFormats.Server));
+                               info.set('endDateTime', Util.formatDateTime(endDate, IndicoDateTimeFormats.Server));
                                hook.set(true);
                            }
                        });
@@ -475,11 +473,12 @@ extend(IndicoUI.Dialogs,
 
                            return this.ExclusivePopup.prototype.draw.call(
                                this,
-                               Widget.block([IndicoUtil.createFormFromMap([[$T('Sub-Title'), $B(Html.edit({style: { width: '300px'}}), info.accessor('title'))],
-                                                                           [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
+                               Widget.block([IndicoUtil.createFormFromMap([isEdit ? [$T('Sub-Title'), $B(Html.edit({style: { width: '300px'}}), info.accessor('title'))]:[],
                                                                            [$T('Date'), conferenceDays],
                                                                            startEndTimeComponent,
-                                                                           [$T('Convener(s)'), convListWidget.draw()]]),
+                                                                           [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
+                                                                           [$T('Convener(s)'), convListWidget.draw()]
+                                                                            ]),
                                              Html.div('dialogButtons',
                                                       [addButton, cancelButton])]
                                            ));

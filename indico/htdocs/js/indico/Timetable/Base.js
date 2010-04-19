@@ -734,7 +734,7 @@ type("ManagementTimeTable",["TimeTable"], {
         });
 
         // JUST FOR SessionManagementTimetable
-        this.addIntervalLink = Html.span({className: 'fakeLink', style:{paddingLeft: pixels(15), paddingRight: pixels(15)}}, $T('Add new interval'));
+        this.addIntervalLink = Html.span({className: 'fakeLink', style:{paddingLeft: pixels(15), paddingRight: pixels(15)}}, $T('Add new block'));
         this.separator2 = Html.span({}, " | ");
         this.fitInnerTimetableLink = Html.span({className: 'fakeLink', style:{paddingLeft: pixels(15), paddingRight: pixels(15)}}, $T('Fit inner timetable'));
 

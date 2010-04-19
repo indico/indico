@@ -934,15 +934,6 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
 
         var menu = Html.div({className: 'menuBar managementMenuBar'});
 
-        if (self.eventData.entryType == 'Session') {
-            var addInterval = Html.a('fakeLink', "Add block");
-            addInterval.observeClick(function() {
-                self.managementActions.addSessionSlot(self.eventData);
-                self.close();
-            });
-            menu.insert(addInterval);
-        }
-
         var deleteLink = Html.a('fakeLink', "Delete");
         deleteLink.observeClick(function() {
             self.managementActions.deleteEntry(self.eventData);
@@ -958,11 +949,11 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
             editLink = Html.a({className: 'dropDownMenu', style: {fontWeght: 'bold'}}, $T('Edit'));
             var menuItems = {};
 
-            menuItems[$T('Interval timetable')] = function() {
+            menuItems[$T('Block timetable')] = function() {
                 self.managementActions.switchToIntervalTimetable(self.eventData.id);
                 self.close();
             };
-            menuItems[$T('Interval properties')] = function() {
+            menuItems[$T('Block properties')] = function() {
                 self.managementActions.editSessionSlot(self.eventData);
                 self.close();
             };
@@ -975,6 +966,14 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
                 var pos = editLink.getAbsolutePosition();
                 menu.open(pos.x + editLink.dom.offsetWidth + 2, pos.y + editLink.dom.offsetHeight + 2);
             });
+
+            var addInterval = Html.a('fakeLink', $T("Add block"));
+            addInterval.observeClick(function() {
+                self.managementActions.addSessionSlot(self.eventData);
+                self.close();
+            });
+            menu.insert(addInterval);
+            menu.insert(" | ");
 
         } else if (self.eventData.entryType == 'Contribution') {
             editLink = Html.a({
@@ -1045,7 +1044,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
         }
 
 
-        var ttLink = Html.a({className: 'fakeLink'}, "View and edit current interval timetable");
+        var ttLink = Html.a({className: 'fakeLink'}, "View and edit this block timetable");
         ttLink.observeClick(function() {
             self.managementActions.switchToIntervalTimetable(self.eventData.id);
             self.close();
