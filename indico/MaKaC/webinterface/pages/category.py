@@ -1248,6 +1248,8 @@ class WConferenceCreation( wcomponents.WTemplated ):
 
 class WPConferenceCreationMainData( WPCategoryDisplayBase ):
 
+    _userData = ['favorite-user-list', 'favorite-user-ids']
+
     def getJSFiles(self):
         return WPCategoryDisplayBase.getJSFiles(self) + \
                self._includeJSPackage('Management')
@@ -1269,12 +1271,6 @@ class WPConferenceCreationMainData( WPCategoryDisplayBase ):
             return wcomponents.WNavigationDrawer( pars )
         return wcomponents.WNavigationDrawer( pars )
 
-    def _includeFavIds(self):
-        return True
-
-    def _includeFavList(self):
-        return True
-
     def _getWComponent( self ):
         return WConferenceCreation( self._target, "", self._rh )
 
@@ -1287,12 +1283,11 @@ class WPConferenceCreationMainData( WPCategoryDisplayBase ):
 
 class WPCategoryModifBase( WPCategoryBase ):
 
+    _userData = ['favorite-user-ids']
+
     def getJSFiles(self):
         return WPCategoryBase.getJSFiles(self) + \
                self._includeJSPackage('Management')
-
-    def _includeFavouriteInfo(self):
-        return True
 
     def _getHeader( self ):
         """
@@ -1353,9 +1348,6 @@ class WPCategoryModifBase( WPCategoryBase ):
 
     def _setActiveSideMenuItem( self ):
         pass
-
-    def _includeFavIds(self):
-        return True
 
     def _getBody( self, params ):
         self._createSideMenu()
@@ -2159,6 +2151,8 @@ class WPCategModifTasks( WPCategoryModifBase ):
 
 class WPCategoryModifExistingMaterials( WPCategoryModifBase ):
 
+    _userData = ['favorite-user-list', 'favorite-user-ids']
+
     def getJSFiles(self):
         return WPCategoryModifBase.getJSFiles(self) + \
                self._includeJSPackage('Management') + \
@@ -2167,9 +2161,6 @@ class WPCategoryModifExistingMaterials( WPCategoryModifBase ):
     def _getPageContent( self, pars ):
         wc=wcomponents.WShowExistingMaterial(self._target)
         return wc.getHTML( pars )
-
-    def _includeFavList(self):
-        return True
 
     def _setActiveSideMenuItem( self ):
         self._filesMenuItem.setActive()

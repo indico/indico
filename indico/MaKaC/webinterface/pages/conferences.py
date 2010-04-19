@@ -2009,6 +2009,8 @@ class WPMeetingTimeTable( WPXSLConferenceDisplay ):
 
 class WPConferenceModifBase( main.WPMainBase ):
 
+    _userData = ['favorite-user-ids']
+
     def __init__( self, rh, conference ):
         main.WPMainBase.__init__( self, rh )
         self._navigationTarget = self._conf = conference
@@ -2038,9 +2040,6 @@ class WPConferenceModifBase( main.WPMainBase ):
     def _getNavigationDrawer(self):
         pars = {"target": self._conf, "isModif": True }
         return wcomponents.WNavigationDrawer( pars, bgColor="white" )
-
-    def _includeFavIds(self):
-        return True
 
     def _createSideMenu(self):
         self._sideMenu = wcomponents.ManagementSideMenu()
@@ -3188,6 +3187,8 @@ class WConfModifScheduleGraphic(wcomponents.WTemplated):
 
 class WPConfModifScheduleGraphic( WPConferenceModifBase ):
 
+    _userData = ['favorite-user-list', 'favorite-user-ids']
+
     def __init__(self, rh, conf):
         WPConferenceModifBase.__init__(self, rh, conf)
         self._session = None
@@ -3199,9 +3200,6 @@ class WPConfModifScheduleGraphic( WPConferenceModifBase ):
     def getJSFiles(self):
         return WPConferenceModifBase.getJSFiles(self) + \
                self._includeJSPackage('Timetable')
-
-    def _includeFavList(self):
-        return True
 
     def _generateTimetable(self):
         tz = self._conf.getTimezone()
@@ -7871,11 +7869,10 @@ class WConfModifContribList(wcomponents.WTemplated):
 
 class WPModifContribList( WPConferenceModifBase ):
 
+    _userData = ['favorite-user-list', 'favorite-user-ids']
+
     def _setActiveSideMenuItem(self):
         self._contribListMenuItem.setActive(True)
-
-    def _includeFavList(self):
-        return True
 
     def _getPageContent( self, params ):
         filterCrit=params.get("filterCrit",None)
@@ -11764,6 +11761,9 @@ class WPConfModifReportNumberEdit(WPConferenceModifBase):
 
 
 class WPConfModifExistingMaterials( WPConferenceModifBase ):
+
+    _userData = ['favorite-user-list', 'favorite-user-ids']
+
     def __init__(self, rh, conf):
         WPConferenceModifBase.__init__(self, rh, conf)
 
@@ -11776,9 +11776,6 @@ class WPConfModifExistingMaterials( WPConferenceModifBase ):
 
     def _setActiveSideMenuItem( self ):
         self._materialMenuItem.setActive()
-
-    def _includeFavList(self):
-        return True
 
 class WPConfModifDisplayImageBrowser (wcomponents.WTemplated):
 

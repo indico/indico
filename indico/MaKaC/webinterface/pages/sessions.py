@@ -1444,6 +1444,8 @@ class WSessionModPosterTTDay(wcomponents.WTemplated):
 
 class WPSessionModifSchedule( WPSessionModifBase, WPConfModifScheduleGraphic  ):
 
+    _userData = ['favorite-user-list']
+
     def __init__( self, rh, session):
         WPSessionModifBase.__init__(self, rh, session)
         WPConfModifScheduleGraphic.__init__( self, rh, session.getConference() )
@@ -1454,9 +1456,6 @@ class WPSessionModifSchedule( WPSessionModifBase, WPConfModifScheduleGraphic  ):
 
     def getJSFiles(self):
         return WPConfModifScheduleGraphic.getJSFiles(self)
-
-    def _includeFavList(self):
-        return True
 
     def _generateTimetable(self):
 
@@ -2808,6 +2807,8 @@ class WPSessionModifRelocate(WPSessionModifBase):
 
 class WPSessionModifMaterials( WPSessionModifBase ):
 
+    _userData = ['favorite-user-list']
+
     def __init__(self, rh, session):
         self._target = session
         WPSessionModifBase.__init__(self, rh, session)
@@ -2822,9 +2823,6 @@ class WPSessionModifMaterials( WPSessionModifBase ):
     def _getTabContent( self, pars ):
         wc=wcomponents.WShowExistingMaterial(self._target)
         return wc.getHTML( pars )
-
-    def _includeFavList(self):
-        return True
 
 class WPSessionDatesModification(WPSessionModifSchedule):
 

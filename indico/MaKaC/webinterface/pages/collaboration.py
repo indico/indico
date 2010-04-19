@@ -173,6 +173,8 @@ class WAdminCollaboration(wcomponents.WTemplated):
 
 class WPConfModifCSBase (WPConferenceModifBase):
 
+    _userData = ['favorite-user-list']
+
     def __init__(self, rh, conf):
         """ Constructor
             The rh is expected to have the attributes _tabs, _activeTab, _tabPlugins (like for ex. RHConfModifCSBookings)
@@ -202,8 +204,6 @@ class WPConfModifCSBase (WPConferenceModifBase):
     def _setActiveSideMenuItem(self):
         self._videoServicesMenuItem.setActive()
 
-    def _includeFavList(self):
-        return True
 
 class WPConfModifCollaboration(WPConfModifCSBase):
 

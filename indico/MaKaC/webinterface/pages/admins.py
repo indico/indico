@@ -53,6 +53,8 @@ from MaKaC.modules.base import ModulesHolder
 
 class WPAdminsBase( WPMainBase ):
 
+    _userData = ['favorite-user-ids']
+
     def _getSiteArea(self):
         return "AdministrationArea"
 
@@ -143,9 +145,6 @@ class WPAdminsBase( WPMainBase ):
 
     def _setActiveTab(self):
         pass
-
-    def _includeFavIds(self):
-        return True
 
     def _setActiveSideMenuItem(self):
         pass
@@ -409,6 +408,8 @@ class WAnnouncementModif(wcomponents.WTemplated):
 
 class WPAdminPlugins( WPAdminsBase ):
 
+    _userData = ['favorite-user-list', 'favorite-user-ids']
+
     def __init__(self, rh, pluginTypeId, initialPlugin):
         WPAdminsBase.__init__(self, rh)
         self._pluginTypeId = pluginTypeId
@@ -436,8 +437,6 @@ class WPAdminPlugins( WPAdminsBase ):
         else:
             self._tabs[self._pluginTypeId].setActive()
 
-    def _includeFavList(self):
-        return True
 
     def _getPageContent(self, params):
         if self._pluginTypeId is None:
@@ -2485,6 +2484,8 @@ class WRoomBookingPluginAdmin( wcomponents.WTemplated ):
 
 class WPRoomBookingRoomForm( WPRoomBookingPluginAdminBase ):
 
+    _userData = ['favorite-user-list']
+
     def __init__( self, rh ):
         self._rh = rh
         WPRoomBookingPluginAdminBase.__init__( self, rh )
@@ -2492,9 +2493,6 @@ class WPRoomBookingRoomForm( WPRoomBookingPluginAdminBase ):
     def _setActiveTab( self ):
         WPRoomBookingPluginAdminBase._setActiveTab( self )
         self._subTabConfig.setActive()
-
-    def _includeFavList(self):
-        return True
 
     def _getTabContent( self, params ):
         wc = wcomponents.WRoomBookingRoomForm( self._rh )

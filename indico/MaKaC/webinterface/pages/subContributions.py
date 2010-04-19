@@ -388,6 +388,8 @@ class WPSubContributionModifTools( WPSubContributionModifBase ):
 class WPSubContributionModifMaterials( WPSubContributionModifBase ):
     #TODO: maybe join it with contributions.WPContributionModifMaterials
 
+    _userData = ['favorite-user-list']
+
     def __init__(self, rh, subcontribution):
         WPSubContributionModifBase.__init__(self, rh, subcontribution)
 
@@ -398,9 +400,6 @@ class WPSubContributionModifMaterials( WPSubContributionModifBase ):
         wc=wcomponents.WShowExistingMaterial(self._target)
         #pars["materialTypes"] = self._matTypes
         return wc.getHTML()
-
-    def _includeFavList(self):
-        return True
 
 
 class WSubContribModNewSpeaker(wcomponents.WTemplated):

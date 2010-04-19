@@ -60,12 +60,7 @@
         <% user = page._rh.getAW().getUser() %>
         <% if user: %>
             IndicoGlobalVars.isUserAuthenticated = true;
-            <% if page._includeFavIds(): %>
-            IndicoGlobalVars.favIds = {<%= ", ".join(['"' + str(favouriteId) + '" \x3a true' for favouriteId in user.getPersonalInfo().getBasket().getUsers().iterkeys()]) %>};
-            <% end %>
-            <% if page._includeFavList(): %>
-            IndicoGlobalVars.favList = <%= offlineRequest(self._rh, 'user.favorites.listUsers') %>;
-            <% end %>
+            IndicoGlobalVars.userData = <%= jsonEncode(page._getJavaScriptUserData()) %>;
         <% end %>
         <% else: %>
             IndicoGlobalVars.isUserAuthenticated = false;

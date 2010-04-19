@@ -30,6 +30,8 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
     """ Configuration of subtabs of the Reviewing tab: for each tab, a class inherits from this one
     """
 
+    _userData = ['favorite-user-list']
+
     def __init__(self, rh, target):
         WPConferenceModifBase.__init__(self, rh, target)
 
@@ -85,9 +87,6 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
 
     def _setActiveTab(self):
         pass
-
-    def _includeFavList(self):
-        return True
 
 #classes for paper reviewing setup tab
 class WPConfModifReviewingPaperSetup(WPConfModifReviewingBase):

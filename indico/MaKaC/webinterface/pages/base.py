@@ -29,6 +29,9 @@ class WPBase:
     """
     _title = "Indico"
 
+    # required user-specific "data packages"
+    _userData = []
+
     def __init__( self, rh ):
         self._rh = rh
         self._locTZ = ""
@@ -73,11 +76,21 @@ class WPBase:
     def _getJavaScriptInclude(self, scriptPath):
         return '<script src="'+ scriptPath +'" type="text/javascript"></script>\n'
 
-    def _includeFavIds(self):
-        return False
+    def _getJavaScriptUserData(self):
+        """
+        Returns structured data that should be passed on to the client side
+        but depends on user data (can't be in vars.js.tpl)
+        """
 
-    def _includeFavList(self):
-        return False
+        user = self._getAW().getUser();
+
+        from MaKaC.webinterface.asyndico import UserDataFactory
+
+        userData = dict((packageName,
+                         UserDataFactory(user).build(packageName))
+                        for packageName in self._userData)
+
+        return userData
 
     def _getHeadContent( self ):
         """

@@ -439,6 +439,9 @@ class WPContributionModifTools( WPContributionModifBase ):
         return wc.getHTML( pars )
 
 class WPContributionModifMaterials( WPContributionModifBase ):
+
+    _userData = ['favorite-user-list']
+
     def __init__(self, rh, contribution):
         WPContributionModifBase.__init__(self, rh, contribution)
 
@@ -448,9 +451,6 @@ class WPContributionModifMaterials( WPContributionModifBase ):
     def _getTabContent( self, pars ):
         wc=wcomponents.WShowExistingMaterial(self._target)
         return wc.getHTML( pars )
-
-    def _includeFavList(self):
-        return True
 
 class WPModSearchPrimAuthor ( WPContribModifMain ):
 
