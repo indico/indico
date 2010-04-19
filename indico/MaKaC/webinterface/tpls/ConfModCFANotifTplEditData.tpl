@@ -1,7 +1,12 @@
 <form action=%(postURL)s method="POST">
-<table width="90%%" cellspacing="0" align="center" border="0" style="border-left: 1px solid #777777;padding-left:2px">
+<table width="90%%" cellspacing="0" align="center" border="0">
 	<tr>
-		<td colspan="3" class="groupTitle"> <%= _("Editing a mail notification template")%></td>
+		<td colspan="3">
+            <span class="groupTitle" style="border:0px;"><%= _("Step 1: Assign a name to the template")%></span>
+            <br/>
+            <em><%= _("Give this email template a name; this is for your own convenience so that you can edit it later.")%></em>
+            <br /><br />
+        </td>
     </tr>
 	%(errors)s
     <tr>
@@ -16,7 +21,14 @@
 			<textarea name="description" rows="5" cols="70">%(description)s</textarea>
 		</td>
     </tr>
-	<tr><td colspan="3">&nbsp;<br><br></td></tr>
+	<tr>
+        <td colspan="3">
+            <span class="groupTitle" style="border:0px;"><%= _("Step 2: Compose the email")%></span>
+            <br/>
+            <em><%= _("Compose the email that will be automatically sent in the abstract reviewing process, inserting tags as needed")%></em>
+            <br /><br />
+        </td>
+    </tr>
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("From address")%></span></td>
         <td colspan="2" bgcolor="white" width="100%%">&nbsp;
@@ -29,7 +41,7 @@
         </td>
     </tr>
 	<tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Cc addresses")%></span></td>
+        <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("CC addresses")%></span></td>
         <td colspan="2" bgcolor="white" width="100%%">&nbsp;
             <input type="text" name="CCAddrs" size="91" value=%(CCAddrs)s>
         </td>
@@ -62,7 +74,7 @@
 		<textarea name="body" rows="26" cols="80">%(body)s</textarea></td>
     </tr>
 	<tr><td colspan="3"><br></td></tr>
-	<tr align="center">
+	<tr style="border-top: 1px dashed rgb(119, 119, 119); background-color: rgb(236, 236, 236);">
 		<td colspan="3" style="border-top:1px solid #777777;" valign="bottom" align="center">
 			<input type="submit" class="btn" name="save" value="<%= _("save")%>">
 			<input type="submit" class="btn" name="cancel" value="<%= _("cancel")%>">

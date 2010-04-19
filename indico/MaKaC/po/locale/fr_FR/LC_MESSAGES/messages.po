@@ -15988,7 +15988,7 @@ msgstr "ok"
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConfModCFANotifTplNew.tpl:32
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConfModCFANotifTplEditData.tpl:32
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConfModCFANotifTplDisplay.tpl:24
-msgid "Cc addresses"
+msgid "CC addresses"
 msgstr "Adresses en copie"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConfModificationControlFrame.tpl:4
