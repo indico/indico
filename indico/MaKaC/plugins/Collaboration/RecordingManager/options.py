@@ -94,13 +94,13 @@ globalOptions = [
                "editable": True,
                "visible": True} ),
 
-    ("micalaDBStatusExportCDS", {"description" : _("DB status message for CDS export"),
+    ("micalaDBStatusExportCDS", {"description" : _("micala DB task name for CDS export"),
                "type": str,
                "defaultValue": "metadata export to CDS",
                "editable": True,
                "visible": True} ),
 
-    ("micalaDBStatusExportMicala", {"description" : _("DB status message for micala export"),
+    ("micalaDBStatusExportMicala", {"description" : _("micala DB task name for micala export"),
                "type": str,
                "defaultValue": "metadata export to micala",
                "editable": True,

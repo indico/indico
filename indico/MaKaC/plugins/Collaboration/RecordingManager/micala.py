@@ -15,7 +15,7 @@ class MicalaCommunication(object):
     def getIdMachine(cls, machine_name):
         '''Look up ID of this machine in database'''
 
-        Logger.get('RecMan').info('machine_name = %s' % machine_name)
+        Logger.get('RecMan').info('in getIdMachine(), machine_name = %s' % machine_name)
 
         try:
             connection = MySQLdb.connect(host   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBServer"),
@@ -187,6 +187,8 @@ class MicalaCommunication(object):
     def reportStatus(cls, status, message, idMachine, idTask, idLecture):
         '''Make status report to the database'''
 
+        Logger.get('RecMan').info('in reportStatus()')
+
         if idLecture == '':
             idLecture = None
 
@@ -260,8 +262,7 @@ class MicalaCommunication(object):
 
         cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
 
-        # the following command is not necessarily what I want. I already have the list of existing CDS records.
-        # Now I just need to know the IndicoID's for whom the export was started not finished.
+        # The following query returns the IndicoID's for which the metadata export task was started.
         cursor.execute('''SELECT L.id, L.LOID, L.IndicoID,
             T.id, T.Name,
             S.idLecture, S.idTask, S.Status, S.Message
@@ -280,9 +281,14 @@ class MicalaCommunication(object):
         connection.close()
 
         talk_array = []
+        # Now we need to eliminate from our list those talks listed in cds_indico_matches.
+        # Those are not pending.
         for row in rows:
-            Logger.get('RecMan').info(" CDS export pending for: %s" % row["IndicoID"])
-            talk_array.append(row["IndicoID"])
+            try:
+                existing_cds_record = cds_indico_matches[row["IndicoID"]]
+            except KeyError:
+                Logger.get('RecMan').info(" CDS export pending for: %s" % row["IndicoID"])
+                talk_array.append(row["IndicoID"])
 
         return talk_array
 
@@ -292,8 +298,17 @@ class MicalaCommunication(object):
         cds_indico_matches is a dictionary of key-value pairs { IndicoID1: CDSID1, IndicoID2: CDSID2, ... }
         cds_indico_pending is a list of IndicoIDs.'''
 
+        Logger.get('RecMan').info('in updateMicalaCDSExport()')
+
+        # debugging:
+        for matched in cds_indico_matches.keys():
+            Logger.get('RecMan').info('Looping through cds_indico_matches: %s -> %s' % (matched, cds_indico_matches[matched]))
         for pending in cds_indico_pending:
             Logger.get('RecMan').info('Looping through cds_indico_pending: %s' % pending)
+
+
+        for pending in cds_indico_pending:
+            Logger.get('RecMan').info('Looping through cds_indico_pending: %s (and looking up in cds_indico_matches)' % pending)
             try:
                 new_record = cds_indico_matches[pending]
                 idMachine = cls.getIdMachine(CollaborationTools.getOptionValue("RecordingManager", "micalaDBMachineName"))
@@ -308,5 +323,5 @@ class MicalaCommunication(object):
 
             except KeyError:
                 # current pending lecture still not found in CDS so do nothing.
-                pass
+                Logger.get('RecMan').info('%s listed as pending and not found in cds_indico_matches, so it must still be pending.' % pending)
 

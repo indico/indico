@@ -209,7 +209,7 @@ def getTalks(conference, sort = False):
             event_info["CDSID"]     = cds_indico_matches[event_info["IndicoID"]]
             event_info["CDSURL"]    = CollaborationTools.getOptionValue("RecordingManager", "CDSBaseURL") % event_info["CDSID"]
         except KeyError:
-            Logger.get('RecMan').info("caught Got KeyError for %s" % event_info["title"])
+            Logger.get('RecMan').info("Following talk not in CDS: %s" % event_info["title"])
             if cds_indico_pending is not None and event_info["IndicoID"] in set(cds_indico_pending):
                 event_info["CDSID"]  = 'pending'
                 event_info["CDSURL"] = ""
