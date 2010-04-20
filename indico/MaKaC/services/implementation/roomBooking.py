@@ -54,9 +54,9 @@ class RoomBookingFullNameListRooms( RoomBookingListRooms):
 
         if Location.parse( self._location ):
             for room in CrossLocationQueries.getRooms( location = self._location ):
-                res.append((room.name, room.getFullName()))
+                res.append((room.getFullName(), room.getFullName()))
 
-        return res
+        return sorted(res)
 
 class RoomBookingListLocationsAndRooms( ServiceBase ):
 
