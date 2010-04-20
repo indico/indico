@@ -29,7 +29,7 @@ from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 
 from MaKaC.common.logger import Logger
 
-from time import mktime
+import time
 from MaKaC.common.xmlGen import XMLGen
 from MaKaC.common.output import outputGenerator, XSLTransformer
 from MaKaC.conference import Link
@@ -93,9 +93,9 @@ def getTalks(conference, sort = False):
                                               contribution    = None,
                                               subcontribution = None)
     event_info["title"]      = conference.getTitle()
-    event_info["titleshort"] = truncate_str(event_info["title"], 40)
+    event_info["titleshort"] = truncateString(event_info["title"], 40)
     # this always comes first, so just pretend it's 0 seconds past the epoch
-    event_info["date"]       = 0
+    event_info["date"]       = int(time.mktime(conference.getStartDate().timetuple()))
     event_info["LOID"]       = ""
     event_info["IndicoLink"] = doesExistIndicoLink(conference)
 
@@ -128,12 +128,12 @@ def getTalks(conference, sort = False):
                                               contribution    = contribution.getId(),
                                               subcontribution = None)
             event_info["title"]      = contribution.getTitle()
-            event_info["titleshort"] = truncate_str(event_info["title"], title_length)
+            event_info["titleshort"] = truncateString(event_info["title"], title_length)
             # NOTE: Sometimes there is no start date?! e.g. 21917. I guess I should deal with this
             try:
-                event_info["date"]       = int(mktime(contribution.getStartDate().timetuple()))
+                event_info["date"]       = int(time.mktime(contribution.getStartDate().timetuple()))
             except AttributeError:
-                event_info["date"]       = 1
+                event_info["date"]       = int(time.mktime(conference.getStartDate().timetuple())) + 1
 
             event_info["LOID"]       = ""
             event_info["IndicoLink"] = doesExistIndicoLink(contribution)
@@ -163,11 +163,11 @@ def getTalks(conference, sort = False):
                                               contribution    = contribution.getId(),
                                               subcontribution = subcontribution.getId())
                 event_info["title"]      = subcontribution.getTitle()
-                event_info["titleshort"] = truncate_str(event_info["title"], title_length)
+                event_info["titleshort"] = truncateString(event_info["title"], title_length)
                 # Subcontribution objects don't have start dates,
                 # so get the owner contribution's start date
                 # and add the counter ctr_sc to that
-                event_info["date"]     = int(mktime(subcontribution.getOwner().getStartDate().timetuple()) + ctr_sc)
+                event_info["date"]     = int(time.mktime(subcontribution.getOwner().getStartDate().timetuple()) + ctr_sc)
                 event_info["LOID"]       = ""
                 event_info["IndicoLink"] = doesExistIndicoLink(subcontribution)
 
@@ -186,9 +186,9 @@ def getTalks(conference, sort = False):
                                                   contribution    = None,
                                                   subcontribution = None)
         event_info["title"]    = session.getTitle()
-        event_info["titleshort"] = truncate_str(event_info["title"], title_length)
+        event_info["titleshort"] = truncateString(event_info["title"], title_length)
         # Get start time as seconds since the epoch so we can sort
-        event_info["date"]     = int(mktime(session.getStartDate().timetuple()))
+        event_info["date"]     = int(time.mktime(session.getStartDate().timetuple()))
         event_info["LOID"]       = ""
         event_info["IndicoLink"] = doesExistIndicoLink(session)
 
@@ -234,6 +234,11 @@ def getTalks(conference, sort = False):
     for talk in recordable_events:
         talk["bg"]         = chooseBGColor(talk)
 
+    # Format dates for each talk for pleasing display
+    for talk in recordable_events:
+        talk["date_nice"] = formatDate(talk["date"])
+        Logger.get('RecMan').info("formatDate(%s) = %s" % (talk["date"], talk["date_nice"]))
+
     # Next, sort the list of events by startDate for display purposes
     recordable_events.sort(startTimeCompare)
 
@@ -260,7 +265,7 @@ def startTimeCompare(a, b):
     else:  #a < b
         return -1
 
-def truncate_str(string, length):
+def truncateString(string, length):
     '''Truncates given string to the desired length and if it
     was longer than that, sticks ellipses on the end'''
 
@@ -268,6 +273,51 @@ def truncate_str(string, length):
         return string
     else:
         return string[:length] + "..."
+
+def formatDate(date_str):
+    '''Given number of seconds since the epoch, convert for display in the main Recording Manager interface.'''
+
+    time_struct = time.localtime(date_str)
+
+    day_of_week   = [_('Mon'),
+                     _('Tue'),
+                     _('Wed'),
+                     _('Thu'),
+                     _('Fri'),
+                     _('Sat'),
+                     _('Sun')]
+    month_of_year = [_('January'),
+                     _('February'),
+                     _('March'),
+                     _('April'),
+                     _('May'),
+                     _('June'),
+                     _('July'),
+                     _('August'),
+                     _('September'),
+                     _('October'),
+                     _('November'),
+                     _('December')]
+    month_of_year = [_('Jan'),
+                     _('Feb'),
+                     _('Mar'),
+                     _('Apr'),
+                     _('May'),
+                     _('Jun'),
+                     _('Jul'),
+                     _('Aug'),
+                     _('Sep'),
+                     _('Oct'),
+                     _('Nov'),
+                     _('Dec')]
+
+#    Logger.get('RecMan').info("time_struct: %s" % time_struct)
+
+    return "%02d:%02d, %s %d %s" % (time_struct[3],
+                                    time_struct[4],
+                                    day_of_week[time_struct[6]],
+                                    time_struct[2],
+                                    month_of_year[int(time_struct[1] - 1)])
 
 def generateIndicoID(conference     = None,
                     session         = None,

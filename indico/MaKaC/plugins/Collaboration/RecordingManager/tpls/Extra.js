@@ -27,7 +27,7 @@ ButtonCreateCDSRecord.observeClick(function(){
 ButtonCreateCDSRecord.observeEvent('mouseover', function(event){
     if (!ButtonCreateCDSRecord.isEnabled()) {
         tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY,
-                $T("First select talk and Lecture Object"), "tooltipError");
+                $T("Please select talk and content type"), "tooltipError");
     }
 });
 
@@ -51,7 +51,7 @@ ButtonCreateIndicoLink.observeClick(function(){
 ButtonCreateIndicoLink.observeEvent('mouseover', function(event){
     if (!ButtonCreateIndicoLink.isEnabled()) {
         tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY,
-                $T("First select talk and Lecture Object"), "tooltipError");
+                $T("Please select talk and content type"), "tooltipError");
     }
 });
 
@@ -275,44 +275,69 @@ function RMLink() {
 
 function RMCreateCDSRecord() {
 
-    var killProgress = IndicoUI.Dialogs.Util.progress($T("Creating CDS record..."));
+    var confirmText = Html.div({},
+            Html.div({}, $T("Are you sure you want to do this? ")),
+            Html.br(),
+            Html.div({}, $T("IndicoID: " + RMselectedTalkId)),
+            Html.br(),
+            Html.div({}, $T("LOID: " + RMselectedLOID)),
+            Html.br(),
+            Html.div({}, $T("format: " + RMvideoFormat)),
+            Html.br(),
+            Html.div({}, "This change cannot be undone.")
+        );
 
-    languageCodes = [];
-    if (RMLanguageFlagPrimary == true) {
-        languageCodes.push(RMLanguageValuePrimary);
-    }
-    if (RMLanguageFlagSecondary == true) {
-        languageCodes.push(RMLanguageValueSecondary);
-    }
-    if (RMLanguageFlagOther == true) {
-        languageCodes.push(RMLanguageValueOther);
-    }
+    var confirmHandler = function(confirm) {
 
-    indicoRequest('collaboration.pluginService',
-            {
-                plugin: 'RecordingManager',
-                service: 'RMCreateCDSRecord',
-                conference: '<%= ConferenceId %>',
-                IndicoID: RMselectedTalkId,
-                LOID: RMselectedLOID,
-                videoFormat: RMvideoFormat,
-                contentType: RMviewMode,
-                languages: languageCodes
-            },
-        function(result, error){
-                document.getElementById('RMMatchSummaryMessage').innerHTML = result;
+        if (confirm) {
 
-                if (!error) {
+            var killProgress = IndicoUI.Dialogs.Util.progress($T("Creating CDS record..."));
 
-                // I don't have anything here yet. This is where we could do something with the result if we want. Don't know what that would be.
-                killProgress(); // turn off the progress indicator
-
-            } else {
-                killProgress(); // turn off the progress indicator
-                IndicoUtil.errorReport(error);
+            languageCodes = [];
+            if (RMLanguageFlagPrimary == true) {
+                languageCodes.push(RMLanguageValuePrimary);
             }
+            if (RMLanguageFlagSecondary == true) {
+                languageCodes.push(RMLanguageValueSecondary);
+            }
+            if (RMLanguageFlagOther == true) {
+                languageCodes.push(RMLanguageValueOther);
+            }
+
+            indicoRequest('collaboration.pluginService',
+                    {
+                        plugin: 'RecordingManager',
+                        service: 'RMCreateCDSRecord',
+                        conference: '<%= ConferenceId %>',
+                        IndicoID: RMselectedTalkId,
+                        LOID: RMselectedLOID,
+                        videoFormat: RMvideoFormat,
+                        contentType: RMviewMode,
+                        languages: languageCodes
+                    },
+                function(result, error){
+                        document.getElementById('RMMatchSummaryMessage').innerHTML = result;
+
+                        if (!error) {
+
+                        // I don't have anything here yet. This is where we could do something with the result if we want. Don't know what that would be.
+                        killProgress(); // turn off the progress indicator
+
+                    } else {
+                        killProgress(); // turn off the progress indicator
+                        IndicoUtil.errorReport(error);
+                    }
+                }
+            );
+
+
+
         }
-    );
+    };
+
+    var confirmPopup = new ConfirmPopup($T("Please review your choice"), confirmText, confirmHandler);
+    confirmPopup.open();
+
 }
 
 function RMCreateIndicoLink() {

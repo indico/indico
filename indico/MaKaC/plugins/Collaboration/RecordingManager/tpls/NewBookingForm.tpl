@@ -5,10 +5,10 @@
 <br />
 </span></div>
 
-<table>
+<table cellspacing="0px" cellpadding="0px" width="1000px" border="0">
   <tr>
-    <td width="590px" valign="top">
-        <b>1. <%= _("Select a record:") %></b>
+    <td cellspacing="0px" cellpadding="0px" width="550px" valign="top">
+        <b>1. <%= _("Select a talk:") %></b>
         <br /> <!-- line breaks to make the pretty boxes below to line up -->
         <br />
         <br />
@@ -18,42 +18,50 @@
                 <% IndicoID = talk["IndicoID"] %>
 
                   <span>
-                    <table cellspacing="0" cellpadding="0" border="0">
+                    <table cellspacing="0px" cellpadding="0px" border="0">
                     <tr>
-                    <td width="380px">
-<!--
-                        <tt><b><%= {'conference':      "E&nbsp;",
-                                 'session':         "&nbsp;S&nbsp;",
-                                 'contribution':    "&nbsp;&nbsp;C&nbsp;",
-                                 'subcontribution': "&nbsp;&nbsp;&nbsp;SC&nbsp;"}[talk["type"]] %></b></tt>
-                        <%= talk["titleshort"] %><br />&nbsp;
--->
+                    <td width="370px">
                         <div id="div<%= IndicoID %>" class="RMtalkDisplay" onclick="RMtalkSelect('<%= IndicoID %>')" onmouseover="RMtalkBoxOnHover('<%= IndicoID %>');" onmouseout="RMtalkBoxOffHover('<%= IndicoID %>');">
+                            <table cellpadding="0px" cellspacing="0px" border="0">
+                            <tr>
+                            <td colspan="2" width="370px">
                             <tt><b><%= {'conference':      "E&nbsp;",
                                      'session':         "S&nbsp;&nbsp;",
                                      'contribution':    "C&nbsp;&nbsp;&nbsp;",
                                      'subcontribution': "SC&nbsp;&nbsp;&nbsp;&nbsp;"}[talk["type"]] %></b></tt>
-                            <%= talk["titleshort"] %><br />&nbsp;
+                            <b><%= talk["titleshort"] %></b>&nbsp;
+                            </td>
+                            </tr>
+                            <tr>
+                            <td width="180px" colspan="1" align="left">
                             <tt><%= {'conference':      "&nbsp;&nbsp;",
                                      'session':         "&nbsp;&nbsp;&nbsp;",
                                      'contribution':    "&nbsp;&nbsp;&nbsp;&nbsp;",
-                                     'subcontribution': "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"}[talk["type"]] %></b></tt>
+                                     'subcontribution': "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"}[talk["type"]] %></tt>
+                            <%= talk["date_nice"] %>
+                            </td>
+                            <td width="190px" colspan="1" align="left">
+                            <em>
                             <% if talk["speakers"] != '': %>
                             <%=    talk["speakers"] %>
                             <% end %>
+                            </em>
+                            </td>
+                            </tr>
+                            </table>
                         </div>
                     </td>
-                    <td width="50px">
+                    <td width="50px" valign="top">
                         <% if talk["LOID"] != '': %>
                             <div class="RMcolumnStatusNone" style="background-image: url('<%= "/indico/images/RecordingManagerMicalaCheck.png" %>');">
-                            &nbsp;</div>
+                            </div>
                         <% end %>
                         <% else: %>
                             <div class="RMcolumnStatusNone">
                             </div>
                         <% end %>
                     </td>
-                    <td width="50px">
+                    <td width="50px" valign="top">
                         <% if talk["CDSID"] != 'none' and talk["CDSID"] != 'pending': %>
                             <div class="RMcolumnStatusCDSDone" id="divCDS<%= talk["IndicoID"] %>" onclick="RMCDSDoneClick('<%= talk["CDSURL"] %>')" onmouseover="RMCDSDoneOnHover('<%= talk["IndicoID"] %>')" onmouseout="RMCDSDoneOffHover('<%= talk["IndicoID"] %>')">
                             </div>
@@ -67,7 +75,7 @@
                             </div>
                         <% end %>
                     </td>
-                    <td width="50px">
+                    <td width="50px" valign="top">
                         <% if talk["IndicoLink"] == True: %>
                             <div class="RMcolumnStatusNone" style="background-image: url('<%= "/indico/images/RecordingManagerIndicoCheck.png" %>');">
                             </div>
@@ -84,7 +92,7 @@
         </div>
         </div>
     </td>
-    <td width="620px" valign="top">
+    <td width="400px" valign="top">
         <b>2. <%= _("Select content type: ") %></b>
         <span id="RMbuttonPlainVideo" class="RMbuttonDisplay" onclick="RMbuttonModeSelect('plain_video')" ><%= _("plain video") %></span>
         &nbsp;<%= _(" or ") %>&nbsp;

@@ -20,9 +20,9 @@ div.nicebox {
 
 div.RMMatchPane {
     background-color: #FFFFFF;
-    padding: 10px 20px 10px 10px;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    padding: 3px 3px 3px 3px;
+    margin-top: 1px;
+    margin-bottom: 1px;
     height: 450px;
     overflow: auto;
 }
@@ -72,7 +72,7 @@ div.RMtalkDisplay {
     border: 1px;
     border-color: #FFFFFF;
     border-style: solid;
-    height: 30px;
+    height: 34px;
     font-family: serif;
     font-size: -2;
     line-height: 1;
@@ -86,7 +86,7 @@ div.RMtalkHover {
     background-color: #FFF6DF;
     border-width: 1px;
     border-style: dashed;
-    height: 30px;
+    height: 34px;
     font-family: serif;
     font-size: -1;
     line-height: 1;
@@ -100,7 +100,7 @@ div.RMtalkSelected {
     background-color: #CDEB8B;
     border-width: 1px;
     border-style: solid;
-    height: 30px;
+    height: 34px;
     font-family: serif;
     font-size: -1;
     font-weight: normal;

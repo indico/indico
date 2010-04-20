@@ -285,6 +285,7 @@ class MicalaCommunication(object):
         # Those are not pending.
         for row in rows:
             try:
+                # check to see if the IndicoID in question is to be found in the dictionary of matches
                 existing_cds_record = cds_indico_matches[row["IndicoID"]]
             except KeyError:
                 Logger.get('RecMan').info(" CDS export pending for: %s" % row["IndicoID"])
