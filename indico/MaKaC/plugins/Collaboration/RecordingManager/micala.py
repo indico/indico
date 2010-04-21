@@ -211,12 +211,11 @@ class MicalaCommunication(object):
         connection.commit()
         connection.close()
 
-    # WHO THE HELL CALLS THIS?!
     @classmethod
-    def updateMicala(cls, IndicoID, contentType, LOID):
-        """Submit Indico ID to the micala DB"""
+    def updateMicala(cls, IndicoID, contentType, LODBID):
+        """Update the micala DB to associate the given talk with the given LOID"""
 
-    #    Logger.get('RecMan').exception("inside updateMicala.")
+        Logger.get('RecMan').info("in updateMicala()")
 
         if contentType == 'web_lecture':
             try:
@@ -232,7 +231,7 @@ class MicalaCommunication(object):
 
             try:
                 cursor.execute("UPDATE Lectures SET IndicoID=%s WHERE id=%s",
-                               (IndicoID, LOID))
+                               (IndicoID, LODBID))
                 connection.commit()
             except MySQLdb.Error, e:
                 raise RecordingManagerException("MySQL database error %d: %s" % (e.args[0], e.args[1]))
@@ -241,10 +240,28 @@ class MicalaCommunication(object):
             connection.close()
 
         elif contentType == 'plain_video':
-            # Should update the database here as well.
-            # first need to backup the DB, create a new column called contentType
-            # (I already created this column in micala.sql, just need to recreate DB from this file)
-            pass
+            try:
+                connection = MySQLdb.connect(host   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBServer"),
+                                             port   = int(CollaborationTools.getOptionValue("RecordingManager", "micalaDBPort")),
+                                             user   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBUser"),
+                                             passwd = CollaborationTools.getOptionValue("RecordingManager", "micalaDBPW"),
+                                             db     = CollaborationTools.getOptionValue("RecordingManager", "micalaDBName"))
+            except MySQLdb.Error, e:
+                raise RecordingManagerException("MySQL database error %d: %s" % (e.args[0], e.args[1]))
+
+            cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+
+            try:
+                # need to fix this query to do INSERT ... ON DUPLICATE KEY UPDATE ...
+                cursor.execute("UPDATE Lectures SET IndicoID=%s WHERE id=%s",
+                               (IndicoID, LODBID))
+                connection.commit()
+            except MySQLdb.Error, e:
+                raise RecordingManagerException("MySQL database error %d: %s" % (e.args[0], e.args[1]))
+
+            cursor.close()
+            connection.close()
+
 
     @classmethod
     def getCDSPending(cls, confId, cds_indico_matches):

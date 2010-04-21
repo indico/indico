@@ -17,7 +17,7 @@ ButtonCreateCDSRecord.observeClick(function(){
     if (ButtonCreateCDSRecord.isEnabled()) {
         if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '' &&
                 (RMviewMode == 'plain_video' ||
-                        typeof RMselectedLOID != 'undefined' && RMselectedLOID != '')) {
+                        typeof RMselectedLODBID != 'undefined' && RMselectedLODBID != '')) {
 
             RMCreateCDSRecord();
         }
@@ -41,7 +41,7 @@ ButtonCreateIndicoLink.observeClick(function(){
     if (ButtonCreateIndicoLink.isEnabled()) {
         if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '' &&
                 (RMviewMode == 'plain_video' ||
-                        typeof RMselectedLOID != 'undefined' && RMselectedLOID != '')) {
+                        typeof RMselectedLODBID != 'undefined' && RMselectedLODBID != '')) {
 
             RMCreateIndicoLink();
         }
@@ -81,11 +81,13 @@ function RMbuttonModeSelect(mode) {
         IndicoUI.Effect.appear($E('RMrightPaneWebLecture'), "block");
 
         if (typeof RMselectedTalkId == 'undefined' || RMselectedTalkId == '' ||
-            typeof RMselectedLOID == 'undefined' || RMselectedLOID == '') {
+            typeof RMselectedLODBID == 'undefined' || RMselectedLODBID == '') {
                 ButtonCreateCDSRecord.disable();
                 ButtonCreateIndicoLink.disable();
         }
     }
+
+    RMMatchSummaryMessageUpdate();
 }
 
 function RMtalkBoxOffHover(IndicoID) {
@@ -110,14 +112,15 @@ function RMtalkSelect(IndicoID) {
     }
     RMselectedTalkId = IndicoID;
     document.getElementById('div' + RMselectedTalkId).className = 'RMtalkSelected';
-    RMMatchSummaryMessage(RMselectedTalkId, RMselectedLOID);
 
     if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '' &&
             (RMviewMode == 'plain_video' ||
-                    typeof RMselectedLOID != 'undefined' && RMselectedLOID != '')) {
+                    typeof RMselectedLODBID != 'undefined' && RMselectedLODBID != '')) {
         ButtonCreateCDSRecord.enable();
         ButtonCreateIndicoLink.enable();
     }
+
+    RMMatchSummaryMessageUpdate();
 }
 
 function RMCDSDoneOnHover(IndicoID) {
@@ -135,19 +138,19 @@ function RMCDSDoneOffHover(IndicoID) {
 }
 
 function RMCDSDoneClick(url) {
-    window.location = url;
+    window.open(url);
 }
 
 function RMLOBoxOffHover(DBID) {
     var DivID = 'lo' + DBID;
-    if (RMselectedLOID != DBID) {
+    if (RMselectedLODBID != DBID) {
         document.getElementById(DivID).className = 'RMLODisplay';
     }
 }
 
 function RMLOBoxOnHover(DBID) {
     var DivID = 'lo' + DBID;
-    if (RMselectedLOID != DBID) {
+    if (RMselectedLODBID != DBID) {
         document.getElementById(DivID).className = 'RMLOHover';
     }
 }
@@ -155,19 +158,20 @@ function RMLOBoxOnHover(DBID) {
 function RMLOSelect(DBID) {
     var DivID = 'lo' + DBID;
     // reset last selected LO div to default color before setting new background
-    if (typeof RMselectedLOID != 'undefined' && RMselectedLOID != '') {
-        document.getElementById('lo' + RMselectedLOID).className = 'RMLODisplay';
+    if (typeof RMselectedLODBID != 'undefined' && RMselectedLODBID != '') {
+        document.getElementById('lo' + RMselectedLODBID).className = 'RMLODisplay';
     }
-    RMselectedLOID = DBID;
-    document.getElementById('lo' + RMselectedLOID).className = 'RMLOSelected';
-    RMMatchSummaryMessage(RMselectedTalkId, RMselectedLOID);
+    RMselectedLODBID = DBID;
+    document.getElementById('lo' + RMselectedLODBID).className = 'RMLOSelected';
 
     if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '' &&
             (RMviewMode == 'plain_video' ||
-                    typeof RMselectedLOID != 'undefined' && RMselectedLOID != '')) {
+                    typeof RMselectedLODBID != 'undefined' && RMselectedLODBID != '')) {
         ButtonCreateCDSRecord.enable();
         ButtonCreateIndicoLink.enable();
     }
+
+    RMMatchSummaryMessageUpdate();
 }
 
 //Set RMLanguageFlagPrimary to true/false depending on whether box is checked
@@ -180,6 +184,8 @@ function RMLanguageTogglePrimary(language) {
     else {
         RMLanguageFlagPrimary = false;
     }
+
+    RMMatchSummaryMessageUpdate();
 }
 
 // Set RMLanguageFlagSecondary to true/false depending on whether box is checked
@@ -192,6 +198,8 @@ function RMLanguageToggleSecondary(language) {
     else {
         RMLanguageFlagSecondary = false;
     }
+
+    RMMatchSummaryMessageUpdate();
 }
 
 // Set RMLanguageFlagOther to true/false depending on whether box is checked
@@ -205,6 +213,7 @@ function RMLanguageToggleOther() {
         $E('RMLanguageOtherSelect').dom.selectedIndex = 0;
     }
 
+    RMMatchSummaryMessageUpdate();
 }
 
 // If drop-down list is clicked, either it was reset to index = 0, in which case uncheck the Other box,
@@ -219,20 +228,79 @@ function RMLanguageSelectOther(language) {
         RMLanguageFlagOther = true;
         RMLanguageValueOther = language;
     }
+
+    RMMatchSummaryMessageUpdate();
 }
 
-//
-function RMMatchSummaryMessage(talk, LO) {
-    if (typeof talk != 'undefined' &&
-            talk != '' &&
-            typeof LO != 'undefined' &&
-            LO != '') {
-        document.getElementById('RMMatchSummaryMessage').innerHTML = '<em>Match talk id</em> <b>' + talk + '</b> <em>to orphan</em> <b>' + LO + '</b>';
+// Populate the RMMatchSummaryMessage text box with basic info like the talk ID, LOID
+function RMMatchSummaryMessageUpdate() {
+    var message_list = [];
+
+    if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '') {
+        message_list.push(Html.span({}, "talk: ", Html.span({style:{fontWeight: "bold"}}, RMselectedTalkId)));
     }
+    if (typeof RMviewMode != 'undefined' && RMviewMode == 'plain_video') {
+        if (typeof RMvideoFormat != 'undefined' && RMvideoFormat != '') {
+            message_list.push(Html.span({}, ", format: ", Html.span({style:{fontWeight: "bold"}}, RMvideoFormat)));
+        }
+    }
+    else if (typeof RMviewMode != 'undefined' && RMviewMode =='web_lecture') {
+        if (typeof RMselectedLODBID != 'undefined' && RMselectedLODBID != '') {
+            message_list.push(Html.span({}, ", web lecture: ", Html.span({style:{fontWeight: "bold"}}, RMLOList[RMselectedLODBID]["LOID"])));
+        }
+    }
+
+    languageCodes = RMGetLanguageCodesList();
+
+    var len = languageCodes.length;
+    if (len > 0) {
+        message_list.push(Html.span({}, ", languages: "))
+        message_list.push(RMLanguagesString(languageCodes));
+    }
+
+    $E('RMMatchSummaryMessage').set(message_list);
+}
+
+//Build a list of language codes based on variables set
+function RMGetLanguageCodesList() {
+
+    languageCodes = [];
+
+    if (RMLanguageFlagPrimary == true) {
+        languageCodes.push(RMLanguageValuePrimary);
+    }
+    if (RMLanguageFlagSecondary == true) {
+        languageCodes.push(RMLanguageValueSecondary);
+    }
+    if (RMLanguageFlagOther == true) {
+        languageCodes.push(RMLanguageValueOther);
+    }
+
+    return languageCodes;
+}
+
+// Build a string listing language codes
+function RMLanguagesString(languageCodes) {
+
+    var messages = [];
+    var len = languageCodes.length;
+
+    if (len > 0) {
+        for(var i=0; i < len; i++) {
+            languageCodes[i];
+            messages.push(Html.span({style:{fontWeight: "bold"}}, languageCodes[i]))
+            if (i < len - 1) {
+                messages.push(Html.span({}, ", "));
+            }
+
+        }
+    }
+
+    return messages;
 }
 
 function RMStatusMessage(message) {
-    document.getElementById('RMStatusMessageID').innerHTML = message;
+    $E('RMStatusMessageID').set(message);
 }
 
 function RMchooseVideoFormat(format_string) {
@@ -240,11 +308,12 @@ function RMchooseVideoFormat(format_string) {
 
     if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '' &&
             (RMviewMode == 'plain_video' ||
-                    typeof RMselectedLOID != 'undefined' && RMselectedLOID != '')) {
+                    typeof RMselectedLODBID != 'undefined' && RMselectedLODBID != '')) {
         ButtonCreateCDSRecord.enable();
         ButtonCreateIndicoLink.enable();
     }
 
+    RMMatchSummaryMessageUpdate();
 }
 
 function RMLink() {
@@ -259,7 +328,7 @@ function RMLink() {
                 service: 'RMLink',
                 conference: '<%= ConferenceId %>',
                 IndicoID: RMselectedTalkId,
-                LOID: RMselectedLOID
+                LOID: RMselectedLODBID
             },
         function(result, error){
             if (!error) {
@@ -273,19 +342,54 @@ function RMLink() {
     );
 }
 
+// Do the AJAX thing to create the CDS record
 function RMCreateCDSRecord() {
 
-    var confirmText = Html.div({},
-            Html.div({}, $T("Are you sure you want to do this? ")),
-            Html.br(),
-            Html.div({}, $T("IndicoID: " + RMselectedTalkId)),
-            Html.br(),
-            Html.div({}, $T("LOID: " + RMselectedLOID)),
-            Html.br(),
-            Html.div({}, $T("format: " + RMvideoFormat)),
-            Html.br(),
-            Html.div({}, "This change cannot be undone.")
+    languageCodes = RMGetLanguageCodesList();
+
+    speakers_string = "";
+    if (RMTalkList[RMselectedTalkId]["speakers"] == "") {
+        speakers_string = "no speaker given";
+    }
+    else {
+        speakers_string = RMTalkList[RMselectedTalkId]["speakers"];
+    }
+
+    if (RMviewMode == 'plain_video') {
+        var confirmText = Html.div({},
+                Html.span({}, $T("This will create a" + " ")),
+                Html.span({style:{fontStyle: "italic"}}, RMviewMode),
+                Html.span({}, " " + $T("CDS record for the following") + " "),
+                Html.span({style:{fontStyle: "italic"}}, RMTalkList[RMselectedTalkId]["type"] + ":"),
+                Html.br(),
+                Html.br(),
+                Html.span({style:{fontWeight: "bold"}}, RMTalkList[RMselectedTalkId]["title"]),
+                Html.span({}, " (" + speakers_string + ")"),
+                Html.br(),
+                Html.br(),
+                Html.span({}, $T("time scheduled") + ": "),
+                Html.span({style:{fontWeight: "bold"}}, RMTalkList[RMselectedTalkId]["date_nice"]),
+                Html.br(),
+                Html.span({}, $T("IndicoID") + ": "),
+                Html.span({style:{fontWeight: "bold"}}, RMselectedTalkId),
+                Html.br(),
+                Html.span({}, $T("video format") + ": "),
+                Html.span({style:{fontWeight: "bold"}}, RMvideoFormat),
+                Html.br(),
+                Html.span({}, $T("spoken language(s)") + ": "),
+                Html.span({style:{fontWeight: "bold"}}, RMLanguagesString(languageCodes)),
+                Html.br(),
+                Html.br(),
+                Html.span({}, $T("To proceed, click OK (you will not be able to undo)."))
         );
+    }
+    else if (RMviewMode =='web_lecture') {
+        var confirmText = Html.div({},
+            Html.div({style:{textAlign:"center", fontWeight:"bold"}}, $T("Create CDS record for web lecture")),
+            Html.div({}, $T("IndicoID: " + RMselectedTalkId)),
+            Html.div({}, $T("Lecture Object ID: " + RMselectedLODBID))
+        );
+    }
 
     var confirmHandler = function(confirm) {
 
@@ -293,30 +397,19 @@ function RMCreateCDSRecord() {
 
             var killProgress = IndicoUI.Dialogs.Util.progress($T("Creating CDS record..."));
 
-            languageCodes = [];
-            if (RMLanguageFlagPrimary == true) {
-                languageCodes.push(RMLanguageValuePrimary);
-            }
-            if (RMLanguageFlagSecondary == true) {
-                languageCodes.push(RMLanguageValueSecondary);
-            }
-            if (RMLanguageFlagOther == true) {
-                languageCodes.push(RMLanguageValueOther);
-            }
-
             indicoRequest('collaboration.pluginService',
                     {
                         plugin: 'RecordingManager',
                         service: 'RMCreateCDSRecord',
                         conference: '<%= ConferenceId %>',
                         IndicoID: RMselectedTalkId,
-                        LOID: RMselectedLOID,
+                        LOID: RMselectedLODBID,
                         videoFormat: RMvideoFormat,
                         contentType: RMviewMode,
                         languages: languageCodes
                     },
                 function(result, error){
-                        document.getElementById('RMMatchSummaryMessage').innerHTML = result;
+                        $E('RMMatchSummaryMessage').set(Html.span({}, result));
 
                         if (!error) {
 
@@ -350,7 +443,7 @@ function RMCreateIndicoLink() {
                 service: 'RMCreateIndicoLink',
                 conference: '<%= ConferenceId %>',
                 IndicoID: RMselectedTalkId,
-                LOID: RMselectedLOID,
+                LOID: RMselectedLODBID,
                 CDSID: RMTalkList[RMselectedTalkId]
             },
         function(result, error){

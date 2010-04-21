@@ -8,7 +8,7 @@
 <table cellspacing="0px" cellpadding="0px" width="1000px" border="0">
   <tr>
     <td cellspacing="0px" cellpadding="0px" width="550px" valign="top">
-        <b>1. <%= _("Select a talk:") %></b>
+        <strong>1. <%= _("Select a talk:") %></strong>
         <br /> <!-- line breaks to make the pretty boxes below to line up -->
         <br />
         <br />
@@ -25,11 +25,11 @@
                             <table cellpadding="0px" cellspacing="0px" border="0">
                             <tr>
                             <td colspan="2" width="370px">
-                            <tt><b><%= {'conference':      "E&nbsp;",
+                            <tt><strong><%= {'conference':      "E&nbsp;",
                                      'session':         "S&nbsp;&nbsp;",
                                      'contribution':    "C&nbsp;&nbsp;&nbsp;",
-                                     'subcontribution': "SC&nbsp;&nbsp;&nbsp;&nbsp;"}[talk["type"]] %></b></tt>
-                            <b><%= talk["titleshort"] %></b>&nbsp;
+                                     'subcontribution': "SC&nbsp;&nbsp;&nbsp;&nbsp;"}[talk["type"]] %></strong></tt>
+                            <strong><%= talk["titleshort"] %></strong>&nbsp;
                             </td>
                             </tr>
                             <tr>
@@ -93,13 +93,13 @@
         </div>
     </td>
     <td width="400px" valign="top">
-        <b>2. <%= _("Select content type: ") %></b>
+        <strong>2. <%= _("Select content type: ") %></strong>
         <span id="RMbuttonPlainVideo" class="RMbuttonDisplay" onclick="RMbuttonModeSelect('plain_video')" ><%= _("plain video") %></span>
         &nbsp;<%= _(" or ") %>&nbsp;
         <span id="RMbuttonWebLecture" class="RMbuttonDisplay" onclick="RMbuttonModeSelect('web_lecture')" ><%= _("web lecture") %></span>
         <div id="RMrightPaneWebLecture" class="RMHolderPaneDefaultInvisible">
             <br />
-            <b>3. <%= _("Select an orphan lecture object: ") %></b>
+            <strong>3. <%= _("Select an orphan lecture object: ") %></strong>
         <div class="nicebox">
         <div class="RMMatchPane">
             <% for orphan in Orphans: %>
@@ -134,7 +134,7 @@
         </div>
         <div id="RMrightPanePlainVideo" class="RMHolderPaneDefaultInvisible">
             <br />
-            <b>3. <%= _("Select options: ") %></b>
+            <strong>3. <%= _("Select options: ") %></strong>
             <div class="RMMatchPane" style="height: 200px;">
                 Select video aspect ratio:
                 <input type="radio" name="talks" value="standard" id="RMvideoFormat4to3" onclick="RMchooseVideoFormat('standard')" checked>
@@ -151,7 +151,7 @@
 <div id="RMlowerPane" class="RMHolderPaneDefaultVisible" style="margin-left: 150px;">
     <span>
         <br />
-        <b>4. <%= _("Select language(s) in which the talk was given") %></b>
+        <strong>4. <%= _("Select language(s) in which the talk was given") %></strong>
         <br />
         <!-- http://www.loc.gov/marc/languages/ -->
 
@@ -176,7 +176,7 @@
     </span>
     <span>
         <br />
-        <b>5. <%= _("Create CDS record (and update micala database)") %></b>
+        <strong>5. <%= _("Create CDS record (and update micala database)") %></strong>
         <br />
         <span id="RMbuttonCreateCDSRecord">
         <!--  Javascript button here -->
@@ -190,7 +190,7 @@
     <br />
     <br />
     <span>
-        <b>6. <%= _("Create Indico link to CDS record") %></b>
+        <strong>6. <%= _("Create Indico link to CDS record") %></strong>
         <br />
         <div id="RMbuttonCreateIndicoLink">
         <!--  Javascript button here -->
@@ -203,7 +203,7 @@
     var RM_orphans = <%= jsonEncode(Orphans) %>;
 
     var RMselectedTalkId    = '';
-    var RMselectedLOID      = '';
+    var RMselectedLODBID    = '';
     var RMselectedTalkName  = '';
     var RMselectedLOName    = '';
     var RMviewMode          = '';
@@ -221,13 +221,27 @@
     "<%= talk["IndicoID"]   %>": {
         "title":      "<%= talk["title"]      %>",
         "titleshort": "<%= talk["titleshort"] %>",
+        "type":       "<%= talk["type"]       %>",
         "CDSID":      "<%= talk["CDSID"]      %>",
         "CDSURL":     "<%= talk["CDSURL"]     %>",
         "type":       "<%= talk["type"]       %>",
         "speakers":   "<%= talk["speakers"]   %>",
         "date":       "<%= talk["date"]       %>",
+        "date_nice":  "<%= talk["date_nice"]  %>",
         "LOID":       "<%= talk["LOID"]       %>",
         "IndicoLink": "<%= talk["IndicoLink"] %>"
+    },
+    <% end %>
+    };
+
+    // Pass the metadata we need for each lecture object
+    var RMLOList = {
+    <% for orphan in Orphans: %>
+    "<%= orphan["id"]   %>": {
+        "LOID":    "<%= orphan["LOID"]    %>",
+        "time":    "<%= orphan["time"]    %>",
+        "date":    "<%= orphan["date"]    %>",
+        "box":     "<%= orphan["box"]     %>"
     },
     <% end %>
     };
