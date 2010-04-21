@@ -154,7 +154,7 @@ Request details:<br />
         if typeOfMail == "remove":
             return "(booking deleted)"
         else:
-            url = self._booking.getURL()
+            url = self._booking.getUrl()
             if url:
                 return url
             else:

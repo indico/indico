@@ -130,7 +130,7 @@ class XMLGenerator(object):
         if (booking.canBeStarted()):
             out.openTag("launchInfo")
             out.writeTag("launchText", _("Join Now!"))
-            out.writeTag("launchLink", booking.getURL())
+            out.writeTag("launchLink", booking.getUrl())
             out.writeTag("launchTooltip", _('Click here to join the EVO meeting!'))
             out.closeTag("launchInfo")
 
@@ -174,7 +174,7 @@ class XMLGenerator(object):
         if booking.getBookingParamByName("displayURL"):
             out.openTag("section")
             out.writeTag("title", _('Auto-join URL:'))
-            out.writeTag("line", booking.getURL())
+            out.writeTag("line", booking.getUrl())
             out.closeTag("section")
 
         out.openTag("section")

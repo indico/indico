@@ -108,7 +108,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
     def getHasAccessPassword(self):
         return self._accessPassword is not None
 
-    def getURL(self):
+    def getUrl(self):
         if self._url.startswith("meeting"): #the first part of the URL is not there
             self._url = getEVOOptionValueByName("koalaLocation") + '?' + self._url
         return self._url
@@ -376,7 +376,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
 
     def _getLaunchDisplayInfo(self):
         return {'launchText' : _("Join Now!"),
-                'launchLink' : str(self.getURL()),
+                'launchLink' : str(self.getUrl()),
                 'launchTooltip': _("Click here to join the EVO meeting!")}
 
     ## end of overrigind methods

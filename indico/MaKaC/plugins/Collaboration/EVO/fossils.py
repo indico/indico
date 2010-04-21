@@ -23,7 +23,7 @@ from MaKaC.common.fossilize import IFossil
 
 class ICSBookingConfModifFossil(ICSBookingBaseConfModifFossil):
 
-    def getURL(self):
+    def getUrl(self):
         pass
 
     def getPhoneBridgeId(self):
