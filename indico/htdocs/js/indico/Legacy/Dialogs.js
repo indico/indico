@@ -449,9 +449,9 @@ extend(IndicoUI.Dialogs,
 
                            var content = IndicoUtil.createFormFromMap([
                                isEdit ? [$T('Sub-Title'), $B(Html.edit({style: { width: '300px'}}), info.accessor('title'))]:[],
-                               [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
                                [$T('Date'), conferenceDays],
                                startEndTimeComponent,
+                               [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
                                [$T('Convener(s)'), convListWidget.draw()]]);
 
                            var buttons = Html.div({}, addButton, cancelButton);
