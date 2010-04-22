@@ -6312,7 +6312,7 @@ class WAbstracts( wcomponents.WTemplated ):
             statusId = AbstractStatusList.getInstance().getId( status )
             statusCaption = AbstractStatusList.getInstance().getCaption( status )
             statusCode=AbstractStatusList.getInstance().getCode(status)
-            statusIconURL= AbstractStatusList().getIconURL( status )
+            statusIconURL= AbstractStatusList.getInstance().getIconURL( status )
             field=self._filterCrit.getField("status")
             if field is not None and statusId in field.getValues():
                 checked = "checked"
@@ -6525,9 +6525,9 @@ class WAbstracts( wcomponents.WTemplated ):
                 tracks.append("%s"%self.htmlText(track.getCode()))
 
             s=abstract.getCurrentStatus()
-            status=AbstractStatusList().getCode(s.__class__ )
-            statusColor=AbstractStatusList().getColor(s.__class__)
-            statusIconURL=AbstractStatusList().getIconURL(s.__class__)
+            status=AbstractStatusList.getInstance().getCode(s.__class__ )
+            statusColor=AbstractStatusList.getInstance().getColor(s.__class__)
+            statusIconURL=AbstractStatusList.getInstance().getIconURL(s.__class__)
             statusIconHTML = """<img src=%s border="0" alt="">"""%quoteattr(str(statusIconURL))
             contribType = abstract.getContribType()
             contribTypeName = _("""--_("not specified")--""")
