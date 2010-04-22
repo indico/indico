@@ -114,6 +114,7 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
              args.ids = contribs;
              args.date = date;
 
+
              indicoRequest(self.args.session?'schedule.slot.scheduleContributions':
                            'schedule.event.scheduleContributions', args, function(result, error){
                                killProgress();
@@ -160,7 +161,9 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
              });
 
              this.button.observeClick(function(){
-                 self.addExisting(unscheduledList.getList(), self.selectedDay);
+                     var ids = translate(unscheduledList.getList(),
+                                         function(contrib) { return contrib.get('id'); });
+                     self.addExisting(ids, self.selectedDay);
              });
 
              return this.ExclusivePopupWithButtons.prototype.draw.call(this, content, this.button.draw());
