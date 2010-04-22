@@ -144,7 +144,8 @@ function RMtalkSelect(IndicoID) {
     // Other stuff like video mode and lecture object are irrelevant.
     if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '' &&
             RMTalkList[RMselectedTalkId]["CDSID"] != "none" &&
-            RMTalkList[RMselectedTalkId]["CDSID"] != "pending") {
+            RMTalkList[RMselectedTalkId]["CDSID"] != "pending" &&
+            RMTalkList[RMselectedTalkId]["IndicoLink"] == 'False') {
         ButtonCreateIndicoLink.enable();
     }
     else {
