@@ -80,7 +80,8 @@ var Indico = {
         arrow_up: "<%= iconFileName("upArrow")%>",
         arrow_down: "<%= iconFileName("downArrow")%>",
         indico_small: "<%= iconFileName("indico_small")%>",
-        protected: "<%= iconFileName("protected")%>"
+        protected: "<%= iconFileName("protected")%>",
+        calendarWidget: "<%= iconFileName("calendarWidget") %>"
     },
     FileTypeIcons:
         <%= simplejson.dumps(dict((k.lower(),v[2]) for k,v in config.getFileTypes().iteritems())) %>

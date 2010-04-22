@@ -6019,3 +6019,23 @@ div.cloneElements {
     background-color: #fff;
     height: 24px;
 }
+
+/*
+    Date field widget
+*/
+
+div.dateField {
+    border: 1px solid #AAAAAA;
+    width: 182px;
+}
+
+div.dateField img {
+    vertical-align: middle;
+    padding: 2px;
+}
+
+div.dateField input {
+    border: none;
+    padding: 2px;
+    vertical-align: middle;
+}

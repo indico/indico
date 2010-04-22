@@ -835,7 +835,7 @@ IndicoUI.Widgets = {
          * @hiddenFields {Array or String} An array of 5 field ids where the day/month/year/hours/minutes will be written,
          *                                 or a single element id where the full string will be put.
          */
-        input2dateField: function(elem, showTime, hiddenFields) {
+        input2dateField: function(elem, showTime, hiddenFields, trigger) {
             if (showTime === undefined) {
                 showTime = false;
             }
@@ -884,6 +884,7 @@ IndicoUI.Widgets = {
 
             var cal = Calendar.setup({
                 inputField: elem.dom,
+                button: trigger == undefined ? elem.dom : trigger.dom,
                 eventName: "click",
                 ifFormat: format,
                 showsTime: showTime
@@ -909,9 +910,16 @@ IndicoUI.Widgets = {
          */
         dateField: function(showTime, attributes, hiddenFields){
             attributes = attributes || {};
-            var elem = Html.input("text",attributes);
-            IndicoUI.Widgets.Generic.input2dateField(elem, showTime, hiddenFields);
-            return elem;
+            var elem = Html.input("text",{},attributes);
+            var trigger = Html.img({src: imageSrc("calendarWidget")});
+            IndicoUI.Widgets.Generic.input2dateField(elem, showTime, hiddenFields, trigger);
+            var tab = Html.div("dateField", elem, trigger);
+            tab.set = function(string)
+            {
+                elem.set(string);
+            }
+
+            return tab;
       },
         dateField_sdate: function(showTime, attributes, hiddenFields){
             attributes = attributes || {};

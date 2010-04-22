@@ -242,7 +242,8 @@ class Config:
                  "invenio": "invenio.png",
                  "heart": "heart.png",
                  "star": "star.png",
-                 "starGrey": "starGrey.png"
+                 "starGrey": "starGrey.png",
+                 "calendarWidget": "calendarWidget.png"
     }
 
 
