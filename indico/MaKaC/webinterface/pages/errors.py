@@ -22,7 +22,7 @@
 """
 import traceback
 import sys
-from xml.sax.saxutils import quoteattr 
+from xml.sax.saxutils import quoteattr
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.common import Config
@@ -31,14 +31,14 @@ from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
-        
+
 class WGenericError( WTemplated ):
-   
-    def __init__( self, rh, showDetails=False ):        
+
+    def __init__( self, rh, showDetails=False ):
         self._rh = rh
         self._showDetails = showDetails
 
-        
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
         ex = sys.exc_info()[1]
@@ -83,7 +83,7 @@ class WGenericError( WTemplated ):
         <td>%s</td>
     </tr>
     """%( self.htmlText( str(ty) ), self.htmlText( str(ex) ))
-    
+
             if hasattr(ex, 'problematic_templates') and hasattr(ex, 'template_tracebacks'):
                 for i in range(len(ex.problematic_templates)):
                     details +="""
@@ -92,7 +92,7 @@ class WGenericError( WTemplated ):
         <td>%s</td>
     </tr>
                 """%(ex.problematic_templates[i], "<br>".join(ex.template_tracebacks[i]))
-            
+
             details +="""
     <tr>
         <td valign="top" nowrap align="right"><b>Traceback:</b></td>
@@ -138,24 +138,24 @@ class WGenericError( WTemplated ):
 
 class WUnexpectedError( WGenericError ):
     pass
-    
+
 
 class WPGenericError( WPDecorated ):
-    
+
     def __init__( self, rh):
         WPDecorated.__init__( self, rh )
 
-    
+
     def _getBody( self, params ):
         wc = WGenericError( self._rh, params.get("showDetails", False) )
         return wc.getHTML()
 
 class WPUnexpectedError( WPDecorated ):
-    
+
     def __init__( self, rh):
         WPDecorated. __init__( self, rh )
 
-    
+
     def _getBody( self, params ):
         wc = WUnexpectedError( self._rh )
         return wc.getHTML()
@@ -180,6 +180,9 @@ class WAccessKeyError( WTemplated ):
     def getVars( self ):
         from MaKaC.conference import Conference,Material, Resource
         vars = WTemplated.getVars( self )
+        vars["loginURL"] = ""
+        if self._rh._getUser() is None:
+            vars["loginURL"] = str(urlHandlers.UHSignIn.getURL(returnURL=self._rh.getCurrentURL()))
         if isinstance(self._rh._target,Conference):
             vars["type"] = "event"
             vars["url"] = quoteattr( str( urlHandlers.UHConfEnterAccessKey.getURL(self._rh._target) ) )
@@ -197,10 +200,10 @@ class WAccessKeyError( WTemplated ):
 
 
 class WPAccessError( WPDecorated ):
-    
+
     def __init__( self, rh ):
         WPDecorated. __init__( self, rh )
-    
+
     def _getBody( self, params ):
         if self._rh._target.getAccessKey() != "" or ( (not type(self._rh._target) is Category) and self._rh._target.getConference().getAccessKey() != ""):
             msg = ""
@@ -246,7 +249,7 @@ class WTimingError( WTemplated ):
         vars["msg"] = self._msg
         vars["urlbase"] = Config.getInstance().getBaseURL()
         return vars
- 
+
 class WParentTimingError( WTimingError ):
     pass
 
@@ -254,23 +257,23 @@ class WEntryTimingError( WTimingError ):
     pass
 
 class WPTimingError( WPDecorated ):
-    
+
     def __init__( self, rh, msg="" ):
         self._msg = msg
         WPDecorated. __init__( self, rh)
-    
+
     def _getBody( self, params ):
         wc = WTimingError( self._rh, self._msg )
         return wc.getHTML()
 
 class WPParentTimingError( WPTimingError ):
-    
+
     def _getBody( self, params ):
         wc = WParentTimingError( self._rh, self._msg )
         return wc.getHTML()
 
 class WPEntryTimingError( WPTimingError ):
-    
+
     def _getBody( self, params ):
         wc = WEntryTimingError( self._rh, self._msg )
         return wc.getHTML()
@@ -306,10 +309,10 @@ class WModificationKeyError( WTemplated ):
 
 
 class WPModificationError( WPDecorated ):
-    
+
     def __init__( self, rh ):
         WPDecorated.__init__( self, rh )
-    
+
     def _getBody( self, params ):
         if hasattr(self._rh._target, "getModifKey") and \
             self._rh._target.getModifKey() != "":
@@ -327,12 +330,12 @@ class WPModificationError( WPDecorated ):
 
 
 class WReportError( WTemplated ):
-    
+
     def __init__( self, dstMail, msg ):
         WTemplated.__init__(self)
         self._dstMail = dstMail
         self._msg = msg
-    
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
         vars["postURL"] = quoteattr( str( urlHandlers.UHErrorReporting.getURL() ) )
@@ -342,16 +345,16 @@ class WReportError( WTemplated ):
 
 
 class WPReportError( WPDecorated ):
-    
+
     def __init__( self, rh):
         WPDecorated.__init__(self, rh)#, True)
-        
+
     def _getHTMLHeader(self):
         return ""
-    
+
     def _getHeader(self):
         return ""
-    
+
     def _getBody( self, params ):
         wc = WReportError( params["userEmail"], params["msg"] )
         return wc.getHTML( params )
@@ -360,10 +363,10 @@ class WPReportError( WPDecorated ):
         return ""
 
 class WNoReportError( WTemplated ):
-    
+
     def __init__( self, msg ):
         self._msg = msg
-    
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
         vars["msg"] = self._msg
@@ -371,30 +374,30 @@ class WNoReportError( WTemplated ):
 
 
 class WPNoReportError( WPDecorated ):
-    
+
     def __init__( self, rh, msg ):
         self._msg = msg
         WPDecorated. __init__( self, rh)
-        
+
     def _getBody( self, params ):
         wc = WNoReportError( self._msg )
         return wc.getHTML( params )
 
 class WReportErrorSummary( WTemplated ):
     pass
-    
+
 
 class WPReportErrorSummary( WPDecorated ):
-    
+
     def __init__( self, rh ):
         WPDecorated. __init__( self, rh)
-    
+
     def _getHTMLHeader( self ):
         return ""
-        
+
     def _getHeader( self ):
         return ""
-    
+
     def _getBody( self, params ):
         wc = WReportErrorSummary()
         return wc.getHTML()
@@ -412,24 +415,24 @@ class WFormValuesError( WTemplated ):
         vars = WTemplated.getVars( self )
         vars["msg"] = self._msg
         return vars
-    
+
 class WPFormValuesError( WPDecorated ):
-    
+
     def __init__( self, rh, msg="" ):
         self._msg = msg
         WPDecorated. __init__( self, rh)
-    
+
     def _getBody( self, params ):
         wc = WFormValuesError( self._rh, self._msg )
         return wc.getHTML()
 
 
 class WPHtmlScriptError(WPDecorated):
-    
+
     def __init__( self, rh, msg="" ):
         self._msg = msg
         WPDecorated. __init__( self, rh)
-    
+
     def _getBody( self, params ):
         wc = WHtmlScriptError( self._rh, self._msg )
         return wc.getHTML()
@@ -450,7 +453,7 @@ class WPRestrictedHTML( WPDecorated ):
     def __init__( self, rh, msg="" ):
         self._msg = msg
         WPDecorated. __init__( self, rh)
-    
+
     def _getBody( self, params ):
         wc = WRestrictedHTML( self._rh, self._msg )
         return wc.getHTML()
