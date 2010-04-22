@@ -393,10 +393,7 @@ function RMCreateCDSRecord() {
 
     if (RMviewMode == 'plain_video') {
         var confirmText = Html.div({},
-                Html.span({}, $T("This will create a" + " ")),
-                Html.span({style:{fontStyle: "italic"}}, RMviewMode),
-                Html.span({}, " " + $T("CDS record for the following") + " "),
-                Html.span({style:{fontStyle: "italic"}}, RMTalkList[RMselectedTalkId]["type"] + ":"),
+                Html.span({}, $T("This will create a CDS record for the following video: ")),
                 Html.br(),
                 Html.br(),
                 Html.span({style:{fontWeight: "bold"}}, RMTalkList[RMselectedTalkId]["title"]),
@@ -421,9 +418,27 @@ function RMCreateCDSRecord() {
     }
     else if (RMviewMode =='web_lecture') {
         var confirmText = Html.div({},
-            Html.div({style:{textAlign:"center", fontWeight:"bold"}}, $T("Create CDS record for web lecture")),
-            Html.div({}, $T("IndicoID: " + RMselectedTalkId)),
-            Html.div({}, $T("Lecture Object ID: " + RMselectedLODBID))
+                Html.span({}, $T("This will create a CDS record for the following web lecture: ")),
+                Html.br(),
+                Html.br(),
+                Html.span({style:{fontWeight: "bold"}}, RMTalkList[RMselectedTalkId]["title"]),
+                Html.span({}, " (" + speakers_string + ")"),
+                Html.br(),
+                Html.br(),
+                Html.span({}, $T("time scheduled") + ": "),
+                Html.span({style:{fontWeight: "bold"}}, RMTalkList[RMselectedTalkId]["date_nice"]),
+                Html.br(),
+                Html.span({}, $T("IndicoID") + ": "),
+                Html.span({style:{fontWeight: "bold"}}, RMselectedTalkId),
+                Html.br(),
+                Html.span({}, $T("Lecture Object ID") + ": "),
+                Html.span({style:{fontWeight: "bold"}}, RMLOList[RMselectedLODBID]["LOID"]),
+                Html.br(),
+                Html.span({}, $T("spoken language(s)") + ": "),
+                Html.span({style:{fontWeight: "bold"}}, RMLanguagesString(languageCodes)),
+                Html.br(),
+                Html.br(),
+                Html.span({}, $T("To proceed, click OK (you will not be able to undo)."))
         );
     }
 
