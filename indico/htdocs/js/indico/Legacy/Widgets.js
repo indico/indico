@@ -918,6 +918,7 @@ IndicoUI.Widgets = {
             {
                 elem.set(string);
             }
+            tab.processDate = elem.processDate;
 
             return tab;
       },
