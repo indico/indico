@@ -16,18 +16,23 @@ var REUpdateOrphanList = function () {
 ButtonCreateCDSRecord.observeClick(function(){
     if (ButtonCreateCDSRecord.isEnabled()) {
         if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '' &&
+                RMTalkList[RMselectedTalkId]["CDSID"] == "none" &&
                 (RMviewMode == 'plain_video' ||
                         typeof RMselectedLODBID != 'undefined' && RMselectedLODBID != '')) {
 
             RMCreateCDSRecord();
         }
     }
+    // I don't think it's possible this will ever happen...
+    else {
+        alert($T("You can only create a CDS record if you've selected a talk and content type, and a record doesn't already exist."));
+    }
 });
 
 ButtonCreateCDSRecord.observeEvent('mouseover', function(event){
     if (!ButtonCreateCDSRecord.isEnabled()) {
         tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY,
-                $T("Please select talk and content type"), "tooltipError");
+                $T("Please select talk and content type."), "tooltipError");
     }
 });
 
@@ -40,8 +45,8 @@ ButtonCreateCDSRecord.observeEvent('mouseout', function(event){
 ButtonCreateIndicoLink.observeClick(function(){
     if (ButtonCreateIndicoLink.isEnabled()) {
         if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '' &&
-                (RMviewMode == 'plain_video' ||
-                        typeof RMselectedLODBID != 'undefined' && RMselectedLODBID != '')) {
+                RMTalkList[RMselectedTalkId]["CDSID"] != "none" &&
+                RMTalkList[RMselectedTalkId]["CDSID"] != "pending") {
 
             RMCreateIndicoLink();
         }
@@ -51,7 +56,7 @@ ButtonCreateIndicoLink.observeClick(function(){
 ButtonCreateIndicoLink.observeEvent('mouseover', function(event){
     if (!ButtonCreateIndicoLink.isEnabled()) {
         tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY,
-                $T("Please select talk and content type"), "tooltipError");
+                $T("Please select talk and create CDS record."), "tooltipError");
     }
 });
 
@@ -61,17 +66,24 @@ ButtonCreateIndicoLink.observeEvent('mouseout', function(event){
 
 IndicoUI.Effect.appear($E('RMlowerPane'), "block");
 
+// This function gets called when either plain_video or web_lecture buttons are clicked.
 function RMbuttonModeSelect(mode) {
+
+    // mode can either be 'plain_video' or 'web_lecture'
     RMviewMode = mode;
+
     if (mode == 'plain_video') {
+        // effects for plain_video and web_lecture buttons
         $E("RMbuttonWebLecture").dom.className = 'RMbuttonNotSelected';
         $E("RMbuttonPlainVideo").dom.className = 'RMbuttonSelected';
         IndicoUI.Effect.disappear($E('RMrightPaneWebLecture'));
         IndicoUI.Effect.appear($E('RMrightPanePlainVideo'), "block");
 
-        if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '') {
+        // User has clicked on the plain_video button, so enable ButtonCreateCDSRecord
+        // only if talk has already been selected and doesn't already have a CDS record.
+        if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '' &&
+            RMTalkList[RMselectedTalkId]["CDSID"] == "none") {
             ButtonCreateCDSRecord.enable();
-            ButtonCreateIndicoLink.enable();
         }
     }
     else if (mode == 'web_lecture') {
@@ -83,24 +95,27 @@ function RMbuttonModeSelect(mode) {
         if (typeof RMselectedTalkId == 'undefined' || RMselectedTalkId == '' ||
             typeof RMselectedLODBID == 'undefined' || RMselectedLODBID == '') {
                 ButtonCreateCDSRecord.disable();
-                ButtonCreateIndicoLink.disable();
         }
     }
+    else {
+        // It shouldn't be possible for this function to get called without one of the 2 args
+    }
 
+    // update the summary text in the box next to the Create CDS Record button
     RMMatchSummaryMessageUpdate();
 }
 
 function RMtalkBoxOffHover(IndicoID) {
     var DivID = 'div' + IndicoID;
     if (RMselectedTalkId != IndicoID) {
-        document.getElementById(DivID).className = 'RMtalkDisplay';
+        $E(DivID).dom.className = 'RMtalkDisplay';
     }
 }
 
 function RMtalkBoxOnHover(IndicoID) {
     var DivID = 'div' + IndicoID;
     if (RMselectedTalkId != IndicoID) {
-        document.getElementById(DivID).className = 'RMtalkHover';
+        $E(DivID).dom.className = 'RMtalkHover';
     }
 }
 
@@ -108,16 +123,32 @@ function RMtalkSelect(IndicoID) {
     var DivID = 'div' + IndicoID;
     // reset last selected talk div to default color before setting new background
     if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '') {
-        document.getElementById('div' + RMselectedTalkId).className = 'RMtalkDisplay';
+        $E('div' + RMselectedTalkId).dom.className = 'RMtalkDisplay';
     }
     RMselectedTalkId = IndicoID;
-    document.getElementById('div' + RMselectedTalkId).className = 'RMtalkSelected';
+    $E('div' + RMselectedTalkId).dom.className = 'RMtalkSelected';
 
+    // Enable ButtonCreateCDSRecord only if RMselectedTalkId is set and either RMviewMode is plain_video or RMselectedLODBID is set,
+    // AND the CDS record has not yet been created. Once you create a CDS record you can't do it again.
     if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '' &&
+            RMTalkList[RMselectedTalkId]["CDSID"] == "none" &&
             (RMviewMode == 'plain_video' ||
                     typeof RMselectedLODBID != 'undefined' && RMselectedLODBID != '')) {
         ButtonCreateCDSRecord.enable();
+    }
+    else {
+        ButtonCreateCDSRecord.disable();
+    }
+
+    // Enable ButtonCreateIndicoLink only if talk has been selected and CDS record already exists.
+    // Other stuff like video mode and lecture object are irrelevant.
+    if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '' &&
+            RMTalkList[RMselectedTalkId]["CDSID"] != "none" &&
+            RMTalkList[RMselectedTalkId]["CDSID"] != "pending") {
         ButtonCreateIndicoLink.enable();
+    }
+    else {
+        ButtonCreateIndicoLink.disable();
     }
 
     RMMatchSummaryMessageUpdate();
@@ -126,14 +157,14 @@ function RMtalkSelect(IndicoID) {
 function RMCDSDoneOnHover(IndicoID) {
     divID = 'divCDS' + IndicoID;
 
-    document.getElementById(divID).className = 'RMcolumnStatusCDSDoneHover';
+    $E(divID).dom.className = 'RMcolumnStatusCDSDoneHover';
 
 }
 
 function RMCDSDoneOffHover(IndicoID) {
     divID = 'divCDS' + IndicoID;
 
-    document.getElementById(divID).className = 'RMcolumnStatusCDSDone';
+    $E(divID).dom.className = 'RMcolumnStatusCDSDone';
 
 }
 
@@ -144,31 +175,36 @@ function RMCDSDoneClick(url) {
 function RMLOBoxOffHover(DBID) {
     var DivID = 'lo' + DBID;
     if (RMselectedLODBID != DBID) {
-        document.getElementById(DivID).className = 'RMLODisplay';
+        $E(DivID).dom.className = 'RMLODisplay';
     }
 }
 
 function RMLOBoxOnHover(DBID) {
     var DivID = 'lo' + DBID;
     if (RMselectedLODBID != DBID) {
-        document.getElementById(DivID).className = 'RMLOHover';
+        $E(DivID).dom.className = 'RMLOHover';
     }
 }
 
+// This function is called when the user clicks on a lecture object
 function RMLOSelect(DBID) {
+
     var DivID = 'lo' + DBID;
+
     // reset last selected LO div to default color before setting new background
     if (typeof RMselectedLODBID != 'undefined' && RMselectedLODBID != '') {
-        document.getElementById('lo' + RMselectedLODBID).className = 'RMLODisplay';
+        $E('lo' + RMselectedLODBID).dom.className = 'RMLODisplay';
     }
     RMselectedLODBID = DBID;
-    document.getElementById('lo' + RMselectedLODBID).className = 'RMLOSelected';
+    $E('lo' + RMselectedLODBID).dom.className = 'RMLOSelected';
 
+    // If talk has been selected, and either we are in plain_video mode or LO has been selected,
+    // and if the CDS record doesn't already exist, then enable Create CDS Record button
     if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '' &&
+            RMTalkList[RMselectedTalkId]["CDSID"] == "none" &&
             (RMviewMode == 'plain_video' ||
                     typeof RMselectedLODBID != 'undefined' && RMselectedLODBID != '')) {
         ButtonCreateCDSRecord.enable();
-        ButtonCreateIndicoLink.enable();
     }
 
     RMMatchSummaryMessageUpdate();
@@ -310,7 +346,6 @@ function RMchooseVideoFormat(format_string) {
             (RMviewMode == 'plain_video' ||
                     typeof RMselectedLODBID != 'undefined' && RMselectedLODBID != '')) {
         ButtonCreateCDSRecord.enable();
-        ButtonCreateIndicoLink.enable();
     }
 
     RMMatchSummaryMessageUpdate();
@@ -444,7 +479,7 @@ function RMCreateIndicoLink() {
                 conference: '<%= ConferenceId %>',
                 IndicoID: RMselectedTalkId,
                 LOID: RMselectedLODBID,
-                CDSID: RMTalkList[RMselectedTalkId]
+                CDSID: RMTalkList[RMselectedTalkId]["CDSID"]
             },
         function(result, error){
             if (!error) {
