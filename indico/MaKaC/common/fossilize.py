@@ -77,7 +77,7 @@ class IFossil(zope.interface.Interface):
     Fossil base interface. All fossil classes should derive from this one.
     """
 
-class Fossilizable(object):
+class Fossilizable:
     """
     Base class for all the objects that can be fossilized
     """
