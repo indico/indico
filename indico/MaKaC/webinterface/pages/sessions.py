@@ -677,7 +677,7 @@ class WPSessionModifBase( WPConferenceModifBase ):
     def _getPageContent( self, params ):
         self._createTabCtrl()
 
-        banner = wcomponents.WTimetableBannerModif(self._session).getHTML()
+        banner = wcomponents.WTimetableBannerModif(self._getAW(), self._session).getHTML()
         body = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
         return banner + body
 

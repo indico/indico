@@ -413,7 +413,7 @@ class WPContributionModifBase( WPConferenceModifBase  ):
         #TODO: check if it comes from the timetable or the contribution list
         # temp solution: isScheduled.
         if self._target.isScheduled():
-            banner = wcomponents.WTimetableBannerModif(self._target).getHTML()
+            banner = wcomponents.WTimetableBannerModif(self._getAW(), self._target).getHTML()
         else:
             banner = wcomponents.WContribListBannerModif(self._target).getHTML()
         body = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )

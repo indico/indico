@@ -806,12 +806,20 @@ class WBannerModif(WTemplated):
 
 class WTimetableBannerModif(WBannerModif):
 
-    def __init__(self, target ):
+    def __init__(self, aw, target):
         ## PATH
         # Iterate till conference is reached
         conf = target.getConference()
         path = self._getOwnerBasePath(target)
-        path.append({"url": urlHandlers.UHConfModifSchedule.getURL( conf ), "title": _("Timetable")})
+
+        # if user has access to top-level timetable
+        if conf.canModify(aw):
+            scheduleModifURL = urlHandlers.UHConfModifSchedule.getURL( conf )
+        else:
+            # otherwise, let them access only the session timetable
+            scheduleModifURL = urlHandlers.UHSessionModifSchedule.getURL( target.getSession() )
+
+        path.append({"url": scheduleModifURL, "title": _("Timetable")})
         # TITLE AND TYPE
         itemType = type(target).__name__
         title = target.getTitle()
