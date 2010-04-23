@@ -1,35 +1,49 @@
-"""Count Transaction for each day.
-
-Usage: objects_stats.py [-n number] tracefile
--m: mean time between transactions
--f: the FileStorage
--d: show the stats only for the date d (format dd-mm-yyyy)
-"""
+# -*- coding: utf-8 -*-
+##
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import os
 import sys
 import struct
 import time
 import ZODB.FileStorage
+import datetime
 from ZODB.utils import U64, get_pickle_metadata
 from persistent.TimeStamp import TimeStamp
 from ZODB.tests.StorageTestBase import zodb_unpickle
 from optparse import OptionParser
 from time import gmtime, strftime
-
+from datetime import timedelta
 
 StringType = str
 
 class Stat(object):
     def __init__(self):
         self.mean = []
-        self.n = 1
+        self.n = 0
+        self.records = 0
 
 def GetInHMS(seconds, showSec):
     hours = int(seconds / 3600)
     seconds -= 3600*hours
     minutes = int(seconds / 60.0)
-    seconds -= 60.0*minutes
+    seconds -= 60*minutes
     if hours == 0:
         if(showSec): return "%02dmin %02dsecs" % (minutes, seconds)
         else: return "%02dmin" % (minutes)
@@ -60,15 +74,17 @@ def main():
     usage = "usage: %prog [options] filename"
     parser = OptionParser(usage=usage)
     parser.add_option("-n", "--number", dest="num",
-                  help="display only the 'n' busiest days", default=-1, type="int")
-    parser.add_option("-f", "--file", dest="filename", action="store", type="string", 
+                  help="display only the 'n' busiest days", default=20, type="int")
+    parser.add_option("-f", "--file", dest="filename", action="store", type="string",
                   help="your FileStorage")
-    parser.add_option("-d", "--date", dest="date", action="store", type="string", 
+    parser.add_option("-d", "--date", dest="date", action="store", type="string",
                   help="show the stats only for the date d (format dd-mm-yyyy)")
+    parser.add_option("-a", "--days", dest="days", action="store", default="0", type="string",
+                  help="show the stats only for the last 'a' days")
 
     (options, args) = parser.parse_args()
     objectsToDisplay = options.num
-    
+
     if options.filename:
         fname = options.filename
     else:
@@ -84,78 +100,90 @@ def main():
     recordsCounter = 0
     interval = 0.005
     dataFound = False
+    now = datetime.date.today()
 
     try:
         for t in it:
 
-            #Format the date of the current transaction following dd-mm-yyyy   
+            #Format the date of the current transaction following dd-mm-yyyy
             ts = TimeStamp(t.tid)
-            dateT = strftime("%d-%m-%Y", [int(ts.year()), int(ts.month()), int(ts.day()),0,0,0,0,0,0] )
-            percent = float(it._file.tell())/float(size) * 100
-            
-            #Check if we found the searched date
-            if options.date: 
-                if str(dateT) == str(options.date):
-                    dataFound = True
-                elif dataFound:
-                    break
+            then = datetime.date(int(ts.year()), int(ts.month()), int(ts.day()))
+            delta = timedelta(days=int(options.days))
 
-            #Show the percentage of the work completed and the remaining time    
-            if(percent - lastPercent > interval):
-                spentTime = time.time() - start
-                remainingTime = spentTime / float(it._file.tell()) * (float(size)) - spentTime
-                sys.stderr.write("\r%f%% complete, time spent %s,  remaining time: %s, recordsCounter %d" % (percent,GetInHMS(time.time() - start, True),  GetInHMS(remainingTime, False), recordsCounter))
-           
-                lastPercent = percent
+            if((not int(options.days)) or (now - then < delta)):
+                dateT = strftime("%d-%m-%Y", [int(ts.year()), int(ts.month()), int(ts.day()),0,0,0,0,0,0] )
+                percent = float(it._file.tell())/float(size) * 100
+                #Check if we found the searched date
+                if options.date:
+                    if str(dateT) == str(options.date):
+                        dataFound = True
+                    elif dataFound:
+                        break
 
-            for r in t:
-                #need to reduce the time of the dictionary stats from time to time
-                if recordsCounter % (objectsToDisplay*100) == 0:  
-                    tmp = {}       
-                    for date, s in sorted(
-                        stats.items(), key=lambda (k,v): v.n, reverse=True)[0: objectsToDisplay]:
-                        tmp[date] = s
-                    stats = tmp
-        
-                if r.data:
-                    mod, klass = get_pickle_metadata(r.data)
-                    l = len(r.data)
-                    stat = stats.get(dateT)
-                    if stat is None:
-                        stat = stats[dateT] = Stat()
-                        stat.n = 1
-                    else:
-                        stat.n += 1
-                    recordsCounter += 1 
+                #Show the percentage of the work completed and the remaining time
+                if(percent - lastPercent > interval):
+                    spentTime = time.time() - start
+                    remainingTime = spentTime / float(it._file.tell()) * (float(size)) - spentTime
+                    sys.stderr.write("\r%f%% complete, time spent %s,  remaining time: %s, recordsCounter %d" % (percent,GetInHMS(time.time() - start, True),  GetInHMS(remainingTime, False), recordsCounter))
 
-            stat = stats.get(dateT) 
-            if stat is not None:
-                stat.mean.append(TimeStamp(t.tid).timeTime())   
+                    lastPercent = percent
+
+                stat = stats.get(dateT)
+                if stat is None:
+                    stat = stats[dateT] = Stat()
+                    stat.n = 1
+                else:
+                    stat.n += 1
+
+                for r in t:
+                    #need to reduce the time of the dictionary stats from time to time
+                    if recordsCounter % (objectsToDisplay*100) == 0:
+                        tmp = {}
+                        for date, s in sorted(
+                            stats.items(), key=lambda (k,v): v.n, reverse=True)[0: objectsToDisplay]:
+                            tmp[date] = s
+                        try:
+                            tmp[dateT] = stats[dateT]
+                        except KeyError:
+                            pass
+
+                        stats = tmp
+
+                    if r.data:
+                        mod, klass = get_pickle_metadata(r.data)
+                        l = len(r.data)
+                        stat = stats.get(dateT)
+                        stat.records += 1
+                    recordsCounter += 1
+
+                stat = stats.get(dateT)
+                if stat is not None:
+                    stat.mean.append(TimeStamp(t.tid).timeTime())
 
     except KeyboardInterrupt:
         pass
 
     print "\n"
-    print "%-15s %15s %21s" % ("Date", "Transactions", "Average interval")
-    print "%s" % "_" * 56
-    
-    if options.date:      
+    print "%-15s %17s %17s %22s" % ("Date", "Transactions","Records Changed", "Average interval")
+    print "%s" % "_" * 74
+
+    if options.date:
         for date, s in sorted(
             stats.items(), key=lambda (k,v): v.n, reverse=True):
             meanTime = 0
             for i in range(1,len(s.mean)):
                 meanTime += s.mean[i] - s.mean[i-1]
             if str(date) == str(options.date):
-                print "%-15s %15d %15f secs" % (date, (s.n), meanTime/s.n) 
-    else:     
+                print "%-15s | %15d | %15d | %15f secs" % (date, (s.n),s.records, meanTime/s.n)
+    else:
         for date, s in sorted(
             stats.items(), key=lambda (k,v): v.n, reverse=True)[0: objectsToDisplay]:
             meanTime = 0
             for i in range(1,len(s.mean)):
                 meanTime += s.mean[i] - s.mean[i-1]
 
-            print "%-15s %15d %15f secs" % (date, (s.n), meanTime/s.n)
-     
+            print "%-15s | %15d | %15d | %15f secs" % (date, (s.n), s.records, meanTime/s.n)
+
 
 if __name__ == '__main__':
     main()

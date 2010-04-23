@@ -1,4 +1,24 @@
-"""Get statistics on objects stored.
+# -*- coding: utf-8 -*-
+##
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+"""Get statistics on classes stored.
 
 Usage: objects_stats.py [-n number] tracefile
 -n: display only the n biggest classes
@@ -54,7 +74,7 @@ def main():
     parser = OptionParser(usage=usage)
     parser.add_option("-n", "--number", dest="num",
                   help="display only the n biggest classes", default=-1, type="int")
-    parser.add_option("-f", "--file", dest="filename", action="store", type="string", 
+    parser.add_option("-f", "--file", dest="filename", action="store", type="string",
                   help="your FileStorage")
 
     (options, args) = parser.parse_args()
@@ -85,25 +105,17 @@ def main():
                 spentTime = time.time() - start
                 remainingTime = spentTime / float(it._file.tell()) * (float(size)) - spentTime
                 sys.stderr.write("\r%f%% complete, time spent %s,  remaining time: %s, recordsCounter %d" % (percent,GetInHMS(time.time() - start),  GetInHMS(remainingTime), recordsCounter))
-           
+
                 lastPercent = percent
 
             for r in t:
-                #need to reduce the time of the dictionary stats from time to time
-                if recordsCounter % (objectsToDisplay*100) == 0:  
-                    tmp = {}       
-                    for class_name, s in sorted(
-                        stats.items(), key=lambda (k,v): v.total, reverse=True)[0: objectsToDisplay]:
-                        tmp[class_name] = s
-                    stats = tmp
-                
                 if r.data:
                     mod, klass = get_pickle_metadata(r.data)
                     l = len(r.data)
                     class_name = mod + "." + klass
                     stat = stats.get(class_name)
-                    
-		    if stat is None:
+
+                    if stat is None:
                         stat = stats[class_name] = Stat()
                         stat.min = stat.max = stat.total = l
                     else:
@@ -111,7 +123,7 @@ def main():
                         stat.max = max(stat.max, l)
                         stat.total += l
                         stat.n += 1
-                   
+
                     recordsCounter += 1
 
     except KeyboardInterrupt:
@@ -123,13 +135,13 @@ def main():
 
     for class_name, s in sorted(
         stats.items(), key=lambda (k,v): v.total, reverse=True)[0: objectsToDisplay]:
-        
-        #Truncate the string if necessary        
-        if len(class_name) > 50: 
+
+        #Truncate the string if necessary
+        if len(class_name) > 50:
             class_name = class_name[::-1][0:45][::-1]
             class_name = "[..]" + class_name
         print "%-50s | %15s%% | %13s | %13s | %13s | %13s" % (class_name, (s.total*100.0/size), pretty_size(s.min), pretty_size(s.max), pretty_size(s.total), s.n)
-        
+
 
 if __name__ == '__main__':
     main()

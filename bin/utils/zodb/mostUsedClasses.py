@@ -26,6 +26,9 @@ import cStringIO, cPickle
 from optparse import OptionParser
 import optparse, getopt
 import sys
+from datetime import timedelta
+import datetime
+from time import gmtime, strftime
 
 class Nonce(object): pass
 
@@ -68,65 +71,59 @@ def pretty_size( size ):
         mb = kb/1024.0
         return '%0.1fMb'%mb
 
-def run(path, ntxn, orderTransactions):
+def run(path, days, notPacked):
     f = open(path, "rb")
     f.seek(0, 2)
+    now = datetime.date.today()
 
+    #day->size
+    stats = {}
     th = prev_txn(f)
-    for i in range(ntxn-1):
+
+    bool = True
+    while bool:
+        ts = TimeStamp(th.tid)
+        then = datetime.date(int(ts.year()), int(ts.month()), int(ts.day()))
+        delta = timedelta(days=int(days))
+        if( not(now - then < delta)):
+            bool = False
         th = th.prev_txn()
 
     reader = Reader()
     iterator = FileIterator(path, pos=th._pos)
-    header = TxnHeader(f,th._pos)
-    transactions = []
-
     for i in iterator:
-        transactions.append({"tid": TimeStamp(i.tid), "user": i.user, "desc": i.description, "len": header.length, "objs": None})
-        
-        header = header.next_txn()   
-    
         object_types = {}
         for o in i:
             ot = reader.getIdentity(o.data)
-            if ot in object_types:
-                size, count = object_types[ot]
-                object_types[ot] = (size+len(o.data), count+1)
-            else:
-                object_types[ot] = (len(o.data),1)
-
-        keys = object_types.keys()
-        transactions[-1]["objs"] = object_types
-            
+            try:
+                stats[ot] = stats[ot] + 1
+            except KeyError:
+                stats[ot] = 1
     f.close()
-    if orderTransactions:
-        transactions = sorted(transactions, key=lambda (d): d["len"], reverse=True)
-    for tr in transactions:
-        print "\n\nTRANSACTION: ", tr["tid"], tr["user"], tr["desc"], pretty_size(tr["len"])
-        object_types = tr["objs"]        
-        keys = object_types.keys()        
-        for k in sorted(keys, key=lambda (k): object_types[k][0], reverse=True):
-            # count, class, size (aggregate)
-            print " - ", object_types[k][1], k, pretty_size(object_types[k][0])
+
+    for (o,n) in sorted(stats.items(), key=lambda (k,v): v, reverse=True):
+        print "%6d: %s" % (n,o)
+
 
 def main():
     usage = "usage: %prog [options] filename"
     parser = OptionParser(usage=usage)
-    parser.add_option("-n", "--number", dest="num",
-                  help="display the last 'n' transactions (Default 100)", default=100, type="int")
-    parser.add_option("-o", "--order", dest="order", action="store_false", 
-                  help="order the transactions by size and not by date")
+    parser.add_option("-d", "--days", dest="days", action="store",
+                  help="show the most used classes during the last 'd' days")
 
     (options, args) = parser.parse_args()
 
-    ntxn = options.num
+    days = 0
+
+    if options.days:
+        days = options.days
+    else:
+        print "You have to enter the number of days, see --help for details"
+        return 2
+
     path = args[0]
-    orderTransactions = False
 
-    if options.order != None:
-        orderTransactions = True
-
-    run(path, ntxn, orderTransactions)
+    run(path, days, int(options.days))
 
 
 if __name__ == "__main__":

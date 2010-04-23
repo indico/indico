@@ -1,3 +1,23 @@
+# -*- coding: utf-8 -*-
+##
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """Get statistics on objects stored.
 
 Usage: objects_stats.py [-n number] tracefile
@@ -5,6 +25,7 @@ Usage: objects_stats.py [-n number] tracefile
 -f: the FileStorage
 """
 
+import datetime
 import os
 import struct
 import time
@@ -17,6 +38,9 @@ from optparse import OptionParser
 from ZODB.FileStorage.format \
      import TRANS_HDR, TRANS_HDR_LEN, DATA_HDR, DATA_HDR_LEN
 
+from persistent.TimeStamp import TimeStamp
+from datetime import timedelta
+
 StringType = str
 
 class Stat(object):
@@ -24,6 +48,9 @@ class Stat(object):
         self.oid = None
         self.className = ""
         self.size = 0
+        self.number = 0
+        self.min = 0
+        self.max = 0
 
 def GetInHMS(seconds):
     hours = int(seconds / 3600)
@@ -79,12 +106,12 @@ def main():
     lastPercent = 0.0
     recordsCounter = 0
     interval = 0.005
+    now = datetime.date.today()
 
     try:
 
         for t in it:
             percent = float(it._file.tell())/float(size) * 100
-
             #Show the percentage of the work completed and the remaining time
             if(percent - lastPercent > interval):
                 spentTime = time.time() - start
@@ -95,7 +122,12 @@ def main():
 
             for r in t:
                 #need to reduce the time of the dictionary stats from time to time
-                if recordsCounter % (objectsToDisplay*100) == 0:  
+                ts = TimeStamp(t.tid)
+                then = datetime.date(int(ts.year()), int(ts.month()), int(ts.day()))
+                delta = timedelta(days=3)
+                
+                #don't reduce the size of the dictionary when analysing last 3 days transactions
+                if recordsCounter % (objectsToDisplay*100) == 0 and (now - then > delta):  
                     tmp = {}       
                     for class_name, s in sorted(
                         stats.items(), key=lambda (k,v): v.size, reverse=True)[0: objectsToDisplay]:
@@ -110,10 +142,16 @@ def main():
                     
                     if stat is None:
                         stat = stats[class_name] = Stat()
-                        stat.size = l
+                        stat.size = stat.min = stat.max = l
                         stat.oid = oid_repr(r.oid).strip()
-                        stat.className = mod + "." + klass
-                   
+                        stat.className = mod + "." + klass 
+                        stat.number = 1
+                    else:
+                        stat.min = min(stat.min, l)
+                        stat.max = max(stat.max, l)  
+                        stat.number = stat.number + 1
+                        stat.size = stat.size + l                
+
                     recordsCounter += 1
 
     except KeyboardInterrupt:
@@ -121,17 +159,17 @@ def main():
 
     print "\n"
 
-    print "%-51s %9s %15s %15s" % ("Module.ClassName", "Oid",  "Percentage", "Size")
-    print "%s" % "_" * 95
+    print "%-41s %9s %15s %15s %9s %9s %9s" % ("Module.ClassName", "Oid",  "Percentage", "Total Size", "Min", "Max", "Copies")
+    print "%s" % "_" * 114
 
     for class_name, s in sorted(
         stats.items(), key=lambda (k,v): v.size, reverse=True)[0: objectsToDisplay]:
 
         class_name = s.className
-        if len(class_name) > 50: 
-            class_name = class_name[::-1][0:45][::-1]
+        if len(class_name) > 40: 
+            class_name = class_name[::-1][0:35][::-1]
             class_name = "[..]" + class_name
-        print "%-50s | %8s | %13f%% | %13s" % (class_name, s.oid, (s.size*100.0/size) , pretty_size(s.size))      
+        print "%-40s | %8s | %13f%% | %13s | %7s | %7s | %7s" % (class_name, s.oid, (s.size*100.0/size) , pretty_size(s.size), pretty_size(s.min), pretty_size(s.max), s.number)      
 
 if __name__ == '__main__':
     main()
