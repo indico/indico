@@ -362,15 +362,14 @@ class DeleteResourceBase(ResourceModifBase):
 
         # remove the resource
         self._material.removeResource(self._resource)
+        event = self._material.getOwner()
 
         # if there are no resources left inside the material,
         # just delete it
         if len(self._material.getResourceList()) == 0:
-            event = self._material.getOwner()
             event.removeMaterial(self._material)
-            newMaterialTypes = event.getMaterialRegistry().getMaterialList(event)
-        else:
-            newMaterialTypes = []
+
+        newMaterialTypes = event.getMaterialRegistry().getMaterialList(event)
 
         return {
             'deletedResourceId': resourceId,
