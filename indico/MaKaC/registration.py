@@ -565,7 +565,7 @@ class Notification(Persistent):
                     text.append("""-- no values --\r\n\t\t\t""")
                 text.append("\r\n             ")
         return "".join(text)
-    
+
     def _printAllSections(self, regForm, rp):
         sects = []
         for formSection in regForm.getSortedForms():
@@ -1936,7 +1936,7 @@ class PersonalData(Persistent):
         p = PersonalDataFormItem({'id':'city', 'name': _("City"), 'input':'text', 'mandatory':True})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'country', 'name': _("Country"), 'input':'list', 'mandatory':True})
+        p = PersonalDataFormItem({'id':'country', 'name': _("Country/Region"), 'input':'list', 'mandatory':True})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
         p = PersonalDataFormItem({'id':'phone', 'name': _("Phone"), 'input':'text', 'mandatory':False})
