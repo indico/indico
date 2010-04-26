@@ -317,7 +317,7 @@ class BadgeTemplate (Persistent):
 
         for backgroundId, filePath in self.__tempBackgroundsFilePaths.iteritems():
             cfg = Config.getInstance()
-            tempPath = cfg.getUploadedFilesTempDir()
+            tempPath = cfg.getUploadedFilesSharedTempDir()
             filePath = os.path.join(tempPath, filePath)
             fileName = "background" + str(backgroundId) + "_t" + self.__id + "_c" + conf.id
 

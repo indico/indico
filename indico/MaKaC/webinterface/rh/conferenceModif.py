@@ -7722,7 +7722,7 @@ class RHConfBadgeSaveTempBackground(RHConferenceModifBase):
 
     def _getNewTempFile( self ):
         cfg = Config.getInstance()
-        tempPath = cfg.getUploadedFilesTempDir()
+        tempPath = cfg.getUploadedFilesSharedTempDir()
         tempFileName = tempfile.mkstemp( suffix="IndicoBadgeBG.tmp", dir = tempPath )[1]
         return tempFileName
 
@@ -7987,7 +7987,7 @@ class RHConfPosterSaveTempBackground(RHConferenceModifBase):
 
     def _getNewTempFile( self ):
         cfg = Config.getInstance()
-        tempPath = cfg.getUploadedFilesTempDir()
+        tempPath = cfg.getUploadedFilesSharedTempDir()
         tempFileName = tempfile.mkstemp( suffix="IndicoPosterBG.tmp", dir = tempPath )[1]
         return tempFileName
 
