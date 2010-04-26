@@ -206,6 +206,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
 
 
     def _checkBookingParams(self):
+
         if len(self._bookingParams["name"].strip()) == 0:
             raise CERNMCUException("name parameter (" + str(self._bookingParams["name"]) +") is empty for booking with id: " + str(self._id))
 
@@ -254,7 +255,9 @@ class CSBooking(CSBookingBase): #already Fossilizable
 
         pSet = set()
         ipSet = set()
+
         for p in self._participants.itervalues():
+
             if not validIP(p.getIp()):
                 raise CERNMCUException("Participant has not a correct ip. (ip string= " + p.getIp() + ")")
 
@@ -317,7 +320,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
             handleSocketError(e)
 
     def _modify(self, oldBookingParams):
-        """ Relays to the MCU the changes donde by the user to the Indico booking object.
+        """ Relays to the MCU the changes done by the user to the Indico booking object.
             For the participants, we retrieve a list of existing participants.
             If a participant is both in the MCU and the Indico booking, it is not touched.
             Thus, we only delete in the MCU those having been removed, and we only create only those who have been added.
@@ -333,69 +336,86 @@ class CSBooking(CSBookingBase): #already Fossilizable
 
             try:
                 mcu = MCU.getInstance()
-                params = MCUConfCommonParams(conferenceName = self._oldName,
-                                         newConferenceName = self._bookingParams["name"],
-                                         numericId = str(numericId),
-                                         startTime = self.getMCUStartTime(),
-                                         durationSeconds = self.getDurationSeconds(),
-                                         pin = self._pin,
-                                         description = self._bookingParams["description"],
-                                         )
-                Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling conference.modify with params: %s""" % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
+                params = MCUConfCommonParams(
+                    conferenceName = self._oldName,
+                    newConferenceName = self._bookingParams["name"],
+                    numericId = str(numericId),
+                    startTime = self.getMCUStartTime(),
+                    durationSeconds = self.getDurationSeconds(),
+                    pin = self._pin,
+                    description = self._bookingParams["description"])
+
+                Logger.get('CERNMCU').debug(
+                    "Evt: %s, booking: %s, calling conference.modify with params: %s" %
+                    (self._conf.getId(), self.getId(), str(paramsForLog(params))))
+
                 answer = unicodeToUtf8(mcu.conference.modify(params))
-                Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling conference.modify. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
+
+                Logger.get('CERNMCU').debug(
+                    "Evt: %s, booking: %s, calling conference.modify. Got answer: %s" %
+                    (self._conf.getId(), self.getId(), str(answer)))
                 self._bookingParams["id"] = numericId
                 self._oldName = self._bookingParams["name"]
 
-
                 #we take care of the participants
-                previousParticipantsList = oldBookingParams["participants"]
-                previousParticipantsDict = dict([(participantData["participantName"], participantData) for participantData in previousParticipantsList])
-                existingInBoth = {} #key: participantName, value: a Participant object
+                previousParticipantList = oldBookingParams["participants"]
+                previousParticipantDict = dict(
+                    (pData["participantName"], pData)
+                    for pData in previousParticipantList)
+
+                # participants indexed by name
+                # (maybe they should be indexed by name by default?)
+                participantDict = dict(
+                    (p.getParticipantName(), p)
+                    for p in self._participants.itervalues())
+
+                currParticipantSet = set(participantDict)
+                prevParticipantSet = set(previousParticipantDict)
+
+                # lists of participants to be added, removed or edited
+                addList = currParticipantSet - prevParticipantSet
+                editList = currParticipantSet.intersection(prevParticipantSet)
+                removeList = prevParticipantSet - editList
 
                 # we add the new participants
-                for p in self._participants.itervalues():
-                    name = p.getParticipantName()
-                    if not name in previousParticipantsDict:
-                        result = self.addParticipant(p)
-                        if not result is True:
+                for name in addList:
+                    result = self.addParticipant(participantDict[name])
+                    if not result is True:
                             return result
-                    else:
-                        existingInBoth[name] = p
 
                 #for the participants that exist both in Indico and the MCU,
                 #we re-add them if the IP has changed,
                 #or we just modify the displayName if the IP has not changed
-                for participantName, localParticipant in existingInBoth.iteritems():
-                    existingParticipantData = previousParticipantsDict[participantName]
+                for name in editList:
 
-                    if existingParticipantData["ip"] != localParticipant.getIp():
-                        if existingParticipantData["participantType"] == "by_address":
-                            result = self.removeParticipant(existingParticipantData["participantName"],
-                                                            existingParticipantData["participantType"],
-                                                            existingParticipantData["participantProtocol"])
-                            if not result is True:
-                                return result
-                            result = self.addParticipant(localParticipant)
-                            if not result is True:
-                                return result
+                    participant = participantDict[name]
+                    existingData = previousParticipantDict[name]
 
-                    elif existingParticipantData["displayName"] != localParticipant.getDisplayName():
+                    if (existingData["ip"] != participant.getIp() and \
+                        existingData["participantType"] == "by_address") or \
+                        (existingData["participantProtocol"] != participant.getParticipantProtocol()):
+
+                        result = self.modifyParticipantAllData(participant,
+                                                               existingData)
+
+                        if not result is True:
+                            return result
+
+                    elif existingData["displayName"] != participant.getDisplayName():
                         result = self.modifyParticipantDisplayName(participantName,
-                                                                   localParticipant.getParticipantType(),
-                                                                   localParticipant.getParticipantProtocol(),
-                                                                   localParticipant.getDisplayName())
+                                                                   participant.getParticipantType(),
+                                                                   participant.getParticipantProtocol(),
+                                                                   participant.getDisplayName())
                         if not result is True:
                             return result
 
                 #we remove the participants existed previously but have been removed
-                participantNamesToBeRemoved = set(previousParticipantsDict) - set(existingInBoth)
-                for name in participantNamesToBeRemoved:
-                    existingParticipantData = previousParticipantsDict[name]
-                    if not existingParticipantData["participantType"] == "by_name" and not existingParticipantData["callState"] == "disconnected":
-                        result = self.removeParticipant(existingParticipantData["participantName"],
-                                                        existingParticipantData["participantType"],
-                                                        existingParticipantData["participantProtocol"])
+                for name in removeList:
+                    existingData = previousParticipantDict[name]
+                    if not existingData["participantType"] == "by_name" and not existingData["callState"] == "disconnected":
+                        result = self.removeParticipant(existingData["participantName"],
+                                                        existingData["participantType"],
+                                                        existingData["participantProtocol"])
                         if not result is True:
                             return result
 
@@ -419,11 +439,16 @@ class CSBooking(CSBookingBase): #already Fossilizable
             for p in self.getParticipantList(returnSorted = True):
                 self._connectParticipant(p)
 
-            self.checkCanStart()
             self._statusMessage = _("Conference started!")
             self.checkCanStart(changeMessage = False)
 
     def _connectParticipant(self, participant):
+        """
+        Tries to actually connect a participant using the MCU.
+        Returns a Fault object in case something goes wrong,
+        None otherwise
+        """
+
         try:
             mcu = MCU.getInstance()
             if (participant.getCallState() == "disconnected" or participant.getCallState() == "dormant") and participant.getParticipantType() != "ad_hoc":
@@ -453,7 +478,6 @@ class CSBooking(CSBookingBase): #already Fossilizable
             self.checkCanStart(changeMessage = False)
             return result
 
-
     def _stop(self):
         self._checkStatus()
         if self._canBeStopped:
@@ -480,6 +504,11 @@ class CSBooking(CSBookingBase): #already Fossilizable
 
                 participant.setCallState("disconnected")
 
+            # if participant is Ad Hoc, get rid of it
+            if not participant.isCreatedByIndico():
+                # not a local...
+                del self._participants[participant.getId()]
+
         except Fault, e:
             Logger.get('CERNMCU').warning("""Evt:%s, booking:%s, calling participant.disconnect. Got error: %s""" % (self._conf.getId(), self.getId(), str(e)))
             fault = self.handleFault('stop', e)
@@ -502,6 +531,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
     def _checkStatus(self):
         if self._created:
             self.queryConference()
+            self._cleanupAdHocParticipants()
             self.checkCanStart()
 
     def _delete(self):
@@ -539,11 +569,13 @@ class CSBooking(CSBookingBase): #already Fossilizable
             params = MCUParticipantCommonParams(conferenceName = self._bookingParams["name"],
                                                 participantName = participant.getParticipantName(),
                                                 displayNameOverrideValue = participant.getDisplayName(),
-                                                address = participant.getIp()
+                                                address = participant.getIp(),
+                                                participantProtocol = participant.getParticipantProtocol()
                                                 )
             Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.add with params: %s""" % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
             answer = unicodeToUtf8(mcu.participant.add(params))
             Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.add. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
+
 
             self.checkCanStart()
             if self._numberOfConnectedParticipants > 0:
@@ -560,6 +592,24 @@ class CSBooking(CSBookingBase): #already Fossilizable
             fault.setInfo(participant.getIp())
             return fault
 
+    def modifyParticipantAllData(self, participant, existingData):
+        """
+        Modifies a participant, by removing and re-adding.
+        participant is a Participant object and existingData a dictionary
+        """
+
+        result = self.removeParticipant(
+            existingData["participantName"],
+            existingData["participantType"],
+            existingData["participantProtocol"])
+
+        if not result is True:
+            return result
+
+        result = self.addParticipant(participant)
+
+        return result
+
     def modifyParticipantDisplayName(self, participantName, participantType, participantProtocol, newDisplayName):
         """ Modifies the display name of a participant
             returns: True if successful, a CERNMCUError if there is a problem in some cases, raises an Exception in others
@@ -567,15 +617,22 @@ class CSBooking(CSBookingBase): #already Fossilizable
         try:
             mcu = MCU.getInstance()
 
-            params = MCUParticipantCommonParams(conferenceName = self._bookingParams["name"],
-                                                participantName = participantName,
-                                                participantType = participantType,
-                                                participantProtocol = participantProtocol,
-                                                displayNameOverrideValue = newDisplayName)
+            params = MCUParticipantCommonParams(
+                conferenceName = self._bookingParams["name"],
+                participantName = participantName,
+                participantType = participantType,
+                participantProtocol = participantProtocol,
+                displayNameOverrideValue = newDisplayName)
 
-            Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.modify with params: %s""" % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
+            Logger.get('CERNMCU').info(
+                "Evt: %s, booking: %s, calling participant.modify with params: %s" %
+                (self._conf.getId(), self.getId(), str(paramsForLog(params))))
+
             answer = unicodeToUtf8(mcu.participant.modify(params))
-            Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.modify. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
+
+            Logger.get('CERNMCU').info(
+                "Evt:%s, booking:%s, calling participant.modify. Got answer: %s" %
+                (self._conf.getId(), self.getId(), str(answer)))
 
             return True
         except Fault, e:
@@ -624,6 +681,130 @@ class CSBooking(CSBookingBase): #already Fossilizable
                     self._needsToBeNotifiedOfDateChanges = False
                     self._canBeNotifiedOfEventDateChanges = False
 
+    def _cleanupAdHocParticipants(self):
+        """
+        Remove ad-hoc participants that had been disconnected
+        """
+
+        for pId, participant in self._participants.items():
+            if participant.getCallState() == "disconnected" and \
+               not participant.isCreatedByIndico():
+                # disconnected, not local
+                # remove from the participant dictionary
+                del self._participants[pId]
+
+
+    def _updateAdHocParticipant(self, name, attrs):
+        """
+        Sets the data for a new ad-hoc participant
+        """
+
+        newId = self._participantIdCounter.newCount()
+        self._participants[newId] = ParticipantRoom(self,
+                                                    newId,
+                                                    {"name": attrs["displayName"],
+                                                     "ip": attrs["ip"]},
+                                                    participantName=name,
+                                                    createdByIndico=False)
+        self._participants[newId].setParticipantType(attrs["participantType"])
+        self._participants[newId].setParticipantProtocol(attrs["participantProtocol"])
+        self._participants[newId].setCallState(attrs["callState"])
+
+
+    def _processQueryConference(self, conference):
+        """
+        Processe an individual conference result from an `enumerate` query
+        This is a helper method for queryConference
+        """
+
+        # we update the local Indico description
+        remoteDescription = conference.get("description", '')
+        if unicodeLength(remoteDescription) < 31 or \
+               not self._bookingParams["description"].startswith(remoteDescription):
+            self._bookingParams["description"] = remoteDescription
+
+        # we update the local id
+        self._bookingParams["id"] = conference.get("numericId", '')
+        if not self._autoGeneratedId:
+            self._customId = self._bookingParams["id"]
+
+        self._oldName = self._bookingParams["name"]
+
+        # we update the local PIN
+        self._pin = conference.get("pin", '')
+
+        # we obtain the remote list of participants in the MCU
+        remoteParticipants = self.queryParticipants()
+
+        # participants/ids indexed by Name
+        # (maybe they should be indexed by name by default?)
+        participantDict = dict(
+            (p.getParticipantName(), (k,p))
+            for k, p in self._participants.iteritems())
+
+        remoteNames = set(remoteParticipants)
+        localNames = set(p.getParticipantName()
+                         for p in self._participants.itervalues())
+
+        # participants that only exist locally (not yet added remotely)
+        localOnlyNames = localNames - remoteNames
+        # participants that exist both locally and in the MCU
+        commonNames = localNames & remoteNames
+        # participants that were added remotely (MCU)
+        mcuOnlyNames = remoteNames - localNames
+
+        # if a participant has been removed remotely, we remove it locally
+        # don't use iteritems, we need a copy
+        for name in localOnlyNames:
+            pId, __ = participantDict[name]
+            del self._participants[pId]
+
+        # for participants that are both in the MCU and Indico,
+        # we update some of their attributes in Indico
+        for name in commonNames:
+            pId, participant = participantDict[name]
+            remoteData = remoteParticipants[name]
+            remoteDispName = remoteData["displayName"]
+
+            if participant.getDisplayName() != remoteDispName:
+                # the display name was updated remotely
+                if participant.getType() == 'room':
+                    participant.setName(remoteDispName)
+                    participant.setInstitution(remoteDispName)
+                else:
+                    self._participants[pId] = \
+                        ParticipantRoom(self,
+                                        pId,
+                                        {"name": remoteDispName},
+                                        createdByIndico=True)
+
+            participant.setParticipantType(remoteData["participantType"])
+            participant.setParticipantProtocol(remoteData["participantProtocol"])
+            participant.setCallState(remoteData["callState"])
+
+        # we try to add to Indico participants that were added
+        # to the MCU (by an operator or by people joining ad hoc)
+        for name in mcuOnlyNames:
+
+            attrs = remoteParticipants[name]
+
+            # only for participants that are not already in
+            # disconnected state
+            if attrs["callState"] != "disconnected":
+                self._updateAdHocParticipant(name, attrs)
+
+        startTime = conference.get("startTime", None)
+        if startTime:
+            adjustedDate = setAdjustedDate(datetimeFromMCUTime(startTime), tz = getCERNMCUOptionValueByName("MCUTZ"))
+            self.setStartDate(adjustedDate)
+
+        durationSeconds = conference.get("durationSeconds", None)
+        if durationSeconds:
+            self.setDurationSeconds(durationSeconds)
+        else:
+            self.setEndDate(self.getStartDate())
+
+
     def queryConference(self):
         """ Queries the MCU for information about a conference with the same conferenceName as self._bookingParams["name"]
             If found, the attributes of the Indico booking object are updated, included the participants.
@@ -642,112 +823,34 @@ class CSBooking(CSBookingBase): #already Fossilizable
                 else:
                     params = MCUParams()
 
-                Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling conference.enumerate with params: %s""" % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
+                Logger.get('CERNMCU').info(
+                    "Evt:%s, booking:%s, calling conference.enumerate with params: %s"
+                    % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
+
                 answer = unicodeToUtf8(mcu.conference.enumerate(params))
                 #un-comment to print all the garbage about other conferences received
-                #Logger.get('CERNMCU').debug("""Evt:%s, booking:%s, calling conference.enumerate. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
+                # Logger.get('CERNMCU').debug(
+                #    "Evt:%s, booking:%s, calling conference.enumerate. Got answer: %s" %
+                #    (self._conf.getId(), self.getId(), str(answer)))
 
                 # we loop through all the returned output
                 for conference in answer.get("conferences", []):
+                    if conference.get("conferenceName", None) == \
+                           self._bookingParams["name"]:
 
-                    if conference.get("conferenceName", None) == self._bookingParams["name"]: # we found our conference
-
-                        Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling conference.enumerate. Found conference:\n%s""" % (self._conf.getId(), self.getId(), str(conference)))
+                        # we found our conference
                         found = True
 
-                        #we update the local Indico description
-                        remoteDescription = conference.get("description", '')
-                        if unicodeLength(remoteDescription) < 31 or not self._bookingParams["description"].startswith(remoteDescription):
-                            self._bookingParams["description"] = remoteDescription
+                        Logger.get('CERNMCU').info(
+                            "Evt:%s, booking:%s, calling conference.enumerate. Found conference:\n%s" %
+                            (self._conf.getId(), self.getId(), str(conference)))
 
-                        #we update the local id
-                        self._bookingParams["id"] = conference.get("numericId", '')
-                        if not self._autoGeneratedId:
-                            self._customId = self._bookingParams["id"]
+                        self._processQueryConference(conference)
 
-                        self._oldName = self._bookingParams["name"]
-
-                        #we update the local PIN
-                        self._pin = conference.get("pin", '')
-
-                        #we obtain the remote list of participants in the MCU
-                        remoteParticipants = self.queryParticipants()
-
-                        #if a participant has been removed remotely, we remove it locally
-                        for participantId, participantObject in self._participants.items(): #dont use iteritems, we need a copy
-                            if participantObject.getParticipantName() not in remoteParticipants:
-                                del self._participants[participantId]
-
-                        #for participants that are both in the MCU and Indico, we update some of their attributes in Indico
-                        for participantId, participantObject in self._participants.items(): #again, we need a copy...
-                            if participantObject.getParticipantName() in remoteParticipants:
-                                remoteParticipantData = remoteParticipants[participantObject.getParticipantName()]
-
-                                remoteParticipantDispayName = remoteParticipantData["displayName"]
-                                if participantObject.getDisplayName() != remoteParticipantDispayName: #the display name was updated remotely
-                                    if participantObject.getType() == 'room':
-                                        participantObject.setName(remoteParticipantDispayName)
-                                        participantObject.setInstitution(remoteParticipantDispayName)
-                                    else:
-                                        self._participants[participantId] = ParticipantRoom(self, participantId, {"name": remoteParticipantDispayName}, createdByIndico=True)
-                                        participantObject = self._participants[participantId] # for the next lines
-
-                                participantObject.setParticipantType(remoteParticipantData["participantType"])
-                                participantObject.setParticipantProtocol(remoteParticipantData["participantProtocol"])
-                                participantObject.setCallState(remoteParticipantData["callState"])
-
-                                #we remove the remote participant (just in the remoteParticipants variable) for the next look
-                                del remoteParticipants[participantObject.getParticipantName()]
-
-                        #we try to add to Indico participants that were added to the MCU (by an operator or by people joining ad hoc)
-                        #maybe the person who added them to the MCU respected the indico convention (e.g. i-c0b2p5) or not
-                        #we only do this for participants that are not already in disconnected state
-                        for participantName, attributes in remoteParticipants.iteritems():
-
-                            if not attributes["callState"] == "disconnected":
-
-                                properMatch = False
-                                matchResult = CSBooking._participantNameRE.match(participantName)
-                                if matchResult:
-                                    possibleConfId, possibleBookingId, possibleParticipantId = matchResult.groups()
-                                    if possibleBookingId == self._id and possibleConfId == self.getConference().getId():
-                                        properMatch = True
-                                        self._participants[possibleParticipantId] = ParticipantRoom(self,
-                                                                                                    possibleParticipantId,
-                                                                                                    {"name": attributes["displayName"],
-                                                                                                     "ip": attributes["ip"]},
-                                                                                                    createdByIndico=True)
-                                        self._participants[possibleParticipantId].setParticipantType(attributes["participantType"])
-                                        self._participants[possibleParticipantId].setParticipantProtocol(attributes["participantProtocol"])
-                                        self._participants[possibleParticipantId].setCallState(attributes["callState"])
-
-                                if not properMatch:
-                                    newId = self._participantIdCounter.newCount()
-                                    self._participants[newId] = ParticipantRoom(self,
-                                                                                newId,
-                                                                                {"name": attributes["displayName"],
-                                                                                 "ip": attributes["ip"]},
-                                                                                participantName=participantName,
-                                                                                createdByIndico=False)
-                                    self._participants[newId].setParticipantType(attributes["participantType"])
-                                    self._participants[newId].setParticipantProtocol(attributes["participantProtocol"])
-                                    self._participants[newId].setCallState(attributes["callState"])
-
-
-
-                        startTime = conference.get("startTime", None)
-                        if startTime:
-                            adjustedDate = setAdjustedDate(datetimeFromMCUTime(startTime), tz = getCERNMCUOptionValueByName("MCUTZ"))
-                            self.setStartDate(adjustedDate)
-
-                        durationSeconds = conference.get("durationSeconds", None)
-                        if durationSeconds:
-                            self.setDurationSeconds(durationSeconds)
-                        else:
-                            self.setEndDate(self.getStartDate())
-
+                        # mark it as created, and stop the cycle
                         self._created = True
                         break
+
 
                 enumerateID = answer.get("enumerateID", None)
                 keepAsking = enumerateID is not None

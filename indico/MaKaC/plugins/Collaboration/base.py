@@ -235,14 +235,17 @@ class CSBookingManager(Persistent, Observer):
                 index.indexBooking(booking)
 
     def changeBooking(self, bookingId, bookingParams):
-        """ Changes the bookingParams of a CSBookingBase object.
-            After updating the booking, its "performBooking" method will be called.
-            bookingId: the id of the CSBookingBase object to change
-            bookingParams: a dictionary with the new parameters that will modify the booking
-                           "modify the booking" can mean that maybe the booking will be rejected with the new parameters.
-                           if "startDate" and "endDate" are among the keys, they will be taken out of the dictionary.
         """
+        Changes the bookingParams of a CSBookingBase object.
+        After updating the booking, its 'performBooking' method will be called.
+        bookingId: the id of the CSBookingBase object to change
+        bookingParams: a dictionary with the new parameters that will modify the booking
+        'modify the booking' can mean that maybe the booking will be rejected with the new parameters.
+        if 'startDate' and 'endDate' are among the keys, they will be taken out of the dictionary.
+        """
+
         booking = self.getBooking(bookingId)
+
 
         oldStartDate = booking.getStartDate()
         oldModificationDate = booking.getModificationDate()

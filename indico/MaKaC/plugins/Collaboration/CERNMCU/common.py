@@ -130,6 +130,12 @@ class Participant(Persistent):
         """
         pass
 
+    def isCreatedByIndico(self):
+        """
+        Who created it? Indico or MCU, remotely?
+        """
+        return self._createdByIndico
+
     def getType(self):
         return self._type
 
@@ -198,6 +204,7 @@ class ParticipantPerson(Participant, Fossilizable):
         self._familyName = data.get("familyName", '')
         self._firstName = data.get("firstName", '')
         self._affiliation = data.get("affiliation", '')
+
         Participant.__init__(self, 'person', booking, participantIndicoId, data.get("ip",''),
                              participantName = None, participantType = "by_address", participantProtocol = data.get("participantProtocol", "h323"),
                              createdByIndico = True)
@@ -207,6 +214,7 @@ class ParticipantPerson(Participant, Fossilizable):
         self._familyName = newData.get("familyName", '')
         self._firstName = newData.get("firstName", '')
         self._affiliation = newData.get("affiliation", '')
+        self._participantProtocol = newData.get("participantProtocol", '')
         self.setIp(newData.get("ip", ''))
 
     def getTitle(self):
@@ -248,6 +256,7 @@ class ParticipantRoom(Participant, Fossilizable):
 
         self._name = data.get("name",'')
         self._institution = data.get("institution", '')
+
         Participant.__init__(self, 'room', booking, participantIndicoId, data.get("ip",''),
                              participantName, participantType, data.get("participantProtocol", "h323"),
                              createdByIndico)
@@ -255,6 +264,7 @@ class ParticipantRoom(Participant, Fossilizable):
     def updateData(self, newData):
         self._name = newData.get("name",'')
         self._institution = newData.get("institution", '')
+        self._participantProtocol = newData.get("participantProtocol", '')
         self.setIp(newData.get("ip", ''))
 
     def getName(self):
@@ -304,7 +314,6 @@ class CERNMCUError(CSErrorBase): #already fossilizable
     fossilizes(ICERNMCUErrorFossil)
 
     def __init__(self, faultCode, info = ''):
-        CSErrorBase.__init__(self)
         self._faultCode = faultCode
         self._info = info
 
