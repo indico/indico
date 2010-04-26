@@ -18,6 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import os
 from persistent import Persistent
 import tempfile
 import simplejson
@@ -320,6 +321,9 @@ class PosterTemplate (Persistent):
         """
 
         for backgroundId, (filePath, bgPosition) in self.__tempBackgroundsFilePaths.iteritems():
+            cfg = Config.getInstance()
+            tempPath = cfg.getUploadedFilesSharedTempDir()
+            filePath = os.path.join(tempPath, filePath)
             fileName = "background" + str(backgroundId) + "_t" + self.__id + "_c" + conf.id
 
             file = conference.LocalFile()

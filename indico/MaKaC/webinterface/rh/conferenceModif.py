@@ -7538,7 +7538,7 @@ class RHConfBadgePrinting(RHConferenceModifBase):
                     filePaths = self._getSession().getVar(key)
                     if filePaths != None:
                         cfg = Config.getInstance()
-                        tempPath = cfg.getXMLCacheDir()
+                        tempPath = cfg.getUploadedFilesSharedTempDir()
                         for filePath in filePaths:
                             self._target.getBadgeTemplateManager().getTemplateById(self.__templateId).addTempBackgroundFilePath(filePath)
                             self._tempFilesToDelete.append(os.path.join(tempPath, filePath))
@@ -7811,7 +7811,7 @@ class RHConfBadgeGetBackground(RHConferenceModifBase):
             return p
         else:
             cfg = Config.getInstance()
-            tempPath = cfg.getUploadedFilesTempDir()
+            tempPath = cfg.getUploadedFilesSharedTempDir()
             if self._conf.getBadgeTemplateManager().hasTemplate(self.__templateId):
                 isArchived, image = self._conf.getBadgeTemplateManager().getTemplateById(self.__templateId).getBackground(self.__backgroundId)
                 if image is not None:
@@ -7996,7 +7996,7 @@ class RHConfPosterSaveTempBackground(RHConferenceModifBase):
         f = open( fileName, "wb" )
         f.write( fd.read() )
         f.close()
-        return fileName
+        return os.path.split(fileName)[-1]
 
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
@@ -8005,9 +8005,9 @@ class RHConfPosterSaveTempBackground(RHConferenceModifBase):
         self._bgPosition = params.get("bgPosition",None)
 
         try:
-          self._tempFilePath = self._saveFileToTemp( params["file"].file )
+            self._tempFilePath = self._saveFileToTemp( params["file"].file )
         except AttributeError:
-          self._tempFilePath = None
+            self._tempFilePath = None
 
     def _process(self):
 
@@ -8090,6 +8090,8 @@ class RHConfPosterGetBackground(RHConferenceModifBase):
             p = conferences.WPConferenceModificationClosed( self, self._target )
             return p
         else:
+            cfg = Config.getInstance()
+            tempPath = cfg.getUploadedFilesSharedTempDir()
 
             if self._conf.getPosterTemplateManager().hasTemplate(self.__templateId):
 
@@ -8099,11 +8101,12 @@ class RHConfPosterGetBackground(RHConferenceModifBase):
                     if isArchived:
                         return self.__imageBin(image)
                     else:
+                        image = os.path.join(tempPath,image)
                         return self.__fileBin(image)
 
             else:
                 key = "tempBackground", self._conf.id, self.__templateId
 
-                filePath = self._getSession().getVar(key) [ int(self.__backgroundId) ][0]
+                filePath = os.path.join(tempPath, self._getSession().getVar(key) [ int(self.__backgroundId) ][0])
                 return self.__fileBin(filePath)
 
