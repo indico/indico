@@ -67,7 +67,7 @@
     <!-- CONTEXT HELP DIVS -->
 	<div id="tooltipPool" style="display: none">
 
-        <!-- Status --> 
+        <!-- Status -->
 		<div id="statusHelp" class="tip">
              <%= _("Validity")%>:<br />
             <ul>
@@ -83,15 +83,15 @@
             </ul>
 		</div>
         <img style="border-style: solid; border-width: thick; border-color: #101010;" />
-        <!-- Repetition type --> 
+        <!-- Repetition type -->
         <div id="repetitionTypeHelp" class="tip">
              <%= _("Repetition type - this indicates how a booking repeats itself.")%>
         </div>
-        <!-- Where is key? --> 
+        <!-- Where is key? -->
         <div id="whereIsKeyHelp" class="tip">
              <%= _("How to obtain a key? Often just a phone number.")%>
         </div>
-        <!-- Created --> 
+        <!-- Created -->
         <div id="createdHelp" class="tip">
              <%= _("When the booking was made?")%>
         </div>
@@ -102,12 +102,12 @@
         <div id="iNeedAVCSupport" class="tip">
              <%= _("Has user requested support for video-conferencing equipment?")%><br />
         </div>
-        
+
 	</div>
 
     <!-- END OF CONTEXT HELP DIVS -->
 
-    <table cellpadding="0" cellspacing="0" border="0" width="80%">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%">
 		<% if standalone: %>
 		    <tr>
 		    <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">&nbsp;</td> <!-- lastvtabtitle -->
@@ -129,7 +129,7 @@
                             <table width="90%" align="left" border="0">
                               <!-- ROOM -->
                               <tr>
-                                <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Room")%></span></td>
+                                <td class="bookingDisplayTitleCell"><span class="titleCellFormat"> <%= _("Room")%></span></td>
                                 <td>
                                     <table width="100%">
                                         <tr>
@@ -152,7 +152,7 @@
                               <tr><td>&nbsp;</td></tr>
                               <!-- WHEN -->
                               <tr>
-                                <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("When")%></span></td>
+                                <td class="bookingDisplayTitleCell"><span class="titleCellFormat"> <%= _("When")%></span></td>
                                 <td>
                                     <table width="100%">
                                         <tr>
@@ -174,7 +174,7 @@
                             <tr><td>&nbsp;</td></tr>
                             <!-- BOOKED FOR -->
                             <tr>
-                                <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Booked for")%></span></td>
+                                <td class="bookingDisplayTitleCell"><span class="titleCellFormat"> <%= _("Booked for")%></span></td>
                                 <td>
                                     <table width="100%">
                                         <tr>
@@ -195,7 +195,7 @@
                             <tr><td>&nbsp;</td></tr>
                             <!-- CREATED -->
                             <tr>
-                                <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Created")%></span></td>
+                                <td class="bookingDisplayTitleCell"><span class="titleCellFormat"> <%= _("Created")%></span></td>
                                 <td>
                                     <table width="100%">
                                         <tr>
@@ -241,7 +241,7 @@
                             </tr>
                             <!-- ACTIONS -->
                             <tr>
-                                <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Actions")%></span></td>
+                                <td class="bookingDisplayTitleCell"><span class="titleCellFormat"> <%= _("Actions")%></span></td>
                                 <td>
                                     <form name="submits" action="" method="post">
                                         &nbsp;
@@ -264,10 +264,109 @@
                                     </form>
                                 </td>
                             </tr>
+                            <% if reservation.getResvHistory().hasHistory() and ( reservation.isOwnedBy( user ) or reservation.room.isOwnedBy( user ) or user.isAdmin() ) : %>
+                            <tr><td>&nbsp;</td></tr>
+                            <!-- BOOKING HISTORY -->
+                            <script type="text/javascript">
+                                function performSlideOnEntry(entryNum, state){
+                                    if ( state ) {
+                                         IndicoUI.Effect.slide('bookingEntryLine' + entryNum, eval('height' + entryNum));
+                                         $E('bookingEntryMoreInfo' + entryNum).set('More Info');
+                                         $E('bookingEntryMoreInfo' + entryNum).dom.className = "fakeLink bookingDisplayEntryMoreInfo";
+                                     } else {
+                                         IndicoUI.Effect.slide('bookingEntryLine' + entryNum, eval('height' + entryNum));
+                                         $E('bookingEntryMoreInfo' + entryNum).set('Hide Info');
+                                         $E('bookingEntryMoreInfo' + entryNum).dom.className = "fakeLink bookingDisplayEntryHideInfo";
+                                     }
+                                     return !state
+                                }
+                            </script>
+                            <tr>
+                                <td class="bookingDisplayTitleCell"><span class="titleCellFormat"> <%= _("Booking History")%></span></td>
+                                <td>
+                                <% count = 0 %>
+                                <% for entry in reservation.getResvHistory().getEntries() : %>
+                                    <% if count == 1 : %>
+                                    <!-- Construct the divs needed by the sliding effect -->
+                                    <div id="bookingHistoryLine" style="visibility: hidden; overflow: hidden;">
+                                    <div class="bookingDisplayBookingHistoryLine">
+                                    <% end %>
+                                        <div class="bookingHistoryEntry">
+                                            <span class="bookingDisplayHistoryTimestamp"><%= entry.getTimestamp() %></span>
+                                            <span class="bookingDisplayHistoryInfo"><%= entry.getInfo()[0] %> by <%= entry.getResponsibleUser() %>
+                                            <% if len(entry.getInfo()) > 1 : %>
+                                                <span class='fakeLink bookingDisplayEntryMoreInfo' id='bookingEntryMoreInfo<%= count %>'> More Info </span>
+                                                </span>
+                                                <div id="bookingEntryLine<%= count %>"  style="visibility: hidden; overflow: hidden;">
+                                                <div class="bookingDisplayEntryLine">
+                                                    <ul>
+                                                    <% for elem in entry.getInfo(): %>
+                                                        <% if entry.getInfo().index(elem) != 0: %>
+                                                        <li>
+                                                        <%= elem %>
+                                                        </li>
+                                                        <% end %>
+                                                    <% end %>
+                                                    </ul>
+                                                </div>
+                                                </div>
+                                                <script type="text/javascript">
+                                                    $E('bookingEntryMoreInfo<%= count %>').dom.onmouseover = function (event) {
+                                                        IndicoUI.Widgets.Generic.tooltip($E('bookingEntryMoreInfo<%= count %>').dom, event, '<div class="bookingHistoryTooltip">Click here to show / hide detailed information.</div>'
+                                                            );
+                                                      }
+                                                    var showEntryMoreState<%= count %> = false;
+                                                    var height<%= count %> = IndicoUI.Effect.prepareForSlide('bookingEntryLine<%= count %>', true);
+                                                    $E('bookingEntryMoreInfo<%= count %>').observeClick(function () {
+                                                        showEntryMoreState<%= count %> = performSlideOnEntry(<%= count %>, showEntryMoreState<%= count %>);
+                                                        });
+                                                </script>
+                                            <% end %>
+                                            <% else : %>
+                                                </span>
+                                            <% end %>
+                                            <% count += 1 %>
+                                        </div>
+                                <% end %>
+                                <% if count > 1 : %>
+                                    </div>
+                                    </div>
+                                    <div class="bookingShowHideHistory">
+                                        <span class="fakeLink bookingDisplayShowHistory" id="bookingShowHistory">
+                                        Show All History ...
+                                        </span>
+                                    </div>
+                                    <script type="text/javascript">
+                                          $E('bookingShowHistory').dom.onmouseover = function (event) {
+                                              IndicoUI.Widgets.Generic.tooltip($E('bookingShowHistory').dom, event, '<div class="bookingHistoryTooltip">Click here to show / hide detailed information.</div>'
+                                                  );
+                                            }
+                                          var height = IndicoUI.Effect.prepareForSlide('bookingHistoryLine', true);
+                                          var showHistoryState = false;
+                                          $E('bookingShowHistory').observeClick(function() {
+                                              if (showHistoryState) {
+                                                  height = IndicoUI.Effect.prepareForSlide('bookingHistoryLine', false);
+                                                  $E('bookingShowHistory').dom.className = "fakeLink bookingDisplayShowHistory";
+                                                  IndicoUI.Effect.slide('bookingHistoryLine', height);
+                                                  $E('bookingShowHistory').set('Show All History ...');
+                                                  }
+                                              else {
+                                                  $E('bookingShowHistory').dom.className = "fakeLink bookingDisplayHideHistory";
+                                                  IndicoUI.Effect.slide('bookingHistoryLine', height);
+                                                  $E('bookingShowHistory').set('Hide All History');
+                                                  }
+                                              showHistoryState = !showHistoryState
+                                        });
+                                    </script>
+                                <% end %>
+                                </td>
+                            </tr>
+                            <% end %>
                             <% if reservation.repeatability != None  and  reservation.getExcludedDays(): %>
+                            <tr><td>&nbsp;</td></tr>
                             <!-- Excluded dates -->
                             <tr>
-                                <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Excluded days")%></span></td>
+                                <td class="bookingDisplayTitleCell"><span class="titleCellFormat"> <%= _("Excluded days")%></span></td>
                                 <td>
                                     <table width="100%">
                                         <tr>
@@ -287,9 +386,10 @@
                             </tr>
                             <% end %>
                             <% if reservation.repeatability != None: %>
+                            <tr><td>&nbsp;</td></tr>
                             <!-- Occurrences -->
                             <tr>
-                                <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Occurrences")%></span></td>
+                                <td class="bookingDisplayTitleCell"><span class="titleCellFormat"> <%= _("Occurrences")%></span></td>
                                 <td>
                                     <table width="100%">
                                         <tr>
@@ -303,7 +403,7 @@
                                             <% canCancel = reservation.canCancel( user ) %>
 
                                             <% for period in reservation.splitToPeriods(): %>
-                                                <%= formatDate(period.startDT.date()) %> 
+                                                <%= formatDate(period.startDT.date()) %>
                                                 <% if canReject: %>
                                                     <a href="javascript: void( 0 )" onclick="submit_reject_occurrence( '<%= urlHandlers.UHRoomBookingRejectBookingOccurrence.getURL( reservation, formatDate(period.startDT.date()) ) %>');">Reject</a>
                                                 <% end %>
@@ -320,7 +420,7 @@
                             </tr>
                             <% end %>
                         </table>
-                        
+
                         </td>
                     </tr>
                 </table>

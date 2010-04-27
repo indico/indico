@@ -1233,6 +1233,7 @@ class ReservationBase( object ):
             lastDT = period.startDT
             periods.append( period )
 
+
     # ==== Private ===================================================
 
     # datetime (DT) converters --------
