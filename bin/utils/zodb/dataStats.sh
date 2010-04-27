@@ -1,14 +1,46 @@
 #!/bin/bash
 
-BACKUP_PATH="/home/davide/daviddatafs/"
-DATA_PATH="/tmp/Data.fs"
-EMAIL="dgalimbe@mail.cern.ch"
+while getopts "hb:f:e:" opt; do
+  case $opt in
+    b)
+      BACKUP_PATH=$OPTARG
+      ;;
+    f)
+      DATA_PATH=$OPTARG
+      ;;
+    e)
+      EMAIL=$OPTARG
+      ;;
+    h)
+      echo "usage: dataStats.sh -b /backup/path -f /tmp/Data.fs -e john@doe.com"
+      echo ""
+      echo "    -h   show this help message and exit"
+      echo "    -b   the backup directory path"
+      echo "    -f   where you want to restore the Data.fs"
+      echo "    -e   the email address to which send the reports"
+      exit 1
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      exit 1
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+  esac
+done
+
+if [ -z $DATA_PATH ] || [ -z $EMAIL ] || [ -z $BACKUP_PATH ]; then
+    echo "All parameters are mandatory. Use -h for details"
+    exit 1
+fi
 
 repozo -Rv -r $BACKUP_PATH -o $DATA_PATH
 
 #---- [1/6] Objects_stats ------------
 SUBJECT="[ZODB-Stats] Objects_stats"
-ELEMENTS_TO_DISPLAY=30
+ELEMENTS_TO_DISPLAY=100
 python objects_stats.py -f $DATA_PATH -n $ELEMENTS_TO_DISPLAY > "/tmp/objects_stats.txt"
 EMAILMESSAGE="/tmp/objects_stats.txt"
 mail -s "$SUBJECT" "$EMAIL" < $EMAILMESSAGE
@@ -17,7 +49,7 @@ rm "/tmp/objects_stats.txt"
 
 #---- [2/6] Class_stats ------------
 SUBJECT="[ZODB-Stats] Class_stats"
-ELEMENTS_TO_DISPLAY=30
+ELEMENTS_TO_DISPLAY=100
 python class_stats.py -f $DATA_PATH -n $ELEMENTS_TO_DISPLAY > "/tmp/class_stats.txt"
 EMAILMESSAGE="/tmp/class_stats.txt"
 mail -s "$SUBJECT" "$EMAIL" < $EMAILMESSAGE
@@ -65,6 +97,7 @@ python mostUsedClasses.py -d $DAYS $DATA_PATH > "/tmp/used.txt"
 EMAILMESSAGE="/tmp/used.txt"
 mail -s "$SUBJECT" "$EMAIL" < $EMAILMESSAGE
 rm "/tmp/used.txt"
+
 
 #Remove the Data.fs
 rm $DATA_PATH
