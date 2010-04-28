@@ -7303,16 +7303,15 @@ class WPConfModifDisplayRemoveLink( WPConfModifDisplayBase ):
         #return wc.getHTML( p )
 
 
-class WPConfParticipantList( WPConferenceBase ):
+class WPConfParticipantList( WPConfAbstractList ):
 
     def __init__(self, rh, conf, emailList, displayedGroups, abstracts):
-        WPConferenceBase.__init__(self, rh, conf)
+        WPConfAbstractList.__init__(self, rh, conf, None)
         self._emailList = emailList
         self._displayedGroups = displayedGroups
         self._abstracts = abstracts
 
-    def _getBody( self, params ):
-        WPConferenceBase._getBody(self, params)
+    def _getTabContent( self, params ):
         wc = WAbstractsParticipantList(self._conf, self._emailList, self._displayedGroups, self._abstracts)
         return wc.getHTML()
 
@@ -8473,7 +8472,7 @@ class WAbstractsParticipantList(wcomponents.WTemplated):
                     color="#F6F6F6"
                 else:
                     color="white"
-                participant = "%s <%s>"%(subm.getFullName(), subm.getEmail())
+                participant = "%s %s %s <%s>"%(subm.getTitle(), subm.getFirstName(), subm.getFamilyName().upper(), subm.getEmail())
                 l.append("<tr>\
                         <td colspan=\"2\" nowrap bgcolor=\"%s\" class=\"blacktext\">\
                         &nbsp;&nbsp;&nbsp;%s</td></tr>"%(color, self.htmlText(participant)))
@@ -8597,7 +8596,7 @@ class WContribParticipantList(wcomponents.WTemplated):
                     color="#F6F6F6"
                 else:
                     color="white"
-                participant = "%s <%s>"%(pAuth.getFullName(), pAuth.getEmail())
+                participant = "%s %s %s <%s>"%(pAuth.getTitle(), pAuth.getFirstName(), pAuth.getFamilyName().upper(), pAuth.getEmail())
                 l.append("<tr><td colspan=\"2\" nowrap bgcolor=\"%s\" \
                         class=\"blacktext\">&nbsp;&nbsp;&nbsp;%s</td></tr>"%(color, self.htmlText(participant)))
             vars["primaryAuthors"] = "".join(l)
@@ -8622,9 +8621,9 @@ class WContribParticipantList(wcomponents.WTemplated):
                     color="white"
                 cAuthEmail = cAuth.getEmail()
                 if cAuthEmail.strip() == "":
-                    participant = "%s"%cAuth.getFullName()
+                    participant = "%s %s %s"%(cAuth.getTitle(), cAuth.getFirstName(), cAuth.getFamilyName().upper())
                 else:
-                    participant = "%s <%s>"%(cAuth.getFullName(), cAuthEmail)
+                    participant = "%s %s %s <%s>"%(cAuth.getTitle(), cAuth.getFirstName(), cAuth.getFamilyName().upper(), cAuthEmail)
                 l.append("<tr><td colspan=\"2\" nowrap bgcolor=\"%s\" class=\"blacktext\">\
                         &nbsp;&nbsp;&nbsp;%s</td></tr>"%(color, self.htmlText(participant)))
             vars["coAuthors"] = "".join(l)

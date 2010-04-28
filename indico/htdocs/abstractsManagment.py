@@ -29,3 +29,6 @@ def abstractsActions( req, **params ):
 
 def newAbstract( req, **params ):
     return conferenceModif.RHNewAbstract( req ).process( params )
+
+def participantList( req, **params ):
+    return conferenceModif.RHAbstractsParticipantList( req ).process( params )
