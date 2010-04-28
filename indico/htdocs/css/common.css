@@ -548,7 +548,7 @@ div.minutesTable {
     margin: 10px;
 }
 
-div.minutesTable h2 {
+div.minutesTable > h2 {
     font-weight: normal;
     color: #444;
     font-size:11pt;
@@ -564,6 +564,10 @@ div.minutesTable > span {
     text-align:justify;
     display: block;
     padding: 10px;
+}
+
+div.minutesTable > span h1 , h2{
+    color: black;
 }
 
 li.meetingSession, li.meetingContrib, li.breakListItem {

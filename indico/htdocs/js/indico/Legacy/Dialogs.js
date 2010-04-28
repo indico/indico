@@ -634,7 +634,25 @@ extend(IndicoUI.Dialogs,
                    }
 
                    killProgress = IndicoUI.Dialogs.Util.progress($T('Saving...'));
-                   req.set(rtWidget.get());
+                   try{
+                       var parsingResult = escapeHarmfulHTML(rtWidget.get());
+                       if( parsingResult[1] > 0) {
+                           var popup = new WarningPopup("Warning!", "Your minutes will be cleaned from scripts, styles and potentially harmful html tags and attributes.");
+                           popup.open();
+                       }
+                       req.set(parsingResult[0]);
+                   }
+                   catch(error){
+                       if(typeof error == "string" && error.indexOf("Parse Error") != -1){
+                           var popup = new WarningPopup("Warning!", "Invalid format!.");
+                           popup.open();
+                           //TODO: Ask Jose what to do in case of exception.
+                           req.set("");
+                       }
+                       else
+                           throw error;
+                   }
+
                };
 
                changedText.observe(

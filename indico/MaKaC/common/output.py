@@ -953,7 +953,6 @@ class outputGenerator:
 
         out.closeTag("subcontribution")
 
-
     def _materialToXML(self,mat, vars, out=None):
         if not out:
             out = self._XMLGen
