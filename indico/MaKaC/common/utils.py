@@ -18,14 +18,17 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import time, re, os
 from random import randint
 from datetime import datetime, date, timedelta
 from MaKaC.common.timezoneUtils import isSameDay, isToday, getAdjustedDate,\
     isTomorrow
-import time
 from MaKaC import user
-import re
 from MaKaC.i18n import _
+
+# fcntl is only available for POSIX systems
+if os.name == 'posix':
+    import fcntl
 
 
 
@@ -573,19 +576,47 @@ def truncate(text, maxSize):
     else:
         return text
 
-def main():
-    DBMgr.getInstance().startRequest()
-    print _("Is working day: ")
-    print str( HolidaysHolder.isWorkingDay( date( 2007, 5, 1 ) ) )
-    print str( HolidaysHolder.isWorkingDay( date( 2007, 5, 2 ) ) )
-    print str( HolidaysHolder.isWorkingDay( date( 2007, 9, 5 ) ) )
+class OSSpecific(object):
+    """
+    Namespace for OS Specific operations:
+     - file locking
+    """
 
-    h = HolidaysHolder.getHolidays()
-    for day in h:
-        if day.year == 2007:
-            print day
+    @classmethod
+    def _lockFilePosix(cls, f, lockType):
+        """
+        Locks file f with lock type lockType
+        """
+        fcntl.fcntl(f, lockType)
 
-    DBMgr.getInstance().endRequest()
+    @classmethod
+    def _lockFileOthers(cls, f, lockType):
+        """
+        Win32/others file locking could be implemented here
+        """
+        pass
 
-if __name__ == '__main__':
-    main()
+    @classmethod
+    def lockFile(cls, f, lockType):
+        """
+        API method - locks a file
+        f - file handler
+        lockType - string: LOCK_EX | LOCK_UN | LOCK_SH
+        """
+        cls._lockFile(f, cls._lockTranslationTable[lockType])
+
+    # Check OS and choose correct locking method
+    if os.name == 'posix':
+        _lockFile = _lockFilePosix
+        _lockTranslationTable = {
+            'LOCK_EX': fcntl.LOCK_EX,
+            'LOCK_UN': fcntl.LOCK_UN,
+            'LOCK_SH': fcntl.LOCK_SH
+            }
+    else:
+        _lockFile = _lockFileOthers
+        _lockTranslationTable = {
+            'LOCK_EX': None,
+            'LOCK_UN': None,
+            'LOCK_SH': None
+            }

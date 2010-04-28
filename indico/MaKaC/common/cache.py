@@ -24,11 +24,15 @@ from MaKaC.common.logger import Logger
 
 from MaKaC.common.logger import Logger
 from MaKaC.common import timezoneUtils
+from MaKaC.common.utils import OSSpecific
 
-import os, shutil, pickle, datetime, fcntl
+import os, shutil, pickle, datetime
+
 
 class IndicoCache:
-    """ Used to cache some pages in Indico """
+    """
+    Used to cache some pages in Indico
+    """
     _subDirName = ""
 
     def __init__( self, vars ):
@@ -39,17 +43,13 @@ class IndicoCache:
 
     def lockCache( self, file, flag=True):
         global fp
-        try:
-            import fcntl
-        except:
-            return
         if flag:
             fp = open(file,"a")
-            fcntl.flock(fp, fcntl.LOCK_EX)
+            OSSpecific.lockFile(fp, 'LOCK_EX')
         else:
             if not fp:
                 return
-            fcntl.flock(fp, fcntl.LOCK_UN)
+            OSSpecific.lockFile(fp, 'LOCK_UN')
             fp.close()
             fp = None
 
@@ -80,11 +80,7 @@ class IndicoCache:
     def getCachePage( self ):
         if os.path.isfile(self.getFilePath()):
             fp = open(self.getFilePath(),"r")
-            try:
-                import fcntl
-                fcntl.flock(fp, fcntl.LOCK_SH)
-            except:
-                pass
+            OSSpecific.lockFile(fp, 'LOCK_SH')
             page = fp.read()
             return page
         return ""
@@ -114,7 +110,9 @@ class EventCache( IndicoCache ):
         return "eve-%s-%s" % (self._eventId, self._type)
 
 class MultiLevelCacheEntry(object):
-    """ An entry(line) for a multilevel cache """
+    """
+    An entry(line) for a multilevel cache
+    """
 
     def __init__(self):
         self._date = None
@@ -134,7 +132,9 @@ class MultiLevelCacheEntry(object):
 
 
 class MultiLevelCache(object):
-    """ A multilevel cache """
+    """
+    A multilevel cache
+    """
 
     def __init__(self, cacheName):
         self.cacheName = cacheName
@@ -144,14 +144,16 @@ class MultiLevelCache(object):
             os.makedirs(cacheDir)
 
     def _saveObject(self, fsPath, path, fileName, data):
-        """ Performs the actual save operation """
+        """
+        Performs the actual save operation
+        """
 
         if len(path) == 0:
             filePath = os.path.join(fsPath, fileName)
             f = open(filePath, 'wb')
-            fcntl.fcntl(f, fcntl.LOCK_EX)
+            OSSpecific.lockFile(f, 'LOCK_EX')
             f.write(data)
-            fcntl.fcntl(f, fcntl.LOCK_UN)
+            OSSpecific.lockFile(f, 'LOCK_UN')
             f.close()
         else:
             dirPath = os.path.join(fsPath, path[0])
@@ -165,7 +167,8 @@ class MultiLevelCache(object):
         return os.path.join(Config().getInstance().getXMLCacheDir(), self.cacheName)
 
     def cacheObject(self, path, fileName, obj):
-        """ path - Path where to store
+        """
+        path - Path where to store
         fileName - File name to use
         obj - MultiLevelCacheEntry to store
         """
@@ -186,9 +189,9 @@ class MultiLevelCache(object):
             f = open(filePath, 'rb')
 
             # Lock file
-            fcntl.fcntl(f, fcntl.LOCK_SH)
+            OSSpecific.lockFile(f, 'LOCK_SH')
             data = f.read()
-            fcntl.fcntl(f, fcntl.LOCK_UN)
+            OSSpecific.lockFile(f, 'LOCK_UN')
             f.close()
 
             obj = MultiLevelCacheEntry.unpickle(data)
