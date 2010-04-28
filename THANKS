@@ -3,12 +3,13 @@ CDS Indico THANKS
 
 $Id: THANKS,v 1.3 2008/08/13 13:31:37 jose Exp $
 
-Several people outside the CDS Indico Development Team 
+Several people outside the CDS Indico Development Team
 contributed to the project:
 
 - Jim Fromm (Fermilab): He developed the Timezone awareness for Indico.
 Thanks for a great job!
 
+- Jim Fulton for helping us with the scripts
 
 Other software and pieces of code:
 
@@ -23,8 +24,8 @@ above.
 
 strip_ml_tags is a routine by Micah D. Cochran submitted on 26 Aug 2005 that
 removes all HTML/XML-like tags from the input text.
-This routine is allowed to be put under any license Open Source (GPL, BSD, LGPL, etc.) License 
-or any Propriety License. Effectively this routine is in public domain. 
+This routine is allowed to be put under any license Open Source (GPL, BSD, LGPL, etc.) License
+or any Propriety License. Effectively this routine is in public domain.
 
 
 See also the AUTHORS and ChangeLog files.

@@ -66,7 +66,7 @@ def buildRefmap(fs):
         if(percent - lastPercent > interval):
             spentTime = time.time() - start
             remainingTime = spentTime / float(fsi._file.tell()) * (float(size)) - spentTime
-            sys.stdout.write("\r%f%% complete, time spent %s,  remaining time: %s" % (percent,GetInHMS(time.time() - start, True),  GetInHMS(remainingTime, False)))  
+            sys.stdout.write("\r%f%% complete, time spent %s,  remaining time: %s" % (percent,GetInHMS(time.time() - start, True),  GetInHMS(remainingTime, False)))
             lastPercent = percent
         for rec in txn:
             if rec.data:
@@ -85,16 +85,16 @@ def buildBackRefsMap(refmap):
     interval = 0.005
 
     print "[2/3] Computing the Back Reference Map"
-   
+
     for oid, (refs, modKlass) in refmap.iteritems():
         percent = float(recordsCounter)/float(nbElements) * 100
 
         if(percent - lastPercent > interval):
             spentTime = time.time() - start
             remainingTime = spentTime / float(recordsCounter) * (float(nbElements)) - spentTime
-            sys.stdout.write("\r%f%% complete, time spent %s,  remaining time: %s" % (percent,GetInHMS(time.time() - start, True),  GetInHMS(remainingTime, False)))  
+            sys.stdout.write("\r%f%% complete, time spent %s,  remaining time: %s" % (percent,GetInHMS(time.time() - start, True),  GetInHMS(remainingTime, False)))
             lastPercent = percent
-              
+
         recordsCounter = recordsCounter + 1
 
         try:
@@ -106,9 +106,9 @@ def buildBackRefsMap(refmap):
                 tmp = list(backRefMap[oid_repr(ref).strip()])
             except:
                 tmp = []
-            finally:
-                tmp.append((oid, modKlass))
-                backRefMap[oid_repr(ref).strip()] = tmp
+
+            tmp.append((oid, modKlass))
+            backRefMap[oid_repr(ref).strip()] = tmp
     return backRefMap
 
 def getBackRefs(target, backRefMap):
@@ -120,7 +120,7 @@ def getBackRefs(target, backRefMap):
 
 def doSearch(target, refmap):
     '''we computer all the path from target to other objects. Only simple path
-       are taken into account. 
+       are taken into account.
        The research is done using a Breadth-first search.
     '''
 
@@ -134,7 +134,7 @@ def doSearch(target, refmap):
     alreadyDone = []
 
     print "\n[3/3] Computing the path..."
-    
+
     while True:
         if(len(paths) != 0):
             target2 = paths.pop()
@@ -201,7 +201,7 @@ def main():
     parser = OptionParser(usage=usage)
     parser.add_option("-o", "--oid", dest="oid",type="string", action="store",
                   help="the oid of the object")
-    parser.add_option("-f", "--file", dest="filename", action="store", type="string", 
+    parser.add_option("-f", "--file", dest="filename", action="store", type="string",
                   help="your FileStorage")
     parser.add_option("-r", "--root", dest="root", action="store_false",
                   help="if you want to display only paths to from the root")
