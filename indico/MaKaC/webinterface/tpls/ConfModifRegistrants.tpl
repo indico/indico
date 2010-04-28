@@ -15,7 +15,7 @@
         var inputNodes = IndicoUtil.findFormFields($E(elementName))
         for (i = 0; i < inputNodes.length; i++)
         {
-            var node = formNodes[i];
+            var node = inputNodes[i];
             if (node.type == "checkbox") {
                 node.checked = true;
             }
@@ -27,7 +27,7 @@
         var inputNodes = IndicoUtil.findFormFields($E(elementName))
         for (i = 0; i < inputNodes.length; i++)
         {
-            var node = formNodes[i];
+            var node = inputNodes[i];
             if (node.type == "checkbox") {
                 node.checked = false;
             }
@@ -257,7 +257,7 @@
             var inputNodes = IndicoUtil.findFormFields($E("registrantsItems"))
             for (i = 0; i < inputNodes.length; i++)
             {
-                var node = formNodes[i];
+                var node = inputNodes[i];
                 if (node.type == "checkbox") {
                     if(node.checked == true) {
                         return true;
