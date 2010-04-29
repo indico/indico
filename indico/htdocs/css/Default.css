@@ -6026,7 +6026,7 @@ div.cloneElements {
 
 div.dateField {
     border: 1px solid #AAAAAA;
-    width: 183px;
+    width: 135px;
 }
 
 div.dateField img {
@@ -6038,4 +6038,5 @@ div.dateField input {
     border: none;
     padding: 2px;
     vertical-align: middle;
+    width: 103px;
 }

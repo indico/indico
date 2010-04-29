@@ -21,6 +21,11 @@ type("DateTimeSelector", ["RealtimeTextBox"],
              }
          },
 
+         draw: function() {
+             this.enableEvent();
+             return this.IWidget.prototype.draw.call(this, this.tab);
+         },
+
          set: function(value, direct) {
              // let the programmer choose if for some reason
              // conversion should be bypassed
@@ -56,8 +61,9 @@ type("DateTimeSelector", ["RealtimeTextBox"],
          this.displayFormat = format || IndicoDateTimeFormats.Default;
          this.RealtimeTextBox(args);
 
-         this.input.dom.style.width = '140px';
-
+         this.input;
+         this.trigger = Html.img({src: imageSrc("calendarWidget")});
+         this.tab = Html.div("dateField", this.input, this.trigger);
          var self = this;
 
          this.observe(function() {
@@ -67,9 +73,11 @@ type("DateTimeSelector", ["RealtimeTextBox"],
          // set up the calendar widget to appear on click
          var cal = Calendar.setup({
              inputField: this.input.dom,
+             button: this.trigger.dom,
              eventName: "click",
              ifFormat: this.displayFormat,
              showsTime: true,
+             align: "Bl",
              // notify the selector each time a new date/time is set
              // (since onkeydown/onkeyup won't be called)
              onUpdate: function() { self.notifyChange(); }

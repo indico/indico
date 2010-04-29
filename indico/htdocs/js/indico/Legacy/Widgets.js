@@ -832,8 +832,9 @@ IndicoUI.Widgets = {
          * Adds a calendar widget to a text input element.
          * @param {XElement} elem The input element
          * @param {Boolean} showTime true to show hours and minutes, false for only date
-         * @hiddenFields {Array or String} An array of 5 field ids where the day/month/year/hours/minutes will be written,
-         *                                 or a single element id where the full string will be put.
+         * @param {Array or String} hiddenFields An array of 5 field ids where the day/month/year/hours/minutes will be written,
+         *                                       or a single element id where the full string will be put.
+         * @param {XElement} trigger Input element triggering calendar (optional).
          */
         input2dateField: function(elem, showTime, hiddenFields, trigger) {
             if (showTime === undefined) {
@@ -882,13 +883,16 @@ IndicoUI.Widgets = {
                 format = "%d/%m/%Y";
             }
 
-            var cal = Calendar.setup({
+            Calendar.setup({
                 inputField: elem.dom,
                 button: trigger == undefined ? elem.dom : trigger.dom,
+                displayArea: elem,
+                align: "Bl",
                 eventName: "click",
                 ifFormat: format,
                 showsTime: showTime
             });
+
         },
 
         /**
@@ -904,37 +908,47 @@ IndicoUI.Widgets = {
          * For this, it uses input2dateField.
          * @param {Boolean} showTime true to show hours and minutes, false for only date
          * @param {Object} attributes An object / dictionary with the attributes of the returned element.
-         * @hiddenFields {Array or String} An array of 5 field ids where the day/month/year/hours/minutes will be written,
-         *                                 or a single element id where the full string will be put.
+         * @param {Array or String} hiddenFields An array of 5 field ids where the day/month/year/hours/minutes will be written,
+         *                                       or a single element id where the full string will be put.
+         * @param {Dictionary} elemInfo Additional parameters attached to the input element (optional).
          * @return {XElement} The text input field with the calendar attached.
          */
-        dateField: function(showTime, attributes, hiddenFields){
+        dateField: function(showTime, attributes, hiddenFields, elemInfo){
             attributes = attributes || {};
-            var elem = Html.input("text",{},attributes);
+            elemInfo = elemInfo || {};
+            var elem = Html.input("text",elemInfo,attributes);
             var trigger = Html.img({src: imageSrc("calendarWidget")});
-            IndicoUI.Widgets.Generic.input2dateField(elem, showTime, hiddenFields, trigger);
             var tab = Html.div("dateField", elem, trigger);
-            tab.set = function(string)
-            {
+
+            IndicoUI.Widgets.Generic.input2dateField(elem, showTime, hiddenFields, trigger);
+
+            elem.set("");
+            //Redirecting method invocation from 'tab' to 'elem'
+            tab.set = function(string){
                 elem.set(string);
-            }
+            };
+            tab.get = function(){
+                return elem.get();
+            };
+            tab.observe = function(fun){
+                elem.observe(fun);
+            };
+            tab.dom.onchange = function(){
+                elem.dom.onchange();
+            };
             tab.processDate = elem.processDate;
 
             return tab;
-      },
+        },
+
         dateField_sdate: function(showTime, attributes, hiddenFields){
-            attributes = attributes || {};
-            var elem = Html.input("text",{'id':'sdate', 'name':'sdate'},attributes);
-            IndicoUI.Widgets.Generic.input2dateField(elem, showTime, hiddenFields);
-            return elem;
+            return IndicoUI.Widgets.Generic.dateField(showTime, attributes, hiddenFields, {'id':'edate', 'name':'sdate'});
         },
 
         dateField_edate: function(showTime, attributes, hiddenFields){
-            attributes = attributes || {};
-            var elem = Html.input("text",{'id':'edate', 'name':'edate'},attributes);
-            IndicoUI.Widgets.Generic.input2dateField(elem, showTime, hiddenFields);
-            return elem;
+            return IndicoUI.Widgets.Generic.dateField(showTime, attributes, hiddenFields, {'id':'edate', 'name':'edate'});
         },
+
         timeField: function(attributes, hiddenFields){
             attributes = attributes || {};
             var elem = Html.input("text",attributes);
