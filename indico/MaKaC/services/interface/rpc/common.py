@@ -1,8 +1,12 @@
 from MaKaC.common.PickleJar import Retrieves
 import sys
 import traceback
+from MaKaC.common.fossilize import Fossilizable, fossilizes
+from MaKaC.fossils.error import ICausedErrorFossil
 
-class CausedError(Exception):
+class CausedError(Exception, Fossilizable):
+    fossilizes(ICausedErrorFossil)
+
     def __init__(self, code, message, inner=None, type=None):
         self.code = code
         self.message = message

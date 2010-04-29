@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: pages.py,v 1.7 2009/04/28 14:07:40 dmartinc Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -24,12 +23,14 @@ from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase,\
 from MaKaC.common.utils import formatDateTime, validIP
 from MaKaC.webinterface.common.tools import strip_ml_tags, unescape_html
 from MaKaC.plugins.Collaboration.CERNMCU.common import getCERNMCUOptionValueByName,\
-    RoomWithH323
+    RoomWithH323, getMinStartDate, getMaxEndDate
 from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
 from MaKaC.errors import MaKaCError
 from MaKaC.common.logger import Logger
 from MaKaC.common import info
 from MaKaC.i18n import _
+from MaKaC.webinterface.pages.collaboration import WAdvancedTabBase
+from datetime import timedelta
 
 class WNewBookingForm(WCSPageTemplateBase):
 
@@ -38,20 +39,28 @@ class WNewBookingForm(WCSPageTemplateBase):
 
         vars["EventTitle"] = self._conf.getTitle()
         vars["EventDescription"] = unescape_html(strip_ml_tags( self._conf.getDescription())).strip()
-        vars["DefaultStartDate"] = formatDateTime(self._conf.getAdjustedStartDate())
-        vars["DefaultEndDate"] = formatDateTime(self._conf.getAdjustedEndDate())
+        vars["DefaultStartDate"] = formatDateTime(self._conf.getAdjustedStartDate() - timedelta(0, 0, 0, 0, getCERNMCUOptionValueByName("defaultMinutesBefore")))
+        vars["DefaultEndDate"] = formatDateTime(self._conf.getAdjustedEndDate() + timedelta(0, 0, 0, 0, getCERNMCUOptionValueByName("defaultMinutesAfter")))
         vars["MinStartDate"] = formatDateTime(self._conf.getAdjustedStartDate())
         vars["MaxEndDate"] = formatDateTime(self._conf.getAdjustedEndDate())
 
         return vars
+
+class WAdvancedTab(WAdvancedTabBase):
+
+    def getVars(self):
+        variables = WAdvancedTabBase.getVars(self)
+        return variables
 
 class WMain (WJSBase):
 
     def getVars(self):
         vars = WJSBase.getVars( self )
 
-        vars["MinStartDate"] = formatDateTime(self._conf.getAdjustedStartDate())
-        vars["MaxEndDate"] = formatDateTime(self._conf.getAdjustedEndDate())
+        vars["MinStartDate"] = formatDateTime(getMinStartDate(self._conf))
+        vars["MaxEndDate"] = formatDateTime(getMaxEndDate(self._conf))
+        vars["ExtraMinutesBefore"] = getCERNMCUOptionValueByName("extraMinutesBefore")
+        vars["ExtraMinutesAfter"] = getCERNMCUOptionValueByName("extraMinutesAfter")
 
         # Code to retrieve the event's location and room in order to include the event's room
         # as an initial participant
@@ -60,9 +69,9 @@ class WMain (WJSBase):
         if location and room and location.getName() and room.getName() and location.getName().strip() and room.getName().strip():
             locationName = location.getName()
             roomName = room.getName()
-            
+
             vars["IncludeInitialRoom"] = True
-            vars["IPRetrievalResult"] = -1 # 0 = OK, 1 = room without H323 IP, 2 = room with invalid H323 IP, 3 = connection to RB problem, 4 = another unknown problem 
+            vars["IPRetrievalResult"] = -1 # 0 = OK, 1 = room without H323 IP, 2 = room with invalid H323 IP, 3 = connection to RB problem, 4 = another unknown problem
             vars["InitialRoomName"] = roomName
             if self._conf.getLocation():
                 vars["InitialRoomInstitution"] = locationName
@@ -81,7 +90,7 @@ class WMain (WJSBase):
 
                     try:
                         returnedRooms = CrossLocationQueries.getRooms( location = locationName, roomName = roomName )
-    
+
                         if isinstance(returnedRooms, list):
                             if len(returnedRooms) == 0:
                                 returnedRoom = None
@@ -89,21 +98,27 @@ class WMain (WJSBase):
                                 returnedRoom = returnedRooms[0]
                         else:
                             returnedRoom = returnedRooms
-    
-                        if (returnedRoom != None) and (attName in returnedRoom.customAtts):
-    
-                            initialRoomIp = returnedRoom.customAtts[attName]
-                            if (initialRoomIp.strip() == ""):
-                                vars["IPRetrievalResult"] = 1
-                            elif not validIP(initialRoomIp):
-                                vars["IPRetrievalResult"] = 2
+
+                        if returnedRoom != None:
+                            vars["InitialRoomName"] = returnedRoom.getFullName()
+                            if attName in returnedRoom.customAtts:
+                                initialRoomIp = returnedRoom.customAtts[attName]
+                                if (initialRoomIp.strip() == ""):
+                                    initialRoomIp = "Please enter IP."
+                                    vars["IPRetrievalResult"] = 1
+                                elif not validIP(initialRoomIp):
+                                    vars["IPRetrievalResult"] = 2
+                                else:
+                                    vars["IPRetrievalResult"] = 0
+
                             else:
-                                vars["IPRetrievalResult"] = 0
-    
+                                initialRoomIp = "IP not defined for this room."
+                                vars["IPRetrievalResult"] = 1
+
                         else:
-                            initialRoomIp = "IP not defined for this room."
-                            vars["IPRetrievalResult"] = 2
-                            
+                            initialRoomIp = "Please enter IP."
+                            vars["IPRetrievalResult"] = 1
+
                     except AttributeError:
                         #CrossLocationQueries.getRooms fails because it does not handle location names that are not in the DB
                         initialRoomIp = "Please enter IP"
@@ -150,10 +165,12 @@ class WExtra (WJSBase):
     def getVars(self):
         vars = WJSBase.getVars( self )
 
+        vars["ConferenceId"] = self._conf.getId()
+
         roomsWithH323IP = []
 
         if self._conf:
-            
+
             # Code to get a list of H.323 Videoconference-able rooms
             # by querying Indico's RB database
             location = self._conf.getLocation()
@@ -180,10 +197,10 @@ class WExtra (WJSBase):
                                     returnedRooms = [returnedRooms]
                                 else:
                                     returnedRooms = []
-    
+
                             for room in returnedRooms:
-                                roomsWithH323IP.append(RoomWithH323(locationName, room._getName(), room.customAtts[attName]))
-                                
+                                roomsWithH323IP.append(RoomWithH323(locationName, room.getFullName(), room.customAtts[attName]))
+
                         except AttributeError:
                             #CrossLocationQueries.getRooms fails because it does not handle location names that are not in the DB
                             pass
@@ -195,6 +212,7 @@ class WExtra (WJSBase):
                 except Exception, e:
                     Logger.get("CERNMCU").warning("Location: " + locationName + "Exception when retrieving the list of all rooms with a H323 IP: " + str(e))
 
+        roomsWithH323IP.sort(key = lambda room: room.getLocation()+':'+room.getName())
         vars["RoomsWithH323IP"] = roomsWithH323IP
         return vars
 
@@ -225,17 +243,31 @@ class XMLGenerator(object):
 
     @classmethod
     def getDisplayName(cls):
-        return "MCU"
+        return "MCU Conference"
+
+    @classmethod
+    def getFirstLineInfo(cls, booking, displayTz):
+        return None
 
     @classmethod
     def getCustomBookingXML(cls, booking, displayTz, out):
 
         out.openTag("information")
 
+        out.openTag("section")
+        out.writeTag("title", _('Name:'))
+        out.writeTag("line", booking._bookingParams["name"])
+        out.closeTag("section")
+
         if booking.getHasPin():
             out.openTag("section")
-            out.writeTag("title", _('Protection:'))
-            out.writeTag("line", _('This conference is protected by a PIN'))
+            out.writeTag("title", _('PIN:'))
+
+            if booking.getBookingParamByName("displayPin"):
+                out.writeTag("line", str(booking.getPin()))
+            else:
+                out.writeTag("line", _('This conference is protected by a PIN.'))
+
             out.closeTag("section")
 
         out.openTag("section")

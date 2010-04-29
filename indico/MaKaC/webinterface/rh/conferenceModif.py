@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: conferenceModif.py,v 1.202 2009/06/11 18:42:45 cangelov Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -203,7 +202,7 @@ class RHConferenceModifKey( RHConferenceModifBase ):
 #        else:
 #            url = urlHandlers.UHConferenceModification.getURL( self._conf )
         else:
-            url = urlHandlers.UHConferenceModification.getURL( self._conf )
+            url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
         self._redirect( url )
 
 class RHConferenceModifManagementAccess( RHConferenceModifKey ):
@@ -245,7 +244,8 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
         elif self._isReferee:
             url = urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf )
         elif self._isVideoServicesManagerOrAdmin:
-            url = urlHandlers.UHConfModifCollaboration.getURL(self._conf)
+            from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
+            url = urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = CollaborationTools.isUsingHTTPS())
 
         else:
             url = urlHandlers.UHConfManagementAccess.getURL( self._conf )
@@ -1812,7 +1812,7 @@ class RHConfAddManagers( RHConferenceModifBase ):
 
     def _process( self ):
         params = self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 p = ph.getById( id )
@@ -1848,7 +1848,7 @@ class RHConfAddRegistrars( RHConferenceModifBase ):
 
     def _process( self ):
         params = self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 p = ph.getById( id )
@@ -2196,18 +2196,18 @@ class RHConfModifParticipantsAction(RHConferenceModifBase):
         action = params.get("participantsAction","")
         selectedList = self._normaliseListParam(self._getRequestParams().get("participants",[]))
 
-        if action == "Remove participant" :
+        if action == _("Remove participant") :
             for id in selectedList :
                 self._conf.getParticipation().removeParticipant(id, self._getUser())
-        elif action == "Mark absence" :
+        elif action == _("Mark absence") :
             for id in selectedList :
                 participant = self._conf.getParticipation().getParticipantById(id)
                 participant.setAbsent()
-        elif action == "Mark present":
+        elif action == _("Mark present"):
             for id in selectedList :
                 participant = self._conf.getParticipation().getParticipantById(id)
                 participant.setPresent()
-        elif action == "Ask for excuse" :
+        elif action == _("Ask for excuse") :
             data = self._conf.getParticipation().prepareAskForExcuse(self._getUser(), selectedList)
             if data is not None :
                 params["emailto"] = ", ".join(data["toList"])
@@ -2232,13 +2232,13 @@ class RHConfModifParticipantsAction(RHConferenceModifBase):
                     errorList.append( _("""One of the error situations listed below occured :"""))
                     errorList.append( _(""" - None of the selected participants was absent in the event"""))
                     errorList.append( _(""" - None of the selected participants has an email address specified"""))
-        elif action == "Excuse absence" :
+        elif action == _("Excuse absence") :
             for id in selectedList :
                 participant = self._conf.getParticipation().getParticipantById(id)
                 if not participant.setStatusExcused() and participant.isPresent() :
                     errorList.append( _("""You cannot excuse absence of %s %s %s - this participant was present
                     in the event""")%(participant.getTitle(), participant.getFirstName(), participant.getFamilyName()))
-        elif action == "Send email to" :
+        elif action == _("Send email to") :
             toList = []
             for id in selectedList :
                 participant = self._conf.getParticipation().getParticipantById(id)
@@ -2248,7 +2248,7 @@ class RHConfModifParticipantsAction(RHConferenceModifBase):
             params["fromDisabled"] = True
             p = conferences.WPConfModifParticipantsEMail( self, self._target )
             return p.display(**params)
-        elif action == "Export to Excel" :
+        elif action == _("Export to Excel") :
             toList = []
             if selectedList == []:
                 toList = self._conf.getParticipation().getParticipantList()
@@ -2265,7 +2265,7 @@ class RHConfModifParticipantsAction(RHConferenceModifBase):
             self._req.content_type = """%s"""%(mimetype)
             self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
             return data
-        elif action == "Inform about adding" :
+        elif action == _("Inform about adding") :
             selected = []
             for id in selectedList :
                 selected.append(self._conf.getParticipation().getParticipantById(id))
@@ -2927,7 +2927,7 @@ class RHConfPerformCloning( RHConferenceModifBase ):
             elif self._cloneType == "days" :
                 self._days(options)
             else :
-                self._redirect( urlHandlers.UHConfModifTools.getURL( self._conf ) )
+                self._redirect( urlHandlers.UHConfClone.getURL( self._conf ) )
         else:
             if self._cloneType == "once" :
                 nbClones = 1
@@ -2945,7 +2945,7 @@ class RHConfPerformCloning( RHConferenceModifBase ):
         elif params["freq"] == "week":
             inter = timedelta( 7*int(params["period"]))
 
-        if params["func"] == "until":
+        if params["intEndDateChoice"] == "until":
             date=self._date
             endDate = datetime(int(params["stdyi"]),int(params["stdmi"]),int(params["stddi"]), self._conf.getEndDate().hour,self._conf.getEndDate().minute)
             while date <= endDate:
@@ -2964,9 +2964,8 @@ class RHConfPerformCloning( RHConferenceModifBase ):
                 elif params["freq"] == "year":
                     date = datetime(int(date.year)+int(params["period"]),int(date.month),int(date.day), int(date.hour), int(date.minute))
 
-        elif params["func"] == "ntimes":
+        elif params["intEndDateChoice"] == "ntimes":
             date = self._date
-            endDate = datetime(int(params["stdyi"]),int(params["stdmi"]),int(params["stddi"]),self._conf.getEndDate().hour,self._conf.getEndDate().minute)
             i=0
             stop = int(params["numi"])
             while i < stop:
@@ -2986,7 +2985,7 @@ class RHConfPerformCloning( RHConferenceModifBase ):
                 elif params["freq"] == "year":
                     date = datetime(int(date.year)+int(params["period"]),int(date.month),int(date.day), int(date.hour), int(date.minute))
         if confirmed:
-            self._redirect( urlHandlers.UHConfModifTools.getURL( self._conf ) )
+            self._redirect( urlHandlers.UHCategoryDisplay.getURL( self._conf.getOwner() ) )
             return "done"
         else:
             return nbClones
@@ -3039,13 +3038,12 @@ class RHConfPerformCloning( RHConferenceModifBase ):
         nbClones = 0
         params = self._getRequestParams()
         #search the first day of the month
-        startDate = self._date
 
         if params["day"] == "NOVAL":
             #self._endRequest()
-            self.redirect( WPConferenceClone.getURL( self._target ) )
+            self.redirect( urlHandlers.UHConfClone.getURL( self._target ) )
 
-        if params["func"] == "until":
+        if params["daysEndDateChoice"] == "until":
             date = self._date
 
             endDate = datetime(int(params["stdyd"]),int(params["stdmd"]),int(params["stddd"]),self._conf.getEndDate().hour,self._conf.getEndDate().minute)
@@ -3086,7 +3084,7 @@ class RHConfPerformCloning( RHConferenceModifBase ):
                     year = year + 1
                 date = datetime(year,month,1, int(date.hour), int(date.minute))
 
-        elif params["func"] == "ntimes":
+        elif params["daysEndDateChoice"] == "ntimes":
 
             date = self._date
             if params["day"] == "OpenDay":
@@ -3125,7 +3123,7 @@ class RHConfPerformCloning( RHConferenceModifBase ):
                     year = year + 1
                 date = datetime(year,month,int(date.day), int(date.hour), int(date.minute))
         if confirmed:
-            self._redirect( urlHandlers.UHConfModifTools.getURL( self._conf ) )
+            self._redirect( urlHandlers.UHCategoryDisplay.getURL( self._conf.getOwner() ) )
         else:
             return nbClones
 
@@ -3558,6 +3556,7 @@ class RHCFANotifTplNew(RHConfModifCFABase):
         self._ccList=params.get("CCAddrs","").split(",")
         self._cancel=params.get("cancel", None)
         self._save=params.get("save", None)
+        self._tplCondition = params.get("condType", None)
 
     def _process(self):
         error = []
@@ -3567,6 +3566,9 @@ class RHCFANotifTplNew(RHConfModifCFABase):
         elif self._save:
             if len(self._toList)<=0:
                 error.append( _("""At least one "To Address" must be selected"""))
+            elif self._tplCondition is None:
+                #TODO: translate
+                error.append( _("Choose a condition"))
             else:
                 tpl=review.NotificationTemplate()
                 tpl.setName(self._title)
@@ -3580,7 +3582,9 @@ class RHCFANotifTplNew(RHConfModifCFABase):
                     if toAddrWrapper:
                         toAddrWrapper.addToAddr(tpl)
                 self._conf.getAbstractMgr().addNotificationTpl(tpl)
-                self._redirect(urlHandlers.UHConfModifCFA.getURL(self._conf))
+                url = urlHandlers.UHConfModNotifTplConditionNew.getURL(tpl)
+                url.addParams({"condType":self._tplCondition})
+                self._redirect(url)
                 return
         p=conferences.WPModCFANotifTplNew(self,self._target)
         return p.display(title=self._title,\
@@ -3755,7 +3759,7 @@ class RHConfModifCFAAddSubmitter(RHConfModifCFABase):
 
     def _process( self ):
         params = self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 if id:
@@ -3909,12 +3913,12 @@ class AbstractStatusFilter( filters.FilterField ):
     _id = "status"
 
     def satisfies( self, abstract ):
-        status = AbstractStatusList().getId( abstract.getCurrentStatus().__class__ )
+        status = AbstractStatusList.getInstance().getId( abstract.getCurrentStatus().__class__ )
         return status in self._values
 
     def needsToBeApplied(self):
         for s in AbstractStatusList.getStatusList():
-            if AbstractStatusList().getId(s) not in self._values:
+            if AbstractStatusList.getInstance().getId(s) not in self._values:
                 return True
         return False
 
@@ -3943,8 +3947,8 @@ class _AbstractStatusSF( filters.SortingField ):
         a1Stat, a2Stat = a1.getCurrentStatus(), a2.getCurrentStatus()
         if a1Stat == a2Stat:
             return 0
-        a1StatLabel = AbstractStatusList().getCaption( a1Stat.__class__ )
-        a2StatLabel = AbstractStatusList().getCaption( a2Stat.__class__ )
+        a1StatLabel = AbstractStatusList.getInstance().getCaption( a1Stat.__class__ )
+        a2StatLabel = AbstractStatusList.getInstance().getCaption( a2Stat.__class__ )
         return cmp( a1StatLabel, a2StatLabel )
 
 
@@ -4067,7 +4071,7 @@ class RHAbstractList(RHConfModifCFABase):
         if not filterUsed:
             for track in self._conf.getTrackList():
                 ltracks.append( track.getId() )
-        filter["track"] = dict.get("selTracks", ltracks)
+        filter["track"] = utils.normalizeToList(dict.get("selTracks", ltracks))
         ltypes = []
         if not filterUsed:
             for type in self._conf.getContribTypeList():
@@ -4078,10 +4082,10 @@ class RHAbstractList(RHConfModifCFABase):
         filter["type"] = ltypes
         lstatus = []
         if not filterUsed:
-            for status in AbstractStatusList().getStatusList():
-                lstatus.append( AbstractStatusList().getId( status ) )
-        filter["status"] = dict.get("selStatus", lstatus)
-        filter["acc_track"]=dict.get("selAccTracks",ltracks)
+            for status in AbstractStatusList.getInstance().getStatusList():
+                lstatus.append( AbstractStatusList.getInstance().getId( status ) )
+        filter["status"] = utils.normalizeToList(dict.get("selStatus", lstatus))
+        filter["acc_track"] = utils.normalizeToList(dict.get("selAccTracks",ltracks))
         ltypes = []
         if not filterUsed:
             for type in self._conf.getContribTypeList():
@@ -4207,7 +4211,7 @@ class RHAbstractsMerge(RHConfModifCFABase):
                                             review.AbstractStatusWithdrawn,\
                                             review.AbstractStatusDuplicated,\
                                             review.AbstractStatusMerged):
-                            label=AbstractStatusList().getCaption(statusKlass)
+                            label=AbstractStatusList.getInstance().getCaption(statusKlass)
                             errorList.append( _("ABSTRACT TO BE MERGED %s is in status which does not allow to merge (%s)")%(abs.getId(),label.upper()))
                         self._abstracts.append(abs)
             if self._targetAbsId=="":
@@ -4225,7 +4229,7 @@ class RHAbstractsMerge(RHConfModifCFABase):
                                         review.AbstractStatusWithdrawn,\
                                         review.AbstractStatusMerged,\
                                         review.AbstractStatusDuplicated):
-                        label=AbstractStatusList().getCaption(statusKlass)
+                        label=AbstractStatusList.getInstance().getInstance().getCaption(statusKlass)
                         errorList.append( _("TARGET ABSTRACT is in status which does not allow to merge (%s)")%label.upper())
             if len(errorList)==0:
                 for abs in self._abstracts:
@@ -6992,7 +6996,7 @@ class RHConfModifAddChairs(RHConferenceModifBase):
 
     def _process( self ):
         params = self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ah = user.AvatarHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 av=ah.getById( id )
@@ -7041,11 +7045,13 @@ class RHReschedule(RHConferenceModifBase):
         self._hour=params.get("hour","")
         self._minute=params.get("minute","")
         self._action=params.get("action","duration")
-        self._targetDay=params.get("targetDay",None)
+        self._targetDay=params.get("targetDay",None) #comes in format YYYYMMDD, ex: 20100317
         if self._targetDay is None:
             raise MaKaCError( _("Error while rescheduling timetable: not target day"))
         else:
-            self._day=timezone(self._conf.getTimezone()).localize(datetime(int(params["targetDay"][0:4]),int(params["targetDay"][5:7]),int(params["targetDay"][8:])))
+            self._day=timezone(self._conf.getTimezone()).localize(datetime(int(params["targetDay"][0:4]),
+                                                                           int(params["targetDay"][4:6]),
+                                                                           int(params["targetDay"][6:8])))
         if self._ok:
             if self._hour.strip() == "" or self._minute.strip() == "":
                 raise FormValuesError( _("Please write the time with the format HH:MM. For instance, 00:05 to indicate 'O hours' and '5 minutes'"))
@@ -7532,7 +7538,7 @@ class RHConfBadgePrinting(RHConferenceModifBase):
                     filePaths = self._getSession().getVar(key)
                     if filePaths != None:
                         cfg = Config.getInstance()
-                        tempPath = cfg.getXMLCacheDir()
+                        tempPath = cfg.getUploadedFilesSharedTempDir()
                         for filePath in filePaths:
                             self._target.getBadgeTemplateManager().getTemplateById(self.__templateId).addTempBackgroundFilePath(filePath)
                             self._tempFilesToDelete.append(os.path.join(tempPath, filePath))
@@ -7716,7 +7722,7 @@ class RHConfBadgeSaveTempBackground(RHConferenceModifBase):
 
     def _getNewTempFile( self ):
         cfg = Config.getInstance()
-        tempPath = cfg.getUploadedFilesTempDir()
+        tempPath = cfg.getUploadedFilesSharedTempDir()
         tempFileName = tempfile.mkstemp( suffix="IndicoBadgeBG.tmp", dir = tempPath )[1]
         return tempFileName
 
@@ -7805,7 +7811,7 @@ class RHConfBadgeGetBackground(RHConferenceModifBase):
             return p
         else:
             cfg = Config.getInstance()
-            tempPath = cfg.getUploadedFilesTempDir()
+            tempPath = cfg.getUploadedFilesSharedTempDir()
             if self._conf.getBadgeTemplateManager().hasTemplate(self.__templateId):
                 isArchived, image = self._conf.getBadgeTemplateManager().getTemplateById(self.__templateId).getBackground(self.__backgroundId)
                 if image is not None:
@@ -7981,7 +7987,7 @@ class RHConfPosterSaveTempBackground(RHConferenceModifBase):
 
     def _getNewTempFile( self ):
         cfg = Config.getInstance()
-        tempPath = cfg.getUploadedFilesTempDir()
+        tempPath = cfg.getUploadedFilesSharedTempDir()
         tempFileName = tempfile.mkstemp( suffix="IndicoPosterBG.tmp", dir = tempPath )[1]
         return tempFileName
 
@@ -7990,7 +7996,7 @@ class RHConfPosterSaveTempBackground(RHConferenceModifBase):
         f = open( fileName, "wb" )
         f.write( fd.read() )
         f.close()
-        return fileName
+        return os.path.split(fileName)[-1]
 
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
@@ -7999,9 +8005,9 @@ class RHConfPosterSaveTempBackground(RHConferenceModifBase):
         self._bgPosition = params.get("bgPosition",None)
 
         try:
-          self._tempFilePath = self._saveFileToTemp( params["file"].file )
+            self._tempFilePath = self._saveFileToTemp( params["file"].file )
         except AttributeError:
-          self._tempFilePath = None
+            self._tempFilePath = None
 
     def _process(self):
 
@@ -8084,6 +8090,8 @@ class RHConfPosterGetBackground(RHConferenceModifBase):
             p = conferences.WPConferenceModificationClosed( self, self._target )
             return p
         else:
+            cfg = Config.getInstance()
+            tempPath = cfg.getUploadedFilesSharedTempDir()
 
             if self._conf.getPosterTemplateManager().hasTemplate(self.__templateId):
 
@@ -8093,11 +8101,12 @@ class RHConfPosterGetBackground(RHConferenceModifBase):
                     if isArchived:
                         return self.__imageBin(image)
                     else:
+                        image = os.path.join(tempPath,image)
                         return self.__fileBin(image)
 
             else:
                 key = "tempBackground", self._conf.id, self.__templateId
 
-                filePath = self._getSession().getVar(key) [ int(self.__backgroundId) ][0]
+                filePath = os.path.join(tempPath, self._getSession().getVar(key) [ int(self.__backgroundId) ][0])
                 return self.__fileBin(filePath)
 

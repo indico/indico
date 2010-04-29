@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: rb_reservation.py,v 1.14 2009/05/14 18:05:51 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -37,9 +36,9 @@ class RepeatabilityEnum( object ):
     """
     Enumeration - types of repetition.
     """
-    daily, onceAWeek, onceEvery2Weeks, onceEvery3Weeks, onceAMonth = range( 5 )    
+    daily, onceAWeek, onceEvery2Weeks, onceEvery3Weeks, onceAMonth = range( 5 )
     # How many days are between consequent repeatings
-    rep2diff = { 
+    rep2diff = {
         daily: 1,
         onceAWeek: 7,
         onceEvery2Weeks: 14,
@@ -77,21 +76,21 @@ NOTIFICATION_SUBJECT_PREFIX = "[CRBS] "
 EMAIL_FOR_CATCH_ALL_NOTIFICATIONS = ""
 
 class ReservationBase( object ):
-    """ 
-    Generic reservation, Data Access Layer independant. 
+    """
+    Generic reservation, Data Access Layer independant.
     Represents physical room reservation.
     """
-    
+
     # !=> Properties are in the end of class definition
 
     # Management -------------------------------------------------------------
-    
+
     def __init__( self ):
         """
         Do NOT insert object into database in the constructor.
         """
         pass
-    
+
     def insert( self ):
         """
         Inserts reservation into database (SQL: INSERT).
@@ -101,7 +100,7 @@ class ReservationBase( object ):
         if self.startDT.date() == self.endDT.date():
             self.repeatability = None
         self.checkIntegrity()
-    
+
     def update( self ):
         """
         Updates reservation in database (SQL: UPDATE)
@@ -109,14 +108,14 @@ class ReservationBase( object ):
         if self.startDT.date() == self.endDT.date():
             self.repeatability = None
         self.checkIntegrity()
-    
+
     def remove( self ):
         """
         Removes reservation from database (SQL: DELETE)
         """
         pass
 
-    def cancel( self ): 
+    def cancel( self ):
         """
         FINAL (not intented to be overriden)
         When user cancels reservation.
@@ -148,10 +147,10 @@ class ReservationBase( object ):
             if self.contactEmail != None and self.contactEmail != "":
                 to2 = self.contactEmail
             if self.isConfirmed:
-                subject = NOTIFICATION_SUBJECT_PREFIX + "You have booked " + self.room.name + " on " + formatDateTime(self.startDT)
+                subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] You have made a New Booking on " + formatDateTime(self.startDT)
                 wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingInsertion' )
             else:
-                subject = NOTIFICATION_SUBJECT_PREFIX + "Your PRE-Booking Waits for Acceptance"
+                subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Your PRE-Booking waits for Acceptance"
                 wc = WTemplated( 'RoomBookingEmail_2UserAfterPreBookingInsertion' )
             text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self } )
             fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -163,23 +162,23 @@ class ReservationBase( object ):
                 if to2 != "" and to != to2:
                     addrs.append( to2 )
                 if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                    addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS ) 
+                    addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
 
         # ---- Email responsible(s) ----
-        
+
         toMain = self.room.getResponsible().getEmail()
-                
+
         if self.isConfirmed:
-            subject = NOTIFICATION_SUBJECT_PREFIX + "New Booking for " + self.room.name + " on " + formatDateTime(self.startDT)
+            subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] New Booking on " + formatDateTime(self.startDT)
             bookingMessage = "Book"
         else:
-            subject = NOTIFICATION_SUBJECT_PREFIX + "New PRE-Booking for " + self.room.name + " on " + formatDateTime(self.startDT)
+            subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] New PRE-Booking on " + formatDateTime(self.startDT)
             bookingMessage = "PRE-book"
         wc = WTemplated( 'RoomBookingEmail_2ResponsibleAfterBookingInsertion' )
         text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'bookingMessage': bookingMessage } )
-   
+
         fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
         addrs = []
         if debug:
@@ -192,13 +191,13 @@ class ReservationBase( object ):
                 addrs.append(self.room.customAtts.get( 'notification email' ).strip())
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
         emails.append(maildata)
-        
+
         # ---- Email AVC Support ----
-        
+
         if self.isConfirmed  and  self.usesAVC: # Inform only about confirmed bookings
             to = Location.parse( self.locationName ).getAVCSupportEmails()
             if to:
-                subject = NOTIFICATION_SUBJECT_PREFIX + "New Booking for " + self.room.name + " on " + formatDateTime(self.startDT)
+                subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] New Booking on " + formatDateTime(self.startDT)
                 wc = WTemplated( 'RoomBookingEmail_2AVCSupportAfterBookingInsertion' )
                 text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation': self } )
                 fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -238,7 +237,7 @@ class ReservationBase( object ):
 
         if self.createdByUser(): # Imported bookings does not have creator
             to = self.createdByUser().getEmail()
-            subject = NOTIFICATION_SUBJECT_PREFIX + "Cancellation Confirmation for " + self.room.name + " on " + startDate + " %s" % occurrenceText
+            subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Cancellation Confirmation on " + startDate + " %s" % occurrenceText
             wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingCancellation' )
             text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'date':date } )
             fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -251,12 +250,12 @@ class ReservationBase( object ):
                     addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
-        
+
         # ---- Email responsible ----
 
-        toMain = self.room.getResponsible().getEmail()       
-        
-        subject = NOTIFICATION_SUBJECT_PREFIX + "Cancelled Booking for " + self.room.name + " on " + startDate + " %s" % occurrenceText
+        toMain = self.room.getResponsible().getEmail()
+
+        subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Cancelled Booking on " + startDate + " %s" % occurrenceText
         wc = WTemplated( 'RoomBookingEmail_2ResponsibleAfterBookingCancellation' )
         text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'date':date } )
         fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -267,15 +266,17 @@ class ReservationBase( object ):
             addrs.append( toMain )
             if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
                 addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
+            if self.room.customAtts.get( 'notification email', None ):
+                addrs.append(self.room.customAtts.get( 'notification email' ).strip())
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
         emails.append(maildata)
 
         # ---- Email AVC Support ----
-        
+
         if self.isCancelled and self.isConfirmed  and  self.usesAVC: # Inform only about confirmed bookings
             to = Location.parse( self.locationName ).getAVCSupportEmails()
             if to:
-                subject = NOTIFICATION_SUBJECT_PREFIX + "Booking Cancelled for " + self.room.name + " on " + startDate
+                subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Booking Cancelled on " + startDate
                 wc = WTemplated( 'RoomBookingEmail_2AVCSupportAfterBookingCancellation' )
                 text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation': self } )
                 fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -318,7 +319,7 @@ class ReservationBase( object ):
             firstName = "User"
 
         if to:
-            subject = NOTIFICATION_SUBJECT_PREFIX + "REJECTED Booking for " + self.room.name + " on " + startDate
+            subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] REJECTED Booking on " + startDate
             wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingRejection' )
             text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'firstName':firstName, 'reason':reason, 'date':date } )
             fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -332,7 +333,7 @@ class ReservationBase( object ):
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
         return emails
-            
+
     def notifyAboutConfirmation( self ):
         """
         FINAL (not intented to be overriden)
@@ -358,9 +359,9 @@ class ReservationBase( object ):
         else:
             to = self.contactEmail
             firstName = "User"
-        
+
         if to:
-            subject = NOTIFICATION_SUBJECT_PREFIX + "Confirmed Booking for " + self.room.name + " on " + startDate
+            subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Confirmed Booking on " + startDate
             wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingConfirmation' )
             text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'firstName':firstName } )
             fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -375,11 +376,11 @@ class ReservationBase( object ):
             emails.append(maildata)
 
         # ---- Email AVC Support ----
-        
+
         if self.isConfirmed  and  self.usesAVC: # Inform only about confirmed bookings
             to = Location.parse( self.locationName ).getAVCSupportEmails()
             if to:
-                subject = NOTIFICATION_SUBJECT_PREFIX + "New Booking for " + self.room.name + " on " + startDate
+                subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] New Booking on " + startDate
                 wc = WTemplated( 'RoomBookingEmail_2AVCSupportAfterBookingInsertion' )
                 text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation': self } )
                 fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -403,18 +404,18 @@ class ReservationBase( object ):
         from MaKaC.webinterface.wcomponents import WTemplated
         debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
         emails = []
-        
+
         # Fix by David: include date in this mails too. I have put a try...except in case the date is not accessible in this method
         try:
             startDate = formatDateTime(self.startDT)
         except:
             startDate = ""
-        
+
         # ---- Email user ----
 
         if self.createdByUser(): # Imported bookings does not have creator
             to = self.createdByUser().getEmail()
-            subject = NOTIFICATION_SUBJECT_PREFIX + "Booking Modified for " + self.room.name + " on " + startDate
+            subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Booking Modified on " + startDate
             wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingModification' )
             text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self } )
             fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -427,12 +428,12 @@ class ReservationBase( object ):
                     addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
-        
+
         # ---- Email responsible ----
-        
+
         toMain = self.room.getResponsible().getEmail()
-        
-        subject = NOTIFICATION_SUBJECT_PREFIX + "Booking Modified for " + self.room.name + " on " + startDate
+
+        subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Booking Modified on " + startDate
         wc = WTemplated( 'RoomBookingEmail_2ResponsibleAfterBookingModification' )
         text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self } )
         fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -443,15 +444,17 @@ class ReservationBase( object ):
             addrs.append( toMain )
             if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
                 addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
+            if self.room.customAtts.get( 'notification email', None ):
+                addrs.append(self.room.customAtts.get( 'notification email' ).strip())
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
         emails.append(maildata)
-        
+
         # ---- Email AVC Support ----
-        
+
         if self.isConfirmed  and  self.usesAVC: # Inform only about confirmed bookings
             to = Location.parse( self.locationName ).getAVCSupportEmails()
             if to:
-                subject = NOTIFICATION_SUBJECT_PREFIX + "Modified booking for " + self.room.name + " on " + startDate
+                subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Modified booking on " + startDate
                 wc = WTemplated( 'RoomBookingEmail_2AVCSupportAfterBookingModification' )
                 text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation': self } )
                 fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -464,20 +467,20 @@ class ReservationBase( object ):
                         addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
                 maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
                 emails.append(maildata)
-        
+
         return emails
 
     def requestProlongation( self ):
         """
         FINAL (not intented to be overriden)
-        Heavy reservations require user confirmation every x weeks. 
+        Heavy reservations require user confirmation every x weeks.
         This method sends user an e-mail, asking him to confirm (prolong)
         the reservation for the next x weeks.
         """
         from MaKaC.webinterface.wcomponents import WTemplated
         debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
         emails = []
-        
+
         # Fix by David: include date in this mails too. I have put a try...except in case the date is not accessible in this method
         try:
             startDate = formatDateTime(self.startDT)
@@ -487,7 +490,7 @@ class ReservationBase( object ):
         # ---- Email user ----
         if self.createdByUser(): # Imported bookings does not have creator
             to = self.createdByUser().getEmail()
-            subject = NOTIFICATION_SUBJECT_PREFIX + "Request for Booking Prolongation for " + self.room.name + " on " + startDate
+            subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Request for Booking Prolongation on " + startDate
             wc = WTemplated( 'RoomBookingEmail_2UserRequestProlongation' )
             text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self } )
             fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -505,7 +508,7 @@ class ReservationBase( object ):
     def notifyAboutLackOfProlongation( self ):
         """
         FINAL (not intented to be overriden)
-        Notifies (e-mails) responsible that user 
+        Notifies (e-mails) responsible that user
         did not prolong his HEAVY booking.
         """
         from MaKaC.webinterface.wcomponents import WTemplated
@@ -513,10 +516,10 @@ class ReservationBase( object ):
         emails = []
 
         # ---- Email responsible ----
-        
+
         toMain = self.room.getResponsible().getEmail()
-                
-        subject = NOTIFICATION_SUBJECT_PREFIX + "Consider Rejecting This Booking"
+
+        subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Consider Rejecting This Booking"
         wc = WTemplated( 'RoomBookingEmail_2ResponsibleConsiderRejecting' )
         text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self } )
         fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -527,6 +530,8 @@ class ReservationBase( object ):
             addrs.append( toMain )
             if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
                 addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
+            if self.room.customAtts.get( 'notification email', None ):
+                addrs.append(self.room.customAtts.get( 'notification email' ).strip())
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
         emails.append(maildata)
         return emails
@@ -535,31 +540,31 @@ class ReservationBase( object ):
 
     @staticmethod
     def getReservations( *args, **kwargs ):
-        """ 
+        """
         Generic, universal query. Returns reservations meeting specified conditions.
 
         It is 'query by example'. You specify conditions by creating
         the object and passing it to the method.
-        
+
         All arguments are optional:
-        
-        resvID - reservation ID 
+
+        resvID - reservation ID
         resvExample - example ReservationBase object
         rooms - _list_ of RoomBase objects
-        
+
         Examples:
 
         # 1. Get all reservations for Dec 2006, booked for Jean
-        
+
         resvEx = ReservationBase()
         resvEx.startDT = datetime( 2006, 12, 1, 0 )     # 2006-12-01 00:00
         resvEx.endDT = datetime( 2006, 12, 31, 23, 59 ) # 2006-12-31 23:59
         resvEx.bookedForName = "Jean"
-        
+
         reservations = ReservationBase.getReservations( resvExample = resvEx )
-        
+
         # 2. Get all reservations of the room "AT AMPHITHEATRE" in Dec 2006
-        
+
         # copy above, then:
         room = RoomBase.getRooms( roomName = 'AT AMPHITHEATRE' )
         reservations = ReservationBase.getReservations( resvExample = resvEx, rooms = [room] )
@@ -571,46 +576,46 @@ class ReservationBase( object ):
     # Time-play: repeatings, overlapings, etc.
 
     def getCollisions( self, sansID = None, rooms = None, boolResult = False ):
-        """ 
+        """
         Returns all collisions with other reservations for the same room,
         or empty list [] if none collisions were found.
-        
+
         Collisions are returned as list of Collision objects.
-        
+
         Reservation having id == sansID is omited (use it to
         skip conflicts with self).
         """
         # IMPLEMENTATION:
-        # 
+        #
         # Reservation is possible if for the given room x,
         # there are no overlaping reservations.
-        
+
         # Reservation may be seen as a group of 1-day periods.
         # For non-repeating reservation, it is exactly one period.
         # For repeating ones, every repeating creates small period (i.e. 4 hours).
-        
+
         # Two reservations does not overlap <=> there are no overlaping periods.
-        
+
         # Therefore every period of r1 must be checked against every period of r2
-        
+
         # 1) Get all reservations that may have impact on the candidate.
         # 2) Split candidate and other reservations into 1-day periods.
         # 3) Check every candidate period against every other period.
         # 4) Remember and return collisions.
-        
+
         if ( rooms == None and self.room == None ) or self.startDT == None or self.endDT == None:
             raise 'room, startDT, endDT fields must not be None'
-        
+
         if rooms == None:
             rooms = [ self.room ]
-        
+
         resvEx = ReservationBase()
         resvEx.startDT = self.startDT
         resvEx.endDT = self.endDT
         resvEx.repeatability = self.repeatability
         resvEx.isRejected = False
         resvEx.isCancelled = False
-        # In general attributes from self cannot be copied to 
+        # In general attributes from self cannot be copied to
         # searching example. Self is i.e. new booking someone tries
         # to insert, so it has all attributes.
         # However, it is safe for isConfirmed == None, because
@@ -624,21 +629,21 @@ class ReservationBase( object ):
 
         from MaKaC.plugins.RoomBooking.CERN.reservationCERN import ReservationCERN
         resvs = ReservationCERN.getReservations( location = self.locationName,
-                                                      resvExample = resvEx, 
-                                                      rooms = rooms, 
+                                                      resvExample = resvEx,
+                                                      rooms = rooms,
                                                       #archival = False,
                                                       days = days )
-            
+
         resvs = filter( lambda r: r.id != sansID, resvs )
-        
+
         collisions = []
         if len( resvs ) == 0:
             return [] # No collisions
-        
+
         potentialColliders = []
         for resv in resvs:
             potentialColliders.append( ( resv, resv.splitToPeriods(endDT=self.endDT) ) )
-            
+
         for r in potentialColliders:
             resv = r[0]
             colliderPeriods = r[1]
@@ -647,17 +652,17 @@ class ReservationBase( object ):
                     if doesPeriodsOverlap( candidatePeriod, colliderPeriod ):
                         if boolResult:
                             # There is at least one collision
-                            return True 
+                            return True
                         else:
                             # Collect collisions
                             collisions.append( Collision( overlap( candidatePeriod, colliderPeriod ), resv ) )
 
         return collisions
-    
-    def getNextRepeating( self, afterDT = None ): 
-        """ 
+
+    def getNextRepeating( self, afterDT = None ):
+        """
         Returns Period of the next repeating (occurence).
-        For non-repeating reservations simply returns 
+        For non-repeating reservations simply returns
         the time of the reservation (also as Period object).
         Returns None if reservation will never repeat after afterDT.
         """
@@ -674,13 +679,13 @@ class ReservationBase( object ):
         if self.repeatability == None:
             if afterDT < self.startDT:
                 return Period( self.startDT, self.endDT )
-            else: 
+            else:
                 return None
-        
+
         # Before first repeating
         if afterDT < self.startDT:
             retEndDT = datetime( self.startDT.year, self.startDT.month, self.startDT.day, self.endDT.hour, self.endDT.minute )
-            
+
             if self.dayIsExcluded( self.startDT.date() ):
                 return self.getNextRepeating( self.startDT )  # Recurrently ask for next
             return Period( self.startDT, retEndDT )
@@ -700,11 +705,11 @@ class ReservationBase( object ):
             # Now it should represent next repeating
             retStartDT = datetime( repCandidateDT.year, repCandidateDT.month, repCandidateDT.day, self.startDT.hour, self.startDT.minute )
             retEndDT = datetime( repCandidateDT.year, repCandidateDT.month, repCandidateDT.day, self.endDT.hour, self.endDT.minute )
-            
+
             if self.dayIsExcluded( retStartDT.date() ):
                 return self.getNextRepeating( retStartDT )  # Recurrently ask for next
             return Period( retStartDT, retEndDT )
-        
+
         # Monthly repeatings
         if self.repeatability == RepeatabilityEnum.onceAMonth:
             # Candidate for next repeating: next day
@@ -724,45 +729,45 @@ class ReservationBase( object ):
             if self.dayIsExcluded( retStartDT.date() ):
                 return self.getNextRepeating( retStartDT )  # Recurrently ask for next
             return Period( retStartDT, retEndDT )
-        
+
         raise 'Unknown repeatability type.'
 
     def overlapsOn( self, startDT, endDT ):
-        """ 
-        Does the reservation overlap on the period (startDT, endDT)? 
-        
-        This method takes repeatings into consideration. 
-        
-        Please note that for repeating reservations, 
+        """
+        Does the reservation overlap on the period (startDT, endDT)?
+
+        This method takes repeatings into consideration.
+
+        Please note that for repeating reservations,
         startDate and endDate DOES NOT imply the overlaping.
-        
-        It is necessary to compute whether specific repeating 
+
+        It is necessary to compute whether specific repeating
         will fall into the requested period. This computation
-        must include not only subsequent repeatings of the 
+        must include not only subsequent repeatings of the
         reservation, but also exceptions to those repeatings.
 
         (Reservation may repeat every week through the whole
         year, except date1, date2 and date3...).
         """
-        
+
         theyOverlap = doesPeriodsOverlap( self.startDT, self.endDT, startDT, endDT )
         if not theyOverlap:
-            return False 
-        
+            return False
+
         # NO REPEATINGS
         if self.repeatability == None:
             return True    # We do not have to check further
-        
+
         overlapStartDT, overlapEndDT = overlap( self.startDT, self.endDT, startDT, endDT )
-        
+
         # DAILY REPEATINGS
         if self.repeatability == RepeatabilityEnum.daily:
             for day in iterdays( overlapStartDT, overlapEndDT ):
                 if not self.dayIsExcluded( day.date() ):
                     return True
             return False
-        
-        weekdaysInPeriod = [] 
+
+        weekdaysInPeriod = []
         for day in iterdays( overlapStartDT, overlapEndDT ):
             if day.weekday() == self.weekDay:
                 if not self.dayIsExcluded( day.date() ):
@@ -773,7 +778,7 @@ class ReservationBase( object ):
         # ONCE A WEEK
         if self.repeatability == RepeatabilityEnum.onceAWeek:
             return True
-        
+
         # ONCE EVERY 2 OR 3 WEEKS
         if self.repeatability in ( RepeatabilityEnum.onceEvery2Weeks, RepeatabilityEnum.onceEvery3Weeks ):
             # Check if candidate weekday is in the overlaping period
@@ -790,7 +795,7 @@ class ReservationBase( object ):
                     if (weekday - self.startDT).days % 21 == 0:
                         return True
             return False
-            
+
         # ONCE A MONTH
         if self.repeatability == RepeatabilityEnum.onceAMonth:
             requiredWeekNumber = self.weekNumber
@@ -799,12 +804,12 @@ class ReservationBase( object ):
                 if weekNumber( weekday ) == requiredWeekNumber:
                     return True
             return False
-            
+
         raise "Unknown repeatability type"
 
     # Excluded days management ----------------------------------------------
 
-    # Repeating reservations repeat in certain period with 
+    # Repeating reservations repeat in certain period with
     # specific frequency. However, there may be *exceptions*
     # to this general pattern. It is possible to *exclude*
     # some days. It allows to create resvs like:
@@ -813,7 +818,7 @@ class ReservationBase( object ):
     #
     # The following methods allow to manage 'excluded days' list
     # for a reservation.
-    
+
     def getExcludedDays( self ):
         """
         Returns list of excluded dates in random order.
@@ -822,7 +827,7 @@ class ReservationBase( object ):
         """
         if self.repeatability == None:
             return 'Not applicable to non-repeating reservations.'
-    
+
     def setExcludedDays( self, excludedDays ):
         """
         Sets list of excluded dates. Accepts:
@@ -834,7 +839,7 @@ class ReservationBase( object ):
         for d in excludedDays:
             if not isinstance( d, date ):
                 raise 'excludedDays must contain only objects of date type (NOT datetime)'
-    
+
     def excludeDay( self, dayD ):
         """
         Inserts dayD into list of excluded days.
@@ -863,8 +868,8 @@ class ReservationBase( object ):
             return 'Not applicable to non-repeating reservations.'
         if not isinstance( dayD, date ):
             raise 'dayD must be of date type (NOT datetime)'
-        
-    
+
+
     # Statistical ------------------------------------------------------------
 
     @staticmethod
@@ -877,7 +882,7 @@ class ReservationBase( object ):
         # Simply redirect to the plugin
         from MaKaC.rb_factory import Factory
         return Factory.newReservation().countReservations()
-    
+
     @staticmethod
     def getNumberOfReservations():
         """
@@ -886,7 +891,7 @@ class ReservationBase( object ):
         # Simply redirect to the plugin
         from MaKaC.rb_factory import Factory
         return Factory.newReservation().getNumberOfReservations()
-        
+
     @staticmethod
     def getNumberOfLiveReservations():
         """
@@ -910,16 +915,16 @@ class ReservationBase( object ):
         # Simply redirect to the plugin
         from MaKaC.rb_factory import Factory
         return Factory.newReservation().getNumberOfArchivalReservations()
-    
+
     @staticmethod
     def getReservationStats( **kwargs ):
         """
         Used to generate statistics like this:
-        
+
                     Valid      Cancelled      Rejected
         Live            x              x             x
         Archival        x              x             x
-        
+
         Returns dictionary with the following keys:
         liveValid, liveCancelled, liveRejected
         archivalValid, archivalCancelled, archivalRejected
@@ -927,11 +932,11 @@ class ReservationBase( object ):
         location = kwargs.get( 'location', Location.getDefaultLocation().friendlyName )
         allResvs = ReservationBase.getReservations( location = location )     # Run Forest, run! :)
         stats = { \
-                     'liveValid': 0, 
-                     'liveCancelled': 0, 
+                     'liveValid': 0,
+                     'liveCancelled': 0,
                      'liveRejected': 0,
-                     'archivalValid': 0, 
-                     'archivalCancelled': 0, 
+                     'archivalValid': 0,
+                     'archivalCancelled': 0,
                      'archivalRejected': 0,
                  }
         for r in allResvs:
@@ -956,11 +961,11 @@ class ReservationBase( object ):
     def getRoomReservationStats(room):
         """
         Used to generate statistics like this:
-        
+
                     Valid      Cancelled      Rejected
         Live            x              x             x
         Archival        x              x             x
-        
+
         Returns dictionary with the following keys:
         liveValid, liveCancelled, liveRejected
         archivalValid, archivalCancelled, archivalRejected
@@ -968,11 +973,11 @@ class ReservationBase( object ):
         location = Location.getDefaultLocation().friendlyName
         allResvs = ReservationBase.getReservations( rooms = [ room ] )     # Run Forest, run! :)
         stats = { \
-                     'liveValid': 0, 
-                     'liveCancelled': 0, 
+                     'liveValid': 0,
+                     'liveCancelled': 0,
                      'liveRejected': 0,
-                     'archivalValid': 0, 
-                     'archivalCancelled': 0, 
+                     'archivalValid': 0,
+                     'archivalCancelled': 0,
                      'archivalRejected': 0,
                  }
         for r in allResvs:
@@ -995,7 +1000,7 @@ class ReservationBase( object ):
     @staticmethod
     def findSoonest( resvs, afterDT = datetime.now() ):
         if not resvs: return None
-        
+
         nextRepeating = datetime( 2050, 01, 01 )
         ret = resvs[0]
         for r in resvs:
@@ -1007,7 +1012,7 @@ class ReservationBase( object ):
 
 
     # "System" ---------------------------------------------------------------
-    
+
     def checkIntegrity( self ):
         """
         FINAL (not intented to be overriden)
@@ -1019,12 +1024,12 @@ class ReservationBase( object ):
         from MaKaC.rb_room import RoomBase
         # list of errors
         errors = []
-        
+
         # locationName - derived
         # guid - derived
         # weekDay - derived
         # weekNumber - derived
-        
+
         # check presence and types of arguments
         # =====================================================
         if self.id != None:         # Only for existing objects
@@ -1073,7 +1078,7 @@ class ReservationBase( object ):
 
         if errors:
             raise str( errors )
-    
+
     # Indico architecture  AND  authorization -----------------------
 
     __owner = None
@@ -1081,7 +1086,7 @@ class ReservationBase( object ):
     def getLocator( self ):
         """
         FINAL (not intented to be overriden)
-        Returns a globaly unique identification 
+        Returns a globaly unique identification
         encapsulated in a Locator object
         """
         owner = self.getOwner()
@@ -1091,7 +1096,7 @@ class ReservationBase( object ):
             from MaKaC.common.Locators import Locator
             loc = Locator()
         # There is no something like "resvLocation" since
-        # location of a reservation always equals location 
+        # location of a reservation always equals location
         # of a room it concerns.
         loc["roomLocation"] = self.locationName
         loc["resvID"] = self.id
@@ -1100,7 +1105,7 @@ class ReservationBase( object ):
     def setOwner( self, owner ):
         """
         FINAL (not intented to be overriden)
-        Owner in terms of "parent", i.e. conference 
+        Owner in terms of "parent", i.e. conference
         """
         oryg = self._p_changed
         self.__owner = None
@@ -1111,7 +1116,7 @@ class ReservationBase( object ):
     def getOwner( self ):
         """
         FINAL (not intented to be overriden)
-        Owner in terms of "parent", i.e. conference 
+        Owner in terms of "parent", i.e. conference
         """
         ####---FIXING THE USE OF IMPERSISTANT CLASS-----
         if isinstance(self.__owner, Impersistant):
@@ -1140,13 +1145,13 @@ class ReservationBase( object ):
         authenticated can view.
         """
         return True
-    
+
     def canModify( self, accessWrapper ):
         """
         FINAL (not intented to be overriden)
         The following persons are authorized to modify a booking:
         - owner (the one who created the booking)
-        - responsible for a room 
+        - responsible for a room
         - admin (of course)
         """
         if accessWrapper == None:
@@ -1177,7 +1182,7 @@ class ReservationBase( object ):
         if user == None:
             return False
         return self.room.isOwnedBy( user ) or user.isAdmin()
-    
+
     def canDelete( self, user ):
         """ Only admin can delete """
         if user == None:
@@ -1186,7 +1191,7 @@ class ReservationBase( object ):
 
     def isOwnedBy( self, avatar ):
         """
-        Returns True if avatar is the one who inserted this 
+        Returns True if avatar is the one who inserted this
         reservation. False otherwise.
         """
         if not self.createdBy:
@@ -1194,11 +1199,11 @@ class ReservationBase( object ):
         if self.createdBy == avatar.id:
             return True
         return False
-    
+
     # Required by Indico architecture
     def getAccessKey( self ): return ""
 
-    def createdByUser( self ): 
+    def createdByUser( self ):
         if self.createdBy == None:
             return None
         user = AvatarHolder().getById( self.createdBy )
@@ -1210,7 +1215,7 @@ class ReservationBase( object ):
     def splitToPeriods( self, endDT = None ):
         """
         Returns the list of Periods that represent this reservation.
-        
+
         For non-repeating reservations it is just the reservation period.
         For repeating ones, the list will include all repeatings.
         """
@@ -1230,19 +1235,19 @@ class ReservationBase( object ):
 
     def _getStartDT( self ):
         return fromUTC( self._utcStartDT )
-    
+
     def _setStartDT( self, localNaiveDT ):
         self._utcStartDT = toUTC( localNaiveDT )
-    
+
     def _getEndDT( self ):
         return fromUTC( self._utcEndDT )
-    
+
     def _setEndDT( self, localNaiveDT ):
         self._utcEndDT = toUTC( localNaiveDT )
-    
+
     def _getCreatedDT( self ):
         return fromUTC( self._utcCreatedDT )
-    
+
     def _setCreatedDT( self, localNaiveDT ):
         self._utcCreatedDT = toUTC( localNaiveDT )
 
@@ -1265,7 +1270,7 @@ class ReservationBase( object ):
         if self.endDT == None:
             return None
         return self.endDT < datetime.now()
-    
+
     def _isHeavy( self ):
         """
         Defines when reservation is considered "heavy".
@@ -1301,12 +1306,12 @@ class ReservationBase( object ):
         """
         FINAL (not intented to be overriden)
         """
-        if self.startDT != None and self.repeatability in ( 
-            RepeatabilityEnum.onceAWeek, RepeatabilityEnum.onceEvery2Weeks, 
+        if self.startDT != None and self.repeatability in (
+            RepeatabilityEnum.onceAWeek, RepeatabilityEnum.onceEvery2Weeks,
             RepeatabilityEnum.onceEvery3Weeks, RepeatabilityEnum.onceAMonth ):
             return self.startDT.weekday()
         return None
-    
+
     def _getWeekNumber( self ):
         if self.repeatability == RepeatabilityEnum.onceAMonth and self.startDT != None:
             return weekNumber( self.startDT )
@@ -1335,7 +1340,7 @@ class ReservationBase( object ):
             try:
                 ret += str( eval( s[ix+2:ixPrv-1] ) )
             except: pass
-        
+
         return ret
 
     def __str__( self ):
@@ -1348,11 +1353,11 @@ class ReservationBase( object ):
            starDT: #{self.startDT}
             endDT: #{self.endDT}
         createdDT: #{self.createdDT}
-    
+
     repeatability: #{self.repeatability}
           weekDay: #{self.weekDay}
        weekNumber: #{self.weekNumber}
-    
+
     bookedForName: #{self.bookedForName}
      contactEmail: #{self.contactEmail}
      contactPhone: #{self.contactPhone}
@@ -1373,7 +1378,7 @@ class ReservationBase( object ):
         s = RepeatabilityEnum.rep2description[ self.repeatability ]
         if self.weekDay != None:
             s += " on %s" % WeekDayEnum.week2desc[self.weekDay]
-            
+
         return s
 
     def _getVerboseStatus( self ):
@@ -1394,16 +1399,16 @@ class ReservationBase( object ):
         if self.isHeavy:
             s += " Heavy"
         s = ', '.join( s.strip().split( ' ' ) )
-        
+
         return s
 
     def _getVerboseCreatedBy( self ):
-        user = self.createdByUser() 
+        user = self.createdByUser()
         if user == None:
             return ""
         return user.getFullName()
 
-    
+
     def __cmp__( self, other ):
         if self.__class__.__name__ == 'NoneType' and other.__class__.__name__ == 'NoneType':
             return 0
@@ -1411,13 +1416,13 @@ class ReservationBase( object ):
             return cmp( None, 1 )
         if other.__class__.__name__ == 'NoneType':
             return cmp( 1, None )
-        
+
         if self.id != None  and  other.id != None:
             if self.id == other.id:
                 return 0
             else:
                 return cmp(self.id, other.id)
-        
+
         c = cmp( self.room, other.room )
         if c == 0 and self.startDT and self.endDT and other.startDT and other.endDT:
             yesterday = datetime.now() - timedelta( 1 )
@@ -1441,7 +1446,7 @@ class ReservationBase( object ):
     locationName = property( _getLocationName ) # location (plugin) name
     guid = property( _getGuid ) # ReservationGUID
 
-    # Basic 
+    # Basic
 
     room = None           # RoomBase - room that is reserved
 
@@ -1450,21 +1455,21 @@ class ReservationBase( object ):
     _utcStartDT = None
     _utcEndDT = None
     _utcCreatedDT = None
-    
+
     startDT = property( _getStartDT, _setStartDT )    # datetime - when the reservation starts; internally UTC, accepted and returned in local/DST
     endDT = property( _getEndDT, _setEndDT )      # datetime - when the reservation ends; internally UTC, accepted and returned in local/DST
     createdDT = property( _getCreatedDT, _setCreatedDT )  # datetime - when the booking was created; internally UTC, accepted and returned in local/DST
-    
+
     # Repeatability
-    
+
     repeatability = None  # int - one of the RepeatabilityEnum
     weekDay = property( _getWeekDay )   # int - one of the WeekDayEnum
-    # weekNumber - int, 1-5, in which week of the month the repeating takes place. 
-    # Applicable only for repeatability == OnceAMonth: 
+    # weekNumber - int, 1-5, in which week of the month the repeating takes place.
+    # Applicable only for repeatability == OnceAMonth:
     weekNumber = property( _getWeekNumber )
 
     # Who and why
-    bookedForName = None  # str - for whom it is booked; free text    
+    bookedForName = None  # str - for whom it is booked; free text
     contactEmail = None   # str - contact; typically the person for whom the booking is done
     contactPhone = None   # str - contact; typically the person for whom the booking is done
     createdBy = None      # str/avatar_id - who has created the booking
@@ -1478,7 +1483,7 @@ class ReservationBase( object ):
 
     # Reservation is valid when neither rejected nor cancelled
     isValid = property( _getIsValid )
-    
+
     # Reservation is archival if endDT is in the past
     isArchival = property( _isArchival )
 
@@ -1490,10 +1495,10 @@ class ReservationBase( object ):
     isHeavy = property( _isHeavy )
 
     # ==== Verbose Properties ================================================
-    
+
     # These are read-only, "redundant" properties designated for end user (GUI)
     # Therefore their purpose is to return human-readable text
-    
+
     verboseRepetition = property( _getVerboseRepetition )
     verboseStatus = property( _getVerboseStatus )
     verboseCreatedBy = property( _getVerboseCreatedBy )
@@ -1507,7 +1512,7 @@ class Collision( object ):
     withReservation = None # With which reservation
     startDT         = None # Overlaping period - begin
     endDT           = None # Overlaping period - end
-    
+
     def __init__( self, periodTuple, resv ):
         self.startDT, self.endDT = periodTuple
         self.withReservation = resv
@@ -1517,7 +1522,7 @@ class Collision( object ):
 # ============================================================================
 
 class Test:
-    
+
     @staticmethod
     def weekNumber():
         resv = ReservationBase()
@@ -1529,14 +1534,14 @@ class Test:
         assert( resv.weekNumber == 5 )
         resv.startDT = datetime( 2006, 9, 1 )
         assert( resv.weekNumber == 1 )
-        
+
     @staticmethod
     def overlapsOn():
         resv = ReservationBase()
 
         resv.startDT = datetime( 2006, 1, 1, 10 )
         resv.endDT = datetime( 2006, 8, 31, 12 )
-        
+
         # Dates does not overlap
         assert( not resv.overlapsOn( datetime( 2006, 9, 1 ) , datetime( 2006, 9, 30 ) ) )
         # Hours does not overlap
@@ -1546,23 +1551,23 @@ class Test:
 
         # ONCE A WEEK
         resv.repeatability = RepeatabilityEnum.onceAWeek
-        
+
         # Weekdays does not overlap (Sunday vs Monday:Saturday)
         assert( not resv.overlapsOn( datetime( 2006, 8, 7, 10 ), datetime( 2006, 8, 12, 12 ) ) )
         # Overlap
         assert( resv.overlapsOn( datetime( 2006, 8, 7, 10 ), datetime( 2006, 8, 13, 12 ) ) )
-        
+
         # ONCE EVERY 2 WEEKS
         resv.repeatability = RepeatabilityEnum.onceEvery2Weeks
-        
+
         # The following week
         assert( not resv.overlapsOn( datetime( 2006, 1, 8, 10 ), datetime( 2006, 1, 14, 12 ) ) )
         # Overlap
         assert( resv.overlapsOn( datetime( 2006, 1, 15, 10 ), datetime( 2006, 1, 15, 12 ) ) )
-        
+
         # ONCE EVERY 3 WEEKS
         resv.repeatability = RepeatabilityEnum.onceEvery3Weeks
-        
+
         # The following week
         assert( not resv.overlapsOn( datetime( 2006, 1, 8, 10 ), datetime( 2006, 1, 14, 12 ) ) )
         # The second week
@@ -1572,7 +1577,7 @@ class Test:
 
         # ONCE A MONTH
         resv.repeatability = RepeatabilityEnum.onceAMonth
-        
+
         # The following week
         assert( not resv.overlapsOn( datetime( 2006, 1, 8, 10 ), datetime( 2006, 1, 14, 12 ) ) )
         # The second week
@@ -1590,18 +1595,18 @@ class Test:
     def statistics():
         from MaKaC.rb_factory import Factory
         Factory.getDALManager().connect()
-        
+
         print "All reservations: %d" % ReservationBase.getNumberOfReservations()
         print "Archival: %d" % ReservationBase.getNumberOfArchivalReservations()
         print "Live: %d" % ReservationBase.getNumberOfLiveReservations()
-        
+
         Factory.getDALManager().disconnect()
 
     @staticmethod
     def getNextRepeating():
         from MaKaC.rb_factory import Factory
         Factory.getDALManager().connect()
-        
+
         # Every x days (daily or every 1-3 weeks)
         resv = ReservationBase.getReservations( resvID = 393966 )
 
@@ -1623,27 +1628,27 @@ class Test:
         period = resv.getNextRepeating( datetime( 2006, 2, 12 ) )
         okPeriod = Period( datetime( 2006, 2, 13, 10 ), datetime( 2006, 2, 13, 12 ) )
         assert( period == okPeriod )
-        
+
         period = resv.getNextRepeating( datetime( 2006, 2, 13 ) )
         okPeriod = Period( datetime( 2006, 3, 13, 10 ), datetime( 2006, 3, 13, 12 ) )
         assert( period == okPeriod )
-        
+
         period = resv.getNextRepeating( datetime( 2006, 4, 9 ) )
         okPeriod = Period( datetime( 2006, 4, 10, 10 ), datetime( 2006, 4, 10, 12 ) )
         assert( period == okPeriod )
-        
+
         Factory.getDALManager().disconnect()
 
     @staticmethod
     def splitToPeriods():
         from MaKaC.rb_factory import Factory
         Factory.getDALManager().connect()
-        
+
         # Every x days (daily or every 1-3 weeks)
         resv = ReservationBase.getReservations( resvID = 393966 )
         periods = resv.splitToPeriods()
         assert( len( periods )  == 50 )
-        
+
         # Every month
         resv = ReservationBase.getReservations( resvID = 371163 )
         periods = resv.splitToPeriods()
@@ -1656,7 +1661,7 @@ class Test:
         from MaKaC.rb_factory import Factory
         from MaKaC.rb_room import RoomBase
         Factory.getDALManager().connect()
-        
+
         # Every x days (daily or every 1-3 weeks)
         #resv = ReservationBase.getReservations( resvID = 393966 )
         #resv = Factory.newReservation()
@@ -1665,13 +1670,13 @@ class Test:
         #resv.endDT = datetime( 2006, 10, 4, 15 )
         #resv.room = RoomBase.getRooms( roomID = 4 )
         #resv.repeatability = RepeatabilityEnum.daily
-        
+
         resv = Factory.newReservation()
         resv.startDT = datetime( 2006, 12, 1, 8, 30 )
         resv.endDT = datetime( 2006, 12, 2, 9, 30 )
         resv.room = RoomBase.getRooms( roomID = 89 )
         resv.repeatability = RepeatabilityEnum.daily
-        
+
         collisions = resv.getCollisions()
         print "\n\nFound %d collisions.\n" % len( collisions )
         for col in collisions:
@@ -1689,23 +1694,23 @@ class Test:
         from MaKaC.common.db import DBMgr
         DBMgr.getInstance().startRequest()
         Factory.getDALManager().connect()
-        
+
         candResv = ReservationBase()
         candResv.startDT = datetime( 2007, 03, 2, 00, 01 )
         candResv.endDT = datetime( 2007, 06, 2, 23, 55 )
         candResv.room = RoomBase.getRooms( roomName = '40-4-C01' )
         candResv.repeatability = RepeatabilityEnum.onceAWeek
-        
+
         print "!"
         t0 = datetime.now()
         for i in xrange( 0, 140 ):
             candResv.getCollisions( boolResult = True )
         t1 = datetime.now()
         print "! " + str( t1 - t0 )
-        
+
         Factory.getDALManager().disconnect()
         DBMgr.getInstance().endRequest()
-    
+
     @staticmethod
     def addUsesAVC():
         # Available rooms
@@ -1713,14 +1718,14 @@ class Test:
         from MaKaC.common.db import DBMgr
         DBMgr.getInstance().startRequest()
         Factory.getDALManager().connect()
-        
+
         for resv in CrossLocationQueries.getReservations():
             resv.usesAVC = False
 
         Factory.getDALManager().commit()
         Factory.getDALManager().disconnect()
         DBMgr.getInstance().endRequest()
-        
+
     @staticmethod
     def addNeedsAVCSupport():
         # Available rooms
@@ -1728,14 +1733,14 @@ class Test:
         from MaKaC.common.db import DBMgr
         DBMgr.getInstance().startRequest()
         Factory.getDALManager().connect()
-        
+
         for resv in CrossLocationQueries.getReservations():
             resv.needsAVCSupport = False
-        
+
         Factory.getDALManager().commit()
         Factory.getDALManager().disconnect()
         DBMgr.getInstance().endRequest()
-        
+
     @staticmethod
     def addLocationAVCSupportEmails():
         # Available rooms
@@ -1743,7 +1748,7 @@ class Test:
         from MaKaC.common.db import DBMgr
         DBMgr.getInstance().startRequest()
         Factory.getDALManager().connect()
-        
+
         for location in Location.allLocations:
             location._avcSupportEmails = []
 
@@ -1759,11 +1764,11 @@ class Test:
         from MaKaC.common.db import DBMgr
         DBMgr.getInstance().startRequest()
         Factory.getDALManager().connect()
-        
-            
+
+
         AvatarHolder().invalidateRoomManagerIdList()
-        
-        
+
+
         Factory.getDALManager().commit()
         Factory.getDALManager().disconnect()
         DBMgr.getInstance().endRequest()
@@ -1778,18 +1783,18 @@ class Test:
         from MaKaC.rb_room import RoomBase
 
         print "Connected..."
-        
+
         avatar = AvatarHolder().match( { "email": "Daniele.Lajust@cern.ch" } )[0]
-        
+
         resvEx = ReservationBase()
         resvEx.isConfirmed = None
         resvEx.bookedForName = "daniele lajust"
-        
+
         allResvs = CrossLocationQueries.getReservations( resvExample = resvEx )
         for r in allResvs:
             r.createdBy = avatar.id
         #print len( allResvs )
-        
+
         Factory.getDALManager().commit()
         Factory.getDALManager().disconnect()
         DBMgr.getInstance().endRequest()

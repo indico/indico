@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: sessions.py,v 1.121 2009/06/23 09:48:49 pferreir Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -343,7 +342,7 @@ class WSessionDisplayBase(wcomponents.WTemplated):
             speakerList.append(spkcapt)
         speakers =""
         if speakerList != []:
-            speakers = _("""<br><small> _("by") %s</small>"%"; """).join(speakerList)
+            speakers = _("""<br><small> _("by") %s</small>""")%"; ".join(speakerList)
         linkColor=""
         if contrib.getSession().isTextColorToLinks():
             linkColor="color:%s"%contrib.getSession().getTextColor()
@@ -654,10 +653,9 @@ class WPSessionModifBase( WPConferenceModifBase ):
                 urlHandlers.UHSessionModifMaterials.getURL( self._session ) )
         self._tabAC = self._tabCtrl.newTab( "ac", _("Protection"), \
                 urlHandlers.UHSessionModifAC.getURL( self._session ) )
-        canCoord=self._session.canCoordinate(self._getAW())
+
         canModify=self._session.canModify(self._getAW())
         self._tabAC.setEnabled(canModify)
-        self._tabMaterials.setEnabled(canModify)
         self._tabTools = self._tabCtrl.newTab( "tools", _("Tools"), \
                 urlHandlers.UHSessionModifTools.getURL( self._session ) )
         self._tabTools.setEnabled(canModify)
@@ -679,7 +677,7 @@ class WPSessionModifBase( WPConferenceModifBase ):
     def _getPageContent( self, params ):
         self._createTabCtrl()
 
-        banner = wcomponents.WTimetableBannerModif(self._session).getHTML()
+        banner = wcomponents.WTimetableBannerModif(self._getAW(), self._session).getHTML()
         body = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
         return banner + body
 
@@ -1446,6 +1444,8 @@ class WSessionModPosterTTDay(wcomponents.WTemplated):
 
 class WPSessionModifSchedule( WPSessionModifBase, WPConfModifScheduleGraphic  ):
 
+    _userData = ['favorite-user-list']
+
     def __init__( self, rh, session):
         WPSessionModifBase.__init__(self, rh, session)
         WPConfModifScheduleGraphic.__init__( self, rh, session.getConference() )
@@ -1497,7 +1497,7 @@ class WSessionModifSchedule(wcomponents.WTemplated):
 
         vars['rbActive'] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
 
-        vars['ttdata'] = simplejson.dumps(schedule.ScheduleToJson.process(self._session.getSchedule(), tz))
+        vars['ttdata'] = simplejson.dumps(schedule.ScheduleToJson.process(self._session.getSchedule(), tz, None))
 
         eventInfo = DictPickler.pickle(self._session.getConference(), timezone=tz)
         eventInfo['timetableSession'] = DictPickler.pickle(self._session, timezone=tz)
@@ -2806,6 +2806,8 @@ class WPSessionModifRelocate(WPSessionModifBase):
 
 
 class WPSessionModifMaterials( WPSessionModifBase ):
+
+    _userData = ['favorite-user-list']
 
     def __init__(self, rh, session):
         self._target = session

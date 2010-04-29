@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: confModifTools.py,v 1.18 2008/04/24 16:59:39 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -33,15 +32,6 @@ def clone( req, **params ):
 
 def performCloning( req, **params ):
     return conferenceModif.RHConfPerformCloning(req).process(params)
-
-def performCloneOnce( req, **params ):
-    return conferenceModif.RHConfPerformCloneOnce( req ).process( params )
-
-def performCloneInterval( req, **params ):
-    return conferenceModif.RHConfPerformCloneInterval( req ).process( params )
-
-def performCloneDays( req, **params ):
-    return conferenceModif.RHConfPerformCloneDays( req ).process( params )
 
 def allSessionsConveners( req, **params ):
     return conferenceModif.RHConfAllSessionsConveners( req ).process( params )

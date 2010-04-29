@@ -8,47 +8,69 @@ var IndicoUtil = {
     /**
      * Utility function that, given a container element, will look at all of the nodes inside it, and
      * return the list of nodes that are of type "input", "select", and "textArea".
-     * @param {XElement} containerElement The XElement that we want to scan for form-like nodes.
+     * @param {multiple XElement} A variable number of XElement's that we want to scan for form-like nodes.
      * @return {Array of DOM nodes} Returns an array of DOM nodes that are of type "input", "select", and "textArea".
      */
-    findFormFields : function(containerElement) {
-        var inputNodes = containerElement.dom.getElementsByTagName("input");
-        var selectNodes = containerElement.dom.getElementsByTagName("select");
-        var textAreaNodes = containerElement.dom.getElementsByTagName("textArea");
-        formNodes = [];
-        for (var i=0; i < inputNodes.length; i++) {formNodes.push(inputNodes[i]);}
-        for (var i=0; i < selectNodes.length; i++) {formNodes.push(selectNodes[i]);}
-        for (var i=0; i < textAreaNodes.length; i++) {formNodes.push(textAreaNodes[i]);}
+    findFormFields : function() {
+        var formNodes = [];
+
+        for (var i=0; i < arguments.length; i++) {
+            var xelement = arguments[i];
+
+            var inputNodes = xelement.dom.getElementsByTagName("input");
+            var selectNodes = xelement.dom.getElementsByTagName("select");
+            var textAreaNodes = xelement.dom.getElementsByTagName("textArea");
+
+            for (var j=0; j < inputNodes.length; j++) {formNodes.push(inputNodes[j]);}
+            for (var j=0; j < selectNodes.length; j++) {formNodes.push(selectNodes[j]);}
+            for (var j=0; j < textAreaNodes.length; j++) {formNodes.push(textAreaNodes[j]);}
+        }
+
         return formNodes;
     },
 
     /**
     * Utility function that, given a container element, will find the "form" nodes inside it
     * and extract the values from those elements.
-    * @param {Array} formNodes An array of input nodes. You can obtain it easily like this: var formNodes = IndicoUtil.findFormFields(containerElement)
+    * @param {Array} components An array of input nodes / custom components.
+    *                           Nodes can be obtained easily like this: var formNodes = IndicoUtil.findFormFields(containerElement)
+    *                           Custom components have to have a .get() and a .getName() method.
+    * @param {Object} values An object where there values will be stored; this object will be "cleaned" and then returned.
+    *                        If left to null, a new object will be returned.
     * @return {Array} an object whose keys are the "name" attribute of the form nodes, and the values
     *                 are the values of those nodes.
     */
-    getFormValues : function(formNodes, values) {
+    getFormValues : function(components, values) {
         if (!exists(values)) {
             values = {};
+        } else {
+            each(values, function(value, key){
+                delete values[key];
+            });
         }
-        for (var i=0; i < formNodes.length; i++) {
-            var node = formNodes[i];
-            if (exists(node.name) && node.name) {
-                if (node.type == "checkbox") {
-                    if (!exists(values[node.name])) {
-                        values[node.name] = [];
-                    }
-                    if (node.checked) {
-                        values[node.name].push(node.value);
-                    }
-                } else if (node.type == "radio") {
-                    if (node.checked) {
+        for (var i=0; i < components.length; i++) {
+            var component = components[i];
+            if (isDom(component)) {
+                var node = component;
+                if (exists(node.name) && node.name) {
+                    if (node.type == "checkbox") {
+                        if (!exists(values[node.name])) {
+                            values[node.name] = [];
+                        }
+                        if (node.checked) {
+                            values[node.name].push(node.value);
+                        }
+                    } else if (node.type == "radio") {
+                        if (node.checked) {
+                            values[node.name] = node.value;
+                        }
+                    } else {
                         values[node.name] = node.value;
                     }
-                } else {
-                    values[node.name] = node.value;
+                }
+            } else {
+                if(exists(component.get) && exists(component.getName)) {
+                    values[component.getName()] = component.get();
                 }
             }
         }
@@ -59,29 +81,38 @@ var IndicoUtil = {
     * Utility function that, given a container element, and an object with key/value pairs, will find the "form" nodes inside it
     * and put those values in each node. To find the correct node for each value, the "name" attribute of the nodes are compared
     * to the 'keys' of the object.
-    * @param {Array} formNodes An array of input nodes. You can obtain it easily like this: var formNodes = IndicoUtil.findFormFields(containerElement)
+    * @param {Array} components An array of input nodes / custom components.
+    *                           Nodes can be obtained easily like this: var formNodes = IndicoUtil.findFormFields(containerElement)
+    *                           Custom components have to have a .get() and a .getName() method.
     * @param {Array} an object whose keys are the "name" attribute of the form nodes, and the values
     *                are the values of those nodes.
     */
-    setFormValues : function(formNodes, values) {
-        for (var i=0; i < formNodes.length; i++) {
-            var node = formNodes[i];
-            if (node.type == "checkbox") {
-                if (node.name in values && exists($L(values[node.name]).indexOf(node.value))) {
-                    node.checked = true;
+    setFormValues : function(components, values) {
+
+        for (var i=0; i < components.length; i++) {
+            var component = components[i];
+            if (isDom(component)) {
+                var node = component;
+                if (node.type == "checkbox") {
+                    if (node.name in values && exists($L(values[node.name]).indexOf(node.value))) {
+                        node.checked = true;
+                    } else {
+                        node.checked = false;
+                    }
+                } else if (node.type == "radio") {
+                    if (node.name in values && values[node.name] == node.value) {
+                        node.checked = true;
+                    } else {
+                        node.checked = false;
+                    }
                 } else {
-                    node.checked = false;
-                }
-            } else if (node.type == "radio") {
-                if (node.name in values && values[node.name] == node.value) {
-                    node.checked = true;
-                } else {
-                    node.checked = false;
+                    node.value = values[node.name];
                 }
             } else {
-                node.value = values[node.name];
+                if(exists(component.set) && exists(component.getName)) {
+                    component.set(values[component.getName()]);
+                }
             }
-
         }
     },
 
@@ -154,18 +185,25 @@ var IndicoUtil = {
     * @param {List} map A map, conforming to the described format
     * @return An element (DIV) containing the form
     */
-    createFormFromMap: function(map) {
+    createFormFromMap: function(map, expand) {
+        expand = any(expand, false);
+        var labelStyle = {style:{textAlign:'right', verticalAlign: 'top'}};
+        var fieldStyle = {style:{verticalAlign: 'top'}};
+        if (expand) {
+            labelStyle.style.whiteSpace = "nowrap";
+            fieldStyle.style.width = "100%";
+        }
         var list = [];
         $L(map).each(function(item) {
             // if the key is an int, do not print the label
             if (item.length == 2) {
                 list.push(Html.tr({style:{marginTop:'10px'}},
-                                  Html.td({style:{textAlign:'right', verticalAlign: 'top'}},Html.label("popUpLabel",item[0])),
-                                  Html.td({style:{verticalAlign: 'top'}}, Html.div('popUpTdContent', item[1]))));
+                                  Html.td(labelStyle, Html.label("popUpLabel",item[0])),
+                                  Html.td(fieldStyle, Html.div('popUpTdContent', item[1]))));
             } else {
                 list.push(Html.tr({style:{marginTop:'10px'}},
                                   Html.td(),
-                                  Html.td(item[0])));
+                                  Html.td(fieldStyle, item[0])));
             }
         });
         var tbody = Html.tbody();
@@ -250,7 +288,7 @@ var IndicoUtil = {
             return null;
         }
 
-        setDate(sdatetime, sdate);
+        var sdatetime = new Date(sdate[2], sdate[1]-1, sdate[0]);
         setTime(sdatetime, stime);
 
         return sdatetime;
@@ -265,8 +303,9 @@ var IndicoUtil = {
             return null;
         }
 
+        var sdatetime = new Date(sdate[2], sdate[1]-1, sdate[0]);
         setTime(sdatetime, [0,0,0,0]);
-        setDate(sdatetime, sdate);
+
 
         return sdatetime;
     },
@@ -372,7 +411,10 @@ var IndicoUtil = {
      *                                          -An Html.div() XElement with the tooltip that was created.
      *                                          -An array of functions that should be called to cancel all the event observations.
      */
-    markInvalidField: function(component, error) {
+    markInvalidField: function(component, error, passive) {
+
+        // passive - don't check actively for changes / keypresses
+
         if ( startsWith(component.dom.type, 'select')) {
             component.dom.className+=' invalidSelect';
         } else {
@@ -388,6 +430,12 @@ var IndicoUtil = {
             });
         };
 
+        // we'll add a function that removes the coloring first of all
+        oList.push(function() {
+                Dom.List.remove(document.body, tooltip);
+                component.dom.className = component.dom.className.substring(0, component.dom.className.length-8);
+        });
+
         oList.push(component.observeEvent('mouseover', function(event){
             tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, error, "tooltipError");
         }));
@@ -396,24 +444,21 @@ var IndicoUtil = {
             Dom.List.remove(document.body, tooltip);
         }));
 
-        oList.push(component.observeEvent('keypress', function(event){
-            component.dom.className = component.dom.className.substring(0, component.dom.className.length-8);
-            Dom.List.remove(document.body, tooltip);
-            stopObserving();
-        }));
+        if (!passive) {
 
-        oList.push(component.observeEvent('change', function(event){
-            component.dom.className = component.dom.className.substring(0, component.dom.className.length-8);
-            Dom.List.remove(document.body, tooltip);
-            stopObserving();
-        }));
-
-        if ( startsWith(component.dom.type, 'select')) {
-            oList.push(component.observeEvent('click', function(event){
-                component.dom.className = component.dom.className.substring(0, component.dom.className.length-14);
-                Dom.List.remove(document.body, tooltip);
+            oList.push(component.observeEvent('keypress', function(event){
                 stopObserving();
             }));
+
+            oList.push(component.observeEvent('change', function(event){
+                stopObserving();
+            }));
+
+            if ( startsWith(component.dom.type, 'select')) {
+                oList.push(component.observeEvent('click', function(event){
+                    stopObserving();
+                }));
+            }
         }
 
         return [tooltip, oList];
@@ -453,18 +498,26 @@ var IndicoUtil = {
                 var extraCheckFunction = value[3];
                 var error = null;
 
-                //--- Restore original values (if it is the second time, there must
-                //    be components with error styles)  ---
-                component.dom.className = classList[component.dom.id];
-                if (exists(eventList[component.dom.id])) {
-                    // --- Remove all the ERROR observers
-                    $L(eventList[component.dom.id]).each(function(value){
-                        value();
-                    });
+                // ErrorAware classes don't want to do this
+                if (!component.ErrorAware) {
+                    //--- Restore original values (if it is the second time, there must
+                    //    be components with error styles)  ---
 
-                    delete eventList[component.dom.id];
+                    component.dom.className = classList[component.dom.id];
+
+                    if (exists(eventList[component.dom.id])) {
+                        // --- Remove all the ERROR observers
+                        $L(eventList[component.dom.id]).each(function(value){
+                            value();
+                        });
+
+                        delete eventList[component.dom.id];
+                    }
+                    //---------------------------------
+
+                } else {
+                    component.setError(false);
                 }
-                //---------------------------------
 
                 //--- Check if there are errors ---
                 if (dataType == "radio" && !allowEmpty && !self.checkRadioButton(component)) {
@@ -478,6 +531,9 @@ var IndicoUtil = {
                 else if (dataType == 'unsigned_int' && !(allowEmpty && trim(component.get()) === '') && (!IndicoUtil.isInteger(component.get()) || component.get()<=0)) {
                     error = Html.span({}, "Field must be a positive number");
                 }
+                else if (dataType == 'non_negative_int' && !(allowEmpty && trim(component.get()) === '') && (!IndicoUtil.isInteger(component.get()) || component.get()<0)) {
+                    error = Html.span({}, "Field must be a positive number");
+                }
                 else if (dataType == 'datetime' && !(allowEmpty && trim(component.get()) === '') && !IndicoUtil.parseDateTime(component.get())) {
                     error = Html.span({}, "Date format is not valid. It should be dd/mm/yyyy hh:mm");
                 }
@@ -486,6 +542,9 @@ var IndicoUtil = {
                 }
                 else if (dataType == 'emaillist' && !(allowEmpty && trim(component.get()) === '') && !Util.Validation.isEmailList(component.get())){
                     error = Html.span({}, "List contains invalid e-mail address or invalid separator");
+                }
+                else if (dataType == 'url' && !(allowEmpty && trim(component.get()) === '') && !Util.Validation.isURL(component.get())) {
+                    error = Html.span({}, "Invalid URL");
                 }
                 else if (dataType == 'ip' && !(allowEmpty && trim(component.get()) === '') &&  !Util.Validation.isIPAddress(component.get())) {
                     error = Html.span({}, "That doesn't seem like a valid IP Address. Example of valid IP Address: 132.156.31.38");
@@ -501,9 +560,12 @@ var IndicoUtil = {
                 if (exists(error)) {
                     hasErrors = true;
 
-                    var oList = [];
+                    var oList;
 
-                    if (component.dom.type != 'radio') {
+                    if (component.ErrorAware) {
+                        oList = component.setError(error);
+
+                    } else if (component.dom.type != 'radio') {
                         var result = IndicoUtil.markInvalidField(component, error);
                         oList = result[1];
 
@@ -549,7 +611,9 @@ var IndicoUtil = {
                         });
                     }
 
-                    eventList[component.dom.id] = oList;
+                    if (!component.ErrorAware) {
+                        eventList[component.dom.id] = oList;
+                    }
                 }
                 //----------------------------
             });
@@ -581,12 +645,16 @@ var IndicoUtil = {
             // Add new entry
             entryList.append([component, dataType, allowEmpty, extraCheckFunction]);
 
-            // Assign an auto ID, if the object has no ID
-            if (!component.dom.id) {
-                component.dom.id = Html.generateId();
-            }
+            // only for DOM elements
+            if (!component.ErrorAware) {
+                // Assign an auto ID, if the object has no ID (if it's a DOM element)
+                if (!component.dom.id) {
+                    component.dom.id = Html.generateId();
+                }
 
-            classList[component.dom.id] = component.dom.className;
+                classList[component.dom.id] = component.dom.className;
+
+            }
             return component;
         };
 
@@ -680,5 +748,3 @@ var IndicoUtil = {
     errorReport: IndicoUI.Dialogs.Util.error
 
 };
-
-

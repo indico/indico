@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: mail.py,v 1.8 2009/04/15 15:17:45 dmartinc Exp $
 ##
 ## This file is par{t of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -34,7 +33,7 @@ class RecordingRequestNotificationBase(GenericNotification):
         GenericNotification.__init__(self)
 
         self._booking = booking
-        self._bp = booking._bookingParams
+        self._bp = booking.getBookingParams()
         self._conference = booking.getConference()
         self._isLecture = self._conference.getType() == 'simple_event'
 
@@ -173,8 +172,8 @@ Request details:<br />
        dict(lectureOptions)[bp["lectureOptions"]],
        dict(typeOfEvents)[bp['lectureStyle']],
        dict(postingUrgency)[bp['postingUrgency']],
-       bp['numRemoteViewers'],
-       bp['numAttendees'],
+       str(bp['numRemoteViewers']),
+       str(bp['numAttendees']),
        self._getPurposes(),
        self._getAudiences(),
        self._getMatters(),

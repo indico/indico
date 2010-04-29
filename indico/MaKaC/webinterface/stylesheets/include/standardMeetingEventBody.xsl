@@ -1,5 +1,5 @@
 <?xml version='1.0'?>
-<!-- $Id: standardMeetingEventBody.xsl,v 1.5 2009/06/16 14:59:27 eragners Exp $
+<!--
 
      This file is part of CDS Indico.
      Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -18,19 +18,19 @@
      along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
      59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
      -->
-<xsl:stylesheet version='1.0' 
+<xsl:stylesheet version='1.0'
    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 <xsl:template name="meetingEventBody">
     <xsl:param name="minutes"/>
     <div class="meetingEventSubHeader">
 
-      <xsl:call-template name="header2"><xsl:with-param name="minutes">on</xsl:with-param></xsl:call-template>
+      <xsl:call-template name="header2"><xsl:with-param name="minutes" select="$minutes"/></xsl:call-template>
 
     </div>
 
     <div class="meetingEventBody">
-        
+
         <div style="position: absolute; right: 50px; top: 3px;"><span class="fakeLink dropDownMenu" id="goToDayLink"><strong>Go to day</strong></span></div>
 
 <script type="text/javascript">
@@ -62,7 +62,7 @@ goToDayLink.observeClick(function(e) {
         goToDayMenu = null;
         return;
     }
-            
+
     // build a dictionary that represents the menu
 
     goToDayMenu = new PopupMenu(goToDayMenuItems, [goToDayLink], null, true, true);

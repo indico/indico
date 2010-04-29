@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: testSciProgramme.py,v 1.3 2008/04/24 16:59:58 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -60,7 +59,7 @@ class TestSetupPy(unittest.TestCase):
             self._stdout = PIPE
 
         self._stdin = PIPE
-        
+
         for f in (SAMPLE_MO_FILE,
                   SAMPLE_JSCOMPRESSED_FILE):
             if os.path.exists(f):
@@ -68,7 +67,7 @@ class TestSetupPy(unittest.TestCase):
 
         # Directory to uncompress packages to
         self.dist_test = '%s/dist_test' % self._rootDir
-        
+
         # We make a backup of indico.conf
         shutil.copyfile(INDICOCONF, "%s.running_tests" % INDICOCONF)
 
@@ -117,7 +116,7 @@ class TestSetupPy(unittest.TestCase):
         self.assertEqual(0, call([sys.executable, 'setup.py', 'sdist', '--version', '0.96'], stdout=self._stdout))
         self.assertTrue(os.path.exists(self._testFileVersion))
 
-    
+
     def testInstallWithExistingInstallationShouldPreserveOldValuesInIndicoConf(self):
         self.testInstallShouldWork()
         # we modify installed indico.conf
@@ -125,7 +124,7 @@ class TestSetupPy(unittest.TestCase):
         retcode = call([sys.executable, 'setup.py', 'install', '--force-upgrade', '--root', TESTSITEPACKAGES, '--uid', str(os.getuid()), '--gid', str(os.getgid())], stdout=self._stdout, stdin=self._stdin)
         self.assertEqual(0, retcode)
         self.assertNotEqual(-1, file('%s/indico.conf' % TESTCONFIGURATIONDIR).read().find('(\'localhost\', 9676)'))
-        
+
 
 
     def testJsbuildShouldWork(self):

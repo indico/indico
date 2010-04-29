@@ -59,7 +59,7 @@
  *  pass none of "inputField", "displayArea" or "button" you'll get a warning
  *  saying "nothing to setup".
  */
- 
+
 // ** I18N
 
 // Calendar EN language
@@ -187,7 +187,7 @@ Calendar._TT["TT_DATE_FORMAT"] = "%a, %b %e";
 
 Calendar._TT["WK"] = $T("wk");
 Calendar._TT["TIME"] = $T("Time:");
- 
+
 Calendar.setup = function (params) {
 	function param_default(pname, def) { if (typeof params[pname] == "undefined") { params[pname] = def; } };
 
@@ -274,10 +274,10 @@ Calendar.setup = function (params) {
 		if (params.ifFormat) {
 			cal.setDateFormat(params.ifFormat);
 		}
+		cal.create(params.flat);
 		if (params.inputField && typeof params.inputField.value == "string") {
 			cal.parseDate(params.inputField.value);
 		}
-		cal.create(params.flat);
 		cal.show();
 		return false;
 	}

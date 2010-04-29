@@ -4,13 +4,13 @@ from simplejson import dumps
 
 import MaKaC
 
-def offlineRequest(rh, method, params):
+def offlineRequest(rh, method, params = {}):
     return dumps(processRequest(method, params, rh._req))
 
 def jsonDescriptor(object):
 
     # TODO: Merge with locators?
-    
+
     if isinstance(object, MaKaC.conference.Conference):
         return {'conference': object.getId()}
     elif isinstance(object, MaKaC.conference.Contribution):
@@ -34,7 +34,7 @@ def jsonDescriptor(object):
     return None
 
 def jsonDescriptorType(descriptor):
-    
+
     if 'break' in descriptor:
         return MaKaC.schedule.BreakTimeSchEntry
     elif 'slot' in descriptor:
@@ -48,7 +48,7 @@ def jsonDescriptorType(descriptor):
     else:
         return None
 
-def decideInheritanceText(event):    
+def decideInheritanceText(event):
     if isinstance(event, MaKaC.conference.SessionSlot):
         text = _("Inherit from parent slot")
     elif isinstance(event, MaKaC.conference.Session):
@@ -67,7 +67,7 @@ def roomInfo(event, level='real'):
         room = event.getInheritedRoom()
         location = event.getInheritedLocation()
         text = decideInheritanceText(event.getLocationParent())
-        
+
     elif level == 'real':
         room = event.getRoom()
         location = event.getLocation()
@@ -79,7 +79,7 @@ def roomInfo(event, level='real'):
         text = ''
 
     locationName, roomName, address = None, None, None
-    
+
     if location:
         locationName = location.getName()
         address = location.getAddress()

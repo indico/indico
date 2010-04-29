@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: collaboration.py,v 1.21 2009/04/25 13:56:05 dmartinc Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -24,9 +23,8 @@ from MaKaC.common.PickleJar import Retrieves
 from MaKaC.common.utils import formatDateTime
 from MaKaC.common.timezoneUtils import nowutc, unixTimeToDatetime
 from MaKaC.plugins.Collaboration.base import CSBookingBase
-from MaKaC.plugins.Collaboration.EVO.common import EVOControlledException, getEVOAnswer, parseEVOAnswer, EVOException,\
-    getMinStartDate, getMaxEndDate, OverlappedError, ChangesFromEVOError,\
-    EVOError, getRequestURL, EVOWarning, getEVOOptionValueByName
+from MaKaC.plugins.Collaboration.EVO.common import EVOControlledException, getEVOAnswer, parseEVOAnswer, EVOException, \
+    getMinStartDate, getMaxEndDate, OverlappedError, EVOError, getRequestURL, EVOWarning, getEVOOptionValueByName
 from MaKaC.plugins.Collaboration.EVO.mail import NewEVOMeetingNotificationAdmin, EVOMeetingModifiedNotificationAdmin, EVOMeetingRemovalNotificationAdmin
 #    NewEVOMeetingNotificationManager, EVOMeetingModifiedNotificationManager,\
 #    EVOMeetingRemovalNotificationManager
@@ -34,8 +32,12 @@ from MaKaC.common.mail import GenericMailer
 from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
+from MaKaC.plugins.Collaboration.EVO.fossils import ICSBookingConfModifFossil,\
+    ICSBookingIndexingFossil
+from MaKaC.common.fossilize import fossilizes
 
-class CSBooking(CSBookingBase):
+class CSBooking(CSBookingBase): #already Fossilizable
+    fossilizes(ICSBookingConfModifFossil, ICSBookingIndexingFossil)
 
     _hasTitle = True
     _hasStart = True
@@ -52,17 +54,22 @@ class CSBooking(CSBookingBase):
 
     _commonIndexes = ["All Videoconference"]
 
+    _simpleParameters = {
+        "communityId": (str, ''),
+        "meetingTitle": (str, ''),
+        "meetingDescription": (str, None),
+        "sendMailToManagers": (bool, False),
+        "type": (int, 0),
+        "displayPhoneBridgeId": (bool, True),
+        "displayPassword": (bool, False),
+        "displayPhonePassword": (bool, False),
+        "displayPhoneBridgeNumbers": (bool, True),
+        "displayURL": (bool, True)}
+
     _complexParameters = ["communityName", "accessPassword", "hasAccessPassword"]
 
     def __init__(self, type, conf):
         CSBookingBase.__init__(self, type, conf)
-        self._bookingParams = {
-            "communityId": None,
-            "meetingTitle": None,
-            "meetingDescription": None,
-            "sendMailToManagers": False,
-            "type": 0
-        }
         self._accessPassword = None
         self._EVOID = None
         self._url = None
@@ -101,33 +108,27 @@ class CSBooking(CSBookingBase):
     def getHasAccessPassword(self):
         return self._accessPassword is not None
 
-    @Retrieves(['MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking'], 'url')
-    def getURL(self):
+    def getUrl(self):
         if self._url.startswith("meeting"): #the first part of the URL is not there
             self._url = getEVOOptionValueByName("koalaLocation") + '?' + self._url
         return self._url
 
-    @Retrieves(['MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking'], 'phoneBridgeId')
     def getPhoneBridgeId(self):
         if not hasattr(self, '_phoneBridgeId'):
             self._phoneBridgeId = None
         return self._phoneBridgeId
 
-    @Retrieves(['MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking'], 'phoneBridgePassword')
     def getPhoneBridgePassword(self):
         if not hasattr(self, '_phoneBridgePassword'):
             self._phoneBridgePassword = None
         return self._phoneBridgePassword
 
-    @Retrieves(['MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking'], 'errorMessage')
     def getErrorMessage(self):
         return self._errorMessage
 
-    @Retrieves(['MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking'], 'errorDetails')
     def getErrorDetails(self):
         return self._errorDetails
 
-    @Retrieves(['MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking'], 'changesFromEVO')
     def getChangesFromEVO(self):
         return self._changesFromEVO
 
@@ -141,8 +142,6 @@ class CSBooking(CSBookingBase):
     def _getTitle(self):
         return self._bookingParams["meetingTitle"]
 
-    def _getPluginDisplayName(self):
-        return "EVO"
 
     def _checkBookingParams(self):
         if self._bookingParams["communityId"] not in self._EVOOptions["communityList"].getValue(): #change when list of community names is ok
@@ -163,11 +162,11 @@ class CSBooking(CSBookingBase):
 
         minStartDate = getMinStartDate(self.getConference())
         if self.getAdjustedStartDate() < minStartDate:
-            raise EVOException("Cannot create a booking %s minutes before the Indico event's start date. Please create it after %s"%(self._EVOOptions["allowedMinutes"].getValue(), formatDateTime(minStartDate)))
+            raise EVOException("Cannot create a booking %s minutes before the Indico event's start date. Please create it after %s"%(self._EVOOptions["extraMinutesBefore"].getValue(), formatDateTime(minStartDate)))
 
         maxEndDate = getMaxEndDate(self.getConference())
         if self.getAdjustedEndDate() > maxEndDate:
-            raise EVOException("Cannot create a booking %s minutes after before the Indico event's end date. Please create it before %s"%(self._EVOOptions["allowedMinutes"].getValue(), formatDateTime(maxEndDate)))
+            raise EVOException("Cannot create a booking %s minutes after before the Indico event's end date. Please create it before %s"%(self._EVOOptions["extraMinutesAfter"].getValue(), formatDateTime(maxEndDate)))
 
         if False: #for now, we don't detect overlapping
             for booking in self.getBookingsOfSameType():
@@ -229,7 +228,8 @@ class CSBooking(CSBookingBase):
                 raise EVOException(_("The booking could not be created due to a problem with the EVO Server\n.The EVO Server sent the following error message: ") + e.message, e)
 
 
-    def _modify(self):
+
+    def _modify(self, oldBookingParams):
         """ Modifies a booking in the EVO server if all conditions are met.
         """
         if self._created:
@@ -277,7 +277,10 @@ class CSBooking(CSBookingBase):
                 if e.message == "START_IN_PAST":
                     return EVOError('start_in_past', str(requestURL))
                 if e.message == "UNKNOWN_MEETING":
-                    return EVOError('deletedByEVO', str(requestURL), 'This EVO meeting could not be modified because it was deleted in the EVO system')
+                    return EVOError('deletedByEVO', str(requestURL), _('This EVO meeting could not be modified because it was deleted in the EVO system'))
+                if e.message == "END_BEFORE_START":
+                    return EVOError('end_before_start', str(requestURL),
+                                    _("This EVO meeting could not be moved because it would have been resulting in the end date being before the start date"))
 
                 raise EVOException(_("The booking could not be modified due to a problem with the EVO Server\n.The EVO Server sent the following error message: ") + e.message, e)
 
@@ -374,7 +377,7 @@ class CSBooking(CSBookingBase):
 
     def _getLaunchDisplayInfo(self):
         return {'launchText' : _("Join Now!"),
-                'launchLink' : str(self.getURL()),
+                'launchLink' : str(self.getUrl()),
                 'launchTooltip': _("Click here to join the EVO meeting!")}
 
     ## end of overrigind methods
@@ -436,6 +439,9 @@ class CSBooking(CSBookingBase):
         self._bookingParams["communityId"] = attributes["com"]
 
         self.checkCanStart()
+
+        if changesFromEVO:
+            return ChangesFromEVOError(changesFromEVO)
 
     def bookingOK(self):
         self._statusMessage = _("Booking created")

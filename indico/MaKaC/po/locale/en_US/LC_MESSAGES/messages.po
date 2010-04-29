@@ -1,4 +1,3 @@
-# $Id: messages.po,v 1.6 2009/05/20 13:48:38 pferreir Exp $
 #
 # This file is part of Indico.
 # Copyright (C) 2007 CERN.
@@ -13755,7 +13754,7 @@ msgid "Report numbers"
 msgstr ""
 
 #: /home/pferreir/projects/indico/indico-development/code/code/MaKaC/webinterface/pages/conferences.py:2012
-msgid "View event page"
+msgid "Switch to event page"
 msgstr ""
 
 #: /home/pferreir/projects/indico/indico-development/code/code/tpls/RoomBookingSearch4Bookings.tpl:189

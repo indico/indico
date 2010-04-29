@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: category.py,v 1.128 2009/06/26 12:13:17 cangelov Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -25,7 +24,6 @@ from datetime import timedelta, datetime
 import time
 import os
 import calendar
-import MaKaC.webinterface.pages.conf_calendar as calend
 import MaKaC.webinterface.pages.main as main
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
@@ -45,37 +43,37 @@ from pytz import timezone
 
 
 class WPCategoryBase ( main.WPMainBase ):
-    
+
     def __init__( self, rh, categ ):
         main.WPMainBase.__init__( self, rh )
-        self._target = categ 
+        self._target = categ
         title = "Indico"
         if self._target:
             title = "Indico [%s]"%(self._target.getName() )
         self._setTitle(title)
         self._conf = None
-    
+
 #    def _createMenu( self ):
 #        main.WPMainBase._createMenu( self )
 #        c = self._target
-#        
+#
 #        # enable event creation
 #        if c and c.canCreateConference(self._getAW().getUser()):
 #            if not c.hasSubcategories():
 #                self._lectureOpt.setEnabled(True)
 #                self._meetingOpt.setEnabled(True)
 #                self._conferenceOpt.setEnabled(True)
-#           
+#
 #                urlConference = urlHandlers.UHConferenceCreation.getURL(c)
 #                urlConference.addParam("event_type","default")
-#    
+#
 #                urlLecture = urlHandlers.UHConferenceCreation.getURL(c)
 #                urlLecture.addParam("event_type","simple_event")
-#    
+#
 #                urlMeeting = urlHandlers.UHConferenceCreation.getURL(c)
 #                urlMeeting.addParam("event_type","meeting")
-#    
-#           
+#
+#
 #                self._conferenceOpt.setURL( urlConference )
 #                self._lectureOpt.setURL( urlLecture )
 #                self._meetingOpt.setURL( urlMeeting )
@@ -106,11 +104,11 @@ class WPCategoryDisplayBase( WPCategoryBase ):
 #        return wc.getHTML(p)
 
 class WCategoryDisplay(wcomponents.WTemplated):
-        
+
     def __init__( self, target, wfReg ):
         self._target = target
         self._wfReg = wfReg
-        
+
     def _getMaterialHTML( self ):
         l = []
         for mat in self._target.getAllMaterialList():
@@ -127,7 +125,7 @@ class WCategoryDisplay(wcomponents.WTemplated):
     def getHTML( self, aw, params ):
         self._aw = aw
         return wcomponents.WTemplated.getHTML( self, params )
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["name"] = self._target.getName()
@@ -145,7 +143,7 @@ class WCategoryDisplay(wcomponents.WTemplated):
             params = {"conferenceDisplayURLGen": vars["confDisplayURLGen"], "material": self._getMaterialHTML()}
             vars["contents"] = cl.getHTML( self._aw, params )
         else:
-            vars["contents"] = _("This category is empty. Please start creating conferences or categories by using the top menu.") 
+            vars["contents"] = _("This category is empty. Please start creating conferences or categories by using the top menu.")
         mgrs=[]
         from MaKaC.user import Avatar
         for mgr in self._target.getManagerList():
@@ -154,32 +152,32 @@ class WCategoryDisplay(wcomponents.WTemplated):
         vars["managers"]=""
         if mgrs != []:
             vars["managers"]= "; ".join(mgrs)
-        
+
         # TODO: Should be added to submenu
         if self._target.tasksAllowed() :
             vars["taskList"] = _("""<a href="%s"> _("Task List")</a>""")%urlHandlers.UHTaskList.getURL(self._target)
         else :
-            vars["taskList"] = ""        
-        
+            vars["taskList"] = ""
+
         return vars
 
 
 class WPCategoryDisplay(WPCategoryDisplayBase):
-    
+
     def __init__( self, rh, target, wfReg ):
         WPCategoryDisplayBase.__init__( self, rh, target )
         self._wfReg = wfReg
         if len(self._target.getSubCategoryList())==0:
-            tzUtil = DisplayTZ(self._getAW(),target)#None,useServerTZ=1) 
-            self._locTZ = tzUtil.getDisplayTZ()      
+            tzUtil = DisplayTZ(self._getAW(),target)#None,useServerTZ=1)
+            self._locTZ = tzUtil.getDisplayTZ()
 
     def _getHeadContent( self ):
         # add RSS feed
         url = urlHandlers.UHCategoryToRSS.getURL(self._target)
-        
+
         return WPCategoryDisplayBase._getHeadContent( self ) + \
         _("""<link rel="alternate" type="application/rss+xml" title= _("Indico RSS Feed") href="%s">""") % url
-        
+
     def _getBody( self, params ):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         tz = DisplayTZ(self._getAW(),self._target).getDisplayTZ()
@@ -197,13 +195,13 @@ class WPCategoryDisplay(WPCategoryDisplayBase):
         if minfo.isCacheActive() and tz == self._target.getTimezone():
             cache.saveCachePage(page)
         return page
-        
+
     def _getNavigationDrawer(self):
         pars = {"target": self._target, "isModif": False}
         return wcomponents.WNavigationDrawer( pars )
 
 class WOverviewBreak( wcomponents.WTemplated ):
-    
+
     def __init__( self, aw, entry ):
         self._break = entry
         self._aw = aw
@@ -217,13 +215,13 @@ class WOverviewBreak( wcomponents.WTemplated ):
 
 
 class WOverviewContribBase( wcomponents.WTemplated ):
-    
+
     def __init__( self, aw, contrib, date, details="conference" ):
         self._aw = aw
         self._contrib = contrib
         self._date = date
         self._details = details
-    
+
     def _getSpeakerText( self ):
         l = []
         if self._contrib.getSpeakerText()!="":
@@ -271,13 +269,13 @@ class WOverviewContribMinDisplay( WOverviewContribBase ):
 
 
 class WOverviewContribution:
-    
+
     def __init__( self, aw, contrib, date, details="conference" ):
         self._comp = None
-        
+
         """ This is needed for the future? The two
             templates are currently identical """
-        
+
         if contrib.canAccess( aw ):
             self._comp = WOverviewContribFullDisplay( aw, \
                                                     contrib, \
@@ -295,13 +293,13 @@ class WOverviewContribution:
 
 
 class WOverviewSessionBase( wcomponents.WTemplated ):
-    
+
     def __init__( self, aw, session, date, details="conference" ):
         self._aw = aw
         self._session = session
         self._date = date
         self._details = details
-    
+
     def _getConvenerText( self ):
         l = []
         if self._session.getConvenerText()!="":
@@ -332,7 +330,7 @@ class WOverviewSessionBase( wcomponents.WTemplated ):
     def _getBreakItem( self, entry ):
         wc = WOverviewBreak( self._aw, entry )
         return wc.getHTML( {} )
-    
+
     def _getDetails( self ):
         if self._details != "contribution":
             return ""
@@ -375,14 +373,14 @@ class WOverviewSessionBase( wcomponents.WTemplated ):
         return vars
 
 class WOverviewSessionSlot( WOverviewSessionBase ):
-    
+
     def __init__( self, aw, slot, date, details="conference" ):
         self._aw = aw
         self._session = slot.getSession()
         self._slot = slot
         self._date = date
         self._details = details
-    
+
     def _getDetails( self ):
         if self._details != "contribution":
             return ""
@@ -405,13 +403,13 @@ class WOverviewSessionFullDisplay( WOverviewSessionBase ):
 
 
 class WOverviewSessionMinDisplay( WOverviewSessionBase ):
-    
+
     def _getBreakItem( self, entry ):
         return ""
 
 
 class WOverviewSession:
-    
+
     def __init__( self, aw, session, date, details="conference" ):
         self._comp = None
         if session.canAccess( aw ):
@@ -428,10 +426,10 @@ class WOverviewSession:
         if not self._comp:
             return ""
         return self._comp.getHTML( params )
-        
+
 
 class WOverviewConfBase( wcomponents.WTemplated ):
-    
+
     def __init__( self, aw, conference, date, url, icons, details="conference" ):
         self._conf = conference
         self._url = url
@@ -439,8 +437,8 @@ class WOverviewConfBase( wcomponents.WTemplated ):
         self._details = details
         self._date = date
         self._icons = icons
-        
-    
+
+
     def _getChairText( self ):
         l = []
         if self._conf.getChairmanText()!="":
@@ -503,7 +501,7 @@ class WOverviewConfBase( wcomponents.WTemplated ):
                 elif isinstance( entry, schedule.BreakTimeSchEntry):
                     res.append( self._getBreakItem( entry ) )
         return "".join( res )
-    
+
     def _getIcon( self ):
         confid = self._conf.getId()
         iconHtml = ""
@@ -534,7 +532,7 @@ class WOverviewConfFullDisplay( WOverviewConfBase ):
     pass
 
 class WOverviewConfMinDisplay( WOverviewConfBase ):
-    
+
     def _getDetails( self ):
         return ""
 
@@ -543,7 +541,7 @@ class WOverviewConfMinDisplay( WOverviewConfBase ):
 
 
 class WOverviewConferenceItem:
-    
+
     def __init__(self, aw, conference, date, displayURL, icons, details="conference"):
         self._comp = None
         if details=="conference" or conference.canAccess( aw ):
@@ -568,7 +566,7 @@ class WOverviewConferenceItem:
 
 
 class WDayOverview(wcomponents.WTemplated):
-    
+
     def __init__( self, ow ):
         self._ow = ow
 
@@ -605,7 +603,7 @@ class WDayOverview(wcomponents.WTemplated):
         return vars
 
 class WWeekOverview(wcomponents.WTemplated):
-    
+
     def __init__( self, ow ):
         self._ow = ow
 
@@ -615,7 +613,7 @@ class WWeekOverview(wcomponents.WTemplated):
         prevsel = urlHandlers.UHCategoryOverview.getURLFromOverview( prevOW )
         nextOW = self._ow.getOverviewNextPeriod()
         nextsel = urlHandlers.UHCategoryOverview.getURLFromOverview( nextOW )
-        
+
         startDate = """<a href="%s">&lt;</a>&nbsp;&nbsp;%s""" % (\
                 prevsel,\
                 self._ow.getStartDate().strftime("%A %d %B %Y"))
@@ -623,7 +621,7 @@ class WWeekOverview(wcomponents.WTemplated):
                 self._ow.getEndDate().strftime("%A %d %B %Y"),\
                 nextsel)
         vars["dates"] = """%s &nbsp;&ndash;&nbsp; %s"""%(startDate, endDate)
-        
+
         inc = timedelta( 1 )
         sd = self._ow.getStartDate()
         idx = 0
@@ -640,7 +638,7 @@ class WWeekOverview(wcomponents.WTemplated):
                                             self._ow._cal.getIcons(), \
                                             self._ow.getDetailLevel() )
                 res.append( wc.getHTML( {} ) )
-           
+
             if res==[]:
                 res.append("<tr><td></td></tr>")
             vars["item%i"%idx] = "".join( res )
@@ -653,7 +651,7 @@ class WWeekOverview(wcomponents.WTemplated):
 # iterate over is always zero for some reason. Remove the class in the future
 # or fix it?
 class WNextWeekOverview(wcomponents.WTemplated):
-    
+
     def __init__( self, ow ):
         self._ow = ow
 
@@ -735,11 +733,11 @@ class WMonthOverview(wcomponents.WTemplated):
             if day.getWeekDay() == 6:
                 month = """%s<tr>%s</tr>"""%(month, week)
                 week = ""
-        
+
         for i in range( 6-dl[-1].getWeekDay() ):
             week = "%s%s"%(week, self._getDayCell())
         return """%s<tr>%s</tr>"""%(month, week)
-            
+
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
@@ -774,7 +772,7 @@ class WMonthOverview(wcomponents.WTemplated):
 
 
 class WCategoryOverview(wcomponents.WTemplated):
-    
+
     def __init__( self, ow, aw ):
         self._categ = ow.getCategoryList()[0]
         self._ow = ow
@@ -801,14 +799,14 @@ class WCategoryOverview(wcomponents.WTemplated):
                 cm= CategoryManager()
                 categ=cm.getById(str(icon))
                 otherOW = self._ow.getOverviewOtherCateg(categ)
-                a=(""" <a href="%s" style="font-size: 1.0em;"><img src="%s" width="16" height="16" border="0" alt="category">&nbsp;%s</a>  <BR>""" %(\
+                a=(""" <a href="%s" style="font-size: 1.0em;"><img src="%s" width="16" height="16" border="0">&nbsp;%s</a>  <br/>""" %(\
                                         vars["categOverviewURLGen"]( otherOW ),\
                                         urlHandlers.UHCategoryIcon.getURL(categ),\
                                         categ.getName().replace(" ","&nbsp;")))
                 if not a in l:
                     l.append(a)
         return "". join(l)
-            
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         l = self._ow.getLocator()
@@ -817,7 +815,7 @@ class WCategoryOverview(wcomponents.WTemplated):
         del l["day"]
         del l["month"]
         del l["year"]
-        
+
         vars["selDay"] = ""
         vars["selWeek"] = ""
         vars["selNextWeek"] = ""
@@ -825,14 +823,14 @@ class WCategoryOverview(wcomponents.WTemplated):
         vars["selYear"] = ""
 
         vars["detailLevelOpts"] = self._getDetailLevelOpts()
-        
+
         if isinstance( self._ow, wcalendar.MonthOverview ):
             displayOW = WMonthOverview( self._ow )
             vars["selMonth"] = "selected"
         elif isinstance( self._ow, wcalendar.WeekOverview ):
             displayOW = WWeekOverview( self._ow )
             vars["selWeek"] = "selected"
-            
+
         #  This will not happen since the option in the selection
         #  box in the user interface has been removed. Can be readded
         #  in the future if needed.
@@ -848,28 +846,28 @@ class WCategoryOverview(wcomponents.WTemplated):
 
         vars["locator"] = l.getWebForm()
         vars["key"] = self._getKey(vars)
-        
+
         vars["day"] = self._ow.getDate().day
         vars["month"] = self._ow.getDate().month
         vars["year"] = self._ow.getDate().year
 
         return vars
-    
+
     def _getWeekDays(self):
         """returns a list with the current week days"""
-        
+
         year=int(self._ow.getDate().year)
         month=int(self._ow.getDate().month)
         day=int(self._ow.getDate().day)
         daynumber=int(calendar.weekday(year,month,day))
-        
+
         date = self._ow.getDate() - timedelta(daynumber)
         delta = timedelta(1)
         res = []
         for i in range(7):
             res.append((str(date.day)+"-"+str(date.month)+"-"+str(date.year)))
             date += delta
-        
+
         #if daynumber == 0:
         #    res = [(str(day)+"-"+str(month)+"-"+str(year))]
         #    i=1
@@ -882,7 +880,7 @@ class WCategoryOverview(wcomponents.WTemplated):
         #            res+=[(str(day+i)+"-"+str(month)+"-"+str(year))]
         #        if (day+i)<30 and month==2 and ((year%4==0 and year%100!=0) or year%400==0):
         #            res+=[(str(day+i)+"-"+str(month)+"-"+str(year))]
-        #            
+        #
         #        i+=1
         #else:
         #    res = [(str(day)+"-"+str(month)+"-"+str(year))]
@@ -890,36 +888,36 @@ class WCategoryOverview(wcomponents.WTemplated):
         #    while i <= 7:
         #        j = day+7-daynumber-i          #day+i-(daynumber+1)
         #        if j>0 and j <32 and (month==8 or month==1 or month==3 or month==5 or month==7 or month==10):
-        #            
+        #
         #            res+=[(str(j)+"-"+str(month)+"-"+str(year))]
-        #        
+        #
         #        if j>0 and j<31 and (month==4 or month==6 or month==9 or month==11):
         #            res+=[(str(j)+"-"+str(month)+"-"+str(year))]
-        #        
+        #
         #        if j>0 and j<29 and month==2 and ((year %4!=0) or (year %4 ==0 and year %100==0)):
         #            res+=[(str(j)+"-"+str(month)+"-"+str(year))]
-        #        
+        #
         #        if j>0 and j<30 and month==2 and ((year%4==0 and year%100!=0) or year%400==0):
         #            res+=[(str(j)+"-"+str(month)+"-"+str(year))]
-        #            
+        #
         #        i+=1
-                                 
+
         return res
-    
-    
+
+
 
 
     def _getNextWeekDays(self):
-        
-     
+
+
         y=int(self._ow.getDate().year)
         m=int(self._ow.getDate().month)
         d=int(self._ow.getDate().day)
-        
+
         res=[]
         i=0
         while i<=6:
-            
+
             if (d+i)<=31 and (m==8 or m==1 or m==3 or m==5 or m==7 or m==10):
                 res+=[str(d+i)+"-"+str(m)+"-"+str(y)]
             if (d+i)<=30 and (m==4 or m==6 or m==9 or m==11):
@@ -929,19 +927,19 @@ class WCategoryOverview(wcomponents.WTemplated):
             if (d+i)<30 and m==2 and ((y%4==0 and y%100!=0) or y%400==0):
                 res+=[(str(d+i)+"-"+str(m)+"-"+str(y))]
             i+=1
-        
-        j=0    
+
+        j=0
         if d<7 and len(res)<7:
             while j<(7-len(res)):
                 res+=[(str(d+i+j)+"-"+str(m)+"-"+str(y))]
                 j+=1
-                
-                
+
+
         return res
-    
+
     def _whichPeriod(self,vars):
-        
-        
+
+
         if vars["selDay"]=="selected":
             return "day"
         if vars["selWeek"]=="selected":
@@ -957,20 +955,20 @@ class WCategoryOverview(wcomponents.WTemplated):
         res=[]
         for day in range(1,calendar.monthrange(year,month)[1]+1):
             res+=[str(day)+'-'+str(month)+'-'+str(year)]
-    
+
         return res
 
 class WPCategOverview( WPCategoryDisplayBase ):
-    
+
     def __init__( self, rh, categ, ow ):
         WPCategoryDisplayBase.__init__( self, rh, categ )
         self._ow = ow
         self._categ = categ
-        self._locTZ = DisplayTZ(self._getAW(),None,useServerTZ=1).getDisplayTZ()  
-        
+        self._locTZ = DisplayTZ(self._getAW(),None,useServerTZ=1).getDisplayTZ()
+
     def _getTitle(self):
-        return WPCategoryDisplayBase._getTitle(self) + " - " + _("Events Display")    
-    
+        return WPCategoryDisplayBase._getTitle(self) + " - " + _("Events Display")
+
     def _getHeadContent( self ):
         # add RSS feed
         if self._ow.getDate().date() == nowutc().astimezone(timezone(self._locTZ)).date():
@@ -1005,56 +1003,56 @@ class WPCategOverview( WPCategoryDisplayBase ):
                      "categOverviewURLGen": urlHandlers.UHCategoryOverview.getURLFromOverview, \
                      "categoryTitle": self._categ.getTitle() }
             return wc.getHTML( pars )
-    
+
     def _getNavigationDrawer(self):
         link = [{"url": urlHandlers.UHCategoryOverview.getURL(self._target), "title": _("Events overview"), "type": "Overview"}]
         pars = {"target": self._target, "isModif": False}
         return wcomponents.WNavigationDrawer( pars, appendPath = link )
-    
+
 class WCategoryMap(wcomponents.WTemplated):
-    
+
     def __init__( self, categ ):
         self._categ = categ
-        
+
     def getCategMap( self, categ ):
         res = []
         if len(categ.getSubCategoryList()) > 0:
             res.append("<ul>")
             for subcat in categ.getSubCategoryList():
                 res.append("<li><a href='%s'>%s</a>"% (urlHandlers.UHCategoryDisplay.getURL(subcat), subcat.getName()))
-                if subcat.hasAnyProtection(): 
+                if subcat.hasAnyProtection():
                     res.append("""&nbsp;<span style="font-size: 0.8em; color: gray;">(%s)</span>"""% _("protected"))
                 res.append(self.getCategMap(subcat))
             res.append("</ul>")
         return "".join(res)
-                
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars['categName'] =  self._categ.getName()
         vars["categDisplayURL"] = urlHandlers.UHCategoryDisplay.getURL(self._categ)
         vars['map'] = self.getCategMap(self._categ)
         return vars
-        
+
 class WPCategoryMap( WPCategoryDisplayBase ):
-    
+
     def __init__( self, rh, categ ):
         WPCategoryDisplayBase.__init__( self, rh, categ )
-        
+
     def _getTitle(self):
-        return WPCategoryDisplayBase._getTitle(self) + " - " + _("Category Map")    
+        return WPCategoryDisplayBase._getTitle(self) + " - " + _("Category Map")
 
     def _getBody( self, params ):
         wc = WCategoryMap( self._target )
         pars = {}
         return wc.getHTML( pars )
-        
+
     def _getNavigationDrawer(self):
         link = [{"url": urlHandlers.UHCategoryMap.getURL(self._target), "title": _("Category map"), "type": "Map"}]
         pars = {"target": self._target, "isModif": False}
         return wcomponents.WNavigationDrawer( pars, appendPath = link )
 
 class WCategoryStatistics(wcomponents.WTemplated):
-        
+
     def __init__( self, target, wfReg, stats ):
         self.__target = target
         self._wfReg = wfReg
@@ -1063,7 +1061,7 @@ class WCategoryStatistics(wcomponents.WTemplated):
     def getHTML( self, aw ):
         self._aw = aw
         return wcomponents.WTemplated.getHTML( self )
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["name"] = self.__target.getName()
@@ -1095,26 +1093,26 @@ class WCategoryStatistics(wcomponents.WTemplated):
         return vars
 
 class WPCategoryStatistics( WPCategoryDisplayBase ):
-    
+
     def __init__( self, rh, target, wfReg, stats ):
         WPCategoryDisplayBase.__init__( self, rh, target )
         self._wfReg = wfReg
         self._stats = stats
-        
+
     def _getTitle(self):
-        return WPCategoryDisplayBase._getTitle(self) + " - " + _("Category Statistics")    
-    
+        return WPCategoryDisplayBase._getTitle(self) + " - " + _("Category Statistics")
+
     def _getBody( self, params ):
         wcs = WCategoryStatistics( self._target, self._wfReg, self._stats )
         return wcs.getHTML( self._getAW() )
-        
+
     def _getNavigationDrawer(self):
         link = [{"url": urlHandlers.UHCategoryStatistics.getURL(self._target), "title": _("Category statistics"), "type": "Statistics"}]
         pars = {"target": self._target, "isModif": False}
         return wcomponents.WNavigationDrawer( pars, appendPath = link )
 
 class WEventTypeSelectionItem(wcomponents.WTemplated):
-    
+
     def __init__(self, webFactory ):
         self.__webFactory = webFactory
 
@@ -1142,7 +1140,7 @@ class WEventTypeSelection(wcomponents.WTemplated):
 
 
 class WPConferenceCreationSelectType( WPCategoryDisplayBase ):
-    
+
     def _getBody( self, params ):
         #p = { "categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL }
         wp = WEventTypeSelection( self._target,\
@@ -1151,19 +1149,19 @@ class WPConferenceCreationSelectType( WPCategoryDisplayBase ):
         return "%s"%wp.getHTML( p )
 
 
-                       
+
 #---------------------------------------------------------------------------
-    
+
 class WConferenceCreation( wcomponents.WTemplated ):
-    
+
     def __init__( self, targetCateg, type="", rh = None ):
         self._categ = targetCateg
         self._type = type
         self._rh = rh
 
-    
+
     def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )        
+        vars = wcomponents.WTemplated.getVars( self )
         navigator = ""
         vars["title"] = vars.get("title","")
         vars["description"] = vars.get("description","")
@@ -1182,14 +1180,14 @@ class WConferenceCreation( wcomponents.WTemplated ):
         vars["eYear"] = vars.get("eYear",now.year)
         vars["eHour"] = vars.get("eHour","18")
         vars["eMinute"] = vars.get("eMinute","00")
-        
+
         vars["sDay_"] = {}
         vars["sMonth_"] = {}
         vars["sYear_"] = {}
         vars["sHour_"] = {}
         vars["sMinute_"] = {}
         vars["dur_"] = {}
-            
+
         for i in range(0,10):
             vars["sDay_"][i] = vars.get("sDay_%s"%i,now.day)
             vars["sMonth_"][i] = vars.get("sMonth_%s"%i,now.month)
@@ -1239,16 +1237,18 @@ class WConferenceCreation( wcomponents.WTemplated ):
                 selected = ""
             styleoptions += "<option value=\"%s\" %s>%s</option>" % (stylesheet,selected,styleMgr.getStylesheetName(stylesheet))
         vars["styleOptions"] = styleoptions
-        
+
         vars["chairpersonDefined"] = vars.get("chairpersonDefined", [])
-        
+
         vars["useRoomBookingModule"] = minfo.getRoomBookingModuleActive()
-        
+
         return vars
-        
-#---------------------------------------------------------------------------            
-    
+
+#---------------------------------------------------------------------------
+
 class WPConferenceCreationMainData( WPCategoryDisplayBase ):
+
+    _userData = ['favorite-user-list', 'favorite-user-ids']
 
     def getJSFiles(self):
         return WPCategoryDisplayBase.getJSFiles(self) + \
@@ -1264,20 +1264,26 @@ class WPConferenceCreationMainData( WPCategoryDisplayBase ):
                              "loginAsURL": self.getLoginAsURL() } )
 
     def _getNavigationDrawer(self):
-        pars = {"target": self._target, "isModif": False}
+        if self._target and self._target.isRoot():
+            return
+        else:
+            pars = {"target": self._target, "isModif": False}
+            return wcomponents.WNavigationDrawer( pars )
         return wcomponents.WNavigationDrawer( pars )
-   
+
     def _getWComponent( self ):
         return WConferenceCreation( self._target, "", self._rh )
 
     def _getBody( self, params ):
         ## TODO: TO REMOVE?????????
-        #p = { "categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL }       
+        #p = { "categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL }
         wc = self._getWComponent()
         params.update({"postURL": urlHandlers.UHConferencePerformCreation.getURL() })
         return "%s"%wc.getHTML( params )
 
 class WPCategoryModifBase( WPCategoryBase ):
+
+    _userData = ['favorite-user-ids']
 
     def getJSFiles(self):
         return WPCategoryBase.getJSFiles(self) + \
@@ -1291,29 +1297,29 @@ class WPCategoryModifBase( WPCategoryBase ):
                              "loginURL": self._escapeChars(str(self.getLoginURL())),\
                              "logoutURL": self._escapeChars(str(self.getLogoutURL())),\
                              "loginAsURL": self.getLoginAsURL() } )
-    
+
     def _getNavigationDrawer(self):
         pars = {"target": self._target , "isModif" : True}
         return wcomponents.WNavigationDrawer( pars, bgColor = "white" )
-        
+
     def _createSideMenu( self ):
         self._sideMenu = wcomponents.ManagementSideMenu()
-        
+
         viewSection = wcomponents.SideMenuSection()
-        
+
         self._viewMenuItem = wcomponents.SideMenuItem(_("View category"),
             urlHandlers.UHCategoryDisplay.getURL( self._target ))
         viewSection.addItem( self._viewMenuItem)
-        
+
         self._sideMenu.addSection(viewSection)
-        
+
 
         mainSection = wcomponents.SideMenuSection()
-        
+
         self._generalSettingsMenuItem = wcomponents.SideMenuItem(_("General settings"),
             urlHandlers.UHCategoryModification.getURL( self._target ))
         mainSection.addItem( self._generalSettingsMenuItem)
-        
+
         self._filesMenuItem = wcomponents.SideMenuItem(_("Files"),
             urlHandlers.UHCategModifFiles.getURL(self._target ))
         mainSection.addItem( self._filesMenuItem)
@@ -1325,7 +1331,7 @@ class WPCategoryModifBase( WPCategoryBase ):
         self._toolsMenuItem = wcomponents.SideMenuItem(_("Tools"),
             urlHandlers.UHCategModifTools.getURL( self._target ))
         mainSection.addItem( self._toolsMenuItem)
-        
+
         self._tasksMenuItem = wcomponents.SideMenuItem(_("Tasks"),
             urlHandlers.UHCategModifTasks.getURL( self._target ))
         mainSection.addItem( self._tasksMenuItem)
@@ -1339,14 +1345,14 @@ class WPCategoryModifBase( WPCategoryBase ):
 
     def _setActiveTab( self ):
         pass
-        
+
     def _setActiveSideMenuItem( self ):
         pass
-    
+
     def _getBody( self, params ):
         self._createSideMenu()
         self._setActiveSideMenuItem()
-        
+
         self._createTabCtrl()
         self._setActiveTab()
 
@@ -1356,12 +1362,12 @@ class WPCategoryModifBase( WPCategoryBase ):
         p = { "category": self._target,
               "body": self._getPageContent( params ),
               "sideMenu": self._sideMenu.getHTML() }
-        
+
         return frame.getHTML( p )
 
     def _getTabContent( self, params ):
         return "nothing"
-    
+
     def _getPageContent( self, params ):
         return "nothing"
 
@@ -1370,7 +1376,7 @@ class WPCategoryModifBase( WPCategoryBase ):
 
 
 class WCategoryModifFrame(wcomponents.WTemplated):
-    
+
     def __init__( self ):
         pass
 
@@ -1379,13 +1385,13 @@ class WCategoryModifFrame(wcomponents.WTemplated):
         return vars
 
 class WPCategModifMain( WPCategoryModifBase ):
-    
+
     def _setActiveSideMenuItem( self ):
         self._generalSettingsMenuItem.setActive()
 
-    
+
 class WCategModifMain(wcomponents.WTemplated):
-    
+
     def __init__( self, category ):
         self._categ = category
 
@@ -1414,7 +1420,7 @@ class WCategModifMain(wcomponents.WTemplated):
                 <table align="center">%s
                 </table>"""%"".join( temp )
         return html
-    
+
     def __getConferenceItems( self, cl, modifURLGen, modifURLOpen ):
         temp = []
         for conf in cl:
@@ -1442,13 +1448,13 @@ class WCategModifMain(wcomponents.WTemplated):
         return html
 
     def getVars( self ):
-        
+
         vars = wcomponents.WTemplated.getVars( self )
         vars["locator"] = self._categ.getLocator().getWebForm()
         vars["name"] = self._categ.getName()
-        
+
         vars["description"] = self._categ.getDescription()
-        
+
         if self._categ.getIcon() is not None:
             vars["icon"] = """<img src="%s" width="16" height="16" alt="category">"""%urlHandlers.UHCategoryIcon.getURL( self._categ)
         else:
@@ -1466,7 +1472,7 @@ class WCategModifMain(wcomponents.WTemplated):
         vars["defaultMeetingStyle"] = styleMgr.getStylesheetName(self._categ.getDefaultStyle("meeting"))
         vars["defaultLectureStyle"] = styleMgr.getStylesheetName(self._categ.getDefaultStyle("simple_event"))
 
-##        vars["defaultVisibility"] = self._categ.getVisibility() 
+##        vars["defaultVisibility"] = self._categ.getVisibility()
         vars["defaultTimezone"] = self._categ.getTimezone()
         visibility = self._categ.getVisibility()
         categpath = self._categ.getCategoryPath()
@@ -1481,18 +1487,18 @@ class WCategModifMain(wcomponents.WTemplated):
             vars["defaultVisibility"] = cat.getName()
 
 ###################################################################################################
-## TODO: this code belongs to the TASKS MODULE. We should fix it or remove it.        
+## TODO: this code belongs to the TASKS MODULE. We should fix it or remove it.
         vars["enablePic"]=quoteattr(str(Config.getInstance().getSystemIconURL( "enabledSection" )))
         vars["disablePic"]=quoteattr(str(Config.getInstance().getSystemIconURL( "disabledSection" )))
         enabledText = _("Click to disable")
         disabledText = _("Click to enable")
-        
+
         url = urlHandlers.UHCategoryTasksOption.getURL( self._categ )
-                
+
         comment = ""
         if (self._categ.hasSubcategories()):
             icon=vars["disablePic"]
-            textIcon = disabledText    
+            textIcon = disabledText
             comment = _("""<b>&nbsp;&nbsp;[ _("Category contains subcategories - this module cannot be enabled")]</b>""")
             url = ""
         elif self._categ.tasksAllowed():
@@ -1503,7 +1509,7 @@ class WCategModifMain(wcomponents.WTemplated):
                 url = ""
         else:
             icon=vars["disablePic"]
-            textIcon=disabledText     
+            textIcon=disabledText
         tasksManagement = """
         <tr>
             <td>
@@ -1516,7 +1522,7 @@ class WCategModifMain(wcomponents.WTemplated):
 
 
 class WPCategoryModification( WPCategModifMain ):
-    
+
     def _getPageContent( self, params ):
         wc = WCategModifMain( self._target )
         pars = { \
@@ -1528,11 +1534,11 @@ class WPCategoryModification( WPCategModifMain ):
 "categModifyURLGen": urlHandlers.UHCategoryModification.getURL, \
 "actionSubCategsURL": urlHandlers.UHCategoryActionSubCategs.getURL(), \
 "actionConferencesURL": urlHandlers.UHCategoryActionConferences.getURL()}
-        return wc.getHTML( pars )        
+        return wc.getHTML( pars )
 
 
 class WCategoryDataModification(wcomponents.WTemplated):
-    
+
     def __init__( self, category ):
         self._categ = category
 
@@ -1550,7 +1556,7 @@ class WCategoryDataModification(wcomponents.WTemplated):
             if level == visibility:
                 selected = "selected"
             if topcat.getId() != "0":
-                from MaKaC.common.TemplateExec import truncateTitle 
+                from MaKaC.common.TemplateExec import truncateTitle
                 vis.append("""<option value="%s" %s>%s</option>""" % (level, selected, truncateTitle(topcat.getName(), 70)))
             topcat = topcat.getOwner()
         selected = ""
@@ -1559,7 +1565,7 @@ class WCategoryDataModification(wcomponents.WTemplated):
         vis.append( _("""<option value="999" %s> _("Everywhere")</option>""") % selected)
         vis.reverse()
         return "".join(vis)
-        
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["locator"] = self._categ.getLocator().getWebForm()
@@ -1585,13 +1591,13 @@ class WCategoryDataModification(wcomponents.WTemplated):
                     selected = ""
                 styleoptions += "<option value=\"%s\" %s>%s</option>" % (stylesheet,selected,styleMgr.getStylesheetName(stylesheet))
             vars["%sStyleOptions" % type] = styleoptions
-        
-            
+
+
         return vars
 
 
 class WPCategoryDataModification( WPCategModifMain ):
-    
+
     def _getPageContent( self, params ):
         wc = WCategoryDataModification( self._target )
         pars = {"postURL": urlHandlers.UHCategoryPerformModification.getURL() }
@@ -1599,7 +1605,7 @@ class WPCategoryDataModification( WPCategModifMain ):
 
 
 class WCategoryCreation(wcomponents.WTemplated):
-    
+
     def __init__( self, target ):
         self.__target = target
 
@@ -1630,7 +1636,7 @@ class WCategoryCreation(wcomponents.WTemplated):
 
 
 class WPCategoryCreation( WPCategModifMain ):
-    
+
     def _getPageContent( self, params ):
         wc = WCategoryCreation( self._target )
         pars = { "categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL, \
@@ -1639,7 +1645,7 @@ class WPCategoryCreation( WPCategModifMain ):
 
 
 class WCategoryDeletion(object):
-    
+
     def __init__( self, categoryList ):
         self._categList = categoryList
 
@@ -1660,7 +1666,7 @@ class WCategoryDeletion(object):
 
 
 class WConferenceDeletion(object):
-    
+
     def __init__( self, conferenceList ):
         self._confList = conferenceList
 
@@ -1679,7 +1685,7 @@ class WConferenceDeletion(object):
 
 
 class WPSubCategoryDeletion( WPCategModifMain ):
-    
+
     def _getPageContent( self, params ):
         selCategs = params["subCategs"]
         wc = WCategoryDeletion( selCategs )
@@ -1694,15 +1700,15 @@ class WPConferenceDeletion(WPCategModifMain ):
         return wc.getHTML( urlHandlers.UHCategoryActionConferences.getURL( self._target ) )
 
 
-class WItemReallocation( wcomponents.WTemplated ):  
-    
+class WItemReallocation( wcomponents.WTemplated ):
+
     def __init__( self, itemList ):
         self._itemList = itemList
 
     def getHTML( self, selectTree, params):
         self._sTree = selectTree
         return wcomponents.WTemplated.getHTML( self, params )
-    
+
     def _getItemDescription( self, item ):
         return ""
 
@@ -1712,24 +1718,24 @@ class WItemReallocation( wcomponents.WTemplated ):
         for item in self._itemList:
             l.append("<li><b>%s</b>"%self._getItemDescription(item))
         vars["selectedItems"] = "".join(l)
-        vars["categTree"] = self._sTree.getHTML() 
+        vars["categTree"] = self._sTree.getHTML()
         return vars
 
 
-class WCategoryReallocation( WItemReallocation ):  
-    
+class WCategoryReallocation( WItemReallocation ):
+
     def _getItemDescription( self, item ):
         return item.getName()
 
 
-class WConferenceReallocation( WItemReallocation ):  
-    
+class WConferenceReallocation( WItemReallocation ):
+
     def _getItemDescription( self, item ):
         return item.getTitle()
 
 
 class CategSelectTree:
-    
+
     def __init__( self, aw, excludedCat, expandedCat, \
                         selectURLGen, expandURLGen, movingConference = 0 ):
         self._aw = aw
@@ -1762,14 +1768,14 @@ class CategSelectTree:
         else:
             html = """%s<a href="%s"><img src="%s" border="0" alt=""></a> %s"""%(html, self._expandURLGen( self._expandedCategs+[categ] ), cfg.getSystemIconURL("itemCollapsed"), title)
         return html
-        
+
     def getHTML( self ):
         cm = conference.CategoryManager()
         return self._getItem( cm.getRoot() )
 
 
 class WPCategoryReallocation( WPCategModifMain ):
-    
+
     def _getReAllocateCategsURL( self, destination ):
         url = urlHandlers.UHCategoryActionSubCategs.getURL( destination )
         selectedCategs = []
@@ -1779,7 +1785,7 @@ class WPCategoryReallocation( WPCategModifMain ):
         url.addParam( "confirm", "" )
         url.addParam( "reallocate", "" )
         return url
-    
+
     def _getCategExpandCategURL( self, expandedCategs ):
         selected = []
         for c in self._categs:
@@ -1792,7 +1798,7 @@ class WPCategoryReallocation( WPCategModifMain ):
         url.addParam( "ex", expanded )
         url.addParam( "reallocate", "" )
         return url
-    
+
     def _getExpandedCategs( self, params ):
         exIdList = params.get("ex", [])
         if not isinstance( exIdList, list ):
@@ -1816,7 +1822,7 @@ class WPCategoryReallocation( WPCategModifMain ):
 
 
 class WPConferenceReallocation( WPCategModifMain ):
-    
+
     def _getReAllocateConfsURL( self, destination ):
         url = urlHandlers.UHCategoryActionConferences.getURL( destination )
         url.addParam( "srcCategId", self._target.getId() )
@@ -1824,7 +1830,7 @@ class WPConferenceReallocation( WPCategModifMain ):
         url.addParam( "confirm", "" )
         url.addParam( "reallocate", "" )
         return url
-    
+
     def _getExpandCategURL( self, expandedCategs ):
         expanded = []
         for c in expandedCategs:
@@ -1834,7 +1840,7 @@ class WPConferenceReallocation( WPCategModifMain ):
         url.addParam( "reallocate", "" )
         url.addParam( "selectedConf", self._confIds )
         return url
-    
+
     def _getExpandedCategs( self, params ):
         exIdList = params.get("ex", [])
         if not isinstance( exIdList, list ):
@@ -1861,7 +1867,7 @@ class WPConferenceReallocation( WPCategModifMain ):
 
 
 class WCategModifAC(wcomponents.WTemplated):
-    
+
     def __init__( self, category ):
         self._categ = category
 
@@ -1889,12 +1895,12 @@ class WCategModifAC(wcomponents.WTemplated):
                   "removeCreatorsURL": vars["removeConfenceCreatorsURL"] }
             vars["confCreationControlFrame"] = frame.getHTML(p)
         return vars
-    
+
 class WPCategModifAC( WPCategoryModifBase ):
-    
+
     def _setActiveSideMenuItem( self ):
         self._ACMenuItem.setActive()
-    
+
     def _getPageContent( self, params ):
         wc = WCategModifAC( self._target )
         pars = { \
@@ -1908,11 +1914,11 @@ class WPCategModifAC( WPCategoryModifBase ):
 "setConferenceCreationControlURL": urlHandlers.UHCategorySetConfCreationControl.getURL() , \
 "addConferenceCreatorsURL": urlHandlers.UHCategorySelectConfCreators.getURL(),\
 "removeConfenceCreatorsURL": urlHandlers.UHCategoryRemoveConfCreators.getURL() }
-        return wc.getHTML( pars )        
+        return wc.getHTML( pars )
 
 
 class WPCategorySelectManagers( WPCategModifAC ):
-    
+
     def _getPageContent( self, params ):
         searchExt = params.get("searchExt","")
         if searchExt != "":
@@ -1925,7 +1931,7 @@ class WPCategorySelectManagers( WPCategModifAC ):
 
 
 class WPCategorySelectAllowed( WPCategModifAC ):
-    
+
     def _getPageContent( self, params ):
         searchExt = params.get("searchExt","")
         if searchExt != "":
@@ -1938,7 +1944,7 @@ class WPCategorySelectAllowed( WPCategModifAC ):
 
 
 class WPCategorySelectConfCreators( WPCategModifAC ):
-    
+
     def _getPageContent( self, params ):
         searchExt = params.get("searchExt","")
         if searchExt != "":
@@ -1952,10 +1958,10 @@ class WPCategorySelectConfCreators( WPCategModifAC ):
 #---------------------------------------------------------------------------------
 
 class WCategModifTools(wcomponents.WTemplated):
-    
+
     def __init__( self, category ):
         self._categ = category
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["deleteButton"] = ""
@@ -1966,24 +1972,24 @@ class WCategModifTools(wcomponents.WTemplated):
         if info.HelperMaKaCInfo.getMaKaCInfoInstance().isCacheActive():
             vars["clearCache"] = _("""<form action="%s" method="POST"><input type="submit" class="btn" value="_("clear category cache")"></form>""") % urlHandlers.UHCategoryClearCache.getURL(self._categ)
             if len(self._categ.getConferenceList()):
-                vars["clearCache"] += _("""<form action="%s" method="POST"><input type="submit" class="btn" value="_("clear conference caches")"></form>""") % urlHandlers.UHCategoryClearConferenceCaches.getURL(self._categ)    
+                vars["clearCache"] += _("""<form action="%s" method="POST"><input type="submit" class="btn" value="_("clear conference caches")"></form>""") % urlHandlers.UHCategoryClearConferenceCaches.getURL(self._categ)
         return vars
 
 
 class WPCategModifTools( WPCategoryModifBase ):
-    
+
     def _setActiveSideMenuItem( self ):
         self._toolsMenuItem.setActive()
-    
+
     def _getPageContent( self, params ):
         wc = WCategModifTools( self._target )
         pars = { \
 "deleteCategoryURL": urlHandlers.UHCategoryDeletion.getURL(self._target) }
-        return wc.getHTML( pars )        
+        return wc.getHTML( pars )
 
 
 class WPCategoryDeletion( WPCategModifTools ):
-    
+
     def _getPageContent( self, params ):
         wc = WCategoryDeletion( [self._target] )
         return wc.getHTML( urlHandlers.UHCategoryDeletion.getURL( self._target ) )
@@ -1991,10 +1997,10 @@ class WPCategoryDeletion( WPCategModifTools ):
 #---------------------------------------------------------------------------------
 
 class WCategModifTasks(wcomponents.WTemplated):
-    
+
     def __init__( self, category ):
         self._categ = category
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         if self._categ.tasksAllowed() :
@@ -2004,7 +2010,7 @@ class WCategModifTasks(wcomponents.WTemplated):
         vars["id"] = self._categ.getId()
         vars["taskAction"] = urlHandlers.UHCategModifTasksAction.getURL(self._categ)
         vars["locator"] = ""
-        
+
         if self._categ.tasksPublic() :
             vars["accessVisibility"] = _("PUBLIC")
             oppVisibility = _("PRIVATE")
@@ -2012,29 +2018,29 @@ class WCategModifTasks(wcomponents.WTemplated):
             vars["accessVisibility"] = _("PRIVATE")
             oppVisibility = _("PUBLIC")
         vars["changeAccessVisibility"] = _("""( _("make it") <input type="submit" class="btn" name="accessVisibility" value="%s">)""")%oppVisibility
-        
+
         if not self._categ.tasksPublic() :
             vars["commentVisibility"] = _("PRIVATE")
             vars["changeCommentVisibility"] = """"""
         else :
-            if self._categ.tasksCommentPublic() :                
+            if self._categ.tasksCommentPublic() :
                 vars["commentVisibility"] = _("PUBLIC")
                 oppVisibility = _("PRIVATE")
             else :
                 vars["commentVisibility"] = _("PRIVATE")
                 oppVisibility = _("PUBLIC")
             vars["changeCommentVisibility"] = _("""( _("make it") <input type="submit" class="btn" name="commentVisibility" value="%s">)""")%oppVisibility
-        
-                
-        vars["managerList"] = self._getPersonList("manager") 
-        vars["commentList"] = self._getPersonList("commentator") 
-        vars["accessList"] = self._getPersonList("access") 
-                        
+
+
+        vars["managerList"] = self._getPersonList("manager")
+        vars["commentList"] = self._getPersonList("commentator")
+        vars["accessList"] = self._getPersonList("access")
+
         vars["accessOptions"] = self._getAccessOptions()
         vars["commentOptions"] = self._getCommentOptions()
         vars["managerOptions"] = self._getManagerOptions()
-        
-            
+
+
         return vars
 
     def _getAccessOptions(self, names=[]):
@@ -2062,10 +2068,10 @@ class WCategModifTasks(wcomponents.WTemplated):
                 index = index + 1
                 if not (participant.getFullName() in names) :
                     html.append(text)
-                    names.append(participant.getFullName())                    
+                    names.append(participant.getFullName())
         return """
                 """.join(html)
-        
+
     def _getCommentOptions(self, names=[]):
         html = []
         if len(names) == 0 :
@@ -2079,10 +2085,10 @@ class WCategModifTasks(wcomponents.WTemplated):
                 names.append(a.getFullName())
         list = """
         """.join(html)
-        
+
         return list + """
         """+self._getAccessOptions(names)
-        
+
     def _getManagerOptions(self):
         html = []
         names = []
@@ -2093,15 +2099,15 @@ class WCategModifTasks(wcomponents.WTemplated):
             index = index + 1
             if not (c.getFullName() in names) :
                 html.append(text)
-                names.append(c.getFullName())                
+                names.append(c.getFullName())
         list = """
         """.join(html)
-        
+
         return list + """
         """+self._getCommentOptions(names)
 
 
-    def _getPersonList(self, personType): 
+    def _getPersonList(self, personType):
         html = []
         index = 0
         if personType == "access" :
@@ -2109,10 +2115,10 @@ class WCategModifTasks(wcomponents.WTemplated):
         elif personType == "manager" :
             personList = self._categ.getTasksManagerList()
         elif personType == "comentator" :
-            personList = self._categ.getTasksCommentatorList() 
+            personList = self._categ.getTasksCommentatorList()
         else :
             return ""
-        
+
         for a in personList :
             line = """
             <tr>
@@ -2122,29 +2128,31 @@ class WCategModifTasks(wcomponents.WTemplated):
             """%(personType, index, a.getFullName())
             index = index + 1
             html.append(line)
-        
+
         list = """
         """.join(html)
         out = """
        <table>
            %s
-       </table>"""%list        
+       </table>"""%list
         return out
 
 class WPCategModifTasks( WPCategoryModifBase ):
-    
+
     def _setActiveSideMenuItem( self ):
         self._tasksMenuItem.setActive()
-    
+
     def _getPageContent( self, params ):
         wc = WCategModifTasks( self._target )
         pars = { \
 "deleteCategoryURL": urlHandlers.UHCategoryDeletion.getURL(self._target) }
-        
-        return wc.getHTML( pars )        
+
+        return wc.getHTML( pars )
 
 class WPCategoryModifExistingMaterials( WPCategoryModifBase ):
-    
+
+    _userData = ['favorite-user-list', 'favorite-user-ids']
+
     def getJSFiles(self):
         return WPCategoryModifBase.getJSFiles(self) + \
                self._includeJSPackage('Management') + \
@@ -2153,7 +2161,7 @@ class WPCategoryModifExistingMaterials( WPCategoryModifBase ):
     def _getPageContent( self, pars ):
         wc=wcomponents.WShowExistingMaterial(self._target)
         return wc.getHTML( pars )
-    
+
     def _setActiveSideMenuItem( self ):
-        self._filesMenuItem.setActive()   
+        self._filesMenuItem.setActive()
 

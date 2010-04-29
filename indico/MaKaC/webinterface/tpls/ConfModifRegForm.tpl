@@ -126,7 +126,7 @@
   </tr>
   <tr>
     <td class="dataCaptionTD">
-      <span class="dataCaptionFormat"> <%= _("Statuses definition")%></span>
+      <span class="dataCaptionFormat"> <%= _("Custom statuses")%></span>
     </td>
     <td colspan="2">
       <form action=%(actionStatusesURL)s method="POST">

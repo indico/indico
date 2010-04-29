@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: oai2.py,v 1.42 2009/06/02 13:04:56 pferreir Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -689,7 +688,7 @@ class OAIResponse:
         self.nb_records_in_resume     = self._config.getNbRecordsInResume()
         self.nb_identifiers_in_resume = self._config.getNbIdentifiersInResume()
         self.oai_rt_expire            = self._config.getOAIRtExpire()
-        self.runtimelogdir            = self._config.getTempDir() #Directory where the data for resuptio token are stocked
+        self.runtimelogdir            = self._config.getUploadedFilesSharedTempDir() #Directory where the data for resuptio token are stocked
 
     def print_oai_header(self,verb,params={}):
         #Print OAI header

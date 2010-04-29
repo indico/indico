@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: base.py,v 1.49 2009/05/20 08:04:30 eragners Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -29,6 +28,9 @@ class WPBase:
     """
     """
     _title = "Indico"
+
+    # required user-specific "data packages"
+    _userData = []
 
     def __init__( self, rh ):
         self._rh = rh
@@ -73,6 +75,22 @@ class WPBase:
 
     def _getJavaScriptInclude(self, scriptPath):
         return '<script src="'+ scriptPath +'" type="text/javascript"></script>\n'
+
+    def _getJavaScriptUserData(self):
+        """
+        Returns structured data that should be passed on to the client side
+        but depends on user data (can't be in vars.js.tpl)
+        """
+
+        user = self._getAW().getUser();
+
+        from MaKaC.webinterface.asyndico import UserDataFactory
+
+        userData = dict((packageName,
+                         UserDataFactory(user).build(packageName))
+                        for packageName in self._userData)
+
+        return userData
 
     def _getHeadContent( self ):
         """
@@ -219,6 +237,9 @@ class WPDecorated( WPBase ):
             Welcome page class overloads this, so that additional info (news, policy)
             is shown.
         """
+        return False
+
+    def _isRoomBooking(self):
         return False
 
     def _currentCategory(self):

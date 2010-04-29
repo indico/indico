@@ -143,7 +143,7 @@ except NameError:
         setMouseEvents($E('printButton'), '<%= _("Printable version")%>');
     }
 
-    setMouseEvents($E('manageEventButton'), '<%= _("Manage event")%>');
+    setMouseEvents($E('manageEventButton'), '<%= _("Switch to management area for this event")%>');
 
 </script>
 

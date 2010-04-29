@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: db.py,v 1.25 2009/06/09 12:48:13 pferreir Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: schedule.py,v 1.75 2009/06/19 14:51:33 pferreir Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -478,8 +477,6 @@ class SchEntry(Persistent):
         self.description = ""
         self._id=""
 
-
-    @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'], 'id')
     def getId(self):
         try:
             if self._id:
@@ -725,6 +722,8 @@ class SlotSchedule(TimeSchedule):
             2: check and adapt the owner dates
         """
 
+        tz = self.getTimezone();
+
         owner = self.getOwner()
         if (entry is None) or self.hasEntry(entry):
             return
@@ -736,7 +735,7 @@ class SlotSchedule(TimeSchedule):
                 raise MaKaCError( _("Cannot schedule into this session a contribution which does not belong to it"), _("Slot"))
         if entry.getStartDate()!=None and entry.getStartDate() < self.getOwner().getStartDate():
             if check == 1:
-                raise ParentTimingError( _("Cannot add entry which starts before (%s) the time slot (%s)")%\
+                raise ParentTimingError( _("The entry would start at %s, which is before the start time of the time slot (%s)")%\
                     (entry.getEndDate().strftime('%Y-%m-%d %H:%M'),\
                     self.getOwner().getStartDate().strftime('%Y-%m-%d %H:%M')),\
                       _("Slot"))
@@ -744,19 +743,19 @@ class SlotSchedule(TimeSchedule):
                 ContextManager.get('autoOps').append((owner,
                                                       "OWNER_START_DATE_EXTENDED",
                                                       owner,
-                                                      entry.getAdjustedStartDate(tz=self.getTimezone())))
+                                                      entry.getAdjustedStartDate(tz=tz)))
                 self.getOwner().setStartDate(entry.getStartDate(),check,0)
         if entry.getEndDate()!=None and entry.getEndDate() > self.getOwner().getEndDate():
             if check == 1:
-                raise ParentTimingError( _("Cannot add entry which finishes after (%s) the time slot (%s)")%\
-                    (entry.getEndDate().strftime('%Y-%m-%d %H:%M'),\
-                    self.getOwner().getEndDate().strftime('%Y-%m-%d %H:%M')),\
+                raise ParentTimingError( _("The entry would finish at %s, which is after the end of the time slot (%s)")%\
+                    (entry.getAdjustedEndDate(tz=tz).strftime('%Y-%m-%d %H:%M'),\
+                    self.getOwner().getAdjustedEndDate(tz=tz).strftime('%Y-%m-%d %H:%M')),\
                      "Slot")
             elif check == 2:
                 ContextManager.get('autoOps').append((owner,
                                                       "OWNER_END_DATE_EXTENDED",
                                                       owner,
-                                                      entry.getAdjustedEndDate(tz=self.getTimezone())))
+                                                      entry.getAdjustedEndDate(tz=tz)))
                 self.getOwner().setEndDate(entry.getEndDate(),check)
         self._setEntryDuration(entry)
         self._addEntry(entry,check)
@@ -1129,6 +1128,7 @@ class BreakTimeSchEntry(IndTimeSchEntry):
     @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'address', lambda x: Conversion.locationAddress(x.getLocation()))
     @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'inheritLoc', lambda x: x.getOwnLocation() is None)
     @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'inheritRoom', lambda x: x.getOwnRoom() is None)
+    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'id', lambda x:Conversion.locatorString(x)+"b"+x.getId())
 
     def __init__(self):
         IndTimeSchEntry.__init__(self)
@@ -1454,7 +1454,7 @@ class ContribSchEntry(LinkedTimeSchEntry):
 class ScheduleToJson:
 
     @staticmethod
-    def processEntry(obj, tz):
+    def processEntry(obj, tz, aw):
 
         #raise "duration: " + (datetime(1900,1,1)+obj.getDuration()).strftime("%Hh%M'") + ''
         entry = DictPickler.pickle(obj, timezone=tz)
@@ -1469,16 +1469,36 @@ class ScheduleToJson:
             # get session content
             entries = {}
             for contrib in sessionSlot.getSchedule().getEntries():
-                contribData = DictPickler.pickle(contrib, timezone=tz)
-                entries[contribData['id']] = contribData
+                if ScheduleToJson.checkProtection(contrib, aw):
+                    contribData = DictPickler.pickle(contrib, timezone=tz)
+                    entries[contribData['id']] = contribData
 
             entry['entries'] = entries
 
         return genId, entry
 
+    @staticmethod
+    def checkProtection(obj, aw):
+
+        if aw is None:
+            return True
+
+        from MaKaC.conference import SessionSlot
+
+        canBeDisplayed = False
+        if isinstance(obj, BreakTimeSchEntry):
+            canBeDisplayed = True
+        else: #contrib or session slot
+            owner = obj.getOwner()
+            if owner.canAccess(aw):
+                canBeDisplayed = True
+            elif isinstance(owner, SessionSlot) and owner.canView(aw):
+                canBeDisplayed = True
+        return canBeDisplayed
+
 
     @staticmethod
-    def process(schedule, tz, days = None):
+    def process(schedule, tz, aw, days = None):
 
         scheduleDict={}
 
@@ -1490,11 +1510,12 @@ class ScheduleToJson:
 
             for obj in schedule.getEntriesOnDay(day):
 
-                genId, pickledData = ScheduleToJson.processEntry(obj, tz)
+                if ScheduleToJson.checkProtection(obj, aw):
+                    genId, pickledData = ScheduleToJson.processEntry(obj, tz, aw)
 
-                # exclude entries that start in the day before
-                if obj.getAdjustedStartDate(tz).date() == day.date():
-                    dayEntry[genId] = pickledData
+                    # exclude entries that start in the day before
+                    if obj.getAdjustedStartDate(tz).date() == day.date():
+                        dayEntry[genId] = pickledData
 
             scheduleDict[day.strftime("%Y%m%d")] = dayEntry
 

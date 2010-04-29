@@ -52,6 +52,9 @@ def main(argv):
                break
 
       if conf:
+
+          DBMgr.getInstance().sync()
+
           #Remove the meeting from conference
           t.remove(conf)
           #Attach meeting to desired category

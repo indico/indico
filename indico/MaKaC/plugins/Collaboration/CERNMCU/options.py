@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: options.py,v 1.3 2009/04/25 13:55:51 dmartinc Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -90,4 +89,17 @@ globalOptions = [
                               "defaultValue": "H323 IP",
                               "editable": True,
                               "visible": True}),
+
+    ("extraMinutesBefore", {"description" : _("Extra minutes allowed before Indico event start time"),
+                            "type": int,
+                            "defaultValue": 60} ),
+    ("extraMinutesAfter", {"description" : _("Extra minutes allowed after Indico event start time"),
+                            "type": int,
+                            "defaultValue": 120} ),
+    ("defaultMinutesBefore", {"description" : _("Default extra minutes before Indico event start time"),
+                            "type": int,
+                            "defaultValue": 30} ),
+    ("defaultMinutesAfter", {"description" : _("Default extra minutes after Indico event start time"),
+                            "type": int,
+                            "defaultValue": 60} ),
 ]

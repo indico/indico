@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: subContribMod.py,v 1.21 2009/06/03 14:36:40 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -42,7 +41,7 @@ class RHSubContribModifBase( RHModificationBaseProtected ):
             if owner.getSession().canCoordinate(self.getAW(), "modifContribs"):
                 return
         RHModificationBaseProtected._checkProtection( self )
-    
+
     def _checkParams( self, params ):
         l = locators.WebLocator()
         l.setSubContribution( params )
@@ -60,7 +59,7 @@ class RHSubContribModifBase( RHModificationBaseProtected ):
 
 class RHSubContributionModification( RHSubContribModifBase ):
     _uh = urlHandlers.UHSubContributionModification
-    
+
     def _process( self ):
         p = subContributions.WPSubContributionModification( self, self._target )
         return p.display( **self._getRequestParams() )
@@ -69,7 +68,7 @@ class RHSubContributionModification( RHSubContribModifBase ):
 
 #class RHSubContributionPerformModification( RHSubContribModifBase ):
 #    _uh = urlHandlers.
-#    
+#
 #    def _process( self ):
 #        params = self._getRequestParams()
 #        if not ("cancel" in params):
@@ -80,7 +79,7 @@ class RHSubContributionModification( RHSubContribModifBase ):
 
 class RHSubContributionTools( RHSubContribModifBase ):
     _uh = urlHandlers.UHSubContribModifTools
-    
+
     def _process( self ):
         p = subContributions.WPSubContributionModifTools( self, self._target )
         return p.display( **self._getRequestParams() )
@@ -88,7 +87,7 @@ class RHSubContributionTools( RHSubContribModifBase ):
 
 class RHSubContributionData( RHSubContribModifBase ):
     _uh = urlHandlers.UHSubContributionDataModification
-    
+
     def _process( self ):
         p = subContributions.WPSubContribData( self, self._target )
         return p.display( **self._getRequestParams() )
@@ -96,21 +95,21 @@ class RHSubContributionData( RHSubContribModifBase ):
 
 class RHSubContributionModifData( RHSubContribModifBase ):
     _uh = urlHandlers.UHSubContributionDataModif
-    
+
     def _process( self ):
         params = self._getRequestParams()
-        
+
         self._target.setTitle( params.get("title","") )
         self._target.setDescription( params.get("description","") )
         self._target.setKeywords( params.get("keywords","") )
-        
+
         self._target.setDuration( params.get("durationHours",""), \
-                             params.get("durationMinutes","") )   
+                             params.get("durationMinutes","") )
         self._target.setSpeakerText( params.get("speakers","") )
         self._redirect(urlHandlers.UHSubContributionModification.getURL( self._target ) )
 
 class RHSubContribNewSpeaker( RHSubContribModifBase ):
-    
+
     def _checkParams(self, params):
         RHSubContribModifBase._checkParams(self, params)
       #  raise '%s'%params
@@ -133,10 +132,10 @@ class RHSubContribNewSpeaker( RHSubContribModifBase ):
         spk.setPhone(p.get("phone",""))
         spk.setFax(p.get("fax",""))
         self._target.newSpeaker(spk)
-    
+
     def _process(self):
         params = self._getRequestParams()
-        
+
         if self._action != "":
             if self._action == "perform":
                 self._newSpeaker()
@@ -152,7 +151,7 @@ class RHSubContribNewSpeaker( RHSubContribModifBase ):
 
 class RHSubContributionSelectSpeakers( RHSubContribModifBase ):
     _uh = urlHandlers.UHSubContributionSelectSpeakers
-    
+
     def _process( self ):
         p = subContributions.WPSubContribSelectSpeakers( self, self._target )
         return p.display( **self._getRequestParams() )
@@ -160,10 +159,10 @@ class RHSubContributionSelectSpeakers( RHSubContribModifBase ):
 
 class RHSubContributionAddSpeakers( RHSubContribModifBase ):
     _uh = urlHandlers.UHSubContributionAddSpeakers
-    
+
     def _process( self ):
         params=self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ah=user.AvatarHolder()
             authIndex = self._target.getConference().getAuthorIndex()
             for id in self._normaliseListParam(params["selectedPrincipals"]):
@@ -179,21 +178,21 @@ class RHSubContributionAddSpeakers( RHSubContribModifBase ):
 
 class RHSubContributionRemoveSpeakers( RHSubContribModifBase ):
     _uh = urlHandlers.UHSubContributionRemoveSpeakers
-    
+
     def _checkParams( self, params ):
         RHSubContribModifBase._checkParams( self, params )
         selSpeakers = self._normaliseListParam( params.get( "selAuthor", [] ) )
         self._speakers = []
         for id in selSpeakers:
             self._speakers.append(self._target.getSpeakerById(id) )
-    
+
     def _process( self ):
         for speaker in self._speakers:
             self._target.removeSpeaker( speaker )
         self._redirect( urlHandlers.UHSubContributionModification.getURL( self._target ) )
 
 class RHEditPresenter( RHSubContribModifBase ):
-    
+
     def _checkParams(self, params):
         RHSubContribModifBase._checkParams(self, params)
         self._authorId=params["authorId"]
@@ -214,7 +213,7 @@ class RHEditPresenter( RHSubContribModifBase ):
         auth.setAddress(p.get("address",""))
         auth.setPhone(p.get("phone",""))
         auth.setFax(p.get("fax",""))
-    
+
     def _process(self):
         if self._action != "":
             if self._action == "perform":
@@ -227,19 +226,19 @@ class RHEditPresenter( RHSubContribModifBase ):
 
             params = self._getRequestParams()
             params['author'] = auth
-            
+
             return p.display(**params)
 
 class RHSubContributionAddMaterial( RHSubContribModifBase ):
     _uh = urlHandlers.UHSubContributionAddMaterial
-    
+
     def _checkParams( self, params ):
         RHSubContribModifBase._checkParams( self, params )
         typeMat = params.get( "typeMaterial", "notype" )
         if typeMat=="notype" or typeMat.strip()=="":
             raise FormValuesError("Please choose a material type")
         self._mf = materialFactories.ContribMFRegistry().getById( typeMat )
-        
+
     def _process( self ):
         if self._mf:
             if not self._mf.needsCreationPage():
@@ -252,7 +251,7 @@ class RHSubContributionAddMaterial( RHSubContribModifBase ):
 
 class RHSubContributionPerformAddMaterial( RHSubContribModifBase ):
     _uh = urlHandlers.UHSubContributionPerformAddMaterial
-    
+
     def _checkParams( self, params ):
         RHSubContribModifBase._checkParams( self, params )
         typeMat = params.get( "typeMaterial", "" )
@@ -276,9 +275,9 @@ class RHMaterialsAdd(RHSubContribModifBase):
     _uh = urlHandlers.UHSubContribModifAddMaterials
 
     def _checkProtection(self):
-        material = self._rhSubmitMaterial._getMaterial()
+        material, _ = self._rhSubmitMaterial._getMaterial(forceCreate = False)
         if self._target.canUserSubmit(self._aw.getUser()) \
-            and material.getReviewingState() < 3:
+            and (not material or material.getReviewingState() < 3):
             return
         RHSubContribModifBase._checkProtection(self)
 
@@ -286,8 +285,8 @@ class RHMaterialsAdd(RHSubContribModifBase):
         RHSubContribModifBase._checkParams(self, params)
         if not hasattr(self,"_rhSubmitMaterial"):
             self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
-        self._rhSubmitMaterial._checkParams(params)    
-    
+        self._rhSubmitMaterial._checkParams(params)
+
     def _process( self ):
         if self._target.getConference().isClosed():
             p = WPConferenceModificationClosed( self, self._target )
@@ -295,20 +294,20 @@ class RHMaterialsAdd(RHSubContribModifBase):
         r=self._rhSubmitMaterial._process(self, self._getRequestParams())
         if r is None:
             self._redirect(self._uh.getURL(self._target))
-        
+
         return r
 
 
 class RHSubContributionRemoveMaterials( RHSubContribModifBase ):
     _uh = urlHandlers.UHSubContributionRemoveMaterials
-    
+
     def _checkParams( self, params ):
         RHSubContribModifBase._checkParams( self, params )
         typeMat = params.get( "typeMaterial", "" )
         #self._mf = materialFactories.ConfMFRegistry().getById( typeMat )
         self._materialIds = self._normaliseListParam( params.get("materialId", []) )
         self._returnURL = params.get("returnURL","")
-    
+
     def _process( self ):
         for id in self._materialIds:
             #Performing the deletion of special material types
@@ -330,24 +329,24 @@ class RHSubContributionRemoveMaterials( RHSubContribModifBase ):
 
 class RHSubContributionDeletion( RHSubContributionTools ):
     _uh = urlHandlers.UHSubContributionDelete
-    
+
     def _checkParams( self, params ):
         RHSubContributionTools._checkParams( self, params )
         self._cancel = False
         if "cancel" in params:
             self._cancel = True
         self._confirmation = params.has_key("confirm")
-    
+
     def _perform( self ):
         self._target.getOwner().removeSubContribution(self._target)
-    
+
     def _process( self ):
         if self._cancel:
             self._redirect( urlHandlers.UHSubContribModifTools.getURL( self._target ) )
         elif self._confirmation:
             owner = self._target.getOwner()
             self._perform()
-            
+
             self._redirect( urlHandlers.UHContributionModification.getURL( owner ) )
         else:
             p = subContributions.WPSubContributionDeletion( self, self._target )
@@ -382,13 +381,13 @@ class RHSubContributionWriteMinutes( RHSubContributionTools ):
 
 class RHMaterials(RHSubContribModifBase):
     _uh = urlHandlers.UHSubContribModifMaterials
-    
+
     def _checkParams(self, params):
         RHSubContribModifBase._checkParams(self, params)
-        if not hasattr(self, "_rhSubmitMaterial"):
-            self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
-        self._rhSubmitMaterial._checkParams(params)
-    
+        #if not hasattr(self, "_rhSubmitMaterial"):
+        #    self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
+        #self._rhSubmitMaterial._checkParams(params)
+
     def _process( self ):
         if self._target.getOwner().getOwner().isClosed():
             p = subContributions.WPSubContributionModificationClosed( self, self._target )
@@ -396,14 +395,14 @@ class RHMaterials(RHSubContribModifBase):
 
         p = subContributions.WPSubContributionModifMaterials( self, self._target )
         return p.display(**self._getRequestParams())
-        
+
 
 class RHSubContributionReportNumberEdit(RHSubContribModifBase):
 
     def _checkParams(self, params):
         RHSubContribModifBase._checkParams(self, params)
         self._reportNumberSystem=params.get("reportNumberSystem","")
-        
+
     def _process(self):
         params = self._getRequestParams()
         if self._reportNumberSystem!="":
@@ -418,7 +417,7 @@ class RHSubContributionReportNumberPerformEdit(RHSubContribModifBase):
         RHSubContribModifBase._checkParams(self, params)
         self._reportNumberSystem=params.get("reportNumberSystem","")
         self._reportNumber=params.get("reportNumber","")
-        
+
     def _process(self):
         if self._reportNumberSystem!="" and self._reportNumber!="":
             self._target.getReportNumberHolder().addReportNumber(self._reportNumberSystem, self._reportNumber)
@@ -430,7 +429,7 @@ class RHSubContributionReportNumberRemove(RHSubContribModifBase):
     def _checkParams(self, params):
         RHSubContribModifBase._checkParams(self, params)
         self._reportNumberIdsToBeDeleted=self._normaliseListParam( params.get("deleteReportNumber",[]))
-        
+
     def _process(self):
         nbDeleted = 0
         for id in self._reportNumberIdsToBeDeleted:

@@ -319,10 +319,6 @@ msgstr ""
 "envoyépour lui demander de créer un compte utilisateur. Une fois ceci fait , "
 "la personne se verra automatiquement attribuer les droits de soumission."
 
-#: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/CategoryOverview.tpl:26
-msgid "Details level"
-msgstr "Niveau de détails"
-
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConfModificationReviewingSettings.tpl:68
 msgid "Add questions for paper reviewing"
 msgstr "Ajouter des questions pour la revue des papiers"
@@ -2238,7 +2234,8 @@ msgstr ""
 "l'espoir de vous rencontrer à %s Votre Indico, sur demande de %s %s"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/EventHeader.tpl:144
-msgid "Manage event"
+#: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConfModifHeader.tpl:2
+msgid "Switch to management area for this event"
 msgstr "Gérer l´évènement"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/SignIn.tpl:118
@@ -3372,7 +3369,7 @@ msgstr "Italique"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/SubContributionCreation.tpl:5
 msgid "Creating a new sub contribution (basic data)"
-msgstr "Créer une nouvelle présentation: %s"
+msgstr "Créer une nouvelle présentation:"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/RoomBookingRoomForm.tpl:26
 msgid "Whether bookings must be accepted by person responsible."
@@ -8834,10 +8831,6 @@ msgstr "Données personnelles"
 msgid "Initial PDF options after a conference is created."
 msgstr "Options PDF initiales après la création d´une conférence."
 
-#: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConfModifHeader.tpl:2
-msgid "Manage Event"
-msgstr "Gérer l'évènement"
-
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/RoomBookingSearch4Rooms.tpl:289
 msgid "Is public"
 msgstr "Est publique"
@@ -11555,8 +11548,8 @@ msgid "Adding a new convener"
 msgstr "Ajouter un nouveau président de session"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConferenceClone.tpl:64
-msgid "Clone the conference :"
-msgstr "Cloner la conférence"
+msgid "Clone the event:"
+msgstr "Cloner l'événement"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/participant.py:401
 msgid "Removed participant %s %s (%s)"
@@ -11857,6 +11850,7 @@ msgstr "Tout sélectioner"
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConferenceSessionTimeTable.tpl:31
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConferencePlainTimeTable.tpl:31
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConferenceHighDetailTimeTable.tpl:30
+#: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/CategoryOverview.tpl:26
 msgid "Detail level"
 msgstr "Niveau de détails"
 
@@ -15994,7 +15988,7 @@ msgstr "ok"
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConfModCFANotifTplNew.tpl:32
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConfModCFANotifTplEditData.tpl:32
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConfModCFANotifTplDisplay.tpl:24
-msgid "Cc addresses"
+msgid "CC addresses"
 msgstr "Adresses en copie"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConfModificationControlFrame.tpl:4
@@ -17399,7 +17393,7 @@ msgid "Report numbers"
 msgstr "Numéros de rapport"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConferenceModifFrame.tpl:23
-msgid "View event page"
+msgid "Switch to event page"
 msgstr "Page d'accueil de l'évènement"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/pages/admins.py:204

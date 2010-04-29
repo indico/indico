@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: cache.py,v 1.9 2009/06/02 13:24:53 pferreir Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -25,11 +24,15 @@ from MaKaC.common.logger import Logger
 
 from MaKaC.common.logger import Logger
 from MaKaC.common import timezoneUtils
+from MaKaC.common.utils import OSSpecific
 
-import os, shutil, pickle, datetime, fcntl
+import os, shutil, pickle, datetime
+
 
 class IndicoCache:
-    """ Used to cache some pages in Indico """
+    """
+    Used to cache some pages in Indico
+    """
     _subDirName = ""
 
     def __init__( self, vars ):
@@ -37,20 +40,16 @@ class IndicoCache:
 
     def getFileName( self ):
         return ""
-    
+
     def lockCache( self, file, flag=True):
         global fp
-        try:
-            import fcntl
-        except:
-            return
         if flag:
             fp = open(file,"a")
-            fcntl.flock(fp, fcntl.LOCK_EX)
+            OSSpecific.lockFile(fp, 'LOCK_EX')
         else:
             if not fp:
                 return
-            fcntl.flock(fp, fcntl.LOCK_UN)
+            OSSpecific.lockFile(fp, 'LOCK_UN')
             fp.close()
             fp = None
 
@@ -62,7 +61,7 @@ class IndicoCache:
             except:
                 pass
         return path
-        
+
     def getFilePath( self ):
         return os.path.join(self.getCachePath(), self.getFileName())
 
@@ -81,11 +80,7 @@ class IndicoCache:
     def getCachePage( self ):
         if os.path.isfile(self.getFilePath()):
             fp = open(self.getFilePath(),"r")
-            try:
-                import fcntl
-                fcntl.flock(fp, fcntl.LOCK_SH)
-            except:
-                pass
+            OSSpecific.lockFile(fp, 'LOCK_SH')
             page = fp.read()
             return page
         return ""
@@ -97,7 +92,7 @@ class IndicoCache:
 
 class CategoryCache( IndicoCache ):
     _subDirName = "categories"
-    
+
     def __init__( self, vars={} ):
         self._categId = vars.get("categId","")
 
@@ -115,12 +110,14 @@ class EventCache( IndicoCache ):
         return "eve-%s-%s" % (self._eventId, self._type)
 
 class MultiLevelCacheEntry(object):
-    """ An entry(line) for a multilevel cache """
+    """
+    An entry(line) for a multilevel cache
+    """
 
     def __init__(self):
         self._date = None
 
-    def pickle(self):                
+    def pickle(self):
         return pickle.dumps(self)
 
     def setDate(self, date):
@@ -130,13 +127,15 @@ class MultiLevelCacheEntry(object):
         return self._date
 
     @classmethod
-    def unpickle(self, data):        
+    def unpickle(self, data):
         return pickle.loads(data)
 
-    
+
 class MultiLevelCache(object):
-    """ A multilevel cache """    
-    
+    """
+    A multilevel cache
+    """
+
     def __init__(self, cacheName):
         self.cacheName = cacheName
         cacheDir = self.getCacheDir()
@@ -145,14 +144,16 @@ class MultiLevelCache(object):
             os.makedirs(cacheDir)
 
     def _saveObject(self, fsPath, path, fileName, data):
-        """ Performs the actual save operation """
+        """
+        Performs the actual save operation
+        """
 
         if len(path) == 0:
             filePath = os.path.join(fsPath, fileName)
             f = open(filePath, 'wb')
-            fcntl.fcntl(f, fcntl.LOCK_EX)
+            OSSpecific.lockFile(f, 'LOCK_EX')
             f.write(data)
-            fcntl.fcntl(f, fcntl.LOCK_UN)
+            OSSpecific.lockFile(f, 'LOCK_UN')
             f.close()
         else:
             dirPath = os.path.join(fsPath, path[0])
@@ -166,14 +167,15 @@ class MultiLevelCache(object):
         return os.path.join(Config().getInstance().getXMLCacheDir(), self.cacheName)
 
     def cacheObject(self, path, fileName, obj):
-        """ path - Path where to store
+        """
+        path - Path where to store
         fileName - File name to use
         obj - MultiLevelCacheEntry to store
         """
 
         obj.setDate(timezoneUtils.nowutc())
         self._saveObject(self.getCacheDir(), path, fileName, obj.pickle())
-        Logger.get('cache/%s'%self.cacheName).debug("Saved %s/%s" % (path, fileName))
+        Logger.get('cache/%s'%self.cacheName).debug("Saved %s" % (os.path.join(*(path + [fileName]))))
 
     def loadObject(self, fnList):
 
@@ -187,9 +189,9 @@ class MultiLevelCache(object):
             f = open(filePath, 'rb')
 
             # Lock file
-            fcntl.fcntl(f, fcntl.LOCK_SH)
+            OSSpecific.lockFile(f, 'LOCK_SH')
             data = f.read()
-            fcntl.fcntl(f, fcntl.LOCK_UN)
+            OSSpecific.lockFile(f, 'LOCK_UN')
             f.close()
 
             obj = MultiLevelCacheEntry.unpickle(data)

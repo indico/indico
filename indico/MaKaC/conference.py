@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: conference.py,v 1.298 2009/06/19 14:34:49 pferreir Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -1070,6 +1069,7 @@ class Category(Persistent):
         iconFile.setOwner( self )
         iconFile.setId( "icon" )
         iconFile.archive( self._getRepository() )
+        iconFile.setProtection( -1 )
         if self.getIcon() != None:
             self._icon.delete()
         self._icon = iconFile
@@ -1146,6 +1146,10 @@ class Category(Persistent):
 
     def getAllowedToAccessList( self ):
         return self.__ac.getAccessList()
+
+    def canKeyAccess( self, aw ):
+        # Categories don't allow access keys
+        return False
 
     def canIPAccess( self, ip ):
         try:
@@ -1967,8 +1971,6 @@ class Conference(Persistent, Fossilizable):
 
     #TODO: Move to fossilize! (Some conference fossiles already available)
 
-    @Retrieves ('MaKaC.conference.Conference', 'videoServicesDisplayURL',
-                lambda conf: (str(urlHandlers.UHConferenceDisplay.getURL(conf)), str(urlHandlers.UHCollaborationDisplay.getURL(conf)))[conf.getType() == 'conference'])
     @Retrieves ('MaKaC.conference.Conference', 'displayURL', lambda conf: str(urlHandlers.UHConferenceDisplay.getURL(conf)))
     @Retrieves ('MaKaC.conference.Conference', 'modifURL', lambda conf: str(urlHandlers.UHConferenceModification.getURL(conf)))
     @Retrieves(['MaKaC.conference.Conference'], 'sessions', lambda conf: DictPickler.pickle(Conversion.sessionList(conf)))
@@ -2306,14 +2308,15 @@ class Conference(Persistent, Fossilizable):
 
 
     def getEnableSessionSlots(self):
-        try :
-            if self._enableSessionSlots  :
-                pass
-        except AttributeError :
-            self._enableSessionSlots = True
-        if self.getType() == "conference":
-            return True
-        return self._enableSessionSlots
+        #try :
+        #    if self._enableSessionSlots  :
+        #        pass
+        #except AttributeError :
+        #    self._enableSessionSlots = True
+        #if self.getType() == "conference":
+        #    return True
+        #return self._enableSessionSlots
+        return True
 
     def getEnableSessions(self):
         try :
@@ -2894,7 +2897,7 @@ class Conference(Persistent, Fossilizable):
                     observer.notifyEventDateChanges(sdate, self.startDate, None, None)
                 except Exception, e:
                     try:
-                        Logger.get('Conference').error("Exception while notifying the observer %s of a start date change from %s to %s for conference %s: "%
+                        Logger.get('Conference').error("Exception while notifying the observer %s of a start date change from %s to %s for conference %s: %s"%
                                                        (observer.getObserverName(), formatDateTime(sdate), formatDateTime(self.startDate), self.getId(), str(e)))
                     except Exception, e2:
                         Logger.get('Conference').error("Exception while notifying a start time change: %s (origin: %s)"%(str(e2), str(e)))
@@ -2982,7 +2985,7 @@ class Conference(Persistent, Fossilizable):
                     observer.notifyEventDateChanges(None, None, oldEdate, eDate)
                 except Exception, e:
                     try:
-                        Logger.get('Conference').error("Exception while notifying the observer %s of a end date change from %s to %s for conference %s: "%
+                        Logger.get('Conference').error("Exception while notifying the observer %s of a end date change from %s to %s for conference %s: %s" %
                                                        (observer.getObserverName(), formatDateTime(oldEdate), formatDateTime(eDate), self.getId(), str(e)))
                     except Exception, e2:
                         Logger.get('Conference').error("Exception while notifying a end date change: %s (origin: %s)"%(str(e2), str(e)))
@@ -3002,7 +3005,7 @@ class Conference(Persistent, Fossilizable):
                     observer.notifyEventDateChanges(None, None, edate, self.endDate)
                 except Exception, e:
                     try:
-                        Logger.get('Conference').error("Exception while notifying the observer %s of a end timet change from %s to %s for conference %s: "%
+                        Logger.get('Conference').error("Exception while notifying the observer %s of a end timet change from %s to %s for conference %s: %s" %
                                                        (observer.getObserverName(), formatDateTime(edate), formatDateTime(self.endDate), self.getId(), str(e)))
                     except Exception, e2:
                         Logger.get('Conference').error("Exception while notifying a end time change: %s (origin: %s)"%(str(e2), str(e)))
@@ -3066,7 +3069,7 @@ class Conference(Persistent, Fossilizable):
                 observer.notifyTimezoneChange(oldTimezone, tz)
             except Exception, e:
                 try:
-                    Logger.get('Conference').error("Exception while notifying the observer %s of a timezone change from %s to %s for conference %s: "%
+                    Logger.get('Conference').error("Exception while notifying the observer %s of a timezone change from %s to %s for conference %s: %s" %
                                                    (observer.getObserverName(), str(oldTimezone), str(tz), self.getId(), str(e)))
                 except Exception, e2:
                     Logger.get('Conference').error("Exception while notifying a timezone change: %s (origin: %s)"%(str(e2), str(e)))
@@ -5586,8 +5589,8 @@ class Session(Persistent):
             self._contributionDuration = timedelta(hours=hour,minutes=min)
 
     def fit(self):
-        if not self.getConference().getEnableSessionSlots():
-            self.getSlotList()[0].fit()
+        #if not self.getConference().getEnableSessionSlots():
+        #    self.getSlotList()[0].fit()
         self.setStartDate(self.getMinSlotStartDate(),0,0)
         self.setEndDate(self.getMaxSlotEndDate(),0)
 
@@ -5596,6 +5599,7 @@ class Session(Persistent):
         if id == "not assigned":
             newSlot.setId(str(self.__slotGenerator.newCount()))
         self.slots[newSlot.getId()]=newSlot
+        self.fit()
         self.getSchedule().addEntry(newSlot.getSessionSchEntry(),2)
         if self.getConference() is not None:
             self.getConference().getSchedule().addEntry(newSlot.getConfSchEntry(),2)
@@ -5613,6 +5617,7 @@ class Session(Persistent):
             if len(self.slots)==1 and not force:
                 raise MaKaCError( _("A session must have at least one slot"), _("Session"))
             self._removeSlot(slot)
+            self.fit()
             self.notifyModification()
 
     def recoverSlot(self, slot):
@@ -5949,9 +5954,9 @@ class Session(Persistent):
             self.verifyStartDate(newDate,check)
         oldSdate = self.getStartDate()
         try:
-           tz = str(self.getStartDate().tzinfo)
+            tz = str(self.getStartDate().tzinfo)
         except:
-           tz = 'UTC'
+            tz = 'UTC'
         diff = newDate - oldSdate
         self.startDate=copy.copy(newDate)
         if moveEntries == 1 and diff is not None and diff != timedelta(0):
@@ -5963,14 +5968,14 @@ class Session(Persistent):
                 entries = self.getSchedule().getEntriesOnDay(newDateTz)[:]
             self.getSchedule().moveEntriesBelow(diff, entries)
 
-        if self.getConference() and \
+        if moveEntries != 0 and self.getConference() and \
                not self.getConference().getEnableSessionSlots() and \
                self.getSlotList() != [] and \
-               self.getSlotList()[0].getStartDate() != newDate and \
-               moveEntries != 0:
+               self.getSlotList()[0].getStartDate() != newDate:
             self.getSlotList()[0].startDate = newDate
+
         if check == 1:
-           self._checkInnerSchedule()
+            self._checkInnerSchedule()
         self.notifyModification()
 
     def _checkInnerSchedule( self ):
@@ -6039,8 +6044,8 @@ class Session(Persistent):
             self.verifyEndDate(newDate,check)
         self.duration=newDate-self.getStartDate()
         # A session is not always linked to a conference (for eg. at creation time)
-        if self.getConference() and not self.getConference().getEnableSessionSlots() and self.getSlotList()[0].getEndDate() != newDate:
-            self.getSlotList()[0].duration = self.duration
+        #if self.getConference() and not self.getConference().getEnableSessionSlots() and self.getSlotList()[0].getEndDate() != newDate:
+        #    self.getSlotList()[0].duration = self.duration
         self.notifyModification()
 
     def setDates(self,sDate,eDate,check=1,moveEntries=0):
@@ -6842,10 +6847,9 @@ class SessionSlot(Persistent):
         slot = SessionSlot(session)
         slot.session = session
         slot.setTitle(self.getTitle())
-
-        timeDifference = session.getStartDate() - self.getSession().getStartDate()
+        timeDifference = session.getConference().getStartDate() - self.getSession().getConference().getStartDate()
         slot.setStartDate(self.getStartDate() + timeDifference)
-        slot.setDuration(dur=self.getDuration())
+        slot.setDuration(dur=self.getDuration(), check=2)
 
         #places
         if self.getOwnLocation() is not None:
@@ -7155,12 +7159,14 @@ class SessionSlot(Persistent):
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
-
         if sDate is None:
             return
         if not sDate.tzname():
             raise MaKaCError("date should be timezone aware")
         if check != 0:
+            #If not using .fit() at the end of this method, comment it out
+            #if self.getSession().getStartDate() > sDate:
+            #    self.getSession().duration += self.getSession().getStartDate() - sDate
             self.verifyStartDate(sDate,check)
 
         # calculate the difference betwwen old and new date
@@ -7183,6 +7189,7 @@ class SessionSlot(Persistent):
         # synchronize with other timetables
         self.getSessionSchEntry().synchro()
         self.getConfSchEntry().synchro()
+        self.getSession().fit()
         self.notifyModification()
 
     def setEndDate(self,eDate,check=2):
@@ -7193,6 +7200,7 @@ class SessionSlot(Persistent):
         self.setDuration(dur=eDate-self.startDate,check=check)
         if self.getConference() and not self.getConference().getEnableSessionSlots() and self.getSession().getEndDate() != eDate:
             self.getSession().setEndDate(eDate, check)
+        self.getSession().fit()
         self.notifyModification()
 
     def getStartDate( self ):
@@ -7286,6 +7294,7 @@ class SessionSlot(Persistent):
         self.duration = dur
         self.getSessionSchEntry().synchro()
         self.getConfSchEntry().synchro()
+        self.getSession().fit()
         self.notifyModification()
 
     def getLocationParent( self ):
@@ -9661,7 +9670,7 @@ class Contribution(Persistent, Fossilizable):
             if r is not None and r.isActivated():
                 self._grantSubmission(r)
             elif sb.getEmail() != "":
-                self.getConference().getPendingQueuesMgr().addPendingSubmitter(sb)
+                self.getConference().getPendingQueuesMgr().addPendingSubmitter(sb, False)
                 self._grantSubmissionEmail(sb.getEmail())
                 #send email once
                 try :
@@ -10969,12 +10978,6 @@ class Material(Persistent):
             return self.getOwner()
         return None
 
-    @Updates (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster'],'title')
     def setTitle( self, newTitle ):
         self.title = newTitle.strip()
         self.notifyModification()
@@ -10988,12 +10991,6 @@ class Material(Persistent):
     def getTitle( self ):
         return self.title
 
-    @Updates (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster'], 'description')
     def setDescription( self, newDescription ):
         self.description = newDescription.strip()
         self.notifyModification()
@@ -11205,13 +11202,6 @@ class Material(Persistent):
             return self.getOwner().isProtected()
         return False
 
-    @Updates (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-               'MaKaC.conference.Poster'], 'protection', lambda(x): int(x))
-
     def setProtection( self, private ):
         self.__ac.setProtection( private )
         self.updateFullyPublic()
@@ -11226,22 +11216,9 @@ class Material(Persistent):
     def isHidden( self ):
         return self.__ac.isHidden()
 
-    @Updates (['MaKaC.conference.Material',
-               'MaKaC.conference.Minutes',
-               'MaKaC.conference.Paper',
-               'MaKaC.conference.Slides',
-               'MaKaC.conference.Video',
-               'MaKaC.conference.Poster'], 'hidden')
     def setHidden( self, hidden ):
         self.__ac.setHidden( hidden )
         self._p_changed = 1
-
-    @Updates (['MaKaC.conference.Material',
-               'MaKaC.conference.Minutes',
-               'MaKaC.conference.Paper',
-               'MaKaC.conference.Slides',
-               'MaKaC.conference.Video',
-               'MaKaC.conference.Poster'], 'accessKey')
 
     def setAccessKey( self, pwd="" ):
         self.__ac.setAccessKey(pwd)
@@ -11656,7 +11633,14 @@ class Resource(Persistent):
         return None
 
     def getConference( self ):
-        return self._owner.getConference()
+        # this check owes itself to the fact that some
+        # protection checking functions call getConference()
+        # directly on resources, without caring whether they
+        # are owned by Conferences or Categories
+        if isinstance(self._owner, Category):
+            return None
+        else:
+            return self._owner.getConference()
 
     def getSession( self ):
         return self._owner.getSession()
@@ -12730,22 +12714,22 @@ class DeletedObjectHolder(ObjectHolder):
 
     def get_earliest_datestamp(self):
         date = []
-        idxConf = indexes.IndexesHolder().getConferenceDateIndex(private=True)
+        idxConf = DeletedObjectHolder.getConferenceDateIndex(private=True)
         d = idxConf.getLowerIndex()
         if d:
             date.append(d)
 
-        idxCont = indexes.IndexesHolder().getContributionDateIndex(private=True)
+        idxCont = DeletedObjectHolder.getContributionDateIndex(private=True)
         d = idxCont.getLowerIndex()
         if d:
             date.append(d)
 
-        idxConf = indexes.IndexesHolder().getConferenceDateIndex(private=False)
+        idxConf = DeletedObjectHolder.getConferenceDateIndex(private=False)
         d = idxConf.getLowerIndex()
         if d:
             date.append(d)
 
-        idxCont = indexes.IndexesHolder().getContributionDateIndex(private=False)
+        idxCont = DeletedObjectHolder.getContributionDateIndex(private=False)
         d = idxCont.getLowerIndex()
         if d:
             date.append(d)

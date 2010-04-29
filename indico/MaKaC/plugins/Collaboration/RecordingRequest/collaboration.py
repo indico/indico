@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: collaboration.py,v 1.12 2009/04/25 13:56:17 dmartinc Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -31,49 +30,54 @@ from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from MaKaC.i18n import _
 
 class CSBooking(CSBookingBase):
-    
+
     _hasStart = False
     _hasStop = False
     _hasCheckStatus = True
     _hasAcceptReject = True
-    
+
     _needsBookingParamsCheck = True
-    
+
     _allowMultiple = False
-    
+
     _hasStartDate = False
-        
+
+    _simpleParameters = {
+        "talks" : (str, ''),
+        "talkSelectionComments": (str, ''),
+        "talkSelection": (list, []),
+        "permission": (str, ''),
+        "lectureOptions": (str, ''),
+        "lectureStyle": (str, ''),
+        "postingUrgency": (str, ''),
+        "numRemoteViewers": (str, ''),
+        "numAttendees": (str, ''),
+        "recordingPurpose": (list, []),
+        "intendedAudience" : (list, []),
+        "subjectMatter": (list, []),
+        "otherComments": (str, '')}
+
     def __init__(self, type, conf):
         CSBookingBase.__init__(self, type, conf)
-        self._bookingParams = {
-            "talks" : None,
-            "talkSelectionComments": None,
-            "talkSelection": [],
-            "permission": None,
-            "lectureOptions": [],
-            "lectureStyle": None,
-            "postingUrgency": None,
-            "numRemoteViewers": 0,
-            "numAttendees": 0,
-            "recordingPurpose": [],
-            "intendedAudience" : [],
-            "subjectMatter": [],
-            "otherComments": None
-        }
-    
+
     def _checkBookingParams(self):
         if not self._bookingParams["permission"]:
             raise RecordingRequestException("permission parameter cannot be left empty")
+        elif self._bookingParams["permission"] == 'No':
+            raise RecordingRequestException("""permission parameter cannot have the "no" value""")
+
         if self._bookingParams["lectureOptions"] == 'chooseOne': #change when list of community names is ok
             raise RecordingRequestException("lectureOptions parameter cannot be 'chooseOne'")
+
         if self._bookingParams["lectureStyle"] == 'chooseOne': #change when list of community names is ok
             raise RecordingRequestException("lectureStyle parameter cannot be 'chooseOne'")
+
         return False
 
     def _create(self):
         self._statusMessage = _("Request successfully sent")
         self._statusClass = "statusMessageOther"
-        
+
         if MailTools.needToSendEmails('RecordingRequest'):
             try:
                 notification = NewRequestNotification(self)
@@ -84,12 +88,13 @@ class CSBooking(CSBookingBase):
                 Logger.get('RecReq').exception(
                     """Could not send NewRequestNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
                 return RecordingRequestError('create', e)
-        
 
-    def _modify(self):
+
+
+    def _modify(self, oldBookingParams):
         self._statusMessage = _("Request successfully sent")
         self._statusClass = "statusMessageOther"
-        
+
         if MailTools.needToSendEmails('RecordingRequest'):
             try:
                 notification = RequestModifiedNotification(self)
@@ -101,14 +106,14 @@ class CSBooking(CSBookingBase):
                     """Could not send RequestModifiedNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
                 return RecordingRequestError('edit', e)
 
-                                
+
     def _checkStatus(self):
         pass
 
     def _accept(self):
         self._statusMessage = _("Request accepted")
         self._statusClass = "statusMessageOK"
-        
+
         try:
             notification = RequestAcceptedNotification(self)
             GenericMailer.sendAndLog(notification, self.getConference(),
@@ -118,7 +123,7 @@ class CSBooking(CSBookingBase):
             Logger.get('RecReq').exception(
                 """Could not send RequestAcceptedNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
             return RecordingRequestError('accept', e)
-            
+
         if MailTools.needToSendEmails('RecordingRequest'):
             try:
                 notificationAdmin = RequestAcceptedNotificationAdmin(self)
@@ -129,13 +134,13 @@ class CSBooking(CSBookingBase):
                 Logger.get('RecReq').exception(
                     """Could not send RequestAcceptedNotificationAdmin for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
                 return RecordingRequestError('accept', e)
-            
-        
-        
+
+
+
     def _reject(self):
         self._statusMessage = _("Request rejected by responsible")
         self._statusClass = "statusMessageError"
-        
+
         try:
             notification = RequestRejectedNotification(self)
             GenericMailer.sendAndLog(notification, self.getConference(),
@@ -145,7 +150,7 @@ class CSBooking(CSBookingBase):
             Logger.get('RecReq').exception(
                 """Could not send RequestRejectedNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
             return RecordingRequestError('reject', e)
-        
+
         if MailTools.needToSendEmails('RecordingRequest'):
             try:
                 notificationAdmin = RequestRejectedNotificationAdmin(self)
@@ -156,7 +161,7 @@ class CSBooking(CSBookingBase):
                 Logger.get('RecReq').exception(
                     """Could not send RequestRejectedNotificationAdmin for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
                 return RecordingRequestError('reject', e)
-                                        
+
     def _delete(self):
         if MailTools.needToSendEmails('RecordingRequest'):
             try:

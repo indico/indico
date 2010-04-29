@@ -26,6 +26,11 @@ type("RoomBookingWidget", ["IWidget"],
          },
 
          postDraw: function() {
+             if(this.defaultLocation != null) {
+                 if (this.locationChooser.get() != this.defaultLocation) {
+                     this.locationChooser.set(this.defaultLocation);
+                 }
+             }
              if (this.parentInfo) {
                  this.inheritCheckbox.set(this.inheritDefault);
              }
@@ -38,7 +43,6 @@ type("RoomBookingWidget", ["IWidget"],
                                                           Html.span({},
                                                                     this.parentInfo.get('room') + " (" +
                                                                     this.parentInfo.get('location') + ")")):'';
-
              return Html.table('roomWidget',
                                Html.tbody({},
                                           Html.tr({}, Html.th({}, Html.div('roomWidgetTitle', $T("Location"))),
@@ -82,24 +86,26 @@ type("RoomBookingWidget", ["IWidget"],
 
              var cacheEntry = this.roomCache[newLocation];
 
-             if (cacheEntry) {
+             if (this.loading){
+                 // do nothing
+             }
+             else if (cacheEntry) {
                  this.roomChooser.setOptionList(cacheEntry);
                  this.roomChooser.setLoading(false);
              } else {
                  var self = this;
-                 indicoRequest('roomBooking.rooms.list',
-                               {location: newLocation},
+                 indicoRequest('roomBooking.rooms.fullNameList',
+                               {'location': newLocation},
                                function(result, error) {
-                                   self.querying = false;
+                                   self.loading = false;
                                    if (!error) {
                                        var dict = {};
 
                                        each(result, function(value) {
-                                           dict[value] = value;
+                                           dict[value[0]] = value[1];
                                        });
 
                                        self.roomCache[newLocation] = dict;
-
                                        self.roomChooser.setOptionList(dict);
                                        self.roomChooser.setLoading(false);
                                    } else {
@@ -108,17 +114,21 @@ type("RoomBookingWidget", ["IWidget"],
                                    }
 
                                });
+                 this.loading = true;
              }
 
          }
      },
-     function(locations, info, parent, inheritDefault, eventFavorites) {
+     function(locations, info, parent, inheritDefault, eventFavorites, defaultLocation) {
          var self = this;
 
+         this.defaultLocation = defaultLocation;
          this.locationChooser = new FlexibleSelect(locations, 177);
          this.roomChooser = new FlexibleSelect({},
                                                177,
-                                               function(e1, e2){ return self._favoriteSort(e1, e2); },
+                                               function(e1, e2){
+                                                     return self._favoriteSort(self.roomChooser.list.get(e1), self.roomChooser.list.get(e2));
+                                               },
                                                function(key, elem){ return self._favoriteDecorator(key, elem); });
          this.addressArea = new RealtimeTextArea({});
          this.inheritCheckbox = Html.checkbox({});
@@ -151,7 +161,6 @@ type("RoomBookingWidget", ["IWidget"],
                      self.info.set('location', null);
                      self.info.set('room', null);
                      self.info.set('address', null);
-
 
                  } else {
                      self.inheritText.dom.className = '';

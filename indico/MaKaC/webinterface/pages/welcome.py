@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: welcome.py,v 1.23 2009/04/17 08:19:08 eragners Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

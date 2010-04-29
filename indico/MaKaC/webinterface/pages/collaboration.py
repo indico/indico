@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: collaboration.py,v 1.20 2009/05/27 08:52:22 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -28,11 +27,13 @@ from MaKaC.common.timezoneUtils import nowutc, setAdjustedDate, DisplayTZ
 from MaKaC.common.utils import formatDateTime, parseDateTime
 from MaKaC.common.timezoneUtils import getAdjustedDate
 from MaKaC.i18n import _
-from MaKaC.common.PickleJar import DictPickler
-from MaKaC.webinterface.rh.admins import RCAdmin
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.common.indexes import IndexesHolder
-from MaKaC.plugins.Collaboration.base import CollaborationException
+from MaKaC.plugins.Collaboration.base import CollaborationException, WCSPageTemplateBase
+from MaKaC.common.fossilize import fossilize
+from MaKaC.fossils.user import IAvatarFossil
+from MaKaC.services.implementation.user import UserComparator
+from MaKaC.plugins.Collaboration.fossils import IIndexInformationFossil
 
 ################################################### Server Wide pages #########################################
 
@@ -41,6 +42,7 @@ class WPAdminCollaboration(WPMainBase):
     def __init__(self, rh, queryParams):
         WPMainBase.__init__(self, rh)
         self._queryParams = queryParams
+        self._user = self._rh.getAW().getUser()
         self._pluginsWithIndexing = CollaborationTools.pluginsWithIndexing() # list of names
         self._buildExtraJS()
 
@@ -56,29 +58,33 @@ class WPAdminCollaboration(WPMainBase):
                              "loginAsURL": self.getLoginAsURL() })
 
     def _getBody(self, params):
-        return WAdminCollaboration(self._queryParams, self._pluginsWithIndexing).getHTML()
+        return WAdminCollaboration(self._queryParams, self._pluginsWithIndexing, self._user).getHTML()
 
     def _getNavigationDrawer(self):
         return wcomponents.WSimpleNavigationDrawer("Video Services Admin", urlHandlers.UHAdminCollaboration.getURL)
 
     def _buildExtraJS(self):
         for pluginName in self._pluginsWithIndexing:
-            extraJS = CollaborationTools.getExtraJS(pluginName, None)
+            extraJS = CollaborationTools.getExtraJS(None, pluginName, self._user)
             if extraJS:
                 self.addExtraJS(extraJS)
 
 class WAdminCollaboration(wcomponents.WTemplated):
 
-    def __init__(self, queryParams, pluginsWithIndexing):
+    def __init__(self, queryParams, pluginsWithIndexing, user):
         wcomponents.WTemplated.__init__(self)
         self._queryParams = queryParams
         self._pluginsWithIndexing = pluginsWithIndexing # list of names
+        self._user = user
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
 
         #dictionary where the keys are names of false "indexes" for the user, and the values are IndexInformation objects
-        vars["Indexes"] = CollaborationTools.getCollaborationPluginType().getOption("pluginsPerIndex").getValue()
+        indexes = CollaborationTools.getCollaborationPluginType().getOption("pluginsPerIndex").getValue()
+        vars["Indexes"] = indexes
+        vars["IndexInformation"] = fossilize(dict([(i.getName(), i) for i in indexes]), IIndexInformationFossil)
+
         vars["InitialIndex"] = self._queryParams["indexName"]
         vars["InitialViewBy"] = self._queryParams["viewBy"]
         vars["InitialOrderBy"] = self._queryParams["orderBy"]
@@ -158,13 +164,13 @@ class WAdminCollaboration(wcomponents.WTemplated):
             vars["InitialTotalInIndex"] = -1
             vars["InitialNumberOfPages"] = -1
 
-        JSCodes = {}
+        jsCodes = {}
         for pluginName in self._pluginsWithIndexing:
             templateClass = CollaborationTools.getTemplateClass(pluginName, "WIndexing")
             if templateClass:
-                JSCodes[pluginName] = templateClass(pluginName, None).getHTML()
+                jsCodes[pluginName] = templateClass(None, pluginName, self._user).getHTML()
 
-        vars["JSCodes"] = JSCodes
+        vars["JSCodes"] = jsCodes
 
         return vars
 
@@ -172,6 +178,8 @@ class WAdminCollaboration(wcomponents.WTemplated):
 ################################################### Event Modif pages ###############################################
 
 class WPConfModifCSBase (WPConferenceModifBase):
+
+    _userData = ['favorite-user-list']
 
     def __init__(self, rh, conf):
         """ Constructor
@@ -183,9 +191,9 @@ class WPConfModifCSBase (WPConferenceModifBase):
         self._tabNames = rh._tabs
         self._activeTabName = rh._activeTabName
 
-    def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
 
+    def _createTabCtrl(self):
         isUsingHTTPS = CollaborationTools.isUsingHTTPS()
         for tabName in self._tabNames:
             if tabName == 'Managers':
@@ -201,6 +209,7 @@ class WPConfModifCSBase (WPConferenceModifBase):
 
     def _setActiveSideMenuItem(self):
         self._videoServicesMenuItem.setActive()
+
 
 class WPConfModifCollaboration(WPConfModifCSBase):
 
@@ -225,7 +234,7 @@ class WPConfModifCollaboration(WPConfModifCSBase):
 
     def _buildExtraJS(self):
         for plugin in self._tabPlugins:
-            extraJS = CollaborationTools.getExtraJS(plugin.getName(), self._conf)
+            extraJS = CollaborationTools.getExtraJS(self._conf, plugin.getName(), self._getAW().getUser())
             if extraJS:
                 self.addExtraJS(extraJS)
 
@@ -253,18 +262,18 @@ class WConfModifCollaboration(wcomponents.WTemplated):
 
         plugins = self._tabPlugins
         singleBookingPlugins, multipleBookingPlugins = CollaborationTools.splitPluginsByAllowMultiple(plugins)
-        CSBookingManager = self._conf.getCSBookingManager()
+        csBookingManager = self._conf.getCSBookingManager()
 
         bookingsS = {}
         for p in singleBookingPlugins:
-            bookingList = CSBookingManager.getBookingList(filterByType = p.getName())
+            bookingList = csBookingManager.getBookingList(filterByType = p.getName())
             if len(bookingList) > 0:
-                bookingsS[p.getName()] = DictPickler.pickle(bookingList[0])
+                bookingsS[p.getName()] = fossilize(bookingList[0]) #will use ICSBookingConfModifBaseFossil or inheriting fossil
 
-        bookingsM = DictPickler.pickle(CSBookingManager.getBookingList(
+        bookingsM = fossilize(csBookingManager.getBookingList(
             sorted = True,
             notify = True,
-            filterByType = [p.getName() for p in multipleBookingPlugins]))
+            filterByType = [p.getName() for p in multipleBookingPlugins])) #will use ICSBookingConfModifBaseFossil or inheriting fossil
 
         vars["Conference"] = self._conf
         vars["AllPlugins"] = plugins
@@ -280,7 +289,7 @@ class WConfModifCollaboration(wcomponents.WTemplated):
 
         singleBookingForms = {}
         multipleBookingForms = {}
-        JSCodes = {}
+        jsCodes = {}
         canBeNotified = {}
 
         for plugin in singleBookingPlugins:
@@ -291,23 +300,45 @@ class WConfModifCollaboration(wcomponents.WTemplated):
         for plugin in multipleBookingPlugins:
             pluginName = plugin.getName()
             templateClass = CollaborationTools.getTemplateClass(pluginName, "WNewBookingForm")
-            multipleBookingForms[pluginName] = templateClass(self._conf, pluginName, self._user).getHTML()
+            newBookingFormHTML = templateClass(self._conf, pluginName, self._user).getHTML()
+
+            advancedTabClass = CollaborationTools.getTemplateClass(pluginName, "WAdvancedTab")
+            if advancedTabClass:
+                advancedTabClassHTML = advancedTabClass(self._conf, pluginName, self._user).getHTML()
+            else:
+                advancedTabClassHTML = WConfModifCollaborationDefaultAdvancedTab(self._conf, pluginName, self._user).getHTML()
+            multipleBookingForms[pluginName] = (newBookingFormHTML, advancedTabClassHTML)
 
         for plugin in plugins:
             pluginName = plugin.getName()
 
             templateClass = CollaborationTools.getTemplateClass(pluginName, "WMain")
-            JSCodes[pluginName] = templateClass(pluginName, self._conf).getHTML()
+            jsCodes[pluginName] = templateClass(self._conf, pluginName, self._user).getHTML()
 
             bookingClass = CollaborationTools.getCSBookingClass(pluginName)
             canBeNotified[pluginName] = bookingClass._canBeNotifiedOfEventDateChanges
 
         vars["SingleBookingForms"] = singleBookingForms
         vars["MultipleBookingForms"] = multipleBookingForms
-        vars["JSCodes"] = JSCodes
+        vars["JSCodes"] = jsCodes
         vars["CanBeNotified"] = canBeNotified
 
         return vars
+
+class WAdvancedTabBase(WCSPageTemplateBase):
+
+    def getVars(self):
+        variables = WCSPageTemplateBase.getVars(self)
+
+        bookingClass = CollaborationTools.getCSBookingClass(self._pluginName)
+        variables["CanBeNotified"] = bookingClass._canBeNotifiedOfEventDateChanges
+
+        return variables
+
+class WConfModifCollaborationDefaultAdvancedTab(WAdvancedTabBase):
+
+    def _setTPLFile(self):
+        wcomponents.WTemplated._setTPLFile(self)
 
 
 class WPConfModifCollaborationProtection(WPConfModifCSBase):
@@ -336,11 +367,10 @@ class WConfModifCollaborationProtection(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["Conference"] = self._conf
-        vars["CSBM"] = self._conf.getCSBookingManager()
-        if self._user:
-            vars["Favorites"] = DictPickler.pickle(self._user.getPersonalInfo().getBasket().getUsers())
-        else:
-            vars["Favorites"] = []
+        csbm = self._conf.getCSBookingManager()
+        vars["CSBM"] = csbm
+        allManagers = fossilize(csbm.getAllManagers(), IAvatarFossil)
+        vars["AllManagers"] = sorted(allManagers, cmp = UserComparator.cmpUsers)
         return vars
 
 ################################################### Event Display pages ###############################################

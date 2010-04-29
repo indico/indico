@@ -60,7 +60,7 @@
             <tr>
                 <td colspan="3" align="center">
                     <input type="submit" class="btn" value="<%= _("select")%>">
-                    <input type="submit" class="btn" value="<%= _("cancel")%>">
+                    <input type="submit" class="btn" value="<%= _("cancel")%>" name="cancel">
                 </td>
             </tr>
         </form>

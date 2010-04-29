@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: conferenceDisplay.py,v 1.86 2009/05/15 11:51:10 eragners Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -397,7 +396,7 @@ class RHConferenceBaseDisplay( RHConferenceBase, RHDisplayBaseProtected ):
             RHDisplayBaseProtected._checkProtection( self )
 
 
-class RHConferenceDisplay( RHConferenceBaseDisplay ):
+class RHConferenceDisplay( RoomBookingDBMixin, RHConferenceBaseDisplay ):
     _uh = urlHandlers.UHConferenceDisplay
 
     def _process( self ):
@@ -458,7 +457,7 @@ class RHConferenceDisplay( RHConferenceBaseDisplay ):
         return warningText + p.display(**params)
 
 
-class RHConferenceOtherViews( RHConferenceBaseDisplay ):
+class RHConferenceOtherViews( RoomBookingDBMixin, RHConferenceBaseDisplay ):
     """this class is for the conference type objects only
     it is an alternative to the standard TimeTable view"""
     _uh = urlHandlers.UHConferenceOtherViews
@@ -1129,7 +1128,7 @@ class RHConferenceToXML(RHConferenceBaseDisplay):
         xmlgen.closeTag("event")
         basexml = xmlgen.getXml()
         path = Config.getInstance().getStylesheetsDir()
-        stylepath = "%s/%s.xsl" % (path,self._xmltype)
+        stylepath = "%s.xsl" % (os.path.join(path,self._xmltype))
         if self._xmltype != "standard" and os.path.exists(stylepath):
             try:
                 parser = XSLTransformer(stylepath)

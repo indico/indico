@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: accessControl.py,v 1.14 2008/08/11 12:00:27 pferreir Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -25,7 +24,7 @@ from MaKaC.common.indexes import IndexesHolder
 from MaKaC.webinterface import urlHandlers
 from MaKaC.conference import ConferenceHolder
 
-WGET_COMMAND = """wget -mk --accept '*confId=%s*,*conferenceTimeTable.py*,*confAuthorIndex.py*,*internalPage.py*,*materialDisplay.py*,*access*,*sessionDisplay.py*,*contributionDisplay.py*,*contributionListDisplay.py*,*conferenceProgram.py*,*getVars*,*.ico,*.png,*.jpg,*.gif,*.css,*.js' --html-extension %s -P %s --domains='%s'"""
+WGET_COMMAND = """wget -nv -mk --accept '*confId=%s*,*conferenceTimeTable.py*,*confAuthorIndex.py*,*internalPage.py*,*materialDisplay.py*,*access*,*sessionDisplay.py*,*contributionDisplay.py*,*contributionListDisplay.py*,*conferenceProgram.py*,*getVars*,*.ico,*.png,*.jpg,*.gif,*.css,*.js' --html-extension %s -P %s --domains='%s'"""
 
 
 def main():

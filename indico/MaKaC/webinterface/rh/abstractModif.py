@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: abstractModif.py,v 1.27 2009/05/14 18:06:01 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -144,7 +143,7 @@ class RHAbstractSetSubmitter(RHAbstractModifBase):
     
     def _process( self ):
         params = self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ph = user.PrincipalHolder()
             id  = params["selectedPrincipals"]
             self._target.setSubmitter( ph.getById( id ) )

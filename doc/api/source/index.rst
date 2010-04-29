@@ -10,8 +10,9 @@ Contents:
 
 .. toctree::
    :maxdepth: 2
+   :numbered:
 
-   fossilize.rst
+   ./fossilize.rst
 
 Indices and tables
 ==================

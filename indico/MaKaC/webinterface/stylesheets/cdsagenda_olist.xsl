@@ -1,5 +1,5 @@
 <?xml version='1.0'?>
-<!-- $Id: cdsagenda_olist.xsl,v 1.14 2009/06/19 12:44:11 jose Exp $
+<!--
 
      This file is part of CDS Indico.
      Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: materialFactories.py,v 1.16 2009/04/21 16:03:50 pferreir Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -332,96 +331,126 @@ class DefaultMaterialFactory(MaterialFactory):
     """ Default factory, searches for material with same name,
     and creates new one if needed. """
 
-    # inheritance from MaterialFactory is actually not needed
+    def __init__(self, matId):
+        self.name = matId
 
-    def __init__(self, name):
-        self.name = name
-    
     def get( self, owner ):
         """returns the material"""
 
         for mat in owner.getMaterialList():
-            if mat.getTitle() == self.name:
+            if mat.getTitle().lower() == self.name.lower():
                 return mat
-
-        return None
-
-    def getTitle(self):
-        return self.name
-
-    def getId(self):
-        return self.id
 
     def remove( self, owner ):
         """performs the deletion of the slides from the owner"""
         owner.removeMaterial(self.get(owner))
 
     def canAdd( self, target ):
-        #only one slide can be added to a contribution
         return True
 
     def canDelete( self, target ):
-        #only a slide which is already set in a contribution can be deleted
         return len(target.getMaterialList) > 0
 
     def getModificationURL( self, mat ):
-        """returns the URL for accessing to the modification view of the 
+        """returns the URL for accessing to the modification view of the
             material"""
         return urlHandlers.UHMaterialModification.getURL( mat )
 
-    def create( self, target ):
+    def create(self, target):
         m = conference.Material()
-        m.setTitle(self.name)
+        m.setTitle(self.name.title())
         target.addMaterial( m )
         return m
+
 
     @classmethod
     def getInstance(cls, name):
         return cls(name)
 
+
 class MaterialFactoryRegistry:
-    """Keeps a list of material factories. When a new material type wants to be 
+    """Keeps a list of material factories. When a new material type wants to be
         added one just needs to implement the corresponding factory and add the
         entry in the "_registry" attribute of this class
     """
-    _registry = {} 
+    _registry = { PaperFactory._id: PaperFactory, \
+                  SlidesFactory._id: SlidesFactory, \
+                  MinutesFactory._id: MinutesFactory, \
+                  VideoFactory._id: VideoFactory, \
+                  PosterFactory._id: PosterFactory }
+
+    _allowedMaterials = {
+        'simple_event': [ "paper", "slides", "poster", "minutes", "agenda", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast", "video", "streaming video", "downloadable video" ],
+        'meeting': [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ],
+        'conference' : ["paper", "slides", "poster", "minutes"],
+        'category': [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ]
+        }
+
 
     @classmethod
-    def getById( cls, id ):
-        return cls._registry.get(id.lower().strip(), DefaultMaterialFactory.getInstance(id))
+    def getById( cls, matId ):
+        return cls._registry.get(matId, DefaultMaterialFactory.getInstance(matId))
 
     @classmethod
     def getList( cls ):
         return cls._registry.values()
 
     @classmethod
-    def get(cls,mat):
+    def getIdList( cls ):
+        return cls._registry.keys()
+
+    @classmethod
+    def get(cls, material):
         for factory in cls._registry.values():
-            if factory.appliesToMaterial(mat):
+            if factory.appliesToMaterial(material):
                 return factory
 
+    @classmethod
+    def getAllowed(cls, target):
+        return cls._allowedMaterials[target.getConference().getType()]
 
-class ConfMFRegistry( MaterialFactoryRegistry ):
+    @classmethod
+    def getMaterialList(cls, target):
+        """
+        Generates a list containing all the materials, with the
+        corresponding Ids for those that already exist.
+        The format is [(id, title), ...] and materials from the allowed
+        material list and the existing material list are unified by title.
+        """
 
-    _registry = { PaperFactory._id: PaperFactory, \
-                  SlidesFactory._id: SlidesFactory, \
-                  MinutesFactory._id: MinutesFactory, \
-                  VideoFactory._id: VideoFactory, \
-                  PosterFactory._id: PosterFactory }
+        # NOTE: This method is a bit alien. It's just here because
+        # we couldn't find a better place
 
-class SessionMFRegistry( MaterialFactoryRegistry ):
+        matDict = dict((title.lower(), title) for title in cls.getAllowed(target))
+
+        for material in target.getMaterialList():
+            title = material.getTitle().lower()
+            matDict[title] = material.getId()
+
+        return sorted(list((matId, title.title())
+                 for title, matId in matDict.iteritems()))
+
+
+
+class CategoryMFRegistry(MaterialFactoryRegistry):
+
+    @classmethod
+    def getAllowed(cls, target):
+        return cls._allowedMaterials['category']
+
+
+class ConfMFRegistry(MaterialFactoryRegistry):
+    pass
+
+
+class SessionMFRegistry(MaterialFactoryRegistry):
+
     _registry = { MinutesFactory._id: MinutesFactory }
 
 
 class ContribMFRegistry(MaterialFactoryRegistry):
-    _registry = { PaperFactory._id: PaperFactory, \
-                  SlidesFactory._id: SlidesFactory, \
-                  MinutesFactory._id: MinutesFactory, \
-                  VideoFactory._id: VideoFactory, \
-                  PosterFactory._id: PosterFactory }
-
-class CategoryMFRegistry( ContribMFRegistry ):
     pass
 
-class SubContributionMFRegistry( ContribMFRegistry ):
+
+class SubContributionMFRegistry(MaterialFactoryRegistry):
     pass

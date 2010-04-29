@@ -15,28 +15,94 @@ type("IWidget", [],
          },
 
          enable: function() {
+         },
+
+         show: function() {
+         },
+
+         hide: function() {
          }
 
      });
 
+/**
+ * Base class for widgets that store internally a list and want to represent each item with a template;
+ * the list will be a <ul> and the items a <li> each, bound to the item data.
+ *
+ * The <ul> will have a random DOM id and each <li> will also have a DOM id: the <ul>'s id + _ + item_key.
+ *
+ * Inherits from WatchObject: each item will have a key and a value (the item data).
+ * When adding a new item, it will always appear last in the DOM.
+ * To add / remove items use the corresponding WatchObject methods: "set(key, item)" to add, or "set(key, null)" to remove.
+ *
+ * This class also has a "setMessage" method, which will delete all the items in the <ul> and display the message inside.
+ *
+ * Inheriting classes will have to implement the _drawItem method.
+ *
+ * @param {String} listCssClass CSS class for the <ul> element.
+ * @param {function} mouseoverObserver A function that will be called when the user hovers the mouse over one of the <li>.
+ *                                     It will be called with 4 arguments:
+ *                                     1. true / false. true for mouseover, false for mouseout.
+ *                                     2. a "pair" object representing the item corresponding to the <li>.
+ *                                     pair.key will be the item's key and pair.get() the item's data.
+ *                                     3. the <li> XElement that received the event
+ *                                     4. the event object
+ *
+ */
 type("ListWidget", ["WatchObject", "IWidget"],
     {
+        /**
+         * The DOM id of the <ul> element, chosen randomly at construction.
+         */
         getId: function(){
             return this.id;
         },
 
+        /**
+         * We cannot call this function "clear" because
+         * WatchObject's "clear" is defined in the WatchObject constructor
+         * and would squash our function.
+         */
+        clearList: function() {
+            var self = this;
+            self.message = null;
+            self.clear(); // this gets rid of the <li> representing (key,values)
+            self.domList.clear(); //this gets rid of eventual messages
+        },
+
+        /**
+         * Sets a message inside the list.
+         * This will delete all the internal data.
+         */
+        setMessage: function(message) {
+            this.clearList();
+            this.message = message;
+            this.domList.append(Html.li('listMessage', message));
+        },
+
         draw: function() {
             var self = this;
 
-            self.domList = Html.ul(self.listCssClass);
+            var returnedDom = $B(self.domList, self,
+                function(pair) {
+                    var listItem =  Html.li({id: self.id + '_' + pair.key}, self._drawItem(pair));
+                    if (exists(self.mouseoverObserver)) {
+                        listItem.observeEvent('mouseover', function(event){
+                            self.mouseoverObserver(true, pair, listItem, event);
+                        });
+                        listItem.observeEvent('mouseout', function(event){
+                            self.mouseoverObserver(false, pair, listItem, event);
+                        });
+                    }
+                    return listItem;
+                });
 
-            return this.IWidget.prototype.draw.call(
-                this,
-                $B(self.domList, self,
-                    function(pair) {
-                        return Html.li({id: self.id + '_' + pair.key},
-                                       self._drawItem(pair));
-                   }));
+            if (exists(this.message)) {
+                this.domList.append(Html.li('listMessage', this.message));
+            }
+
+            return this.IWidget.prototype.draw.call(this, returnedDom);
+
         },
 
         _drawItem: function(pair) {
@@ -46,44 +112,117 @@ type("ListWidget", ["WatchObject", "IWidget"],
         }
     },
 
-    function(listCssClass) {
+    /**
+     * Constructor
+     */
+    function(listCssClass, mouseoverObserver) {
         this.WatchObject();
         this.id = Html.generateId();
+        this.domList = Html.ul({id: this.id, className: listCssClass});
         this.listCssClass = listCssClass;
+        this.mouseoverObserver = mouseoverObserver;
     }
 );
 
+/**
+ * Base class which adds selection capability to ListWidget.
+ * See first the documentation of ListWidget.
+ *
+ * @param {function} selectedObserver Function that will be called when an item is selected / unselected.
+ *                                    It will be passed the list of currently selected items, as a WatchObject
+ *                                    similar to the internal WatchObject that holds all the items.
+ *
+ * @param {Boolean} onlyOne false by default. If true, selecting an item will deselect a previously selected item.
+ *
+ * @param {String} listCssClass see ListWidget doc.
+ * @param {String} selectedCssClass CSS class that will be added to the <li> if they are selected.
+ * @param {String} unselectedCssClass CSS class that will be added to the <li> if they are unselected.
+ *
+ * @param {function} mouseoverObserver see ListWidget doc.
+ */
 type("SelectableListWidget", ["ListWidget"],
     {
-        _getSelectedList: function() {
+        getSelectedList: function() {
             return this.selectedList;
         },
+
+        clearSelection: function() {
+            var self = this;
+            each(self.domList, function(listItem) {
+                if (listItem.dom.className.search(self.selectedCssClass) >= 0) {
+                    listItem.dom.className = listItem.dom.className.replace(self.selectedCssClass, self.unselectedCssClass);
+                }
+            });
+            this.selectedList.clear();
+        },
+
+        /**
+         * We cannot call this function "clear" because
+         * WatchObject's "clear" is defined in the WatchObject constructor
+         * and would squash our function.
+         */
+        clearList: function() {
+            this.clearSelection();
+            this.ListWidget.prototype.clearList.call(this);
+        },
+
+        /**
+         * Sets a message inside the list.
+         * This will delete all the internal data.
+         */
+        setMessage: function(message) {
+            this.clearSelection();
+            this.ListWidget.prototype.setMessage.call(this, message);
+        },
+
         draw: function() {
             var self = this;
 
-            self.domList = Html.ul(self.listCssClass);
+            var returnedDom = $B(self.domList, self,
 
-            return this.IWidget.prototype.draw.call(
-                this,
-                $B(self.domList, self,
-                    function(pair) {
-                        var listItem = Html.li({id: self.id + '_' + pair.key}, self._drawItem(pair));
-                        if (pair.get().get("unselectable") === true) {
-                            listItem.dom.className += ' unselectable';
-                        } else {
-                            listItem.observeClick(function(){
-                                if (exists(self.selectedList.get(pair.key))) {
-                                    self.selectedList.set(pair.key, null);
-                                    listItem.dom.className = self.unselectedCssClass;
-                                } else {
-                                    self.selectedList.set(pair.key, pair.get());
-                                    listItem.dom.className = self.selectedCssClass;
+                function(pair) {
+
+                    var listItem = Html.li({id: self.id + '_' + pair.key}, self._drawItem(pair));
+
+                    if (pair.get().get("unselectable") === true) {
+                        listItem.dom.className += ' unselectable';
+
+                    } else {
+                        listItem.observeClick(function(event){
+
+                            if (exists(self.selectedList.get(pair.key))) {
+                                self.selectedList.set(pair.key, null);
+                                listItem.dom.className = self.unselectedCssClass;
+                            } else {
+                                if (self.onlyOne) {
+                                    self.clearSelection();
                                 }
+                                self.selectedList.set(pair.key, pair.get());
+                                listItem.dom.className = self.selectedCssClass;
+                            }
+
+                            if (exists(self.selectedObserver)) {
                                 self.selectedObserver(self.selectedList);
-                            });
-                        }
-                        return listItem;
-                   }));
+                            }
+
+                        });
+                    }
+                    if (exists(self.mouseoverObserver)) {
+                        listItem.observeEvent('mouseover', function(event){
+                            self.mouseoverObserver(true, pair, listItem, event);
+                        });
+                        listItem.observeEvent('mouseout', function(event){
+                            self.mouseoverObserver(false, pair, listItem, event);
+                        });
+                    }
+                    return listItem;
+               });
+
+            if (exists(this.message)) {
+                this.domList.append(Html.li('listMessage', this.message));
+            }
+
+            return this.IWidget.prototype.draw.call(this, returnedDom);
         },
         _drawItem: function(pair) {
             // Function to be overloaded by inheriting classes
@@ -91,9 +230,10 @@ type("SelectableListWidget", ["ListWidget"],
             return '';
         }
     },
-    function (selectedObserver, listCssClass, selectedCssClass, unselectedCssClass) {
+    function (selectedObserver, onlyOne, listCssClass, selectedCssClass, unselectedCssClass, mouseoverObserver) {
         this.selectedList = $O();
         this.selectedObserver = selectedObserver;
+        this.onlyOne = any(onlyOne, false);
         if (exists (selectedCssClass)) {
             this.selectedCssClass = selectedCssClass;
         } else {
@@ -104,13 +244,21 @@ type("SelectableListWidget", ["ListWidget"],
         } else {
             this.unselectedCssClass = "unselectedListItem";
         }
-        this.ListWidget(listCssClass);
+        this.ListWidget(listCssClass, mouseoverObserver);
     }
 );
 
-type("TabWidget", ["Chooser", "IWidget"],{
+type("TabWidget", ["IWidget"],{
     _titleTemplate: function(text) {
         return text;
+    },
+
+    enableTab: function(index) {
+        this.tabs[index].dom.style.display = 'inline';
+    },
+
+    disableTab: function(index) {
+        this.tabs[index].dom.style.display = 'none';
     },
 
     enable: function() {
@@ -119,6 +267,28 @@ type("TabWidget", ["Chooser", "IWidget"],{
 
     disable: function() {
         this.disableOverlay.dom.style.display = 'block';
+    },
+
+    _drawContent: function() {
+
+        var self = this;
+
+        try {
+
+            each(this.optionDict,
+                 function(value, key) {
+                     if (key == self.selected.get()) {
+                         value.dom.style.display = 'block';
+                     } else {
+                         value.dom.style.display = 'none';
+                     }
+                 });
+
+        } catch(e) {
+            if (e == "stopDrawing") {
+                // Otherwise stop drawing
+            }
+        }
     },
 
     draw: function(dataRetrievalFunc) {
@@ -152,7 +322,7 @@ type("TabWidget", ["Chooser", "IWidget"],{
         var arrow, bg;
 
         arrow = Html.div({className: 'tabScrollArrow', style: {backgroundPosition: '0 -30px'}});
-        bg = Html.div({className: 'tabScrollArrowBg', style: {left: pixels(self.width - 17)}}, arrow);
+        bg = Html.div({className: 'tabScrollArrowBg'}, arrow);
         this.scrollArrows.right = [bg, arrow];
 
         arrow = Html.div({className: 'tabScrollArrow', style: {backgroundPosition: '0 -15px'}});
@@ -209,21 +379,18 @@ type("TabWidget", ["Chooser", "IWidget"],{
 
         // this piece of code is sensitive to exceptions
         // coming from the drawing functions (for LookupTabWidget)
-        try {
-            if(dataRetrievalFunc) {
-                dataRetrievalFunc.call(this);
-            }
-
-            // if everything goes OK, replace the canvas
-            this.canvas.set(Widget.block(this));
-
-        } catch(e) {
-            if (e == "stopDrawing") {
-                // Otherwise stop drawing
-            }
+        if(dataRetrievalFunc) {
+            dataRetrievalFunc.call(this);
+        } else {
+            each(this.optionDict,
+                 function(value, key) {
+                     self.canvas.append(value);
+                 });
         }
 
-        var wrapperStyle = this.width?{width: pixels(this.width)}:{};
+        this._drawContent();
+
+        var wrapperStyle = this.width?{width: this.width}:{};
 
         this.container = this.IWidget.prototype.draw.call(
             this,
@@ -234,7 +401,7 @@ type("TabWidget", ["Chooser", "IWidget"],{
                                        Html.div({className: 'tabBorderGradient', style: {cssFloat: 'right'}})*/)
                              ),
                      Html.div({style: {marginTop: pixels(10),
-                                       width: self.width ? pixels(self.width) : 'auto',
+                                       width: self.width ? self.width : 'auto',
                                        minHeight: self.height ? pixels(self.height) : 'auto' }},
                               this.canvas),
                      this.disableOverlay));
@@ -263,9 +430,22 @@ type("TabWidget", ["Chooser", "IWidget"],{
             }
         }
 
+        this.scrollArrows.right[0].dom.style.left = pixels(this.container.dom.clientWidth - 17);
+
         // Initially allow scroll right but not left
         this.setScrollArrowState('right', true);
         this.setScrollArrowState('left', false);
+    },
+
+    heightToTallestTab: function() {
+        var currentSelectedTab = this.getSelectedTab();
+        var maxHeight = 0;
+        for(var i = this.tabs.length-1; i >= 0; i--) {
+            this.setSelectedTab(this.options.item(i));
+            maxHeight = Math.max(maxHeight, this.container.dom.offsetHeight);
+        }
+        this.container.setStyle('height', maxHeight);
+        this.setSelectedTab(currentSelectedTab);
     },
 
     checkTabOverflow: function(tab) {
@@ -412,7 +592,9 @@ type("TabWidget", ["Chooser", "IWidget"],{
      function(options, width, height, initialSelection, extraButtons, canvas) {
 
          var self = this;
-         this.width = width;
+
+         this.width = exists(width) ? ((typeof(width)=='string' && width.indexOf('%') >= 0) ? width : pixels(width)) : width;
+
          this.height = height;
          this.tabs = [];
          this.leftTabIndex = 0;
@@ -423,36 +605,32 @@ type("TabWidget", ["Chooser", "IWidget"],{
          this.canvas = canvas || Html.div('canvas');
 
          if (!exists(initialSelection)) {
-             initialSelection = 0;
+             initialSelection = options[0][0];
          }
 
          this.options = new WatchList();
 
          //replace with appropriate method, when ready
+
          $L(options).each(function(pair) {
              var value = pair[1];
              var key = pair[0];
 
              self.options.append(key);
-             if (value.getParent()) {
-                 value.getParent().dom.removeChild(value.dom);
-                 value.setStyle('display','');
-             }
          });
 
-         this.selected = new WatchValue(this.options.item(initialSelection));
+         this.optionDict = {};
+         each(options, function(item) {
+             self.optionDict[item[0]] = item[1];
+         });
+
+         this.selected = new WatchValue();
 
          this.selected.observe(function(value) {
-             self.set(value);
+             self._drawContent();
          });
 
-         var optionDict = {};
-         each(options, function(item) {
-             optionDict[item[0]] = item[1];
-         });
-
-         this.Chooser(optionDict);
-         this.set(this.selected.get());
+         this.selected.set(initialSelection);
 
          this.initializeDisableOverlay();
      }
@@ -460,59 +638,39 @@ type("TabWidget", ["Chooser", "IWidget"],{
 
 type("LookupTabWidget", ["TabWidget"],
      {
+         _drawContent: function() {
+             var self = this;
+
+             try {
+                 this.canvas.set(this.optionDict[self.selected.get()]());
+
+             } catch(e) {
+                 if (e == "stopDrawing") {
+                     // Otherwise stop drawing
+                 }
+             }
+         },
+
          draw: function() {
              return this.TabWidget.prototype.draw.call(
                  this,
                  function() {
-                     this.set(this.selected.get());
+                     this.canvas.set(Html.div({}));
                  });
          }
      },
+
      function(options, width, height, initialSelection, extraButtons, canvas) {
-
-         var self = this;
-         this.width = width;
-         this.height = height;
-         this.tabs = [];
-         this.leftTabIndex = 0;
-         this.rightTabIndex = 0;
-         this.scrollArrows = {};
-         this.scrollArrowStates = {};
-         this.extraButtons = any(extraButtons, []);
-         this.canvas = canvas || Html.div('canvas');
-
-         this.initializeDisableOverlay();
-
-         if (!exists(initialSelection)) {
-             initialSelection = 0;
-         }
-         this.options = $L(translate(options,
-                                     function(value) {
-                                         return value[0];
-                                     }));
-
-         this.selected = new WatchValue(this.options.item(initialSelection));
-
-         this.selected.observe(function(value) {
-             self.set(value);
-         });
-
-         var optionDict = {};
-         each(options, function(item) {
-             optionDict[item[0]] = item[1];
-         });
-
-         this.Chooser(new Lookup(optionDict));
-
+         this.TabWidget(options, width, height, initialSelection, extraButtons, canvas);
      }
+
     );
 
 type("RemoteWidget", [],
      {
 
          _error: function(error) {
-             var dialog = new ErrorReportDialog(error);
-             dialog.open();
+            IndicoUI.Dialogs.Util.error(error);
          },
 
          run: function(content) {
@@ -614,15 +772,15 @@ type("PreloadedWidget", ["IWidget"],
      });
 
 progressIndicator = function(small, center) {
-    return Html.div(center?{style:{textAlign: 'center'}}:{},Html.img({src: imageSrc(small?"loading":"ui_loading"), alt: "Loading..."
+    var htmlTag = small?Html.span:Html.div;
+    return htmlTag(center?{style:{textAlign: 'center'}}:{},Html.img({src: imageSrc(small?"loading":"ui_loading"), alt: "Loading..."
 }));
 };
 
 type("ServiceWidget", ["IWidget"],
      {
          _error: function(error) {
-             var dialog = new ErrorReportDialog(error);
-             dialog.open();
+             IndicoUI.Dialogs.Util.error(error);
          },
 
          request: function(extraArgs) {
@@ -686,6 +844,11 @@ type("PopupWidget", [], {
         return this.canvas;
     },
 
+    /**
+     * Opens the PopupWidget
+     * @param {Integer} x The horizontal position of the top left corner.
+     * @param {Integer} y The vertical position of the top left corner.
+     */
     open: function(x, y) {
         $E(document.body).append(this.draw(x,y));
         this.isopen = true;
@@ -741,8 +904,8 @@ type("PopupWidget", [], {
         this.isopen = false;
     }
     },
-    function() {
-        this.canvas = Html.div();
+    function(styleData) {
+        this.canvas = Html.div({style: styleData}||{});
     }
 );
 
@@ -767,46 +930,61 @@ type("HistoryListener", [],
 
      });
 
-type("ErrorSensitive", [],
+type("ErrorAware", [],
      {
          _setElementErrorState: function(element, text) {
-
-             var tooltip;
-
-             this.oldClassName = element.dom.className;
-             element.dom.className += ' invalid';
-
-             this.errorElement = element;
-
-             this._stopObservingError =
-                 element.observeEvent('mouseover', function(event) {
-                     tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, text, "tooltipError");
-                 });
-
-             this._stopObservingErrorOut =
-                 element.observeEvent('mouseout', function(event) {
-                     Dom.List.remove(document.body, tooltip);
-                 });
+             this._stopErrorList = IndicoUtil.markInvalidField(element, text)[1];
          },
 
          setError: function(text) {
              if (!text) {
                  // everything back to normal
-                 if (this._stopObservingError){
-                     this._stopObservingError();
-                     //this._stopObservingErrorOut();
+                 if (this._stopErrorList){
 
-                     this.errorElement.dom.className = this.oldClassName;
+                     each(this._stopErrorList,
+                          function(elem) {
+                              elem();
+                          });
 
                      this._inError = false;
+                     this._stopErrorList = [];
                  }
              } else {
                  this._setErrorState(text);
                  this._inError = true;
              }
+             return this._stopErrorList;
          },
 
          inError: function() {
              return this._inError;
+         },
+
+         askForErrorCheck: function() {
+             var errorState = this._checkErrorState();
+
+             if (errorState) {
+                 // if we're already in error state,
+                 // no need to do anything
+
+                 if (!this._inError) {
+                     // otherwise, we have to set it
+                     this.setError(errorState);
+                 }
+                 return errorState;
+             } else {
+                 this.setError(null);
+                 return null;
+             }
          }
+     },
+     function(parameterManager) {
+         this.parameterManager = parameterManager;
+
+         var self = this;
+
+         parameterManager.add(self, null, null,
+                              function(){
+                                  return self.askForErrorCheck();
+                              });
      });

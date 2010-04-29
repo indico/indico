@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: oai.py,v 1.12 2009/05/14 18:06:04 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -27,7 +26,10 @@ from MaKaC.common import info
 from MaKaC.common import DBMgr
 from MaKaC.common.logger import Logger
 
-from mod_python import apache
+try:
+    from mod_python import apache
+except ImportError:
+    pass
 
 def __request(req, params, private=False):
     start = datetime.now()
@@ -45,7 +47,7 @@ def __request(req, params, private=False):
     sec = tsec-min*60
 
     Logger.get('oai/interface').debug("from: %s request: %s responseTime: %s\n" %(req.connection.remote_ip, req.unparsed_uri, "%d:%d:%d"%(min, sec, msec)  ))
- 
+
     req.content_type = "text/xml"   # set content type
     return response
 
@@ -58,12 +60,12 @@ def private(req, **params):
 
     # load allowed IP address list from DB
     DBMgr.getInstance().startRequest()
-    
+
     minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
     ipList = minfo.getOAIPrivateHarvesterList()[:]
 
     useProxy = minfo.useProxy()
-    
+
     DBMgr.getInstance().endRequest()
 
 

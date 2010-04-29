@@ -1,3 +1,4 @@
+<% declareTemplate(newTemplateStyle=True) %>
 
 <% colors=["blue","green","yellow","pink"]; color=0 %>
 <!-- EvaluationResults start -->
@@ -24,7 +25,7 @@
 
     <fieldset class="evalationResultsFieldset" style="margin-top: 20px;">
       <legend><%= _("Statistics")%></legend>
-      
+
       <% if evaluation.getNbOfSubmissions()>0 : %>
         <% for q in evaluation.getQuestions(): %>
         <!--stat of question : start-->
@@ -43,7 +44,7 @@
               <% if choiceItemsNb<2: %>
                 <i> <%= _("[Warning] it's strange: you have less than 2 choice items for this kind of question...")%></i>
               <% end %>
-              
+
               <% if choiceItemsNb==2 and q.areAllAnswersFilled(selectedSubmissions): %><% choiceItem1=q.getChoiceItemsKeyAt(1); choiceItem2=q.getChoiceItemsKeyAt(2); %>
               <!--inline graphic : start-->
               <table class="statsGraphContainer">
@@ -73,7 +74,7 @@
               </table>
               <!--inline graphic : end-->
               <% end %>
-              
+
               <% if choiceItemsNb>2 or ( choiceItemsNb==2 and not q.areAllAnswersFilled(selectedSubmissions) ): %><% color=0 %>
               <!--multilines graphic : start-->
               <table class="statsGraphContainer">

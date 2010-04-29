@@ -19,7 +19,18 @@
 
 from MaKaC.common.fossilize import IFossil
 
-class IAvatarMinimalFossil(IFossil):
+class IGroupFossil(IFossil):
+
+    def getId(self):
+        """ Group id """
+
+    def getName(self):
+        """ Group name """
+
+    def getEmail(self):
+        """ Group email """
+
+class IAvatarFossil(IFossil):
 
     def getId(self):
         """ Avatar id"""
@@ -30,9 +41,6 @@ class IAvatarMinimalFossil(IFossil):
 
     def getEmail( self ):
         """ Avatar email """
-
-
-class IAvatarDetailedFossil(IAvatarMinimalFossil):
 
     def getFirstName(self):
         """ Avatar first name """
@@ -48,7 +56,7 @@ class IAvatarDetailedFossil(IAvatarMinimalFossil):
     getOrganisation.name = "affiliation"
 
 
-class IAvatarAllDetailsFossil(IAvatarDetailedFossil):
+class IAvatarAllDetailsFossil(IAvatarFossil):
 
     def getAddress( self ):
         """ Avatar address """

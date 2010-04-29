@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: admins.py,v 1.70 2009/06/26 16:07:57 cangelov Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -43,7 +42,6 @@ from MaKaC.common.pendingQueues import PendingSubmitterReminder, PendingManagerR
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC import roomMapping
 from MaKaC import domain
-from MaKaC import plugins
 from MaKaC.plugins.base import PluginsHolder
 import MaKaC.common.indexes as indexes
 import MaKaC.webinterface.personalization as personalization
@@ -51,8 +49,11 @@ from cgi import escape
 import re
 from MaKaC.i18n import _
 from MaKaC.modules.base import ModulesHolder
+from MaKaC.plugins.pluginLoader import PluginLoader
 
 class WPAdminsBase( WPMainBase ):
+
+    _userData = ['favorite-user-ids']
 
     def _getSiteArea(self):
         return "AdministrationArea"
@@ -407,6 +408,8 @@ class WAnnouncementModif(wcomponents.WTemplated):
 
 class WPAdminPlugins( WPAdminsBase ):
 
+    _userData = ['favorite-user-list', 'favorite-user-ids']
+
     def __init__(self, rh, pluginTypeId, initialPlugin):
         WPAdminsBase.__init__(self, rh)
         self._pluginTypeId = pluginTypeId
@@ -419,7 +422,7 @@ class WPAdminPlugins( WPAdminsBase ):
 
         self._tabs["Main"] = self._tabCtrl.newTab("Main", _("Main"), urlHandlers.UHAdminPlugins.getURL())
 
-        pluginTypes = PluginsHolder().getPluginTypes(sorted = True)
+        pluginTypes = PluginsHolder().getPluginTypes(doSort = True)
         for pluginType in pluginTypes:
             if pluginType.isVisible() and pluginType.isActive():
                 self._tabs[pluginType.getId()] = self._tabCtrl.newTab(pluginType.getName(), pluginType.getName(),
@@ -433,6 +436,7 @@ class WPAdminPlugins( WPAdminsBase ):
             self._tabs["Main"].setActive()
         else:
             self._tabs[self._pluginTypeId].setActive()
+
 
     def _getPageContent(self, params):
         if self._pluginTypeId is None:
@@ -656,7 +660,7 @@ class WWebcastSetup( wcomponents.WTemplated ):
         managers = wm.getManagers()
         urlselectmanager = urlHandlers.UHWebcastSelectManager.getURL()
         urlremovemanager = urlHandlers.UHWebcastRemoveManager.getURL()
-        vars["adminList"] = wcomponents.WPrincipalTable().getHTML( managers,  None, urlselectmanager, urlremovemanager )
+        vars["adminList"] = wcomponents.WPrincipalTable().getHTML( managers,  None, urlselectmanager, urlremovemanager, selectable=False )
         channels = wm.getChannels()
         iconremove = Config.getInstance().getSystemIconURL( "remove" )
         iconadd = Config.getInstance().getSystemIconURL( "add" )
@@ -2467,7 +2471,7 @@ class WRoomBookingPluginAdmin( wcomponents.WTemplated ):
         else:
             vars["iconURL"] = iconDisabled
             vars["activationText"] = _("Click to ACTIVATE Room Booking Module")
-        rbPlugins = plugins.getPluginsByType("RoomBooking")
+        rbPlugins = PluginLoader.getPluginsByType("RoomBooking")
         vars["plugins"] = rbPlugins
         vars["zodbHost"] = self._rh._host
         vars["zodbPort"] = self._rh._port
@@ -2479,6 +2483,8 @@ class WRoomBookingPluginAdmin( wcomponents.WTemplated ):
 
 
 class WPRoomBookingRoomForm( WPRoomBookingPluginAdminBase ):
+
+    _userData = ['favorite-user-list']
 
     def __init__( self, rh ):
         self._rh = rh

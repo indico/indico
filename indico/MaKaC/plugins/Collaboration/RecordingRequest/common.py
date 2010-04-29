@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: common.py,v 1.4 2009/04/25 13:56:17 dmartinc Exp $
 ##
 ## This file is par{t of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -21,9 +20,10 @@
 
 from MaKaC.plugins.Collaboration.base import CollaborationServiceException,\
     CSErrorBase
-from MaKaC.common.PickleJar import Retrieves
 from MaKaC.webinterface.common.contribFilters import PosterFilterField
 from MaKaC.conference import Contribution
+from MaKaC.common.fossilize import fossilizes
+from MaKaC.plugins.Collaboration.RecordingRequest.fossils import IRecordingRequestErrorFossil
 
 lectureOptions = [
     ("none", "None"),
@@ -76,7 +76,7 @@ subjectMatter = [
     ("safety" , "Safety"),
     ("techTraining" , "Technical Training")
 ]
-    
+
 def getTalks(conference, oneIsEnough = False, sort = False):
     """ oneIsEnough: the algorithm will stop at the first contribution found
                      it will then return a list with a single element
@@ -91,35 +91,29 @@ def getTalks(conference, oneIsEnough = False, sort = False):
                 break
     if sort and not oneIsEnough:
         talks.sort(key = Contribution.contributionStartDateForSort)
-        
+
     return talks
-    
-class RecordingRequestError(CSErrorBase):
+
+class RecordingRequestError(CSErrorBase): #already Fossilizable
+    fossilizes(IRecordingRequestErrorFossil)
+
     def __init__(self, operation, inner):
         CSErrorBase.__init__(self)
         self._operation = operation
         self._inner = inner
-        
-    @Retrieves(['MaKaC.plugins.Collaboration.RecordingRequest.common.RecordingRequestError'], 'origin')
-    def getOrigin(self):
-        return 'RecordingRequest'
-        
-    @Retrieves(['MaKaC.plugins.Collaboration.RecordingRequest.common.RecordingRequestError'],
-               'operation')
+
     def getOperation(self):
         return self._operation
-    
-    @Retrieves(['MaKaC.plugins.Collaboration.RecordingRequest.common.RecordingRequestError'],
-               'inner')
+
     def getInner(self):
         return str(self._inner)
-    
+
     def getUserMessage(self):
         return ''
-    
+
     def getLogMessage(self):
         return "Recording Request error for operation: " + str(self._operation) + ", inner exception: " + str(self._inner)
-    
-    
+
+
 class RecordingRequestException(CollaborationServiceException):
     pass

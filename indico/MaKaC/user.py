@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: user.py,v 1.76 2009/05/29 14:10:51 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -19,8 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.fossils.user import IAvatarMinimalFossil, IAvatarDetailedFossil,\
-    IAvatarAllDetailsFossil
+from MaKaC.fossils.user import IAvatarFossil, IAvatarAllDetailsFossil, IGroupFossil
 from MaKaC.common.fossilize import Fossilizable, fossilizes
 from random import random
 
@@ -57,7 +55,9 @@ from copy import copy
 """Contains the classes that implement the user management subsystem
 """
 
-class Group(Persistent):
+class Group(Persistent, Fossilizable):
+    fossilizes(IGroupFossil)
+
     """
     """
     groupType = "Default"
@@ -236,6 +236,7 @@ class CERNGroup(Group):
         return [ avList[0] for avList in avatarLists if avList ]
 
     def containsUser( self, avatar ):
+
         if avatar == None:
             return False
         try:
@@ -369,6 +370,7 @@ class GroupHolder(ObjectHolder):
         return result
 
     def match(self,criteria,forceWithoutExtAuth=False, exact=False):
+
         crit={}
         result = []
         for f,v in criteria.items():
@@ -378,10 +380,11 @@ class GroupHolder(ObjectHolder):
         if "Nice" in Config.getInstance().getAuthenticatorList() and not forceWithoutExtAuth:
             self.updateCERNGroupMatch(crit["name"][0],exact)
         match = self.getIndex().matchGroup(crit["name"][0], exact=exact)
+
         if match != None:
             for groupid in match:
-                if self.getById(groupid) not in result:
-                    gr=self.getById(groupid)
+                gr = self.getById(groupid)
+                if gr not in result:
                     result.append(gr)
         return result
 
@@ -419,7 +422,7 @@ class Avatar(Persistent, Fossilizable):
        Basically it contains personal data from them which is relevant for the
        system.
     """
-    fossilizes(IAvatarMinimalFossil, IAvatarDetailedFossil, IAvatarAllDetailsFossil)
+    fossilizes(IAvatarFossil, IAvatarAllDetailsFossil)
 
     linkedToBase = {"category":{"creator":[],
                                 "manager":[],
@@ -508,7 +511,7 @@ class Avatar(Persistent, Fossilizable):
             if userData.has_key( "surName" ):
                 self.setSurName( userData["surName"] )
             if userData.has_key( "title" ):
-                self.setName( userData["title"] )
+                self.setTitle( userData["title"] )
             if userData.has_key( "organisation" ):
                 if len(userData["organisation"])>0:
                     for org in userData["organisation"]:
@@ -540,9 +543,14 @@ class Avatar(Persistent, Fossilizable):
             ############################
 
             if userData.has_key("timezone"):
-               self.setTimezone(userData["timezone"])
+                self.setTimezone(userData["timezone"])
             else:
-               self.setTimezone("UTC")
+                self.setTimezone(info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone())
+
+            if userData.has_key("displayTZMode"):
+                self.setDisplayTZMode(userData["displayTZMode"])
+            else:
+                self.setDisplayTZMode("Event Timezone")
 
             ################################
             #Fermi timezone awareness(end) #
@@ -1064,6 +1072,7 @@ class Avatar(Persistent, Fossilizable):
     @Retrieves('MaKaC.user.Avatar', 'telephone')
     def getTelephone( self ):
         return self.telephone[0]
+    getPhone = getTelephone
 
     def setTelephone(self, tel, item=0 ):
         self.telephone[item] = tel
@@ -1175,14 +1184,24 @@ class Avatar(Persistent, Fossilizable):
     # Room booking related
 
     def isMemberOfSimbaList( self, simbaListName ):
+
+        # Try to get the result from the cache
         try:
             if simbaListName in self._v_isMember.keys():
                 return self._v_isMember[simbaListName]
         except:
             self._v_isMember = {}
-        groups = GroupHolder().match( { 'name': simbaListName }, forceWithoutExtAuth = True, exact=True )
-        if not groups:
-            groups = GroupHolder().match( { 'name': simbaListName }, exact=True )
+
+        groups = []
+        try:
+            # try to get the exact match first, which is what we expect since
+            # there shouldn't be uppercase letters
+            groups.append(GroupHolder().getById(simbaListName))
+        except KeyError:
+            groups = GroupHolder().match( { 'name': simbaListName }, forceWithoutExtAuth = True, exact=True)
+            if not groups:
+                groups = GroupHolder().match( { 'name': simbaListName }, exact=True)
+
         if groups:
             result = groups[0].containsUser( self )
             self._v_isMember[simbaListName] = result
@@ -1304,7 +1323,7 @@ class AvatarHolder( ObjectHolder ):
         root = DBMgr.getInstance().getDBConnection().root()
         allRooms = CrossLocationQueries.getRooms()
 
-        idList = [ room.getResponsible().id for room in allRooms ]
+        idList = [ room.getResponsible().id for room in allRooms if room.getResponsible()]
 
         for room in allRooms:
             if room.customAtts.get( 'Simba List' ):

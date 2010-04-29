@@ -9,7 +9,7 @@
 
     <div style="padding: 10px">
         <input type="hidden" value="<%= categ['id'] %>" name="categId" id="createCategId"/>
-        <span class="selectedCategoryName"><%= _("The event will be created in:")%> <span id="categTitle" class="categTitleChosen"><%= categ['title'] %></span></span><input <% if nocategs: %>style="display: none;"<% end %> id="buttonCategChooser" type="button" value="<%= _("Browse...")%>" onclick="categoryChooser.open()"/>
+        <span class="selectedCategoryName"><%= _("The event will be created in:")%> <span id="categTitle" class="categTitleChosen"><%= categ['title'] %></span></span><input <% if nocategs: %>style="display: none;"<% end %> id="buttonCategChooser" type="button" value="<%= _("Browse...")%>" onclick="openCategoryChooser()"/>
     </div>
 
 	<div class="groupTitle"><%= _("Step 2: Enter basic information about the meeting") %></div>
@@ -122,15 +122,11 @@
 
     //---- chairperson management
 
-    var userList = [];
-    <% from MaKaC.common.PickleJar import DictPickler %>
-    var uf = new UserListField('VeryShortPeopleListDiv', 'PluginPeopleList',
-            userList,
-		    null,
-		    <%= jsonEncode(DictPickler.pickle(rh._getUser().getPersonalInfo().getBasket().getUsers())) %>,
-		    true, true, false,
-		    userListNothing, userListNothing, userListNothing, false,
-            {"grant-manager": ['<%= _("event modification")%>', false]});
+    var uf = new UserListField('VeryShortPeopleListDiv', 'PeopleList',
+            null, true, null,
+		    true, false, false, {"grant-manager": ['<%= _("event modification")%>', false]},
+            true, false, true,
+		    userListNothing, userListNothing, userListNothing);
 
     $E('chairpersonsContainer').set(uf.draw());
 
@@ -160,7 +156,11 @@
         $E("buttonCategChooser").set("<%= _("Change...")%>")
         IndicoUI.Effect.highLightBackground("categTitle");
     };
-    var categoryChooser = new CategoryChooser(<%= categ %>, categoryChooserHandler, true);
+
+    var openCategoryChooser = function() {
+        var categoryChooserPopup = new CategoryChooser(<%= categ %>, categoryChooserHandler, true);
+        categoryChooserPopup.open();
+    }
 
     // ---- On Load
     IndicoUI.executeOnLoad(function()

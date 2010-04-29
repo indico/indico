@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: categoryMod.py,v 1.32 2009/05/25 13:26:24 eragners Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -596,7 +595,7 @@ class RHCategoryAddAllowed( RHCategModifBase ):
     
     def _process( self ):
         params = self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 self._target.grantAccess( ph.getById( id ) )
@@ -665,7 +664,7 @@ class RHCategoryAddConfCreators( RHCategModifBase ):
     
     def _process( self ):
         params = self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 entity = ph.getById( id )

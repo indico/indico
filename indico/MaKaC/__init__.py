@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: __init__.py,v 1.22 2009/05/13 15:30:20 pferreir Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

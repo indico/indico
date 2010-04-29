@@ -203,6 +203,10 @@ a.img:active {
     background: transparent url(../images/menu_arrow_up_black.png) scroll no-repeat center right;
 }
 
+.centeredCheckBox {
+    vertical-align: middle;
+}
+
 .listtitle {
    font-weight: bold;
    font-size: 16px;
@@ -280,7 +284,7 @@ a.img:active {
 /* styles used for the category overview page */
 
 .categoryOverview {
-    margin-top: 20px;
+    margin-top: 0px;
 }
 
 .categoryOverview table.item {
@@ -1214,7 +1218,7 @@ span.horizontalSeparator {
     font-size: 11px;
 }
 
-.tip ul {
+.tip ul, .tip strong, .tip em {
     color:#222222;
     font-size:11px;
 }
@@ -1304,10 +1308,29 @@ span.horizontalSeparator {
     color: Red; margin-left: 6px; font-weight: bold;
 }
 
-.publicRoom { color: Green; }
-.moderatedRoom { color: #D37209; }
-.privateRoom { color: Red; }
+a.roomLink:hover, a.dateLink:hover {
+    text-decoration: underline;
+}
 
+a.basicRoom {
+    color: #0b63a5;
+}
+
+option.publicRoom, span.publicRoom, a.publicRoom {
+    color: Green;
+}
+
+option.moderatedRoom, span.moderatedRoom, a.moderatedRoom {
+    color: #D37209;
+}
+
+option.privateRoom, span.privateRoom, a.privateRoom, a.weekend {
+    color: Red;
+}
+
+a.weekday {
+    color: Black;
+}
 
 /********************/
 /**** Evaluation ****/
@@ -1796,6 +1819,9 @@ ul.CategoryList li:hover{
     margin: 20px 0 0;
 }
 
+
+/* ListWidget, list of users styles */
+
 li.selectedListItem {
     background-color: #CDEB8B;
 }
@@ -1809,18 +1835,7 @@ li.unselectable {
     color: #888888;
 }
 
-div.UISearchPeopleListDiv {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    height: 200px;
-    width: 100%;
-    max-width: 450px;
-    min-width: 450px;
-    border: 1px solid #CCCCCC;
-    overflow: auto;
-}
-
-div.UIPeopleListDiv {
+div.UIPeopleListDiv { /* for lists of users in forms */
     margin-top: 10px;
     margin-bottom: 10px;
     height: 200px;
@@ -1829,8 +1844,31 @@ div.UIPeopleListDiv {
     overflow: auto;
 }
 
-ul.UIPeopleList
-{
+div.PluginOptionPeopleListDiv {
+    border: 1px dashed #CCCCCC;
+    min-height: 25px;
+}
+
+div.UISearchPeopleListDiv, div.UISuggestedPeopleListDiv {
+    overflow: auto;
+}
+
+div.UISearchPeopleListDiv {
+    height: 200px;
+    border: 1px solid #CCCCCC;
+    margin-top:10px;
+    max-width:450px;
+    min-width:450px;
+    overflow:auto;
+    width:100%;
+}
+
+div.UISuggestedPeopleListDiv {
+    border-top: 1px dotted #DDDDDD;
+    height: 300px;
+}
+
+ul.PeopleList, ul.UIPeopleList, ul.UISuggestedPeopleList { /* UIPeopleList: for all lists of users, among them, found users */
     border: none;
     display: block;
     list-style-type: none;
@@ -1838,19 +1876,54 @@ ul.UIPeopleList
     margin: 0;
 }
 
-ul.UIPeopleList li{
-    border-bottom: 1px solid #DDDDDD;
+ul.PeopleList li, ul.UIPeopleList li, ul.UISuggestedPeopleList li {
     margin: 0;
     display: block;
     margin-bottom: 0px;
     line-height: 25px;
-    vertical-align: middle;
-    cursor: pointer;
     padding-left: 5px;
+    vertical-align: middle;
+}
+
+ul.UIPeopleList li, ul.UISuggestedPeopleList li {
+    border-bottom: 1px dotted #DDDDDD;
+    cursor: pointer;
+}
+
+ul.PeopleList li:hover {
+    background-color: #ECECEC;
+}
+
+ul.UIPeopleList li:hover, ul.UISuggestedPeopleList li:hover {
+    background-color: #FFF6DF;
+}
+
+ul.UIPeopleList li.listMessage, ul.UISuggestedPeopleList li.listMessage {
+    border-bottom: none;
+    font-style: italic;
+    padding: 10px;
+    cursor: auto;
+    line-height: normal;
+}
+
+ul.UIPeopleList li.listMessage, ul.UISuggestedPeopleList li.listMessage {
+    background-color: transparent;
 }
 
 ul.UIPeopleList li .nameLink {
     padding: 4px 30px;
+}
+
+ul.UIPeopleList li .foundUserEmail, ul.UISuggestedPeopleList li .foundUserEmail {
+    font-style: italic;
+    font-size: 8pt;
+    padding-left: 5px;
+    line-height: 15px;
+    display:none;
+}
+
+ul.UIPeopleList li:hover > .foundUserEmail, ul.UISuggestedPeopleList li:hover > .foundUserEmail {
+    display:inline;
 }
 
 ul.UIPeopleList li.selectedUser {
@@ -1858,12 +1931,43 @@ ul.UIPeopleList li.selectedUser {
 }
 
 ul.UIPeopleList li.unselectedUser {
-    background-color: #FFFFFF;
 }
 
 ul.UIPeopleList li.unselectable {
     cursor: default;
     color: #888888;
+}
+
+div.searchUsersButtonDiv {
+    text-align: center;
+    padding-top: 5px;
+    padding-bottom: 15px;
+}
+
+div.suggestedUsersTitle {
+    text-align: center;
+    font-size: 14pt;
+    padding-top: 10px;
+    padding-bottom: 20px;
+}
+
+td.searchUsersGroupsPanel, td.suggestedUsersPanel {
+    vertical-align: top;
+    padding-bottom: 10px;
+}
+
+td.searchUsersGroupsPanel {
+    width: 450px;
+    padding-left: 10px;
+    background-color: white;
+    padding-top: 10px;
+    padding-right:10px;
+}
+
+td.suggestedUsersPanel {
+    width: 250px;
+    background-color: #F8F8F8;
+    border-left: 1px dotted #CCCCCC;
 }
 
 ul.UIListNestedMenu
@@ -3462,7 +3566,7 @@ ul.materialList li
 
 ul.materialList li span
 {
-    padding-left: 10px;
+    padding-left: 5px;
     font-size: 14px;
 }
 
@@ -3664,11 +3768,11 @@ ul.keywordList li.multipleLinesListItem_last {
 }
 
 .invalidLabel {
-    color: #D01F3C;
+    color: #881122;
 }
 
 select.invalidSelect {
-    color: #D01F3C;
+    color: #881122;
 }
 
 .tooltipError {
@@ -3689,11 +3793,11 @@ ul.errorList {
 }
 
 ul.errorList li {
-    color: #D01F3C;
+    color: #881122;
 }
 
 .errorList {
-    color: #D01F3C;
+    color: #881122;
 }
 
 ul.warningList {
@@ -3704,13 +3808,13 @@ ul.warningList {
 
 span.errorTitle {
     font-size: medium;
-    color: #D01F3C;
+    color: #881122;
     font-weight: bold;
 }
 
 span.messageAfterErrors {
     margin-top: 1em;
-    color: #D01F3C;
+    color: #881122;
 }
 
 span.warningTitle {
@@ -3831,32 +3935,6 @@ span.optionKey1 {
     font-weight: bold;
 }
 
-div.PluginPeopleListDiv {
-    margin-bottom: 10px;
-    height: 100px;
-    width: 300px;
-    border: 1px solid #CCCCCC;
-    overflow: auto;
-}
-
-ul.PluginPeopleList
-{
-    border: none;
-    display: block;
-    list-style-type: none;
-    padding-left: 0px;
-    margin: 0;
-}
-
-ul.PluginPeopleList li{
-    margin: 0;
-    display: block;
-    margin-bottom: 0px;
-    line-height: 25px;
-    padding-left: 5px;
-    vertical-align: middle;
-}
-
 /* COLLABORATION */
 
 span.createBookingText {
@@ -3901,7 +3979,7 @@ span.statusMessage {
 }
 
 .statusMessageError {
-    color: #D01F3C;
+    color: #881122;
 }
 
 .statusMessageOK {
@@ -3910,6 +3988,25 @@ span.statusMessage {
 
 .statusMessageOther {
     color: #7A7A7A;/*#356AA0;*/
+}
+
+div.collaborationAdvancedTabTitle {
+    font-size:13px;
+    background:none repeat scroll 0 0 white;
+    position:absolute;
+    padding-right:5px;
+}
+
+div.collaborationAdvancedTabTitleLine {
+    height: 9px;
+    border-bottom: 1px dotted #777;
+    position: relative;
+    min-width: 200px;
+}
+
+div.collaborationAdvancedTabCheckboxDiv {
+    margin-left:50px;
+    padding-top:5px;
 }
 
 td.collaborationInfoLeftCol {
@@ -3922,7 +4019,7 @@ td.collaborationInfoLeftCol {
 
 .collaborationWarning {
     font-weight: bold;
-    color: #D01F3C;
+    color: #881122;
 }
 
 td.bookingFormFieldName {
@@ -3950,6 +4047,98 @@ div.actionButton {
     display: inline;
     margin-left: 5px;
 }
+
+/* Conference, Registrants List */
+
+.CRLgroupTitleNoBorder {
+   font-family: "Times New Roman", Verdana, Arial;
+   font-size: 19px;
+   color: #4E4C46;
+   letter-spacing: 1px;
+   padding: 3px;
+}
+
+.CRLabstractLeftDataCell {
+    padding-right:5px;
+    border-bottom: 1px solid #DDDDDD;
+    vertical-align: top;
+}
+
+.CRLabstractDataCell {
+    padding:5px;
+    border-bottom: 1px solid #DDDDDD;
+    vertical-align: top;
+}
+
+.CRLNoSelection {
+    color: #881122;
+    font-family: Verdana;
+    font-size: 16px;
+    font-weight: bold;
+ }
+
+.btnRemove {
+    color: red;
+    background-color: transparent;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+}
+
+div.CRLDiv {
+    background: #ECECEC url('../images/grey_gradient2.png') scroll repeat-x bottom left;
+    padding: 10px 20px 10px 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    color: #444;
+    border: 1px solid #AAA;
+    -moz-border-radius-bottomleft:10px;
+    -moz-border-radius-bottomright:10px;
+    -moz-border-radius-topleft:10px;
+    -moz-border-radius-topright:10px;
+    border-bottom:1px solid #AAAAAA;
+    border-right:1px solid #AAAAAA;
+}
+
+
+.CRLIndexSelected  {
+    color: #B38B1F;
+}
+
+.CRLIndexUnselected {
+    color: #4C6A83;
+}
+
+ul.CRLIndexList {
+    display: block;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    padding-top: 10px;
+    padding-bottom: 5px;
+}
+
+ul.CRLIndexList li {
+    display: inline;
+    position: relative;
+    padding-right: 15px;
+    padding-left: 15px;
+    border-right: 1px solid #AAAAAA;
+}
+
+ul.CRLIndexList a {
+    font-family: Verdana;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+ul.CRLIndexList a:hover
+{
+    color: #dbb03a;
+}
+
 
 /* Collaboration Admin */
 
@@ -4235,12 +4424,55 @@ div.collaborationDisplayDateGroup {
     padding-bottom: 15px;
 }
 
-span.collaborationDisplayBookingTitle {
-    color: black;
+.collaborationDisplayMoreInfo {
+    color: #0B63A5;
+}
+
+.collaborationDisplayHideInfo {
+    color: #B38B1F;
+}
+
+.collaborationDisplayMoreInfo , .collaborationDisplayHideInfo {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.collaborationDisplayMoreInfo:hover , .collaborationDisplayHideInfo:hover {
+    color: #DBB03A;
 }
 
 div.collaborationDisplayBookingLine {
     padding-bottom: 5px;
+}
+
+div.collaborationConfDisplayBookingLine {
+    font-size:12px;
+}
+
+td.collaborationConfDisplayInfoLeftCol {
+    white-space: nowrap;
+    text-align: right;
+    padding-right: 10px;
+    padding-left: 5px;
+}
+
+td.collaborationConfDisplayInfoLeftCol, td.collaborationConfDisplayInfoRightCol {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    vertical-align: top;
+    font-size: 11px;
+}
+
+td.collaborationConfDisplayInfoRightCol {
+    padding-right: 5px;
+}
+
+td.collaborationConfDisplayInfoRightCol a {
+    font-size: 11px;
+}
+
+div.collaborationDisplayInfoLine tr:hover {
+    background-color: #ECECEC;
 }
 
 div.collaborationLinkTooltipMeetingLecture {
@@ -4254,7 +4486,8 @@ div.collaborationLinkTooltipConference {
 
 div.collaborationDisplayInfoLine {
     padding-top: 5px;
-    padding-bottom: 10px;
+    padding-bottom: 15px;
+    padding-left: 20px;
 }
 
 span.collShowHideBookingsText {
@@ -4290,20 +4523,7 @@ table.eventDetails td.collaborationDisplayInfoRightCol {
     font-size: 10px;
 }
 
-td.collaborationConfDisplayInfoLeftCol {
-    padding: 0px;
-    padding-right: 10px;
-    vertical-align: top;
-    text-align: right;
-    white-space: nowrap;
-    width: 0px;
-    color: #222222;
-    font-size: 10px;
-}
-
-td.collaborationConfDisplayInfoRightCol {
-    padding: 0px;
-    vertical-align: top;
+td.collaborationDisplayInfoRightCol a {
     font-size: 10px;
 }
 
@@ -4333,7 +4553,6 @@ td.collaborationDisplayInfoLeftCol span {
     -moz-border-radius: 3px;
     -webkit-border-radius:3px;
     behavior: url(border-radius.htc);
-    overflow: hidden;
     color: #202020;
 }
 
@@ -4402,6 +4621,14 @@ div.timetableBlockTimeDiscreet{
 div.timetableBlockLocation {
     position: absolute;
     bottom: 4px;
+    left: 4px;
+    font-style: italic;
+    padding-top: 4px;
+    font-size: 11px;
+}
+
+div.timetableBlockConvener {
+    position: absolute;
     left: 4px;
     font-style: italic;
     padding-top: 4px;
@@ -4485,6 +4712,7 @@ div.exclusivePopupCloseButton {
     height: 15px;
 }
 
+
 div.balloonPopup {
     position: absolute;
     padding-bottom: 15px;
@@ -4501,7 +4729,20 @@ div.balloonPopupArrow {
     background: transparent url('../images/balloon_popup_arrows.png') scroll no-repeat 0 -19px;
     background-repeat: no-repeat;
     background-position: 0 -19px;
+    opacity: 0.95;
 }
+
+div.yellowBalloon {
+    color: #000;
+    border: 1px solid black;
+    background-color: #ffed92;
+    opacity: 0.95;
+}
+
+div.yellowArrow {
+    background: transparent url('../images/balloon_popup_arrows_yellow.png') scroll no-repeat 0 -19px;
+}
+
 
 div.balloonPopupCloseButton {
     position: absolute;
@@ -5142,6 +5383,30 @@ ul.nobulletsListInline li
     display: inline;
 }
 
+ul.nobulletsListWrapping
+{
+    position: relative;
+    margin:0px;
+    margin-top: 10px;
+    padding-left: 0px;
+    color: #777;
+}
+
+ul.nobulletsListWrapping li
+{
+    margin-top: 5px;
+    overflow: visible;
+    list-style-type: none;
+}
+
+div.PeopleListDiv {
+    margin-bottom: 10px;
+    height: 100px;
+    width: 300px;
+    border: 1px solid #CCCCCC;
+    overflow: auto;
+}
+
 div.FavoritePeopleListDiv {
     margin-bottom: 10px;
     height: 300px;
@@ -5252,6 +5517,29 @@ ul.UnscheduledContribList li.selected {
     background-color: #CDEB8B;
 }
 
+div.popupWithButtonsMainContent {
+    background-color: #FFFFFF;
+    padding: 10px;
+}
+
+div.popupButtonBar {
+    border: 0;
+    border-top: 1px solid #CCCCCC;
+    padding: 10px;
+    text-align: center;
+    position:relative;
+    top:-10px;
+    background: #F8F8F8;
+    margin-bottom: -10px;
+
+    -moz-border-radius-bottomleft: 10px;
+    -webkit-border-bottom-left-radius:10px;
+    -moz-border-radius-bottomright: 10px;
+    -webkit-border-bottom-right-radius:10px;
+    behavior: url(border-radius.htc);
+
+}
+
 div.dialogButtons {
     background:#F8F8F8 none repeat scroll 0 0;
     border-top:1px solid #CCCCCC;
@@ -5259,6 +5547,59 @@ div.dialogButtons {
     padding:10px;
     text-align:center;
 }
+
+
+/* Reschedule dialog */
+
+div.rescheduleSection {
+    padding-bottom: 20px;
+}
+
+div.rescheduleTitle {
+    font-size: 18px;
+    padding-bottom: 5px;
+}
+
+
+tr.selectedAction {
+    background-color: #CDEB8B;
+}
+
+td.rescheduleAction {
+    vertical-align:top;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+div.rescheduleLabelTitle {
+    font-size:16px;
+    cursor: default;
+}
+
+div.rescheduleLabelDetails {
+    font-size:12px;
+    font-style: italic;
+    cursor: default;
+}
+
+
+
+.rescheduleWarning {
+    font-weight: bold;
+    color: #881122;
+}
+
+/* End of reschedule dialog */
+
+/* Fit inner timetable dialog */
+
+div.fitInnerTimetableDialog {
+    width: 350px;
+}
+
+/* End of inner timetable dialog */
+
+
 
 .slotTitle {
     font-size:14px;
@@ -5597,4 +5938,84 @@ div.eventModifButtonBar .separator {
     width: 1px;
     height: 18px;
     border-right: 1px dotted #999;
+}
+
+label.normal {
+    font-weight: normal;
+}
+
+label.emphasis {
+    font-weight: normal;
+    font-style: italic;
+}
+
+.smallGrey {
+    margin-top: 2px;
+    font-size: 9px;
+    color: #777;
+}
+
+tr.selectedItem td {
+    color: #000;
+}
+
+.strongRed strong{
+    color: #881122;
+}
+
+div.cloneElements {
+    background: #ECECEC url('../images/grey_gradient2.png') scroll repeat-x bottom left;
+    padding: 10px 20px 10px 10px;
+    color: #444;
+    border: 1px solid #AAA;
+    -moz-border-radius-bottomleft:10px;
+    -moz-border-radius-bottomright:10px;
+    -moz-border-radius-topleft:10px;
+    -moz-border-radius-topright:10px;
+    border-bottom:1px solid #AAAAAA;
+    border-right:1px solid #AAAAAA;
+    width: 450px;
+}
+
+.ttentryArrowsBackground {
+    padding: 3px;
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    -moz-border-radius-bottomleft:3px;
+    border-bottom:1px solid #AAAAAA;
+    border-left:1px solid #AAAAAA;
+    background-color: white;
+    width: 33px;
+    height: 14px;
+}
+
+.ttentryArrows {
+    padding: 2px;
+    position: absolute;
+    right:0px;
+}
+
+.filterTable {
+    border-collapse: collapse;
+}
+
+.eventActionsToolBarLabel {
+    padding:3px 7px 5px;
+    -moz-border-radius-topright: 5px;
+    -moz-border-radius-topleft: 5px;
+    border: 1px solid #AAA;
+    border-bottom: 0px;
+    background-color: #fff;
+    font-size:8pt;
+}
+
+.eventActionsToolBarButtons {
+    padding:4px;
+    border: 1px solid #AAA;
+    border-top:0px;
+    -moz-border-radius-bottomright: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    background-color: #fff;
+    height: 24px;
 }

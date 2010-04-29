@@ -127,6 +127,18 @@ function eventTarget(event) {
     return any(event.srcElement, event.target);
 }
 
+function relatedTarget(event) {
+    return any(event.relatedTarget, event.toElement);
+}
+
+function stopPropagation(event) {
+    if (event.stopProgagation) {
+        event.stopPropagation();
+    } else {
+        event.cancelBubble = true;
+    }
+}
+
 function $N(name) {
     return translate(document.getElementsByName(name), $E);
 }
@@ -145,11 +157,11 @@ function flatten(array) {
 
 }
 
-// Function that alwats returns true
+// Function that always returns true
 function positive() {return true;}
 
-//Function that alwats returns false
-function negative() {return true;}
+//Function that always returns false
+function negative() {return false;}
 
 //Function to sort arrays of integers
 var numberSorter = function(a, b) {
@@ -331,3 +343,12 @@ String.prototype.replaceAll = Browser.Gecko?
     function(pattern, replace) {
         return this.replace( new RegExp( pattern, "g" ), replace );
     };
+
+
+Html.unescaped = map({'div': null, 'span': null}, function(value, elemType) {
+    return function() {
+        var res = Html[elemType].apply(this, arguments);
+        res.dom.innerHTML = res.get();
+        return res;
+    };
+});

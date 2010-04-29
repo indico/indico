@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: slotDataWrapper.py,v 1.11 2008/09/19 09:21:53 pferreir Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

@@ -1,4 +1,4 @@
-<% from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase %>
+<% from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry %>
 <% from MaKaC.common import Config %>
 <% import MaKaC.common.info as info %>
 <% from MaKaC.rb_location import Location %>
@@ -58,10 +58,14 @@ var Indico = {
         basket: "<%= iconFileName("basket") %>",
         play: "<%= iconFileName("play") %>",
         stop: "<%= iconFileName("stop") %>",
+        play_small: "<%= iconFileName("play_small") %>",
+        stop_small: "<%= iconFileName("stop_small") %>",
         reload: "<%= iconFileName("reload") %>",
         mail_big: "<%= iconFileName("mail_big") %>",
         play_faded: "<%= iconFileName("play_faded") %>",
         stop_faded: "<%= iconFileName("stop_faded") %>",
+        play_faded_small: "<%= iconFileName("play_faded_small") %>",
+        stop_faded_small: "<%= iconFileName("stop_faded_small") %>",
         info: "<%= iconFileName("info") %>",
         accept: "<%= iconFileName("accept") %>",
         reject:"<%= iconFileName("reject") %>",
@@ -75,7 +79,8 @@ var Indico = {
         warning_yellow: "<%= iconFileName("warning_yellow")%>",
         arrow_up: "<%= iconFileName("upArrow")%>",
         arrow_down: "<%= iconFileName("downArrow")%>",
-        indico_small: "<%= iconFileName("indico_small")%>"
+        indico_small: "<%= iconFileName("indico_small")%>",
+        protected: "<%= iconFileName("protected")%>"
     },
     FileTypeIcons:
         <%= simplejson.dumps(dict((k.lower(),v[2]) for k,v in config.getFileTypes().iteritems())) %>
@@ -89,21 +94,28 @@ var Indico = {
 
         Login: "<%= urlHandlers.UHSignIn.getURL() %>",
 
+        Favourites: "<%= urlHandlers.UHUserBaskets.getURL() %>",
+
         ConferenceDisplay: "<%= urlHandlers.UHConferenceDisplay.getURL() %>",
         ContributionDisplay: "<%= urlHandlers.UHContributionDisplay.getURL() %>",
         SessionDisplay: "<%= urlHandlers.UHSessionDisplay.getURL() %>",
+        ConfCollaborationDisplay: "<%= urlHandlers.UHCollaborationDisplay.getURL() %>",
 
         ContribToXML: "<%= urlHandlers.UHContribToXML.getURL() %>",
         ContribToPDF: "<%= urlHandlers.UHContribToPDF.getURL() %>",
         ContribToiCal: "<%= urlHandlers.UHContribToiCal.getURL() %>",
 
-        SessionToPDF: "<%= urlHandlers.UHSessionToiCal.getURL() %>",
+        SessionToiCal:  "<%= urlHandlers.UHSessionToiCal.getURL() %>",
         ConfTimeTablePDF: "<%= urlHandlers.UHConfTimeTablePDF.getURL() %>",
+        ConfTimeTableCustomPDF: "<%= urlHandlers.UHConfTimeTableCustomizePDF.getURL() %>",
 
         SessionModification: "<%= urlHandlers.UHSessionModification.getURL() %>",
         ContributionModification: "<%= urlHandlers.UHContributionModification.getURL() %>",
         BreakModification: "<%= urlHandlers.UHConfModifyBreak.getURL() %>",
+
         Reschedule: "<%= urlHandlers.UHConfModifReschedule.getURL() %>",
+        SlotCalc: "<%= urlHandlers.UHSessionModSlotCalc.getURL() %>",
+        FitSession: "<%= urlHandlers.UHSessionModFit.getURL() %>",
 
         UploadAction: {
             subContribution: '<%= str(urlHandlers.UHSubContribModifAddMaterials.getURL()) %>',
@@ -115,11 +127,12 @@ var Indico = {
     },
 
     Data: {
-        MaterialTypes: { meeting : <%= RHSubmitMaterialBase._allowedMatsForMeetings %>,
-        simple_event: <%= RHSubmitMaterialBase._allowedMatsForSE %>,
-        conference: <%= RHSubmitMaterialBase._allowedMatsConference %>,
-        category: <%= RHSubmitMaterialBase._allowedMatsCategory %>},
+        MaterialTypes: { meeting : <%= simplejson.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['meeting'])) %>,
+        simple_event: <%= simplejson.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['simple_event'])) %>,
+        conference: <%= simplejson.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['conference'])) %>,
+        category: <%= simplejson.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['category'])) %>},
         WeekDays: <%= [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ] %>,
+        DefaultLocation: '<%= str(Location.getDefaultLocation().friendlyName) %>',
         Locations: <%= jsonEncode(locationList) %>
     },
     Settings: {

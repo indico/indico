@@ -99,9 +99,21 @@ type("TimetableBlockBase", [],
              return button;
          },
 
-         _getRightSideDecorators: function()
-         {
+         _getRightSideDecorators: function() {
              return Html.span({});
+         },
+
+         _formatConveners: function(conveners) {
+             if (conveners) {
+                 return translate(
+                     conveners,
+                     function(conv) {
+                         return conv.firstName + ' ' +
+                             conv.familyName;
+                     }).join(', ');
+             } else {
+                 return '';
+             }
          }
 
      },
@@ -114,15 +126,19 @@ type("TimetableBlockBase", [],
 
 type("TimetableBlockNormal", ["TimetableBlockBase"],
         {
+            _getTitle: function(){
+                var title = this.eventData.title;
+
+                if (this.eventData.slotTitle && this.eventData.slotTitle !== "") {
+                    title += ": " + this.eventData.slotTitle;
+                }
+                return title;
+            },
+
             _blockDescription: function(block, event) {
                 var self = this;
 
-                this.titleDiv = Html.div({className: 'timetableBlockTitle', style: {fontWeight: this.eventData.fontWeight}}, this.eventData.title);
-                // If it's a session slot it might have a slot title that should be
-                // added to the title
-                if (this.eventData.slotTitle && this.eventData.slotTitle !== "") {
-                    this.titleDiv.append(": " + this.eventData.slotTitle);
-                }
+                this.titleDiv = Html.div({className: 'timetableBlockTitle', style: {fontWeight: this.eventData.fontWeight}}, this._getTitle());
 
                 this.titleWrapper = Html.div({}, this._getRightSideDecorators(), this.titleDiv);
 
@@ -162,6 +178,12 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
 
                     //this.titleWrapper.insert(this.createManageButton());
 
+                    //Add converner's info
+                    this.convenerDiv = Html.div(
+                        'timetableBlockConvener',
+                        self._formatConveners(this.eventData.conveners));
+
+                    this.div.append(this.convenerDiv);
                     this.div.append(this.timeDiv);
                     this.div.append(this.locationDiv);
                 }
@@ -239,7 +261,8 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
            },
             postDraw: function(hook) {
                 var self = this;
-                var title = this.eventData.title;
+                var title = this._getTitle();
+
 
                 // Returns the total height of the divs in the block
                 var contentHeight = function() {
@@ -260,7 +283,7 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                 var parentDivHeight = this.div.dom.parentNode.offsetHeight;
                 var parentDivWidth = this.div.dom.parentNode.offsetWidth;
 
-                // If nothin has been drawn do nothing
+                // If nothing has been drawn do nothing
                 if (!parentDivHeight) {
                     return;
                 }
@@ -288,6 +311,18 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                     if (this.presentersDiv && this.presentersDiv.dom.offsetWidth > parentDivWidth / 2) {
                         this.presentersDiv.dom.style.display = 'none';
                     }
+
+                    // Convener information should not take more than half of the space of the block
+                    // if not truncate the string.
+                    if (this.convenerDiv && this.convenerDiv.dom.offsetWidth > parentDivWidth / 2) {
+                        var newLength = parentDivWidth / 2 / this.convenerDiv.dom.offsetWidth * this.convenerDiv.get().length;
+                        this.convenerDiv.set(this.truncateTitle(newLength - 1, this.convenerDiv.get()));
+                    }
+
+                    // If checks if height of the cell is enough to paint convener's name.
+                    if (this.convenerDiv && this.convenerDiv.dom.offsetHeight + contentHeight() > parentDivHeight) {
+                        this.convenerDiv.dom.style.display = 'none';
+                    }
                 }
 
                 // If content height <= div height then nothing needs to be done
@@ -305,11 +340,25 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                     return;
                 }
 
-                // Truncate title based on a ratio: div height / content height
-                this.titleDiv.set(this.truncateTitle(Math.ceil(this.eventData.title.length * ((parentDivHeight) / contentHeight())), title));
+                //Calculates the the width of title, presenters and possible arrows
+                var topContentWidth = function() {
+                    var width = 2 * self.margin;
 
-                var step = Math.ceil(parentDivWidth / 40);
-                while (contentHeight() > parentDivHeight && title.length > step) {
+                    if(self.titleDiv)
+                        width += self.titleDiv.dom.offsetWidth;
+                    if(self.presentersDiv)
+                        width += self.presentersDiv.dom.offsetWidth;
+
+                    return width;
+                }
+
+                // Truncate title based on a ratio: div height / content height
+                title = this.truncateTitle(Math.ceil(title.length * ((parentDivHeight) / contentHeight())), title);
+                this.titleDiv.set(title);
+                //String will be shorten by the value of 'step'
+                var step = 2;
+                //Truncating the title since it can be displayed in a single line
+                while (contentHeight() > parentDivHeight && topContentWidth() > parentDivWidth * 0.8) {
                     title = this.truncateTitle(-step, title);
                     this.titleDiv.set(title);
                 }
@@ -496,7 +545,9 @@ type("TimetableBlockManagementMixin",[],
              });
 
 
-         this.arrows = Html.div({style: {cssFloat: 'right', padding: '2px'}}, arrowUp, arrowDown);
+         this.arrows = Html.div({},
+                             Html.div({className: "ttentryArrowsBackground"}),
+                             Html.div({className: "ttentryArrows"}, arrowUp, arrowDown));
      });
 
 type("TimetableBlockWholeDayDisplay", ["TimetableBlockWholeDayBase", "TimetableBlockDisplayMixin"],
@@ -598,6 +649,20 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
         if (self.eventData.location) {
             infoContentDiv.append(Html.strong({style:{fontStyle: 'normal'}}, 'Location: '));
             infoContentDiv.append(self.eventData.location);
+            infoContentDiv.append(Html.br());
+        }
+
+        if(self.eventData.conveners &&
+           self.eventData.conveners.length > 0)
+        {
+            //Using plural if there are multiple conveners
+            infoContentDiv.append(
+                Html.strong({style:{fontStyle: 'normal'}},
+                            (self.eventData.conveners.length > 1)?
+                            $T('Conveners'):
+                            $T('Convener'), ': '));
+
+            infoContentDiv.append(self._formatConveners(this.eventData.conveners));
             infoContentDiv.append(Html.br());
         }
 
@@ -819,7 +884,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
                                  }
                              });
 
-        var saveButton = Html.button({}, 'Save');
+        var saveButton = Html.input('button', {}, 'Save');
         saveButton.observeClick(function() {
 
             if (!parameterManager.check()) {
@@ -838,7 +903,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
                                                          rescheduleCheckbox.get());
             self.close();
         });
-        var cancelButton = Html.button({}, 'Cancel');
+        var cancelButton = Html.input('button', {}, 'Cancel');
         cancelButton.observeClick(function() {
             timeEditDiv.dom.style.display = 'none';
             timeDiv.dom.style.display = 'block';
@@ -884,11 +949,11 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
             editLink = Html.a({className: 'dropDownMenu', style: {fontWeght: 'bold'}}, $T('Edit'));
             var menuItems = {};
 
-            menuItems[$T('Interval timetable')] = function() {
+            menuItems[$T('Block timetable')] = function() {
                 self.managementActions.switchToIntervalTimetable(self.eventData.id);
                 self.close();
             };
-            menuItems[$T('Interval properties')] = function() {
+            menuItems[$T('Block properties')] = function() {
                 self.managementActions.editSessionSlot(self.eventData);
                 self.close();
             };
@@ -901,6 +966,14 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
                 var pos = editLink.getAbsolutePosition();
                 menu.open(pos.x + editLink.dom.offsetWidth + 2, pos.y + editLink.dom.offsetHeight + 2);
             });
+
+            var addInterval = Html.a('fakeLink', $T("Add block"));
+            addInterval.observeClick(function() {
+                self.managementActions.addSessionSlot(self.eventData);
+                self.close();
+            });
+            menu.insert(addInterval);
+            menu.insert(" | ");
 
         } else if (self.eventData.entryType == 'Contribution') {
             editLink = Html.a({
@@ -971,7 +1044,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
         }
 
 
-        var ttLink = Html.a({className: 'fakeLink'}, "View and edit current interval timetable");
+        var ttLink = Html.a({className: 'fakeLink'}, "View and edit this block timetable");
         ttLink.observeClick(function() {
             self.managementActions.switchToIntervalTimetable(self.eventData.id);
             self.close();
@@ -1311,7 +1384,7 @@ type("TimetableDrawer", ["IWidget"],
                  if (entry.entryType == 'Session' && !entry.isPoster) {
                      each(entry.entries, function(subentry, subkey) {
                          result[subkey] = clone(subentry);
-                         result[subkey].color = entry.color;
+                         result[subkey].color = subentry.entryType == 'Break' ? subentry.color:entry.color;
                          result[subkey].textColor = entry.textColor;
                      });
                  } else {
@@ -1399,13 +1472,8 @@ type("TimetableDrawer", ["IWidget"],
                      headerStyle.marginTop = '0';
                  }
 
-                 // Format the day string
-                 var d = day.substring(6,8);
-                 var m = day.substring(4,6);
-                 var strDate =  d + '/' + m + '/' + day.substring(0,4);
-                 var nDate = new Date();
-                 setDate(nDate, parseDate(strDate));
-                 var dayStr = Indico.Data.WeekDays[nDate.getDay()].substring(0,3)+' '+d+'/'+m;
+                 var nDate = Util.parseJSDateTime(day, IndicoDateTimeFormats.Ordinal);
+                 var dayStr = Indico.Data.WeekDays[nDate.getDay()].substring(0,3)+' '+nDate.getDate()+'/'+(nDate.getMonth()+1);
 
                  header = Html.div({className: 'timetableHeader', style: headerStyle}, dayStr);
                  div.append(header);

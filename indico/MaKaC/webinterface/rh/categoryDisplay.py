@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: categoryDisplay.py,v 1.54 2009/06/16 15:00:14 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -478,6 +477,16 @@ class UtilsConference:
 
 
 class RHCategoryGetIcon(RHCategDisplayBase):
+
+    def _checkProtection( self ):
+        # Since the object of the request is the icon, and not
+        # the conference, we do a first check for the icon
+        icon = self._target.getIcon()
+        if icon.canAccess( self.getAW() ):
+            return
+        else:
+            RHCategDisplayBase._checkProtection(self)
+
 
     def _process(self):
         icon=self._target.getIcon()

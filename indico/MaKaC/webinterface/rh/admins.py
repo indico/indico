@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: admins.py,v 1.27 2009/05/07 13:36:33 pferreir Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -110,7 +109,7 @@ class RHAdminAddUsers( RHAdminBase ):
     
     def _process( self ):
         params = self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             al = self._minfo.getAdminList()
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
@@ -124,7 +123,7 @@ class RHAdminRemoveUsers( RHAdminBase ):
     
     def _process( self ):
         params = self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             al = self._minfo.getAdminList()
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):

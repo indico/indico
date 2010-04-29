@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: contributions.py,v 1.112 2009/06/17 16:38:52 pferreir Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -414,7 +413,7 @@ class WPContributionModifBase( WPConferenceModifBase  ):
         #TODO: check if it comes from the timetable or the contribution list
         # temp solution: isScheduled.
         if self._target.isScheduled():
-            banner = wcomponents.WTimetableBannerModif(self._target).getHTML()
+            banner = wcomponents.WTimetableBannerModif(self._getAW(), self._target).getHTML()
         else:
             banner = wcomponents.WContribListBannerModif(self._target).getHTML()
         body = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
@@ -440,6 +439,9 @@ class WPContributionModifTools( WPContributionModifBase ):
         return wc.getHTML( pars )
 
 class WPContributionModifMaterials( WPContributionModifBase ):
+
+    _userData = ['favorite-user-list']
+
     def __init__(self, rh, contribution):
         WPContributionModifBase.__init__(self, rh, contribution)
 
@@ -1010,7 +1012,7 @@ class WPContribModifSC( WPContributionModifBase ):
         wc = wcomponents.WContribModifSC( self._target )
         pars = { \
             "moveSubContribURL": urlHandlers.UHSubContribActions.getURL(self._contrib), \
-            "addSubContURL": urlHandlers.UHContribAddSubCont.getURL(), \
+            "addSubContURL": urlHandlers.UHContribAddSubCont.getURL(self._contrib), \
             "subContModifURL": urlHandlers.UHSubContribModification.getURL, \
             "subContUpURL": urlHandlers.UHContribUpSubCont.getURL(), \
             "subContDownURL": urlHandlers.UHContribDownSubCont.getURL()}

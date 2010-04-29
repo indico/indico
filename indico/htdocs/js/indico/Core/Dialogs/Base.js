@@ -40,46 +40,57 @@ type("PreLoadHandler", [],
 
 
 type("ServiceDialog", ["ExclusivePopup"],
-     {
-         _error: function(error) {
-             var dialog = new ErrorReportDialog(error);
-             dialog.open();
-         },
+    {
+        _error: function(error) {
+            IndicoUI.Dialogs.Util.error(error);
+        },
 
-         request: function(extraArgs) {
-             var self = this;
-             var args = extend(clone(this.args), extraArgs);
+        request: function(extraArgs) {
+            var self = this;
+            var args = extend(clone(this.args), extraArgs);
 
-             var progressDialog = new ProgressDialog();
-             progressDialog.open();
+            var killProgress = IndicoUI.Dialogs.Util.progress();
 
-             jsonRpc(Indico.Urls.JsonRpcService, this.method, args,
-                     function(response,error) {
-                         if(exists(error)) {
-                             progressDialog.close();
-                             self._error(error);
-                         } else {
-                             self._success(response);
-                             progressDialog.close();
-                             self.close();
-                         }
-                     }
-                    );
-         }
-     },
+            jsonRpc(Indico.Urls.JsonRpcService, this.method, args,
+                function(response,error) {
+                    if(exists(error)) {
+                        killProgress();
+                        self._error(error);
+                    } else {
+                        self._success(response);
+                        killProgress();
+                        self.close();
+                    }
+                }
+            );
+        }
+    },
 
-     function(endPoint, method, args, title, closeHandler) {
-         this.endPoint = endPoint;
-         this.method = method;
-         this.args = args;
-         this.ExclusivePopup(title, closeHandler);
-     }
-    );
+    function(endPoint, method, args, title, closeHandler) {
+       this.endPoint = endPoint;
+       this.method = method;
+       this.args = args;
+       this.ExclusivePopup(title, closeHandler);
+    }
+);
 
 
+type("ServiceDialogWithButtons", ["ExclusivePopupWithButtons", "ServiceDialog"], {},
+    function(endPoint, method, args, title, closeHandler){
+        this.endPoint = endPoint;
+        this.method = method;
+        this.args = args;
+        this.ExclusivePopupWithButtons(title, closeHandler);
+    }
+);
 
 
-type("ErrorReportDialog", ["ServiceDialog"],
+
+/**
+ * Dialog for unforeseen errors that will ask to the user if he wants
+ * to send an error report.
+ */
+type("ErrorReportDialog", ["ServiceDialogWithButtons"],
      {
          _sendReport: function(email) {
              var self = this;
@@ -88,83 +99,83 @@ type("ErrorReportDialog", ["ServiceDialog"],
                            this.error,
                            function(result, error){
                                if (error) {
-                                   alert("Unable to send your error report: " + error.message);
+                                   alert($T("Unable to send your error report: ") + error.message);
                                }
                                else {
                                    if (result) {
-                                       alert("Your report has been sent. Thank you!");
+                                       alert($T("Your report has been sent. Thank you!"));
                                    } else {
-                                       alert("Your report could not be sent to the support address.");
+                                       alert($T("Your report could not be sent to the support address."));
                                    }
                                    self.close();
                                }
                            }
                           );
          },
-         
-         _drawError: function() {
+
+         draw: function() {
              var self = this;
              var email = new WatchObject();
 
              // TODO: force unidirectional binding?
              $B(email.accessor(), indicoSource('user.data.email.get', {}));
 
-             return this.ExclusivePopup.prototype.draw.call(
-                 this,
-                 Html.div(
-                     {},
-                     Html.div({style:{marginBottom: pixels(10), width:'300px', textAlign: 'center'}},'An error has occurred while processing your request. We advise you to submit an error report, by clicking "Send report".'),
-                     Html.div({style:{color: 'red', marginBottom: pixels(10), width: '300px', height: '75px', textAlign: 'center', overflow: 'auto'}},
+             var content = Html.div({style:{paddingLeft:pixels(10), paddingRight: pixels(10), paddingBottom:pixels(10)}},
+                     Html.div({style:{marginBottom: pixels(10), width:'300px', textAlign: 'center'}}, $T('An error has occurred while processing your request. We advise you to submit an error report, by clicking "Send report".')),
+                     Html.div({style:{color: 'red', marginBottom: pixels(10), width: '300px', maxHeight: '75px', textAlign: 'center', overflow: 'auto'}},
                               this.error.code+": "+this.error.message),
                      Html.div({style:{marginBottom: pixels(10), textAlign: 'center'}},
                               Html.label({},"Your e-mail: "),
-                              $B(Html.input("text",{}), email.accessor())),
-                     Html.div({style:{textAlign: 'center'}},
-                              Widget.link(command(
-                                  function() {
-                                      self._sendReport(email);
-                                  },
-                                  Html.button({},'Send report'))),
-                              Widget.link(command(
-                                  function() {
-                                      self.close();
-                                  },
-                                  Html.button({style:{marginLeft: pixels(5)}},'Do not send report')
-                              ))
-                             )
-                 ));
-         },
-         
-         _drawWarning: function() {
-             
-             var content = [this.error.message];
-             
-             var content = Html.div({style: {textAlign: 'center'}});
-             content.append(Html.span('',this.error.message));
-             if (this.error.code == 'ERR-P4') {
-                 content.append(Html.br());
-                 content.append(Html.a({href: Indico.Urls.Login+'?returnURL='+document.URL}, "Go to login page"));
-             }
-             
-             var popup = new AlertPopup(Html.span('warningTitle', "Warning"), content);
-             popup.open();
-         },
+                              $B(Html.input("text",{}), email.accessor())));
 
-         draw: function() {
-             var self = this;
-             
-             if (this.error.type == "noReport") {
-                 self._drawWarning();
-             }else {
-                 return self._drawError();
-             }
+             var buttons = Html.div({},
+                     Widget.link(command(
+                         function() {
+                             self._sendReport(email);
+                         },
+                         Html.input('button', {}, $T('Send report')))),
+                     Widget.link(command(
+                         function() {
+                             self.close();
+                         },
+                         Html.input('button', {style:{marginLeft: pixels(5)}}, $T('Do not send report'))
+                     )));
+
+             return this.ServiceDialogWithButtons.prototype.draw.call(this, content, buttons);
          }
      },
      function(error) {
          this.error = error;
      }
-    );
+);
 
+/**
+ * Dialog for errors whose type is "noReport", such as "not logged in" warning
+ */
+type("NoReportErrorDialog", ["AlertPopup"], {
+
+    __getTitle: function() {
+        return Html.span('warningTitle', $T("Warning"));
+    },
+
+    __getContent: function() {
+
+        var content = Html.div({style: {textAlign: 'center'}});
+        content.append(Html.span({}, this.error.message));
+
+        if (this.error.code == 'ERR-P4') {
+            content.append(Html.div({style:{marginTop:pixels(10)}},
+                    Html.a({href: Indico.Urls.Login+'?returnURL='+document.URL}, $T("Go to login page"))));
+        }
+
+        return content;
+    }
+},
+    function(error){
+        this.error = error;
+        this.AlertPopup(this.__getTitle(), this.__getContent());
+    }
+);
 
 type("ProgressDialog",["ExclusivePopup"],
      {

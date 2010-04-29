@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: wcomponents.py,v 1.340 2009/06/17 13:52:52 eragners Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -41,7 +40,7 @@ from MaKaC.errors import UserError
 from MaKaC.common.url import URL
 from MaKaC.common import Config
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
-from MaKaC.conference import Conference
+from MaKaC.conference import Conference, Category
 
 from MaKaC.webinterface.common.timezones import TimezoneRegistry, DisplayTimezoneRegistry
 import MaKaC.webinterface.common.timezones as convertTime
@@ -61,6 +60,9 @@ from MaKaC.i18n import _
 from MaKaC.i18n import langList
 
 from MaKaC.common.TemplateExec import truncateTitle
+from MaKaC.fossils.user import IAvatarFossil
+from MaKaC.common.fossilize import fossilize
+from MaKaC.common.contextManager import ContextManager
 
 
 class WTemplated:
@@ -410,10 +412,10 @@ class WConferenceHeader( WHeader ):
         the conferences' web interface.
     """
 
-    def __init__(self, aw, navDrawer, conf):
+    def __init__(self, aw, conf):
         self._conf = conf
         self._aw = aw
-        WHeader.__init__(self, self._aw, navDrawer, tpl_name='EventHeader')
+        WHeader.__init__(self, self._aw, tpl_name='EventHeader')
         tzUtil = DisplayTZ(self._aw,self._conf)
         self._locTZ = tzUtil.getDisplayTZ()
 
@@ -461,11 +463,11 @@ class WMenuConferenceHeader( WConferenceHeader ):
     """Templating web component for generating the HTML header for
         the conferences' web interface with a menu
     """
-    def __init__(self, aw, navDrawer, conf, modifKey=False):
+    def __init__(self, aw, conf, modifKey=False):
         self._conf = conf
         self._modifKey=modifKey
         self._aw=aw
-        WConferenceHeader.__init__(self, self._aw, navDrawer, conf)
+        WConferenceHeader.__init__(self, self._aw, conf)
 
     def getVars( self ):
         vars = WConferenceHeader.getVars( self )
@@ -581,11 +583,11 @@ class WMenuMeetingHeader( WConferenceHeader ):
     """Templating web component for generating the HTML header for
         the meetings web interface with a menu
     """
-    def __init__(self, aw, navDrawer, conf, modifKey=False):
+    def __init__(self, aw, conf, modifKey=False):
         self._conf = conf
         self._modifKey=modifKey
         self._aw=aw
-        WHeader.__init__(self, self._aw, navDrawer, tpl_name='EventHeader')
+        WHeader.__init__(self, self._aw, tpl_name='EventHeader')
         tzUtil = DisplayTZ(self._aw,self._conf)
         self._locTZ = tzUtil.getDisplayTZ()
 
@@ -804,12 +806,20 @@ class WBannerModif(WTemplated):
 
 class WTimetableBannerModif(WBannerModif):
 
-    def __init__(self, target ):
+    def __init__(self, aw, target):
         ## PATH
         # Iterate till conference is reached
         conf = target.getConference()
         path = self._getOwnerBasePath(target)
-        path.append({"url": urlHandlers.UHConfModifSchedule.getURL( conf ), "title": _("Timetable")})
+
+        # if user has access to top-level timetable
+        if conf.canModify(aw):
+            scheduleModifURL = urlHandlers.UHConfModifSchedule.getURL( conf )
+        else:
+            # otherwise, let them access only the session timetable
+            scheduleModifURL = urlHandlers.UHSessionModifSchedule.getURL( target.getSession() )
+
+        path.append({"url": scheduleModifURL, "title": _("Timetable")})
         # TITLE AND TYPE
         itemType = type(target).__name__
         title = target.getTitle()
@@ -860,15 +870,13 @@ class WAbstractBannerModif(WBannerModif):
 
 class WTrackBannerModif(WBannerModif):
 
-    def __init__( self, track, abstract=None ):
+    def __init__( self, track, abstract=None, isManager = False ):
         path = []
         target = track
         if abstract:
-            target = abstract
-            path = [{"url": urlHandlers.UHHelper.getModifUH(type(track)).getURL(track),
-                             "title": truncateTitle(track.getTitle(), 30),
-                             "type": type(track).__name__}]
-        path.append({"url": urlHandlers.UHConfModifProgram.getURL(track.getConference()), "title":_("Track list")})
+            path.append({"url": urlHandlers.UHTrackModifAbstracts.getURL(track), "title":_("Abstract list")})
+        if isManager:
+            path.append({"url": urlHandlers.UHConfModifProgram.getURL(track.getConference()), "title":_("Track list")})
         itemType=type(target).__name__
         title=target.getTitle()
         WBannerModif.__init__(self, path, itemType, title)
@@ -1889,21 +1897,29 @@ class WUserTableItem(WTemplated):
     def __init__(self, multi=True):
         self._multi = multi
 
-    def getHTML( self, user, selected=False, selectable=True ):
+    def getHTML( self, user, selected=False, selectable=True, parentPrincipalTableId=None ):
         self.__user = user
         self._selected = selected
         self._selectable = selectable
+        self._parentPrincipalTableId = parentPrincipalTableId
         return WTemplated.getHTML( self, {} )
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
+
+        vars["ParentPrincipalTableId"] = self._parentPrincipalTableId
+
+        vars["avatar"] = fossilize(self.__user, IAvatarFossil)
+
         vars["id"] = self.__user.getId()
         vars["email"] = self.__user.getEmail()
         vars["fullName"] = self.__user.getFullName()
-        vars["type"] = "checkbox"
+
+        vars["selectable"] = self._selectable
+        vars["inputType"] = "checkbox"
         selectionText = "checked"
         if not self._multi:
-            vars["type"] = "radio"
+            vars["inputType"] = "radio"
             selectionText = "selected"
         vars["selected"] = ""
         if self._selected:
@@ -1913,8 +1929,6 @@ class WUserTableItem(WTemplated):
             vars["currentUserBasket"] = self._rh._getUser().getPersonalInfo().getBasket()
         else:
             vars["currentUserBasket"] = None
-
-        vars["selectable"] = self._selectable
 
         return vars
 
@@ -2012,6 +2026,13 @@ class WAuthorTableItem(WTemplated):
 
 class WPrincipalTable(WTemplated):
 
+    def __init__(self):
+        WTemplated.__init__(self)
+        if not ContextManager.has("principalTableCounter"):
+            ContextManager.set("principalTableCounter", 0)
+        self._principalTableId = ContextManager.get("principalTableCounter")
+        ContextManager.set("principalTableCounter", self._principalTableId + 1)
+
     def getHTML( self, principalList, target, addPrincipalsURL, removePrincipalsURL, pendings=[], selectable=True ):
         self.__principalList = principalList
         self.__principalList.sort(utils.sortPrincipalsByName)
@@ -2032,7 +2053,7 @@ class WPrincipalTable(WTemplated):
             selected = True
         for principal in self.__principalList:
             if isinstance(principal, user.Avatar):
-                ul.append( WUserTableItem().getHTML( principal, selected, self.__selectable ) )
+                ul.append( WUserTableItem().getHTML( principal, selected, self.__selectable, self._principalTableId ) )
             elif isinstance(principal, user.CERNGroup):
                 ul.append( WGroupNICETableItem().getHTML( principal, selected, self.__selectable ) )
             elif isinstance(principal, user.Group):
@@ -5540,9 +5561,13 @@ class WShowExistingMaterial(WTemplated):
     def __init__(self,target):
         self._target=target
 
-
     def getVars(self):
         vars=WTemplated.getVars(self)
+
+        # yes, this may look a bit redundant, but materialRegistry isn't
+        # bound to a particular target
+        materialRegistry = self._target.getMaterialRegistry()
+        vars["materialList"] = materialRegistry.getMaterialList(self._target)
 
         vars["materialModifHandler"] = vars.get("materialModifHandler", None)
         vars["materialProtectHandler"] = vars.get("materialProtectHandler", None)
@@ -6016,8 +6041,6 @@ class WRoomBookingSearch4Rooms( WTemplated ):
             vars["detailsUH"] = urlHandlers.UHConfModifRoomBookingRoomDetails
             vars["bookingFormUH"] =  urlHandlers.UHConfModifRoomBookingBookingForm
 
-        vars['youCannot'] = "javascript:alert( 'You cannot book this room' );"
-
         return vars
 
 class WRoomBookingSearch4Bookings( WTemplated ):
@@ -6029,7 +6052,7 @@ class WRoomBookingSearch4Bookings( WTemplated ):
         vars = WTemplated.getVars( self )
 
         vars["today"] = datetime.now()
-        vars["monthLater"] = datetime.now() + timedelta( 30 )
+        vars["weekLater"] = datetime.now() + timedelta( 7 )
         vars["Location"] = Location
         vars["rooms"] = self._rh._rooms
         vars["repeatability"] = None
@@ -6196,6 +6219,9 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
         newParams4Next['eMonth'] = nextEndD.month
         newParams4Next['eYear'] = nextEndD.year
 
+        #Number of the RoomBookingBookingListPrevNext templates used in the code.
+        #Variable increments when new template is put.
+        vars["prevNextNo"] = 0
         vars["withPrevNext"] = True
         vars["prevURL"] = urlHandlers.UHRoomBookingBookingList.getURL( newParams = newParams4Previous )
         vars["nextURL"] = urlHandlers.UHRoomBookingBookingList.getURL( newParams = newParams4Next )

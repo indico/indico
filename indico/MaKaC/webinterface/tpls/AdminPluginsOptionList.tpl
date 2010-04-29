@@ -1,4 +1,4 @@
-<% from MaKaC.fossils.user import IAvatarDetailedFossil %>
+<% from MaKaC.fossils.user import IAvatarFossil %>
 
     <% if ObjectType == "PluginType" :%>
     <form method="post" action="<%= urlHandlers.UHAdminPluginsTypeSaveOptions.getURL(Object, subtab = Index) %>" >
@@ -8,7 +8,7 @@
     <% end %>
 
     <table>
-        <% for option in Object.getOptionList(sorted = True, includeOnlyEditable = True, includeOnlyVisible = True): %>
+        <% for option in Object.getOptionList(doSort = True, includeOnlyEditable = True, includeOnlyVisible = True): %>
         <tr>
             <td style="text-align: right;vertical-align:top; padding-right: 10px; width: 60%%;">
                 <%= option.getDescription() %>:
@@ -22,7 +22,7 @@
                 <% end %>
 
                 <% if option.getType() == "users": %>
-                    <div id="userList<%=name%>">
+                    <div id="userList<%=name%>" style="margin-bottom: 10px">
                     </div>
 
                     <script type="text/javascript">
@@ -35,11 +35,11 @@
                                 },
                                 function(result,error) {
                                     if (!error) {
-                        setResult(true);
+                                        setResult(true);
                                     } else {
                                         IndicoUtil.errorReport(error);
-                    setResult(false);
-                    }
+                                        setResult(false);
+                                    }
                                 }
                             );
                         }
@@ -52,26 +52,25 @@
                                 },
                                 function(result,error) {
                                     if (!error) {
-                        setResult(true);
+                                        setResult(true);
                                     } else {
                                         IndicoUtil.errorReport(error);
-                    setResult(false);
+                                        setResult(false);
                                     }
                                 }
                             );
                         }
 
-                        var uf = new UserListField('PluginPeopleListDiv', 'PluginPeopleList',
-                                                   <%= jsonEncode(fossilize(option.getValue(), IAvatarDetailedFossil)) %>,
-                                                   null,
-                                                   <%=jsonEncode(Favorites)%>,
-                                                   true, false, false,
+                        var uf = new UserListField('PluginOptionPeopleListDiv', 'PeopleList',
+                                                   <%= jsonEncode(fossilize(option.getValue(), IAvatarFossil)) %>, true, null,
+                                                   true, false, null, null,
+                                                   false, false, true,
                                                    newPersonsHandler, userListNothing, removePersonHandler)
                         $E('userList<%=name%>').set(uf.draw())
                     </script>
                 <% end %>
                 <% elif option.getType() =="rooms": %>
-                    <div id="roomList" class="PluginPeopleListDiv"></div>
+                    <div id="roomList" class="PeopleListDiv"></div>
                     <div id="roomChooser"></div>
                     <div id="roomAddButton"></div>
                     <script type="text/javascript">
@@ -111,7 +110,7 @@
                                     }
                                 );
                         });
-                        var roomList = new RoomListWidget('PluginPeopleList',removeRoomHandler);
+                        var roomList = new RoomListWidget('PeopleList',removeRoomHandler);
                         //var temp = roomChooser.source.get()["CERN:1"];
                         var roomSelectedBefore=<%= option.getValue() %>
                         each (roomSelectedBefore,function(room){
@@ -169,7 +168,7 @@
         </tr>
         <% end %>
 
-        <% for option in Object.getOptionList(sorted = True, includeOnlyNonEditable = True, includeOnlyVisible = True): %>
+        <% for option in Object.getOptionList(doSort = True, includeOnlyNonEditable = True, includeOnlyVisible = True): %>
         <tr>
             <td style="text-align: right; vertical-align:top; padding-right: 10px;width: 50%%;">
                 <%= option.getDescription() %>:

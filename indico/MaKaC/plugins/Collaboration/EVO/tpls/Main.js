@@ -36,14 +36,14 @@
                     errors.push($T("Start date cannot be before the past <%= AllowedStartMinutes %> minutes"));
                 }
 
-                // check start date is not before the minimum start date (event start date - <%= AllowedMarginMinutes %> min )
+                // check start date is not before the minimum start date (event start date - <%= ExtraMinutesBefore %> min )
                 if (startDate < IndicoUtil.parseDateTime("<%= MinStartDate %>")) {
-                    errors.push($T("Start date cannot be <%= AllowedMarginMinutes %> minutes before the Indico event start date. Please choose it after <%= MinStartDate %>"));
+                    errors.push($T("Start date cannot be more than <%= ExtraMinutesBefore %> minutes before the Indico event start date. Please choose it after <%= MinStartDate %>"));
                 }
 
-                // check start date is not after the maximum start date (event end date + <%= AllowedMarginMinutes %> min )
+                // check start date is not after the maximum start date (event end date + <%= ExtraMinutesAfter %> min )
                 if (startDate > IndicoUtil.parseDateTime("<%= MaxEndDate %>")) {
-                    errors.push($T("Start date cannot be <%= AllowedMarginMinutes %> minutes after the Indico event end date. Please choose it before <%= MaxEndDate %>"));
+                    errors.push($T("Start date cannot be more than <%= ExtraMinutesAfter %> minutes after the Indico event end date. Please choose it before <%= MaxEndDate %>"));
                 }
 
                 // check start date is not after end date, if end date exists
@@ -66,14 +66,14 @@
                     errors.push($T("End date cannot be before the past <%= AllowedStartMinutes %> minutes"));
                 }
 
-                // check end date is not after the maximum start date (event end date + <%= AllowedMarginMinutes %> min )
+                // check end date is not after the maximum end date (event end date + <%= ExtraMinutesAfter %> min )
                 if (endDate > IndicoUtil.parseDateTime("<%= MaxEndDate %>")) {
-                    errors.push($T("End date cannot be <%= AllowedMarginMinutes %> minutes after the Indico event end date. Please choose it before <%= MaxEndDate %>"));
+                    errors.push($T("End date cannot be more than <%= ExtraMinutesAfter %> minutes after the Indico event end date. Please choose it before <%= MaxEndDate %>"));
                 }
 
-                // check start date is not before the minimum start date (event start date - <%= AllowedMarginMinutes %> min )
+                // check start date is not before the minimum start date (event start date - <%= ExtraMinutesBefore %> min )
                 if (endDate < IndicoUtil.parseDateTime("<%= MinStartDate %>")) {
-                    errors.push($T("End date cannot be <%= AllowedMarginMinutes %> minutes before the Indico event start date. Please choose it after <%= MinStartDate %>"));
+                    errors.push($T("End date cannot be more than <%= ExtraMinutesBefore %> minutes before the Indico event start date. Please choose it after <%= MinStartDate %>"));
                 }
 
                 // check start date is not after end date, if start date exists
@@ -238,9 +238,11 @@
         return ["startDate", "endDate"]
     },
 
-    onCreate: function() {
-        EVOPasswordField = new ShowablePasswordField('accessPassword', '', false);
+    onCreate: function(bookingPopup) {
+        var EVOPasswordField = new ShowablePasswordField('accessPassword', '', false);
         $E('passwordField').set(EVOPasswordField.draw());
+        bookingPopup.addComponent(EVOPasswordField);
+
         EVODrawContextHelpIcons();
         <% if not PossibleToCreateOrModify: %>
             var popup = new WarningPopup($T("Impossible to create an EVO booking"),
@@ -256,9 +258,11 @@
         <% end %>
     },
 
-    onEdit: function(booking) {
-        EVOPasswordField = new ShowablePasswordField('accessPassword', booking.bookingParams.accessPassword, false);
+    onEdit: function(booking, bookingPopup) {
+        var EVOPasswordField = new ShowablePasswordField('accessPassword', '', false);
         $E('passwordField').set(EVOPasswordField.draw());
+        bookingPopup.addComponent(EVOPasswordField);
+
         EVODrawContextHelpIcons();
         <% if not PossibleToCreateOrModify: %>
             var popup = new WarningPopup($T("Impossible to modify this EVO booking"),
@@ -272,12 +276,6 @@
                  ]);
             popup.open();
         <% end %>
-    },
-
-    onSave: function(values) {
-        var password = EVOPasswordField.getPassword();
-        values["accessPassword"] = password;
-        return true;
     },
 
     postCheckStatus: function(booking) {

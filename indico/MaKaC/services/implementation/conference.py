@@ -50,6 +50,18 @@ class ConferenceBase(object):
         except:
             raise ServiceError("ERR-E4", "Invalid conference id.")
 
+
+    def _getCheckFlag(self):
+        """
+        Returns the "check" flag, a value that specifies what kind of
+        checking should be done before modifying. Classes that wish
+        to change this behavior should overload it.
+        """
+
+        # automatically adapt everything
+        return 2
+
+
 class ConferenceModifBase(ProtectedModificationService, ConferenceBase):
     def _checkParams(self):
         ConferenceBase._checkParams(self)
@@ -158,14 +170,19 @@ class ConferenceBookingModification( ConferenceTextModificationBase ):
             room = conference.CustomRoom()
             self._target.setRoom(room)
 
-        room.setName( self._value['room'] )
+        # if a room name is not passed, it is assumed
+        # as empty
+        if 'room' in self._value:
+            room.setName( self._value['room'] )
 
         loc = self._target.getLocation()
         if not loc:
             loc = conference.CustomLocation()
             self._target.setLocation(loc)
 
-        loc.setName( self._value['location'] )
+        if 'location' in self._value:
+            loc.setName( self._value['location'] )
+
         loc.setAddress( self._value['address'] )
 
     def _handleGet(self):
@@ -559,7 +576,7 @@ class ShowConcurrentEvents(ServiceBase):
         return evtsByCateg
 
 
-class ConferenceGetFieldsAndContribTypes(ConferenceModifBase):
+class ConferenceGetFieldsAndContribTypes(ConferenceDisplayBase):
     def _getAnswer( self ):
         afm = self._target.getAbstractMgr().getAbstractFieldsMgr()
         afmDict =  dict([(f.getId(), f.getName()) for f in afm.getFields()])

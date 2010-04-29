@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: fossils.py,v 1.12 2009/04/25 13:56:17 dmartinc Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -23,16 +22,25 @@ from MaKaC.fossils.contribution import IContributionWithSpeakersFossil
 from MaKaC.fossils.subcontribution import ISubContributionWithSpeakersFossil
 from MaKaC.common.fossilize import addFossil
 from MaKaC.conference import Contribution
+from MaKaC.plugins.Collaboration.fossils import ICSErrorBaseFossil
 
 
 class IContributionWRFossil(IContributionWithSpeakersFossil):
     """ This fossil is ready for when we add subcontribution granularity to contributions
         and to provide an example for a plugin-specific fossil
     """
-    
+
     def getSubContributionList(self):
         pass
     getSubContributionList.result = ISubContributionWithSpeakersFossil
-    
+
 # We cannot include this fossil in the Contribution class directly because it belongs to a plugin
 addFossil(Contribution, IContributionWRFossil)
+
+class IWebcastRequestErrorFossil(ICSErrorBaseFossil):
+
+    def getOperation(self):
+        pass
+
+    def getInner(self):
+        pass

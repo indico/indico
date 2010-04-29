@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: urlHandlers.py,v 1.214 2009/06/04 14:58:48 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -1461,7 +1460,7 @@ class UHConfModifBookingModification(URLHandler):
 
 
 ## New Collaboration related
-class UHAdminCollaboration(OptionallySecureURLHandler):
+class UHAdminCollaboration(URLHandler):
     _relativeURL = "adminCollaboration.py"
 
 class UHConfModifCollaboration(OptionallySecureURLHandler):
@@ -3380,13 +3379,13 @@ class UHWebcastMoveChannelDown( URLHandler ):
 
 class UHWebcastSaveWebcastServiceURL( URLHandler ):
     _relativeURL = "adminServices.py/webcastSaveWebcastServiceURL"
-    
+
 class UHWebcastSaveWebcastSynchronizationURL( URLHandler ):
     _relativeURL = "adminServices.py/webcastSaveWebcastSynchronizationURL"
-    
+
 class UHWebcastManualSynchronization( URLHandler ):
     _relativeURL = "adminServices.py/webcastManualSynchronization"
-    
+
 class UHWebcastAddStream( URLHandler ):
     _relativeURL = "adminServices.py/webcastAddStream"
 

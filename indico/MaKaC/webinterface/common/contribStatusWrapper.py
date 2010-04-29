@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: contribStatusWrapper.py,v 1.4 2009/05/22 18:32:59 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: __init__.py,v 1.5 2009/06/26 16:07:27 cangelov Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -19,7 +18,6 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.plugins import getModules, initModule
 from MaKaC.i18n import _
 
 pluginType = "RoomBooking"
@@ -27,5 +25,4 @@ pluginName = "CERN"
 pluginDescription = _("""_("This is the CERN Indico Room Booking plugin. It relies on a ZODB separate backend. It support custom room attributes, and equipment")""")
 
 modules = {}
-topModule = None
 

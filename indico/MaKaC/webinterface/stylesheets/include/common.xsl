@@ -1,5 +1,5 @@
 <?xml version='1.0'?>
-<!-- $Id: common.xsl,v 1.23 2009/06/24 12:43:38 jose Exp $
+<!--
 
      This file is part of CDS Indico.
      Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -122,11 +122,19 @@
             '<xsl:value-of select="$subContId"/>',true);m.close();}return false;},
         </xsl:if>
         <xsl:if test="$item/materialLink != ''">
-            'Manage material': function(m){IndicoUI.Dialogs.Material.editor('<xsl:value-of select="$confId"/>',
-            '<xsl:value-of select="$sessId"/>',
-            '<xsl:value-of select="$contId"/>',
-            '<xsl:value-of select="$subContId"/>',
-            Indico.Data.MaterialTypes.meeting, <xsl:value-of select="$uploadURL"/>, true);m.close();return false;}
+            'Manage material': function(m){
+                IndicoUI.Dialogs.Material.editor('<xsl:value-of select="$confId"/>',
+                '<xsl:value-of select="$sessId"/>',
+                '<xsl:value-of select="$contId"/>',
+                '<xsl:value-of select="$subContId"/>',
+                <xsl:value-of select="$item/parentProtection"/>,
+                <xsl:value-of select="$item/materialList"/>,
+                <xsl:value-of select="$uploadURL"/>,
+                true);
+
+                m.close();
+                return false;
+           }
         </xsl:if>
         <xsl:text disable-output-escaping="yes">
         <![CDATA[

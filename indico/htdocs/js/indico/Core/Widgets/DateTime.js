@@ -1,5 +1,5 @@
 
-type("DateTimeSelector", ["RealtimeTextBox", "ErrorSensitive"],
+type("DateTimeSelector", ["RealtimeTextBox"],
      {
          get: function(direct) {
 
@@ -7,10 +7,15 @@ type("DateTimeSelector", ["RealtimeTextBox", "ErrorSensitive"],
              // conversion should be bypassed
              var value = RealtimeTextBox.prototype.get.call(this);
 
-             if (!direct) {
+             if (value && !direct) {
                  // convert formats, server <-> client
                  var dateTime = Util.parseDateTime(value, this.displayFormat);
-                 return Util.formatDateTime(dateTime, IndicoDateTimeFormats.Server);
+
+                 if (dateTime) {
+                     return Util.formatDateTime(dateTime, IndicoDateTimeFormats.Server);
+                 } else {
+                     return null;
+                 }
              } else {
                  return value;
              }
@@ -30,22 +35,20 @@ type("DateTimeSelector", ["RealtimeTextBox", "ErrorSensitive"],
              }
          },
 
-         _setErrorState: function(text) {
-             this._setElementErrorState(this.input, text);
+
+         _setElementErrorState: function(element, text) {
+             // use "passive" mode, so that fields can be verified live
+             this._stopErrorList = IndicoUtil.markInvalidField(element, text, true)[1];
          },
 
          _checkErrorState: function() {
 
              var value = this.get();
 
-             if (!this.inError()) {
-                 if (!value) {
-                     this.setError($T('Date is invalid'));
-                 }
+             if (!value) {
+                 return $T('Date is invalid');
              } else {
-                 if (value) {
-                     this.setError(null);
-                 }
+                 return null;
              }
          }
      },
@@ -58,10 +61,9 @@ type("DateTimeSelector", ["RealtimeTextBox", "ErrorSensitive"],
          var self = this;
 
          this.observe(function() {
-             self._checkErrorState();
+             self.askForErrorCheck();
              return true;
          });
-
          // set up the calendar widget to appear on click
          var cal = Calendar.setup({
              inputField: this.input.dom,
@@ -72,6 +74,7 @@ type("DateTimeSelector", ["RealtimeTextBox", "ErrorSensitive"],
              // (since onkeydown/onkeyup won't be called)
              onUpdate: function() { self.notifyChange(); }
          });
+
      });
 
 
@@ -96,14 +99,12 @@ type("StartEndDateWidget", ["InlineEditWidget"],
 
              var valid = true;
 
-             this.startDate._checkErrorState();
-             this.endDate._checkErrorState();
+             this.startDate.askForErrorCheck();
+             this.endDate.askForErrorCheck();
 
              if (this.startDate.inError() || this.endDate.inError()) {
                  valid = false;
              } else {
-                 this.startDate.setError(null);
-                 this.endDate.setError(null);
 
                  var sDateTime = Util.parseJSDateTime(this.startDate.get(), IndicoDateTimeFormats.Server);
                  var eDateTime = Util.parseJSDateTime(this.endDate.get(), IndicoDateTimeFormats.Server);

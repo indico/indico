@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: services.py,v 1.5 2009/05/14 18:06:03 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -128,7 +127,7 @@ class RHWebcastAddManager( RHWebcastBase ):
 
     def _process( self ):
         params = self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             al = self._wm.getManagers()
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):

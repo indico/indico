@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: __init__.py,v 1.2 2008/08/13 15:52:10 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -19,7 +18,5 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.plugins import getModules, initModule
-modules = {}
-topModule = None
+
 

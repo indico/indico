@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: options.py,v 1.3 2009/04/17 18:24:18 dmartinc Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -38,9 +37,6 @@ globalOptions = [
     ("useHTTPS", {"description": _("Use HTTPS in collaboration pages?"),
                      "type" : bool,
                      "defaultValue": False} ),
-    ("startMinutes", {"description": _("Default start time before Indico event start time (minutes)"),
-                     "type" : int,
-                     "defaultValue": 30} ),
     ("tabOrder", {"description": _("Order in which the tabs will appear"),
                   "type": list,
                   "defaultValue": ["Videoconferencing", "Recording Request", "Webcast Request"]
@@ -52,5 +48,8 @@ globalOptions = [
     ("pluginsPerIndex", {"description": _("Information about each index seen by collaboration admins"),
                          "type": list, #a list of IndexInformation objects
                          "editable": False,
-                         "visible": True} )
+                         "visible": True} ),
+    ("verifyIndexingResults", {"description": _("""Verify that indexing results do not contain bookings from plugins that have been removed in order to avoid exceptions (not efficient)"""),
+                         "type": bool,
+                         "defaultValue": False})
 ]

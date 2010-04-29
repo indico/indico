@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: users.py,v 1.43 2009/06/04 09:30:00 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -95,7 +94,7 @@ class RHUserManagementLogMeAs( admins.RHAdminBase ):
         if "returnURL" in params.keys():
             self._returnURL = params["returnURL"]
         
-        if "selectedPrincipals" in params.keys():
+        if "selectedPrincipals" in params.keys() and not "cancel" in params:
             self._userId = params["selectedPrincipals"]
             try:
                 self._av = user.AvatarHolder().getById(self._userId)

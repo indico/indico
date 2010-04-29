@@ -1,9 +1,12 @@
-from mod_python import apache
+try:
+    from mod_python import apache
+except ImportError:
+    pass
 import MaKaC.services.interface.rpc.json as jsonrpc
 
 
 def handler(req):
-    # runs services according to the URL 
+    # runs services according to the URL
     if req.uri.endswith('json-rpc'):
         return jsonrpc_handler(req)
     elif req.uri.endswith('test'):

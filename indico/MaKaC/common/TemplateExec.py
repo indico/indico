@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: TemplateExec.py,v 1.39 2009/05/19 16:53:58 pferreir Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -52,10 +51,10 @@ class TemplateExecException( Exception ):
         if s[-1] != "}":
 
             if hasattr(self, 'problematic_templates'):
-                s += """ - - - -> {Python code generated from templates is available in %s/%s.tpl.error.py""" % ( ERROR_PATH, self.problematic_templates[0])
+                s += """ - - - -> {Python code generated from templates is available in %s.tpl.error.py""" % (os.path.join(ERROR_PATH, self.problematic_templates[0]))
 
                 for template_name in self.problematic_templates[1:]:
-                    s += ", %s/%s.py"%(ERROR_PATH, template_name)
+                    s += ", %s.py" % (os.path.join(ERROR_PATH, template_name))
                 s += " file(s)}"
 
         return s
@@ -158,7 +157,7 @@ def quoteattr( s ):
 
 def roomClass( room ):
     if room.isReservable:
-        roomClass = ""
+        roomClass = "basicRoom"
     if not room.isReservable:
         roomClass = "privateRoom"
     if room.isReservable and room.resvsNeedConfirmation:

@@ -45,7 +45,7 @@ type("TimeTable", ["HistoryListener"], {
 
     _draw: function(timetableDiv) {
 
-        return Html.div({style:{width: pixels(this.width)}},
+        return Html.div({style:{width: this.width}},
                         this.header,
                         timetableDiv,
                         this.loadingIndicator);
@@ -175,8 +175,8 @@ type("DisplayTimeTable", ["TimeTable"], {
         var timetableElements = translate(self.timetableDrawer.canvas.dom.childNodes, function(value) {return $E(value);});
         var elements = translate($E(document.body).dom.childNodes, function(value) {return $E(value);});
 
-        var goBackLink = Html.a({href: '#', style: {fontSize: '17px'}}, 'Go back');
-        var printLink = Html.a({href: '#', style: {fontSize: '17px'}}, 'Print');
+        var goBackLink = Html.a({href: window.location.hash, style: {fontSize: '17px'}}, $T('Go back'));
+        var printLink = Html.a({href: window.location.hash, style: {fontSize: '17px'}}, $T('Print'));
 
         var links = Html.span({style: {cssFloat: 'right'}}, printLink, ' | ', goBackLink);
 
@@ -201,6 +201,56 @@ type("DisplayTimeTable", ["TimeTable"], {
         $E(document.body).setStyle('padding', pixels(30));
     },
 
+    pdf: function() {
+        window.location = Indico.Urls.ConfTimeTableCustomPDF + '?confId=' + this.eventInfo.id + '&showDays=all&showSessions=all';
+    },
+
+    fullScreen: function() {
+        var self = this;
+
+        //self.timetableDrawer.setPrintableVersion(true);
+
+        var bodyPadding = $E(document.body).dom.style.padding;
+        var elements = translate($E(document.body).dom.childNodes, function(value) {return $E(value);});
+        IndicoUI.Dialogs.Util.progress($T("Switching to full screen mode..."));
+
+        var goBackLink = Html.a({href: window.location.hash, style: {fontSize: '17px'}}, $T('Go back'));
+
+        var links = Html.span({style: {cssFloat: 'right'}}, goBackLink);
+
+        self.previousWidth = self.timetableDrawer.width;
+
+        goBackLink.observeClick(function(e) {
+            IndicoUI.Dialogs.Util.progress($T("Switching to normal mode..."));
+            // This timeout is needed in order to give time to the progress indicator to be rendered
+            setTimeout(function(){
+                self.timetableDrawer.width = self.previousWidth;
+                self.timetableDrawer.setPrintableVersion(false);
+                $E(document.body).setStyle('padding', bodyPadding);
+                $E(document.body).set(elements);
+                self.timetableDrawer.redraw(self.currentDay);
+            }, 50);
+        });
+
+     // This timeout is needed in order to give time to the progress indicator to be rendered
+        setTimeout(function(){
+            self.timetableDrawer.width = $E(document.body).dom.clientWidth - 50; // 50 is a width offset.
+
+            var headerStyle = {padding: '0px 5px 5px 5px',
+                    borderBottom: '1px solid black',
+                    textAlign: 'center',
+                    width: pixels(self.timetableDrawer.width)};
+            var header = Html.div({className: 'timetableHeader clearfix', style: headerStyle}, links,
+                Html.span({style: {cssFloat: 'left'}}, self._titleTemplate(self.timetableDrawer.day)));
+
+            self.timetableDrawer.redraw(self.currentDay);
+            var timetableElements = translate(self.timetableDrawer.canvas.dom.childNodes, function(value) {return $E(value);});
+            var timetableDiv = Html.div({style: {paddingTop: pixels(20), position: 'relative'}}, timetableElements);
+            $E(document.body).set(header, timetableDiv);
+            $E(document.body).setStyle('padding', pixels(30));
+        }, 50);
+    },
+
     _filterSetup: function() {
         var self = this;
         this.filter = new TimeTableFilter(this.timetableDrawer, function () {
@@ -211,6 +261,17 @@ type("DisplayTimeTable", ["TimeTable"], {
         this.filter.draw();
     },
 
+    toggleDetailedView: function() {
+        var detailLevel = this.timetableDrawer.detail.get();
+        var newDetailLevel = detailLevel == 'contribution' ? 'session' : 'contribution';
+        this.timetableDrawer.detail.set(newDetailLevel);
+        var state = (newDetailLevel == 'contribution');
+        this.inDetailedMode = state;
+        //detailsButton.btn.set(state ? "Hide details" : "Show details");
+        this.detailsButton.btn.getParent().dom.style.background = state ? "#9F883B" : "";
+        this._addToHistory(this.currentDay + (state?'.detailed':''));
+    },
+
     _functionButtons: function() {
         var self = this;
 
@@ -218,20 +279,25 @@ type("DisplayTimeTable", ["TimeTable"], {
             'onclick': function(btnContainer) {
                 self.print();
             }
-                          };
+        };
+
+        var pdfButton = {'btn': Html.div('buttonWhite', $T('PDF')),
+                'onclick': function(btnContainer) {
+                    self.pdf();
+                }
+        };
+
+        var fullScreenButton = {'btn': Html.div('buttonWhite', $T('Full screen')),
+                'onclick': function(btnContainer) {
+                    self.fullScreen();
+                }
+        };
 
         // TODO: Needs to be implemented
         var linkButton = Html.div('linkButtonWhite', $T('Link'));
 
-        var detailsButton = {'btn': Html.div('buttonWhite', Html.span({}, $T('Detailed view'))),
-            'onclick': function(btnContainer) {
-                var detailLevel = self.timetableDrawer.detail.get();
-                var newDetailLevel = detailLevel == 'contribution' ? 'session' : 'contribution';
-                self.timetableDrawer.detail.set(newDetailLevel);
-                var state = (newDetailLevel == 'contribution');
-                //detailsButton.btn.set(state ? "Hide details" : "Show details");
-                btnContainer.dom.style.background = state ? "#9F883B" : "";
-            }};
+        this.detailsButton = {'btn': Html.div('buttonWhite', Html.span({}, $T('Detailed view'))),
+            'onclick': function() {self.toggleDetailedView();}};
 
         var filterButton = {'btn': Html.div('buttonWhite', $T('Filter')),
             'onclick': function(btnContainer) {
@@ -242,10 +308,12 @@ type("DisplayTimeTable", ["TimeTable"], {
                 var state = self.filter.state.get();
                 btnContainer.dom.style.background = state ? "#9F883B" : "";
             }
-                           };
+        };
 
         return [printButton,
-                detailsButton,
+                pdfButton,
+                fullScreenButton,
+                this.detailsButton,
                 filterButton];
     }
 },
@@ -291,46 +359,22 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
 
         var strDate =  day + '/' + month + '/' + text.substring(0,4);
 
-        var nDate = new Date();
-        setDate(nDate, parseDate(strDate));
+        //var nDate = new Date();
+        var delements = parseDate(strDate);
+        var nDate = new Date(delements[2], delements[1]-1, delements[0]);
 
         return Indico.Data.WeekDays[nDate.getDay()].substring(0,3)+' '+day+'/'+month;
 
     },
 
-    _followArgs_interval: function(hash, data) {
-        var m = hash.match(/#(\d{8})(?:\.(s\d+l\d+))?/);
+
+    _parseDayInterval: function(hash) {
+        var m = hash.match(/#(\d{8}|all)(?:\.((?:s\d+l\d+)|detailed))?/);
 
         if (m) {
-
-            this.currentDay = m[1];
-
-            if (m[2]) {
-                this.switchToInterval(m[2]);
-                return true;
-            }
-        }
-
-        return false;
-    },
-
-    _followArgs_day: function(hash,data) {
-
-        var m = hash.match(/#(\d{8}|all)(?:\.(s\d+l\d+))?/);
-
-        if (m) {
-
-            this.currentDay = m[1];
-
-            var tab = 0;
-
-            for (k in this.sortedKeys) {
-                if (this.sortedKeys[k] == this.currentDay) {
-                    return tab;
-                }
-                tab++;
-            }
-            return -1;
+            return [m[1],m[2]];
+        } else {
+            return [null, null];
         }
     },
 
@@ -344,12 +388,14 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
                                                                  data,
                                                                  intervalInfo,
                                                                  this.eventInfo,
-                                                                 this.width,
+                                                                 this.width.slice(0,-2),
                                                                  this.canvas,
-                                                                 'contribution');
+                                                                 'contribution',
+                                                                this.isSessionTimetable);
 
         this.intervalTimeTable.setData(intervalInfo);
-        this.canvas.set(this.intervalTimeTable.draw());
+        var content = this.intervalTimeTable.draw()
+        this.canvas.set(content);
         this.menu.dom.style.display = 'none';
 
     },
@@ -362,8 +408,8 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
 
     switchToTopLevel : function() {
         this.enable();
-        this.set(this.currentDay);
-        this.canvas.set(Widget.block(this));
+        this.setSelectedTab(this.currentDay);
+        this._drawContent();
         this.menu.dom.style.display = 'block';
         this.timetableDrawer.redraw();
     }
@@ -394,31 +440,39 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
          var today = new Date();
          var todayStr = IndicoUtil.formatDate2(today);
 
-         // parse "command line" arguments
-         var initialTab = this._followArgs_day(window.location.hash, data);
+         var originalHash = window.location.hash;
+
+         var dayAndInterval = this._parseDayInterval(originalHash);
+         var initialTab = null;
+
+         if (dayAndInterval[0]) {
+             initialTab = dayAndInterval[0];
+         }
 
          // if nothing is found
-         if (initialTab == -1) {
+         if (initialTab === null) {
              // look for today
-             while (exists(data[todayStr])) {
-                 today.setDate(today.getDate()-1);
-                 todayStr = IndicoUtil.formatDate2(today);
-                 initialTab++;
+             if (exists(data[todayStr])) {
+                 initialTab = todayStr;
+             } else {
+                 // otherwise use the default
+                 initialTab = keys(data)[0];
              }
          }
 
-         // if today not found, set initial tab to the first one
-         if (initialTab == -1) {
-             initialTab = 0;
-         }
+         this.currentDay = initialTab;
 
          this.LookupTabWidget( translate(this.sortedKeys, function(key) {
+
              return [key, function() {
+
+                 detailed = self.inDetailedMode?'.detailed':'';
+
                  self.currentDay = key;
                  // each time one tab is clicked,
                  // drawDay is called over a different day
                  if (key == 'all') {
-                     self._addToHistory('all');
+                     self._addToHistory('all' + detailed);
                      return self._draw(self.timetableDrawer.drawAllDays());
                  } else {
 
@@ -429,13 +483,23 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
                          throw "stopDrawing";
                      }
 
-                     self._addToHistory(key);
+                     self._addToHistory(key + detailed);
                      return self._draw(self.timetableDrawer.drawDay(key));
                  }
              }];
          }), this.width, 100, initialTab, this._functionButtons(), this.canvas);
 
-         this._followArgs_interval(window.location.hash, data);
+         if (dayAndInterval[1]) {
+             var subref = dayAndInterval[1];
+             // TODO: replace with appropriate notification system
+             setTimeout(function() {
+                 if (subref == 'detailed') {
+                     self.toggleDetailedView();
+                 } else {
+                     self.switchToInterval(subref);
+                 }
+             }, 500);
+         }
 
      });
 
@@ -662,22 +726,26 @@ type("ManagementTimeTable",["TimeTable"], {
         });
 
         this.separator = Html.span({}, " | ");
-        // TODO: implement reschedule function
-        var href = Indico.Urls.Reschedule;
-        this.rescheduleLink = Html.a({style: {margin: '0 15px'}}, Html.span({style: {cursor: 'default', color: '#888'}}, 'Reschedule'));
 
-        var underConstr = function(event) {
-            IndicoUI.Widgets.Generic.tooltip(this, event,"This option will be available soon");
-        };
-        this.rescheduleLink.dom.onmouseover = underConstr;
+        this.rescheduleLink = Html.span({className: 'fakeLink', style:{paddingLeft: pixels(15), paddingRight: pixels(15)}}, $T('Reschedule'));
+        this.rescheduleLink.observeClick(function(){
+            var popup = new RescheduleDialog(self);
+            popup.open();
+        });
 
         // JUST FOR SessionManagementTimetable
-        this.addIntervalLink = Html.span('fakeLink', 'Add new interval');
+        this.addIntervalLink = Html.span({className: 'fakeLink', style:{paddingLeft: pixels(15), paddingRight: pixels(15)}}, $T('Add new block'));
+        this.separator2 = Html.span({}, " | ");
+        this.fitInnerTimetableLink = Html.span({className: 'fakeLink', style:{paddingLeft: pixels(15), paddingRight: pixels(15)}}, $T('Fit inner timetable'));
 
 
         if (self.isSessionTimetable) {
             this.addIntervalLink.observeClick(function() {
                 self.managementActions.addSessionSlot(self.eventInfo.timetableSession);
+            });
+            this.fitInnerTimetableLink.observeClick(function(){
+                var popup = new FitInnerTimetableDialog(self);
+                popup.open();
             });
         }
 
@@ -689,7 +757,9 @@ type("ManagementTimeTable",["TimeTable"], {
                              this.addMenuLink,
                              this.addIntervalLink,
                              this.separator,
-                             this.rescheduleLink);
+                             this.rescheduleLink,
+                             this.separator2,
+                             this.fitInnerTimetableLink);
         return Html.div({}, this.warningArea, Html.div('clearfix', this.menu, this.infoBox));
     }
 },
@@ -707,8 +777,8 @@ type("ManagementTimeTable",["TimeTable"], {
 type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"], {
 
     _retrieveHistoryState: function(hash) {
-        this._followArgs_day(hash, this.data);
-        this.setSelectedTab(this.currentDay);
+        var currentDay = this._parseDayInterval(hash)[0];
+        this.setSelectedTab(currentDay);
     }
 
 
@@ -845,16 +915,23 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
             this.separator.dom.style.display = "none";
         } else {
             this.addIntervalLink.dom.style.display = "none";
+            this.separator2.dom.style.display = "none";
+            this.fitInnerTimetableLink.dom.style.display = "none";
         }
 
         return '';
     },
 
     _retrieveHistoryState: function(hash) {
-        this._followArgs_day(hash, this.data);
-        if (!this._followArgs_interval(hash, this.data)) {
+        var dayInterval = this._parseDayInterval(hash);
+
+        var currentDay =  dayInterval[0] || keys(this.data)[0];
+        if (dayInterval[1]) {
+            this.setSelectedTab(dayInterval[0]);
+            this.switchToInterval(dayInterval[1]);
+        } else {
             this.switchToTopLevel();
-            this.setSelectedTab(this.currentDay);
+            this.setSelectedTab(dayInterval[0]);
         }
     }
 
@@ -951,6 +1028,8 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
     getTTMenu: function() {
         var self = this;
 
+        this.separator2.dom.style.display = "none";
+        this.fitInnerTimetableLink.dom.style.display = "none";
         if (this.isSessionTimetable) {
             this.addMenuLink.dom.style.display = "inline";
             this.addIntervalLink.dom.style.display = "none";
@@ -973,10 +1052,10 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
     }
 
 },
-     function(parent, data, contextInfo, eventInfo, width, wrappingElement, detailLevel) {
+     function(parent, data, contextInfo, eventInfo, width, wrappingElement, detailLevel, isSessionTimetable) {
 
          this.ManagementTimeTable(data, contextInfo, eventInfo, width, wrappingElement, detailLevel);
-         var managementActions = new IntervalTimeTableManagementActions(this, eventInfo, contextInfo, false);
+         var managementActions = new IntervalTimeTableManagementActions(this, eventInfo, contextInfo, isSessionTimetable);
          this.IntervalTimeTableMixin(parent, width, wrappingElement, managementActions);
 
          this.canvas = Html.div({});

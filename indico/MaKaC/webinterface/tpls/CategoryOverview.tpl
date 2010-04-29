@@ -1,61 +1,99 @@
-<div class="container">
+<div class="container" style="overflow: visible; margin:15px;">
     <div class="categoryHeader">
-        <ul>      
+        <ul>
             <li><a href="<%= categDisplayURL %>"><%= _("Go back to category page") %></a></li>
         </ul>
-        <h1 class="categoryTitle" style="margin-bottom: 0; border: none;">
+        <h1 class="categoryTitle">
             <%= categoryTitle %>&nbsp;
             <span style="font-style: italic; font-size: 0.8em;">(<%= _("events overview") %>)</span>
         </h1>
     </div>
+    <table width = "100%%" cellSpacing="3px" cellPadding="2px">
+        <tbody>
+            <tr>
+                <td valign="top" style="width: 210px;">
+                    <div style="margin-top: 30px; float: none; width: 100%%" class="sideBar clearfix">
+                        <div class="leftCorner"></div>
+                        <div class="rightCorner"></div>
+                        <div class="content" style="padding-right:10px;padding-left:10px;">
 
-    <div class="topBar">
-        <div class="content"">
-        
-            <form action="%(postURL)s" id="optionsForm" method="GET">
-            <h1 style="display: inline; padding-right: 50px;"><%= _("Display options") %></h1>
-            
-            %(locator)s
-            
-            <%= _("Period")%>:&nbsp;
-                        <select name="period" style="margin-right: 30px; font-size: 10pt; min-width: 70px;">
-                            <option value="day" %(selDay)s> <%= _("day")%></option>
-                            <option value="week" %(selWeek)s> <%= _("week")%></option>
-                            <option value="month" %(selMonth)s> <%= _("month")%></option>
-                        </select>
-            <%= _("Details level")%>:&nbsp; <span><select name="detail" style="margin-right: 30px; font-size: 10pt;  min-width: 70px;">
-                            %(detailLevelOpts)s
-                        </select></span>
-            <%= _("Date")%>:&nbsp;
-                        <span id="datePlace" style="margin-right: 30px; font-size: 10pt;"></span>
-                        <input type="hidden" id="day" name="day" value="<%= day %>" />
-                        <input type="hidden" id="month" name="month" value="<%= month %>" />
-                        <input type="hidden" id="year" name="year" value="<%= year %>" />
+                            <form action="%(postURL)s" id="optionsForm" name="optionsForm" method="GET">
+                                %(locator)s
 
-                <input type="submit" class="btn" value="<%= _("apply")%>" >
+                                <span id="calendar-container" style="width:0px"></span>
+                                <input type="hidden" id="dateContainer" name="dateContainer" value="<%= "%s/%s/%s"%(day, month, year)%>"/>
+                                <input type="hidden" id="day" name="day" value="<%= day %>" />
+                                <input type="hidden" id="month" name="month" value="<%= month %>" />
+                                <input type="hidden" id="year" name="year" value="<%= year %>" /><br />
 
-            </form>
-            <% if key: %>
-                <div style="display: none;">
-                <h1><%= _("Legend") %></h1>
-                <div style="margin: 10px 0 30px 10px;">%(key)s</div>
-                </div>
-            <% end %>
-        </div>
-    </div>
+                                <h1 style="padding-bottom:5px;"><%= _("Display options") %>:</h1>
+                                <table cellpadding="0" cellspacing="0" style="width:100%%">
+                                    <tr>
+                                        <td><%= _("Period")%>:</td>
+                                        <td><select name="period">
+                                            <option value="day" %(selDay)s> <%= _("day")%></option>
+                                            <option value="week" %(selWeek)s> <%= _("week")%></option>
+                                            <option value="month" %(selMonth)s> <%= _("month")%></option>
+                                        </select></td>
+                                    </tr>
+                                    <tr>
+                                        <td><%= _("Detail level")%>:</td>
+                                        <td><select name="detail">
+                                            <%= detailLevelOpts %>
+                                        </select></td>
+                                   </tr>
+                                </table>
+                            <span id="applyButtonWrapper"><input type="button" value="<%= _("Apply") %>" onclick="javascript:buttonSubmitForm();" /></span>
 
-    <div>
-    
-        <div class="categoryOverview">
-            %(overview)s
-        </div>
-    </div>
-
+                            </form>
+                            <% if key: %>
+                                <br><h1><%= _("Legend") %>:</h1>
+                                <div style="margin: 10px 0 30px 10px;width:180px;">%(key)s</div>
+                            <% end %>
+                        </div>
+                    </div>
+                </td>
+                <td valign = "top">
+                    <div class="categoryOverview">
+                        %(overview)s
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </div>
 
-
 <script type="text/javascript">
-    var date = IndicoUI.Widgets.Generic.dateField(false,null,['day', 'month', 'year'])
-    date.set('<%= day %>/<%= month %>/<%= year %>');
-    $E('datePlace').set(date);
+
+    function buttonSubmitForm() {
+        var applyButtonWrapper = $E("applyButtonWrapper");
+        applyButtonWrapper.set(progressIndicator(true, false));
+        setTimeout(function(){
+            submitForm();
+        }, 30);
+
+    }
+
+    function submitForm()
+    {
+        document.optionsForm.submit();
+    };
+
+
+    function dateChanged(calendar){
+        if(calendar.dateClicked){
+            $E("day").set(calendar.date.getDate());
+            $E("month").set(calendar.date.getMonth() + 1);
+            $E("year").set(calendar.date.getFullYear());
+            submitForm();
+        }
+    };
+
+    Calendar.setup({
+        inputField: $E("dateContainer").dom,
+        ifFormat: IndicoDateTimeFormats.DefaultHourless,
+        flat : "calendar-container",
+        flatCallback :  dateChanged
+    });
+
 </script>

@@ -1,5 +1,5 @@
 <% declareTemplate(newTemplateStyle=True) %>
-<% pluginList = PluginType.getPluginList(sorted = True, includeNonPresent = False, includeNonActive = True) %>
+<% pluginList = PluginType.getPluginList(doSort = True, includeNonPresent = False, includeNonActive = True) %>
 
 <table style="width: 100%%">
     <tr>
@@ -83,7 +83,7 @@
     </div>
     <div id="pluginTabs">
     </div>
-    
+
     <div>
         <% for i, plugin in enumerate(pluginList): %>
         <div id="<%=plugin.getName()%>OptionsDiv" style="display:none;">
@@ -96,13 +96,14 @@
         </div>
         <% end %>
     </div>
-    
+
 <% end %>
 
 <script type="text/javascript">
-var tabControl = new TabWidget([
+var tabList = [
     <%= ",\n".join(['["' + plugin.getName() + '" , $E("' + plugin.getName() + 'OptionsDiv")]' for plugin in pluginList])%>
-], null, null, <%= InitialPlugin %>);
+]
+var tabControl = new TabWidget(tabList, null, null, tabList[<%= InitialPlugin %>][0]);
 $E('pluginTabs').set(tabControl.draw());
 
 </script>

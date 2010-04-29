@@ -2,8 +2,7 @@
 type("InlineWidget", ["IWidget"],
      {
          _error: function(error) {
-             var dialog = new ErrorReportDialog(error);
-             dialog.open();
+             IndicoUI.Dialogs.Util.error(error);
          }
      });
 
@@ -102,18 +101,20 @@ type("RemoteSwitchButton", ["InlineWidget"],
 
              var chooser = new Chooser(
                  { 'disable': command(
-                     function(){
+                     function(event){
                          chooser.set('progress');
                          // server request to disable the button
                          request('disable','enable',self.enableMethod);
+                         stopPropagation(event);
                          return false;
                      }, this.imgEnabled),
 
                    'enable': command(
-                       function(){
+                       function(event){
                            chooser.set('progress');
                            // server request to enable the button
                            request('enable','disable',self.disableMethod);
+                           stopPropagation(event);
                            return false;
                        }, this.imgDisabled),
 
@@ -149,59 +150,129 @@ type("RemoteSwitchButton", ["InlineWidget"],
 
 
 
-type("RadioFieldWidget", ["InlineWidget"],
+type("RadioFieldWidget", ["InlineWidget", "WatchAccessor"],
      {
          draw: function() {
              var self = this;
 
-             return $B(Html.ul(this.cssClassRadios),
-                       this.orderedItems,
-                       function(item) {
-                           var radio = self.radioDict[item.key];
-                           radio.observeClick(function() {
-                               self.select(item.key);
-                           });
-                           self.options.accessor(item.key).observe(
-                               function(value) {
-                                   radio.set(value);
-                               });
+             this.canvas = Html.div(
+                 {style:{position:'relative'}},
+                 Html.table(this.cssClassRadios,
+                 $B(Html.tbody({}),
+                     this.orderedItems,
+                     function(item) {
+                         var radio = self.radioDict[item.key];
+                         radio.observeClick(function() {
+                             self.select(item.key);
+                         });
+                         self.options.accessor(item.key).observe(
+                             function(value) {
+                                 radio.set(value);
+                                 if (value) {
+                                     liItem.dom.className = 'selectedItem';
+                                 } else {
+                                     liItem.dom.className = '';
+                                 }
+                             });
 
-                           var itemContent = item.get();
+                         var itemContent = item.get();
 
-                           if (itemContent.IWidget) {
-                               itemContent = itemContent.draw();
-                           }
+                         if (itemContent.IWidget) {
+                             itemContent = itemContent.draw();
+                         } else {
+                             itemContent = Html.span({style:{verticalAlign: 'middle'}}, itemContent);
+                         }
 
-                           // create li item, add visibility info too
-                           var liItem = Html.li(self.visibility.get(item.key)?{}:'disabledRadio', keys(self.radioDict).length > 1?radio:'', itemContent);
-                           radio.dom.disabled = !self.visibility.get(item.key);
+                         // create li item, add visibility info too
+                         var liItem = Html.tr(
+                             self.visibility.get(item.key) ? {} : 'disabledRadio',
+                             keys(self.radioDict).length > 1 ? Html.td({}, radio):'',
+                             Html.td( {}, itemContent ));
+                         radio.dom.disabled = !self.visibility.get(item.key);
 
-
-                           // observe future changes in visibility
-                           self.visibility.accessor(item.key).observe(
-                               function(value) {
-                                   if (!value) {
-                                       liItem.dom.className = 'disabledRadio';
-                                       radio.dom.disabled = true;
-                                   } else {
-                                       liItem.dom.className = 'enabledRadio';
-                                       radio.dom.disabled = false;
-                                   }
-                                   if (!value && radio.get()) {
-                                       self.selectLast();
-                                   }
-                               });
+                         if (self.options.get(item.key)) {
+                             liItem.dom.className = 'selectedItem';
+                         }
 
 
-                           return liItem;
-                       });
+                         // observe future changes in visibility
+                         self.visibility.accessor(item.key).observe(
+                             function(value) {
+                                 if (!value) {
+                                     liItem.dom.className = 'disabledRadio';
+                                     radio.dom.disabled = true;
+                                 } else {
+                                     liItem.dom.className = 'enabledRadio';
+                                     radio.dom.disabled = false;
+                                 }
+                                 if (!value && radio.get()) {
+                                     self.selectLast();
+                                 }
+                             });
+
+
+                         return liItem;
+                     })));
+
+             return this.canvas;
          },
 
          setVisibility: function(key, visible) {
              this.visibility.set(key, visible);
          },
 
+         show: function() {
+             this.canvas.dom.style.display =  'block';
+         },
+
+         hide: function() {
+             this.canvas.dom.style.display =  'none';
+         },
+
          onSelect: function(state) {
+         },
+
+         set: function(state) {
+             this.select(state);
+         },
+
+         get: function() {
+             var selKey = null;
+
+             each(this.options, function(value, key){
+                 if (value) {
+                     selKey = key;
+                 }
+             });
+
+             return selKey;
+         },
+
+
+         enable: function() {
+             each(this.radioDict,
+                  function(value, key) {
+                      value.dom.disabled = false;
+                  });
+
+             this.canvas.dom.style.opacity = 1;
+         },
+
+         disable: function() {
+             each(this.radioDict,
+                  function(value, key) {
+                      value.dom.disabled = true;
+                  });
+
+             this.canvas.dom.style.opacity = 0.4;
+         },
+
+         observe: function(callback) {
+             this.options.observe(function(value, key){
+                 if (value) {
+                     callback(key);
+                 }
+             });
          },
 
          select: function(state, /* optional */ fromSource) {
@@ -219,6 +290,7 @@ type("RadioFieldWidget", ["InlineWidget"],
              self.state.set(state);
              // set every other option to false
              self.options.each(function(value, key) {
+
                  if (value) {
                      self.options.set(key, false);
                  }
@@ -230,6 +302,7 @@ type("RadioFieldWidget", ["InlineWidget"],
                  }
 
              });
+
              self.options.set(state, true);
 
              // update the DOM element
@@ -259,8 +332,8 @@ type("RadioFieldWidget", ["InlineWidget"],
          }
      },
 
-     function(items, order, cssClassRadios) {
-         this.items = items;
+     function(items, cssClassRadios) {
+         this.items = {};
          this.radioDict = {};
          this.options = new WatchObject();
          this.visibility = new WatchObject();
@@ -271,22 +344,19 @@ type("RadioFieldWidget", ["InlineWidget"],
 
          var name = Html.generateId();
 
-         // consider ordering of elements, if specified
-         if (order) {
-             this.orderedItems = $L();
-             each(order,
-                  function(key) {
-                      self.orderedItems.append(new WatchPair(key, items[key]));
+         this.orderedItems = $L();
+         each(items,
+              function(item) {
+                  var key = item[0];
+                  self.items[key] = item[1];
+                  self.orderedItems.append(new WatchPair(key, item[1]));
 
-                      // add some extra stuff, since we're in the loop
-                      self.visibility.set(key, true);
-                      self.options.set(key, false);
-                      self.radioDict[key] = Html.radio({'name': name});
-                  });
-
-         } else {
-             this.orderedItems = $L(items);
-         }
+                  // add some extra stuff, since we're in the loop
+                  self.visibility.set(key, true);
+                  self.options.set(key, false);
+                  self.radioDict[key] = Html.radio({'name': name,
+                                                    style: {verticalAlign: 'middle'}});
+              });
 
          this.state = new Chooser(map(items,
                                       function(value, key) {
@@ -361,8 +431,16 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor"],
      });
 
 
-type("RealtimeTextBox", ["IWidget", "WatchAccessor"],
+type("RealtimeTextBox", ["IWidget", "WatchAccessor", "ErrorAware"],
      {
+         _setErrorState: function(text) {
+             this._setElementErrorState(this.input, text);
+         },
+
+         _checkErrorState: function() {
+             return null;
+         },
+
          draw: function() {
              this.enableEvent();
              return this.IWidget.prototype.draw.call(this, this.input);
@@ -455,6 +533,7 @@ type("RealtimeTextArea", ["RealtimeTextBox"],
      {
      },
      function(args) {
+
          this.RealtimeTextBox(clone(args));
          this.input = Html.textarea(args);
      });
@@ -487,7 +566,7 @@ type("EnterObserverTextBox", ["IWidget", "WatchAccessor"],
             this.input.observeEvent('keypress', function(event) {
                 if (event.keyCode == 13) {
                     Dom.Event.dispatch(self.input.dom, 'change');
-                    keyPressAction();
+                    return keyPressAction();
                 }
                 Dom.Event.dispatch(self.input.dom, 'change');
             });
@@ -853,96 +932,226 @@ type("HiddenText", ["IWidget"], {
  * @param {String} hiddenMessage The text to show when "text" is hidden.
  * @param {Boolean} true if we want to show the text initially, false otherwise
  */
-type("ShowablePasswordField", ["IWidget"], {
+type("ShowablePasswordField", ["IWidget", "ErrorAware"], {
 
-    __clearInvalid: function() {
-        // We normally could do: Dom.Event.dispatch(this.passwordField.dom, 'change');
-        // but it seems that IE does not like to dispatch events on elements that are not in the DOM tree,
-        // so we have to do things manually
-
-        // we remove the "invalid" word from the class if needed
-        this.passwordField.dom.className = this.passwordField.dom.className.replace(" invalid", "");
-        this.clearTextField.dom.className = this.passwordField.dom.className.replace(" invalid", "");
-
-        // we remove the tooltip divs from the DOM
-        each(this.invalidFieldTooltips, function(tooltip){
-            Dom.List.remove(document.body, tooltip);
-        });
-        this.invalidFieldTooltips = [];
-
-        // we detach the observers
-        each(this.invalidFieldObserverDetachers, function(detacher){
-            detacher();
-        });
-        this.invalidFieldObserverDetachers = [];
+    _setErrorState: function(text) {
+        if (this.show) {
+            this._setElementErrorState(this.clearTextField, text);
+        } else {
+            this._setElementErrorState(this.passwordField, text);
+        }
     },
 
-    setPassword: function(newPassword) {
+    getName: function() {
+        return this.name;
+    },
+
+    set: function(newPassword) {
         this.passwordField.dom.value = newPassword;
         this.clearTextField.dom.value = newPassword;
-        this.__clearInvalid();
+        this.setError(false);
     },
 
-    getPassword: function(newPassword) {
-        if (this.show.get()) {
+    get: function(newPassword) {
+        if (this.show) {
             return this.clearTextField.dom.value;
         } else {
             return this.passwordField.dom.value;
         }
     },
 
-    markAsInvalid: function(errors){
-        var result1 = IndicoUtil.markInvalidField(this.passwordField, errors);
-        var result2 = IndicoUtil.markInvalidField(this.clearTextField, errors);
-
-        this.invalidFieldTooltips.push(result1[0]);
-        this.invalidFieldTooltips.push(result2[0]);
-        this.invalidFieldObserverDetachers = this.invalidFieldObserverDetachers.concat(result1[1].concat(result2[1]));
+    refresh: function() {
+        if (this.show) {
+            this.button.set(" (" + $T("Hide") + ")");
+            this.inputDiv.set(this.clearTextField);
+        } else {
+            this.button.set(" (" + $T("Show") + ")");
+            this.inputDiv.set(this.passwordField);
+        }
     },
 
     draw: function() {
         var self = this;
 
-        var content = $B(Html.div({style:{display:"inline"}}), this.show, function(show) {
-            var field;
-            var button;
-            if (show) {
-                field = self.clearTextField;
-                field.dom.value = self.passwordField.dom.value;
-                self.button.set(" (" + $T("Hide") + ")");
+        this.inputDiv = Html.div({style:{display:'inline'}});
+
+        // We do not use $B and $V for the password because of a bug with two dual bindings between 2 XElements and a $V
+        this.passwordField = Html.input('password', {name: this.name}, this.initialPassword);
+        this.clearTextField = Html.input('text', {name: this.name}, this.initialPassword);
+
+        this.button = Html.span("fakeLink");
+
+        this.button.observeClick(function(){
+            if (self.show) {
+                self.passwordField.set(self.clearTextField.get());
             } else {
-                field = self.passwordField;
-                field.dom.value = self.clearTextField.dom.value;
-                self.button.set(" (" + $T("Show") + ")");
+                self.clearTextField.set(self.passwordField.get());
             }
-            self.__clearInvalid();
-            return Html.span({}, field, self.button);
+            self.show = !self.show;
+            self.refresh();
+            self.setError(false);
         });
+
+        this.refresh();
+
+        var content = Html.div({style:{display:"inline"}}, this.inputDiv, this.button);
         return this.IWidget.prototype.draw.call(this, content);
     }
 },
     function(name, initialPassword, initialShow) {
         this.name = name;
-        this.show = $V(initialShow);
-
-        // We do not use $B and $V for the password because of a bug with two dual bindings between 2 XElements and a $V
-        this.passwordField = Html.input('password', {name: this.name}, initialPassword);
-        this.clearTextField = Html.input('text', {name: this.name}, initialPassword);
-
-        this.button = Html.span("fakeLink");
-
-        var self = this;
-        this.button.observeClick(function(){
-            self.show.set(!self.show.get());
-        });
+        this.initialPassword = initialPassword;
+        this.show = initialShow;
 
         this.invalidFieldTooltips = [];
         this.invalidFieldObserverDetachers = [];
-
     }
 );
 
 
+type("TypeSelector", ["IWidget", "WatchAccessor", "ErrorAware"],
+{
+
+    _checkErrorState: function() {
+        if (this.selectOn) {
+            return null;
+        } else {
+            return this.text._checkErrorState();
+        }
+    },
+
+    setError: function(text) {
+        this.text.setError(text);
+    },
+
+    draw: function() {
+        var self = this;
+
+        var chooser = new Chooser(new Lookup({
+            select: function() {
+                self.selectOn = true;
+
+                self._notifyObservers(self.select.get());
+
+                return Html.div({}, self.select,
+                         " ",
+                         $T("or"),
+                         " ",
+                         Widget.link(command(function() {
+                             chooser.set('write');
+                             self.text.setFocus();
+                         }, $T("other"))));
+            },
+
+            write: function() {
+                bind.detach(self.select);
+                self.selectOn = false;
+
+                self._notifyObservers(self.text.get());
+
+                return Html.div({}, self.text.draw(),
+                                " ",
+                               $T("or"),
+                               " ",
+                                Widget.link(command(function() {
+                                    chooser.set('select');
+                                    self.select.dom.focus();
+                                }, $T("select from list"))));
+            }
+        }));
+        chooser.set('select');
+
+        return Widget.block(chooser);
+    },
+
+    isSelect: function(){
+        var self = this;
+        return self.selectOn;
+    },
+
+    _notifyObservers: function(value) {
+        each(this.observers,
+             function(observer) {
+                 observer(value);
+             });
+    },
+
+    set: function(value) {
+        if(this.selectOn){
+            this.select.set(value);
+        } else {
+            this.text.set(value);
+        }
+
+        this._notifyObservers(value);
+    },
+
+    get: function() {
+        var self = this;
+        if(self.selectOn){
+            return self.select.get();
+        }
+        else{
+            return self.text.get();
+        }
+    },
+
+    observe: function(callback) {
+        var self = this;
+        this.observers.push(callback);
+
+        this.select.observe(
+            function(value) {
+                if (self.selectOn) {
+                    callback(value);
+                }
+            });
+
+        this.text.observe(
+            function(value) {
+                if (!self.selectOn) {
+                    callback(value);
+                }
+            });
+
+    },
+
+    getSelectBox: function() {
+        return this.select;
+    }
+},
+     function(parameterManager, types, selParams, textParams){
+         selParams = selParams || {};
+         textParams = textParams || {};
+
+         this.select = bind.element(Html.select(selParams),
+                                    $L(types),
+                                    function(value) {
+                                        return Html.option({'value': value[0]}, value[1]);
+                                    });
+
+         textParams.id = Html.generateId();
+
+         this.text = new RealtimeTextBox(textParams);
+
+         // just to avoid defining yet another class
+         this.text._checkErrorState = function() {
+             if (this.get() !== '') {
+                 return null;
+             } else {
+                 return $T('Please select a material type');
+             }
+         };
+
+         this.selectOn = true;
+         this.pm = parameterManager;
+         this.types = types;
+
+         this.observers = [];
+
+         this.ErrorAware(parameterManager);
+     }
+    );
 
 type("InlineEditWidget", ["InlineRemoteWidget"],
      {

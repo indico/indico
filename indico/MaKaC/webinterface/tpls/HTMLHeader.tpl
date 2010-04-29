@@ -30,7 +30,7 @@
 	  currentLanguage = '<%= language %>';
 	  loadDictionary(currentLanguage);
 	</script>
-        
+
         <!-- Tooltip -->
         <script type="text/javascript" src="<%= baseurl %>/js/tooltip/domLib.js"></script>
         <script type="text/javascript" src="<%= baseurl %>/js/tooltip/domTT.js"></script>
@@ -44,15 +44,27 @@
         <% for CSSFile in extraCSSFiles: %>
             <link rel="stylesheet" type="text/css" href="<%= baseurl %>/css/<%= CSSFile %>">
         <% end %>
-        
+
         <!-- Page Specific, directly inserted CSS -->
         <style type="text/css">
             <%= "\n".join(extraCSS) %>
         </style>
-        
+
         <!-- Page Specific, directly inserted Javascript -->
         <script type="text/javascript">
             <%= "\n\n".join(extraJS) %>
+        </script>
+
+        <!-- Indico page-wide global JS variables -->
+        <script type="text/javascript">
+        <% user = page._rh.getAW().getUser() %>
+        <% if user: %>
+            IndicoGlobalVars.isUserAuthenticated = true;
+            IndicoGlobalVars.userData = <%= jsonEncode(page._getJavaScriptUserData()) %>;
+        <% end %>
+        <% else: %>
+            IndicoGlobalVars.isUserAuthenticated = false;
+        <% end %>
         </script>
 
         <!-- Other Page Specific -->

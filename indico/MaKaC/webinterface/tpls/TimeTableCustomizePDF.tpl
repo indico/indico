@@ -3,7 +3,7 @@
 <form action=%(getPDFURL)s method="post" target="_blank">
     <input type="hidden" name="showDays" value="%(showDays)s">
     <input type="hidden" name="showSessions" value="%(showSessions)s">
-    <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
+    <table width="80%%" align="center" border="0">
         <tr>
             <td class="groupTitle"> <%= _("PDF timetable customisation")%></td>
         </tr>

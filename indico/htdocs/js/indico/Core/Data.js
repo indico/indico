@@ -1,3 +1,6 @@
+// Place where to put page-wide Indico-related global variables
+var IndicoGlobalVars = {}
+
 var Util = {
     parseId: function(id){
 
@@ -129,9 +132,7 @@ var Util = {
             return null;
         }
 
-        var date = new Date();
-
-        setDate(date, [results['%d'],results['%m'],results['%Y']]);
+        var date = new Date(results['%Y'],results['%m']-1,results['%d']);
         setTime(date, [results['%H'],results['%M'],results['%S']]);
 
         return date;
@@ -156,9 +157,8 @@ var Util = {
         m1 = obj.date.match(/(\d+)[\-\/](\d+)[\-\/](\d+)/);
         m2 = obj.time.match(/(\d+):(\d+):(\d+)/);
 
-        var date = new Date();
 
-        setDate(date, [m1[3],m1[2],m1[1]]);
+        var date = new Date(m1[1],m1[2],m1[3]);
         setTime(date, [m2[1],m2[2],m2[3]]);
 
         return date;
@@ -185,6 +185,27 @@ Util.Validation = {
     isEmailList: function(emails) {
         // check if the emails given are valid and if valid separators are used
         return exists(emails.toLowerCase().match(/^(?:[ ,;]*)(?:[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+(?:\.[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+)*@(?:[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?)(?:[ ,;]+(?:[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+(?:\.[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+)*@(?:[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?))*(?:[ ,;]*)$/));
+    },
+    isURL: function(address) {
+        // per RFC2396, but forcing xxx: prefix and at least some text after
+        return exists(address.match(/^(([^:\/?#]+):)((\/\/)?([^\/?#]+))([^?#]*)(\?([^#]*))?(#(.*))?$/));
+    }
+
+
+};
+
+Protection = {
+
+    ParentRestrictionMessages: {
+        '1': $T("(currently <strong>restricted</strong> to some users, but can change)"),
+        '-1': $T("(currently <strong>open</strong> to everyone, but can change)") },
+
+    resolveProtection: function(resourceProtection, parentProtection) {
+        if (resourceProtection === 0) {
+            return parentProtection;
+        } else {
+            return resourceProtection;
+        }
     }
 };
 

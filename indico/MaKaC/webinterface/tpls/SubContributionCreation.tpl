@@ -1,8 +1,8 @@
 <form method="POST" action="%(postURL)s">
     %(locator)s
     <table width="60%%" cellspacing="0" align="center" border="0" style="border-left: 1px solid #777777;padding-left:2px">
-		<tr>
-			<td colspan="2" class="groupTitle"> <%= _("Creating a new sub contribution (basic data)")%></td>
+        <tr>
+            <td colspan="2" class="groupTitle"> <%= _("Creating a new sub contribution (basic data)")%></td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Title")%></span></td>
@@ -23,7 +23,7 @@
                 <input type="text" size="2" name="durationMinutes" value="%(durationMinutes)s">
             </td>
         </tr>
-		%(presenter)s        
+        %(presenter)s
         <tr><td>&nbsp;</td></tr>
         <tr align="center">
             <td colspan="2" style="border-top:1px solid #777777;" valign="bottom" align="center">

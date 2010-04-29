@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: __init__.py,v 1.2 2009/05/14 18:06:26 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -19,9 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.plugins import getModules, initModule
 modules = {}
-topModule = None
 
 
 
@@ -41,7 +38,7 @@ def preprocessParams(params):
         if params['szReturnCode'] == '1':
            params['requestTag'] = 'confirm'
         else:
-           params['requestTag'] = 'cancel' 
+           params['requestTag'] = 'cancel'
     #raise("preprocessParams ... " + str(params))
     return True
   except Exception,e:

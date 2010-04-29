@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: LocalAuthentication.py,v 1.3 2008/04/24 16:58:47 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -26,15 +25,15 @@ from MaKaC.i18n import _
 
 class LocalAuthenticator(Authenthicator):
     idxName = "localIdentities"
-    id = _("Local")
+    id = "Local"
     name = "Indico"
     desciption = "Indico Login"
     UserCreator = None
-    
+
     def createIdentity(self, li, avatar):
         return LocalIdentity(li.getLogin(), li.getPassword(), avatar)
-    
-    
+
+
 
 
 
@@ -42,7 +41,7 @@ class LocalAuthenticator(Authenthicator):
 
 
 class LocalIdentity(PIdentity):
-    
+
     def __init__(self, login, password, user):
         PIdentity.__init__( self, login, user )
         self.setPassword( password )
@@ -55,7 +54,7 @@ class LocalIdentity(PIdentity):
             self.password == id.getPassword():
             return self.user
         return None
-    
+
     def getAuthenticatorTag(self):
         return LocalAuthenticator.getId()
 

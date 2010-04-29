@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: output.py,v 1.74 2009/06/02 13:24:53 pferreir Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -20,7 +19,6 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from datetime import datetime
-from datetime import timedelta
 from pytz import timezone
 from MaKaC.plugins.base import PluginsHolder
 try:
@@ -29,6 +27,7 @@ try:
 except ImportError:
     pass
 import string,re
+import simplejson
 
 import MaKaC.conference as conference
 import MaKaC.schedule as schedule
@@ -41,9 +40,10 @@ from Configuration import Config
 from xmlGen import XMLGen
 import os, time
 from MaKaC.i18n import _
-from MaKaC.common.timezoneUtils import DisplayTZ, nowutc, getAdjustedDate
+from MaKaC.common.timezoneUtils import DisplayTZ, nowutc
 from MaKaC.common.utils import getHierarchicalId
 from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
+from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
 
 
 def fake(string1=""):
@@ -107,6 +107,18 @@ class outputGenerator:
         from MaKaC.webinterface.webFactoryRegistry import WebFactoryRegistry
         self.webFactory = WebFactoryRegistry()
 
+    def _generateMaterialList(self, obj):
+        """
+        Generates a list containing all the materials, with the
+        corresponding Ids for those that already exist
+        """
+
+        # yes, this may look a bit redundant, but materialRegistry isn't
+        # bound to a particular target
+        materialRegistry = obj.getMaterialRegistry()
+        return materialRegistry.getMaterialList(obj.getConference())
+
+
     def getOutput(self, conf, stylesheet, vars=None, includeSession=1,includeContribution=1,includeMaterial=1,showSession="all",showDate="all",showContribution="all"):
         # get xml conference
         start_time_XML = time.time()
@@ -114,7 +126,7 @@ class outputGenerator:
         end_time_XML = start_time_HTML = time.time()
         if not os.path.exists(stylesheet):
             self.text = _("Cannot find stylesheet")
-        if stylesheet == "xml.xsl":
+        if os.path.basename(stylesheet) == "xml.xsl":
             self.text = xml
         else:
             # instanciate the XSL tool
@@ -169,6 +181,25 @@ class outputGenerator:
             pass
         out.closeTag("user")
 
+    def _getRoom(self, room, location):
+        # get the name that is saved
+        roomName = room.getName()
+
+        # if there is a connection to the room booking DB
+        if CrossLocationDB.isConnected() and location:
+            # get the room info
+            roomFromDB = CrossLocationQueries.getRooms( roomName = roomName, location = location.getName() )
+            #roomFromDB can be a list or an object room
+            if isinstance(roomFromDB,list) and roomFromDB != []:
+                roomFromDB = roomFromDB[0]
+            # If there's a room with such name.
+            # Sometimes CrossLocationQueries.getRooms returns a list with None elements
+            if roomFromDB:
+                # use the full name instead
+                roomName = roomFromDB.getFullName()
+        return roomName
+
+
     def _confToXML(self, conf, vars, includeSession=1, includeContribution=1, includeMaterial=1, showSession="all", showDate="all",showContribution="all", showWithdrawed=True, useSchedule=True, out=None):
         if not out:
             out = self._XMLGen
@@ -184,6 +215,9 @@ class outputGenerator:
             out.writeTag("category",conf.getOwnerList()[0].getName())
         else:
             out.writeTag("category","")
+
+        out.writeTag("parentProtection", simplejson.dumps(conf.getAccessController().isProtected()))
+        out.writeTag("materialList", simplejson.dumps(self._generateMaterialList(conf)))
 
         if conf.canModify( self.__aw ) and vars and modificons:
             out.writeTag("modifyLink",vars["modifyURL"])
@@ -250,7 +284,8 @@ class outputGenerator:
                 out.writeTag("name",l.getName())
                 out.writeTag("address",l.getAddress())
             if conf.getRoom():
-                out.writeTag("room",conf.getRoom().getName())
+                roomName = self._getRoom(conf.getRoom(), loc)
+                out.writeTag("room", roomName)
                 url=RoomLinker().getURL(conf.getRoom(), loc)
                 if url != "":
                     out.writeTag("roomMapURL",url)
@@ -350,64 +385,8 @@ class outputGenerator:
         #plugins XML
         out.openTag("plugins")
         if PluginsHolder().hasPluginType("Collaboration"):
-
-            #collaboration XML
-            out.openTag("collaboration")
-            csbm = conf.getCSBookingManager()
-
-            out.writeComment("Needed for timezone awareness")
-            out.writeTag("todayReference", getAdjustedDate(nowutc(), None, tz).strftime("%Y-%m-%d"))
-            out.writeTag("tomorrowReference", getAdjustedDate(nowutc() + timedelta(days = 1), None, tz).strftime("%Y-%m-%d"))
-
-            pluginNames = csbm.getEventDisplayPlugins()
-
-            bookingXmlGenerators = {}
-
-            from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
-            for pluginName in pluginNames:
-                xmlGenerator = CollaborationTools.getXMLGenerator(pluginName)
-                bookingXmlGenerators[pluginName] = xmlGenerator
-
-            bookings = csbm.getBookingList(filterByType = pluginNames, notify = True, onlyPublic = True)
-            bookings.sort(key = lambda b: b.getStartDate())
-
-            ongoingBookings = []
-            scheduledBookings = []
-
-            for b in bookings:
-                if b.canBeStarted():
-                    ongoingBookings.append(b)
-                if b.hasStartDate() and b.getAdjustedStartDate('UTC') > nowutc():
-                    scheduledBookings.append(b)
-
-            for b in ongoingBookings :
-                bookingType = b.getType()
-                out.openTag("booking")
-                out.writeTag("id", b.getId())
-                out.writeTag("title", b._getTitle())
-                out.writeTag("kind", "ongoing")
-                out.writeTag("type", bookingType)
-                out.writeTag("typeDisplayName", b._getPluginDisplayName())
-                out.writeTag("startDate", b.getAdjustedStartDate(tz).strftime("%Y-%m-%dT%H:%M:%S"))
-                out.writeTag("endDate",b.getAdjustedEndDate(tz).strftime("%Y-%m-%dT%H:%M:%S"))
-                bookingXmlGenerators[bookingType].getCustomBookingXML(b, tz, out)
-                out.closeTag("booking")
-
-            for b in scheduledBookings :
-                bookingType = b.getType()
-                out.openTag("booking")
-                out.writeTag("id", b.getId())
-                out.writeTag("title", b._getTitle())
-                out.writeTag("kind", "scheduled")
-                out.writeTag("type", bookingType)
-                out.writeTag("typeDisplayName", b._getPluginDisplayName())
-                out.writeTag("startDate", b.getAdjustedStartDate(tz).strftime("%Y-%m-%dT%H:%M:%S"))
-                out.writeTag("endDate",b.getAdjustedEndDate(tz).strftime("%Y-%m-%dT%H:%M:%S"))
-                bookingXmlGenerators[bookingType].getCustomBookingXML(b, tz, out)
-                out.closeTag("booking")
-
-            out.closeTag("collaboration")
-
+            from MaKaC.plugins.Collaboration.output import OutputGenerator
+            OutputGenerator.collaborationToXML(out, conf, tz)
         out.closeTag("plugins")
 
 
@@ -421,6 +400,7 @@ class outputGenerator:
             modificons = 1
         out.openTag("session")
         out.writeTag("ID",session.getId())
+
         if session.getCode() not in ["no code", ""]:
             out.writeTag("code",session.getCode())
         else:
@@ -447,7 +427,8 @@ class outputGenerator:
                 out.writeTag("name",l.getName())
                 out.writeTag("address",l.getAddress())
             if session.getRoom():
-                out.writeTag("room",session.getRoom().getName())
+                roomName = self._getRoom(session.getRoom(), l)
+                out.writeTag("room", roomName)
                 url=RoomLinker().getURL(session.getRoom(), l)
                 if url != "":
                     out.writeTag("roomMapURL",url)
@@ -504,6 +485,11 @@ class outputGenerator:
             modificons = 1
         out.openTag("session")
         out.writeTag("ID",session.getId())
+
+        out.writeTag("parentProtection", simplejson.dumps(session.getAccessController().isProtected()))
+        out.writeTag("materialList", simplejson.dumps(self._generateMaterialList(session)))
+
+
         slotCode = session.getSortedSlotList().index(slot) + 1
         if session.getCode() not in ["no code", ""]:
             out.writeTag("code","%s-%s" % (session.getCode(),slotCode))
@@ -538,7 +524,8 @@ class outputGenerator:
                 out.writeTag("name",l.getName())
                 out.writeTag("address",l.getAddress())
             if room:
-                out.writeTag("room",room.getName())
+                roomName = self._getRoom(room, l)
+                out.writeTag("room", roomName)
                 url=RoomLinker().getURL(room, l)
                 if url != "":
                     out.writeTag("roomMapURL",url)
@@ -578,6 +565,10 @@ class outputGenerator:
             modificons = 1
         out.openTag("contribution")
         out.writeTag("ID",cont.getId())
+
+        out.writeTag("parentProtection", simplejson.dumps(cont.getAccessController().isProtected()))
+        out.writeTag("materialList", simplejson.dumps(self._generateMaterialList(cont)))
+
         if cont.getBoardNumber() != "":
             out.writeTag("board",cont.getBoardNumber())
         if cont.getTrack() != None:
@@ -633,7 +624,8 @@ class outputGenerator:
                 out.writeTag("name",l.getName())
                 out.writeTag("address",l.getAddress())
             if cont.getRoom():
-                out.writeTag("room",cont.getRoom().getName())
+                roomName = self._getRoom(cont.getRoom(), l)
+                out.writeTag("room", roomName)
                 url=RoomLinker().getURL(cont.getRoom(), l)
                 if url != "":
                     out.writeTag("roomMapURL",url)
@@ -642,8 +634,6 @@ class outputGenerator:
             out.closeTag("location")
         tzUtil = DisplayTZ(self.__aw,conf)
         tz = tzUtil.getDisplayTZ()
-
-        startDate = cont.startDate.astimezone(timezone(tz))
 
         startDate = None
         if cont.startDate:
@@ -677,6 +667,10 @@ class outputGenerator:
             modificons = 1
         out.openTag("subcontribution")
         out.writeTag("ID",subCont.getId())
+
+        out.writeTag("parentProtection", simplejson.dumps(subCont.getContribution().getAccessController().isProtected()))
+        out.writeTag("materialList", simplejson.dumps(self._generateMaterialList(subCont)))
+
         if subCont.canModify( self.__aw ) and vars and modificons:
             out.writeTag("modifyLink",vars["subContribModifyURLGen"](subCont))
         if (subCont.canModify( self.__aw ) or subCont.canUserSubmit( self.__aw.getUser())) and vars and modificons:
@@ -842,7 +836,8 @@ class outputGenerator:
                 out.writeTag("name",l.getName())
                 out.writeTag("address",l.getAddress())
             if br.getRoom():
-                out.writeTag("room",br.getRoom().getName())
+                roomName = self._getRoom(br.getRoom(), l)
+                out.writeTag("room", roomName)
                 url=RoomLinker().getURL(br.getRoom(), l)
                 if url != "":
                     out.writeTag("roomMapURL",url)
@@ -919,7 +914,8 @@ class outputGenerator:
                 loc = loc +", "+conf.getLocation().getAddress()
 
             if conf.getRoom():
-                loc = loc + ", "+conf.getRoom().getName()
+                roomName = self._getRoom(conf.getRoom(), l)
+                loc = loc + ", " + roomName
 
             if l.getName() != "":
                 out.writeTag("marc:subfield",loc,[["code","c"]])

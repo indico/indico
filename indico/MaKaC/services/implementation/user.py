@@ -17,7 +17,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.services.implementation.base import LoggedOnlyService, ProtectedService
+from MaKaC.services.implementation.base import LoggedOnlyService
 from MaKaC.services.implementation.base import ServiceBase
 
 import MaKaC.user as user
@@ -27,9 +27,24 @@ from MaKaC.common.PickleJar import DictPickler
 from MaKaC.common import info
 
 import time
-from MaKaC.fossils.user import IAvatarAllDetailsFossil, IAvatarDetailedFossil,\
-    IAvatarMinimalFossil
+from MaKaC.fossils.user import IAvatarAllDetailsFossil, IAvatarFossil
 from MaKaC.common.fossilize import fossilize
+
+from MaKaC.rb_location import CrossLocationQueries
+
+class UserComparator(object):
+
+    @staticmethod
+    def cmpUsers(x, y):
+        cmpResult = cmp(x["familyName"].lower(), y["familyName"].lower())
+        if cmpResult == 0:
+            cmpResult = cmp(x["firstName"].lower(), y["firstName"].lower())
+        return cmpResult
+
+    @staticmethod
+    def cmpGroups(x, y):
+        return cmp(x["name"].lower(), y["name"].lower())
+
 
 class UserListEvents(LoggedOnlyService):
 
@@ -128,7 +143,7 @@ class UserRemoveFromBasket(LoggedOnlyService):
             self._target.getPersonalInfo().getBasket().deleteElement(self._obj)
 
 
-class UserListBasket(ProtectedService):
+class UserListBasket(ServiceBase):
 
     """
     Service that lists the users belonging to the the user's "favorites"
@@ -136,24 +151,25 @@ class UserListBasket(ProtectedService):
     """
 
     def _checkParams(self):
-        ProtectedService._checkParams(self)
+        ServiceBase._checkParams(self)
 
         self._target = self.getAW().getUser()
-        self._detailLevel = self._params.get("detailLevel", "max")
+        self._allDetails = self._params.get("allDetails", False)
 
     def _getAnswer( self):
 
         if self._target:
             users = self._target.getPersonalInfo().getBasket().getUsers().values()
 
-            if self._detailLevel == "min":
-                fossilToUse = IAvatarMinimalFossil
-            elif self._detailLevel == "medium":
-                fossilToUse = IAvatarDetailedFossil
-            elif self._detailLevel == "max":
+            if self._allDetails:
                 fossilToUse = IAvatarAllDetailsFossil
+            else:
+                fossilToUse = IAvatarFossil
 
-            return fossilize(users, fossilToUse)
+            fossilizedResult = fossilize(users, fossilToUse)
+            fossilizedResult.sort(cmp=UserComparator.cmpUsers)
+            return fossilizedResult
+
         else:
             return None
 
@@ -229,6 +245,23 @@ class UserGetSessionLanguage(ServiceBase):
             minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
             return minfo.getLang()
 
+class UserCanBook(LoggedOnlyService):
+
+    def _checkParams(self):
+        LoggedOnlyService._checkParams(self)
+        self._user = self.getAW().getUser()
+        self._roomID = int(self._params.get("roomID", ""))
+        self._roomLocation = self._params.get("roomLocation", "")
+        self._room = CrossLocationQueries.getRooms(roomID = self._roomID, location = self._roomLocation)
+
+    def _getAnswer( self):
+        if self._user and self._room:
+            if not self._room.isActive and not self._user.isAdmin():
+                return False
+            if not self._room.canBook( self._user ) and not self._room.canPrebook( self._user ):
+                return False
+            return True
+        return False
 
 methodMap = {
     "event.list": UserListEvents,
@@ -240,5 +273,6 @@ methodMap = {
     "personalinfo.set": UserSetPersonalInfo,
     "timezone.get": UserGetTimezone,
     "session.timezone.get": UserGetSessionTimezone,
-    "session.language.get": UserGetSessionLanguage
+    "session.language.get": UserGetSessionLanguage,
+    "canBook": UserCanBook
 }

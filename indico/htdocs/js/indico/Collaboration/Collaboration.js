@@ -105,22 +105,32 @@ var beforeNow = function(date) {
 /**
  * Builds a parameter manager to verify a form's parameter
  * @param {String} pluginName The name of the plugin that the form belongs to.
- * @param {Array of nodes} formNodes An array of nodes such as the one that can be obtained with
- *                                   var formNodes = IndicoUtil.findFormFields(containerElement)
  * @param {object} values The values of the input nodes of the form. This is needed because checks
  *                        on some fields depend on values of others.
- * @return The parameterManager object so that we can call parameterManager.check() later.
  */
-var buildParameterManager = function(pluginName, formNodes, values) {
-    var parameterManager = new IndicoUtil.parameterManager();
-    var checks = codes[pluginName].checkParams();
-    each(formNodes, function(node){
-        var checkData = checks[node.name]
+type("CSParameterManager", [], {
+
+    __addComponent: function(component) {
+        var self = this;
+
+        var name;
+        var componentToAdd;
+        if (component.ErrorAware) {
+            name = component.getName();
+            componentToAdd = component;
+        } else if (isDom(component)){
+            name = component.name;
+            componentToAdd = $E(component);
+        } else {
+            return;
+        }
+        var checkData = this.checks[name];
+
         if (exists(checkData)) {
             var customCheckFunction = checkData[2];
             if (exists(customCheckFunction)) {
-                parameterManager.add($E(node), checkData[0], checkData[1], function(value){
-                    var errors = checkData[2](value, values);
+                this.parameterManager.add(componentToAdd, checkData[0], checkData[1], function(value){
+                    var errors = checkData[2](value, self.values);
                     if (errors.length == 0) {
                         return null;
                     } else {
@@ -128,12 +138,43 @@ var buildParameterManager = function(pluginName, formNodes, values) {
                     }
                 });
             } else {
-                parameterManager.add($E(node), checkData[0], checkData[1]);
+                this.parameterManager.add(componentToAdd, checkData[0], checkData[1]);
             }
         }
-    });
-    return parameterManager;
-};
+    },
+
+    /**
+     * Adds component(s) to the inner parameter manager, looking for what checks should be done
+     * in the corresponding plugin code.
+     * @param {object} formNodes An array of nodes or ErrorAware components.
+     *                           For example, an array of nodes can be obtained with
+     *                           var formNodes = IndicoUtil.findFormFields(containerElement)
+     */
+    add: function(components) {
+        var self = this;
+
+        if(!isArrayOrListable(components)) {
+            components = [components];
+        }
+        each(components, function(component) {
+            self.__addComponent(component);
+        });
+    },
+
+    /**
+     * Executes check() on the inner parameterManager
+     */
+    check: function() {
+        return this.parameterManager.check();
+    }
+},
+    function(pluginName, values) {
+        this.parameterManager = new IndicoUtil.parameterManager();
+        this.values = values;
+        this.checks = codes[pluginName].checkParams();
+    }
+);
+
 
 var formatDateStringCS = function(dateString) {
     return (dateString.substring(0,10) + ' at ' + dateString.substring(11, 16));
@@ -507,7 +548,7 @@ var bookingTemplateS = function(booking) {
  * refreshBookingS (for bookings of plugins who allow only one booking)
  */
 var refreshBooking = function(booking) {
-    if (booking.allowMultiple) {
+    if (booking.isAllowMultiple) {
         refreshBookingM(booking);
     } else {
         refreshBookingS(booking);
@@ -686,7 +727,7 @@ var rejectBooking = function(booking, conferenceId) {
         var span2 = Html.span('', "The reason will be displayed to the user.");
 
         // We construct the "ok" button and what happens when it's pressed
-        var okButton = Html.button('', "OK");
+        var okButton = Html.input('button', '', "OK");
         okButton.observeClick(function() {
             var killProgress = IndicoUI.Dialogs.Util.progress("Rejecting booking...");
             var reason = textarea.get();
@@ -712,7 +753,7 @@ var rejectBooking = function(booking, conferenceId) {
         });
 
         // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
-        var cancelButton = Html.button({style:{marginLeft:pixels(5)}}, "Cancel Rejection");
+        var cancelButton = Html.input('button', {style:{marginLeft:pixels(5)}}, "Cancel Rejection");
         cancelButton.observeClick(function(){
             self.close();
         });
@@ -854,10 +895,10 @@ var showAllInfoRows = function(showAll) {
 
 var dateChangeHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px">' +
-            $T('By activating this option, you ensure that') + '<br \/>' +
-            $T('if a manager changes the event\'s dates,') + '<br \/>' +
-            $T('this booking\'s dates change accordingly.') + '<br \/>' +
+        '<div style="padding:3px; width: 200px;"">' +
+        $T('This option ensures that ' +
+                'if a manager changes the event\'s dates, ' +
+                'this booking\'s dates change accordingly. ') +
         '<\/div>');
 };
 
@@ -867,12 +908,12 @@ var dateChangeHelpPopup = function(event) {
 
 var dateChangeDisabledHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px">' +
-            $T('By activating this option, you ensure that') + '<br \/>' +
-            $T('if a manager changes the event\'s dates,') + '<br \/>' +
-            $T('this booking\'s dates change accordingly.') + '<br \/>' +
-            $T('The event already took place,') + '<br \/>' +
-            $T('so you cannot activate this option.') + '<br \/>' +
+        '<div style="padding:3px; width: 300px;"">' +
+            $T('This option ensures that ' +
+            'if a manager changes the event\'s dates, ' +
+            'this booking\'s dates change accordingly. ' +
+            'The event already took place, ' +
+            'so you cannot activate this option.') +
         '<\/div>');
 };
 
@@ -881,10 +922,8 @@ var dateChangeDisabledHelpPopup = function(event) {
  */
 var hiddenHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px">' +
-            $T('By activating this option, you keep') + '<br \/>' +
-            $T('the booking from appearing in the') + '<br \/>' +
-            $T('event\'s display page.') + '<br \/>' +
+        '<div style="padding:3px; width: 150px;"">' +
+            $T('This option hides the booking in the event page.') +
         '<\/div>');
 };
 
@@ -915,227 +954,242 @@ var sanitizationError = function(invalidFields) {
  * @param {object} booking If 'create' mode, leave to null. If 'edit' mode, the booking object
  * @param {string} conferenceId the conferenceId of the current event
  */
-type ("BookingPopup", ["ExclusivePopup"],
+type ("BookingPopup", ["ExclusivePopupWithButtons"],
     {
         switchToBasicTab: function() {
             if (this.tabControl.getSelectedTab() === 'Advanced') {
                 this.tabControl.setSelectedTab('Basic');
             }
         },
+
+        /**
+         * Opens the popup, but does NOT call postdraw()
+         * Necessary so that we can call plugin's onCreate() or onEdit() between draw() and postdraw()
+         */
+        open: function() {
+            $E(document.body).append(this.draw());
+            this.isopen = true;
+        },
+
         draw: function() {
             var self = this;
 
             // We get the form HTML
-            var form = Html.div();
-            form.dom.innerHTML = forms[self.bookingType];
+            this.basicTabForm = Html.div();
+            this.basicTabForm.dom.innerHTML = forms[self.bookingType][0];
 
-            var formNodes = IndicoUtil.findFormFields(form);
-            var values = {};
+            this.advancedTabForm = Html.div();
+            this.advancedTabForm.dom.innerHTML = forms[self.bookingType][1];
+
+            // We scan the input nodes inside the dialog
+            this.components = IndicoUtil.findFormFields(this.basicTabForm, this.advancedTabForm);
+
+            // We initialize the parameter manager in order to make checks on the fields
+            this.__buildParameterManager();
+
+            // We construct the "save" button and what happens when it's pressed
+            var saveButton = Html.input('button', null, $T("Save"));
+            saveButton.observeClick(function(){
+                self.__save();
+            });
+
+            // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
+            var cancelButton = Html.input('button', {style:{marginLeft:pixels(5)}}, $T("Cancel"));
+            cancelButton.observeClick(function(){
+                self.close();
+            });
+
+            var buttonDiv = Html.div({}, saveButton, cancelButton);
+
+            var width = 600;
+            if (pluginHasFunction(self.bookingType, "getPopupWidth")) {
+                var width = codes[self.bookingType].getPopupWidth();
+                width = width > 400 ? width : 400;
+            }
+
+            this.tabControl = new TabWidget([[$T("Basic"), this.basicTabForm], [$T("Advanced"), this.advancedTabForm]], width, null);
+
+            return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.tabControl.draw(), buttonDiv,
+                    {backgroundColor: "#FFFFFF"});
+        },
+
+        postDraw: function() {
+
+            // If we are modifying a booking, we put the booking's values the dialog's input fields
+            if (this.popupType === 'edit') {
+                IndicoUtil.setFormValues(this.components, this.booking.bookingParams);
+            }
+
+            if (exists($E('dateSyncHelpImg'))){
+                $E('dateSyncHelpImg').dom.onmouseover = dateChangeHelpPopup;
+            }
+
+            if (this.popupType === 'edit' && !this.booking.canBeNotifiedOfEventDateChanges) {
+                if (exists($E('dateSyncCheckBox'))) {
+                    $E('dateSyncCheckBox').dom.disabled = true;
+                    $E('dateSyncCheckBox').dom.className = 'disabled';
+                }
+                if (exists($E('dateSyncHelpImg'))){
+                    $E('dateSyncHelpImg').dom.onmouseover = dateChangeDisabledHelpPopup;
+                }
+            }
+            if(exists($E('hiddenHelpImg'))) {
+                $E('hiddenHelpImg').dom.onmouseover = hiddenHelpPopup;
+            }
+
+            this.tabControl.heightToTallestTab();
+            this.ExclusivePopupWithButtons.prototype.postDraw.call(this);
 
             // We put calendar widgets on the date fields
-            if (pluginHasFunction(self.bookingType, "getDateFields")) {
-                var fieldList = codes[self.bookingType].getDateFields();
+            this.__drawCalendarWidgets();
+        },
+
+        /**
+         * Adds a HTML node or an ErrorAware widget to the parameter manager
+         */
+        addComponent: function(component) {
+            this.components.push(component);
+            this.parameterManager.add(component);
+        },
+
+        __save: function(){
+            var self = this;
+
+            IndicoUtil.getFormValues(this.components, this.values);
+
+            // We check if there are errors
+            var checkOK = true;
+            if (this.needsCheck) {
+                checkOK = this.parameterManager.check();
+            }
+
+            // If there are no errors, the booking is sent to the server
+            if (checkOK) {
+                var onSaveResult = true;
+                if (pluginHasFunction(self.bookingType, "onSave")) {
+                    onSaveResult = codes[this.bookingType].onSave(this.values);
+                }
+
+                if (onSaveResult) {
+                    var killProgress = IndicoUI.Dialogs.Util.progress($T("Saving your booking..."));
+
+                    if (this.popupType === 'create') {
+                        indicoRequest(
+                            'collaboration.createCSBooking',
+                            {
+                                conference: this.conferenceId,
+                                type: this.bookingType,
+                                bookingParams: this.values
+                            },
+                            function(result,error) {
+                                if (!error) {
+                                    // If the server found no problems, a booking object is returned in the result.
+                                    // We add it to the watchlist and create an iframe.
+                                    if (result.error) {
+                                        killProgress();
+                                        self.switchToBasicTab();
+                                        if (result._type === 'CSSanitizationError') {
+                                            sanitizationError(result.invalidFields);
+                                        } else {
+                                            codes[self.bookingType].errorHandler('create', result);
+                                        }
+                                    } else {
+                                        hideAllInfoRows(false);
+                                        showInfo[result.id] = true; // we initialize the show info boolean for this booking
+                                        bookings.append(result);
+                                        showAllInfoRows(false);
+                                        addIFrame(result);
+                                        refreshStartAllStopAllButtons();
+                                        refreshTableHead();
+                                        if (pluginHasFunction(self.bookingType, 'postCreate')) {
+                                            codes[self.bookingType].postCreate(result);
+                                        }
+                                        killProgress();
+                                        hightlightBookingM(result);
+                                        self.close();
+
+                                    }
+                                } else {
+                                    killProgress();
+                                    self.close();
+                                    IndicoUtil.errorReport(error);
+                                }
+                            }
+                        );
+
+                    } else if (this.popupType === 'edit') {
+                        indicoRequest(
+                            'collaboration.editCSBooking',
+                            {
+                                conference: self.conferenceId,
+                                bookingId: self.booking.id,
+                                bookingParams: self.values
+                            },
+                            function(result,error) {
+                                if (!error) {
+                                    if (result.error) {
+                                        killProgress();
+                                        self.switchToBasicTab();
+                                        if (result._type === 'CSSanitizationError') {
+                                            sanitizationError(result.invalidFields);
+                                        } else {
+                                            codes[self.bookingType].errorHandler('edit', result);
+                                        }
+                                    } else {
+                                        if (pluginHasFunction(self.bookingType, 'postEdit')) {
+                                            codes[self.bookingType].postEdit(result);
+                                        }
+                                        showInfo[result.id] = true;
+                                        refreshBooking(result);
+                                        killProgress();
+                                        self.close();
+                                    }
+                                } else {
+                                    killProgress();
+                                    self.close();
+                                    IndicoUtil.errorReport(error);
+                                }
+                            }
+                        );
+                    }
+                }
+            } else { // Parameter manager detected errors
+                this.switchToBasicTab();
+            }
+        },
+
+        __buildParameterManager: function() {
+            this.needsCheck = pluginHasFunction(this.bookingType, "checkParams");
+
+            if (this.needsCheck) {
+                this.parameterManager = new CSParameterManager(this.bookingType, this.values);
+                this.parameterManager.add(this.components);
+            } else {
+                this.parameterManager = null;
+            }
+
+        },
+
+        __drawCalendarWidgets: function() {
+
+            if (pluginHasFunction(this.bookingType, "getDateFields")) {
+                var fieldList = codes[this.bookingType].getDateFields();
                 var fieldDict = {};
                 each(fieldList, function(name){
                     fieldDict[name] = true;
                 });
-                each(formNodes, function(node){
+                each(this.components, function(node){
                     if (node.name in fieldDict) {
                         IndicoUI.Widgets.Generic.input2dateField($E(node), true, null)
                     }
                 });
             }
-
-            // If we are modifying a booking, we put the booking's values in the form in the Basic tab
-            if (self.popupType === 'edit') {
-                IndicoUtil.setFormValues(formNodes, self.booking.bookingParams);
-            }
-
-            // We initialize the parameter manager in order to make checks on the fields
-            var needsCheck = pluginHasFunction (self.bookingType, "checkParams");
-            var parameterManager;
-            if (needsCheck) {
-                parameterManager = buildParameterManager(self.bookingType, formNodes, values);
-            }
-
-            var advancedDiv = Html.div();
-
-            // If this kind of booking can be notified of date changes, we offer a checkbox (checked by default)
-            if (canBeNotifiedOnDateChanges[self.bookingType]) {
-
-                // If this booking in particular cannot be notified of date changes any more, we disable the checkbox
-                var dateCheckBox = Html.checkbox({id : "dateCheckBox"});
-                var dateLabel = Html.label({style: {fontWeight: "normal"}}, $T("Keep booking synchronized with event"));
-                dateLabel.dom.htmlFor = "dateCheckBox";
-                var dateChangeHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
-                dateChangeHelpImg.dom.onmouseover = dateChangeHelpPopup;
-                var dateChangeDiv = Html.div({style : {display: "block", marginTop:pixels(10), marginLeft: pixels(50)}},
-                        dateCheckBox, dateLabel, dateChangeHelpImg);
-
-                if (self.popupType === 'create') {
-                    dateCheckBox.dom.checked = true;
-                } else if (self.popupType === 'edit'){
-                    dateCheckBox.dom.checked = self.booking.bookingParams["notifyOnDateChanges"];
-                    if (!self.booking.canBeNotifiedOfEventDateChanges) {
-                        dateCheckBox.dom.disabled = true;
-                        dateLabel.dom.className = 'disabled';
-                        dateChangeHelpImg.dom.onmouseover = dateChangeDisabledHelpPopup;
-                    }
-                }
-
-                advancedDiv.append(dateChangeDiv);
-            }
-
-            // Privacy option
-            var hiddenCheckBox = Html.checkbox({id : "hiddenCheckBox"});
-            var hiddenLabel = Html.label({style: {fontWeight: "normal"}}, $T("Keep this booking hidden"));
-            hiddenLabel.dom.htmlFor = "hiddenCheckBox";
-            var hiddenHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
-            hiddenHelpImg.dom.onmouseover = hiddenHelpPopup;
-            var hiddenDiv = Html.div({style : {display: "block", marginTop:pixels(10), marginLeft: pixels(50)}},
-                    hiddenCheckBox, hiddenLabel, hiddenHelpImg);
-            if (self.popupType === 'edit') {
-                hiddenCheckBox.dom.checked = self.booking.bookingParams["hidden"];
-            }
-            advancedDiv.append(hiddenDiv);
-
-            // We construct the "save" button and what happens when it's pressed
-            var saveButton = Html.button(null, "Save");
-            saveButton.observeClick(function(){
-
-                // We retrieve the values from the form
-                IndicoUtil.getFormValues(formNodes, values);
-                if (exists (dateCheckBox)) {
-                    values["notifyOnDateChanges"] = dateCheckBox.dom.checked;
-                }
-                values["hidden"] = hiddenCheckBox.dom.checked;
-
-                // We check if there are errors
-                var checkOK = true;
-                if (needsCheck) {
-                    checkOK = parameterManager.check();
-                }
-
-                // If there are no errors, the booking is sent to the server
-                if (checkOK) {
-                    var onSaveResult = true;
-                    if (pluginHasFunction(self.bookingType, "onSave")) {
-                        onSaveResult = codes[self.bookingType].onSave(values);
-                    }
-
-                    if (onSaveResult) {
-                        var killProgress = IndicoUI.Dialogs.Util.progress("Saving your booking...");
-
-                        if (self.popupType === 'create') {
-                            indicoRequest(
-                                'collaboration.createCSBooking',
-                                {
-                                    conference: self.conferenceId,
-                                    type: self.bookingType,
-                                    bookingParams: values
-                                },
-                                function(result,error) {
-                                    if (!error) {
-                                        // If the server found no problems, a booking object is returned in the result.
-                                        // We add it to the watchlist and create an iframe.
-                                        if (result.error) {
-                                            killProgress();
-                                            self.switchToBasicTab();
-                                            if (result.origin === 'sanitization') {
-                                                sanitizationError(result.invalidFields);
-                                            } else {
-                                                codes[self.bookingType].errorHandler('create', result);
-                                            }
-                                        } else {
-                                            hideAllInfoRows(false);
-                                            showInfo[result.id] = true; // we initialize the show info boolean for this booking
-                                            bookings.append(result);
-                                            showAllInfoRows(false);
-                                            addIFrame(result);
-                                            refreshStartAllStopAllButtons();
-                                            refreshTableHead();
-                                            if (pluginHasFunction(self.bookingType, 'postCreate')) {
-                                                codes[self.bookingType].postCreate(result);
-                                            }
-                                            killProgress();
-                                            hightlightBookingM(result);
-                                            self.close();
-
-                                        }
-                                    } else {
-                                        killProgress();
-                                        self.close();
-                                        IndicoUtil.errorReport(error);
-                                    }
-                                }
-                            );
-
-                        } else if (self.popupType === 'edit') {
-                            indicoRequest(
-                                'collaboration.editCSBooking',
-                                {
-                                    conference: self.conferenceId,
-                                    bookingId: self.booking.id,
-                                    bookingParams: values
-                                },
-                                function(result,error) {
-                                    if (!error) {
-                                        if (result.error) {
-                                            killProgress();
-                                            self.switchToBasicTab();
-                                            if (result.origin === 'sanitization') {
-                                                sanitizationError(result.invalidFields);
-                                            } else {
-                                                codes[self.bookingType].errorHandler('edit', result);
-                                            }
-                                        } else {
-                                            if (pluginHasFunction(self.bookingType, 'postEdit')) {
-                                                codes[self.bookingType].postEdit(result);
-                                            }
-                                            showInfo[result.id] = true;
-                                            refreshBooking(result);
-                                            killProgress();
-                                            self.close();
-                                        }
-                                    } else {
-                                        killProgress();
-                                        self.close();
-                                        IndicoUtil.errorReport(error);
-                                    }
-                                }
-                            );
-                        }
-                    }
-                } else { // Parameter manager detected errors
-                    self.switchToBasicTab();
-                }
-            });
-
-            // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
-            var cancelButton = Html.button({style:{marginLeft:pixels(5)}}, "Cancel");
-            cancelButton.observeClick(function(){
-                self.close();
-            });
-
-            var buttonDiv = Html.div('dialogButtons', saveButton, cancelButton)
-
-            if (pluginHasFunction(self.bookingType, "getPopupDimensions")) {
-                var dimensions = codes[self.bookingType].getPopupDimensions();
-                var width = dimensions['width'];
-                var height = dimensions['height'];
-                width = width > 400 ? width : 400;
-                height = height > 200 ? height : 0;
-            } else {
-                var width = 600;
-                var height = 0;
-            }
-
-            var tabControl = new TabWidget([["Basic", form], ["Advanced", advancedDiv]], width, height);
-            this.tabControl = tabControl;
-
-            return this.ExclusivePopup.prototype.draw.call(this, Widget.block([tabControl.draw(), buttonDiv]));
         }
     },
+
+    /**
+     * Constructor
+     */
     function(popupType, pluginType, booking, conferenceId) {
         this.popupType = popupType;
         this.bookingType = pluginType;
@@ -1146,9 +1200,16 @@ type ("BookingPopup", ["ExclusivePopup"],
             var title = this.bookingType + ' booking modification';
         }
         this.conferenceId = conferenceId;
-        this.ExclusivePopup(title, positive);
+        this.ExclusivePopupWithButtons(title, positive);
+
+        // We initialize the dictionary where the values sent to the server
+        // will be sent on save
+        this.values = {};
+
+        this.extraComponents = [];
     }
 );
+
 
 
 /**
@@ -1162,8 +1223,9 @@ var createBooking = function(pluginName, conferenceId) {
     var popup = new BookingPopup('create', pluginName, null, conferenceId);
     popup.open();
     if (pluginHasFunction(pluginName, "onCreate")) {
-        codes[pluginName].onCreate();
+        codes[pluginName].onCreate(popup);
     }
+    popup.postDraw();
 }
 
 /**
@@ -1177,8 +1239,9 @@ var editBooking = function(booking, conferenceId) {
     var popup = new BookingPopup('edit', booking.type, booking, conferenceId);
     popup.open();
     if (pluginHasFunction(booking.type, "onEdit")) {
-        codes[booking.type].onEdit(booking);
+        codes[booking.type].onEdit(booking, popup);
     }
+    popup.postDraw();
 }
 
 /**
@@ -1192,64 +1255,46 @@ var editBooking = function(booking, conferenceId) {
  */
 var removeBooking = function(booking, conferenceId) {
 
-    var title = "Remove booking";
+    var confirmHandler = function(confirm) { if (confirm) {
 
-    var popup = new ExclusivePopup(title, function(){return true;});
+        var killProgress = IndicoUI.Dialogs.Util.progress($T("Removing your booking..."));
 
-    popup.draw = function(){
-        var self = this;
-        var span = Html.span("", "Are you sure you want to remove that " + booking.type + " booking?");
-
-        // We construct the "ok" button and what happens when it's pressed
-        var okButton = Html.button(null, "Remove");
-        okButton.observeClick(function() {
-            var killProgress = IndicoUI.Dialogs.Util.progress("Removing your booking...");
-
-            indicoRequest(
-                'collaboration.removeCSBooking',
-                {
-                    conference: conferenceId,
-                    bookingId: booking.id
-                },
-                function(result,error) {
-                    if (!error) {
-                        // If the server found no problems, we remove the booking from the watchlist and remove the corresponding iframe.
-                        if (result && result.error) {
-                            killProgress();
-                            codes[booking.type].errorHandler('remove', result);
-                        } else {
-                            hideAllInfoRows(false);
-                            bookings.removeAt(getBookingIndexById(booking.id))
-                            showAllInfoRows(false);
-                            removeIFrame(booking);
-                            refreshStartAllStopAllButtons();
-                            refreshTableHead();
-
-                            if (pluginHasFunction(booking.type, 'postDelete')) {
-                                codes[booking.type].postDelete(result);
-                            }
-                        }
+        indicoRequest(
+            'collaboration.removeCSBooking',
+            {
+                conference: conferenceId,
+                bookingId: booking.id
+            },
+            function(result,error) {
+                if (!error) {
+                    // If the server found no problems, we remove the booking from the watchlist and remove the corresponding iframe.
+                    if (result && result.error) {
                         killProgress();
+                        codes[booking.type].errorHandler('remove', result);
                     } else {
-                        killProgress();
-                        IndicoUtil.errorReport(error);
+                        hideAllInfoRows(false);
+                        bookings.removeAt(getBookingIndexById(booking.id))
+                        showAllInfoRows(false);
+                        removeIFrame(booking);
+                        refreshStartAllStopAllButtons();
+                        refreshTableHead();
+
+                        if (pluginHasFunction(booking.type, 'postDelete')) {
+                            codes[booking.type].postDelete(result);
+                        }
                     }
+                    killProgress();
+                } else {
+                    killProgress();
+                    IndicoUtil.errorReport(error);
                 }
-            );
-            self.close();
-        });
+            }
+        );
+    }};
 
-        // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
-        var cancelButton = Html.button({style:{marginLeft:pixels(5)}}, "Cancel");
-        cancelButton.observeClick(function(){
-            self.close();
-        });
-
-        var buttonDiv = Html.div({style:{textAlign:"center", marginTop:pixels(10)}}, okButton, cancelButton)
-
-        return this.ExclusivePopup.prototype.draw.call(this, Widget.block([span, Html.br(), buttonDiv]));
-    };
-    popup.open();
+    IndicoUI.Dialogs.Util.confirm($T("Remove booking"),
+            Html.div({style:{paddingTop:pixels(10), paddingBottom:pixels(10)}}, $T("Are you sure you want to remove that ") + booking.type + $T(" booking?")),
+            confirmHandler);
 };
 
 
@@ -1352,7 +1397,8 @@ var sendRequest = function(pluginName, conferenceId) {
     var needsCheck = pluginHasFunction (pluginName, "checkParams");
     var parameterManager;
     if (needsCheck) {
-        parameterManager = buildParameterManager(pluginName, formNodes, values);
+        parameterManager = new CSParameterManager(pluginName, values);
+        parameterManager.add(formNodes);
     }
 
     // We check if there are errors
@@ -1363,12 +1409,12 @@ var sendRequest = function(pluginName, conferenceId) {
 
     // If there are no errors, the booking is sent to the server
     if (checkOK) {
-        var killProgress = IndicoUI.Dialogs.Util.progress("Sending your request...");
+        var killProgress = IndicoUI.Dialogs.Util.progress($T("Sending your request..."));
         var commonHandler = function(result,error) {
             if (!error) {
                 if (result.error) {
                     killProgress();
-                    if (result.origin === 'sanitization') {
+                    if (result._type === 'CSSanitizationError') {
                         sanitizationError(result.invalidFields);
                     } else {
                         codes[pluginName].errorHandler(exists(singleBookings[pluginName]) ? 'edit' : 'create', result)
@@ -1431,7 +1477,7 @@ var sendRequest = function(pluginName, conferenceId) {
             }
         });
         // If there are problems, we show them
-        CSErrorPopup("Errors detected", allErrors, "The corresponding fields have been marked in red");
+        CSErrorPopup($T("Errors detected"), allErrors, $T("The corresponding fields have been marked in red."));
     }
 };
 
@@ -1439,17 +1485,17 @@ var withdrawRequest = function(pluginName, conferenceId) {
 
     if (exists(singleBookings[pluginName])) {
         var self = this;
-        var title = "Withdraw request";
+        var title = $T("Withdraw request");
 
         var popup = new ExclusivePopup(title, function(){return true;});
         popup.draw = function(){
             var self = this;
-            var span = Html.span("", "Are you sure you want to withdraw the request?");
+            var span = Html.span("", $T("Are you sure you want to withdraw the request?"));
 
             // We construct the "ok" button and what happens when it's pressed
-            var okButton = Html.button(null, "Withdraw");
+            var okButton = Html.input('button', null, "Withdraw");
             okButton.observeClick(function() {
-                var killProgress = IndicoUI.Dialogs.Util.progress("Withdrawing your request...");
+                var killProgress = IndicoUI.Dialogs.Util.progress($T("Withdrawing your request..."));
 
                 indicoRequest(
                     'collaboration.removeCSBooking',
@@ -1461,7 +1507,7 @@ var withdrawRequest = function(pluginName, conferenceId) {
                         if (!error) {
                             if (result.error) {
                                 killProgress();
-                                if (result.origin === 'sanitization') {
+                                if (result._type === 'CSSanitizationError') {
                                     sanitizationError(result.invalidFields);
                                 } else {
                                     codes[pluginName].errorHandler('remove', result);
@@ -1489,7 +1535,7 @@ var withdrawRequest = function(pluginName, conferenceId) {
             });
 
             // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
-            var cancelButton = Html.button({style:{marginLeft:pixels(5)}}, "Cancel");
+            var cancelButton = Html.input('button', {style:{marginLeft:pixels(5)}}, $T("Cancel"));
             cancelButton.observeClick(function(){
                 self.close();
             });
@@ -1505,8 +1551,8 @@ var withdrawRequest = function(pluginName, conferenceId) {
 var buildShowHideButton = function(pluginName) {
     var showHideButton = IndicoUI.Buttons.customTextSwitchButton(
         true,
-        "Show",
-        "Hide",
+        $T("Show"),
+        $T("Hide"),
         null,
         function() {IndicoUI.Effect.appear($E(pluginName + "Div"), '');},
         function() {IndicoUI.Effect.disappear($E(pluginName + "Div"), '');}

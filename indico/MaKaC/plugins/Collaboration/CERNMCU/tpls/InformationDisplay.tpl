@@ -1,31 +1,46 @@
-<table>
+<table cellpadding="0" cellspacing="0">
     <tbody>
+        <tr>
+            <td class="collaborationConfDisplayInfoLeftCol">
+                <%= _('Name:')%>
+            </td>
+            <td class="collaborationConfDisplayInfoRightCol">
+                <%= Booking._bookingParams["name"] %>
+            </td>
+        </tr>
         <% if Booking.getHasPin(): %>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <span><%= _('Protection')%>:</span>
+                <%= _('PIN:')%>
             </td>
+            <% if Booking.getBookingParamByName("displayPin"): %>
             <td class="collaborationConfDisplayInfoRightCol">
-                <%= _("This conference is protected by a PIN.") %>      
+                <%= Booking.getPin() %>
             </td>
+            <% end %>
+            <% else: %>
+            <td class="collaborationConfDisplayInfoRightCol">
+                <%= _("This conference is protected by a PIN.") %>
+            </td>
+            <% end %>
         </tr>
         <% end %>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <span><%= _('Description')%>:</span>
+                <%= _('Description:')%>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                <%= Booking._bookingParams["description"] %>      
+                <%= Booking._bookingParams["description"] %>
             </td>
         </tr>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <span><%= _('Participants')%>:</span>
+                <%= _('Participants:')%>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
                 <% if Booking.getParticipantList(): %>
                     <% for p in Booking.getParticipantList(): %>
-                        <div><%= p.getDisplayName() %></div>
+                        <div><%= p.getDisplayName(truncate=False) %></div>
                     <% end %>
                 <% end %>
                 <% else: %>
@@ -35,7 +50,7 @@
         </tr>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <span><%= _('How to join')%>:</span>
+                <%= _('How to join:')%>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
                 <% bookingIdInMCU = str(Booking._bookingParams["id"]) %>

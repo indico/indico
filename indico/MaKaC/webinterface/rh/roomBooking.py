@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: roomBooking.py,v 1.19 2009/06/02 14:33:23 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -41,8 +40,8 @@ from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum
 from MaKaC.rb_factory import Factory
 from MaKaC.rb_location import CrossLocationQueries, RoomGUID, Location
 from MaKaC.rb_tools import intd, FormMode
-from MaKaC import plugins
 from MaKaC.errors import MaKaCError
+from MaKaC.plugins.pluginLoader import PluginLoader
 
 class CandidateDataFrom( object ):
     DEFAULTS, PARAMS, SESSION = xrange( 3 )
@@ -786,7 +785,7 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
         self._autoCriteria = False
         if params.get( "autoCriteria" ) == "True" or not resvEx.startDT:
             now = datetime.now()
-            after = now + timedelta( 30 ) # 1 month later
+            after = now + timedelta( 7 ) # 1 week later
 
             resvEx.startDT = datetime( now.year, now.month, now.day, 0, 0, 0 )
             resvEx.endDT = datetime( after.year, after.month, after.day, 23, 59, 00 )
@@ -1015,6 +1014,23 @@ class RHRoomBookingBookingForm( RHRoomBookingBase ):
                 self._loadResvCandidateFromSession( candResv, params )
 
         self._errors = session.getVar( "errors" )
+
+        # Sets the dates if needed
+        dayD = params.get("day")
+        monthM = params.get("month")
+        yearY = params.get("year")
+
+        if dayD != None and dayD.isdigit() and \
+           monthM != None and monthM.isdigit() and \
+           yearY != None and yearY.isdigit():
+            # If the dates aren't set
+            if candResv.startDT == None:
+                candResv.startDT = datetime(int(yearY), int(monthM), int(dayD), 8, 30)
+                candResv.endDT = datetime(int(yearY), int(monthM), int(dayD), 17, 30)
+            else :
+                candResv.startDT = candResv.startDT.replace(year=int(yearY), month=int(monthM), day=int(dayD))
+                candResv.endDT = candResv.endDT.replace(year=int(yearY), month=int(monthM), day=int(dayD))
+
         self._candResv = candResv
 
         self._clearSessionState()
@@ -1196,11 +1212,13 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
                         session.setVar( "title", 'You have successfully made a <span style="color: Red;">PRE</span>-booking.' )
                         session.setVar( "description", 'NOTE: PRE-bookings are subject to acceptance or rejection. Expect an e-mail with acceptance/rejection information.' )
                 elif self._formMode == FormMode.MODIF:
+                    self._orig_candResv.unindexDayReservations()
                     if self._forceAddition:
                         self._loadResvCandidateFromSession( self._orig_candResv, self._params )
                     else:
                         self._loadResvCandidateFromParams( self._orig_candResv, self._params )
                     self._orig_candResv.update()
+                    self._orig_candResv.indexDayReservations()
                     self._emailsToBeSent += self._orig_candResv.notifyAboutUpdate()
                     session.setVar( "title", 'Booking updated.' )
                     session.setVar( "description", 'Please review details below.' )
@@ -1445,7 +1463,7 @@ class RHRoomBookingCancelBooking( RHRoomBookingBase ):
         # Booking deletion is always possible - just delete
         self._emailsToBeSent = []
         self._resv.cancel()    # Just sets isCancel = True
-        self._resv.update(udpateReservationIndex=False)
+        self._resv.update()
         self._emailsToBeSent += self._resv.notifyAboutCancellation()
 
         self._websession.setVar( 'actionSucceeded', True )
@@ -1477,7 +1495,7 @@ class RHRoomBookingCancelBookingOccurrence( RHRoomBookingBase ):
     def _process( self ):
         self._emailsToBeSent = []
         self._resv.excludeDay( self._date, unindex=True )
-        self._resv.update(udpateReservationIndex=False)
+        self._resv.update()
         self._emailsToBeSent += self._resv.notifyAboutCancellation( date = self._date )
 
         self._websession.setVar( 'actionSucceeded', True )
@@ -1510,7 +1528,7 @@ class RHRoomBookingRejectBooking( RHRoomBookingBase ):
     def _process( self ):
         self._emailsToBeSent = []
         self._resv.reject()    # Just sets isRejected = True
-        self._resv.update(udpateReservationIndex=False)
+        self._resv.update()
         self._emailsToBeSent += self._resv.notifyAboutRejection()
 
         self._websession.setVar( 'actionSucceeded', True )
@@ -1589,7 +1607,7 @@ class RHRoomBookingAcceptBooking( RHRoomBookingBase ):
         if len( self._resv.getCollisions( sansID = self._resv.id ) ) == 0:
             # No conflicts
             self._resv.isConfirmed = True
-            self._resv.update(False)
+            self._resv.update()
             self._emailsToBeSent += self._resv.notifyAboutConfirmation()
 
             session.setVar( 'actionSucceeded', True )
@@ -1681,7 +1699,7 @@ class RHRoomBookingSaveLocation( RHRoomBookingAdminBase ):
         self._locationName = params["newLocationName"].strip()
         self._pluginClass = None
         name = params.get("pluginName","default")
-        plugs = plugins.getPluginsByType("RoomBooking")
+        plugs = PluginLoader.getPluginsByType("RoomBooking")
         for plug in plugs:
             if plug.pluginName == name:
                 self._pluginClass = plug.roombooking.getRBClass()
@@ -1893,7 +1911,7 @@ class RHRoomBookingRejectBookingOccurrence( RHRoomBookingBase ):
     def _process( self ):
         self._emailsToBeSent = []
         self._resv.excludeDay( self._date, unindex=True )
-        self._resv.update(udpateReservationIndex=False)
+        self._resv.update()
         self._emailsToBeSent += self._resv.notifyAboutRejection( date = self._date, reason = self._rejectionReason )
 
         self._websession.setVar( 'actionSucceeded', True )

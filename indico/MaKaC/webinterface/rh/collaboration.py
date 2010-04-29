@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: collaboration.py,v 1.13 2009/04/28 14:08:41 dmartinc Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -36,8 +35,7 @@ class RCCollaborationAdmin(object):
         """ Returns True if the user is a Server Admin or a Collaboration admin
             request: an RH or Service object
             user: an Avatar object
-            If user is not None, the request object will be used to check the user's privileges.
-            Otherwise the user will be retrieved from the request object
+            If user is None, the user will be retrieved from the request object.
         """
         if not PluginsHolder().hasPluginType("Collaboration"):
             return False
@@ -166,15 +164,8 @@ class RHConfModifCSBase(RHConferenceModifBase):
 
         self._activeTabName = params.get("tab", None)
 
-        self._canSeeAllPluginTabs = self._target.canModify(self.getAW()) or RCCollaborationAdmin.hasRights(self) or RCVideoServicesManager.hasRights(self)
-
         # we build the list 'allowedTabs', a list of all tabs that the user can see
-        if self._canSeeAllPluginTabs:
-            #if the logged in user is event manager, server admin or collaboration admin: we show all plugin tabs
-            allowedTabs = CollaborationTools.getTabs(self._conf)
-        else:
-            #else we show only the tabs of plugins of which the user is admin
-            allowedTabs = CollaborationTools.getTabs(self._conf, self._getUser())
+        allowedTabs = CollaborationTools.getTabs(self._conf, self._getUser())
 
         if self._target.canModify(self.getAW()) or RCVideoServicesManager.hasRights(self):
             allowedTabs.append('Managers')
@@ -209,10 +200,7 @@ class RHConfModifCSBookings(RHConfModifCSBase):
             if not self._activeTabName and self._tabs:
                 self._activeTabName = self._tabs[0]
 
-            if self._canSeeAllPluginTabs:
-                self._tabPlugins = CollaborationTools.getPluginsByTab(self._activeTabName, self._conf)
-            else:
-                self._tabPlugins = CollaborationTools.getPluginsByTab(self._activeTabName, self._conf, self._getUser())
+            self._tabPlugins = CollaborationTools.getPluginsByTab(self._activeTabName, self._conf, self._getUser())
 
     def _checkProtection(self):
         if not PluginsHolder().hasPluginType("Collaboration"):

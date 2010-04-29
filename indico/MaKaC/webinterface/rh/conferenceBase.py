@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: conferenceBase.py,v 1.40 2009/05/27 10:05:40 pferreir Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -201,10 +200,6 @@ class RHAbstractBase( RHConferenceSite ):
 
 class RHSubmitMaterialBase:
 
-    _allowedMatsConference=["paper", "slides", "poster", "minutes"]
-    _allowedMatsForMeetings = [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ]
-    _allowedMatsForSE = [ "paper", "slides", "poster", "minutes", "agenda", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast", "video", "streaming video", "downloadable video" ]
-    _allowedMatsCategory = [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ]
 
     def __init__(self, target, rh = None):
         self._target=target
@@ -230,6 +225,7 @@ class RHSubmitMaterialBase:
         filesToDelete = []
         self._action = ""
         self._overwrite = False
+        #if request has already been handled (DB conflict), then we keep the existing files list
 
         self._file = {}
         self._link = {}
@@ -238,13 +234,18 @@ class RHSubmitMaterialBase:
         self._uploadType = params.get("uploadType","")
         self._materialId = params.get("materialId","")
         self._description = params.get("description","")
+        self._statusSelection = int(params.get("statusSelection", 1))
+        self._visibility = int(params.get("visibility", 0))
+        self._password = params.get("password","")
+
+        from MaKaC.services.interface.rpc import json
+        self._userList = json.decode(params.get("userList", ""))
 
         if self._uploadType == "file":
             if type(params["file"]) != str and params["file"].filename.strip() != "":
                 fDict = {}
                 fDict["filePath"]=self._saveFileToTemp(params["file"].file)
 
-                # TODO: Check this!
                 if self._callerRH != None:
                     self._callerRH._tempFilesToDelete.append(fDict["filePath"])
 
@@ -257,7 +258,6 @@ class RHSubmitMaterialBase:
             link["url"]=params.get("url","")
             link["matType"]=params.get("materialType","")
             self._link = link
-
 
     def _getErrorList(self):
         res=[]
@@ -277,26 +277,123 @@ class RHSubmitMaterialBase:
             res.append("""A material ID must be selected.""")
         return res
 
-    def _getMaterial(self):
-
-        """ Returns the Material object to which the ressource is being submitted
+    def _getMaterial(self, forceCreate = True):
+        """
+        Returns the Material object to which the resource is being added
         """
 
-        mf = self._target.getMaterialRegistry().getById(self._materialId)
+        registry = self._target.getMaterialRegistry()
+        material = self._target.getMaterialById(self._materialId)
 
-        material = mf.get(self._target)
-        if material is None:
-            material = mf.create(self._target)
+        if material:
+            return material, False
+        # there's a defined id (not new type)
+        elif self._materialId:
+            # get a material factory for it
+            mf = registry.getById(self._materialId)
+            # get a material from the material factory
+            material = mf.get(self._target)
 
-        return material
+            # if the factory returns an empty material (doesn't exist)
+            if material == None and forceCreate:
+                # create one
+                material = mf.create(self._target)
+                newlyCreated = True
+            else:
+                newlyCreated = False
+
+            return material, newlyCreated
+        else:
+            # else, something has gone wrong
+            raise Exception("""A material ID must be specified.""")
+
+    def _addMaterialType(self, text, user):
+
+        from MaKaC.common.PickleJar import DictPickler
+
+        Logger.get('requestHandler').debug('Adding %s - request %s ' % (self._uploadType, id(self._callerRH._req)))
+
+        mat, newlyCreated = self._getMaterial()
+
+        # if the material still doesn't exist, create it
+        if newlyCreated:
+            protectedAtResourceLevel = False
+        else:
+            protectedAtResourceLevel = True
+
+        if self._uploadType in ['file','link']:
+            if self._uploadType == "file":
+
+                resource = LocalFile()
+                resource.setFileName(self._file["fileName"])
+                resource.setName(resource.getFileName())
+                resource.setFilePath(self._file["filePath"])
+                resource.setDescription(self._description)
+
+                if not type(self._target) is Category:
+                    self._target.getConference().getLogHandler().logAction({"subject":"Added file %s%s" % (self._file["fileName"],text)},"Files",user)
+                # in case of db conflict we do not want to send the file to conversion again, nor re-store the file
+
+            elif self._uploadType == "link":
+
+                resource = Link()
+                resource.setURL(self._link["url"])
+                resource.setName(resource.getURL())
+                resource.setDescription(self._description)
+
+                if not type(self._target) is Category:
+                    self._target.getConference().getLogHandler().logAction({"subject":"Added link %s%s" % (resource.getURL(),text)},"Files",user)
+
+            status = "OK"
+            info = resource
+        else:
+            status = "ERROR"
+            info = "Unknown upload type"
+            return mat, status, info
+
+        # forcedFileId - in case there is a conflict, use the file that is
+        # already stored
+        mat.addResource(resource, forcedFileId=self._repositoryId)
+
+        #apply conversion
+        if self._topdf and fileConverter.CDSConvFileConverter.hasAvailableConversionsFor(os.path.splitext(resource.getFileName())[1].strip().lower()):
+            Logger.get('conv').debug('Queueing %s for conversion' % resource.getFilePath())
+
+            fileConverter.CDSConvFileConverter.convert(resource.getFilePath(), "pdf", mat)
+
+        self._topdf = False
+
+        # store the repo id, for files
+        if isinstance(resource, LocalFile):
+            self._repositoryId = resource.getRepositoryId()
+
+        if protectedAtResourceLevel:
+            protectedObject = resource
+        else:
+            protectedObject = mat
+            mat.setHidden(self._visibility)
+            mat.setAccessKey(self._password)
+
+        protectedObject.setProtection(self._statusSelection)
+
+        from MaKaC.user import AvatarHolder, GroupHolder
+
+        for userElement in self._userList:
+            if 'isGroup' in userElement and userElement['isGroup']:
+                avatar = GroupHolder().getById(userElement['id'])
+            else:
+                avatar = AvatarHolder().getById(userElement['id'])
+            protectedObject.grantAccess(avatar)
+
+        return mat, status, DictPickler.pickle(info)
 
     def _process(self, rh, params):
 
         # We will need to pickle the data back into JSON
-        from MaKaC.common.PickleJar import DictPickler
 
         errorList=[]
         user = rh.getAW().getUser()
+
         try:
             owner = self._target
             title = owner.getTitle()
@@ -316,67 +413,16 @@ class RHSubmitMaterialBase:
             text = ""
 
         errorList=self._getErrorList()
-        fDict = self._file
-        link = self._link
         resource = None
 
-        Logger.get('requestHandler').debug('Adding %s - request %s ' % (self._uploadType, id(self._callerRH._req)))
-
-        if self._uploadType == "file":
-            if len(errorList)==0:
-                mat = self._getMaterial()
-
-                if mat == None:
-                    errorList.append("Unknown material");
-                else:
-                    resource = LocalFile()
-                    resource.setFileName(fDict["fileName"])
-                    resource.setName(resource.getFileName())
-                    resource.setFilePath(fDict["filePath"])
-                    resource.setDescription(self._description)
-                    mat.addResource(resource, forcedFileId=self._repositoryId)
-                    #apply conversion
-                    if self._topdf and fileConverter.CDSConvFileConverter.hasAvailableConversionsFor(os.path.splitext(resource.getFileName())[1].strip().lower()):
-                        fileConverter.CDSConvFileConverter.convert(resource.getFilePath(), "pdf", mat)
-                    if not type(self._target) is Category:
-                        self._target.getConference().getLogHandler().logAction({"subject":"Added file %s%s" % (fDict["fileName"],text)},"Files",user)
-                    # in case of db conflict we do not want to send the file to conversion again, nor re-store the file
-                    self._topdf = False
-                    self._repositoryId = resource.getRepositoryId()
-
-            if len(errorList) > 0:
-                status = "ERROR"
-                info = errorList
-            else:
-                status = "OK"
-                info = DictPickler.pickle(resource)
-                info['material'] = mat.getId();
-
-        elif self._uploadType == "link":
-            if len(errorList)==0:
-                mat = self._getMaterial()
-                if mat == None:
-                    mat = Material()
-                    mat.setTitle(link["matType"])
-                    self._target.addMaterial( mat )
-                resource = Link()
-                resource.setURL(link["url"])
-                resource.setName(resource.getURL())
-                resource.setDescription(self._description)
-                mat.addResource(resource)
-                if not type(self._target) is Category:
-                    self._target.getConference().getLogHandler().logAction({"subject":"Added link %s%s" % (resource.getURL(),text)},"Files",user)
-
-                status = "OK"
-                info = DictPickler.pickle(resource)
-                info['material'] = mat.getId();
-            else:
-                status = "ERROR"
-                info = errorList
-
-        else:
+        if len(errorList) > 0:
             status = "ERROR"
-            info = "Unknown upload type"
+            info = errorList
+        else:
+            mat, status, info = self._addMaterialType(text, user)
+
+            if status == "OK":
+                info['material'] = mat.getId();
 
         # hackish, because of mime types. Konqueror, for instance, would assume text if there were no tags,
         # and would try to open it

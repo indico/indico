@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: test.py,v 1.14 2008/04/24 16:59:57 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.

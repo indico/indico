@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: __init__.py,v 1.1 2009/04/09 13:13:17 dmartinc Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -19,12 +18,8 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.plugins import getModules, initModule
 from MaKaC.i18n import _
 
 pluginType = "Collaboration"
 pluginName = "CERNMCU"
 pluginDescription = _("Create conferences in CERN's MCU")
-
-modules = {}
-topModule = None

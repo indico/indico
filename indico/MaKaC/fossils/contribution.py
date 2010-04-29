@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: contribution.py,v 1.39 2009/06/25 15:21:49 dmartinc Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -24,17 +23,17 @@ from MaKaC.common.Conversion import Conversion
 from MaKaC.fossils.subcontribution import ISubContributionFossil
 
 class IContributionFossil(IFossil):
-    
+
     def getId(self):
         pass
-    
+
     def getTitle(self):
         pass
-    
+
     def getLocation(self):
         pass
     getLocation.convert = lambda l: l and l.getName()
-    
+
     def getRoom(self):
         pass
     getRoom.convert = lambda r: r and r.getName()
@@ -42,31 +41,57 @@ class IContributionFossil(IFossil):
     def getStartDate(self):
         pass
     getStartDate.convert = Conversion.datetime
-    
+
     def getEndDate(self):
         pass
     getEndDate.convert = Conversion.datetime
-    
+
     def getDuration(self):
         pass
     getDuration.convert = Conversion.duration
 
 class IContributionParticipationFossil(IFossil):
-    
+
     def getId(self):
         pass
-    
+
+    def getTitle(self):
+        pass
+
+    def getFirstName(self):
+        pass
+
+    def getFamilyName(self):
+        pass
+
     def getFullName(self):
         pass
 
+    def getEmail(self):
+        pass
+
+    def getAffiliation(self):
+        pass
+
+    def getAddress(self):
+        pass
+
+    def getPhone(self):
+        pass
+
+    def getFax(self):
+        pass
+
+
+
 class IContributionWithSpeakersFossil(IContributionFossil):
-    
+
     def getSpeakerList(self):
         pass
     getSpeakerList.result = IContributionParticipationFossil
-    
+
 class IContributionWithSubContribsFossil(IContributionFossil):
-    
+
     def getSubContributionList(self):
         pass
     getSubContributionList.result = ISubContributionFossil

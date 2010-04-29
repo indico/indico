@@ -1,8 +1,6 @@
 /*
 * -*- mode: text; coding: utf-8; -*-
 
-   $Id: pf.css,v 1.7 2009/05/07 09:55:56 eragners Exp $
-
    This file is part of CDS Indico.
    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
 
@@ -22,49 +20,36 @@
 */
 
 body {
-    background: #424242;
+    background: white;
 }
 
-.pageHeader {
-    border-bottom: none;
+p,br,dl,strong,em,h1,h2,h3,h4,h5,h6,td,blockquote,ol,ul,a {
+   font-family: verdana, arial, sans-serif;
+   font-size: 12px;
+   color: #000000;
+}
+pre {
+   font-family: helvetica, verdana, sans-serif;
+   font-size: small;
+   color: #000;
+   white-space: pre-wrap;       /* css-3 */
+   white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+   white-space: -pre-wrap;      /* Opera 4-6 */
+   white-space: -o-pre-wrap;    /* Opera 7 */
+   word-wrap: break-word;       /* Internet Explorer 5.5+ */
+   margin: 0px;
+   margin-left: 10px;
+}
+.tablepre {
+   table-layout: fixed;
 }
 
-div.meetingEventHeader {
-    background: white url('../images/PFlogo.png') left top no-repeat;
-    background-position: 50% 5px;
-    border-top: 1px #AAA solid;
-    border-right: 1px #AAA solid;
-    border-left: 1px #AAA solid;
-    
-    margin: 0;
-    
-    color: #333333;
-    
-    padding-left: 200px;
-    padding-top: 85px;
+/* Footer */
+
+.footerDark {
+    color: #444444;
 }
 
-div.meetingEventSubHeader {
-    border: 1px solid #AAA;
-}
-
-div.meetingEventHeader a:link {
-   color: #0b63a5;
-}
-div.meetingEventHeader a:visited {
-   color: #0b63a5;
-}
-div.meetingEventHeader a:active {
-   color: #E25300;
-}
-div.meetingEventHeader a:hover {
-   color: #E25300;
-}
-
-div.meetingEventHeader h1 {
-    color: #333333;
-}
-
-div.meetingEventHeader h2 {
-    color: #333333;
+.footerDark a {
+    color: #0B63A5;
 }

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: collaboration.py,v 1.4 2009/04/07 14:40:08 dmartinc Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -24,18 +23,17 @@ from MaKaC.plugins.Collaboration.base import CSBookingBase
 class CSBooking(CSBookingBase):
 
     _allowMultiple = True
-        
+
     def __init__(self, type, conf):
         CSBookingBase.__init__(self, type, conf)
         self._bookingParams = {}
-            
+
     def _create(self):
         pass
 
-    def _modify(self):
+    def _modify(self, oldBookingParams):
         pass
-    
+
     def _delete(self):
         pass
-        
-    
+

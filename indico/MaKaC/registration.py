@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: registration.py,v 1.57 2009/06/15 14:06:06 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -566,7 +565,7 @@ class Notification(Persistent):
                     text.append("""-- no values --\r\n\t\t\t""")
                 text.append("\r\n             ")
         return "".join(text)
-    
+
     def _printAllSections(self, regForm, rp):
         sects = []
         for formSection in regForm.getSortedForms():
@@ -843,6 +842,21 @@ detail of Booking:
 
 class BaseForm(Persistent):
 
+    """
+    Base class for registration forms
+
+    It includes iterators/getters, provided if the class attribute
+    _iterableContainer is present. _iterableContainer is a simple workaround for
+    the problem of having a generic iterator interface over all the forms, even
+    if the initial design didn't unify the form container into a BaseForm
+    attribute. Since it is too late now for redesigning the DB schema, this
+    attribute kind of fixes it.
+
+    """
+
+    # should be overloaded if iteration is to be provided
+    _iterableContainer = None
+
     def __init__(self):
         self._enabled = True # it means that the form cannot be used either in the registration display or in the management area.
 
@@ -856,6 +870,13 @@ class BaseForm(Persistent):
         except AttributeError, e:
             self._enabled = True
         return self._enabled
+
+    def __iter__(self):
+        return getattr(self, self._iterableContainer).__iter__();
+
+    def __getitem__(self, key):
+        return getattr(self, self._iterableContainer)[key]
+
 
 class FieldInputType(Persistent):
     _id=""
@@ -1915,7 +1936,7 @@ class PersonalData(Persistent):
         p = PersonalDataFormItem({'id':'city', 'name': _("City"), 'input':'text', 'mandatory':True})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'country', 'name': _("Country"), 'input':'list', 'mandatory':True})
+        p = PersonalDataFormItem({'id':'country', 'name': _("Country/Region"), 'input':'list', 'mandatory':True})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
         p = PersonalDataFormItem({'id':'phone', 'name': _("Phone"), 'input':'text', 'mandatory':False})
@@ -2172,6 +2193,8 @@ class AccommodationType(Persistent):
 
 class AccommodationForm(BaseForm):
 
+    _iterableContainer = '_accommodationTypes'
+
     def __init__(self, regForm, data=None):
         BaseForm.__init__(self)
         self._accoTypeGenerator = Counter()
@@ -2352,6 +2375,7 @@ class AccommodationForm(BaseForm):
         for at in self.getAccommodationTypesList():
             self.removeAccommodationType(at)
 
+
 class ReasonParticipationForm(BaseForm):
 
     def __init__(self, data=None):
@@ -2481,6 +2505,9 @@ class RegistrationSession(Persistent):
     def getTitle(self):
         return self._session.getTitle()
 
+    # for compatibility with other fields
+    getCaption = getTitle
+
     def getStartDate(self):
         return self._session.getStartDate()
 
@@ -2498,6 +2525,8 @@ class RegistrationSession(Persistent):
     _cmpTitle=staticmethod(_cmpTitle)
 
 class SessionsForm(BaseForm):
+
+    _iterableContainer = '_sessions'
 
     def __init__(self, data=None):
         BaseForm.__init__(self)
@@ -2774,6 +2803,8 @@ class SocialEventItem(Persistent):
         return cmp(se1.getCaption().lower(), se2.getCaption().lower())
 
 class SocialEventForm(BaseForm):
+
+    _iterableContainer = '_socialEvents'
 
     def __init__(self, regForm, data=None):
         BaseForm.__init__(self)

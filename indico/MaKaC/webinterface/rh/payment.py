@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: payment.py,v 1.4 2009/05/14 18:06:03 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -22,14 +21,14 @@
 from copy import copy
 
 class RHPaymentModule:
-    
+
     def __init__(self, req):
         self._req = req
-    
-    
+
+
     def process(self, params):
-        from MaKaC import plugins
-        epaymentModules = plugins.getPluginsByType("EPayment")
+        from MaKaC.plugins.pluginLoader import PluginLoader
+        epaymentModules = PluginLoader.getPluginsByType("EPayment")
         module = None
         for mod in epaymentModules:
             params2 = copy(params)

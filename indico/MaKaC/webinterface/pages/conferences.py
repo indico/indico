@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: conferences.py,v 1.414 2009/06/26 13:09:59 eragners Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -66,7 +65,6 @@ from MaKaC.webinterface.pages import base
 import MaKaC.common.info as info
 from MaKaC.common.cache import EventCache
 from MaKaC.i18n import _
-from MaKaC.plugins import importPlugin
 from MaKaC.modules.base import ModulesHolder
 import MaKaC.webcast as webcast
 from MaKaC.common.PickleJar import DictPickler
@@ -142,7 +140,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
     def _getHeader( self ):
         """
         """
-        wc = wcomponents.WConferenceHeader( self._getAW(), self._getNavigationDrawer(), self._conf )
+        wc = wcomponents.WConferenceHeader( self._getAW(), self._conf )
         return wc.getHTML( { "loginURL": self.getLoginURL(),\
                              "logoutURL": self.getLogoutURL(),\
                              "loginAsURL": self.getLoginAsURL(), \
@@ -914,9 +912,6 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
         return wc.getHTML(p)
 
     def _getHeadContent( self ):
-        if self._view in ["xml","text","jacow"] and (self._params.get("frame","")=="no" or self._params.get("fr","")=="no"):
-            return ""
-        path = Config.getInstance().getStylesheetsDir()
         htdocs = Config.getInstance().getHtdocsDir()
         # First include the default Indico stylesheet
         styleText = """<link rel="stylesheet" href="%s/css/%s">\n""" % \
@@ -932,6 +927,9 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
         return styleText
 
     def _getHTMLHeader( self ):
+
+        if self._view in ["xml","text","jacow"] and (self._params.get("frame","")=="no" or self._params.get("fr","")=="no"):
+            return ""
 
         tpl = wcomponents.WHTMLHeader();
 
@@ -950,11 +948,11 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
         """
         """
         if self._type == "simple_event":
-            wc = wcomponents.WMenuSimpleEventHeader( self._getAW(), self._getNavigationDrawer(), self._conf )
+            wc = wcomponents.WMenuSimpleEventHeader( self._getAW(), self._conf )
         elif self._type == "meeting":
-            wc = wcomponents.WMenuMeetingHeader( self._getAW(), self._getNavigationDrawer(), self._conf )
+            wc = wcomponents.WMenuMeetingHeader( self._getAW(), self._conf )
         else:
-            wc = wcomponents.WMenuConferenceHeader( self._getAW(), self._getNavigationDrawer(), self._conf )
+            wc = wcomponents.WMenuConferenceHeader( self._getAW(), self._conf )
         return wc.getHTML( { "loginURL": self.getLoginURL(),\
                              "logoutURL": self.getLogoutURL(),\
                              "confId": self._conf.getId(),\
@@ -971,11 +969,14 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
         """
         """
         if self._params.get("frame","")=="no" or self._params.get("fr","")=="no":
-            return WPrintPageFrame().getHTML({"content":body})
+            if self._view in ["xml","text","jacow"]:
+                return body
+            else:
+                return WPrintPageFrame().getHTML({"content":body})
         return WPConferenceBase._applyDecoration(self, body)
 
     def _getHTMLFooter( self ):
-        if ("xml" in self._view or "text" in self._view or "jacow" in self._view) and (self._params.get("frame","")=="no" or self._params.get("fr","")=="no"):
+        if (self._view in ["xml","text","jacow"]) and (self._params.get("frame","")=="no" or self._params.get("fr","")=="no"):
             return ""
         return WPConferenceBase._getHTMLFooter(self)
 
@@ -1004,7 +1005,7 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
         view = self._view
         outGen = outputGenerator(self._getAW())
         path = Config.getInstance().getStylesheetsDir()
-        if os.path.exists("%s/%s.xsl" % (path,view)):
+        if os.path.exists("%s.xsl" % (os.path.join(path,view))):
             minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
             tz = DisplayTZ(self._getAW(),self._conf).getDisplayTZ()
             useCache = minfo.isCacheActive() and frame and self._params.get("detailLevel", "") in [ "", "contribution" ] and self._view == self._conf.getDefaultStyle() and self._params.get("showSession","all") == "all" and self._params.get("showDate","all") == "all" and tz == self._conf.getTimezone()
@@ -1018,7 +1019,7 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
                 cache = EventCache({"id": self._conf.getId(), "type": "normal"})
                 body = cache.getCachePage()
             if body == "":
-                stylepath = "%s/%s.xsl" % (path,view)
+                stylepath = "%s.xsl" % (os.path.join(path,view))
                 if self._params.get("detailLevel", "") == "contribution" or self._params.get("detailLevel", "") == "":
                     includeContribution = 1
                 else:
@@ -1096,10 +1097,6 @@ class WConfProgram(wcomponents.WTemplated):
 
 class WPConferenceProgram( WPConferenceDefaultDisplayBase ):
 
-    def __init__(*params):
-        WPConferenceDefaultDisplayBase.__init__(*params)
-        navigationEntry = navigation.NEConferenceProgramme()
-
     def _getBody( self, params ):
         wc = WConfProgram( self._getAW(), self._conf )
         return wc.getHTML()
@@ -1155,7 +1152,7 @@ class WConferenceTimeTable(wcomponents.WTemplated):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         tz = DisplayTZ(self._aw,self._conf).getDisplayTZ()
-        vars["ttdata"] = simplejson.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(), tz))
+        vars["ttdata"] = simplejson.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(), tz, self._aw))
         vars['eventInfo'] = simplejson.dumps(DictPickler.pickle(self._conf, timezone=tz))
         return vars
 
@@ -2011,6 +2008,8 @@ class WPMeetingTimeTable( WPXSLConferenceDisplay ):
 
 class WPConferenceModifBase( main.WPMainBase ):
 
+    _userData = ['favorite-user-ids']
+
     def __init__( self, rh, conference ):
         main.WPMainBase.__init__( self, rh )
         self._navigationTarget = self._conf = conference
@@ -2079,7 +2078,7 @@ class WPConferenceModifBase( main.WPMainBase ):
             urlHandlers.UHConfModifRegForm.getURL( self._conf ))
         self._generalSection.addItem( self._regFormMenuItem)
 
-        if self._conf.getCSBookingManager() is not None and self._conf.getCSBookingManager().isCSAllowed():
+        if self._conf.getCSBookingManager() is not None and self._conf.getCSBookingManager().isCSAllowed(self._rh.getAW().getUser()):
             from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
             self._videoServicesMenuItem = wcomponents.SideMenuItem(_("Video Services"),
                 urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = CollaborationTools.isUsingHTTPS()))
@@ -2330,11 +2329,11 @@ class WPConfModifBookings( WPConferenceModifBase ):
         elif self._bs.strip()=="VRVS":
             wc = WBookingsWarning(self._conf)
             return wc.getHTML(p)
-        elif self._bs.strip()=="MCU":
-            wc = importPlugin("Collaboration", "Hermes", "CreateComponent")(self._conf)
-            if (wc == None):
-                wc= WBookingsNotYetAvailable(self._conf)
-            return wc.getHTML(p)
+#        elif self._bs.strip()=="MCU":
+#            wc = importPlugin("Collaboration", "Hermes", "CreateComponent")(self._conf)
+#            if (wc == None):
+#                wc= WBookingsNotYetAvailable(self._conf)
+#            return wc.getHTML(p)
 
 class WConfModifBookings( wcomponents.WTemplated ):
 
@@ -2530,11 +2529,11 @@ class WPBookingsDetail(WPConferenceModifBase):
 "listOfBookings": quoteattr(str(urlHandlers.UHConfModifBookings.getURL(self._conf)))}
             wc = WBookingsVRVSDetail(self._booking)
             return wc.getHTML(p)
-        elif self._booking.getSystem()=="HERMES":
-            wc = importPlugin("Collaboration", "Hermes", "ShowComponent")(self._conf, self._booking)
-            if (wc == None):
-                wc= WBookingsNotYetAvailable(self._conf)
-            return wc.getHTML()
+#        elif self._booking.getSystem()=="HERMES":
+#            wc = importPlugin("Collaboration", "Hermes", "ShowComponent")(self._conf, self._booking)
+#            if (wc == None):
+#                wc= WBookingsNotYetAvailable(self._conf)
+#            return wc.getHTML()
 
 class WBookingsVRVSPerformed(WBookingsVRVS):
 
@@ -3180,12 +3179,14 @@ class WConfModifScheduleGraphic(wcomponents.WTemplated):
         vars["newContribURL"] = newContribURL
         vars['rbActive'] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
 
-        vars['ttdata'] = simplejson.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(), tz))
+        vars['ttdata'] = simplejson.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(), tz, None))
         vars['eventInfo'] = simplejson.dumps(DictPickler.pickle(self._conf, timezone=tz))
 
         return vars
 
 class WPConfModifScheduleGraphic( WPConferenceModifBase ):
+
+    _userData = ['favorite-user-list', 'favorite-user-ids']
 
     def __init__(self, rh, conf):
         WPConferenceModifBase.__init__(self, rh, conf)
@@ -4078,7 +4079,7 @@ class WConferenceParticipants(wcomponents.WTemplated):
         vars["participants"] = self.getParticipantsList()
         vars["statisticAction"] = str(urlHandlers.UHConfModifParticipantsStatistics.getURL(self._conf))
         vars["sendButton"] = _("""<input type="submit" class="btn" value="_("Send email to")" name="participantsAction" />""")
-        vars["excelButton"] = """<input type="submit" class="btn" value="Export to Excel" name="participantsAction"/>"""
+        vars["excelButton"] = _("""<input type="submit" class="btn" value="_("Export to Excel")" name="participantsAction"/>""")
         vars["participantsAction"] = str(urlHandlers.UHConfModifParticipantsAction.getURL(self._conf))
         if nowutc() < self._conf.getStartDate() :
             vars["inviteButton"] = _("""<input type="submit" class="btn" value="_("Invite participant")" />""")
@@ -4362,7 +4363,7 @@ class WPConfModifParticipantsEMail(WPConferenceModifBase):
     def _setActiveTab( self ):
         self._tabParticipants.setActive()
 
-    def _getTabContent( self, params ):
+    def _getPageContent( self, params ):
         toemail = params["emailto"]
         params["postURL"] = urlHandlers.UHConfModifParticipantsSendEmail.getURL( self._conf )
         wc = WEmail(self._conf, self._getAW().getUser(), toemail)
@@ -4617,26 +4618,11 @@ class WPConfClone( WPConfModifToolsBase ):
                 "cloneInterval": urlHandlers.UHConfPerformCloneInterval.getURL( self._conf ), \
                 "cloneday": urlHandlers.UHConfPerformCloneDays.getURL( self._conf ), \
                 "cloning" : urlHandlers.UHConfPerformCloning.getURL( self._conf ),
-                "cloneOptions": _("""<table>
-                                <tr><td width="10%%"></td>
-                                    <td width="10%%"><input type="checkbox" name="cloneTracks" id="cloneTracks" value="1" ></td>
-                                    <td width="80%%">_("Tracks")</td></tr>
-                                                <tr><td width="10%%"></td>
-                                <tr><td width="10%%"></td>
-                                    <td width="10%%"><input type="checkbox" name="cloneTimetable" id="cloneTimetable" value="1" ></td>
-                                    <td width="80%%">_("Full timetable")</td></tr>
-                                <!--<tr><td width="10%%"></td>
-                                    <td width="10%%"></td>
-                                    <td width="80%%"><input type="checkbox" name="cloneAbstracts" id="cloneAbstracts" value="1" > _("with abstracts")</td></tr>-->
-                                <tr><td width="10%%"></td>
-                                    <td width="10%%"><input type="checkbox" name="cloneSessions" id="cloneSessions" value="1" ></td>
-                                    <td width="80%%">_("Sessions")</td></tr>
-                                <tr><td width="10%%"></td>
-                                    <td width="10%%"><input type="checkbox" name="cloneRegistration" id="cloneRegistration" value="1" ></td>
-                                    <td width="80%%"> _("Registration")</td></tr>
-                                <tr><td width="10%%"></td>
-                                    <td width="10%%"><input type="checkbox" name="cloneEvaluation" id="cloneEvaluation" value="1" ></td>
-                                    <td width="80%%">_("Evaluation")</td></tr></table>""") }
+                "cloneOptions": _("""<li><input type="checkbox" name="cloneTracks" id="cloneTracks" value="1" />_("Tracks")</li>
+                                     <li><input type="checkbox" name="cloneTimetable" id="cloneTimetable" value="1" />_("Full timetable")</li>
+                                     <li><ul style="list-style-type: none;"><li><input type="checkbox" name="cloneSessions" id="cloneSessions" value="1" />_("Sessions")</li></ul></li>
+                                     <li><input type="checkbox" name="cloneRegistration" id="cloneRegistration" value="1" >_("Registration")</li>
+                                     <li><input type="checkbox" name="cloneEvaluation" id="cloneEvaluation" value="1" />_("Evaluation")</li>""") }
         return p.getHTML( pars )
 
 #---------------------------------------------------------------------------------------
@@ -4895,7 +4881,7 @@ class WPConfAllSpeakers( WPConfModifListings ):
 
 class WPConfAllPrimaryAuthors( WPConfModifListings ):
 
-    def _getTabContent( self, params ):
+    def _getPageContent( self, params ):
         p = WConfModifAllContribParticipants( self._conf, self._conf.getPrimaryAuthorIndex() )
         return p.getHTML({"title": _("All primary authors list"), \
                           "participantMainPageURL":urlHandlers.UHConfAllPrimaryAuthors.getURL(self._conf), \
@@ -4903,7 +4889,7 @@ class WPConfAllPrimaryAuthors( WPConfModifListings ):
 
 class WPConfAllCoAuthors( WPConfModifListings ):
 
-    def _getTabContent( self, params ):
+    def _getPageContent( self, params ):
         p = WConfModifAllContribParticipants( self._conf, self._conf.getCoAuthorIndex() )
         return p.getHTML({"title": _("All co-authors list"), \
                           "participantMainPageURL":urlHandlers.UHConfAllCoAuthors.getURL(self._conf), \
@@ -4914,7 +4900,7 @@ class WPEMailContribParticipants ( WPConfModifListings):
         WPConfModifListings.__init__(self, rh, conf)
         self._participantList = participantList
 
-    def _getTabContent(self,params):
+    def _getPageContent(self,params):
         wc = WEmailToContribParticipants(self._conf, self._getAW().getUser(), self._participantList)
         return wc.getHTML()
 
@@ -4948,7 +4934,7 @@ class WPEMailConveners ( WPConfModifListings):
         WPConfModifListings.__init__(self, rh, conf)
         self._convenerList = convenerList
 
-    def _getTabContent(self,params):
+    def _getPageContent(self,params):
         wc = WEmailToConveners(self._conf, self._getAW().getUser(), self._convenerList)
         return wc.getHTML()
 
@@ -5673,6 +5659,7 @@ class WConfModCFANotifTplNew(wcomponents.WTemplated):
         vars["CCAddrs"]=quoteattr(str(",".join(vars.get("ccList",[]))))
         vars["toAddrs"] = self._getToAddrsHTML()
         vars["vars"]=self._getAvailableTagsHTML()
+        vars["availableConditions"]= NotifTplConditionsFactory.getConditionList()
         return vars
 
 
@@ -6020,7 +6007,7 @@ class WConfModCFANotifTplDisplay(wcomponents.WTemplated):
                 caption= _("""REJECTED""")
             elif isinstance(cond,review.NotifTplCondMerged):
                 caption= _("""MERGED""")
-            res.append("""<input type="checkbox" name="selCond" value=%s>%s"""%(quoteattr(str(cond.getId())),caption))
+            res.append(""" <input type="image" name="selCond" value=%s src="%s"> %s"""%(quoteattr(str(cond.getId())), Config.getInstance().getSystemIconURL( "remove" ), caption))
         return "<br>".join(res)
 
     def _getToAddrsHTML(self):
@@ -6320,12 +6307,12 @@ class WAbstracts( wcomponents.WTemplated ):
 
     def _getStatusFilterItemList( self ):
         l = []
-        for status in AbstractStatusList().getStatusList():
+        for status in AbstractStatusList.getInstance().getStatusList():
             checked = ""
-            statusId = AbstractStatusList().getId( status )
-            statusCaption = AbstractStatusList().getCaption( status )
-            statusCode=AbstractStatusList().getCode(status)
-            statusIconURL= AbstractStatusList().getIconURL( status )
+            statusId = AbstractStatusList.getInstance().getId( status )
+            statusCaption = AbstractStatusList.getInstance().getCaption( status )
+            statusCode=AbstractStatusList.getInstance().getCode(status)
+            statusIconURL= AbstractStatusList.getInstance().getIconURL( status )
             field=self._filterCrit.getField("status")
             if field is not None and statusId in field.getValues():
                 checked = "checked"
@@ -6538,9 +6525,9 @@ class WAbstracts( wcomponents.WTemplated ):
                 tracks.append("%s"%self.htmlText(track.getCode()))
 
             s=abstract.getCurrentStatus()
-            status=AbstractStatusList().getCode(s.__class__ )
-            statusColor=AbstractStatusList().getColor(s.__class__)
-            statusIconURL=AbstractStatusList().getIconURL(s.__class__)
+            status=AbstractStatusList.getInstance().getCode(s.__class__ )
+            statusColor=AbstractStatusList.getInstance().getColor(s.__class__)
+            statusIconURL=AbstractStatusList.getInstance().getIconURL(s.__class__)
             statusIconHTML = """<img src=%s border="0" alt="">"""%quoteattr(str(statusIconURL))
             contribType = abstract.getContribType()
             contribTypeName = _("""--_("not specified")--""")
@@ -7880,6 +7867,8 @@ class WConfModifContribList(wcomponents.WTemplated):
         return vars
 
 class WPModifContribList( WPConferenceModifBase ):
+
+    _userData = ['favorite-user-list', 'favorite-user-ids']
 
     def _setActiveSideMenuItem(self):
         self._contribListMenuItem.setActive(True)
@@ -10486,7 +10475,7 @@ class WPStaticMeetingBase(WPConferenceStaticDefaultDisplayBase):
                        <link rel="stylesheet" href="%s/css/common.css">""" % \
                     (self.getRootDir(self._target), Config.getInstance().getCssStylesheetName(), self.getRootDir(self._target))
         try:
-            if os.path.exists("%s/%s.css" % (path,self._view)):
+            if os.path.exists("%s.css" % (os.path.join(path,self._view))):
                 styleText += """
                      <style type="text/css">
                         %s
@@ -10558,8 +10547,8 @@ class WPXSLMeetingStaticDisplay( WPStaticMeetingBase ):
         from MaKaC.accessControl import AccessWrapper
         outGen = outputGenerator(AccessWrapper())
         path = Config.getInstance().getStylesheetsDir()
-        if os.path.exists("%s/%s.xsl" % (path,view)):
-            stylepath = "%s/%s.xsl" % (path,view)
+        if os.path.exists("%s.xsl" % (os.path.join(path,view))):
+            stylepath = "%s.xsl" % (os.path.join(path,view))
             if self._params.get("detailLevel", "") == "contribution" or self._params.get("detailLevel", "") == "":
                 includeContribution = 1
             else:
@@ -11771,6 +11760,9 @@ class WPConfModifReportNumberEdit(WPConferenceModifBase):
 
 
 class WPConfModifExistingMaterials( WPConferenceModifBase ):
+
+    _userData = ['favorite-user-list', 'favorite-user-ids']
+
     def __init__(self, rh, conf):
         WPConferenceModifBase.__init__(self, rh, conf)
 
@@ -11859,12 +11851,7 @@ class WPConfModifRoomBookingBase( WPConferenceModifBase ):
         <!-- Our libs -->
         <script type="text/javascript" src="%s/js/indico/Legacy/validation.js"></script>
 
-        <!-- Calendar -->
-        <link rel="stylesheet" type="text/css" href="%s/css/calendar-blue.css" />
-        <script type="text/javascript" src="%s"></script>
-        <script type="text/javascript" src="%s"></script>
-        """ % ( baseurl, baseurl, baseurl, baseurl, urlHandlers.UHJavascriptCalendar.getURL(),
-                urlHandlers.UHJavascriptCalendarSetup.getURL() )
+        """ % ( baseurl, baseurl, baseurl )
 
     def _setActiveSideMenuItem(self):
         self._roomBookingMenuItem.setActive()
@@ -12143,15 +12130,19 @@ class WConfModifBadgeDesign( wcomponents.WTemplated ):
         vars["loadingIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("loading")))
         vars["templateId"]=self.__templateId
 
+        badgeDesignConfiguration = BadgeDesignConfiguration()
+        from MaKaC.services.interface.rpc.json import encode as jsonEncode
+        vars["translateName"]= jsonEncode(dict([(key, value[0]) for key, value in badgeDesignConfiguration.items_actions.iteritems()]))
+
         cases = []
-        for itemName in BadgeDesignConfiguration().items_actions.keys():
+        for itemKey in badgeDesignConfiguration.items_actions.keys():
             case = []
             case.append('case "')
-            case.append(itemName)
+            case.append(itemKey)
             case.append('":')
             case.append('\n')
             case.append('items[itemId] = new Item(itemId, "')
-            case.append(itemName)
+            case.append(itemKey)
             case.append('");')
             case.append('\n')
             case.append('newDiv.innerHTML = items[itemId].toHTML();')
@@ -12162,15 +12153,15 @@ class WConfModifBadgeDesign( wcomponents.WTemplated ):
         vars['switchCases'] = "\n".join(cases)
 
         optgroups = []
-        for optgroupName, options in BadgeDesignConfiguration().groups:
+        for optgroupName, options in badgeDesignConfiguration.groups:
             optgroup = []
             optgroup.append('<optgroup label="')
             optgroup.append(optgroupName)
             optgroup.append('">')
             optgroup.append('\n')
             for optionName in options:
-                optgroup.append('<option>')
-                optgroup.append(optionName)
+                optgroup.append('<option value="%s">'%optionName)
+                optgroup.append(badgeDesignConfiguration.items_actions[optionName][0])
                 optgroup.append('</option>')
                 optgroup.append('\n')
             optgroup.append('</optgroup>')
@@ -12202,7 +12193,6 @@ class WConfModifBadgeDesign( wcomponents.WTemplated ):
             vars["titleMessage"]= _("Editing badge template")
             vars["editingTemplate"]="true"
 
-            from MaKaC.services.interface.rpc.json import encode as jsonEncode
             templateDataString = jsonEncode(self.__conf.getBadgeTemplateManager().getTemplateData(self.__templateId))
             vars["templateData"]= templateDataString
 
@@ -12270,9 +12260,9 @@ class WConfCommonPDFOptions( wcomponents.WTemplated ):
         pagesizeNames.sort()
         pagesizeOptions = []
         for pagesizeName in pagesizeNames:
-            pagesizeOptions.append('<option')
+            pagesizeOptions.append('<option ')
             if pagesizeName == 'A4':
-                pagesizeOptions.append( _("SELECTED"))
+                pagesizeOptions.append('selected="selected"')
             pagesizeOptions.append('>')
             pagesizeOptions.append(pagesizeName)
             pagesizeOptions.append('</option>')
@@ -12281,9 +12271,9 @@ class WConfCommonPDFOptions( wcomponents.WTemplated ):
 
         fontsizeOptions = []
         for fontsizeName in PDFSizes().PDFfontsizes:
-            fontsizeOptions.append('<option')
+            fontsizeOptions.append('<option ')
             if fontsizeName == 'normal':
-                fontsizeOptions.append( _("SELECTED"))
+                fontsizeOptions.append('selected="selected"')
             fontsizeOptions.append('>')
             fontsizeOptions.append(fontsizeName)
             fontsizeOptions.append('</option>')
@@ -12393,9 +12383,9 @@ class WConfModifPosterPDFOptions( wcomponents.WTemplated ):
         pagesizeNames.sort()
         pagesizeOptions = []
         for pagesizeName in pagesizeNames:
-            pagesizeOptions.append('<option')
+            pagesizeOptions.append('<option ')
             if pagesizeName == 'A4':
-                pagesizeOptions.append(" SELECTED")
+                pagesizeOptions.append('selected="selected"')
             pagesizeOptions.append('>')
             pagesizeOptions.append(pagesizeName)
             pagesizeOptions.append('</option>')
@@ -12439,15 +12429,20 @@ class WConfModifPosterDesign( wcomponents.WTemplated ):
         vars["loadingIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("loading")))
         vars["templateId"]=self.__templateId
 
+        posterDesignConfiguration = PosterDesignConfiguration()
+        from MaKaC.services.interface.rpc.json import encode as jsonEncode
+        vars["translateName"]= jsonEncode(dict([(key, value[0]) for key, value in posterDesignConfiguration.items_actions.iteritems()]))
+
+
         cases = []
-        for itemName in PosterDesignConfiguration().items_actions.keys():
+        for itemKey in posterDesignConfiguration.items_actions.keys():
             case = []
             case.append('case "')
-            case.append(itemName)
+            case.append(itemKey)
             case.append('":')
             case.append('\n')
             case.append('items[itemId] = new Item(itemId, "')
-            case.append(itemName)
+            case.append(itemKey)
             case.append('");')
             case.append('\n')
             case.append('newDiv.innerHTML = items[itemId].toHTML();')
@@ -12458,15 +12453,15 @@ class WConfModifPosterDesign( wcomponents.WTemplated ):
         vars['switchCases'] = "\n".join(cases)
 
         optgroups = []
-        for optgroupName, options in PosterDesignConfiguration().groups:
+        for optgroupName, options in posterDesignConfiguration.groups:
             optgroup = []
             optgroup.append('<optgroup label="')
             optgroup.append(optgroupName)
             optgroup.append('">')
             optgroup.append('\n')
             for optionName in options:
-                optgroup.append('<option>')
-                optgroup.append(optionName)
+                optgroup.append('<option value="%s">'%optionName)
+                optgroup.append(posterDesignConfiguration.items_actions[optionName][0])
                 optgroup.append('</option>')
                 optgroup.append('\n')
             optgroup.append('</optgroup>')
@@ -12492,7 +12487,7 @@ class WConfModifPosterDesign( wcomponents.WTemplated ):
             vars["backgroundURL"]="false"
             vars["backgroundId"]=-1
             vars["backgroundPos"]="Stretch"
-            vars["templateData"] == "''"
+            vars["templateData"] = "''"
             vars["editingTemplate"]="false"
 
 
@@ -12500,7 +12495,7 @@ class WConfModifPosterDesign( wcomponents.WTemplated ):
             vars["saveTemplateURL"]=urlHandlers.UHConfModifPosterPrinting.getURL(self.__conf)
             vars["titleMessage"]= _("Editing poster template")
             vars["editingTemplate"]="true"
-            templateDataString = simplejson.dumps(self.__conf.getPosterTemplateManager().getTemplateData(self.__templateId))
+            templateDataString = jsonEncode(self.__conf.getPosterTemplateManager().getTemplateData(self.__templateId))
             vars["templateData"]=quoteattr(templateDataString)
 
             usedBackgroundId = self.__conf.getPosterTemplateManager().getTemplateById(self.__templateId).getUsedBackgroundId()

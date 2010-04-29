@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: contribMod.py,v 1.71 2009/06/04 12:07:13 cangelov Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -519,7 +518,7 @@ class RHNewSubcontributionPersonAdd(RHContribModifBaseSpecialSesCoordRights):
                 else :
                     self._errorList.append("%s has been already defined as %s of this session"%(person.getFullName(), self._typeName))
 
-        elif params.get("orgin", "") == "selected" :
+        elif params.get("orgin", "") == "selected":
             selectedList = self._normaliseListParam(self._getRequestParams().get("selectedPrincipals", []))
 
             for s in selectedList :
@@ -584,6 +583,9 @@ class RHNewSubcontributionPersonAdd(RHContribModifBaseSpecialSesCoordRights):
                 chosenPerson = object.getCoAuthorById(chosenId)
             elif chosen[0:1] == "d" :
                 chosenPerson = object.getConvenerById(chosenId)
+            elif index ==  -1 : #person data doesn't contain proper id
+                if self._getUser() and chosenId in self._getUser().getPersonalInfo().getBasket().getUsers() :   #checking if such person is listed on favourites
+                    chosenPerson = self._getUser().getPersonalInfo().getBasket().getUsers()[chosenId]
             if chosenPerson is None :
                 self._redirect(urlHandlers.UHConfModScheduleNewContrib.getURL(self._target))
                 return
@@ -795,7 +797,7 @@ class RHSearchAddPrimaryAuthor (RHContribModifBaseSpecialSesCoordRights):
 
     def _process(self):
         params=self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ah=user.AvatarHolder()
             authIndex = self._target.getConference().getAuthorIndex()
             for id in self._normaliseListParam(params["selectedPrincipals"]):
@@ -845,7 +847,7 @@ class RHSearchAddCoAuthor (RHContribModifBaseSpecialSesCoordRights):
 
     def _process(self):
         params=self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ah=user.AvatarHolder()
             authIndex = self._target.getConference().getAuthorIndex()
             for id in self._normaliseListParam(params["selectedPrincipals"]):
@@ -896,7 +898,7 @@ class RHSearchAddSpeakers (RHContribModifBaseSpecialSesCoordRights):
 
     def _process(self):
         params=self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ah=user.AvatarHolder()
             authIndex = self._target.getConference().getAuthorIndex()
             for id in self._normaliseListParam(params["selectedPrincipals"]):
@@ -1362,15 +1364,15 @@ class RHContributionRemoveMaterials(RHContribModifBaseSpecialSesCoordRights):
         self._redirect( url )
 
 
-class RHMaterialsAdd(RHContribModifBase):
+class RHMaterialsAdd(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContribModifAddMaterials
 
     def _checkProtection(self):
-        material = self._rhSubmitMaterial._getMaterial()
+        material, _ = self._rhSubmitMaterial._getMaterial(forceCreate = False)
         if self._target.canUserSubmit(self._aw.getUser()) \
-            and material.getReviewingState() < 3:
+            and (not material or material.getReviewingState() < 3):
             return
-        RHContribModifBase._checkProtection(self)
+        RHContribModifBaseSpecialSesCoordRights._checkProtection(self)
 
     def _checkParams(self, params):
         RHContribModifBase._checkParams(self, params)
@@ -1402,7 +1404,7 @@ class RHContributionAddManagers(RHContribModifBaseSpecialSesCoordRights):
 
     def _process(self):
         params = self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam(params["selectedPrincipals"]):
                 self._target.grantModification(ph.getById(id))
@@ -1452,7 +1454,7 @@ class RHContributionAddAllowed(RHContribModifBaseSpecialSesCoordRights):
 
     def _process(self):
         params = self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam(params["selectedPrincipals"]):
                 self._target.grantAccess(ph.getById(id))
@@ -1844,7 +1846,7 @@ class RHSubmittersAdd(RHContribModifBaseSpecialSesCoordRights):
 
     def _process(self):
         params=self._getRequestParams()
-        if "selectedPrincipals" in params:
+        if "selectedPrincipals" in params and not "cancel" in params:
             ah=user.PrincipalHolder()
             for id in self._normaliseListParam(params["selectedPrincipals"]):
                 av=ah.getById(id)
@@ -1877,9 +1879,9 @@ class RHMaterials(RHContribModifBaseSpecialSesCoordAndReviewingStaffRights):
 
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordAndReviewingStaffRights._checkParams(self, params)
-        if not hasattr(self, "_rhSubmitMaterial"):
-            self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
-        self._rhSubmitMaterial._checkParams(params)
+        #if not hasattr(self, "_rhSubmitMaterial"):
+        #    self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
+        #self._rhSubmitMaterial._checkParams(params)
         params["days"] = params.get("day", "all")
         if params.get("day", None) is not None :
             del params["day"]

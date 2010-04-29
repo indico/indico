@@ -2,52 +2,64 @@
 Asynchronous request handlers for room booking
 """
 
-from MaKaC.services.implementation.base import ProtectedService
+from MaKaC.services.implementation.base import ServiceBase
 
 from MaKaC.rb_location import Location
 from MaKaC.rb_location import CrossLocationQueries
 
-class RoomBookingListLocations( ProtectedService ):
-    
+class RoomBookingListLocations( ServiceBase ):
+
     def _getAnswer( self ):
         """
         Calls _handle() on the derived classes, in order to make it happen. Provides
         them with self._value.
-        """        
-        
+        """
+
         result = {}
-        
+
         locationNames = map(lambda l: l.friendlyName, Location.allLocations);
-        
+
         for name in locationNames:
             result[name] = name;
-        
+
         return result
 
- 
-class RoomBookingListRooms( ProtectedService ):
-    
+
+class RoomBookingListRooms( ServiceBase ):
+
     def _checkParams( self ):
-        
+
         try:
             self._location = self._params["location"];
         except:
             from MaKaC.services.interface.rpc.common import ServiceError
             raise ServiceError("ERR-RB0", "Invalid location.")
-                   
-    def _getAnswer( self ):          
+
+    def _getAnswer( self ):
 
         if not Location.parse( self._location ):
             return {}
-        
+
         res = {}
         for room in CrossLocationQueries.getRooms( location = self._location ):
             res[room.name] = room.name
-        
+
         return sorted(res)
 
-class RoomBookingListLocationsAndRooms( ProtectedService ):
-    
+class RoomBookingFullNameListRooms( RoomBookingListRooms):
+
+    def _getAnswer( self ):
+
+        res = []
+
+        if Location.parse( self._location ):
+            for room in CrossLocationQueries.getRooms( location = self._location ):
+                res.append((room.name, room.getFullName()))
+
+        return res
+
+class RoomBookingListLocationsAndRooms( ServiceBase ):
+
     def _getAnswer( self ):
         result = {}
         locationNames = map(lambda l: l.friendlyName, Location.allLocations);
@@ -56,8 +68,8 @@ class RoomBookingListLocationsAndRooms( ProtectedService ):
                 result[loc +":" +room.name] = loc +":" +room.name;
         return sorted(result)
 
-class GetBookingBase(ProtectedService):
-    
+class GetBookingBase(object):
+
     def _getRoomInfo(self, target):
         location = target.getOwnLocation()
 
@@ -74,7 +86,7 @@ class GetBookingBase(ProtectedService):
             roomName = room.getName()
         else:
             roomName = None
-        
+
         return {'location': locName,
                 'room': roomName,
                 'address': locAddress}

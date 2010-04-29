@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: registrantsModif.py,v 1.19 2009/05/14 18:06:03 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -19,7 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import MaKaC.webinterface.urlHandlers as urlHandlers 
+import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.registrants as registrants
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.rh.conferenceModif as conferenceModif
@@ -43,7 +42,7 @@ class RHRegistrantListModifBase( registrationFormModif.RHRegistrationFormModifBa
     pass
 
 class RHRegistrantListMenuClose(RHRegistrantListModifBase):
-    
+
     def _checkParams( self, params ):
         RHRegistrantListModifBase._checkParams( self, params )
         self._currentURL = params.get("currentURL","")
@@ -55,7 +54,7 @@ class RHRegistrantListMenuClose(RHRegistrantListModifBase):
 
 
 class RHRegistrantListMenuOpen(RHRegistrantListModifBase):
-    
+
     def _checkParams( self, params ):
         RHRegistrantListModifBase._checkParams( self, params )
         self._currentURL = params.get("currentURL","")
@@ -64,93 +63,198 @@ class RHRegistrantListMenuOpen(RHRegistrantListModifBase):
         websession = self._getSession()
         websession.setVar("RegistrantListMenuStatus", "open")
         self._redirect(self._currentURL)
-    
+
 class RHRegistrantListModif( RHRegistrantListModifBase ):
+    """
+    Registrant List - management area
+    Handles filtering and display of different columns
+    """
+
     _uh = urlHandlers.UHConfModifRegistrantList
 
-    def _checkParams( self, params ):
-        RHRegistrantListModifBase._checkParams(self, params)        
+    def _resetFilters( self, sessionData ):
+        """
+        Brings the filter data to a consistent state (websession),
+        marking everything as "checked"
+        """
+
         regForm = self._conf.getRegistrationForm()
-        websession = self._getSession()
-        dict = websession.getVar("registrantsFilterAndSortingConf%s"%self._conf.getId())
-        noMemory = False
-        if not dict:
-            noMemory = True
-            dict = {}
+        accommTypes = regForm.getAccommodationForm().getAccommodationTypesList()
+        sessionData["accomm"] = map(lambda accom: accom.getId(),
+                                    accommTypes)
+
+        lstatuses = []
+        for st in regForm.getStatusesList():
+            lstatuses.append(st.getCaption() + st.getId() + "-NoValue")
+            for stInt in st.getStatusValues():
+                lstatuses.append(st.getCaption() + st.getId() + "-" +
+                                 st.getStatusValues()[stInt].getCaption())
+        sessionData["statuses"] = lstatuses
+
+        sessTypes = regForm.getSessionsForm().getSessionList()
+        sessionData["session"] = map(lambda session: session.getId(), sessTypes)
+
+        socialEvents = regForm.getSocialEventForm().getSocialEventList()
+        sessionData["event"] = map(lambda event: event.getId(), socialEvents)
+
+        # By default, check '--none--'
+        sessionData["accommShowNoValue"] = True
+        sessionData["sessionShowNoValue"] = True
+        sessionData["eventShowNoValue"] = True
+
+        return sessionData
+
+    def _updateFilters( self, sessionData, params ):
+        """
+        Updates the filter parameters in the websession with those
+        coming from the HTTP request
+        """
+
+        sessionData['event'] = []
+        sessionData['accomm'] = []
+        sessionData['statuses'] = []
+
+        sessionData.update(params)
+        sessionData['session'] = utils.normalizeToList(params.get('session',[]))
+
+        # update these elements in the session so that the parameters that are
+        # passed are always taken into account (sessionData.update is not
+        # enough, since the elements that are ommitted in params would just be
+        # ignored
+
+        sessionData['accommShowNoValue'] = params.has_key('accommShowNoValue')
+        sessionData['eventShowNoValue'] = params.has_key('eventShowNoValue')
+        sessionData['sessionShowNoValue'] = params.has_key('sessionShowNoValue')
+        sessionData['firstChoice'] = params.has_key("firstChoice")
+
+        return sessionData
+
+    def _buildFilteringCriteria(self, sessionData):
+        """
+        Creates the Filtering Criteria object, without changint the existing
+        session data (sessionData is cloned, not directly changed)
+        """
+        sessionCopy = sessionData.copy()
+
+        # filtering criteria needs a proper "filter name"
+        del sessionCopy['session']
+        sessionCopy[self._sessionFilterName] = sessionData['session']
+
+        # Build the filtering criteria
+        filterCrit = regFilters.RegFilterCrit(self._conf, sessionCopy)
+
+        filterCrit.getField("accomm").setShowNoValue(
+            sessionCopy.get("accommShowNoValue") )
+        filterCrit.getField(self._sessionFilterName).setShowNoValue(
+            sessionCopy.get("sessionShowNoValue") )
+        filterCrit.getField("event").setShowNoValue(
+            sessionCopy.get("eventShowNoValue") )
+
+        return filterCrit
+
+    def _checkAction( self, params, filtersActive, sessionData, operation ):
+        """
+        Decides what to do with the request parameters, depending
+        on the type of operation that is requested
+        """
+
+        # user chose to reset the filters
+        if operation ==  'resetFilters':
+            self._filterUsed = False
+            sessionData = self._resetFilters(sessionData)
+
+        # user set the filters
+        elif operation ==  'setFilters':
+            self._filterUsed = True
+            sessionData = self._updateFilters(sessionData, params)
+
+        # user has changed the display options
+        elif operation == 'setDisplay':
+            self._filterUsed = filtersActive
+            sessionData['disp'] = params.get('disp',[])
+
+        # session is empty (first time)
+        elif not filtersActive:
+            self._filterUsed = False
+            sessionData = self._resetFilters(sessionData)
         else:
-            dict = dict.copy()
-        if not noMemory and params.has_key("disp"):
-            if "accommShowNoValue" in dict:
-                del dict["accommShowNoValue"]
-            if "eventShowNoValue" in dict:
-                del dict["eventShowNoValue"]
-            if "sessionShowNoValue" in dict:
-                del dict["sessionShowNoValue"]
-            if not params.has_key("event") and "event" in dict:
-                del dict["event"]
-            if not params.has_key("session") and "session" in dict:
-                del dict["session"]
-            if not params.has_key("accomm") and "accomm" in dict:
-                del dict["accomm"]
-        dict.update(params)
-        self._display = dict.get("disp",[])
-        if not isinstance(self._display, list):
-            self._display = [self._display]
-        if dict.has_key("firstChoice"):
+            self._filterUsed = True
+
+        # preserve the order and sortBy parameters, whatever happens
+        sessionData['order'] = params.get('order', 'down')
+        sessionData['sortBy'] = params.get('sortBy', 'Name')
+
+        return sessionData
+
+    def _checkParams( self, params ):
+        """
+        Main parameter checking routine
+        """
+
+        RHRegistrantListModifBase._checkParams(self, params)
+
+        operationType = params.get('operationType')
+
+        # session data
+        websession = self._getSession()
+        sessionData = websession.getVar("registrantsFilterAndSortingConf%s"%self._conf.getId())
+
+        # check if there is information already
+        # set in the session variables
+        if sessionData:
+            # work on a copy
+            sessionData = sessionData.copy()
+            filtersActive =  sessionData['filtersActive']
+        else:
+            # set a default, empty dict
+            sessionData = {}
+            filtersActive = False
+
+        if params.has_key("resetFilters"):
+            operation =  'resetFilters'
+        elif operationType ==  'filter':
+            operation =  'setFilters'
+        elif operationType ==  'display':
+            operation =  'setDisplay'
+        else:
+            operation = None
+
+        # the filter name will be different, depending
+        # on whether only  the first choice for the session
+        # is taken into account
+
+        if params.has_key("firstChoice"):
             self._sessionFilterName="sessionfirstpriority"
         else:
-            self._sessionFilterName="session"  
-        filterUsed = False
-        if not noMemory:
-            filterUsed = True
-        filter = {}
-        laccomm = []        
-        accommform = regForm.getAccommodationForm()
-        accommtypes = accommform.getAccommodationTypesList()
-        if not filterUsed:
-            for accomm in accommtypes:
-                laccomm.append(accomm.getId())
-        filter["accomm"]=dict.get("accomm",laccomm)
-        sessform =regForm.getSessionsForm()
-        sesstypes = sessform.getSessionList()
-        lsessions = []
-        if not filterUsed:
-            for sess in sesstypes:
-                lsessions.append( sess.getId() )
-        filter[self._sessionFilterName]=dict.get("session",lsessions)
-        eventForm = regForm.getSocialEventForm()
-        events = eventForm.getSocialEventList()
-        levents = []
-        if not filterUsed:
-            for event in events:
-                levents.append( event.getId() ) 
-        filter["event"]=dict.get("event",levents)
-        self._filterCrit=regFilters.RegFilterCrit(self._conf,filter)
-        accommShowNoValue=True
-        sessionShowNoValue=True
-        eventShowNoValue=True
-        if filterUsed or dict.has_key("disp"):
-            accommShowNoValue =  dict.has_key("accommShowNoValue")
-            sessionShowNoValue =  dict.has_key("sessionShowNoValue")
-            eventShowNoValue =  dict.has_key("eventShowNoValue")
-        self._filterCrit.getField("accomm").setShowNoValue( accommShowNoValue )
-        self._filterCrit.getField(self._sessionFilterName).setShowNoValue( sessionShowNoValue )
-        self._filterCrit.getField("event").setShowNoValue( eventShowNoValue )
-        self._sortingCrit = regFilters.SortingCriteria( [dict.get( "sortBy", "Name" ).strip()] )
-        self._order = dict.get("order","down")
-        self._menuStatus = websession.getVar("RegistrantListMenuStatus")
-        
+            self._sessionFilterName="session"
+
+        sessionData = self._checkAction(params, filtersActive, sessionData, operation)
+
+        # Maintain the state abotu filter usage
+        sessionData['filtersActive'] = self._filterUsed;
+
+        # Save the web session
+        websession.setVar("registrantsFilterAndSortingConf%s"%self._conf.getId(), sessionData)
+
+        self._filterCrit = self._buildFilteringCriteria(sessionData)
+
+        self._sortingCrit = regFilters.SortingCriteria( [sessionData.get( "sortBy", "Name" ).strip()] )
+
+        self._order = sessionData.get("order","down")
+
+        self._display = utils.normalizeToList(sessionData.get("disp",[]))
+
+
     def _process( self ):
-        p = registrants.WPConfModifRegistrantList( self, self._conf )
-        return p.display(filterCrit = self._filterCrit, sortingCrit=self._sortingCrit, display = self._display, sessionFilterName = self._sessionFilterName, order=self._order, menuStatus=self._menuStatus)
+        p = registrants.WPConfModifRegistrantList( self, self._conf, self._filterUsed )
+        return p.display(filterCrit = self._filterCrit, sortingCrit=self._sortingCrit, display = self._display, sessionFilterName = self._sessionFilterName, order=self._order )
 
 
 class RHRegistrantListModifAction( RHRegistrantListModifBase ):
-
     def _checkParams( self, params ):
         RHRegistrantListModifBase._checkParams(self, params)
-        self._selectedRegistrants = self._normaliseListParam(params.get("registrants",[]))
-        self._addNew = params.has_key("newRegistrant")         
+        self._selectedRegistrants = self._normaliseListParam(params.get("registrant",[]))
+        self._addNew = params.has_key("newRegistrant")
         self._remove = params.has_key("removeRegistrants")
         self._email = params.has_key("email.x")
         self._emailSelected = params.has_key("emailSelected")
@@ -160,7 +264,7 @@ class RHRegistrantListModifAction( RHRegistrantListModifBase ):
         self._reglist = params.get("reglist","").split(",")
         self._display = self._normaliseListParam(params.get("disp",[]))
         self._printBadgesSelected = params.has_key("printBadgesSelected")
-    
+
     def _process( self ):
         if self._addNew:
             self._redirect(RHRegistrantNewForm._uh.getURL(self._conf))
@@ -181,21 +285,21 @@ class RHRegistrantListModifAction( RHRegistrantListModifBase ):
                 self._redirect(urlHandlers.UHConfModifRegistrantList.getURL(self._conf))
         elif self._pdf:
             regs =[]
-            for reg in self._reglist:
+            for reg in self._selectedRegistrants:
                 if self._conf.getRegistrantById(reg) !=None:
                     regs.append(self._conf.getRegistrantById(reg))
             r = RHRegistrantListPDF(self,self._conf,regs, self._display)
             return r.pdf()
         elif self._info:
             regs =[]
-            for reg in self._reglist:
+            for reg in self._selectedRegistrants:
                 if self._conf.getRegistrantById(reg) !=None:
                     regs.append(self._conf.getRegistrantById(reg))
             r = RHRegistrantsInfo(self,self._conf,regs)
             return r.info()
         elif self._excel:
             regs =[]
-            for reg in self._reglist:
+            for reg in self._selectedRegistrants:
                 if self._conf.getRegistrantById(reg) !=None:
                     regs.append(self._conf.getRegistrantById(reg))
             r = RHRegistrantListExcel(self,self._conf,regs, self._display)
@@ -211,14 +315,14 @@ class RHRegistrantListModifAction( RHRegistrantListModifBase ):
 
 class RHRegistrantNewForm(RHRegistrantListModifBase):
     _uh = urlHandlers.Derive(RHRegistrantListModif, "newRegistrant")
-    
+
     def _checkParams(self, params):
         RHRegistrantListModifBase._checkParams(self, params)
-    
+
     def _process(self):
         p = registrationForm.WPRegistrationFormDisplay(self, self._conf)
         return p.display()
-        
+
 class RHRegistrantListRemove(RHRegistrantListModifBase):
 
     def _checkParams( self, params ):
@@ -238,7 +342,7 @@ class RHRegistrantsInfo:
         self._conf = conf
         self._list = reglist
         self._rh = rh
-    
+
     def info(self):
         p=registrants.WPRegistrantsInfo(self._rh, self._conf)
         return p.display(reglist=self._list)
@@ -249,8 +353,8 @@ class RHRegistrantListPDF:
         self._list = reglist
         self._rh = rh
         self._display = disp
-        
-    
+
+
     def pdf( self ):
         filename = "RegistrantsList.pdf"
         pdf = RegistrantsListToPDF(self._conf,list=self._list, display=self._display)
@@ -268,7 +372,7 @@ class RHRegistrantListExcel:
         self._list = reglist
         self._rh = rh
         self._display = disp
-    
+
     def excel( self ):
         filename = "RegistrantsList.csv"
         excel = RegistrantsListToExcel(self._conf,list=self._list, display=self._display)
@@ -279,13 +383,13 @@ class RHRegistrantListExcel:
         self._rh._req.content_type = """%s"""%(mimetype)
         self._rh._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
         return data
-    
+
 class RHRegistrantListEmail:
     def __init__(self, rh, conf, reglist):
         self._conf = conf
         self._regList = reglist
         self._rh = rh
-           
+
     def email(self):
         p=registrants.WPEMail(self._rh, self._conf, self._regList)
         return p.display()
@@ -296,25 +400,25 @@ class RHRegistrantModifBase( conferenceModif.RHConferenceModifBase ):
         conferenceModif.RHConferenceModifBase._checkProtection(self)
         if not self._conf.hasEnabledSection("regForm"):
             raise MaKaCError( _("The registrants' management was disabled by the conference managers"))
-    
+
     def _checkParams( self, params ):
         conferenceModif.RHConferenceModifBase._checkParams(self, params)
         self._registrant = self._conf.getRegistrantById(params.get("registrantId",""))
 
 class RHRegistrantModification( RHRegistrantModifBase ):
-    
+
     def _process( self ):
         p = registrants.WPRegistrantModification( self, self._registrant )
         return p.display()
 
 class RHRegistrantDataModification( RHRegistrantModifBase ):
-    
+
     def _process( self ):
         p = registrants.WPRegistrantDataModification( self, self._registrant )
         return p.display()
 
 class RHRegistrantSendEmail( RHRegistrantModifBase ):
-    
+
     def _checkParams(self, params):
         RHRegistrantModifBase._checkParams( self, params )
         self._regsIds = self._normaliseListParam(params.get("regsIds",[]))
@@ -350,7 +454,7 @@ class RHRegistrantSendEmail( RHRegistrantModifBase ):
         else:
             self._redirect(urlHandlers.UHConfModifRegistrantList.getURL(self._conf))
 
-            
+
 class RHRegistrantPerformDataModification( RHRegistrantModifBase ):
 
     def _checkParams( self, params ):
@@ -362,21 +466,21 @@ class RHRegistrantPerformDataModification( RHRegistrantModifBase ):
             if key not in params.keys() or params.get(key,"").strip() == "":
                 raise FormValuesError("The field \"%s\" is mandatory and you must fill it in order to modify the registrant"%(pd.getData()[key].getName()))
         self._cancel = params.has_key("cancel")
-    
+
     def _process( self ):
         if not self._cancel:
             if self._conf.hasRegistrantByEmail(self._getRequestParams().get("email",""), self._registrant):
                 raise FormValuesError("There is already a user with the email \"%s\". Please choose another one"%self._getRequestParams().get("email","--no email--"))
             self._registrant.setPersonalData(self._getRequestParams())
         self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
-    
+
 
 class RHRegistrantSessionModify( RHRegistrantModifBase ):
 
     def _checkParams( self, params ):
         RHRegistrantModifBase._checkParams(self, params)
         self._cancel = params.has_key("cancel")
-    
+
     def _process( self ):
         if not self._conf.getRegistrationForm().getSessionsForm().isEnabled():
             self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
@@ -389,15 +493,15 @@ class RHRegistrantTransactionModify( RHRegistrantModifBase ):
     def _checkParams( self, params ):
         RHRegistrantModifBase._checkParams(self, params)
         self._cancel = params.has_key("cancel")
-    
+
     def _process( self ):
-        
+
         if not self._conf.getRegistrationForm().isActivated():
             self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
         else:
             p = registrants.WPRegistrantTransactionModify(self, self._registrant)
-            return p.display()        
-            
+            return p.display()
+
 class RHRegistrantTransactionPerformModify( RHRegistrantModifBase ):
     _uh = urlHandlers.UHRegistrantModification
 
@@ -419,14 +523,14 @@ class RHRegistrantTransactionPerformModify( RHRegistrantModifBase ):
                 self._registrant.setPayed(True)
                 d={}
                 d["OrderTotal"]=self._registrant.getTotal()
-                d["Currency"]=self._registrant.getRegistrationForm().getCurrency()                         
+                d["Currency"]=self._registrant.getRegistrationForm().getCurrency()
                 tr=epayment.TransactionPayLaterMod(d)
-                self._registrant.setTransactionInfo(tr)  
-            else :self._registrant.setTransactionInfo(None)  
+                self._registrant.setTransactionInfo(tr)
+            else :self._registrant.setTransactionInfo(None)
             #self._registrant.setSessions(self._sessions)
-        self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))  
-        
-        
+        self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
+
+
 class RHRegistrantSessionPerformModify( RHRegistrantModifBase ):
     _uh = urlHandlers.UHRegistrantModification
 
@@ -447,7 +551,7 @@ class RHRegistrantSessionPerformModify( RHRegistrantModifBase ):
         self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
 
 class RHRegistrantAccommodationModify( RHRegistrantModifBase ):
-    
+
     def _process( self ):
         if not self._conf.getRegistrationForm().getAccommodationForm().isEnabled():
             self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
@@ -486,7 +590,7 @@ class RHRegistrantAccommodationPerformModify( RHRegistrantModifBase ):
         self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
 
 class RHRegistrantSocialEventsModify( RHRegistrantModifBase ):
-    
+
     def _process( self ):
         if not self._conf.getRegistrationForm().getSocialEventForm().isEnabled():
             self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
@@ -511,12 +615,12 @@ class RHRegistrantSocialEventsPerformModify( RHRegistrantModifBase ):
                 for id in socialEventIds:
                     self._socialEvents.append(self._regForm.getSocialEventForm().getSocialEventById(id))
                     self._places[id] = params.get("places-%s"%id, "1")
-                
+
     def _process( self ):
         if not self._cancel:
             for seItem in self._registrant.getSocialEvents()[:]:
                 self._registrant.removeSocialEventById(seItem.getId())
-                
+
             l = []
             for seItem in self._socialEvents:
                 newSE = SocialEvent(seItem, int(self._places[seItem.getId()]))
@@ -524,7 +628,7 @@ class RHRegistrantSocialEventsPerformModify( RHRegistrantModifBase ):
         self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
 
 class RHRegistrantReasonParticipationModify( RHRegistrantModifBase ):
-    
+
     def _process( self ):
         if not self._conf.getRegistrationForm().getReasonParticipationForm().isEnabled():
             self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
@@ -544,7 +648,7 @@ class RHRegistrantReasonParticipationPerformModify( RHRegistrantModifBase ):
                 self._cancel = True
             else:
                 self._reason = params.get("reason","")
-                
+
     def _process( self ):
         if not self._cancel:
             self._registrant.setReasonParticipation(self._reason)
@@ -556,7 +660,7 @@ class RHRegistrantMiscInfoModify( RHRegistrantModifBase ):
         RHRegistrantModifBase._checkParams(self, params)
         self._miscInfoId = params.get("miscInfoId","")
         self._miscInfo=self._registrant.getMiscellaneousGroupById(self._miscInfoId)
-    
+
     def _process( self ):
         gsf=self._conf.getRegistrationForm().getGeneralSectionFormById(self._miscInfoId)
         if gsf is not None:
@@ -575,7 +679,7 @@ class RHRegistrantMiscInfoPerformModify( RHRegistrantModifBase ):
         self._cancel = params.has_key("cancel")
         miscInfoId = params.get("miscInfoId","")
         self._miscInfo=self._registrant.getMiscellaneousGroupById(miscInfoId)
-                
+
     def _process( self ):
         if not self._cancel:
             params=self._getRequestParams()
@@ -601,7 +705,7 @@ class RHRegistrantStatusesPerformModify( RHRegistrantModifBase ):
             if pkey.startswith("statuses-"):
                 id=pkey.split("-")[1]
                 self._statuses[id]=params.get(pkey)
-                
+
     def _process( self ):
         if not self._cancel:
             for stkey in self._statuses.keys():

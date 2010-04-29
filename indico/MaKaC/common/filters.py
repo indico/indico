@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: filters.py,v 1.3 2008/04/24 16:58:48 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -184,6 +183,7 @@ class FilterCriteria:
                     and the values must be a list of the values the field must
                     satisfy in order to make it pass the filter.
         """
+
         self._conf=conf
         self._fields = {}
         #Match the criteria keys with the allowed fields and construct the 

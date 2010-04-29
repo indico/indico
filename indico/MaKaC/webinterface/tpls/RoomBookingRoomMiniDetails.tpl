@@ -5,7 +5,11 @@
                                     <table width="100%">
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small> <%= _("Name")%>&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><a href="<%= roomDetailsUH.getURL( room ) %>"><%= room.name %></a></td>
+                                            <td align="left" class="blacktext"><a href="<%= roomDetailsUH.getURL( room ) %>"><%= room.building %>-<%= room.floor %>-<%= room.roomNr %>
+                                                <% if room.name != str(room.building) + '-' + str(room.floor) + '-' + str(room.roomNr): %>
+                                                    <small>(<%= room.name %>)</small>
+                                                 <% end %></a>
+                                            </td>
                                         </tr>
                                         <% if room.photoId != None: %>
                                         <tr>

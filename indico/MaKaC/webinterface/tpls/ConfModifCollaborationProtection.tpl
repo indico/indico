@@ -1,4 +1,5 @@
-<% from MaKaC.common.PickleJar import DictPickler %>
+<% from MaKaC.fossils.user import IAvatarFossil %>
+<% from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools %>
 
 <p style="font-style: italic; padding-bottom: 20px;" >
     Event managers have all the necessary rights for all of the <strong>Video Services</strong> section.<br />
@@ -7,7 +8,7 @@
 </p>
 
 <div style="padding-bottom: 30px;">
-    <div class="groupTitle"><%= _("Video Services Managers")%></div> 
+    <div class="groupTitle"><%= _("Video Services Managers")%></div>
     <p style="font-style: italic;" >
         Users added here will be able to access <strong>all</strong> of the the Video Services section of this event, including this <strong>Protection</strong> tab.
     </p>
@@ -15,7 +16,7 @@
     </div>
 </div>
 
-<% allowedPluginNames = [p.getName() for p in CSBM.getAllowedPlugins()] %>
+<% allowedPluginNames = [p.getName() for p in CSBM.getAllowedPlugins() if not CollaborationTools.isAdminOnlyPlugin(p)] %>
 <% allowedPluginNames.sort() %>
 
 <div class="groupTitle"><%= _("Managers for individual systems") %></div>
@@ -31,13 +32,15 @@
         </td>
         <td style="padding-bottom: 30px;">
             <div style="padding-left: 20px;" id="userList_<%= name %>">
-            </div>        
+            </div>
         </td>
     </tr>
 <% end %>
 </table>
 
 <script type="text/javascript">
+    var allManagers = $L(<%= jsonEncode(AllManagers)%>);
+
     <% for name in ["all"] + allowedPluginNames: %>
     var newPersonsHandler = function(userList, setResult) {
         indicoRequest(
@@ -50,6 +53,9 @@
             function(result,error) {
                 if (!error) {
                     setResult(true);
+                    each(userList, function(user){
+                        allManagers.append(user);
+                    });
                 } else {
                     IndicoUtil.errorReport(error);
                     setResult(false);
@@ -75,13 +81,12 @@
             }
         );
     }
-    
-    var uf = new UserListField('PluginPeopleListDiv', 'PluginPeopleList',
-                               <%= jsonEncode(DictPickler.pickle(CSBM.getPluginManagers(name))) %>,
-                               null,
-                               <%=jsonEncode(Favorites)%>,
-                               true, false, false,
-                               newPersonsHandler, userListNothing, removePersonHandler)
+
+    var uf = new UserListField('PeopleListDiv', 'PeopleList',
+                               <%= jsonEncode(fossilize(CSBM.getPluginManagers(name), IAvatarFossil)) %>, true, allManagers,
+                               true, false, null, null,
+                               false, false, true,
+                               newPersonsHandler, singleUserNothing, removePersonHandler)
     $E('userList_<%=name%>').set(uf.draw())
     <% end %>
 </script>

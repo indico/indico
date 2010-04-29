@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: conference.py,v 1.60 2009/06/03 16:33:15 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -442,7 +441,7 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
             target=status.getTargetAbstract()
             st = _(""" _("MERGED") (%s : %s)""")%(target.getId(), target.getTitle())
         else:
-            st = AbstractStatusList().getCaption( status.__class__ ).upper()
+            st = AbstractStatusList.getInstance().getCaption( status.__class__ ).upper()
         text = _("""<b> _("Status")</b> : %s""")%escape(st)
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
@@ -1380,9 +1379,9 @@ class TimeTablePlain(PDFWithTOC):
                 spkList.append(spkName)
             if len(spkList) > 0:
                 if len(spkList) == 1:
-                    speakerWord = _(""" _("Speaker"): """)
+                    speakerWord = _(""" _("Presenter"): """)
                 else:
-                    speakerWord = _(""" _("Speakers"): """)
+                    speakerWord = _(""" _("Presenters"): """)
                 speakerText = speakerWord + ", ".join(spkList)
                 speakerText = "<font name=\"Times-Italic\"><i>%s</i></font>"%speakerText
                 lt.append([self._fontify(speakerText,9)])
@@ -1469,9 +1468,9 @@ class TimeTablePlain(PDFWithTOC):
                 spkList.append(spkName)
             if len(spkList) > 0:
                 if len(spkList) == 1:
-                    speakerWord = _(""" _("Speaker"): """)
+                    speakerWord = _(""" _("Presenter"): """)
                 else:
-                    speakerWord = _(""" _("Speakers"): """)
+                    speakerWord = _(""" _("Presenters"): """)
                 speakerText = speakerWord + ", ".join(spkList)
                 speakerText = "<font name=\"Times-Italic\"><i>%s</i></font>"%speakerText
                 lt.append([self._fontify(speakerText, 10)])
@@ -1732,7 +1731,7 @@ class TimeTablePlain(PDFWithTOC):
                         spks.append(escape(c.getFullName()))
                 spks="; ".join(spks)
                 if spks.strip()!="":
-                    spks=_("""<font name=\"Times-Bold\"><b>- _("Speakers"): %s</b></font>""")%spks
+                    spks=_("""<font name=\"Times-Bold\"><b>- _("Presenters"): %s</b></font>""")%spks
                 text="""<u>%s</u>%s (%s-%s)"""%(
                         escape(caption),room,
                         escape(contrib.getAdjustedStartDate(self._tz).strftime("%H:%M")),
@@ -1922,7 +1921,7 @@ class SimplifiedTimeTablePlain(PDFBase):
                 for c in contrib.getSpeakerList():
                     spks.append("%s"%c.getFullName())
                 if spks != []:
-                    res.append(Paragraph( _("""<font name=\"Times-Bold\"><b> _("Speaker/s"):</b></font> %s""")%("; ".join(spks)),self._styles["normal"]))
+                    res.append(Paragraph( _("""<font name=\"Times-Bold\"><b> _("Presenter/s"):</b></font> %s""")%("; ".join(spks)),self._styles["normal"]))
                 res.append(Spacer(1,0.2*inch))
             elif self._ttPDFFormat.showBreaksAtConfLevel() and isinstance(entry,schedule.BreakTimeSchEntry):
                 title=entry.getTitle()
@@ -2730,9 +2729,8 @@ class RegistrantsListToBadgesPDF:
 
         # We draw the items of the badge
         for item in self.__badgeTemplate.getItems():
-
             # First we determine the actual text that has to be drawed.
-            action = BadgeDesignConfiguration().items_actions[item.getName()]
+            action = BadgeDesignConfiguration().items_actions[item.getKey()][1]
             if isinstance(action, str):
                 # If for this kind of item we have to draw always the same string, let's draw it.
                 text = action
@@ -2964,7 +2962,7 @@ class LectureToPosterPDF:
         for item in self.__posterTemplate.getItems():
 
             # First we determine the actual text that has to be drawed.
-            action = PosterDesignConfiguration().items_actions[item.getName()]
+            action = PosterDesignConfiguration().items_actions[item.getKey()][1]
 
             if isinstance(action, str):
                 # If for this kind of item we have to draw always the same string, let's draw it.

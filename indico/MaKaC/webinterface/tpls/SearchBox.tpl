@@ -7,7 +7,7 @@
         </div>
 	<div style="background: white; padding: 2px;">
 	  <div id="yoo" class="<%= moreOptionsClass %>" onclick="javascript:return expandMenu(this);"></div>
-	  <input style="background-color: transparent;" type="text" id="searchText" name="p" />
+	  <input style="background-color: transparent; margin-top: -1px;" type="text" id="searchText" name="p" />
     	</div>
     </div>
 
@@ -108,7 +108,7 @@ var searchControls = $E('searchControls');
 var extraOptions = $E('extraOptions');
 
 var intelligentSearchBox = new IntelligentSearchBox({name: 'p', id: 'searchText',
-                                 style: {backgroundColor: 'transparent'}
+                                 style: {backgroundColor: 'transparent', outline: 'none', marginTop: '-1px'}
 				 }, $E('UISearchBox'), $E('searchSubmit'));
 
 IndicoUI.executeOnLoad(function(){

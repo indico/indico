@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: conferenceModification.py,v 1.20 2008/10/16 13:17:46 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -28,26 +27,26 @@
 
 #import __builtin__
 #class RollbackImporter:
-#        
+#
 #    def __init__(self):
 #        "Creates an instance and installs as the global importer"
-#        
+#
 #        self.previousModules = sys.modules.copy()
 #        self.realImport = __builtin__.__import__
 #        __builtin__.__import__ = self._import
 #        self.newModules = {}
-#        
+#
 #    def _import(self, name, globals=None, locals=None, fromlist=[]):
 #        result = apply(self.realImport, (name, globals, locals, fromlist))
 #        self.newModules[name] = 1
 #        return result
-#        
+#
 #    def uninstall(self):
 #        for modname in self.newModules.keys():
 #            if not self.previousModules.has_key(modname):
 #                # Force reload when modname next imported
 #                del(sys.modules[modname])
-#                    
+#
 #        __builtin__.__import__ = self.realImport
 
 #rollbackImporter = RollbackImporter()
@@ -83,10 +82,10 @@ def addChairs(req,**params):
 
 def addMaterial( req, **args ):
     return conferenceModif.RHConfAddMaterial( req ).process( args )
-    
+
 def performAddMaterial( req, **args ):
     return conferenceModif.RHConfPerformAddMaterial( req ).process( args )
-    
+
 def removeMaterials( req, **params ):
     return conferenceModif.RHConfRemoveMaterials( req ).process( params )
 
@@ -146,11 +145,11 @@ def materialsShow(req, **params):
 # === Room booking related ===================================================
 # ============================================================================
 
-# 0. Searching 
+# 0. Searching
 def roomBookingChooseEvent( req, **params ):
     return conferenceModif.RHConfModifRoomBookingChooseEvent( req ).process(params)
 
-# 1. Searching 
+# 1. Searching
 def roomBookingSearch4Rooms( req, **params ):
     return conferenceModif.RHConfModifRoomBookingSearch4Rooms( req ).process(params)
 
@@ -176,7 +175,7 @@ def roomBookingBookingForm( req, **params ):
 # 4. New booking: physical insert
 def roomBookingSaveBooking( req, **params ):
 #    import wingdbstub
-#    if wingdbstub.debugger != None: 
+#    if wingdbstub.debugger != None:
 #        wingdbstub.debugger.StartDebug()
     return conferenceModif.RHConfModifRoomBookingSaveBooking(req).process(params)
 

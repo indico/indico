@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: base.py,v 1.24 2009/04/25 13:55:18 dmartinc Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -20,8 +19,6 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from persistent import Persistent
-from MaKaC.common.PickleJar import Retrieves
-from MaKaC.common.Conversion import Conversion
 from MaKaC.common.Counter import Counter
 from MaKaC.common.utils import formatDateTime, parseDateTime
 from MaKaC.common.timezoneUtils import getAdjustedDate, setAdjustedDate,\
@@ -43,6 +40,9 @@ from MaKaC.common.mail import GenericMailer
 import os, inspect
 import MaKaC.plugins.Collaboration as Collaboration
 from MaKaC.i18n import _
+from MaKaC.common.fossilize import Fossilizable, fossilizes
+from MaKaC.plugins.Collaboration.fossils import ICSErrorBaseFossil, ICSSanitizationErrorFossil,\
+    ICSBookingBaseConfModifFossil, ICSBookingBaseIndexingFossil
 
 
 class CSBookingManager(Persistent, Observer):
@@ -84,14 +84,16 @@ class CSBookingManager(Persistent, Observer):
         if not self in self._conf.getObservers():
             self._conf.addObserver(self)
 
-    def isCSAllowed(self):
+    def isCSAllowed(self, user = None):
         """ Returns if the associated event should display a Video Services tab
             This can depend on the kind of event (meeting, lecture, conference), on the equipment of the room...
+            If a user is provided, we will take into account if the user can manage the plugin (for example,
+            an event manager cannot manage an admin-only plugin)
         """
         pluginsPerEventType = CollaborationTools.getCollaborationPluginType().getOption("pluginsPerEventType").getValue()
         if pluginsPerEventType:
             for plugin in pluginsPerEventType[self._conf.getType()]:
-                if plugin.isActive():
+                if plugin.isActive() and (user is None or CollaborationTools.canUserManagePlugin(self._conf, plugin, user)):
                     return True
         return False
 
@@ -233,14 +235,17 @@ class CSBookingManager(Persistent, Observer):
                 index.indexBooking(booking)
 
     def changeBooking(self, bookingId, bookingParams):
-        """ Changes the bookingParams of a CSBookingBase object.
-            After updating the booking, its "performBooking" method will be called.
-            bookingId: the id of the CSBookingBase object to change
-            bookingParams: a dictionary with the new parameters that will modify the booking
-                           "modify the booking" can mean that maybe the booking will be rejected with the new parameters.
-                           if "startDate" and "endDate" are among the keys, they will be taken out of the dictionary.
         """
+        Changes the bookingParams of a CSBookingBase object.
+        After updating the booking, its 'performBooking' method will be called.
+        bookingId: the id of the CSBookingBase object to change
+        bookingParams: a dictionary with the new parameters that will modify the booking
+        'modify the booking' can mean that maybe the booking will be rejected with the new parameters.
+        if 'startDate' and 'endDate' are among the keys, they will be taken out of the dictionary.
+        """
+
         booking = self.getBooking(bookingId)
+
 
         oldStartDate = booking.getStartDate()
         oldModificationDate = booking.getModificationDate()
@@ -253,7 +258,7 @@ class CSBookingManager(Persistent, Observer):
             CSBookingManager._rollbackChanges(booking, oldBookingParams, oldModificationDate)
             raise CollaborationServiceException("Problem while modifying a booking of type " + booking.getType())
         else:
-            modifyResult = booking._modify()
+            modifyResult = booking._modify(oldBookingParams)
             if isinstance(modifyResult, CSErrorBase):
                 CSBookingManager._rollbackChanges(booking, oldBookingParams, oldModificationDate)
                 return modifyResult
@@ -500,6 +505,15 @@ class CSBookingManager(Persistent, Observer):
     def isPluginManager(self, plugin, user):
         return user in self.getManagers().setdefault(plugin, [])
 
+    def getAllManagers(self):
+        """ Returns a list with all the managers, no matter their type
+            The returned list is not ordered.
+        """
+        managers = set()
+        for managerList in self.getManagers().itervalues():
+            managers = managers.union(managerList)
+        return list(managers)
+
     def isPluginManagerOfAnyPlugin(self, user):
         #TODO: this method is not optimal. to be optimal, we should store somewhere an index where the key
         #is the user, and the value is a list of plugins where they are managers.
@@ -537,6 +551,9 @@ class CSBookingManager(Persistent, Observer):
         endDateChanged = oldEndDate is not None and newEndDate is not None and not oldEndDate == newEndDate
         someDateChanged = startDateChanged or endDateChanged
 
+        Logger.get("VideoServ").info("""CSBookingManager: starting notifyEventDateChanges. Arguments: confId=%s, oldStartDate=%s, newStartDate=%s, oldEndDate=%s, newEndDate=%s""" %
+                                     (str(self._conf.getId()), str(oldStartDate), str(newStartDate), str(oldEndDate), str(newEndDate)))
+
         if someDateChanged:
             problems = []
             for booking in self.getBookingList():
@@ -548,8 +565,12 @@ class CSBookingManager(Persistent, Observer):
                             Logger.get('VideoServ').error("Exception while reindexing a booking in the event start date index because its event's start date changed: " + str(e))
 
                     if booking.needsToBeNotifiedOfDateChanges():
+                        Logger.get("VideoServ").info("""CSBookingManager: notifying date changes to booking %s of event %s""" %
+                                                     (str(booking.getId()), str(self._conf.getId())))
                         oldBookingStartDate = booking.getStartDate()
                         oldBookingEndDate = booking.getEndDate()
+                        oldBookingParams = booking.getBookingParams() #this is a copy so it's ok
+
                         if startDateChanged:
                             booking.setStartDate(oldBookingStartDate + (newStartDate - oldStartDate) )
                         if endDateChanged:
@@ -558,12 +579,14 @@ class CSBookingManager(Persistent, Observer):
                         rollback = False
                         modifyResult = None
                         try:
-                            modifyResult = booking._modify()
+                            modifyResult = booking._modify(oldBookingParams)
                             if isinstance(modifyResult, CSErrorBase):
-                                Logger.get('VideoServ').warning("Error while changing a booking's dates after event dates changed: " + modifyResult.getLogMessage())
+                                Logger.get('VideoServ').warning("""Error while changing the dates of booking %s of event %s after event dates changed: %s""" %
+                                                                (str(booking.getId()), str(self._conf.getId()), modifyResult.getLogMessage()))
                                 rollback = True
                         except Exception, e:
-                            Logger.get('VideoServ').error("Exception while changing a booking's dates after event dates changed: " + str(e))
+                            Logger.get('VideoServ').error("""Exception while changing the dates of booking %s of event %s after event dates changed: %s""" %
+                                                          (str(booking.getId()), str(self._conf.getId()), str(e)))
                             rollback = True
 
                         if rollback:
@@ -576,7 +599,7 @@ class CSBookingManager(Persistent, Observer):
                 ContextManager.get('dateChangeNotificationProblems')['Collaboration'] = [
                     'Some Video Services bookings could not be moved:',
                     problems,
-                    'Go to [[' + str(urlHandlers.UHConfModifCollaboration.getURL(self.getOwner())) + ' the Video Services section]] to modify them yourself.'
+                    'Go to [[' + str(urlHandlers.UHConfModifCollaboration.getURL(self.getOwner(), secure = CollaborationTools.isUsingHTTPS())) + ' the Video Services section]] to modify them yourself.'
                 ]
 
 
@@ -668,7 +691,9 @@ class CSBookingManager(Persistent, Observer):
 
 
 
-class CSBookingBase(Persistent):
+class CSBookingBase(Persistent, Fossilizable):
+    fossilizes(ICSBookingBaseConfModifFossil, ICSBookingBaseIndexingFossil)
+
     """ Base class that represents a Collaboration Systems booking.
         Every Collaboration plugin will have to implement this class.
         In the base class are gathered all the functionalities / elements that are common for all plugins.
@@ -711,7 +736,7 @@ class CSBookingBase(Persistent):
     _hasStartDate = True
     _hasEventDisplay = False
     _hasTitle = False
-    _complexParameters = []
+    _adminOnly = False
 
     def __init__(self, bookingType, conf):
         """ Constructor for the CSBookingBase class.
@@ -756,12 +781,11 @@ class CSBookingBase(Persistent):
         self._endDate = None
         self._startDateTimestamp = None
         self._endDateTimestamp = None
-        self._bookingParams = None # a dict that should be initialized by the implementing class
         self._statusMessage = ""
         self._statusClass = ""
         self._acceptRejectStatus = None #None = not yet accepted / rejected; True = accepted; False = rejected
         self._rejectReason = ""
-
+        self._bookingParams = {}
         self._canBeDeleted = True
         self._canBeStarted = self._hasStart
         self._canBeStopped = False
@@ -773,7 +797,6 @@ class CSBookingBase(Persistent):
         setattr(self, "_" + bookingType + "Options", CollaborationTools.getPlugin(bookingType).getOptions())
 
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'id')
     def getId(self):
         """ Returns the internal, per-conference id of the booking.
             This attribute will be available in Javascript with the "id" identifier.
@@ -785,22 +808,17 @@ class CSBookingBase(Persistent):
         """
         self._id = id
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'type')
     def getType(self):
         """ Returns the type of the booking, as a string: "EVO", "DummyPlugin"
             This attribute will be available in Javascript with the "type" identifier.
         """
         return self._type
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'],
-               'conference', isPicklableObject = True)
     def getConference(self):
         """ Returns the owner of this CSBookingBase object, which is a Conference object representing the meeting.
         """
         return self._conf
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'],
-               'warning', isPicklableObject = True)
     def getWarning(self):
         """ Returns a warning attached to this booking.
             A warning is a plugin-defined object, with information to show to the user when
@@ -818,8 +836,6 @@ class CSBookingBase(Persistent):
             self._creationDate = nowutc()
         return self._creationDate
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'],
-               'creationDate', Conversion.datetime)
     def getAdjustedCreationDate(self, tz=None):
         """ Returns the booking creation date, adjusted to a given timezone.
             If no timezone is provided, the event's timezone is used
@@ -838,8 +854,6 @@ class CSBookingBase(Persistent):
             self._modificationDate = nowutc()
         return self._modificationDate
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'],
-               'modificationDate', Conversion.datetime)
     def getAdjustedModificationDate(self, tz=None):
         """ Returns the booking last modification date, adjusted to a given timezone.
             If no timezone is provided, the event's timezone is used
@@ -886,8 +900,6 @@ class CSBookingBase(Persistent):
         """
         return self._startDate
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'],
-               'startDate', Conversion.datetime)
     def getAdjustedStartDate(self, tz=None):
         """ Returns the booking start date, adjusted to a given timezone.
             If no timezone is provided, the event's timezone is used
@@ -974,14 +986,12 @@ class CSBookingBase(Persistent):
             except ValueError:
                 raise CollaborationServiceException("endDate parameter (" + endDateString +" ) is in an incorrect format for booking with id: " + str(self._id))
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'statusMessage')
     def getStatusMessage(self):
         """ Returns the status message as a string.
             This attribute will be available in Javascript with the "statusMessage"
         """
         return self._statusMessage
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'statusClass')
     def getStatusClass(self):
         """ Returns the status message CSS class as a string.
             This attribute will be available in Javascript with the "statusClass"
@@ -1008,7 +1018,6 @@ class CSBookingBase(Persistent):
         """
         self._acceptRejectStatus = None
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'acceptRejectStatus')
     def getAcceptRejectStatus(self):
         """ Returns the Accept/Reject status of the booking
             This attribute will be available in Javascript with the "acceptRejectStatus"
@@ -1021,7 +1030,6 @@ class CSBookingBase(Persistent):
             self._acceptRejectStatus = None
         return self._acceptRejectStatus
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'rejectionReason')
     def getRejectReason(self):
         """ Returns the rejection reason.
             This attribute will be available in Javascript with the "rejectReason"
@@ -1030,7 +1038,6 @@ class CSBookingBase(Persistent):
             self._rejectReason = ""
         return self._rejectReason
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'bookingParams')
     def getBookingParams(self):
         """ Returns a dictionary with the booking params.
             This attribute will be available in Javascript with the "bookingParams"
@@ -1047,14 +1054,20 @@ class CSBookingBase(Persistent):
             to the methods getCommunityName, getAccessPassword, getHasAccessPassword.
             If you include a parameter in the _complexParameters list, you always have to implement the corresponding getter method.
         """
+        bookingParams = {}
+        for k, v in self.__class__._simpleParameters.iteritems():
+            if k in self._bookingParams:
+                value = self._bookingParams[k]
+            else:
+                value = v[1] #we use the default value
+            if v[0] is bool and value is True: #we assume it will be used in a single checkbox
+                value = ["yes"]
+            if value is not False: #we do not include False, it means the single checkbox is not checked
+                bookingParams[k] = value
 
-        if self._bookingParams is None:
-            raise CollaborationServiceException("This CSBooking object with id " + str(id) + " of the class " + str(self.__class__) + " doesn't have an attribute _bookingParams defined")
-
-        bookingParams = self._bookingParams.copy()
-        if len(self._complexParameters) > 0:
+        if hasattr(self.__class__, "_complexParameters") and len(self.__class__._complexParameters) > 0:
             getterMethods = dict(inspect.getmembers(self, lambda m: inspect.ismethod(m) and m.__name__.startswith('get')))
-            for paramName in self._complexParameters:
+            for paramName in self.__class__._complexParameters:
                 getMethodName = 'get' + paramName[0].upper() + paramName[1:]
                 if getMethodName in getterMethods:
                     bookingParams[paramName] = getterMethods[getMethodName]()
@@ -1064,10 +1077,27 @@ class CSBookingBase(Persistent):
         bookingParams["startDate"] = self.getStartDateAsString()
         bookingParams["endDate"] = self.getEndDateAsString()
         if self.needsToBeNotifiedOfDateChanges():
-            bookingParams["notifyOnDateChanges"] = ["notifyOnDateChanges"]
-        bookingParams["hidden"] = self.isHidden()
+            bookingParams["notifyOnDateChanges"] = ["yes"]
+        if self.isHidden():
+            bookingParams["hidden"] = ["yes"]
 
         return bookingParams
+
+
+    def getBookingParamByName(self, paramName):
+        if paramName in self.__class__._simpleParameters:
+            if not paramName in self._bookingParams:
+                self._bookingParams[paramName] = self.__class__._simpleParameters[paramName][1]
+            return self._bookingParams[paramName]
+        elif hasattr(self.__class__, "_complexParameters") and paramName in self.__class__._complexParameters:
+            getterMethods = dict(inspect.getmembers(self, lambda m: inspect.ismethod(m) and m.__name__.startswith('get')))
+            getMethodName = 'get' + paramName[0].upper() + paramName[1:]
+            if getMethodName in getterMethods:
+                return getterMethods[getMethodName]()
+            else:
+                raise CollaborationServiceException("Tried to retrieve complex parameter " + str(paramName) + " but the corresponding getter method " + getMethodName + " is not implemented")
+        else:
+            raise CollaborationServiceException("Tried to retrieve parameter " + str(paramName) + " but this parameter does not exist")
 
 
     def setBookingParams(self, params):
@@ -1088,12 +1118,13 @@ class CSBookingBase(Persistent):
             Note: even if a parameter is in this list, you can decide not to implement its corresponding set
             method if you never expect the parameter name to come up inside 'params'.
         """
+
         sanitizeResult = self.sanitizeParams(params)
         if sanitizeResult:
             return sanitizeResult
 
-        self.setHidden(params.pop("hidden", False))
-        self.setNeedsToBeNotifiedOfDateChanges(params.pop("notifyOnDateChanges", False))
+        self.setHidden(params.pop("hidden", False) == ["yes"])
+        self.setNeedsToBeNotifiedOfDateChanges(params.pop("notifyOnDateChanges", False) == ["yes"])
 
         startDate = params.pop("startDate", None)
         if startDate is not None:
@@ -1103,9 +1134,14 @@ class CSBookingBase(Persistent):
             self.setEndDateFromString(endDate)
 
         for k,v in params.iteritems():
-            if k in self._bookingParams:
+            if k in self.__class__._simpleParameters:
+                if self.__class__._simpleParameters[k][0]:
+                    try:
+                        v = self.__class__._simpleParameters[k][0](v)
+                    except ValueError:
+                        raise CollaborationServiceException("Tried to set value of parameter with name " + str(k) + ", recognized as a simple parameter of type" + str(self._simpleParameters[k]) + ", but the conversion failed")
                 self._bookingParams[k] = v
-            elif k in self._complexParameters:
+            elif k in self.__class__._complexParameters:
                 setterMethods = dict(inspect.getmembers(self, lambda m: inspect.ismethod(m) and m.__name__.startswith('set')))
                 setMethodName = 'set' + k[0].upper() + k[1:]
                 if setMethodName in setterMethods:
@@ -1114,6 +1150,10 @@ class CSBookingBase(Persistent):
                     raise CollaborationServiceException("Tried to set value of parameter with name " + str(k) + ", recognized as a complex parameter, but the corresponding setter method " + setMethodName + " is not implemented")
             else:
                 raise CollaborationServiceException("Tried to set the value of a parameter with name " + str(k) + " that was not declared")
+
+        for k, v in self.__class__._simpleParameters.iteritems():
+            if not k in self._bookingParams:
+                self._bookingParams[k] = self.__class__._simpleParameters[k][1]
 
         if self.needsBookingParamsCheck():
             return self._checkBookingParams()
@@ -1137,13 +1177,15 @@ class CSBookingBase(Persistent):
         else:
             return None
 
+    def _getTypeDisplayName(self):
+        return CollaborationTools.getXMLGenerator(self._type).getDisplayName()
+
+    def _getFirstLineInfo(self, tz):
+        return CollaborationTools.getXMLGenerator(self._type).getFirstLineInfo(self, tz)
+
     def _getTitle(self):
         if self.hasEventDisplay():
             raise CollaborationException("Method _getTitle was not overriden for the plugin type " + str(self._type))
-
-    def _getPluginDisplayName(self):
-        if self.hasEventDisplay():
-            raise CollaborationException("Method _getPluginDisplayName was not overriden for the plugin type " + str(self._type))
 
     def _getInformationDisplay(self, tz):
         templateClass = CollaborationTools.getTemplateClass(self.getType(), "WInformationDisplay")
@@ -1166,14 +1208,12 @@ class CSBookingBase(Persistent):
         if self.needsBookingParamsCheck():
             raise CollaborationServiceException("Method _checkBookingParams was not overriden for the plugin type " + str(self._type))
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'hasStart')
     def hasStart(self):
         """ Returns if this booking belongs to a plugin who has a "start" concept.
             This attribute will be available in Javascript with the "hasStart" attribute
         """
         return self._hasStart
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'hasStartStopAll')
     def hasStartStopAll(self):
         """ Returns if this booking belongs to a plugin who has a "start" concept, and all of its bookings for a conference
             can be started simultanously.
@@ -1181,56 +1221,48 @@ class CSBookingBase(Persistent):
         """
         return self._hasStartStopAll
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'hasStop')
     def hasStop(self):
         """ Returns if this booking belongs to a plugin who has a "stop" concept.
             This attribute will be available in Javascript with the "hasStop" attribute
         """
         return self._hasStop
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'hasCheckStatus')
     def hasCheckStatus(self):
         """ Returns if this booking belongs to a plugin who has a "check status" concept.
             This attribute will be available in Javascript with the "hasCheckStatus" attribute
         """
         return self._hasCheckStatus
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'hasAcceptReject')
     def hasAcceptReject(self):
         """ Returns if this booking belongs to a plugin who has a "accept or reject" concept.
             This attribute will be available in Javascript with the "hasAcceptReject" attribute
         """
         return self._hasAcceptReject
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'requiresServerCallForStart')
     def requiresServerCallForStart(self):
         """ Returns if this booking belongs to a plugin who requires a server call when the start button is pressed.
             This attribute will be available in Javascript with the "requiresServerCallForStart" attribute
         """
         return self._requiresServerCallForStart
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'requiresServerCallForStop')
     def requiresServerCallForStop(self):
         """ Returns if this booking belongs to a plugin who requires a server call when the stop button is pressed.
             This attribute will be available in Javascript with the "requiresServerCallForStop" attribute
         """
         return self._requiresServerCallForStop
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'requiresClientCallForStart')
     def requiresClientCallForStart(self):
         """ Returns if this booking belongs to a plugin who requires a client call when the start button is pressed.
             This attribute will be available in Javascript with the "requiresClientCallForStart" attribute
         """
         return self._requiresClientCallForStart
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'requiresClientCallForStop')
     def requiresClientCallForStop(self):
         """ Returns if this booking belongs to a plugin who requires a client call when the stop button is pressed.
             This attribute will be available in Javascript with the "requiresClientCallForStop" attribute
         """
         return self._requiresClientCallForStop
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'canBeDeleted')
     def canBeDeleted(self):
         """ Returns if this booking can be deleted, in the sense that the "Remove" button will be active and able to be pressed.
             This attribute will be available in Javascript with the "canBeDeleted" attribute
@@ -1240,21 +1272,18 @@ class CSBookingBase(Persistent):
             self._canBeDeleted = True
         return self._canBeDeleted
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'canBeStarted')
     def canBeStarted(self):
         """ Returns if this booking can be started, in the sense that the "Start" button will be active and able to be pressed.
             This attribute will be available in Javascript with the "canBeStarted" attribute
         """
         return self._canBeStarted
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'canBeStopped')
     def canBeStopped(self):
         """ Returns if this booking can be stopped, in the sense that the "Stop" button will be active and able to be pressed.
             This attribute will be available in Javascript with the "canBeStopped" attribute
         """
         return self._canBeStopped
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'permissionToStart')
     def isPermittedToStart(self):
         """ Returns if this booking is allowed to start, in the sense that it will be started after the "Start" button is pressed.
             For example a booking should not be permitted to start before a given time, even if the button is active.
@@ -1262,7 +1291,6 @@ class CSBookingBase(Persistent):
         """
         return self._permissionToStart
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'permissionToStop')
     def isPermittedToStop(self):
         """ Returns if this booking is allowed to stop, in the sense that it will be started after the "Stop" button is pressed.
             This attribute will be available in Javascript with the "isPermittedToStop" attribute
@@ -1279,7 +1307,6 @@ class CSBookingBase(Persistent):
         """
         return self._needsToBeNotifiedOnView
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'canBeNotifiedOfEventDateChanges')
     def canBeNotifiedOfEventDateChanges(self):
         """ Returns if bookings of this type should be able to be notified
             of their owner Event changing start date, end date or timezone.
@@ -1313,7 +1340,6 @@ class CSBookingBase(Persistent):
         """
         self._hidden = hidden
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'], 'allowMultiple')
     def isAllowMultiple(self):
         """ Returns if this booking belongs to a type that allows multiple bookings per event.
         """
@@ -1331,8 +1357,6 @@ class CSBookingBase(Persistent):
         """
         return self._commonIndexes
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSBookingBase', 'MaKaC.plugins.Collaboration.DummyPlugin.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.EVO.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.RecordingRequest.collaboration.CSBooking','MaKaC.plugins.Collaboration.WebcastRequest.collaboration.CSBooking', 'MaKaC.plugins.Collaboration.CERNMCU.collaboration.CSBooking'],
-                'modificationURL', lambda url: str(url))
     def getModificationURL(self):
         return urlHandlers.UHConfModifCollaboration.getURL(self.getConference(),
                                                            secure = CollaborationTools.isUsingHTTPS(),
@@ -1355,6 +1379,12 @@ class CSBookingBase(Persistent):
         """
         return self._hasEventDisplay
 
+    def isAdminOnly(self):
+        """ Returns if this booking / this booking's plugin pages should only be displayed
+            to Server Admins, Video Service Admins, or the respective plugin admins.
+        """
+        return self._adminOnly
+
     def _create(self):
         """ To be overriden by inheriting classes.
             This method is called when a booking is created, after setting the booking parameters.
@@ -1364,12 +1394,14 @@ class CSBookingBase(Persistent):
         """
         raise CollaborationException("Method _create was not overriden for the plugin type " + str(self._type))
 
-    def _modify(self):
+    def _modify(self, oldBookingParams):
         """ To be overriden by inheriting classes.
             This method is called when a booking is modifying, after setting the booking parameters.
             The plugin should decide if the booking is accepted or not.
             Often this will involve communication with another entity, like an MCU for the multi-point H.323 plugin
             or a EVO HTTP server in the EVO case.
+            A dictionary with the previous booking params is passed. This dictionary is the one obtained
+            by the method self.getBookingParams() before the new params input by the user are applied.
         """
         raise CollaborationException("Method _modify was not overriden for the plugin type " + str(self._type))
 
@@ -1488,11 +1520,12 @@ class WCSPageTemplateBase(WCSTemplateBase):
 
 class WJSBase(WCSTemplateBase):
     """ Base class for Collaboration templates for Javascript code template.
-        It overloads _setTPLFile so that indico can find the Main.js files.
+        It overloads _setTPLFile so that indico can find the Main.js, Extra.js and Indexing.js files.
     """
-    def __init__(self, pluginName, conf):
+    def __init__(self, conf, pluginName, user):
         WCSTemplateBase.__init__(self, pluginName)
         self._conf = conf
+        self._user = user
 
     def _setTPLFile(self):
         dir = os.path.join(Collaboration.__path__[0], self._pluginName, "tpls")
@@ -1511,22 +1544,12 @@ class WCSCSSBase(WCSTemplateBase):
         self.tplFile = os.path.join(dir, file)
         self.helpFile = ''
 
-class CSErrorBase(object):
+class CSErrorBase(Fossilizable):
+    fossilizes(ICSErrorBaseFossil)
+
     """ When _create, _modify or _remove want to return an error,
         they should return an error that inherits from this class
     """
-
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSErrorBase',
-                'MaKaC.plugins.Collaboration.base.CSSanitizationError',
-                'MaKaC.plugins.Collaboration.EVO.common.EVOError',
-                'MaKaC.plugins.Collaboration.EVO.common.OverlappedError',
-                'MaKaC.plugins.Collaboration.EVO.common.ChangesFromEVOError',
-                'MaKaC.plugins.Collaboration.RecordingRequest.common.RecordingRequestError',
-                'MaKaC.plugins.Collaboration.WebcastRequest.common.WebcastRequestError',
-                'MaKaC.plugins.Collaboration.CERNMCU.common.CERNMCUError'],
-                'error')
-    def getError(self):
-        return True
 
     def getUserMessage(self):
         """ To be overloaded.
@@ -1540,21 +1563,17 @@ class CSErrorBase(object):
         """
         raise CollaborationException("Method getLogMessage was not overriden for the a CSErrorBase object of class " + self.__class__.__name__)
 
-class CSSanitizationError(CSErrorBase):
+class CSSanitizationError(CSErrorBase): #already Fossilizable
+    fossilizes(ICSSanitizationErrorFossil)
+
     """ Class used to return which fields have a sanitization error (invalid html / script tags)
     """
 
     def __init__(self, invalidFields):
         self._invalidFields = invalidFields
 
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSSanitizationError'], 'origin')
-    def getOrigin(self):
-        return 'sanitization'
-
-    @Retrieves(['MaKaC.plugins.Collaboration.base.CSSanitizationError'], 'invalidFields')
     def invalidFields(self):
         return self._invalidFields
-
 
 
 class CollaborationException(MaKaCError):

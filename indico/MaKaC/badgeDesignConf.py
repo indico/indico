@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: badgeDesignConf.py,v 1.7 2009/05/14 18:05:50 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -63,6 +62,28 @@ class RegistrantFullName4(RegistrantBadge):
     def getValue(cls, reg):
         return reg.getFullName(title=False, firstNameFirst=True)
 
+class RegistrantFullName5(RegistrantBadge):
+    """
+    FullName with Title, the FirstName first and uppercase in surname.
+    """
+    @classmethod
+    def getValue(cls, reg):
+        res = "%s %s"%( reg.getFirstName(), reg.getFamilyName().upper())
+        res = res.strip()
+        if reg.getTitle() != "":
+            res = "%s %s"%( reg.getTitle(), res )
+        return res
+
+class RegistrantFullName6(RegistrantBadge):
+    """
+    FullName without Title, the FirstName first and uppercase inthe surname.
+    """
+    @classmethod
+    def getValue(cls, reg):
+        res = "%s %s"%( reg.getFirstName(), reg.getFamilyName().upper())
+        res = res.strip()
+        return res
+
 class ConferenceDates:
 
     @classmethod
@@ -78,7 +99,7 @@ class ConferenceDates:
                 adjusted_eDate.strftime("%d%B%Y"):
             confDateInterval = adjusted_sDate.strftime("%d %B %Y")
         elif adjusted_sDate.strftime("%B%Y") == adjusted_eDate.strftime("%B%Y"):
-           confDateInterval = "%s-%s %s"%(adjusted_sDate.day, adjusted_eDate.day, adjusted_sDate.strftime("%B %Y"))
+            confDateInterval = "%s-%s %s"%(adjusted_sDate.day, adjusted_eDate.day, adjusted_sDate.strftime("%B %Y"))
         return confDateInterval
 
 
@@ -89,7 +110,7 @@ class BadgeDesignConfiguration:
     -groups organizes the item names into groups. These groups are used for the
     <select> box in the WConfModifBadgeDesign.tpl file.
     """
-    
+
     """ Dictionary that maps the name of an item to the action that should be taken
     at the time it is drawed.
     An action can be:
@@ -106,36 +127,38 @@ class BadgeDesignConfiguration:
        Depending on what is returned, we will pass a different object to the getValue() method.
        *it must have a getValue(object) method, to which a Conference instance, a Registrant instance or a
        BadgeTemplateItem instance must be passed, depending on the result of the getArgumentType() method.
-      
+
       """
     def __init__(self):
-          
-            self.items_actions = { _("Title") : Registrant.getTitle,
-                               _("Full Name") : Registrant.getFullName,
-                               _("Full Name (w/o title)") : RegistrantFullName2,
-                               _("Full Name B") : RegistrantFullName3,
-                               _("Full Name B (w/o title)") : RegistrantFullName4,
-                               _("First Name") : Registrant.getFirstName,
-                               _("Surname") : Registrant.getSurName,
-                               _("Position") : Registrant.getPosition,
-                               _("Institution") : Registrant.getInstitution,
-                               _("Country") : RegistrantCountry,
-                               _("City") : Registrant.getCity,
-                               _("Address") : Registrant.getAddress,
-                               _("Phone") : Registrant.getPhone,
-                               _("Fax") : Registrant.getFax,
-                               _("Email") : Registrant.getEmail,
-                               _("Personal homepage") : Registrant.getPersonalHomepage,
-                               _("Amount") : Registrant.getTotal,
-                               _("Conference Name") : Conference.getTitle,
-                               _("Conference Dates") : ConferenceDates,
-                               _("Fixed Text") : BadgeTemplateItem.getFixedText
+
+            self.items_actions = { "Title":               (_("Title"), Registrant.getTitle),
+                               "Full Name":               (_("Full Name"), Registrant.getFullName),
+                               "Full Name (w/o title)":   (_("Full Name (w/o title)"), RegistrantFullName2),
+                               "Full Name B":             (_("Full Name B"), RegistrantFullName3),
+                               "Full Name B (w/o title)": (_("Full Name B (w/o title)"), RegistrantFullName4),
+                               "Full Name C":             (_("Full Name C"), RegistrantFullName5),
+                               "Full Name C (w/o title)": (_("Full Name C (w/o title)"), RegistrantFullName6),
+                               "First Name":              (_("First Name"), Registrant.getFirstName),
+                               "Surname":                 (_("Surname"), Registrant.getSurName),
+                               "Position":                (_("Position"), Registrant.getPosition),
+                               "Institution":             (_("Institution"), Registrant.getInstitution),
+                               "Country":                 (_("Country"), RegistrantCountry),
+                               "City":                    (_("City"), Registrant.getCity),
+                               "Address":                 (_("Address"), Registrant.getAddress),
+                               "Phone":                   (_("Phone"), Registrant.getPhone),
+                               "Fax":                     (_("Fax"), Registrant.getFax),
+                               "Email":                   (_("Email"), Registrant.getEmail),
+                               "Personal homepage":       (_("Personal homepage"), Registrant.getPersonalHomepage),
+                               "Amount":                  (_("Amount"), Registrant.getTotal),
+                               "Conference Name":         (_("Conference Name"), Conference.getTitle),
+                               "Conference Dates":        (_("Conference Dates"), ConferenceDates),
+                               "Fixed Text":              (_("Fixed Text"), BadgeTemplateItem.getFixedText)
                             }
-            
+
             """ Dictionary that maps group names to the item names that fall into that group.
             The groups are only used for the <select> box in the WConfModifBadgeDesign.tpl file.
             """
-            self.groups = [( _("Registrant Data"), [ _("Title"), _("Full Name"), _("Full Name (w/o title)"), _("Full Name B"), _("Full Name B (w/o title)"),  _("First Name"),  _("Surname"),  _("Position"),
-                                                     _("Institution"),  _("Country"),  _("City"), _("Address"), _("Phone"), _("Fax"), _("Email"), _("Personal homepage"), _("Amount")]),
-                      ( _("Conference Data"), [ _("Conference Name"),  _("Conference Dates")]),
-                      ( _("Fixed Elements"), [ _("Fixed Text")])]
+            self.groups = [( _("Registrant Data"), [ "Title", "Full Name", "Full Name (w/o title)", "Full Name B", "Full Name B (w/o title)", "Full Name C", "Full Name C (w/o title)", "First Name",  "Surname",  "Position",
+                                                     "Institution",  "Country",  "City", "Address", "Phone", "Fax", "Email", "Personal homepage", "Amount"]),
+                      ( _("Conference Data"), [ "Conference Name",  "Conference Dates"]),
+                      ( _("Fixed Elements"), [ "Fixed Text"])]

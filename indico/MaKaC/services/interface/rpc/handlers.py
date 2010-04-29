@@ -14,14 +14,15 @@ def importModule(name):
 
 
 methodMap = {
-     
+
     "roomBooking.locations.list": roomBooking.RoomBookingListLocations,
     "roomBooking.rooms.list": roomBooking.RoomBookingListRooms,
+    "roomBooking.rooms.fullNameList": roomBooking.RoomBookingFullNameListRooms,
     "roomBooking.locationsAndRooms.list" :roomBooking.RoomBookingListLocationsAndRooms,
-    
+
     "resources.timezones.getAll": resources.GetTimezones,
     "resources.languages.getAll": resources.GetLanguages,
-    
+
     "system.describe": description.describe,
     "system.error.report": error.SendErrorReport
 }

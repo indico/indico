@@ -1,8 +1,8 @@
   <script type="text/javascript">
 
-	// "Zoom factor" - the size of the document, related to reality
-	
-	var zoom_factor = 0.5
+    // "Zoom factor" - the size of the document, related to reality
+
+    var zoom_factor = 0.5
 
     // These variables are initialised by a script at the end of the document
     // They represent the top left corner of the blank space where poster template design takes place
@@ -17,7 +17,7 @@
 
     // Number of pixels per cm
     var pixelsPerCm = 50 * zoom_factor;
-    
+
     // Id of the background used
     var backgroundId = -1
 
@@ -35,13 +35,16 @@
     // Last selected item (holds the div for that item)
     var lastSelectedDiv;
 
+    // Translation dictionary from key to name in current language.
+    var translate = <%=translateName%>;
+
     // List of poster template items
     var items = [];
 
     // Item class
-    function Item(itemId, name) {
+    function Item(itemId, key) {
       this.id = itemId;
-      this.name = name;
+      this.key = key;
       this.x = initialOffset;
       this.y = initialOffset;
       this.fontFamily = "Times New Roman";
@@ -67,11 +70,11 @@
               ' width="' + this.width + '" bgColor="' + (this.selected? "#CCCCFF" : "white") +
               '" style="cursor:move; font-weight:' + (this.bold ? 'bold' : 'normal') + '; font-style:' + (this.italic ? 'italic' : 'normal') +
               '; text-align: ' + this.textAlign + ';"' +
-              '><tbody><tr><td><span style="color:' + this.color + '; font-family: ' + this.fontFamily + '; font-size:' + this.fontSize + ';">' + 
-              (this.name == "Fixed Text" ? this.text : this.name) + 
+              '><tbody><tr><td><span style="color:' + this.color + '; font-family: ' + this.fontFamily + '; font-size:' + this.fontSize + ';">' +
+              (this.key == "Fixed Text" ? this.text : translate[this.key]) +
               '</span></td></tr></tbody></table>';
       }
-      
+
     // Dimensions class
     function Dimensions(width, height) {
       this.width = width
@@ -101,15 +104,15 @@
         return [xResult,yResult];
     }
 
-	// This function creates a new draggable div
-	function createDiv() {
-	//       Each div has:
+    // This function creates a new draggable div
+    function createDiv() {
+    //       Each div has:
     //       -an unique id, which is a natural number (0, 1, 2, ...)
     //       -a type (stored in the name attribute)
     //       -absolute x,y position
     //       -an inner HTML with its content
       itemId++;
-    
+
       var newDiv = document.createElement('div');
 
       newDiv.id = itemId;
@@ -155,14 +158,14 @@
         },
 
         snap: ($F('snap checkbox') == "on") ? mySnap : false
-      }); 
+      });
 
       // We store the initial position as a good position which to return to
       newDiv.lastGoodPositionLeft = 0;
       newDiv.lastGoodPositionTop = 0;
-      
+
       return newDiv;
-	}
+    }
 
     // This function inserts the selected element in the blank space where poster template designing takes place
     function insertElement() {
@@ -177,7 +180,7 @@
       if (!lastSelectedDiv) {
         markSelected(newDiv);
       }
-      
+
       initialOffset += 10
 
     }
@@ -214,7 +217,7 @@
     function markSelected(newSelectedDiv) {
 
       // Change the text that says which item is selected
-      $('selection text').innerHTML = items[newSelectedDiv.id].name;
+      $('selection text').innerHTML = translate[items[newSelectedDiv.id].key];
 
       // TODO: add check to see if there's a table inside and not an image
 
@@ -236,10 +239,10 @@
       $('style selector').selectedIndex = newSelectedItem.styleIndex;
       $('color selector').selectedIndex = newSelectedItem.colorIndex;
       $('width field').value = newSelectedItem.width / pixelsPerCm;
-      if (newSelectedItem.name == "Fixed Text") {
+      if (newSelectedItem.key == "Fixed Text") {
         $('fixed text field').value = newSelectedItem.text
       } else {
-      	$('fixed text field').value = "--"
+          $('fixed text field').value = "--"
       }
     }
 
@@ -252,8 +255,8 @@
       var horizontalRuler = $('vertical ruler');
 
       if (templateDimensions.width > previousTemplateDimensions.width) {
-       	var hRuler = $('horizontal ruler');
-       	
+           var hRuler = $('horizontal ruler');
+
         for (i = Math.ceil(previousTemplateDimensions.width / pixelsPerCm); i < Math.ceil(templateDimensions.width / pixelsPerCm); i++) {
           var newImg = document.createElement('div');
           newImg.id = "rulerh" + i;
@@ -277,10 +280,10 @@
       }
 
       if (templateDimensions.height > previousTemplateDimensions.height) {
-   		var vRuler = $('vertical ruler');
-   		
+           var vRuler = $('vertical ruler');
+
         for (i = Math.ceil(previousTemplateDimensions.height / pixelsPerCm); i < Math.ceil(templateDimensions.height / pixelsPerCm); i++) {
-		  var newImg = document.createElement('div');
+          var newImg = document.createElement('div');
           newImg.id = "rulerv" + i;
           newImg.style.height = pixelsPerCm-1 + 'px';
           newImg.style.width = '10px';
@@ -302,7 +305,7 @@
       }
 
     }
-    
+
     // This function displays all the items in the 'items' array on the screen
     // If there are already some items being displayed, it does not erase them
     function displayItems() {
@@ -403,14 +406,14 @@
         lastSelectedDiv.innerHTML = item.toHTML();
       }
     }
-    
+
     function zoom_font(zfact,fontSize)
     {
-		var pattern = new RegExp ("([0-9.]+)pt", "g");
-		
-		var ftsize = pattern.exec(fontSize)[1];
-		
-		return (ftsize*zfact)+"pt";
+        var pattern = new RegExp ("([0-9.]+)pt", "g");
+
+        var ftsize = pattern.exec(fontSize)[1];
+
+        return (ftsize*zfact)+"pt";
     }
 
     function changeSize() {
@@ -467,7 +470,7 @@
         lastSelectedDiv.innerHTML = item.toHTML();
       }
     }
-    
+
     function changeText() {
       if(lastSelectedDiv) {
         var item = items[lastSelectedDiv.id]
@@ -485,24 +488,24 @@
       template.push($F('template name'));
       template.push(templateDimensions, pixelsPerCm);
       template.push(backgroundId);
-      
+
       for (var i=0;i<items.length;++i)
       {
-      	if (items[i] != false)
-      		items[i].fontSize = zoom_font(1/zoom_factor,items[i].fontSize);
+          if (items[i] != false)
+              items[i].fontSize = zoom_font(1/zoom_factor,items[i].fontSize);
       }
-      
+
       template.push(items);
       $('templateData').value = template.toJSON();
       document.hiddenform.submit()
     }
-    
+
     function sending() {
       Element.show('loadingIcon')
     }
-    
+
     firstLoad = true
-    
+
     function sent() {
       if (firstLoad) {
         firstLoad = false
@@ -517,92 +520,92 @@
             Element.remove('background')
           }
           backgroundId = iframeDocument.getElementById('background id').innerHTML
-    	  var backgroundURL = iframeDocument.getElementById('background url').innerHTML
-    	  
-    	  backgroundPos = iframeDocument.getElementById('background pos').innerHTML
-    	  
-	      displayBackground(backgroundURL);
-	      
-         
-	      
+          var backgroundURL = iframeDocument.getElementById('background url').innerHTML
+
+          backgroundPos = iframeDocument.getElementById('background pos').innerHTML
+
+          displayBackground(backgroundURL);
+
+
+
         } catch (err) {
           Element.hide('loadingIcon')
         }
       }
     }
 
-    
+
     function setBackgroundPos(mode)
     {
-    	var background = document.getElementById('background');
-		var hiddenField = document.getElementById('bgPosition');
+        var background = document.getElementById('background');
+        var hiddenField = document.getElementById('bgPosition');
 
-    	var bgPosStretch = document.getElementById('bgPosStretch');
-		var bgPosCenter = document.getElementById('bgPosCenter');
+        var bgPosStretch = document.getElementById('bgPosStretch');
+        var bgPosCenter = document.getElementById('bgPosCenter');
 
 
-    	if (mode == 'Stretch')
-    	{
-        	background.style.left = 0;
-        	background.style.top = 0;
-    		background.height = templateDimensions.height;
-        	background.width = templateDimensions.width;
-        	
-        	
-        	bgPosStretch.checked = true;
-        	bgPosCenter.checked = false;
-    	}
-    	else if (mode == 'Center')
-    	{
-	    	background.height = background.naturalHeight;
-			background.width = background.naturalWidth;
-    		
-    		if (background.width > templateDimensions.width ||
-    			background.height > templateDimensions.height)
-    		{    			
-    			if (background.width > templateDimensions.width)
-    			{
-					var ratio = templateDimensions.width/background.width;
-					
-    				background.width = templateDimensions.width;
-    				background.height = background.height * ratio;
-    				background.style.top = templateDimensions.height/2.0 - background.height/2.0;
-    				background.style.left = 0;
-    				
-    			}
-    			
-    			if (background.height > templateDimensions.height)
-    			{
-    				var ratio = templateDimensions.height/background.height;
-    				
-    				background.height = templateDimensions.height;
-    				background.height = background.height * ratio;
-    				
-    				background.style.left = templateDimensions.width/2.0 - background.width/2.0;
-    				baclground.style.top = 0;
-    			}    		    
-    		}
-    		else
-    		{		
-    			background.style.left = templateDimensions.width/2 - background.naturalWidth/2;
-    			background.style.top = templateDimensions.height/2 - background.naturalHeight/2;
-    		}
-    		
-    						
-    		bgPosStretch.checked = false;
-        	bgPosCenter.checked = true;
-    		
-    	}    	
-    	
-    	
+        if (mode == 'Stretch')
+        {
+            background.style.left = 0;
+            background.style.top = 0;
+            background.height = templateDimensions.height;
+            background.width = templateDimensions.width;
+
+
+            bgPosStretch.checked = true;
+            bgPosCenter.checked = false;
+        }
+        else if (mode == 'Center')
+        {
+            background.height = background.naturalHeight;
+            background.width = background.naturalWidth;
+
+            if (background.width > templateDimensions.width ||
+                background.height > templateDimensions.height)
+            {
+                if (background.width > templateDimensions.width)
+                {
+                    var ratio = templateDimensions.width/background.width;
+
+                    background.width = templateDimensions.width;
+                    background.height = background.height * ratio;
+                    background.style.top = templateDimensions.height/2.0 - background.height/2.0;
+                    background.style.left = 0;
+
+                }
+
+                if (background.height > templateDimensions.height)
+                {
+                    var ratio = templateDimensions.height/background.height;
+
+                    background.height = templateDimensions.height;
+                    background.height = background.height * ratio;
+
+                    background.style.left = templateDimensions.width/2.0 - background.width/2.0;
+                    baclground.style.top = 0;
+                }
+            }
+            else
+            {
+                background.style.left = templateDimensions.width/2 - background.naturalWidth/2;
+                background.style.top = templateDimensions.height/2 - background.naturalHeight/2;
+            }
+
+
+            bgPosStretch.checked = false;
+            bgPosCenter.checked = true;
+
+        }
+
+
     }
- 
+
     function backgroundReceived() {
       Element.hide('loadingIcon')
-      
+
       setBackgroundPos(backgroundPos);
     }
-    
+
     function displayBackground(backgroundURL) {
         var newBackground = document.createElement('img');
         newBackground.id = 'background'
@@ -615,9 +618,9 @@
         newBackground.style.zIndex = 5
         newBackground.onload = backgroundReceived
         var template = $("templateDiv");
-        template.appendChild(newBackground);	  
-    }   
-    
+        template.appendChild(newBackground);
+    }
+
     function removeBackground() {
       if (backgroundId != -1) {
         backgroundId = -1;
@@ -626,10 +629,10 @@
     }
 
   </script>
-  
-  
-  
-  
+
+
+
+
 <iframe id="uploadTarget" name="uploadTarget" src="" style="width:0px;height:0px;border:0" onload="sent()"></iframe>
 
 <div style="width:100%%">
@@ -654,30 +657,30 @@
         </td>
         <form action="%(saveBackgroundURL)s" method="POST" ENCTYPE="multipart/form-data" onsubmit="sending()" target="uploadTarget">
         <td height="20px" NOWRAP align="left" colspan="3">
-	      <input name="file" size="58" type="file">
+          <input name="file" size="58" type="file">
           <input class="btn" value="Send File" type="submit">
           <input class="btn" type="button" value="Remove background" onclick="removeBackground()">
         </td>
-	    <td width="100%%" align="left" colspan="4">
+        <td width="100%%" align="left" colspan="4">
           <img id="loadingIcon" src=%(loadingIconURL)s width="20px" height="20px" style="display:none;">
-	    </td>
+        </td>
       </tr>
       <tr>
         <td></td>
         <td>
-			<table>
-			  <tbody>
-			    <tr><td>
-			  			<input checked type="radio" id="bgPosStretch" name ='bgPosition' value="Stretch">
-					  	<label>Stretch</label> 
-					</td>
-			    	<td>
-						<input type='radio' id="bgPosCenter" name ='bgPosition' value="Center">
-						<label>Center</label>
-			    </td></tr>
-			  </tbody>
-			</table>
-	    </form>
+            <table>
+              <tbody>
+                <tr><td>
+                          <input checked type="radio" id="bgPosStretch" name ='bgPosition' value="Stretch">
+                          <label>Stretch</label>
+                    </td>
+                    <td>
+                        <input type='radio' id="bgPosCenter" name ='bgPosition' value="Center">
+                        <label>Center</label>
+                </td></tr>
+              </tbody>
+            </table>
+        </form>
         </td>
         <td></td>
       </tr>
@@ -815,7 +818,7 @@
             <optgroup label="Normal Fonts">
               <option>Times New Roman</option>
               <option>Courier</option>
-            </optgroup>  
+            </optgroup>
             <optgroup label="Special Character Fonts">
               <option>LinuxLibertine</option>
               <option>Kochi-Mincho</option>
@@ -938,12 +941,12 @@
       </tr>
     </tbody>
   </table>
-  
+
   <form name="hiddenform" action="%(saveTemplateURL)s" method="POST">
-  	<input name="templateId" value="%(templateId)s" type="hidden">
-  	<input id="templateData" name="templateData" type="hidden">
+      <input name="templateId" value="%(templateId)s" type="hidden">
+      <input id="templateData" name="templateData" type="hidden">
   </form>
-  
+
 <!--
   <table id='test' width="200" height="200" border="1" onclick="alert(Element.getDimensions(this).width);this.width = parseInt(this.width) + 10; return false">
     <tr><td></tr></td>
@@ -951,7 +954,7 @@
 -->
 
   <script type="text/javascript">
-  
+
     // We load the template if we are editing a template
     if (%(editingTemplate)s) {
        var template = eval(%(templateData)s.unescapeHTML());
@@ -967,18 +970,18 @@
     } else {
        templateDimensions = new Dimensions(525,742); //put here the initial dimensions of templateDiv
     }
-	
+
     previousTemplateDimensions = new Dimensions(0,0)
-    
+
     $('poster width').value = templateDimensions.width / pixelsPerCm;
     $('poster height').value = templateDimensions.height / pixelsPerCm;
-    
+
     // This function initialises the rulers
     updateRulers();
-    
+
     // This function displays the items, if any have been loaded, on the screen
     displayItems()
-    
+
     if (%(editingTemplate)s && %(hasBackground)s) {
        backgroundId = %(backgroundId)s
        backgroundPos = '%(backgroundPos)s'

@@ -35,7 +35,7 @@
     <% eventFavorites = [] %>
   <% end %>
 
-  var rbWidget = new RoomBookingWidget(Indico.Data.Locations, info, parentEvt, nullRoomInfo(info), <%= eventFavorites %>);
+  var rbWidget = new RoomBookingWidget(Indico.Data.Locations, info, parentEvt, nullRoomInfo(info), <%= eventFavorites %>, Indico.Data.DefaultLocation);
 
   var domContent = rbWidget.draw();
 

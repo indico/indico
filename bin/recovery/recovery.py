@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: recovery.py,v 1.9 2008/08/13 13:31:39 jose Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -1885,7 +1884,7 @@ class TmpDBMgr:
             names = []
             l = os.listdir(backupsPath)
             for f in l:
-                if os.path.isfile("%s/%s"%(backupsPath, f)) and (".fsz" in f):
+                if os.path.isfile(os.path.join(backupsPath, f)) and (".fsz" in f):
                     names.append(os.path.splitext(f)[0])
             names.append("current")
             names.sort()

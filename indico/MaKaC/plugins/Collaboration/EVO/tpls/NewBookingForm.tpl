@@ -1,6 +1,6 @@
 <% declareTemplate(newTemplateStyle=True) %>
 
-<table style="margin-top: 10px;">
+<table>
     <tr>
         <td class="bookingFormFieldName">
             <span>Community</span>
@@ -36,7 +36,7 @@
         </td>
         <td>
             <input id="startDate" type="text" size="16" name="startDate" value="<%= DefaultStartDate %>" />
-            <span id="startDateHelp"></span>
+            <img id="startDateHelpImg" src="<%= systemIcon('help')%>" style="margin-left:5px; vertical-align:middle;" />
         </td>
     </tr>
     <tr>
@@ -45,7 +45,7 @@
         </td>
         <td>
             <input id="endDate" type="text" size="16" name="endDate" value="<%= DefaultEndDate %>" />
-            <span id="endDateHelp"></span>
+            <img id="endDateHelpImg" src="<%= systemIcon('help')%>" style="margin-left:5px; vertical-align:middle;" />
         </td>
     </tr>
 
@@ -55,7 +55,7 @@
         </td>
         <td>
             <span id="passwordField"></span>
-            <span id="passwordHelp"></span>
+            <img id="passwordHelpImg" src="<%= systemIcon('help')%>" style="margin-left:5px; vertical-align:middle;" />
         </td>
     </tr>
 </table>

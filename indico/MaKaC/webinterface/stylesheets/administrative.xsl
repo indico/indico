@@ -1,5 +1,5 @@
 <?xml version='1.0'?>
-<!-- $Id: administrative.xsl,v 1.16 2009/03/13 12:48:27 jose Exp $
+<!--
 
      This file is part of CDS Indico.
      Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -80,6 +80,7 @@ EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
     <xsl:with-param name="subContId" value=""/>
     <xsl:with-param name="uploadURL">Indico.Urls.UploadAction.conference</xsl:with-param>
 </xsl:call-template>
+
 
 <font size="+1" face="Times">
 <xsl:value-of select="./title" disable-output-escaping="yes"/><br/>
