@@ -111,7 +111,7 @@ def main():
             delta = timedelta(days=int(options.days))
 
             if((not int(options.days)) or (now - then < delta)):
-                dateT = strftime("%d-%m-%Y", [int(ts.year()), int(ts.month()), int(ts.day()),0,0,0,0,0,0] )
+                dateT = strftime("%d-%m-%Y", [int(ts.year()), int(ts.month()), int(ts.day()),1,1,1,1,1,1] )
                 percent = float(it._file.tell())/float(size) * 100
                 #Check if we found the searched date
                 if options.date:

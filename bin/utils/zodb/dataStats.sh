@@ -1,23 +1,52 @@
+# -*- coding: utf-8 -*-
+##
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 #!/bin/bash
 
-while getopts "hb:f:e:" opt; do
+while getopts "hb:t:e:" opt; do
   case $opt in
     b)
       BACKUP_PATH=$OPTARG
       ;;
-    f)
-      DATA_PATH=$OPTARG
+    t)
+      case $OPTARG in
+          */)
+            TMP_PATH=$OPTARG
+            DATA_PATH=$OPTARG"Data.fs"
+            ;;
+          *)
+            TMP_PATH=/$OPTARG
+            DATA_PATH=$OPTARG"/Data.fs"
+            ;;
+      esac
       ;;
     e)
       EMAIL=$OPTARG
       ;;
     h)
-      echo "usage: dataStats.sh -b /backup/path -f /tmp/Data.fs -e john@doe.com"
+      echo "usage: dataStats.sh -b /backup/path -t /tmp/ -e john@doe.com"
       echo ""
       echo "    -h   show this help message and exit"
       echo "    -b   the backup directory path"
-      echo "    -f   where you want to restore the Data.fs"
-      echo "    -e   the email address to which send the reports"
+      echo "    -t   a temporary directory"
+      echo "    -e   the email address to which send the reports. If you want multiple recipients, use quotes and commas, i.e. -e 'john@doe.com, john@smith.com'"
       exit 1
       ;;
     :)
@@ -31,7 +60,7 @@ while getopts "hb:f:e:" opt; do
   esac
 done
 
-if [ -z $DATA_PATH ] || [ -z $EMAIL ] || [ -z $BACKUP_PATH ]; then
+if [ -z $TMP_PATH ] || [ -z $EMAIL ] || [ -z $BACKUP_PATH ]; then
     echo "All parameters are mandatory. Use -h for details"
     exit 1
 fi
@@ -41,62 +70,62 @@ repozo -Rv -r $BACKUP_PATH -o $DATA_PATH
 #---- [1/6] Objects_stats ------------
 SUBJECT="[ZODB-Stats] Objects_stats"
 ELEMENTS_TO_DISPLAY=100
-python objects_stats.py -f $DATA_PATH -n $ELEMENTS_TO_DISPLAY > "/tmp/objects_stats.txt"
-EMAILMESSAGE="/tmp/objects_stats.txt"
+python objects_stats.py -f $DATA_PATH -n $ELEMENTS_TO_DISPLAY > TMP_PATH"objects_stats.txt"
+EMAILMESSAGE=TMP_PATH"objects_stats.txt"
 mail -s "$SUBJECT" "$EMAIL" < $EMAILMESSAGE
-rm "/tmp/objects_stats.txt"
+rm TMP_PATH"objects_stats.txt"
 
 
 #---- [2/6] Class_stats ------------
 SUBJECT="[ZODB-Stats] Class_stats"
 ELEMENTS_TO_DISPLAY=100
-python class_stats.py -f $DATA_PATH -n $ELEMENTS_TO_DISPLAY > "/tmp/class_stats.txt"
-EMAILMESSAGE="/tmp/class_stats.txt"
+python class_stats.py -f $DATA_PATH -n $ELEMENTS_TO_DISPLAY > TMP_PATH"class_stats.txt"
+EMAILMESSAGE=TMP_PATH"class_stats.txt"
 mail -s "$SUBJECT" "$EMAIL" < $EMAILMESSAGE
-rm "/tmp/class_stats.txt"
+rm TMP_PATH"class_stats.txt"
 
 
 #---- [3/6] Transactions_stats ------------
 SUBJECT="[ZODB-Stats] Transactions_stats"
 DAYS=7
-python transactions_stats.py -f $DATA_PATH -a $DAYS > "/tmp/transactions_stats.txt"
-EMAILMESSAGE="/tmp/transactions_stats.txt"
+python transactions_stats.py -f $DATA_PATH -a $DAYS > TMP_PATH"transactions_stats.txt"
+EMAILMESSAGE=TMP_PATH"transactions_stats.txt"
 mail -s "$SUBJECT" "$EMAIL" < $EMAILMESSAGE
-rm "/tmp/transactions_stats.txt"
+rm TMP_PATH"transactions_stats.txt"
 
 
 #---- [4/6] Simple consistency checker ------------
 SUBJECT="[ZODB-Stats] Consistency Checker"
-python fstest.py $DATA_PATH > "/tmp/cchecker.txt"
+python fstest.py $DATA_PATH > TMP_PATH"cchecker.txt"
 
 #If the file is empy -> no error detected
-if [ `ls -l "/tmp/cchecker.txt" | awk '{print $5}'` -eq 0 ]
+if [ `ls -l TMP_PATH"cchecker.txt" | awk '{print $5}'` -eq 0 ]
 then
     echo "No error detected" | mail -s "$SUBJECT" "$EMAIL"
 else
-    EMAILMESSAGE="/tmp/cchecker.txt"
+    EMAILMESSAGE=TMP_PATH"cchecker.txt"
     mail -s "$SUBJECT" "$EMAIL" < $EMAILMESSAGE
 fi;
 
-rm "/tmp/cchecker.txt"
+rm TMP_PATH"cchecker.txt"
 
 
 #---- [5/6] Amount of data added per day ------------
 SUBJECT="[ZODB-Stats] Amount of data per day"
 DAYS=7
-python sizeIncreasing_stats.py -d $DAYS $DATA_PATH > "/tmp/data.txt"
-EMAILMESSAGE="/tmp/data.txt"
+python sizeIncreasing_stats.py -d $DAYS $DATA_PATH > TMP_PATH"data.txt"
+EMAILMESSAGE=TMP_PATH"data.txt"
 mail -s "$SUBJECT" "$EMAIL" < $EMAILMESSAGE
-rm "/tmp/data.txt"
+rm TMP_PATH"data.txt"
 
 
 #---- [6/6] Most used classes ------------
 SUBJECT="[ZODB-Stats] Most modified classes during last two days"
 DAYS=2
-python mostUsedClasses.py -d $DAYS $DATA_PATH > "/tmp/used.txt"
-EMAILMESSAGE="/tmp/used.txt"
+python mostUsedClasses.py -d $DAYS $DATA_PATH > TMP_PATH"used.txt"
+EMAILMESSAGE=TMP_PATH"used.txt"
 mail -s "$SUBJECT" "$EMAIL" < $EMAILMESSAGE
-rm "/tmp/used.txt"
+rm TMP_PATH"used.txt"
 
 
 #Remove the Data.fs
