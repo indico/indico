@@ -71,11 +71,6 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
             raise RecordingManagerException("No languages supplied")
 
     def _getAnswer(self):
-        # Update the micala database
-        resultUpdateMicala = MicalaCommunication.updateMicala(self._IndicoID,
-                                          self._contentType,
-                                          self._params.get('LOID', None))
-
         # Get the MARC XML and submit it to CDS
         resultCreateCDSRecord = createCDSRecord(self._aw,
                                                 self._IndicoID,
@@ -83,9 +78,21 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
                                                 self._videoFormat,
                                                 self._languages)
 
-#        raise RecordingManagerException("got this far")
+        if resultCreateCDSRecord["success"] == False:
+            raise RecordingManagerException("CDS record creation failed.\n%s" % resultCreateCDSRecord["result"])
+            return "CDS record creation aborted."
 
-        return str(resultUpdateMicala) + ', ' + str(resultCreateCDSRecord)
+        # Update the micala database
+        resultUpdateMicala = MicalaCommunication.updateMicala(self._IndicoID,
+                                          self._contentType,
+                                          self._params.get('LOID', None))
+
+        if resultUpdateMicala["success"] == False:
+            raise RecordingManagerException("micala database update failed.\n%s" % resultUpdateMicala["result"])
+            return "CDS record creation aborted."
+
+
+        return "Successfully updated micala database and submitted CDS record for creation."
 
 class RMCreateIndicoLinkService(CollaborationPluginServiceBase):
 

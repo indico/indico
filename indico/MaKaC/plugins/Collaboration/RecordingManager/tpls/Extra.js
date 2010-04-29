@@ -391,6 +391,8 @@ function RMCreateCDSRecord() {
         speakers_string = RMTalkList[RMselectedTalkId]["speakers"];
     }
 
+    // contents of popup window showing information about task before submitting plain_video record
+    // CDS record creation can not be easily undone.
     if (RMviewMode == 'plain_video') {
         var confirmText = Html.div({},
                 Html.span({}, $T("This will create a CDS record for the following video: ")),
@@ -416,6 +418,8 @@ function RMCreateCDSRecord() {
                 Html.span({}, $T("To proceed, click OK (you will not be able to undo)."))
         );
     }
+    // contents of popup window showing information about task before submitting web_lecture record
+    // CDS record creation can not be easily undone.
     else if (RMviewMode =='web_lecture') {
         var confirmText = Html.div({},
                 Html.span({}, $T("This will create a CDS record for the following web lecture: ")),

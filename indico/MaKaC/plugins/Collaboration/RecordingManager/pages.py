@@ -22,12 +22,20 @@
 from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase, WCSCSSBase, \
     CollaborationTools
 from MaKaC.plugins.Collaboration.RecordingManager.common import getTalks, getOrphans, languageList
+from MaKaC.plugins.Collaboration.RecordingManager.exceptions import RecordingManagerException
+from MaKaC.services.implementation.collaboration import CollaborationPluginServiceBase
 
-class WNewBookingForm(WCSPageTemplateBase):
+class WNewBookingForm(WCSPageTemplateBase, CollaborationPluginServiceBase):
 
     def getVars(self):
         vars = WCSPageTemplateBase.getVars( self )
-        orphans = getOrphans()
+
+        resultGetOrphans = getOrphans()
+        if resultGetOrphans["success"] == True:
+            orphans = resultGetOrphans["result"]
+        else:
+            raise RecordingManagerException(resultGetOrphans["result"])
+
         vars["Orphans"] = orphans
         talks = getTalks(self._conf, sort = True)
         vars["Talks"] = talks
