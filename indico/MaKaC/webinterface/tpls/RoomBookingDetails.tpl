@@ -183,7 +183,7 @@
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> <%= _("E-mail")%>&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><a style="font-weight: normal" href="mailto:<%= verbose( reservation.contactEmail ) %>"><%= reservation.contactEmail %></a></td>
+                                            <td align="left" class="blacktext"><a style="font-weight: normal" href="mailto:<%= verbose( reservation.contactEmail ) %>"><%= reservation.contactEmail.replace(',',', ') %></a></td>
                                         </tr>
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small> <%= _("Telephone")%>&nbsp;&nbsp;</small></td>

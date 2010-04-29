@@ -1,4 +1,4 @@
-Dear <%= reservation.createdByUser().getFirstName() %>,
+Dear <%= firstName %>,
 
 
 TINY ACTION IS REQUIRED TO PROLONG YOUR BOOKING
@@ -6,10 +6,10 @@ TINY ACTION IS REQUIRED TO PROLONG YOUR BOOKING
 If you are still interested in the following booking:
 
 <%= urlHandlers.UHRoomBookingBookingDetails.getURL( reservation ) %>
-Room: <%= reservation.room.getFullName() %> 
+Room: <%= reservation.room.getFullName() %>
 For:  <%= reservation.bookedForName %>
 Reason: <%= reservation.reason %>
-Dates: <%= formatDate(reservation.startDT.date()) %> -- <%= formatDate(reservation.endDT.date()) %> 
+Dates: <%= formatDate(reservation.startDT.date()) %> -- <%= formatDate(reservation.endDT.date()) %>
 Hours: <%= reservation.startDT.strftime("%H:%M") %> -- <%= reservation.endDT.strftime("%H:%M") %>
 
 please just click this link:

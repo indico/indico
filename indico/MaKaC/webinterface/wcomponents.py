@@ -6493,6 +6493,8 @@ class WRoomBookingRoomDetails( WTemplated ):
         for attribute in attributes:
             if not attribute.get("hidden",False) or self._rh._getUser().isAdmin():
                 vars["attrs"][attribute['name']] = self._rh._room.customAtts.get(attribute['name'],"")
+                if attribute['name'] == 'notification email' :
+                    vars["attrs"][attribute['name']] = vars["attrs"][attribute['name']].replace(',', ', ')
         vars["config"] = Config.getInstance()
         #vars["roomPhoto"] = urlHandlers.UHSendRoomPhoto.getURL( self._rh._room.photoId, small = False )
         vars["standalone"] = self._standalone

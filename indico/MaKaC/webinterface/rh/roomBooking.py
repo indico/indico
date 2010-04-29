@@ -28,7 +28,7 @@ from MaKaC.common.general import *
 from MaKaC.common.Configuration import Config
 from MaKaC.webinterface.rh.base import RHProtected, RoomBookingDBMixin
 from datetime import datetime, timedelta
-from MaKaC.common.utils import HolidaysHolder
+from MaKaC.common.utils import HolidaysHolder, validMail, setValidEmailSeparators
 from MaKaC.common.datetimeParser import parse_date
 
 # The following are room booking related
@@ -239,6 +239,9 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
         # Custom attributes
         manager = CrossLocationQueries.getCustomAttributesManager( c.locationName )
         for ca in manager.getAttributes( location = c.locationName ):
+            if ca['name'] == 'notification email' :
+                if c.customAtts[ 'notification email' ] and not validMail(c.customAtts['notification email']) :
+                    errors.append( "Invalid format for the notification email" )
             if ca['required']:
                 if not c.customAtts.has_key( ca['name'] ): # not exists
                     errors.append( ca['name'] + " can not be blank" )
@@ -296,7 +299,10 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
         for ca in manager.getAttributes( location = candRoom.locationName ):
             value = session.getVar( "cattr_" + ca['name'] )
             if value != None:
-                candRoom.customAtts[ ca['name'] ] = value
+                if ca['name'] == 'notification email' :
+                    candRoom.customAtts[ 'notification email' ] = setValidEmailSeparators(value)
+                else :
+                    candRoom.customAtts[ ca['name'] ] = value
 
 
     def _loadRoomCandidateFromParams( self, candRoom, params ):
@@ -339,7 +345,10 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
         for k, v in params.iteritems():
             if k.startswith( "cattr_" ):
                 attrName = k[6:len(k)]
-                candRoom.customAtts[attrName] = v
+                if attrName == 'notification email' :
+                    candRoom.customAtts['notification email'] = setValidEmailSeparators(v)
+                else :
+                    candRoom.customAtts[attrName] = v
 
     # Resv
 
@@ -414,7 +423,7 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
         candResv.repeatability = session.getVar( "repeatability" )
         candResv.bookedForName = session.getVar( "bookedForName" )
         candResv.contactPhone = session.getVar( "contactPhone" )
-        candResv.contactEmail = session.getVar( "contactEmail" )
+        candResv.contactEmail = setValidEmailSeparators(session.getVar( "contactEmail" ))
         candResv.reason = session.getVar( "reason" )
         candResv.usesAVC = session.getVar( "usesAVC" )
         candResv.needsAVCSupport = session.getVar( "needsAVCSupport" )
@@ -445,7 +454,7 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
         candResv.endDT = self._endDT
         candResv.repeatability = self._repeatability
         candResv.bookedForName = params["bookedForName"]
-        candResv.contactEmail = params["contactEmail"]
+        candResv.contactEmail = setValidEmailSeparators(params["contactEmail"])
         candResv.contactPhone = params["contactPhone"]
         candResv.reason = params["reason"]
         candResv.usesAVC = params.get( "usesAVC" ) == "on"

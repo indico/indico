@@ -5,10 +5,10 @@ if isinstance(reservation.getExcludedDays(),list) and len(reservation.getExclude
 %>
 <%end%>
 
-Dear <%= reservation.createdByUser().getFirstName() %>,
+Dear <%= firstName %>,
 
 
-The conference room <%= reservation.room.getFullName() %> 
+The conference room <%= reservation.room.getFullName() %>
 has been booked for <%= reservation.bookedForName %>
 reason: <%= reservation.reason %>
 from <%= formatDate(reservation.startDT.date()) %> to <%= formatDate(reservation.endDT.date()) %> between <%= reservation.startDT.strftime("%H:%M") %> and <%= reservation.endDT.strftime("%H:%M") %> <%= exclDays %>
@@ -16,8 +16,8 @@ Access: <%= urlHandlers.UHRoomBookingBookingDetails.getURL( reservation ) %>
 
 This is the final confirmation.
 
-NOTE: please be aware that in special (rare) cases the person 
-responsible for this room may reject your booking. In that case, 
+NOTE: please be aware that in special (rare) cases the person
+responsible for this room may reject your booking. In that case,
 you will be instantly notified by e-mail.
 
 <% if reservation.usesAVC: %>

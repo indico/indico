@@ -66,7 +66,7 @@ class WeekDayEnum( object ):
 TEST_VERSION_WARNING = "" #"[This notification considers FAKE event in TEST version of new Indico::CRBS. You can ignore it.]"
 
 # Room booking module notifications will be send to this e-mail when debug is on
-EMAIL_FOR_DEBUG_NOTIFICATIONS = "jose.benito.gonzalez@cern.ch"
+EMAIL_FOR_DEBUG_NOTIFICATIONS = ""
 EMAIL_FROM_PREFIX = "noreply-"
 
 # Room booking module notifications will be send to this e-mail when debug is on
@@ -141,26 +141,30 @@ class ReservationBase( object ):
         debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
         emails = []
         # ---- Email creator and contact ----
+
         if self.createdByUser(): # Imported bookings does not have creator
             to = self.createdByUser().getEmail()
-            to2 = ""
-            if self.contactEmail != None and self.contactEmail != "":
-                to2 = self.contactEmail
+            firstName = self.createdByUser().getFirstName()
+
+            to2 = self._getContactEmailList()
+
             if self.isConfirmed:
                 subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] You have made a New Booking on " + formatDateTime(self.startDT)
                 wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingInsertion' )
             else:
                 subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Your PRE-Booking waits for Acceptance"
                 wc = WTemplated( 'RoomBookingEmail_2UserAfterPreBookingInsertion' )
-            text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self } )
+            text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'firstName':firstName } )
             fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
             addrs = []
             if debug:
                 addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
             else:
-                addrs.append( to )
-                if to2 != "" and to != to2:
-                    addrs.append( to2 )
+                if to :
+                    addrs.append( to )
+                    if to in to2:
+                        to2.remove(to)
+                addrs.extend(to2)
                 if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
                     addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
@@ -169,6 +173,7 @@ class ReservationBase( object ):
         # ---- Email responsible(s) ----
 
         toMain = self.room.getResponsible().getEmail()
+        toCustom = self._getNotificationEmailList()
 
         if self.isConfirmed:
             subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] New Booking on " + formatDateTime(self.startDT)
@@ -187,8 +192,9 @@ class ReservationBase( object ):
             addrs.append( toMain )
             if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
                 addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
-            if self.room.customAtts.get( 'notification email', None ):
-                addrs.append(self.room.customAtts.get( 'notification email' ).strip())
+            if toMain in toCustom :
+                toCustom.remove( toMain )
+            addrs.extend( toCustom )
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
         emails.append(maildata)
 
@@ -237,15 +243,23 @@ class ReservationBase( object ):
 
         if self.createdByUser(): # Imported bookings does not have creator
             to = self.createdByUser().getEmail()
+            firstName = self.createdByUser().getFirstName()
+
+            to2 = self._getContactEmailList()
+
             subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Cancellation Confirmation on " + startDate + " %s" % occurrenceText
             wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingCancellation' )
-            text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'date':date } )
+            text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'date':date, 'firstName':firstName } )
             fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
             addrs = []
             if debug:
                 addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
             else:
-                addrs.append( to )
+                if to :
+                    addrs.append( to )
+                    if to in to2:
+                        to2.remove(to)
+                addrs.extend(to2)
                 if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
                     addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
@@ -254,6 +268,7 @@ class ReservationBase( object ):
         # ---- Email responsible ----
 
         toMain = self.room.getResponsible().getEmail()
+        toCustom = self._getNotificationEmailList()
 
         subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Cancelled Booking on " + startDate + " %s" % occurrenceText
         wc = WTemplated( 'RoomBookingEmail_2ResponsibleAfterBookingCancellation' )
@@ -266,8 +281,9 @@ class ReservationBase( object ):
             addrs.append( toMain )
             if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
                 addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
-            if self.room.customAtts.get( 'notification email', None ):
-                addrs.append(self.room.customAtts.get( 'notification email' ).strip())
+            if toMain in toCustom :
+                toCustom.remove( toMain )
+            addrs.extend( toCustom )
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
         emails.append(maildata)
 
@@ -302,24 +318,26 @@ class ReservationBase( object ):
         emails = []
         reason = self.rejectionReason or reason
 
-        # Fix by David: include date in this mails too. I have put a try...except in case the date is not accessible in this method
-        try:
-            startDate = formatDateTime(self.startDT)
-        except:
-            startDate = ""
+        if date:
+            occurrenceText = " (SINGLE OCCURRENCE)"
+            startDate = formatDate(date)
+        else:
+            occurrenceText = ""
+            # Fix by David: include date in this mails too. I have put a try...except in case the date is not accessible in this method
+            try:
+                startDate = formatDateTime(self.startDT)
+            except:
+                startDate = ""
 
         # ---- Email user ----
 
-        to = firstName = None
         if self.createdByUser(): # Imported bookings does not have creator
             to = self.createdByUser().getEmail()
             firstName = self.createdByUser().getFirstName()
-        else:
-            to = self.contactEmail
-            firstName = "User"
 
-        if to:
-            subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] REJECTED Booking on " + startDate
+            to2 = self._getContactEmailList()
+
+            subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] REJECTED Booking on " + startDate + " %s" % occurrenceText
             wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingRejection' )
             text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'firstName':firstName, 'reason':reason, 'date':date } )
             fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
@@ -327,11 +345,34 @@ class ReservationBase( object ):
             if debug:
                 addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
             else:
-                addrs.append( to )
+                if to :
+                    addrs.append(to)
+                    if to in to2:
+                        to2.remove(to)
+                addrs.extend(to2)
                 if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
                     addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
+
+        # ---- Email responsible ----
+
+        toCustom = self._getNotificationEmailList()
+
+        subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Rejected Booking on " + startDate + " %s" % occurrenceText
+        wc = WTemplated( 'RoomBookingEmail_2ResponsibleAfterBookingRejection' )
+        text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'date':date, 'reason':reason } )
+        fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+        addrs = []
+        if debug:
+            addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
+        else:
+            addrs.extend( toCustom )
+            if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
+                addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
+        maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
+        emails.append(maildata)
+
         return emails
 
     def notifyAboutConfirmation( self ):
@@ -352,15 +393,12 @@ class ReservationBase( object ):
 
         # ---- Email user ----
 
-        to = firstName = None
         if self.createdByUser(): # Imported bookings does not have creator
             to = self.createdByUser().getEmail()
             firstName = self.createdByUser().getFirstName()
-        else:
-            to = self.contactEmail
-            firstName = "User"
 
-        if to:
+            to2 = self._getContactEmailList()
+
             subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Confirmed Booking on " + startDate
             wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingConfirmation' )
             text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'firstName':firstName } )
@@ -369,11 +407,33 @@ class ReservationBase( object ):
             if debug:
                 addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
             else:
-                addrs.append( to )
+                if to :
+                    addrs.append(to)
+                    if to in to2:
+                        to2.remove(to)
+                addrs.extend(to2)
                 if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
                     addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
+
+        # ---- Email responsible ----
+
+        toCustom = self._getNotificationEmailList()
+
+        subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Confirmed Booking on " + startDate
+        wc = WTemplated( 'RoomBookingEmail_2ResponsibleAfterBookingConfirmation' )
+        text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self } )
+        fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+        addrs = []
+        if debug:
+            addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
+        else:
+            addrs.extend( toCustom )
+            if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
+                addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
+        maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
+        emails.append(maildata)
 
         # ---- Email AVC Support ----
 
@@ -415,15 +475,23 @@ class ReservationBase( object ):
 
         if self.createdByUser(): # Imported bookings does not have creator
             to = self.createdByUser().getEmail()
+            firstName = self.createdByUser().getFirstName()
+
+            to2 = self._getContactEmailList()
+
             subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Booking Modified on " + startDate
             wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingModification' )
-            text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self } )
+            text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'firstName':firstName } )
             fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
             addrs = []
             if debug:
                 addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
             else:
-                addrs.append( to )
+                if to :
+                    addrs.append(to)
+                    if to in to2:
+                        to2.remove(to)
+                addrs.extend(to2)
                 if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
                     addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
@@ -432,6 +500,7 @@ class ReservationBase( object ):
         # ---- Email responsible ----
 
         toMain = self.room.getResponsible().getEmail()
+        toCustom = self._getNotificationEmailList()
 
         subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Booking Modified on " + startDate
         wc = WTemplated( 'RoomBookingEmail_2ResponsibleAfterBookingModification' )
@@ -444,8 +513,9 @@ class ReservationBase( object ):
             addrs.append( toMain )
             if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
                 addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
-            if self.room.customAtts.get( 'notification email', None ):
-                addrs.append(self.room.customAtts.get( 'notification email' ).strip())
+            if toMain in toCustom :
+                toCustom.remove( toMain )
+            addrs.extend( toCustom )
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
         emails.append(maildata)
 
@@ -488,17 +558,26 @@ class ReservationBase( object ):
             startDate = ""
 
         # ---- Email user ----
+
         if self.createdByUser(): # Imported bookings does not have creator
             to = self.createdByUser().getEmail()
+            firstName = self.createdByUser().getFirstName()
+
+            to2 = self._getContactEmailList()
+
             subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Request for Booking Prolongation on " + startDate
             wc = WTemplated( 'RoomBookingEmail_2UserRequestProlongation' )
-            text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self } )
+            text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'firstName':firstName } )
             fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
             addrs = []
             if debug:
                 addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
             else:
-                addrs.append( to )
+                if to :
+                    addrs.append(to)
+                    if to in to2:
+                        to2.remove(to)
+                addrs.extend(to2)
                 if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
                     addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
@@ -518,6 +597,7 @@ class ReservationBase( object ):
         # ---- Email responsible ----
 
         toMain = self.room.getResponsible().getEmail()
+        toCustom = self._getNotificationEmailList()
 
         subject = NOTIFICATION_SUBJECT_PREFIX + " [" + self.room.getFullName() + "] Consider Rejecting This Booking"
         wc = WTemplated( 'RoomBookingEmail_2ResponsibleConsiderRejecting' )
@@ -530,8 +610,9 @@ class ReservationBase( object ):
             addrs.append( toMain )
             if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
                 addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
-            if self.room.customAtts.get( 'notification email', None ):
-                addrs.append(self.room.customAtts.get( 'notification email' ).strip())
+            if toMain in toCustom :
+                toCustom.remove( toMain )
+            addrs.extend( toCustom )
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
         emails.append(maildata)
         return emails
@@ -1331,6 +1412,28 @@ class ReservationBase( object ):
         if self.locationName == None:
             return None
         return ReservationGUID( Location.parse( self.locationName ), self.id )
+
+    def _getContactEmailList( self ):
+        """
+        Util method used for returning the contact emails in a list in case
+        the contact email string contains more than one address
+        """
+        if self.contactEmail != None and self.contactEmail != "":
+            return self.contactEmail.split(",")
+        else :
+            return []
+
+    def _getNotificationEmailList( self ):
+        """
+        Util method used for returning the notification emails in a list in case
+        the notification email custom attribute string contains more than one address
+        """
+        addrs = []
+        addr = self.room.customAtts.get( 'notification email', "" ).strip()
+        if addr:
+                addrs = addr.split(',')
+
+        return addrs
 
     def _eval_str( self, s ):
         ixPrv = 0
