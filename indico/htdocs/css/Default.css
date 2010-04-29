@@ -2100,13 +2100,13 @@ div#UISearchBox #extraOptions table {
 div#UISearchBox #extraOptions input {
     margin-left: 8px;
     font-size: 12px;
-    width: 145px;
+    width: 119px;
 }
 
 div#UISearchBox #extraOptions select {
     margin-left: 8px;
     font-size: 12px;
-    width: 150px;
+    width: 148px;
 }
 
 div#UISearchBox #extraOptions td {
@@ -2114,7 +2114,7 @@ div#UISearchBox #extraOptions td {
     color: #444;
 }
 
-div#UISearchBox #extraOptions div {
+div#UISearchBox #advancedOptionsLabel {
     text-align: center;
     padding: 5px;
     background-color: #ECECEC;
@@ -6026,17 +6026,20 @@ div.cloneElements {
 
 div.dateField {
     border: 1px solid #AAAAAA;
-    width: 135px;
+    width: 140px;
+    display: inline;
+    padding: 3px;
+    background: white;
 }
 
 div.dateField img {
     vertical-align: middle;
     padding: 2px;
+    cursor: pointer;
 }
 
 div.dateField input {
     border: none;
-    padding: 2px;
     vertical-align: middle;
-    width: 103px;
+    width: 115px;
 }

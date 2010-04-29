@@ -201,8 +201,8 @@ IndicoUI.executeOnLoad(function(){
 
 <% end %>
 
-var startDate = IndicoUI.Widgets.Generic.dateField(false, {name: 'startDate', style: {'width':'179px'}});
-var endDate = IndicoUI.Widgets.Generic.dateField(false, {name: 'endDate', style: {'width':'179px'}});
+var startDate = IndicoUI.Widgets.Generic.dateField(false, {name: 'startDate', style: {'width':'157px'}});
+var endDate = IndicoUI.Widgets.Generic.dateField(false, {name: 'endDate', style: {'width':'157px'}});
 
 $E('startDatePlace').set(startDate);
 $E('endDatePlace').set(endDate);

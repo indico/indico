@@ -74,10 +74,11 @@ type("DateTimeSelector", ["RealtimeTextBox"],
          var cal = Calendar.setup({
              inputField: this.input.dom,
              button: this.trigger.dom,
+             displayArea: this.input,
              eventName: "click",
              ifFormat: this.displayFormat,
              showsTime: true,
-             align: "Bl",
+             align: "",
              // notify the selector each time a new date/time is set
              // (since onkeydown/onkeyup won't be called)
              onUpdate: function() { self.notifyChange(); }

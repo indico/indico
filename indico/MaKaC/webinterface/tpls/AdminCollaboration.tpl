@@ -58,8 +58,8 @@
                 <% checked2 = '' %>
             <% end %>
             <input type="radio" name="dateFilterType" id="sinceToDateRadio" onclick="updateDateFilterType()" class="CARadio" <%= checked1 %> />
-            <%= _("Since")%> <input type="text" size="16" id="sinceDate" onkeypress="updateFilterButton()" value="<%= InitialSinceDate %>"/>
-            <%= _("to")%> <input type="text" size="16" id="toDate" onkeypress="updateFilterButton()" value="<%= InitialToDate %>"/>
+            <%= _("Since")%> <span id="sinceDateContainer"></span>
+            <%= _("to")%> <span id="toDateContainer"></span>
             <span class="CAMinMaxKeySuggestion"><%= _("Please input dates") %></span>
         </div>
         <div style="padding-top: 5px">
@@ -571,6 +571,16 @@ var pageSelectedHandler = function(page) {
 var pf = new PageFooter('<%= InitialNumberOfPages %>', '<%= InitialPage %>', 4, pageSelectedHandler)
 
 IndicoUI.executeOnLoad(function(){
+
+    var sinceDate = IndicoUI.Widgets.Generic.dateField(true, {id:'sinceDate'});
+    $E('sinceDateContainer').set(sinceDate);
+    sinceDate.set(<%= InitialSinceDate %>);
+    sinceDate.observeEvent("keypress", function (e) { updateFilterButton(); });
+    var toDate = IndicoUI.Widgets.Generic.dateField(true, {id:'toDate'});
+    $E('toDateContainer').set(toDate);
+    toDate.set(<%= InitialToDate %>);
+    toDate.observeEvent("keypress", function (e) { updateFilterButton(); });
+
     buildIndexTooltips();
     confIdObs();
     viewByObs('<%=InitialViewBy %>', true);
@@ -585,10 +595,8 @@ IndicoUI.executeOnLoad(function(){
 
     $E('pageNumberList').set(pf.draw());
 
-    dateParameterManager.add($E('sinceDate'), 'datetime', true);
+    dateParameterManager.add(sinceDate, 'datetime', true);
     dateParameterManager.add($E('toDate'), 'datetime', true);
-    IndicoUI.Widgets.Generic.input2dateField($E('sinceDate'), true, null);
-    IndicoUI.Widgets.Generic.input2dateField($E('toDate'), true, null);
 
     resultsPerPageParameterManager.add($E('resultsPerPage'), 'int', false, function(value) {
         if (value < 1) {

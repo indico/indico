@@ -12,7 +12,7 @@
     </div>
 
 	<div id="extraOptions">
-        <div><%= _("Advanced options")%></div>
+        <div id="advancedOptionsLabel"><%= _("Advanced options")%></div>
         <table>
             <tr>
                 <td style="text-align: right;"><%= _("Search in")%></td>

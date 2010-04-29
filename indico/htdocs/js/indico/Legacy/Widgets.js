@@ -887,7 +887,7 @@ IndicoUI.Widgets = {
                 inputField: elem.dom,
                 button: trigger == undefined ? elem.dom : trigger.dom,
                 displayArea: elem,
-                align: "Bl",
+                align: "",
                 eventName: "click",
                 ifFormat: format,
                 showsTime: showTime
@@ -916,7 +916,8 @@ IndicoUI.Widgets = {
         dateField: function(showTime, attributes, hiddenFields, elemInfo){
             attributes = attributes || {};
             elemInfo = elemInfo || {};
-            var elem = Html.input("text",elemInfo,attributes);
+            extend(elemInfo, attributes);
+            var elem = Html.input("text",elemInfo);
             var trigger = Html.img({src: imageSrc("calendarWidget")});
             var tab = Html.div("dateField", elem, trigger);
 
