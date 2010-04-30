@@ -24,7 +24,7 @@ from MaKaC.common.utils import formatDateTime
 from MaKaC.common.timezoneUtils import nowutc, unixTimeToDatetime
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.EVO.common import EVOControlledException, getEVOAnswer, parseEVOAnswer, EVOException, \
-    getMinStartDate, getMaxEndDate, OverlappedError, EVOError, getRequestURL, EVOWarning, getEVOOptionValueByName
+    getMinStartDate, getMaxEndDate, OverlappedError, EVOError, ChangesFromEVOError, getRequestURL, EVOWarning, getEVOOptionValueByName
 from MaKaC.plugins.Collaboration.EVO.mail import NewEVOMeetingNotificationAdmin, EVOMeetingModifiedNotificationAdmin, EVOMeetingRemovalNotificationAdmin
 #    NewEVOMeetingNotificationManager, EVOMeetingModifiedNotificationManager,\
 #    EVOMeetingRemovalNotificationManager
