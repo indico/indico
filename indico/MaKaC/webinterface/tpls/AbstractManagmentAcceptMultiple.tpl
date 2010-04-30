@@ -16,11 +16,10 @@ function showAbstracts()
 
 </script>
 
-
-<table width="50%%" align="center" border="0" style="border-left: 1px solid #777777">
-    <tr>
-        <td class="groupTitle"><%= _("Accepting abstract")%><a href="javascript:showAbstracts()">(%(abstractsQuantity)s)</a></td>
-    </tr>
+<div class="groupTitle"><%= _("Accepting %s abstracts")%abstractsQuantity %></div>
+<em><%= _("Click")%><a href="javascript:showAbstracts()"><%=" "+_("here")+" "%></a><%=_("to see the list of the abstracts you are accepting")%></em>
+<br/><br/>
+<table width="100%%" align="center" border="0">
     <tr>
         <td bgcolor="white">
             <table>

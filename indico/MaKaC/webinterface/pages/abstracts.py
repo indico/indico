@@ -1060,8 +1060,8 @@ class WAbstractManagmentAcceptMultiple( wcomponents.WTemplated):
     def __init__( self, abstracts ):
         wcomponents.WTemplated.__init__(self)
         self._abstracts = abstracts
-        if len(abstracts) > 0:
-            self._conf = abstracts[0].getOwner().getOwner()
+        # we suppose that we always have a least one abstract:
+        self._conf = abstracts[0].getOwner().getOwner()
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
@@ -1074,7 +1074,7 @@ class WAbstractManagmentAcceptMultiple( wcomponents.WTemplated):
         IDs = []
         for abstract in self._abstracts:
             IDs.append(abstract.getId())
-            vars["listOfAbstracts"].append(abstract.getId() + ". " + abstract.getTitle())
+            vars["listOfAbstracts"].append("[%s] %s"%(abstract.getId(), abstract.getTitle()))
         acceptURL.addParams({'abstracts':IDs})
         vars["acceptURL"] = quoteattr(str(acceptURL))
         vars["cancelURL"] = quoteattr(str(urlHandlers.UHConfAbstractManagment.getURL(self._conf)))
@@ -1174,8 +1174,8 @@ class WAbstractManagmentRejectMultiple( wcomponents.WTemplated ):
 
     def __init__( self, abstracts ):
         self._abstracts = abstracts
-        if len(abstracts) > 0:
-            self._conf = abstracts[0].getOwner().getOwner()
+        # we suppose that we always have a least one abstract:
+        self._conf = abstracts[0].getOwner().getOwner()
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
@@ -1185,7 +1185,7 @@ class WAbstractManagmentRejectMultiple( wcomponents.WTemplated ):
         IDs = []
         for abstract in self._abstracts:
             IDs.append(abstract.getId())
-            vars["listOfAbstracts"].append(abstract.getId() + ". " + abstract.getTitle())
+            vars["listOfAbstracts"].append("[%s] %s"%(abstract.getId(), abstract.getTitle()))
         rejectURL.addParams({'abstracts':IDs})
         vars["rejectURL"] = quoteattr(str(rejectURL))
         vars["cancelURL"] = quoteattr(str(urlHandlers.UHConfAbstractManagment.getURL(self._conf)))

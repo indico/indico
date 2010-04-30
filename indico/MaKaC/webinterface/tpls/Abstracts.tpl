@@ -218,7 +218,7 @@ document.optionForm.showSubmissionDate.checked=false
 					<tr>
 						%(abstractTitleBar)s
 					</tr>
-                    <form action=%(abstractSelectionAction)s method="post" target="_blank">
+                    <form action=%(abstractSelectionAction)s method="post">
 					%(abstracts)s
 					%(fieldsToPrint)s
 					<tr>

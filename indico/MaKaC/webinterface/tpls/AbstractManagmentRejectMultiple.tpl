@@ -16,11 +16,10 @@ function showAbstracts()
 
 </script>
 
-
-<table width="50%%" align="center" border="0" style="border-left: 1px solid #777777">
-    <tr>
-        <td class="groupTitle" colspan="2"> <%= _("Rejecting abstract")%><a href="javascript:showAbstracts()">(%(abstractsQuantity)s)</a></td>
-    </tr>
+<div class="groupTitle"><%= _("Rejecting %s abstracts")%abstractsQuantity %></div>
+<em><%= _("Click")%><a href="javascript:showAbstracts()"><%=" "+_("here")+" "%></a><%=_("to see the list of the abstracts you are rejecting")%></em>
+<br/><br/>
+<table width="100%%" align="center" border="0">
     <tr>
         <form action=%(rejectURL)s method="POST">
         <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Comments")%></span></td>

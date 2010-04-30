@@ -4252,28 +4252,120 @@ class RHAbstractsMerge(RHConfModifCFABase):
                             errorMsgList=errorList,\
                             notify=self._notify)
 
-#class AbstractNotification:
-#
-#    def __init__(self, conf, abstract):
-#        self._conf = conf
-#        self._abstract = abstract
-#
-#    def getDict(self):
-#        dict = {}
-#        dict["conference_title"] = self._conf.getTitle()
-#        dict["conference_URL"] = str(urlHandlers.UHConferenceDisplay.getURL(self._conf))
-#        dict["abstract_title"] = self._abstract.getTitle()
-#        dict["abstract_track"] = "--not specified--"
-#        dict["contribution_type"] = "--not defined--"
-#        if self._abstract.getCurrentStatus().__class__ == review.AbstractStatusAccepted:
-#            dict["abstract_track"] = self._abstract.getCurrentStatus().getTrack().getTitle()
-#            dict["contribution_type"] = self._abstract.getContribType()#.getName()
-#        dict["submitter_first_name"] = self._abstract.getSubmitter().getFirstName()
-#        dict["submitter_familly_name"] = self._abstract.getSubmitter().getSurName()
-#        dict["submitter_title"] = self._abstract.getSubmitter().getTitle()
-#        dict["abstract_URL"] = str(urlHandlers.UHAbstractDisplay.getURL(self._abstract))
-#        return dict
+#Base class for multi abstract management
+class RHAbstractManagmentMultiple( RHConferenceModifBase ):
 
+    def _checkParams( self, params ):
+        RHConferenceModifBase._checkParams(self, params)
+        abstractIds = params.get("abstracts",[])
+        abMgr = self._conf.getAbstractMgr()
+        self._abstracts = []
+        #if single abstract id is sent it's not a list so it shouldn't be iterated
+        if isinstance(abstractIds, types.ListType):
+            for id in abstractIds:
+                self._abstracts.append(abMgr.getAbstractById(id))
+        else:
+            self._abstracts.append(abMgr.getAbstractById(abstractIds))
+        self._warningShown=params.has_key("confirm")
+        self._comments = params.get("comments", "")
+        self._notify=params.has_key("notify")
+
+    #checks if notification email template is defined for all selected abstracts
+    #returns List of abstracts which doesn't have required template
+    def _checkNotificationTemplate(self, status):
+        from MaKaC.webinterface.rh.abstractModif import _AbstractWrapper
+        abstractsWithMissingTemplate = []
+        for abstract in self._abstracts:
+            status._setAbstract(abstract)
+            wrapper=_AbstractWrapper(status)
+            if abstract.getOwner().getNotifTplForAbstract(wrapper) is None:
+                abstractsWithMissingTemplate.append(abstract)
+        return abstractsWithMissingTemplate
+
+    #checks the status of selected abstracts
+    #returns list of abstracts with improper status
+    def _checkStatus(self):
+        improperAbstracts = []
+        for abstract in self._abstracts:
+            status = abstract.getCurrentStatus()
+            if not isinstance(status, AbstractStatusSubmitted) and \
+               not isinstance(status, AbstractStatusProposedToAccept) and \
+               not isinstance(status, AbstractStatusProposedToReject):
+                improperAbstracts.append(abstract)
+        return improperAbstracts
+
+
+class RHAbstractManagmentAcceptMultiple( RHAbstractManagmentMultiple ):
+
+    def _checkParams( self, params ):
+        RHAbstractManagmentMultiple._checkParams(self, params)
+        self._accept = params.get("accept", None)
+        self._track=self._conf.getTrackById(params.get("track", ""))
+        self._session=self._conf.getSessionById(params.get("session", ""))
+        self._typeId = params.get("type", "")
+
+    def _process( self ):
+        if self._abstracts != []:
+            improperAbstracts = self._checkStatus()
+            if improperAbstracts == []:
+                if self._accept:
+                    improperTemplates = self._checkNotificationTemplate(review.AbstractStatusAccepted(None, None, None, None))
+                    if self._notify and not self._warningShown and  improperTemplates != []:
+                        raise FormValuesError("""The abstracts with the following IDs can not be automatically
+                                                 notified: %s. Therefore, none of your request has been processed;
+                                                 go back, uncheck the relevant abstracts and try again."""%(", ".join(map(lambda x:x.getId(),improperTemplates))))
+                    cType=self._conf.getContribTypeById(self._typeId)
+                    for abstract in self._abstracts:
+                        abstract.accept(self._getUser(),self._track,cType,self._comments,self._session)
+                        if self._notify:
+                            n=EmailNotificator()
+                            abstract.notify(n,self._getUser())
+                    self._redirect(urlHandlers.UHConfAbstractManagment.getURL(self._conf))
+                else:
+                    p = abstracts.WPAbstractManagmentAcceptMultiple( self, self._abstracts )
+                    return p.display( **self._getRequestParams() )
+            else:
+                raise FormValuesError("""The abstracts with the following IDs cannot be accepted because of their
+                                current status: %s. Therefore, none of your request has been processed;
+                                go back, uncheck the relevant abstracts and try again."""%(", ".join(map(lambda x:x.getId(),improperAbstracts))))
+        else:
+            raise FormValuesError("No abstracts selected")
+
+
+class RHAbstractManagmentRejectMultiple( RHAbstractManagmentMultiple ):
+
+    def _checkParams( self, params ):
+        RHAbstractManagmentMultiple._checkParams(self, params)
+        self._reject = params.get("reject", None)
+        self._comments = params.get("comments", "")
+        self._notify=params.has_key("notify")
+        self._warningShown=params.has_key("confirm")
+
+    def _process( self ):
+        if self._abstracts != []:
+            improperAbstracts = self._checkStatus()
+            if improperAbstracts == []:
+                if self._reject:
+                    improperTemplates = self._checkNotificationTemplate(review.AbstractStatusRejected(None, None))
+                    if self._notify and not self._warningShown and  improperTemplates != []:
+                        raise FormValuesError("""The abstracts with the following IDs can not be automatically
+                                                 notified: %s. Therefore, none of your request has been processed;
+                                                 go back, uncheck the relevant abstracts and try again."""%(", ".join(map(lambda x:x.getId(),improperTemplates))))
+                    for abstract in self._abstracts:
+                        abstract.reject(self._getUser(), self._comments)
+                        if self._notify:
+                            n=EmailNotificator()
+                            abstract.notify(n,self._getUser())
+                    self._redirect(urlHandlers.UHConfAbstractManagment.getURL(self._conf))
+                else:
+                    p = abstracts.WPAbstractManagmentRejectMultiple( self, self._abstracts )
+                    return p.display( **self._getRequestParams() )
+            else:
+                raise FormValuesError("""The abstracts with the following IDs cannot be rejected because of their
+                                current status: %s. Therefore, none of your request has been processed;
+                                go back, uncheck the relevant abstracts and try again."""%(", ".join(map(lambda x:x.getId(),improperAbstracts))))
+        else:
+            raise FormValuesError("No abstracts selected")
 
 class RHAbstractSendNotificationMail(RHConfModifCFABase):
 
@@ -8122,123 +8214,3 @@ class RHConfPosterGetBackground(RHConferenceModifBase):
 
                 filePath = os.path.join(tempPath, self._getSession().getVar(key) [ int(self.__backgroundId) ][0])
                 return self.__fileBin(filePath)
-
-
-#Base class for multi abstract management
-class RHAbstractManagmentMultiple( RHConferenceModifBase ):
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams(self, params)
-        self._abstractIds = params.get("abstracts",[])
-        abMgr = self._conf.getAbstractMgr()
-        self._abstracts = []
-        #if single abstract id is sent it's not a list so it shouldn't be iterated
-        if isinstance(self._abstractIds, types.ListType):
-            for id in self._abstractIds:
-                self._abstracts.append(abMgr.getAbstractById(id))
-        else:
-            self._abstracts.append(abMgr.getAbstractById(self._abstractIds))
-        self._warningShown=params.has_key("confirm")
-        self._comments = params.get("comments", "")
-        self._notify=params.has_key("notify")
-
-    #checks if notification email template is defined for all selected abstracts
-    #returns List of abstracts which doesn't have required template
-    def _checkNotificationTemplate(self, status):
-        from MaKaC.webinterface.rh.abstractModif import _AbstractWrapper
-        abstractsWithMissingTemplate = []
-        for abstract in self._abstracts:
-            status._setAbstract(abstract)
-            wrapper=_AbstractWrapper(status)
-            if abstract.getOwner().getNotifTplForAbstract(wrapper) is None:
-                abstractsWithMissingTemplate.append(abstract)
-        return abstractsWithMissingTemplate
-
-    #checks the status of selected abstracts
-    #returns list of abstracts with improper status
-    def _checkStatus(self):
-        improperAbstracts = []
-        for abstract in self._abstracts:
-            status = abstract.getCurrentStatus()
-            if not isinstance(status, AbstractStatusSubmitted) and \
-               not isinstance(status, AbstractStatusProposedToAccept) and \
-               not isinstance(status, AbstractStatusProposedToReject):
-                improperAbstracts.append(abstract)
-        return improperAbstracts
-
-
-class RHAbstractManagmentAcceptMultiple( RHAbstractManagmentMultiple ):
-
-    def _checkParams( self, params ):
-        RHAbstractManagmentMultiple._checkParams(self, params)
-        self._accept = params.get("accept", None)
-        self._track=self._conf.getTrackById(params.get("track", ""))
-        self._session=self._conf.getSessionById(params.get("session", ""))
-        self._typeId = params.get("type", "")
-
-    def _process( self ):
-        if self._abstracts != []:
-            improperAbstracts = self._checkStatus()
-            if improperAbstracts == []:
-                if self._accept:
-                    improperTemplates = self._checkNotificationTemplate(review.AbstractStatusAccepted(None, None, None, None))
-                    if self._notify and not self._warningShown and  improperTemplates != []:
-                        errorMessage = "Following abstracts don't have an email template: "
-                        for improperTemplate in improperTemplates:
-                            errorMessage += improperTemplate.getTitle() + ", "
-                        raise MaKaCError(errorMessage)
-                    cType=self._conf.getContribTypeById(self._typeId)
-                    for abstract in self._abstracts:
-                        abstract.accept(self._getUser(),self._track,cType,self._comments,self._session)
-                        if self._notify:
-                            n=EmailNotificator()
-                            abstract.notify(n,self._getUser())
-                    self._redirect(urlHandlers.UHConfAbstractManagment.getURL(self._conf))
-                else:
-                    p = abstracts.WPAbstractManagmentAcceptMultiple( self, self._abstracts )
-                    return p.display( **self._getRequestParams() )
-            else:
-                errorMessage = "Following abstracts have improper status: "
-                for improperAbstract in improperAbstracts:
-                    errorMessage += improperAbstract.getTitle() + ", "
-                raise MaKaCError(errorMessage)
-        else:
-            raise MaKaCError("No abstracts selected!")
-
-
-class RHAbstractManagmentRejectMultiple( RHAbstractManagmentMultiple ):
-
-    def _checkParams( self, params ):
-        RHAbstractManagmentMultiple._checkParams(self, params)
-        self._reject = params.get("reject", None)
-        self._comments = params.get("comments", "")
-        self._notify=params.has_key("notify")
-        self._warningShown=params.has_key("confirm")
-
-    def _process( self ):
-        if self._abstracts != []:
-            improperAbstracts = self._checkStatus()
-            if improperAbstracts == []:
-                if self._reject:
-                    improperTemplates = self._checkNotificationTemplate(review.AbstractStatusRejected(None, None))
-                    if self._notify and not self._warningShown and  improperTemplates != []:
-                        errorMessage = "Following abstracts don't have an email template: "
-                        for improperTemplate in improperTemplates:
-                            errorMessage += improperTemplate.getTitle() + ", "
-                        raise MaKaCError(errorMessage)
-                    for abstract in self._abstracts:
-                        abstract.reject(self._getUser(), self._comments)
-                        if self._notify:
-                            n=EmailNotificator()
-                            abstract.notify(n,self._getUser())
-                    self._redirect(urlHandlers.UHConfAbstractManagment.getURL(self._conf))
-                else:
-                    p = abstracts.WPAbstractManagmentRejectMultiple( self, self._abstracts )
-                    return p.display( **self._getRequestParams() )
-            else:
-                errorMessage = "Following abstracts have improper status: "
-                for improperAbstract in improperAbstracts:
-                    errorMessage += improperAbstract.getTitle() + ", "
-                raise MaKaCError(errorMessage)
-        else:
-            raise MaKaCError("No abstracts selected!")
