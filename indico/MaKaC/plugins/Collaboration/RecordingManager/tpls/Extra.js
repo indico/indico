@@ -468,12 +468,15 @@ function RMCreateCDSRecord() {
 
                         if (!error) {
 
-                        // I don't have anything here yet. This is where we could do something with the result if we want. Don't know what that would be.
                         killProgress(); // turn off the progress indicator
+
+                        // Reload page so you can see updated status of talks
+                        window.location.reload();
 
                     } else {
                         killProgress(); // turn off the progress indicator
                         IndicoUtil.errorReport(error);
+
                     }
                 }
             );
@@ -503,8 +506,11 @@ function RMCreateIndicoLink() {
             },
         function(result, error){
             if (!error) {
-// I don't have anything here yet. This is where we could do something with the result if we want. Don't know what that would be.
                 killProgress(); // turn off the progress indicator
+
+                // Reload page so you can see updated status of talks
+                window.location.reload();
+
 
             } else {
                 killProgress(); // turn off the progress indicator

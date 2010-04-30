@@ -23,9 +23,8 @@ from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase, WCSCS
     CollaborationTools
 from MaKaC.plugins.Collaboration.RecordingManager.common import getTalks, getOrphans, languageList
 from MaKaC.plugins.Collaboration.RecordingManager.exceptions import RecordingManagerException
-from MaKaC.services.implementation.collaboration import CollaborationPluginServiceBase
 
-class WNewBookingForm(WCSPageTemplateBase, CollaborationPluginServiceBase):
+class WNewBookingForm(WCSPageTemplateBase):
 
     def getVars(self):
         vars = WCSPageTemplateBase.getVars( self )

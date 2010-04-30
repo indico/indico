@@ -592,9 +592,10 @@ def createCDSRecord(aw, IndicoID, contentType, videoFormat, languages):
     try:
         f = urlopen(req)
         result = f.read()
-    except HTTPError:
+    except HTTPError, e:
         flagSuccess = False
-        result += "HTTPError when submitting to %s" % CollaborationTools.getOptionValue("RecordingManager", "CDSUploadURL") + "\n"
+        result += "CDS returned an error when submitting to %s: %s\n" % \
+            (CollaborationTools.getOptionValue("RecordingManager", "CDSUploadURL"), e)
     except Exception, e:
         flagSuccess = False
         result += "Unknown error occured when submitting CDS record: %s.\n" % e
