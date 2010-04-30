@@ -165,11 +165,11 @@ class WExtra (WJSBase):
     def getVars(self):
         vars = WJSBase.getVars( self )
 
-        vars["ConferenceId"] = self._conf.getId()
-
         roomsWithH323IP = []
 
         if self._conf:
+
+            vars["ConferenceId"] = self._conf.getId()
 
             # Code to get a list of H.323 Videoconference-able rooms
             # by querying Indico's RB database
@@ -211,6 +211,8 @@ class WExtra (WJSBase):
                     Logger.get("CERNMCU").warning("Location: " + locationName + "MaKaCError when retrieving the list of all rooms with a H323 IP: " + e.getMsg())
                 except Exception, e:
                     Logger.get("CERNMCU").warning("Location: " + locationName + "Exception when retrieving the list of all rooms with a H323 IP: " + str(e))
+        else:
+            vars["ConferenceId"] = ""
 
         roomsWithH323IP.sort(key = lambda room: room.getLocation()+':'+room.getName())
         vars["RoomsWithH323IP"] = roomsWithH323IP
