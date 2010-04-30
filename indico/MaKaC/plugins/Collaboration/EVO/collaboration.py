@@ -444,7 +444,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
             return ChangesFromEVOError(changesFromEVO)
 
     def bookingOK(self):
-        self._statusMessage = _("Booking created")
+        self._statusMessage = "Booking created"
         self._statusClass = "statusMessageOK"
         self._created = True
 
@@ -457,13 +457,13 @@ class CSBooking(CSBookingBase): #already Fossilizable
                 self._canBeStarted = True
                 self._canBeDeleted = False
                 if changeMessage:
-                    self._statusMessage = _("Ready to start!")
+                    self._statusMessage = "Ready to start!"
                     self._statusClass = "statusMessageOK"
             else:
                 self._canBeStarted = False
                 if now > self.getEndDate() and changeMessage:
                     self._canBeDeleted = False
-                    self._statusMessage = _("Already took place")
+                    self._statusMessage = "Already took place"
                     self._statusClass = "statusMessageOther"
                     self._needsToBeNotifiedOfDateChanges = False
                     self._canBeNotifiedOfEventDateChanges = False
