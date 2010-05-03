@@ -427,7 +427,7 @@ class RHChairEdit( RHConferenceModifBase ):
         c.setPhone(p.get("phone",""))
         c.setFax(p.get("fax",""))
         if p.get("manager", None):
-            avl = user.AvatarHolder().match({"email":p.get("email","")})
+            avl = user.AvatarHolder().match({"email":p.get("email","")}, exact = 1)
             if avl:
                 av = avl[0]
                 self._target.grantModification(av)
