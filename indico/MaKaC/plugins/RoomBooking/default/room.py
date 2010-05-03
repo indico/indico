@@ -420,13 +420,19 @@ class NonBookableDate(Persistent):
         return self._startDate
 
     def setStartDate(self, startDate):
-        self._startDate = startDate.replace(hour=0,minute=0,second=0)
+        if startDate is None:
+            self._startDate = None
+        else:
+            self._startDate = startDate.replace(hour=0,minute=0,second=0)
 
     def getEndDate(self):
         return self._endDate
 
     def setEndDate(self, endDate):
-        self._endDate = endDate.replace(hour=23,minute=59,second=59)
+        if endDate is None:
+            self._endDate = None
+        else:
+            self._endDate = endDate.replace(hour=23,minute=59,second=59)
 
     def doesDayOverlap(self, day):
         if day >= self.getStartDate().date() and day <= self.getEndDate().date():
