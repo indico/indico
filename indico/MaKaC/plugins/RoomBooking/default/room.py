@@ -44,6 +44,35 @@ class Room( Persistent, RoomBase ):
         RoomBase.__init__( self )
         self.customAtts = PersistentMapping()
         self.avaibleVC = []
+        self._nonBookableDates = []
+
+    def getNonBookableDates(self):
+        try:
+            if self._nonBookableDates:
+                pass
+        except AttributeError, e:
+            self._nonBookableDates = []
+            self._p_changed = 1
+        return self._nonBookableDates
+
+    def addNonBookableDate(self, udate):
+        self._nonBookableDates.append(udate)
+        self._p_changed = 1
+
+    def addNonBookableDateFromParams(self, params):
+        nbd = NonBookableDate(params["startDate"], params["endDate"])
+        self._nonBookableDates.append(nbd)
+        self._p_changed = 1
+
+    def clearNonBookableDates(self):
+        self._nonBookableDates = []
+        self._p_changed = 1
+
+    def isNonBookableDay(self, day):
+        for nbd in self.getNonBookableDates():
+            if nbd.doesDayOverlap(day):
+                return True
+        return False
 
     def setAvailableVC(self, avc):
         self.avaibleVC = avc
@@ -373,6 +402,37 @@ class Room( Persistent, RoomBase ):
                 return False
         return True
 
+class NonBookableDate(Persistent):
+
+    def __init__(self, startDate, endDate):
+        self.setStartDate(startDate)
+        self.setEndDate(endDate)
+
+    def toDict(self):
+        return {"startDate": self._startDate,
+                "endDate": self._endDate}
+
+    def saveFromDict(self, data):
+        self.setStartDate(data["startDate"])
+        self.setEndDate(data["endDate"])
+
+    def getStartDate(self):
+        return self._startDate
+
+    def setStartDate(self, startDate):
+        self._startDate = startDate.replace(hour=0,minute=0,second=0)
+
+    def getEndDate(self):
+        return self._endDate
+
+    def setEndDate(self, endDate):
+        self._endDate = endDate.replace(hour=23,minute=59,second=59)
+
+    def doesDayOverlap(self, day):
+        if day >= self.getStartDate().date() and day <= self.getEndDate().date():
+            return True
+        else:
+            return False
 # ============================================================================
 # ================================== TEST ====================================
 # ============================================================================

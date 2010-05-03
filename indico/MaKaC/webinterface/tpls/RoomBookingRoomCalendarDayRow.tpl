@@ -5,11 +5,18 @@
         <% if dayDT.weekday() in (5, 6): %>
             <% dateclass = "weekend" %>
         <% end %> <!-- of if block -->
-        <a href="<%= urlHandlers.UHRoomBookingBookingForm.getURL( room )%>&day=<%= dayDT.day %>&month=<%= dayDT.month %>&year=<%= dayDT.year %>" class="dateLink <%= dateclass %>">
-            <span>
+        <% if room.isNonBookableDay(dayDT): %>
+            <span title="This room cannot be booked for this date due to maintenance reasons" class="unavailable">
                 <%= formatDate(dayDT) %>
             </span>
-        </a>
+        <% end %>
+        <% else: %>
+            <a href="<%= urlHandlers.UHRoomBookingBookingForm.getURL( room )%>&day=<%= dayDT.day %>&month=<%= dayDT.month %>&year=<%= dayDT.year %>" class="dateLink <%= dateclass %>">
+                <span>
+                    <%= formatDate(dayDT) %>
+                </span>
+            </a>
+        <% end %>
     </td>
 
     <!-- Bars Column -->

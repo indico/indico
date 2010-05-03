@@ -78,6 +78,14 @@
 
      });
 </script>
+                                        <% if unavailableDates:%>
+                                        <tr id="sdatesTR" >
+                                            <td class="subFieldWidth" align="right" ></td>
+                                            <td class="blacktext">
+                                            <span style="color:#881122">This room cannot be booked during the following dates due to maintenance reasons:<ul><li><%= "</li><li>".join(map(lambda x: 'from %s to %s'%(x.getStartDate().strftime('%d/%m/%Y'), x.getEndDate().strftime('%d/%m/%Y')), unavailableDates )) %></li></ul></span>
+                                            </td>
+                                        </tr>
+                                        <% end %>
                                         <tr id="sdatesTR" >
                                             <td class="subFieldWidth" align="right" ><small> <%= _("Start Date")%>&nbsp;&nbsp;</small></td>
                                             <td class="blacktext">

@@ -6705,6 +6705,12 @@ class WRoomBookingRoomForm( WTemplated ):
         else:
             vars["responsibleName"] = ""
 
+        nbd = candRoom.getNonBookableDates()
+        if len(nbd) == 0:
+            from MaKaC.plugins.RoomBooking.default.room import NonBookableDate
+            nbd = [NonBookableDate(None, None)]
+        vars["nonBookableDates"] = nbd
+
         return vars
 
 

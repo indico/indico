@@ -20,7 +20,7 @@
 
 # Most of the following imports are probably not necessary - to clean
 
-import os
+import os,time
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.locators as locators
@@ -39,8 +39,8 @@ from MaKaC.rb_room import RoomBase
 from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum
 from MaKaC.rb_factory import Factory
 from MaKaC.rb_location import CrossLocationQueries, RoomGUID, Location
-from MaKaC.rb_tools import intd, FormMode
-from MaKaC.errors import MaKaCError
+from MaKaC.rb_tools import intd, FormMode, doesPeriodsOverlap
+from MaKaC.errors import MaKaCError, FormValuesError
 from MaKaC.plugins.pluginLoader import PluginLoader
 
 class CandidateDataFrom( object ):
@@ -159,6 +159,7 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
     # Room
 
     def _saveRoomCandidateToSession( self, c ):
+        # TODO: is this method needed anymore??
         session = self._websession     # Just an alias
         if self._formMode == FormMode.MODIF:
             session.setVar( "roomID", c.id )
@@ -289,6 +290,11 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
         candRoom.division = params.get( "division" )
         candRoom.surfaceArea = intd( params.get( "surfaceArea" ) )
         candRoom.comments = params.get( "comments" )
+        #TODO: change this in order to support many periods
+        candRoom.clearNonBookableDates()
+        if params.get("startDateNonBookablePeriod0", "") and params.get("endDateNonBookablePeriod0",""):
+            candRoom.addNonBookableDateFromParams({"startDate": datetime(*(time.strptime(params.get("startDateNonBookablePeriod0"), '%d/%m/%Y')[0:6])),
+                                                   "endDate": datetime(*(time.strptime(params.get("endDateNonBookablePeriod0"), '%d/%m/%Y')[0:6]))})
 
         eqList = []
         vcList = []
@@ -1148,6 +1154,10 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
 
 
         self._candResv = candResv
+
+        for nbd in self._candResv.room.getNonBookableDates():
+            if (doesPeriodsOverlap(nbd.getStartDate(),nbd.getEndDate(),self._candResv.startDT,self._candResv.endDT)):
+                raise FormValuesError("You cannot book this room during the following periods due to maintenance reasons: %s"%("; ".join(map(lambda x: "from %s to %s"%(x.getStartDate().strftime("%d/%m/%Y"),x.getEndDate().strftime("%d/%m/%Y")), self._candResv.room.getNonBookableDates()))))
 
         self._params = params
         self._clearSessionState()

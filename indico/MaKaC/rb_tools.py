@@ -33,7 +33,7 @@ class FormMode( object ):
     NEW, MODIF = xrange( 2 )
 
 class Period:
-    """ 
+    """
     Composed of two dates. Comparable by start date.
     """
     startDT = None
@@ -65,17 +65,17 @@ def intd( s, default = None ):
 def qbeMatch( example, candidate, special, **kwargs ):
     """
     Queary By Example Match.
-    
-    Used for "query by example" searching mechanism. The 'example' 
-    parameter defines match conditions. Function returns true if 
+
+    Used for "query by example" searching mechanism. The 'example'
+    parameter defines match conditions. Function returns true if
     'candidate' matches 'example', false otherwise.
 
     The rules for generic comparison:
-    - Only not-None attributes of 'example' are compared. 
+    - Only not-None attributes of 'example' are compared.
     - Strings are matched by inclusion, not equality.
-    
+
     Arguments:
-    example - specifies match conditions. If example.attribute is 
+    example - specifies match conditions. If example.attribute is
         None, the attribute is skipped as not important.
     candidate - object that is testet for match with example
     special - method that knows how to treat special attributes.
@@ -87,17 +87,17 @@ def qbeMatch( example, candidate, special, **kwargs ):
         - True if values are equal
         - False otherwise
     """
-    
+
     for attrName in dir( example ):
         # Skip methods, private attributes and Nones
-        if attrName[0] == '_' or attrName in ['avaibleVC', 'vcList', 'needsAVCSetup', 'verboseEquipment']: 
-            continue 
+        if attrName[0] == '_' or attrName in ['avaibleVC', 'vcList', 'needsAVCSetup', 'verboseEquipment']:
+            continue
 
         attrType = eval( 'example.' + attrName + '.__class__.__name__' )
-        if attrType in ['instancemethod', 'staticmethod', 'function' ]: 
+        if attrType in ['instancemethod', 'staticmethod', 'function' ]:
             continue
         exAttrVal = eval( 'example.' + attrName )
-        if exAttrVal == None: 
+        if exAttrVal == None:
             continue
 
         candAttrVal = eval( 'candidate.' + attrName )
@@ -116,13 +116,13 @@ def qbeMatch( example, candidate, special, **kwargs ):
                 areEqual = ( candAttrVal.lower().find( exAttrVal.lower() ) != -1 )
             else:
                 raise attrType + ": " + str( candAttrVal ) + " - can not compare"
-        
+
         if not areEqual:
             #print "Does not match: %s (%s : %s)" % (attrName, str( exAttrVal ), str( attrVal ) )
             return False
 #        if 'Room' not in example.__class__.__name__ and attrName == 'repeatability' and example.repeatability == 1 and candidate.reason == "TDAQ Meeting" and candidate.startDT == datetime( 2007, 05, 21, 9 ):
 #            raise str( areEqual ) + '--' + str( example )
-    
+
     # All attributes match
     return True
 
@@ -130,7 +130,7 @@ def qbeMatch( example, candidate, special, **kwargs ):
 def containsExactly_OR_containsAny( attrValExample, attrValCandidate ):
     attrValExample = attrValExample.strip().lower()
     attrValCandidate = attrValCandidate.lower()
-    
+
     if attrValExample[0] in ['"', "'"] and attrValExample[-1] in ['"', "'"]:
         # If quoted, check for exact containmet
         attrValExample = attrValExample[1:-1]
@@ -141,7 +141,7 @@ def containsExactly_OR_containsAny( attrValExample, attrValCandidate ):
         for word in words:
             if word in attrValCandidate:
                 return True
-    
+
     return False
 
 
@@ -160,19 +160,19 @@ def __doesPeriodsOverlap( startDT1, endDT1, startDT2, endDT2 ):
     # Dates must overlap
     if endDT1.date() < startDT2.date() or endDT2.date() < startDT1.date():
         return False
-    
+
     # Times must overlap
     if endDT1.time() <= startDT2.time() or endDT2.time() <= startDT1.time():
         return False
-    
+
     return True
 
 
 from datetime import datetime, timedelta, date
 
 def overlap( *args, **kwargs ):
-    """ 
-    Returns two datetimes - the common part of two given periods. 
+    """
+    Returns two datetimes - the common part of two given periods.
     """
     if len( args ) == 4:
         return __overlap( args[0], args[1], args[2], args[3] )
@@ -185,13 +185,13 @@ def __overlap( startDT1, endDT1, startDT2, endDT2):
     if not doesPeriodsOverlap( startDT1, endDT1, startDT2, endDT2):
         # [---]  [----]
         return None
-    
+
     dates = __overlapDates( startDT1.date(), endDT1.date(), startDT2.date(), endDT2.date() )
     times = __overlapTimes( startDT1.time(), endDT1.time(), startDT2.time(), endDT2.time() )
 
     fromOverlap = datetime( dates[0].year, dates[0].month, dates[0].day, times[0].hour, times[0].minute, times[0].second )
     toOverlap = datetime( dates[1].year, dates[1].month, dates[1].day, times[1].hour, times[1].minute, times[1].second )
-    
+
     return ( fromOverlap, toOverlap )
 
 def __overlapDates( startD1, endD1, startD2, endD2 ):
@@ -200,12 +200,12 @@ def __overlapDates( startD1, endD1, startD2, endD2 ):
         # [-----]       (1)
         #     [------]  (2)
         return ( startD2, endD1 )
-    
+
     if startD1 >= startD2 and endD1 <= endD2:
         #    [---]      (1)
         # [----------]  (2)
         return ( startD1, endD1 )
-    
+
     return __overlapDates( startD2, endD2, startD1, endD1 )
 
 def __overlapTimes( startT1, endT1, startT2, endT2 ):
@@ -214,12 +214,12 @@ def __overlapTimes( startT1, endT1, startT2, endT2 ):
         # [-----]       (1)
         #     [------]  (2)
         return ( startT2, endT1 )
-    
+
     if startT1 >= startT2 and endT1 <= endT2:
         #    [---]      (1)
         # [----------]  (2)
         return ( startT1, endT1 )
-    
+
     return __overlapTimes( startT2, endT2, startT1, endT1 )
 
 
@@ -237,7 +237,7 @@ def iterdays(first, last):
 
 def weekNumber( dt ):
     """
-    Lets assume dt is Friday. 
+    Lets assume dt is Friday.
     Then weekNumber( dt ) will return WHICH Friday of the month it is: 1st - 5th.
     """
     weekDay = dt.weekday()
@@ -248,10 +248,10 @@ def weekNumber( dt ):
     return weekNumber
 
 class Impersistant( object ):
-    
+
     def __init__( self, obj ):
         self.__obj = obj
-    
+
     def getObject( self ):
         return self.__obj
 
@@ -271,7 +271,7 @@ def checkPresence( self, errors, attrName, type ):
 
 import time
 from datetime import timedelta
-    
+
 def toUTC( localNaiveDT ):
     """
     Converts naive (timezone-less) datetime to UTC.
@@ -304,25 +304,25 @@ def formatDateTime(date):
 # ============================================================================
 
 class Test:
-    
+
     @staticmethod
     def doesPeriodsOverlap():
-    
+
         # Days overlap, hours not
-        ret = doesPeriodsOverlap( 
+        ret = doesPeriodsOverlap(
             datetime( 2006, 9, 20, 16 ),
-            datetime( 2006, 9, 20, 18 ), 
+            datetime( 2006, 9, 20, 18 ),
             datetime( 2006, 9, 20, 18, 30 ),
             datetime( 2006, 9, 20, 19 ) )
         assert( not ret )
-        
-        ret = doesPeriodsOverlap( 
+
+        ret = doesPeriodsOverlap(
             datetime( 2006, 9, 20, 16 ),
-            datetime( 2006, 9, 25, 18 ), 
+            datetime( 2006, 9, 25, 18 ),
             datetime( 2006, 9, 23, 13 ),
             datetime( 2006, 9, 24, 15 ) )
         assert( not ret )
-        
+
         # Days does not overlap, hours do
         ret = doesPeriodsOverlap(
             datetime( 2006, 9, 20, 16 ),
@@ -330,34 +330,34 @@ class Test:
             datetime( 2006, 9, 21, 16, 30 ),
             datetime( 2006, 9, 22, 17, ) )
         assert( not ret )
-    
+
         p1 = Period( datetime( 2006, 12, 1, 8 ), datetime( 2006, 12, 1, 9 ) )
         p2 = Period( datetime( 2006, 12, 1, 9 ), datetime( 2006, 12, 1, 10 ) )
         assert( not doesPeriodsOverlap( p1, p2 ) )
 
         # Periods overlap
-        ret = doesPeriodsOverlap( 
+        ret = doesPeriodsOverlap(
             datetime( 2006, 9, 20, 16 ),
-            datetime( 2006, 9, 25, 18 ), 
+            datetime( 2006, 9, 25, 18 ),
             datetime( 2006, 9, 23, 13 ),
             datetime( 2006, 9, 24, 17 ) )
         assert( ret )
 
     @staticmethod
     def overlap():
-    
+
         # Days overlap, hours not
-        ret = overlap( 
+        ret = overlap(
             datetime( 2006, 9, 20, 16 ),
-            datetime( 2006, 9, 20, 18 ), 
+            datetime( 2006, 9, 20, 18 ),
             datetime( 2006, 9, 20, 18, 30 ),
             datetime( 2006, 9, 20, 19 ) )
         assert( ret == None )
-        
+
         # Periods overlap
-        sdt, edt = overlap( 
+        sdt, edt = overlap(
             datetime( 2006, 9, 20, 16 ),
-            datetime( 2006, 9, 25, 18 ), 
+            datetime( 2006, 9, 25, 18 ),
             datetime( 2006, 9, 23, 13 ),
             datetime( 2006, 9, 24, 17 ) )
         print sdt, edt

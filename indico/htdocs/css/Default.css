@@ -1328,6 +1328,12 @@ option.privateRoom, span.privateRoom, a.privateRoom, a.weekend {
     color: Red;
 }
 
+span.unavailable {
+    background-color: #881122;
+    color: white;
+    padding: 1px;
+}
+
 a.weekday {
     color: Black;
 }

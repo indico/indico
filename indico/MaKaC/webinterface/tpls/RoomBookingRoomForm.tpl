@@ -206,6 +206,23 @@
                                             <td align="right" valign="top"><small> <%= _("Comments")%>&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext"><textarea cols="40" id="comments" name="comments" ><%=verbose( room.comments )%></textarea><% contextHelp( 'commentsCH' ) %></td>
                                         </tr>
+                                        <tr>
+                                            <td align="right" valign="top"><small> <%= _("Unavailable booking periods")%>&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext">
+                                                <span id="nonBookablePeriods" name="nonBookablePeriods" >
+                                                    <table><tbody>
+                                                        <% for i in range(0, len(nonBookableDates)): %>
+                                                        <tr class="startEndDate">
+                                                            <td class="startEndDateEntry"><%= _("from") %>:</td>
+                                                            <td><span id="startDateNonBookablePeriod<%= i %>"></span></td>
+                                                            <td class="startEndDateEntry"><%= _("to") %>:</td>
+                                                            <td><span id="endDateNonBookablePeriod<%= i %>"></span></td>
+                                                        </tr>
+                                                        <% end %>
+                                                    </tbody></table>
+                                                </span>
+                                            </td>
+                                        </tr>
                                  </table>
                                 </td>
                               </tr>
@@ -264,6 +281,24 @@
     </form>
 
 <script type="text/javascript">
+    IndicoUI.executeOnLoad(function(){
+    <% for i in range(0, len(nonBookableDates)): %>
+        <% nbd = nonBookableDates[i] %>
+        var startDateNonBookablePeriod<%= i %> = IndicoUI.Widgets.Generic.dateField(false,{id:'startDateNonBookablePeriod<%= i %>', name:'startDateNonBookablePeriod<%= i %>'});
+        $E('startDateNonBookablePeriod<%= i %>').set(startDateNonBookablePeriod<%= i %>);
+        <% if nbd.getStartDate() is not None: %>
+            startDateNonBookablePeriod<%= i %>.set('<%= nbd.getStartDate().strftime("%d/%m/%Y") %>');
+        <% end %>
+
+
+        var endDateNonBookablePeriod<%= i %> = IndicoUI.Widgets.Generic.dateField(false,{id:'endDateNonBookablePeriod<%= i %>', name:'endDateNonBookablePeriod<%= i %>'});
+        $E('endDateNonBookablePeriod<%= i %>').set(endDateNonBookablePeriod<%= i %>);
+        <% if nbd.getStartDate() is not None: %>
+            endDateNonBookablePeriod<%= i %>.set('<%= nbd.getEndDate().strftime("%d/%m/%Y") %>');
+        <% end %>
+    <% end %>
+    });
+
   function searchForUsers() {
 
     var popup = new ChooseUsersPopup($T('Select a responsible'),
