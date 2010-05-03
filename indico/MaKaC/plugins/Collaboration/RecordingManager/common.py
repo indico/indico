@@ -705,7 +705,13 @@ def getCDSRecords(confId):
     # Here is a help page describing the GET args,
     # if this CDS query needs to be changed (thanks jerome.caffaro@cern.ch):
     # http://invenio-demo.cern.ch/help/hacking/search-engine-api
-    url = CollaborationTools.getOptionValue("RecordingManager", "CDSQueryURL") % id_plus_wildcard
+    # NB: We replace the string INDICO_ID manually instead of using %s because
+    # there are also url-encoded chars containing the % char.
+    optionsCDSQueryURL = CollaborationTools.getOptionValue("RecordingManager", "CDSQueryURL")
+    escapedOptionsCDSQueryURL = optionsCDSQueryURL.replace("REPLACE_WITH_INDICO_ID", id_plus_wildcard)
+    Logger.get('RecMan').debug("optionsCDSQueryURL = " + optionsCDSQueryURL)
+    Logger.get('RecMan').debug("escapedOptionsCDSQueryURL = " + escapedOptionsCDSQueryURL)
+    url = escapedOptionsCDSQueryURL
 
     # This dictionary will contain CDS ID's, referenced by Indico ID's
     results = {}

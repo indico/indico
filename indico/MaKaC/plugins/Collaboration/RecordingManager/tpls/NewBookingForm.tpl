@@ -113,18 +113,22 @@
                                 date: <%= orphan["date"] %><br />
                                 box:  <%= orphan["box"]  %>
                             </td>
-                            <td width="70%" align="right">
+                            <td width="70%" align="right">&nbsp;
+<!--
                                 <img src="<%= PreviewURL %><%= LOID %>/video0001.jpg">
                                 <img src="<%= PreviewURL %><%= LOID %>/video0002.jpg"><br />
+ -->
                             </td>
                         </tr>
                         <tr width="100%">
-                            <td width="100%" colspan="2">
+                            <td width="100%" colspan="2">&nbsp;
+<!--
                             <img src="<%= PreviewURL %><%= LOID %>/content0001.jpg">
                             <img src="<%= PreviewURL %><%= LOID %>/content0002.jpg">
                             <img src="<%= PreviewURL %><%= LOID %>/content0003.jpg">
                             <img src="<%= PreviewURL %><%= LOID %>/content0004.jpg">
-                            </td>
+ -->
+                             </td>
                         </tr>
                     </table>
                 </div>

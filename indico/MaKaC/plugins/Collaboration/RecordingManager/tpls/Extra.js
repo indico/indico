@@ -470,6 +470,9 @@ function RMCreateCDSRecord() {
 
                         killProgress(); // turn off the progress indicator
 
+                        // Tell user to wait while page reloads
+                        var killProgressReload = IndicoUI.Dialogs.Util.progress($T("CDS record submitted. Page now reloading to update status..."));
+
                         // Reload page so you can see updated status of talks
                         window.location.reload();
 
@@ -508,9 +511,11 @@ function RMCreateIndicoLink() {
             if (!error) {
                 killProgress(); // turn off the progress indicator
 
+                // Tell user to wait until page reloads
+                var killProgressReload = IndicoUI.Dialogs.Util.progress($T("Indico link to CDS record created. Page now reloading to update status..."));
+
                 // Reload page so you can see updated status of talks
                 window.location.reload();
-
 
             } else {
                 killProgress(); // turn off the progress indicator
