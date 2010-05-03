@@ -144,18 +144,6 @@
         <xsl:text disable-output-escaping="yes"><![CDATA[")],null, false, ]]></xsl:text>
         <xsl:value-of select="$alignMenuRight"/>
         <xsl:text disable-output-escaping="yes"><![CDATA[);</script>]]></xsl:text>
-
-        <!--
-        <xsl:if test="$item/modifyLink != ''">
-            <a href="{$item/modifyLink}"><img src="images/manage.png"  alt="modify this item" title="modify this item" style="vertical-align: middle;"/></a>
-        </xsl:if>
-        <xsl:if test="$item/minutesLink != ''">
-            <a href="#" onclick="IndicoUI.Dialogs.writeMinutes({$confId},{$sessId},{$contId},{$subContId});return false;"><img src="images/write_minutes.png" alt="write minutes" style="vertical-align: middle; margin-left:2px;margin-right:0px;" title="write minutes"/></a>
-        </xsl:if>
-        <xsl:if test="$item/materialLink != ''">
-            <a href="#" onclick="IndicoUI.Dialogs.Material.editor({$confId},{$sessId},{$contId},{$subContId},Indico.Data.MaterialTypes.meeting, {$uploadURL});return false;"><img src="images/file_shadow.png" border="0" alt="submit material" style="vertical-align: middle; margin-left:2px;margin-right:0px;" title="submit material"/></a>
-        </xsl:if>
-        -->
     </xsl:if>
 
 </xsl:template>

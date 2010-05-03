@@ -1001,7 +1001,6 @@ function contains(a, obj){
 type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
 
     _drawItem: function(pair) {
-
         var self = this;
 
         var material = pair.get();
@@ -1265,17 +1264,18 @@ type("MaterialEditorDialog", ["ExclusivePopupWithButtons"], {
         var changes = 0;
 
         var args = {
-            'categId': intToStr(this.categId),
-            'confId': intToStr(this.confId),
-            'sessionId': intToStr(this.sessId),
-            'contribId': intToStr(this.contId),
-            'subContId': intToStr(this.subContId),
+            'categId': this.categId,
+            'confId': this.confId,
+            'sessionId': this.sessId,
+            'contribId': this.contId,
+            'subContId': this.subContId,
             'parentProtected': this.parentProtected
         };
 
         // Remove null parameters
         each(args, function(value, key) {
-            if (value === null) {
+            //sometimes 'null' value is set as a string
+            if (value === null || value === undefined || value =="null") {
                 delete args[key];
             }
         });
