@@ -20,6 +20,12 @@
 
 #!/bin/bash
 
+# Absolute path to this script.
+SCRIPT=$(readlink -f $0)
+
+# Absolute directory's path this script
+SCRIPTPATH=`dirname $SCRIPT`
+
 while getopts "hb:t:e:" opt; do
   case $opt in
     b)
@@ -70,7 +76,7 @@ repozo -Rv -r $BACKUP_PATH -o $DATA_PATH
 #---- [1/6] Objects_stats ------------
 SUBJECT="[ZODB-Stats] Objects_stats"
 ELEMENTS_TO_DISPLAY=100
-python objects_stats.py -f $DATA_PATH -n $ELEMENTS_TO_DISPLAY > TMP_PATH"objects_stats.txt"
+python $SCRIPTPATH/objects_stats.py -f $DATA_PATH -n $ELEMENTS_TO_DISPLAY > TMP_PATH"objects_stats.txt"
 EMAILMESSAGE=TMP_PATH"objects_stats.txt"
 mail -s "$SUBJECT" "$EMAIL" < $EMAILMESSAGE
 rm TMP_PATH"objects_stats.txt"
@@ -79,7 +85,7 @@ rm TMP_PATH"objects_stats.txt"
 #---- [2/6] Class_stats ------------
 SUBJECT="[ZODB-Stats] Class_stats"
 ELEMENTS_TO_DISPLAY=100
-python class_stats.py -f $DATA_PATH -n $ELEMENTS_TO_DISPLAY > TMP_PATH"class_stats.txt"
+python $SCRIPTPATH/class_stats.py -f $DATA_PATH -n $ELEMENTS_TO_DISPLAY > TMP_PATH"class_stats.txt"
 EMAILMESSAGE=TMP_PATH"class_stats.txt"
 mail -s "$SUBJECT" "$EMAIL" < $EMAILMESSAGE
 rm TMP_PATH"class_stats.txt"
@@ -88,7 +94,7 @@ rm TMP_PATH"class_stats.txt"
 #---- [3/6] Transactions_stats ------------
 SUBJECT="[ZODB-Stats] Transactions_stats"
 DAYS=7
-python transactions_stats.py -f $DATA_PATH -a $DAYS > TMP_PATH"transactions_stats.txt"
+python $SCRIPTPATH/transactions_stats.py -f $DATA_PATH -a $DAYS > TMP_PATH"transactions_stats.txt"
 EMAILMESSAGE=TMP_PATH"transactions_stats.txt"
 mail -s "$SUBJECT" "$EMAIL" < $EMAILMESSAGE
 rm TMP_PATH"transactions_stats.txt"
@@ -96,7 +102,7 @@ rm TMP_PATH"transactions_stats.txt"
 
 #---- [4/6] Simple consistency checker ------------
 SUBJECT="[ZODB-Stats] Consistency Checker"
-python fstest.py $DATA_PATH > TMP_PATH"cchecker.txt"
+python $SCRIPTPATH/fstest.py $DATA_PATH > TMP_PATH"cchecker.txt"
 
 #If the file is empy -> no error detected
 if [ `ls -l TMP_PATH"cchecker.txt" | awk '{print $5}'` -eq 0 ]
@@ -113,7 +119,7 @@ rm TMP_PATH"cchecker.txt"
 #---- [5/6] Amount of data added per day ------------
 SUBJECT="[ZODB-Stats] Amount of data per day"
 DAYS=7
-python sizeIncreasing_stats.py -d $DAYS $DATA_PATH > TMP_PATH"data.txt"
+python $SCRIPTPATH/sizeIncreasing_stats.py -d $DAYS $DATA_PATH > TMP_PATH"data.txt"
 EMAILMESSAGE=TMP_PATH"data.txt"
 mail -s "$SUBJECT" "$EMAIL" < $EMAILMESSAGE
 rm TMP_PATH"data.txt"
@@ -122,7 +128,7 @@ rm TMP_PATH"data.txt"
 #---- [6/6] Most used classes ------------
 SUBJECT="[ZODB-Stats] Most modified classes during last two days"
 DAYS=2
-python mostUsedClasses.py -d $DAYS $DATA_PATH > TMP_PATH"used.txt"
+python $SCRIPTPATH/mostUsedClasses.py -d $DAYS $DATA_PATH > TMP_PATH"used.txt"
 EMAILMESSAGE=TMP_PATH"used.txt"
 mail -s "$SUBJECT" "$EMAIL" < $EMAILMESSAGE
 rm TMP_PATH"used.txt"
