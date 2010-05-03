@@ -722,6 +722,7 @@ class WConfDetailsBase( wcomponents.WTemplated ):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         tz = DisplayTZ(self._aw,self._conf).getDisplayTZ()
+        vars["timezone"] = tz
         if isStringHTML(self._conf.getDescription()):
             vars["description"] = self._conf.getDescription()
         else:
