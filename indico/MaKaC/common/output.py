@@ -902,58 +902,67 @@ class outputGenerator:
         from MaKaC.conference import Minutes
         if isinstance(mat, Minutes):
             out.writeTag("minutesText",mat.getText())
-        pdfs = []
-        docs = []
-        ppts = []
-        odps = []
-        odts = []
-        odss = []
-        others = []
-        links = []
+
+        types = {"pdf"   :{"mapsTo" : "pdf",   "imgURL" : "images/pdf_small.png",  "imgAlt" : "pdf file"},
+                 "doc"   :{"mapsTo" : "doc",   "imgURL" : "images/word.png",       "imgAlt" : "word file"},
+                 "docx"  :{"mapsTo" : "doc",   "imgURL" : "images/word.png",       "imgAlt" : "word file"},
+                 "ppt"   :{"mapsTo" : "ppt",   "imgURL" : "images/powerpoint.png", "imgAlt" : "powerpoint file"},
+                 "pptx"  :{"mapsTo" : "ppt",   "imgURL" : "images/powerpoint.png", "imgAlt" : "powerpoint file"},
+                 "sxi"   :{"mapsTo" : "odp",   "imgURL" : "images/impress.png",    "imgAlt" : "presentation file"},
+                 "odp"   :{"mapsTo" : "odp",   "imgURL" : "images/impress.png",    "imgAlt" : "presentation file"},
+                 "sxw"   :{"mapsTo" : "odt",   "imgURL" : "images/writer.png",     "imgAlt" : "writer file"},
+                 "odt"   :{"mapsTo" : "odt",   "imgURL" : "images/writer.png",     "imgAlt" : "writer file"},
+                 "sxc"   :{"mapsTo" : "ods",   "imgURL" : "images/calc.png",       "imgAlt" : "spreadsheet file"},
+                 "ods"   :{"mapsTo" : "ods",   "imgURL" : "images/calc.png",       "imgAlt" : "spreadsheet file"},
+                 "other" :{"mapsTo" : "other", "imgURL" : "images/file_small.png", "imgAlt" : "unknown type file"},
+                 "link"  :{"mapsTo" : "link",  "imgURL" : "images/link.png",       "imgAlt" : "link"}}
+
         if len(mat.getResourceList()) > 0:
             out.openTag("files")
+            processedFiles = []
             for res in mat.getResourceList():
                 try:
                     type = res.getFileType().lower()
-                    if type=="pdf":
-                        pdfs.append(res)
-                    elif type=="doc" or type == "docx":
-                        docs.append(res)
-                    elif type=="ppt" or type == "pptx":
-                        ppts.append(res)
-                    elif type=="sxi" or type=="odp":
-                        odps.append(res)
-                    elif type=="sxw" or type=="odt":
-                        odts.append(res)
-                    elif type=="sxc" or type=="ods":
-                        odss.append(res)
-                    else:
-                        others.append(res)
+
+                    try:
+                        fileType = types[type]["mapsTo"]
+                    except KeyError:
+                        fileType = "other"
+
                     if vars:
+                        filename = res.getFileName()
+                        if filename in processedFiles:
+                            filename = "%s-%s"%(processedFiles.count(filename)+1, filename)
                         out.openTag("file")
-                        out.writeTag("name",res.getFileName())
-                        out.writeTag("type",res.getFileType().lower())
+                        out.writeTag("name",filename)
+                        out.writeTag("type", fileType)
                         out.writeTag("url",vars["resourceURLGen"](res))
                         out.closeTag("file")
+                        processedFiles.append(res.getFileName())
                 except:
-                    links.append(res)
+                    out.openTag("file")
+                    out.writeTag("name", str(res.getURL()))
+                    out.writeTag("type", "link")
+                    out.writeTag("url", str(res.getURL()))
+                    out.closeTag("file")
             out.closeTag("files")
-            if not len(pdfs) > 1 and not len(docs) > 1 and not len(ppts) > 1 and not len(odps) > 1 and not len(odts) > 1 and not len(odss) > 1 and len(others) == 0 and not len(links) > 1:
-                if vars:
-                    if len(pdfs)==1:
-                        out.writeTag("pdf",vars["resourceURLGen"](pdfs[0]))
-                    if len(docs)==1:
-                        out.writeTag("doc",vars["resourceURLGen"](docs[0]))
-                    if len(ppts)==1:
-                        out.writeTag("ppt",vars["resourceURLGen"](ppts[0]))
-                    if len(odps)==1:
-                        out.writeTag("odp",vars["resourceURLGen"](odps[0]))
-                    if len(odts)==1:
-                        out.writeTag("odt",vars["resourceURLGen"](odts[0]))
-                    if len(odss)==1:
-                        out.writeTag("ods",vars["resourceURLGen"](odss[0]))
-                if len(links)==1:
-                    out.writeTag("link",str(links[0].getURL()))
+
+            # Used to enumerate types in the stylesheet. The order of the icons
+            # showed for the materials will be the one specified here
+            # TODO: find a way to avoid this hard coded list and get it from types
+            # typeList = set([ type["mapsTo"] for type in types.values()])
+
+            typeList = ["doc", "ppt", "pdf", "odt", "odp", "ods", "other", "link"]
+
+            out.openTag("types")
+            for type in typeList:
+                out.openTag("type")
+                out.writeTag("name", types[type]["mapsTo"])
+                out.writeTag("imgURL", types[type]["imgURL"])
+                out.writeTag("imgAlt", types[type]["imgAlt"])
+                out.closeTag("type")
+            out.closeTag("types")
+
         if mat.isItselfProtected():
             out.writeTag("locked","yes")
         out.closeTag("material")
