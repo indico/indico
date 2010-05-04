@@ -30,21 +30,25 @@ type("InlineRemoteWidget", ["InlineWidget"],
          draw: function() {
              var self = this;
 
+             var content = this._handleContent();
+
              // if the widget is set to load on startup,
              // the content will be a 'loading' message
              var wcanvas = Html.div({}, this.loadOnStartup?
                                    this._handleLoading():
-                                   this._handleContent());
+                                   content);
 
              // observe state changes and call
              // the handlers accordingly
              this.source.state.observe(function(state) {
                  if (state == SourceState.Error) {
                      self._handleError(self.source.error.get());
-                     wcanvas.set(self._handleContent());
+                     wcanvas.set(content);
+                     self.setMode('edit');
                  } else if (state == SourceState.Loaded) {
                      self._handleLoaded(self.source.get());
-                     wcanvas.set(self._handleContent());
+                     wcanvas.set(content);
+                     self.setMode('display');
                  } else {
                      wcanvas.set(self._handleLoading());
                  }
@@ -1156,30 +1160,24 @@ type("TypeSelector", ["IWidget", "WatchAccessor", "ErrorAware"],
 type("InlineEditWidget", ["InlineRemoteWidget"],
      {
 
-        _buildFrame: function(modeChooser, switchChooser) {
-            return Html.div({},
-                            modeChooser,
-                            Html.div({style:{marginTop: '5px'}},
-                                     switchChooser));
+         setMode: function(mode) {
+             this.modeChooser.set(mode);
+         },
 
-        },
+         _buildFrame: function(modeChooser, switchChooser) {
+             return Html.div({},
+                             modeChooser,
+                             Html.div({style:{marginTop: '5px'}},
+                                      switchChooser));
+         },
 
          _handleError: function(error) {
              this._error(error);
          },
 
-         _handleContent: function() {
+         _handleContentEdit: function() {
 
              var self = this;
-
-             // there are two possible widget modes: edit and display
-             var modeChooser = new Chooser(new Lookup(
-                 {
-                     'edit': function() { return self._handleEditMode(self.value); },
-                     'display': function() { return self._handleDisplayMode(self.value); }
-                 }));
-
-             // edit buttons - save and cancel
 
              this.saveButton = Widget.button(command(function() {
                      if (self._verifyInput()){
@@ -1191,29 +1189,41 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
                  this.saveButton,
                  Widget.button(command(function() {
                      // back to the start
-                     modeChooser.set('display');
-                     switchChooser.set('switchToEdit');
+                     self.setMode('display')
                  }, 'Cancel')));
 
              // there are two possible states for the "switch" area
-             var switchChooser = new Chooser(
+
+             return this._buildFrame(self._handleEditMode(self.value),
+                                     editButtons);
+
+         },
+
+         _handleContentDisplay: function() {
+
+             var self = this;
+             return this._buildFrame(self._handleDisplayMode(self.value),
+                                     Widget.link(command(function() {
+                                         self.setMode('edit');
+                                         return false;
+                                     }, '(edit)')));
+         },
+
+         _handleContent: function(mode) {
+
+             var self = this;
+
+             // there are two possible widget modes: edit and display
+             this.modeChooser = new Chooser(new Lookup(
                  {
-                     'switchToEdit': Widget.link(command(function() {
-                         modeChooser.set('edit');
-                         switchChooser.set('switchToDisplay');
-                         return false;
-                     }, '(edit)')),
-                     'switchToDisplay': editButtons
-                 });
+                     'edit': function() { return self._handleContentEdit(); },
+                     'display': function() { return self._handleContentDisplay(); }
+                 }));
 
-             // start in display mode, switchToEdit link
-             modeChooser.set('display');
-             switchChooser.set('switchToEdit');
+             // start in display mode
+             this.modeChooser.set('display');
 
-             // call the method that disposes the controllers (subclass)
-             return this._buildFrame(Widget.block(modeChooser),
-                                     Widget.block(switchChooser));
-
+             return Widget.block(this.modeChooser);
          },
 
          /* By default, any input is accepted */

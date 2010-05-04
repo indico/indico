@@ -33,7 +33,7 @@ from MaKaC.errors import TimingError
 from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
 
-from MaKaC.services.interface.rpc.common import ServiceError, Warning, ResultWithWarning
+from MaKaC.services.interface.rpc.common import ServiceError, Warning, ResultWithWarning, TimingNoReportError
 
 class ConferenceBase(object):
     """
@@ -305,9 +305,9 @@ class ConferenceDefaultStyleModification( ConferenceTextModificationBase ):
 
 class ConferenceVisibilityModification( ConferenceTextModificationBase ):
     """
-
     Conference visibility modification
     """
+
     def _handleSet(self):
         try:
             val = int(self._value)
@@ -319,14 +319,20 @@ class ConferenceVisibilityModification( ConferenceTextModificationBase ):
         return self._target.getVisibility()
 
 class ConferenceStartEndDateTimeModification( ConferenceModifBase ):
-    """ Conference start date/time modification
-        When changing the start date / time, the _setParam method will be called by DateTimeModificationBase's _handleSet method.
-        The _setParam method will return None (if there are no problems),
-        or a Warning object if the event start date change was OK but there were side problems,
-        such as an object observing the event start date change could not perform its task
-        (Ex: a videoconference booking could not be moved in time according with the conference's time change)
-        For this, it will check the 'dateChangeNotificationProblems' context variable.
     """
+    Conference start date/time modification
+
+    When changing the start date / time, the _setParam method will be called
+    by DateTimeModificationBase's _handleSet method.
+    The _setParam method will return None (if there are no problems),
+    or a Warning object if the event start date change was OK but there were
+    side problems, such as an object observing the event start date change
+    could not perform its task
+    (Ex: a videoconference booking could not be moved in time according with
+    the conference's time change)
+    For this, it will check the 'dateChangeNotificationProblems' context variable.
+    """
+
     def _checkParams(self):
 
         ConferenceModifBase._checkParams(self)
@@ -335,20 +341,32 @@ class ConferenceStartEndDateTimeModification( ConferenceModifBase ):
 
         self._startDate = pm.extract('startDate', pType=datetime.datetime)
         self._endDate = pm.extract('endDate', pType=datetime.datetime)
+        self._keepTimes = pm.extract('keepTimes', pType=bool)
 
     def _getAnswer(self):
 
         ContextManager.set('dateChangeNotificationProblems', {})
 
+        if (self._keepTimes):
+            moveEntries = 0
+        else:
+            moveEntries = 1
+
+        # first sanity check
         if (self._startDate > self._endDate):
             raise ServiceError("ERR-E3",
-                               "Date/time of start cannot " +
+                               "Date/time of start cannot "
                                "be greater than date/time of end")
 
+        # catch TimingErrors that can be returned by the algorithm
         try:
-            self._target.setDates(self._startDate, self._endDate, moveEntries=1)
+            self._target.setDates(self._startDate,
+                                  self._endDate,
+                                  moveEntries = moveEntries)
         except TimingError,e:
-            raise ServiceError("ERR-E2", e.getMsg())
+            raise TimingNoReportError("ERR-E2", e.getMsg(),
+                                      title = _("Cannot set event dates"),
+                                      explanation = e.getExplanation())
 
         dateChangeNotificationProblems = ContextManager.get('dateChangeNotificationProblems')
 
@@ -358,8 +376,8 @@ class ConferenceStartEndDateTimeModification( ConferenceModifBase ):
             for problemGroup in dateChangeNotificationProblems.itervalues():
                 warningContent.extend(problemGroup)
 
-            w = Warning(_('Warning'), [_('The start date of your event was changed correctly.'),
-                                       _('However, there were the following problems:'),
+            w = Warning(_('Warning'), [_('The start date of your event was changed correctly. '
+                                       'However, there were the following problems:'),
                                        warningContent])
 
             return DictPickler.pickle(ResultWithWarning(self._params.get('value'), w))

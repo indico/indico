@@ -134,6 +134,8 @@ type("StartEndDateWidget", ["InlineEditWidget"],
 
          _handleEditMode: function(value) {
 
+             this.keepTimes = Html.checkbox({});
+
              // create datefields
              this.startDate = new DateTimeSelector();
              this.endDate = new DateTimeSelector();
@@ -154,7 +156,12 @@ type("StartEndDateWidget", ["InlineEditWidget"],
              });
 
              // call buildStructure with modification widgets
-             return this.__buildStructure(this.startDate.draw(), this.endDate.draw());
+             return Html.div({},
+                             this.__buildStructure(this.startDate.draw(), this.endDate.draw()),
+                             Html.div("widgetCheckboxOption",
+                                      this.keepTimes,
+                                      Html.unescaped.span({},
+                                      $T("<strong>Don't change</strong> session/contribution times in the timetable"))));
          },
 
          _handleDisplayMode: function(value) {
@@ -165,8 +172,12 @@ type("StartEndDateWidget", ["InlineEditWidget"],
          },
 
          _getNewValue: function() {
-             return {startDate: Util.parseDateTime(this.startDate.get(), IndicoDateTimeFormats.Server),
-                     endDate: Util.parseDateTime(this.endDate.get(),IndicoDateTimeFormats.Server)};
+             return {startDate: Util.parseDateTime(this.startDate.get(),
+                                                   IndicoDateTimeFormats.Server),
+                     endDate: Util.parseDateTime(this.endDate.get(),
+                                                 IndicoDateTimeFormats.Server),
+                     keepTimes: this.keepTimes
+                     };
          },
 
          _verifyInput: function() {

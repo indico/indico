@@ -2794,21 +2794,58 @@ class Conference(Persistent, Fossilizable):
         self._p_changed=1
 
     def setDates( self, sDate, eDate=None, check=1, moveEntries=0 ):
-        if sDate>eDate:
+        """
+        Set the start/end date for a conference
+        """
+
+        # just store the old values for later
+        oldStartDate = copy.copy(self.getStartDate())
+        oldEndDate = copy.copy(self.getEndDate())
+
+
+        # do some checks first
+        if sDate > eDate:
+            # obvious case
             raise MaKaCError( _("Start date cannot be after the end date"), _("Event"))
-        oldStartDate=copy.copy(self.getStartDate())
-        oldEndDate=copy.copy(self.getEndDate())
-        if sDate==oldStartDate and eDate==oldEndDate:
+
+        elif sDate == oldStartDate and eDate == oldEndDate:
+            # if there's nothing to do (yet another obvious case)
             return
+
+        elif moveEntries == 1:
+            # in case the entries are to be simply shifted
+            # we should make sure the interval is big enough
+            newInterval = eDate - sDate
+            oldInterval = oldEndDate - oldStartDate
+
+            if oldInterval > newInterval:
+                raise TimingError(
+                    _("The start/end dates were not changed since the selected "
+                      "timespan is not large enough to accomodate the contained "
+                      "timetable entries."),
+                    explanation =
+                    _("You should try using a larger timespan or checking "
+                      "the <em>Don't change session/contribution times...</em> "
+                      "checkbox"))
+
+        # so, we really need to try changing something
+        # let's get to work and remove the conference from the date indexes
         self.unindexConf()
 
+        # set the dates
         self.setStartDate(sDate, check=0, moveEntries = moveEntries, index=False, notifyObservers = False)
         self.setEndDate(eDate, check=0, index=False, notifyObservers = False)
 
+        # sanity check
         self._checkInnerSchedule()
+
+        # reindex the conference
         self.indexConf()
+
+        # clear the category cache
         self.cleanCategoryCache()
 
+        # notify observers
         for observer in self.getObservers():
             try:
                 observer.notifyEventDateChanges(oldStartDate, self.getStartDate(), oldEndDate, self.getEndDate())

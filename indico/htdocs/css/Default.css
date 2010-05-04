@@ -3828,6 +3828,13 @@ span.warningTitle {
     font-weight: bold;
 }
 
+div.warningExplanation {
+    margin-top: 10px;
+    color: #555;
+    text-align: left;
+}
+
+
 ul.warningLevel0 {
     margin: 0;
     padding: 0;
@@ -6048,4 +6055,26 @@ div.dateField input {
     border: none;
     vertical-align: middle;
     width: 115px;
+}
+
+/*
+    Widget checkbox options
+*/
+
+.widgetCheckboxOption {
+    margin-top: 5px;
+}
+
+.widgetCheckboxOption strong {
+    font-weight: bold;
+}
+
+.widgetCheckboxOption span {
+    vertical-align: middle;
+    font-style: italic;
+    margin-left: 2px;
+}
+
+.widgetCheckboxOption input {
+    vertical-align: middle;
 }

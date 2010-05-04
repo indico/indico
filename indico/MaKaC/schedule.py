@@ -108,7 +108,7 @@ class TimeSchedule(Schedule, Persistent):
 
     def checkSanity( self ):
         if self.hasEntriesBefore(self.getStartDate()) or self.hasEntriesAfter(self.getEndDate()):
-            raise TimingError("Sorry, cannot perform this date change: Some entries in the timetable would be outside the new dates [conference id => %s ]"%(self.getOwner().getConference().getId()))
+            raise TimingError("Sorry, cannot perform this date change as some entries in the timetable would fall outside the new dates.")
 
     def isOutside(self,entry):
         """Tells whether an entry is outside the date boundaries of the schedule

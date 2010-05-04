@@ -1,10 +1,35 @@
+# -*- coding: utf-8 -*-
+##
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 from MaKaC.common.PickleJar import Retrieves
 import sys
 import traceback
 from MaKaC.common.fossilize import Fossilizable, fossilizes
-from MaKaC.fossils.error import ICausedErrorFossil
+from MaKaC.fossils.error import ICausedErrorFossil, INoReportErrorFossil
 
 class CausedError(Exception, Fossilizable):
+
+    """
+    A normal error, triggered on the server side
+    """
+
     fossilizes(ICausedErrorFossil)
 
     def __init__(self, code, message, inner=None, type=None):
@@ -13,75 +38,15 @@ class CausedError(Exception, Fossilizable):
         self.inner = inner
         self.type = type
 
-    @Retrieves(['MaKaC.services.interface.rpc.common.CausedError',
-                'MaKaC.services.interface.rpc.common.NoReportError',
-                'MaKaC.services.interface.rpc.common.RequestError',
-                'MaKaC.services.interface.rpc.common.ProcessError',
-                'MaKaC.services.interface.rpc.common.ServiceError',
-                'MaKaC.services.interface.rpc.common.PermissionError',
-                'MaKaC.services.interface.rpc.common.HTMLSecurityError',
-                'MaKaC.services.interface.rpc.common.ServiceAccessError',
-                'MaKaC.services.interface.rpc.common.TimingNoReportError',
-                'MaKaC.services.implementation.base.ExpectedParameterException',
-                'MaKaC.services.implementation.base.EmptyParameterException',
-                'MaKaC.plugins.Collaboration.base.CollaborationServiceException',
-                'MaKaC.plugins.Collaboration.EVO.common.EVOServiceException',
-                'MaKaC.plugins.Collaboration.RecordingRequest.common.RecordingRequestException',
-                'MaKaC.plugins.Collaboration.CERNMCU.common.CERNMCUException'], 'message')
     def getMessage(self):
         return self.message
 
-    @Retrieves(['MaKaC.services.interface.rpc.common.CausedError',
-                'MaKaC.services.interface.rpc.common.NoReportError',
-                'MaKaC.services.interface.rpc.common.RequestError',
-                'MaKaC.services.interface.rpc.common.ProcessError',
-                'MaKaC.services.interface.rpc.common.ServiceError',
-                'MaKaC.services.interface.rpc.common.PermissionError',
-                'MaKaC.services.interface.rpc.common.HTMLSecurityError',
-                'MaKaC.services.interface.rpc.common.ServiceAccessError',
-                'MaKaC.services.interface.rpc.common.TimingNoReportError',
-                'MaKaC.services.implementation.base.ExpectedParameterException',
-                'MaKaC.services.implementation.base.EmptyParameterException',
-                'MaKaC.plugins.Collaboration.base.CollaborationServiceException',
-                'MaKaC.plugins.Collaboration.EVO.common.EVOServiceException',
-                'MaKaC.plugins.Collaboration.RecordingRequest.common.RecordingRequestException',
-                'MaKaC.plugins.Collaboration.CERNMCU.common.CERNMCUException'], 'code')
     def getCode(self):
         return self.code
 
-    @Retrieves(['MaKaC.services.interface.rpc.common.CausedError',
-                'MaKaC.services.interface.rpc.common.NoReportError',
-                'MaKaC.services.interface.rpc.common.RequestError',
-                'MaKaC.services.interface.rpc.common.ProcessError',
-                'MaKaC.services.interface.rpc.common.ServiceError',
-                'MaKaC.services.interface.rpc.common.PermissionError',
-                'MaKaC.services.interface.rpc.common.HTMLSecurityError',
-                'MaKaC.services.interface.rpc.common.ServiceAccessError',
-                'MaKaC.services.interface.rpc.common.TimingNoReportError',
-                'MaKaC.services.implementation.base.ExpectedParameterException',
-                'MaKaC.services.implementation.base.EmptyParameterException',
-                'MaKaC.plugins.Collaboration.base.CollaborationServiceException',
-                'MaKaC.plugins.Collaboration.EVO.common.EVOServiceException',
-                'MaKaC.plugins.Collaboration.RecordingRequest.common.RecordingRequestException',
-                'MaKaC.plugins.Collaboration.CERNMCU.common.CERNMCUException'], 'inner')
     def getInner(self):
         return self.inner
 
-    @Retrieves(['MaKaC.services.interface.rpc.common.CausedError',
-                'MaKaC.services.interface.rpc.common.NoReportError',
-                'MaKaC.services.interface.rpc.common.RequestError',
-                'MaKaC.services.interface.rpc.common.ProcessError',
-                'MaKaC.services.interface.rpc.common.ServiceError',
-                'MaKaC.services.interface.rpc.common.PermissionError',
-                'MaKaC.services.interface.rpc.common.HTMLSecurityError',
-                'MaKaC.services.interface.rpc.common.ServiceAccessError',
-                'MaKaC.services.interface.rpc.common.TimingNoReportError',
-                'MaKaC.services.implementation.base.ExpectedParameterException',
-                'MaKaC.services.implementation.base.EmptyParameterException',
-                'MaKaC.plugins.Collaboration.base.CollaborationServiceException',
-                'MaKaC.plugins.Collaboration.EVO.common.EVOServiceException',
-                'MaKaC.plugins.Collaboration.RecordingRequest.common.RecordingRequestException',
-                'MaKaC.plugins.Collaboration.CERNMCU.common.CERNMCUException'], 'type')
     def getType(self):
         return self.type
 
@@ -96,9 +61,26 @@ class CausedError(Exception, Fossilizable):
             return "%s : %s\r\n\r\nInner Exception:\r\n%s" % (self.code, self.message, inner)
 
 class NoReportError(CausedError):
+    """
+    An error that doesn't get reported (no log entry, no warning e-mail,
+    no error report form)
+    """
 
-    def __init__(self, code, message, inner=None):
+    fossilizes(INoReportErrorFossil)
+
+    def __init__(self, code, message, inner=None, title=None, explanation=None):
         CausedError.__init__(self, code, message, inner, "noReport")
+        self._title = title
+        self._explanation = explanation
+
+    def getTitle(self):
+        """
+        A title for the error (optional)
+        """
+        return self._title
+
+    def getExplanation(self):
+        return self._explanation
 
 class RequestError(CausedError):
     pass

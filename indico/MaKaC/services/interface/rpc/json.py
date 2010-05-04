@@ -118,15 +118,12 @@ def process(req):
     except CausedError, e:
 
         try:
-            errorInfo = fossilize(e, ICausedErrorFossil)
+            errorInfo = fossilize(e)
         except NonFossilizableException, e2:
-
-            try:
-                errorInfo = DictPickler.pickle(e);
-            except Exception, e3:
-                # This is to catch Exceptions that are not registered as Pickles.
-                errorInfo  = {'code':'', 'message': str(e)}
-                Logger.get('dev').exception('Exception not registered as pickle')
+            # catch Exceptions that are not registered as Fossils
+            # and log them
+            errorInfo  = {'code':'', 'message': str(e2)}
+            Logger.get('dev').exception('Exception not registered as fossil')
 
 
         if isinstance(e, NoReportError):
