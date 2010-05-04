@@ -76,14 +76,20 @@ def main():
                   help="display only the n biggest classes", default=-1, type="int")
     parser.add_option("-f", "--file", dest="filename", action="store", type="string",
                   help="your FileStorage")
+    parser.add_option("-v", "--verbose", dest="verbose", action="store_false",
+                  help="show percentage and time remaining")
 
     (options, args) = parser.parse_args()
 
+    VERBOSE = False
     if options.filename:
         fname = options.filename
     else:
         print "You have to enter the filename, see --help for details"
         return 2
+
+    if options.verbose != None:
+        VERBOSE = True
 
     objectsToDisplay = options.num
     stats = {}
@@ -104,7 +110,8 @@ def main():
             if(percent - lastPercent > interval):
                 spentTime = time.time() - start
                 remainingTime = spentTime / float(it._file.tell()) * (float(size)) - spentTime
-                sys.stderr.write("\r%f%% complete, time spent %s,  remaining time: %s, recordsCounter %d" % (percent,GetInHMS(time.time() - start),  GetInHMS(remainingTime), recordsCounter))
+                if VERBOSE:
+                    sys.stderr.write("\r%f%% complete, time spent %s,  remaining time: %s, recordsCounter %d" % (percent,GetInHMS(time.time() - start),  GetInHMS(remainingTime), recordsCounter))
 
                 lastPercent = percent
 

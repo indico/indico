@@ -85,16 +85,23 @@ def main():
     parser = OptionParser(usage=usage)
     parser.add_option("-n", "--number", dest="num",
                   help="display only the n biggest objects", default=-1, type="int")
-    parser.add_option("-f", "--output", dest="filename", action="store", type="string", 
+    parser.add_option("-f", "--output", dest="filename", action="store", type="string",
                   help="the FileStorage")
+    parser.add_option("-v", "--verbose", dest="verbose", action="store_false",
+                  help="show percentage and time remaining")
 
     (options, args) = parser.parse_args()
+
+    VERBOSE = False
 
     if options.filename:
         fname = options.filename
     else:
         print "You have to enter the FileStorage filename, see --help for details"
         return 2
+
+    if options.verbose != None:
+        VERBOSE = True
 
     objectsToDisplay = options.num
     stats = {}
@@ -116,7 +123,8 @@ def main():
             if(percent - lastPercent > interval):
                 spentTime = time.time() - start
                 remainingTime = spentTime / float(it._file.tell()) * (float(size)) - spentTime
-                sys.stderr.write("\r%f%% complete, time spent %s,  remaining time: %s, recordsCounter %d" % (percent,GetInHMS(time.time() - start),  GetInHMS(remainingTime), recordsCounter))
+                if VERBOSE:
+                    sys.stderr.write("\r%f%% complete, time spent %s,  remaining time: %s, recordsCounter %d" % (percent,GetInHMS(time.time() - start),  GetInHMS(remainingTime), recordsCounter))
                 sys.stdout.flush()
                 lastPercent = percent
 
@@ -125,32 +133,32 @@ def main():
                 ts = TimeStamp(t.tid)
                 then = datetime.date(int(ts.year()), int(ts.month()), int(ts.day()))
                 delta = timedelta(days=3)
-                
+
                 #don't reduce the size of the dictionary when analysing last 3 days transactions
-                if recordsCounter % (objectsToDisplay*100) == 0 and (now - then > delta):  
-                    tmp = {}       
+                if recordsCounter % (objectsToDisplay*100) == 0 and (now - then > delta):
+                    tmp = {}
                     for class_name, s in sorted(
                         stats.items(), key=lambda (k,v): v.size, reverse=True)[0: objectsToDisplay]:
                         tmp[class_name] = s
                     stats = tmp
-                
+
                 if r.data:
                     mod, klass = get_pickle_metadata(r.data)
                     l = len(r.data)
                     class_name = mod + "." + klass + " oid: " +  oid_repr(r.oid).strip()
                     stat = stats.get(class_name)
-                    
+
                     if stat is None:
                         stat = stats[class_name] = Stat()
                         stat.size = stat.min = stat.max = l
                         stat.oid = oid_repr(r.oid).strip()
-                        stat.className = mod + "." + klass 
+                        stat.className = mod + "." + klass
                         stat.number = 1
                     else:
                         stat.min = min(stat.min, l)
-                        stat.max = max(stat.max, l)  
+                        stat.max = max(stat.max, l)
                         stat.number = stat.number + 1
-                        stat.size = stat.size + l                
+                        stat.size = stat.size + l
 
                     recordsCounter += 1
 
@@ -166,10 +174,10 @@ def main():
         stats.items(), key=lambda (k,v): v.size, reverse=True)[0: objectsToDisplay]:
 
         class_name = s.className
-        if len(class_name) > 40: 
+        if len(class_name) > 40:
             class_name = class_name[::-1][0:35][::-1]
             class_name = "[..]" + class_name
-        print "%-40s | %8s | %13f%% | %13s | %7s | %7s | %7s" % (class_name, s.oid, (s.size*100.0/size) , pretty_size(s.size), pretty_size(s.min), pretty_size(s.max), s.number)      
+        print "%-40s | %8s | %13f%% | %13s | %7s | %7s | %7s" % (class_name, s.oid, (s.size*100.0/size) , pretty_size(s.size), pretty_size(s.min), pretty_size(s.max), s.number)
 
 if __name__ == '__main__':
     main()
