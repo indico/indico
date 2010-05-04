@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from MaKaC.conference import ConferenceHolder
 
 """
 Part of Room Booking Module (rb_)
@@ -466,15 +467,27 @@ class RoomBase( object ):
         FINAL (not intented to be overriden)
         """
         oryg = self._p_changed
-        self.__owner = Impersistant( owner )
+        self.__owner = None
+        if owner:
+            self.__owner = owner.getId()#Impersistant( owner )
         self._p_changed = oryg
 
     def getOwner( self ):
         """
         FINAL (not intented to be overriden)
+        Owner in terms of "parent", i.e. conference
         """
+        ####---FIXING THE USE OF IMPERSISTANT CLASS-----
+        if isinstance(self.__owner, Impersistant):
+            o = self.__owner.getObject()
+            if o:
+                self.__owner=o.getId()
+            else:
+                self.__owner=None
+        ####---ENDO OF FIXING THE USE OF IMPERSISTANT CLASS-----
         if self.__owner:
-            return self.__owner.getObject() # Wrapped in Impersistent
+            return ConferenceHolder().getById(self.__owner) #self.__owner.getObject() # Wrapped in Impersistant
+
         return None
 
     def isProtected( self ):
