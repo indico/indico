@@ -446,10 +446,22 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
             now = now + timedelta( 7 - now.weekday() )
         else:
             now = now + timedelta( 1 )
-        if candResv.startDT == None:
-            candResv.startDT = datetime( now.year, now.month, now.day, 8, 30 )
-        if candResv.endDT == None:
-            candResv.endDT = datetime( now.year, now.month, now.day, 17, 30 )
+
+        # Sets the dates if needed
+        dayD = params.get("day")
+        monthM = params.get("month")
+        yearY = params.get("year")
+
+        if dayD != None and dayD.isdigit() and \
+           monthM != None and monthM.isdigit() and \
+           yearY != None and yearY.isdigit():
+            candResv.startDT = datetime(int(yearY), int(monthM), int(dayD), 8, 30)
+            candResv.endDT = datetime(int(yearY), int(monthM), int(dayD), 17, 30)
+        else:
+            if candResv.startDT == None:
+                candResv.startDT = datetime( now.year, now.month, now.day, 8, 30 )
+            if candResv.endDT == None:
+                candResv.endDT = datetime( now.year, now.month, now.day, 17, 30 )
         if self._getUser():
             if candResv.bookedForName == None:
                 candResv.bookedForName = self._getUser().getFullName()
@@ -1020,22 +1032,6 @@ class RHRoomBookingBookingForm( RHRoomBookingBase ):
                 self._loadResvCandidateFromSession( candResv, params )
 
         self._errors = session.getVar( "errors" )
-
-        # Sets the dates if needed
-        dayD = params.get("day")
-        monthM = params.get("month")
-        yearY = params.get("year")
-
-        if dayD != None and dayD.isdigit() and \
-           monthM != None and monthM.isdigit() and \
-           yearY != None and yearY.isdigit():
-            # If the dates aren't set
-            if candResv.startDT == None:
-                candResv.startDT = datetime(int(yearY), int(monthM), int(dayD), 8, 30)
-                candResv.endDT = datetime(int(yearY), int(monthM), int(dayD), 17, 30)
-            else :
-                candResv.startDT = candResv.startDT.replace(year=int(yearY), month=int(monthM), day=int(dayD))
-                candResv.endDT = candResv.endDT.replace(year=int(yearY), month=int(monthM), day=int(dayD))
 
         self._candResv = candResv
 
