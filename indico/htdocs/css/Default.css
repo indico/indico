@@ -5882,7 +5882,7 @@ div.posterEntry:hover {
 .startEndDate td, .support td {
     color: #000;
 }
-td.startEndDateEntry, td.supportEntry {
+td.startEndDateEntry, td.supportEntry, span.innerWidgetLabel {
     color: #666;
     padding-right: 6px;
 }

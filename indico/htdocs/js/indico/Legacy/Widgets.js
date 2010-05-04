@@ -23,9 +23,9 @@ IndicoUI.Widgets = {
 
         var info = source.get();
 
-        target.set([Html.div({}, Html.label({}, $T("Location: ")), info.get('location')),
-                    Html.div({}, Html.label({}, $T("Room: ")), info.get('room')),
-                    Html.div({}, Html.label({}, $T("Address: ")), info.get('address'))]);
+        target.set([Html.div({}, Html.span("innerWidgetLabel", $T("Location: ")), info.get('location')),
+                    Html.div({}, Html.span("innerWidgetLabel", $T("Room: ")), info.get('room')),
+                    Html.div({}, Html.span("innerWidgetLabel", $T("Address: ")), info.get('address'))]);
     },
 
     /**
