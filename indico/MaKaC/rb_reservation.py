@@ -24,7 +24,7 @@ Responsible: Piotr Wlodarek
 """
 
 from datetime import datetime, timedelta, date
-from MaKaC.rb_tools import iterdays, weekNumber, doesPeriodsOverlap, overlap, Period, Impersistant, checkPresence, fromUTC, toUTC, formatDateTime
+from MaKaC.rb_tools import iterdays, weekNumber, doesPeriodsOverlap, overlap, Period, Impersistant, checkPresence, fromUTC, toUTC, formatDateTime, formatDate
 from MaKaC.rb_location import ReservationGUID, Location, CrossLocationQueries
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.user import AvatarHolder, Avatar
@@ -224,14 +224,14 @@ class ReservationBase( object ):
 
         if date:
             occurrenceText = " (SINGLE OCCURRENCE)"
+            startDate = formatDate(date)
         else:
             occurrenceText = ""
-
-        # Fix by David: include date in this mails too. I have put a try...except in case the date is not accessible in this method
-        try:
-            startDate = formatDateTime(self.startDT)
-        except:
-            startDate = ""
+            # Fix by David: include date in this mails too. I have put a try...except in case the date is not accessible in this method
+            try:
+                startDate = formatDateTime(self.startDT)
+            except:
+                startDate = ""
 
         # ---- Email user ----
 
