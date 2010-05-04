@@ -28,6 +28,7 @@
         <xsl:with-param name="item" select="."/>
         <xsl:with-param name="confId" select="/iconf/ID"/>
         <xsl:with-param name="sessId" value=""/>
+        <xsl:with-param name="sessCode" value=""/>
         <xsl:with-param name="contId" value=""/>
         <xsl:with-param name="subContId" value=""/>
         <xsl:with-param name="uploadURL">Indico.Urls.UploadAction.conference</xsl:with-param>
@@ -129,6 +130,7 @@
             <xsl:with-param name="item" select="."/>
             <xsl:with-param name="confId" select="../ID"/>
             <xsl:with-param name="sessId" select="./ID"/>
+            <xsl:with-param name="sessCode" select="./code"/>
             <xsl:with-param name="contId">null</xsl:with-param>
             <xsl:with-param name="alignMenuRight">true</xsl:with-param>
             <xsl:with-param name="subContId">null</xsl:with-param>
@@ -240,6 +242,7 @@
           <xsl:with-param name="item" select="."/>
           <xsl:with-param name="confId" select="../../ID"/>
           <xsl:with-param name="sessId" select="../ID"/>
+          <xsl:with-param name="sessCode" select="../code"/>
           <xsl:with-param name="contId" select="./ID"/>
           <xsl:with-param name="alignMenuRight">true</xsl:with-param>
           <xsl:with-param name="subContId">null</xsl:with-param>
@@ -251,6 +254,7 @@
             <xsl:with-param name="item" select="."/>
             <xsl:with-param name="confId" select="../ID"/>
             <xsl:with-param name="sessId">null</xsl:with-param>
+            <xsl:with-param name="sessCode">null</xsl:with-param>
             <xsl:with-param name="contId" select="./ID"/>
             <xsl:with-param name="alignMenuRight">true</xsl:with-param>
             <xsl:with-param name="subContId">null</xsl:with-param>
@@ -374,6 +378,7 @@
             <xsl:with-param name="item" select="."/>
             <xsl:with-param name="confId" select="../../../ID"/>
             <xsl:with-param name="sessId" select="../../ID"/>
+            <xsl:with-param name="sessCode" select="../../code"/>
             <xsl:with-param name="contId" select="../ID"/>
             <xsl:with-param name="alignMenuRight">true</xsl:with-param>
             <xsl:with-param name="subContId" select="./ID"/>
@@ -385,6 +390,7 @@
             <xsl:with-param name="item" select="."/>
             <xsl:with-param name="confId" select="../../ID"/>
             <xsl:with-param name="sessId">null</xsl:with-param>
+            <xsl:with-param name="sessCode">null</xsl:with-param>
             <xsl:with-param name="alignMenuRight">true</xsl:with-param>
             <xsl:with-param name="contId" select="../ID"/>
             <xsl:with-param name="subContId" select="./ID"/>

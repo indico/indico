@@ -19,7 +19,7 @@
      59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 -->
 
-<xsl:stylesheet version='1.0' 
+<xsl:stylesheet version='1.0'
    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 <xsl:include href="include/date.xsl"/>
@@ -75,7 +75,7 @@
     <font color="white">
     <b>
     <font size="+1" face="arial" color="white">
-    <xsl:value-of select="./title" disable-output-escaping="yes"/>	
+    <xsl:value-of select="./title" disable-output-escaping="yes"/>
     </font>
     </b>
     </font>
@@ -101,7 +101,7 @@
         <b><strong>
         Chairperson:
         </strong></b>
-      </td> 
+      </td>
       <td>
         <small>
         <xsl:apply-templates select="./convener"/>
@@ -168,6 +168,7 @@
       <xsl:with-param name="item" select="."/>
       <xsl:with-param name="confId" select="../ID"/>
       <xsl:with-param name="sessId" select="./ID"/>
+      <xsl:with-param name="sessCode" select="./code"/>
       <xsl:with-param name="contId">null</xsl:with-param>
       <xsl:with-param name="subContId">null</xsl:with-param>
       <xsl:with-param name="uploadURL">Indico.Urls.UploadAction.session</xsl:with-param>
@@ -193,7 +194,7 @@
   <td valign="top" width="1%">
     <font color="black">
     <b><xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
-    <xsl:value-of select="substring(./startDate,12,5)"/> 
+    <xsl:value-of select="substring(./startDate,12,5)"/>
     </b>
     </font>
     <xsl:if test="@broadcasturl != ''">
@@ -230,11 +231,11 @@
       <td valign="top" align="left">
         <font class="headline"><b>
         <xsl:value-of select="./title" disable-output-escaping="yes"/>
-        </b></font> 
+        </b></font>
         <xsl:if test="./duration != '00:00'"><small><font color="red"> (<xsl:call-template name="prettyduration"><xsl:with-param name="duration" select="./duration"/></xsl:call-template>) </font></small></xsl:if>
         <xsl:if test="count(child::repno) != 0">(
 		<xsl:for-each select="./repno">
-			<xsl:apply-templates select="."/> 
+			<xsl:apply-templates select="."/>
             <xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
 		</xsl:for-each>
         )</xsl:if>
@@ -242,7 +243,7 @@
         (<xsl:for-each select="./material">
         <xsl:apply-templates select="."><xsl:with-param name="contribId" select="../ID"/></xsl:apply-templates>
         <xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
-        </xsl:for-each>) 
+        </xsl:for-each>)
         </xsl:if>
       </td>
       <td align="right">
@@ -252,7 +253,7 @@
       </td>
       <td>
         <xsl:if test="name(..) = 'session'">
-        <xsl:call-template name="displayModifIcons">        
+        <xsl:call-template name="displayModifIcons">
           <xsl:with-param name="item" select="."/>
           <xsl:with-param name="confId" select="../../ID"/>
           <xsl:with-param name="sessId" select="../ID"/>
@@ -263,7 +264,7 @@
         </xsl:call-template>
           </xsl:if>
           <xsl:if test="name(..) != 'session'">
-        <xsl:call-template name="displayModifIcons">        
+        <xsl:call-template name="displayModifIcons">
           <xsl:with-param name="item" select="."/>
           <xsl:with-param name="confId" select="../ID"/>
           <xsl:with-param name="sessId">null</xsl:with-param>
@@ -274,7 +275,7 @@
         </xsl:call-template>
         </xsl:if>
       </td>
-    </tr>	
+    </tr>
     <xsl:if test="./abstract != ''">
     <tr>
       <td colspan="3" style="text-align: justify">
@@ -308,7 +309,7 @@
 		<font color="black">
         <xsl:if test="count(child::repno) != 0">(
 		<xsl:for-each select="./repno">
-			<xsl:apply-templates select="."/> 
+			<xsl:apply-templates select="."/>
             <xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
 		</xsl:for-each>
         )</xsl:if>
@@ -333,7 +334,7 @@
 		</td>
         <td>
         <xsl:if test="name(../..) = 'session'">
-            <xsl:call-template name="displayModifIcons">        
+            <xsl:call-template name="displayModifIcons">
               <xsl:with-param name="item" select="."/>
               <xsl:with-param name="confId" select="../../../ID"/>
               <xsl:with-param name="sessId" select="../../ID"/>
@@ -344,7 +345,7 @@
             </xsl:call-template>
               </xsl:if>
               <xsl:if test="name(../..) != 'session'">
-            <xsl:call-template name="displayModifIcons">        
+            <xsl:call-template name="displayModifIcons">
               <xsl:with-param name="item" select="."/>
               <xsl:with-param name="confId" select="../../ID"/>
               <xsl:with-param name="sessId">null</xsl:with-param>
@@ -364,7 +365,7 @@
 	<td align="center" valign="top" width="1%">
 		<font color="black">
 		<b><xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
-		<xsl:value-of select="substring(./startDate,12,5)"/> 
+		<xsl:value-of select="substring(./startDate,12,5)"/>
 		</b>
 		</font>
 	</td>
