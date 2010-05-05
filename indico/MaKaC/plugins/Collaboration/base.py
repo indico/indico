@@ -1551,6 +1551,9 @@ class CSErrorBase(Fossilizable):
         they should return an error that inherits from this class
     """
 
+    def __init__(self):
+        pass
+
     def getUserMessage(self):
         """ To be overloaded.
             Returns the string that will be shown to the user when this error will happen.
