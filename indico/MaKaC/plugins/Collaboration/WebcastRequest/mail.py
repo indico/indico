@@ -405,22 +405,24 @@ class RequestAcceptedNotificationAdmin(WebcastRequestAdminNotificationBase):
     """ Template to build an email notification to the admins when a request gets accepted
     """
 
-    def __init__(self, booking):
+    def __init__(self, booking, user = None):
         WebcastRequestAdminNotificationBase.__init__(self, booking)
 
         self.setSubject("""[WebcastReq] Webcast request accepted: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
 
+        userInfo = ""
+        if user :
+            userInfo = " by %s %s" %(user.getFirstName(), user.getFamilyName().upper())
         self.setBody("""Dear Webcast Responsible,<br />
 <br />
-A webcast request for the event: "%s" has been accepted in <a href="%s">%s</a><br />
+A webcast request for the event: "%s" has been accepted in <a href="%s">%s</a>""" %(self._conference.getTitle(),
+                                                                                    MailTools.getServerName(),
+                                                                                    MailTools.getServerName())
++ userInfo + """.<br />
 Click <a href="%s">here</a> to view the request.<br />
 
-""" % ( self._conference.getTitle(),
-        MailTools.getServerName(),
-        MailTools.getServerName(),
-        self._modifLink
-      ))
+""" % (self._modifLink))
 
 
 class RequestRejectedNotification(WebcastRequestManagerNotificationBase):

@@ -21,7 +21,7 @@ def lookupHandler(method):
     while True:
         handler = endpoint.methodMap.get(functionName, None)
         if handler != None:
-            break        
+            break
         try:
             endpointName, functionName = method.split(".", 1)
         except:
@@ -33,7 +33,7 @@ def lookupHandler(method):
                 raise RequestError("ERR-R0", "Unknown endpoint: %s" % endpointName)
         else:
             raise RequestError("ERR-R1", "Unsupported method")
-        
+
     return handler
 
 def processRequest(method, params, req):
@@ -109,13 +109,13 @@ def _startRequestSpecific2RH():
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         if minfo.getRoomBookingModuleActive():
             CrossLocationDB.connect()
-        
+
 def _endRequestSpecific2RH( commit = True ):
     minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
     if minfo.getRoomBookingModuleActive():
-        if commit: 
+        if commit:
             CrossLocationDB.commit()
-        else: 
+        else:
             CrossLocationDB.rollback()
         CrossLocationDB.disconnect()
 

@@ -373,12 +373,12 @@ class CSBookingManager(Persistent, Observer):
         else:
             raise ServiceError(_("Tried to check status of booking ") + str(id) + _(" of meeting ") + str(self._conf.getId()) + _(" but this booking does not support the check status service."))
 
-    def acceptBooking(self, id):
+    def acceptBooking(self, id, user = None):
         booking = self._bookings[id]
         if booking.hasAcceptReject():
             if booking.getAcceptRejectStatus() is None:
                 self._removeFromPendingIndex(booking)
-            booking.accept()
+            booking.accept(user)
             return booking
         else:
             raise ServiceError(_("Tried to accept booking ") + str(id) + _(" of meeting ") + str(self._conf.getId()) + _(" but this booking cannot be accepted."))
@@ -1018,11 +1018,11 @@ class CSBookingBase(Persistent, Fossilizable):
             self._statusClass = ""
         return self._statusClass
 
-    def accept(self):
+    def accept(self, user = None):
         """ Sets this booking as accepted
         """
         self._acceptRejectStatus = True
-        self._accept()
+        self._accept(user)
 
     def reject(self, reason):
         """ Sets this booking as rejected, and stores the reason
@@ -1455,7 +1455,7 @@ class CSBookingBase(Persistent, Fossilizable):
         else:
             pass
 
-    def _accept(self):
+    def _accept(self, user = None):
         """ To be overriden by inheriting classes
             This method is called when a user with privileges presses the "Accept" button
             in a plugin who has a "accept or reject" concept.
