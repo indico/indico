@@ -98,7 +98,6 @@ class RecordingRequestError(CSErrorBase): #already Fossilizable
     fossilizes(IRecordingRequestErrorFossil)
 
     def __init__(self, operation, inner):
-        CSErrorBase.__init__(self)
         self._operation = operation
         self._inner = inner
 
