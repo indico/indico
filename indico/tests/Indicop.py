@@ -20,27 +20,25 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-import os
-import sys
-import nose
-import figleaf
-import figleaf.annotate_html
-import subprocess
-import socket
-import time
-import commands
-import StringIO
-import re
-import shutil
-import signal
-import tempfile
+# System modules
+import os, sys, subprocess, socket, shutil, signal, commands, tempfile
+
+# Python stdlib
+import time, re
+
+# Test modules
+import nose, figleaf, figleaf.annotate_html
+from selenium import selenium
+
+# Database
 import transaction
 from MaKaC.common.db import DBMgr
-from BaseTest import BaseTest
-from TestsConfig import TestsConfig
-from selenium import selenium
+
+# Indico
 from MaKaC.common.Configuration import Config
 
+from indico.tests.config import TestsConfig
+from indico.tests.base import BaseTest
 
 class Unit(BaseTest):
 
@@ -54,13 +52,10 @@ class Unit(BaseTest):
         if coverage != False:
             coverage.start()
 
-        #capturing the stderr
-        outerr = StringIO.StringIO()
-        sys.stderr = outerr
-
+        self._startStdErrCapture()
 
         #retrieving tests from tests folder
-        args = ['nose', '--nologcapture', '--logging-clear-handlers', '-v',
+        args = ['nose', '--nologcapture', '--rednose', '--logging-clear-handlers', '-v', '-s',
                 os.path.join(self.setupDir, 'python', 'unit')]
         #retrieving tests from plugins folder
         for folder in self.walkThroughFolders(os.path.join(self.setupDir,
@@ -73,20 +68,19 @@ class Unit(BaseTest):
 
         result = nose.run(argv = args)
 
-        #restoring the stderr
-        sys.stderr = sys.__stderr__
+        if not self.options['verbose']:
+            # restoring the stderr
+            s = self._finishStdErrCapture()
+            returnString += self.writeReport("pyunit", s)
 
         if coverage:
             returnString += coverage.stop()
-
-        s = outerr.getvalue()
-        returnString += self.writeReport("pyunit", s)
 
         if result:
             return returnString + "PY Unit tests succeeded\n"
         else:
             return returnString + \
-                "[FAIL] Unit tests - report in tests/report/pyunit.txt\n"
+                "[FAIL] Unit tests - report in indico/tests/report/pyunit.txt\n"
 
     def walkThroughPluginsFolders(self):
         rootPluginsPath = os.path.join(self.setupDir,
@@ -137,7 +131,9 @@ class Coverage(BaseTest):
 
 
 class Functional(BaseTest):
-    def __init__(self):
+
+    def __init__(self, **kwargs):
+        BaseTest.__init__(self, **kwargs)
         self.child = None
 
     def run(self):
@@ -149,9 +145,7 @@ class Functional(BaseTest):
                 return ('[ERR] Could not start functional tests because selenium'
                         ' server cannot be started.\n')
 
-            #capturing the stderr
-            outerr = StringIO.StringIO()
-            sys.stderr = outerr
+            self._startStdErrCapture()
 
             #retrieving tests from tests folder
             args = ['nose', '--nologcapture', '--logging-clear-handlers', '-v',
@@ -173,7 +167,7 @@ class Functional(BaseTest):
             #restoring the stderr
             sys.stderr = sys.__stderr__
 
-        s = outerr.getvalue()
+        s = self._finishStdErrCapture()
         returnString += self.writeReport("pyfunctional", s)
 
         report = ""
@@ -276,7 +270,11 @@ def raise_timeout(signum, frame):
 
 
 class Grid(BaseTest):
-    def __init__(self):
+
+    def __init__(self, **kwargs):
+
+        BaseTest.__init__(self, **kwargs)
+
         try:
             self.hubEnv = TestsConfig.getInstance().getHubEnv()
             self.gridData = GridData.getInstance()
@@ -309,9 +307,7 @@ class Grid(BaseTest):
                 #disable the alarm signal
                 signal.alarm(0)
 
-                #capturing the stderr
-                outerr = StringIO.StringIO()
-                sys.stderr = outerr
+                self._startStdErrCapture()
 
                 returnString = ""
                 for env in self.hubEnv:
@@ -328,10 +324,8 @@ class Grid(BaseTest):
                         returnString += ("[FAIL] Functional (%s) tests - report in"
                                 " tests/report/pygrid.txt\n") % env
 
-                #restoring the stderr
-                sys.stderr = sys.__stderr__
+                s = self._finishStdErrCapture()
 
-                s = outerr.getvalue()
                 returnString += self.writeReport("pygrid", s)
             except socket.error:
                 return ("[ERR] Selenium Grid - Connection refused, check your "
@@ -352,7 +346,8 @@ class GridData(BaseTest):
     Because nosetest cannot forward the arguments to selenium grid."""
 
     __instance = None
-    def __init__(self):
+    def __init__(self, **kwargs):
+        BaseTest.__init__(self, **kwargs)
         self.active = None
         self.url = None
         self.port = None
@@ -408,9 +403,11 @@ class Pylint(BaseTest):
 
 
 class Jsunit(BaseTest):
-    def __init__(self, jsSpecify, jsCoverage):
-        self.coverage = jsCoverage
-        self.specify = jsSpecify
+
+    def __init__(self, **kwargs):
+        BaseTest.__init__(self, **kwargs)
+        self.coverage = self.options['coverage']
+        self.specify = self.options['specify']
 
     def run(self):
         self.startMessage("Starting Javascript unit tests")
@@ -613,6 +610,7 @@ class Jsunit(BaseTest):
             return "[ERR] JS Unit Tests - Could not open a file. (%s)" % e
 
 class Jslint(BaseTest):
+
     def run(self):
         returnString = ""
         self.startMessage("Starting jslint tests")
@@ -688,24 +686,20 @@ class Jslint(BaseTest):
 class Indicop(object):
     __instance = None
 
-    def __init__(self, jsspecify, jscoverage):
+    def __init__(self):
         self.dbmgr = None
         self.zeoServer = None
 
-        #variables for jsunit
-        self.jsSpecify = jsspecify
-        self.jsCoverage = jscoverage
-
         #define the set of tests
-        self.testsDict = {'unit': Unit(),
-                 'functional': Functional(),
-                 'pylint': Pylint(),
-                 'jsunit': Jsunit(self.jsSpecify, self.jsCoverage),
-                 'jslint': Jslint(),
-                 'grid': Grid()}
+        self.testsDict = {'unit': Unit,
+                 'functional': Functional,
+                 'pylint': Pylint,
+                 'jsunit': Jsunit,
+                 'jslint': Jslint,
+                 'grid': Grid}
 
 
-    def main(self, FakeDBManaging, specify, coverage, testsToRun):
+    def main(self, FakeDBManaging, testsToRun, options):
 
         returnString = "\n\n=============== ~INDICOP SAYS~ ===============\n\n"
 
@@ -715,19 +709,21 @@ class Indicop(object):
 
         self.startManageDB(FakeDBManaging)
 
-        if coverage:
+        if options['coverage']:
             Coverage.instantiate()
 
         #specified test can either be unit or functional.
-        if specify:
-            returnString += Specify(specify).run()
+        if options['specify']:
+            returnString += Specify(options['specify']).run()
         else:
             for test in testsToRun:
-                try:
-                    returnString += self.testsDict[test].run()
-                except KeyError:
-                    returnString += ("[ERR] Test %s does not exist. "
+                if test in self.testsDict:
+                    print test
+                    returnString += self.testsDict[test](**options).run()
+                else:
+                    returnString += ("[ERR] Test set '%s' does not exist. "
                       "It has to be added in the testsDict variable\n") % test
+
 
         self.stopManageDB(FakeDBManaging)
 
@@ -785,12 +781,11 @@ class Indicop(object):
 
     def stopFakeDB(self):
         try:
-            os.kill(self.zeoServer, signal.SIGTERM)
+            os.kill(self.zeoServer, signal.SIGINT)
         except OSError, e:
             print ("Problem sending kill signal: " + str(e))
 
         try:
-            #os.wait()
             os.waitpid(self.zeoServer, 0)
             self.removeDBFile()
         except OSError, e:
@@ -835,13 +830,19 @@ class Indicop(object):
         shutil.rmtree(self.dbFolder)
 
     def createDBServer(self, file, port):
-        from util import TestZEOServer
+        """
+        Creates a fake DB server for testing
+        """
+
         pid = os.fork()
         if pid:
             return pid
         else:
+            # run a DB in a child process
+            from indico.tests.util import TestZEOServer
             server = TestZEOServer(port, file)
             server.start()
+
 ################## End of DB Managing functions ##################
 
     def createDummyUser(self):

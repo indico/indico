@@ -19,20 +19,43 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+# System modules
+import os, tempfile, signal, shutil, commands, sys
 
-import os
-import tempfile
+# Python stdlib
+import StringIO
+
+# Database
 import transaction
-import signal
-import shutil
-import commands
-import sys
-from TestsConfig import TestsConfig
 from MaKaC.common.db import DBMgr
+
+# Indico
+from indico.tests.util import TeeStringIO
+from indico.tests.config import TestsConfig
+
 
 class BaseTest(object):
     #path to this current file
     setupDir = os.path.dirname(__file__)
+
+    def __init__(self, **kwargs):
+        self.options = kwargs
+
+    def _startStdErrCapture(self):
+
+        if self.options['verbose']:
+            # capture I/O but display it as well
+            self.outerr = TeeStringIO(sys.stderr)
+        else:
+            # just capture it
+            self.outerr = StringIO.StringIO()
+        sys.stderr = self.outerr
+
+
+    def _finishStdErrCapture(self):
+        sys.stderr = sys.__stderr__
+        return self.outerr.getvalue()
+
 
     def startMessage(self, message):
         print "##################################################################"

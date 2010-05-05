@@ -298,6 +298,10 @@ Please specify the directory where you'd like it to be placed.
         open(filePath, 'w').write(fdata)
 
 class test_indico(Command):
+    """
+    Test command for Indico
+    """
+
     description = "Test Suite Framework"
     user_options = [('specify=', None, "Use nosetests style (file.class:testcase)"),
                     ('coverage', None, "Output coverage report in html"),
@@ -308,7 +312,8 @@ class test_indico(Command):
                     ('jslint', None, "Run js source analysis"),
                     ('jscoverage', None, "Output coverage report in html for js"),
                     ('jsspecify=', None, "Use js-test-driver style (TestCaseName.testName)"),
-                    ('grid', None, "Use Selenium Grid")]
+                    ('grid', None, "Use Selenium Grid"),
+                    ('full-output', None, "Write the results to the console, in addition to the log file")]
     boolean_options = []
 
     specify = None
@@ -321,10 +326,13 @@ class test_indico(Command):
     jscoverage = False
     jsspecify = None
     grid = None
+    full_output = None
 
-    def initialize_options(self): pass
+    def initialize_options(self):
+        pass
 
-    def finalize_options(self): pass
+    def finalize_options(self):
+        pass
 
     def run(self):
 
@@ -340,39 +348,36 @@ class test_indico(Command):
         from tests.Indicop import Indicop
         testsToRun = []
 
-        if self.unit:
-            testsToRun.append('unit')
-        if self.pylint:
-            testsToRun.append('pylint')
-        if self.functional:
-            testsToRun.append('functional')
-        if self.grid:
-            testsToRun.append('grid')
-        if self.jsunit or self.jsspecify:
+        allTests = ['unit', 'pylint', 'functional', 'grid', 'jsunit', 'jslint']
+
+        for testType in allTests:
+            if getattr(self, testType):
+                testsToRun.append(testType)
+
+        if self.jsspecify and 'jsunit' not in testsToRun:
             testsToRun.append('jsunit')
-        if self.jslint:
-            testsToRun.append('jslint')
-        if self.specify != None:
+        if self.specify != None and 'specify' not in testsToRun:
             testsToRun.append('specify')
+
         if testsToRun == []:
-            testsToRun.append('unit')
-            testsToRun.append('functional')
-            testsToRun.append('grid')
-            testsToRun.append('pylint')
-            testsToRun.append('jsunit')
-            testsToRun.append('jslint')
+            testsToRun == allTests
+
+
+        options = {'verbose': self.full_output,
+                   'specify': self.specify,
+                   'coverage': self.coverage}
 
         #this variable will tell what to do with the databases
         FakeDBManaging = self.checkDBStatus(testsToRun, self.specify)
 
-        indicop = Indicop(self.jsspecify, self.jscoverage)
-        result = indicop.main(FakeDBManaging, self.specify, self.coverage, testsToRun)
+        indicop = Indicop()
+        result = indicop.main(FakeDBManaging, testsToRun, options)
 
         print result
 
 
     def checkDBStatus(self, testsToRun, specify):
-        from tests.TestsConfig import TestsConfig
+        from tests.config import TestsConfig
         from tests.util import TestZEOServer
         from MaKaC.common.Configuration import Config
 
@@ -419,29 +424,28 @@ i.e. try 'easy_install %s'""" % (package, package)
         return validPackages
 
     def checkIndicopJars(self):
-        from tests.TestsConfig import TestsConfig
+        from tests.config import TestsConfig
 
         """check if needed jars are here, if not, dowloading them and unzip a file if necessary"""
         jarsList = {}
         currentFilePath = os.path.dirname(__file__)
+        testModPath = os.path.join(currentFilePath, 'indico', 'tests')
+
         try:
-            jarsList['jsunit'] = {'path':     os.path.join(currentFilePath,
-                                                           'tests',
+            jarsList['jsunit'] = {'path':     os.path.join(testModPath,
                                                            'javascript',
                                                            'unit'),
                                   'url':      TestsConfig.getInstance().getJsunitURL(),
                                   'filename': TestsConfig.getInstance().getJsunitFilename()}
 
-            jarsList['jscoverage'] = {'path':     os.path.join(currentFilePath,
-                                                               'tests',
+            jarsList['jscoverage'] = {'path':     os.path.join(testModPath,
                                                                'javascript',
                                                                'unit',
                                                                'plugins'),
                                       'url':      TestsConfig.getInstance().getJscoverageURL(),
                                       'filename': TestsConfig.getInstance().getJscoverageFilename()}
 
-            jarsList['selenium'] = {'path':      os.path.join(currentFilePath,
-                                                              'tests',
+            jarsList['selenium'] = {'path':      os.path.join(testModPath,
                                                               'python',
                                                               'functional'),
                                     'url':       TestsConfig.getInstance().getSeleniumURL(),
@@ -502,7 +506,8 @@ i.e. try 'easy_install %s'""" % (package, package)
             print e
 
 if __name__ == '__main__':
-    sys.path = [os.path.abspath('indico')] + sys.path # Always load source from the current folder
+    # Always load source from the current folder
+    sys.path = [os.path.abspath('indico')] + sys.path
 
     #PWD_INDICO_CONF = 'etc/indico.conf'
     #if not os.path.exists(PWD_INDICO_CONF):
