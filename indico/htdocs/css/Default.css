@@ -5802,7 +5802,7 @@ div.fitInnerTimetableDialog {
     margin-bottom: 5px;
 }
 
-div.flexibleSelect {
+div.flexibleSelect, input.roomTextField {
     border: 1px solid #AAAAAA;
     position: relative;
     width: 200px;
