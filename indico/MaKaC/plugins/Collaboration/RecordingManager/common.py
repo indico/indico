@@ -382,16 +382,22 @@ def parseIndicoID(IndicoID):
     """Given an "Indico ID" of the form shown above, determine whether it is
     a conference, subcontribution etc, and return that info with the individual IDs."""
 
+    # regular expressions to match IndicoIDs for conference, session, contribution, subcontribution
     pConference      = re.compile('(\d+)$')
     pSession         = re.compile('(\d+)s(\d+)$')
     pContribution    = re.compile('(\d+)c(\d+)$')
     pSubcontribution = re.compile('(\d+)c(\d+)sc(\d+)$')
 
+    # perform the matches (match searches from the beginning of the string,
+    # unlike search, which matches anywhere in the string)
     mE  = pConference.match(IndicoID)
     mS  = pSession.match(IndicoID)
     mC  = pContribution.match(IndicoID)
     mSC = pSubcontribution.match(IndicoID)
 
+    # Depending on which talk type it is, populate a dictionary containing the name of
+    # the type of talk, the actual object, and the individual conference, session, contribution,
+    # subcontribution IDs.
     if mE:
         Logger.get('RecMan').debug("searched %s, matched %s" % (IndicoID, 'conference'))
         conference = ConferenceHolder().getById(mE.group(1))
@@ -471,6 +477,18 @@ def getBasicXMLRepresentation(aw, IndicoID, contentType, videoFormat, languages)
 
     # Defining the dictionary 'tags' is how we identify ourselves to the outputGenerator
     # methods.
+    # Call ConfToXML with different args depending on talk type.
+    # includeSession - descend into each session.
+    #                  This is necessary for sessions, contributions, and subcontributions,
+    #                  since contributions and subcontributions are children of sessions.
+    # includeContribution - necessary for contributions and subcontributions
+    # includeMaterial - this is always set to "1".
+    # showSession - create XML for a particular session, identified by ID
+    # showContribution - create XML for a particular contribution, identified by ID
+    # showSubContribution - create XML for a particular subcontribution, identified by ID
+    # forceCache - True means force it NOT to use the cache, the opposite of what you would expect.
+    # recordingManagerTags - this is how we pass along all the necessary RecordingManager args to the outputGenerator methods.
+    #
     # Nobody outside CERN should have access to CERN access lists.
     # OAI harvesters outside CERN call the same methods we'll be calling,
     # and we don't want to make the access lists available to them.
@@ -523,7 +541,7 @@ def getBasicXMLRepresentation(aw, IndicoID, contentType, videoFormat, languages)
 
     xmlGen.closeTag("event")
 
-    # Get base XML
+    # Retrieve the entire basic XML string
     return xmlGen.getXml()
 
 def createCDSRecord(aw, IndicoID, contentType, videoFormat, languages):
@@ -628,12 +646,46 @@ def createCDSRecord(aw, IndicoID, contentType, videoFormat, languages):
             MicalaCommunication.reportStatus('START', '', idMachine, idTask, idLecture)
         except Exception, e:
             flagSuccess = False
-            result += "Unknown error occured when updating task information in micala database: %s\n." % e
+            result += _("Unknown error occured when updating task information in micala database: ") + e + "\n"
 
     return {"success": flagSuccess, "result": result}
 
-def submitMicalaMetadata(aw, IndicoID, contentType, videoFormat, languages):
+def submitMicalaMetadata(aw, IndicoID, contentType, LOID, videoFormat, languages):
     '''Generate a lecture.xml file for the given event, then web upload it to the micala server.'''
+
+    Logger.get('RecMan').debug('in submitMicalaMetadata()')
+
+    # Initialize success flag, and result string to which we will append any errors.
+    flagSuccess = True
+    result = ""
+
+    # First, update the micala Tasks table that the submission has started
+
+    # pattern to match for the signal file
+    # Here we are looking for
+    # CONFID
+    # or CONFIDcCONTRID
+    # or CONFIDcCONTRIDscSCONTRID
+    # or CONFIDsSESSID
+    pattern_cern  = re.compile('([sc\d]+)$')
+    # Here we are looking for YYYYMMDD-DEVICENAME-HHMMSS
+    pattern_umich = re.compile('(\d+\-[\w\d]+\-\d)$')
+
+    # Update the micala database with our current task status
+    try:
+        Logger.get('RecMan').debug('calling getIdMachine...')
+        idMachine = MicalaCommunication.getIdMachine(CollaborationTools.getOptionValue("RecordingManager", "micalaDBMachineName"))
+        Logger.get('RecMan').debug('calling getIdTask...')
+        idTask    = MicalaCommunication.getIdTask(CollaborationTools.getOptionValue("RecordingManager", "micalaDBStatusExportMicala"))
+        Logger.get('RecMan').debug('calling getIdLecture...')
+        idLecture = MicalaCommunication.getIdLecture(IndicoID, pattern_cern, pattern_umich)
+        Logger.get('RecMan').debug('calling reportStatus...')
+        if idLecture == '':
+            idLecture = MicalaCommunication.createNewMicalaLecture(IndicoID, contentType, pattern_cern, pattern_umich)
+        MicalaCommunication.reportStatus('START', '', idMachine, idTask, idLecture)
+    except Exception, e:
+        flagSuccess = False
+        result += _("Unknown error occured when updating MICALA START task information in micala database: %s\n." % e)
 
     basexml = getBasicXMLRepresentation(aw, IndicoID, contentType, videoFormat, languages)
 
@@ -649,7 +701,7 @@ def submitMicalaMetadata(aw, IndicoID, contentType, videoFormat, languages):
     # - micala_lecture_session.xsl
     # - micala_lecture_contribution.xsl
     # - micala_lecture_subcontribution.xsl
-    styleSheet = "%s_%s.xsl" % ('cds_marcxml_video', parsed["type"])
+    styleSheet = "%s_%s.xsl" % ('micala_lecture', parsed["type"])
     stylePath = os.path.join(Config.getInstance().getStylesheetsDir(), styleSheet)
 
     if os.path.exists(stylePath):
@@ -657,39 +709,69 @@ def submitMicalaMetadata(aw, IndicoID, contentType, videoFormat, languages):
             Logger.get('RecMan').info("Trying to do XSLT using path %s" % stylePath)
             parser = XSLTransformer(stylePath)
             micalaxml = parser.process(basexml)
-        except Exception:
-            micalaxml = "Cannot parse stylesheet: %s" % sys.exc_info()[0]
+        except Exception, e:
+            flagSuccess = False
+            result += "Cannot parse stylesheet: %s" % sys.exc_info()[0]
     else:
-        micalaxml = basexml
-
-    # pattern to match for the signal file
-    # Here we are looking for
-    # CONFID
-    # or CONFIDcCONTRID
-    # or CONFIDcCONTRIDscSCONTRID
-    # or CONFIDsSESSID
-    pattern_cern  = re.compile('([sc\d]+)$')
-    # Here we are looking for YYYYMMDD-DEVICENAME-HHMMSS
-    pattern_umich = re.compile('(\d+\-[\w\d]+\-\d)$')
-
-    # Update the micala database with our current task status
-    idMachine = MicalaCommunication.getIdMachine(CollaborationTools.getOptionValue("RecordingManager", "micalaDBMachineName"))
-    idTask    = MicalaCommunication.getIdTask(CollaborationTools.getOptionValue("RecordingManager", "micalaDBStatusExportCDS"))
-    idLecture = MicalaCommunication.getIdLecture(IndicoID, pattern_cern, pattern_umich)
-    if idLecture == '':
-        idLecture = MicalaCommunication.createNewMicalaLecture(IndicoID, contentType, pattern_cern, pattern_umich)
-    MicalaCommunication.reportStatus('START', '', idMachine, idTask, idLecture)
+        flagSuccess = False
+        result += "Stylesheet does not exist: %s" % stylePath
 
     # temporary, for my own debugging
-    f = open('/tmp/lecture.xml', 'w')
+    f = open('/tmp/micala.xml', 'w')
     f.write(micalaxml)
     f.close()
 
-    # Submit XML record to micala server
-    data = urlencode({
-        "file": micalaxml,
-        "mode": "-ir"
-    })
+    # Web upload metadata to micala server
+    if flagSuccess == True:
+        # encode the LOID and the XML file as POST variables
+        data = urlencode({ "LOID": LOID, "micalaxml": micalaxml })
+        # use the header to identify ourselves
+        headers = {"User-Agent": "micala_webupload"}
+        # build the request
+        request = Request(CollaborationTools.getOptionValue("RecordingManager", "micalaUploadURL"), data, headers)
+
+        Logger.get('RecMan').debug("micala request = %s" % str(request))
+
+        # submit the request, and append caught exceptions to the result string,
+        # to be displayed by services.py
+        try:
+            f = urlopen(request)
+            request_result = f.read()
+            if request_result == 'no data':
+                result += _("micala web upload returned an unknown error when submitting to ") + "%s\n" % \
+                    (CollaborationTools.getOptionValue("RecordingManager", "micalaUploadURL"))
+            Logger.get('RecMan').debug("micala result = %s" % str(request_result))
+        except HTTPError, e:
+            flagSuccess = False
+            result += _("micala web upload returned an error when submitting to ") + "%s: %s\n" % \
+                (CollaborationTools.getOptionValue("RecordingManager", "micalaUploadURL"), e)
+        except Exception, e:
+            flagSuccess = False
+            result += _("Unknown error occured when submitting micala metadata: ") + e + "\n"
+
+    # Update the micala database showing the task has started, but only if
+    # the submission actually succeeded.
+    if flagSuccess == True:
+        # pattern to match for the signal file
+        # Here we are looking for
+        # CONFID
+        # or CONFIDcCONTRID
+        # or CONFIDcCONTRIDscSCONTRID
+        # or CONFIDsSESSID
+        pattern_cern  = re.compile('([sc\d]+)$')
+        # Here we are looking for YYYYMMDD-DEVICENAME-HHMMSS
+        pattern_umich = re.compile('(\d+\-[\w\d]+\-\d)$')
+
+        # Update the micala database with our current task status
+        try:
+            if idLecture == '':
+                idLecture = MicalaCommunication.createNewMicalaLecture(IndicoID, contentType, pattern_cern, pattern_umich)
+            MicalaCommunication.reportStatus('COMPLETE', '', idMachine, idTask, idLecture)
+        except Exception, e:
+            flagSuccess = False
+            result += _("Unknown error occured when updating COMPLETE MICALA task information in micala database: %s\n." % e)
+
+    return {"success": flagSuccess, "result": result}
 
 def getCDSRecords(confId):
     '''Query CDS to see if it has an entry for the given event as well as all its sessions, contributions and subcontributions.
@@ -705,11 +787,10 @@ def getCDSRecords(confId):
     # Here is a help page describing the GET args,
     # if this CDS query needs to be changed (thanks jerome.caffaro@cern.ch):
     # http://invenio-demo.cern.ch/help/hacking/search-engine-api
-    # NB: We replace the string INDICO_ID manually instead of using %s because
+    # NB: We replace the string REPLACE_WITH_INDICO_ID manually instead of using %s because
     # there are also url-encoded chars containing the % char.
     optionsCDSQueryURL = CollaborationTools.getOptionValue("RecordingManager", "CDSQueryURL")
     escapedOptionsCDSQueryURL = optionsCDSQueryURL.replace("REPLACE_WITH_INDICO_ID", id_plus_wildcard)
-    Logger.get('RecMan').debug("optionsCDSQueryURL = " + optionsCDSQueryURL)
     Logger.get('RecMan').debug("escapedOptionsCDSQueryURL = " + escapedOptionsCDSQueryURL)
     url = escapedOptionsCDSQueryURL
 

@@ -21,7 +21,7 @@
 
 from MaKaC.services.implementation.collaboration import CollaborationPluginServiceBase
 from MaKaC.plugins.Collaboration.RecordingManager.exceptions import RecordingManagerException
-from MaKaC.plugins.Collaboration.RecordingManager.common import createIndicoLink, createCDSRecord
+from MaKaC.plugins.Collaboration.RecordingManager.common import createIndicoLink, createCDSRecord, submitMicalaMetadata
 from MaKaC.plugins.Collaboration.RecordingManager.micala import MicalaCommunication
 
 class RMLinkService(CollaborationPluginServiceBase):
@@ -47,6 +47,7 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
         CollaborationPluginServiceBase._checkParams(self) #puts the Conference in self._conf
         self._IndicoID    = self._params.get('IndicoID',    None)
         self._LOID        = self._params.get('LOID',        None)
+        self._LODBID      = self._params.get('LODBID',      None)
         self._confId      = self._params.get('conference',  None)
         self._videoFormat = self._params.get('videoFormat', None)
         self._contentType = self._params.get('contentType', None)
@@ -58,8 +59,8 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
             raise RecordingManagerException("No IndicoID supplied")
 
         if self._contentType == 'web_lecture':
-            if not self._LOID:
-                raise RecordingManagerException("No LOID supplied")
+            if not self._LODBID:
+                raise RecordingManagerException("No LODBID supplied")
         elif self._contentType == 'plain_video':
             if not self._videoFormat:
                 raise RecordingManagerException("No video format supplied")
@@ -71,7 +72,8 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
             raise RecordingManagerException("No languages supplied")
 
     def _getAnswer(self):
-        # Get the MARC XML and submit it to CDS
+        # Get the MARC XML and submit it to CDS,
+        # then update micala database Status table showing task completed
         resultCreateCDSRecord = createCDSRecord(self._aw,
                                                 self._IndicoID,
                                                 self._contentType,
@@ -82,10 +84,27 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
             raise RecordingManagerException("CDS record creation failed.\n%s" % resultCreateCDSRecord["result"])
             return "CDS record creation aborted."
 
-        # Update the micala database
+        # Create lecture.xml and submit to micala server,
+        # then update micala database Status table showing task completed
+        # (this only makes sense if it is a web lecture)
+        if self._contentType == 'web_lecture':
+            resultSubmitMicalaMetadata = submitMicalaMetadata(self._aw,
+                                                              self._IndicoID,
+                                                              self._contentType,
+                                                              self._params.get('LOID', None),
+                                                              self._videoFormat,
+                                                              self._languages)
+
+            if resultSubmitMicalaMetadata["success"] == False:
+                raise RecordingManagerException("CDS record creation failed.\n%s" % resultSubmitMicalaMetadata["result"])
+                return "micala metadata creation aborted."
+
+        # Update the micala database to match the LODBID with the IndicoID
+        # This only makes sense for web lectures, so if contentType is plain_video,
+        # this method does nothing.
         resultUpdateMicala = MicalaCommunication.updateMicala(self._IndicoID,
                                           self._contentType,
-                                          self._params.get('LOID', None))
+                                          self._params.get('LODBID', None))
 
         if resultUpdateMicala["success"] == False:
             raise RecordingManagerException("micala database update failed.\n%s" % resultUpdateMicala["result"])
@@ -99,7 +118,6 @@ class RMCreateIndicoLinkService(CollaborationPluginServiceBase):
     def _checkParams(self):
         CollaborationPluginServiceBase._checkParams(self) #puts the Conference in self._conf
         self._IndicoID = self._params.get('IndicoID',   None)
-        self._LOID     = self._params.get('LOID',       None)
         self._confId   = self._params.get('conference', None)
         self._CDSID    = self._params.get('CDSID',      None)
 

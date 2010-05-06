@@ -26,15 +26,15 @@
 
 <!--  <!DOCTYPE LECTURE SYSTEM "http://www.wlap.org/dtd/lecture.dtd">  -->
 <LECTURE>
-  <TITLE><xsl:value-of select="./title" /></TITLE>
-  <xsl:for-each select="./chair/user">
+  <TITLE><xsl:value-of select="./contribution/title" /></TITLE>
+  <xsl:for-each select="./contribution/speakers/user">
     <AUTHOR><xsl:apply-templates select="./name"/></AUTHOR>
   </xsl:for-each>
   <DATE><xsl:value-of select="substring(./startDate, 0, 11)" /></DATE>
   <LANGUAGE>
     <xsl:choose>
-      <xsl:when test="./languages != ''">
-        <xsl:for-each select="./languages/code">
+      <xsl:when test="./contribution/languages != ''">
+        <xsl:for-each select="./contribution/languages/code">
           <xsl:value-of select="." />
         </xsl:for-each>
       </xsl:when>
@@ -43,8 +43,8 @@
       </xsl:otherwise>
     </xsl:choose>
   </LANGUAGE>
-  <DURATION><xsl:value-of select="./duration"/></DURATION>
-  <TIME><xsl:value-of select="substring(./startDate, 12, 8)" disable-output-escaping="yes"/></TIME>
+  <DURATION><xsl:value-of select="./contribution/duration"/></DURATION>
+  <TIME><xsl:value-of select="substring(./contribution/startDate, 12, 8)" disable-output-escaping="yes"/></TIME>
   <PAR>
     <VIDEO REGION="speaker-face">
     <SWITCH>

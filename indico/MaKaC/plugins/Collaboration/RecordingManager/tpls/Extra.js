@@ -458,7 +458,8 @@ function RMCreateCDSRecord() {
                         service: 'RMCreateCDSRecord',
                         conference: '<%= ConferenceId %>',
                         IndicoID: RMselectedTalkId,
-                        LOID: RMselectedLODBID,
+                        LOID: RMLOList[RMselectedLODBID]["LOID"],
+                        LODBID: RMselectedLODBID,
                         videoFormat: RMvideoFormat,
                         contentType: RMviewMode,
                         languages: languageCodes
@@ -504,7 +505,6 @@ function RMCreateIndicoLink() {
                 service: 'RMCreateIndicoLink',
                 conference: '<%= ConferenceId %>',
                 IndicoID: RMselectedTalkId,
-                LOID: RMselectedLODBID,
                 CDSID: RMTalkList[RMselectedTalkId]["CDSID"]
             },
         function(result, error){

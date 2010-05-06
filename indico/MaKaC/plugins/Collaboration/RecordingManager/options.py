@@ -112,6 +112,12 @@ globalOptions = [
                "editable": True,
                "visible": True} ),
 
+    ("micalaUploadURL", {"description" : _("URL for micala web upload"),
+               "type": str,
+               "defaultValue": "http://lectureprocessing01.cern.ch/micala_monitor/test.py",
+               "editable": True,
+               "visible": True} ),
+
     ("CDSQueryURL", {"description" : _("CDS query URL (put the string REPLACE_WITH_INDICO_ID where you want the Indico ID to be)"),
                "type": str,
                "defaultValue": '''http://cdsdev.cern.ch/search?p=sysno%3A%22INDICO.REPLACE_WITH_INDICO_ID%22&f=&action_search=Search&sf=&so=d&rm=&rg=1000&sc=1&ot=970&of=t&ap=0''',

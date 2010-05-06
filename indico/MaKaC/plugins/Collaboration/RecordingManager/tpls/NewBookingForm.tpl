@@ -220,20 +220,22 @@
     var RMLanguageValueOther    = 0;
 
     // Pass the metadata we need for each talk to JavaScript
+    // replacing any double-quotes " with the encoded char %22,
+    // (otherwise any quotes in the title will cause a JavaScript error)
     var RMTalkList = {
     <% for talk in Talks: %>
     "<%= talk["IndicoID"]   %>": {
-        "title":      "<%= talk["title"]      %>",
-        "titleshort": "<%= talk["titleshort"] %>",
-        "type":       "<%= talk["type"]       %>",
-        "CDSID":      "<%= talk["CDSID"]      %>",
-        "CDSURL":     "<%= talk["CDSURL"]     %>",
-        "type":       "<%= talk["type"]       %>",
-        "speakers":   "<%= talk["speakers"]   %>",
-        "date":       "<%= talk["date"]       %>",
-        "date_nice":  "<%= talk["date_nice"]  %>",
-        "LOID":       "<%= talk["LOID"]       %>",
-        "IndicoLink": "<%= talk["IndicoLink"] %>"
+        "title":      "<%= talk["title"].replace('"', '%22')      %>",
+        "titleshort": "<%= talk["titleshort"].replace('"', '%22') %>",
+        "type":       "<%= talk["type"]                           %>",
+        "CDSID":      "<%= talk["CDSID"]                          %>",
+        "CDSURL":     "<%= talk["CDSURL"]                         %>",
+        "type":       "<%= talk["type"]                           %>",
+        "speakers":   "<%= talk["speakers"]                       %>",
+        "date":       "<%= talk["date"]                           %>",
+        "date_nice":  "<%= talk["date_nice"]                      %>",
+        "LOID":       "<%= talk["LOID"]                           %>",
+        "IndicoLink": "<%= talk["IndicoLink"]                     %>"
     },
     <% end %>
     };
