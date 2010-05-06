@@ -6007,7 +6007,7 @@ class WConfModCFANotifTplDisplay(wcomponents.WTemplated):
                 caption= _("""REJECTED""")
             elif isinstance(cond,review.NotifTplCondMerged):
                 caption= _("""MERGED""")
-            res.append(""" <input type="image" name="selCond" value=%s src="%s"> %s"""%(quoteattr(str(cond.getId())), Config.getInstance().getSystemIconURL( "remove" ), caption))
+            res.append(""" <input type="image" src="%s" onclick="javascript:this.form.selCond.value = '%s'; this.form.submit();return false;"> %s"""%(Config.getInstance().getSystemIconURL( "remove" ), cond.getId(), caption))
         return "<br>".join(res)
 
     def _getToAddrsHTML(self):
