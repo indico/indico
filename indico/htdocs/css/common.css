@@ -538,7 +538,7 @@ div.minutesTable h2 {
     padding: 5px;
 }
 
-div.minutesTable span {
+div.minutesTable > span {
     text-align:justify;
     display: block;
     padding: 10px;
