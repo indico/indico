@@ -34,20 +34,29 @@ div.lectureEventHeader {
     background: #1a64a0;
     color: white;
     font-size: 12pt;
-    position: relative; 
-    
+    position: relative;
+
     min-height: 130px;
     margin: 0px;
-    padding: 30px;
+    padding: 20px 30px;
     position: relative;
 }
 
-div.lectureEventHeader a {
-    color: white;
+div.lectureEventHeader > h1 {
+    margin-top:10px;
+}
+
+div.lectureEventHeader > h2 {
+    font-style:normal;
+    color: #BBB;
+}
+
+div.lectureEventHeader > div.details, div.lectureEventHeader a {
+    color: #BBB;
 }
 
 div.lectureEventHeader a:hover {
-    color: #AAAAAA;
+    text-decoration: underline;
 }
 
 div.lectureEventHeader .iCal {
@@ -58,9 +67,9 @@ div.lectureEventHeader .iCal {
 }
 
 div.eventInfoBox {
-	color: white;	
-	float: right;	
-	padding: 10px;	
+	color: white;
+	float: right;
+	padding: 10px;
 }
 
 h1 {
@@ -80,10 +89,10 @@ h2 {
 }
 
 div.lectureEventBody {
-	background: white;			
+	background: white;
 	font-size: 10pt;
-	color: black;	
-	margin: 0;	
+	color: black;
+	margin: 0;
 	padding: 20px;
 }
 
@@ -93,11 +102,11 @@ div.partList {
 	height: 20px;
 }
 
-div.materialList h3, div.partList h3{	
+div.materialList h3, div.partList h3{
 	font-size: 11pt;
 	color: black;
 	margin-left: 10px;
-	display: inline;	
+	display: inline;
 }
 
 div.descriptionBox {
@@ -117,5 +126,9 @@ div.lectureEventBody pre {
 }
 
 div.lectureExtraInfo {
-	margin: 10px;	
+	margin: 10px;
+}
+
+div.lectureCategory {
+    color:#C79810;
 }

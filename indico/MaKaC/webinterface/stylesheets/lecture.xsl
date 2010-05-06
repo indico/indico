@@ -35,7 +35,7 @@
 
 <div class="lectureEventHeader">
 
-    <xsl:call-template name="eventInfoBox"/>	
+    <xsl:call-template name="eventInfoBox"/>
 
 </div>
 <div class="lectureEventBody">

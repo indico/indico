@@ -70,7 +70,7 @@
         (<xsl:value-of select="substring(./timezone,0,25)"/>)
 
         <xsl:if test="count(child::location) != 0 and (./location/name !='' or ./location/room !='')">
-            <br />at <strong><xsl:apply-templates select="./location"><xsl:with-param name="span">headerRoomLink</xsl:with-param></xsl:apply-templates></strong>
+            <br />at <xsl:apply-templates select="./location"><xsl:with-param name="span">headerRoomLink</xsl:with-param></xsl:apply-templates>
         </xsl:if>
     </div>
 

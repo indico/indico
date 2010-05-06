@@ -26,6 +26,7 @@
 
 
 <xsl:template name="eventInfoBox">
+    <div class="lectureCategory"><xsl:value-of select="./category"/></div>
 	<h1>
 		<xsl:text disable-output-escaping="yes"></xsl:text><xsl:value-of select="./title" disable-output-escaping="yes"/><xsl:text disable-output-escaping="yes"></xsl:text>
 	</h1>
@@ -49,7 +50,7 @@
 		(<xsl:value-of select="substring(./timezone,0,25)"/>)
 
 		<xsl:if test="count(child::location) != 0 and (./location/name !='' or ./location/room !='')">
-			<br />at <strong><xsl:apply-templates select="./location"><xsl:with-param name="span">headerRoomLink</xsl:with-param></xsl:apply-templates></strong>
+			<br />at <xsl:apply-templates select="./location"><xsl:with-param name="span">headerRoomLink</xsl:with-param></xsl:apply-templates>
 		</xsl:if>
 	</div>
     <xsl:call-template name="displayModifIcons">
