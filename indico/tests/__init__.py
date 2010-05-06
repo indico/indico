@@ -23,5 +23,5 @@
 
 # API classes
 from indico.tests.config import TestConfig
-from indico.tests.core import TestManager, UnitTestRunner, testRunnerDict
+from indico.tests.core import TestManager, UnitTestRunner, TEST_RUNNERS
 from indico.tests.base import BaseTestRunner

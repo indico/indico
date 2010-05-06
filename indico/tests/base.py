@@ -20,17 +20,13 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 # System modules
-import os, tempfile, signal, shutil, commands, sys
+import os, sys
 
 # Python stdlib
 import StringIO
 
-# Database
-import transaction
-from MaKaC.common.db import DBMgr
-
 # Indico
-from indico.tests.util import TeeStringIO
+from indico.tests.util import TeeStringIO, colored
 
 
 class BaseTestRunner(object):
@@ -44,6 +40,17 @@ class BaseTestRunner(object):
 
     def __init__(self, **kwargs):
         self.options = kwargs
+        self.err = None
+        self.out = None
+
+    def run(self):
+        # get the description from the first lines
+        # of the docstring
+        description =  self.__doc__.strip().split('\n')[0]
+
+        print colored("** Running %s" % description, 'yellow', attrs = ['bold'])
+
+        return self._run()
 
     def _startIOCapture(self):
 
@@ -66,18 +73,13 @@ class BaseTestRunner(object):
         return (self.out.getvalue(),
                 self.err.getvalue())
 
-    def _redirectPipeToStdout(self, pipe):
+    @staticmethod
+    def _redirectPipeToStdout(pipe):
         while True:
             data = pipe.readline()
             if not data:
                 break
             print data,
-
-
-    def startMessage(self, message):
-        print "##################################################################"
-        print "#####     %s" % message
-        print "##################################################################\n"
 
     def writeReport(self, filename, content):
         try:
@@ -89,20 +91,14 @@ class BaseTestRunner(object):
             return "Unable to write in %s, check your file permissions." % \
                     os.path.join(self.setupDir, 'report', filename + ".txt")
 
-        #removing user from list
-        la = ih.getById("Local")
-        la.remove(userid)
-        ah.remove(avatar)
-
-        DBMgr.getInstance().endRequest()
-
-    def walkThroughFolders(self, rootPath, foldersPattern):
+    @staticmethod
+    def walkThroughFolders(rootPath, foldersPattern):
         """scan a directory and return folders which match the pattern"""
 
         rootPluginsPath = os.path.join(rootPath)
         foldersArray = []
 
-        for root, dirs, files in os.walk(rootPluginsPath):
+        for root, __, __ in os.walk(rootPluginsPath):
             if root.endswith(foldersPattern) > 0:
                 foldersArray.append(root)
 

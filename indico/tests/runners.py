@@ -20,7 +20,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 # System modules
-import os, commands, subprocess, sys
+import commands, os, signal, socket, subprocess, sys
 
 # Python stdlib
 import time, re
@@ -32,11 +32,26 @@ from selenium import selenium
 from indico.tests.config import TestConfig
 from indico.tests.base import BaseTestRunner
 
-class UnitTestRunner(BaseTestRunner):
+__all__ = [
+    'UnitTestRunner',
+    'CoverageTestRunner',
+    'FunctionalTestRunner',
+    'SpecificFunctionalTestRunner',
+    'GridTestRunner',
+    'PylintTestRunner',
+    'JSLintTestRunner',
+    'JSUnitTestRunner'
+    ]
 
-    def run(self):
+class UnitTestRunner(BaseTestRunner):
+    """
+    Python Unit Tests
+
+    Using nosetest
+    """
+
+    def _run(self):
         returnString = ""
-        self.startMessage("Starting Python unit tests")
 
         result = False
 
@@ -48,9 +63,10 @@ class UnitTestRunner(BaseTestRunner):
 
         #retrieving tests from tests folder
         args = ['nose', '--nologcapture',  '--logging-clear-handlers', \
-                '--with-id', '-v', '-s', os.path.join(self.setupDir, 'python', 'unit')]
+                '--with-id', '-v', '-s', \
+                os.path.join(self.setupDir, 'python', 'unit')]
         #retrieving tests from plugins folder
-        for folder in self.walkThroughFolders(os.path.join(self.setupDir,
+        for folder in BaseTestRunner.walkThroughFolders(os.path.join(self.setupDir,
                                                            '..',
                                                            'MaKaC',
                                                            'plugins'),
@@ -80,16 +96,20 @@ class UnitTestRunner(BaseTestRunner):
                                        'plugins')
         foldersArray = []
 
-        for root, dirs, files in os.walk(rootPluginsPath):
+        for root, __, ___ in os.walk(rootPluginsPath):
             if root.endswith("/tests/python/unit") > 0:
                 foldersArray.append(root)
 
         return foldersArray
 
 class CoverageTestRunner(BaseTestRunner):
-    """This class is a singleton instantiate by TestRunner class and
+    """
+    Python Coverage Tests
+
+    This class is a singleton instantiate by TestRunner class and
     used by Python Unit tests.
     """
+
     __instance = None
 
     def start(self):
@@ -116,19 +136,23 @@ class CoverageTestRunner(BaseTestRunner):
     getInstance = classmethod( getInstance )
 
     def instantiate(cls):
-        cls.__instance = Coverage()
+        cls.__instance = CoverageTestRunner()
     instantiate = classmethod( instantiate )
 
 
 class FunctionalTestRunner(BaseTestRunner):
+    """
+    Functional Tests
+
+    Using selenium
+    """
 
     def __init__(self, **kwargs):
         BaseTestRunner.__init__(self, **kwargs)
         self.child = None
 
-    def run(self):
+    def _run(self):
         returnString = ""
-        self.startMessage("Starting Python functional tests")
 
         try:
             if not self.startSeleniumServer():
@@ -141,11 +165,9 @@ class FunctionalTestRunner(BaseTestRunner):
             args = ['nose', '--nologcapture', '--logging-clear-handlers', '-v',
                     os.path.join(self.setupDir, 'python', 'functional')]
             #retrieving tests from plugins folder
-            for folder in self.walkThroughFolders(os.path.join(self.setupDir,
-                                                               '..',
-                                                               'MaKaC',
-                                                               'plugins'),
-                                                  "/tests/python/functional"):
+            for folder in BaseTestRunner.walkThroughFolders(
+                os.path.join(self.setupDir, '..', 'MaKaC', 'plugins'),
+                "/tests/python/functional"):
                 args.append(folder)
 
             result = nose.run(argv = args)
@@ -168,13 +190,10 @@ class FunctionalTestRunner(BaseTestRunner):
         return report
 
     def walkThroughPluginsFolders(self):
-        rootPluginsPath = os.path.join(self.setupDir,
-                                       '..',
-                                       'MaKaC',
-                                       'plugins')
+        rootPluginsPath = os.path.join(self.setupDir, '..', 'MaKaC', 'plugins')
         foldersArray = []
 
-        for root, dirs, files in os.walk(rootPluginsPath):
+        for root, __, ___ in os.walk(rootPluginsPath):
             if root.endswith("/tests/python/functional") > 0:
                 foldersArray.append(root)
 
@@ -187,7 +206,7 @@ class FunctionalTestRunner(BaseTestRunner):
                                       os.path.join(self.setupDir,
                                                    'python',
                                                    'functional',
-                                                   TestsConfig.getInstance().
+                                                   TestConfig.getInstance().
                                                    getSeleniumFilename())],
                                       stdout=subprocess.PIPE)
         except OSError, e:
@@ -218,15 +237,18 @@ class FunctionalTestRunner(BaseTestRunner):
         self.child.kill()
 
 
-class Specify(FunctionalTestRunner):
+class SpecificFunctionalTestRunner(FunctionalTestRunner):
+    """
+    Specific Functional Test
+    """
+
     def __init__(self, specifyArg):
         self.specify = specifyArg
 
-    def run(self):
-        self.startMessage("Starting Python specified tests")
-
+    def _run(self):
         #if specified path does not contained unit, we are probably dealing
         #with functional tests
+
         if self.specify.find('unit/') < 0:
             if not self.startSeleniumServer():
                 return ('[ERR] Could not start functional tests because selenium'
@@ -249,32 +271,27 @@ class Specify(FunctionalTestRunner):
         else:
             return "[FAIL] Specified Test - read output from console\n"
 
-class TimeoutException(Exception):
-    """SIGALARM was sent to the process"""
-    pass
-
-def raise_timeout(signum, frame):
-    raise TimeoutException("15sec Timeout")
-
-
 class GridTestRunner(BaseTestRunner):
+    """
+    Selenium Grid Tests
+    """
 
     def __init__(self, **kwargs):
 
         BaseTestRunner.__init__(self, **kwargs)
 
         try:
-            self.hubEnv = TestsConfig.getInstance().getHubEnv()
-            self.gridData = GridData.getInstance()
-            self.gridData.setUrl(TestsConfig.getInstance().getHubURL())
-            self.gridData.setPort(TestsConfig.getInstance().getHubPort())
+            testConf = TestConfig.getInstance()
+            self.hubEnv = testConf.getHubEnv()
+            self.gridData = GridDataTestRunner.getInstance()
+            self.gridData.setUrl(testConf.getHubURL())
+            self.gridData.setPort(testConf.getHubPort())
             self.gridData.setActive(False)
             self.configExists = True
         except KeyError:
             self.configExists = False
 
-    def run(self):
-        self.startMessage("Starting grid tests")
+    def _run(self):
 
         if not self.configExists:
             return "[ERR] Grid - Please specify hub configuration in tests.conf\n"
@@ -287,7 +304,7 @@ class GridTestRunner(BaseTestRunner):
                 sel = selenium(self.gridData.getUrl(), self.gridData.getPort(),
                                self.hubEnv[0], "http://www.cern.ch/")
 
-                signal.signal(signal.SIGALRM, raise_timeout)
+                signal.signal(signal.SIGALRM, raiseTimeout)
                 signal.alarm(15)
                 sel.start()
                 sel.open("/")
@@ -320,8 +337,9 @@ class GridTestRunner(BaseTestRunner):
                         "hub's settings (%s:%s)") % \
                         (self.gridData.getUrl(), self.gridData.getPort())
             except TimeoutException, e:
-                return "[ERR] Selenium Grid - Hub is probably down (%s:%s) (%s)\n" % \
-                        (self.gridData.getUrl(), self.gridData.getPort(), e)
+                return "[ERR] Selenium Grid - Hub is probably down " \
+                       "(%s:%s) (%s)\n" % \
+                       (self.gridData.getUrl(), self.gridData.getPort(), e)
         finally:
             #disable alarm
             signal.alarm(0)
@@ -329,9 +347,11 @@ class GridTestRunner(BaseTestRunner):
         return returnString
 
 class GridDataTestRunner(BaseTestRunner):
-    """Provide informations for selenium grid, data are set from Class Grid
+    """
+    Provides informations for selenium grid, data are set from Class Grid
     and are used by seleniumTestCase.py.
-    Because nosetest cannot forward the arguments to selenium grid."""
+    Because nosetest cannot forward the arguments to selenium grid.
+    """
 
     __instance = None
     def __init__(self, **kwargs):
@@ -363,14 +383,17 @@ class GridDataTestRunner(BaseTestRunner):
     @classmethod
     def getInstance(cls):
         if cls.__instance == None:
-            cls.__instance = GridData()
+            cls.__instance = GridDataTestRunner()
         return cls.__instance
 
 
 class PylintTestRunner(BaseTestRunner):
-    def run(self):
+    """
+    Pylint
+    """
+
+    def _run(self):
         returnString = ""
-        self.startMessage("Starting pylint tests")
 
         self._startIOCapture()
 
@@ -404,14 +427,18 @@ class PylintTestRunner(BaseTestRunner):
 
 
 class JSUnitTestRunner(BaseTestRunner):
+    """
+    JS Unit Tests
+
+    Based on JSUnit
+    """
 
     def __init__(self, **kwargs):
         BaseTestRunner.__init__(self, **kwargs)
         self.coverage = self.options['coverage']
         self.specify = self.options['specify']
 
-    def run(self):
-        self.startMessage("Starting Javascript unit tests")
+    def _run(self):
 
         #conf file used at run time
         confFile = ("builtConf.conf")
@@ -424,7 +451,7 @@ class JSUnitTestRunner(BaseTestRunner):
                                        os.path.join(self.setupDir,
                                                     'javascript',
                                                     'unit',
-                                                    TestsConfig.getInstance().
+                                                    TestConfig.getInstance().
                                                     getJSUnitFilename()),
                                         "--port",
                                         "9876",
@@ -450,7 +477,7 @@ class JSUnitTestRunner(BaseTestRunner):
                                              " --config "
                                              "%s"
                                              " --tests Fake.dryRun") %\
-                                             (TestsConfig.getInstance().
+                                             (TestConfig.getInstance().
                                               getJSUnitFilename(),
                                               confFile))
                 if jsDryRun[1].startswith("No browsers were captured"):
@@ -474,7 +501,7 @@ class JSUnitTestRunner(BaseTestRunner):
             command = ("java -jar %s "
                             "--config %s "
                             "--tests %s ") % \
-                            (TestsConfig.getInstance().getJSUnitFilename(),
+                            (TestConfig.getInstance().getJSUnitFilename(),
                              confFile,
                              toTest)
             if self.coverage:
@@ -520,7 +547,9 @@ class JSUnitTestRunner(BaseTestRunner):
                 report += self.writeReport("jsunit", jsTest)
 
                 #check if all tests succedded
-                successRegexp = re.compile('(.|\n)*\nTotal\s[0-9]+\stests\s\(Passed:\s[0-9]+;\sFails:\s0;\sErrors:\s0\).*\n(.|\n)*')
+                successRegexp = re.compile('(.|\n)*\nTotal\s[0-9]+\stests' \
+                                           '\s\(Passed:\s[0-9]+;\sFails:\s0;' \
+                                           '\sErrors:\s0\).*\n(.|\n)*')
                 success = successRegexp.match(jsTest)
                 if not success:
                     report += ("[FAIL] JS Unit Tests - report in "
@@ -561,7 +590,7 @@ class JSUnitTestRunner(BaseTestRunner):
   - name: \"coverage\"
     jar: \"plugins/%s\"
     module: \"com.google.jstestdriver.coverage.CoverageModule\"""" % \
-        TestsConfig.getInstance().getJscoverageFilename()
+        TestConfig.getInstance().getJscoverageFilename()
         except KeyError:
             return "[ERR] Please, specify a JscoverageFilename in tests.conf\n"
 
@@ -573,7 +602,7 @@ class JSUnitTestRunner(BaseTestRunner):
             f.close()
 
             #adding tests files from tests folder
-            for root, dirs, files in os.walk(absoluteTestsFolder):
+            for root, __, files in os.walk(absoluteTestsFolder):
                 for name in files:
                     if name.endswith(".js"):
                         absoluteFilePath = os.path.join(root, name)
@@ -584,7 +613,7 @@ class JSUnitTestRunner(BaseTestRunner):
 
 
             #adding plugins test files
-            for root, dirs, files in os.walk(absolutePluginsFolder):
+            for root, __, files in os.walk(absolutePluginsFolder):
                 for name in files:
                     if name.endswith(".js") and \
                                           root.find("/tests/javascript/unit") > 0:
@@ -611,10 +640,12 @@ class JSUnitTestRunner(BaseTestRunner):
             return "[ERR] JS Unit Tests - Could not open a file. (%s)" % e
 
 class JSLintTestRunner(BaseTestRunner):
+    """
+    JSLint
+    """
 
-    def run(self):
+    def _run(self):
         returnString = ""
-        self.startMessage("Starting jslint tests")
 
         #Folders which are not going to be scanned.
         #Files are going to be find recursively in the other folders
@@ -631,43 +662,37 @@ class JSLintTestRunner(BaseTestRunner):
 
         #constructing a list of folders to scan
         folderNames = []
-        list  = os.listdir(os.path.join(self.setupDir,
+        fileList  = os.listdir(os.path.join(self.setupDir,
                                         '..',
                                         'indico',
                                         'htdocs',
                                         'js',
                                         'indico'))
-        for name in list:
+        for name in fileList:
             if not (name in blackList):
                 folderNames.append(name)
 
         #Scanning Indico core
         for folderName in folderNames:
-            outputString += self.walkThroughFolders(os.path.join(
-                                                          self.setupDir,
-                                                          '..',
-                                                          'indico',
-                                                          'htdocs',
-                                                          'js',
-                                                          'indico'),
-                                                    folderName)
+            outputString += self.runJSLint(
+                os.path.join(
+                    self.setupDir, '..', 'indico', 'htdocs',
+                    'js', 'indico'),
+                folderName)
 
         #Scanning plugins js files
-        outputString += self.walkThroughFolders(os.path.join(
-                                                          self.setupDir,
-                                                          '..',
-                                                          'indico',
-                                                          'MaKaC',
-                                                          'plugins'))
+        outputString += self.runJSLint(
+            os.path.join(
+                self.setupDir,'..', 'indico', 'MaKaC', 'plugins'))
 
         returnString += self.writeReport("jslint", outputString)
         return returnString + "JS Lint - report in tests/report/jslint.txt\n"
 
-    def walkThroughFolders(self, path, folderRestriction=''):
+    def runJSLint(self, path, folderRestriction=''):
         returnString = ""
-        for root, dirs, files in os.walk(os.path.join(self.setupDir,
-                                                      path,
-                                                      folderRestriction)):
+        for root, __, files in os.walk(os.path.join(self.setupDir,
+                                                    path,
+                                                    folderRestriction)):
             for name in files:
                 if name.endswith(".js"):
                     filename = os.path.join(root, name)
@@ -682,3 +707,10 @@ class JSLintTestRunner(BaseTestRunner):
                                                                 filename))
                     returnString += output[1]
         return returnString
+
+class TimeoutException(Exception):
+    """SIGALARM was sent to the process"""
+    pass
+
+def raiseTimeout(__, ___):
+    raise TimeoutException("15sec Timeout")

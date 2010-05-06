@@ -55,7 +55,6 @@ class ContextManager:
         * forceCleanup - forces the context to be reset
         """
 
-
         tid = threading._get_ident()
         contextDict = cls._getContextDict()
 

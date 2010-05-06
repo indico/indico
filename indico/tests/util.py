@@ -49,3 +49,10 @@ class TeeStringIO(StringIO):
      def read(self):
          self.seek(0)
          self.__outStream.write(StringIO.read(self))
+
+
+try:
+    from termcolor import colored
+except:
+    def colored(text, *__, **___):
+        return text

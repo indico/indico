@@ -133,7 +133,9 @@ class Fossilizable:
                                              " A fossil name should follow the"
                                              " pattern: I(\w+)Fossil." % name)
             else:
-                fossilName = fossilNameMatch.group(1)[0].lower() + fossilNameMatch.group(1)[1:]
+                fossilName = fossilNameMatch.group(1)[0].lower() + \
+                fossilNameMatch.group(1)[1:]
+
                 cls.__fossilNameCache[name] = fossilName
         return fossilName
 
@@ -145,20 +147,27 @@ class Fossilizable:
         :param interfaceArg: the target fossile type
         :type interfaceArg: IFossil, NoneType, or dict
 
-            -If IFossil, we will use it.
-            -If None, we will take the default fossil (the first one of this class's "fossilizes" list)
-            -If a dict, we will use the object's class, class name, or full class name as key.
+        * If IFossil, we will use it.
+        * If None, we will take the default fossil
+        (the first one of this class's 'fossilizes' list)
+        * If a dict, we will use the objects class, class name, or full class name
+        as key.
 
-        Also verifies that the interface obtained through these 3 methods is effectively provided by the object.
+        Also verifies that the interface obtained through these 3 methods is
+        effectively provided by the object.
         """
+
         if interfaceArg is None:
-            #we try to take the 1st interface declared with fossilizes
-            implementedInterfaces = list(i for i in zope.interface.implementedBy(self.__class__) if i.extends(IFossil))
+            # we try to take the 1st interface declared with fossilizes
+            implementedInterfaces = list(
+                i for i in zope.interface.implementedBy(self.__class__) \
+                if i.extends(IFossil) )
+
             if not implementedInterfaces:
-                raise NonFossilizableException("Object %s of class %s cannot be fossilized,"
-                                               "no fossils were declared for it" %
-                                               (str(self),
-                                                self.__class__.__name__))
+                raise NonFossilizableException(
+                    "Object %s of class %s cannot be fossilized,"
+                    "no fossils were declared for it" %
+                    (str(self), self.__class__.__name__))
             else:
                 interface = implementedInterfaces[0]
 
@@ -171,10 +180,10 @@ class Fossilizable:
             if className in interfaceArg:
                 interface = interfaceArg[className]
             else:
-                raise NonFossilizableException("Object %s of class %s cannot be fossilized; "
-                                               "its class was not a key in the provided fossils dictionary" %
-                                               (str(self),
-                                                self.__class__.__name__))
+                raise NonFossilizableException(
+                    "Object %s of class %s cannot be fossilized; "
+                    "its class was not a key in the provided fossils dictionary" %
+                    (str(self), self.__class__.__name__))
         else:
             interface = interfaceArg
 
@@ -256,7 +265,8 @@ class Fossilizable:
                 except KeyError:
                     pass
             if not cacheUsed:
-                #Please use 'produce' as little as possible; there is almost always a more elegant and modular solution!
+	            # Please use 'produce' as little as possible;
+    	        # there is almost always a more elegant and modular solution!
                 if 'produce' in tags:
                     methodResult = interface[method].getTaggedValue('produce')(self)
                 else:

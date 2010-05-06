@@ -345,10 +345,10 @@ class test_indico(Command):
             print "Some jars could not be downloaded. Please download the missing jars manually"
             sys.exit(-1)
 
-        from indico.tests import TestManager, testRunnerDict
+        from indico.tests import TestManager, TEST_RUNNERS
         testsToRun = []
 
-        allTests = testRunnerDict.keys()
+        allTests = TEST_RUNNERS.keys()
 
         for testType in allTests:
             if getattr(self, testType):
@@ -368,10 +368,10 @@ class test_indico(Command):
                    'coverage': self.coverage}
 
         #this variable will tell what to do with the databases
-        FakeDBManaging = self.checkDBStatus(testsToRun, self.specify)
+        fakeDBPolicy = self.checkDBStatus(testsToRun, self.specify)
 
         manager = TestManager()
-        result = manager.main(FakeDBManaging, testsToRun, options)
+        result = manager.main(fakeDBPolicy, testsToRun, options)
 
         print result
 
@@ -381,7 +381,7 @@ class test_indico(Command):
         from indico.tests.util import TestZEOServer
         from MaKaC.common.Configuration import Config
 
-        FakeDBManaging = 0
+        fakeDBPolicy = 0
         if ('functional' in testsToRun) or ('grid' in testsToRun) or ((specify != None) and (specify.find('unit/') < 0)):
 
             #checking if production db is running
@@ -394,17 +394,17 @@ Do you want to stop it using this command '%s' and run the tests?
 
                 userInput = raw_input("Press enter or type 'yes' to accept: ")
                 if userInput == 'yes' or userInput == '':
-                    FakeDBManaging = 3
+                    fakeDBPolicy = 3
                 else:
                     print "Exiting testing framework..."
                     sys.exit(1)
 
             else:
-                FakeDBManaging = 2
+                fakeDBPolicy = 2
         elif 'unit' in testsToRun or 'specify' in testsToRun:
-            FakeDBManaging = 1
+            fakeDBPolicy = 1
 
-        return FakeDBManaging
+        return fakeDBPolicy
 
     def checkIndicopPackages(self):
         packagesList = ['figleaf',

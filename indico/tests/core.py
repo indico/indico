@@ -21,7 +21,7 @@
 
 
 # System modules
-import os, sys, socket, shutil, signal, commands, tempfile
+import os, sys, shutil, signal, commands, tempfile
 
 # Database
 import transaction
@@ -30,14 +30,17 @@ from MaKaC.common.db import DBMgr
 # Indico
 from MaKaC.common.Configuration import Config
 
+from indico.tests.util import colored
+from indico.tests.config import TestConfig
 from indico.tests.runners import *
 
-testRunnerDict = {'unit': UnitTestRunner,
-                  'functional': FunctionalTestRunner,
-                  'pylint': PylintTestRunner,
-                  'jsunit': JSUnitTestRunner,
-                  'jslint': JSLintTestRunner,
-                  'grid': GridTestRunner}
+TEST_RUNNERS = {'unit': UnitTestRunner,
+                'functional': FunctionalTestRunner,
+                'pylint': PylintTestRunner,
+                'jsunit': JSUnitTestRunner,
+                'jslint': JSLintTestRunner,
+                'grid': GridTestRunner}
+
 
 class TestManager(object):
     """
@@ -50,34 +53,36 @@ class TestManager(object):
     def __init__(self):
         self.dbmgr = None
         self.zeoServer = None
+        self.tempDirs = {}
+        self.dbFolder = None
 
-    def main(self, FakeDBManaging, testsToRun, options):
+    def main(self, fakeDBPolicy, testsToRun, options):
 
-        returnString = "\n\n=============== ~INDICOP SAYS~ ===============\n\n"
+        returnString = "\n\n%s\n\n" % colored('** Results', 'blue', attrs = ['bold'])
 
         #To not pollute the installation of Indico
         self.configureTempFolders()
 
 
-        self.startManageDB(FakeDBManaging)
+        self.startManageDB(fakeDBPolicy)
 
         if options['coverage']:
             CoverageTestRunner.instantiate()
 
         #specified test can either be unit or functional.
         if options['specify']:
-            returnString += Specify(options['specify']).run()
+            returnString += SpecificFunctionalTestRunner(options['specify']).run()
         else:
             for test in testsToRun:
-                if test in testRunnerDict:
-                    print test
-                    returnString += testRunnerDict[test](**options).run()
+                if test in TEST_RUNNERS:
+                    returnString += TEST_RUNNERS[test](**options).run()
                 else:
-                    returnString += ("[ERR] Test set '%s' does not exist. "
-                      "It has to be added in the testRunnerDict variable\n") % test
+                    returnString += colored("[ERR] Test set '%s' does not exist. "
+                      "It has to be added in the TEST_RUNNERS variable\n", 'red') \
+                    % test
 
 
-        self.stopManageDB(FakeDBManaging)
+        self.stopManageDB(fakeDBPolicy)
 
         return returnString
 
@@ -85,50 +90,54 @@ class TestManager(object):
         keyNames = [#'LogDir',
                     'ArchiveDir',
                     'UploadedFilesTempDir']
-        self.newValues = {}
 
         for key in keyNames:
-            self.newValues[key] = tempfile.mkdtemp()
+            self.tempDirs[key] = tempfile.mkdtemp()
 
-        Config.getInstance().updateValues(self.newValues)
+        Config.getInstance().updateValues(self.tempDirs)
 
     def deleteTempFolders(self):
-        for k in self.newValues:
-            shutil.rmtree(self.newValues[k])
+        for k in self.tempDirs:
+            shutil.rmtree(self.tempDirs[k])
 
 ################## Start of DB Managing functions ##################
-    def startManageDB(self, FakeDBManaging):
-        """FakeDBManaging == 0, the tests to run do not need any DB
-        FakeDBManaging == 1, unit tests need a fake DB that can be run in parallel
-        of the production DB
-        FakeDBManaging == 2, production DB is not running and functional tests
+    def startManageDB(self, fakeDBPolicy):
+        """
+        fakeDBPolicy == 0, the tests to run do not need any DB
+        fakeDBPolicy == 1, unit tests need a fake DB that can be run in parallel
+        with the production DB
+        fakeDBPolicy == 2, production DB is not running and functional tests
         need fake DB which is going to be run on production port.
-        FakeDBManaging == 3, production DB is running, we need to stop it and
-        and start a fake DB on the production port. we will restart production DB"""
-        if FakeDBManaging == 1:
-            self.startFakeDB(TestConfig.getInstance().getFakeDBPort())
-            self.createDummyUser()
-        elif FakeDBManaging == 2:
-            self.startFakeDB(Config.getInstance().getDBConnectionParams()[1])
-            self.createDummyUser()
-        elif FakeDBManaging == 3:
-            self.stopProductionDB()
-            self.startFakeDB(Config.getInstance().getDBConnectionParams()[1])
-            self.createDummyUser()
+        fakeDBPolicy == 3, production DB is running, we need to stop it and
+        and start a fake DB on the production port. we will restart production DB
+        """
 
-    def stopManageDB(self, FakeDBManaging):
-        if FakeDBManaging == 1 or FakeDBManaging == 2:
+        if fakeDBPolicy == 1:
+            self.startFakeDB(TestConfig.getInstance().getFakeDBPort())
+            TestManager.createDummyUser()
+        elif fakeDBPolicy == 2:
+            self.startFakeDB(Config.getInstance().getDBConnectionParams()[1])
+            TestManager.createDummyUser()
+        elif fakeDBPolicy == 3:
+            TestManager.stopProductionDB()
+            self.startFakeDB(Config.getInstance().getDBConnectionParams()[1])
+            TestManager.createDummyUser()
+
+    def stopManageDB(self, fakeDBPolicy):
+        if fakeDBPolicy == 1 or fakeDBPolicy == 2:
             self.stopFakeDB()
-            self.restoreDBInstance()
-        elif FakeDBManaging == 3:
+            TestManager.restoreDBInstance()
+        elif fakeDBPolicy == 3:
             self.stopFakeDB()
-            self.startProductionDB()
-            self.restoreDBInstance()
+            TestManager.startProductionDB()
+            TestManager.restoreDBInstance()
 
     def startFakeDB(self, zeoPort):
         self.createNewDBFile()
-        self.zeoServer = self.createDBServer(os.path.join(self.dbFolder, "Data.fs"),
-                                             zeoPort)
+        self.zeoServer = TestManager.createDBServer(
+            os.path.join(self.dbFolder, "Data.fs"),
+            zeoPort)
+
         DBMgr.setInstance(DBMgr(hostname="localhost", port=zeoPort))
 
     def stopFakeDB(self):
@@ -143,17 +152,20 @@ class TestManager(object):
         except OSError, e:
             print ("Problem waiting for ZEO Server: " + str(e))
 
-    def restoreDBInstance(self):
+    @staticmethod
+    def restoreDBInstance():
         DBMgr.setInstance(None)
 
-    def startProductionDB(self):
+    @staticmethod
+    def startProductionDB():
         try:
             commands.getstatusoutput(TestConfig.getInstance().getStartDBCmd())
         except KeyError:
             print "[ERR] Not found in tests.conf: command to start production DB\n"
             sys.exit(1)
 
-    def stopProductionDB(self):
+    @staticmethod
+    def stopProductionDB():
         try:
             commands.getstatusoutput(TestConfig.getInstance().getStopDBCmd())
         except KeyError:
@@ -169,7 +181,6 @@ class TestManager(object):
         storage = FileStorage.FileStorage("Data.fs")
         db = DB(storage)
         connection = db.open()
-        dbroot = connection.root()
 
         transaction.commit()
 
@@ -181,7 +192,8 @@ class TestManager(object):
     def removeDBFile(self):
         shutil.rmtree(self.dbFolder)
 
-    def createDBServer(self, file, port):
+    @staticmethod
+    def createDBServer(dbFile, port):
         """
         Creates a fake DB server for testing
         """
@@ -192,16 +204,17 @@ class TestManager(object):
         else:
             # run a DB in a child process
             from indico.tests.util import TestZEOServer
-            server = TestZEOServer(port, file)
+            server = TestZEOServer(port, dbFile)
             server.start()
 
 ################## End of DB Managing functions ##################
 
-    def createDummyUser(self):
+    @staticmethod
+    def createDummyUser():
         from MaKaC import user
         from MaKaC.authentication import AuthenticatorMgr
         from MaKaC.common import HelperMaKaCInfo
-        from MaKaC.common import indexes
+
         DBMgr.getInstance().startRequest()
 
         #filling info to new user
@@ -232,7 +245,8 @@ class TestManager(object):
 
         DBMgr.getInstance().endRequest()
 
-    def deleteDummyUser(self):
+    @staticmethod
+    def deleteDummyUser():
         from MaKaC import user
         from MaKaC.authentication import AuthenticatorMgr
         from MaKaC.common import HelperMaKaCInfo
@@ -262,3 +276,5 @@ class TestManager(object):
         index.unindexUser(avatar)
         index = indexes.IndexesHolder().getById("status")
         index.unindexUser(avatar)
+
+        DBMgr.getInstance().endRequest()
