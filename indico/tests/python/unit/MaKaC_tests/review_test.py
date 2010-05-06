@@ -23,24 +23,18 @@
 """
 
 import unittest
+from indico.tests.env import *
+
+from datetime import datetime
+from pytz import timezone
 
 import MaKaC.user as user
 import MaKaC.conference as conference
 import MaKaC.review as review
 import MaKaC.errors as errors
 
-from datetime import datetime
-from pytz import timezone
-from MaKaC.common import DBMgr
 
-def setup_module():
-    DBMgr.getInstance().startRequest()
-
-def teardown_module():
-    DBMgr.getInstance().abort()
-    DBMgr.getInstance().endRequest()
-
-class TestCFADirectives( unittest.TestCase ):
+class _Needs_Rewriting_TestCFADirectives( unittest.TestCase ):
     """Tests the setting of the main CFA directives.
     """
 
@@ -85,7 +79,7 @@ class TestCFADirectives( unittest.TestCase ):
         self.assert_( not cfa.inSubmissionPeriod( id ) )
 
 
-class TestAbstractSubmission( unittest.TestCase ):
+class _Needs_Rewriting_TestAbstractSubmission( unittest.TestCase ):
     """Tests different abstract submission scenarios
     """
 
@@ -121,7 +115,7 @@ class TestAbstractSubmission( unittest.TestCase ):
         #checking modification privileges
 
 
-class TestAbstractModification( unittest.TestCase ):
+class _Needs_Rewriting_TestAbstractModification( unittest.TestCase ):
     """Tests different abstract modification scenarios
     """
     def setUp( self ):
@@ -162,7 +156,7 @@ class TestAbstractModification( unittest.TestCase ):
         self.assert_( self._abstract.isProposedForTrack( self._track3 ) )
 
 
-class TestAbstractAcceptation( unittest.TestCase ):
+class _Needs_Rewriting_TestAbstractAcceptation( unittest.TestCase ):
     """Tests different abstract acceptation scenarios
     """
     def setUp( self ):
@@ -262,7 +256,7 @@ class TestAbstractAcceptation( unittest.TestCase ):
         self.assert_( self._track3.hasAbstract( self._abstract ) )
 
 
-class TestAbstractDisplay(unittest.TestCase):
+class _Needs_Rewriting_TestAbstractDisplay(unittest.TestCase):
     """tests different abstract displaying scenarios.
     """
 
@@ -287,7 +281,7 @@ class TestAbstractDisplay(unittest.TestCase):
                         and l[2] == self._track3 )
 
 
-class TestAbstractWithdrawal(unittest.TestCase):
+class _Needs_Rewriting_TestAbstractWithdrawal(unittest.TestCase):
     """tests different abstract withdrawal scenarios.
     """
 
@@ -337,7 +331,7 @@ class TestAbstractWithdrawal(unittest.TestCase):
         self.assert_(isinstance(contribStatus,conference.ContribStatusWithdrawn))
 
 
-class TestAbstractRecovery(unittest.TestCase):
+class _Needs_Rewriting_TestAbstractRecovery(unittest.TestCase):
     """tests different abstract recovery scenarios.
     """
 
@@ -377,7 +371,7 @@ class TestAbstractRecovery(unittest.TestCase):
         self.assert_( self._abstract.getNumJudgements() == 2 )
 
 
-class TestAbstractReallocation(unittest.TestCase):
+class _Needs_Rewriting_TestAbstractReallocation(unittest.TestCase):
     """tests different abstract reallocation scenarios.
     """
 
@@ -417,7 +411,7 @@ class TestAbstractReallocation(unittest.TestCase):
         self.assert_( t1jud not in t1_tl )
 
 
-class TestNotification(unittest.TestCase):
+class _Needs_Rewriting_TestNotification(unittest.TestCase):
     """
     """
 
@@ -556,7 +550,7 @@ class TestNotification(unittest.TestCase):
         self.assert_(absMgr.getNotifTplForAbstract(abs3)==tpl1)
 
 
-class TestAuthorSearch(unittest.TestCase):
+class _Needs_Rewriting_TestAuthorSearch(unittest.TestCase):
     """
     """
 
@@ -597,16 +591,3 @@ class TestAuthorSearch(unittest.TestCase):
         self.assert_(len(absMgr.getAbstractsMatchingAuth("B"))==0)
         self.assert_(abs1 not in absMgr.getAbstractsMatchingAuth("b"))
 
-def testsuite():
-    suite = unittest.TestSuite()
-    suite.addTest( unittest.makeSuite(TestCFADirectives) )
-    suite.addTest( unittest.makeSuite(TestAbstractSubmission) )
-    suite.addTest( unittest.makeSuite(TestAbstractModification) )
-    suite.addTest( unittest.makeSuite(TestAbstractAcceptation) )
-    suite.addTest( unittest.makeSuite(TestAbstractDisplay) )
-    suite.addTest( unittest.makeSuite(TestAbstractWithdrawal) )
-    suite.addTest( unittest.makeSuite(TestAbstractRecovery) )
-    suite.addTest( unittest.makeSuite(TestAbstractReallocation) )
-    suite.addTest( unittest.makeSuite(TestNotification) )
-    suite.addTest( unittest.makeSuite(TestAuthorSearch) )
-    return suite

@@ -22,26 +22,18 @@
 """Contains tests regarding some scenarios related to schedule management.
 """
 import unittest
+from indico.tests.env import *
+
 import os
-
-
 from datetime import datetime,timedelta
 from pytz import timezone
 
 from MaKaC.schedule import IndTimeSchEntry
 from MaKaC.errors import MaKaCError
-from MaKaC.conference import Conference
-from MaKaC.conference import Category
+from MaKaC.conference import Conference, Category
 from MaKaC.user import Avatar
 import MaKaC.common.indexes as indexes
-from MaKaC.common import DBMgr
 
-def setup_module():
-    DBMgr.getInstance().startRequest()
-
-def teardown_module():
-    DBMgr.getInstance().abort()
-    DBMgr.getInstance().endRequest()
 
 class _ScheduleOwnerWrapper:
 
@@ -75,7 +67,7 @@ class _ScheduleOwnerWrapper:
         self._eDate=ed
 
 
-class TestTimeSchedule(unittest.TestCase):
+class _Needs_Rewriting_TestTimeSchedule(unittest.TestCase):
     """Tests the basic schedule management functions
     """
 

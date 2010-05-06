@@ -22,8 +22,17 @@ FakeDBPort = 9686
 #------------------------------------------------------------------------------
 # Jars
 #------------------------------------------------------------------------------
-JsunitURL          = "http://js-test-driver.googlecode.com/files/JsTestDriver-1.2.jar"
-JsunitFilename     = "JsTestDriver-1.2.jar"
+PylintFiles        =   ["MaKaC.common.contextManager",
+                        "MaKaC.common.fossilize",
+                        "tests.runners",
+                        "tests.__init__",
+                        "tests.core",
+                        "tests.config",
+                        "tests.base"]
+
+
+JSUnitURL          = "http://js-test-driver.googlecode.com/files/JsTestDriver-1.2.jar"
+JSUnitFilename     = "JsTestDriver-1.2.jar"
 
 JscoverageURL      = "http://js-test-driver.googlecode.com/files/coverage-1.2.jar"
 JscoverageFilename = "coverage-1.2.jar"

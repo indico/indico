@@ -345,10 +345,10 @@ class test_indico(Command):
             print "Some jars could not be downloaded. Please download the missing jars manually"
             sys.exit(-1)
 
-        from tests.Indicop import Indicop
+        from indico.tests import TestManager, testRunnerDict
         testsToRun = []
 
-        allTests = ['unit', 'pylint', 'functional', 'grid', 'jsunit', 'jslint']
+        allTests = testRunnerDict.keys()
 
         for testType in allTests:
             if getattr(self, testType):
@@ -360,7 +360,7 @@ class test_indico(Command):
             testsToRun.append('specify')
 
         if testsToRun == []:
-            testsToRun == allTests
+            testsToRun = allTests
 
 
         options = {'verbose': self.full_output,
@@ -370,15 +370,15 @@ class test_indico(Command):
         #this variable will tell what to do with the databases
         FakeDBManaging = self.checkDBStatus(testsToRun, self.specify)
 
-        indicop = Indicop()
-        result = indicop.main(FakeDBManaging, testsToRun, options)
+        manager = TestManager()
+        result = manager.main(FakeDBManaging, testsToRun, options)
 
         print result
 
 
     def checkDBStatus(self, testsToRun, specify):
-        from tests.config import TestsConfig
-        from tests.util import TestZEOServer
+        from indico.tests import TestConfig
+        from indico.tests.util import TestZEOServer
         from MaKaC.common.Configuration import Config
 
         FakeDBManaging = 0
@@ -390,7 +390,7 @@ class test_indico(Command):
                 print """Your production database is currently running.
 Do you want to stop it using this command '%s' and run the tests?
 (We will restart your produduction after the tests with this command '%s')""" % \
-(TestsConfig.getInstance().getStopDBCmd(), TestsConfig.getInstance().getStartDBCmd())
+(TestConfig.getInstance().getStopDBCmd(), TestConfig.getInstance().getStartDBCmd())
 
                 userInput = raw_input("Press enter or type 'yes' to accept: ")
                 if userInput == 'yes' or userInput == '':
@@ -424,7 +424,7 @@ i.e. try 'easy_install %s'""" % (package, package)
         return validPackages
 
     def checkIndicopJars(self):
-        from tests.config import TestsConfig
+        from indico.tests import TestConfig
 
         """check if needed jars are here, if not, dowloading them and unzip a file if necessary"""
         jarsList = {}
@@ -435,23 +435,23 @@ i.e. try 'easy_install %s'""" % (package, package)
             jarsList['jsunit'] = {'path':     os.path.join(testModPath,
                                                            'javascript',
                                                            'unit'),
-                                  'url':      TestsConfig.getInstance().getJsunitURL(),
-                                  'filename': TestsConfig.getInstance().getJsunitFilename()}
+                                  'url':      TestConfig.getInstance().getJsunitURL(),
+                                  'filename': TestConfig.getInstance().getJsunitFilename()}
 
             jarsList['jscoverage'] = {'path':     os.path.join(testModPath,
                                                                'javascript',
                                                                'unit',
                                                                'plugins'),
-                                      'url':      TestsConfig.getInstance().getJscoverageURL(),
-                                      'filename': TestsConfig.getInstance().getJscoverageFilename()}
+                                      'url':      TestConfig.getInstance().getJscoverageURL(),
+                                      'filename': TestConfig.getInstance().getJscoverageFilename()}
 
             jarsList['selenium'] = {'path':      os.path.join(testModPath,
                                                               'python',
                                                               'functional'),
-                                    'url':       TestsConfig.getInstance().getSeleniumURL(),
-                                    'inZipPath': TestsConfig.getInstance().getSeleniumInZipPath(),
-                                    'zipname':   TestsConfig.getInstance().getSeleniumZipname(),
-                                    'filename':  TestsConfig.getInstance().getSeleniumFilename()}
+                                    'url':       TestConfig.getInstance().getSeleniumURL(),
+                                    'inZipPath': TestConfig.getInstance().getSeleniumInZipPath(),
+                                    'zipname':   TestConfig.getInstance().getSeleniumZipname(),
+                                    'filename':  TestConfig.getInstance().getSeleniumFilename()}
         except KeyError, key:
             print "[ERR] Please specify a value for %s in tests.conf" % key
             sys.exit(1)

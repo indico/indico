@@ -24,6 +24,7 @@ import threading, time
 from MaKaC.common.contextManager import ContextManager
 
 class TestInitializedContextManager(unittest.TestCase):
+    "Context Manager - Properly Initialized"
 
     def setUp(self):
         ContextManager.create()
@@ -32,16 +33,24 @@ class TestInitializedContextManager(unittest.TestCase):
         ContextManager.destroy()
 
     def testGetDefaultWorks(self):
+        "Default value for non-existing attribute"
+
         self.assertEquals(ContextManager.getdefault('test', '42'), '42')
 
     def testGetWorks(self):
+        "Getting the value of an existing attribute"
+
         ContextManager.set('test', 123)
         self.assertEquals(ContextManager.get('test'), 123)
 
-    def testThrowsKeyError(self):
+    def testReturnsDummyContext(self):
+        "Return a DummyContext in case the attribute is not defined"
+
         self.assertEquals(ContextManager.get('test').__class__, ContextManager.DummyContext)
 
     def testDoubleSetWorks(self):
+        "Two consecutive set() operations over the same attribute"
+
         ContextManager.set('test2', 65)
         ContextManager.set('test2', 66)
         self.assertEquals(ContextManager.get('test2'), 66)
@@ -59,6 +68,8 @@ class TestInitializedContextManager(unittest.TestCase):
         self.assertEquals(ContextManager.get('samevariable'), 'b')
 
     def testWithThreads(self):
+        "Thread safety"
+
         t1 = threading.Thread(target=self.thread1)
         t2 = threading.Thread(target=self.thread2)
 
@@ -70,5 +81,43 @@ class TestInitializedContextManager(unittest.TestCase):
 
         self.assertEquals(ContextManager.get('samevariable').__class__, ContextManager.DummyContext)
 
-if __name__ == '__main__':
-    unittest.main()
+
+class TestUninitializedContextManager(unittest.TestCase):
+    "Context Manager - Uninitialized"
+
+    def testGetDefaultSilent(self):
+        "getdefault() shouldn't fail, but return a DummyContext instead"
+
+        ret = ContextManager.getdefault('utest', '42')
+        self.assertEquals(ret.__class__, ContextManager.DummyContext)
+
+    def testGetSilent(self):
+        "get() shouldn't fail, but return a DummyContext instead"
+
+        self.assertEquals(ContextManager.get('utest').__class__, ContextManager.DummyContext)
+
+    def testSetSilent(self):
+        "set() shouldn't fail, but return a DummyContext instead"
+
+        self.assertEquals(ContextManager.set('utest','foo').__class__, ContextManager.DummyContext)
+
+    def testHasFalse(self):
+        "has() will return false"
+
+        self.assertEquals(ContextManager.has('utest'), False)
+
+    def testGetIgnoresCalls(self):
+        "methods called on get() should do nothing"
+
+        self.assertEquals(ContextManager.get('utest').doSomething(), None)
+
+    def testGetIgnoresGetItem(self):
+        "__getitem__ should do nothing"
+
+        self.assertEquals(ContextManager.get('utest')['foo'], None)
+
+    def testGetIgnoresSetItem(self):
+        "__setitem__ should be ignored"
+
+        # shouldn't fail
+        ContextManager.get('test')['foo'] = 'ubar'

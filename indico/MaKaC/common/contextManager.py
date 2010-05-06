@@ -55,6 +55,7 @@ class ContextManager:
         * forceCleanup - forces the context to be reset
         """
 
+
         tid = threading._get_ident()
         contextDict = cls._getContextDict()
 
@@ -79,7 +80,7 @@ class ContextManager:
     def get(cls, name):
         """
         If no set has been done over the variable before,
-        an exception will be thrown.
+        a dummy context will be returned.
         """
         try:
             return cls._getThreadContext()[name]

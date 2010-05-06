@@ -23,30 +23,6 @@ import threading, time
 
 from MaKaC.common.contextManager import ContextManager
 
-class TestUninitializedContextManager(unittest.TestCase):
-
-
-    def testGetDefaultSilent(self):
-        self.assertEquals(ContextManager.getdefault('test', '42').__class__, ContextManager.DummyContext)
-
-    def testGetSilent(self):
-        self.assertEquals(ContextManager.get('test').__class__, ContextManager.DummyContext)
-
-    def testSetSilent(self):
-        self.assertEquals(ContextManager.set('test','foo').__class__, ContextManager.DummyContext)
-
-    def testHasFalse(self):
-        self.assertEquals(ContextManager.has('test'), False)
-
-    def testGetIgnoresCalls(self):
-        self.assertEquals(ContextManager.get('test').doSomething(), None)
-
-    def testGetIgnoresGetItem(self):
-        self.assertEquals(ContextManager.get('test')['foo'], None)
-
-    def testGetIgnoresSetItem(self):
-        ContextManager.get('test')['foo'] = 'bar'
-
 
 if __name__ == '__main__':
     unittest.main()

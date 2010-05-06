@@ -1,6 +1,6 @@
 import os
 
-class TestsConfig:
+class TestConfig:
     __instance = None
 
     def __init__(self):
@@ -33,5 +33,5 @@ class TestsConfig:
     @classmethod
     def getInstance(cls):
         if cls.__instance == None:
-            cls.__instance = TestsConfig()
+            cls.__instance = cls()
         return cls.__instance

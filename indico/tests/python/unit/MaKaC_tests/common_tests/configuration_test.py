@@ -17,24 +17,16 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 import unittest
-import shutil
-import sys
+from indico.tests.env import *
+
+import shutil, sys
 from MaKaC.common.Configuration import Config
 from MaKaC.consoleScripts.installBase import modifyOnDiskIndicoConfOption
 
-def setup_module():
-    #this test module is deprecated
-    import nose
-    raise nose.SkipTest
 
-    DBMgr.getInstance().startRequest()
-
-def teardown_module():
-    DBMgr.getInstance().abort()
-    DBMgr.getInstance().endRequest()
-
-class TestConfiguration(unittest.TestCase):
+class _Needs_Rewriting_TestConfiguration(unittest.TestCase):
     def testGetInstanceShouldWork(self):
         self.config = Config.getInstance()
 

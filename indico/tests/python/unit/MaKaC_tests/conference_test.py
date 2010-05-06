@@ -20,31 +20,22 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
+import unittest
+from indico.tests.env import *
 
-from MaKaC import conference
-from MaKaC.conference import Conference, Category
-from MaKaC.conference import Session,Contribution,SessionSlot
-from MaKaC.conference import ContributionParticipation
-from MaKaC.conference import SCIndex
-from MaKaC.errors import MaKaCError
-from MaKaC.schedule import BreakTimeSchEntry
-from MaKaC.common import DBMgr
 from datetime import datetime
 from pytz import timezone
 from MaKaC.user import Avatar
 
-import unittest
+from MaKaC.conference import Conference, Category, Session, Contribution, \
+     SessionSlot, ContributionParticipation, SCIndex
+from MaKaC.schedule import BreakTimeSchEntry
+from MaKaC import conference
+from MaKaC.errors import MaKaCError
 
-
-def setup_module():
-    DBMgr.getInstance().startRequest()
-
-def teardown_module():
-    DBMgr.getInstance().abort()
-    DBMgr.getInstance().endRequest()
 
 #From testCategories.py
-class TestCategories(unittest.TestCase):
+class _Needs_Rewriting_TestCategories(unittest.TestCase):
 
     def testBasicAddAndRemoveConferences(self):
 
@@ -132,7 +123,7 @@ class TestCategories(unittest.TestCase):
         assert (c2.getNumConferences()==0)
 
 #from testConferences.py
-class TestBasicManagement(unittest.TestCase):
+class _Needs_Rewriting_TestBasicManagement(unittest.TestCase):
     """Tests the basic conference management functions
     """
 
@@ -192,7 +183,7 @@ class TestBasicManagement(unittest.TestCase):
         self.assert_(c2 not in s1.getContributionList())
         self.assert_(c3 in s2.getContributionList())
 
-class TestModifyConferenceDates(unittest.TestCase):
+class _Needs_Rewriting_TestModifyConferenceDates(unittest.TestCase):
     """Tests different scenarios which can occur when modifying conference start
         and end dates
     """
@@ -240,7 +231,7 @@ class TestModifyConferenceDates(unittest.TestCase):
         #self.assertRaises(MaKaCError,self._conf.setStartDate,datetime(2004, 01, 01, 10, 01, tzinfo=timezone('UTC')))
         #self.assertRaises(MaKaCError,self._conf.setEndDate,datetime(2004, 01, 01, 10, 20, tzinfo=timezone('UTC')))
 
-class TestSchedule(unittest.TestCase):
+class _Needs_Rewriting_TestSchedule(unittest.TestCase):
     """Tests the schedule management functions
     """
 
@@ -357,7 +348,7 @@ class TestSchedule(unittest.TestCase):
         self.assert_(c2.getStartDate()==datetime(2004, 01, 01, 10, 10, tzinfo=timezone('UTC')))
 
 
-class TestAuthorIndex(unittest.TestCase):
+class _Needs_Rewriting_TestAuthorIndex(unittest.TestCase):
     """Tests the author index
     """
 
@@ -458,7 +449,7 @@ class TestAuthorIndex(unittest.TestCase):
         self.assert_(len(idx.getParticipations()[1])==1)
 
 
-class TestAuthorSearch(unittest.TestCase):
+class _Needs_Rewriting_TestAuthorSearch(unittest.TestCase):
     """Tests the author search
     """
 
@@ -554,7 +545,7 @@ class TestAuthorSearch(unittest.TestCase):
         self.assert_(c1 in self._conf.getContribsMatchingAuth("a"))
 
 
-class TestContributionSubmitterIndex(unittest.TestCase):
+class _Needs_Rewriting_TestContributionSubmitterIndex(unittest.TestCase):
     """
     """
 
@@ -611,7 +602,7 @@ class TestContributionSubmitterIndex(unittest.TestCase):
 
 
 
-class TestBasicManagement(unittest.TestCase):
+class _Needs_Rewriting_TestBasicManagement(unittest.TestCase):
     """Tests the basic contribution management functions
     """
 
@@ -713,7 +704,7 @@ class TestBasicManagement(unittest.TestCase):
         self.assert_(self._conf.getContributionById("3")==contrib6)
 
 
-class TestWithdrawal(unittest.TestCase):
+class _Needs_Rewriting_TestWithdrawal(unittest.TestCase):
     """Tests different scenarios concerning the contribution withdrawal
     """
 
@@ -729,25 +720,31 @@ class TestWithdrawal(unittest.TestCase):
         self._conf.setDates(sd,ed)
 
     def testBasicWithdrawal(self):
-        c1,c2=Contribution(),Contribution()
-        auth1,auth2=ContributionParticipation(),ContributionParticipation()
+
+        c1, c2 = Contribution(),Contribution()
+        auth1, auth2 = ContributionParticipation(), ContributionParticipation()
         self._conf.addContribution(c1)
         self._conf.addContribution(c2)
+
         auth1.setFirstName("a")
         auth1.setFamilyName("a")
         auth1.setEmail("a")
         auth2.setFirstName("b")
         auth2.setFamilyName("b")
         auth2.setEmail("b")
+
         c1.addPrimaryAuthor(auth1)
         c2.addPrimaryAuthor(auth2)
-        s1=Session()
-        sd=datetime(2004, 01, 01, 12, 00, tzinfo=timezone("UTC"))
-        ed=datetime(2004, 01, 01, 19, 00, tzinfo=timezone("UTC"))
+
+        s1 = Session()
+        sd = datetime(2004, 01, 01, 12, 00, tzinfo=timezone("UTC"))
+        ed = datetime(2004, 01, 01, 19, 00, tzinfo=timezone("UTC"))
         s1.setDates(sd,ed)
-        slot1=SessionSlot(s1)
+
+        slot1 = SessionSlot(s1)
         self._conf.addSession(s1)
         s1.addSlot(slot1)
+
         s1.addContribution(c1)
         s1.addContribution(c2)
         slot1.getSchedule().addEntry(c1.getSchEntry())
@@ -778,7 +775,7 @@ class TestWithdrawal(unittest.TestCase):
         self.assert_(auth4 in authIdx.getParticipations()[1])
         self.assertRaises(MaKaCError,slot1.getSchedule().addEntry,c1.getSchEntry())
 
-class TestSubmissionPrivileges(unittest.TestCase):
+class _Needs_Rewriting_TestSubmissionPrivileges(unittest.TestCase):
     """Tests different scenarios concerning the material submission privileges
     """
 
@@ -839,7 +836,7 @@ class TestSubmissionPrivileges(unittest.TestCase):
 #from testSciProgramme.py
 """Contains tests about some typical "scientific programme" scenarios.
 """
-class TestTCIndex( unittest.TestCase ):
+class _Needs_Rewriting_TestTCIndex( unittest.TestCase ):
     """Makes sure the track coordinators index is working properly as standalone
         component
     """
@@ -937,7 +934,7 @@ class TestTCIndex( unittest.TestCase ):
         self.assert_( t2 in self._idx.getTracks( av1 ) )
 
 
-class TestAddTrackCoordinator( unittest.TestCase ):
+class _Needs_Rewriting_TestAddTrackCoordinator( unittest.TestCase ):
     """Tests different scenarios of the Define Track Coord use case.
     """
 
@@ -965,7 +962,7 @@ class TestAddTrackCoordinator( unittest.TestCase ):
         self.assert_( self._track1 in self._conf.getCoordinatedTracks( tc1 ) )
 
 
-class TestRemoveTrackCoordinator( unittest.TestCase ):
+class _Needs_Rewriting_TestRemoveTrackCoordinator( unittest.TestCase ):
     """Tests different scenarios of the Remove Track Coord use case.
     """
 
@@ -997,7 +994,7 @@ class TestRemoveTrackCoordinator( unittest.TestCase ):
         self.assert_( self._track1 in self._conf.getCoordinatedTracks( tc2 ) )
 
 
-class TestContributionInclusion( unittest.TestCase ):
+class _Needs_Rewriting_TestContributionInclusion( unittest.TestCase ):
 
     def setUp( self ):
         from MaKaC.user import Avatar
@@ -1021,7 +1018,7 @@ class TestContributionInclusion( unittest.TestCase ):
         self.assert_( contrib1.getTrack() == None )
 
 #from testSessions.py
-class TestBasicManagement(unittest.TestCase):
+class _Needs_Rewriting_TestBasicManagement(unittest.TestCase):
     """Tests the basic contribution management functions
     """
 
@@ -1161,7 +1158,7 @@ class TestBasicManagement(unittest.TestCase):
         self.assert_(len(self._conf.getCoordinatedSessions(c2))==1)
 
 
-class TestSchedule(unittest.TestCase):
+class _Needs_Rewriting_TestSchedule(unittest.TestCase):
     """Tests the schedule management functions
     """
 
@@ -1312,17 +1309,24 @@ class TestSchedule(unittest.TestCase):
 
 
     def testSlots(self):
-        self._conf.setDates(datetime(2004,1,1,9,0,tzinfo=timezone('UTC')),datetime(2004,1,5,10,0,tzinfo=timezone('UTC')))
-        session1=Session()
-        session1.setStartDate(datetime(2004,1,1,9,0,tzinfo=timezone('UTC')))
-        session1.setDuration(hours=10,minutes=0)
+
+        self._conf.setDates(
+            datetime(2004,1,1,9,0,tzinfo=timezone('UTC')),
+            datetime(2004,1,5,10,0,tzinfo=timezone('UTC')))
+
+        session1 = Session()
+        session1.setStartDate(datetime(2004, 1, 1, 9, 0, tzinfo = timezone('UTC')))
+        session1.setDuration(hours = 10, minutes = 0)
         self._conf.addSession(session1)
-        slot1=SessionSlot(session1)
-        slot1.setDuration(hours=2,minutes=0)
+
+        slot1 = SessionSlot(session1)
+        slot1.setDuration(hours = 2, minutes = 0)
         session1.addSlot(slot1)
+
         self.assert_(slot1.getSessionSchEntry() in session1.getSchedule().getEntries())
         self.assert_(slot1.getStartDate()==session1.getStartDate())
         self.assert_(slot1.getDuration().seconds==7200)
+
         slot2=SessionSlot(session1)
         slot2.setDuration(hours=2,minutes=0)
         session1.addSlot(slot2)
@@ -1412,7 +1416,7 @@ class TestSchedule(unittest.TestCase):
         self.assert_(c2.isScheduled())
 
 
-class TestPosterSchedule(unittest.TestCase):
+class _Needs_Rewriting_TestPosterSchedule(unittest.TestCase):
     """Tests the schedule for posters like schedules management functions
     """
 
@@ -1485,7 +1489,7 @@ class TestPosterSchedule(unittest.TestCase):
         #self.assert_(p1.getStartDate()==datetime(2004,1,1,11,25,tzinfo=timezone('UTC')))
         #self.assert_(p2.getStartDate()==datetime(2004,1,1,11,25,tzinfo=timezone('UTC')))
 
-class TestCoordinatorsIndexComponent(unittest.TestCase):
+class _Needs_Rewriting_TestCoordinatorsIndexComponent(unittest.TestCase):
     """
     """
 
@@ -1525,7 +1529,7 @@ class TestCoordinatorsIndexComponent(unittest.TestCase):
 #from testWebInterface.py should be renamed to testContributions.py anyway
 """Contains tests regarding some scenarios related to contribution list display.
 """
-class TestContributionList(unittest.TestCase):
+class _Needs_Rewriting_TestContributionList(unittest.TestCase):
     """Tests the contribution list functions
     """
 

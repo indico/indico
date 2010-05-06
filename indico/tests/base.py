@@ -31,30 +31,47 @@ from MaKaC.common.db import DBMgr
 
 # Indico
 from indico.tests.util import TeeStringIO
-from indico.tests.config import TestsConfig
 
 
-class BaseTest(object):
-    #path to this current file
+class BaseTestRunner(object):
+    """
+    Base class for all other TestRunners.
+    A TestRunner runs a specific kind of test (i.e. UnitTestRunner)
+    """
+
+    # path to this current file
     setupDir = os.path.dirname(__file__)
 
     def __init__(self, **kwargs):
         self.options = kwargs
 
-    def _startStdErrCapture(self):
+    def _startIOCapture(self):
 
         if self.options['verbose']:
             # capture I/O but display it as well
-            self.outerr = TeeStringIO(sys.stderr)
+            self.err = TeeStringIO(sys.stderr)
+            self.out = TeeStringIO(sys.stdout)
         else:
             # just capture it
-            self.outerr = StringIO.StringIO()
-        sys.stderr = self.outerr
+            self.err = StringIO.StringIO()
+            self.out = StringIO.StringIO()
+        sys.stderr = self.err
+        sys.stdout = self.out
 
 
-    def _finishStdErrCapture(self):
+    def _finishIOCapture(self):
         sys.stderr = sys.__stderr__
-        return self.outerr.getvalue()
+        sys.stdout = sys.__stdout__
+
+        return (self.out.getvalue(),
+                self.err.getvalue())
+
+    def _redirectPipeToStdout(self, pipe):
+        while True:
+            data = pipe.readline()
+            if not data:
+                break
+            print data,
 
 
     def startMessage(self, message):

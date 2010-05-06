@@ -19,25 +19,19 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Contains tests regarding some scenarios related to submission and archiving
+"""
+Contains tests regarding some scenarios related to submission and archiving
 of files.
 """
 
 import unittest
-from MaKaC.common import DBMgr
 import os
-
-
-def setup_module():
-    DBMgr.getInstance().startRequest()
-
-def teardown_module():
-    DBMgr.getInstance().abort()
-    DBMgr.getInstance().endRequest()
+from indico.tests.env import *
 
 class TestMaterialRepository(unittest.TestCase):
-    """Tests the basic functionalities of the MaterialLocalRepository file
-        repository.
+    """
+    Tests the basic functionalities of the MaterialLocalRepository file
+    repository.
     """
 
     def setUp( self ):

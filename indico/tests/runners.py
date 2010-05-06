@@ -19,9 +19,8 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-
 # System modules
-import os, sys, subprocess, socket, shutil, signal, commands, tempfile
+import os, commands, subprocess, sys
 
 # Python stdlib
 import time, re
@@ -30,17 +29,10 @@ import time, re
 import nose, figleaf, figleaf.annotate_html
 from selenium import selenium
 
-# Database
-import transaction
-from MaKaC.common.db import DBMgr
+from indico.tests.config import TestConfig
+from indico.tests.base import BaseTestRunner
 
-# Indico
-from MaKaC.common.Configuration import Config
-
-from indico.tests.config import TestsConfig
-from indico.tests.base import BaseTest
-
-class Unit(BaseTest):
+class UnitTestRunner(BaseTestRunner):
 
     def run(self):
         returnString = ""
@@ -48,19 +40,18 @@ class Unit(BaseTest):
 
         result = False
 
-        coverage = Coverage.getInstance()
+        coverage = CoverageTestRunner.getInstance()
         if coverage != False:
             coverage.start()
 
-        self._startStdErrCapture()
+        self._startIOCapture()
 
         #retrieving tests from tests folder
-        args = ['nose', '--nologcapture', '--rednose', '--logging-clear-handlers', '-v', '-s',
-                os.path.join(self.setupDir, 'python', 'unit')]
+        args = ['nose', '--nologcapture',  '--logging-clear-handlers', \
+                '--with-id', '-v', '-s', os.path.join(self.setupDir, 'python', 'unit')]
         #retrieving tests from plugins folder
         for folder in self.walkThroughFolders(os.path.join(self.setupDir,
                                                            '..',
-                                                           'indico',
                                                            'MaKaC',
                                                            'plugins'),
                                               "/tests/python/unit"):
@@ -70,7 +61,7 @@ class Unit(BaseTest):
 
         if not self.options['verbose']:
             # restoring the stderr
-            s = self._finishStdErrCapture()
+            s = self._finishIOCapture()[1]
             returnString += self.writeReport("pyunit", s)
 
         if coverage:
@@ -85,7 +76,6 @@ class Unit(BaseTest):
     def walkThroughPluginsFolders(self):
         rootPluginsPath = os.path.join(self.setupDir,
                                        '..',
-                                       'indico',
                                        'MaKaC',
                                        'plugins')
         foldersArray = []
@@ -96,8 +86,8 @@ class Unit(BaseTest):
 
         return foldersArray
 
-class Coverage(BaseTest):
-    """This class is a singleton instantiate by Indicop class and
+class CoverageTestRunner(BaseTestRunner):
+    """This class is a singleton instantiate by TestRunner class and
     used by Python Unit tests.
     """
     __instance = None
@@ -130,10 +120,10 @@ class Coverage(BaseTest):
     instantiate = classmethod( instantiate )
 
 
-class Functional(BaseTest):
+class FunctionalTestRunner(BaseTestRunner):
 
     def __init__(self, **kwargs):
-        BaseTest.__init__(self, **kwargs)
+        BaseTestRunner.__init__(self, **kwargs)
         self.child = None
 
     def run(self):
@@ -145,7 +135,7 @@ class Functional(BaseTest):
                 return ('[ERR] Could not start functional tests because selenium'
                         ' server cannot be started.\n')
 
-            self._startStdErrCapture()
+            self._startIOCapture()
 
             #retrieving tests from tests folder
             args = ['nose', '--nologcapture', '--logging-clear-handlers', '-v',
@@ -153,7 +143,6 @@ class Functional(BaseTest):
             #retrieving tests from plugins folder
             for folder in self.walkThroughFolders(os.path.join(self.setupDir,
                                                                '..',
-                                                               'indico',
                                                                'MaKaC',
                                                                'plugins'),
                                                   "/tests/python/functional"):
@@ -167,7 +156,7 @@ class Functional(BaseTest):
             #restoring the stderr
             sys.stderr = sys.__stderr__
 
-        s = self._finishStdErrCapture()
+        s = self._finishIOCapture()[1]
         returnString += self.writeReport("pyfunctional", s)
 
         report = ""
@@ -181,7 +170,6 @@ class Functional(BaseTest):
     def walkThroughPluginsFolders(self):
         rootPluginsPath = os.path.join(self.setupDir,
                                        '..',
-                                       'indico',
                                        'MaKaC',
                                        'plugins')
         foldersArray = []
@@ -230,7 +218,7 @@ class Functional(BaseTest):
         self.child.kill()
 
 
-class Specify(Functional):
+class Specify(FunctionalTestRunner):
     def __init__(self, specifyArg):
         self.specify = specifyArg
 
@@ -269,11 +257,11 @@ def raise_timeout(signum, frame):
     raise TimeoutException("15sec Timeout")
 
 
-class Grid(BaseTest):
+class GridTestRunner(BaseTestRunner):
 
     def __init__(self, **kwargs):
 
-        BaseTest.__init__(self, **kwargs)
+        BaseTestRunner.__init__(self, **kwargs)
 
         try:
             self.hubEnv = TestsConfig.getInstance().getHubEnv()
@@ -307,7 +295,7 @@ class Grid(BaseTest):
                 #disable the alarm signal
                 signal.alarm(0)
 
-                self._startStdErrCapture()
+                self._startIOCapture()
 
                 returnString = ""
                 for env in self.hubEnv:
@@ -324,7 +312,7 @@ class Grid(BaseTest):
                         returnString += ("[FAIL] Functional (%s) tests - report in"
                                 " tests/report/pygrid.txt\n") % env
 
-                s = self._finishStdErrCapture()
+                s = self._finishIOCapture()[1]
 
                 returnString += self.writeReport("pygrid", s)
             except socket.error:
@@ -340,14 +328,14 @@ class Grid(BaseTest):
 
         return returnString
 
-class GridData(BaseTest):
+class GridDataTestRunner(BaseTestRunner):
     """Provide informations for selenium grid, data are set from Class Grid
     and are used by seleniumTestCase.py.
     Because nosetest cannot forward the arguments to selenium grid."""
 
     __instance = None
     def __init__(self, **kwargs):
-        BaseTest.__init__(self, **kwargs)
+        BaseTestRunner.__init__(self, **kwargs)
         self.active = None
         self.url = None
         self.port = None
@@ -379,33 +367,46 @@ class GridData(BaseTest):
         return cls.__instance
 
 
-class Pylint(BaseTest):
+class PylintTestRunner(BaseTestRunner):
     def run(self):
         returnString = ""
         self.startMessage("Starting pylint tests")
 
-        statusOutput = commands.getstatusoutput("pylint --rcfile=%s %s" %
-                                                (os.path.join(self.setupDir,
-                                                              'python',
-                                                              'pylint',
-                                                              'pylint.conf'),
-                                                os.path.join(self.setupDir,
-                                                             '..',
-                                                             'indico',
-                                                             'MaKaC')))
-        if statusOutput[1].find("pylint: not found") > -1:
+        self._startIOCapture()
+
+        baseDir = os.path.join(self.setupDir, '..')
+
+        filePaths = map(lambda s: s.replace('.', os.sep)+".py",
+                        TestConfig.getInstance().getPylintFiles())
+
+        fileList = list(os.path.join(baseDir, f) for f in filePaths)
+
+        try:
+            pylintProcess = subprocess.Popen(
+                ["pylint", "--rcfile=%s" % os.path.join(self.setupDir,
+                                                         'python',
+                                                         'pylint',
+                                                         'pylint.conf'),
+                ] + fileList,
+                stdout = subprocess.PIPE,
+                stderr = subprocess.STDOUT)
+
+            self._redirectPipeToStdout(pylintProcess.stdout)
+        except OSError, e:
+            self._finishIOCapture()
             return ("[ERR] Could not start Source Analysis - "
-                    "command \"pylint\" needs to be in your PATH. (%s)\n" %
-                                                                statusOutput[1])
-        else:
-            returnString += self.writeReport("pylint", statusOutput[1])
-            return returnString + "PY Lint - report in tests/report/pylint.txt\n"
+                    "command \"pylint\" needs to be in your PATH. (%s)\n" % e)
+
+        statusOutput = self._finishIOCapture()
+
+        returnString += self.writeReport("pylint", statusOutput[0])
+        return returnString + "PY Lint - report in indico/tests/report/pylint.txt\n"
 
 
-class Jsunit(BaseTest):
+class JSUnitTestRunner(BaseTestRunner):
 
     def __init__(self, **kwargs):
-        BaseTest.__init__(self, **kwargs)
+        BaseTestRunner.__init__(self, **kwargs)
         self.coverage = self.options['coverage']
         self.specify = self.options['specify']
 
@@ -424,7 +425,7 @@ class Jsunit(BaseTest):
                                                     'javascript',
                                                     'unit',
                                                     TestsConfig.getInstance().
-                                                    getJsunitFilename()),
+                                                    getJSUnitFilename()),
                                         "--port",
                                         "9876",
                                         "--browser",
@@ -450,7 +451,7 @@ class Jsunit(BaseTest):
                                              "%s"
                                              " --tests Fake.dryRun") %\
                                              (TestsConfig.getInstance().
-                                              getJsunitFilename(),
+                                              getJSUnitFilename(),
                                               confFile))
                 if jsDryRun[1].startswith("No browsers were captured"):
                     print ("Js-test-driver server has not started yet. "
@@ -473,7 +474,7 @@ class Jsunit(BaseTest):
             command = ("java -jar %s "
                             "--config %s "
                             "--tests %s ") % \
-                            (TestsConfig.getInstance().getJsunitFilename(),
+                            (TestsConfig.getInstance().getJSUnitFilename(),
                              confFile,
                              toTest)
             if self.coverage:
@@ -530,7 +531,7 @@ class Jsunit(BaseTest):
             return ("[ERR] Could not start js-test-driver server - command "
                     "\"java\" needs to be in your PATH. (%s)\n" % e)
         except KeyError:
-            return "[ERR] Please specify a JsunitFilename in tests.conf\n"
+            return "[ERR] Please specify a JSUnitFilename in tests.conf\n"
 
         #stopping the server
         server.kill()
@@ -609,7 +610,7 @@ class Jsunit(BaseTest):
         except IOError, e:
             return "[ERR] JS Unit Tests - Could not open a file. (%s)" % e
 
-class Jslint(BaseTest):
+class JSLintTestRunner(BaseTestRunner):
 
     def run(self):
         returnString = ""
@@ -681,232 +682,3 @@ class Jslint(BaseTest):
                                                                 filename))
                     returnString += output[1]
         return returnString
-
-
-class Indicop(object):
-    __instance = None
-
-    def __init__(self):
-        self.dbmgr = None
-        self.zeoServer = None
-
-        #define the set of tests
-        self.testsDict = {'unit': Unit,
-                 'functional': Functional,
-                 'pylint': Pylint,
-                 'jsunit': Jsunit,
-                 'jslint': Jslint,
-                 'grid': Grid}
-
-
-    def main(self, FakeDBManaging, testsToRun, options):
-
-        returnString = "\n\n=============== ~INDICOP SAYS~ ===============\n\n"
-
-        #To not pollute the installation of Indico
-        self.configureTempFolders()
-
-
-        self.startManageDB(FakeDBManaging)
-
-        if options['coverage']:
-            Coverage.instantiate()
-
-        #specified test can either be unit or functional.
-        if options['specify']:
-            returnString += Specify(options['specify']).run()
-        else:
-            for test in testsToRun:
-                if test in self.testsDict:
-                    print test
-                    returnString += self.testsDict[test](**options).run()
-                else:
-                    returnString += ("[ERR] Test set '%s' does not exist. "
-                      "It has to be added in the testsDict variable\n") % test
-
-
-        self.stopManageDB(FakeDBManaging)
-
-        return returnString
-
-    def configureTempFolders(self):
-        keyNames = [#'LogDir',
-                    'ArchiveDir',
-                    'UploadedFilesTempDir']
-        self.newValues = {}
-
-        for key in keyNames:
-            self.newValues[key] = tempfile.mkdtemp()
-
-        Config.getInstance().updateValues(self.newValues)
-
-    def deleteTempFolders(self):
-        for k in self.newValues:
-            shutil.rmtree(self.newValues[k])
-
-################## Start of DB Managing functions ##################
-    def startManageDB(self, FakeDBManaging):
-        """FakeDBManaging == 0, the tests to run do not need any DB
-        FakeDBManaging == 1, unit tests need a fake DB that can be run in parallel
-        of the production DB
-        FakeDBManaging == 2, production DB is not running and functional tests
-        need fake DB which is going to be run on production port.
-        FakeDBManaging == 3, production DB is running, we need to stop it and
-        and start a fake DB on the production port. we will restart production DB"""
-        if FakeDBManaging == 1:
-            self.startFakeDB(TestsConfig.getInstance().getFakeDBPort())
-            self.createDummyUser()
-        elif FakeDBManaging == 2:
-            self.startFakeDB(Config.getInstance().getDBConnectionParams()[1])
-            self.createDummyUser()
-        elif FakeDBManaging == 3:
-            self.stopProductionDB()
-            self.startFakeDB(Config.getInstance().getDBConnectionParams()[1])
-            self.createDummyUser()
-
-    def stopManageDB(self, FakeDBManaging):
-        if FakeDBManaging == 1 or FakeDBManaging == 2:
-            self.stopFakeDB()
-            self.restoreDBInstance()
-        elif FakeDBManaging == 3:
-            self.stopFakeDB()
-            self.startProductionDB()
-            self.restoreDBInstance()
-
-    def startFakeDB(self, zeoPort):
-        self.createNewDBFile()
-        self.zeoServer = self.createDBServer(os.path.join(self.dbFolder, "Data.fs"),
-                                             zeoPort)
-        DBMgr.setInstance(DBMgr(hostname="localhost", port=zeoPort))
-
-    def stopFakeDB(self):
-        try:
-            os.kill(self.zeoServer, signal.SIGINT)
-        except OSError, e:
-            print ("Problem sending kill signal: " + str(e))
-
-        try:
-            os.waitpid(self.zeoServer, 0)
-            self.removeDBFile()
-        except OSError, e:
-            print ("Problem waiting for ZEO Server: " + str(e))
-
-    def restoreDBInstance(self):
-        DBMgr.setInstance(None)
-
-    def startProductionDB(self):
-        try:
-            commands.getstatusoutput(TestsConfig.getInstance().getStartDBCmd())
-        except KeyError:
-            print "[ERR] Not found in tests.conf: command to start production DB\n"
-            sys.exit(1)
-
-    def stopProductionDB(self):
-        try:
-            commands.getstatusoutput(TestsConfig.getInstance().getStopDBCmd())
-        except KeyError:
-            print "[ERR] Not found in tests.conf: command to stop production DB\n"
-            sys.exit(1)
-
-    def createNewDBFile(self):
-        from ZODB import FileStorage, DB
-        savedDir = os.getcwd()
-        self.dbFolder = tempfile.mkdtemp()
-        os.chdir(self.dbFolder)
-
-        storage = FileStorage.FileStorage("Data.fs")
-        db = DB(storage)
-        connection = db.open()
-        dbroot = connection.root()
-
-        transaction.commit()
-
-        connection.close()
-        db.close()
-        storage.close()
-        os.chdir(savedDir)
-
-    def removeDBFile(self):
-        shutil.rmtree(self.dbFolder)
-
-    def createDBServer(self, file, port):
-        """
-        Creates a fake DB server for testing
-        """
-
-        pid = os.fork()
-        if pid:
-            return pid
-        else:
-            # run a DB in a child process
-            from indico.tests.util import TestZEOServer
-            server = TestZEOServer(port, file)
-            server.start()
-
-################## End of DB Managing functions ##################
-
-    def createDummyUser(self):
-        from MaKaC import user
-        from MaKaC.authentication import AuthenticatorMgr
-        from MaKaC.common import HelperMaKaCInfo
-        from MaKaC.common import indexes
-        DBMgr.getInstance().startRequest()
-
-        #filling info to new user
-        avatar = user.Avatar()
-        avatar.setName( "fake" )
-        avatar.setSurName( "fake" )
-        avatar.setOrganisation( "fake" )
-        avatar.setLang( "en_US" )
-        avatar.setEmail( "fake@fake.fake" )
-
-        #registering user
-        ah = user.AvatarHolder()
-        ah.add(avatar)
-
-        #setting up the login info
-        li = user.LoginInfo( "dummyuser", "dummyuser" )
-        ih = AuthenticatorMgr()
-        userid = ih.createIdentity( li, avatar, "Local" )
-        ih.add( userid )
-
-        #activate the account
-        avatar.activateAccount()
-
-        #since the DB is empty, we have to add dummy user as admin
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        al = minfo.getAdminList()
-        al.grant( avatar )
-
-        DBMgr.getInstance().endRequest()
-
-    def deleteDummyUser(self):
-        from MaKaC import user
-        from MaKaC.authentication import AuthenticatorMgr
-        from MaKaC.common import HelperMaKaCInfo
-        from MaKaC.common import indexes
-        DBMgr.getInstance().startRequest()
-
-        #removing user from admin list
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        al = minfo.getAdminList()
-        ah = user.AvatarHolder()
-        avatar = ah.match({'email':'fake@fake.fake'})[0]
-        al.revoke( avatar )
-
-        #remove the login info
-        userid = avatar.getIdentityList()[0]
-        ih = AuthenticatorMgr()
-        ih.removeIdentity(userid)
-
-        #unregistering the user info
-        index = indexes.IndexesHolder().getById("email")
-        index.unindexUser(avatar)
-        index = indexes.IndexesHolder().getById("name")
-        index.unindexUser(avatar)
-        index = indexes.IndexesHolder().getById("surName")
-        index.unindexUser(avatar)
-        index = indexes.IndexesHolder().getById("organisation")
-        index.unindexUser(avatar)
-        index = indexes.IndexesHolder().getById("status")
-        index.unindexUser(avatar)
