@@ -63,6 +63,12 @@ class TeeStringIO(StringIO):
         self.seek(0)
         self.__outStream.write(StringIO.read(self, n=n))
 
+def openBrowser(browserPath, filePath):
+    """
+    Open a browser window with an HTML document
+    """
+    os.system("%s %s" % (browserPath, filePath))
+
 # pylint: disable-msg=W0611
 
 try:

@@ -313,6 +313,7 @@ class test_indico(Command):
                     ('jscoverage', None, "Output coverage report in html for js"),
                     ('jsspecify=', None, "Use js-test-driver style (TestCaseName.testName)"),
                     ('grid', None, "Use Selenium Grid"),
+                    ('html', None, "Make an HTML report (when possible)"),
                     ('full-output', None, "Write the results to the console, in addition to the log file")]
     boolean_options = []
 
@@ -327,6 +328,7 @@ class test_indico(Command):
     jsspecify = None
     grid = None
     full_output = None
+    html = None
 
     def initialize_options(self):
         pass
@@ -364,6 +366,7 @@ class test_indico(Command):
 
 
         options = {'verbose': self.full_output,
+                   'html': self.html,
                    'specify': self.specify,
                    'coverage': self.coverage}
 

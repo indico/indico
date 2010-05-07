@@ -34,7 +34,7 @@ This module defines the TestRunners that are included by default by indico.tests
 """
 
 # System modules
-import commands, os, signal, socket, subprocess, sys
+import commands, os, signal, socket, subprocess, sys, tempfile
 
 # Python stdlib
 import time, re
@@ -45,6 +45,7 @@ from selenium import selenium
 
 from indico.tests.config import TestConfig
 from indico.tests.base import BaseTestRunner
+from indico.tests.util import openBrowser
 
 __all__ = [
     'UnitTestRunner',
@@ -467,22 +468,35 @@ class PylintTestRunner(BaseTestRunner):
     """
 
     def _run(self):
+
+        htmlReport = self.options['html']
         returnString = ""
-
-        import pylint.lint
-
-        fileList = TestConfig.getInstance().getPylintFiles()
+        fileList = self.config.getPylintFiles()
 
         self._startIOCapture()
 
         try:
-            pylint.lint.Run(
-                ["--rcfile=%s" % os.path.join(self.setupDir,
-                                              'python',
-                                              'pylint',
-                                              'pylint.conf'),
-                 ] + fileList)
+            # while we have MaKaC, we have to keep this extra path
+            extraPath = os.path.join(self.setupDir, '..')
+            os.environ['PYTHONPATH'] = "%s:%s" % (extraPath,
+                                                  os.environ.get('PYTHONPATH',''))
 
+            args = ["pylint", "--rcfile=%s" %
+                    os.path.join(self.setupDir,
+                                 'python',
+                                 'pylint',
+                                 'pylint.conf')
+                    ] + fileList
+
+            if htmlReport:
+                args += ['-f', 'html']
+
+            pylintProcess = subprocess.Popen(
+                args,
+                stdout = subprocess.PIPE,
+                stderr = subprocess.PIPE)
+
+            self._redirectPipeToStdout(pylintProcess.stdout)
         except OSError, e:
             self._finishIOCapture()
             return ("[ERR] Could not start Source Analysis - "
@@ -490,8 +504,18 @@ class PylintTestRunner(BaseTestRunner):
 
         statusOutput = self._finishIOCapture()
 
-        returnString += self.writeReport("pylint", statusOutput[0])
-        return returnString + "PY Lint - report in indico/tests/report/pylint.txt\n"
+        if htmlReport:
+            __, filePath = tempfile.mkstemp()
+            tmpFile = open(filePath, 'w+b')
+            tmpFile.write(statusOutput[0])
+            tmpFile.close()
+
+            # open a browser window with the report
+            openBrowser(self.config.getBrowserPath(), filePath)
+            return ""
+        else:
+            returnString += self.writeReport("pylint", statusOutput[0])
+            return returnString + "PY Lint - report in indico/tests/report/pylint.txt\n"
 
 
 class JSUnitTestRunner(BaseTestRunner):

@@ -32,7 +32,7 @@ import StringIO
 
 # Indico
 from indico.tests.util import TeeStringIO, colored
-
+from indico.tests.config import TestConfig
 
 class BaseTestRunner(object):
     """
@@ -54,6 +54,9 @@ class BaseTestRunner(object):
         self.options = kwargs
         self.err = None
         self.out = None
+
+        # make a TestConfig instance available everywhere
+        self.config = TestConfig.getInstance()
 
     def _run(self):
         """

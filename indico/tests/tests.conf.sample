@@ -7,6 +7,11 @@
 # Lines starting with "#" are comments and they will be ignored by the test framework.
 
 #------------------------------------------------------------------------------
+# General Options
+#------------------------------------------------------------------------------
+BrowserPath = "/usr/bin/firefox"
+
+#------------------------------------------------------------------------------
 # Start/Stop Production DB commands
 #------------------------------------------------------------------------------
 StartDBCmd = "/usr/bin/python /usr/local/lib/python2.6/dist-packages/zdaemon-2.0.4-py2.6.egg/zdaemon/zdctl.py -C /home/jeremy/cds-indico/etc/zdctl.conf start"
