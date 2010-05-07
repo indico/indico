@@ -19,6 +19,20 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+This module defines the TestRunners that are included by default by indico.tests:
+
+ * UnitTestRunner
+ * CoverageTestRunner
+ * FunctionalTestRunner
+ * SpecificFunctionalTestRunner
+ * GridTestRunner
+ * PylintTestRunner
+ * JSLintTestRunner
+ * JSUnitTestRunner
+
+"""
+
 # System modules
 import commands, os, signal, socket, subprocess, sys
 
@@ -90,6 +104,10 @@ class UnitTestRunner(BaseTestRunner):
                 "[FAIL] Unit tests - report in indico/tests/report/pyunit.txt\n"
 
     def walkThroughPluginsFolders(self):
+        """
+        Goes throught the plugin directories, and adds
+        existing unit test dirs
+        """
         rootPluginsPath = os.path.join(self.setupDir,
                                        '..',
                                        'MaKaC',
@@ -113,31 +131,43 @@ class CoverageTestRunner(BaseTestRunner):
     __instance = None
 
     def start(self):
+        """
+        starts figleaf
+        """
         figleaf.start()
 
     def stop(self):
+        """
+        stops figleaf and returns a report
+        """
         figleaf.stop()
         coverageOutput = figleaf.get_data().gather_files()
         coverageDir = os.path.join(self.setupDir, 'report', 'pycoverage')
-        try:
-            figleaf.annotate_html.report_as_html(coverageOutput,
-                                                 coverageDir, [], {})
-        except IOError:
+
+        # check if there's a dir first
+        if not os.path.exists(coverageDir):
             os.mkdir(coverageDir)
-            figleaf.annotate_html.report_as_html(coverageOutput,
-                                                 coverageDir, [], {})
+
+        figleaf.annotate_html.report_as_html(coverageOutput,
+                                             coverageDir, [], {})
         return ("PY Coverage - Report generated in "
                              "tests/report/pycoverage/index.html\n")
 
     def getInstance(cls):
+        """
+        returns a singleton instance
+        """
         if cls.__instance == None:
             return False
         return cls.__instance
     getInstance = classmethod( getInstance )
 
+    @classmethod
     def instantiate(cls):
+        """
+        create an instance of the class (singleton)
+        """
         cls.__instance = CoverageTestRunner()
-    instantiate = classmethod( instantiate )
 
 
 class FunctionalTestRunner(BaseTestRunner):
@@ -190,6 +220,10 @@ class FunctionalTestRunner(BaseTestRunner):
         return report
 
     def walkThroughPluginsFolders(self):
+        """
+        Goes throught the plugin directories, and adds
+        existing functional test dirs
+        """
         rootPluginsPath = os.path.join(self.setupDir, '..', 'MaKaC', 'plugins')
         foldersArray = []
 
@@ -200,6 +234,9 @@ class FunctionalTestRunner(BaseTestRunner):
         return foldersArray
 
     def startSeleniumServer(self):
+        """
+        starts the selenium server
+        """
         started = True
         try:
             self.child = subprocess.Popen(["java", "-jar",
@@ -234,6 +271,9 @@ class FunctionalTestRunner(BaseTestRunner):
         return started
 
     def stopSeleniumServer(self):
+        """
+        stops the selenium server
+        """
         self.child.kill()
 
 
@@ -242,7 +282,8 @@ class SpecificFunctionalTestRunner(FunctionalTestRunner):
     Specific Functional Test
     """
 
-    def __init__(self, specifyArg):
+    def __init__(self, specifyArg, **kwargs):
+        FunctionalTestRunner.__init__(self)
         self.specify = specifyArg
 
     def _run(self):
@@ -363,25 +404,58 @@ class GridDataTestRunner(BaseTestRunner):
         self.currentEnv = None
 
     def isActive(self):
+        """
+        returns True if the grid is active, False otherwise
+        """
         return self.active
+
     def getUrl(self):
+        """
+        returns the hub URL
+        """
         return self.url
+
     def getPort(self):
+        """
+        returns the hub port
+        """
         return self.port
+
     def getEnv(self):
+        """
+        returns the current running environment
+        """
         return self.currentEnv
 
     def setActive(self, active):
+        """
+        sets the active status for the grid
+        """
         self.active = active
+
     def setUrl(self, url):
+        """
+        sets the hub url
+        """
         self.url = url
+
     def setPort(self, port):
+        """
+        sets the hub port
+        """
         self.port = port
+
     def setEnv(self, env):
+        """
+        sets the current running environment
+        """
         self.currentEnv = env
 
     @classmethod
     def getInstance(cls):
+        """
+        gets a class instance (singleton)
+        """
         if cls.__instance == None:
             cls.__instance = GridDataTestRunner()
         return cls.__instance
@@ -395,26 +469,20 @@ class PylintTestRunner(BaseTestRunner):
     def _run(self):
         returnString = ""
 
+        import pylint.lint
+
+        fileList = TestConfig.getInstance().getPylintFiles()
+
         self._startIOCapture()
 
-        baseDir = os.path.join(self.setupDir, '..')
-
-        filePaths = map(lambda s: s.replace('.', os.sep)+".py",
-                        TestConfig.getInstance().getPylintFiles())
-
-        fileList = list(os.path.join(baseDir, f) for f in filePaths)
-
         try:
-            pylintProcess = subprocess.Popen(
-                ["pylint", "--rcfile=%s" % os.path.join(self.setupDir,
-                                                         'python',
-                                                         'pylint',
-                                                         'pylint.conf'),
-                ] + fileList,
-                stdout = subprocess.PIPE,
-                stderr = subprocess.STDOUT)
+            pylint.lint.Run(
+                ["--rcfile=%s" % os.path.join(self.setupDir,
+                                              'python',
+                                              'pylint',
+                                              'pylint.conf'),
+                 ] + fileList)
 
-            self._redirectPipeToStdout(pylintProcess.stdout)
         except OSError, e:
             self._finishIOCapture()
             return ("[ERR] Could not start Source Analysis - "
@@ -567,6 +635,9 @@ class JSUnitTestRunner(BaseTestRunner):
         return coverageReport + report
 
     def buildConfFile(self, confFilePath, coverage):
+        """
+        Builds a jslint config file
+        """
         confTemplatePath = os.path.join(self.setupDir,
                                         'javascript',
                                         'unit',
@@ -689,6 +760,9 @@ class JSLintTestRunner(BaseTestRunner):
         return returnString + "JS Lint - report in tests/report/jslint.txt\n"
 
     def runJSLint(self, path, folderRestriction=''):
+        """
+        runs the actual JSLint command
+        """
         returnString = ""
         for root, __, files in os.walk(os.path.join(self.setupDir,
                                                     path,
@@ -713,4 +787,7 @@ class TimeoutException(Exception):
     pass
 
 def raiseTimeout(__, ___):
+    """
+    handler for the timeout signal
+    """
     raise TimeoutException("15sec Timeout")

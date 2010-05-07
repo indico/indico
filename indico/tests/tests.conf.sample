@@ -24,12 +24,7 @@ FakeDBPort = 9686
 #------------------------------------------------------------------------------
 PylintFiles        =   ["MaKaC.common.contextManager",
                         "MaKaC.common.fossilize",
-                        "tests.runners",
-                        "tests.__init__",
-                        "tests.core",
-                        "tests.config",
-                        "tests.base"]
-
+                        "indico.tests"]
 
 JSUnitURL          = "http://js-test-driver.googlecode.com/files/JsTestDriver-1.2.jar"
 JSUnitFilename     = "JsTestDriver-1.2.jar"

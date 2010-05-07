@@ -25,15 +25,35 @@ storing runtime information
 
 import threading
 
-class ContextManager:
+class ContextManager(object):
+    """
+    A context manager provides a global access namespace (singleton) for storing
+    run-time information.
+    """
+
+    def __init__(self):
+        pass
 
     class NoContextException(Exception):
+        """
+        Thrown where there is no Context currently defined
+        """
         pass
 
 
     class DummyContext:
+        """
+        A context that doesn't react, much like a Null Object
+        """
 
-        def _dummyMethod(*args, **kwargs):
+        def __init__(self):
+            pass
+
+        def _dummyMethod(*args, **__):
+            """
+            this method just does nothing, accepting
+            whatever arguments are passed to it
+            """
             return None
 
         def __getattr__(self, name):
@@ -45,6 +65,10 @@ class ContextManager:
 
     @classmethod
     def _getContextDict(cls):
+        """
+        Retrieve the corresponding dictionary for the current
+        context
+        """
         if not hasattr(cls, 'contextDict'):
             cls.contextDict = {}
         return cls.contextDict
@@ -68,11 +92,17 @@ class ContextManager:
 
     @classmethod
     def destroy(cls):
+        """
+        destroy the context
+        """
         tid = threading._get_ident()
         del cls._getContextDict()[tid]
 
     @classmethod
     def create(cls):
+        """
+        create the context
+        """
         cls._getThreadContext(forceCleanup=True)
 
     @classmethod
@@ -111,6 +141,9 @@ class ContextManager:
 
     @classmethod
     def set(cls, name, value):
+        """
+        Set the 'name' entry to 'value'
+        """
         try:
             cls._getThreadContext()[name] = value
         except cls.NoContextException:

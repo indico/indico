@@ -19,6 +19,8 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+# pylint: disable-msg=C0103,C0111
+
 """
 This module contains a basic setup for unit tests that
 should be included from each file

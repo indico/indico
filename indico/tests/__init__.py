@@ -21,6 +21,17 @@
 
 # pylint: disable-msg=W0611
 
+"""
+indico.tests provides a common framework for all the different libraries and
+technologies used for different types of testing.
+
+ * Python/JS Unit Tests - using nosetest and JSUnit
+ * Python Coverage Tests - using figleaf
+ * Functional Tests - using selenium and selenium grid
+ * Code conventions, standards, smells - Pylint and JSlint
+
+"""
+
 # API classes
 from indico.tests.config import TestConfig
 from indico.tests.core import TestManager, UnitTestRunner, TEST_RUNNERS

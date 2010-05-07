@@ -19,6 +19,11 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+This module provides a skeleton of a test runner (BaseTestRunner) that all the
+other TestRunners should inherit from.
+"""
+
 # System modules
 import os, sys
 
@@ -39,11 +44,29 @@ class BaseTestRunner(object):
     setupDir = os.path.dirname(__file__)
 
     def __init__(self, **kwargs):
+        """
+        Options can be passed as kwargs, currently the following is supported:
+
+         * verbose - if the output should be redirected to the console in
+        addition to the log file;
+        """
+
         self.options = kwargs
         self.err = None
         self.out = None
 
+    def _run(self):
+        """
+        This method should be overloaded by inheriting classes.
+        It should provide the code that executes the actual tests,
+        returning output information.
+        """
+        pass
+
     def run(self):
+        """
+        Executes the actual test code
+        """
         # get the description from the first lines
         # of the docstring
         description =  self.__doc__.strip().split('\n')[0]
@@ -53,6 +76,11 @@ class BaseTestRunner(object):
         return self._run()
 
     def _startIOCapture(self):
+        """
+        Start capturing stdout and stderr to StringIOs
+        If options['verbose'] has been set, the data will be output to the
+        stdout/stderr as well
+        """
 
         if self.options['verbose']:
             # capture I/O but display it as well
@@ -67,6 +95,9 @@ class BaseTestRunner(object):
 
 
     def _finishIOCapture(self):
+        """
+        Restore stdout/stderr and return the captured data
+        """
         sys.stderr = sys.__stderr__
         sys.stdout = sys.__stdout__
 
@@ -75,6 +106,9 @@ class BaseTestRunner(object):
 
     @staticmethod
     def _redirectPipeToStdout(pipe):
+        """
+        Redirect a given pipe to stdout
+        """
         while True:
             data = pipe.readline()
             if not data:
@@ -82,6 +116,9 @@ class BaseTestRunner(object):
             print data,
 
     def writeReport(self, filename, content):
+        """
+        Write the test report, using the filename and content that are passed
+        """
         try:
             f = open(os.path.join(self.setupDir, 'report', filename + ".txt"), 'w')
             f.write(content)
@@ -93,7 +130,9 @@ class BaseTestRunner(object):
 
     @staticmethod
     def walkThroughFolders(rootPath, foldersPattern):
-        """scan a directory and return folders which match the pattern"""
+        """
+        Scan a directory and return folders which match the pattern
+        """
 
         rootPluginsPath = os.path.join(rootPath)
         foldersArray = []

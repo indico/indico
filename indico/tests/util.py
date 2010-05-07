@@ -19,40 +19,58 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+This module defines some utility classes for the testing framework,
+such as a wrapper for ZEOServer that allows a "test" server to be created
+"""
 
 import os
 from StringIO import StringIO
 
 from ZEO.runzeo import ZEOOptions, ZEOServer
 
-class TestZEOServer:
 
+class TestZEOServer:
+    """
+    Creates a standalone ZEO server for tests
+    """
     def __init__(self, port, fd):
-        self.options = ZEOOptions();
-        self.options.realize(['-f',fd,'-a','localhost:%d' % port])
+        self.options = ZEOOptions()
+        self.options.realize(['-f', fd, '-a', 'localhost:%d' % port])
         self.server = ZEOServer(self.options)
 
     def start(self):
+        """
+        Actually starts the server
+        """
         print "spawning server on PID %s" % os.getpid()
         self.server.main()
 
+
 class TeeStringIO(StringIO):
+    """
+    Wrapper for StringIO that writes to an output stream as well
+    """
+    def __init__(self, out):
+        self.__outStream =  out
+        StringIO.__init__(self)
 
-     def __init__(self, out):
-         self.__outStream =  out
-         StringIO.__init__(self)
+    def write(self, string):
+        self.__outStream.write(string)
+        StringIO.write(self, string)
 
-     def write(self, string):
-         self.__outStream.write(string)
-         StringIO.write(self, string)
+    def read(self, n=-1):
+        self.seek(0)
+        self.__outStream.write(StringIO.read(self, n=n))
 
-     def read(self):
-         self.seek(0)
-         self.__outStream.write(StringIO.read(self))
-
+# pylint: disable-msg=W0611
 
 try:
     from termcolor import colored
-except:
+except ImportError:
     def colored(text, *__, **___):
+        """
+        just a dummy function that returns the same string
+        (in case termcolor is not available)
+        """
         return text

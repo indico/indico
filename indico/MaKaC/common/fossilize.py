@@ -31,7 +31,7 @@ Some of the features are:
 import inspect
 import re
 import zope.interface
-from types import NoneType, ClassType, TypeType
+from types import NoneType
 
 
 def fossilizes(*classList):

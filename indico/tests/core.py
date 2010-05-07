@@ -19,6 +19,13 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+# pylint: disable-msg=W0401
+
+"""
+This is the very core of indico.tests
+Here is defined the TestManager class, that provides a single point of access
+to the outside world.
+"""
 
 # System modules
 import os, sys, shutil, signal, commands, tempfile
@@ -51,20 +58,30 @@ class TestManager(object):
     __instance = None
 
     def __init__(self):
+        """
+        Initializes the object
+        """
         self.dbmgr = None
         self.zeoServer = None
         self.tempDirs = {}
         self.dbFolder = None
 
     def main(self, fakeDBPolicy, testsToRun, options):
+        """
+        Runs the main test cycle, iterating over all the TestRunners available
+
+         * fakeDBPolicy - see startManageDB()
+         * testsToRun - a list of strings specifying which tests to run
+         * options - test options (such as verbosity...)
+        """
 
         returnString = "\n\n%s\n\n" % colored('** Results', 'blue', attrs = ['bold'])
 
         #To not pollute the installation of Indico
-        self.configureTempFolders()
+        self._configureTempFolders()
 
 
-        self.startManageDB(fakeDBPolicy)
+        self._startManageDB(fakeDBPolicy)
 
         if options['coverage']:
             CoverageTestRunner.instantiate()
@@ -82,11 +99,17 @@ class TestManager(object):
                     % test
 
 
-        self.stopManageDB(fakeDBPolicy)
+        self._stopManageDB(fakeDBPolicy)
+
+        self._deleteTempFolders()
 
         return returnString
 
-    def configureTempFolders(self):
+    def _configureTempFolders(self):
+        """
+        Creates temporary directories for the archive and uploaded files
+        """
+
         keyNames = [#'LogDir',
                     'ArchiveDir',
                     'UploadedFilesTempDir']
@@ -96,51 +119,65 @@ class TestManager(object):
 
         Config.getInstance().updateValues(self.tempDirs)
 
-    def deleteTempFolders(self):
+    def _deleteTempFolders(self):
+        """
+        Deletes the temporary folders
+        """
         for k in self.tempDirs:
             shutil.rmtree(self.tempDirs[k])
 
 ################## Start of DB Managing functions ##################
-    def startManageDB(self, fakeDBPolicy):
+    def _startManageDB(self, fakeDBPolicy):
         """
-        fakeDBPolicy == 0, the tests to run do not need any DB
-        fakeDBPolicy == 1, unit tests need a fake DB that can be run in parallel
+        Stops the production DB (if needed) and starts a temporary / fake DB
+
+        * fakeDBPolicy == 0, the tests to run do not need any DB
+        * fakeDBPolicy == 1, unit tests need a fake DB that can be run in parallel
         with the production DB
-        fakeDBPolicy == 2, production DB is not running and functional tests
+        * fakeDBPolicy == 2, production DB is not running and functional tests
         need fake DB which is going to be run on production port.
         fakeDBPolicy == 3, production DB is running, we need to stop it and
         and start a fake DB on the production port. we will restart production DB
         """
 
         if fakeDBPolicy == 1:
-            self.startFakeDB(TestConfig.getInstance().getFakeDBPort())
-            TestManager.createDummyUser()
+            self._startFakeDB(TestConfig.getInstance().getFakeDBPort())
+            TestManager._createDummyUser()
         elif fakeDBPolicy == 2:
-            self.startFakeDB(Config.getInstance().getDBConnectionParams()[1])
-            TestManager.createDummyUser()
+            self._startFakeDB(Config.getInstance().getDBConnectionParams()[1])
+            TestManager._createDummyUser()
         elif fakeDBPolicy == 3:
-            TestManager.stopProductionDB()
-            self.startFakeDB(Config.getInstance().getDBConnectionParams()[1])
-            TestManager.createDummyUser()
+            TestManager._stopProductionDB()
+            self._startFakeDB(Config.getInstance().getDBConnectionParams()[1])
+            TestManager._createDummyUser()
 
-    def stopManageDB(self, fakeDBPolicy):
+    def _stopManageDB(self, fakeDBPolicy):
+        """
+        Stops the temporary DB and restarts the production DB if needed
+        """
         if fakeDBPolicy == 1 or fakeDBPolicy == 2:
-            self.stopFakeDB()
-            TestManager.restoreDBInstance()
+            self._stopFakeDB()
+            TestManager._restoreDBInstance()
         elif fakeDBPolicy == 3:
-            self.stopFakeDB()
-            TestManager.startProductionDB()
-            TestManager.restoreDBInstance()
+            self._stopFakeDB()
+            TestManager._startProductionDB()
+            TestManager._restoreDBInstance()
 
-    def startFakeDB(self, zeoPort):
-        self.createNewDBFile()
-        self.zeoServer = TestManager.createDBServer(
+    def _startFakeDB(self, zeoPort):
+        """
+        Starts a temporary DB in a different port
+        """
+        self._createNewDBFile()
+        self.zeoServer = TestManager._createDBServer(
             os.path.join(self.dbFolder, "Data.fs"),
             zeoPort)
 
         DBMgr.setInstance(DBMgr(hostname="localhost", port=zeoPort))
 
-    def stopFakeDB(self):
+    def _stopFakeDB(self):
+        """
+        Stops the temporary DB
+        """
         try:
             os.kill(self.zeoServer, signal.SIGINT)
         except OSError, e:
@@ -148,16 +185,22 @@ class TestManager(object):
 
         try:
             os.waitpid(self.zeoServer, 0)
-            self.removeDBFile()
+            self._removeDBFile()
         except OSError, e:
             print ("Problem waiting for ZEO Server: " + str(e))
 
     @staticmethod
-    def restoreDBInstance():
+    def _restoreDBInstance():
+        """
+        Resets the DB instance in the DBMgr
+        """
         DBMgr.setInstance(None)
 
     @staticmethod
-    def startProductionDB():
+    def _startProductionDB():
+        """
+        Starts the 'production' db (the one configured in indico.conf)
+        """
         try:
             commands.getstatusoutput(TestConfig.getInstance().getStartDBCmd())
         except KeyError:
@@ -165,14 +208,20 @@ class TestManager(object):
             sys.exit(1)
 
     @staticmethod
-    def stopProductionDB():
+    def _stopProductionDB():
+        """
+        Stops the 'production' DB
+        """
         try:
             commands.getstatusoutput(TestConfig.getInstance().getStopDBCmd())
         except KeyError:
             print "[ERR] Not found in tests.conf: command to stop production DB\n"
             sys.exit(1)
 
-    def createNewDBFile(self):
+    def _createNewDBFile(self):
+        """
+        Creates a new DB file for a temporary DB
+        """
         from ZODB import FileStorage, DB
         savedDir = os.getcwd()
         self.dbFolder = tempfile.mkdtemp()
@@ -189,11 +238,14 @@ class TestManager(object):
         storage.close()
         os.chdir(savedDir)
 
-    def removeDBFile(self):
+    def _removeDBFile(self):
+        """
+        Removes the files of the temporary DB
+        """
         shutil.rmtree(self.dbFolder)
 
     @staticmethod
-    def createDBServer(dbFile, port):
+    def _createDBServer(dbFile, port):
         """
         Creates a fake DB server for testing
         """
@@ -210,7 +262,10 @@ class TestManager(object):
 ################## End of DB Managing functions ##################
 
     @staticmethod
-    def createDummyUser():
+    def _createDummyUser():
+        """
+        Creates a test user in the DB
+        """
         from MaKaC import user
         from MaKaC.authentication import AuthenticatorMgr
         from MaKaC.common import HelperMaKaCInfo
@@ -246,7 +301,11 @@ class TestManager(object):
         DBMgr.getInstance().endRequest()
 
     @staticmethod
-    def deleteDummyUser():
+    def _deleteDummyUser():
+        """
+        Deletes the test user from the DB
+        """
+
         from MaKaC import user
         from MaKaC.authentication import AuthenticatorMgr
         from MaKaC.common import HelperMaKaCInfo
