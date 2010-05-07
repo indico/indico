@@ -7082,3 +7082,30 @@ class WBeautifulHTMLDict(WTemplated):
         vars["KeyClassName"] = self.__classNames.get("KeyClassName", "")
         vars["Level"] = self.__level
         return vars
+
+
+class WFilterCriteria(WTemplated):
+    """
+    Draws the options for a filter criteria object
+    This means rendering the actual table that contains
+    all the HTML for the several criteria
+    """
+
+    def __init__(self, options, filterCrit, extraInfo=""):
+        WTemplated.__init__(self, tpl_name = "FilterCriteria")
+        self._filterCrit = filterCrit
+        self._options = options
+        self._extraInfo = extraInfo
+
+    def _drawFieldOptions(self, formName, form):
+        raise Exception("Method WFilterCriteria._drawFieldOptions must be overwritten")
+
+    def getVars(self):
+
+        vars = WTemplated.getVars( self )
+
+        vars["extra"] = self._extraInfo
+
+        vars["content"] =  list((name, self._drawFieldOptions(name, form))
+                                for (name, form) in self._options)
+        return vars

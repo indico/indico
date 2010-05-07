@@ -1,3 +1,5 @@
+<% declareTemplate(newTemplateStyle=True) %>
+<div class="CRLDiv" style="display: none;" id="filterMenu">
 <table width="100%%" cellpadding="0" cellspacing="0" valign="top"  style="padding-bottom: 10px;">
 
 <% counter = 0 %>
@@ -20,3 +22,5 @@
 
 <% end %>
 </table>
+<%= extra %>
+<div style="text-align: center;"><input type="submit" class="btn" name="OK" value="<%= _("Apply filter")%>"></div></div>

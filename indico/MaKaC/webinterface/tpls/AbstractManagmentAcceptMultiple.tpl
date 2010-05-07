@@ -3,13 +3,12 @@
 function showAbstracts()
 {
     var listOfAbstracts = <%= listOfAbstracts %>;
-    var div = Html.div({});
+    var ul = Html.ul({id: '',style:{listStyle: 'circle', marginLeft:'-25px'}});
     for (a in listOfAbstracts)
     {
-        div.append(listOfAbstracts[a]);
-        div.append(Html.br());
+        ul.append(Html.li('', listOfAbstracts[a]));
     }
-    var popup = new AlertPopup(Html.span('warningTitle', "List of abstracts"), div);
+    var popup = new AlertPopup(Html.span('warningTitle', "List of abstracts"), ul);
     popup.open();
 }
 

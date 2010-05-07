@@ -1,264 +1,360 @@
-
-<table width="95%%" valign="top" align="center" cellspacing="0">
-	<tr>
-		<td>
-			<table width="100%%" align="center" style="padding-left:1px solid #777777">
-				<tr>
-					<td>
-						<table bgcolor="white" width="100%%">
-							<tr>
-								<form action=%(accessAbstract)s method="post">
-								<td class="titleCellFormat"> <%= _("Quick search: Abstract ID")%> <input type="text" name="abstractId" size="4"><input type="submit" class="btn" value="<%= _("seek it")%>"><br>
-								</td>
-								</form>
-							</tr>
-						</table>
-					</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<br>
 <script type="text/javascript">
 <!--
-function selecAllTracks()
+
+var newAbstract = false;
+
+function selectAllTracks()
 {
-document.optionForm.trackShowNoValue.checked=true
-if (!document.optionForm.selTracks.length)
+document.filterOptionForm.trackShowNoValue.checked=true
+if (!document.filterOptionForm.track.length)
         {
-            document.optionForm.selTracks.checked=true
+            document.filterOptionForm.track.checked=true
         }else{
-for (i = 0; i < document.optionForm.selTracks.length; i++)
-	{
-	document.optionForm.selTracks[i].checked=true
-	}
+for (i = 0; i < document.filterOptionForm.track.length; i++)
+    {
+    document.filterOptionForm.track[i].checked=true
+    }
 }
 }
 
-function unselecAllTracks()
+function unselectAllTracks()
 {
-document.optionForm.trackShowNoValue.checked=false
-if (!document.optionForm.selTracks.length)
+document.filterOptionForm.trackShowNoValue.checked=false
+if (!document.filterOptionForm.track.length)
         {
-            document.optionForm.selTracks.checked=false
+            document.filterOptionForm.track.checked=false
         }else{
-    for (i = 0; i < document.optionForm.selTracks.length; i++)
+    for (i = 0; i < document.filterOptionForm.track.length; i++)
         {
-        document.optionForm.selTracks[i].checked=false
+        document.filterOptionForm.track[i].checked=false
         }
     }
 }
 
-function selecAllTypes()
+function selectAllTypes()
 {
-document.optionForm.typeShowNoValue.checked=true
-if (!document.optionForm.selTypes.length)
+document.filterOptionForm.typeShowNoValue.checked=true
+if (!document.filterOptionForm.type.length)
         {
-            document.optionForm.selTypes.checked=true
+            document.filterOptionForm.type.checked=true
         }else{
-for (i = 0; i < document.optionForm.selTypes.length; i++)
-	{
-	document.optionForm.selTypes[i].checked=true
-	}
+for (i = 0; i < document.filterOptionForm.type.length; i++)
+    {
+    document.filterOptionForm.type[i].checked=true
+    }
 }
 }
 
-function unselecAllTypes()
+function unselectAllTypes()
 {
-document.optionForm.typeShowNoValue.checked=false
-if (!document.optionForm.selTypes.length)
+document.filterOptionForm.typeShowNoValue.checked=false
+if (!document.filterOptionForm.type.length)
         {
-            document.optionForm.selTypes.checked=false
+            document.filterOptionForm.type.checked=false
         }else{
-for (i = 0; i < document.optionForm.selTypes.length; i++)
-	{
-	document.optionForm.selTypes[i].checked=false
-	}
+for (i = 0; i < document.filterOptionForm.type.length; i++)
+    {
+    document.filterOptionForm.type[i].checked=false
+    }
 }
 }
 
-function selecAllStatus()
+function selectAllStatus()
 {
-for (i = 0; i < document.optionForm.selStatus.length; i++)
-	{
-	document.optionForm.selStatus[i].checked=true
-	}
+for (i = 0; i < document.filterOptionForm.status.length; i++)
+    {
+    document.filterOptionForm.status[i].checked=true
+    }
 }
 
-function unselecAllStatus()
+function unselectAllStatus()
 {
-for (i = 0; i < document.optionForm.selStatus.length; i++)
-	{
-	document.optionForm.selStatus[i].checked=false
-	}
+for (i = 0; i < document.filterOptionForm.status.length; i++)
+    {
+    document.filterOptionForm.status[i].checked=false
+    }
 }
 
-function selecAllAccTracks()
+function selectAllAccTracks()
 {
-document.optionForm.accTrackShowNoValue.checked=true
-if (!document.optionForm.selAccTracks.length)
+document.filterOptionForm.accTrackShowNoValue.checked=true
+if (!document.filterOptionForm.acc_track.length)
         {
-            document.optionForm.selAccTracks.checked=true
+            document.filterOptionForm.acc_track.checked=true
         }else{
-for (i = 0; i < document.optionForm.selAccTracks.length; i++)
-	{
-	document.optionForm.selAccTracks[i].checked=true
-	}
+for (i = 0; i < document.filterOptionForm.acc_track.length; i++)
+    {
+    document.filterOptionForm.acc_track[i].checked=true
+    }
 }
 }
 
-function unselecAllAccTracks()
+function unselectAllAccTracks()
 {
-document.optionForm.accTrackShowNoValue.checked=false
-if (!document.optionForm.selAccTracks.length)
+document.filterOptionForm.accTrackShowNoValue.checked=false
+if (!document.filterOptionForm.acc_track.length)
         {
-            document.optionForm.selAccTracks.checked=false
+            document.filterOptionForm.acc_track.checked=false
         }else{
-for (i = 0; i < document.optionForm.selAccTracks.length; i++)
-	{
-	document.optionForm.selAccTracks[i].checked=false
-	}
+for (i = 0; i < document.filterOptionForm.acc_track.length; i++)
+    {
+    document.filterOptionForm.acc_track[i].checked=false
+    }
 }
 }
 
-function selecAllAccTypes()
+function selectAllAccTypes()
 {
-document.optionForm.accTypeShowNoValue.checked=true
-if (!document.optionForm.selAccTypes.length)
+document.filterOptionForm.accTypeShowNoValue.checked=true
+if (!document.filterOptionForm.acc_type.length)
         {
-            document.optionForm.selAccTypes.checked=true
+            document.filterOptionForm.acc_type.checked=true
         }else{
-for (i = 0; i < document.optionForm.selAccTypes.length; i++)
-	{
-	document.optionForm.selAccTypes[i].checked=true
-	}
+for (i = 0; i < document.filterOptionForm.acc_type.length; i++)
+    {
+    document.filterOptionForm.acc_type[i].checked=true
+    }
 }
 }
 
-function unselecAllAccTypes()
+function unselectAllAccTypes()
 {
-document.optionForm.accTypeShowNoValue.checked=false
-if (!document.optionForm.selAccTypes.length)
+document.filterOptionForm.accTypeShowNoValue.checked=false
+if (!document.filterOptionForm.acc_type.length)
         {
-            document.optionForm.selAccTypes.checked=false
+            document.filterOptionForm.acc_type.checked=false
         }else{
-for (i = 0; i < document.optionForm.selAccTypes.length; i++)
-	{
-	document.optionForm.selAccTypes[i].checked=false
-	}
+for (i = 0; i < document.filterOptionForm.acc_type.length; i++)
+    {
+    document.filterOptionForm.acc_type[i].checked=false
+    }
 }
 }
 
-function selecAllFields()
+function selectAllFields()
 {
 
-document.optionForm.showID.checked=true
-document.optionForm.showPrimaryAuthor.checked=true
-document.optionForm.showTracks.checked=true
-document.optionForm.showType.checked=true
-document.optionForm.showStatus.checked=true
-document.optionForm.showAccTrack.checked=true
-document.optionForm.showAccType.checked=true
-document.optionForm.showSubmissionDate.checked=true
+document.filterOptionForm.showID.checked=true
+document.filterOptionForm.showPrimaryAuthor.checked=true
+document.filterOptionForm.showTracks.checked=true
+document.filterOptionForm.showType.checked=true
+document.filterOptionForm.showStatus.checked=true
+document.filterOptionForm.showAccTrack.checked=true
+document.filterOptionForm.showAccType.checked=true
+document.filterOptionForm.showSubmissionDate.checked=true
 }
 
-function unselecAllFields()
+function unselectAllFields()
 {
-document.optionForm.showID.checked=false
-document.optionForm.showPrimaryAuthor.checked=false
-document.optionForm.showTracks.checked=false
-document.optionForm.showType.checked=false
-document.optionForm.showStatus.checked=false
-document.optionForm.showAccTrack.checked=false
-document.optionForm.showAccType.checked=false
-document.optionForm.showSubmissionDate.checked=false
+document.filterOptionForm.showID.checked=false
+document.filterOptionForm.showPrimaryAuthor.checked=false
+document.filterOptionForm.showTracks.checked=false
+document.filterOptionForm.showType.checked=false
+document.filterOptionForm.showStatus.checked=false
+document.filterOptionForm.showAccTrack.checked=false
+document.filterOptionForm.showAccType.checked=false
+document.filterOptionForm.showSubmissionDate.checked=false
 }
 //-->
 </script>
 
-			<form action=%(filterPostURL)s name="optionForm" method="post">
-				%(currentSorting)s
-				%(menu)s
-			</form>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<br>
-				<a name="abstracts"></a>
-				<table width="100%%" cellspacing="0" align="center" border="0" style="border-left: 1px solid #777777;padding-left:2px">
-					<tr>
-						<td colspan="9">
-							%(generateExcel)s
-						</td>
-					</tr>
-					<tr>
-						<td colspan="9" class="groupTitle">
-                            <table>
-                                <tr>
-                                    <td nowrap class="groupTitle"> <%= _("Found Abstracts")%> (%(number)s)</td>
-                                    <form action=%(newAbstractURL)s method="POST">
-                                    <td class="titleCellFormat"><input type="submit" class="btn" value="<%= _("new")%>"></td>
-                                    </form>
-                                    <form action=%(abstractsPDFURL)s method="post" target="_blank">
-                                    <td>%(abstractsToPrint)s<input type="submit" class="btn" value="<%= _("PDF of all")%>"></td>
-                                    </form>
-                                    <form action=%(abstractsXMLURL)s method="post" target="_blank">
-                                    <td>%(abstractsToPrint)s<input type="submit" class="btn" value="<%= _("XML of all")%>"></td>
-                                    </form>
-                                    <form action=%(participantListURL)s method="post" target="_blank">
-                                    <td>%(abstractsToPrint)s<input type="submit" class="btn" value="<%= _("author list of all")%>"></td>
-                                    </form>
-                            </tr>
-                            </table>
-                        </td>
-					</tr>
-					<tr>
-						%(abstractTitleBar)s
-					</tr>
-                    <form action=%(abstractSelectionAction)s method="post">
-					%(abstracts)s
-					%(fieldsToPrint)s
-					<tr>
-						<td colspan="4" style="border-top:1px solid #777777;" valign="bottom" align="left">
-						<table align="left" border="0">
-                            <tr>
-                                <td colspan="4">
-                                    <table>
-                                        <tr>
-                                            <td>
-                                                <input type="submit" class="btn" name="merge" value="<%= _("merge selected abstracts")%>" style="width:264px">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <input type="submit" class="btn" name="PDF" value="<%= _("get PDF of selected abstracts")%>" style="width:264px">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <input type="submit" class="btn" name="AUTH" value="<%= _("get author list of selected abstracts")%>" style="width:264px">
-                                            </td>
-                                            <td>
-                                                <input type="submit" class="btn" name="acceptMultiple" value="Accept multiple">
-                                            </td>
-                                            <td>
-                                                <input type="submit" class="btn" name="rejectMultiple" value="Reject multiple">
-                                            </td>
-                            </form>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-						</table>
-					</td>
-					<td colspan="5" bgcolor="white" align="center" style="border-top:1px solid #777777;border-left:1px solid #777777;color:black">
-						<b> <%= _("Total")%> : %(number)s  <%= _("abstract(s)")%></b>
-					</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
+<table width="100%%" valign="top" align="left" cellspacing="0">
+    <tr>
+        <td class="titleCellFormat">
+            <form action=%(accessAbstract)s method="post">
+            <%= _("Quick search: Abstract ID")%> <input type="text" name="abstractId" size="4"><input type="submit" class="btn" value="<%= _("seek it")%>"><br>
+            </form>
+        </td>
+    </tr>
 </table>
+<a href="" name="results"></a>
+<table width="100%%" cellspacing="0" align="center" border="0">
+    <tr>
+       <td nowrap colspan="10">
+            <div class="CRLgroupTitleNoBorder"><%= _("Displaying")%><strong> %(filteredNumberAbstracts)s </strong>
+            <% if filteredNumberAbstracts == "1": %>
+                <%= _("abstract")%>
+            <% end %>
+            <% else: %>
+                <%= _("abstracts")%>
+            <% end %>
+            <% if filterUsed: %>
+                (<%= _("Total")%>: <strong>%(totalNumberAbstracts)s</strong>)
+            <% end %>
+            </div>
+            <form action=%(filterPostURL)s method="post" name="optionForm">
+            <div class="CRLIndexList" >
+                <% if filterUsed: %>
+                    <input type="submit" class="btnRemove" name="resetFilters" value="Reset filters">
+                    <span style="padding: 0px 6px 0px 6px">|</span>
+                <% end %>
+                <a id="index_filter" onclick="showFilters()" class="CAIndexUnselected" font-size="16" font-weight="bold" font-family="Verdana">
+                  <% if filterUsed: %>
+                    <%= _("Show filters")%>
+                  <% end %>
+                  <% else: %>
+                    <%= _("Apply filters")%>
+                  <% end %>
+                </a>
+            </div>
+            </form>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="10" align="left" width="100%%">
+          <form action=%(filterPostURL)s method="post" name="filterOptionForm">
+            <input type="hidden" name="operationType" value="filter" />
+            %(filterMenu)s
+            %(sortingOptions)s
+          </form>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="10" style="border-bottom:2px solid #777777;padding-top:5px" valign="bottom" align="left">
+            <table>
+                <form action=%(abstractSelectionAction)s method="post" name="abstractsForm" onSubmit="return atLeastOneSelected()">
+                <tr>
+                    <td valign="bottom" align="left" class="eventModifButtonBar"><input type="submit" class="btn" name="newAbstract" onclick="newAbstract = true;" value="<%= _("Add New")%>"></td>
+                    <td valign="bottom" align="left"><input type="submit" class="btn" name="acceptMultiple" value="<%= _("accept") %>">
+                    <td valign="bottom" align="left"><input type="submit" class="btn" name="rejectMultiple" value="<%= _("reject") %>">
+                    <td valign="bottom" align="left"><input type="submit" class="btn" name="merge" value="<%= _("merge")%>"></td>
+                    <td valign="bottom" align="left"><input type="submit" class="btn" name="auth" value="<%= _("author list")%>"></td>
+                    <td valign="bottom" align="left">Export to:</td>
+                    <td valign="bottom" align="left"><input type="image" name="excel" src=<%= excelIconURL%> border="0"></td>
+                    <td valign="bottom" align="left"><input type="image" name="pdf" src=<%= pdfIconURL%> border="0"></td>
+                    <td valign="bottom" align="left"><input type="image" name="xml" src=<%= xmlIconURL%> border="0"></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        %(abstractTitleBar)s
+    </tr>
+    <tr><td>
+        <tbody id="abstractsItems">
+        %(abstracts)s
+        </tbody>
+    </td></tr>
+    <tr>
+        <td colspan="10" style="border-top: 2px solid #777777; padding-top: 3px;" valign="bottom" align="left">
+            <table>
+                <tr>
+                    <td valign="bottom" align="left" class="eventModifButtonBar"><input type="submit" class="btn" value="<%= _("new")%>"></td>
+                    <td valign="bottom" align="left"><input type="submit" class="btn" name="acceptMultiple" value="<%= _("accept") %>">
+                    <td valign="bottom" align="left"><input type="submit" class="btn" name="rejectMultiple" value="<%= _("reject") %>">
+                    <td valign="bottom" align="left"><input type="submit" class="btn" name="merge" value="<%= _("merge")%>"></td>
+                    <td valign="bottom" align="left"><input type="submit" class="btn" value="<%= _("author list")%>"></td>
+                    <td valign="bottom" align="left">Export to:</td>
+                    <td valign="bottom" align="left"><input type="image" name="excel" src=<%= excelIconURL%> border="0"></td>
+                    <td valign="bottom" align="left"><input type="image" name="pdf" src=<%= pdfIconURL%> border="0"></td>
+                    <td valign="bottom" align="left"><input type="image" name="xml" src=<%= xmlIconURL%> border="0"></td>
+            </tr>
+            </form>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<script type="text/javascript">
+    function onMouseOver(element) {
+        if ($E(element).dom.style.backgroundColor ==='transparent') {
+           $E(element).dom.style.backgroundColor='rgb(255, 246, 223)';
+        }
+    }
+
+    function onMouseOut(element) {
+        var inputNodes = IndicoUtil.findFormFields($E(element))
+        for (i = 0; i < inputNodes.length; i++) {
+            var node = inputNodes[i];
+            if (node.type == "checkbox") {
+                if(node.checked !== true) {
+                    $E(node.name+node.value).dom.style.backgroundColor='transparent';
+                } else {
+                    $E(node.name+node.value).dom.style.backgroundColor = "#CDEB8B";
+                }
+            }
+        }
+    }
+
+
+    function atLeastOneSelected() {
+        if(!newAbstract) {
+            var inputNodes = IndicoUtil.findFormFields($E("abstractsItems"))
+            for (i = 0; i < inputNodes.length; i++)
+            {
+                var node = inputNodes[i];
+                if (node.type == "checkbox") {
+                    if(node.checked == true) {
+                        return true;
+                    }
+                }
+            }
+
+            var dialog = new WarningPopup($T("Warning"), $T("No abstract selected! Please select at least one."));
+            dialog.open();
+
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    function isSelected(element) {
+        var inputNodes = IndicoUtil.findFormFields($E(element))
+        for (i = 0; i < inputNodes.length; i++) {
+            var node = inputNodes[i];
+            if (node.type == "checkbox") {
+                if(node.checked == true) {
+                    $E(node.name+node.value).dom.style.backgroundColor = "#CDEB8B";
+                } else {
+                    $E(node.name+node.value).dom.style.backgroundColor='transparent';
+                }
+            }
+        }
+    }
+
+    function selectAll()
+    {
+        if (!document.abstractsForm.abstracts.length)
+        {
+            document.abstractsForm.abstracts.checked=true
+        }else{
+            for (i = 0; i < document.abstractsForm.abstracts.length; i++)
+            {
+                document.abstractsForm.abstracts[i].checked=true;
+            }
+        }
+        isSelected("abstractsItems")
+    }
+
+    function deselectAll()
+    {
+        if (!document.abstractsForm.abstracts.length)
+        {
+            document.abstractsForm.abstracts.checked=false
+        }else{
+            for (i = 0; i < document.abstractsForm.abstracts.length; i++)
+            {
+                document.abstractsForm.abstracts[i].checked=false;
+            }
+        }
+        isSelected("abstractsItems")
+    }
+
+    function showFilters() {
+        if ($E("filterMenu").dom.style.display == "") {
+<% if filterUsed: %>
+            $E("index_filter").set('<%= _("Show filters")%>');
+<% end %>
+<% else: %>
+            $E("index_filter").set('<%= _("Apply filters")%>');
+<% end %>
+            $E('index_filter').dom.className = "CRLIndexUnselected";
+            $E("filterMenu").dom.style.display = "none";
+        }else {
+            $E("index_filter").set('<%= _("Hide filters")%>');
+            $E('index_filter').dom.className = "CRLIndexSelected";
+            $E("filterMenu").dom.style.display = "";
+        }
+    }
+</script>

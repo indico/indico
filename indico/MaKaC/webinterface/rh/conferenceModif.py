@@ -4005,156 +4005,186 @@ class RHAbstractListMenuOpen(RHConfModifCFABase):
 class RHAbstractList(RHConfModifCFABase):
     _uh = urlHandlers.UHConfAbstractManagment
 
-    #def _checkProtection( self ):
-    #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
-    #        RHConfModifCFABase._checkProtection( self )
+    def _resetFilters( self, sessionData ):
+        """
+        Brings the filter data to a consistent state (websession),
+        marking everything as "checked"
+        """
+
+        sessionData["track"] = sessionData["acc_track"] = map(lambda track: track.getId(), self._conf.getTrackList())
+        sessionData["type"] = sessionData["acc_type"] = map(lambda contribType: contribType, self._conf.getContribTypeList())
+        abstractStatusList = AbstractStatusList.getInstance()
+        sessionData["status"] = map(lambda status: abstractStatusList.getId( status ), abstractStatusList.getStatusList())
+        sessionData['authSearch'] = ""
+
+        sessionData["trackShowNoValue"] = True
+        sessionData["typeShowNoValue"] = True
+        sessionData["accTypeShowNoValue"] = True
+        sessionData["accTrackShowNoValue"] = True
+        sessionData["trackShowMultiple"] = False
+        if sessionData.has_key("comment"):
+            del sessionData["comment"]
+
+        # TODO: improve this part and do it as with the registrants
+        self._fields = {"ID": [ _("ID"), "checked"],
+                            "PrimaryAuthor": [ _("Primary Author"), "checked"],
+                            "Tracks": [ _("Tracks"), "checked"],
+                            "Type": [ _("Type"), "checked"],
+                            "Status": [ _("Status"), "checked"],
+                            "AccTrack": [ _("Acc. Track"), "checked"],
+                            "AccType": [ _("Acc. Type"), "checked"],
+                            "SubmissionDate": [ _("Submission Date"), "checked"]}
+
+        return sessionData
+
+    def _updateFilters( self, sessionData, params ):
+        """
+        Updates the filter parameters in the websession with those
+        coming from the HTTP request
+        """
+
+        sessionData['track'] = []
+        sessionData['acc_track'] = []
+        sessionData['type'] = []
+        sessionData['acc_type'] = []
+        sessionData['status'] = []
+        sessionData['authSearch'] = ""
+
+        sessionData.update(params)
+
+        # TODO: this should work as for the tracks, NOTE hat this filter is used in many
+        # places (ContribTypeFilterField and AccContribTypeFilterField should expect ids
+        # instead of objects).
+        sessionData["type"] = map(lambda contTypeId: self._conf.getContribTypeById(contTypeId), sessionData["type"])
+        sessionData["acc_type"] = map(lambda contTypeId: self._conf.getContribTypeById(contTypeId), sessionData["acc_type"])
+
+        # update these elements in the session so that the parameters that are
+        # passed are always taken into account (sessionData.update is not
+        # enough, since the elements that are ommitted in params would just be
+        # ignored
+
+        sessionData['trackShowNoValue'] = params.has_key('trackShowNoValue')
+        sessionData['trackShowMultiple'] = params.has_key("trackShowMultiple")
+        sessionData['accTrackShowNoValue'] = params.has_key("accTrackShowNoValue")
+        sessionData['typeShowNoValue'] = params.has_key('typeShowNoValue')
+        sessionData['accTypeShowNoValue'] = params.has_key('accTypeShowNoValue')
+        if params.has_key("comment"):
+            sessionData['comment'] = ""
+        elif sessionData.has_key("comment"):
+            del sessionData['comment']
+
+
+        # TODO: improve this part and do it as with the registrants
+        self._fields["ID"] = [ _("ID"), sessionData.get("showID", "")]
+        self._fields["PrimaryAuthor"] = [ _("Primary Author"), sessionData.get("showPrimaryAuthor", "")]
+        self._fields["Tracks"] = [ _("Tracks"), sessionData.get("showTracks", "")]
+        self._fields["Type"] = [ _("Type"), sessionData.get("showType", "")]
+        self._fields["Status"] = [ _("Status"), sessionData.get("showStatus", "")]
+        self._fields["AccTrack"] = [ _("showAcc. Track"), sessionData.get("showAccTrack", "")]
+        self._fields["AccType"] = [ _("showAcc. Type"), sessionData.get("showAccType", "")]
+        self._fields["SubmissionDate"] = [ _("Submission Date"), sessionData.get("showSubmissionDate", "")]
+
+        return sessionData
+
+    def _buildFilteringCriteria(self, sessionData):
+        """
+        Creates the Filtering Criteria object, without changing the existing
+        session data (sessionData is cloned, not directly changed)
+        """
+        sessionCopy = sessionData.copy()
+
+        # Build the filtering criteria
+        filterCrit = AbstractFilterCriteria(self._conf, sessionCopy)
+
+        filterCrit.getField("track").setShowNoValue(sessionCopy.get("trackShowNoValue"))
+        filterCrit.getField("track").setOnlyMultiple(sessionCopy.get("trackShowMultiple"))
+        filterCrit.getField("acc_track").setShowNoValue(sessionCopy.get("accTrackShowNoValue"))
+        filterCrit.getField("type").setShowNoValue(sessionCopy.get("typeShowNoValue"))
+        filterCrit.getField("acc_type").setShowNoValue(sessionCopy.get("accTypeShowNoValue"))
+
+        return filterCrit
+
+    def _checkAction( self, params, filtersActive, sessionData, operation ):
+        """
+        Decides what to do with the request parameters, depending
+        on the type of operation that is requested
+        """
+
+        # user chose to reset the filters
+        if operation ==  'resetFilters':
+            self._filterUsed = False
+            sessionData = self._resetFilters(sessionData)
+
+        # user set the filters
+        elif operation ==  'setFilters':
+            self._filterUsed = True
+            sessionData = self._updateFilters(sessionData, params)
+
+        # session is empty (first time)
+        elif not filtersActive:
+            self._filterUsed = False
+            sessionData = self._resetFilters(sessionData)
+        else:
+            self._filterUsed = True
+
+        # preserve the order and sortBy parameters, whatever happens
+        sessionData['order'] = params.get('order', 'down')
+        sessionData['sortBy'] = params.get('sortBy', 'number')
+
+        return sessionData
 
     def _checkParams( self, params ):
         RHConfModifCFABase._checkParams( self, params )
 
-        websession = self._getSession()
-        dict = websession.getVar("abstractFilterAndSortingConf%s"%self._conf.getId())
-        noMemory = False
-        if not dict:
-            noMemory = True
-            dict = {}
-        else:
-            dict = dict.copy()
-        dict.update(params)
-        if params.has_key("OK"):
-            if not params.has_key("trackShowNoValue") and dict.has_key("trackShowNoValue"):
-                del dict["trackShowNoValue"]
-            if not params.has_key("typeShowNoValue") and dict.has_key("typeShowNoValue"):
-                del dict["typeShowNoValue"]
-            if not params.has_key("trackShowMultiple") and dict.has_key("trackShowMultiple"):
-                del dict["trackShowMultiple"]
-            if not params.has_key("accTypeShowNoValue") and dict.has_key("accTypeShowNoValue"):
-                del dict["accTypeShowNoValue"]
-            if not params.has_key("accTrackShowNoValue") and dict.has_key("accTrackShowNoValue"):
-                del dict["accTrackShowNoValue"]
-            if not params.has_key("selTracks") and dict.has_key("selTracks"):
-                del dict["selTracks"]
-            if not params.has_key("selTypes") and dict.has_key("selTypes"):
-                del dict["selTypes"]
-            if not params.has_key("selStatus") and dict.has_key("selStatus"):
-                del dict["selStatus"]
-            if not params.has_key("selAccTracks") and dict.has_key("selAccTracks"):
-                del dict["selAccTracks"]
-            if not params.has_key("selAccTypes") and dict.has_key("selAccTypes"):
-                del dict["selAccTypes"]
-
-            if not params.has_key("showID") and dict.has_key("showID"):
-                del dict["showID"]
-            if not params.has_key("showPrimaryAuthor") and dict.has_key("showPrimaryAuthor"):
-                del dict["showPrimaryAuthor"]
-            if not params.has_key("showTracks") and dict.has_key("showTracks"):
-                del dict["showTracks"]
-            if not params.has_key("showType") and dict.has_key("showType"):
-                del dict["showType"]
-            if not params.has_key("showStatus") and dict.has_key("showStatus"):
-                del dict["showStatus"]
-            if not params.has_key("showAccTrack") and dict.has_key("showAccTrack"):
-                del dict["showAccTrack"]
-            if not params.has_key("showAccType") and dict.has_key("showAccType"):
-                del dict["showAccType"]
-            if not params.has_key("showSubmissionDate") and dict.has_key("showSubmissionDate"):
-                del dict["showSubmissionDate"]
-
-
-        #filterUsed = dict.has_key( "OK" ) #this variable is true when the
-        #                                    #   filter has been used
-        filterUsed = False
-        if not noMemory:
-            filterUsed = True
-
-        self._order = dict.get("order","down")
-        filter = {}
-        ltracks = []
-        if not filterUsed:
-            for track in self._conf.getTrackList():
-                ltracks.append( track.getId() )
-        filter["track"] = utils.normalizeToList(dict.get("selTracks", ltracks))
-        ltypes = []
-        if not filterUsed:
-            for type in self._conf.getContribTypeList():
-                ltypes.append( type )
-        else:
-            for id in dict.get("selTypes", []):
-                ltypes.append(self._conf.getContribTypeById(id))
-        filter["type"] = ltypes
-        lstatus = []
-        if not filterUsed:
-            for status in AbstractStatusList.getInstance().getStatusList():
-                lstatus.append( AbstractStatusList.getInstance().getId( status ) )
-        filter["status"] = utils.normalizeToList(dict.get("selStatus", lstatus))
-        filter["acc_track"] = utils.normalizeToList(dict.get("selAccTracks",ltracks))
-        ltypes = []
-        if not filterUsed:
-            for type in self._conf.getContribTypeList():
-                ltypes.append( type )
-        else:
-            for id in dict.get("selAccTypes", []):
-                ltypes.append(self._conf.getContribTypeById(id))
-        filter["acc_type"]=ltypes
-        if dict.has_key("selOnlyComments") and params.get("selOnlyComments", None):
-            filter["comment"] = ""
-        self._criteria=AbstractFilterCriteria(self._conf,filter)
-        trackShowNoValue,typeShowNoValue,accTypeShowNoValue=True,True,True
-        accTrackShowNoValue,trackShowMultiple=True,False
-        if filterUsed:
-            trackShowNoValue =  dict.has_key("trackShowNoValue")
-            typeShowNoValue =  dict.has_key("typeShowNoValue")
-            trackShowMultiple =  dict.has_key("trackShowMultiple")
-            accTypeShowNoValue =  dict.has_key("accTypeShowNoValue")
-            accTrackShowNoValue=dict.has_key("accTrackShowNoValue")
-        self._criteria.getField("track").setShowNoValue(trackShowNoValue)
-        self._criteria.getField("track").setOnlyMultiple(trackShowMultiple)
-        self._criteria.getField("type").setShowNoValue(typeShowNoValue)
-        self._criteria.getField("acc_track").setShowNoValue(accTrackShowNoValue)
-        self._criteria.getField("acc_type").setShowNoValue(accTypeShowNoValue)
-        self._sortingCrit = AbstractSortingCriteria( [dict.get( "sortBy", "number" ).strip()] )
-        self._msg = dict.get("directAbstractMsg","")
-        self._authSearch=dict.get("authSearch","")
-
         self._fields = {}
-        fieldsSelected = False
-        if filterUsed:
-            if dict.has_key("showID"):
-                fieldsSelected = True
-            self._fields["ID"] = [ _("ID"), dict.get("showID", "")]
-            #if dict.has_key("showTitle"):
-            #    fieldsSelected = True
-            #self._fields["Title"] = "checked"
-            if dict.has_key("showPrimaryAuthor"):
-                fieldsSelected = True
-            self._fields["PrimaryAuthor"] = [ _("Primary Author"), dict.get("showPrimaryAuthor", "")]
-            if dict.has_key("showTracks"):
-                fieldsSelected = True
-            self._fields["Tracks"] = [ _("Tracks"), dict.get("showTracks", "")]
-            if dict.has_key("showType"):
-                fieldsSelected = True
-            self._fields["Type"] = [ _("Type"), dict.get("showType", "")]
-            if dict.has_key("showStatus"):
-                fieldsSelected = True
-            self._fields["Status"] = [ _("Status"), dict.get("showStatus", "")]
-            if dict.has_key("showAccTrack"):
-                fieldsSelected = True
-            self._fields["AccTrack"] = [ _("showAcc. Track"), dict.get("showAccTrack", "")]
-            if dict.has_key("showAccType"):
-                fieldsSelected = True
-            self._fields["AccType"] = [ _("showAcc. Type"), dict.get("showAccType", "")]
-            if dict.has_key("showSubmissionDate"):
-                fieldsSelected = True
-            self._fields["SubmissionDate"] = [ _("Submission Date"), dict.get("showSubmissionDate", "")]
 
-        self._menuStatus = websession.getVar("AbstractListMenuStatus")
+        operationType = params.get('operationType')
+
+        # session data
+        websession = self._getSession()
+        sessionData = websession.getVar("abstractFilterAndSortingConf%s"%self._conf.getId())
+
+        # check if there is information already
+        # set in the session variables
+        if sessionData:
+            # work on a copy
+            sessionData = sessionData.copy()
+            filtersActive =  sessionData['filtersActive']
+        else:
+            # set a default, empty dict
+            sessionData = {}
+            filtersActive = False
+
+        if params.has_key("resetFilters"):
+            operation =  'resetFilters'
+        elif operationType ==  'filter':
+            operation =  'setFilters'
+        else:
+            operation = None
+
+        sessionData = self._checkAction(params, filtersActive, sessionData, operation)
+
+        # Maintain the state abotu filter usage
+        sessionData['filtersActive'] = self._filterUsed;
+
+        # Save the web session
+        websession.setVar("abstractFilterAndSortingConf%s"%self._conf.getId(), sessionData)
+
+        self._filterCrit = self._buildFilteringCriteria(sessionData)
+
+        self._sortingCrit = AbstractSortingCriteria( [sessionData.get( "sortBy", "number" ).strip()] )
+
+        self._order = sessionData.get("order","down")
+
+        self._msg = sessionData.get("directAbstractMsg","")
+        self._authSearch = sessionData.get("authSearch", "")
 
     def _process( self ):
-        p = conferences.WPConfAbstractList(self,self._target,self._msg)
-        return p.display( filterCrit = self._criteria, \
-                            sortingCrit = self._sortingCrit,\
-                            authSearch=self._authSearch, order=self._order, fields=self._fields,\
-                            menuStatus=self._menuStatus)
+        p = conferences.WPConfAbstractList(self,self._target, self._msg, self._filterUsed)
+        return p.display( filterCrit = self._filterCrit,
+                            sortingCrit = self._sortingCrit,
+                            authSearch=self._authSearch, order=self._order,
+                            fields=self._fields)
 
 class RHAbstractsActions:
     """
@@ -4164,9 +4194,15 @@ class RHAbstractsActions:
         self._req = req
 
     def process(self, params):
-        if params.has_key("PDF"):
+        if params.has_key("newAbstract"):
+            return RHNewAbstract(self._req).process(params)
+        elif params.has_key("pdf.x"):
             return RHAbstractsToPDF(self._req).process(params)
-        elif params.has_key("AUTH"):
+        elif params.has_key("excel.x"):
+            return RHAbstractsListToExcel(self._req).process(params)
+        elif params.has_key("xml.x"):
+            return RHAbstractsToXML(self._req).process(params)
+        elif params.has_key("auth"):
             return RHAbstractsParticipantList(self._req).process(params)
         elif params.has_key("merge"):
             return RHAbstractsMerge(self._req).process(params)

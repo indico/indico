@@ -24,32 +24,5 @@ import MaKaC.webinterface.rh.conferenceModif as conferenceModif
 def index( req, **params ):
     return conferenceModif.RHAbstractList( req ).process( params )
 
-def abstractsToPDF( req, **params ):
-    return conferenceModif.RHAbstractsToPDF( req ).process( params )
-
-def abstractsToXML( req, **params ):
-    return conferenceModif.RHAbstractsToXML( req ).process( params )
-
-def abstractsListToExcel( req, **params ):
-    return conferenceModif.RHAbstractsListToExcel( req ).process( params )    
-
-def participantList( req, **params ):
-    return conferenceModif.RHAbstractsParticipantList( req ).process( params )
-
 def abstractsActions( req, **params ):
     return conferenceModif.RHAbstractsActions( req ).process( params )
-
-def newAbstract( req, **params ):
-    return conferenceModif.RHNewAbstract( req ).process( params )
-
-def mergeAbstracts( req, **params ):
-    return conferenceModif.RHAbstractsMerge( req ).process( params )
-
-def test( req, **params ):
-    return conferenceModif.RHTest( req ).process( params )
-
-def closeMenu( req, **params ):
-    return conferenceModif.RHAbstractListMenuClose( req ).process( params )
-
-def openMenu( req, **params ):
-    return conferenceModif.RHAbstractListMenuOpen( req ).process( params )

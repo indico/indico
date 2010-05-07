@@ -187,20 +187,6 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
 
         return url
 
-
-    def _getFilterBoxesHTML(self):
-        regForm = self._conf.getRegistrationForm()
-
-        options = [
-            ('accomm', regForm.getAccommodationForm()),
-            ('event', regForm.getSocialEventForm()),
-            (self._sessionFilterName, regForm.getSessionsForm())
-            ]
-
-        p = WFilterCriteria(options, self._filterCrit)
-
-        return p.getHTML()
-
     def _getStatusesHTML(self):
         self._statusesObjects = {}
         for st in self._conf.getRegistrationForm().getStatusesList():
@@ -457,22 +443,29 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         return url
 
     def _getFilterMenu(self):
-        menu =  _("""<div class="CRLDiv" style="display: none;" id="filterMenu">
-                     %(filterBoxes)s
-                    """)
+
+        regForm = self._conf.getRegistrationForm()
+
+        options = [
+            ('accomm', regForm.getAccommodationForm()),
+            ('event', regForm.getSocialEventForm()),
+            (self._sessionFilterName, regForm.getSessionsForm())
+            ]
+
         if self._conf.getRegistrationForm().getStatusesList():
-            menu +=  _("""<table align="center" cellspacing="0" width="100%%">
+            extraInfo = _("""<table align="center" cellspacing="0" width="100%%">
                                 <tr>
-                                    <td align="left" class="titleCellFormat" style="border-bottom: 1px solid #888; padding-right:10px">  _("Statuses") %(checkStatuses)s%(uncheckStatuses)s</td>
+                                    <td align="left" class="titleCellFormat" style="border-bottom: 1px solid #888; padding-right:10px">  _("Statuses") <img src=%s border="0" alt="Select all" onclick="javascript:selectStatuses()"><img src=%s border="0" alt="Unselect all" onclick="javascript:unselectStatuses()"></td>
                                 </tr>
                                 <tr>
-                                    <td valign="top">%(status)s</td>
+                                    <td valign="top">%s</td>
                                 </tr>
                             </table>
-                        """)
-        menu +=  _("""<div style="text-align: center;"><input type="submit" class="btn" name="OK" value=  _("Apply filter")></div></div>""")
+                        """)%(quoteattr(Config.getInstance().getSystemIconURL("checkAll")),quoteattr(Config.getInstance().getSystemIconURL("uncheckAll")),self._getStatusesHTML())
 
-        return menu
+        p = WFilterCriteriaRegistrants(options, self._filterCrit, extraInfo)
+
+        return p.getHTML()
 
     def _getDisplayMenu(self):
         menu =  _("""<div class="CRLDiv" style="display: none;" id="displayMenu"><table width="95%%" align="center" border="0">
@@ -544,8 +537,6 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         vars["excelIconURL"]="""<input type="image" name="excel" src=%s border="0">"""%quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
         vars["pdfUrl"] = quoteattr(str(Config.getInstance().getSystemIconURL("pdf")))
         vars["excelUrl"] = quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
-        vars ["filterBoxes"] = self._getFilterBoxesHTML()
-        vars ["status"]= self._getStatusesHTML()
         vars ["disp"]= self._getDispHTML()
         tit=self._conf.getRegistrationForm().getAccommodationForm().getTitle()
         if not self._conf.getRegistrationForm().getAccommodationForm().isEnabled():
@@ -575,10 +566,8 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         vars["uncheckSession"] = """<img src=%s border="0" alt="Unselect all" onclick="javascript:unselectSession()">"""%quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))
         vars["checkDisplay"] = """<img src=%s border="0" alt="Select all" onclick="javascript:selectDisplay()">"""%quoteattr(Config.getInstance().getSystemIconURL("checkAll"))
         vars["uncheckDisplay"] = """<img src=%s border="0" alt="Unselect all" onclick="javascript:unselectDisplay()">"""%quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))
-        vars["checkStatuses"] = """<img src=%s border="0" alt="Select all" onclick="javascript:selectStatuses()">"""%quoteattr(Config.getInstance().getSystemIconURL("checkAll"))
-        vars["uncheckStatuses"] = """<img src=%s border="0" alt="Unselect all" onclick="javascript:unselectStatuses()">"""%quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))
         vars["displayMenu"] = self._getDisplayMenu()%vars
-        vars["filterMenu"] = self._getFilterMenu()%vars
+        vars["filterMenu"] = self._getFilterMenu()
 
         return vars
 
@@ -600,19 +589,15 @@ class WRegistrantsFilterStatuses (wcomponents.WTemplated):
 
         return vars
 
-
-
-class WFilterCriteria(wcomponents.WTemplated):
+class WFilterCriteriaRegistrants(wcomponents.WFilterCriteria):
     """
     Draws the options for a filter criteria object
     This means rendering the actual table that contains
     all the HTML for the several criteria
     """
 
-    def __init__(self, options, filterCrit):
-        wcomponents.WTemplated.__init__(self)
-        self._filterCrit = filterCrit
-        self._options = options
+    def __init__(self, options, filterCrit, extraInfo=""):
+        wcomponents.WFilterCriteria.__init__(self, options, filterCrit, extraInfo)
 
     def _drawFieldOptions(self, formName, form):
 
@@ -626,15 +611,6 @@ class WFilterCriteria(wcomponents.WTemplated):
 
         # TODO: remove when we have a better template system
         return page.getHTML().replace('%','%%')
-
-    def getVars(self):
-
-        vars = wcomponents.WTemplated.getVars( self )
-
-        vars["content"] =  list((name, self._drawFieldOptions(name, form))
-                                for (name, form) in self._options)
-        return vars
-
 
 class WFilterCriterionOptions(wcomponents.WTemplated):
     """
@@ -655,7 +631,6 @@ class WFilterCriterionOptions(wcomponents.WTemplated):
         parentVars["filterCrit"] = self._filterCrit
 
         return parentVars
-
 
 class WFilterSessionCriterionOptions(WFilterCriterionOptions):
     """
