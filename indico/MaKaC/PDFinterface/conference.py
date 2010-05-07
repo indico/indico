@@ -877,7 +877,7 @@ class ConfManagerContribToPDF(ContribToPDF):
 
 class ContributionBook(PDFBase):
 
-    def __init__(self,conf,contribList,aw,tz=None):
+    def __init__(self,conf,contribList,aw,tz=None, sortedBy=""):
         self._conf=conf
         if not tz:
             self._tz = self._conf.getTimezone()
@@ -887,6 +887,12 @@ class ContributionBook(PDFBase):
         self._aw=aw
         PDFBase.__init__(self)
         self._title=_("Book of abstracts")
+        self._sortedBy = sortedBy
+        if self._sortedBy == "boardNo":
+            try:
+                self._contribList = sorted(self._contribList, key=lambda x:int(x.getBoardNumber()))
+            except ValueError,e:
+                raise MaKaCError(_("In order to generate this PDF, all the contributions must contain a board number and it must only contain digits. There is a least one contribution with a wrong board number."))
         self._doc.leftMargin=1*cm
         self._doc.rightMargin=1*cm
         self._doc.topMargin=1.5*cm
@@ -980,7 +986,10 @@ class ContributionBook(PDFBase):
         for contrib in self._contribList:
             if not contrib.canAccess(self._aw):
                 continue
-            caption="%s - %s"%(contrib.getId(),contrib.getTitle())
+            if self._sortedBy == "boardNo":
+                caption="%s"%(contrib.getTitle())
+            else:
+                caption="%s - %s"%(contrib.getId(),contrib.getTitle())
             p1=Paragraph(escape(caption),self._styles["title"])
             lspk=[]
             for spk in contrib.getSpeakerList():

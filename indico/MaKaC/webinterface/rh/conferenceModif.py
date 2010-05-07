@@ -6298,6 +6298,7 @@ class RHContribsToPDFMenu(RHConferenceModifBase):
         self._displayType = params.get("displaytype", None)
 
     def _process( self ):
+        from MaKaC.PDFinterface.conference import ContributionBook
         if not self._displayType:
             wp =  conferences.WPConfModifContribToPDFMenu(self, self._conf, self._contribIds)
             return wp.display()
@@ -6305,8 +6306,19 @@ class RHContribsToPDFMenu(RHConferenceModifBase):
         elif self._displayType == "bookOfAbstract":
             tz = self._target.getTimezone()
             filename = "%s - Book of abstracts.pdf"%self._target.getTitle()
-            from MaKaC.PDFinterface.conference import ContributionBook
             pdf = ContributionBook(self._target, self._contribs, self.getAW(),tz=tz)
+            data = pdf.getPDFBin()
+            self._req.headers_out["Content-Length"] = "%s"%len(data)
+            cfg = Config.getInstance()
+            mimetype = cfg.getFileTypeMimeType( "PDF" )
+            self._req.content_type = """%s"""%(mimetype)
+            self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
+            return data
+
+        elif self._displayType == "bookOfAbstractBoardNo":
+            tz = self._target.getTimezone()
+            filename = "%s - Book of abstracts.pdf"%self._target.getTitle()
+            pdf = ContributionBook(self._target, self._contribs, self.getAW(),tz=tz, sortedBy="boardNo")
             data = pdf.getPDFBin()
             self._req.headers_out["Content-Length"] = "%s"%len(data)
             cfg = Config.getInstance()
