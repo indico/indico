@@ -539,7 +539,7 @@
         <xsl:if test="./description != ''">
           <tr>
             <td class="leftCol">Description</td>
-            <td style="font-style: italic;">
+            <td>
               <xsl:apply-templates select="./description"/>
             </td>
           </tr>
