@@ -26,7 +26,7 @@ from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.rl_config import defaultPageSize
 from reportlab.lib.units import inch, cm
-from reportlab.lib.enums import TA_CENTER  
+from reportlab.lib.enums import TA_CENTER
 from reportlab import platypus
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus.frames import Frame
@@ -40,7 +40,7 @@ from MaKaC.errors import MaKaCError
 ratio = math.sqrt(math.sqrt(2.0))
 
 class PDFSizes:
-    
+
     def __init__(self):
         self.PDFpagesizes = {'Letter' : LETTER,
                     'A0' : A3,
@@ -51,7 +51,7 @@ class PDFSizes:
                     'A5' : A5
                    }
 
-        self.PDFfontsizes = [_("xxx-small"), _("xx-small"), _("x-small"), _("smaller"), _("small"), _("normal"), _("large"), _("larger")]   
+        self.PDFfontsizes = [_("xxx-small"), _("xx-small"), _("x-small"), _("smaller"), _("small"), _("normal"), _("large"), _("larger")]
 
 class PDFHTMLParser(HTMLParser):
     _removedTags = ["a", "font"]
@@ -59,13 +59,13 @@ class PDFHTMLParser(HTMLParser):
     def __init__(self):
         HTMLParser.__init__(self)
         self.text = []
-        
+
     def parse(self, s):
         "Parse the given string 's'."
         self.feed(s)
         self.close()
         return "".join(self.text)
-        
+
     def handle_data(self, data):
         self.text.append( saxutils.escape(data) )
 
@@ -89,14 +89,14 @@ class PDFHTMLParser(HTMLParser):
 
     def handle_startendtag(self, tag, attrs):
         self.text.append( "<%s%s/>" % (tag, " ".join([ ' %s="%s"' % (x,y) for x,y in self.filterAttrs(attrs)])) )
-        
+
     def handle_endtag(self, tag):
         if tag in self._removedTags:
             return
         self.text.append( "</%s>" % tag )
-        
+
 def escape(text):
-    if text is None: 
+    if text is None:
         text = ""
     try:
         text = PDFHTMLParser().parse(text)
@@ -109,7 +109,7 @@ def escape(text):
         return saxutils.escape(text)
 
 def modifiedFontSize(fontsize, lowerNormalHigher):
-    
+
     if lowerNormalHigher == _("normal"):
         return fontsize
     elif lowerNormalHigher == _("small"):
@@ -128,7 +128,7 @@ def modifiedFontSize(fontsize, lowerNormalHigher):
         return fontsize * ratio * ratio
     else:
         return fontsize
-    
+
 
 def setTTFonts():
     # Import fonts from indico.extra (separate package)
@@ -158,10 +158,10 @@ class Paragraph(platypus.Paragraph):
     def __init__(self, test, style, part="", bulletText=None, frags=None, caseSensitive=1):
         platypus.Paragraph.__init__(self, test, style, bulletText, frags, caseSensitive)
         self._part = part
-    
+
     def setPart(self, part):
         self._part = part
-    
+
     def getPart(self):
         return self._part
 
@@ -169,10 +169,10 @@ class Spacer(platypus.Spacer):
     def __init__(self, width, height, part=""):
         platypus.Spacer.__init__(self, width, height)
         self._part = part
-    
+
     def setPart(self, part):
         self._part = part
-    
+
     def getPart(self):
         return self._part
 
@@ -180,10 +180,10 @@ class Image(platypus.Image):
     def __init__(self, filename, part="", width=None, height=None, kind='direct', mask="auto", lazy=1):
         platypus.Image.__init__(self, filename, width=None, height=None, kind='direct', mask="auto", lazy=1)
         self._part = part
-    
+
     def setPart(self, part):
         self._part = part
-    
+
     def getPart(self):
         return self._part
 
@@ -191,10 +191,10 @@ class Image(platypus.Image):
 class PageBreak(platypus.PageBreak):
     def __init__(self, part=""):
         self._part = part
-    
+
     def setPart(self, part):
         self._part = part
-    
+
     def getPart(self):
         return self._part
 
@@ -202,10 +202,10 @@ class Preformatted(platypus.Preformatted):
     def __init__(self, text, style, part="", bulletText = None, dedent=0):
         platypus.Preformatted.__init__(self, text, style, bulletText = None, dedent=0)
         self._part = part
-    
+
     def setPart(self, part):
         self._part = part
-    
+
     def getPart(self):
         return self._part
 
@@ -214,13 +214,13 @@ class FileDummy:
     def __init__(self):
         self._data = ""
         self.name = "fileDummy"
-    
+
     def write(self, data):
         self._data += data
-    
+
     def getData(self):
         return self._data
-    
+
     def close(self):
         pass
 
@@ -232,7 +232,7 @@ class CanvasA0(Canvas):
                  encoding = None,
                  invariant = None,
                  verbosity=0):
-        
+
         Canvas.__init__(self, filename, pagesize=pagesize, bottomup=bottomup, pageCompression=pageCompression,
                         encoding=encoding, invariant=invariant, verbosity=verbosity)
         self.scale(4.0, 4.0)
@@ -246,7 +246,7 @@ class CanvasA1(Canvas):
                  encoding = None,
                  invariant = None,
                  verbosity=0):
-        
+
         Canvas.__init__(self, filename, pagesize=pagesize, bottomup=bottomup, pageCompression=pageCompression,
                         encoding=encoding, invariant=invariant, verbosity=verbosity)
         self.scale(2.0 * math.sqrt(2.0), 2.0 * math.sqrt(2.0))
@@ -260,7 +260,7 @@ class CanvasA2(Canvas):
                  encoding = None,
                  invariant = None,
                  verbosity=0):
-        
+
         Canvas.__init__(self, filename, pagesize=pagesize, bottomup=bottomup, pageCompression=pageCompression,
                         encoding=encoding, invariant=invariant, verbosity=verbosity)
         self.scale(2.0, 2.0)
@@ -274,12 +274,12 @@ class CanvasA3(Canvas):
                  encoding = None,
                  invariant = None,
                  verbosity=0):
-        
+
         Canvas.__init__(self, filename, pagesize=pagesize, bottomup=bottomup, pageCompression=pageCompression,
                         encoding=encoding, invariant=invariant, verbosity=verbosity)
         self.scale(math.sqrt(2.0), math.sqrt(2.0))
         self.setPageSize(A3)
-        
+
 class CanvasA5(Canvas):
     def __init__(self,filename,
                  pagesize=None,
@@ -288,7 +288,7 @@ class CanvasA5(Canvas):
                  encoding = None,
                  invariant = None,
                  verbosity=0):
-        
+
         Canvas.__init__(self, filename, pagesize=pagesize, bottomup=bottomup, pageCompression=pageCompression,
                         encoding=encoding, invariant=invariant, verbosity=verbosity)
         self.scale(1.0 / math.sqrt(2.0), 1.0 / math.sqrt(2.0))
@@ -304,9 +304,9 @@ pagesizeNameToCanvas = {'A4': Canvas,
                         }
 
 class PDFBase:
-    
+
     def __init__(self, doc=None, story=None, pagesize = 'A4', printLandscape=False):
-        
+
         if doc:
             self._doc = doc
         else:
@@ -318,46 +318,46 @@ class PDFBase:
                 self._doc = SimpleDocTemplate(self._fileDummy, pagesize = landscape(PDFSizes().PDFpagesizes[pagesize]))
             else:
                 self._doc = SimpleDocTemplate(self._fileDummy, pagesize = PDFSizes().PDFpagesizes[pagesize])
-        
+
         if story is not None:
             self._story = story
         else:
             #create a new story with a spacer which take all the first page
             #then the first page is only drawing by the firstPage method
             self._story = [PageBreak()]
-            
+
         if printLandscape:
             self._PAGE_HEIGHT = landscape(PDFSizes().PDFpagesizes[pagesize])[1]
             self._PAGE_WIDTH = landscape(PDFSizes().PDFpagesizes[pagesize])[0]
         else:
             self._PAGE_HEIGHT = PDFSizes().PDFpagesizes[pagesize][1]
             self._PAGE_WIDTH = PDFSizes().PDFpagesizes[pagesize][0]
-            
+
         self._canv = Canvas
         setTTFonts()
-    
+
     def firstPage(self, c, doc):
         """set the first page of the document
         This function is call by doc.build method for the first page
         """
         pass
-    
-    
+
+
     def laterPages(self, c, doc):
         """set the layout of the page after the first
         This function is call by doc.build method one each page after the first
         """
         pass
-    
-    
+
+
     def getBody(self, story=None):
         if not story:
             story = self._story
         """add the content to the story
         """
         pass
-    
-    
+
+
     def getPDFBin(self):
         #build the pdf in the fileDummy
         self.getBody()
@@ -394,23 +394,23 @@ class PDFBase:
         if line.strip() != "":
             draw(width, height, escape(line))
         return height
-    
-    
+
+
 
 def _doNothing(canvas, doc):
     "Dummy callback for onPage"
     pass
 
 class DocTemplateWithTOC(SimpleDocTemplate):
-    
+
     def __init__(self, toc, indexedFlowable, filename, firstPageNumber = 1, **kw ):
         """toc is the TableOfContents object
         indexedFlowale is a dictionnary with flowables as key and a dictionnary as value.
-            the sub-dictionnary have two key: 
+            the sub-dictionnary have two key:
                 text: the text which will br print in the table
                 level: the level of the entry( modifying the indentation and the police
         """
-        
+
         self._toc = toc
         self._indexedFlowable = indexedFlowable
         self._filename = filename
@@ -418,7 +418,7 @@ class DocTemplateWithTOC(SimpleDocTemplate):
         self._firstPageNumber = firstPageNumber
         SimpleDocTemplate.__init__(self, filename, **kw)
         setTTFonts()
-    
+
     def afterFlowable(self, flowable):
         if flowable in self._indexedFlowable:
             self._toc.addEntry(self._indexedFlowable[flowable]["level"], self._indexedFlowable[flowable]["text"], self.page + (self._firstPageNumber - 1))
@@ -427,13 +427,13 @@ class DocTemplateWithTOC(SimpleDocTemplate):
                 self._part = flowable.getPart()
         except:
             pass
-    
+
     def handle_documentBegin(self):
         self._part = ""
         SimpleDocTemplate.handle_documentBegin(self)
-        
-    
-    
+
+
+
     def multiBuild(self, story, filename=None, canvasMaker=Canvas, maxPasses=10, onFirstPage=_doNothing, onLaterPages=_doNothing):
         self._calc()    #in case we changed margins sizes etc
         frameT = Frame(self.leftMargin, self.bottomMargin, self.width, self.height, id='normal')
@@ -444,8 +444,12 @@ class DocTemplateWithTOC(SimpleDocTemplate):
             self.pageTemplates[0].beforeDrawPage = self.onFirstPage
         if onLaterPages is _doNothing and hasattr(self,'onLaterPages'):
             self.pageTemplates[1].beforeDrawPage = self.onLaterPages
-        SimpleDocTemplate.multiBuild(self, story, self._filename, canvasMaker, maxPasses)
-    
+
+        try:
+            SimpleDocTemplate.multiBuild(self, story, self._filename, canvasMaker, maxPasses)
+        except TypeError:
+            SimpleDocTemplate.multiBuild(self, story, maxPasses, canvasmaker=canvasMaker)
+
     def getCurrentPart(self):
         return self._part
 
@@ -454,12 +458,12 @@ class DocTemplateWithTOC(SimpleDocTemplate):
 class PDFWithTOC(PDFBase):
     """
     create a PDF with a Table of Contents
-    
+
     """
-    
+
     def __init__(self, story=None, pagesize = 'A4', fontsize = 'normal', firstPageNumber = 1 ):
-        
-        
+
+
         self._fontsize = fontsize
         self._indexedFlowable = [] #indexedFlowable
         self._toc = TableOfContents()
@@ -472,14 +476,14 @@ class PDFWithTOC(PDFBase):
         self._processTOCPage()
         self._indexedFlowable = {}
         self._fileDummy = FileDummy()
-        
+
         self._doc = DocTemplateWithTOC(self._toc, self._indexedFlowable, self._fileDummy, firstPageNumber = firstPageNumber, pagesize=PDFSizes().PDFpagesizes[pagesize])
-        
+
         self._PAGE_HEIGHT = PDFSizes().PDFpagesizes[pagesize][1]
         self._PAGE_WIDTH = PDFSizes().PDFpagesizes[pagesize][0]
-        
+
         setTTFonts()
-        
+
     def _processTOCPage(self):
         style1 = ParagraphStyle({})
         style1.fontName = "Times-Bold"
@@ -492,7 +496,7 @@ class PDFWithTOC(PDFBase):
         self._story.append(Spacer(inch, 2*cm))
         self._story.append(self._toc)
         self._story.append(PageBreak())
-        
+
     def getBody(self, story=None):
         """add the content to the story
         When you want to put a paragraph p in the toc, add it to the self._indexedFlowable as this:
@@ -501,7 +505,7 @@ class PDFWithTOC(PDFBase):
         if not story:
             story = self._story
         pass
-            
+
     def getPDFBin(self):
         self.getBody()
         self._doc.multiBuild( self._story, onFirstPage=self.firstPage, onLaterPages=self.laterPages)
