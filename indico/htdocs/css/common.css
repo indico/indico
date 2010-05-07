@@ -567,7 +567,8 @@ div.minutesTable > span {
 }
 
 div.minutesTable > span h1 , h2{
-    color: black;
+    font-size: 13px;
+    color: #444444;
 }
 
 li.meetingSession, li.meetingContrib, li.breakListItem {

@@ -636,21 +636,78 @@ extend(IndicoUI.Dialogs,
                    killProgress = IndicoUI.Dialogs.Util.progress($T('Saving...'));
                    try{
                        var parsingResult = escapeHarmfulHTML(rtWidget.get());
+
                        if( parsingResult[1] > 0) {
-                           var popup = new WarningPopup("Warning!", "Your minutes will be cleaned from scripts, styles and potentially harmful html tags and attributes.");
+                           closeMinutes = false;
+
+                           var cleaningFunction = function(confirmed) {
+                               if(confirmed) {
+                                   if(parsingResult[0])
+                                       rtWidget.set(parsingResult[0]);
+                                   else
+                                       rtWidget.set(" ");
+                               }
+                           }
+
+                           var security;
+                           switch(parsingResult[1]) {
+                               case 1:
+                                   security = "HTML";
+                                   break;
+                               case 2:
+                                   security = "HTML and scripts";
+                                   break;
+                               default:
+                                   security = "code";
+                                   break;
+                           }
+
+                           var popup = new ConfirmPopup("Warning!", Html.div({style: {width:pixels(300), textAlign:'justify'}},"Your minutes contains some potentially harmful " + security + ", which cannot be stored in the database. Clean the text manually or use the automatic Indico cleaner."), cleaningFunction);
+                           popup.draw = function(){
+                               var self = this;
+
+                               var okButton = Html.input('button', {style:{marginRight: pixels(3)}}, $T('Clean automatically'));
+                               okButton.observeClick(function(){
+                                   self.close();
+                                   self.handler(true);
+                               });
+
+                               var cancelButton = Html.input('button', {style:{marginLeft: pixels(3)}}, $T('Clean manually'));
+                               cancelButton.observeClick(function(){
+                                   self.close();
+                                   self.handler(false);
+                               });
+
+                               return this.ExclusivePopupWithButtons.prototype.draw.call(this,
+                                       this.content,
+                                       Html.div({}, okButton, cancelButton));
+                           }
                            popup.open();
                        }
-                       req.set(parsingResult[0]);
+                       else
+                           req.set(parsingResult[0]);
                    }
                    catch(error){
                        if(typeof error == "string" && error.indexOf("Parse Error") != -1){
-                           var popup = new WarningPopup("Warning!", "Invalid format!.");
+                           closeMinutes = false;
+                           var popup = new WarningPopup("Warning!", "Format of your minutes is invalid. Please check the syntax.");
                            popup.open();
-                           //TODO: Ask Jose what to do in case of exception.
-                           req.set("");
                        }
                        else
                            throw error;
+                   }
+
+                   if (changedText) {
+                       req.observe(function(_){
+                           //killProgress();
+                           changedText.set(false);
+                           wasChanged = true;
+                           saveButton.dom.disabled = true;
+                           saveCloseButton.dom.disabled = true;
+                           if (exists(closeMinutes) && typeof(closeMinutes) == "function") {
+                               closeMinutes();
+                           }
+                       });
                    }
 
                };
