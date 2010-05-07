@@ -402,8 +402,9 @@ class AbstractsToPDF(PDFWithTOC):
 
 
     def getBody(self):
+        abMgr = self._conf.getAbstractMgr()
         for abstract in self._abstracts:
-            temp = AbstractToPDF(self._conf, abstract, tz=self._tz)
+            temp = AbstractToPDF(self._conf, abMgr.getAbstractById(abstract), tz=self._tz)
             temp.getBody(self._story, indexedFlowable=self._indexedFlowable, level=1)
             self._story.append(PageBreak())
 
@@ -536,8 +537,9 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
 class ConfManagerAbstractsToPDF(AbstractsToPDF):
 
     def getBody(self):
+        abMgr = self._conf.getAbstractMgr()
         for abstract in self._abstracts:
-            temp = ConfManagerAbstractToPDF(self._conf, abstract,tz=self._tz)
+            temp = ConfManagerAbstractToPDF(self._conf, abMgr.getAbstractById(abstract),tz=self._tz)
             temp.getBody(self._story, indexedFlowable=self._indexedFlowable, level=1)
             self._story.append(PageBreak())
 
@@ -668,8 +670,9 @@ class TrackManagerAbstractsToPDF(AbstractsToPDF):
         self._track = track
 
     def getBody(self):
+        abMgr = self._conf.getAbstractMgr()
         for abstract in self._abstracts:
-            temp = TrackManagerAbstractToPDF(self._conf, abstract, self._track, tz=self._tz)
+            temp = TrackManagerAbstractToPDF(self._conf, abMgr.getAbstractById(abstract), self._track, tz=self._tz)
             temp.getBody(self._story, indexedFlowable=self._indexedFlowable, level=1)
             self._story.append(PageBreak())
 

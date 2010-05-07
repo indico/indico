@@ -43,9 +43,9 @@ from MaKaC.i18n import _
 
 
 class RHBaseCFA( RHConferenceBaseDisplay ):
-    
+
     def _processIfActive( self ):
-        """only override this method if the CFA must be activated for 
+        """only override this method if the CFA must be activated for
             carrying on the handler execution"""
         return "cfa"
 
@@ -63,20 +63,20 @@ class RHBaseCFA( RHConferenceBaseDisplay ):
 
 class RHConferenceCFA( RHBaseCFA ):
     _uh = urlHandlers.UHConferenceCFA
-    
+
     def _processIfActive( self ):
         p = abstracts.WPConferenceCFA( self, self._target )
         return p.display()
 
 
 class RHAbstractSubmissionBase( RHBaseCFA ):
-    
+
     def _checkProtection( self ):
         self._checkSessionUser()
         RHBaseCFA._checkProtection( self )
-    
+
     def _processIfOpened( self ):
-        """only override this method if the submission period must be opened 
+        """only override this method if the submission period must be opened
             for the request handling"""
         return "cfa opened"
 
@@ -85,10 +85,10 @@ class RHAbstractSubmissionBase( RHBaseCFA ):
         #if the user is in the autorized list, don't check period
         if self._getUser() in cfaMgr.getAuthorizedSubmitterList():
             return self._processIfOpened()
-        #if the submission period is not yet opened we show up a form informing 
+        #if the submission period is not yet opened we show up a form informing
         #   about that.
         if timezoneUtils.nowutc() < cfaMgr.getStartSubmissionDate():
-        #if the submission period is already closed we show up a form informing 
+        #if the submission period is already closed we show up a form informing
         #   about that.
             p = abstracts.WPCFANotYetOpened( self, self._conf )
             return p.display()
@@ -100,7 +100,7 @@ class RHAbstractSubmissionBase( RHBaseCFA ):
 
 
 class _AbstractAuthorList:
-    
+
     def __init__( self, params ):
         self._mapFromParams( params )
 
@@ -186,18 +186,18 @@ class _AbstractAuthorList:
         data["primary"] = True
         author = self._getNewAuthor( **data )
         self._primaryAuthors[ author["auth_id"] ] = author
-    
+
     def addSecondaryAuthor( self, **data ):
         data["primary"] = False
         author = self._getNewAuthor( **data )
         self._secondaryAuthors[ author["auth_id"] ] = author
-    
+
     def removePrimaryAuthor( self, id ):
         try:
             del self._primaryAuthors[ int(id) ]
         except KeyError:
             pass
-    
+
     def removeSecondaryAuthor( self, id ):
         try:
             del self._secondaryAuthors[ int(id) ]
@@ -206,7 +206,7 @@ class _AbstractAuthorList:
 
 
 class AbstractData:
-    
+
     def __init__( self, absMgr, params ):
         self._absMgr = absMgr
         self._afm = absMgr.getAbstractFieldsMgr()
@@ -229,7 +229,7 @@ class AbstractData:
 
     def setFieldValue( self, id, value ):
         self._otherFields[id] = value
-    
+
     def check( self ):
         errors = []
         if self.title.strip() == "":
@@ -374,14 +374,14 @@ class _AbstractSubmissionNotification:
         msg.append( tw.fill( _("""_("Comments"): %s""")%self._abstract.getComments() ) )
         msg.append( "" )
         return "\n".join( msg )
-    
+
     def getBody(self):
         msg=self.getMsg()
         return _("""
 _("The following email has been sent to %s"):
 
 ===
-                
+
 %s""")%(self.getDestination().getFullName(), msg)
 
 
@@ -501,7 +501,7 @@ class RHAbstractSubmission( RHAbstractSubmissionBase ):
             return p.display( **pars )
 
 
-            
+
 class RHUserAbstracts( RHAbstractSubmissionBase ):
     _uh = urlHandlers.UHUserAbstracts
 
@@ -509,9 +509,9 @@ class RHUserAbstracts( RHAbstractSubmissionBase ):
         p = abstracts.WPUserAbstracts( self, self._conf )
         return p.display()
 
-        
+
 class RHAbstractDisplayBase( RHAbstractSubmissionBase ):
-    
+
     def _checkParams( self, params ):
         RHAbstractSubmissionBase._checkParams( self, params )
         cfaMgr = self._conf.getAbstractMgr()
@@ -529,8 +529,8 @@ class RHAbstractSubmissionConfirmation( RHAbstractDisplayBase ):
 
 
 class RHAbstractDisplay( RHAbstractDisplayBase ):
-    _uh = urlHandlers.UHAbstractDisplay 
-    
+    _uh = urlHandlers.UHAbstractDisplay
+
     def _processIfActive( self ):
         p = abstracts.WPAbstractDisplay( self, self._target )
         return p.display()
@@ -542,7 +542,7 @@ class RHAbstractDisplayPDF( RHAbstractDisplayBase ):
         RHConferenceBaseDisplay._checkProtection(self)
         if not self._conf.hasEnabledSection("cfa"):
             raise MaKaCError( _("The Call For Abstracts was disabled by the conference managers"))
-    
+
     def _process( self ):
         tz = timezoneUtils.DisplayTZ(self._aw,self._conf).getDisplayTZ()
         filename = "%s - Abstract.pdf"%self._target.getTitle()
@@ -563,22 +563,17 @@ class RHAbstractsDisplayPDF(RHConferenceBaseDisplay):
         RHConferenceBaseDisplay._checkProtection(self)
         if not self._conf.hasEnabledSection("cfa"):
             raise MaKaCError( _("The Call For Abstracts was disabled by the conference managers"))
-    
+
     def _checkParams( self, params ):
         RHConferenceBaseDisplay._checkParams( self, params )
         self._abstractIds = normaliseListParam( params.get("abstracts", []) )
-        self._abstracts = []
-        abMgr = self._conf.getAbstractMgr()
-        for id in self._abstractIds:
-            if abMgr.getAbstractById(id).canView(self._aw):
-                self._abstracts.append(abMgr.getAbstractById(id))
-    
-    def _process( self ):  
-        tz = timezoneUtils.DisplayTZ(self._aw,self._conf).getDisplayTZ()      
+
+    def _process( self ):
+        tz = timezoneUtils.DisplayTZ(self._aw,self._conf).getDisplayTZ()
         filename = "Abstracts.pdf"
-        if not self._abstracts:
+        if not self._abstractIds:
             return _("No abstract to print")
-        pdf = AbstractsToPDF(self._conf, self._abstracts,tz=tz)
+        pdf = AbstractsToPDF(self._conf, self._abstractIds,tz=tz)
         data = pdf.getPDFBin()
         self._req.set_content_length(len(data))
         cfg = Config.getInstance()
@@ -589,11 +584,11 @@ class RHAbstractsDisplayPDF(RHConferenceBaseDisplay):
 
 
 class RHAbstractModificationBase( RHAbstractDisplayBase, RHModificationBaseProtected ):
-    
+
     def _checkProtection( self ):
         RHModificationBaseProtected._checkProtection( self )
-    
-    
+
+
     def _processIfActive( self ):
         #We overload this method to alow modification after the CFA is closed if the modification deadline is after the submission deadline
         cfaMgr = self._conf.getAbstractMgr()
@@ -603,10 +598,10 @@ class RHAbstractModificationBase( RHAbstractDisplayBase, RHModificationBaseProte
         #if the user is in the autorized list, don't check period
         if self._getUser() in cfaMgr.getAuthorizedSubmitterList():
             return self._processIfOpened()
-        #if the submission period is not yet opened we show up a form informing 
+        #if the submission period is not yet opened we show up a form informing
         #   about that.
         if timezoneUtils.nowutc() < cfaMgr.getStartSubmissionDate():
-        #if the submission period is already closed we show up a form informing 
+        #if the submission period is already closed we show up a form informing
         #   about that.
             p = abstracts.WPCFANotYetOpened( self, self._conf )
             return p.display()
@@ -683,7 +678,7 @@ class RHAbstractModify( RHAbstractModificationBase ):
                 trackIds.append( track.getId() )
             self._abstractData.tracks = trackIds
             self._abstractData.comments = self._abstract.getComments()
-    
+
     def _doValidate( self ):
         #First, one must validate that the information is fine
         errors = self._abstractData.check()
@@ -765,7 +760,7 @@ class RHAbstractModify( RHAbstractModificationBase ):
 
 class RHAbstractWithdraw( RHAbstractModificationBase ):
     _uh = urlHandlers.UHAbstractWithdraw
-    
+
     def _checkParams( self, params ):
         RHAbstractModificationBase._checkParams( self, params )
         self._action = ""
@@ -774,19 +769,19 @@ class RHAbstractWithdraw( RHAbstractModificationBase ):
             self._action = "WITHDRAW"
         elif params.has_key("cancel"):
             self._action = "CANCEL"
-        
+
     def _processIfOpened( self ):
         if self._action == "CANCEL":
             self._redirect( urlHandlers.UHAbstractDisplay.getURL( self._abstract ) )
         elif self._action == "WITHDRAW":
             if self._abstract.getCurrentStatus().__class__ not in \
-                    [review.AbstractStatusSubmitted, 
+                    [review.AbstractStatusSubmitted,
                     review.AbstractStatusUnderReview,
                     review.AbstractStatusInConflict,
                     review.AbstractStatusProposedToAccept,
                     review.AbstractStatusProposedToReject]:
                 raise MaKaCError( _("this abstract cannot be withdrawn, please contact the conference organisers in order to do so"))
-            self._abstract.withdraw(self._getUser(),self._comments) 
+            self._abstract.withdraw(self._getUser(),self._comments)
             self._redirect( urlHandlers.UHAbstractDisplay.getURL( self._abstract ) )
         else:
             wp = abstracts.WPAbstractWithdraw( self, self._abstract )
@@ -812,7 +807,7 @@ class RHAbstractRecovery( RHAbstractModificationBase ):
             if isinstance(status,review.AbstractStatusWithdrawn):
                 if status.getResponsible()!=self._getUser():
                     raise MaKaCError( _("you are not allowed to recover this abstract"))
-                self._abstract.recover() 
+                self._abstract.recover()
             self._redirect( urlHandlers.UHAbstractDisplay.getURL( self._abstract ) )
         else:
             wp = abstracts.WPAbstractRecovery( self, self._abstract )

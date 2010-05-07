@@ -4291,18 +4291,13 @@ class RHAbstractsToPDF(RHConfModifCFABase):
     def _checkParams( self, params ):
         RHConfModifCFABase._checkParams( self, params )
         self._abstractIds = normaliseListParam( params.get("abstracts", []) )
-        self._abstracts = []
-        abMgr = self._conf.getAbstractMgr()
-        for id in self._abstractIds:
-            #if abMgr.getAbstractById(id).canView( self._aw ):
-            self._abstracts.append(abMgr.getAbstractById(id))
 
     def _process( self ):
         tz = self._conf.getTimezone()
         filename = "Abstracts.pdf"
-        if not self._abstracts:
+        if not self._abstractIds:
             return _("No abstract to print")
-        pdf = ConfManagerAbstractsToPDF(self._conf, self._abstracts,tz=tz)
+        pdf = ConfManagerAbstractsToPDF(self._conf, self._abstractIds,tz=tz)
         data = pdf.getPDFBin()
         self._req.set_content_length(len(data))
         cfg = Config.getInstance()
