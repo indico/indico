@@ -452,6 +452,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
             (self._sessionFilterName, regForm.getSessionsForm())
             ]
 
+        extraInfo = ""
         if self._conf.getRegistrationForm().getStatusesList():
             extraInfo = _("""<table align="center" cellspacing="0" width="100%%">
                                 <tr>
