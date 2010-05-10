@@ -4052,6 +4052,10 @@ class RHAbstractList(RHConfModifCFABase):
 
         sessionData.update(params)
 
+        sessionData['track'] = utils.normalizeToList(sessionData.get("track"))
+        sessionData['status'] = utils.normalizeToList(sessionData.get("status"))
+        sessionData['acc_track'] = utils.normalizeToList(sessionData.get("acc_track"))
+
         # TODO: this should work as for the tracks, NOTE hat this filter is used in many
         # places (ContribTypeFilterField and AccContribTypeFilterField should expect ids
         # instead of objects).
