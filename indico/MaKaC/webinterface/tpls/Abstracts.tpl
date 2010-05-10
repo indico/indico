@@ -157,18 +157,15 @@ document.filterOptionForm.showSubmissionDate.checked=false
 }
 //-->
 </script>
-
+<a href="" name="results"></a>
 <table width="100%%" valign="top" align="left" cellspacing="0">
     <tr>
-        <td class="titleCellFormat">
+        <td class="titleCellFormat" nowrap colspan="10">
             <form action=%(accessAbstract)s method="post">
             <%= _("Quick search: Abstract ID")%> <input type="text" name="abstractId" size="4"><input type="submit" class="btn" value="<%= _("seek it")%>"><br>
             </form>
         </td>
     </tr>
-</table>
-<a href="" name="results"></a>
-<table width="100%%" cellspacing="0" align="center" border="0">
     <tr>
        <td nowrap colspan="10">
             <div class="CRLgroupTitleNoBorder"><%= _("Displaying")%><strong> %(filteredNumberAbstracts)s </strong>
