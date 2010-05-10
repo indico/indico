@@ -14,8 +14,8 @@ BrowserPath = "/usr/bin/firefox"
 #------------------------------------------------------------------------------
 # Start/Stop Production DB commands
 #------------------------------------------------------------------------------
-StartDBCmd = "/usr/bin/python /usr/local/lib/python2.6/dist-packages/zdaemon-2.0.4-py2.6.egg/zdaemon/zdctl.py -C /home/jeremy/cds-indico/etc/zdctl.conf start"
-StopDBCmd  = "/usr/bin/python /usr/local/lib/python2.6/dist-packages/zdaemon-2.0.4-py2.6.egg/zdaemon/zdctl.py -C /home/jeremy/cds-indico/etc/zdctl.conf stop"
+StartDBCmd = "zdaemon -C /home/jdoe/cds-indico/etc/zdctl.conf start"
+StopDBCmd  = "zdaemon -C /home/jdoe/cds-indico/etc/zdctl.conf stop"
 
 
 #------------------------------------------------------------------------------

@@ -78,6 +78,12 @@ class BaseTestRunner(object):
 
         return self._run()
 
+    def info(self, message):
+        """
+        Prints an info message
+        """
+        print colored("** %s" % message, 'blue')
+
     def _startIOCapture(self):
         """
         Start capturing stdout and stderr to StringIOs

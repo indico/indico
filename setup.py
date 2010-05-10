@@ -314,6 +314,7 @@ class test_indico(Command):
                     ('jsspecify=', None, "Use js-test-driver style (TestCaseName.testName)"),
                     ('grid', None, "Use Selenium Grid"),
                     ('html', None, "Make an HTML report (when possible)"),
+                    ('record', None, "Record tests (for --functional)"),
                     ('full-output', None, "Write the results to the console, in addition to the log file")]
     boolean_options = []
 
@@ -327,8 +328,9 @@ class test_indico(Command):
     jscoverage = False
     jsspecify = None
     grid = None
-    full_output = None
-    html = None
+    full_output = False
+    html = False
+    record = False
 
     def initialize_options(self):
         pass
@@ -368,7 +370,8 @@ class test_indico(Command):
         options = {'verbose': self.full_output,
                    'html': self.html,
                    'specify': self.specify,
-                   'coverage': self.coverage}
+                   'coverage': self.coverage,
+                   'record': self.record}
 
         #this variable will tell what to do with the databases
         fakeDBPolicy = self.checkDBStatus(testsToRun, self.specify)
@@ -387,8 +390,14 @@ class test_indico(Command):
         fakeDBPolicy = 0
         if ('functional' in testsToRun) or ('grid' in testsToRun) or ((specify != None) and (specify.find('unit/') < 0)):
 
+            params = Config.getInstance().getDBConnectionParams()
+
             #checking if production db is running
-            server = TestZEOServer(Config.getInstance().getDBConnectionParams()[1], 'test')
+            server = TestZEOServer(params[1],
+                                   'test',
+                                   hostname = params[0])
+
+
             if server.server.can_connect(server.options.family, server.options.address):
                 print """Your production database is currently running.
 Do you want to stop it using this command '%s' and run the tests?

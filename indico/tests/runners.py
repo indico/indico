@@ -45,7 +45,7 @@ from selenium import selenium
 
 from indico.tests.config import TestConfig
 from indico.tests.base import BaseTestRunner
-from indico.tests.util import openBrowser
+from indico.tests.util import openBrowser, colored
 
 __all__ = [
     'UnitTestRunner',
@@ -181,20 +181,23 @@ class FunctionalTestRunner(BaseTestRunner):
     def __init__(self, **kwargs):
         BaseTestRunner.__init__(self, **kwargs)
         self.child = None
+        self._record = kwargs['record']
 
-    def _run(self):
-        returnString = ""
+    def _runSeleniumCycle(self):
+
+        returnString = ''
+
+        self._startIOCapture()
 
         try:
-            if not self.startSeleniumServer():
+            if not self._startSeleniumServer():
                 return ('[ERR] Could not start functional tests because selenium'
                         ' server cannot be started.\n')
-
-            self._startIOCapture()
 
             #retrieving tests from tests folder
             args = ['nose', '--nologcapture', '--logging-clear-handlers', '-v',
                     os.path.join(self.setupDir, 'python', 'functional')]
+
             #retrieving tests from plugins folder
             for folder in BaseTestRunner.walkThroughFolders(
                 os.path.join(self.setupDir, '..', 'MaKaC', 'plugins'),
@@ -203,8 +206,10 @@ class FunctionalTestRunner(BaseTestRunner):
 
             result = nose.run(argv = args)
 
+        except Exception, e:
+            raise e
         finally:
-            self.stopSeleniumServer()
+            self._stopSeleniumServer()
 
             #restoring the stderr
             sys.stderr = sys.__stderr__
@@ -212,12 +217,23 @@ class FunctionalTestRunner(BaseTestRunner):
         s = self._finishIOCapture()[1]
         returnString += self.writeReport("pyfunctional", s)
 
-        report = ""
         if result:
             report = returnString + "PY Functional tests succeeded\n"
         else:
             report = returnString + ("[FAIL] Functional tests - report in"
                     " tests/report/pyfunctional.txt\n")
+
+        return report
+
+    def _run(self):
+        returnString = ""
+
+        if self._record:
+            raw_input("Press [ENTER] to finish recording... ")
+            report = ""
+        else:
+            report = self._runSeleniumCycle()
+
         return report
 
     def walkThroughPluginsFolders(self):
@@ -234,11 +250,14 @@ class FunctionalTestRunner(BaseTestRunner):
 
         return foldersArray
 
-    def startSeleniumServer(self):
+    def _startSeleniumServer(self):
         """
         starts the selenium server
         """
         started = True
+
+        self.info("Starting Selenium Server")
+
         try:
             self.child = subprocess.Popen(["java", "-jar",
                                       os.path.join(self.setupDir,
@@ -246,14 +265,17 @@ class FunctionalTestRunner(BaseTestRunner):
                                                    'functional',
                                                    TestConfig.getInstance().
                                                    getSeleniumFilename())],
-                                      stdout=subprocess.PIPE)
+                                      stdout=None)
+
         except OSError, e:
             return ("[ERR] Could not start selenium server - command \"java\""
                     " needs to be in your PATH. (%s)\n" % e)
         except KeyError:
             return "[ERR] Please specify a SeleniumFilename in tests.conf\n"
 
-        sel = selenium("localhost", 4444, "*chrome", "http://www.cern.ch/")
+        self.info("Starting Selenium RC")
+
+        sel = selenium("localhost", 4444, "*firefox", "http://www.cern.ch/")
         for i in range(5):
             try:
                 #testing if the selenium server has started
@@ -271,7 +293,7 @@ class FunctionalTestRunner(BaseTestRunner):
 
         return started
 
-    def stopSeleniumServer(self):
+    def _stopSeleniumServer(self):
         """
         stops the selenium server
         """

@@ -1,8 +1,8 @@
 from MaKaC.common.db import DBMgr
 from MaKaC.conference import ConferenceHolder
 from MaKaC.errors import MaKaCError
-from tests.BaseTest import BaseTest
-from tests.Indicop import GridData
+from indico.tests import BaseTestRunner
+from indico.tests.runners import GridDataTestRunner
 import unittest
 from twill import commands as tc
 from selenium import selenium
@@ -10,17 +10,17 @@ import unittest
 from twill import commands as tc
 from MaKaC.common.Configuration import Config
 
-class SeleniumTestCase(unittest.TestCase, BaseTest):
+class SeleniumTestCase(unittest.TestCase, BaseTestRunner):
 
     def setUp(self):
         self.verificationErrors = []
         self.confId = None
         self.selenium = None
-        grid = GridData.getInstance()
+        grid = GridDataTestRunner.getInstance()
         if grid.isActive():
             self.selenium = selenium(grid.getUrl(), grid.getPort(), grid.getEnv(), self.getRootUrl())
         else:
-            self.selenium = selenium("localhost", 4444, "*chrome", self.getRootUrl())
+            self.selenium = selenium("localhost", 4444, "*firefox", self.getRootUrl())
 
         self.selenium.start()
 

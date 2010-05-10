@@ -34,9 +34,9 @@ class TestZEOServer:
     """
     Creates a standalone ZEO server for tests
     """
-    def __init__(self, port, fd):
+    def __init__(self, port, fd, hostname="localhost"):
         self.options = ZEOOptions()
-        self.options.realize(['-f', fd, '-a', 'localhost:%d' % port])
+        self.options.realize(['-f', fd, '-a', '%s:%d' % (hostname, port)])
         self.server = ZEOServer(self.options)
 
     def start(self):

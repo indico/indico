@@ -27,7 +27,7 @@ technologies used for different types of testing.
 
  * Python/JS Unit Tests - using nosetest and JSUnit
  * Python Coverage Tests - using figleaf
- * Functional Tests - using selenium and selenium grid
+ * Functional Tests - using selenium, nose and selenium grid
  * Code conventions, standards, smells - Pylint and JSlint
 
 """

@@ -60,116 +60,64 @@ class ExampleTest(SeleniumTestCase):
         sel.click("link=Timetable")
         sel.wait_for_page_to_load("30000")
         sel.click("link=Add new")
-        for i in range(60):
-            try:
-                if sel.is_text_present("Session"):
-                    break
-                else:
-                    sel.click("link=Add new")
-            except: pass
-            time.sleep(1)
-        else: self.fail("time out")
+
+        time.sleep(1)
+        self.failUnless(sel.is_text_present("Session"))
         sel.click("link=Session")
-        for i in range(60):
-            try:
-                if sel.is_text_present("Add Session"):
-                    break
-                else:
-                    sel.click("link=Session")
-            except: pass
-            time.sleep(1)
-        else: self.fail("time out")
-        sel.type("_GID5", "Session One")
+
+        time.sleep(1)
+        self.failUnless(sel.is_text_present("Add Session"))
+        sel.type("//div[@class='popupWithButtonsMainContent']//input[@type='text']", "Session One")
         sel.type("//textarea", "bla bla bla")
-        sel.click("//button[1]")
-        for i in range(60):
-            try:
-                if sel.is_text_present("Session One"):
-                    break
-                else:
-                    sel.click("//button[1]")
-            except: pass
-            time.sleep(1)
-        else: self.fail("time out")
-        sel.click("//div[@id='timetableDiv']/div/div[2]/div/div/div/div[2]/div[2]/div[2]/div/div/div[1]/div")
-        for i in range(60):
-            try:
-                if sel.is_text_present("View and edit current interval timetable"):
-                    break
-                else:
-                    sel.click("//div[@id='timetableDiv']/div/div[2]/div/div/div/div[2]/div[2]/div[2]/div/div/div[1]/div")
-            except: pass
-            time.sleep(1)
-        else: self.fail("time out")
-        sel.click("link=View and edit current interval timetable")
+        sel.click("//input[@value='Add']")
+
+        time.sleep(1)
+        self.failUnless(sel.is_text_present("Session One"))
+
+        time.sleep(1)
+        sel.click("//div[contains(@class,'timetableSession')]//div[1]")
+
+        time.sleep(1)
+        self.failUnless(sel.is_text_present("View and edit this block timetable"))
+
+        sel.click("link=View and edit this block timetable")
         sel.click("link=Add new")
-        for i in range(60):
-            try:
-                if sel.is_text_present("Contribution"): break
-                else: sel.click("link=Add new")
-            except: pass
-            time.sleep(1)
-        else: self.fail("time out")
+
+        self.failUnless(sel.is_text_present("Contribution"))
         sel.click("link=Contribution")
-        for i in range(60):
-            try:
-                if sel.is_text_present("Add Contribution"): break
-                else: sel.click("link=Contribution")
-            except: pass
-            time.sleep(1)
-        else: self.fail("time out")
-        sel.type("//input[@type='text']", "Contribution in Session One")
-        sel.click("//button[1]")
-        for i in range(60):
-            try:
-                if sel.is_text_present("Contribution in Session One"): break
-                else: sel.click("//button[1]")
-            except: pass
-            time.sleep(1)
-        else: self.fail("time out")
+
+        time.sleep(1)
+        self.failUnless(sel.is_text_present("Add Contribution"))
+
+
+        sel.type("//div[@class='canvas']//input[@type='text']", "Contribution in Session One")
+        sel.click("//div[@class='popupButtonBar']//input[@value='Add']")
+
+        time.sleep(5)
+        self.failUnless(sel.is_text_present("Contribution in Session One"))
+
         sel.click("link=Go back to timetable")
-        for i in range(60):
-            try:
-                if sel.is_text_present("Session One"): break
-                else: sel.click("link=Go back to timetable")
-            except: pass
-            time.sleep(1)
-        else: self.fail("time out")
+        self.failUnless(sel.is_text_present("Session One"))
+
         sel.click("link=Add new")
-        for i in range(60):
-            try:
-                if sel.is_text_present("Break"): break
-                else: sel.click("link=Add new")
-            except: pass
-            time.sleep(1)
-        else: self.fail("time out")
+        self.failUnless(sel.is_text_present("Break"))
         sel.click("link=Break")
-        for i in range(60):
-            try:
-                if sel.is_text_present("Add Break"): break
-                else: sel.click("link=Break")
-            except: pass
-            time.sleep(1)
-        else: self.fail("time out")
-        sel.type("//input[@type='text']", "Break")
-        sel.click("//button[1]")
-        for i in range(60):
-            try:
-                if sel.is_text_present("Break"): break
-                else: sel.click("//button[1]")
-            except: pass
-            time.sleep(1)
-        else: self.fail("time out")
+        time.sleep(1)
+
+        self.failUnless(sel.is_text_present("Add Break"))
+        sel.type("//div[@class='popupWithButtonsMainContent']//input[@type='text']", "Break in Contribution")
+        sel.click("//input[@value='Add']")
+        time.sleep(1)
+
+        self.failUnless(sel.is_text_present("Break in Contribution"))
         sel.click("link=Tools")
+
         sel.wait_for_page_to_load("30000")
-        sel.click("//html/body/div[1]/div[3]/div/table/tbody/tr/td[2]/div/div/div/ul[@id='tabList']/li[5]/a")
+        sel.click("//div[@class='eventActionsToolBarButtons']//a[3]")
         sel.wait_for_page_to_load("30000")
-        for i in range(60):
-            try:
-                if sel.is_text_present("Are you sure that you want to DELETE the conference \"conference test\"?"): break
-            except: pass
-            time.sleep(1)
-        else: self.fail("time out")
+
+        self.failUnless(sel.is_text_present("Are you sure that you want to DELETE the conference \"conference test\"?"))
+
         sel.click("confirm")
         sel.wait_for_page_to_load("30000")
 

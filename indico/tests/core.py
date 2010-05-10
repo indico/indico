@@ -66,6 +66,20 @@ class TestManager(object):
         self.tempDirs = {}
         self.dbFolder = None
 
+    @staticmethod
+    def _info(message):
+        """
+        Prints an info message
+        """
+        print colored("-- " + str(message), 'cyan')
+
+    @staticmethod
+    def _debug(message):
+        """
+        Prints an info message
+        """
+        print colored("-- " + str(message), 'grey')
+
     def main(self, fakeDBPolicy, testsToRun, options):
         """
         Runs the main test cycle, iterating over all the TestRunners available
@@ -79,7 +93,6 @@ class TestManager(object):
 
         #To not pollute the installation of Indico
         self._configureTempFolders()
-
 
         self._startManageDB(fakeDBPolicy)
 
@@ -140,16 +153,23 @@ class TestManager(object):
         and start a fake DB on the production port. we will restart production DB
         """
 
+        params = Config.getInstance().getDBConnectionParams()
+
         if fakeDBPolicy == 1:
+            self._info("Starting fake DB in non-standard port")
             self._startFakeDB(TestConfig.getInstance().getFakeDBPort())
             TestManager._createDummyUser()
         elif fakeDBPolicy == 2:
-            self._startFakeDB(Config.getInstance().getDBConnectionParams()[1])
+            self._info("Starting fake DB in standard port")
+            self._startFakeDB(params[0], params[1])
             TestManager._createDummyUser()
         elif fakeDBPolicy == 3:
+            self._info("Stopping production DB and Starting fake DB in standard port")
             TestManager._stopProductionDB()
-            self._startFakeDB(Config.getInstance().getDBConnectionParams()[1])
+            self._startFakeDB(params[0], params[1])
             TestManager._createDummyUser()
+        else:
+            self._info("No DB is needed")
 
     def _stopManageDB(self, fakeDBPolicy):
         """
@@ -163,21 +183,27 @@ class TestManager(object):
             TestManager._startProductionDB()
             TestManager._restoreDBInstance()
 
-    def _startFakeDB(self, zeoPort):
+    def _startFakeDB(self, zeoHost, zeoPort):
         """
         Starts a temporary DB in a different port
         """
+
+        print colored("-- Starting a test DB", "cyan")
+
         self._createNewDBFile()
         self.zeoServer = TestManager._createDBServer(
             os.path.join(self.dbFolder, "Data.fs"),
-            zeoPort)
+            zeoHost, zeoPort)
 
-        DBMgr.setInstance(DBMgr(hostname="localhost", port=zeoPort))
+        DBMgr.setInstance(DBMgr(hostname=zeoHost, port=zeoPort))
 
     def _stopFakeDB(self):
         """
         Stops the temporary DB
         """
+
+        print colored("-- Stoppping test DB", "cyan")
+
         try:
             os.kill(self.zeoServer, signal.SIGINT)
         except OSError, e:
@@ -201,6 +227,7 @@ class TestManager(object):
         """
         Starts the 'production' db (the one configured in indico.conf)
         """
+        TestManager._info("Starting production DB")
         try:
             commands.getstatusoutput(TestConfig.getInstance().getStartDBCmd())
         except KeyError:
@@ -212,8 +239,9 @@ class TestManager(object):
         """
         Stops the 'production' DB
         """
+        TestManager._info("Stopping production DB")
         try:
-            commands.getstatusoutput(TestConfig.getInstance().getStopDBCmd())
+            TestManager._debug(commands.getstatusoutput(TestConfig.getInstance().getStopDBCmd()))
         except KeyError:
             print "[ERR] Not found in tests.conf: command to stop production DB\n"
             sys.exit(1)
@@ -245,7 +273,7 @@ class TestManager(object):
         shutil.rmtree(self.dbFolder)
 
     @staticmethod
-    def _createDBServer(dbFile, port):
+    def _createDBServer(dbFile, host, port):
         """
         Creates a fake DB server for testing
         """
@@ -256,7 +284,7 @@ class TestManager(object):
         else:
             # run a DB in a child process
             from indico.tests.util import TestZEOServer
-            server = TestZEOServer(port, dbFile)
+            server = TestZEOServer(port, dbFile, hostname = host)
             server.start()
 
 ################## End of DB Managing functions ##################
@@ -269,6 +297,8 @@ class TestManager(object):
         from MaKaC import user
         from MaKaC.authentication import AuthenticatorMgr
         from MaKaC.common import HelperMaKaCInfo
+
+        TestManager._info("Adding a dummy user")
 
         DBMgr.getInstance().startRequest()
 
@@ -310,6 +340,9 @@ class TestManager(object):
         from MaKaC.authentication import AuthenticatorMgr
         from MaKaC.common import HelperMaKaCInfo
         from MaKaC.common import indexes
+
+        TestManager._info("Deleting dummy user", "cyan")
+
         DBMgr.getInstance().startRequest()
 
         #removing user from admin list
