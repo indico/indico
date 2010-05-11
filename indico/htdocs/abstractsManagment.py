@@ -26,3 +26,6 @@ def index( req, **params ):
 
 def abstractsActions( req, **params ):
     return conferenceModif.RHAbstractsActions( req ).process( params )
+
+def newAbstract( req, **params ):
+    return conferenceModif.RHNewAbstract( req ).process( params )
