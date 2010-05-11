@@ -1,7 +1,7 @@
 <script type="text/javascript">
 <!--
 
-var newAbstract = false;
+var newAbst = false;
 
 function selectAllTracks()
 {
@@ -211,11 +211,11 @@ document.filterOptionForm.showSubmissionDate.checked=false
             <table>
                 <form action=%(abstractSelectionAction)s method="post" name="abstractsForm" onSubmit="return atLeastOneSelected()">
                 <tr>
-                    <td valign="bottom" align="left" class="eventModifButtonBar"><input type="submit" class="btn" name="newAbstract" onclick="newAbstract = true;" value="<%= _("add new")%>"></td>
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="acceptMultiple" value="<%= _("accept") %>">
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="rejectMultiple" value="<%= _("reject") %>">
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="merge" value="<%= _("merge")%>"></td>
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="auth" value="<%= _("author list")%>"></td>
+                    <td valign="bottom" align="left" class="eventModifButtonBar"><input type="submit" class="btn" name="newAbstract" onclick="newAbst = true;" value="<%= _("Add new")%>"></td>
+                    <td valign="bottom" align="left"><input type="submit" class="btn" name="acceptMultiple" value="<%= _("Accept") %>">
+                    <td valign="bottom" align="left"><input type="submit" class="btn" name="rejectMultiple" value="<%= _("Reject") %>">
+                    <td valign="bottom" align="left"><input type="submit" class="btn" name="merge" value="<%= _("Merge")%>"></td>
+                    <td valign="bottom" align="left"><input type="submit" class="btn" name="auth" value="<%= _("Author list")%>"></td>
                     <td valign="bottom" align="left">Export to:</td>
                     <td valign="bottom" align="left"><input type="image" name="excel" src=<%= excelIconURL%> border="0"></td>
                     <td valign="bottom" align="left"><input type="image" name="pdf" src=<%= pdfIconURL%> border="0"></td>
@@ -236,11 +236,11 @@ document.filterOptionForm.showSubmissionDate.checked=false
         <td colspan="10" style="border-top: 2px solid #777777; padding-top: 3px;" valign="bottom" align="left">
             <table>
                 <tr>
-                    <td valign="bottom" align="left" class="eventModifButtonBar"><input type="submit" class="btn" name="newAbstract" onclick="newAbstract = true;" value="<%= _("add new")%>"></td>
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="acceptMultiple" value="<%= _("accept") %>">
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="rejectMultiple" value="<%= _("reject") %>">
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="merge" value="<%= _("merge")%>"></td>
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="auth" value="<%= _("author list")%>"></td>
+                    <td valign="bottom" align="left" class="eventModifButtonBar"><input type="submit" class="btn" name="newAbstract" onclick="newAbst = true;" value="<%= _("Add new")%>"></td>
+                    <td valign="bottom" align="left"><input type="submit" class="btn" name="acceptMultiple" value="<%= _("Accept") %>">
+                    <td valign="bottom" align="left"><input type="submit" class="btn" name="rejectMultiple" value="<%= _("Reject") %>">
+                    <td valign="bottom" align="left"><input type="submit" class="btn" name="merge" value="<%= _("Merge")%>"></td>
+                    <td valign="bottom" align="left"><input type="submit" class="btn" name="auth" value="<%= _("Author list")%>"></td>
                     <td valign="bottom" align="left">Export to:</td>
                     <td valign="bottom" align="left"><input type="image" name="excel" src=<%= excelIconURL%> border="0"></td>
                     <td valign="bottom" align="left"><input type="image" name="pdf" src=<%= pdfIconURL%> border="0"></td>
@@ -275,7 +275,7 @@ document.filterOptionForm.showSubmissionDate.checked=false
 
 
     function atLeastOneSelected() {
-        if(!newAbstract) {
+        if(!newAbst) {
             var inputNodes = IndicoUtil.findFormFields($E("abstractsItems"))
             for (i = 0; i < inputNodes.length; i++)
             {

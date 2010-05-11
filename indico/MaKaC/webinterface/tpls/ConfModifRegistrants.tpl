@@ -160,7 +160,7 @@
                 </tr>
 
                 <td valign="bottom" align="left" class="eventModifButtonBar">
-                  <input type="submit" class="btn" name="newRegistrant" onclick="newUser = true;" value="<%= _("Add New")%>">
+                  <input type="submit" class="btn" name="newRegistrant" onclick="newUser = true;" value="<%= _("Add new")%>">
                 </td>
                 <td valign="bottom" align="left">
                   <input type="submit" class="btn" name="removeRegistrants" value="<%= _("Remove")%>">
@@ -169,10 +169,10 @@
                   <input type="submit" class="btn" name="emailSelected" value="<%= _("Email")%>">
                 </td>
                 <td valign="bottom" align="left">
-                  <input type="submit" class="btn" name="printBadgesSelected" value="<%= _("Print Badges")%>">
+                  <input type="submit" class="btn" name="printBadgesSelected" value="<%= _("Print badges")%>">
                 </td>
                 <td valign="bottom" align="left">
-                  <input type="submit" class="btn" name="info.x" value="<%= _("Show Stats")%>">
+                  <input type="submit" class="btn" name="info.x" value="<%= _("Show stats")%>">
                 </td>
                 <td valign="bottom" align="left">
                   Export to:
@@ -199,7 +199,7 @@
                 <tbody>
 
                         <td valign="bottom" align="left" class="eventModifButtonBar">
-                            <input type="submit" class="btn" name="newRegistrant" onclick="newUser = true;" value="<%= _("Add New")%>">
+                            <input type="submit" class="btn" name="newRegistrant" onclick="newUser = true;" value="<%= _("Add new")%>">
                         </td>
                         <td valign="bottom" align="left">
                             <input type="submit" class="btn" name="removeRegistrants" value="<%= _("Remove")%>">
@@ -208,10 +208,10 @@
                             <input type="submit" class="btn" name="emailSelected" value="<%= _("Email")%>">
                         </td>
                         <td valign="bottom" align="left">
-                            <input type="submit" class="btn" name="printBadgesSelected" value="<%= _("Print Badges")%>">
+                            <input type="submit" class="btn" name="printBadgesSelected" value="<%= _("Print badges")%>">
                         </td>
                         <td valign="bottom" align="left">
-                            <input type="submit" class="btn" name="info.x" value="<%= _("Show Stats")%>">
+                            <input type="submit" class="btn" name="info.x" value="<%= _("Show stats")%>">
                         </td>
                         <td valign="bottom" align="left">
                             Export to:
