@@ -93,6 +93,9 @@
             </table>
         </td></tr>
     </table>
+
+    <% includeTpl('EventSetProtection', eventType='meeting') %>
+
     <table class="groupTable" style="background-color: #ECECEC; border-top: 1px dashed #777777;">
         <tr>
             <td width="15%%" nowrap>&nbsp;</td>
@@ -150,17 +153,21 @@
     }
 
     // ----- Categ Chooser
-    var categoryChooserHandler = function(categ){
+    var categoryChooserHandler = function(categ, protection){
         $E("createCategId").set(categ.id);
         $E("categTitle").set(categ.title);
-        $E("buttonCategChooser").set("<%= _("Change...")%>")
+        $E("buttonCategChooser").set("<%= _("Change...")%>");
         IndicoUI.Effect.highLightBackground("categTitle");
-    };
+
+        updateProtectionChooser(categ.title, protection);
+
+        };
 
     var openCategoryChooser = function() {
         var categoryChooserPopup = new CategoryChooser(<%= categ %>, categoryChooserHandler, true);
         categoryChooserPopup.open();
     }
+
 
     // ---- On Load
     IndicoUI.executeOnLoad(function()
@@ -170,6 +177,8 @@
         if ("<%=categ["id"]%>" != ""){
             $E("buttonCategChooser").set("<%= _("Change...")%>");
         }
+
+        protectionChooserExecOnLoad("<%= categ["id"] %>", "<%= protection %>");
 
 		var startDate = IndicoUI.Widgets.Generic.dateField(true,null,['sDay', 'sMonth', 'sYear','sHour', 'sMinute']);
 		$E('sDatePlace').set(startDate);
@@ -200,6 +209,7 @@
                     return false;
                 }else {
                     $E('chairperson').set(Json.write(uf.getUsers()));
+                    injectFromProtectionChooser();
                 }
         });
 

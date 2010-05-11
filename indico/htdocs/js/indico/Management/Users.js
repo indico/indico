@@ -1559,7 +1559,6 @@ type("UserListField", ["IWidget"], {
      * @param {Function} newProcess A function that will be called when new users (from new data, or from the search dialog, or from the suggested list) is added to the list.
      * @param {Function} editProcess A function that will be called when a user is edited.
      * @param {Function} removeProcess A function that will be called when a user is removed.
-     * @param {Boolean} showToggleFavouriteButtons. false by default. If true, favouritize buttons will not be shown.
      */
     function(userDivStyle, userListStyle,
              initialUsers, includeFavourites, suggestedUsers,

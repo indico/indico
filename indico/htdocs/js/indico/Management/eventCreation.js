@@ -156,7 +156,7 @@ type("CategoryChooserListWidget", ["RemoteListWidget"], {
 
     _returnChoice: function(categ) {
         if (!this.creationControl) {
-            this.owner.closeHandler(categ);
+            this.owner.closeHandler(categ, 'public');
         } else {
             var self = this;
             self.killProgress = IndicoUI.Dialogs.Util.progress();
@@ -165,11 +165,11 @@ type("CategoryChooserListWidget", ["RemoteListWidget"], {
             src.state.observe(function(value) {
                 if (value == SourceState.Loaded) {
                     if (self.owner) {
-                        if (!src.get()) {
+                        if (!src.get()["canCreate"]) {
                             var popup = new ErrorPopup($T("Creation forbidden"), [$T("You do not have permissions to create events in that category")], "");
                             popup.open();
                         }else{
-                            self.owner.closeHandler(self.resultCateg);
+                            self.owner.closeHandler(self.resultCateg, src.get()["protection"]);
                         }
                         self.killProgress();
                     }
@@ -203,8 +203,8 @@ type("CategoryChooserWidget", [], {
         this.drawBreadcrumb();
     },
 
-    closeHandler: function(categ) {
-        this.handler(categ);
+    closeHandler: function(categ, protection) {
+        this.handler(categ, protection);
     },
 
     drawBreadcrumb: function(){
@@ -265,10 +265,11 @@ type("CategoryChooser", ["ExclusivePopup"], {
     draw: function() {
         var self = this;
 
-        var handler = function(categ) {
+        var handler = function(categ, protection) {
             self.categ = categ;
+            self.protection = protection
             self.close();
-            self.categoryChooserHandler(categ);
+            self.categoryChooserHandler(categ, protection);
         };
         var catChooserWidget = new CategoryChooserWidget(self.categ, handler, self.creationControl);
 

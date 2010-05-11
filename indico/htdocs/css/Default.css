@@ -3193,6 +3193,86 @@ ul.listCompact {
     font-size: 16px;
 }
 
+div.accessProtection {
+    padding: 10px;
+    font-size: 16px;
+}
+
+span.eventProtectionRadioEntry {
+    display: block;
+    padding-left: 50px;
+    padding-bottom: 5px;
+}
+
+span.eventProtectionRadioEntry label, span.categProtectionRadioEntry label {
+    font-weight: normal;
+    padding-left: 5px;
+}
+
+span.protectionRadioInfo {
+    display: block;
+    padding: 20px;
+}
+
+input.eventProtectionRadioButton {
+    padding-right: 5px;
+}
+
+span.categProtectionRadioEntry {
+    display: block;
+    padding-bottom: 5px;
+}
+
+div.userListWrapper {
+    padding-left: 63px;
+}
+
+div.userListWrapper div {
+    padding: 6px;
+}
+
+div.userListDiv , div.allowedUserListDiv{
+    width: 320px;
+    height: 200px;
+    border: 1px solid #CCCCCC;
+    overflow: auto;
+}
+
+ul.userList, ul.allowedUserList {
+    padding-left: 0;
+    margin: 0;
+    list-style-type: none;
+    display: block;
+    border: medium none;
+
+}
+
+ul.userList li , ul.allowedUserList li {
+    display: block;
+    line-height: 28px;
+    margin: 0 0 0;
+    padding-left: 5px;
+    vertical-align: middle;
+}
+
+ul.allowedUserList li {
+    line-height: 21px;
+}
+
+ul.userList li:hover, ul.allowedUserList li:hover {
+    background-color: #ECECEC;
+}
+
+span.userListInfo {
+    display: block;
+    padding-left: 70px;
+}
+
+span.allowedUserListInfo {
+    display: block;
+    padding-left: 27px;
+}
+
 .bannerTitle
 {
     color: #777777;
