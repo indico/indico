@@ -3,7 +3,7 @@ if bgColorCode:
     bgColorStyle = """ style="background: %s; border-color: %s;" """%(bgColorCode, bgColorCode)
 else:
     bgColorStyle = ""
-    
+
 if textColorCode:
     textColorStyle = """ style="color: %s;" """%(textColorCode)
 else:
@@ -36,6 +36,7 @@ else:
                    <div class="datePlace">
                         <div class="date">%(confDateInterval)s</div>
                         <div class="place">%(confLocation)s</div>
+                        <div class="timezone">%(timezone)s timezone</div>
                     </div>
                     <% if nowHappening: %>
                         <div class="nowHappening" %(textColorStyle)s><%= nowHappening %></div>

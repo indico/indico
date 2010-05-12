@@ -413,6 +413,7 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         tz = DisplayTZ(self._aw,self._conf).getDisplayTZ()
         adjusted_sDate = self._conf.getAdjustedScreenStartDate(tz)
         adjusted_eDate = self._conf.getAdjustedScreenEndDate(tz)
+        vars["timezone"] = tz
         vars["confDateInterval"] = "from %s to %s (%s)"%(adjusted_sDate.strftime("%d %B %Y"), adjusted_eDate.strftime("%d %B %Y"), tz)
         if adjusted_sDate.strftime("%d%B%Y") == \
                 adjusted_eDate.strftime("%d%B%Y"):
