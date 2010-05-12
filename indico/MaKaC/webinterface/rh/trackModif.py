@@ -42,13 +42,13 @@ from MaKaC.i18n import _
 
 
 class RHTrackModifBase( RHTrackBase, RHModificationBaseProtected ):
-    
+
     def _checkParams( self, params ):
         RHTrackBase._checkParams( self, params )
 
     def _checkProtection( self ):
         RHModificationBaseProtected._checkProtection( self )
-    
+
 
 class RHTrackModification( RHTrackModifBase ):
 
@@ -69,7 +69,7 @@ class RHTrackPerformDataModification(RHTrackModifBase):
     def _checkParams(self,params):
         RHTrackModifBase._checkParams(self,params)
         self._cancel=params.has_key("cancel")
-    
+
     def _process(self):
         if self._cancel:
             self._redirect(urlHandlers.UHTrackModification.getURL(self._track))
@@ -82,26 +82,26 @@ class RHTrackPerformDataModification(RHTrackModifBase):
 
 
 class RHTrackCoordination( RHTrackModifBase ):
-    
+
     def _checkProtection(self):
         RHTrackModifBase._checkProtection(self)
         if not self._conf.hasEnabledSection("cfa"):
             raise MaKaCError( _("You cannot access this option because \"Call for abstracts\" was disabled"))
-    
+
     def _process( self ):
         p = tracks.WPTrackModifCoordination( self, self._track )
         return p.display()
 
 
 class RHTrackSelectCoordinators( RHTrackCoordination ):
-    
+
     def _process( self ):
         p = tracks.WPTrackModifSelectCoordinators( self, self._track )
         return p.display( **self._getRequestParams() )
 
 
 class RHTrackAddCoordinators( RHTrackCoordination ):
-    
+
     def _checkParams( self, params ):
         RHTrackCoordination._checkParams( self, params )
         selIds = self._normaliseListParam( params.get( "selectedPrincipals", [] ) )
@@ -111,15 +111,15 @@ class RHTrackAddCoordinators( RHTrackCoordination ):
             av = ah.getById( id )
             if av is not None:
                 self._coordinators.append( av )
-    
+
     def _process( self ):
         for av in self._coordinators:
             self._track.addCoordinator( av )
         self._redirect( urlHandlers.UHTrackModifCoordination.getURL( self._track ) )
 
-    
+
 class RHTrackRemoveCoordinators( RHTrackCoordination ):
-    
+
     def _checkParams( self, params ):
         RHTrackCoordination._checkParams( self, params )
         selIds = self._normaliseListParam( params.get( "selectedPrincipals", [] ) )
@@ -127,7 +127,7 @@ class RHTrackRemoveCoordinators( RHTrackCoordination ):
         self._coordinators = []
         for id in selIds:
             self._coordinators.append( ah.getById( id ) )
-    
+
     def _process( self ):
         for av in self._coordinators:
             self._track.removeCoordinator( av )
@@ -135,8 +135,8 @@ class RHTrackRemoveCoordinators( RHTrackCoordination ):
 
 
 class TrackCoordinationError( MaKaCError ):
-    pass 
-    
+    pass
+
 
 class RHTrackAbstractsBase( RHTrackModifBase ):
     """Base class for the areas accessible with track coordination privileges.
@@ -154,7 +154,7 @@ class RHTrackAbstractsBase( RHTrackModifBase ):
             raise MaKaCError( _("You cannot access this option because \"Call for abstracts\" was disabled"))
 
 class _TrackAbstractFilterField( filters.FilterField ):
-    
+
     def __init__( self, track, values, showNoValue=True ):
         self._track = track
         filters.FilterField.__init__(self,track.getConference(),values,showNoValue)
@@ -179,7 +179,7 @@ class _ContribTypeFilterField( _TrackAbstractFilterField, abstractFilters.Contri
 
     def __init__( self, track, values, showNoValue=True ):
         _TrackAbstractFilterField.__init__( self, track, values, showNoValue )
-    
+
     def satisfies( self, abstract ):
         """
         """
@@ -188,7 +188,7 @@ class _ContribTypeFilterField( _TrackAbstractFilterField, abstractFilters.Contri
 
 class _MultipleTrackFilterField(_TrackAbstractFilterField):
     _id = "multiple_tracks"
-    
+
     def satisfies( self, abstract ):
         return len( abstract.getTrackList() )>1
 
@@ -198,7 +198,7 @@ class _CommentsTrackFilterField(_TrackAbstractFilterField, abstractFilters.Comme
 
     def __init__( self, track, values, showNoValue=True ):
         _TrackAbstractFilterField.__init__( self, track, values, showNoValue )
-    
+
     def satisfies( self, abstract ):
         """
         """
@@ -212,7 +212,7 @@ class _AccContribTypeFilterField(_TrackAbstractFilterField,abstractFilters.AccCo
 
     def __init__(self,track,values,showNoValue=True):
         _TrackAbstractFilterField.__init__(self,track,values,showNoValue)
-    
+
     def satisfies(self,abstract):
         astv = tracks.AbstractStatusTrackViewFactory().getStatus( self._track, abstract )
         if astv.__class__ in [tracks._ASTrackViewAccepted,\
@@ -246,14 +246,14 @@ class TrackAbstractsFilterCrit(filters.FilterCriteria):
 
 
 class _TrackAbstractsSortingField( filters.SortingField ):
-    
+
     def __init__( self, track ):
         self._track = track
         filters.SortingField.__init__( self )
 
 
 class _ContribTypeSF( _TrackAbstractsSortingField, abstractFilters.ContribTypeSortingField ):
-    
+
     _id = "type"
 
     def __init__( self, track ):
@@ -288,7 +288,7 @@ class _DateSF( _TrackAbstractsSortingField ):
     _id = "date"
 
     def compare( self, a1, a2 ):
-        
+
         return cmp( a2.getSubmissionDate(), a1.getSubmissionDate() )
 
 
@@ -300,7 +300,7 @@ class TrackAbstractsSortingCrit( filters.SortingCriteria ):
                         _NumberSF.getId(): _NumberSF, \
                         _DateSF.getId(): _DateSF }
 
-    
+
     def __init__( self, track, crit=[] ):
         """
         """
@@ -317,7 +317,7 @@ class RHTrackAbstractList( RHTrackAbstractsBase ):
 
     def _checkParams( self, params ):
         RHTrackAbstractsBase._checkParams( self, params )
-        filterUsed = params.has_key( "OK" ) #this variable is true when the 
+        filterUsed = params.has_key( "OK" ) #this variable is true when the
                                             #   filter has been used
         filter = {}
         ltypes = []
@@ -357,8 +357,8 @@ class RHTrackAbstractList( RHTrackAbstractsBase ):
         self._sortingCrit = TrackAbstractsSortingCrit( self._track, [params.get( "sortBy", "number").strip()] )
         self._selectAll = params.get("selectAll", None)
         self._msg = params.get("directAbstractMsg","")
-        
-    
+
+
     def _process( self ):
         p = tracks.WPTrackModifAbstracts( self, self._track, self._msg )
         return p.display( filterCrit= self._criteria, \
@@ -367,7 +367,7 @@ class RHTrackAbstractList( RHTrackAbstractsBase ):
 
 
 class RHTrackAbstractBase( RHTrackAbstractsBase ):
-    
+
     def _checkParams( self, params ):
         RHTrackModifBase._checkParams( self, params )
         absId = params.get( "abstractId", "" ).strip()
@@ -377,14 +377,14 @@ class RHTrackAbstractBase( RHTrackAbstractsBase ):
 
 
 class RHTrackAbstract( RHTrackAbstractBase ):
-    
+
     def _process( self ):
         p = tracks.WPTrackAbstractModif( self, self._track, self._abstract )
         return p.display()
 
 
 class RHTrackAbstractDirectAccess( RHTrackAbstractBase ):
-    
+
     def _checkParams(self, params):
         self._params = params
         RHTrackBase._checkParams(self, params)
@@ -396,7 +396,7 @@ class RHTrackAbstractDirectAccess( RHTrackAbstractBase ):
             RHTrackAbstractBase._checkParams(self, params)
         except KeyError:
             pass
-    
+
     def _process( self ):
         if self._abstractExist:
             p = tracks.WPTrackAbstractModif( self, self._track, self._abstract )
@@ -409,7 +409,7 @@ class RHTrackAbstractDirectAccess( RHTrackAbstractBase ):
 
 
 class RHTrackAbstractPropToAccept( RHTrackAbstractBase ):
-    
+
     def _checkParams(self,params):
         RHTrackAbstractBase._checkParams(self,params)
         self._action=""
@@ -440,7 +440,7 @@ class RHTrackAbstractPropToAccept( RHTrackAbstractBase ):
 
 
 class RHTrackAbstractPropToReject( RHTrackAbstractBase ):
-    
+
     def _checkParams( self, params ):
         RHTrackAbstractBase._checkParams( self, params )
         self._action, self._comment = "", ""
@@ -464,7 +464,7 @@ class RHTrackAbstractPropToReject( RHTrackAbstractBase ):
 
 
 class RHTrackAbstractPropForOtherTracks( RHTrackAbstractBase ):
-    
+
     def _checkParams( self, params ):
         RHTrackAbstractBase._checkParams( self, params )
         self._action, self._comment = "", ""
@@ -492,7 +492,7 @@ class RHTrackAbstractPropForOtherTracks( RHTrackAbstractBase ):
 
 
 class RHModAbstractMarkAsDup(RHTrackAbstractBase):
-    
+
     def _checkParams( self, params ):
         RHTrackAbstractBase._checkParams( self, params )
         self._action,self._comments,self._original="","",None
@@ -507,8 +507,8 @@ class RHModAbstractMarkAsDup(RHTrackAbstractBase):
         res=[]
         if self._original==None or self._target==self._original:
             res.append("invalid original abstract id")
-        return res 
-    
+        return res
+
     def _process( self ):
         errMsg=""
         if self._action=="MARK":
@@ -516,7 +516,7 @@ class RHModAbstractMarkAsDup(RHTrackAbstractBase):
             if len(errorList)==0:
                 self._abstract.markAsDuplicated(self._getUser(),self._original,self._comments, self._track)
                 self._redirect(urlHandlers.UHTrackAbstractModif.getURL(self._track,self._abstract))
-                return 
+                return
             else:
                 errMsg="<br>".join(errorList)
         p=tracks.WPModAbstractMarkAsDup(self,self._track,self._abstract)
@@ -524,25 +524,25 @@ class RHModAbstractMarkAsDup(RHTrackAbstractBase):
 
 
 class RHModAbstractUnMarkAsDup(RHTrackAbstractBase):
-    
+
     def _checkParams( self, params ):
         RHTrackAbstractBase._checkParams( self, params )
         self._action,self._comments="",""
         if params.has_key("OK"):
             self._action="UNMARK"
             self._comments=params.get("comments","")
-            
-    
+
+
     def _process( self ):
         if self._action=="UNMARK":
             self._abstract.unMarkAsDuplicated(self._getUser(),self._comments, self._track)
             self._redirect(urlHandlers.UHTrackAbstractModif.getURL(self._track,self._abstract))
-            return 
+            return
         p = tracks.WPModAbstractUnMarkAsDup(self,self._track,self._abstract)
         return p.display(comments=self._comments)
 
 class RHAbstractToPDF(RHTrackAbstractBase):
-    
+
     def _process( self ):
         tz = self._conf.getTimezone()
         filename = "%s - Abstract.pdf"%self._target.getTitle()
@@ -563,15 +563,15 @@ class RHAbstractsActions:
     """
     def __init__(self, req):
         self._req = req
-    
+
     def _checkParams( self, params ):
         self._pdf = params.get("PDF", None)
         self._mail = params.get("mail", None)
         self._participant = params.get("PART", None)
         self._tplPreview = params.get("tplPreview", None)
         self._params = params
-        
-    
+
+
     def _process( self ):
         if self._pdf:
             return RHAbstractsToPDF(self._req).process( self._params )
@@ -583,7 +583,7 @@ class RHAbstractsActions:
             return RHAbstractsParticipantList(self._req).process( self._params )
         else:
             return "no action to do"
-    
+
     def process(self, params):
         self._checkParams(params)
         ret = self._process()
@@ -593,23 +593,23 @@ class RHAbstractsActions:
 
 
 class RHAbstractTPLPreview(RHTrackBase):
-    
+
     def _checkParams(self, params):
         RHTrackBase._checkParams( self, params )
         self._notifTplId = params.get("notifTpl","")
-    
+
     def _process(self):
         tpl = self._conf.getAbstractMgr().getNotificationTplById(self._notifTplId)
         self._redirect(urlHandlers.UHAbstractModNotifTplPreview.getURL(tpl))
-    
-    
+
+
 
 class AbstractNotification:
-    
+
     def __init__(self, conf, abstract):
         self._conf = conf
         self._abstract = abstract
-    
+
     def getDict(self):
         dict = {}
         dict["conference_title"] = self._conf.getTitle()
@@ -628,7 +628,7 @@ class AbstractNotification:
 
 
 class RHAbstractSendNotificationMail(RHTrackModification):
-    
+
     def _checkParams( self, params ):
         RHTrackModification._checkParams( self, params )
         notifTplId = params.get("notifTpl", "")
@@ -638,7 +638,7 @@ class RHAbstractSendNotificationMail(RHTrackModification):
         abMgr = self._conf.getAbstractMgr()
         for id in self._abstractIds:
             self._abstracts.append(abMgr.getAbstractById(id))
-    
+
     def _process( self ):
         count = 0
         for abstract in self._abstracts:
@@ -649,31 +649,26 @@ class RHAbstractSendNotificationMail(RHTrackModification):
             GenericMailer.send(GenericNotification(maildata))
             self._conf.newSentMail(abstract.getSubmitter(), mail.getSubject(), b%dict)
             count += 1
-            
+
         #self._redirect(urlHandlers.UHConfAbstractManagment.getURL(self._conf))
-        
+
         p = conferences.WPAbstractSendNotificationMail(self, self._conf, count )
         return p.display()
 
 
 class RHAbstractsToPDF(RHTrackAbstractsBase):
-    
+
     def _checkParams( self, params ):
         RHTrackAbstractsBase._checkParams( self, params )
         self._abstractIds = self._normaliseListParam( params.get("abstracts", []) )
-        self._abstracts = []
-        abMgr = self._conf.getAbstractMgr()
-        for id in self._abstractIds:
-            if abMgr.getAbstractById(id).canView(self._aw):
-                self._abstracts.append(abMgr.getAbstractById(id))
 
-    
-    def _process( self ): 
+
+    def _process( self ):
         tz = self._conf.getTimezone()
         filename = "Abstracts.pdf"
-        if not self._abstracts:
+        if not self._abstractIds:
             return "No abstract to print"
-        pdf = TrackManagerAbstractsToPDF(self._conf, self._track, self._abstracts,tz=tz)
+        pdf = TrackManagerAbstractsToPDF(self._conf, self._track, self._abstractIds,tz=tz)
         data = pdf.getPDFBin()
         self._req.set_content_length(len(data))
         cfg = Config.getInstance()
@@ -684,14 +679,14 @@ class RHAbstractsToPDF(RHTrackAbstractsBase):
 
 
 class RHAbstractIntComments( RHTrackAbstractBase ):
-    
+
     def _process( self ):
         p = tracks.WPModAbstractIntComments(self,self._track,self._abstract)
         return p.display()
 
 
 class RHAbstractIntCommentNew(RHAbstractIntComments):
-    
+
     def _checkParams(self,params):
         RHAbstractIntComments._checkParams(self,params)
         self._action=""
@@ -700,14 +695,14 @@ class RHAbstractIntCommentNew(RHAbstractIntComments):
             self._content=params.get("content","")
         elif params.has_key("CANCEL"):
             self._action="CANCEL"
-    
+
     def _process( self ):
         if self._action=="UPDATE":
             c=review.Comment(self._getUser())
             c.setContent(self._content)
             self._abstract.addIntComment(c)
             self._redirect(urlHandlers.UHTrackAbstractModIntComments.getURL(self._track,self._abstract))
-            return 
+            return
         elif self._action=="CANCEL":
             self._redirect(urlHandlers.UHTrackAbstractModIntComments.getURL(self._track,self._abstract))
             return
@@ -716,24 +711,24 @@ class RHAbstractIntCommentNew(RHAbstractIntComments):
 
 
 class RHAbstractIntCommentBase(RHTrackAbstractBase):
-    
+
     def _checkParams(self,params):
         RHTrackAbstractBase._checkParams(self,params)
         id=params.get("intCommentId","")
         if id=="":
             raise MaKaCError( _("the internal comment identifier hasn't been specified"))
         self._comment=self._abstract.getIntCommentById(id)
-        
+
 
 class RHAbstractIntCommentRem(RHAbstractIntCommentBase):
-    
+
     def _process(self):
         self._abstract.removeIntComment(self._comment)
         self._redirect(urlHandlers.UHTrackAbstractModIntComments.getURL(self._track,self._abstract))
-    
+
 
 class RHAbstractIntCommentEdit(RHAbstractIntCommentBase):
-    
+
     def _checkParams(self,params):
         RHAbstractIntCommentBase._checkParams(self,params)
         self._action=""
@@ -742,7 +737,7 @@ class RHAbstractIntCommentEdit(RHAbstractIntCommentBase):
             self._content=params.get("content","")
         elif params.has_key("CANCEL"):
             self._action="CANCEL"
-        
+
     def _process(self):
         if self._action=="UPDATE":
             self._comment.setContent(self._content)
@@ -750,13 +745,13 @@ class RHAbstractIntCommentEdit(RHAbstractIntCommentBase):
             return
         elif self._action=="CANCEL":
             self._redirect(urlHandlers.UHTrackAbstractModIntComments.getURL(self._track,self._abstract))
-            return 
+            return
         p=tracks.WPModAbstractIntCommentEdit(self,self._track,self._comment)
         return p.display()
 
 
 class RHAbstractsParticipantList(RHTrackAbstractsBase):
-                
+
     def _checkParams( self, params ):
         RHTrackAbstractsBase._checkParams( self, params )
         self._abstractIds = self._normaliseListParam( params.get("abstracts", []) )
@@ -770,11 +765,11 @@ class RHAbstractsParticipantList(RHTrackAbstractsBase):
             self._displayedGroups.remove(self._clickedGroup)
         else:
             self._displayedGroups.append(self._clickedGroup)
-        
+
     def _process( self ):
         if not self._abstractIds:
             return "<table align=\"center\" width=\"100%%\"><tr><td>There are no abstracts</td></tr></table>"
-        
+
         submitters = OOBTree()
         primaryAuthors = OOBTree()
         coAuthors = OOBTree()
@@ -783,7 +778,7 @@ class RHAbstractsParticipantList(RHTrackAbstractsBase):
         coAuthorEmails = Set()
 
         self._setGroupsToDisplay()
-        
+
         abMgr = self._conf.getAbstractMgr()
         for abstId in self._abstractIds:
             abst = abMgr.getAbstractById(abstId)
@@ -874,7 +869,7 @@ class RHContribList(RHTrackAbstractsBase):
         self._filterCrit.getField("session").setShowNoValue(sessionShowNoValue)
 
 
-    
+
     def _process( self ):
         p = tracks.WPModContribList(self,self._track)
         return p.display( filterCrit= self._filterCrit, sortingCrit=self._sortingCrit, order=self._order )
@@ -885,7 +880,7 @@ class RHContribsActions:
     """
     def __init__(self, req):
         self._req = req
-    
+
     def process(self, params):
         if params.has_key("PDF"):
             return RHContribsToPDF(self._req).process(params)
@@ -897,7 +892,7 @@ class RHContribsToPDF(RHTrackAbstractsBase):
 
     def _checkProtection(self):
         RHTrackAbstractsBase._checkProtection(self, False)
-    
+
     def _checkParams( self, params ):
         RHTrackAbstractsBase._checkParams( self, params )
         self._contribIds = self._normaliseListParam( params.get("contributions", []) )
@@ -922,7 +917,7 @@ class RHContribsToPDF(RHTrackAbstractsBase):
         return data
 
 class RHContribsParticipantList(RHTrackAbstractsBase):
-    
+
     def _checkProtection( self ):
         if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
             RHTrackAbstractsBase._checkProtection( self )
@@ -938,11 +933,11 @@ class RHContribsParticipantList(RHTrackAbstractsBase):
             self._displayedGroups.remove(self._clickedGroup)
         else:
             self._displayedGroups.append(self._clickedGroup)
-        
+
     def _process( self ):
         if not self._contribIds:
             return "<table align=\"center\" width=\"100%%\"><tr><td>There are no contributions</td></tr></table>"
-        
+
         speakers = OOBTree()
         primaryAuthors = OOBTree()
         coAuthors = OOBTree()
@@ -1001,4 +996,4 @@ class RHContribQuickAccess(RHTrackAbstractsBase):
         self._redirect(url)
 
 
- 
+
