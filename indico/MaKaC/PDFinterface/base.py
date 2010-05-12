@@ -18,15 +18,15 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import os, math, types, tempfile
+import os, math
 import xml.sax.saxutils as saxutils
 from HTMLParser import HTMLParser
-from reportlab.platypus import SimpleDocTemplate, PageTemplate
+from reportlab.platypus import SimpleDocTemplate, PageTemplate, Table
 from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.rl_config import defaultPageSize
 from reportlab.lib.units import inch, cm
-from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
 from reportlab import platypus
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus.frames import Frame
@@ -35,8 +35,6 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from MaKaC.i18n import _
 from MaKaC.common.utils import isStringHTML
-from MaKaC.errors import MaKaCError
-from MaKaC.common import Config
 
 # PIL is the library used by reportlab to work with images.
 # If it isn't available, we must NOT put images in the PDF.
@@ -139,31 +137,35 @@ def modifiedFontSize(fontsize, lowerNormalHigher):
     else:
         return fontsize
 
+alreadyRegistered = False
 
 def setTTFonts():
-    # Import fonts from indico.extra (separate package)
-    import indico.extra.fonts
+    global alreadyRegistered
+    if not alreadyRegistered:
+        # Import fonts from indico.extra (separate package)
+        import indico.extra.fonts
 
-    dir=os.path.split(os.path.abspath(indico.extra.fonts.__file__))[0]
-    pdfmetrics.registerFont(TTFont('Times-Roman', os.path.join(dir,'LiberationSerif-Regular.ttf')))
-    pdfmetrics.registerFont(TTFont('Times-Bold', os.path.join(dir, 'LiberationSerif-Bold.ttf')))
-    pdfmetrics.registerFont(TTFont('Times-Italic', os.path.join(dir,'LiberationSerif-Italic.ttf')))
-    pdfmetrics.registerFont(TTFont('Times-Bold-Italic', os.path.join(dir, 'LiberationSerif-BoldItalic.ttf')))
-    pdfmetrics.registerFont(TTFont('Sans', os.path.join(dir,'LiberationSans-Regular.ttf')))
-    pdfmetrics.registerFont(TTFont('Sans-Bold', os.path.join(dir, 'LiberationSans-Bold.ttf')))
-    pdfmetrics.registerFont(TTFont('Sans-Italic', os.path.join(dir,'LiberationSans-Italic.ttf')))
-    pdfmetrics.registerFont(TTFont('Sans-Bold-Italic', os.path.join(dir, 'LiberationSans-BoldItalic.ttf')))
-    pdfmetrics.registerFont(TTFont('Courier', os.path.join(dir, 'LiberationMono-Regular.ttf')))
-    pdfmetrics.registerFont(TTFont('Courier-Bold', os.path.join(dir, 'LiberationMono-Bold.ttf')))
-    pdfmetrics.registerFont(TTFont('Courier-Italic', os.path.join(dir, 'LiberationMono-Italic.ttf')))
-    pdfmetrics.registerFont(TTFont('Courier-Bold-Italic', os.path.join(dir, 'LiberationMono-BoldItalic.ttf')))
-    pdfmetrics.registerFont(TTFont('LinuxLibertine', os.path.join(dir, 'LinLibertine_Re-4.4.1.ttf')))
-    pdfmetrics.registerFont(TTFont('LinuxLibertine-Bold', os.path.join(dir, 'LinLibertine_Bd-4.1.0.ttf')))
-    pdfmetrics.registerFont(TTFont('LinuxLibertine-Italic', os.path.join(dir, 'LinLibertine_It-4.0.6.ttf')))
-    pdfmetrics.registerFont(TTFont('LinuxLibertine-Bold-Italic', os.path.join(dir, 'LinLibertine_BI-4.0.5.ttf')))
-    pdfmetrics.registerFont(TTFont('Kochi-Mincho', os.path.join(dir, 'kochi-mincho-subst.ttf')))
-    pdfmetrics.registerFont(TTFont('Kochi-Gothic', os.path.join(dir, 'kochi-gothic-subst.ttf')))
-    #pdfmetrics.registerFont(TTFont('Uming-CN', os.path.join(dir, 'uming.ttc')))
+        dir=os.path.split(os.path.abspath(indico.extra.fonts.__file__))[0]
+        pdfmetrics.registerFont(TTFont('Times-Roman', os.path.join(dir,'LiberationSerif-Regular.ttf')))
+        pdfmetrics.registerFont(TTFont('Times-Bold', os.path.join(dir, 'LiberationSerif-Bold.ttf')))
+        pdfmetrics.registerFont(TTFont('Times-Italic', os.path.join(dir,'LiberationSerif-Italic.ttf')))
+        pdfmetrics.registerFont(TTFont('Times-Bold-Italic', os.path.join(dir, 'LiberationSerif-BoldItalic.ttf')))
+        pdfmetrics.registerFont(TTFont('Sans', os.path.join(dir,'LiberationSans-Regular.ttf')))
+        pdfmetrics.registerFont(TTFont('Sans-Bold', os.path.join(dir, 'LiberationSans-Bold.ttf')))
+        pdfmetrics.registerFont(TTFont('Sans-Italic', os.path.join(dir,'LiberationSans-Italic.ttf')))
+        pdfmetrics.registerFont(TTFont('Sans-Bold-Italic', os.path.join(dir, 'LiberationSans-BoldItalic.ttf')))
+        pdfmetrics.registerFont(TTFont('Courier', os.path.join(dir, 'LiberationMono-Regular.ttf')))
+        pdfmetrics.registerFont(TTFont('Courier-Bold', os.path.join(dir, 'LiberationMono-Bold.ttf')))
+        pdfmetrics.registerFont(TTFont('Courier-Italic', os.path.join(dir, 'LiberationMono-Italic.ttf')))
+        pdfmetrics.registerFont(TTFont('Courier-Bold-Italic', os.path.join(dir, 'LiberationMono-BoldItalic.ttf')))
+        pdfmetrics.registerFont(TTFont('LinuxLibertine', os.path.join(dir, 'LinLibertine_Re-4.4.1.ttf')))
+        pdfmetrics.registerFont(TTFont('LinuxLibertine-Bold', os.path.join(dir, 'LinLibertine_Bd-4.1.0.ttf')))
+        pdfmetrics.registerFont(TTFont('LinuxLibertine-Italic', os.path.join(dir, 'LinLibertine_It-4.0.6.ttf')))
+        pdfmetrics.registerFont(TTFont('LinuxLibertine-Bold-Italic', os.path.join(dir, 'LinLibertine_BI-4.0.5.ttf')))
+        pdfmetrics.registerFont(TTFont('Kochi-Mincho', os.path.join(dir, 'kochi-mincho-subst.ttf')))
+        pdfmetrics.registerFont(TTFont('Kochi-Gothic', os.path.join(dir, 'kochi-gothic-subst.ttf')))
+        #pdfmetrics.registerFont(TTFont('Uming-CN', os.path.join(dir, 'uming.ttc')))
+        alreadyRegistered = True
 
 class Paragraph(platypus.Paragraph):
     """
@@ -178,6 +180,57 @@ class Paragraph(platypus.Paragraph):
 
     def getPart(self):
         return self._part
+
+class SimpleParagraph(platypus.Flowable):
+    """  Simple and fast paragraph.
+
+    WARNING! This paragraph cannot break the line and doesn't have almost any formatting methods.
+             It's used only to increase PDF performance in places where normal paragraph is not needed.
+    """
+    def __init__(self, text, fontSize = 10, indent = 0, spaceAfter = 2):
+        platypus.Flowable.__init__(self)
+        self.text = text
+        self.height = fontSize + spaceAfter
+        self.fontSize = fontSize
+        self.spaceAfter = spaceAfter
+        self.indent = indent
+
+    def __repr__(self):
+        return ""
+
+    def draw(self):
+        #centre the text
+        self.canv.setFont('Times-Roman',self.fontSize)
+        self.canv.drawString(self.indent, self.spaceAfter, self.text)
+
+class TableOfContentsEntry(Paragraph):
+    """
+        Class used to create table of contents entry with its number.
+        Much faster than table of table of contents from platypus lib
+    """
+    def __init__(self, test, pageNumber,style, part="", bulletText=None, frags=None, caseSensitive=1):
+        Paragraph.__init__(self, test, style, part, bulletText, frags, caseSensitive)
+        self._part = part
+        self._pageNumber = pageNumber
+
+    def _drawDots(self):
+        """
+        Draws row of dots from the end of the abstract title to the page number.
+        """
+        freeSpace = int(self.blPara.lines[-1][0])
+        while( freeSpace > 10 ):
+            dot = self.beginText(self.width + 10 - freeSpace, self.style.leading - self.style.fontSize)
+            dot.textLine(".")
+            self.canv.drawText(dot)
+            freeSpace -= 3
+
+    def draw(self):
+        platypus.Paragraph.draw(self)
+        tx = self.beginText(self.width + 10, self.style.leading - self.style.fontSize)
+        tx.setFont(self.style.fontName, self.style.fontSize, 0)
+        tx.textLine(str(self._pageNumber))
+        self.canv.drawText(tx)
+        self._drawDots()
 
 class Spacer(platypus.Spacer):
     def __init__(self, width, height, part=""):
@@ -437,7 +490,7 @@ def _doNothing(canvas, doc):
 
 class DocTemplateWithTOC(SimpleDocTemplate):
 
-    def __init__(self, toc, indexedFlowable, filename, firstPageNumber = 1, **kw ):
+    def __init__(self, indexedFlowable, filename, firstPageNumber = 1, **kw ):
         """toc is the TableOfContents object
         indexedFlowale is a dictionnary with flowables as key and a dictionnary as value.
             the sub-dictionnary have two key:
@@ -445,7 +498,8 @@ class DocTemplateWithTOC(SimpleDocTemplate):
                 level: the level of the entry( modifying the indentation and the police
         """
 
-        self._toc = toc
+        self._toc = []
+        self._tocStory = []
         self._indexedFlowable = indexedFlowable
         self._filename = filename
         self._part = ""
@@ -455,7 +509,7 @@ class DocTemplateWithTOC(SimpleDocTemplate):
 
     def afterFlowable(self, flowable):
         if flowable in self._indexedFlowable:
-            self._toc.addEntry(self._indexedFlowable[flowable]["level"], self._indexedFlowable[flowable]["text"], self.page + (self._firstPageNumber - 1))
+            self._toc.append((self._indexedFlowable[flowable]["level"],self._indexedFlowable[flowable]["text"], self.page + self._firstPageNumber - 1))
         try:
             if flowable.getPart() != "":
                 self._part = flowable.getPart()
@@ -466,27 +520,61 @@ class DocTemplateWithTOC(SimpleDocTemplate):
         self._part = ""
         SimpleDocTemplate.handle_documentBegin(self)
 
-
+    def _prepareTOC(self):
+        headerStyle = ParagraphStyle({})
+        headerStyle.fontName = "Times-Bold"
+        headerStyle.fontSize = modifiedFontSize(18, 18)
+        headerStyle.leading = modifiedFontSize(22, 22)
+        headerStyle.alignment = TA_CENTER
+        entryStyle = ParagraphStyle({})
+        entryStyle.spaceBefore = 8
+        self._tocStory.append(PageBreak())
+        self._tocStory.append(Spacer(inch, 1*cm))
+        self._tocStory.append(Paragraph( _("Table of contents"), headerStyle))
+        self._tocStory.append(Spacer(inch, 2*cm))
+        for entry in self._toc:
+            self._tocStory.append(TableOfContentsEntry("<para leftIndent=%s" % ((entry[0] - 1) * 50) + ">" + entry[1] + "</para>", str(entry[2]),entryStyle))
+            #self._tocStory.append(SimpleParagraph(entry[1]))
+        self._tocStory.append(PageBreak())
 
     def multiBuild(self, story, filename=None, canvasMaker=Canvas, maxPasses=10, onFirstPage=_doNothing, onLaterPages=_doNothing):
         self._calc()    #in case we changed margins sizes etc
         frameT = Frame(self.leftMargin, self.bottomMargin, self.width, self.height, id='normal')
-        # we add the function for the later pages to the onPageEnd of the PageTemplate because we must know the part for the page
-        self.addPageTemplates([PageTemplate(id='First',frames=frameT, onPage=onFirstPage,pagesize=self.pagesize),
-                        PageTemplate(id='Later',frames=frameT, onPageEnd=onLaterPages,pagesize=self.pagesize)])
+        self.addPageTemplates([PageTemplate(id='Later',frames=frameT, onPageEnd=onLaterPages,pagesize=self.pagesize)])
+        if onLaterPages is _doNothing and hasattr(self,'onLaterPages'):
+            self.pageTemplates[0].beforeDrawPage = self.onLaterPages
+        SimpleDocTemplate.multiBuild(self, story, maxPasses, canvasmaker=canvasMaker)
+        self._prepareTOC()
+        contentFile = self.filename
+        self.filename = FileDummy()
+        self.pageTemplates = []
+        self.addPageTemplates([PageTemplate(id='First',frames=frameT, onPage=onFirstPage,pagesize=self.pagesize)])
         if onFirstPage is _doNothing and hasattr(self,'onFirstPage'):
             self.pageTemplates[0].beforeDrawPage = self.onFirstPage
-        if onLaterPages is _doNothing and hasattr(self,'onLaterPages'):
-            self.pageTemplates[1].beforeDrawPage = self.onLaterPages
+        SimpleDocTemplate.multiBuild(self, self._tocStory, maxPasses, canvasmaker=canvasMaker)
+        self.mergePDFs(self.filename, contentFile)
 
-        try:
-            SimpleDocTemplate.multiBuild(self, story, self._filename, canvasMaker, maxPasses)
-        except TypeError:
-            SimpleDocTemplate.multiBuild(self, story, maxPasses, canvasmaker=canvasMaker)
+    def mergePDFs(self, pdf1, pdf2):
+        from pyPdf import PdfFileWriter, PdfFileReader
+        import cStringIO
+        outputStream = cStringIO.StringIO()
+        pdf1Stream = cStringIO.StringIO()
+        pdf2Stream = cStringIO.StringIO()
+        pdf1Stream.write(pdf1.getData())
+        pdf2Stream.write(pdf2.getData())
+        output = PdfFileWriter()
+        background_pages = PdfFileReader(pdf1Stream)
+        foreground_pages = PdfFileReader(pdf2Stream)
+        for page in background_pages.pages:
+            output.addPage(page)
+        for page in foreground_pages.pages:
+            output.addPage(page)
+        output.write(outputStream)
+        pdf2._data = outputStream.getvalue()
+        outputStream.close()
 
     def getCurrentPart(self):
         return self._part
-
 
 
 class PDFWithTOC(PDFBase):
@@ -499,26 +587,31 @@ class PDFWithTOC(PDFBase):
 
 
         self._fontsize = fontsize
-        self._indexedFlowable = [] #indexedFlowable
-        self._toc = TableOfContents()
+        #self._indexedFlowable = [] #indexedFlowable
+        #self._toc = TableOfContents()
         self._story=story
         if story is None:
             self._story = []
-            self._story.append( PageBreak() )
+            self._story.append( Spacer(inch, 0*cm) ) #without this blank spacer first abstract isn't displayed. why?
 
-        self._toc = TableOfContents()
-        self._processTOCPage()
+        #self._toc = TableOfContents()
+        #self._processTOCPage()
         self._indexedFlowable = {}
         self._fileDummy = FileDummy()
 
-        self._doc = DocTemplateWithTOC(self._toc, self._indexedFlowable, self._fileDummy, firstPageNumber = firstPageNumber, pagesize=PDFSizes().PDFpagesizes[pagesize])
+        self._doc = DocTemplateWithTOC(self._indexedFlowable, self._fileDummy, firstPageNumber = firstPageNumber, pagesize=PDFSizes().PDFpagesizes[pagesize])
 
         self._PAGE_HEIGHT = PDFSizes().PDFpagesizes[pagesize][1]
         self._PAGE_WIDTH = PDFSizes().PDFpagesizes[pagesize][0]
 
         setTTFonts()
 
+
     def _processTOCPage(self):
+        """ Generates page with table of contents.
+
+        Not used, because table of contents is generated automatically inside DocTemplateWithTOC class
+        """
         style1 = ParagraphStyle({})
         style1.fontName = "Times-Bold"
         style1.fontSize = modifiedFontSize(18, self._fontsize)

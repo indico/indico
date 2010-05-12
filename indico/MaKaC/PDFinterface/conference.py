@@ -44,7 +44,7 @@ import MaKaC.schedule as schedule
 from MaKaC.badge import BadgeTemplateItem
 from MaKaC.poster import PosterTemplateItem
 from MaKaC.registration import Registrant
-from MaKaC.PDFinterface.base import PDFBase, PDFWithTOC, Paragraph, Spacer, PageBreak, Preformatted, FileDummy, setTTFonts, PDFSizes, modifiedFontSize
+from MaKaC.PDFinterface.base import PDFBase, PDFWithTOC, Paragraph, Spacer, PageBreak, Preformatted, FileDummy, setTTFonts, PDFSizes, modifiedFontSize, SimpleParagraph
 from MaKaC.webinterface.pages.tracks import AbstractStatusTrackViewFactory, _ASTrackViewPFOT, _ASTrackViewPA, _ASTrackViewDuplicated, _ASTrackViewMerged,_ASTrackViewAccepted
 from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
 import MaKaC.common.filters as filters
@@ -156,7 +156,7 @@ class AbstractToPDF(PDFBase):
         c.restoreState()
 
     def _getTrackText(self):
-        text = _("""<b> _("Track classification")</b> : """)
+        text = _("""_("Track classification") : """)
         status=self._abstract.getCurrentStatus()
         if isinstance(status,review.AbstractStatusAccepted):
             if status.getTrack() is not None:
@@ -171,19 +171,20 @@ class AbstractToPDF(PDFBase):
     def _getContribTypeText(self):
         status=self._abstract.getCurrentStatus()
         if isinstance(status,review.AbstractStatusAccepted):
-            text= _("""<b> _("Contribution type")</b> : %s""")%(escape(str(status.getType())))
+            text= _(""" _("Contribution type") : %s""")%(escape(str(status.getType())))
         else:
-            text= _("""<b> _("Contribution type")</b> : %s""")%escape(str(self._abstract.getContribType()))
+            text= _(""" _("Contribution type") : %s""")%escape(str(self._abstract.getContribType()))
         return text
 
     def getBody(self, story=None, indexedFlowable={}, level=1 ):
         if not story:
             story = self._story
 
-        style = ParagraphStyle({})
-        style.fontSize = 12
+        #style = ParagraphStyle({})
+        #style.fontSize = 12
         text = _(""" _("Abstract ID") : %s""")%self._abstract.getId()
-        p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+        #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+        p = SimpleParagraph(text, 12)
         story.append(p)
 
         story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
@@ -201,6 +202,7 @@ class AbstractToPDF(PDFBase):
         style = ParagraphStyle({})
         style.fontName = "LinuxLibertine"
         style.fontSize = 9
+        style.alignment = TA_JUSTIFY
         #XXX:Not optimal, but the only way I've found to do it
         #l=self._abstract.getField("content").split("\n")
         #res=[]
@@ -217,24 +219,27 @@ class AbstractToPDF(PDFBase):
             name = field.getName()
             value = self._abstract.getField(id).strip()
             if value: #id not in ["content"] and
-                styleHead = ParagraphStyle({})
-                styleHead.firstLineIndent = -45
-                styleHead.leftIndent = 45
-                text = "<b>%s</b> :" % name
-                p = Paragraph(text, styleHead, part=escape(self._abstract.getTitle()))
+                #styleHead = ParagraphStyle({})
+                #styleHead.firstLineIndent = -45
+                #styleHead.leftIndent = 45
+                text = "%s :" % name
+                #p = Paragraph(text, styleHead, part=escape(self._abstract.getTitle()))
+                p = SimpleParagraph(text, spaceAfter = 5)
                 story.append(p)
-                l=value.split("\n")
-                res=[]
-                for line in l:
-                    res.append(fill(line,85))
-                res="\n".join(res)
-                p = Paragraph(escape(res), style, part=escape(self._abstract.getTitle()))
+                #l=value.split("\n")
+                #res=[]
+                #for line in l:
+                #    res.append(fill(line,85))
+                #res="\n".join(res)
+                p = Paragraph(escape(value), style, part=escape(self._abstract.getTitle()))
                 story.append(p)
                 story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
 
+        story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
         style = ParagraphStyle({})
         style.firstLineIndent = -80
         style.leftIndent = 80
+        style.alignment = TA_JUSTIFY
         text = _("""<b> _("Primary authors")</b> : """)
         listAuthor = []
         for author in self._abstract.getPrimaryAuthorsList():
@@ -248,6 +253,7 @@ class AbstractToPDF(PDFBase):
         style = ParagraphStyle({})
         style.firstLineIndent = -35
         style.leftIndent = 35
+        style.alignment = TA_JUSTIFY
         text = _("""<b> _("Co-authors")</b> : """)
         listAuthor = []
         for author in self._abstract.getCoAuthorList():
@@ -259,15 +265,16 @@ class AbstractToPDF(PDFBase):
 
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
 
-        style = ParagraphStyle({})
-        style.firstLineIndent = -45
-        style.leftIndent = 45
-        text = _("""<b> _("Presenter")</b> : """)
+        #style = ParagraphStyle({})
+        #style.firstLineIndent = -45
+        #style.leftIndent = 45
+        text = _("""_("Presenter") : """)
         listSpeaker= []
         for speaker in self._abstract.getSpeakerList():
             listSpeaker.append( "%s (%s)"%(escape(speaker.getFullName()), escape(speaker.getAffiliation()) )  )
         text += " ; ".join(listSpeaker)
-        p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+        #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+        p = SimpleParagraph(text)
         story.append(p)
 
         story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
@@ -275,44 +282,51 @@ class AbstractToPDF(PDFBase):
         style.firstLineIndent = -90
         style.leftIndent = 90
         p = Paragraph(self._getTrackText(), style, part=escape(self._abstract.getTitle()))
+        #p = SimpleParagraph(self._getTrackText())
         story.append(p)
 
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
         tmp= _("""--_("not specified")--""")
         if self._abstract.getContribType() is not None:
             tmp=self._abstract.getContribType().getName()
-        text = _("""<b> _("Contribution type")</b> : %s""")%escape(tmp)
-        p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+        text = _("""_("Contribution type") : %s""")%escape(tmp)
+        #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+        p = SimpleParagraph(text)
         story.append(p)
 
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
 
-        text = _("""<b> _("Submitted by")</b> : %s""")%escape(self._abstract.getSubmitter().getFullName())
-        p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+        text = _("""_("Submitted by") : %s""")%escape(self._abstract.getSubmitter().getFullName())
+        #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+        p = SimpleParagraph(text)
         story.append(p)
 
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
 
-        text = _("""<b> _("Submitted on")</b> %s""")%self._abstract.getSubmissionDate().strftime("%A %d %B %Y")
-        p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+        text = _("""_("Submitted on") %s""")%self._abstract.getSubmissionDate().strftime("%A %d %B %Y")
+        #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+        p = SimpleParagraph(text)
         story.append(p)
 
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
 
-        text = _("""<b> _("Last modified on")</b> : %s""")%self._abstract.getModificationDate().strftime("%A %d %B %Y")
-        p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+        text = _("""_("Last modified on") : %s""")%self._abstract.getModificationDate().strftime("%A %d %B %Y")
+        #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+        p = SimpleParagraph(text)
         story.append(p)
 
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
 
-        text = _("""<b> _("Comments")</b> : """)
+        text = _("""_("Comments") : """)
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+        #p = SimpleParagraph(text)
         story.append(p)
 
         style = ParagraphStyle({})
         style.leftIndent = 40
+        style.alignment = TA_JUSTIFY
         text = "%s"%escape(self._abstract.getComments())
-        p = Preformatted(text, style, part=escape(self._abstract.getTitle()))
+        p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
 
         return story
@@ -374,7 +388,7 @@ class AbstractsToPDF(PDFWithTOC):
 class ConfManagerAbstractToPDF(AbstractToPDF):
 
     def _getTrackText(self):
-        text = _("""<b> _("Track classification")</b> : """)
+        text = _("""_("Track classification") : """)
         listTrack= []
         for track in self._abstract.getTrackListSorted():
             listTrack.append( escape(track.getTitle()))
@@ -383,7 +397,7 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
 
     def _getContribTypeText(self):
         status=self._abstract.getCurrentStatus()
-        text= _("""<b> _("Contribution type")</b> : %s""")%escape(str(self._abstract.getContribType()))
+        text= _("""_("Contribution type") : %s""")%escape(str(self._abstract.getContribType()))
         return text
 
     def getBody(self, story=None, indexedFlowable={}, level=1 ):
@@ -394,9 +408,9 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
         #add info for the conference manager
         story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
         status = self._abstract.getCurrentStatus()
-        style = ParagraphStyle({})
-        style.firstLineIndent = -90
-        style.leftIndent = 90
+        #style = ParagraphStyle({})
+        #style.firstLineIndent = -90
+        #style.leftIndent = 90
         if status.__class__ == review.AbstractStatusDuplicated:
             original=status.getOriginal()
             st = _(""" _("DUPLICATED") (%s : %s)""")%(original.getId(), original.getTitle())
@@ -405,15 +419,17 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
             st = _(""" _("MERGED") (%s : %s)""")%(target.getId(), target.getTitle())
         else:
             st = AbstractStatusList.getInstance().getCaption( status.__class__ ).upper()
-        text = _("""<b> _("Status")</b> : %s""")%escape(st)
-        p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+        text = _("""_("Status") : %s""")%escape(st)
+        #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+        p = SimpleParagraph(text)
         story.append(p)
         story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
-        style = ParagraphStyle({})
-        style.firstLineIndent = -90
-        style.leftIndent = 90
-        text = _("""<b> _("Track judgments")</b> :""")
-        p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+        #style = ParagraphStyle({})
+        #style.firstLineIndent = -90
+        #style.leftIndent = 90
+        text = _("""_("Track judgments") :""")
+        #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+        p = SimpleParagraph(text)
         story.append(p)
 
         for track in self._abstract.getTrackListSorted():
@@ -448,41 +464,45 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
             story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
 
             status = self._abstract.getCurrentStatus()
-            style = ParagraphStyle({})
-            style.firstLineIndent = -90
-            style.leftIndent = 130
-            text = _(""" _("Track") : %s""")%escape(track.getTitle())
-            p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+            #style = ParagraphStyle({})
+            #style.firstLineIndent = -90
+            #style.leftIndent = 130
+            text = _("""_("Track") : %s""")%escape(track.getTitle())
+            #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+            p = SimpleParagraph(text, indent = 40)
             story.append(p)
 
             story.append(Spacer(inch, 0.1*cm, part=escape(self._abstract.getTitle())))
 
             status = self._abstract.getCurrentStatus()
-            style = ParagraphStyle({})
-            style.firstLineIndent = -90
-            style.leftIndent = 170
-            text = _(""" _("Judgment") : %s""")%st
-            p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+            #style = ParagraphStyle({})
+            #style.firstLineIndent = -90
+            #style.leftIndent = 170
+            text = _("""_("Judgment") : %s""")%st
+            #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+            p = SimpleParagraph(text, indent = 80)
             story.append(p)
 
             #story.append(Spacer(inch, 0.1*cm, part=self._abstract.getTitle()))
 
             status = self._abstract.getCurrentStatus()
-            style = ParagraphStyle({})
-            style.firstLineIndent = -90
-            style.leftIndent = 170
-            text = _(""" _("Judged by") : %s""")%modifier
-            p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+            #style = ParagraphStyle({})
+            #style.firstLineIndent = -90
+            #style.leftIndent = 170
+            text = _("""_("Judged by") : %s""")%modifier
+            #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+            p = SimpleParagraph(text, indent = 80)
             story.append(p)
 
             #story.append(Spacer(inch, 0.1*cm, part=self._abstract.getTitle()))
 
             status = self._abstract.getCurrentStatus()
-            style = ParagraphStyle({})
-            style.firstLineIndent = -90
-            style.leftIndent = 170
-            text = _(""" _("Date") : %s""")%modifDate
-            p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+            #style = ParagraphStyle({})
+            #style.firstLineIndent = -90
+            #style.leftIndent = 170
+            text = _("""_("Date") : %s""")%modifDate
+            #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+            p = SimpleParagraph(text, indent = 80)
             story.append(p)
 
             #story.append(Spacer(inch, 0.1*cm, part=self._abstract.getTitle()))
@@ -491,8 +511,10 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
             style = ParagraphStyle({})
             style.firstLineIndent = -55
             style.leftIndent = 135
-            text = _(""" _("Comments") : \"<i>%s</i>\"""")%comments
+            style.alignment = TA_JUSTIFY
+            text = _("""_("Comments") : \"<i>%s</i>\"""")%comments
             p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+            #p = SimpleParagraph(text)
             story.append(p)
 
 
@@ -577,17 +599,18 @@ class TrackManagerAbstractToPDF(AbstractToPDF):
             modifDate = status.getDate().strftime( "%d %B %Y %H:%M" )
         story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
         status = self._abstract.getCurrentStatus()
-        style = ParagraphStyle({})
-        style.firstLineIndent = -90
-        style.leftIndent = 90
+        #style = ParagraphStyle({})
+        #style.firstLineIndent = -90
+        #style.leftIndent = 90
         if st:
-            text = _("""<b> _("Status")</b> : %s""")%st
+            text = _("""_("Status") : %s""")%st
             if modifier or modifDate:
                 text += " (%s)"%" - ".join( [modifier, modifDate])
 
         else:
-            text = _("""<b> _("Status")</b> : _("SUBMITTED")""")
-        p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+            text = _("""_("Status") : _("SUBMITTED")""")
+        #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
+        p = SimpleParagraph(text)
         story.append(p)
 
 
