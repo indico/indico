@@ -2805,10 +2805,8 @@ class Conference(Persistent, Fossilizable):
         Set the start/end date for a conference
         """
 
-        # just store the old values for later
-        oldStartDate = copy.copy(self.getStartDate())
-        oldEndDate = copy.copy(self.getEndDate())
-
+        oldStartDate = self.getStartDate()
+        oldEndDate = self.getEndDate()
 
         # do some checks first
         if sDate > eDate:
@@ -2819,21 +2817,28 @@ class Conference(Persistent, Fossilizable):
             # if there's nothing to do (yet another obvious case)
             return
 
-        elif moveEntries == 1:
+        # if we reached this point, it means either the start or
+        # the end date (or both) changed
+        # If only the end date was changed, moveEntries = 0
+        if sDate == oldStartDate:
+            moveEntries = 0
+
+        # Pre-check for moveEntries
+        if moveEntries == 1:
             # in case the entries are to be simply shifted
             # we should make sure the interval is big enough
-            newInterval = eDate - sDate
+            # just store the old values for later
+
             oldInterval = oldEndDate - oldStartDate
+            newInterval = eDate - sDate
 
             if oldInterval > newInterval:
                 raise TimingError(
                     _("The start/end dates were not changed since the selected "
                       "timespan is not large enough to accomodate the contained "
-                      "timetable entries."),
+                      "timetable entries and spacings."),
                     explanation =
-                    _("You should try using a larger timespan or checking "
-                      "the <em>Don't change session/contribution times...</em> "
-                      "checkbox"))
+                    _("You should try using a larger timespan."))
 
         # so, we really need to try changing something
         # let's get to work and remove the conference from the date indexes

@@ -341,16 +341,16 @@ class ConferenceStartEndDateTimeModification( ConferenceModifBase ):
 
         self._startDate = pm.extract('startDate', pType=datetime.datetime)
         self._endDate = pm.extract('endDate', pType=datetime.datetime)
-        self._keepTimes = pm.extract('keepTimes', pType=bool)
+        self._shiftTimes = pm.extract('shiftTimes', pType=bool)
 
     def _getAnswer(self):
 
         ContextManager.set('dateChangeNotificationProblems', {})
 
-        if (self._keepTimes):
-            moveEntries = 0
-        else:
+        if (self._shiftTimes):
             moveEntries = 1
+        else:
+            moveEntries = 0
 
         # first sanity check
         if (self._startDate > self._endDate):
