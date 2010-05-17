@@ -92,7 +92,7 @@ class WPTrackModifBase( WPConferenceModifBase ):
                 urlHandlers.UHTrackModifCoordination.getURL( self._track ) )
         self._tabAbstracts = self._tabCtrl.newTab( "abstracts", _("Abstracts"), \
                 urlHandlers.UHTrackModifAbstracts.getURL( self._track ) )
-        if self._conf.hasEnabledSection("cfa"):
+        if  self._conf.getAbstractMgr().isActive() and self._conf.hasEnabledSection("cfa"):
             self._tabAbstracts.enable()
             self._tabCoordination.enable()
         else:

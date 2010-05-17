@@ -28,13 +28,12 @@ from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.errors import FormValuesError
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.i18n import _
+from MaKaC.webinterface.pages import registrationForm
 
 class RHEPaymentModifBase( conferenceModif.RHConferenceModifBase ):
 
     def _checkProtection( self ):
         conferenceModif.RHConferenceModifBase._checkProtection(self)
-        if not self._conf.hasEnabledSection("epay"):
-            raise MaKaCError( _("The registration form was disabled by the conference managers"))
 
 class RHEPaymentModif( RHEPaymentModifBase ):
 

@@ -540,7 +540,7 @@ class RHAbstractDisplayPDF( RHAbstractDisplayBase ):
 
     def _checkProtection( self ):
         RHConferenceBaseDisplay._checkProtection(self)
-        if not self._conf.hasEnabledSection("cfa"):
+        if not self._conf.getAbstractMgr().isActive() or not self._conf.hasEnabledSection("cfa"):
             raise MaKaCError( _("The Call For Abstracts was disabled by the conference managers"))
 
     def _process( self ):
@@ -561,7 +561,7 @@ class RHAbstractsDisplayPDF(RHConferenceBaseDisplay):
 
     def _checkProtection( self ):
         RHConferenceBaseDisplay._checkProtection(self)
-        if not self._conf.hasEnabledSection("cfa"):
+        if not self._conf.getAbstractMgr().isActive() or not self._conf.hasEnabledSection("cfa"):
             raise MaKaCError( _("The Call For Abstracts was disabled by the conference managers"))
 
     def _checkParams( self, params ):

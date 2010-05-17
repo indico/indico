@@ -4907,7 +4907,17 @@ class Conference(Persistent, Fossilizable):
         return self._sections
 
     def hasEnabledSection(self, section):
-        return section in self.getSections()
+        # This hack is there since there is no more enable/disable boxes
+        # in the conference managment area corresponding to those features.
+        # Until the managment area is improved to get a more user-friendly
+        # way of enabling/disabling those features, we always make them
+        # available for the time being, but we keep the previous code for
+        # further improvements
+        #return section in self.getSections()
+        if section in ["paperReviewing"] :
+            return False
+        else :
+            return True
 
     def enableSection(self, section):
         if ConfSectionsMgr().hasSection(section) and not self.hasEnabledSection(section):
@@ -5048,12 +5058,18 @@ class ConfSectionsMgr:
             "evaluation": _("Evaluation Form"),
             "videoconference": _("Videoconference"), # only for meetings
             "collaboration": _("Collaboration"), # only for meetings
-            "regForm": _("Registration Form") ,
-            "epay": _("e-payment")
+            "regForm": _("Registration Form")
         }
 
     def hasSection(self, s):
-        return self._sections.has_key(s)
+        # This hack is there since there is no more enable/disable boxes
+        # in the conference managment area corresponding to those features.
+        # Until the managment area is improved to get a more user-friendly
+        # way of enabling/disabling those features, we always make them
+        # available in the side menu for the time being, but we keep
+        # the previous code for further improvements
+        #return self._sections.has_key(s)
+        return True
 
     def getSections(self):
         return self._sections
