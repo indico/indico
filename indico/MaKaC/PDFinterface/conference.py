@@ -17,8 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from MaKaC.common import logger
-
+from MaKaC.common import logger, utils
 import string
 import types
 from copy import deepcopy
@@ -394,7 +393,7 @@ class AbstractsToPDF(PDFWithTOC):
         c.drawString(inch, self._PAGE_HEIGHT - 0.75 * inch, "%s / %s"%(confTitle, self._title))
         title = doc.getCurrentPart()
         if len(doc.getCurrentPart())>50:
-            title = doc.getCurrentPart()[:50] + "..."
+            title = utils.unicodeSlice(doc.getCurrentPart(), 0, 50) + "..."
         c.drawRightString(self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - 0.75 * inch, "%s"%title)
         c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, _(""" _("Page") %d """)%doc.page)
         c.drawString(inch,  0.75 * inch, nowutc().strftime("%A %d %B %Y"))
