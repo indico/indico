@@ -51,6 +51,7 @@
                             </table>
                         </div>
                     </td>
+                    <!--  This column shows whether the talk has a matching LOID associated with it (only makes sense for web lectures, not plain video). -->
                     <td width="50px" valign="top">
                         <% if talk["LOID"] != '': %>
                             <div class="RMcolumnStatusNone" style="background-image: url('<%= "/indico/images/RecordingManagerMicalaCheck.png" %>');">
@@ -61,6 +62,7 @@
                             </div>
                         <% end %>
                     </td>
+                    <!--  This column shows whether a CDS record for this talk exists, or if it is pending. -->
                     <td width="50px" valign="top">
                         <% if talk["CDSID"] != 'none' and talk["CDSID"] != 'pending': %>
                             <div class="RMcolumnStatusCDSDone" id="divCDS<%= talk["IndicoID"] %>" onclick="RMCDSDoneClick('<%= talk["CDSURL"] %>')" onmouseover="RMCDSDoneOnHover('<%= talk["IndicoID"] %>')" onmouseout="RMCDSDoneOffHover('<%= talk["IndicoID"] %>')">
@@ -75,6 +77,7 @@
                             </div>
                         <% end %>
                     </td>
+                    <!--  This column shows whether a link has been created from Indico to the CDS record. -->
                     <td width="50px" valign="top">
                         <% if talk["IndicoLink"] == True: %>
                             <div class="RMcolumnStatusNone" style="background-image: url('<%= "/indico/images/RecordingManagerIndicoCheck.png" %>');">

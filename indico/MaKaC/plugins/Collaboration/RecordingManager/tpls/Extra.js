@@ -458,8 +458,9 @@ function RMCreateCDSRecord() {
                         service: 'RMCreateCDSRecord',
                         conference: '<%= ConferenceId %>',
                         IndicoID: RMselectedTalkId,
-                        LOID: RMLOList[RMselectedLODBID]["LOID"],
                         LODBID: RMselectedLODBID,
+                        // LOID is only defined for web_lecture, not plain_video
+                        LOID: RMselectedLODBID != undefined && RMselectedLODBID != "" ? RMLOList[RMselectedLODBID]["LOID"] : "",
                         videoFormat: RMvideoFormat,
                         contentType: RMviewMode,
                         languages: languageCodes

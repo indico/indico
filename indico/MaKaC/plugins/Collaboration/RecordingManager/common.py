@@ -222,12 +222,14 @@ def getTalks(conference, sort = False):
 
     # insert any existing matches into the recordable_events array
     for talk in recordable_events:
+        # Look up IndicoID in existing_matches dictionary
         try:
             matching_LOID = existing_matches[talk["IndicoID"]]
+        # If not found, do nothing (talk["LOID"] should already be assigned to "" by default)
         except KeyError:
-            matching_LOID = ""
-
-        if matching_LOID != "":
+            pass
+        # If there is a matching_LOID, assign it to talk["LOID"]
+        else:
             talk["LOID"] = matching_LOID
 
     # Now that we have all the micala, CDS and IndicoLink info, set up the bg images

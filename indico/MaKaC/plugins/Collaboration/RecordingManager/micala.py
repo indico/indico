@@ -159,7 +159,7 @@ class MicalaCommunication(object):
 
     @classmethod
     def getMatches(cls, confID):
-        '''For the current conference, get list from the database of IndicoID's already matched to Lecture Object.'''
+        '''For the current conference, get list from the database of IndicoID's already matched to Lecture Objects.'''
 
         try:
             connection = MySQLdb.connect(host   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBServer"),
@@ -171,15 +171,22 @@ class MicalaCommunication(object):
             raise RecordingManagerException("MySQL database error %d: %s" % (e.args[0], e.args[1]))
 
         cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
-        cursor.execute('''SELECT IndicoID, LOID FROM Lectures WHERE IndicoID LIKE "%s%%"''' % confID)
+        cursor.execute('''SELECT IndicoID, LOID, ContentType FROM Lectures WHERE IndicoID LIKE "%s%%"''' % confID)
         connection.commit()
         rows = cursor.fetchall()
         cursor.close()
         connection.close()
 
+        # Build dictionary of matches
         match_array = {}
         for row in rows:
-            match_array[row["IndicoID"]] = row["LOID"]
+            # We are only interested in reporting on lecture object matches here,
+            # not whether plain video talks are in the micala database.
+            # Also, it shouldn't ever happen, but ignore records in the micala DB with ContentType WEBLECTURE
+            # that don't have a LOID.
+            # LOID = NULL in the MySQL database translates in Python to being None.
+            if row["ContentType"] == 'WEBLECTURE' and row["LOID"] is not None:
+                match_array[row["IndicoID"]] = row["LOID"]
 
         return (match_array)
 
