@@ -259,7 +259,7 @@ class outputGenerator:
 
         if conf.getParticipation().displayParticipantList() :
             out.writeTag("participants",conf.getParticipation().getPresentParticipantListText())
-        if conf.getType() == "meeting" and conf.getParticipation().isAllowedForApplying() and conf.getStartDate() > nowutc():
+        if (conf.getType() == "meeting" or conf.getType() == "simple_event") and conf.getParticipation().isAllowedForApplying() and conf.getStartDate() > nowutc():
             out.writeTag("apply",urlHandlers.UHConfParticipantsNewPending.getURL(conf))
 
         evaluation = conf.getEvaluation()
