@@ -295,11 +295,15 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                 if (!this.compactMode) {
                     var locationMaxWidth = parentDivWidth  - 20;
 
-                    // Hide the time if there are not enough space
+                    // Hide the time if there is not enough space
                     if (this.timeDiv.dom.offsetWidth + 8 >= parentDivWidth) {
                         this.timeDiv.dom.style.display = 'none';
                     }
-                    else if (contentWidth() >= parentDivWidth) {
+                    // If at this point the width of the content fits but the height of the content
+                    // is bigger than the height of the parent div, it is probably because the
+                    // location takes more than one line in the block. For this edge case we force
+                    // the hiding of the time div so that the location div takes only one line.
+                    else if (contentWidth() >= parentDivWidth || contentHeight() >= parentDivHeight) {
                         this.timeDiv.dom.style.display = 'none';
                     } else {
                         locationMaxWidth -= this.timeDiv.dom.offsetWidth;
@@ -331,7 +335,7 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                 }
 
                 // Try to remove the location info, and set title font weight to non bold,
-                // if this works then we're done otherwisestart to truncate the title as well.
+                // if this works, then we're done. Otherwise, start to truncate the title as well.
                 if (this.timeDiv.dom.style.display == 'none') {
                     this.locationDiv.dom.style.display = 'none';
                 }
