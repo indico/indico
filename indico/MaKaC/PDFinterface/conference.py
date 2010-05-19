@@ -1387,6 +1387,8 @@ class TimeTablePlain(PDFWithTOC):
                 spkName = spk.getFullName()
                 if not self._ttPDFFormat.showSpeakerTitle():
                     spkName = self._getNameWithoutTitle(spk)
+                if self._showSpeakerAffiliation and spk.getAffiliation().strip() != "":
+                    spkName += " (" + spk.getAffiliation() + ")"
                 spkList.append(spkName)
             if len(spkList) > 0:
                 if len(spkList) == 1:
@@ -1410,6 +1412,8 @@ class TimeTablePlain(PDFWithTOC):
                 spkName = spk.getFullName()
                 if not self._ttPDFFormat.showSpeakerTitle():
                     spkName = self._getNameWithoutTitle(spk)
+                if self._showSpeakerAffiliation and spk.getAffiliation().strip() != "":
+                    spkName += " (" + spk.getAffiliation() + ")"
                 p=Paragraph(escape(spkName),self._styles["table_body"])
                 spkList.append([p])
             if len(spkList)==0:
@@ -1476,6 +1480,8 @@ class TimeTablePlain(PDFWithTOC):
                 spkName = spk.getFullName()
                 if not self._ttPDFFormat.showSpeakerTitle():
                     spkName = self._getNameWithoutTitle(spk)
+                if self._showSpeakerAffiliation and spk.getAffiliation().strip() != "":
+                    spkName += " (" + spk.getAffiliation() + ")"
                 spkList.append(spkName)
             if len(spkList) > 0:
                 if len(spkList) == 1:
@@ -1590,7 +1596,7 @@ class TimeTablePlain(PDFWithTOC):
                     sesCaption="%s: %s"%(sesCaption,sessionSlot.getTitle())
                 conv=[]
                 for c in sessionSlot.getConvenerList():
-                    if self._showSpeakerAffiliation:
+                    if self._showSpeakerAffiliation and c.getAffiliation().strip() != "":
                         conv.append("%s (%s)"%(escape(c.getFullName()), escape(c.getAffiliation())))
                     else:
                         conv.append(escape(c.getFullName()))
@@ -1736,7 +1742,7 @@ class TimeTablePlain(PDFWithTOC):
                 caption="%s"%contrib.getTitle()
                 spks=[]
                 for c in contrib.getSpeakerList():
-                    if self._showSpeakerAffiliation:
+                    if self._showSpeakerAffiliation and c.getAffiliation().strip() != "":
                         spks.append("%s (%s)"%(escape(c.getFullName()), escape(c.getAffiliation())))
                     else:
                         spks.append(escape(c.getFullName()))
