@@ -1005,9 +1005,9 @@ class WPCategOverview( WPCategoryDisplayBase ):
             return wc.getHTML( pars )
 
     def _getNavigationDrawer(self):
-        link = [{"url": urlHandlers.UHCategoryOverview.getURL(self._target), "title": _("Events overview"), "type": "Overview"}]
+        #link = [{"url": urlHandlers.UHCategoryOverview.getURL(self._target), "title": _("Events overview")}]
         pars = {"target": self._target, "isModif": False}
-        return wcomponents.WNavigationDrawer( pars, appendPath = link )
+        return wcomponents.WNavigationDrawer( pars, type = "Overview" )
 
 class WCategoryMap(wcomponents.WTemplated):
 
@@ -1047,9 +1047,9 @@ class WPCategoryMap( WPCategoryDisplayBase ):
         return wc.getHTML( pars )
 
     def _getNavigationDrawer(self):
-        link = [{"url": urlHandlers.UHCategoryMap.getURL(self._target), "title": _("Category map"), "type": "Map"}]
+        #link = [{"url": urlHandlers.UHCategoryMap.getURL(self._target), "title": _("Category map")}]
         pars = {"target": self._target, "isModif": False}
-        return wcomponents.WNavigationDrawer( pars, appendPath = link )
+        return wcomponents.WNavigationDrawer( pars, type = "Map" )
 
 class WCategoryStatistics(wcomponents.WTemplated):
 
@@ -1107,9 +1107,9 @@ class WPCategoryStatistics( WPCategoryDisplayBase ):
         return wcs.getHTML( self._getAW() )
 
     def _getNavigationDrawer(self):
-        link = [{"url": urlHandlers.UHCategoryStatistics.getURL(self._target), "title": _("Category statistics"), "type": "Statistics"}]
+        #link = [{"url": urlHandlers.UHCategoryStatistics.getURL(self._target), "title": _("Category statistics")}]
         pars = {"target": self._target, "isModif": False}
-        return wcomponents.WNavigationDrawer( pars, appendPath = link )
+        return wcomponents.WNavigationDrawer( pars, type = "Statistics" )
 
 class WEventTypeSelectionItem(wcomponents.WTemplated):
 

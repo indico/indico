@@ -743,11 +743,12 @@ class WFooter(WTemplated):
 
 class WNavigationDrawer(WTemplated):
 
-    def __init__( self, pars, bgColor = None, appendPath = [] ):
+    def __init__( self, pars, bgColor = None, appendPath = [] , type = None):
         self._target = pars["target"]
         self._isModif = pars.get("isModif", False)
         self._track = pars.get("track", None) #for abstracts viewed inside a track
         self._bgColor = bgColor
+        self._actionType = type #type of action
 
         """
             The appendPath is an array with dictionaries: {"url": x, "title": x}.
@@ -762,6 +763,7 @@ class WNavigationDrawer(WTemplated):
         vars["track"]= self._track
         vars["bgColor"] = self._bgColor
         vars["appendPath"] = self._appendPath
+        vars["actionType"] = self._actionType
         return vars
 
     def getHTML(self, params=None):

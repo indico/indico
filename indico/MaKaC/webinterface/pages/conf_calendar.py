@@ -277,9 +277,9 @@ class WPCalendar( WPCalendarBase ):
         return wc.getHTML( params )
 
     def _getNavigationDrawer(self):
-        link = [{"url": urlHandlers.UHCalendar.getURL([self._categ]), "title": _("Calendar overview"), "type": "Calendar"}]
+        #link = [{"url": urlHandlers.UHCalendar.getURL([self._categ]), "title": _("Calendar overview")}]
         pars = {"target": self._categ, "isModif": False}
-        return wcomponents.WNavigationDrawer( pars, appendPath = link )
+        return wcomponents.WNavigationDrawer( pars, type = "Calendar" )
 
 
 class MulSelectCategTree:

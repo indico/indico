@@ -3984,6 +3984,9 @@ class UHConfModifRegistrantStatusesPerformModify( URLHandler ):
 class UHGetCalendarOverview( URLHandler ):
     _relativeURL ="categOverview.py"
 
+class UHCategoryCalendarOverview( URLHandler ):
+    _relativeURL ="wcalendar.py"
+
 
 """
 URL Handlers for  Printing and Design
@@ -4493,7 +4496,7 @@ class UHHelper(object):
         "CategoryMap" : UHCategoryMap,
         "CategoryOverview" : UHCategoryOverview,
         "CategoryStatistics" : UHCategoryStatistics,
-        "CategoryCalendar" : UHGetCalendarOverview,
+        "CategoryCalendar" : UHCategoryCalendarOverview,
         "Conference" : UHConferenceDisplay,
         "Contribution": UHContributionDisplay,
         "AcceptedContribution": UHContributionDisplay,
