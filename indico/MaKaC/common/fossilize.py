@@ -195,18 +195,20 @@ class Fossilizable:
             ttype = type(target)
             if ttype in [int, str, float, NoneType]:
                 return target
-            elif ttype in [list, set, tuple]:
-                container = [] #we turn sets and tuples into lists since JSON does not have sets / tuples
-                for elem in target:
-                    container.append(fossilize(elem, interface, useAttrCache, **kwargs))
-                return container
             elif ttype is dict:
                 container = {}
                 for key, value in target.iteritems():
                     container[key] = fossilize(value, interface, useAttrCache, **kwargs)
                 return container
+            elif hasattr(target, '__iter__'):
+                #we turn sets and tuples into lists since JSON does not have sets / tuples
+                return list(fossilize(elem,
+                                      interface,
+                                      useAttrCache,
+                                      **kwargs) for elem in target)
             else:
-                raise NonFossilizableException()
+                raise NonFossilizableException("Type %s is not fossilizable!" %
+                                               ttype)
 
             return fossilize(target, interface, useAttrCache)
 

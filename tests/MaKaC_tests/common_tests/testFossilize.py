@@ -247,15 +247,8 @@ class TestFossilize(unittest.TestCase):
     def testFossilizeDict(self):
         s1 = SimpleClass(10, 20, 'foo')
         d1 = DerivedClass(10, 50, 'bar')
-        self.assertEquals(fossilize([s1, d1], {SimpleClass: ISimpleFossil2Fossil, DerivedClass: ISimpleFossil1Fossil}),
+        self.assertEquals(fossilize([s1, d1], {"MaKaC_tests.common_tests.testFossilize.SimpleClass": ISimpleFossil2Fossil, "MaKaC_tests.common_tests.testFossilize.DerivedClass": ISimpleFossil1Fossil}),
                           [s1.fossilize(ISimpleFossil2Fossil), d1.fossilize(ISimpleFossil1Fossil)])
-        self.assertEquals(fossilize([s1, d1], {"SimpleClass": ISimpleFossil2Fossil, "DerivedClass": ISimpleFossil1Fossil}),
-                          [s1.fossilize(ISimpleFossil2Fossil), d1.fossilize(ISimpleFossil1Fossil)])
-        self.assertEquals(fossilize([s1, d1], {"MaKaC_tests.common_tests.testFossilize.SimpleClass": ISimpleFossil2Fossil,
-                                               "MaKaC_tests.common_tests.testFossilize.DerivedClass": ISimpleFossil1Fossil}),
-                          [s1.fossilize(ISimpleFossil2Fossil), d1.fossilize(ISimpleFossil1Fossil)])
-        self.assertEquals(fossilize([s1, d1], {SimpleClass: ISimpleFossil2Fossil}),
-                          [s1.fossilize(ISimpleFossil2Fossil), d1.fossilize(ISimpleFossil2Fossil)])
 
 
 if __name__ == '__main__':
