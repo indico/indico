@@ -66,6 +66,8 @@ def index(req, **params):
         previous = """<a href="http://indico.cern.ch/tools/SSLPdisplay.py?stdate=2007-07-02&nbweeks=7">Previous Year Lecture Programme</a>"""
     elif str(year) == "2009":
         previous = """<a href="http://indico.cern.ch/tools/SSLPdisplay.py?stdate=2008-06-30&nbweeks=9">Previous Year Lecture Programme</a>"""
+    elif str(year) == "2010":
+        previous = """<a href="http://indico.cern.ch/tools/SSLPdisplay.py?stdate=2009-06-29&nbweeks=8">Previous Year Lecture Programme</a>"""
 
     html = """
 <!doctype html public "-//w3c//dtd html 4.0 transitional//en">
