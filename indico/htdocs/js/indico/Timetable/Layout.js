@@ -12,7 +12,28 @@ type("TimetableLayoutManager", [],
                  checkpoints[time].push([key, type, sessionId]);
              };
 
-             each(data, function(value, key){
+             // Enforce key ordering
+             // In case we are dealing with structures that are inside a session,
+             // and have a non-null sessionCode, use it for ordering
+             var orderedKeys = keys(data);
+
+             orderedKeys.sort(function(e1, e2) {
+                 // if there's a session code
+                 if (exists(data[e1].sessionCode) &&
+                     exists(data[e2].sessionCode)) {
+                     var byCode = SortCriteria.Integer(data[e1].sessionCode,
+                                                       data[e2].sessionCode);
+                     if (byCode != 0) {
+                         return byCode;
+                     }
+                 }
+
+                 // default behavior
+                 return SortCriteria.Integer(e1, e2);
+             });
+
+             each(orderedKeys, function(key){
+                 var value = data[key];
                  sTime =value.startDate.time.replace(/:/g,'');
                  eTime = value.endDate.time.replace(/:/g,'');
 

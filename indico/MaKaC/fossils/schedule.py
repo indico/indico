@@ -38,6 +38,10 @@ class ISchEntryFossil(IFossil):
     def getDescription(self):
         """ Description """
 
+    def getSessionCode(self):
+        """ Entry Session Id """
+    getSessionCode.produce = Conversion.parentSessionCode
+
 
 class IBreakTimeSchEntryFossil(ISchEntryFossil):
 

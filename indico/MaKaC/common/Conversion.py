@@ -60,6 +60,22 @@ class Conversion:
             return None
 
     @classmethod
+    def parentSessionCode(cls, entry):
+        from MaKaC.schedule import ContribSchEntry, BreakTimeSchEntry
+        from MaKaC.conference import SessionSlot
+
+        session = None
+        owner = entry.getOwner()
+
+        if type(entry) == ContribSchEntry or (type(entry) == BreakTimeSchEntry and type(owner) == SessionSlot):
+            session = owner.getSession()
+
+        if session:
+            return session.getCode()
+        else:
+            return None
+
+    @classmethod
     def parentSlot(cls, entry):
         from MaKaC.schedule import ContribSchEntry, BreakTimeSchEntry
         from MaKaC.conference import SessionSlot#, Session
