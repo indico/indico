@@ -312,11 +312,11 @@ def formatDate(date_str):
                      _('Nov'),
                      _('Dec')]
 
-    return "%02d:%02d, %s %d %s" % (time_struct[3],
-                                    time_struct[4],
-                                    day_of_week[time_struct[6]],
-                                    time_struct[2],
-                                    month_of_year[int(time_struct[1] - 1)])
+    return "%02d:%02d, %s %d %s" % (time_struct.tm_hour,
+                                    time_struct.tm_min,
+                                    day_of_week[time_struct.tm_wday],
+                                    time_struct.tm_mday,
+                                    month_of_year[int(time_struct.tm_mon - 1)])
 
 def generateIndicoID(conference     = None,
                     session         = None,
