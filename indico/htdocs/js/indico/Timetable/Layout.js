@@ -79,7 +79,7 @@ type("TimetableLayoutManager", [],
 
              // Returns number of previously processed session slots
              var numAssignedBlocks = function(sessionId) {
-                 var blocks = lastAssigned.sessionId.blocks;
+                 var blocks = lastAssigned[sessionId].blocks;
                  var keyss = keys(blocks);
                  var length = keyss.length;
                  return length;
@@ -87,11 +87,11 @@ type("TimetableLayoutManager", [],
 
              // Adds/updates a block in the lastAssigned dictionary
              var lastAssign = function(block, col) {
-                 col = any(col, null);
+
                  if (!exists(lastAssigned[block.sessionId])) {
                      lastAssigned[block.sessionId] = {'blocks': {}};
                  }
-                 if (col !== null) {
+                 if (col !== undefined) {
                      lastAssigned[block.sessionId].col = col;
                  }
                  lastAssigned[block.sessionId].blocks[block.id] = true;
@@ -354,6 +354,7 @@ type("CompactLayoutManager", ["IncrementalLayoutManager"],
                      self.addWholeDayBlock(algData.wholeDayBlocks, point[0]);
                  }
              });
+
              // Try to reaorder the assigned blocks based on their previous position
              if (blockAdded) {
                  self.reorderAssigned(algData.assigned, algData.lastAssigned, algData.currentGroup);
