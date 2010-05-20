@@ -216,7 +216,7 @@ type ("UserSearchPanel", ["SimpleSearchPanel"], {
     _createSearchForm: function() {
         var self = this;
 
-        var familyName = new EnterObserverTextBox("text",{style:{width:"100%"}}, function() {
+        var familyName = new EnterObserverTextBox("text",{style:{width:"100%"},id:'userSearchFocusField'}, function() {
             self._searchAction();
             return false;
         });
@@ -298,7 +298,7 @@ type ("UserSearchPanel", ["SimpleSearchPanel"], {
      */
     draw: function() {
         return this.SimpleSearchPanel.prototype.draw.call(this);
-    }
+    },
 },
 
     /**
@@ -754,6 +754,7 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
             this.suggestedUsersPanel.suggestedUserListDiv.setStyle('height', pixels(this.cellSuggested.dom.offsetHeight - this.suggestedUsersPanel.titleDiv.dom.offsetHeight - 10));
         }
         this.ExclusivePopupWithButtons.prototype.postDraw.call(this);
+        $E('userSearchFocusField').dom.focus();
     }
 },
     /**
