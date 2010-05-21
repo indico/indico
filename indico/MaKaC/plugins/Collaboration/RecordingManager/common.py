@@ -362,7 +362,7 @@ def getOrphans():
     if flagSuccess == True:
         try:
             cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
-            cursor.execute("SELECT id, LOID, IndicoID, Title, Creator FROM Lectures WHERE NOT IndicoID")
+            cursor.execute("SELECT id, LOID, IndicoID, Title, Creator FROM Lectures WHERE NOT IndicoID OR IndicoID IS NULL ORDER BY LOID")
             connection.commit()
             rows = cursor.fetchall()
             cursor.close()
@@ -546,7 +546,7 @@ def getBasicXMLRepresentation(aw, IndicoID, contentType, videoFormat, languages)
     # Retrieve the entire basic XML string
     return xmlGen.getXml()
 
-def createCDSRecord(aw, IndicoID, contentType, videoFormat, languages):
+def createCDSRecord(aw, IndicoID, LODBID, contentType, videoFormat, languages):
     '''Retrieve a MARC XML string for the given conference, then web upload it to CDS.'''
 
 # I need to break this up into 2 functions: one to simply get the MARC XML,
@@ -640,11 +640,22 @@ def createCDSRecord(aw, IndicoID, contentType, videoFormat, languages):
 
         # Update the micala database with our current task status
         try:
+            # first need to get DB ids for stuff
             idMachine = MicalaCommunication.getIdMachine(CollaborationTools.getOptionValue("RecordingManager", "micalaDBMachineName"))
             idTask    = MicalaCommunication.getIdTask(CollaborationTools.getOptionValue("RecordingManager", "micalaDBStatusExportCDS"))
-            idLecture = MicalaCommunication.getIdLecture(IndicoID, pattern_cern, pattern_umich)
-            if idLecture == '':
-                idLecture = MicalaCommunication.createNewMicalaLecture(IndicoID, contentType, pattern_cern, pattern_umich)
+            # Look for the current talk in the Lectures table of the micala database
+            # If it is a plain_video talk, look for its IndicoID;
+            # if it is a web_lecture talk, use its LODBID
+            if contentType == 'plain_video':
+                idLecture = MicalaCommunication.getIdLecture(IndicoID, pattern_cern, pattern_umich)
+                # If the current talk was not found in the micala DB, add a new record.
+                if idLecture == '':
+                    idLecture = MicalaCommunication.createNewMicalaLecture(IndicoID, contentType, pattern_cern, pattern_umich)
+            elif contentType == 'web_lecture':
+                # there's no question that there is a record for this lecture object,
+                # because we just read the database to get the LODBID.
+                idLecture = LODBID
+
             MicalaCommunication.reportStatus('START', '', idMachine, idTask, idLecture)
         except Exception, e:
             flagSuccess = False
@@ -652,7 +663,7 @@ def createCDSRecord(aw, IndicoID, contentType, videoFormat, languages):
 
     return {"success": flagSuccess, "result": result}
 
-def submitMicalaMetadata(aw, IndicoID, contentType, LOID, videoFormat, languages):
+def submitMicalaMetadata(aw, IndicoID, contentType, LODBID, LOID, videoFormat, languages):
     '''Generate a lecture.xml file for the given event, then web upload it to the micala server.'''
 
     Logger.get('RecMan').debug('in submitMicalaMetadata()')
@@ -661,29 +672,12 @@ def submitMicalaMetadata(aw, IndicoID, contentType, LOID, videoFormat, languages
     flagSuccess = True
     result = ""
 
-    # First, update the micala Tasks table that the submission has started
-
-    # pattern to match for the signal file
-    # Here we are looking for
-    # CONFID
-    # or CONFIDcCONTRID
-    # or CONFIDcCONTRIDscSCONTRID
-    # or CONFIDsSESSID
-    pattern_cern  = re.compile('([sc\d]+)$')
-    # Here we are looking for YYYYMMDD-DEVICENAME-HHMMSS
-    pattern_umich = re.compile('(\d+\-[\w\d]+\-\d)$')
-
-    # Update the micala database with our current task status
+    # First update the micala database that we've started this task
     try:
-        Logger.get('RecMan').debug('calling getIdMachine...')
         idMachine = MicalaCommunication.getIdMachine(CollaborationTools.getOptionValue("RecordingManager", "micalaDBMachineName"))
-        Logger.get('RecMan').debug('calling getIdTask...')
         idTask    = MicalaCommunication.getIdTask(CollaborationTools.getOptionValue("RecordingManager", "micalaDBStatusExportMicala"))
-        Logger.get('RecMan').debug('calling getIdLecture...')
-        idLecture = MicalaCommunication.getIdLecture(IndicoID, pattern_cern, pattern_umich)
-        Logger.get('RecMan').debug('calling reportStatus...')
-        if idLecture == '':
-            idLecture = MicalaCommunication.createNewMicalaLecture(IndicoID, contentType, pattern_cern, pattern_umich)
+        idLecture = LODBID
+        Logger.get('RecMan').debug('submitMicalaMetadata calling reportStatus...')
         MicalaCommunication.reportStatus('START', '', idMachine, idTask, idLecture)
     except Exception, e:
         flagSuccess = False
@@ -698,7 +692,7 @@ def submitMicalaMetadata(aw, IndicoID, contentType, LOID, videoFormat, languages
     # Given the IndicoID, retrieve the type of talk and IDs, so we know which XSL file to use.
     parsed = parseIndicoID(IndicoID)
 
-    # Choose the appropriate stylesheet:
+    # Choose the appropriate stylesheet for the type of talk:
     # - micala_lecture_conference.xsl
     # - micala_lecture_session.xsl
     # - micala_lecture_contribution.xsl
@@ -754,21 +748,15 @@ def submitMicalaMetadata(aw, IndicoID, contentType, LOID, videoFormat, languages
     # Update the micala database showing the task has started, but only if
     # the submission actually succeeded.
     if flagSuccess == True:
-        # pattern to match for the signal file
-        # Here we are looking for
-        # CONFID
-        # or CONFIDcCONTRID
-        # or CONFIDcCONTRIDscSCONTRID
-        # or CONFIDsSESSID
-        pattern_cern  = re.compile('([sc\d]+)$')
-        # Here we are looking for YYYYMMDD-DEVICENAME-HHMMSS
-        pattern_umich = re.compile('(\d+\-[\w\d]+\-\d)$')
-
-        # Update the micala database with our current task status
         try:
-            if idLecture == '':
-                idLecture = MicalaCommunication.createNewMicalaLecture(IndicoID, contentType, pattern_cern, pattern_umich)
             MicalaCommunication.reportStatus('COMPLETE', '', idMachine, idTask, idLecture)
+        except Exception, e:
+            flagSuccess = False
+            result += _("Unknown error occured when updating COMPLETE MICALA task information in micala database: %s\n." % e)
+    # if errors were encountered, report ERROR status and details to micala DB
+    else:
+        try:
+            MicalaCommunication.reportStatus('ERROR', result, idMachine, idTask, idLecture)
         except Exception, e:
             flagSuccess = False
             result += _("Unknown error occured when updating COMPLETE MICALA task information in micala database: %s\n." % e)

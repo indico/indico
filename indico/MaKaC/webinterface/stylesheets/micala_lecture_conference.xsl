@@ -24,12 +24,19 @@
 <!-- Event -->
 <xsl:template match="event">
 
-<!--  <!DOCTYPE LECTURE SYSTEM "http://www.wlap.org/dtd/lecture.dtd">  -->
+<!--  <!DOCTYPE LECTURE SYSTEM "http://www.wlap.org/dtd/lecture.dtd"> -->
 <LECTURE>
   <TITLE><xsl:value-of select="./title" /></TITLE>
-  <xsl:for-each select="./chair/user">
-    <AUTHOR><xsl:apply-templates select="./name"/></AUTHOR>
-  </xsl:for-each>
+  <xsl:choose>
+    <xsl:when test="./chair/user != ''">
+      <xsl:for-each select="./chair/user">
+        <AUTHOR><xsl:apply-templates select="./name"/></AUTHOR>
+      </xsl:for-each>
+    </xsl:when>
+    <xsl:otherwise>
+      <AUTHOR>no speaker given</AUTHOR>
+    </xsl:otherwise>
+  </xsl:choose>
   <DATE><xsl:value-of select="substring(./startDate, 0, 11)" /></DATE>
   <LANGUAGE>
     <xsl:choose>
@@ -52,7 +59,7 @@
     </SWITCH>
     </VIDEO>
     <SEQ TITLE="Sequence of slides" REGION="slide" >
-      <SLIDE TYPE="DUMMY" />
+        <!-- This section will be populated by a list of slide timings later -->
     </SEQ>
   </PAR>
 </LECTURE>

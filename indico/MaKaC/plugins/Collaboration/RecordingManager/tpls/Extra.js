@@ -352,32 +352,6 @@ function RMchooseVideoFormat(format_string) {
     RMMatchSummaryMessageUpdate();
 }
 
-function RMLink() {
-    //RMselectedTalk
-    //RMselectedLO
-
-    var killProgress = IndicoUI.Dialogs.Util.progress($T("doing something"));
-
-    indicoRequest('collaboration.pluginService',
-            {
-                plugin: 'RecordingManager',
-                service: 'RMLink',
-                conference: '<%= ConferenceId %>',
-                IndicoID: RMselectedTalkId,
-                LOID: RMselectedLODBID
-            },
-        function(result, error){
-            if (!error) {
-// I don't have anything here yet. This is where we could do something with the result if we want. Don't know what that would be.
-                killProgress(); // turn off the progress indicator
-            } else {
-                killProgress(); // turn off the progress indicator
-                IndicoUtil.errorReport(error);
-            }
-        }
-    );
-}
-
 // Do the AJAX thing to create the CDS record
 function RMCreateCDSRecord() {
 

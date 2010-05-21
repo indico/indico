@@ -78,13 +78,10 @@ class MicalaCommunication(object):
         return(idTask)
 
     @classmethod
-    def getIdLecture(cls, lecture_name, pattern_cern, pattern_umich):
-        '''Look up ID of this lecture in database'''
+    def getIdLecture(cls, lecture_name):
+        '''Look up internal database ID of the given lecture'''
 
         Logger.get('RecMan').debug('lecture_name = [%s]' % lecture_name)
-
-        match_cern  = pattern_cern.search(lecture_name)
-        match_umich = pattern_umich.search(lecture_name)
 
         try:
             connection = MySQLdb.connect(host   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBServer"),
@@ -104,10 +101,8 @@ class MicalaCommunication(object):
 
         result_set = cursor.fetchone()
 
-        if result_set is not None and len(result_set) > 0 and match_cern:
+        if result_set is not None and len(result_set) > 0:
             Logger.get('RecMan').debug("result_set: %s" % str(result_set))
-            idLecture = result_set[0]
-        elif result_set is not None and len(result_set) > 0 and match_umich:
             idLecture = result_set[0]
         else:
             idLecture = ''
@@ -155,7 +150,7 @@ class MicalaCommunication(object):
 
         connection.close()
 
-        return cls.getIdLecture(lecture_name, pattern_cern, pattern_umich)
+        return cls.getIdLecture(lecture_name)
 
     @classmethod
     def getMatches(cls, confID):
@@ -219,48 +214,43 @@ class MicalaCommunication(object):
         connection.close()
 
     @classmethod
-    def updateMicala(cls, IndicoID, contentType, LODBID):
+    def associateIndicoIDToLOID(cls, IndicoID, LODBID):
         """Update the micala DB to associate the given talk with the given LOID"""
 
         # Initialize success flag and result string
         flagSuccess = True
         result      = ""
 
-        Logger.get('RecMan').debug("in updateMicala()")
+        Logger.get('RecMan').debug("in associateIndicoIDToLOID()")
 
-        if contentType == 'web_lecture':
-            try:
-                connection = MySQLdb.connect(host   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBServer"),
-                                             port   = int(CollaborationTools.getOptionValue("RecordingManager", "micalaDBPort")),
-                                             user   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBUser"),
-                                             passwd = CollaborationTools.getOptionValue("RecordingManager", "micalaDBPW"),
-                                             db     = CollaborationTools.getOptionValue("RecordingManager", "micalaDBName"))
-            except MySQLdb.Error, e:
-                flagSuccess = False
-                result += "MySQL error %d: %s" % (e.args[0], e.args[1])
-            except Exception, e:
-                flagSuccess = False
-                result += "Unknown error %d: %s" % (e.args[0], e.args[1])
+        try:
+            connection = MySQLdb.connect(host   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBServer"),
+                                         port   = int(CollaborationTools.getOptionValue("RecordingManager", "micalaDBPort")),
+                                         user   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBUser"),
+                                         passwd = CollaborationTools.getOptionValue("RecordingManager", "micalaDBPW"),
+                                         db     = CollaborationTools.getOptionValue("RecordingManager", "micalaDBName"))
+        except MySQLdb.Error, e:
+            flagSuccess = False
+            result += "MySQL error %d: %s" % (e.args[0], e.args[1])
+        except Exception, e:
+            flagSuccess = False
+            result += "Unknown error %d: %s" % (e.args[0], e.args[1])
 
-            cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+        cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
 
-            try:
-                cursor.execute("UPDATE Lectures SET IndicoID=%s WHERE id=%s",
-                               (IndicoID, LODBID))
-                connection.commit()
-            except MySQLdb.Error, e:
-                flagSuccess = False
-                result += "MySQL error %d: %s" % (e.args[0], e.args[1])
-            except Exception, e:
-                flagSuccess = False
-                result += "Unknown error %d: %s" % (e.args[0], e.args[1])
+        try:
+            cursor.execute("UPDATE Lectures SET IndicoID=%s WHERE id=%s",
+                           (IndicoID, LODBID))
+            connection.commit()
+        except MySQLdb.Error, e:
+            flagSuccess = False
+            result += "MySQL error %d: %s" % (e.args[0], e.args[1])
+        except Exception, e:
+            flagSuccess = False
+            result += "Unknown error %d: %s" % (e.args[0], e.args[1])
 
-            cursor.close()
-            connection.close()
-
-        elif contentType == 'plain_video':
-            # do nothing, since a record in Lectures should already have been created by createCDSRecord()
-            pass
+        cursor.close()
+        connection.close()
 
         return {"success": flagSuccess, "result": result}
 
@@ -332,10 +322,7 @@ class MicalaCommunication(object):
                 new_record = cds_indico_matches[pending]
                 idMachine = cls.getIdMachine(CollaborationTools.getOptionValue("RecordingManager", "micalaDBMachineName"))
                 idTask    = cls.getIdTask(CollaborationTools.getOptionValue("RecordingManager", "micalaDBStatusExportCDS"))
-                import re
-                pattern_cern  = re.compile('([sc\d]+)$')
-                pattern_umich = re.compile('(\d+\-[\w\d]+\-\d)$')
-                idLecture = cls.getIdLecture(pending, pattern_cern, pattern_umich)
+                idLecture = cls.getIdLecture(pending)
                 cls.reportStatus("COMPLETE", "CDS record: %s" % new_record, idMachine, idTask, idLecture)
 
                 # I should still update the Lectures table to add the CDS record

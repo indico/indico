@@ -24,23 +24,6 @@ from MaKaC.plugins.Collaboration.RecordingManager.exceptions import RecordingMan
 from MaKaC.plugins.Collaboration.RecordingManager.common import createIndicoLink, createCDSRecord, submitMicalaMetadata
 from MaKaC.plugins.Collaboration.RecordingManager.micala import MicalaCommunication
 
-class RMLinkService(CollaborationPluginServiceBase):
-
-    def _checkParams(self):
-        CollaborationPluginServiceBase._checkParams(self) #puts the Conference in self._conf
-        self._IndicoID = self._params.get('IndicoID', None)
-        self._LOID     = self._params.get('LOID', None)
-
-        if not self._IndicoID:
-            raise RecordingManagerException("No IndicoID supplied")
-        if not self._LOID:
-            raise RecordingManagerException("No LOID supplied")
-
-    def _getAnswer(self):
-#        here is where we make a submission to the database?
-        MicalaCommunication.updateMicala(self._params.get('IndicoID', None), self._params.get('LOID', None))
-        return {'some':'thing'}
-
 class RMCreateCDSRecordService(CollaborationPluginServiceBase):
 
     def _checkParams(self):
@@ -72,44 +55,75 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
             raise RecordingManagerException("No languages supplied")
 
     def _getAnswer(self):
+        """This method does everything necessary to create a CDS record and also update the micala database.
+        For plain_video talks, it does the following:
+         - calls createCDSRecord(),
+                 which generates the MARC XML,
+                 submits it to CDS,
+                 and makes sure a record for this talk exists in micala DB
+        For web_lecture talks, it does the following:
+         - calls createCDSRecord(),
+                 which generates the MARC XML and submits it to CDS
+         - calls associateIndicoIDToLOID(),
+                 which associates the chosen IndicoID to the existing record of the LOID in micala DB
+                 (no need to create a new record, because the user is only allowed to choose LOID's that are already in the micala DB)
+         - calls submitMicalaMetadata(), which generates the micala lecture.xml and submits it to micala DB.
+        All of these methods update their status to micala DB.
+        """
+
+        ###################################################################
+        # FOR DEBUGGING
+        resultSubmitMicalaMetadata = submitMicalaMetadata(self._aw,
+                                                          self._IndicoID,
+                                                          self._contentType,
+                                                          self._LODBID,
+                                                          self._params.get('LOID', None),
+                                                          self._videoFormat,
+                                                          self._languages)
+        if resultSubmitMicalaMetadata["success"] == False:
+            raise RecordingManagerException("CDS record creation failed.\n%s" % resultSubmitMicalaMetadata["result"])
+            return "micala metadata creation aborted."
+
+        return
+        # /FOR DEBUGGING!
+        ###################################################################
+
         # Get the MARC XML and submit it to CDS,
-        # then update micala database Status table showing task completed
+        # then update micala database Status table showing task completed.
+        # do this for both plain_video and web_lecture talks
         resultCreateCDSRecord = createCDSRecord(self._aw,
                                                 self._IndicoID,
+                                                self._LODBID,
                                                 self._contentType,
                                                 self._videoFormat,
                                                 self._languages)
-
         if resultCreateCDSRecord["success"] == False:
             raise RecordingManagerException("CDS record creation failed.\n%s" % resultCreateCDSRecord["result"])
             return "CDS record creation aborted."
 
-        # Create lecture.xml and submit to micala server,
-        # then update micala database Status table showing task completed
-        # (this only makes sense if it is a web lecture)
         if self._contentType == 'web_lecture':
+            # Update the micala database to match the LODBID with the IndicoID
+            # This only makes sense for web_lecture talks
+            # (for plain_video, a record in Lectures should already have been created by createCDSRecord() )
+            resultAssociateIndicoIDToLOID = MicalaCommunication.associateIndicoIDToLOID(self._IndicoID,
+                                              self._params.get('LODBID', None))
+            if resultAssociateIndicoIDToLOID["success"] == False:
+                raise RecordingManagerException("micala database update failed.\n%s" % resultAssociateIndicoIDToLOID["result"])
+                return "CDS record creation aborted."
+
+            # Create lecture.xml and submit to micala server,
+            # then update micala database Status table showing task completed
+            # (this only makes sense if it is a web_lecture)
             resultSubmitMicalaMetadata = submitMicalaMetadata(self._aw,
                                                               self._IndicoID,
                                                               self._contentType,
+                                                              self._LODBID,
                                                               self._params.get('LOID', None),
                                                               self._videoFormat,
                                                               self._languages)
-
             if resultSubmitMicalaMetadata["success"] == False:
                 raise RecordingManagerException("CDS record creation failed.\n%s" % resultSubmitMicalaMetadata["result"])
                 return "micala metadata creation aborted."
-
-        # Update the micala database to match the LODBID with the IndicoID
-        # This only makes sense for web lectures, so if contentType is plain_video,
-        # this method does nothing.
-        resultUpdateMicala = MicalaCommunication.updateMicala(self._IndicoID,
-                                          self._contentType,
-                                          self._params.get('LODBID', None))
-
-        if resultUpdateMicala["success"] == False:
-            raise RecordingManagerException("micala database update failed.\n%s" % resultUpdateMicala["result"])
-            return "CDS record creation aborted."
-
 
         return "Successfully updated micala database and submitted CDS record for creation."
 
