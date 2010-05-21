@@ -13,6 +13,7 @@ from email.Utils import formatdate
 
 class RHTemplateContentJS(base.RH):
     _uh = urlHandlers.Build("JSContent.py")
+    _tplName = ''
 
     def __init__(self, req):
         base.RH.__init__(self, req)
@@ -56,9 +57,11 @@ class RHTemplateContentJS(base.RH):
                 # if the etag the same, send NOT_MODIFIED
                 self._req.status = apache.HTTP_NOT_MODIFIED
                 self._doProcess = False
+            else:
+                self._regenerate = True
         else:
             # file needs to be regenerated
-            self._regenerate = True;
+            self._regenerate = True
 
 
     def _process( self ):
@@ -97,8 +100,20 @@ class RHTemplateContentJS(base.RH):
 class RHGetVarsJs(RHTemplateContentJS):
     _uh = urlHandlers.Derive(RHTemplateContentJS, "getVars")
 
+    _tplName = 'vars.js'
+
     def __init__(self, req):
         RHTemplateContentJS.__init__(self, req)
-        self._tplName = 'vars.js';
         self._dict = {}
 
+    @classmethod
+    def removeTmpVarsFile(cls):
+        cfg = Config.getInstance()
+        fileName = cfg.getTPLFile( cls._tplName )
+
+        if fileName == "":
+            fileName = "%s.tpl"%cls._tplName
+
+        htmlPath = os.path.join(cfg.getTempDir(), fileName+".tmp")
+        if os.access(htmlPath, os.R_OK):
+            os.remove(htmlPath)
