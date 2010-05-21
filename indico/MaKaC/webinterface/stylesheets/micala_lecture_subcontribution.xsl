@@ -20,13 +20,17 @@
 <xsl:stylesheet version='1.0' xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
+<!--  Generate the DOCTYPE for lecture.xml -->
+<xsl:output
+        method="LECTURE"
+        doctype-system="http://www.wlap.org/dtd/lecture.dtd"
+        indent="yes"/>
 
 <!-- Event -->
 <xsl:template match="event">
 
-<!--  <!DOCTYPE LECTURE SYSTEM "http://www.wlap.org/dtd/lecture.dtd">  -->
 <LECTURE>
-  <TITLE><xsl:value-of select="./contribution/subcontribution/title" /></TITLE>
+  <xsl:attribute name="TITLE"><xsl:value-of select="./contribution/subcontribution/title" /></xsl:attribute>
   <xsl:choose>
     <xsl:when test="./contribution/subcontribution/speakers/user != ''">
       <xsl:for-each select="./contribution/subcontribution/speakers/user">

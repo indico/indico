@@ -71,23 +71,6 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
         All of these methods update their status to micala DB.
         """
 
-        ###################################################################
-        # FOR DEBUGGING
-        resultSubmitMicalaMetadata = submitMicalaMetadata(self._aw,
-                                                          self._IndicoID,
-                                                          self._contentType,
-                                                          self._LODBID,
-                                                          self._params.get('LOID', None),
-                                                          self._videoFormat,
-                                                          self._languages)
-        if resultSubmitMicalaMetadata["success"] == False:
-            raise RecordingManagerException("CDS record creation failed.\n%s" % resultSubmitMicalaMetadata["result"])
-            return "micala metadata creation aborted."
-
-        return
-        # /FOR DEBUGGING!
-        ###################################################################
-
         # Get the MARC XML and submit it to CDS,
         # then update micala database Status table showing task completed.
         # do this for both plain_video and web_lecture talks
