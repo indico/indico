@@ -20,7 +20,7 @@
 
 # Most of the following imports are probably not necessary - to clean
 
-import os,time
+import os,time,re
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.locators as locators
@@ -40,7 +40,7 @@ from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum
 from MaKaC.rb_factory import Factory
 from MaKaC.rb_location import CrossLocationQueries, RoomGUID, Location
 from MaKaC.rb_tools import intd, FormMode, doesPeriodsOverlap
-from MaKaC.errors import MaKaCError, FormValuesError
+from MaKaC.errors import MaKaCError, FormValuesError, NoReportError
 from MaKaC.plugins.pluginLoader import PluginLoader
 
 class CandidateDataFrom( object ):
@@ -88,27 +88,40 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
         Assigns these values to self, or Nones if values
         are not present.
         """
+
         sDay = params.get( "sDay" )
+        eDay = params.get( "eDay" )
+        sMonth = params.get( "sMonth" )
+        eMonth = params.get( "eMonth" )
+        sYear = params.get( "sYear" )
+        eYear = params.get( "eYear" )
+
+        # For format checking
+        try:
+            time.strptime(sDay.strip() + "/" + sMonth.strip() + "/" + sYear.strip() , "%d/%m/%Y")
+        except ValueError:
+            raise NoReportError(_("The Start Date must be of the form DD/MM/YYYY and must be a valid date."))
+
+        try:
+            time.strptime(eDay.strip() + "/" + eMonth.strip() + "/" + eYear.strip() , "%d/%m/%Y")
+        except ValueError:
+            raise NoReportError(_("The End Date must be of the form DD/MM/YYYY and must be a valid date."))
+
         if sDay and len( sDay.strip() ) > 0:
             sDay = int( sDay.strip() )
 
-        eDay = params.get( "eDay" )
         if eDay and len( eDay.strip() ) > 0:
             eDay = int( eDay.strip() )
 
-        sMonth = params.get( "sMonth" )
         if sMonth and len( sMonth.strip() ) > 0:
             sMonth = int( sMonth.strip() )
 
-        eMonth = params.get( "eMonth" )
         if eMonth and len( eMonth.strip() ) > 0:
             eMonth = int( eMonth.strip() )
 
-        sYear = params.get( "sYear" )
         if sYear and len( sYear.strip() ) > 0:
             sYear = int( sYear.strip() )
 
-        eYear = params.get( "eYear" )
         if eYear and len( eYear.strip() ) > 0:
             eYear = int( eYear.strip() )
 
@@ -122,9 +135,21 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
 
         # process sTime and eTime
         if sTime and eTime:
+
+            try:
+                time.strptime(sTime, "%H:%M")
+            except ValueError:
+                raise NoReportError(_("The Start Time must be of the form HH:MM and must be a valid time."))
+
             t = sTime.split( ':' )
             sHour = int( t[0] )
             sMinute = int( t[1] )
+
+            try:
+                time.strptime(eTime, "%H:%M")
+            except ValueError:
+                raise NoReportError(_("The End Time must be of the form HH:MM and must be a valid time."))
+
             t = eTime.split( ':' )
             eHour = int( t[0] )
             eMinute = int( t[1] )
