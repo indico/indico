@@ -262,6 +262,11 @@ Please specify the directory where you'd like it to be placed.
         print 'Done!'
 
         directories['htdocs'] = os.path.join(os.getcwd(), 'indico', 'htdocs')
+        directories['bin'] = os.path.join(os.getcwd(), 'bin')
+        directories['etc'] = os.path.join(os.getcwd(), 'etc')
+        directories['doc'] = os.path.join(os.getcwd(), 'doc')
+
+        self._update_conf_dir_paths(local, directories)
 
         from MaKaC.consoleScripts.installBase import _databaseText, _findApacheUserGroup, _checkDirPermissions, _updateDbConfigFiles, _updateMaKaCEggCache
 
@@ -283,6 +288,13 @@ Please specify the directory where you'd like it to be placed.
         print '''
 %s
         ''' % _databaseText('etc')
+
+    def _update_conf_dir_paths(self, filepath, dirs):
+        fdata = open(filePath).read()
+        for dir in dirs.items():
+            d = dir[1].replace("\\","/") # For Windows users
+            fdata = re.sub('\/opt\/indico\/%s'%dir[0], d, fdata)
+        open(filePath, 'w').write(fdata)
 
 class tests_indico(Command):
     description = "run the test suite"
