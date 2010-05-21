@@ -21,6 +21,10 @@ if rbActive:
 else:
     locationList = None
 
+if Location.getDefaultLocation():
+    defaultLocation = Location.getDefaultLocation().friendlyName
+else:
+    defaultLocation = ""
 %>
 <% end %>
 
@@ -133,7 +137,7 @@ var Indico = {
         conference: <%= simplejson.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['conference'])) %>,
         category: <%= simplejson.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['category'])) %>},
         WeekDays: <%= [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ] %>,
-        DefaultLocation: '<%= str(Location.getDefaultLocation().friendlyName) %>',
+        DefaultLocation: '<%= str(defaultLocation) %>',
         Locations: <%= jsonEncode(locationList) %>
     },
     Settings: {
