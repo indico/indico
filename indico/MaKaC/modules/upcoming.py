@@ -17,14 +17,19 @@ import MaKaC.conference as conference
 from MaKaC.common.logger import Logger
 
 class UECacheEntry(MultiLevelCacheEntry):
-    def __init__(self, entryList=[]):
-        self._entryList = entryList
 
-    def addEntry(self, entry):
-        self._entryList.append(entry)
+    def getId(self):
+        """
+        Fixed id
+        """
+        return 'events'
 
-    def getContents(self):
-        return self._entryList
+    @classmethod
+    def create(cls, content):
+        entry = cls()
+        entry.setContent(content)
+        return entry
+
 
 class UpcomingEventsCache(MultiLevelCache, Persistent):
 
@@ -32,10 +37,15 @@ class UpcomingEventsCache(MultiLevelCache, Persistent):
     Cache for upcoming events (per user)
     """
 
+    _entryFactory = UECacheEntry
+
     def __init__(self, ttl=datetime.timedelta(minutes=5), dirty=False):
         self._ttl = ttl
         self._dirty = dirty
         MultiLevelCache.__init__(self, 'upcoming_events')
+
+    def _generateFileName(self, entry, version):
+        return entry.getId()
 
     def isDirty(self, path, object):
 
@@ -55,14 +65,13 @@ class UpcomingEventsCache(MultiLevelCache, Persistent):
     def getTTL(self):
         return self._ttl
 
-
-    def loadObject(self, path):
+    def loadObject(self):
         # TODO: Use user IDs, private events
-        return MultiLevelCache.loadObject(self, ['PUBLIC', path])
+        return MultiLevelCache.loadObject(self, '')
 
-    def cacheObject(self, objectId, object):
+    def cacheObject(self, object):
         # TODO: Use user IDs, private events
-        MultiLevelCache.cacheObject(self, ['PUBLIC'], objectId, object)
+        MultiLevelCache.cacheObject(self, '', object)
         self._dirty = False
 
 class ObservedObject(Persistent):
@@ -183,17 +192,16 @@ class UpcomingEventsModule(modules.Module):
     def getUpcomingEventList(self):
 
         # check if there's a valid cached copy first
-        fromCache = self._cache.loadObject('events')
+        fromCache = self._cache.loadObject()
 
         if fromCache:
             # Cache hit!
-            resultList = fromCache.getContents()
+            resultList = fromCache.getContent()
         else:
             resultList = map(self._processEventDisplay, self._generateList())
 
             # cache the results
-            cacheEntry = UECacheEntry(entryList = resultList)
-            self._cache.cacheObject('events', cacheEntry)
+            self._cache.cacheObject(resultList)
 
         ## TODO: Remove this
         ## HACK: Until this version goes to production
@@ -215,7 +223,7 @@ class UpcomingEventsModule(modules.Module):
                 filteredResultList.append(result)
             except:
                 pass
-                
+
         return filteredResultList
 
     def _generateList(self, date=None):
@@ -227,7 +235,7 @@ class UpcomingEventsModule(modules.Module):
 
         objDict = {}
 
-        for obj in self._objects:                    
+        for obj in self._objects:
             if isinstance(obj.getObject(), conference.Conference):
                 self.processEvent(date, obj.getObject(), obj, objDict)
             elif isinstance(obj.getObject(), conference.Category):
@@ -246,7 +254,7 @@ class UpcomingEventsModule(modules.Module):
         resultList = []
         keys = objDict.keys()
         keys.sort(reverse=True)
-        
+
         for weight in keys:
             sortedEvents = objDict[weight]
             sortedEvents.sort(key=operator.attrgetter('startDate'))
@@ -260,5 +268,5 @@ class UpcomingEventsModule(modules.Module):
         resultList.sort(key=operator.attrgetter('startDate'))
 
         Logger.get('upcoming_events').info("Regenerated upcoming event cache")
-        
+
         return resultList

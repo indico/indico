@@ -115,20 +115,27 @@ class MultiLevelCacheEntry(object):
     """
 
     def __init__(self):
-        self._date = None
+        pass
+
+    def getId(self):
+        """
+        Overloaded by subclasses
+        """
+        pass
 
     def pickle(self):
         return pickle.dumps(self)
 
-    def setDate(self, date):
-        self._date = date
+    def setContent(self, content):
+        self.content = content
 
-    def getDate(self):
-        return self._date
+    def getContent(self):
+        return self.content
 
     @classmethod
     def unpickle(self, data):
         return pickle.loads(data)
+
 
 
 class MultiLevelCache(object):
@@ -136,7 +143,10 @@ class MultiLevelCache(object):
     A multilevel cache
     """
 
+    __entryFactory = None
+
     def __init__(self, cacheName):
+
         self.cacheName = cacheName
         cacheDir = self.getCacheDir()
 
@@ -163,23 +173,41 @@ class MultiLevelCache(object):
 
             self._saveObject(dirPath, path[1:], fileName, data)
 
+
     def getCacheDir(self):
+        """
+        Returns the directory where the cache is located
+        Can be overriden by subclasses
+        """
         return os.path.join(Config().getInstance().getXMLCacheDir(), self.cacheName)
 
-    def cacheObject(self, path, fileName, obj):
+    def cacheObject(self, version, content, *args):
         """
-        path - Path where to store
-        fileName - File name to use
-        obj - MultiLevelCacheEntry to store
+        Actually puts an object into the cache
         """
 
-        obj.setDate(timezoneUtils.nowutc())
-        self._saveObject(self.getCacheDir(), path, fileName, obj.pickle())
-        Logger.get('cache/%s'%self.cacheName).debug("Saved %s" % (os.path.join(*(path + [fileName]))))
+        entry = self._entryFactory.create(content, *args)
 
-    def loadObject(self, fnList):
+        path = self._generatePath(entry)
 
-        filePath = os.path.join(*([self.getCacheDir()] + fnList))
+        fileName = self._generateFileName(entry, version)
+
+        self._saveObject(self.getCacheDir(), path, fileName, entry.pickle())
+
+        Logger.get('cache/%s' % self.cacheName).debug(
+            "Saved %s" % (os.path.join(*(path + [fileName]))))
+
+    def loadObject(self, version, *args):
+        """
+        Loads an object from the cache, returning None if it doesn't exist
+        or in case it is dirty (has expired)
+        """
+
+        dummyEntry = self._entryFactory.create(None, *args)
+
+        filePath = os.path.join(*([self.getCacheDir()] +
+                                  self._generatePath(dummyEntry) +
+                                  [self._generateFileName(dummyEntry, version)]))
 
         Logger.get('cache/%s'%self.cacheName).debug("Checking %s...", filePath)
         if os.path.isfile(filePath):
@@ -209,6 +237,23 @@ class MultiLevelCache(object):
             Logger.get('cache/%s'%self.cacheName).debug("MISS")
             # Cache miss!
             return None
+
+
+    def _generatePath(self, entry):
+        """
+        Generate the actual hierarchical location
+        Can be overriden
+        """
+
+        return [entry.getId()[0]]
+
+    def _generateFileName(self, entry, version):
+        """
+        Generate the file name
+        Can be overriden
+        """
+
+        return '%s_%s' % (entry.getId(), version)
 
     def isDirty(self, path, object):
         """

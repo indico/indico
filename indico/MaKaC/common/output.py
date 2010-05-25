@@ -41,7 +41,7 @@ from xmlGen import XMLGen
 import os, time
 from MaKaC.i18n import _
 from MaKaC.common.timezoneUtils import DisplayTZ, nowutc
-from MaKaC.common.utils import getHierarchicalId
+from MaKaC.common.utils import getHierarchicalId, resolveHierarchicalId
 from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
 from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
 
@@ -854,14 +854,14 @@ class outputGenerator:
         version = "ses-%s_cont-%s_mat-%s_sch-%s"%(includeSession,includeContribution,includeMaterial,False)
         obj = None
         if not forceCache:
-            obj = self.cache.loadObject(conf, version)
+            obj = self.cache.loadObject(version, conf)
         if obj:
-            xml = obj.xml
+            xml = obj.getContent()
         else:
             temp = XMLGen(init=False)
             self._confToXML(conf,None,includeSession,includeContribution,includeMaterial,showSession=showSession, showDate="all", showContribution=showContribution, showWithdrawed=False, useSchedule=False, out=temp)
             xml = temp.getXml()
-            self.cache.cacheObject(conf, version, xml)
+            self.cache.cacheObject(version, xml, conf)
         #    out.writeTag("cache", "not found in cache")
         #else:
         #    out.writeTag("cache", "found in cache")
@@ -881,16 +881,16 @@ class outputGenerator:
         version = "MARC21_ses-%s_cont-%s_mat-%s"%(includeSession,includeContribution,includeMaterial)
         obj = None
         if not forceCache:
-            obj = self.cache.loadObject(conf, version)
+            obj = self.cache.loadObject(version, conf)
         if obj:
-            xml = obj.xml
+            xml = obj.getContent()
         else:
             # No cache, build the XML
             temp = XMLGen(init=False)
             self._confToXMLMarc21(conf,includeSession,includeContribution,includeMaterial, out=temp)
             xml = temp.getXml()
             # save XML in cache
-            self.cache.cacheObject(conf, version, xml)
+            self.cache.cacheObject(version, xml, conf)
         out.writeXML(xml)
 
     def _confToXMLMarc21(self,conf,includeSession=1,includeContribution=1,includeMaterial=1,out=None):
@@ -1171,16 +1171,16 @@ class outputGenerator:
         version = "MARC21_mat-%s"%(includeMaterial)
         obj = None
         if not forceCache:
-            obj = self.cache.loadObject(cont, version)
+            obj = self.cache.loadObject(version, cont)
         if obj:
-            xml = obj.xml
+            xml = obj.getContent()
         else:
             # No cache, build the XML
             temp = XMLGen(init=False)
             self._contribToXMLMarc21(cont,includeMaterial, out=temp)
             xml = temp.getXml()
             # save XML in cache
-            self.cache.cacheObject(cont, version, xml)
+            self.cache.cacheObject(version, xml, cont)
         out.writeXML(xml)
 
 
@@ -1350,16 +1350,16 @@ class outputGenerator:
         version = "MARC21_mat-%s"%(includeMaterial)
         obj = None
         if not forceCache:
-            obj = self.cache.loadObject(subCont, version)
+            obj = self.cache.loadObject(version, subCont)
         if obj:
-            xml = obj.xml
+            xml = obj.getContent()
         else:
             # No cache, build the XML
             temp = XMLGen(init=False)
             self._subContribToXMLMarc21(subCont,includeMaterial, out=temp)
             xml = temp.getXml()
             # save XML in cache
-            self.cache.cacheObject(subCont, version, xml)
+            self.cache.cacheObject(version, xml, subCont)
         out.writeXML(xml)
 
 
@@ -1586,50 +1586,57 @@ class outputGenerator:
         #out.writeTag("creationDate",creationDateStr)
 
 class XMLCacheEntry(MultiLevelCacheEntry):
-    def __init__(self, xml, oaiDate):
+    def __init__(self, objId):
         MultiLevelCacheEntry.__init__(self)
-        self.xml = xml
-        self.oaiDate = oaiDate
+        self.id = objId
 
-    def getOAIDate(self):
-        return self.oaiDate
+    def getId(self):
+        return self.id
+
+    @classmethod
+    def create(cls, content, obj):
+        entry = cls(getHierarchicalId(obj))
+        entry.setContent(content)
+        return entry
+
 
 class XMLCache(MultiLevelCache):
+
+    _entryFactory = XMLCacheEntry
 
     def __init__(self):
         MultiLevelCache.__init__(self, 'xml')
 
-    def _getRecordId(self, obj):
-        """ Retrieves the ID of a given record """
 
-        return getHierarchicalId(obj)
+    def isDirty(self, file, object):
 
-    def _generateFileName(self, id, version):
-        return '%s_%s' % (id, version)
+        # get event OAI date
+        oaiModDate = resolveHierarchicalId(object.getId()).getOAIModificationDate()
+        fileModDate = timezone("UTC").localize(
+            datetime.utcfromtimestamp(os.path.getmtime(file)))
 
-    def _generatePath(self, obj):
-        """ Generate the actual hierarchical location """
+        # check file system date vs. event date
+        return (oaiModDate > fileModDate)
+
+    def _generatePath(self, entry):
+        """
+        Generate the actual hierarchical location
+        """
 
         # by default, use the dots and first char
         # a205.0 -> /cachedir/a/a205/0
 
-        tree = self._getRecordId(obj).split('.')
+        tree = entry.getId().split('.')
         return [tree[0][0]]+tree
 
-    def isDirty(self, file, object):
-        objectDate = time.mktime(object.getOAIDate().timetuple())
-
-        # check file system date vs. event date
-        return (os.path.getmtime(file) < objectDate)
-
-    def cacheObject(self, obj, version, xml):
-        MultiLevelCache.cacheObject(self, self._generatePath(obj), self._generateFileName(obj.getId(), version), XMLCacheEntry(xml, obj.getOAIModificationDate()))
-
-
-    def loadObject(self, obj, version):
-        return MultiLevelCache.loadObject(self, self._generatePath(obj) + [self._generateFileName(obj.getId(), version)])
 
 class ProtectedXMLCache(XMLCache):
+    """
+    XMLCache that is content protection-aware
+    It uses a DataInt, in order to map object to their
+    corresponding ids (rXXX, pXXX)
+    """
+
 
     def __init__(self, dataInt):
         XMLCache.__init__(self)
@@ -1639,7 +1646,9 @@ class ProtectedXMLCache(XMLCache):
         return self.dataInt.objToId(obj, separator='.')
 
     def generatePath(self, obj):
-        """ Generate the actual hierarchical location """
+        """
+        Generate the actual hierarchical location
+        """
 
         # by default, use the dots and first char
         # pa205.0 -> /cachedir/p/a/a205/0

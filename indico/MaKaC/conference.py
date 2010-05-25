@@ -2559,13 +2559,13 @@ class Conference(Persistent, Fossilizable):
     def getAbstractMgr(self):
         return self.abstractMgr
 
-    def notifyModification( self, date=None ):
+    def notifyModification( self, date=None, updateChildren=False):
         """Method called to notify the current conference has been modified.
         """
         if not date:
             date = nowutc()
         self._modificationDS = date
-        self.notifyOAIModification(date=date)
+        self.notifyOAIModification(date=date, updateChildren = updateChildren)
         self.cleanCache()
         self._p_changed=1
 
@@ -3169,7 +3169,7 @@ class Conference(Persistent, Fossilizable):
 
         self.title = title
         self.cleanCategoryCache()
-        self.notifyModification()
+        self.notifyModification(updateChildren = True)
 
         #we notify the observers that the conference's title has changed
         for observer in self.getObservers():

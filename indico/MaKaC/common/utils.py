@@ -23,7 +23,7 @@ from random import randint
 from datetime import datetime, date, timedelta
 from MaKaC.common.timezoneUtils import isSameDay, isToday, getAdjustedDate,\
     isTomorrow
-from MaKaC import user
+from MaKaC import user, errors
 from MaKaC.i18n import _
 
 # fcntl is only available for POSIX systems
@@ -553,7 +553,10 @@ def normalizeToList(l):
 
 def getHierarchicalId(obj):
 
-    """ Gets the ID of a Conference, Contribution or Subcontribution, in an hierarchical manner"""
+    """
+    Gets the ID of a Conference, Contribution or Subcontribution,
+    in an hierarchical manner
+    """
 
     from MaKaC import conference
 
@@ -569,6 +572,55 @@ def getHierarchicalId(obj):
     elif isinstance(obj, conference.SessionSlot):
         ret="%s.s%s.%s"%(obj.getConference().getId(), obj.getSession().getId(), ret)
     return ret
+
+def resolveHierarchicalId(objId):
+    """
+    Gets an object from its Id (unless it doesn't exist,
+    in which case it returns None
+    """
+
+    from MaKaC.conference import ConferenceHolder
+
+    m = re.match(r'(\w+)(?:\.(s?)(\w+))?(?:\.(\w+))?', objId)
+
+    # If the expression doesn't match at all, return
+    if not m or not m.groups()[0]:
+        return None
+
+    try:
+        m = m.groups()
+        conference = ConferenceHolder().getById(m[0])
+
+        if m[1]:
+            # session id specified - session or slot
+            session = conference.getSessionById(m[2])
+
+            if m[3]:
+                # session slot: 1234.s12.1
+                return session.getSlotById(m[3])
+            else:
+                # session: 1234.s12
+                return session
+        else:
+            if m[2]:
+                # second token is not a session id
+                # (either contribution or subcontribution)
+
+                contribution = conference.getContributionById(m[2])
+
+                if m[3]:
+                    # subcontribution: 1234.12.1
+                    return contribution.getSubContributionById(m[3])
+                else:
+                    # contribution: 1234.12
+                    return contribution
+            else:
+                # there's not second token
+                # it's definitely a conference
+                return conference
+
+    except errors.MaKaCError:
+        return None
 
 def truncate(text, maxSize):
     if len(text) > maxSize:
