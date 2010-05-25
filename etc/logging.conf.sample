@@ -1,0 +1,46 @@
+[loggers]
+keys=root
+
+[handlers]
+keys=indico,other,smtp
+
+[formatters]
+keys=defaultFormatter,mailFormatter
+
+# For deactivating a handler, remove its entry from
+# the list below.
+[logger_root]
+level=DEBUG
+handlers=indico,other,smtp
+
+# By default, the args are taken from the indico.conf file.
+# For setting your custom arguments, uncomment the args entry below.
+[handler_indico]
+class=FileHandler
+level=NOTSET
+formatter=defaultFormatter
+#args=('',)
+
+# By default, the args are taken from the indico.conf file.
+# For setting your custom arguments, uncomment the args entry below.
+[handler_other]
+class=FileHandler
+level=WARNING
+formatter=defaultFormatter
+#args=('',)
+
+# By default, the args are taken from the indico.conf file.
+# For setting your custom arguments, uncomment args the entry below.
+[handler_smtp]
+class=handlers.SMTPHandler
+level=ERROR
+formatter=mailFormatter
+#args=('','',[],'')
+
+[formatter_mailFormatter]
+format=%(asctime)s %(name)s - %(levelname)s %(filename)s:%(lineno)d:%(funcName)s -- %(message)s
+datefmt=
+
+[formatter_defaultFormatter]
+format=%(asctime)s %(name)-16s: %(levelname)-8s - %(message)s
+datefmt=

@@ -25,8 +25,6 @@ from MaKaC.i18n import _
 
 from MaKaC.common.logger import Logger
 
-from MaKaC.common.logger import Logger
-
 class GenericMailer:
 
     @staticmethod
@@ -50,7 +48,7 @@ class GenericMailer:
         for cc in notification.getCCList() :
             if len(cc) == 0 :
                 notification.getCCList().remove(cc)
-        
+
         to=", ".join(notification.getToList())
 #        raise to
         cc=""
@@ -73,7 +71,7 @@ class GenericMailer:
         server.quit()
 
         Logger.get('mail').debug('Mail sent to %s' % to)
-        
+
     def sendAndLog(notification, conference, module="", user = None):
         GenericMailer.send(notification)
         logData = {}
@@ -85,7 +83,7 @@ class GenericMailer:
             logData["toList"] = notification._toList
         except:
             logData["toList"] = notification.getToList()
-        logData["ccList"] = notification._ccList 
+        logData["ccList"] = notification._ccList
         try:
             logData["subject"] = notification._subject
         except:

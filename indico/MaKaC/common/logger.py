@@ -1,7 +1,8 @@
-import os, logging
+import os, logging.config
 import logging.handlers
 
 from MaKaC.common.Configuration import Config
+import ConfigParser
 
 class ExtraIndicoFilter(logging.Filter):
 
@@ -10,6 +11,95 @@ class ExtraIndicoFilter(logging.Filter):
             return 0
         return 1
 
+class LoggerUtils:
+
+    @classmethod
+    def configFromFile(self, fname, defaultArgs, filters):
+        """
+        Read the logging configuration from the logging.conf file.
+        Fetch default values if the logging.conf file is not set.
+        """
+
+        if not os.path.exists(fname):
+            return
+
+        cp = ConfigParser.ConfigParser()
+        if hasattr(cp, 'readfp') and hasattr(fname, 'readline'):
+            cp.readfp(fname)
+        else:
+            cp.read(fname)
+
+        formatters = logging.config._create_formatters(cp)
+
+        logging._acquireLock()
+        try:
+            logging._handlers.clear()
+            del logging._handlerList[:]
+            handlers = self._install_handlers(cp, defaultArgs, formatters, filters)
+            try:
+                logging.config._install_loggers(cp, handlers)
+            except TypeError:
+                logging.config._install_loggers(cp, handlers, False)
+
+        finally:
+            logging._releaseLock()
+
+    @classmethod
+    def _install_handlers(self, cp, defaultArgs, formatters, filters = None):
+        """
+        Install and return handlers. If a handler configuration
+        is missing its args, fetches the default values from the
+        indico.conf file
+        """
+        hlist = cp.get("handlers", "keys")
+        if not len(hlist):
+            return {}
+        hlist = hlist.split(",")
+        handlers = {}
+        fixups = [] #for inter-handler references
+
+        for hand in hlist:
+            sectname = "handler_%s" % hand.strip()
+            klass = cp.get(sectname, "class")
+            opts = cp.options(sectname)
+            if "formatter" in opts:
+                fmt = cp.get(sectname, "formatter")
+            else:
+                fmt = ""
+            klass = eval(klass, vars(logging))
+            if "args" in opts :
+                # if the args are not present in the file,
+                # take default values
+                args = cp.get(sectname, "args")
+            else :
+                try:
+                    args = defaultArgs[hand.strip()]
+                except KeyError:
+                    continue
+            args = eval(args, vars(logging))
+            h = apply(klass, args)
+            if "level" in opts:
+                level = cp.get(sectname, "level")
+                h.setLevel(logging._levelNames[level])
+            if len(fmt):
+                h.setFormatter(formatters[fmt])
+            if filters and hand.strip() in filters:
+                for fltr in filters[hand.strip()]:
+                    h.addFilter(fltr)
+            #temporary hack for FileHandler and MemoryHandler.
+            if klass == logging.handlers.MemoryHandler:
+                if "target" in opts:
+                    target = cp.get(sectname,"target")
+                else:
+                    target = ""
+                if len(target): #the target handler may not be loaded yet, so keep for later...
+                    fixups.append((h, target))
+            handlers[hand] = h
+        #now all handlers are loaded, fixup inter-handler references...
+        for h, t in fixups:
+            h.setTarget(handlers[t])
+        return handlers
+
 class Logger:
     """
     Encapsulates the features provided by the standard logging module
@@ -17,44 +107,28 @@ class Logger:
 
     config = Config.getInstance()
 
-    __rootLogger = logging.getLogger('')
-
-    __indicoFileHandler = logging.FileHandler(os.path.join(config.getLogDir(), 'indico.log'),'a')
-    __otherFileHandler = logging.FileHandler(os.path.join(config.getLogDir(), 'other.log'),'a')
-
-    __formatter = logging.Formatter('%(asctime)s %(name)-16s: %(levelname)-8s %(message)s')
-    __indicoFileHandler.setFormatter(__formatter)
-    __otherFileHandler.setFormatter(__formatter)
-    __indicoFileHandler.addFilter(logging.Filter('indico'))
-    __otherFileHandler.addFilter(ExtraIndicoFilter())
-
+    configDir = config.getLogDir()
+    smtpServer = config.getSmtpServer()
     serverName = config.getWorkerName()
     if not serverName:
         serverName = config.getHostNameURL()
 
-    # TODO: add config option to disable this?
-    __smtpHandler = logging.handlers.SMTPHandler(config.getSmtpServer(),
-                                            'logger@%s' % serverName,
-                                            config.getSupportEmail(),
-                                            'Unexpected Exception occurred at %s' % serverName)
+    # Default arguments for the handlers, taken mostly for the configuration
+    defaultArgs = { 'indico' : "('%s', 'a')" %os.path.join(configDir, 'indico.log'),
+                    'other'  : "('%s', 'a')" %os.path.join(configDir, 'other.log'),
+                    'smtp'   : "('%s', 'logger@%s', ['%s'], 'Unexpected Exception occurred at %s')"
+                                %(smtpServer, serverName, config.getSupportEmail(), serverName)
+                    }
 
-    __smtpHandler.addFilter(logging.Filter('indico'))
-    __smtpHandler.setLevel(logging.ERROR)
-    __smtpHandler.setFormatter(logging.Formatter("%(asctime)s %(name)s - %(levelname)s %(filename)s:%(lineno)d\n\n%(message)s"))
+    # Lists of filters for each handler
+    filters = {'indico' : [logging.Filter('indico')],
+               'other'  : [ExtraIndicoFilter()],
+               'smtp'   : [logging.Filter('indico')]}
 
-    __rootLogger.addHandler(__indicoFileHandler)
-    __rootLogger.addHandler(__otherFileHandler)
-    __otherFileHandler.setLevel(logging.WARNING)
-    __rootLogger.addHandler(__smtpHandler)
+    logConfFilepath = os.path.join(config.getConfigurationDir(), "logging.conf")
 
-    # TODO: see savannah task
-    # if it's debug mode, be more exhaustive
-    #if DEBUG or HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive():
-    #    __rootLogger.setLevel(logging.DEBUG)
-    #else:
-    #    __rootLogger.setLevel(logging.WARNING)
-
-    __rootLogger.setLevel(logging.DEBUG)
+    #logging.config.fileConfig(logConfFilepath)
+    LoggerUtils.configFromFile(logConfFilepath, defaultArgs, filters)
 
     @classmethod
     def get(cls, module=''):
