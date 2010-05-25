@@ -240,10 +240,10 @@
 		</xsl:for-each>
         )</xsl:if>
         <xsl:if test="count(child::material) != 0">
-        (<xsl:for-each select="./material">
+        <xsl:for-each select="./material">
         <xsl:apply-templates select="."><xsl:with-param name="contribId" select="../ID"/></xsl:apply-templates>
         <xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
-        </xsl:for-each>)
+        </xsl:for-each>
         </xsl:if>
       </td>
       <td align="right">
@@ -314,10 +314,10 @@
 		</xsl:for-each>
         )</xsl:if>
 		<xsl:if test="count(child::material) != 0">
-			(<xsl:for-each select="./material">
+			<xsl:for-each select="./material">
 			<xsl:apply-templates select="."><xsl:with-param name="contribId" select="../../ID"/><xsl:with-param name="subContId" select="../ID"/></xsl:apply-templates>
 			<xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
-			</xsl:for-each>)
+			</xsl:for-each>
 		</xsl:if>
 		<xsl:if test="./abstract != ''">
 			<br/><small><xsl:apply-templates select="./abstract"/></small>
