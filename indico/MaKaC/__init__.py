@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 DEVELOPMENT = 0
-__version__="0.97b2"
+__version__="0.97-rc1"
 
 def setEnvironment():
     import os
