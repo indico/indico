@@ -26,6 +26,8 @@
 	<xsl:value-of select="./rn" disable-output-escaping="yes"/>
 </xsl:template>
 
+<xsl:variable name="closed" select="/iconf/closed"/>
+
 <xsl:template name="displayModifIcons">
     <xsl:param name="item"/>
     <xsl:param name="confId"/>
@@ -42,8 +44,7 @@
     -->
     <xsl:param name="alignMenuRight">false</xsl:param>
     <xsl:variable name="menuName">menu<xsl:value-of select="$confId"/><xsl:value-of select="translate($sessCode, '-','')"/><xsl:value-of select="$contId"/><xsl:value-of select="$subContId"/></xsl:variable>
-
-    <xsl:if test="$item/modifyLink != '' or $item/materialLink != '' or $item/minutesLink != ''">
+    <xsl:if test="$closed = 'False' and ($item/modifyLink != '' or $item/materialLink != '' or $item/minutesLink != '')">
         <!-- script that creates a variable for a menu  -->
 
         <xsl:choose>

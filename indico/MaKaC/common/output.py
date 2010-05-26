@@ -231,7 +231,6 @@ class outputGenerator:
 
         if not out:
             out = self._XMLGen
-
         if vars and vars.has_key("frame") and vars["frame"] == "no":
             modificons = 0
         else:
@@ -317,6 +316,8 @@ class outputGenerator:
         evaluation = conf.getEvaluation()
         if evaluation.isVisible() and evaluation.inEvaluationPeriod() and evaluation.getNbOfQuestions()>0 :
             out.writeTag("evaluationLink",urlHandlers.UHConfEvaluationDisplay.getURL(conf))
+
+        out.writeTag("closed", str(conf.isClosed()))
 
 #        if len(conf.getBookingsList()):
 #            out.openTag("videoconference")
