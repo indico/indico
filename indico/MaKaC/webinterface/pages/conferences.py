@@ -6862,6 +6862,16 @@ class WConfModifDisplayConfHeader(wcomponents.WTemplated):
             vars["searchBoxTextIcon"]=disabledText
         vars["searchBoxURL"]=quoteattr(str(urlSB))
 
+        #enable or disable navigation icons
+        vars["confType"] = self._conf.getType()
+        urlSB=urlHandlers.UHConfModifToggleNavigationBar.getURL(self._conf)
+        if displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getDisplayNavigationBar():
+            vars["navigationBoxIcon"]=vars["enablePic"]
+            vars["navigationBoxTextIcon"]=enabledText
+        else:
+            vars["navigationBoxIcon"]=vars["disablePic"]
+            vars["navigationBoxTextIcon"]=disabledText
+        vars["navigationBoxURL"]=quoteattr(str(urlSB))
 
         return vars
 

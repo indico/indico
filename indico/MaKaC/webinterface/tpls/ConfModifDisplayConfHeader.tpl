@@ -1,13 +1,13 @@
 <a name="tickertape"></a>
 <div class="groupItem">
-    
+
     <table class="groupTable">
         <tr>
             <td colspan="2">
                 <div class="groupTitle"> <%= _("Announcement")%></div>
             </td>
         </tr>
-        
+
         <tr>
             <td nowrap class="dataCaptionTD"><span class="titleCellFormat"> <%= _("Status")%></span></td>
             <td bgcolor="white" width="65%%" class="blacktext"><b>%(status)s</b>
@@ -25,12 +25,12 @@
                 <form action=%(tickertapeURL)s method="POST" style="margin:0;">
                     <input type="text" size="60" name="ttText" value=%(text)s>
                     <input type="submit" class="btn" name="savettText" value="<%= _("save")%>"> %(modifiedText)s<br>
-                
+
                     <small> <%= _("""Note that text announcement must be enabled above to display this text""")%></small>
                 </form>
             </td>
         </tr>
-        
+
         <tr>
             <td colspan="2">
                 <a name="headerFeatures"></a>
@@ -58,6 +58,13 @@
                         <a href=%(searchBoxURL)s><img src=%(searchBoxIcon)s alt="%(searchBoxTextIcon)s" class="imglink">&nbsp; <%= _("Display search box")%></a>
                     </td>
                 </tr>
+                <% if confType == "conference" : %>
+                <tr>
+                    <td>
+                        <a href=%(navigationBoxURL)s><img src=%(navigationBoxIcon)s alt="%(navigationBoxTextIcon)s" class="imglink">&nbsp; <%= _("Display navigation bar")%></a>
+                    </td>
+                </tr>
+                <% end %>
               </table>
             </td>
         </tr>

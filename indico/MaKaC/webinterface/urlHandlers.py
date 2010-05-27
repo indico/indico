@@ -1770,6 +1770,9 @@ class UHConfModifParticipantsSendEmail( URLHandler ):
 class UHConfModifToggleSearch( URLHandler ):
     _relativeURL = "confModifDisplay.py/toggleSearch"
 
+class UHConfModifToggleNavigationBar( URLHandler ):
+    _relativeURL = "confModifDisplay.py/toggleNavigationBar"
+
 class UHTickerTapeAction( URLHandler ):
     _relativeURL = "confModifDisplay.py/tickerTapeAction"
 

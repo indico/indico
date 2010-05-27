@@ -457,6 +457,7 @@ class WConferenceHeader( WHeader ):
         vars["usingModifKey"]=False
         if self._conf.canKeyModify(self._aw):
             vars["usingModifKey"]=True
+        vars["displayNavigationBar"] = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getDisplayNavigationBar()
         return vars
 
 class WMenuConferenceHeader( WConferenceHeader ):

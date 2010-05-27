@@ -121,6 +121,9 @@ class ConfDisplayMgr(DisplayMgr):
         # Caption for the email support
         self._supportEmailCaption = "Support"
 
+        # Displaying navigation bar
+        self._displayNavigationBar = True
+
     def clone(self, conf):
         newCdm = ConfDisplayMgrRegistery().getDisplayMgr(conf)
         # default style
@@ -164,6 +167,15 @@ class ConfDisplayMgr(DisplayMgr):
     #################################
     # Fermi timezone awareness(end) #
     #################################
+
+
+    def getDisplayNavigationBar(self):
+        if not hasattr(self, "_displayNavigationBar"):
+            self._displayNavigationBar = True
+        return self._displayNavigationBar
+
+    def setDisplayNavigationBar(self, value):
+        self._displayNavigationBar = value
 
     def getMenu(self):
         if self._menu.getParent() == None:
