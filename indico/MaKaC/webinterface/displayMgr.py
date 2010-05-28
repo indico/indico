@@ -125,7 +125,7 @@ class ConfDisplayMgr(DisplayMgr):
         self._displayNavigationBar = True
 
     def clone(self, conf):
-        newCdm = ConfDisplayMgrRegistery().getDisplayMgr(conf)
+        newCdm = ConfDisplayMgrRegistery().getDisplayMgr(conf, update=False)
         # default style
         newCdm.setDefaultStyle(self.getDefaultStyle())
         # clone the menu
@@ -256,13 +256,7 @@ class Menu(Persistent):
         newList = []
         for link in self.getLinkList():
             id = link.getId()
-            newLink = None
-            if newMenu.getLinkById(id) != None:
-                newLink = newMenu.getLinkById(id)
-            elif type(link) is ExternLink:
-                newLink = link.clone(newMenu)
-            if newLink != None:
-                newList.append(newLink)
+            newList.append(link.clone(newMenu))
         if len(newList) != 0:
             newMenu._listLink = newList
         return newMenu
@@ -754,6 +748,24 @@ class SystemLink(Link):
     The URL is dynamicly generated
     """
     Type = "system"
+
+    def clone(self, newMenu):
+        newLink = SystemLink(self.getName(), newMenu)
+        newLink.setEnabled(self.isEnabled())
+        newLink.setVisible(self.isVisible())
+        newLink.setId(self.getId())
+        newLink.setDisplayTarget(self.getDisplayTarget())
+        newLink.setCaption(self.getCaption(), store = True)
+        newLink.setURL(self.getURL())
+        newLink.setStaticURL(self.getStaticURL())
+
+        listLink = []
+        for link in self.getLinkList():
+            listLink.append(link.clone(newLink))
+
+        newLink._listLink = listLink
+
+        return newLink
 
     def getURL(self):
         return self._v_URL
