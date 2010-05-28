@@ -329,7 +329,7 @@ class _AbstractSubmissionNotification:
         for track in self._abstract.getTrackListSorted():
             tracks.append( """%s"""%track.getTitle() )
         tw = TextWrapper()
-        msg = [ _("""_("Dear") %s,""")%self._abstract.getSubmitter().getFullName() ]
+        msg = [ _("""_("Dear") %s,""")%self._abstract.getSubmitter().getStraightFullName() ]
         msg.append( "" )
         msg.append( tw.fill(_("The submission of your abstract has been successfully processed.")) )
         msg.append( "" )
