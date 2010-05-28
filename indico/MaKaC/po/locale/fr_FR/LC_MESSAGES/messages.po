@@ -16474,6 +16474,10 @@ msgstr "pas encore ouvert"
 msgid "Chairperson text"
 msgstr "Texte du responsable"
 
+#: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConferenceDataModification.tpl
+msgid "Chairperson text is deprecated, use chairpersons list instead.<br>Click on the red cross to remove the text."
+msgstr "Le texte du responsable est obsolète, veuillez utiliser la liste des responsables à la place.<br>Cliquez sur la croix rouge pour supprimer le texte."
+
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/RoomBookingManyRoomsCalendar.tpl:15
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/RoomBookingRoomCalendar.tpl:41
 msgid "Conflict with PRE-Booking"
